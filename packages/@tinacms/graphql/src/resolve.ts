@@ -246,12 +246,24 @@ export const resolve = async ({
                       collectionName: args.collection,
                       relativePath: args.relativePath,
                     });
-                  case 'createDocument':
+                  case 'createDocument': {
+                    assertShape<{
+                      params: {
+                        // [args.collection]: Record<string, unknown>; .. effectively.
+                      }
+                    }>(args, (yup) =>
+                      yup.object({
+                        params: yup.object().shape({
+                          [args.collection]: yup.object().required()
+                        }).required()
+                      })
+                    );
                     return resolver.resolveCreateDocument({
                       collectionName: args.collection,
                       relativePath: args.relativePath,
-                      args,
+                      body: args.params[args.collection],
                     });
+                  }
                   case 'updateDocument': {
                     assertShape<{
                       params: {
@@ -355,10 +367,17 @@ export const resolve = async ({
 
               if (isMutation) {
                 if (isCreation) {
+                  assertShape<{
+                    params: Record<string, unknown>
+                  }>(args, (yup) =>
+                    yup.object({
+                      params: yup.object().required()
+                    })
+                  );
                   return resolver.resolveCreateDocument({
                     collectionName: lookup.collection,
                     relativePath: args.relativePath,
-                    args
+                    body: args.params,
                   });
                 } else {
                   assertShape<{
@@ -421,7 +440,19 @@ export const resolve = async ({
               if (!unionValue) {
                 const unionArgs = args as { relativePath?: string };
                 if (unionArgs.relativePath) {
-                  // FIXME: unionData doesn't have enough info
+                  console.log(' *** Requesting additional unionData for ', unionArgs.relativePath, ' ***');
+                  console.log(`isMutation = '${isMutation}', isCreation = '${isCreation}'`);
+                  console.log(args);
+                  // FIXME: there is a bug in the lookup generation where the create fieldname is not generated.
+                  /* if (isMutation) {
+                    if (isCreation) {
+                      return resolver.resolveCreateDocument({
+                        collectionName: lookup.collection,
+                        relativePath: args.relativePath,
+                        args.params
+                      })
+                    }
+                  } */
                   const result = await resolver.resolveDocument({
                     args,
                     collection: lookup.collection,

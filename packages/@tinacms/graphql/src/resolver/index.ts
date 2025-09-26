@@ -862,11 +862,11 @@ export class Resolver {
   public resolveCreateDocument = async ({
     collectionName,
     relativePath,
-    args,
+    body,
   }: {
     collectionName: string;
     relativePath: string;
-    args: Record<string, unknown>;
+    body: Record<string, unknown>;
   }) => {
     const collection = this.getCollectionWithName(collectionName);
     const realPath = path.join(collection.path, relativePath);
@@ -876,7 +876,7 @@ export class Resolver {
     }
 
     const params = await this.buildObjectMutations(
-      args.params[collection.name],
+      body,
       collection
     );
     // @ts-expect-error
