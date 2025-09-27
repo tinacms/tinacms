@@ -86,8 +86,8 @@ export const resolve = async ({
         info: GraphQLResolveInfo
       ) => {
         try {
-          /**
-           * `collection`
+          /*
+           * 'collections' and 'collection'.
            */
           const returnType = getNamedType(info.returnType).toString();
           if (returnType === 'Collection') {
@@ -271,7 +271,7 @@ export const resolve = async ({
 
               return possibleValue;
 
-            /**
+            /*
              * eg `getMovieDocument.data.actors`
              */
             case 'multiCollectionDocumentList':
@@ -315,7 +315,7 @@ export const resolve = async ({
                 `Expected an array for result of ${info.fieldName} at ${info.path}`
               );
 
-            /**
+            /*
              * Collections-specific getter
              * eg. `getPostDocument`/`createPostDocument`/`updatePostDocument`
              *
@@ -366,7 +366,7 @@ export const resolve = async ({
               }
             }
 
-            /**
+            /*
              * Collections-specific list getter
              * eg. `getPageList`
              */
@@ -381,7 +381,7 @@ export const resolve = async ({
                 collection: tinaSchema.getCollection(lookup.collection),
               });
 
-            /**
+            /*
              * A polymorphic data set, it can be from a document's data
              * of any nested object which can be one of many shapes
              *
