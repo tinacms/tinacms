@@ -349,7 +349,7 @@ export class Resolver {
   }
 
   public resolveCollection = async (
-    args,
+    _args,
     collectionName: string,
     hasDocuments?: boolean
   ) => {
