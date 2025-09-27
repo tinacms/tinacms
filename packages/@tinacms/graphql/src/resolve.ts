@@ -166,102 +166,110 @@ export const resolve = async ({
               return resolver.getDocument(args.id);
 
             case 'multiCollectionDocument':
-              const possibleReferenceValue = source[info.fieldName];
-              if (
-                typeof possibleReferenceValue === 'string' &&
-                possibleReferenceValue !== ''
-              ) {
+              const possibleValue = source[info.fieldName];
+              if (typeof possibleValue === 'string' && possibleValue !== '') {
                 // This is a reference value (`director: /path/to/george.md`)
-                return resolver.getDocument(possibleReferenceValue);
+                return resolver.getDocument(possibleValue);
               }
 
-              assertShape<{
-                collection: string;
-                relativePath: string;
-              }>(args, (yup) =>
-                yup.object({
-                  collection: yup.string().required(),
-                  relativePath: yup.string().required(),
-                })
-              );
+              if (
+                [
+                  NAMER.documentQueryName(),
+                  'addPendingDocument',
+                  'createDocument',
+                  'updateDocument',
+                  'deleteDocument',
+                  'createFolder',
+                ].includes(info.fieldName)
+              ) {
+                assertShape<{
+                  collection: string;
+                  relativePath: string;
+                }>(args, (yup) =>
+                  yup.object({
+                    collection: yup.string().required(),
+                    relativePath: yup.string().required(),
+                  })
+                );
 
-              if (isMutation) {
-                switch (info.fieldName) {
-                  case 'addPendingDocument':
-                    return resolver.resolveAddPendingDocument({
-                      collectionName: args.collection,
-                      relativePath: args.relativePath,
-                      templateName: (args as { template?: string }).template,
-                    });
-                  case 'createFolder':
-                    return resolver.resolveCreateFolder({
-                      collectionName: args.collection,
-                      relativePath: args.relativePath,
-                    });
-                  case 'createDocument': {
-                    assertShape<{
-                      params: {
-                        // [args.collection]: Record<string, unknown>; .. effectively.
-                      };
-                    }>(args, (yup) =>
-                      yup.object({
-                        params: yup
-                          .object()
-                          .shape({
-                            [args.collection]: yup.object().required(),
-                          })
-                          .required(),
-                      })
-                    );
-                    return resolver.resolveCreateDocument({
-                      collectionName: args.collection,
-                      relativePath: args.relativePath,
-                      body: args.params[args.collection],
-                    });
+                if (isMutation) {
+                  switch (info.fieldName) {
+                    case 'addPendingDocument':
+                      return resolver.resolveAddPendingDocument({
+                        collectionName: args.collection,
+                        relativePath: args.relativePath,
+                        templateName: (args as { template?: string }).template,
+                      });
+                    case 'createFolder':
+                      return resolver.resolveCreateFolder({
+                        collectionName: args.collection,
+                        relativePath: args.relativePath,
+                      });
+                    case 'createDocument': {
+                      assertShape<{
+                        params: {
+                          // [args.collection]: Record<string, unknown>; .. effectively.
+                        };
+                      }>(args, (yup) =>
+                        yup.object({
+                          params: yup
+                            .object()
+                            .shape({
+                              [args.collection]: yup.object().required(),
+                            })
+                            .required(),
+                        })
+                      );
+                      return resolver.resolveCreateDocument({
+                        collectionName: args.collection,
+                        relativePath: args.relativePath,
+                        body: args.params[args.collection],
+                      });
+                    }
+                    case 'updateDocument': {
+                      assertShape<{
+                        params: {
+                          relativePath: string;
+                          // [args.collection]: Record<string, unknown>; .. effectively.
+                        };
+                      }>(args, (yup) =>
+                        yup.object({
+                          params: yup
+                            .object()
+                            .shape({
+                              relativePath: yup.string().optional(),
+                              [args.collection]: yup.object().required(),
+                            })
+                            .required(),
+                        })
+                      );
+                      const newRelativePath = args.params.relativePath;
+                      const newBody = args.params[args.collection] as Record<
+                        string,
+                        unknown
+                      >;
+                      return resolver.resolveUpdateDocument({
+                        collectionName: args.collection,
+                        relativePath: args.relativePath,
+                        newRelativePath,
+                        newBody,
+                      });
+                    }
+                    case 'deleteDocument':
+                      return resolver.resolveDeleteDocument({
+                        collectionName: args.collection,
+                        relativePath: args.relativePath,
+                      });
                   }
-                  case 'updateDocument': {
-                    assertShape<{
-                      params: {
-                        relativePath: string;
-                        // [args.collection]: Record<string, unknown>; .. effectively.
-                      };
-                    }>(args, (yup) =>
-                      yup.object({
-                        params: yup
-                          .object()
-                          .shape({
-                            relativePath: yup.string().optional(),
-                            [args.collection]: yup.object().required(),
-                          })
-                          .required(),
-                      })
-                    );
-                    const newRelativePath = args.params.relativePath;
-                    const newBody = args.params[args.collection] as Record<
-                      string,
-                      unknown
-                    >;
-                    return resolver.resolveUpdateDocument({
-                      collectionName: args.collection,
-                      relativePath: args.relativePath,
-                      newRelativePath,
-                      newBody,
-                    });
-                  }
-                  case 'deleteDocument':
-                    return resolver.resolveDeleteDocument({
-                      collectionName: args.collection,
-                      relativePath: args.relativePath,
-                    });
+                } else if (info.fieldName === NAMER.documentQueryName()) {
+                  return resolver.resolveRetrievedDocument({
+                    collectionName: args.collection,
+                    relativePath: args.relativePath,
+                  });
                 }
-              } else if (info.fieldName === NAMER.documentQueryName()) {
-                return resolver.resolveRetrievedDocument({
-                  collectionName: args.collection,
-                  relativePath: args.relativePath,
-                });
               }
 
-              return possibleReferenceValue;
+              return possibleValue;
 
             /**
              * eg `getMovieDocument.data.actors`
@@ -439,8 +447,12 @@ export const resolve = async ({
               return unionValue;
 
             default:
-              console.error(`Could not recognize resolve type '${lookup.resolveType}'.`);
-              console.error('The field resolver needs to be updated to handle this new type.')
+              console.error(
+                `Could not recognize resolve type '${lookup.resolveType}'.`
+              );
+              console.error(
+                'The field resolver needs to be updated to handle this new type.'
+              );
               throw new Error('Unexpected resolve type');
           }
         } catch (e) {
