@@ -1,0 +1,17 @@
+{
+  "errors": [
+    {
+      "message": "Unable to update document, authors/non-existent-author.md does not exist",
+      "locations": [
+        {
+          "line": 3,
+          "column": 13
+        }
+      ],
+      "path": [
+        "updateDocument"
+      ]
+    }
+  ],
+  "data": null
+}

@@ -1,0 +1,13 @@
+{
+  "data": {
+    "updateAuthor": {
+      "__typename": "AuthorAuthor",
+      "id": "authors/bob-northwind.md",
+      "_sys": {
+        "filename": "bob-northwind",
+        "extension": ".md",
+        "path": "authors/bob-northwind.md"
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "data": {
+    "createDocument": {
+      "__typename": "AuthorAuthor",
+      "id": "authors/new-author.md",
+      "_sys": {
+        "filename": "new-author",
+        "extension": ".md",
+        "path": "authors/new-author.md"
+      },
+      "name": "Mr John Smith",
+      "email": "john@smith.com",
+      "bio": "CEO of Smith company"
+    }
+  }
+}
