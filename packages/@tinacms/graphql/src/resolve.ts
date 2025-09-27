@@ -21,50 +21,6 @@ import {
 } from './resolver/auth-fields';
 import { NotFoundError } from './error';
 
-const handleCollectionsField = (
-  info: GraphQLResolveInfo,
-  tinaSchema: TinaSchema,
-  resolver: Resolver,
-  args: unknown
-) => {
-  const collectionNode = info.fieldNodes.find(
-    (x) => x.name.value === 'collections'
-  );
-  const hasDocuments = collectionNode.selectionSet.selections.find(
-    (x) => x.kind == 'Field' && x?.name?.value === 'documents'
-  );
-  return tinaSchema.getCollections().map((collection) => {
-    return resolver.resolveCollection(
-      args,
-      collection.name,
-      Boolean(hasDocuments)
-    );
-  });
-};
-
-const handleCollectionField = (
-  info: GraphQLResolveInfo,
-  args: unknown,
-  resolver: Resolver
-) => {
-  const collectionNode = info.fieldNodes.find(
-    (x) => x.name.value === 'collection'
-  );
-  const hasDocuments = collectionNode.selectionSet.selections.find(
-    (x) => x.kind == 'Field' && x?.name?.value === 'documents'
-  );
-  assertShape<{ collection: string }>(args, (yup) =>
-    yup.object({
-      collection: yup.string().required(),
-    })
-  );
-  return resolver.resolveCollection(
-    args,
-    args.collection,
-    Boolean(hasDocuments)
-  );
-};
-
 export const resolve = async ({
   config,
   query,
@@ -96,7 +52,7 @@ export const resolve = async ({
     const tinaSchema = await createSchema({
       // TODO: please update all the types to import from @tinacms/schema-tools
       schema: tinaConfig,
-      // @ts-ignore
+      // @ts-expect-error
       flags: tinaConfig?.meta?.flags,
     });
     const resolver = createResolver({
@@ -129,11 +85,6 @@ export const resolve = async ({
         _context: object,
         info: GraphQLResolveInfo
       ) => {
-        // console.log("Path is: ");
-        // console.log(info.path);
-        // console.log("Field name");
-        // console.log(info.fieldName);
-
         try {
           /**
            * `collection`
@@ -213,6 +164,7 @@ export const resolve = async ({
                 yup.object({ id: yup.string().required() })
               );
               return resolver.getDocument(args.id);
+
             case 'multiCollectionDocument':
               const possibleReferenceValue = source[info.fieldName];
               if (
@@ -310,6 +262,7 @@ export const resolve = async ({
               }
 
               return possibleReferenceValue;
+
             /**
              * eg `getMovieDocument.data.actors`
              */
@@ -353,6 +306,7 @@ export const resolve = async ({
               throw new Error(
                 `Expected an array for result of ${info.fieldName} at ${info.path}`
               );
+
             /**
              * Collections-specific getter
              * eg. `getPostDocument`/`createPostDocument`/`updatePostDocument`
@@ -403,6 +357,7 @@ export const resolve = async ({
                 });
               }
             }
+
             /**
              * Collections-specific list getter
              * eg. `getPageList`
@@ -417,6 +372,7 @@ export const resolve = async ({
                 args: collectionArgs,
                 collection: tinaSchema.getCollection(lookup.collection),
               });
+
             /**
              * A polymorphic data set, it can be from a document's data
              * of any nested object which can be one of many shapes
@@ -481,8 +437,10 @@ export const resolve = async ({
                 }
               }
               return unionValue;
+
             default:
-              console.error(lookup);
+              console.error(`Could not recognize resolve type '${lookup.resolveType}'.`);
+              console.error('The field resolver needs to be updated to handle this new type.')
               throw new Error('Unexpected resolve type');
           }
         } catch (e) {
@@ -520,4 +478,48 @@ export const resolve = async ({
     }
     throw e;
   }
+};
+
+const handleCollectionsField = (
+  info: GraphQLResolveInfo,
+  tinaSchema: TinaSchema,
+  resolver: Resolver,
+  args: unknown
+) => {
+  const collectionNode = info.fieldNodes.find(
+    (x) => x.name.value === 'collections'
+  );
+  const hasDocuments = collectionNode.selectionSet.selections.find(
+    (x) => x.kind == 'Field' && x?.name?.value === 'documents'
+  );
+  return tinaSchema.getCollections().map((collection) => {
+    return resolver.resolveCollection(
+      args,
+      collection.name,
+      Boolean(hasDocuments)
+    );
+  });
+};
+
+const handleCollectionField = (
+  info: GraphQLResolveInfo,
+  args: unknown,
+  resolver: Resolver
+) => {
+  const collectionNode = info.fieldNodes.find(
+    (x) => x.name.value === 'collection'
+  );
+  const hasDocuments = collectionNode.selectionSet.selections.find(
+    (x) => x.kind == 'Field' && x?.name?.value === 'documents'
+  );
+  assertShape<{ collection: string }>(args, (yup) =>
+    yup.object({
+      collection: yup.string().required(),
+    })
+  );
+  return resolver.resolveCollection(
+    args,
+    args.collection,
+    Boolean(hasDocuments)
+  );
 };
