@@ -1,7 +1,7 @@
 {
   "data": {
     "createDocument": {
-      "__typename": "AuthorAuthor",
+      "__typename": "AuthorPerson",
       "id": "authors/new-author.md",
       "_sys": {
         "filename": "new-author",

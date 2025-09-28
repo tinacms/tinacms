@@ -8,8 +8,8 @@ export const schema: Schema = {
       path: 'authors',
       templates: [
         {
-          name: 'author',
-          label: 'Author',
+          name: 'person',
+          label: 'Person',
           fields: [
             { name: 'name', label: 'Name', type: 'string' },
             { name: 'email', label: 'Email', type: 'string' },

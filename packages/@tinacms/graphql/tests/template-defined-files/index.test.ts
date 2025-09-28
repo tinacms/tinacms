@@ -15,7 +15,7 @@ it('queries single template-defined document', async () => {
             path
           }
         }
-        ... on AuthorAuthor {
+        ... on AuthorPerson {
           name
           email
           bio
@@ -107,7 +107,7 @@ describe('Template-Defined Files Mutations', () => {
               relativePath: "new-author.md"
               params: {
                 author: {
-                  author: {
+                  person: {
                     name: "Mr John Smith"
                     email: "john@smith.com"
                     bio: "CEO of Smith company"
@@ -124,7 +124,7 @@ describe('Template-Defined Files Mutations', () => {
                   path
                 }
               }
-              ... on AuthorAuthor {
+              ... on AuthorPerson {
                 name
                 email
                 bio
@@ -158,7 +158,7 @@ describe('Template-Defined Files Mutations', () => {
             createAuthor(
               relativePath: "john-smith.md"
               params: {
-                author: {
+                person: {
                   name: "Mr John Smith"
                   email: "john@smith.com"
                   bio: "CEO of Smith company"
@@ -174,7 +174,7 @@ describe('Template-Defined Files Mutations', () => {
                   path
                 }
               }
-              ... on AuthorAuthor {
+              ... on AuthorPerson {
                 name
                 email
                 bio
@@ -301,7 +301,7 @@ describe('Template-Defined Files Mutations', () => {
               relativePath: "bob-northwind.md"
               params: {
                 author: {
-                  author: {
+                  person: {
                     name: "Mr Bob Northwind"
                     email: "bob.northwind@northwind.com"
                     bio: "Updated CEO of Northwind company with extensive business experience"
@@ -318,7 +318,7 @@ describe('Template-Defined Files Mutations', () => {
                   path
                 }
               }
-              ... on AuthorAuthor {
+              ... on AuthorPerson {
                 name
                 email
                 bio
@@ -349,7 +349,7 @@ describe('Template-Defined Files Mutations', () => {
             updateAuthor(
               relativePath: "bob-northwind.md"
               params: {
-                author: {
+                person: {
                   name: "Mr Bob Northwind"
                   email: "ceo@northwind.com"
                   bio: "Founder and CEO of Northwind company"
@@ -527,7 +527,7 @@ describe('Template-Defined Files Mutations', () => {
               relativePath: "non-existent-author.md"
               params: {
                 author: {
-                  author: {
+                  person: {
                     name: "Mr John Smith"
                     email: "john@smith.com"
                     bio: "CEO of Smith company"

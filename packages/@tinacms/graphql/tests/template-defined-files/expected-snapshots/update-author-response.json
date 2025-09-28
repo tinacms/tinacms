@@ -1,7 +1,7 @@
 {
   "data": {
     "updateDocument": {
-      "__typename": "AuthorAuthor",
+      "__typename": "AuthorPerson",
       "id": "authors/bob-northwind.md",
       "_sys": {
         "filename": "bob-northwind",
