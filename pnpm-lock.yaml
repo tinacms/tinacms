@@ -1434,6 +1434,9 @@ importers:
       '@types/multer':
         specifier: 'catalog:'
         version: 1.4.12
+      '@types/node':
+        specifier: ^22.13.1
+        version: 22.15.32
       '@types/progress':
         specifier: 'catalog:'
         version: 2.0.7

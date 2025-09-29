@@ -83,7 +83,7 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
   const thumbnail = (item.thumbnails || {})['400x400'];
   const itemIsImage = isImage(thumbnail);
   return (
-    <li className='block overflow-hidden flex justify-center shrink-0 w-full transition duration-150 ease-out'>
+    <li className='block flex justify-center shrink-0 w-full transition duration-150 ease-out'>
       <button
         className={cn(
           'relative flex flex-col items-center justify-center w-full',
@@ -101,6 +101,15 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
           }
         }}
       >
+        <span
+          className={cn(
+            'absolute bottom-0 left-0 w-full text-xs text-white px-2 py-1 truncate z-10',
+            active ? 'bg-blue-500/60' : 'bg-black/60'
+          )}
+          style={{ pointerEvents: 'none' }}
+        >
+          {item.filename}
+        </span>
         {item.new && (
           <span className='absolute top-1 right-1 rounded shadow bg-green-100 border border-green-200 text-[10px] tracking-wide font-bold text-green-600 px-1.5 py-0.5 z-10'>
             NEW
@@ -118,15 +127,6 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
                 src={thumbnail}
                 alt={item.filename}
               />
-              <span
-                className={cn(
-                  'absolute bottom-0 left-0 w-full text-xs text-white px-2 py-1 truncate z-10',
-                  active ? 'bg-blue-500/60' : 'bg-black/60'
-                )}
-                style={{ pointerEvents: 'none' }}
-              >
-                {item.filename}
-              </span>
             </>
           ) : (
             <div className='p-4 w-full flex flex-col gap-4 items-center justify-center'>

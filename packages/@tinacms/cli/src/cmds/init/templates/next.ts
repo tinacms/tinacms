@@ -58,7 +58,7 @@ const BlogPage = (props) => {
         <div className='bg-green-100 text-center'>
           Lost and looking for a place to start?
           <a
-            href='https://tina.io/guides/tina-cloud/getting-started/overview/'
+            href='https://tina.io/docs/r/beginner-series'
             className='text-blue-500 underline'
           >
             {' '}

@@ -9,6 +9,7 @@ import normalizePath from 'normalize-path';
 import chalk from 'chalk';
 import { logger } from '../logger';
 import { createRequire } from 'module';
+import { stripNativeTrailingSlash } from '../utils/path';
 
 export const TINA_FOLDER = 'tina';
 export const LEGACY_TINA_FOLDER = '.tina';
@@ -236,9 +237,8 @@ export class ConfigManager {
     this.outputHTMLFilePath = path.join(this.outputFolderPath, 'index.html');
     this.outputGitignorePath = path.join(this.outputFolderPath, '.gitignore');
 
-    const fullLocalContentPath = path.join(
-      this.tinaFolderPath,
-      this.config.localContentPath || ''
+    const fullLocalContentPath = stripNativeTrailingSlash(
+      path.join(this.tinaFolderPath, this.config.localContentPath || '')
     );
 
     if (this.config.localContentPath) {
