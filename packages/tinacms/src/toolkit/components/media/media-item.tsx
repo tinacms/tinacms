@@ -127,15 +127,6 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
                 src={thumbnail}
                 alt={item.filename}
               />
-              {/* <span
-                className={cn(
-                  'absolute bottom-0 left-0 w-full text-xs text-white px-2 py-1 truncate z-10',
-                  active ? 'bg-blue-500/60' : 'bg-black/60'
-                )}
-                style={{ pointerEvents: 'none' }}
-              >
-                {item.filename}
-              </span> */}
             </>
           ) : (
             <div className='p-4 w-full flex flex-col gap-4 items-center justify-center'>
