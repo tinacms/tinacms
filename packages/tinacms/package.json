@@ -7,7 +7,7 @@
 		".": "./dist/index.js",
 		"./dist/client": "./dist/client.js",
 		"./dist/edit-state": "./dist/edit-state.js",
-		"./dist/react": "./dist/react.js",
+    	"./react": "./dist/react.mjs",
 		"./dist/rich-text": "./dist/rich-text/index.js",
 		"./dist/rich-text/static": "./dist/rich-text/static.js",
 		"./dist/rich-text/prism": "./dist/rich-text/prism.js"
