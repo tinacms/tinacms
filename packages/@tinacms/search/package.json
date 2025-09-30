@@ -5,7 +5,7 @@
 	"files": ["dist"],
 	"exports": {
 		".": "./dist/index.js",
-		"./index-client": "./dist/index-client.mjs"
+		"./index-client": "./dist/index-client.js"
 	},
 	"typings": "dist/index.d.ts",
 	"license": "SEE LICENSE IN LICENSE",
