@@ -23,7 +23,7 @@ import {
   optionsToSearchIndexOptions,
   parseSearchIndexResponse,
   queryToSearchIndexQuery,
-} from '@tinacms/search/dist/index-client';
+} from '@tinacms/search/index-client';
 import gql from 'graphql-tag';
 import { EDITORIAL_WORKFLOW_STATUS } from '../toolkit/form-builder/editorial-workflow-constants';
 import { AsyncData, asyncPoll } from './asyncPoll';
