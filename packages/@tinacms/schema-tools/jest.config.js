@@ -1,4 +1,4 @@
-import jestRunnerConfig from '@tinacms/scripts/dist/jest-runner.mjs';
+import jestRunnerConfig from '@tinacms/scripts/dist/jest-runner.js';
 
 export default {
   ...jestRunnerConfig,
@@ -6,7 +6,7 @@ export default {
   testEnvironment: 'node',
   testMatch: ['**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[tj]s?(x)'],
   transform: {
-    "\\.[jt]s?$": [
+    '\\.[jt]s?$': [
       'ts-jest',
       {
         tsconfig: 'tsconfig.json',

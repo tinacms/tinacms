@@ -1,6 +1,7 @@
 {
 	"name": "@tinacms/schema-tools",
 	"version": "1.9.1",
+	"type": "module",
 	"main": "dist/index.js",
 	"module": "./dist/index.mjs",
 	"exports": {

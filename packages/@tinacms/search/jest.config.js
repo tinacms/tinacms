@@ -1,1 +1,1 @@
-export default '@tinacms/scripts/dist/jest-runner.mjs'
+export default '@tinacms/scripts/dist/jest-runner.js';
