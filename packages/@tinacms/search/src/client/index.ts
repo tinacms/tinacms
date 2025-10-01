@@ -1,5 +1,6 @@
 import type { SearchClient } from '../types';
-import { SqliteLevel } from 'sqlite-level';
+import sqliteLevel from 'sqlite-level';
+const { SqliteLevel } = sqliteLevel;
 import si from 'search-index';
 import { MemoryLevel } from 'memory-level';
 import { lookupStopwords } from '../indexer/utils';
@@ -123,9 +124,10 @@ export class TinaCMSSearchIndexClient extends LocalSearchIndexClient {
     const buffer = sqliteLevel.db.serialize();
     await sqliteLevel.close();
     // upload the buffer to the apiUrl
+    const compressedBuffer = zlib.gzipSync(buffer);
     res = await fetch(signedUrl, {
       method: 'PUT',
-      body: zlib.gzipSync(buffer),
+      body: new Uint8Array(compressedBuffer),
     });
     if (res.status !== 200) {
       throw new Error(
