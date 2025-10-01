@@ -1,0 +1,15 @@
+{
+  "data": {
+    "author": {
+      "id": "authors/bob-northwind.md",
+      "_sys": {
+        "filename": "bob-northwind",
+        "extension": ".md",
+        "path": "authors/bob-northwind.md"
+      },
+      "name": "Mr Bob Northwind",
+      "email": "bob@northwind.com",
+      "bio": "CEO of Northwind Company"
+    }
+  }
+}
