@@ -415,7 +415,7 @@ export class ConfigManager {
     };
 
     const outfile = path.join(tmpdir, 'config.build.jsx');
-    const outfile2 = path.join(tmpdir, 'config.build.js');
+    const outfile2 = path.join(tmpdir, 'config.build.mjs');
     const tempTSConfigFile = path.join(tmpdir, 'tsconfig.json');
 
     fs.outputFileSync(tempTSConfigFile, '{}');
