@@ -4,7 +4,7 @@
 	"typings": "dist/index.d.ts",
 	"version": "2.9.0",
 	"main": "dist/index.js",
-	"module": "./dist/index.mjs",
+	"module": "./dist/index.js",
 	"exports": {
 		".": "./dist/index.js",
 		"./dist/client": "./dist/client.js",
