@@ -10,6 +10,7 @@
 		"./dist/client": "./dist/client.js",
 		"./dist/edit-state": "./dist/edit-state.js",
     	"./react": "./dist/react.js",
+		"./dist/react": "./dist/react.js",
 		"./dist/rich-text": "./dist/rich-text/index.js",
 		"./dist/rich-text/static": "./dist/rich-text/static.js",
 		"./dist/rich-text/prism": "./dist/rich-text/prism.js"
