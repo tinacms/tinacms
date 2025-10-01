@@ -3,7 +3,7 @@
 	"version": "1.6.1",
 	"type": "module",
 	"main": "dist/index.js",
-	"module": "dist/index.mjs",
+	"module": "./dist/index.js",
 	"files": [
 		"package.json",
 		"dist"
@@ -11,7 +11,7 @@
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
-			"import": "./dist/index.mjs",
+			"import": "./dist/index.js",
 			"require": "./dist/index.js"
 		}
 	},

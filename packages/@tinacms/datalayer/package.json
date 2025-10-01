@@ -3,7 +3,7 @@
 	"version": "1.4.1",
 	"type": "module",
 	"main": "dist/index.js",
-	"module": "dist/index.mjs",
+	"module": "./dist/index.js",
 	"typings": "dist/index",
 	"files": [
 		"package.json",
@@ -12,12 +12,12 @@
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
-			"import": "./dist/index.mjs",
+			"import": "./dist/index.js",
 			"require": "./dist/index.js"
 		},
 		"./dist/*": {
 			"types": "./dist/*.d.ts",
-			"import": "./dist/*.mjs",
+			"import": "./dist/*.js",
 			"require": "./dist/*.js"
 		}
 	},
