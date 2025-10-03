@@ -378,7 +378,7 @@ export class ConfigManager {
     // good way of invalidating them when this file changes
     // https://github.com/nodejs/modules/issues/307
     const tmpdir = path.join(os.tmpdir(), Date.now().toString());
-    const outfile = path.join(tmpdir, 'database.build.js');
+    const outfile = path.join(tmpdir, 'database.build.mjs'); // .mjs tells Node.js this is ESM
     await esbuild.build({
       entryPoints: [this.selfHostedDatabaseFilePath],
       bundle: true,
@@ -386,6 +386,14 @@ export class ConfigManager {
       format: 'esm',
       outfile: outfile,
       loader: loaders,
+      // Provide a require() polyfill for ESM bundles containing CommonJS packages.
+      // Some bundled packages (e.g., 'scmp' used by 'mongodb-level') use require('crypto').
+      // When esbuild inlines these CommonJS packages, it keeps the require() calls,
+      // but ESM doesn't have a global require. This banner creates one using Node.js's
+      // official createRequire API, allowing the bundled CommonJS code to work in ESM.
+      banner: {
+        js: `import { createRequire } from 'module';const require = createRequire(import.meta.url);`,
+      },
     });
     const result = await import(outfile);
     fs.removeSync(outfile);
