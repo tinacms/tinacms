@@ -3,8 +3,7 @@
 	"version": "1.4.1",
 	"type": "module",
 	"main": "dist/index.js",
-	"module": "./dist/index.js",
-	"typings": "dist/index",
+	"types": "dist/index.d.ts",
 	"files": [
 		"package.json",
 		"dist"
