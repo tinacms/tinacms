@@ -2,14 +2,8 @@
 	"name": "@tinacms/schema-tools",
 	"version": "1.9.1",
 	"type": "module",
-	"main": "dist/test/index.js",
+	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
-	"exports": {
-		".": {
-			"types": "./dist/index.d.ts",
-			"default": "./dist/test/index.js"
-		}
-	},
 	"files": [
 		"dist"
 	],
