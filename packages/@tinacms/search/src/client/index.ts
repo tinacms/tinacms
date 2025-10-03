@@ -1,4 +1,5 @@
 import type { SearchClient } from '../types';
+// default import + destructuring because `sqlite-level` still exposes CJS-style exports.
 import sqliteLevel from 'sqlite-level';
 const { SqliteLevel } = sqliteLevel;
 import si from 'search-index';

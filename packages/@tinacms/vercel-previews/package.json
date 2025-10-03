@@ -1,9 +1,9 @@
 {
 	"name": "@tinacms/vercel-previews",
 	"version": "0.1.4",
+	"type": "module",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
-	"module": "./dist/index.js",
 	"keywords": [
 		"tinacms",
 		"cms",
@@ -12,13 +12,6 @@
 	"files": [
 		"dist"
 	],
-	"exports": {
-		".": {
-			"types": "./dist/index.d.ts",
-			"import": "./dist/index.js",
-			"require": "./dist/index.js"
-		}
-	},
 	"buildConfig": {
 		"entryPoints": [
 			"src/index.ts"
