@@ -1,6 +1,6 @@
 import { vercelStegaCombine } from '@vercel/stega';
 import React from 'react';
-import { tinaField, useEditState } from 'tinacms/dist/react';
+import { tinaField, useEditState } from 'tinacms/react';
 import { useCallback, useEffect } from 'react';
 
 export const vercelEditInfo = <

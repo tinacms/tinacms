@@ -14,7 +14,7 @@
 		"build": "turbo run build --filter=\"./packages/**\"",
 		"diff-tina-lock": "pnpm -r --filter='{./**}' --workspace-concurrency=1 run --if-present diff-tina-lock",
 		"update-tina-lock": "pnpm -r --filter='{./**}' --workspace-concurrency=1 run --if-present update-tina-lock",
-		"test": "turbo run test --filter=\"./packages/**\" -- --silent",
+		"test": "turbo run test --filter=\"./packages/**\"",
 		"types": "turbo run types --filter=\"./packages/**\"",
 		"build:e2e": "pnpm run build && pnpm --filter=kitchen-sink-starter run build",
 		"start:e2e": "pnpm --filter=kitchen-sink-starter run start ",
