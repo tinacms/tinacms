@@ -2,12 +2,19 @@
 	"name": "@tinacms/search",
 	"version": "1.1.1",
 	"type": "module",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
 	"files": ["dist"],
 	"exports": {
-		".": "./dist/index.js",
-		"./index-client": "./dist/index-client.js"
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		},
+		"./index-client": {
+			"types": "./dist/index-client.d.ts",
+			"default": "./dist/index-client.js"
+		}
 	},
-	"typings": "dist/index.d.ts",
 	"license": "SEE LICENSE IN LICENSE",
 	"buildConfig": {
 		"entryPoints": [
