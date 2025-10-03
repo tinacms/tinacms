@@ -9,18 +9,6 @@
 		"package.json",
 		"dist"
 	],
-	"exports": {
-		".": {
-			"types": "./dist/index.d.ts",
-			"import": "./dist/index.js",
-			"require": "./dist/index.js"
-		},
-		"./dist/*": {
-			"types": "./dist/*.d.ts",
-			"import": "./dist/*.js",
-			"require": "./dist/*.js"
-		}
-	},
 	"license": "SEE LICENSE IN LICENSE",
 	"buildConfig": {
 		"entryPoints": [
