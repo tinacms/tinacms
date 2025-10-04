@@ -1,7 +1,7 @@
 import { useCMS } from '@toolkit/react-core';
 import * as React from 'react';
 import { BiError, BiRightArrowAlt } from 'react-icons/bi';
-import { Alert } from './alert';
+import { Callout } from './callout';
 
 export const LocalWarning = () => {
   const cms = useCMS();
@@ -12,11 +12,11 @@ export const LocalWarning = () => {
   }
 
   return (
-    <Alert alertStyle='warning'>
+    <Callout calloutStyle='warning' className='w-fit'>
       <a href='https://tina.io/docs/r/what-is-tinacloud/' target='_blank'>
         You are in local mode
       </a>
-    </Alert>
+    </Callout>
   );
 };
 
