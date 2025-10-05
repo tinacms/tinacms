@@ -54,6 +54,44 @@ it('updates document and validates bridge writes', async () => {
   );
 });
 
+const renameDocumentMutation = `
+  mutation {
+    updateDocument(
+      collection: "post",
+      relativePath: "in.md",
+      params: {
+        relativePath: "renamed-by-bob.md"
+      }
+    ) {
+      ...on Document { _values, _sys { title } }
+    }
+  }
+`;
+
+it('renames document using updateDocument mutation', async () => {
+  const { query, bridge } = await setupMutation(__dirname, config);
+
+  // Execute mutation to rename the document
+  const result = await query({
+    query: renameDocumentMutation,
+    variables: {},
+  });
+
+  // Validate GraphQL response
+  expect(format(result)).toMatchFileSnapshot('rename-document-node.json');
+
+  // Validate Bridge write operations
+  const writes = bridge.getWrites();
+  expect(writes.size).toBeGreaterThan(0);
+  expect(bridge.getWrite('posts/renamed-by-bob.md')).toMatchFileSnapshot(
+    'rename-document-content.md'
+  );
+
+  // Validate that original file was deleted
+  const deletes = bridge.getDeletes();
+  expect(deletes).toContain('posts/in.md');
+});
+
 const updatePostMutation = `
   mutation {
     updatePost(
