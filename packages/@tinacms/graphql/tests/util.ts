@@ -16,7 +16,6 @@ class OutputBridge extends FilesystemBridge {
 }
 
 class MemoryCaptureBridge extends FilesystemBridge {
-
   private writes: Map<string, string> = new Map();
 
   private deletes: string[] = [];
@@ -48,7 +47,6 @@ class MemoryCaptureBridge extends FilesystemBridge {
   getDeletes(): string[] {
     return [...this.deletes];
   }
-
 }
 
 const dataSchema = z.object({
