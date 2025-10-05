@@ -44,13 +44,15 @@ it('updates document and validates bridge writes', async () => {
   });
 
   // Validate GraphQL response
-  expect(format(result)).toMatchFileSnapshot('update-document-node.json');
+  expect(format(result)).toMatchFileSnapshot(
+    'expected-snapshots/update-document-node.json'
+  );
 
   // Validate Bridge write operations
   const writes = bridge.getWrites();
   expect(writes.size).toBeGreaterThan(0);
   expect(bridge.getWrite('posts/in.md')).toMatchFileSnapshot(
-    'update-document-content.md'
+    'expected-snapshots/update-document-content.md'
   );
 });
 
@@ -78,13 +80,15 @@ it('renames document using updateDocument mutation', async () => {
   });
 
   // Validate GraphQL response
-  expect(format(result)).toMatchFileSnapshot('rename-document-node.json');
+  expect(format(result)).toMatchFileSnapshot(
+    'expected-snapshots/rename-document-node.json'
+  );
 
   // Validate Bridge write operations
   const writes = bridge.getWrites();
   expect(writes.size).toBeGreaterThan(0);
   expect(bridge.getWrite('posts/renamed-by-bob.md')).toMatchFileSnapshot(
-    'rename-document-content.md'
+    'expected-snapshots/rename-document-content.md'
   );
 
   // Validate that original file was deleted
@@ -132,12 +136,14 @@ it('updates document using updatePost mutation', async () => {
   });
 
   // Validate GraphQL response
-  expect(format(result)).toMatchFileSnapshot('update-post-node.json');
+  expect(format(result)).toMatchFileSnapshot(
+    'expected-snapshots/update-post-node.json'
+  );
 
   // Validate Bridge write operations
   const writes = bridge.getWrites();
   expect(writes.size).toBeGreaterThan(0);
   expect(bridge.getWrite('posts/in.md')).toMatchFileSnapshot(
-    'update-post-content.md'
+    'expected-snapshots/update-post-content.md'
   );
 });
