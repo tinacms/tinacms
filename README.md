@@ -51,7 +51,7 @@ To be the world-leading CMS with Git support that developers love.
 ## Tech Stack
 
 See
-https://tina.io/docs/introduction/faq/#what-is-tinas-tech-stack
+https://tina.io/docs/r/FAQ/#5-what-is-tinas-tech-stack
 
 ## Roadmap
 
@@ -67,12 +67,9 @@ Please see our [./CONTRIBUTING.md](https://github.com/tinacms/tinacms/blob/main/
 - Jeff See ([@jeffsee55](https://github.com/jeffsee55))
 - Matt Wicks ([@wicksipedia](https://github.com/wicksipedia))
 - Jack Pettit ([@JackDevAU](https://github.com/JackDevAU))
-- Jord Gui ([@Jord-Gui](https://github.com/Jord-Gui))
-- Nick Curran ([@ncn-ssw](https://github.com/ncn-ssw))
+- Eli Kent ([@kulesy](https://github.com/kulesy))
 - Brook Jeynes ([@brookjeynes-ssw](https://github.com/brookjeynes-ssw))
 - Ben Neoh ([@Ben0189](https://github.com/Ben0189))
-- Warwick Leahy ([@leahy268](https://github.com/leahy268))
-- Seth Daily ([@sethdaily ](https://github.com/sethdaily))
 - Josh Berman ([@joshbermanssw](https://github.com/joshbermanssw))
 - Scott Gallant ([@scottgallant](https://github.com/scottgallant))
 - Adam Cogan ([@adamcogan](https://github.com/adamcogan))

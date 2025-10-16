@@ -311,7 +311,7 @@ const generateCollectionFromForestrySection = (args: {
           label: 'Dummy field',
           type: 'string',
           description:
-            'This is a dummy field, please replace it with the fields you want to edit. See https://tina.io/docs/schema/ for more info',
+            'This is a dummy field, please replace it with the fields you want to edit. See https://tina.io/docs/r/content-modelling-collections/ for more info',
         });
         logger.warn(
           warnText(

@@ -20,11 +20,11 @@ export const SidebarNoFormsPlaceholder = () => (
     </p>
     <p className='block pt-5'>
       <Button
-        href='https://tina.io/docs/contextual-editing/overview'
+        href='https://tina.io/docs/r/visual-editing-setup'
         target='_blank'
         as='a'
       >
-        <Emoji className='mr-1.5'>📖</Emoji> Contextual Editing Docs
+        <Emoji className='mr-1.5'>📖</Emoji> Visual Editing Docs
       </Button>
     </p>
   </div>

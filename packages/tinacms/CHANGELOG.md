@@ -1,5 +1,49 @@
 # tinacms
 
+## 2.9.0
+
+### Minor Changes
+
+- [#5992](https://github.com/tinacms/tinacms/pull/5992) [`98fbc94`](https://github.com/tinacms/tinacms/commit/98fbc941a07fbc52edafaeb43b49b5ea30ea4172) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Consistency Fixes for Alerts, Callouts, Badges
+
+### Patch Changes
+
+- [#6014](https://github.com/tinacms/tinacms/pull/6014) [`0bbe080`](https://github.com/tinacms/tinacms/commit/0bbe0804e334238850a4f8f33be5cd123ff68ab3) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐛 Bug - Fix Media Manager Title Overlay
+  🐛 Bug - Button Overlap on Collections Menu
+
+- [#5995](https://github.com/tinacms/tinacms/pull/5995) [`ced9076`](https://github.com/tinacms/tinacms/commit/ced9076d25d7177bd8d9ae3c6133d0560366511c) Thanks [@kulesy](https://github.com/kulesy)! - ⚡ Performance - Improve media load performance
+
+## 2.8.3
+
+### Patch Changes
+
+- [#5951](https://github.com/tinacms/tinacms/pull/5951) [`ea917dd`](https://github.com/tinacms/tinacms/commit/ea917dd2840c955d462b66b58009d2a16da39377) Thanks [@tiagov8](https://github.com/tiagov8)! - Auth prompt - added branding
+
+- [#5947](https://github.com/tinacms/tinacms/pull/5947) [`b012b6c`](https://github.com/tinacms/tinacms/commit/b012b6c7fae2674c613fd4c54e1819a86c6d2c3e) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Sidebar - updated tooltips, show editing panel is now orange for visibility/branding
+
+- [#5969](https://github.com/tinacms/tinacms/pull/5969) [`39e5b05`](https://github.com/tinacms/tinacms/commit/39e5b0562af7bca1e2923fc94b7c8119e12a0133) Thanks [@kulesy](https://github.com/kulesy)! - Content manager - Make UTC the default for the DateField
+
+- [#5946](https://github.com/tinacms/tinacms/pull/5946) [`55e018b`](https://github.com/tinacms/tinacms/commit/55e018b9826a540005bbadf8fd51e9bac456d531) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Media manager - improved display of transparent images
+  Media manager - grid view now displays filenames
+
+## 2.8.2
+
+### Patch Changes
+
+- [#5909](https://github.com/tinacms/tinacms/pull/5909) [`eaa6ed5`](https://github.com/tinacms/tinacms/commit/eaa6ed551c76349c5849cd1e19a8066ecbbe205c) Thanks [@wicksipedia](https://github.com/wicksipedia)! - feat: added ability to opt out of latest version update check
+
+- [#5766](https://github.com/tinacms/tinacms/pull/5766) [`60a15d5`](https://github.com/tinacms/tinacms/commit/60a15d533b85a0c3f9f483f6f0f0b6824616284b) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - fix: improve blocks plugin behavior by appending new items instead of inserting them at the start
+  feat: Added a new `addItemBehavior` prop for lists/groups, allowing users to choose between `prepend` or `append`
+
+- [#5900](https://github.com/tinacms/tinacms/pull/5900) [`2fb1c4e`](https://github.com/tinacms/tinacms/commit/2fb1c4e79d1cae5ab29c3f93b0867214e193f59c) Thanks [@kulesy](https://github.com/kulesy)! - ✨ Enhanced Editorial Workflow: Improved Branch Selector with Pull Request Creation
+  - 🎨 Improved UI step indicators and progress bar
+  - 📝 Enhanced alerts with URL parsing
+  - 🗂️ Implemented editorial workflow status updates
+- Updated dependencies [[`eaa6ed5`](https://github.com/tinacms/tinacms/commit/eaa6ed551c76349c5849cd1e19a8066ecbbe205c)]:
+  - @tinacms/schema-tools@1.9.1
+  - @tinacms/mdx@1.8.1
+  - @tinacms/search@1.1.1
+
 ## 2.8.1
 
 ### Patch Changes

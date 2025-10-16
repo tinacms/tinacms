@@ -1,0 +1,16 @@
+{
+  "data": {
+    "createDocument": {
+      "__typename": "ProductBook",
+      "id": "products/northwind-book.md",
+      "_sys": {
+        "filename": "northwind-book",
+        "extension": ".md",
+        "path": "products/northwind-book.md"
+      },
+      "title": "Northwind Business Guide",
+      "isbn": "978-0-123456-78-9",
+      "pages": 250
+    }
+  }
+}

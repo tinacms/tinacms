@@ -14,8 +14,8 @@ export const PageWrapper = ({
   children: React.ReactNode;
 }) => {
   return (
-    <div className='relative left-0 w-full h-full bg-gradient-to-b from-gray-50/50 to-gray-50 shadow-2xl overflow-y-auto transition-opacity duration-300 ease-out flex flex-col opacity-100'>
-      <div className={`py-2 px-4 ${headerClassName}`}>
+    <div className='relative left-0 w-full h-full bg-gradient-to-b from-gray-50/50 to-gray-50 overflow-y-auto transition-opacity duration-300 ease-out flex flex-col opacity-100'>
+      <div className={`py-2 pl-4 pr-4 w-full ${headerClassName}`}>
         <LocalWarning />
         <BillingWarning />
         <div className='flex justify-between items-center'>

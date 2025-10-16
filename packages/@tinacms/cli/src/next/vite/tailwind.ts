@@ -209,6 +209,7 @@ export const tinaTailwind = (
                 500: '#EC4815',
                 600: '#DC4419',
               },
+              'tina-orange': '#EC4815',
               background: '#FFFFFF',
               foreground: '#0A0A0A',
               muted: '#F5F5F5',
