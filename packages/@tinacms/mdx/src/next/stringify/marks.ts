@@ -181,14 +181,17 @@ export const eat = (
   if (marks.length === 0) {
     const f = first as Plate.TextElement & {
       linkifyTextNode?: (arg: Md.Text) => Md.Link;
-    }
+    };
     if (first.linkifyTextNode) {
       return [
         first.linkifyTextNode(text({ text: f.text })),
         ...eat(content.slice(1), field, imageCallback),
       ];
     } else {
-      return [text({ text: f.text }), ...eat(content.slice(1), field, imageCallback)];
+      return [
+        text({ text: f.text }),
+        ...eat(content.slice(1), field, imageCallback),
+      ];
     }
   }
   let nonMatchingSiblingIndex: number = 0;
@@ -232,13 +235,16 @@ export const eat = (
   if (!markToProcess) {
     const f = first as Plate.TextElement & {
       linkifyTextNode?: (arg: Md.Text) => Md.Link;
-    }
-    return [text({ text: f.text }), ...eat(content.slice(1), field, imageCallback)];
+    };
+    return [
+      text({ text: f.text }),
+      ...eat(content.slice(1), field, imageCallback),
+    ];
   }
   if (markToProcess === 'inlineCode') {
     const f = first as Plate.TextElement & {
       linkifyTextNode?: (arg: Md.Text) => Md.Link;
-    }
+    };
     if (nonMatchingSiblingIndex) {
       throw new Error(`Marks inside inline code are not supported`);
     }

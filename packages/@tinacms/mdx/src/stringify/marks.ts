@@ -179,7 +179,7 @@ export const eat = (
     if (first.linkifyTextNode) {
       const f = first as Plate.TextElement & {
         linkifyTextNode?: (arg: Md.Text) => Md.Link;
-      }
+      };
       return [
         first.linkifyTextNode(text({ text: f.text })),
         ...eat(content.slice(1), field, imageCallback),
@@ -187,8 +187,11 @@ export const eat = (
     } else {
       const f = first as Plate.TextElement & {
         linkifyTextNode?: (arg: Md.Text) => Md.Link;
-      }
-      return [text({ text: f.text }), ...eat(content.slice(1), field, imageCallback)];
+      };
+      return [
+        text({ text: f.text }),
+        ...eat(content.slice(1), field, imageCallback),
+      ];
     }
   }
   let nonMatchingSiblingIndex: number = 0;
@@ -232,8 +235,11 @@ export const eat = (
   if (!markToProcess) {
     const f = first as Plate.TextElement & {
       linkifyTextNode?: (arg: Md.Text) => Md.Link;
-    }
-    return [text({ text: f.text }), ...eat(content.slice(1), field, imageCallback)];
+    };
+    return [
+      text({ text: f.text }),
+      ...eat(content.slice(1), field, imageCallback),
+    ];
   }
   if (markToProcess === 'inlineCode') {
     if (nonMatchingSiblingIndex) {
@@ -241,7 +247,7 @@ export const eat = (
     }
     const f = first as Plate.TextElement & {
       linkifyTextNode?: (arg: Md.Text) => Md.Link;
-    }
+    };
     const node = {
       type: markToProcess,
       value: f.text,
