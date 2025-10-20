@@ -126,7 +126,7 @@ const inlineElementExceptLink = (
       };
     }
     default:
-      // @ts-expect-error type is 'never'
+      // @ts-ignore type is 'never'
       if (!content.type && typeof content.text === 'string') {
         return text(content);
       }
@@ -177,12 +177,18 @@ export const eat = (
 
   if (marks.length === 0) {
     if (first.linkifyTextNode) {
+      const f = first as Plate.TextElement & {
+        linkifyTextNode?: (arg: Md.Text) => Md.Link;
+      }
       return [
-        first.linkifyTextNode(text(first)),
+        first.linkifyTextNode(text({ text: f.text })),
         ...eat(content.slice(1), field, imageCallback),
       ];
     } else {
-      return [text(first), ...eat(content.slice(1), field, imageCallback)];
+      const f = first as Plate.TextElement & {
+        linkifyTextNode?: (arg: Md.Text) => Md.Link;
+      }
+      return [text({ text: f.text }), ...eat(content.slice(1), field, imageCallback)];
     }
   }
   let nonMatchingSiblingIndex: number = 0;
@@ -224,17 +230,24 @@ export const eat = (
     }
   });
   if (!markToProcess) {
-    return [text(first), ...eat(content.slice(1), field, imageCallback)];
+    const f = first as Plate.TextElement & {
+      linkifyTextNode?: (arg: Md.Text) => Md.Link;
+    }
+    return [text({ text: f.text }), ...eat(content.slice(1), field, imageCallback)];
   }
   if (markToProcess === 'inlineCode') {
     if (nonMatchingSiblingIndex) {
       throw new Error('Marks inside inline code are not supported');
     }
+    const f = first as Plate.TextElement & {
+      linkifyTextNode?: (arg: Md.Text) => Md.Link;
+    }
     const node = {
       type: markToProcess,
-      value: first.text,
+      value: f.text,
     };
     return [
+      // @ts-ignore
       first.linkifyTextNode?.(node) ?? node,
       ...eat(content.slice(nonMatchingSiblingIndex + 1), field, imageCallback),
     ];
