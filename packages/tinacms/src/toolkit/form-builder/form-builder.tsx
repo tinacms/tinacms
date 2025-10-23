@@ -361,7 +361,9 @@ export const CreateBranchModal = ({
   const tinaApi = cms.api.tina;
   const { setCurrentBranch } = useBranchData();
   const [disabled, setDisabled] = React.useState(false);
-  const [newBranchName, setNewBranchName] = React.useState('');
+  const [newBranchName, setNewBranchName] = React.useState(
+    `${crudType}-${path}`
+  );
   const [isExecuting, setIsExecuting] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState('');
   const [currentStep, setCurrentStep] = React.useState(0);
@@ -646,11 +648,19 @@ export const CreateBranchModal = ({
             </div>
           )}
           <p className='text-lg text-gray-700 font-bold mb-2'>
-            This content is protected 🚧
+            First, let's create a copy
           </p>
           <p className='text-sm text-gray-700 mb-4 max-w-sm'>
             To make changes, you need to create a copy then get it approved and
-            merged for it to go live.
+            merged for it to go live. Learn more about{' '}
+            <a
+              className='underline hover:text-tina-orange'
+              href='https://tina.io/docs/tinacloud/editorial-workflow'
+              target='_blank'
+            >
+              Editorial Workflow
+            </a>
+            .
           </p>
           <PrefixedTextField
             placeholder='e.g. {{PAGE-NAME}}-updates'
@@ -690,7 +700,7 @@ export const CreateBranchModal = ({
               disabled={newBranchName === '' || disabled}
               onClick={executeEditorialWorkflow}
             >
-              Confirm
+              Continue
             </Button>
             <OverflowMenu
               className='-ml-2'
