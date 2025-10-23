@@ -24,7 +24,7 @@ Usage: @tinacms/cli command [options]
 Options:
   -V, --version             output the version number
   -h, --help                display help for command
-  -v, --verbose             increase verbosity of console output   
+  -v, --verbose             increase verbosity of console output
 
 Commands:
   server:start [options]    Start Filesystem Graphql Server
@@ -151,7 +151,7 @@ When you use Tina's GraphQL forms, we know about all of the relationships in you
 
 ### `fields`
 
-For the most part, you can think of `fields` as the backend equivalent to [Tina field plugins](https://tina.io/docs/plugins/fields/). You might notice that we're defining a `type` on each field, rather than a `component`. This is because the backend isn't concerned with `component`s, only the shape of your content. By default we use the built-in Tina fields, to customize your `component` read the [field customization](https://tina.io/docs/tina-cloud/client/#field-customization) instructions.
+For the most part, you can think of `fields` as the backend equivalent to [Tina field plugins](https://tina.io/docs/plugins/fields/). You might notice that we're defining a `type` on each field, rather than a `component`. This is because the backend isn't concerned with `component`s, only the shape of your content. By default we use the built-in Tina fields, to customize your `component` read the [field customization](https://tina.io/docs/tinacloud/client/#field-customization) instructions.
 
 #### `reference` & `reference-list`
 
@@ -229,7 +229,7 @@ getPostsDocument(relativePath: "voteForPedro.md") {
 }
 ```
 
-To learn how to work with this data on a Tina-enabled site, check out the [client documentation](https://tina.io/docs/tina-cloud/client/)
+To learn how to work with this data on a Tina-enabled site, check out the [client documentation](https://tina.io/docs/tinacloud/client/)
 
 > This API is currently somewhat limited. Specifically there's no support for filtering and sorting "list" queries. We have plans to tackle that in upcoming cycles
 
