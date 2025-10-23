@@ -23,7 +23,6 @@ import { PanelHeader } from '../group-field-plugin';
 const constructUrlWithBasePath = (url: string, basePath?: string): string => {
   if (!url) return url;
 
-  // Check if URL is absolute (starts with protocol or //)
   if (
     url.startsWith('http://') ||
     url.startsWith('https://') ||
@@ -33,17 +32,6 @@ const constructUrlWithBasePath = (url: string, basePath?: string): string => {
   }
 
   // Check if URL is already absolute path
-  if (url.startsWith('/')) {
-    // If basePath exists, prepend it
-    if (basePath) {
-      // Ensure basePath doesn't have leading/trailing slashes and URL starts with /
-      const cleanBasePath = basePath.replace(/^\/+|\/+$/g, '');
-      return `/${cleanBasePath}${url}`;
-    }
-    return url;
-  }
-
-  // For relative URLs, prepend basePath if it exists
   if (basePath) {
     const cleanBasePath = basePath.replace(/^\/+|\/+$/g, '');
     return `/${cleanBasePath}/${url}`;
