@@ -40,6 +40,7 @@ export const askCommonSetUp = async () => {
         { title: 'PNPM', value: 'pnpm' },
         { title: 'Yarn', value: 'yarn' },
         { title: 'NPM', value: 'npm' },
+        { title: 'Bun', value: 'bun' },
       ],
     },
   ]);
@@ -51,7 +52,7 @@ export const askCommonSetUp = async () => {
   }
   return answers as {
     framework: Framework;
-    packageManager: 'pnpm' | 'yarn' | 'npm';
+    packageManager: 'pnpm' | 'yarn' | 'npm' | 'bun';
   };
 };
 export const askForestryMigrate = async ({
@@ -118,7 +119,7 @@ export const askTinaSetupPrompts = async (params: {
         `Where are public assets stored? (default: "public")\n` +
         logText(
           `Not sure what value to use? Refer to our "Frameworks" doc: ${linkText(
-            'https://tina.io/docs/integration/frameworks/#configuring-tina-with-each-framework'
+            'https://tina.io/docs/r/framework-guides-overview'
           )}`
         ),
     });

@@ -2,12 +2,23 @@ import { useCMS } from '@toolkit/react-tinacms';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import { Check, LoaderCircle, TriangleAlert } from 'lucide-react';
 import React from 'react';
-// import { version as currentVersion } from '../../../../package.json';
+import { version as currentVersion } from '../../../../package.json';
 import { LatestVersionResponse } from '../../../internalClient';
 
-const currentVersion = '1.0';
-
 export const VersionInfo = () => {
+  const cms = useCMS();
+  const optOutOfUpdateCheck =
+    cms.api?.tina?.schema?.config?.config?.ui?.optOutOfUpdateCheck;
+
+  return (
+    <span className='font-sans font-light text-xs mb-3 mt-4 text-gray-500'>
+      TinaCMS v{currentVersion + ' '}
+      {!optOutOfUpdateCheck && <LatestVersionCheck />}
+    </span>
+  );
+};
+
+const LatestVersionCheck = () => {
   const cms = useCMS();
   const [isLoading, setIsLoading] = React.useState(true);
   const [latestVersionInfo, setLatestVersionInfo] =
@@ -27,16 +38,11 @@ export const VersionInfo = () => {
     fetchVersionInfo();
   }, [cms]);
 
-  return (
-    <span className='font-sans font-light text-xs mb-3 mt-4 text-gray-500'>
-      TinaCMS v{currentVersion + ' '}
-      {isLoading ? (
-        <LoaderCircle className='animate-spin w-4 h-4 inline-block mb-px' />
-      ) : (
-        <LatestVersionWarning latestVersionInfo={latestVersionInfo} />
-      )}
-    </span>
-  );
+  if (isLoading) {
+    return <LoaderCircle className='animate-spin w-4 h-4 inline-block mb-px' />;
+  }
+
+  return <LatestVersionWarning latestVersionInfo={latestVersionInfo} />;
 };
 
 const LatestVersionWarning = ({

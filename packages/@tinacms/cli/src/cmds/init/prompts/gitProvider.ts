@@ -58,7 +58,7 @@ export const chooseGitProvider = async ({ config }: { config: Config }) => {
       message: `What is your GitHub Personal Access Token? (Hit enter to skip and set up later)\n${logText(
         'Learn more here: '
       )}${linkText(
-        'https://tina.io/docs/self-hosted/existing-site/#github-personal-access-token'
+        'https://tina.io/docs/r/self-hosting-nextjs/#github-personal-access-token'
       )}`,
       initial: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
     },

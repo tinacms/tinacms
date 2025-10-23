@@ -1,5 +1,17 @@
 # @tinacms/schema-tools
 
+## 1.9.1
+
+### Patch Changes
+
+- [#5909](https://github.com/tinacms/tinacms/pull/5909) [`eaa6ed5`](https://github.com/tinacms/tinacms/commit/eaa6ed551c76349c5849cd1e19a8066ecbbe205c) Thanks [@wicksipedia](https://github.com/wicksipedia)! - feat: added ability to opt out of latest version update check
+
+## 1.9.0
+
+### Minor Changes
+
+- [#5744](https://github.com/tinacms/tinacms/pull/5744) [`98a61e2`](https://github.com/tinacms/tinacms/commit/98a61e2d263978a7096cc23ac7e94aa0039981be) Thanks [@Ben0189](https://github.com/Ben0189)! - Upgrade Plate editor to v48 beta, integrating latest features and improvements.
+
 ## 1.8.0
 
 ### Minor Changes

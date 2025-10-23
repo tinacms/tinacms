@@ -2,12 +2,27 @@ import { Media } from '@toolkit/core';
 import React from 'react';
 import { BiFile, BiFolder, BiMovie } from 'react-icons/bi';
 import { isImage, isVideo } from './utils';
+import { cn } from '../../../utils/cn';
 
 interface MediaItemProps {
   item: Media & { new?: boolean };
   onClick(_item: Media | false): void;
   active: boolean;
 }
+
+export const checkerboardStyle = {
+  backgroundImage:
+    'linear-gradient(45deg, #eee 25%, transparent 25%), linear-gradient(-45deg, #eee 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #eee 75%), linear-gradient(-45deg, transparent 75%, #eee 75%)',
+  backgroundSize: '12px 12px',
+  backgroundPosition: '0 0, 0 6px, 6px -6px, -6px 0px',
+};
+
+export const smallCheckerboardStyle = {
+  backgroundImage:
+    'linear-gradient(45deg, #eee 25%, transparent 25%), linear-gradient(-45deg, #eee 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #eee 75%), linear-gradient(-45deg, transparent 75%, #eee 75%)',
+  backgroundSize: '6px 6px',
+  backgroundPosition: '0 0, 0 3px, 3px -3px, -3px 0px',
+};
 
 export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
   let FileIcon = BiFile;
@@ -33,14 +48,15 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
       }}
     >
       {item.new && (
-        <span className='absolute top-1.5 left-1.5 rounded shadow bg-green-100 border border-green-200 text-[10px] tracking-wide	 font-bold text-green-600 px-1.5 py-0.5 z-10'>
+        <span className='absolute top-1 right-1 rounded shadow bg-green-100 border border-green-200 text-[10px] tracking-wide	 font-bold text-green-600 px-1.5 py-0.5 z-10'>
           NEW
         </span>
       )}
-      <div className='w-16 h-16 bg-gray-50 border-r border-gray-150 overflow-hidden flex justify-center flex-shrink-0'>
+      <div className='w-16 h-16 overflow-hidden flex justify-center flex-shrink-0'>
         {isImage(thumbnail) ? (
           <img
-            className='object-contain object-center w-full h-full origin-center transition-all duration-150 ease-out group-hover:scale-110'
+            className='block overflow-hidden object-center object-contain max-w-full max-h-full m-auto shadow'
+            style={smallCheckerboardStyle}
             src={thumbnail}
             alt={item.filename}
           />
@@ -65,21 +81,18 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
     FileIcon = BiMovie;
   }
   const thumbnail = (item.thumbnails || {})['400x400'];
+  const itemIsImage = isImage(thumbnail);
   return (
-    <li
-      className={`relative pb-[100%] h-0 block border border-gray-100 rounded overflow-hidden flex justify-center shrink-0 w-full transition duration-150 ease-out ${
-        active
-          ? 'shadow-outline'
-          : 'shadow hover:shadow-md hover:scale-103 hover:border-gray-150'
-      } ${item.type === 'dir' ? 'cursor-pointer' : ''}`}
-    >
-      {item.new && (
-        <span className='absolute top-1.5 left-1.5 rounded shadow bg-green-100 border border-green-200 text-[10px] tracking-wide	 font-bold text-green-600 px-1.5 py-0.5 z-10'>
-          NEW
-        </span>
-      )}
+    <li className='block flex justify-center shrink-0 w-full transition duration-150 ease-out'>
       <button
-        className='absolute w-full h-full flex items-center justify-center bg-white'
+        className={cn(
+          'relative flex flex-col items-center justify-center w-full',
+          {
+            'shadow hover:shadow-md hover:scale-103 hover:border-gray-150':
+              !active,
+            'cursor-pointer': item.type === 'dir',
+          }
+        )}
         onClick={() => {
           if (!active) {
             onClick(item);
@@ -88,20 +101,42 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
           }
         }}
       >
-        {isImage(thumbnail) ? (
-          <img
-            className='object-contain object-center w-full h-full'
-            src={thumbnail}
-            alt={item.filename}
-          />
-        ) : (
-          <div className='p-4 w-full flex flex-col gap-4 items-center justify-center'>
-            <FileIcon className='w-[30%] h-auto fill-gray-300' />
-            <span className='block text-base text-gray-600 w-full break-words truncate'>
-              {item.filename}
-            </span>
-          </div>
+        <span
+          className={cn(
+            'absolute bottom-0 left-0 w-full text-xs text-white px-2 py-1 truncate z-10',
+            active ? 'bg-blue-500/60' : 'bg-black/60'
+          )}
+          style={{ pointerEvents: 'none' }}
+        >
+          {item.filename}
+        </span>
+        {item.new && (
+          <span className='absolute top-1 right-1 rounded shadow bg-green-100 border border-green-200 text-[10px] tracking-wide font-bold text-green-600 px-1.5 py-0.5 z-10'>
+            NEW
+          </span>
         )}
+        <div className='relative w-full flex items-center justify-center'>
+          {itemIsImage ? (
+            <>
+              <img
+                className={cn(
+                  'block overflow-hidden object-center object-contain max-w-full max-h-[16rem] m-auto shadow',
+                  { 'border border-blue-500': active }
+                )}
+                style={checkerboardStyle}
+                src={thumbnail}
+                alt={item.filename}
+              />
+            </>
+          ) : (
+            <div className='p-4 w-full flex flex-col gap-4 items-center justify-center'>
+              <FileIcon className='w-[30%] h-auto fill-gray-300' />
+              <span className='block text-base text-gray-600 w-full break-words truncate'>
+                {item.filename}
+              </span>
+            </div>
+          )}
+        </div>
       </button>
     </li>
   );

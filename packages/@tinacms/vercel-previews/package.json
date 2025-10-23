@@ -1,6 +1,6 @@
 {
 	"name": "@tinacms/vercel-previews",
-	"version": "0.0.67",
+	"version": "0.1.4",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"module": "./dist/index.mjs",
@@ -45,7 +45,7 @@
 		"typescript": "^5.7.3"
 	},
 	"dependencies": {
-		"@vercel/stega": "^0.0.5",
+		"@vercel/stega": "catalog:",
 		"tinacms": "workspace:*"
 	},
 	"peerDependencies": {

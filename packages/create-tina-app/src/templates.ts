@@ -1,12 +1,14 @@
 import { downloadAndExtractRepo, getRepoInfo } from './util/examples';
 import { copy } from 'fs-extra';
 import path from 'path';
-import { log, TextStyles } from './util/logger';
+import { TextStyles } from './util/textstyles';
+import { Ora } from 'ora';
 
-type BaseExample = {
+export type BaseExample = {
   title: string;
   description?: string;
   value: string;
+  devUrl: string;
 };
 
 export type InternalTemplate = BaseExample & {
@@ -22,10 +24,20 @@ export const TEMPLATES: Template[] = [
   {
     title: '⭐ NextJS starter',
     description:
-      'Kickstart your project with NextJS – our top recommendation for a seamless, performant, and versatile web experience.',
+      'Kickstart your project with Next.js – our top recommendation for a seamless, performant, and versatile web experience.',
     value: 'tina-cloud-starter',
     isInternal: false,
     gitURL: 'https://github.com/tinacms/tina-cloud-starter',
+    devUrl: 'http://localhost:3000',
+  },
+  {
+    title: '⭐️ TinaDocs',
+    description:
+      'Get your documentation site up and running with TinaCMS and Next.js in minutes.',
+    value: 'tina-docs',
+    isInternal: false,
+    gitURL: 'https://github.com/tinacms/tina-docs',
+    devUrl: 'http://localhost:3000',
   },
   {
     title: 'Astro Starter',
@@ -34,6 +46,7 @@ export const TEMPLATES: Template[] = [
     value: 'tina-astro-starter',
     isInternal: false,
     gitURL: 'https://github.com/tinacms/tina-astro-starter',
+    devUrl: 'http://localhost:4321',
   },
   {
     title: 'Hugo Starter',
@@ -42,6 +55,7 @@ export const TEMPLATES: Template[] = [
     value: 'tina-hugo-starter',
     isInternal: false,
     gitURL: 'https://github.com/tinacms/tina-hugo-starter',
+    devUrl: 'http://localhost:1313',
   },
   {
     title: 'Remix Starter',
@@ -50,6 +64,7 @@ export const TEMPLATES: Template[] = [
     value: 'tina-remix-starter',
     isInternal: false,
     gitURL: 'https://github.com/tinacms/tina-remix-starter',
+    devUrl: 'http://localhost:3000',
   },
   {
     title: 'Docusaurus Starter',
@@ -58,6 +73,7 @@ export const TEMPLATES: Template[] = [
     value: 'tinasaurus',
     isInternal: false,
     gitURL: 'https://github.com/tinacms/tinasaurus',
+    devUrl: 'http://localhost:3000',
   },
   {
     title: 'Bare bones starter',
@@ -66,10 +82,15 @@ export const TEMPLATES: Template[] = [
     value: 'basic',
     isInternal: false,
     gitURL: 'https://github.com/tinacms/tina-barebones-starter',
+    devUrl: 'http://localhost:3000',
   },
 ];
 
-export async function downloadTemplate(template: Template, root: string) {
+export async function downloadTemplate(
+  template: Template,
+  root: string,
+  spinner: Ora
+) {
   if (template.isInternal === false) {
     const repoURL = new URL(template.gitURL);
     const repoInfo = await getRepoInfo(repoURL);
@@ -77,11 +98,9 @@ export async function downloadTemplate(template: Template, root: string) {
       throw new Error('Repository information not found.');
     }
 
-    log.info(
-      `Downloading files from repo ${TextStyles.link(
-        `${repoInfo?.username}/${repoInfo?.name}`
-      )}.`
-    );
+    spinner.text = `Downloading files from repo ${TextStyles.tinaOrange(
+      `${repoInfo?.username}/${repoInfo?.name}`
+    )}`;
     await downloadAndExtractRepo(root, repoInfo);
   } else {
     // Copy the template from the local file system.

@@ -34,9 +34,17 @@
           ]
         },
         {
-          "value": "let it = 'be'",
+          "type": "code_block",
           "lang": "javascript",
-          "type": "code_block"
+          "value": "let it = 'be'",
+          "children": [
+            {
+              "type": "code_line",
+              "children": [
+                { "text": "let it = 'be'" }
+              ]
+            }
+          ]
         }
       ],
       "type": "root"

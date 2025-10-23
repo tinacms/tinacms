@@ -24,6 +24,7 @@ interface ListFieldDefinititon extends Field {
   type?: string;
   list?: boolean;
   parentTypename?: string;
+  addItemBehavior?: 'append' | 'prepend';
   /**
    * An optional function which generates `props` for
    * this items's `li`.
@@ -59,7 +60,11 @@ const List = ({ tinaForm, form, field, input, meta, index }: ListProps) => {
     } else if (typeof field.defaultItem !== 'undefined') {
       newItem = field.defaultItem;
     }
-    form.mutators.insert(field.name, 0, newItem);
+    if (field.addItemBehavior === 'prepend') {
+      form.mutators.insert(field.name, 0, newItem);
+    } else {
+      form.mutators.push(field.name, newItem);
+    }
   }, [form, field]);
 
   const items = input.value || [];

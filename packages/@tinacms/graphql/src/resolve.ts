@@ -7,14 +7,17 @@ import type { TinaSchema } from '@tinacms/schema-tools';
 import type { GraphQLConfig } from './types';
 import { createSchema } from './schema/createSchema';
 import { createResolver } from './resolver';
-import { assertShape, get } from './util';
-import set from 'lodash.set';
+import { assertShape } from './util';
 
 import type { GraphQLResolveInfo } from 'graphql';
 import type { Database } from './database';
 import { NAMER } from './ast-builder';
 import { handleFetchErrorError } from './resolver/error';
-import { checkPasswordHash, mapUserFields } from './auth/utils';
+import {
+  handleAuthenticate,
+  handleAuthorize,
+  handleUpdatePassword,
+} from './resolver/auth-fields';
 import { NotFoundError } from './error';
 
 export const resolve = async ({
@@ -170,138 +173,35 @@ export const resolve = async ({
             }
           }
 
-          if (
-            info.fieldName === 'authenticate' ||
-            info.fieldName === 'authorize'
-          ) {
-            const sub = args.sub || ctxUser?.sub;
-            const collection = tinaSchema
-              .getCollections()
-              .find((c) => c.isAuthCollection);
-            if (!collection) {
-              throw new Error('Auth collection not found');
-            }
+          if (info.fieldName === 'authenticate') {
+            return handleAuthenticate({
+              tinaSchema,
+              resolver,
+              sub: args.sub,
+              password: args.password,
+              info,
+              ctxUser,
+            });
+          }
 
-            const userFields = mapUserFields(collection, ['_rawData']);
-            if (!userFields.length) {
-              throw new Error(
-                `No user field found in collection ${collection.name}`
-              );
-            }
-            if (userFields.length > 1) {
-              throw new Error(
-                `Multiple user fields found in collection ${collection.name}`
-              );
-            }
-            const userField = userFields[0];
-
-            const realPath = `${collection.path}/index.json`;
-            const userDoc = await resolver.getDocument(realPath);
-            const users = get(userDoc, userField.path);
-            if (!users) {
-              throw new Error('No users found');
-            }
-            const { idFieldName, passwordFieldName } = userField;
-            if (!idFieldName) {
-              throw new Error('No uid field found on user field');
-            }
-            const user = users.find((u) => u[idFieldName] === sub);
-            if (!user) {
-              return null;
-            }
-
-            if (info.fieldName === 'authenticate') {
-              const saltedHash = get(user, [passwordFieldName || '', 'value']);
-              if (!saltedHash) {
-                throw new Error('No password field found on user field');
-              }
-
-              const matches = await checkPasswordHash({
-                saltedHash,
-                password: args.password,
-              });
-
-              if (matches) {
-                return user;
-              }
-              return null;
-            }
-            return user;
+          if (info.fieldName === 'authorize') {
+            return handleAuthorize({
+              tinaSchema,
+              resolver,
+              sub: args.sub,
+              info,
+              ctxUser,
+            });
           }
 
           if (info.fieldName === 'updatePassword') {
-            if (!ctxUser?.sub) {
-              throw new Error('Not authorized');
-            }
-
-            if (!args.password) {
-              throw new Error('No password provided');
-            }
-
-            const collection = tinaSchema
-              .getCollections()
-              .find((c) => c.isAuthCollection);
-            if (!collection) {
-              throw new Error('Auth collection not found');
-            }
-
-            const userFields = mapUserFields(collection, ['_rawData']);
-            if (!userFields.length) {
-              throw new Error(
-                `No user field found in collection ${collection.name}`
-              );
-            }
-            if (userFields.length > 1) {
-              throw new Error(
-                `Multiple user fields found in collection ${collection.name}`
-              );
-            }
-            const userField = userFields[0];
-            const realPath = `${collection.path}/index.json`;
-            const userDoc = await resolver.getDocument(realPath);
-            const users = get(userDoc, userField.path);
-            if (!users) {
-              throw new Error('No users found');
-            }
-            const { idFieldName, passwordFieldName } = userField;
-            const user = users.find((u) => u[idFieldName] === ctxUser.sub);
-            if (!user) {
-              throw new Error('Not authorized');
-            }
-
-            user[passwordFieldName] = {
-              value: args.password,
-              passwordChangeRequired: false,
-            };
-
-            const params = {};
-            set(
-              params,
-              userField.path.slice(1), // remove _rawData from users path
-              users.map((u) => {
-                if (user[idFieldName] === u[idFieldName]) {
-                  return user;
-                }
-                return {
-                  // don't overwrite other users' passwords
-                  ...u,
-                  [passwordFieldName]: {
-                    ...u[passwordFieldName],
-                    value: '',
-                  },
-                };
-              })
-            );
-
-            await resolver.updateResolveDocument({
-              collection,
-              args: { params },
-              realPath,
-              isCollectionSpecific: true,
-              isAddPendingDocument: false,
+            return handleUpdatePassword({
+              tinaSchema,
+              resolver,
+              password: args.password,
+              info,
+              ctxUser,
             });
-
-            return true;
           }
 
           // We assume the value is already fully resolved

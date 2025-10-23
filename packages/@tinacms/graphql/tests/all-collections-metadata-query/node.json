@@ -1,0 +1,149 @@
+{
+  "data": {
+    "collections": [
+      {
+        "name": "post",
+        "label": "Blog Posts",
+        "path": "content/posts",
+        "format": "md",
+        "fields": [
+          {
+            "type": "string",
+            "label": "Title",
+            "name": "title",
+            "namespace": [
+              "post",
+              "title"
+            ],
+            "searchable": true,
+            "uid": false
+          },
+          {
+            "type": "string",
+            "label": "Author",
+            "name": "author",
+            "namespace": [
+              "post",
+              "author"
+            ],
+            "searchable": true,
+            "uid": false
+          },
+          {
+            "type": "datetime",
+            "label": "Date",
+            "name": "date",
+            "namespace": [
+              "post",
+              "date"
+            ],
+            "searchable": true,
+            "uid": false
+          },
+          {
+            "type": "rich-text",
+            "label": "Content",
+            "name": "content",
+            "namespace": [
+              "post",
+              "content"
+            ],
+            "searchable": true,
+            "parser": {
+              "type": "markdown"
+            },
+            "uid": false
+          }
+        ]
+      },
+      {
+        "name": "page",
+        "label": "Pages",
+        "path": "content/pages",
+        "format": "md",
+        "fields": [
+          {
+            "type": "string",
+            "label": "Title",
+            "name": "title",
+            "namespace": [
+              "page",
+              "title"
+            ],
+            "searchable": true,
+            "uid": false
+          },
+          {
+            "type": "string",
+            "label": "Slug",
+            "name": "slug",
+            "namespace": [
+              "page",
+              "slug"
+            ],
+            "searchable": true,
+            "uid": false
+          },
+          {
+            "type": "rich-text",
+            "label": "Body",
+            "name": "body",
+            "namespace": [
+              "page",
+              "body"
+            ],
+            "searchable": true,
+            "parser": {
+              "type": "markdown"
+            },
+            "uid": false
+          }
+        ]
+      },
+      {
+        "name": "author",
+        "label": "Authors",
+        "path": "content/authors",
+        "format": "md",
+        "fields": [
+          {
+            "type": "string",
+            "label": "Name",
+            "name": "name",
+            "namespace": [
+              "author",
+              "name"
+            ],
+            "searchable": true,
+            "uid": false
+          },
+          {
+            "type": "string",
+            "label": "Email",
+            "name": "email",
+            "namespace": [
+              "author",
+              "email"
+            ],
+            "searchable": true,
+            "uid": false
+          },
+          {
+            "type": "rich-text",
+            "label": "Bio",
+            "name": "bio",
+            "namespace": [
+              "author",
+              "bio"
+            ],
+            "searchable": true,
+            "parser": {
+              "type": "markdown"
+            },
+            "uid": false
+          }
+        ]
+      }
+    ]
+  }
+}

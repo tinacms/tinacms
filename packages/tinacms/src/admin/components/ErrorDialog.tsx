@@ -44,7 +44,7 @@ export const ErrorDialog = (props: {
           <a
             className='text-gray-600'
             style={{ textDecoration: 'underline' }}
-            href='https://tina.io/docs/errors/faq/'
+            href='https://tina.io/docs/r/FAQ/'
             target='_blank'
           >
             {' '}

@@ -35,7 +35,7 @@ function createPlaceholder(name: string, _pr: string) {
         <p className='whitespace-normal text-[15px] mt-2'>
           <a
             className='text-blue-500 underline'
-            href='https://tina.io/docs/editing/markdown/#registering-the-field-plugins'
+            href='https://tina.io/docs/r/custom-fields-react'
             target='_blank'
             rel='noreferrer noopener'
           >

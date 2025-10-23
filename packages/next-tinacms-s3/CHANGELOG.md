@@ -1,5 +1,51 @@
 # next-tinacms-s3
 
+## 12.0.0
+
+### Patch Changes
+
+- Updated dependencies [[`0bbe080`](https://github.com/tinacms/tinacms/commit/0bbe0804e334238850a4f8f33be5cd123ff68ab3), [`98fbc94`](https://github.com/tinacms/tinacms/commit/98fbc941a07fbc52edafaeb43b49b5ea30ea4172), [`ced9076`](https://github.com/tinacms/tinacms/commit/ced9076d25d7177bd8d9ae3c6133d0560366511c)]:
+  - tinacms@2.9.0
+
+## 11.0.3
+
+### Patch Changes
+
+- Updated dependencies [[`ea917dd`](https://github.com/tinacms/tinacms/commit/ea917dd2840c955d462b66b58009d2a16da39377), [`b012b6c`](https://github.com/tinacms/tinacms/commit/b012b6c7fae2674c613fd4c54e1819a86c6d2c3e), [`39e5b05`](https://github.com/tinacms/tinacms/commit/39e5b0562af7bca1e2923fc94b7c8119e12a0133), [`55e018b`](https://github.com/tinacms/tinacms/commit/55e018b9826a540005bbadf8fd51e9bac456d531)]:
+  - tinacms@2.8.3
+
+## 11.0.2
+
+### Patch Changes
+
+- Updated dependencies [[`eaa6ed5`](https://github.com/tinacms/tinacms/commit/eaa6ed551c76349c5849cd1e19a8066ecbbe205c), [`60a15d5`](https://github.com/tinacms/tinacms/commit/60a15d533b85a0c3f9f483f6f0f0b6824616284b), [`2fb1c4e`](https://github.com/tinacms/tinacms/commit/2fb1c4e79d1cae5ab29c3f93b0867214e193f59c)]:
+  - tinacms@2.8.2
+
+## 11.0.1
+
+### Patch Changes
+
+- Updated dependencies [[`41359ed`](https://github.com/tinacms/tinacms/commit/41359edaf08def7a5e26969ec114155038c09752), [`b20a2c4`](https://github.com/tinacms/tinacms/commit/b20a2c4fd64fa2d06711850db63fb317302ee361), [`41359ed`](https://github.com/tinacms/tinacms/commit/41359edaf08def7a5e26969ec114155038c09752)]:
+  - tinacms@2.8.1
+
+## 11.0.0
+
+### Minor Changes
+
+- [#5744](https://github.com/tinacms/tinacms/pull/5744) [`98a61e2`](https://github.com/tinacms/tinacms/commit/98a61e2d263978a7096cc23ac7e94aa0039981be) Thanks [@Ben0189](https://github.com/Ben0189)! - Upgrade Plate editor to v48 beta, integrating latest features and improvements.
+
+### Patch Changes
+
+- Updated dependencies [[`98a61e2`](https://github.com/tinacms/tinacms/commit/98a61e2d263978a7096cc23ac7e94aa0039981be)]:
+  - tinacms@2.8.0
+
+## 10.0.10
+
+### Patch Changes
+
+- Updated dependencies [[`5269d65`](https://github.com/tinacms/tinacms/commit/5269d6578d361c55326f39375eaa175707342d51), [`3026a2b`](https://github.com/tinacms/tinacms/commit/3026a2b492113a53c036e43d5d85837cea4a6de3), [`28a94a6`](https://github.com/tinacms/tinacms/commit/28a94a602186f48b528b91236007839e5d02a9de)]:
+  - tinacms@2.7.10
+
 ## 10.0.9
 
 ### Patch Changes

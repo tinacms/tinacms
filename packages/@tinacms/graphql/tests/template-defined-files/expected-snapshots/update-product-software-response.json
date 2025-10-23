@@ -1,0 +1,16 @@
+{
+  "data": {
+    "updateProduct": {
+      "__typename": "ProductSoftware",
+      "id": "products/crm-software.md",
+      "_sys": {
+        "filename": "crm-software",
+        "extension": ".md",
+        "path": "products/crm-software.md"
+      },
+      "title": "Northwind CRM Enterprise",
+      "version": "3.0.0",
+      "platform": "cloud"
+    }
+  }
+}

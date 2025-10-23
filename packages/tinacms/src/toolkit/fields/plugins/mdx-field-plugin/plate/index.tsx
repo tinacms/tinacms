@@ -1,68 +1,38 @@
-import { Plate, createPlugins } from '@udecode/plate-common';
 import React from 'react';
-import type { RichTextType } from '..';
-import { Editor } from './components/editor';
-import FixedToolbarButtons from './components/fixed-toolbar-buttons';
-import FloatingToolbarButtons from './components/floating-toolbar-buttons';
-import { FixedToolbar } from './components/plate-ui/fixed-toolbar';
-import { FloatingToolbar } from './components/plate-ui/floating-toolbar';
-import { LinkFloatingToolbar } from './components/plate-ui/link-floating-toolbar';
-import { TooltipProvider } from './components/plate-ui/tooltip';
-import { commonPlugins, formattingPlugins } from './plugins/core';
-import { helpers } from './plugins/core/common';
-import createImgPlugin from './plugins/create-img-plugin';
-import { createInvalidMarkdownPlugin } from './plugins/create-invalid-markdown-plugin';
-import { createLinkPlugin } from './plugins/create-link-plugin';
-import {
-  createMdxBlockPlugin,
-  createMdxInlinePlugin,
-} from './plugins/create-mdx-plugins';
-import { createMermaidPlugin } from './plugins/custom/mermaid-plugin';
 import { Components } from './plugins/ui/components';
-import { uuid } from './plugins/ui/helpers';
+import { helpers, normalizeLinksInCodeBlocks } from './plugins/core/common';
+import type { RichTextType } from '..';
+import { Editor, EditorContainer } from './components/editor';
+import { FixedToolbar } from './components/plate-ui/fixed-toolbar';
+import { TooltipProvider } from './components/plate-ui/tooltip';
+import FixedToolbarButtons from './components/fixed-toolbar-buttons';
 import { ToolbarProvider } from './toolbar/toolbar-provider';
-import { isUrl } from './transforms/is-url';
+import { Plate } from '@udecode/plate/react';
+import { useCreateEditor } from './hooks/use-create-editor';
+import { editorPlugins } from './plugins/editor-plugins';
+import { FloatingToolbar } from './components/plate-ui/floating-toolbar';
+import FloatingToolbarButtons from './components/floating-toolbar-buttons';
 
 export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
-  const initialValue = React.useMemo(
-    () =>
-      field?.parser?.type === 'slatejson'
-        ? input.value.children
-        : input.value?.children?.length
-          ? input.value.children.map(helpers.normalize)
-          : [{ type: 'p', children: [{ type: 'text', text: '' }] }],
-    []
-  );
+  const initialValue = React.useMemo(() => {
+    if (field?.parser?.type === 'slatejson') {
+      return input.value.children;
+    } else if (input.value?.children?.length) {
+      const normalized = input.value.children.map(helpers.normalize);
+      return normalized;
+    } else {
+      return [{ type: 'p', children: [{ type: 'text', text: '' }] }];
+    }
+  }, []);
 
-  const plugins = React.useMemo(
-    () =>
-      createPlugins(
-        [
-          ...formattingPlugins,
-          ...commonPlugins,
-          createMdxBlockPlugin(),
-          createMdxInlinePlugin(),
-          createImgPlugin(),
-          createMermaidPlugin(),
-          createInvalidMarkdownPlugin(),
-          createLinkPlugin({
-            options: {
-              //? NOTE: This is a custom validation function that allows for relative links i.e. /about
-              isUrl: (url: string) => isUrl(url),
-            },
-            renderAfterEditable: LinkFloatingToolbar,
-          }),
-        ],
-        {
-          components: Components(),
-        }
-      ),
-    []
-  );
+  //TODO try with a wrapper?
+  const editor = useCreateEditor({
+    plugins: [...editorPlugins],
+    value: initialValue,
+    components: Components(),
+  });
 
   // This should be a plugin customization
-  const tempId = [tinaForm.id, input.name].join('.');
-  const id = React.useMemo(() => uuid() + tempId, [tempId]);
   const ref = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -80,39 +50,45 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
       }, 100);
     }
   }, [field.experimental_focusIntent, ref]);
-
+  //
   return (
     <div ref={ref}>
       <Plate
-        id={id}
-        initialValue={initialValue}
-        plugins={plugins}
+        editor={editor}
         onChange={(value) => {
+          // Normalize links in code blocks before saving (we dont want type: 'a' inside code blocks, this will break the mdx parser)
+          // Ideal Solution: let code block provider to have a option for exclude certain plugins
+          const normalized = (value.value as any[]).map(
+            normalizeLinksInCodeBlocks
+          );
+
           input.onChange({
             type: 'root',
-            children: value,
+            children: normalized,
           });
         }}
       >
-        <TooltipProvider>
-          <ToolbarProvider
-            tinaForm={tinaForm}
-            templates={field.templates}
-            overrides={
-              field?.toolbarOverride ? field.toolbarOverride : field.overrides
-            }
-          >
-            <FixedToolbar>
-              <FixedToolbarButtons />
-            </FixedToolbar>
-            {field?.overrides?.showFloatingToolbar !== false ? (
-              <FloatingToolbar>
-                <FloatingToolbarButtons />
-              </FloatingToolbar>
-            ) : null}
-          </ToolbarProvider>
-          <Editor />
-        </TooltipProvider>
+        <EditorContainer>
+          <TooltipProvider>
+            <ToolbarProvider
+              tinaForm={tinaForm}
+              templates={field.templates}
+              overrides={
+                field?.toolbarOverride ? field.toolbarOverride : field.overrides
+              }
+            >
+              <FixedToolbar>
+                <FixedToolbarButtons />
+              </FixedToolbar>
+              {field?.overrides?.showFloatingToolbar !== false ? (
+                <FloatingToolbar>
+                  <FloatingToolbarButtons />
+                </FloatingToolbar>
+              ) : null}
+            </ToolbarProvider>
+            <Editor />
+          </TooltipProvider>
+        </EditorContainer>
       </Plate>
     </div>
   );

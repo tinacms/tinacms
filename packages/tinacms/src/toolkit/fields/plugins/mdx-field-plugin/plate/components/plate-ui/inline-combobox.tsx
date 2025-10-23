@@ -12,7 +12,11 @@ import React, {
   useState,
 } from 'react';
 
-import type { PointRef } from 'slate';
+import {
+  useComboboxInput,
+  UseComboboxInputResult,
+  useHTMLInputCursorState,
+} from '@udecode/plate-combobox/react';
 
 import {
   Combobox,
@@ -25,23 +29,10 @@ import {
   useComboboxStore,
 } from '@ariakit/react';
 import { cn } from '@udecode/cn';
-import {
-  type UseComboboxInputResult,
-  filterWords,
-  useComboboxInput,
-  useHTMLInputCursorState,
-} from '@udecode/plate-combobox';
-import {
-  type TElement,
-  createPointRef,
-  findNodePath,
-  getPointBefore,
-  insertText,
-  moveSelection,
-  useComposedRef,
-  useEditorRef,
-} from '@udecode/plate-common';
+import { filterWords } from '@udecode/plate-combobox';
+import { useComposedRef, useEditorRef } from '@udecode/plate/react';
 import { cva } from 'class-variance-authority';
+import { PointRef, TElement } from '@udecode/plate';
 
 type FilterFn = (
   item: { keywords?: string[]; value: string },
@@ -112,15 +103,15 @@ const InlineCombobox = ({
   const [insertPoint, setInsertPoint] = useState<PointRef | null>(null);
 
   useEffect(() => {
-    const path = findNodePath(editor, element);
+    const path = editor.api.findPath(element);
 
     if (!path) return;
 
-    const point = getPointBefore(editor, path);
+    const point = editor.api.before(path);
 
     if (!point) return;
 
-    const pointRef = createPointRef(editor, point);
+    const pointRef = editor.api.pointRef(point);
     setInsertPoint(pointRef);
 
     return () => {
@@ -129,16 +120,16 @@ const InlineCombobox = ({
   }, [editor, element]);
 
   const { props: inputProps, removeInput } = useComboboxInput({
-    cancelInputOnBlur: false,
+    cancelInputOnBlur: true,
     cursorState,
     onCancelInput: (cause) => {
       if (cause !== 'backspace') {
-        insertText(editor, trigger + value, {
+        editor.tf.insertText(trigger + value, {
           at: insertPoint?.current ?? undefined,
         });
       }
       if (cause === 'arrowLeft' || cause === 'arrowRight') {
-        moveSelection(editor, {
+        editor.tf.move({
           distance: 1,
           reverse: cause === 'arrowLeft',
         });
