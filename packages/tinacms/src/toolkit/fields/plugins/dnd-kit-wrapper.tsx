@@ -15,9 +15,9 @@ import {
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import {
   useSortable,
+  defaultAnimateLayoutChanges,
+  type AnimateLayoutChanges,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
@@ -73,31 +73,50 @@ export const DragDropContext: React.FC<DragDropContextProps> = ({
   onDragEnd,
   children,
 }) => {
+  const [activeId, setActiveId] = React.useState<string | null>(null);
+  const [overId, setOverId] = React.useState<string | null>(null);
+
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Require 8px movement before drag starts
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
 
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(String(event.active.id));
+  };
+
+  const handleDragOver = (event: any) => {
+    const { over } = event;
+    setOverId(over ? String(over.id) : null);
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+
+    setActiveId(null);
+    setOverId(null);
 
     if (!over || active.id === over.id) {
       return;
     }
 
     // Parse the IDs to extract field name and indices
-    const activeId = String(active.id);
-    const overId = String(over.id);
+    const activeIdStr = String(active.id);
+    const overIdStr = String(over.id);
     
     // Extract field name (everything before the last dot)
-    const activeFieldName = activeId.substring(0, activeId.lastIndexOf('.'));
-    const overFieldName = overId.substring(0, overId.lastIndexOf('.'));
+    const activeFieldName = activeIdStr.substring(0, activeIdStr.lastIndexOf('.'));
+    const overFieldName = overIdStr.substring(0, overIdStr.lastIndexOf('.'));
     
     // Extract indices (everything after the last dot)
-    const activeIndex = parseInt(activeId.substring(activeId.lastIndexOf('.') + 1));
-    const overIndex = parseInt(overId.substring(overId.lastIndexOf('.') + 1));
+    const activeIndex = parseInt(activeIdStr.substring(activeIdStr.lastIndexOf('.') + 1));
+    const overIndex = parseInt(overIdStr.substring(overIdStr.lastIndexOf('.') + 1));
 
     if (activeFieldName === overFieldName) {
       const result: DropResult = {
@@ -110,15 +129,25 @@ export const DragDropContext: React.FC<DragDropContextProps> = ({
         type: activeFieldName,
       };
 
+      // Call onDragEnd immediately
+      // dnd-kit's transforms handle the visual transition smoothly
       onDragEnd(result);
     }
+  };
+
+  const handleDragCancel = () => {
+    setActiveId(null);
+    setOverId(null);
   };
 
   return (
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
+      onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
+      onDragCancel={handleDragCancel}
     >
       {children}
     </DndContext>
@@ -147,6 +176,25 @@ export const Draggable: React.FC<DraggableProps> = ({
   index,
   children,
 }) => {
+  // Customize animation behavior to prevent snap-back
+  const animateLayoutChanges: AnimateLayoutChanges = (args) => {
+    const { isSorting, wasDragging } = args;
+    
+    // Don't animate when the item was just being dragged
+    // This prevents the snap-back effect on drop
+    if (wasDragging) {
+      return false;
+    }
+    
+    // Animate during sorting
+    if (isSorting) {
+      return defaultAnimateLayoutChanges(args);
+    }
+    
+    // Allow animations in other cases
+    return true;
+  };
+
   const {
     attributes,
     listeners,
@@ -154,11 +202,17 @@ export const Draggable: React.FC<DraggableProps> = ({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: draggableId });
+    setActivatorNodeRef,
+  } = useSortable({ 
+    id: draggableId,
+    animateLayoutChanges,
+  });
 
-  const style = {
+  const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
+    // Boost zIndex for dragging item to prevent visual glitches
+    ...(isDragging && { zIndex: 9999 }),
   };
 
   return (
@@ -172,7 +226,7 @@ export const Draggable: React.FC<DraggableProps> = ({
             ...attributes,
           },
           dragHandleProps: {
-            style: {},
+            ref: setActivatorNodeRef,
             ...listeners,
           },
         },

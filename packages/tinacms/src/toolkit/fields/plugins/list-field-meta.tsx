@@ -50,7 +50,6 @@ export const ListFieldMeta = ({
       margin={margin}
       {...hoverEvents}
       onClick={() => setFocusedField({ id: tinaForm.id, fieldName: name })}
-      style={{ zIndex: index ? 1000 - index : undefined }}
       {...props}
     >
       <ListHeader>

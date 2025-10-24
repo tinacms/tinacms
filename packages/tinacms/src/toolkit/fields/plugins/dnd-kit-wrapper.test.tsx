@@ -1,5 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
+import { describe, it, vi } from 'vitest';
 import { DragDropContext, Droppable, Draggable, SortableProvider } from './dnd-kit-wrapper';
 
 describe('DnD Kit Wrapper', () => {
