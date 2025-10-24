@@ -37,7 +37,6 @@ export const Group = wrapFieldWithNoHeader(
               return;
             }
 
-            // setExpanded((p) => !p)
             cms.dispatch({
               type: 'forms:set-active-field-name',
               value: { formId: tinaForm.id, fieldName: field.name },
@@ -52,12 +51,6 @@ export const Group = wrapFieldWithNoHeader(
             ></span>
           )}
         </Header>
-        {/* <Panel
-        isExpanded={isExpanded}
-        setExpanded={setExpanded}
-        field={field}
-        tinaForm={tinaForm}
-      /> */}
       </>
     );
   }
@@ -70,6 +63,7 @@ interface PanelProps {
   field: GroupFieldDefinititon;
   children?: any;
 }
+
 const Panel = function Panel({
   setExpanded,
   isExpanded,

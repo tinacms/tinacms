@@ -120,7 +120,9 @@ const Blocks = ({
           {(provider) => (
             <div ref={provider.innerRef} className='edit-page--list-parent'>
               {items.length === 0 && <EmptyList />}
-              <SortableProvider items={items.map((_, index) => `${field.name}.${index}`)}>
+              <SortableProvider
+                items={items.map((_, index) => `${field.name}.${index}`)}
+              >
                 {items.map((block: any, index: any) => {
                   const template = field.templates[block._template];
 
@@ -201,7 +203,10 @@ const BlockListItem = ({
       {(provider, snapshot) => (
         <>
           <ItemHeader provider={provider} isDragging={snapshot.isDragging}>
-            <DragHandle isDragging={snapshot.isDragging} dragHandleProps={provider.dragHandleProps} />
+            <DragHandle
+              isDragging={snapshot.isDragging}
+              dragHandleProps={provider.dragHandleProps}
+            />
             <ItemClickTarget
               onClick={() => {
                 const state = tinaForm.finalForm.getState();
@@ -263,7 +268,10 @@ const InvalidBlockListItem = ({
     <Draggable key={index} draggableId={`${field.name}.${index}`} index={index}>
       {(provider, snapshot) => (
         <ItemHeader provider={provider} isDragging={snapshot.isDragging}>
-          <DragHandle isDragging={snapshot.isDragging} dragHandleProps={provider.dragHandleProps} />
+          <DragHandle
+            isDragging={snapshot.isDragging}
+            dragHandleProps={provider.dragHandleProps}
+          />
           <ItemClickTarget>
             <GroupLabel error>Invalid Block</GroupLabel>
           </ItemClickTarget>

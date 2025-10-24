@@ -3,7 +3,6 @@ import {
   DndContext,
   DragEndEvent,
   DragStartEvent,
-  DragOverlay,
   closestCenter,
   KeyboardSensor,
   PointerSensor,
@@ -11,7 +10,6 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import {
-  arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
@@ -21,7 +19,6 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-// Compatibility layer for react-beautiful-dnd API
 export interface DropResult {
   destination: {
     index: number;
@@ -68,7 +65,6 @@ export interface DraggableProps {
   ) => React.ReactNode;
 }
 
-// Implementation of compatibility layer
 export const DragDropContext: React.FC<DragDropContextProps> = ({
   onDragEnd,
   children,
@@ -106,17 +102,20 @@ export const DragDropContext: React.FC<DragDropContextProps> = ({
       return;
     }
 
-    // Parse the IDs to extract field name and indices
     const activeIdStr = String(active.id);
     const overIdStr = String(over.id);
-    
-    // Extract field name (everything before the last dot)
-    const activeFieldName = activeIdStr.substring(0, activeIdStr.lastIndexOf('.'));
+
+    const activeFieldName = activeIdStr.substring(
+      0,
+      activeIdStr.lastIndexOf('.')
+    );
     const overFieldName = overIdStr.substring(0, overIdStr.lastIndexOf('.'));
-    
-    // Extract indices (everything after the last dot)
-    const activeIndex = parseInt(activeIdStr.substring(activeIdStr.lastIndexOf('.') + 1));
-    const overIndex = parseInt(overIdStr.substring(overIdStr.lastIndexOf('.') + 1));
+    const activeIndex = parseInt(
+      activeIdStr.substring(activeIdStr.lastIndexOf('.') + 1)
+    );
+    const overIndex = parseInt(
+      overIdStr.substring(overIdStr.lastIndexOf('.') + 1)
+    );
 
     if (activeFieldName === overFieldName) {
       const result: DropResult = {
@@ -128,9 +127,6 @@ export const DragDropContext: React.FC<DragDropContextProps> = ({
         },
         type: activeFieldName,
       };
-
-      // Call onDragEnd immediately
-      // dnd-kit's transforms handle the visual transition smoothly
       onDragEnd(result);
     }
   };
@@ -165,7 +161,7 @@ export const Droppable: React.FC<DroppableProps> = ({
     <>
       {children({
         innerRef: ref,
-        placeholder: null, // dnd-kit doesn't use placeholders the same way
+        placeholder: null,
       })}
     </>
   );
@@ -173,25 +169,19 @@ export const Droppable: React.FC<DroppableProps> = ({
 
 export const Draggable: React.FC<DraggableProps> = ({
   draggableId,
-  index,
   children,
 }) => {
-  // Customize animation behavior to prevent snap-back
   const animateLayoutChanges: AnimateLayoutChanges = (args) => {
     const { isSorting, wasDragging } = args;
-    
-    // Don't animate when the item was just being dragged
-    // This prevents the snap-back effect on drop
+
     if (wasDragging) {
       return false;
     }
-    
-    // Animate during sorting
+
     if (isSorting) {
       return defaultAnimateLayoutChanges(args);
     }
-    
-    // Allow animations in other cases
+
     return true;
   };
 
@@ -203,7 +193,7 @@ export const Draggable: React.FC<DraggableProps> = ({
     transition,
     isDragging,
     setActivatorNodeRef,
-  } = useSortable({ 
+  } = useSortable({
     id: draggableId,
     animateLayoutChanges,
   });
@@ -211,7 +201,6 @@ export const Draggable: React.FC<DraggableProps> = ({
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
-    // Boost zIndex for dragging item to prevent visual glitches
     ...(isDragging && { zIndex: 9999 }),
   };
 
@@ -219,7 +208,7 @@ export const Draggable: React.FC<DraggableProps> = ({
     <>
       {children(
         {
-          innerRef: { current: null }, // We handle ref differently
+          innerRef: { current: null },
           draggableProps: {
             ref: setNodeRef,
             style,
@@ -237,8 +226,6 @@ export const Draggable: React.FC<DraggableProps> = ({
     </>
   );
 };
-
-// Context for managing sortable items
 interface SortableProviderProps {
   items: string[];
   children: React.ReactNode;

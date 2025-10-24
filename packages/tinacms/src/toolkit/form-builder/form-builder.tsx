@@ -5,7 +5,10 @@ import { Form as FinalForm } from 'react-final-form';
 
 import { useBranchData } from '@toolkit/plugin-branch-switcher';
 import { Button, OverflowMenu } from '@toolkit/styles';
-import { DragDropContext, type DropResult } from '../fields/plugins/dnd-kit-wrapper';
+import {
+  DragDropContext,
+  type DropResult,
+} from '../fields/plugins/dnd-kit-wrapper';
 import { AiOutlineLoading } from 'react-icons/ai';
 import { BiError, BiGitBranch } from 'react-icons/bi';
 import { FaCircle } from 'react-icons/fa';

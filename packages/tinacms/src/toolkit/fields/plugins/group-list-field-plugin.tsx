@@ -104,7 +104,9 @@ const Group = ({ tinaForm, form, field, input, meta, index }: GroupProps) => {
             {(provider) => (
               <div ref={provider.innerRef}>
                 {items.length === 0 && <EmptyList />}
-                <SortableProvider items={items.map((_, index) => `${field.name}.${index}`)}>
+                <SortableProvider
+                  items={items.map((_, index) => `${field.name}.${index}`)}
+                >
                   {items.map((item: any, index: any) => (
                     <Item
                       // NOTE: Supressing warnings, but not helping with render perf
@@ -168,7 +170,10 @@ const Item = ({
             isDragging={snapshot.isDragging}
             {...p}
           >
-            <DragHandle isDragging={snapshot.isDragging} dragHandleProps={provider.dragHandleProps} />
+            <DragHandle
+              isDragging={snapshot.isDragging}
+              dragHandleProps={provider.dragHandleProps}
+            />
             <ItemClickTarget
               onMouseOver={() =>
                 setHoveredField({
@@ -286,7 +291,10 @@ export const ItemDeleteButton = ({ onClick, disabled = false }) => {
   );
 };
 
-export const DragHandle = ({ isDragging, dragHandleProps }: { isDragging: boolean; dragHandleProps?: any }) => {
+export const DragHandle = ({
+  isDragging,
+  dragHandleProps,
+}: { isDragging: boolean; dragHandleProps?: any }) => {
   return (
     <div
       {...dragHandleProps}
@@ -305,16 +313,6 @@ export const DragHandle = ({ isDragging, dragHandleProps }: { isDragging: boolea
     </div>
   );
 };
-
-interface PanelProps {
-  setExpanded(next: boolean): void;
-  isExpanded: boolean;
-  tinaForm: Form;
-  index: number;
-  field: GroupFieldDefinititon;
-  itemTitle: string;
-  zIndexShift: number;
-}
 
 export const GroupListField = Group;
 

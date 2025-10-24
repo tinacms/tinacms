@@ -105,7 +105,9 @@ const List = ({ tinaForm, form, field, input, meta, index }: ListProps) => {
             {(provider) => (
               <div ref={provider.innerRef}>
                 {items.length === 0 && <EmptyList />}
-                <SortableProvider items={items.map((_, index) => `${field.name}.${index}`)}>
+                <SortableProvider
+                  items={items.map((_, index) => `${field.name}.${index}`)}
+                >
                   {items.map((item: any, index: any) => (
                     <Item
                       // NOTE: Supressing warnings, but not helping with render perf
@@ -168,7 +170,10 @@ const Item = ({
     <Draggable draggableId={`${field.name}.${index}`} index={index}>
       {(provider, snapshot) => (
         <ItemHeader provider={provider} isDragging={snapshot.isDragging} {...p}>
-          <DragHandle isDragging={snapshot.isDragging} dragHandleProps={provider.dragHandleProps} />
+          <DragHandle
+            isDragging={snapshot.isDragging}
+            dragHandleProps={provider.dragHandleProps}
+          />
           <ItemClickTarget>
             <FieldsBuilder padding={false} form={tinaForm} fields={fields} />
           </ItemClickTarget>
