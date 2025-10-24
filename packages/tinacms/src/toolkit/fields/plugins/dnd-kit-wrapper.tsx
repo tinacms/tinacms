@@ -69,13 +69,11 @@ export const DragDropContext: React.FC<DragDropContextProps> = ({
   onDragEnd,
   children,
 }) => {
-  const [activeId, setActiveId] = React.useState<string | null>(null);
-  const [overId, setOverId] = React.useState<string | null>(null);
-
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8, // Require 8px movement before drag starts
+        delay: 100, 
+        tolerance: 5, 
       },
     }),
     useSensor(KeyboardSensor, {
@@ -83,20 +81,8 @@ export const DragDropContext: React.FC<DragDropContextProps> = ({
     })
   );
 
-  const handleDragStart = (event: DragStartEvent) => {
-    setActiveId(String(event.active.id));
-  };
-
-  const handleDragOver = (event: any) => {
-    const { over } = event;
-    setOverId(over ? String(over.id) : null);
-  };
-
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-
-    setActiveId(null);
-    setOverId(null);
 
     if (!over || active.id === over.id) {
       return;
@@ -131,19 +117,11 @@ export const DragDropContext: React.FC<DragDropContextProps> = ({
     }
   };
 
-  const handleDragCancel = () => {
-    setActiveId(null);
-    setOverId(null);
-  };
-
   return (
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
-      onDragStart={handleDragStart}
-      onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
-      onDragCancel={handleDragCancel}
     >
       {children}
     </DndContext>
@@ -192,7 +170,6 @@ export const Draggable: React.FC<DraggableProps> = ({
     transform,
     transition,
     isDragging,
-    setActivatorNodeRef,
   } = useSortable({
     id: draggableId,
     animateLayoutChanges,
@@ -213,9 +190,9 @@ export const Draggable: React.FC<DraggableProps> = ({
             ref: setNodeRef,
             style,
             ...attributes,
+            ...listeners, 
           },
           dragHandleProps: {
-            ref: setActivatorNodeRef,
             ...listeners,
           },
         },

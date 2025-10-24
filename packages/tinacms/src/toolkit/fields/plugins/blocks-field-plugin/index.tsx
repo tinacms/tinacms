@@ -205,7 +205,6 @@ const BlockListItem = ({
           <ItemHeader provider={provider} isDragging={snapshot.isDragging}>
             <DragHandle
               isDragging={snapshot.isDragging}
-              dragHandleProps={provider.dragHandleProps}
             />
             <ItemClickTarget
               onClick={() => {
@@ -270,7 +269,6 @@ const InvalidBlockListItem = ({
         <ItemHeader provider={provider} isDragging={snapshot.isDragging}>
           <DragHandle
             isDragging={snapshot.isDragging}
-            dragHandleProps={provider.dragHandleProps}
           />
           <ItemClickTarget>
             <GroupLabel error>Invalid Block</GroupLabel>

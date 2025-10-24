@@ -172,7 +172,6 @@ const Item = ({
         <ItemHeader provider={provider} isDragging={snapshot.isDragging} {...p}>
           <DragHandle
             isDragging={snapshot.isDragging}
-            dragHandleProps={provider.dragHandleProps}
           />
           <ItemClickTarget>
             <FieldsBuilder padding={false} form={tinaForm} fields={fields} />

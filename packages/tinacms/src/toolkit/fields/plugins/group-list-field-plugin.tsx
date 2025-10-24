@@ -172,7 +172,6 @@ const Item = ({
           >
             <DragHandle
               isDragging={snapshot.isDragging}
-              dragHandleProps={provider.dragHandleProps}
             />
             <ItemClickTarget
               onMouseOver={() =>
@@ -293,11 +292,9 @@ export const ItemDeleteButton = ({ onClick, disabled = false }) => {
 
 export const DragHandle = ({
   isDragging,
-  dragHandleProps,
-}: { isDragging: boolean; dragHandleProps?: any }) => {
+}: { isDragging: boolean }) => {
   return (
     <div
-      {...dragHandleProps}
       className={`relative w-8 px-1 py-2.5 flex items-center justify-center hover:bg-gray-50 group cursor-[grab] ${
         isDragging ? `text-blue-500` : `text-gray-200 hover:text-gray-600`
       }`}
