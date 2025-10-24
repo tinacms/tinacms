@@ -72,8 +72,8 @@ export const DragDropContext: React.FC<DragDropContextProps> = ({
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        delay: 100, 
-        tolerance: 5, 
+        delay: 100,
+        tolerance: 5,
       },
     }),
     useSensor(KeyboardSensor, {
@@ -190,7 +190,7 @@ export const Draggable: React.FC<DraggableProps> = ({
             ref: setNodeRef,
             style,
             ...attributes,
-            ...listeners, 
+            ...listeners,
           },
           dragHandleProps: {
             ...listeners,

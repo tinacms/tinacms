@@ -170,9 +170,7 @@ const Item = ({
     <Draggable draggableId={`${field.name}.${index}`} index={index}>
       {(provider, snapshot) => (
         <ItemHeader provider={provider} isDragging={snapshot.isDragging} {...p}>
-          <DragHandle
-            isDragging={snapshot.isDragging}
-          />
+          <DragHandle isDragging={snapshot.isDragging} />
           <ItemClickTarget>
             <FieldsBuilder padding={false} form={tinaForm} fields={fields} />
           </ItemClickTarget>
