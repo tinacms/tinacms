@@ -1,4 +1,4 @@
-The _TinaCloud CLI_ can be used to set up your project with TinaCloud configuration, and run a local version of the TinaCloud content-api (using your file system's content). For a real-world example of how this is being used checkout the [TinaCloud Starter](https://github.com/tinacms/tina-cloud-starter).
+The _TinaCloud CLI_ can be used to set up your project with TinaCloud configuration, and run a local version of the TinaCloud content-api (using your file system's content). For a real-world example of how this is being used checkout the [TinaCloud Starter](https://github.com/tinacms/tina-nextjs-starter).
 
 ## Installation
 
@@ -137,7 +137,7 @@ The top-level key in the schema is an array of _collections_, a `collection` inf
 
 ### `templates`
 
-Templates are responsible for defining the shape of your content, you'll see in the schema for [the starter](https://github.com/tinacms/tina-cloud-starter) that we use `templates` for `collections` as well as `blocks`. One important thing to note is that since a `collection` can have multiple `templates`, each file in your collection must store a `_template` key in it's frontmatter:
+Templates are responsible for defining the shape of your content, you'll see in the schema for [the starter](https://github.com/tinacms/tina-nextjs-starter) that we use `templates` for `collections` as well as `blocks`. One important thing to note is that since a `collection` can have multiple `templates`, each file in your collection must store a `_template` key in it's frontmatter:
 
 ```markdown
 ---
