@@ -949,7 +949,9 @@ const CollectionListPage = () => {
                                               allowDelete && {
                                                 name: 'rename',
                                                 label: 'Rename',
-                                                Icon: <BiRename size='1.3rem' />,
+                                                Icon: (
+                                                  <BiRename size='1.3rem' />
+                                                ),
                                                 onMouseDown: () => {
                                                   setVars((old) => ({
                                                     ...old,

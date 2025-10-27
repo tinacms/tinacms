@@ -51,7 +51,7 @@ export const OverflowMenu = ({ toolbarItems, className = 'w-full' }) => {
                           ? 'bg-gray-50 text-blue-500'
                           : 'bg-white text-gray-600',
                         'hover:bg-gray-50 hover:text-blue-500 cursor-pointer pointer-events-auto px-4 py-2 text-sm w-full flex items-center whitespace-nowrap',
-                        toolbarItem.className ?? '',
+                        toolbarItem.className ?? ''
                       )}
                     >
                       <div className='mr-2 opacity-80'>{toolbarItem.Icon}</div>{' '}
