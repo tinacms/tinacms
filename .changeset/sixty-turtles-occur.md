@@ -8,4 +8,4 @@
 "@tinacms/scripts": patch
 ---
 
-Migrate from react-beautiful-dnd to dnd-kit to fix deprecation error
+Migrate from react-beautiful-dnd to dnd-kit to fix deprecation error.
