@@ -947,42 +947,9 @@ const CollectionListPage = () => {
                                                 },
                                               },
                                               allowDelete && {
-                                                name: 'delete',
-                                                label: 'Delete',
-                                                Icon: (
-                                                  <BiTrash
-                                                    size='1.3rem'
-                                                    className='text-red-500'
-                                                  />
-                                                ),
-                                                onMouseDown: () => {
-                                                  setVars((old) => ({
-                                                    ...old,
-                                                    collection: collectionName,
-                                                    relativePathWithoutExtension:
-                                                      document.node._sys.breadcrumbs.join(
-                                                        '/'
-                                                      ),
-                                                    relativePath:
-                                                      document.node._sys.breadcrumbs.join(
-                                                        '/'
-                                                      ) +
-                                                      document.node._sys
-                                                        .extension,
-                                                    newRelativePath: '',
-                                                  }));
-                                                  setDeleteModalOpen(true);
-                                                },
-                                              },
-                                              allowDelete && {
                                                 name: 'rename',
                                                 label: 'Rename',
-                                                Icon: (
-                                                  <BiRename
-                                                    size='1.3rem'
-                                                    className='text-red-500'
-                                                  />
-                                                ),
+                                                Icon: <BiRename size='1.3rem' />,
                                                 onMouseDown: () => {
                                                   setVars((old) => ({
                                                     ...old,
@@ -1000,6 +967,35 @@ const CollectionListPage = () => {
                                                     newRelativePath: '',
                                                   }));
                                                   setRenameModalOpen(true);
+                                                },
+                                              },
+                                              allowDelete && {
+                                                name: 'delete',
+                                                label: 'Delete',
+                                                Icon: (
+                                                  <BiTrash
+                                                    size='1.3rem'
+                                                    className='text-red-500'
+                                                  />
+                                                ),
+                                                className: 'text-red-500',
+                                                onMouseDown: () => {
+                                                  setVars((old) => ({
+                                                    ...old,
+                                                    collection: collectionName,
+                                                    relativePathWithoutExtension:
+                                                      document.node._sys.breadcrumbs.join(
+                                                        '/'
+                                                      ),
+                                                    relativePath:
+                                                      document.node._sys.breadcrumbs.join(
+                                                        '/'
+                                                      ) +
+                                                      document.node._sys
+                                                        .extension,
+                                                    newRelativePath: '',
+                                                  }));
+                                                  setDeleteModalOpen(true);
                                                 },
                                               },
                                             ].filter(Boolean)}
