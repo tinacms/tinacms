@@ -4,9 +4,9 @@
 	"main": "src/main.tsx",
 	"license": "Apache-2.0",
 	"devDependencies": {
-		"@types/react": "^18.3.18",
-		"@types/react-dom": "^18.3.5",
-		"typescript": "^5.7.3"
+		"@types/react": "catalog:",
+		"@types/react-dom": "catalog:",
+		"typescript": "catalog:"
 	},
 	"peerDependencies": {
 		"react": ">=18.3.1 <20.0.0",
@@ -26,7 +26,7 @@
 		"react-dom": "^18.3.1",
 		"react-router-dom": "catalog:",
 		"tinacms": "workspace:*",
-		"typescript": "^5.7.3",
-		"zod": "^3.24.2"
+		"typescript": "catalog:",
+		"zod": "catalog:"
 	}
 }

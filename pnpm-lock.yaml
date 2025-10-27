@@ -67,8 +67,8 @@ catalogs:
       specifier: ^2.2.5
       version: 2.2.5
     '@monaco-editor/react':
-      specifier: 4.4.5
-      version: 4.4.5
+      specifier: 4.7.0-rc.0
+      version: 4.7.0-rc.0
     '@octokit/rest':
       specifier: ^19.0.13
       version: 19.0.13
@@ -78,9 +78,36 @@ catalogs:
     '@puppeteer/replay':
       specifier: ^1.3.2
       version: 1.3.2
+    '@radix-ui/react-checkbox':
+      specifier: ^1.1.4
+      version: 1.1.4
+    '@radix-ui/react-dialog':
+      specifier: ^1.1.6
+      version: 1.1.14
+    '@radix-ui/react-dropdown-menu':
+      specifier: ^2.1.6
+      version: 2.1.6
     '@radix-ui/react-icons':
       specifier: ^1.3.2
       version: 1.3.2
+    '@radix-ui/react-popover':
+      specifier: ^1.1.6
+      version: 1.1.6
+    '@radix-ui/react-separator':
+      specifier: ^1.1.2
+      version: 1.1.2
+    '@radix-ui/react-slot':
+      specifier: ^1.1.2
+      version: 1.2.3
+    '@radix-ui/react-toolbar':
+      specifier: ^1.1.2
+      version: 1.1.2
+    '@radix-ui/react-tooltip':
+      specifier: ^1.2.6
+      version: 1.2.7
+    '@react-hook/window-size':
+      specifier: ^3.1.1
+      version: 3.1.1
     '@rollup/pluginutils':
       specifier: ^5.1.4
       version: 5.1.4
@@ -99,6 +126,9 @@ catalogs:
     '@tailwindcss/container-queries':
       specifier: ^0.1.1
       version: 0.1.1
+    '@tailwindcss/typography':
+      specifier: ^0.5.16
+      version: 0.5.16
     '@testing-library/dom':
       specifier: ^10.4.0
       version: 10.4.0
@@ -138,6 +168,9 @@ catalogs:
     '@types/isomorphic-fetch':
       specifier: ^0.0.35
       version: 0.0.35
+    '@types/json-diff':
+      specifier: ^1.0.3
+      version: 1.0.3
     '@types/level':
       specifier: ^6.0.3
       version: 6.0.3
@@ -174,6 +207,9 @@ catalogs:
     '@types/multer':
       specifier: ^1.4.12
       version: 1.4.12
+    '@types/node':
+      specifier: ^22.13.1
+      version: 22.15.32
     '@types/normalize-path':
       specifier: ^3.0.2
       version: 3.0.2
@@ -192,12 +228,18 @@ catalogs:
     '@types/prop-types':
       specifier: ^15.7.14
       version: 15.7.14
+    '@types/react':
+      specifier: ^18.3.18
+      version: 18.3.18
     '@types/react-beautiful-dnd':
       specifier: ^13.1.8
       version: 13.1.8
     '@types/react-color':
       specifier: ^3.0.13
       version: 3.0.13
+    '@types/react-dom':
+      specifier: ^18.3.5
+      version: 18.3.5
     '@types/search-index':
       specifier: ^3.2.4
       version: 3.2.4
@@ -405,6 +447,9 @@ catalogs:
     happy-dom:
       specifier: 15.10.2
       version: 15.10.2
+    highlight.js:
+      specifier: ^11.11.1
+      version: 11.11.1
     identity-obj-proxy:
       specifier: ^3.0.0
       version: 3.0.0
@@ -456,6 +501,9 @@ catalogs:
     log4js:
       specifier: ^6.9.1
       version: 6.9.1
+    lowlight:
+      specifier: ^3.3.0
+      version: 3.3.0
     lucide-react:
       specifier: ^0.424.0
       version: 0.424.0
@@ -525,6 +573,9 @@ catalogs:
     normalize-path:
       specifier: ^3.0.0
       version: 3.0.0
+    ora:
+      specifier: ^8.2.0
+      version: 8.2.0
     parse-entities:
       specifier: 4.0.1
       version: 4.0.1
@@ -535,11 +586,11 @@ catalogs:
       specifier: 2.2.6
       version: 2.2.6
     postcss-import:
-      specifier: ^14.1.0
-      version: 14.1.0
+      specifier: ^16.1.0
+      version: 16.1.1
     postcss-nesting:
-      specifier: ^10.2.0
-      version: 10.2.0
+      specifier: ^13.0.1
+      version: 13.0.2
     prettier:
       specifier: ^2.8.8
       version: 2.8.8
@@ -621,6 +672,15 @@ catalogs:
     stringify-entities:
       specifier: 4.0.3
       version: 4.0.3
+    styled-jsx:
+      specifier: ^5.1.6
+      version: 5.1.7
+    tailwind-merge:
+      specifier: ^2.6.0
+      version: 2.6.0
+    tailwindcss:
+      specifier: ^3.4.17
+      version: 3.4.17
     tailwindcss-animate:
       specifier: ^1.0.7
       version: 1.0.7
@@ -654,6 +714,9 @@ catalogs:
     typedoc-plugin-markdown:
       specifier: ^3.17.1
       version: 3.17.1
+    typescript:
+      specifier: ^5.7.3
+      version: 5.7.3
     unist-util-source:
       specifier: 4.0.2
       version: 4.0.2
@@ -678,13 +741,16 @@ catalogs:
     webfontloader:
       specifier: 1.6.28
       version: 1.6.28
+    zod:
+      specifier: ^3.24.2
+      version: 3.24.2
 
 importers:
 
   .:
     dependencies:
       highlight.js:
-        specifier: ^11.11.1
+        specifier: 'catalog:'
         version: 11.11.1
     devDependencies:
       '@biomejs/biome':
@@ -712,7 +778,7 @@ importers:
         specifier: 'catalog:'
         version: 2.5.4
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
       vite:
         specifier: ^4.5.9
@@ -754,7 +820,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/tinacms
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
     devDependencies:
       '@tinacms/cli':
@@ -764,8 +830,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/@tinacms/scripts
       '@types/node':
-        specifier: ^22.13.1
-        version: 22.13.5
+        specifier: 'catalog:'
+        version: 22.15.32
       eslint:
         specifier: '7'
         version: 7.32.0
@@ -791,12 +857,12 @@ importers:
         specifier: workspace:*
         version: link:../../packages/tinacms
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
     devDependencies:
       '@types/node':
-        specifier: ^22.13.1
-        version: 22.13.5
+        specifier: 'catalog:'
+        version: 22.15.32
       eslint:
         specifier: '7'
         version: 7.32.0
@@ -810,8 +876,8 @@ importers:
         specifier: ^2.2.0
         version: 2.2.0(react@18.3.1)
       '@tailwindcss/typography':
-        specifier: ^0.5.16
-        version: 0.5.16(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.15.17)(typescript@5.7.3)))
+        specifier: 'catalog:'
+        version: 0.5.16(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3)))
       '@tinacms/datalayer':
         specifier: workspace:*
         version: link:../../packages/@tinacms/datalayer
@@ -871,14 +937,14 @@ importers:
         specifier: 'catalog:'
         version: 23.11.1(bufferutil@4.0.9)(typescript@5.7.3)
       tailwindcss:
-        specifier: ^3.4.17
-        version: 3.4.17(ts-node@10.9.2(@types/node@22.15.17)(typescript@5.7.3))
+        specifier: 'catalog:'
+        version: 3.4.17(ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3))
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
       vite:
         specifier: ^4.5.9
-        version: 4.5.9(@types/node@22.15.17)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0)
+        version: 4.5.9(@types/node@22.15.32)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0)
       vitest:
         specifier: ^0.32.4
         version: 0.32.4(happy-dom@15.10.2)(jsdom@15.2.1(bufferutil@4.0.9))(lightningcss@1.30.1)(playwright@1.50.1)(sass@1.89.2)(terser@5.39.0)
@@ -910,11 +976,11 @@ importers:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
       tailwind-merge:
-        specifier: ^2.6.0
+        specifier: 'catalog:'
         version: 2.6.0
       tailwindcss-animate:
         specifier: 'catalog:'
-        version: 1.0.7(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3)))
+        version: 1.0.7(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3)))
       tinacms:
         specifier: workspace:*
         version: link:../../packages/tinacms
@@ -929,23 +995,108 @@ importers:
         specifier: workspace:*
         version: link:../../packages/@tinacms/scripts
       '@types/node':
-        specifier: ^22.13.1
-        version: 22.13.5
+        specifier: 'catalog:'
+        version: 22.15.32
       '@types/react':
-        specifier: ^18.3.18
+        specifier: 'catalog:'
         version: 18.3.18
       '@types/react-dom':
-        specifier: ^18.3.5
+        specifier: 'catalog:'
         version: 18.3.5(@types/react@18.3.18)
       postcss:
         specifier: ^8.5.2
         version: 8.5.3
       tailwindcss:
-        specifier: ^3.4.17
-        version: 3.4.17(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3))
+        specifier: 'catalog:'
+        version: 3.4.17(ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3))
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
+
+  examples/tina-cloud-starter:
+    dependencies:
+      '@headlessui/react':
+        specifier: ^2.2.0
+        version: 2.2.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@tailwindcss/typography':
+        specifier: 'catalog:'
+        version: 0.5.16(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3)))
+      class-variance-authority:
+        specifier: 'catalog:'
+        version: 0.7.1
+      clsx:
+        specifier: 'catalog:'
+        version: 2.1.1
+      date-fns:
+        specifier: ^3.6.0
+        version: 3.6.0
+      next:
+        specifier: ^14.2.23
+        version: 14.2.24(@babel/core@7.26.9)(@playwright/test@1.50.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2)
+      next-themes:
+        specifier: 'catalog:'
+        version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+      react-icons:
+        specifier: ^5.4.0
+        version: 5.5.0(react@18.3.1)
+      styled-jsx:
+        specifier: 'catalog:'
+        version: 5.1.7(@babel/core@7.26.9)(react@18.3.1)
+      tailwind-merge:
+        specifier: 'catalog:'
+        version: 2.6.0
+      tailwindcss:
+        specifier: 'catalog:'
+        version: 3.4.17(ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3))
+      tinacms:
+        specifier: workspace:*
+        version: link:../../packages/tinacms
+      typescript:
+        specifier: 'catalog:'
+        version: 5.7.3
+    devDependencies:
+      '@svgr/webpack':
+        specifier: 'catalog:'
+        version: 8.1.0(typescript@5.7.3)
+      '@tinacms/cli':
+        specifier: workspace:*
+        version: link:../../packages/@tinacms/cli
+      '@types/js-cookie':
+        specifier: ^3.0.6
+        version: 3.0.6
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.15.32
+      '@types/react':
+        specifier: 'catalog:'
+        version: 18.3.18
+      '@types/styled-components':
+        specifier: 'catalog:'
+        version: 5.1.34
+      autoprefixer:
+        specifier: 'catalog:'
+        version: 10.4.20(postcss@8.5.3)
+      eslint:
+        specifier: ^8.57.1
+        version: 8.57.1
+      eslint-config-next:
+        specifier: 14.2.4
+        version: 14.2.4(eslint@8.57.1)(typescript@5.7.3)
+      postcss:
+        specifier: ^8.5.1
+        version: 8.5.3
+      postcss-import:
+        specifier: 'catalog:'
+        version: 16.1.1(postcss@8.5.3)
+      postcss-nesting:
+        specifier: 'catalog:'
+        version: 13.0.2(postcss@8.5.3)
 
   examples/tina-self-hosted-demo:
     dependencies:
@@ -956,8 +1107,8 @@ importers:
         specifier: 'catalog:'
         version: 19.0.13
       '@tailwindcss/typography':
-        specifier: ^0.5.16
-        version: 0.5.16(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3)))
+        specifier: 'catalog:'
+        version: 0.5.16(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3)))
       '@tinacms/datalayer':
         specifier: workspace:*
         version: link:../../packages/@tinacms/datalayer
@@ -1002,10 +1153,10 @@ importers:
         specifier: workspace:*
         version: link:../../packages/@tinacms/scripts
       '@types/node':
-        specifier: ^22.13.1
-        version: 22.13.5
+        specifier: 'catalog:'
+        version: 22.15.32
       '@types/react':
-        specifier: ^18.3.18
+        specifier: 'catalog:'
         version: 18.3.18
       '@typescript-eslint/eslint-plugin':
         specifier: 'catalog:'
@@ -1024,15 +1175,15 @@ importers:
         version: 8.5.3
       postcss-import:
         specifier: 'catalog:'
-        version: 14.1.0(postcss@8.5.3)
+        version: 16.1.1(postcss@8.5.3)
       postcss-nesting:
         specifier: 'catalog:'
-        version: 10.2.0(postcss@8.5.3)
+        version: 13.0.2(postcss@8.5.3)
       tailwindcss:
-        specifier: ^3.4.17
-        version: 3.4.17(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3))
+        specifier: 'catalog:'
+        version: 3.4.17(ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3))
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   experimental-examples/kitchen-sink:
@@ -1066,7 +1217,7 @@ importers:
         specifier: ^14.2.24
         version: 14.2.24(eslint@9.21.0(jiti@2.4.2))(typescript@5.7.3)
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   experimental-examples/tina-cloud-starter:
@@ -1075,8 +1226,8 @@ importers:
         specifier: 2.1.8
         version: 2.1.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tailwindcss/typography':
-        specifier: ^0.5.16
-        version: 0.5.16(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3)))
+        specifier: 'catalog:'
+        version: 0.5.16(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3)))
       '@tinacms/mdx':
         specifier: workspace:*
         version: link:../../packages/@tinacms/mdx
@@ -1108,7 +1259,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/tinacms
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
     devDependencies:
       '@svgr/webpack':
@@ -1124,10 +1275,10 @@ importers:
         specifier: ^3.0.6
         version: 3.0.6
       '@types/node':
-        specifier: ^22.13.1
-        version: 22.13.5
+        specifier: 'catalog:'
+        version: 22.15.32
       '@types/react':
-        specifier: ^18.3.18
+        specifier: 'catalog:'
         version: 18.3.18
       '@types/styled-components':
         specifier: 'catalog:'
@@ -1149,13 +1300,13 @@ importers:
         version: 8.5.3
       postcss-import:
         specifier: 'catalog:'
-        version: 14.1.0(postcss@8.5.3)
+        version: 16.1.1(postcss@8.5.3)
       postcss-nesting:
         specifier: 'catalog:'
-        version: 10.2.0(postcss@8.5.3)
+        version: 13.0.2(postcss@8.5.3)
       tailwindcss:
-        specifier: ^3.4.17
-        version: 3.4.17(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3))
+        specifier: 'catalog:'
+        version: 3.4.17(ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3))
 
   packages/@tinacms/app:
     dependencies:
@@ -1170,7 +1321,7 @@ importers:
         version: 1.0.6(react@18.3.1)
       '@monaco-editor/react':
         specifier: 'catalog:'
-        version: 4.4.5(monaco-editor@0.31.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 4.7.0-rc.0(monaco-editor@0.31.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tinacms/mdx':
         specifier: workspace:*
         version: link:../mdx
@@ -1199,17 +1350,17 @@ importers:
         specifier: workspace:*
         version: link:../../tinacms
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
       zod:
-        specifier: ^3.24.2
+        specifier: 'catalog:'
         version: 3.24.2
     devDependencies:
       '@types/react':
-        specifier: ^18.3.18
+        specifier: 'catalog:'
         version: 18.3.18
       '@types/react-dom':
-        specifier: ^18.3.5
+        specifier: 'catalog:'
         version: 18.3.5(@types/react@18.3.18)
 
   packages/@tinacms/auth:
@@ -1230,7 +1381,7 @@ importers:
         specifier: 18.3.1
         version: 18.3.1(react@18.3.1)
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   packages/@tinacms/cli:
@@ -1272,7 +1423,7 @@ importers:
         specifier: 'catalog:'
         version: 0.1.1(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3)))
       '@tailwindcss/typography':
-        specifier: ^0.5.16
+        specifier: 'catalog:'
         version: 0.5.16(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3)))
       '@tinacms/app':
         specifier: workspace:*
@@ -1374,7 +1525,7 @@ importers:
         specifier: 'catalog:'
         version: 4.7.0
       tailwindcss:
-        specifier: ^3.4.17
+        specifier: 'catalog:'
         version: 3.4.17(ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3))
       tinacms:
         specifier: workspace:*
@@ -1383,7 +1534,7 @@ importers:
         specifier: 'catalog:'
         version: 3.13.0
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
       vite:
         specifier: ^4.5.9
@@ -1392,7 +1543,7 @@ importers:
         specifier: ^1.6.1
         version: 1.6.1
       zod:
-        specifier: ^3.24.2
+        specifier: 'catalog:'
         version: 3.24.2
     devDependencies:
       '@tinacms/scripts':
@@ -1435,7 +1586,7 @@ importers:
         specifier: 'catalog:'
         version: 1.4.12
       '@types/node':
-        specifier: ^22.13.1
+        specifier: 'catalog:'
         version: 22.15.32
       '@types/progress':
         specifier: 'catalog:'
@@ -1478,8 +1629,8 @@ importers:
         specifier: 'catalog:'
         version: 4.3.9
       '@types/node':
-        specifier: ^22.13.1
-        version: 22.13.5
+        specifier: 'catalog:'
+        version: 22.15.32
       '@types/normalize-path':
         specifier: 'catalog:'
         version: 3.0.2
@@ -1488,7 +1639,7 @@ importers:
         version: 0.29.14
       jest:
         specifier: 'catalog:'
-        version: 29.7.0(@types/node@22.13.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3))
+        version: 29.7.0(@types/node@22.15.32)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3))
       jest-diff:
         specifier: 'catalog:'
         version: 29.7.0
@@ -1499,7 +1650,7 @@ importers:
         specifier: 'catalog:'
         version: 29.7.0
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   packages/@tinacms/graphql:
@@ -1608,8 +1759,8 @@ importers:
         specifier: 'catalog:'
         version: 4.0.9
       '@types/node':
-        specifier: ^22.13.1
-        version: 22.13.5
+        specifier: 'catalog:'
+        version: 22.15.32
       '@types/normalize-path':
         specifier: 'catalog:'
         version: 3.0.2
@@ -1626,16 +1777,16 @@ importers:
         specifier: 'catalog:'
         version: 1.0.0
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
       vite:
         specifier: ^4.5.9
-        version: 4.5.9(@types/node@22.13.5)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0)
+        version: 4.5.9(@types/node@22.15.32)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0)
       vitest:
         specifier: ^0.32.4
         version: 0.32.4(happy-dom@15.10.2)(jsdom@15.2.1(bufferutil@4.0.9))(lightningcss@1.30.1)(playwright@1.50.1)(sass@1.89.2)(terser@5.39.0)
       zod:
-        specifier: ^3.24.2
+        specifier: 'catalog:'
         version: 3.24.2
 
   packages/@tinacms/mdx:
@@ -1744,8 +1895,8 @@ importers:
         specifier: 'catalog:'
         version: 3.0.15
       '@types/node':
-        specifier: ^22.13.1
-        version: 22.13.5
+        specifier: 'catalog:'
+        version: 22.15.32
       '@types/prettier':
         specifier: 'catalog:'
         version: 2.7.3
@@ -1763,16 +1914,16 @@ importers:
         version: 0.5.0
       ts-node:
         specifier: 'catalog:'
-        version: 10.9.2(@types/node@22.13.5)(typescript@5.7.3)
+        version: 10.9.2(@types/node@22.15.32)(typescript@5.7.3)
       typedoc-plugin-markdown:
         specifier: 'catalog:'
         version: 3.17.1(typedoc@0.26.11(typescript@5.7.3))
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
       vite:
         specifier: ^4.5.9
-        version: 4.5.9(@types/node@22.13.5)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0)
+        version: 4.5.9(@types/node@22.15.32)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0)
       vitest:
         specifier: ^0.32.4
         version: 0.32.4(happy-dom@15.10.2)(jsdom@15.2.1(bufferutil@4.0.9))(lightningcss@1.30.1)(playwright@1.50.1)(sass@1.89.2)(terser@5.39.0)
@@ -1799,7 +1950,7 @@ importers:
         specifier: 'catalog:'
         version: 29.7.0(@types/node@22.15.32)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3))
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   packages/@tinacms/schema-tools:
@@ -1811,7 +1962,7 @@ importers:
         specifier: 'catalog:'
         version: 1.0.3
       zod:
-        specifier: ^3.24.2
+        specifier: 'catalog:'
         version: 3.24.2
     devDependencies:
       '@tinacms/scripts':
@@ -1824,7 +1975,7 @@ importers:
         specifier: 'catalog:'
         version: 4.0.9
       '@types/react':
-        specifier: ^18.3.18
+        specifier: 'catalog:'
         version: 18.3.18
       '@types/yup':
         specifier: ^0.29.14
@@ -1839,7 +1990,7 @@ importers:
         specifier: 'catalog:'
         version: 29.2.6(@babel/core@7.26.9)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.9))(jest@29.7.0(@types/node@22.15.32)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3)))(typescript@5.7.3)
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
       yup:
         specifier: ^0.32.11
@@ -1872,7 +2023,7 @@ importers:
         specifier: 'catalog:'
         version: 8.4.0(jiti@2.4.2)(postcss@8.5.3)(typescript@5.7.3)(yaml@2.7.0)
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
       vite:
         specifier: ^4.5.9
@@ -1882,7 +2033,7 @@ importers:
         specifier: ^11.0.4
         version: 11.0.4
       '@types/json-diff':
-        specifier: ^1.0.3
+        specifier: 'catalog:'
         version: 1.0.3
 
   packages/@tinacms/search:
@@ -1916,14 +2067,14 @@ importers:
         specifier: 'catalog:'
         version: 4.0.9
       '@types/node':
-        specifier: ^22.13.1
-        version: 22.13.5
+        specifier: 'catalog:'
+        version: 22.15.32
       '@types/search-index':
         specifier: 'catalog:'
         version: 3.2.4
       jest:
         specifier: 'catalog:'
-        version: 29.7.0(@types/node@22.13.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3))
+        version: 29.7.0(@types/node@22.15.32)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3))
       jest-diff:
         specifier: 'catalog:'
         version: 29.7.0
@@ -1934,7 +2085,7 @@ importers:
         specifier: 'catalog:'
         version: 29.7.0
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   packages/@tinacms/vercel-previews:
@@ -1950,19 +2101,19 @@ importers:
         specifier: workspace:*
         version: link:../scripts
       '@types/react':
-        specifier: ^18.3.18
+        specifier: 'catalog:'
         version: 18.3.18
       react:
         specifier: ^18.3.1
         version: 18.3.1
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   packages/@tinacms/webpack-helpers:
     dependencies:
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   packages/create-tina-app:
@@ -1983,7 +2134,7 @@ importers:
         specifier: 'catalog:'
         version: 11.3.0
       ora:
-        specifier: ^8.2.0
+        specifier: 'catalog:'
         version: 8.2.0
       prompts:
         specifier: 'catalog:'
@@ -2005,8 +2156,8 @@ importers:
         specifier: ^11.0.4
         version: 11.0.4
       '@types/node':
-        specifier: ^22.13.1
-        version: 22.13.5
+        specifier: 'catalog:'
+        version: 22.15.32
       '@types/prompts':
         specifier: 'catalog:'
         version: 2.4.9
@@ -2014,7 +2165,7 @@ importers:
         specifier: 'catalog:'
         version: 6.1.13
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   packages/next-tinacms-azure:
@@ -2039,8 +2190,8 @@ importers:
         specifier: ^2.2.7
         version: 2.2.7
       '@types/node':
-        specifier: ^22.13.1
-        version: 22.13.5
+        specifier: 'catalog:'
+        version: 22.15.32
       next:
         specifier: 14.2.10
         version: 14.2.10(@babel/core@7.26.9)(@playwright/test@1.50.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2)
@@ -2054,7 +2205,7 @@ importers:
         specifier: workspace:*
         version: link:../tinacms
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   packages/next-tinacms-cloudinary:
@@ -2076,8 +2227,8 @@ importers:
         specifier: ^2.2.7
         version: 2.2.7
       '@types/node':
-        specifier: ^22.13.1
-        version: 22.13.5
+        specifier: 'catalog:'
+        version: 22.15.32
       next:
         specifier: 14.2.10
         version: 14.2.10(@babel/core@7.26.9)(@playwright/test@1.50.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2)
@@ -2091,7 +2242,7 @@ importers:
         specifier: workspace:*
         version: link:../tinacms
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   packages/next-tinacms-dos:
@@ -2113,8 +2264,8 @@ importers:
         specifier: ^2.2.7
         version: 2.2.7
       '@types/node':
-        specifier: ^22.13.1
-        version: 22.13.5
+        specifier: 'catalog:'
+        version: 22.15.32
       next:
         specifier: 14.2.10
         version: 14.2.10(@babel/core@7.26.9)(@playwright/test@1.50.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2)
@@ -2128,7 +2279,7 @@ importers:
         specifier: workspace:*
         version: link:../tinacms
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   packages/next-tinacms-s3:
@@ -2150,10 +2301,10 @@ importers:
         specifier: ^2.2.7
         version: 2.2.7
       '@types/node':
-        specifier: ^22.13.1
-        version: 22.13.5
+        specifier: 'catalog:'
+        version: 22.15.32
       '@types/react':
-        specifier: ^18.3.18
+        specifier: 'catalog:'
         version: 18.3.18
       next:
         specifier: 14.2.10
@@ -2168,7 +2319,7 @@ importers:
         specifier: workspace:*
         version: link:../tinacms
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   packages/tinacms:
@@ -2192,34 +2343,34 @@ importers:
         specifier: ^1.0.6
         version: 1.0.6(react@18.3.1)
       '@monaco-editor/react':
-        specifier: 4.7.0-rc.0
+        specifier: 'catalog:'
         version: 4.7.0-rc.0(monaco-editor@0.31.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-checkbox':
-        specifier: ^1.1.4
+        specifier: 'catalog:'
         version: 1.1.4(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-dialog':
-        specifier: ^1.1.6
-        version: 1.1.6(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 1.1.14(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-dropdown-menu':
-        specifier: ^2.1.6
+        specifier: 'catalog:'
         version: 2.1.6(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-popover':
-        specifier: ^1.1.6
+        specifier: 'catalog:'
         version: 1.1.6(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-separator':
-        specifier: ^1.1.2
+        specifier: 'catalog:'
         version: 1.1.2(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-slot':
-        specifier: ^1.1.2
-        version: 1.1.2(@types/react@18.3.18)(react@18.3.1)
+        specifier: 'catalog:'
+        version: 1.2.3(@types/react@18.3.18)(react@18.3.1)
       '@radix-ui/react-toolbar':
-        specifier: ^1.1.2
+        specifier: 'catalog:'
         version: 1.1.2(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-tooltip':
-        specifier: ^1.2.6
+        specifier: 'catalog:'
         version: 1.2.7(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@react-hook/window-size':
-        specifier: ^3.1.1
+        specifier: 'catalog:'
         version: 3.1.1(react@18.3.1)
       '@tinacms/mdx':
         specifier: workspace:*
@@ -2259,7 +2410,7 @@ importers:
         version: 48.0.0(@udecode/plate@48.0.5(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.5.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@udecode/plate-dnd':
         specifier: 'catalog:'
-        version: 48.0.0(@udecode/plate@48.0.5(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.5.0(react@18.3.1)))(react-dnd-html5-backend@16.0.1)(react-dnd@16.0.1(@types/hoist-non-react-statics@3.3.6)(@types/node@22.13.5)(@types/react@18.3.18)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 48.0.0(@udecode/plate@48.0.5(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.5.0(react@18.3.1)))(react-dnd-html5-backend@16.0.1)(react-dnd@16.0.1(@types/hoist-non-react-statics@3.3.6)(@types/node@22.15.32)(@types/react@18.3.18)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@udecode/plate-floating':
         specifier: 'catalog:'
         version: 48.0.0(@udecode/plate@48.0.5(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.5.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2376,7 +2527,7 @@ importers:
         version: 3.3.1(moment@2.29.4)(react@18.3.1)
       react-dnd:
         specifier: 'catalog:'
-        version: 16.0.1(@types/hoist-non-react-statics@3.3.6)(@types/node@22.13.5)(@types/react@18.3.18)(react@18.3.1)
+        version: 16.0.1(@types/hoist-non-react-statics@3.3.6)(@types/node@22.15.32)(@types/react@18.3.18)(react@18.3.1)
       react-dnd-html5-backend:
         specifier: 'catalog:'
         version: 16.0.1
@@ -2396,7 +2547,7 @@ importers:
         specifier: 'catalog:'
         version: 17.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       tailwind-merge:
-        specifier: ^2.6.0
+        specifier: 'catalog:'
         version: 2.6.0
       webfontloader:
         specifier: 'catalog:'
@@ -2405,7 +2556,7 @@ importers:
         specifier: ^1.6.1
         version: 1.6.1
       zod:
-        specifier: ^3.24.2
+        specifier: 'catalog:'
         version: 3.24.2
     devDependencies:
       '@graphql-tools/utils':
@@ -2442,13 +2593,13 @@ importers:
         specifier: 'catalog:'
         version: 4.4.9
       '@types/node':
-        specifier: ^22.13.1
-        version: 22.13.5
+        specifier: 'catalog:'
+        version: 22.15.32
       '@types/prop-types':
         specifier: 'catalog:'
         version: 15.7.14
       '@types/react':
-        specifier: ^18.3.18
+        specifier: 'catalog:'
         version: 18.3.18
       '@types/react-beautiful-dnd':
         specifier: 'catalog:'
@@ -2457,7 +2608,7 @@ importers:
         specifier: 'catalog:'
         version: 3.0.13(@types/react@18.3.18)
       '@types/react-dom':
-        specifier: ^18.3.5
+        specifier: 'catalog:'
         version: 18.3.5(@types/react@18.3.18)
       '@types/yup':
         specifier: ^0.32.0
@@ -2475,7 +2626,7 @@ importers:
         specifier: ^0.7.0
         version: 0.7.0
       lowlight:
-        specifier: ^3.3.0
+        specifier: 'catalog:'
         version: 3.3.0
       next:
         specifier: 14.2.10
@@ -2496,14 +2647,14 @@ importers:
         specifier: 'catalog:'
         version: 2.8.1
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
       vite:
         specifier: ^5.4.14
-        version: 5.4.14(@types/node@22.13.5)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0)
+        version: 5.4.14(@types/node@22.15.32)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0)
       vitest:
         specifier: ^2.1.9
-        version: 2.1.9(@types/node@22.13.5)(happy-dom@15.10.2)(jsdom@15.2.1(bufferutil@4.0.9))(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0)
+        version: 2.1.9(@types/node@22.15.32)(happy-dom@15.10.2)(jsdom@15.2.1(bufferutil@4.0.9))(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0)
 
   packages/tinacms-authjs:
     dependencies:
@@ -2533,7 +2684,7 @@ importers:
         specifier: workspace:*
         version: link:../tinacms
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   packages/tinacms-clerk:
@@ -2548,13 +2699,13 @@ importers:
         specifier: workspace:*
         version: link:../@tinacms/scripts
       '@types/node':
-        specifier: ^22.13.1
-        version: 22.13.5
+        specifier: 'catalog:'
+        version: 22.15.32
       tinacms:
         specifier: workspace:*
         version: link:../tinacms
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   packages/tinacms-gitprovider-github:
@@ -2566,7 +2717,7 @@ importers:
         specifier: 'catalog:'
         version: 3.7.7
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
     devDependencies:
       '@tinacms/datalayer':
@@ -2576,8 +2727,8 @@ importers:
         specifier: workspace:*
         version: link:../@tinacms/scripts
       '@types/node':
-        specifier: ^22.13.1
-        version: 22.13.5
+        specifier: 'catalog:'
+        version: 22.15.32
 
   playwright/tina-playwright:
     dependencies:
@@ -2607,8 +2758,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/@tinacms/cli
       '@types/node':
-        specifier: ^22.13.1
-        version: 22.13.5
+        specifier: 'catalog:'
+        version: 22.15.32
       eslint:
         specifier: '7'
         version: 7.32.0
@@ -3703,11 +3854,17 @@ packages:
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
     engines: {node: '>=12'}
 
-  '@csstools/selector-specificity@2.2.0':
-    resolution: {integrity: sha512-+OJ9konv95ClSTOJCmMZqpd5+YGsB2S+x6w3E1oaM8UuR5j8nTNHYSz8c9BEPGDOCMQYIEEGlVPj/VY64iTbGw==}
-    engines: {node: ^14 || ^16 || >=18}
+  '@csstools/selector-resolve-nested@3.1.0':
+    resolution: {integrity: sha512-mf1LEW0tJLKfWyvn5KdDrhpxHyuxpbNwTIwOYLIvsTffeyOf85j5oIzfG0yosxDgx/sswlqBnESYUcQH0vgZ0g==}
+    engines: {node: '>=18'}
     peerDependencies:
-      postcss-selector-parser: ^6.0.10
+      postcss-selector-parser: ^7.0.0
+
+  '@csstools/selector-specificity@5.0.0':
+    resolution: {integrity: sha512-PCqQV3c4CoVm3kdPhyeZ07VmBRdH2EpMFA/pd9OASpOEC3aXNGoqPDAZ80D0cLpMBxnmk0+yNhGsEx31hq7Gtw==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      postcss-selector-parser: ^7.0.0
 
   '@emnapi/runtime@1.3.1':
     resolution: {integrity: sha512-kEBmG8KyqtxJZv+ygbEim+KCGtIq1fC22Ms3S4ziXmYKm8uyoLX0MHONVKwp+9opg390VaKRNt4a7A9NwmpNhw==}
@@ -4906,13 +5063,6 @@ packages:
   '@monaco-editor/loader@1.5.0':
     resolution: {integrity: sha512-hKoGSM+7aAc7eRTRjpqAZucPmoNOC4UUbknb/VNoTkEIkCPhqV8LfbsgM1webRM7S/z21eHEx9Fkwx8Z/C/+Xw==}
 
-  '@monaco-editor/react@4.4.5':
-    resolution: {integrity: sha512-IImtzU7sRc66OOaQVCG+5PFHkSWnnhrUWGBuH6zNmH2h0YgmAhcjHZQc/6MY9JWEbUtVF1WPBMJ9u1XuFbRrVA==}
-    peerDependencies:
-      monaco-editor: '>= 0.25.0 < 1'
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
-
   '@monaco-editor/react@4.7.0-rc.0':
     resolution: {integrity: sha512-YfjXkDK0bcwS0zo8PXptvQdCQfOPPtzGsAzmIv7PnoUGFdIohsR+NVDyjbajMddF+3cWUm/3q9NzP/DUke9a+w==}
     peerDependencies:
@@ -4959,6 +5109,9 @@ packages:
 
   '@next/eslint-plugin-next@14.2.24':
     resolution: {integrity: sha512-FDL3qs+5DML0AJz56DCVr+KnFYivxeAX73En8QbPw9GjJZ6zbfvqDy+HrarHFzbsIASn7y8y5ySJ/lllSruNVQ==}
+
+  '@next/eslint-plugin-next@14.2.4':
+    resolution: {integrity: sha512-svSFxW9f3xDaZA3idQmlFw7SusOuWTpDTAeBlO3AEPDltrraV+lqs7mAc6A27YdnpQVVIA3sODqUAAHdWhVWsA==}
 
   '@next/swc-darwin-arm64@14.2.10':
     resolution: {integrity: sha512-V3z10NV+cvMAfxQUMhKgfQnPbjw+Ew3cnr64b0lr8MDiBJs3eLnM6RpGC46nhfMZsiXgQngCJKWGTC/yDcgrDQ==}
@@ -5357,19 +5510,6 @@ packages:
 
   '@radix-ui/react-dialog@1.1.14':
     resolution: {integrity: sha512-+CpweKjqpzTmwRwcYECQcNYbI8V9VSQt0SNFKeEBLgfucbsLssU6Ppq7wUdNXEGb573bMjFhVjKVll8rmV6zMw==}
-    peerDependencies:
-      '@types/react': '*'
-      '@types/react-dom': '*'
-      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-      react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      '@types/react-dom':
-        optional: true
-
-  '@radix-ui/react-dialog@1.1.6':
-    resolution: {integrity: sha512-/IVhJV5AceX620DUJ4uYVMymzsipdKBzo3edo+omeskCKGm9FRHM0ebIdbPnlQVJqyuHbuBltQUOG2mOTq2IYw==}
     peerDependencies:
       '@types/react': '*'
       '@types/react-dom': '*'
@@ -6785,12 +6925,6 @@ packages:
 
   '@types/node@16.18.6':
     resolution: {integrity: sha512-vmYJF0REqDyyU0gviezF/KHq/fYaUbFhkcNbQCuPGFQj6VTbXuHZoxs/Y7mutWe73C8AC6l9fFu8mSYiBAqkGA==}
-
-  '@types/node@22.13.5':
-    resolution: {integrity: sha512-+lTU0PxZXn0Dr1NBtC7Y8cR21AJr87dLLU953CWA6pMxxv/UDc7jYAY90upcrie1nRcD6XNG5HOYEDtgW5TxAg==}
-
-  '@types/node@22.15.17':
-    resolution: {integrity: sha512-wIX2aSZL5FE+MR0JlvF87BNVrtFWf6AE6rxSE9X7OwnVvoyCQjpzSRJ+M87se/4QCkCiebQAqrJ0y6fwIyi7nw==}
 
   '@types/node@22.15.32':
     resolution: {integrity: sha512-3jigKqgSjsH6gYZv2nEsqdXfZqIFGAV36XYYjf9KGZ3PSG+IhLecqPnI310RvjutyMwifE2hhhNEklOUrvx/wA==}
@@ -8427,6 +8561,9 @@ packages:
     resolution: {integrity: sha512-fnULvOpxnC5/Vg3NCiWelDsLiUc9bRwAPs/+LfTLNvetFCtCTN+yQz15C/fs4AwX1R9K5GLtLfn8QW+dWisaAw==}
     engines: {node: '>=0.11'}
 
+  date-fns@3.6.0:
+    resolution: {integrity: sha512-fRHTG8g/Gif+kSh50gaGEdToemgfj74aRX3swtiouboip5JDLAyDE9F11nHMIcvOaXeOC6D7SpNhi7uFyB7Uww==}
+
   date-format@4.0.14:
     resolution: {integrity: sha512-39BOQLs9ZjKh0/patS9nrT8wc3ioX3/eA/zgbKNopnF2wCqJEoxywwwElATYvRsXdnOxA/OQeQoFZ3rFjVajhg==}
     engines: {node: '>=4.0'}
@@ -8892,6 +9029,15 @@ packages:
 
   eslint-config-next@14.2.24:
     resolution: {integrity: sha512-9r1ujK++Pgpfixr5+DQ6rXDIQmSzuDbBlAQYMkJRMz9KWqovX7ESUTC0EAyBfOCl3ubkoeplw+aoXDuih3A8fw==}
+    peerDependencies:
+      eslint: ^7.23.0 || ^8.0.0
+      typescript: '>=3.3.1'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  eslint-config-next@14.2.4:
+    resolution: {integrity: sha512-Qr0wMgG9m6m4uYy2jrYJmyuNlYZzPRQq5Kvb9IDlYwn+7yq6W6sfMNFgb+9guM1KYwuIo6TIaiFhZJ6SnQ/Efw==}
     peerDependencies:
       eslint: ^7.23.0 || ^8.0.0
       typescript: '>=3.3.1'
@@ -11684,15 +11830,15 @@ packages:
     resolution: {integrity: sha512-/+5VFTchJDoVj3bhoqi6UeymcD00DAwb1nJwamzPvHEszJ4FpF6SNNbUbOS8yI56qHzdV8eK0qEfOSiodkTdxg==}
     engines: {node: '>= 0.4'}
 
-  postcss-import@14.1.0:
-    resolution: {integrity: sha512-flwI+Vgm4SElObFVPpTIT7SU7R3qk2L7PyduMcokiaVKuWv9d/U+Gm/QAd8NDLuykTWTkcrjOeD2Pp1rMeBTGw==}
-    engines: {node: '>=10.0.0'}
-    peerDependencies:
-      postcss: ^8.0.0
-
   postcss-import@15.1.0:
     resolution: {integrity: sha512-hpr+J05B2FVYUAXHeK1YyI267J/dDDhMU6B6civm8hSY1jYJnBXxzKDKDswzJmtLHryrjhnDjqqp/49t8FALew==}
     engines: {node: '>=14.0.0'}
+    peerDependencies:
+      postcss: ^8.0.0
+
+  postcss-import@16.1.1:
+    resolution: {integrity: sha512-2xVS1NCZAfjtVdvXiyegxzJ447GyqCeEI5V7ApgQVOWnros1p5lGNovJNapwPpMombyFBfqDwt7AD3n2l0KOfQ==}
+    engines: {node: '>=18.0.0'}
     peerDependencies:
       postcss: ^8.0.0
 
@@ -11738,11 +11884,11 @@ packages:
     peerDependencies:
       postcss: ^8.2.14
 
-  postcss-nesting@10.2.0:
-    resolution: {integrity: sha512-EwMkYchxiDiKUhlJGzWsD9b2zvq/r2SSubcRrgP+jujMXFzqvANLt16lJANC+5uZ6hjI7lpRmI6O8JIl+8l1KA==}
-    engines: {node: ^12 || ^14 || >=16}
+  postcss-nesting@13.0.2:
+    resolution: {integrity: sha512-1YCI290TX+VP0U/K/aFxzHzQWHWURL+CtHMSbex1lCdpXD1SoR2sYuxDu5aNI9lPoXpKTCggFZiDJbwylU0LEQ==}
+    engines: {node: '>=18'}
     peerDependencies:
-      postcss: ^8.2
+      postcss: ^8.4
 
   postcss-selector-parser@6.0.10:
     resolution: {integrity: sha512-IQ7TZdoaqbT+LCpShg46jnZVlhWD2w6iQYAcYXfHARZ7X1t/UGhhceQDs5X0cGqKvYlHNOuv7Oa1xmb0oQuA3w==}
@@ -11750,6 +11896,10 @@ packages:
 
   postcss-selector-parser@6.1.2:
     resolution: {integrity: sha512-Q8qQfPiZ+THO/3ZrOrO0cJJKfpYCagtMUkXbnEfmgUjwXg6z/WBeOyS9APBBPCTSiDV+s4SwQGu8yFsiMRIudg==}
+    engines: {node: '>=4'}
+
+  postcss-selector-parser@7.1.0:
+    resolution: {integrity: sha512-8sLjZwK0R+JlxlYcTuVnyT2v+htpdrjDOKuMcOVdYjt52Lh8hWRYpxBPoKx/Zg+bcjc3wx6fmQevMmUztS/ccA==}
     engines: {node: '>=4'}
 
   postcss-value-parser@4.2.0:
@@ -12825,6 +12975,19 @@ packages:
       babel-plugin-macros:
         optional: true
 
+  styled-jsx@5.1.7:
+    resolution: {integrity: sha512-HPLmEIYprxCeWDMLYiaaAhsV3yGfIlCqzuVOybE6fjF3SUJmH67nCoMDO+nAvHNHo46OfvpCNu4Rcue82dMNFg==}
+    engines: {node: '>= 12.0.0'}
+    peerDependencies:
+      '@babel/core': '*'
+      babel-plugin-macros: '*'
+      react: '>= 16.8.0 || 17.x.x || ^18.0.0-0 || ^19.0.0-0'
+    peerDependenciesMeta:
+      '@babel/core':
+        optional: true
+      babel-plugin-macros:
+        optional: true
+
   stylis@4.1.3:
     resolution: {integrity: sha512-GP6WDNWf+o403jrEp9c5jibKavrtLW+/qYGhFxFrG8maXhwTBI7gLLhiBb0o7uFccWN+EOS9aMO6cGHWAO07OA==}
 
@@ -13336,9 +13499,6 @@ packages:
 
   underscore@1.13.7:
     resolution: {integrity: sha512-GMXzWtsc57XAtguZgaQViUOzs0KTkk8ojr3/xAxXLITqf/3EMwxC0inyETfDFjH/Krbhuep0HNbbjI9i/q3F3g==}
-
-  undici-types@6.20.0:
-    resolution: {integrity: sha512-Ny6QZ2Nju20vw1SRHe3d9jVu6gJ+4e3+MMpqu7pqE5HT6WsTSlce++GQmK5UXS8mzV8DSYHrQH+Xrf2jVcuKNg==}
 
   undici-types@6.21.0:
     resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
@@ -15790,9 +15950,13 @@ snapshots:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
 
-  '@csstools/selector-specificity@2.2.0(postcss-selector-parser@6.1.2)':
+  '@csstools/selector-resolve-nested@3.1.0(postcss-selector-parser@7.1.0)':
     dependencies:
-      postcss-selector-parser: 6.1.2
+      postcss-selector-parser: 7.1.0
+
+  '@csstools/selector-specificity@5.0.0(postcss-selector-parser@7.1.0)':
+    dependencies:
+      postcss-selector-parser: 7.1.0
 
   '@emnapi/runtime@1.3.1':
     dependencies:
@@ -16310,7 +16474,7 @@ snapshots:
     dependencies:
       '@graphiql/toolkit': 0.8.4(@types/node@22.15.32)(graphql@15.8.0)
       '@headlessui/react': 1.7.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@radix-ui/react-dialog': 1.1.6(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@radix-ui/react-dialog': 1.1.14(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-dropdown-menu': 2.1.6(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-tooltip': 1.2.7(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-visually-hidden': 1.2.3(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -16719,41 +16883,6 @@ snapshots:
       jest-util: 29.7.0
       slash: 3.0.0
 
-  '@jest/core@29.7.0(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3))':
-    dependencies:
-      '@jest/console': 29.7.0
-      '@jest/reporters': 29.7.0
-      '@jest/test-result': 29.7.0
-      '@jest/transform': 29.7.0
-      '@jest/types': 29.6.3
-      '@types/node': 22.15.32
-      ansi-escapes: 4.3.2
-      chalk: 4.1.2
-      ci-info: 3.9.0
-      exit: 0.1.2
-      graceful-fs: 4.2.11
-      jest-changed-files: 29.7.0
-      jest-config: 29.7.0(@types/node@22.15.32)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3))
-      jest-haste-map: 29.7.0
-      jest-message-util: 29.7.0
-      jest-regex-util: 29.6.3
-      jest-resolve: 29.7.0
-      jest-resolve-dependencies: 29.7.0
-      jest-runner: 29.7.0
-      jest-runtime: 29.7.0
-      jest-snapshot: 29.7.0
-      jest-util: 29.7.0
-      jest-validate: 29.7.0
-      jest-watcher: 29.7.0
-      micromatch: 4.0.8
-      pretty-format: 29.7.0
-      slash: 3.0.0
-      strip-ansi: 6.0.1
-    transitivePeerDependencies:
-      - babel-plugin-macros
-      - supports-color
-      - ts-node
-
   '@jest/core@29.7.0(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3))':
     dependencies:
       '@jest/console': 29.7.0
@@ -16996,14 +17125,6 @@ snapshots:
     dependencies:
       state-local: 1.0.7
 
-  '@monaco-editor/react@4.4.5(monaco-editor@0.31.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
-    dependencies:
-      '@monaco-editor/loader': 1.5.0
-      monaco-editor: 0.31.0
-      prop-types: 15.8.1
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-
   '@monaco-editor/react@4.7.0-rc.0(monaco-editor@0.31.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@monaco-editor/loader': 1.5.0
@@ -17066,6 +17187,10 @@ snapshots:
       glob: 7.1.7
 
   '@next/eslint-plugin-next@14.2.24':
+    dependencies:
+      glob: 10.3.10
+
+  '@next/eslint-plugin-next@14.2.4':
     dependencies:
       glob: 10.3.10
 
@@ -17424,28 +17549,6 @@ snapshots:
       '@types/react': 18.3.18
       '@types/react-dom': 18.3.5(@types/react@18.3.18)
 
-  '@radix-ui/react-dialog@1.1.6(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
-    dependencies:
-      '@radix-ui/primitive': 1.1.1
-      '@radix-ui/react-compose-refs': 1.1.1(@types/react@18.3.18)(react@18.3.1)
-      '@radix-ui/react-context': 1.1.1(@types/react@18.3.18)(react@18.3.1)
-      '@radix-ui/react-dismissable-layer': 1.1.5(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@radix-ui/react-focus-guards': 1.1.1(@types/react@18.3.18)(react@18.3.1)
-      '@radix-ui/react-focus-scope': 1.1.2(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@radix-ui/react-id': 1.1.0(@types/react@18.3.18)(react@18.3.1)
-      '@radix-ui/react-portal': 1.1.4(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@radix-ui/react-presence': 1.1.2(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@radix-ui/react-primitive': 2.0.2(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@radix-ui/react-slot': 1.1.2(@types/react@18.3.18)(react@18.3.1)
-      '@radix-ui/react-use-controllable-state': 1.1.0(@types/react@18.3.18)(react@18.3.1)
-      aria-hidden: 1.2.4
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      react-remove-scroll: 2.6.3(@types/react@18.3.18)(react@18.3.1)
-    optionalDependencies:
-      '@types/react': 18.3.18
-      '@types/react-dom': 18.3.5(@types/react@18.3.18)
-
   '@radix-ui/react-direction@1.1.0(@types/react@18.3.18)(react@18.3.1)':
     dependencies:
       react: 18.3.1
@@ -17596,7 +17699,7 @@ snapshots:
 
   '@radix-ui/react-popper@1.2.2(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@floating-ui/react-dom': 2.1.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@floating-ui/react-dom': 2.1.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-arrow': 1.1.2(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-compose-refs': 1.1.1(@types/react@18.3.18)(react@18.3.1)
       '@radix-ui/react-context': 1.1.1(@types/react@18.3.18)(react@18.3.1)
@@ -17614,7 +17717,7 @@ snapshots:
 
   '@radix-ui/react-popper@1.2.7(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@floating-ui/react-dom': 2.1.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@floating-ui/react-dom': 2.1.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-arrow': 1.1.7(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-compose-refs': 1.1.2(@types/react@18.3.18)(react@18.3.1)
       '@radix-ui/react-context': 1.1.2(@types/react@18.3.18)(react@18.3.1)
@@ -18532,22 +18635,6 @@ snapshots:
     dependencies:
       tailwindcss: 3.4.17(ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3))
 
-  '@tailwindcss/typography@0.5.16(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3)))':
-    dependencies:
-      lodash.castarray: 4.4.0
-      lodash.isplainobject: 4.0.6
-      lodash.merge: 4.6.2
-      postcss-selector-parser: 6.0.10
-      tailwindcss: 3.4.17(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3))
-
-  '@tailwindcss/typography@0.5.16(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.15.17)(typescript@5.7.3)))':
-    dependencies:
-      lodash.castarray: 4.4.0
-      lodash.isplainobject: 4.0.6
-      lodash.merge: 4.6.2
-      postcss-selector-parser: 6.0.10
-      tailwindcss: 3.4.17(ts-node@10.9.2(@types/node@22.15.17)(typescript@5.7.3))
-
   '@tailwindcss/typography@0.5.16(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3)))':
     dependencies:
       lodash.castarray: 4.4.0
@@ -19016,14 +19103,6 @@ snapshots:
 
   '@types/node@16.18.6': {}
 
-  '@types/node@22.13.5':
-    dependencies:
-      undici-types: 6.20.0
-
-  '@types/node@22.15.17':
-    dependencies:
-      undici-types: 6.21.0
-
   '@types/node@22.15.32':
     dependencies:
       undici-types: 6.21.0
@@ -19439,13 +19518,13 @@ snapshots:
       - slate-dom
       - use-sync-external-store
 
-  '@udecode/plate-dnd@48.0.0(@udecode/plate@48.0.5(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.5.0(react@18.3.1)))(react-dnd-html5-backend@16.0.1)(react-dnd@16.0.1(@types/hoist-non-react-statics@3.3.6)(@types/node@22.13.5)(@types/react@18.3.18)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@udecode/plate-dnd@48.0.0(@udecode/plate@48.0.5(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.5.0(react@18.3.1)))(react-dnd-html5-backend@16.0.1)(react-dnd@16.0.1(@types/hoist-non-react-statics@3.3.6)(@types/node@22.15.32)(@types/react@18.3.18)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@udecode/plate': 48.0.5(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.5.0(react@18.3.1))
       lodash: 4.17.21
       raf: 3.4.1
       react: 18.3.1
-      react-dnd: 16.0.1(@types/hoist-non-react-statics@3.3.6)(@types/node@22.13.5)(@types/react@18.3.18)(react@18.3.1)
+      react-dnd: 16.0.1(@types/hoist-non-react-statics@3.3.6)(@types/node@22.15.32)(@types/react@18.3.18)(react@18.3.1)
       react-dnd-html5-backend: 16.0.1
       react-dom: 18.3.1(react@18.3.1)
 
@@ -19646,13 +19725,13 @@ snapshots:
       chai: 5.2.0
       tinyrainbow: 1.2.0
 
-  '@vitest/mocker@2.1.9(vite@5.4.14(@types/node@22.13.5)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0))':
+  '@vitest/mocker@2.1.9(vite@5.4.14(@types/node@22.15.32)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0))':
     dependencies:
       '@vitest/spy': 2.1.9
       estree-walker: 3.0.3
       magic-string: 0.30.17
     optionalDependencies:
-      vite: 5.4.14(@types/node@22.13.5)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0)
+      vite: 5.4.14(@types/node@22.15.32)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0)
 
   '@vitest/pretty-format@2.1.9':
     dependencies:
@@ -20510,7 +20589,7 @@ snapshots:
 
   cmdk@1.0.4(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
-      '@radix-ui/react-dialog': 1.1.6(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@radix-ui/react-dialog': 1.1.14(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-id': 1.1.1(@types/react@18.3.18)(react@18.3.1)
       '@radix-ui/react-primitive': 2.1.3(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
@@ -20690,21 +20769,6 @@ snapshots:
       typescript: 5.7.3
 
   crc-32@1.2.2: {}
-
-  create-jest@29.7.0(@types/node@22.13.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3)):
-    dependencies:
-      '@jest/types': 29.6.3
-      chalk: 4.1.2
-      exit: 0.1.2
-      graceful-fs: 4.2.11
-      jest-config: 29.7.0(@types/node@22.13.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3))
-      jest-util: 29.7.0
-      prompts: 2.4.2
-    transitivePeerDependencies:
-      - '@types/node'
-      - babel-plugin-macros
-      - supports-color
-      - ts-node
 
   create-jest@29.7.0(@types/node@22.15.32)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3)):
     dependencies:
@@ -21036,6 +21100,8 @@ snapshots:
   date-fns@2.30.0:
     dependencies:
       '@babel/runtime': 7.26.9
+
+  date-fns@3.6.0: {}
 
   date-format@4.0.14: {}
 
@@ -21625,6 +21691,25 @@ snapshots:
       - eslint-plugin-import-x
       - supports-color
 
+  eslint-config-next@14.2.4(eslint@8.57.1)(typescript@5.7.3):
+    dependencies:
+      '@next/eslint-plugin-next': 14.2.4
+      '@rushstack/eslint-patch': 1.10.5
+      '@typescript-eslint/parser': 5.62.0(eslint@8.57.1)(typescript@5.7.3)
+      eslint: 8.57.1
+      eslint-import-resolver-node: 0.3.9
+      eslint-import-resolver-typescript: 3.8.3(eslint-plugin-import@2.31.0(eslint@8.57.1))(eslint@8.57.1)
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.7.3))(eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-plugin-jsx-a11y: 6.10.2(eslint@8.57.1)
+      eslint-plugin-react: 7.37.4(eslint@8.57.1)
+      eslint-plugin-react-hooks: 4.6.2(eslint@8.57.1)
+    optionalDependencies:
+      typescript: 5.7.3
+    transitivePeerDependencies:
+      - eslint-import-resolver-webpack
+      - eslint-plugin-import-x
+      - supports-color
+
   eslint-import-resolver-node@0.3.9:
     dependencies:
       debug: 3.2.7
@@ -21657,6 +21742,21 @@ snapshots:
       tinyglobby: 0.2.12
     optionalDependencies:
       eslint-plugin-import: 2.31.0(@typescript-eslint/parser@5.62.0(eslint@8.24.0)(typescript@5.7.3))(eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0(eslint@8.24.0))(eslint@8.24.0))(eslint@8.24.0)
+    transitivePeerDependencies:
+      - supports-color
+
+  eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0(eslint@8.57.1))(eslint@8.57.1):
+    dependencies:
+      '@nolyfill/is-core-module': 1.0.39
+      debug: 4.4.0
+      enhanced-resolve: 5.18.1
+      eslint: 8.57.1
+      get-tsconfig: 4.10.0
+      is-bun-module: 1.3.0
+      stable-hash: 0.0.4
+      tinyglobby: 0.2.12
+    optionalDependencies:
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.7.3))(eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -21694,6 +21794,17 @@ snapshots:
       eslint: 8.24.0
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 3.8.3(eslint-plugin-import@2.31.0(eslint@8.24.0))(eslint@8.24.0)
+    transitivePeerDependencies:
+      - supports-color
+
+  eslint-module-utils@2.12.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1):
+    dependencies:
+      debug: 3.2.7
+    optionalDependencies:
+      '@typescript-eslint/parser': 5.62.0(eslint@8.57.1)(typescript@5.7.3)
+      eslint: 8.57.1
+      eslint-import-resolver-node: 0.3.9
+      eslint-import-resolver-typescript: 3.8.3(eslint-plugin-import@2.31.0(eslint@8.57.1))(eslint@8.57.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -21766,6 +21877,35 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
+  eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.7.3))(eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1):
+    dependencies:
+      '@rtsao/scc': 1.1.0
+      array-includes: 3.1.8
+      array.prototype.findlastindex: 1.2.5
+      array.prototype.flat: 1.3.3
+      array.prototype.flatmap: 1.3.3
+      debug: 3.2.7
+      doctrine: 2.1.0
+      eslint: 8.57.1
+      eslint-import-resolver-node: 0.3.9
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
+      hasown: 2.0.2
+      is-core-module: 2.16.1
+      is-glob: 4.0.3
+      minimatch: 3.1.2
+      object.fromentries: 2.0.8
+      object.groupby: 1.0.3
+      object.values: 1.2.1
+      semver: 6.3.1
+      string.prototype.trimend: 1.0.9
+      tsconfig-paths: 3.15.0
+    optionalDependencies:
+      '@typescript-eslint/parser': 5.62.0(eslint@8.57.1)(typescript@5.7.3)
+    transitivePeerDependencies:
+      - eslint-import-resolver-typescript
+      - eslint-import-resolver-webpack
+      - supports-color
+
   eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.62.0(eslint@9.21.0(jiti@2.4.2))(typescript@5.7.3))(eslint-import-resolver-typescript@3.8.3)(eslint@9.21.0(jiti@2.4.2)):
     dependencies:
       '@rtsao/scc': 1.1.0
@@ -21833,6 +21973,25 @@ snapshots:
       safe-regex-test: 1.1.0
       string.prototype.includes: 2.0.1
 
+  eslint-plugin-jsx-a11y@6.10.2(eslint@8.57.1):
+    dependencies:
+      aria-query: 5.3.2
+      array-includes: 3.1.8
+      array.prototype.flatmap: 1.3.3
+      ast-types-flow: 0.0.8
+      axe-core: 4.10.2
+      axobject-query: 4.1.0
+      damerau-levenshtein: 1.0.8
+      emoji-regex: 9.2.2
+      eslint: 8.57.1
+      hasown: 2.0.2
+      jsx-ast-utils: 3.3.5
+      language-tags: 1.0.9
+      minimatch: 3.1.2
+      object.fromentries: 2.0.8
+      safe-regex-test: 1.1.0
+      string.prototype.includes: 2.0.1
+
   eslint-plugin-jsx-a11y@6.10.2(eslint@9.21.0(jiti@2.4.2)):
     dependencies:
       aria-query: 5.3.2
@@ -21859,6 +22018,10 @@ snapshots:
   eslint-plugin-react-hooks@4.6.2(eslint@8.24.0):
     dependencies:
       eslint: 8.24.0
+
+  eslint-plugin-react-hooks@4.6.2(eslint@8.57.1):
+    dependencies:
+      eslint: 8.57.1
 
   eslint-plugin-react-hooks@4.6.2(eslint@9.21.0(jiti@2.4.2)):
     dependencies:
@@ -21895,6 +22058,28 @@ snapshots:
       doctrine: 2.1.0
       es-iterator-helpers: 1.2.1
       eslint: 8.24.0
+      estraverse: 5.3.0
+      hasown: 2.0.2
+      jsx-ast-utils: 3.3.5
+      minimatch: 3.1.2
+      object.entries: 1.1.8
+      object.fromentries: 2.0.8
+      object.values: 1.2.1
+      prop-types: 15.8.1
+      resolve: 2.0.0-next.5
+      semver: 6.3.1
+      string.prototype.matchall: 4.0.12
+      string.prototype.repeat: 1.0.0
+
+  eslint-plugin-react@7.37.4(eslint@8.57.1):
+    dependencies:
+      array-includes: 3.1.8
+      array.prototype.findlast: 1.2.5
+      array.prototype.flatmap: 1.3.3
+      array.prototype.tosorted: 1.1.4
+      doctrine: 2.1.0
+      es-iterator-helpers: 1.2.1
+      eslint: 8.57.1
       estraverse: 5.3.0
       hasown: 2.0.2
       jsx-ast-utils: 3.3.5
@@ -23301,25 +23486,6 @@ snapshots:
       - babel-plugin-macros
       - supports-color
 
-  jest-cli@29.7.0(@types/node@22.13.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3)):
-    dependencies:
-      '@jest/core': 29.7.0(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3))
-      '@jest/test-result': 29.7.0
-      '@jest/types': 29.6.3
-      chalk: 4.1.2
-      create-jest: 29.7.0(@types/node@22.13.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3))
-      exit: 0.1.2
-      import-local: 3.2.0
-      jest-config: 29.7.0(@types/node@22.13.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3))
-      jest-util: 29.7.0
-      jest-validate: 29.7.0
-      yargs: 17.7.2
-    transitivePeerDependencies:
-      - '@types/node'
-      - babel-plugin-macros
-      - supports-color
-      - ts-node
-
   jest-cli@29.7.0(@types/node@22.15.32)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3)):
     dependencies:
       '@jest/core': 29.7.0(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3))
@@ -23338,68 +23504,6 @@ snapshots:
       - babel-plugin-macros
       - supports-color
       - ts-node
-
-  jest-config@29.7.0(@types/node@22.13.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3)):
-    dependencies:
-      '@babel/core': 7.26.9
-      '@jest/test-sequencer': 29.7.0
-      '@jest/types': 29.6.3
-      babel-jest: 29.7.0(@babel/core@7.26.9)
-      chalk: 4.1.2
-      ci-info: 3.9.0
-      deepmerge: 4.3.1
-      glob: 7.2.3
-      graceful-fs: 4.2.11
-      jest-circus: 29.7.0(babel-plugin-macros@3.1.0)
-      jest-environment-node: 29.7.0
-      jest-get-type: 29.6.3
-      jest-regex-util: 29.6.3
-      jest-resolve: 29.7.0
-      jest-runner: 29.7.0
-      jest-util: 29.7.0
-      jest-validate: 29.7.0
-      micromatch: 4.0.8
-      parse-json: 5.2.0
-      pretty-format: 29.7.0
-      slash: 3.0.0
-      strip-json-comments: 3.1.1
-    optionalDependencies:
-      '@types/node': 22.13.5
-      ts-node: 10.9.2(@types/node@22.13.5)(typescript@5.7.3)
-    transitivePeerDependencies:
-      - babel-plugin-macros
-      - supports-color
-
-  jest-config@29.7.0(@types/node@22.15.32)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3)):
-    dependencies:
-      '@babel/core': 7.26.9
-      '@jest/test-sequencer': 29.7.0
-      '@jest/types': 29.6.3
-      babel-jest: 29.7.0(@babel/core@7.26.9)
-      chalk: 4.1.2
-      ci-info: 3.9.0
-      deepmerge: 4.3.1
-      glob: 7.2.3
-      graceful-fs: 4.2.11
-      jest-circus: 29.7.0(babel-plugin-macros@3.1.0)
-      jest-environment-node: 29.7.0
-      jest-get-type: 29.6.3
-      jest-regex-util: 29.6.3
-      jest-resolve: 29.7.0
-      jest-runner: 29.7.0
-      jest-util: 29.7.0
-      jest-validate: 29.7.0
-      micromatch: 4.0.8
-      parse-json: 5.2.0
-      pretty-format: 29.7.0
-      slash: 3.0.0
-      strip-json-comments: 3.1.1
-    optionalDependencies:
-      '@types/node': 22.15.32
-      ts-node: 10.9.2(@types/node@22.13.5)(typescript@5.7.3)
-    transitivePeerDependencies:
-      - babel-plugin-macros
-      - supports-color
 
   jest-config@29.7.0(@types/node@22.15.32)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3)):
     dependencies:
@@ -23694,18 +23798,6 @@ snapshots:
       jest-util: 29.7.0
       merge-stream: 2.0.0
       supports-color: 8.1.1
-
-  jest@29.7.0(@types/node@22.13.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3)):
-    dependencies:
-      '@jest/core': 29.7.0(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3))
-      '@jest/types': 29.6.3
-      import-local: 3.2.0
-      jest-cli: 29.7.0(@types/node@22.13.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3))
-    transitivePeerDependencies:
-      - '@types/node'
-      - babel-plugin-macros
-      - supports-color
-      - ts-node
 
   jest@29.7.0(@types/node@22.15.32)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3)):
     dependencies:
@@ -25545,14 +25637,14 @@ snapshots:
 
   possible-typed-array-names@1.1.0: {}
 
-  postcss-import@14.1.0(postcss@8.5.3):
+  postcss-import@15.1.0(postcss@8.5.3):
     dependencies:
       postcss: 8.5.3
       postcss-value-parser: 4.2.0
       read-cache: 1.0.0
       resolve: 1.22.10
 
-  postcss-import@15.1.0(postcss@8.5.3):
+  postcss-import@16.1.1(postcss@8.5.3):
     dependencies:
       postcss: 8.5.3
       postcss-value-parser: 4.2.0
@@ -25563,22 +25655,6 @@ snapshots:
     dependencies:
       camelcase-css: 2.0.1
       postcss: 8.5.3
-
-  postcss-load-config@4.0.2(postcss@8.5.3)(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3)):
-    dependencies:
-      lilconfig: 3.1.3
-      yaml: 2.7.0
-    optionalDependencies:
-      postcss: 8.5.3
-      ts-node: 10.9.2(@types/node@22.13.5)(typescript@5.7.3)
-
-  postcss-load-config@4.0.2(postcss@8.5.3)(ts-node@10.9.2(@types/node@22.15.17)(typescript@5.7.3)):
-    dependencies:
-      lilconfig: 3.1.3
-      yaml: 2.7.0
-    optionalDependencies:
-      postcss: 8.5.3
-      ts-node: 10.9.2(@types/node@22.15.17)(typescript@5.7.3)
 
   postcss-load-config@4.0.2(postcss@8.5.3)(ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3)):
     dependencies:
@@ -25601,11 +25677,12 @@ snapshots:
       postcss: 8.5.3
       postcss-selector-parser: 6.1.2
 
-  postcss-nesting@10.2.0(postcss@8.5.3):
+  postcss-nesting@13.0.2(postcss@8.5.3):
     dependencies:
-      '@csstools/selector-specificity': 2.2.0(postcss-selector-parser@6.1.2)
+      '@csstools/selector-resolve-nested': 3.1.0(postcss-selector-parser@7.1.0)
+      '@csstools/selector-specificity': 5.0.0(postcss-selector-parser@7.1.0)
       postcss: 8.5.3
-      postcss-selector-parser: 6.1.2
+      postcss-selector-parser: 7.1.0
 
   postcss-selector-parser@6.0.10:
     dependencies:
@@ -25613,6 +25690,11 @@ snapshots:
       util-deprecate: 1.0.2
 
   postcss-selector-parser@6.1.2:
+    dependencies:
+      cssesc: 3.0.0
+      util-deprecate: 1.0.2
+
+  postcss-selector-parser@7.1.0:
     dependencies:
       cssesc: 3.0.0
       util-deprecate: 1.0.2
@@ -25899,7 +25981,7 @@ snapshots:
     dependencies:
       dnd-core: 16.0.1
 
-  react-dnd@16.0.1(@types/hoist-non-react-statics@3.3.6)(@types/node@22.13.5)(@types/react@18.3.18)(react@18.3.1):
+  react-dnd@16.0.1(@types/hoist-non-react-statics@3.3.6)(@types/node@22.15.32)(@types/react@18.3.18)(react@18.3.1):
     dependencies:
       '@react-dnd/invariant': 4.0.2
       '@react-dnd/shallowequal': 4.0.2
@@ -25909,7 +25991,7 @@ snapshots:
       react: 18.3.1
     optionalDependencies:
       '@types/hoist-non-react-statics': 3.3.6
-      '@types/node': 22.13.5
+      '@types/node': 22.15.32
       '@types/react': 18.3.18
 
   react-dom@18.3.1(react@18.3.1):
@@ -26987,6 +27069,13 @@ snapshots:
       '@babel/core': 7.26.9
       babel-plugin-macros: 3.1.0
 
+  styled-jsx@5.1.7(@babel/core@7.26.9)(react@18.3.1):
+    dependencies:
+      client-only: 0.0.1
+      react: 18.3.1
+    optionalDependencies:
+      '@babel/core': 7.26.9
+
   stylis@4.1.3: {}
 
   stylis@4.2.0: {}
@@ -27053,63 +27142,9 @@ snapshots:
 
   tailwind-merge@2.6.0: {}
 
-  tailwindcss-animate@1.0.7(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3))):
+  tailwindcss-animate@1.0.7(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3))):
     dependencies:
-      tailwindcss: 3.4.17(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3))
-
-  tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3)):
-    dependencies:
-      '@alloc/quick-lru': 5.2.0
-      arg: 5.0.2
-      chokidar: 3.6.0
-      didyoumean: 1.2.2
-      dlv: 1.1.3
-      fast-glob: 3.3.3
-      glob-parent: 6.0.2
-      is-glob: 4.0.3
-      jiti: 1.21.7
-      lilconfig: 3.1.3
-      micromatch: 4.0.8
-      normalize-path: 3.0.0
-      object-hash: 3.0.0
-      picocolors: 1.1.1
-      postcss: 8.5.3
-      postcss-import: 15.1.0(postcss@8.5.3)
-      postcss-js: 4.0.1(postcss@8.5.3)
-      postcss-load-config: 4.0.2(postcss@8.5.3)(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3))
-      postcss-nested: 6.2.0(postcss@8.5.3)
-      postcss-selector-parser: 6.1.2
-      resolve: 1.22.10
-      sucrase: 3.35.0
-    transitivePeerDependencies:
-      - ts-node
-
-  tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.15.17)(typescript@5.7.3)):
-    dependencies:
-      '@alloc/quick-lru': 5.2.0
-      arg: 5.0.2
-      chokidar: 3.6.0
-      didyoumean: 1.2.2
-      dlv: 1.1.3
-      fast-glob: 3.3.3
-      glob-parent: 6.0.2
-      is-glob: 4.0.3
-      jiti: 1.21.7
-      lilconfig: 3.1.3
-      micromatch: 4.0.8
-      normalize-path: 3.0.0
-      object-hash: 3.0.0
-      picocolors: 1.1.1
-      postcss: 8.5.3
-      postcss-import: 15.1.0(postcss@8.5.3)
-      postcss-js: 4.0.1(postcss@8.5.3)
-      postcss-load-config: 4.0.2(postcss@8.5.3)(ts-node@10.9.2(@types/node@22.15.17)(typescript@5.7.3))
-      postcss-nested: 6.2.0(postcss@8.5.3)
-      postcss-selector-parser: 6.1.2
-      resolve: 1.22.10
-      sucrase: 3.35.0
-    transitivePeerDependencies:
-      - ts-node
+      tailwindcss: 3.4.17(ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3))
 
   tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3)):
     dependencies:
@@ -27341,43 +27376,6 @@ snapshots:
       '@jest/types': 29.6.3
       babel-jest: 29.7.0(@babel/core@7.26.9)
 
-  ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3):
-    dependencies:
-      '@cspotcode/source-map-support': 0.8.1
-      '@tsconfig/node10': 1.0.11
-      '@tsconfig/node12': 1.0.11
-      '@tsconfig/node14': 1.0.3
-      '@tsconfig/node16': 1.0.4
-      '@types/node': 22.13.5
-      acorn: 8.14.0
-      acorn-walk: 8.3.4
-      arg: 4.1.3
-      create-require: 1.1.1
-      diff: 4.0.2
-      make-error: 1.3.6
-      typescript: 5.7.3
-      v8-compile-cache-lib: 3.0.1
-      yn: 3.1.1
-
-  ts-node@10.9.2(@types/node@22.15.17)(typescript@5.7.3):
-    dependencies:
-      '@cspotcode/source-map-support': 0.8.1
-      '@tsconfig/node10': 1.0.11
-      '@tsconfig/node12': 1.0.11
-      '@tsconfig/node14': 1.0.3
-      '@tsconfig/node16': 1.0.4
-      '@types/node': 22.15.17
-      acorn: 8.14.0
-      acorn-walk: 8.3.4
-      arg: 4.1.3
-      create-require: 1.1.1
-      diff: 4.0.2
-      make-error: 1.3.6
-      typescript: 5.7.3
-      v8-compile-cache-lib: 3.0.1
-      yn: 3.1.1
-    optional: true
-
   ts-node@10.9.2(@types/node@22.15.32)(typescript@5.7.3):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
@@ -27395,7 +27393,6 @@ snapshots:
       typescript: 5.7.3
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
-    optional: true
 
   tsc-alias@1.8.11:
     dependencies:
@@ -27613,8 +27610,6 @@ snapshots:
   unc-path-regex@0.1.2: {}
 
   underscore@1.13.7: {}
-
-  undici-types@6.20.0: {}
 
   undici-types@6.21.0: {}
 
@@ -27881,14 +27876,14 @@ snapshots:
       '@types/unist': 3.0.3
       vfile-message: 4.0.2
 
-  vite-node@0.32.4(@types/node@22.15.17)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0):
+  vite-node@0.32.4(@types/node@22.15.32)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0):
     dependencies:
       cac: 6.7.14
       debug: 4.4.0
       mlly: 1.7.4
       pathe: 1.1.2
       picocolors: 1.1.1
-      vite: 4.5.9(@types/node@22.15.17)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0)
+      vite: 4.5.9(@types/node@22.15.32)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -27899,13 +27894,13 @@ snapshots:
       - supports-color
       - terser
 
-  vite-node@2.1.9(@types/node@22.13.5)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0):
+  vite-node@2.1.9(@types/node@22.15.32)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0):
     dependencies:
       cac: 6.7.14
       debug: 4.4.0
       es-module-lexer: 1.6.0
       pathe: 1.1.2
-      vite: 5.4.14(@types/node@22.13.5)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0)
+      vite: 5.4.14(@types/node@22.15.32)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -27916,30 +27911,6 @@ snapshots:
       - sugarss
       - supports-color
       - terser
-
-  vite@4.5.9(@types/node@22.13.5)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0):
-    dependencies:
-      esbuild: 0.18.20
-      postcss: 8.5.3
-      rollup: 3.29.5
-    optionalDependencies:
-      '@types/node': 22.13.5
-      fsevents: 2.3.3
-      lightningcss: 1.30.1
-      sass: 1.89.2
-      terser: 5.39.0
-
-  vite@4.5.9(@types/node@22.15.17)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0):
-    dependencies:
-      esbuild: 0.18.20
-      postcss: 8.5.3
-      rollup: 3.29.5
-    optionalDependencies:
-      '@types/node': 22.15.17
-      fsevents: 2.3.3
-      lightningcss: 1.30.1
-      sass: 1.89.2
-      terser: 5.39.0
 
   vite@4.5.9(@types/node@22.15.32)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0):
     dependencies:
@@ -27953,13 +27924,13 @@ snapshots:
       sass: 1.89.2
       terser: 5.39.0
 
-  vite@5.4.14(@types/node@22.13.5)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0):
+  vite@5.4.14(@types/node@22.15.32)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0):
     dependencies:
       esbuild: 0.21.5
       postcss: 8.5.3
       rollup: 4.34.8
     optionalDependencies:
-      '@types/node': 22.13.5
+      '@types/node': 22.15.32
       fsevents: 2.3.3
       lightningcss: 1.30.1
       sass: 1.89.2
@@ -27969,7 +27940,7 @@ snapshots:
     dependencies:
       '@types/chai': 4.3.20
       '@types/chai-subset': 1.3.5
-      '@types/node': 22.15.17
+      '@types/node': 22.15.32
       '@vitest/expect': 0.32.4
       '@vitest/runner': 0.32.4
       '@vitest/snapshot': 0.32.4
@@ -27988,8 +27959,8 @@ snapshots:
       strip-literal: 1.3.0
       tinybench: 2.9.0
       tinypool: 0.5.0
-      vite: 4.5.9(@types/node@22.15.17)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0)
-      vite-node: 0.32.4(@types/node@22.15.17)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0)
+      vite: 4.5.9(@types/node@22.15.32)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0)
+      vite-node: 0.32.4(@types/node@22.15.32)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
       happy-dom: 15.10.2
@@ -28004,10 +27975,10 @@ snapshots:
       - supports-color
       - terser
 
-  vitest@2.1.9(@types/node@22.13.5)(happy-dom@15.10.2)(jsdom@15.2.1(bufferutil@4.0.9))(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0):
+  vitest@2.1.9(@types/node@22.15.32)(happy-dom@15.10.2)(jsdom@15.2.1(bufferutil@4.0.9))(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0):
     dependencies:
       '@vitest/expect': 2.1.9
-      '@vitest/mocker': 2.1.9(vite@5.4.14(@types/node@22.13.5)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0))
+      '@vitest/mocker': 2.1.9(vite@5.4.14(@types/node@22.15.32)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0))
       '@vitest/pretty-format': 2.1.9
       '@vitest/runner': 2.1.9
       '@vitest/snapshot': 2.1.9
@@ -28023,11 +27994,11 @@ snapshots:
       tinyexec: 0.3.2
       tinypool: 1.0.2
       tinyrainbow: 1.2.0
-      vite: 5.4.14(@types/node@22.13.5)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0)
-      vite-node: 2.1.9(@types/node@22.13.5)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0)
+      vite: 5.4.14(@types/node@22.15.32)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0)
+      vite-node: 2.1.9(@types/node@22.15.32)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.39.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
-      '@types/node': 22.13.5
+      '@types/node': 22.15.32
       happy-dom: 15.10.2
       jsdom: 15.2.1(bufferutil@4.0.9)
     transitivePeerDependencies:

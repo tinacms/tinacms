@@ -128,6 +128,7 @@ export class TinaClient<GenQueries> {
     //})
     const draftBranch = headers.get('x-branch');
     const url = replaceGithubPathSplit(args?.url || this.apiUrl, draftBranch);
+    console.log('Request URL with branch:', url);
 
     let key = '';
     let result: {

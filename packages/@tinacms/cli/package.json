@@ -38,7 +38,7 @@
 		"@types/listr": "catalog:",
 		"@types/log4js": "catalog:",
 		"@types/multer": "catalog:",
-		"@types/node": "^22.13.1",
+		"@types/node": "catalog:",
 		"@types/progress": "catalog:",
 		"@types/prompts": "catalog:",
 		"@types/yup": "^0.32.0",
@@ -65,7 +65,7 @@
 		"@svgr/core": "catalog:",
 		"@tailwindcss/aspect-ratio": "catalog:",
 		"@tailwindcss/container-queries": "catalog:",
-		"@tailwindcss/typography": "^0.5.16",
+		"@tailwindcss/typography": "catalog:",
 		"@tinacms/app": "workspace:*",
 		"@tinacms/graphql": "workspace:*",
 		"@tinacms/metrics": "workspace:*",
@@ -97,13 +97,13 @@
 		"progress": "catalog:",
 		"prompts": "catalog:",
 		"readable-stream": "catalog:",
-		"tailwindcss": "^3.4.17",
+		"tailwindcss": "catalog:",
 		"tinacms": "workspace:*",
 		"typanion": "catalog:",
-		"typescript": "^5.7.3",
+		"typescript": "catalog:",
 		"vite": "^4.5.9",
 		"yup": "^1.6.1",
-		"zod": "^3.24.2"
+		"zod": "catalog:"
 	},
 	"publishConfig": {
 		"registry": "https://registry.npmjs.org"

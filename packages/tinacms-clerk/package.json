@@ -25,9 +25,9 @@
 		"@clerk/backend": "catalog:",
 		"@clerk/clerk-js": "catalog:",
 		"@tinacms/scripts": "workspace:*",
-		"@types/node": "^22.13.1",
+		"@types/node": "catalog:",
 		"tinacms": "workspace:*",
-		"typescript": "^5.7.3"
+		"typescript": "catalog:"
 	},
 	"peerDependencies": {
 		"@clerk/backend": "0.x",

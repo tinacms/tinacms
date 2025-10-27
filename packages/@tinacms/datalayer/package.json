@@ -53,13 +53,13 @@
 		"@types/level": "catalog:",
 		"@types/lodash.camelcase": "catalog:",
 		"@types/lodash.upperfirst": "catalog:",
-		"@types/node": "^22.13.1",
+		"@types/node": "catalog:",
 		"@types/normalize-path": "catalog:",
 		"@types/yup": "^0.29.14",
 		"jest": "catalog:",
 		"jest-diff": "catalog:",
 		"jest-file-snapshot": "^0.5.0",
 		"jest-matcher-utils": "catalog:",
-		"typescript": "^5.7.3"
+		"typescript": "catalog:"
 	}
 }

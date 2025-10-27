@@ -23,12 +23,12 @@
 	"dependencies": {
 		"@octokit/rest": "catalog:",
 		"js-base64": "catalog:",
-		"typescript": "^5.7.3"
+		"typescript": "catalog:"
 	},
 	"devDependencies": {
 		"@tinacms/datalayer": "workspace:*",
 		"@tinacms/scripts": "workspace:*",
-		"@types/node": "^22.13.1"
+		"@types/node": "catalog:"
 	},
 	"peerDependencies": {
 		"@tinacms/datalayer": "workspace:*"

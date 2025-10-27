@@ -17,8 +17,8 @@
     "@tinacms/cli": "workspace:*",
     "@tinacms/scripts": "workspace:*",
     "@types/js-cookie": "^3.0.6",
-    "@types/node": "^22.13.1",
-    "@types/react": "^18.3.18",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
     "@types/styled-components": "catalog:",
     "@typescript-eslint/eslint-plugin": "catalog:",
     "@typescript-eslint/parser": "catalog:",
@@ -27,11 +27,11 @@
     "postcss": "^8.5.2",
     "postcss-import": "catalog:",
     "postcss-nesting": "catalog:",
-    "tailwindcss": "^3.4.17"
+    "tailwindcss": "catalog:"
   },
   "dependencies": {
     "@headlessui/react": "2.1.8",
-    "@tailwindcss/typography": "^0.5.16",
+    "@tailwindcss/typography": "catalog:",
     "@tinacms/mdx": "workspace:*",
     "@tinacms/vercel-previews": "workspace:*",
     "date-fns": "^2.30.0",
@@ -42,6 +42,6 @@
     "react-dom": "^18.3.1",
     "react-icons": "^4.12.0",
     "tinacms": "workspace:*",
-    "typescript": "^5.7.3"
+    "typescript": "catalog:"
   }
 }

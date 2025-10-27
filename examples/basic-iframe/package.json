@@ -22,12 +22,12 @@
 		"react-dom": "^18.3.1",
 		"react-is": "^18.3.1",
 		"tinacms": "workspace:*",
-		"typescript": "^5.7.3"
+		"typescript": "catalog:"
 	},
 	"devDependencies": {
 		"@tinacms/cli": "workspace:*",
 		"@tinacms/scripts": "workspace:*",
-		"@types/node": "^22.13.1",
+		"@types/node": "catalog:",
 		"eslint": "7"
 	},
 	"version": "0.1"

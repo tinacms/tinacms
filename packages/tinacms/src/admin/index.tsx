@@ -42,6 +42,7 @@ const Redirect = () => {
 };
 
 const BranchRedirect = ({ branch }) => {
+  console.log(branch);
   const navigate = useNavigate();
   React.useEffect(() => {
     navigate(`/${encodeURIComponent(branch)}`);
@@ -62,7 +63,9 @@ const MaybeRedirectToPreview = ({
   React.useEffect(() => {
     const basePath = cms.flags.get('tina-basepath');
     if (redirect) {
-      navigate(`/${encodeURIComponent(branchName)}/~${basePath ? `/${basePath}` : ''}`);
+      navigate(
+        `/${encodeURIComponent(branchName)}/~${basePath ? `/${basePath}` : ''}`
+      );
     }
   }, [redirect, branchName]);
 

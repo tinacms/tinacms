@@ -79,7 +79,7 @@
 		"@types/estree": "1.0.0",
 		"@types/lodash.flatten": "catalog:",
 		"@types/mdast": "catalog:",
-		"@types/node": "^22.13.1",
+		"@types/node": "catalog:",
 		"@types/prettier": "catalog:",
 		"@types/unist": "catalog:",
 		"c8": "catalog:",
@@ -87,7 +87,7 @@
 		"jest-file-snapshot": "^0.5.0",
 		"ts-node": "catalog:",
 		"typedoc-plugin-markdown": "catalog:",
-		"typescript": "^5.7.3",
+		"typescript": "catalog:",
 		"vite": "^4.5.9",
 		"vitest": "^0.32.4"
 	}

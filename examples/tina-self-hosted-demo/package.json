@@ -13,7 +13,7 @@
 	"dependencies": {
 		"@headlessui/react": "2.1.8",
 		"@octokit/rest": "catalog:",
-		"@tailwindcss/typography": "^0.5.16",
+		"@tailwindcss/typography": "catalog:",
 		"@tinacms/datalayer": "workspace:*",
 		"date-fns": "^2.30.0",
 		"mongodb-level": "^0.0.3",
@@ -30,8 +30,8 @@
 		"@svgr/webpack": "catalog:",
 		"@tinacms/cli": "workspace:*",
 		"@tinacms/scripts": "workspace:*",
-		"@types/node": "^22.13.1",
-		"@types/react": "^18.3.18",
+		"@types/node": "catalog:",
+		"@types/react": "catalog:",
 		"@typescript-eslint/eslint-plugin": "catalog:",
 		"@typescript-eslint/parser": "catalog:",
 		"autoprefixer": "catalog:",
@@ -39,7 +39,7 @@
 		"postcss": "^8.5.2",
 		"postcss-import": "catalog:",
 		"postcss-nesting": "catalog:",
-		"tailwindcss": "^3.4.17",
-		"typescript": "^5.7.3"
+		"tailwindcss": "catalog:",
+		"typescript": "catalog:"
 	}
 }

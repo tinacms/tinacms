@@ -93,6 +93,7 @@ export class Client {
   tinaGraphQLVersion: string;
   branch: string;
   private options: ServerOptions;
+  private configBranch: string;
   events = new EventBus(); // automatically hooked into global event bus when attached via cms.
   protectedBranches: string[] = [];
   usingEditorialWorkflow: boolean = false;
@@ -115,6 +116,8 @@ export class Client {
       this.schema = enrichedSchema;
     }
     this.options = options;
+    
+    this.configBranch = options.branch || options.schema?.config?.branch || 'main';
 
     if (options.schema?.config?.contentApiUrlOverride) {
       this.options.customContentApiUrl =
@@ -151,7 +154,8 @@ export class Client {
   }
 
   setBranch(branchName: string) {
-    const encodedBranch = encodeURIComponent(branchName);
+    const safeBranchName = branchName || this.configBranch;
+    const encodedBranch = encodeURIComponent(safeBranchName);
     // When we change our branch, we add the 'x-branch' cookie. This is used when you change branches and want to use content from the new branch.
     // This is then used in the TinaClient to fetch the correct content from the correct branch. Instead of defaulting to the 'main' branch which is generated at build time.
     document.cookie = `x-branch=${encodedBranch}; path=/; max-age=3600`;

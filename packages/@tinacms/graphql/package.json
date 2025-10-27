@@ -74,15 +74,15 @@
 		"@types/lru-cache": "catalog:",
 		"@types/mdast": "catalog:",
 		"@types/micromatch": "catalog:",
-		"@types/node": "^22.13.1",
+		"@types/node": "catalog:",
 		"@types/normalize-path": "catalog:",
 		"@types/ws": "catalog:",
 		"@types/yup": "^0.29.14",
 		"jest-file-snapshot": "^0.5.0",
 		"memory-level": "catalog:",
-		"typescript": "^5.7.3",
+		"typescript": "catalog:",
 		"vite": "^4.5.9",
 		"vitest": "^0.32.4",
-		"zod": "^3.24.2"
+		"zod": "catalog:"
 	}
 }

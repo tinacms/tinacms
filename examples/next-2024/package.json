@@ -18,7 +18,7 @@
 		"next-themes": "catalog:",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
-		"tailwind-merge": "^2.6.0",
+		"tailwind-merge": "catalog:",
 		"tailwindcss-animate": "catalog:",
 		"tinacms": "workspace:*"
 	},
@@ -26,11 +26,11 @@
 		"@biomejs/biome": "catalog:",
 		"@tinacms/cli": "workspace:*",
 		"@tinacms/scripts": "workspace:*",
-		"@types/node": "^22.13.1",
-		"@types/react": "^18.3.18",
-		"@types/react-dom": "^18.3.5",
+		"@types/node": "catalog:",
+		"@types/react": "catalog:",
+		"@types/react-dom": "catalog:",
 		"postcss": "^8.5.2",
-		"tailwindcss": "^3.4.17",
-		"typescript": "^5.7.3"
+		"tailwindcss": "catalog:",
+		"typescript": "catalog:"
 	}
 }

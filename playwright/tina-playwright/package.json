@@ -20,7 +20,7 @@
 	"devDependencies": {
 		"@playwright/test": "catalog:",
 		"@tinacms/cli": "workspace:*",
-		"@types/node": "^22.13.1",
+		"@types/node": "catalog:",
 		"eslint": "7",
 		"eslint-config-next": "12.0.3"
 	},

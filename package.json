@@ -39,11 +39,11 @@
 		"picomatch": "catalog:",
 		"pretty-quick": "catalog:",
 		"turbo": "catalog:",
-		"typescript": "^5.7.3",
+		"typescript": "catalog:",
 		"vite": "^4.5.9"
 	},
 	"packageManager": "pnpm@9.15.5",
 	"dependencies": {
-		"highlight.js": "^11.11.1"
+		"highlight.js": "catalog:"
 	}
 }

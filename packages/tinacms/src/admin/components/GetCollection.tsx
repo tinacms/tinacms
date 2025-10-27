@@ -3,7 +3,7 @@
 */
 
 import type { Collection, TinaField, TinaSchema } from '@tinacms/schema-tools';
-import type { TinaCMS } from '@tinacms/toolkit';
+import { useCMS, type TinaCMS } from '@tinacms/toolkit';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FilterArgs, TinaAdminApi } from '../api';
@@ -257,24 +257,24 @@ const GetCollection = ({
   const { collection, loading, error, reFetchCollection, collectionExtra } =
     search
       ? // biome-ignore lint/correctness/useHookAtTopLevel: not ready to fix these yet
-        useSearchCollection(
-          cms,
-          collectionName,
-          includeDocuments,
-          folder,
-          startCursor || '',
-          search
-        )
+      useSearchCollection(
+        cms,
+        collectionName,
+        includeDocuments,
+        folder,
+        startCursor || '',
+        search
+      )
       : // biome-ignore lint/correctness/useHookAtTopLevel: not ready to fix these yet
-        useGetCollection(
-          cms,
-          collectionName,
-          includeDocuments,
-          folder,
-          startCursor || '',
-          sortKey,
-          filterArgs
-        ) || {};
+      useGetCollection(
+        cms,
+        collectionName,
+        includeDocuments,
+        folder,
+        startCursor || '',
+        sortKey,
+        filterArgs
+      ) || {};
 
   useEffect(() => {
     if (loading) return;
@@ -305,7 +305,8 @@ const GetCollection = ({
         cms,
         collectionResponse,
         collectionDefinition,
-        doc
+        doc,
+        cms.api.tina.branch
       );
     }
   }, [collection?.name || '', loading]);

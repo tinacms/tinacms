@@ -26,12 +26,12 @@
 		"@tinacms/scripts": "workspace:*",
 		"@types/jest": "^29.5.14",
 		"@types/micromatch": "catalog:",
-		"@types/react": "^18.3.18",
+		"@types/react": "catalog:",
 		"@types/yup": "^0.29.14",
 		"jest": "catalog:",
 		"react": "^18.3.1",
 		"ts-jest": "catalog:",
-		"typescript": "^5.7.3",
+		"typescript": "catalog:",
 		"yup": "^0.32.11"
 	},
 	"peerDependencies": {
@@ -55,6 +55,6 @@
 	"dependencies": {
 		"picomatch-browser": "catalog:",
 		"url-pattern": "catalog:",
-		"zod": "^3.24.2"
+		"zod": "catalog:"
 	}
 }
