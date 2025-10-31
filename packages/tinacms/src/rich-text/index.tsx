@@ -23,7 +23,7 @@ type BaseComponents = {
   ol?: { children: JSX.Element };
   li?: { children: JSX.Element };
   lic?: { children: JSX.Element };
-  block_quote?: { children: JSX.Element };
+  blockquote?: { children: JSX.Element };
   code_block?: { lang?: string; value: string };
   mermaid?: { value: string };
   img?: { url: string; caption?: string; alt?: string };
