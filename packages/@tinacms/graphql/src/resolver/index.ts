@@ -578,8 +578,6 @@ export class Resolver {
         await this.database.addPendingDocument(realPath, {});
         break;
       case 'union':
-        // @ts-ignore
-        // const templateString = args.template;
         if (!templateName) {
           throw new Error(
             `Must specify a template when creating content for a collection with multiple templates. Possible templates are: ${templateInfo.templates
@@ -759,11 +757,11 @@ export class Resolver {
         return doc;
       }
 
-      // Update the document
+      // update the document
       await this.database.put(newRealPath, doc._rawData, collection.name);
-      // Delete the old document
+      // delete the old document
       await this.deleteDocument(realPath);
-      // Update references to the document
+      // update references to the document
       const collRefs = await this.findReferences(realPath, collection);
       for (const [_collection, docsWithRefs] of Object.entries(collRefs)) {
         for (const [pathToDocWithRef, referencePaths] of Object.entries(
