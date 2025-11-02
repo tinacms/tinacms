@@ -807,6 +807,9 @@ export class Resolver {
       return this.getDocument(newRealPath);
     }
 
+    if (!newBody) {
+      throw new Error('Body not provided for updated document.');
+    }
     const params = await this.buildObjectMutations(
       newBody,
       collection,

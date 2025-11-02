@@ -230,7 +230,6 @@ export const resolve = async ({
                       assertShape<{
                         params: {
                           relativePath: string;
-                          // [args.collection]: Record<string, unknown>; .. effectively.
                         };
                       }>(args, (yup) =>
                         yup.object({
@@ -238,7 +237,6 @@ export const resolve = async ({
                             .object()
                             .shape({
                               relativePath: yup.string().optional(),
-                              [args.collection]: yup.object().required(),
                             })
                             .required(),
                         })
@@ -247,7 +245,7 @@ export const resolve = async ({
                       const newBody = args.params[args.collection] as Record<
                         string,
                         unknown
-                      >;
+                      > | undefined;
                       return resolver.resolveUpdateDocument({
                         collectionName: args.collection,
                         relativePath: args.relativePath,
