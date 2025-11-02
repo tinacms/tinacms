@@ -50,7 +50,6 @@ export const resolve = async ({
 
     const tinaConfig = await database.getTinaSchema();
     const tinaSchema = await createSchema({
-      // TODO: please update all the types to import from @tinacms/schema-tools
       schema: tinaConfig,
       // @ts-expect-error
       flags: tinaConfig?.meta?.flags,
