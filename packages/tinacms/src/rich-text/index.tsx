@@ -23,6 +23,10 @@ type BaseComponents = {
   ol?: { children: JSX.Element };
   li?: { children: JSX.Element };
   lic?: { children: JSX.Element };
+  /**
+   * @deprecated Use `blockquote` instead. This was incorrectly named and will be removed in a future version.
+   */
+  block_quote?: { children: JSX.Element };
   blockquote?: { children: JSX.Element };
   code_block?: { lang?: string; value: string };
   mermaid?: { value: string };
@@ -238,7 +242,6 @@ const Node = ({ components, child }) => {
     case 'h5':
     case 'h6':
     case 'p':
-    case 'blockquote':
     case 'ol':
     case 'ul':
     case 'li':
@@ -267,6 +270,20 @@ const Node = ({ components, child }) => {
           <TinaMarkdown components={components} content={child.children} />
         </div>
       );
+    case 'blockquote':
+     // Support both blockquote and block_quote (deprecated) for backwards compatibility
+     const BlockquoteComponent =
+       components.blockquote || components.block_quote;
+     if (BlockquoteComponent) {
+       return (
+         <BlockquoteComponent {...props}>
+           <TinaMarkdown components={components} content={children} />
+         </BlockquoteComponent>
+       );
+     }
+     return React.createElement('blockquote', {
+       children: <TinaMarkdown components={components} content={children} />,
+     });
     case 'img':
       if (components[child.type]) {
         const Component = components[child.type];
