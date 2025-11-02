@@ -199,20 +199,22 @@ const Node = ({
           <StaticTinaMarkdown components={components} content={children} />
         ),
       });
-      case 'blockquote':
+    case 'blockquote':
       // Support both blockquote and block_quote (deprecated) for backwards compatibility
       const BlockquoteComponent =
-          components.blockquote || components.block_quote;
-        if (BlockquoteComponent) {
-          return (
-            <BlockquoteComponent {...props}>
-              <StaticTinaMarkdown components={components} content={children} />
-            </BlockquoteComponent>
-          );
-        }
-        return React.createElement('blockquote', {
-          children: <StaticTinaMarkdown components={components} content={children} />,
-        });
+        components.blockquote || components.block_quote;
+      if (BlockquoteComponent) {
+        return (
+          <BlockquoteComponent {...props}>
+            <StaticTinaMarkdown components={components} content={children} />
+          </BlockquoteComponent>
+        );
+      }
+      return React.createElement('blockquote', {
+        children: (
+          <StaticTinaMarkdown components={components} content={children} />
+        ),
+      });
     case 'lic': // List Item Content
       if (components.lic) {
         const Component = components.lic;

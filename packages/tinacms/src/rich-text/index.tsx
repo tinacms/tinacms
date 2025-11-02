@@ -271,19 +271,19 @@ const Node = ({ components, child }) => {
         </div>
       );
     case 'blockquote':
-     // Support both blockquote and block_quote (deprecated) for backwards compatibility
-     const BlockquoteComponent =
-       components.blockquote || components.block_quote;
-     if (BlockquoteComponent) {
-       return (
-         <BlockquoteComponent {...props}>
-           <TinaMarkdown components={components} content={children} />
-         </BlockquoteComponent>
-       );
-     }
-     return React.createElement('blockquote', {
-       children: <TinaMarkdown components={components} content={children} />,
-     });
+      // Support both blockquote and block_quote (deprecated) for backwards compatibility
+      const BlockquoteComponent =
+        components.blockquote || components.block_quote;
+      if (BlockquoteComponent) {
+        return (
+          <BlockquoteComponent {...props}>
+            <TinaMarkdown components={components} content={children} />
+          </BlockquoteComponent>
+        );
+      }
+      return React.createElement('blockquote', {
+        children: <TinaMarkdown components={components} content={children} />,
+      });
     case 'img':
       if (components[child.type]) {
         const Component = components[child.type];
