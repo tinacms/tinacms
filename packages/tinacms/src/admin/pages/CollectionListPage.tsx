@@ -153,6 +153,7 @@ export const handleNavigate = async (
   const plugins = cms.plugins.all<RouteMappingPlugin>('tina-admin');
   const routeMapping = plugins.find(({ name }) => name === 'route-mapping');
   const tinaPreview = cms.flags.get('tina-preview') || false;
+  const basePath = cms.flags.get('tina-basepath');
 
   /**
    * Determine if the document has a route mapped
@@ -175,8 +176,8 @@ export const handleNavigate = async (
       routeOverride = routeOverride.slice(1);
     }
     tinaPreview
-      ? navigate(`/~/${routeOverride}`)
-      : (window.location.href = routeOverride);
+      ? navigate(`/~${basePath ? `/${basePath}` : ''}/${routeOverride}`)
+      : (window.location.href = `${basePath ? `/${basePath}` : ''}/${routeOverride}`);
     return null;
   } else {
     const pathToDoc = document._sys.breadcrumbs;
@@ -946,41 +947,10 @@ const CollectionListPage = () => {
                                                 },
                                               },
                                               allowDelete && {
-                                                name: 'delete',
-                                                label: 'Delete',
-                                                Icon: (
-                                                  <BiTrash
-                                                    size='1.3rem'
-                                                    className='text-red-500'
-                                                  />
-                                                ),
-                                                onMouseDown: () => {
-                                                  setVars((old) => ({
-                                                    ...old,
-                                                    collection: collectionName,
-                                                    relativePathWithoutExtension:
-                                                      document.node._sys.breadcrumbs.join(
-                                                        '/'
-                                                      ),
-                                                    relativePath:
-                                                      document.node._sys.breadcrumbs.join(
-                                                        '/'
-                                                      ) +
-                                                      document.node._sys
-                                                        .extension,
-                                                    newRelativePath: '',
-                                                  }));
-                                                  setDeleteModalOpen(true);
-                                                },
-                                              },
-                                              allowDelete && {
                                                 name: 'rename',
                                                 label: 'Rename',
                                                 Icon: (
-                                                  <BiRename
-                                                    size='1.3rem'
-                                                    className='text-red-500'
-                                                  />
+                                                  <BiRename size='1.3rem' />
                                                 ),
                                                 onMouseDown: () => {
                                                   setVars((old) => ({
@@ -999,6 +969,35 @@ const CollectionListPage = () => {
                                                     newRelativePath: '',
                                                   }));
                                                   setRenameModalOpen(true);
+                                                },
+                                              },
+                                              allowDelete && {
+                                                name: 'delete',
+                                                label: 'Delete',
+                                                Icon: (
+                                                  <BiTrash
+                                                    size='1.3rem'
+                                                    className='text-red-500'
+                                                  />
+                                                ),
+                                                className: 'text-red-500',
+                                                onMouseDown: () => {
+                                                  setVars((old) => ({
+                                                    ...old,
+                                                    collection: collectionName,
+                                                    relativePathWithoutExtension:
+                                                      document.node._sys.breadcrumbs.join(
+                                                        '/'
+                                                      ),
+                                                    relativePath:
+                                                      document.node._sys.breadcrumbs.join(
+                                                        '/'
+                                                      ) +
+                                                      document.node._sys
+                                                        .extension,
+                                                    newRelativePath: '',
+                                                  }));
+                                                  setDeleteModalOpen(true);
                                                 },
                                               },
                                             ].filter(Boolean)}

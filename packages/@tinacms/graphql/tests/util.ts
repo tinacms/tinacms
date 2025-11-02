@@ -18,6 +18,8 @@ class OutputBridge extends FilesystemBridge {
 class MemoryCaptureBridge extends FilesystemBridge {
   private writes: Map<string, string> = new Map();
 
+  private deletes: string[] = [];
+
   // Read operations continue to use filesystem
   async get(filepath: string): Promise<string> {
     return super.get(filepath);
@@ -35,6 +37,15 @@ class MemoryCaptureBridge extends FilesystemBridge {
 
   getWrite(filepath: string): string | undefined {
     return this.writes.get(filepath);
+  }
+
+  // Intercept delete operations, prevent them as they will prevent running tests twice.
+  async delete(filepath: string) {
+    this.deletes.push(filepath);
+  }
+
+  getDeletes(): string[] {
+    return [...this.deletes];
   }
 }
 
