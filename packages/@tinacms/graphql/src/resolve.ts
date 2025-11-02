@@ -241,10 +241,9 @@ export const resolve = async ({
                         })
                       );
                       const newRelativePath = args.params.relativePath;
-                      const newBody = args.params[args.collection] as Record<
-                        string,
-                        unknown
-                      > | undefined;
+                      const newBody = args.params[args.collection] as
+                        | Record<string, unknown>
+                        | undefined;
                       return resolver.resolveUpdateDocument({
                         collectionName: args.collection,
                         relativePath: args.relativePath,
