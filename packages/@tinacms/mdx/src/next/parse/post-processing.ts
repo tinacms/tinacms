@@ -51,7 +51,9 @@ export const postProcessor = (
     node.children = [{ type: 'text', text: '' }];
   };
 
+  // @ts-ignore - TODO: Type error: Type instantiation is excessively deep and possibly infinite.
   visit(tree, 'mdxJsxFlowElement', addPropsToMdxFlow);
+  // @ts-ignore - TODO: Type error: Type instantiation is excessively deep and possibly infinite.
   visit(tree, 'mdxJsxTextElement', addPropsToMdxFlow);
 
   return remarkToSlate(tree, field, imageCallback, '', true);

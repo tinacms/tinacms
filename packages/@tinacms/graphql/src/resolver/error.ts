@@ -55,9 +55,6 @@ export class TinaFetchError extends Error {
 
 export class TinaQueryError extends TinaFetchError {
   public stack?: string;
-  public collection?: string;
-  public file?: string;
-  originalError: Error;
   constructor(args: TypeFetchErrorArgs) {
     super(
       `Error querying file ${args.file} from collection ${
@@ -69,10 +66,6 @@ export class TinaQueryError extends TinaFetchError {
 }
 
 export class TinaParseDocumentError extends TinaFetchError {
-  public collection?: string;
-  public file?: string;
-  originalError: Error;
-
   constructor(args: TypeFetchErrorArgs) {
     super(
       `Error parsing file ${args.file} from collection ${

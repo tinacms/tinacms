@@ -28,7 +28,7 @@ export const optionsToSearchIndexOptions = (options?: {
   limit?: number;
   cursor?: string;
 }) => {
-  const opt = {};
+  const opt: { PAGE?: {} } = {};
   if (options?.limit) {
     opt['PAGE'] = {
       SIZE: options.limit,
