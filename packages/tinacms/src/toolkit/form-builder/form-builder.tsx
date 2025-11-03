@@ -33,6 +33,7 @@ import { LoadingDots } from './loading-dots';
 import { ResetForm } from './reset-form';
 import { TinaIcon } from '@tinacms/toolkit';
 import { FieldLabel } from '@toolkit/fields';
+import { GitBranchIcon } from 'lucide-react';
 
 export interface FormBuilderProps {
   form: { tinaForm: Form; activeFieldName?: string };
@@ -697,13 +698,10 @@ export const CreateBranchModal = ({
         </ModalHeader>
         <ModalBody padded={true}>{renderStateContent()}</ModalBody>
         {!isExecuting && (
-          <ModalActions>
-            <Button style={{ flexGrow: 1 }} onClick={close}>
-              Cancel
-            </Button>
+          <ModalActions align='end'>
+            <Button onClick={close}>Cancel</Button>
             <DropdownButton
               variant='primary'
-              style={{ flexGrow: 2 }}
               disabled={newBranchName === '' || disabled}
               onMainAction={executeEditorialWorkflow}
               items={[
@@ -717,7 +715,8 @@ export const CreateBranchModal = ({
                 },
               ]}
             >
-              Continue
+              <GitBranchIcon className='w-4 h-4 mr-1 fill-none' />
+              Save to a new branch
             </DropdownButton>
           </ModalActions>
         )}
