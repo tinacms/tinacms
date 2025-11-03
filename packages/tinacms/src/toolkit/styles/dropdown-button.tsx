@@ -100,7 +100,6 @@ export const DropdownButton = React.forwardRef<
       onMainAction,
       items,
       showSplitButton = true,
-      align = 'start',
       ...props
     },
     ref
@@ -130,7 +129,7 @@ export const DropdownButton = React.forwardRef<
               />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align={align} className='z-[100000]'>
+          <DropdownMenuContent align='end' side='bottom' className='z-[100000]'>
             {items.map((item, index) => (
               <DropdownMenuItem
                 key={index}
@@ -138,7 +137,7 @@ export const DropdownButton = React.forwardRef<
                 disabled={item.disabled}
                 variant={item.variant}
               >
-                {item.icon && <span className='mr-2'>{item.icon}</span>}
+                {item.icon && item.icon}
                 {item.label}
               </DropdownMenuItem>
             ))}
@@ -170,7 +169,7 @@ export const DropdownButton = React.forwardRef<
               busy={busy}
               disabled={disabled}
               rounded='right'
-              className='px-2 border-l'
+              className='px-4 border-l'
               style={{ borderColor: '#00000030' }}
               aria-label='More options'
             >
@@ -183,7 +182,7 @@ export const DropdownButton = React.forwardRef<
               />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align={align}>
+          <DropdownMenuContent align='end' side='bottom'>
             {items.map((item, index) => (
               <React.Fragment key={index}>
                 <DropdownMenuItem
@@ -191,7 +190,7 @@ export const DropdownButton = React.forwardRef<
                   disabled={item.disabled}
                   variant={item.variant}
                 >
-                  {item.icon && <span className='mr-2'>{item.icon}</span>}
+                  {item.icon && item.icon}
                   {item.label}
                 </DropdownMenuItem>
                 {/* Add separator before destructive items */}
