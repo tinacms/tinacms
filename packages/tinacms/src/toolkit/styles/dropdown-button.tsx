@@ -170,7 +170,8 @@ export const DropdownButton = React.forwardRef<
               busy={busy}
               disabled={disabled}
               rounded='right'
-              className='px-2'
+              className='px-2 border-l'
+              style={{ borderColor: '#00000030' }}
               aria-label='More options'
             >
               <ChevronDownIcon

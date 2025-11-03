@@ -660,7 +660,7 @@ export const CreateBranchModal = ({
             <br />
             <span className='text-gray-400'>Learn more about </span>
             <a
-              className='underline text-tina-orange'
+              className='underline text-tina-orange-dark'
               href='https://tina.io/docs/tinacloud/editorial-workflow'
               target='_blank'
             >
@@ -737,7 +737,7 @@ export const PrefixedTextField = ({
     <>
       {label && <FieldLabel name={props.name}>{label}</FieldLabel>}
       <div className='border border-gray-200 focus-within:border-blue-200 bg-gray-100 focus-within:bg-blue-100 rounded shadow-sm focus-within:shadow-outline overflow-hidden flex items-stretch divide-x divide-gray-200 focus-within:divide-blue-100 w-full transition-all ease-out duration-150'>
-        <span className='pl-3 pr-2 py-2 font-medium text-base text-gray-700 text-tina-orange bg-tina-orange-light'>
+        <span className='pl-3 pr-2 py-2 text-base text-tina-orange-dark bg-tina-orange-light'>
           {prefix}
         </span>
         <input
