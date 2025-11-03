@@ -178,6 +178,7 @@ export const DropdownButton = React.forwardRef<
                   'h-4 w-4 transition-transform duration-200 fill-none',
                   open && 'rotate-180'
                 )}
+                style={{ fill: 'none' }}
               />
             </Button>
           </DropdownMenuTrigger>

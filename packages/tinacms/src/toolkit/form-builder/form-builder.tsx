@@ -691,7 +691,7 @@ export const CreateBranchModal = ({
         <ModalHeader close={isExecuting ? undefined : close}>
           <div className='flex items-center justify-between w-full'>
             <div className='flex items-center'>
-              <TinaIcon className='w-8 h-auto mr-1 text-blue-500 opacity-70 text-tina-orange' />
+              <TinaIcon className='w-8 h-auto mr-1 text-blue-500 text-tina-orange' />
               Save changes to new branch
             </div>
           </div>
@@ -715,7 +715,10 @@ export const CreateBranchModal = ({
                 },
               ]}
             >
-              <GitBranchIcon className='w-4 h-4 mr-1 fill-none' />
+              <GitBranchIcon
+                className='w-4 h-4 mr-1'
+                style={{ fill: 'none' }}
+              />
               Save to a new branch
             </DropdownButton>
           </ModalActions>
@@ -734,7 +737,7 @@ export const PrefixedTextField = ({
     <>
       {label && <FieldLabel name={props.name}>{label}</FieldLabel>}
       <div className='border border-gray-200 focus-within:border-blue-200 bg-gray-100 focus-within:bg-blue-100 rounded shadow-sm focus-within:shadow-outline overflow-hidden flex items-stretch divide-x divide-gray-200 focus-within:divide-blue-100 w-full transition-all ease-out duration-150'>
-        <span className='pl-3 pr-2 py-2 font-medium text-base text-gray-700 opacity-50'>
+        <span className='pl-3 pr-2 py-2 font-medium text-base text-gray-700 text-tina-orange bg-tina-orange-light'>
           {prefix}
         </span>
         <input
