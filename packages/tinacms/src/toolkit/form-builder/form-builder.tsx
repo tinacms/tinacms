@@ -4,10 +4,10 @@ import { type FC, useEffect } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 
 import { useBranchData } from '@toolkit/plugin-branch-switcher';
-import { Button, OverflowMenu } from '@toolkit/styles';
+import { Button, DropdownButton } from '@toolkit/styles';
 import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
 import { AiOutlineLoading } from 'react-icons/ai';
-import { BiError, BiGitBranch } from 'react-icons/bi';
+import { BiError } from 'react-icons/bi';
 import { FaCircle } from 'react-icons/fa';
 import { MdOutlineSaveAlt } from 'react-icons/md';
 import {
@@ -701,28 +701,24 @@ export const CreateBranchModal = ({
             <Button style={{ flexGrow: 1 }} onClick={close}>
               Cancel
             </Button>
-            <Button
+            <DropdownButton
               variant='primary'
               style={{ flexGrow: 2 }}
               disabled={newBranchName === '' || disabled}
-              onClick={executeEditorialWorkflow}
-            >
-              Continue
-            </Button>
-            <OverflowMenu
-              className='-ml-2'
-              toolbarItems={[
+              onMainAction={executeEditorialWorkflow}
+              items={[
                 {
-                  name: 'override',
                   label: 'Save to Protected Branch',
-                  Icon: <MdOutlineSaveAlt size='1rem' />,
-                  onMouseDown: () => {
+                  onClick: () => {
                     close();
                     safeSubmit();
                   },
+                  icon: <MdOutlineSaveAlt size='1rem' />,
                 },
               ]}
-            />
+            >
+              Continue
+            </DropdownButton>
           </ModalActions>
         )}
       </PopupModal>
