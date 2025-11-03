@@ -658,9 +658,9 @@ export const CreateBranchModal = ({
             merged for it to go live.
             <br />
             <br />
-            <span className='text-gray-400'>Learn more about </span>
+            <span className='text-gray-500'>Learn more about </span>
             <a
-              className='underline text-tina-orange-dark'
+              className='underline text-tina-orange-dark font-medium'
               href='https://tina.io/docs/tinacloud/editorial-workflow'
               target='_blank'
             >
