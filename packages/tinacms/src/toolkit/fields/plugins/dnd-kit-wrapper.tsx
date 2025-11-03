@@ -170,6 +170,7 @@ export const Draggable: React.FC<DraggableProps> = ({
     transform,
     transition,
     isDragging,
+    setActivatorNodeRef,
   } = useSortable({
     id: draggableId,
     animateLayoutChanges,
@@ -190,9 +191,9 @@ export const Draggable: React.FC<DraggableProps> = ({
             ref: setNodeRef,
             style,
             ...attributes,
-            ...listeners,
           },
           dragHandleProps: {
+            ref: setActivatorNodeRef,
             ...listeners,
           },
         },

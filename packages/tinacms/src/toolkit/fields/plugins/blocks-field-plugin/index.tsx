@@ -203,7 +203,10 @@ const BlockListItem = ({
       {(provider, snapshot) => (
         <>
           <ItemHeader provider={provider} isDragging={snapshot.isDragging}>
-            <DragHandle isDragging={snapshot.isDragging} />
+            <DragHandle
+              isDragging={snapshot.isDragging}
+              dragHandleProps={provider.dragHandleProps}
+            />
             <ItemClickTarget
               onClick={() => {
                 const state = tinaForm.finalForm.getState();
@@ -265,7 +268,10 @@ const InvalidBlockListItem = ({
     <Draggable key={index} draggableId={`${field.name}.${index}`} index={index}>
       {(provider, snapshot) => (
         <ItemHeader provider={provider} isDragging={snapshot.isDragging}>
-          <DragHandle isDragging={snapshot.isDragging} />
+          <DragHandle
+            isDragging={snapshot.isDragging}
+            dragHandleProps={provider.dragHandleProps}
+          />
           <ItemClickTarget>
             <GroupLabel error>Invalid Block</GroupLabel>
           </ItemClickTarget>
