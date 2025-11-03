@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@headlessui/react": "2.1.8",
-    "@tailwindcss/typography": "^0.5.16",
+    "@tailwindcss/typography": "catalog:",
     "@tinacms/mdx": "workspace:*",
     "@tinacms/vercel-previews": "workspace:*",
     "date-fns": "^2.30.0",

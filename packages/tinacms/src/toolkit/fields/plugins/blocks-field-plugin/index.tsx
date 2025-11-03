@@ -1,6 +1,6 @@
 import * as React from 'react';
 import type { Field, Form } from '@toolkit/forms';
-import { Droppable, Draggable } from 'react-beautiful-dnd';
+import { Droppable, Draggable, SortableProvider } from '../dnd-kit-wrapper';
 import {
   GroupLabel,
   ItemDeleteButton,
@@ -120,40 +120,44 @@ const Blocks = ({
           {(provider) => (
             <div ref={provider.innerRef} className='edit-page--list-parent'>
               {items.length === 0 && <EmptyList />}
-              {items.map((block: any, index: any) => {
-                const template = field.templates[block._template];
+              <SortableProvider
+                items={items.map((_, index) => `${field.name}.${index}`)}
+              >
+                {items.map((block: any, index: any) => {
+                  const template = field.templates[block._template];
 
-                if (!template) {
+                  if (!template) {
+                    return (
+                      <InvalidBlockListItem
+                        // NOTE: Supressing warnings, but not helping with render perf
+                        key={index}
+                        index={index}
+                        field={field}
+                        tinaForm={tinaForm}
+                      />
+                    );
+                  }
+
+                  const itemProps = (item: object) => {
+                    if (!template.itemProps) return {};
+                    return template.itemProps(item);
+                  };
                   return (
-                    <InvalidBlockListItem
+                    <BlockListItem
                       // NOTE: Supressing warnings, but not helping with render perf
                       key={index}
+                      block={block}
+                      template={template}
                       index={index}
                       field={field}
                       tinaForm={tinaForm}
+                      isMin={isMin}
+                      fixedLength={fixedLength}
+                      {...itemProps(block)}
                     />
                   );
-                }
-
-                const itemProps = (item: object) => {
-                  if (!template.itemProps) return {};
-                  return template.itemProps(item);
-                };
-                return (
-                  <BlockListItem
-                    // NOTE: Supressing warnings, but not helping with render perf
-                    key={index}
-                    block={block}
-                    template={template}
-                    index={index}
-                    field={field}
-                    tinaForm={tinaForm}
-                    isMin={isMin}
-                    fixedLength={fixedLength}
-                    {...itemProps(block)}
-                  />
-                );
-              })}
+                })}
+              </SortableProvider>
               {provider.placeholder}
             </div>
           )}
@@ -199,7 +203,10 @@ const BlockListItem = ({
       {(provider, snapshot) => (
         <>
           <ItemHeader provider={provider} isDragging={snapshot.isDragging}>
-            <DragHandle isDragging={snapshot.isDragging} />
+            <DragHandle
+              isDragging={snapshot.isDragging}
+              dragHandleProps={provider.dragHandleProps}
+            />
             <ItemClickTarget
               onClick={() => {
                 const state = tinaForm.finalForm.getState();
@@ -261,7 +268,10 @@ const InvalidBlockListItem = ({
     <Draggable key={index} draggableId={`${field.name}.${index}`} index={index}>
       {(provider, snapshot) => (
         <ItemHeader provider={provider} isDragging={snapshot.isDragging}>
-          <DragHandle isDragging={snapshot.isDragging} />
+          <DragHandle
+            isDragging={snapshot.isDragging}
+            dragHandleProps={provider.dragHandleProps}
+          />
           <ItemClickTarget>
             <GroupLabel error>Invalid Block</GroupLabel>
           </ItemClickTarget>

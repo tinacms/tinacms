@@ -44,6 +44,6 @@
 	},
 	"packageManager": "pnpm@9.15.5",
 	"dependencies": {
-		"highlight.js": "^11.11.1"
+		"highlight.js": "catalog:"
 	}
 }

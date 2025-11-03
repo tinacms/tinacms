@@ -83,6 +83,6 @@
 		"typescript": "^5.7.3",
 		"vite": "^4.5.9",
 		"vitest": "^0.32.4",
-		"zod": "^3.24.2"
+		"zod": "catalog:"
 	}
 }

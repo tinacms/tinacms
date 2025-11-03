@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Field, Form } from '@toolkit/forms';
 import { IconButton } from '@toolkit/styles';
-import { Droppable, Draggable } from 'react-beautiful-dnd';
+import { Droppable, Draggable, SortableProvider } from './dnd-kit-wrapper';
 import { AddIcon, DragIcon, ReorderIcon, TrashIcon } from '@toolkit/icons';
 import { useEvent } from '@toolkit/react-core/use-cms-event';
 import type { FieldHoverEvent, FieldFocusEvent } from '../field-events';
@@ -104,19 +104,23 @@ const Group = ({ tinaForm, form, field, input, meta, index }: GroupProps) => {
             {(provider) => (
               <div ref={provider.innerRef}>
                 {items.length === 0 && <EmptyList />}
-                {items.map((item: any, index: any) => (
-                  <Item
-                    // NOTE: Supressing warnings, but not helping with render perf
-                    key={index}
-                    tinaForm={tinaForm}
-                    field={field}
-                    item={item}
-                    index={index}
-                    isMin={isMin}
-                    fixedLength={fixedLength}
-                    {...itemProps(item)}
-                  />
-                ))}
+                <SortableProvider
+                  items={items.map((_, index) => `${field.name}.${index}`)}
+                >
+                  {items.map((item: any, index: any) => (
+                    <Item
+                      // NOTE: Supressing warnings, but not helping with render perf
+                      key={index}
+                      tinaForm={tinaForm}
+                      field={field}
+                      item={item}
+                      index={index}
+                      isMin={isMin}
+                      fixedLength={fixedLength}
+                      {...itemProps(item)}
+                    />
+                  ))}
+                </SortableProvider>
                 {provider.placeholder}
               </div>
             )}
@@ -166,7 +170,10 @@ const Item = ({
             isDragging={snapshot.isDragging}
             {...p}
           >
-            <DragHandle isDragging={snapshot.isDragging} />
+            <DragHandle
+              isDragging={snapshot.isDragging}
+              dragHandleProps={provider.dragHandleProps}
+            />
             <ItemClickTarget
               onMouseOver={() =>
                 setHoveredField({
@@ -252,9 +259,8 @@ export const ItemHeader = ({
 } & any) => {
   return (
     <div
-      ref={provider.innerRef}
+      ref={provider.draggableProps?.ref}
       {...provider.draggableProps}
-      {...provider.dragHandleProps}
       {...props}
       className={`relative group cursor-pointer flex justify-between items-stretch bg-white border border-gray-100 -mb-px overflow-visible p-0 text-sm font-normal ${
         isDragging
@@ -262,8 +268,7 @@ export const ItemHeader = ({
           : 'text-gray-600 first:rounded-t last:rounded-b'
       } ${props.className ?? ''}`}
       style={{
-        ...(provider.draggableProps.style ?? {}),
-        ...(provider.dragHandleProps.style ?? {}),
+        ...(provider.draggableProps?.style ?? {}),
         ...(props.style ?? {}),
       }}
     >
@@ -286,9 +291,16 @@ export const ItemDeleteButton = ({ onClick, disabled = false }) => {
   );
 };
 
-export const DragHandle = ({ isDragging }: { isDragging: boolean }) => {
+export const DragHandle = ({
+  isDragging,
+  dragHandleProps,
+}: {
+  isDragging: boolean;
+  dragHandleProps?: any;
+}) => {
   return (
     <div
+      {...dragHandleProps}
       className={`relative w-8 px-1 py-2.5 flex items-center justify-center hover:bg-gray-50 group cursor-[grab] ${
         isDragging ? `text-blue-500` : `text-gray-200 hover:text-gray-600`
       }`}
@@ -304,16 +316,6 @@ export const DragHandle = ({ isDragging }: { isDragging: boolean }) => {
     </div>
   );
 };
-
-interface PanelProps {
-  setExpanded(next: boolean): void;
-  isExpanded: boolean;
-  tinaForm: Form;
-  index: number;
-  field: GroupFieldDefinititon;
-  itemTitle: string;
-  zIndexShift: number;
-}
 
 export const GroupListField = Group;
 
