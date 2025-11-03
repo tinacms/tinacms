@@ -1,5 +1,21 @@
 # tinacms
 
+## 2.9.1
+
+### Patch Changes
+
+- [#5863](https://github.com/tinacms/tinacms/pull/5863) [`003e348`](https://github.com/tinacms/tinacms/commit/003e348472ddc08eee63d78190038097542b6311) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Fix basePath support for preview images in TinaCMS blocks
+
+- [#6063](https://github.com/tinacms/tinacms/pull/6063) [`5527e8a`](https://github.com/tinacms/tinacms/commit/5527e8ab5821c8613fcfd1b0b8bc6d93291a6d03) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: move delete icon position
+  feat re-organise file edit popup menu
+
+- [#6083](https://github.com/tinacms/tinacms/pull/6083) [`5ffd60e`](https://github.com/tinacms/tinacms/commit/5ffd60e7b07b19cde6fab36a911503276c83715f) Thanks [@Calinator444](https://github.com/Calinator444)! - Fix - Fixed blockquotes (block_quote)
+  Deprecated `block_quote` in favor of `blockquote`
+
+- [#6059](https://github.com/tinacms/tinacms/pull/6059) [`b23aa0c`](https://github.com/tinacms/tinacms/commit/b23aa0c5defc51b8f9fe00a59dd87e1d2f8b9f0b) Thanks [@kulesy](https://github.com/kulesy)! - docs: Update references from tina-cloud-starter to tina-nextjs-starter
+
+- [#6055](https://github.com/tinacms/tinacms/pull/6055) [`5d13c0d`](https://github.com/tinacms/tinacms/commit/5d13c0d023373692233c8be2127ae6e3d7d68b47) Thanks [@kulesy](https://github.com/kulesy)! - 🐛 Fix: Decode branch name in protected branch check
+
 ## 2.9.0
 
 ### Minor Changes
