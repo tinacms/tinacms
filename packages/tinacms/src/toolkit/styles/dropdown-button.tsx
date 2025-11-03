@@ -175,7 +175,7 @@ export const DropdownButton = React.forwardRef<
             >
               <ChevronDownIcon
                 className={cn(
-                  'h-4 w-4 transition-transform duration-200',
+                  'h-4 w-4 transition-transform duration-200 fill-none',
                   open && 'rotate-180'
                 )}
               />
