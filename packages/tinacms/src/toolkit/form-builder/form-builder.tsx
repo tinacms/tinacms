@@ -33,7 +33,7 @@ import { LoadingDots } from './loading-dots';
 import { ResetForm } from './reset-form';
 import { TinaIcon } from '@tinacms/toolkit';
 import { FieldLabel } from '@toolkit/fields';
-import { GitBranchIcon } from 'lucide-react';
+import { GitBranchIcon, TriangleAlert } from 'lucide-react';
 
 export interface FormBuilderProps {
   form: { tinaForm: Form; activeFieldName?: string };
@@ -702,6 +702,7 @@ export const CreateBranchModal = ({
             <Button onClick={close}>Cancel</Button>
             <DropdownButton
               variant='primary'
+              align='start'
               disabled={newBranchName === '' || disabled}
               onMainAction={executeEditorialWorkflow}
               items={[
@@ -711,7 +712,7 @@ export const CreateBranchModal = ({
                     close();
                     safeSubmit();
                   },
-                  icon: <MdOutlineSaveAlt size='1rem' />,
+                  icon: <TriangleAlert className='w-4 h-4' />,
                 },
               ]}
             >
