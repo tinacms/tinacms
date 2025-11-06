@@ -18,6 +18,7 @@ import { BillingWarning, LocalWarning } from './local-warning';
 import { Nav } from './nav';
 import { ResizeHandle } from './resize-handle';
 import { FormsView } from './sidebar-body';
+import { TinaIcon } from '@toolkit/icons';
 
 export const SidebarContext = React.createContext<any>(null);
 export const minPreviewWidth = 440;
@@ -380,7 +381,7 @@ const SidebarHeader = ({ isLocalMode }) => {
             >
               <BiMenu className='h-6 w-auto text-gray-600' />
             </button>
-
+            <TinaIcon className='self-center h-10 w-auto text-orange-500' />
             <BranchButton />
 
             <div className='px-4'>
