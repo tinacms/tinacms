@@ -175,13 +175,16 @@ export const handleNavigate = async (
   /**
    * Redirect the browser if 'yes', else navigate react-router.
    */
+
   if (routeOverride) {
     // remove leading /
     if (routeOverride.startsWith('/')) {
       routeOverride = routeOverride.slice(1);
     }
     tinaPreview
-      ? navigate(`/~${basePath ? `/${basePath}` : ''}/${routeOverride}`)
+      ? navigate(
+          `${encodeURIComponent(branchName)}/~${basePath ? `/${basePath}` : ''}/${routeOverride}`
+        )
       : (window.location.href = `${basePath ? `/${basePath}` : ''}/${routeOverride}`);
     return null;
   } else {
