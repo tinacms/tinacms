@@ -1,5 +1,34 @@
 # tinacms
 
+## 2.9.1
+
+### Patch Changes
+
+- [#5863](https://github.com/tinacms/tinacms/pull/5863) [`003e348`](https://github.com/tinacms/tinacms/commit/003e348472ddc08eee63d78190038097542b6311) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Fix basePath support for preview images in TinaCMS blocks
+
+- [#6063](https://github.com/tinacms/tinacms/pull/6063) [`5527e8a`](https://github.com/tinacms/tinacms/commit/5527e8ab5821c8613fcfd1b0b8bc6d93291a6d03) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: move delete icon position
+  feat re-organise file edit popup menu
+
+- [#6083](https://github.com/tinacms/tinacms/pull/6083) [`5ffd60e`](https://github.com/tinacms/tinacms/commit/5ffd60e7b07b19cde6fab36a911503276c83715f) Thanks [@Calinator444](https://github.com/Calinator444)! - Fix - Fixed blockquotes (block_quote)
+  Deprecated `block_quote` in favor of `blockquote`
+
+- [#6059](https://github.com/tinacms/tinacms/pull/6059) [`b23aa0c`](https://github.com/tinacms/tinacms/commit/b23aa0c5defc51b8f9fe00a59dd87e1d2f8b9f0b) Thanks [@kulesy](https://github.com/kulesy)! - docs: Update references from tina-cloud-starter to tina-nextjs-starter
+
+- [#6055](https://github.com/tinacms/tinacms/pull/6055) [`5d13c0d`](https://github.com/tinacms/tinacms/commit/5d13c0d023373692233c8be2127ae6e3d7d68b47) Thanks [@kulesy](https://github.com/kulesy)! - 🐛 Fix: Decode branch name in protected branch check
+
+## 2.9.0
+
+### Minor Changes
+
+- [#5992](https://github.com/tinacms/tinacms/pull/5992) [`98fbc94`](https://github.com/tinacms/tinacms/commit/98fbc941a07fbc52edafaeb43b49b5ea30ea4172) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Consistency Fixes for Alerts, Callouts, Badges
+
+### Patch Changes
+
+- [#6014](https://github.com/tinacms/tinacms/pull/6014) [`0bbe080`](https://github.com/tinacms/tinacms/commit/0bbe0804e334238850a4f8f33be5cd123ff68ab3) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐛 Bug - Fix Media Manager Title Overlay
+  🐛 Bug - Button Overlap on Collections Menu
+
+- [#5995](https://github.com/tinacms/tinacms/pull/5995) [`ced9076`](https://github.com/tinacms/tinacms/commit/ced9076d25d7177bd8d9ae3c6133d0560366511c) Thanks [@kulesy](https://github.com/kulesy)! - ⚡ Performance - Improve media load performance
+
 ## 2.8.3
 
 ### Patch Changes

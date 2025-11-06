@@ -13,7 +13,7 @@ jobs:
       matrix:
         package-manager: [yarn, npm, pnpm]
         template:
-          - tina-cloud-starter
+          - tina-nextjs-starter
           - tina-hugo-starter
           - tina-remix-starter
           - tinasaurus
@@ -42,7 +42,7 @@ jobs:
 
       - name: Setup build tokens
         run: |
-          if [[ "${{ matrix.template }}" == "tina-cloud-starter" ]]; then
+          if [[ "${{ matrix.template }}" == "tina-nextjs-starter" ]]; then
             echo "NEXT_PUBLIC_TINA_CLIENT_ID=${{ secrets.TINA_CLOUD_STARTER_CLIENT_ID }}" >> $GITHUB_ENV
             echo "TINA_TOKEN=${{ secrets.TINA_CLOUD_STARTER_TOKEN }}" >> $GITHUB_ENV
           elif [[ "${{ matrix.template }}" == "tina-hugo-starter" ]]; then

@@ -102,17 +102,19 @@ export const Nav = ({
 
   return (
     <>
-      <button
-        className={cn(
-          'fixed pointer-events-auto p-4 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded z-10',
-          menuIsOpen ? 'hidden' : ''
-        )}
-        onClick={() => {
-          toggleMenu();
-        }}
-      >
-        <BiMenu className='h-6 w-auto text-gray-600' />
-      </button>
+      <div className='flex items-baseline'>
+        <button
+          className={cn(
+            'pointer-events-auto p-4 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded z-10',
+            menuIsOpen ? 'hidden' : ''
+          )}
+          onClick={() => {
+            toggleMenu();
+          }}
+        >
+          <BiMenu className='h-6 w-auto text-gray-600' />
+        </button>
+      </div>
 
       <div
         className={cn(

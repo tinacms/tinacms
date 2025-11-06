@@ -1,0 +1,39 @@
+{
+  "data": {
+    "updateDocument": {
+      "_values": {
+        "_collection": "post",
+        "_template": "post",
+        "title": "Original Title",
+        "genre": "drama",
+        "rating": 7,
+        "body": {
+          "type": "root",
+          "children": [
+            {
+              "type": "p",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "This is the original content for Mr Bob Northwind's post about his company Northwind."
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "The post talks about the company's growth and success in the market."
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "_sys": {
+        "title": ""
+      }
+    }
+  }
+}

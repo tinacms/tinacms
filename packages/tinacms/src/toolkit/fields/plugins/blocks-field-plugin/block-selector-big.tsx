@@ -8,11 +8,37 @@ import {
 import { useFormPortal } from '@toolkit/form-builder';
 import { AddIcon } from '@toolkit/icons';
 import { IconButton } from '@toolkit/styles';
+import { useCMS } from '@toolkit/react-core';
 import * as React from 'react';
 import { BiSearch } from 'react-icons/bi';
 import { MdKeyboardArrowDown, MdOutlineClear } from 'react-icons/md';
 import type { BlockTemplate } from '.';
 import { PanelHeader } from '../group-field-plugin';
+
+/**
+ * Constructs a URL with basePath applied to relative URLs.
+ * Absolute URLs (starting with http://, https://, or //) are returned unchanged.
+ * Relative URLs get the basePath prepended if it exists.
+ */
+const constructUrlWithBasePath = (url: string, basePath?: string): string => {
+  if (!url) return url;
+
+  if (
+    url.startsWith('http://') ||
+    url.startsWith('https://') ||
+    url.startsWith('//')
+  ) {
+    return url;
+  }
+
+  // Check if URL is already absolute path
+  if (basePath) {
+    const cleanBasePath = basePath.replace(/^\/+|\/+$/g, '');
+    return `/${cleanBasePath}/${url}`;
+  }
+
+  return url;
+};
 
 export const BlockSelectorBig = ({
   templates,
@@ -285,6 +311,14 @@ const CardColumns = ({ children, className = '' }) => {
 };
 
 const BlockCard = ({ close, name, template }) => {
+  const cms = useCMS();
+  const basePath = cms.flags.get('tina-basepath');
+  const basePathStr = typeof basePath === 'string' ? basePath : undefined;
+
+  const previewSrc = template.previewSrc
+    ? constructUrlWithBasePath(template.previewSrc, basePathStr)
+    : undefined;
+
   return (
     <button
       className='mb-2 mt-2 group relative text-xs font-bold border border-gray-100 w-full outline-none transition-all ease-out duration-150 hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50 rounded bg-white shadow overflow-hidden'
@@ -294,15 +328,15 @@ const BlockCard = ({ close, name, template }) => {
         close(name, template);
       }}
     >
-      {template.previewSrc && (
+      {previewSrc && (
         <img
-          src={template.previewSrc}
+          src={previewSrc}
           className='w-full h-auto transition-all ease-out duration-150 group-hover:opacity-50'
         />
       )}
       <span
         className={`relative flex justify-between items-center gap-4 w-full px-4 text-left ${
-          template.previewSrc ? `py-2 border-t border-gray-100 ` : `py-3`
+          previewSrc ? `py-2 border-t border-gray-100 ` : `py-3`
         }`}
       >
         {template.label ? template.label : name}
