@@ -3,7 +3,7 @@ import * as React from 'react';
 import { BiError, BiRightArrowAlt } from 'react-icons/bi';
 import { Callout } from './callout';
 
-export const LocalWarning = () => {
+export const LocalWarning = ({ className = '' }) => {
   const cms = useCMS();
   const isLocalMode = cms.api?.tina?.isLocalMode;
 
@@ -12,7 +12,7 @@ export const LocalWarning = () => {
   }
 
   return (
-    <Callout calloutStyle='warning' className='w-fit'>
+    <Callout calloutStyle='warning' className={`w-fit ${className}`}>
       <a href='https://tina.io/docs/r/what-is-tinacloud/' target='_blank'>
         You are in local mode
       </a>
