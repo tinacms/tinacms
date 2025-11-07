@@ -31,7 +31,6 @@ export const BranchButton = ({ className = '' }) => {
         size='custom'
         className={cn(
           'pointer-events-auto px-3 py-3 flex shrink gap-1 items-center justify-between',
-          isProtected && 'hover:text-blue-50 hover:bg-blue-400',
           className
         )}
         onClick={() => setOpen(true)}
@@ -56,23 +55,23 @@ export const BranchButton = ({ className = '' }) => {
 export const BranchPreviewButton = (
   props: React.ButtonHTMLAttributes<HTMLButtonElement>
 ) => {
-  const cms = useCMS();
-  const branchingEnabled = cms.flags.get('branch-switcher');
+  // const cms = useCMS();
+  // const branchingEnabled = cms.flags.get('branch-switcher');
 
-  if (!branchingEnabled) {
-    return null;
-  }
+  // if (!branchingEnabled) {
+  //   return null;
+  // }
 
-  const previewFunction = cms.api?.tina?.schema?.config?.config?.ui?.previewUrl;
-  const branch = cms.api?.tina?.branch;
-  const previewUrl =
-    typeof previewFunction === 'function'
-      ? previewFunction({ branch })?.url
-      : null;
+  // const previewFunction = cms.api?.tina?.schema?.config?.config?.ui?.previewUrl;
+  // const branch = cms.api?.tina?.branch;
+  // const previewUrl =
+  //   typeof previewFunction === 'function'
+  //     ? previewFunction({ branch })?.url
+  //     : null;
 
-  if (!previewUrl) {
-    return null;
-  }
+  // if (!previewUrl) {
+  //   return null;
+  // }
 
   return (
     <button
@@ -80,7 +79,7 @@ export const BranchPreviewButton = (
       className='p-2 text-gray-500 hover:text-blue-500 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
       {...props}
       onClick={() => {
-        window.open(previewUrl, '_blank');
+        window.open('', '_blank');
       }}
       title='Preview site in new tab'
     >
