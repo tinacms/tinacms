@@ -372,7 +372,7 @@ const SidebarHeader = ({ isLocalMode }) => {
         {!isLocalMode && <BillingWarning />}
 
         <div className='w-full flex justify-between items-center'>
-          <div className='flex overflow-hidden'>
+          <div className='flex overflow-hidden py-1'>
             <button
               className='p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
               onClick={toggleMenu}
@@ -382,7 +382,7 @@ const SidebarHeader = ({ isLocalMode }) => {
               <BiMenu className='h-6 w-auto text-gray-600' />
             </button>
             <TinaIcon className='self-center h-10 min-w-10 w-auto text-orange-500 mr-2' />
-            <BranchButton className='overflow-hidden' />
+            <BranchButton className='overflow-hidden mr-2' />
             <LocalWarning className='px-4' />
           </div>
 
