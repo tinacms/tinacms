@@ -4,12 +4,11 @@ import { type FC, useEffect } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 
 import { useBranchData } from '@toolkit/plugin-branch-switcher';
-import { Button, OverflowMenu } from '@toolkit/styles';
+import { Button, DropdownButton } from '@toolkit/styles';
 import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
 import { AiOutlineLoading } from 'react-icons/ai';
-import { BiError, BiGitBranch } from 'react-icons/bi';
+import { BiError } from 'react-icons/bi';
 import { FaCircle } from 'react-icons/fa';
-import { MdOutlineSaveAlt } from 'react-icons/md';
 import {
   CREATE_DOCUMENT_GQL,
   DELETE_DOCUMENT_GQL,
@@ -31,6 +30,9 @@ import { FormActionMenu } from './form-actions';
 import { FormPortalProvider } from './form-portal';
 import { LoadingDots } from './loading-dots';
 import { ResetForm } from './reset-form';
+import { TinaIcon } from '@tinacms/toolkit';
+import { FieldLabel } from '@toolkit/fields';
+import { GitBranchIcon, TriangleAlert } from 'lucide-react';
 
 export interface FormBuilderProps {
   form: { tinaForm: Form; activeFieldName?: string };
@@ -652,9 +654,12 @@ export const CreateBranchModal = ({
           </p>
           <p className='text-sm text-gray-700 mb-4 max-w-sm'>
             To make changes, you need to create a copy then get it approved and
-            merged for it to go live. Learn more about{' '}
+            merged for it to go live.
+            <br />
+            <br />
+            <span className='text-gray-500'>Learn more about </span>
             <a
-              className='underline hover:text-tina-orange'
+              className='underline text-tina-orange-dark font-medium'
               href='https://tina.io/docs/tinacloud/editorial-workflow'
               target='_blank'
             >
@@ -663,6 +668,8 @@ export const CreateBranchModal = ({
             .
           </p>
           <PrefixedTextField
+            name='new-branch-name'
+            label={'Branch Name'}
             placeholder='e.g. {{PAGE-NAME}}-updates'
             value={newBranchName}
             onChange={(e) => {
@@ -683,39 +690,40 @@ export const CreateBranchModal = ({
         <ModalHeader close={isExecuting ? undefined : close}>
           <div className='flex items-center justify-between w-full'>
             <div className='flex items-center'>
-              <BiGitBranch className='w-6 h-auto mr-1 text-blue-500 opacity-70' />
-              Create Branch
+              <TinaIcon className='w-8 h-auto mr-1 text-blue-500 text-tina-orange' />
+              Save changes to new branch
             </div>
           </div>
         </ModalHeader>
         <ModalBody padded={true}>{renderStateContent()}</ModalBody>
         {!isExecuting && (
-          <ModalActions>
-            <Button style={{ flexGrow: 1 }} onClick={close}>
+          <ModalActions align='end'>
+            <Button onClick={close} className='w-full sm:w-auto'>
               Cancel
             </Button>
-            <Button
+            <DropdownButton
               variant='primary'
-              style={{ flexGrow: 2 }}
+              align='start'
+              className='w-full sm:w-auto'
               disabled={newBranchName === '' || disabled}
-              onClick={executeEditorialWorkflow}
-            >
-              Continue
-            </Button>
-            <OverflowMenu
-              className='-ml-2'
-              toolbarItems={[
+              onMainAction={executeEditorialWorkflow}
+              items={[
                 {
-                  name: 'override',
                   label: 'Save to Protected Branch',
-                  Icon: <MdOutlineSaveAlt size='1rem' />,
-                  onMouseDown: () => {
+                  onClick: () => {
                     close();
                     safeSubmit();
                   },
+                  icon: <TriangleAlert className='w-4 h-4' />,
                 },
               ]}
-            />
+            >
+              <GitBranchIcon
+                className='w-4 h-4 mr-1'
+                style={{ fill: 'none' }}
+              />
+              Save to a new branch
+            </DropdownButton>
           </ModalActions>
         )}
       </PopupModal>
@@ -723,17 +731,25 @@ export const CreateBranchModal = ({
   );
 };
 
-export const PrefixedTextField = ({ prefix = 'tina/', ...props }) => {
+export const PrefixedTextField = ({
+  label = null,
+  prefix = 'tina/',
+  ...props
+}) => {
   return (
-    <div className='border border-gray-200 focus-within:border-blue-200 bg-gray-100 focus-within:bg-blue-100 rounded shadow-sm focus-within:shadow-outline overflow-hidden flex items-stretch divide-x divide-gray-200 focus-within:divide-blue-100 w-full transition-all ease-out duration-150'>
-      <span className='pl-3 pr-2 py-2 font-medium text-base text-gray-700 opacity-50'>
-        {prefix}
-      </span>
-      <input
-        type='text'
-        className='shadow-inner focus:outline-none block text-base placeholder:text-gray-300 px-3 py-2 text-gray-600 flex-1 bg-white focus:text-gray-900'
-        {...props}
-      />
-    </div>
+    <>
+      {label && <FieldLabel name={props.name}>{label}</FieldLabel>}
+      <div className='border border-gray-200 focus-within:border-blue-200 bg-gray-100 focus-within:bg-blue-100 rounded shadow-sm focus-within:shadow-outline overflow-hidden flex items-stretch divide-x divide-gray-200 focus-within:divide-blue-100 w-full transition-all ease-out duration-150'>
+        <span className='pl-3 pr-2 py-2 text-base text-tina-orange-dark bg-tina-orange-light'>
+          {prefix}
+        </span>
+        <input
+          id={props.name}
+          type='text'
+          className='shadow-inner focus:outline-none block text-base placeholder:text-gray-300 px-3 py-2 text-gray-600 flex-1 bg-white focus:text-gray-900'
+          {...props}
+        />
+      </div>
+    </>
   );
 };
