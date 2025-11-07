@@ -36,7 +36,7 @@ export const Button = ({
   const baseClasses =
     'icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center inline-flex justify-center transition-all duration-150 ease-out ';
   const variantClasses = {
-    primary: `shadow text-white bg-tina-orange-dark hover:bg-tina-orange focus:ring-blue-500 border-0`,
+    primary: `shadow text-white bg-tina-orange-dark hover:bg-tina-orange focus:ring-tina-orange-dark border-0`,
     secondary: `shadow text-gray-500 hover:text-blue-500 bg-gray-50 hover:bg-white border border-gray-100`,
     white: `shadow text-gray-500 hover:text-blue-500 bg-white hover:bg-gray-50 border border-gray-100`,
     ghost: `text-gray-500 hover:text-blue-500 hover:shadow border border-transparent border-0 hover:border hover:border-gray-200 bg-transparent`,
@@ -92,7 +92,7 @@ export const IconButton = ({
   const baseClasses =
     'icon-parent inline-flex items-center border border-transparent text-sm font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center inline-flex justify-center transition-all duration-150 ease-out rounded-full';
   const variantClasses = {
-    primary: `shadow text-white bg-tina-orange-dark hover:bg-tina-orange focus:ring-blue-500`,
+    primary: `shadow text-white bg-tina-orange-dark hover:bg-tina-orange focus:ring-tina-orange-dark`,
     secondary: `shadow text-gray-500 hover:text-blue-500 bg-gray-50 hover:bg-white border border-gray-200`,
     white: `shadow text-gray-500 hover:text-blue-500 bg-white hover:bg-gray-50 border border-gray-200`,
     ghost: `text-gray-500 hover:text-blue-500 hover:shadow border border-transparent hover:border-gray-200 bg-transparent`,
