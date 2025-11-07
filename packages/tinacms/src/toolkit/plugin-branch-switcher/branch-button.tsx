@@ -27,7 +27,7 @@ export const BranchButton = ({ className = '' }) => {
   return (
     <>
       <Button
-        variant={isProtected ? 'primary' : 'secondary'}
+        variant={'secondary'}
         size='custom'
         className={cn(
           'pointer-events-auto px-3 py-3 flex shrink gap-1 items-center justify-between',
