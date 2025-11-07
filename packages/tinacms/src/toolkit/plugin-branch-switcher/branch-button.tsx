@@ -38,9 +38,9 @@ export const BranchButton = ({ className = '' }) => {
         title={currentBranch}
       >
         {isProtected ? (
-          <BiLockAlt className='flex-shrink-0 h-4 w-auto opacity-70' />
+          <BiLockAlt className='flex-shrink-0 h-6 w-auto opacity-70' />
         ) : (
-          <BiGitBranch className='flex-shrink-0 h-4 w-auto opacity-70 text-zinc-400' />
+          <BiGitBranch className='flex-shrink-0 h-6 w-auto opacity-70 text-zinc-400' />
         )}
         <span className='truncate max-w-full -mr-1'>{currentBranch}</span>
         <BiChevronDown

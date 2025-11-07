@@ -379,7 +379,7 @@ const SidebarHeader = ({ isLocalMode }) => {
               title='Open navigation menu'
               aria-label='Open navigation menu'
             >
-              <BiMenu className='h-6 w-auto text-gray-600' />
+              <BiMenu className='h-8 w-auto text-gray-600' />
             </button>
             <TinaIcon className='self-center h-10 min-w-10 w-auto text-orange-500 mr-2' />
             <BranchButton className='overflow-hidden mr-2' />
