@@ -156,7 +156,7 @@ export const DropdownButton = React.forwardRef<
           disabled={disabled}
           rounded='left'
           onClick={onMainAction}
-          className='border-r-0'
+          className='border-r-0 w-full'
           {...props}
         >
           {children}

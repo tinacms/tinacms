@@ -9,7 +9,6 @@ import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
 import { AiOutlineLoading } from 'react-icons/ai';
 import { BiError } from 'react-icons/bi';
 import { FaCircle } from 'react-icons/fa';
-import { MdOutlineSaveAlt } from 'react-icons/md';
 import {
   CREATE_DOCUMENT_GQL,
   DELETE_DOCUMENT_GQL,
@@ -699,10 +698,13 @@ export const CreateBranchModal = ({
         <ModalBody padded={true}>{renderStateContent()}</ModalBody>
         {!isExecuting && (
           <ModalActions align='end'>
-            <Button onClick={close}>Cancel</Button>
+            <Button onClick={close} className='w-full sm:w-auto'>
+              Cancel
+            </Button>
             <DropdownButton
               variant='primary'
               align='start'
+              className='w-full sm:w-auto'
               disabled={newBranchName === '' || disabled}
               onMainAction={executeEditorialWorkflow}
               items={[
