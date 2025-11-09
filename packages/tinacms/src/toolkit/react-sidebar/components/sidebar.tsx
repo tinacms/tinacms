@@ -18,6 +18,7 @@ import { BillingWarning, LocalWarning } from './local-warning';
 import { Nav } from './nav';
 import { ResizeHandle } from './resize-handle';
 import { FormsView } from './sidebar-body';
+import { TinaIcon } from '@toolkit/icons';
 
 export const SidebarContext = React.createContext<any>(null);
 export const minPreviewWidth = 440;
@@ -371,21 +372,18 @@ const SidebarHeader = ({ isLocalMode }) => {
         {!isLocalMode && <BillingWarning />}
 
         <div className='w-full flex justify-between items-center'>
-          <div className='flex'>
+          <div className='flex overflow-hidden py-1'>
             <button
               className='p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
               onClick={toggleMenu}
               title='Open navigation menu'
               aria-label='Open navigation menu'
             >
-              <BiMenu className='h-6 w-auto text-gray-600' />
+              <BiMenu className='h-8 w-auto text-gray-600' />
             </button>
-
-            <BranchButton />
-
-            <div className='px-4'>
-              <LocalWarning />
-            </div>
+            <TinaIcon className='self-center h-10 min-w-10 w-auto text-orange-500 mr-2' />
+            <BranchButton className='overflow-hidden mr-2' />
+            <LocalWarning className='px-4' />
           </div>
 
           <div className='flex'>
