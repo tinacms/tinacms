@@ -559,15 +559,7 @@ export const CreateBranchModal = ({
                   )}
                 </div>
                 <div className='text-center max-w-24'>
-                  <div
-                    className={`text-sm font-semibold leading-tight ${
-                      isActive
-                        ? 'text-blue-600'
-                        : isCompleted
-                          ? 'text-green-600'
-                          : 'text-gray-400'
-                    }`}
-                  >
+                  <div className='text-sm font-semibold leading-tight'>
                     {step.name}
                   </div>
                   <div className='text-xs text-gray-400 mt-1 leading-tight'>
