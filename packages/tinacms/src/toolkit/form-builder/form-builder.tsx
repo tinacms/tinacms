@@ -731,7 +731,7 @@ export const PrefixedTextField = ({
   return (
     <>
       {label && <FieldLabel name={props.name}>{label}</FieldLabel>}
-      <div className='border border-gray-200 focus-within:border-tina-orange-light bg-gray-100 focus-within:bg-tina-orange-light rounded shadow-sm focus-within:shadow-outline overflow-hidden flex items-stretch divide-x divide-gray-200 focus-within:divide-tina-orange-light w-full transition-all ease-out duration-150'>
+      <div className='border border-gray-200 focus-within:border-blue-200 bg-gray-100 focus-within:bg-blue-100 rounded shadow-sm focus-within:shadow-outline overflow-hidden flex items-stretch divide-x divide-gray-200 focus-within:divide-blue-100 w-full transition-all ease-out duration-150'>
         <span className='pl-3 pr-2 py-2 text-base text-tina-orange-dark bg-tina-orange-light'>
           {prefix}
         </span>

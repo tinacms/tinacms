@@ -98,7 +98,7 @@ export const InlineEmbed = ({
           <span
             style={{ fontWeight: 'inherit', maxWidth: '275px' }}
             // Tailwind reset puts styles on buttons
-            className='truncate cursor-pointer relative inline-flex items-center justify-start px-2 py-0.5 rounded-l border border-gray-200 bg-white  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-tina-orange-dark focus:border-tina-orange-dark'
+            className='truncate cursor-pointer relative inline-flex items-center justify-start px-2 py-0.5 rounded-l border border-gray-200 bg-white  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
             onMouseDown={handleSelect}
           >
             {label}
@@ -156,7 +156,7 @@ export const BlockEmbed = ({
           )}
           <span
             onMouseDown={handleSelect}
-            className='truncate cursor-pointer w-full relative inline-flex items-center justify-start px-4 py-2 rounded-l border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-tina-orange-dark focus:border-tina-orange-dark'
+            className='truncate cursor-pointer w-full relative inline-flex items-center justify-start px-4 py-2 rounded-l border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
           >
             {label}
           </span>
@@ -207,7 +207,7 @@ const DotMenu = ({ onOpen, onRemove }) => {
     <Popover as='span' className='-ml-px relative block'>
       <PopoverButton
         as='span'
-        className='cursor-pointer h-full relative inline-flex items-center px-1 py-0.5 rounded-r border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-tina-orange-dark focus:border-tina-orange-dark'
+        className='cursor-pointer h-full relative inline-flex items-center px-1 py-0.5 rounded-r border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
       >
         <EllipsisIcon title='Open options' />
       </PopoverButton>

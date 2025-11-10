@@ -21,7 +21,7 @@ const IndicatorWrap = ({ style = {}, position, ...props }) => (
 
 const ArrowWrap = (props) => (
   <div
-    className='inline-block fill-white rounded-[50%] bg-tina-orange-dark shadow-md'
+    className='inline-block fill-white rounded-[50%] bg-blue-500 shadow-md'
     {...props}
   />
 );
