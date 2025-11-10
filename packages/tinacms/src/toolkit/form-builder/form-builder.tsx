@@ -690,7 +690,7 @@ export const CreateBranchModal = ({
         <ModalBody padded={true}>{renderStateContent()}</ModalBody>
         {!isExecuting && (
           <ModalActions align='end'>
-            <Button onClick={close} className='w-full sm:w-auto'>
+            <Button variant='secondary' className='w-full sm:w-auto'>
               Cancel
             </Button>
             <DropdownButton
