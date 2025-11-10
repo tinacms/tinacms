@@ -53,3 +53,4 @@ export * from './Folder';
 export * from './File';
 export * from './Circle';
 export * from './CircleCheck';
+export * from './TinaExtended';
