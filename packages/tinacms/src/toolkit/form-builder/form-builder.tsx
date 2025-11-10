@@ -30,7 +30,6 @@ import { FormActionMenu } from './form-actions';
 import { FormPortalProvider } from './form-portal';
 import { LoadingDots } from './loading-dots';
 import { ResetForm } from './reset-form';
-import { TinaIcon } from '@tinacms/toolkit';
 import { FieldLabel } from '@toolkit/fields';
 import { GitBranchIcon, TriangleAlert } from 'lucide-react';
 
