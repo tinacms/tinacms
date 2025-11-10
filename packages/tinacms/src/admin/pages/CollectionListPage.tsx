@@ -81,7 +81,7 @@ const TemplateMenu = ({
       {() => (
         <div>
           <div>
-            <MenuButton className='icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded justify-center transition-all duration-150 ease-out  shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 text-sm h-10 px-6'>
+            <MenuButton className='icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded justify-center transition-all duration-150 ease-out  shadow text-white bg-tina-orange-dark hover:bg-tina-orange focus:ring-tina-orange-dark text-sm h-10 px-6'>
               Create New <BiPlus className='w-5 h-full ml-1 opacity-70' />
             </MenuButton>
           </div>
@@ -640,7 +640,7 @@ const CollectionListPage = () => {
                                             }}
                                             to='/collections/new-folder'
                                             className={cn(
-                                              'icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-gray-500 hover:tina-orange-dark bg-white hover:bg-gray-50 border border-gray-100 focus:ring-white focus:ring-tina-orange-dark w-full md:w-auto text-sm h-10 px-6 mr-4',
+                                              'icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-gray-500 hover:text-tina-orange-dark bg-white hover:bg-gray-50 border border-gray-100 focus:ring-white focus:ring-tina-orange-dark w-full md:w-auto text-sm h-10 px-6 mr-4',
                                               collection.templates &&
                                                 'opacity-50 pointer-events-none cursor-not-allowed'
                                             )}
@@ -1087,7 +1087,7 @@ const SearchInput = ({
                 }
               }
             }}
-            className='shadow appearance-none bg-white block pl-10 pr-10 py-2 truncate w-full text-base border border-gray-200 focus:outline-none focus:shadow-outline focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded placeholder:text-gray-300 text-gray-600 focus:text-gray-900'
+            className='shadow appearance-none bg-white block pl-10 pr-10 py-2 truncate w-full text-base border border-gray-200 focus:outline-none focus:shadow-outline focus:ring-tina-orange-dark focus:border-tina-orange-dark sm:text-sm rounded placeholder:text-gray-300 text-gray-600 focus:text-gray-900'
           />
           {search && searchLoaded && (
             <button

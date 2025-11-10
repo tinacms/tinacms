@@ -26,6 +26,7 @@ export const ResetForm: FC<ResetFormProps> = ({
   return (
     <>
       <Button
+        variant='secondary'
         onClick={() => {
           setOpen((p) => !p);
         }}
@@ -53,7 +54,7 @@ const ResetModal = ({ close, reset }: ResetModalProps) => {
           <p>Are you sure you want to reset all changes?</p>
         </ModalBody>
         <ModalActions>
-          <Button style={{ flexGrow: 2 }} onClick={close}>
+          <Button variant='secondary' style={{ flexGrow: 2 }} onClick={close}>
             Cancel
           </Button>
           <Button
