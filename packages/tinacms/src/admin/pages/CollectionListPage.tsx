@@ -719,7 +719,7 @@ const CollectionListPage = () => {
                       </div>
                     </PageHeader>
                     <PageBody>
-                      <div className='w-full mx-auto max-w-screen-xl'>
+                      <div className='w-full'>
                         {sortField && !sortField.required && (
                           <p className='mb-4 text-gray-500'>
                             <em>
