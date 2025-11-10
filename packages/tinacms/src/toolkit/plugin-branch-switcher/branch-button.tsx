@@ -55,23 +55,23 @@ export const BranchButton = ({ className = '' }) => {
 export const BranchPreviewButton = (
   props: React.ButtonHTMLAttributes<HTMLButtonElement>
 ) => {
-  // const cms = useCMS();
-  // const branchingEnabled = cms.flags.get('branch-switcher');
+  const cms = useCMS();
+  const branchingEnabled = cms.flags.get('branch-switcher');
 
-  // if (!branchingEnabled) {
-  //   return null;
-  // }
+  if (!branchingEnabled) {
+    return null;
+  }
 
-  // const previewFunction = cms.api?.tina?.schema?.config?.config?.ui?.previewUrl;
-  // const branch = cms.api?.tina?.branch;
-  // const previewUrl =
-  //   typeof previewFunction === 'function'
-  //     ? previewFunction({ branch })?.url
-  //     : null;
+  const previewFunction = cms.api?.tina?.schema?.config?.config?.ui?.previewUrl;
+  const branch = cms.api?.tina?.branch;
+  const previewUrl =
+    typeof previewFunction === 'function'
+      ? previewFunction({ branch })?.url
+      : null;
 
-  // if (!previewUrl) {
-  //   return null;
-  // }
+  if (!previewUrl) {
+    return null;
+  }
 
   return (
     <button
