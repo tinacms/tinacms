@@ -15,7 +15,9 @@ export const OverflowMenu = ({ toolbarItems, className = 'w-full' }) => {
         <Popover.Root open={open} onOpenChange={setOpen}>
           <Popover.Trigger
             className={`cursor-pointer relative justify-center inline-flex items-center p-3 text-sm font-medium focus:outline-1 focus:outline-tina-orange-light pointer-events-auto ${
-              open ? `text-tina-orange` : `text-gray-300 hover:text-tina-orange-dark`
+              open
+                ? `text-tina-orange`
+                : `text-gray-300 hover:text-tina-orange-dark`
             } ${className}}`}
           >
             <svg
