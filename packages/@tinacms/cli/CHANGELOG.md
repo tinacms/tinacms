@@ -1,5 +1,19 @@
 # tinacms-cli
 
+## 1.12.0
+
+### Minor Changes
+
+- [#6054](https://github.com/tinacms/tinacms/pull/6054) [`6727bcf`](https://github.com/tinacms/tinacms/commit/6727bcf95200e05e8388986de4546f1730a1be47) Thanks [@0xharkirat](https://github.com/0xharkirat)! - fix broken links, from `tina.io/docs/tina-cloud` to `tina.io/docs/tinacloud`
+
+### Patch Changes
+
+- [#6059](https://github.com/tinacms/tinacms/pull/6059) [`b23aa0c`](https://github.com/tinacms/tinacms/commit/b23aa0c5defc51b8f9fe00a59dd87e1d2f8b9f0b) Thanks [@kulesy](https://github.com/kulesy)! - docs: Update references from tina-cloud-starter to tina-nextjs-starter
+
+- Updated dependencies [[`003e348`](https://github.com/tinacms/tinacms/commit/003e348472ddc08eee63d78190038097542b6311), [`5527e8a`](https://github.com/tinacms/tinacms/commit/5527e8ab5821c8613fcfd1b0b8bc6d93291a6d03), [`5ffd60e`](https://github.com/tinacms/tinacms/commit/5ffd60e7b07b19cde6fab36a911503276c83715f), [`b23aa0c`](https://github.com/tinacms/tinacms/commit/b23aa0c5defc51b8f9fe00a59dd87e1d2f8b9f0b), [`5d13c0d`](https://github.com/tinacms/tinacms/commit/5d13c0d023373692233c8be2127ae6e3d7d68b47)]:
+  - tinacms@2.9.1
+  - @tinacms/app@2.3.5
+
 ## 1.11.0
 
 ### Minor Changes

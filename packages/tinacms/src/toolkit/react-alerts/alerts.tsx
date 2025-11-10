@@ -9,7 +9,7 @@ import {
 } from '@toolkit/react-modals';
 import { Button } from '@toolkit/styles';
 import React from 'react';
-import { BiError, BiX } from 'react-icons/bi';
+import { BiX } from 'react-icons/bi';
 import { MdCheckCircle, MdError, MdInfo, MdWarning } from 'react-icons/md';
 
 const parseUrlsInText = (text: string): React.ReactNode => {
