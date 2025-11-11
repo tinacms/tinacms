@@ -1,5 +1,17 @@
 # tinacms
 
+## 2.9.3
+
+### Patch Changes
+
+- [#6106](https://github.com/tinacms/tinacms/pull/6106) [`9e8bc37`](https://github.com/tinacms/tinacms/commit/9e8bc37402c8aa4d408c38e00d4402d596b0d896) Thanks [@kulesy](https://github.com/kulesy)! - Re-enable conditional checks for branch preview button
+
+- [#6111](https://github.com/tinacms/tinacms/pull/6111) [`0f265aa`](https://github.com/tinacms/tinacms/commit/0f265aadf918ae6f5b789e298fc2c406a6df0b16) Thanks [@kulesy](https://github.com/kulesy)! - Refactor CreateBranchModal text for clarity and conciseness
+
+- [#6107](https://github.com/tinacms/tinacms/pull/6107) [`32bd9b2`](https://github.com/tinacms/tinacms/commit/32bd9b21b54462be3e83b2d3e4b4237a48758bb1) Thanks [@Pat-Stuart](https://github.com/Pat-Stuart)! - Fix for redundant icons in modals
+
+- [#6082](https://github.com/tinacms/tinacms/pull/6082) [`ce1414c`](https://github.com/tinacms/tinacms/commit/ce1414ce1b82e6755a96c9c12949cd469b43e283) Thanks [@JackDevAU](https://github.com/JackDevAU)! - fix: update rich text editor to take up the full width
+
 ## 2.9.2
 
 ### Patch Changes
