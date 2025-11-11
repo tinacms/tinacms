@@ -644,11 +644,8 @@ export const CreateBranchModal = ({
             First, let's create a copy
           </p>
           <p className='text-sm text-gray-700 mb-4 max-w-sm'>
-            To make changes, you need to create a copy then get it approved and
-            merged for it to go live.
-            <br />
-            <br />
-            <span className='text-gray-500'>Learn more about </span>
+            To make changes, create a copy then get it approved and merged for
+            it to go live.{' '}
             <a
               className='underline text-tina-orange-dark font-medium'
               href='https://tina.io/docs/tinacloud/editorial-workflow'
@@ -656,7 +653,6 @@ export const CreateBranchModal = ({
             >
               Editorial Workflow
             </a>
-            .
           </p>
           <PrefixedTextField
             name='new-branch-name'
