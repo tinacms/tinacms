@@ -30,7 +30,6 @@ import { FormActionMenu } from './form-actions';
 import { FormPortalProvider } from './form-portal';
 import { LoadingDots } from './loading-dots';
 import { ResetForm } from './reset-form';
-import { TinaIcon } from '@tinacms/toolkit';
 import { FieldLabel } from '@toolkit/fields';
 import { GitBranchIcon, TriangleAlert } from 'lucide-react';
 
@@ -645,11 +644,8 @@ export const CreateBranchModal = ({
             First, let's create a copy
           </p>
           <p className='text-sm text-gray-700 mb-4 max-w-sm'>
-            To make changes, you need to create a copy then get it approved and
-            merged for it to go live.
-            <br />
-            <br />
-            <span className='text-gray-500'>Learn more about </span>
+            To make changes, create a copy then get it approved and merged for
+            it to go live.{' '}
             <a
               className='underline text-tina-orange-dark font-medium'
               href='https://tina.io/docs/tinacloud/editorial-workflow'
@@ -657,7 +653,6 @@ export const CreateBranchModal = ({
             >
               Editorial Workflow
             </a>
-            .
           </p>
           <PrefixedTextField
             name='new-branch-name'
@@ -681,16 +676,13 @@ export const CreateBranchModal = ({
       <PopupModal className='w-auto'>
         <ModalHeader close={isExecuting ? undefined : close}>
           <div className='flex items-center justify-between w-full'>
-            <div className='flex items-center'>
-              <TinaIcon className='w-8 h-auto mr-1 text-blue-500 text-tina-orange' />
-              Save changes to new branch
-            </div>
+            <div className='flex items-center'>Save changes to new branch</div>
           </div>
         </ModalHeader>
         <ModalBody padded={true}>{renderStateContent()}</ModalBody>
         {!isExecuting && (
           <ModalActions align='end'>
-            <Button onClick={close} className='w-full sm:w-auto'>
+            <Button variant='secondary' className='w-full sm:w-auto'>
               Cancel
             </Button>
             <DropdownButton

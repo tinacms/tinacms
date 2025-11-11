@@ -49,7 +49,7 @@ export class Alerts {
   add(
     level: AlertLevel,
     message: string | React.FunctionComponent,
-    timeout = 4000
+    timeout = 8000
   ): () => void {
     const alert = {
       level,
