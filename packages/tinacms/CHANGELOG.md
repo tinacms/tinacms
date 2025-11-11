@@ -1,5 +1,23 @@
 # tinacms
 
+## 2.9.2
+
+### Patch Changes
+
+- [#6087](https://github.com/tinacms/tinacms/pull/6087) [`1286e87`](https://github.com/tinacms/tinacms/commit/1286e87323694dc819edc56360613dc654f3d3ca) Thanks [@kulesy](https://github.com/kulesy)! - feat: Enhance branch creation modal with improved UI/UX and dropdown button component
+
+- [#6095](https://github.com/tinacms/tinacms/pull/6095) [`4416a28`](https://github.com/tinacms/tinacms/commit/4416a283ac1cfea5e9c4890cd71f2edf3b704344) Thanks [@Pat-Stuart](https://github.com/Pat-Stuart)! - Adding TinaCMS branding to sidebar
+
+- [#6099](https://github.com/tinacms/tinacms/pull/6099) [`6cba118`](https://github.com/tinacms/tinacms/commit/6cba118c90f7c7ab6356c0ef83fca18526e47f8d) Thanks [@kulesy](https://github.com/kulesy)! - Enhance Page component with TinaIcon and layout adjustments
+
+- [#6104](https://github.com/tinacms/tinacms/pull/6104) [`572fb28`](https://github.com/tinacms/tinacms/commit/572fb28236b56db4ede5fe53b177b80323ae7284) Thanks [@kulesy](https://github.com/kulesy)! - Extend alert timeout duration
+
+- [#6102](https://github.com/tinacms/tinacms/pull/6102) [`f224124`](https://github.com/tinacms/tinacms/commit/f224124220811fb44749122d46eb7100af89ee77) Thanks [@Pat-Stuart](https://github.com/Pat-Stuart)! - Add branding into modal header
+
+- [#6098](https://github.com/tinacms/tinacms/pull/6098) [`a2d983e`](https://github.com/tinacms/tinacms/commit/a2d983ed886f66db2c133e902eacaa8d07e88bdb) Thanks [@Pat-Stuart](https://github.com/Pat-Stuart)! - Change from blue accent coloring to orange
+
+- [#6100](https://github.com/tinacms/tinacms/pull/6100) [`bc35474`](https://github.com/tinacms/tinacms/commit/bc354740d0cb359c372ba287974e7e9db3c5119c) Thanks [@kulesy](https://github.com/kulesy)! - Refactor CreateBranchModal styling for improved clarity
+
 ## 2.9.1
 
 ### Patch Changes

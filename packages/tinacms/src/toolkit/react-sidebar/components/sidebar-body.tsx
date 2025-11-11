@@ -212,7 +212,6 @@ export const FormBreadcrumbs = ({
                   {dropdownBreadcrumbs.map((breadcrumb) => (
                     <DropdownMenuItem
                       key={breadcrumb.formId}
-                      className='cursor-pointer text-gray-700 hover:text-blue-500'
                       onClick={(e) => {
                         e.preventDefault();
                         goBack(breadcrumb.formId, breadcrumb.formName);

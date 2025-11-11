@@ -5,6 +5,7 @@ import {
   LocalWarning,
 } from '@tinacms/toolkit';
 import React from 'react';
+import { TinaIcon } from '@toolkit/icons';
 
 export const PageWrapper = ({
   headerClassName,
@@ -15,10 +16,11 @@ export const PageWrapper = ({
 }) => {
   return (
     <div className='relative left-0 w-full h-full bg-gradient-to-b from-gray-50/50 to-gray-50 overflow-y-auto transition-opacity duration-300 ease-out flex flex-col opacity-100'>
-      <div className={`py-2 pl-4 pr-4 w-full ${headerClassName}`}>
+      <div className={`py-2 pr-4 w-full ${headerClassName}`}>
         <LocalWarning />
         <BillingWarning />
-        <div className='flex justify-between items-center'>
+        <div className='flex items-center gap-4'>
+          <TinaIcon className='self-center h-10 min-w-10 w-auto text-orange-500' />
           <BranchButton />
           <BranchPreviewButton />
         </div>
