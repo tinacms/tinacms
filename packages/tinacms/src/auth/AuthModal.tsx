@@ -4,7 +4,6 @@ import {
   ModalHeader,
   ModalBody,
   ModalActions,
-  TinaIcon,
 } from '@tinacms/toolkit';
 import { LoadingDots, Button } from '@tinacms/toolkit';
 import React, { useCallback, useEffect, useState } from 'react';
