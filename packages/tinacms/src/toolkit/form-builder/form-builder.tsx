@@ -645,7 +645,7 @@ export const CreateBranchModal = ({
           </p>
           <p className='text-sm text-gray-700 mb-4 max-w-sm'>
             To make changes, create a copy then get it approved and merged for
-            it to go live.
+            it to go live.{' '}
             <a
               className='underline text-tina-orange-dark font-medium'
               href='https://tina.io/docs/tinacloud/editorial-workflow'
