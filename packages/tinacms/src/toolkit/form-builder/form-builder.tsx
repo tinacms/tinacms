@@ -30,7 +30,6 @@ import { FormActionMenu } from './form-actions';
 import { FormPortalProvider } from './form-portal';
 import { LoadingDots } from './loading-dots';
 import { ResetForm } from './reset-form';
-import { TinaIcon } from '@tinacms/toolkit';
 import { FieldLabel } from '@toolkit/fields';
 import { GitBranchIcon, TriangleAlert } from 'lucide-react';
 
@@ -681,10 +680,7 @@ export const CreateBranchModal = ({
       <PopupModal className='w-auto'>
         <ModalHeader close={isExecuting ? undefined : close}>
           <div className='flex items-center justify-between w-full'>
-            <div className='flex items-center'>
-              <TinaIcon className='w-8 h-auto mr-1 text-blue-500 text-tina-orange' />
-              Save changes to new branch
-            </div>
+            <div className='flex items-center'>Save changes to new branch</div>
           </div>
         </ModalHeader>
         <ModalBody padded={true}>{renderStateContent()}</ModalBody>
