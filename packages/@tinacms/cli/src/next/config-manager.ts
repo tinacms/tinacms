@@ -1,6 +1,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 import os from 'os';
+import { pathToFileURL } from 'url';
 import * as esbuild from 'esbuild';
 import type { Loader } from 'esbuild';
 import { Config } from '@tinacms/schema-tools';
@@ -395,7 +396,7 @@ export class ConfigManager {
         js: `import { createRequire } from 'module';const require = createRequire(import.meta.url);`,
       },
     });
-    const result = await import(outfile);
+    const result = await import(pathToFileURL(outfile).href);
     fs.removeSync(outfile);
     return result.default;
   }
@@ -472,7 +473,7 @@ export class ConfigManager {
     });
     let result: { default: any };
     try {
-      result = await import(outfile2);
+      result = await import(pathToFileURL(outfile2).href);
     } catch (e) {
       console.error('Unexpected error loading config');
       console.error(e);
