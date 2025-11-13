@@ -587,7 +587,7 @@ const CollectionListPage = () => {
                               </>
                             )}
                             <div className='flex flex-1 flex-row gap-2 items-end w-full'>
-                              {true ? (
+                              {searchEnabled ? (
                                 <SearchInput
                                   loading={_loading}
                                   search={search}
