@@ -57,13 +57,13 @@ const Toaster = ({ ...props }: ToasterProps) => {
   return (
     <Sonner
       className='toaster group'
-      position='bottom-center'
+      position='top-left'
       closeButton
       toastOptions={{
         classNames: {
           toast:
-            'group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg',
-          description: 'group-[.toast]:text-muted-foreground',
+            'group toast group-[.toaster]:bg-white group-[.toaster]:shadow-lg',
+          description: 'group-[.toast]:text-gray-700',
           actionButton:
             'group-[.toast]:bg-primary group-[.toast]:text-primary-foreground',
           cancelButton:
@@ -71,12 +71,12 @@ const Toaster = ({ ...props }: ToasterProps) => {
           closeButton:
             'group-[.toast]:bg-transparent group-[.toast]:text-current group-[.toast]:border-0',
           success:
-            'group-[.toaster]:bg-green-100 group-[.toaster]:border-green-200 group-[.toaster]:text-green-600',
+            'group-[.toaster]:border-green-500 [&_[data-icon]]:text-green-500 [&_[data-content]]:text-gray-700',
           error:
-            'group-[.toaster]:bg-red-100 group-[.toaster]:border-red-200 group-[.toaster]:text-red-600',
+            'group-[.toaster]:border-red-500 [&_[data-icon]]:text-red-500 [&_[data-content]]:text-gray-700',
           warning:
-            'group-[.toaster]:bg-yellow-100 group-[.toaster]:border-yellow-200 group-[.toaster]:text-yellow-600',
-          info: 'group-[.toaster]:bg-blue-100 group-[.toaster]:border-blue-200 group-[.toaster]:text-blue-600',
+            'group-[.toaster]:border-yellow-500 [&_[data-icon]]:text-yellow-500 [&_[data-content]]:text-gray-700',
+          info: 'group-[.toaster]:border-blue-500 [&_[data-icon]]:text-blue-500 [&_[data-content]]:text-gray-700',
         },
       }}
       {...props}
