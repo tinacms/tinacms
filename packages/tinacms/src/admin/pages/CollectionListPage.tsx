@@ -77,11 +77,11 @@ const TemplateMenu = ({
   folder: CollectionFolder;
 }) => {
   return (
-    <Menu as='div' className='relative inline-block text-left'>
+    <Menu as='div' className='relative inline-block text-left w-full md:w-auto'>
       {() => (
         <div>
           <div>
-            <MenuButton className='icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded justify-center transition-all duration-150 ease-out  shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 text-sm h-10 px-6'>
+            <MenuButton className='w-full md:w-auto icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded justify-center transition-all duration-150 ease-out  shadow text-white bg-tina-orange-dark hover:bg-tina-orange focus:ring-tina-orange-dark text-sm h-10 px-6'>
               Create New <BiPlus className='w-5 h-full ml-1 opacity-70' />
             </MenuButton>
           </div>
@@ -622,39 +622,35 @@ const CollectionListPage = () => {
                                   <TooltipProvider>
                                     <Tooltip>
                                       <TooltipTrigger asChild>
-                                        <span>
-                                          <Link
-                                            onMouseDown={(evt) => {
-                                              if (collection.templates) {
-                                                // TODO: behavior not supported yet - see https://github.com/tinacms/tinacms/issues/4797
-                                                evt.preventDefault();
-                                                return;
-                                              }
-                                              setVars((old) => ({
-                                                ...old,
-                                                collection: collectionName,
-                                                folderName: '',
-                                              }));
-                                              setFolderModalOpen(true);
-                                              evt.stopPropagation();
-                                            }}
-                                            to='/collections/new-folder'
-                                            className={cn(
-                                              'icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-gray-500 bg-white hover:bg-gray-50 border border-gray-100 focus:ring-white focus:ring-blue-500 w-full md:w-auto text-sm h-10 px-6 mr-4',
-                                              collection.templates &&
-                                                'opacity-50 pointer-events-none cursor-not-allowed'
-                                            )}
-                                            aria-disabled={
-                                              !!collection.templates
+                                        <Link
+                                          onMouseDown={(evt) => {
+                                            if (collection.templates) {
+                                              // TODO: behavior not supported yet - see https://github.com/tinacms/tinacms/issues/4797
+                                              evt.preventDefault();
+                                              return;
                                             }
-                                            tabIndex={
-                                              collection.templates ? -1 : 0
-                                            }
-                                          >
-                                            <FaFolder className='mr-2' />
-                                            Add Folder
-                                          </Link>
-                                        </span>
+                                            setVars((old) => ({
+                                              ...old,
+                                              collection: collectionName,
+                                              folderName: '',
+                                            }));
+                                            setFolderModalOpen(true);
+                                            evt.stopPropagation();
+                                          }}
+                                          to='/collections/new-folder'
+                                          className={cn(
+                                            'icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-gray-500 bg-white hover:bg-gray-50 border border-gray-100 focus:ring-white focus:ring-blue-500 w-full md:w-auto text-sm h-10 px-6 mr-4',
+                                            collection.templates &&
+                                              'opacity-50 pointer-events-none cursor-not-allowed'
+                                          )}
+                                          aria-disabled={!!collection.templates}
+                                          tabIndex={
+                                            collection.templates ? -1 : 0
+                                          }
+                                        >
+                                          <FaFolder className='mr-2' />
+                                          Add Folder
+                                        </Link>
                                       </TooltipTrigger>
                                       {collection.templates && (
                                         <TooltipContent
