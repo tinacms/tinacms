@@ -426,31 +426,37 @@ const BranchSelector = ({
       )}
       {filteredBranchList.length > 0 && (
         <div className='min-w-[192px] max-h-[24rem] overflow-y-auto w-full h-full rounded-lg shadow-inner bg-white border border-gray-200'>
-          {/* Header Row */}
-          <div className='grid grid-cols-[4fr_2fr_1fr_1fr] gap-4 py-3 px-3 bg-white border-b-2 border-gray-100 w-full'>
-            <div className='text-left text-xs font-bold text-gray-700 uppercase tracking-wider'>
-              Branch Name
-            </div>
-            <div className='text-left text-xs font-bold text-gray-700 uppercase tracking-wider'>
-              Last Updated
-            </div>
-            <div></div>
-            <div className='text-right text-xs font-bold text-gray-700 uppercase tracking-wider'>
-              Actions
-            </div>
-          </div>
-          {/* Branch Items */}
-          {filteredBranchList.map((branch) => (
-            <BranchItem
-              key={branch.name}
-              branch={branch}
-              currentBranch={currentBranch}
-              onChange={onChange}
-              refreshBranchList={refreshBranchList}
-              previewFunction={previewFunction}
-              cms={cms}
-            />
-          ))}
+          <table className='w-full'>
+            <thead className='bg-white border-b-2 border-gray-100'>
+              <tr>
+                <th className='pl-3 pr-3 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider'>
+                  Branch Name
+                </th>
+                <th className='px-3 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider'>
+                  Last Updated
+                </th>
+                <th className='px-3 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider'>
+                  {/* Empty header for Select button column */}
+                </th>
+                <th className='px-3 py-3 text-right text-xs font-bold text-gray-700 uppercase tracking-wider'>
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredBranchList.map((branch) => (
+                <BranchItem
+                  key={branch.name}
+                  branch={branch}
+                  currentBranch={currentBranch}
+                  onChange={onChange}
+                  refreshBranchList={refreshBranchList}
+                  previewFunction={previewFunction}
+                  cms={cms}
+                />
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
@@ -503,33 +509,33 @@ const BranchItem = ({
   const indexingStatus = branch?.indexStatus?.status;
 
   return (
-    <div
-      className={`grid grid-cols-[4fr_2fr_1fr_1fr] gap-4 text-base py-1.5 px-3 border-l-0 border-t-0 border-r-0 border-gray-50 w-full outline-none transition-all ease-out duration-150 min-h-[3.5rem] ${
+    <tr
+      className={`text-base border-l-0 border-t-0 border-r-0 outline-none transition-all ease-out duration-150 ${
         indexingStatus !== 'complete'
           ? 'bg-gray-50 text-gray-400'
           : isCurrentBranch
-            ? 'border-blue-500 border-l-5 bg-blue-50 text-blue-800 border-b-0'
-            : 'border-b-2'
+            ? 'border-blue-500 border-l-[5px] bg-blue-50 text-blue-800 border-b-0'
+            : 'border-b-2 border-gray-50'
       }`}
     >
-      <div className='flex flex-col min-w-0'>
-        <div className='flex h-full items-center gap-1'>
-          <div className='flex-0'>
+      <td className='pl-3 pr-3 py-1.5 min-w-0'>
+        <div className='flex flex-col'>
+          <div className='flex items-center gap-1'>
             {branch.protected && (
-              <BiLock className='w-5 h-auto opacity-70 text-blue-500' />
+              <BiLock className='w-5 h-auto opacity-70 text-blue-500 flex-shrink-0' />
             )}
+            <span className='text-sm leading-tight truncate'>
+              {branch.name}
+            </span>
           </div>
-          <div className='truncate flex-1'>
-            <span className='text-sm leading-tight'>{branch.name}</span>
-          </div>
+          {indexingStatus !== 'complete' && (
+            <div className='w-fit mt-1'>
+              <IndexStatus indexingStatus={branch.indexStatus.status} />
+            </div>
+          )}
         </div>
-        {indexingStatus !== 'complete' && (
-          <div className='w-fit mt-1'>
-            <IndexStatus indexingStatus={branch.indexStatus.status} />
-          </div>
-        )}
-      </div>
-      <div className='flex items-center min-w-0'>
+      </td>
+      <td className='px-3 py-1.5 min-w-0'>
         {creatingPR ? (
           <div className='flex items-center gap-2'>
             <div>
@@ -547,8 +553,8 @@ const BranchItem = ({
             })}
           </span>
         )}
-      </div>
-      <div className='flex items-center justify-end'>
+      </td>
+      <td className='px-3 py-1.5 text-left'>
         {indexingStatus === 'complete' && !isCurrentBranch && (
           <Button
             variant='white'
@@ -562,8 +568,8 @@ const BranchItem = ({
             Select
           </Button>
         )}
-      </div>
-      <div className='flex items-center justify-end'>
+      </td>
+      <td className='px-3 py-1.5 text-right'>
         <OverflowMenu
           toolbarItems={[
             branch.githubPullRequestUrl && {
@@ -600,8 +606,8 @@ const BranchItem = ({
               },
           ].filter(Boolean)}
         />
-      </div>
-    </div>
+      </td>
+    </tr>
   );
 };
 
