@@ -4,7 +4,6 @@ import { BiError } from 'react-icons/bi';
 import { GitBranchIcon, TriangleAlert } from 'lucide-react';
 import { useBranchData } from '@toolkit/plugin-branch-switcher';
 import { Button, DropdownButton } from '@toolkit/styles';
-import { ProgressBar } from '../components/ProgressBar';
 import { useCMS } from '../react-core';
 import {
   Modal,
@@ -66,7 +65,6 @@ export const CreateBranchModal = ({
   const [isExecuting, setIsExecuting] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState('');
   const [currentStep, setCurrentStep] = React.useState(0);
-  const [statusMessage, setStatusMessage] = React.useState('');
   const [elapsedTime, setElapsedTime] = React.useState(0);
 
   React.useEffect(() => {
@@ -113,7 +111,6 @@ export const CreateBranchModal = ({
       setDisabled(true);
       setIsExecuting(true);
       setCurrentStep(1);
-      setStatusMessage('Initializing workflow...');
 
       let graphql = '';
       if (crudType === 'create') {
@@ -141,9 +138,6 @@ export const CreateBranchModal = ({
           },
         },
         onStatusUpdate: (status) => {
-          const message = status.message || `Status: ${status.status}`;
-          setStatusMessage(message);
-
           switch (status.status) {
             case EDITORIAL_WORKFLOW_STATUS.SETTING_UP:
             case EDITORIAL_WORKFLOW_STATUS.CREATING_BRANCH:
@@ -187,12 +181,10 @@ export const CreateBranchModal = ({
   };
 
   const renderProgressIndicator = () => {
-    const progressPercentage = ((currentStep - 1) / steps.length) * 100;
-
     return (
-      <div className='py-6'>
+      <>
         {/* Horizontal step indicators */}
-        <div className='flex justify-between mb-4 relative px-5 sm:gap-x-8'>
+        <div className='flex justify-between my-8 relative px-5 sm:gap-x-8'>
           {/* Connecting line - only between steps */}
           <div
             className='absolute top-5 h-0.5 bg-gray-200 -z-10'
@@ -200,7 +192,7 @@ export const CreateBranchModal = ({
           ></div>
           {currentStep > 1 && currentStep <= steps.length && (
             <div
-              className='absolute top-5 h-0.5 bg-blue-500 -z-10 transition-all duration-500'
+              className='absolute top-5 h-0.5 bg-tina-orange -z-10 transition-all duration-500'
               style={{
                 left: '50px',
                 width: `calc((100% - 100px) * ${(currentStep - 1) / (steps.length - 1)})`,
@@ -229,11 +221,11 @@ export const CreateBranchModal = ({
                 className='flex flex-col items-center relative'
               >
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center font-medium mb-3 border-2 transition-all duration-300 ${
+                  className={`w-10 h-10 rounded-full flex items-center justify-center font-medium mb-3 border-2 transition-all duration-300 select-none ${
                     isCompleted
                       ? 'bg-green-500 border-green-500 text-white'
                       : isActive
-                        ? 'bg-blue-500 border-blue-500 text-white'
+                        ? 'bg-tina-orange border-tina-orange text-white'
                         : 'bg-white border-gray-200 text-gray-400'
                   }`}
                 >
@@ -268,12 +260,9 @@ export const CreateBranchModal = ({
           })}
         </div>
 
-        {/* Step count and timer - between stepper and progress bar */}
-        <div className='flex items-center justify-between mb-4'>
-          <div className='text-sm font-medium text-gray-700'>
-            Step {currentStep > steps.length ? steps.length : currentStep} of{' '}
-            {steps.length}
-          </div>
+        {/* Timer and estimated time - inline */}
+        <div className='flex items-center justify-between'>
+          <div className='text-xs text-gray-500'>Estimated time: 1-2 min </div>
           {isExecuting && currentStep > 0 && (
             <div className='flex items-center gap-1 text-sm text-gray-500'>
               <svg className='w-4 h-4' fill='currentColor' viewBox='0 0 20 20'>
@@ -287,40 +276,14 @@ export const CreateBranchModal = ({
             </div>
           )}
         </div>
-
-        <ProgressBar
-          progress={progressPercentage}
-          className='mb-4'
-          color={currentStep > steps.length ? 'green' : 'blue'}
-        />
-
-        {/* Current status - reduced padding */}
-        <div className='flex items-center gap-2 mb-2'>
-          {currentStep >= 4 ? (
-            <svg
-              className='w-4 h-4 text-green-500'
-              fill='currentColor'
-              viewBox='0 0 20 20'
-            >
-              <path
-                fillRule='evenodd'
-                d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
-                clipRule='evenodd'
-              />
-            </svg>
-          ) : (
-            <AiOutlineLoading className='text-blue-500 animate-spin' />
-          )}
-          <span className='text-sm font-medium text-gray-700'>
-            {statusMessage || `${steps[currentStep - 1]?.name}...`}
-          </span>
-        </div>
-
-        {/* Estimated time - aligned left */}
-        <div className='text-left'>
-          <p className='text-xs text-gray-500'>Estimated time: 1-2 minutes</p>
-        </div>
-      </div>
+        <a
+          className='underline text-tina-orange-dark font-medium text-xs'
+          href='https://tina.io/docs/tinacloud/editorial-workflow'
+          target='_blank'
+        >
+          Learn more about Editorial Workflow
+        </a>
+      </>
     );
   };
 
@@ -364,7 +327,6 @@ export const CreateBranchModal = ({
             onChange={(e) => {
               // reset error state on change
               setErrorMessage('');
-              setStatusMessage('');
               setNewBranchName(e.target.value);
             }}
           />
