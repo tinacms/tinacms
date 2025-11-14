@@ -4,6 +4,17 @@ import { toast as sonnerToast, Toaster as Sonner } from 'sonner';
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
 // Helper to parse URLs in text and make them clickable
+// Ensures only links with allowed protocols get rendered as clickable links to avoid XSS.
+const isSafeHref = (href: string) => {
+  // Only allow http, https links -- can be expanded as needed
+  return (
+    /^https?:\/\//.test(href) &&
+    !/^javascript:/i.test(href) &&
+    !/^data:/i.test(href) &&
+    !/^vbscript:/i.test(href)
+  );
+};
+
 const parseUrlsInText = (text: string): React.ReactNode => {
   const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
   const parts = text.split(urlRegex);
@@ -11,18 +22,23 @@ const parseUrlsInText = (text: string): React.ReactNode => {
   return parts.map((part, index) => {
     if (part.match(urlRegex)) {
       const href = part.startsWith('http') ? part : `https://${part}`;
-      return (
-        <a
-          key={index}
-          href={href}
-          target='_blank'
-          rel='noopener noreferrer'
-          className='underline hover:opacity-80'
-          onClick={(e) => e.stopPropagation()}
-        >
-          {part}
-        </a>
-      );
+      if (isSafeHref(href)) {
+        return (
+          <a
+            key={index}
+            href={href}
+            target='_blank'
+            rel='noopener noreferrer'
+            className='underline hover:opacity-80'
+            onClick={(e) => e.stopPropagation()}
+          >
+            {part}
+          </a>
+        );
+      } else {
+        // Render as plain text (not a link) if not safe
+        return <span key={index}>{part}</span>;
+      }
     }
     return part;
   });
