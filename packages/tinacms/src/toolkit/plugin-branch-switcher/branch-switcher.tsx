@@ -427,11 +427,17 @@ const BranchSelector = ({
       {filteredBranchList.length > 0 && (
         <div className='min-w-[192px] max-h-[24rem] overflow-y-auto w-full h-full rounded-lg shadow-inner bg-white border border-gray-200'>
           {/* Header Row */}
-          <div className='grid grid-cols-[4fr_2fr_1fr_1fr] gap-4 text-sm font-bold py-2 px-3 bg-gray-100 border-b-2 border-gray-200 w-full'>
-            <div>Branch Name</div>
-            <div>Last Updated</div>
+          <div className='grid grid-cols-[4fr_2fr_1fr_1fr] gap-4 py-3 px-3 bg-white border-b-2 border-gray-100 w-full'>
+            <div className='text-left text-xs font-bold text-gray-700 uppercase tracking-wider'>
+              Branch Name
+            </div>
+            <div className='text-left text-xs font-bold text-gray-700 uppercase tracking-wider'>
+              Last Updated
+            </div>
             <div></div>
-            <div className='text-right'>Actions</div>
+            <div className='text-right text-xs font-bold text-gray-700 uppercase tracking-wider'>
+              Actions
+            </div>
           </div>
           {/* Branch Items */}
           {filteredBranchList.map((branch) => (
