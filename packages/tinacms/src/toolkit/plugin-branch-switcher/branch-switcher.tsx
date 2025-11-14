@@ -498,7 +498,7 @@ const BranchItem = ({
 
   return (
     <div
-      className={`grid grid-cols-[4fr_2fr_1fr_1fr] gap-4 text-base py-1.5 px-3 border-l-0 border-t-0 border-r-0 border-gray-50 w-full outline-none transition-all ease-out duration-150 ${
+      className={`grid grid-cols-[4fr_2fr_1fr_1fr] gap-4 text-base py-1.5 px-3 border-l-0 border-t-0 border-r-0 border-gray-50 w-full outline-none transition-all ease-out duration-150 min-h-[3.5rem] ${
         indexingStatus !== 'complete'
           ? 'bg-gray-50 text-gray-400'
           : isCurrentBranch
@@ -507,13 +507,15 @@ const BranchItem = ({
       }`}
     >
       <div className='flex flex-col min-w-0'>
-        <div className='flex items-center gap-1'>
+        <div className='flex h-full items-center gap-1'>
           <div className='flex-0'>
             {branch.protected && (
               <BiLock className='w-5 h-auto opacity-70 text-blue-500' />
             )}
           </div>
-          <div className='truncate flex-1'>{branch.name}</div>
+          <div className='truncate flex-1'>
+            <span className='text-sm leading-tight'>{branch.name}</span>
+          </div>
         </div>
         {indexingStatus !== 'complete' && (
           <div className='w-fit mt-1'>
