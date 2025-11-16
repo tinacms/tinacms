@@ -1,4 +1,5 @@
 import React from 'react';
+import DOMPurify from 'dompurify';
 import { toast as sonnerToast, Toaster as Sonner } from 'sonner';
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
@@ -21,8 +22,12 @@ const parseUrlsInText = (text: string): React.ReactNode => {
 
   return parts.map((part, index) => {
     if (part.match(urlRegex)) {
-      const href = part.startsWith('http') ? part : `https://${part}`;
+      let href = part.startsWith('http') ? part : `https://${part}`;
+      // Sanitize href using DOMPurify
+      href = DOMPurify.sanitize(href, { ALLOWED_URI_REGEXP: /^https?:\/\/.*/i });
       if (isSafeHref(href)) {
+        // Also sanitize the visible link text
+        const safeText = DOMPurify.sanitize(part, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
         return (
           <a
             key={index}
@@ -32,15 +37,18 @@ const parseUrlsInText = (text: string): React.ReactNode => {
             className='underline hover:opacity-80'
             onClick={(e) => e.stopPropagation()}
           >
-            {part}
+            {safeText}
           </a>
         );
       } else {
         // Render as plain text (not a link) if not safe
-        return <span key={index}>{part}</span>;
+        const safeText = DOMPurify.sanitize(part, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
+        return <span key={index}>{safeText}</span>;
       }
     }
-    return part;
+    // For plain text, always sanitize
+    const safeText = DOMPurify.sanitize(part, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
+    return safeText;
   });
 };
 
