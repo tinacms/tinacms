@@ -4,8 +4,8 @@ import {
   Modal,
   ModalHeader,
   ModalBody,
-  PopupModal,
-  FullscreenModal,
+  ModalPopup,
+  ModalFullscreen,
 } from '@toolkit/react-modals';
 import { ScreenPlugin } from '../screen-plugin';
 
@@ -37,13 +37,13 @@ const ModalLayout = ({ children, name, close, layout }: ModalLayoutProps) => {
 
   switch (layout) {
     case 'popup':
-      Wrapper = PopupModal;
+      Wrapper = ModalPopup;
       break;
     case 'fullscreen':
-      Wrapper = FullscreenModal;
+      Wrapper = ModalFullscreen;
       break;
     default:
-      Wrapper = PopupModal;
+      Wrapper = ModalPopup;
       break;
   }
 
