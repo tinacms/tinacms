@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.1.9
+
+### Patch Changes
+
+- Updated dependencies [[`d900f4e`](https://github.com/tinacms/tinacms/commit/d900f4e6c6f0a86c94bba5f0925bbaa54eeb90db)]:
+  - tinacms@2.9.5
+
 ## 0.1.8
 
 ### Patch Changes
