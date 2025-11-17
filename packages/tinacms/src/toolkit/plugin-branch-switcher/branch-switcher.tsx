@@ -439,7 +439,7 @@ const BranchSelector = ({
                   {/* Empty header for Select button column */}
                 </th>
                 <th className='px-3 py-3 text-right text-xs font-bold text-gray-700 uppercase tracking-wider'>
-                  Actions
+                  {/* Empty header for options button column */}
                 </th>
               </tr>
             </thead>
@@ -514,7 +514,7 @@ const BranchItem = ({
         indexingStatus !== 'complete'
           ? 'bg-gray-50 text-gray-400'
           : isCurrentBranch
-            ? 'border-blue-500 border-l-[5px] bg-blue-50 text-blue-800 border-b-0'
+            ? 'bg-blue-50 text-blue-800 border-b-0'
             : 'border-b-2 border-gray-50'
       }`}
     >
