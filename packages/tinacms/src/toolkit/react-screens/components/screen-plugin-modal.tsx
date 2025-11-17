@@ -4,8 +4,8 @@ import {
   Modal,
   ModalHeader,
   ModalBody,
-  ModalPopup,
   ModalFullscreen,
+  ModalPopup,
 } from '@toolkit/react-modals';
 import { ScreenPlugin } from '../screen-plugin';
 
