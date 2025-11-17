@@ -2,13 +2,9 @@ import { render } from '@testing-library/react';
 import React from 'react';
 import { Alerts } from './alerts';
 import { Alert } from '../alerts';
-import { ModalProvider } from '../react-modals';
-import { describe, it, vi, beforeEach } from 'vitest';
+import { describe, it, vi } from 'vitest';
 
 describe('Alerts', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
   it('subscribes to the `alerts`', () => {
     const alerts = createMockAlerts();
 
@@ -25,43 +21,35 @@ describe('Alerts', () => {
       expect(container.children).toHaveLength(0);
     });
   });
-  describe('when there are error alerts', () => {
-    it('renders one error alert in a modal', () => {
+  describe('when there are alerts', () => {
+    it('renders one alert', () => {
       const alert: Alert = {
-        id: 'error-1',
-        level: 'error',
-        message: 'Error message',
+        id: '',
+        level: 'success',
+        message: 'Hello World',
         timeout: 1000,
       };
       const alerts = createMockAlerts([alert]);
 
-      const output = render(
-        <ModalProvider>
-          <Alerts alerts={alerts} />
-        </ModalProvider>
-      );
+      const output = render(<Alerts alerts={alerts} />);
 
-      // Should render error message in modal
-      output.getByText('Error message');
-      output.getByText('Error');
+      const alertMessage = alert.message;
+      if (typeof alertMessage === 'string') {
+        output.getByText(alertMessage);
+      }
     });
-
-    describe('clicking close on an error alert', () => {
+    describe('clicking an alert', () => {
       it('calls dismiss on the collection', () => {
         const alert: Alert = {
-          id: 'error-1',
-          level: 'error',
-          message: 'Error message',
+          id: '',
+          level: 'success',
+          message: 'Hello World',
           timeout: 1000,
         };
         const alerts = createMockAlerts([alert]);
-        const output = render(
-          <ModalProvider>
-            <Alerts alerts={alerts} />
-          </ModalProvider>
-        );
+        const output = render(<Alerts alerts={alerts} />);
 
-        output.getByRole('button', { name: /close/i }).click();
+        output.getByRole('button').click();
 
         expect(alerts.dismiss).toHaveBeenCalledWith(alert);
       });

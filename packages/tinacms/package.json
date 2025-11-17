@@ -146,12 +146,10 @@
 		"react-icons": "^5.4.0",
 		"react-router-dom": "catalog:",
 		"react-use": "catalog:",
-		"sonner": "^2.0.7",
 		"tailwind-merge": "^2.6.0",
 		"webfontloader": "catalog:",
 		"yup": "^1.6.1",
-		"zod": "^3.24.2",
-		"dompurify": "^3.3.0"
+		"zod": "^3.24.2"
 	},
 	"devDependencies": {
 		"@graphql-tools/utils": "catalog:",
@@ -172,11 +170,11 @@
 		"@types/react-color": "catalog:",
 		"@types/react-dom": "^18.3.5",
 		"@types/yup": "^0.32.0",
+		"lowlight": "^3.3.0",
 		"happy-dom": "catalog:",
 		"identity-obj-proxy": "catalog:",
 		"isomorphic-fetch": "catalog:",
 		"jest-file-snapshot": "^0.7.0",
-		"lowlight": "^3.3.0",
 		"next": "14.2.10",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",

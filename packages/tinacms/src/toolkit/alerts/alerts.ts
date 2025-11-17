@@ -1,6 +1,5 @@
 import React from 'react';
 import type { EventBus, Callback, CMSEvent } from '@toolkit/core';
-import { toast } from '@toolkit/components/ui/sonner';
 
 export interface EventsToAlerts {
   [key: string]: ToAlert | AlertArgs;
@@ -52,54 +51,25 @@ export class Alerts {
     message: string | React.FunctionComponent,
     timeout = 8000
   ): () => void {
-    let id: string | number;
-
-    // Use sonner's toast methods based on level
-    // For FunctionComponent messages, render them directly
-    // For string messages, use them as-is (URL parsing happens in component)
-    const toastMessage =
-      typeof message === 'string' ? message : React.createElement(message);
-
-    switch (level) {
-      case 'success':
-        id = toast.success(toastMessage, {
-          duration: timeout,
-        });
-        break;
-      case 'error':
-        id = `${message}|${Date.now()}`;
-        break;
-      case 'warn':
-        id = toast.warning(toastMessage, {
-          duration: timeout,
-        });
-        break;
-      case 'info':
-      default:
-        id = toast.info(toastMessage, {
-          duration: timeout,
-        });
-        break;
-    }
-
     const alert = {
       level,
       message,
       timeout,
-      id: String(id),
+      id: `${message}|${Date.now()}`,
     };
 
     this.alerts.set(alert.id, alert);
 
     this.events.dispatch({ type: 'alerts:add', alert });
 
-    const dismiss = () => {
-      if (level !== 'error') {
-        toast.dismiss(id);
-      }
+    let timeoutId: any = null;
 
+    const dismiss = () => {
+      clearTimeout(timeoutId);
       this.dismiss(alert);
     };
+
+    timeoutId = level !== 'error' ? setTimeout(dismiss, alert.timeout) : null;
 
     return dismiss;
   }
