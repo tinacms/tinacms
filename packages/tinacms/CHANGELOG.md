@@ -1,5 +1,11 @@
 # tinacms
 
+## 2.9.5
+
+### Patch Changes
+
+- [#6131](https://github.com/tinacms/tinacms/pull/6131) [`d900f4e`](https://github.com/tinacms/tinacms/commit/d900f4e6c6f0a86c94bba5f0925bbaa54eeb90db) Thanks [@kulesy](https://github.com/kulesy)! - Revert Sonner alert notifications
+
 ## 2.9.4
 
 ### Patch Changes
