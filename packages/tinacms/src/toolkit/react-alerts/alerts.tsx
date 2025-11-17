@@ -42,6 +42,10 @@ export interface AlertsProps {
 export function Alerts({ alerts }: AlertsProps) {
   useSubscribable(alerts);
 
+  if (alerts.all.length === 0) {
+    return null;
+  }
+
   return (
     <>
       {/* Sonner toaster for non-error alerts */}

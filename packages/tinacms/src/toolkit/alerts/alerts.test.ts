@@ -1,6 +1,19 @@
 import { EventBus } from '@toolkit/core';
-import { describe, it, vi } from 'vitest';
+import { describe, it, vi, beforeEach } from 'vitest';
 import { Alerts } from './alerts';
+import { toast } from '../components/ui/sonner';
+
+// Mock the toast module
+vi.mock('../components/ui/sonner', () => ({
+  toast: {
+    success: vi.fn(() => 'success-toast-id'),
+    error: vi.fn(() => 'error-toast-id'),
+    warning: vi.fn(() => 'warning-toast-id'),
+    info: vi.fn(() => 'info-toast-id'),
+    dismiss: vi.fn(),
+  },
+  Toaster: () => null,
+}));
 
 // biome-ignore lint/correctness/useHookAtTopLevel: not ready to fix these yet
 vi.useFakeTimers();
@@ -8,27 +21,111 @@ vi.useFakeTimers();
 const events = new EventBus();
 
 describe('Alerts', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('is empty by default', () => {
     const alerts = new Alerts(events);
 
     expect(alerts.all).toHaveLength(0);
   });
-  describe('calling alerts.add("info", "Test")', () => {
-    it('creates alert with message: "Test"', () => {
+
+  describe('Toast Notifications', () => {
+    it('triggers toast.info when info alert is added', () => {
       const alerts = new Alerts(events);
 
-      alerts.info('Test');
+      alerts.info('Info message', 5000);
 
-      const testAlert = alerts.all.pop();
-      expect(testAlert?.message).toBe('Test');
+      expect(toast.info).toHaveBeenCalledWith('Info message', {
+        duration: 5000,
+      });
     });
-    it('creates alert with level: "info"', () => {
+
+    it('triggers toast.success when success alert is added', () => {
+      const alerts = new Alerts(events);
+
+      alerts.success('Success message', 3000);
+
+      expect(toast.success).toHaveBeenCalledWith('Success message', {
+        duration: 3000,
+      });
+    });
+
+    it('triggers toast.warning when warn alert is added', () => {
+      const alerts = new Alerts(events);
+
+      alerts.warn('Warning message', 4000);
+
+      expect(toast.warning).toHaveBeenCalledWith('Warning message', {
+        duration: 4000,
+      });
+    });
+
+    it('does not trigger toast for error alerts', () => {
+      const alerts = new Alerts(events);
+
+      alerts.error('Error message');
+
+      // Error alerts don't trigger toasts - they're shown in modals
+      expect(toast.error).not.toHaveBeenCalled();
+    });
+
+    it('calls toast.dismiss when non-error alert is dismissed', () => {
+      const alerts = new Alerts(events);
+      const dismiss = alerts.info('Info message');
+
+      dismiss();
+
+      expect(toast.dismiss).toHaveBeenCalledWith('info-toast-id');
+    });
+
+    it('does not call toast.dismiss when error alert is dismissed', () => {
+      const alerts = new Alerts(events);
+      const dismiss = alerts.error('Error message');
+
+      dismiss();
+
+      // Error alerts don't dismiss the toast, only remove from collection
+      expect(toast.dismiss).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Alert Storage', () => {
+    it('stores all alerts in the collection', () => {
+      const alerts = new Alerts(events);
+
+      alerts.info('Info');
+      alerts.success('Success');
+      alerts.warn('Warning');
+      alerts.error('Error');
+
+      // All alerts are stored
+      expect(alerts.all).toHaveLength(4);
+    });
+
+    it('stores error alerts with custom ID', () => {
+      const alerts = new Alerts(events);
+
+      alerts.error('Error message');
+
+      const errorAlert = alerts.all[0];
+      expect(errorAlert?.level).toBe('error');
+      expect(errorAlert?.message).toBe('Error message');
+      // Error alerts get a custom timestamp-based ID
+      expect(errorAlert?.id).toContain('Error message|');
+    });
+  });
+
+  describe('calling alerts.add("info", "Test")', () => {
+    it('stores info alerts in the collection', () => {
       const alerts = new Alerts(events);
 
       alerts.info('Test');
 
-      const testAlert = alerts.all.pop();
-      expect(testAlert?.level).toBe('info');
+      expect(alerts.all).toHaveLength(1);
+      expect(alerts.all[0]?.message).toBe('Test');
+      expect(alerts.all[0]?.level).toBe('info');
     });
     it.skip('will remove the message after 3000ms', async () => {
       const alerts = new Alerts(events);
