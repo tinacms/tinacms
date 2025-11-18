@@ -5,6 +5,8 @@ import { AutoformatPlugin } from '@udecode/plate-autoformat/react';
 import {
   BasicMarksPlugin,
   UnderlinePlugin,
+  SubscriptPlugin,
+  SuperscriptPlugin,
 } from '@udecode/plate-basic-marks/react';
 import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
 import { ExitBreakPlugin, SoftBreakPlugin } from '@udecode/plate-break/react';
@@ -90,6 +92,8 @@ const resetBlockTypesCodeBlockRule = {
 export const viewPlugins = [
   BasicMarksPlugin,
   UnderlinePlugin,
+  SubscriptPlugin,
+  SuperscriptPlugin,
   HeadingPlugin.configure({ options: { levels: 6 } }),
   ParagraphPlugin,
   CodeBlockPlugin.configure({

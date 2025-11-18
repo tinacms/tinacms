@@ -29,6 +29,8 @@ import {
   CodeToolbarButton,
   ItalicToolbarButton,
   StrikethroughToolbarButton,
+  SubscriptButton,
+  SuperscriptButton,
 } from './plate-ui/mark-toolbar-button';
 import { TablePlugin } from '@udecode/plate-table/react';
 import {
@@ -96,6 +98,16 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
     label: 'Strikethrough',
     width: () => STANDARD_ICON_WIDTH,
     Component: <StrikethroughToolbarButton />,
+  },
+  subscript: {
+    label: 'Subscript',
+    width: () => STANDARD_ICON_WIDTH,
+    Component: <SubscriptButton />,
+  },
+  superscript: {
+    label: 'Superscript',
+    width: () => STANDARD_ICON_WIDTH,
+    Component: <SuperscriptButton />,
   },
   italic: {
     label: 'Italic',

@@ -17,6 +17,8 @@ type BaseComponents = {
   bold?: { children: JSX.Element };
   strikethrough?: { children: JSX.Element };
   underline?: { children: JSX.Element };
+  subscript?: { children: JSX.Element };
+  superscript?: { children: JSX.Element };
   code?: { children: JSX.Element };
   text?: { children: string };
   ul?: { children: JSX.Element };
@@ -125,10 +127,12 @@ const Leaf = (props: {
   italic?: boolean;
   underline?: boolean;
   strikethrough?: boolean;
+  subscript?: boolean;
+  superscript?: boolean;
   code?: boolean;
   components: Pick<
     BaseComponentSignature,
-    'bold' | 'italic' | 'underline' | 'strikethrough' | 'code' | 'text'
+    'bold' | 'italic' | 'underline' | 'strikethrough' | 'code' | 'text' | 'subscript' | 'superscript'
   >;
 }) => {
   if (props.bold) {
@@ -193,6 +197,38 @@ const Leaf = (props: {
       <s>
         <Leaf {...rest} />
       </s>
+    );
+  }
+  if (props.subscript) {
+    const { subscript, ...rest } = props;
+    if (props.components.subscript) {
+      const Component = props.components.subscript;
+      return (
+        <Component>
+          <Leaf {...rest} />
+        </Component>
+      );
+    }
+    return (
+      <sub>
+        <Leaf {...rest} />
+      </sub>
+    );
+  }
+  if (props.superscript) {
+    const { superscript, ...rest } = props;
+    if (props.components.superscript) {
+      const Component = props.components.superscript;
+      return (
+        <Component>
+          <Leaf {...rest} />
+        </Component>
+      );
+    }
+    return (
+      <sup>
+        <Leaf {...rest} />
+      </sup>
     );
   }
   if (props.code) {

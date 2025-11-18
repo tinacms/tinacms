@@ -9,6 +9,8 @@ export type ToolbarOverrideType =
   | 'codeBlock'
   | 'bold'
   | 'strikethrough'
+  | 'subscript'
+  | 'superscript'
   | 'italic'
   | 'mermaid'
   | 'raw'

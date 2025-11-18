@@ -309,7 +309,9 @@ type ToolbarOverrideType =
   | 'raw'
   | 'embed'
   | 'mermaid'
-  | 'table';
+  | 'table'
+  | 'subscript'
+  | 'superscript';
 type RichTextAst = { type: 'root'; children: Record<string, unknown>[] };
 export type RichTextField<WithNamespace extends boolean = false> = (
   | FieldGeneric<RichTextAst, undefined>

@@ -5,6 +5,8 @@ import {
   ItalicPlugin,
   StrikethroughPlugin,
   UnderlinePlugin,
+  SubscriptPlugin,
+  SuperscriptPlugin,
 } from '@udecode/plate-basic-marks/react';
 import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
 import {
@@ -211,6 +213,8 @@ export const Components = () => {
     [CodePlugin.key]: CodeLeaf,
     [UnderlinePlugin.key]: withProps(PlateLeaf, { as: 'u' }),
     [StrikethroughPlugin.key]: withProps(PlateLeaf, { as: 's' }),
+    [SubscriptPlugin.key]: withProps(PlateLeaf, { as: 'sub' }),
+    [SuperscriptPlugin.key]: withProps(PlateLeaf, { as: 'sup' }),
     [ItalicPlugin.key]: withProps(PlateLeaf, { as: 'em' }),
     [BoldPlugin.key]: withProps(PlateLeaf, { as: 'strong' }),
     [HorizontalRulePlugin.key]: HrElement,
