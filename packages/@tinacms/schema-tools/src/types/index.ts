@@ -243,10 +243,23 @@ export type DateTimeField = (
     type: 'datetime';
   };
 
+type ImageFieldOptions = {
+  /**
+   * A function that returns the upload directory path based on the form values.
+   * This is used to organize uploaded images into specific folders.
+   *
+   * @example
+   * ```ts
+   * uploadDir: (formValues) => `uploads/${formValues.category}`
+   * ```
+   */
+  uploadDir?: (formValues: any) => string;
+};
+
 export type ImageField = (
-  | FieldGeneric<string, undefined>
-  | FieldGeneric<string, true>
-  | FieldGeneric<string, false>
+  | FieldGeneric<string, undefined, ImageFieldOptions>
+  | FieldGeneric<string, true, ImageFieldOptions>
+  | FieldGeneric<string, false, ImageFieldOptions>
 ) &
   BaseField & {
     type: 'image';
