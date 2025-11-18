@@ -23,6 +23,9 @@ import { Branch, BranchSwitcherProps } from './types';
 
 type ListState = 'loading' | 'ready' | 'error';
 
+const tableHeadingStyle =
+  'px-3 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider';
+
 export function formatBranchName(str: string): string {
   const pattern = /[^/\w-]+/g; // regular expression pattern to match invalid special characters
   const formattedStr = str.replace(pattern, '-'); // remove special characters
@@ -429,18 +432,10 @@ const BranchSelector = ({
           <table className='w-full'>
             <thead className='bg-white border-b-2 border-gray-100'>
               <tr>
-                <th className='pl-3 pr-3 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider'>
-                  Branch Name
-                </th>
-                <th className='px-3 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider'>
-                  Last Updated
-                </th>
-                <th className='px-3 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider'>
-                  {/* Empty header for Select button column */}
-                </th>
-                <th className='px-3 py-3 text-right text-xs font-bold text-gray-700 uppercase tracking-wider'>
-                  {/* Empty header for options button column */}
-                </th>
+                <th className={`${tableHeadingStyle}`}>Branch Name</th>
+                <th className={tableHeadingStyle}>Last Updated</th>
+                <th>{/* Empty header for Select button column */}</th>
+                <th>{/* Empty header for options button column */}</th>
               </tr>
             </thead>
             <tbody>
