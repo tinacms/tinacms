@@ -1,5 +1,40 @@
 # next-tinacms-s3
 
+## 12.0.5
+
+### Patch Changes
+
+- Updated dependencies [[`d900f4e`](https://github.com/tinacms/tinacms/commit/d900f4e6c6f0a86c94bba5f0925bbaa54eeb90db)]:
+  - tinacms@2.9.5
+
+## 12.0.4
+
+### Patch Changes
+
+- Updated dependencies [[`e1b6d05`](https://github.com/tinacms/tinacms/commit/e1b6d05c6b31c5c0928633064a065ddd331667ca), [`4ee0dd9`](https://github.com/tinacms/tinacms/commit/4ee0dd95913392b0da12dd5c9344909e5292e911), [`27e5ca9`](https://github.com/tinacms/tinacms/commit/27e5ca9b18a90f13f92425ebb2628b143d6a81be)]:
+  - tinacms@2.9.4
+
+## 12.0.3
+
+### Patch Changes
+
+- Updated dependencies [[`9e8bc37`](https://github.com/tinacms/tinacms/commit/9e8bc37402c8aa4d408c38e00d4402d596b0d896), [`0f265aa`](https://github.com/tinacms/tinacms/commit/0f265aadf918ae6f5b789e298fc2c406a6df0b16), [`32bd9b2`](https://github.com/tinacms/tinacms/commit/32bd9b21b54462be3e83b2d3e4b4237a48758bb1), [`ce1414c`](https://github.com/tinacms/tinacms/commit/ce1414ce1b82e6755a96c9c12949cd469b43e283)]:
+  - tinacms@2.9.3
+
+## 12.0.2
+
+### Patch Changes
+
+- Updated dependencies [[`1286e87`](https://github.com/tinacms/tinacms/commit/1286e87323694dc819edc56360613dc654f3d3ca), [`4416a28`](https://github.com/tinacms/tinacms/commit/4416a283ac1cfea5e9c4890cd71f2edf3b704344), [`6cba118`](https://github.com/tinacms/tinacms/commit/6cba118c90f7c7ab6356c0ef83fca18526e47f8d), [`572fb28`](https://github.com/tinacms/tinacms/commit/572fb28236b56db4ede5fe53b177b80323ae7284), [`f224124`](https://github.com/tinacms/tinacms/commit/f224124220811fb44749122d46eb7100af89ee77), [`a2d983e`](https://github.com/tinacms/tinacms/commit/a2d983ed886f66db2c133e902eacaa8d07e88bdb), [`bc35474`](https://github.com/tinacms/tinacms/commit/bc354740d0cb359c372ba287974e7e9db3c5119c)]:
+  - tinacms@2.9.2
+
+## 12.0.1
+
+### Patch Changes
+
+- Updated dependencies [[`003e348`](https://github.com/tinacms/tinacms/commit/003e348472ddc08eee63d78190038097542b6311), [`5527e8a`](https://github.com/tinacms/tinacms/commit/5527e8ab5821c8613fcfd1b0b8bc6d93291a6d03), [`5ffd60e`](https://github.com/tinacms/tinacms/commit/5ffd60e7b07b19cde6fab36a911503276c83715f), [`b23aa0c`](https://github.com/tinacms/tinacms/commit/b23aa0c5defc51b8f9fe00a59dd87e1d2f8b9f0b), [`5d13c0d`](https://github.com/tinacms/tinacms/commit/5d13c0d023373692233c8be2127ae6e3d7d68b47)]:
+  - tinacms@2.9.1
+
 ## 12.0.0
 
 ### Patch Changes

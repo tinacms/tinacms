@@ -233,7 +233,7 @@ export async function run() {
     `  • 🖌️ Extend Tina with custom field components: ${TextStyles.link('https://tina.io/docs/advanced/extending-tina/')}`
   );
   console.log(
-    `  • 🚀 Deploy to Production: ${TextStyles.link('https://tina.io/docs/tina-cloud/')}`
+    `  • 🚀 Deploy to Production: ${TextStyles.link('https://tina.io/docs/tinacloud/')}`
   );
 }
 

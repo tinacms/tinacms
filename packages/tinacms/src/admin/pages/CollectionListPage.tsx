@@ -153,6 +153,7 @@ export const handleNavigate = async (
   const plugins = cms.plugins.all<RouteMappingPlugin>('tina-admin');
   const routeMapping = plugins.find(({ name }) => name === 'route-mapping');
   const tinaPreview = cms.flags.get('tina-preview') || false;
+  const basePath = cms.flags.get('tina-basepath');
 
   /**
    * Determine if the document has a route mapped
@@ -175,8 +176,8 @@ export const handleNavigate = async (
       routeOverride = routeOverride.slice(1);
     }
     tinaPreview
-      ? navigate(`/~/${routeOverride}`)
-      : (window.location.href = routeOverride);
+      ? navigate(`/~${basePath ? `/${basePath}` : ''}/${routeOverride}`)
+      : (window.location.href = `${basePath ? `/${basePath}` : ''}/${routeOverride}`);
     return null;
   } else {
     const pathToDoc = document._sys.breadcrumbs;
@@ -509,7 +510,7 @@ const CollectionListPage = () => {
                     )}
 
                     <PageHeader>
-                      <div className='w-full'>
+                      <div className='w-full mx-auto max-w-screen-xl'>
                         <h3 className='font-sans text-2xl text-tina-orange'>
                           {collection.label
                             ? collection.label
@@ -639,7 +640,7 @@ const CollectionListPage = () => {
                                             }}
                                             to='/collections/new-folder'
                                             className={cn(
-                                              'icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-blue-500 bg-white hover:bg-[#f1f5f9] focus:ring-white focus:ring-blue-500 w-full md:w-auto text-sm h-10 px-6 mr-4',
+                                              'icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-gray-500 hover:tina-orange-dark bg-white hover:bg-gray-50 border border-gray-100 focus:ring-white focus:ring-tina-orange-dark w-full md:w-auto text-sm h-10 px-6 mr-4',
                                               collection.templates &&
                                                 'opacity-50 pointer-events-none cursor-not-allowed'
                                             )}
@@ -698,7 +699,7 @@ const CollectionListPage = () => {
                                             collectionName,
                                           ].join('/')
                                     }`}
-                                    className='inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-white bg-blue-500 hover:bg-blue-600 w-full md:w-auto text-sm h-10 px-6'
+                                    className='inline-flex items-center font-medium focus:ring-2 focus:outline-none focus:ring-tina-orange-dark focus:shadow-outline text-center rounded justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-white bg-tina-orange-dark hover:bg-tina-orange w-full md:w-auto text-sm h-10 px-6'
                                   >
                                     <FaFile className='mr-2' />
                                     Add File
@@ -946,41 +947,10 @@ const CollectionListPage = () => {
                                                 },
                                               },
                                               allowDelete && {
-                                                name: 'delete',
-                                                label: 'Delete',
-                                                Icon: (
-                                                  <BiTrash
-                                                    size='1.3rem'
-                                                    className='text-red-500'
-                                                  />
-                                                ),
-                                                onMouseDown: () => {
-                                                  setVars((old) => ({
-                                                    ...old,
-                                                    collection: collectionName,
-                                                    relativePathWithoutExtension:
-                                                      document.node._sys.breadcrumbs.join(
-                                                        '/'
-                                                      ),
-                                                    relativePath:
-                                                      document.node._sys.breadcrumbs.join(
-                                                        '/'
-                                                      ) +
-                                                      document.node._sys
-                                                        .extension,
-                                                    newRelativePath: '',
-                                                  }));
-                                                  setDeleteModalOpen(true);
-                                                },
-                                              },
-                                              allowDelete && {
                                                 name: 'rename',
                                                 label: 'Rename',
                                                 Icon: (
-                                                  <BiRename
-                                                    size='1.3rem'
-                                                    className='text-red-500'
-                                                  />
+                                                  <BiRename size='1.3rem' />
                                                 ),
                                                 onMouseDown: () => {
                                                   setVars((old) => ({
@@ -999,6 +969,35 @@ const CollectionListPage = () => {
                                                     newRelativePath: '',
                                                   }));
                                                   setRenameModalOpen(true);
+                                                },
+                                              },
+                                              allowDelete && {
+                                                name: 'delete',
+                                                label: 'Delete',
+                                                Icon: (
+                                                  <BiTrash
+                                                    size='1.3rem'
+                                                    className='text-red-500'
+                                                  />
+                                                ),
+                                                className: 'text-red-500',
+                                                onMouseDown: () => {
+                                                  setVars((old) => ({
+                                                    ...old,
+                                                    collection: collectionName,
+                                                    relativePathWithoutExtension:
+                                                      document.node._sys.breadcrumbs.join(
+                                                        '/'
+                                                      ),
+                                                    relativePath:
+                                                      document.node._sys.breadcrumbs.join(
+                                                        '/'
+                                                      ) +
+                                                      document.node._sys
+                                                        .extension,
+                                                    newRelativePath: '',
+                                                  }));
+                                                  setDeleteModalOpen(true);
                                                 },
                                               },
                                             ].filter(Boolean)}
