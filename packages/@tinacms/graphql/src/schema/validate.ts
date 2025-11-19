@@ -1,5 +1,4 @@
 import { addNamespaceToSchema } from '@tinacms/schema-tools';
-import deepClone from 'lodash.clonedeep';
 import { sequential } from '../util';
 import * as yup from 'yup';
 
@@ -25,7 +24,7 @@ const FIELD_TYPES: TinaField['type'][] = [
 
 export const validateSchema = async (schema: Schema) => {
   const schema2: Schema<true> = addNamespaceToSchema<Schema<true>>(
-    deepClone(schema) as unknown as Schema<true>
+    structuredClone(schema) as unknown as Schema<true>
   );
   const collections = await sequential(
     schema2.collections,

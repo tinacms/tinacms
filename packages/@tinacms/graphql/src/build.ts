@@ -2,10 +2,10 @@
 
 */
 
-import { print, type OperationDefinitionNode } from 'graphql';
+import { print, type OperationDefinitionNode, type DocumentNode } from 'graphql';
 import type { TinaSchema, Config } from '@tinacms/schema-tools';
 import type { FragmentDefinitionNode, FieldDefinitionNode } from 'graphql';
-import uniqBy from 'lodash.uniqby';
+import { uniqBy } from 'es-toolkit';
 
 import { astBuilder, NAMER } from './ast-builder';
 import { sequential } from './util';
@@ -63,11 +63,11 @@ const _buildFragments = async (builder: Builder, tinaSchema: TinaSchema) => {
     fragmentDefinitionsFields.push(frag);
   });
 
-  const fragDoc = {
+  const fragDoc: DocumentNode = {
     kind: 'Document' as const,
     definitions: uniqBy(
-      // @ts-ignore
       extractInlineTypes(fragmentDefinitionsFields),
+      // @ts-ignore - all nodes returned by extractInlineTypes have a name property
       (node) => node.name.value
     ),
   };
@@ -105,11 +105,11 @@ const _buildQueries = async (builder: Builder, tinaSchema: TinaSchema) => {
     );
   });
 
-  const queryDoc = {
+  const queryDoc: DocumentNode = {
     kind: 'Document' as const,
     definitions: uniqBy(
-      // @ts-ignore
       extractInlineTypes(operationsDefinitions),
+      // @ts-ignore - all nodes returned by extractInlineTypes have a name property
       (node) => node.name.value
     ),
   };
@@ -217,12 +217,14 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
     })
   );
 
-  return {
+  const schema: DocumentNode = {
     kind: 'Document' as const,
     definitions: uniqBy(
-      // @ts-ignore
       extractInlineTypes(definitions),
+      // @ts-ignore - all nodes returned by extractInlineTypes have a name property
       (node) => node.name.value
     ),
   };
+
+  return schema;
 };
