@@ -37,6 +37,21 @@ export const tinaConfigZod = z.object({
       maxSearchIndexFieldLength: z.number().gte(1).optional(),
     })
     .optional(),
+  ui: z.object({ 
+    previewUrl: z.function().optional(),
+    optOutOfUpdateCheck: z.boolean().optional(),
+    regexValidation: z.object({
+      folderNameRegex: z.string().refine((val) => {
+        try {
+          new RegExp(val);
+          return true;
+        } catch (error) {
+          return false;
+        }
+      }, { message: 'folderNameRegex is not a valid regex pattern' }).optional(),
+    }).optional(),
+  })
+  .optional(),
 });
 
 export const validateTinaCloudSchemaConfig = (config: unknown): Config => {
