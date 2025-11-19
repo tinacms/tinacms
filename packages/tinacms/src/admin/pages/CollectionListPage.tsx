@@ -1313,6 +1313,7 @@ const FolderModal = ({
   validationRegex,
 }: FolderModalProps) => {
   const [isFolderNameValid, setIsFolderNameValid] = useState(false);
+  const [isInteracted, setIsInteracted] = useState(false);
 
   useEffect(() => {
     validateFolderName(folderName);
@@ -1347,12 +1348,13 @@ const FolderModal = ({
               className={`mb-4 ${!isFolderNameValid ? 'border-red-500' : ''}`}
               onChange={(event) => {
                 setFolderName(event.target.value);
+                setIsInteracted(true);
                 validateFolderName(event.target.value);
               }}
             />
-            {!isFolderNameValid && (
+            {!isFolderNameValid && isInteracted && (
               <p className='text-red-500 text-sm pl-1'>
-                Folder name is not valid. Please enter a valid folder name.
+                Folder name is not valid – please enter a valid folder name.
               </p>
             )}
           </>
