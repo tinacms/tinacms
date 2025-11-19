@@ -468,7 +468,10 @@ const CollectionListPage = () => {
                             return { ...vars, folderName };
                           });
                         }}
-                        validationRegex={cms.api.tina?.schema.config.config.ui?.regexValidation?.folderNameRegex}
+                        validationRegex={
+                          cms.api.tina?.schema.config.config.ui?.regexValidation
+                            ?.folderNameRegex
+                        }
                         createFunc={async () => {
                           try {
                             admin
@@ -1309,7 +1312,6 @@ const FolderModal = ({
   setFolderName,
   validationRegex,
 }: FolderModalProps) => {
-
   const [isFolderNameValid, setIsFolderNameValid] = useState(false);
 
   useEffect(() => {
@@ -1321,7 +1323,7 @@ const FolderModal = ({
       setIsFolderNameValid(!!name.trim());
       return !!name.trim();
     }
-    
+
     try {
       const regex = new RegExp(validationRegex);
       const valid = regex.test(name);
@@ -1332,7 +1334,6 @@ const FolderModal = ({
       return false;
     }
   };
-
 
   return (
     <Modal>
@@ -1348,7 +1349,6 @@ const FolderModal = ({
                 setFolderName(event.target.value);
                 validateFolderName(event.target.value);
               }}
-
             />
             {!isFolderNameValid && (
               <p className='text-red-500 text-sm pl-1'>
