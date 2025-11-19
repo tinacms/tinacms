@@ -468,6 +468,7 @@ const CollectionListPage = () => {
                             return { ...vars, folderName };
                           });
                         }}
+                        validationRegex={cms.api.tina?.schema.config.config.ui?.regexValidation?.folderNameRegex}
                         createFunc={async () => {
                           try {
                             admin
@@ -1298,6 +1299,7 @@ interface FolderModalProps {
   createFunc(): void;
   folderName: string;
   setFolderName(folderName: string): void;
+  validationRegex?: string;
 }
 
 const FolderModal = ({
@@ -1305,20 +1307,54 @@ const FolderModal = ({
   createFunc,
   folderName,
   setFolderName,
+  validationRegex,
 }: FolderModalProps) => {
+
+  const [isFolderNameValid, setIsFolderNameValid] = useState(false);
+
+  useEffect(() => {
+    validateFolderName(folderName);
+  }, [folderName]);
+
+  const validateFolderName = (name: string) => {
+    if (!validationRegex || !name.trim()) {
+      setIsFolderNameValid(!!name.trim());
+      return !!name.trim();
+    }
+    
+    try {
+      const regex = new RegExp(validationRegex);
+      const valid = regex.test(name);
+      setIsFolderNameValid(valid);
+      return valid;
+    } catch (error) {
+      setIsFolderNameValid(false);
+      return false;
+    }
+  };
+
+
   return (
     <Modal>
       <PopupModal>
         <ModalHeader close={close}>Create Folder</ModalHeader>
         <ModalBody padded={true}>
           <>
-            {/* <p className='mb-4'>
-            </p> */}
             <BaseTextField
               placeholder='Enter the name of the new folder'
               value={folderName}
-              onChange={(event) => setFolderName(event.target.value)}
+              className={`mb-4 ${!isFolderNameValid ? 'border-red-500' : ''}`}
+              onChange={(event) => {
+                setFolderName(event.target.value);
+                validateFolderName(event.target.value);
+              }}
+
             />
+            {!isFolderNameValid && (
+              <p className='text-red-500 text-sm pl-1'>
+                Folder name is not valid. Please enter a valid folder name.
+              </p>
+            )}
           </>
         </ModalBody>
         <ModalActions>
@@ -1328,6 +1364,7 @@ const FolderModal = ({
           <Button
             style={{ flexGrow: 3 }}
             variant='primary'
+            disabled={!isFolderNameValid}
             onClick={async () => {
               await createFunc();
               close();
