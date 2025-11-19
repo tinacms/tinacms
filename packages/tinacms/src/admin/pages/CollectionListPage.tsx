@@ -785,11 +785,11 @@ const CollectionListPage = () => {
                                     {!hasAnyDocuments && hasAnyFolders && (
                                       <thead className={tableHeadingStyle}>
                                         <tr>
-                                          <th className='pl-5 pr-3 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider'>
+                                          <th className={tableHeadingCellStyle}>
                                             Name
                                           </th>
                                           <th
-                                            className='px-3 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider'
+                                            className={tableHeadingCellStyle}
                                             colSpan={4}
                                           >
                                             Path
