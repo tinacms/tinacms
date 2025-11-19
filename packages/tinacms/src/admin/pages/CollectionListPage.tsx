@@ -278,6 +278,10 @@ const CollectionListPage = () => {
   const tableRowStyle =
     'hover:bg-gray-50/50 border-b-2 border-gray-50 transition-colors duration-300';
 
+  const tableHeadingCellStyle =
+    'px-3 py-3 text-left text-xs font-bold text-gray-700 tracking-wider';
+
+  const tableHeadingStyle = 'bg-gray-100 border-b-2 border-gray-200';
   return (
     <GetCMS>
       {(cms: TinaCMS) => {
@@ -749,10 +753,10 @@ const CollectionListPage = () => {
                                 return (
                                   <>
                                     {hasAnyDocuments && (
-                                      <thead className='bg-gray-100 border-b-2 border-gray-200'>
+                                      <thead className={tableHeadingStyle}>
                                         <tr>
                                           <th
-                                            className='pl-5 pr-3 py-3 text-left text-xs font-bold text-gray-700 tracking-wider'
+                                            className={tableHeadingCellStyle}
                                             colSpan={hasAnyTitles ? 1 : 2}
                                           >
                                             {hasAnyTitles
@@ -760,28 +764,32 @@ const CollectionListPage = () => {
                                               : 'Filename'}
                                           </th>
                                           {hasAnyTitles && (
-                                            <th className='px-3 py-3 text-left text-xs font-bold text-gray-700 tracking-wider'>
+                                            <th
+                                              className={tableHeadingCellStyle}
+                                            >
                                               Filename
                                             </th>
                                           )}
-                                          <th className='px-3 py-3 text-left text-xs font-bold text-gray-700 tracking-wider'>
+                                          <th className={tableHeadingCellStyle}>
                                             Extension
                                           </th>
-                                          <th className='px-3 py-3 text-left text-xs font-bold text-gray-700 tracking-wider'>
+                                          <th className={tableHeadingCellStyle}>
                                             Template
                                           </th>
-                                          <th className='w-0'></th>
+                                          <th>
+                                            {/* Empty heading for options column */}
+                                          </th>
                                         </tr>
                                       </thead>
                                     )}
                                     {!hasAnyDocuments && hasAnyFolders && (
-                                      <thead className='bg-white border-b-2 border-gray-100'>
+                                      <thead className={tableHeadingStyle}>
                                         <tr>
-                                          <th className='pl-5 pr-3 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider'>
+                                          <th className={tableHeadingCellStyle}>
                                             Name
                                           </th>
                                           <th
-                                            className='px-3 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider'
+                                            className={tableHeadingCellStyle}
                                             colSpan={4}
                                           >
                                             Path
