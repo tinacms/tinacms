@@ -275,6 +275,9 @@ const CollectionListPage = () => {
     }));
   }, [collectionName]);
 
+  const tableRowStyle =
+    'hover:bg-gray-50/50 border-b-2 border-gray-50 transition-colors duration-300';
+
   return (
     <GetCMS>
       {(cms: TinaCMS) => {
@@ -728,7 +731,7 @@ const CollectionListPage = () => {
                         <div className='w-full overflow-x-auto shadow-md rounded-md'>
                           {((folder.name && !search) ||
                             documents.length > 0) && (
-                            <table className='table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg'>
+                            <table className='table-auto shadow bg-white border border-gray-200 w-full max-w-full rounded-lg'>
                               {(() => {
                                 // Check if any documents have titles to determine column structure
                                 const hasAnyDocuments = documents.some(
@@ -746,10 +749,10 @@ const CollectionListPage = () => {
                                 return (
                                   <>
                                     {hasAnyDocuments && (
-                                      <thead className='bg-white border-b-2 border-gray-100'>
+                                      <thead className='bg-gray-100 border-b-2 border-gray-200'>
                                         <tr>
                                           <th
-                                            className='pl-5 pr-3 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider'
+                                            className='pl-5 pr-3 py-3 text-left text-xs font-bold text-gray-700 tracking-wider'
                                             colSpan={hasAnyTitles ? 1 : 2}
                                           >
                                             {hasAnyTitles
@@ -757,14 +760,14 @@ const CollectionListPage = () => {
                                               : 'Filename'}
                                           </th>
                                           {hasAnyTitles && (
-                                            <th className='px-3 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider'>
+                                            <th className='px-3 py-3 text-left text-xs font-bold text-gray-700 tracking-wider'>
                                               Filename
                                             </th>
                                           )}
-                                          <th className='px-3 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider'>
+                                          <th className='px-3 py-3 text-left text-xs font-bold text-gray-700 tracking-wider'>
                                             Extension
                                           </th>
-                                          <th className='px-3 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider'>
+                                          <th className='px-3 py-3 text-left text-xs font-bold text-gray-700 tracking-wider'>
                                             Template
                                           </th>
                                           <th className='w-0'></th>
@@ -806,11 +809,12 @@ const CollectionListPage = () => {
                                           ) {
                                             return (
                                               <tr
+                                                className={tableRowStyle}
                                                 key={`folder-${document.node.path}`}
                                               >
                                                 <td className='pl-5 pr-3 py-3'>
                                                   <a
-                                                    className='text-blue-600 hover:text-blue-400 flex items-center gap-3 cursor-pointer truncate'
+                                                    className='text-blue-600 flex items-center gap-3 cursor-pointer truncate'
                                                     onClick={() => {
                                                       navigate(
                                                         `/${[
@@ -868,7 +872,7 @@ const CollectionListPage = () => {
 
                                           return (
                                             <tr
-                                              className='hover:bg-gray-100 transition-colors duration-300'
+                                              className={tableRowStyle}
                                               key={`document-${document.node._sys.relativePath}`}
                                             >
                                               <td
@@ -876,7 +880,7 @@ const CollectionListPage = () => {
                                                 colSpan={hasTitle ? 1 : 2}
                                               >
                                                 <a
-                                                  className='text-blue-600 hover:text-blue-400 flex items-center gap-3 cursor-pointer truncate'
+                                                  className='text-blue-600 flex items-center gap-3 cursor-pointer truncate'
                                                   onClick={() => {
                                                     handleNavigate(
                                                       navigate,
