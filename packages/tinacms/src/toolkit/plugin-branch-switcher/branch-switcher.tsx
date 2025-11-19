@@ -20,11 +20,12 @@ import { MdArrowForward, MdOutlineClear } from 'react-icons/md';
 import { useBranchData } from './branch-data';
 import { BranchSwitcherLegacy } from './branch-switcher-legacy';
 import { Branch, BranchSwitcherProps } from './types';
+import { Badge } from '@toolkit/react-sidebar/components/badge';
 
 type ListState = 'loading' | 'ready' | 'error';
 
 const tableHeadingStyle =
-  'px-3 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider';
+  'px-3 py-3 text-left text-xs font-bold text-gray-700 tracking-wider';
 
 export function formatBranchName(str: string): string {
   const pattern = /[^/\w-]+/g; // regular expression pattern to match invalid special characters
@@ -359,7 +360,7 @@ const BranchSelector = ({
 
   return (
     <div className='flex flex-col gap-4'>
-      <div className='flex items-end space-x-4'>
+      <div className='flex items-stretch space-x-4'>
         <div>
           <label
             htmlFor='search'
@@ -387,7 +388,7 @@ const BranchSelector = ({
             )}
           </div>
         </div>
-        <div>
+        <div className='flex flex-col'>
           <label
             htmlFor='branch-type'
             className='text-xs mb-1 flex flex-col font-bold'
@@ -430,7 +431,7 @@ const BranchSelector = ({
       {filteredBranchList.length > 0 && (
         <div className='min-w-[192px] max-h-[24rem] overflow-y-auto w-full h-full rounded-lg shadow-inner bg-white border border-gray-200'>
           <table className='w-full'>
-            <thead className='bg-white border-b-2 border-gray-100'>
+            <thead className='bg-gray-100 border-b-2 border-gray-200'>
               <tr>
                 <th className={`${tableHeadingStyle}`}>Branch Name</th>
                 <th className={tableHeadingStyle}>Last Updated</th>
@@ -562,6 +563,11 @@ const BranchItem = ({
             <BiPencil className='h-4 w-auto text-blue-500 opacity-70 -mt-px' />{' '}
             Select
           </Button>
+        )}
+        {indexingStatus === 'complete' && isCurrentBranch && (
+          <Badge calloutStyle='info' className='w-fit' displayIcon={false}>
+            <span>Selected</span>
+          </Badge>
         )}
       </td>
       <td className='px-3 py-1.5 text-right'>
