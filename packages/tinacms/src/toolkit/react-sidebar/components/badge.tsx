@@ -23,7 +23,7 @@ export const Badge = ({
   displayIcon?: boolean;
 } & React.HTMLProps<HTMLDivElement>) => {
   const commonAlertStyles =
-    'ml-8 text-xs px-2 py-0.5 flex items-center rounded-md border';
+    'text-xs px-2 py-0.5 flex items-center rounded-md border';
 
   const styles = {
     warning: `text-amber-700 bg-amber-100 border-amber-700/20`,

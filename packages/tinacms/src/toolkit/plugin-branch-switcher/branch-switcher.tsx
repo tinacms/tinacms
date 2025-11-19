@@ -433,7 +433,7 @@ const BranchSelector = ({
           <table className='w-full'>
             <thead className='bg-gray-100 border-b-2 border-gray-200'>
               <tr>
-                <th className={`${tableHeadingStyle}`}>Branch Name</th>
+                <th className={tableHeadingStyle}>Branch Name</th>
                 <th className={tableHeadingStyle}>Last Updated</th>
                 <th>{/* Empty header for Select button column */}</th>
                 <th>{/* Empty header for options button column */}</th>
