@@ -1345,7 +1345,7 @@ const FolderModal = ({
             <BaseTextField
               placeholder='Enter the name of the new folder'
               value={folderName}
-              className={`mb-4 ${!isFolderNameValid ? 'border-red-500' : ''}`}
+              className={`mb-4 ${!isFolderNameValid && isInteracted ? 'border-red-500' : ''}`}
               onChange={(event) => {
                 setFolderName(event.target.value);
                 setIsInteracted(true);
