@@ -279,7 +279,7 @@ const CollectionListPage = () => {
     'hover:bg-gray-50/50 border-b-2 border-gray-50 transition-colors duration-300';
 
   const tableHeadingCellStyle =
-    'pl-5 pr-3 py-3 text-left text-xs font-bold text-gray-700 tracking-wider';
+    'px-3 py-3 text-left text-xs font-bold text-gray-700 tracking-wider';
 
   const tableHeadingStyle = 'bg-gray-100 border-b-2 border-gray-200';
   return (
