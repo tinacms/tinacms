@@ -1,5 +1,19 @@
 # next-tinacms-azure
 
+## 3.0.5
+
+### Patch Changes
+
+- Updated dependencies [[`d900f4e`](https://github.com/tinacms/tinacms/commit/d900f4e6c6f0a86c94bba5f0925bbaa54eeb90db)]:
+  - tinacms@2.9.5
+
+## 3.0.4
+
+### Patch Changes
+
+- Updated dependencies [[`e1b6d05`](https://github.com/tinacms/tinacms/commit/e1b6d05c6b31c5c0928633064a065ddd331667ca), [`4ee0dd9`](https://github.com/tinacms/tinacms/commit/4ee0dd95913392b0da12dd5c9344909e5292e911), [`27e5ca9`](https://github.com/tinacms/tinacms/commit/27e5ca9b18a90f13f92425ebb2628b143d6a81be)]:
+  - tinacms@2.9.4
+
 ## 3.0.3
 
 ### Patch Changes

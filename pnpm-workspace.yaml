@@ -15,6 +15,9 @@ catalog:
   "@changesets/cli": 2.27.8
   "@clerk/backend": 0.31.3
   "@clerk/clerk-js": 4.56.2
+  "@dnd-kit/core": ^6.1.0
+  "@dnd-kit/sortable": ^8.0.0
+  "@dnd-kit/utilities": ^3.2.2
   "@floating-ui/dom": ^1.6.13
   "@floating-ui/react-dom": ^2.1.2
   "@graphiql/toolkit": 0.8.4
@@ -26,7 +29,7 @@ catalog:
   "@graphql-tools/load": ^7.8.14
   "@graphql-tools/utils": ^10.8.1
   "@iarna/toml": ^2.2.5
-  "@monaco-editor/react": 4.4.5
+  "@monaco-editor/react": 4.7.0-rc.0
   "@octokit/rest": ^19.0.13
   "@playwright/test": ^1.50.1
   "@puppeteer/replay": ^1.3.2
@@ -38,7 +41,7 @@ catalog:
   "@radix-ui/react-separator": ^1.1.2
   "@radix-ui/react-slot": ^1.1.2
   "@radix-ui/react-toolbar": ^1.1.2
-  "@radix-ui/react-tooltip": ^1.1.8
+  "@radix-ui/react-tooltip": ^1.2.6
   "@react-hook/window-size": ^3.1.1
   "@rollup/pluginutils": ^5.1.4
   "@sucrase/jest-plugin": ^3.0.0
@@ -46,6 +49,7 @@ catalog:
   "@svgr/webpack": ^8.1.0
   "@tailwindcss/aspect-ratio": ^0.4.2
   "@tailwindcss/container-queries": ^0.1.1
+  "@tailwindcss/typography": ^0.5.16
   "@testing-library/dom": ^10.4.0
   "@testing-library/jest-dom": ^6.6.3
   "@testing-library/react": ^16.2.0
@@ -59,6 +63,7 @@ catalog:
   "@types/express": ^4.17.21
   "@types/figlet": 1.2.0
   "@types/isomorphic-fetch": ^0.0.35
+  "@types/json-diff": ^1.0.3
   "@types/level": ^6.0.3
   "@types/listr": 0.14.2
   "@types/lodash.camelcase": ^4.3.9
@@ -79,6 +84,7 @@ catalog:
   "@types/prop-types": ^15.7.14
   "@types/react-beautiful-dnd": ^13.1.8
   "@types/react-color": ^3.0.13
+  "@types/react-dom": ^18.3.5
   "@types/search-index": ^3.2.4
   "@types/styled-components": ^5.1.34
   "@types/tar": 6.1.13
@@ -149,6 +155,7 @@ catalog:
   graphql-tag: ^2.12.6
   gray-matter: ^4.0.3
   happy-dom: 15.10.2
+  highlight.js: ^11.11.1
   identity-obj-proxy: ^3.0.0
   is-hotkey: ^0.2.0
   isomorphic-fetch: ^3.0.0
@@ -166,6 +173,7 @@ catalog:
   lodash.set: ^4.3.2
   lodash.uniqby: ^4.7.0
   log4js: ^6.9.1
+  lowlight: ^3.3.0
   lucide-react: ^0.424.0
   many-level: ^2.0.0
   mdast-util-compact: 4.1.1
@@ -189,6 +197,7 @@ catalog:
   multer: 1.4.5-lts.1
   next-themes: ^0.3.0
   normalize-path: ^3.0.0
+  ora: ^8.2.0
   parse-entities: 4.0.1
   picomatch: ^4.0.2
   picomatch-browser: 2.2.6
@@ -241,3 +250,4 @@ catalog:
   validate-npm-package-name: ^5.0.1
   vfile-message: 3.1.4
   webfontloader: 1.6.28
+  zod: ^3.24.2
