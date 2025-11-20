@@ -2,6 +2,7 @@ import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from '../../../utils/cn';
+import { ButtonOptions } from "@ariakit/react";
 
 
 const buttonVariants = cva(
@@ -36,25 +37,29 @@ const buttonVariants = cva(
   }
 )
 
-function Button({
+type buttonProps = React.ComponentProps<"button"> &
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean
+  };
+
+const Button = React.forwardRef<React.ElementRef<"button">, buttonProps>(({
   className,
   variant,
   size,
   asChild = false,
   ...props
-}: React.ComponentProps<"button"> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean
-  }) {
+}, ref) => {
+
   const Comp = asChild ? Slot : "button"
 
   return (
     <Comp
+        ref={ref}
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     />
   )
-}
+});
 
 export { Button, buttonVariants }
