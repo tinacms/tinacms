@@ -12,7 +12,7 @@ import { useImperativeHandle, useRef } from 'react';
 
 import { DayPicker, DayPickerProps } from 'react-day-picker';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
-import { cn } from 'src/lib/utils';
+import { cn } from '../../../utils/cn';
 
 // ---------- utils start ----------
 /**
