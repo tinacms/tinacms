@@ -9,10 +9,22 @@ import { format, parse, DEFAULT_DATE_DISPLAY_FORMAT } from './date-format';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore importing css is not recognized
 import type { Field } from '../../forms';
+import { DateTimePicker } from '../../components/ui/date-time-picker';
 
 export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
   ({ input, field: { dateFormat, timeFormat, ...rest } }) => {
+    console.log("rest",rest);
+    if(typeof dateFormat === 'boolean')
+    {
+      throw new Error("dateFormat cannot be a boolean");
+    }
+    if(typeof timeFormat === 'boolean')
+      {throw new Error("timeFormat cannot be a boolean");}
+    
+    const [date, setDate] = useState<Date | undefined>(undefined);
+    return <DateTimePicker dateFormat={dateFormat}  value={date} onChange={setDate}/>;
     return (
+      
       <>
         <ReactDateTimeWithStyles
           value={input.value}
@@ -72,7 +84,7 @@ export const ReactDateTimeWithStyles = (
   return (
     <>
       <div className='tina-date-field' ref={area}>
-        <ReactDatetime {...props} isOpen={isOpen} />
+        <ReactDatetime  {...props} isOpen={isOpen} />
       </div>
     </>
   );

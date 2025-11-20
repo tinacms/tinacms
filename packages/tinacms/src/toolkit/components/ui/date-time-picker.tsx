@@ -1,10 +1,11 @@
 import { Button, buttonVariants } from './button';
 import { Input } from './input';
 import { Popover, PopoverContent, PopoverTrigger } from './popover';
-
-import { add, Locale, format } from 'date-fns';
+import moment from 'moment';
+import { add, //format, 
+  Locale } from 'date-fns';
 import { enUS } from 'date-fns/locale';
-
+import 'moment-timezone';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Clock } from 'lucide-react';
 import * as React from 'react';
@@ -13,6 +14,7 @@ import { useImperativeHandle, useRef } from 'react';
 import { DayPicker, DayPickerProps } from 'react-day-picker';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
 import { cn } from '../../../utils/cn';
+import { time } from 'console';
 
 // ---------- utils start ----------
 /**
@@ -125,52 +127,54 @@ function set12Hours(date: Date, value: string, period: Period) {
 type TimePickerType = 'minutes' | 'seconds' | 'hours' | '12hours';
 type Period = 'AM' | 'PM';
 
-function setDateByType(date: Date, value: string, type: TimePickerType, period?: Period) {
-  switch (type) {
-    case 'minutes':
-      return setMinutes(date, value);
-    case 'seconds':
-      return setSeconds(date, value);
-    case 'hours':
-      return setHours(date, value);
-    case '12hours': {
-      if (!period) return date;
+function setDateByType(date: Date, value: string, period?: Period) {
+  // switch (type) {
+  //   case 'minutes':
+  //     return setMinutes(date, value);
+  //   case 'seconds':
+  //     return setSeconds(date, value);
+  //   case 'hours':
+  //     return setHours(date, value);
+  //   case '12hours': {
+  //     if (!period) return date;
       return set12Hours(date, value, period);
-    }
-    default:
-      return date;
-  }
+  //   }
+    // default:
+    //   return date;
+  // }
 }
 
-function getDateByType(date: Date | null, type: TimePickerType) {
-  if (!date) return '00';
-  switch (type) {
-    case 'minutes':
-      return getValidMinuteOrSecond(String(date.getMinutes()));
-    case 'seconds':
-      return getValidMinuteOrSecond(String(date.getSeconds()));
-    case 'hours':
-      return getValidHour(String(date.getHours()));
-    case '12hours':
+function getDateByType(date: Date | null) {
+  // if (!date) return '00';
+  // switch (type) {
+  //   case 'minutes':
+  //     return getValidMinuteOrSecond(String(date.getMinutes()));
+  //   case 'seconds':
+  //     return getValidMinuteOrSecond(String(date.getSeconds()));
+  //   case 'hours':
+  //     return getValidHour(String(date.getHours()));
+  //   case '12hours':
       return getValid12Hour(String(display12HourValue(date.getHours())));
-    default:
-      return '00';
-  }
+    // default:
+    //   return '00';
+  // }
 }
 
-function getArrowByType(value: string, step: number, type: TimePickerType) {
-  switch (type) {
-    case 'minutes':
-      return getValidArrowMinuteOrSecond(value, step);
-    case 'seconds':
-      return getValidArrowMinuteOrSecond(value, step);
-    case 'hours':
-      return getValidArrowHour(value, step);
-    case '12hours':
-      return getValidArrow12Hour(value, step);
-    default:
-      return '00';
-  }
+function getArrowByType(value: string, step: number) {
+
+  return getValidArrow12Hour(value, step);
+  // switch (type) {
+  //   case 'minutes':
+  //     return getValidArrowMinuteOrSecond(value, step);
+  //   case 'seconds':
+  //     return getValidArrowMinuteOrSecond(value, step);
+  //   case 'hours':
+  //     return getValidArrowHour(value, step);
+  //   case '12hours':
+  //     return getValidArrow12Hour(value, step);
+  //   default:
+  //     return '00';
+  // }
 }
 
 /**
@@ -208,7 +212,7 @@ function display12HourValue(hours: number) {
 function genMonths(locale: Pick<Locale, 'options' | 'localize' | 'formatLong'>) {
   return Array.from({ length: 12 }, (_, i) => ({
     value: i,
-    label: format(new Date(2021, i), 'MMMM', { locale }),
+    label: format(new Date(2021, i), 'MMMM'),
   }));
 }
 
@@ -290,11 +294,11 @@ function Calendar({
         weekdays: cn('flex', props.showWeekNumber && 'justify-end'),
         weekday: 'text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]',
         week: 'flex w-full mt-2',
-        day: 'h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20 rounded-1',
+        day: cn(buttonVariants({ variant: 'ghost' }),'h-9 w-9 text-center hover:bg-accent text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20 rounded-1'),
         day_button: cn(
-          buttonVariants({ variant: 'ghost' }),
           'h-9 w-9 p-0 font-normal aria-selected:opacity-100 rounded-l-md rounded-r-md',
         ),
+
         range_end: 'day-range-end',
         selected:
           'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground rounded-l-md rounded-r-md',
@@ -327,7 +331,7 @@ function Calendar({
                 <SelectTrigger className="focus:bg-accent focus:text-accent-foreground w-fit gap-1 border-none p-0">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent position='popper'>
                   {MONTHS.map((month) => (
                     <SelectItem key={month.value} value={month.value.toString()}>
                       {month.label}
@@ -391,7 +395,7 @@ const TimePeriodSelect = React.forwardRef<HTMLButtonElement, PeriodSelectorProps
         const tempDate = new Date(date);
         const hours = display12HourValue(date.getHours());
         onDateChange?.(
-          setDateByType(tempDate, hours.toString(), '12hours', period === 'AM' ? 'PM' : 'AM'),
+          setDateByType(tempDate, hours.toString(), period === 'AM' ? 'PM' : 'AM'),
         );
       }
     };
@@ -419,7 +423,7 @@ const TimePeriodSelect = React.forwardRef<HTMLButtonElement, PeriodSelectorProps
 TimePeriodSelect.displayName = 'TimePeriodSelect';
 
 interface TimePickerInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  picker: TimePickerType;
+  // picker: TimePickerType;
   date?: Date | null;
   onDateChange?: (date: Date | undefined) => void;
   period?: Period;
@@ -439,7 +443,7 @@ const TimePickerInput = React.forwardRef<HTMLInputElement, TimePickerInputProps>
       onDateChange,
       onChange,
       onKeyDown,
-      picker,
+      // picker,
       period,
       onLeftFocus,
       onRightFocus,
@@ -465,17 +469,17 @@ const TimePickerInput = React.forwardRef<HTMLInputElement, TimePickerInputProps>
     }, [flag]);
 
     const calculatedValue = React.useMemo(() => {
-      return getDateByType(date, picker);
-    }, [date, picker]);
+      return getDateByType(date);
+    }, [date]);
 
     const calculateNewValue = (key: string) => {
       /*
        * If picker is '12hours' and the first digit is 0, then the second digit is automatically set to 1.
        * The second entered digit will break the condition and the value will be set to 10-12.
        */
-      if (picker === '12hours') {
-        if (flag && calculatedValue.slice(1, 2) === '1' && prevIntKey === '0') return `0${key}`;
-      }
+      // if (picker === '12hours') {
+      //   if (flag && calculatedValue.slice(1, 2) === '1' && prevIntKey === '0') return `0${key}`;
+      // }
 
       return !flag ? `0${key}` : calculatedValue.slice(1, 2) + key;
     };
@@ -487,27 +491,27 @@ const TimePickerInput = React.forwardRef<HTMLInputElement, TimePickerInputProps>
       if (e.key === 'ArrowLeft') onLeftFocus?.();
       if (['ArrowUp', 'ArrowDown'].includes(e.key)) {
         const step = e.key === 'ArrowUp' ? 1 : -1;
-        const newValue = getArrowByType(calculatedValue, step, picker);
+        const newValue = getArrowByType(calculatedValue, step);
         if (flag) setFlag(false);
         const tempDate = date ? new Date(date) : new Date();
-        onDateChange?.(setDateByType(tempDate, newValue, picker, period));
+        onDateChange?.(setDateByType(tempDate, newValue, period));
       }
       if (e.key >= '0' && e.key <= '9') {
-        if (picker === '12hours') setPrevIntKey(e.key);
+        // if (picker === '12hours') setPrevIntKey(e.key);
 
         const newValue = calculateNewValue(e.key);
         if (flag) onRightFocus?.();
         setFlag((prev) => !prev);
         const tempDate = date ? new Date(date) : new Date();
-        onDateChange?.(setDateByType(tempDate, newValue, picker, period));
+        onDateChange?.(setDateByType(tempDate, newValue, period));
       }
     };
 
     return (
       <Input
         ref={ref}
-        id={id || picker}
-        name={name || picker}
+        id={id}
+        name={name}
         className={cn(
           'focus:bg-accent focus:text-accent-foreground w-[48px] text-center font-mono text-base tabular-nums caret-transparent [&::-webkit-inner-spin-button]:appearance-none',
           className,
@@ -572,7 +576,7 @@ const TimePicker = React.forwardRef<TimePickerRef, TimePickerProps>(
           <Clock className="mr-2 h-4 w-4" />
         </label>
         <TimePickerInput
-          picker={hourCycle === 24 ? 'hours' : '12hours'}
+          // picker={hourCycle === 24 ? 'hours' : '12hours'}
           date={date}
           id="datetime-picker-hour-input"
           onDateChange={onChange}
@@ -584,7 +588,7 @@ const TimePicker = React.forwardRef<TimePickerRef, TimePickerProps>(
           <>
             :
             <TimePickerInput
-              picker="minutes"
+              // picker="minutes"
               date={date}
               onDateChange={onChange}
               ref={minuteRef}
@@ -597,7 +601,7 @@ const TimePicker = React.forwardRef<TimePickerRef, TimePickerProps>(
           <>
             :
             <TimePickerInput
-              picker="seconds"
+              // picker="seconds"
               date={date}
               onDateChange={onChange}
               ref={secondRef}
@@ -638,6 +642,8 @@ type DateTimePickerProps = {
   onChange?: (date: Date | undefined) => void;
   onMonthChange?: (date: Date | undefined) => void;
   disabled?: boolean;
+  dateFormat?: string;
+  timeFormat?: string;
   /** showing `AM/PM` or not. */
   hourCycle?: 12 | 24;
   placeholder?: string;
@@ -677,7 +683,8 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
       value,
       onChange,
       onMonthChange,
-      hourCycle = 24,
+      dateFormat,
+      timeFormat,
       yearRange = 50,
       disabled = false,
       displayFormat,
@@ -745,14 +752,15 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
       [displayDate],
     );
 
-    const initHourFormat = {
-      hour24:
-        displayFormat?.hour24 ??
-        `PPP HH:mm${!granularity || granularity === 'second' ? ':ss' : ''}`,
-      hour12:
-        displayFormat?.hour12 ??
-        `PP hh:mm${!granularity || granularity === 'second' ? ':ss' : ''} b`,
-    };
+
+    // const initHourFormat = {
+    //   hour24:
+    //     displayFormat?.hour24 ??
+    //     `PPP HH:mm${!granularity || granularity === 'second' ? ':ss' : ''}`,
+    //   hour12:
+    //     displayFormat?.hour12 ??
+    //     `PP hh:mm${!granularity || granularity === 'second' ? ':ss' : ''} b`,
+    // };
 
     let loc = enUS;
     const { options, localize, formatLong } = locale;
@@ -778,7 +786,10 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
             ref={buttonRef}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {displayDate ? (
+            <span>{displayDate? format(displayDate, dateFormat): placeholder}</span>
+
+            
+            {/* {displayDate ? (
               format(
                 displayDate,
                 hourCycle === 24 ? initHourFormat.hour24 : initHourFormat.hour12,
@@ -788,7 +799,7 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
               )
             ) : (
               <span>{placeholder}</span>
-            )}
+            )} */}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0">
@@ -822,7 +833,7 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
                   }
                 }}
                 date={month}
-                hourCycle={hourCycle}
+                // hourCycle={hourCycle}
                 granularity={granularity}
               />
             </div>
@@ -834,6 +845,19 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
 );
 
 DateTimePicker.displayName = 'DateTimePicker';
+
+
+const format = (date: Date, format: string)=> {
+  console.log('date (format)', date);
+  console.log('format (format)', format);
+  const m = moment(date).tz(moment.tz.guess());
+  return m.format(format);
+  // return moment(date).format(format)
+};
+
+// const formatDate = (date: string, format: string ) => {
+//     moment.tz(date, format).toString();
+// }
 
 export { DateTimePicker, TimePickerInput, TimePicker };
 export type { TimePickerType, DateTimePickerProps, DateTimePickerRef };
