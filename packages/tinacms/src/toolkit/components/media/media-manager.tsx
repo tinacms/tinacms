@@ -581,8 +581,8 @@ const ActiveItemPreview = ({
                   variant='primary'
                   onClick={() => selectMediaItem(activeItem)}
                 >
+                  <BiArrowToBottom className='mr-1 -ml-0.5 w-6 h-auto opacity-70' />
                   Insert
-                  <BiArrowToBottom className='ml-1 -mr-0.5 w-6 h-auto opacity-70' />
                 </Button>
               )}
               {allowDelete && (
@@ -591,8 +591,8 @@ const ActiveItemPreview = ({
                   size='medium'
                   onClick={deleteMediaItem}
                 >
+                  <TrashIcon className='mr-1 -ml-0.5 w-6 h-auto opacity-70' />
                   Delete
-                  <TrashIcon className='ml-1 -mr-0.5 w-6 h-auto opacity-70' />
                 </Button>
               )}
             </div>

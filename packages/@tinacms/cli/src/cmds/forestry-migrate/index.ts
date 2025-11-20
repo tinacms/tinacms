@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 import yaml from 'js-yaml';
-import minimatch from 'minimatch';
+import { minimatch } from 'minimatch';
 import { parseFile, stringifyFile } from '@tinacms/graphql';
 import type {
   Collection,

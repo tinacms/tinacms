@@ -546,7 +546,7 @@ mutation addPendingDocumentMutation(
   usingProtectedBranch() {
     return (
       this.usingEditorialWorkflow &&
-      this.protectedBranches?.includes(this.branch)
+      this.protectedBranches?.includes(decodeURIComponent(this.branch))
     );
   }
   async createBranch({ baseBranch, branchName }: BranchData) {

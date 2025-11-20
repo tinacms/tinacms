@@ -48,6 +48,6 @@
 	"dependencies": {
 		"picomatch-browser": "catalog:",
 		"url-pattern": "catalog:",
-		"zod": "^3.24.2"
+		"zod": "catalog:"
 	}
 }

@@ -1,5 +1,15 @@
 # create-tina-app
 
+## 1.6.0
+
+### Minor Changes
+
+- [#6054](https://github.com/tinacms/tinacms/pull/6054) [`6727bcf`](https://github.com/tinacms/tinacms/commit/6727bcf95200e05e8388986de4546f1730a1be47) Thanks [@0xharkirat](https://github.com/0xharkirat)! - fix broken links, from `tina.io/docs/tina-cloud` to `tina.io/docs/tinacloud`
+
+### Patch Changes
+
+- [#6059](https://github.com/tinacms/tinacms/pull/6059) [`b23aa0c`](https://github.com/tinacms/tinacms/commit/b23aa0c5defc51b8f9fe00a59dd87e1d2f8b9f0b) Thanks [@kulesy](https://github.com/kulesy)! - docs: Update references from tina-cloud-starter to tina-nextjs-starter
+
 ## 1.5.2
 
 ### Patch Changes

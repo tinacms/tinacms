@@ -8,7 +8,7 @@ Right now, the first phase adds a more "complete" Document Creator utilizing you
 
 ## How to Setup
 
-### From a fresh `tina-cloud-starter`...
+### From a fresh `tina-nextjs-starter`...
 
 > Make sure you use the latest version of `tinacms` and `@tinacms/cli`!
 
@@ -117,7 +117,7 @@ A new `RouteMappingPlugin` accepts a single argument - the `mapper` function - t
 * If `mapper` returns a `string`, it displays a "View" link beside the document.
 * If `mapper` returns `undefined` (or `null` or `''`), no "View" link is displayed.
 
-Below is an example of how a `RouteMappingPlugin` might be added to our `tina-cloud-starter`:
+Below is an example of how a `RouteMappingPlugin` might be added to our `tina-nextjs-starter`:
 
 ```tsx
 const App = ({ Component, pageProps }) => {
