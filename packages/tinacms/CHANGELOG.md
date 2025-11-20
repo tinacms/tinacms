@@ -1,5 +1,33 @@
 # tinacms
 
+## 2.9.5
+
+### Patch Changes
+
+- [#6131](https://github.com/tinacms/tinacms/pull/6131) [`d900f4e`](https://github.com/tinacms/tinacms/commit/d900f4e6c6f0a86c94bba5f0925bbaa54eeb90db) Thanks [@kulesy](https://github.com/kulesy)! - Revert Sonner alert notifications
+
+## 2.9.4
+
+### Patch Changes
+
+- [#6124](https://github.com/tinacms/tinacms/pull/6124) [`e1b6d05`](https://github.com/tinacms/tinacms/commit/e1b6d05c6b31c5c0928633064a065ddd331667ca) Thanks [@kulesy](https://github.com/kulesy)! - ✨ Enhance CreateBranchModal - UI improvements and code organization
+
+- [#6126](https://github.com/tinacms/tinacms/pull/6126) [`4ee0dd9`](https://github.com/tinacms/tinacms/commit/4ee0dd95913392b0da12dd5c9344909e5292e911) Thanks [@kulesy](https://github.com/kulesy)! - feat: Integrate Sonner for alert notifications
+
+- [#6103](https://github.com/tinacms/tinacms/pull/6103) [`27e5ca9`](https://github.com/tinacms/tinacms/commit/27e5ca9b18a90f13f92425ebb2628b143d6a81be) Thanks [@Pat-Stuart](https://github.com/Pat-Stuart)! - Refactor collections UI
+
+## 2.9.3
+
+### Patch Changes
+
+- [#6106](https://github.com/tinacms/tinacms/pull/6106) [`9e8bc37`](https://github.com/tinacms/tinacms/commit/9e8bc37402c8aa4d408c38e00d4402d596b0d896) Thanks [@kulesy](https://github.com/kulesy)! - Re-enable conditional checks for branch preview button
+
+- [#6111](https://github.com/tinacms/tinacms/pull/6111) [`0f265aa`](https://github.com/tinacms/tinacms/commit/0f265aadf918ae6f5b789e298fc2c406a6df0b16) Thanks [@kulesy](https://github.com/kulesy)! - Refactor CreateBranchModal text for clarity and conciseness
+
+- [#6107](https://github.com/tinacms/tinacms/pull/6107) [`32bd9b2`](https://github.com/tinacms/tinacms/commit/32bd9b21b54462be3e83b2d3e4b4237a48758bb1) Thanks [@Pat-Stuart](https://github.com/Pat-Stuart)! - Fix for redundant icons in modals
+
+- [#6082](https://github.com/tinacms/tinacms/pull/6082) [`ce1414c`](https://github.com/tinacms/tinacms/commit/ce1414ce1b82e6755a96c9c12949cd469b43e283) Thanks [@JackDevAU](https://github.com/JackDevAU)! - fix: update rich text editor to take up the full width
+
 ## 2.9.2
 
 ### Patch Changes

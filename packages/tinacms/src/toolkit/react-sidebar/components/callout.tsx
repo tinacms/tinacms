@@ -11,7 +11,7 @@ export const Callout = ({
   children?: React.ReactNode;
   calloutStyle?: 'warning' | 'info' | 'success' | 'error';
 } & React.HTMLProps<HTMLDivElement>) => {
-  const commonAlertStyles = 'ml-8 text-sm px-4 py-3 rounded-md border';
+  const commonAlertStyles = 'text-sm px-4 py-3 rounded-md border';
 
   const styles = {
     warning: `text-amber-700 bg-amber-100 border-amber-700/20`,
