@@ -4,7 +4,6 @@
 "@tinacms/datalayer": patch
 "@tinacms/graphql": patch
 "@tinacms/mdx": patch
-"playwright-testing": patch
 ---
 
 Remove Lodash and replace usages with either native functions or es-toolkit equivalents
