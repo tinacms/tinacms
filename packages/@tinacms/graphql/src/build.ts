@@ -2,7 +2,11 @@
 
 */
 
-import { print, type OperationDefinitionNode, type DocumentNode } from 'graphql';
+import {
+  print,
+  type OperationDefinitionNode,
+  type DocumentNode,
+} from 'graphql';
 import type { TinaSchema, Config } from '@tinacms/schema-tools';
 import type { FragmentDefinitionNode, FieldDefinitionNode } from 'graphql';
 import { uniqBy } from 'es-toolkit';
