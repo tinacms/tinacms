@@ -1,4 +1,5 @@
 import * as React from 'react';
+import path from 'node:path';
 import { AiOutlineLoading } from 'react-icons/ai';
 import { BiError } from 'react-icons/bi';
 import { GitBranchIcon, TriangleAlert } from 'lucide-react';
@@ -53,10 +54,9 @@ const formatDefaultBranchName = (filePath: string): string => {
   }
 
   // Remove file extension
-  const lastDotIndex = result.lastIndexOf('.');
-  const lastSlashIndex = result.lastIndexOf('/');
-  if (lastDotIndex > lastSlashIndex && lastDotIndex !== -1) {
-    result = result.substring(0, lastDotIndex);
+  const ext = path.extname(result);
+  if (ext) {
+    result = result.slice(0, -ext.length);
   }
 
   return result;
