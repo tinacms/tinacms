@@ -1,22 +1,9 @@
-import path from 'node:path'
-import fs from 'fs-extra'
-import type { DocumentNode } from 'graphql'
-import { GraphQLError } from 'graphql'
-import micromatch from 'micromatch'
+import path from 'node:path';
+import fs from 'fs-extra';
+import type { DocumentNode } from 'graphql';
+import { GraphQLError } from 'graphql';
+import micromatch from 'micromatch';
 
-import { createSchema } from '../schema/createSchema'
-import { atob, btoa, get, lastItem, sequential } from '../util'
-import {
-  getTemplateForFile,
-  hasOwnProperty,
-  loadAndParseWithAliases,
-  normalizePath,
-  partitionPathsByCollection,
-  scanAllContent,
-  scanContentByPaths,
-  stringifyFile,
-  transformDocument,
-} from './util'
 import type {
   Collection,
   CollectionTemplateable,
@@ -24,23 +11,35 @@ import type {
   Template,
   TinaField,
   TinaSchema,
-} from '@tinacms/schema-tools'
-import type { Bridge } from './bridge'
-import { TinaFetchError, TinaQueryError } from '../resolver/error'
+} from '@tinacms/schema-tools';
+import sha from 'js-sha1';
+import set from 'lodash.set';
+import { FilesystemBridge, TinaLevelClient } from '..';
+import { generatePasswordHash, mapUserFields } from '../auth/utils';
+import { NotFoundError } from '../error';
+import { TinaFetchError, TinaQueryError } from '../resolver/error';
+import { createSchema } from '../schema/createSchema';
+import { atob, btoa, get, lastItem, sequential } from '../util';
+import { applyNameOverrides, replaceNameOverrides } from './alias-utils';
+import type { Bridge } from './bridge';
 import {
   type BinaryFilter,
-  coerceFilterChainOperands,
   DEFAULT_COLLECTION_SORT_KEY,
   DEFAULT_NUMERIC_LPAD,
   FOLDER_ROOT,
   FolderTreeBuilder,
   type IndexDefinition,
+  REFS_COLLECTIONS_SORT_KEY,
+  REFS_PATH_FIELD,
+  REFS_REFERENCE_FIELD,
+  type TernaryFilter,
+  coerceFilterChainOperands,
   makeFilter,
   makeFilterSuffixes,
   makeFolderOpsForCollection,
   makeIndexOpsForDocument,
-  type TernaryFilter,
-} from './datalayer'
+  makeRefOpsForDocument,
+} from './datalayer';
 import {
   ARRAY_ITEM_VALUE_SEPARATOR,
   type BatchOp,
@@ -51,83 +50,88 @@ import {
   LevelProxy,
   type PutOp,
   SUBLEVEL_OPTIONS,
-} from './level'
-import { applyNameOverrides, replaceNameOverrides } from './alias-utils'
-import sha from 'js-sha1'
-import { FilesystemBridge, TinaLevelClient } from '..'
-import { generatePasswordHash, mapUserFields } from '../auth/utils'
-import { NotFoundError } from '../error'
-import set from 'lodash.set'
+} from './level';
+import {
+  getTemplateForFile,
+  hasOwnProperty,
+  loadAndParseWithAliases,
+  normalizePath,
+  partitionPathsByCollection,
+  scanAllContent,
+  scanContentByPaths,
+  stringifyFile,
+  transformDocument,
+} from './util';
 
 type IndexStatusEvent = {
-  status: 'inprogress' | 'complete' | 'failed'
-  error?: Error
-}
-type IndexStatusCallback = (event: IndexStatusEvent) => Promise<void>
-export type OnPutCallback = (key: string, value: any) => Promise<void>
-export type OnDeleteCallback = (key: string) => Promise<void>
+  status: 'inprogress' | 'complete' | 'failed';
+  error?: Error;
+};
+type IndexStatusCallback = (event: IndexStatusEvent) => Promise<void>;
+export type OnPutCallback = (key: string, value: any) => Promise<void>;
+export type OnDeleteCallback = (key: string) => Promise<void>;
 
 export interface DatabaseArgs {
-  bridge?: Bridge
-  level: Level
-  onPut?: (key: string, value: any) => Promise<void>
-  onDelete?: (key: string) => Promise<void>
-  tinaDirectory?: string
-  indexStatusCallback?: IndexStatusCallback
-  version?: boolean
-  namespace?: string
+  bridge?: Bridge;
+  level: Level;
+  onPut?: (key: string, value: any) => Promise<void>;
+  onDelete?: (key: string) => Promise<void>;
+  tinaDirectory?: string;
+  indexStatusCallback?: IndexStatusCallback;
+  version?: boolean;
+  namespace?: string;
 }
 
 export interface GitProvider {
-  onPut: (key: string, value: string) => Promise<void>
-  onDelete: (key: string) => Promise<void>
+  onPut: (key: string, value: string) => Promise<void>;
+  onDelete: (key: string) => Promise<void>;
 }
 
 export type CreateDatabase = Omit<
   DatabaseArgs,
   'level' | 'onPut' | 'onDelete'
 > & {
-  databaseAdapter: Level
-  gitProvider: GitProvider
+  databaseAdapter: Level;
+  gitProvider: GitProvider;
 
   /**
    * @deprecated Use databaseAdapter instead
    */
-  level?: Level
+  level?: Level;
   /**
    * @deprecated Use gitProvider instead
    */
-  onPut?: OnPutCallback
+  onPut?: OnPutCallback;
   /**
    * @deprecated Use gitProvider instead
    */
-  onDelete?: OnDeleteCallback
-}
+  onDelete?: OnDeleteCallback;
+};
 
 export type CreateLocalDatabaseArgs = Omit<DatabaseArgs, 'level'> & {
-  port?: number
-  rootPath?: string
-}
+  port?: number;
+  rootPath?: string;
+};
 
 export const createLocalDatabase = (config?: CreateLocalDatabaseArgs) => {
-  const level = new TinaLevelClient(config?.port)
-  level.openConnection()
-  const fsBridge = new FilesystemBridge(config?.rootPath || process.cwd())
+  const level = new TinaLevelClient(config?.port);
+  level.openConnection();
+  const fsBridge = new FilesystemBridge(config?.rootPath || process.cwd());
   return new Database({
     bridge: fsBridge,
     ...(config || {}),
     level,
-  })
-}
+  });
+};
 
 export const createDatabase = (config: CreateDatabase) => {
   if (config.onPut && config.onDelete) {
     console.warn(
       'onPut and onDelete are deprecated. Please use gitProvider.onPut and gitProvider.onDelete instead.'
-    )
+    );
   }
   if (config.level) {
-    console.warn('level is deprecated. Please use databaseAdapter instead.')
+    console.warn('level is deprecated. Please use databaseAdapter instead.');
   }
   if (
     config.onPut &&
@@ -140,19 +144,19 @@ export const createDatabase = (config: CreateDatabase) => {
     return new Database({
       ...config,
       level: config.level,
-    })
+    });
   }
 
   if (!config.gitProvider) {
     throw new Error(
       'createDatabase requires a gitProvider. Please provide a gitProvider.'
-    )
+    );
   }
 
   if (!config.databaseAdapter) {
     throw new Error(
       'createDatabase requires a databaseAdapter. Please provide a databaseAdapter.'
-    )
+    );
   }
 
   return new Database({
@@ -162,123 +166,126 @@ export const createDatabase = (config: CreateDatabase) => {
     onPut: config.gitProvider.onPut.bind(config.gitProvider),
     onDelete: config.gitProvider.onDelete.bind(config.gitProvider),
     namespace: config.namespace || 'tinacms',
-  })
-}
+  });
+};
 
 export const createDatabaseInternal = (config: DatabaseArgs) => {
   return new Database({
     ...config,
     bridge: config.bridge,
     level: config.level,
-  })
-}
-const SYSTEM_FILES = ['_schema', '_graphql', '_lookup']
+  });
+};
+const SYSTEM_FILES = ['_schema', '_graphql', '_lookup'];
 
 /** Options for {@link Database.query} **/
 export type QueryOptions = {
-  fileExtension?: string
+  fileExtension?: string;
   /* collection name */
-  collection: string
+  collection: string;
   /* filters to apply to the query */
-  filterChain?: (BinaryFilter | TernaryFilter)[]
+  filterChain?: (BinaryFilter | TernaryFilter)[];
   /* sort (either field or index) */
-  sort?: string
+  sort?: string;
   /* limit results to first N items */
-  first?: number
+  first?: number;
   /* limit results to last N items */
-  last?: number
+  last?: number;
   /* specify cursor to start results at */
-  after?: string
+  after?: string;
   /* specify cursor to end results at */
-  before?: string
+  before?: string;
   /* folder to query */
-  folder?: string
-}
+  folder?: string;
+};
 
-const defaultStatusCallback: IndexStatusCallback = () => Promise.resolve()
-const defaultOnPut: OnPutCallback = () => Promise.resolve()
-const defaultOnDelete: OnDeleteCallback = () => Promise.resolve()
+const defaultStatusCallback: IndexStatusCallback = () => Promise.resolve();
+const defaultOnPut: OnPutCallback = () => Promise.resolve();
+const defaultOnDelete: OnDeleteCallback = () => Promise.resolve();
 
 export class Database {
-  public bridge?: Bridge
-  public rootLevel: Level
-  public appLevel: Level | undefined
-  public contentLevel: Level | undefined
-  public tinaDirectory: string
-  public indexStatusCallback: IndexStatusCallback | undefined
-  private readonly onPut: OnPutCallback
-  private readonly onDelete: OnDeleteCallback
-  private tinaSchema: TinaSchema | undefined
-  private contentNamespace: string | undefined
+  public bridge?: Bridge;
+  public rootLevel: Level;
+  public appLevel: Level | undefined;
+  public contentLevel: Level | undefined;
+  public tinaDirectory: string;
+  public indexStatusCallback: IndexStatusCallback | undefined;
+  private readonly onPut: OnPutCallback;
+  private readonly onDelete: OnDeleteCallback;
+  private tinaSchema: TinaSchema | undefined;
+  private contentNamespace: string | undefined;
 
   private collectionIndexDefinitions:
     | Record<string, Record<string, IndexDefinition>>
-    | undefined
-  private _lookup: { [returnType: string]: LookupMapType } | undefined
+    | undefined;
+  private collectionReferences:
+    | Record<string, Record<string, string[]>>
+    | undefined;
+  private _lookup: { [returnType: string]: LookupMapType } | undefined;
 
   constructor(public config: DatabaseArgs) {
-    this.tinaDirectory = config.tinaDirectory || 'tina'
-    this.bridge = config.bridge
+    this.tinaDirectory = config.tinaDirectory || 'tina';
+    this.bridge = config.bridge;
     this.rootLevel =
-      config.level && (new LevelProxy(config.level) as unknown as Level)
+      config.level && (new LevelProxy(config.level) as unknown as Level);
     this.indexStatusCallback =
-      config.indexStatusCallback || defaultStatusCallback
-    this.onPut = config.onPut || defaultOnPut
-    this.onDelete = config.onDelete || defaultOnDelete
-    this.contentNamespace = config.namespace
+      config.indexStatusCallback || defaultStatusCallback;
+    this.onPut = config.onPut || defaultOnPut;
+    this.onDelete = config.onDelete || defaultOnDelete;
+    this.contentNamespace = config.namespace;
   }
 
   private collectionForPath = async (filepath: string) => {
-    const tinaSchema = await this.getSchema(this.contentLevel)
+    const tinaSchema = await this.getSchema(this.contentLevel);
     try {
-      return tinaSchema.getCollectionByFullPath(filepath)
+      return tinaSchema.getCollectionByFullPath(filepath);
     } catch (e) {}
-  }
+  };
 
   private getGeneratedFolder = () =>
-    path.join(this.tinaDirectory, '__generated__')
+    path.join(this.tinaDirectory, '__generated__');
 
   private async updateDatabaseVersion(version: string) {
-    let metadataLevel = this.rootLevel.sublevel('_metadata', SUBLEVEL_OPTIONS)
+    let metadataLevel = this.rootLevel.sublevel('_metadata', SUBLEVEL_OPTIONS);
     if (this.contentNamespace) {
       metadataLevel = metadataLevel.sublevel(
         this.contentNamespace,
         SUBLEVEL_OPTIONS
-      )
+      );
     }
-    await metadataLevel.put('metadata', { version })
+    await metadataLevel.put('metadata', { version });
   }
 
   private async getDatabaseVersion(): Promise<string | undefined> {
-    let metadataLevel = this.rootLevel.sublevel('_metadata', SUBLEVEL_OPTIONS)
+    let metadataLevel = this.rootLevel.sublevel('_metadata', SUBLEVEL_OPTIONS);
     if (this.contentNamespace) {
       metadataLevel = metadataLevel.sublevel(
         this.contentNamespace,
         SUBLEVEL_OPTIONS
-      )
+      );
     }
-    const metadata = await metadataLevel.get('metadata')
-    return metadata?.version
+    const metadata = await metadataLevel.get('metadata');
+    return metadata?.version;
   }
 
   private async initLevel() {
     if (this.contentLevel) {
-      return
+      return;
     }
 
-    this.appLevel = this.rootLevel.sublevel('_appData', SUBLEVEL_OPTIONS)
+    this.appLevel = this.rootLevel.sublevel('_appData', SUBLEVEL_OPTIONS);
     if (!this.config.version) {
       this.contentLevel = this.contentNamespace
         ? this.rootLevel
             .sublevel('_content', SUBLEVEL_OPTIONS)
             .sublevel(this.contentNamespace, SUBLEVEL_OPTIONS)
-        : this.rootLevel.sublevel('_content', SUBLEVEL_OPTIONS)
+        : this.rootLevel.sublevel('_content', SUBLEVEL_OPTIONS);
     } else {
-      let version = await this.getDatabaseVersion()
+      let version = await this.getDatabaseVersion();
       if (!version) {
-        version = ''
+        version = '';
         try {
-          await this.updateDatabaseVersion(version)
+          await this.updateDatabaseVersion(version);
         } catch (e) {} // this might fail on queries that don't have a version
       }
       this.contentLevel = this.contentNamespace
@@ -286,51 +293,51 @@ export class Database {
             .sublevel('_content')
             .sublevel(this.contentNamespace, SUBLEVEL_OPTIONS)
             .sublevel(version, SUBLEVEL_OPTIONS)
-        : this.rootLevel.sublevel(version, SUBLEVEL_OPTIONS)
+        : this.rootLevel.sublevel(version, SUBLEVEL_OPTIONS);
     }
 
     // Make sure this error bubbles up to the user
     if (!this.contentLevel) {
-      throw new GraphQLError('Error initializing LevelDB instance')
+      throw new GraphQLError('Error initializing LevelDB instance');
     }
   }
 
   public getMetadata = async (key: string) => {
-    await this.initLevel()
-    let metadataLevel = this.rootLevel.sublevel('_metadata', SUBLEVEL_OPTIONS)
+    await this.initLevel();
+    let metadataLevel = this.rootLevel.sublevel('_metadata', SUBLEVEL_OPTIONS);
     if (this.contentNamespace) {
       metadataLevel = metadataLevel.sublevel(
         this.contentNamespace,
         SUBLEVEL_OPTIONS
-      )
+      );
     }
-    const metadata = await metadataLevel.get(`metadata_${key}`)
-    return metadata?.value
-  }
+    const metadata = await metadataLevel.get(`metadata_${key}`);
+    return metadata?.value;
+  };
 
   public setMetadata = async (key: string, value: string) => {
-    await this.initLevel()
-    let metadataLevel = this.rootLevel.sublevel('_metadata', SUBLEVEL_OPTIONS)
+    await this.initLevel();
+    let metadataLevel = this.rootLevel.sublevel('_metadata', SUBLEVEL_OPTIONS);
     if (this.contentNamespace) {
       metadataLevel = metadataLevel.sublevel(
         this.contentNamespace,
         SUBLEVEL_OPTIONS
-      )
+      );
     }
-    return metadataLevel.put(`metadata_${key}`, { value })
-  }
+    return metadataLevel.put(`metadata_${key}`, { value });
+  };
 
   public get = async <T extends object>(filepath: string): Promise<T> => {
-    await this.initLevel()
+    await this.initLevel();
     if (SYSTEM_FILES.includes(filepath)) {
-      throw new Error(`Unexpected get for config file ${filepath}`)
+      throw new Error(`Unexpected get for config file ${filepath}`);
     } else {
-      let collection: Collection<true> | undefined
-      let level = this.contentLevel
+      let collection: Collection<true> | undefined;
+      let level = this.contentLevel;
       if (this.appLevel) {
-        collection = await this.collectionForPath(filepath)
+        collection = await this.collectionForPath(filepath);
         if (collection?.isDetached) {
-          level = this.appLevel.sublevel(collection.name, SUBLEVEL_OPTIONS)
+          level = this.appLevel.sublevel(collection.name, SUBLEVEL_OPTIONS);
         }
       }
       const contentObject = await level
@@ -338,47 +345,50 @@ export class Database {
           CONTENT_ROOT_PREFIX,
           SUBLEVEL_OPTIONS
         )
-        .get(normalizePath(filepath))
+        .get(normalizePath(filepath));
 
       if (!contentObject) {
-        throw new NotFoundError(`Unable to find record ${filepath}`)
+        throw new NotFoundError(`Unable to find record ${filepath}`);
       }
       return transformDocument(
         filepath,
         contentObject,
         await this.getSchema(this.contentLevel)
-      )
+      );
     }
-  }
+  };
 
   public addPendingDocument = async (
     filepath: string,
     data: { [key: string]: unknown }
   ) => {
-    await this.initLevel()
-    const dataFields = await this.formatBodyOnPayload(filepath, data)
+    await this.initLevel();
+    const dataFields = await this.formatBodyOnPayload(filepath, data);
 
-    const collection = await this.collectionForPath(filepath)
+    const collection = await this.collectionForPath(filepath);
     if (!collection) {
-      throw new GraphQLError(`Unable to find collection for ${filepath}`)
+      throw new GraphQLError(`Unable to find collection for ${filepath}`);
     }
 
     const stringifiedFile = await this.stringifyFile(
       filepath,
       dataFields,
       collection
-    )
+    );
 
-    const indexDefinitions = await this.getIndexDefinitions(this.contentLevel)
-    const collectionIndexDefinitions = indexDefinitions?.[collection.name]
-    const normalizedPath = normalizePath(filepath)
+    const indexDefinitions = await this.getIndexDefinitions(this.contentLevel);
+    const collectionIndexDefinitions = indexDefinitions?.[collection.name];
+    const collectionReferences = (await this.getCollectionReferences())?.[
+      collection.name
+    ];
+    const normalizedPath = normalizePath(filepath);
     if (!collection?.isDetached) {
       if (this.bridge) {
-        await this.bridge.put(normalizedPath, stringifiedFile)
+        await this.bridge.put(normalizedPath, stringifiedFile);
       }
 
       try {
-        await this.onPut(normalizedPath, stringifiedFile)
+        await this.onPut(normalizedPath, stringifiedFile);
       } catch (e) {
         throw new GraphQLError(
           `Error running onPut hook for ${filepath}: ${e}`,
@@ -387,21 +397,29 @@ export class Database {
           null,
           null,
           e
-        )
+        );
       }
     }
 
-    let level = this.contentLevel
+    let level = this.contentLevel;
     if (collection?.isDetached) {
-      level = this.appLevel.sublevel(collection.name, SUBLEVEL_OPTIONS)
+      level = this.appLevel.sublevel(collection.name, SUBLEVEL_OPTIONS);
     }
-    const folderTreeBuilder = new FolderTreeBuilder()
-    const folderKey = folderTreeBuilder.update(filepath, collection.path || '')
+    const folderTreeBuilder = new FolderTreeBuilder();
+    const folderKey = folderTreeBuilder.update(filepath, collection.path || '');
 
-    let putOps: BatchOp[] = []
-    let delOps: BatchOp[] = []
+    let putOps: BatchOp[] = [];
+    let delOps: BatchOp[] = [];
     if (!isGitKeep(normalizedPath, collection)) {
       putOps = [
+        ...makeRefOpsForDocument(
+          normalizedPath,
+          collection?.name,
+          collectionReferences,
+          dataFields,
+          'put',
+          level
+        ),
         ...makeIndexOpsForDocument(
           normalizedPath,
           collection?.name,
@@ -419,17 +437,25 @@ export class Database {
           'put',
           level
         ),
-      ]
+      ];
 
       const existingItem = await level
         .sublevel<string, Record<string, any>>(
           CONTENT_ROOT_PREFIX,
           SUBLEVEL_OPTIONS
         )
-        .get(normalizedPath)
+        .get(normalizedPath);
 
       delOps = existingItem
         ? [
+            ...makeRefOpsForDocument(
+              normalizedPath,
+              collection?.name,
+              collectionReferences,
+              existingItem,
+              'del',
+              level
+            ),
             ...makeIndexOpsForDocument(
               normalizedPath,
               collection?.name,
@@ -448,7 +474,7 @@ export class Database {
               level
             ),
           ]
-        : []
+        : [];
     }
 
     const ops: BatchOp[] = [
@@ -463,45 +489,48 @@ export class Database {
           SUBLEVEL_OPTIONS
         ),
       },
-    ]
+    ];
 
-    await level.batch(ops)
-  }
+    await level.batch(ops);
+  };
 
   public put = async (
     filepath: string,
     data: { [key: string]: unknown },
     collectionName?: string
   ) => {
-    await this.initLevel()
+    await this.initLevel();
 
     try {
       if (SYSTEM_FILES.includes(filepath)) {
         // noinspection ExceptionCaughtLocallyJS
-        throw new Error(`Unexpected put for config file ${filepath}`)
+        throw new Error(`Unexpected put for config file ${filepath}`);
       } else {
-        let collectionIndexDefinitions: Record<string, IndexDefinition>
+        let collectionIndexDefinitions: Record<string, IndexDefinition>;
         if (collectionName) {
           const indexDefinitions = await this.getIndexDefinitions(
             this.contentLevel
-          )
-          collectionIndexDefinitions = indexDefinitions?.[collectionName]
+          );
+          collectionIndexDefinitions = indexDefinitions?.[collectionName];
         }
+        const collectionReferences = (await this.getCollectionReferences())?.[
+          collectionName
+        ];
 
-        const normalizedPath = normalizePath(filepath)
-        const dataFields = await this.formatBodyOnPayload(filepath, data)
-        const collection = await this.collectionForPath(filepath)
+        const normalizedPath = normalizePath(filepath);
+        const dataFields = await this.formatBodyOnPayload(filepath, data);
+        const collection = await this.collectionForPath(filepath);
         if (!collection) {
           // noinspection ExceptionCaughtLocallyJS
-          throw new GraphQLError(`Unable to find collection for ${filepath}.`)
+          throw new GraphQLError(`Unable to find collection for ${filepath}.`);
         }
 
         // If a collection match is specified, make sure the file matches the glob.
         // TODO: Maybe we should service this error better in the frontend?
         if (collection.match?.exclude || collection.match?.include) {
-          const matches = this.tinaSchema.getMatches({ collection })
+          const matches = this.tinaSchema.getMatches({ collection });
 
-          const match = micromatch.isMatch(filepath, matches)
+          const match = micromatch.isMatch(filepath, matches);
 
           if (!match) {
             // noinspection ExceptionCaughtLocallyJS
@@ -513,7 +542,7 @@ export class Database {
               )}. Please change the filename or update matches for ${
                 collection.name
               } in your config file.`
-            )
+            );
           }
         }
 
@@ -521,14 +550,14 @@ export class Database {
           `.gitkeep.${collection.format || 'md'}`
         )
           ? ''
-          : await this.stringifyFile(filepath, dataFields, collection)
+          : await this.stringifyFile(filepath, dataFields, collection);
 
         if (!collection?.isDetached) {
           if (this.bridge) {
-            await this.bridge.put(normalizedPath, stringifiedFile)
+            await this.bridge.put(normalizedPath, stringifiedFile);
           }
           try {
-            await this.onPut(normalizedPath, stringifiedFile)
+            await this.onPut(normalizedPath, stringifiedFile);
           } catch (e) {
             // noinspection ExceptionCaughtLocallyJS
             throw new GraphQLError(
@@ -538,23 +567,31 @@ export class Database {
               null,
               null,
               e
-            )
+            );
           }
         }
 
-        const folderTreeBuilder = new FolderTreeBuilder()
+        const folderTreeBuilder = new FolderTreeBuilder();
         const folderKey = folderTreeBuilder.update(
           filepath,
           collection.path || ''
-        )
+        );
         const level = collection?.isDetached
           ? this.appLevel.sublevel(collection?.name, SUBLEVEL_OPTIONS)
-          : this.contentLevel
+          : this.contentLevel;
 
-        let putOps: BatchOp[] = []
-        let delOps: BatchOp[] = []
+        let putOps: BatchOp[] = [];
+        let delOps: BatchOp[] = [];
         if (!isGitKeep(normalizedPath, collection)) {
           putOps = [
+            ...makeRefOpsForDocument(
+              normalizedPath,
+              collectionName,
+              collectionReferences,
+              dataFields,
+              'put',
+              level
+            ),
             ...makeIndexOpsForDocument(
               normalizedPath,
               collectionName,
@@ -572,17 +609,25 @@ export class Database {
               'put',
               level
             ),
-          ]
+          ];
 
           const existingItem = await level
             .sublevel<string, Record<string, any>>(
               CONTENT_ROOT_PREFIX,
               SUBLEVEL_OPTIONS
             )
-            .get(normalizedPath)
+            .get(normalizedPath);
 
           delOps = existingItem
             ? [
+                ...makeRefOpsForDocument(
+                  normalizedPath,
+                  collectionName,
+                  collectionReferences,
+                  existingItem,
+                  'del',
+                  level
+                ),
                 ...makeIndexOpsForDocument(
                   normalizedPath,
                   collectionName,
@@ -601,7 +646,7 @@ export class Database {
                   level
                 ),
               ]
-            : []
+            : [];
         }
 
         const ops: BatchOp[] = [
@@ -616,88 +661,88 @@ export class Database {
               SUBLEVEL_OPTIONS
             ),
           },
-        ]
+        ];
 
-        await level.batch(ops)
+        await level.batch(ops);
       }
-      return true
+      return true;
     } catch (error) {
       if (error instanceof GraphQLError) {
-        throw error
+        throw error;
       }
       throw new TinaFetchError(`Error in PUT for ${filepath}`, {
         originalError: error,
         file: filepath,
         collection: collectionName,
-        stack: error.stack,
-      })
+      });
     }
-  }
+  };
 
   public async getTemplateDetailsForFile(
     collection: Collection<true>,
     data: { [key: string]: unknown }
   ) {
-    const tinaSchema = await this.getSchema()
-    const templateInfo = await tinaSchema.getTemplatesForCollectable(collection)
+    const tinaSchema = await this.getSchema();
+    const templateInfo =
+      await tinaSchema.getTemplatesForCollectable(collection);
 
-    let template: Template | undefined
+    let template: Template | undefined;
     if (templateInfo.type === 'object') {
-      template = templateInfo.template
+      template = templateInfo.template;
     }
     if (templateInfo.type === 'union') {
       if (hasOwnProperty(data, '_template')) {
         template = templateInfo.templates.find(
           (t) => lastItem(t.namespace) === data._template
-        )
+        );
       } else {
         throw new Error(
           `Expected _template to be provided for document in an ambiguous collection`
-        )
+        );
       }
     }
     if (!template) {
-      throw new Error(`Unable to determine template`)
+      throw new Error(`Unable to determine template`);
     }
 
     return {
       template: template,
       info: templateInfo,
-    }
+    };
   }
 
   public formatBodyOnPayload = async (
     filepath: string,
     data: { [key: string]: unknown }
   ) => {
-    const collection = await this.collectionForPath(filepath)
+    const collection = await this.collectionForPath(filepath);
     if (!collection) {
-      throw new Error(`Unable to find collection for path ${filepath}`)
+      throw new Error(`Unable to find collection for path ${filepath}`);
     }
 
-    const { template } = await this.getTemplateDetailsForFile(collection, data)
+    const { template } = await this.getTemplateDetailsForFile(collection, data);
     const bodyField = template.fields.find((field) => {
       if (field.type === 'string' || field.type === 'rich-text') {
         if (field.isBody) {
-          return true
+          return true;
         }
       }
-      return false
-    })
-    let payload: { [key: string]: unknown } = {}
+      return false;
+    });
+    let payload: { [key: string]: unknown } = {};
     if (['md', 'mdx'].includes(collection.format) && bodyField) {
       Object.entries(data).forEach(([key, value]) => {
         if (key !== bodyField.name) {
-          payload[key] = value
+          payload[key] = value;
         }
-      })
-      payload['$_body'] = data[bodyField.name]
+      });
+      payload['$_body'] = data[bodyField.name];
     } else {
-      payload = data
+      payload = data;
     }
 
-    return payload
-  }
+    return payload;
+  };
 
   public stringifyFile = async (
     filepath: string,
@@ -707,12 +752,12 @@ export class Database {
     const templateDetails = await this.getTemplateDetailsForFile(
       collection,
       payload
-    )
-    const writeTemplateKey = templateDetails.info.type === 'union'
+    );
+    const writeTemplateKey = templateDetails.info.type === 'union';
 
-    const aliasedData = applyNameOverrides(templateDetails.template, payload)
+    const aliasedData = applyNameOverrides(templateDetails.template, payload);
 
-    const extension = path.extname(filepath)
+    const extension = path.extname(filepath);
     return stringifyFile(
       aliasedData,
       extension,
@@ -721,36 +766,36 @@ export class Database {
         frontmatterFormat: collection?.frontmatterFormat,
         frontmatterDelimiters: collection?.frontmatterDelimiters,
       }
-    )
-  }
+    );
+  };
 
   /**
    * Clears the internal cache of the tinaSchema and the lookup file. This allows the state to be reset
    */
   public clearCache() {
-    this.tinaSchema = null
-    this._lookup = null
-    this.collectionIndexDefinitions = null
+    this.tinaSchema = null;
+    this._lookup = null;
+    this.collectionIndexDefinitions = null;
   }
 
   public flush = async (filepath: string) => {
-    const data = await this.get<{ [key: string]: unknown }>(filepath)
+    const data = await this.get<{ [key: string]: unknown }>(filepath);
 
-    const dataFields = await this.formatBodyOnPayload(filepath, data)
-    const collection = await this.collectionForPath(filepath)
+    const dataFields = await this.formatBodyOnPayload(filepath, data);
+    const collection = await this.collectionForPath(filepath);
     if (!collection) {
-      throw new Error(`Unable to find collection for path ${filepath}`)
+      throw new Error(`Unable to find collection for path ${filepath}`);
     }
-    return this.stringifyFile(filepath, dataFields, collection)
-  }
+    return this.stringifyFile(filepath, dataFields, collection);
+  };
 
   public getLookup = async (
     returnType?: string
   ): Promise<LookupMapType | Record<string, LookupMapType>> => {
-    await this.initLevel()
+    await this.initLevel();
     const lookupPath = normalizePath(
       path.join(this.getGeneratedFolder(), `_lookup.json`)
-    )
+    );
     if (!this._lookup) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -759,87 +804,150 @@ export class Database {
           CONTENT_ROOT_PREFIX,
           SUBLEVEL_OPTIONS
         )
-        .get(lookupPath)
+        .get(lookupPath);
     }
-    return returnType ? this._lookup[returnType] : this._lookup
-  }
+    return returnType ? this._lookup[returnType] : this._lookup;
+  };
   public getGraphQLSchema = async (): Promise<DocumentNode> => {
-    await this.initLevel()
+    await this.initLevel();
     const graphqlPath = normalizePath(
       path.join(this.getGeneratedFolder(), `_graphql.json`)
-    )
+    );
     return (await this.contentLevel
       .sublevel<string, Record<string, any>>(
         CONTENT_ROOT_PREFIX,
         SUBLEVEL_OPTIONS
       )
-      .get(graphqlPath)) as unknown as DocumentNode
-  }
+      .get(graphqlPath)) as unknown as DocumentNode;
+  };
   //TODO - is there a reason why the database fetches some config with "bridge.get", and some with "store.get"?
   public getGraphQLSchemaFromBridge = async (): Promise<DocumentNode> => {
     if (!this.bridge) {
-      throw new Error(`No bridge configured`)
+      throw new Error(`No bridge configured`);
     }
 
     const graphqlPath = normalizePath(
       path.join(this.getGeneratedFolder(), `_graphql.json`)
-    )
-    const _graphql = await this.bridge.get(graphqlPath)
-    return JSON.parse(_graphql)
-  }
+    );
+    const _graphql = await this.bridge.get(graphqlPath);
+    return JSON.parse(_graphql);
+  };
   public getTinaSchema = async (level?: Level): Promise<Schema> => {
-    await this.initLevel()
+    await this.initLevel();
     const schemaPath = normalizePath(
       path.join(this.getGeneratedFolder(), `_schema.json`)
-    )
+    );
     return (await (level || this.contentLevel)
       .sublevel<string, Record<string, any>>(
         CONTENT_ROOT_PREFIX,
         SUBLEVEL_OPTIONS
       )
-      .get(schemaPath)) as unknown as Schema
-  }
+      .get(schemaPath)) as unknown as Schema;
+  };
 
   public getSchema = async (level?: Level, existingSchema?: Schema) => {
     if (this.tinaSchema) {
-      return this.tinaSchema
+      return this.tinaSchema;
     }
-    await this.initLevel()
+    await this.initLevel();
     const schema =
-      existingSchema || (await this.getTinaSchema(level || this.contentLevel))
+      existingSchema || (await this.getTinaSchema(level || this.contentLevel));
     if (!schema) {
       throw new Error(
         `Unable to get schema from level db: ${normalizePath(
           path.join(this.getGeneratedFolder(), `_schema.json`)
         )}`
-      )
+      );
     }
-    this.tinaSchema = await createSchema({ schema })
-    return this.tinaSchema
-  }
+    this.tinaSchema = await createSchema({ schema });
+    return this.tinaSchema;
+  };
+
+  public getCollectionReferences = async (
+    level?: Level
+  ): Promise<Record<string, Record<string, string[]>>> => {
+    if (this.collectionReferences) {
+      return this.collectionReferences;
+    }
+    const result: Record<string, Record<string, string[]>> = {};
+    const schema = await this.getSchema(level || this.contentLevel);
+    const collections = schema.getCollections();
+    for (const collection of collections) {
+      const collectionReferences = this.tinaSchema.findReferencesFromCollection(
+        collection.name
+      );
+      result[collection.name] = collectionReferences;
+    }
+    this.collectionReferences = result;
+    return result;
+  };
 
   public getIndexDefinitions = async (
     level?: Level
   ): Promise<Record<string, Record<string, IndexDefinition>>> => {
     if (!this.collectionIndexDefinitions) {
       await new Promise<void>(async (resolve, reject) => {
-        await this.initLevel()
+        await this.initLevel();
         try {
-          const schema = await this.getSchema(level || this.contentLevel)
-          const collections = schema.getCollections()
+          const schema = await this.getSchema(level || this.contentLevel);
+          const collections = schema.getCollections();
           for (const collection of collections) {
             const indexDefinitions = {
               [DEFAULT_COLLECTION_SORT_KEY]: { fields: [] }, // provide a default sort key which is the file sort
+              // pseudo-index for the collection's references
+              [REFS_COLLECTIONS_SORT_KEY]: {
+                fields: [
+                  {
+                    name: REFS_REFERENCE_FIELD,
+                    type: 'string',
+                    list: false,
+                  },
+                  {
+                    name: REFS_PATH_FIELD,
+                    type: 'string',
+                    list: false,
+                  },
+                ],
+              },
+            };
+
+            let fields: TinaField<true>[] = [];
+            if (collection.templates) {
+              // Aggregate all fields from all templates
+              const templateFieldMap: Record<string, TinaField<true>> = {};
+              const conflictedFields: Set<string> = new Set();
+              for (const template of collection.templates) {
+                for (const field of template.fields) {
+                  if (!templateFieldMap[field.name]) {
+                    templateFieldMap[field.name] = field;
+                  } else {
+                    if (templateFieldMap[field.name].type !== field.type) {
+                      console.warn(
+                        `Field ${field.name} has conflicting types in templates - skipping index`
+                      );
+                      conflictedFields.add(field.name);
+                    }
+                  }
+                }
+              }
+              for (const conflictedField in conflictedFields) {
+                delete templateFieldMap[conflictedField];
+              }
+              for (const field of Object.values(templateFieldMap)) {
+                fields.push(field);
+              }
+            } else if (collection.fields) {
+              fields = collection.fields;
             }
 
-            if (collection.fields) {
-              for (const field of collection.fields as TinaField<true>[]) {
+            if (fields) {
+              for (const field of fields) {
                 if (
                   (field.indexed !== undefined && field.indexed === false) ||
                   field.type ===
                     'object' /* TODO do we want indexes on objects? */
                 ) {
-                  continue
+                  continue;
                 }
 
                 indexDefinitions[field.name] = {
@@ -854,7 +962,7 @@ export class Database {
                           : undefined,
                     },
                   ],
-                }
+                };
               }
             }
 
@@ -865,44 +973,44 @@ export class Database {
                   fields: index.fields.map((indexField) => {
                     const field = (collection.fields as TinaField<true>[]).find(
                       (field) => indexField.name === field.name
-                    )
+                    );
                     return {
                       name: indexField.name,
                       type: field?.type,
                       list: !!field?.list,
-                    }
+                    };
                   }),
-                }
+                };
               }
             }
             this.collectionIndexDefinitions =
-              this.collectionIndexDefinitions || {}
-            this.collectionIndexDefinitions[collection.name] = indexDefinitions
+              this.collectionIndexDefinitions || {};
+            this.collectionIndexDefinitions[collection.name] = indexDefinitions;
           }
-          resolve()
+          resolve();
         } catch (err) {
-          reject(err)
+          reject(err);
         }
-      })
+      });
     }
 
-    return this.collectionIndexDefinitions
-  }
+    return this.collectionIndexDefinitions;
+  };
 
   public documentExists = async (fullpath: unknown) => {
     try {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore assert is string
-      await this.get(fullpath)
+      await this.get(fullpath);
     } catch (e) {
-      return false
+      return false;
     }
 
-    return true
-  }
+    return true;
+  };
 
   public query = async (queryOptions: QueryOptions, hydrator) => {
-    await this.initLevel()
+    await this.initLevel();
     const {
       first,
       after,
@@ -911,54 +1019,54 @@ export class Database {
       sort = DEFAULT_COLLECTION_SORT_KEY,
       filterChain: rawFilterChain,
       folder,
-    } = queryOptions
-    let limit = 50
+    } = queryOptions;
+    let limit = 50;
     if (first) {
-      limit = first
+      limit = first;
     } else if (last) {
-      limit = last
+      limit = last;
     }
 
     const query: {
-      gt?: string
-      gte?: string
-      lt?: string
-      lte?: string
-      reverse: boolean
-    } = { reverse: !!last }
+      gt?: string;
+      gte?: string;
+      lt?: string;
+      lte?: string;
+      reverse: boolean;
+    } = { reverse: !!last };
 
     if (after) {
-      query.gt = atob(after)
+      query.gt = atob(after);
     } else if (before) {
-      query.lt = atob(before)
+      query.lt = atob(before);
     }
-    const tinaSchema = await this.getSchema(this.contentLevel)
-    const collection = tinaSchema.getCollection(queryOptions.collection)
+    const tinaSchema = await this.getSchema(this.contentLevel);
+    const collection = tinaSchema.getCollection(queryOptions.collection);
 
     const allIndexDefinitions = await this.getIndexDefinitions(
       this.contentLevel
-    )
-    const indexDefinitions = allIndexDefinitions?.[collection.name]
+    );
+    const indexDefinitions = allIndexDefinitions?.[collection.name];
     if (!indexDefinitions) {
-      throw new Error(`No indexDefinitions for collection ${collection.name}`)
+      throw new Error(`No indexDefinitions for collection ${collection.name}`);
     }
 
-    const filterChain = coerceFilterChainOperands(rawFilterChain)
+    const filterChain = coerceFilterChainOperands(rawFilterChain);
 
     // Because we default to DEFAULT_COLLECTION_SORT_KEY, the only way this is
     // actually undefined is if the caller specified a non-existent sort key
     const indexDefinition = (sort && indexDefinitions?.[sort]) as
       | IndexDefinition
-      | undefined
+      | undefined;
     const filterSuffixes =
-      indexDefinition && makeFilterSuffixes(filterChain, indexDefinition)
+      indexDefinition && makeFilterSuffixes(filterChain, indexDefinition);
     const level = collection?.isDetached
       ? this.appLevel.sublevel(collection?.name, SUBLEVEL_OPTIONS)
-      : this.contentLevel
+      : this.contentLevel;
     const rootLevel = level.sublevel<string, Record<string, any>>(
       CONTENT_ROOT_PREFIX,
       SUBLEVEL_OPTIONS
-    )
+    );
     const sublevel = indexDefinition
       ? level
           .sublevel(
@@ -970,136 +1078,148 @@ export class Database {
             SUBLEVEL_OPTIONS
           )
           .sublevel(sort, SUBLEVEL_OPTIONS)
-      : rootLevel
+      : rootLevel;
 
     if (!query.gt && !query.gte) {
-      query.gte = filterSuffixes?.left ? filterSuffixes.left : ''
+      query.gte = filterSuffixes?.left ? filterSuffixes.left : '';
     }
 
     if (!query.lt && !query.lte) {
       query.lte = filterSuffixes?.right
         ? `${filterSuffixes.right}\uFFFF`
-        : '\uFFFF'
+        : '\uFFFF';
     }
 
-    let edges: { cursor: string; path: string }[] = []
-    let startKey: string = ''
-    let endKey: string = ''
-    let hasPreviousPage = false
-    let hasNextPage = false
+    let edges: { cursor: string; path: string; value?: Record<string, any> }[] =
+      [];
+    let startKey: string = '';
+    let endKey: string = '';
+    let hasPreviousPage = false;
+    let hasNextPage = false;
 
     const fieldsPattern = indexDefinition?.fields?.length
       ? `${indexDefinition.fields
           .map((p) => `(?<${p.name}>.+)${INDEX_KEY_FIELD_SEPARATOR}`)
           .join('')}`
-      : ''
+      : '';
     const valuesRegex = indexDefinition
       ? new RegExp(`^${fieldsPattern}(?<_filepath_>.+)`)
-      : new RegExp(`^(?<_filepath_>.+)`)
-    const itemFilter = makeFilter({ filterChain })
+      : new RegExp(`^(?<_filepath_>.+)`);
+    const itemFilter = makeFilter({ filterChain });
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     // It looks like tslint is confused by the multiple iterator() overloads
-    const iterator = sublevel.iterator<string, Record<string, any>>(query)
+    const iterator = sublevel.iterator<string, Record<string, any>>(query);
     for await (const [key, value] of iterator) {
-      const matcher = valuesRegex.exec(key)
+      const matcher = valuesRegex.exec(key);
       if (
         !matcher ||
         (indexDefinition &&
           matcher.length !== indexDefinition.fields.length + 2)
       ) {
-        continue
+        continue;
       }
 
-      const filepath = matcher.groups['_filepath_']
-      let itemRecord: Record<string, any>
+      const filepath = matcher.groups['_filepath_'];
+      let itemRecord: Record<string, any>;
       if (filterSuffixes) {
-        itemRecord = matcher.groups
+        itemRecord = matcher.groups;
         // for index match fields, convert the array value from comma-separated string to array
         for (const field of indexDefinition.fields) {
           if (itemRecord[field.name]) {
             if (field.list) {
               itemRecord[field.name] = itemRecord[field.name].split(
                 ARRAY_ITEM_VALUE_SEPARATOR
-              )
+              );
             }
           }
         }
       } else {
         if (indexDefinition) {
-          itemRecord = await rootLevel.get(filepath)
+          itemRecord = await rootLevel.get(filepath);
         } else {
-          itemRecord = value
+          itemRecord = value;
         }
       }
       if (!itemFilter(itemRecord)) {
-        continue
+        continue;
       }
 
       if (limit !== -1 && edges.length >= limit) {
         if (query.reverse) {
-          hasPreviousPage = true
+          hasPreviousPage = true;
         } else {
-          hasNextPage = true
+          hasNextPage = true;
         }
-        break
+        break;
       }
 
-      startKey = startKey || key || ''
-      endKey = key || ''
-      edges = [...edges, { cursor: key, path: filepath }]
+      startKey = startKey || key || '';
+      endKey = key || '';
+      edges = [...edges, { cursor: key, path: filepath, value: itemRecord }];
     }
 
     return {
-      edges: await sequential(edges, async (edge) => {
-        try {
-          const node = await hydrator(edge.path)
-          return {
-            node,
-            cursor: btoa(edge.cursor),
+      edges: await sequential(
+        edges,
+        async ({
+          cursor,
+          path,
+          value,
+        }: {
+          cursor: string;
+          path: string;
+          value?: Record<string, any>;
+        }) => {
+          try {
+            // pass the path to the matched item and the raw index value
+            const node = await hydrator(path, value);
+            return {
+              node,
+              cursor: btoa(cursor),
+            };
+          } catch (error) {
+            console.log(error);
+            if (
+              error instanceof Error &&
+              (!path.includes('.tina/__generated__/_graphql.json') ||
+                !path.includes('tina/__generated__/_graphql.json'))
+            ) {
+              throw new TinaQueryError({
+                originalError: error,
+                file: path,
+                collection: collection.name,
+              });
+            }
+            // I dont think this should ever happen
+            throw error;
           }
-        } catch (error) {
-          console.log(error)
-          if (
-            error instanceof Error &&
-            (!edge.path.includes('.tina/__generated__/_graphql.json') ||
-              !edge.path.includes('tina/__generated__/_graphql.json'))
-          ) {
-            throw new TinaQueryError({
-              originalError: error,
-              file: edge.path,
-              collection: collection.name,
-              stack: error.stack,
-            })
-          }
-          // I dont think this should ever happen
-          throw error
         }
-      }),
+      ),
       pageInfo: {
         hasPreviousPage,
         hasNextPage,
         startCursor: btoa(startKey),
         endCursor: btoa(endKey),
       },
-    }
-  }
+    };
+  };
   private async indexStatusCallbackWrapper<T>(
     fn: () => Promise<T>,
     post?: () => Promise<void>
   ): Promise<T> {
-    await this.indexStatusCallback({ status: 'inprogress' })
+    await this.indexStatusCallback({ status: 'inprogress' });
     try {
-      const result = await fn()
-      await this.indexStatusCallback({ status: 'complete' })
+      const result = await fn();
+      await this.indexStatusCallback({ status: 'complete' });
       if (post) {
-        await post()
+        await post();
       }
-      return result
+      return result;
     } catch (error) {
-      await this.indexStatusCallback({ status: 'failed', error })
-      throw error
+      await this.indexStatusCallback({ status: 'failed', error });
+      throw error;
     }
   }
 
@@ -1108,18 +1228,18 @@ export class Database {
     tinaSchema,
     lookup: lookupFromLockFile,
   }: {
-    graphQLSchema: DocumentNode
-    tinaSchema: TinaSchema
-    lookup?: object
+    graphQLSchema: DocumentNode;
+    tinaSchema: TinaSchema;
+    lookup?: object;
   }) => {
     if (!this.bridge) {
-      throw new Error('No bridge configured')
+      throw new Error('No bridge configured');
     }
-    await this.initLevel()
-    let nextLevel: Level | undefined
+    await this.initLevel();
+    let nextLevel: Level | undefined;
     return await this.indexStatusCallbackWrapper(
       async () => {
-        let lookup
+        let lookup;
         try {
           lookup =
             lookupFromLockFile ||
@@ -1129,77 +1249,77 @@ export class Database {
                   path.join(this.getGeneratedFolder(), '_lookup.json')
                 )
               )
-            )
+            );
         } catch (error) {
-          console.error('Error: Unable to find generated lookup file')
+          console.error('Error: Unable to find generated lookup file');
           if (this.tinaDirectory === 'tina') {
             console.error(
               'If you are using the .tina folder. Please set {tinaDirectory: ".tina"} in your createDatabase options or migrate to the new tina folder: https://tina.io/blog/tina-config-rearrangements/'
-            )
+            );
           }
-          throw error
+          throw error;
         }
 
-        let nextVersion: string | undefined
+        let nextVersion: string | undefined;
         if (!this.config.version) {
-          await this.contentLevel.clear()
-          nextLevel = this.contentLevel
+          await this.contentLevel.clear();
+          nextLevel = this.contentLevel;
         } else {
-          const version = await this.getDatabaseVersion()
-          nextVersion = version ? `${parseInt(version) + 1}` : '0'
-          nextLevel = this.rootLevel.sublevel(nextVersion, SUBLEVEL_OPTIONS)
+          const version = await this.getDatabaseVersion();
+          nextVersion = version ? `${parseInt(version) + 1}` : '0';
+          nextLevel = this.rootLevel.sublevel(nextVersion, SUBLEVEL_OPTIONS);
         }
 
         const contentRootLevel = nextLevel.sublevel<
           string,
           Record<string, any>
-        >(CONTENT_ROOT_PREFIX, SUBLEVEL_OPTIONS)
+        >(CONTENT_ROOT_PREFIX, SUBLEVEL_OPTIONS);
         await contentRootLevel.put(
           normalizePath(path.join(this.getGeneratedFolder(), '_graphql.json')),
           graphQLSchema as any
-        )
+        );
         await contentRootLevel.put(
           normalizePath(path.join(this.getGeneratedFolder(), '_schema.json')),
           tinaSchema.schema as any
-        )
+        );
         await contentRootLevel.put(
           normalizePath(path.join(this.getGeneratedFolder(), '_lookup.json')),
           lookup
-        )
+        );
         const result = await this._indexAllContent(
           nextLevel,
           tinaSchema.schema as any
-        )
+        );
         if (this.config.version) {
-          await this.updateDatabaseVersion(nextVersion)
+          await this.updateDatabaseVersion(nextVersion);
         }
-        return result
+        return result;
       },
       async () => {
         if (this.config.version) {
           if (this.contentLevel) {
-            await this.contentLevel.clear()
+            await this.contentLevel.clear();
           }
-          this.contentLevel = nextLevel
+          this.contentLevel = nextLevel;
         }
       }
-    )
-  }
+    );
+  };
 
   public deleteContentByPaths = async (documentPaths: string[]) => {
-    await this.initLevel()
-    const operations: DelOp[] = []
+    await this.initLevel();
+    const operations: DelOp[] = [];
     const enqueueOps = async (ops: DelOp[]): Promise<void> => {
-      operations.push(...ops)
+      operations.push(...ops);
       while (operations.length >= 25) {
         // make this an option
-        await this.contentLevel.batch(operations.splice(0, 25))
+        await this.contentLevel.batch(operations.splice(0, 25));
       }
-    }
-    const tinaSchema = await this.getSchema(this.contentLevel)
+    };
+    const tinaSchema = await this.getSchema(this.contentLevel);
     await this.indexStatusCallbackWrapper(async () => {
       const { pathsByCollection, nonCollectionPaths, collections } =
-        await partitionPathsByCollection(tinaSchema, documentPaths)
+        await partitionPathsByCollection(tinaSchema, documentPaths);
 
       for (const collection of Object.keys(pathsByCollection)) {
         await _deleteIndexContent(
@@ -1207,79 +1327,91 @@ export class Database {
           pathsByCollection[collection],
           enqueueOps,
           collections[collection]
-        )
+        );
       }
 
       if (nonCollectionPaths.length) {
-        await _deleteIndexContent(this, nonCollectionPaths, enqueueOps, null)
+        await _deleteIndexContent(this, nonCollectionPaths, enqueueOps, null);
       }
-    })
+    });
     while (operations.length) {
-      await this.contentLevel.batch(operations.splice(0, 25))
+      await this.contentLevel.batch(operations.splice(0, 25));
     }
-  }
+  };
 
   public indexContentByPaths = async (documentPaths: string[]) => {
-    await this.initLevel()
-    const operations: BatchOp[] = []
+    await this.initLevel();
+    const operations: BatchOp[] = [];
     const enqueueOps = async (ops: BatchOp[]): Promise<void> => {
-      operations.push(...ops)
+      operations.push(...ops);
       while (operations.length >= 25) {
         // make this an option
-        await this.contentLevel.batch(operations.splice(0, 25))
+        await this.contentLevel.batch(operations.splice(0, 25));
       }
-    }
-    const tinaSchema = await this.getSchema(this.contentLevel)
+    };
+    const tinaSchema = await this.getSchema(this.contentLevel);
     await this.indexStatusCallbackWrapper(async () => {
       await scanContentByPaths(
         tinaSchema,
         documentPaths,
         async (collection, documentPaths) => {
           if (collection && !collection.isDetached) {
-            await _indexContent(
-              this,
-              this.contentLevel,
+            await _indexContent({
+              database: this,
+              level: this.contentLevel,
               documentPaths,
               enqueueOps,
-              collection
-            )
+              collection,
+              isPartialReindex: true,
+            });
           }
         }
-      )
-    })
+      );
+    });
     while (operations.length) {
-      await this.contentLevel.batch(operations.splice(0, 25))
+      await this.contentLevel.batch(operations.splice(0, 25));
     }
-  }
+  };
 
   public delete = async (filepath: string) => {
-    await this.initLevel()
-    const collection = await this.collectionForPath(filepath)
+    await this.initLevel();
+    const collection = await this.collectionForPath(filepath);
     if (!collection) {
-      throw new Error(`No collection found for path: ${filepath}`)
+      throw new Error(`No collection found for path: ${filepath}`);
     }
-    const indexDefinitions = await this.getIndexDefinitions(this.contentLevel)
-    const collectionIndexDefinitions = indexDefinitions?.[collection.name]
+    const indexDefinitions = await this.getIndexDefinitions(this.contentLevel);
+    const collectionReferences = (await this.getCollectionReferences())?.[
+      collection.name
+    ];
+    const collectionIndexDefinitions = indexDefinitions?.[collection.name];
 
-    let level = this.contentLevel
+    let level = this.contentLevel;
     if (collection?.isDetached) {
-      level = this.appLevel.sublevel(collection?.name, SUBLEVEL_OPTIONS)
+      level = this.appLevel.sublevel(collection?.name, SUBLEVEL_OPTIONS);
     }
-    const itemKey = normalizePath(filepath)
+    const normalizedPath = normalizePath(filepath);
     const rootSublevel = level.sublevel<string, Record<string, any>>(
       CONTENT_ROOT_PREFIX,
       SUBLEVEL_OPTIONS
-    )
-    const item = await rootSublevel.get(itemKey)
+    );
+    const item = await rootSublevel.get(normalizedPath);
     if (item) {
-      const folderTreeBuilder = new FolderTreeBuilder()
+      const folderTreeBuilder = new FolderTreeBuilder();
       const folderKey = folderTreeBuilder.update(
         filepath,
         collection.path || ''
-      )
+      );
       await this.contentLevel.batch([
+        ...makeRefOpsForDocument(
+          normalizedPath,
+          collection.name,
+          collectionReferences,
+          item,
+          'del',
+          level
+        ),
         ...makeIndexOpsForDocument<Record<string, any>>(
-          filepath,
+          normalizedPath,
           collection.name,
           collectionIndexDefinitions,
           item,
@@ -1288,7 +1420,7 @@ export class Database {
         ),
         // folder indices
         ...makeIndexOpsForDocument(
-          filepath,
+          normalizedPath,
           `${collection.name}_${folderKey}`,
           collectionIndexDefinitions,
           item,
@@ -1297,18 +1429,18 @@ export class Database {
         ),
         {
           type: 'del',
-          key: itemKey,
+          key: normalizedPath,
           sublevel: rootSublevel,
         },
-      ])
+      ]);
     }
 
     if (!collection?.isDetached) {
       if (this.bridge) {
-        await this.bridge.delete(normalizePath(filepath))
+        await this.bridge.delete(normalizedPath);
       }
       try {
-        await this.onDelete(normalizePath(filepath))
+        await this.onDelete(normalizedPath);
       } catch (e) {
         throw new GraphQLError(
           `Error running onDelete hook for ${filepath}: ${e}`,
@@ -1317,58 +1449,64 @@ export class Database {
           null,
           null,
           e
-        )
+        );
       }
     }
-  }
+  };
 
   public _indexAllContent = async (level: Level, schema?: Schema) => {
-    const tinaSchema = await this.getSchema(level, schema)
-    const operations: PutOp[] = []
+    const tinaSchema = await this.getSchema(level, schema);
+    const operations: PutOp[] = [];
     const enqueueOps = async (ops: PutOp[]): Promise<void> => {
-      operations.push(...ops)
+      operations.push(...ops);
       while (operations.length >= 25) {
         // make this an option
-        const batchOps = operations.splice(0, 25)
-        await level.batch(batchOps)
+        const batchOps = operations.splice(0, 25);
+        await level.batch(batchOps);
       }
-    }
+    };
     const warnings = await scanAllContent(
       tinaSchema,
       this.bridge,
       async (collection, contentPaths) => {
-        const userFields = mapUserFields(collection, [])
+        const userFields = mapUserFields(collection, []);
         if (collection.isDetached) {
           const level = this.appLevel.sublevel(
             collection.name,
             SUBLEVEL_OPTIONS
-          )
-          const doc = await level.keys({ limit: 1 }).next()
+          );
+          const doc = await level.keys({ limit: 1 }).next();
           if (!doc) {
             // initialize app data with content from filesystem
-            await _indexContent(
-              this,
-              level,
-              contentPaths,
+            await _indexContent({
+              database: this,
+              level: level,
+              documentPaths: contentPaths,
               enqueueOps,
               collection,
-              userFields.map((field) => [
+              passwordFields: userFields.map((field) => [
                 ...field.path,
                 field.passwordFieldName,
-              ])
-            )
+              ]),
+            });
           }
         } else {
-          await _indexContent(this, level, contentPaths, enqueueOps, collection)
+          await _indexContent({
+            database: this,
+            level,
+            documentPaths: contentPaths,
+            enqueueOps,
+            collection,
+          });
         }
       }
-    )
+    );
 
     while (operations.length) {
-      await level.batch(operations.splice(0, 25))
+      await level.batch(operations.splice(0, 25));
     }
-    return { warnings }
-  }
+    return { warnings };
+  };
 }
 
 export type LookupMapType =
@@ -1380,43 +1518,43 @@ export type LookupMapType =
   | CollectionDocumentListLookup
   | ReverseCollectionDocumentListLookup
   | UnionDataLookup
-  | NodeDocument
+  | NodeDocument;
 
 type NodeDocument = {
-  type: string
-  resolveType: 'nodeDocument'
-}
+  type: string;
+  resolveType: 'nodeDocument';
+};
 type GlobalDocumentLookup = {
-  type: string
-  resolveType: 'globalDocument'
-  collection: string
-}
+  type: string;
+  resolveType: 'globalDocument';
+  collection: string;
+};
 type CollectionDocumentLookup = {
-  type: string
-  resolveType: 'collectionDocument'
-  collection: string
-}
+  type: string;
+  resolveType: 'collectionDocument';
+  collection: string;
+};
 type CollectionFolderLookup = {
-  type: string
-  resolveType: 'collectionFolder'
-  collection: string
-}
+  type: string;
+  resolveType: 'collectionFolder';
+  collection: string;
+};
 type MultiCollectionDocumentLookup = {
-  type: string
-  resolveType: 'multiCollectionDocument'
-  createDocument: 'create'
-  updateDocument: 'update'
-}
+  type: string;
+  resolveType: 'multiCollectionDocument';
+  createDocument: 'create';
+  updateDocument: 'update';
+};
 type MultiCollectionDocumentListLookup = {
-  type: string
-  resolveType: 'multiCollectionDocumentList'
-  collections: string[]
-}
+  type: string;
+  resolveType: 'multiCollectionDocumentList';
+  collections: string[];
+};
 export type CollectionDocumentListLookup = {
-  type: string
-  resolveType: 'collectionDocumentList'
-  collection: string
-}
+  type: string;
+  resolveType: 'collectionDocumentList';
+  collection: string;
+};
 type UnionDataLookup = {
   type: string
   resolveType: 'unionData'
@@ -1429,35 +1567,40 @@ export type ReverseCollectionDocumentListLookup = {
   collection: string
 }
 
+
+
+
+
+
 const hashPasswordVisitor = async (node: any, path: string[]) => {
-  const passwordValuePath = [...path, 'value']
-  const plaintextPassword = get(node, passwordValuePath)
+  const passwordValuePath = [...path, 'value'];
+  const plaintextPassword = get(node, passwordValuePath);
   if (plaintextPassword) {
     set(
       node,
       passwordValuePath,
       await generatePasswordHash({ password: plaintextPassword })
-    )
+    );
   }
-}
+};
 
 const visitNodes = async (
   node: any,
   path: string[],
   callback: (node: any, path: string[]) => Promise<void> | void
 ) => {
-  const [currentLevel, ...remainingLevels] = path
+  const [currentLevel, ...remainingLevels] = path;
   if (!remainingLevels?.length) {
-    return callback(node, path)
+    return callback(node, path);
   }
   if (Array.isArray(node[currentLevel])) {
     for (const item of node[currentLevel]) {
-      await visitNodes(item, remainingLevels, callback)
+      await visitNodes(item, remainingLevels, callback);
     }
   } else {
-    await visitNodes(node[currentLevel], remainingLevels, callback)
+    await visitNodes(node[currentLevel], remainingLevels, callback);
   }
-}
+};
 
 const hashPasswordValues = async (
   data: Record<string, any>,
@@ -1467,37 +1610,49 @@ const hashPasswordValues = async (
     passwordFields.map(async (passwordField) =>
       visitNodes(data, passwordField, hashPasswordVisitor)
     )
-  )
+  );
 
 const isGitKeep = (filepath: string, collection?: Collection<true>) =>
-  filepath.endsWith(`.gitkeep.${collection?.format || 'md'}`)
+  filepath.endsWith(`.gitkeep.${collection?.format || 'md'}`);
 
-const _indexContent = async (
-  database: Database,
-  level: Level,
-  documentPaths: string[],
-  enqueueOps: (ops: BatchOp[]) => Promise<void>,
-  collection?: Collection<true>,
-  passwordFields?: string[][]
-) => {
-  let collectionIndexDefinitions: Record<string, IndexDefinition>
-  let collectionPath: string | undefined
+const _indexContent = async ({
+  database,
+  level,
+  documentPaths,
+  enqueueOps,
+  collection,
+  passwordFields,
+  isPartialReindex,
+}: {
+  database: Database;
+  level: Level;
+  documentPaths: string[];
+  enqueueOps: (ops: BatchOp[]) => Promise<void>;
+  collection?: Collection<true>;
+  passwordFields?: string[][];
+  isPartialReindex?: boolean;
+}) => {
+  let collectionIndexDefinitions: Record<string, IndexDefinition>;
+  let collectionPath: string | undefined;
   if (collection) {
-    const indexDefinitions = await database.getIndexDefinitions(level)
-    collectionIndexDefinitions = indexDefinitions?.[collection.name]
+    const indexDefinitions = await database.getIndexDefinitions(level);
+    collectionIndexDefinitions = indexDefinitions?.[collection.name];
     if (!collectionIndexDefinitions) {
-      throw new Error(`No indexDefinitions for collection ${collection.name}`)
+      throw new Error(`No indexDefinitions for collection ${collection.name}`);
     }
-    collectionPath = collection.path
+    collectionPath = collection.path;
   }
+  const collectionReferences = (await database.getCollectionReferences())?.[
+    collection?.name
+  ];
 
-  const tinaSchema = await database.getSchema()
-  let templateInfo: CollectionTemplateable | null = null
+  const tinaSchema = await database.getSchema();
+  let templateInfo: CollectionTemplateable | null = null;
   if (collection) {
-    templateInfo = tinaSchema.getTemplatesForCollectable(collection)
+    templateInfo = tinaSchema.getTemplatesForCollectable(collection);
   }
 
-  const folderTreeBuilder = new FolderTreeBuilder()
+  const folderTreeBuilder = new FolderTreeBuilder();
   await sequential(documentPaths, async (filepath) => {
     try {
       const aliasedData = await loadAndParseWithAliases(
@@ -1505,25 +1660,74 @@ const _indexContent = async (
         filepath,
         collection,
         templateInfo
-      )
+      );
 
       // if we aren't able to load the data, we can't index it
       if (!aliasedData) {
-        return
+        return;
       }
 
       if (passwordFields?.length) {
-        await hashPasswordValues(aliasedData, passwordFields)
+        await hashPasswordValues(aliasedData, passwordFields);
       }
 
-      const normalizedPath = normalizePath(filepath)
+      const normalizedPath = normalizePath(filepath);
+      const rootSublevel = level.sublevel<string, Record<string, any>>(
+        CONTENT_ROOT_PREFIX,
+        SUBLEVEL_OPTIONS
+      );
       const folderKey = folderTreeBuilder.update(
         normalizedPath,
         collectionPath || ''
-      )
+      );
+      if (isPartialReindex) {
+        const item = await rootSublevel.get(normalizedPath);
+        if (item) {
+          await database.contentLevel.batch([
+            ...makeRefOpsForDocument(
+              normalizedPath,
+              collection?.name,
+              collectionReferences,
+              item,
+              'del',
+              level
+            ),
+            ...makeIndexOpsForDocument<Record<string, any>>(
+              normalizedPath,
+              collection.name,
+              collectionIndexDefinitions,
+              item,
+              'del',
+              level
+            ),
+            // folder indices
+            ...makeIndexOpsForDocument(
+              normalizedPath,
+              `${collection.name}_${folderKey}`,
+              collectionIndexDefinitions,
+              item,
+              'del',
+              level
+            ),
+            {
+              type: 'del',
+              key: normalizedPath,
+              sublevel: rootSublevel,
+            },
+          ]);
+        }
+      }
 
       if (!isGitKeep(filepath, collection)) {
         await enqueueOps([
+          ...makeRefOpsForDocument(
+            normalizedPath,
+            collection?.name,
+            collectionReferences,
+            aliasedData,
+            'put',
+            level
+          ),
           ...makeIndexOpsForDocument<Record<string, any>>(
             normalizedPath,
             collection?.name,
@@ -1550,17 +1754,16 @@ const _indexContent = async (
               SUBLEVEL_OPTIONS
             ),
           },
-        ])
+        ]);
       }
     } catch (error) {
       throw new TinaFetchError(`Unable to seed ${filepath}`, {
         originalError: error,
         file: filepath,
         collection: collection?.name,
-        stack: error.stack,
-      })
+      });
     }
-  })
+  });
 
   if (collection) {
     await enqueueOps(
@@ -1571,9 +1774,9 @@ const _indexContent = async (
         'put',
         level
       )
-    )
+    );
   }
-}
+};
 
 const _deleteIndexContent = async (
   database: Database,
@@ -1582,47 +1785,59 @@ const _deleteIndexContent = async (
   collection?: Collection<true>
 ) => {
   if (!documentPaths.length) {
-    return
+    return;
   }
 
-  let collectionIndexDefinitions: Record<string, IndexDefinition>
+  let collectionIndexDefinitions: Record<string, IndexDefinition>;
   if (collection) {
     const indexDefinitions = await database.getIndexDefinitions(
       database.contentLevel
-    )
-    collectionIndexDefinitions = indexDefinitions?.[collection.name]
+    );
+    collectionIndexDefinitions = indexDefinitions?.[collection.name];
     if (!collectionIndexDefinitions) {
-      throw new Error(`No indexDefinitions for collection ${collection.name}`)
+      throw new Error(`No indexDefinitions for collection ${collection.name}`);
     }
   }
 
-  const tinaSchema = await database.getSchema()
-  let templateInfo: CollectionTemplateable | null = null
+  const collectionReferences = (await database.getCollectionReferences())?.[
+    collection?.name
+  ];
+
+  const tinaSchema = await database.getSchema();
+  let templateInfo: CollectionTemplateable | null = null;
   if (collection) {
-    templateInfo = tinaSchema.getTemplatesForCollectable(collection)
+    templateInfo = tinaSchema.getTemplatesForCollectable(collection);
   }
 
   const rootLevel = database.contentLevel.sublevel<string, Record<string, any>>(
     CONTENT_ROOT_PREFIX,
     SUBLEVEL_OPTIONS
-  )
+  );
 
-  const folderTreeBuilder = new FolderTreeBuilder()
+  const folderTreeBuilder = new FolderTreeBuilder();
   await sequential(documentPaths, async (filepath) => {
-    const itemKey = normalizePath(filepath)
-    const item = await rootLevel.get(itemKey)
+    const itemKey = normalizePath(filepath);
+    const item = await rootLevel.get(itemKey);
     if (item) {
       const folderKey = folderTreeBuilder.update(
         itemKey,
         collection?.path || ''
-      )
+      );
       const aliasedData = templateInfo
         ? replaceNameOverrides(
             getTemplateForFile(templateInfo, item as any),
             item
           )
-        : item
+        : item;
       await enqueueOps([
+        ...makeRefOpsForDocument(
+          itemKey,
+          collection?.name,
+          collectionReferences,
+          aliasedData,
+          'del',
+          database.contentLevel
+        ),
         ...makeIndexOpsForDocument(
           itemKey,
           collection.name,
@@ -1641,9 +1856,9 @@ const _deleteIndexContent = async (
           database.contentLevel
         ),
         { type: 'del', key: itemKey, sublevel: rootLevel },
-      ])
+      ]);
     }
-  })
+  });
   if (collectionIndexDefinitions) {
     await enqueueOps(
       makeFolderOpsForCollection(
@@ -1653,6 +1868,6 @@ const _deleteIndexContent = async (
         'del',
         database.contentLevel
       )
-    )
+    );
   }
-}
+};

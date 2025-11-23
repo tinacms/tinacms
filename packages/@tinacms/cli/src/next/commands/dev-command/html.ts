@@ -36,12 +36,12 @@ const errorHTML = `<style type="text/css">
   the assets for this page.
 </p>
 <p>
-  Please visit <a href="https://tina.io/docs/tina-cloud/faq/#how-do-i-resolve-failed-loading-tinacms-assets-error">this doc</a> for help.
+  Please visit <a href="https://tina.io/docs/r/FAQ/#13-how-do-i-resolve-failed-loading-tinacms-assets-error">this doc</a> for help.
 </p>
 </div>
 </div>`
   .trim()
-  .replace(/[\r\n\s]+/g, ' ')
+  .replace(/[\r\n\s]+/g, ' ');
 
 export const devHTML = (port: string) => `<!DOCTYPE html>
 <html lang="en">
@@ -74,4 +74,4 @@ export const devHTML = (port: string) => `<!DOCTYPE html>
   <body class="tina-tailwind">
     <div id="root"></div>
   </body>
-</html>`
+</html>`;

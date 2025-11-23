@@ -2,7 +2,7 @@
 
 */
 
-import { Template, TinaField } from '@tinacms/schema-tools'
+import { Template, TinaField } from '@tinacms/schema-tools';
 
 const cta: Template = {
   name: 'Cta',
@@ -49,7 +49,7 @@ const cta: Template = {
       ],
     },
   ],
-}
+};
 
 export const richBody: TinaField = {
   type: 'rich-text',
@@ -117,4 +117,4 @@ export const richBody: TinaField = {
       ],
     },
   ],
-}
+};

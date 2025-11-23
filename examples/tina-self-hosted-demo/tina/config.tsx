@@ -1,18 +1,17 @@
-import { defineStaticConfig, LocalAuthProvider } from 'tinacms'
+import { LocalAuthProvider, defineStaticConfig } from 'tinacms'
 
-import { contentBlockSchema } from '../components/blocks/content'
-import { featureBlockSchema } from '../components/blocks/features'
-import { heroBlockSchema } from '../components/blocks/hero'
-import { testimonialBlockSchema } from '../components/blocks/testimonial'
-import { ColorPickerInput } from '../components/fields/color'
-import { iconSchema } from '../components/util/icon'
+import { contentBlockSchema } from '@/components/blocks/content'
+import { featureBlockSchema } from '@/components/blocks/features'
+import { heroBlockSchema } from '@/components/blocks/hero'
+import { testimonialBlockSchema } from '@/components/blocks/testimonial'
+import { ColorPickerInput } from '@/components/fields/color'
+import { iconSchema } from '@/components/util/icon'
 import {
   TinaUserCollection,
   UsernamePasswordAuthJSProvider,
 } from 'tinacms-authjs/dist/tinacms'
 
 const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
-
 const config = defineStaticConfig({
   contentApiUrlOverride: '/api/tina/gql',
   clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID!,
@@ -30,7 +29,7 @@ const config = defineStaticConfig({
     //   const pack = await import("next-tinacms-cloudinary");
     //   return pack.TinaCloudCloudinaryMediaStore;
     // },
-    // this is the config for the tina cloud media store
+    // this is the config for the TinaCloud media store
     tina: {
       publicFolder: 'public',
       mediaRoot: 'uploads',

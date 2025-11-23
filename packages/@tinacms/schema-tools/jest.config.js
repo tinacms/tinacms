@@ -1,4 +1,4 @@
-const jestRunnerConfig = require('@tinacms/scripts/dist/jest-runner.js')
+const jestRunnerConfig = require('@tinacms/scripts/dist/jest-runner.js');
 
 module.exports = {
   ...jestRunnerConfig,
@@ -20,4 +20,4 @@ module.exports = {
       tsconfig: 'tsconfig.json',
     },
   },
-}
+};

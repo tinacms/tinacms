@@ -1,6 +1,6 @@
-import { RichTextTemplate } from '@tinacms/schema-tools'
-import { stringifyMDX } from '@tinacms/mdx'
-import { z } from 'zod'
+import { serializeMDX } from '@tinacms/mdx';
+import { RichTextTemplate } from '@tinacms/schema-tools';
+import { z } from 'zod';
 
 /**
  * Out-of-the-box template for rendering basic markdown tables
@@ -32,12 +32,12 @@ export const tinaTableTemplate: RichTextTemplate = {
             if (Array.isArray(value.tableCells)) {
               return {
                 label: value.tableCells
-                  .map((cellItem) => stringifyCell(cellItem.value)?.trim())
+                  .map((cellItem) => stringifyCell(cellItem.value))
                   .join(' | '),
-              }
+              };
             }
           }
-          return { label: 'Row' }
+          return { label: 'Row' };
         },
       },
       fields: [
@@ -51,11 +51,11 @@ export const tinaTableTemplate: RichTextTemplate = {
               if (cell) {
                 if (cell.value) {
                   return {
-                    label: stringifyCell(cell.value)?.trim(),
-                  }
+                    label: stringifyCell(cell.value),
+                  };
                 }
               }
-              return { label: 'Value' }
+              return { label: 'Value' };
             },
           },
           fields: [
@@ -68,12 +68,12 @@ export const tinaTableTemplate: RichTextTemplate = {
               ui: {
                 validate(value) {
                   try {
-                    tableCellSchema.parse(value)
+                    tableCellSchema.parse(value);
                   } catch (e) {
                     if (e instanceof z.ZodError) {
-                      return e.errors[0].message
+                      return e.errors[0].message;
                     }
-                    return e.message
+                    return e.message;
                   }
                 },
               },
@@ -83,7 +83,7 @@ export const tinaTableTemplate: RichTextTemplate = {
       ],
     },
   ],
-}
+};
 
 const tableCellSchema = z.object({
   type: z.literal('root'),
@@ -96,8 +96,8 @@ const tableCellSchema = z.object({
     )
     .refine(
       (value) => {
-        const firstValue = value[0]
-        return firstValue && firstValue.type === 'p'
+        const firstValue = value[0];
+        return firstValue && firstValue.type === 'p';
       },
       {
         message: `Table cell content cannot contain block elements like headers, blockquotes, or lists.`,
@@ -106,21 +106,29 @@ const tableCellSchema = z.object({
     .refine(
       (value) => {
         if (value.length > 1) {
-          const secondBlock = value[1]
+          const secondBlock = value[1];
           return (
             secondBlock &&
             secondBlock.children.length === 1 &&
             !secondBlock.children[0]?.text
-          )
+          );
         }
-        return true
+        return true;
       },
       {
         message: `Table cells can only have 1 block level element.`,
       }
     ),
-})
+});
 
-const stringifyCell = (cell: any) => {
-  return stringifyMDX(cell, { name: 'body', type: 'rich-text' }, () => '')
-}
+const stringifyCell = (cell: any): string => {
+  const serialized = serializeMDX(
+    cell,
+    { name: 'body', type: 'rich-text' },
+    () => ''
+  );
+  if (typeof serialized !== 'string') {
+    throw new Error('stringifyCell: Expected serializeMDX to return a string');
+  }
+  return serialized?.trim();
+};

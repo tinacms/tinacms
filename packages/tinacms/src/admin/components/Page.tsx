@@ -1,67 +1,47 @@
-/**
-
-*/
-
-import React from 'react'
 import {
-  LocalWarning,
   BillingWarning,
-  BranchBanner,
-  useCMS,
-} from '@tinacms/toolkit'
+  BranchButton,
+  BranchPreviewButton,
+  LocalWarning,
+} from '@tinacms/toolkit';
+import React from 'react';
+import { TinaIcon } from '@toolkit/icons';
 
-export const PageWrapper = ({ children }: { children: React.ReactNode }) => {
-  const cms = useCMS()
-  const isLocalMode = cms.api?.tina?.isLocalMode
-
-  const [branchingEnabled, setBranchingEnabled] = React.useState(() =>
-    cms.flags.get('branch-switcher')
-  )
-  React.useEffect(() => {
-    cms.events.subscribe('flag:set', ({ key, value }) => {
-      if (key === 'branch-switcher') {
-        setBranchingEnabled(value)
-      }
-    })
-  }, [cms.events])
-
-  return (
-    <div className="relative left-0 w-full h-full bg-gradient-to-b from-gray-50/50 to-gray-50 shadow-2xl overflow-y-auto transition-opacity duration-300 ease-out flex flex-col opacity-100">
-      {branchingEnabled && !isLocalMode && <BranchBanner />}
-      {children}
-    </div>
-  )
-}
-
-export const PageHeader = ({
-  isLocalMode,
+export const PageWrapper = ({
+  headerClassName,
   children,
 }: {
-  isLocalMode?: boolean
-  children: React.ReactNode
+  headerClassName?: string;
+  children: React.ReactNode;
 }) => {
   return (
-    <>
-      {isLocalMode && <LocalWarning />}
-      {!isLocalMode && <BillingWarning />}
-
-      <div className="pt-16 xl:pt-12 px-6 xl:px-12">
-        <div className="w-full mx-auto max-w-screen-xl">
-          <div className="w-full flex justify-between items-end">
-            {children}
-          </div>
+    <div className='relative left-0 w-full h-full bg-gradient-to-b from-gray-50/50 to-gray-50 overflow-y-auto transition-opacity duration-300 ease-out flex flex-col opacity-100'>
+      <div className={`py-2 pr-4 w-full ${headerClassName}`}>
+        <BillingWarning />
+        <div className='flex items-center gap-4'>
+          <TinaIcon className='self-center h-10 min-w-10 w-auto text-orange-500' />
+          <LocalWarning />
+          <BranchButton />
+          <BranchPreviewButton />
         </div>
       </div>
-    </>
-  )
-}
+      {children}
+    </div>
+  );
+};
+
+export const PageHeader = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
+  return (
+    <div className='pt-4 pb-2 px-6'>
+      <div className='w-full flex justify-between items-end'>{children}</div>
+    </div>
+  );
+};
 
 export const PageBody = ({ children }: { children: React.ReactNode }) => (
-  <div className="py-8 px-6 xl:px-12">{children}</div>
-)
-
-export const PageBodyNarrow = ({ children }: { children: React.ReactNode }) => (
-  <div className="py-10 px-6 xl:px-12">
-    <div className="w-full mx-auto max-w-screen-xl">{children}</div>
-  </div>
-)
+  <div className='py-4 px-6'>{children}</div>
+);

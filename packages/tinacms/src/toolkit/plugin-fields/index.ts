@@ -12,4 +12,4 @@ export {
   DateFieldPlugin,
   CheckboxGroupFieldPlugin,
   ReferenceFieldPlugin,
-} from '@toolkit/fields'
+} from '@toolkit/fields';

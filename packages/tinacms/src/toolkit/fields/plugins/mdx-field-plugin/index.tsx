@@ -1,33 +1,41 @@
-import React from 'react'
+import React from 'react';
 import {
   type InputFieldType,
   wrapFieldsWithMeta,
-} from '../wrap-field-with-meta'
-import { EditorContext } from './plate/editor-context'
+} from '../wrap-field-with-meta';
+import { EditorContext } from './plate/editor-context';
 
-import type { MdxTemplate } from './plate/types'
-import { RichEditor } from './plate'
-import type { InputProps } from '@toolkit/fields/components'
-import type { ToolbarOverrideType } from './plate/toolbar/toolbar-overrides'
+import type { InputProps } from '@toolkit/fields/components';
+import { RichEditor } from './plate';
+import type {
+  ToolbarOverrideType,
+  ToolbarOverrides,
+} from './plate/toolbar/toolbar-overrides';
+import type { MdxTemplate } from './plate/types';
 
 export type RichTextType = React.PropsWithChildren<
   InputFieldType<
     InputProps,
     {
-      templates: MdxTemplate[]
-      toolbarOverride?: ToolbarOverrideType[]
+      templates: MdxTemplate[];
+      toolbarOverride?: ToolbarOverrideType[];
+      overrides?: ToolbarOverrides;
     }
   >
->
+>;
 
 export const MdxFieldPlugin = {
   name: 'rich-text',
   Component: wrapFieldsWithMeta<
     InputProps,
-    { templates: MdxTemplate[]; toolbarOverride?: ToolbarOverrideType[] }
+    {
+      templates: MdxTemplate[];
+      toolbarOverride?: ToolbarOverrideType[];
+      overrides?: ToolbarOverrides;
+    }
   >((props) => {
-    const [rawMode, setRawMode] = React.useState(false)
-    const [key, setKey] = React.useState(0)
+    const [rawMode, setRawMode] = React.useState(false);
+    const [key, setKey] = React.useState(0);
 
     /**
      * Since slate keeps track of it's own state, and that state is an object rather
@@ -36,12 +44,12 @@ export const MdxFieldPlugin = {
      * logic that just remounts slate entirely
      */
     React.useMemo(() => {
-      const { reset } = props.form
+      const { reset } = props.form;
       props.form.reset = (initialValues) => {
-        setKey((key) => key + 1)
-        return reset(initialValues)
-      }
-    }, [])
+        setKey((key) => key + 1);
+        return reset(initialValues);
+      };
+    }, []);
 
     return (
       <EditorContext.Provider
@@ -55,16 +63,15 @@ export const MdxFieldPlugin = {
       >
         <div
           className={
-            'min-h-[100px] max-w-full tina-prose relative shadow-inner focus-within:shadow-outline focus-within:border-blue-500 block w-full bg-white border border-gray-200 text-gray-600 focus-within:text-gray-900 rounded-md pt-0 py-2'
+            'min-h-[100px] max-w-full tina-prose relative shadow-inner focus-within:shadow-outline focus-within:border-blue-500 block w-full bg-white border border-gray-200 text-gray-600 focus-within:text-gray-900 rounded pt-0 py-2'
           }
         >
-          {/* {rawMode ? <RawEditor {...props} /> : <RichEditor {...props} />} */}
           <RichEditor {...props} />
         </div>
       </EditorContext.Provider>
-    )
+    );
   }),
-}
+};
 
 export const MdxFieldPluginExtendible = {
   name: 'rich-text',
@@ -76,15 +83,19 @@ export const MdxFieldPluginExtendible = {
       value.children[0] &&
       value.children[0].type === 'invalid_markdown'
     ) {
-      return 'Unable to parse rich-text'
+      return 'Unable to parse rich-text';
     }
-    return undefined
+    return undefined;
   },
   Component: wrapFieldsWithMeta<
     InputProps,
-    { templates: MdxTemplate[]; toolbarOverride?: ToolbarOverrideType[] }
+    {
+      templates: MdxTemplate[];
+      toolbarOverride?: ToolbarOverrideType[];
+      overrides?: ToolbarOverrides;
+    }
   >((props) => {
-    const [key, setKey] = React.useState(0)
+    const [key, setKey] = React.useState(0);
 
     /**
      * Since slate keeps track of it's own state, and that state is an object rather
@@ -93,13 +104,12 @@ export const MdxFieldPluginExtendible = {
      * logic that just remounts slate entirely
      */
     React.useMemo(() => {
-      const { reset } = props.form
+      const { reset } = props.form;
       props.form.reset = (initialValues) => {
-        setKey((key) => key + 1)
-        return reset(initialValues)
-      }
-    }, [])
-
+        setKey((key) => key + 1);
+        return reset(initialValues);
+      };
+    }, []);
     return (
       <EditorContext.Provider
         key={key}
@@ -112,12 +122,12 @@ export const MdxFieldPluginExtendible = {
       >
         <div
           className={
-            'min-h-[100px] max-w-full tina-prose relative shadow-inner focus-within:shadow-outline focus-within:border-blue-500 block w-full bg-white border border-gray-200 text-gray-600 focus-within:text-gray-900 rounded-md pt-0 py-2'
+            'min-h-[100px] max-w-full tina-prose relative shadow-inner focus-within:shadow-outline focus-within:border-blue-500 block w-full bg-white border border-gray-200 text-gray-600 focus-within:text-gray-900 rounded pt-0 py-2'
           }
         >
           {props.rawMode ? props.rawEditor : <RichEditor {...props} />}
         </div>
       </EditorContext.Provider>
-    )
+    );
   }),
-}
+};

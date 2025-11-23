@@ -1,6 +1,6 @@
 {
   "name": "create-tina-app",
-  "version": "1.2.3",
+  "version": "1.6.0",
   "main": "dist/index.js",
   "files": [
     "dist",
@@ -35,22 +35,22 @@
   },
   "devDependencies": {
     "@tinacms/scripts": "workspace:*",
-    "@types/cross-spawn": "^6.0.6",
+    "@types/cross-spawn": "catalog:",
     "@types/fs-extra": "^11.0.4",
-    "@types/node": "^22.7.4",
-    "@types/prompts": "^2.4.9",
-    "@types/tar": "6.1.13",
-    "typescript": "^5.6.2"
+    "@types/node": "^22.13.1",
+    "@types/prompts": "catalog:",
+    "@types/tar": "catalog:",
+    "typescript": "^5.7.3"
   },
   "dependencies": {
     "@tinacms/metrics": "workspace:*",
     "chalk": "4.1.2",
     "commander": "^12.1.0",
-    "cross-spawn": "^7.0.3",
-    "fs-extra": "^11.2.0",
-    "got": "^14.4.2",
-    "prompts": "^2.4.2",
-    "tar": "7.4.0",
-    "validate-npm-package-name": "^5.0.1"
+    "cross-spawn": "catalog:",
+    "fs-extra": "catalog:",
+    "ora": "catalog:",
+    "prompts": "catalog:",
+    "tar": "catalog:",
+    "validate-npm-package-name": "catalog:"
   }
 }

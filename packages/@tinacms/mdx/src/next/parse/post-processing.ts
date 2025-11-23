@@ -1,8 +1,8 @@
-import { MdxJsxFlowElement, MdxJsxTextElement } from 'mdast-util-mdx-jsx'
-import { visit } from 'unist-util-visit'
-import { remarkToSlate } from '../../parse/remarkToPlate'
-import { RichTextField } from '@tinacms/schema-tools'
-import type { Root } from 'mdast'
+import { MdxJsxFlowElement, MdxJsxTextElement } from 'mdast-util-mdx-jsx';
+import { visit } from 'unist-util-visit';
+import { remarkToSlate } from '../../parse/remarkToPlate';
+import { RichTextField } from '@tinacms/schema-tools';
+import type { Root } from 'mdast';
 
 export const postProcessor = (
   tree: Root,
@@ -13,20 +13,20 @@ export const postProcessor = (
   // don't adhere to the MDAST spec, casting as any
   const addPropsToMdxFlow = (
     node: (MdxJsxFlowElement | MdxJsxTextElement) & {
-      props: any
-      children: any
+      props: any;
+      children: any;
     }
   ) => {
-    const props: Record<string, any> = {}
+    const props: Record<string, any> = {};
     node.attributes.forEach((attribute) => {
       if (attribute.type === 'mdxJsxAttribute') {
-        props[attribute.name] = attribute.value
+        props[attribute.name] = attribute.value;
       } else {
-        throw new Error('HANDLE mdxJsxExpressionAttribute')
+        throw new Error('HANDLE mdxJsxExpressionAttribute');
       }
-    })
+    });
     if (node.children.length) {
-      let tree
+      let tree;
       if (node.type === 'mdxJsxTextElement') {
         tree = postProcessor(
           {
@@ -35,24 +35,24 @@ export const postProcessor = (
           },
           field,
           imageCallback
-        )
+        );
       } else {
         tree = postProcessor(
           { type: 'root', children: node.children },
           field,
           imageCallback
-        )
+        );
       }
-      props.children = tree
+      props.children = tree;
     }
-    node.props = props
+    node.props = props;
     // @ts-ignore
-    delete node.attributes
-    node.children = [{ type: 'text', text: '' }]
-  }
+    delete node.attributes;
+    node.children = [{ type: 'text', text: '' }];
+  };
 
-  visit(tree, 'mdxJsxFlowElement', addPropsToMdxFlow)
-  visit(tree, 'mdxJsxTextElement', addPropsToMdxFlow)
+  visit(tree, 'mdxJsxFlowElement', addPropsToMdxFlow);
+  visit(tree, 'mdxJsxTextElement', addPropsToMdxFlow);
 
-  return remarkToSlate(tree, field, imageCallback, '', true)
-}
+  return remarkToSlate(tree, field, imageCallback, '', true);
+};

@@ -1,4 +1,4 @@
-import type { Page, PageBlocks } from '../.tina/__generated__/types'
+import type { Page, PageBlocks } from '../tina/__generated__/types'
 import { Content } from './blocks/content'
 import { Features } from './blocks/features'
 import { Hero } from './blocks/hero'

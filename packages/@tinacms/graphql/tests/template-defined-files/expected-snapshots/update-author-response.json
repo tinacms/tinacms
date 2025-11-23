@@ -1,0 +1,16 @@
+{
+  "data": {
+    "updateDocument": {
+      "__typename": "AuthorPerson",
+      "id": "authors/bob-northwind.md",
+      "_sys": {
+        "filename": "bob-northwind",
+        "extension": ".md",
+        "path": "authors/bob-northwind.md"
+      },
+      "name": "Mr Bob Northwind",
+      "email": "bob.northwind@northwind.com",
+      "bio": "Updated CEO of Northwind company with extensive business experience"
+    }
+  }
+}

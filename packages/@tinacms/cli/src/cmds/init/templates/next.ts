@@ -1,18 +1,18 @@
-export type NextTemplateTypes = 'demo-post-page'
+export type NextTemplateTypes = 'demo-post-page';
 
 export const templates: {
   [key in NextTemplateTypes]: (opts?: {
-    nextAuthCredentialsProviderName?: string
-    usingSrc?: boolean
-    dataLayer?: boolean
-  }) => string
+    nextAuthCredentialsProviderName?: string;
+    usingSrc?: boolean;
+    dataLayer?: boolean;
+  }) => string;
 } = {
   ['demo-post-page']: ({
     usingSrc,
     dataLayer,
   }: {
-    usingSrc: boolean
-    dataLayer: boolean
+    usingSrc: boolean;
+    dataLayer: boolean;
   }) => {
     return `// THIS FILE HAS BEEN GENERATED WITH THE TINA CLI.
 // @ts-nocheck
@@ -58,7 +58,7 @@ const BlogPage = (props) => {
         <div className='bg-green-100 text-center'>
           Lost and looking for a place to start?
           <a
-            href='https://tina.io/guides/tina-cloud/getting-started/overview/'
+            href='https://tina.io/docs/r/beginner-series'
             className='text-blue-500 underline'
           >
             {' '}
@@ -234,6 +234,6 @@ const ContentSection = ({ content }) => {
     </div>
   )
 }
-`
+`;
   },
-}
+};

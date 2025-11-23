@@ -1,18 +1,19 @@
-import React from 'react'
-import type { Field, Form } from '@toolkit/forms'
-import { IconButton } from '@toolkit/styles'
-import { Droppable, Draggable } from 'react-beautiful-dnd'
-import { AddIcon, DragIcon, ReorderIcon, TrashIcon } from '@toolkit/icons'
-import { useEvent } from '@toolkit/react-core/use-cms-event'
-import type { FieldHoverEvent, FieldFocusEvent } from '../field-events'
-import { useCMS } from '@toolkit/react-core/use-cms'
-import { BiPencil } from 'react-icons/bi'
-import { EmptyList, ListFieldMeta, ListPanel } from './list-field-meta'
+import React from 'react';
+import type { Field, Form } from '@toolkit/forms';
+import { IconButton } from '@toolkit/styles';
+import { Droppable, Draggable, SortableProvider } from './dnd-kit-wrapper';
+import { AddIcon, DragIcon, ReorderIcon, TrashIcon } from '@toolkit/icons';
+import { useEvent } from '@toolkit/react-core/use-cms-event';
+import type { FieldHoverEvent, FieldFocusEvent } from '../field-events';
+import { useCMS } from '@toolkit/react-core/use-cms';
+import { BiPencil } from 'react-icons/bi';
+import { EmptyList, ListFieldMeta, ListPanel } from './list-field-meta';
 
 interface GroupFieldDefinititon extends Field {
-  component: 'group'
-  fields: Field[]
-  defaultItem?: object | (() => object)
+  component: 'group';
+  fields: Field[];
+  defaultItem?: object | (() => object);
+  addItemBehavior?: 'append' | 'prepend';
   /**
    * An optional function which generates `props` for
    * this items's `li`.
@@ -27,49 +28,53 @@ interface GroupFieldDefinititon extends Field {
      * Reference:
      * * https://reactjs.org/docs/lists-and-keys.html
      */
-    key?: string
+    key?: string;
     /**
      * The label to be display on the list item.
      */
-    label?: string
-  }
+    label?: string;
+  };
 }
 
 interface GroupProps {
-  input: any
-  meta: any
-  field: GroupFieldDefinititon
-  form: any
-  tinaForm: Form
-  index?: number
+  input: any;
+  meta: any;
+  field: GroupFieldDefinititon;
+  form: any;
+  tinaForm: Form;
+  index?: number;
 }
 
 const Group = ({ tinaForm, form, field, input, meta, index }: GroupProps) => {
   const addItem = React.useCallback(() => {
-    let obj = {}
+    let obj = {};
     if (typeof field.defaultItem === 'function') {
-      obj = field.defaultItem()
+      obj = field.defaultItem();
     } else {
-      obj = field.defaultItem || {}
+      obj = field.defaultItem || {};
     }
-    form.mutators.insert(field.name, 0, obj)
-  }, [form, field])
+    if (field.addItemBehavior === 'prepend') {
+      form.mutators.insert(field.name, 0, obj);
+    } else {
+      form.mutators.push(field.name, obj);
+    }
+  }, [form, field]);
 
-  const items = input.value || []
+  const items = input.value || [];
   const itemProps = React.useCallback(
     (item: object) => {
-      if (!field.itemProps) return {}
-      return field.itemProps(item)
+      if (!field.itemProps) return {};
+      return field.itemProps(item);
     },
     [field.itemProps]
-  )
+  );
 
   // @ts-ignore
-  const isMax = items.length >= (field.max || Number.POSITIVE_INFINITY)
+  const isMax = items.length >= (field.max || Number.POSITIVE_INFINITY);
   // @ts-ignore
-  const isMin = items.length <= (field.min || 0)
+  const isMin = items.length <= (field.min || 0);
   // @ts-ignore
-  const fixedLength = field.min === field.max
+  const fixedLength = field.min === field.max;
 
   return (
     <ListFieldMeta
@@ -85,10 +90,10 @@ const Group = ({ tinaForm, form, field, input, meta, index }: GroupProps) => {
           <IconButton
             onClick={addItem}
             disabled={isMax}
-            variant="primary"
-            size="small"
+            variant='primary'
+            size='small'
           >
-            <AddIcon className="w-5/6 h-auto" />
+            <AddIcon className='w-5/6 h-auto' />
           </IconButton>
         )
       }
@@ -99,19 +104,23 @@ const Group = ({ tinaForm, form, field, input, meta, index }: GroupProps) => {
             {(provider) => (
               <div ref={provider.innerRef}>
                 {items.length === 0 && <EmptyList />}
-                {items.map((item: any, index: any) => (
-                  <Item
-                    // NOTE: Supressing warnings, but not helping with render perf
-                    key={index}
-                    tinaForm={tinaForm}
-                    field={field}
-                    item={item}
-                    index={index}
-                    isMin={isMin}
-                    fixedLength={fixedLength}
-                    {...itemProps(item)}
-                  />
-                ))}
+                <SortableProvider
+                  items={items.map((_, index) => `${field.name}.${index}`)}
+                >
+                  {items.map((item: any, index: any) => (
+                    <Item
+                      // NOTE: Supressing warnings, but not helping with render perf
+                      key={index}
+                      tinaForm={tinaForm}
+                      field={field}
+                      item={item}
+                      index={index}
+                      isMin={isMin}
+                      fixedLength={fixedLength}
+                      {...itemProps(item)}
+                    />
+                  ))}
+                </SortableProvider>
                 {provider.placeholder}
               </div>
             )}
@@ -119,17 +128,17 @@ const Group = ({ tinaForm, form, field, input, meta, index }: GroupProps) => {
         </div>
       </ListPanel>
     </ListFieldMeta>
-  )
-}
+  );
+};
 
 interface ItemProps {
-  tinaForm: Form
-  field: GroupFieldDefinititon
-  index: number
-  item: any
-  label?: string
-  isMin: boolean
-  fixedLength: boolean
+  tinaForm: Form;
+  field: GroupFieldDefinititon;
+  index: number;
+  item: any;
+  label?: string;
+  isMin: boolean;
+  fixedLength: boolean;
 }
 
 const Item = ({
@@ -142,14 +151,16 @@ const Item = ({
   fixedLength,
   ...p
 }: ItemProps) => {
-  const cms = useCMS()
+  const cms = useCMS();
   const removeItem = React.useCallback(() => {
-    tinaForm.mutators.remove(field.name, index)
-  }, [tinaForm, field, index])
-  const title = label || `${field.label || field.name} Item`
+    tinaForm.mutators.remove(field.name, index);
+  }, [tinaForm, field, index]);
+  const title = label || `${field.label || field.name} Item`;
 
-  const { dispatch: setHoveredField } = useEvent<FieldHoverEvent>('field:hover')
-  const { dispatch: setFocusedField } = useEvent<FieldFocusEvent>('field:focus')
+  const { dispatch: setHoveredField } =
+    useEvent<FieldHoverEvent>('field:hover');
+  const { dispatch: setFocusedField } =
+    useEvent<FieldFocusEvent>('field:focus');
   return (
     <Draggable draggableId={`${field.name}.${index}`} index={index}>
       {(provider, snapshot) => (
@@ -159,7 +170,10 @@ const Item = ({
             isDragging={snapshot.isDragging}
             {...p}
           >
-            <DragHandle isDragging={snapshot.isDragging} />
+            <DragHandle
+              isDragging={snapshot.isDragging}
+              dragHandleProps={provider.dragHandleProps}
+            />
             <ItemClickTarget
               onMouseOver={() =>
                 setHoveredField({
@@ -169,11 +183,13 @@ const Item = ({
               }
               onMouseOut={() => setHoveredField({ id: null, fieldName: null })}
               onClick={() => {
-                const state = tinaForm.finalForm.getState()
+                const state = tinaForm.finalForm.getState();
                 if (state.invalid === true) {
                   // @ts-ignore
-                  cms.alerts.error('Cannot navigate away from an invalid form.')
-                  return
+                  cms.alerts.error(
+                    'Cannot navigate away from an invalid form.'
+                  );
+                  return;
                 }
 
                 cms.dispatch({
@@ -182,15 +198,15 @@ const Item = ({
                     formId: tinaForm.id,
                     fieldName: `${field.name}.${index}`,
                   },
-                })
+                });
                 setFocusedField({
                   id: tinaForm.id,
                   fieldName: `${field.name}.${index}`,
-                })
+                });
               }}
             >
               <GroupLabel>{title}</GroupLabel>
-              <BiPencil className="h-5 w-auto fill-current text-gray-200 group-hover:text-inherit transition-colors duration-150 ease-out" />
+              <BiPencil className='h-5 w-auto fill-current text-gray-200 group-hover:text-inherit transition-colors duration-150 ease-out' />
             </ItemClickTarget>
             {(!fixedLength || (fixedLength && !isMin)) && (
               <ItemDeleteButton disabled={isMin} onClick={removeItem} />
@@ -199,26 +215,26 @@ const Item = ({
         </>
       )}
     </Draggable>
-  )
-}
+  );
+};
 
 export const ItemClickTarget = ({ children, ...props }) => {
   return (
     <div
-      className="group text-gray-400 hover:text-blue-600 flex-1 min-w-0 relative flex justify-between items-center p-2"
+      className='group text-gray-400 hover:text-blue-600 flex-1 min-w-0 relative flex justify-between items-center p-2'
       {...props}
     >
       {children}
     </div>
-  )
-}
+  );
+};
 
 export const GroupLabel = ({
   error,
   children,
 }: {
-  children?: any
-  error?: boolean
+  children?: any;
+  error?: boolean;
 }) => {
   return (
     <span
@@ -228,8 +244,8 @@ export const GroupLabel = ({
     >
       {children}
     </span>
-  )
-}
+  );
+};
 
 export const ItemHeader = ({
   isDragging,
@@ -237,15 +253,14 @@ export const ItemHeader = ({
   provider,
   ...props
 }: {
-  isDragging: boolean
-  children: any | any[]
-  provider: any
+  isDragging: boolean;
+  children: any | any[];
+  provider: any;
 } & any) => {
   return (
     <div
-      ref={provider.innerRef}
+      ref={provider.draggableProps?.ref}
       {...provider.draggableProps}
-      {...provider.dragHandleProps}
       {...props}
       className={`relative group cursor-pointer flex justify-between items-stretch bg-white border border-gray-100 -mb-px overflow-visible p-0 text-sm font-normal ${
         isDragging
@@ -253,62 +268,58 @@ export const ItemHeader = ({
           : 'text-gray-600 first:rounded-t last:rounded-b'
       } ${props.className ?? ''}`}
       style={{
-        ...(provider.draggableProps.style ?? {}),
-        ...(provider.dragHandleProps.style ?? {}),
+        ...(provider.draggableProps?.style ?? {}),
         ...(props.style ?? {}),
       }}
     >
       {children}
     </div>
-  )
-}
+  );
+};
 
 export const ItemDeleteButton = ({ onClick, disabled = false }) => {
   return (
     <button
-      type="button"
+      type='button'
       className={`w-8 px-1 py-2.5 flex items-center justify-center text-gray-200 hover:opacity-100 opacity-30 hover:bg-gray-50 ${
         disabled && 'pointer-events-none opacity-30 cursor-not-allowed'
       }`}
       onClick={onClick}
     >
-      <TrashIcon className="h-5 w-auto fill-current text-red-500 transition-colors duration-150 ease-out" />
+      <TrashIcon className='h-5 w-auto fill-current text-red-500 transition-colors duration-150 ease-out' />
     </button>
-  )
-}
+  );
+};
 
-export const DragHandle = ({ isDragging }: { isDragging: boolean }) => {
+export const DragHandle = ({
+  isDragging,
+  dragHandleProps,
+}: {
+  isDragging: boolean;
+  dragHandleProps?: any;
+}) => {
   return (
     <div
+      {...dragHandleProps}
       className={`relative w-8 px-1 py-2.5 flex items-center justify-center hover:bg-gray-50 group cursor-[grab] ${
         isDragging ? `text-blue-500` : `text-gray-200 hover:text-gray-600`
       }`}
     >
       {isDragging ? (
-        <ReorderIcon className="fill-current w-7 h-auto" />
+        <ReorderIcon className='fill-current w-7 h-auto' />
       ) : (
         <>
-          <DragIcon className="fill-current w-7 h-auto group-hover:opacity-0 transition-opacity duration-150 ease-out" />
-          <ReorderIcon className="fill-current w-7 h-auto absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 ease-out" />
+          <DragIcon className='fill-current w-7 h-auto group-hover:opacity-0 transition-opacity duration-150 ease-out' />
+          <ReorderIcon className='fill-current w-7 h-auto absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 ease-out' />
         </>
       )}
     </div>
-  )
-}
+  );
+};
 
-interface PanelProps {
-  setExpanded(next: boolean): void
-  isExpanded: boolean
-  tinaForm: Form
-  index: number
-  field: GroupFieldDefinititon
-  itemTitle: string
-  zIndexShift: number
-}
-
-export const GroupListField = Group
+export const GroupListField = Group;
 
 export const GroupListFieldPlugin = {
   name: 'group-list',
   Component: GroupListField,
-}
+};

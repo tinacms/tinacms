@@ -2,4 +2,4 @@
 
 */
 
-declare module 'path'
+declare module 'path';

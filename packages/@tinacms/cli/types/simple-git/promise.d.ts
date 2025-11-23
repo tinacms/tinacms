@@ -2,4 +2,4 @@
 
 */
 
-declare module 'simple-git/promise'
+declare module 'simple-git/promise';

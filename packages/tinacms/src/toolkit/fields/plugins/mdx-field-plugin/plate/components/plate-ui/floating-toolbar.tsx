@@ -1,35 +1,31 @@
-'use client'
+'use client';
 
-import React from 'react'
+import React from 'react';
 
-import { cn, withRef } from '@udecode/cn'
-import {
-  PortalBody,
-  useComposedRef,
-  useEventEditorSelectors,
-  usePlateSelectors,
-} from '@udecode/plate-common'
+import { cn, PortalBody, useComposedRef, withRef } from '@udecode/cn';
+
 import {
   type FloatingToolbarState,
   flip,
   offset,
-  useFloatingToolbar,
-  useFloatingToolbarState,
-} from '@udecode/plate-floating'
+} from '@udecode/plate-floating';
 
-import { Toolbar } from './toolbar'
+import { Toolbar } from './toolbar';
+import { useEditorRef, useEventEditorValue } from '@udecode/plate/react';
+import { useCustomFloatingToolbarState } from './use-floating-toolbar-state';
+import { useCustomFloatingToolbar } from './use-floating-toolbar-hook';
 
 export const FloatingToolbar = withRef<
   typeof Toolbar,
   {
-    state?: FloatingToolbarState
+    state?: FloatingToolbarState;
   }
->(({ children, state, ...props }, componentRef) => {
-  const editorId = usePlateSelectors().id()
-  const focusedEditorId = useEventEditorSelectors.focus()
+>(({ children, state, ...props }, propRef) => {
+  const editorId = useEditorRef();
+  const focusedEditorId = useEventEditorValue('focus');
 
-  const floatingToolbarState = useFloatingToolbarState({
-    editorId,
+  const test = useCustomFloatingToolbarState({
+    editorId: editorId.id,
     focusedEditorId,
     ...state,
     floatingOptions: {
@@ -48,30 +44,30 @@ export const FloatingToolbar = withRef<
       placement: 'top',
       ...state?.floatingOptions,
     },
-  })
+  });
 
   const {
     hidden,
     props: rootProps,
     ref: floatingRef,
-  } = useFloatingToolbar(floatingToolbarState)
+  } = useCustomFloatingToolbar(test);
 
-  const ref = useComposedRef<HTMLDivElement>(componentRef, floatingRef)
+  const ref = useComposedRef<HTMLDivElement>(propRef, floatingRef);
 
-  if (hidden) return null
+  if (hidden) return null;
 
   return (
     <PortalBody>
       <Toolbar
         className={cn(
-          'absolute z-[999999] whitespace-nowrap border bg-popover px-1 opacity-100 shadow-md print:hidden'
+          'absolute z-[999999] whitespace-nowrap border bg-popover px-1 opacity-100 shadow-md print:hidden rounded-md'
         )}
-        ref={ref}
-        {...rootProps}
         {...props}
+        {...rootProps}
+        ref={ref}
       >
         {children}
       </Toolbar>
     </PortalBody>
-  )
-})
+  );
+});

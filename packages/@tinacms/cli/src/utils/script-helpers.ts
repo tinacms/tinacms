@@ -8,11 +8,11 @@ export function generateGqlScript(
   scriptValue,
   opts?: { isLocalEnvVarName?: string }
 ) {
-  const cmd = `tinacms dev -c "${scriptValue}"`
+  const cmd = `tinacms dev -c "${scriptValue}"`;
   if (opts?.isLocalEnvVarName) {
-    return `${opts.isLocalEnvVarName}=true ${cmd}`
+    return `${opts.isLocalEnvVarName}=true ${cmd}`;
   }
-  return cmd
+  return cmd;
 }
 
 export function extendNextScripts(
@@ -29,11 +29,11 @@ export function extendNextScripts(
       !scripts?.build || !scripts?.build?.startsWith('tinacms build &&')
         ? `tinacms build && ${scripts?.build || 'next build'}`
         : scripts?.build,
-  }
+  };
 
   if (opts?.addSetupUsers && !scripts['setup:users']) {
-    result['setup:users'] = 'tinacms-next-auth setup'
+    result['setup:users'] = 'tinacms-next-auth setup';
   }
 
-  return result
+  return result;
 }

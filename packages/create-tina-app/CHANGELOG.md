@@ -1,5 +1,103 @@
 # create-tina-app
 
+## 1.6.0
+
+### Minor Changes
+
+- [#6054](https://github.com/tinacms/tinacms/pull/6054) [`6727bcf`](https://github.com/tinacms/tinacms/commit/6727bcf95200e05e8388986de4546f1730a1be47) Thanks [@0xharkirat](https://github.com/0xharkirat)! - fix broken links, from `tina.io/docs/tina-cloud` to `tina.io/docs/tinacloud`
+
+### Patch Changes
+
+- [#6059](https://github.com/tinacms/tinacms/pull/6059) [`b23aa0c`](https://github.com/tinacms/tinacms/commit/b23aa0c5defc51b8f9fe00a59dd87e1d2f8b9f0b) Thanks [@kulesy](https://github.com/kulesy)! - docs: Update references from tina-cloud-starter to tina-nextjs-starter
+
+## 1.5.2
+
+### Patch Changes
+
+- [#5939](https://github.com/tinacms/tinacms/pull/5939) [`8a5ca67`](https://github.com/tinacms/tinacms/commit/8a5ca6745b918c6fe7cb15b4b4f3420fd4b3104d) Thanks [@wicksipedia](https://github.com/wicksipedia)! - fix: cli compatibility with CommonJS
+
+## 1.5.1
+
+### Patch Changes
+
+- [#5937](https://github.com/tinacms/tinacms/pull/5937) [`3f1e88d`](https://github.com/tinacms/tinacms/commit/3f1e88dfed8d597cee7936f9b0c09e6e4a2e4e71) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - fix: added missing devUrl
+
+- [#5624](https://github.com/tinacms/tinacms/pull/5624) [`0e749d5`](https://github.com/tinacms/tinacms/commit/0e749d5bf7bce552da1beadef3772103c55afd67) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Add TinaDocs to NPX CLI templates
+
+## 1.5.0
+
+### Minor Changes
+
+- [#5929](https://github.com/tinacms/tinacms/pull/5929) [`ec43c87`](https://github.com/tinacms/tinacms/commit/ec43c87a1da55b4cb86e9b428eb39fc0740a9e1f) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Enhanced CLI output with some branded ASCII art
+  Refined user experience with clearer messaging and structure
+  Added optional --verbose flag (disabled by default) for detailed output
+
+## 1.4.0
+
+### Minor Changes
+
+- [#5744](https://github.com/tinacms/tinacms/pull/5744) [`98a61e2`](https://github.com/tinacms/tinacms/commit/98a61e2d263978a7096cc23ac7e94aa0039981be) Thanks [@Ben0189](https://github.com/Ben0189)! - Upgrade Plate editor to v48 beta, integrating latest features and improvements.
+
+### Patch Changes
+
+- Updated dependencies [[`98a61e2`](https://github.com/tinacms/tinacms/commit/98a61e2d263978a7096cc23ac7e94aa0039981be)]:
+  - @tinacms/metrics@1.1.0
+
+## 1.3.4
+
+### Patch Changes
+
+- [#5594](https://github.com/tinacms/tinacms/pull/5594) [`95a293c`](https://github.com/tinacms/tinacms/commit/95a293cffab73635dc0677ad5277fc84cbf2c507) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: Added `bun` package manager.
+  fix: Removed dead code from `install` method.
+- Updated dependencies []:
+  - @tinacms/metrics@1.0.9
+
+## 1.3.3
+
+### Patch Changes
+
+- [#5565](https://github.com/tinacms/tinacms/pull/5565) [`b4450e7`](https://github.com/tinacms/tinacms/commit/b4450e7ed610eec217429cd85900c5b7956b952f) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Add a message to indicate that the user needs to install Hugo before running “yarn dev”
+
+## 1.3.2
+
+### Patch Changes
+
+- [#5486](https://github.com/tinacms/tinacms/pull/5486) [`d7c5ec1`](https://github.com/tinacms/tinacms/commit/d7c5ec1b174419dcc6ddba3cfb3684dd469da571) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Update dependencies across packages
+
+- Updated dependencies [[`d7c5ec1`](https://github.com/tinacms/tinacms/commit/d7c5ec1b174419dcc6ddba3cfb3684dd469da571)]:
+  - @tinacms/metrics@1.0.9
+
+## 1.3.1
+
+### Patch Changes
+
+- [#5457](https://github.com/tinacms/tinacms/pull/5457) [`4b04107`](https://github.com/tinacms/tinacms/commit/4b04107f9799748f93205a743c393ed22fc5f424) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Update template title for Astro Starter
+
+## 1.3.0
+
+### Minor Changes
+
+- [#5433](https://github.com/tinacms/tinacms/pull/5433) [`ba036d7`](https://github.com/tinacms/tinacms/commit/ba036d71bacbcb98f3c7c63eaa4db26f754d8642) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Add Tina Astro Starter template to create-tina-app
+
+### Patch Changes
+
+- [#5411](https://github.com/tinacms/tinacms/pull/5411) [`fe34947`](https://github.com/tinacms/tinacms/commit/fe34947bd9ef0c510f4bf5a4933a375c956d7a92) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - refactor: support a range of node versions instead of specific versions.
+
+## 1.2.5
+
+### Patch Changes
+
+- [#5341](https://github.com/tinacms/tinacms/pull/5341) [`d80714b`](https://github.com/tinacms/tinacms/commit/d80714bd1065f59fe1bb2c7da9dcf114faee5faf) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Remove `got` package
+
+## 1.2.4
+
+### Patch Changes
+
+- [#5276](https://github.com/tinacms/tinacms/pull/5276) [`f90ef4d`](https://github.com/tinacms/tinacms/commit/f90ef4d92ae7b21c8c610d14af9510354a3969c6) Thanks [@Ben0189](https://github.com/Ben0189)! - Updates minor and patch dependencies
+
+- Updated dependencies [[`f90ef4d`](https://github.com/tinacms/tinacms/commit/f90ef4d92ae7b21c8c610d14af9510354a3969c6)]:
+  - @tinacms/metrics@1.0.8
+
 ## 1.2.3
 
 ### Patch Changes

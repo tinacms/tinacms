@@ -2,4 +2,4 @@
 
 */
 
-export * from './unifiedClient'
+export * from './unifiedClient';

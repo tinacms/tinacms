@@ -1,28 +1,29 @@
-import fs from 'fs-extra'
-import path from 'path'
-import { logger } from '../../logger'
-import { FrontmatterFormat, GeneratedFile, InitEnvironment } from './index'
+import fs from 'fs-extra';
+import path from 'path';
+import { logger } from '../../logger';
+import { GeneratedFile, InitEnvironment } from './index';
+import { ContentFrontmatterFormat } from '@tinacms/schema-tools';
 
 const checkGitignoreForItem = async ({
   baseDir,
   line,
 }: {
-  baseDir: string
-  line: string
+  baseDir: string;
+  line: string;
 }) => {
   const gitignoreContent = fs
     .readFileSync(path.join(baseDir, '.gitignore'))
-    .toString()
-  return gitignoreContent.split('\n').some((item) => item === line)
-}
+    .toString();
+  return gitignoreContent.split('\n').some((item) => item === line);
+};
 
 const makeGeneratedFile = async (
   name: string,
   generatedFileType: string,
   parentPath: string,
   opts?: {
-    typescriptSuffix?: string
-    extensionOverride?: string
+    typescriptSuffix?: string;
+    extensionOverride?: string;
   }
 ) => {
   const result = {
@@ -54,15 +55,15 @@ const makeGeneratedFile = async (
               exists: this.javascriptExists,
               path: this.fullPathJS,
               parentPath: this.parentPath,
-            }
+            };
     },
-  } as GeneratedFile
+  } as GeneratedFile;
 
-  result.typescriptExists = await fs.pathExists(result.fullPathTS)
-  result.javascriptExists = await fs.pathExists(result.fullPathJS)
+  result.typescriptExists = await fs.pathExists(result.fullPathTS);
+  result.javascriptExists = await fs.pathExists(result.fullPathJS);
 
-  return result
-}
+  return result;
+};
 
 const detectEnvironment = async ({
   baseDir = '',
@@ -70,39 +71,39 @@ const detectEnvironment = async ({
   rootPath,
   debug = false,
 }: {
-  baseDir?: string
-  pathToForestryConfig: string
-  rootPath: string
-  debug?: boolean
-  tinaVersion?: string
+  baseDir?: string;
+  pathToForestryConfig: string;
+  rootPath: string;
+  debug?: boolean;
+  tinaVersion?: string;
 }): Promise<InitEnvironment> => {
   // If there is a forestry config, ask user to migrate it to tina collections
   const hasForestryConfig = await fs.pathExists(
     path.join(pathToForestryConfig, '.forestry', 'settings.yml')
-  )
+  );
   const sampleContentPath = path.join(
     baseDir,
     'content',
     'posts',
     'hello-world.md'
-  )
+  );
   const usingSrc =
     fs.pathExistsSync(path.join(baseDir, 'src')) &&
     (fs.pathExistsSync(path.join(baseDir, 'src', 'app')) ||
-      fs.pathExistsSync(path.join(baseDir, 'src', 'pages')))
+      fs.pathExistsSync(path.join(baseDir, 'src', 'pages')));
 
-  const tinaFolder = path.join(baseDir, 'tina')
+  const tinaFolder = path.join(baseDir, 'tina');
   const tinaConfigExists = Boolean(
     // Does the tina folder exist?
     (await fs.pathExists(tinaFolder)) &&
       // Does the tina folder contain a config file?
       (await fs.readdir(tinaFolder)).find((x) => x.includes('config'))
-  )
+  );
 
   // The path to the pages directory. If using src, it will be <baseDir>/src/pages
   const pagesDir = [baseDir, usingSrc ? 'src' : false, 'pages'].filter(
     Boolean
-  ) as string[]
+  ) as string[];
 
   const generatedFiles: InitEnvironment['generatedFiles'] = {
     config: await makeGeneratedFile('config', 'config', tinaFolder),
@@ -133,54 +134,56 @@ const detectEnvironment = async ({
       path.join(baseDir, 'content', 'posts'),
       { extensionOverride: 'md' }
     ),
-  }
+  };
 
-  const hasSampleContent = await fs.pathExists(sampleContentPath)
-  const hasPackageJSON = await fs.pathExists('package.json')
-  let hasTinaDeps = false
+  const hasSampleContent = await fs.pathExists(sampleContentPath);
+  const hasPackageJSON = await fs.pathExists('package.json');
+  let hasTinaDeps = false;
 
   if (hasPackageJSON) {
     try {
-      const packageJSON = await fs.readJSON('package.json')
-      const deps: string[] = []
+      const packageJSON = await fs.readJSON('package.json');
+      const deps: string[] = [];
       if (packageJSON?.dependencies) {
-        deps.push(...Object.keys(packageJSON.dependencies))
+        deps.push(...Object.keys(packageJSON.dependencies));
       }
       if (packageJSON?.devDependencies) {
-        deps.push(...Object.keys(packageJSON.devDependencies))
+        deps.push(...Object.keys(packageJSON.devDependencies));
       }
       if (deps.includes('@tinacms/cli') && deps.includes('tinacms')) {
-        hasTinaDeps = true
+        hasTinaDeps = true;
       }
     } catch (e) {
       logger.error(
         'Error reading package.json assuming that no Tina dependencies are installed'
-      )
+      );
     }
   }
 
-  const hasGitIgnore = await fs.pathExists(path.join('.gitignore'))
+  const hasGitIgnore = await fs.pathExists(path.join('.gitignore'));
   const hasGitIgnoreNodeModules =
     hasGitIgnore &&
-    (await checkGitignoreForItem({ baseDir, line: 'node_modules' }))
+    (await checkGitignoreForItem({ baseDir, line: 'node_modules' }));
   const hasEnvTina =
     hasGitIgnore &&
-    (await checkGitignoreForItem({ baseDir, line: '.env.tina' }))
+    (await checkGitignoreForItem({ baseDir, line: '.env.tina' }));
   const hasGitIgnoreEnv =
-    hasGitIgnore && (await checkGitignoreForItem({ baseDir, line: '.env' }))
-  let frontMatterFormat: FrontmatterFormat
+    hasGitIgnore && (await checkGitignoreForItem({ baseDir, line: '.env' }));
+  let frontMatterFormat: ContentFrontmatterFormat;
   if (hasForestryConfig) {
-    const hugoConfigPath = path.join(rootPath, 'config.toml')
+    const hugoConfigPath = path.join(rootPath, 'config.toml');
     if (await fs.pathExists(hugoConfigPath)) {
-      const hugoConfig = await fs.readFile(hugoConfigPath, 'utf8')
-      const metaDataFormat = hugoConfig.match(/metaDataFormat = "(.*)"/)?.[1]
+      const hugoConfig = await fs.readFile(hugoConfigPath, 'utf8');
+      const metaDataFormat = hugoConfig
+        .toString()
+        .match(/metaDataFormat = "(.*)"/)?.[1];
       if (
         metaDataFormat &&
         (metaDataFormat === 'yaml' ||
           metaDataFormat === 'toml' ||
           metaDataFormat === 'json')
       ) {
-        frontMatterFormat = metaDataFormat
+        frontMatterFormat = metaDataFormat;
       }
     }
   }
@@ -198,11 +201,11 @@ const detectEnvironment = async ({
     usingSrc,
     tinaConfigExists,
     hasTinaDeps,
-  }
+  };
   if (debug) {
-    console.log('Environment:')
-    console.log(JSON.stringify(env, null, 2))
+    console.log('Environment:');
+    console.log(JSON.stringify(env, null, 2));
   }
-  return env
-}
-export default detectEnvironment
+  return env;
+};
+export default detectEnvironment;

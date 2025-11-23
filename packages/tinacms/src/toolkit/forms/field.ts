@@ -1,21 +1,25 @@
-export type AnyField = Field & { [key: string]: any }
+import { Parser } from '@tinacms/schema-tools';
+
+export type AnyField = Field & { [key: string]: any };
 
 export interface Field<F extends Field = AnyField> {
-  name: string
-  label?: string | boolean
-  description?: string
-  component: React.FC<any> | string | null
-  inlineComponent?: React.FC<any>
-  parse?: (value: any, name: string, field: F) => any
-  format?: (value: any, name: string, field: F) => any
+  name: string;
+  label?: string | boolean;
+  description?: string;
+  component: React.FC<any> | string | null;
+  inlineComponent?: React.FC<any>;
+  parser?: Parser;
+  parse?: (value: any, name: string, field: F) => any;
+  format?: (value: any, name: string, field: F) => any;
   validate?(
     value: any,
     allValues: any,
     meta: any,
     field: Field
-  ): string | object | undefined
-  defaultValue?: any
-  fields?: F[]
+  ): string | object | undefined;
+  defaultValue?: any;
+  namespace?: string[];
+  fields?: F[];
   /**
    * Focus events can come from outside of the component, this is not
    * a guarantee that the given field will receive focus since that functionality
@@ -25,5 +29,5 @@ export interface Field<F extends Field = AnyField> {
    * necessarily updated when a user clicks on a new field. So you can have a
    * field which is marked as the active field, and have focus on another field
    */
-  experimental_focusIntent?: boolean
+  experimental_focusIntent?: boolean;
 }

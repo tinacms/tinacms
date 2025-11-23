@@ -1,68 +1,39 @@
-import React from 'react'
-import { Components } from './plugins/ui/components'
-import { formattingPlugins, commonPlugins } from './plugins/core'
-import { helpers } from './plugins/core/common'
-import {
-  createMdxBlockPlugin,
-  createMdxInlinePlugin,
-} from './plugins/create-mdx-plugins'
-import createImgPlugin from './plugins/create-img-plugin'
-import { createInvalidMarkdownPlugin } from './plugins/create-invalid-markdown-plugin'
-import { createLinkPlugin } from './plugins/create-link-plugin'
-import { uuid } from './plugins/ui/helpers'
-import type { RichTextType } from '..'
-import { createPlugins, Plate } from '@udecode/plate-common'
-import { Editor } from './components/editor'
-import { FixedToolbar } from './components/plate-ui/fixed-toolbar'
-import { TooltipProvider } from './components/plate-ui/tooltip'
-import FixedToolbarButtons from './components/fixed-toolbar-buttons'
-import { FloatingToolbar } from './components/plate-ui/floating-toolbar'
-import FloatingToolbarButtons from './components/floating-toolbar-buttons'
-import { LinkFloatingToolbar } from './components/plate-ui/link-floating-toolbar'
-import { isUrl } from './transforms/is-url'
-import { ToolbarProvider } from './toolbar/toolbar-provider'
-import { createMermaidPlugin } from './plugins/custom/mermaid-plugin'
+import React from 'react';
+import { Components } from './plugins/ui/components';
+import { helpers, normalizeLinksInCodeBlocks } from './plugins/core/common';
+import type { RichTextType } from '..';
+import { Editor, EditorContainer } from './components/editor';
+import { FixedToolbar } from './components/plate-ui/fixed-toolbar';
+import { TooltipProvider } from './components/plate-ui/tooltip';
+import FixedToolbarButtons from './components/fixed-toolbar-buttons';
+import { ToolbarProvider } from './toolbar/toolbar-provider';
+import { Plate } from '@udecode/plate/react';
+import { useCreateEditor } from './hooks/use-create-editor';
+import { editorPlugins } from './plugins/editor-plugins';
+import { FloatingToolbar } from './components/plate-ui/floating-toolbar';
+import FloatingToolbarButtons from './components/floating-toolbar-buttons';
 
-export const RichEditor = (props: RichTextType) => {
-  const initialValue = React.useMemo(
-    () =>
-      props.input.value?.children?.length
-        ? props.input.value.children.map(helpers.normalize)
-        : [{ type: 'p', children: [{ type: 'text', text: '' }] }],
-    []
-  )
+export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
+  const initialValue = React.useMemo(() => {
+    if (field?.parser?.type === 'slatejson') {
+      return input.value.children;
+    } else if (input.value?.children?.length) {
+      const normalized = input.value.children.map(helpers.normalize);
+      return normalized;
+    } else {
+      return [{ type: 'p', children: [{ type: 'text', text: '' }] }];
+    }
+  }, []);
 
-  const plugins = React.useMemo(
-    () =>
-      createPlugins(
-        [
-          ...formattingPlugins,
-          ...commonPlugins,
-          createMdxBlockPlugin(),
-          createMdxInlinePlugin(),
-          createImgPlugin(),
-          createMermaidPlugin(),
-          createInvalidMarkdownPlugin(),
-          createLinkPlugin({
-            options: {
-              //? NOTE: This is a custom validation function that allows for relative links i.e. /about
-              isUrl: (url: string) => isUrl(url),
-            },
-            renderAfterEditable: LinkFloatingToolbar,
-          }),
-        ],
-        {
-          components: Components(),
-        }
-      ),
-    []
-  )
+  //TODO try with a wrapper?
+  const editor = useCreateEditor({
+    plugins: [...editorPlugins],
+    value: initialValue,
+    components: Components(),
+  });
 
   // This should be a plugin customization
-  const withToolbar = true
-  const tempId = [props.tinaForm.id, props.input.name].join('.')
-  const id = React.useMemo(() => uuid() + tempId, [tempId])
-  const ref = React.useRef<HTMLDivElement>(null)
+  const ref = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     if (ref.current) {
@@ -71,44 +42,54 @@ export const RichEditor = (props: RichTextType) => {
         // as a ref, so we need to query for it ourselves
         const plateElement = ref.current?.querySelector(
           '[role="textbox"]'
-        ) as HTMLElement
-        if (props.field.experimental_focusIntent && plateElement) {
-          if (plateElement) plateElement.focus()
+        ) as HTMLElement;
+        if (field.experimental_focusIntent && plateElement) {
+          if (plateElement) plateElement.focus();
         }
         // Slate takes a second to mount
-      }, 100)
+      }, 100);
     }
-  }, [props.field.experimental_focusIntent, ref])
-
+  }, [field.experimental_focusIntent, ref]);
+  //
   return (
     <div ref={ref}>
       <Plate
-        id={id}
-        initialValue={initialValue}
-        plugins={plugins}
+        editor={editor}
         onChange={(value) => {
-          props.input.onChange({
+          // Normalize links in code blocks before saving (we dont want type: 'a' inside code blocks, this will break the mdx parser)
+          // Ideal Solution: let code block provider to have a option for exclude certain plugins
+          const normalized = (value.value as any[]).map(
+            normalizeLinksInCodeBlocks
+          );
+
+          input.onChange({
             type: 'root',
-            children: value,
-          })
+            children: normalized,
+          });
         }}
       >
-        <TooltipProvider>
-          <ToolbarProvider
-            tinaForm={props.tinaForm}
-            templates={props.field.templates}
-            overrides={props.field?.toolbarOverride}
-          >
-            <FixedToolbar>
-              <FixedToolbarButtons />
-            </FixedToolbar>
-            <FloatingToolbar>
-              <FloatingToolbarButtons />
-            </FloatingToolbar>
-          </ToolbarProvider>
-          <Editor />
-        </TooltipProvider>
+        <EditorContainer>
+          <TooltipProvider>
+            <ToolbarProvider
+              tinaForm={tinaForm}
+              templates={field.templates}
+              overrides={
+                field?.toolbarOverride ? field.toolbarOverride : field.overrides
+              }
+            >
+              <FixedToolbar>
+                <FixedToolbarButtons />
+              </FixedToolbar>
+              {field?.overrides?.showFloatingToolbar !== false ? (
+                <FloatingToolbar>
+                  <FloatingToolbarButtons />
+                </FloatingToolbar>
+              ) : null}
+            </ToolbarProvider>
+            <Editor />
+          </TooltipProvider>
+        </EditorContainer>
       </Plate>
     </div>
-  )
-}
+  );
+};

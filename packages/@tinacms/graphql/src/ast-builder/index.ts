@@ -23,9 +23,9 @@ import {
   type OperationDefinitionNode,
   type VariableDefinitionNode,
   type ArgumentNode,
-} from 'graphql'
-import { flattenDeep, lastItem } from '../util'
-import uniqBy from 'lodash.uniqby'
+} from 'graphql';
+import { flattenDeep, lastItem } from '../util';
+import uniqBy from 'lodash.uniqby';
 
 export const SysFieldDefinition = {
   kind: 'Field' as const,
@@ -112,7 +112,7 @@ export const SysFieldDefinition = {
       },
     ],
   },
-}
+};
 
 /**
  * the `gql` module provides functions and types which can be
@@ -133,8 +133,8 @@ export const astBuilder = {
     name,
     additionalFields,
   }: {
-    name: string
-    additionalFields?: FieldDefinitionNode[]
+    name: string;
+    additionalFields?: FieldDefinitionNode[];
   }) => {
     return astBuilder.ObjectTypeDefinition({
       name: name,
@@ -157,14 +157,14 @@ export const astBuilder = {
         }),
         ...(additionalFields || []),
       ],
-    })
+    });
   },
   ScalarTypeDefinition: ({
     name,
     description,
   }: {
-    name: string
-    description?: string
+    name: string;
+    description?: string;
   }): ScalarTypeDefinitionNode => {
     return {
       kind: 'ScalarTypeDefinition',
@@ -177,7 +177,7 @@ export const astBuilder = {
         value: description || '',
       },
       directives: [],
-    }
+    };
   },
   InputValueDefinition: ({
     name,
@@ -185,26 +185,26 @@ export const astBuilder = {
     list,
     required,
   }: {
-    name: string
-    type: string | InputObjectTypeDefinitionNode | EnumTypeDefinitionNode
-    list?: boolean
-    required?: boolean
+    name: string;
+    type: string | InputObjectTypeDefinitionNode | EnumTypeDefinitionNode;
+    list?: boolean;
+    required?: boolean;
   }) => {
-    let res = {}
+    let res = {};
     const namedType = {
       kind: 'NamedType' as const,
       name: {
         kind: 'Name' as const,
         value: type,
       },
-    }
+    };
     const def = {
       kind: 'InputValueDefinition' as const,
       name: {
         kind: 'Name' as const,
         value: name,
       },
-    }
+    };
     if (list) {
       if (required) {
         res = {
@@ -216,7 +216,7 @@ export const astBuilder = {
               type: namedType,
             },
           },
-        }
+        };
       } else {
         res = {
           ...def,
@@ -224,7 +224,7 @@ export const astBuilder = {
             kind: 'ListType' as const,
             type: namedType,
           },
-        }
+        };
       }
     } else {
       if (required) {
@@ -234,21 +234,21 @@ export const astBuilder = {
             kind: 'NonNullType',
             type: namedType,
           },
-        }
+        };
       } else {
         res = {
           ...def,
           type: namedType,
-        }
+        };
       }
     }
 
-    return res as InputValueDefinitionNode
+    return res as InputValueDefinitionNode;
   },
   EnumDefinition: (props: {
-    name: string
-    required?: boolean
-    values: string[]
+    name: string;
+    required?: boolean;
+    values: string[];
   }): EnumTypeDefinitionNode => {
     return {
       kind: 'EnumTypeDefinition',
@@ -263,9 +263,9 @@ export const astBuilder = {
             kind: 'Name',
             value: val,
           },
-        }
+        };
       }),
-    }
+    };
   },
   FieldNodeDefinition: ({
     name,
@@ -274,16 +274,16 @@ export const astBuilder = {
     list,
     required,
   }: {
-    name: string
-    type: string | TypeDefinitionNode
-    required?: boolean
-    list?: boolean
-    args?: InputValueDefinitionNode[]
+    name: string;
+    type: string | TypeDefinitionNode;
+    required?: boolean;
+    list?: boolean;
+    args?: InputValueDefinitionNode[];
   }) =>
     ({
       name: { kind: 'Name' as const, value: name },
       kind: 'Field' as const,
-    } as FieldNode),
+    }) as FieldNode,
   FieldDefinition: ({
     name,
     type,
@@ -291,21 +291,21 @@ export const astBuilder = {
     list,
     required,
   }: {
-    name: string
-    type: string | TypeDefinitionNode
-    required?: boolean
-    list?: boolean
-    args?: InputValueDefinitionNode[]
+    name: string;
+    type: string | TypeDefinitionNode;
+    required?: boolean;
+    list?: boolean;
+    args?: InputValueDefinitionNode[];
   }) => {
     // Default to true
-    let res = {}
+    let res = {};
     const namedType = {
       kind: 'NamedType' as const,
       name: {
         kind: 'Name' as const,
         value: type,
       },
-    }
+    };
     const def = {
       kind: 'FieldDefinition' as const,
       name: {
@@ -313,7 +313,7 @@ export const astBuilder = {
         value: name,
       },
       arguments: args,
-    }
+    };
 
     // list
     if (list) {
@@ -331,7 +331,7 @@ export const astBuilder = {
               },
             },
           },
-        }
+        };
         // list and not required
       } else {
         res = {
@@ -340,7 +340,7 @@ export const astBuilder = {
             kind: 'ListType' as const,
             type: namedType,
           },
-        }
+        };
       }
       // Not a list
     } else {
@@ -352,26 +352,26 @@ export const astBuilder = {
             kind: 'NonNullType' as const,
             type: namedType,
           },
-        }
+        };
         // Not a list and not required
       } else {
         res = {
           ...def,
           type: namedType,
-        }
+        };
       }
     }
 
-    return res as FieldDefinitionNode
+    return res as FieldDefinitionNode;
   },
   InterfaceTypeDefinition: ({
     name,
     fields,
     description = '',
   }: {
-    name: string
-    description?: string
-    fields: FieldDefinitionNode[]
+    name: string;
+    description?: string;
+    fields: FieldDefinitionNode[];
   }): InterfaceTypeDefinitionNode => {
     return {
       kind: 'InterfaceTypeDefinition',
@@ -383,14 +383,14 @@ export const astBuilder = {
       interfaces: [],
       directives: [],
       fields: fields,
-    }
+    };
   },
   InputObjectTypeDefinition: ({
     name,
     fields,
   }: {
-    name: string
-    fields: InputValueDefinitionNode[] | ObjectTypeDefinitionNode[]
+    name: string;
+    fields: InputValueDefinitionNode[] | ObjectTypeDefinitionNode[];
   }): InputObjectTypeDefinitionNode => ({
     kind: 'InputObjectTypeDefinition' as const,
     name: {
@@ -405,8 +405,8 @@ export const astBuilder = {
     name,
     types,
   }: {
-    name: string
-    types: (string | TypeDefinitionNode)[]
+    name: string;
+    types: (string | TypeDefinitionNode)[];
   }): UnionTypeDefinitionNode => ({
     kind: 'UnionTypeDefinition' as const,
     name: {
@@ -431,7 +431,7 @@ export const astBuilder = {
         kind: 'Name',
         value: name,
       },
-    }
+    };
   },
   ObjectTypeDefinition: ({
     name,
@@ -440,11 +440,11 @@ export const astBuilder = {
     directives = [],
     args = [],
   }: {
-    name: string
-    fields: FieldDefinitionNode[]
-    interfaces?: NamedTypeNode[]
-    directives?: DirectiveNode[]
-    args?: NamedTypeNode[]
+    name: string;
+    fields: FieldDefinitionNode[];
+    interfaces?: NamedTypeNode[];
+    directives?: DirectiveNode[];
+    args?: NamedTypeNode[];
   }): ObjectTypeDefinitionNode => ({
     kind: 'ObjectTypeDefinition' as const,
     interfaces,
@@ -459,8 +459,8 @@ export const astBuilder = {
     name,
     selections,
   }: {
-    name: string
-    selections: SelectionNode[]
+    name: string;
+    selections: SelectionNode[];
   }) => {
     return {
       name: { kind: 'Name' as const, value: name },
@@ -469,14 +469,14 @@ export const astBuilder = {
         kind: 'SelectionSet' as const,
         selections,
       },
-    }
+    };
   },
   InlineFragmentDefinition: ({
     name,
     selections,
   }: {
-    name: string
-    selections: SelectionNode[]
+    name: string;
+    selections: SelectionNode[];
   }): InlineFragmentNode => {
     return {
       kind: 'InlineFragment' as const,
@@ -491,16 +491,16 @@ export const astBuilder = {
           value: name,
         },
       },
-    }
+    };
   },
   FragmentDefinition: ({
     name,
     fragmentName,
     selections,
   }: {
-    name: string
-    fragmentName: string
-    selections: SelectionNode[]
+    name: string;
+    fragmentName: string;
+    selections: SelectionNode[];
   }): FragmentDefinitionNode => {
     return {
       kind: 'FragmentDefinition' as const,
@@ -520,7 +520,7 @@ export const astBuilder = {
         kind: 'SelectionSet' as const,
         selections,
       },
-    }
+    };
   },
   TYPES: {
     Scalar: (type: scalarNames) => {
@@ -531,8 +531,8 @@ export const astBuilder = {
         datetime: 'String', // FIXME
         image: 'String', // FIXME
         text: 'String',
-      }
-      return scalars[type]
+      };
+      return scalars[type];
     },
     MultiCollectionDocument: 'DocumentNode',
     CollectionDocumentUnion: 'DocumentUnion',
@@ -556,8 +556,8 @@ export const astBuilder = {
     queryName,
     fragName,
   }: {
-    queryName: string
-    fragName: string
+    queryName: string;
+    fragName: string;
   }): OperationDefinitionNode => {
     return {
       kind: 'OperationDefinition' as const,
@@ -650,7 +650,7 @@ export const astBuilder = {
           },
         ],
       },
-    }
+    };
   },
 
   ListQueryOperationDefinition: ({
@@ -659,10 +659,10 @@ export const astBuilder = {
     filterType,
     dataLayer,
   }: {
-    queryName: string
-    fragName: string
-    filterType: string
-    dataLayer: boolean
+    queryName: string;
+    fragName: string;
+    filterType: string;
+    dataLayer: boolean;
   }): OperationDefinitionNode => {
     const variableDefinitions: VariableDefinitionNode[] = [
       {
@@ -755,7 +755,7 @@ export const astBuilder = {
         },
         directives: [],
       },
-    ]
+    ];
     const queryArguments: ArgumentNode[] = [
       {
         kind: 'Argument',
@@ -827,7 +827,7 @@ export const astBuilder = {
           },
         },
       },
-    ]
+    ];
 
     if (dataLayer) {
       queryArguments.push({
@@ -843,7 +843,7 @@ export const astBuilder = {
             value: 'filter',
           },
         },
-      })
+      });
 
       variableDefinitions.push({
         kind: 'VariableDefinition',
@@ -862,7 +862,7 @@ export const astBuilder = {
           },
         },
         directives: [],
-      })
+      });
     }
 
     return {
@@ -1023,12 +1023,12 @@ export const astBuilder = {
           },
         ],
       },
-    }
+    };
   },
   toGraphQLAst: (ast: {
-    globalTemplates: TypeDefinitionNode[]
-    query: TypeDefinitionNode
-    definitions: TypeDefinitionNode[]
+    globalTemplates: TypeDefinitionNode[];
+    query: TypeDefinitionNode;
+    definitions: TypeDefinitionNode[];
   }): DocumentNode => {
     const definitions = uniqBy(
       [
@@ -1037,14 +1037,14 @@ export const astBuilder = {
         ...ast.definitions,
       ],
       (field) => field.name.value
-    )
+    );
 
     return {
       kind: 'Document',
       definitions,
-    }
+    };
   },
-}
+};
 
 type scalarNames =
   | 'string'
@@ -1052,12 +1052,12 @@ type scalarNames =
   | 'datetime'
   | 'image'
   | 'text'
-  | 'number'
+  | 'number';
 
 const capitalize = (s: string) => {
-  if (typeof s !== 'string') return ''
-  return s.charAt(0).toUpperCase() + s.slice(1)
-}
+  if (typeof s !== 'string') return '';
+  return s.charAt(0).toUpperCase() + s.slice(1);
+};
 
 export const extractInlineTypes = (
   item: TypeDefinitionNode | TypeDefinitionNode[]
@@ -1065,42 +1065,42 @@ export const extractInlineTypes = (
   if (Array.isArray(item)) {
     // @ts-ignore
     const accumulator: TypeDefinitionNode[] = item.map((i) => {
-      return extractInlineTypes(i)
-    })
-    return flattenDeep(accumulator)
+      return extractInlineTypes(i);
+    });
+    return flattenDeep(accumulator);
   }
-  const accumulator: TypeDefinitionNode[] = [item]
+  const accumulator: TypeDefinitionNode[] = [item];
   // @ts-ignore
   for (const node of walk(item)) {
     if (node.kind === 'UnionTypeDefinition') {
       // @ts-ignore
-      node.types = uniqBy(node.types, (type) => type.name.value)
+      node.types = uniqBy(node.types, (type) => type.name.value);
     }
     // @ts-ignore
     if (node.kind === 'NamedType') {
       // @ts-ignore
       if (typeof node.name.value !== 'string') {
         // @ts-ignore
-        accumulator.push(node.name.value)
+        accumulator.push(node.name.value);
         // @ts-ignore
-        node.name.value = node.name.value.name.value
+        node.name.value = node.name.value.name.value;
       }
     }
   }
 
-  return accumulator
-}
+  return accumulator;
+};
 
 export function* walk(
   maybeNode: TypeDefinitionNode,
   visited = new WeakSet()
 ): IterableIterator<TypeDefinitionNode> {
   if (typeof maybeNode === 'string') {
-    return
+    return;
   }
 
   if (visited.has(maybeNode)) {
-    return
+    return;
   }
 
   // Traverse node's properties first
@@ -1108,132 +1108,84 @@ export function* walk(
     if (Array.isArray(value)) {
       for (const element of value) {
         // @ts-ignore
-        yield* walk(element, visited)
+        yield* walk(element, visited);
       }
     } else {
       // @ts-ignore
-      yield* walk(value, visited)
+      yield* walk(value, visited);
     }
   }
   // Then pass it back to our callback, which will mutate it
-  yield maybeNode
-  visited.add(maybeNode)
-}
-
-export function addNamespaceToSchema<T extends object | string>(
-  maybeNode: T,
-  namespace: string[] = []
-): T {
-  if (typeof maybeNode === 'string') {
-    return maybeNode
-  }
-  if (typeof maybeNode === 'boolean') {
-    return maybeNode
-  }
-
-  // @ts-ignore
-  const newNode: {
-    [key in keyof T]: (T & { namespace?: string[] }) | string
-  } = maybeNode
-  // Traverse node's properties first
-  const keys = Object.keys(maybeNode)
-  Object.values(maybeNode).map((m, index) => {
-    const key = keys[index]
-    if (Array.isArray(m)) {
-      // @ts-ignore
-      newNode[key] = m.map((element) => {
-        if (!element) {
-          return
-        }
-        if (!element.hasOwnProperty('name')) {
-          return element
-        }
-        const value = element.name || element.value // options field accepts an object with `value`  instead of `name`
-        return addNamespaceToSchema(element, [...namespace, value])
-      })
-    } else {
-      if (!m) {
-        return
-      }
-      if (!m.hasOwnProperty('name')) {
-        // @ts-ignore
-        newNode[key] = m
-      } else {
-        // @ts-ignore
-        newNode[key] = addNamespaceToSchema(m, [...namespace, m.name])
-      }
-    }
-  })
-  // @ts-ignore
-  return { ...newNode, namespace: namespace }
+  yield maybeNode;
+  visited.add(maybeNode);
 }
 
 const generateNamespacedFieldName = (names: string[], suffix: string = '') => {
-  return (suffix ? [...names, suffix] : names).map(capitalize).join('')
-}
+  return (suffix ? [...names, suffix] : names).map(capitalize).join('');
+};
 
 export const NAMER = {
   dataFilterTypeNameOn: (namespace: string[]) => {
-    return generateNamespacedFieldName(namespace, '_FilterOn')
+    return generateNamespacedFieldName(namespace, '_FilterOn');
   },
   dataFilterTypeName: (namespace: string[]) => {
-    return generateNamespacedFieldName(namespace, 'Filter')
+    return generateNamespacedFieldName(namespace, 'Filter');
   },
   dataMutationTypeNameOn: (namespace: string[]) => {
-    return generateNamespacedFieldName(namespace, '_MutationOn')
+    return generateNamespacedFieldName(namespace, '_MutationOn');
   },
   dataMutationTypeName: (namespace: string[]) => {
-    return generateNamespacedFieldName(namespace, 'Mutation')
+    return generateNamespacedFieldName(namespace, 'Mutation');
   },
   dataMutationUpdateTypeName: (namespace: string[]) => {
-    return generateNamespacedFieldName(namespace, 'UpdateMutation')
+    return generateNamespacedFieldName(namespace, 'UpdateMutation');
   },
   updateName: (namespace: string[]) => {
-    return `update${generateNamespacedFieldName(namespace)}`
+    return `update${generateNamespacedFieldName(namespace)}`;
   },
   createName: (namespace: string[]) => {
-    return `create${generateNamespacedFieldName(namespace)}`
+    return `create${generateNamespacedFieldName(namespace)}`;
   },
   documentQueryName: () => {
-    return 'document'
+    return 'document';
   },
   documentConnectionQueryName: () => {
-    return 'documentConnection'
+    return 'documentConnection';
   },
   collectionQueryName: () => {
-    return 'collection'
+    return 'collection';
   },
   collectionListQueryName: () => {
-    return 'collections'
+    return 'collections';
   },
   queryName: (namespace: string[]) => {
-    return String(lastItem(namespace))
+    return String(lastItem(namespace));
   },
   generateQueryListName: (namespace: string[]) => {
-    return `${lastItem(namespace)}Connection`
+    return `${lastItem(namespace)}Connection`;
   },
   generateReverseQueryListName: (namespace: string[]) => {
     return `${lastItem(namespace)}ReverseConnection`
   },
   fragmentName: (namespace: string[]) => {
-    return generateNamespacedFieldName(namespace, '') + 'Parts'
+    return generateNamespacedFieldName(namespace, '') + 'Parts';
   },
   collectionTypeName: (namespace: string[]) => {
-    return generateNamespacedFieldName(namespace, 'Collection')
+    return generateNamespacedFieldName(namespace, 'Collection');
   },
   documentTypeName: (namespace: string[]) => {
-    return generateNamespacedFieldName(namespace)
+    return generateNamespacedFieldName(namespace);
   },
   dataTypeName: (namespace: string[]) => {
-    return generateNamespacedFieldName(namespace, '')
+    return generateNamespacedFieldName(namespace, '');
   },
   referenceConnectionType: (namespace: string[]) => {
-    return generateNamespacedFieldName(namespace, 'Connection')
+    return generateNamespacedFieldName(namespace, 'Connection');
   },
   reverseReferenceConnectionType: (namespace: string[]) => {
     return generateNamespacedFieldName(namespace, 'ReverseConnection')
   },
   referenceConnectionEdgesTypeName: (namespace: string[]) => {
-    return generateNamespacedFieldName(namespace, 'ConnectionEdges')
+    return generateNamespacedFieldName(namespace, 'ConnectionEdges');
   },
-}
+};

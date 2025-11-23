@@ -1,3 +1,7 @@
+/**
+ * @deprecated as the API is clunky and hard to use. Mutations should now be
+ * done via Graphql. This will be removed by July 2025.
+ */
 export class GitClient {
   constructor(private baseUrl: string) {}
 
@@ -7,7 +11,7 @@ export class GitClient {
    * @deprecated
    */
   onSubmit(data: any): Promise<any> {
-    return this.commit(data)
+    return this.commit(data);
   }
   /**
    * An alias to `writeToDisk`
@@ -15,7 +19,7 @@ export class GitClient {
    * @deprecated
    */
   onChange(data: any): Promise<any> {
-    return this.writeToDisk(data)
+    return this.writeToDisk(data);
   }
   /**
    * An alias to `writeMediaToDisk`
@@ -23,7 +27,7 @@ export class GitClient {
    * @deprecated
    */
   onUploadMedia(data: any): Promise<any> {
-    return this.writeMediaToDisk(data)
+    return this.writeMediaToDisk(data);
   }
   /**
    * An alias to `deleteFromDisk`
@@ -31,20 +35,23 @@ export class GitClient {
    * @deprecated
    */
   onDelete(data: any): Promise<any> {
-    return this.deleteFromDisk(data)
+    return this.deleteFromDisk(data);
   }
   /**
    * @deprecated
    */
   isAuthenticated(): boolean {
-    return true
+    return true;
   }
 
+  /**
+   * @deprecated
+   */
   commit(data: {
-    files: string[]
-    message?: string
-    name?: string
-    email?: string
+    files: string[];
+    message?: string;
+    name?: string;
+    email?: string;
   }): Promise<Response> {
     return fetch(`${this.baseUrl}/commit`, {
       method: 'POST',
@@ -52,13 +59,14 @@ export class GitClient {
         'Content-Type': 'application/json; charset=utf-8',
       },
       body: JSON.stringify(data),
-    })
+    });
   }
 
   /**
-   *
    * TODO: Add return type.
    * TODO: Remove `catch`
+   *
+   * @deprecated
    */
   push(): Promise<any> {
     return fetch(`${this.baseUrl}/push`, {
@@ -67,18 +75,19 @@ export class GitClient {
         'Content-Type': 'application/json; charset=utf-8',
       },
     }).catch((e) => {
-      console.error(e)
-    })
+      console.error(e);
+    });
   }
 
   /**
-   *
    * TODO: Add return type.
    * TODO: Remove `catch`
+   *
+   * @deprecated
    */
   writeToDisk(data: {
-    fileRelativePath: string
-    content: string
+    fileRelativePath: string;
+    content: string;
   }): Promise<any> {
     return fetch(
       `${this.baseUrl}/${encodeURIComponent(data.fileRelativePath)}`,
@@ -90,30 +99,34 @@ export class GitClient {
         body: JSON.stringify(data),
       }
     ).catch((e) => {
-      console.error(e)
-    })
+      console.error(e);
+    });
   }
 
   /**
    * Uploads a File to disk
    * TODO: Remove `catch`
+   *
+   * @deprecated
    */
   writeMediaToDisk(data: { directory: string; content: File }): Promise<any> {
-    const formData = new FormData()
-    formData.append('file', data.content)
-    formData.append('directory', data.directory)
+    const formData = new FormData();
+    formData.append('file', data.content);
+    formData.append('directory', data.directory);
     return fetch(`${this.baseUrl}/upload`, {
       method: 'POST',
       body: formData,
     }).catch((e) => {
-      console.error(e)
-    })
+      console.error(e);
+    });
   }
 
   /**
    * TODO: rename `data.relPath` to `data.fileRelativePath`
    * TODO: Add return type.
    * TODO: Remove `catch`
+   *
+   * @deprecated
    */
   deleteFromDisk(data: { relPath: string }): Promise<any> {
     return fetch(`${this.baseUrl}/${encodeURIComponent(data.relPath)}`, {
@@ -123,12 +136,14 @@ export class GitClient {
       },
       body: JSON.stringify(data),
     }).catch((e) => {
-      console.error(e)
-    })
+      console.error(e);
+    });
   }
 
   /**
    * Resets the given files.
+   *
+   * @deprecated
    */
   reset(data: { files: string[] }) {
     return fetch(`${this.baseUrl}/reset`, {
@@ -137,11 +152,13 @@ export class GitClient {
         'Content-Type': 'application/json; charset=utf-8',
       },
       body: JSON.stringify(data),
-    })
+    });
   }
 
   /**
    * Get the contents of a file or directory on disk.
+   *
+   * @deprecated
    */
   getFile(fileRelativePath: string) {
     return fetch(`${this.baseUrl}/${encodeURIComponent(fileRelativePath)}`, {
@@ -149,12 +166,14 @@ export class GitClient {
         'Content-Type': 'application/json; charset=utf-8',
       },
     }).then((response) => {
-      return response.json()
-    })
+      return response.json();
+    });
   }
 
   /**
    * Get the contents of a file for the most recent commit.
+   *
+   * @deprecated
    */
   show(fileRelativePath: string) {
     return fetch(
@@ -165,13 +184,15 @@ export class GitClient {
         },
       }
     ).then((response) => {
-      return response.json()
-    })
+      return response.json();
+    });
   }
 
   /**
    * Get information about a local branch by name, or the current branch if no
    * name is specified.
+   *
+   * @deprecated
    */
   branch(name?: string) {
     return fetch(`${this.baseUrl}/${name ? `branches/${name}` : 'branch'}`, {
@@ -179,12 +200,14 @@ export class GitClient {
         'Content-Type': 'application/json; charset=utf-8',
       },
     }).then((response) => {
-      return response.json()
-    })
+      return response.json();
+    });
   }
 
   /**
    * Get a list of the names of all local branches.
+   *
+   * @deprecated
    */
   branches() {
     return fetch(`${this.baseUrl}/branches`, {
@@ -192,7 +215,7 @@ export class GitClient {
         'Content-Type': 'application/json; charset=utf-8',
       },
     }).then((response) => {
-      return response.json()
-    })
+      return response.json();
+    });
   }
 }

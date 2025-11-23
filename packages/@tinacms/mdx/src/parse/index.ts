@@ -4,20 +4,20 @@
 
 */
 
-import { remark } from 'remark'
-import remarkMdx, { type Root } from 'remark-mdx'
-import { gfm } from 'micromark-extension-gfm'
-import { gfmFromMarkdown } from 'mdast-util-gfm'
-import remarkGfm from 'remark-gfm'
-import { parseMDX as parseMDXNext } from '../next'
-import { fromMarkdown } from 'mdast-util-from-markdown'
-import { remarkToSlate, RichTextParseError } from './remarkToPlate'
-import type { RichTextType } from '@tinacms/schema-tools'
-import type * as Plate from './plate'
-import { directiveFromMarkdown } from '../extensions/tina-shortcodes/from-markdown'
-import { tinaDirective } from '../extensions/tina-shortcodes/extension'
-import type { Pattern } from '../stringify'
-import { parseShortcode } from './parseShortcode'
+import type { RichTextType } from '@tinacms/schema-tools';
+import { fromMarkdown } from 'mdast-util-from-markdown';
+import { gfmFromMarkdown } from 'mdast-util-gfm';
+import { gfm } from 'micromark-extension-gfm';
+import { remark } from 'remark';
+import remarkGfm from 'remark-gfm';
+import remarkMdx, { type Root } from 'remark-mdx';
+import { tinaDirective } from '../extensions/tina-shortcodes/extension';
+import { directiveFromMarkdown } from '../extensions/tina-shortcodes/from-markdown';
+import { parseMDX as parseMDXNext } from '../next';
+import type { Pattern } from '../stringify';
+import { parseShortcode } from './parseShortcode';
+import type * as Plate from './plate';
+import { RichTextParseError, remarkToSlate } from './remarkToPlate';
 /**
  * ### Convert the MDXAST into an API-friendly format
  *
@@ -68,10 +68,10 @@ import { parseShortcode } from './parseShortcode'
  * format we can just allow Tina to do it's thing and update the form value with no additional work.
  */
 export const markdownToAst = (value: string, field: RichTextType) => {
-  const patterns: Pattern[] = []
+  const patterns: Pattern[] = [];
   field.templates?.forEach((template) => {
     if (typeof template === 'string') {
-      return
+      return;
     }
     if (template && template.match) {
       patterns.push({
@@ -81,21 +81,21 @@ export const markdownToAst = (value: string, field: RichTextType) => {
         type: template.fields.find((f) => f.name === 'children')
           ? 'block'
           : 'leaf',
-      })
+      });
     }
-  })
+  });
   return fromMarkdown(value, {
     extensions: [gfm(), tinaDirective(patterns)],
     mdastExtensions: [gfmFromMarkdown(), directiveFromMarkdown],
-  })
-}
+  });
+};
 export const mdxToAst = (value: string) => {
-  return remark().use(remarkMdx).use(remarkGfm).parse(value)
-}
+  return remark().use(remarkMdx).use(remarkGfm).parse(value);
+};
 export const MDX_PARSE_ERROR_MSG =
-  'TinaCMS supports a stricter version of markdown and a subset of MDX. https://tina.io/docs/editing/mdx/#differences-from-other-mdx-implementations'
+  'TinaCMS supports a stricter version of markdown and a subset of MDX. https://tina.io/docs/r/what-is-markdown';
 export const MDX_PARSE_ERROR_MSG_HTML =
-  'TinaCMS supports a stricter version of markdown and a subset of MDX. <a href="https://tina.io/docs/editing/mdx/#differences-from-other-mdx-implementations" target="_blank" rel="noopener noreferrer">Learn More</a>'
+  'TinaCMS supports a stricter version of markdown and a subset of MDX. <a href="https://tina.io/docs/r/what-is-markdown" target="_blank" rel="noopener noreferrer">Learn More</a>';
 
 export const parseMDX = (
   value: string,
@@ -103,48 +103,52 @@ export const parseMDX = (
   imageCallback: (s: string) => string
 ): Plate.RootElement => {
   if (!value) {
-    return { type: 'root', children: [] }
+    return { type: 'root', children: [] };
   }
-  let tree: Root | null
+  let tree: Root | null;
   try {
-    if (field.parser?.type === 'markdown') {
-      return parseMDXNext(value, field, imageCallback)
+    switch (field.parser?.type) {
+      case 'markdown':
+        return parseMDXNext(value, field, imageCallback);
+      case 'slatejson':
+        // Assuming `value` is a JSON object
+        return value as unknown as Plate.RootElement;
     }
-    let preprocessedString = value
+    let preprocessedString = value;
     const templatesWithMatchers = field.templates?.filter(
       (template) => template.match
-    )
+    );
     templatesWithMatchers?.forEach((template) => {
       if (typeof template === 'string') {
-        throw new Error('Global templates are not supported')
+        throw new Error('Global templates are not supported');
       }
       if (template.match) {
         if (preprocessedString) {
-          preprocessedString = parseShortcode(preprocessedString, template)
+          preprocessedString = parseShortcode(preprocessedString, template);
         }
       }
-    })
-    tree = mdxToAst(preprocessedString)
+    });
+    tree = mdxToAst(preprocessedString);
     if (tree) {
-      return remarkToSlate(tree, field, imageCallback, value)
+      return remarkToSlate(tree, field, imageCallback, value);
     } else {
-      return { type: 'root', children: [] }
+      return { type: 'root', children: [] };
     }
   } catch (e: any) {
     if (e instanceof RichTextParseError) {
-      return invalidMarkdown(e, value)
+      return invalidMarkdown(e, value);
     }
-    return invalidMarkdown(new RichTextParseError(e.message), value)
+    return invalidMarkdown(new RichTextParseError(e.message), value);
   }
-}
+};
 
 export const invalidMarkdown = (
   e: RichTextParseError,
   value: string
 ): Plate.RootElement => {
-  const extra: Record<string, unknown> = {}
+  const extra: Record<string, unknown> = {};
   if (e.position && Object.keys(e.position).length) {
-    extra['position'] = e.position
+    extra['position'] = e.position;
   }
   return {
     type: 'root',
@@ -157,10 +161,10 @@ export const invalidMarkdown = (
         ...extra,
       },
     ],
-  }
-}
+  };
+};
 
 export const replaceAll = (string: string, target: string, value: string) => {
-  const regex = new RegExp(target, 'g')
-  return string.valueOf().replace(regex, value)
-}
+  const regex = new RegExp(target, 'g');
+  return string.valueOf().replace(regex, value);
+};

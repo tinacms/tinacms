@@ -1,1 +1,1 @@
-export const parse = (value?: string) => value && +value
+export const parse = (value?: string) => value && +value;

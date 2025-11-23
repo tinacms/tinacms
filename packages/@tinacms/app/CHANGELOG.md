@@ -1,5 +1,248 @@
 # @tinacms/app
 
+## 2.3.9
+
+### Patch Changes
+
+- Updated dependencies [[`d900f4e`](https://github.com/tinacms/tinacms/commit/d900f4e6c6f0a86c94bba5f0925bbaa54eeb90db)]:
+  - tinacms@2.9.5
+
+## 2.3.8
+
+### Patch Changes
+
+- Updated dependencies [[`e1b6d05`](https://github.com/tinacms/tinacms/commit/e1b6d05c6b31c5c0928633064a065ddd331667ca), [`4ee0dd9`](https://github.com/tinacms/tinacms/commit/4ee0dd95913392b0da12dd5c9344909e5292e911), [`27e5ca9`](https://github.com/tinacms/tinacms/commit/27e5ca9b18a90f13f92425ebb2628b143d6a81be)]:
+  - tinacms@2.9.4
+
+## 2.3.7
+
+### Patch Changes
+
+- Updated dependencies [[`9e8bc37`](https://github.com/tinacms/tinacms/commit/9e8bc37402c8aa4d408c38e00d4402d596b0d896), [`0f265aa`](https://github.com/tinacms/tinacms/commit/0f265aadf918ae6f5b789e298fc2c406a6df0b16), [`32bd9b2`](https://github.com/tinacms/tinacms/commit/32bd9b21b54462be3e83b2d3e4b4237a48758bb1), [`ce1414c`](https://github.com/tinacms/tinacms/commit/ce1414ce1b82e6755a96c9c12949cd469b43e283)]:
+  - tinacms@2.9.3
+
+## 2.3.6
+
+### Patch Changes
+
+- [#6087](https://github.com/tinacms/tinacms/pull/6087) [`1286e87`](https://github.com/tinacms/tinacms/commit/1286e87323694dc819edc56360613dc654f3d3ca) Thanks [@kulesy](https://github.com/kulesy)! - feat: Enhance branch creation modal with improved UI/UX and dropdown button component
+
+- [#6098](https://github.com/tinacms/tinacms/pull/6098) [`a2d983e`](https://github.com/tinacms/tinacms/commit/a2d983ed886f66db2c133e902eacaa8d07e88bdb) Thanks [@Pat-Stuart](https://github.com/Pat-Stuart)! - Change from blue accent coloring to orange
+
+- Updated dependencies [[`1286e87`](https://github.com/tinacms/tinacms/commit/1286e87323694dc819edc56360613dc654f3d3ca), [`4416a28`](https://github.com/tinacms/tinacms/commit/4416a283ac1cfea5e9c4890cd71f2edf3b704344), [`6cba118`](https://github.com/tinacms/tinacms/commit/6cba118c90f7c7ab6356c0ef83fca18526e47f8d), [`572fb28`](https://github.com/tinacms/tinacms/commit/572fb28236b56db4ede5fe53b177b80323ae7284), [`f224124`](https://github.com/tinacms/tinacms/commit/f224124220811fb44749122d46eb7100af89ee77), [`a2d983e`](https://github.com/tinacms/tinacms/commit/a2d983ed886f66db2c133e902eacaa8d07e88bdb), [`bc35474`](https://github.com/tinacms/tinacms/commit/bc354740d0cb359c372ba287974e7e9db3c5119c)]:
+  - tinacms@2.9.2
+
+## 2.3.5
+
+### Patch Changes
+
+- Updated dependencies [[`003e348`](https://github.com/tinacms/tinacms/commit/003e348472ddc08eee63d78190038097542b6311), [`5527e8a`](https://github.com/tinacms/tinacms/commit/5527e8ab5821c8613fcfd1b0b8bc6d93291a6d03), [`5ffd60e`](https://github.com/tinacms/tinacms/commit/5ffd60e7b07b19cde6fab36a911503276c83715f), [`b23aa0c`](https://github.com/tinacms/tinacms/commit/b23aa0c5defc51b8f9fe00a59dd87e1d2f8b9f0b), [`5d13c0d`](https://github.com/tinacms/tinacms/commit/5d13c0d023373692233c8be2127ae6e3d7d68b47)]:
+  - tinacms@2.9.1
+
+## 2.3.4
+
+### Patch Changes
+
+- Updated dependencies [[`0bbe080`](https://github.com/tinacms/tinacms/commit/0bbe0804e334238850a4f8f33be5cd123ff68ab3), [`98fbc94`](https://github.com/tinacms/tinacms/commit/98fbc941a07fbc52edafaeb43b49b5ea30ea4172), [`ced9076`](https://github.com/tinacms/tinacms/commit/ced9076d25d7177bd8d9ae3c6133d0560366511c)]:
+  - tinacms@2.9.0
+
+## 2.3.3
+
+### Patch Changes
+
+- Updated dependencies [[`ea917dd`](https://github.com/tinacms/tinacms/commit/ea917dd2840c955d462b66b58009d2a16da39377), [`b012b6c`](https://github.com/tinacms/tinacms/commit/b012b6c7fae2674c613fd4c54e1819a86c6d2c3e), [`39e5b05`](https://github.com/tinacms/tinacms/commit/39e5b0562af7bca1e2923fc94b7c8119e12a0133), [`55e018b`](https://github.com/tinacms/tinacms/commit/55e018b9826a540005bbadf8fd51e9bac456d531)]:
+  - tinacms@2.8.3
+
+## 2.3.2
+
+### Patch Changes
+
+- Updated dependencies [[`eaa6ed5`](https://github.com/tinacms/tinacms/commit/eaa6ed551c76349c5849cd1e19a8066ecbbe205c), [`60a15d5`](https://github.com/tinacms/tinacms/commit/60a15d533b85a0c3f9f483f6f0f0b6824616284b), [`2fb1c4e`](https://github.com/tinacms/tinacms/commit/2fb1c4e79d1cae5ab29c3f93b0867214e193f59c)]:
+  - tinacms@2.8.2
+  - @tinacms/mdx@1.8.1
+
+## 2.3.1
+
+### Patch Changes
+
+- Updated dependencies [[`41359ed`](https://github.com/tinacms/tinacms/commit/41359edaf08def7a5e26969ec114155038c09752), [`b20a2c4`](https://github.com/tinacms/tinacms/commit/b20a2c4fd64fa2d06711850db63fb317302ee361), [`41359ed`](https://github.com/tinacms/tinacms/commit/41359edaf08def7a5e26969ec114155038c09752)]:
+  - tinacms@2.8.1
+
+## 2.3.0
+
+### Minor Changes
+
+- [#5744](https://github.com/tinacms/tinacms/pull/5744) [`98a61e2`](https://github.com/tinacms/tinacms/commit/98a61e2d263978a7096cc23ac7e94aa0039981be) Thanks [@Ben0189](https://github.com/Ben0189)! - Upgrade Plate editor to v48 beta, integrating latest features and improvements.
+
+### Patch Changes
+
+- Updated dependencies [[`98a61e2`](https://github.com/tinacms/tinacms/commit/98a61e2d263978a7096cc23ac7e94aa0039981be)]:
+  - @tinacms/mdx@1.8.0
+  - tinacms@2.8.0
+
+## 2.2.10
+
+### Patch Changes
+
+- [#5833](https://github.com/tinacms/tinacms/pull/5833) [`5269d65`](https://github.com/tinacms/tinacms/commit/5269d6578d361c55326f39375eaa175707342d51) Thanks [@JackDevAU](https://github.com/JackDevAU)! - 🐛 FIX - Visual Editor Webpack HMR loading issue
+
+- Updated dependencies [[`5269d65`](https://github.com/tinacms/tinacms/commit/5269d6578d361c55326f39375eaa175707342d51), [`3026a2b`](https://github.com/tinacms/tinacms/commit/3026a2b492113a53c036e43d5d85837cea4a6de3), [`28a94a6`](https://github.com/tinacms/tinacms/commit/28a94a602186f48b528b91236007839e5d02a9de)]:
+  - tinacms@2.7.10
+
+## 2.2.9
+
+### Patch Changes
+
+- [#5741](https://github.com/tinacms/tinacms/pull/5741) [`0e9de37`](https://github.com/tinacms/tinacms/commit/0e9de379dab2970206b9b60eb014808662f67287) Thanks [@wicksipedia](https://github.com/wicksipedia)! - CMS admin UI - Refactor Sidebar and Branch Button Components
+  Forms header - Adds breadcrumb navigation
+
+- [#5784](https://github.com/tinacms/tinacms/pull/5784) [`b25c5f0`](https://github.com/tinacms/tinacms/commit/b25c5f0b0e1d3f37870b780230b41dbc56bef1ab) Thanks [@JackDevAU](https://github.com/JackDevAU)! - - Fixed padding issues in FormLists
+
+  - Fixed Visual Editing's "Edit" button (Reference Fields)
+
+- [#5789](https://github.com/tinacms/tinacms/pull/5789) [`5040a6a`](https://github.com/tinacms/tinacms/commit/5040a6aa24e62166d942c47b61a3f18585caded6) Thanks [@JackDevAU](https://github.com/JackDevAU)! - ✨ Adds click to focus for nested objects
+
+- Updated dependencies [[`2a3ed6c`](https://github.com/tinacms/tinacms/commit/2a3ed6c3ec3233fd90fd94f3dd3d0243aaad079a), [`bc47f93`](https://github.com/tinacms/tinacms/commit/bc47f938431c400714808613f633b05659a87be1), [`0e9de37`](https://github.com/tinacms/tinacms/commit/0e9de379dab2970206b9b60eb014808662f67287), [`468f0ee`](https://github.com/tinacms/tinacms/commit/468f0eefc0a15a9a9a23737d29ea9a5cb5c6aef6), [`e27c017`](https://github.com/tinacms/tinacms/commit/e27c0172005797af93b908152d51b2966c0cf059), [`b25c5f0`](https://github.com/tinacms/tinacms/commit/b25c5f0b0e1d3f37870b780230b41dbc56bef1ab), [`5040a6a`](https://github.com/tinacms/tinacms/commit/5040a6aa24e62166d942c47b61a3f18585caded6), [`dbef36f`](https://github.com/tinacms/tinacms/commit/dbef36f594b949024d5525184b6a9e1b9085b759), [`3ba6d78`](https://github.com/tinacms/tinacms/commit/3ba6d78f35f817d55bfc3d12b750e54b7e0d11f2)]:
+  - tinacms@2.7.9
+  - @tinacms/mdx@1.7.0
+
+## 2.2.8
+
+### Patch Changes
+
+- Updated dependencies [[`5e36123`](https://github.com/tinacms/tinacms/commit/5e361239a372e21dda624d17b4ff274bab23ce90), [`856e07a`](https://github.com/tinacms/tinacms/commit/856e07a0b8d742ee78d5eba565623cf081a61534), [`4d9c8ab`](https://github.com/tinacms/tinacms/commit/4d9c8abf6badd1bcc833bda432ab22dace4925ae), [`7346dc9`](https://github.com/tinacms/tinacms/commit/7346dc996fd81ecb395b62f373976512e8224c21)]:
+  - tinacms@2.7.8
+  - @tinacms/mdx@1.6.3
+
+## 2.2.7
+
+### Patch Changes
+
+- [#5607](https://github.com/tinacms/tinacms/pull/5607) [`1965236`](https://github.com/tinacms/tinacms/commit/19652363784e48b065ec1924a9cd9611c8e79cae) Thanks [@jeffsee55](https://github.com/jeffsee55)! - Specify react and react-dom as peer deps
+
+- Updated dependencies [[`1965236`](https://github.com/tinacms/tinacms/commit/19652363784e48b065ec1924a9cd9611c8e79cae)]:
+  - tinacms@2.7.7
+
+## 2.2.6
+
+### Patch Changes
+
+- Updated dependencies [[`65cee5d`](https://github.com/tinacms/tinacms/commit/65cee5d6ae16c7320a4a14f0d9a82dc5f9103e34)]:
+  - tinacms@2.7.6
+
+## 2.2.5
+
+### Patch Changes
+
+- [#5602](https://github.com/tinacms/tinacms/pull/5602) [`ab43169`](https://github.com/tinacms/tinacms/commit/ab43169af5a95f31fa27bb0236623a031883a1fd) Thanks [@wicksipedia](https://github.com/wicksipedia)! - fix naming of TinaCloud
+
+- [#5588](https://github.com/tinacms/tinacms/pull/5588) [`fd664d8`](https://github.com/tinacms/tinacms/commit/fd664d8f4e83941ed1b1f234668ab6341a6178f8) Thanks [@JackDevAU](https://github.com/JackDevAU)! - - Fix server-side branch queries by storing the active branch in a cookie and passing it via the x-branch header.
+  - Ensure GraphQL playground correctly updates when switching branches.
+- Updated dependencies [[`921f235`](https://github.com/tinacms/tinacms/commit/921f2356e4615d532d02eefa7103fdb70f83b97a), [`ab43169`](https://github.com/tinacms/tinacms/commit/ab43169af5a95f31fa27bb0236623a031883a1fd), [`b551232`](https://github.com/tinacms/tinacms/commit/b5512326ad0ad9855bc75e2073a3ab2a8ec4c064), [`ea204c9`](https://github.com/tinacms/tinacms/commit/ea204c9045451f3ebea04f503e6158d2016613e4), [`fd664d8`](https://github.com/tinacms/tinacms/commit/fd664d8f4e83941ed1b1f234668ab6341a6178f8)]:
+  - tinacms@2.7.5
+  - @tinacms/mdx@1.6.2
+
+## 2.2.3
+
+### Patch Changes
+
+- Updated dependencies [[`991db1f`](https://github.com/tinacms/tinacms/commit/991db1f10c1f9cf9211d7e82bd56658cdcce24c7)]:
+  - tinacms@2.7.3
+
+## 2.2.2
+
+### Patch Changes
+
+- Updated dependencies [[`619e601`](https://github.com/tinacms/tinacms/commit/619e6010d6f95d893e980952bef64f747808c956), [`602b4d0`](https://github.com/tinacms/tinacms/commit/602b4d07f94de4c10d5bb059a5edc49546a2031c)]:
+  - tinacms@2.7.2
+  - @tinacms/mdx@1.6.1
+
+## 2.2.1
+
+### Patch Changes
+
+- Updated dependencies [[`74513b3`](https://github.com/tinacms/tinacms/commit/74513b357aa27165aa86f7b3218c697c663539e8), [`06c1716`](https://github.com/tinacms/tinacms/commit/06c17163b558a96275b0ef66c746b005a6f90d13)]:
+  - tinacms@2.7.1
+
+## 2.2.0
+
+### Minor Changes
+
+- [#5503](https://github.com/tinacms/tinacms/pull/5503) [`99bb59f`](https://github.com/tinacms/tinacms/commit/99bb59ff7b9f3cf27a1382b91826eb81831ecb95) Thanks [@JackDevAU](https://github.com/JackDevAU)! - feat: add experimental user form select to the useTina hook
+
+### Patch Changes
+
+- [#5486](https://github.com/tinacms/tinacms/pull/5486) [`d7c5ec1`](https://github.com/tinacms/tinacms/commit/d7c5ec1b174419dcc6ddba3cfb3684dd469da571) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Update dependencies across packages
+
+- Updated dependencies [[`3974aa7`](https://github.com/tinacms/tinacms/commit/3974aa759192713140733b99ee0254a1a056e124), [`7541614`](https://github.com/tinacms/tinacms/commit/7541614527a02268ea453b23ce84637f978dcf2d), [`d7c5ec1`](https://github.com/tinacms/tinacms/commit/d7c5ec1b174419dcc6ddba3cfb3684dd469da571), [`99bb59f`](https://github.com/tinacms/tinacms/commit/99bb59ff7b9f3cf27a1382b91826eb81831ecb95)]:
+  - tinacms@2.7.0
+  - @tinacms/mdx@1.6.0
+
+## 2.1.19
+
+### Patch Changes
+
+- Updated dependencies []:
+  - tinacms@2.6.4
+
+## 2.1.18
+
+### Patch Changes
+
+- Updated dependencies [[`05ba069`](https://github.com/tinacms/tinacms/commit/05ba0692a7e990fbb671177829562869d517e7c1), [`42daaf7`](https://github.com/tinacms/tinacms/commit/42daaf7af125da265d2c5998168e9c7345dc0a59), [`bc986dd`](https://github.com/tinacms/tinacms/commit/bc986dd48f9a7da264281b55926ec51ce1068bb7), [`3af2354`](https://github.com/tinacms/tinacms/commit/3af23542b984c10e138d0cf10a165d50b99bb0e9)]:
+  - tinacms@2.6.3
+
+## 2.1.17
+
+### Patch Changes
+
+- Updated dependencies []:
+  - tinacms@2.6.2
+
+## 2.1.16
+
+### Patch Changes
+
+- Updated dependencies [[`61c45f4`](https://github.com/tinacms/tinacms/commit/61c45f49a2abe82336b661dedbbe2a15d0f3da05)]:
+  - tinacms@2.6.1
+
+## 2.1.15
+
+### Patch Changes
+
+- Updated dependencies [[`9931d5a`](https://github.com/tinacms/tinacms/commit/9931d5a0d7e5e9e5165170047cf5653041bddd7a), [`4aadf3e`](https://github.com/tinacms/tinacms/commit/4aadf3ee0b5e7ba6614baee9507a3b51abc92053), [`92b683b`](https://github.com/tinacms/tinacms/commit/92b683bd3d73b47271eee5b8ff648ed4dcde51e3), [`82b0039`](https://github.com/tinacms/tinacms/commit/82b00393da8bbcc2cf357fbbb546904f07e8d89c), [`877699d`](https://github.com/tinacms/tinacms/commit/877699d08b3e2c2470742a3acf25d02a95e440b3)]:
+  - tinacms@2.6.0
+  - @tinacms/mdx@1.5.4
+
+## 2.1.14
+
+### Patch Changes
+
+- Updated dependencies [[`b54b303`](https://github.com/tinacms/tinacms/commit/b54b303a8290528230dc83d8fb1b7535df7199f6), [`0345852`](https://github.com/tinacms/tinacms/commit/0345852e3a7568b61a1417cd037715ab0d0dca01)]:
+  - tinacms@2.5.2
+  - @tinacms/mdx@1.5.3
+
+## 2.1.13
+
+### Patch Changes
+
+- Updated dependencies [[`bbfd415`](https://github.com/tinacms/tinacms/commit/bbfd415762a8b2c62b7653b497b94d67aaa8501a), [`83a25cf`](https://github.com/tinacms/tinacms/commit/83a25cf61b736e1867d37bee37f7514d349e4427)]:
+  - tinacms@2.5.1
+
+## 2.1.12
+
+### Patch Changes
+
+- [#5276](https://github.com/tinacms/tinacms/pull/5276) [`f90ef4d`](https://github.com/tinacms/tinacms/commit/f90ef4d92ae7b21c8c610d14af9510354a3969c6) Thanks [@Ben0189](https://github.com/Ben0189)! - Updates minor and patch dependencies
+
+- [#5218](https://github.com/tinacms/tinacms/pull/5218) [`03bb823`](https://github.com/tinacms/tinacms/commit/03bb8237df87dab9da503818b839d44209263a48) Thanks [@kldavis4](https://github.com/kldavis4)! - Adds referential integrity for renaming and deleting referenced documents.
+
+  When a document is renamed, any documents which reference the document will be updated with the new document name. When a document is deleted, the user will be warned and any references to the document will be deleted.
+
+- Updated dependencies [[`f90ef4d`](https://github.com/tinacms/tinacms/commit/f90ef4d92ae7b21c8c610d14af9510354a3969c6), [`03bb823`](https://github.com/tinacms/tinacms/commit/03bb8237df87dab9da503818b839d44209263a48), [`60fb710`](https://github.com/tinacms/tinacms/commit/60fb710addd539860eb7ba39196e02f3bb5f08c1), [`f3aa146`](https://github.com/tinacms/tinacms/commit/f3aa1465423101520bd05939249228c8d8b2a0df)]:
+  - @tinacms/mdx@1.5.2
+  - tinacms@2.5.0
+
 ## 2.1.11
 
 ### Patch Changes
@@ -360,7 +603,7 @@
 
   fix: Use clean page-sizes on media manager (to make pagination more obvious)
 
-  Fix issue with uploading media in a folder with tina cloud
+  Fix issue with uploading media in a folder with TinaCloud
 
 - Updated dependencies [9c27087fb]
 - Updated dependencies [65d0a701f]
@@ -683,7 +926,7 @@
   > NOTE: Relative paths are fine to use here, but make sure it's relative to the `.tina/config` file
 
   ```ts
-  localContentPath: process.env.REMOTE_ROOT_PATH // eg. '../../my-content-repo'
+  localContentPath: process.env.REMOTE_ROOT_PATH; // eg. '../../my-content-repo'
   ```
 
   ### Production workflow
@@ -727,18 +970,18 @@
   EX:
 
   ```ts
-  import { defineConfig } from 'tinacms'
+  import { defineConfig } from "tinacms";
 
   export default defineConfig({
     admin: {
       auth: {
         onLogin: () => {
-          console.log('On Log in!')
+          console.log("On Log in!");
         },
       },
     },
     /// ...
-  })
+  });
   ```
 
 - 9d4943a82: Fix issue resolving alias fields when passing through the `useTina` hook
@@ -961,13 +1204,13 @@
 
   ```ts
   // .tina/config.ts
-  import schema from './schema'
+  import schema from "./schema";
 
   export default defineConfig({
     schema: schema,
     //.. Everything from define config in `schema.ts`
     //.. Everything from `schema.config`
-  })
+  });
   ```
 
   2. Add Build config

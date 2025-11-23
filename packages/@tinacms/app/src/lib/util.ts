@@ -1,5 +1,5 @@
-const charCodeOfDot = '.'.charCodeAt(0)
-const reEscapeChar = /\\(\\)?/g
+const charCodeOfDot = '.'.charCodeAt(0);
+const reEscapeChar = /\\(\\)?/g;
 const rePropName = RegExp(
   // Match anything that isn't a dot or bracket.
   '[^.[\\]]+' +
@@ -16,7 +16,7 @@ const rePropName = RegExp(
     // Or match "" as the space between consecutive dots or empty brackets.
     '(?=(?:\\.|\\[\\])(?:\\.|\\[\\]|$))',
   'g'
-)
+);
 
 /**
  * Converts `string` to a property path array.
@@ -26,31 +26,31 @@ const rePropName = RegExp(
  * @returns {Array} Returns the property path array.
  */
 const stringToPath = (string: string) => {
-  const result = []
+  const result = [];
   if (string.charCodeAt(0) === charCodeOfDot) {
-    result.push('')
+    result.push('');
   }
   string.replace(rePropName, (match, expression, quote, subString) => {
-    let key = match
+    let key = match;
     if (quote) {
-      key = subString.replace(reEscapeChar, '$1')
+      key = subString.replace(reEscapeChar, '$1');
     } else if (expression) {
-      key = expression.trim()
+      key = expression.trim();
     }
-    result.push(key)
-  })
-  return result
-}
+    result.push(key);
+  });
+  return result;
+};
 
-const keysCache: { [key: string]: string[] } = {}
-const keysRegex = /[.[\]]+/
+const keysCache: { [key: string]: string[] } = {};
+const keysRegex = /[.[\]]+/;
 
 const toPath = (key: string): string[] => {
   if (key === null || key === undefined || !key.length) {
-    return []
+    return [];
   }
   if (typeof key !== 'string') {
-    throw new Error('toPath() expects a string')
+    throw new Error('toPath() expects a string');
   }
   if (keysCache[key] == null) {
     /**
@@ -68,67 +68,62 @@ const toPath = (key: string): string[] => {
      */
     if (key.endsWith('[]')) {
       // v4.20.2 (a `key` like 'choices[]' should map to ['choices'], which is fine).
-      keysCache[key] = key.split(keysRegex).filter(Boolean)
+      keysCache[key] = key.split(keysRegex).filter(Boolean);
     } else {
       // v4.20.3 (a `key` like 'choices[]' maps to ['choices', ''], which breaks applications relying on inputs like `<input type="checkbox" name="choices[]" />`).
-      keysCache[key] = stringToPath(key)
+      keysCache[key] = stringToPath(key);
     }
   }
-  return keysCache[key]
-}
+  return keysCache[key];
+};
 export const getDeepestMetadata = (state: Object, complexKey: string): any => {
   // Intentionally using iteration rather than recursion
-  const path = toPath(complexKey)
-  let current: any = state
-  let metadata: any
+  const path = toPath(complexKey);
+  let current: any = state;
+  let metadata: any;
   for (let i = 0; i < path.length; i++) {
-    const key = path[i]
+    const key = path[i];
     if (
       current === undefined ||
       current === null ||
       typeof current !== 'object' ||
       (Array.isArray(current) && isNaN(Number(key)))
     ) {
-      return undefined
+      return undefined;
     }
-    const value = current[key]
+    const value = current[key];
     if (value?._tina_metadata) {
       // We're at a reference field, we don't want to select the
       // reference form, just the reference select field
       if (complexKey === value._tina_metadata?.prefix && metadata) {
       } else {
-        metadata = value._tina_metadata
+        metadata = value._tina_metadata;
       }
     }
-    current = value
+    current = value;
   }
-  return metadata
-}
+  return metadata;
+};
 export const getFormAndFieldNameFromMetadata = (
   object: object,
   eventFieldName: string
 ) => {
-  let formId
-  let n
-  const value = getDeepestMetadata(object, eventFieldName)
-  if (value) {
-    if (value.prefix) {
-      const fieldName = eventFieldName.slice(value?.prefix?.length + 1)
-      const localFieldName = value.name
-        ? fieldName.slice(value?.name?.length + 1)
-        : fieldName
-      if (localFieldName) {
-        // If localFieldName is tags.2, just use `tags`
-        if (!isNaN(Number(localFieldName.split('.')[1]))) {
-          n = value.fields[localFieldName.split('.')[0]]
-        } else {
-          n = value.fields[localFieldName]
-        }
-      } else {
-        n = value.name
-      }
-      formId = value.id
-    }
+  const metadata = getDeepestMetadata(object, eventFieldName);
+
+  if (!metadata) {
+    console.warn(
+      '[getFormAndFieldNameFromMetadata] No metadata found for:',
+      eventFieldName
+    );
+    return { formId: undefined, fieldName: undefined };
   }
-  return { formId, fieldName: n }
-}
+
+  const { id: formId, prefix } = metadata;
+  const prefixLength = prefix?.length ?? 0;
+  const localFieldName = eventFieldName.slice(prefixLength + 1);
+
+  return {
+    formId,
+    fieldName: localFieldName,
+  };
+};

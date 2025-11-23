@@ -1,36 +1,46 @@
-import { eat } from './marks'
-import { stringifyProps } from './acorn'
-import type { RichTextField } from '@tinacms/schema-tools'
-import type * as Md from 'mdast'
-import type * as Plate from '../../parse/plate'
-import type { RootElement } from '../../parse/plate'
+import { eat } from './marks';
+import { stringifyProps } from './acorn';
+import type { RichTextField } from '@tinacms/schema-tools';
+import type * as Md from 'mdast';
+import type * as Plate from '../../parse/plate';
+import type { RootElement } from '../../parse/plate';
 
 export const preProcess = (
   tree: RootElement,
   field: RichTextField,
   imageCallback: (url: string) => string
 ) => {
-  const ast = rootElement(tree, field, imageCallback)
-  return ast
-}
+  const ast = rootElement(tree, field, imageCallback);
+  return ast;
+};
 
 export const rootElement = (
   content: Plate.RootElement,
   field: RichTextField,
   imageCallback: (url: string) => string
 ): Md.Root => {
-  const children: Md.Content[] = []
+  const children: Md.Content[] = [];
   content.children?.forEach((child) => {
-    const value = blockElement(child, field, imageCallback)
+    const value = blockElement(child, field, imageCallback);
     if (value) {
-      children.push(value)
+      children.push(value);
     }
-  })
+  });
   return {
     type: 'root',
     children,
-  }
-}
+  };
+};
+
+export const codeLinesToString = (children: any[]) => {
+  return (children ?? []).map((line: any) =>
+    Array.isArray(line.children) && line.children.length > 0
+      ? line.children
+          .map((t: any) => t.text)
+          .join('') // join in case of multiple text nodes
+      : ''
+  );
+};
 
 export const blockElement = (
   content: Plate.BlockElement,
@@ -49,42 +59,36 @@ export const blockElement = (
         // @ts-ignore Type 'number' is not assignable to type '1 | 2 | 3 | 4 | 5 | 6'
         depth: { h1: 1, h2: 2, h3: 3, h4: 4, h5: 5, h6: 6 }[content.type],
         children: eat(content.children, field, imageCallback),
-      }
+      };
     case 'p':
       // Ignore empty blocks
       if (content.children.length === 1) {
-        const onlyChild = content.children[0]
+        const onlyChild = content.children[0];
         if (
           onlyChild &&
           // Slate text nodes don't get a `type` property for text nodes
           (onlyChild.type === 'text' || !onlyChild.type) &&
           onlyChild.text === ''
         ) {
-          return null
+          return null;
         }
       }
       return {
         type: 'paragraph',
         children: eat(content.children, field, imageCallback),
-      }
-    case 'mermaid':
-      return {
-        type: 'code',
-        lang: 'mermaid',
-        value: content.value,
-      }
+      };
     case 'code_block':
       return {
         type: 'code',
         lang: content.lang,
-        value: content.value,
-      }
+        value: codeLinesToString(content.children).join('\n'),
+      };
     case 'mdxJsxFlowElement':
       if (content.name === 'table') {
         const table = content.props as {
-          align: Md.AlignType[] | undefined
-          tableRows: { tableCells: { value: any }[] }[]
-        }
+          align: Md.AlignType[] | undefined;
+          tableRows: { tableCells: { value: any }[] }[];
+        };
         return {
           type: 'table',
           align: table.align,
@@ -99,21 +103,21 @@ export const blockElement = (
                     field,
                     imageCallback
                   ),
-                }
+                };
               }),
-            }
-            return tr
+            };
+            return tr;
           }),
-        }
+        };
       }
       const { children, attributes, useDirective, directiveType } =
-        stringifyProps(content, field, false, imageCallback)
+        stringifyProps(content, field, false, imageCallback);
       return {
         type: 'mdxJsxFlowElement',
         name: content.name,
         attributes: attributes,
         children: children,
-      }
+      };
     case 'blockquote':
       return {
         type: 'blockquote',
@@ -123,11 +127,11 @@ export const blockElement = (
             children: eat(content.children, field, imageCallback),
           },
         ],
-      }
+      };
     case 'hr':
       return {
         type: 'thematicBreak',
-      }
+      };
     case 'ol':
     case 'ul':
       return {
@@ -137,12 +141,12 @@ export const blockElement = (
         children: content.children.map((child) =>
           listItemElement(child, field, imageCallback)
         ),
-      }
+      };
     case 'html': {
       return {
         type: 'html',
         value: content.value,
-      }
+      };
     }
     case 'img':
       // Slate editor treats `img` as a block-level element, wrap
@@ -157,13 +161,13 @@ export const blockElement = (
             title: content.caption,
           },
         ],
-      }
+      };
     case 'table':
       const table = content.props as
         | {
-            align: Md.AlignType[] | undefined
+            align: Md.AlignType[] | undefined;
           }
-        | undefined
+        | undefined;
       return {
         type: 'table',
         align: table?.align,
@@ -178,15 +182,15 @@ export const blockElement = (
                   field,
                   imageCallback
                 ),
-              }
+              };
             }),
-          }
+          };
         }),
-      }
+      };
     default:
-      throw new Error(`BlockElement: ${content.type} is not yet supported`)
+      throw new Error(`BlockElement: ${content.type} is not yet supported`);
   }
-}
+};
 const listItemElement = (
   content: Plate.ListItemElement,
   field: RichTextField,
@@ -202,12 +206,12 @@ const listItemElement = (
         return {
           type: 'paragraph',
           children: eat(child.children, field, imageCallback),
-        }
+        };
       }
-      return blockContentElement(child, field, imageCallback)
+      return blockContentElement(child, field, imageCallback);
     }),
-  }
-}
+  };
+};
 const blockContentElement = (
   content: Plate.BlockElement,
   field: RichTextField,
@@ -222,12 +226,12 @@ const blockContentElement = (
           // @ts-ignore
           blockContentElement(child, field, imageCallback)
         ),
-      }
+      };
     case 'p':
       return {
         type: 'paragraph',
         children: eat(content.children, field, imageCallback),
-      }
+      };
     case 'ol':
     case 'ul':
       return {
@@ -237,29 +241,10 @@ const blockContentElement = (
         children: content.children.map((child) =>
           listItemElement(child, field, imageCallback)
         ),
-      }
+      };
     default:
       throw new Error(
         `BlockContentElement: ${content.type} is not yet supported`
-      )
+      );
   }
-}
-
-export type Marks = 'strong' | 'emphasis' | 'inlineCode'
-
-export const getMarks = (content: Plate.InlineElement) => {
-  const marks: Marks[] = []
-  if (content.type !== 'text') {
-    return []
-  }
-  if (content.bold) {
-    marks.push('strong')
-  }
-  if (content.italic) {
-    marks.push('emphasis')
-  }
-  if (content.code) {
-    marks.push('inlineCode')
-  }
-  return marks
-}
+};

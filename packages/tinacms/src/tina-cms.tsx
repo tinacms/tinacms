@@ -1,10 +1,11 @@
-import React, { ReactNode, useState } from 'react'
-import { TinaCloudProvider } from './auth'
+import React, { ReactNode, useState } from 'react';
+import { TinaCloudProvider } from './auth';
+import { FontLoader } from './toolkit/styles/font-loader';
 
-import { LocalClient } from './internalClient/index'
-import { useDocumentCreatorPlugin } from './hooks/use-content-creator'
-import { parseURL } from '@tinacms/schema-tools'
-import type { TinaCMSProviderDefaultProps } from './types/cms'
+import { LocalClient } from './internalClient/index';
+import { useDocumentCreatorPlugin } from './hooks/use-content-creator';
+import { parseURL } from '@tinacms/schema-tools';
+import type { TinaCMSProviderDefaultProps } from './types/cms';
 
 const errorButtonStyles = {
   background: '#eb6337',
@@ -17,25 +18,25 @@ const errorButtonStyles = {
   border: 'none',
   color: 'white',
   margin: '1rem 0',
-}
+};
 
 interface ErrorBoundaryProps {
-  children: ReactNode
-  hasError?: boolean
+  children: ReactNode;
+  hasError?: boolean;
 }
 class ErrorBoundary extends React.Component<ErrorBoundaryProps> {
   constructor(props) {
-    super(props)
+    super(props);
 
     this.state = {
       hasError: props.hasError,
       message: '',
       pageRefresh: false,
-    }
+    };
   }
 
   static getDerivedStateFromError(error) {
-    return { hasError: true, message: error.message }
+    return { hasError: true, message: error.message };
   }
 
   /**
@@ -94,10 +95,10 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps> {
             <p>
               See our{' '}
               <a
-                className="text-gray-600"
+                className='text-gray-600'
                 style={{ textDecoration: 'underline' }}
-                href="https://tina.io/docs/errors/faq/"
-                target="_blank"
+                href='https://tina.io/docs/r/FAQ/'
+                target='_blank'
               >
                 {' '}
                 Error FAQ{' '}
@@ -105,29 +106,29 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps> {
               for more information.
             </p>
             <button
-              type="button"
+              type='button'
               style={errorButtonStyles as any}
               onClick={() => {
                 /* @ts-ignore */
-                this.setState({ pageRefresh: true })
+                this.setState({ pageRefresh: true });
                 setTimeout(
                   () => this.setState({ hasError: false, pageRefresh: false }),
                   3000
-                )
+                );
               }}
             >
               Refresh
             </button>
           </div>
         </div>
-      )
+      );
     }
     /* @ts-ignore */
     if (this.state.pageRefresh) {
-      return <Loader>Let's try that again.</Loader>
+      return <Loader>Let's try that again.</Loader>;
     }
 
-    return this.props.children
+    return this.props.children;
   }
 }
 
@@ -146,9 +147,9 @@ export const TinaCMSProvider2 = ({
   if (props?.apiURL) {
     console.warn(
       'The apiURL prop is deprecated. Please see https://tina.io/blog/tina-v-0.68.14 for information on how to upgrade to the new API'
-    )
+    );
   }
-  const apiURL = props?.client?.apiUrl || props?.apiURL
+  const apiURL = props?.client?.apiUrl || props?.apiURL;
   const { branch, clientId, isLocalClient } = apiURL
     ? parseURL(apiURL)
     : {
@@ -156,7 +157,7 @@ export const TinaCMSProvider2 = ({
         clientId: props.clientId,
         // @ts-expect-error this is for backwards compatibility
         isLocalClient: props?.isLocalClient,
-      }
+      };
   if (
     // Check if local client is defined
     typeof isLocalClient === 'undefined' ||
@@ -167,15 +168,15 @@ export const TinaCMSProvider2 = ({
       !schema.config.contentApiUrlOverride)
   ) {
     throw new Error(
-      'Invalid setup. See https://tina.io/docs/tina-cloud/overview for more information.'
-    )
+      'Invalid setup. See https://tina.io/docs/r/what-is-tinacloud for more information.'
+    );
   }
 
   // schema is now required as the Global Nav and CMS utilize it
   if (!schema) {
     throw new Error(
       '`schema` is required to be passed as a property to `TinaProvider`.  You can learn more about this change here: https://github.com/tinacms/tinacms/pull/2823'
-    )
+    );
   }
 
   return (
@@ -196,25 +197,26 @@ export const TinaCMSProvider2 = ({
         tinaGraphQLVersion={props.tinaGraphQLVersion}
       >
         {/* <style>{styles}</style> */}
+        <FontLoader />
         <ErrorBoundary>{props.children}</ErrorBoundary>
       </TinaCloudProvider>
     </>
-  )
-}
+  );
+};
 
 export type DocumentCreatorCallback = Parameters<
   typeof useDocumentCreatorPlugin
->[0]
+>[0];
 const DocumentCreator = ({
   documentCreatorCallback,
 }: {
   /** Callback if you need access to the "document creator" API */
-  documentCreatorCallback?: DocumentCreatorCallback
+  documentCreatorCallback?: DocumentCreatorCallback;
 }) => {
-  useDocumentCreatorPlugin(documentCreatorCallback)
+  useDocumentCreatorPlugin(documentCreatorCallback);
 
-  return null
-}
+  return null;
+};
 
 const Loader = (props: { children: React.ReactNode }) => {
   return (
@@ -254,50 +256,50 @@ const Loader = (props: { children: React.ReactNode }) => {
               marginTop: '-8px',
               marginBottom: '16px',
             }}
-            version="1.1"
-            id="L5"
-            xmlns="http://www.w3.org/2000/svg"
-            xmlnsXlink="http://www.w3.org/1999/xlink"
-            x="0px"
-            y="0px"
-            viewBox="0 0 100 64"
-            enableBackground="new 0 0 0 0"
-            xmlSpace="preserve"
+            version='1.1'
+            id='L5'
+            xmlns='http://www.w3.org/2000/svg'
+            xmlnsXlink='http://www.w3.org/1999/xlink'
+            x='0px'
+            y='0px'
+            viewBox='0 0 100 64'
+            enableBackground='new 0 0 0 0'
+            xmlSpace='preserve'
           >
-            <circle fill="currentColor" stroke="none" cx={6} cy={32} r={6}>
+            <circle fill='currentColor' stroke='none' cx={6} cy={32} r={6}>
               <animateTransform
-                attributeName="transform"
-                dur="1s"
-                type="translate"
-                values="0 15 ; 0 -15; 0 15"
-                calcMode="spline"
-                keySplines="0.8 0 0.4 1; 0.4 0 0.2 1"
-                repeatCount="indefinite"
-                begin="0.1"
+                attributeName='transform'
+                dur='1s'
+                type='translate'
+                values='0 15 ; 0 -15; 0 15'
+                calcMode='spline'
+                keySplines='0.8 0 0.4 1; 0.4 0 0.2 1'
+                repeatCount='indefinite'
+                begin='0.1'
               />
             </circle>
-            <circle fill="currentColor" stroke="none" cx={30} cy={32} r={6}>
+            <circle fill='currentColor' stroke='none' cx={30} cy={32} r={6}>
               <animateTransform
-                attributeName="transform"
-                dur="1s"
-                type="translate"
-                values="0 15 ; 0 -10; 0 15"
-                calcMode="spline"
-                keySplines="0.8 0 0.4 1; 0.4 0 0.2 1"
-                repeatCount="indefinite"
-                begin="0.2"
+                attributeName='transform'
+                dur='1s'
+                type='translate'
+                values='0 15 ; 0 -10; 0 15'
+                calcMode='spline'
+                keySplines='0.8 0 0.4 1; 0.4 0 0.2 1'
+                repeatCount='indefinite'
+                begin='0.2'
               />
             </circle>
-            <circle fill="currentColor" stroke="none" cx={54} cy={32} r={6}>
+            <circle fill='currentColor' stroke='none' cx={54} cy={32} r={6}>
               <animateTransform
-                attributeName="transform"
-                dur="1s"
-                type="translate"
-                values="0 15 ; 0 -5; 0 15"
-                calcMode="spline"
-                keySplines="0.8 0 0.4 1; 0.4 0 0.2 1"
-                repeatCount="indefinite"
-                begin="0.3"
+                attributeName='transform'
+                dur='1s'
+                type='translate'
+                values='0 15 ; 0 -5; 0 15'
+                calcMode='spline'
+                keySplines='0.8 0 0.4 1; 0.4 0 0.2 1'
+                repeatCount='indefinite'
+                begin='0.3'
               />
             </circle>
           </svg>
@@ -317,11 +319,11 @@ const Loader = (props: { children: React.ReactNode }) => {
       </div>
       {props.children}
     </>
-  )
-}
+  );
+};
 
 /**
- * @deprecated v0.62.0: Use `staticRequest` and a "try catch" block instead. see https://tina.io/docs/features/data-fetching/#querying-tina-content-in-nextjs for more details
+ * @deprecated v0.62.0: Use `staticRequest` and a "try catch" block instead. see https://tina.io/docs/r/content-api-overview for more details
  *
  * A convenience function which makes a GraphQL request
  * to a local GraphQL server and ensures the response fits
@@ -331,18 +333,18 @@ export const getStaticPropsForTina = async ({
   query,
   variables,
 }: {
-  query: string
-  variables?: object
+  query: string;
+  variables?: object;
 }) => {
   try {
-    const data = await staticRequest({ query, variables })
+    const data = await staticRequest({ query, variables });
     return JSON.parse(
       JSON.stringify({
         data,
         query,
         variables,
       })
-    )
+    );
   } catch (e) {
     // FIXME: no need to catch all errors, just the ones that are related to
     // a new document being created, if there's a way to surface those only
@@ -353,12 +355,12 @@ export const getStaticPropsForTina = async ({
         query,
         variables,
       })
-    )
+    );
   }
-}
+};
 
 function is_server() {
-  return !(typeof window != 'undefined' && window.document)
+  return !(typeof window != 'undefined' && window.document);
 }
 
 /**
@@ -371,11 +373,11 @@ export const staticRequest = async ({
   variables,
 }: {
   /** A GraphQL request string */
-  query: string
+  query: string;
   /** GraphQL variables */
-  variables?: object
+  variables?: object;
 }) => {
-  const client = new LocalClient()
+  const client = new LocalClient();
   if (!is_server()) {
     // If we are running this in the browser (for example a useEffect) we should display a warning
     console.warn(`Whoops! Looks like you are using \`staticRequest\` in the browser to fetch data.
@@ -384,8 +386,8 @@ The local server is not available outside of \`getStaticProps\` or \`getStaticPa
 This function should only be called on the server at build time.
 
 This will work when developing locally but NOT when deployed to production.
-`)
+`);
   }
 
-  return client.request(query, { variables })
-}
+  return client.request(query, { variables });
+};

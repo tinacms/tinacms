@@ -1,4 +1,4 @@
-import { RichTextField } from '@tinacms/schema-tools'
+import { RichTextField } from '@tinacms/schema-tools';
 
 export const field: RichTextField = {
   name: 'body',
@@ -12,4 +12,4 @@ export const field: RichTextField = {
       fields: [{ name: 'children', type: 'rich-text' }],
     },
   ],
-}
+};

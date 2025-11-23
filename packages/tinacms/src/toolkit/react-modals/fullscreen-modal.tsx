@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 export const FullscreenModal = ({ className = '', style = {}, ...props }) => (
   <div
@@ -9,10 +9,10 @@ export const FullscreenModal = ({ className = '', style = {}, ...props }) => (
     }}
     {...props}
   />
-)
+);
 
 /**
  * @alias [FullscreenModal]
  * @deprecated
  */
-export const ModalFullscreen = FullscreenModal
+export const ModalFullscreen = FullscreenModal;

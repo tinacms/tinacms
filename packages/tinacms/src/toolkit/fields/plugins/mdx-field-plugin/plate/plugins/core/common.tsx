@@ -1,63 +1,15 @@
-import {
-  createParagraphPlugin,
-  createHorizontalRulePlugin,
-  createNodeIdPlugin,
-  createListPlugin,
-  getListItemEntry,
-  createBlockquotePlugin,
-  createHeadingPlugin,
-  createBoldPlugin,
-  createItalicPlugin,
-  createUnderlinePlugin,
-  createCodePlugin,
-  createIndentListPlugin,
-  createTablePlugin,
-} from '@udecode/plate'
-import { ReactEditor } from 'slate-react'
-import {
-  createCodeBlockPlugin,
-  createHTMLBlockPlugin,
-  createHTMLInlinePlugin,
-} from '../create-code-block'
-import { ELEMENT_IMG } from '../create-img-plugin'
-import { ELEMENT_MDX_BLOCK, ELEMENT_MDX_INLINE } from '../create-mdx-plugins'
-import { HANDLES_MDX } from './formatting'
-import {
-  findNode,
-  getBlockAbove,
-  getPluginType,
-  insertNodes,
-  type PlateEditor,
-  setNodes,
-  someNode,
-} from '@udecode/plate-common'
-import { createSlashPlugin } from '@udecode/plate-slash-command'
-import { Transforms, Editor, Node } from 'slate'
-
-export const plugins = [
-  createHeadingPlugin(),
-  createParagraphPlugin(),
-  createCodeBlockPlugin(),
-  createHTMLBlockPlugin(),
-  createHTMLInlinePlugin(),
-  createBlockquotePlugin(),
-  createBoldPlugin(),
-  createItalicPlugin(),
-  createUnderlinePlugin(),
-  createCodePlugin(),
-  createListPlugin(),
-  createIndentListPlugin(),
-  createHorizontalRulePlugin(),
-  // Allows us to do things like copy/paste, remembering the state of the element (like mdx)
-  createNodeIdPlugin(),
-  createSlashPlugin(),
-  createTablePlugin(),
-]
+import { NodeApi } from '@udecode/plate';
+import { getListItemEntry } from '@udecode/plate-list';
+import { type PlateEditor } from '@udecode/plate/react';
+import { ELEMENT_IMG } from '../create-img-plugin';
+import { ELEMENT_MDX_BLOCK, ELEMENT_MDX_INLINE } from '../create-mdx-plugins';
+import { HANDLES_MDX } from './formatting';
 
 export const unsupportedItemsInTable = new Set([
   'Code Block',
   'Unordered List',
   'Ordered List',
+  'Horizontal Rule',
   'Quote',
   'Mermaid',
   'Heading 1',
@@ -66,19 +18,19 @@ export const unsupportedItemsInTable = new Set([
   'Heading 4',
   'Heading 5',
   'Heading 6',
-])
+]);
 
 const isNodeActive = (editor, type) => {
-  const pluginType = getPluginType(editor, type)
+  const pluginType = editor.getType(type);
   return (
-    !!editor?.selection && someNode(editor, { match: { type: pluginType } })
-  )
-}
+    !!editor?.selection && editor.api.some({ match: { type: pluginType } })
+  );
+};
 
 const isListActive = (editor, type) => {
-  const res = !!editor?.selection && getListItemEntry(editor)
-  return !!res && res.list[0].type === type
-}
+  const res = !!editor?.selection && getListItemEntry(editor);
+  return !!res && res.list[0].type === type;
+};
 
 const normalize = (node: any) => {
   if (
@@ -88,7 +40,7 @@ const normalize = (node: any) => {
       ...node,
       children: [{ type: 'text', text: '' }],
       id: Date.now(),
-    }
+    };
   }
   if (node.children) {
     if (node.children.length) {
@@ -96,72 +48,50 @@ const normalize = (node: any) => {
         ...node,
         children: node.children.map(normalize),
         id: Date.now(),
-      }
+      };
     }
     // Always supply an empty text leaf
     return {
       ...node,
       children: [{ text: '' }],
       id: Date.now(),
-    }
+    };
   }
-  return node
-}
+  return node;
+};
 
-export const insertInlineElement = (editor, inlineElement) => {
-  insertNodes(editor, [inlineElement])
-  /**
-   * FIXME mdx-setTimeout: setTimeout seems to work, but not sure why it's necessary
-   * Without this, the move occurs on the element that was selected
-   * _before_ we inserted the node
-   */
-  // Move selection to the space after the embedded line
-  setTimeout(() => {
-    Transforms.move(editor)
-  }, 1)
-}
-export const insertBlockElement = (editor, blockElement) => {
-  const editorEl = ReactEditor.toDOMNode(editor, editor)
-  if (editorEl) {
-    /**
-     * FIXME mdx-setTimeout: there must be a better way to do this. When jumping
-     * back from a nested form, the entire editor doesn't receive
-     * focus, so enable that, but what we also want is to ensure
-     * that this node is selected - so do that, too. But there
-     * seems to be a race condition where the `editorEl.focus` doesn't
-     * happen in time for the Transform to take effect, hence the
-     * setTimeout. I _think_ it just needs to queue and the actual
-     * ms timeout is irrelevant, but might be worth checking on
-     * devices with lower CPUs
-     */
-    editorEl.focus()
-    setTimeout(() => {
-      // If empty, replace the current block
-      if (isCurrentBlockEmpty(editor)) {
-        setNodes(editor, blockElement)
-      } else {
-        insertNodes(editor, [blockElement])
-      }
-    }, 1)
-  }
-}
+export const insertInlineElement = (editor: PlateEditor, inlineElement) => {
+  editor.tf.insertNodes([inlineElement]);
+};
+
+export const insertBlockElement = (editor: PlateEditor, blockElement) => {
+  editor.tf.withoutNormalizing(() => {
+    const block = editor.api.block();
+    if (!block) return;
+    if (isCurrentBlockEmpty(editor)) {
+      editor.tf.setNodes(blockElement);
+    } else {
+      editor.tf.insertNodes([blockElement]);
+    }
+  });
+};
 
 const isCurrentBlockEmpty = (editor) => {
   if (!editor.selection) {
-    return false
+    return false;
   }
-  const [node] = Editor.node(editor, editor.selection)
-  const cursor = editor.selection.focus
-  const blockAbove = getBlockAbove(editor)
+  const [node] = editor.api.node(editor.selection);
+  const cursor = editor.selection.focus;
+  const blockAbove = editor.api.block();
   const isEmpty =
-    !Node.string(node) &&
+    !NodeApi.string(node) &&
     // @ts-ignore bad type from slate
     !node.children?.some((n) => Editor.isInline(editor, n)) &&
     // Only do this if we're at the start of a block
-    Editor.isStart(editor, cursor, blockAbove[1])
+    editor.api.isStart(cursor, blockAbove[1]);
 
-  return isEmpty
-}
+  return isEmpty;
+};
 
 /** Specifies node types which mdx can be embedded.
  * This prevents nodes like code blocks from having
@@ -170,13 +100,41 @@ const isCurrentBlockEmpty = (editor) => {
  * allow for that, at the moment blockquotes are strict
  */
 const currentNodeSupportsMDX = (editor: PlateEditor) =>
-  findNode(editor, {
+  editor.api.node({
     match: { type: HANDLES_MDX },
-  })
+  });
+
+/**
+ * Recursively removes link nodes (type: 'a') from inside code blocks,
+ * replacing them with their text children.
+ */
+export function normalizeLinksInCodeBlocks(node) {
+  // If this is a code_line node, flatten any 'a' children
+  if (node.type === 'code_line' && node.children) {
+    return {
+      ...node,
+      children: node.children.flatMap((child) => {
+        if (child.type === 'a') {
+          return child.children || []; // Replace link node with its text children
+        }
+        return [normalizeLinksInCodeBlocks(child)];
+      }),
+    };
+  }
+  // Recurse for other nodes with children
+  if (node.children) {
+    return {
+      ...node,
+      children: node.children.map(normalizeLinksInCodeBlocks),
+    };
+  }
+  return node;
+}
 
 export const helpers = {
   isNodeActive,
   isListActive,
   currentNodeSupportsMDX,
   normalize,
-}
+  normalizeLinksInCodeBlocks,
+};

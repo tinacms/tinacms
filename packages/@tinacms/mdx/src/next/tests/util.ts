@@ -1,5 +1,5 @@
-import { expect } from 'vitest'
-import { toMatchFile } from 'jest-file-snapshot'
+import { expect } from 'vitest';
+import { toMatchFile } from 'jest-file-snapshot';
 
 const join = function (...parts: string[]) {
   // From: https://stackoverflow.com/questions/29855098/is-there-a-built-in-javascript-function-similar-to-os-path-join
@@ -8,44 +8,48 @@ const join = function (...parts: string[]) {
   function intelligently adds and removes slashes as required, and is
   aware that `file` URLs will contain three adjacent slashes. */
 
-  const [first, last, slash] = [0, parts.length - 1, '/']
+  const [first, last, slash] = [0, parts.length - 1, '/'];
 
-  const matchLeadingSlash = new RegExp('^' + slash)
-  const matchTrailingSlash = new RegExp(slash + '$')
+  const matchLeadingSlash = new RegExp('^' + slash);
+  const matchTrailingSlash = new RegExp(slash + '$');
 
   parts = parts.map(function (part, index) {
-    if (index === first && part === 'file://') return part
+    if (index === first && part === 'file://') return part;
 
-    if (index > first) part = part.replace(matchLeadingSlash, '')
+    if (index > first) part = part.replace(matchLeadingSlash, '');
 
-    if (index < last) part = part.replace(matchTrailingSlash, '')
+    if (index < last) part = part.replace(matchTrailingSlash, '');
 
-    return part
-  })
+    return part;
+  });
 
-  return parts.join(slash)
-}
+  return parts.join(slash);
+};
 
-expect.extend({ toMatchFile })
+expect.extend({ toMatchFile });
 
 // @ts-ignore
 export function removePosition(tree) {
-  ;[...walkThrough(tree)]
+  [...walkThrough(tree)];
 
-  return tree
+  return tree;
 }
 
 export const print = (tree: object) => {
-  return `${JSON.stringify(removePosition(tree), null, 2)}\n`
-}
+  return `${JSON.stringify(removePosition(tree), null, 2)}\n`;
+};
 
 export const nodePath = (dir: string) => {
-  return join(dir, './node.json')
-}
+  return join(dir, './node.json');
+};
 
 export const mdPath = (dir: string) => {
-  return join(dir, './out.md')
-}
+  return join(dir, './out.md');
+};
+
+export const jsonPath = (dir: string) => {
+  return join(dir, './out.json');
+};
 
 const walkThrough = function* (obj: object) {
   // @ts-ignore
@@ -53,14 +57,14 @@ const walkThrough = function* (obj: object) {
     if (x) {
       for (const key of Object.keys(x)) {
         if (key === 'position') {
-          delete x.position
+          delete x.position;
         }
         // @ts-ignore
-        if (typeof x[key] === 'object') yield* walk(x[key], [...previous, key])
+        if (typeof x[key] === 'object') yield* walk(x[key], [...previous, key]);
         // @ts-ignore
-        else yield [[...previous, key], x[key]]
+        else yield [[...previous, key], x[key]];
       }
     }
-  }
-  yield* walk(obj)
-}
+  };
+  yield* walk(obj);
+};

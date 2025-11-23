@@ -13,7 +13,7 @@ jobs:
       matrix:
         package-manager: [yarn, npm, pnpm]
         template:
-          - tina-cloud-starter
+          - tina-nextjs-starter
           - tina-hugo-starter
           - tina-remix-starter
           - tinasaurus
@@ -37,12 +37,12 @@ jobs:
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3
         with:
-          hugo-version: 'latest'
+          hugo-version: 0.139.4
         if: ${{ matrix.template == 'tina-hugo-starter' }}
 
       - name: Setup build tokens
         run: |
-          if [[ "${{ matrix.template }}" == "tina-cloud-starter" ]]; then
+          if [[ "${{ matrix.template }}" == "tina-nextjs-starter" ]]; then
             echo "NEXT_PUBLIC_TINA_CLIENT_ID=${{ secrets.TINA_CLOUD_STARTER_CLIENT_ID }}" >> $GITHUB_ENV
             echo "TINA_TOKEN=${{ secrets.TINA_CLOUD_STARTER_TOKEN }}" >> $GITHUB_ENV
           elif [[ "${{ matrix.template }}" == "tina-hugo-starter" ]]; then

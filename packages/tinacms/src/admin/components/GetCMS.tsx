@@ -2,16 +2,16 @@
 
 */
 
-import React from 'react'
-import { useCMS } from '@tinacms/toolkit'
+import { useCMS } from '@tinacms/toolkit';
+import React from 'react';
 
 const GetCMS = ({ children }: { children: any }) => {
+  const cms = useCMS();
   try {
-    const cms = useCMS()
-    return <>{children(cms)}</>
+    return <>{children(cms)}</>;
   } catch (e) {
-    return null
+    return null;
   }
-}
+};
 
-export default GetCMS
+export default GetCMS;

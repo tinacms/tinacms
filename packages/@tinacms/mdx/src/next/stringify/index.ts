@@ -1,7 +1,7 @@
-import { RichTextField } from '@tinacms/schema-tools'
-import type * as Plate from '../../parse/plate'
-import { toTinaMarkdown } from './to-markdown'
-import { preProcess } from './pre-processing'
+import { RichTextField } from '@tinacms/schema-tools';
+import type * as Plate from '../../parse/plate';
+import { toTinaMarkdown } from './to-markdown';
+import { preProcess } from './pre-processing';
 
 export const stringifyMDX = (
   value: Plate.RootElement,
@@ -9,8 +9,8 @@ export const stringifyMDX = (
   imageCallback: (url: string) => string
 ) => {
   if (!value) {
-    return
+    return;
   }
-  const mdTree = preProcess(value, field, imageCallback)
-  return toTinaMarkdown(mdTree, field)
-}
+  const mdTree = preProcess(value, field, imageCallback);
+  return toTinaMarkdown(mdTree, field);
+};

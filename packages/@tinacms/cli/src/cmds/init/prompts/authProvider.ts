@@ -1,13 +1,13 @@
-import prompts from 'prompts'
-import crypto from 'crypto-js'
+import crypto from 'crypto-js';
+import prompts from 'prompts';
 
-import type { PromptAuthProvider, Config } from './types'
-import type { Framework } from '../'
-import { askTinaCloudSetup } from './askTinaCloudSetup'
+import type { Framework } from '../';
+import { askTinaCloudSetup } from './askTinaCloudSetup';
+import type { Config, PromptAuthProvider } from './types';
 const supportedAuthProviders: {
-  'tina-cloud': PromptAuthProvider
-  'next-auth': PromptAuthProvider
-  other: PromptAuthProvider
+  'tina-cloud': PromptAuthProvider;
+  'next-auth': PromptAuthProvider;
+  other: PromptAuthProvider;
 } = {
   other: {
     name: 'other',
@@ -50,14 +50,14 @@ const supportedAuthProviders: {
     ],
     peerDependencies: ['next-auth'],
   },
-}
+};
 
 const authProviderUpdateConfig: {
   [key in keyof typeof supportedAuthProviders]: ({
     config,
   }: {
-    config: Config
-  }) => Promise<void>
+    config: Config;
+  }) => Promise<void>;
 } = {
   other: async () => {},
   'tina-cloud': askTinaCloudSetup,
@@ -71,23 +71,23 @@ const authProviderUpdateConfig: {
           process.env.NEXTAUTH_SECRET ||
           crypto.lib.WordArray.random(16).toString(),
       },
-    ])
+    ]);
     config.envVars.push({
       key: 'NEXTAUTH_SECRET',
       value: result.nextAuthSecret,
-    })
+    });
   },
-}
+};
 export const chooseAuthProvider = async ({
   framework,
   config,
 }: {
-  config: Config
-  framework: Framework
+  config: Config;
+  framework: Framework;
 }) => {
   // Could add this back in later if we want to support things other then next-auth in the init
   // {
-  //   title: 'Tina Cloud for Auth',
+  //   title: 'TinaCloud for Auth',
   //   value: 'tina-cloud',
   // },
   // const choices = []
@@ -120,11 +120,11 @@ export const chooseAuthProvider = async ({
   // await authProviderUpdateConfig[authProviderChoice.authProvider]({
   //   config,
   // })
-  const authProvider = supportedAuthProviders['next-auth']
+  const authProvider = supportedAuthProviders['next-auth'];
 
   await authProviderUpdateConfig['next-auth']({
     config,
-  })
+  });
 
-  return authProvider
-}
+  return authProvider;
+};

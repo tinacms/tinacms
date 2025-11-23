@@ -1,17 +1,17 @@
-import * as React from 'react'
-import { FC } from 'react'
+import * as React from 'react';
+import { FC } from 'react';
 import {
   Modal,
   ModalHeader,
   ModalBody,
   ModalFullscreen,
   ModalPopup,
-} from '@toolkit/react-modals'
-import { ScreenPlugin } from '../screen-plugin'
+} from '@toolkit/react-modals';
+import { ScreenPlugin } from '../screen-plugin';
 
 export interface ScreenPluginModalProps {
-  screen: ScreenPlugin
-  close(): void
+  screen: ScreenPlugin;
+  close(): void;
 }
 
 export const ScreenPluginModal: FC<ScreenPluginModalProps> = ({
@@ -22,29 +22,29 @@ export const ScreenPluginModal: FC<ScreenPluginModalProps> = ({
     <ModalLayout name={screen.name} close={close} layout={screen.layout}>
       <screen.Component close={close} />
     </ModalLayout>
-  )
-}
+  );
+};
 
 interface ModalLayoutProps {
-  children: any
-  name: string
-  close: any
-  layout?: 'fullscreen' | 'popup'
+  children: any;
+  name: string;
+  close: any;
+  layout?: 'fullscreen' | 'popup';
 }
 
 const ModalLayout = ({ children, name, close, layout }: ModalLayoutProps) => {
-  let Wrapper
+  let Wrapper;
 
   switch (layout) {
     case 'popup':
-      Wrapper = ModalPopup
-      break
+      Wrapper = ModalPopup;
+      break;
     case 'fullscreen':
-      Wrapper = ModalFullscreen
-      break
+      Wrapper = ModalFullscreen;
+      break;
     default:
-      Wrapper = ModalPopup
-      break
+      Wrapper = ModalPopup;
+      break;
   }
 
   return (
@@ -58,5 +58,5 @@ const ModalLayout = ({ children, name, close, layout }: ModalLayoutProps) => {
         </ModalBody>
       </Wrapper>
     </Modal>
-  )
-}
+  );
+};

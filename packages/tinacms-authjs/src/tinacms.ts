@@ -1,54 +1,54 @@
-import { Collection, LoginStrategy } from '@tinacms/schema-tools'
+import { Collection, LoginStrategy } from '@tinacms/schema-tools';
 import {
   getCsrfToken,
   getSession,
   signIn,
   signOut,
   SessionProvider,
-} from 'next-auth/react'
-import { AbstractAuthProvider } from 'tinacms'
-import type { FC } from 'react'
+} from 'next-auth/react';
+import { AbstractAuthProvider } from 'tinacms';
+import type { FC } from 'react';
 
-export const TINA_CREDENTIALS_PROVIDER_NAME = 'TinaCredentials'
+export const TINA_CREDENTIALS_PROVIDER_NAME = 'TinaCredentials';
 
 export class DefaultAuthJSProvider extends AbstractAuthProvider {
-  readonly callbackUrl: string
-  readonly name: string
-  readonly redirect: boolean
+  readonly callbackUrl: string;
+  readonly name: string;
+  readonly redirect: boolean;
   constructor(props?: {
-    name?: string
-    callbackUrl?: string
-    redirect?: boolean
+    name?: string;
+    callbackUrl?: string;
+    redirect?: boolean;
   }) {
-    super()
-    this.name = props?.name || TINA_CREDENTIALS_PROVIDER_NAME
-    this.callbackUrl = props?.callbackUrl || '/admin/index.html'
-    this.redirect = props?.redirect ?? false
+    super();
+    this.name = props?.name || TINA_CREDENTIALS_PROVIDER_NAME;
+    this.callbackUrl = props?.callbackUrl || '/admin/index.html';
+    this.redirect = props?.redirect ?? false;
   }
   async authenticate(_props): Promise<any> {
-    return signIn(this.name, { callbackUrl: this.callbackUrl })
+    return signIn(this.name, { callbackUrl: this.callbackUrl });
   }
   getToken() {
-    return Promise.resolve({ id_token: '' })
+    return Promise.resolve({ id_token: '' });
   }
   async getUser() {
-    const session = await getSession()
-    return session?.user || false
+    const session = await getSession();
+    return session?.user || false;
   }
   async logout() {
-    await signOut({ redirect: this.redirect, callbackUrl: this.callbackUrl })
+    await signOut({ redirect: this.redirect, callbackUrl: this.callbackUrl });
   }
   async authorize(context?: any): Promise<any> {
-    const user: any = (await getSession(context))?.user || {}
-    return user.role === 'user'
+    const user: any = (await getSession(context))?.user || {};
+    return user.role === 'user';
   }
 
   getSessionProvider() {
-    return SessionProvider as FC
+    return SessionProvider as FC;
   }
 }
 
-const errorRegex = /\?error=([^&]*)/
+const errorRegex = /\?error=([^&]*)/;
 // https://github.com/nextauthjs/next-auth/blob/ce7a49910e2ea8fb98f6f9cfb1b1f307aa3dc46f/packages/next-auth/src/core/pages/signin.tsx#L8
 export type SignInErrorTypes =
   | 'Signin'
@@ -61,7 +61,7 @@ export type SignInErrorTypes =
   | 'EmailSignin'
   | 'CredentialsSignin'
   | 'SessionRequired'
-  | 'default'
+  | 'default';
 
 const errorMap: Record<SignInErrorTypes, string> = {
   Signin: 'Try signing in with a different account.',
@@ -77,16 +77,16 @@ const errorMap: Record<SignInErrorTypes, string> = {
     'Sign in failed. Check the details you provided are correct.',
   SessionRequired: 'Please sign in to access this page.',
   default: 'Unable to sign in.',
-}
+};
 
 export class UsernamePasswordAuthJSProvider extends DefaultAuthJSProvider {
   async authenticate(props?: Record<string, any>) {
-    const username = props?.username
-    const password = props?.password
+    const username = props?.username;
+    const password = props?.password;
     if (!username || !password) {
-      throw new Error('Username and password are required')
+      throw new Error('Username and password are required');
     }
-    const csrfToken = await getCsrfToken()
+    const csrfToken = await getCsrfToken();
     // TODO make api baseUrl configurable
     return fetch('/api/tina/auth/callback/credentials', {
       redirect: 'error', //redirect should throw an error
@@ -103,27 +103,27 @@ export class UsernamePasswordAuthJSProvider extends DefaultAuthJSProvider {
       }).toString(),
     })
       .then(async (res) => {
-        const { url } = await res.json()
+        const { url } = await res.json();
         if (!url) {
-          throw new Error('Unexpected error on login')
+          throw new Error('Unexpected error on login');
         }
         // extract error message from url
-        const error = url.match(errorRegex)?.[1]
+        const error = url.match(errorRegex)?.[1];
         if (error) {
           if (error in errorMap) {
-            throw errorMap[error as SignInErrorTypes]
+            throw errorMap[error as SignInErrorTypes];
           } else {
-            throw errorMap['default']
+            throw errorMap['default'];
           }
         }
       })
       .catch((err) => {
-        throw err
-      })
+        throw err;
+      });
   }
 
   getLoginStrategy(): LoginStrategy {
-    return 'UsernamePassword'
+    return 'UsernamePassword';
   }
 }
 
@@ -181,4 +181,4 @@ export const TinaUserCollection: Collection = {
       ],
     },
   ],
-}
+};

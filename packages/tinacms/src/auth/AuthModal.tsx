@@ -1,24 +1,20 @@
-/**
-
-*/
-
 import {
   Modal,
   ModalPopup,
   ModalHeader,
   ModalBody,
   ModalActions,
-} from '@tinacms/toolkit'
-import { LoadingDots, Button } from '@tinacms/toolkit'
-import React, { useCallback, useEffect, useState } from 'react'
+} from '@tinacms/toolkit';
+import { LoadingDots, Button } from '@tinacms/toolkit';
+import React, { useCallback, useEffect, useState } from 'react';
 
 interface ModalBuilderProps {
-  title: string
-  message?: string
-  error?: string
-  actions: ButtonProps[]
-  close(): void
-  children?: React.ReactNode
+  title: string;
+  message?: React.ReactNode;
+  error?: string;
+  actions: ButtonProps[];
+  close(): void;
+  children?: React.ReactNode;
 }
 
 export function ModalBuilder(modalProps: ModalBuilderProps) {
@@ -27,7 +23,12 @@ export function ModalBuilder(modalProps: ModalBuilderProps) {
       <ModalPopup>
         <ModalHeader>{modalProps.title}</ModalHeader>
         <ModalBody padded>
-          {modalProps.message && <p>{modalProps.message}</p>}
+          {modalProps.message &&
+            (typeof modalProps.message === 'string' ? (
+              <p>{modalProps.message}</p>
+            ) : (
+              modalProps.message
+            ))}
           {modalProps.error && <ErrorLabel>{modalProps.error}</ErrorLabel>}
           {modalProps.children}
         </ModalBody>
@@ -38,39 +39,39 @@ export function ModalBuilder(modalProps: ModalBuilderProps) {
         </ModalActions>
       </ModalPopup>
     </Modal>
-  )
+  );
 }
 
 export const ErrorLabel = ({ style = {}, ...props }) => (
   <p style={{ ...style, color: 'var(--tina-color-error)' }} {...props} />
-)
+);
 
 interface ButtonProps {
-  name: string
-  action(): Promise<void>
-  primary: boolean
+  name: string;
+  action(): Promise<void>;
+  primary: boolean;
 }
 
 export const AsyncButton = ({ name, primary, action }: ButtonProps) => {
-  const [submitting, setSubmitting] = useState(false)
-  const [mounted, setMounted] = useState(false)
+  const [submitting, setSubmitting] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true)
-    return () => setMounted(false)
-  }, [])
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   const onClick = useCallback(async () => {
-    if (!mounted) return
-    setSubmitting(true)
+    if (!mounted) return;
+    setSubmitting(true);
     try {
-      await action()
-      setSubmitting(false)
+      await action();
+      setSubmitting(false);
     } catch (e) {
-      setSubmitting(false)
-      throw e
+      setSubmitting(false);
+      throw e;
     }
-  }, [action, setSubmitting, mounted])
+  }, [action, setSubmitting, mounted]);
 
   return (
     <Button
@@ -83,5 +84,5 @@ export const AsyncButton = ({ name, primary, action }: ButtonProps) => {
       {submitting && <LoadingDots />}
       {!submitting && name}
     </Button>
-  )
-}
+  );
+};

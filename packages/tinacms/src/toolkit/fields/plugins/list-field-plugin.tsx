@@ -1,29 +1,30 @@
-import * as React from 'react'
-import { Field, Form } from '@toolkit/forms'
-import { FieldsBuilder } from '@toolkit/form-builder'
-import { IconButton } from '@toolkit/styles'
-import { Droppable, Draggable } from 'react-beautiful-dnd'
-import { AddIcon } from '@toolkit/icons'
+import * as React from 'react';
+import { Field, Form } from '@toolkit/forms';
+import { FieldsBuilder } from '@toolkit/form-builder';
+import { IconButton } from '@toolkit/styles';
+import { Droppable, Draggable, SortableProvider } from './dnd-kit-wrapper';
+import { AddIcon } from '@toolkit/icons';
 import {
   DragHandle,
   ItemClickTarget,
   ItemDeleteButton,
   ItemHeader,
-} from './group-list-field-plugin'
-import { EmptyList, ListFieldMeta, ListPanel } from './list-field-meta'
+} from './group-list-field-plugin';
+import { EmptyList, ListFieldMeta, ListPanel } from './list-field-meta';
 
-type DefaultItem = string | number | (() => string | number)
+type DefaultItem = string | number | (() => string | number);
 
 interface ListFieldDefinititon extends Field {
-  component: 'list'
-  defaultItem?: DefaultItem
+  component: 'list';
+  defaultItem?: DefaultItem;
   field: {
-    component: 'text' | 'textarea' | 'number' | 'select' | 'image'
-  }
+    component: 'text' | 'textarea' | 'number' | 'select' | 'image';
+  };
 
-  type?: string
-  list?: boolean
-  parentTypename?: string
+  type?: string;
+  list?: boolean;
+  parentTypename?: string;
+  addItemBehavior?: 'append' | 'prepend';
   /**
    * An optional function which generates `props` for
    * this items's `li`.
@@ -38,45 +39,49 @@ interface ListFieldDefinititon extends Field {
      * Reference:
      * * https://reactjs.org/docs/lists-and-keys.html
      */
-    key?: string
-  }
+    key?: string;
+  };
 }
 
 interface ListProps {
-  input: any
-  meta: any
-  field: ListFieldDefinititon
-  form: any
-  tinaForm: Form
-  index?: number
+  input: any;
+  meta: any;
+  field: ListFieldDefinititon;
+  form: any;
+  tinaForm: Form;
+  index?: number;
 }
 
 const List = ({ tinaForm, form, field, input, meta, index }: ListProps) => {
   const addItem = React.useCallback(() => {
-    let newItem: DefaultItem = ''
+    let newItem: DefaultItem = '';
     if (typeof field.defaultItem === 'function') {
-      newItem = field.defaultItem()
+      newItem = field.defaultItem();
     } else if (typeof field.defaultItem !== 'undefined') {
-      newItem = field.defaultItem
+      newItem = field.defaultItem;
     }
-    form.mutators.insert(field.name, 0, newItem)
-  }, [form, field])
+    if (field.addItemBehavior === 'prepend') {
+      form.mutators.insert(field.name, 0, newItem);
+    } else {
+      form.mutators.push(field.name, newItem);
+    }
+  }, [form, field]);
 
-  const items = input.value || []
+  const items = input.value || [];
   const itemProps = React.useCallback(
     (item: object) => {
-      if (!field.itemProps) return {}
-      return field.itemProps(item)
+      if (!field.itemProps) return {};
+      return field.itemProps(item);
     },
     [field.itemProps]
-  )
+  );
 
   // @ts-ignore
-  const isMax = items.length >= (field.max || Infinity)
+  const isMax = items.length >= (field.max || Infinity);
   // @ts-ignore
-  const isMin = items.length <= (field.min || 0)
+  const isMin = items.length <= (field.min || 0);
   // @ts-ignore
-  const fixedLength = field.min === field.max
+  const fixedLength = field.min === field.max;
 
   return (
     <ListFieldMeta
@@ -88,8 +93,8 @@ const List = ({ tinaForm, form, field, input, meta, index }: ListProps) => {
       tinaForm={tinaForm}
       actions={
         (!fixedLength || (fixedLength && !isMax)) && (
-          <IconButton onClick={addItem} variant="primary" size="small">
-            <AddIcon className="w-5/6 h-auto" />
+          <IconButton onClick={addItem} variant='primary' size='small'>
+            <AddIcon className='w-5/6 h-auto' />
           </IconButton>
         )
       }
@@ -100,19 +105,23 @@ const List = ({ tinaForm, form, field, input, meta, index }: ListProps) => {
             {(provider) => (
               <div ref={provider.innerRef}>
                 {items.length === 0 && <EmptyList />}
-                {items.map((item: any, index: any) => (
-                  <Item
-                    // NOTE: Supressing warnings, but not helping with render perf
-                    key={index}
-                    tinaForm={tinaForm}
-                    field={field}
-                    item={item}
-                    index={index}
-                    isMin={isMin}
-                    fixedLength={fixedLength}
-                    {...itemProps(item)}
-                  />
-                ))}
+                <SortableProvider
+                  items={items.map((_, index) => `${field.name}.${index}`)}
+                >
+                  {items.map((item: any, index: any) => (
+                    <Item
+                      // NOTE: Supressing warnings, but not helping with render perf
+                      key={index}
+                      tinaForm={tinaForm}
+                      field={field}
+                      item={item}
+                      index={index}
+                      isMin={isMin}
+                      fixedLength={fixedLength}
+                      {...itemProps(item)}
+                    />
+                  ))}
+                </SortableProvider>
                 {provider.placeholder}
               </div>
             )}
@@ -120,17 +129,17 @@ const List = ({ tinaForm, form, field, input, meta, index }: ListProps) => {
         </div>
       </ListPanel>
     </ListFieldMeta>
-  )
-}
+  );
+};
 
 interface ItemProps {
-  tinaForm: Form
-  field: ListFieldDefinititon
-  index: number
-  item: any
-  label?: string
-  isMin?: boolean
-  fixedLength?: boolean
+  tinaForm: Form;
+  field: ListFieldDefinititon;
+  index: number;
+  item: any;
+  label?: string;
+  isMin?: boolean;
+  fixedLength?: boolean;
 }
 
 const Item = ({
@@ -144,8 +153,8 @@ const Item = ({
   ...p
 }: ItemProps) => {
   const removeItem = React.useCallback(() => {
-    tinaForm.mutators.remove(field.name, index)
-  }, [tinaForm, field, index])
+    tinaForm.mutators.remove(field.name, index);
+  }, [tinaForm, field, index]);
   const fields = [
     {
       type: field.type,
@@ -155,13 +164,16 @@ const Item = ({
       label: false,
       name: `${field.name}.${index}`,
     },
-  ]
+  ];
 
   return (
     <Draggable draggableId={`${field.name}.${index}`} index={index}>
       {(provider, snapshot) => (
         <ItemHeader provider={provider} isDragging={snapshot.isDragging} {...p}>
-          <DragHandle isDragging={snapshot.isDragging} />
+          <DragHandle
+            isDragging={snapshot.isDragging}
+            dragHandleProps={provider.dragHandleProps}
+          />
           <ItemClickTarget>
             <FieldsBuilder padding={false} form={tinaForm} fields={fields} />
           </ItemClickTarget>
@@ -171,15 +183,15 @@ const Item = ({
         </ItemHeader>
       )}
     </Draggable>
-  )
-}
+  );
+};
 
-export const ListField = List
+export const ListField = List;
 
 export const ListFieldPlugin = {
   name: 'list',
   Component: ListField,
   validate(value: any, values: any, meta: any, field: any) {
-    if (field.required && !value) return 'Required'
+    if (field.required && !value) return 'Required';
   },
-}
+};

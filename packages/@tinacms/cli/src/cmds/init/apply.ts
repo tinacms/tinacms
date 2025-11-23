@@ -1,7 +1,7 @@
-import path from 'path'
-import { generateCollections } from '../forestry-migrate'
-import { addVariablesToCode } from '../forestry-migrate/util/codeTransformer'
-import { logger } from '../../logger'
+import path from 'path';
+import { generateCollections } from '../forestry-migrate';
+import { addVariablesToCode } from '../forestry-migrate/util/codeTransformer';
+import { logger } from '../../logger';
 import {
   cmdText,
   focusText,
@@ -10,50 +10,51 @@ import {
   linkText,
   logText,
   titleText,
-} from '../../utils/theme'
-import { Telemetry } from '@tinacms/metrics'
-import fs from 'fs-extra'
-import { writeGitignore } from '../../next/commands/codemod-command'
-import { templates as NextTemplates } from './templates/next'
-import { ConfigTemplateArgs, generateConfig } from './templates/config'
-import { databaseTemplate } from './templates/database'
-import { nextApiRouteTemplate } from './templates/tinaNextRoute'
-import { helloWorldPost } from './templates/content'
-import { format } from 'prettier'
-import { extendNextScripts } from '../../utils/script-helpers'
+} from '../../utils/theme';
+import { Telemetry } from '@tinacms/metrics';
+import fs from 'fs-extra';
+import { writeGitignore } from '../../next/commands/codemod-command';
+import { templates as NextTemplates } from './templates/next';
+import { ConfigTemplateArgs, generateConfig } from './templates/config';
+import { databaseTemplate } from './templates/database';
+import { nextApiRouteTemplate } from './templates/tinaNextRoute';
+import { helloWorldPost } from './templates/content';
+import { format } from 'prettier';
+import { extendNextScripts } from '../../utils/script-helpers';
 import {
   Framework,
   GeneratedFile,
   InitEnvironment,
   InitParams,
   ReactiveFramework,
-} from './index'
-import { Config } from './prompts'
-import { addSelfHostedTinaAuthToConfig } from './codegen'
+} from './index';
+import { Config } from './prompts';
+import { addSelfHostedTinaAuthToConfig } from './codegen';
+import { ContentFrontmatterFormat } from '@tinacms/schema-tools';
 
 async function apply({
   env,
   params,
   config,
 }: {
-  env: InitEnvironment
-  params: InitParams
-  config: Config
+  env: InitEnvironment;
+  params: InitParams;
+  config: Config;
 }) {
   if (config.framework.name === 'other' && config.hosting === 'self-host') {
     logger.error(
       logText(
         'Self-hosted Tina requires init setup only works with next.js right now. Please check out the docs for info on how to setup Tina on another framework: https://tina.io/docs/self-hosted/existing-site/'
       )
-    )
-    return
+    );
+    return;
   }
-  const { pathToForestryConfig, noTelemetry, baseDir = '' } = params
-  let collections: string | null | undefined
-  let templateCode: string | null | undefined
-  let extraText: string | null | undefined
+  const { pathToForestryConfig, noTelemetry, baseDir = '' } = params;
+  let collections: string | null | undefined;
+  let templateCode: string | null | undefined;
+  let extraText: string | null | undefined;
 
-  let isForestryMigration = false
+  let isForestryMigration = false;
   if (env.forestryConfigExists) {
     // CollectionsString is the string that will be added to the tina config
     // importStatements are the import statements that will be added to the tina config
@@ -62,12 +63,12 @@ async function apply({
       frontMatterFormat: env.frontMatterFormat || config.frontMatterFormat,
       pathToForestryConfig,
       usingTypescript: config.typescript,
-    })
+    });
     if (res) {
-      templateCode = res.templateCodeString
-      collections = res.collectionString
-      extraText = res.importStatements
-      isForestryMigration = true
+      templateCode = res.templateCodeString;
+      collections = res.collectionString;
+      extraText = res.importStatements;
+      isForestryMigration = true;
     }
   }
 
@@ -76,26 +77,26 @@ async function apply({
     usingTypescript: config.typescript,
     hasForestryConfig: env.forestryConfigExists,
     noTelemetry: noTelemetry,
-  })
+  });
 
   // if no package.json, init
   if (!env.packageJSONExists) {
-    await createPackageJSON()
+    await createPackageJSON();
   }
 
   // if no .gitignore, create one
   if (!env.gitIgnoreExists) {
-    await createGitignore({ baseDir })
+    await createGitignore({ baseDir });
   } else {
-    const itemsToAdd = []
+    const itemsToAdd = [];
     if (!env.gitIgnoreNodeModulesExists) {
-      itemsToAdd.push('node_modules')
+      itemsToAdd.push('node_modules');
     }
     if (!env.gitIgnoreEnvExists) {
-      itemsToAdd.push('.env')
+      itemsToAdd.push('.env');
     }
     if (itemsToAdd.length > 0) {
-      await updateGitIgnore({ baseDir, items: itemsToAdd })
+      await updateGitIgnore({ baseDir, items: itemsToAdd });
     }
   }
 
@@ -105,22 +106,22 @@ async function apply({
       generatedFile: env.generatedFiles['templates'],
       content: templateCode,
       config,
-    })
+    });
   }
-  const usingDataLayer = config.hosting === 'self-host'
+  const usingDataLayer = config.hosting === 'self-host';
 
   if (usingDataLayer) {
     // add tina/database file
     await addDatabaseFile({
       config,
       generatedFile: env.generatedFiles['database'],
-    })
+    });
     // add pages/api/tina/[...routes].ts file
     await addNextApiRoute({
       env,
       config,
       generatedFile: env.generatedFiles['next-api-handler'],
-    })
+    });
     // add content/users/index.json file
     await addTemplateFile({
       config,
@@ -142,13 +143,13 @@ async function apply({
         null,
         2
       ),
-    })
+    });
   }
 
   // add NextJS Demo file (First time init only)
   if (!env.forestryConfigExists && !env.tinaConfigExists) {
     // add /content/posts/hello-world.md
-    await addContentFile({ config, env })
+    await addContentFile({ config, env });
   }
 
   // add nextJs example code (First time init only)
@@ -163,10 +164,10 @@ async function apply({
       env,
       dataLayer: usingDataLayer,
       generatedFile: env.generatedFiles['reactive-example'],
-    })
+    });
   }
 
-  await addDependencies(config, env, params)
+  await addDependencies(config, env, params);
 
   if (!env.tinaConfigExists) {
     // add tina/config.{js,ts}]
@@ -186,7 +187,7 @@ async function apply({
       baseDir,
       generatedFile: env.generatedFiles['config'],
       config,
-    })
+    });
   }
 
   if (
@@ -199,7 +200,7 @@ async function apply({
     // the user did not choose the 'tina-cloud' auth provider
     (config.authProvider?.name || '') !== 'tina-cloud'
   ) {
-    await addSelfHostedTinaAuthToConfig(config, env.generatedFiles['config'])
+    await addSelfHostedTinaAuthToConfig(config, env.generatedFiles['config']);
   }
 
   logNextSteps({
@@ -208,7 +209,7 @@ async function apply({
     dataLayer: usingDataLayer,
     packageManager: config.packageManager,
     framework: config.framework,
-  })
+  });
 }
 
 const forestryMigrate = async ({
@@ -216,126 +217,126 @@ const forestryMigrate = async ({
   usingTypescript,
   frontMatterFormat,
 }: {
-  usingTypescript: boolean
-  pathToForestryConfig: string
-  frontMatterFormat: 'yaml' | 'toml' | 'json'
+  usingTypescript: boolean;
+  pathToForestryConfig: string;
+  frontMatterFormat: ContentFrontmatterFormat;
 }) => {
   const { collections, importStatements, templateCode } =
     await generateCollections({
       pathToForestryConfig,
       usingTypescript,
       frontMatterFormat,
-    })
+    });
 
   // print errors
   // This error is handled now so we do not need to print it
   // ErrorSingleton.getInstance().printCollectionNameErrors()
-  const JSONString = JSON.stringify(collections, null, 2)
+  const JSONString = JSON.stringify(collections, null, 2);
 
-  const { code } = addVariablesToCode(JSONString)
+  const { code } = addVariablesToCode(JSONString);
 
   return {
     collectionString: code,
     importStatements,
     templateCodeString: templateCode,
-  }
-}
+  };
+};
 
 const reportTelemetry = async ({
   hasForestryConfig,
   noTelemetry,
   usingTypescript,
 }: {
-  usingTypescript: boolean
-  noTelemetry: boolean
-  hasForestryConfig: boolean
+  usingTypescript: boolean;
+  noTelemetry: boolean;
+  hasForestryConfig: boolean;
 }) => {
   if (noTelemetry) {
-    logger.info(logText('Telemetry disabled'))
+    logger.info(logText('Telemetry disabled'));
   }
-  const telemetry = new Telemetry({ disabled: noTelemetry })
-  const schemaFileType = usingTypescript ? 'ts' : 'js'
+  const telemetry = new Telemetry({ disabled: noTelemetry });
+  const schemaFileType = usingTypescript ? 'ts' : 'js';
   await telemetry.submitRecord({
     event: {
       name: 'tinacms:cli:init:invoke',
       schemaFileType,
       hasForestryConfig,
     },
-  })
-}
+  });
+};
 
 const createPackageJSON = async () => {
-  logger.info(logText('No package.json found, creating one'))
-  await execShellCommand(`npm init --yes`)
-}
+  logger.info(logText('No package.json found, creating one'));
+  await execShellCommand(`npm init --yes`);
+};
 const createGitignore = async ({ baseDir }: { baseDir: string }) => {
-  logger.info(logText('No .gitignore found, creating one'))
-  fs.outputFileSync(path.join(baseDir, '.gitignore'), 'node_modules')
-}
+  logger.info(logText('No .gitignore found, creating one'));
+  fs.outputFileSync(path.join(baseDir, '.gitignore'), 'node_modules');
+};
 
 const updateGitIgnore = async ({
   baseDir,
   items,
 }: {
-  baseDir: string
-  items: string[]
+  baseDir: string;
+  items: string[];
 }) => {
-  logger.info(logText(`Adding ${items.join(',')} to .gitignore`))
+  logger.info(logText(`Adding ${items.join(',')} to .gitignore`));
   const gitignoreContent = fs
     .readFileSync(path.join(baseDir, '.gitignore'))
-    .toString()
+    .toString();
   const newGitignoreContent = [...gitignoreContent.split('\n'), ...items].join(
     '\n'
-  )
-  await fs.writeFile(path.join(baseDir, '.gitignore'), newGitignoreContent)
-}
+  );
+  await fs.writeFile(path.join(baseDir, '.gitignore'), newGitignoreContent);
+};
 const addDependencies = async (
   config: Config,
   env: InitEnvironment,
   params: InitParams
 ) => {
-  const { packageManager } = config
-  const tagVersion = params.tinaVersion ? `@${params.tinaVersion}` : ''
-  let deps = []
-  let devDeps = []
+  const { packageManager } = config;
+  const tagVersion = params.tinaVersion ? `@${params.tinaVersion}` : '';
+  let deps = [];
+  let devDeps = [];
 
   // If TinaCMS is already installed, don't add it again
   if (!env.hasTinaDeps) {
-    deps.push('tinacms')
-    devDeps.push('@tinacms/cli')
+    deps.push('tinacms');
+    devDeps.push('@tinacms/cli');
   }
 
   if (config.typescript) {
-    devDeps.push('@types/node')
+    devDeps.push('@types/node');
   }
 
   if (config.hosting === 'self-host') {
-    deps.push('@tinacms/datalayer')
+    deps.push('@tinacms/datalayer');
   }
 
   // Add deps from database adapter, auth provider, and git provider
   deps.push(
     ...(config.databaseAdapter?.imports?.map((x) => x.packageName) || [])
-  )
-  deps.push(...(config.authProvider?.peerDependencies || []))
+  );
+  deps.push(...(config.authProvider?.peerDependencies || []));
   deps.push(
     ...(config.authProvider?.backendAuthProviderImports?.map(
       (x) => x.packageName
     ) || [])
-  )
+  );
   deps.push(
     ...(config.authProvider?.configImports?.map((x) => x.packageName) || [])
-  )
-  deps.push(...(config.gitProvider?.imports?.map((x) => x.packageName) || []))
+  );
+  deps.push(...(config.gitProvider?.imports?.map((x) => x.packageName) || []));
 
   // add tag version if this is a pr tagged version
   if (tagVersion) {
     deps = deps.map((dep) =>
       dep.indexOf('tina') >= 0 ? `${dep}${tagVersion}` : dep
-    )
+    );
     devDeps = devDeps.map((dep) =>
       dep.indexOf('tina') >= 0 ? `${dep}${tagVersion}` : dep
-    )
+    );
   }
 
   // dependencies
@@ -345,12 +346,13 @@ const addDependencies = async (
       : `pnpm add ${deps.join(' ')}`,
     npm: `npm install ${deps.join(' ')}`,
     yarn: `yarn add ${deps.join(' ')}`,
-  }
+    bun: `bun add ${deps.join(' ')}`,
+  };
 
   if (packageManagers[packageManager] && deps.length > 0) {
-    logger.info(logText('Adding dependencies, this might take a moment...'))
-    logger.info(indentedCmd(`${logText(packageManagers[packageManager])}`))
-    await execShellCommand(packageManagers[packageManager])
+    logger.info(logText('Adding dependencies, this might take a moment...'));
+    logger.info(indentedCmd(`${logText(packageManagers[packageManager])}`));
+    await execShellCommand(packageManagers[packageManager]);
   }
 
   // dev dependencies
@@ -361,16 +363,17 @@ const addDependencies = async (
         : `pnpm add -D ${devDeps.join(' ')}`,
       npm: `npm install -D ${devDeps.join(' ')}`,
       yarn: `yarn add -D ${devDeps.join(' ')}`,
-    }
+      bun: `bun add -D ${devDeps.join(' ')}`,
+    };
     if (packageManagers[packageManager]) {
       logger.info(
         logText('Adding dev dependencies, this might take a moment...')
-      )
-      logger.info(indentedCmd(`${logText(packageManagers[packageManager])}`))
-      await execShellCommand(packageManagers[packageManager])
+      );
+      logger.info(indentedCmd(`${logText(packageManagers[packageManager])}`));
+      await execShellCommand(packageManagers[packageManager]);
     }
   }
-}
+};
 
 const writeGeneratedFile = async ({
   generatedFile,
@@ -378,28 +381,28 @@ const writeGeneratedFile = async ({
   content,
   typescript,
 }: {
-  generatedFile: GeneratedFile
-  overwrite: boolean
-  content: string
-  typescript: boolean
+  generatedFile: GeneratedFile;
+  overwrite: boolean;
+  content: string;
+  typescript: boolean;
 }) => {
-  const { exists, path, parentPath } = generatedFile.resolve(typescript)
+  const { exists, path, parentPath } = generatedFile.resolve(typescript);
   if (exists) {
     if (overwrite) {
-      logger.info(`Overwriting file at ${path}... ✅`)
-      fs.outputFileSync(path, content)
+      logger.info(`Overwriting file at ${path}... ✅`);
+      fs.outputFileSync(path, content);
     } else {
-      logger.info(`Not overwriting file at ${path}.`)
+      logger.info(`Not overwriting file at ${path}.`);
       logger.info(
         logText(`Please add the following to ${path}:\n${indentText(content)}}`)
-      )
+      );
     }
   } else {
-    logger.info(`Adding file at ${path}... ✅`)
-    await fs.ensureDir(parentPath)
-    fs.outputFileSync(path, content)
+    logger.info(`Adding file at ${path}... ✅`);
+    await fs.ensureDir(parentPath);
+    fs.outputFileSync(path, content);
   }
-}
+};
 
 const addConfigFile = async ({
   baseDir,
@@ -407,59 +410,59 @@ const addConfigFile = async ({
   generatedFile,
   config,
 }: {
-  baseDir: string
-  configArgs: ConfigTemplateArgs
-  generatedFile: GeneratedFile
-  config: Config
+  baseDir: string;
+  configArgs: ConfigTemplateArgs;
+  generatedFile: GeneratedFile;
+  config: Config;
 }) => {
   const content = format(generateConfig(configArgs), {
     parser: 'babel',
-  })
+  });
   await writeGeneratedFile({
     overwrite: config.overwriteList?.includes('config'),
     generatedFile,
     content,
     typescript: config.typescript,
-  })
-  const { exists } = generatedFile.resolve(config.typescript)
+  });
+  const { exists } = generatedFile.resolve(config.typescript);
   if (!exists) {
-    await writeGitignore(baseDir)
+    await writeGitignore(baseDir);
   }
-}
+};
 
 const addDatabaseFile = async ({
   config,
   generatedFile,
 }: {
-  config: Config
-  generatedFile: GeneratedFile
+  config: Config;
+  generatedFile: GeneratedFile;
 }) => {
   await writeGeneratedFile({
     generatedFile,
     overwrite: config.overwriteList?.includes('database'),
     content: databaseTemplate({ config }),
     typescript: config.typescript,
-  })
-}
+  });
+};
 const addNextApiRoute = async ({
   config,
   generatedFile,
   env,
 }: {
-  env: InitEnvironment
-  config: Config
-  generatedFile: GeneratedFile
+  env: InitEnvironment;
+  config: Config;
+  generatedFile: GeneratedFile;
 }) => {
   const content = format(nextApiRouteTemplate({ config, env }), {
     parser: 'babel',
-  })
+  });
   await writeGeneratedFile({
     generatedFile,
     overwrite: config.overwriteList?.includes('next-api-handler'),
     content,
     typescript: config.typescript,
-  })
-}
+  });
+};
 
 // Adds tina/template.{ts,js} file
 export const addTemplateFile = async ({
@@ -467,24 +470,24 @@ export const addTemplateFile = async ({
   generatedFile,
   config,
 }: {
-  content: string
-  generatedFile: GeneratedFile
-  config: Config
+  content: string;
+  generatedFile: GeneratedFile;
+  config: Config;
 }) => {
   await writeGeneratedFile({
     generatedFile,
     overwrite: config.overwriteList?.includes(generatedFile.generatedFileType),
     content,
     typescript: config.typescript,
-  })
-}
+  });
+};
 
 const addContentFile = async ({
   config,
   env,
 }: {
-  config: Config
-  env: InitEnvironment
+  config: Config;
+  env: InitEnvironment;
 }) => {
   await writeGeneratedFile({
     generatedFile: {
@@ -500,14 +503,14 @@ const addContentFile = async ({
           exists: env.sampleContentExists,
           path: env.sampleContentPath,
           parentPath: path.dirname(env.sampleContentPath),
-        })
+        });
       },
     },
     overwrite: config.overwriteList?.includes('sample-content'),
     content: helloWorldPost,
     typescript: false,
-  })
-}
+  });
+};
 
 const logNextSteps = ({
   config,
@@ -516,66 +519,75 @@ const logNextSteps = ({
   packageManager,
   isBackend,
 }: {
-  config: Config
-  isBackend: boolean
-  dataLayer: boolean
-  packageManager: string
-  framework: Framework
+  config: Config;
+  isBackend: boolean;
+  dataLayer: boolean;
+  packageManager: string;
+  framework: Framework;
 }) => {
   if (isBackend) {
-    logger.info(focusText(`\n${titleText(' TinaCMS ')} backend initialized!`))
+    logger.info(focusText(`\n${titleText(' TinaCMS ')} backend initialized!`));
     const envFileText =
       config.envVars
         .map((x) => {
-          return `${x.key}=${x.value || '***'}`
+          return `${x.key}=${x.value || '***'}`;
         })
-        .join('\n') + `\nTINA_PUBLIC_IS_LOCAL=true`
-    const envFile = path.join(process.cwd(), '.env')
+        .join('\n') + `\nTINA_PUBLIC_IS_LOCAL=true`;
+    const envFile = path.join(process.cwd(), '.env');
     if (!fs.existsSync(envFile)) {
-      logger.info(`Adding .env file to your project... ✅`)
-      fs.writeFileSync(envFile, envFileText)
+      logger.info(`Adding .env file to your project... ✅`);
+      fs.writeFileSync(envFile, envFileText);
     } else {
       logger.info(
         'Please add the following environment variables to your .env file'
-      )
-      logger.info(indentText(envFileText))
+      );
+      logger.info(indentText(envFileText));
     }
     logger.info(
       'Before you can run your site you will need to update it to use the backend client.\nSee docs for more info: https://tina.io/docs/self-hosted/querying-data/'
-    )
+    );
     logger.info(
       'If you are deploying to vercel make sure to add the environment variables to your project.'
-    )
-    logger.info('Make sure  to push tina-lock.json to your GitHub repo')
+    );
+    logger.info('Make sure  to push tina-lock.json to your GitHub repo');
   } else {
-    logger.info(focusText(`\n${titleText(' TinaCMS ')} has been initialized!`))
+    logger.info(focusText(`\n${titleText(' TinaCMS ')} has been initialized!`));
     logger.info(
       'To get started run: ' +
         cmdText(frameworkDevCmds[framework.name]({ packageManager }))
-    )
+    );
+    if (framework.name === 'hugo') {
+      logger.info(
+        focusText('Hugo is required. '),
+        "Don't have Hugo installed? Follow this guide to set it up: ",
+        linkText('https://gohugo.io/installation/')
+      );
+    }
+
     logger.info(
       'To get your site production ready, run: ' +
         cmdText(`tinacms init backend`)
-    )
+    );
     logger.info(
       `\nOnce your site is running, access the CMS at ${linkText(
         '<YourDevURL>/admin/index.html'
       )}`
-    )
+    );
   }
-}
+};
 
 const other = ({ packageManager }: { packageManager: string }) => {
   const packageManagers = {
     pnpm: `pnpm`,
     npm: `npx`, // npx is the way to run executables that aren't in your "scripts"
     yarn: `yarn`,
-  }
-  return `${packageManagers[packageManager]} tinacms dev -c "<your dev command>"`
-}
+    bun: `bun run`,
+  };
+  return `${packageManagers[packageManager]} tinacms dev -c "<your dev command>"`;
+};
 
 const frameworkDevCmds: {
-  [key in Framework['name']]: (args?: { packageManager: string }) => string
+  [key in Framework['name']]: (args?: { packageManager: string }) => string;
 } = {
   other,
   hugo: other,
@@ -585,21 +597,22 @@ const frameworkDevCmds: {
       pnpm: `pnpm`,
       npm: `npm run`, // npx is the way to run executables that aren't in your "scripts"
       yarn: `yarn`,
-    }
-    return `${packageManagers[packageManager]} dev`
+      bun: `bun run`,
+    };
+    return `${packageManagers[packageManager]} dev`;
   },
-}
+};
 
 type AddReactiveParams = {
-  baseDir: string
-  config: Config
-  env: InitEnvironment
-  dataLayer: boolean
-  generatedFile: GeneratedFile
-}
+  baseDir: string;
+  config: Config;
+  env: InitEnvironment;
+  dataLayer: boolean;
+  generatedFile: GeneratedFile;
+};
 
 const addReactiveFile: {
-  [key in ReactiveFramework]: (params: AddReactiveParams) => Promise<void>
+  [key in ReactiveFramework]: (params: AddReactiveParams) => Promise<void>;
 } = {
   next: async ({
     generatedFile,
@@ -608,7 +621,7 @@ const addReactiveFile: {
     baseDir,
     dataLayer,
   }: AddReactiveParams) => {
-    const packageJsonPath = path.join(baseDir, 'package.json')
+    const packageJsonPath = path.join(baseDir, 'package.json');
     await writeGeneratedFile({
       generatedFile,
       typescript: config.typescript,
@@ -619,12 +632,12 @@ const addReactiveFile: {
         usingSrc: env.usingSrc,
         dataLayer,
       }),
-    })
-    logger.info('Adding a nextjs example... ✅')
+    });
+    logger.info('Adding a nextjs example... ✅');
 
     // 4. update the users package.json
-    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath).toString())
-    const scripts = packageJson.scripts || {}
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath).toString());
+    const scripts = packageJson.scripts || {};
     const updatedPackageJson = JSON.stringify(
       {
         ...packageJson,
@@ -635,10 +648,10 @@ const addReactiveFile: {
       },
       null,
       2
-    )
-    fs.writeFileSync(packageJsonPath, updatedPackageJson)
+    );
+    fs.writeFileSync(packageJsonPath, updatedPackageJson);
   },
-}
+};
 
 /**
  * Executes a shell command and return it as a Promise.
@@ -646,15 +659,15 @@ const addReactiveFile: {
  * @return {Promise<string>}
  */
 export function execShellCommand(cmd): Promise<string> {
-  const exec = require('child_process').exec
+  const exec = require('child_process').exec;
   return new Promise((resolve, reject) => {
     exec(cmd, (error, stdout, stderr) => {
       if (error) {
-        reject(error)
+        reject(error);
       }
-      resolve(stdout ? stdout : stderr)
-    })
-  })
+      resolve(stdout ? stdout : stderr);
+    });
+  });
 }
 
-export default apply
+export default apply;

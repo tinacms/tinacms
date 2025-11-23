@@ -3,8 +3,8 @@
 
 
 */
-import { it, expect, describe } from 'vitest'
-import { stringifyShortcode } from './stringifyShortcode'
+import { it, expect, describe } from 'vitest';
+import { stringifyShortcode } from './stringifyShortcode';
 
 describe('stringifyShortcode', () => {
   describe('with keyed field', () => {
@@ -26,10 +26,10 @@ describe('stringifyShortcode', () => {
             },
           ],
         }
-      )
-      expect(result).toEqual('{{< signature foo="bar123" >}}')
-    })
-  })
+      );
+      expect(result).toEqual('{{< signature foo="bar123" >}}');
+    });
+  });
 
   describe('with unkeyed attributes', () => {
     describe('and no text value set', () => {
@@ -48,10 +48,10 @@ describe('stringifyShortcode', () => {
               type: 'string',
             },
           ],
-        })
-        expect(result).toEqual('{{< signature  >}}')
-      })
-    })
+        });
+        expect(result).toEqual('{{< signature  >}}');
+      });
+    });
     it('parses attributes', () => {
       const result = stringifyShortcode(
         '<signature _value="bar123"></signature>',
@@ -70,10 +70,10 @@ describe('stringifyShortcode', () => {
             },
           ],
         }
-      )
-      expect(result).toEqual('{{< signature "bar123" >}}')
-    })
-  })
+      );
+      expect(result).toEqual('{{< signature "bar123" >}}');
+    });
+  });
 
   describe('with children', () => {
     it('parses children field', () => {
@@ -91,10 +91,10 @@ describe('stringifyShortcode', () => {
             type: 'string',
           },
         ],
-      })
+      });
       expect(result).toEqual(
         '{{< signature  >}}\n# FOO\n##Bar\n{{< /signature >}}'
-      )
-    })
-  })
-})
+      );
+    });
+  });
+});

@@ -1,28 +1,32 @@
 {
 	"name": "@tinacms/app",
-	"version": "2.1.11",
+	"version": "2.3.9",
 	"main": "src/main.tsx",
 	"license": "Apache-2.0",
 	"devDependencies": {
-		"@types/react": "^18.3.10",
-		"@types/react-dom": "^18.3.0",
-		"typescript": "^5.6.2"
+		"@types/react": "^18.3.18",
+		"@types/react-dom": "catalog:",
+		"typescript": "^5.7.3"
+	},
+	"peerDependencies": {
+		"react": ">=18.3.1 <20.0.0",
+		"react-dom": ">=18.3.1 <20.0.0"
 	},
 	"dependencies": {
-		"@graphiql/toolkit": "0.8.4",
+		"@graphiql/toolkit": "catalog:",
 		"@headlessui/react": "2.1.8",
 		"@heroicons/react": "^1.0.6",
-		"@monaco-editor/react": "4.4.5",
+		"@monaco-editor/react": "catalog:",
 		"@tinacms/mdx": "workspace:*",
-		"final-form": "4.20.10",
-		"graphiql": "3.0.0-alpha.1",
+		"final-form": "catalog:",
+		"graphiql": "catalog:",
 		"graphql": "15.8.0",
-		"monaco-editor": "0.31.0",
+		"monaco-editor": "catalog:",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
-		"react-router-dom": "6.3.0",
+		"react-router-dom": "catalog:",
 		"tinacms": "workspace:*",
-		"typescript": "^5.6.2",
-		"zod": "^3.23.8"
+		"typescript": "^5.7.3",
+		"zod": "catalog:"
 	}
 }

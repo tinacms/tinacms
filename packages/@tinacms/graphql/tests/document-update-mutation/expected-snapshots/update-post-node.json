@@ -1,0 +1,30 @@
+{
+  "data": {
+    "updatePost": {
+      "_values": {
+        "_collection": "post",
+        "_template": "post",
+        "title": "Updated Title by Mr Bob Northwind via updatePost",
+        "genre": "thriller",
+        "rating": 8,
+        "body": {
+          "type": "root",
+          "children": [
+            {
+              "type": "p",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "This is the updated content for Mr Bob Northwind's post about Northwind via updatePost. The company continues to thrive under his leadership."
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "_sys": {
+        "title": ""
+      }
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "data": {
+    "blueDesigners": {
+      "edges": [
+        {
+          "node": {
+            "id": "crew/bob-northwind.md"
+          }
+        }
+      ]
+    },
+    "redDesigners": {
+      "edges": [
+        {
+          "node": {
+            "id": "crew/charlie-southwind.md"
+          }
+        }
+      ]
+    },
+    "carChaseExperts": {
+      "edges": [
+        {
+          "node": {
+            "id": "crew/alice-eastwind.md"
+          }
+        }
+      ]
+    },
+    "wireWorkExperts": {
+      "edges": [
+        {
+          "node": {
+            "id": "crew/dave-westwind.md"
+          }
+        }
+      ]
+    }
+  }
+}

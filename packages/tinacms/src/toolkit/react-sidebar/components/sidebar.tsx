@@ -1,42 +1,43 @@
-import * as React from 'react'
-import { BiExpandAlt, BiLinkExternal, BiMenu, BiPencil } from 'react-icons/bi'
-import type { IconType } from 'react-icons/lib'
-import { type ScreenPlugin, ScreenPluginModal } from '@toolkit/react-screens'
-import type { SidebarState, SidebarStateOptions } from '../sidebar'
-import { useCMS, useSubscribable } from '@toolkit/react-core'
-import { useState } from 'react'
-import { Button } from '@toolkit/styles'
-import { FormsView } from './sidebar-body'
-import { ImFilesEmpty, ImUsers } from 'react-icons/im'
-import { IoMdClose } from 'react-icons/io'
-import { BillingWarning, LocalWarning } from './local-warning'
-import { MdOutlineArrowBackIos } from 'react-icons/md'
-import { Nav } from './nav'
-import { ResizeHandle } from './resize-handle'
-import { Transition, TransitionChild } from '@headlessui/react'
-import { useWindowWidth } from '@react-hook/window-size'
-import type { CloudConfigPlugin } from '@toolkit/react-cloud-config'
-import { BranchButton } from '@toolkit/plugin-branch-switcher'
+import { Transition, TransitionChild } from '@headlessui/react';
+import {
+  BranchButton,
+  BranchPreviewButton,
+} from '@toolkit/plugin-branch-switcher';
+import type { CloudConfigPlugin } from '@toolkit/react-cloud-config';
+import { useCMS, useSubscribable } from '@toolkit/react-core';
+import { type ScreenPlugin, ScreenPluginModal } from '@toolkit/react-screens';
+import { Button } from '@toolkit/styles';
+import * as React from 'react';
+import { useState } from 'react';
+import { BiMenu } from 'react-icons/bi';
+import { ImFilesEmpty, ImUsers } from 'react-icons/im';
+import type { IconType } from 'react-icons/lib';
+import { PiSidebarSimpleLight } from 'react-icons/pi';
+import type { SidebarState, SidebarStateOptions } from '../sidebar';
+import { BillingWarning, LocalWarning } from './local-warning';
+import { Nav } from './nav';
+import { ResizeHandle } from './resize-handle';
+import { FormsView } from './sidebar-body';
+import { TinaIcon } from '@toolkit/icons';
 
-export const SidebarContext = React.createContext<any>(null)
-export const minPreviewWidth = 440
-export const minSidebarWidth = 360
-export const navBreakpoint = 1279
+export const SidebarContext = React.createContext<any>(null);
+export const minPreviewWidth = 440;
+export const minSidebarWidth = 360;
 
-const LOCALSTATEKEY = 'tina.sidebarState'
-const LOCALWIDTHKEY = 'tina.sidebarWidth'
+const LOCALSTATEKEY = 'tina.sidebarState';
+const LOCALWIDTHKEY = 'tina.sidebarWidth';
 
-const defaultSidebarWidth = 440
-const defaultSidebarPosition = 'displace'
-const defaultSidebarState = 'open'
+const defaultSidebarWidth = 440;
+const defaultSidebarPosition = 'displace';
+const defaultSidebarState = 'open';
 
 export interface SidebarProviderProps {
-  sidebar: SidebarState
-  resizingSidebar: boolean
-  setResizingSidebar: React.Dispatch<React.SetStateAction<boolean>>
-  defaultWidth?: SidebarStateOptions['defaultWidth']
-  position?: SidebarStateOptions['position']
-  defaultState?: SidebarStateOptions['defaultState']
+  sidebar: SidebarState;
+  resizingSidebar: boolean;
+  setResizingSidebar: React.Dispatch<React.SetStateAction<boolean>>;
+  defaultWidth?: SidebarStateOptions['defaultWidth'];
+  position?: SidebarStateOptions['position'];
+  defaultState?: SidebarStateOptions['defaultState'];
 }
 
 export function SidebarProvider({
@@ -46,9 +47,9 @@ export function SidebarProvider({
   defaultWidth = defaultSidebarWidth,
   sidebar,
 }: SidebarProviderProps) {
-  useSubscribable(sidebar)
-  const cms = useCMS()
-  if (!cms.enabled) return null
+  useSubscribable(sidebar);
+  const cms = useCMS();
+  if (!cms.enabled) return null;
 
   return (
     <Sidebar
@@ -67,22 +68,22 @@ export function SidebarProvider({
       }
       sidebar={sidebar}
     />
-  )
+  );
 }
 
 interface SidebarProps {
-  sidebar: SidebarState
-  resizingSidebar: boolean
-  setResizingSidebar: React.Dispatch<React.SetStateAction<boolean>>
-  defaultWidth?: SidebarStateOptions['defaultWidth']
-  defaultState?: SidebarStateOptions['defaultState']
-  position?: SidebarStateOptions['position']
-  renderNav?: boolean
+  sidebar: SidebarState;
+  resizingSidebar: boolean;
+  setResizingSidebar: React.Dispatch<React.SetStateAction<boolean>>;
+  defaultWidth?: SidebarStateOptions['defaultWidth'];
+  defaultState?: SidebarStateOptions['defaultState'];
+  position?: SidebarStateOptions['position'];
+  renderNav?: boolean;
 }
 
 const useFetchCollections = (cms) => {
-  return { collections: cms.api.admin.fetchCollections(), loading: false }
-}
+  return { collections: cms.api.admin.fetchCollections(), loading: false };
+};
 
 const Sidebar = ({
   sidebar,
@@ -93,139 +94,131 @@ const Sidebar = ({
   resizingSidebar,
   setResizingSidebar,
 }: SidebarProps) => {
-  const cms = useCMS()
-  const collectionsInfo = useFetchCollections(cms)
+  const cms = useCMS();
+  const collectionsInfo = useFetchCollections(cms);
 
   const [branchingEnabled, setBranchingEnabled] = React.useState(() =>
     cms.flags.get('branch-switcher')
-  )
+  );
   React.useEffect(() => {
     cms.events.subscribe('flag:set', ({ key, value }) => {
       if (key === 'branch-switcher') {
-        setBranchingEnabled(value)
+        setBranchingEnabled(value);
       }
-    })
-  }, [cms.events])
+    });
+  }, [cms.events]);
 
-  const screens = cms.plugins.getType<ScreenPlugin>('screen')
-  const cloudConfigs = cms.plugins.getType<CloudConfigPlugin>('cloud-config')
+  const screens = cms.plugins.getType<ScreenPlugin>('screen');
+  const cloudConfigs = cms.plugins.getType<CloudConfigPlugin>('cloud-config');
 
-  useSubscribable(sidebar)
-  useSubscribable(screens)
-  const allScreens = screens.all()
-  const allConfigs = cloudConfigs.all()
+  useSubscribable(sidebar);
+  useSubscribable(screens);
+  const allScreens = screens.all();
+  const allConfigs = cloudConfigs.all();
 
-  const [menuIsOpen, setMenuIsOpen] = useState(false)
-  const [activeScreen, setActiveView] = useState<ScreenPlugin | null>(null)
-  const [sidebarWidth, setSidebarWidth] = React.useState<any>(defaultWidth)
-  const [formIsPristine, setFormIsPristine] = React.useState(true)
+  const [menuIsOpen, setMenuIsOpen] = useState(false);
+  const [activeScreen, setActiveView] = useState<ScreenPlugin | null>(null);
+  const [sidebarWidth, setSidebarWidth] = React.useState<any>(defaultWidth);
+  const [formIsPristine, setFormIsPristine] = React.useState(true);
   const activeScreens = allScreens.filter(
     (screen) =>
       screen.navCategory !== 'Account' ||
       cms.api.tina?.authProvider?.getLoginStrategy() === 'UsernamePassword'
-  )
+  );
 
   const setDisplayState = (value: 'closed' | 'fullscreen' | 'open') =>
-    cms.dispatch({ type: 'sidebar:set-display-state', value: value })
-  const displayState = cms.state.sidebarDisplayState
+    cms.dispatch({ type: 'sidebar:set-display-state', value: value });
+  const displayState = cms.state.sidebarDisplayState;
 
   /* Set sidebar open state and width to local values if available */
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
-      const localSidebarState = window.localStorage.getItem(LOCALSTATEKEY)
-      const localSidebarWidth = window.localStorage.getItem(LOCALWIDTHKEY)
+      const localSidebarState = window.localStorage.getItem(LOCALSTATEKEY);
+      const localSidebarWidth = window.localStorage.getItem(LOCALWIDTHKEY);
 
       if (localSidebarState !== null) {
-        setDisplayState(JSON.parse(localSidebarState))
+        setDisplayState(JSON.parse(localSidebarState));
       }
 
       if (localSidebarWidth !== null) {
-        setSidebarWidth(JSON.parse(localSidebarWidth))
+        setSidebarWidth(JSON.parse(localSidebarWidth));
       }
     }
-  }, [])
+  }, []);
 
   /* If the default sidebar state changes, update current state if no local value is found */
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
-      const localSidebarState = window.localStorage.getItem(LOCALSTATEKEY)
+      const localSidebarState = window.localStorage.getItem(LOCALSTATEKEY);
 
       if (localSidebarState === null) {
-        setDisplayState(defaultSidebarState)
+        setDisplayState(defaultSidebarState);
       }
     }
-  }, [defaultSidebarState])
+  }, [defaultSidebarState]);
 
   /* Update the local value of the sidebar state any time it updates, if the CMS is loaded */
   React.useEffect(() => {
     if (typeof window !== 'undefined' && cms.enabled) {
-      window.localStorage.setItem(LOCALSTATEKEY, JSON.stringify(displayState))
+      window.localStorage.setItem(LOCALSTATEKEY, JSON.stringify(displayState));
     }
-  }, [displayState, cms])
+  }, [displayState, cms]);
 
   /* Update the local value of the sidebar width any time the user drags to resize it */
   React.useEffect(() => {
     if (resizingSidebar) {
-      window.localStorage.setItem(LOCALWIDTHKEY, JSON.stringify(sidebarWidth))
+      window.localStorage.setItem(LOCALWIDTHKEY, JSON.stringify(sidebarWidth));
     }
-  }, [sidebarWidth, resizingSidebar])
+  }, [sidebarWidth, resizingSidebar]);
 
   const isTinaAdminEnabled =
-    cms.flags.get('tina-admin') === false ? false : true
+    cms.flags.get('tina-admin') === false ? false : true;
 
   /**
    * Only show ContentCreators when TinaAdmin is disabled
    */
   const contentCreators = isTinaAdminEnabled
     ? []
-    : cms.plugins.getType('content-creator').all()
+    : cms.plugins.getType('content-creator').all();
 
   const toggleFullscreen = () => {
     if (displayState === 'fullscreen') {
-      setDisplayState('open')
+      setDisplayState('open');
     } else {
-      setDisplayState('fullscreen')
+      setDisplayState('fullscreen');
     }
-  }
+  };
 
   const toggleSidebarOpen = () => {
-    cms.dispatch({ type: 'toggle-edit-state' })
-  }
+    cms.dispatch({ type: 'toggle-edit-state' });
+  };
 
   const toggleMenu = () => {
-    setMenuIsOpen((menuIsOpen) => !menuIsOpen)
-  }
+    setMenuIsOpen((menuIsOpen) => !menuIsOpen);
+  };
 
+  // update the iframe body padding when the sidebar is resized or the display state changes
   React.useEffect(() => {
     const updateLayout = () => {
       if (displayState === 'fullscreen') {
-        return
+        return;
       }
       updateBodyDisplacement({
         position,
         displayState,
         sidebarWidth,
         resizingSidebar,
-      })
-    }
+      });
+    };
 
-    updateLayout()
+    updateLayout();
 
-    window.addEventListener('resize', updateLayout)
+    window.addEventListener('resize', updateLayout);
 
     return () => {
-      window.removeEventListener('resize', updateLayout)
-    }
-  }, [displayState, position, sidebarWidth, resizingSidebar])
-
-  const windowWidth = useWindowWidth()
-  const displayNav =
-    renderNav &&
-    ((sidebarWidth > navBreakpoint && windowWidth > navBreakpoint) ||
-      (displayState === 'fullscreen' && windowWidth > navBreakpoint))
-  const renderMobileNav =
-    renderNav &&
-    (sidebarWidth < navBreakpoint + 1 || windowWidth < navBreakpoint + 1)
+      window.removeEventListener('resize', updateLayout);
+    };
+  }, [displayState, position, sidebarWidth, resizingSidebar]);
 
   return (
     <SidebarContext.Provider
@@ -250,56 +243,9 @@ const Sidebar = ({
       <>
         <SidebarWrapper>
           <EditButton />
-          {displayNav && (
-            <Nav
-              isLocalMode={cms.api?.tina?.isLocalMode}
-              showCollections={isTinaAdminEnabled}
-              collectionsInfo={collectionsInfo}
-              screens={activeScreens}
-              cloudConfigs={allConfigs}
-              contentCreators={contentCreators}
-              sidebarWidth={sidebarWidth}
-              RenderNavSite={({ view }) => (
-                <SidebarSiteLink
-                  view={view}
-                  onClick={() => {
-                    setActiveView(view)
-                    setMenuIsOpen(false)
-                  }}
-                />
-              )}
-              RenderNavCloud={({ config }) => (
-                <SidebarCloudLink config={config} />
-              )}
-              RenderNavCollection={({ collection }) => (
-                <SidebarCollectionLink
-                  onClick={() => {
-                    setMenuIsOpen(false)
-                  }}
-                  collection={collection}
-                />
-              )}
-              AuthRenderNavCollection={({ collection }) => (
-                <SidebarCollectionLink
-                  onClick={() => {
-                    setMenuIsOpen(false)
-                  }}
-                  collection={collection}
-                  Icon={ImUsers}
-                />
-              )}
-            />
-          )}
           <SidebarBody>
-            <SidebarHeader
-              displayNav={displayNav}
-              renderNav={renderNav}
-              isLocalMode={cms.api?.tina?.isLocalMode}
-              branchingEnabled={branchingEnabled}
-            />
-            <FormsView>
-              <sidebar.placeholder />
-            </FormsView>
+            <SidebarHeader isLocalMode={cms.api?.tina?.isLocalMode} />
+            <FormsView loadingPlaceholder={sidebar.loadingPlaceholder} />
             {activeScreen && (
               <ScreenPluginModal
                 screen={activeScreen}
@@ -309,313 +255,252 @@ const Sidebar = ({
           </SidebarBody>
           <ResizeHandle />
         </SidebarWrapper>
-        {renderMobileNav && (
-          <Transition show={menuIsOpen} as="div">
-            <TransitionChild
-              enter="transform transition-all ease-out duration-300"
-              enterFrom="opacity-0 -translate-x-full"
-              enterTo="opacity-100 translate-x-0"
-              leave="transform transition-all ease-in duration-200"
-              leaveFrom="opacity-100 translate-x-0"
-              leaveTo="opacity-0 -translate-x-full"
-            >
-              <div className="fixed left-0 top-0 z-overlay h-full transform">
-                <Nav
-                  isLocalMode={cms.api?.tina?.isLocalMode}
-                  className="rounded-r-md"
-                  showCollections={isTinaAdminEnabled}
-                  collectionsInfo={collectionsInfo}
-                  screens={activeScreens}
-                  cloudConfigs={allConfigs}
-                  contentCreators={contentCreators}
-                  sidebarWidth={sidebarWidth}
-                  RenderNavSite={({ view }) => (
-                    <SidebarSiteLink
-                      view={view}
-                      onClick={() => {
-                        setActiveView(view)
-                        setMenuIsOpen(false)
-                      }}
-                    />
-                  )}
-                  RenderNavCloud={({ config }) => (
-                    <SidebarCloudLink config={config} />
-                  )}
-                  RenderNavCollection={({ collection }) => (
-                    <SidebarCollectionLink
-                      onClick={() => {
-                        setMenuIsOpen(false)
-                      }}
-                      collection={collection}
-                    />
-                  )}
-                  AuthRenderNavCollection={({ collection }) => (
-                    <SidebarCollectionLink
-                      onClick={() => {
-                        setMenuIsOpen(false)
-                      }}
-                      collection={collection}
-                      Icon={ImUsers}
-                    />
-                  )}
-                >
-                  <div className="absolute top-8 right-0 transform translate-x-full overflow-hidden">
-                    <Button
-                      rounded="right"
-                      variant="secondary"
-                      onClick={() => {
-                        setMenuIsOpen(false)
-                      }}
-                      className={'transition-opacity duration-150 ease-out'}
-                    >
-                      <IoMdClose className="h-5 w-auto text-blue-500" />
-                    </Button>
-                  </div>
-                </Nav>
-              </div>
-            </TransitionChild>
-            <TransitionChild
-              enter="ease-out duration-300"
-              enterFrom="opacity-0"
-              enterTo="opacity-80"
-              entered="opacity-80"
-              leave="ease-in duration-200"
-              leaveFrom="opacity-80"
-              leaveTo="opacity-0"
-            >
-              <div
-                onClick={() => {
-                  setMenuIsOpen(false)
-                }}
-                className="fixed z-menu inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black"
-              />
-            </TransitionChild>
-          </Transition>
-        )}
+        <Transition show={menuIsOpen} as='div'>
+          <TransitionChild
+            enter='transform transition-all ease-out duration-300'
+            enterFrom='opacity-0 -translate-x-full'
+            enterTo='opacity-100 translate-x-0'
+            leave='transform transition-all ease-in duration-200'
+            leaveFrom='opacity-100 translate-x-0'
+            leaveTo='opacity-0 -translate-x-full'
+          >
+            <div className='fixed left-0 top-0 z-overlay h-full transform'>
+              <Nav
+                isLocalMode={cms.api?.tina?.isLocalMode}
+                menuIsOpen
+                toggleMenu={toggleMenu}
+                showCollections={isTinaAdminEnabled}
+                collectionsInfo={collectionsInfo}
+                screens={activeScreens}
+                cloudConfigs={allConfigs}
+                contentCreators={contentCreators}
+                sidebarWidth={sidebarWidth}
+                RenderNavSite={({ view }) => (
+                  <SidebarSiteLink
+                    view={view}
+                    onClick={() => {
+                      setActiveView(view);
+                      setMenuIsOpen(false);
+                    }}
+                  />
+                )}
+                RenderNavCloud={({ config }) => (
+                  <SidebarCloudLink config={config} />
+                )}
+                RenderNavCollection={({ collection }) => (
+                  <SidebarCollectionLink
+                    onClick={() => {
+                      setMenuIsOpen(false);
+                    }}
+                    collection={collection}
+                  />
+                )}
+                AuthRenderNavCollection={({ collection }) => (
+                  <SidebarCollectionLink
+                    onClick={() => {
+                      setMenuIsOpen(false);
+                    }}
+                    collection={collection}
+                    Icon={ImUsers}
+                  />
+                )}
+              ></Nav>
+            </div>
+          </TransitionChild>
+          <TransitionChild
+            enter='ease-out duration-300'
+            enterFrom='opacity-0'
+            enterTo='opacity-80'
+            entered='opacity-80'
+            leave='ease-in duration-200'
+            leaveFrom='opacity-80'
+            leaveTo='opacity-0'
+          >
+            <div
+              onClick={() => {
+                setMenuIsOpen(false);
+              }}
+              className='fixed z-menu inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black'
+            />
+          </TransitionChild>
+        </Transition>
       </>
     </SidebarContext.Provider>
-  )
-}
+  );
+};
 
-export const updateBodyDisplacement = ({
+const updateBodyDisplacement = ({
   position = 'overlay',
   displayState,
   sidebarWidth,
   resizingSidebar,
 }) => {
-  const body = document.getElementsByTagName('body')[0]
-  const windowWidth = window.innerWidth
+  const body = document.getElementsByTagName('body')[0];
+  const windowWidth = window.innerWidth;
 
   if (position === 'displace') {
     // Padding can't be animated smoothly, so we're using a delay to time the size change
     body.style.transition = resizingSidebar
       ? ''
       : displayState === 'fullscreen'
-      ? 'padding 0ms 150ms'
-      : displayState === 'closed'
-      ? 'padding 0ms 0ms'
-      : 'padding 0ms 300ms'
+        ? 'padding 0ms 150ms'
+        : displayState === 'closed'
+          ? 'padding 0ms 0ms'
+          : 'padding 0ms 300ms';
 
     if (displayState === 'open') {
       const bodyDisplacement = Math.min(
         sidebarWidth,
         windowWidth - minPreviewWidth
-      )
-      body.style.paddingLeft = `${bodyDisplacement}px`
+      );
+      body.style.paddingLeft = `${bodyDisplacement}px`;
     } else {
-      body.style.paddingLeft = '0'
+      body.style.paddingLeft = '0';
     }
   } else {
-    body.style.transition = ''
-    body.style.paddingLeft = '0'
+    body.style.transition = '';
+    body.style.paddingLeft = '0';
   }
-}
+};
 
-const SidebarHeader = ({
-  branchingEnabled,
-  renderNav,
-  displayNav,
-  isLocalMode,
-}) => {
-  const { toggleFullscreen, displayState, setMenuIsOpen, toggleSidebarOpen } =
-    React.useContext(SidebarContext)
-
-  const displayMenuButton = renderNav && !displayNav
-
-  const cms = useCMS()
-  const previewFunction = cms.api?.tina?.schema?.config?.config?.ui?.previewUrl
-  const branch = cms.api?.tina?.branch
-  const previewUrl =
-    typeof previewFunction === 'function'
-      ? previewFunction({ branch })?.url
-      : null
+const SidebarHeader = ({ isLocalMode }) => {
+  const { toggleSidebarOpen, toggleMenu } = React.useContext(SidebarContext);
 
   return (
-    <div className="flex-grow-0 w-full overflow-visible z-20">
-      {isLocalMode && <LocalWarning />}
-      {!isLocalMode && <BillingWarning />}
+    <>
+      <div className='p-2 flex-grow-0 w-full'>
+        {!isLocalMode && <BillingWarning />}
 
-      <div className="mt-4 -mb-14 w-full flex gap-3 items-center justify-between pointer-events-none">
-        {displayMenuButton && (
-          <Button
-            rounded="right"
-            variant="white"
-            onClick={() => {
-              setMenuIsOpen(true)
-            }}
-            className="pointer-events-auto -ml-px"
-          >
-            <BiMenu className="h-6 w-auto text-blue-500" />
-          </Button>
-        )}
-        <div className="flex-1 flex gap-3 items-center shrink min-w-0">
-          {branchingEnabled && !isLocalMode && <BranchButton />}
-          {branchingEnabled && !isLocalMode && previewUrl && (
+        <div className='w-full flex justify-between items-center'>
+          <div className='flex overflow-hidden py-1'>
             <button
-              className="pointer-events-auto flex min-w-0	shrink gap-1 items-center justify-between form-select text-sm h-10 px-4 shadow text-gray-500 hover:text-blue-500 bg-white hover:bg-gray-50 border border-gray-100 transition-color duration-150 ease-out rounded-full focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out text-[12px] leading-tight min-w-[5rem]"
-              onClick={() => {
-                window.open(previewUrl, '_blank')
-              }}
+              className='p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
+              onClick={toggleMenu}
+              title='Open navigation menu'
+              aria-label='Open navigation menu'
             >
-              <BiLinkExternal className="flex-shrink-0 w-4 h-auto text-blue-500/70 mr-1" />
-              <span className="truncate max-w-full min-w-0 shrink">
-                Preview
-              </span>
+              <BiMenu className='h-8 w-auto text-gray-600' />
             </button>
-          )}
-        </div>
-        <div
-          className={
-            'flex items-center pointer-events-auto transition-opacity duration-150 ease-in-out -mr-px'
-          }
-        >
-          <Button
-            rounded="left"
-            variant="white"
-            onClick={toggleSidebarOpen}
-            aria-label="closes cms sidebar"
-            className="-mr-px"
-          >
-            <MdOutlineArrowBackIos className="h-[18px] w-auto -mr-1 text-blue-500" />
-          </Button>
-          <Button rounded="custom" variant="white" onClick={toggleFullscreen}>
-            {displayState === 'fullscreen' ? (
-              // BiCollapseAlt
-              <svg
-                className="h-5 w-auto -mx-1 text-blue-500"
-                stroke="currentColor"
-                fill="currentColor"
-                stroke-width="0"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path d="M2 15h7v7h2v-9H2v2zM15 2h-2v9h9V9h-7V2z"></path>
-              </svg>
-            ) : (
-              <BiExpandAlt className="h-5 -mx-1 w-auto text-blue-500" />
-            )}
-          </Button>
+            <TinaIcon className='self-center h-10 min-w-10 w-auto text-orange-500 mr-2' />
+            <BranchButton className='overflow-hidden mr-2' />
+            <LocalWarning className='px-4' />
+          </div>
+
+          <div className='flex'>
+            <BranchPreviewButton />
+
+            <button
+              type='button'
+              className='p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
+              onClick={toggleSidebarOpen}
+              title='Hide editing panel'
+              aria-label='Hide editing panel'
+            >
+              <PiSidebarSimpleLight className='h-6 w-auto text-gray-600' />
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  )
-}
+    </>
+  );
+};
 
 const SidebarSiteLink = ({
   view,
   onClick,
 }: {
-  view: ScreenPlugin
-  onClick: () => void
+  view: ScreenPlugin;
+  onClick: () => void;
 }) => {
   return (
     <button
-      className="text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100"
+      className='text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100'
       value={view.name}
       onClick={onClick}
     >
-      <view.Icon className="mr-2 h-6 opacity-80 w-auto" /> {view.name}
+      <view.Icon className='mr-2 h-6 opacity-80 w-auto' /> {view.name}
     </button>
-  )
-}
+  );
+};
 
 const SidebarCloudLink = ({ config }: { config: CloudConfigPlugin }) => {
   if (config.text) {
     return (
-      <span className="text-base tracking-wide text-gray-500 flex items-center opacity-90">
+      <span className='text-base tracking-wide text-gray-500 flex items-center opacity-90'>
         {config.text}{' '}
         <a
-          target="_blank"
-          className="ml-1 text-blue-600 hover:opacity-60"
+          target='_blank'
+          className='ml-1 text-blue-600 hover:opacity-60'
           href={config.link.href}
         >
           {config.link.text}
         </a>
       </span>
-    )
+    );
   }
   return (
-    <span className="text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100">
-      <config.Icon className="mr-2 h-6 opacity-80 w-auto" />
-      <a target="_blank" href={config.link.href}>
+    <span className='text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100'>
+      <config.Icon className='mr-2 h-6 opacity-80 w-auto' />
+      <a target='_blank' href={config.link.href}>
         {config.link.text}
       </a>
     </span>
-  )
-}
+  );
+};
 
 const SidebarCollectionLink = ({
   Icon = ImFilesEmpty,
   collection,
   onClick,
 }: {
-  Icon?: IconType
+  Icon?: IconType;
   collection: {
-    label: string
-    name: string
-  }
-  onClick: () => void
+    label: string;
+    name: string;
+  };
+  onClick: () => void;
 }) => {
-  const cms = useCMS()
-  const tinaPreview = cms.flags.get('tina-preview') || false
+  const cms = useCMS();
+  const tinaPreview = cms.flags.get('tina-preview') || false;
   return (
     <a
       onClick={onClick}
       href={`${
         tinaPreview ? `/${tinaPreview}/index.html#` : '/admin#'
       }/collections/${collection.name}/~`}
-      className="text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100"
+      className='text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100'
     >
-      <Icon className="mr-2 h-6 opacity-80 w-auto" />{' '}
+      <Icon className='mr-2 h-6 opacity-80 w-auto' />{' '}
       {collection.label ? collection.label : collection.name}
     </a>
-  )
-}
+  );
+};
 
 const EditButton = ({}) => {
-  const { displayState, toggleSidebarOpen } = React.useContext(SidebarContext)
+  const { displayState, toggleSidebarOpen } = React.useContext(SidebarContext);
 
   return (
     <Button
-      rounded="right"
-      variant="primary"
-      size="custom"
+      rounded='right'
+      variant='accent'
+      size='custom'
       onClick={toggleSidebarOpen}
-      className={`z-chrome absolute top-6 right-0 translate-x-full text-sm h-10 pl-3 pr-4 transition-all duration-300 ${
+      className={`z-chrome absolute top-6 right-0 translate-x-full text-sm h-10 px-3 transition-all duration-300 ${
         displayState !== 'closed'
           ? 'opacity-0 ease-in pointer-events-none'
           : 'ease-out pointer-events-auto'
       }`}
-      aria-label="opens cms sidebar"
+      title='Show editing panel'
+      aria-label='Show editing panel'
     >
-      <BiPencil className="h-6 w-auto" />
+      <PiSidebarSimpleLight className='h-6 w-auto' />
     </Button>
-  )
-}
+  );
+};
 
 const SidebarWrapper = ({ children }) => {
   const { displayState, sidebarWidth, resizingSidebar } =
-    React.useContext(SidebarContext)
+    React.useContext(SidebarContext);
 
   return (
     <div
@@ -630,10 +515,10 @@ const SidebarWrapper = ({ children }) => {
           resizingSidebar
             ? 'transition-none'
             : displayState === 'closed'
-            ? 'transition-all duration-300 ease-in'
-            : displayState === 'fullscreen'
-            ? 'transition-all duration-150 ease-out'
-            : 'transition-all duration-300 ease-out'
+              ? 'transition-all duration-300 ease-in'
+              : displayState === 'fullscreen'
+                ? 'transition-all duration-150 ease-out'
+                : 'transition-all duration-300 ease-out'
         }`}
         style={{
           width: displayState === 'fullscreen' ? '100vw' : `${sidebarWidth}px`,
@@ -645,17 +530,17 @@ const SidebarWrapper = ({ children }) => {
         {children}
       </div>
     </div>
-  )
-}
+  );
+};
 
 const SidebarBody = ({ children }) => {
   return (
     <div
       className={
-        'relative left-0 w-full h-full flex flex-col items-stretch bg-white border-r border-gray-200 overflow-hidden'
+        'relative left-0 w-full h-full flex flex-col items-stretch bg-gray-50 border-r border-gray-200 overflow-hidden'
       }
     >
       {children}
     </div>
-  )
-}
+  );
+};

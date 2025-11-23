@@ -1,19 +1,23 @@
-import { log } from './logger'
+import { Ora } from 'ora';
 
-export const SUPPORTED_NODE_VERSIONS = ['18', '20', '22']
+const SUPPORTED_NODE_VERSION_BOUNDS = { oldest: 20, latest: 22 };
+const SUPPORTED_NODE_VERSION_RANGE: number[] = [
+  ...Array(SUPPORTED_NODE_VERSION_BOUNDS.latest).keys(),
+].map((i) => i + SUPPORTED_NODE_VERSION_BOUNDS.oldest);
+const isSupported = SUPPORTED_NODE_VERSION_RANGE.some((version) =>
+  process.version.startsWith(`v${version}`)
+);
 
-export function preRunChecks() {
-  checkSupportedNodeVersion()
-}
+export function preRunChecks(spinner: Ora) {
+  spinner.start('Running pre-run checks...');
 
-function checkSupportedNodeVersion() {
-  if (
-    !SUPPORTED_NODE_VERSIONS.some((version) =>
-      process.version.startsWith(`v${version}`)
-    )
-  ) {
-    log.warn(
-      `Version ${process.version} of Node.js is not supported in create-tina-app, please update to the latest LTS version. See https://nodejs.org/en/download/ for more details.`
-    )
+  if (!isSupported) {
+    spinner.warn(
+      `Node ${process.version} is not supported by create-tina-app. ` +
+        `Please update to be within v${SUPPORTED_NODE_VERSION_BOUNDS.oldest}-v${SUPPORTED_NODE_VERSION_BOUNDS.latest}. ` +
+        `See https://nodejs.org/en/download/ for more details.`
+    );
+  } else {
+    spinner.succeed(`Node ${process.version} is supported.`);
   }
 }

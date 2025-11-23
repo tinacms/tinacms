@@ -1,5 +1,140 @@
 # tina-graphql
 
+## 1.6.1
+
+### Patch Changes
+
+- Updated dependencies [[`eaa6ed5`](https://github.com/tinacms/tinacms/commit/eaa6ed551c76349c5849cd1e19a8066ecbbe205c)]:
+  - @tinacms/schema-tools@1.9.1
+  - @tinacms/mdx@1.8.1
+
+## 1.6.0
+
+### Minor Changes
+
+- [#5744](https://github.com/tinacms/tinacms/pull/5744) [`98a61e2`](https://github.com/tinacms/tinacms/commit/98a61e2d263978a7096cc23ac7e94aa0039981be) Thanks [@Ben0189](https://github.com/Ben0189)! - Upgrade Plate editor to v48 beta, integrating latest features and improvements.
+
+### Patch Changes
+
+- Updated dependencies [[`98a61e2`](https://github.com/tinacms/tinacms/commit/98a61e2d263978a7096cc23ac7e94aa0039981be)]:
+  - @tinacms/schema-tools@1.9.0
+  - @tinacms/mdx@1.8.0
+
+## 1.5.19
+
+### Patch Changes
+
+- [#5786](https://github.com/tinacms/tinacms/pull/5786) [`e27c017`](https://github.com/tinacms/tinacms/commit/e27c0172005797af93b908152d51b2966c0cf059) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Modifies SlateJson rich text parser to store non-stringified json objects of the rich text content
+
+- Updated dependencies [[`e27c017`](https://github.com/tinacms/tinacms/commit/e27c0172005797af93b908152d51b2966c0cf059), [`dbef36f`](https://github.com/tinacms/tinacms/commit/dbef36f594b949024d5525184b6a9e1b9085b759)]:
+  - @tinacms/mdx@1.7.0
+  - @tinacms/schema-tools@1.8.0
+
+## 1.5.18
+
+### Patch Changes
+
+- [#5679](https://github.com/tinacms/tinacms/pull/5679) [`d689189`](https://github.com/tinacms/tinacms/commit/d68918973d39aabbb9e5e4672a913771f8841734) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: dedupe format types by moving them into schema-tools
+
+- [#5653](https://github.com/tinacms/tinacms/pull/5653) [`4c2c724`](https://github.com/tinacms/tinacms/commit/4c2c7240fdc1d0f177cc71eddd006e73389fe7c8) Thanks [@ncn-ssw](https://github.com/ncn-ssw)! - fix: spurious error messages by FilesystemBridge on some relative paths
+
+- Updated dependencies [[`d689189`](https://github.com/tinacms/tinacms/commit/d68918973d39aabbb9e5e4672a913771f8841734)]:
+  - @tinacms/schema-tools@1.7.4
+  - @tinacms/mdx@1.6.3
+
+## 1.5.17
+
+### Patch Changes
+
+- [#5640](https://github.com/tinacms/tinacms/pull/5640) [`450d5cd`](https://github.com/tinacms/tinacms/commit/450d5cda6b200c03de0a91fa58d48177531d44fe) Thanks [@kldavis4](https://github.com/kldavis4)! - Only delete existing items when partial indexing
+
+- [#5652](https://github.com/tinacms/tinacms/pull/5652) [`515f2a4`](https://github.com/tinacms/tinacms/commit/515f2a427cb51b050af25910eeae5ca97ce04e92) Thanks [@ncn-ssw](https://github.com/ncn-ssw)! - 📝 Docs - Improve @tinacms/graphql README
+
+## 1.5.16
+
+### Patch Changes
+
+- [#5602](https://github.com/tinacms/tinacms/pull/5602) [`ab43169`](https://github.com/tinacms/tinacms/commit/ab43169af5a95f31fa27bb0236623a031883a1fd) Thanks [@wicksipedia](https://github.com/wicksipedia)! - fix naming of TinaCloud
+
+- [#5560](https://github.com/tinacms/tinacms/pull/5560) [`ea204c9`](https://github.com/tinacms/tinacms/commit/ea204c9045451f3ebea04f503e6158d2016613e4) Thanks [@kldavis4](https://github.com/kldavis4)! - Sorting on fields within templates
+
+- Updated dependencies [[`ab43169`](https://github.com/tinacms/tinacms/commit/ab43169af5a95f31fa27bb0236623a031883a1fd)]:
+  - @tinacms/schema-tools@1.7.3
+  - @tinacms/mdx@1.6.2
+
+## 1.5.14
+
+### Patch Changes
+
+- [#5538](https://github.com/tinacms/tinacms/pull/5538) [`22669e8`](https://github.com/tinacms/tinacms/commit/22669e8e226d14a73387407b3af134925ac356d6) Thanks [@kldavis4](https://github.com/kldavis4)! - Fix bugs in reference logic related to using the wrong correction when updating documents with references
+
+- [#5497](https://github.com/tinacms/tinacms/pull/5497) [`602b4d0`](https://github.com/tinacms/tinacms/commit/602b4d07f94de4c10d5bb059a5edc49546a2031c) Thanks [@kldavis4](https://github.com/kldavis4)! - This reimplements references to more thoroughly find deeply nested references and add a reference index to the collection in order to query these deep references. The rename modal is updated to remove the warning about breaking references as well.
+
+- Updated dependencies [[`602b4d0`](https://github.com/tinacms/tinacms/commit/602b4d07f94de4c10d5bb059a5edc49546a2031c)]:
+  - @tinacms/schema-tools@1.7.2
+  - @tinacms/mdx@1.6.1
+
+## 1.5.13
+
+### Patch Changes
+
+- [#5498](https://github.com/tinacms/tinacms/pull/5498) [`3974aa7`](https://github.com/tinacms/tinacms/commit/3974aa759192713140733b99ee0254a1a056e124) Thanks [@kldavis4](https://github.com/kldavis4)! - fix: correctly handle noop renames
+
+- [#5486](https://github.com/tinacms/tinacms/pull/5486) [`d7c5ec1`](https://github.com/tinacms/tinacms/commit/d7c5ec1b174419dcc6ddba3cfb3684dd469da571) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Update dependencies across packages
+
+- Updated dependencies [[`7541614`](https://github.com/tinacms/tinacms/commit/7541614527a02268ea453b23ce84637f978dcf2d), [`d7c5ec1`](https://github.com/tinacms/tinacms/commit/d7c5ec1b174419dcc6ddba3cfb3684dd469da571)]:
+  - @tinacms/mdx@1.6.0
+  - @tinacms/schema-tools@1.7.1
+
+## 1.5.12
+
+### Patch Changes
+
+- [#5481](https://github.com/tinacms/tinacms/pull/5481) [`1d93305`](https://github.com/tinacms/tinacms/commit/1d93305e76c0dd0eee745a7770e01796b166a846) Thanks [@kldavis4](https://github.com/kldavis4)! - Fix indexContentByPaths to delete existing indexes if they exist
+
+## 1.5.11
+
+### Patch Changes
+
+- [#5439](https://github.com/tinacms/tinacms/pull/5439) [`47cfaf6`](https://github.com/tinacms/tinacms/commit/47cfaf63cee139309458fccc49670e3b5cbf430c) Thanks [@kldavis4](https://github.com/kldavis4)! - Test improvements for @tinacms/graphql including switching to vitest and additional tests
+
+## 1.5.10
+
+### Patch Changes
+
+- [#5396](https://github.com/tinacms/tinacms/pull/5396) [`7994046`](https://github.com/tinacms/tinacms/commit/79940467f97355651d86daace044717179a47734) Thanks [@kldavis4](https://github.com/kldavis4)! - Fix issue with deleting files on windows in dev mode
+
+- [#5393](https://github.com/tinacms/tinacms/pull/5393) [`8d24f89`](https://github.com/tinacms/tinacms/commit/8d24f899838b9d5384782f699febd26be65902fd) Thanks [@kldavis4](https://github.com/kldavis4)! - Fix issue with addNamespaceToSchema which caused https://github.com/tinacms/tinacms/issues/5364
+
+- [#5408](https://github.com/tinacms/tinacms/pull/5408) [`877699d`](https://github.com/tinacms/tinacms/commit/877699d08b3e2c2470742a3acf25d02a95e440b3) Thanks [@Ben0189](https://github.com/Ben0189)! - Fixes for React 19 support
+  - Change react-use import statements to default import method
+  - Fixed deprecated API from headless UI in the experimental example
+- Updated dependencies [[`92b683b`](https://github.com/tinacms/tinacms/commit/92b683bd3d73b47271eee5b8ff648ed4dcde51e3), [`82b0039`](https://github.com/tinacms/tinacms/commit/82b00393da8bbcc2cf357fbbb546904f07e8d89c)]:
+  - @tinacms/schema-tools@1.7.0
+  - @tinacms/mdx@1.5.4
+
+## 1.5.9
+
+### Patch Changes
+
+- Updated dependencies [[`c45ac5d`](https://github.com/tinacms/tinacms/commit/c45ac5d9c7219593cde63e0cc6fbf945480884f7)]:
+  - @tinacms/schema-tools@1.6.9
+  - @tinacms/mdx@1.5.3
+
+## 1.5.8
+
+### Patch Changes
+
+- [#5276](https://github.com/tinacms/tinacms/pull/5276) [`f90ef4d`](https://github.com/tinacms/tinacms/commit/f90ef4d92ae7b21c8c610d14af9510354a3969c6) Thanks [@Ben0189](https://github.com/Ben0189)! - Updates minor and patch dependencies
+
+- [#5218](https://github.com/tinacms/tinacms/pull/5218) [`03bb823`](https://github.com/tinacms/tinacms/commit/03bb8237df87dab9da503818b839d44209263a48) Thanks [@kldavis4](https://github.com/kldavis4)! - Adds referential integrity for renaming and deleting referenced documents.
+
+  When a document is renamed, any documents which reference the document will be updated with the new document name. When a document is deleted, the user will be warned and any references to the document will be deleted.
+
+- Updated dependencies [[`f90ef4d`](https://github.com/tinacms/tinacms/commit/f90ef4d92ae7b21c8c610d14af9510354a3969c6), [`ac2003f`](https://github.com/tinacms/tinacms/commit/ac2003f87381de36c417d69fdb59485dc96f334a), [`03bb823`](https://github.com/tinacms/tinacms/commit/03bb8237df87dab9da503818b839d44209263a48)]:
+  - @tinacms/mdx@1.5.2
+  - @tinacms/schema-tools@1.6.8
+
 ## 1.5.7
 
 ### Patch Changes
@@ -195,11 +330,11 @@
   #### Updated `database.ts` Example
 
   ```typescript
-  import { createDatabase, createLocalDatabase } from '@tinacms/datalayer'
-  import { MongodbLevel } from 'mongodb-level'
-  import { GitHubProvider } from 'tinacms-gitprovider-github'
+  import { createDatabase, createLocalDatabase } from "@tinacms/datalayer";
+  import { MongodbLevel } from "mongodb-level";
+  import { GitHubProvider } from "tinacms-gitprovider-github";
 
-  const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
+  const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === "true";
 
   export default isLocal
     ? createLocalDatabase()
@@ -211,12 +346,12 @@
           token: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
         }),
         databaseAdapter: new MongodbLevel<string, Record<string, any>>({
-          collectionName: 'tinacms',
-          dbName: 'tinacms',
+          collectionName: "tinacms",
+          dbName: "tinacms",
           mongoUri: process.env.MONGODB_URI,
         }),
         namespace: process.env.GITHUB_BRANCH,
-      })
+      });
   ```
 
   ### Migrating `database.ts`
@@ -231,7 +366,7 @@
     owner: process.env.GITHUB_OWNER,
     repo: process.env.GITHUB_REPO,
     token: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
-  })
+  });
   ```
 
   - **Custom Git Provider**: Implement the `GitProvider` interface for different git providers.
@@ -266,8 +401,8 @@
   - **Usage**: Implement a local database with the `createLocalDatabase` function.
 
   ```typescript
-  import { createLocalDatabase } from '@tinacms/datalayer'
-  createLocalDatabase(port)
+  import { createLocalDatabase } from "@tinacms/datalayer";
+  createLocalDatabase(port);
   ```
 
   #### d. Consolidated Example
@@ -314,13 +449,13 @@
       },
     },
     //...
-  })
+  });
   ```
 
   - **New API**:
 
   ```javascript
-  import { AbstractAuthProvider } from 'tinacms'
+  import { AbstractAuthProvider } from "tinacms";
   class CustomAuthProvider extends AbstractAuthProvider {
     login() {}
     logout() {}
@@ -329,7 +464,7 @@
   defineConfig({
     authProvider: new CustomAuthProvider(),
     //...
-  })
+  });
   ```
 
   ### TinaCMS Self Hosted backend updates
@@ -346,13 +481,16 @@
   `/api/tina/[...routes].{ts,js}`
 
   ```typescript
-  import { TinaNodeBackend, LocalBackendAuthProvider } from '@tinacms/datalayer'
+  import {
+    TinaNodeBackend,
+    LocalBackendAuthProvider,
+  } from "@tinacms/datalayer";
 
-  import { TinaAuthJSOptions, AuthJsBackendAuthProvider } from 'tinacms-authjs'
+  import { TinaAuthJSOptions, AuthJsBackendAuthProvider } from "tinacms-authjs";
 
-  import databaseClient from '../../../tina/__generated__/databaseClient'
+  import databaseClient from "../../../tina/__generated__/databaseClient";
 
-  const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
+  const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === "true";
 
   const handler = TinaNodeBackend({
     authProvider: isLocal
@@ -364,12 +502,12 @@
           }),
         }),
     databaseClient,
-  })
+  });
 
   export default (req, res) => {
     // Modify the request here if you need to
-    return handler(req, res)
-  }
+    return handler(req, res);
+  };
   ```
 
   These changes are put in place to make self hosted TinaCMS easier to use and more flexible.
@@ -588,7 +726,7 @@
 
 ### Patch Changes
 
-- ae3abe927: handle image array in Tina Cloud media transformation
+- ae3abe927: handle image array in TinaCloud media transformation
 
 ## 1.4.3
 
@@ -700,7 +838,7 @@
 
 ### Patch Changes
 
-- a8457798a: Fix LevelDB initialization to throw a GraphQL error that can be handled correctly in Tina Cloud
+- a8457798a: Fix LevelDB initialization to throw a GraphQL error that can be handled correctly in TinaCloud
 - 94b8bb6e0: Fix update Database.get to properly handle LEVEL_NOT_FOUND errors
 - e732906b6: Support .yml file extension for yaml files
 - Updated dependencies [169147490]
@@ -743,7 +881,7 @@
   > NOTE: Relative paths are fine to use here, but make sure it's relative to the `.tina/config` file
 
   ```ts
-  localContentPath: process.env.REMOTE_ROOT_PATH // eg. '../../my-content-repo'
+  localContentPath: process.env.REMOTE_ROOT_PATH; // eg. '../../my-content-repo'
   ```
 
   ### Production workflow
@@ -1136,7 +1274,7 @@
       },
     },
     // ...
-  })
+  });
   ```
 
   To get the old behavior set referenceDepth to `1`.
@@ -1149,7 +1287,7 @@
       },
     },
     // ...
-  })
+  });
   ```
 
 - Updated dependencies [870a32f18]
@@ -1195,25 +1333,25 @@
   ```ts
   // .tina/schema.ts
 
-  import { defineSchema } from 'tinacms'
+  import { defineSchema } from "tinacms";
 
   const schema = defineSchema({
     collections: [
       {
-        name: 'page',
-        path: 'content/page',
-        label: 'Page',
+        name: "page",
+        path: "content/page",
+        label: "Page",
         // Need to provide the format if the file being used (default is `.md`)
-        format: 'mdx',
+        format: "mdx",
         fields: [
           //...
         ],
       },
     ],
-  })
+  });
   //...
 
-  export default schema
+  export default schema;
   ```
 
 ### Patch Changes
@@ -1238,7 +1376,7 @@
 
 ### Patch Changes
 
-- f6cb634c2: Added an optional config key to the schema that will be used for tina cloud media store
+- f6cb634c2: Added an optional config key to the schema that will be used for TinaCloud media store
 - b1a4290e6: Use media config from the schema in the local media server
 - 1955b8842: Uses new `schema.config` when resolving media/asset urls
 - 8b81c3cf3: Added more context to error messages to help to user debug issues
@@ -1491,8 +1629,8 @@
   If you gone though the `tinacms init` process there should be a file called `.tina/components/TinaProvider`. In that file you can import the schema from `schema.ts` and add it to the TinaCMS wrapper component.
 
   ```tsx
-  import TinaCMS from 'tinacms'
-  import schema, { tinaConfig } from '../schema.ts'
+  import TinaCMS from "tinacms";
+  import schema, { tinaConfig } from "../schema.ts";
 
   // Importing the TinaProvider directly into your page will cause Tina to be added to the production bundle.
   // Instead, import the tina/provider/index default export to have it dynamially imported in edit-moode
@@ -1505,10 +1643,10 @@
       <TinaCMS {...tinaConfig} schema={schema}>
         {children}
       </TinaCMS>
-    )
-  }
+    );
+  };
 
-  export default TinaProvider
+  export default TinaProvider;
   ```
 
 - 591640db0: Fixes a bug with `breadcrumbs` to account for subfolders (instead of just the `filename`) and allows Documents to be created and updated within subfolders.
@@ -1592,7 +1730,7 @@
 
 ### Patch Changes
 
-- bd4e1f802: Pin version number from @tinacms/graphql during schema compilation. This can be used to ensure the proper version is provided when working with Tina Cloud
+- bd4e1f802: Pin version number from @tinacms/graphql during schema compilation. This can be used to ensure the proper version is provided when working with TinaCloud
 
 ## 0.58.2
 
@@ -1817,19 +1955,19 @@
   {
     collections: [
       {
-        name: 'post',
-        label: 'Post',
-        path: 'content/posts',
+        name: "post",
+        label: "Post",
+        path: "content/posts",
         fields: [
           {
-            name: 'title',
-            label: 'Title',
-            type: 'string', // read on below to learn more about _type_ changes
+            name: "title",
+            label: "Title",
+            type: "string", // read on below to learn more about _type_ changes
           },
         ],
         // defining `fields` and `templates` would result in a compilation error
       },
-    ]
+    ];
   }
   ```
 
@@ -1900,9 +2038,9 @@
 
   ```js
   cms.fields.add({
-    name: 'myMapField',
+    name: "myMapField",
     Component: MapPicker,
-  })
+  });
   ```
 
   ### One important gotcha
@@ -1923,17 +2061,17 @@
   And then when you register the plugin, provide your custom logic here:
 
   ```js
-  import { TextFieldPlugin } from 'tinacms'
+  import { TextFieldPlugin } from "tinacms";
 
   // ...
 
   cms.fields.add({
     ...TextFieldPlugin, // spread existing text plugin
-    name: 'myText',
+    name: "myText",
     validate: (value) => {
-      someValidationLogic(value)
+      someValidationLogic(value);
     },
-  })
+  });
   ```
 
   **Why?**
@@ -1955,8 +2093,8 @@
           {props.getPostDocument.data?.category}
         </MyCategoryComponent>
       </>
-    )
-  }
+    );
+  };
   ```
 
   2. The query did not ask for that field:
@@ -1979,7 +2117,7 @@
 
   ```md
   ---
-  title: 'Hello, World'
+  title: "Hello, World"
   categories:
     - sports
     - movies
@@ -1990,7 +2128,7 @@
 
   ```md
   ---
-  title: 'Hello, World'
+  title: "Hello, World"
   categories: []
   ---
   ```
@@ -1999,7 +2137,7 @@
 
   ```md
   ---
-  title: 'Hello, World'
+  title: "Hello, World"
   ---
   ```
 
@@ -2016,11 +2154,11 @@
     return props.blocks.map((block) => {
       return (
         <>
-          <h2>{block.categories.split(',')}</h2>
+          <h2>{block.categories.split(",")}</h2>
         </>
-      )
-    })
-  }
+      );
+    });
+  };
   ```
 
   For a new item, `categories` will be null, so we'll get an error. This only happens when you're editing your page with Tina, so it's not a production-facing issue.

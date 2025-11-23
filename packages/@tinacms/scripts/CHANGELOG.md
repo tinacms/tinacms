@@ -1,5 +1,43 @@
 # Change Log
 
+## 1.4.0
+
+### Minor Changes
+
+- [#5744](https://github.com/tinacms/tinacms/pull/5744) [`98a61e2`](https://github.com/tinacms/tinacms/commit/98a61e2d263978a7096cc23ac7e94aa0039981be) Thanks [@Ben0189](https://github.com/Ben0189)! - Upgrade Plate editor to v48 beta, integrating latest features and improvements.
+
+## 1.3.5
+
+### Patch Changes
+
+- [#5677](https://github.com/tinacms/tinacms/pull/5677) [`26e1fb0`](https://github.com/tinacms/tinacms/commit/26e1fb052162d90632fa72cc41e2e8cf863865aa) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - refactor: build script
+
+- [#5690](https://github.com/tinacms/tinacms/pull/5690) [`f0adfbf`](https://github.com/tinacms/tinacms/commit/f0adfbfda3839823b75518914874c2142c0d47b4) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Disable sourcemap generation (reduce HEAP consumption on build)
+
+## 1.3.4
+
+### Patch Changes
+
+- [#5602](https://github.com/tinacms/tinacms/pull/5602) [`ab43169`](https://github.com/tinacms/tinacms/commit/ab43169af5a95f31fa27bb0236623a031883a1fd) Thanks [@wicksipedia](https://github.com/wicksipedia)! - fix naming of TinaCloud
+
+## 1.3.3
+
+### Patch Changes
+
+- [#5515](https://github.com/tinacms/tinacms/pull/5515) [`98df118`](https://github.com/tinacms/tinacms/commit/98df11889d39af2ad7b4cde033fa26f8046a8852) Thanks [@kldavis4](https://github.com/kldavis4)! - Add diff-tina-lock script for verifying changes to schema in CI and update-tina-lock script for updating tina locks. Update CI to call this script on example projects.
+
+## 1.3.2
+
+### Patch Changes
+
+- [#5486](https://github.com/tinacms/tinacms/pull/5486) [`d7c5ec1`](https://github.com/tinacms/tinacms/commit/d7c5ec1b174419dcc6ddba3cfb3684dd469da571) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Update dependencies across packages
+
+## 1.3.1
+
+### Patch Changes
+
+- [#5276](https://github.com/tinacms/tinacms/pull/5276) [`f90ef4d`](https://github.com/tinacms/tinacms/commit/f90ef4d92ae7b21c8c610d14af9510354a3969c6) Thanks [@Ben0189](https://github.com/Ben0189)! - Updates minor and patch dependencies
+
 ## 1.3.0
 
 ### Minor Changes
@@ -75,11 +113,11 @@
   #### Updated `database.ts` Example
 
   ```typescript
-  import { createDatabase, createLocalDatabase } from '@tinacms/datalayer'
-  import { MongodbLevel } from 'mongodb-level'
-  import { GitHubProvider } from 'tinacms-gitprovider-github'
+  import { createDatabase, createLocalDatabase } from "@tinacms/datalayer";
+  import { MongodbLevel } from "mongodb-level";
+  import { GitHubProvider } from "tinacms-gitprovider-github";
 
-  const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
+  const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === "true";
 
   export default isLocal
     ? createLocalDatabase()
@@ -91,12 +129,12 @@
           token: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
         }),
         databaseAdapter: new MongodbLevel<string, Record<string, any>>({
-          collectionName: 'tinacms',
-          dbName: 'tinacms',
+          collectionName: "tinacms",
+          dbName: "tinacms",
           mongoUri: process.env.MONGODB_URI,
         }),
         namespace: process.env.GITHUB_BRANCH,
-      })
+      });
   ```
 
   ### Migrating `database.ts`
@@ -111,7 +149,7 @@
     owner: process.env.GITHUB_OWNER,
     repo: process.env.GITHUB_REPO,
     token: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
-  })
+  });
   ```
 
   - **Custom Git Provider**: Implement the `GitProvider` interface for different git providers.
@@ -146,8 +184,8 @@
   - **Usage**: Implement a local database with the `createLocalDatabase` function.
 
   ```typescript
-  import { createLocalDatabase } from '@tinacms/datalayer'
-  createLocalDatabase(port)
+  import { createLocalDatabase } from "@tinacms/datalayer";
+  createLocalDatabase(port);
   ```
 
   #### d. Consolidated Example
@@ -194,13 +232,13 @@
       },
     },
     //...
-  })
+  });
   ```
 
   - **New API**:
 
   ```javascript
-  import { AbstractAuthProvider } from 'tinacms'
+  import { AbstractAuthProvider } from "tinacms";
   class CustomAuthProvider extends AbstractAuthProvider {
     login() {}
     logout() {}
@@ -209,7 +247,7 @@
   defineConfig({
     authProvider: new CustomAuthProvider(),
     //...
-  })
+  });
   ```
 
   ### TinaCMS Self Hosted backend updates
@@ -226,13 +264,16 @@
   `/api/tina/[...routes].{ts,js}`
 
   ```typescript
-  import { TinaNodeBackend, LocalBackendAuthProvider } from '@tinacms/datalayer'
+  import {
+    TinaNodeBackend,
+    LocalBackendAuthProvider,
+  } from "@tinacms/datalayer";
 
-  import { TinaAuthJSOptions, AuthJsBackendAuthProvider } from 'tinacms-authjs'
+  import { TinaAuthJSOptions, AuthJsBackendAuthProvider } from "tinacms-authjs";
 
-  import databaseClient from '../../../tina/__generated__/databaseClient'
+  import databaseClient from "../../../tina/__generated__/databaseClient";
 
-  const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
+  const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === "true";
 
   const handler = TinaNodeBackend({
     authProvider: isLocal
@@ -244,12 +285,12 @@
           }),
         }),
     databaseClient,
-  })
+  });
 
   export default (req, res) => {
     // Modify the request here if you need to
-    return handler(req, res)
-  }
+    return handler(req, res);
+  };
   ```
 
   These changes are put in place to make self hosted TinaCMS easier to use and more flexible.
@@ -264,7 +305,7 @@
 
   fix: Use clean page-sizes on media manager (to make pagination more obvious)
 
-  Fix issue with uploading media in a folder with tina cloud
+  Fix issue with uploading media in a folder with TinaCloud
 
 ## 1.1.1
 
@@ -362,13 +403,13 @@
 
   ```ts
   // .tina/config.ts
-  import schema from './schema'
+  import schema from "./schema";
 
   export default defineConfig({
     schema: schema,
     //.. Everything from define config in `schema.ts`
     //.. Everything from `schema.config`
-  })
+  });
   ```
 
   2. Add Build config

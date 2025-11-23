@@ -1,9 +1,9 @@
-import React from 'react'
+import React from 'react';
 
 export const ErrorDialog = (props: {
-  title: string
-  message: string
-  error: Error
+  title: string;
+  message: string;
+  error: Error;
 }) => {
   return (
     <div
@@ -42,10 +42,10 @@ export const ErrorDialog = (props: {
         <p>
           See our{' '}
           <a
-            className="text-gray-600"
+            className='text-gray-600'
             style={{ textDecoration: 'underline' }}
-            href="https://tina.io/docs/errors/faq/"
-            target="_blank"
+            href='https://tina.io/docs/r/FAQ/'
+            target='_blank'
           >
             {' '}
             Error FAQ{' '}
@@ -54,5 +54,5 @@ export const ErrorDialog = (props: {
         </p>
       </div>
     </div>
-  )
-}
+  );
+};

@@ -1,11 +1,11 @@
-import * as React from 'react'
+import * as React from 'react';
 
-import { Slot } from '@radix-ui/react-slot'
-import { cn, withRef } from '@udecode/cn'
-import { type VariantProps, cva } from 'class-variance-authority'
+import { Slot } from '@radix-ui/react-slot';
+import { cn, withRef } from '@udecode/cn';
+import { type VariantProps, cva } from 'class-variance-authority';
 
 export const buttonVariants = cva(
-  'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center justify-center whitespace-nowrap rounded text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
   {
     defaultVariants: {
       size: 'default',
@@ -18,11 +18,11 @@ export const buttonVariants = cva(
       size: {
         default: 'h-10 px-4 py-2',
         icon: 'size-10',
-        lg: 'h-11 rounded-md px-8',
+        lg: 'h-11 rounded px-8',
         none: '',
-        sm: 'h-9 rounded-md px-3',
-        sms: 'size-9 rounded-md px-0',
-        xs: 'h-8 rounded-md px-3',
+        sm: 'h-9 rounded px-3',
+        sms: 'size-9 rounded px-0',
+        xs: 'h-8 rounded px-3',
       },
       variant: {
         default: 'bg-primary text-primary-foreground hover:bg-primary/90',
@@ -38,21 +38,23 @@ export const buttonVariants = cva(
       },
     },
   }
-)
+);
 
 export const Button = withRef<
   'button',
   {
-    asChild?: boolean
+    asChild?: boolean;
   } & VariantProps<typeof buttonVariants>
 >(({ asChild = false, className, isMenu, size, variant, ...props }, ref) => {
-  const Comp = asChild ? Slot : 'button'
+  const Comp = asChild ? Slot : 'button';
 
   return (
     <Comp
       className={cn(buttonVariants({ className, isMenu, size, variant }))}
       ref={ref}
+      contentEditable={false}
+      type='button'
       {...props}
     />
-  )
-})
+  );
+});

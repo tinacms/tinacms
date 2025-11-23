@@ -1,0 +1,16 @@
+{
+  "data": {
+    "updateDocument": {
+      "__typename": "ProductBook",
+      "id": "products/accounting-book.md",
+      "_sys": {
+        "filename": "accounting-book",
+        "extension": ".md",
+        "path": "products/accounting-book.md"
+      },
+      "title": "Advanced Accounting for Northwind",
+      "isbn": "978-0-987654-32-1",
+      "pages": 350
+    }
+  }
+}

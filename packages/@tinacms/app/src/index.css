@@ -1,5 +1,5 @@
-@import 'global.css';
-@import 'preflight.css';
+@import "global.css";
+@import "preflight.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -13,18 +13,22 @@
   fill: currentColor;
 }
 
+.font-libre-baskerville {
+  font-family: "Libre Baskerville", serif;
+}
+
 body {
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
 
@@ -38,32 +42,32 @@ div.graphiql-explorer-root > div:last-child {
 }
 
 /* if the last block has margin-bottom it makes the text box larger but some of it isn't clickable */
-.tina-prose [data-slate-editor='true'] {
+.tina-prose [data-slate-editor="true"] {
   padding-bottom: 0.5em;
   /* Outline is placed on the parent element for styling consistency with other elements */
   outline: none;
 }
 /* prose adds backticks, which look like they should be editable */
-.tina-prose [data-slate-editor='true'] .slate-code::before {
-  content: '';
+.tina-prose [data-slate-editor="true"] .slate-code::before {
+  content: "";
 }
-.tina-prose [data-slate-editor='true'] .slate-code::after {
-  content: '';
+.tina-prose [data-slate-editor="true"] .slate-code::after {
+  content: "";
 }
-.tina-prose [data-slate-editor='true'] .slate-code_block {
+.tina-prose [data-slate-editor="true"] .slate-code_block {
   margin: 0;
 }
 /* code lines as part of a block don't need the same background formatting */
-.tina-prose [data-slate-editor='true'] .slate-code_block .slate-code {
+.tina-prose [data-slate-editor="true"] .slate-code_block .slate-code {
   background: none;
 }
 /* prose makes the first p in a block slightly larger */
-.tina-prose [data-slate-editor='true'] p:first-of-type {
+.tina-prose [data-slate-editor="true"] p:first-of-type {
   font-size: 1em;
 }
 
 /* experimental floating toolbar doesn't need a large text area */
-.with-toolbar [data-slate-editor='true'] {
+.with-toolbar [data-slate-editor="true"] {
   min-height: 72px;
 }
 
@@ -190,7 +194,7 @@ div.graphiql-explorer-root > div:last-child {
 }
 
 .tina-date-field .rdtPicker td.rdtToday:before {
-  content: '';
+  content: "";
   display: inline-block;
   border-left: 7px solid transparent;
   border-bottom: 7px solid var(--tina-color-primary);
@@ -381,4 +385,9 @@ td.rdtYear:hover {
 
 .tina-date-field .rdtTime td {
   cursor: default;
+}
+
+/* Override Radix UI Portal wrapper z-index for dropdown menus */
+[data-radix-popper-content-wrapper] {
+  z-index: 10800 !important;
 }

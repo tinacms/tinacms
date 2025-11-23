@@ -1,40 +1,40 @@
-import * as React from 'react'
-import { useRef, useEffect } from 'react'
+import * as React from 'react';
+import { useRef, useEffect } from 'react';
 
 export interface DismissibleProps {
   /**
    * The function that called in response to a dismissal.
    */
-  onDismiss: Function
+  onDismiss: Function;
 
   /**
    * If `true`, pressing `ESC` key will trigger a dismissal. Default: `false`
    */
-  escape?: boolean
+  escape?: boolean;
 
   /**
    * When `true` clicking outside of the surrounding area triggers a dismissal. Default: `false`
    */
-  click?: boolean
+  click?: boolean;
 
   /**
    * When `true` there will be no dismissals. Default: `false`
    */
-  disabled?: boolean
+  disabled?: boolean;
 
   /**
    * An extra Document to add the event listeners too.
    *
    * Used when the dismissible area is inside of an iframe.
    */
-  document?: Document
+  document?: Document;
 
   /**
    * Adding this flag allows click events outside of the
    * dismissible area to propagate to their intended target.
    */
-  allowClickPropagation?: boolean
-  children?: React.ReactNode
+  allowClickPropagation?: boolean;
+  children?: React.ReactNode;
 }
 
 export const Dismissible: React.FC<DismissibleProps> = ({
@@ -53,9 +53,9 @@ export const Dismissible: React.FC<DismissibleProps> = ({
     disabled,
     allowClickPropagation,
     document,
-  })
-  return <div ref={area} {...props} />
-}
+  });
+  return <div ref={area} {...props} />;
+};
 
 export function useDismissible({
   onDismiss,
@@ -65,59 +65,58 @@ export function useDismissible({
   allowClickPropagation = false,
   document: customDocument,
 }: DismissibleProps) {
-  const area: any = useRef()
+  const area: any = useRef();
 
   useEffect(() => {
     const documents: any[] = customDocument
       ? [document, customDocument]
-      : [document]
+      : [document];
 
     const stopAndPrevent = (event: MouseEvent) => {
-      event.stopPropagation()
-      event.stopImmediatePropagation()
-      event.preventDefault()
-    }
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      event.preventDefault();
+    };
 
     const handleDocumentClick = (event: MouseEvent) => {
-      if (disabled) return
+      if (disabled) return;
 
       if (!area.current.contains(event.target)) {
-        console.log('did not click main content', event.target, area.current)
         if (!allowClickPropagation) {
-          stopAndPrevent(event)
+          stopAndPrevent(event);
         }
-        onDismiss(event)
+        onDismiss(event);
       }
-    }
+    };
 
     const handleEscape = (event: KeyboardEvent) => {
-      if (disabled) return
+      if (disabled) return;
 
       if (event.keyCode === 27) {
-        event.stopPropagation()
-        onDismiss(event)
+        event.stopPropagation();
+        onDismiss(event);
       }
-    }
+    };
 
     if (click) {
       documents.forEach((document) =>
         document.body.addEventListener('click', handleDocumentClick)
-      )
+      );
     }
 
     if (escape) {
       documents.forEach((document) =>
         document.addEventListener('keydown', handleEscape)
-      )
+      );
     }
     // Clean up event listeners on unmount
     return () => {
       documents.forEach((document) => {
-        document.body.removeEventListener('click', handleDocumentClick)
-        document.removeEventListener('keydown', handleEscape)
-      })
-    }
-  }, [click, customDocument, escape, disabled, onDismiss])
+        document.body.removeEventListener('click', handleDocumentClick);
+        document.removeEventListener('keydown', handleEscape);
+      });
+    };
+  }, [click, customDocument, escape, disabled, onDismiss]);
 
-  return area
+  return area;
 }

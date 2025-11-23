@@ -1,15 +1,7 @@
-import {
-  ELEMENT_OL,
-  ELEMENT_TABLE,
-  ELEMENT_UL,
-  MARK_BOLD,
-  MARK_CODE,
-  MARK_ITALIC,
-} from '@udecode/plate'
-import { useEditorState } from '@udecode/plate-common'
-import React from 'react'
-import { useResize } from '../hooks/use-resize'
-import { helpers, unsupportedItemsInTable } from '../plugins/core/common'
+import { useEditorState } from '@udecode/plate/react';
+import React from 'react';
+import { useResize } from '../hooks/use-resize';
+import { helpers, unsupportedItemsInTable } from '../plugins/core/common';
 import {
   CONTAINER_MD_BREAKPOINT,
   EMBED_ICON_WIDTH,
@@ -19,28 +11,40 @@ import {
   HEADING_LABEL,
   STANDARD_ICON_WIDTH,
   type ToolbarOverrideType,
-} from '../toolbar/toolbar-overrides'
-import { useToolbarContext } from '../toolbar/toolbar-provider'
-import { HeadingsMenu } from './headings-dropdown'
-import { CodeBlockToolbarButton } from './plate-ui/code-block-toolbar-button'
-import { Icons } from './plate-ui/icons'
-import { ImageToolbarButton } from './plate-ui/image-toolbar-button'
-import { IndentListToolbarButton } from './plate-ui/indent-list-toolbar-button'
-import { LinkToolbarButton } from './plate-ui/link-toolbar-button'
-import { MarkToolbarButton } from './plate-ui/mark-toolbar-button'
-import { MermaidToolbarButton } from './plate-ui/mermaid-toolbar-button'
-import OverflowMenu from './plate-ui/overflow-menu'
-import { QuoteToolbarButton } from './plate-ui/quote-toolbar-button'
-import { RawMarkdownToolbarButton } from './plate-ui/raw-markdown-toolbar-button'
-import { TableDropdownMenu } from './plate-ui/table-dropdown-menu'
-import TemplatesToolbarButton from './plate-ui/templates-toolbar-button'
-import { ToolbarGroup } from './plate-ui/toolbar'
+} from '../toolbar/toolbar-overrides';
+import { useToolbarContext } from '../toolbar/toolbar-provider';
+import { HeadingsMenu } from './headings-dropdown';
+import { CodeBlockToolbarButton } from './plate-ui/code-block-toolbar-button';
+import { ImageToolbarButton } from './plate-ui/image-toolbar-button';
+import { LinkToolbarButton } from './plate-ui/link-toolbar-button';
+import { MermaidToolbarButton } from './plate-ui/mermaid-toolbar-button';
+import OverflowMenu from './plate-ui/overflow-menu';
+import { QuoteToolbarButton } from './plate-ui/quote-toolbar-button';
+import { RawMarkdownToolbarButton } from './plate-ui/raw-markdown-toolbar-button';
+import { HorizontalRuleToolbarButton } from './plate-ui/hr-toolbar-button';
+import TemplatesToolbarButton from './plate-ui/templates-toolbar-button';
+import { ToolbarGroup } from './plate-ui/toolbar';
+import {
+  BoldToolbarButton,
+  CodeToolbarButton,
+  ItalicToolbarButton,
+  StrikethroughToolbarButton,
+} from './plate-ui/mark-toolbar-button';
+import { TablePlugin } from '@udecode/plate-table/react';
+import {
+  BulletedListPlugin,
+  NumberedListPlugin,
+} from '@udecode/plate-list/react';
+import { ListToolbarButton } from './plate-ui/indent-list-toolbar-button';
+import { TableDropdownMenu } from './plate-ui/table/table-dropdown-menu';
+import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
+import { cn } from '@udecode/cn';
 
 type ToolbarItem = {
-  label: string
-  width: (paragraphIconExists?: boolean) => number // Use function to calculate width
-  Component: React.ReactNode
-}
+  label: string;
+  width: (paragraphIconExists?: boolean) => number; // Use function to calculate width
+  Component: React.ReactNode;
+};
 
 const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
   heading: {
@@ -63,47 +67,45 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
     width: () => STANDARD_ICON_WIDTH,
     Component: <ImageToolbarButton />,
   },
+  hr: {
+    label: 'Horizontal Rule',
+    width: () => STANDARD_ICON_WIDTH,
+    Component: <HorizontalRuleToolbarButton />,
+  },
   quote: {
     label: 'Quote',
     width: () => STANDARD_ICON_WIDTH,
-    Component: <QuoteToolbarButton tooltip="Quote Quote (⌘+⇧+.)" />,
+    Component: <QuoteToolbarButton />,
   },
   ul: {
     label: 'Unordered List',
     width: () => STANDARD_ICON_WIDTH,
-    Component: <IndentListToolbarButton nodeType={ELEMENT_UL} />,
+    Component: <ListToolbarButton nodeType={BulletedListPlugin.key} />,
   },
   ol: {
     label: 'Ordered List',
     width: () => STANDARD_ICON_WIDTH,
-    Component: <IndentListToolbarButton nodeType={ELEMENT_OL} />,
+    Component: <ListToolbarButton nodeType={NumberedListPlugin.key} />,
   },
   bold: {
     label: 'Bold',
     width: () => STANDARD_ICON_WIDTH,
-    Component: (
-      <MarkToolbarButton tooltip="Bold (⌘+B)" nodeType={MARK_BOLD}>
-        <Icons.bold />
-      </MarkToolbarButton>
-    ),
+    Component: <BoldToolbarButton />,
+  },
+  strikethrough: {
+    label: 'Strikethrough',
+    width: () => STANDARD_ICON_WIDTH,
+    Component: <StrikethroughToolbarButton />,
   },
   italic: {
     label: 'Italic',
     width: () => STANDARD_ICON_WIDTH,
-    Component: (
-      <MarkToolbarButton tooltip="Italic (⌘+I)" nodeType={MARK_ITALIC}>
-        <Icons.italic />
-      </MarkToolbarButton>
-    ),
+    Component: <ItalicToolbarButton />,
   },
   code: {
     label: 'Code',
     width: () => STANDARD_ICON_WIDTH,
-    Component: (
-      <MarkToolbarButton tooltip="Code (⌘+E)" nodeType={MARK_CODE}>
-        <Icons.code />
-      </MarkToolbarButton>
-    ),
+    Component: <CodeToolbarButton />,
   },
   codeBlock: {
     label: 'Code Block',
@@ -130,40 +132,51 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
     width: () => EMBED_ICON_WIDTH,
     Component: <TemplatesToolbarButton />,
   },
-}
+};
 
 export default function FixedToolbarButtons() {
-  const toolbarRef = React.useRef(null)
-  const [itemsShown, setItemsShown] = React.useState(11)
-  const { overrides, templates } = useToolbarContext()
-  const showEmbedButton = templates.length > 0
+  const toolbarRef = React.useRef(null);
+  const [itemsShown, setItemsShown] = React.useState(11);
+  const { overrides, templates } = useToolbarContext();
+  const showEmbedButton = templates.length > 0;
 
-  let items =
-    overrides === undefined
-      ? Object.values(toolbarItems)
-      : overrides
-          .map((item) => toolbarItems[item])
-          .filter((item) => item !== undefined)
+  let items = [];
+
+  if (Array.isArray(overrides)) {
+    items =
+      overrides === undefined
+        ? Object.values(toolbarItems)
+        : overrides
+            .map((item) => toolbarItems[item])
+            .filter((item) => item !== undefined);
+  } else {
+    items =
+      overrides?.toolbar === undefined
+        ? Object.values(toolbarItems)
+        : overrides.toolbar
+            .map((item) => toolbarItems[item])
+            .filter((item) => item !== undefined);
+  }
 
   if (!showEmbedButton) {
-    items = items.filter((item) => item.label !== toolbarItems.embed.label)
+    items = items.filter((item) => item.label !== toolbarItems.embed.label);
   }
 
-  const editorState = useEditorState()
-  const userInTable = helpers.isNodeActive(editorState, ELEMENT_TABLE)
-  if (userInTable) {
-    items = items.filter((item) => !unsupportedItemsInTable.has(item.label))
-  }
+  const editorState = useEditorState();
+  const userInTable = helpers.isNodeActive(editorState, TablePlugin);
+
+  const userInCodeBlock = helpers.isNodeActive(editorState, CodeBlockPlugin);
 
   useResize(toolbarRef, (entry) => {
-    const width = entry.target.getBoundingClientRect().width
-    const headingButton = items.find((item) => item.label === HEADING_LABEL)
+    const width = entry.target.getBoundingClientRect().width - 8;
+    const headingButton = items.find((item) => item.label === HEADING_LABEL);
     const headingWidth = headingButton
-      ? headingButton.width(width > CONTAINER_MD_BREAKPOINT)
-      : 0
+      ? //some discrepancy here between the md breakpoint here and in practice, but it works
+        headingButton.width(width > CONTAINER_MD_BREAKPOINT - 9)
+      : 0;
 
-    // Calculate the available width excluding the heading button and float button icon width
-    const availableWidth = width - headingWidth - FLOAT_BUTTON_WIDTH
+    // Calculate the available width excluding the heading button
+    const availableWidth = width - headingWidth;
 
     // Count numbers of buttons can fit into the available width
     const { itemFitCount } = items.reduce(
@@ -173,39 +186,70 @@ export default function FixedToolbarButtons() {
           acc.totalItemsWidth + item.width() <= availableWidth
         ) {
           return {
-            totalItemsWidth: acc.totalItemsWidth + item.width(),
+            //add 4px to account for additional padding on toolbar buttons
+            totalItemsWidth: acc.totalItemsWidth + item.width() + 4,
             itemFitCount: acc.itemFitCount + 1,
-          }
+          };
         }
-        return acc
+        return acc;
       },
       { totalItemsWidth: 0, itemFitCount: 1 }
-    ) // Initial values fit count set as 1 becasue heading is always exist
+    ); // Initial values fit count set as 1 becasue heading is always exist
 
-    setItemsShown(itemFitCount)
-  })
+    setItemsShown(itemFitCount);
+  });
+
+  const getOpacity = (item: ToolbarItem) => {
+    if (userInTable && unsupportedItemsInTable.has(item.label)) {
+      return 'opacity-25 pointer-events-none';
+    }
+    if (userInCodeBlock) {
+      return 'opacity-25 pointer-events-none';
+    }
+    return 'opacity-100';
+  };
 
   return (
-    <div className="w-full overflow-hidden @container/toolbar" ref={toolbarRef}>
+    <div className='w-full overflow-hidden @container/toolbar' ref={toolbarRef}>
       <div
-        className="flex"
+        className='flex'
         style={{
           transform: 'translateX(calc(-1px))',
         }}
       >
         <>
-          {items.slice(0, itemsShown).map((item) => (
-            <React.Fragment key={item.label}>{item.Component}</React.Fragment>
-          ))}
+          {items
+            .slice(0, items.length > itemsShown ? itemsShown - 1 : itemsShown)
+            .map((item) => (
+              <div
+                className={cn(
+                  'transition duration-500 ease-in-out',
+                  getOpacity(item)
+                )}
+                key={item.label}
+              >
+                {item.Component}
+              </div>
+            ))}
           {items.length > itemsShown && (
-            <OverflowMenu>
-              {items.slice(itemsShown).flatMap((c) => (
-                <React.Fragment key={c.label}>{c.Component}</React.Fragment>
-              ))}
-            </OverflowMenu>
+            <div className='w-fit ml-auto'>
+              <OverflowMenu>
+                {items.slice(itemsShown - 1).flatMap((c) => (
+                  <div
+                    className={cn(
+                      'transition duration-500 ease-in-out',
+                      getOpacity(c)
+                    )}
+                    key={c.label}
+                  >
+                    {c.Component}
+                  </div>
+                ))}
+              </OverflowMenu>
+            </div>
           )}
         </>
       </div>
     </div>
-  )
+  );
 }
