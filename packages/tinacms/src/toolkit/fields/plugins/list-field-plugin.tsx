@@ -20,7 +20,8 @@ interface ListFieldDefinititon extends Field {
   field: {
     component: 'text' | 'textarea' | 'number' | 'select' | 'image';
   };
-
+  min?: number;
+  max?: number;
   type?: string;
   list?: boolean;
   parentTypename?: string;
@@ -75,13 +76,10 @@ const List = ({ tinaForm, form, field, input, meta, index }: ListProps) => {
     },
     [field.itemProps]
   );
-
-  // @ts-ignore
-  const isMax = items.length >= (field.max || Infinity);
-  // @ts-ignore
-  const isMin = items.length <= (field.min || 0);
-  // @ts-ignore
-  const fixedLength = field.min === field.max;
+  const isMax = items.length >= (field?.max);
+  const isMin = items.length <= (field?.min);
+  // fixedLength is true when min and max are the same 
+  const fixedLength = field?.min === field?.max;
 
   return (
     <ListFieldMeta
@@ -92,8 +90,8 @@ const List = ({ tinaForm, form, field, input, meta, index }: ListProps) => {
       index={index}
       tinaForm={tinaForm}
       actions={
-        (!fixedLength || (fixedLength && !isMax)) && (
-          <IconButton onClick={addItem} variant='primary' size='small'>
+         (
+          <IconButton onClick={addItem} variant='primary' size='small' disabled={isMax}>
             <AddIcon className='w-5/6 h-auto' />
           </IconButton>
         )
