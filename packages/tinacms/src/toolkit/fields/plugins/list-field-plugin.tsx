@@ -76,9 +76,9 @@ const List = ({ tinaForm, form, field, input, meta, index }: ListProps) => {
     },
     [field.itemProps]
   );
-  const isMax = items.length >= (field?.max);
-  const isMin = items.length <= (field?.min);
-  // fixedLength is true when min and max are the same 
+  const isMax = items.length >= field?.max;
+  const isMin = items.length <= field?.min;
+  // fixedLength is true when min and max are the same
   const fixedLength = field?.min === field?.max;
 
   return (
@@ -90,11 +90,14 @@ const List = ({ tinaForm, form, field, input, meta, index }: ListProps) => {
       index={index}
       tinaForm={tinaForm}
       actions={
-         (
-          <IconButton onClick={addItem} variant='primary' size='small' disabled={isMax}>
-            <AddIcon className='w-5/6 h-auto' />
-          </IconButton>
-        )
+        <IconButton
+          onClick={addItem}
+          variant='primary'
+          size='small'
+          disabled={isMax}
+        >
+          <AddIcon className='w-5/6 h-auto' />
+        </IconButton>
       }
     >
       <ListPanel>
