@@ -22,23 +22,7 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
       {throw new Error("timeFormat cannot be a boolean");}
     
     const [date, setDate] = useState<Date | undefined>(undefined);
-    return <DateTimePicker dateFormat={dateFormat}  value={date} onChange={setDate}/>;
-    return (
-      
-      <>
-        <ReactDateTimeWithStyles
-          value={input.value}
-          onChange={(value) => {
-            const newValue = value === '' ? undefined : value;
-            input.onChange(newValue);
-          }}
-          dateFormat={dateFormat || DEFAULT_DATE_DISPLAY_FORMAT}
-          timeFormat={timeFormat || false}
-          inputProps={{ className: textFieldClasses }}
-          {...rest}
-        />
-      </>
-    );
+    return <DateTimePicker granularity='minute' hourCycle={12} dateFormat={dateFormat} value={date} onChange={setDate}/>;
   }
 );
 
