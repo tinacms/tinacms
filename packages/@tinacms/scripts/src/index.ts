@@ -493,7 +493,7 @@ export class BuildTina {
            * I'm pretty sure it doesn't, since everything works
            *
            * By setting a global for each external dep we're silencing these warnings
-           * No name was provided for external module 'react-beautiful-dnd' in output.globals – guessing 'reactBeautifulDnd'
+           * No name was provided for external module in output.globals
            *
            * They don't occur for es builds, only UMD and I can't quite find
            * an authoritative response on wny they're needed or how they're

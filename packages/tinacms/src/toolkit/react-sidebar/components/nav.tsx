@@ -1,4 +1,4 @@
-import { TinaIcon } from '@tinacms/toolkit';
+import { TinaExtendedIcon } from '@tinacms/toolkit';
 import type { CloudConfigPlugin } from '@toolkit/react-cloud-config';
 import { useCMS } from '@toolkit/react-core';
 import { FormModal } from '@toolkit/react-forms';
@@ -109,7 +109,7 @@ export const Nav = ({
             toggleMenu();
           }}
         >
-          <BiMenu className='h-6 w-auto text-gray-600' />
+          <BiMenu className='h-8 w-auto text-gray-600' />
         </button>
       </div>
 
@@ -130,12 +130,11 @@ export const Nav = ({
               toggleMenu();
             }}
           >
-            <BiMenu className='h-6 w-auto text-gray-600' />
+            <BiMenu className='h-8 w-auto text-gray-600' />
           </button>
 
           <span className='text-left inline-flex items-center text-xl tracking-wide text-gray-800/80 flex-1 gap-1'>
-            <TinaIcon className='w-10 h-auto -ml-1 fill-orange-500' />
-            <span>TinaCMS</span>
+            <TinaExtendedIcon className='h-8 w-auto fill-orange-500' />
           </span>
         </div>
         {children}

@@ -386,3 +386,8 @@ td.rdtYear:hover {
 .tina-date-field .rdtTime td {
   cursor: default;
 }
+
+/* Override Radix UI Portal wrapper z-index for dropdown menus */
+[data-radix-popper-content-wrapper] {
+  z-index: 10800 !important;
+}

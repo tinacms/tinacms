@@ -9,7 +9,7 @@ import {
 } from '@toolkit/react-modals';
 import { Button } from '@toolkit/styles';
 import React from 'react';
-import { BiError, BiX } from 'react-icons/bi';
+import { BiX } from 'react-icons/bi';
 import { MdCheckCircle, MdError, MdInfo, MdWarning } from 'react-icons/md';
 
 const parseUrlsInText = (text: string): React.ReactNode => {
@@ -48,7 +48,7 @@ export function Alerts({ alerts }: AlertsProps) {
 
   return (
     <>
-      <div className='fixed bottom-0 left-0 right-0 p-6 flex flex-col items-center z-[999999]'>
+      <div className='fixed top-0 left-0 p-6 flex flex-col items-center z-[999999]'>
         {alerts.all
           .filter((alert) => {
             return alert.level !== 'error';
@@ -133,10 +133,10 @@ const Alert: React.FC<{ level: AlertLevel; children: React.ReactNode }> = ({
   ...props
 }) => {
   const colorClasses = {
-    info: 'bg-blue-100 border-blue-500 text-blue-600 fill-blue-500',
-    success: 'bg-green-100 border-green-500 text-green-600 fill-green-500',
-    warn: 'bg-yellow-100 border-yellow-500 text-yellow-600 fill-yellow-500',
-    error: 'bg-red-100 border-red-500 text-red-600 fill-red-500',
+    info: 'bg-white border-blue-500 text-blue-600 fill-blue-500',
+    success: 'bg-white border-green-500 text-green-600 fill-green-500',
+    warn: 'bg-white border-yellow-500 text-yellow-600 fill-yellow-500',
+    error: 'bg-white border-red-500 text-red-600 fill-red-500',
   };
 
   const borderClasses = {
@@ -158,7 +158,7 @@ const Alert: React.FC<{ level: AlertLevel; children: React.ReactNode }> = ({
       }}
     >
       <div
-        className={`flex items-center gap-1.5 min-w-[350px] rounded-md border p-2 ${borderClasses[level]}`}
+        className={`flex items-center gap-1.5 w-[350px] rounded-md border p-2 ${borderClasses[level]}`}
         {...props}
       />
     </div>
@@ -170,6 +170,6 @@ const CloseAlert = ({ ...styleProps }) => (
     className='border-none bg-transparent p-0 outline-none flex items-center'
     {...styleProps}
   >
-    <BiX className='w-5 auto flex-grow-0 flex-shrink-0' />
+    <BiX className='w-5 auto flex-grow-0 flex-shrink-0 text-gray-700' />
   </button>
 );
