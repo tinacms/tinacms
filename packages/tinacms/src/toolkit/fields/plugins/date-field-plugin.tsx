@@ -22,7 +22,7 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
       {throw new Error("timeFormat cannot be a boolean");}
     
     const [date, setDate] = useState<Date | undefined>(undefined);
-    return <DateTimePicker granularity='minute' hourCycle={12} dateFormat={dateFormat} value={date} onChange={setDate}/>;
+    return <DateTimePicker granularity='minute' timeFormat={timeFormat} hourCycle={12} dateFormat={dateFormat} value={date} onChange={setDate}/>;
   }
 );
 

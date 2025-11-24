@@ -772,6 +772,8 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
       };
     }
 
+  
+
     return (
       <Popover>
         <PopoverTrigger asChild disabled={disabled}>
@@ -785,7 +787,7 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
             ref={buttonRef}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            <span>{displayDate? format(displayDate, dateFormat): placeholder}</span>
+            <span>{displayDate? `${format(displayDate, dateFormat)} ${format(displayDate, timeFormat)}`: placeholder}</span>
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0">
@@ -832,18 +834,10 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
 
 DateTimePicker.displayName = 'DateTimePicker';
 
-
 const format = (date: Date, format: string)=> {
-  console.log('date (format)', date);
-  console.log('format (format)', format);
   const m = moment(date).tz(moment.tz.guess());
   return m.format(format);
-  // return moment(date).format(format)
 };
-
-// const formatDate = (date: string, format: string ) => {
-//     moment.tz(date, format).toString();
-// }
 
 export { DateTimePicker, TimePickerInput, TimePicker };
 export type { TimePickerType, DateTimePickerProps, DateTimePickerRef };
