@@ -47,7 +47,7 @@ const pathRelativeToCollection = (
 const formatDefaultBranchName = (filePath: string): string => {
   let result = filePath;
 
-  const contentPrefix = 'content/'
+  const contentPrefix = 'content/';
   // Remove "content/" prefix if present
   if (result.startsWith(contentPrefix)) {
     result = result.substring(contentPrefix.length);
