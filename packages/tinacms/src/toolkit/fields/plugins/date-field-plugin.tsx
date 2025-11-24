@@ -17,6 +17,15 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
 
     const granularity = timeFormat === false ? 'day' : 'minute';
 
+    const inputRef = React.useRef(null);
+    React.useEffect(() => {
+      console.log('focusing date field', rest.experimental_focusIntent);
+      console.log("ref", inputRef.current);
+      if (inputRef.current && rest.experimental_focusIntent) {
+        inputRef.current.focus();
+      }
+    }, [rest]);
+
     const getTimeFormat = useCallback(()=> {
 
       if(timeFormat === false)
@@ -41,9 +50,10 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
     }, [dateFormat]);
 
     const date = input.value ? new Date(input.value) : input.value;
-    
     return (
+      <React.Fragment>
       <DateTimePicker 
+        ref={inputRef}
         granularity={granularity} 
         onChange={(value)=> {
         
@@ -55,6 +65,7 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
         value={date}
         
         />
+        </React.Fragment>
     )
   }
 );

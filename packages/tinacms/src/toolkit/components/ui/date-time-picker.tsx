@@ -6,7 +6,7 @@ import 'moment-timezone';
 import { add, //format, 
   Locale } from 'date-fns';
 import { enUS } from 'date-fns/locale';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar as ChevronLeft, ChevronRight } from 'lucide-react';
 import { Clock } from 'lucide-react';
 import * as React from 'react';
 import { useImperativeHandle, useRef } from 'react';
@@ -14,8 +14,7 @@ import { useImperativeHandle, useRef } from 'react';
 import { DayPicker, DayPickerProps } from 'react-day-picker';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
 import { cn } from '../../../utils/cn';
-import { time } from 'console';
-import { date } from 'zod';
+import { BaseTextField } from '@toolkit/fields';
 
 // ---------- utils start ----------
 /**
@@ -689,7 +688,7 @@ type DateTimePickerProps = {
 
 type DateTimePickerRef = {
   value?: Date;
-} & Omit<HTMLButtonElement, 'value'>;
+} & Omit<HTMLInputElement, 'value'>;
 
 const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePickerProps>(
   (
@@ -713,7 +712,7 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
     ref,
   ) => {
     const [month, setMonth] = React.useState<Date>(value ?? defaultPopupValue);
-    const buttonRef = useRef<HTMLButtonElement>(null);
+    const buttonRef = useRef<HTMLInputElement>(null);
     console.log("value", value);
     const [displayDate, setDisplayDate] = React.useState<Date | undefined>(value ?? undefined);
     onMonthChange ||= onChange;
@@ -767,6 +766,7 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
       ref,
       () => ({
         ...buttonRef.current,
+        focus: ()=> buttonRef.current?.focus(),
         value: displayDate,
       }),
       [displayDate],
@@ -787,18 +787,8 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
     return (
       <Popover>
         <PopoverTrigger asChild disabled={disabled}>
-          <Button
-            variant="outline"
-            className={cn(
-              'w-full justify-start text-left font-normal',
-              !displayDate && 'text-muted-foreground',
-              className,
-            )}
-            ref={buttonRef}
-          >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            <span>{displayDate? formatCurrentDate({dateFormat, displayDate, timeFormat}): placeholder}</span>
-          </Button>
+
+          <BaseTextField className='text-left' ref={buttonRef} value={displayDate? formatCurrentDate({dateFormat, displayDate, }): placeholder} />
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0">
           <Calendar
