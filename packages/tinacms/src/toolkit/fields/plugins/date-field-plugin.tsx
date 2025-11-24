@@ -10,34 +10,30 @@ import { format, parse, DEFAULT_DATE_DISPLAY_FORMAT, DEFAULT_TIME_DISPLAY_FORMAT
 // @ts-ignore importing css is not recognized
 import type { Field } from '../../forms';
 import { DateTimePicker } from '../../components/ui/date-time-picker';
-import { getTime } from 'date-fns';
 
 export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
-  ({ input, field: { dateFormat, timeFormat, ...rest } }) => {
+  ({ input, field: { dateFormat, timeFormat, onChange,  ...rest} }) => {
 
-    const granularity = timeFormat === false ? 'day' : 'minute';
+    const granularity = timeFormat?  'minute' : 'day';
 
     const inputRef = React.useRef(null);
+
     React.useEffect(() => {
-      console.log('focusing date field', rest.experimental_focusIntent);
-      console.log("ref", inputRef.current);
       if (inputRef.current && rest.experimental_focusIntent) {
         inputRef.current.focus();
+        inputRef.current.open();
       }
     }, [rest]);
 
     const getTimeFormat = useCallback(()=> {
-
       if(timeFormat === false)
       {
         return
       }
-
       if(timeFormat === true)
       {
         return DEFAULT_TIME_DISPLAY_FORMAT
       }
-      
       return timeFormat;
     }, [timeFormat]);
 
@@ -55,14 +51,12 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
       <DateTimePicker 
         ref={inputRef}
         granularity={granularity} 
-        onChange={(value)=> {
-        
-          input.onChange(value.toISOString());}}
+        onChange={(value)=> input.onChange(value.toISOString())}
         timeFormat={getTimeFormat()} 
         hourCycle={12} 
         dateFormat={getDateFormat()} 
-        // {...rest}
         value={date}
+        {...rest}
         
         />
         </React.Fragment>

@@ -712,8 +712,8 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
     ref,
   ) => {
     const [month, setMonth] = React.useState<Date>(value ?? defaultPopupValue);
+    const [open, setOpen] = React.useState<boolean>(false);
     const buttonRef = useRef<HTMLInputElement>(null);
-    console.log("value", value);
     const [displayDate, setDisplayDate] = React.useState<Date | undefined>(value ?? undefined);
     onMonthChange ||= onChange;
 
@@ -730,15 +730,21 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
      * instead of resetting to 00:00
      */
     const handleMonthChange = (newDay: Date | undefined) => {
+      
+
+      console.log("handle month change", {newDay, defaultPopupValue, month});
       if (!newDay) {
+        console.log("no new day");
         return;
       }
       if (!defaultPopupValue) {
+        console.log("no default popup value");
         newDay.setHours(month?.getHours() ?? 0, month?.getMinutes() ?? 0, month?.getSeconds() ?? 0);
         onMonthChange?.(newDay);
         setMonth(newDay);
         return;
       }
+    
       const diff = newDay.getTime() - defaultPopupValue.getTime();
       const diffInDays = diff / (1000 * 60 * 60 * 24);
       const newDateFull = add(defaultPopupValue, { days: Math.ceil(diffInDays) });
@@ -747,7 +753,6 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
         month?.getMinutes() ?? 0,
         month?.getSeconds() ?? 0,
       );
-      onMonthChange?.(newDateFull);
       setMonth(newDateFull);
     };
 
@@ -767,6 +772,7 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
       () => ({
         ...buttonRef.current,
         focus: ()=> buttonRef.current?.focus(),
+        open: ()=> setOpen(true),
         value: displayDate,
       }),
       [displayDate],
@@ -787,7 +793,7 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
 
 
       
-      <Popover  >
+      <Popover open={open} onOpenChange={setOpen}> 
         <PopoverTrigger asChild disabled={disabled}>
           <BaseTextField className='text-left' ref={buttonRef} value={displayDate? formatCurrentDate({dateFormat, displayDate, }): placeholder} />
         </PopoverTrigger>
