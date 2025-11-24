@@ -922,7 +922,7 @@ export class Builder {
     })
     const others = []
     for (const c of Object.keys(
-      this.tinaSchema.findReferences(collection.name)
+      this.tinaSchema.findReferencesFromCollection(collection.name)
     )) {
       const refCollection = this.tinaSchema.getCollection(c)
       if (!refCollection) {
