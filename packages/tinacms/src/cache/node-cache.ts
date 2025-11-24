@@ -29,18 +29,18 @@ export const makeCacheDir = async (
 
 export const NodeCache = async (dir: string): Promise<Cache> => {
   // TODO: These will need to be changed from using require to import when we eventually move to ESM
-  const fs = require('node:fs');
-  const path = require('node:path');
-  const os = require('node:os');
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  const os = await import('node:os');
 
-  const { createHash } = require('node:crypto');
+  const crypto = await import('node:crypto');
   const cacheDir = await makeCacheDir(dir, fs, path, os);
 
   return {
     makeKey: (key: any) => {
       const input =
         key && key instanceof Object ? JSON.stringify(key) : key || '';
-      return createHash('sha256').update(input).digest('hex');
+      return crypto.createHash('sha256').update(input).digest('hex');
     },
     get: async (key: string) => {
       let readValue: object | undefined;

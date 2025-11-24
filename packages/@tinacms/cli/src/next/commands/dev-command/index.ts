@@ -102,13 +102,13 @@ export class DevCommand extends BaseCommand {
         const apiURL = await codegen.execute();
 
         if (!configManager.isUsingLegacyFolder) {
-          delete require.cache[configManager.generatedSchemaJSONPath];
-          delete require.cache[configManager.generatedLookupJSONPath];
-          delete require.cache[configManager.generatedGraphQLJSONPath];
-
-          const schemaObject = require(configManager.generatedSchemaJSONPath);
-          const lookupObject = require(configManager.generatedLookupJSONPath);
-          const graphqlSchemaObject = require(
+          const schemaObject = await fs.readJSON(
+            configManager.generatedSchemaJSONPath
+          );
+          const lookupObject = await fs.readJSON(
+            configManager.generatedLookupJSONPath
+          );
+          const graphqlSchemaObject = await fs.readJSON(
             configManager.generatedGraphQLJSONPath
           );
 

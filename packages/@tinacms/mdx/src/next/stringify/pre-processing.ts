@@ -68,7 +68,7 @@ export const blockElement = (
           onlyChild &&
           // Slate text nodes don't get a `type` property for text nodes
           (onlyChild.type === 'text' || !onlyChild.type) &&
-          onlyChild.text === ''
+          (onlyChild as { text: string }).text === ''
         ) {
           return null;
         }
