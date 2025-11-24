@@ -46,6 +46,38 @@ export class Builder {
   private maxDepth: number;
   public tinaSchema: TinaSchema;
   public lookupMap: Record<string, LookupMapType>;
+  
+  private collectionHasReferenceFields(collection: Collection<true>) {
+    if (!collection.fields) {
+      return false
+    }
+    for (const field of collection.fields) {
+      if (field.type === 'reference') {
+        return true
+      } else if (field.type === 'object') {
+        if (this.fieldHasReferenceFields(field)) {
+          return true
+        }
+      }
+    }
+    return false
+  }
+
+  private fieldHasReferenceFields(field: TinaField) {
+    if (field.type === 'object' && field.fields) {
+      for (const subField of field.fields) {
+        if (subField.type === 'reference') {
+          return true
+        } else if (subField.type === 'object') {
+          if (this.fieldHasReferenceFields(subField)) {
+            return true
+          }
+        }
+      }
+    }
+    return false
+  }
+  
   constructor(
     public config: {
       tinaSchema: TinaSchema;
@@ -928,18 +960,23 @@ export class Builder {
       if (!refCollection) {
         throw new Error(`Collection ${c} not found`)
       }
-      const refTypeName = NAMER.reverseReferenceConnectionType(
-        refCollection.namespace
-      )
-      // add a list of references
-      others.push(
-        astBuilder.FieldDefinition({
-          name: refCollection.name,
-          required: false,
-          type: refTypeName,
-          list: false,
-        })
-      )
+      
+      // Only add reverse reference fields for collections that have reference fields
+      // (and thus have their reverse connection types generated)
+      if (this.collectionHasReferenceFields(refCollection)) {
+        const refTypeName = NAMER.reverseReferenceConnectionType(
+          refCollection.namespace
+        )
+        // add a list of references
+        others.push(
+          astBuilder.FieldDefinition({
+            name: refCollection.name,
+            required: false,
+            type: refTypeName,
+            list: false,
+          })
+        )
+      }
     }
     return astBuilder.ObjectTypeDefinition({
       name: documentTypeName + suffix,
