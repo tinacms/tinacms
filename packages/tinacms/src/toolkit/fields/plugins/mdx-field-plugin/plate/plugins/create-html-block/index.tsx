@@ -43,6 +43,7 @@ export const createBlockquoteEnterBreakPlugin = createPlatePlugin({
       if (!cursorPosition) return;
 
       editor.tf.insertNodes(
+        
         [
           { type: ELEMENT_BREAK, children: [{ text: '' }] },
           { type: 'text', text: '' },
