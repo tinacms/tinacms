@@ -1,37 +1,56 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useEffect, useState, useRef } from 'react';
 import { type InputProps, textFieldClasses } from '../components';
 import { wrapFieldsWithMeta } from './wrap-field-with-meta';
 // we might be able to go back to react-datetime when https://github.com/arqex/react-datetime/pull/813 is merged
 import ReactDatetime from '../../react-datetime/DateTime';
 import type { DatetimepickerProps } from 'react-datetime';
-import { format, parse, DEFAULT_DATE_DISPLAY_FORMAT } from './date-format';
+import { format, parse, DEFAULT_DATE_DISPLAY_FORMAT, DEFAULT_TIME_DISPLAY_FORMAT } from './date-format';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore importing css is not recognized
 import type { Field } from '../../forms';
 import { DateTimePicker } from '../../components/ui/date-time-picker';
+import { getTime } from 'date-fns';
 
 export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
   ({ input, field: { dateFormat, timeFormat, ...rest } }) => {
-    console.log("rest",rest);
 
+    const granularity = timeFormat === false ? 'day' : 'minute';
 
-    if(typeof dateFormat === 'boolean')
-    {
-      throw new Error("dateFormat cannot be a boolean");
-    }
-    if(typeof timeFormat === 'boolean')
-      {throw new Error("timeFormat cannot be a boolean");}
+    const getTimeFormat = useCallback(()=> {
+      if(timeFormat === true)
+      {
+        return DEFAULT_TIME_DISPLAY_FORMAT
+      }
+      if(timeFormat === false)
+      {
+        return
+      }
+      return timeFormat;
+    }, [timeFormat]);
+
+    const getDateFormat = useCallback(()=> {
+      if(dateFormat === true)
+      {
+        return DEFAULT_DATE_DISPLAY_FORMAT 
+      }
+      if(dateFormat === false)
+      {
+        return
+      }
+      return dateFormat;
+    }, [dateFormat]);
 
     const date = new Date(input.value)  
     
     return (
       <DateTimePicker 
-        granularity='minute' 
+        granularity={granularity} 
         onChange={input.onChange}
-        timeFormat={timeFormat} 
+        timeFormat={getTimeFormat()} 
         hourCycle={12} 
-        dateFormat={dateFormat} 
+        dateFormat={getDateFormat()} 
+        {...rest}
         value={date} />
     )
   }

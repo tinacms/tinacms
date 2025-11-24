@@ -772,6 +772,25 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
       };
     }
 
+
+    const formatCurrentDate = React.useCallback((displayDate)=> {
+
+      if(!dateFormat && !timeFormat) {
+        throw new Error('DateTimePicker must have at least one of dateFormat or timeFormat defined');
+      }
+      
+      if(!timeFormat) {
+        return format(displayDate, dateFormat);
+      }
+
+      if(!dateFormat) {
+        return format(displayDate, timeFormat);
+      }
+
+      return `${format(displayDate, dateFormat)} ${format(displayDate, timeFormat)}`;
+      
+    }, [timeFormat, dateFormat, granularity]);
+
   
 
     return (
@@ -787,7 +806,7 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
             ref={buttonRef}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            <span>{displayDate? `${format(displayDate, dateFormat)} ${format(displayDate, timeFormat)}`: placeholder}</span>
+            <span>{displayDate? formatCurrentDate(displayDate): placeholder}</span>
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0">
