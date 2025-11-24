@@ -20,7 +20,7 @@ import {
 
 import GetCMS from './components/GetCMS';
 import Layout from './components/Layout';
-import Sidebar from './components/Sidebar';
+import { AdminNav } from './components/AdminNav';
 
 import CollectionCreatePage from './pages/CollectionCreatePage';
 import CollectionDuplicatePage from './pages/CollectionDuplicatePage';
@@ -351,7 +351,7 @@ const DefaultWrapper = ({
     <Layout>
       <NavProvider defaultOpen={false}>
         <div className='flex items-stretch h-dvh overflow-hidden'>
-          <Sidebar cms={cms} />
+          <AdminNav cms={cms} />
           <div className='w-full relative'>{children}</div>
         </div>
       </NavProvider>
