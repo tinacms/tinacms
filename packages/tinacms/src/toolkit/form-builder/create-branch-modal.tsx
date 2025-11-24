@@ -43,7 +43,10 @@ const pathRelativeToCollection = (
 };
 
 // Format the default branch name by removing content/ prefix and file extension
-const formatDefaultBranchName = (filePath: string, crudType: string): string => {
+const formatDefaultBranchName = (
+  filePath: string,
+  crudType: string
+): string => {
   let result = filePath;
 
   const contentPrefix = 'content/';
