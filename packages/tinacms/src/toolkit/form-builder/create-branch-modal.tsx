@@ -43,7 +43,7 @@ const pathRelativeToCollection = (
 };
 
 // Format the default branch name by removing content/ prefix and file extension
-const formatDefaultBranchName = (filePath: string): string => {
+const formatDefaultBranchName = (filePath: string, crudType: string): string => {
   let result = filePath;
 
   const contentPrefix = 'content/';
@@ -57,6 +57,11 @@ const formatDefaultBranchName = (filePath: string): string => {
   const lastSlash = Math.max(result.lastIndexOf('/'), result.lastIndexOf('\\'));
   if (lastDot > lastSlash && lastDot > 0) {
     result = result.slice(0, lastDot);
+  }
+
+  // Add deletion indicator for delete operations
+  if (crudType === 'delete') {
+    result = `❌-${result}`;
   }
 
   return result;
@@ -80,7 +85,7 @@ export const CreateBranchModal = ({
   const { setCurrentBranch } = useBranchData();
   const [disabled, setDisabled] = React.useState(false);
   const [newBranchName, setNewBranchName] = React.useState(
-    formatDefaultBranchName(path)
+    formatDefaultBranchName(path, crudType)
   );
   const [isExecuting, setIsExecuting] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState('');
