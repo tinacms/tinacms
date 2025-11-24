@@ -782,15 +782,19 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
         formatLong,
       };
     }
-    console.log({dateFormat, timeFormat, displayDate});
 
     return (
-      <Popover>
-        <PopoverTrigger asChild disabled={disabled}>
 
+
+      
+      <Popover  >
+        <PopoverTrigger asChild disabled={disabled}>
           <BaseTextField className='text-left' ref={buttonRef} value={displayDate? formatCurrentDate({dateFormat, displayDate, }): placeholder} />
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0">
+        
+        <PopoverContent 
+        
+          align='start' className="w-auto p-0">
           <Calendar
             mode="single"
             selected={displayDate}
