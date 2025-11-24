@@ -18,40 +18,43 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
     const granularity = timeFormat === false ? 'day' : 'minute';
 
     const getTimeFormat = useCallback(()=> {
-      if(timeFormat === true)
-      {
-        return DEFAULT_TIME_DISPLAY_FORMAT
-      }
+
       if(timeFormat === false)
       {
         return
       }
+
+      if(timeFormat === true)
+      {
+        return DEFAULT_TIME_DISPLAY_FORMAT
+      }
+      
       return timeFormat;
     }, [timeFormat]);
 
     const getDateFormat = useCallback(()=> {
-      if(dateFormat === true)
+      if(dateFormat === true || typeof dateFormat !== 'string')
       {
         return DEFAULT_DATE_DISPLAY_FORMAT 
-      }
-      if(dateFormat === false)
-      {
-        return
       }
       return dateFormat;
     }, [dateFormat]);
 
-    const date = new Date(input.value)  
+    const date = input.value ? new Date(input.value) : input.value;
     
     return (
       <DateTimePicker 
         granularity={granularity} 
-        onChange={input.onChange}
+        onChange={(value)=> {
+        
+          input.onChange(value.toISOString());}}
         timeFormat={getTimeFormat()} 
         hourCycle={12} 
         dateFormat={getDateFormat()} 
-        {...rest}
-        value={date} />
+        // {...rest}
+        value={date}
+        
+        />
     )
   }
 );

@@ -15,6 +15,7 @@ import { DayPicker, DayPickerProps } from 'react-day-picker';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
 import { cn } from '../../../utils/cn';
 import { time } from 'console';
+import { date } from 'zod';
 
 // ---------- utils start ----------
 /**
@@ -220,6 +221,23 @@ function genYears(yearRange = 50) {
     value: today.getFullYear() - yearRange + i,
     label: (today.getFullYear() - yearRange + i).toString(),
   }));
+}
+
+
+const formatCurrentDate = ({dateFormat, timeFormat, displayDate}: {dateFormat?: string, timeFormat?: string, displayDate: Date})=> {
+  if(!dateFormat && !timeFormat) {
+        throw new Error('DateTimePicker must have at least one of dateFormat or timeFormat defined');
+      }
+      console.log({timeFormat, dateFormat});
+      
+      if(!timeFormat) {
+        return format(displayDate, dateFormat);
+      }
+
+      if(!dateFormat) {
+        return format(displayDate, timeFormat);
+      }
+      return `${format(displayDate, dateFormat)} ${format(displayDate, timeFormat)}`;
 }
 
 // ---------- utils end ----------
@@ -696,6 +714,7 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
   ) => {
     const [month, setMonth] = React.useState<Date>(value ?? defaultPopupValue);
     const buttonRef = useRef<HTMLButtonElement>(null);
+    console.log("value", value);
     const [displayDate, setDisplayDate] = React.useState<Date | undefined>(value ?? undefined);
     onMonthChange ||= onChange;
 
@@ -737,6 +756,8 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
       if (!newDay) {
         return;
       }
+      
+      console.log("new day", newDay);
       onChange?.(newDay);
       setMonth(newDay);
       setDisplayDate(newDay);
@@ -751,16 +772,6 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
       [displayDate],
     );
 
-
-    const initHourFormat = {
-      hour24:
-        displayFormat?.hour24 ??
-        `PPP HH:mm${!granularity || granularity === 'second' ? ':ss' : ''}`,
-      hour12:
-        displayFormat?.hour12 ??
-        `PP hh:mm${!granularity || granularity === 'second' ? ':ss' : ''} b`,
-    };
-
     let loc = enUS;
     const { options, localize, formatLong } = locale;
     if (options && localize && formatLong) {
@@ -771,27 +782,7 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
         formatLong,
       };
     }
-
-
-    const formatCurrentDate = React.useCallback((displayDate)=> {
-
-      if(!dateFormat && !timeFormat) {
-        throw new Error('DateTimePicker must have at least one of dateFormat or timeFormat defined');
-      }
-      
-      if(!timeFormat) {
-        return format(displayDate, dateFormat);
-      }
-
-      if(!dateFormat) {
-        return format(displayDate, timeFormat);
-      }
-
-      return `${format(displayDate, dateFormat)} ${format(displayDate, timeFormat)}`;
-      
-    }, [timeFormat, dateFormat, granularity]);
-
-  
+    console.log({dateFormat, timeFormat, displayDate});
 
     return (
       <Popover>
@@ -806,7 +797,7 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
             ref={buttonRef}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            <span>{displayDate? formatCurrentDate(displayDate): placeholder}</span>
+            <span>{displayDate? formatCurrentDate({dateFormat, displayDate, timeFormat}): placeholder}</span>
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0">
@@ -854,9 +845,9 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
 DateTimePicker.displayName = 'DateTimePicker';
 
 const format = (date: Date, format: string)=> {
-  const m = moment(date).tz(moment.tz.guess());
+  const m = moment(date);
   return m.format(format);
 };
 
-export { DateTimePicker, TimePickerInput, TimePicker };
+export { DateTimePicker, TimePickerInput, TimePicker , formatCurrentDate};
 export type { TimePickerType, DateTimePickerProps, DateTimePickerRef };
