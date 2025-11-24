@@ -1,5 +1,33 @@
 # tinacms-cli
 
+## 1.12.5
+
+### Patch Changes
+
+- [#6147](https://github.com/tinacms/tinacms/pull/6147) [`38920ce`](https://github.com/tinacms/tinacms/commit/38920ce29a9b63c54b04f39537f19beab62d2c86) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Fix: ui.max not applying to primitive type list:true
+
+- [#6145](https://github.com/tinacms/tinacms/pull/6145) [`d1bd1a1`](https://github.com/tinacms/tinacms/commit/d1bd1a1312fa910e237ec06608e7c11830c78346) Thanks [@18-th](https://github.com/18-th)! - Remove Lodash and replace usages with either native functions or es-toolkit equivalents
+  Removed the following lodash usages:
+
+  - debounce - was not used, removed the reference
+  - camelcase - unused, removed the reference
+  - upperfirst - unused, removed the reference
+  - flatten - replaced by native .flat()
+  - get - replaced with an existing implementation from the GraphQL package
+  - cloneDeep - replaced with cloneDeep from es-toolkit
+  - set - replaced with es-toolkit compat version. That implementation is identical to the one used by lodash
+  - uniqBy - replace with es-toolkit version. That implementation is identical to the one used by lodash
+
+- [#5822](https://github.com/tinacms/tinacms/pull/5822) [`4b824be`](https://github.com/tinacms/tinacms/commit/4b824be53572f9231753ebd3b5f14fd778fd73d6) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Migrate from react-beautiful-dnd to dnd-kit to fix deprecation error.
+
+- Updated dependencies [[`f2577b9`](https://github.com/tinacms/tinacms/commit/f2577b911a97ecc1c3f53a98ae8218cc33bc9867), [`3ffa092`](https://github.com/tinacms/tinacms/commit/3ffa0929e4964f17d5ffa05e0d4cbbff5d9ef4d9), [`38920ce`](https://github.com/tinacms/tinacms/commit/38920ce29a9b63c54b04f39537f19beab62d2c86), [`d1bd1a1`](https://github.com/tinacms/tinacms/commit/d1bd1a1312fa910e237ec06608e7c11830c78346), [`67e1a3d`](https://github.com/tinacms/tinacms/commit/67e1a3d4c52e0acdab0a8dc53956e39f2e3075fa), [`9fb1402`](https://github.com/tinacms/tinacms/commit/9fb1402491f52d16e763c875ee550f7d879c83c8), [`3fa1098`](https://github.com/tinacms/tinacms/commit/3fa109849f552406dd0059041afe0bf09edadb25), [`ccab7a5`](https://github.com/tinacms/tinacms/commit/ccab7a5d0fd1f4167e8f72306e9d32e8750ed9bf), [`4b824be`](https://github.com/tinacms/tinacms/commit/4b824be53572f9231753ebd3b5f14fd778fd73d6), [`d9487bf`](https://github.com/tinacms/tinacms/commit/d9487bff276ba20a84b76944c5a7a333666f4984)]:
+  - @tinacms/schema-tools@1.10.0
+  - tinacms@2.10.0
+  - @tinacms/graphql@1.6.2
+  - @tinacms/app@2.3.10
+  - @tinacms/search@1.1.2
+  - @tinacms/metrics@1.1.0
+
 ## 1.12.4
 
 ### Patch Changes
