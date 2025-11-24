@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 import { buildASTSchema, printSchema } from 'graphql';
-import type { TypeDefinitionNode, GraphQLSchema, DocumentNode } from 'graphql';
+import type { GraphQLSchema, DocumentNode } from 'graphql';
 import { generateTypes } from './codegen';
 import { transform } from 'esbuild';
 import { ConfigManager } from '../config-manager';
