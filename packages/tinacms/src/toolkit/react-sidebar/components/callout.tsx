@@ -11,13 +11,13 @@ export const Callout = ({
   children?: React.ReactNode;
   calloutStyle?: 'warning' | 'info' | 'success' | 'error';
 } & React.HTMLProps<HTMLDivElement>) => {
-  const commonAlertStyles = 'text-sm px-4 py-3 rounded-md border';
+  const commonAlertStyles = 'text-sm px-4 py-3 rounded-md border-2';
 
   const styles = {
-    warning: `text-amber-700 bg-amber-100 border-amber-700/20`,
-    info: `text-blue-600 bg-blue-100/50 border-blue-600/20`,
-    success: `text-green-600 bg-green-100/50 border-green-600/20`,
-    error: `text-red-600 bg-red-100/50 border-red-600/20`,
+    warning: `text-black bg-amber-100 border-amber-700/20`,
+    info: `text-black bg-blue-100/50 border-blue-600/20`,
+    success: `text-black bg-green-100/50 border-green-600/20`,
+    error: `text-black bg-red-100/50 border-red-600/20`,
   };
 
   const icon = {
