@@ -7,7 +7,7 @@
 		"examples/*",
 		"experimental-examples/*",
 		"packages/[^@]*"
-	],
+	], 
 	"scripts": {
 		"dev": "pnpm watch",
 		"watch": "pnpm run build && pnpm --filter=\"./packages/@tinacms/scripts\" run watch",
