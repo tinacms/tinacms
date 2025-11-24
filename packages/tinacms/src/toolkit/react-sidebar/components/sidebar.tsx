@@ -16,6 +16,7 @@ import { PiSidebarSimpleLight } from 'react-icons/pi';
 import type { SidebarState, SidebarStateOptions } from '../sidebar';
 import { BillingWarning, LocalWarning } from './local-warning';
 import { Nav } from './nav';
+import { NavProvider } from './nav-context';
 import { ResizeHandle } from './resize-handle';
 import { FormsView } from './sidebar-body';
 import { TinaIcon } from '@toolkit/icons';
@@ -255,75 +256,46 @@ const Sidebar = ({
           </SidebarBody>
           <ResizeHandle />
         </SidebarWrapper>
-        <Transition show={menuIsOpen} as='div'>
-          <TransitionChild
-            enter='transform transition-all ease-out duration-300'
-            enterFrom='opacity-0 -translate-x-full'
-            enterTo='opacity-100 translate-x-0'
-            leave='transform transition-all ease-in duration-200'
-            leaveFrom='opacity-100 translate-x-0'
-            leaveTo='opacity-0 -translate-x-full'
-          >
-            <div className='fixed left-0 top-0 z-overlay h-full transform'>
-              <Nav
-                isLocalMode={cms.api?.tina?.isLocalMode}
-                menuIsOpen
-                toggleMenu={toggleMenu}
-                showCollections={isTinaAdminEnabled}
-                collectionsInfo={collectionsInfo}
-                screens={activeScreens}
-                cloudConfigs={allConfigs}
-                contentCreators={contentCreators}
-                sidebarWidth={sidebarWidth}
-                RenderNavSite={({ view }) => (
-                  <SidebarSiteLink
-                    view={view}
-                    onClick={() => {
-                      setActiveView(view);
-                      setMenuIsOpen(false);
-                    }}
-                  />
-                )}
-                RenderNavCloud={({ config }) => (
-                  <SidebarCloudLink config={config} />
-                )}
-                RenderNavCollection={({ collection }) => (
-                  <SidebarCollectionLink
-                    onClick={() => {
-                      setMenuIsOpen(false);
-                    }}
-                    collection={collection}
-                  />
-                )}
-                AuthRenderNavCollection={({ collection }) => (
-                  <SidebarCollectionLink
-                    onClick={() => {
-                      setMenuIsOpen(false);
-                    }}
-                    collection={collection}
-                    Icon={ImUsers}
-                  />
-                )}
-              ></Nav>
-            </div>
-          </TransitionChild>
-          <TransitionChild
-            enter='ease-out duration-300'
-            enterFrom='opacity-0'
-            enterTo='opacity-80'
-            entered='opacity-80'
-            leave='ease-in duration-200'
-            leaveFrom='opacity-80'
-            leaveTo='opacity-0'
-          >
-            <div
-              onClick={() => {
-                setMenuIsOpen(false);
-              }}
-              className='fixed z-menu inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black'
-            />
-          </TransitionChild>
-        </Transition>
+        <NavProvider isOpen={menuIsOpen} onToggle={toggleMenu}>
+          <Nav
+            isLocalMode={cms.api?.tina?.isLocalMode}
+            showCollections={isTinaAdminEnabled}
+            collectionsInfo={collectionsInfo}
+            screens={activeScreens}
+            cloudConfigs={allConfigs}
+            contentCreators={contentCreators}
+            sidebarWidth={sidebarWidth}
+            RenderNavSite={({ view }) => (
+              <SidebarSiteLink
+                view={view}
+                onClick={() => {
+                  setActiveView(view);
+                  setMenuIsOpen(false);
+                }}
+              />
+            )}
+            RenderNavCloud={({ config }) => (
+              <SidebarCloudLink config={config} />
+            )}
+            RenderNavCollection={({ collection }) => (
+              <SidebarCollectionLink
+                onClick={() => {
+                  setMenuIsOpen(false);
+                }}
+                collection={collection}
+              />
+            )}
+            AuthRenderNavCollection={({ collection }) => (
+              <SidebarCollectionLink
+                onClick={() => {
+                  setMenuIsOpen(false);
+                }}
+                collection={collection}
+                Icon={ImUsers}
+              />
+            )}
+          />
+        </NavProvider>
       </>
     </SidebarContext.Provider>
   );

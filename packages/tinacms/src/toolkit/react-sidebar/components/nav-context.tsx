@@ -19,17 +19,38 @@ export function useNavContext() {
 interface NavProviderProps {
   children: React.ReactNode;
   defaultOpen?: boolean;
+  isOpen?: boolean;
+  onToggle?: () => void;
 }
 
 export function NavProvider({
   children,
   defaultOpen = false,
+  isOpen: controlledIsOpen,
+  onToggle,
 }: NavProviderProps) {
-  const [isOpen, setIsOpen] = React.useState(defaultOpen);
+  const [internalIsOpen, setInternalIsOpen] = React.useState(defaultOpen);
+
+  // Use controlled state if provided, otherwise use internal state
+  const isOpen =
+    controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
 
   const toggleNav = React.useCallback(() => {
-    setIsOpen((prev) => !prev);
-  }, []);
+    if (onToggle) {
+      onToggle();
+    } else {
+      setInternalIsOpen((prev) => !prev);
+    }
+  }, [onToggle]);
+
+  const setIsOpen = React.useCallback(
+    (value: boolean) => {
+      if (controlledIsOpen === undefined) {
+        setInternalIsOpen(value);
+      }
+    },
+    [controlledIsOpen]
+  );
 
   const value = React.useMemo(
     () => ({
@@ -37,7 +58,7 @@ export function NavProvider({
       toggleNav,
       setIsOpen,
     }),
-    [isOpen, toggleNav]
+    [isOpen, toggleNav, setIsOpen]
   );
 
   return <NavContext.Provider value={value}>{children}</NavContext.Provider>;
