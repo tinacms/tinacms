@@ -2,10 +2,15 @@
 
 */
 
-import { print, type OperationDefinitionNode } from 'graphql';
-import type { TinaSchema, Config } from '@tinacms/schema-tools';
-import type { FragmentDefinitionNode, FieldDefinitionNode } from 'graphql';
-import uniqBy from 'lodash.uniqby';
+import { print, type OperationDefinitionNode } from 'graphql'
+import type {
+  TinaSchema,
+  Config,
+  Collection,
+  TinaField,
+} from '@tinacms/schema-tools'
+import type { FragmentDefinitionNode, FieldDefinitionNode } from 'graphql'
+import uniqBy from 'lodash.uniqby'
 
 import { astBuilder, NAMER } from './ast-builder';
 import { sequential } from './util';
@@ -201,8 +206,13 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
     );
     queryTypeDefinitionFields.push(
       await builder.collectionDocumentList(collection)
-    );
-  });
+    )
+    if (collectionHasReferenceFields(collection)) {
+      queryTypeDefinitionFields.push(
+        await builder.reverseCollectionDocumentList(collection)
+      )
+    }
+  })
 
   definitions.push(
     astBuilder.ObjectTypeDefinition({
@@ -224,5 +234,37 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
       extractInlineTypes(definitions),
       (node) => node.name.value
     ),
-  };
-};
+  }
+}
+
+function collectionHasReferenceFields(collection: Collection<true>) {
+  if (!collection.fields) {
+    return false
+  }
+  for (const field of collection.fields) {
+    if (field.type === 'reference') {
+      return true
+    } else if (field.type === 'object') {
+      if (fieldHasReferenceFields(field)) {
+        return true
+      }
+    }
+  }
+  return false
+}
+
+function fieldHasReferenceFields(field: TinaField) {
+  if (field.type === 'object' && field.fields) {
+    for (const subField of field.fields) {
+      if (subField.type === 'reference') {
+        return true
+      } else if (subField.type === 'object') {
+        if (fieldHasReferenceFields(subField)) {
+          return true
+        }
+      }
+    }
+  }
+
+  return false
+}

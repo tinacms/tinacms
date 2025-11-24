@@ -17,6 +17,10 @@
         "label": "About"
       },
       {
+        "href": "authors",
+        "label": "Authors"
+      },
+      {
         "href": "posts",
         "label": "Blog"
       }

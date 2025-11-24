@@ -46,6 +46,38 @@ export class Builder {
   private maxDepth: number;
   public tinaSchema: TinaSchema;
   public lookupMap: Record<string, LookupMapType>;
+  
+  private collectionHasReferenceFields(collection: Collection<true>) {
+    if (!collection.fields) {
+      return false
+    }
+    for (const field of collection.fields) {
+      if (field.type === 'reference') {
+        return true
+      } else if (field.type === 'object') {
+        if (this.fieldHasReferenceFields(field)) {
+          return true
+        }
+      }
+    }
+    return false
+  }
+
+  private fieldHasReferenceFields(field: TinaField) {
+    if (field.type === 'object' && field.fields) {
+      for (const subField of field.fields) {
+        if (subField.type === 'reference') {
+          return true
+        } else if (subField.type === 'object') {
+          if (this.fieldHasReferenceFields(subField)) {
+            return true
+          }
+        }
+      }
+    }
+    return false
+  }
+  
   constructor(
     public config: {
       tinaSchema: TinaSchema;
@@ -849,6 +881,27 @@ export class Builder {
     });
   };
 
+  public reverseCollectionDocumentList = async (
+    collection: Collection<true>
+  ) => {
+    const connectionName = NAMER.reverseReferenceConnectionType(
+      collection.namespace
+    )
+
+    this.addToLookupMap({
+      type: connectionName,
+      resolveType: 'reverseCollectionDocumentList' as const,
+      collection: collection.name,
+    })
+    return this._connectionFieldBuilder({
+      fieldName: NAMER.generateReverseQueryListName(collection.namespace),
+      connectionName,
+      nodeType: NAMER.documentTypeName(collection.namespace),
+      namespace: collection.namespace,
+      collection,
+    })
+  }
+
   /**
    * GraphQL type definitions which remain unchanged regardless
    * of the supplied Tina schema. Ex. "node" interface
@@ -897,8 +950,34 @@ export class Builder {
     }
     const fields = templateInfo.template.fields;
     const templateFields = await sequential(fields, async (field) => {
-      return this._buildDataField(field);
-    });
+      return this._buildDataField(field)
+    })
+    const others = []
+    for (const c of Object.keys(
+      this.tinaSchema.findReferencesFromCollection(collection.name)
+    )) {
+      const refCollection = this.tinaSchema.getCollection(c)
+      if (!refCollection) {
+        throw new Error(`Collection ${c} not found`)
+      }
+      
+      // Only add reverse reference fields for collections that have reference fields
+      // (and thus have their reverse connection types generated)
+      if (this.collectionHasReferenceFields(refCollection)) {
+        const refTypeName = NAMER.reverseReferenceConnectionType(
+          refCollection.namespace
+        )
+        // add a list of references
+        others.push(
+          astBuilder.FieldDefinition({
+            name: refCollection.name,
+            required: false,
+            type: refTypeName,
+            list: false,
+          })
+        )
+      }
+    }
     return astBuilder.ObjectTypeDefinition({
       name: documentTypeName + suffix,
       interfaces: [
@@ -913,6 +992,7 @@ export class Builder {
           required: true,
           type: astBuilder.TYPES.ID,
         }),
+        ...others,
         astBuilder.FieldDefinition({
           name: '_sys',
           required: true,

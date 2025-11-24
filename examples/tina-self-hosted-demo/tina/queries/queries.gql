@@ -38,3 +38,23 @@ query blogPostQuery($relativePath: String!) {
     }
   }
 }
+
+query authorQuery($relativePath: String!) {
+  ...LayoutQueryFragment
+  author(relativePath: $relativePath) {
+    ...AuthorParts
+    post {
+      edges {
+        node {
+          id
+          title
+          excerpt
+          date
+          _sys {
+            filename
+          }
+        }
+      }
+    }
+  }
+}

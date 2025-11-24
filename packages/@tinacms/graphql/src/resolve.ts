@@ -355,7 +355,18 @@ export const resolve = async ({
               return resolver.resolveCollectionConnection({
                 args,
                 collection: tinaSchema.getCollection(lookup.collection),
-              });
+              })
+            case 'reverseCollectionDocumentList':
+              return resolver.resolveCollectionConnection({
+                args: {
+                  ...args,
+                  reverseRef: {
+                    id: source['id'],
+                    collection: source['_collection'],
+                  },
+                },
+                collection: tinaSchema.getCollection(lookup.collection),
+              })
             /**
              * A polymorphic data set, it can be from a document's data
              * of any nested object which can be one of many shapes

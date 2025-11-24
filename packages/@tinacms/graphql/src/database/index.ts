@@ -1516,6 +1516,7 @@ export type LookupMapType =
   | MultiCollectionDocumentLookup
   | MultiCollectionDocumentListLookup
   | CollectionDocumentListLookup
+  | ReverseCollectionDocumentListLookup
   | UnionDataLookup
   | NodeDocument;
 
@@ -1555,11 +1556,21 @@ export type CollectionDocumentListLookup = {
   collection: string;
 };
 type UnionDataLookup = {
-  type: string;
-  resolveType: 'unionData';
-  collection?: string;
-  typeMap: { [templateName: string]: string };
-};
+  type: string
+  resolveType: 'unionData'
+  collection?: string
+  typeMap: { [templateName: string]: string }
+}
+export type ReverseCollectionDocumentListLookup = {
+  type: string
+  resolveType: 'reverseCollectionDocumentList'
+  collection: string
+}
+
+
+
+
+
 
 const hashPasswordVisitor = async (node: any, path: string[]) => {
   const passwordValuePath = [...path, 'value'];
