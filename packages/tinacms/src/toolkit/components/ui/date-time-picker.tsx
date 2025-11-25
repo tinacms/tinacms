@@ -1,4 +1,4 @@
-import { Button, buttonVariants } from './button';
+import { buttonVariants } from './button';
 
 import { RotateCw } from 'lucide-react';
 import { Calendar as CalendarSVG, CalendarDays, CalendarCheck } from 'lucide-react';
@@ -6,19 +6,14 @@ import { Input } from './input';
 import { Popover, PopoverContent, PopoverTrigger } from './popover';
 import moment from 'moment';
 import 'moment-timezone';
-import { add,
-  Locale, 
-  set} from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import {  ChevronLeft, ChevronRight } from 'lucide-react';
 import { Clock } from 'lucide-react';
 import * as React from 'react';
 import { useImperativeHandle, useRef } from 'react';
-
 import { DayPicker, DayPickerProps } from 'react-day-picker';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
 import { cn } from '../../../utils/cn';
-import { BaseTextField } from '@toolkit/fields';
 
 // ---------- utils start ----------
 /**
@@ -211,7 +206,7 @@ function display12HourValue(hours: number) {
   return `0${hours % 12}`;
 }
 
-function genMonths(locale: Pick<Locale, 'options' | 'localize' | 'formatLong'>) {
+function genMonths() {
   return Array.from({ length: 12 }, (_, i) => ({
     value: i,
     label: format(new Date(2021, i), 'MMMM'),
@@ -268,7 +263,7 @@ function Calendar({
     if (options && localize && formatLong) {
       locale = { options, localize, formatLong };
     }
-    return genMonths(locale);
+    return genMonths();
   }, [localeOverride]);
 
   const YEARS = React.useMemo(() => genYears(yearRange), [yearRange]);
