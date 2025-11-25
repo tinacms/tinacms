@@ -223,10 +223,17 @@ export class DevCommand extends BaseCommand {
       );
     }
 
+    // Pass both searchIndex and fuzzySearchWrapper
+    const searchIndexWithFuzzy = searchIndexClient.searchIndex;
+    if (searchIndexClient.fuzzySearchWrapper) {
+      searchIndexWithFuzzy.fuzzySearchWrapper =
+        searchIndexClient.fuzzySearchWrapper;
+    }
+
     const server = await createDevServer(
       configManager,
       database,
-      searchIndexClient.searchIndex,
+      searchIndexWithFuzzy,
       apiURL,
       this.noWatch,
       dbLock

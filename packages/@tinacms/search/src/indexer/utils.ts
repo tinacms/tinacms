@@ -151,6 +151,11 @@ export const processDocumentForIndexing = (
 };
 
 const memo: Record<string, string[]> = {};
+
+// Words that are technically stopwords but are commonly used as document/page names
+// These should NOT be filtered out during search
+const PRESERVED_WORDS = ['about'];
+
 export const lookupStopwords = (
   keys?: string[],
   defaultStopWords: string[] = sw.eng
@@ -166,5 +171,6 @@ export const lookupStopwords = (
     }
     memo[keys.join(',')] = stopwords;
   }
-  return stopwords;
+  // Filter out preserved words that should remain searchable
+  return stopwords.filter((word) => !PRESERVED_WORDS.includes(word));
 };
