@@ -23,7 +23,7 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
         inputRef.current.focus();
         inputRef.current.open();
       }
-    }, [rest]);
+    }, [rest.experimental_focusIntent]);
 
     const getTimeFormat = useCallback(()=> {
       if(timeFormat === false)

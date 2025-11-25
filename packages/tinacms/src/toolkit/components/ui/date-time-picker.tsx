@@ -806,8 +806,8 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
                 onClick={
                   (e)=> {
                     e.stopPropagation();
-                    onChange?.(undefined)
                     setOpen(false);
+                    onChange?.(undefined) 
                   }
                 }
                 className='px-1 w-8 hover:text-blue-600 hover:text-inherit text-gray-200 flex items-center justify-center hover:bg-gray-50'
