@@ -51,7 +51,7 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
       <DateTimePicker 
         ref={inputRef}
         granularity={granularity} 
-        onChange={(value)=> input.onChange(value.toISOString())}
+        onChange={(value)=> input.onChange(value ? value.toISOString() :value)}
         timeFormat={getTimeFormat()} 
         hourCycle={12} 
         dateFormat={getDateFormat()} 
