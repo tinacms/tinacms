@@ -5,16 +5,20 @@ import { wrapFieldsWithMeta } from './wrap-field-with-meta';
 // we might be able to go back to react-datetime when https://github.com/arqex/react-datetime/pull/813 is merged
 import ReactDatetime from '../../react-datetime/DateTime';
 import type { DatetimepickerProps } from 'react-datetime';
-import { format, parse, DEFAULT_DATE_DISPLAY_FORMAT, DEFAULT_TIME_DISPLAY_FORMAT } from './date-format';
+import {
+  format,
+  parse,
+  DEFAULT_DATE_DISPLAY_FORMAT,
+  DEFAULT_TIME_DISPLAY_FORMAT,
+} from './date-format';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore importing css is not recognized
 import type { Field } from '../../forms';
 import { DateTimePicker } from '../../components/ui/date-time-picker';
 
 export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
-  ({ input, field: { dateFormat, timeFormat, onChange,  ...rest} }) => {
-
-    const granularity = timeFormat?  'minute' : 'day';
+  ({ input, field: { dateFormat, timeFormat, onChange, ...rest } }) => {
+    const granularity = timeFormat ? 'minute' : 'day';
 
     const inputRef = React.useRef(null);
 
@@ -25,22 +29,19 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
       }
     }, [rest.experimental_focusIntent]);
 
-    const getTimeFormat = useCallback(()=> {
-      if(timeFormat === false)
-      {
-        return
+    const getTimeFormat = useCallback(() => {
+      if (timeFormat === false) {
+        return;
       }
-      if(timeFormat === true)
-      {
-        return DEFAULT_TIME_DISPLAY_FORMAT
+      if (timeFormat === true) {
+        return DEFAULT_TIME_DISPLAY_FORMAT;
       }
       return timeFormat;
     }, [timeFormat]);
 
-    const getDateFormat = useCallback(()=> {
-      if(dateFormat === true || typeof dateFormat !== 'string')
-      {
-        return DEFAULT_DATE_DISPLAY_FORMAT 
+    const getDateFormat = useCallback(() => {
+      if (dateFormat === true || typeof dateFormat !== 'string') {
+        return DEFAULT_DATE_DISPLAY_FORMAT;
       }
       return dateFormat;
     }, [dateFormat]);
@@ -48,19 +49,20 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
     const date = input.value ? new Date(input.value) : input.value;
     return (
       <React.Fragment>
-      <DateTimePicker 
-        ref={inputRef}
-        granularity={granularity} 
-        onChange={(value)=> input.onChange(value ? value.toISOString() :value)}
-        timeFormat={getTimeFormat()} 
-        hourCycle={12} 
-        dateFormat={getDateFormat()} 
-        value={date}
-        {...rest}
-        
+        <DateTimePicker
+          ref={inputRef}
+          granularity={granularity}
+          onChange={(value) =>
+            input.onChange(value ? value.toISOString() : value)
+          }
+          timeFormat={getTimeFormat()}
+          hourCycle={12}
+          dateFormat={getDateFormat()}
+          value={date}
+          {...rest}
         />
-        </React.Fragment>
-    )
+      </React.Fragment>
+    );
   }
 );
 
@@ -106,7 +108,7 @@ export const ReactDateTimeWithStyles = (
   return (
     <>
       <div className='tina-date-field' ref={area}>
-        <ReactDatetime  {...props} isOpen={isOpen} />
+        <ReactDatetime {...props} isOpen={isOpen} />
       </div>
     </>
   );
