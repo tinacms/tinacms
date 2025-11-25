@@ -7,7 +7,8 @@ import { Popover, PopoverContent, PopoverTrigger } from './popover';
 import moment from 'moment';
 import 'moment-timezone';
 import { add,
-  Locale } from 'date-fns';
+  Locale, 
+  set} from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import {  ChevronLeft, ChevronRight } from 'lucide-react';
 import { Clock } from 'lucide-react';
@@ -231,17 +232,15 @@ const formatCurrentDate = ({dateFormat, timeFormat, displayDate}: {dateFormat?: 
       console.error("DateTimePicker: Missing date or time format");
       return "Error: Missing date or time format";
     }
+    
+    if(!timeFormat) {
+      return format(displayDate, dateFormat);
+    }
 
-      
-      
-      if(!timeFormat) {
-        return format(displayDate, dateFormat);
-      }
-
-      if(!dateFormat) {
-        return format(displayDate, timeFormat);
-      }
-      return `${format(displayDate, dateFormat)} ${format(displayDate, timeFormat)}`;
+    if(!dateFormat) {
+      return format(displayDate, timeFormat);
+    }
+    return `${format(displayDate, dateFormat)} ${format(displayDate, timeFormat)}`;
 }
 
 // ---------- utils end ----------
@@ -751,6 +750,16 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
       setMonth(newDateFull);
     };
 
+    console.log("defaultPopupValue", defaultPopupValue);
+
+    const handleClose = React.useCallback((isOpen : boolean) => {
+      if(!isOpen)
+      {
+        setMonth(value ?? defaultPopupValue);
+      }
+      setOpen(isOpen);
+    }, [defaultPopupValue, value]);
+
     const onSelect = (newDay?: Date) => {
       if (!newDay) {
         return;
@@ -784,7 +793,9 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
     }
 
     return (
-      <Popover open={open} onOpenChange={setOpen}> 
+      <Popover open={open} onOpenChange={(isOpen)=> {
+        handleClose(isOpen);
+        }}> 
         <PopoverTrigger asChild disabled={disabled}>
           <div ref={buttonRef} tabIndex={0} className='text-xs pointer overflow-hidden hover:text-gray-600 cursor-pointer rounded border border-gray-100 flex font-semibold shadow transition-colors bg-white text-gray-500'>
             <div className='my-auto group gap-0.5 flex w-full'>
@@ -805,8 +816,8 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
                 onClick={
                   (e)=> {
                     e.stopPropagation();
-                    setOpen(false);
                     onChange?.(undefined) 
+                    setOpen(false);
                   }
                 }
                 className='px-1 w-8 hover:text-blue-600 hover:text-inherit text-gray-200 flex items-center justify-center hover:bg-gray-50'
