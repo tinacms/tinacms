@@ -803,7 +803,7 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
                 </>
                 }
               </div>
-              <span className='my-auto text-gray-600 group-hover:text-blue-600'>{displayDate? formatCurrentDate({dateFormat, displayDate, }): placeholder}</span>
+              <span className='my-auto text-gray-600 group-hover:text-blue-600'>{displayDate? formatCurrentDate({dateFormat, displayDate, timeFormat}): placeholder}</span>
             </div>
             {
               value && 
