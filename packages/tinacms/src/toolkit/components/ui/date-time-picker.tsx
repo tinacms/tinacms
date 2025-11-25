@@ -506,7 +506,7 @@ const TimePeriodSelect = React.forwardRef<
         >
           <SelectTrigger
             ref={ref}
-            className='focus:border-blue-500 focus:ring-[3px] focus:ring-outline focus:text-accent-foreground w-[65px]'
+            className='focus:border-blue-500 shadow-none focus:ring-[3px] focus:ring-outline focus:text-accent-foreground w-[65px]'
             onKeyDown={handleKeyDown}
           >
             <SelectValue />
