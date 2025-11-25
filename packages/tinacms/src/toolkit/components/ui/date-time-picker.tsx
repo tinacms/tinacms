@@ -1,6 +1,6 @@
 import { Button, buttonVariants } from './button';
 import { RotateCw } from 'lucide-react';
-import { Calendar as CalendarSVG } from 'lucide-react';
+import { Calendar as CalendarSVG, CalendarDays } from 'lucide-react';
 import { Input } from './input';
 import { Popover, PopoverContent, PopoverTrigger } from './popover';
 import moment from 'moment';
@@ -791,17 +791,26 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
     return (
       <Popover open={open} onOpenChange={setOpen}> 
         <PopoverTrigger asChild disabled={disabled}>
-          <div ref={buttonRef} tabIndex={0} className='text-xs pointer overflow-hidden group hover:text-gray-600 cursor-pointer rounded border border-gray-100 flex font-semibold shadow group transition-colors bg-white text-gray-500'>
-            <div className='relative size-8 my-auto'>
-              <CalendarSVG className='absolute size-5 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-in size-10 transition-colors' />
+          <div ref={buttonRef} tabIndex={0} className='text-xs pointer overflow-hidden hover:text-gray-600 cursor-pointer rounded border border-gray-100 flex font-semibold shadow transition-colors bg-white text-gray-500'>
+            <div className='my-auto group flex  w-full'>
+              <div className='relative w-7 h-10'>
+                <CalendarSVG className='absolute size-5 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-opacity transition-colors' />
+                <CalendarDays className='absolute size-5 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100' />
+              </div>
+              <span className='my-auto group-hover:text-blue-600'>{displayDate? formatCurrentDate({dateFormat, displayDate, }): placeholder}</span>
             </div>
-            <span className='my-auto group-hover:text-blue-600'>{displayDate? formatCurrentDate({dateFormat, displayDate, }): placeholder}</span>
-            <button 
-            
-            onClick={()=> onChange?.(undefined)}
-            className='ml-auto px-1 w-8 py-2.5 hover:text-blue-600 hover:text-inherit text-gray-200 flex items-center justify-center hover:bg-gray-50'>
-              <RotateCw className='h-5 p-0.5 w-auto  ' />
-            </button>
+            {
+              value && 
+              <button 
+                onClick={(e)=> {
+                  e.stopPropagation();
+                  onChange?.(undefined)}
+                }
+                className='px-1 w-8 hover:text-blue-600 hover:text-inherit text-gray-200 flex items-center justify-center hover:bg-gray-50'
+                >
+                  <RotateCw className='h-5 p-0.5 w-auto  ' />
+              </button>
+            }
           </div>
         </PopoverTrigger>
         
