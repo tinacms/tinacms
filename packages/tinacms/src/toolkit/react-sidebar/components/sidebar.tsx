@@ -9,7 +9,6 @@ import { type ScreenPlugin, ScreenPluginModal } from '@toolkit/react-screens';
 import { Button } from '@toolkit/styles';
 import * as React from 'react';
 import { useState } from 'react';
-import { BiMenu } from 'react-icons/bi';
 import { ImFilesEmpty, ImUsers } from 'react-icons/im';
 import type { IconType } from 'react-icons/lib';
 import { PiSidebarSimpleLight } from 'react-icons/pi';
@@ -245,7 +244,18 @@ const Sidebar = ({
         <SidebarWrapper>
           <EditButton />
           <SidebarBody>
-            <SidebarHeader isLocalMode={cms.api?.tina?.isLocalMode} />
+            <SidebarHeader 
+              isLocalMode={cms.api?.tina?.isLocalMode}
+              isTinaAdminEnabled={isTinaAdminEnabled}
+              collectionsInfo={collectionsInfo}
+              screens={activeScreens}
+              cloudConfigs={allConfigs}
+              contentCreators={contentCreators}
+              sidebarWidth={sidebarWidth}
+              menuIsOpen={menuIsOpen}
+              setMenuIsOpen={setMenuIsOpen}
+              setActiveView={setActiveView}
+            />
             <FormsView loadingPlaceholder={sidebar.loadingPlaceholder} />
             {activeScreen && (
               <ScreenPluginModal
@@ -256,44 +266,6 @@ const Sidebar = ({
           </SidebarBody>
           <ResizeHandle />
         </SidebarWrapper>
-        <Nav
-          isLocalMode={cms.api?.tina?.isLocalMode}
-          showCollections={isTinaAdminEnabled}
-          collectionsInfo={collectionsInfo}
-          screens={activeScreens}
-          cloudConfigs={allConfigs}
-          contentCreators={contentCreators}
-          sidebarWidth={sidebarWidth}
-          open={menuIsOpen}
-          onOpenChange={setMenuIsOpen}
-          RenderNavSite={({ view }) => (
-            <SidebarSiteLink
-              view={view}
-              onClick={() => {
-                setActiveView(view);
-                setMenuIsOpen(false);
-              }}
-            />
-          )}
-          RenderNavCloud={({ config }) => <NavCloudLink config={config} />}
-          RenderNavCollection={({ collection }) => (
-            <SidebarCollectionLink
-              onClick={() => {
-                setMenuIsOpen(false);
-              }}
-              collection={collection}
-            />
-          )}
-          AuthRenderNavCollection={({ collection }) => (
-            <SidebarCollectionLink
-              onClick={() => {
-                setMenuIsOpen(false);
-              }}
-              collection={collection}
-              Icon={ImUsers}
-            />
-          )}
-        />
       </>
     </SidebarContext.Provider>
   );
@@ -333,7 +305,18 @@ const updateBodyDisplacement = ({
   }
 };
 
-const SidebarHeader = ({ isLocalMode }) => {
+const SidebarHeader = ({ 
+  isLocalMode,
+  isTinaAdminEnabled,
+  collectionsInfo,
+  screens,
+  cloudConfigs,
+  contentCreators,
+  sidebarWidth,
+  menuIsOpen,
+  setMenuIsOpen,
+  setActiveView,
+}) => {
   const { toggleSidebarOpen } = React.useContext(SidebarContext);
 
   return (
@@ -343,6 +326,44 @@ const SidebarHeader = ({ isLocalMode }) => {
 
         <div className='w-full flex justify-between items-center'>
           <div className='flex overflow-hidden py-1'>
+            <Nav
+              isLocalMode={isLocalMode}
+              showCollections={isTinaAdminEnabled}
+              collectionsInfo={collectionsInfo}
+              screens={screens}
+              cloudConfigs={cloudConfigs}
+              contentCreators={contentCreators}
+              sidebarWidth={sidebarWidth}
+              open={menuIsOpen}
+              onOpenChange={setMenuIsOpen}
+              RenderNavSite={({ view }) => (
+                <SidebarSiteLink
+                  view={view}
+                  onClick={() => {
+                    setActiveView(view);
+                    setMenuIsOpen(false);
+                  }}
+                />
+              )}
+              RenderNavCloud={({ config }) => <NavCloudLink config={config} />}
+              RenderNavCollection={({ collection }) => (
+                <SidebarCollectionLink
+                  onClick={() => {
+                    setMenuIsOpen(false);
+                  }}
+                  collection={collection}
+                />
+              )}
+              AuthRenderNavCollection={({ collection }) => (
+                <SidebarCollectionLink
+                  onClick={() => {
+                    setMenuIsOpen(false);
+                  }}
+                  collection={collection}
+                  Icon={ImUsers}
+                />
+              )}
+            />
             <TinaIcon className='self-center h-10 min-w-10 w-auto text-orange-500 mr-2' />
             <BranchButton className='overflow-hidden mr-2' />
             <LocalWarning className='px-4' />

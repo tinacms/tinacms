@@ -114,10 +114,10 @@ export const Nav = ({
       <Sheet {...sheetProps}>
         <SheetTrigger asChild>
           <button
-            className='pointer-events-auto p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
+            className='pointer-events-auto  p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
             aria-label='Toggle navigation menu'
           >
-            <BiMenu size={24} color='#4B5563' />
+            <BiMenu className='h-8 w-auto' color='#4B5563' />
           </button>
         </SheetTrigger>
         <SheetContent
@@ -131,7 +131,7 @@ export const Nav = ({
               <TinaExtendedIcon className='h-8 w-auto fill-orange-500' />
             </SheetTitle>
             <SheetClose className='p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'>
-              <BiX size={24} color='#4B5563' />
+              <BiX className='h-8 w-auto' color='#4B5563' />
               <span className='sr-only'>Close</span>
             </SheetClose>
           </SheetHeader>
