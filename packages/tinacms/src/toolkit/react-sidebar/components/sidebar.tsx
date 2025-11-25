@@ -257,44 +257,44 @@ const Sidebar = ({
           </SidebarBody>
           <ResizeHandle />
         </SidebarWrapper>
-        <NavProvider isOpen={menuIsOpen} onToggle={toggleMenu}>
-          <Nav
-            isLocalMode={cms.api?.tina?.isLocalMode}
-            showCollections={isTinaAdminEnabled}
-            collectionsInfo={collectionsInfo}
-            screens={activeScreens}
-            cloudConfigs={allConfigs}
-            contentCreators={contentCreators}
-            sidebarWidth={sidebarWidth}
-            RenderNavSite={({ view }) => (
-              <SidebarSiteLink
-                view={view}
-                onClick={() => {
-                  setActiveView(view);
-                  setMenuIsOpen(false);
-                }}
-              />
-            )}
-            RenderNavCloud={({ config }) => <NavCloudLink config={config} />}
-            RenderNavCollection={({ collection }) => (
-              <SidebarCollectionLink
-                onClick={() => {
-                  setMenuIsOpen(false);
-                }}
-                collection={collection}
-              />
-            )}
-            AuthRenderNavCollection={({ collection }) => (
-              <SidebarCollectionLink
-                onClick={() => {
-                  setMenuIsOpen(false);
-                }}
-                collection={collection}
-                Icon={ImUsers}
-              />
-            )}
-          />
-        </NavProvider>
+        <Nav
+          isLocalMode={cms.api?.tina?.isLocalMode}
+          showCollections={isTinaAdminEnabled}
+          collectionsInfo={collectionsInfo}
+          screens={activeScreens}
+          cloudConfigs={allConfigs}
+          contentCreators={contentCreators}
+          sidebarWidth={sidebarWidth}
+          open={menuIsOpen}
+          onOpenChange={setMenuIsOpen}
+          RenderNavSite={({ view }) => (
+            <SidebarSiteLink
+              view={view}
+              onClick={() => {
+                setActiveView(view);
+                setMenuIsOpen(false);
+              }}
+            />
+          )}
+          RenderNavCloud={({ config }) => <NavCloudLink config={config} />}
+          RenderNavCollection={({ collection }) => (
+            <SidebarCollectionLink
+              onClick={() => {
+                setMenuIsOpen(false);
+              }}
+              collection={collection}
+            />
+          )}
+          AuthRenderNavCollection={({ collection }) => (
+            <SidebarCollectionLink
+              onClick={() => {
+                setMenuIsOpen(false);
+              }}
+              collection={collection}
+              Icon={ImUsers}
+            />
+          )}
+        />
       </>
     </SidebarContext.Provider>
   );
