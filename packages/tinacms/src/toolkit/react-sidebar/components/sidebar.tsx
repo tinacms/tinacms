@@ -244,7 +244,7 @@ const Sidebar = ({
         <SidebarWrapper>
           <EditButton />
           <SidebarBody>
-            <SidebarHeader 
+            <SidebarHeader
               isLocalMode={cms.api?.tina?.isLocalMode}
               isTinaAdminEnabled={isTinaAdminEnabled}
               collectionsInfo={collectionsInfo}
@@ -305,7 +305,7 @@ const updateBodyDisplacement = ({
   }
 };
 
-const SidebarHeader = ({ 
+const SidebarHeader = ({
   isLocalMode,
   isTinaAdminEnabled,
   collectionsInfo,
