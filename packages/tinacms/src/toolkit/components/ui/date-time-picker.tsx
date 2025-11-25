@@ -412,7 +412,7 @@ function Calendar({
                   setMonth(newDate);
                 }}
               >
-                <SelectTrigger className='focus:bg-accent focus:text-accent-foreground w-fit gap-1 border-none p-0 shadow-none'>
+                <SelectTrigger className='focus:text-accent-foreground w-fit gap-1 border-none p-0 shadow-none'>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent position='popper'>
@@ -434,7 +434,7 @@ function Calendar({
                   setMonth(newDate);
                 }}
               >
-                <SelectTrigger className='focus:bg-accent focus:text-accent-foreground w-fit gap-1 border-none p-0 shadow-none'>
+                <SelectTrigger className='focus:text-accent-foreground w-fit gap-1 border-none p-0 shadow-none'>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -506,7 +506,7 @@ const TimePeriodSelect = React.forwardRef<
         >
           <SelectTrigger
             ref={ref}
-            className='focus:bg-accent focus:border-blue-500 focus:ring-[3px] focus:ring-outline focus:text-accent-foreground w-[65px]'
+            className='focus:border-blue-500 focus:ring-[3px] focus:ring-outline focus:text-accent-foreground w-[65px]'
             onKeyDown={handleKeyDown}
           >
             <SelectValue />
@@ -611,7 +611,7 @@ const TimePickerInput = React.forwardRef<
         id={id}
         name={name}
         className={cn(
-          'focus:bg-accent focus-visible:ring-outline focus-visible:border-blue-500 shadow-none focus:text-accent-foreground w-[48px] text-center font-mono text-base tabular-nums caret-transparent [&::-webkit-inner-spin-button]:appearance-none',
+          'focus-visible:ring-outline focus-visible:border-blue-500 shadow-none focus:text-accent-foreground w-[48px] text-center font-mono text-base tabular-nums caret-transparent [&::-webkit-inner-spin-button]:appearance-none',
           className
         )}
         value={value || calculatedValue}
