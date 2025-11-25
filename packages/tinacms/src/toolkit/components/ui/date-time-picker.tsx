@@ -1,7 +1,7 @@
 import { Button, buttonVariants } from './button';
 
 import { RotateCw } from 'lucide-react';
-import { Calendar as CalendarSVG, CalendarDays, CalendarX } from 'lucide-react';
+import { Calendar as CalendarSVG, CalendarDays, CalendarCheck } from 'lucide-react';
 import { Input } from './input';
 import { Popover, PopoverContent, PopoverTrigger } from './popover';
 import moment from 'moment';
@@ -423,7 +423,7 @@ const TimePeriodSelect = React.forwardRef<HTMLButtonElement, PeriodSelectorProps
         <Select defaultValue={period} onValueChange={(value: Period) => handleValueChange(value)}>
           <SelectTrigger
             ref={ref}
-            className="focus:bg-accent focus:text-accent-foreground w-[65px]"
+            className="focus:bg-accent focus:border-blue-500 focus:ring-[3px] focus:ring-outline focus:text-accent-foreground w-[65px]"
             onKeyDown={handleKeyDown}
           >
             <SelectValue />
@@ -531,7 +531,7 @@ const TimePickerInput = React.forwardRef<HTMLInputElement, TimePickerInputProps>
         id={id}
         name={name}
         className={cn(
-          'focus:bg-accent focus:text-accent-foreground w-[48px] text-center font-mono text-base tabular-nums caret-transparent [&::-webkit-inner-spin-button]:appearance-none',
+          'focus:bg-accent focus-visible:ring-outline focus-visible:border-blue-500 shadow-none focus:text-accent-foreground w-[48px] text-center font-mono text-base tabular-nums caret-transparent [&::-webkit-inner-spin-button]:appearance-none',
           className,
         )}
         value={value || calculatedValue}
@@ -793,17 +793,17 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
       <Popover open={open} onOpenChange={setOpen}> 
         <PopoverTrigger asChild disabled={disabled}>
           <div ref={buttonRef} tabIndex={0} className='text-xs pointer overflow-hidden hover:text-gray-600 cursor-pointer rounded border border-gray-100 flex font-semibold shadow transition-colors bg-white text-gray-500'>
-            <div className='my-auto group flex gap-2 w-full'>
-              <div className='relative w-8 h-10'>
+            <div className='my-auto group gap-0.5 flex w-full'>
+              <div className='relative w-9 h-10'>
                 {value ? 
-                <CalendarX className='absolute size-5 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-opacity' />
+                <CalendarCheck className='absolute size-5 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-opacity' />
               : <>
                 <CalendarSVG className='absolute size-5 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-opacity transition-colors' />
                 <CalendarDays className='absolute size-5 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100' />
                 </>
                 }
               </div>
-              <span className='my-auto group-hover:text-blue-600'>{displayDate? formatCurrentDate({dateFormat, displayDate, }): placeholder}</span>
+              <span className='my-auto text-gray-600 group-hover:text-blue-600'>{displayDate? formatCurrentDate({dateFormat, displayDate, }): placeholder}</span>
             </div>
             {
               value && 
@@ -827,6 +827,7 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
         
           align='start' className="w-auto p-0">
           <Calendar
+          className='text-gray-700'
             mode="single"
             selected={displayDate}
             month={month}
