@@ -12,7 +12,7 @@ export const queryToSearchIndexQuery = (
   if (parts.length === 1) {
     q = { AND: [parts[0]] };
   } else {
-    // TODO only allow AND for now - need parser
+    // Filter out stopwords and the literal "AND" keyword
     q = {
       AND: parts.filter(
         (part) =>
@@ -47,6 +47,8 @@ export const parseSearchIndexResponse = (
 ) => {
   const results = data['RESULT'];
   const total = data['RESULT_LENGTH'];
+  const fuzzyMatches = data['FUZZY_MATCHES'];
+
   if (options?.cursor && options?.limit) {
     const prevCursor =
       options.cursor === '0' ? null : (parseInt(options.cursor) - 1).toString();
@@ -59,6 +61,7 @@ export const parseSearchIndexResponse = (
       total,
       prevCursor,
       nextCursor,
+      fuzzyMatches,
     };
   } else if (!options?.cursor && options?.limit) {
     const prevCursor = null;
@@ -68,6 +71,7 @@ export const parseSearchIndexResponse = (
       total,
       prevCursor,
       nextCursor,
+      fuzzyMatches,
     };
   } else {
     return {
@@ -75,6 +79,7 @@ export const parseSearchIndexResponse = (
       total,
       prevCursor: null,
       nextCursor: null,
+      fuzzyMatches,
     };
   }
 };

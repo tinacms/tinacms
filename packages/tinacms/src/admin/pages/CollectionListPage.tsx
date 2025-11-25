@@ -603,6 +603,8 @@ const CollectionListPage = () => {
                             <div className='flex flex-1 flex-row gap-2 items-end w-full'>
                               {searchEnabled ? (
                                 <SearchInput
+                                  cms={cms}
+                                  collectionName={collectionName}
                                   loading={_loading}
                                   search={search}
                                   setSearch={setSearch}
@@ -1146,13 +1148,30 @@ const CollectionListPage = () => {
 };
 
 const SearchInput = ({
+  cms,
+  collectionName,
   loading,
   search,
   setSearch,
   searchInput,
   setSearchInput,
+}: {
+  cms: TinaCMS;
+  collectionName: string;
+  loading: boolean;
+  search: string;
+  setSearch: (search: string) => void;
+  searchInput: string;
+  setSearchInput: (input: string) => void;
 }) => {
   const [searchLoaded, setSearchLoaded] = useState(false);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+  const suggestionsRef = React.useRef<HTMLDivElement>(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     if (loading) {
       setSearchLoaded(false);
@@ -1161,30 +1180,326 @@ const SearchInput = ({
     }
   }, [loading]);
 
+  // Debounced suggestion fetching
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (!searchInput || searchInput.trim().length < 2) {
+        setSuggestions([]);
+        setShowSuggestions(false);
+        return;
+      }
+
+      setIsLoadingSuggestions(true);
+
+      try {
+        // Get unique words from the search input
+        const words = searchInput.trim().split(/\s+/);
+        const currentWord = words[words.length - 1];
+
+        if (currentWord.length < 2) {
+          setSuggestions([]);
+          setShowSuggestions(false);
+          setIsLoadingSuggestions(false);
+          return;
+        }
+
+        // Try to fetch suggestions from the search index
+        if (cms.api.search) {
+          try {
+            // Query the search index for documents containing the current word
+            // This will give us fuzzy matches from the DICTIONARY
+            const response: any = await cms.api.search.query(
+              `${currentWord} AND _collection:${collectionName}`,
+              {
+                limit: 10,
+                fuzzy: true,
+                fuzzyOptions: {
+                  maxDistance: 2,
+                  minSimilarity: 0.5, // Require at least 50% similarity for suggestions
+                  maxResults: 5,
+                },
+              }
+            );
+
+            // Extract suggestions from fuzzyMatches (DICTIONARY terms)
+            const uniqueSuggestions = new Set<string>();
+
+            // First, try to use fuzzyMatches from the response
+            if (response.fuzzyMatches && response.fuzzyMatches[currentWord]) {
+              const matches = response.fuzzyMatches[currentWord];
+              // Sort by similarity (descending) and take top 5
+              matches
+                .sort((a: any, b: any) => b.similarity - a.similarity)
+                .slice(0, 5)
+                .forEach((match: any) => {
+                  if (
+                    match.term !== currentWord &&
+                    uniqueSuggestions.size < 5
+                  ) {
+                    uniqueSuggestions.add(match.term);
+                  }
+                });
+            }
+
+            // If we didn't get enough from fuzzyMatches, try extracting from results
+            if (uniqueSuggestions.size < 3 && response.results?.length > 0) {
+              response.results.forEach((result: any) => {
+                const content = JSON.stringify(result).toLowerCase();
+                const matches = content.match(
+                  new RegExp(`\\b${currentWord}\\w*`, 'gi')
+                );
+                if (matches) {
+                  matches.forEach((match) => {
+                    if (
+                      match.length >= currentWord.length &&
+                      uniqueSuggestions.size < 5 &&
+                      match !== currentWord
+                    ) {
+                      uniqueSuggestions.add(match.toLowerCase());
+                    }
+                  });
+                }
+              });
+            }
+
+            const suggestionList = Array.from(uniqueSuggestions);
+
+            // If we didn't get enough suggestions from the index, add some common terms
+            if (suggestionList.length < 3) {
+              const commonTerms = [
+                'title',
+                'content',
+                'author',
+                'date',
+                'published',
+                'draft',
+                'category',
+                'tags',
+                'description',
+                'image',
+                'post',
+                'page',
+                'article',
+                'blog',
+                'news',
+                'document',
+                'file',
+                'folder',
+              ];
+
+              const additionalSuggestions = commonTerms
+                .filter(
+                  (term) =>
+                    term.toLowerCase().startsWith(currentWord.toLowerCase()) &&
+                    !suggestionList.includes(term)
+                )
+                .slice(0, 5 - suggestionList.length);
+
+              suggestionList.push(...additionalSuggestions);
+            }
+
+            setSuggestions(suggestionList);
+            setShowSuggestions(suggestionList.length > 0);
+          } catch (error) {
+            // Fall back to common terms if search fails
+            console.warn(
+              'Search API failed, using fallback suggestions:',
+              error
+            );
+            const commonTerms = [
+              'title',
+              'content',
+              'author',
+              'date',
+              'published',
+              'draft',
+              'category',
+              'tags',
+              'description',
+              'image',
+              'post',
+              'page',
+              'article',
+              'blog',
+              'news',
+              'document',
+              'file',
+              'folder',
+            ];
+
+            const filtered = commonTerms
+              .filter(
+                (term) =>
+                  term.toLowerCase().startsWith(currentWord.toLowerCase()) ||
+                  term.toLowerCase().includes(currentWord.toLowerCase())
+              )
+              .slice(0, 5);
+
+            setSuggestions(filtered);
+            setShowSuggestions(filtered.length > 0);
+          }
+        } else {
+          // Fallback to common terms if search API is not available
+          const commonTerms = [
+            'title',
+            'content',
+            'author',
+            'date',
+            'published',
+            'draft',
+            'category',
+            'tags',
+            'description',
+            'image',
+            'post',
+            'page',
+            'article',
+            'blog',
+            'news',
+            'document',
+            'file',
+            'folder',
+          ];
+
+          const filtered = commonTerms
+            .filter(
+              (term) =>
+                term.toLowerCase().startsWith(currentWord.toLowerCase()) ||
+                term.toLowerCase().includes(currentWord.toLowerCase())
+            )
+            .slice(0, 5);
+
+          setSuggestions(filtered);
+          setShowSuggestions(filtered.length > 0);
+        }
+      } catch (error) {
+        console.error('Error fetching suggestions:', error);
+        setSuggestions([]);
+        setShowSuggestions(false);
+      } finally {
+        setIsLoadingSuggestions(false);
+      }
+    };
+
+    const timer = setTimeout(fetchSuggestions, 300); // 300ms debounce
+    return () => clearTimeout(timer);
+  }, [searchInput, cms, collectionName]);
+
+  // Handle click outside to close suggestions
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        suggestionsRef.current &&
+        !suggestionsRef.current.contains(event.target as Node) &&
+        inputRef.current &&
+        !inputRef.current.contains(event.target as Node)
+      ) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleSuggestionClick = (suggestion: string) => {
+    const words = searchInput.trim().split(/\s+/);
+    words[words.length - 1] = suggestion;
+    const newInput = words.join(' ');
+    setSearchInput(newInput);
+    setShowSuggestions(false);
+    setSelectedIndex(-1);
+    // Trigger the search with the new input
+    setSearch(newInput);
+    setSearchLoaded(false);
+    inputRef.current?.focus();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showSuggestions || suggestions.length === 0) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (searchInput.trim()) {
+          setSearch(searchInput);
+          setSearchLoaded(false);
+          setShowSuggestions(false);
+        }
+      }
+      return;
+    }
+
+    switch (e.key) {
+      case 'Tab':
+        e.preventDefault();
+        // Tab moves down, Shift+Tab moves up
+        if (e.shiftKey) {
+          setSelectedIndex((prev) =>
+            prev > 0 ? prev - 1 : suggestions.length - 1
+          );
+        } else {
+          setSelectedIndex((prev) =>
+            prev < suggestions.length - 1 ? prev + 1 : 0
+          );
+        }
+        break;
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedIndex((prev) =>
+          prev < suggestions.length - 1 ? prev + 1 : prev
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1));
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (selectedIndex >= 0 && selectedIndex < suggestions.length) {
+          handleSuggestionClick(suggestions[selectedIndex]);
+          // Trigger search after selecting suggestion
+          const words = searchInput.trim().split(/\s+/);
+          words[words.length - 1] = suggestions[selectedIndex];
+          const newInput = words.join(' ');
+          setSearch(newInput);
+          setSearchLoaded(false);
+        } else if (searchInput.trim()) {
+          setSearch(searchInput);
+          setSearchLoaded(false);
+          setShowSuggestions(false);
+        }
+        break;
+      case 'Escape':
+        e.preventDefault();
+        setShowSuggestions(false);
+        setSelectedIndex(-1);
+        break;
+    }
+  };
+
   return (
     <form className='flex flex-1 flex-col gap-2 items-start w-full'>
       <div className='h-4'></div>
       <div className='flex flex-col md:flex-row items-start md:items-center w-full md:w-auto gap-3'>
         <div className='flex-1 min-w-[200px] w-full md:w-auto relative'>
-          <BiSearch className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none' />
+          <BiSearch className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none z-10' />
           <input
+            ref={inputRef}
             type='text'
             name='search'
             placeholder='Search...'
             value={searchInput}
             onChange={(e) => {
               setSearchInput(e.target.value);
+              setSelectedIndex(-1);
             }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                if (searchInput.trim()) {
-                  setSearch(searchInput);
-                  setSearchLoaded(false);
-                }
+            onKeyDown={handleKeyDown}
+            onFocus={() => {
+              if (suggestions.length > 0) {
+                setShowSuggestions(true);
               }
             }}
             className='shadow appearance-none bg-white block pl-10 pr-10 py-2 truncate w-full text-base border border-gray-200 focus:outline-none focus:shadow-outline focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded placeholder:text-gray-300 text-gray-600 focus:text-gray-900'
+            autoComplete='off'
           />
           {search && searchLoaded && (
             <button
@@ -1192,11 +1507,41 @@ const SearchInput = ({
                 e.preventDefault();
                 setSearch('');
                 setSearchInput('');
+                setSuggestions([]);
+                setShowSuggestions(false);
               }}
-              className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors'
+              className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors z-10'
             >
               <BiX className='w-5 h-5' />
             </button>
+          )}
+          {showSuggestions && suggestions.length > 0 && (
+            <div
+              ref={suggestionsRef}
+              className='absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded shadow-lg z-50 max-h-60 overflow-y-auto'
+            >
+              {isLoadingSuggestions && (
+                <div className='px-4 py-2 text-sm text-gray-400'>
+                  Loading suggestions...
+                </div>
+              )}
+              {!isLoadingSuggestions &&
+                suggestions.map((suggestion, index) => (
+                  <button
+                    key={`${suggestion}-${index}`}
+                    type='button'
+                    onClick={() => handleSuggestionClick(suggestion)}
+                    onMouseEnter={() => setSelectedIndex(index)}
+                    className={`w-full text-left px-4 py-2 text-sm transition-colors ${
+                      index === selectedIndex
+                        ? 'bg-blue-50 text-blue-600'
+                        : 'text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+            </div>
           )}
         </div>
       </div>

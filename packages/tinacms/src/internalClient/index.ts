@@ -746,12 +746,15 @@ export class TinaCMSSearchClient implements SearchClient {
     options?: {
       limit?: number;
       cursor?: string;
+      fuzzy?: boolean;
+      fuzzyOptions?: any;
     }
   ): Promise<{
     results: any[];
     nextCursor: string | null;
     total: number;
     prevCursor: string | null;
+    fuzzyMatches?: Record<string, any[]>;
   }> {
     const q = queryToSearchIndexQuery(
       query,
@@ -759,10 +762,17 @@ export class TinaCMSSearchClient implements SearchClient {
     );
     const opt = optionsToSearchIndexOptions(options);
     const optionsParam = opt['PAGE'] ? `&options=${JSON.stringify(opt)}` : '';
+
+    // Add fuzzy search parameters if enabled
+    let fuzzyParam = '';
+    if (options?.fuzzy) {
+      fuzzyParam = `&fuzzy=true&fuzzyOptions=${JSON.stringify(options.fuzzyOptions || {})}`;
+    }
+
     const res = await this.client.authProvider.fetchWithToken(
       `${this.client.contentApiBase}/searchIndex/${
         this.client.clientId
-      }/${this.client.getBranch()}?q=${JSON.stringify(q)}${optionsParam}`
+      }/${this.client.getBranch()}?q=${JSON.stringify(q)}${optionsParam}${fuzzyParam}`
     );
     return parseSearchIndexResponse(await res.json(), options);
   }
@@ -812,18 +822,28 @@ export class LocalSearchClient implements SearchClient {
     options?: {
       limit?: number;
       cursor?: string;
+      fuzzy?: boolean;
+      fuzzyOptions?: any;
     }
   ): Promise<{
     results: any[];
     nextCursor: string | null;
     total: number;
     prevCursor: string | null;
+    fuzzyMatches?: Record<string, any[]>;
   }> {
     const q = queryToSearchIndexQuery(query);
     const opt = optionsToSearchIndexOptions(options);
     const optionsParam = opt['PAGE'] ? `&options=${JSON.stringify(opt)}` : '';
+
+    // Add fuzzy search parameters if enabled
+    let fuzzyParam = '';
+    if (options?.fuzzy) {
+      fuzzyParam = `&fuzzy=true&fuzzyOptions=${JSON.stringify(options.fuzzyOptions || {})}`;
+    }
+
     const res = await this.client.authProvider.fetchWithToken(
-      `http://localhost:4001/searchIndex?q=${JSON.stringify(q)}${optionsParam}`
+      `http://localhost:4001/searchIndex?q=${JSON.stringify(q)}${optionsParam}${fuzzyParam}`
     );
     return parseSearchIndexResponse(await res.json(), options);
   }

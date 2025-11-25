@@ -1,10 +1,11 @@
-import type { SearchClient } from '../types';
+import type { SearchClient, SearchOptions } from '../types';
 // default import + destructuring because `sqlite-level` still exposes CJS-style exports.
 import sqliteLevel from 'sqlite-level';
 const { SqliteLevel } = sqliteLevel;
 import si from 'search-index';
 import { MemoryLevel } from 'memory-level';
 import { lookupStopwords } from '../indexer/utils';
+import { FuzzySearchWrapper } from '../fuzzy-search-wrapper';
 import * as zlib from 'node:zlib';
 
 const DEFAULT_TOKEN_SPLIT_REGEX = /[\p{L}\d_]+/gu;
@@ -25,6 +26,8 @@ export class LocalSearchIndexClient implements SearchClient {
   protected readonly memoryLevel: MemoryLevel;
   private readonly stopwords: string[];
   private readonly tokenSplitRegex: RegExp;
+  private fuzzySearchWrapper?: FuzzySearchWrapper;
+
   constructor(options: TinaSearchIndexerClientOptions) {
     this.memoryLevel = new MemoryLevel();
     this.stopwords = lookupStopwords(options.stopwordLanguages);
@@ -39,6 +42,9 @@ export class LocalSearchIndexClient implements SearchClient {
       stopwords: this.stopwords,
       tokenSplitRegex: this.tokenSplitRegex,
     });
+
+    // Initialize fuzzy search wrapper
+    this.fuzzySearchWrapper = new FuzzySearchWrapper(this.searchIndex);
   }
 
   async put(docs: any[]) {
@@ -55,21 +61,60 @@ export class LocalSearchIndexClient implements SearchClient {
     return this.searchIndex.DELETE(ids);
   }
 
-  query(
+  async query(
     query: string,
-    options: { cursor?: string; limit?: number } | undefined
+    options?: SearchOptions
   ): Promise<{
     results: any[];
     total: number;
     nextCursor: string | null;
     prevCursor: string | null;
   }> {
-    return Promise.resolve({
-      nextCursor: undefined,
-      prevCursor: undefined,
-      results: [],
-      total: 0,
-    });
+    if (!this.searchIndex) {
+      throw new Error('onStartIndexing must be called first');
+    }
+
+    // Apply fuzzy search if enabled
+    if (options?.fuzzy && this.fuzzySearchWrapper) {
+      try {
+        // Use the FuzzySearchWrapper's query method which handles everything
+        return await this.fuzzySearchWrapper.query(query, {
+          limit: options.limit,
+          cursor: options.cursor,
+          fuzzy: true,
+          fuzzyOptions: options.fuzzyOptions,
+        });
+      } catch (error) {
+        // Fall back to standard search if fuzzy search fails
+        console.warn('Fuzzy search failed, using standard search:', error);
+      }
+    }
+
+    // Standard search without fuzzy matching
+    const searchIndexOptions: any = {};
+
+    if (options?.limit) {
+      searchIndexOptions.PAGE = {
+        NUMBER: 0,
+        SIZE: options.limit,
+      };
+    }
+
+    // Execute the search with AND logic for all query terms
+    const terms = query.split(' ').filter((t) => t.trim().length > 0);
+    const queryObj =
+      terms.length > 1 ? { AND: terms } : { AND: [terms[0] || ''] };
+    const searchResults = await this.searchIndex.QUERY(
+      queryObj,
+      searchIndexOptions
+    );
+
+    return {
+      results: searchResults.RESULT || [],
+      total: searchResults.RESULT_LENGTH || 0,
+      nextCursor: null, // Local search doesn't use cursors
+      prevCursor: null,
+    };
   }
 
   async export(filename: string) {
