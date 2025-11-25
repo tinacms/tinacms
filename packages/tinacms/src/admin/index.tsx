@@ -19,7 +19,6 @@ import {
 
 import GetCMS from './components/GetCMS';
 import Layout from './components/Layout';
-import { AdminNav } from './components/AdminNav';
 
 import CollectionCreatePage from './pages/CollectionCreatePage';
 import CollectionDuplicatePage from './pages/CollectionDuplicatePage';
