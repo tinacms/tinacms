@@ -343,7 +343,7 @@ function Calendar({
                   props.onMonthChange?.(newDate);
                 }}
               >
-                <SelectTrigger className="focus:bg-accent focus:text-accent-foreground w-fit gap-1 border-none p-0">
+                <SelectTrigger className="focus:bg-accent focus:text-accent-foreground w-fit gap-1 border-none p-0 shadow-none">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent position='popper'>
@@ -362,7 +362,7 @@ function Calendar({
                   props.onMonthChange?.(newDate);
                 }}
               >
-                <SelectTrigger className="focus:bg-accent focus:text-accent-foreground w-fit gap-1 border-none p-0">
+                <SelectTrigger className="focus:bg-accent focus:text-accent-foreground w-fit gap-1 border-none p-0 shadow-none">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -730,9 +730,6 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
      * instead of resetting to 00:00
      */
     const handleMonthChange = (newDay: Date | undefined) => {
-      
-
-      console.log("handle month change", {newDay, defaultPopupValue, month});
       if (!newDay) {
         console.log("no new day");
         return;
