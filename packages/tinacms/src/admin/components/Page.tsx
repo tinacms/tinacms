@@ -11,7 +11,7 @@ import {
 import React from 'react';
 import { ImFilesEmpty, ImUsers } from 'react-icons/im';
 import type { IconType } from 'react-icons/lib';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { TinaIcon } from '@toolkit/icons';
 import { slugify } from '../utils/slugify';
 
@@ -23,6 +23,9 @@ export const PageWrapper = ({
   children: React.ReactNode;
 }) => {
   const cms = useCMS();
+  const location = useLocation();
+  const isOnDashboard = location.pathname === '/';
+  const [menuIsOpen, setMenuIsOpen] = React.useState(isOnDashboard);
   const { collectionsInfo, screens, cloudConfigs, isLocalMode } =
     useNavData(cms);
 
@@ -37,6 +40,7 @@ export const PageWrapper = ({
             showCollections={true}
             collectionsInfo={collectionsInfo}
             screens={screens}
+            defaultOpen={menuIsOpen}
             cloudConfigs={cloudConfigs}
             contentCreators={[]}
             RenderNavSite={({ view }) => (
