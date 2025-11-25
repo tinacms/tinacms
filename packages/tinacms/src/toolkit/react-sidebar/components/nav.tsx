@@ -51,6 +51,40 @@ interface NavProps {
   }>;
 }
 
+const partitionCollections = (collections: NavCollection[]) => {
+  return collections.reduce(
+    (acc, collection) => {
+      if (collection.isAuthCollection) {
+        acc.authCollection = collection;
+      } else {
+        acc.contentCollections.push(collection);
+      }
+      return acc;
+    },
+    {
+      contentCollections: [] as NavCollection[],
+      authCollection: undefined as NavCollection | undefined,
+    }
+  );
+};
+
+const partitionScreens = (screens: ScreenPlugin[] = []) => {
+  return screens.reduce(
+    (acc, screen) => {
+      const category = screen.navCategory || 'Site';
+      acc[category] = acc[category] || [];
+      acc[category].push(screen);
+      return acc;
+    },
+    { Site: [] as ScreenPlugin[] } as Record<string, ScreenPlugin[]>
+  );
+};
+
+const SECTION_HEADING_CLASS =
+  'uppercase font-sans font-bold text-sm mb-3 mt-8 text-gray-700';
+const NAV_LINK_CLASS =
+  'text-lg py-2 first:pt-3 last:pb-3 whitespace-nowrap flex items-center opacity-80 text-gray-600 hover:text-blue-400';
+
 export const Nav = ({
   isLocalMode,
   className = '',
@@ -72,54 +106,27 @@ export const Nav = ({
 }: NavProps) => {
   const cms = useCMS();
   const [eventsOpen, setEventsOpen] = React.useState(false);
-  const { contentCollections, authCollection } =
-    collectionsInfo.collections.reduce(
-      (
-        acc: {
-          contentCollections: NavCollection[];
-          authCollection?: NavCollection;
-        },
-        collection: NavCollection
-      ) => {
-        if (collection.isAuthCollection) {
-          acc.authCollection = collection;
-        } else {
-          acc.contentCollections.push(collection);
-        }
-        return acc;
-      },
-      {
-        contentCollections: [],
-      }
-    );
 
-  // partition screens by navCategory prop
-  const screenCategories = screens.reduce(
-    (acc, screen) => {
-      const category = screen.navCategory || 'Site';
-      acc[category] = acc[category] || [];
-      acc[category].push(screen);
-      return acc;
-    },
-    { Site: [] }
+  const { contentCollections, authCollection } = partitionCollections(
+    collectionsInfo.collections
   );
-
-  const sheetProps =
-    open !== undefined && onOpenChange !== undefined
-      ? { open, onOpenChange }
-      : { defaultOpen };
+  const screenCategories = partitionScreens(screens);
+  const isControlled = open !== undefined && onOpenChange !== undefined;
+  const sheetProps = isControlled ? { open, onOpenChange } : { defaultOpen };
 
   return (
     <>
       <Sheet {...sheetProps}>
-        <SheetTrigger asChild>
-          <button
-            className='pointer-events-auto  p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
-            aria-label='Toggle navigation menu'
-          >
-            <BiMenu className='h-8 w-auto' color='#4B5563' />
-          </button>
-        </SheetTrigger>
+        {!isControlled && (
+          <SheetTrigger asChild>
+            <button
+              className='pointer-events-auto  p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
+              aria-label='Toggle navigation menu'
+            >
+              <BiMenu className='h-8 w-auto text-gray-600' />
+            </button>
+          </SheetTrigger>
+        )}
         <SheetContent
           side='left'
           className={`flex flex-col w-96 ${className}`}
@@ -131,14 +138,16 @@ export const Nav = ({
               <TinaExtendedIcon className='h-8 w-auto fill-orange-500' />
             </SheetTitle>
             <SheetClose className='p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'>
-              <BiX className='h-8 w-auto' color='#4B5563' />
+              <BiX className='h-8 w-auto text-gray-600' />
               <span className='sr-only'>Close</span>
             </SheetClose>
           </SheetHeader>
           <div className='flex flex-col px-6 flex-1 overflow-auto'>
             {showCollections && (
               <>
-                <h4 className='flex space-x-1 justify-items-start uppercase font-sans font-bold text-sm mb-3 mt-8 text-gray-700'>
+                <h4
+                  className={`flex space-x-1 justify-items-start ${SECTION_HEADING_CLASS}`}
+                >
                   <span>Collections</span>
                   {isLocalMode && (
                     <span className='flex items-center'>
@@ -160,9 +169,7 @@ export const Nav = ({
             {(screenCategories.Site.length > 0 || contentCreators.length) >
               0 && (
               <>
-                <h4 className='uppercase font-sans font-bold text-sm mb-3 mt-8 text-gray-700'>
-                  Site
-                </h4>
+                <h4 className={SECTION_HEADING_CLASS}>Site</h4>
                 <ul className='flex flex-col gap-4'>
                   {screenCategories.Site.map((view) => {
                     return (
@@ -193,9 +200,7 @@ export const Nav = ({
               if (category !== 'Site') {
                 return (
                   <div key={category}>
-                    <h4 className='uppercase font-sans font-bold text-sm mb-3 mt-8 text-gray-700'>
-                      {category}
-                    </h4>
+                    <h4 className={SECTION_HEADING_CLASS}>{category}</h4>
                     <ul className='flex flex-col gap-4'>
                       {screens.map((view) => {
                         return (
@@ -211,9 +216,7 @@ export const Nav = ({
             })}
             {!!cloudConfigs?.length && (
               <>
-                <h4 className='uppercase font-sans font-bold text-sm mb-3 mt-8 text-gray-700'>
-                  Cloud
-                </h4>
+                <h4 className={SECTION_HEADING_CLASS}>Cloud</h4>
                 <ul className='flex flex-col gap-4'>
                   {cloudConfigs.map((config) => {
                     return (
@@ -229,14 +232,11 @@ export const Nav = ({
             <div className='grow my-4 border-b border-gray-200'></div>
 
             <SyncStatusButton
-              className='text-lg py-2 first:pt-3 last:pb-3 whitespace-nowrap flex items-center opacity-80 text-gray-600 hover:text-blue-400'
+              className={NAV_LINK_CLASS}
               cms={cms}
               setEventsOpen={setEventsOpen}
             />
-            <Logout
-              className='text-lg py-2 first:pt-3 last:pb-3 whitespace-nowrap flex items-center opacity-80 text-gray-600 hover:text-blue-400'
-              cms={cms}
-            />
+            <Logout className={NAV_LINK_CLASS} cms={cms} />
             <VersionInfo />
           </div>
         </SheetContent>
@@ -289,10 +289,7 @@ const CreateContentNavItem = ({ plugin }) => {
           setOpen(true);
         }}
       >
-        <span className='mr-3 opacity-80'>
-          <VscNewFile size={24} />
-        </span>{' '}
-        {plugin.name}
+        <VscNewFile className='mr-3 h-6 opacity-80 w-auto' /> {plugin.name}
       </button>
       {open && <FormModal plugin={plugin} close={() => setOpen(false)} />}
     </li>
@@ -322,10 +319,7 @@ const Logout = ({
 
   return (
     <button onClick={handleLogout} {...buttonProps}>
-      <span className='mr-2'>
-        <BiExit size={24} />
-      </span>{' '}
-      Log Out
+      <BiExit className='w-6 h-auto mr-2' /> Log Out
     </button>
   );
 };

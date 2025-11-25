@@ -19,6 +19,7 @@ import { NavCloudLink } from './nav-components';
 import { ResizeHandle } from './resize-handle';
 import { FormsView } from './sidebar-body';
 import { TinaIcon } from '@toolkit/icons';
+import { BiMenu } from 'react-icons/bi';
 
 export const SidebarContext = React.createContext<any>(null);
 export const minPreviewWidth = 440;
@@ -244,18 +245,7 @@ const Sidebar = ({
         <SidebarWrapper>
           <EditButton />
           <SidebarBody>
-            <SidebarHeader
-              isLocalMode={cms.api?.tina?.isLocalMode}
-              isTinaAdminEnabled={isTinaAdminEnabled}
-              collectionsInfo={collectionsInfo}
-              screens={activeScreens}
-              cloudConfigs={allConfigs}
-              contentCreators={contentCreators}
-              sidebarWidth={sidebarWidth}
-              menuIsOpen={menuIsOpen}
-              setMenuIsOpen={setMenuIsOpen}
-              setActiveView={setActiveView}
-            />
+            <SidebarHeader isLocalMode={cms.api?.tina?.isLocalMode} />
             <FormsView loadingPlaceholder={sidebar.loadingPlaceholder} />
             {activeScreen && (
               <ScreenPluginModal
@@ -265,6 +255,44 @@ const Sidebar = ({
             )}
           </SidebarBody>
           <ResizeHandle />
+          <Nav
+            isLocalMode={cms.api?.tina?.isLocalMode}
+            showCollections={isTinaAdminEnabled}
+            collectionsInfo={collectionsInfo}
+            screens={activeScreens}
+            cloudConfigs={allConfigs}
+            contentCreators={contentCreators}
+            sidebarWidth={sidebarWidth}
+            open={menuIsOpen}
+            onOpenChange={setMenuIsOpen}
+            RenderNavSite={({ view }) => (
+              <SidebarSiteLink
+                view={view}
+                onClick={() => {
+                  setActiveView(view);
+                  setMenuIsOpen(false);
+                }}
+              />
+            )}
+            RenderNavCloud={({ config }) => <NavCloudLink config={config} />}
+            RenderNavCollection={({ collection }) => (
+              <SidebarCollectionLink
+                onClick={() => {
+                  setMenuIsOpen(false);
+                }}
+                collection={collection}
+              />
+            )}
+            AuthRenderNavCollection={({ collection }) => (
+              <SidebarCollectionLink
+                onClick={() => {
+                  setMenuIsOpen(false);
+                }}
+                collection={collection}
+                Icon={ImUsers}
+              />
+            )}
+          />
         </SidebarWrapper>
       </>
     </SidebarContext.Provider>
@@ -305,19 +333,8 @@ const updateBodyDisplacement = ({
   }
 };
 
-const SidebarHeader = ({
-  isLocalMode,
-  isTinaAdminEnabled,
-  collectionsInfo,
-  screens,
-  cloudConfigs,
-  contentCreators,
-  sidebarWidth,
-  menuIsOpen,
-  setMenuIsOpen,
-  setActiveView,
-}) => {
-  const { toggleSidebarOpen } = React.useContext(SidebarContext);
+const SidebarHeader = ({ isLocalMode }) => {
+  const { toggleSidebarOpen, toggleMenu } = React.useContext(SidebarContext);
 
   return (
     <>
@@ -326,44 +343,14 @@ const SidebarHeader = ({
 
         <div className='w-full flex justify-between items-center'>
           <div className='flex overflow-hidden py-1'>
-            <Nav
-              isLocalMode={isLocalMode}
-              showCollections={isTinaAdminEnabled}
-              collectionsInfo={collectionsInfo}
-              screens={screens}
-              cloudConfigs={cloudConfigs}
-              contentCreators={contentCreators}
-              sidebarWidth={sidebarWidth}
-              open={menuIsOpen}
-              onOpenChange={setMenuIsOpen}
-              RenderNavSite={({ view }) => (
-                <SidebarSiteLink
-                  view={view}
-                  onClick={() => {
-                    setActiveView(view);
-                    setMenuIsOpen(false);
-                  }}
-                />
-              )}
-              RenderNavCloud={({ config }) => <NavCloudLink config={config} />}
-              RenderNavCollection={({ collection }) => (
-                <SidebarCollectionLink
-                  onClick={() => {
-                    setMenuIsOpen(false);
-                  }}
-                  collection={collection}
-                />
-              )}
-              AuthRenderNavCollection={({ collection }) => (
-                <SidebarCollectionLink
-                  onClick={() => {
-                    setMenuIsOpen(false);
-                  }}
-                  collection={collection}
-                  Icon={ImUsers}
-                />
-              )}
-            />
+            <button
+              className='p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
+              onClick={toggleMenu}
+              title='Open navigation menu'
+              aria-label='Open navigation menu'
+            >
+              <BiMenu className='h-8 w-auto text-gray-600' />
+            </button>
             <TinaIcon className='self-center h-10 min-w-10 w-auto text-orange-500 mr-2' />
             <BranchButton className='overflow-hidden mr-2' />
             <LocalWarning className='px-4' />
@@ -379,7 +366,7 @@ const SidebarHeader = ({
               title='Hide editing panel'
               aria-label='Hide editing panel'
             >
-              <PiSidebarSimpleLight size={24} color='#4B5563' />
+              <PiSidebarSimpleLight className='h-6 w-auto text-gray-600' />
             </button>
           </div>
         </div>
@@ -401,10 +388,7 @@ const SidebarSiteLink = ({
       value={view.name}
       onClick={onClick}
     >
-      <span className='mr-2 opacity-80'>
-        <view.Icon size={24} />
-      </span>{' '}
-      {view.name}
+      <view.Icon className='mr-2 h-6 opacity-80 w-auto' /> {view.name}
     </button>
   );
 };
@@ -431,9 +415,7 @@ const SidebarCollectionLink = ({
       }/collections/${collection.name}/~`}
       className='text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100'
     >
-      <span className='mr-2 opacity-80'>
-        <Icon size={24} />
-      </span>{' '}
+      <Icon className='mr-2 h-6 opacity-80 w-auto' />{' '}
       {collection.label ? collection.label : collection.name}
     </a>
   );
