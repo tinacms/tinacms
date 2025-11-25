@@ -42,6 +42,34 @@ const pathRelativeToCollection = (
   );
 };
 
+// Format the default branch name by removing content/ prefix and file extension
+const formatDefaultBranchName = (
+  filePath: string,
+  crudType: string
+): string => {
+  let result = filePath;
+
+  const contentPrefix = 'content/';
+  // Remove "content/" prefix if present
+  if (result.startsWith(contentPrefix)) {
+    result = result.substring(contentPrefix.length);
+  }
+
+  // Remove file extension
+  const lastDot = result.lastIndexOf('.');
+  const lastSlash = Math.max(result.lastIndexOf('/'), result.lastIndexOf('\\'));
+  if (lastDot > lastSlash && lastDot > 0) {
+    result = result.slice(0, lastDot);
+  }
+
+  // Add deletion indicator for delete operations
+  if (crudType === 'delete') {
+    result = `❌-${result}`;
+  }
+
+  return result;
+};
+
 export const CreateBranchModal = ({
   close,
   safeSubmit,
@@ -60,7 +88,7 @@ export const CreateBranchModal = ({
   const { setCurrentBranch } = useBranchData();
   const [disabled, setDisabled] = React.useState(false);
   const [newBranchName, setNewBranchName] = React.useState(
-    `${crudType}-${path}`
+    formatDefaultBranchName(path, crudType)
   );
   const [isExecuting, setIsExecuting] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState('');
@@ -346,7 +374,11 @@ export const CreateBranchModal = ({
         <ModalBody padded={true}>{renderStateContent()}</ModalBody>
         {!isExecuting && (
           <ModalActions align='end'>
-            <Button variant='secondary' className='w-full sm:w-auto'>
+            <Button
+              variant='secondary'
+              className='w-full sm:w-auto'
+              onClick={close}
+            >
               Cancel
             </Button>
             <DropdownButton

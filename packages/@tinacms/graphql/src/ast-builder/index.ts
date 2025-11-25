@@ -23,9 +23,10 @@ import {
   type OperationDefinitionNode,
   type VariableDefinitionNode,
   type ArgumentNode,
+  type DefinitionNode,
 } from 'graphql';
 import { flattenDeep, lastItem } from '../util';
-import uniqBy from 'lodash.uniqby';
+import { uniqBy } from 'es-toolkit';
 
 export const SysFieldDefinition = {
   kind: 'Field' as const,
@@ -1036,6 +1037,7 @@ export const astBuilder = {
         ...extractInlineTypes(ast.globalTemplates),
         ...ast.definitions,
       ],
+      // @ts-ignore - all nodes have a name property in practice
       (field) => field.name.value
     );
 
@@ -1060,16 +1062,16 @@ const capitalize = (s: string) => {
 };
 
 export const extractInlineTypes = (
-  item: TypeDefinitionNode | TypeDefinitionNode[]
-) => {
+  item: DefinitionNode | DefinitionNode[]
+): DefinitionNode[] => {
   if (Array.isArray(item)) {
     // @ts-ignore
-    const accumulator: TypeDefinitionNode[] = item.map((i) => {
+    const accumulator: DefinitionNode[] = item.map((i) => {
       return extractInlineTypes(i);
     });
     return flattenDeep(accumulator);
   }
-  const accumulator: TypeDefinitionNode[] = [item];
+  const accumulator: DefinitionNode[] = [item];
   // @ts-ignore
   for (const node of walk(item)) {
     if (node.kind === 'UnionTypeDefinition') {

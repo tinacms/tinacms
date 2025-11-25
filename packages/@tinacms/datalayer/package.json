@@ -1,6 +1,6 @@
 {
 	"name": "@tinacms/datalayer",
-	"version": "1.4.1",
+	"version": "1.4.2",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
 	"typings": "dist/index",
@@ -51,8 +51,6 @@
 		"@types/jest": "^27.5.2",
 		"@types/js-yaml": "^3.12.10",
 		"@types/level": "catalog:",
-		"@types/lodash.camelcase": "catalog:",
-		"@types/lodash.upperfirst": "catalog:",
 		"@types/node": "^22.13.1",
 		"@types/normalize-path": "catalog:",
 		"@types/yup": "^0.29.14",
