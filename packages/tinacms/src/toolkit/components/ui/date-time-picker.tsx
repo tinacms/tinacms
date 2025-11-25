@@ -1,6 +1,7 @@
 import { Button, buttonVariants } from './button';
+
 import { RotateCw } from 'lucide-react';
-import { Calendar as CalendarSVG, CalendarDays } from 'lucide-react';
+import { Calendar as CalendarSVG, CalendarDays, CalendarX } from 'lucide-react';
 import { Input } from './input';
 import { Popover, PopoverContent, PopoverTrigger } from './popover';
 import moment from 'moment';
@@ -311,14 +312,14 @@ function Calendar({
         weekdays: cn('flex', props.showWeekNumber && 'justify-end'),
         weekday: 'text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]',
         week: 'flex w-full mt-2',
-        day: cn(buttonVariants({ variant: 'ghost' }),'h-9 w-9 text-center hover:bg-accent text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20 rounded-1'),
+        day: cn('h-9 w-9 text-center  hover:[&:not([aria-selected])]:bg-tina-orange/10 text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20 rounded-md'),
         day_button: cn(
           'h-9 w-9 p-0 font-normal aria-selected:opacity-100 rounded-l-md rounded-r-md',
         ),
 
         range_end: 'day-range-end',
         selected:
-          'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground rounded-l-md rounded-r-md',
+          'bg-tina-orange-dark text-primary-foreground active:bg-tina-orange-dark hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground rounded-md rounded-r-md',
         today: 'bg-accent text-accent-foreground',
         outside:
           'day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30',
@@ -792,19 +793,27 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
       <Popover open={open} onOpenChange={setOpen}> 
         <PopoverTrigger asChild disabled={disabled}>
           <div ref={buttonRef} tabIndex={0} className='text-xs pointer overflow-hidden hover:text-gray-600 cursor-pointer rounded border border-gray-100 flex font-semibold shadow transition-colors bg-white text-gray-500'>
-            <div className='my-auto group flex  w-full'>
-              <div className='relative w-7 h-10'>
+            <div className='my-auto group flex gap-2 w-full'>
+              <div className='relative w-8 h-10'>
+                {value ? 
+                <CalendarX className='absolute size-5 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-opacity' />
+              : <>
                 <CalendarSVG className='absolute size-5 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-opacity transition-colors' />
                 <CalendarDays className='absolute size-5 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100' />
+                </>
+                }
               </div>
               <span className='my-auto group-hover:text-blue-600'>{displayDate? formatCurrentDate({dateFormat, displayDate, }): placeholder}</span>
             </div>
             {
               value && 
               <button 
-                onClick={(e)=> {
-                  e.stopPropagation();
-                  onChange?.(undefined)}
+                onClick={
+                  (e)=> {
+                    e.stopPropagation();
+                    onChange?.(undefined)
+                    setOpen(false);
+                  }
                 }
                 className='px-1 w-8 hover:text-blue-600 hover:text-inherit text-gray-200 flex items-center justify-center hover:bg-gray-50'
                 >
@@ -867,3 +876,4 @@ const format = (date: Date, format: string)=> {
 
 export { DateTimePicker, TimePickerInput, TimePicker , formatCurrentDate};
 export type { TimePickerType, DateTimePickerProps, DateTimePickerRef };
+
