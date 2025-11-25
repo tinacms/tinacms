@@ -8,9 +8,10 @@ import { slugify } from '../utils/slugify';
 
 interface AdminNavProps {
   cms: TinaCMS;
+  children?: React.ReactNode;
 }
 
-export const AdminNav = ({ cms }: AdminNavProps) => {
+export const AdminNav = ({ cms, children }: AdminNavProps) => {
   const { collectionsInfo, screens, cloudConfigs, isLocalMode } =
     useNavData(cms);
 
@@ -45,7 +46,9 @@ export const AdminNav = ({ cms }: AdminNavProps) => {
           Icon={ImUsers}
         />
       )}
-    />
+    >
+      {children}
+    </Nav>
   );
 };
 

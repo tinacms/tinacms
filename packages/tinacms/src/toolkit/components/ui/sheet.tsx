@@ -67,7 +67,10 @@ const SheetHeader = ({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
-    className={cn('flex w-full px-4 py-3 justify-between items-center gap-2 border-b border-gray-200', className)}
+    className={cn(
+      'flex w-full px-4 py-3 justify-between items-center gap-2 border-b border-gray-200',
+      className
+    )}
     {...props}
   />
 );
@@ -79,7 +82,10 @@ const SheetTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={cn('text-left inline-flex items-center text-xl tracking-wide text-gray-800/80 flex-1 gap-1', className)}
+    className={cn(
+      'text-left inline-flex items-center text-xl tracking-wide text-gray-800/80 flex-1 gap-1',
+      className
+    )}
     {...props}
   />
 ));

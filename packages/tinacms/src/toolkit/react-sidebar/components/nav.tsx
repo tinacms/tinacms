@@ -1,4 +1,3 @@
-import { Transition, TransitionChild } from '@headlessui/react';
 import { TinaExtendedIcon } from '@tinacms/toolkit';
 import type { CloudConfigPlugin } from '@toolkit/react-cloud-config';
 import { useCMS } from '@toolkit/react-core';
@@ -9,10 +8,15 @@ import * as React from 'react';
 import { BiExit, BiX } from 'react-icons/bi';
 import { FiInfo } from 'react-icons/fi';
 import { VscNewFile } from 'react-icons/vsc';
-import { cn } from '../../../utils/cn';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetClose,
+} from '../../components/ui/sheet';
 import { VersionInfo } from './VersionInfo';
 import { SyncStatusButton, SyncStatusModal } from './sync-status';
-import { useNavContext } from './nav-context';
 
 interface NavCollection {
   label?: string;
@@ -33,6 +37,9 @@ interface NavProps {
   screens?: ScreenPlugin[];
   cloudConfigs?: CloudConfigPlugin[];
   sidebarWidth?: number;
+  defaultOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   RenderNavSite: React.ComponentType<{ view: ScreenPlugin }>;
   RenderNavCloud: React.ComponentType<{ config: CloudConfigPlugin }>;
   RenderNavCollection: React.ComponentType<{
@@ -53,6 +60,9 @@ export const Nav = ({
   cloudConfigs,
   contentCreators,
   sidebarWidth,
+  defaultOpen = false,
+  open,
+  onOpenChange,
   RenderNavSite,
   RenderNavCloud,
   RenderNavCollection,
@@ -60,7 +70,6 @@ export const Nav = ({
   ...props
 }: NavProps) => {
   const cms = useCMS();
-  const { isOpen: menuIsOpen, toggleNav } = useNavContext();
   const [eventsOpen, setEventsOpen] = React.useState(false);
   const { contentCollections, authCollection } =
     collectionsInfo.collections.reduce(
@@ -94,160 +103,136 @@ export const Nav = ({
     { Site: [] }
   );
 
+  const sheetProps =
+    open !== undefined && onOpenChange !== undefined
+      ? { open, onOpenChange }
+      : { defaultOpen };
+
   return (
     <>
-      <Transition show={menuIsOpen} as='div'>
-        <TransitionChild
-          enter='transform transition-all ease-out duration-300'
-          enterFrom='opacity-0 -translate-x-full'
-          enterTo='opacity-100 translate-x-0'
-          leave='transform transition-all ease-in duration-200'
-          leaveFrom='opacity-100 translate-x-0'
-          leaveTo='opacity-0 -translate-x-full'
+      <Sheet {...sheetProps}>
+        {children}
+        <SheetContent
+          side='left'
+          className={`flex flex-col w-96 ${className}`}
+          style={{ maxWidth: `${sidebarWidth}px` }}
+          {...props}
         >
-          <div
-            className={cn(
-              `fixed left-0 top-0 z-overlay flex flex-col bg-white border-r border-gray-200 w-96 h-full transform ${className}`
+          <SheetHeader>
+            <SheetTitle>
+              <TinaExtendedIcon className='h-8 w-auto fill-orange-500' />
+            </SheetTitle>
+            <SheetClose className='p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'>
+              <BiX size={24} color='#4B5563' />
+              <span className='sr-only'>Close</span>
+            </SheetClose>
+          </SheetHeader>
+          <div className='flex flex-col px-6 flex-1 overflow-auto'>
+            {showCollections && (
+              <>
+                <h4 className='flex space-x-1 justify-items-start uppercase font-sans font-bold text-sm mb-3 mt-8 text-gray-700'>
+                  <span>Collections</span>
+                  {isLocalMode && (
+                    <span className='flex items-center'>
+                      <a
+                        href='https://tina.io/docs/r/content-modelling-collections'
+                        target='_blank'
+                      >
+                        <FiInfo />
+                      </a>
+                    </span>
+                  )}
+                </h4>
+                <CollectionsList
+                  RenderNavCollection={RenderNavCollection}
+                  collections={contentCollections}
+                />
+              </>
             )}
-            style={{ maxWidth: `${sidebarWidth}px` }}
-            {...props}
-          >
-            <div className='flex w-full px-4 py-3 justify-between items-center gap-2 border-b border-gray-200'>
-              <span className='text-left inline-flex items-center text-xl tracking-wide text-gray-800/80 flex-1 gap-1'>
-                <TinaExtendedIcon className='h-8 w-auto fill-orange-500' />
-              </span>
-              <button
-                className='p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
-                onClick={toggleNav}
-                aria-label='Close navigation menu'
-                title='Close navigation menu'
-              >
-                <BiX className='h-6 w-auto text-gray-600' />
-              </button>
-            </div>
-            {children}
-            <div className='flex flex-col px-6 flex-1 overflow-auto'>
-              {showCollections && (
-                <>
-                  <h4 className='flex space-x-1 justify-items-start uppercase font-sans font-bold text-sm mb-3 mt-8 text-gray-700'>
-                    <span>Collections</span>
-                    {isLocalMode && (
-                      <span className='flex items-center'>
-                        <a
-                          href='https://tina.io/docs/r/content-modelling-collections'
-                          target='_blank'
-                        >
-                          <FiInfo />
-                        </a>
-                      </span>
-                    )}
-                  </h4>
-                  <CollectionsList
-                    RenderNavCollection={RenderNavCollection}
-                    collections={contentCollections}
-                  />
-                </>
-              )}
-              {(screenCategories.Site.length > 0 || contentCreators.length) >
-                0 && (
-                <>
-                  <h4 className='uppercase font-sans font-bold text-sm mb-3 mt-8 text-gray-700'>
-                    Site
-                  </h4>
-                  <ul className='flex flex-col gap-4'>
-                    {screenCategories.Site.map((view) => {
-                      return (
-                        <li key={`nav-site-${view.name}`}>
-                          <RenderNavSite view={view} />
-                        </li>
-                      );
-                    })}
+            {(screenCategories.Site.length > 0 || contentCreators.length) >
+              0 && (
+              <>
+                <h4 className='uppercase font-sans font-bold text-sm mb-3 mt-8 text-gray-700'>
+                  Site
+                </h4>
+                <ul className='flex flex-col gap-4'>
+                  {screenCategories.Site.map((view) => {
+                    return (
+                      <li key={`nav-site-${view.name}`}>
+                        <RenderNavSite view={view} />
+                      </li>
+                    );
+                  })}
 
-                    {contentCreators.map((plugin, idx) => {
-                      return (
-                        <CreateContentNavItem
-                          key={`plugin-${idx}`}
-                          plugin={plugin}
-                        />
-                      );
-                    })}
-                    {authCollection && (
-                      <CollectionsList
-                        RenderNavCollection={AuthRenderNavCollection}
-                        collections={[authCollection]}
+                  {contentCreators.map((plugin, idx) => {
+                    return (
+                      <CreateContentNavItem
+                        key={`plugin-${idx}`}
+                        plugin={plugin}
                       />
-                    )}
-                  </ul>
-                </>
-              )}
-              {Object.entries(screenCategories).map(([category, screens]) => {
-                if (category !== 'Site') {
-                  return (
-                    <div key={category}>
-                      <h4 className='uppercase font-sans font-bold text-sm mb-3 mt-8 text-gray-700'>
-                        {category}
-                      </h4>
-                      <ul className='flex flex-col gap-4'>
-                        {screens.map((view) => {
-                          return (
-                            <li key={`nav-site-${view.name}`}>
-                              <RenderNavSite view={view} />
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </div>
-                  );
-                }
-              })}
-              {!!cloudConfigs?.length && (
-                <>
-                  <h4 className='uppercase font-sans font-bold text-sm mb-3 mt-8 text-gray-700'>
-                    Cloud
-                  </h4>
-                  <ul className='flex flex-col gap-4'>
-                    {cloudConfigs.map((config) => {
-                      return (
-                        <li key={`nav-site-${config.name}`}>
-                          <RenderNavCloud config={config} />
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </>
-              )}
+                    );
+                  })}
+                  {authCollection && (
+                    <CollectionsList
+                      RenderNavCollection={AuthRenderNavCollection}
+                      collections={[authCollection]}
+                    />
+                  )}
+                </ul>
+              </>
+            )}
+            {Object.entries(screenCategories).map(([category, screens]) => {
+              if (category !== 'Site') {
+                return (
+                  <div key={category}>
+                    <h4 className='uppercase font-sans font-bold text-sm mb-3 mt-8 text-gray-700'>
+                      {category}
+                    </h4>
+                    <ul className='flex flex-col gap-4'>
+                      {screens.map((view) => {
+                        return (
+                          <li key={`nav-site-${view.name}`}>
+                            <RenderNavSite view={view} />
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                );
+              }
+            })}
+            {!!cloudConfigs?.length && (
+              <>
+                <h4 className='uppercase font-sans font-bold text-sm mb-3 mt-8 text-gray-700'>
+                  Cloud
+                </h4>
+                <ul className='flex flex-col gap-4'>
+                  {cloudConfigs.map((config) => {
+                    return (
+                      <li key={`nav-site-${config.name}`}>
+                        <RenderNavCloud config={config} />
+                      </li>
+                    );
+                  })}
+                </ul>
+              </>
+            )}
 
-              <div className='grow my-4 border-b border-gray-200'></div>
+            <div className='grow my-4 border-b border-gray-200'></div>
 
-              <SyncStatusButton
-                className='text-lg py-2 first:pt-3 last:pb-3 whitespace-nowrap flex items-center opacity-80 text-gray-600 hover:text-blue-400'
-                cms={cms}
-                setEventsOpen={setEventsOpen}
-              />
-              <Logout
-                className='text-lg py-2 first:pt-3 last:pb-3 whitespace-nowrap flex items-center opacity-80 text-gray-600 hover:text-blue-400'
-                cms={cms}
-              />
-              <VersionInfo />
-            </div>
+            <SyncStatusButton
+              className='text-lg py-2 first:pt-3 last:pb-3 whitespace-nowrap flex items-center opacity-80 text-gray-600 hover:text-blue-400'
+              cms={cms}
+              setEventsOpen={setEventsOpen}
+            />
+            <Logout
+              className='text-lg py-2 first:pt-3 last:pb-3 whitespace-nowrap flex items-center opacity-80 text-gray-600 hover:text-blue-400'
+              cms={cms}
+            />
+            <VersionInfo />
           </div>
-        </TransitionChild>
-
-        <TransitionChild
-          enter='ease-out duration-300'
-          enterFrom='opacity-0'
-          enterTo='opacity-80'
-          entered='opacity-80'
-          leave='ease-in duration-200'
-          leaveFrom='opacity-80'
-          leaveTo='opacity-0'
-        >
-          <div
-            onClick={toggleNav}
-            className='fixed z-menu inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black'
-          />
-        </TransitionChild>
-      </Transition>
+        </SheetContent>
+      </Sheet>
 
       {eventsOpen && (
         <SyncStatusModal
@@ -296,7 +281,10 @@ const CreateContentNavItem = ({ plugin }) => {
           setOpen(true);
         }}
       >
-        <VscNewFile className='mr-3 h-6 opacity-80 w-auto' /> {plugin.name}
+        <span className='mr-3 opacity-80'>
+          <VscNewFile size={24} />
+        </span>{' '}
+        {plugin.name}
       </button>
       {open && <FormModal plugin={plugin} close={() => setOpen(false)} />}
     </li>
@@ -326,7 +314,10 @@ const Logout = ({
 
   return (
     <button onClick={handleLogout} {...buttonProps}>
-      <BiExit className='w-6 h-auto mr-2' /> Log Out
+      <span className='mr-2'>
+        <BiExit size={24} />
+      </span>{' '}
+      Log Out
     </button>
   );
 };

@@ -4,7 +4,6 @@ import {
   ModalActions,
   ModalBody,
   ModalHeader,
-  NavProvider,
   PopupModal,
   TinaCMS,
   useCMS,
@@ -349,12 +348,9 @@ const DefaultWrapper = ({
 }) => {
   return (
     <Layout>
-      <NavProvider defaultOpen={false}>
-        <div className='flex items-stretch h-dvh overflow-hidden'>
-          <AdminNav cms={cms} />
-          <div className='w-full relative'>{children}</div>
-        </div>
-      </NavProvider>
+      <div className='flex items-stretch h-dvh overflow-hidden'>
+        <div className='w-full relative'>{children}</div>
+      </div>
     </Layout>
   );
 };
