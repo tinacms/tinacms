@@ -5,3 +5,5 @@ export { NavProvider, useNavContext } from './components/nav-context';
 export { NavTrigger } from './components/nav-trigger';
 export { LocalWarning, BillingWarning } from './components/local-warning';
 export { SyncStatusButton } from './components/sync-status';
+export { NavCloudLink } from './components/nav-components';
+export { useNavData } from './hooks/useNavData';

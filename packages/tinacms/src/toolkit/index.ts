@@ -40,6 +40,8 @@ export {
   LocalWarning,
   BillingWarning,
   SyncStatusButton,
+  NavCloudLink,
+  useNavData,
 } from '@toolkit/react-sidebar';
 
 export { useCMS } from '@toolkit/react-core';

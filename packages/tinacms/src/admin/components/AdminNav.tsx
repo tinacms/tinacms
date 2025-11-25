@@ -3,12 +3,7 @@ import { ImFilesEmpty, ImUsers } from 'react-icons/im';
 import type { IconType } from 'react-icons/lib';
 import { NavLink } from 'react-router-dom';
 
-import {
-  Nav,
-  type TinaCMS,
-  type ScreenPlugin,
-  type CloudConfigPlugin,
-} from '@tinacms/toolkit';
+import { Nav, type TinaCMS, NavCloudLink, useNavData } from '@tinacms/toolkit';
 import { slugify } from '../utils/slugify';
 
 interface AdminNavProps {
@@ -16,17 +11,8 @@ interface AdminNavProps {
 }
 
 export const AdminNav = ({ cms }: AdminNavProps) => {
-  const collectionsInfo = { collections: cms.api.admin.fetchCollections() };
-  const screens = cms.plugins.getType<ScreenPlugin>('screen').all();
-  const cloudConfigs = cms.plugins
-    .getType<CloudConfigPlugin>('cloud-config')
-    .all();
-  const isLocalMode = cms.api?.tina?.isLocalMode;
-  const activeScreens = screens.filter(
-    (screen) =>
-      screen.navCategory !== 'Account' ||
-      cms.api.tina.authProvider?.getLoginStrategy() === 'UsernamePassword'
-  );
+  const { collectionsInfo, screens, cloudConfigs, isLocalMode } =
+    useNavData(cms);
 
   return (
     <Nav
@@ -34,7 +20,7 @@ export const AdminNav = ({ cms }: AdminNavProps) => {
       sidebarWidth={360}
       showCollections={true}
       collectionsInfo={collectionsInfo}
-      screens={activeScreens}
+      screens={screens}
       cloudConfigs={cloudConfigs}
       contentCreators={[]}
       RenderNavSite={({ view }) => (
@@ -44,7 +30,7 @@ export const AdminNav = ({ cms }: AdminNavProps) => {
           Icon={view.Icon ? view.Icon : ImFilesEmpty}
         />
       )}
-      RenderNavCloud={({ config }) => <SidebarCloudLink config={config} />}
+      RenderNavCloud={({ config }) => <NavCloudLink config={config} />}
       RenderNavCollection={({ collection }) => (
         <SidebarLink
           label={collection.label ? collection.label : collection.name}
@@ -82,30 +68,5 @@ const SidebarLink = (props: {
     >
       <Icon className='mr-2 h-6 opacity-80 w-auto' /> {label}
     </NavLink>
-  );
-};
-
-const SidebarCloudLink = ({ config }: { config: CloudConfigPlugin }) => {
-  if (config.text) {
-    return (
-      <span className='text-base tracking-wide text-gray-500 flex items-center opacity-90'>
-        {config.text}{' '}
-        <a
-          target='_blank'
-          className='ml-1 text-blue-600 hover:opacity-60'
-          href={config.link.href}
-        >
-          {config.link.text}
-        </a>
-      </span>
-    );
-  }
-  return (
-    <span className='text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100'>
-      <config.Icon className='mr-2 h-6 opacity-80 w-auto' />
-      <a target='_blank' href={config.link.href}>
-        {config.link.text}
-      </a>
-    </span>
   );
 };
