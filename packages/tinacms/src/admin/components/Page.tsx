@@ -8,15 +8,12 @@ import {
   NavCloudLink,
   useNavData,
 } from '@tinacms/toolkit';
-import { Sheet, SheetTrigger } from '@toolkit/components/ui/sheet';
 import React from 'react';
-import { BiMenu } from 'react-icons/bi';
 import { ImFilesEmpty, ImUsers } from 'react-icons/im';
 import type { IconType } from 'react-icons/lib';
 import { NavLink } from 'react-router-dom';
 import { TinaIcon } from '@toolkit/icons';
 import { slugify } from '../utils/slugify';
-import { cn } from '../../utils/cn';
 
 export const PageWrapper = ({
   headerClassName,
@@ -64,18 +61,7 @@ export const PageWrapper = ({
                 Icon={ImUsers}
               />
             )}
-          >
-            <SheetTrigger asChild>
-              <button
-                className={cn(
-                  'pointer-events-auto p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
-                )}
-                aria-label='Toggle navigation menu'
-              >
-                <BiMenu size={24} color='#4B5563' />
-              </button>
-            </SheetTrigger>
-          </Nav>
+          />
           <TinaIcon className='self-center h-10 min-w-10 w-auto text-orange-500' />
           <LocalWarning />
           <BranchButton />
@@ -98,18 +84,12 @@ const SidebarLink = (props: {
     <NavLink
       to={to}
       end
-      className={({ isActive }) =>
-        isActive
-          ? 'px-4 py-2 bg-orange-100 text-orange-500 border-l-4 border-orange-500 -ml-px flex items-center justify-between font-medium text-sm transition-all duration-150 ease-out'
-          : 'px-4 py-2 hover:bg-gray-50 text-gray-600 hover:text-orange-500 border-l-4 border-transparent -ml-px flex items-center justify-between font-medium text-sm transition-all duration-150 ease-out'
-      }
+      className='text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100'
     >
-      <div className='flex items-center gap-3'>
-        <span className='opacity-80'>
-          <Icon size={20} />
-        </span>
-        <span>{label}</span>
-      </div>
+      <span className='mr-2 opacity-80'>
+        <Icon size={24} />
+      </span>{' '}
+      {label}
     </NavLink>
   );
 };

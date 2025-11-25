@@ -5,7 +5,7 @@ import { FormModal } from '@toolkit/react-forms';
 import type { ScreenPlugin } from '@toolkit/react-screens';
 import { TinaCMS } from '@toolkit/tina-cms';
 import * as React from 'react';
-import { BiExit, BiX } from 'react-icons/bi';
+import { BiExit, BiMenu, BiX } from 'react-icons/bi';
 import { FiInfo } from 'react-icons/fi';
 import { VscNewFile } from 'react-icons/vsc';
 import {
@@ -14,6 +14,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetClose,
+  SheetTrigger,
 } from '../../components/ui/sheet';
 import { VersionInfo } from './VersionInfo';
 import { SyncStatusButton, SyncStatusModal } from './sync-status';
@@ -111,7 +112,14 @@ export const Nav = ({
   return (
     <>
       <Sheet {...sheetProps}>
-        {children}
+        <SheetTrigger asChild>
+          <button
+            className='pointer-events-auto p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
+            aria-label='Toggle navigation menu'
+          >
+            <BiMenu size={24} color='#4B5563' />
+          </button>
+        </SheetTrigger>
         <SheetContent
           side='left'
           className={`flex flex-col w-96 ${className}`}

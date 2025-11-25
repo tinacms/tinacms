@@ -17,7 +17,6 @@ import type { SidebarState, SidebarStateOptions } from '../sidebar';
 import { BillingWarning, LocalWarning } from './local-warning';
 import { Nav } from './nav';
 import { NavCloudLink } from './nav-components';
-import { NavProvider } from './nav-context';
 import { ResizeHandle } from './resize-handle';
 import { FormsView } from './sidebar-body';
 import { TinaIcon } from '@toolkit/icons';
@@ -335,7 +334,7 @@ const updateBodyDisplacement = ({
 };
 
 const SidebarHeader = ({ isLocalMode }) => {
-  const { toggleSidebarOpen, toggleMenu } = React.useContext(SidebarContext);
+  const { toggleSidebarOpen } = React.useContext(SidebarContext);
 
   return (
     <>
@@ -344,14 +343,6 @@ const SidebarHeader = ({ isLocalMode }) => {
 
         <div className='w-full flex justify-between items-center'>
           <div className='flex overflow-hidden py-1'>
-            <button
-              className='p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
-              onClick={toggleMenu}
-              title='Open navigation menu'
-              aria-label='Open navigation menu'
-            >
-              <BiMenu className='h-8 w-auto text-gray-600' />
-            </button>
             <TinaIcon className='self-center h-10 min-w-10 w-auto text-orange-500 mr-2' />
             <BranchButton className='overflow-hidden mr-2' />
             <LocalWarning className='px-4' />
@@ -367,7 +358,7 @@ const SidebarHeader = ({ isLocalMode }) => {
               title='Hide editing panel'
               aria-label='Hide editing panel'
             >
-              <PiSidebarSimpleLight className='h-6 w-auto text-gray-600' />
+              <PiSidebarSimpleLight size={24} color='#4B5563' />
             </button>
           </div>
         </div>
@@ -389,7 +380,10 @@ const SidebarSiteLink = ({
       value={view.name}
       onClick={onClick}
     >
-      <view.Icon className='mr-2 h-6 opacity-80 w-auto' /> {view.name}
+      <span className='mr-2 opacity-80'>
+        <view.Icon size={24} />
+      </span>{' '}
+      {view.name}
     </button>
   );
 };
@@ -416,7 +410,9 @@ const SidebarCollectionLink = ({
       }/collections/${collection.name}/~`}
       className='text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100'
     >
-      <Icon className='mr-2 h-6 opacity-80 w-auto' />{' '}
+      <span className='mr-2 opacity-80'>
+        <Icon size={24} />
+      </span>{' '}
       {collection.label ? collection.label : collection.name}
     </a>
   );
