@@ -228,9 +228,11 @@ function genYears(yearRange = 50) {
 
 const formatCurrentDate = ({dateFormat, timeFormat, displayDate}: {dateFormat?: string, timeFormat?: string, displayDate: Date})=> {
   if(!dateFormat && !timeFormat) {
-        throw new Error('DateTimePicker must have at least one of dateFormat or timeFormat defined');
-      }
-      console.log({timeFormat, dateFormat});
+      console.error("DateTimePicker: Missing date or time format");
+      return "Error: Missing date or time format";
+    }
+
+      
       
       if(!timeFormat) {
         return format(displayDate, dateFormat);
@@ -754,7 +756,6 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
         return;
       }
       
-      console.log("new day", newDay);
       onChange?.(newDay);
       setMonth(newDay);
       setDisplayDate(newDay);
