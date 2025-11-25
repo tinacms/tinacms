@@ -6,7 +6,7 @@ import { Input } from './input';
 import { Popover, PopoverContent, PopoverTrigger } from './popover';
 import moment from 'moment';
 import 'moment-timezone';
-import { add, //format, 
+import { add,
   Locale } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import {  ChevronLeft, ChevronRight } from 'lucide-react';
@@ -470,8 +470,6 @@ const TimePickerInput = React.forwardRef<HTMLInputElement, TimePickerInputProps>
     ref,
   ) => {
     const [flag, setFlag] = React.useState<boolean>(false);
-    const [prevIntKey, setPrevIntKey] = React.useState<string>('0');
-
     /**
      * allow the user to enter the second digit within 2 seconds
      * otherwise start again with entering first digit
@@ -495,9 +493,6 @@ const TimePickerInput = React.forwardRef<HTMLInputElement, TimePickerInputProps>
        * If picker is '12hours' and the first digit is 0, then the second digit is automatically set to 1.
        * The second entered digit will break the condition and the value will be set to 10-12.
        */
-      // if (picker === '12hours') {
-      //   if (flag && calculatedValue.slice(1, 2) === '1' && prevIntKey === '0') return `0${key}`;
-      // }
 
       return !flag ? `0${key}` : calculatedValue.slice(1, 2) + key;
     };
