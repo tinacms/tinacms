@@ -66,11 +66,6 @@ catalog:
   "@types/json-diff": ^1.0.3
   "@types/level": ^6.0.3
   "@types/listr": 0.14.2
-  "@types/lodash.camelcase": ^4.3.9
-  "@types/lodash.debounce": ^4.0.9
-  "@types/lodash.flatten": ^4.4.9
-  "@types/lodash.get": ^4.4.9
-  "@types/lodash.upperfirst": ^4.3.9
   "@types/log4js": ^2.3.5
   "@types/lru-cache": ^5.1.1
   "@types/mdast": ^3.0.15
@@ -167,11 +162,6 @@ catalog:
   js-sha1: ^0.6.0
   json-diff: ^1.0.6
   jsonpath-plus: 10.1.0
-  lodash.clonedeep: ^4.5.0
-  lodash.flatten: 4.4.0
-  lodash.get: ^4.4.2
-  lodash.set: ^4.3.2
-  lodash.uniqby: ^4.7.0
   log4js: ^6.9.1
   lowlight: ^3.3.0
   lucide-react: ^0.424.0

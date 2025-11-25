@@ -1,5 +1,17 @@
 # @tinacms/schema-tools
 
+## 1.10.0
+
+### Minor Changes
+
+- [#6142](https://github.com/tinacms/tinacms/pull/6142) [`f2577b9`](https://github.com/tinacms/tinacms/commit/f2577b911a97ecc1c3f53a98ae8218cc33bc9867) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Folder creation validation with regex
+
+### Patch Changes
+
+- [#6147](https://github.com/tinacms/tinacms/pull/6147) [`38920ce`](https://github.com/tinacms/tinacms/commit/38920ce29a9b63c54b04f39537f19beab62d2c86) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Fix: ui.max not applying to primitive type list:true
+
+- [#5822](https://github.com/tinacms/tinacms/pull/5822) [`4b824be`](https://github.com/tinacms/tinacms/commit/4b824be53572f9231753ebd3b5f14fd778fd73d6) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Migrate from react-beautiful-dnd to dnd-kit to fix deprecation error.
+
 ## 1.9.1
 
 ### Patch Changes
