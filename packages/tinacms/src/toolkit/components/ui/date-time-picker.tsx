@@ -250,49 +250,84 @@ function Calendar({
   classNames,
   showOutsideDays = true,
   yearRange = 50,
+  selected,
+  onSelect,
+  initialMonth,
+  locale: localeOverride,
+  required,
   ...props
-}: DayPickerProps & { yearRange?: number }) {
+}: Omit<DayPickerProps, 'mode' | 'selected' | 'onSelect' | 'month' | 'onMonthChange'> & {
+  yearRange?: number;
+  selected?: Date;
+  onSelect?: (date: Date | undefined) => void;
+  initialMonth?: Date;
+}) {
   const MONTHS = React.useMemo(() => {
     let locale: Pick<Locale, 'options' | 'localize' | 'formatLong'> = enUS;
-    const { options, localize, formatLong } = props.locale || {};
+    const { options, localize, formatLong } = localeOverride || {};
     if (options && localize && formatLong) {
-      locale = {
-        options,
-        localize,
-        formatLong,
-      };
+      locale = { options, localize, formatLong };
     }
     return genMonths(locale);
-  }, []);
+  }, [localeOverride]);
 
-  const YEARS = React.useMemo(() => genYears(yearRange), []);
-  const disableLeftNavigation = () => {
+  const YEARS = React.useMemo(() => genYears(yearRange), [yearRange]);
+  
+  // Calendar manages its own month state, initialized from selected date or initialMonth
+  const [month, setMonth] = React.useState<Date>(initialMonth || selected || new Date());
+
+  // Update month when selected date changes to a different month/year
+  React.useEffect(() => {
+    if (
+      selected &&
+      (selected.getMonth() !== month.getMonth() || selected.getFullYear() !== month.getFullYear())
+    ) {
+      setMonth(selected);
+    }
+  }, [selected]);
+  const disableLeftNavigation = React.useCallback(() => {
     const today = new Date();
     const startDate = new Date(today.getFullYear() - yearRange, 0, 1);
-    if (props.month) {
-      return (
-        props.month.getMonth() === startDate.getMonth() &&
-        props.month.getFullYear() === startDate.getFullYear()
-      );
-    }
-    return false;
-  };
-  const disableRightNavigation = () => {
+    return (
+      month.getMonth() === startDate.getMonth() &&
+      month.getFullYear() === startDate.getFullYear()
+    );
+  }, [month, yearRange]);
+  const disableRightNavigation = React.useCallback(() => {
     const today = new Date();
     const endDate = new Date(today.getFullYear() + yearRange, 11, 31);
-    if (props.month) {
-      return (
-        props.month.getMonth() === endDate.getMonth() &&
-        props.month.getFullYear() === endDate.getFullYear()
-      );
-    }
-    return false;
-  };
+    return (
+      month.getMonth() === endDate.getMonth() &&
+      month.getFullYear() === endDate.getFullYear()
+    );
+  }, [month, yearRange]);
 
   return (
     <DayPicker
+      mode="single"
+      selected={selected}
+      onSelect={(day) => {
+        if (!day) {
+          onSelect?.(undefined);
+          return;
+        }
+        // Preserve time from selected date when picking a new day
+        const withTime = new Date(day);
+        if (selected) {
+          withTime.setHours(
+            selected.getHours(),
+            selected.getMinutes(),
+            selected.getSeconds(),
+            selected.getMilliseconds()
+          );
+        }
+        onSelect?.(withTime);
+      }}
+      month={month}
+      onMonthChange={setMonth}
       showOutsideDays={showOutsideDays}
       className={cn('p-3', className)}
+      {...props}
       classNames={{
         months: 'flex flex-col sm:flex-row space-y-4 relative sm:space-y-0 justify-center',
         month: 'flex flex-col items-center space-y-4',
@@ -344,7 +379,7 @@ function Calendar({
                 onValueChange={(value) => {
                   const newDate = new Date(calendarMonth.date);
                   newDate.setMonth(Number.parseInt(value, 10));
-                  props.onMonthChange?.(newDate);
+                  setMonth(newDate);
                 }}
               >
                 <SelectTrigger className="focus:bg-accent focus:text-accent-foreground w-fit gap-1 border-none p-0 shadow-none">
@@ -363,7 +398,7 @@ function Calendar({
                 onValueChange={(value) => {
                   const newDate = new Date(calendarMonth.date);
                   newDate.setFullYear(Number.parseInt(value, 10));
-                  props.onMonthChange?.(newDate);
+                  setMonth(newDate);
                 }}
               >
                 <SelectTrigger className="focus:bg-accent focus:text-accent-foreground w-fit gap-1 border-none p-0 shadow-none">
@@ -511,8 +546,6 @@ const TimePickerInput = React.forwardRef<HTMLInputElement, TimePickerInputProps>
         onDateChange?.(setDateByType(tempDate, newValue, picker, period));
       }
       if (e.key >= '0' && e.key <= '9') {
-        // if (picker === '12hours') setPrevIntKey(e.key);
-
         const newValue = calculateNewValue(e.key);
         if (flag) onRightFocus?.();
         setFlag((prev) => !prev);
@@ -654,7 +687,6 @@ type Granularity = 'day' | 'hour' | 'minute' | 'second';
 type DateTimePickerProps = {
   value?: Date;
   onChange?: (date: Date | undefined) => void;
-  onMonthChange?: (date: Date | undefined) => void;
   disabled?: boolean;
   dateFormat?: string;
   timeFormat?: string;
@@ -696,7 +728,6 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
       defaultPopupValue = new Date(new Date().setHours(0, 0, 0, 0)),
       value,
       onChange,
-      onMonthChange,
       hourCycle = 24,
       dateFormat,
       timeFormat,
@@ -710,63 +741,24 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
     },
     ref,
   ) => {
-    const [month, setMonth] = React.useState<Date>(value ?? defaultPopupValue);
     const [open, setOpen] = React.useState<boolean>(false);
     const buttonRef = useRef<HTMLInputElement>(null);
     const [displayDate, setDisplayDate] = React.useState<Date | undefined>(value ?? undefined);
-    onMonthChange ||= onChange;
 
     /**
-     * Makes sure display date updates when value change on
-     * parent component
+     * Makes sure display date updates when value changes on parent component
      */
     React.useEffect(() => {
       setDisplayDate(value);
     }, [value]);
 
-    /**
-     * carry over the current time when a user clicks a new day
-     * instead of resetting to 00:00
-     */
-    const handleMonthChange = (newDay: Date | undefined) => {
-      if (!newDay) {
-        return;
-      }
-      if (!defaultPopupValue) {
-        newDay.setHours(month?.getHours() ?? 0, month?.getMinutes() ?? 0, month?.getSeconds() ?? 0);
-        onMonthChange?.(newDay);
-        setMonth(newDay);
-        return;
-      }
-    
-      const diff = newDay.getTime() - defaultPopupValue.getTime();
-      const diffInDays = diff / (1000 * 60 * 60 * 24);
-      const newDateFull = add(defaultPopupValue, { days: Math.ceil(diffInDays) });
-      newDateFull.setHours(
-        month?.getHours() ?? 0,
-        month?.getMinutes() ?? 0,
-        month?.getSeconds() ?? 0,
-      );
-      setMonth(newDateFull);
-    };
-
-    console.log("defaultPopupValue", defaultPopupValue);
-
-    const handleClose = React.useCallback((isOpen : boolean) => {
-      if(!isOpen)
-      {
-        setMonth(value ?? defaultPopupValue);
-      }
+    const handleClose = React.useCallback((isOpen: boolean) => {
       setOpen(isOpen);
-    }, [defaultPopupValue, value]);
+    }, []);
 
-    const onSelect = (newDay?: Date) => {
-      if (!newDay) {
-        return;
-      }
-      
+    const handleDaySelect = (newDay?: Date) => {
+      if (!newDay) return;
       onChange?.(newDay);
-      setMonth(newDay);
       setDisplayDate(newDay);
     };
 
@@ -832,21 +824,10 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
         
           align='start' className="w-auto p-0">
           <Calendar
-          className='text-gray-700'
-            mode="single"
+            className='text-gray-700'
             selected={displayDate}
-            month={month}
-            onSelect={(newDate) => {
-              if (newDate) {
-                newDate.setHours(
-                  month?.getHours() ?? 0,
-                  month?.getMinutes() ?? 0,
-                  month?.getSeconds() ?? 0,
-                );
-                onSelect(newDate);
-              }
-            }}
-            onMonthChange={handleMonthChange}
+            onSelect={handleDaySelect}
+            initialMonth={value ?? defaultPopupValue}
             yearRange={yearRange}
             locale={locale}
             {...props}
@@ -857,11 +838,8 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
                 onChange={(value) => {
                   onChange?.(value);
                   setDisplayDate(value);
-                  if (value) {
-                    setMonth(value);
-                  }
                 }}
-                date={month}
+                date={displayDate}
                 hourCycle={hourCycle}
                 granularity={granularity}
               />
