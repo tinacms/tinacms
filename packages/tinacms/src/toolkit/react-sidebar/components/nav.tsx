@@ -9,6 +9,7 @@ import { BiExit, BiMenu } from 'react-icons/bi';
 import { FiInfo } from 'react-icons/fi';
 import { VscNewFile } from 'react-icons/vsc';
 import { cn } from '../../../utils/cn';
+import { NavContext } from './nav-context';
 import { VersionInfo } from './VersionInfo';
 import { SyncStatusButton, SyncStatusModal } from './sync-status';
 
@@ -21,8 +22,8 @@ interface NavCollection {
 interface NavProps {
   isLocalMode: boolean;
   showHamburger?: boolean;
-  menuIsOpen: boolean;
-  toggleMenu: () => void;
+  menuIsOpen?: boolean;
+  toggleMenu?: () => void;
   children?: any;
   className?: string;
   userName?: string;
@@ -47,8 +48,8 @@ interface NavProps {
 export const Nav = ({
   isLocalMode,
   showHamburger = true,
-  menuIsOpen,
-  toggleMenu,
+  menuIsOpen: menuIsOpenProp,
+  toggleMenu: toggleMenuProp,
   className = '',
   children,
   showCollections,
@@ -65,6 +66,12 @@ export const Nav = ({
 }: NavProps) => {
   const cms = useCMS();
   const [eventsOpen, setEventsOpen] = React.useState(false);
+
+  // Use context if available, otherwise fall back to props
+  const navContext = React.useContext(NavContext);
+
+  const menuIsOpen = menuIsOpenProp ?? navContext?.menuIsOpen ?? false;
+  const toggleMenu = toggleMenuProp ?? navContext?.toggleMenu ?? (() => {});
   const { contentCollections, authCollection } =
     collectionsInfo.collections.reduce(
       (
