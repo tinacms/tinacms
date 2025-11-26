@@ -15,7 +15,12 @@ export const NavMenuTrigger: React.FC<NavMenuTriggerProps> = ({
   className = '',
   label = 'Toggle navigation menu',
 }) => {
-  const { toggleMenu } = useNav();
+  const { toggleMenu, menuIsOpen } = useNav();
+
+  // Only render when menu is closed
+  if (menuIsOpen) {
+    return null;
+  }
 
   return (
     <button

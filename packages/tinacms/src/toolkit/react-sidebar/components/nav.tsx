@@ -106,20 +106,21 @@ export const Nav = ({
 
   return (
     <>
-      <div className='flex items-baseline'>
-        <button
-          className={cn(
-            'pointer-events-auto p-4 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded z-10',
-            menuIsOpen ? 'hidden' : ''
-          )}
-          onClick={() => {
-            toggleMenu();
-          }}
-        >
-          <BiMenu className='h-8 w-auto text-gray-600' />
-        </button>
-      </div>
-
+      {showHamburger && (
+        <div className='flex items-baseline'>
+          <button
+            className={cn(
+              'pointer-events-auto p-4 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded z-10',
+              menuIsOpen ? 'hidden' : ''
+            )}
+            onClick={() => {
+              toggleMenu();
+            }}
+          >
+            <BiMenu className='h-8 w-auto text-gray-600' />
+          </button>
+        </div>
+      )}
       <div
         className={cn(
           `relative z-30 flex flex-col bg-white border-r border-gray-200 w-96 h-full ${className}`,
@@ -249,7 +250,6 @@ export const Nav = ({
           <VersionInfo />
         </div>
       </div>
-
       {eventsOpen && (
         <SyncStatusModal
           cms={cms}

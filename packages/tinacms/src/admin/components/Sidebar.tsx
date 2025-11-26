@@ -38,40 +38,38 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
   );
 
   return (
-    <NavProvider defaultOpen={isOnDashboard}>
-      <Nav
-        isLocalMode={isLocalMode}
-        showHamburger={false}
-        sidebarWidth={360}
-        showCollections={true}
-        collectionsInfo={collectionsInfo}
-        screens={activeScreens}
-        cloudConfigs={cloudConfigs}
-        contentCreators={[]}
-        RenderNavSite={({ view }) => (
-          <SidebarLink
-            label={view.name}
-            to={`/screens/${slugify(view.name)}`}
-            Icon={view.Icon ? view.Icon : ImFilesEmpty}
-          />
-        )}
-        RenderNavCloud={({ config }) => <NavCloudLink config={config} />}
-        RenderNavCollection={({ collection }) => (
-          <SidebarLink
-            label={collection.label ? collection.label : collection.name}
-            to={`/collections/${collection.name}/~`}
-            Icon={ImFilesEmpty}
-          />
-        )}
-        AuthRenderNavCollection={({ collection }) => (
-          <SidebarLink
-            label={collection.label ? collection.label : collection.name}
-            to={`/collections/${collection.name}/~`}
-            Icon={ImUsers}
-          />
-        )}
-      />
-    </NavProvider>
+    <Nav
+      isLocalMode={isLocalMode}
+      showHamburger={false}
+      sidebarWidth={360}
+      showCollections={true}
+      collectionsInfo={collectionsInfo}
+      screens={activeScreens}
+      cloudConfigs={cloudConfigs}
+      contentCreators={[]}
+      RenderNavSite={({ view }) => (
+        <SidebarLink
+          label={view.name}
+          to={`/screens/${slugify(view.name)}`}
+          Icon={view.Icon ? view.Icon : ImFilesEmpty}
+        />
+      )}
+      RenderNavCloud={({ config }) => <NavCloudLink config={config} />}
+      RenderNavCollection={({ collection }) => (
+        <SidebarLink
+          label={collection.label ? collection.label : collection.name}
+          to={`/collections/${collection.name}/~`}
+          Icon={ImFilesEmpty}
+        />
+      )}
+      AuthRenderNavCollection={({ collection }) => (
+        <SidebarLink
+          label={collection.label ? collection.label : collection.name}
+          to={`/collections/${collection.name}/~`}
+          Icon={ImUsers}
+        />
+      )}
+    />
   );
 };
 
