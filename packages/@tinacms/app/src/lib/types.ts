@@ -5,6 +5,7 @@ export type PostMessage =
       data: object;
     }
   | { type: 'field:selected'; fieldName: string }
+  | { type: 'field:hovered'; fieldName: string | null }
   | { type: 'quick-edit'; value: boolean }
   | { type: 'user-select-form'; formId: string }
   | { type: 'url-changed' };

@@ -536,6 +536,31 @@ export const useGraphQLReducer = (
           value: 'openOrFull',
         });
       }
+      if (event.data.type === 'field:hovered') {
+        if (event.data.fieldName) {
+          const [queryId, eventFieldName] = event.data.fieldName.split('---');
+          const result = results.find((res) => res.id === queryId);
+          if (result?.data) {
+            const { formId, fieldName } = getFormAndFieldNameFromMetadata(
+              result.data,
+              eventFieldName
+            );
+            cms.dispatch({
+              type: 'forms:set-hovered-field-name',
+              value: getFormAndFieldNameFromMetadata(
+                result.data,
+                eventFieldName
+              ),
+            });
+          }
+        } else {
+          // Clear hover state when fieldName is null
+          cms.dispatch({
+            type: 'forms:set-hovered-field-name',
+            value: { formId: null, fieldName: null },
+          });
+        }
+      }
       if (event.data.type === 'close') {
         const payloadSchema = z.object({ id: z.string() });
         const { id } = payloadSchema.parse(event.data);
