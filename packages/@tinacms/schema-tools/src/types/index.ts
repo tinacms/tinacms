@@ -921,6 +921,7 @@ export interface UICollection<Form = any, CMS = any, TinaForm = any> {
   allowedActions?: {
     create?: boolean;
     delete?: boolean;
+    createFolder?: boolean;
     createNestedFolder?: boolean;
   };
   /**

@@ -349,6 +349,8 @@ const CollectionListPage = () => {
                   collectionDefinition?.ui?.allowedActions?.create ?? true;
                 const allowDelete =
                   collectionDefinition?.ui?.allowedActions?.delete ?? true;
+                const allowCreateFolder =
+                  collectionDefinition?.ui?.allowedActions?.createFolder ?? true;
                 const allowCreateNestedFolder =
                   collectionDefinition?.ui?.allowedActions
                     ?.createNestedFolder ?? true;
@@ -628,7 +630,7 @@ const CollectionListPage = () => {
                           </div>
                           {allowCreate && (
                             <div className='flex flex-col md:flex-row items-start md:items-end gap-2 md:gap-0 pt-4 lg:pt-0'>
-                              {allowCreateNestedFolder && (
+                              {allowCreateFolder && allowCreateNestedFolder && (
                                 <>
                                   <TooltipProvider>
                                     <Tooltip>
