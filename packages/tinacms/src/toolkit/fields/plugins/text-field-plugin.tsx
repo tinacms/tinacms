@@ -2,7 +2,7 @@ import * as React from 'react';
 import { BaseTextField, type InputProps } from '../components';
 import { wrapFieldsWithMeta } from './wrap-field-with-meta';
 import { parse } from './text-format';
-import get from 'lodash.get';
+import { get } from '../../../utils';
 interface ExtraProps {
   placeholder: string;
   disabled?: boolean;

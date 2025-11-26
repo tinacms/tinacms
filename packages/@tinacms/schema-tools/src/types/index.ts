@@ -250,6 +250,16 @@ export type ImageField = (
 ) &
   BaseField & {
     type: 'image';
+    /**
+     * A function that returns the upload directory path based on the form values.
+     * This is used to organize uploaded images into specific folders.
+     *
+     * @example
+     * ```ts
+     * uploadDir: (formValues) => `uploads/${formValues.category}`
+     * ```
+     */
+    uploadDir?: (formValues: Record<string, any>) => string;
   };
 
 type ReferenceFieldOptions = {

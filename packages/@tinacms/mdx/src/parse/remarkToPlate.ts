@@ -4,13 +4,12 @@
 
 */
 
-import flatten from 'lodash.flatten';
-import { directiveElement, mdxJsxElement as mdxJsxElementDefault } from './mdx';
-import type * as Md from 'mdast';
-import type * as Plate from './plate';
 import type { RichTextType } from '@tinacms/schema-tools';
-import type { MdxJsxTextElement, MdxJsxFlowElement } from 'mdast-util-mdx-jsx';
+import type * as Md from 'mdast';
 import type { ContainerDirective } from 'mdast-util-directive';
+import type { MdxJsxFlowElement, MdxJsxTextElement } from 'mdast-util-mdx-jsx';
+import { directiveElement, mdxJsxElement as mdxJsxElementDefault } from './mdx';
+import type * as Plate from './plate';
 
 export type { Position, PositionItem } from './plate';
 
@@ -55,11 +54,9 @@ export const remarkToSlate = (
                   children: [
                     {
                       type: 'p',
-                      children: flatten(
-                        tableCell.children.map((child) =>
-                          phrasingContent(child)
-                        )
-                      ),
+                      children: tableCell.children
+                        .map((child) => phrasingContent(child))
+                        .flat(),
                     },
                   ],
                 };
@@ -102,9 +99,9 @@ export const remarkToSlate = (
           children: [
             {
               type: 'lic',
-              children: flatten(
-                content.children.map((child) => unwrapBlockContent(child))
-              ),
+              children: content.children
+                .map((child) => unwrapBlockContent(child))
+                .flat(),
             },
           ],
         };
@@ -189,9 +186,9 @@ export const remarkToSlate = (
           case 'paragraph':
             return {
               type: 'lic',
-              children: flatten(
-                child.children.map((child) => phrasingContent(child))
-              ),
+              children: child.children
+                .map((child) => phrasingContent(child))
+                .flat(),
             };
           case 'blockquote': {
             return {
@@ -260,7 +257,7 @@ export const remarkToSlate = (
       children: Md.PhrasingContent[]
     ): Plate.LicElement[] => {
       const children2 = children.map((child) => phrasingContent(child));
-      return flatten(Array.isArray(children2) ? children2 : [children2]);
+      return (Array.isArray(children2) ? children2 : [children2]).flat();
     };
     switch (content.type) {
       case 'heading':
@@ -318,9 +315,9 @@ export const remarkToSlate = (
       type: 'a',
       url: sanitizeUrl(content.url),
       title: content.title,
-      children: flatten(
-        content.children.map((child) => staticPhrasingContent(child))
-      ),
+      children: content.children
+        .map((child) => staticPhrasingContent(child))
+        .flat(),
     };
   };
   const heading = (content: Md.Heading): Plate.HeadingElement => {
@@ -328,7 +325,7 @@ export const remarkToSlate = (
       type: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'][
         content.depth - 1
       ] as Plate.HeadingElement['type'],
-      children: flatten(content.children.map(phrasingContent)),
+      children: content.children.map(phrasingContent).flat(),
     };
   };
   const staticPhrasingContent = (
@@ -409,11 +406,9 @@ export const remarkToSlate = (
     const accum: Plate.InlineElement[] = [];
     switch (node.type) {
       case 'emphasis': {
-        const children = flatten(
-          node.children.map((child) =>
-            phrashingMark(child, [...marks, 'italic'])
-          )
-        );
+        const children = node.children
+          .map((child) => phrashingMark(child, [...marks, 'italic']))
+          .flat();
         children.forEach((child) => {
           accum.push(child);
         });
@@ -431,11 +426,9 @@ export const remarkToSlate = (
         break;
       }
       case 'delete': {
-        const children = flatten(
-          node.children.map((child) =>
-            phrashingMark(child, [...marks, 'strikethrough'])
-          )
-        );
+        const children = node.children
+          .map((child) => phrashingMark(child, [...marks, 'strikethrough']))
+          .flat();
         children.forEach((child) => {
           accum.push(child);
         });
@@ -443,9 +436,9 @@ export const remarkToSlate = (
       }
 
       case 'strong': {
-        const children = flatten(
-          node.children.map((child) => phrashingMark(child, [...marks, 'bold']))
-        );
+        const children = node.children
+          .map((child) => phrashingMark(child, [...marks, 'bold']))
+          .flat();
         children.forEach((child) => {
           accum.push(child);
         });
@@ -456,9 +449,9 @@ export const remarkToSlate = (
         break;
       }
       case 'link': {
-        const children = flatten(
-          node.children.map((child) => phrashingMark(child, marks))
-        );
+        const children = node.children
+          .map((child) => phrashingMark(child, marks))
+          .flat();
         accum.push({
           type: 'a',
           url: sanitizeUrl(node.url),
@@ -523,7 +516,7 @@ export const remarkToSlate = (
   const paragraph = (
     content: Md.Paragraph
   ): Plate.ParagraphElement | Plate.HTMLElement => {
-    const children = flatten(content.children.map(phrasingContent));
+    const children = content.children.map(phrasingContent).flat();
     // MDX treats <div>Hello</div> is inline even if it's isolated on one line
     // If that's the case, swap it out with html
     // TODO: probably need to do the same with JSX

@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.4.1
+
+### Patch Changes
+
+- [#5822](https://github.com/tinacms/tinacms/pull/5822) [`4b824be`](https://github.com/tinacms/tinacms/commit/4b824be53572f9231753ebd3b5f14fd778fd73d6) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Migrate from react-beautiful-dnd to dnd-kit to fix deprecation error.
+
 ## 1.4.0
 
 ### Minor Changes

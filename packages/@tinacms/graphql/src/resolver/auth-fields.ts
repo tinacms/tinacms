@@ -2,7 +2,7 @@ import path from 'path';
 import type { TinaSchema } from '@tinacms/schema-tools';
 import type { GraphQLResolveInfo } from 'graphql';
 import { get } from '../util';
-import set from 'lodash.set';
+import { set } from 'es-toolkit/compat';
 import { checkPasswordHash, mapUserFields } from '../auth/utils';
 import type { Resolver } from './index';
 
