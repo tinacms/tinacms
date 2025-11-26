@@ -56,6 +56,10 @@ export type TinaAction =
       value: { formId: string; fieldName: string };
     }
   | {
+      type: 'forms:set-hovered-field-name';
+      value: { formId: string; fieldName: string | null };
+    }
+  | {
       type: 'form-lists:clear';
     }
   | {
@@ -240,6 +244,7 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         };
       }
       return state;
+    
     case 'forms:set-active-field-name':
       if (state.activeFormId === action.value.formId) {
         const existingForm = state.forms.find(
@@ -274,6 +279,35 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         forms,
         activeFormId: action.value.formId,
       };
+    
+    case 'forms:set-hovered-field-name':
+      // Only set hovered field if we're within the current active form
+      if (state.activeFormId !== action.value.formId) {
+        return state;
+      }
+
+      const hoveredForms = state.forms.map((form) => {
+        if (form.tinaForm.id === action.value.formId) {
+          return {
+            tinaForm: form.tinaForm,
+            activeFieldName: action.value.fieldName,
+          };
+        }
+        return form;
+      });
+
+      const hoveredBreadcrumbs = calculateBreadcrumbs(
+        state.forms,
+        action.value.formId,
+        action.value.fieldName || ''
+      );
+
+      return {
+        ...state,
+        breadcrumbs: hoveredBreadcrumbs,
+        forms: hoveredForms,
+      };
+    
     case 'toggle-edit-state': {
       return state.sidebarDisplayState === 'closed'
         ? { ...state, sidebarDisplayState: 'open' }
