@@ -630,14 +630,14 @@ const CollectionListPage = () => {
                           </div>
                           {allowCreate && (
                             <div className='flex flex-col md:flex-row items-start md:items-end gap-2 md:gap-0 pt-4 lg:pt-0'>
-                              {allowCreateFolder && allowCreateNestedFolder && (
+                              {allowCreateNestedFolder && (
                                 <>
                                   <TooltipProvider>
                                     <Tooltip>
                                       <TooltipTrigger asChild>
                                         <Link
                                           onMouseDown={(evt) => {
-                                            if (collection.templates) {
+                                            if (collection.templates || !allowCreateFolder) {
                                               // TODO: behavior not supported yet - see https://github.com/tinacms/tinacms/issues/4797
                                               evt.preventDefault();
                                               return;
@@ -653,36 +653,42 @@ const CollectionListPage = () => {
                                           to='/collections/new-folder'
                                           className={cn(
                                             'icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-gray-500 bg-white hover:bg-gray-50 border border-gray-100 focus:ring-white focus:ring-blue-500 w-full md:w-auto text-sm h-10 px-6 mr-4',
-                                            collection.templates &&
+                                            (collection.templates || !allowCreateFolder) &&
                                               'opacity-50 pointer-events-none cursor-not-allowed'
                                           )}
-                                          aria-disabled={!!collection.templates}
+                                          aria-disabled={!!collection.templates || !allowCreateFolder}
                                           tabIndex={
-                                            collection.templates ? -1 : 0
+                                            collection.templates || !allowCreateFolder ? -1 : 0
                                           }
                                         >
                                           <FaFolder className='mr-2' />
                                           Add Folder
                                         </Link>
                                       </TooltipTrigger>
-                                      {collection.templates && (
+                                      {(collection.templates || !allowCreateFolder) && (
                                         <TooltipContent
                                           side='top'
                                           align='center'
                                         >
                                           <p>
-                                            Folders can&apos;t be manually added
-                                            when using templates.
-                                            <br />
-                                            See the docs -{' '}
-                                            <a
-                                              href='https://tina.io/docs/r/content-modelling-templates'
-                                              target='_blank'
-                                              rel='noopener noreferrer'
-                                              className='underline text-blue-500'
-                                            >
-                                              https://tina.io/docs/r/content-modelling-templates
-                                            </a>
+                                            {collection.templates ? (
+                                              <>
+                                                Folders can&apos;t be manually added
+                                                when using templates.
+                                                <br />
+                                                See the docs -{' '}
+                                                <a
+                                                  href='https://tina.io/docs/r/content-modelling-templates'
+                                                  target='_blank'
+                                                  rel='noopener noreferrer'
+                                                  className='underline text-blue-500'
+                                                >
+                                                  https://tina.io/docs/r/content-modelling-templates
+                                                </a>
+                                              </>
+                                            ) : (
+                                              'Folder creation is disabled for this collection.'
+                                            )}
                                           </p>
                                         </TooltipContent>
                                       )}
