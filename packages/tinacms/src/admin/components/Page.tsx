@@ -17,10 +17,10 @@ export const PageWrapper = ({
 }) => {
   return (
     <div className='relative left-0 w-full h-full bg-gradient-to-b from-gray-50/50 to-gray-50 overflow-y-auto transition-opacity duration-300 ease-out flex flex-col opacity-100'>
-      <div className={`py-2 pr-4 w-full ${headerClassName}`}>
+      <div className={`py-2 w-full ${headerClassName}`}>
         <BillingWarning />
         <div className='flex items-center gap-4'>
-          <NavMenuTrigger />
+          <NavMenuTrigger className='ml-2' />
           <TinaIcon className='self-center h-10 min-w-10 w-auto text-orange-500' />
           <LocalWarning />
           <BranchButton />

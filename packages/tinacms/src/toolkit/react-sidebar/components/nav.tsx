@@ -5,7 +5,7 @@ import { FormModal } from '@toolkit/react-forms';
 import type { ScreenPlugin } from '@toolkit/react-screens';
 import { TinaCMS } from '@toolkit/tina-cms';
 import * as React from 'react';
-import { BiExit, BiMenu } from 'react-icons/bi';
+import { BiExit, BiMenu, BiX } from 'react-icons/bi';
 import { FiInfo } from 'react-icons/fi';
 import { VscNewFile } from 'react-icons/vsc';
 import { cn } from '../../../utils/cn';
@@ -130,6 +130,9 @@ export const Nav = ({
         {...props}
       >
         <div className='flex w-full px-4 py-3 justify-between items-center gap-2 border-b border-gray-200'>
+          <span className='text-left inline-flex items-center text-xl tracking-wide text-gray-800/80 flex-1 gap-1'>
+            <TinaExtendedIcon className='h-8 w-auto fill-orange-500' />
+          </span>
           <button
             className={cn(
               'pointer-events-auto p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
@@ -138,12 +141,8 @@ export const Nav = ({
               toggleMenu();
             }}
           >
-            <BiMenu className='h-8 w-auto text-gray-600' />
+            <BiX className='h-8 w-auto text-gray-600' />
           </button>
-
-          <span className='text-left inline-flex items-center text-xl tracking-wide text-gray-800/80 flex-1 gap-1'>
-            <TinaExtendedIcon className='h-8 w-auto fill-orange-500' />
-          </span>
         </div>
         {children}
         <div className='flex flex-col px-6 flex-1 overflow-auto'>
