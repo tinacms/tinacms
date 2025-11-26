@@ -74,6 +74,9 @@ export function useTina<T extends object>(props: {
       document.head.appendChild(style);
       document.body.classList.add('__tina-quick-editing-enabled');
 
+      let lastHoveredField: string | null = null;
+      let hoverTimeout: NodeJS.Timeout | null = null;
+
       function mouseDownHandler(e) {
         const attributeNames = e.target.getAttributeNames();
         // If multiple attributes start with data-tina-field, only the first is used
@@ -103,7 +106,18 @@ export function useTina<T extends object>(props: {
           }
         }
         if (fieldName) {
+          // Clear any pending hover timeout when clicking
+          if (hoverTimeout) {
+            clearTimeout(hoverTimeout);
+            hoverTimeout = null;
+          }
+          // Clear hover state on click
+          lastHoveredField = null;
           if (isInTinaIframe) {
+            parent.postMessage(
+              { type: 'field:hovered', fieldName: null },
+              window.location.origin
+            );
             parent.postMessage(
               { type: 'field:selected', fieldName: fieldName },
               window.location.origin
@@ -119,10 +133,120 @@ export function useTina<T extends object>(props: {
           }
         }
       }
+
+      function mouseHoverHandler(e) {
+        const attributeNames = e.target.getAttributeNames();
+        const tinaAttribute = attributeNames.find((name) =>
+          name.startsWith('data-tina-field')
+        );
+
+        let fieldName;
+        if (tinaAttribute) {
+          fieldName = e.target.getAttribute(tinaAttribute);
+        } else {
+          const ancestor = e.target.closest(
+            '[data-tina-field], [data-tina-field-overlay]'
+          );
+          if (ancestor) {
+            const attributeNames = ancestor.getAttributeNames();
+            const tinaAttribute = attributeNames.find((name) =>
+              name.startsWith('data-tina-field')
+            );
+            if (tinaAttribute) {
+              fieldName = ancestor.getAttribute(tinaAttribute);
+            }
+          }
+        }
+        
+        // Clear any existing timeout
+        if (hoverTimeout) {
+          clearTimeout(hoverTimeout);
+          hoverTimeout = null;
+        }
+        
+        if (fieldName && fieldName !== lastHoveredField) {
+          // Debounce the hover message by 150ms
+          hoverTimeout = setTimeout(() => {
+            lastHoveredField = fieldName;
+            if (isInTinaIframe) {
+              parent.postMessage(
+                { type: 'field:hovered', fieldName: fieldName },
+                window.location.origin
+              );
+            }
+          }, 150);
+        } else if (!fieldName && lastHoveredField !== null) {
+          // Clear immediately when leaving all fields
+          lastHoveredField = null;
+          if (isInTinaIframe) {
+            parent.postMessage(
+              { type: 'field:hovered', fieldName: null },
+              window.location.origin
+            );
+          }
+        }
+      }
+
+      function mouseOutHandler(e) {
+        const relatedTarget = e.relatedTarget as HTMLElement;
+        if (!relatedTarget) {
+          if (lastHoveredField !== null && isInTinaIframe) {
+            lastHoveredField = null;
+            parent.postMessage(
+              { type: 'field:hovered', fieldName: null },
+              window.location.origin
+            );
+          }
+          return;
+        }
+
+        // Check if we're moving to another tina field
+        const relatedAttributeNames = relatedTarget.getAttributeNames?.();
+        const relatedTinaAttribute = relatedAttributeNames?.find((name) =>
+          name.startsWith('data-tina-field')
+        );
+
+        let relatedFieldName;
+        if (relatedTinaAttribute) {
+          relatedFieldName = relatedTarget.getAttribute(relatedTinaAttribute);
+        } else {
+          const relatedAncestor = relatedTarget.closest?.(
+            '[data-tina-field], [data-tina-field-overlay]'
+          );
+          if (relatedAncestor) {
+            const ancestorAttributeNames = relatedAncestor.getAttributeNames();
+            const ancestorTinaAttribute = ancestorAttributeNames.find((name) =>
+              name.startsWith('data-tina-field')
+            );
+            if (ancestorTinaAttribute) {
+              relatedFieldName = relatedAncestor.getAttribute(
+                ancestorTinaAttribute
+              );
+            }
+          }
+        }
+
+        // Only clear if we're not moving to another tina field
+        if (!relatedFieldName && lastHoveredField !== null && isInTinaIframe) {
+          lastHoveredField = null;
+          parent.postMessage(
+            { type: 'field:hovered', fieldName: null },
+            window.location.origin
+          );
+        }
+      }
+
       document.addEventListener('click', mouseDownHandler, true);
+      document.addEventListener('mouseover', mouseHoverHandler, true);
+      document.addEventListener('mouseout', mouseOutHandler, true);
 
       return () => {
+        if (hoverTimeout) {
+          clearTimeout(hoverTimeout);
+        }
         document.removeEventListener('click', mouseDownHandler, true);
+        document.removeEventListener('mouseover', mouseHoverHandler, true);
+        document.removeEventListener('mouseout', mouseOutHandler, true);
         document.body.classList.remove('__tina-quick-editing-enabled');
         style.remove();
       };
