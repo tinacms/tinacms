@@ -4,7 +4,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 
 import GetCMS from '../components/GetCMS';
-import { slugify } from '../components/Sidebar';
+import { slugify } from '../components/AdminNav';
 
 const ScreenPage = () => {
   const { screenName } = useParams();

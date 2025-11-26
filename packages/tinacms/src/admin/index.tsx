@@ -20,7 +20,7 @@ import {
 
 import GetCMS from './components/GetCMS';
 import Layout from './components/Layout';
-import Sidebar from './components/Sidebar';
+import Sidebar from './components/AdminNav';
 
 import CollectionCreatePage from './pages/CollectionCreatePage';
 import CollectionDuplicatePage from './pages/CollectionDuplicatePage';
