@@ -117,7 +117,10 @@ export function HeadingsMenu(props: DropdownMenuProps) {
           </ToolbarButton>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent align='start' className='min-w-0 rounded-md'>
+        <DropdownMenuContent
+          align='start'
+          className='min-w-0 rounded-md border-border'
+        >
           <DropdownMenuRadioGroup
             className='flex flex-col gap-0.5'
             onValueChange={(type) => {
