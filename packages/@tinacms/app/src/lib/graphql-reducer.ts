@@ -540,6 +540,8 @@ export const useGraphQLReducer = (
         if (event.data.fieldName) {
           const [queryId, eventFieldName] = event.data.fieldName.split('---');
           const result = results.find((res) => res.id === queryId);
+          console.log(result);
+          console.log(eventFieldName);
           if (result?.data) {
             const { formId, fieldName } = getFormAndFieldNameFromMetadata(
               result.data,

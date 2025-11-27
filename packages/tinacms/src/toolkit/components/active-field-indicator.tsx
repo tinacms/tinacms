@@ -111,6 +111,7 @@ export const ActiveFieldIndicator = () => {
   const activeEle = useFieldReference(activeFieldName);
 
   React.useEffect(() => {
+    console.log(activeEle);
     let displayTimeout;
     if (activeEle) {
       setDisplay(true);

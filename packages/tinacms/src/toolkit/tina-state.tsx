@@ -244,16 +244,33 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         };
       }
       return state;
-    
+
     case 'forms:set-active-field-name':
+      console.log('set-active-field-name');
+      console.log(state.forms[0].activeFieldName);
       if (state.activeFormId === action.value.formId) {
         const existingForm = state.forms.find(
           (form) => form.tinaForm.id === action.value.formId
         );
 
         if (existingForm?.activeFieldName === action.value.fieldName) {
-          // If the active field name is already set, do nothing
-          return state;
+          console.log('Blah - toggling off');
+          // If the active field name is already set, toggle it off (unfocus)
+          const clearedForms = state.forms.map((form) => {
+            if (form.tinaForm.id === action.value.formId) {
+              return {
+                tinaForm: form.tinaForm,
+                activeFieldName: null,
+              };
+            }
+            return form;
+          });
+
+          return {
+            ...state,
+            breadcrumbs: [],
+            forms: clearedForms,
+          };
         }
       }
 
@@ -279,8 +296,10 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         forms,
         activeFormId: action.value.formId,
       };
-    
+
     case 'forms:set-hovered-field-name':
+      console.log('set-hovered-field-name');
+      console.log(state.forms[0].activeFieldName);
       // Only set hovered field if we're within the current active form
       if (state.activeFormId !== action.value.formId) {
         return state;
@@ -307,7 +326,7 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         breadcrumbs: hoveredBreadcrumbs,
         forms: hoveredForms,
       };
-    
+
     case 'toggle-edit-state': {
       return state.sidebarDisplayState === 'closed'
         ? { ...state, sidebarDisplayState: 'open' }
