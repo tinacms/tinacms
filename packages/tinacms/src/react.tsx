@@ -112,12 +112,16 @@ export function useTina<T extends object>(props: {
             hoverTimeout = null;
           }
           // Clear hover state on click
-          lastHoveredField = null;
+          if (lastHoveredField !== null) {
+            lastHoveredField = null;
+            if (isInTinaIframe) {
+              parent.postMessage(
+                { type: 'field:hovered', fieldName: null },
+                window.location.origin
+              );
+            }
+          }
           if (isInTinaIframe) {
-            parent.postMessage(
-              { type: 'field:hovered', fieldName: null },
-              window.location.origin
-            );
             parent.postMessage(
               { type: 'field:selected', fieldName: fieldName },
               window.location.origin
@@ -134,7 +138,7 @@ export function useTina<T extends object>(props: {
         }
       }
 
-      function mouseHoverHandler(e) {
+      function mouseEnterHandler(e) {
         const attributeNames = e.target.getAttributeNames();
         const tinaAttribute = attributeNames.find((name) =>
           name.startsWith('data-tina-field')
@@ -157,13 +161,13 @@ export function useTina<T extends object>(props: {
             }
           }
         }
-        
+
         // Clear any existing timeout
         if (hoverTimeout) {
           clearTimeout(hoverTimeout);
           hoverTimeout = null;
         }
-        
+
         if (fieldName && fieldName !== lastHoveredField) {
           // Debounce the hover message by 150ms
           hoverTimeout = setTimeout(() => {
@@ -175,59 +179,18 @@ export function useTina<T extends object>(props: {
               );
             }
           }, 150);
-        } else if (!fieldName && lastHoveredField !== null) {
-          // Clear immediately when leaving all fields
-          lastHoveredField = null;
-          if (isInTinaIframe) {
-            parent.postMessage(
-              { type: 'field:hovered', fieldName: null },
-              window.location.origin
-            );
-          }
         }
       }
 
-      function mouseOutHandler(e) {
-        const relatedTarget = e.relatedTarget as HTMLElement;
-        if (!relatedTarget) {
-          if (lastHoveredField !== null && isInTinaIframe) {
-            lastHoveredField = null;
-            parent.postMessage(
-              { type: 'field:hovered', fieldName: null },
-              window.location.origin
-            );
-          }
-          return;
+      function mouseLeaveHandler(e) {
+        // Clear any pending timeout
+        if (hoverTimeout) {
+          clearTimeout(hoverTimeout);
+          hoverTimeout = null;
         }
 
-        // Check if we're moving to another tina field
-        const relatedAttributeNames = relatedTarget.getAttributeNames?.();
-        const relatedTinaAttribute = relatedAttributeNames?.find((name) =>
-          name.startsWith('data-tina-field')
-        );
-
-        let relatedFieldName;
-        if (relatedTinaAttribute) {
-          relatedFieldName = relatedTarget.getAttribute(relatedTinaAttribute);
-        } else {
-          const relatedAncestor = relatedTarget.closest?.(
-            '[data-tina-field], [data-tina-field-overlay]'
-          );
-          if (relatedAncestor) {
-            const ancestorAttributeNames = relatedAncestor.getAttributeNames();
-            const ancestorTinaAttribute = ancestorAttributeNames.find((name) =>
-              name.startsWith('data-tina-field')
-            );
-            if (ancestorTinaAttribute) {
-              relatedFieldName = relatedAncestor.getAttribute(
-                ancestorTinaAttribute
-              );
-            }
-          }
-        }
-
-        // Only clear if we're not moving to another tina field
-        if (!relatedFieldName && lastHoveredField !== null && isInTinaIframe) {
+        // Clear hover state when leaving the field
+        if (lastHoveredField !== null && isInTinaIframe) {
           lastHoveredField = null;
           parent.postMessage(
             { type: 'field:hovered', fieldName: null },
@@ -237,16 +200,16 @@ export function useTina<T extends object>(props: {
       }
 
       document.addEventListener('click', mouseDownHandler, true);
-      document.addEventListener('mouseover', mouseHoverHandler, true);
-      document.addEventListener('mouseout', mouseOutHandler, true);
+      document.addEventListener('mouseenter', mouseEnterHandler, true);
+      document.addEventListener('mouseleave', mouseLeaveHandler, true);
 
       return () => {
         if (hoverTimeout) {
           clearTimeout(hoverTimeout);
         }
         document.removeEventListener('click', mouseDownHandler, true);
-        document.removeEventListener('mouseover', mouseHoverHandler, true);
-        document.removeEventListener('mouseout', mouseOutHandler, true);
+        document.removeEventListener('mouseenter', mouseEnterHandler, true);
+        document.removeEventListener('mouseleave', mouseLeaveHandler, true);
         document.body.classList.remove('__tina-quick-editing-enabled');
         style.remove();
       };
