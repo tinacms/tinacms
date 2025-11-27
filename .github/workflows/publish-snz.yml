@@ -70,49 +70,25 @@ jobs:
           echo "registry=https://streamliners-npm-368438108069.d.codeartifact.ap-southeast-2.amazonaws.com/npm/tina-cms-snz/" > ~/.npmrc
           echo "//streamliners-npm-368438108069.d.codeartifact.ap-southeast-2.amazonaws.com/npm/tina-cms-snz/:_authToken=${CODEARTIFACT_TOKEN}" >> ~/.npmrc
 
-      # ----------------------------- #
-      # Detect changed workspaces first
-      # ----------------------------- #
-      - name: Detect changed packages since appropriate base
+      # ----------------------------------------------------------------- #
+      # Get all packages and treat them as "changed" for this workflow
+      # ----------------------------------------------------------------- #
+      - name: Get all package paths
         id: changed
         shell: bash
         run: |
           set -euo pipefail
 
-          # Decide the base:
-          # - If we're pushing on streamliners-main, use the previous commit (github.event.before)
-          # - Otherwise (feature branches), compare to the current tip of origin/streamliners-main
-          BASE_SHA=""
-          if [[ "${GITHUB_EVENT_NAME}" == "push" && "${GITHUB_REF}" == "refs/heads/streamliners-main" ]]; then
-            BASE_SHA="${{ github.event.before }}"
-            echo "Push on streamliners-main. Using github.event.before as base: ${BASE_SHA}"
-          else
-            echo "Feature branch. Using tip of origin/streamliners-main as base."
-            git fetch origin streamliners-main --depth=1 || true
-            BASE_SHA="$(git rev-parse origin/streamliners-main)"
-          fi
-
-          echo "BASE_SHA=${BASE_SHA}"
-          echo "HEAD_SHA=${GITHUB_SHA}"
-
-          # Files changed vs base
-          git diff --name-only "${BASE_SHA}..${GITHUB_SHA}" > changed_files.txt || true
-          echo "Changed files:"
-          cat changed_files.txt || true
-
+          echo "Listing all workspace packages..."
           # List all workspaces quickly (no install required)
           pnpm -r list --depth=-1 --json > workspace_list.json
 
-          # Map changed files -> nearest workspace root using pnpm workspace list
+          # Map all workspaces to paths and write to changed_paths.txt
           node -e '
             const fs = require("fs");
             const path = require("path");
             const repo = process.cwd();
             const toAbs = p => path.resolve(repo, p);
-
-            const files = fs.existsSync("changed_files.txt")
-              ? fs.readFileSync("changed_files.txt","utf8").split("\n").filter(Boolean).map(toAbs)
-              : [];
 
             let workspaces = [];
             try { workspaces = JSON.parse(fs.readFileSync("workspace_list.json","utf8")) || []; } catch {}
@@ -122,29 +98,13 @@ jobs:
               .map(w => ({ name: w.name, version: w.version, path: toAbs(w.path || w.dir || ""), private: !!w.private }))
               .filter(w => w.path && fs.existsSync(w.path));
 
-            const roots = new Set();
-            for (const f of files) {
-              const candidates = workspaces.filter(w => f.startsWith(w.path + path.sep));
-              if (candidates.length) {
-                candidates.sort((a,b) => b.path.length - a.path.length);
-                roots.add(candidates[0].path);
-              }
-            }
-
-            const rootList = Array.from(roots);
-            const rels = rootList.map(p => path.relative(repo, p));
+            const rels = workspaces.map(w => path.relative(repo, w.path));
             fs.writeFileSync("changed_paths.txt", rels.join("\n") + (rels.length ? "\n" : ""));
 
-            // Compact info for summary/env
-            const info = [];
-            for (const r of rootList) {
-              const ws = workspaces.find(w => w.path === r);
-              if (ws) info.push(ws);
-            }
-            fs.writeFileSync("changed_list.json", JSON.stringify(info));
+            fs.writeFileSync("changed_list.json", JSON.stringify(workspaces));
           '
 
-          echo "Changed package paths:"
+          echo "All package paths:"
           cat changed_paths.txt || true
 
           CHANGED_COUNT=$(grep -c . changed_paths.txt || true)
@@ -196,7 +156,7 @@ jobs:
       # ------------------------------------- #
       # PREVIEW: feature branches -> tag beta
       # ------------------------------------- #
-      - name: Bump snapshot versions (CHANGED ONLY)
+      - name: Bump snapshot versions (ALL PACKAGES)
         if: ${{ github.ref != 'refs/heads/streamliners-main' && (github.event_name != 'workflow_dispatch' || inputs.force_snz != 'true') }}
         run: |
           set -euo pipefail
@@ -227,7 +187,25 @@ jobs:
             console.log("BUMPED_SNAPSHOTS=" + JSON.stringify(bumped));
           ' | tee snapshot_bump.log
 
-      - name: Publish preview (changed only) to CodeArtifact with tag=beta
+     
+      - name: Show snapshot versions in summary
+        if: ${{ github.ref != 'refs/heads/streamliners-main' && (github.event_name != 'workflow_dispatch' || inputs.force_snz != 'true') }}
+        run: |
+          echo "## 📦 Snapshot Versions (tag: beta)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [[ -f snapshot_bump.log ]]; then
+            grep "BUMPED_SNAPSHOTS=" snapshot_bump.log | sed 's/BUMPED_SNAPSHOTS=//' | \
+              node -e '
+                const input = require("fs").readFileSync(0, "utf8").trim();
+                const packages = JSON.parse(input);
+                packages.forEach(pkg => console.log(`- ${pkg}`));
+              ' >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No packages to snapshot." >> $GITHUB_STEP_SUMMARY
+          fi
+   
+
+      - name: Publish preview (all packages) to CodeArtifact with tag=beta
         if: ${{ github.ref != 'refs/heads/streamliners-main' && (github.event_name != 'workflow_dispatch' || inputs.force_snz != 'true') }}
         run: |
           set -euo pipefail
@@ -251,7 +229,7 @@ jobs:
       # ------------------------------------- #
       # STABLE-INTERNAL (SNZ): streamliners-main or forced
       # ------------------------------------- #
-      - name: Bump SNZ prerelease versions (CHANGED ONLY)
+      - name: Bump SNZ prerelease versions (ALL PACKAGES)
         if: ${{ github.ref == 'refs/heads/streamliners-main' || (github.event_name == 'workflow_dispatch' && inputs.force_snz == 'true') }}
         run: |
           set -euo pipefail
@@ -283,8 +261,19 @@ jobs:
             }
             console.log("BUMPED_SNZ=" + JSON.stringify(bumped));
           ' | tee snz_bump.log
+           
+          echo "## 📦 SNZ Versions (tag: snz + latest)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [[ -f snz_bump.log ]]; then
+            grep "BUMPED_SNZ=" snz_bump.log | sed 's/BUMPED_SNZ=//' | \
+              node -e '
+                const input = require("fs").readFileSync(0, "utf8").trim();
+                const packages = JSON.parse(input);
+                packages.forEach(pkg => console.log(`- ${pkg}`));
+              ' >> $GITHUB_STEP_SUMMARY
+          fi
                 
-      - name: Publish SNZ prerelease (changed only) to CodeArtifact with tag=snz
+      - name: Publish SNZ prerelease (all packages) to CodeArtifact with tag=snz
         if: ${{ github.ref == 'refs/heads/streamliners-main' || (github.event_name == 'workflow_dispatch' && inputs.force_snz == 'true') }}
         run: |
           set -euo pipefail
@@ -304,6 +293,54 @@ jobs:
             --no-git-checks \
             --access public \
             ${DRY_FLAG}
+          
+          # 🏷️  Assign 'latest' tag to published SNZ packages
+          if [[ -z "$DRY_FLAG" ]]; then
+          echo ""
+            echo "⏳ Waiting 10 seconds for packages to be available in registry..."
+            sleep 10
+            
+            echo "🏷️  Assigning 'latest' tag to SNZ packages:"
+            echo "=============================================="
+      
+            # Read the bumped packages from the previous step's log
+            if [[ -f snz_bump.log ]]; then
+              # Extract package names and versions from the bump log
+              while IFS= read -r line; do
+                if [[ $line =~ BUMPED_SNZ= ]]; then
+                  # Parse the JSON array of package@version strings
+                  echo "$line" | node -e '
+                    const fs = require("fs");
+                    const input = fs.readFileSync(0, "utf8");
+                    const match = input.match(/BUMPED_SNZ=(\[.*\])/);
+                    if (match) {
+                      const packages = JSON.parse(match[1]);
+                      packages.forEach(pkg => {
+                        const lastAtIndex = pkg.lastIndexOf("@");
+                        if (lastAtIndex > 0) {
+                         const name = pkg.substring(0, lastAtIndex);
+                         const version = pkg.substring(lastAtIndex + 1);
+                         if (name && version) {
+                           console.log(`${name}@${version}`);
+                         } 
+                        }                       
+                      });
+                    }
+                  ' | while read pkgver; do
+                    echo "  📦 Tagging $pkgver as 'latest'"
+                    npm dist-tag add "$pkgver" latest \
+                      --registry=https://streamliners-npm-368438108069.d.codeartifact.ap-southeast-2.amazonaws.com/npm/tina-cms-snz/ \
+                      || echo "⚠️  Failed to tag $pkgver"
+                  done
+                fi
+              done < snz_bump.log
+            fi
+      
+            echo "=============================================="
+            echo "✅ Latest tags applied to all SNZ packages."
+          else
+            echo "⏭️  Skipping 'latest' tag assignment (dry run mode)"
+          fi
 
       - name: Summary
         if: always()
