@@ -119,7 +119,7 @@ export function HeadingsMenu(props: DropdownMenuProps) {
 
         <DropdownMenuContent
           align='start'
-          className='min-w-0 rounded-md border-border'
+          className='min-w-0 rounded-[0,0,4,4] border-border'
         >
           <DropdownMenuRadioGroup
             className='flex flex-col gap-0.5'
