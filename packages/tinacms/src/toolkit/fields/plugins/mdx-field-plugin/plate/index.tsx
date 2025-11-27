@@ -43,7 +43,13 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
         const plateElement = ref.current?.querySelector(
           '[role="textbox"]'
         ) as HTMLElement;
-        if (field.experimental_focusIntent && plateElement) {
+        const focusIntent = field.experimental_focusIntent;
+        // Only focus if visualOnly is not set (or is false)
+        const shouldFocus =
+          focusIntent &&
+          (typeof focusIntent === 'boolean' || !focusIntent.visualOnly);
+
+        if (shouldFocus && plateElement) {
           if (plateElement) plateElement.focus();
         }
         // Slate takes a second to mount

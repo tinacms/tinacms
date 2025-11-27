@@ -11,7 +11,13 @@ export const TextField = wrapFieldsWithMeta<{}, InputProps & ExtraProps>(
   (props) => {
     const ref = React.useRef(null);
     React.useEffect(() => {
-      if (ref.current && props.field.experimental_focusIntent) {
+      const focusIntent = props.field.experimental_focusIntent;
+      // Only focus if visualOnly is not set (or is false)
+      const shouldFocus =
+        focusIntent &&
+        (typeof focusIntent === 'boolean' || !focusIntent.visualOnly);
+
+      if (ref.current && shouldFocus) {
         ref.current.focus();
       }
     }, [props.field.experimental_focusIntent, ref]);

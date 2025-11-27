@@ -23,6 +23,7 @@ export function wrapFieldsWithMeta<ExtraFieldProps = {}, InputProps = {}>(
         error={props.meta.error}
         index={props.index}
         tinaForm={props.tinaForm}
+        focusIntent={props.field.experimental_focusIntent}
       >
         <Field {...props} />
       </FieldMeta>
@@ -47,6 +48,7 @@ export function wrapFieldWithNoHeader<ExtraFieldProps = {}, InputProps = {}>(
         error={props.meta.error}
         index={props.index}
         tinaForm={props.tinaForm}
+        focusIntent={props.field.experimental_focusIntent}
       >
         <Field {...props} />
       </FieldMeta>
@@ -72,6 +74,7 @@ export function wrapFieldWithError<ExtraFieldProps = {}, InputProps = {}>(
         error={props.meta.error}
         index={props.index}
         tinaForm={props.tinaForm}
+        focusIntent={props.field.experimental_focusIntent}
       >
         <Field {...props} />
       </FieldMeta>
@@ -88,6 +91,7 @@ interface FieldMetaProps extends React.HTMLAttributes<HTMLElement> {
   margin?: boolean;
   index?: number;
   tinaForm: Form;
+  focusIntent?: boolean | { active: boolean; visualOnly?: boolean };
 }
 
 export const FieldMeta = ({
@@ -99,12 +103,20 @@ export const FieldMeta = ({
   children,
   index,
   tinaForm,
+  focusIntent,
   ...props
 }: FieldMetaProps) => {
   const { dispatch: setHoveredField } =
     useEvent<FieldHoverEvent>('field:hover');
   const { dispatch: setFocusedField } =
     useEvent<FieldFocusEvent>('field:focus');
+
+  const isActive =
+    focusIntent &&
+    (typeof focusIntent === 'boolean' ? focusIntent : focusIntent.active);
+  const isHovering =
+    focusIntent && typeof focusIntent !== 'boolean' && focusIntent.visualOnly;
+
   return (
     <FieldWrapper
       margin={margin}
@@ -112,6 +124,8 @@ export const FieldMeta = ({
       onMouseOut={() => setHoveredField({ id: null, fieldName: null })}
       onClick={() => setFocusedField({ id: tinaForm.id, fieldName: name })}
       style={{ zIndex: index ? 1000 - index : undefined }}
+      data-tina-field-active={isActive ? 'true' : undefined}
+      data-tina-field-hovering={isHovering ? 'true' : undefined}
       {...props}
     >
       {(label !== false || description) && (
@@ -139,8 +153,17 @@ export const FieldWrapper = ({
   margin: boolean;
   children: React.ReactNode;
 } & Partial<React.ComponentPropsWithoutRef<'div'>>) => {
+  const isHovering = props['data-tina-field-hovering'] === 'true';
+
   return (
-    <div className={`relative ${margin ? `mb-5 last:mb-0` : ``}`} {...props}>
+    <div
+      className={`relative ${margin ? `mb-5 last:mb-0` : ``} ${
+        isHovering
+          ? '[&_input]:!shadow-outline [&_input]:!border-blue-500 [&_textarea]:!shadow-outline [&_textarea]:!border-blue-500 [&_select]:!shadow-outline [&_select]:!border-blue-500 [&_.ProseMirror]:!shadow-outline [&_.ProseMirror]:!border-blue-500'
+          : ''
+      }`}
+      {...props}
+    >
       {children}
     </div>
   );

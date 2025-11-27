@@ -104,7 +104,11 @@ export interface TinaState {
    * all at once, putting state this high up at least allows us to not have to touch the Form class too much.
    * Longer term, replaceing Form with something stateful seems like the right approach
    */
-  forms: { activeFieldName?: string | null; tinaForm: Form }[];
+  forms: {
+    activeFieldName?: string | null;
+    tinaForm: Form;
+    isHovering?: boolean;
+  }[];
   formLists: FormList[];
   editingMode: 'visual' | 'basic';
   isLoadingContent: boolean;
@@ -253,14 +257,17 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
           (form) => form.tinaForm.id === action.value.formId
         );
 
-        if (existingForm?.activeFieldName === action.value.fieldName) {
-          console.log('Blah - toggling off');
-          // If the active field name is already set, toggle it off (unfocus)
+        if (
+          existingForm?.activeFieldName === action.value.fieldName &&
+          !existingForm?.isHovering
+        ) {
+          // Only toggle off if we're clicking the same field that's already focused (not just hovered)
           const clearedForms = state.forms.map((form) => {
             if (form.tinaForm.id === action.value.formId) {
               return {
                 tinaForm: form.tinaForm,
                 activeFieldName: null,
+                isHovering: false,
               };
             }
             return form;
@@ -279,6 +286,7 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
           return {
             tinaForm: form.tinaForm,
             activeFieldName: action.value.fieldName,
+            isHovering: false, // Clear hover state on click
           };
         }
         return form;
@@ -298,18 +306,18 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
       };
 
     case 'forms:set-hovered-field-name':
-      console.log('set-hovered-field-name');
-      console.log(state.forms[0].activeFieldName);
       // Only set hovered field if we're within the current active form
       if (state.activeFormId !== action.value.formId) {
         return state;
       }
 
+      // For hover, we want visual styling but not actual input focus
       const hoveredForms = state.forms.map((form) => {
         if (form.tinaForm.id === action.value.formId) {
           return {
             tinaForm: form.tinaForm,
             activeFieldName: action.value.fieldName,
+            isHovering: true, // Mark as hovering
           };
         }
         return form;

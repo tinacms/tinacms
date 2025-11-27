@@ -28,6 +28,12 @@ export interface Field<F extends Field = AnyField> {
    * This is also a one-way stree. The "active field" for a given form isn't
    * necessarily updated when a user clicks on a new field. So you can have a
    * field which is marked as the active field, and have focus on another field
+   *
+   * Can be a boolean (legacy) or an object with:
+   * - active: boolean - whether to apply styling
+   * - visualOnly: boolean - if true, only apply visual styling without focusing the input
    */
-  experimental_focusIntent?: boolean;
+  experimental_focusIntent?:
+    | boolean
+    | { active: boolean; visualOnly?: boolean };
 }

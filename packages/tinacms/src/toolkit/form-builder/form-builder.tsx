@@ -21,7 +21,7 @@ import { ResetForm } from './reset-form';
 import { CreateBranchModal } from './create-branch-modal';
 
 export interface FormBuilderProps {
-  form: { tinaForm: Form; activeFieldName?: string };
+  form: { tinaForm: Form; activeFieldName?: string; isHovering?: boolean };
   hideFooter?: boolean;
   label?: string;
   onPristineChange?: (_pristine: boolean) => unknown;
@@ -208,6 +208,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                     <FieldsBuilder
                       form={tinaForm}
                       activeFieldName={form.activeFieldName}
+                      isHovering={form.isHovering}
                       fields={fieldGroup.fields}
                     />
                   ) : (

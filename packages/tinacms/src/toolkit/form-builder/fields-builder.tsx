@@ -7,6 +7,7 @@ import { FieldPlugin } from './field-plugin';
 export interface FieldsBuilderProps {
   form: Form;
   activeFieldName?: string;
+  isHovering?: boolean;
   fields: Field[];
   padding?: boolean;
 }
@@ -15,6 +16,7 @@ export function FieldsBuilder({
   form,
   fields,
   activeFieldName,
+  isHovering = false,
   padding = false,
 }: FieldsBuilderProps) {
   const cms = useCMS();
@@ -36,6 +38,7 @@ export function FieldsBuilder({
             key={field.name}
             field={field}
             activeFieldName={activeFieldName}
+            isHovering={isHovering}
             form={form}
             fieldPlugins={fieldPlugins}
             index={index}
@@ -52,6 +55,7 @@ interface InnerFieldProps {
   fieldPlugins: FieldPlugin[];
   index: number;
   activeFieldName?: string;
+  isHovering?: boolean;
 }
 
 const InnerField = ({
@@ -60,6 +64,7 @@ const InnerField = ({
   fieldPlugins,
   index,
   activeFieldName,
+  isHovering = false,
 }: InnerFieldProps) => {
   /**
    * We double-render form builders for some reason which reults in useMemo not working here
@@ -91,6 +96,12 @@ const InnerField = ({
   }
 
   let isActiveField = field.name === activeFieldName;
+  // Create focusIntent: boolean for backwards compat, or object with visualOnly flag
+  const focusIntent = isActiveField
+    ? isHovering
+      ? { active: true, visualOnly: true }
+      : true
+    : false;
   // TODO: this handles focusing on the tag element when one
   // of it's items is the activeField (categories.2) but not
   // for when the items are displayed with the ListFieldPlugin
@@ -139,7 +150,7 @@ const InnerField = ({
               {...fieldProps}
               form={form.finalForm}
               tinaForm={form}
-              field={{ ...field, experimental_focusIntent: isActiveField }}
+              field={{ ...field, experimental_focusIntent: focusIntent }}
             />
           );
         }
@@ -148,10 +159,10 @@ const InnerField = ({
           return (
             <plugin.Component
               {...fieldProps}
-              experimental_focusIntent={isActiveField}
+              experimental_focusIntent={focusIntent}
               form={form.finalForm}
               tinaForm={form}
-              field={{ ...field, experimental_focusIntent: isActiveField }}
+              field={{ ...field, experimental_focusIntent: focusIntent }}
               index={index}
             />
           );

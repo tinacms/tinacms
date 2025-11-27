@@ -6,7 +6,13 @@ import { parse } from './text-format';
 const TextareaField = wrapFieldsWithMeta<{ input: InputProps }>((props) => {
   const ref = React.useRef(null);
   React.useEffect(() => {
-    if (ref.current && props.field.experimental_focusIntent) {
+    const focusIntent = props.field.experimental_focusIntent;
+    // Only focus if visualOnly is not set (or is false)
+    const shouldFocus =
+      focusIntent &&
+      (typeof focusIntent === 'boolean' || !focusIntent.visualOnly);
+
+    if (ref.current && shouldFocus) {
       const el = ref.current;
       el.focus();
       // Move the cursor to the end of the text
