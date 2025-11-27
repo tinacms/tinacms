@@ -6,10 +6,10 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
+  useOpenState,
 } from './dropdown-menu';
-import { PlusIcon } from './icons';
+import { ToolbarButton } from './toolbar';
 import { insertMDX } from '../../plugins/create-mdx-plugins';
 
 export default function TemplatesToolbarButton() {
@@ -25,7 +25,7 @@ interface EmbedButtonProps {
 }
 
 const EmbedButton: React.FC<EmbedButtonProps> = ({ editor, templates }) => {
-  const [open, setOpen] = useState(false);
+  const openState = useOpenState();
   const [filteredTemplates, setFilteredTemplates] = useState(templates);
 
   const filterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,16 +38,21 @@ const EmbedButton: React.FC<EmbedButtonProps> = ({ editor, templates }) => {
   };
 
   return (
-    <DropdownMenu open={open} onOpenChange={setOpen}>
-      <DropdownMenuTrigger className='inline-flex items-center rounded-full text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg:not([data-icon])]:size-5 h-9 px-2 bg-transparent hover:bg-muted hover:text-muted-foreground aria-checked:bg-accent aria-checked:text-accent-foreground my-1 justify-between pr-1'>
-        <span className='flex'>Embed</span>
-        <PlusIcon
-          className={`origin-center transition-all ease-out duration-150 ${
-            open ? 'rotate-45' : ''
-          }`}
-        />
+    <DropdownMenu modal={false} {...openState}>
+      <DropdownMenuTrigger asChild>
+        <ToolbarButton
+          showArrow
+          isDropdown
+          pressed={openState.open}
+          tooltip='Embed'
+        >
+          Embed
+        </ToolbarButton>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className='max-h-48 overflow-y-auto'>
+      <DropdownMenuContent
+        align='start'
+        className='max-h-72 overflow-y-auto border-border rounded-[0,0,4,4]'
+      >
         {templates.length > 10 && (
           <input
             type='text'
@@ -56,13 +61,12 @@ const EmbedButton: React.FC<EmbedButtonProps> = ({ editor, templates }) => {
             onChange={filterChange}
           />
         )}
-        <DropdownMenuSeparator />
         {filteredTemplates.map((template) => (
           <DropdownMenuItem
             key={template.name}
             onMouseDown={(e) => {
               e.preventDefault();
-              setOpen(false);
+              openState.onOpenChange(false);
               insertMDX(editor, template);
             }}
             className={''}
