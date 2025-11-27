@@ -315,9 +315,12 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
       const existingFormState = state.forms.find(
         (form) => form.tinaForm.id === action.value.formId
       );
-      
+
       // If a field is already focused (not just hovering), don't change on hover
-      if (existingFormState?.activeFieldName && !existingFormState?.isHovering) {
+      if (
+        existingFormState?.activeFieldName &&
+        !existingFormState?.isHovering
+      ) {
         return state;
       }
 
