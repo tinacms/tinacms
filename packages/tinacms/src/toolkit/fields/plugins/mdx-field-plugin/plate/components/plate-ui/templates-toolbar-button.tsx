@@ -25,7 +25,7 @@ interface EmbedButtonProps {
 }
 
 const EmbedButton: React.FC<EmbedButtonProps> = ({ editor, templates }) => {
-  const {open, onOpenChange} = useOpenState();
+  const { open, onOpenChange } = useOpenState();
   const [filteredTemplates, setFilteredTemplates] = useState(templates);
 
   const filterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,14 +38,9 @@ const EmbedButton: React.FC<EmbedButtonProps> = ({ editor, templates }) => {
   };
 
   return (
-    <DropdownMenu modal={false} open={open} onOpenChange={onOpenChange} >
+    <DropdownMenu modal={false} open={open} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
-        <ToolbarButton
-          showArrow
-          isDropdown
-          pressed={open}
-          tooltip='Embed'
-        >
+        <ToolbarButton showArrow isDropdown pressed={open} tooltip='Embed'>
           Embed
         </ToolbarButton>
       </DropdownMenuTrigger>
