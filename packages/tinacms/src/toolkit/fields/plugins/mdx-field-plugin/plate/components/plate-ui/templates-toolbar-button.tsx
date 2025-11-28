@@ -25,7 +25,7 @@ interface EmbedButtonProps {
 }
 
 const EmbedButton: React.FC<EmbedButtonProps> = ({ editor, templates }) => {
-  const openState = useOpenState();
+  const {open, onOpenChange} = useOpenState();
   const [filteredTemplates, setFilteredTemplates] = useState(templates);
 
   const filterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,7 +38,7 @@ const EmbedButton: React.FC<EmbedButtonProps> = ({ editor, templates }) => {
   };
 
   return (
-    <DropdownMenu modal={false} {...openState}>
+    <DropdownMenu modal={false} open={open} onOpenChange={setOpen} >
       <DropdownMenuTrigger asChild>
         <ToolbarButton
           showArrow
@@ -51,7 +51,7 @@ const EmbedButton: React.FC<EmbedButtonProps> = ({ editor, templates }) => {
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align='start'
-        className='max-h-72 overflow-y-auto border-border rounded-[0,0,4,4]'
+        className='max-h-72 overflow-y-auto border-border rounded-none rounded-bl rounded-br'
       >
         {templates.length > 10 && (
           <input
@@ -66,7 +66,7 @@ const EmbedButton: React.FC<EmbedButtonProps> = ({ editor, templates }) => {
             key={template.name}
             onMouseDown={(e) => {
               e.preventDefault();
-              openState.onOpenChange(false);
+              onOpenChange(false);
               insertMDX(editor, template);
             }}
             className={''}
