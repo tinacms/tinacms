@@ -57,13 +57,13 @@ export function Alerts({ alerts }: AlertsProps) {
             return (
               <Alert key={alert.id} level={alert.level}>
                 {alert.level === 'info' && (
-                  <MdInfo className='w-5 h-auto opacity-70' />
+                  <MdInfo className='w-5 h-auto text-blue-500' />
                 )}
                 {alert.level === 'success' && (
-                  <MdCheckCircle className='w-5 h-auto opacity-70' />
+                  <MdCheckCircle className='w-5 h-auto text-green-500' />
                 )}
                 {alert.level === 'warn' && (
-                  <MdWarning className='w-5 h-auto opacity-70' />
+                  <MdWarning className='w-5 h-auto text-yellow-500' />
                 )}
                 <p className='m-0 flex-1 max-w-[680px] text-left'>
                   {parseUrlsInText(alert.message.toString())}
@@ -133,22 +133,22 @@ const Alert: React.FC<{ level: AlertLevel; children: React.ReactNode }> = ({
   ...props
 }) => {
   const colorClasses = {
-    info: 'bg-white border-blue-500 text-blue-600 fill-blue-500',
-    success: 'bg-white border-green-500 text-green-600 fill-green-500',
-    warn: 'bg-white border-yellow-500 text-yellow-600 fill-yellow-500',
-    error: 'bg-white border-red-500 text-red-600 fill-red-500',
+    info: 'bg-white',
+    success: 'bg-white',
+    warn: 'bg-white',
+    error: 'bg-white',
   };
 
   const borderClasses = {
-    info: 'border-blue-200',
-    success: 'border-green-200',
-    warn: 'border-yellow-200',
-    error: 'border-red-200',
+    info: 'border-blue-500',
+    success: 'border-green-500',
+    warn: 'border-amber-500',
+    error: 'border-red-500',
   };
 
   return (
     <div
-      className={`rounded shadow-lg font-normal cursor-pointer pointer-events-all text-sm transition-all duration-100 ease-out mb-4 max-w-full ${colorClasses[level]}}`}
+      className={`rounded-md shadow-lg font-medium cursor-pointer pointer-events-all text-sm transition-all duration-100 ease-out mb-4 max-w-full text-gray-700 ${colorClasses[level]}`}
       style={{
         animationName: 'fly-in-up, fade-in',
         animationTimingFunction: 'ease-out',
