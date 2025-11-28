@@ -1,6 +1,6 @@
 {
 	"name": "@tinacms/graphql",
-	"version": "1.6.2",
+	"version": "1.6.3",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
 	"typings": "dist/index.d.ts",
@@ -73,7 +73,6 @@
 		"@types/node": "^22.13.1",
 		"@types/normalize-path": "catalog:",
 		"@types/ws": "catalog:",
-
 		"jest-file-snapshot": "^0.5.0",
 		"memory-level": "catalog:",
 		"typescript": "^5.7.3",

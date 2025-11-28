@@ -1,5 +1,18 @@
 # tinacms
 
+## 2.10.1
+
+### Patch Changes
+
+- [#6187](https://github.com/tinacms/tinacms/pull/6187) [`a76fdb6`](https://github.com/tinacms/tinacms/commit/a76fdb639b94cfefa169ebbd184f55d62e4a8a76) Thanks [@18-th](https://github.com/18-th)! - Updated yup to v1 to remove transitive lodash dependency
+
+- [#6184](https://github.com/tinacms/tinacms/pull/6184) [`dd2089d`](https://github.com/tinacms/tinacms/commit/dd2089dbde4a7b1a0116cce096f50a97fdca9d81) Thanks [@Pat-Stuart](https://github.com/Pat-Stuart)! - Adjust styling on markdown dropdown toolbar items
+
+- Updated dependencies [[`a76fdb6`](https://github.com/tinacms/tinacms/commit/a76fdb639b94cfefa169ebbd184f55d62e4a8a76), [`a736baf`](https://github.com/tinacms/tinacms/commit/a736bafe1b20bc1465f8e4a4c0c2281f40dcbf2f)]:
+  - @tinacms/schema-tools@1.10.1
+  - @tinacms/search@1.1.3
+  - @tinacms/mdx@1.8.3
+
 ## 2.10.0
 
 ### Minor Changes
