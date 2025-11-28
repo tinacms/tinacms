@@ -38,12 +38,12 @@ const EmbedButton: React.FC<EmbedButtonProps> = ({ editor, templates }) => {
   };
 
   return (
-    <DropdownMenu modal={false} open={open} onOpenChange={setOpen} >
+    <DropdownMenu modal={false} open={open} onOpenChange={onOpenChange} >
       <DropdownMenuTrigger asChild>
         <ToolbarButton
           showArrow
           isDropdown
-          pressed={openState.open}
+          pressed={open}
           tooltip='Embed'
         >
           Embed
