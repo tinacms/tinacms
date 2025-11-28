@@ -50,7 +50,7 @@
 		"normalize-path": "catalog:",
 		"readable-stream": "catalog:",
 		"scmp": "catalog:",
-		"yup": "^0.32.11"
+		"yup": "^1.6.1"
 	},
 	"publishConfig": {
 		"registry": "https://registry.npmjs.org"
@@ -73,7 +73,7 @@
 		"@types/node": "^22.13.1",
 		"@types/normalize-path": "catalog:",
 		"@types/ws": "catalog:",
-		"@types/yup": "^0.29.14",
+
 		"jest-file-snapshot": "^0.5.0",
 		"memory-level": "catalog:",
 		"typescript": "^5.7.3",
