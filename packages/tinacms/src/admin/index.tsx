@@ -4,6 +4,7 @@ import {
   ModalActions,
   ModalBody,
   ModalHeader,
+  NavProvider,
   PopupModal,
   TinaCMS,
   useCMS,
@@ -19,7 +20,7 @@ import {
 
 import GetCMS from './components/GetCMS';
 import Layout from './components/Layout';
-import Sidebar from './components/Sidebar';
+import Sidebar from './components/AdminNav';
 
 import CollectionCreatePage from './pages/CollectionCreatePage';
 import CollectionDuplicatePage from './pages/CollectionDuplicatePage';
@@ -348,10 +349,12 @@ const DefaultWrapper = ({
 }) => {
   return (
     <Layout>
-      <div className='flex items-stretch h-dvh overflow-hidden'>
-        <Sidebar cms={cms} />
-        <div className='w-full relative'>{children}</div>
-      </div>
+      <NavProvider defaultOpen={false}>
+        <div className='flex items-stretch h-dvh overflow-hidden'>
+          <Sidebar cms={cms} />
+          <div className='w-full relative'>{children}</div>
+        </div>
+      </NavProvider>
     </Layout>
   );
 };
