@@ -10,20 +10,8 @@ export const format = (
   _name: string,
   field: DatetimepickerProps
 ): string => {
-  // allow the date to be empty
   if (!val) return val;
-  const dateFormat = parseDateFormat(field.dateFormat);
-  const timeFormat = parseTimeFormat(field.timeFormat);
-
-  const combinedFormat =
-    typeof timeFormat === 'string' ? `${dateFormat} ${timeFormat}` : dateFormat;
-
-  if (typeof val === 'string') {
-    const date = moment(val);
-    return date.isValid() ? date.format(combinedFormat) : val;
-  }
-
-  return moment(val).format(combinedFormat);
+  return new Date(val).toISOString();
 };
 
 // parses a function from the given format to default datetime format
