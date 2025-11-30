@@ -107,7 +107,7 @@ export interface TinaState {
   forms: {
     activeFieldName?: string | null;
     tinaForm: Form;
-    isHovering?: boolean;
+    hoveringFieldName?: string | null;
   }[];
   formLists: FormList[];
   editingMode: 'visual' | 'basic';
@@ -250,24 +250,20 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
       return state;
 
     case 'forms:set-active-field-name':
-      console.log('set-active-field-name');
-      console.log(state.forms[0].activeFieldName);
       if (state.activeFormId === action.value.formId) {
         const existingForm = state.forms.find(
           (form) => form.tinaForm.id === action.value.formId
         );
 
         if (
-          existingForm?.activeFieldName === action.value.fieldName &&
-          !existingForm?.isHovering
+          existingForm?.activeFieldName === action.value.fieldName
         ) {
-          // Only toggle off if we're clicking the same field that's already focused (not just hovered)
           const clearedForms = state.forms.map((form) => {
             if (form.tinaForm.id === action.value.formId) {
               return {
                 tinaForm: form.tinaForm,
                 activeFieldName: null,
-                isHovering: false,
+                hoveringFieldName: null,
               };
             }
             return form;
@@ -286,7 +282,7 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
           return {
             tinaForm: form.tinaForm,
             activeFieldName: action.value.fieldName,
-            isHovering: false, // Clear hover state on click
+            hoveringFieldName: null,
           };
         }
         return form;
@@ -306,45 +302,32 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
       };
 
     case 'forms:set-hovered-field-name':
-      // Only set hovered field if we're within the current active form
-      if (state.activeFormId !== action.value.formId) {
-        return state;
-      }
-
-      // Check if there's already a focused field (isHovering: false)
+      // Check if there's already a focused field
       const existingFormState = state.forms.find(
         (form) => form.tinaForm.id === action.value.formId
       );
 
-      // If a field is already focused (not just hovering), don't change on hover
+      // If a field is already focused, don't change on hover
       if (
-        existingFormState?.activeFieldName &&
-        !existingFormState?.isHovering
+        existingFormState?.activeFieldName
       ) {
         return state;
       }
+      console.log(action.value.fieldName)
 
-      // For hover, we want visual styling but not actual input focus
       const hoveredForms = state.forms.map((form) => {
         if (form.tinaForm.id === action.value.formId) {
           return {
             tinaForm: form.tinaForm,
-            activeFieldName: action.value.fieldName,
-            isHovering: true, // Mark as hovering
+            activeFieldName: null,
+            isHovering: action.value.fieldName,
           };
         }
         return form;
       });
 
-      const hoveredBreadcrumbs = calculateBreadcrumbs(
-        state.forms,
-        action.value.formId,
-        action.value.fieldName || ''
-      );
-
       return {
         ...state,
-        breadcrumbs: hoveredBreadcrumbs,
         forms: hoveredForms,
       };
 

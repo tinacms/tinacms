@@ -111,7 +111,6 @@ export const ActiveFieldIndicator = () => {
   const activeEle = useFieldReference(activeFieldName);
 
   React.useEffect(() => {
-    console.log(activeEle);
     let displayTimeout;
     if (activeEle) {
       setDisplay(true);
@@ -148,6 +147,97 @@ export const ActiveFieldIndicator = () => {
   React.useEffect(() =>
     subscribe(({ fieldName, id }) => {
       setActiveFieldName(`${id}#${fieldName}`);
+    })
+  );
+
+  useScrollToFocusedField();
+
+  if (!display) return null;
+
+  const eleTopY = position.top + window.scrollY;
+  const eleBottomY = position.top + position.height + window.scrollY;
+  const viewportTopY = window.scrollY;
+  const viewportBottomY = window.innerHeight + window.scrollY;
+
+  if (eleTopY > viewportBottomY) {
+    // element is below the viewport
+    return <BelowViewportIndicator />;
+  }
+
+  if (eleBottomY < viewportTopY) {
+    // element is above the viewport
+    return <AboveViewportIndicator />;
+  }
+
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        zIndex: 'var(--tina-z-index-3)',
+        top: position.top + window.scrollY,
+        left: position.left + window.scrollX + iframePosition.left,
+        width: position.width,
+        height: position.height,
+        outline: '2px dashed var(--tina-color-indicator)',
+        borderRadius: 'var(--tina-radius-small)',
+        transition: display
+          ? activeEle
+            ? `opacity 300ms ease-out`
+            : `opacity 150ms ease-in`
+          : `none`,
+        opacity: activeEle && display ? 0.8 : 0,
+      }}
+    ></div>
+  );
+};
+
+
+export const HoveredFieldIndicator = () => {
+  const [hoveredFieldName, setHoveredFieldName] = React.useState<string | null>(
+    null
+  );
+  const [display, setDisplay] = React.useState<boolean>(false);
+  const [position, setPosition] = React.useState<any>(false);
+  const [iframePosition, setIframePosition] = React.useState<any>({ left: 0 });
+  const activeEle = useFieldReference(hoveredFieldName);
+
+  React.useEffect(() => {
+    let displayTimeout;
+    if (activeEle) {
+      setDisplay(true);
+      setPosition(activeEle.getBoundingClientRect());
+      const iframe = document.getElementById(
+        'tina-iframe'
+      ) as HTMLIFrameElement;
+      if (iframe) {
+        setIframePosition(iframe.getBoundingClientRect());
+      }
+    } else {
+      displayTimeout = setTimeout(() => {
+        setDisplay(false);
+      }, 150);
+    }
+
+    return () => {
+      clearTimeout(displayTimeout);
+    };
+  }, [activeEle]);
+
+  const [, setArbitraryValue] = React.useState(0);
+  const rerender = () => setArbitraryValue((s) => s + 1);
+
+  React.useEffect(() => {
+    window.addEventListener('scroll', rerender);
+    return () => {
+      window.removeEventListener('scroll', rerender);
+    };
+  }, []);
+
+  const { subscribe } = useEvent<FieldHoverEvent>('field:hover');
+
+  React.useEffect(() =>
+    subscribe(({ fieldName, id }) => {
+      setHoveredFieldName(`${id}#${fieldName}`);
     })
   );
 
