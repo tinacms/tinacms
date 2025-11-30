@@ -168,7 +168,6 @@
 		"@types/react": "^18.3.18",
 		"@types/react-color": "catalog:",
 		"@types/react-dom": "catalog:",
-		"@types/yup": "^0.32.0",
 		"happy-dom": "catalog:",
 		"identity-obj-proxy": "catalog:",
 		"isomorphic-fetch": "catalog:",

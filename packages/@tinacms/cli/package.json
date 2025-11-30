@@ -41,7 +41,7 @@
 		"@types/node": "^22.13.1",
 		"@types/progress": "catalog:",
 		"@types/prompts": "catalog:",
-		"@types/yup": "^0.32.0",
+
 		"jest": "catalog:"
 	},
 	"scripts": {
