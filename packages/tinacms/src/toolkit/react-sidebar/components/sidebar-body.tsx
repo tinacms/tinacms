@@ -138,7 +138,7 @@ export const FormHeader = ({ activeForm }: FormHeaderProps) => {
   const { formIsPristine } = React.useContext(SidebarContext);
 
   return (
-    <div className='px-4 pt-2 z-panel pb-4 flex flex-row flex-nowrap justify-between items-center gap-2 bg-gradient-to-t from-white to-gray-50'>
+    <div className='px-4 pt-2 pb-4 flex flex-row flex-nowrap justify-between items-center gap-2 bg-gradient-to-t from-white to-gray-50'>
       <MultiformSelector activeForm={activeForm} />
       <FormBreadcrumbs className='w-[calc(100%-3rem)]' />
       <FormStatus pristine={formIsPristine} />
