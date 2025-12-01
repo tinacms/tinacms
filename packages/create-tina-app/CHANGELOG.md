@@ -1,5 +1,12 @@
 # create-tina-app
 
+## 1.6.2
+
+### Patch Changes
+
+- Updated dependencies [[`2e1535d`](https://github.com/tinacms/tinacms/commit/2e1535dd5495dc390902f2db6ef1f26afb072396)]:
+  - @tinacms/metrics@2.0.0
+
 ## 1.6.1
 
 ### Patch Changes

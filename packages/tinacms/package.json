@@ -2,7 +2,7 @@
 	"name": "tinacms",
 	"type": "module",
 	"typings": "dist/index.d.ts",
-	"version": "2.10.1",
+	"version": "3.0.0",
 	"main": "dist/index.js",
 	"module": "./dist/index.js",
 	"exports": {
@@ -15,7 +15,9 @@
 		"./dist/rich-text/static": "./dist/rich-text/static.js",
 		"./dist/rich-text/prism": "./dist/rich-text/prism.js"
 	},
-	"files": ["dist"],
+	"files": [
+		"dist"
+	],
 	"buildConfig": {
 		"entryPoints": [
 			"src/index.ts",
