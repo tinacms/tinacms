@@ -430,10 +430,12 @@ const BranchSelector = ({
       )}
       {filteredBranchList.length > 0 && (
         <div className='min-w-[192px] max-h-[24rem] overflow-y-auto w-full h-full rounded-lg shadow-inner bg-white border border-gray-200'>
-          <table className='w-full'>
+          <table className='w-full table-fixed'>
             <thead className='sticky top-0 z-20 bg-gray-100 border-b-2 border-gray-200'>
               <tr>
-                <th className={tableHeadingStyle}>Branch Name</th>
+                <th className={`${tableHeadingStyle} max-w-[30%]`}>
+                  Branch Name
+                </th>
                 <th className={tableHeadingStyle}>Last Updated</th>
                 <th className={tableHeadingStyle}>
                   {/* Empty header for Select button column, needs style for sticky fucntionality */}
@@ -518,13 +520,13 @@ const BranchItem = ({
             : 'border-b-2 border-gray-50'
       }`}
     >
-      <td className='pl-3 pr-3 py-1.5 min-w-0 max-w-1/4'>
+      <td className='pl-3 pr-3 py-1.5'>
         <div className='flex flex-col'>
-          <div className='flex items-center gap-1'>
+          <div className='flex items-center gap-1 min-w-0'>
             {branch.protected && (
               <BiLock className='w-5 h-auto opacity-70 text-blue-500 flex-shrink-0' />
             )}
-            <span className='text-sm leading-tight truncate'>
+            <span className='text-sm leading-tight truncate block min-w-0'>
               {branch.name}
             </span>
           </div>
