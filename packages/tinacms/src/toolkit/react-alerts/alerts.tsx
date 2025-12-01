@@ -158,7 +158,7 @@ const Alert: React.FC<{ level: AlertLevel; children: React.ReactNode }> = ({
       }}
     >
       <div
-        className={`flex items-center gap-1.5 w-[350px] rounded-md border p-2 ${borderClasses[level]}`}
+        className={`flex items-center gap-2 w-[350px] rounded-md border px-4 py-3 ${borderClasses[level]}`}
         {...props}
       />
     </div>
