@@ -1,5 +1,6 @@
 {
 	"name": "@tinacms/cli",
+	"type": "module",
 	"version": "1.12.6",
 	"main": "dist/index.js",
 	"typings": "dist/index.d.ts",

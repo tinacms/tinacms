@@ -80,7 +80,7 @@ export class TinaSchema {
         return;
       }
       if (field.type === 'reference') {
-        field.collections.forEach((name) => {
+        field.collections.forEach((name: string) => {
           if (result[name] === undefined) {
             result[name] = [];
           }

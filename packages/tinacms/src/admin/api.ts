@@ -10,7 +10,7 @@ import type { CollectionResponse, DocumentForm } from './types';
 import {
   SearchClient,
   processDocumentForIndexing,
-} from '@tinacms/search/dist/index-client';
+} from '@tinacms/search/index-client';
 
 export const CREATE_DOCUMENT_GQL = `#graphql
 mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {

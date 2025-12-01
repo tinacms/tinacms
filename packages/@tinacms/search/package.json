@@ -1,21 +1,18 @@
 {
 	"name": "@tinacms/search",
+	"type": "module",
 	"version": "1.1.3",
 	"main": "dist/index.js",
-	"module": "dist/index-client.mjs",
-	"typings": "dist/index.d.ts",
-	"files": [
-		"package.json",
-		"dist"
-	],
+	"types": "dist/index.d.ts",
+	"files": ["dist"],
 	"exports": {
 		".": {
-			"import": "./dist/index.mjs",
-			"require": "./dist/index.js"
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
 		},
-		"./dist/index-client": {
-			"import": "./dist/index-client.mjs",
-			"require": "./dist/index-client.js"
+		"./index-client": {
+			"types": "./dist/index-client.d.ts",
+			"default": "./dist/index-client.js"
 		}
 	},
 	"license": "SEE LICENSE IN LICENSE",

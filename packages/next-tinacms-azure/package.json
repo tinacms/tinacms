@@ -3,7 +3,7 @@
 	"version": "4.0.1",
 	"description": "",
 	"main": "dist/index.js",
-	"module": "dist/index.mjs",
+	"module": "./dist/index.js",
 	"files": [
 		"dist"
 	],

@@ -5,6 +5,7 @@ import twTypography from '@tailwindcss/typography';
 import tailwind from 'tailwindcss';
 import defaultTheme from 'tailwindcss/defaultTheme.js';
 import type { Plugin } from 'vite';
+import { createRequire } from 'module';
 
 export const tinaTailwind = (
   spaPath: string,
@@ -14,6 +15,7 @@ export const tinaTailwind = (
     name: 'vite-plugin-tina',
     // @ts-ignore
     config: (viteConfig) => {
+      const require = createRequire(import.meta.url);
       const plugins: Plugin[] = [];
       const content = [
         path.join(spaPath, 'src/**/*.{vue,js,ts,jsx,tsx,svelte}'),
