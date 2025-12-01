@@ -34,6 +34,10 @@ export * from '@toolkit/icons';
 export * from '@toolkit/react-dismissible';
 export {
   Nav,
+  NavCloudLink,
+  NavProvider,
+  NavMenuTrigger,
+  useNav,
   LocalWarning,
   BillingWarning,
   SyncStatusButton,
