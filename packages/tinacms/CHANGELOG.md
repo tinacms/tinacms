@@ -1,5 +1,26 @@
 # tinacms
 
+## 3.0.0
+
+### Major Changes
+
+- [#5982](https://github.com/tinacms/tinacms/pull/5982) [`2e1535d`](https://github.com/tinacms/tinacms/commit/2e1535dd5495dc390902f2db6ef1f26afb072396) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: migrate from commonjs to esm
+
+### Minor Changes
+
+- [#6183](https://github.com/tinacms/tinacms/pull/6183) [`ed6025e`](https://github.com/tinacms/tinacms/commit/ed6025ee87ebe051957fc93e987ba8de8b003995) Thanks [@Pat-Stuart](https://github.com/Pat-Stuart)! - Add in ability to disable folder creation in UI per collection
+
+- [#6174](https://github.com/tinacms/tinacms/pull/6174) [`3bf79e1`](https://github.com/tinacms/tinacms/commit/3bf79e19c005dca745a8ddd46546190741b322a5) Thanks [@Calinator444](https://github.com/Calinator444)! - rewrote date time picker
+
+### Patch Changes
+
+- [#6200](https://github.com/tinacms/tinacms/pull/6200) [`bb1ad6a`](https://github.com/tinacms/tinacms/commit/bb1ad6a11d10976074453ed218b178935ec96fd3) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Media Manager - View more images on larger screens with a dynamic grid layout.
+
+- Updated dependencies [[`2e1535d`](https://github.com/tinacms/tinacms/commit/2e1535dd5495dc390902f2db6ef1f26afb072396), [`ed6025e`](https://github.com/tinacms/tinacms/commit/ed6025ee87ebe051957fc93e987ba8de8b003995)]:
+  - @tinacms/mdx@2.0.0
+  - @tinacms/schema-tools@2.0.0
+  - @tinacms/search@1.1.4
+
 ## 2.10.1
 
 ### Patch Changes
