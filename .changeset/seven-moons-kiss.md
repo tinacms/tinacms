@@ -2,4 +2,4 @@
 "tinacms": patch
 ---
 
-Adjustments to branch selector ui
+Branch Selector - Add truncation and tooltip to branch name, adjust max width, add sticky header

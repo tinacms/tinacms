@@ -21,6 +21,13 @@ import { useBranchData } from './branch-data';
 import { BranchSwitcherLegacy } from './branch-switcher-legacy';
 import { Branch, BranchSwitcherProps } from './types';
 import { Badge } from '@toolkit/react-sidebar/components/badge';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipPortal,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@toolkit/fields/plugins/mdx-field-plugin/plate/components/plate-ui/tooltip';
 
 type ListState = 'loading' | 'ready' | 'error';
 
@@ -429,37 +436,39 @@ const BranchSelector = ({
         </div>
       )}
       {filteredBranchList.length > 0 && (
-        <div className='min-w-[192px] max-h-[24rem] overflow-y-auto w-full h-full rounded-lg shadow-inner bg-white border border-gray-200'>
-          <table className='w-full table-fixed'>
-            <thead className='sticky top-0 z-20 bg-gray-100 border-b-2 border-gray-200'>
-              <tr>
-                <th className={`${tableHeadingStyle} max-w-[30%]`}>
-                  Branch Name
-                </th>
-                <th className={tableHeadingStyle}>Last Updated</th>
-                <th className={tableHeadingStyle}>
-                  {/* Empty header for Select button column, needs style for sticky fucntionality */}
-                </th>
-                <th className={tableHeadingStyle}>
-                  {/* Empty header for options button column, needs style for sticky fucntionality */}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredBranchList.map((branch) => (
-                <BranchItem
-                  key={branch.name}
-                  branch={branch}
-                  currentBranch={currentBranch}
-                  onChange={onChange}
-                  refreshBranchList={refreshBranchList}
-                  previewFunction={previewFunction}
-                  cms={cms}
-                />
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <TooltipProvider>
+          <div className='min-w-[192px] max-h-[24rem] overflow-y-auto w-full h-full rounded-lg shadow-inner bg-white border border-gray-200'>
+            <table className='w-full table-fixed'>
+              <thead className='sticky top-0 z-20 bg-gray-100 border-b-2 border-gray-200'>
+                <tr>
+                  <th className={`${tableHeadingStyle} max-w-[30%]`}>
+                    Branch Name
+                  </th>
+                  <th className={tableHeadingStyle}>Last Updated</th>
+                  <th className={tableHeadingStyle}>
+                    {/* Empty header for Select button column, needs style for sticky fucntionality */}
+                  </th>
+                  <th className={tableHeadingStyle}>
+                    {/* Empty header for options button column, needs style for sticky fucntionality */}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredBranchList.map((branch) => (
+                  <BranchItem
+                    key={branch.name}
+                    branch={branch}
+                    currentBranch={currentBranch}
+                    onChange={onChange}
+                    refreshBranchList={refreshBranchList}
+                    previewFunction={previewFunction}
+                    cms={cms}
+                  />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </TooltipProvider>
       )}
     </div>
   );
@@ -526,9 +535,16 @@ const BranchItem = ({
             {branch.protected && (
               <BiLock className='w-5 h-auto opacity-70 text-blue-500 flex-shrink-0' />
             )}
-            <span className='text-sm leading-tight truncate block min-w-0'>
-              {branch.name}
-            </span>
+            <Tooltip delayDuration={300}>
+              <TooltipTrigger asChild>
+                <span className='text-sm leading-tight truncate block min-w-0 cursor-default'>
+                  {branch.name}
+                </span>
+              </TooltipTrigger>
+              <TooltipPortal>
+                <TooltipContent side='top'>{branch.name}</TooltipContent>
+              </TooltipPortal>
+            </Tooltip>
           </div>
           {indexingStatus !== 'complete' && (
             <div className='w-fit mt-1'>
