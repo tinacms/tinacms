@@ -1,24 +1,54 @@
-import { act, render } from '@testing-library/react';
+import { act, cleanup, render } from '@testing-library/react';
 import React, { useEffect } from 'react';
-import { describe, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, it, vi } from 'vitest';
 import { TinaCMS } from '../tina-cms';
 import { TinaCMSProvider } from './tina-cms-provider';
 import { TinaUI } from './tina-ui';
 
+// Mock localStorage
+const localStorageMock = (() => {
+  let store: Record<string, string> = {};
+  return {
+    getItem: vi.fn((key: string) => store[key] ?? null),
+    setItem: vi.fn((key: string, value: string) => {
+      store[key] = value;
+    }),
+    removeItem: vi.fn((key: string) => {
+      delete store[key];
+    }),
+    clear: vi.fn(() => {
+      store = {};
+    }),
+  };
+})();
+
+Object.defineProperty(window, 'localStorage', {
+  value: localStorageMock,
+});
+
+// Helper to create a fresh CMS instance for each test
+const createCMS = (options: { enabled: boolean; sidebar: boolean }) => {
+  const cms = new TinaCMS(options);
+  cms.registerApi('admin', {
+    fetchCollections: () => [],
+  });
+  return cms;
+};
+
 describe('TinaUI', () => {
+  beforeEach(() => {
+    localStorageMock.clear();
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    cleanup();
+  });
+
   describe('when the CMS is enabled', () => {
     describe('when sidebar is true', () => {
-      const cms = new TinaCMS({
-        enabled: true,
-        sidebar: true,
-      });
-      cms.registerApi('admin', {
-        fetchCollections: () => {
-          return [];
-        },
-      });
-
       it('renders children', () => {
+        const cms = createCMS({ enabled: true, sidebar: true });
         const app = render(
           <TinaCMSProvider cms={cms}>
             <TinaUI>
@@ -30,6 +60,7 @@ describe('TinaUI', () => {
         app.getByText('something');
       });
       it('renders the "open cms" sidebar button', () => {
+        const cms = createCMS({ enabled: true, sidebar: true });
         const app = render(
           <TinaCMSProvider cms={cms}>
             <TinaUI />
@@ -40,12 +71,8 @@ describe('TinaUI', () => {
       });
     });
     describe('when sidebar is false', () => {
-      const cms = new TinaCMS({
-        enabled: true,
-        sidebar: false,
-      });
-
       it('renders children', () => {
+        const cms = createCMS({ enabled: true, sidebar: false });
         const app = render(
           <TinaCMSProvider cms={cms}>
             <TinaUI>
@@ -57,6 +84,7 @@ describe('TinaUI', () => {
         app.getByText('something');
       });
       it('does not render the "opens cms" sidebar button', () => {
+        const cms = createCMS({ enabled: true, sidebar: false });
         const app = render(
           <TinaCMSProvider cms={cms}>
             <TinaUI />
@@ -70,12 +98,8 @@ describe('TinaUI', () => {
   });
   describe('when the CMS is disabled', () => {
     describe('when sidebar is true', () => {
-      const cms = new TinaCMS({
-        enabled: false,
-        sidebar: true,
-      });
-
       it('renders children', () => {
+        const cms = createCMS({ enabled: false, sidebar: true });
         const app = render(
           <TinaCMSProvider cms={cms}>
             <TinaUI>
@@ -87,6 +111,7 @@ describe('TinaUI', () => {
         app.getByText('something');
       });
       it('does not render the "opens cms" sidebar button', () => {
+        const cms = createCMS({ enabled: false, sidebar: true });
         const app = render(
           <TinaCMSProvider cms={cms}>
             <TinaUI />
@@ -97,15 +122,7 @@ describe('TinaUI', () => {
         expect(sidebarButton).toBeNull();
       });
       it('does not remount children when cms is toggled', () => {
-        const cms = new TinaCMS({
-          enabled: false,
-          sidebar: true,
-        });
-        cms.registerApi('admin', {
-          fetchCollections: () => {
-            return [];
-          },
-        });
+        const cms = createCMS({ enabled: false, sidebar: true });
 
         const onMount = vi.fn();
         function Child() {
@@ -128,12 +145,8 @@ describe('TinaUI', () => {
       });
     });
     describe('when sidebar is false', () => {
-      const cms = new TinaCMS({
-        enabled: false,
-        sidebar: false,
-      });
-
       it('renders children', () => {
+        const cms = createCMS({ enabled: false, sidebar: false });
         const app = render(
           <TinaCMSProvider cms={cms}>
             <TinaUI>
@@ -145,6 +158,7 @@ describe('TinaUI', () => {
         app.getByText('something');
       });
       it('does not render the "opens cms" sidebar button', () => {
+        const cms = createCMS({ enabled: false, sidebar: false });
         const app = render(
           <TinaCMSProvider cms={cms}>
             <TinaUI />
