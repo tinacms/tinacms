@@ -231,8 +231,8 @@ type DateFormatProps = {
    * dateFormat: 'YYYY MM DD'
    * ```
    */
-  dateFormat?: string;
-  timeFormat?: string;
+  dateFormat?: string | boolean;
+  timeFormat?: string | boolean;
 };
 export type DateTimeField = (
   | FieldGeneric<string, undefined, DateFormatProps>
@@ -250,6 +250,16 @@ export type ImageField = (
 ) &
   BaseField & {
     type: 'image';
+    /**
+     * A function that returns the upload directory path based on the form values.
+     * This is used to organize uploaded images into specific folders.
+     *
+     * @example
+     * ```ts
+     * uploadDir: (formValues) => `uploads/${formValues.category}`
+     * ```
+     */
+    uploadDir?: (formValues: Record<string, any>) => string;
   };
 
 type ReferenceFieldOptions = {
@@ -921,6 +931,7 @@ export interface UICollection<Form = any, CMS = any, TinaForm = any> {
   allowedActions?: {
     create?: boolean;
     delete?: boolean;
+    createFolder?: boolean;
     createNestedFolder?: boolean;
   };
   /**

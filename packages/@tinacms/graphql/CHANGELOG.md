@@ -1,5 +1,37 @@
 # tina-graphql
 
+## 1.6.3
+
+### Patch Changes
+
+- [#6187](https://github.com/tinacms/tinacms/pull/6187) [`a76fdb6`](https://github.com/tinacms/tinacms/commit/a76fdb639b94cfefa169ebbd184f55d62e4a8a76) Thanks [@18-th](https://github.com/18-th)! - Updated yup to v1 to remove transitive lodash dependency
+
+- Updated dependencies [[`a76fdb6`](https://github.com/tinacms/tinacms/commit/a76fdb639b94cfefa169ebbd184f55d62e4a8a76), [`a736baf`](https://github.com/tinacms/tinacms/commit/a736bafe1b20bc1465f8e4a4c0c2281f40dcbf2f)]:
+  - @tinacms/schema-tools@1.10.1
+  - @tinacms/mdx@1.8.3
+
+## 1.6.2
+
+### Patch Changes
+
+- [#6145](https://github.com/tinacms/tinacms/pull/6145) [`d1bd1a1`](https://github.com/tinacms/tinacms/commit/d1bd1a1312fa910e237ec06608e7c11830c78346) Thanks [@18-th](https://github.com/18-th)! - Remove Lodash and replace usages with either native functions or es-toolkit equivalents
+  Removed the following lodash usages:
+
+  - debounce - was not used, removed the reference
+  - camelcase - unused, removed the reference
+  - upperfirst - unused, removed the reference
+  - flatten - replaced by native .flat()
+  - get - replaced with an existing implementation from the GraphQL package
+  - cloneDeep - replaced with cloneDeep from es-toolkit
+  - set - replaced with es-toolkit compat version. That implementation is identical to the one used by lodash
+  - uniqBy - replace with es-toolkit version. That implementation is identical to the one used by lodash
+
+- [#5822](https://github.com/tinacms/tinacms/pull/5822) [`4b824be`](https://github.com/tinacms/tinacms/commit/4b824be53572f9231753ebd3b5f14fd778fd73d6) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Migrate from react-beautiful-dnd to dnd-kit to fix deprecation error.
+
+- Updated dependencies [[`f2577b9`](https://github.com/tinacms/tinacms/commit/f2577b911a97ecc1c3f53a98ae8218cc33bc9867), [`38920ce`](https://github.com/tinacms/tinacms/commit/38920ce29a9b63c54b04f39537f19beab62d2c86), [`d1bd1a1`](https://github.com/tinacms/tinacms/commit/d1bd1a1312fa910e237ec06608e7c11830c78346), [`4b824be`](https://github.com/tinacms/tinacms/commit/4b824be53572f9231753ebd3b5f14fd778fd73d6)]:
+  - @tinacms/schema-tools@1.10.0
+  - @tinacms/mdx@1.8.2
+
 ## 1.6.1
 
 ### Patch Changes

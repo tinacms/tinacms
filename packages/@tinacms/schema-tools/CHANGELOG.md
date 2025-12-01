@@ -1,5 +1,25 @@
 # @tinacms/schema-tools
 
+## 1.10.1
+
+### Patch Changes
+
+- [#6187](https://github.com/tinacms/tinacms/pull/6187) [`a76fdb6`](https://github.com/tinacms/tinacms/commit/a76fdb639b94cfefa169ebbd184f55d62e4a8a76) Thanks [@18-th](https://github.com/18-th)! - Updated yup to v1 to remove transitive lodash dependency
+
+- [#6138](https://github.com/tinacms/tinacms/pull/6138) [`a736baf`](https://github.com/tinacms/tinacms/commit/a736bafe1b20bc1465f8e4a4c0c2281f40dcbf2f) Thanks [@Pat-Stuart](https://github.com/Pat-Stuart)! - Update Image field type definition to include uploadDir
+
+## 1.10.0
+
+### Minor Changes
+
+- [#6142](https://github.com/tinacms/tinacms/pull/6142) [`f2577b9`](https://github.com/tinacms/tinacms/commit/f2577b911a97ecc1c3f53a98ae8218cc33bc9867) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Folder creation validation with regex
+
+### Patch Changes
+
+- [#6147](https://github.com/tinacms/tinacms/pull/6147) [`38920ce`](https://github.com/tinacms/tinacms/commit/38920ce29a9b63c54b04f39537f19beab62d2c86) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Fix: ui.max not applying to primitive type list:true
+
+- [#5822](https://github.com/tinacms/tinacms/pull/5822) [`4b824be`](https://github.com/tinacms/tinacms/commit/4b824be53572f9231753ebd3b5f14fd778fd73d6) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Migrate from react-beautiful-dnd to dnd-kit to fix deprecation error.
+
 ## 1.9.1
 
 ### Patch Changes

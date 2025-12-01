@@ -21,7 +21,7 @@ import {
   type Visitor,
   visitWithTypeInfo,
 } from 'graphql';
-import set from 'lodash.set';
+import { set } from 'es-toolkit/compat';
 
 type VisitorType = Visitor<ASTKindToNode, ASTNode>;
 

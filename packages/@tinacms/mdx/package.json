@@ -1,6 +1,6 @@
 {
     "name": "@tinacms/mdx",
-    "version": "1.8.1",
+    "version": "1.8.3",
     "type": "module",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -40,7 +40,6 @@
 		"acorn": "catalog:",
 		"ccount": "catalog:",
 		"estree-util-is-identifier-name": "catalog:",
-		"lodash.flatten": "catalog:",
 		"mdast-util-compact": "catalog:",
 		"mdast-util-directive": "catalog:",
 		"mdast-util-from-markdown": "catalog:",
@@ -77,7 +76,6 @@
 	"devDependencies": {
 		"@tinacms/scripts": "workspace:*",
 		"@types/estree": "1.0.0",
-		"@types/lodash.flatten": "catalog:",
 		"@types/mdast": "catalog:",
 		"@types/node": "^22.13.1",
 		"@types/prettier": "catalog:",

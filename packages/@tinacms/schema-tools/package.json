@@ -1,7 +1,7 @@
 {
 	"name": "@tinacms/schema-tools",
-	"version": "1.9.1",
 	"type": "module",
+	"version": "1.10.1",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"files": [
@@ -20,16 +20,15 @@
 		"@types/jest": "^29.5.14",
 		"@types/micromatch": "catalog:",
 		"@types/react": "^18.3.18",
-		"@types/yup": "^0.29.14",
 		"jest": "catalog:",
 		"react": "^18.3.1",
 		"ts-jest": "catalog:",
 		"typescript": "^5.7.3",
-		"yup": "^0.32.11"
+		"yup": "^1.6.1"
 	},
 	"peerDependencies": {
 		"react": ">=16.14.0",
-		"yup": "^0.32.0"
+		"yup": "^1.0.0"
 	},
 	"scripts": {
 		"build": "tinacms-scripts build",

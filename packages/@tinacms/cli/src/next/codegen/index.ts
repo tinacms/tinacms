@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 import { buildASTSchema, printSchema } from 'graphql';
-import type { TypeDefinitionNode, GraphQLSchema } from 'graphql';
+import type { GraphQLSchema, DocumentNode } from 'graphql';
 import { generateTypes } from './codegen';
 import { transform } from 'esbuild';
 import { ConfigManager } from '../config-manager';
@@ -23,10 +23,7 @@ export class Codegen {
   localUrl: string;
   // production url
   productionUrl: string;
-  graphqlSchemaDoc: {
-    kind: 'Document';
-    definitions: TypeDefinitionNode[];
-  };
+  graphqlSchemaDoc: DocumentNode;
   tinaSchema: TinaSchema;
   lookup: any;
   noClientBuildCache: boolean;
@@ -47,10 +44,7 @@ export class Codegen {
     queryDoc: string;
     fragDoc: string;
     isLocal: boolean;
-    graphqlSchemaDoc: {
-      kind: 'Document';
-      definitions: TypeDefinitionNode[];
-    };
+    graphqlSchemaDoc: DocumentNode;
     tinaSchema: TinaSchema;
     lookup: any;
     noClientBuildCache: boolean;
