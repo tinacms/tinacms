@@ -5,6 +5,7 @@
 "@tinacms/mdx": major
 "@tinacms/metrics": major
 "@tinacms/schema-tools": major
+"tinacms": major
 ---
 
 feat: migrate from commonjs to esm
