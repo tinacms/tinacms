@@ -24,6 +24,7 @@ export function wrapFieldsWithMeta<ExtraFieldProps = {}, InputProps = {}>(
         index={props.index}
         tinaForm={props.tinaForm}
         focusIntent={props.field.experimental_focusIntent}
+        hoverIntent={props.field.experimental_hoverIntent}
       >
         <Field {...props} />
       </FieldMeta>
@@ -49,6 +50,7 @@ export function wrapFieldWithNoHeader<ExtraFieldProps = {}, InputProps = {}>(
         index={props.index}
         tinaForm={props.tinaForm}
         focusIntent={props.field.experimental_focusIntent}
+        hoverIntent={props.field.experimental_hoverIntent}
       >
         <Field {...props} />
       </FieldMeta>
@@ -75,6 +77,7 @@ export function wrapFieldWithError<ExtraFieldProps = {}, InputProps = {}>(
         index={props.index}
         tinaForm={props.tinaForm}
         focusIntent={props.field.experimental_focusIntent}
+        hoverIntent={props.field.experimental_hoverIntent}
       >
         <Field {...props} />
       </FieldMeta>
@@ -91,7 +94,8 @@ interface FieldMetaProps extends React.HTMLAttributes<HTMLElement> {
   margin?: boolean;
   index?: number;
   tinaForm: Form;
-  focusIntent?: boolean | { active: boolean; visualOnly?: boolean };
+  focusIntent?: boolean;
+  hoverIntent?: boolean;
 }
 
 export const FieldMeta = ({
@@ -104,6 +108,7 @@ export const FieldMeta = ({
   index,
   tinaForm,
   focusIntent,
+  hoverIntent,
   ...props
 }: FieldMetaProps) => {
   const { dispatch: setHoveredField } =
@@ -111,11 +116,8 @@ export const FieldMeta = ({
   const { dispatch: setFocusedField } =
     useEvent<FieldFocusEvent>('field:focus');
 
-  const isActive =
-    focusIntent &&
-    (typeof focusIntent === 'boolean' ? focusIntent : focusIntent.active);
-  const isHovering =
-    focusIntent && typeof focusIntent !== 'boolean' && focusIntent.visualOnly;
+  const isActive = !!focusIntent;
+  const isHovering = !!hoverIntent;
 
   return (
     <FieldWrapper
@@ -148,21 +150,30 @@ export const FieldMeta = ({
 export const FieldWrapper = ({
   margin,
   children,
-  ...props
+  'data-tina-field-active': dataActive,
+  'data-tina-field-hovering': dataHovering,
+  ...restProps
 }: {
   margin: boolean;
   children: React.ReactNode;
+  'data-tina-field-active'?: string;
+  'data-tina-field-hovering'?: string;
 } & Partial<React.ComponentPropsWithoutRef<'div'>>) => {
-  const isHovering = props['data-tina-field-hovering'] === 'true';
+  const isActive = dataActive === 'true';
+  const isHovering = dataHovering === 'true';
 
   return (
     <div
       className={`relative ${margin ? `mb-5 last:mb-0` : ``} ${
-        isHovering
+        isHovering && !isActive
           ? '[&_input]:!shadow-outline [&_input]:!border-blue-500 [&_textarea]:!shadow-outline [&_textarea]:!border-blue-500 [&_select]:!shadow-outline [&_select]:!border-blue-500 [&_.ProseMirror]:!shadow-outline [&_.ProseMirror]:!border-blue-500'
-          : ''
+          : isActive
+            ? '[&_input]:!border-tina-orange-dark [&_input]:!ring-2 [&_input]:!ring-tina-orange-dark/20 [&_textarea]:!border-tina-orange-dark [&_textarea]:!ring-2 [&_textarea]:!ring-tina-orange-dark/20 [&_select]:!border-tina-orange-dark [&_select]:!ring-2 [&_select]:!ring-tina-orange-dark/20 [&_.ProseMirror]:!border-tina-orange-dark [&_.ProseMirror]:!ring-2 [&_.ProseMirror]:!ring-tina-orange-dark/20'
+            : ''
       }`}
-      {...props}
+      data-tina-field-active={dataActive}
+      data-tina-field-hovering={dataHovering}
+      {...restProps}
     >
       {children}
     </div>

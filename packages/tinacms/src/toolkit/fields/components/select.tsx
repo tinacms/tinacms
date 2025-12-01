@@ -36,10 +36,7 @@ export const Select: React.FC<SelectProps> = ({
   const ref = React.useRef(null);
   React.useEffect(() => {
     const focusIntent = field?.experimental_focusIntent;
-    // Only focus if visualOnly is not set (or is false)
-    const shouldFocus =
-      focusIntent &&
-      (typeof focusIntent === 'boolean' || !focusIntent.visualOnly);
+    const shouldFocus = !!focusIntent;
 
     if (ref.current && shouldFocus) {
       ref.current.focus();

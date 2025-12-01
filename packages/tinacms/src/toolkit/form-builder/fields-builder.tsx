@@ -7,7 +7,7 @@ import { FieldPlugin } from './field-plugin';
 export interface FieldsBuilderProps {
   form: Form;
   activeFieldName?: string;
-  isHovering?: boolean;
+  hoveringFieldName?: string;
   fields: Field[];
   padding?: boolean;
 }
@@ -16,7 +16,7 @@ export function FieldsBuilder({
   form,
   fields,
   activeFieldName,
-  isHovering = false,
+  hoveringFieldName,
   padding = false,
 }: FieldsBuilderProps) {
   const cms = useCMS();
@@ -38,7 +38,7 @@ export function FieldsBuilder({
             key={field.name}
             field={field}
             activeFieldName={activeFieldName}
-            isHovering={isHovering}
+            hoveringFieldName={hoveringFieldName}
             form={form}
             fieldPlugins={fieldPlugins}
             index={index}
@@ -55,7 +55,7 @@ interface InnerFieldProps {
   fieldPlugins: FieldPlugin[];
   index: number;
   activeFieldName?: string;
-  isHovering?: boolean;
+  hoveringFieldName?: string;
 }
 
 const InnerField = ({
@@ -64,7 +64,7 @@ const InnerField = ({
   fieldPlugins,
   index,
   activeFieldName,
-  isHovering = false,
+  hoveringFieldName,
 }: InnerFieldProps) => {
   /**
    * We double-render form builders for some reason which reults in useMemo not working here
@@ -96,12 +96,11 @@ const InnerField = ({
   }
 
   let isActiveField = field.name === activeFieldName;
-  // Create focusIntent: boolean for backwards compat, or object with visualOnly flag
-  const focusIntent = isActiveField
-    ? isHovering
-      ? { active: true, visualOnly: true }
-      : true
-    : false;
+  const isHoveringField = field.name === hoveringFieldName;
+
+  const focusIntent = isActiveField;
+  const hoverIntent = isHoveringField;
+  
   // TODO: this handles focusing on the tag element when one
   // of it's items is the activeField (categories.2) but not
   // for when the items are displayed with the ListFieldPlugin
@@ -150,7 +149,11 @@ const InnerField = ({
               {...fieldProps}
               form={form.finalForm}
               tinaForm={form}
-              field={{ ...field, experimental_focusIntent: focusIntent }}
+              field={{ 
+                ...field, 
+                experimental_focusIntent: focusIntent,
+                experimental_hoverIntent: hoverIntent
+              }}
             />
           );
         }
@@ -162,7 +165,11 @@ const InnerField = ({
               experimental_focusIntent={focusIntent}
               form={form.finalForm}
               tinaForm={form}
-              field={{ ...field, experimental_focusIntent: focusIntent }}
+              field={{ 
+                ...field, 
+                experimental_focusIntent: focusIntent,
+                experimental_hoverIntent: hoverIntent
+              }}
               index={index}
             />
           );

@@ -27,10 +27,7 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
 
     React.useEffect(() => {
       const focusIntent = props.field.experimental_focusIntent;
-      // Only focus if visualOnly is not set (or is false)
-      const shouldFocus =
-        focusIntent &&
-        (typeof focusIntent === 'boolean' || !focusIntent.visualOnly);
+      const shouldFocus = !!focusIntent;
 
       if (ref.current && shouldFocus) {
         ref.current.focus();

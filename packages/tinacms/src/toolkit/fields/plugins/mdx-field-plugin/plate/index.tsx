@@ -44,10 +44,7 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
           '[role="textbox"]'
         ) as HTMLElement;
         const focusIntent = field.experimental_focusIntent;
-        // Only focus if visualOnly is not set (or is false)
-        const shouldFocus =
-          focusIntent &&
-          (typeof focusIntent === 'boolean' || !focusIntent.visualOnly);
+        const shouldFocus = !!focusIntent;
 
         if (shouldFocus && plateElement) {
           if (plateElement) plateElement.focus();

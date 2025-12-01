@@ -110,6 +110,14 @@ export const ActiveFieldIndicator = () => {
   const [iframePosition, setIframePosition] = React.useState<any>({ left: 0 });
   const activeEle = useFieldReference(activeFieldName);
 
+  const { subscribe } = useEvent<FieldFocusEvent>('field:focus');
+
+  React.useEffect(() =>
+    subscribe(({ fieldName, id }) => {
+      setActiveFieldName(`${id}#${fieldName}`);
+    })
+  );
+
   React.useEffect(() => {
     let displayTimeout;
     if (activeEle) {
@@ -141,14 +149,6 @@ export const ActiveFieldIndicator = () => {
       window.removeEventListener('scroll', rerender);
     };
   }, []);
-
-  const { subscribe } = useEvent<FieldHoverEvent>('field:hover');
-
-  React.useEffect(() =>
-    subscribe(({ fieldName, id }) => {
-      setActiveFieldName(`${id}#${fieldName}`);
-    })
-  );
 
   useScrollToFocusedField();
 
@@ -190,7 +190,6 @@ export const ActiveFieldIndicator = () => {
     ></div>
   );
 };
-
 
 export const HoveredFieldIndicator = () => {
   const [hoveredFieldName, setHoveredFieldName] = React.useState<string | null>(

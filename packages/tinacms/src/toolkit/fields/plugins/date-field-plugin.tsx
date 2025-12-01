@@ -61,11 +61,8 @@ export const ReactDateTimeWithStyles = (
         const plateElement = area.current.querySelector(
           'input[type="text"]'
         ) as HTMLElement;
-        const focusIntent = props.experimental_focusIntent;
-        // Only focus if visualOnly is not set (or is false)
-        const shouldFocus =
-          focusIntent &&
-          (typeof focusIntent === 'boolean' || !focusIntent.visualOnly);
+        const focusIntent = props.field.experimental_focusIntent;
+        const shouldFocus = !!focusIntent;
 
         if (shouldFocus && plateElement) {
           if (plateElement) plateElement.focus();

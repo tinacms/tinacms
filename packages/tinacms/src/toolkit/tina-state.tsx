@@ -255,9 +255,7 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
           (form) => form.tinaForm.id === action.value.formId
         );
 
-        if (
-          existingForm?.activeFieldName === action.value.fieldName
-        ) {
+        if (existingForm?.activeFieldName === action.value.fieldName) {
           const clearedForms = state.forms.map((form) => {
             if (form.tinaForm.id === action.value.formId) {
               return {
@@ -302,25 +300,39 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
       };
 
     case 'forms:set-hovered-field-name':
-      // Check if there's already a focused field
-      const existingFormState = state.forms.find(
-        (form) => form.tinaForm.id === action.value.formId
-      );
-
-      // If a field is already focused, don't change on hover
-      if (
-        existingFormState?.activeFieldName
-      ) {
-        return state;
-      }
-      console.log(action.value.fieldName)
-
       const hoveredForms = state.forms.map((form) => {
         if (form.tinaForm.id === action.value.formId) {
+          const activeFieldName = form.activeFieldName;
+          const hoveredFieldName = action.value.fieldName;
+
+          // If there's an active field and we're hovering on something
+          if (activeFieldName && hoveredFieldName) {
+            // Don't allow hover if hovering the same field as active
+            if (activeFieldName === hoveredFieldName) {
+              return {
+                ...form,
+                hoveringFieldName: null,
+              };
+            }
+
+            // Don't allow hover if the hovered field is not a child of the active field
+            // Check if hoveredFieldName starts with activeFieldName followed by a dot
+            const isChildOfActive = hoveredFieldName.startsWith(
+              activeFieldName + '.'
+            );
+
+            if (!isChildOfActive) {
+              // Not a child field, don't update hover
+              return {
+                ...form,
+                hoveringFieldName: null,
+              };
+            }
+          }
+
           return {
-            tinaForm: form.tinaForm,
-            activeFieldName: null,
-            isHovering: action.value.fieldName,
+            ...form,
+            hoveringFieldName: hoveredFieldName,
           };
         }
         return form;

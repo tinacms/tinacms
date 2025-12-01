@@ -27,11 +27,8 @@ export const TagsField = wrapFieldsWithMeta<
   const items = input.value || [];
   const ref = React.useRef(null);
   React.useEffect(() => {
-    const focusIntent = field.experimental_focusIntent;
-    // Only focus if visualOnly is not set (or is false)
-    const shouldFocus =
-      focusIntent &&
-      (typeof focusIntent === 'boolean' || !focusIntent.visualOnly);
+    const focusIntent = props.field.experimental_focusIntent;
+    const shouldFocus = !!focusIntent;
 
     if (ref.current && shouldFocus) {
       ref.current.focus();
