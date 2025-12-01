@@ -1,4 +1,9 @@
-import { BillingWarning, LocalWarning } from '@tinacms/toolkit';
+import {
+  BillingWarning,
+  LocalWarning,
+  NavMenuTrigger,
+  TinaIcon,
+} from '@tinacms/toolkit';
 import type { ScreenPlugin, TinaCMS } from '@tinacms/toolkit';
 import React from 'react';
 import { useParams } from 'react-router-dom';
@@ -18,9 +23,13 @@ const ScreenPage = () => {
         );
         return (
           <div className='relative w-full h-full flex flex-col items-stretch justify-between'>
-            <div className='py-2 px-6 w-fit '>
-              <LocalWarning />
+            <div className='py-2 w-full'>
               <BillingWarning />
+              <div className='flex items-center gap-4'>
+                <NavMenuTrigger className='ml-2' />
+                <TinaIcon className='self-center h-10 min-w-10 w-auto text-orange-500' />
+                <LocalWarning />
+              </div>
             </div>
             <div
               className={`xl:hidden pl-6 py-5 border-b border-gray-200 bg-white`}
