@@ -84,6 +84,7 @@ const ImageField = TinaScalerBase.extend({
     invalid_type_error: typeTypeError,
     required_error: typeRequiredError,
   }),
+  uploadDir: z.function().args(z.any()).returns(z.string()).optional(),
 });
 
 const DateTimeField = TinaScalerBase.extend({

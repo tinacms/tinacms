@@ -1,7 +1,7 @@
 import React from 'react';
 import { ImFilesEmpty, ImUsers } from 'react-icons/im';
 import type { IconType } from 'react-icons/lib';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 
 import { Nav } from '@tinacms/toolkit';
 import type { ScreenPlugin, TinaCMS } from '@tinacms/toolkit';
@@ -20,13 +20,16 @@ export const slugify = (text) => {
 };
 
 const Sidebar = ({ cms }: { cms: TinaCMS }) => {
+  const location = useLocation();
   const collectionsInfo = useGetCollections(cms);
   const screens = cms.plugins.getType<ScreenPlugin>('screen').all();
   const cloudConfigs = cms.plugins
     .getType<CloudConfigPlugin>('cloud-config')
     .all();
 
-  const [menuIsOpen, setMenuIsOpen] = React.useState(false);
+  // Open sidebar by default only on the dashboard page (root path)
+  const isOnDashboard = location.pathname === '/';
+  const [menuIsOpen, setMenuIsOpen] = React.useState(isOnDashboard);
 
   const isLocalMode = cms.api?.tina?.isLocalMode;
   const activeScreens = screens.filter(

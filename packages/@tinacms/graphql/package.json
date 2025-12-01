@@ -1,6 +1,6 @@
 {
 	"name": "@tinacms/graphql",
-	"version": "1.6.1",
+	"version": "1.6.3",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
 	"typings": "dist/index.d.ts",
@@ -35,6 +35,7 @@
 		"@tinacms/schema-tools": "workspace:*",
 		"abstract-level": "catalog:",
 		"date-fns": "^2.30.0",
+		"es-toolkit": "^1.42.0",
 		"fast-glob": "catalog:",
 		"fs-extra": "catalog:",
 		"glob-parent": "catalog:",
@@ -44,15 +45,12 @@
 		"js-sha1": "catalog:",
 		"js-yaml": "^3.14.1",
 		"jsonpath-plus": "catalog:",
-		"lodash.clonedeep": "catalog:",
-		"lodash.set": "catalog:",
-		"lodash.uniqby": "catalog:",
 		"many-level": "catalog:",
 		"micromatch": "catalog:",
 		"normalize-path": "catalog:",
 		"readable-stream": "catalog:",
 		"scmp": "catalog:",
-		"yup": "^0.32.11"
+		"yup": "^1.6.1"
 	},
 	"publishConfig": {
 		"registry": "https://registry.npmjs.org"
@@ -69,15 +67,12 @@
 		"@types/express": "catalog:",
 		"@types/fs-extra": "^9.0.13",
 		"@types/js-yaml": "^3.12.10",
-		"@types/lodash.camelcase": "catalog:",
-		"@types/lodash.upperfirst": "catalog:",
 		"@types/lru-cache": "catalog:",
 		"@types/mdast": "catalog:",
 		"@types/micromatch": "catalog:",
 		"@types/node": "^22.13.1",
 		"@types/normalize-path": "catalog:",
 		"@types/ws": "catalog:",
-		"@types/yup": "^0.29.14",
 		"jest-file-snapshot": "^0.5.0",
 		"memory-level": "catalog:",
 		"typescript": "^5.7.3",
