@@ -25,7 +25,7 @@ import { Badge } from '@toolkit/react-sidebar/components/badge';
 type ListState = 'loading' | 'ready' | 'error';
 
 const tableHeadingStyle =
-  'px-3 py-3 text-left text-xs font-bold text-gray-700 tracking-wider';
+  'px-3 py-3 text-left text-xs font-bold text-gray-700 tracking-wider sticky top-0 bg-gray-100 z-20 border-b-2 border-gray-200';
 
 export function formatBranchName(str: string): string {
   const pattern = /[^/\w-]+/g; // regular expression pattern to match invalid special characters
@@ -431,12 +431,16 @@ const BranchSelector = ({
       {filteredBranchList.length > 0 && (
         <div className='min-w-[192px] max-h-[24rem] overflow-y-auto w-full h-full rounded-lg shadow-inner bg-white border border-gray-200'>
           <table className='w-full'>
-            <thead className='bg-gray-100 border-b-2 border-gray-200'>
+            <thead className='sticky top-0 z-20 bg-gray-100 border-b-2 border-gray-200'>
               <tr>
                 <th className={tableHeadingStyle}>Branch Name</th>
                 <th className={tableHeadingStyle}>Last Updated</th>
-                <th>{/* Empty header for Select button column */}</th>
-                <th>{/* Empty header for options button column */}</th>
+                <th className={tableHeadingStyle}>
+                  {/* Empty header for Select button column, needs style for sticky fucntionality */}
+                </th>
+                <th className={tableHeadingStyle}>
+                  {/* Empty header for options button column, needs style for sticky fucntionality */}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -514,7 +518,7 @@ const BranchItem = ({
             : 'border-b-2 border-gray-50'
       }`}
     >
-      <td className='pl-3 pr-3 py-1.5 min-w-0'>
+      <td className='pl-3 pr-3 py-1.5 min-w-0 max-w-1/4'>
         <div className='flex flex-col'>
           <div className='flex items-center gap-1'>
             {branch.protected && (
