@@ -1,10 +1,11 @@
-import * as React from 'react';
-import { useState } from 'react';
-import { Dismissible } from '@toolkit/react-dismissible';
-import * as pkg from 'react-color';
-const { SketchPicker, BlockPicker } = pkg;
-import { ColorRGBA, ColorFormat, ColorFormatter } from './color-formatter';
 import { useFormPortal } from '@toolkit/form-builder';
+import { Dismissible } from '@toolkit/react-dismissible';
+import * as React from 'react';
+import { useCallback, useState } from 'react';
+import { BlockWidget } from './block-widget';
+import { ColorFormat, ColorFormatter, ColorRGBA } from './color-formatter';
+import { hexToRgb, rgbToHex } from './color-utils';
+import { SketchWidget } from './sketch-widget';
 
 type DivProps = any;
 type WrappedFieldProps = any;
@@ -12,10 +13,10 @@ interface SwatchProps extends DivProps {
   colorRGBA?: ColorRGBA;
   onClick: (_event: React.SyntheticEvent) => void;
   colorFormat: ColorFormat;
+  width?: string;
 }
 
 const GetTextColorForBackground = function (backgroundColor?: ColorRGBA) {
-  //fudgy rgb values found on the internets
   return !backgroundColor ||
     backgroundColor.r * 0.299 +
       backgroundColor.g * 0.587 +
@@ -29,14 +30,16 @@ const Swatch = ({
   colorRGBA,
   colorFormat,
   unselectable,
+  width,
   ...props
 }: SwatchProps) => (
   <div
-    className='bg-gray-100 rounded-3xl shadow-[0_2px_3px_rgba(0,0,0,0.12)] cursor-pointer w-full m-0'
+    className='bg-gray-100 rounded shadow-[0_2px_3px_rgba(0,0,0,0.12)] cursor-pointer m-0'
+    style={width ? { width: width } : undefined}
     {...props}
   >
     <div
-      className='swatch-inner flex items-center justify-center text-[13px] font-bold w-full h-10 rounded-3xl hover:opacity-[.6]'
+      className='swatch-inner flex items-center justify-center text-[13px] font-bold w-full h-10 rounded hover:opacity-[.6]'
       style={{
         background: colorRGBA
           ? `rgba(${colorRGBA.r}, ${colorRGBA.g}, ${colorRGBA.b}, ${colorRGBA.a})`
@@ -77,9 +80,7 @@ const Popover = ({
       transform: openTop
         ? 'translate3d(-50%, calc(-100% - 8px), 0) scale3d(1, 1, 1)'
         : 'translate3d(-50%, 8px, 0) scale3d(1, 1, 1)',
-      animation: `${
-        openTop ? 'color-popup-open-top-keyframes' : 'color-popup-keyframes'
-      } 85ms ease-out both 1`,
+      animation: `${openTop ? 'color-popup-open-top-keyframes' : 'color-popup-keyframes'} 85ms ease-out both 1`,
       transformOrigin: `50% ${openTop ? '100%' : '0'}`,
       ...style,
     }}
@@ -91,6 +92,7 @@ interface Props {
   colorFormat: ColorFormat;
   userColors: string[];
   widget?: 'sketch' | 'block';
+  width?: string;
   input: WrappedFieldProps['input'];
 }
 
@@ -114,88 +116,46 @@ const presetColors = [
   '#FFFFFF',
 ];
 
-interface WidgetProps {
-  presetColors: string[];
-  color: ColorRGBA;
-  onChange: (_pickerColor: any) => void;
-  disableAlpha?: boolean;
-  width: string;
-}
-
-const SketchWidget: React.FC<WidgetProps> = (props) => (
-  <SketchPicker
-    presetColors={props.presetColors}
-    color={props.color}
-    onChange={props.onChange}
-    disableAlpha={props.disableAlpha}
-    width={props.width}
-  />
-);
-const BlockWidget: React.FC<WidgetProps> = (props) => (
-  <BlockPicker
-    colors={props.presetColors}
-    color={props.color}
-    onChange={props.onChange}
-    width={props.width}
-  />
-);
-
 const WIDGETS = { sketch: SketchWidget, block: BlockWidget };
 
 export const ColorPicker: React.FC<Props> = ({
   colorFormat,
   userColors = presetColors,
   widget = 'sketch',
+  width,
   input,
 }) => {
   const FormPortal = useFormPortal();
   const triggerRef = React.useRef<HTMLDivElement | null>(null);
   const [triggerBoundingBox, setTriggerBoundingBox] = useState<any>(null);
-  const [openTop, setOpenTop] = useState<boolean>(false);
+  const [openTop, setOpenTop] = useState(false);
+  const [displayColorPicker, setDisplayColorPicker] = useState(false);
 
   const updateTriggerBoundingBox = () => {
-    if (triggerRef.current) {
+    if (triggerRef.current)
       setTriggerBoundingBox(triggerRef.current.getBoundingClientRect());
-    }
   };
 
   React.useEffect(() => {
     if (triggerBoundingBox) {
-      const triggerOffsetTop =
-        triggerBoundingBox.top + triggerBoundingBox.height / 2;
-      const windowHeight = window.innerHeight;
-      if (triggerOffsetTop > windowHeight / 2) {
-        setOpenTop(true);
-      } else {
-        setOpenTop(false);
-      }
+      setOpenTop(
+        triggerBoundingBox.top + triggerBoundingBox.height / 2 >
+          window.innerHeight / 2
+      );
     }
   }, [triggerBoundingBox]);
 
   React.useEffect(() => {
     const delay = 100;
     let timeout: any = false;
-
-    setTimeout(() => {
-      updateTriggerBoundingBox();
-    }, delay);
-
+    setTimeout(updateTriggerBoundingBox, delay);
     const handleResize = () => {
       clearTimeout(timeout);
       timeout = setTimeout(updateTriggerBoundingBox, delay);
     };
-
     window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
+    return () => window.removeEventListener('resize', handleResize);
   }, [triggerRef.current]);
-
-  const Widget = WIDGETS[widget];
-  if (!Widget) throw new Error('You must specify a widget type.');
-
-  const [displayColorPicker, setDisplayColorPicker] = useState(false);
 
   const getColorFormat = (
     colorFormat || ColorFormat.Hex
@@ -203,27 +163,37 @@ export const ColorPicker: React.FC<Props> = ({
   const getColorRGBA = input.value
     ? ColorFormatter[getColorFormat].parse(input.value)
     : null;
+  const currentHexColor = getColorRGBA
+    ? rgbToHex(getColorRGBA.r, getColorRGBA.g, getColorRGBA.b)
+    : '';
 
-  const handleChange = (pickerColor: any) => {
-    const color = (
-      pickerColor.hex === nullColor ? null : { ...pickerColor.rgb, a: 1 }
-    ) as ColorRGBA | null;
-    input.onChange(
-      color ? ColorFormatter[getColorFormat].getValue(color) : null
-    );
-  };
+  const handleChange = useCallback(
+    (hexColor: string | null) => {
+      if (!hexColor) {
+        input.onChange(null);
+        return;
+      }
+      const rgb = hexToRgb(hexColor);
+      if (rgb)
+        input.onChange(
+          ColorFormatter[getColorFormat].getValue({ ...rgb, a: 1 })
+        );
+    },
+    [getColorFormat, input]
+  );
 
   const toggleColorPicker = (event: React.SyntheticEvent) => {
     event.stopPropagation();
     const display = !displayColorPicker;
     setDisplayColorPicker(display);
-    if (display) {
-      updateTriggerBoundingBox();
-    }
+    if (display) updateTriggerBoundingBox();
   };
 
+  const Widget = WIDGETS[widget];
+  if (!Widget) throw new Error('You must specify a widget type.');
+
   return (
-    <div className='relative' ref={triggerRef}>
+    <div className='relative' ref={triggerRef} style={width ? { width: width } : undefined}>
       <Swatch
         onClick={toggleColorPicker}
         colorRGBA={getColorRGBA}
@@ -245,10 +215,9 @@ export const ColorPicker: React.FC<Props> = ({
               >
                 <Widget
                   presetColors={[...userColors, nullColor]}
-                  color={getColorRGBA || { r: 0, g: 0, b: 0, a: 0 }}
+                  color={currentHexColor}
                   onChange={handleChange}
-                  disableAlpha={true}
-                  width={'240px'}
+                  width={width || '240px'}
                 />
               </Dismissible>
             </Popover>

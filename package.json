@@ -44,6 +44,7 @@
 	},
 	"packageManager": "pnpm@9.15.5",
 	"dependencies": {
-		"highlight.js": "catalog:"
+		"highlight.js": "catalog:",
+		"react-colorful": "^5.6.1"
 	}
 }
