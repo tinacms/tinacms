@@ -231,8 +231,8 @@ type DateFormatProps = {
    * dateFormat: 'YYYY MM DD'
    * ```
    */
-  dateFormat?: string;
-  timeFormat?: string;
+  dateFormat?: string | boolean;
+  timeFormat?: string | boolean;
 };
 export type DateTimeField = (
   | FieldGeneric<string, undefined, DateFormatProps>

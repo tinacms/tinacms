@@ -369,7 +369,7 @@ const SidebarHeader = ({ isLocalMode }) => {
 
   return (
     <>
-      <div className='p-2 flex-grow-0 w-full'>
+      <div className='p-2 flex-grow-0 w-full bg-gray-50'>
         {!isLocalMode && <BillingWarning />}
 
         <div className='w-full flex justify-between items-center'>

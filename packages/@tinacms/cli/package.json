@@ -1,6 +1,6 @@
 {
 	"name": "@tinacms/cli",
-	"version": "1.12.5",
+	"version": "1.12.6",
 	"main": "dist/index.js",
 	"typings": "dist/index.d.ts",
 	"files": [
@@ -41,7 +41,6 @@
 		"@types/node": "^22.13.1",
 		"@types/progress": "catalog:",
 		"@types/prompts": "catalog:",
-		"@types/yup": "^0.32.0",
 		"jest": "catalog:"
 	},
 	"scripts": {
