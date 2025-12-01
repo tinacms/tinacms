@@ -1,19 +1,19 @@
 {
 	"name": "@tinacms/mdx",
-	"version": "1.8.3",
-	"typings": "dist/index.d.ts",
+	"version": "2.0.0",
+	"type": "module",
 	"main": "dist/index.js",
-	"browser": "dist/index.browser.mjs",
-	"module": "dist/index.mjs",
+	"types": "dist/index.d.ts",
+	"browser": "dist/index.browser.js",
 	"files": [
 		"package.json",
 		"dist"
 	],
 	"exports": {
 		".": {
-			"browser": "./dist/index.browser.mjs",
-			"import": "./dist/index.mjs",
-			"require": "./dist/index.js"
+			"types": "./dist/index.d.ts",
+			"browser": "./dist/index.browser.js",
+			"default": "./dist/index.js"
 		}
 	},
 	"license": "Apache-2.0",

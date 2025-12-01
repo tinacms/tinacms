@@ -1,23 +1,17 @@
-const jestRunnerConfig = require('@tinacms/scripts/dist/jest-runner.js');
+import jestRunnerConfig from '@tinacms/scripts/dist/jest-runner.js';
 
-module.exports = {
+export default {
   ...jestRunnerConfig,
   preset: 'ts-jest',
   testEnvironment: 'node',
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   testMatch: ['**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[tj]s?(x)'],
   transform: {
-    '^.+\\.(ts|tsx)$': [
+    '\\.[jt]s?$': [
       'ts-jest',
       {
         tsconfig: 'tsconfig.json',
       },
     ],
     ...(jestRunnerConfig.transform || {}),
-  },
-  globals: {
-    'ts-jest': {
-      tsconfig: 'tsconfig.json',
-    },
   },
 };

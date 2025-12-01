@@ -1,25 +1,13 @@
 {
 	"name": "@tinacms/datalayer",
-	"version": "1.4.3",
+	"type": "module",
+	"version": "2.0.0",
 	"main": "dist/index.js",
-	"module": "dist/index.mjs",
-	"typings": "dist/index",
+	"types": "dist/index.d.ts",
 	"files": [
 		"package.json",
 		"dist"
 	],
-	"exports": {
-		".": {
-			"types": "./dist/index.d.ts",
-			"import": "./dist/index.mjs",
-			"require": "./dist/index.js"
-		},
-		"./dist/*": {
-			"types": "./dist/*.d.ts",
-			"import": "./dist/*.mjs",
-			"require": "./dist/*.js"
-		}
-	},
 	"license": "SEE LICENSE IN LICENSE",
 	"buildConfig": {
 		"entryPoints": [
