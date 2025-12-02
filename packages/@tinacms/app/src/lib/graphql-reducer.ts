@@ -532,17 +532,12 @@ export const useGraphQLReducer = (
           );
           cms.dispatch({
             type: 'forms:set-active-field-name',
-            value: { formId, fieldName },
+            value: getFormAndFieldNameFromMetadata(result.data, eventFieldName),
           });
           cms.events.dispatch({
             type: 'field:focus',
             fieldName: fieldName,
             id: formId,
-          });
-          // Notify iframe to add focused attribute to the element
-          iframe.current?.contentWindow?.postMessage({
-            type: 'field:set-focused',
-            fieldName: event.data.fieldName,
           });
         }
         cms.dispatch({
