@@ -301,11 +301,11 @@ export const RenderForm = ({
             values
           );
           cms.alerts.success('Document created!');
-          
+
           // Construct the edit URL for the newly created document
           const { filename } = values;
           let editPath: string;
-          
+
           // If filename starts with '/', it's an absolute path - strip the leading slash for URL
           if (filename.startsWith('/')) {
             const filenameWithoutSlash = filename.substring(1);
@@ -317,7 +317,7 @@ export const RenderForm = ({
             // Regular case: no folder, no absolute path
             editPath = `/collections/edit/${collection.name}/${filename}`;
           }
-          
+
           setTimeout(() => {
             navigate(editPath);
           }, 10);
