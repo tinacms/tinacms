@@ -194,9 +194,15 @@ export const CreateBranchModal = ({
         `Branch created successfully - Pull Request at ${result.pullRequestUrl}`
       );
 
-      // For new content creation, redirect to the collection page
+      // For new content creation, redirect to the collection page with folder
       if (crudType === 'create') {
-        window.location.hash = `#/collections/${collection.name}`;
+        // Extract folder path from relativePath (e.g., "folder/file.md" -> "folder")
+        const folderPath = relativePath.includes('/')
+          ? relativePath.substring(0, relativePath.lastIndexOf('/'))
+          : '';
+        window.location.hash = `#/collections/${collection.name}${
+          folderPath ? `/${folderPath}` : ''
+        }`;
       }
 
       close();
