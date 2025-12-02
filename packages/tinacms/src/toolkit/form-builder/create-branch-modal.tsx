@@ -196,8 +196,7 @@ export const CreateBranchModal = ({
 
       // For new content creation, redirect to the collection page
       if (crudType === 'create') {
-        const collectionName = collection.name;
-        window.location.hash = `#/collections/${collectionName}`;
+        window.location.hash = `#/collections/${collection.name}`;
       }
 
       close();
