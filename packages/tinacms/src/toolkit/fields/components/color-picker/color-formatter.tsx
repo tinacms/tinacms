@@ -1,5 +1,5 @@
-import * as pkg from 'color-string';
-const { get: getColor, to: toColor } = pkg;
+import { get as getColor, to as toColor } from 'color-string';
+import { rgbToHex } from './color-utils';
 
 export interface ColorRGBA {
   r: number;
@@ -22,15 +22,6 @@ interface ColorFormatHandler {
 interface ColorFormatHandlers {
   [key: string]: ColorFormatHandler;
 }
-
-const rgbToHex = function (color: { r: number; g: number; b: number }) {
-  return (
-    '#' +
-    ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b)
-      .toString(16)
-      .slice(1)
-  );
-};
 
 function ParseColorStr(color?: string): ColorRGBA | null {
   if (!color) {
@@ -58,7 +49,7 @@ export const ColorFormatter: ColorFormatHandlers = {
   },
   [ColorFormat.Hex]: {
     getLabel(color: ColorRGBA) {
-      return rgbToHex(color);
+      return rgbToHex(color.r, color.g, color.b);
     },
     getValue(color: ColorRGBA) {
       const colorVals = [color.r, color.g, color.b, color.a];

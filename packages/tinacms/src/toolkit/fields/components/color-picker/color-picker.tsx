@@ -4,35 +4,36 @@ import * as React from 'react';
 import { useCallback, useState } from 'react';
 import { BlockWidget } from './block-widget';
 import { ColorFormat, ColorFormatter, ColorRGBA } from './color-formatter';
-import { hexToRgb, rgbToHex } from './color-utils';
+import { TRANSPARENT, hexToRgb, rgbToHex } from './color-utils';
 import { SketchWidget } from './sketch-widget';
 
-type DivProps = any;
-type WrappedFieldProps = any;
-interface SwatchProps extends DivProps {
+interface FieldInput {
+  value: string | null;
+  onChange: (value: string | null) => void;
+}
+
+interface SwatchProps extends React.HTMLAttributes<HTMLDivElement> {
   colorRGBA?: ColorRGBA;
   onClick: (_event: React.SyntheticEvent) => void;
   colorFormat: ColorFormat;
   width?: string;
 }
 
-const GetTextColorForBackground = function (backgroundColor?: ColorRGBA) {
-  return !backgroundColor ||
+const isLightBackground = function (backgroundColor?: ColorRGBA) {
+  return (
+    !backgroundColor ||
     backgroundColor.r * 0.299 +
       backgroundColor.g * 0.587 +
       backgroundColor.b * 0.114 >
       186
-    ? '#000000'
-    : '#ffffff';
+  );
 };
 
-const Swatch = ({
-  colorRGBA,
-  colorFormat,
-  unselectable,
-  width,
-  ...props
-}: SwatchProps) => (
+const getTextColorForBackground = function (backgroundColor?: ColorRGBA) {
+  return isLightBackground(backgroundColor) ? '#000000' : '#ffffff';
+};
+
+const Swatch = ({ colorRGBA, colorFormat, width, ...props }: SwatchProps) => (
   <div
     className='bg-gray-100 rounded shadow-[0_2px_3px_rgba(0,0,0,0.12)] cursor-pointer m-0'
     style={width ? { width: width } : undefined}
@@ -44,7 +45,7 @@ const Swatch = ({
         background: colorRGBA
           ? `rgba(${colorRGBA.r}, ${colorRGBA.g}, ${colorRGBA.b}, ${colorRGBA.a})`
           : `#fff`,
-        color: GetTextColorForBackground(colorRGBA),
+        color: getTextColorForBackground(colorRGBA),
         transition: 'all var(--tina-timing-short) ease-out',
       }}
     >
@@ -93,10 +94,8 @@ interface Props {
   userColors: string[];
   widget?: 'sketch' | 'block';
   width?: string;
-  input: WrappedFieldProps['input'];
+  input: FieldInput;
 }
-
-const nullColor = 'transparent';
 
 const presetColors = [
   '#D0021B',
@@ -193,7 +192,11 @@ export const ColorPicker: React.FC<Props> = ({
   if (!Widget) throw new Error('You must specify a widget type.');
 
   return (
-    <div className='relative' ref={triggerRef} style={width ? { width: width } : undefined}>
+    <div
+      className='relative'
+      ref={triggerRef}
+      style={width ? { width: width } : undefined}
+    >
       <Swatch
         onClick={toggleColorPicker}
         colorRGBA={getColorRGBA}
@@ -214,7 +217,7 @@ export const ColorPicker: React.FC<Props> = ({
                 onDismiss={toggleColorPicker}
               >
                 <Widget
-                  presetColors={[...userColors, nullColor]}
+                  presetColors={[...userColors, TRANSPARENT]}
                   color={currentHexColor}
                   onChange={handleChange}
                   width={width || '240px'}

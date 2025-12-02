@@ -21,13 +21,8 @@ export const SketchWidget: React.FC<WidgetProps> = ({
 
   const handleRgbChange = (channel: 'r' | 'g' | 'b', value: string) => {
     const num = Math.max(0, Math.min(255, parseInt(value, 10) || 0));
-    onChange(
-      rgbToHex(
-        ...([currentRgb.r, currentRgb.g, currentRgb.b].map((v, i) =>
-          i === ['r', 'g', 'b'].indexOf(channel) ? num : v
-        ) as [number, number, number])
-      )
-    );
+    const updated = { ...currentRgb, [channel]: num };
+    onChange(rgbToHex(updated.r, updated.g, updated.b));
   };
 
   return (

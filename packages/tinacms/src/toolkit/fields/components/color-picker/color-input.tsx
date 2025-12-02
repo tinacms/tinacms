@@ -1,6 +1,11 @@
+import { get as getColor } from 'color-string';
 import * as React from 'react';
-import { useCallback, useState } from 'react';
-import { checkerboardStyle } from './color-utils';
+import {
+  TRANSPARENT,
+  checkerboardStyle,
+  isValidHex,
+  rgbToHex,
+} from './color-utils';
 
 export interface WidgetProps {
   presetColors: string[];
@@ -9,11 +14,19 @@ export interface WidgetProps {
   width: string;
 }
 
+const parseColorValue = (value: string): string | null => {
+  if (isValidHex(value)) return value;
+  const parsed = getColor(value.toLowerCase());
+  if (parsed)
+    return rgbToHex(parsed.value[0], parsed.value[1], parsed.value[2]);
+  return null;
+};
+
 export const useHexInput = (
   color: string,
   onChange: (color: string | null) => void
 ) => {
-  const [inputValue, setInputValue] = useState(color);
+  const [inputValue, setInputValue] = React.useState(color);
   React.useEffect(() => {
     setInputValue(color);
   }, [color]);
@@ -21,15 +34,16 @@ export const useHexInput = (
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setInputValue(value);
-    if (/^#[0-9A-Fa-f]{6}$/.test(value)) onChange(value);
+    const parsedColor = parseColorValue(value);
+    if (parsedColor) onChange(parsedColor);
   };
 
   const handleBlur = () => {
-    if (!/^#[0-9A-Fa-f]{6}$/.test(inputValue)) setInputValue(color);
+    if (!parseColorValue(inputValue)) setInputValue(color);
   };
 
-  const handleSwatchClick = useCallback(
-    (c: string) => onChange(c === 'transparent' ? null : c),
+  const handleSwatchClick = React.useCallback(
+    (c: string) => onChange(c === TRANSPARENT ? null : c),
     [onChange]
   );
 
@@ -47,11 +61,11 @@ export const SwatchButton: React.FC<{
       onClick={onClick}
       className={`absolute inset-0 rounded-sm border cursor-pointer transition-all ${isSelected ? 'border-blue-500 border-2 scale-110' : 'border-gray-200 hover:scale-105'}`}
       style={{
-        backgroundColor: color === 'transparent' ? '#fff' : color,
-        ...(color === 'transparent' ? checkerboardStyle() : {}),
+        backgroundColor: color === TRANSPARENT ? '#fff' : color,
+        ...(color === TRANSPARENT ? checkerboardStyle() : {}),
       }}
       aria-label={
-        color === 'transparent' ? 'Clear color' : `Select color ${color}`
+        color === TRANSPARENT ? 'Clear color' : `Select color ${color}`
       }
     />
   </div>
@@ -68,7 +82,7 @@ export const ColorPreview: React.FC<{ color: string; size?: 'sm' | 'lg' }> = ({
         : 'w-8 h-8 rounded border border-gray-200 flex-shrink-0'
     }
     style={{
-      backgroundColor: color || 'transparent',
+      backgroundColor: color || TRANSPARENT,
       ...(!color ? checkerboardStyle(size === 'lg' ? 16 : 8) : {}),
     }}
     aria-label='Current color preview'
@@ -86,9 +100,8 @@ export const HexInput: React.FC<{
     value={value || ''}
     onChange={onChange}
     onBlur={onBlur}
-    placeholder='#000000'
+    placeholder='#000000 or color name'
     className={`shadow-inner px-2 py-1 text-sm border border-gray-200 rounded focus:shadow-outline focus:border-blue-500 focus:outline-none ${fullWidth ? 'w-full' : 'flex-1'}`}
-    maxLength={7}
   />
 );
 

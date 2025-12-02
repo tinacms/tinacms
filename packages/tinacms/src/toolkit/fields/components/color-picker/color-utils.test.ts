@@ -1,7 +1,28 @@
-import { describe, it, expect } from 'vitest';
-import { hexToRgb, rgbToHex, checkerboardStyle } from './color-utils';
+import { describe, expect, it } from 'vitest';
+import {
+  checkerboardStyle,
+  hexToRgb,
+  isValidHex,
+  rgbToHex,
+} from './color-utils';
 
 describe('color-utils', () => {
+  describe('isValidHex', () => {
+    it('returns true for valid hex colors', () => {
+      expect(isValidHex('#FF0000')).toBe(true);
+      expect(isValidHex('#00ff00')).toBe(true);
+      expect(isValidHex('#000000')).toBe(true);
+    });
+
+    it('returns false for invalid hex colors', () => {
+      expect(isValidHex('')).toBe(false);
+      expect(isValidHex('FF0000')).toBe(false);
+      expect(isValidHex('#F00')).toBe(false);
+      expect(isValidHex('#GGGGGG')).toBe(false);
+      expect(isValidHex('red')).toBe(false);
+    });
+  });
+
   describe('hexToRgb', () => {
     it('converts valid hex to rgb', () => {
       expect(hexToRgb('#FF0000')).toEqual({ r: 255, g: 0, b: 0 });

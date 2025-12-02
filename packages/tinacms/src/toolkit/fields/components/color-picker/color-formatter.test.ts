@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { ColorFormatter, ColorFormat, ColorRGBA } from './color-formatter';
+import { describe, expect, it } from 'vitest';
+import { ColorFormat, ColorFormatter, ColorRGBA } from './color-formatter';
 
 describe('ColorFormatter', () => {
   const redRGBA: ColorRGBA = { r: 255, g: 0, b: 0, a: 1 };
