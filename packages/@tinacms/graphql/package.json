@@ -1,16 +1,19 @@
 {
 	"name": "@tinacms/graphql",
-	"version": "1.6.3",
+	"type": "module",
+	"version": "2.0.0",
 	"main": "dist/index.js",
-	"module": "dist/index.mjs",
-	"typings": "dist/index.d.ts",
+	"module": "./dist/index.js",
 	"files": [
 		"package.json",
 		"dist"
 	],
 	"exports": {
-		"import": "./dist/index.mjs",
-		"require": "./dist/index.js"
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"require": "./dist/index.js"
+		}
 	},
 	"license": "SEE LICENSE IN LICENSE",
 	"buildConfig": {
