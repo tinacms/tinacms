@@ -292,7 +292,6 @@ export const RenderForm = ({
       ].filter((x) => !!x),
       onSubmit: async (values) => {
         try {
-          const folderName = folder.fullyQualifiedName ? folder.name : '';
           await createDocument(
             cms,
             collection,
