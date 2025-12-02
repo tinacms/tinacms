@@ -526,9 +526,31 @@ export const useGraphQLReducer = (
         const [queryId, eventFieldName] = event.data.fieldName.split('---');
         const result = results.find((res) => res.id === queryId);
         if (result?.data) {
+          const { formId, fieldName } = getFormAndFieldNameFromMetadata(
+            result.data,
+            eventFieldName
+          );
+          console.log('🟠 graphql-reducer: field:selected dispatching', {
+            formId,
+            fieldName,
+            eventFieldName: event.data.fieldName,
+          });
           cms.dispatch({
             type: 'forms:set-active-field-name',
-            value: getFormAndFieldNameFromMetadata(result.data, eventFieldName),
+            value: { formId, fieldName },
+          });
+          cms.events.dispatch({
+            type: 'field:focus',
+            fieldName: fieldName,
+            id: formId,
+          });
+          // Notify iframe to add focused attribute to the element
+          iframe.current?.contentWindow?.postMessage({
+            type: 'field:set-focused',
+            fieldName: event.data.fieldName,
+          });
+          console.log('🟠 graphql-reducer: sent field:set-focused to iframe', {
+            fieldName: event.data.fieldName,
           });
         }
         cms.dispatch({

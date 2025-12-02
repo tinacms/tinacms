@@ -3,6 +3,7 @@ import { ChevronUpIcon, ChevronDownIcon } from '@toolkit/icons';
 import { useEvent } from '@toolkit/react-core/use-cms-event';
 import { FieldHoverEvent, FieldFocusEvent } from '@toolkit/fields/field-events';
 import { useFieldReference } from '@toolkit/hooks/use-field-reference';
+import { useCMS } from '@toolkit/react-core';
 
 const IndicatorWrap = ({ style = {}, position, ...props }) => (
   <div
@@ -108,15 +109,41 @@ export const ActiveFieldIndicator = () => {
   const [display, setDisplay] = React.useState<boolean>(false);
   const [position, setPosition] = React.useState<any>(false);
   const [iframePosition, setIframePosition] = React.useState<any>({ left: 0 });
+  const [isFocused, setIsFocused] = React.useState(false);
   const activeEle = useFieldReference(activeFieldName);
 
   const { subscribe } = useEvent<FieldFocusEvent>('field:focus');
 
   React.useEffect(() =>
     subscribe(({ fieldName, id }) => {
+      console.log('🟠 ActiveFieldIndicator: field:focus event received', {
+        fieldName,
+        id,
+        fullRef: `${id}#${fieldName}`,
+      });
       setActiveFieldName(`${id}#${fieldName}`);
+      // Set focused state when field:focus event fires
+      setIsFocused(true);
     })
   );
+
+  // Check if the active element has the focused attribute and update state
+  React.useEffect(() => {
+    if (activeEle) {
+      const hasFocusedAttr = activeEle.hasAttribute('data-tina-field-focused');
+      console.log('🟠 ActiveFieldIndicator: activeEle found', {
+        element: activeEle,
+        hasAttribute: hasFocusedAttr,
+        getAttribute: activeEle.getAttribute('data-tina-field-focused'),
+        isFocused,
+      });
+      // Update isFocused based on the attribute
+      setIsFocused(hasFocusedAttr);
+    } else {
+      // Reset when no active element
+      setIsFocused(false);
+    }
+  }, [activeEle, activeFieldName]);
 
   React.useEffect(() => {
     let displayTimeout;
@@ -169,6 +196,16 @@ export const ActiveFieldIndicator = () => {
     return <AboveViewportIndicator />;
   }
 
+  const outlineColor = isFocused
+    ? '2px dashed #C2410C'
+    : '2px dashed var(--tina-color-indicator)';
+
+  console.log('🟠 ActiveFieldIndicator: rendering with', {
+    isFocused,
+    outlineColor,
+    display,
+  });
+
   return (
     <div
       style={{
@@ -178,7 +215,7 @@ export const ActiveFieldIndicator = () => {
         left: position.left + window.scrollX + iframePosition.left,
         width: position.width,
         height: position.height,
-        outline: '2px dashed var(--tina-color-indicator)',
+        outline: outlineColor,
         borderRadius: 'var(--tina-radius-small)',
         transition: display
           ? activeEle

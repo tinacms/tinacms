@@ -50,6 +50,15 @@ export function useTina<T extends object>(props: {
           outline: 2px solid rgba(34,150,254,1);
           cursor: pointer;
         }
+        [data-tina-field-focused] {
+          outline: 2px dashed #C2410C !important;
+          box-shadow: none !important;
+        }
+        [data-tina-field-focused]:hover {
+          box-shadow: inset 100vi 100vh rgba(194, 65, 12, 0.3) !important;
+          outline: 2px solid #C2410C !important;
+          cursor: pointer;
+        }
         [data-tina-field-overlay] {
           outline: 2px dashed rgba(34,150,254,0.5);
           position: relative;
@@ -68,6 +77,10 @@ export function useTina<T extends object>(props: {
           opacity: 0;
         }
         [data-tina-field-overlay]:hover::after {
+          opacity: 1;
+        }
+        [data-tina-field-overlay][data-tina-field-focused]::after {
+          background-color: rgba(194, 65, 12, 0.3);
           opacity: 1;
         }
       `;
@@ -252,6 +265,39 @@ export function useTina<T extends object>(props: {
             { type: 'quick-edit', value: false },
             window.location.origin
           );
+        }
+      }
+
+      // Handle field focus to add data attribute for orange styling
+      if (event.data.type === 'field:set-focused') {
+        console.log(
+          '🟠 iframe: received field:set-focused',
+          event.data.fieldName
+        );
+
+        // Remove focused attribute from all elements
+        const allTinaFields = document.querySelectorAll('[data-tina-field]');
+        allTinaFields.forEach((el) => {
+          el.removeAttribute('data-tina-field-focused');
+        });
+
+        // Add focused attribute to the clicked field
+        if (event.data.fieldName) {
+          const targetElement = document.querySelector(
+            `[data-tina-field="${event.data.fieldName}"]`
+          );
+          if (targetElement) {
+            targetElement.setAttribute('data-tina-field-focused', 'true');
+            console.log(
+              '🟠 iframe: added data-tina-field-focused to',
+              event.data.fieldName
+            );
+          } else {
+            console.log(
+              '🟠 iframe: could not find element for',
+              event.data.fieldName
+            );
+          }
         }
       }
     };
