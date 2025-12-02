@@ -166,7 +166,7 @@ export const FieldWrapper = ({
     <div
       className={`relative ${margin ? `mb-5 last:mb-0` : ``} ${
         isHovering && !isActive
-          ? '[&_input]:!shadow-outline [&_input]:!border-blue-500 [&_textarea]:!shadow-outline [&_textarea]:!border-blue-500 [&_select]:!shadow-outline [&_select]:!border-blue-500 [&_.ProseMirror]:!shadow-outline [&_.ProseMirror]:!border-blue-500'
+          ? '[&_input]:!border-blue-500 [&_input]:!ring-2 [&_input]:!ring-blue-500/20 [&_textarea]:!border-blue-500 [&_textarea]:!ring-2 [&_textarea]:!ring-blue-500/20 [&_select]:!border-blue-500 [&_select]:!ring-2 [&_select]:!ring-blue-500/20 [&_.ProseMirror]:!border-blue-500 [&_.ProseMirror]:!ring-2 [&_.ProseMirror]:!ring-blue-500/20'
           : isActive
             ? '[&_input]:!border-tina-orange-dark [&_input]:!ring-2 [&_input]:!ring-tina-orange-dark/20 [&_textarea]:!border-tina-orange-dark [&_textarea]:!ring-2 [&_textarea]:!ring-tina-orange-dark/20 [&_select]:!border-tina-orange-dark [&_select]:!ring-2 [&_select]:!ring-tina-orange-dark/20 [&_.ProseMirror]:!border-tina-orange-dark [&_.ProseMirror]:!ring-2 [&_.ProseMirror]:!ring-tina-orange-dark/20'
             : ''
