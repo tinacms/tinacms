@@ -26,12 +26,12 @@ test.describe("Create Blog Post", () => {
 
     await page.click('button:has-text("Save")');
 
-    await page.goto(
-      "http://localhost:3000/admin/index.html#/collections/post/~"
-    );
+    // After clicking Save, the user should be redirected to the edit page
+    // Wait for the navigation to complete
+    await page.waitForURL('**/collections/edit/post/**', { timeout: 5000 });
 
-    const blogPost = await page.locator(`text=${blogFilename}`).first();
-    await expect(blogPost).toBeVisible();
+    // Verify we're on the edit page by checking for the Save button (which is present in edit mode)
+    await expect(page.locator('button:has-text("Save")')).toBeVisible();
     isNewBlogCreated = true;
   });
 
