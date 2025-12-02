@@ -146,15 +146,15 @@ export const ColorPicker: React.FC<Props> = ({
 
   React.useEffect(() => {
     const delay = 100;
-    let timeout: any = false;
+    let timeout: ReturnType<typeof setTimeout> | null = null;
     setTimeout(updateTriggerBoundingBox, delay);
     const handleResize = () => {
-      clearTimeout(timeout);
+      if (timeout) clearTimeout(timeout);
       timeout = setTimeout(updateTriggerBoundingBox, delay);
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [triggerRef.current]);
+  }, []);
 
   const getColorFormat = (
     colorFormat || ColorFormat.Hex

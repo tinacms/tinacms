@@ -10,15 +10,20 @@ describe('color-utils', () => {
   describe('isValidHex', () => {
     it('returns true for valid hex colors', () => {
       expect(isValidHex('#FF0000')).toBe(true);
-      expect(isValidHex('#00ff00')).toBe(true);
+      expect(isValidHex('#00FF00')).toBe(true);
       expect(isValidHex('#000000')).toBe(true);
+    });
+
+    it('returns true for shorthand hex colors', () => {
+      expect(isValidHex('#F00')).toBe(true);
+      expect(isValidHex('#abc')).toBe(true);
     });
 
     it('returns false for invalid hex colors', () => {
       expect(isValidHex('')).toBe(false);
       expect(isValidHex('FF0000')).toBe(false);
-      expect(isValidHex('#F00')).toBe(false);
       expect(isValidHex('#GGGGGG')).toBe(false);
+      expect(isValidHex('#GGG')).toBe(false);
       expect(isValidHex('red')).toBe(false);
     });
   });
@@ -31,12 +36,19 @@ describe('color-utils', () => {
     });
 
     it('handles lowercase hex', () => {
-      expect(hexToRgb('#ff0000')).toEqual({ r: 255, g: 0, b: 0 });
+      expect(hexToRgb('#FF0000')).toEqual({ r: 255, g: 0, b: 0 });
     });
 
     it('converts black and white', () => {
       expect(hexToRgb('#000000')).toEqual({ r: 0, g: 0, b: 0 });
       expect(hexToRgb('#FFFFFF')).toEqual({ r: 255, g: 255, b: 255 });
+    });
+
+    it('converts shorthand hex to rgb', () => {
+      expect(hexToRgb('#F00')).toEqual({ r: 255, g: 0, b: 0 });
+      expect(hexToRgb('#0F0')).toEqual({ r: 0, g: 255, b: 0 });
+      expect(hexToRgb('#00F')).toEqual({ r: 0, g: 0, b: 255 });
+      expect(hexToRgb('#abc')).toEqual({ r: 170, g: 187, b: 204 });
     });
 
     it('returns null for invalid hex', () => {
@@ -46,22 +58,18 @@ describe('color-utils', () => {
       expect(hexToRgb('#12345')).toBeNull();
       expect(hexToRgb('FF0000')).toBeNull();
     });
-
-    it('returns null for shorthand hex', () => {
-      expect(hexToRgb('#F00')).toBeNull();
-    });
   });
 
   describe('rgbToHex', () => {
     it('converts rgb to hex', () => {
-      expect(rgbToHex(255, 0, 0)).toBe('#ff0000');
-      expect(rgbToHex(0, 255, 0)).toBe('#00ff00');
-      expect(rgbToHex(0, 0, 255)).toBe('#0000ff');
+      expect(rgbToHex(255, 0, 0)).toBe('#FF0000');
+      expect(rgbToHex(0, 255, 0)).toBe('#00FF00');
+      expect(rgbToHex(0, 0, 255)).toBe('#0000FF');
     });
 
     it('converts black and white', () => {
       expect(rgbToHex(0, 0, 0)).toBe('#000000');
-      expect(rgbToHex(255, 255, 255)).toBe('#ffffff');
+      expect(rgbToHex(255, 255, 255)).toBe('#FFFFFF');
     });
 
     it('pads single digit hex values', () => {
@@ -71,7 +79,7 @@ describe('color-utils', () => {
 
   describe('hexToRgb and rgbToHex round-trip', () => {
     it('converts hex to rgb and back', () => {
-      const originalHex = '#abc123';
+      const originalHex = '#ABC123';
       const rgb = hexToRgb(originalHex);
       expect(rgb).not.toBeNull();
       const resultHex = rgbToHex(rgb!.r, rgb!.g, rgb!.b);

@@ -52,7 +52,7 @@ describe('SketchWidget', () => {
 
     fireEvent.change(gInput, { target: { value: '255' } });
 
-    expect(onChange).toHaveBeenCalledWith('#00ff00');
+    expect(onChange).toHaveBeenCalledWith('#00FF00');
   });
 
   it('calls onChange when B input changes', () => {
@@ -64,7 +64,7 @@ describe('SketchWidget', () => {
 
     fireEvent.change(bInput, { target: { value: '255' } });
 
-    expect(onChange).toHaveBeenCalledWith('#0000ff');
+    expect(onChange).toHaveBeenCalledWith('#0000FF');
   });
 
   it('clamps RGB values to 0-255 range', () => {
@@ -76,7 +76,7 @@ describe('SketchWidget', () => {
 
     fireEvent.change(rInput, { target: { value: '300' } });
 
-    expect(onChange).toHaveBeenCalledWith('#ff0000');
+    expect(onChange).toHaveBeenCalledWith('#FF0000');
   });
 
   it('renders preset color swatches', () => {

@@ -53,8 +53,9 @@ describe('useHexInput', () => {
     expect(result.current.inputValue).toBe('#FF0000');
   });
 
-  it('keeps value on blur if valid', () => {
-    const { result } = renderHook(() => useHexInput('#FF0000', vi.fn()));
+  it('normalizes valid hex on blur', () => {
+    const onChange = vi.fn();
+    const { result } = renderHook(() => useHexInput('#FF0000', onChange));
 
     act(() => {
       result.current.handleChange({
@@ -67,6 +68,7 @@ describe('useHexInput', () => {
     });
 
     expect(result.current.inputValue).toBe('#00FF00');
+    expect(onChange).toHaveBeenLastCalledWith('#00FF00');
   });
 
   it('handleSwatchClick calls onChange with color', () => {
@@ -104,7 +106,7 @@ describe('useHexInput', () => {
     expect(result.current.inputValue).toBe('#00FF00');
   });
 
-  it('accepts named colors and converts to hex', () => {
+  it('keeps input value but sends normalized color on change', () => {
     const onChange = vi.fn();
     const { result } = renderHook(() => useHexInput('#FF0000', onChange));
 
@@ -115,10 +117,10 @@ describe('useHexInput', () => {
     });
 
     expect(result.current.inputValue).toBe('red');
-    expect(onChange).toHaveBeenCalledWith('#ff0000');
+    expect(onChange).toHaveBeenCalledWith('#FF0000');
   });
 
-  it('accepts CSS named colors like tomato', () => {
+  it('normalizes CSS named colors for preview', () => {
     const onChange = vi.fn();
     const { result } = renderHook(() => useHexInput('#000000', onChange));
 
@@ -128,10 +130,11 @@ describe('useHexInput', () => {
       } as React.ChangeEvent<HTMLInputElement>);
     });
 
-    expect(onChange).toHaveBeenCalledWith('#ff6347');
+    expect(result.current.inputValue).toBe('tomato');
+    expect(onChange).toHaveBeenCalledWith('#FF6347');
   });
 
-  it('accepts named colors in any case', () => {
+  it('normalizes named colors in any case for preview', () => {
     const onChange = vi.fn();
     const { result } = renderHook(() => useHexInput('#000000', onChange));
 
@@ -140,18 +143,21 @@ describe('useHexInput', () => {
         target: { value: 'RED' },
       } as React.ChangeEvent<HTMLInputElement>);
     });
-    expect(onChange).toHaveBeenCalledWith('#ff0000');
+    expect(result.current.inputValue).toBe('RED');
+    expect(onChange).toHaveBeenCalledWith('#FF0000');
 
     act(() => {
       result.current.handleChange({
         target: { value: 'DarkBlue' },
       } as React.ChangeEvent<HTMLInputElement>);
     });
-    expect(onChange).toHaveBeenCalledWith('#00008b');
+    expect(result.current.inputValue).toBe('DarkBlue');
+    expect(onChange).toHaveBeenCalledWith('#00008B');
   });
 
-  it('keeps named color value on blur', () => {
-    const { result } = renderHook(() => useHexInput('#FF0000', vi.fn()));
+  it('normalizes named color to hex on blur', () => {
+    const onChange = vi.fn();
+    const { result } = renderHook(() => useHexInput('#FF0000', onChange));
 
     act(() => {
       result.current.handleChange({
@@ -163,6 +169,49 @@ describe('useHexInput', () => {
       result.current.handleBlur();
     });
 
-    expect(result.current.inputValue).toBe('blue');
+    expect(result.current.inputValue).toBe('#0000FF');
+    expect(onChange).toHaveBeenLastCalledWith('#0000FF');
+  });
+
+  it('normalizes shorthand hex on blur', () => {
+    const onChange = vi.fn();
+    const { result } = renderHook(() => useHexInput('#000000', onChange));
+
+    act(() => {
+      result.current.handleChange({
+        target: { value: '#F00' },
+      } as React.ChangeEvent<HTMLInputElement>);
+    });
+
+    expect(result.current.inputValue).toBe('#F00');
+    expect(onChange).toHaveBeenCalledWith('#FF0000');
+
+    act(() => {
+      result.current.handleBlur();
+    });
+
+    expect(result.current.inputValue).toBe('#FF0000');
+    expect(onChange).toHaveBeenLastCalledWith('#FF0000');
+  });
+
+  it('normalizes uppercase hex to lowercase on blur', () => {
+    const onChange = vi.fn();
+    const { result } = renderHook(() => useHexInput('#000000', onChange));
+
+    act(() => {
+      result.current.handleChange({
+        target: { value: '#FF0000' },
+      } as React.ChangeEvent<HTMLInputElement>);
+    });
+
+    expect(result.current.inputValue).toBe('#FF0000');
+    expect(onChange).toHaveBeenCalledWith('#FF0000');
+
+    act(() => {
+      result.current.handleBlur();
+    });
+
+    expect(result.current.inputValue).toBe('#FF0000');
+    expect(onChange).toHaveBeenLastCalledWith('#FF0000');
   });
 });

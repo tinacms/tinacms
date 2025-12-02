@@ -53,7 +53,7 @@ export const ColorFormatter: ColorFormatHandlers = {
     },
     getValue(color: ColorRGBA) {
       const colorVals = [color.r, color.g, color.b, color.a];
-      return toColor.hex(colorVals);
+      return toColor.hex(colorVals).toUpperCase();
     },
     parse: ParseColorStr,
   },

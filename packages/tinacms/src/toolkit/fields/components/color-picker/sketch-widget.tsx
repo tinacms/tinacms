@@ -15,7 +15,7 @@ export const SketchWidget: React.FC<WidgetProps> = ({
   onChange,
   width,
 }) => {
-  const { inputValue, handleChange, handleBlur, handleSwatchClick } =
+  const { inputValue, handleChange, handleFocus, handleBlur, handleSwatchClick } =
     useHexInput(color, onChange);
   const currentRgb = hexToRgb(color) || { r: 0, g: 0, b: 0 };
 
@@ -37,6 +37,7 @@ export const SketchWidget: React.FC<WidgetProps> = ({
         <HexInput
           value={inputValue}
           onChange={handleChange}
+          onFocus={handleFocus}
           onBlur={handleBlur}
         />
       </div>

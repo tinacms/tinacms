@@ -13,7 +13,7 @@ export const BlockWidget: React.FC<WidgetProps> = ({
   onChange,
   width,
 }) => {
-  const { inputValue, handleChange, handleBlur, handleSwatchClick } =
+  const { inputValue, handleChange, handleFocus, handleBlur, handleSwatchClick } =
     useHexInput(color, onChange);
 
   return (
@@ -26,6 +26,7 @@ export const BlockWidget: React.FC<WidgetProps> = ({
         <HexInput
           value={inputValue}
           onChange={handleChange}
+          onFocus={handleFocus}
           onBlur={handleBlur}
           fullWidth
         />

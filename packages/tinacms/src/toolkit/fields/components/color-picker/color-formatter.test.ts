@@ -11,14 +11,14 @@ describe('ColorFormatter', () => {
 
     describe('getLabel', () => {
       it('returns hex string for color', () => {
-        expect(hexFormatter.getLabel(redRGBA)).toBe('#ff0000');
-        expect(hexFormatter.getLabel(greenRGBA)).toBe('#00ff00');
-        expect(hexFormatter.getLabel(blueRGBA)).toBe('#0000ff');
+        expect(hexFormatter.getLabel(redRGBA)).toBe('#FF0000');
+        expect(hexFormatter.getLabel(greenRGBA)).toBe('#00FF00');
+        expect(hexFormatter.getLabel(blueRGBA)).toBe('#0000FF');
       });
     });
 
     describe('getValue', () => {
-      it('returns hex value for color', () => {
+      it('returns lowercase hex value for color', () => {
         expect(hexFormatter.getValue(redRGBA)).toBe('#FF0000');
       });
     });
@@ -30,7 +30,7 @@ describe('ColorFormatter', () => {
       });
 
       it('parses lowercase hex', () => {
-        expect(hexFormatter.parse('#ff0000')).toEqual(redRGBA);
+        expect(hexFormatter.parse('#FF0000')).toEqual(redRGBA);
       });
 
       it('returns null for undefined or empty', () => {

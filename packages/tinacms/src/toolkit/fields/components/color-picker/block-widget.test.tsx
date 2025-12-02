@@ -76,7 +76,7 @@ describe('BlockWidget', () => {
     const input = getByDisplayValue('#FF0000');
     fireEvent.change(input, { target: { value: 'blue' } });
 
-    expect(onChange).toHaveBeenCalledWith('#0000ff');
+    expect(onChange).toHaveBeenCalledWith('#0000FF');
   });
 
   it('respects the provided width', () => {

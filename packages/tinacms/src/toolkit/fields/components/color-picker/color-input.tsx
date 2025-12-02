@@ -3,6 +3,7 @@ import * as React from 'react';
 import {
   TRANSPARENT,
   checkerboardStyle,
+  hexToRgb,
   isValidHex,
   rgbToHex,
 } from './color-utils';
@@ -14,8 +15,11 @@ export interface WidgetProps {
   width: string;
 }
 
-const parseColorValue = (value: string): string | null => {
-  if (isValidHex(value)) return value;
+const normalizeColorValue = (value: string): string | null => {
+  if (isValidHex(value)) {
+    const rgb = hexToRgb(value);
+    if (rgb) return rgbToHex(rgb.r, rgb.g, rgb.b);
+  }
   const parsed = getColor(value.toLowerCase());
   if (parsed)
     return rgbToHex(parsed.value[0], parsed.value[1], parsed.value[2]);
@@ -27,27 +31,49 @@ export const useHexInput = (
   onChange: (color: string | null) => void
 ) => {
   const [inputValue, setInputValue] = React.useState(color);
+  const [isFocused, setIsFocused] = React.useState(false);
+
   React.useEffect(() => {
-    setInputValue(color);
-  }, [color]);
+    if (!isFocused) {
+      setInputValue(color);
+    }
+  }, [color, isFocused]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setInputValue(value);
-    const parsedColor = parseColorValue(value);
-    if (parsedColor) onChange(parsedColor);
+    const normalized = normalizeColorValue(value);
+    if (normalized) onChange(normalized);
+  };
+
+  const handleFocus = () => {
+    setIsFocused(true);
   };
 
   const handleBlur = () => {
-    if (!parseColorValue(inputValue)) setInputValue(color);
+    setIsFocused(false);
+    const normalized = normalizeColorValue(inputValue);
+    if (normalized) {
+      setInputValue(normalized);
+      onChange(normalized);
+    } else {
+      setInputValue(color);
+    }
   };
 
   const handleSwatchClick = React.useCallback(
-    (c: string) => onChange(c === TRANSPARENT ? null : c),
+    (c: string) => {
+      if (c === TRANSPARENT) {
+        onChange(null);
+      } else {
+        const normalized = normalizeColorValue(c);
+        onChange(normalized || c);
+      }
+    },
     [onChange]
   );
 
-  return { inputValue, handleChange, handleBlur, handleSwatchClick };
+  return { inputValue, handleChange, handleFocus, handleBlur, handleSwatchClick };
 };
 
 export const SwatchButton: React.FC<{
@@ -92,13 +118,15 @@ export const ColorPreview: React.FC<{ color: string; size?: 'sm' | 'lg' }> = ({
 export const HexInput: React.FC<{
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onFocus: () => void;
   onBlur: () => void;
   fullWidth?: boolean;
-}> = ({ value, onChange, onBlur, fullWidth }) => (
+}> = ({ value, onChange, onFocus, onBlur, fullWidth }) => (
   <input
     type='text'
     value={value || ''}
     onChange={onChange}
+    onFocus={onFocus}
     onBlur={onBlur}
     placeholder='#000000 or color name'
     className={`shadow-inner px-2 py-1 text-sm border border-gray-200 rounded focus:shadow-outline focus:border-blue-500 focus:outline-none ${fullWidth ? 'w-full' : 'flex-1'}`}
