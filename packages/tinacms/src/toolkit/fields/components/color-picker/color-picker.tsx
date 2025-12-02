@@ -63,7 +63,7 @@ const Popover = ({
   ...props
 }) => (
   <div
-    className={`fixed z-50 before:content-[""] before:absolute before:left-1/2 before:-translate-x-1/2 before:w-[18px] before:h-[14px] before:bg-gray-200 before:z-10 after:content-[""] after:absolute after:left-1/2 after:-translate-x-1/2 after:w-4 after:h-[13px] after:bg-white after:z-20 ${
+    className={`fixed z-50 before:content-[""] before:absolute before:left-1/2 before:-translate-x-1/2 before:w-[18px] before:h-[14px] before:bg-white before:z-10 after:content-[""] after:absolute after:left-1/2 after:-translate-x-1/2 after:w-4 after:h-[13px] after:bg-white after:z-20 ${
       openTop
         ? 'before:bottom-0 before:mt-[1px] before:translate-y-full color-picker-on-top-clip-path after:bottom-0 after:mb-0.5 after:translate-y-full'
         : 'before:top-0 before:mb-[1px] before:-translate-y-full color-picker-clip-path after:top-0 after:mt-0.5 after:-translate-y-full'
