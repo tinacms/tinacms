@@ -530,11 +530,6 @@ export const useGraphQLReducer = (
             result.data,
             eventFieldName
           );
-          console.log('🟠 graphql-reducer: field:selected dispatching', {
-            formId,
-            fieldName,
-            eventFieldName: event.data.fieldName,
-          });
           cms.dispatch({
             type: 'forms:set-active-field-name',
             value: { formId, fieldName },
@@ -547,9 +542,6 @@ export const useGraphQLReducer = (
           // Notify iframe to add focused attribute to the element
           iframe.current?.contentWindow?.postMessage({
             type: 'field:set-focused',
-            fieldName: event.data.fieldName,
-          });
-          console.log('🟠 graphql-reducer: sent field:set-focused to iframe', {
             fieldName: event.data.fieldName,
           });
         }
@@ -645,39 +637,26 @@ export const useGraphQLReducer = (
   React.useEffect(() => {
     const unsubscribe = cms.events.subscribe('field:focus', (event: any) => {
       const { fieldName, id } = event;
-      console.log('🟠 graphql-reducer: field:focus from sidebar', {
-        fieldName,
-        id,
-      });
 
       // Find the active form in cms.state
       const activeForm = cms.state.forms.find(
         (form: any) => form.tinaForm.id === id
       );
       if (!activeForm) {
-        console.log('🟠 graphql-reducer: could not find active form in state', {
-          id,
-        });
         return;
       }
 
       // Get the queryId from the form's queries array (forms track which queries created them)
       const queries = activeForm.tinaForm.queries;
-      console.log('🟠 graphql-reducer: form queries', queries);
 
       if (queries && queries.length > 0) {
         // Use the last query ID (most recent)
         const queryId = queries[queries.length - 1];
         const fullFieldName = `${queryId}---${fieldName}`;
-        console.log('🟠 graphql-reducer: sending field:set-focused to iframe', {
-          fullFieldName,
-        });
         iframe.current?.contentWindow?.postMessage({
           type: 'field:set-focused',
           fieldName: fullFieldName,
         });
-      } else {
-        console.log('🟠 graphql-reducer: no queries found on form');
       }
     });
 

@@ -270,11 +270,6 @@ export function useTina<T extends object>(props: {
 
       // Handle field focus to add data attribute for orange styling
       if (event.data.type === 'field:set-focused') {
-        console.log(
-          '🟠 iframe: received field:set-focused',
-          event.data.fieldName
-        );
-
         // Remove focused attribute from all elements
         const allTinaFields = document.querySelectorAll('[data-tina-field]');
         allTinaFields.forEach((el) => {
@@ -303,15 +298,6 @@ export function useTina<T extends object>(props: {
 
           if (targetElement) {
             targetElement.setAttribute('data-tina-field-focused', 'true');
-            console.log(
-              '🟠 iframe: added data-tina-field-focused to',
-              targetElement.getAttribute('data-tina-field')
-            );
-          } else {
-            console.log(
-              '🟠 iframe: could not find element for',
-              event.data.fieldName
-            );
           }
         }
       }

@@ -116,11 +116,6 @@ export const ActiveFieldIndicator = () => {
 
   React.useEffect(() =>
     subscribe(({ fieldName, id }) => {
-      console.log('🟠 ActiveFieldIndicator: field:focus event received', {
-        fieldName,
-        id,
-        fullRef: `${id}#${fieldName}`,
-      });
       setActiveFieldName(`${id}#${fieldName}`);
       // Set focused state when field:focus event fires
       setIsFocused(true);
@@ -131,12 +126,6 @@ export const ActiveFieldIndicator = () => {
   React.useEffect(() => {
     if (activeEle) {
       const hasFocusedAttr = activeEle.hasAttribute('data-tina-field-focused');
-      console.log('🟠 ActiveFieldIndicator: activeEle found', {
-        element: activeEle,
-        hasAttribute: hasFocusedAttr,
-        getAttribute: activeEle.getAttribute('data-tina-field-focused'),
-        isFocused,
-      });
       // Update isFocused based on the attribute
       setIsFocused(hasFocusedAttr);
     } else {
@@ -199,12 +188,6 @@ export const ActiveFieldIndicator = () => {
   const outlineColor = isFocused
     ? '2px dashed #C2410C'
     : '2px dashed var(--tina-color-indicator)';
-
-  console.log('🟠 ActiveFieldIndicator: rendering with', {
-    isFocused,
-    outlineColor,
-    display,
-  });
 
   return (
     <div
