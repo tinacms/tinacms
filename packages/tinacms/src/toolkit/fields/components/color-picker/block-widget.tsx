@@ -13,8 +13,13 @@ export const BlockWidget: React.FC<WidgetProps> = ({
   onChange,
   width,
 }) => {
-  const { inputValue, handleChange, handleFocus, handleBlur, handleSwatchClick } =
-    useHexInput(color, onChange);
+  const {
+    inputValue,
+    handleChange,
+    handleFocus,
+    handleBlur,
+    handleSwatchClick,
+  } = useHexInput(color, onChange);
 
   return (
     <div

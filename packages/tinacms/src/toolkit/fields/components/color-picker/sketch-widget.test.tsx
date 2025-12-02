@@ -88,7 +88,7 @@ describe('SketchWidget', () => {
 
   it('respects the provided width', () => {
     const { container } = render(
-      <SketchWidget {...defaultProps} width="300px" />
+      <SketchWidget {...defaultProps} width='300px' />
     );
     const wrapper = container.firstChild as HTMLElement;
 

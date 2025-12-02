@@ -81,7 +81,7 @@ describe('BlockWidget', () => {
 
   it('respects the provided width', () => {
     const { container } = render(
-      <BlockWidget {...defaultProps} width="300px" />
+      <BlockWidget {...defaultProps} width='300px' />
     );
     const wrapper = container.firstChild as HTMLElement;
 

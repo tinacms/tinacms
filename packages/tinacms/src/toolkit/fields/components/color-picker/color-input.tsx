@@ -73,7 +73,13 @@ export const useHexInput = (
     [onChange]
   );
 
-  return { inputValue, handleChange, handleFocus, handleBlur, handleSwatchClick };
+  return {
+    inputValue,
+    handleChange,
+    handleFocus,
+    handleBlur,
+    handleSwatchClick,
+  };
 };
 
 export const SwatchButton: React.FC<{
