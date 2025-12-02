@@ -302,12 +302,25 @@ export const RenderForm = ({
             values
           );
           cms.alerts.success('Document created!');
+          
+          // Construct the edit URL for the newly created document
+          const { filename } = values;
+          let editPath: string;
+          
+          // If filename starts with '/', it's an absolute path - strip the leading slash for URL
+          if (filename.startsWith('/')) {
+            const filenameWithoutSlash = filename.substring(1);
+            editPath = `/collections/edit/${collection.name}/${filenameWithoutSlash}`;
+          } else if (folder.fullyQualifiedName) {
+            // If we're in a folder view, include the folder path in the URL
+            editPath = `/collections/edit/${collection.name}/~/${folderName}/${filename}`;
+          } else {
+            // Regular case: no folder, no absolute path
+            editPath = `/collections/edit/${collection.name}/${filename}`;
+          }
+          
           setTimeout(() => {
-            navigate(
-              `/collections/${collection.name}${
-                folder.fullyQualifiedName ? `/${folder.fullyQualifiedName}` : ''
-              }`
-            );
+            navigate(editPath);
           }, 10);
         } catch (error) {
           console.error(error);
