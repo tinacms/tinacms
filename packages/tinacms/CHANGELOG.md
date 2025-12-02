@@ -1,5 +1,39 @@
 # tinacms
 
+## 3.0.0
+
+### Major Changes
+
+- [#5982](https://github.com/tinacms/tinacms/pull/5982) [`2e1535d`](https://github.com/tinacms/tinacms/commit/2e1535dd5495dc390902f2db6ef1f26afb072396) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: migrate from commonjs to esm
+
+### Minor Changes
+
+- [#6183](https://github.com/tinacms/tinacms/pull/6183) [`ed6025e`](https://github.com/tinacms/tinacms/commit/ed6025ee87ebe051957fc93e987ba8de8b003995) Thanks [@Pat-Stuart](https://github.com/Pat-Stuart)! - Add in ability to disable folder creation in UI per collection
+
+- [#6174](https://github.com/tinacms/tinacms/pull/6174) [`3bf79e1`](https://github.com/tinacms/tinacms/commit/3bf79e19c005dca745a8ddd46546190741b322a5) Thanks [@Calinator444](https://github.com/Calinator444)! - rewrote date time picker
+
+### Patch Changes
+
+- [#6200](https://github.com/tinacms/tinacms/pull/6200) [`bb1ad6a`](https://github.com/tinacms/tinacms/commit/bb1ad6a11d10976074453ed218b178935ec96fd3) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Media Manager - View more images on larger screens with a dynamic grid layout.
+
+- Updated dependencies [[`2e1535d`](https://github.com/tinacms/tinacms/commit/2e1535dd5495dc390902f2db6ef1f26afb072396), [`ed6025e`](https://github.com/tinacms/tinacms/commit/ed6025ee87ebe051957fc93e987ba8de8b003995)]:
+  - @tinacms/mdx@2.0.0
+  - @tinacms/schema-tools@2.0.0
+  - @tinacms/search@1.1.4
+
+## 2.10.1
+
+### Patch Changes
+
+- [#6187](https://github.com/tinacms/tinacms/pull/6187) [`a76fdb6`](https://github.com/tinacms/tinacms/commit/a76fdb639b94cfefa169ebbd184f55d62e4a8a76) Thanks [@18-th](https://github.com/18-th)! - Updated yup to v1 to remove transitive lodash dependency
+
+- [#6184](https://github.com/tinacms/tinacms/pull/6184) [`dd2089d`](https://github.com/tinacms/tinacms/commit/dd2089dbde4a7b1a0116cce096f50a97fdca9d81) Thanks [@Pat-Stuart](https://github.com/Pat-Stuart)! - Adjust styling on markdown dropdown toolbar items
+
+- Updated dependencies [[`a76fdb6`](https://github.com/tinacms/tinacms/commit/a76fdb639b94cfefa169ebbd184f55d62e4a8a76), [`a736baf`](https://github.com/tinacms/tinacms/commit/a736bafe1b20bc1465f8e4a4c0c2281f40dcbf2f)]:
+  - @tinacms/schema-tools@1.10.1
+  - @tinacms/search@1.1.3
+  - @tinacms/mdx@1.8.3
+
 ## 2.10.0
 
 ### Minor Changes

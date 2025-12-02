@@ -231,8 +231,8 @@ type DateFormatProps = {
    * dateFormat: 'YYYY MM DD'
    * ```
    */
-  dateFormat?: string;
-  timeFormat?: string;
+  dateFormat?: string | boolean;
+  timeFormat?: string | boolean;
 };
 export type DateTimeField = (
   | FieldGeneric<string, undefined, DateFormatProps>
@@ -931,6 +931,7 @@ export interface UICollection<Form = any, CMS = any, TinaForm = any> {
   allowedActions?: {
     create?: boolean;
     delete?: boolean;
+    createFolder?: boolean;
     createNestedFolder?: boolean;
   };
   /**
