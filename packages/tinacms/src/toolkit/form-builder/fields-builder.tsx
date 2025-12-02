@@ -100,7 +100,7 @@ const InnerField = ({
 
   const focusIntent = isActiveField;
   const hoverIntent = isHoveringField;
-  
+
   // TODO: this handles focusing on the tag element when one
   // of it's items is the activeField (categories.2) but not
   // for when the items are displayed with the ListFieldPlugin
@@ -149,10 +149,10 @@ const InnerField = ({
               {...fieldProps}
               form={form.finalForm}
               tinaForm={form}
-              field={{ 
-                ...field, 
+              field={{
+                ...field,
                 experimental_focusIntent: focusIntent,
-                experimental_hoverIntent: hoverIntent
+                hoverIntent: hoverIntent,
               }}
             />
           );
@@ -165,10 +165,10 @@ const InnerField = ({
               experimental_focusIntent={focusIntent}
               form={form.finalForm}
               tinaForm={form}
-              field={{ 
-                ...field, 
+              field={{
+                ...field,
                 experimental_focusIntent: focusIntent,
-                experimental_hoverIntent: hoverIntent
+                hoverIntent: hoverIntent,
               }}
               index={index}
             />

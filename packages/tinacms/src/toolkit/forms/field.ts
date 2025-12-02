@@ -30,5 +30,5 @@ export interface Field<F extends Field = AnyField> {
    * field which is marked as the active field, and have focus on another field
    */
   experimental_focusIntent?: boolean;
-  experimental_hoverIntent?: boolean;
+  hoverIntent?: boolean;
 }

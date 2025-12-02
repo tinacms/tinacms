@@ -24,7 +24,7 @@ export function wrapFieldsWithMeta<ExtraFieldProps = {}, InputProps = {}>(
         index={props.index}
         tinaForm={props.tinaForm}
         focusIntent={props.field.experimental_focusIntent}
-        hoverIntent={props.field.experimental_hoverIntent}
+        hoverIntent={props.field.hoverIntent}
       >
         <Field {...props} />
       </FieldMeta>
@@ -50,7 +50,7 @@ export function wrapFieldWithNoHeader<ExtraFieldProps = {}, InputProps = {}>(
         index={props.index}
         tinaForm={props.tinaForm}
         focusIntent={props.field.experimental_focusIntent}
-        hoverIntent={props.field.experimental_hoverIntent}
+        hoverIntent={props.field.hoverIntent}
       >
         <Field {...props} />
       </FieldMeta>
@@ -77,7 +77,7 @@ export function wrapFieldWithError<ExtraFieldProps = {}, InputProps = {}>(
         index={props.index}
         tinaForm={props.tinaForm}
         focusIntent={props.field.experimental_focusIntent}
-        hoverIntent={props.field.experimental_hoverIntent}
+        hoverIntent={props.field.hoverIntent}
       >
         <Field {...props} />
       </FieldMeta>
