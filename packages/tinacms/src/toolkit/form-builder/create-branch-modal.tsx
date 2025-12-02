@@ -194,6 +194,12 @@ export const CreateBranchModal = ({
         `Branch created successfully - Pull Request at ${result.pullRequestUrl}`
       );
 
+      // For new content creation, redirect to the collection page
+      if (crudType === 'create') {
+        const collectionName = collection.name;
+        window.location.hash = `#/collections/${collectionName}`;
+      }
+
       close();
     } catch (e) {
       console.error(e);
