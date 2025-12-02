@@ -287,17 +287,20 @@ export function useTina<T extends object>(props: {
           let targetElement = document.querySelector(
             `[data-tina-field="${event.data.fieldName}"]`
           );
-          
+
           // If not found, try to find by searching for elements whose data-tina-field ends with this value
           if (!targetElement) {
             const allFields = Array.from(allTinaFields);
             targetElement = allFields.find((el) => {
               const fieldValue = el.getAttribute('data-tina-field');
               // Match if the field value ends with the fieldName we're looking for
-              return fieldValue && fieldValue.endsWith(event.data.fieldName.split('---')[1]);
+              return (
+                fieldValue &&
+                fieldValue.endsWith(event.data.fieldName.split('---')[1])
+              );
             }) as Element | undefined;
           }
-          
+
           if (targetElement) {
             targetElement.setAttribute('data-tina-field-focused', 'true');
             console.log(
