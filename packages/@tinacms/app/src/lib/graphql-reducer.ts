@@ -641,6 +641,51 @@ export const useGraphQLReducer = (
     });
   }, [cms.state.sidebarDisplayState]);
 
+  // Listen for field:focus events from sidebar and notify iframe
+  React.useEffect(() => {
+    const unsubscribe = cms.events.subscribe('field:focus', (event: any) => {
+      const { fieldName, id } = event;
+      console.log('🟠 graphql-reducer: field:focus from sidebar', {
+        fieldName,
+        id,
+      });
+
+      // Find the active form in cms.state
+      const activeForm = cms.state.forms.find(
+        (form: any) => form.tinaForm.id === id
+      );
+      if (!activeForm) {
+        console.log('🟠 graphql-reducer: could not find active form in state', {
+          id,
+        });
+        return;
+      }
+
+      // Get the queryId from the form's queries array (forms track which queries created them)
+      const queries = activeForm.tinaForm.queries;
+      console.log('🟠 graphql-reducer: form queries', queries);
+
+      if (queries && queries.length > 0) {
+        // Use the last query ID (most recent)
+        const queryId = queries[queries.length - 1];
+        const fullFieldName = `${queryId}---${fieldName}`;
+        console.log('🟠 graphql-reducer: sending field:set-focused to iframe', {
+          fullFieldName,
+        });
+        iframe.current?.contentWindow?.postMessage({
+          type: 'field:set-focused',
+          fieldName: fullFieldName,
+        });
+      } else {
+        console.log('🟠 graphql-reducer: no queries found on form');
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [iframe.current, cms.state.forms]);
+
   React.useEffect(() => {
     cms.dispatch({ type: 'set-edit-mode', value: 'visual' });
     if (iframe) {
