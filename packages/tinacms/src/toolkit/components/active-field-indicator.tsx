@@ -47,10 +47,12 @@ const BelowViewportIndicator = () => {
   );
 };
 
-const useScrollToFocusedField = () => {
+const useScrollToFocusedField = (enabled: boolean) => {
   const { subscribe } = useEvent<FieldFocusEvent>('field:focus');
-  React.useEffect(() =>
-    subscribe(({ fieldName }) => {
+  React.useEffect(() => {
+    if (!enabled) return;
+
+    return subscribe(({ fieldName }) => {
       const ele = document.querySelector<HTMLElement>(
         `[data-tinafield="${fieldName}"]`
       );
@@ -98,41 +100,55 @@ const useScrollToFocusedField = () => {
           });
         }
       }
-    })
-  );
+    });
+  }, [enabled, subscribe]);
 };
 
-export const ActiveFieldIndicator = () => {
-  const [activeFieldName, setActiveFieldName] = React.useState<string | null>(
-    null
-  );
+type FieldIndicatorProps = {
+  eventType: 'field:focus' | 'field:hover';
+  checkFocusedAttribute?: boolean;
+  scrollToField?: boolean;
+};
+
+const FieldIndicator = ({
+  eventType,
+  checkFocusedAttribute = false,
+  scrollToField = false,
+}: FieldIndicatorProps) => {
+  const [fieldName, setFieldName] = React.useState<string | null>(null);
   const [display, setDisplay] = React.useState<boolean>(false);
   const [position, setPosition] = React.useState<any>(false);
   const [iframePosition, setIframePosition] = React.useState<any>({ left: 0 });
   const [isFocused, setIsFocused] = React.useState(false);
-  const activeEle = useFieldReference(activeFieldName);
+  const activeEle = useFieldReference(fieldName);
 
-  const { subscribe } = useEvent<FieldFocusEvent>('field:focus');
+  const { subscribe: subscribeFocus } =
+    useEvent<FieldFocusEvent>('field:focus');
+  const { subscribe: subscribeHover } =
+    useEvent<FieldHoverEvent>('field:hover');
 
-  React.useEffect(() =>
-    subscribe(({ fieldName, id }) => {
-      setActiveFieldName(`${id}#${fieldName}`);
-      // Set focused state when field:focus event fires
-      setIsFocused(true);
-    })
-  );
+  React.useEffect(() => {
+    const subscribe =
+      eventType === 'field:focus' ? subscribeFocus : subscribeHover;
+    return subscribe(({ fieldName: eventFieldName, id }) => {
+      setFieldName(`${id}#${eventFieldName}`);
+      if (eventType === 'field:focus' && checkFocusedAttribute) {
+        setIsFocused(true);
+      }
+    });
+  }, [eventType, subscribeFocus, subscribeHover, checkFocusedAttribute]);
 
   // Check if the active element has the focused attribute and update state
   React.useEffect(() => {
+    if (!checkFocusedAttribute) return;
+
     if (activeEle) {
       const hasFocusedAttr = activeEle.hasAttribute('data-tina-field-focused');
-      // Update isFocused based on the attribute
       setIsFocused(hasFocusedAttr);
     } else {
-      // Reset when no active element
       setIsFocused(false);
     }
-  }, [activeEle, activeFieldName]);
+  }, [activeEle, fieldName, checkFocusedAttribute]);
 
   React.useEffect(() => {
     let displayTimeout;
@@ -166,7 +182,7 @@ export const ActiveFieldIndicator = () => {
     };
   }, []);
 
-  useScrollToFocusedField();
+  useScrollToFocusedField(scrollToField);
 
   if (!display) return null;
 
@@ -176,18 +192,17 @@ export const ActiveFieldIndicator = () => {
   const viewportBottomY = window.innerHeight + window.scrollY;
 
   if (eleTopY > viewportBottomY) {
-    // element is below the viewport
     return <BelowViewportIndicator />;
   }
 
   if (eleBottomY < viewportTopY) {
-    // element is above the viewport
     return <AboveViewportIndicator />;
   }
 
-  const outlineColor = isFocused
-    ? '2px dashed #C2410C'
-    : '2px dashed var(--tina-color-indicator)';
+  const outlineColor =
+    checkFocusedAttribute && isFocused
+      ? '2px dashed #C2410C'
+      : '2px dashed var(--tina-color-indicator)';
 
   return (
     <div
@@ -211,92 +226,14 @@ export const ActiveFieldIndicator = () => {
   );
 };
 
-export const HoveredFieldIndicator = () => {
-  const [hoveredFieldName, setHoveredFieldName] = React.useState<string | null>(
-    null
-  );
-  const [display, setDisplay] = React.useState<boolean>(false);
-  const [position, setPosition] = React.useState<any>(false);
-  const [iframePosition, setIframePosition] = React.useState<any>({ left: 0 });
-  const activeEle = useFieldReference(hoveredFieldName);
+export const ActiveFieldIndicator = () => (
+  <FieldIndicator
+    eventType='field:focus'
+    checkFocusedAttribute={true}
+    scrollToField={true}
+  />
+);
 
-  React.useEffect(() => {
-    let displayTimeout;
-    if (activeEle) {
-      setDisplay(true);
-      setPosition(activeEle.getBoundingClientRect());
-      const iframe = document.getElementById(
-        'tina-iframe'
-      ) as HTMLIFrameElement;
-      if (iframe) {
-        setIframePosition(iframe.getBoundingClientRect());
-      }
-    } else {
-      displayTimeout = setTimeout(() => {
-        setDisplay(false);
-      }, 150);
-    }
-
-    return () => {
-      clearTimeout(displayTimeout);
-    };
-  }, [activeEle]);
-
-  const [, setArbitraryValue] = React.useState(0);
-  const rerender = () => setArbitraryValue((s) => s + 1);
-
-  React.useEffect(() => {
-    window.addEventListener('scroll', rerender);
-    return () => {
-      window.removeEventListener('scroll', rerender);
-    };
-  }, []);
-
-  const { subscribe } = useEvent<FieldHoverEvent>('field:hover');
-
-  React.useEffect(() =>
-    subscribe(({ fieldName, id }) => {
-      setHoveredFieldName(`${id}#${fieldName}`);
-    })
-  );
-
-  useScrollToFocusedField();
-
-  if (!display) return null;
-
-  const eleTopY = position.top + window.scrollY;
-  const eleBottomY = position.top + position.height + window.scrollY;
-  const viewportTopY = window.scrollY;
-  const viewportBottomY = window.innerHeight + window.scrollY;
-
-  if (eleTopY > viewportBottomY) {
-    // element is below the viewport
-    return <BelowViewportIndicator />;
-  }
-
-  if (eleBottomY < viewportTopY) {
-    // element is above the viewport
-    return <AboveViewportIndicator />;
-  }
-
-  return (
-    <div
-      style={{
-        position: 'absolute',
-        zIndex: 'var(--tina-z-index-3)',
-        top: position.top + window.scrollY,
-        left: position.left + window.scrollX + iframePosition.left,
-        width: position.width,
-        height: position.height,
-        outline: '2px dashed var(--tina-color-indicator)',
-        borderRadius: 'var(--tina-radius-small)',
-        transition: display
-          ? activeEle
-            ? `opacity 300ms ease-out`
-            : `opacity 150ms ease-in`
-          : `none`,
-        opacity: activeEle && display ? 0.8 : 0,
-      }}
-    ></div>
-  );
-};
+export const HoveredFieldIndicator = () => (
+  <FieldIndicator eventType='field:hover' />
+);
