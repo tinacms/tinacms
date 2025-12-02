@@ -88,7 +88,6 @@ export function useTina<T extends object>(props: {
       document.body.classList.add('__tina-quick-editing-enabled');
 
       let lastHoveredField: string | null = null;
-      let hoverTimeout: NodeJS.Timeout | null = null;
 
       function mouseDownHandler(e) {
         const attributeNames = e.target.getAttributeNames();
@@ -119,11 +118,6 @@ export function useTina<T extends object>(props: {
           }
         }
         if (fieldName) {
-          // Clear any pending hover timeout when clicking
-          if (hoverTimeout) {
-            clearTimeout(hoverTimeout);
-            hoverTimeout = null;
-          }
           // Clear hover state on click
           if (lastHoveredField !== null) {
             lastHoveredField = null;
@@ -175,33 +169,18 @@ export function useTina<T extends object>(props: {
           }
         }
 
-        // Clear any existing timeout
-        if (hoverTimeout) {
-          clearTimeout(hoverTimeout);
-          hoverTimeout = null;
-        }
-
         if (fieldName && fieldName !== lastHoveredField) {
-          // Debounce the hover message by 150ms
-          hoverTimeout = setTimeout(() => {
-            lastHoveredField = fieldName;
-            if (isInTinaIframe) {
-              parent.postMessage(
-                { type: 'field:hovered', fieldName: fieldName },
-                window.location.origin
-              );
-            }
-          }, 150);
+          lastHoveredField = fieldName;
+          if (isInTinaIframe) {
+            parent.postMessage(
+              { type: 'field:hovered', fieldName: fieldName },
+              window.location.origin
+            );
+          }
         }
       }
 
       function mouseLeaveHandler(e) {
-        // Clear any pending timeout
-        if (hoverTimeout) {
-          clearTimeout(hoverTimeout);
-          hoverTimeout = null;
-        }
-
         // Clear hover state when leaving the field
         if (lastHoveredField !== null && isInTinaIframe) {
           lastHoveredField = null;
@@ -217,9 +196,6 @@ export function useTina<T extends object>(props: {
       document.addEventListener('mouseleave', mouseLeaveHandler, true);
 
       return () => {
-        if (hoverTimeout) {
-          clearTimeout(hoverTimeout);
-        }
         document.removeEventListener('click', mouseDownHandler, true);
         document.removeEventListener('mouseenter', mouseEnterHandler, true);
         document.removeEventListener('mouseleave', mouseLeaveHandler, true);
