@@ -2,7 +2,7 @@ import path from 'path';
 import fs from 'fs-extra';
 import { TinaField } from '@tinacms/schema-tools';
 import { format } from 'prettier';
-import TsParser from 'prettier/parser-typescript';
+import TsParser from 'prettier/parser-typescript.js';
 import { stringifyLabelWithField } from '..';
 
 /**
@@ -83,7 +83,7 @@ export const makeTemplateFile = async ({
       )} (){
         return ${
           addVariablesToCode(JSON.stringify(template.fields, null, 2)).code
-        } ${usingTypescript ? 'as TinaField[]' : ''} 
+        } ${usingTypescript ? 'as TinaField[]' : ''}
       } `
     );
   }
