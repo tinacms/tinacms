@@ -1,5 +1,12 @@
 # next-tinacms-cloudinary
 
+## 14.0.1
+
+### Patch Changes
+
+- Updated dependencies [[`50fa9f4`](https://github.com/tinacms/tinacms/commit/50fa9f4bf932a3dc45b88d245e35917efe8d3423), [`428ec7e`](https://github.com/tinacms/tinacms/commit/428ec7eca20603e2cb666d562fd4cc16dda4cbed), [`6946476`](https://github.com/tinacms/tinacms/commit/69464767d339a5df3c6c530ece94ef80049e534f), [`f99bbbc`](https://github.com/tinacms/tinacms/commit/f99bbbc221eead8d714b3791348d415dd8fcd063)]:
+  - tinacms@3.0.1
+
 ## 14.0.0
 
 ### Patch Changes
