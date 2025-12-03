@@ -31,6 +31,7 @@ import {
 import { Config } from './prompts';
 import { addSelfHostedTinaAuthToConfig } from './codegen';
 import { ContentFrontmatterFormat } from '@tinacms/schema-tools';
+import { exec } from 'child_process';
 
 async function apply({
   env,
@@ -659,7 +660,6 @@ const addReactiveFile: {
  * @return {Promise<string>}
  */
 export function execShellCommand(cmd): Promise<string> {
-  const exec = require('child_process').exec;
   return new Promise((resolve, reject) => {
     exec(cmd, (error, stdout, stderr) => {
       if (error) {
