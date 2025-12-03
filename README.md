@@ -63,17 +63,22 @@ Please see our [./CONTRIBUTING.md](https://github.com/tinacms/tinacms/blob/main/
 
 ### Maintainers
 
-- Kelly Davis ([@kldavis](https://github.com/kldavis4))
-- Jeff See ([@jeffsee55](https://github.com/jeffsee55))
-- Matt Wicks ([@wicksipedia](https://github.com/wicksipedia))
+- Matt Wicks ([@wicksipedia](https://github.com/wicksipedia)) [Product Owner of [TinaCMS](https://github.com/tinacms/tinacms) and [TinaCloud](https://github.com/tinacms/tinacloud)]
+- Gert Marx ([@gertieMarx](https://github.com/gertieMarx)) [Product Owner of website [tina.io](https://github.com/tinacms/tina.io)]
 - Jack Pettit ([@JackDevAU](https://github.com/JackDevAU))
 - Eli Kent ([@kulesy](https://github.com/kulesy))
 - Brook Jeynes ([@brookjeynes-ssw](https://github.com/brookjeynes-ssw))
 - Ben Neoh ([@Ben0189](https://github.com/Ben0189))
 - Josh Berman ([@joshbermanssw](https://github.com/joshbermanssw))
-- Scott Gallant ([@scottgallant](https://github.com/scottgallant))
-- Adam Cogan ([@adamcogan](https://github.com/adamcogan))
+- Ivan Gaiduk ([@18-th](https://github.com/18-th))
+- Adam Cogan ([@adamcogan](https://github.com/adamcogan)) [Key Stakeholder]
 
-View our awesome SSW devs at [ssw.com.au/people](https://www.ssw.com.au/people/?skill=%F0%9F%A6%99-TinaCMS).
+### Part time
+
+- Kelly Davis ([@kldavis](https://github.com/kldavis4))
+- Jeff See ([@jeffsee55](https://github.com/jeffsee55))
+- Scott Gallant ([@scottgallant](https://github.com/scottgallant))
+
+View our awesome SSW devs at [ssw.com.au/people](https://www.ssw.com.au/people/?skill=%F0%9F%A6%99-TinaCMS)
 
 ![](https://res.cloudinary.com/forestry-demo/image/upload/h_85/v1573167387/Favicon.png)
