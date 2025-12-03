@@ -32,7 +32,7 @@ import {
 type ListState = 'loading' | 'ready' | 'error';
 
 const tableHeadingStyle =
-  'px-3 py-3 text-left text-xs font-bold text-gray-700 tracking-wider sticky top-0 bg-gray-100 z-20 border-b-2 border-gray-200';
+  'px-3 py-3 text-left text-xs font-bold text-gray-700 tracking-wider sticky top-0 bg-gray-100 z-20 border-b-2 border-gray-200 ';
 
 export function formatBranchName(str: string): string {
   const pattern = /[^/\w-]+/g; // regular expression pattern to match invalid special characters
@@ -353,6 +353,7 @@ const BranchSelector = ({
   const [sortValue, setSortValue] = React.useState<
     'default' | 'updated' | 'name'
   >('default');
+  const [selectedBranch, setSelectedBranch] = React.useState<string | null>(null);
 
   const cms = useCMS();
 
@@ -441,15 +442,12 @@ const BranchSelector = ({
             <table className='w-full table-auto'>
               <thead className='sticky top-0 z-20 bg-gray-100 border-b-2 border-gray-200'>
                 <tr>
-                  <th className={`${tableHeadingStyle} max-w-xs`}>
+                  <th className={`${tableHeadingStyle} w-auto`}>
                     Branch Name
                   </th>
-                  <th className={tableHeadingStyle}>Last Updated</th>
-                  <th className={`${tableHeadingStyle} w-auto`}>
-                    {/* Empty header for Select button column, needs style for sticky functionality */}
-                  </th>
-                  <th className={`${tableHeadingStyle} w-auto`}>
-                    {/* Empty header for options button column, needs style for sticky functionality */}
+                  <th className={`${tableHeadingStyle} w-0 whitespace-nowrap`}>Last Updated</th>
+                  <th className={`${tableHeadingStyle} w-0 whitespace-nowrap`}>
+                    Pull Request
                   </th>
                 </tr>
               </thead>
@@ -463,6 +461,8 @@ const BranchSelector = ({
                     refreshBranchList={refreshBranchList}
                     previewFunction={previewFunction}
                     cms={cms}
+                    selectedBranch={selectedBranch}
+                    onSelectBranch={setSelectedBranch}
                   />
                 ))}
               </tbody>
@@ -470,6 +470,17 @@ const BranchSelector = ({
           </div>
         </TooltipProvider>
       )}
+      <div className='flex justify-end'>
+        <Button
+          variant='primary'
+          onClick={() => {
+            onChange(selectedBranch);
+          }}
+          disabled={!selectedBranch || selectedBranch === currentBranch}
+        >
+          Open branch in editor
+        </Button>
+      </div>
     </div>
   );
 };
@@ -481,6 +492,8 @@ const BranchItem = ({
   refreshBranchList,
   previewFunction,
   cms,
+  selectedBranch,
+  onSelectBranch,
 }: {
   branch: Branch;
   currentBranch: string;
@@ -488,6 +501,8 @@ const BranchItem = ({
   refreshBranchList: () => void;
   previewFunction?: any;
   cms: any;
+  selectedBranch: string | null;
+  onSelectBranch: (branchName: string | null) => void;
 }) => {
   const [creatingPR, setCreatingPR] = React.useState(false);
 
@@ -516,17 +531,27 @@ const BranchItem = ({
   };
 
   const isCurrentBranch = branch.name === currentBranch;
+  const isSelected = selectedBranch === branch.name;
   // @ts-ignore
   const indexingStatus = branch?.indexStatus?.status;
 
+  const handleRowClick = () => {
+    if (indexingStatus === 'complete' && !isCurrentBranch) {
+      onSelectBranch(isSelected ? null : branch.name);
+    }
+  };
+
   return (
     <tr
-      className={`text-base border-l-0 border-t-0 border-r-0 outline-none transition-all ease-out duration-150 ${
+      onClick={handleRowClick}
+      className={`text-base border-l-0 transition-colors border-t-0 border-r-0 outline-none transition-all ease-out duration-150 ${
         indexingStatus !== 'complete'
           ? 'bg-gray-50 text-gray-400'
           : isCurrentBranch
-            ? 'bg-blue-50 text-blue-800 border-b-0'
-            : 'border-b-2 border-gray-50'
+            ? 'border-b-2 border-gray-50'
+            : isSelected
+              ? 'bg-blue-100 text-blue-900 border-b-2 border-blue-50 cursor-pointer'
+              : 'border-b-2 border-gray-50 hover:bg-gray-50/50 cursor-pointer'
       }`}
     >
       <td className='pl-3 pr-3 py-1.5 max-w-xs'>
@@ -545,6 +570,12 @@ const BranchItem = ({
                 <TooltipContent side='top'>{branch.name}</TooltipContent>
               </TooltipPortal>
             </Tooltip>
+            {isCurrentBranch && (
+              <Badge calloutStyle='info' className='ml-1 w-fit flex-shrink-0' displayIcon={false}>
+                <BiPencil className='w-3 h-auto inline-block mr-1' />
+                <span>Editing</span>
+              </Badge>
+            )}
           </div>
           {indexingStatus !== 'complete' && (
             <div className='w-fit mt-1'>
@@ -553,7 +584,7 @@ const BranchItem = ({
           )}
         </div>
       </td>
-      <td className='px-3 py-1.5 min-w-0'>
+      <td className='px-3 py-1.5 min-w-0 text-center'>
         {creatingPR ? (
           <div className='flex items-center gap-2'>
             <div>
@@ -572,63 +603,52 @@ const BranchItem = ({
           </span>
         )}
       </td>
-      <td className='px-3 py-1.5 text-left'>
-        {indexingStatus === 'complete' && !isCurrentBranch && (
-          <Button
-            variant='white'
-            size='custom'
-            onClick={() => {
-              onChange(branch.name);
-            }}
-            className='cursor-pointer text-sm h-9 px-4 flex items-center gap-1'
-          >
-            <BiPencil className='h-4 w-auto text-blue-500 opacity-70 -mt-px' />{' '}
-            Select
-          </Button>
-        )}
-        {indexingStatus === 'complete' && isCurrentBranch && (
-          <Badge calloutStyle='info' className='w-fit' displayIcon={false}>
-            <span>Selected</span>
-          </Badge>
-        )}
-      </td>
-      <td className='px-3 py-1.5 text-right'>
-        <OverflowMenu
-          toolbarItems={[
-            branch.githubPullRequestUrl && {
-              name: 'github-pr',
-              label: 'View in GitHub',
-              Icon: (
-                <BiLinkExternal className='w-5 h-auto text-blue-500 opacity-70' />
-              ),
-              onMouseDown: () => {
-                window.open(branch.githubPullRequestUrl, '_blank');
-              },
-            },
-            !branch.githubPullRequestUrl &&
+      <td className='px-3 py-1.5 flex justify-center' onClick={(e) => e.stopPropagation()}>
+        {branch.githubPullRequestUrl ? (
+          <Tooltip delayDuration={300}>
+            <TooltipTrigger asChild>
+              <Button
+                variant='white'
+                size='custom'
+                onClick={() => {
+                  window.open(branch.githubPullRequestUrl, '_blank');
+                }}
+                className='cursor-pointer h-9 px-2 flex items-center gap-1'
+              >
+                <BiLinkExternal className='h-5 w-auto text-gray-700' />
+              </Button>
+            </TooltipTrigger>
+            <TooltipPortal>
+              <TooltipContent side='top'>Open Git Pull Request</TooltipContent>
+            </TooltipPortal>
+          </Tooltip>
+        ) : (
+          <OverflowMenu
+            toolbarItems={[
               !branch.protected &&
-              !creatingPR &&
-              cms.api.tina.usingProtectedBranch() && {
-                name: 'create-pr',
-                label: 'Create Pull Request',
-                Icon: (
-                  <BiGitBranch className='w-5 h-auto text-blue-500 opacity-70' />
-                ),
-                onMouseDown: () => handleCreatePullRequest(),
-              },
-            typeof previewFunction === 'function' &&
-              previewFunction({ branch: branch.name })?.url && {
-                name: 'preview',
-                label: 'Preview',
-                onMouseDown: () => {
-                  const previewUrl = previewFunction({
-                    branch: branch.name,
-                  })?.url;
-                  window.open(previewUrl, '_blank');
+                !creatingPR &&
+                cms.api.tina.usingProtectedBranch() && {
+                  name: 'create-pr',
+                  label: 'Create Pull Request',
+                  Icon: (
+                    <BiGitBranch className='w-5 h-auto text-blue-500' />
+                  ),
+                  onMouseDown: () => handleCreatePullRequest(),
                 },
-              },
-          ].filter(Boolean)}
-        />
+              typeof previewFunction === 'function' &&
+                previewFunction({ branch: branch.name })?.url && {
+                  name: 'preview',
+                  label: 'Preview',
+                  onMouseDown: () => {
+                    const previewUrl = previewFunction({
+                      branch: branch.name,
+                    })?.url;
+                    window.open(previewUrl, '_blank');
+                  },
+                },
+            ].filter(Boolean)}
+          />
+        )}
       </td>
     </tr>
   );
