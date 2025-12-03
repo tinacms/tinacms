@@ -532,7 +532,7 @@ export const useGraphQLReducer = (
           );
           cms.dispatch({
             type: 'forms:set-active-field-name',
-            value: getFormAndFieldNameFromMetadata(result.data, eventFieldName),
+            value: { formId: formId, fieldName: fieldName },
           });
           cms.events.dispatch({
             type: 'field:focus',
@@ -550,12 +550,13 @@ export const useGraphQLReducer = (
           const [queryId, eventFieldName] = event.data.fieldName.split('---');
           const result = results.find((res) => res.id === queryId);
           if (result?.data) {
+            const fieldData = getFormAndFieldNameFromMetadata(
+              result.data,
+              eventFieldName
+            );
             cms.dispatch({
               type: 'forms:set-hovered-field-name',
-              value: getFormAndFieldNameFromMetadata(
-                result.data,
-                eventFieldName
-              ),
+              value: fieldData,
             });
           }
         } else {
@@ -633,6 +634,15 @@ export const useGraphQLReducer = (
     const unsubscribe = cms.events.subscribe('field:focus', (event: any) => {
       const { fieldName, id } = event;
 
+      // If fieldName is null, send clear message to iframe
+      if (fieldName === null) {
+        iframe.current?.contentWindow?.postMessage({
+          type: 'field:set-focused',
+          fieldName: null,
+        });
+        return;
+      }
+
       // Find the active form in cms.state
       const activeForm = cms.state.forms.find(
         (form: any) => form.tinaForm.id === id
@@ -658,7 +668,27 @@ export const useGraphQLReducer = (
     return () => {
       unsubscribe();
     };
-  }, [iframe.current, cms.state.forms]);
+  }, [iframe.current]);
+
+  // Watch Redux state changes and dispatch field:focus events to sync with iframe
+  React.useEffect(() => {
+    const activeForm = cms.state.forms.find(
+      (form: any) => form.tinaForm.id === cms.state.activeFormId
+    );
+
+    if (!activeForm) {
+      return;
+    }
+
+    const activeFieldName = activeForm.activeFieldName;
+
+    // Dispatch field:focus event which will be picked up by the subscription above
+    cms.events.dispatch({
+      type: 'field:focus',
+      fieldName: activeFieldName,
+      id: activeForm.tinaForm.id,
+    });
+  }, [cms.state.forms, cms.state.activeFormId]);
 
   React.useEffect(() => {
     cms.dispatch({ type: 'set-edit-mode', value: 'visual' });
