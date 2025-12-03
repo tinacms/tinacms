@@ -127,7 +127,6 @@ export const ColorPicker: React.FC<Props> = ({
   const FormPortal = useFormPortal();
   const triggerRef = React.useRef<HTMLDivElement | null>(null);
   const [triggerBoundingBox, setTriggerBoundingBox] = useState<any>(null);
-  const [openTop, setOpenTop] = useState(false);
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
 
   const updateTriggerBoundingBox = () => {
@@ -135,14 +134,10 @@ export const ColorPicker: React.FC<Props> = ({
       setTriggerBoundingBox(triggerRef.current.getBoundingClientRect());
   };
 
-  React.useEffect(() => {
-    if (triggerBoundingBox) {
-      setOpenTop(
-        triggerBoundingBox.top + triggerBoundingBox.height / 2 >
-          window.innerHeight / 2
-      );
-    }
-  }, [triggerBoundingBox]);
+  const openTop = triggerBoundingBox
+    ? triggerBoundingBox.top + triggerBoundingBox.height / 2 >
+      window.innerHeight / 2
+    : false;
 
   React.useEffect(() => {
     const delay = 100;
