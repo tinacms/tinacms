@@ -36,7 +36,7 @@ const getTextColorForBackground = function (backgroundColor?: ColorRGBA) {
 const Swatch = ({ colorRGBA, colorFormat, width, ...props }: SwatchProps) => (
   <div
     className='bg-gray-100 rounded shadow-[0_2px_3px_rgba(0,0,0,0.12)] cursor-pointer m-0'
-    style={width ? { width: width } : undefined}
+    style={{ width }}
     {...props}
   >
     <div
@@ -192,11 +192,7 @@ export const ColorPicker: React.FC<Props> = ({
   if (!Widget) throw new Error('You must specify a widget type.');
 
   return (
-    <div
-      className='relative'
-      ref={triggerRef}
-      style={width ? { width: width } : undefined}
-    >
+    <div className='relative' ref={triggerRef} style={{ width }}>
       <Swatch
         onClick={toggleColorPicker}
         colorRGBA={getColorRGBA}
