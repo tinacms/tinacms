@@ -130,10 +130,7 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
             </>
           ) : (
             <div className='p-4 w-full flex flex-col gap-4 items-center justify-center'>
-              <FileIcon className='w-[30%] h-auto fill-gray-300' />
-              <span className='block text-base text-gray-600 w-full break-words truncate'>
-                {item.filename}
-              </span>
+              <FileIcon className='w-[40%] h-auto fill-gray-300' size={40}/>
             </div>
           )}
         </div>
