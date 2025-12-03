@@ -535,9 +535,8 @@ export const useGraphQLReducer = (
             value: { formId: formId, fieldName: fieldName },
           });
           cms.events.dispatch({
+            ...event.data,
             type: 'field:focus',
-            fieldName: fieldName,
-            id: formId,
           });
         }
         cms.dispatch({
@@ -629,65 +628,42 @@ export const useGraphQLReducer = (
     });
   }, [cms.state.sidebarDisplayState]);
 
-  // Listen for field:focus events from sidebar and notify iframe
-  React.useEffect(() => {
-    const unsubscribe = cms.events.subscribe('field:focus', (event: any) => {
-      const { fieldName, id } = event;
-
-      // If fieldName is null, send clear message to iframe
-      if (fieldName === null) {
-        iframe.current?.contentWindow?.postMessage({
-          type: 'field:set-focused',
-          fieldName: null,
-        });
-        return;
-      }
-
-      // Find the active form in cms.state
-      const activeForm = cms.state.forms.find(
-        (form: any) => form.tinaForm.id === id
-      );
-      if (!activeForm) {
-        return;
-      }
-
-      // Get the queryId from the form's queries array (forms track which queries created them)
-      const queries = activeForm.tinaForm.queries;
-
-      if (queries && queries.length > 0) {
-        // Use the last query ID (most recent)
-        const queryId = queries[queries.length - 1];
-        const fullFieldName = `${queryId}---${fieldName}`;
-        iframe.current?.contentWindow?.postMessage({
-          type: 'field:set-focused',
-          fieldName: fullFieldName,
-        });
-      }
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, [iframe.current]);
-
-  // Watch Redux state changes and dispatch field:focus events to sync with iframe
+  // Watch Redux state changes and sync active field with iframe
   React.useEffect(() => {
     const activeForm = cms.state.forms.find(
       (form: any) => form.tinaForm.id === cms.state.activeFormId
     );
 
     if (!activeForm) {
+      iframe.current?.contentWindow?.postMessage({
+        type: 'field:set-focused',
+        fieldName: null,
+      });
       return;
     }
 
     const activeFieldName = activeForm.activeFieldName;
 
-    // Dispatch field:focus event which will be picked up by the subscription above
-    cms.events.dispatch({
-      type: 'field:focus',
-      fieldName: activeFieldName,
-      id: activeForm.tinaForm.id,
-    });
+    // If fieldName is null, send clear message to iframe
+    if (activeFieldName === null) {
+      iframe.current?.contentWindow?.postMessage({
+        type: 'field:set-focused',
+        fieldName: null,
+      });
+      return;
+    }
+    console.log(activeForm);
+    // Get the queryId from the form's queries array (forms track which queries created them)
+    const queries = activeForm.tinaForm.queries;
+    console.log(queries);
+    if (queries && queries.length > 0) {
+      // Use the last query ID (most recent)
+      const queryId = queries[queries.length - 1];
+      iframe.current?.contentWindow?.postMessage({
+        type: 'field:set-focused',
+        fieldName: `${queryId}---${activeFieldName}`,
+      });
+    }
   }, [cms.state.forms, cms.state.activeFormId]);
 
   React.useEffect(() => {
