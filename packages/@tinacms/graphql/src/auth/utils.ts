@@ -1,5 +1,4 @@
 import crypto from 'crypto';
-import scmp from 'scmp';
 import { Collectable } from '@tinacms/schema-tools';
 
 const DEFAULT_SALT_LENGTH = 32;
@@ -103,7 +102,12 @@ export const checkPasswordHash = async ({
             reject(null);
           }
 
-          if (scmp(hashBuffer, Buffer.from(hash, 'hex'))) {
+          const expectedBuffer = Buffer.from(hash, 'hex');
+          // Use constant-time comparison to prevent timing attacks
+          if (
+            hashBuffer.length === expectedBuffer.length &&
+            crypto.timingSafeEqual(hashBuffer, expectedBuffer)
+          ) {
             resolve();
           }
           reject(null);
