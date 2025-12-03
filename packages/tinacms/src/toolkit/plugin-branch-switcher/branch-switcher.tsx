@@ -353,7 +353,9 @@ const BranchSelector = ({
   const [sortValue, setSortValue] = React.useState<
     'default' | 'updated' | 'name'
   >('default');
-  const [selectedBranch, setSelectedBranch] = React.useState<string | null>(null);
+  const [selectedBranch, setSelectedBranch] = React.useState<string | null>(
+    null
+  );
 
   const cms = useCMS();
 
@@ -442,10 +444,10 @@ const BranchSelector = ({
             <table className='w-full table-auto'>
               <thead className='sticky top-0 z-20 bg-gray-100 border-b-2 border-gray-200'>
                 <tr>
-                  <th className={`${tableHeadingStyle} w-auto`}>
-                    Branch Name
+                  <th className={`${tableHeadingStyle} w-auto`}>Branch Name</th>
+                  <th className={`${tableHeadingStyle} w-0 whitespace-nowrap`}>
+                    Last Updated
                   </th>
-                  <th className={`${tableHeadingStyle} w-0 whitespace-nowrap`}>Last Updated</th>
                   <th className={`${tableHeadingStyle} w-0 whitespace-nowrap`}>
                     Pull Request
                   </th>
@@ -571,7 +573,11 @@ const BranchItem = ({
               </TooltipPortal>
             </Tooltip>
             {isCurrentBranch && (
-              <Badge calloutStyle='info' className='ml-1 w-fit flex-shrink-0' displayIcon={false}>
+              <Badge
+                calloutStyle='info'
+                className='ml-1 w-fit flex-shrink-0'
+                displayIcon={false}
+              >
                 <BiPencil className='w-3 h-auto inline-block mr-1' />
                 <span>Editing</span>
               </Badge>
@@ -603,7 +609,10 @@ const BranchItem = ({
           </span>
         )}
       </td>
-      <td className='px-3 py-1.5 flex justify-center' onClick={(e) => e.stopPropagation()}>
+      <td
+        className='px-3 py-1.5 flex justify-center'
+        onClick={(e) => e.stopPropagation()}
+      >
         {branch.githubPullRequestUrl ? (
           <Tooltip delayDuration={300}>
             <TooltipTrigger asChild>
@@ -630,9 +639,7 @@ const BranchItem = ({
                 cms.api.tina.usingProtectedBranch() && {
                   name: 'create-pr',
                   label: 'Create Pull Request',
-                  Icon: (
-                    <BiGitBranch className='w-5 h-auto text-blue-500' />
-                  ),
+                  Icon: <BiGitBranch className='w-5 h-auto text-blue-500' />,
                   onMouseDown: () => handleCreatePullRequest(),
                 },
               typeof previewFunction === 'function' &&
