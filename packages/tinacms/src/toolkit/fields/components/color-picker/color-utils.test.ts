@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   checkerboardStyle,
+  expandHex,
   hexToRgb,
   isValidHex,
   rgbToHex,
@@ -28,6 +29,20 @@ describe('color-utils', () => {
     });
   });
 
+  describe('expandHex', () => {
+    it('expands shorthand hex to full uppercase', () => {
+      expect(expandHex('#F00')).toBe('#FF0000');
+      expect(expandHex('#0F0')).toBe('#00FF00');
+      expect(expandHex('#00F')).toBe('#0000FF');
+      expect(expandHex('#abc')).toBe('#AABBCC');
+    });
+
+    it('normalizes full hex to uppercase', () => {
+      expect(expandHex('#ff0000')).toBe('#FF0000');
+      expect(expandHex('#ABC123')).toBe('#ABC123');
+    });
+  });
+
   describe('hexToRgb', () => {
     it('converts valid hex to rgb', () => {
       expect(hexToRgb('#FF0000')).toEqual({ r: 255, g: 0, b: 0 });
@@ -35,8 +50,10 @@ describe('color-utils', () => {
       expect(hexToRgb('#0000FF')).toEqual({ r: 0, g: 0, b: 255 });
     });
 
-    it('handles lowercase hex', () => {
+    it('handles hex in any case', () => {
       expect(hexToRgb('#FF0000')).toEqual({ r: 255, g: 0, b: 0 });
+      expect(hexToRgb('#ff0000')).toEqual({ r: 255, g: 0, b: 0 });
+      expect(hexToRgb('#Ff0000')).toEqual({ r: 255, g: 0, b: 0 });
     });
 
     it('converts black and white', () => {

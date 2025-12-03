@@ -3,7 +3,7 @@ import * as React from 'react';
 import {
   TRANSPARENT,
   checkerboardStyle,
-  hexToRgb,
+  expandHex,
   isValidHex,
   rgbToHex,
 } from './color-utils';
@@ -17,8 +17,7 @@ export interface WidgetProps {
 
 const normalizeColorValue = (value: string): string | null => {
   if (isValidHex(value)) {
-    const rgb = hexToRgb(value);
-    if (rgb) return rgbToHex(rgb.r, rgb.g, rgb.b);
+    return expandHex(value);
   }
   const parsed = getColor(value.toLowerCase());
   if (parsed)
@@ -87,13 +86,13 @@ export const SwatchButton: React.FC<{
   isSelected: boolean;
   onClick: () => void;
 }> = ({ color, isSelected, onClick }) => (
-  <div className='relative w-full' style={{ paddingBottom: '100%' }}>
+  <div className='relative w-full pb-[100%]'>
     <button
       type='button'
       onClick={onClick}
       className={`absolute inset-0 rounded-sm border cursor-pointer transition-all ${isSelected ? 'border-blue-500 border-2 scale-110' : 'border-gray-200 hover:scale-105'}`}
       style={{
-        backgroundColor: color === TRANSPARENT ? '#fff' : color,
+        backgroundColor: color === TRANSPARENT ? '#FFF' : color,
         ...(color === TRANSPARENT ? checkerboardStyle() : {}),
       }}
       aria-label={
@@ -144,12 +143,7 @@ export const SwatchGrid: React.FC<{
   selectedColor: string;
   onSelect: (color: string) => void;
 }> = ({ colors, selectedColor, onSelect }) => (
-  <div
-    className='mt-2 grid gap-1.5'
-    style={{
-      gridTemplateColumns: 'repeat(8, 1fr)',
-    }}
-  >
+  <div className='mt-2 grid grid-cols-8 gap-1.5'>
     {colors.map((c) => (
       <SwatchButton
         key={c}

@@ -3,18 +3,23 @@ export const TRANSPARENT = 'transparent';
 export const isValidHex = (value: string): boolean =>
   /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(value);
 
+export const expandHex = (hex: string): string => {
+  const h = hex.replace('#', '');
+  if (h.length === 3) {
+    return `#${h[0]}${h[0]}${h[1]}${h[1]}${h[2]}${h[2]}`.toUpperCase();
+  }
+  return `#${h.toUpperCase()}`;
+};
+
 export const hexToRgb = (
   hex: string
 ): { r: number; g: number; b: number } | null => {
   if (!hex || !isValidHex(hex)) return null;
-  let h = hex.replace('#', '');
-  if (h.length === 3) {
-    h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
-  }
+  const expanded = expandHex(hex).replace('#', '');
   return {
-    r: parseInt(h.substring(0, 2), 16),
-    g: parseInt(h.substring(2, 4), 16),
-    b: parseInt(h.substring(4, 6), 16),
+    r: parseInt(expanded.substring(0, 2), 16),
+    g: parseInt(expanded.substring(2, 4), 16),
+    b: parseInt(expanded.substring(4, 6), 16),
   };
 };
 

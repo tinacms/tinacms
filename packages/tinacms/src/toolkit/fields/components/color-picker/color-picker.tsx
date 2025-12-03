@@ -12,7 +12,7 @@ interface FieldInput {
   onChange: (value: string | null) => void;
 }
 
-interface SwatchProps extends React.HTMLAttributes<HTMLDivElement> {
+interface SwatchProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   colorRGBA?: ColorRGBA;
   onClick: (_event: React.SyntheticEvent) => void;
   colorFormat: ColorFormat;
@@ -30,12 +30,13 @@ const isLightBackground = function (backgroundColor?: ColorRGBA) {
 };
 
 const getTextColorForBackground = function (backgroundColor?: ColorRGBA) {
-  return isLightBackground(backgroundColor) ? '#000000' : '#ffffff';
+  return isLightBackground(backgroundColor) ? '#000000' : '#FFFFFF';
 };
 
 const Swatch = ({ colorRGBA, colorFormat, width, ...props }: SwatchProps) => (
-  <div
-    className='bg-gray-100 rounded shadow-[0_2px_3px_rgba(0,0,0,0.12)] cursor-pointer m-0'
+  <button
+    type='button'
+    className='bg-gray-100 rounded shadow-[0_2px_3px_rgba(0,0,0,0.12)] cursor-pointer m-0 p-0 border-0'
     style={width ? { width: width } : undefined}
     {...props}
   >
@@ -53,7 +54,7 @@ const Swatch = ({ colorRGBA, colorFormat, width, ...props }: SwatchProps) => (
         ? 'Click to add color'
         : ColorFormatter[colorFormat].getLabel(colorRGBA)}
     </div>
-  </div>
+  </button>
 );
 
 const Popover = ({
@@ -147,7 +148,7 @@ export const ColorPicker: React.FC<Props> = ({
   React.useEffect(() => {
     const delay = 100;
     let timeout: ReturnType<typeof setTimeout> | null = null;
-    setTimeout(updateTriggerBoundingBox, delay);
+    timeout = setTimeout(updateTriggerBoundingBox, delay);
     const handleResize = () => {
       if (timeout) clearTimeout(timeout);
       timeout = setTimeout(updateTriggerBoundingBox, delay);
@@ -201,6 +202,7 @@ export const ColorPicker: React.FC<Props> = ({
         onClick={toggleColorPicker}
         colorRGBA={getColorRGBA}
         colorFormat={getColorFormat}
+        width={width}
       />
       {displayColorPicker && (
         <FormPortal>

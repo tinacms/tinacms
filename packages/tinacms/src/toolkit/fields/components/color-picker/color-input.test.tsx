@@ -194,7 +194,7 @@ describe('useHexInput', () => {
     expect(onChange).toHaveBeenLastCalledWith('#FF0000');
   });
 
-  it('normalizes uppercase hex to lowercase on blur', () => {
+  it('normalizes hex case on blur', () => {
     const onChange = vi.fn();
     const { result } = renderHook(() => useHexInput('#000000', onChange));
 

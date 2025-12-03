@@ -18,7 +18,7 @@ describe('ColorFormatter', () => {
     });
 
     describe('getValue', () => {
-      it('returns lowercase hex value for color', () => {
+      it('returns hex value for color', () => {
         expect(hexFormatter.getValue(redRGBA)).toBe('#FF0000');
       });
     });
@@ -29,8 +29,16 @@ describe('ColorFormatter', () => {
         expect(hexFormatter.parse('#00FF00')).toEqual(greenRGBA);
       });
 
-      it('parses lowercase hex', () => {
+      it('parses uppercase hex', () => {
         expect(hexFormatter.parse('#FF0000')).toEqual(redRGBA);
+      });
+
+      it('parses lowercase hex', () => {
+        expect(hexFormatter.parse('#ff0000')).toEqual(redRGBA);
+      });
+
+      it('parses mixed case hex', () => {
+        expect(hexFormatter.parse('#Ff0000')).toEqual(redRGBA);
       });
 
       it('returns null for undefined or empty', () => {
@@ -56,9 +64,7 @@ describe('ColorFormatter', () => {
 
     describe('getValue', () => {
       it('returns rgb value string', () => {
-        const value = rgbFormatter.getValue(redRGBA);
-        expect(value).toMatch(/rgb/i);
-        expect(value).toContain('255');
+        expect(rgbFormatter.getValue(redRGBA)).toBe('rgb(255, 0, 0)');
       });
     });
 

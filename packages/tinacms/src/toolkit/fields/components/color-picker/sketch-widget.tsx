@@ -35,7 +35,7 @@ export const SketchWidget: React.FC<WidgetProps> = ({
       <HexColorPicker
         color={color || '#000000'}
         onChange={onChange}
-        style={{ width: '100%', height: '150px' }}
+        className='!w-full !h-[150px]'
       />
       <div className='mt-2 flex gap-2 items-center'>
         <ColorPreview color={color} />
