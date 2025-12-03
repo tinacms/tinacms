@@ -3,6 +3,7 @@ import { FieldProps } from './field-props';
 import { useEvent } from '@toolkit/react-core/use-cms-event';
 import { FieldHoverEvent, FieldFocusEvent } from '@toolkit/fields/field-events';
 import { Form } from '@toolkit/forms';
+import { useCMS } from '@toolkit/react-core';
 
 export type InputFieldType<ExtraFieldProps, InputProps> =
   FieldProps<InputProps> & ExtraFieldProps;
@@ -111,6 +112,7 @@ export const FieldMeta = ({
   hoverIntent,
   ...props
 }: FieldMetaProps) => {
+  const cms = useCMS();
   const { dispatch: setHoveredField } =
     useEvent<FieldHoverEvent>('field:hover');
   const { dispatch: setFocusedField } =
@@ -119,12 +121,32 @@ export const FieldMeta = ({
   const isActive = !!focusIntent;
   const isHovering = !!hoverIntent;
 
+  const handleClick = () => {
+    // Check if this field is already active - if so, don't toggle it off
+    const existingForm = cms.state.forms.find(
+      (form: any) => form.tinaForm.id === tinaForm.id
+    );
+    const isAlreadyActive = existingForm?.activeFieldName === name;
+
+    if (isAlreadyActive) {
+      return; // Don't toggle off when clicking an already-active field
+    }
+    console.log({ id: tinaForm.id, fieldName: name });
+    // Dispatch the field:focus event for iframe communication
+    setFocusedField({ id: tinaForm.id, fieldName: name });
+    // Also set the active field in Redux state for sidebar highlighting
+    cms.dispatch({
+      type: 'forms:set-active-field-name',
+      value: { formId: tinaForm.id, fieldName: name },
+    });
+  };
+
   return (
     <FieldWrapper
       margin={margin}
       onMouseOver={() => setHoveredField({ id: tinaForm.id, fieldName: name })}
       onMouseOut={() => setHoveredField({ id: null, fieldName: null })}
-      onClick={() => setFocusedField({ id: tinaForm.id, fieldName: name })}
+      onClick={handleClick}
       style={{ zIndex: index ? 1000 - index : undefined }}
       data-tina-field-active={isActive ? 'true' : undefined}
       data-tina-field-hovering={isHovering ? 'true' : undefined}
