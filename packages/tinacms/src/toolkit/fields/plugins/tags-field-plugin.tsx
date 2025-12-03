@@ -27,7 +27,7 @@ export const TagsField = wrapFieldsWithMeta<
   const items = input.value || [];
   const ref = React.useRef(null);
   React.useEffect(() => {
-    const focusIntent = props.field.experimental_focusIntent;
+    const focusIntent = field.experimental_focusIntent;
     const shouldFocus = !!focusIntent;
 
     if (ref.current && shouldFocus) {
