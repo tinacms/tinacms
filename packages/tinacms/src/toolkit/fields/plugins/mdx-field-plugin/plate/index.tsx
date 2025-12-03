@@ -43,10 +43,7 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
         const plateElement = ref.current?.querySelector(
           '[role="textbox"]'
         ) as HTMLElement;
-        const focusIntent = field.experimental_focusIntent;
-        const shouldFocus = !!focusIntent;
-
-        if (shouldFocus && plateElement) {
+        if (field.experimental_focusIntent && plateElement) {
           if (plateElement) plateElement.focus();
         }
         // Slate takes a second to mount
