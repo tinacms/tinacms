@@ -134,7 +134,7 @@ export const HexInput: React.FC<{
     onFocus={onFocus}
     onBlur={onBlur}
     placeholder='#000000 or color name'
-    className={`shadow-inner px-2 py-1 text-sm border border-gray-200 rounded focus:shadow-outline focus:border-blue-500 focus:outline-none ${fullWidth ? 'w-full' : 'flex-1'}`}
+    className={`shadow-inner px-2 py-1 text-sm border border-gray-200 rounded focus:shadow-outline focus:border-blue-500 focus:outline-none ${fullWidth ? 'w-full' : 'flex-1 min-w-0'}`}
   />
 );
 

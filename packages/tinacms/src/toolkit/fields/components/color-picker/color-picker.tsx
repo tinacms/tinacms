@@ -12,7 +12,7 @@ interface FieldInput {
   onChange: (value: string | null) => void;
 }
 
-interface SwatchProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface SwatchProps extends React.HTMLAttributes<HTMLDivElement> {
   colorRGBA?: ColorRGBA;
   onClick: (_event: React.SyntheticEvent) => void;
   colorFormat: ColorFormat;
@@ -34,9 +34,8 @@ const getTextColorForBackground = function (backgroundColor?: ColorRGBA) {
 };
 
 const Swatch = ({ colorRGBA, colorFormat, width, ...props }: SwatchProps) => (
-  <button
-    type='button'
-    className='bg-gray-100 rounded shadow-[0_2px_3px_rgba(0,0,0,0.12)] cursor-pointer m-0 p-0 border-0'
+  <div
+    className='bg-gray-100 rounded shadow-[0_2px_3px_rgba(0,0,0,0.12)] cursor-pointer m-0'
     style={width ? { width: width } : undefined}
     {...props}
   >
@@ -54,7 +53,7 @@ const Swatch = ({ colorRGBA, colorFormat, width, ...props }: SwatchProps) => (
         ? 'Click to add color'
         : ColorFormatter[colorFormat].getLabel(colorRGBA)}
     </div>
-  </button>
+  </div>
 );
 
 const Popover = ({
