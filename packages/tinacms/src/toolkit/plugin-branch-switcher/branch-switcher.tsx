@@ -438,18 +438,18 @@ const BranchSelector = ({
       {filteredBranchList.length > 0 && (
         <TooltipProvider>
           <div className='min-w-[192px] max-h-[24rem] overflow-y-auto w-full h-full rounded-lg shadow-inner bg-white border border-gray-200'>
-            <table className='w-full table-fixed'>
+            <table className='w-full table-auto'>
               <thead className='sticky top-0 z-20 bg-gray-100 border-b-2 border-gray-200'>
                 <tr>
-                  <th className={`${tableHeadingStyle} max-w-[30%]`}>
+                  <th className={`${tableHeadingStyle} max-w-xs`}>
                     Branch Name
                   </th>
                   <th className={tableHeadingStyle}>Last Updated</th>
-                  <th className={tableHeadingStyle}>
-                    {/* Empty header for Select button column, needs style for sticky fucntionality */}
+                  <th className={`${tableHeadingStyle} w-auto`}>
+                    {/* Empty header for Select button column, needs style for sticky functionality */}
                   </th>
-                  <th className={tableHeadingStyle}>
-                    {/* Empty header for options button column, needs style for sticky fucntionality */}
+                  <th className={`${tableHeadingStyle} w-auto`}>
+                    {/* Empty header for options button column, needs style for sticky functionality */}
                   </th>
                 </tr>
               </thead>
@@ -529,7 +529,7 @@ const BranchItem = ({
             : 'border-b-2 border-gray-50'
       }`}
     >
-      <td className='pl-3 pr-3 py-1.5'>
+      <td className='pl-3 pr-3 py-1.5 max-w-xs'>
         <div className='flex flex-col'>
           <div className='flex items-center gap-1 min-w-0'>
             {branch.protected && (
