@@ -258,11 +258,7 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         if (existingForm?.activeFieldName === action.value.fieldName) {
           const clearedForms = state.forms.map((form) => {
             if (form.tinaForm.id === action.value.formId) {
-              return {
-                tinaForm: form.tinaForm,
-                activeFieldName: null,
-                hoveringFieldName: null,
-              };
+              return form;
             }
             return form;
           });
