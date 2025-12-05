@@ -559,9 +559,9 @@ const logNextSteps = ({
     );
     if (framework.name === 'hugo') {
       logger.info(
-        focusText('Hugo is required. '),
-        "Don't have Hugo installed? Follow this guide to set it up: ",
-        linkText('https://gohugo.io/installation/')
+        focusText('Hugo is required. ') +
+          "Don't have Hugo installed? Follow this guide to set it up: " +
+          linkText('https://gohugo.io/installation/')
       );
     }
 

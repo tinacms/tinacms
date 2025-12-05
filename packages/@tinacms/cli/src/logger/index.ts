@@ -1,18 +1,17 @@
 import chalk from 'chalk';
 import isUnicodeSupported from './is-unicode-supported';
-import log4js from 'log4js';
-export const logger = log4js.getLogger();
 
-// https://log4js-node.github.io/log4js-node/layouts.html
-// This disables the logger prefix
-log4js.configure({
-  appenders: {
-    out: { type: 'stdout', layout: { type: 'messagePassThrough' } },
+// Simple logger that outputs directly to stdout/stderr (like log4js with messagePassThrough)
+// This matches the previous log4js behavior where messages are output as-is
+export const logger = {
+  level: 'info' as string,
+  info: (msg: string) => process.stdout.write(msg + '\n'),
+  warn: (msg: string) => process.stdout.write(msg + '\n'),
+  error: (msg: string) => process.stderr.write(msg + '\n'),
+  debug: (msg: string) => {
+    if (logger.level === 'debug') process.stdout.write(msg + '\n');
   },
-  categories: { default: { appenders: ['out'], level: 'info' } },
-});
-// set initial level to info
-logger.level = 'info';
+};
 
 // Used from https://github.com/natemoo-re/clack/blob/main/packages/prompts/src/index.ts
 function ansiRegex() {
@@ -99,15 +98,6 @@ export const tnote = (message = '', title = '') => {
       S_CONNECT_LEFT + S_BAR_H.repeat(len + 2) + S_CORNER_BOTTOM_RIGHT
     )}\n`
   );
-  // process.stdout.write(
-  //   `${chalk.gray(S_BAR)}\n${chalk.green(S_STEP_SUBMIT)}  ${chalk.reset(
-  //     title
-  //   )} ${chalk.gray(
-  //     S_BAR_H.repeat(Math.max(len - title.length - 1, 1)) + S_CORNER_TOP_RIGHT
-  //   )}\n${msg}\n${chalk.gray(
-  //     S_CONNECT_LEFT + S_BAR_H.repeat(len + 2) + S_CORNER_BOTTOM_RIGHT
-  //   )}\n`
-  // )
 };
 
 export const summary = (content: {

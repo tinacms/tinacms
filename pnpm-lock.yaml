@@ -174,18 +174,12 @@ catalogs:
     '@types/figlet':
       specifier: 1.2.0
       version: 1.2.0
-    '@types/isomorphic-fetch':
-      specifier: ^0.0.35
-      version: 0.0.35
     '@types/level':
       specifier: ^6.0.3
       version: 6.0.3
     '@types/listr':
       specifier: 0.14.2
       version: 0.14.2
-    '@types/log4js':
-      specifier: ^2.3.5
-      version: 2.3.5
     '@types/lru-cache':
       specifier: ^5.1.1
       version: 5.1.1
@@ -354,6 +348,9 @@ catalogs:
     ccount:
       specifier: 2.0.1
       version: 2.0.1
+    chalk:
+      specifier: ^5.4.1
+      version: 5.4.1
     chokidar:
       specifier: ^3.6.0
       version: 3.6.0
@@ -438,9 +435,6 @@ catalogs:
     is-hotkey:
       specifier: ^0.2.0
       version: 0.2.0
-    isomorphic-fetch:
-      specifier: ^3.0.0
-      version: 3.0.0
     isomorphic-git:
       specifier: ^1.29.0
       version: 1.29.0
@@ -465,9 +459,6 @@ catalogs:
     jsonpath-plus:
       specifier: 10.1.0
       version: 10.1.0
-    log4js:
-      specifier: ^6.9.1
-      version: 6.9.1
     lowlight:
       specifier: ^3.3.0
       version: 3.3.0
@@ -1616,8 +1607,8 @@ importers:
         specifier: 'catalog:'
         version: 1.6.0
       chalk:
-        specifier: ^2.4.2
-        version: 2.4.2
+        specifier: 'catalog:'
+        version: 5.4.1
       chokidar:
         specifier: 'catalog:'
         version: 3.6.0
@@ -1648,9 +1639,6 @@ importers:
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.0
-      log4js:
-        specifier: 'catalog:'
-        version: 6.9.1
       many-level:
         specifier: 'catalog:'
         version: 2.0.0
@@ -1736,9 +1724,6 @@ importers:
       '@types/listr':
         specifier: 'catalog:'
         version: 0.14.2
-      '@types/log4js':
-        specifier: 'catalog:'
-        version: 2.3.5
       '@types/multer':
         specifier: 'catalog:'
         version: 1.4.12
@@ -2050,10 +2035,6 @@ importers:
         version: 0.32.4(happy-dom@15.10.2)(jsdom@20.0.3(bufferutil@4.0.9))(lightningcss@1.30.2)(playwright@1.57.0)(sass@1.89.2)(terser@5.39.0)
 
   packages/@tinacms/metrics:
-    dependencies:
-      isomorphic-fetch:
-        specifier: 'catalog:'
-        version: 3.0.0
     devDependencies:
       '@tinacms/scripts':
         specifier: workspace:*
@@ -2061,9 +2042,6 @@ importers:
       '@types/fs-extra':
         specifier: ^9.0.13
         version: 9.0.13
-      '@types/isomorphic-fetch':
-        specifier: 'catalog:'
-        version: 0.0.35
       fs-extra:
         specifier: 'catalog:'
         version: 11.3.0
@@ -2120,8 +2098,8 @@ importers:
         specifier: 'catalog:'
         version: 3.0.0(jest@30.2.0(@types/node@22.18.12)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.18.12)(typescript@5.7.3)))(sucrase@3.35.0)
       chalk:
-        specifier: ^4.1.2
-        version: 4.1.2
+        specifier: 'catalog:'
+        version: 5.4.1
       chokidar:
         specifier: 'catalog:'
         version: 3.6.0
@@ -2243,8 +2221,8 @@ importers:
         specifier: workspace:*
         version: link:../@tinacms/metrics
       chalk:
-        specifier: 4.1.2
-        version: 4.1.2
+        specifier: 'catalog:'
+        version: 5.4.1
       commander:
         specifier: ^12.1.0
         version: 12.1.0
@@ -2732,9 +2710,6 @@ importers:
         specifier: 'catalog:'
         version: 15.10.2
       identity-obj-proxy:
-        specifier: 'catalog:'
-        version: 3.0.0
-      isomorphic-fetch:
         specifier: 'catalog:'
         version: 3.0.0
       jest-file-snapshot:
@@ -8420,9 +8395,6 @@ packages:
   '@types/http-errors@2.0.4':
     resolution: {integrity: sha512-D0CFMMtydbJAegzOyHjtiKPLlvnm3iTZyZRSZoLq2mRhDdmLfIWOCYPfQJ4cu2erKghU++QvjcUjp/5h7hESpA==}
 
-  '@types/isomorphic-fetch@0.0.35':
-    resolution: {integrity: sha512-DaZNUvLDCAnCTjgwxgiL1eQdxIKEpNLOlTNtAgnZc50bG2copGhRrFN9/PxPBuJe+tZVLCbQ7ls0xveXVRPkvw==}
-
   '@types/istanbul-lib-coverage@2.0.6':
     resolution: {integrity: sha512-2QF/t/auWm0lsy8XtKVPG19v3sSOQlJe/YHZgfjb/KBBHOGSV+J2q/S671rcq9uTBrLAXmZpqJiaQbMT+zNU1w==}
 
@@ -8491,10 +8463,6 @@ packages:
 
   '@types/lodash@4.17.21':
     resolution: {integrity: sha512-FOvQ0YPD5NOfPgMzJihoT+Za5pdkDJWcbpuj1DjaKZIr/gxodQjY/uWEFlTNqW2ugXHUiL8lRQgw63dzKHZdeQ==}
-
-  '@types/log4js@2.3.5':
-    resolution: {integrity: sha512-SwF8LkSHqHy9A8GQ67NAYJiGl8zzP4Qtx65Wa+IOxDGdMHxKeoQZjg7m2M1erIT6VK0DYHpu2aTbdLkdkuMHjw==}
-    deprecated: This is a stub types definition for log4js (https://github.com/nomiddlename/log4js-node). log4js provides its own type definitions, so you don't need @types/log4js installed!
 
   '@types/lru-cache@5.1.1':
     resolution: {integrity: sha512-ssE3Vlrys7sdIzs5LOxCzTVMsU7i9oa/IaW92wF32JFb3CVczqOkru2xspuKczHEbG3nvmPY7IFqVmGGHdNbYw==}
@@ -10529,10 +10497,6 @@ packages:
   date-fns@4.1.0:
     resolution: {integrity: sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==}
 
-  date-format@4.0.14:
-    resolution: {integrity: sha512-39BOQLs9ZjKh0/patS9nrT8wc3ioX3/eA/zgbKNopnF2wCqJEoxywwwElATYvRsXdnOxA/OQeQoFZ3rFjVajhg==}
-    engines: {node: '>=4.0'}
-
   dayjs@1.11.13:
     resolution: {integrity: sha512-oaMBel6gjolK862uaPQOVTA7q3TZhuSvuMQAAglQDOWYO9A91IrAOUJEyKVlqJlHE0vq5p5UXxzdPfMH/x6xNg==}
 
@@ -12331,9 +12295,6 @@ packages:
     resolution: {integrity: sha512-WhB9zCku7EGTj/HQQRz5aUQEUeoQZH2bWcltRErOpymJ4boYE6wL9Tbr23krRPSZ+C5zqNSrSw+Cc7sZZ4b7vg==}
     engines: {node: '>=0.10.0'}
 
-  isomorphic-fetch@3.0.0:
-    resolution: {integrity: sha512-qvUtwJ3j6qwsF3jLxkZ72qCgjMysPzDfeV240JHiGZsANBYd+EEuu35v7dfrJ9Up0Ak07D7GGSkGhCHTqg/5wA==}
-
   isomorphic-git@1.29.0:
     resolution: {integrity: sha512-zWGqk8901cicvVEhVpN76AwKrS/TzHak2NQCtNXIAavpMIy/yqh+d/JtC9A8AUKZAauUdOyEWKI29tuCLAL+Zg==}
     engines: {node: '>=12'}
@@ -13070,10 +13031,6 @@ packages:
   log-symbols@6.0.0:
     resolution: {integrity: sha512-i24m8rpwhmPIS4zscNzK6MSEhk0DUWa/8iYQWxhffV8jkI4Phvs3F+quL5xvS0gdQR0FyTCMMH33Y78dDTzzIw==}
     engines: {node: '>=18'}
-
-  log4js@6.9.1:
-    resolution: {integrity: sha512-1somDdy9sChrr9/f4UlzhdaGfDR2c/SaD2a4T7qEkG4jTS57/B3qmnjLYePwQ8cqWnUHZI0iAKxMBpCZICiZ2g==}
-    engines: {node: '>=8.0'}
 
   logform@2.7.0:
     resolution: {integrity: sha512-TFYA4jnP7PVbmlBIfhlSe+WKxs9dklXMTEGcBCIvLhE/Tn3H6Gk1norupVW7m5Cnd4bLcr08AytbyV/xj7f/kQ==}
@@ -15098,9 +15055,6 @@ packages:
     resolution: {integrity: sha512-g6QUff04oZpHs0eG5p83rFLhHeV00ug/Yf9nZM6fLeUrPguBTkTQOdpAWWspMh55TZfVQDPaN3NQJfbVRAxdIw==}
     engines: {iojs: '>=1.0.0', node: '>=0.10.0'}
 
-  rfdc@1.4.1:
-    resolution: {integrity: sha512-q1b3N5QkRUWUl7iyylaaj3kOpIT0N2i9MqIEQXP73GVsN9cw3fdx8X63cEmWhJGi2PPCF23Ijp7ktmd39rawIA==}
-
   rimraf@2.6.3:
     resolution: {integrity: sha512-mwqeW5XsA2qAejG46gYdENaxXjx9onRNCfn7L0duuP4hCuTIi/QO7PDK07KJfp1d+izWPrzEJDcSqBa0OZQriA==}
     deprecated: Rimraf versions prior to v4 are no longer supported
@@ -15531,10 +15485,6 @@ packages:
 
   stopword@3.1.4:
     resolution: {integrity: sha512-RiyU12FwHWX1i42gxhn5sywgpV5mptZTzbHKqKh5wVDWC2Uu+8vKbLv8xxeNa0p29vECbYGLXpDayo54n9+dsg==}
-
-  streamroller@3.1.5:
-    resolution: {integrity: sha512-KFxaM7XT+irxvdqSP1LGLgNWbYN7ay5owZ3r/8t77p+EtSUAfUgtl7be3xtqtOmGUl9K9YPO2ca8133RlTjvKw==}
-    engines: {node: '>=8.0'}
 
   streamsearch@1.1.0:
     resolution: {integrity: sha512-Mcc5wHehp9aXz1ax6bZUyY5afg9u2rv5cqQI3mRrYkGC8rW2hM02jWuwjtL++LS5qinSyhj2QfLyNsuc+VsExg==}
@@ -16720,9 +16670,6 @@ packages:
   whatwg-encoding@2.0.0:
     resolution: {integrity: sha512-p41ogyeMUrw3jWclHWTQg1k05DSVXPLcVxRTYsXUk+ZooOCZLcoYgPZ/HL/D/N+uQPOtcp1me1WhBEaX02mhWg==}
     engines: {node: '>=12'}
-
-  whatwg-fetch@3.6.20:
-    resolution: {integrity: sha512-EqhiFU6daOA8kpjOWTL0olhVOF3i7OrFzSYiGsEMB8GcXS+RrzauAERX65xMeNWVqxA6HXH2m69Z9LaKKdisfg==}
 
   whatwg-mimetype@3.0.0:
     resolution: {integrity: sha512-nt+N2dzIutVRxARx1nghPKGv1xHikU7HKdfafKkLNLindmPU/ch3U31NOCGGA/dmPcmb1VlofO0vnKAcsm0o/Q==}
@@ -24443,8 +24390,6 @@ snapshots:
 
   '@types/http-errors@2.0.4': {}
 
-  '@types/isomorphic-fetch@0.0.35': {}
-
   '@types/istanbul-lib-coverage@2.0.6': {}
 
   '@types/istanbul-lib-report@3.0.3':
@@ -24525,12 +24470,6 @@ snapshots:
       '@types/lodash': 4.17.21
 
   '@types/lodash@4.17.21': {}
-
-  '@types/log4js@2.3.5':
-    dependencies:
-      log4js: 6.9.1
-    transitivePeerDependencies:
-      - supports-color
 
   '@types/lru-cache@5.1.1': {}
 
@@ -27108,8 +27047,6 @@ snapshots:
       '@babel/runtime': 7.26.9
 
   date-fns@4.1.0: {}
-
-  date-format@4.0.14: {}
 
   dayjs@1.11.13: {}
 
@@ -29696,13 +29633,6 @@ snapshots:
 
   isobject@3.0.1: {}
 
-  isomorphic-fetch@3.0.0:
-    dependencies:
-      node-fetch: 2.7.0
-      whatwg-fetch: 3.6.20
-    transitivePeerDependencies:
-      - encoding
-
   isomorphic-git@1.29.0:
     dependencies:
       async-lock: 1.4.1
@@ -31116,16 +31046,6 @@ snapshots:
     dependencies:
       chalk: 5.4.1
       is-unicode-supported: 1.3.0
-
-  log4js@6.9.1:
-    dependencies:
-      date-format: 4.0.14
-      debug: 4.4.0
-      flatted: 3.3.3
-      rfdc: 1.4.1
-      streamroller: 3.1.5
-    transitivePeerDependencies:
-      - supports-color
 
   logform@2.7.0:
     dependencies:
@@ -33729,8 +33649,6 @@ snapshots:
 
   reusify@1.1.0: {}
 
-  rfdc@1.4.1: {}
-
   rimraf@2.6.3:
     dependencies:
       glob: 7.2.3
@@ -34322,14 +34240,6 @@ snapshots:
   stdin-discarder@0.2.2: {}
 
   stopword@3.1.4: {}
-
-  streamroller@3.1.5:
-    dependencies:
-      date-format: 4.0.14
-      debug: 4.4.0
-      fs-extra: 8.1.0
-    transitivePeerDependencies:
-      - supports-color
 
   streamsearch@1.1.0: {}
 
@@ -35813,8 +35723,6 @@ snapshots:
   whatwg-encoding@2.0.0:
     dependencies:
       iconv-lite: 0.6.3
-
-  whatwg-fetch@3.6.20: {}
 
   whatwg-mimetype@3.0.0: {}
 
