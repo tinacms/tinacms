@@ -19,6 +19,7 @@ import {
   useFloatingLinkInsertState,
 } from '@udecode/plate-link/react';
 import {
+  useEditorPlugin,
   useEditorRef,
   useEditorSelection,
   useFormInputProps,
@@ -44,7 +45,7 @@ export function LinkFloatingToolbar({
 }) {
   const activeCommentId = usePluginOption({ key: 'comment' }, 'activeId');
   const activeSuggestionId = usePluginOption({ key: 'suggestion' }, 'activeId');
-  const editor = useEditorRef();
+  const { api, editor } = useEditorPlugin(LinkPlugin);
 
   const isUrlValidator = usePluginOption(LinkPlugin, 'isUrl');
 
@@ -166,8 +167,7 @@ export function LinkFloatingToolbar({
           type='button'
           className={buttonVariants({ size: 'sm', variant: 'ghost' })}
           onClick={() => {
-            // @ts-expect-error floatingLink exists at runtime
-            editor.api.floatingLink.hide();
+            api.floatingLink.hide();
           }}
         >
           Cancel
