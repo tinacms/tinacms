@@ -1,48 +1,44 @@
 {
-	"name": "@tinacms/metrics",
-	"version": "2.0.0",
-	"main": "dist/index.js",
-	"type": "module",
-	"typings": "dist/index.d.ts",
-	"files": [
-		"dist",
-		".env"
-	],
-	"license": "Apache-2.0",
-	"buildConfig": {
-		"entryPoints": [
-			{
-				"name": "src/index.ts",
-				"target": "node"
-			}
-		]
-	},
-	"peerDependencies": {
-		"fs-extra": "^9.0.1"
-	},
-	"devDependencies": {
-		"@tinacms/scripts": "workspace:*",
-		"@types/fs-extra": "^9.0.13",
-		"@types/isomorphic-fetch": "catalog:",
-		"fs-extra": "catalog:",
-		"jest": "catalog:",
-		"typescript": "^5.7.3"
-	},
-	"scripts": {
-		"build": "tinacms-scripts build",
-		"test": "jest --passWithNoTests",
-		"types": "pnpm tsc",
-		"test-watch": "jest  --passWithNoTests --watch",
-		"generate:schema": "pnpm node scripts/generateSchema.js"
-	},
-	"publishConfig": {
-		"registry": "https://registry.npmjs.org"
-	},
-	"repository": {
-		"url": "https://github.com/tinacms/tinacms.git",
-		"directory": "packages/@tinacms/cli"
-	},
-	"dependencies": {
-		"isomorphic-fetch": "catalog:"
-	}
+    "name": "@tinacms/metrics",
+    "version": "2.0.0",
+    "main": "dist/index.js",
+    "type": "module",
+    "typings": "dist/index.d.ts",
+    "files": [
+        "dist",
+        ".env"
+    ],
+    "license": "Apache-2.0",
+    "buildConfig": {
+        "entryPoints": [
+            {
+                "name": "src/index.ts",
+                "target": "node"
+            }
+        ]
+    },
+    "peerDependencies": {
+        "fs-extra": "^9.0.1"
+    },
+    "devDependencies": {
+        "@tinacms/scripts": "workspace:*",
+        "@types/fs-extra": "^9.0.13",
+        "fs-extra": "catalog:",
+        "jest": "catalog:",
+        "typescript": "^5.7.3"
+    },
+    "scripts": {
+        "build": "tinacms-scripts build",
+        "test": "jest --passWithNoTests",
+        "types": "pnpm tsc",
+        "test-watch": "jest  --passWithNoTests --watch",
+        "generate:schema": "pnpm node scripts/generateSchema.js"
+    },
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org"
+    },
+    "repository": {
+        "url": "https://github.com/tinacms/tinacms.git",
+        "directory": "packages/@tinacms/cli"
+    }
 }
