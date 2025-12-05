@@ -12,19 +12,21 @@ import {
   type LinkFloatingToolbarState,
   FloatingLinkUrlInput,
   LinkPlugin,
+  submitFloatingLink,
   useFloatingLinkEdit,
   useFloatingLinkEditState,
   useFloatingLinkInsert,
   useFloatingLinkInsertState,
 } from '@udecode/plate-link/react';
 import {
+  useEditorPlugin,
   useEditorRef,
   useEditorSelection,
   useFormInputProps,
   usePluginOption,
 } from '@udecode/plate/react';
 import { cva } from 'class-variance-authority';
-import { ExternalLink, Link, Text, Unlink } from 'lucide-react';
+import { ExternalLink, Link, Text, Unlink, CircleX } from 'lucide-react';
 import { Separator } from './separator';
 import { buttonVariants } from './button';
 
@@ -43,6 +45,26 @@ export function LinkFloatingToolbar({
 }) {
   const activeCommentId = usePluginOption({ key: 'comment' }, 'activeId');
   const activeSuggestionId = usePluginOption({ key: 'suggestion' }, 'activeId');
+  const { api, editor } = useEditorPlugin(LinkPlugin);
+
+  const isUrlValidator = usePluginOption(LinkPlugin, 'isUrl');
+
+  const [currentUrl, setCurrentUrl] = React.useState('');
+  const [isValidUrl, setIsValidUrl] = React.useState(true);
+
+  const handleUrlInput = React.useCallback(
+    (e: React.FormEvent<HTMLInputElement>) => {
+      const value = e.currentTarget.value;
+      setCurrentUrl(value);
+      if (value && isUrlValidator) {
+        const valid = isUrlValidator(value);
+        setIsValidUrl(valid);
+      } else {
+        setIsValidUrl(true);
+      }
+    },
+    [isUrlValidator]
+  );
 
   const floatingOptions: UseVirtualFloatingOptions = React.useMemo(() => {
     return {
@@ -92,7 +114,29 @@ export function LinkFloatingToolbar({
   if (hidden) return null;
 
   const input = (
-    <div className='z-[999999] flex w-[330px] flex-col' {...inputProps}>
+    <div
+      className='z-[999999] flex w-[330px] flex-col relative'
+      {...inputProps}
+    >
+      {!isValidUrl && currentUrl && (
+        <div className='absolute -top-16 left-0 right-0 z-[1000000] mb-2'>
+          <div
+            className='bg-red-50 border border-red-200 rounded-md p-2 shadow-lg'
+            role='alert'
+            aria-live='polite'
+          >
+            <div className='flex items-center'>
+              <CircleX className='size-4 text-red-500 mr-2 flex-shrink-0' />
+              <span className='text-sm text-red-700 text-wrap'>
+                Invalid URL. Please prefix link with https:// or use a relative
+                path like /about
+              </span>
+            </div>
+            <div className='absolute -bottom-1 left-4 w-2 h-2 bg-red-50 border-r border-b border-red-200 transform rotate-45'></div>
+          </div>
+        </div>
+      )}
+
       <div className='flex items-center'>
         <div className='flex items-center pr-1 pl-2 text-muted-foreground'>
           <Link className='size-4' />
@@ -102,6 +146,7 @@ export function LinkFloatingToolbar({
           className={inputVariants()}
           placeholder='Paste link'
           data-plate-focus
+          onInput={handleUrlInput}
         />
       </div>
       <Separator className='my-1' />
@@ -115,6 +160,33 @@ export function LinkFloatingToolbar({
           data-plate-focus
           {...textInputProps}
         />
+      </div>
+      <Separator className='my-1' />
+      <div className='flex items-center justify-end gap-2 px-2 py-1'>
+        <button
+          type='button'
+          className={buttonVariants({ size: 'sm', variant: 'ghost' })}
+          onClick={() => {
+            api.floatingLink.hide();
+          }}
+        >
+          Cancel
+        </button>
+        <button
+          type='button'
+          className={buttonVariants({
+            size: 'sm',
+            variant: 'tinaPrimary',
+          })}
+          onClick={() => {
+            if (isValidUrl && currentUrl) {
+              submitFloatingLink(editor);
+            }
+          }}
+          disabled={!isValidUrl && !!currentUrl}
+        >
+          OK
+        </button>
       </div>
     </div>
   );
