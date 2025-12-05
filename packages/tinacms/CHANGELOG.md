@@ -1,5 +1,13 @@
 # tinacms
 
+## 3.0.2
+
+### Patch Changes
+
+- [#6208](https://github.com/tinacms/tinacms/pull/6208) [`f717193`](https://github.com/tinacms/tinacms/commit/f717193aa4a1d3205df42d120fd1f6192b5e41e5) Thanks [@18-th](https://github.com/18-th)! - `react-color` to `react-colorful` migration
+
+- [#6213](https://github.com/tinacms/tinacms/pull/6213) [`ac59522`](https://github.com/tinacms/tinacms/commit/ac59522053c71c713057c4c2b6ce610617bce85e) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - plate : hyperlink UI fixes for valid urls
+
 ## 3.0.1
 
 ### Patch Changes
