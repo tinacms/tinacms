@@ -179,7 +179,7 @@ export function LinkFloatingToolbar({
             variant: 'tinaPrimary',
           })}
           onClick={() => {
-            if (isValidUrl || !currentUrl) {
+            if (isValidUrl && currentUrl) {
               submitFloatingLink(editor);
             }
           }}
