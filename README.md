@@ -57,6 +57,17 @@ https://tina.io/docs/r/FAQ/#5-what-is-tinas-tech-stack
 
 Our development priorities can be read on our [Public Roadmap](https://tina.io/roadmap/).
 
+## Activity 
+
+<a href="https://next.ossinsight.io/widgets/official/analyze-repo-issue-opened-and-closed?repo_id=198488459" target="_blank" style="display: block" align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://next.ossinsight.io/widgets/official/analyze-repo-issue-opened-and-closed/thumbnail.png?repo_id=198488459&image_size=auto&color_scheme=dark" width="721" height="auto">
+    <img alt="Issue Opened and Closed of tinacms/tinacms" src="https://next.ossinsight.io/widgets/official/analyze-repo-issue-opened-and-closed/thumbnail.png?repo_id=198488459&image_size=auto&color_scheme=light" width="721" height="auto">
+  </picture>
+</a>
+
+**Graph: Issues Opened and Closed for TinaCMS**
+<!-- Made with [OSS Insight](https://ossinsight.io/) -->
 ## Contributing
 
 Please see our [./CONTRIBUTING.md](https://github.com/tinacms/tinacms/blob/main/CONTRIBUTING.md)
