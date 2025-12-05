@@ -1,5 +1,46 @@
 # tinacms-cli
 
+## 2.0.1
+
+### Patch Changes
+
+- [#6212](https://github.com/tinacms/tinacms/pull/6212) [`4b25507`](https://github.com/tinacms/tinacms/commit/4b25507d26af1611525048877a0e442575d94712) Thanks [@Pat-Stuart](https://github.com/Pat-Stuart)! - Resolve bug in cli due to ESM switch-over
+
+- Updated dependencies [[`50fa9f4`](https://github.com/tinacms/tinacms/commit/50fa9f4bf932a3dc45b88d245e35917efe8d3423), [`428ec7e`](https://github.com/tinacms/tinacms/commit/428ec7eca20603e2cb666d562fd4cc16dda4cbed), [`6946476`](https://github.com/tinacms/tinacms/commit/69464767d339a5df3c6c530ece94ef80049e534f), [`f99bbbc`](https://github.com/tinacms/tinacms/commit/f99bbbc221eead8d714b3791348d415dd8fcd063)]:
+  - tinacms@3.0.1
+  - @tinacms/app@2.3.13
+
+## 2.0.0
+
+### Major Changes
+
+- [#5982](https://github.com/tinacms/tinacms/pull/5982) [`2e1535d`](https://github.com/tinacms/tinacms/commit/2e1535dd5495dc390902f2db6ef1f26afb072396) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: migrate from commonjs to esm
+
+### Patch Changes
+
+- [#5982](https://github.com/tinacms/tinacms/pull/5982) [`2e1535d`](https://github.com/tinacms/tinacms/commit/2e1535dd5495dc390902f2db6ef1f26afb072396) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - fix: Adds in resolver for file path to handle windows
+
+- Updated dependencies [[`2e1535d`](https://github.com/tinacms/tinacms/commit/2e1535dd5495dc390902f2db6ef1f26afb072396), [`ed6025e`](https://github.com/tinacms/tinacms/commit/ed6025ee87ebe051957fc93e987ba8de8b003995), [`3bf79e1`](https://github.com/tinacms/tinacms/commit/3bf79e19c005dca745a8ddd46546190741b322a5), [`bb1ad6a`](https://github.com/tinacms/tinacms/commit/bb1ad6a11d10976074453ed218b178935ec96fd3)]:
+  - @tinacms/graphql@2.0.0
+  - @tinacms/metrics@2.0.0
+  - @tinacms/schema-tools@2.0.0
+  - tinacms@3.0.0
+  - @tinacms/search@1.1.4
+  - @tinacms/app@2.3.12
+
+## 1.12.6
+
+### Patch Changes
+
+- [#6187](https://github.com/tinacms/tinacms/pull/6187) [`a76fdb6`](https://github.com/tinacms/tinacms/commit/a76fdb639b94cfefa169ebbd184f55d62e4a8a76) Thanks [@18-th](https://github.com/18-th)! - Updated yup to v1 to remove transitive lodash dependency
+
+- Updated dependencies [[`a76fdb6`](https://github.com/tinacms/tinacms/commit/a76fdb639b94cfefa169ebbd184f55d62e4a8a76), [`a736baf`](https://github.com/tinacms/tinacms/commit/a736bafe1b20bc1465f8e4a4c0c2281f40dcbf2f), [`dd2089d`](https://github.com/tinacms/tinacms/commit/dd2089dbde4a7b1a0116cce096f50a97fdca9d81)]:
+  - tinacms@2.10.1
+  - @tinacms/graphql@1.6.3
+  - @tinacms/schema-tools@1.10.1
+  - @tinacms/app@2.3.11
+  - @tinacms/search@1.1.3
+
 ## 1.12.5
 
 ### Patch Changes

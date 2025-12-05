@@ -1,5 +1,23 @@
 # @tinacms/schema-tools
 
+## 2.0.0
+
+### Major Changes
+
+- [#5982](https://github.com/tinacms/tinacms/pull/5982) [`2e1535d`](https://github.com/tinacms/tinacms/commit/2e1535dd5495dc390902f2db6ef1f26afb072396) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: migrate from commonjs to esm
+
+### Minor Changes
+
+- [#6183](https://github.com/tinacms/tinacms/pull/6183) [`ed6025e`](https://github.com/tinacms/tinacms/commit/ed6025ee87ebe051957fc93e987ba8de8b003995) Thanks [@Pat-Stuart](https://github.com/Pat-Stuart)! - Add in ability to disable folder creation in UI per collection
+
+## 1.10.1
+
+### Patch Changes
+
+- [#6187](https://github.com/tinacms/tinacms/pull/6187) [`a76fdb6`](https://github.com/tinacms/tinacms/commit/a76fdb639b94cfefa169ebbd184f55d62e4a8a76) Thanks [@18-th](https://github.com/18-th)! - Updated yup to v1 to remove transitive lodash dependency
+
+- [#6138](https://github.com/tinacms/tinacms/pull/6138) [`a736baf`](https://github.com/tinacms/tinacms/commit/a736bafe1b20bc1465f8e4a4c0c2281f40dcbf2f) Thanks [@Pat-Stuart](https://github.com/Pat-Stuart)! - Update Image field type definition to include uploadDir
+
 ## 1.10.0
 
 ### Minor Changes

@@ -1,5 +1,51 @@
 # tinacms
 
+## 3.0.1
+
+### Patch Changes
+
+- [#6182](https://github.com/tinacms/tinacms/pull/6182) [`50fa9f4`](https://github.com/tinacms/tinacms/commit/50fa9f4bf932a3dc45b88d245e35917efe8d3423) Thanks [@Pat-Stuart](https://github.com/Pat-Stuart)! - UI fix for menu icon in admin panel
+
+- [#6206](https://github.com/tinacms/tinacms/pull/6206) [`428ec7e`](https://github.com/tinacms/tinacms/commit/428ec7eca20603e2cb666d562fd4cc16dda4cbed) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Redirect to collection page after creating content on protected branch
+
+- [#6209](https://github.com/tinacms/tinacms/pull/6209) [`6946476`](https://github.com/tinacms/tinacms/commit/69464767d339a5df3c6c530ece94ef80049e534f) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - media manager - remove directory dupicate name bar
+
+- [#6152](https://github.com/tinacms/tinacms/pull/6152) [`f99bbbc`](https://github.com/tinacms/tinacms/commit/f99bbbc221eead8d714b3791348d415dd8fcd063) Thanks [@kulesy](https://github.com/kulesy)! - Style Alert component with black text and thicker border
+
+## 3.0.0
+
+### Major Changes
+
+- [#5982](https://github.com/tinacms/tinacms/pull/5982) [`2e1535d`](https://github.com/tinacms/tinacms/commit/2e1535dd5495dc390902f2db6ef1f26afb072396) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: migrate from commonjs to esm
+
+### Minor Changes
+
+- [#6183](https://github.com/tinacms/tinacms/pull/6183) [`ed6025e`](https://github.com/tinacms/tinacms/commit/ed6025ee87ebe051957fc93e987ba8de8b003995) Thanks [@Pat-Stuart](https://github.com/Pat-Stuart)! - Add in ability to disable folder creation in UI per collection
+
+- [#6174](https://github.com/tinacms/tinacms/pull/6174) [`3bf79e1`](https://github.com/tinacms/tinacms/commit/3bf79e19c005dca745a8ddd46546190741b322a5) Thanks [@Calinator444](https://github.com/Calinator444)! - rewrote date time picker
+
+### Patch Changes
+
+- [#6200](https://github.com/tinacms/tinacms/pull/6200) [`bb1ad6a`](https://github.com/tinacms/tinacms/commit/bb1ad6a11d10976074453ed218b178935ec96fd3) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Media Manager - View more images on larger screens with a dynamic grid layout.
+
+- Updated dependencies [[`2e1535d`](https://github.com/tinacms/tinacms/commit/2e1535dd5495dc390902f2db6ef1f26afb072396), [`ed6025e`](https://github.com/tinacms/tinacms/commit/ed6025ee87ebe051957fc93e987ba8de8b003995)]:
+  - @tinacms/mdx@2.0.0
+  - @tinacms/schema-tools@2.0.0
+  - @tinacms/search@1.1.4
+
+## 2.10.1
+
+### Patch Changes
+
+- [#6187](https://github.com/tinacms/tinacms/pull/6187) [`a76fdb6`](https://github.com/tinacms/tinacms/commit/a76fdb639b94cfefa169ebbd184f55d62e4a8a76) Thanks [@18-th](https://github.com/18-th)! - Updated yup to v1 to remove transitive lodash dependency
+
+- [#6184](https://github.com/tinacms/tinacms/pull/6184) [`dd2089d`](https://github.com/tinacms/tinacms/commit/dd2089dbde4a7b1a0116cce096f50a97fdca9d81) Thanks [@Pat-Stuart](https://github.com/Pat-Stuart)! - Adjust styling on markdown dropdown toolbar items
+
+- Updated dependencies [[`a76fdb6`](https://github.com/tinacms/tinacms/commit/a76fdb639b94cfefa169ebbd184f55d62e4a8a76), [`a736baf`](https://github.com/tinacms/tinacms/commit/a736bafe1b20bc1465f8e4a4c0c2281f40dcbf2f)]:
+  - @tinacms/schema-tools@1.10.1
+  - @tinacms/search@1.1.3
+  - @tinacms/mdx@1.8.3
+
 ## 2.10.0
 
 ### Minor Changes

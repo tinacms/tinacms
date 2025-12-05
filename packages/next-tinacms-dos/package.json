@@ -1,8 +1,8 @@
 {
 	"name": "next-tinacms-dos",
-	"version": "13.0.0",
+	"version": "14.0.1",
 	"main": "dist/index.js",
-	"module": "dist/index.mjs",
+	"module": "./dist/index.js",
 	"files": [
 		"dist"
 	],

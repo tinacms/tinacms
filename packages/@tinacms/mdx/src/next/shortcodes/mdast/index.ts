@@ -475,7 +475,8 @@ export const mdxJsxToMarkdown = function (
   }
 ) {
   const patterns = options.patterns || [];
-  const options_ = options || {};
+  // TODO: should this be set to an empty object?
+  const options_ = options || ({} as typeof options);
   const quote = options_.quote || '"';
   const quoteSmart = options_.quoteSmart || false;
   const tightSelfClosing = options_.tightSelfClosing || false;

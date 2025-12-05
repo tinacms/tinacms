@@ -1,6 +1,7 @@
 {
 	"name": "@examples/self-hosted-starter",
 	"version": "0.1.83",
+	"type": "module",
 	"private": true,
 	"scripts": {
 		"dev": "TINA_PUBLIC_IS_LOCAL=true tinacms dev -c \"next dev\"",

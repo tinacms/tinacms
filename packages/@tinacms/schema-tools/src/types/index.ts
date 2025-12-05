@@ -152,6 +152,26 @@ export type UIField<Type, List extends boolean> = {
    * @deprecated use `defaultItem` at the collection level instead
    */
   defaultValue?: List extends true ? Type[] : Type;
+  /**
+   * The color format for the color picker component.
+   * Can be 'hex' or 'rgb'.
+   */
+  colorFormat?: 'hex' | 'rgb';
+  /**
+   * The widget style for the color picker component.
+   * Can be 'sketch' or 'block'.
+   */
+  widget?: 'sketch' | 'block';
+  /**
+   * The width of the color picker component.
+   * Accepts CSS width values (e.g., '350px').
+   */
+  width?: string;
+  /**
+   * Preset colors for the color picker component.
+   * An array of color strings (e.g., ['#D0021B', '#F5A623']).
+   */
+  colors?: string[];
 };
 
 type FieldGeneric<
@@ -231,8 +251,8 @@ type DateFormatProps = {
    * dateFormat: 'YYYY MM DD'
    * ```
    */
-  dateFormat?: string;
-  timeFormat?: string;
+  dateFormat?: string | boolean;
+  timeFormat?: string | boolean;
 };
 export type DateTimeField = (
   | FieldGeneric<string, undefined, DateFormatProps>
@@ -931,6 +951,7 @@ export interface UICollection<Form = any, CMS = any, TinaForm = any> {
   allowedActions?: {
     create?: boolean;
     delete?: boolean;
+    createFolder?: boolean;
     createNestedFolder?: boolean;
   };
   /**

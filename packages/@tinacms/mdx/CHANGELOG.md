@@ -1,5 +1,23 @@
 # @tinacms/mdx
 
+## 2.0.0
+
+### Major Changes
+
+- [#5982](https://github.com/tinacms/tinacms/pull/5982) [`2e1535d`](https://github.com/tinacms/tinacms/commit/2e1535dd5495dc390902f2db6ef1f26afb072396) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: migrate from commonjs to esm
+
+### Patch Changes
+
+- Updated dependencies [[`2e1535d`](https://github.com/tinacms/tinacms/commit/2e1535dd5495dc390902f2db6ef1f26afb072396), [`ed6025e`](https://github.com/tinacms/tinacms/commit/ed6025ee87ebe051957fc93e987ba8de8b003995)]:
+  - @tinacms/schema-tools@2.0.0
+
+## 1.8.3
+
+### Patch Changes
+
+- Updated dependencies [[`a76fdb6`](https://github.com/tinacms/tinacms/commit/a76fdb639b94cfefa169ebbd184f55d62e4a8a76), [`a736baf`](https://github.com/tinacms/tinacms/commit/a736bafe1b20bc1465f8e4a4c0c2281f40dcbf2f)]:
+  - @tinacms/schema-tools@1.10.1
+
 ## 1.8.2
 
 ### Patch Changes
