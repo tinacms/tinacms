@@ -3,6 +3,7 @@ import { FieldProps } from './field-props';
 import { useEvent } from '@toolkit/react-core/use-cms-event';
 import { FieldHoverEvent, FieldFocusEvent } from '@toolkit/fields/field-events';
 import { Form } from '@toolkit/forms';
+import { useCMS } from '@toolkit/react-core';
 
 export type InputFieldType<ExtraFieldProps, InputProps> =
   FieldProps<InputProps> & ExtraFieldProps;
@@ -23,6 +24,8 @@ export function wrapFieldsWithMeta<ExtraFieldProps = {}, InputProps = {}>(
         error={props.meta.error}
         index={props.index}
         tinaForm={props.tinaForm}
+        focusIntent={props.field.experimental_focusIntent}
+        hoverIntent={props.field.hoverIntent}
       >
         <Field {...props} />
       </FieldMeta>
@@ -47,6 +50,8 @@ export function wrapFieldWithNoHeader<ExtraFieldProps = {}, InputProps = {}>(
         error={props.meta.error}
         index={props.index}
         tinaForm={props.tinaForm}
+        focusIntent={props.field.experimental_focusIntent}
+        hoverIntent={props.field.hoverIntent}
       >
         <Field {...props} />
       </FieldMeta>
@@ -72,6 +77,8 @@ export function wrapFieldWithError<ExtraFieldProps = {}, InputProps = {}>(
         error={props.meta.error}
         index={props.index}
         tinaForm={props.tinaForm}
+        focusIntent={props.field.experimental_focusIntent}
+        hoverIntent={props.field.hoverIntent}
       >
         <Field {...props} />
       </FieldMeta>
@@ -88,6 +95,8 @@ interface FieldMetaProps extends React.HTMLAttributes<HTMLElement> {
   margin?: boolean;
   index?: number;
   tinaForm: Form;
+  focusIntent?: boolean;
+  hoverIntent?: boolean;
 }
 
 export const FieldMeta = ({
@@ -99,19 +108,48 @@ export const FieldMeta = ({
   children,
   index,
   tinaForm,
+  focusIntent,
+  hoverIntent,
   ...props
 }: FieldMetaProps) => {
+  const cms = useCMS();
   const { dispatch: setHoveredField } =
     useEvent<FieldHoverEvent>('field:hover');
   const { dispatch: setFocusedField } =
     useEvent<FieldFocusEvent>('field:focus');
+
+  const isActive = !!focusIntent;
+  const isHovering = !!hoverIntent;
+
+  const handleClick = () => {
+    // Check if this field is already active - if so, don't toggle it off
+    const existingForm = cms.state.forms.find(
+      (form: any) => form.tinaForm.id === tinaForm.id
+    );
+    const isAlreadyActive = existingForm?.activeFieldName === name;
+
+    if (isAlreadyActive) {
+      return; // Don't toggle off when clicking an already-active field
+    }
+    console.log({ id: tinaForm.id, fieldName: name });
+    // Dispatch the field:focus event for iframe communication
+    setFocusedField({ id: tinaForm.id, fieldName: name });
+    // Also set the active field in Redux state for sidebar highlighting
+    cms.dispatch({
+      type: 'forms:set-active-field-name',
+      value: { formId: tinaForm.id, fieldName: name },
+    });
+  };
+
   return (
     <FieldWrapper
       margin={margin}
       onMouseOver={() => setHoveredField({ id: tinaForm.id, fieldName: name })}
       onMouseOut={() => setHoveredField({ id: null, fieldName: null })}
-      onClick={() => setFocusedField({ id: tinaForm.id, fieldName: name })}
+      onClick={handleClick}
       style={{ zIndex: index ? 1000 - index : undefined }}
+      data-tina-field-active={isActive ? 'true' : undefined}
+      data-tina-field-hovering={isHovering ? 'true' : undefined}
       {...props}
     >
       {(label !== false || description) && (
@@ -134,13 +172,31 @@ export const FieldMeta = ({
 export const FieldWrapper = ({
   margin,
   children,
-  ...props
+  'data-tina-field-active': dataActive,
+  'data-tina-field-hovering': dataHovering,
+  ...restProps
 }: {
   margin: boolean;
   children: React.ReactNode;
+  'data-tina-field-active'?: string;
+  'data-tina-field-hovering'?: string;
 } & Partial<React.ComponentPropsWithoutRef<'div'>>) => {
+  const isActive = dataActive === 'true';
+  const isHovering = dataHovering === 'true';
+
   return (
-    <div className={`relative ${margin ? `mb-5 last:mb-0` : ``}`} {...props}>
+    <div
+      className={`relative ${margin ? `mb-5 last:mb-0` : ``} ${
+        isHovering && !isActive
+          ? '[&_input]:!border-blue-500 [&_input]:!ring-2 [&_input]:!ring-blue-500/20 [&_textarea]:!border-blue-500 [&_textarea]:!ring-2 [&_textarea]:!ring-blue-500/20 [&_select]:!border-blue-500 [&_select]:!ring-2 [&_select]:!ring-blue-500/20 [&_.ProseMirror]:!border-blue-500 [&_.ProseMirror]:!ring-2 [&_.ProseMirror]:!ring-blue-500/20'
+          : isActive
+            ? '[&_input]:!border-tina-orange-dark [&_input]:!ring-2 [&_input]:!ring-tina-orange-dark/20 [&_textarea]:!border-tina-orange-dark [&_textarea]:!ring-2 [&_textarea]:!ring-tina-orange-dark/20 [&_select]:!border-tina-orange-dark [&_select]:!ring-2 [&_select]:!ring-tina-orange-dark/20 [&_.ProseMirror]:!border-tina-orange-dark [&_.ProseMirror]:!ring-2 [&_.ProseMirror]:!ring-tina-orange-dark/20'
+            : ''
+      }`}
+      data-tina-field-active={dataActive}
+      data-tina-field-hovering={dataHovering}
+      {...restProps}
+    >
       {children}
     </div>
   );

@@ -526,15 +526,45 @@ export const useGraphQLReducer = (
         const [queryId, eventFieldName] = event.data.fieldName.split('---');
         const result = results.find((res) => res.id === queryId);
         if (result?.data) {
+          const { formId, fieldName } = getFormAndFieldNameFromMetadata(
+            result.data,
+            eventFieldName
+          );
           cms.dispatch({
             type: 'forms:set-active-field-name',
-            value: getFormAndFieldNameFromMetadata(result.data, eventFieldName),
+            value: { formId: formId, fieldName: fieldName },
+          });
+          cms.events.dispatch({
+            ...event.data,
+            type: 'field:focus',
           });
         }
         cms.dispatch({
           type: 'sidebar:set-display-state',
           value: 'openOrFull',
         });
+      }
+      if (event.data.type === 'field:hovered') {
+        if (event.data.fieldName) {
+          const [queryId, eventFieldName] = event.data.fieldName.split('---');
+          const result = results.find((res) => res.id === queryId);
+          if (result?.data) {
+            const fieldData = getFormAndFieldNameFromMetadata(
+              result.data,
+              eventFieldName
+            );
+            cms.dispatch({
+              type: 'forms:set-hovered-field-name',
+              value: fieldData,
+            });
+          }
+        } else {
+          // Clear hover state when fieldName is null
+          cms.dispatch({
+            type: 'forms:set-hovered-field-name',
+            value: { formId: null, fieldName: null },
+          });
+        }
       }
       if (event.data.type === 'close') {
         const payloadSchema = z.object({ id: z.string() });
@@ -597,6 +627,44 @@ export const useGraphQLReducer = (
       value: cms.state.sidebarDisplayState === 'open',
     });
   }, [cms.state.sidebarDisplayState]);
+
+  // Watch Redux state changes and sync active field with iframe
+  React.useEffect(() => {
+    const activeForm = cms.state.forms.find(
+      (form: any) => form.tinaForm.id === cms.state.activeFormId
+    );
+
+    if (!activeForm) {
+      iframe.current?.contentWindow?.postMessage({
+        type: 'field:set-focused',
+        fieldName: null,
+      });
+      return;
+    }
+
+    const activeFieldName = activeForm.activeFieldName;
+
+    // If fieldName is null, send clear message to iframe
+    if (activeFieldName === null) {
+      iframe.current?.contentWindow?.postMessage({
+        type: 'field:set-focused',
+        fieldName: null,
+      });
+      return;
+    }
+    console.log(activeForm);
+    // Get the queryId from the form's queries array (forms track which queries created them)
+    const queries = activeForm.tinaForm.queries;
+    console.log(queries);
+    if (queries && queries.length > 0) {
+      // Use the last query ID (most recent)
+      const queryId = queries[queries.length - 1];
+      iframe.current?.contentWindow?.postMessage({
+        type: 'field:set-focused',
+        fieldName: `${queryId}---${activeFieldName}`,
+      });
+    }
+  }, [cms.state.forms, cms.state.activeFormId]);
 
   React.useEffect(() => {
     cms.dispatch({ type: 'set-edit-mode', value: 'visual' });

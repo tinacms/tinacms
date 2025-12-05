@@ -10,7 +10,10 @@ import { SidebarProvider, SidebarPosition } from '@toolkit/react-sidebar';
 import { useCMS } from '../react-tinacms/use-cms';
 import { Alerts } from '@toolkit/react-alerts';
 import { MediaManager } from './media';
-import { ActiveFieldIndicator } from './active-field-indicator';
+import {
+  ActiveFieldIndicator,
+  HoveredFieldIndicator,
+} from './active-field-indicator';
 import { MutationSignalProvider } from './mutation-signal';
 
 export interface TinaUIProps {
@@ -37,6 +40,7 @@ export const TinaUI: React.FC<TinaUIProps> = ({ children, position }) => {
           />
         )}
         <ActiveFieldIndicator />
+        <HoveredFieldIndicator />
         {/* Dragging across the iframe causes mouse events to stop propagating so there's a laggy feeling without this */}
         <div className={`${resizingSidebar ? 'pointer-events-none' : ''}`}>
           {children}

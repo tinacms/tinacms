@@ -175,7 +175,7 @@ export const tinaTailwind = (
             },
             boxShadow: {
               xs: '0 0 0 1px rgba(0, 0, 0, 0.05)',
-              outline: '0 0 0 3px rgba(66, 153, 225, 0.5)',
+              outline: '0 0 0 3px rgba(194, 65, 12, 0.2)',
             },
             colors: {
               blue: {
@@ -232,7 +232,7 @@ export const tinaTailwind = (
               'accent-foreground': '#171717',
               destructive: '#FF3B3B',
               'destructive-foreground': '#FAFAFA',
-              ring: '#0A0A0A',
+              ring: '#C2410C',
             },
             fontFamily: {
               sans: ['Inter', ...defaultTheme.fontFamily.sans],
