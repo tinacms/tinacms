@@ -464,7 +464,6 @@ export class ConfigManager {
       format: 'esm',
       outfile: outfile2,
       loader: loaders,
-      banner: esmRequireBanner,
     });
     let result: { default: any };
     try {
