@@ -213,7 +213,6 @@ catalog:
     remark-gfm: ^2.0.0
     remark-mdx: 2.3.0
     remove: ^0.1.5
-    scmp: ^2.1.0
     search-index: 4.0.0
     sharp: ^0.33.5
     sqlite-level: ^1.2.1
