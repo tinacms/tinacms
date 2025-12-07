@@ -88,7 +88,7 @@ export const generateAllTemplates = async ({
       });
       templateMap.set(tem, { fields, templateObj });
     } catch (e) {
-      logger.warn(`Error parsing template frontmatter template', tem + '.yml'`);
+      logger.warn(`Error parsing template frontmatter template, ${tem}.yml`);
       console.error(e);
       templateMap.set(tem, { fields: [], templateObj: {} });
     }
