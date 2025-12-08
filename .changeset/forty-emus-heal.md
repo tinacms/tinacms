@@ -1,5 +1,6 @@
 ---
+"create-tina-app": patch
 "tinacms": patch
 ---
 
-fix: Fix mdx component types 
+fix: attempt to fix types
