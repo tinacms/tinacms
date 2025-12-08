@@ -256,18 +256,8 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         );
 
         if (existingForm?.activeFieldName === action.value.fieldName) {
-          const clearedForms = state.forms.map((form) => {
-            if (form.tinaForm.id === action.value.formId) {
-              return form;
-            }
-            return form;
-          });
-
-          return {
-            ...state,
-            breadcrumbs: [],
-            forms: clearedForms,
-          };
+          // Clicking on the same field - don't change state
+          return state;
         }
       }
 
@@ -311,14 +301,21 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
               };
             }
 
-            // Don't allow hover if the hovered field is not a child of the active field
-            // Check if hoveredFieldName starts with activeFieldName followed by a dot
+            // Check if hoveredFieldName is a child of activeFieldName
             const isChildOfActive = hoveredFieldName.startsWith(
               activeFieldName + '.'
             );
 
-            if (!isChildOfActive) {
-              // Not a child field, don't update hover
+            // Check if hoveredFieldName is a sibling of activeFieldName
+            const activePathParts = activeFieldName.split('.');
+            const hoveredPathParts = hoveredFieldName.split('.');
+            const isSibling =
+              activePathParts.length === hoveredPathParts.length &&
+              activePathParts.slice(0, -1).join('.') ===
+                hoveredPathParts.slice(0, -1).join('.');
+
+            if (!isChildOfActive && !isSibling) {
+              // Not a child or sibling field - don't update hover
               return {
                 ...form,
                 hoveringFieldName: null,
