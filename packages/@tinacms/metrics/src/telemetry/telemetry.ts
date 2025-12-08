@@ -4,7 +4,6 @@
 
 import { BinaryLike, createHash } from 'crypto';
 import { getID } from './getId';
-import fetch from 'isomorphic-fetch';
 import {
   getTinaVersion,
   getTinaCliVersion,

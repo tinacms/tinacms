@@ -1,115 +1,113 @@
 {
-	"name": "@tinacms/cli",
-	"type": "module",
-	"version": "2.0.0",
-	"main": "dist/index.js",
-	"typings": "dist/index.d.ts",
-	"files": [
-		"dist",
-		"bin/*",
-		".env"
-	],
-	"license": "Apache-2.0",
-	"bin": {
-		"tinacms": "bin/tinacms"
-	},
-	"buildConfig": {
-		"entryPoints": [
-			{
-				"name": "src/index.ts",
-				"target": "node"
-			}
-		]
-	},
-	"peerDependencies": {
-		"react": ">=18.3.1 <20.0.0",
-		"react-dom": ">=18.3.1 <20.0.0"
-	},
-	"devDependencies": {
-		"@tinacms/scripts": "workspace:*",
-		"@types/clear": "catalog:",
-		"@types/cli-spinner": "catalog:",
-		"@types/cors": "2.8.5",
-		"@types/crypto-js": "^4.2.2",
-		"@types/express": "catalog:",
-		"@types/figlet": "catalog:",
-		"@types/fs-extra": "^11.0.4",
-		"@types/jest": "26.0.4",
-		"@types/js-yaml": "^4.0.9",
-		"@types/listr": "catalog:",
-		"@types/log4js": "catalog:",
-		"@types/multer": "catalog:",
-		"@types/node": "^22.13.1",
-		"@types/progress": "catalog:",
-		"@types/prompts": "catalog:",
-		"jest": "catalog:"
-	},
-	"scripts": {
-		"build": "tinacms-scripts build",
-		"test": "jest --passWithNoTests",
-		"types": "pnpm tsc",
-		"test-watch": "jest  --passWithNoTests --watch",
-		"tinacms": "MONOREPO_DEV=true node ./bin/tinacms",
-		"generate:schema": "pnpm node scripts/generateSchema.js"
-	},
-	"dependencies": {
-		"@graphql-codegen/core": "catalog:",
-		"@graphql-codegen/plugin-helpers": "latest",
-		"@graphql-codegen/typescript": "catalog:",
-		"@graphql-codegen/typescript-operations": "catalog:",
-		"@graphql-codegen/visitor-plugin-common": "catalog:",
-		"@graphql-inspector/core": "^4.2.2",
-		"@graphql-tools/graphql-file-loader": "catalog:",
-		"@graphql-tools/load": "catalog:",
-		"@rollup/pluginutils": "catalog:",
-		"@svgr/core": "catalog:",
-		"@tailwindcss/aspect-ratio": "catalog:",
-		"@tailwindcss/container-queries": "catalog:",
-		"@tailwindcss/typography": "catalog:",
-		"@tinacms/app": "workspace:*",
-		"@tinacms/graphql": "workspace:*",
-		"@tinacms/metrics": "workspace:*",
-		"@tinacms/schema-tools": "workspace:*",
-		"@tinacms/search": "workspace:*",
-		"@vitejs/plugin-react": "catalog:",
-		"altair-express-middleware": "catalog:",
-		"async-lock": "catalog:",
-		"auto-bind": "catalog:",
-		"body-parser": "catalog:",
-		"busboy": "catalog:",
-		"chalk": "^2.4.2",
-		"chokidar": "catalog:",
-		"cli-spinner": "catalog:",
-		"clipanion": "catalog:",
-		"cors": "catalog:",
-		"crypto-js": "catalog:",
-		"dotenv": "catalog:",
-		"esbuild": "catalog:",
-		"fs-extra": "catalog:",
-		"graphql": "15.8.0",
-		"js-yaml": "^4.1.0",
-		"log4js": "catalog:",
-		"many-level": "catalog:",
-		"memory-level": "catalog:",
-		"minimatch": "catalog:",
-		"normalize-path": "catalog:",
-		"prettier": "catalog:",
-		"progress": "catalog:",
-		"prompts": "catalog:",
-		"readable-stream": "catalog:",
-		"tailwindcss": "^3.4.17",
-		"tinacms": "workspace:*",
-		"typanion": "catalog:",
-		"typescript": "^5.7.3",
-		"vite": "^4.5.9",
-		"yup": "^1.6.1",
-		"zod": "catalog:"
-	},
-	"publishConfig": {
-		"registry": "https://registry.npmjs.org"
-	},
-	"repository": {
-		"url": "https://github.com/tinacms/tinacms.git",
-		"directory": "packages/@tinacms/cli"
-	}
+    "name": "@tinacms/cli",
+    "type": "module",
+    "version": "2.0.1",
+    "main": "dist/index.js",
+    "typings": "dist/index.d.ts",
+    "files": [
+        "dist",
+        "bin/*",
+        ".env"
+    ],
+    "license": "Apache-2.0",
+    "bin": {
+        "tinacms": "bin/tinacms"
+    },
+    "buildConfig": {
+        "entryPoints": [
+            {
+                "name": "src/index.ts",
+                "target": "node"
+            }
+        ]
+    },
+    "peerDependencies": {
+        "react": ">=18.3.1 <20.0.0",
+        "react-dom": ">=18.3.1 <20.0.0"
+    },
+    "devDependencies": {
+        "@tinacms/scripts": "workspace:*",
+        "@types/clear": "catalog:",
+        "@types/cli-spinner": "catalog:",
+        "@types/cors": "2.8.5",
+        "@types/crypto-js": "^4.2.2",
+        "@types/express": "catalog:",
+        "@types/figlet": "catalog:",
+        "@types/fs-extra": "^11.0.4",
+        "@types/jest": "26.0.4",
+        "@types/js-yaml": "^4.0.9",
+        "@types/listr": "catalog:",
+        "@types/multer": "catalog:",
+        "@types/node": "^22.13.1",
+        "@types/progress": "catalog:",
+        "@types/prompts": "catalog:",
+        "jest": "catalog:"
+    },
+    "scripts": {
+        "build": "tinacms-scripts build",
+        "test": "jest --passWithNoTests",
+        "types": "pnpm tsc",
+        "test-watch": "jest  --passWithNoTests --watch",
+        "tinacms": "MONOREPO_DEV=true node ./bin/tinacms",
+        "generate:schema": "pnpm node scripts/generateSchema.js"
+    },
+    "dependencies": {
+        "@graphql-codegen/core": "catalog:",
+        "@graphql-codegen/plugin-helpers": "latest",
+        "@graphql-codegen/typescript": "catalog:",
+        "@graphql-codegen/typescript-operations": "catalog:",
+        "@graphql-codegen/visitor-plugin-common": "catalog:",
+        "@graphql-inspector/core": "^4.2.2",
+        "@graphql-tools/graphql-file-loader": "catalog:",
+        "@graphql-tools/load": "catalog:",
+        "@rollup/pluginutils": "catalog:",
+        "@svgr/core": "catalog:",
+        "@tailwindcss/aspect-ratio": "catalog:",
+        "@tailwindcss/container-queries": "catalog:",
+        "@tailwindcss/typography": "catalog:",
+        "@tinacms/app": "workspace:*",
+        "@tinacms/graphql": "workspace:*",
+        "@tinacms/metrics": "workspace:*",
+        "@tinacms/schema-tools": "workspace:*",
+        "@tinacms/search": "workspace:*",
+        "@vitejs/plugin-react": "catalog:",
+        "altair-express-middleware": "catalog:",
+        "async-lock": "catalog:",
+        "auto-bind": "catalog:",
+        "body-parser": "catalog:",
+        "busboy": "catalog:",
+        "chalk": "catalog:",
+        "chokidar": "catalog:",
+        "cli-spinner": "catalog:",
+        "clipanion": "catalog:",
+        "cors": "catalog:",
+        "crypto-js": "catalog:",
+        "dotenv": "catalog:",
+        "esbuild": "catalog:",
+        "fs-extra": "catalog:",
+        "graphql": "15.8.0",
+        "js-yaml": "^4.1.0",
+        "many-level": "catalog:",
+        "memory-level": "catalog:",
+        "minimatch": "catalog:",
+        "normalize-path": "catalog:",
+        "prettier": "catalog:",
+        "progress": "catalog:",
+        "prompts": "catalog:",
+        "readable-stream": "catalog:",
+        "tailwindcss": "^3.4.17",
+        "tinacms": "workspace:*",
+        "typanion": "catalog:",
+        "typescript": "^5.7.3",
+        "vite": "^4.5.9",
+        "yup": "^1.6.1",
+        "zod": "catalog:"
+    },
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org"
+    },
+    "repository": {
+        "url": "https://github.com/tinacms/tinacms.git",
+        "directory": "packages/@tinacms/cli"
+    }
 }

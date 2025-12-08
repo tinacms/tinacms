@@ -1,5 +1,17 @@
 # tinacms
 
+## 3.0.1
+
+### Patch Changes
+
+- [#6182](https://github.com/tinacms/tinacms/pull/6182) [`50fa9f4`](https://github.com/tinacms/tinacms/commit/50fa9f4bf932a3dc45b88d245e35917efe8d3423) Thanks [@Pat-Stuart](https://github.com/Pat-Stuart)! - UI fix for menu icon in admin panel
+
+- [#6206](https://github.com/tinacms/tinacms/pull/6206) [`428ec7e`](https://github.com/tinacms/tinacms/commit/428ec7eca20603e2cb666d562fd4cc16dda4cbed) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Redirect to collection page after creating content on protected branch
+
+- [#6209](https://github.com/tinacms/tinacms/pull/6209) [`6946476`](https://github.com/tinacms/tinacms/commit/69464767d339a5df3c6c530ece94ef80049e534f) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - media manager - remove directory dupicate name bar
+
+- [#6152](https://github.com/tinacms/tinacms/pull/6152) [`f99bbbc`](https://github.com/tinacms/tinacms/commit/f99bbbc221eead8d714b3791348d415dd8fcd063) Thanks [@kulesy](https://github.com/kulesy)! - Style Alert component with black text and thicker border
+
 ## 3.0.0
 
 ### Major Changes
