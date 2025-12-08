@@ -2,6 +2,17 @@ import { useFloatingToolbarState } from '@udecode/plate-floating';
 import { useEditorSelector, useOnClickOutside } from '@udecode/plate/react';
 import React from 'react';
 
+type UseOnClickOutsideReturn = ReturnType<typeof useOnClickOutside>;
+
+type FloatingToolbarHookReturn = {
+  clickOutsideRef: UseOnClickOutsideReturn;
+  hidden: boolean;
+  props: {
+    style: React.CSSProperties;
+  };
+  ref: (node: HTMLElement | null) => void;
+};
+
 export const useCustomFloatingToolbar = ({
   editorId,
   floating,
@@ -17,7 +28,7 @@ export const useCustomFloatingToolbar = ({
   setWaitForCollapsedSelection,
   showWhenReadOnly,
   waitForCollapsedSelection,
-}: ReturnType<typeof useFloatingToolbarState>) => {
+}: ReturnType<typeof useFloatingToolbarState>): FloatingToolbarHookReturn => {
   // On refocus, the editor keeps the previous selection,
   // so we need to wait it's collapsed at the new position before displaying the floating toolbar.
   React.useEffect(() => {

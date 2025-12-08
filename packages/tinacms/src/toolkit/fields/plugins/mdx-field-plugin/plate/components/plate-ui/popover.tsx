@@ -2,14 +2,17 @@
 import * as React from 'react';
 
 import * as PopoverPrimitive from '@radix-ui/react-popover';
-import { cn, withRef } from '@udecode/cn';
+import { cn } from '@udecode/cn';
 import { type VariantProps, cva } from 'class-variance-authority';
 
-export const Popover = PopoverPrimitive.Root;
+export const Popover: React.FC<PopoverPrimitive.PopoverProps> =
+  PopoverPrimitive.Root;
 
-export const PopoverTrigger = PopoverPrimitive.Trigger;
+export const PopoverTrigger: React.FC<PopoverPrimitive.PopoverTriggerProps> =
+  PopoverPrimitive.Trigger;
 
-export const PopoverAnchor = PopoverPrimitive.Anchor;
+export const PopoverAnchor: React.FC<PopoverPrimitive.PopoverAnchorProps> =
+  PopoverPrimitive.Anchor;
 
 export const popoverVariants = cva(
   'z-50 w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-hidden print:hidden',
@@ -25,17 +28,25 @@ export const popoverVariants = cva(
   }
 );
 
-export const PopoverContent = withRef<
-  typeof PopoverPrimitive.Content,
-  VariantProps<typeof popoverVariants>
->(({ align = 'center', animate, className, sideOffset = 4, ...props }, ref) => (
-  <PopoverPrimitive.Portal>
-    <PopoverPrimitive.Content
-      ref={ref}
-      className={cn(popoverVariants({ animate }), className)}
-      align={align}
-      sideOffset={sideOffset}
-      {...props}
-    />
-  </PopoverPrimitive.Portal>
-));
+type PopoverContentProps = React.ComponentPropsWithoutRef<
+  typeof PopoverPrimitive.Content
+> &
+  VariantProps<typeof popoverVariants>;
+
+export const PopoverContent: React.ForwardRefExoticComponent<
+  PopoverContentProps & React.RefAttributes<HTMLDivElement>
+> = React.forwardRef<HTMLDivElement, PopoverContentProps>(
+  ({ align = 'center', animate, className, sideOffset = 4, ...props }, ref) => (
+    <PopoverPrimitive.Portal>
+      <PopoverPrimitive.Content
+        ref={ref}
+        className={cn(popoverVariants({ animate }), className)}
+        align={align}
+        sideOffset={sideOffset}
+        {...props}
+      />
+    </PopoverPrimitive.Portal>
+  )
+);
+
+PopoverContent.displayName = 'PopoverContent';

@@ -2,33 +2,38 @@
 
 import React from 'react';
 
-import { cn, withRef } from '@udecode/cn';
+import { cn } from '@udecode/cn';
 import { useDropLine } from '@udecode/plate-dnd';
 import {
   PlateElement,
   useEditorRef,
   useElement,
   useSelected,
+  type PlateElementProps,
 } from '@udecode/plate/react';
 import { GripVertical } from 'lucide-react';
 import { Button } from '../button';
 
-export const TableRowElement = withRef<typeof PlateElement>(
-  ({ children, className, ...props }, ref) => {
-    const selected = useSelected();
+export const TableRowElement: React.FC<PlateElementProps> = React.forwardRef<
+  HTMLTableRowElement,
+  PlateElementProps
+>(({ children, className, ...props }, ref) => {
+  const selected = useSelected();
 
-    return (
-      <PlateElement
-        as='tr'
-        className={cn(className, 'group/row')}
-        data-selected={selected ? 'true' : undefined}
-        {...props}
-      >
-        {children}
-      </PlateElement>
-    );
-  }
-);
+  return (
+    <PlateElement
+      as='tr'
+      className={cn(className, 'group/row')}
+      data-selected={selected ? 'true' : undefined}
+      ref={ref}
+      {...props}
+    >
+      {children}
+    </PlateElement>
+  );
+});
+
+TableRowElement.displayName = 'TableRowElement';
 
 function RowDragHandle({ dragRef }: { dragRef: React.Ref<any> }) {
   const editor = useEditorRef();

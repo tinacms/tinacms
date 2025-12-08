@@ -1,7 +1,10 @@
 import React, { type ComponentType, type SVGProps } from 'react';
 
-import { withRef } from '@udecode/cn';
-import { type PlateEditor, PlateElement } from '@udecode/plate/react';
+import {
+  type PlateEditor,
+  PlateElement,
+  type PlateElementProps,
+} from '@udecode/plate/react';
 import { HEADING_KEYS } from '@udecode/plate-heading';
 
 import { Icons } from './icons';
@@ -66,41 +69,42 @@ const rules: SlashCommandRule[] = [
   },
 ];
 
-export const SlashInputElement = withRef<typeof PlateElement>(
-  ({ className, ...props }, ref) => {
-    const { children, editor, element } = props;
+export const SlashInputElement: React.FC<PlateElementProps> = React.forwardRef<
+  HTMLElement,
+  PlateElementProps
+>(({ className, ...props }, ref) => {
+  const { children, editor, element } = props;
 
-    return (
-      <PlateElement
-        as='span'
-        data-slate-value={element.value}
-        ref={ref}
-        {...props}
-      >
-        <InlineCombobox element={element} trigger='/'>
-          <InlineComboboxInput />
+  return (
+    <PlateElement
+      as='span'
+      data-slate-value={(element as any).value}
+      ref={ref}
+      {...props}
+    >
+      <InlineCombobox element={element} trigger='/'>
+        <InlineComboboxInput />
 
-          <InlineComboboxContent>
-            <InlineComboboxEmpty>
-              No matching commands found
-            </InlineComboboxEmpty>
+        <InlineComboboxContent>
+          <InlineComboboxEmpty>No matching commands found</InlineComboboxEmpty>
 
-            {rules.map(({ icon: Icon, keywords, onSelect, value }) => (
-              <InlineComboboxItem
-                key={value}
-                keywords={keywords}
-                onClick={() => onSelect(editor)}
-                value={value}
-              >
-                <Icon aria-hidden className='mr-2 size-4' />
-                {value}
-              </InlineComboboxItem>
-            ))}
-          </InlineComboboxContent>
-        </InlineCombobox>
+          {rules.map(({ icon: Icon, keywords, onSelect, value }) => (
+            <InlineComboboxItem
+              key={value}
+              keywords={keywords}
+              onClick={() => onSelect(editor)}
+              value={value}
+            >
+              <Icon aria-hidden className='mr-2 size-4' />
+              {value}
+            </InlineComboboxItem>
+          ))}
+        </InlineComboboxContent>
+      </InlineCombobox>
 
-        {children}
-      </PlateElement>
-    );
-  }
-);
+      {children}
+    </PlateElement>
+  );
+});
+
+SlashInputElement.displayName = 'SlashInputElement';

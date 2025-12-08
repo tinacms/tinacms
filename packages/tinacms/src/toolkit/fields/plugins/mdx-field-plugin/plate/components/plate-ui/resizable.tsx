@@ -2,12 +2,12 @@
 
 import React from 'react';
 
-import { cn, withRef, withVariants } from '@udecode/cn';
+import { cn, withVariants } from '@udecode/cn';
 import {
   Resizable as ResizablePrimitive,
   ResizeHandle as ResizeHandlePrimitive,
 } from '@udecode/plate-resizable';
-import { cva } from 'class-variance-authority';
+import { cva, type VariantProps } from 'class-variance-authority';
 
 export const mediaResizeHandleVariants = cva(
   cn(
@@ -35,21 +35,28 @@ const resizeHandleVariants = cva(cn('absolute z-40'), {
   },
 });
 
-const ResizeHandleVariants = withVariants(
+type ResizeHandleVariantsProps = React.ComponentPropsWithoutRef<
+  typeof ResizeHandlePrimitive
+> &
+  VariantProps<typeof resizeHandleVariants>;
+
+const ResizeHandleVariants: React.FC<ResizeHandleVariantsProps> = withVariants(
   ResizeHandlePrimitive,
   resizeHandleVariants,
   ['direction']
-);
+) as React.FC<ResizeHandleVariantsProps>;
 
-export const ResizeHandle = withRef<typeof ResizeHandlePrimitive>(
-  (props, ref) => (
-    <ResizeHandleVariants
-      direction={props.options?.direction}
-      ref={ref}
-      {...props}
-    />
-  )
-);
+type ResizeHandleProps = React.ComponentPropsWithoutRef<
+  typeof ResizeHandlePrimitive
+>;
+
+export const ResizeHandle: React.ForwardRefExoticComponent<
+  ResizeHandleProps & React.RefAttributes<HTMLDivElement>
+> = React.forwardRef<HTMLDivElement, ResizeHandleProps>((props, ref) => (
+  <ResizeHandleVariants direction={props.options?.direction} {...props} />
+));
+
+ResizeHandle.displayName = 'ResizeHandle';
 
 const resizableVariants = cva('', {
   variants: {
@@ -61,6 +68,13 @@ const resizableVariants = cva('', {
   },
 });
 
-export const Resizable = withVariants(ResizablePrimitive, resizableVariants, [
-  'align',
-]);
+type ResizableProps = React.ComponentPropsWithoutRef<
+  typeof ResizablePrimitive
+> &
+  VariantProps<typeof resizableVariants>;
+
+export const Resizable: React.FC<ResizableProps> = withVariants(
+  ResizablePrimitive,
+  resizableVariants,
+  ['align']
+) as React.FC<ResizableProps>;

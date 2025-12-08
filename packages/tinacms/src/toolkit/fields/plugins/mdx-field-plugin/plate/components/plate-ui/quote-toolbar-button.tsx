@@ -1,7 +1,5 @@
 import React from 'react';
 
-import { withRef } from '@udecode/cn';
-
 import { Icons } from './icons';
 
 import { ToolbarButton } from './toolbar';
@@ -20,14 +18,14 @@ const useBlockQuoteToolbarButtonState = () => {
   };
 };
 
-const useBlockQuoteToolbarButton = (state) => {
+const useBlockQuoteToolbarButton = (state: { pressed: boolean }) => {
   const editor = useEditorState();
 
   const onClick = () => {
     editor.tf.toggleBlock(BaseBlockquotePlugin.key);
   };
 
-  const onMouseDown = (e) => {
+  const onMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
   };
@@ -41,18 +39,25 @@ const useBlockQuoteToolbarButton = (state) => {
   };
 };
 
-export const QuoteToolbarButton = withRef<
-  typeof ToolbarButton,
-  {
-    clear?: string | string[];
-  }
->(({ clear, ...rest }, ref) => {
-  const state = useBlockQuoteToolbarButtonState();
-  const { props } = useBlockQuoteToolbarButton(state);
+type QuoteToolbarButtonProps = React.ComponentPropsWithoutRef<
+  typeof ToolbarButton
+> & {
+  clear?: string | string[];
+};
 
-  return (
-    <ToolbarButton ref={ref} tooltip='Quote (⌘+⇧+.)' {...rest} {...props}>
-      <Icons.quote />
-    </ToolbarButton>
-  );
-});
+export const QuoteToolbarButton: React.ForwardRefExoticComponent<
+  QuoteToolbarButtonProps & React.RefAttributes<HTMLButtonElement>
+> = React.forwardRef<HTMLButtonElement, QuoteToolbarButtonProps>(
+  ({ clear, ...rest }, ref) => {
+    const state = useBlockQuoteToolbarButtonState();
+    const { props } = useBlockQuoteToolbarButton(state);
+
+    return (
+      <ToolbarButton ref={ref} tooltip='Quote (⌘+⇧+.)' {...rest} {...props}>
+        <Icons.quote />
+      </ToolbarButton>
+    );
+  }
+);
+
+QuoteToolbarButton.displayName = 'QuoteToolbarButton';

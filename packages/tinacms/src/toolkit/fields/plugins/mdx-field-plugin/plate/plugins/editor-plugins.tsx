@@ -64,7 +64,7 @@ import {
 import { createHTMLBlockPlugin } from './create-html-block';
 
 // Define block types that support MDX embedding
-export const HANDLES_MDX = [
+export const HANDLES_MDX: string[] = [
   HEADING_KEYS.h1,
   HEADING_KEYS.h2,
   HEADING_KEYS.h3,

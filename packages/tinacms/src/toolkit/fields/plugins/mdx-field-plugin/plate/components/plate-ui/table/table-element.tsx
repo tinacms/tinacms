@@ -5,7 +5,7 @@ import React, { useCallback, useState } from 'react';
 import type * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 
 import { PopoverAnchor } from '@radix-ui/react-popover';
-import { cn, withRef } from '@udecode/cn';
+import { cn } from '@udecode/cn';
 import { BlockSelectionPlugin } from '@udecode/plate-selection/react';
 import { type TTableElement, setCellBackground } from '@udecode/plate-table';
 import {
@@ -26,6 +26,7 @@ import {
   useRemoveNodeButton,
   useSelected,
   withHOC,
+  type PlateElementProps,
 } from '@udecode/plate/react';
 import {
   ArrowDown,
@@ -53,56 +54,65 @@ import {
 import { Popover, PopoverContent } from '../popover';
 import { Toolbar, ToolbarButton, ToolbarGroup } from '../toolbar';
 
-export const TableElement = withHOC(
+const TableElementInner: React.FC<PlateElementProps> = React.forwardRef<
+  HTMLTableElement,
+  PlateElementProps
+>(({ children, className, ...props }, ref) => {
+  const readOnly = useReadOnly();
+  const isSelectionAreaVisible = usePluginOption(
+    BlockSelectionPlugin,
+    'isSelectionAreaVisible'
+  );
+  const hasControls = !readOnly && !isSelectionAreaVisible;
+  const selected = useSelected();
+  const { isSelectingCell, marginLeft, props: tableProps } = useTableElement();
+
+  const content = (
+    <PlateElement
+      ref={ref}
+      className={cn(
+        className,
+        'overflow-x-auto py-2',
+        hasControls && '*:data-[slot=block-selection]:left-2'
+      )}
+      style={{ paddingLeft: marginLeft }}
+      {...props}
+    >
+      <div className='group/table relative w-fit'>
+        <table
+          className={cn(
+            'mr-0 table h-px border-collapse border border-gray-200 not-tina-prose my-2',
+            isSelectingCell && 'selection:bg-transparent'
+          )}
+          {...tableProps}
+        >
+          <tbody className='min-w-full'>{children}</tbody>
+        </table>
+      </div>
+    </PlateElement>
+  );
+
+  if (readOnly || !selected) {
+    return content;
+  }
+
+  return <TableFloatingToolbar>{content}</TableFloatingToolbar>;
+});
+
+TableElementInner.displayName = 'TableElementInner';
+
+export const TableElement: React.FC<PlateElementProps> = withHOC(
   TableProvider,
-  withRef<typeof PlateElement>(({ children, className, ...props }, ref) => {
-    const readOnly = useReadOnly();
-    const isSelectionAreaVisible = usePluginOption(
-      BlockSelectionPlugin,
-      'isSelectionAreaVisible'
-    );
-    const hasControls = !readOnly && !isSelectionAreaVisible;
-    const selected = useSelected();
-    const {
-      isSelectingCell,
-      marginLeft,
-      props: tableProps,
-    } = useTableElement();
+  TableElementInner
+) as React.FC<PlateElementProps>;
 
-    const content = (
-      <PlateElement
-        ref={ref}
-        className={cn(
-          className,
-          'overflow-x-auto py-2',
-          hasControls && '*:data-[slot=block-selection]:left-2'
-        )}
-        style={{ paddingLeft: marginLeft }}
-        {...props}
-      >
-        <div className='group/table relative w-fit'>
-          <table
-            className={cn(
-              'mr-0 table h-px border-collapse border border-gray-200 not-tina-prose my-2',
-              isSelectingCell && 'selection:bg-transparent'
-            )}
-            {...tableProps}
-          >
-            <tbody className='min-w-full'>{children}</tbody>
-          </table>
-        </div>
-      </PlateElement>
-    );
+type TableFloatingToolbarProps = {
+  children: React.ReactNode;
+};
 
-    if (readOnly || !selected) {
-      return content;
-    }
-
-    return <TableFloatingToolbar>{content}</TableFloatingToolbar>;
-  })
-);
-
-export const TableFloatingToolbar = withRef<typeof PopoverContent>(
+export const TableFloatingToolbar: React.ForwardRefExoticComponent<
+  TableFloatingToolbarProps & React.RefAttributes<HTMLDivElement>
+> = React.forwardRef<HTMLDivElement, TableFloatingToolbarProps>(
   ({ children, ...props }, ref) => {
     const { tf } = useEditorPlugin(TablePlugin);
     const element = useElement<TTableElement>();
@@ -242,77 +252,87 @@ export const TableFloatingToolbar = withRef<typeof PopoverContent>(
   }
 );
 
-export const TableBordersDropdownMenuContent = withRef<
+TableFloatingToolbar.displayName = 'TableFloatingToolbar';
+
+type TableBordersDropdownMenuContentProps = React.ComponentPropsWithoutRef<
   typeof DropdownMenuPrimitive.Content
->((props, ref) => {
-  const editor = useEditorRef();
-  const {
-    getOnSelectTableBorder,
-    hasBottomBorder,
-    hasLeftBorder,
-    hasNoBorders,
-    hasOuterBorders,
-    hasRightBorder,
-    hasTopBorder,
-  } = useTableBordersDropdownMenuContentState();
+>;
 
-  return (
-    <DropdownMenuContent
-      ref={ref}
-      className={cn('min-w-[220px]')}
-      onCloseAutoFocus={(e) => {
-        e.preventDefault();
-        editor.tf.focus();
-      }}
-      align='start'
-      side='right'
-      sideOffset={0}
-      {...props}
-    >
-      <DropdownMenuGroup>
-        <DropdownMenuCheckboxItem
-          checked={hasTopBorder}
-          onCheckedChange={getOnSelectTableBorder('top')}
-        >
-          <div>Top Border</div>
-        </DropdownMenuCheckboxItem>
-        <DropdownMenuCheckboxItem
-          checked={hasRightBorder}
-          onCheckedChange={getOnSelectTableBorder('right')}
-        >
-          <div>Right Border</div>
-        </DropdownMenuCheckboxItem>
-        <DropdownMenuCheckboxItem
-          checked={hasBottomBorder}
-          onCheckedChange={getOnSelectTableBorder('bottom')}
-        >
-          <div>Bottom Border</div>
-        </DropdownMenuCheckboxItem>
-        <DropdownMenuCheckboxItem
-          checked={hasLeftBorder}
-          onCheckedChange={getOnSelectTableBorder('left')}
-        >
-          <div>Left Border</div>
-        </DropdownMenuCheckboxItem>
-      </DropdownMenuGroup>
+export const TableBordersDropdownMenuContent: React.ForwardRefExoticComponent<
+  TableBordersDropdownMenuContentProps & React.RefAttributes<HTMLDivElement>
+> = React.forwardRef<HTMLDivElement, TableBordersDropdownMenuContentProps>(
+  (props, ref) => {
+    const editor = useEditorRef();
+    const {
+      getOnSelectTableBorder,
+      hasBottomBorder,
+      hasLeftBorder,
+      hasNoBorders,
+      hasOuterBorders,
+      hasRightBorder,
+      hasTopBorder,
+    } = useTableBordersDropdownMenuContentState();
 
-      <DropdownMenuGroup>
-        <DropdownMenuCheckboxItem
-          checked={hasNoBorders}
-          onCheckedChange={getOnSelectTableBorder('none')}
-        >
-          <div>No Border</div>
-        </DropdownMenuCheckboxItem>
-        <DropdownMenuCheckboxItem
-          checked={hasOuterBorders}
-          onCheckedChange={getOnSelectTableBorder('outer')}
-        >
-          <div>Outside Borders</div>
-        </DropdownMenuCheckboxItem>
-      </DropdownMenuGroup>
-    </DropdownMenuContent>
-  );
-});
+    return (
+      <DropdownMenuContent
+        ref={ref}
+        className={cn('min-w-[220px]')}
+        onCloseAutoFocus={(e) => {
+          e.preventDefault();
+          editor.tf.focus();
+        }}
+        align='start'
+        side='right'
+        sideOffset={0}
+        {...props}
+      >
+        <DropdownMenuGroup>
+          <DropdownMenuCheckboxItem
+            checked={hasTopBorder}
+            onCheckedChange={getOnSelectTableBorder('top')}
+          >
+            <div>Top Border</div>
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            checked={hasRightBorder}
+            onCheckedChange={getOnSelectTableBorder('right')}
+          >
+            <div>Right Border</div>
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            checked={hasBottomBorder}
+            onCheckedChange={getOnSelectTableBorder('bottom')}
+          >
+            <div>Bottom Border</div>
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            checked={hasLeftBorder}
+            onCheckedChange={getOnSelectTableBorder('left')}
+          >
+            <div>Left Border</div>
+          </DropdownMenuCheckboxItem>
+        </DropdownMenuGroup>
+
+        <DropdownMenuGroup>
+          <DropdownMenuCheckboxItem
+            checked={hasNoBorders}
+            onCheckedChange={getOnSelectTableBorder('none')}
+          >
+            <div>No Border</div>
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            checked={hasOuterBorders}
+            onCheckedChange={getOnSelectTableBorder('outer')}
+          >
+            <div>Outside Borders</div>
+          </DropdownMenuCheckboxItem>
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    );
+  }
+);
+
+TableBordersDropdownMenuContent.displayName = 'TableBordersDropdownMenuContent';
 
 type ColorDropdownMenuProps = {
   children: React.ReactNode;

@@ -465,7 +465,7 @@ export function MediaPicker({
           <div className='flex h-full overflow-hidden bg-white'>
             <div className='flex w-full flex-col h-full @container'>
               <ul
-                {...rootProps}
+                {...(rootProps as React.HTMLAttributes<HTMLUListElement>)}
                 className={`h-full grow overflow-y-auto transition duration-150 ease-out bg-gradient-to-b from-gray-50/50 to-gray-50 ${
                   list.items.length === 0 ||
                   (viewMode === 'list' &&

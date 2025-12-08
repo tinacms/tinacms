@@ -6,20 +6,31 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { cn, createPrimitiveElement, withCn, withRef } from '@udecode/cn';
 import { X } from 'lucide-react';
 
-export const Dialog = DialogPrimitive.Root;
+export const Dialog: React.FC<DialogPrimitive.DialogProps> =
+  DialogPrimitive.Root;
 
-export const DialogTrigger = DialogPrimitive.Trigger;
+export const DialogTrigger: React.FC<DialogPrimitive.DialogTriggerProps> =
+  DialogPrimitive.Trigger;
 
-export const DialogPortal = DialogPrimitive.Portal;
+export const DialogPortal: React.FC<DialogPrimitive.DialogPortalProps> =
+  DialogPrimitive.Portal;
 
-export const DialogClose = DialogPrimitive.Close;
+export const DialogClose: React.FC<DialogPrimitive.DialogCloseProps> =
+  DialogPrimitive.Close;
 
-export const DialogOverlay = withCn(
+type DialogOverlayProps = React.ComponentPropsWithoutRef<
+  typeof DialogPrimitive.Overlay
+>;
+
+export const DialogOverlay: React.FC<DialogOverlayProps> = withCn(
   DialogPrimitive.Overlay,
   'fixed inset-0 z-50 bg-black/80 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0'
-);
+) as React.FC<DialogOverlayProps>;
 
-export const DialogContent = withRef<typeof DialogPrimitive.Content>(
+export const DialogContent: React.ForwardRefExoticComponent<
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> &
+    React.RefAttributes<React.ElementRef<typeof DialogPrimitive.Content>>
+> = withRef<typeof DialogPrimitive.Content>(
   ({ children, className, ...props }, ref) => (
     <DialogPortal>
       <DialogOverlay />
@@ -41,22 +52,34 @@ export const DialogContent = withRef<typeof DialogPrimitive.Content>(
   )
 );
 
-export const DialogHeader = withCn(
+type DialogHeaderProps = React.HTMLAttributes<HTMLDivElement>;
+
+export const DialogHeader: React.FC<DialogHeaderProps> = withCn(
   createPrimitiveElement('div'),
   'flex flex-col space-y-1.5 text-center sm:text-left'
-);
+) as React.FC<DialogHeaderProps>;
 
-export const DialogFooter = withCn(
+type DialogFooterProps = React.HTMLAttributes<HTMLDivElement>;
+
+export const DialogFooter: React.FC<DialogFooterProps> = withCn(
   createPrimitiveElement('div'),
   'flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2'
-);
+) as React.FC<DialogFooterProps>;
 
-export const DialogTitle = withCn(
+type DialogTitleProps = React.ComponentPropsWithoutRef<
+  typeof DialogPrimitive.Title
+>;
+
+export const DialogTitle: React.FC<DialogTitleProps> = withCn(
   DialogPrimitive.Title,
   'text-lg leading-none font-semibold tracking-tight'
-);
+) as React.FC<DialogTitleProps>;
 
-export const DialogDescription = withCn(
+type DialogDescriptionProps = React.ComponentPropsWithoutRef<
+  typeof DialogPrimitive.Description
+>;
+
+export const DialogDescription: React.FC<DialogDescriptionProps> = withCn(
   DialogPrimitive.Description,
   'text-sm text-muted-foreground'
-);
+) as React.FC<DialogDescriptionProps>;

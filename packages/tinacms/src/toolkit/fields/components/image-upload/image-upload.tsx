@@ -65,7 +65,10 @@ export const ImageUpload = React.forwardRef<
     noClick: !!onClick,
   });
   return (
-    <div className='w-full max-w-full' {...getRootProps()}>
+    <div
+      className='w-full max-w-full'
+      {...(getRootProps() as React.HTMLAttributes<HTMLDivElement>)}
+    >
       <input {...getInputProps()} />
       {value ? (
         loading ? (
