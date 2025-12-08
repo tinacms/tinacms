@@ -1,5 +1,19 @@
 # next-tinacms-azure
 
+## 5.0.2
+
+### Patch Changes
+
+- [#6216](https://github.com/tinacms/tinacms/pull/6216) [`5c1e891`](https://github.com/tinacms/tinacms/commit/5c1e89181f595d392ad6cb56ca5fc0b6d9e60a23) Thanks [@JackDevAU](https://github.com/JackDevAU)! - - `@tinacms/graphql`: remove scmp dependency, replaced with modern code (now inbuilt)
+  - `@tinacms/metrics`: remove isomorphic-fetch dependency, now relies on global fetch
+  - `@tinacms/cli`: remove log4js dependency, replaced with custom logger implementation; update chalk to v5 (ESM-only)
+  - `@tinacms/scripts`, `create-tina-app`: update chalk to v5 (ESM-only)
+  - `next-tinacms-azure`: Buffer to Uint8Array conversion
+  - `tinacms`: TypeScript style prop typing
+- Updated dependencies [[`5c1e891`](https://github.com/tinacms/tinacms/commit/5c1e89181f595d392ad6cb56ca5fc0b6d9e60a23), [`f717193`](https://github.com/tinacms/tinacms/commit/f717193aa4a1d3205df42d120fd1f6192b5e41e5), [`ac59522`](https://github.com/tinacms/tinacms/commit/ac59522053c71c713057c4c2b6ce610617bce85e)]:
+  - tinacms@3.0.2
+  - @tinacms/auth@1.1.0
+
 ## 5.0.1
 
 ### Patch Changes
