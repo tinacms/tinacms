@@ -224,11 +224,21 @@ export function LinkFloatingToolbar({
 
   return (
     <>
-      <div ref={insertRef} className={popoverVariants()} {...insertProps}>
+      <div
+        ref={insertRef}
+        className={popoverVariants()}
+        {...insertProps}
+        style={insertProps.style as React.CSSProperties}
+      >
         {input}
       </div>
 
-      <div ref={editRef} className={popoverVariants()} {...editProps}>
+      <div
+        ref={editRef}
+        className={popoverVariants()}
+        {...editProps}
+        style={editProps.style as React.CSSProperties}
+      >
         {editContent}
       </div>
     </>

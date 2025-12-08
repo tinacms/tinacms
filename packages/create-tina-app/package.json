@@ -45,7 +45,7 @@
     },
     "dependencies": {
         "@tinacms/metrics": "workspace:*",
-        "chalk": "4.1.2",
+        "chalk": "catalog:",
         "commander": "^12.1.0",
         "cross-spawn": "catalog:",
         "fs-extra": "catalog:",
