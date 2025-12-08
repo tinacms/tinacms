@@ -214,6 +214,8 @@ export function useTina<T extends object>(props: {
     }
   }, [id]);
 
+  const lastFocusedFieldRef = React.useRef<string | null>(null);
+
   React.useEffect(() => {
     const { experimental___selectFormByFormId, ...rest } = props;
     parent.postMessage({ type: 'open', ...rest, id }, window.location.origin);
@@ -246,6 +248,15 @@ export function useTina<T extends object>(props: {
 
       // Handle field focus to add data attribute for orange styling
       if (event.data.type === 'field:set-focused') {
+        const newFieldName = event.data.fieldName;
+        
+        // Only process if the focused field has actually changed
+        if (newFieldName === lastFocusedFieldRef.current) {
+          return;
+        }
+        
+        lastFocusedFieldRef.current = newFieldName;
+
         // Remove focused attribute from all elements
         const allTinaFields = document.querySelectorAll('[data-tina-field]');
         allTinaFields.forEach((el) => {
@@ -253,10 +264,10 @@ export function useTina<T extends object>(props: {
         });
 
         // Add focused attribute to the clicked field
-        if (event.data.fieldName) {
+        if (newFieldName) {
           // Try exact match first
           let targetElement = document.querySelector(
-            `[data-tina-field="${event.data.fieldName}"]`
+            `[data-tina-field="${newFieldName}"]`
           );
 
           // If not found, try to find by searching for elements whose data-tina-field ends with this value
@@ -267,13 +278,28 @@ export function useTina<T extends object>(props: {
               // Match if the field value ends with the fieldName we're looking for
               return (
                 fieldValue &&
-                fieldValue.endsWith(event.data.fieldName.split('---')[1])
+                fieldValue.endsWith(newFieldName.split('---')[1])
               );
             }) as Element | undefined;
           }
 
           if (targetElement) {
             targetElement.setAttribute('data-tina-field-focused', 'true');
+            
+            // Scroll the element into view if it's not visible
+            const rect = targetElement.getBoundingClientRect();
+            const isInViewport =
+              rect.top >= 0 &&
+              rect.left >= 0 &&
+              rect.bottom <= window.innerHeight &&
+              rect.right <= window.innerWidth;
+
+            if (!isInViewport) {
+              targetElement.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+              });
+            }
           }
         }
       }
