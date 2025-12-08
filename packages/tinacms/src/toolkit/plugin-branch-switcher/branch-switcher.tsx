@@ -445,10 +445,14 @@ const BranchSelector = ({
               <thead className='sticky top-0 z-20 bg-gray-100 border-b-2 border-gray-200'>
                 <tr>
                   <th className={`${tableHeadingStyle} w-auto`}>Branch Name</th>
-                  <th className={`${tableHeadingStyle} w-0 whitespace-nowrap`}>
+                  <th
+                    className={`${tableHeadingStyle} w-0 whitespace-nowrap text-left`}
+                  >
                     Last Updated
                   </th>
-                  <th className={`${tableHeadingStyle} w-0 whitespace-nowrap`}>
+                  <th
+                    className={`${tableHeadingStyle} w-0 whitespace-nowrap text-left`}
+                  >
                     Pull Request
                   </th>
                 </tr>
@@ -485,6 +489,10 @@ const BranchSelector = ({
       </div>
     </div>
   );
+};
+
+const extractPullRequestId = (url: string): string => {
+  return url.split('/').pop() || '';
 };
 
 const BranchItem = ({
@@ -579,7 +587,9 @@ const BranchItem = ({
                 displayIcon={false}
               >
                 <BiPencil className='w-3 h-auto inline-block mr-1' />
-                <span>Editing</span>
+                Currently
+                <br />
+                Editing
               </Badge>
             )}
           </div>
@@ -590,7 +600,7 @@ const BranchItem = ({
           )}
         </div>
       </td>
-      <td className='px-3 py-1.5 min-w-0 text-center'>
+      <td className='px-3 py-1.5 min-w-0'>
         {creatingPR ? (
           <div className='flex items-center gap-2'>
             <div>
@@ -609,10 +619,7 @@ const BranchItem = ({
           </span>
         )}
       </td>
-      <td
-        className='px-3 py-1.5 flex justify-center'
-        onClick={(e) => e.stopPropagation()}
-      >
+      <td className='px-3 py-1.5 flex' onClick={(e) => e.stopPropagation()}>
         {branch.githubPullRequestUrl ? (
           <Tooltip delayDuration={300}>
             <TooltipTrigger asChild>
@@ -624,7 +631,10 @@ const BranchItem = ({
                 }}
                 className='cursor-pointer h-9 px-2 flex items-center gap-1'
               >
-                <BiLinkExternal className='h-5 w-auto text-gray-700' />
+                <span className='text-sm truncate max-w-[120px]'>
+                  PR: #{extractPullRequestId(branch.githubPullRequestUrl)}
+                </span>
+                <BiLinkExternal className='h-3.5 w-auto text-gray-700 flex-shrink-0' />
               </Button>
             </TooltipTrigger>
             <TooltipPortal>
