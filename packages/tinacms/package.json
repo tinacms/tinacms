@@ -78,7 +78,7 @@
         "@udecode/plate-break": "catalog:",
         "@udecode/plate-code-block": "catalog:",
         "@udecode/plate-combobox": "catalog:",
-        "@udecode/plate-dnd": "catalog:",
+
         "@udecode/plate-floating": "catalog:",
         "@udecode/plate-heading": "catalog:",
         "@udecode/plate-horizontal-rule": "catalog:",

@@ -261,9 +261,6 @@ catalogs:
     '@udecode/plate-combobox':
       specifier: ^48
       version: 48.0.0
-    '@udecode/plate-dnd':
-      specifier: ^48.0.0
-      version: 48.0.0
     '@udecode/plate-floating':
       specifier: ^48.0.0
       version: 48.0.0
@@ -2220,9 +2217,6 @@ importers:
       '@udecode/plate-combobox':
         specifier: 'catalog:'
         version: 48.0.0(@udecode/plate@48.0.5(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.26.0)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.5.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@udecode/plate-dnd':
-        specifier: 'catalog:'
-        version: 48.0.0(@udecode/plate@48.0.5(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.26.0)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.5.0(react@18.3.1)))(react-dnd-html5-backend@16.0.1)(react-dnd@16.0.1(@types/hoist-non-react-statics@3.3.6)(@types/node@22.13.5)(@types/react@18.3.18)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@udecode/plate-floating':
         specifier: 'catalog:'
         version: 48.0.0(@udecode/plate@48.0.5(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.26.0)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.5.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -6278,15 +6272,6 @@ packages:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
       react-dom: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
 
-  '@react-dnd/asap@5.0.2':
-    resolution: {integrity: sha512-WLyfoHvxhs0V9U+GTsGilGgf2QsPl6ZZ44fnv0/b8T3nQyvzxidxsg/ZltbWssbsRDlYW8UKSQMTGotuTotZ6A==}
-
-  '@react-dnd/invariant@4.0.2':
-    resolution: {integrity: sha512-xKCTqAK/FFauOM9Ta2pswIyT3D8AQlfrYdOi/toTPEhqCuAs1v5tcJ3Y08Izh1cJ5Jchwy9SeAXmMg6zrKs2iw==}
-
-  '@react-dnd/shallowequal@4.0.2':
-    resolution: {integrity: sha512-/RVXdLvJxLg4QKvMoM5WlwNR9ViO9z8B/qPcc+C0Sa/teJY7QG7kJ441DwzOjMYEY7GmU4dj5EcGHIkKZiQZCA==}
-
   '@react-hook/debounce@3.0.0':
     resolution: {integrity: sha512-ir/kPrSfAzY12Gre0sOHkZ2rkEmM4fS5M5zFxCi4BnCeXh2nvx9Ujd+U4IGpKCuPA+EQD0pg1eK2NGLvfWejag==}
     peerDependencies:
@@ -7678,15 +7663,6 @@ packages:
     resolution: {integrity: sha512-Ep0/yISRWOOv2ZtSBjgnJ7wGKQZ2pqh+2xWxu7R2YqwbTk2Zteuuvassn7hGieaalti37ecyi9dIkUZZQL8uGg==}
     peerDependencies:
       react: '>=18.0.0'
-      react-dom: '>=18.0.0'
-
-  '@udecode/plate-dnd@48.0.0':
-    resolution: {integrity: sha512-XzKOWUmveakZBDgOeOJcAakXfYx30hudYnv+/t5C726uYHAgaPAiGPg5IhH50uu1lDivA2MKv7MESMkeb/vRlw==}
-    peerDependencies:
-      '@udecode/plate': '>=48.0.0'
-      react: '>=18.0.0'
-      react-dnd: '>=14.0.0'
-      react-dnd-html5-backend: '>=14.0.0'
       react-dom: '>=18.0.0'
 
   '@udecode/plate-floating@48.0.0':
@@ -9372,9 +9348,6 @@ packages:
 
   dlv@1.1.3:
     resolution: {integrity: sha512-+HlytyjlPKnIG8XuRG8WvmBP8xs8P71y+SKKS6ZXWoEgLuePxtDoUEiH7WkdePWrQ5JBpE6aoVqfZfJUQkjXwA==}
-
-  dnd-core@16.0.1:
-    resolution: {integrity: sha512-HK294sl7tbw6F6IeuK16YSBUoorvHpY8RHO+9yFfaJyCDVb6n7PRcezrOEOa2SBCqiYpemh5Jx20ZcjKdFAVng==}
 
   doctoc@2.2.1:
     resolution: {integrity: sha512-qNJ1gsuo7hH40vlXTVVrADm6pdg30bns/Mo7Nv1SxuXSM1bwF9b4xQ40a6EFT/L1cI+Yylbyi8MPI4G4y7XJzQ==}
@@ -12428,9 +12401,6 @@ packages:
   pend@1.2.0:
     resolution: {integrity: sha512-F3asv42UuXchdzt+xXqfW1OGlVBe+mxa2mqI0pg5yAHZPvFmY3Y6drSf/GQ1A86WgWEN9Kzh/WrgKa6iGcHXLg==}
 
-  performance-now@2.1.0:
-    resolution: {integrity: sha512-7EAHlyLHI56VEIdK57uwHdHKIaAGbnXPiw0yWbarQZOKaKpvUIgW0jWRVLiatnM+XXlSwsanIBH/hzGMJulMow==}
-
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
 
@@ -12781,9 +12751,6 @@ packages:
     resolution: {integrity: sha512-ARhCpm70fzdcvNQfPoy49IaanKkTlRWF2JMzqhcJbhSFRZv7nPTvZJdcY7301IPmvW+/p0RgIWnQDLJxifsQ7g==}
     engines: {node: '>=8'}
 
-  raf@3.4.1:
-    resolution: {integrity: sha512-Sq4CW4QhwOHE8ucn6J34MqtZCeWFP2aQSmrlroYgqAV1PjStIhJXxYuTgUIfkEk7zTLjmIjLmU5q+fbD1NnOJA==}
-
   range-parser@1.2.1:
     resolution: {integrity: sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==}
     engines: {node: '>= 0.6'}
@@ -12813,24 +12780,6 @@ packages:
     engines: {node: '>=18'}
     peerDependencies:
       react: '>=16.8.0'
-
-  react-dnd-html5-backend@16.0.1:
-    resolution: {integrity: sha512-Wu3dw5aDJmOGw8WjH1I1/yTH+vlXEL4vmjk5p+MHxP8HuHJS1lAGeIdG/hze1AvNeXWo/JgULV87LyQOr+r5jw==}
-
-  react-dnd@16.0.1:
-    resolution: {integrity: sha512-QeoM/i73HHu2XF9aKksIUuamHPDvRglEwdHL4jsp784BgUuWcg6mzfxT0QDdQz8Wj0qyRKx2eMg8iZtWvU4E2Q==}
-    peerDependencies:
-      '@types/hoist-non-react-statics': '>= 3.3.1'
-      '@types/node': '>= 12'
-      '@types/react': '>= 16'
-      react: '>= 16.14'
-    peerDependenciesMeta:
-      '@types/hoist-non-react-statics':
-        optional: true
-      '@types/node':
-        optional: true
-      '@types/react':
-        optional: true
 
   react-dom@18.3.1:
     resolution: {integrity: sha512-5m4nQKp+rZRb09LNH59GM4BxTh9251/ylbKIbpe7TpGxfJ+9kv6BLkLBXIjjspbgbnIBNqlI23tRnTWT0snUIw==}
@@ -12988,9 +12937,6 @@ packages:
   redent@3.0.0:
     resolution: {integrity: sha512-6tDA8g98We0zd0GvVeMT9arEOnTw9qM03L9cJXaCjrip1OO764RDBLBfrB4cwzNGDj5OA5ioymC9GkizgWJDUg==}
     engines: {node: '>=8'}
-
-  redux@4.2.1:
-    resolution: {integrity: sha512-LAUYz4lc+Do8/g7aeRa8JkyDErK6ekstQaqWQrNRW//MY1TvCEpMtpTWvlQ+FPbWCx+Xixu/6SHt5N0HR+SB4w==}
 
   reflect.getprototypeof@1.0.10:
     resolution: {integrity: sha512-00o4I+DVrefhv+nX0ulyi3biSHCPDe+yLv5o/p6d/UVlirijB8E16FtfwSAi4g3tcqrQ4lRAqQSoFEZJehYEcw==}
@@ -19608,12 +19554,6 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@react-dnd/asap@5.0.2': {}
-
-  '@react-dnd/invariant@4.0.2': {}
-
-  '@react-dnd/shallowequal@4.0.2': {}
-
   '@react-hook/debounce@3.0.0(react@18.3.1)':
     dependencies:
       '@react-hook/latest': 1.0.3(react@18.3.1)
@@ -21490,16 +21430,6 @@ snapshots:
       - slate-dom
       - use-sync-external-store
 
-  '@udecode/plate-dnd@48.0.0(@udecode/plate@48.0.5(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.26.0)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.5.0(react@18.3.1)))(react-dnd-html5-backend@16.0.1)(react-dnd@16.0.1(@types/hoist-non-react-statics@3.3.6)(@types/node@22.13.5)(@types/react@18.3.18)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
-    dependencies:
-      '@udecode/plate': 48.0.5(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.26.0)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.5.0(react@18.3.1))
-      lodash: 4.17.21
-      raf: 3.4.1
-      react: 18.3.1
-      react-dnd: 16.0.1(@types/hoist-non-react-statics@3.3.6)(@types/node@22.13.5)(@types/react@18.3.18)(react@18.3.1)
-      react-dnd-html5-backend: 16.0.1
-      react-dom: 18.3.1(react@18.3.1)
-
   '@udecode/plate-floating@48.0.0(@udecode/plate@48.0.5(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.26.0)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.5.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@floating-ui/core': 1.6.9
@@ -23355,12 +23285,6 @@ snapshots:
   direction@1.0.4: {}
 
   dlv@1.1.3: {}
-
-  dnd-core@16.0.1:
-    dependencies:
-      '@react-dnd/asap': 5.0.2
-      '@react-dnd/invariant': 4.0.2
-      redux: 4.2.1
 
   doctoc@2.2.1:
     dependencies:
@@ -28032,8 +27956,6 @@ snapshots:
 
   pend@1.2.0: {}
 
-  performance-now@2.1.0: {}
-
   picocolors@1.1.1: {}
 
   picomatch-browser@2.2.6: {}
@@ -28412,10 +28334,6 @@ snapshots:
 
   quick-lru@4.0.1: {}
 
-  raf@3.4.1:
-    dependencies:
-      performance-now: 2.1.0
-
   range-parser@1.2.1: {}
 
   raw-body@2.5.2:
@@ -28454,23 +28372,6 @@ snapshots:
       date-fns: 4.1.0
       date-fns-jalali: 4.1.0-0
       react: 18.3.1
-
-  react-dnd-html5-backend@16.0.1:
-    dependencies:
-      dnd-core: 16.0.1
-
-  react-dnd@16.0.1(@types/hoist-non-react-statics@3.3.6)(@types/node@22.13.5)(@types/react@18.3.18)(react@18.3.1):
-    dependencies:
-      '@react-dnd/invariant': 4.0.2
-      '@react-dnd/shallowequal': 4.0.2
-      dnd-core: 16.0.1
-      fast-deep-equal: 3.1.3
-      hoist-non-react-statics: 3.3.2
-      react: 18.3.1
-    optionalDependencies:
-      '@types/hoist-non-react-statics': 3.3.6
-      '@types/node': 22.13.5
-      '@types/react': 18.3.18
 
   react-dom@18.3.1(react@18.3.1):
     dependencies:
@@ -28648,10 +28549,6 @@ snapshots:
     dependencies:
       indent-string: 4.0.0
       strip-indent: 3.0.0
-
-  redux@4.2.1:
-    dependencies:
-      '@babel/runtime': 7.26.9
 
   reflect.getprototypeof@1.0.10:
     dependencies:

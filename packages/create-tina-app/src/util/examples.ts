@@ -40,7 +40,12 @@ export async function getRepoInfo(
   ) {
     try {
       const infoResponse = await fetch(
-        `https://api.github.com/repos/${username}/${name}`
+        `https://api.github.com/repos/${username}/${name}`,
+        {
+          headers: {
+            'User-Agent': 'create-tina-app',
+          },
+        }
       );
       if (infoResponse.status !== 200) {
         return;
