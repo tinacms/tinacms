@@ -1,5 +1,19 @@
 # next-tinacms-s3
 
+## 14.0.2
+
+### Patch Changes
+
+- Updated dependencies [[`5c1e891`](https://github.com/tinacms/tinacms/commit/5c1e89181f595d392ad6cb56ca5fc0b6d9e60a23), [`f717193`](https://github.com/tinacms/tinacms/commit/f717193aa4a1d3205df42d120fd1f6192b5e41e5), [`ac59522`](https://github.com/tinacms/tinacms/commit/ac59522053c71c713057c4c2b6ce610617bce85e)]:
+  - tinacms@3.0.2
+
+## 14.0.1
+
+### Patch Changes
+
+- Updated dependencies [[`50fa9f4`](https://github.com/tinacms/tinacms/commit/50fa9f4bf932a3dc45b88d245e35917efe8d3423), [`428ec7e`](https://github.com/tinacms/tinacms/commit/428ec7eca20603e2cb666d562fd4cc16dda4cbed), [`6946476`](https://github.com/tinacms/tinacms/commit/69464767d339a5df3c6c530ece94ef80049e534f), [`f99bbbc`](https://github.com/tinacms/tinacms/commit/f99bbbc221eead8d714b3791348d415dd8fcd063)]:
+  - tinacms@3.0.1
+
 ## 14.0.0
 
 ### Patch Changes

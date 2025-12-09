@@ -7,6 +7,7 @@ export interface ColorFieldProps {
   colorFormat: string;
   colors: string[];
   widget?: 'sketch' | 'block';
+  width?: string;
 }
 export const ColorField = wrapFieldsWithMeta<InputProps, ColorFieldProps>(
   ({ input, field }) => {
@@ -15,6 +16,7 @@ export const ColorField = wrapFieldsWithMeta<InputProps, ColorFieldProps>(
         colorFormat={(field as any).colorFormat}
         userColors={(field as any).colors}
         widget={(field as any).widget}
+        width={(field as any).width}
         input={input}
       />
     );
