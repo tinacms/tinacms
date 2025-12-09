@@ -146,6 +146,9 @@ export function useTina<T extends object>(props: {
       }
 
       function mouseEnterHandler(e) {
+        if (!(e.target instanceof Element)) {
+          return;
+        }
         const attributeNames = e.target.getAttributeNames();
         const tinaAttribute = attributeNames.find((name) =>
           name.startsWith('data-tina-field')
