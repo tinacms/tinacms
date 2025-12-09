@@ -131,7 +131,6 @@ export const FieldMeta = ({
     if (isAlreadyActive) {
       return; // Don't toggle off when clicking an already-active field
     }
-    console.log({ id: tinaForm.id, fieldName: name });
     // Dispatch the field:focus event for iframe communication
     setFocusedField({ id: tinaForm.id, fieldName: name });
     // Also set the active field in Redux state for sidebar highlighting

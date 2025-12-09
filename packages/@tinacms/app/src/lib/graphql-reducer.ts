@@ -652,10 +652,8 @@ export const useGraphQLReducer = (
       });
       return;
     }
-    console.log(activeForm);
     // Get the queryId from the form's queries array (forms track which queries created them)
     const queries = activeForm.tinaForm.queries;
-    console.log(queries);
     if (queries && queries.length > 0) {
       // Use the last query ID (most recent)
       const queryId = queries[queries.length - 1];
