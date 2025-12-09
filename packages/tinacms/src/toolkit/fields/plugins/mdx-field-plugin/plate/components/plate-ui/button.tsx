@@ -35,6 +35,8 @@ export const buttonVariants = cva(
           'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
         secondary:
           'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+        tinaPrimary:
+          'bg-tina-orange-dark text-white hover:bg-tina-orange-dark/90 disabled:bg-tina-orange-dark/50',
       },
     },
   }

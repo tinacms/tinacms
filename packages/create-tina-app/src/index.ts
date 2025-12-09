@@ -1,6 +1,7 @@
 import { Telemetry } from '@tinacms/metrics';
 import prompts from 'prompts';
 import path from 'node:path';
+import { createRequire } from 'node:module';
 import {
   isWriteable,
   setupProjectDirectory,
@@ -32,6 +33,7 @@ export async function run() {
   } else {
     console.log(TextStyles.tinaOrange(`🦙 TinaCMS`));
   }
+  const require = createRequire(import.meta.url);
   const version = require('../package.json').version;
   console.log(`Create Tina App v${version}`);
 
@@ -203,7 +205,9 @@ export async function run() {
 
   if (template.value === 'tina-hugo-starter') {
     spinner.warn(
-      `Hugo is required for this starter. Install it via ${TextStyles.link('https://gohugo.io/installation/')}\n`
+      `Hugo is required for this starter. Install it via ${TextStyles.link(
+        'https://gohugo.io/installation/'
+      )}\n`
     );
   }
 
@@ -218,22 +222,32 @@ export async function run() {
   ${padCommand(`${pkgManager} install`)}# install dependencies`
       : ''
   }
-  ${padCommand(`${pkgManager} run dev`)}# start the dev server ${TextStyles.link(template.devUrl)}
+  ${padCommand(
+    `${pkgManager} run dev`
+  )}# start the dev server ${TextStyles.link(template.devUrl)}
   ${padCommand(`${pkgManager} run build`)}# build the app for production
 `);
 
   console.log('Next steps:');
   console.log(
-    `  • 📝 Edit some content: ${TextStyles.link('https://tina.io/docs/using-tina-editor')}`
+    `  • 📝 Edit some content: ${TextStyles.link(
+      'https://tina.io/docs/using-tina-editor'
+    )}`
   );
   console.log(
-    `  • 📖 Learn the basics: ${TextStyles.link('https://tina.io/docs/schema/')}`
+    `  • 📖 Learn the basics: ${TextStyles.link(
+      'https://tina.io/docs/schema/'
+    )}`
   );
   console.log(
-    `  • 🖌️ Extend Tina with custom field components: ${TextStyles.link('https://tina.io/docs/advanced/extending-tina/')}`
+    `  • 🖌️ Extend Tina with custom field components: ${TextStyles.link(
+      'https://tina.io/docs/advanced/extending-tina/'
+    )}`
   );
   console.log(
-    `  • 🚀 Deploy to Production: ${TextStyles.link('https://tina.io/docs/tinacloud/')}`
+    `  • 🚀 Deploy to Production: ${TextStyles.link(
+      'https://tina.io/docs/tinacloud/'
+    )}`
   );
 }
 
