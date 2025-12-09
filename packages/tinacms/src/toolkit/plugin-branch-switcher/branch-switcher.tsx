@@ -639,7 +639,9 @@ const BranchItem = ({
             title='Open Git Pull Request'
           >
             <BiLinkExternal className='h-3.5 w-auto text-gray-700 flex-shrink-0' />
-            <span className='text-sm truncate max-w-[120px]'>Open PR</span>
+            <span className='text-sm truncate max-w-[120px]'>
+              PR: {extractPullRequestId(branch.githubPullRequestUrl)}
+            </span>
           </Button>
         ) : !branch.protected &&
           !creatingPR &&
