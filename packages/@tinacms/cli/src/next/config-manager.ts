@@ -411,21 +411,15 @@ export class ConfigManager {
       'config.prebuild.jsx'
     );
 
-    const nativeNodeModulesPlugin = {
-      name: 'native-node-modules',
-      setup(build) {
-        build.onResolve({ filter: /^node:.*/ }, (args) => {
-          return {
-            path: args.path,
-            external: true,
-          };
-        });
-      },
-    };
-
     const outfile = path.join(tmpdir, 'config.build.jsx');
     const outfile2 = path.join(tmpdir, 'config.build.mjs');
     const tempTSConfigFile = path.join(tmpdir, 'tsconfig.json');
+
+    // Provide a require() polyfill for ESM bundles containing CommonJS packages.
+    // Some packages (e.g., 'postcss-selector-parser' via tailwindcss) use require() internally.
+    const esmRequireBanner = {
+      js: `import { createRequire } from 'module';const require = createRequire(import.meta.url);`,
+    };
 
     fs.outputFileSync(tempTSConfigFile, '{}');
     const result2 = await esbuild.build({
@@ -459,11 +453,11 @@ export class ConfigManager {
       format: 'esm',
       outfile,
       loader: loaders,
+      banner: esmRequireBanner,
     });
     await esbuild.build({
       entryPoints: [outfile],
       bundle: true,
-      // Suppress warning about comparison with -0 from client module
       logLevel: 'silent',
       platform: 'node',
       target: ['esnext'],

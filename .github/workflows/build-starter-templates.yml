@@ -16,9 +16,11 @@ jobs:
           - tina-nextjs-starter
           - tina-hugo-starter
           - tina-remix-starter
+          - tina-astro-starter
+          - tina-docs
           - tinasaurus
           - basic
-        node-version: [18, 20, 22]
+        node-version: [20, 22, 24]
     outputs:
       failed: ${{ steps.report-errors.outputs.failed }}
 
@@ -51,6 +53,12 @@ jobs:
           elif [[ "${{ matrix.template }}" == "tina-remix-starter" ]]; then
             echo "TINA_CLIENT_ID=${{ secrets.TINA_REMIX_STARTER_CLIENT_ID }}" >> $GITHUB_ENV
             echo "TINA_TOKEN=${{ secrets.TINA_REMIX_STARTER_TOKEN }}" >> $GITHUB_ENV
+          elif [[ "${{ matrix.template }}" == "tina-astro-starter" ]]; then
+            echo "TINA_CLIENT_ID=${{ secrets.TINA_ASTRO_STARTER_CLIENT_ID }}" >> $GITHUB_ENV
+            echo "TINA_TOKEN=${{ secrets.TINA_ASTRO_STARTER_TOKEN }}" >> $GITHUB_ENV
+          elif [[ "${{ matrix.template }}" == "tina-docs" ]]; then
+            echo "NEXT_PUBLIC_TINA_CLIENT_ID=${{ secrets.TINA_DOCS_CLIENT_ID }}" >> $GITHUB_ENV
+            echo "TINA_TOKEN=${{ secrets.TINA_DOCS_TOKEN }}" >> $GITHUB_ENV
           elif [[ "${{ matrix.template }}" == "tinasaurus" ]]; then
             echo "NEXT_PUBLIC_TINA_CLIENT_ID=${{ secrets.TINASAURUS_CLIENT_ID }}" >> $GITHUB_ENV
             echo "TINA_TOKEN=${{ secrets.TINASAURUS_TOKEN }}" >> $GITHUB_ENV
@@ -100,7 +108,7 @@ jobs:
             echo "Issue already exists. Skipping issue creation."
           else
             echo "Creating a new issue..."
-            gh issue -R tinacms/tinacms create --title "$ISSUE_TITLE" --label "bug" --body "$ISSUE_BODY"
+            gh issue -R tinacms/tinacms create --title "$ISSUE_TITLE" --label "bug" --body "$ISSUE_BODY" --project "TinaCloud"
           fi
 
   # Required to check for failures due to the `continue-on-error` being set to true.

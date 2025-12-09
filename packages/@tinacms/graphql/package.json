@@ -1,86 +1,84 @@
 {
-	"name": "@tinacms/graphql",
-	"type": "module",
-	"version": "2.0.0",
-	"main": "dist/index.js",
-	"module": "./dist/index.js",
-	"files": [
-		"package.json",
-		"dist"
-	],
-	"exports": {
-		".": {
-			"types": "./dist/index.d.ts",
-			"import": "./dist/index.js",
-			"require": "./dist/index.js"
-		}
-	},
-	"license": "SEE LICENSE IN LICENSE",
-	"buildConfig": {
-		"entryPoints": [
-			{
-				"name": "src/index.ts",
-				"target": "node",
-				"bundle": []
-			}
-		]
-	},
-	"scripts": {
-		"types": "pnpm tsc",
-		"build": "tinacms-scripts build",
-		"docs": "pnpm typedoc",
-		"test": "vitest run",
-		"test-watch": "vitest"
-	},
-	"dependencies": {
-		"@iarna/toml": "catalog:",
-		"@tinacms/mdx": "workspace:*",
-		"@tinacms/schema-tools": "workspace:*",
-		"abstract-level": "catalog:",
-		"date-fns": "^2.30.0",
-		"es-toolkit": "^1.42.0",
-		"fast-glob": "catalog:",
-		"fs-extra": "catalog:",
-		"glob-parent": "catalog:",
-		"graphql": "15.8.0",
-		"gray-matter": "catalog:",
-		"isomorphic-git": "catalog:",
-		"js-sha1": "catalog:",
-		"js-yaml": "^3.14.1",
-		"jsonpath-plus": "catalog:",
-		"many-level": "catalog:",
-		"micromatch": "catalog:",
-		"normalize-path": "catalog:",
-		"readable-stream": "catalog:",
-		"scmp": "catalog:",
-		"yup": "^1.6.1"
-	},
-	"publishConfig": {
-		"registry": "https://registry.npmjs.org"
-	},
-	"repository": {
-		"url": "https://github.com/tinacms/tinacms.git",
-		"directory": "packages/tina-graphql"
-	},
-	"devDependencies": {
-		"@tinacms/schema-tools": "workspace:*",
-		"@tinacms/scripts": "workspace:*",
-		"@types/cors": "^2.8.17",
-		"@types/estree": "^0.0.50",
-		"@types/express": "catalog:",
-		"@types/fs-extra": "^9.0.13",
-		"@types/js-yaml": "^3.12.10",
-		"@types/lru-cache": "catalog:",
-		"@types/mdast": "catalog:",
-		"@types/micromatch": "catalog:",
-		"@types/node": "^22.13.1",
-		"@types/normalize-path": "catalog:",
-		"@types/ws": "catalog:",
-		"jest-file-snapshot": "^0.5.0",
-		"memory-level": "catalog:",
-		"typescript": "^5.7.3",
-		"vite": "^4.5.9",
-		"vitest": "^0.32.4",
-		"zod": "catalog:"
-	}
+    "name": "@tinacms/graphql",
+    "type": "module",
+    "version": "2.0.1",
+    "main": "dist/index.js",
+    "module": "./dist/index.js",
+    "files": [
+        "package.json",
+        "dist"
+    ],
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        }
+    },
+    "license": "SEE LICENSE IN LICENSE",
+    "buildConfig": {
+        "entryPoints": [
+            {
+                "name": "src/index.ts",
+                "target": "node",
+                "bundle": []
+            }
+        ]
+    },
+    "scripts": {
+        "types": "pnpm tsc",
+        "build": "tinacms-scripts build",
+        "docs": "pnpm typedoc",
+        "test": "vitest run",
+        "test-watch": "vitest"
+    },
+    "dependencies": {
+        "@iarna/toml": "catalog:",
+        "@tinacms/mdx": "workspace:*",
+        "@tinacms/schema-tools": "workspace:*",
+        "abstract-level": "catalog:",
+        "date-fns": "^2.30.0",
+        "es-toolkit": "^1.42.0",
+        "fast-glob": "catalog:",
+        "fs-extra": "catalog:",
+        "glob-parent": "catalog:",
+        "graphql": "15.8.0",
+        "gray-matter": "catalog:",
+        "isomorphic-git": "catalog:",
+        "js-sha1": "catalog:",
+        "js-yaml": "^3.14.1",
+        "jsonpath-plus": "catalog:",
+        "many-level": "catalog:",
+        "micromatch": "catalog:",
+        "normalize-path": "catalog:",
+        "readable-stream": "catalog:",
+        "yup": "^1.6.1"
+    },
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org"
+    },
+    "repository": {
+        "url": "https://github.com/tinacms/tinacms.git",
+        "directory": "packages/tina-graphql"
+    },
+    "devDependencies": {
+        "@tinacms/schema-tools": "workspace:*",
+        "@tinacms/scripts": "workspace:*",
+        "@types/cors": "^2.8.17",
+        "@types/estree": "^0.0.50",
+        "@types/express": "catalog:",
+        "@types/fs-extra": "^9.0.13",
+        "@types/js-yaml": "^3.12.10",
+        "@types/lru-cache": "catalog:",
+        "@types/mdast": "catalog:",
+        "@types/micromatch": "catalog:",
+        "@types/node": "^22.13.1",
+        "@types/normalize-path": "catalog:",
+        "@types/ws": "catalog:",
+        "jest-file-snapshot": "^0.5.0",
+        "memory-level": "catalog:",
+        "typescript": "^5.7.3",
+        "vite": "^4.5.9",
+        "vitest": "^0.32.4",
+        "zod": "catalog:"
+    }
 }

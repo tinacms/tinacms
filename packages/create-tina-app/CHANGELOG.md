@@ -1,5 +1,22 @@
 # create-tina-app
 
+## 2.0.0
+
+### Major Changes
+
+- [#6232](https://github.com/tinacms/tinacms/pull/6232) [`bf308a9`](https://github.com/tinacms/tinacms/commit/bf308a9efed89384264f70f4247f81a6a6ea9fcb) Thanks [@JackDevAU](https://github.com/JackDevAU)! - fix(create-tina-app): update create-tina-app package to use esm
+
+### Patch Changes
+
+- [#6216](https://github.com/tinacms/tinacms/pull/6216) [`5c1e891`](https://github.com/tinacms/tinacms/commit/5c1e89181f595d392ad6cb56ca5fc0b6d9e60a23) Thanks [@JackDevAU](https://github.com/JackDevAU)! - - `@tinacms/graphql`: remove scmp dependency, replaced with modern code (now inbuilt)
+  - `@tinacms/metrics`: remove isomorphic-fetch dependency, now relies on global fetch
+  - `@tinacms/cli`: remove log4js dependency, replaced with custom logger implementation; update chalk to v5 (ESM-only)
+  - `@tinacms/scripts`, `create-tina-app`: update chalk to v5 (ESM-only)
+  - `next-tinacms-azure`: Buffer to Uint8Array conversion
+  - `tinacms`: TypeScript style prop typing
+- Updated dependencies [[`5c1e891`](https://github.com/tinacms/tinacms/commit/5c1e89181f595d392ad6cb56ca5fc0b6d9e60a23)]:
+  - @tinacms/metrics@2.0.1
+
 ## 1.6.2
 
 ### Patch Changes
