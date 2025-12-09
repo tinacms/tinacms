@@ -580,19 +580,19 @@ const BranchItem = ({
                 <TooltipContent side='top'>{branch.name}</TooltipContent>
               </TooltipPortal>
             </Tooltip>
-            {isCurrentBranch && (
+          </div>
+          {isCurrentBranch && (
+            <div className='w-fit mt-1'>
               <Badge
                 calloutStyle='info'
-                className='ml-1 w-fit flex-shrink-0'
+                className='w-fit flex-shrink-0'
                 displayIcon={false}
               >
                 <BiPencil className='w-3 h-auto inline-block mr-1' />
-                Currently
-                <br />
-                Editing
+                Currently editing
               </Badge>
-            )}
-          </div>
+            </div>
+          )}
           {indexingStatus !== 'complete' && (
             <div className='w-fit mt-1'>
               <IndexStatus indexingStatus={branch.indexStatus.status} />
