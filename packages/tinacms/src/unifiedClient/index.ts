@@ -48,7 +48,7 @@ export class TinaClient<GenQueries> {
   initialized = false;
   cacheLock: AsyncLock | undefined;
   cacheDir: string;
-  cache: Cache;
+  cache: Cache | null;
 
   constructor({
     token,
