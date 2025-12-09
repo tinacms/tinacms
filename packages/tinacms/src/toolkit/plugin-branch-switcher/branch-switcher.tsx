@@ -440,39 +440,43 @@ const BranchSelector = ({
       )}
       {filteredBranchList.length > 0 && (
         <TooltipProvider>
-          <div className='min-w-[192px] w-full h-full rounded-lg shadow-inner bg-white border border-gray-200'>
-            <table className='w-full table-auto'>
-              <thead className='block w-full bg-gray-100 border-b-2 border-gray-200'>
-                <tr className='flex w-full'>
-                  <th className={`${tableHeadingStyle} flex-1`}>Branch Name</th>
-                  <th
-                    className={`${tableHeadingStyle} w-32 whitespace-nowrap text-left`}
-                  >
-                    Last Updated
-                  </th>
-                  <th
-                    className={`${tableHeadingStyle} w-32 whitespace-nowrap text-left`}
-                  >
-                    Pull Request
-                  </th>
-                </tr>
-              </thead>
-              <tbody className='block w-full max-h-[24rem] overflow-y-auto'>
-                {filteredBranchList.map((branch) => (
-                  <BranchItem
-                    key={branch.name}
-                    branch={branch}
-                    currentBranch={currentBranch}
-                    onChange={onChange}
-                    refreshBranchList={refreshBranchList}
-                    previewFunction={previewFunction}
-                    cms={cms}
-                    selectedBranch={selectedBranch}
-                    onSelectBranch={setSelectedBranch}
-                  />
-                ))}
-              </tbody>
-            </table>
+          <div className='rounded-lg border border-gray-200 overflow-hidden'>
+            <div className='min-w-[192px] max-h-[24rem] overflow-y-auto w-full h-full shadow-inner bg-white'>
+              <table className='w-full table-auto max-h-[24rem]'>
+                <thead className='sticky top-0 z-20 bg-gray-100 border-b-2 border-gray-200'>
+                  <tr>
+                    <th className={`${tableHeadingStyle} w-auto`}>
+                      Branch Name
+                    </th>
+                    <th
+                      className={`${tableHeadingStyle} w-0 whitespace-nowrap text-left`}
+                    >
+                      Last Updated
+                    </th>
+                    <th
+                      className={`${tableHeadingStyle} w-0 whitespace-nowrap text-left`}
+                    >
+                      Pull Request
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredBranchList.map((branch) => (
+                    <BranchItem
+                      key={branch.name}
+                      branch={branch}
+                      currentBranch={currentBranch}
+                      onChange={onChange}
+                      refreshBranchList={refreshBranchList}
+                      previewFunction={previewFunction}
+                      cms={cms}
+                      selectedBranch={selectedBranch}
+                      onSelectBranch={setSelectedBranch}
+                    />
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </TooltipProvider>
       )}
@@ -569,8 +573,10 @@ const BranchItem = ({
       >
         <div className='flex flex-col'>
           <div className='flex items-center gap-1 min-w-0'>
-            {branch.protected && (
-              <BiLockAlt className='w-5 h-auto opacity-70 text-blue-500 flex-shrink-0' />
+            {branch.protected ? (
+              <BiLockAlt className='w-4 h-auto opacity-70 text-blue-500 flex-shrink-0' />
+            ) : (
+              <BiGitBranch className='w-4 h-auto opacity-70 text-gray-600 flex-shrink-0' />
             )}
             <Tooltip delayDuration={300}>
               <TooltipTrigger asChild>
