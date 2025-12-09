@@ -1,7 +1,7 @@
 import { BaseTextField, FieldLabel, Select } from '@toolkit/fields';
 import { LoadingDots, PrefixedTextField } from '@toolkit/form-builder';
 import { useCMS } from '@toolkit/react-core';
-import { Button, OverflowMenu } from '@toolkit/styles';
+import { Button } from '@toolkit/styles';
 import { formatDistanceToNow } from 'date-fns';
 import * as React from 'react';
 import { AiFillWarning } from 'react-icons/ai';
@@ -9,7 +9,7 @@ import {
   BiError,
   BiGitBranch,
   BiLinkExternal,
-  BiLock,
+  BiLockAlt,
   BiPencil,
   BiRefresh,
   BiSearch,
@@ -440,24 +440,24 @@ const BranchSelector = ({
       )}
       {filteredBranchList.length > 0 && (
         <TooltipProvider>
-          <div className='min-w-[192px] max-h-[24rem] overflow-y-auto w-full h-full rounded-lg shadow-inner bg-white border border-gray-200'>
+          <div className='min-w-[192px] w-full h-full rounded-lg shadow-inner bg-white border border-gray-200'>
             <table className='w-full table-auto'>
-              <thead className='sticky top-0 z-20 bg-gray-100 border-b-2 border-gray-200'>
-                <tr>
-                  <th className={`${tableHeadingStyle} w-auto`}>Branch Name</th>
+              <thead className='block w-full bg-gray-100 border-b-2 border-gray-200'>
+                <tr className='flex w-full'>
+                  <th className={`${tableHeadingStyle} flex-1`}>Branch Name</th>
                   <th
-                    className={`${tableHeadingStyle} w-0 whitespace-nowrap text-left`}
+                    className={`${tableHeadingStyle} w-32 whitespace-nowrap text-left`}
                   >
                     Last Updated
                   </th>
                   <th
-                    className={`${tableHeadingStyle} w-0 whitespace-nowrap text-left`}
+                    className={`${tableHeadingStyle} w-32 whitespace-nowrap text-left`}
                   >
                     Pull Request
                   </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className='block w-full max-h-[24rem] overflow-y-auto'>
                 {filteredBranchList.map((branch) => (
                   <BranchItem
                     key={branch.name}
@@ -564,11 +564,13 @@ const BranchItem = ({
               : 'border-b-2 border-gray-50 hover:bg-gray-50/50 cursor-pointer'
       }`}
     >
-      <td className='pl-3 pr-3 py-1.5 max-w-xs'>
+      <td
+        className={`pl-3 pr-3 max-w-xs ${isCurrentBranch ? 'py-2.5' : 'py-1.5'}`}
+      >
         <div className='flex flex-col'>
           <div className='flex items-center gap-1 min-w-0'>
             {branch.protected && (
-              <BiLock className='w-5 h-auto opacity-70 text-blue-500 flex-shrink-0' />
+              <BiLockAlt className='w-5 h-auto opacity-70 text-blue-500 flex-shrink-0' />
             )}
             <Tooltip delayDuration={300}>
               <TooltipTrigger asChild>
@@ -621,51 +623,32 @@ const BranchItem = ({
       </td>
       <td className='px-3 py-1.5 flex' onClick={(e) => e.stopPropagation()}>
         {branch.githubPullRequestUrl ? (
-          <Tooltip delayDuration={300}>
-            <TooltipTrigger asChild>
-              <Button
-                variant='white'
-                size='custom'
-                onClick={() => {
-                  window.open(branch.githubPullRequestUrl, '_blank');
-                }}
-                className='cursor-pointer h-9 px-2 flex items-center gap-1'
-              >
-                <span className='text-sm truncate max-w-[120px]'>
-                  PR: #{extractPullRequestId(branch.githubPullRequestUrl)}
-                </span>
-                <BiLinkExternal className='h-3.5 w-auto text-gray-700 flex-shrink-0' />
-              </Button>
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent side='top'>Open Git Pull Request</TooltipContent>
-            </TooltipPortal>
-          </Tooltip>
-        ) : (
-          <OverflowMenu
-            toolbarItems={[
-              !branch.protected &&
-                !creatingPR &&
-                cms.api.tina.usingProtectedBranch() && {
-                  name: 'create-pr',
-                  label: 'Create Pull Request',
-                  Icon: <BiGitBranch className='w-5 h-auto text-blue-500' />,
-                  onMouseDown: () => handleCreatePullRequest(),
-                },
-              typeof previewFunction === 'function' &&
-                previewFunction({ branch: branch.name })?.url && {
-                  name: 'preview',
-                  label: 'Preview',
-                  onMouseDown: () => {
-                    const previewUrl = previewFunction({
-                      branch: branch.name,
-                    })?.url;
-                    window.open(previewUrl, '_blank');
-                  },
-                },
-            ].filter(Boolean)}
-          />
-        )}
+          <Button
+            variant='white'
+            size='custom'
+            onClick={() => {
+              window.open(branch.githubPullRequestUrl, '_blank');
+            }}
+            className='cursor-pointer h-9 px-2 flex items-center gap-1'
+            title='Open Git Pull Request'
+          >
+            <BiLinkExternal className='h-3.5 w-auto text-gray-700 flex-shrink-0' />
+            <span className='text-sm truncate max-w-[120px]'>Open PR</span>
+          </Button>
+        ) : !branch.protected &&
+          !creatingPR &&
+          cms.api.tina.usingProtectedBranch() ? (
+          <Button
+            variant='white'
+            size='custom'
+            onClick={handleCreatePullRequest}
+            className='cursor-pointer h-9 px-2 flex items-center gap-1'
+            title='Create Pull Request'
+          >
+            <BiGitBranch className='h-3.5 w-auto text-gray-700 flex-shrink-0' />
+            <span className='text-sm whitespace-nowrap'>Create PR</span>
+          </Button>
+        ) : null}
       </td>
     </tr>
   );
