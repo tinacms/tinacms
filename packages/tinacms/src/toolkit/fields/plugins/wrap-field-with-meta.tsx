@@ -129,7 +129,7 @@ export const FieldMeta = ({
     const isAlreadyActive = existingForm?.activeFieldName === name;
 
     if (isAlreadyActive) {
-      return; // Don't toggle off when clicking an already-active field
+      return;
     }
     // Dispatch the field:focus event for iframe communication
     setFocusedField({ id: tinaForm.id, fieldName: name });
@@ -183,15 +183,21 @@ export const FieldWrapper = ({
   const isActive = dataActive === 'true';
   const isHovering = dataHovering === 'true';
 
+  const getFieldStateClasses = () => {
+    if (isActive) {
+      return '[&_input]:!border-tina-orange-dark [&_input]:!ring-2 [&_input]:!ring-tina-orange-dark/20 [&_textarea]:!border-tina-orange-dark [&_textarea]:!ring-2 [&_textarea]:!ring-tina-orange-dark/20 [&_select]:!border-tina-orange-dark [&_select]:!ring-2 [&_select]:!ring-tina-orange-dark/20 [&_.ProseMirror]:!border-tina-orange-dark [&_.ProseMirror]:!ring-2 [&_.ProseMirror]:!ring-tina-orange-dark/20';
+    }
+
+    if (isHovering) {
+      return '[&_input]:!border-blue-500 [&_input]:!ring-2 [&_input]:!ring-blue-500/20 [&_textarea]:!border-blue-500 [&_textarea]:!ring-2 [&_textarea]:!ring-blue-500/20 [&_select]:!border-blue-500 [&_select]:!ring-2 [&_select]:!ring-blue-500/20 [&_.ProseMirror]:!border-blue-500 [&_.ProseMirror]:!ring-2 [&_.ProseMirror]:!ring-blue-500/20';
+    }
+
+    return '';
+  };
+
   return (
     <div
-      className={`relative ${margin ? `mb-5 last:mb-0` : ``} ${
-        isHovering && !isActive
-          ? '[&_input]:!border-blue-500 [&_input]:!ring-2 [&_input]:!ring-blue-500/20 [&_textarea]:!border-blue-500 [&_textarea]:!ring-2 [&_textarea]:!ring-blue-500/20 [&_select]:!border-blue-500 [&_select]:!ring-2 [&_select]:!ring-blue-500/20 [&_.ProseMirror]:!border-blue-500 [&_.ProseMirror]:!ring-2 [&_.ProseMirror]:!ring-blue-500/20'
-          : isActive
-            ? '[&_input]:!border-tina-orange-dark [&_input]:!ring-2 [&_input]:!ring-tina-orange-dark/20 [&_textarea]:!border-tina-orange-dark [&_textarea]:!ring-2 [&_textarea]:!ring-tina-orange-dark/20 [&_select]:!border-tina-orange-dark [&_select]:!ring-2 [&_select]:!ring-tina-orange-dark/20 [&_.ProseMirror]:!border-tina-orange-dark [&_.ProseMirror]:!ring-2 [&_.ProseMirror]:!ring-tina-orange-dark/20'
-            : ''
-      }`}
+      className={`relative ${margin ? `mb-5 last:mb-0` : ``} ${getFieldStateClasses()}`}
       data-tina-field-active={dataActive}
       data-tina-field-hovering={dataHovering}
       {...restProps}

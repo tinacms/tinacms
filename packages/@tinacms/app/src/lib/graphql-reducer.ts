@@ -652,10 +652,9 @@ export const useGraphQLReducer = (
       });
       return;
     }
-    // Get the queryId from the form's queries array (forms track which queries created them)
+    // Get the queryId from the form's queries array, reconstruct full fieldName
     const queries = activeForm.tinaForm.queries;
     if (queries && queries.length > 0) {
-      // Use the last query ID (most recent)
       const queryId = queries[queries.length - 1];
       iframe.current?.contentWindow?.postMessage({
         type: 'field:set-focused',
