@@ -630,31 +630,32 @@ export const useGraphQLReducer = (
     });
   }, [cms.state.sidebarDisplayState]);
 
-  // Extract just the active field name to avoid unnecessary re-renders
-  const activeForm = cms.state.forms.find(
-    (form: any) => form.tinaForm.id === cms.state.activeFormId
-  );
-  const activeFieldName = activeForm?.activeFieldName;
-
-  // Compute the full field name to send to iframe
-  const focusedFieldName = React.useMemo(() => {
-    if (!activeForm || !activeFieldName) {
+  // Compute the active field name to send to iframe
+  const activeFieldName = React.useMemo(() => {
+    const activeForm = cms.state.forms.find(
+      (form: any) => form.tinaForm.id === cms.state.activeFormId
+    );
+    if (!activeForm) {
       return null;
     }
-
+    const fieldName = activeForm.activeFieldName;
+    if (fieldName === null) {
+      return null;
+    }
     const queries = activeForm.tinaForm.queries;
-    const queryId = queries?.[queries.length - 1];
+    if (queries && queries.length > 0) {
+      const queryId = queries[queries.length - 1];
+      return `${queryId}---${fieldName}`;
+    }
+    return null;
+  }, [cms.state.forms, cms.state.activeFormId]);
 
-    return queryId ? `${queryId}---${activeFieldName}` : null;
-  }, [cms.state.activeFormId, activeFieldName]);
-
-  // Sync active field state with iframe
   React.useEffect(() => {
     iframe.current?.contentWindow?.postMessage({
       type: 'field:set-focused',
-      fieldName: focusedFieldName,
+      fieldName: activeFieldName,
     });
-  }, [focusedFieldName]);
+  }, [activeFieldName, iframe]);
 
   React.useEffect(() => {
     cms.dispatch({ type: 'set-edit-mode', value: 'visual' });
