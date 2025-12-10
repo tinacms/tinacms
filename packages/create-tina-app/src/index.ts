@@ -22,6 +22,25 @@ import validate from 'validate-npm-package-name';
 import * as ascii from './util/asciiArt';
 import { THEMES } from './themes';
 
+
+// Formats a template into a prompts choice object with description and features
+function formatTemplateChoice(template: Template) {
+  let description = template.description || '';
+
+  if (template.features && template.features.length > 0) {
+    const featuresText = template.features
+      .map((feature) => `  • ${feature.name}: ${feature.description}`)
+      .join('\n');
+    description = `${description}\n\nFeatures:\n${featuresText}`;
+  }
+
+  return {
+    title: template.title,
+    value: template.value,
+    description: description,
+  };
+}
+
 export async function run() {
   // Dynamic import for ora to handle ES module compatibility
   const ora = (await import('ora')).default;
@@ -120,7 +139,7 @@ export async function run() {
       name: 'template',
       type: 'select',
       message: 'What starter code would you like to use?',
-      choices: TEMPLATES,
+      choices: TEMPLATES.map(formatTemplateChoice),
     });
     if (!Object.hasOwn(res, 'template')) exit(1); // User most likely sent SIGINT.
     template = TEMPLATES.find((_template) => _template.value === res.template);
