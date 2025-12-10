@@ -22,7 +22,6 @@ import validate from 'validate-npm-package-name';
 import * as ascii from './util/asciiArt';
 import { THEMES } from './themes';
 
-
 // Formats a template into a prompts choice object with description and features
 function formatTemplateChoice(template: Template) {
   let description = template.description || '';

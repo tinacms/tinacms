@@ -45,7 +45,7 @@ export const TEMPLATES: Template[] = [
       {
         name: 'SSG',
         description: '✅',
-      }
+      },
     ],
     gitURL: 'https://github.com/tinacms/tina-nextjs-starter',
     devUrl: 'http://localhost:3000',
