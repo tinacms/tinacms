@@ -13,8 +13,7 @@
 // OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
 // CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-'use strict';
-const { builtinModules: builtins } = require('module');
+import { builtinModules as builtins } from 'node:module';
 
 /**
  * @typedef {Object} ValidationResult
