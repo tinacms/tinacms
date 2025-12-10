@@ -37,6 +37,9 @@ jobs:
           node-version-file: '.nvmrc'
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Upgrade npm for OIDC support
+        run: npm install -g npm@latest
+
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         id: pnpm-install
