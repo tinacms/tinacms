@@ -560,9 +560,11 @@ export const useGraphQLReducer = (
           }
         } else {
           // Clear hover state when fieldName is null
-          cms.dispatch({
-            type: 'forms:set-hovered-field-name',
-            value: { formId: null, fieldName: null },
+          cms.forms.all().forEach((form) => {
+            cms.dispatch({
+              type: 'forms:set-hovered-field-name',
+              value: { formId: form.id, fieldName: null },
+            });
           });
         }
       }
@@ -628,40 +630,31 @@ export const useGraphQLReducer = (
     });
   }, [cms.state.sidebarDisplayState]);
 
-  // Watch Redux state changes and sync active field with iframe
-  React.useEffect(() => {
-    const activeForm = cms.state.forms.find(
-      (form: any) => form.tinaForm.id === cms.state.activeFormId
-    );
+  // Extract just the active field name to avoid unnecessary re-renders
+  const activeForm = cms.state.forms.find(
+    (form: any) => form.tinaForm.id === cms.state.activeFormId
+  );
+  const activeFieldName = activeForm?.activeFieldName;
 
-    if (!activeForm) {
-      iframe.current?.contentWindow?.postMessage({
-        type: 'field:set-focused',
-        fieldName: null,
-      });
-      return;
+  // Compute the full field name to send to iframe
+  const focusedFieldName = React.useMemo(() => {
+    if (!activeForm || !activeFieldName) {
+      return null;
     }
 
-    const activeFieldName = activeForm.activeFieldName;
-
-    // If fieldName is null, send clear message to iframe
-    if (activeFieldName === null) {
-      iframe.current?.contentWindow?.postMessage({
-        type: 'field:set-focused',
-        fieldName: null,
-      });
-      return;
-    }
-    // Get the queryId from the form's queries array, reconstruct full fieldName
     const queries = activeForm.tinaForm.queries;
-    if (queries && queries.length > 0) {
-      const queryId = queries[queries.length - 1];
-      iframe.current?.contentWindow?.postMessage({
-        type: 'field:set-focused',
-        fieldName: `${queryId}---${activeFieldName}`,
-      });
-    }
-  }, [cms.state.forms, cms.state.activeFormId]);
+    const queryId = queries?.[queries.length - 1];
+
+    return queryId ? `${queryId}---${activeFieldName}` : null;
+  }, [cms.state.activeFormId, activeFieldName]);
+
+  // Sync active field state with iframe
+  React.useEffect(() => {
+    iframe.current?.contentWindow?.postMessage({
+      type: 'field:set-focused',
+      fieldName: focusedFieldName,
+    });
+  }, [focusedFieldName]);
 
   React.useEffect(() => {
     cms.dispatch({ type: 'set-edit-mode', value: 'visual' });
