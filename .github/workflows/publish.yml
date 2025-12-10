@@ -32,6 +32,9 @@ jobs:
         with:
           node-version-file: '.nvmrc'
 
+      - name: Upgrade npm for OIDC support
+        run: npm install -g npm@latest
+
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         id: pnpm-install
