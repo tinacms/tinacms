@@ -183,25 +183,12 @@ export function useTina<T extends object>(props: {
         }
       }
 
-      function mouseLeaveHandler(e) {
-        // Clear hover state when leaving the field
-        if (lastHoveredField !== null && isInTinaIframe) {
-          lastHoveredField = null;
-          parent.postMessage(
-            { type: 'field:hovered', fieldName: null },
-            window.location.origin
-          );
-        }
-      }
-
       document.addEventListener('click', mouseDownHandler, true);
       document.addEventListener('mouseenter', mouseEnterHandler, true);
-      document.addEventListener('mouseleave', mouseLeaveHandler, true);
 
       return () => {
         document.removeEventListener('click', mouseDownHandler, true);
         document.removeEventListener('mouseenter', mouseEnterHandler, true);
-        document.removeEventListener('mouseleave', mouseLeaveHandler, true);
         document.body.classList.remove('__tina-quick-editing-enabled');
         style.remove();
       };
