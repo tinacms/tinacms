@@ -1,30 +1,52 @@
 import type { Cache } from './index';
 
-const getRootPath = (pathParts: string[], path: any) => {
-  if (pathParts.length === 0) return null;
-  const isWindows = path.sep === '\\';
-  const root = pathParts[0];
-  return isWindows ? `${root}${path.sep}` : `${path.sep}${root}`;
+// Type definitions for dynamically imported modules
+type FsModule = typeof import('node:fs');
+type PathModule = typeof import('node:path');
+type OsModule = typeof import('node:os');
+type CryptoModule = typeof import('node:crypto');
+
+/**
+ * Helper to extract the actual module from a dynamic import result.
+ * In ESM, dynamic imports of Node built-ins return namespace objects.
+ * The actual module might be on `.default` or directly on the namespace.
+ */
+const resolveModule = <T>(mod: T | { default: T }): T => {
+  // If the module has a default export and it looks like the actual module,
+  // prefer that (handles ESM namespace objects)
+  if (mod && typeof mod === 'object' && 'default' in mod && mod.default) {
+    return mod.default as T;
+  }
+  return mod as T;
 };
 
-export const makeCacheDir = async (
+const getRootPath = (pathParts: string[], pathArg: PathModule) => {
+  if (pathParts.length === 0) return null;
+  const isWindows = pathArg.sep === '\\';
+  const root = pathParts[0];
+  return isWindows ? `${root}${pathArg.sep}` : `${pathArg.sep}${root}`;
+};
+
+// Exported for testing with dependency injection
+// Note: No default parameter values to avoid top-level module resolution
+export const makeCacheDir = (
   dir: string,
-  fs: any,
-  path: any,
-  os: any
-): Promise<string | null> => {
-  const normalizedDir = path.normalize(dir);
-  const pathParts = normalizedDir.split(path.sep).filter(Boolean);
+  fsArg: FsModule,
+  pathArg: PathModule,
+  osArg: OsModule
+): string | null => {
+  const normalizedDir = pathArg.normalize(dir);
+  const pathParts = normalizedDir.split(pathArg.sep).filter(Boolean);
   const cacheHash = pathParts[pathParts.length - 1];
 
-  const rootPath = getRootPath(pathParts, path);
-  const rootExists = rootPath && fs.existsSync(rootPath);
+  const rootPath = getRootPath(pathParts, pathArg);
+  const rootExists = rootPath && fsArg.existsSync(rootPath);
   const cacheDir = rootExists
     ? normalizedDir
-    : path.join(os.tmpdir(), cacheHash);
+    : pathArg.join(osArg.tmpdir(), cacheHash);
 
   try {
-    fs.mkdirSync(cacheDir, { recursive: true });
+    fsArg.mkdirSync(cacheDir, { recursive: true });
   } catch (error) {
     console.warn(
       `Warning: Failed to create cache directory: ${error.message}. Caching will be disabled.`
@@ -37,24 +59,32 @@ export const makeCacheDir = async (
 
 export const NodeCache = async (dir: string): Promise<Cache | null> => {
   try {
-    const fsModule = await import('node:fs');
-    const pathModule = await import('node:path');
-    const osModule = await import('node:os');
-    const cryptoModule = await import('node:crypto');
+    // Use node: protocol to clearly signal these are Node.js built-ins
+    // This helps bundlers like Turbopack understand these should not be polyfilled
+    const [fsModule, pathModule, osModule, cryptoModule] = await Promise.all([
+      import('node:fs'),
+      import('node:path'),
+      import('node:os'),
+      import('node:crypto'),
+    ]);
 
-    const fs = fsModule.default ?? fsModule;
-    const path = pathModule.default ?? pathModule;
-    const os = osModule.default ?? osModule;
-    const crypto = cryptoModule.default ?? cryptoModule;
+    // Resolve modules from ESM namespace objects
+    // Dynamic imports return {default, ...namedExports}, we need the actual module
+    const fs = resolveModule(fsModule);
+    const path = resolveModule(pathModule);
+    const os = resolveModule(osModule);
+    const crypto = resolveModule(cryptoModule);
 
-    if (typeof path.join !== 'function') {
+    // Verify path module is available and properly resolved
+    // This guards against bundler stubs that don't implement the full API
+    if (typeof path?.join !== 'function') {
       console.warn(
         'Warning: Node.js path module not available. Caching will be disabled.'
       );
       return null;
     }
 
-    const cacheDir = await makeCacheDir(dir, fs, path, os);
+    const cacheDir = makeCacheDir(dir, fs, path, os);
     if (cacheDir === null) {
       return null;
     }
@@ -100,6 +130,7 @@ export const NodeCache = async (dir: string): Promise<Cache | null> => {
       },
     };
   } catch (e) {
+    // This handles cases (like Edge runtime) where import('node:fs') might throw
     console.warn(
       'Warning: Failed to initialize cache. Caching will be disabled.',
       e.message
