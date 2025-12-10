@@ -122,11 +122,15 @@ export async function run() {
       message: 'What is your project named?',
       initial: 'my-tina-app',
       validate: (name) => {
-        const { validForNewPackages, errors } = validate(
+        const { validForNewPackages, errors, warnings } = validate(
           path.basename(path.resolve(name))
         );
         if (validForNewPackages) return true;
-        return `Invalid project name: ${errors[0]}`;
+        if (errors?.length > 0) {
+          return `Invalid project name: ${errors[0]}`;
+        }
+        // Some validation checks are "warnings" instead of "errors". E.g capital letters - https://github.com/npm/validate-npm-package-name/blob/23a9e2cba69fe548d9dcadc17ea770b23d67a439/lib/index.js#L63
+        return `Invalid project name: ${warnings[0]}`;
       },
     });
     if (!Object.hasOwn(res, 'name')) exit(1); // User most likely sent SIGINT.

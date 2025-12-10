@@ -664,8 +664,8 @@ catalogs:
       specifier: 0.5.6
       version: 0.5.6
     validate-npm-package-name:
-      specifier: ^5.0.1
-      version: 5.0.1
+      specifier: ^7.0.0
+      version: 7.0.0
     vfile-message:
       specifier: 3.1.4
       version: 3.1.4
@@ -1944,7 +1944,7 @@ importers:
         version: 7.4.0
       validate-npm-package-name:
         specifier: 'catalog:'
-        version: 5.0.1
+        version: 7.0.0
     devDependencies:
       '@tinacms/scripts':
         specifier: workspace:*
@@ -14363,9 +14363,9 @@ packages:
   validate-npm-package-license@3.0.4:
     resolution: {integrity: sha512-DpKm2Ui/xN7/HQKCtpZxoRWBhZ9Z0kqtygG8XCgNQ8ZlDnxuQmWhj566j8fN4Cu3/JmbhsDo7fcAJq4s9h27Ew==}
 
-  validate-npm-package-name@5.0.1:
-    resolution: {integrity: sha512-OljLrQ9SQdOUqTaQxqL5dEfZWrXExyyWsozYlAWFawPVNuD83igl7uJD2RTkNMbniIYgt8l81eCJGIdQF7avLQ==}
-    engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
+  validate-npm-package-name@7.0.0:
+    resolution: {integrity: sha512-bwVk/OK+Qu108aJcMAEiU4yavHUI7aN20TgZNBj9MR2iU1zPUl1Z1Otr7771ExfYTPTvfN8ZJ1pbr5Iklgt4xg==}
+    engines: {node: ^20.17.0 || >=22.9.0}
 
   value-or-promise@1.0.12:
     resolution: {integrity: sha512-Z6Uz+TYwEqE7ZN50gwn+1LCVo9ZVrpxRPOhOLnncYkY1ZzOYtrX8Fwf/rFktZ8R5mJms6EZf5TqNOMeZmnPq9Q==}
@@ -30375,7 +30375,7 @@ snapshots:
       spdx-correct: 3.2.0
       spdx-expression-parse: 3.0.1
 
-  validate-npm-package-name@5.0.1: {}
+  validate-npm-package-name@7.0.0: {}
 
   value-or-promise@1.0.12: {}
 
