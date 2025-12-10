@@ -36,54 +36,74 @@ export const makeCacheDir = async (
 };
 
 export const NodeCache = async (dir: string): Promise<Cache | null> => {
-  const fs = await import('node:fs');
-  const path = await import('node:path');
-  const os = await import('node:os');
-  const crypto = await import('node:crypto');
+  try {
+    const fsModule = await import('node:fs');
+    const pathModule = await import('node:path');
+    const osModule = await import('node:os');
+    const cryptoModule = await import('node:crypto');
 
-  const cacheDir = await makeCacheDir(dir, fs, path, os);
-  if (cacheDir === null) {
+    const fs = fsModule.default ?? fsModule;
+    const path = pathModule.default ?? pathModule;
+    const os = osModule.default ?? osModule;
+    const crypto = cryptoModule.default ?? cryptoModule;
+
+    if (typeof path.join !== 'function') {
+      console.warn(
+        'Warning: Node.js path module not available. Caching will be disabled.'
+      );
+      return null;
+    }
+
+    const cacheDir = await makeCacheDir(dir, fs, path, os);
+    if (cacheDir === null) {
+      return null;
+    }
+
+    return {
+      makeKey: (key: any) => {
+        const input =
+          key && key instanceof Object ? JSON.stringify(key) : key || '';
+        return crypto.createHash('sha256').update(input).digest('hex');
+      },
+      get: async (key: string) => {
+        let readValue: object | undefined;
+        const cacheFilename = path.join(cacheDir, key);
+
+        try {
+          const data = await fs.promises.readFile(cacheFilename, 'utf-8');
+          readValue = JSON.parse(data);
+        } catch (e) {
+          if (e.code !== 'ENOENT') {
+            console.warn(
+              `Warning: Failed to read cache file ${cacheFilename}: ${e.message}`
+            );
+          }
+        }
+
+        return readValue;
+      },
+      set: async (key: string, value: any) => {
+        const cacheFilename = path.join(cacheDir, key);
+
+        try {
+          await fs.promises.writeFile(cacheFilename, JSON.stringify(value), {
+            encoding: 'utf-8',
+            flag: 'wx',
+          });
+        } catch (e) {
+          if (e.code !== 'EEXIST') {
+            console.warn(
+              `Warning: Failed to write cache file ${cacheFilename}: ${e.message}`
+            );
+          }
+        }
+      },
+    };
+  } catch (e) {
+    console.warn(
+      'Warning: Failed to initialize cache. Caching will be disabled.',
+      e.message
+    );
     return null;
   }
-
-  return {
-    makeKey: (key: any) => {
-      const input =
-        key && key instanceof Object ? JSON.stringify(key) : key || '';
-      return crypto.createHash('sha256').update(input).digest('hex');
-    },
-    get: async (key: string) => {
-      let readValue: object | undefined;
-      const cacheFilename = path.join(cacheDir, key);
-
-      try {
-        const data = await fs.promises.readFile(cacheFilename, 'utf-8');
-        readValue = JSON.parse(data);
-      } catch (e) {
-        if (e.code !== 'ENOENT') {
-          console.warn(
-            `Warning: Failed to read cache file ${cacheFilename}: ${e.message}`
-          );
-        }
-      }
-
-      return readValue;
-    },
-    set: async (key: string, value: any) => {
-      const cacheFilename = path.join(cacheDir, key);
-
-      try {
-        await fs.promises.writeFile(cacheFilename, JSON.stringify(value), {
-          encoding: 'utf-8',
-          flag: 'wx',
-        });
-      } catch (e) {
-        if (e.code !== 'EEXIST') {
-          console.warn(
-            `Warning: Failed to write cache file ${cacheFilename}: ${e.message}`
-          );
-        }
-      }
-    },
-  };
 };

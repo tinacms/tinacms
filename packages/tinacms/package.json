@@ -33,7 +33,11 @@
                     "crypto",
                     "fs",
                     "path",
-                    "os"
+                    "os",
+                    "node:crypto",
+                    "node:fs",
+                    "node:path",
+                    "node:os"
                 ]
             }
         }
