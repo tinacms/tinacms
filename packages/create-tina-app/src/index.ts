@@ -270,6 +270,9 @@ export async function run() {
 }
 
 run().catch((error) => {
-  console.error('Error running create-tina-app:', error);
+  if (process.stdout.columns >= 60) {
+    console.log(TextStyles.tinaOrange(`${ascii.errorArt}`));
+  }
+  console.error('Error running create-tina-app: \n', error);
   process.exit(1);
 });
