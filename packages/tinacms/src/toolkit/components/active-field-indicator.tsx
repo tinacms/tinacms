@@ -3,7 +3,6 @@ import { ChevronUpIcon, ChevronDownIcon } from '@toolkit/icons';
 import { useEvent } from '@toolkit/react-core/use-cms-event';
 import { FieldHoverEvent, FieldFocusEvent } from '@toolkit/fields/field-events';
 import { useFieldReference } from '@toolkit/hooks/use-field-reference';
-import { useCMS } from '@toolkit/react-core';
 
 const IndicatorWrap = ({ style = {}, position, ...props }) => (
   <div
