@@ -13,8 +13,8 @@
 // OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
 // CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-'use strict'
-const { builtinModules: builtins } = require('module')
+'use strict';
+const { builtinModules: builtins } = require('module');
 
 /**
  * @typedef {Object} ValidationResult
@@ -31,67 +31,64 @@ const { builtinModules: builtins } = require('module')
 export default function validate(name) {
   if (name === null) {
     return {
-      message: "name cannot be null",
+      message: 'name cannot be null',
       isError: true,
     };
   }
 
   if (name === undefined) {
     return {
-      message: "name cannot be undefined",
+      message: 'name cannot be undefined',
       isError: true,
     };
   }
 
   if (typeof name !== 'string') {
     return {
-      message: "name must be a string",
+      message: 'name must be a string',
       isError: true,
     };
   }
 
   if (!name.length) {
     return {
-      message: "name length must be greater than zero",
+      message: 'name length must be greater than zero',
       isError: true,
     };
   }
 
   if (name.startsWith('.')) {
     return {
-      message: "name cannot start with a period",
+      message: 'name cannot start with a period',
       isError: true,
     };
   }
 
   if (name.match(/^_/)) {
     return {
-      message: "name cannot start with an underscore",
+      message: 'name cannot start with an underscore',
       isError: true,
     };
   }
 
   if (name.trim() !== name) {
     return {
-      message: "name cannot contain leading or trailing spaces",
+      message: 'name cannot contain leading or trailing spaces',
       isError: true,
     };
   }
 
   // No funny business
-  const exclusionList = [
-    'node_modules',
-    'favicon.ico',
-  ];
+  const exclusionList = ['node_modules', 'favicon.ico'];
 
-  exclusionList.forEach(function(excludedName) {
+  exclusionList.forEach(function (excludedName) {
     if (name.toLowerCase() === excludedName) {
       return {
         message: excludedName + ' is not a valid package name',
         isError: true,
       };
     }
-  })
+  });
 
   // Generate warnings for stuff that used to be allowed
 
@@ -105,7 +102,7 @@ export default function validate(name) {
 
   if (name.length > 214) {
     return {
-      message: "name can no longer contain more than 214 characters",
+      message: 'name can no longer contain more than 214 characters',
       isError: true,
     };
   }
@@ -113,7 +110,7 @@ export default function validate(name) {
   // mIxeD CaSe nAMEs
   if (name.toLowerCase() !== name) {
     return {
-      message: "name can no longer contain capital letters",
+      message: 'name can no longer contain capital letters',
       isError: true,
     };
   }
@@ -126,27 +123,30 @@ export default function validate(name) {
   }
 
   if (encodeURIComponent(name) !== name) {
-    const scopedPackagePattern = new RegExp('^(?:@([^/]+?)[/])?([^/]+?)$')
+    const scopedPackagePattern = new RegExp('^(?:@([^/]+?)[/])?([^/]+?)$');
     // Maybe it's a scoped package name, like @user/package
-    const nameMatch = name.match(scopedPackagePattern)
+    const nameMatch = name.match(scopedPackagePattern);
     if (nameMatch) {
-      const user = nameMatch[1]
-      const pkg = nameMatch[2]
+      const user = nameMatch[1];
+      const pkg = nameMatch[2];
 
       if (pkg.startsWith('.')) {
         return {
-          message: "name cannot start with a period",
+          message: 'name cannot start with a period',
           isError: true,
         };
       }
 
-      if (encodeURIComponent(user) === user && encodeURIComponent(pkg) === pkg) {
+      if (
+        encodeURIComponent(user) === user &&
+        encodeURIComponent(pkg) === pkg
+      ) {
         return { message: null, isError: false };
       }
     }
 
     return {
-      message: "name can only contain URL-friendly characters",
+      message: 'name can only contain URL-friendly characters',
       isError: true,
     };
   }
