@@ -21,6 +21,16 @@ import { PackageManager, PKG_MANAGERS } from './util/packageManagers';
 import validate from 'validate-npm-package-name';
 import * as ascii from './util/asciiArt';
 import { THEMES } from './themes';
+import posthog from 'posthog-js';
+import {
+  PackageManagerSelectedEvent,
+  postHogCapture,
+  TemplateSelectedEvent,
+} from './util/posthog';
+
+posthog.init(process.env.POSTHOG_API_KEY, {
+  api_host: process.env.POSTHOG_ENDPOINT,
+});
 
 export async function run() {
   // Dynamic import for ora to handle ES module compatibility
@@ -95,6 +105,7 @@ export async function run() {
     if (!Object.hasOwn(res, 'packageManager')) exit(1); // User most likely sent SIGINT.
     pkgManager = res.packageManager;
   }
+  postHogCapture(PackageManagerSelectedEvent, { packageManager: pkgManager });
 
   let projectName = opts.projectName;
   if (!projectName) {
@@ -125,6 +136,11 @@ export async function run() {
     if (!Object.hasOwn(res, 'template')) exit(1); // User most likely sent SIGINT.
     template = TEMPLATES.find((_template) => _template.value === res.template);
   }
+  postHogCapture(TemplateSelectedEvent, {
+    'template-title': template.title,
+    template: template.value,
+    'template-url': template.devUrl,
+  });
 
   let themeChoice: string | undefined;
   if (template.value === 'tina-docs') {

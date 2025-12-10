@@ -50,6 +50,7 @@
         "cross-spawn": "catalog:",
         "fs-extra": "catalog:",
         "ora": "catalog:",
+        "posthog-js": "^1.302.2",
         "prompts": "catalog:",
         "tar": "catalog:",
         "validate-npm-package-name": "catalog:"
