@@ -28,5 +28,9 @@
 		"tinacms": "workspace:*",
 		"typescript": "^5.7.3",
 		"zod": "catalog:"
+	},
+	"repository": {
+		"url": "https://github.com/tinacms/tinacms.git",
+		"directory": "packages/@tinacms/app"
 	}
 }
