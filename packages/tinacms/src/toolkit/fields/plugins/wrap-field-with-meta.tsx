@@ -184,23 +184,14 @@ export const FieldWrapper = ({
   const isHovering = dataHovering === 'true';
 
   const getFieldStateClasses = () => {
-    const baseInputClasses =
-      '[&_input]:!border-{color} [&_input]:!ring-2 [&_input]:!ring-{color}/20';
-    const baseTextareaClasses =
-      '[&_textarea]:!border-{color} [&_textarea]:!ring-2 [&_textarea]:!ring-{color}/20';
-    const baseSelectClasses =
-      '[&_select]:!border-{color} [&_select]:!ring-2 [&_select]:!ring-{color}/20';
-    const baseProseMirrorClasses =
-      '[&_.ProseMirror]:!border-{color} [&_.ProseMirror]:!ring-2 [&_.ProseMirror]:!ring-{color}/20';
+    const elements = ['input', 'textarea', 'select', '.ProseMirror'];
 
     const buildClasses = (color: string) => {
-      return [
-        baseInputClasses,
-        baseTextareaClasses,
-        baseSelectClasses,
-        baseProseMirrorClasses,
-      ]
-        .map((classes) => classes.replace(/{color}/g, color))
+      return elements
+        .map(
+          (el) =>
+            `[&_${el}]:!border-${color} [&_${el}]:!ring-2 [&_${el}]:!ring-${color}/20`
+        )
         .join(' ');
     };
 
