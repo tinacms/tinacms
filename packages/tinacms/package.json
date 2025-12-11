@@ -25,18 +25,8 @@
             "src/rich-text/static.tsx",
             "src/rich-text/prism.tsx",
             "src/react.tsx",
-            "src/client.ts"
-        ],
-        "build": {
-            "rollupOptions": {
-                "external": [
-                    "crypto",
-                    "fs",
-                    "path",
-                    "os"
-                ]
-            }
-        }
+            { "name": "src/client.ts", "target": "node" }
+        ]
     },
     "license": "Apache-2.0",
     "scripts": {
