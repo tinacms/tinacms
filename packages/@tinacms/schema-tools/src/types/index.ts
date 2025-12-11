@@ -773,6 +773,52 @@ export interface Config<
         loadCustomStore?: never;
         accept?: string | string[];
       };
+  /**
+   * Configuration for repository-related UI features.
+   *
+   * This allows you to configure how the CMS displays repository information
+   * and generates links to view file history in your Git provider (e.g., GitHub, GitLab).
+   *
+   * @example
+   *
+   * repoProvider: {
+   *   defaultBranchName: 'main',
+   *   historyUrl: ({ relativePath, branch }) => ({
+   *     url: `https://github.com/owner/repo/commits/${branch}/${relativePath}`
+   *   })
+   * }
+   *    */
+  repoProvider?: {
+    /**
+     * The default branch name to use when in local mode or when no branch is specified.
+     * When not in local mode, TinaCMS will use the branch selected in the editor.
+     *
+     * This is typically your main/master branch name (e.g., "main", "master").
+     */
+    defaultBranchName?: string;
+    /**
+     * A function that generates a URL to view the commit history for a specific file.
+     *
+     * This URL is used to link to your Git provider's history view (e.g., GitHub's commits page).
+     * The function receives the file's relative path and current branch, and should return
+     * a URL object with the full URL to the history page.
+     *
+     * @param context - Context object containing file and branch information
+     * @param context.relativePath - The relative path of the file from the repository root
+     * @param context.branch - The current branch name
+     * @returns An object with a `url` property containing the full URL to the history page
+     *
+     * @example
+     *s
+     * historyUrl: ({ relativePath, branch }) => ({
+     *   url: `https://github.com/tinacms/tinacms/commits/${branch}/examples/next-2024/${relativePath}`
+     * })
+     *      */
+    historyUrl?: (context: {
+      relativePath: string;
+      branch: string;
+    }) => { url: string };
+  };
   search?: (
     | {
         /**
