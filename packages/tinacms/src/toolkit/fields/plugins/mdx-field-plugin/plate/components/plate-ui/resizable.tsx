@@ -53,7 +53,7 @@ type ResizeHandleProps = React.ComponentPropsWithoutRef<
 export const ResizeHandle: React.ForwardRefExoticComponent<
   ResizeHandleProps & React.RefAttributes<HTMLDivElement>
 > = React.forwardRef<HTMLDivElement, ResizeHandleProps>((props, ref) => (
-  <ResizeHandleVariants direction={props.options?.direction} {...props} />
+  <ResizeHandleVariants ref={ref} direction={props.options?.direction} {...props} />
 ));
 
 ResizeHandle.displayName = 'ResizeHandle';

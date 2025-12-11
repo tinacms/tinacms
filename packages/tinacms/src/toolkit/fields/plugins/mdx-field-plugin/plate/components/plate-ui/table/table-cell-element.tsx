@@ -35,7 +35,7 @@ export const TableCellElement: React.ForwardRefExoticComponent<
       key: TableRowPlugin.key,
     });
     const isSelectingRow = useBlockSelected(rowId);
-    const { borders, minHeight, selected, width } = useTableCellElement();
+    const { minHeight, selected, width } = useTableCellElement();
 
     return (
       <PlateElement
