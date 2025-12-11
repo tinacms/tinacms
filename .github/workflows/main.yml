@@ -17,9 +17,7 @@ jobs:
           - macOS-latest
     runs-on: ${{ matrix.os }}
     permissions:
-      contents: write
       id-token: write  # Required for OIDC authentication with npm
-      pull-requests: write
     timeout-minutes: 15
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
