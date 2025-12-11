@@ -24,7 +24,7 @@ export interface SelectProps {
 }
 
 export const selectFieldClasses =
-  'shadow appearance-none h-full bg-white block pl-3 pr-8 py-2 truncate w-full text-base cursor-pointer border border-gray-200 focus:outline-none focus:shadow-outline focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded';
+  'shadow appearance-none h-full bg-white block pl-3 pr-8 py-2 truncate w-full text-base cursor-pointer border border-gray-200 focus:outline-none focus:shadow-outline focus:ring-tina-orange-dark focus:border-tina-orange-dark sm:text-sm rounded';
 
 export const Select: React.FC<SelectProps> = ({
   input,
@@ -35,10 +35,13 @@ export const Select: React.FC<SelectProps> = ({
   const selectOptions = options || field.options;
   const ref = React.useRef(null);
   React.useEffect(() => {
-    if (ref.current && field?.experimental_focusIntent) {
+    const focusIntent = field?.focusIntent;
+    const shouldFocus = !!focusIntent;
+
+    if (ref.current && shouldFocus) {
       ref.current.focus();
     }
-  }, [field?.experimental_focusIntent, ref]);
+  }, [field?.focusIntent, ref]);
 
   return (
     <div className='relative group w-full h-full md:w-auto'>

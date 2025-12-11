@@ -56,6 +56,10 @@ export type TinaAction =
       value: { formId: string; fieldName: string };
     }
   | {
+      type: 'forms:set-hovered-field-name';
+      value: { formId: string; fieldName: string | null };
+    }
+  | {
       type: 'form-lists:clear';
     }
   | {
@@ -100,7 +104,11 @@ export interface TinaState {
    * all at once, putting state this high up at least allows us to not have to touch the Form class too much.
    * Longer term, replaceing Form with something stateful seems like the right approach
    */
-  forms: { activeFieldName?: string | null; tinaForm: Form }[];
+  forms: {
+    activeFieldName?: string | null;
+    tinaForm: Form;
+    hoveringFieldName?: string | null;
+  }[];
   formLists: FormList[];
   editingMode: 'visual' | 'basic';
   isLoadingContent: boolean;
@@ -240,6 +248,7 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         };
       }
       return state;
+
     case 'forms:set-active-field-name':
       if (state.activeFormId === action.value.formId) {
         const existingForm = state.forms.find(
@@ -247,7 +256,7 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         );
 
         if (existingForm?.activeFieldName === action.value.fieldName) {
-          // If the active field name is already set, do nothing
+          // Clicking on the same field - don't change state
           return state;
         }
       }
@@ -257,6 +266,7 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
           return {
             tinaForm: form.tinaForm,
             activeFieldName: action.value.fieldName,
+            hoveringFieldName: null,
           };
         }
         return form;
@@ -274,6 +284,58 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         forms,
         activeFormId: action.value.formId,
       };
+
+    case 'forms:set-hovered-field-name':
+      const hoveredForms = state.forms.map((form) => {
+        if (form.tinaForm.id === action.value.formId) {
+          const activeFieldName = form.activeFieldName;
+          const hoveredFieldName = action.value.fieldName;
+
+          // If there's an active field and we're hovering on something
+          if (activeFieldName && hoveredFieldName) {
+            // Don't allow hover if hovering the same field as active
+            if (activeFieldName === hoveredFieldName) {
+              return {
+                ...form,
+                hoveringFieldName: null,
+              };
+            }
+
+            // Check if hoveredFieldName is a child of activeFieldName
+            const isChildOfActive = hoveredFieldName.startsWith(
+              activeFieldName + '.'
+            );
+
+            // Check if hoveredFieldName is a sibling of activeFieldName
+            const activePathParts = activeFieldName.split('.');
+            const hoveredPathParts = hoveredFieldName.split('.');
+            const isSibling =
+              activePathParts.length === hoveredPathParts.length &&
+              activePathParts.slice(0, -1).join('.') ===
+                hoveredPathParts.slice(0, -1).join('.');
+
+            if (!isChildOfActive && !isSibling) {
+              // Not a child or sibling field - don't update hover
+              return {
+                ...form,
+                hoveringFieldName: null,
+              };
+            }
+          }
+
+          return {
+            ...form,
+            hoveringFieldName: hoveredFieldName,
+          };
+        }
+        return form;
+      });
+
+      return {
+        ...state,
+        forms: hoveredForms,
+      };
+
     case 'toggle-edit-state': {
       return state.sidebarDisplayState === 'closed'
         ? { ...state, sidebarDisplayState: 'open' }

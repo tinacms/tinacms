@@ -146,7 +146,7 @@ export const BlockSelectorBig = ({
                           <input
                             type='text'
                             className={
-                              'shadow-inner focus:shadow-outline focus:border-blue-400 focus:outline-none block text-sm pl-2.5 pr-8 py-1.5 text-gray-600 w-full bg-white border border-gray-200 focus:text-gray-900 rounded placeholder-gray-400 hover:placeholder-gray-600 transition-all ease-out duration-150'
+                              'shadow-inner focus:shadow-outline focus:border-tina-orange-dark focus:outline-none block text-sm pl-2.5 pr-8 py-1.5 text-gray-600 w-full bg-white border border-gray-200 focus:text-gray-900 rounded placeholder-gray-400 hover:placeholder-gray-600 transition-all ease-out duration-150'
                             }
                             onClick={(event: any) => {
                               event.stopPropagation();

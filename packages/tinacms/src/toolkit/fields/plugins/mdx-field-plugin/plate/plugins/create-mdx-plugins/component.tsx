@@ -207,7 +207,7 @@ const DotMenu = ({ onOpen, onRemove }) => {
     <Popover as='span' className='-ml-px relative block'>
       <PopoverButton
         as='span'
-        className='cursor-pointer h-full relative inline-flex items-center px-1 py-0.5 rounded-r border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
+        className='cursor-pointer h-full relative inline-flex items-center px-1 py-0.5 rounded-r border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-tina-orange-dark focus:border-tina-orange-dark'
       >
         <EllipsisIcon title='Open options' />
       </PopoverButton>
