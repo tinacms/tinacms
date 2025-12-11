@@ -51,7 +51,6 @@
         "fs-extra": "catalog:",
         "ora": "catalog:",
         "prompts": "catalog:",
-        "tar": "catalog:",
-        "validate-npm-package-name": "catalog:"
+        "tar": "catalog:"
     }
 }

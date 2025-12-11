@@ -1,5 +1,24 @@
 # tinacms
 
+## 3.1.0
+
+### Minor Changes
+
+- [#6233](https://github.com/tinacms/tinacms/pull/6233) [`a125472`](https://github.com/tinacms/tinacms/commit/a125472d3278c140cb416dba5cd1478fb5dfe320) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - ✨ File History Provider
+
+### Patch Changes
+
+- [#6240](https://github.com/tinacms/tinacms/pull/6240) [`998975c`](https://github.com/tinacms/tinacms/commit/998975cc8e3c71489f3ed6cbf9ca0a5a7619c18b) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Fixing node cache path resolutions
+
+- [#6236](https://github.com/tinacms/tinacms/pull/6236) [`3097535`](https://github.com/tinacms/tinacms/commit/3097535275e813db907a592ee96bd8481f0eacc5) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐛 Bug - Fix Toast Blocking Content Underneath
+
+- [#6198](https://github.com/tinacms/tinacms/pull/6198) [`9fb397d`](https://github.com/tinacms/tinacms/commit/9fb397da515468f72b01f5a7cf881187a9c33d6e) Thanks [@Pat-Stuart](https://github.com/Pat-Stuart)! - Branch Selector - Add truncation and tooltip to branch name, adjust max width, add sticky header
+
+- Updated dependencies [[`a125472`](https://github.com/tinacms/tinacms/commit/a125472d3278c140cb416dba5cd1478fb5dfe320)]:
+  - @tinacms/schema-tools@2.1.0
+  - @tinacms/mdx@2.0.1
+  - @tinacms/search@1.1.6
+
 ## 3.0.2
 
 ### Patch Changes
