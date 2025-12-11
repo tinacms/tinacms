@@ -108,7 +108,7 @@ jobs:
             echo "Issue already exists. Skipping issue creation."
           else
             echo "Creating a new issue..."
-            gh issue -R tinacms/tinacms create --title "$ISSUE_TITLE" --label "bug" --body "$ISSUE_BODY" --project "TinaCloud"
+            gh issue -R tinacms/tinacms create --title "$ISSUE_TITLE" --label "bug" --body "$ISSUE_BODY" --project "tinacms/38"
           fi
 
   # Required to check for failures due to the `continue-on-error` being set to true.
