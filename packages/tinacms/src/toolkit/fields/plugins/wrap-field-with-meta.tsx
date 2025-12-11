@@ -184,12 +184,32 @@ export const FieldWrapper = ({
   const isHovering = dataHovering === 'true';
 
   const getFieldStateClasses = () => {
+    const baseInputClasses =
+      '[&_input]:!border-{color} [&_input]:!ring-2 [&_input]:!ring-{color}/20';
+    const baseTextareaClasses =
+      '[&_textarea]:!border-{color} [&_textarea]:!ring-2 [&_textarea]:!ring-{color}/20';
+    const baseSelectClasses =
+      '[&_select]:!border-{color} [&_select]:!ring-2 [&_select]:!ring-{color}/20';
+    const baseProseMirrorClasses =
+      '[&_.ProseMirror]:!border-{color} [&_.ProseMirror]:!ring-2 [&_.ProseMirror]:!ring-{color}/20';
+
+    const buildClasses = (color: string) => {
+      return [
+        baseInputClasses,
+        baseTextareaClasses,
+        baseSelectClasses,
+        baseProseMirrorClasses,
+      ]
+        .map((classes) => classes.replace(/{color}/g, color))
+        .join(' ');
+    };
+
     if (isActive) {
-      return '[&_input]:!border-tina-orange-dark [&_input]:!ring-2 [&_input]:!ring-tina-orange-dark/20 [&_textarea]:!border-tina-orange-dark [&_textarea]:!ring-2 [&_textarea]:!ring-tina-orange-dark/20 [&_select]:!border-tina-orange-dark [&_select]:!ring-2 [&_select]:!ring-tina-orange-dark/20 [&_.ProseMirror]:!border-tina-orange-dark [&_.ProseMirror]:!ring-2 [&_.ProseMirror]:!ring-tina-orange-dark/20';
+      return buildClasses('tina-orange-dark');
     }
 
     if (isHovering) {
-      return '[&_input]:!border-blue-500 [&_input]:!ring-2 [&_input]:!ring-blue-500/20 [&_textarea]:!border-blue-500 [&_textarea]:!ring-2 [&_textarea]:!ring-blue-500/20 [&_select]:!border-blue-500 [&_select]:!ring-2 [&_select]:!ring-blue-500/20 [&_.ProseMirror]:!border-blue-500 [&_.ProseMirror]:!ring-2 [&_.ProseMirror]:!ring-blue-500/20';
+      return buildClasses('blue-500');
     }
 
     return '';
