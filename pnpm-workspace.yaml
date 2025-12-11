@@ -233,7 +233,7 @@ catalog:
     unist-util-visit: 4.1.2
     url-pattern: ^1.0.3
     uvu: 0.5.6
-    validate-npm-package-name: ^5.0.1
+    validate-npm-package-name: ^7.0.0
     vfile-message: 3.1.4
     webfontloader: 1.6.28
     zod: ^3.24.2

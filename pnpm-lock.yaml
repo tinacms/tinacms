@@ -663,9 +663,6 @@ catalogs:
     uvu:
       specifier: 0.5.6
       version: 0.5.6
-    validate-npm-package-name:
-      specifier: ^5.0.1
-      version: 5.0.1
     vfile-message:
       specifier: 3.1.4
       version: 3.1.4
@@ -1942,9 +1939,6 @@ importers:
       tar:
         specifier: 'catalog:'
         version: 7.4.0
-      validate-npm-package-name:
-        specifier: 'catalog:'
-        version: 5.0.1
     devDependencies:
       '@tinacms/scripts':
         specifier: workspace:*
@@ -14362,10 +14356,6 @@ packages:
 
   validate-npm-package-license@3.0.4:
     resolution: {integrity: sha512-DpKm2Ui/xN7/HQKCtpZxoRWBhZ9Z0kqtygG8XCgNQ8ZlDnxuQmWhj566j8fN4Cu3/JmbhsDo7fcAJq4s9h27Ew==}
-
-  validate-npm-package-name@5.0.1:
-    resolution: {integrity: sha512-OljLrQ9SQdOUqTaQxqL5dEfZWrXExyyWsozYlAWFawPVNuD83igl7uJD2RTkNMbniIYgt8l81eCJGIdQF7avLQ==}
-    engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
 
   value-or-promise@1.0.12:
     resolution: {integrity: sha512-Z6Uz+TYwEqE7ZN50gwn+1LCVo9ZVrpxRPOhOLnncYkY1ZzOYtrX8Fwf/rFktZ8R5mJms6EZf5TqNOMeZmnPq9Q==}
@@ -30374,8 +30364,6 @@ snapshots:
     dependencies:
       spdx-correct: 3.2.0
       spdx-expression-parse: 3.0.1
-
-  validate-npm-package-name@5.0.1: {}
 
   value-or-promise@1.0.12: {}
 
