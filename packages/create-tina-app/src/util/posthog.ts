@@ -1,15 +1,29 @@
-import { posthog, Properties } from 'posthog-js';
+import { PostHog } from 'posthog-node';
+export const CreateTinaAppStartedEvent: string = 'create-tina-app-started';
+export const CreateTinaAppFinishedEvent: string = 'create-tina-app-finished';
 
-export const TemplateSelectedEvent: string = 'template-selected';
-export const PackageManagerSelectedEvent: string = 'package-manager-selected';
+export function postHogCapture(
+  client: PostHog,
+  event: string,
+  properties: Record<string, any>
+): void {
+  if (process.env.TINA_DEV === 'true') return;
 
-export function postHogCapture(event: string, properties: Properties): void {
-  if (process.env.TINA_DEV) return;
-  const res = posthog.capture(event, {
-    ...properties,
-    system: 'tinacms/create-tina-app',
-  });
-  if (res === undefined) {
-    console.error(`failed to log ${event} posthog event`);
+  if (!client) {
+    console.error(`PostHog client not initialized`);
+    return;
+  }
+
+  try {
+    client.capture({
+      distinctId: 'create-tina-app',
+      event,
+      properties: {
+        ...properties,
+        system: 'tinacms/create-tina-app',
+      },
+    });
+  } catch (error) {
+    console.error('Error capturing event:', error);
   }
 }

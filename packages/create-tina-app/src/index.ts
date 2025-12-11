@@ -21,17 +21,23 @@ import { PackageManager, PKG_MANAGERS } from './util/packageManagers';
 import validate from 'validate-npm-package-name';
 import * as ascii from './util/asciiArt';
 import { THEMES } from './themes';
-import posthog from 'posthog-js';
+import { PostHog } from 'posthog-node';
 import {
-  PackageManagerSelectedEvent,
+  CreateTinaAppFinishedEvent,
+  CreateTinaAppStartedEvent,
   postHogCapture,
-  TemplateSelectedEvent,
 } from './util/posthog';
+import * as dotenv from 'dotenv';
+import { fileURLToPath } from 'node:url';
 
-posthog.init(process.env.POSTHOG_API_KEY, {
-  api_host: process.env.POSTHOG_ENDPOINT,
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.join(__dirname, '..', '.env') });
+
+const posthogClient: PostHog = new PostHog(process.env.POSTHOG_API_KEY, {
+  host: process.env.POSTHOG_ENDPOINT,
 });
-
 export async function run() {
   // Dynamic import for ora to handle ES module compatibility
   const ora = (await import('ora')).default;
@@ -49,6 +55,8 @@ export async function run() {
 
   const spinner = ora();
   preRunChecks(spinner);
+
+  postHogCapture(posthogClient, CreateTinaAppStartedEvent, {});
 
   const opts = extractOptions(process.argv);
 
@@ -105,7 +113,6 @@ export async function run() {
     if (!Object.hasOwn(res, 'packageManager')) exit(1); // User most likely sent SIGINT.
     pkgManager = res.packageManager;
   }
-  postHogCapture(PackageManagerSelectedEvent, { packageManager: pkgManager });
 
   let projectName = opts.projectName;
   if (!projectName) {
@@ -136,11 +143,6 @@ export async function run() {
     if (!Object.hasOwn(res, 'template')) exit(1); // User most likely sent SIGINT.
     template = TEMPLATES.find((_template) => _template.value === res.template);
   }
-  postHogCapture(TemplateSelectedEvent, {
-    'template-title': template.title,
-    template: template.value,
-    'template-url': template.devUrl,
-  });
 
   let themeChoice: string | undefined;
   if (template.value === 'tina-docs') {
@@ -265,9 +267,22 @@ export async function run() {
       'https://tina.io/docs/tinacloud/'
     )}`
   );
+
+  postHogCapture(posthogClient, CreateTinaAppFinishedEvent, {
+    template: template.value,
+    'package-manager': pkgManager,
+    'node-version': process.version,
+    'app-name': appName,
+  });
 }
 
-run().catch((error) => {
-  console.error('Error running create-tina-app:', error);
-  process.exit(1);
-});
+run()
+  .catch((error) => {
+    console.error('Error running create-tina-app:', error);
+    process.exit(1);
+  })
+  .then(() => {
+    if (posthogClient) {
+      posthogClient.shutdown();
+    }
+  });
