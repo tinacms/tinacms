@@ -1,5 +1,11 @@
 # create-tina-app
 
+## 2.1.0
+
+### Minor Changes
+
+- [#6245](https://github.com/tinacms/tinacms/pull/6245) [`e1eb9ad`](https://github.com/tinacms/tinacms/commit/e1eb9ad156f2bf076d64ff576505e853045c9e13) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - ✨ Add Features to Templates + 🐛 Fix handling of package-name warnings
+
 ## 2.0.0
 
 ### Major Changes
