@@ -16,6 +16,10 @@ jobs:
           - ubuntu-latest
           - macOS-latest
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
+      id-token: write  # Required for OIDC authentication with npm
+      pull-requests: write
     timeout-minutes: 15
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
@@ -31,6 +35,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Upgrade npm for OIDC support
+        run: npm install -g npm@latest
 
       - uses: pnpm/action-setup@v4
         name: Install pnpm
@@ -77,12 +85,7 @@ jobs:
 
       - name: Check Tina lock changes
         run: pnpm diff-tina-lock
-
-      - name: Set NPMRC
-        run: echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" > .npmrc
-        env:
-          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-
+        
       - name: Publish tagged PR
         if: >
           matrix.os == 'ubuntu-latest' &&
@@ -98,3 +101,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+          NPM_CONFIG_PROVENANCE: true
