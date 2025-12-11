@@ -29,6 +29,6 @@ export interface Field<F extends Field = AnyField> {
    * necessarily updated when a user clicks on a new field. So you can have a
    * field which is marked as the active field, and have focus on another field
    */
-  experimental_focusIntent?: boolean;
+  focusIntent?: boolean;
   hoverIntent?: boolean;
 }

@@ -35,13 +35,13 @@ export const Select: React.FC<SelectProps> = ({
   const selectOptions = options || field.options;
   const ref = React.useRef(null);
   React.useEffect(() => {
-    const focusIntent = field?.experimental_focusIntent;
+    const focusIntent = field?.focusIntent;
     const shouldFocus = !!focusIntent;
 
     if (ref.current && shouldFocus) {
       ref.current.focus();
     }
-  }, [field?.experimental_focusIntent, ref]);
+  }, [field?.focusIntent, ref]);
 
   return (
     <div className='relative group w-full h-full md:w-auto'>

@@ -151,7 +151,7 @@ const InnerField = ({
               tinaForm={form}
               field={{
                 ...field,
-                experimental_focusIntent: focusIntent,
+                focusIntent: focusIntent,
                 hoverIntent: hoverIntent,
               }}
             />
@@ -162,12 +162,12 @@ const InnerField = ({
           return (
             <plugin.Component
               {...fieldProps}
-              experimental_focusIntent={focusIntent}
+              focusIntent={focusIntent}
               form={form.finalForm}
               tinaForm={form}
               field={{
                 ...field,
-                experimental_focusIntent: focusIntent,
+                focusIntent: focusIntent,
                 hoverIntent: hoverIntent,
               }}
               index={index}

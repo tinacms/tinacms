@@ -6,7 +6,7 @@ import { parse } from './text-format';
 const TextareaField = wrapFieldsWithMeta<{ input: InputProps }>((props) => {
   const ref = React.useRef(null);
   React.useEffect(() => {
-    const focusIntent = props.field.experimental_focusIntent;
+    const focusIntent = props.field.focusIntent;
     const shouldFocus = !!focusIntent;
 
     if (ref.current && shouldFocus) {
@@ -15,7 +15,7 @@ const TextareaField = wrapFieldsWithMeta<{ input: InputProps }>((props) => {
       // Move the cursor to the end of the text
       el.setSelectionRange(el.value.length, el.value.length);
     }
-  }, [props.field.experimental_focusIntent, ref]);
+  }, [props.field.focusIntent, ref]);
 
   return <TextArea ref={ref} {...props.input} />;
 });
