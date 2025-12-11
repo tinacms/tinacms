@@ -6,7 +6,10 @@ import {
 } from '@tinacms/schema-tools';
 import { Form, FormBuilder, FormStatus } from '@tinacms/toolkit';
 import type { TinaCMS } from '@tinacms/toolkit';
-import { FormBreadcrumbs } from '@toolkit/react-sidebar/components/sidebar-body';
+import {
+  FormBreadcrumbs,
+  FileHistoryProvider,
+} from '@toolkit/react-sidebar/components/sidebar-body';
 import React, { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { TinaAdminApi } from '../api';
@@ -175,6 +178,18 @@ const RenderForm = ({
           <FormBreadcrumbs
             className='w-[calc(100%-3rem)]'
             rootBreadcrumbName={`${filename}.${collection.format}`}
+          />
+          <FileHistoryProvider
+            defaultBranchName={
+              cms.api.admin.api.schema.config.config.repoProvider
+                ?.defaultBranchName
+            }
+            historyUrl={
+              cms.api.admin.api.schema.config.config.repoProvider?.historyUrl
+            }
+            contentRelativePath={relativePath}
+            tinaBranch={cms.api.admin.api.branch}
+            isLocalMode={cms.api?.tina?.isLocalMode}
           />
           <FormStatus pristine={formIsPristine} />
         </div>
