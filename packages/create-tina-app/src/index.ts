@@ -14,7 +14,7 @@ import { initializeGit, makeFirstCommit } from './util/git';
 import { TEMPLATES, Template, downloadTemplate } from './templates';
 import { preRunChecks } from './util/preRunChecks';
 import { checkPackageExists } from './util/checkPkgManagers';
-import { TextStyles } from './util/textstyles';
+import { TextStyles, TextStylesBold } from './util/textstyles';
 import { exit } from 'node:process';
 import { extractOptions } from './util/options';
 import { PackageManager, PKG_MANAGERS } from './util/packageManagers';
@@ -53,14 +53,15 @@ export async function run() {
   const require = createRequire(import.meta.url);
   const version = require('../package.json').version;
   console.log(`Create Tina App v${version}`);
-  console.log(
-    `At TinaCMS we collect anonymous usage data to help us improve the product. You can opt out by passing the --noTelemetry flag.\n`
-  );
-
+  const opts = extractOptions(process.argv);
+  if (!opts.noTelemetry) {
+    console.log(`\n${TextStylesBold.bold('Telemetry Notice')}`);
+    console.log(
+      `To help the TinaCMS team improve the developer experience, create-tina-app collects anonymous usage statistics. This data helps us understand which environments and features are most important to support. Usage analytics may include: Operating system and version, package manager name and version (local only), Node.js version (local only), and the selected TinaCMS starter template.\nNo personal or project-specific code is ever collected. You can opt out at any time by passing the --noTelemetry flag.\n`
+    );
+  }
   const spinner = ora();
   preRunChecks(spinner);
-
-  const opts = extractOptions(process.argv);
 
   if (!opts.noTelemetry) {
     postHogCapture(posthogClient, CreateTinaAppStartedEvent, {});
