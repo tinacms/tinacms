@@ -33,11 +33,12 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-dotenv.config({ path: path.join(__dirname, '..', '.env') });
+dotenv.config({ path: path.join(__dirname, '..', '.env'), quiet: true });
 
 const posthogClient: PostHog = new PostHog(process.env.POSTHOG_API_KEY, {
   host: process.env.POSTHOG_ENDPOINT,
 });
+
 export async function run() {
   // Dynamic import for ora to handle ES module compatibility
   const ora = (await import('ora')).default;
@@ -52,13 +53,18 @@ export async function run() {
   const require = createRequire(import.meta.url);
   const version = require('../package.json').version;
   console.log(`Create Tina App v${version}`);
+  console.log(
+    `At TinaCMS we collect anonymous usage data to help us improve the product. You can opt out by passing the --noTelemetry flag.\n`
+  );
 
   const spinner = ora();
   preRunChecks(spinner);
 
-  postHogCapture(posthogClient, CreateTinaAppStartedEvent, {});
-
   const opts = extractOptions(process.argv);
+
+  if (!opts.noTelemetry) {
+    postHogCapture(posthogClient, CreateTinaAppStartedEvent, {});
+  }
 
   const telemetry = new Telemetry({ disabled: opts?.noTelemetry });
 
@@ -268,12 +274,14 @@ export async function run() {
     )}`
   );
 
-  postHogCapture(posthogClient, CreateTinaAppFinishedEvent, {
-    template: template.value,
-    'package-manager': pkgManager,
-    'node-version': process.version,
-    'app-name': appName,
-  });
+  if (!opts.noTelemetry) {
+    postHogCapture(posthogClient, CreateTinaAppFinishedEvent, {
+      template: template.value,
+      'package-manager': pkgManager,
+      'node-version': process.version,
+      'app-name': appName,
+    });
+  }
 }
 
 run()
