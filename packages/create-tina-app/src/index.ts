@@ -27,19 +27,32 @@ import {
   CreateTinaAppStartedEvent,
   postHogCapture,
 } from './util/posthog';
-import * as dotenv from 'dotenv';
-import { fileURLToPath } from 'node:url';
+import fetchPostHogConfig from './util/fetchPosthogConfig';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+let posthogClient: PostHog | null = null;
 
-dotenv.config({ path: path.join(__dirname, '..', '.env'), quiet: true });
+async function initializePostHog(configEndpoint?: string): Promise<PostHog | null> {
+  let apiKey: string | undefined;
+  let endpoint: string | undefined;
 
-const posthogClient: PostHog = new PostHog(process.env.POSTHOG_API_KEY, {
-  host: process.env.POSTHOG_ENDPOINT,
-});
+  if (configEndpoint) {
+    const config = await fetchPostHogConfig(configEndpoint);
+    apiKey = config.POSTHOG_API_KEY;
+    endpoint = config.POSTHOG_ENDPOINT;
+  }
+
+  if (!apiKey) {
+    console.warn('PostHog API key not found. PostHog tracking will be disabled.');
+    return null;
+  }
+
+  return new PostHog(apiKey, {
+    host: endpoint,
+  });
+}
 
 export async function run() {
+  
   // Dynamic import for ora to handle ES module compatibility
   const ora = (await import('ora')).default;
   let packageManagerInstallationHadError = false;
@@ -60,10 +73,15 @@ export async function run() {
       `To help the TinaCMS team improve the developer experience, create-tina-app collects anonymous usage statistics. This data helps us understand which environments and features are most important to support. Usage analytics may include: Operating system and version, package manager name and version (local only), Node.js version (local only), and the selected TinaCMS starter template.\nNo personal or project-specific code is ever collected. You can opt out at any time by passing the --noTelemetry flag.\n`
     );
   }
+
+  if (!opts.noTelemetry) {
+    posthogClient = await initializePostHog('https://identity-v2.tinajs.io/v2/posthog-token');
+  }
+
   const spinner = ora();
   preRunChecks(spinner);
 
-  if (!opts.noTelemetry) {
+  if (!opts.noTelemetry && posthogClient) {
     postHogCapture(posthogClient, CreateTinaAppStartedEvent, {});
   }
 
@@ -187,8 +205,6 @@ export async function run() {
   }
 
   try {
-    await downloadTemplate(template, rootDir, spinner);
-
     if (themeChoice) {
       // Add selected theme to content/settings/config.json
       await updateThemeSettings(rootDir, themeChoice);
@@ -275,7 +291,7 @@ export async function run() {
     )}`
   );
 
-  if (!opts.noTelemetry) {
+  if (!opts.noTelemetry && posthogClient) {
     postHogCapture(posthogClient, CreateTinaAppFinishedEvent, {
       template: template.value,
       'package-manager': pkgManager,
@@ -290,8 +306,8 @@ run()
     console.error('Error running create-tina-app:', error);
     process.exit(1);
   })
-  .then(() => {
+  .then(async () => {
     if (posthogClient) {
-      posthogClient.shutdown();
+      await posthogClient.shutdown();
     }
   });
