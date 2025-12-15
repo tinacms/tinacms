@@ -5,9 +5,13 @@ import type {
   IndexableDocument,
   SearchIndexResult,
 } from '../types';
-// default import + destructuring because `sqlite-level` still exposes CJS-style exports.
-import sqliteLevel from 'sqlite-level';
-const { SqliteLevel } = sqliteLevel;
+// TODO: Update to use named import once https://github.com/tinacms/sqlite-level/pull/24 is merged and released
+// Use namespace import because `sqlite-level` is a CJS module and esbuild
+// rewrites default imports in ways that break ESM named-export resolution.
+import * as sqliteLevelModule from 'sqlite-level';
+const SqliteLevel =
+  (sqliteLevelModule as any).default?.SqliteLevel ??
+  (sqliteLevelModule as any).SqliteLevel;
 import si from 'search-index';
 import { MemoryLevel } from 'memory-level';
 import { lookupStopwords } from '../indexer/utils';
