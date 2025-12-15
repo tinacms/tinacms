@@ -19,7 +19,6 @@ export default async function fetchPostHogConfig(
     }
 
     const config = await response.json();
-    console.log(config.api_key);
     return {
       POSTHOG_API_KEY: config.api_key,
       POSTHOG_ENDPOINT: config.host,

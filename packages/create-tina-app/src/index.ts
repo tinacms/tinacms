@@ -31,7 +31,9 @@ import fetchPostHogConfig from './util/fetchPosthogConfig';
 
 let posthogClient: PostHog | null = null;
 
-async function initializePostHog(configEndpoint?: string): Promise<PostHog | null> {
+async function initializePostHog(
+  configEndpoint?: string
+): Promise<PostHog | null> {
   let apiKey: string | undefined;
   let endpoint: string | undefined;
 
@@ -42,7 +44,9 @@ async function initializePostHog(configEndpoint?: string): Promise<PostHog | nul
   }
 
   if (!apiKey) {
-    console.warn('PostHog API key not found. PostHog tracking will be disabled.');
+    console.warn(
+      'PostHog API key not found. PostHog tracking will be disabled.'
+    );
     return null;
   }
 
@@ -52,7 +56,6 @@ async function initializePostHog(configEndpoint?: string): Promise<PostHog | nul
 }
 
 export async function run() {
-  
   // Dynamic import for ora to handle ES module compatibility
   const ora = (await import('ora')).default;
   let packageManagerInstallationHadError = false;
@@ -75,7 +78,9 @@ export async function run() {
   }
 
   if (!opts.noTelemetry) {
-    posthogClient = await initializePostHog('https://identity-v2.tinajs.io/v2/posthog-token');
+    posthogClient = await initializePostHog(
+      'https://identity-v2.tinajs.io/v2/posthog-token'
+    );
   }
 
   const spinner = ora();
