@@ -1,7 +1,15 @@
 import si from 'search-index';
 export { SearchIndexer } from './indexer';
 export { LocalSearchIndexClient, TinaCMSSearchIndexClient } from './client';
-export type { SearchClient, SearchOptions, FuzzySearchOptions } from './types';
+export type {
+  SearchClient,
+  SearchOptions,
+  SearchResult,
+  SearchQueryResponse,
+  IndexableDocument,
+  SearchIndexResult,
+} from './types';
+export type { FuzzySearchOptions, FuzzyMatch } from './fuzzy';
 export {
   levenshteinDistance,
   similarityScore,
@@ -10,5 +18,5 @@ export {
   FuzzyCache,
   DEFAULT_FUZZY_OPTIONS,
 } from './fuzzy';
-export type { FuzzyMatch } from './fuzzy';
+export { FuzzySearchWrapper } from './fuzzy-search-wrapper';
 export { si };

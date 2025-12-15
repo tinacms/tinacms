@@ -1,7 +1,3 @@
-/**
- * Unit tests for fuzzy search utilities
- */
-
 import {
   levenshteinDistance,
   similarityScore,
@@ -49,7 +45,7 @@ describe('similarityScore', () => {
     expect(similarityScore('', '')).toBe(1);
   });
 
-  it('should return 0 for completely different strings', () => {
+  it('should return low score for completely different strings', () => {
     const score = similarityScore('abc', 'xyz');
     expect(score).toBeLessThan(0.1);
   });
@@ -68,9 +64,7 @@ describe('similarityScore', () => {
 });
 
 describe('damerauLevenshteinDistance', () => {
-  it('should handle transpositions', () => {
-    // Standard Levenshtein would count this as 2 (delete + insert)
-    // Damerau-Levenshtein counts it as 1 (transposition)
+  it('should handle transpositions as single edit', () => {
     expect(damerauLevenshteinDistance('ab', 'ba')).toBe(1);
     expect(damerauLevenshteinDistance('the', 'teh')).toBe(1);
   });
@@ -104,33 +98,23 @@ describe('findSimilarTerms', () => {
   });
 
   it('should find similar terms with typos', () => {
-    const matches = findSimilarTerms('aple', dictionary, {
-      maxDistance: 1,
-    });
+    const matches = findSimilarTerms('aple', dictionary, { maxDistance: 1 });
     expect(matches.length).toBeGreaterThan(0);
     expect(matches.some((m) => m.term === 'apple')).toBe(true);
   });
 
   it('should respect maxDistance option', () => {
-    const matches = findSimilarTerms('aple', dictionary, {
-      maxDistance: 1,
-    });
-    // 'application' has distance > 1, should not be included
+    const matches = findSimilarTerms('aple', dictionary, { maxDistance: 1 });
     expect(matches.some((m) => m.term === 'application')).toBe(false);
   });
 
   it('should respect minSimilarity option', () => {
-    const matches = findSimilarTerms('app', dictionary, {
-      minSimilarity: 0.8,
-    });
-    // Should only match very similar terms
+    const matches = findSimilarTerms('app', dictionary, { minSimilarity: 0.8 });
     expect(matches.every((m) => m.similarity >= 0.8)).toBe(true);
   });
 
   it('should respect maxResults option', () => {
-    const matches = findSimilarTerms('app', dictionary, {
-      maxResults: 2,
-    });
+    const matches = findSimilarTerms('app', dictionary, { maxResults: 2 });
     expect(matches.length).toBeLessThanOrEqual(2);
   });
 
@@ -154,7 +138,6 @@ describe('findSimilarTerms', () => {
     const matches = findSimilarTerms('APPLE', dictionary, {
       caseSensitive: true,
     });
-    // Exact match won't be found due to case difference
     expect(matches[0]?.term === 'APPLE' && matches[0]?.similarity === 1).toBe(
       false
     );
@@ -165,20 +148,17 @@ describe('findSimilarTerms', () => {
       usePrefixFilter: true,
       prefixLength: 2,
     });
-    // Should only match terms starting with 'ap'
     expect(matches.every((m) => m.term.toLowerCase().startsWith('ap'))).toBe(
       true
     );
   });
 
   it('should handle empty dictionary', () => {
-    const matches = findSimilarTerms('apple', []);
-    expect(matches).toEqual([]);
+    expect(findSimilarTerms('apple', [])).toEqual([]);
   });
 
   it('should handle empty query', () => {
-    const matches = findSimilarTerms('', dictionary);
-    expect(matches).toEqual([]);
+    expect(findSimilarTerms('', dictionary)).toEqual([]);
   });
 
   it('should use transpositions by default', () => {
@@ -193,20 +173,17 @@ describe('FuzzyCache', () => {
   let cache: FuzzyCache;
 
   beforeEach(() => {
-    cache = new FuzzyCache(3); // Small cache for testing
+    cache = new FuzzyCache(3);
   });
 
   it('should store and retrieve values', () => {
     const results = [{ term: 'apple', distance: 0, similarity: 1 }];
     cache.set('apple', {}, results);
-
-    const retrieved = cache.get('apple', {});
-    expect(retrieved).toEqual(results);
+    expect(cache.get('apple', {})).toEqual(results);
   });
 
   it('should return undefined for missing keys', () => {
-    const retrieved = cache.get('missing', {});
-    expect(retrieved).toBeUndefined();
+    expect(cache.get('missing', {})).toBeUndefined();
   });
 
   it('should evict oldest entries when at capacity', () => {
@@ -218,12 +195,9 @@ describe('FuzzyCache', () => {
     cache.set('apple', {}, results1);
     cache.set('banana', {}, results2);
     cache.set('cherry', {}, results3);
-
     expect(cache.size).toBe(3);
 
-    // Adding fourth entry should evict the oldest (apple)
     cache.set('date', {}, results4);
-
     expect(cache.size).toBe(3);
     expect(cache.get('apple', {})).toBeUndefined();
     expect(cache.get('date', {})).toEqual(results4);
@@ -239,10 +213,7 @@ describe('FuzzyCache', () => {
     cache.set('banana', {}, results2);
     cache.set('cherry', {}, results3);
 
-    // Access apple to make it recently used
     cache.get('apple', {});
-
-    // Adding fourth entry should evict banana (oldest unused)
     cache.set('date', {}, results4);
 
     expect(cache.get('apple', {})).toEqual(results1);
@@ -252,11 +223,9 @@ describe('FuzzyCache', () => {
   it('should clear all entries', () => {
     cache.set('apple', {}, []);
     cache.set('banana', {}, []);
-
     expect(cache.size).toBe(2);
 
     cache.clear();
-
     expect(cache.size).toBe(0);
     expect(cache.get('apple', {})).toBeUndefined();
   });
@@ -280,7 +249,7 @@ describe('DEFAULT_FUZZY_OPTIONS', () => {
     expect(DEFAULT_FUZZY_OPTIONS.maxResults).toBe(10);
     expect(DEFAULT_FUZZY_OPTIONS.useTranspositions).toBe(true);
     expect(DEFAULT_FUZZY_OPTIONS.caseSensitive).toBe(false);
-    expect(DEFAULT_FUZZY_OPTIONS.usePrefixFilter).toBe(false); // Disabled by default for better fuzzy matching
+    expect(DEFAULT_FUZZY_OPTIONS.usePrefixFilter).toBe(false);
     expect(DEFAULT_FUZZY_OPTIONS.prefixLength).toBe(2);
   });
 });

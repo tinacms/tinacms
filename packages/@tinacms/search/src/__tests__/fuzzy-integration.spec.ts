@@ -1,7 +1,3 @@
-/**
- * Integration tests for fuzzy search with search-index
- */
-
 import { LocalSearchIndexClient } from '../client';
 
 describe('Fuzzy Search Integration', () => {

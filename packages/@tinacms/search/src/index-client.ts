@@ -1,85 +1,94 @@
-export type { SearchClient } from './types';
+export type {
+  SearchClient,
+  SearchResult,
+  SearchQueryResponse,
+  IndexableDocument,
+} from './types';
 export { processDocumentForIndexing } from './indexer/utils';
 import { lookupStopwords } from './indexer/utils';
+import type { FuzzyMatch } from './fuzzy';
+
+interface SearchQuery {
+  AND: string[];
+}
+
+interface PaginationOptions {
+  limit?: number;
+  cursor?: string;
+}
+
+interface PageOptions {
+  PAGE?: {
+    SIZE: number;
+    NUMBER: number;
+  };
+}
+
+interface SearchIndexResponse {
+  RESULT: unknown[];
+  RESULT_LENGTH: number;
+  FUZZY_MATCHES?: Record<string, FuzzyMatch[]>;
+}
+
+interface ParsedSearchResponse {
+  results: unknown[];
+  total: number;
+  prevCursor: string | null;
+  nextCursor: string | null;
+  fuzzyMatches?: Record<string, FuzzyMatch[]>;
+}
 
 export const queryToSearchIndexQuery = (
   query: string,
   stopwordLanguages?: string[]
-) => {
-  let q;
+): SearchQuery => {
   const parts = query.split(' ');
   const stopwords = lookupStopwords(stopwordLanguages);
+
   if (parts.length === 1) {
-    q = { AND: [parts[0]] };
-  } else {
-    // Filter out stopwords and the literal "AND" keyword
-    q = {
-      AND: parts.filter(
-        (part) =>
-          part.toLowerCase() !== 'and' &&
-          stopwords.indexOf(part.toLowerCase()) === -1
-      ),
-    };
+    return { AND: [parts[0]] };
   }
-  return q;
+
+  const filteredParts = parts.filter(
+    (part) =>
+      part.toLowerCase() !== 'and' && !stopwords.includes(part.toLowerCase())
+  );
+
+  return { AND: filteredParts };
 };
 
-export const optionsToSearchIndexOptions = (options?: {
-  limit?: number;
-  cursor?: string;
-}) => {
-  const opt: { PAGE?: {} } = {};
-  if (options?.limit) {
-    opt['PAGE'] = {
+export const optionsToSearchIndexOptions = (
+  options?: PaginationOptions
+): PageOptions => {
+  if (!options?.limit) return {};
+
+  return {
+    PAGE: {
       SIZE: options.limit,
-      NUMBER: options?.cursor ? parseInt(options.cursor) : 0,
-    };
-  }
-  return opt;
+      NUMBER: options.cursor ? parseInt(options.cursor) : 0,
+    },
+  };
 };
 
 export const parseSearchIndexResponse = (
-  data: any,
-  options?: {
-    limit?: number;
-    cursor?: string;
-  }
-) => {
-  const results = data['RESULT'];
-  const total = data['RESULT_LENGTH'];
-  const fuzzyMatches = data['FUZZY_MATCHES'];
+  data: SearchIndexResponse,
+  options?: PaginationOptions
+): ParsedSearchResponse => {
+  const results = data.RESULT;
+  const total = data.RESULT_LENGTH;
+  const fuzzyMatches = data.FUZZY_MATCHES;
 
-  if (options?.cursor && options?.limit) {
-    const prevCursor =
-      options.cursor === '0' ? null : (parseInt(options.cursor) - 1).toString();
-    const nextCursor =
-      total <= (parseInt(options.cursor) + 1) * options.limit
-        ? null
-        : (parseInt(options.cursor) + 1).toString();
-    return {
-      results,
-      total,
-      prevCursor,
-      nextCursor,
-      fuzzyMatches,
-    };
-  } else if (!options?.cursor && options?.limit) {
-    const prevCursor = null;
-    const nextCursor = total <= options.limit ? null : '1';
-    return {
-      results,
-      total,
-      prevCursor,
-      nextCursor,
-      fuzzyMatches,
-    };
-  } else {
-    return {
-      results,
-      total,
-      prevCursor: null,
-      nextCursor: null,
-      fuzzyMatches,
-    };
-  }
+  const currentPage = options?.cursor ? parseInt(options.cursor) : 0;
+  const pageSize = options?.limit;
+
+  const hasPreviousPage = currentPage > 0;
+  const hasNextPage = pageSize ? total > (currentPage + 1) * pageSize : false;
+
+  return {
+    results,
+    total,
+    prevCursor: hasPreviousPage ? (currentPage - 1).toString() : null,
+    nextCursor: hasNextPage ? (currentPage + 1).toString() : null,
+    fuzzyMatches,
+  };
 };
