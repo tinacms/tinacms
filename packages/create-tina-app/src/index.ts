@@ -18,7 +18,7 @@ import { TextStyles, TextStylesBold } from './util/textstyles';
 import { exit } from 'node:process';
 import { extractOptions } from './util/options';
 import { PackageManager, PKG_MANAGERS } from './util/packageManagers';
-import validate from 'validate-npm-package-name';
+import validate from './util/isNpm';
 import * as ascii from './util/asciiArt';
 import { THEMES } from './themes';
 import { PostHog } from 'posthog-node';
@@ -53,6 +53,24 @@ async function initializePostHog(
   return new PostHog(apiKey, {
     host: endpoint,
   });
+}
+
+// Formats a template into a prompts choice object with description and features
+function formatTemplateChoice(template: Template) {
+  let description = template.description || '';
+
+  if (template.features && template.features.length > 0) {
+    const featuresText = template.features
+      .map((feature) => `  • ${feature.name}: ${feature.description}`)
+      .join('\n');
+    description = `${description}\n\nFeatures:\n${featuresText}`;
+  }
+
+  return {
+    title: template.title,
+    value: template.value,
+    description: description,
+  };
 }
 
 export async function run() {
@@ -152,11 +170,11 @@ export async function run() {
       message: 'What is your project named?',
       initial: 'my-tina-app',
       validate: (name) => {
-        const { validForNewPackages, errors } = validate(
+        const { message, isError } = validate(
           path.basename(path.resolve(name))
         );
-        if (validForNewPackages) return true;
-        return `Invalid project name: ${errors[0]}`;
+        if (isError) return `Invalid project name: ${message}`;
+        return true;
       },
     });
     if (!Object.hasOwn(res, 'name')) exit(1); // User most likely sent SIGINT.
@@ -168,7 +186,7 @@ export async function run() {
       name: 'template',
       type: 'select',
       message: 'What starter code would you like to use?',
-      choices: TEMPLATES,
+      choices: TEMPLATES.map(formatTemplateChoice),
     });
     if (!Object.hasOwn(res, 'template')) exit(1); // User most likely sent SIGINT.
     template = TEMPLATES.find((_template) => _template.value === res.template);
@@ -308,6 +326,10 @@ export async function run() {
 
 run()
   .catch((error) => {
+    if (process.stdout.columns >= 60) {
+      console.log(TextStyles.tinaOrange(`${ascii.errorArt}`));
+    }
+  
     console.error('Error running create-tina-app:', error);
     process.exit(1);
   })

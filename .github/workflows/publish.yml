@@ -8,6 +8,10 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write  # Required for OIDC authentication with npm
+      pull-requests: write
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
       TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
@@ -31,6 +35,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Upgrade npm for OIDC support
+        run: npm install -g npm@latest
 
       - uses: pnpm/action-setup@v4
         name: Install pnpm
@@ -62,11 +70,6 @@ jobs:
       - name: Build Types
         run: pnpm types
 
-      - name: Set NPMRC
-        run: echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" > .npmrc
-        env:
-          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-
       - name: Setup git credentials
         run: |
           git config --global user.email "bot@tina.io"
@@ -82,6 +85,7 @@ jobs:
           setupGitUser: false
         env:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token  }}
+          NPM_CONFIG_PROVENANCE: true
 
       - name: Release to @dev channel
         if: steps.changesets.outputs.hasChangesets == 'true'
@@ -92,6 +96,7 @@ jobs:
           echo "A release PR has been created: <https://github.com/tinacms/tinacms/pull/${{ steps.changesets.outputs.pullRequestNumber }}>" >> $GITHUB_STEP_SUMMARY
         env:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token  }}
+          NPM_CONFIG_PROVENANCE: true
 
       - name: Has TinaCMS been published
         id: newTinaCMSVersion

@@ -53,7 +53,6 @@
         "ora": "catalog:",
         "posthog-node": "^5.17.2",
         "prompts": "catalog:",
-        "tar": "catalog:",
-        "validate-npm-package-name": "catalog:"
+        "tar": "catalog:"
     }
 }
