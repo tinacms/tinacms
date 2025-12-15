@@ -19,4 +19,10 @@ export {
   DEFAULT_FUZZY_OPTIONS,
 } from './fuzzy';
 export { FuzzySearchWrapper } from './fuzzy-search-wrapper';
+export { buildPageOptions, buildPaginationCursors } from './pagination';
+export type {
+  PaginationOptions,
+  PageOptions,
+  PaginationCursors,
+} from './pagination';
 export { si };

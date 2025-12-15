@@ -1,6 +1,7 @@
 import { findSimilarTerms, FuzzyCache, DEFAULT_FUZZY_OPTIONS } from './fuzzy';
 import type { FuzzySearchOptions, FuzzyMatch } from './fuzzy';
 import type { SearchQueryResponse, SearchResult } from './types';
+import { buildPageOptions, buildPaginationCursors } from './pagination';
 
 interface SearchIndex {
   QUERY: (
@@ -92,40 +93,11 @@ export class FuzzySearchWrapper {
     };
   }
 
-  private buildPageOptions(options: QueryOptions): {
-    PAGE?: { NUMBER: number; SIZE: number };
-  } {
-    if (!options.limit) return {};
-
-    return {
-      PAGE: {
-        NUMBER: options.cursor ? parseInt(options.cursor, 10) : 0,
-        SIZE: options.limit,
-      },
-    };
-  }
-
-  private buildPaginationResponse(
-    total: number,
-    options: QueryOptions
-  ): { nextCursor: string | null; prevCursor: string | null } {
-    const currentPage = options.cursor ? parseInt(options.cursor, 10) : 0;
-    const pageSize = options.limit;
-
-    const hasPreviousPage = currentPage > 0;
-    const hasNextPage = pageSize ? total > (currentPage + 1) * pageSize : false;
-
-    return {
-      prevCursor: hasPreviousPage ? (currentPage - 1).toString() : null,
-      nextCursor: hasNextPage ? (currentPage + 1).toString() : null,
-    };
-  }
-
   async query(
     query: string,
     options: QueryOptions = {}
   ): Promise<SearchQueryResponse> {
-    const pageOptions = this.buildPageOptions(options);
+    const pageOptions = buildPageOptions(options);
 
     if (!options.fuzzy) {
       const results = await this.searchIndex.QUERY(
@@ -133,7 +105,7 @@ export class FuzzySearchWrapper {
         pageOptions
       );
 
-      const pagination = this.buildPaginationResponse(
+      const pagination = buildPaginationCursors(
         results.RESULT_LENGTH || 0,
         options
       );
@@ -153,7 +125,7 @@ export class FuzzySearchWrapper {
         pageOptions
       );
 
-      const pagination = this.buildPaginationResponse(
+      const pagination = buildPaginationCursors(
         results.RESULT_LENGTH || 0,
         options
       );
@@ -183,7 +155,7 @@ export class FuzzySearchWrapper {
 
     const results = await this.searchIndex.QUERY(searchQuery, pageOptions);
 
-    const pagination = this.buildPaginationResponse(
+    const pagination = buildPaginationCursors(
       results.RESULT_LENGTH || 0,
       options
     );

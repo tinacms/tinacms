@@ -12,6 +12,7 @@ import si from 'search-index';
 import { MemoryLevel } from 'memory-level';
 import { lookupStopwords } from '../indexer/utils';
 import { FuzzySearchWrapper } from '../fuzzy-search-wrapper';
+import { buildPageOptions, buildPaginationCursors } from '../pagination';
 import * as zlib from 'node:zlib';
 
 const DEFAULT_TOKEN_SPLIT_REGEX = /[\p{L}\d_]+/gu;
@@ -24,6 +25,7 @@ interface SearchIndex {
     options?: { PAGE?: { NUMBER: number; SIZE: number } }
   ) => Promise<SearchIndexResult>;
   DICTIONARY: (token?: { FIELD: string }) => Promise<unknown[]>;
+  fuzzySearchWrapper?: FuzzySearchWrapper;
 }
 
 type TinaSearchIndexerClientOptions = {
@@ -37,16 +39,12 @@ type TinaCloudSearchIndexerClientOptions = {
   indexerToken: string;
 } & TinaSearchIndexerClientOptions;
 
-interface PageOptions {
-  PAGE?: { NUMBER: number; SIZE: number };
-}
-
 export class LocalSearchIndexClient implements SearchClient {
   public searchIndex?: SearchIndex;
   protected readonly memoryLevel: MemoryLevel;
   private readonly stopwords: string[];
   private readonly tokenSplitRegex: RegExp;
-  private fuzzySearchWrapper?: FuzzySearchWrapper;
+  public fuzzySearchWrapper?: FuzzySearchWrapper;
 
   constructor(options: TinaSearchIndexerClientOptions) {
     this.memoryLevel = new MemoryLevel();
@@ -101,11 +99,10 @@ export class LocalSearchIndexClient implements SearchClient {
       });
     }
 
-    const searchIndexOptions: PageOptions = {};
-    if (options?.limit) {
-      const pageNumber = options.cursor ? parseInt(options.cursor, 10) : 0;
-      searchIndexOptions.PAGE = { NUMBER: pageNumber, SIZE: options.limit };
-    }
+    const searchIndexOptions = buildPageOptions({
+      limit: options?.limit,
+      cursor: options?.cursor,
+    });
 
     const terms = query.split(' ').filter((t) => t.trim().length > 0);
     const queryObj =
@@ -116,17 +113,15 @@ export class LocalSearchIndexClient implements SearchClient {
     );
 
     const total = searchResults.RESULT_LENGTH || 0;
-    const currentPage = options?.cursor ? parseInt(options.cursor, 10) : 0;
-    const pageSize = options?.limit;
-
-    const hasPreviousPage = currentPage > 0;
-    const hasNextPage = pageSize ? total > (currentPage + 1) * pageSize : false;
+    const pagination = buildPaginationCursors(total, {
+      limit: options?.limit,
+      cursor: options?.cursor,
+    });
 
     return {
       results: searchResults.RESULT || [],
       total,
-      prevCursor: hasPreviousPage ? (currentPage - 1).toString() : null,
-      nextCursor: hasNextPage ? (currentPage + 1).toString() : null,
+      ...pagination,
     };
   }
 

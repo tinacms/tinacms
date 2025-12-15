@@ -1,6 +1,45 @@
+import type { IncomingMessage, ServerResponse } from 'node:http';
+import type { SearchQueryResponse, SearchResult } from '@tinacms/search';
+
 export interface PathConfig {
   apiURL: string;
   searchPath: string;
+}
+
+interface SearchIndexOptions {
+  DOCUMENTS?: boolean;
+  PAGE?: { NUMBER: number; SIZE: number };
+}
+
+interface SearchIndexResult {
+  RESULT: SearchResult[];
+  RESULT_LENGTH: number;
+}
+
+interface FuzzySearchWrapper {
+  query: (
+    query: string,
+    options: {
+      limit?: number;
+      cursor?: string;
+      fuzzy: boolean;
+      fuzzyOptions: Record<string, unknown>;
+    }
+  ) => Promise<SearchQueryResponse>;
+}
+
+interface SearchIndex {
+  PUT: (docs: Record<string, unknown>[]) => Promise<unknown>;
+  DELETE: (id: string) => Promise<unknown>;
+  QUERY: (
+    query: { AND?: string[]; OR?: string[] },
+    options: SearchIndexOptions
+  ) => Promise<SearchIndexResult>;
+  fuzzySearchWrapper?: FuzzySearchWrapper;
+}
+
+interface RequestWithBody extends IncomingMessage {
+  body?: { docs?: Record<string, unknown>[] };
 }
 
 export const createSearchIndexRouter = ({
@@ -8,17 +47,17 @@ export const createSearchIndexRouter = ({
   searchIndex,
 }: {
   config: PathConfig;
-  searchIndex: any;
+  searchIndex: SearchIndex;
 }) => {
-  const put = async (req, res) => {
-    const { docs } = req.body as { docs: Record<string, any>[] };
+  const put = async (req: RequestWithBody, res: ServerResponse) => {
+    const docs = req.body?.docs ?? [];
     const result = await searchIndex.PUT(docs);
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ result }));
   };
 
-  const get = async (req, res) => {
-    const requestURL = new URL(req.url, config.apiURL);
+  const get = async (req: IncomingMessage, res: ServerResponse) => {
+    const requestURL = new URL(req.url ?? '', config.apiURL);
     const query = requestURL.searchParams.get('q');
     const optionsParam = requestURL.searchParams.get('options');
     const fuzzyParam = requestURL.searchParams.get('fuzzy');
@@ -100,7 +139,10 @@ export const createSearchIndexRouter = ({
           );
           return;
         } catch (error) {
-          // Fall through to standard search on error
+          console.warn(
+            '[search] Fuzzy search failed, falling back to standard search:',
+            error instanceof Error ? error.message : error
+          );
         }
       }
 
@@ -111,8 +153,8 @@ export const createSearchIndexRouter = ({
     }
   };
 
-  const del = async (req, res) => {
-    const requestURL = new URL(req.url, config.apiURL);
+  const del = async (req: IncomingMessage, res: ServerResponse) => {
+    const requestURL = new URL(req.url ?? '', config.apiURL);
     const docId = requestURL.pathname
       .split('/')
       .filter(Boolean)
