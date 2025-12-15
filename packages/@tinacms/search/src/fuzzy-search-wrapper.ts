@@ -13,6 +13,13 @@ interface SearchIndex {
   DICTIONARY: (token?: { FIELD: string }) => Promise<unknown[]>;
 }
 
+interface QueryOptions {
+  limit?: number;
+  cursor?: string;
+  fuzzy?: boolean;
+  fuzzyOptions?: FuzzySearchOptions;
+}
+
 export class FuzzySearchWrapper {
   private cache: FuzzyCache;
   private searchIndex: SearchIndex;
@@ -85,40 +92,76 @@ export class FuzzySearchWrapper {
     };
   }
 
+  private buildPageOptions(options: QueryOptions): {
+    PAGE?: { NUMBER: number; SIZE: number };
+  } {
+    if (!options.limit) return {};
+
+    return {
+      PAGE: {
+        NUMBER: options.cursor ? parseInt(options.cursor, 10) : 0,
+        SIZE: options.limit,
+      },
+    };
+  }
+
+  private buildPaginationResponse(
+    total: number,
+    options: QueryOptions
+  ): { nextCursor: string | null; prevCursor: string | null } {
+    const currentPage = options.cursor ? parseInt(options.cursor, 10) : 0;
+    const pageSize = options.limit;
+
+    const hasPreviousPage = currentPage > 0;
+    const hasNextPage = pageSize ? total > (currentPage + 1) * pageSize : false;
+
+    return {
+      prevCursor: hasPreviousPage ? (currentPage - 1).toString() : null,
+      nextCursor: hasNextPage ? (currentPage + 1).toString() : null,
+    };
+  }
+
   async query(
     query: string,
-    options: {
-      limit?: number;
-      cursor?: string;
-      fuzzy?: boolean;
-      fuzzyOptions?: FuzzySearchOptions;
-    } = {}
+    options: QueryOptions = {}
   ): Promise<SearchQueryResponse> {
+    const pageOptions = this.buildPageOptions(options);
+
     if (!options.fuzzy) {
-      const results = await this.searchIndex.QUERY({
-        AND: query.split(' ').filter((t) => t),
-      });
+      const results = await this.searchIndex.QUERY(
+        { AND: query.split(' ').filter((t) => t) },
+        pageOptions
+      );
+
+      const pagination = this.buildPaginationResponse(
+        results.RESULT_LENGTH || 0,
+        options
+      );
 
       return {
         results: results.RESULT || [],
         total: results.RESULT_LENGTH || 0,
-        nextCursor: null,
-        prevCursor: null,
+        ...pagination,
       };
     }
 
     const expansion = await this.expandQuery(query, options.fuzzyOptions);
 
     if (expansion.expanded.length === expansion.original.length) {
-      const results = await this.searchIndex.QUERY({
-        AND: expansion.original,
-      });
+      const results = await this.searchIndex.QUERY(
+        { AND: expansion.original },
+        pageOptions
+      );
+
+      const pagination = this.buildPaginationResponse(
+        results.RESULT_LENGTH || 0,
+        options
+      );
 
       return {
         results: results.RESULT || [],
         total: results.RESULT_LENGTH || 0,
-        nextCursor: null,
-        prevCursor: null,
+        ...pagination,
         fuzzyMatches: expansion.matches,
       };
     }
@@ -138,13 +181,17 @@ export class FuzzySearchWrapper {
             ),
           };
 
-    const results = await this.searchIndex.QUERY(searchQuery);
+    const results = await this.searchIndex.QUERY(searchQuery, pageOptions);
+
+    const pagination = this.buildPaginationResponse(
+      results.RESULT_LENGTH || 0,
+      options
+    );
 
     return {
       results: results.RESULT || [],
       total: results.RESULT_LENGTH || 0,
-      nextCursor: null,
-      prevCursor: null,
+      ...pagination,
       fuzzyMatches: expansion.matches,
     };
   }

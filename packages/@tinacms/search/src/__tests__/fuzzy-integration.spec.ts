@@ -324,4 +324,141 @@ describe('Fuzzy Search Integration', () => {
       expect(results.results).toBeDefined();
     });
   });
+
+  describe('Pagination', () => {
+    beforeEach(async () => {
+      // Index 25 documents for pagination tests
+      const docs = Array.from({ length: 25 }, (_, i) => ({
+        _id: `doc-${i}`,
+        title: `React Tutorial ${i}`,
+        body: `Learn React development part ${i}`,
+      }));
+      await client.put(docs);
+    });
+
+    it('should return first page with correct cursors', async () => {
+      const results = await client.query('React', {
+        fuzzy: true,
+        limit: 10,
+      });
+
+      expect(results.results.length).toBeLessThanOrEqual(10);
+      expect(results.prevCursor).toBeNull();
+      if (results.total > 10) {
+        expect(results.nextCursor).toBe('1');
+      }
+    });
+
+    it('should return second page when cursor provided', async () => {
+      const results = await client.query('React', {
+        fuzzy: true,
+        limit: 10,
+        cursor: '1',
+      });
+
+      expect(results.results.length).toBeLessThanOrEqual(10);
+      expect(results.prevCursor).toBe('0');
+      if (results.total > 20) {
+        expect(results.nextCursor).toBe('2');
+      }
+    });
+
+    it('should return last page with no next cursor', async () => {
+      const results = await client.query('React', {
+        fuzzy: true,
+        limit: 10,
+        cursor: '2',
+      });
+
+      expect(results.results.length).toBeLessThanOrEqual(10);
+      expect(results.prevCursor).toBe('1');
+      // Last page should have no next cursor (25 docs / 10 per page = 3 pages)
+      expect(results.nextCursor).toBeNull();
+    });
+
+    it('should paginate fuzzy search results correctly', async () => {
+      // Search with typo "Raect" -> should find "React"
+      const page1 = await client.query('Raect', {
+        fuzzy: true,
+        limit: 5,
+      });
+
+      expect(page1.results.length).toBeLessThanOrEqual(5);
+      expect(page1.total).toBeGreaterThan(5);
+
+      if (page1.nextCursor) {
+        const page2 = await client.query('Raect', {
+          fuzzy: true,
+          limit: 5,
+          cursor: page1.nextCursor,
+        });
+
+        expect(page2.results.length).toBeLessThanOrEqual(5);
+        expect(page2.prevCursor).toBe('0');
+      }
+    });
+
+    it('should return consistent total across pages', async () => {
+      const page1 = await client.query('React', {
+        fuzzy: true,
+        limit: 10,
+      });
+
+      const page2 = await client.query('React', {
+        fuzzy: true,
+        limit: 10,
+        cursor: '1',
+      });
+
+      expect(page1.total).toBe(page2.total);
+    });
+
+    it('should handle pagination without fuzzy search', async () => {
+      const page1 = await client.query('React', {
+        fuzzy: false,
+        limit: 10,
+      });
+
+      expect(page1.results.length).toBeLessThanOrEqual(10);
+      expect(page1.prevCursor).toBeNull();
+
+      if (page1.total > 10) {
+        expect(page1.nextCursor).toBe('1');
+
+        const page2 = await client.query('React', {
+          fuzzy: false,
+          limit: 10,
+          cursor: '1',
+        });
+
+        expect(page2.prevCursor).toBe('0');
+      }
+    });
+
+    it('should handle small result sets without pagination', async () => {
+      // Query that returns fewer results than limit
+      const results = await client.query('Tutorial 0', {
+        fuzzy: true,
+        limit: 10,
+      });
+
+      // If we have few results, no pagination needed
+      if (results.total <= 10) {
+        expect(results.nextCursor).toBeNull();
+      }
+    });
+
+    it('should handle empty results with pagination options', async () => {
+      const results = await client.query('nonexistentterm', {
+        fuzzy: true,
+        limit: 10,
+        cursor: '0',
+      });
+
+      expect(results.results.length).toBe(0);
+      expect(results.total).toBe(0);
+      expect(results.nextCursor).toBeNull();
+      expect(results.prevCursor).toBeNull();
+    });
+  });
 });

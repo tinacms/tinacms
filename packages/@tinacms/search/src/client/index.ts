@@ -103,7 +103,8 @@ export class LocalSearchIndexClient implements SearchClient {
 
     const searchIndexOptions: PageOptions = {};
     if (options?.limit) {
-      searchIndexOptions.PAGE = { NUMBER: 0, SIZE: options.limit };
+      const pageNumber = options.cursor ? parseInt(options.cursor, 10) : 0;
+      searchIndexOptions.PAGE = { NUMBER: pageNumber, SIZE: options.limit };
     }
 
     const terms = query.split(' ').filter((t) => t.trim().length > 0);
@@ -114,11 +115,18 @@ export class LocalSearchIndexClient implements SearchClient {
       searchIndexOptions
     );
 
+    const total = searchResults.RESULT_LENGTH || 0;
+    const currentPage = options?.cursor ? parseInt(options.cursor, 10) : 0;
+    const pageSize = options?.limit;
+
+    const hasPreviousPage = currentPage > 0;
+    const hasNextPage = pageSize ? total > (currentPage + 1) * pageSize : false;
+
     return {
       results: searchResults.RESULT || [],
-      total: searchResults.RESULT_LENGTH || 0,
-      nextCursor: null,
-      prevCursor: null,
+      total,
+      prevCursor: hasPreviousPage ? (currentPage - 1).toString() : null,
+      nextCursor: hasNextPage ? (currentPage + 1).toString() : null,
     };
   }
 

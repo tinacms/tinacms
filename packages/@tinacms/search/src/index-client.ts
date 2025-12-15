@@ -28,6 +28,8 @@ interface SearchIndexResponse {
   RESULT: unknown[];
   RESULT_LENGTH: number;
   FUZZY_MATCHES?: Record<string, FuzzyMatch[]>;
+  NEXT_CURSOR?: string | null;
+  PREV_CURSOR?: string | null;
 }
 
 interface ParsedSearchResponse {
@@ -78,6 +80,18 @@ export const parseSearchIndexResponse = (
   const total = data.RESULT_LENGTH;
   const fuzzyMatches = data.FUZZY_MATCHES;
 
+  // Use server-provided cursors if available, otherwise calculate
+  if (data.NEXT_CURSOR !== undefined || data.PREV_CURSOR !== undefined) {
+    return {
+      results,
+      total,
+      prevCursor: data.PREV_CURSOR ?? null,
+      nextCursor: data.NEXT_CURSOR ?? null,
+      fuzzyMatches,
+    };
+  }
+
+  // Fallback: calculate pagination from options
   const currentPage = options?.cursor ? parseInt(options.cursor) : 0;
   const pageSize = options?.limit;
 

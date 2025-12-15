@@ -24,12 +24,15 @@ export const createSearchIndexRouter = ({
     const fuzzyParam = requestURL.searchParams.get('fuzzy');
     const fuzzyOptionsParam = requestURL.searchParams.get('fuzzyOptions');
 
-    let options = {
+    let searchIndexOptions: {
+      DOCUMENTS?: boolean;
+      PAGE?: { NUMBER: number; SIZE: number };
+    } = {
       DOCUMENTS: false,
     };
     if (optionsParam) {
-      options = {
-        ...options,
+      searchIndexOptions = {
+        ...searchIndexOptions,
         ...JSON.parse(optionsParam),
       };
     }
@@ -46,34 +49,52 @@ export const createSearchIndexRouter = ({
             : {};
 
           const searchTerms = queryObj.AND
-            ? queryObj.AND.filter((term) => !term.includes('_collection:'))
+            ? queryObj.AND.filter(
+                (term: string) => !term.includes('_collection:')
+              )
             : [];
 
+          const collectionFilter = queryObj.AND?.find((term: string) =>
+            term.includes('_collection:')
+          );
+
+          // Convert PAGE options to limit/cursor format for FuzzySearchWrapper
+          const paginationOptions: { limit?: number; cursor?: string } = {};
+          if (searchIndexOptions.PAGE) {
+            paginationOptions.limit = searchIndexOptions.PAGE.SIZE;
+            paginationOptions.cursor =
+              searchIndexOptions.PAGE.NUMBER.toString();
+          }
+
+          // If filtering by collection, include it in the search query
+          // so pagination works correctly
+          const searchQuery = collectionFilter
+            ? `${searchTerms.join(' ')} ${collectionFilter}`
+            : searchTerms.join(' ');
+
           const result = await searchIndex.fuzzySearchWrapper.query(
-            searchTerms.join(' '),
+            searchQuery,
             {
-              ...options,
+              ...paginationOptions,
               fuzzy: true,
               fuzzyOptions,
             }
           );
 
-          const collectionFilter = queryObj.AND?.find((term) =>
-            term.includes('_collection:')
-          );
-
+          // Filter results by collection if needed (for results that don't have _collection indexed)
           if (collectionFilter) {
             const collection = collectionFilter.split(':')[1];
             result.results = result.results.filter(
               (r) => r._id && r._id.startsWith(`${collection}:`)
             );
-            result.total = result.results.length;
           }
 
           res.end(
             JSON.stringify({
               RESULT: result.results,
               RESULT_LENGTH: result.total,
+              NEXT_CURSOR: result.nextCursor,
+              PREV_CURSOR: result.prevCursor,
               FUZZY_MATCHES: result.fuzzyMatches || {},
             })
           );
@@ -83,7 +104,7 @@ export const createSearchIndexRouter = ({
         }
       }
 
-      const result = await searchIndex.QUERY(queryObj, options);
+      const result = await searchIndex.QUERY(queryObj, searchIndexOptions);
       res.end(JSON.stringify(result));
     } else {
       res.end(JSON.stringify({ RESULT: [] }));

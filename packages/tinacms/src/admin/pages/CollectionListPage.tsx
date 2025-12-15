@@ -277,6 +277,12 @@ const CollectionListPage = () => {
     }));
   }, [collectionName]);
 
+  // Reset pagination when search query changes
+  useEffect(() => {
+    setEndCursor('');
+    setPrevCursors([]);
+  }, [search]);
+
   const tableRowStyle =
     'hover:bg-gray-50/50 border-b-2 border-gray-50 transition-colors duration-300';
 
