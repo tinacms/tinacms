@@ -35,28 +35,22 @@ export const createSearchIndexRouter = ({
     }
 
     res.writeHead(200, { 'Content-Type': 'application/json' });
+
     if (query) {
       const queryObj = JSON.parse(query);
 
-      // Handle fuzzy search if enabled
       if (fuzzyParam === 'true' && searchIndex.fuzzySearchWrapper) {
         try {
           const fuzzyOptions = fuzzyOptionsParam
             ? JSON.parse(fuzzyOptionsParam)
             : {};
 
-          // Extract search terms (non-collection filters)
           const searchTerms = queryObj.AND
             ? queryObj.AND.filter((term) => !term.includes('_collection:'))
             : [];
 
-          const searchQuery = searchTerms.join(' ');
-
-          console.log('[Fuzzy Search] Query:', searchQuery);
-          console.log('[Fuzzy Search] Options:', fuzzyOptions);
-
           const result = await searchIndex.fuzzySearchWrapper.query(
-            searchQuery,
+            searchTerms.join(' '),
             {
               ...options,
               fuzzy: true,
@@ -64,33 +58,16 @@ export const createSearchIndexRouter = ({
             }
           );
 
-          console.log(
-            '[Fuzzy Search] Raw results:',
-            result.results?.length || 0
+          const collectionFilter = queryObj.AND?.find((term) =>
+            term.includes('_collection:')
           );
-          console.log('[Fuzzy Search] Sample result:', result.results?.[0]);
-          console.log('[Fuzzy Search] Fuzzy matches:', result.fuzzyMatches);
 
-          // Filter results by collection if needed
-          const collectionFilter = queryObj.AND
-            ? queryObj.AND.find((term) => term.includes('_collection:'))
-            : null;
           if (collectionFilter) {
             const collection = collectionFilter.split(':')[1];
-            console.log('[Fuzzy Search] Filtering by collection:', collection);
-            const originalLength = result.results.length;
-            result.results = result.results.filter((r) => {
-              // Check if _id contains the collection
-              const hasCollection = r._id && r._id.startsWith(`${collection}:`);
-              console.log(
-                `[Fuzzy Search] Checking result ${r._id}: ${hasCollection}`
-              );
-              return hasCollection;
-            });
-            result.total = result.results.length;
-            console.log(
-              `[Fuzzy Search] Filtered ${originalLength} -> ${result.total} results`
+            result.results = result.results.filter(
+              (r) => r._id && r._id.startsWith(`${collection}:`)
             );
+            result.total = result.results.length;
           }
 
           res.end(
@@ -102,15 +79,10 @@ export const createSearchIndexRouter = ({
           );
           return;
         } catch (error) {
-          console.error(
-            'Fuzzy search failed, falling back to standard search:',
-            error
-          );
-          // Fall through to standard search
+          // Fall through to standard search on error
         }
       }
 
-      // Standard search
       const result = await searchIndex.QUERY(queryObj, options);
       res.end(JSON.stringify(result));
     } else {
