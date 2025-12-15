@@ -845,6 +845,25 @@ export interface Config<
            * regex used for splitting tokens (default: /[\p{L}\d_]+/)
            */
           tokenSplitRegex?: string;
+          /**
+           * Enable fuzzy search by default (default: true)
+           */
+          fuzzyEnabled?: boolean;
+          /**
+           * Fuzzy search options
+           */
+          fuzzyOptions?: {
+            /** Maximum edit distance for fuzzy matching (default: 2) */
+            maxDistance?: number;
+            /** Minimum similarity score 0-1 for matches (default: 0.6) */
+            minSimilarity?: number;
+            /** Maximum number of fuzzy matches to return per term (default: 10) */
+            maxResults?: number;
+            /** Use Damerau-Levenshtein (allows transpositions) (default: true) */
+            useTranspositions?: boolean;
+            /** Case sensitive matching (default: false) */
+            caseSensitive?: boolean;
+          };
         };
       }
   ) & {

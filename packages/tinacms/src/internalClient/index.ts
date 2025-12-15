@@ -737,10 +737,34 @@ export class LocalClient extends Client {
 }
 
 export class TinaCMSSearchClient implements SearchClient {
+  private fuzzyEnabled: boolean;
+  private defaultFuzzyOptions?: {
+    maxDistance?: number;
+    minSimilarity?: number;
+    maxResults?: number;
+    useTranspositions?: boolean;
+    caseSensitive?: boolean;
+  };
+
   constructor(
     private client: Client,
-    private tinaSearchConfig?: { stopwordLanguages?: string[] }
-  ) {}
+    private tinaSearchConfig?: {
+      stopwordLanguages?: string[];
+      fuzzyEnabled?: boolean;
+      fuzzyOptions?: {
+        maxDistance?: number;
+        minSimilarity?: number;
+        maxResults?: number;
+        useTranspositions?: boolean;
+        caseSensitive?: boolean;
+      };
+    }
+  ) {
+    // Default to fuzzy enabled unless explicitly disabled
+    this.fuzzyEnabled = tinaSearchConfig?.fuzzyEnabled !== false;
+    this.defaultFuzzyOptions = tinaSearchConfig?.fuzzyOptions;
+  }
+
   async query(
     query: string,
     options?: {
@@ -763,16 +787,30 @@ export class TinaCMSSearchClient implements SearchClient {
     const opt = optionsToSearchIndexOptions(options);
     const optionsParam = opt['PAGE'] ? `&options=${JSON.stringify(opt)}` : '';
 
+    // Determine if fuzzy search should be used
+    // options.fuzzy takes precedence, otherwise use config default
+    const useFuzzy =
+      options?.fuzzy !== undefined ? options.fuzzy : this.fuzzyEnabled;
+
     // Add fuzzy search parameters if enabled
     let fuzzyParam = '';
-    if (options?.fuzzy) {
-      fuzzyParam = `&fuzzy=true&fuzzyOptions=${JSON.stringify(options.fuzzyOptions || {})}`;
+    if (useFuzzy) {
+      // Merge default options with query-specific options
+      const mergedFuzzyOptions = {
+        ...this.defaultFuzzyOptions,
+        ...options?.fuzzyOptions,
+      };
+      fuzzyParam = `&fuzzy=true&fuzzyOptions=${JSON.stringify(
+        mergedFuzzyOptions
+      )}`;
     }
 
     const res = await this.client.authProvider.fetchWithToken(
       `${this.client.contentApiBase}/searchIndex/${
         this.client.clientId
-      }/${this.client.getBranch()}?q=${JSON.stringify(q)}${optionsParam}${fuzzyParam}`
+      }/${this.client.getBranch()}?q=${JSON.stringify(
+        q
+      )}${optionsParam}${fuzzyParam}`
     );
     return parseSearchIndexResponse(await res.json(), options);
   }
@@ -816,7 +854,33 @@ export class TinaCMSSearchClient implements SearchClient {
 }
 
 export class LocalSearchClient implements SearchClient {
-  constructor(private client: Client) {}
+  private fuzzyEnabled: boolean;
+  private defaultFuzzyOptions?: {
+    maxDistance?: number;
+    minSimilarity?: number;
+    maxResults?: number;
+    useTranspositions?: boolean;
+    caseSensitive?: boolean;
+  };
+
+  constructor(
+    private client: Client,
+    private tinaSearchConfig?: {
+      fuzzyEnabled?: boolean;
+      fuzzyOptions?: {
+        maxDistance?: number;
+        minSimilarity?: number;
+        maxResults?: number;
+        useTranspositions?: boolean;
+        caseSensitive?: boolean;
+      };
+    }
+  ) {
+    // Default to fuzzy enabled unless explicitly disabled
+    this.fuzzyEnabled = tinaSearchConfig?.fuzzyEnabled !== false;
+    this.defaultFuzzyOptions = tinaSearchConfig?.fuzzyOptions;
+  }
+
   async query(
     query: string,
     options?: {
@@ -836,14 +900,28 @@ export class LocalSearchClient implements SearchClient {
     const opt = optionsToSearchIndexOptions(options);
     const optionsParam = opt['PAGE'] ? `&options=${JSON.stringify(opt)}` : '';
 
+    // Determine if fuzzy search should be used
+    // options.fuzzy takes precedence, otherwise use config default
+    const useFuzzy =
+      options?.fuzzy !== undefined ? options.fuzzy : this.fuzzyEnabled;
+
     // Add fuzzy search parameters if enabled
     let fuzzyParam = '';
-    if (options?.fuzzy) {
-      fuzzyParam = `&fuzzy=true&fuzzyOptions=${JSON.stringify(options.fuzzyOptions || {})}`;
+    if (useFuzzy) {
+      // Merge default options with query-specific options
+      const mergedFuzzyOptions = {
+        ...this.defaultFuzzyOptions,
+        ...options?.fuzzyOptions,
+      };
+      fuzzyParam = `&fuzzy=true&fuzzyOptions=${JSON.stringify(
+        mergedFuzzyOptions
+      )}`;
     }
 
     const res = await this.client.authProvider.fetchWithToken(
-      `http://localhost:4001/searchIndex?q=${JSON.stringify(q)}${optionsParam}${fuzzyParam}`
+      `http://localhost:4001/searchIndex?q=${JSON.stringify(
+        q
+      )}${optionsParam}${fuzzyParam}`
     );
     return parseSearchIndexResponse(await res.json(), options);
   }

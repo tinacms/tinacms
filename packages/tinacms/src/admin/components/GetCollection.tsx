@@ -153,39 +153,18 @@ export const useSearchCollection = (
     const searchCollection = async () => {
       if ((await api.isAuthenticated()) && !folder.loading && !cancelled) {
         try {
-          // First try standard search (exact match)
-          let response = (await cms.api.search.query(
+          const response = (await cms.api.search.query(
             `${search} AND _collection:${collectionName}`,
             {
               limit: 15,
               cursor: after,
+              fuzzy: true,
             }
           )) as {
             results: { _id: string }[];
             nextCursor: string;
             prevCursor: string;
           };
-
-          // If no results, try fuzzy search as fallback
-          if (response.results.length === 0) {
-            response = (await cms.api.search.query(
-              `${search} AND _collection:${collectionName}`,
-              {
-                limit: 15,
-                cursor: after,
-                fuzzy: true,
-                fuzzyOptions: {
-                  maxDistance: 2,
-                  minSimilarity: 0.5, // Slightly higher threshold for better relevance
-                  maxResults: 10,
-                },
-              }
-            )) as {
-              results: { _id: string }[];
-              nextCursor: string;
-              prevCursor: string;
-            };
-          }
 
           const docs = (await Promise.allSettled<
             Promise<{ document: DocumentForm }>
