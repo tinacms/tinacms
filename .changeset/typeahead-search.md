@@ -4,4 +4,4 @@
 "@tinacms/cli": minor
 ---
 
-Add typeahead/autosuggest functionality to search input. Users can now see word suggestions as they type in the collection search box, with keyboard navigation support (Arrow Up/Down, Enter, Escape) and click interaction.
+Added fuzzy search options + support. This is now set as the new default. Going forawrd this package will also be used on the TinaCloud side so we don't duplicate code. Search now uses the closest index instead of being exact. 
