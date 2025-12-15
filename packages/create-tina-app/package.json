@@ -48,7 +48,6 @@
         "chalk": "catalog:",
         "commander": "^12.1.0",
         "cross-spawn": "catalog:",
-        "dotenv": "^17.2.3",
         "fs-extra": "catalog:",
         "ora": "catalog:",
         "posthog-node": "^5.17.2",
