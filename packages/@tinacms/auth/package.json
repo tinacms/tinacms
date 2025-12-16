@@ -1,32 +1,32 @@
 {
-	"name": "@tinacms/auth",
-	"version": "1.1.0",
-	"main": "dist/index.js",
-	"typings": "dist/index.d.ts",
-	"files": [
-		"dist",
-		"src/fixtures/**/*"
-	],
-	"license": "Apache-2.0",
-	"scripts": {
-		"types": "pnpm tsc",
-		"build": "tinacms-scripts build",
-		"test": "jest --passWithNoTests"
-	},
-	"publishConfig": {
-		"registry": "https://registry.npmjs.org"
-	},
-	"repository": {
-		"url": "https://github.com/tinacms/tinacms.git",
-		"directory": "packages/tina-graphql"
-	},
-	"devDependencies": {
-		"@tinacms/scripts": "workspace:*",
-		"jest": "catalog:",
-		"next": "14.2.10",
-		"react": "18.3.1",
-		"react-dom": "18.3.1",
-		"typescript": "^5.7.3"
-	},
-	"dependencies": {}
+  "name": "@tinacms/auth",
+  "version": "1.1.0",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src/fixtures/**/*"
+  ],
+  "license": "Apache-2.0",
+  "scripts": {
+    "types": "pnpm tsc",
+    "build": "tinacms-scripts build",
+    "test": "jest --passWithNoTests"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/tina-graphql"
+  },
+  "devDependencies": {
+    "@tinacms/scripts": "workspace:*",
+    "jest": "catalog:",
+    "next": "14.2.35",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {}
 }

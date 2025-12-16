@@ -1,50 +1,50 @@
 {
-	"name": "next-tinacms-s3",
-	"version": "15.0.0",
-	"main": "dist/index.js",
-	"module": "./dist/index.js",
-	"files": [
-		"dist"
-	],
-	"typings": "dist/index.d.ts",
-	"license": "Apache-2.0",
-	"buildConfig": {
-		"entryPoints": [
-			"src/index.ts",
-			{
-				"name": "src/handlers.ts",
-				"target": "node"
-			}
-		]
-	},
-	"scripts": {
-		"types": "pnpm tsc",
-		"build": "tinacms-scripts build"
-	},
-	"devDependencies": {
-		"@tinacms/scripts": "workspace:*",
-		"@types/crypto-js": "^3.1.47",
-		"@types/js-cookie": "^2.2.7",
-		"@types/node": "^22.13.1",
-		"@types/react": "^18.3.18",
-		"next": "14.2.10",
-		"react": "^18.3.1",
-		"react-dom": "^18.3.1",
-		"tinacms": "workspace:*",
-		"typescript": "^5.7.3"
-	},
-	"peerDependencies": {
-		"tinacms": "workspace:*"
-	},
-	"publishConfig": {
-		"registry": "https://registry.npmjs.org"
-	},
-	"repository": {
-		"url": "https://github.com/tinacms/tinacms.git",
-		"directory": "packages/next-tinacms-s3"
-	},
-	"dependencies": {
-		"@aws-sdk/client-s3": "catalog:",
-		"@aws-sdk/s3-request-presigner": "catalog:"
-	}
+  "name": "next-tinacms-s3",
+  "version": "15.0.0",
+  "main": "dist/index.js",
+  "module": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "typings": "dist/index.d.ts",
+  "license": "Apache-2.0",
+  "buildConfig": {
+    "entryPoints": [
+      "src/index.ts",
+      {
+        "name": "src/handlers.ts",
+        "target": "node"
+      }
+    ]
+  },
+  "scripts": {
+    "types": "pnpm tsc",
+    "build": "tinacms-scripts build"
+  },
+  "devDependencies": {
+    "@tinacms/scripts": "workspace:*",
+    "@types/crypto-js": "^3.1.47",
+    "@types/js-cookie": "^2.2.7",
+    "@types/node": "^22.13.1",
+    "@types/react": "^18.3.18",
+    "next": "14.2.35",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tinacms": "workspace:*",
+    "typescript": "^5.7.3"
+  },
+  "peerDependencies": {
+    "tinacms": "workspace:*"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/next-tinacms-s3"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "catalog:",
+    "@aws-sdk/s3-request-presigner": "catalog:"
+  }
 }
