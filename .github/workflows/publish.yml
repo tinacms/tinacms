@@ -17,6 +17,7 @@ jobs:
     permissions:
       contents: read
       id-token: write # Required for OIDC authentication with npm
+      pull-requests: write
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
       TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
@@ -75,6 +76,78 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
           NPM_CONFIG_PROVENANCE: true
+
+      - name: Get published package versions
+        id: package-versions
+        run: |
+          # Find all modified package.json files and extract their versions
+          modified_packages=$(git diff --name-only HEAD~1 HEAD | grep 'package\.json$' || true)
+          
+          if [ -z "$modified_packages" ]; then
+            echo "packages_json={}" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          packages_json="{"
+          first=true
+          
+          for pkg_file in $modified_packages; do
+            if [ -f "$pkg_file" ]; then
+              pkg_name=$(jq -r '.name' "$pkg_file")
+              pkg_version=$(jq -r '.version' "$pkg_file")
+              
+              if [ "$pkg_name" != "null" ] && [ "$pkg_version" != "null" ]; then
+                if [ "$first" = true ]; then
+                  first=false
+                else
+                  packages_json="${packages_json},"
+                fi
+                packages_json="${packages_json}\"${pkg_name}\":\"${pkg_version}\""
+              fi
+            fi
+          done
+          
+          packages_json="${packages_json}}"
+          echo "packages_json=${packages_json}" >> $GITHUB_OUTPUT
+
+      - name: Comment on PR with install instructions
+        if: steps.package-versions.outputs.packages_json != '{}'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const packages = JSON.parse('${{ steps.package-versions.outputs.packages_json }}');
+            const branchName = context.payload.pull_request.head.ref;
+            
+            let packagesSection = '';
+            if (Object.keys(packages).length > 0) {
+              packagesSection = '\n**Published Packages:**\n';
+              for (const [name, version] of Object.entries(packages)) {
+                packagesSection += `- \`${name}@${version}\`\n`;
+              }
+            }
+            
+            const comment = `## 📦 Tagged Release Published
+            
+            Your tagged PR has been published! You can now install the packages using:
+            
+            \`\`\`bash
+            pnpm add tinacms@${branchName}
+            \`\`\`
+            
+            Or install a specific package:
+            \`\`\`bash
+            pnpm add @tinacms/<package-name>@${branchName}
+            \`\`\`
+            ${packagesSection}
+            **Tag:** \`${branchName}\`  
+            **Commit:** ${context.sha}`;
+            
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: comment
+            });
 
   build:
     if: github.event_name == 'push'
