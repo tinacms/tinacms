@@ -143,16 +143,6 @@ describe('findSimilarTerms', () => {
     );
   });
 
-  it('should apply prefix filter for performance', () => {
-    const matches = findSimilarTerms('app', dictionary, {
-      usePrefixFilter: true,
-      prefixLength: 2,
-    });
-    expect(matches.every((m) => m.term.toLowerCase().startsWith('ap'))).toBe(
-      true
-    );
-  });
-
   it('should handle empty dictionary', () => {
     expect(findSimilarTerms('apple', [])).toEqual([]);
   });
@@ -249,7 +239,8 @@ describe('DEFAULT_FUZZY_OPTIONS', () => {
     expect(DEFAULT_FUZZY_OPTIONS.maxResults).toBe(10);
     expect(DEFAULT_FUZZY_OPTIONS.useTranspositions).toBe(true);
     expect(DEFAULT_FUZZY_OPTIONS.caseSensitive).toBe(false);
-    expect(DEFAULT_FUZZY_OPTIONS.usePrefixFilter).toBe(false);
-    expect(DEFAULT_FUZZY_OPTIONS.prefixLength).toBe(2);
+    expect(DEFAULT_FUZZY_OPTIONS.useNgramFilter).toBe(true);
+    expect(DEFAULT_FUZZY_OPTIONS.ngramSize).toBe(2);
+    expect(DEFAULT_FUZZY_OPTIONS.minNgramOverlap).toBe(0.2);
   });
 });

@@ -4,8 +4,12 @@ export interface FuzzySearchOptions {
   maxResults?: number;
   useTranspositions?: boolean;
   caseSensitive?: boolean;
-  usePrefixFilter?: boolean;
-  prefixLength?: number;
+  /** Use n-gram filtering for candidate selection (supports transpositions) */
+  useNgramFilter?: boolean;
+  /** Size of n-grams for filtering (default: 2) */
+  ngramSize?: number;
+  /** Minimum n-gram overlap ratio to consider a candidate (0-1, default: 0.2) */
+  minNgramOverlap?: number;
 }
 
 export interface FuzzyMatch {
@@ -20,6 +24,7 @@ export const DEFAULT_FUZZY_OPTIONS: Required<FuzzySearchOptions> = {
   maxResults: 10,
   useTranspositions: true,
   caseSensitive: false,
-  usePrefixFilter: false,
-  prefixLength: 2,
+  useNgramFilter: true,
+  ngramSize: 2,
+  minNgramOverlap: 0.2,
 };

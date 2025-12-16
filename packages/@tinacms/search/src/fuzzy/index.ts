@@ -6,4 +6,6 @@ export {
   similarityScore,
   damerauLevenshteinDistance,
   findSimilarTerms,
+  getNgrams,
+  ngramOverlap,
 } from './distance';

@@ -29,8 +29,14 @@ export function levenshteinDistance(str1: string, str2: string): number {
   return dp[len1][len2];
 }
 
-export function similarityScore(str1: string, str2: string): number {
-  const distance = levenshteinDistance(str1, str2);
+export function similarityScore(
+  str1: string,
+  str2: string,
+  useTranspositions: boolean = false
+): number {
+  const distance = useTranspositions
+    ? damerauLevenshteinDistance(str1, str2)
+    : levenshteinDistance(str1, str2);
   const maxLength = Math.max(str1.length, str2.length);
   if (maxLength === 0) return 1;
   return 1 - distance / maxLength;
@@ -88,6 +94,44 @@ export function damerauLevenshteinDistance(str1: string, str2: string): number {
   return dp[len1 + 1][len2 + 1];
 }
 
+/**
+ * Generate n-grams (character sequences) from a string
+ * Example: getNgrams("react", 2) => Set{"re", "ea", "ac", "ct"}
+ */
+export function getNgrams(str: string, n: number = 2): Set<string> {
+  const ngrams = new Set<string>();
+  if (str.length < n) {
+    // For very short strings, use the string itself as an n-gram
+    ngrams.add(str);
+    return ngrams;
+  }
+  for (let i = 0; i <= str.length - n; i++) {
+    ngrams.add(str.substring(i, i + n));
+  }
+  return ngrams;
+}
+
+/**
+ * Calculate the overlap ratio between two sets of n-grams
+ * Returns a value between 0 and 1
+ */
+export function ngramOverlap(
+  ngrams1: Set<string>,
+  ngrams2: Set<string>
+): number {
+  if (ngrams1.size === 0 || ngrams2.size === 0) return 0;
+
+  let overlap = 0;
+  for (const ngram of ngrams1) {
+    if (ngrams2.has(ngram)) overlap++;
+  }
+
+  // Use the smaller set size as denominator to be more permissive
+  // This helps with prefix matching (e.g., "mark" vs "markdown")
+  const minSize = Math.min(ngrams1.size, ngrams2.size);
+  return overlap / minSize;
+}
+
 export function findSimilarTerms(
   query: string,
   dictionary: string[],
@@ -103,22 +147,46 @@ export function findSimilarTerms(
     ? damerauLevenshteinDistance
     : levenshteinDistance;
 
-  const prefix =
-    opts.usePrefixFilter && normalizedQuery.length >= opts.prefixLength
-      ? normalizedQuery.substring(0, opts.prefixLength)
-      : null;
+  // Pre-compute query n-grams for filtering
+  const queryNgrams = opts.useNgramFilter
+    ? getNgrams(normalizedQuery, opts.ngramSize)
+    : null;
 
   for (const term of dictionary) {
     if (typeof term !== 'string' || term.length === 0) continue;
 
     const normalizedTerm = opts.caseSensitive ? term : term.toLowerCase();
 
-    if (prefix && !normalizedTerm.startsWith(prefix)) continue;
+    // N-gram filter: skip terms with too little n-gram overlap
+    // This is much more permissive than prefix filtering and works with transpositions
+    if (queryNgrams) {
+      const termNgrams = getNgrams(normalizedTerm, opts.ngramSize);
+      const overlap = ngramOverlap(queryNgrams, termNgrams);
+      if (overlap < opts.minNgramOverlap) continue;
+    }
+
+    // Prefix match: if the term starts with the query, prioritize it
+    // This ensures "mark" matches "markdown" even though edit distance is high
+    if (normalizedTerm.startsWith(normalizedQuery)) {
+      // Calculate a prefix-aware similarity score
+      // Shorter terms that match the prefix get higher scores
+      const prefixSimilarity = normalizedQuery.length / normalizedTerm.length;
+      matches.push({
+        term,
+        distance: normalizedTerm.length - normalizedQuery.length,
+        similarity: Math.max(prefixSimilarity, 0.8), // Prefix matches get at least 0.8 similarity
+      });
+      continue;
+    }
 
     const distance = distanceFunc(normalizedQuery, normalizedTerm);
     if (distance > opts.maxDistance) continue;
 
-    const similarity = similarityScore(normalizedQuery, normalizedTerm);
+    const similarity = similarityScore(
+      normalizedQuery,
+      normalizedTerm,
+      opts.useTranspositions
+    );
     if (similarity >= opts.minSimilarity) {
       matches.push({ term, distance, similarity });
     }

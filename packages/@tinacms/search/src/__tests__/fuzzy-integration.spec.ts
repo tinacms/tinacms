@@ -200,7 +200,9 @@ describe('Fuzzy Search Integration', () => {
     it('should expand each word in query separately', async () => {
       const results = await client.query('Raect managment', {
         fuzzy: true,
-        fuzzyOptions: { maxDistance: 2 },
+        fuzzyOptions: {
+          maxDistance: 2,
+        },
         limit: 10,
       });
 

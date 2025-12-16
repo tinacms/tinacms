@@ -3,6 +3,8 @@ import {
   damerauLevenshteinDistance,
   similarityScore,
   findSimilarTerms,
+  getNgrams,
+  ngramOverlap,
 } from './distance';
 import { FuzzyCache } from './cache';
 import { DEFAULT_FUZZY_OPTIONS } from './types';
@@ -138,6 +140,7 @@ describe('Fuzzy Search', () => {
 
     it('finds terms with typos', () => {
       // "raect" is a transposition of "react"
+      // N-gram filter allows this since they share some n-grams
       const results = findSimilarTerms('raect', dictionary);
       expect(results.some((r) => r.term === 'react')).toBe(true);
     });
@@ -209,22 +212,6 @@ describe('Fuzzy Search', () => {
 
       expect(withTranspositions.some((r) => r.term === 'react')).toBe(true);
       expect(withoutTranspositions.some((r) => r.term === 'react')).toBe(false);
-    });
-
-    it('uses prefix filter when enabled', () => {
-      // With prefix filter, "raect" won't match "react" because "ra" != "re"
-      const withPrefixFilter = findSimilarTerms('raect', dictionary, {
-        usePrefixFilter: true,
-        prefixLength: 2,
-        maxDistance: 2,
-      });
-      const withoutPrefixFilter = findSimilarTerms('raect', dictionary, {
-        usePrefixFilter: false,
-        maxDistance: 2,
-      });
-
-      expect(withPrefixFilter.some((r) => r.term === 'react')).toBe(false);
-      expect(withoutPrefixFilter.some((r) => r.term === 'react')).toBe(true);
     });
 
     it('returns results sorted by similarity (descending)', () => {
@@ -386,8 +373,102 @@ describe('Fuzzy Search', () => {
       expect(DEFAULT_FUZZY_OPTIONS.maxResults).toBe(10);
       expect(DEFAULT_FUZZY_OPTIONS.useTranspositions).toBe(true);
       expect(DEFAULT_FUZZY_OPTIONS.caseSensitive).toBe(false);
-      expect(DEFAULT_FUZZY_OPTIONS.usePrefixFilter).toBe(false);
-      expect(DEFAULT_FUZZY_OPTIONS.prefixLength).toBe(2);
+      expect(DEFAULT_FUZZY_OPTIONS.useNgramFilter).toBe(true);
+      expect(DEFAULT_FUZZY_OPTIONS.ngramSize).toBe(2);
+      expect(DEFAULT_FUZZY_OPTIONS.minNgramOverlap).toBe(0.2);
+    });
+  });
+
+  describe('prefix matching', () => {
+    it('matches terms that start with the query', () => {
+      const dictionary = ['markdown', 'mario', 'market', 'markup', 'mars'];
+      const results = findSimilarTerms('mark', dictionary);
+
+      // All terms starting with "mark" should be found
+      expect(results.some((r) => r.term === 'markdown')).toBe(true);
+      expect(results.some((r) => r.term === 'market')).toBe(true);
+      expect(results.some((r) => r.term === 'markup')).toBe(true);
+    });
+
+    it('prioritizes prefix matches over edit distance matches', () => {
+      const dictionary = ['markdown', 'mario', 'market'];
+      const results = findSimilarTerms('mark', dictionary, {
+        maxDistance: 2,
+        minSimilarity: 0.5,
+      });
+
+      // "markdown" and "market" should rank higher than "mario"
+      // because they start with "mark"
+      const markdownResult = results.find((r) => r.term === 'markdown');
+      const marioResult = results.find((r) => r.term === 'mario');
+
+      expect(markdownResult).toBeDefined();
+      if (markdownResult && marioResult) {
+        expect(markdownResult.similarity).toBeGreaterThan(
+          marioResult.similarity
+        );
+      }
+    });
+
+    it('gives prefix matches a minimum similarity of 0.8', () => {
+      const dictionary = ['markdown'];
+      const results = findSimilarTerms('mark', dictionary);
+
+      expect(results.length).toBe(1);
+      expect(results[0].term).toBe('markdown');
+      expect(results[0].similarity).toBeGreaterThanOrEqual(0.8);
+    });
+  });
+
+  describe('n-gram filtering', () => {
+    it('generates correct n-grams', () => {
+      const ngrams = getNgrams('react', 2);
+      expect(ngrams.has('re')).toBe(true);
+      expect(ngrams.has('ea')).toBe(true);
+      expect(ngrams.has('ac')).toBe(true);
+      expect(ngrams.has('ct')).toBe(true);
+      expect(ngrams.size).toBe(4);
+    });
+
+    it('handles short strings', () => {
+      const ngrams = getNgrams('a', 2);
+      expect(ngrams.has('a')).toBe(true);
+      expect(ngrams.size).toBe(1);
+    });
+
+    it('calculates n-gram overlap correctly', () => {
+      const ngrams1 = getNgrams('react', 2); // {re, ea, ac, ct}
+      const ngrams2 = getNgrams('raect', 2); // {ra, ae, ec, ct}
+
+      // Only "ct" overlaps
+      const overlap = ngramOverlap(ngrams1, ngrams2);
+      expect(overlap).toBe(0.25); // 1 overlap / 4 n-grams
+    });
+
+    it('allows transpositions with n-gram filter', () => {
+      const dictionary = ['react', 'redux', 'angular', 'vue'];
+      // "raect" is a transposition of "react"
+      // n-grams: raect = {ra, ae, ec, ct}, react = {re, ea, ac, ct}
+      // overlap: {ct} = 1/4 = 0.25, which passes minNgramOverlap of 0.2
+      const results = findSimilarTerms('raect', dictionary, {
+        useNgramFilter: true,
+        minNgramOverlap: 0.2,
+      });
+
+      expect(results.some((r) => r.term === 'react')).toBe(true);
+    });
+
+    it('filters out completely unrelated terms', () => {
+      const dictionary = ['react', 'xyz123'];
+      const results = findSimilarTerms('raect', dictionary, {
+        useNgramFilter: true,
+        minNgramOverlap: 0.2,
+        maxDistance: 5,
+        minSimilarity: 0,
+      });
+
+      // "xyz123" should be filtered out due to no n-gram overlap
+      expect(results.some((r) => r.term === 'xyz123')).toBe(false);
     });
   });
 });
