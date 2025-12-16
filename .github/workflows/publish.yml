@@ -131,16 +131,15 @@ jobs:
             Your tagged PR has been published! You can now install the packages using:
             
             \`\`\`bash
-            pnpm add tinacms@${branchName}
+            pnpm add packagename@${branchName}
             \`\`\`
             
-            Or install a specific package:
-            \`\`\`bash
-            pnpm add @tinacms/<package-name>@${branchName}
-            \`\`\`
+            Published packages:
             ${packagesSection}
+
             **Tag:** \`${branchName}\`  
-            **Commit:** ${context.sha}`;
+            **Commit:**   \`${context.sha}\`
+            `;
             
             github.rest.issues.createComment({
               owner: context.repo.owner,
