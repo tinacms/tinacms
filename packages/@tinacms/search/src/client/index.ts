@@ -190,7 +190,7 @@ export class TinaCMSSearchIndexClient extends LocalSearchIndexClient {
   private async uploadIndex(signedUrl: string, data: Buffer): Promise<void> {
     const response = await fetch(signedUrl, {
       method: 'PUT',
-      body: new Uint8Array(data),
+      body: data as unknown as BodyInit,
     });
 
     if (response.status !== 200) {
