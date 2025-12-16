@@ -80,8 +80,8 @@ jobs:
       - name: Get published package versions
         id: package-versions
         run: |
-          # Find all modified package.json files and extract their versions
-          modified_packages=$(git diff --name-only HEAD~1 HEAD | grep 'package\.json$' || true)
+          # Find all modified package.json files (uncommitted changes from version:snapshot)
+          modified_packages=$(git diff --name-only | grep 'package\.json$' || true)
           
           if [ -z "$modified_packages" ]; then
             echo "packages_json={}" >> $GITHUB_OUTPUT
