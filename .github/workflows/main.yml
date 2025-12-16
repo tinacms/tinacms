@@ -16,8 +16,6 @@ jobs:
           - ubuntu-latest
           - macOS-latest
     runs-on: ${{ matrix.os }}
-    permissions:
-      id-token: write # Required for OIDC authentication with npm
     timeout-minutes: 15
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
@@ -33,10 +31,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: ".nvmrc"
-          registry-url: "https://registry.npmjs.org"
-
-      - name: Upgrade npm for OIDC support
-        run: npm install -g npm@latest
 
       - uses: pnpm/action-setup@v4
         name: Install pnpm
