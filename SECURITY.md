@@ -7,7 +7,7 @@ We only support the latest version of TinaCMS. If you are experiencing a securit
 | Version | Supported          |
 | :------ | :----------------- |
 | Latest  | :white_check_mark: |
-| < Latest| :x:                |
+| < Latest | :x:                |
 
 ## Reporting a Vulnerability
 
