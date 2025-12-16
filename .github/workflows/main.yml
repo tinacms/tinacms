@@ -16,8 +16,6 @@ jobs:
           - ubuntu-latest
           - macOS-latest
     runs-on: ${{ matrix.os }}
-    permissions:
-      id-token: write  # Required for OIDC authentication with npm
     timeout-minutes: 15
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
@@ -32,11 +30,7 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
-          registry-url: 'https://registry.npmjs.org'
-
-      - name: Upgrade npm for OIDC support
-        run: npm install -g npm@latest
+          node-version-file: ".nvmrc"
 
       - uses: pnpm/action-setup@v4
         name: Install pnpm
@@ -83,20 +77,3 @@ jobs:
 
       - name: Check Tina lock changes
         run: pnpm diff-tina-lock
-        
-      - name: Publish tagged PR
-        if: >
-          matrix.os == 'ubuntu-latest' &&
-          github.event_name == 'pull_request' &&
-          contains(github.event.pull_request.labels.*.name, 'tagged') &&
-          github.event.pull_request.title != 'Version Packages'
-        continue-on-error: true
-        run: |
-          echo running on branch ${BRANCH_NAME}
-          pnpm version:snapshot $(echo ${{ github.sha }} | cut -c1-7)
-          pnpm publish -r --tag ${BRANCH_NAME} --no-git-checks --access public
-          echo "Published NPM tag: $BRANCH_NAME" >> $GITHUB_STEP_SUMMARY
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
-          NPM_CONFIG_PROVENANCE: true
