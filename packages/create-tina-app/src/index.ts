@@ -29,6 +29,7 @@ import {
 } from './util/posthog';
 import fetchPostHogConfig from './util/fetchPosthogConfig';
 import os from 'node:os';
+import * as sys from 'systeminformation';
 
 let posthogClient: PostHog | null = null;
 
@@ -56,6 +57,7 @@ async function initializePostHog(
   });
 }
 
+
 // Formats a template into a prompts choice object with description and features
 function formatTemplateChoice(template: Template) {
   let description = template.description || '';
@@ -75,6 +77,7 @@ function formatTemplateChoice(template: Template) {
 }
 
 export async function run() {
+  
   // Dynamic import for ora to handle ES module compatibility
   const ora = (await import('ora')).default;
   let packageManagerInstallationHadError = false;
@@ -89,6 +92,8 @@ export async function run() {
   const version = require('../package.json').version;
   console.log(`Create Tina App v${version}`);
   const opts = extractOptions(process.argv);
+  const osInfo = await sys.osInfo()
+
   if (!opts.noTelemetry) {
     console.log(`\n${TextStylesBold.bold('Telemetry Notice')}`);
     console.log(
@@ -110,6 +115,8 @@ export async function run() {
       'node-version': process.version,
       'os-version': os.version(),
       'os-platform': os.platform(),
+      'os-distro': osInfo.distro,
+      'os-release': osInfo.release
     });
   }
 
@@ -327,6 +334,8 @@ export async function run() {
       'app-name': appName,
       'os-version': os.version(),
       'os-platform': os.platform(),
+      'os-distro': osInfo.distro,
+      'os-release': osInfo.release
     });
   }
 }
