@@ -88,42 +88,44 @@ jobs:
             exit 0
           fi
           
-          packages_json="{"
-          first=true
-          
-          for pkg_file in $modified_packages; do
+          # Build a JSON object mapping package names to versions using jq
+          packages_json=$(for pkg_file in $modified_packages; do
             if [ -f "$pkg_file" ]; then
               pkg_name=$(jq -r '.name' "$pkg_file")
               pkg_version=$(jq -r '.version' "$pkg_file")
-              
               if [ "$pkg_name" != "null" ] && [ "$pkg_version" != "null" ]; then
-                if [ "$first" = true ]; then
-                  first=false
-                else
-                  packages_json="${packages_json},"
-                fi
-                packages_json="${packages_json}\"${pkg_name}\":\"${pkg_version}\""
+                echo "{\"name\":$(
+                  jq -Rn --arg v "$pkg_name" '$v'
+                ),\"version\":$(
+                  jq -Rn --arg v "$pkg_version" '$v'
+                )}"
               fi
             fi
-          done
-          
-          packages_json="${packages_json}}"
+          done | jq -s 'map({(.name): .version}) | add')
           echo "packages_json=${packages_json}" >> $GITHUB_OUTPUT
 
       - name: Comment on PR with install instructions
         if: steps.package-versions.outputs.packages_json != '{}'
         uses: actions/github-script@v7
+        env:
+          PACKAGES_JSON: ${{ steps.package-versions.outputs.packages_json }}
         with:
           script: |
-            const packages = JSON.parse('${{ steps.package-versions.outputs.packages_json }}');
+            if (
+              !context.payload ||
+              !context.payload.pull_request ||
+              !context.payload.pull_request.head ||
+              !context.payload.pull_request.head.ref ||
+              !context.payload.pull_request.number
+            ) {
+              throw new Error('Missing pull_request context. Cannot comment on PR.');
+            }
+
             const branchName = context.payload.pull_request.head.ref;
             
-            let packagesSection = '';
-            if (Object.keys(packages).length > 0) {
-              packagesSection = '\n**Published Packages:**\n';
-              for (const [name, version] of Object.entries(packages)) {
-                packagesSection += `- \`${name}@${version}\`\n`;
-              }
+            let packagesSection = '\n**Published Packages:**\n';
+            for (const [name, version] of Object.entries(packages)) {
+              packagesSection += `- \`${name}@${version}\`\n`;
             }
             
             const comment = `## 📦 Tagged Release Published
