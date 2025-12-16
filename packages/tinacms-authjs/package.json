@@ -1,52 +1,52 @@
 {
-	"name": "tinacms-authjs",
-	"version": "15.0.0",
-	"main": "dist/index.js",
-	"module": "./dist/index.js",
-	"files": [
-		"dist"
-	],
-	"typings": "dist/index.d.ts",
-	"license": "Apache-2.0",
-	"buildConfig": {
-		"entryPoints": [
-			{
-				"name": "src/index.ts",
-				"target": "node"
-			},
-			"src/tinacms.ts"
-		]
-	},
-	"scripts": {
-		"types": "pnpm tsc",
-		"build": "tinacms-scripts build",
-		"run-self-script": "node bin/tinacms-authjs setup"
-	},
-	"dependencies": {
-		"@tinacms/schema-tools": "workspace:*"
-	},
-	"devDependencies": {
-		"@tinacms/datalayer": "workspace:*",
-		"@tinacms/scripts": "workspace:*",
-		"next": "14.2.10",
-		"next-auth": "4.24.7",
-		"react": "^18.3.1",
-		"react-dom": "^18.3.1",
-		"tinacms": "workspace:*",
-		"typescript": "^5.7.3"
-	},
-	"peerDependencies": {
-		"next": "^12.2.5 || ^13 || ^14",
-		"next-auth": "^4.22.1",
-		"react": "^17.0.2 || ^18",
-		"react-dom": "^17.0.2 || ^18",
-		"tinacms": "workspace:*"
-	},
-	"publishConfig": {
-		"registry": "https://registry.npmjs.org"
-	},
-	"repository": {
-		"url": "https://github.com/tinacms/tinacms.git",
-		"directory": "packages/next-auth"
-	}
+  "name": "tinacms-authjs",
+  "version": "15.0.0",
+  "main": "dist/index.js",
+  "module": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "typings": "dist/index.d.ts",
+  "license": "Apache-2.0",
+  "buildConfig": {
+    "entryPoints": [
+      {
+        "name": "src/index.ts",
+        "target": "node"
+      },
+      "src/tinacms.ts"
+    ]
+  },
+  "scripts": {
+    "types": "pnpm tsc",
+    "build": "tinacms-scripts build",
+    "run-self-script": "node bin/tinacms-authjs setup"
+  },
+  "dependencies": {
+    "@tinacms/schema-tools": "workspace:*"
+  },
+  "devDependencies": {
+    "@tinacms/datalayer": "workspace:*",
+    "@tinacms/scripts": "workspace:*",
+    "next": "14.2.35",
+    "next-auth": "4.24.7",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tinacms": "workspace:*",
+    "typescript": "^5.7.3"
+  },
+  "peerDependencies": {
+    "next": "^12.2.5 || ^13 || ^14",
+    "next-auth": "^4.22.1",
+    "react": "^17.0.2 || ^18",
+    "react-dom": "^17.0.2 || ^18",
+    "tinacms": "workspace:*"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/next-auth"
+  }
 }
