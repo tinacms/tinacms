@@ -28,6 +28,7 @@ import {
   postHogCapture,
 } from './util/posthog';
 import fetchPostHogConfig from './util/fetchPosthogConfig';
+import os from 'node:os';
 
 let posthogClient: PostHog | null = null;
 
@@ -105,7 +106,11 @@ export async function run() {
   preRunChecks(spinner);
 
   if (!opts.noTelemetry && posthogClient) {
-    postHogCapture(posthogClient, CreateTinaAppStartedEvent, {});
+    postHogCapture(posthogClient, CreateTinaAppStartedEvent, {
+      'node-version': process.version,
+      'os-version': os.version(),
+      'os-platform': os.platform(),
+    });
   }
 
   const telemetry = new Telemetry({ disabled: opts?.noTelemetry });
@@ -320,6 +325,8 @@ export async function run() {
       'package-manager': pkgManager,
       'node-version': process.version,
       'app-name': appName,
+      'os-version': os.version(),
+      'os-platform': os.platform(),
     });
   }
 }
