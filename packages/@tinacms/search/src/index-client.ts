@@ -76,8 +76,19 @@ export const parseSearchIndexResponse = (
   data: SearchIndexResponse,
   options?: PaginationOptions
 ): ParsedSearchResponse => {
+  // Handle error responses or missing data
+  if (!data || !Array.isArray(data.RESULT)) {
+    return {
+      results: [],
+      total: 0,
+      prevCursor: null,
+      nextCursor: null,
+      fuzzyMatches: undefined,
+    };
+  }
+
   const results = data.RESULT;
-  const total = data.RESULT_LENGTH;
+  const total = data.RESULT_LENGTH ?? 0;
   const fuzzyMatches = data.FUZZY_MATCHES;
 
   // Use server-provided cursors if available, otherwise calculate

@@ -166,10 +166,13 @@ export const useSearchCollection = (
             prevCursor: string;
           };
 
+          // Handle empty or missing results
+          const results = response?.results ?? [];
+
           const docs = (await Promise.allSettled<
             Promise<{ document: DocumentForm }>
           >(
-            response.results.map((result) => {
+            results.map((result) => {
               const [collection, relativePath] = result._id.split(':');
               return api.fetchDocument(collection, relativePath, false);
             })
@@ -188,10 +191,10 @@ export const useSearchCollection = (
             templates: collection.templates,
             documents: {
               pageInfo: {
-                hasNextPage: !!response.nextCursor,
-                hasPreviousPage: !!response.prevCursor,
+                hasNextPage: !!response?.nextCursor,
+                hasPreviousPage: !!response?.prevCursor,
                 startCursor: '',
-                endCursor: response.nextCursor || '',
+                endCursor: response?.nextCursor || '',
               },
               edges,
             },
