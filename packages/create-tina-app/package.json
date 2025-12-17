@@ -44,13 +44,14 @@
         "typescript": "^5.7.3"
     },
     "dependencies": {
-        "@tinacms/metrics": "workspace:*",
         "chalk": "catalog:",
         "commander": "^12.1.0",
         "cross-spawn": "catalog:",
         "fs-extra": "catalog:",
         "ora": "catalog:",
+        "posthog-node": "^5.17.2",
         "prompts": "catalog:",
+        "systeminformation": "^5.27.13",
         "tar": "catalog:"
     }
 }
