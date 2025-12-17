@@ -61,6 +61,18 @@ const matterEngines = {
       );
     },
   },
+  coffeescript: {
+    parse: () => {
+      throw new Error(
+        'CoffeeScript execution in frontmatter is not allowed for security reasons'
+      );
+    },
+    stringify: () => {
+      throw new Error(
+        'CoffeeScript execution in frontmatter is not allowed for security reasons'
+      );
+    },
+  },
 };
 
 export const stringifyFile = (

@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import { parseFile, stringifyFile } from './util';
-import * as yup from 'yup';
 
 describe('gray-matter security', () => {
   describe('parseFile', () => {
