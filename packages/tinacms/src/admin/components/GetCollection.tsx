@@ -185,10 +185,10 @@ export const useSearchCollection = (
             .map((result) => ({ node: result.value.document })) as any[];
           const c = await api.fetchCollection(collectionName, false, '');
           setCollection({
-            format: collection.format,
-            label: collection.label,
+            format: c.format,
+            label: c.label,
             name: collectionName,
-            templates: collection.templates,
+            templates: c.templates,
             documents: {
               pageInfo: {
                 hasNextPage: !!response?.nextCursor,
