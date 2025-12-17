@@ -673,6 +673,11 @@ catalogs:
       specifier: ^3.24.2
       version: 3.25.76
 
+overrides:
+  '@clerk/clerk-js>react': 19.2.3
+  '@clerk/clerk-js>react-dom': 19.2.3
+  '@clerk/backend>react': 19.2.3
+
 importers:
 
   .:
@@ -1915,9 +1920,6 @@ importers:
 
   packages/create-tina-app:
     dependencies:
-      '@tinacms/metrics':
-        specifier: workspace:*
-        version: link:../@tinacms/metrics
       chalk:
         specifier: 'catalog:'
         version: 5.6.2
@@ -1933,9 +1935,15 @@ importers:
       ora:
         specifier: 'catalog:'
         version: 8.2.0
+      posthog-node:
+        specifier: ^5.17.2
+        version: 5.17.3
       prompts:
         specifier: 'catalog:'
         version: 2.4.2
+      systeminformation:
+        specifier: ^5.27.13
+        version: 5.27.14
       tar:
         specifier: 'catalog:'
         version: 7.4.0
@@ -3605,7 +3613,7 @@ packages:
   '@clerk/clerk-js@4.56.2':
     resolution: {integrity: sha512-t1dQnW/UD+SKjMqAYmWQj4HX3EWTb3uK4CMEMQ0FFG4fOOMzPwIhoKZkWe5wIxkwZ/TMIvzGqTL94jMMy9ysJQ==}
     peerDependencies:
-      react: '>=18'
+      react: 19.2.3
 
   '@clerk/localizations@1.28.10':
     resolution: {integrity: sha512-eTJ1DJeMKNIie4TB4vE5rqkU1ZJgPG4/j4XTiisFtcag+YUgNxABMuaCdxojIZE5jcKaJ4k1OrUtYFnHAe7TWw==}
@@ -5167,6 +5175,9 @@ packages:
     resolution: {integrity: sha512-6TyEnHgd6SArQO8UO2OMTxshln3QMWBtPGrOCgs3wVEmQmwyuNtB10IZMfmYDE0riwNR1cu4q+pPcxMVtaG3TA==}
     engines: {node: '>=18'}
     hasBin: true
+
+  '@posthog/core@1.8.0':
+    resolution: {integrity: sha512-SfmG1EdbR+2zpQccgBUxM/snCROB9WGkY7VH1r9iaoTNqoaN9IkmIEA/07cZLY4DxVP8jt6Vdfe3s84xksac1g==}
 
   '@puppeteer/browsers@2.6.1':
     resolution: {integrity: sha512-aBSREisdsGH890S2rQqK82qmQYU3uFpSH8wcZWHgHzl3LfzsxAKbLNiAG9mO8v1Y0UICBeClICxPJvyr0rcuxg==}
@@ -11547,6 +11558,10 @@ packages:
     resolution: {integrity: sha512-3Ybi1tAuwAP9s0r1UQ2J4n5Y0G05bJkpUIO0/bI9MhwmD70S5aTWbXGBwxHrelT+XM1k6dM0pk+SwNkpTRN7Pg==}
     engines: {node: ^10 || ^12 || >=14}
 
+  posthog-node@5.17.3:
+    resolution: {integrity: sha512-sV7olZNd4RTmqUyfk0FARqy8WRVsqCkgQtuO+P1GkP5oURcqx0VvGqktnByw2zFV63qX5Fa3vdoH4xheahYzKQ==}
+    engines: {node: '>=20'}
+
   preact-render-to-string@5.2.6:
     resolution: {integrity: sha512-JyhErpYOvBV1hEPwIxc/fHWXPfnEGdRKxc8gFdAZ7XV4tlzyzG847XAyEZqoDnynP88akM4eaHcSOzNcLWFguw==}
     peerDependencies:
@@ -12577,6 +12592,12 @@ packages:
   synckit@0.11.11:
     resolution: {integrity: sha512-MeQTA1r0litLUf0Rp/iisCaL8761lKAZHaimlbGK4j0HysC4PLfqygQj9srcs0m2RdtDYnF8UuYyKpbjHYp7Jw==}
     engines: {node: ^14.18.0 || >=16.0.0}
+
+  systeminformation@5.27.14:
+    resolution: {integrity: sha512-3DoNDYSZBLxBwaJtQGWNpq0fonga/VZ47HY1+7/G3YoIPaPz93Df6egSzzTKbEMmlzUpy3eQ0nR9REuYIycXGg==}
+    engines: {node: '>=8.0.0'}
+    os: [darwin, linux, win32, freebsd, openbsd, netbsd, sunos, android]
+    hasBin: true
 
   tabbable@6.3.0:
     resolution: {integrity: sha512-EIHvdY5bPLuWForiR/AN2Bxngzpuwn1is4asboytXtpTgsArc+WmSJKVLlhdh71u7jFcryDqB2A8lQvj78MkyQ==}
@@ -17087,6 +17108,10 @@ snapshots:
   '@playwright/test@1.57.0':
     dependencies:
       playwright: 1.57.0
+
+  '@posthog/core@1.8.0':
+    dependencies:
+      cross-spawn: 7.0.6
 
   '@puppeteer/browsers@2.6.1':
     dependencies:
@@ -25274,6 +25299,10 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
+  posthog-node@5.17.3:
+    dependencies:
+      '@posthog/core': 1.8.0
+
   preact-render-to-string@5.2.6(preact@10.28.0):
     dependencies:
       preact: 10.28.0
@@ -26566,6 +26595,8 @@ snapshots:
   synckit@0.11.11:
     dependencies:
       '@pkgr/core': 0.2.9
+
+  systeminformation@5.27.14: {}
 
   tabbable@6.3.0: {}
 
