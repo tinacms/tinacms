@@ -166,7 +166,7 @@ Content with components stored in frontmatter`;
   });
 
   describe('stringifyFile', () => {
-    it('should not allow stringify with javascript engines', () => {
+    it('should not allow stringify with js engine', () => {
       const content = {
         title: 'Test',
         _relativePath: 'test.md',
@@ -176,9 +176,6 @@ Content with components stored in frontmatter`;
         $_body: 'Content',
       };
 
-      // Note: stringifyFile doesn't directly expose the language option,
-      // but we're testing that the engines configuration prevents JS execution
-      // This test ensures our engine overrides work for stringify operations
       expect(() => {
         // @ts-ignore - testing invalid configuration
         stringifyFile(content, '.md', false, {
@@ -186,6 +183,66 @@ Content with components stored in frontmatter`;
         });
       }).toThrow(
         'JavaScript execution in frontmatter is not allowed for security reasons'
+      );
+    });
+
+    it('should not allow stringify with javascript engine', () => {
+      const content = {
+        title: 'Test',
+        _relativePath: 'test.md',
+        _id: 'test.md',
+        _template: 'post',
+        _collection: 'posts',
+        $_body: 'Content',
+      };
+
+      expect(() => {
+        // @ts-ignore - testing invalid configuration
+        stringifyFile(content, '.md', false, {
+          frontmatterFormat: 'javascript' as any,
+        });
+      }).toThrow(
+        'JavaScript execution in frontmatter is not allowed for security reasons'
+      );
+    });
+
+    it('should not allow stringify with coffee engine', () => {
+      const content = {
+        title: 'Test',
+        _relativePath: 'test.md',
+        _id: 'test.md',
+        _template: 'post',
+        _collection: 'posts',
+        $_body: 'Content',
+      };
+
+      expect(() => {
+        // @ts-ignore - testing invalid configuration
+        stringifyFile(content, '.md', false, {
+          frontmatterFormat: 'coffee' as any,
+        });
+      }).toThrow(
+        'CoffeeScript execution in frontmatter is not allowed for security reasons'
+      );
+    });
+
+    it('should not allow stringify with coffeescript engine', () => {
+      const content = {
+        title: 'Test',
+        _relativePath: 'test.md',
+        _id: 'test.md',
+        _template: 'post',
+        _collection: 'posts',
+        $_body: 'Content',
+      };
+
+      expect(() => {
+        // @ts-ignore - testing invalid configuration
+        stringifyFile(content, '.md', false, {
+          frontmatterFormat: 'coffeescript' as any,
+        });
+      }).toThrow(
+        'CoffeeScript execution in frontmatter is not allowed for security reasons'
       );
     });
 
