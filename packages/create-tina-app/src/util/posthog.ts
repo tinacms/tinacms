@@ -252,8 +252,11 @@ export function postHogCapture(
  *
  * @remarks
  * - Sanitizes stack traces to remove local file paths
- * - Categories determine the event name (e.g., 'create-tina-app-network-error')
- * - Includes error code, sanitized stack, step name, and telemetry data
+ * - Maps error categories to three event types:
+ *   - 'create-tina-app-error' for technical failures (filesystem, network, installation, git, etc.)
+ *   - 'create-tina-app-validation-error' for user input validation issues
+ *   - 'create-tina-app-user-cancelled' for user cancellations (Ctrl+C)
+ * - Includes error code, sanitized stack, step name, and telemetry data in properties
  * - Non-fatal errors are tracked but allow the process to continue
  *
  * @example
@@ -262,8 +265,8 @@ export function postHogCapture(
  *   await downloadTemplate();
  * } catch (err) {
  *   postHogCaptureError(client, err as Error, {
- *     errorCode: ERROR_CODES.ERR_NET_TARBALL_DOWNLOAD,
- *     errorCategory: 'network',
+ *     errorCode: ERROR_CODES.ERR_TPL_DOWNLOAD_FAILED,
+ *     errorCategory: 'template',
  *     step: TRACKING_STEPS.DOWNLOADING_TEMPLATE,
  *     fatal: true,
  *     additionalProperties: { template: 'basic' }
@@ -294,8 +297,16 @@ export function postHogCaptureError(
     additionalProperties = {},
   } = context;
 
-  // Determine event name based on category
-  const eventName = `create-tina-app-${errorCategory}-error`;
+  // Determine event name based on category type
+  let eventName: string;
+  if (errorCategory === 'user-cancellation') {
+    eventName = 'create-tina-app-user-cancelled';
+  } else if (errorCategory === 'validation') {
+    eventName = 'create-tina-app-validation-error';
+  } else {
+    // All technical errors (filesystem, template, installation, git, network, uncategorized)
+    eventName = 'create-tina-app-error';
+  }
 
   // Build properties
   const properties = {
