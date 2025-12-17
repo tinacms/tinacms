@@ -1,4 +1,7 @@
 import { PostHog } from 'posthog-node';
+import { createHash, randomUUID } from 'node:crypto';
+import { system as getSystemInfo } from 'systeminformation';
+
 export const CreateTinaAppStartedEvent: string = 'create-tina-app-started';
 export const CreateTinaAppFinishedEvent: string = 'create-tina-app-finished';
 
@@ -20,6 +23,37 @@ export const TRACKING_STEPS = {
   GIT_INIT: 'git_initialization',
   COMPLETE: 'complete',
 } as const;
+
+/**
+ * Generate a unique session ID for this run
+ */
+export function generateSessionId(): string {
+  return randomUUID();
+}
+
+/**
+ * Get a hashed user ID based on system UUID
+ * Returns a consistent anonymous identifier for the machine
+ */
+export async function getAnonymousUserId(): Promise<string> {
+  try {
+    const sysInfo = await getSystemInfo();
+    const systemUuid = sysInfo.uuid || 'unknown';
+
+    if (systemUuid === 'unknown' || !systemUuid) {
+      // Fallback to a random UUID if system UUID is not available
+      return `fallback-${randomUUID()}`;
+    }
+
+    // Hash the system UUID for anonymization
+    const hash = createHash('sha256');
+    hash.update(systemUuid);
+    return hash.digest('hex').substring(0, 32); // First 32 chars is plenty
+  } catch (error) {
+    // Fallback if systeminformation fails
+    return `fallback-${randomUUID()}`;
+  }
+}
 
 /**
  * Structured error codes for categorizing failures
@@ -199,6 +233,8 @@ function sanitizeError(error: Error): SanitizedError {
  * Sends an event to PostHog for analytics tracking.
  *
  * @param client - The PostHog client instance used to send the event
+ * @param distinctId - A unique identifier for the user (hashed system UUID)
+ * @param sessionId - A unique identifier for this run/session
  * @param event - The name of the event to track (e.g., 'create-tina-app-started')
  * @param properties - Additional properties to include with the event
  *
@@ -206,13 +242,16 @@ function sanitizeError(error: Error): SanitizedError {
  * - Returns early if the PostHog client is not provided
  * - Skips sending data when `TINA_DEV` environment variable is set to 'true'
  * - Automatically adds a 'system' property with value 'tinacms/create-tina-app'
- * - Uses 'create-tina-app' as the distinctId for all events
+ * - Includes sessionId in properties to track individual runs
+ * - Uses hashed system UUID as distinctId to track unique users anonymously
  * - Logs errors to console if event capture fails
  *
  * @example
  * ```typescript
  * const client = new PostHog('api-key');
- * postHogCapture(client, 'create-tina-app-started', {
+ * const userId = await getAnonymousUserId();
+ * const sessionId = generateSessionId();
+ * postHogCapture(client, userId, sessionId, 'create-tina-app-started', {
  *   template: 'basic',
  *   typescript: true
  * });
@@ -220,6 +259,8 @@ function sanitizeError(error: Error): SanitizedError {
  */
 export function postHogCapture(
   client: PostHog,
+  distinctId: string,
+  sessionId: string,
   event: string,
   properties: Record<string, any>
 ): void {
@@ -231,10 +272,11 @@ export function postHogCapture(
 
   try {
     client.capture({
-      distinctId: 'create-tina-app',
+      distinctId,
       event,
       properties: {
         ...properties,
+        sessionId,
         system: 'tinacms/create-tina-app',
       },
     });
@@ -247,6 +289,8 @@ export function postHogCapture(
  * Capture an error event in PostHog with categorized tracking and sanitized stack traces
  *
  * @param client - The PostHog client instance
+ * @param distinctId - A unique identifier for the user (hashed system UUID)
+ * @param sessionId - A unique identifier for this run/session
  * @param error - The error object that was thrown
  * @param context - Context about the error including code, category, step, and additional properties
  *
@@ -264,7 +308,7 @@ export function postHogCapture(
  * try {
  *   await downloadTemplate();
  * } catch (err) {
- *   postHogCaptureError(client, err as Error, {
+ *   postHogCaptureError(client, userId, sessionId, err as Error, {
  *     errorCode: ERROR_CODES.ERR_TPL_DOWNLOAD_FAILED,
  *     errorCategory: 'template',
  *     step: TRACKING_STEPS.DOWNLOADING_TEMPLATE,
@@ -276,6 +320,8 @@ export function postHogCapture(
  */
 export function postHogCaptureError(
   client: PostHog | null,
+  distinctId: string,
+  sessionId: string,
   error: Error,
   context: {
     errorCode: string;
@@ -318,12 +364,13 @@ export function postHogCaptureError(
     step,
     fatal,
     user_cancelled: errorCategory === 'user-cancellation',
+    sessionId,
     ...additionalProperties,
   };
 
   try {
     client.capture({
-      distinctId: 'create-tina-app',
+      distinctId,
       event: eventName,
       properties: {
         ...properties,

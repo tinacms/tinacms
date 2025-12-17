@@ -28,6 +28,8 @@ import {
   postHogCaptureError,
   ERROR_CODES,
   TRACKING_STEPS,
+  generateSessionId,
+  getAnonymousUserId,
 } from './util/posthog';
 import fetchPostHogConfig from './util/fetchPosthogConfig';
 import { osInfo as getOsSystemInfo } from 'systeminformation';
@@ -80,6 +82,10 @@ export async function run() {
   const ora = (await import('ora')).default;
   let packageManagerInstallationHadError = false;
 
+  // Generate telemetry identifiers for this session
+  const sessionId = generateSessionId();
+  const userId = await getAnonymousUserId();
+
   if (process.stdout.columns >= 60) {
     console.log(TextStyles.tinaOrange(`${ascii.llama}`));
     console.log(TextStyles.tinaOrange(`${ascii.tinaCms}`));
@@ -131,7 +137,13 @@ export async function run() {
   preRunChecks(spinner);
 
   // posthog client should only be initialized once telemetry is confirmed to be enabled, if null then telemetry cannot be sent
-  postHogCapture(posthogClient, CreateTinaAppStartedEvent, telemetryData);
+  postHogCapture(
+    posthogClient,
+    userId,
+    sessionId,
+    CreateTinaAppStartedEvent,
+    telemetryData
+  );
 
   let template: Template = null;
   if (opts.template) {
@@ -146,6 +158,8 @@ export async function run() {
       );
       postHogCaptureError(
         posthogClient,
+        userId,
+        sessionId,
         new Error(`Invalid template: ${opts.template}`),
         {
           errorCode: ERROR_CODES.ERR_VAL_INVALID_TEMPLATE,
@@ -171,6 +185,8 @@ export async function run() {
       );
       postHogCaptureError(
         posthogClient,
+        userId,
+        sessionId,
         new Error(`Invalid package manager: ${opts.pkgManager}`),
         {
           errorCode: ERROR_CODES.ERR_VAL_INVALID_PKG_MANAGER,
@@ -195,6 +211,8 @@ export async function run() {
       );
       postHogCaptureError(
         posthogClient,
+        userId,
+        sessionId,
         new Error('No supported package managers installed'),
         {
           errorCode: ERROR_CODES.ERR_VAL_NO_PKG_MANAGERS,
@@ -219,6 +237,8 @@ export async function run() {
     if (!Object.hasOwn(res, 'packageManager')) {
       postHogCaptureError(
         posthogClient,
+        userId,
+        sessionId,
         new Error('User cancelled package manager selection'),
         {
           errorCode: ERROR_CODES.ERR_CANCEL_PKG_MANAGER_PROMPT,
@@ -253,6 +273,8 @@ export async function run() {
     if (!Object.hasOwn(res, 'name')) {
       postHogCaptureError(
         posthogClient,
+        userId,
+        sessionId,
         new Error('User cancelled project name input'),
         {
           errorCode: ERROR_CODES.ERR_CANCEL_PROJECT_NAME_PROMPT,
@@ -278,6 +300,8 @@ export async function run() {
     if (!Object.hasOwn(res, 'template')) {
       postHogCaptureError(
         posthogClient,
+        userId,
+        sessionId,
         new Error('User cancelled template selection'),
         {
           errorCode: ERROR_CODES.ERR_CANCEL_TEMPLATE_PROMPT,
@@ -305,6 +329,8 @@ export async function run() {
     if (!Object.hasOwn(res, 'theme')) {
       postHogCaptureError(
         posthogClient,
+        userId,
+        sessionId,
         new Error('User cancelled theme selection'),
         {
           errorCode: ERROR_CODES.ERR_CANCEL_THEME_PROMPT,
@@ -328,16 +354,22 @@ export async function run() {
     spinner.fail(
       'The application path is not writable, please check folder permissions and try again. It is likely you do not have write permissions for this folder.'
     );
-    postHogCaptureError(posthogClient, new Error('Directory not writable'), {
-      errorCode: ERROR_CODES.ERR_FS_NOT_WRITABLE,
-      errorCategory: 'filesystem',
-      step: TRACKING_STEPS.DIRECTORY_SETUP,
-      fatal: true,
-      additionalProperties: {
-        ...telemetryData,
-        template: template.value,
-      },
-    });
+    postHogCaptureError(
+      posthogClient,
+      userId,
+      sessionId,
+      new Error('Directory not writable'),
+      {
+        errorCode: ERROR_CODES.ERR_FS_NOT_WRITABLE,
+        errorCategory: 'filesystem',
+        step: TRACKING_STEPS.DIRECTORY_SETUP,
+        fatal: true,
+        additionalProperties: {
+          ...telemetryData,
+          template: template.value,
+        },
+      }
+    );
     if (posthogClient) await posthogClient.shutdown();
     process.exit(1);
   }
@@ -349,7 +381,7 @@ export async function run() {
   } catch (err) {
     const error = err as Error;
     spinner.fail(error.message);
-    postHogCaptureError(posthogClient, error, {
+    postHogCaptureError(posthogClient, userId, sessionId, error, {
       errorCode: ERROR_CODES.ERR_FS_MKDIR_FAILED,
       errorCategory: 'filesystem',
       step: TRACKING_STEPS.DIRECTORY_SETUP,
@@ -380,7 +412,7 @@ export async function run() {
   } catch (err) {
     const error = err as Error;
     spinner.fail(`Failed to download template: ${error.message}`);
-    postHogCaptureError(posthogClient, error, {
+    postHogCaptureError(posthogClient, userId, sessionId, error, {
       errorCode: ERROR_CODES.ERR_TPL_DOWNLOAD_FAILED,
       errorCategory: 'template',
       step: TRACKING_STEPS.DOWNLOADING_TEMPLATE,
@@ -403,7 +435,7 @@ export async function run() {
     const error = err as Error;
     spinner.fail(`Failed to install packages: ${error.message}`);
     packageManagerInstallationHadError = true;
-    postHogCaptureError(posthogClient, error, {
+    postHogCaptureError(posthogClient, userId, sessionId, error, {
       errorCode: ERROR_CODES.ERR_INSTALL_PKG_MANAGER_FAILED,
       errorCategory: 'installation',
       step: TRACKING_STEPS.INSTALLING_PACKAGES,
@@ -425,7 +457,7 @@ export async function run() {
   } catch (err) {
     const error = err as Error;
     spinner.fail('Failed to initialize Git repository, skipping.');
-    postHogCaptureError(posthogClient, error, {
+    postHogCaptureError(posthogClient, userId, sessionId, error, {
       errorCode: ERROR_CODES.ERR_GIT_INIT_FAILED,
       errorCategory: 'git',
       step: TRACKING_STEPS.GIT_INIT,
@@ -437,7 +469,13 @@ export async function run() {
     });
   }
 
-  postHogCapture(posthogClient, CreateTinaAppFinishedEvent, telemetryData);
+  postHogCapture(
+    posthogClient,
+    userId,
+    sessionId,
+    CreateTinaAppFinishedEvent,
+    telemetryData
+  );
   spinner.succeed(`Created ${TextStyles.tinaOrange(appName)}\n`);
 
   if (template.value === 'tina-hugo-starter') {
@@ -496,7 +534,11 @@ run()
 
     console.error('Error running create-tina-app:', error);
 
-    postHogCaptureError(posthogClient, error, {
+    // Generate identifiers for error tracking if not already available
+    const sessionId = generateSessionId();
+    const userId = await getAnonymousUserId();
+
+    postHogCaptureError(posthogClient, userId, sessionId, error, {
       errorCode: ERROR_CODES.ERR_UNCAUGHT,
       errorCategory: 'uncategorized',
       step: 'unknown',
