@@ -52,6 +52,21 @@ Content here`;
       );
     });
 
+    it('should reject CoffeeScript (full name) frontmatter to prevent code execution', () => {
+      const maliciousContent = `---coffeescript
+title: "Pawned" + console.log(require("fs").readFileSync("/etc/passwd").toString())
+---
+# Blog Post
+
+Content here`;
+
+      expect(() => {
+        parseFile(maliciousContent, '.md', (yup) => yup.object({}));
+      }).toThrow(
+        'CoffeeScript execution in frontmatter is not allowed for security reasons'
+      );
+    });
+
     it('should successfully parse YAML frontmatter (default safe format)', () => {
       const safeContent = `---
 title: Safe Title
