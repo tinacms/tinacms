@@ -1,4 +1,3 @@
-import { Telemetry } from '@tinacms/metrics';
 import prompts from 'prompts';
 import path from 'node:path';
 import { createRequire } from 'node:module';
@@ -17,7 +16,7 @@ import { checkPackageExists } from './util/checkPkgManagers';
 import { TextStyles, TextStylesBold } from './util/textstyles';
 import { exit } from 'node:process';
 import { extractOptions } from './util/options';
-import { PackageManager, PKG_MANAGERS } from './util/packageManagers';
+import { type PackageManager, PKG_MANAGERS } from './util/packageManagers';
 import validate from './util/isNpm';
 import * as ascii from './util/asciiArt';
 import { THEMES } from './themes';
@@ -28,10 +27,9 @@ import {
   postHogCapture,
 } from './util/posthog';
 import fetchPostHogConfig from './util/fetchPosthogConfig';
-import * as sys from 'systeminformation';
+import { osInfo as getOsSystemInfo } from 'systeminformation';
 
 let posthogClient: PostHog | null = null;
-
 async function initializePostHog(
   configEndpoint?: string
 ): Promise<PostHog | null> {
@@ -89,33 +87,48 @@ export async function run() {
   const version = require('../package.json').version;
   console.log(`Create Tina App v${version}`);
   const opts = extractOptions(process.argv);
-  const osInfo = await sys.osInfo();
+
+  // check which package managers are installed
+  const installedPkgManagers = [];
+  for (const pkg_manager of PKG_MANAGERS) {
+    if (await checkPackageExists(pkg_manager)) {
+      installedPkgManagers.push(pkg_manager);
+    }
+  }
+
+  const telemetryData = {};
 
   if (!opts.noTelemetry) {
     console.log(`\n${TextStylesBold.bold('Telemetry Notice')}`);
     console.log(
       `To help the TinaCMS team improve the developer experience, create-tina-app collects anonymous usage statistics. This data helps us understand which environments and features are most important to support. Usage analytics may include: Operating system and version, package manager name and version (local only), Node.js version (local only), and the selected TinaCMS starter template.\nNo personal or project-specific code is ever collected. You can opt out at any time by passing the --noTelemetry flag.\n`
     );
-  }
 
-  if (!opts.noTelemetry) {
     posthogClient = await initializePostHog(
       'https://identity-v2.tinajs.io/v2/posthog-token'
     );
+
+    // add os info
+    const osInfo = await getOsSystemInfo();
+    telemetryData['os-platform'] = osInfo.platform;
+    telemetryData['os-distro'] = osInfo.distro;
+    telemetryData['os-release'] = osInfo.release;
+
+    // add node version
+    telemetryData['node-version'] = process.version;
+
+    // add package manager versions
+    for (const pkgManager of PKG_MANAGERS) {
+      telemetryData[`${pkgManager}-installed`] =
+        installedPkgManagers.includes(pkgManager);
+    }
   }
 
   const spinner = ora();
   preRunChecks(spinner);
 
-  if (!opts.noTelemetry && posthogClient) {
-    postHogCapture(posthogClient, CreateTinaAppStartedEvent, {
-      'node-version': process.version,
-      'os-distro': osInfo.distro,
-      'os-release': osInfo.release,
-    });
-  }
-
-  const telemetry = new Telemetry({ disabled: opts?.noTelemetry });
+  // posthog client should only be initialized once telemetry is confirmed to be enabled, if null then telemetry cannot be sent
+  postHogCapture(posthogClient, CreateTinaAppStartedEvent, telemetryData);
 
   let template: Template = null;
   if (opts.template) {
@@ -143,13 +156,6 @@ export async function run() {
   }
 
   if (!pkgManager) {
-    const installedPkgManagers = [];
-    for (const pkg_manager of PKG_MANAGERS) {
-      if (await checkPackageExists(pkg_manager)) {
-        installedPkgManagers.push(pkg_manager);
-      }
-    }
-
     if (installedPkgManagers.length === 0) {
       spinner.fail(
         `You have no supported package managers installed. Please install one of the following: ${PKG_MANAGERS}`
@@ -167,6 +173,7 @@ export async function run() {
     });
     if (!Object.hasOwn(res, 'packageManager')) exit(1); // User most likely sent SIGINT.
     pkgManager = res.packageManager;
+    telemetryData['package-manager'] = pkgManager;
   }
 
   let projectName = opts.projectName;
@@ -198,6 +205,7 @@ export async function run() {
     if (!Object.hasOwn(res, 'template')) exit(1); // User most likely sent SIGINT.
     template = TEMPLATES.find((_template) => _template.value === res.template);
   }
+  telemetryData['template'] = template.value;
 
   let themeChoice: string | undefined;
   if (template.value === 'tina-docs') {
@@ -210,13 +218,6 @@ export async function run() {
     if (!Object.hasOwn(res, 'theme')) exit(1); // User most likely sent SIGINT.
     themeChoice = res.theme;
   }
-  await telemetry.submitRecord({
-    event: {
-      name: 'create-tina-app:invoke',
-      template: template.value,
-      pkgManager: pkgManager,
-    },
-  });
 
   const rootDir = path.join(process.cwd(), projectName);
   if (!(await isWriteable(path.dirname(rootDir)))) {
@@ -229,6 +230,7 @@ export async function run() {
   let appName: string;
   try {
     appName = await setupProjectDirectory(rootDir);
+    telemetryData['app-name'] = appName;
   } catch (err) {
     spinner.fail((err as Error).message);
     exit(1);
@@ -272,6 +274,7 @@ export async function run() {
     spinner.fail('Failed to initialize Git repository, skipping.');
   }
 
+  postHogCapture(posthogClient, CreateTinaAppFinishedEvent, telemetryData);
   spinner.succeed(`Created ${TextStyles.tinaOrange(appName)}\n`);
 
   if (template.value === 'tina-hugo-starter') {
@@ -320,17 +323,6 @@ export async function run() {
       'https://tina.io/docs/tinacloud/'
     )}`
   );
-
-  if (!opts.noTelemetry && posthogClient) {
-    postHogCapture(posthogClient, CreateTinaAppFinishedEvent, {
-      template: template.value,
-      'package-manager': pkgManager,
-      'node-version': process.version,
-      'app-name': appName,
-      'os-distro': osInfo.distro,
-      'os-release': osInfo.release,
-    });
-  }
 }
 
 run()
