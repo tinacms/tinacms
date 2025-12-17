@@ -316,7 +316,6 @@ export function postHogCaptureError(
     sanitized_stack: sanitizedStack,
     stack_hash: originalStackHash,
     step,
-    timestamp: new Date().toISOString(),
     fatal,
     user_cancelled: errorCategory === 'user-cancellation',
     ...additionalProperties,
