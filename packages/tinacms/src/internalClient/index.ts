@@ -760,7 +760,6 @@ export class TinaCMSSearchClient implements SearchClient {
       };
     }
   ) {
-    // Default to fuzzy enabled unless explicitly disabled
     this.fuzzyEnabled = tinaSearchConfig?.fuzzyEnabled !== false;
     this.defaultFuzzyOptions = tinaSearchConfig?.fuzzyOptions;
   }
@@ -788,15 +787,11 @@ export class TinaCMSSearchClient implements SearchClient {
       this.tinaSearchConfig?.stopwordLanguages
     );
 
-    // Determine if fuzzy search should be used
-    // options.fuzzy takes precedence, otherwise use config default
     const useFuzzy =
       options?.fuzzy !== undefined ? options.fuzzy : this.fuzzyEnabled;
 
-    // Add fuzzy search parameters if enabled
     let fuzzyParam = '';
     if (useFuzzy) {
-      // Merge default options with query-specific options
       const mergedFuzzyOptions = {
         ...this.defaultFuzzyOptions,
         ...options?.fuzzyOptions,
@@ -877,7 +872,6 @@ export class LocalSearchClient implements SearchClient {
       };
     }
   ) {
-    // Default to fuzzy enabled unless explicitly disabled
     this.fuzzyEnabled = tinaSearchConfig?.fuzzyEnabled !== false;
     this.defaultFuzzyOptions = tinaSearchConfig?.fuzzyOptions;
   }
@@ -901,15 +895,11 @@ export class LocalSearchClient implements SearchClient {
     const opt = optionsToSearchIndexOptions(options);
     const optionsParam = opt['PAGE'] ? `&options=${JSON.stringify(opt)}` : '';
 
-    // Determine if fuzzy search should be used
-    // options.fuzzy takes precedence, otherwise use config default
     const useFuzzy =
       options?.fuzzy !== undefined ? options.fuzzy : this.fuzzyEnabled;
 
-    // Add fuzzy search parameters if enabled
     let fuzzyParam = '';
     if (useFuzzy) {
-      // Merge default options with query-specific options
       const mergedFuzzyOptions = {
         ...this.defaultFuzzyOptions,
         ...options?.fuzzyOptions,
@@ -936,7 +926,6 @@ export class LocalSearchClient implements SearchClient {
   }
 
   supportsClientSideIndexing(): boolean {
-    // chokidar will keep index updated
     return false;
   }
 }

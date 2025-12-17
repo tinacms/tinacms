@@ -38,13 +38,13 @@ describe('Fuzzy Search', () => {
     it('returns correct distance for mixed operations', () => {
       expect(levenshteinDistance('kitten', 'sitting')).toBe(3);
       expect(levenshteinDistance('saturday', 'sunday')).toBe(3);
-      expect(levenshteinDistance('react', 'raect')).toBe(2); // transposition = 2 ops in Levenshtein
+      expect(levenshteinDistance('react', 'raect')).toBe(2);
     });
 
     it('handles common typos', () => {
-      expect(levenshteinDistance('javascript', 'javscript')).toBe(1); // missing 'a'
-      expect(levenshteinDistance('function', 'funtion')).toBe(1); // missing 'c'
-      expect(levenshteinDistance('receive', 'recieve')).toBe(2); // ie vs ei
+      expect(levenshteinDistance('javascript', 'javscript')).toBe(1);
+      expect(levenshteinDistance('function', 'funtion')).toBe(1);
+      expect(levenshteinDistance('receive', 'recieve')).toBe(2);
     });
   });
 
@@ -55,7 +55,6 @@ describe('Fuzzy Search', () => {
     });
 
     it('returns 1 for transpositions (unlike Levenshtein)', () => {
-      // Transposition: swapping two adjacent characters
       expect(damerauLevenshteinDistance('ab', 'ba')).toBe(1);
       expect(damerauLevenshteinDistance('react', 'raect')).toBe(1);
       expect(damerauLevenshteinDistance('teh', 'the')).toBe(1);
@@ -68,15 +67,13 @@ describe('Fuzzy Search', () => {
     });
 
     it('handles multiple transpositions', () => {
-      expect(damerauLevenshteinDistance('abcd', 'badc')).toBe(2); // two transpositions
+      expect(damerauLevenshteinDistance('abcd', 'badc')).toBe(2);
     });
 
     it('handles common typos better than Levenshtein', () => {
-      // "form" vs "from" - transposition
       expect(damerauLevenshteinDistance('form', 'from')).toBe(1);
       expect(levenshteinDistance('form', 'from')).toBe(2);
 
-      // "tina" vs "tian" - transposition
       expect(damerauLevenshteinDistance('tina', 'tian')).toBe(1);
       expect(levenshteinDistance('tina', 'tian')).toBe(2);
     });
@@ -97,12 +94,8 @@ describe('Fuzzy Search', () => {
     });
 
     it('calculates correct similarity', () => {
-      // "hello" vs "hallo" = distance 1, max length 5
-      // similarity = 1 - (1/5) = 0.8
       expect(similarityScore('hello', 'hallo')).toBe(0.8);
 
-      // "cat" vs "cats" = distance 1, max length 4
-      // similarity = 1 - (1/4) = 0.75
       expect(similarityScore('cat', 'cats')).toBe(0.75);
     });
 
@@ -139,8 +132,6 @@ describe('Fuzzy Search', () => {
     });
 
     it('finds terms with typos', () => {
-      // "raect" is a transposition of "react"
-      // N-gram filter allows this since they share some n-grams
       const results = findSimilarTerms('raect', dictionary);
       expect(results.some((r) => r.term === 'react')).toBe(true);
     });
@@ -199,8 +190,6 @@ describe('Fuzzy Search', () => {
     });
 
     it('respects useTranspositions option', () => {
-      // "raect" has distance 1 with Damerau-Levenshtein (transposition)
-      // but distance 2 with standard Levenshtein
       const withTranspositions = findSimilarTerms('raect', dictionary, {
         useTranspositions: true,
         maxDistance: 1,
@@ -252,7 +241,6 @@ describe('Fuzzy Search', () => {
         'frontmatter',
       ];
 
-      // Common typos
       expect(
         findSimilarTerms('tincams', cmsTerms).some((r) => r.term === 'tinacms')
       ).toBe(true);
@@ -307,7 +295,6 @@ describe('Fuzzy Search', () => {
 
       expect(cache.size).toBe(3);
 
-      // Adding a 4th item should evict the oldest (a)
       cache.set('d', {}, []);
 
       expect(cache.size).toBe(3);
@@ -324,10 +311,8 @@ describe('Fuzzy Search', () => {
       cache.set('b', {}, []);
       cache.set('c', {}, []);
 
-      // Access 'a' to make it most recently used
       cache.get('a', {});
 
-      // Add new item - should evict 'b' (now oldest) instead of 'a'
       cache.set('d', {}, []);
 
       expect(cache.get('a', {})).toBeDefined();
@@ -437,19 +422,15 @@ describe('Fuzzy Search', () => {
     });
 
     it('calculates n-gram overlap correctly', () => {
-      const ngrams1 = getNgrams('react', 2); // {re, ea, ac, ct}
-      const ngrams2 = getNgrams('raect', 2); // {ra, ae, ec, ct}
+      const ngrams1 = getNgrams('react', 2);
+      const ngrams2 = getNgrams('raect', 2);
 
-      // Only "ct" overlaps
       const overlap = ngramOverlap(ngrams1, ngrams2);
-      expect(overlap).toBe(0.25); // 1 overlap / 4 n-grams
+      expect(overlap).toBe(0.25);
     });
 
     it('allows transpositions with n-gram filter', () => {
       const dictionary = ['react', 'redux', 'angular', 'vue'];
-      // "raect" is a transposition of "react"
-      // n-grams: raect = {ra, ae, ec, ct}, react = {re, ea, ac, ct}
-      // overlap: {ct} = 1/4 = 0.25, which passes minNgramOverlap of 0.2
       const results = findSimilarTerms('raect', dictionary, {
         useNgramFilter: true,
         minNgramOverlap: 0.2,
@@ -467,7 +448,6 @@ describe('Fuzzy Search', () => {
         minSimilarity: 0,
       });
 
-      // "xyz123" should be filtered out due to no n-gram overlap
       expect(results.some((r) => r.term === 'xyz123')).toBe(false);
     });
   });

@@ -164,6 +164,7 @@ export const useSearchCollection = (
             results: { _id: string }[];
             nextCursor: string;
             prevCursor: string;
+            fuzzyMatches?: Record<string, any[]>;
           };
 
           // Handle empty or missing results
@@ -179,12 +180,15 @@ export const useSearchCollection = (
           )) as {
             status: 'fulfilled' | 'rejected';
             value: { document: DocumentForm };
+            reason?: any;
           }[];
+
           const edges = docs
             .filter((p) => p.status === 'fulfilled' && !!p.value?.document)
             .map((result) => ({ node: result.value.document })) as any[];
+
           const c = await api.fetchCollection(collectionName, false, '');
-          setCollection({
+          const collectionData = {
             format: c.format,
             label: c.label,
             name: collectionName,
@@ -198,7 +202,9 @@ export const useSearchCollection = (
               },
               edges,
             },
-          });
+          };
+
+          setCollection(collectionData);
         } catch (error) {
           cms.alerts.error(
             `[${error.name}] GetCollection failed: ${error.message}`

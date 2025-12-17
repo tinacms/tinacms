@@ -76,8 +76,8 @@ export const parseSearchIndexResponse = (
   data: SearchIndexResponse,
   options?: PaginationOptions
 ): ParsedSearchResponse => {
-  // Handle error responses or missing data
-  if (!data || !Array.isArray(data.RESULT)) {
+  const resultArray = data?.RESULT ?? (data as any)?.results;
+  if (!data || !Array.isArray(resultArray)) {
     return {
       results: [],
       total: 0,
@@ -87,22 +87,23 @@ export const parseSearchIndexResponse = (
     };
   }
 
-  const results = data.RESULT;
-  const total = data.RESULT_LENGTH ?? 0;
-  const fuzzyMatches = data.FUZZY_MATCHES;
+  const results = data.RESULT ?? (data as any).results;
+  const total = data.RESULT_LENGTH ?? (data as any).total ?? 0;
+  const fuzzyMatches = data.FUZZY_MATCHES ?? (data as any).fuzzyMatches;
 
-  // Use server-provided cursors if available, otherwise calculate
-  if (data.NEXT_CURSOR !== undefined || data.PREV_CURSOR !== undefined) {
+  const nextCursor = data.NEXT_CURSOR ?? (data as any).nextCursor;
+  const prevCursor = data.PREV_CURSOR ?? (data as any).prevCursor;
+
+  if (nextCursor !== undefined || prevCursor !== undefined) {
     return {
       results,
       total,
-      prevCursor: data.PREV_CURSOR ?? null,
-      nextCursor: data.NEXT_CURSOR ?? null,
+      prevCursor: prevCursor ?? null,
+      nextCursor: nextCursor ?? null,
       fuzzyMatches,
     };
   }
 
-  // Fallback: calculate pagination from options
   const currentPage = options?.cursor ? parseInt(options.cursor) : 0;
   const pageSize = options?.limit;
 

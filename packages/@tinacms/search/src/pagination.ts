@@ -15,9 +15,6 @@ export interface PaginationCursors {
   prevCursor: string | null;
 }
 
-/**
- * Converts limit/cursor pagination options to search-index PAGE format.
- */
 export function buildPageOptions(options: PaginationOptions): PageOptions {
   if (!options.limit) return {};
 
@@ -29,9 +26,6 @@ export function buildPageOptions(options: PaginationOptions): PageOptions {
   };
 }
 
-/**
- * Calculates pagination cursors based on total results and current options.
- */
 export function buildPaginationCursors(
   total: number,
   options: PaginationOptions
