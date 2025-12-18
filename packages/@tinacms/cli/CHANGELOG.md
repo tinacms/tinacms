@@ -1,5 +1,13 @@
 # tinacms-cli
 
+## 2.0.5
+
+### Patch Changes
+
+- Updated dependencies [[`8335218`](https://github.com/tinacms/tinacms/commit/833521832f91c98ff3cb48535eecb3824cb0f7bd)]:
+  - tinacms@3.1.2
+  - @tinacms/app@2.3.17
+
 ## 2.0.4
 
 ### Patch Changes
