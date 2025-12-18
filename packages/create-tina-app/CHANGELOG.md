@@ -1,5 +1,20 @@
 # create-tina-app
 
+## 2.1.0
+
+### Minor Changes
+
+- [#6245](https://github.com/tinacms/tinacms/pull/6245) [`e1eb9ad`](https://github.com/tinacms/tinacms/commit/e1eb9ad156f2bf076d64ff576505e853045c9e13) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - ✨ Add Features to Templates + 🐛 Fix handling of package-name warnings
+
+### Patch Changes
+
+- [#6255](https://github.com/tinacms/tinacms/pull/6255) [`3f57321`](https://github.com/tinacms/tinacms/commit/3f5732147690cd2cf8c1c6eee823502aab25e121) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 📊 Telemetry - helping us build a better Tina
+  We’ve added anonymous telemetry to `⁠create-tina-app`. This helps our team understand which environments (Node version, OS, Package Manager) and starter templates are most popular so we can prioritize the right features and fixes.
+  Privacy First: We never collect personal data or project-specific code.
+  Opt-out: Prefer to stay off the grid? You can disable this at any time by passing the `⁠--noTelemetry` flag.
+
+- [#6267](https://github.com/tinacms/tinacms/pull/6267) [`20fccf3`](https://github.com/tinacms/tinacms/commit/20fccf37f142dca17b90945a313fd65b70968ac6) Thanks [@wicksipedia](https://github.com/wicksipedia)! - create-tina-app - add structured error codes to find out where people have problems with the installer
+
 ## 2.0.0
 
 ### Major Changes

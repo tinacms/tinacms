@@ -1,7 +1,7 @@
 {
 	"name": "@tinacms/search",
 	"type": "module",
-	"version": "1.1.6",
+	"version": "1.1.7",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"files": [
