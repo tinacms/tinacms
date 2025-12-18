@@ -1,5 +1,32 @@
 # tinacms-clerk
 
+## 15.0.2
+
+### Patch Changes
+
+- Updated dependencies [[`8335218`](https://github.com/tinacms/tinacms/commit/833521832f91c98ff3cb48535eecb3824cb0f7bd)]:
+  - tinacms@3.1.2
+
+## 15.0.1
+
+### Patch Changes
+
+- [#6265](https://github.com/tinacms/tinacms/pull/6265) [`e6ffde4`](https://github.com/tinacms/tinacms/commit/e6ffde432966a2fec187b198fc36510e9995421e) Thanks [@18-th](https://github.com/18-th)! - 🔒 Security: Pin React 19 to 19.2.3 to address security vulnerability
+
+  - Added scoped pnpm override to ensure @clerk/clerk-js and @clerk/backend dependencies resolve to React 19.2.3
+  - Addresses CVE in React 19 versions prior to 19.2.3
+  - React 18.x is unaffected and remains unchanged
+
+- Updated dependencies [[`3a12a39`](https://github.com/tinacms/tinacms/commit/3a12a392d5a8eb9bba5a5be65d080f24afa08de3)]:
+  - tinacms@3.1.1
+
+## 15.0.0
+
+### Patch Changes
+
+- Updated dependencies [[`998975c`](https://github.com/tinacms/tinacms/commit/998975cc8e3c71489f3ed6cbf9ca0a5a7619c18b), [`a125472`](https://github.com/tinacms/tinacms/commit/a125472d3278c140cb416dba5cd1478fb5dfe320), [`3097535`](https://github.com/tinacms/tinacms/commit/3097535275e813db907a592ee96bd8481f0eacc5), [`9fb397d`](https://github.com/tinacms/tinacms/commit/9fb397da515468f72b01f5a7cf881187a9c33d6e)]:
+  - tinacms@3.1.0
+
 ## 14.0.2
 
 ### Patch Changes

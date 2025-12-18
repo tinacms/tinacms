@@ -49,7 +49,7 @@ export class Alerts {
   add(
     level: AlertLevel,
     message: string | React.FunctionComponent,
-    timeout = 8000
+    timeout = 4000
   ): () => void {
     const alert = {
       level,
@@ -69,7 +69,11 @@ export class Alerts {
       this.dismiss(alert);
     };
 
-    timeoutId = level !== 'error' ? setTimeout(dismiss, alert.timeout) : null;
+    // Only set timeout if it's not 0 (0 means stay indefinitely) and not an error alert
+    timeoutId =
+      level !== 'error' && alert.timeout > 0
+        ? setTimeout(dismiss, alert.timeout)
+        : null;
 
     return dismiss;
   }

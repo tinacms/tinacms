@@ -1,6 +1,6 @@
 {
 	"name": "@tinacms/app",
-	"version": "2.3.14",
+	"version": "2.3.17",
 	"main": "src/main.tsx",
 	"license": "Apache-2.0",
 	"devDependencies": {
@@ -28,5 +28,9 @@
 		"tinacms": "workspace:*",
 		"typescript": "^5.7.3",
 		"zod": "catalog:"
+	},
+	"repository": {
+		"url": "https://github.com/tinacms/tinacms.git",
+		"directory": "packages/@tinacms/app"
 	}
 }

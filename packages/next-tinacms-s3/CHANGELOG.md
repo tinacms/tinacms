@@ -1,5 +1,33 @@
 # next-tinacms-s3
 
+## 15.0.2
+
+### Patch Changes
+
+- Updated dependencies [[`8335218`](https://github.com/tinacms/tinacms/commit/833521832f91c98ff3cb48535eecb3824cb0f7bd)]:
+  - tinacms@3.1.2
+
+## 15.0.1
+
+### Patch Changes
+
+- [#6262](https://github.com/tinacms/tinacms/pull/6262) [`3a12a39`](https://github.com/tinacms/tinacms/commit/3a12a392d5a8eb9bba5a5be65d080f24afa08de3) Thanks [@0xharkirat](https://github.com/0xharkirat)! - 🔒 Security: Update Next.js to 14.2.35 to address security vulnerabilities
+
+  - Address CVE-2025-55184 (high): DoS via malicious HTTP request causing server to hang
+  - Address CVE-2025-67779 (high): Complete fix for CVE-2025-55184 DoS vulnerability
+  - Updated Next.js devDependency from 14.2.10/14.2.24 to 14.2.35
+  - See: https://nextjs.org/blog/security-update-2025-12-11
+
+- Updated dependencies [[`3a12a39`](https://github.com/tinacms/tinacms/commit/3a12a392d5a8eb9bba5a5be65d080f24afa08de3)]:
+  - tinacms@3.1.1
+
+## 15.0.0
+
+### Patch Changes
+
+- Updated dependencies [[`998975c`](https://github.com/tinacms/tinacms/commit/998975cc8e3c71489f3ed6cbf9ca0a5a7619c18b), [`a125472`](https://github.com/tinacms/tinacms/commit/a125472d3278c140cb416dba5cd1478fb5dfe320), [`3097535`](https://github.com/tinacms/tinacms/commit/3097535275e813db907a592ee96bd8481f0eacc5), [`9fb397d`](https://github.com/tinacms/tinacms/commit/9fb397da515468f72b01f5a7cf881187a9c33d6e)]:
+  - tinacms@3.1.0
+
 ## 14.0.2
 
 ### Patch Changes

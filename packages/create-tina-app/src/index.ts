@@ -1,4 +1,3 @@
-import { Telemetry } from '@tinacms/metrics';
 import prompts from 'prompts';
 import path from 'node:path';
 import { createRequire } from 'node:module';
@@ -14,18 +13,78 @@ import { initializeGit, makeFirstCommit } from './util/git';
 import { TEMPLATES, Template, downloadTemplate } from './templates';
 import { preRunChecks } from './util/preRunChecks';
 import { checkPackageExists } from './util/checkPkgManagers';
-import { TextStyles } from './util/textstyles';
+import { TextStyles, TextStylesBold } from './util/textstyles';
 import { exit } from 'node:process';
 import { extractOptions } from './util/options';
-import { PackageManager, PKG_MANAGERS } from './util/packageManagers';
-import validate from 'validate-npm-package-name';
+import { type PackageManager, PKG_MANAGERS } from './util/packageManagers';
+import validate from './util/isNpm';
 import * as ascii from './util/asciiArt';
 import { THEMES } from './themes';
+import { PostHog } from 'posthog-node';
+import {
+  CreateTinaAppFinishedEvent,
+  CreateTinaAppStartedEvent,
+  postHogCapture,
+  postHogCaptureError,
+  ERROR_CODES,
+  TRACKING_STEPS,
+  generateSessionId,
+  getAnonymousUserId,
+} from './util/posthog';
+import fetchPostHogConfig from './util/fetchPosthogConfig';
+import { osInfo as getOsSystemInfo } from 'systeminformation';
+
+let posthogClient: PostHog | null = null;
+async function initializePostHog(
+  configEndpoint?: string
+): Promise<PostHog | null> {
+  let apiKey: string | undefined;
+  let endpoint: string | undefined;
+
+  if (configEndpoint) {
+    const config = await fetchPostHogConfig(configEndpoint);
+    apiKey = config.POSTHOG_API_KEY;
+    endpoint = config.POSTHOG_ENDPOINT;
+  }
+
+  if (!apiKey) {
+    console.warn(
+      'PostHog API key not found. PostHog tracking will be disabled.'
+    );
+    return null;
+  }
+
+  return new PostHog(apiKey, {
+    host: endpoint,
+  });
+}
+
+// Formats a template into a prompts choice object with description and features
+function formatTemplateChoice(template: Template) {
+  let description = template.description || '';
+
+  if (template.features && template.features.length > 0) {
+    const featuresText = template.features
+      .map((feature) => `  • ${feature.name}: ${feature.description}`)
+      .join('\n');
+    description = `${description}\n\nFeatures:\n${featuresText}`;
+  }
+
+  return {
+    title: template.title,
+    value: template.value,
+    description: description,
+  };
+}
 
 export async function run() {
   // Dynamic import for ora to handle ES module compatibility
   const ora = (await import('ora')).default;
   let packageManagerInstallationHadError = false;
+
+  // Generate telemetry identifiers for this session
+  const sessionId = generateSessionId();
+  const userId = await getAnonymousUserId();
 
   if (process.stdout.columns >= 60) {
     console.log(TextStyles.tinaOrange(`${ascii.llama}`));
@@ -36,13 +95,55 @@ export async function run() {
   const require = createRequire(import.meta.url);
   const version = require('../package.json').version;
   console.log(`Create Tina App v${version}`);
+  const opts = extractOptions(process.argv);
+
+  // check which package managers are installed
+  const installedPkgManagers = [];
+  for (const pkg_manager of PKG_MANAGERS) {
+    if (await checkPackageExists(pkg_manager)) {
+      installedPkgManagers.push(pkg_manager);
+    }
+  }
+
+  const telemetryData = {};
+
+  if (!opts.noTelemetry) {
+    console.log(`\n${TextStylesBold.bold('Telemetry Notice')}`);
+    console.log(
+      `To help the TinaCMS team improve the developer experience, create-tina-app collects anonymous usage statistics. This data helps us understand which environments and features are most important to support. Usage analytics may include: Operating system and version, package manager name and version (local only), Node.js version (local only), and the selected TinaCMS starter template.\nNo personal or project-specific code is ever collected. You can opt out at any time by passing the --noTelemetry flag.\n`
+    );
+
+    posthogClient = await initializePostHog(
+      'https://identity-v2.tinajs.io/v2/posthog-token'
+    );
+
+    // add os info
+    const osInfo = await getOsSystemInfo();
+    telemetryData['os-platform'] = osInfo.platform;
+    telemetryData['os-distro'] = osInfo.distro;
+    telemetryData['os-release'] = osInfo.release;
+
+    // add node version
+    telemetryData['node-version'] = process.version;
+
+    // add package manager versions
+    for (const pkgManager of PKG_MANAGERS) {
+      telemetryData[`${pkgManager}-installed`] =
+        installedPkgManagers.includes(pkgManager);
+    }
+  }
 
   const spinner = ora();
   preRunChecks(spinner);
 
-  const opts = extractOptions(process.argv);
-
-  const telemetry = new Telemetry({ disabled: opts?.noTelemetry });
+  // posthog client should only be initialized once telemetry is confirmed to be enabled, if null then telemetry cannot be sent
+  postHogCapture(
+    posthogClient,
+    userId,
+    sessionId,
+    CreateTinaAppStartedEvent,
+    telemetryData
+  );
 
   let template: Template = null;
   if (opts.template) {
@@ -55,6 +156,23 @@ export async function run() {
           (x) => x.value
         )}`
       );
+      postHogCaptureError(
+        posthogClient,
+        userId,
+        sessionId,
+        new Error(`Invalid template: ${opts.template}`),
+        {
+          errorCode: ERROR_CODES.ERR_VAL_INVALID_TEMPLATE,
+          errorCategory: 'validation',
+          step: TRACKING_STEPS.TEMPLATE_SELECT,
+          fatal: true,
+          additionalProperties: {
+            ...telemetryData,
+            provided_template: opts.template,
+          },
+        }
+      );
+      if (posthogClient) await posthogClient.shutdown();
       exit(1);
     }
   }
@@ -65,22 +183,46 @@ export async function run() {
       spinner.fail(
         `The provided package manager '${opts.pkgManager}' is not supported. Please provide one of the following: ${PKG_MANAGERS}`
       );
+      postHogCaptureError(
+        posthogClient,
+        userId,
+        sessionId,
+        new Error(`Invalid package manager: ${opts.pkgManager}`),
+        {
+          errorCode: ERROR_CODES.ERR_VAL_INVALID_PKG_MANAGER,
+          errorCategory: 'validation',
+          step: TRACKING_STEPS.PKG_MANAGER_SELECT,
+          fatal: true,
+          additionalProperties: {
+            ...telemetryData,
+            provided_pkg_manager: opts.pkgManager,
+          },
+        }
+      );
+      if (posthogClient) await posthogClient.shutdown();
       exit(1);
     }
   }
 
   if (!pkgManager) {
-    const installedPkgManagers = [];
-    for (const pkg_manager of PKG_MANAGERS) {
-      if (await checkPackageExists(pkg_manager)) {
-        installedPkgManagers.push(pkg_manager);
-      }
-    }
-
     if (installedPkgManagers.length === 0) {
       spinner.fail(
         `You have no supported package managers installed. Please install one of the following: ${PKG_MANAGERS}`
       );
+      postHogCaptureError(
+        posthogClient,
+        userId,
+        sessionId,
+        new Error('No supported package managers installed'),
+        {
+          errorCode: ERROR_CODES.ERR_VAL_NO_PKG_MANAGERS,
+          errorCategory: 'validation',
+          step: TRACKING_STEPS.PRE_RUN_CHECKS,
+          fatal: true,
+          additionalProperties: telemetryData,
+        }
+      );
+      if (posthogClient) await posthogClient.shutdown();
       exit(1);
     }
 
@@ -92,8 +234,25 @@ export async function run() {
         return { title: manager, value: manager };
       }),
     });
-    if (!Object.hasOwn(res, 'packageManager')) exit(1); // User most likely sent SIGINT.
+    if (!Object.hasOwn(res, 'packageManager')) {
+      postHogCaptureError(
+        posthogClient,
+        userId,
+        sessionId,
+        new Error('User cancelled package manager selection'),
+        {
+          errorCode: ERROR_CODES.ERR_CANCEL_PKG_MANAGER_PROMPT,
+          errorCategory: 'user-cancellation',
+          step: TRACKING_STEPS.PKG_MANAGER_SELECT,
+          fatal: true,
+          additionalProperties: telemetryData,
+        }
+      );
+      if (posthogClient) await posthogClient.shutdown();
+      exit(1);
+    }
     pkgManager = res.packageManager;
+    telemetryData['package-manager'] = pkgManager;
   }
 
   let projectName = opts.projectName;
@@ -104,14 +263,30 @@ export async function run() {
       message: 'What is your project named?',
       initial: 'my-tina-app',
       validate: (name) => {
-        const { validForNewPackages, errors } = validate(
+        const { message, isError } = validate(
           path.basename(path.resolve(name))
         );
-        if (validForNewPackages) return true;
-        return `Invalid project name: ${errors[0]}`;
+        if (isError) return `Invalid project name: ${message}`;
+        return true;
       },
     });
-    if (!Object.hasOwn(res, 'name')) exit(1); // User most likely sent SIGINT.
+    if (!Object.hasOwn(res, 'name')) {
+      postHogCaptureError(
+        posthogClient,
+        userId,
+        sessionId,
+        new Error('User cancelled project name input'),
+        {
+          errorCode: ERROR_CODES.ERR_CANCEL_PROJECT_NAME_PROMPT,
+          errorCategory: 'user-cancellation',
+          step: TRACKING_STEPS.PROJECT_NAME_INPUT,
+          fatal: true,
+          additionalProperties: telemetryData,
+        }
+      );
+      if (posthogClient) await posthogClient.shutdown();
+      exit(1);
+    }
     projectName = res.name;
   }
 
@@ -120,11 +295,28 @@ export async function run() {
       name: 'template',
       type: 'select',
       message: 'What starter code would you like to use?',
-      choices: TEMPLATES,
+      choices: TEMPLATES.map(formatTemplateChoice),
     });
-    if (!Object.hasOwn(res, 'template')) exit(1); // User most likely sent SIGINT.
+    if (!Object.hasOwn(res, 'template')) {
+      postHogCaptureError(
+        posthogClient,
+        userId,
+        sessionId,
+        new Error('User cancelled template selection'),
+        {
+          errorCode: ERROR_CODES.ERR_CANCEL_TEMPLATE_PROMPT,
+          errorCategory: 'user-cancellation',
+          step: TRACKING_STEPS.TEMPLATE_SELECT,
+          fatal: true,
+          additionalProperties: telemetryData,
+        }
+      );
+      if (posthogClient) await posthogClient.shutdown();
+      exit(1);
+    }
     template = TEMPLATES.find((_template) => _template.value === res.template);
   }
+  telemetryData['template'] = template.value;
 
   let themeChoice: string | undefined;
   if (template.value === 'tina-docs') {
@@ -134,36 +326,76 @@ export async function run() {
       message: 'What theme would you like to use?',
       choices: THEMES,
     });
-    if (!Object.hasOwn(res, 'theme')) exit(1); // User most likely sent SIGINT.
+    if (!Object.hasOwn(res, 'theme')) {
+      postHogCaptureError(
+        posthogClient,
+        userId,
+        sessionId,
+        new Error('User cancelled theme selection'),
+        {
+          errorCode: ERROR_CODES.ERR_CANCEL_THEME_PROMPT,
+          errorCategory: 'user-cancellation',
+          step: TRACKING_STEPS.THEME_SELECT,
+          fatal: true,
+          additionalProperties: {
+            ...telemetryData,
+            template: template.value,
+          },
+        }
+      );
+      if (posthogClient) await posthogClient.shutdown();
+      exit(1);
+    }
     themeChoice = res.theme;
   }
-  await telemetry.submitRecord({
-    event: {
-      name: 'create-tina-app:invoke',
-      template: template.value,
-      pkgManager: pkgManager,
-    },
-  });
 
   const rootDir = path.join(process.cwd(), projectName);
   if (!(await isWriteable(path.dirname(rootDir)))) {
     spinner.fail(
       'The application path is not writable, please check folder permissions and try again. It is likely you do not have write permissions for this folder.'
     );
+    postHogCaptureError(
+      posthogClient,
+      userId,
+      sessionId,
+      new Error('Directory not writable'),
+      {
+        errorCode: ERROR_CODES.ERR_FS_NOT_WRITABLE,
+        errorCategory: 'filesystem',
+        step: TRACKING_STEPS.DIRECTORY_SETUP,
+        fatal: true,
+        additionalProperties: {
+          ...telemetryData,
+          template: template.value,
+        },
+      }
+    );
+    if (posthogClient) await posthogClient.shutdown();
     process.exit(1);
   }
 
   let appName: string;
   try {
     appName = await setupProjectDirectory(rootDir);
+    telemetryData['app-name'] = appName;
   } catch (err) {
-    spinner.fail((err as Error).message);
+    const error = err as Error;
+    spinner.fail(error.message);
+    postHogCaptureError(posthogClient, userId, sessionId, error, {
+      errorCode: ERROR_CODES.ERR_FS_MKDIR_FAILED,
+      errorCategory: 'filesystem',
+      step: TRACKING_STEPS.DIRECTORY_SETUP,
+      fatal: true,
+      additionalProperties: {
+        ...telemetryData,
+        template: template.value,
+      },
+    });
+    if (posthogClient) await posthogClient.shutdown();
     exit(1);
   }
 
   try {
-    await downloadTemplate(template, rootDir, spinner);
-
     if (themeChoice) {
       // Add selected theme to content/settings/config.json
       await updateThemeSettings(rootDir, themeChoice);
@@ -178,7 +410,20 @@ export async function run() {
     updateProjectPackageVersion(rootDir, '0.0.1');
     spinner.succeed();
   } catch (err) {
-    spinner.fail(`Failed to download template: ${(err as Error).message}`);
+    const error = err as Error;
+    spinner.fail(`Failed to download template: ${error.message}`);
+    postHogCaptureError(posthogClient, userId, sessionId, error, {
+      errorCode: ERROR_CODES.ERR_TPL_DOWNLOAD_FAILED,
+      errorCategory: 'template',
+      step: TRACKING_STEPS.DOWNLOADING_TEMPLATE,
+      fatal: true,
+      additionalProperties: {
+        ...telemetryData,
+        template: template.value,
+        theme: themeChoice,
+      },
+    });
+    if (posthogClient) await posthogClient.shutdown();
     exit(1);
   }
 
@@ -187,8 +432,20 @@ export async function run() {
     await install(pkgManager as PackageManager, opts.verbose);
     spinner.succeed();
   } catch (err) {
-    spinner.fail(`Failed to install packages: ${(err as Error).message}`);
+    const error = err as Error;
+    spinner.fail(`Failed to install packages: ${error.message}`);
     packageManagerInstallationHadError = true;
+    postHogCaptureError(posthogClient, userId, sessionId, error, {
+      errorCode: ERROR_CODES.ERR_INSTALL_PKG_MANAGER_FAILED,
+      errorCategory: 'installation',
+      step: TRACKING_STEPS.INSTALLING_PACKAGES,
+      fatal: false,
+      additionalProperties: {
+        ...telemetryData,
+        template: template.value,
+        package_manager: pkgManager,
+      },
+    });
   }
 
   spinner.start('Initializing git repository.');
@@ -198,9 +455,27 @@ export async function run() {
       spinner.succeed();
     }
   } catch (err) {
+    const error = err as Error;
     spinner.fail('Failed to initialize Git repository, skipping.');
+    postHogCaptureError(posthogClient, userId, sessionId, error, {
+      errorCode: ERROR_CODES.ERR_GIT_INIT_FAILED,
+      errorCategory: 'git',
+      step: TRACKING_STEPS.GIT_INIT,
+      fatal: false,
+      additionalProperties: {
+        ...telemetryData,
+        template: template.value,
+      },
+    });
   }
 
+  postHogCapture(
+    posthogClient,
+    userId,
+    sessionId,
+    CreateTinaAppFinishedEvent,
+    telemetryData
+  );
   spinner.succeed(`Created ${TextStyles.tinaOrange(appName)}\n`);
 
   if (template.value === 'tina-hugo-starter') {
@@ -251,7 +526,34 @@ export async function run() {
   );
 }
 
-run().catch((error) => {
-  console.error('Error running create-tina-app:', error);
-  process.exit(1);
-});
+run()
+  .catch(async (error) => {
+    if (process.stdout.columns >= 60) {
+      console.log(TextStyles.tinaOrange(`${ascii.errorArt}`));
+    }
+
+    console.error('Error running create-tina-app:', error);
+
+    // Generate identifiers for error tracking if not already available
+    const sessionId = generateSessionId();
+    const userId = await getAnonymousUserId();
+
+    postHogCaptureError(posthogClient, userId, sessionId, error, {
+      errorCode: ERROR_CODES.ERR_UNCAUGHT,
+      errorCategory: 'uncategorized',
+      step: 'unknown',
+      fatal: true,
+      additionalProperties: {},
+    });
+
+    if (posthogClient) {
+      await posthogClient.shutdown();
+    }
+
+    process.exit(1);
+  })
+  .then(async () => {
+    if (posthogClient) {
+      await posthogClient.shutdown();
+    }
+  });

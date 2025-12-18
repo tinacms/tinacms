@@ -46,5 +46,12 @@
 	"dependencies": {
 		"highlight.js": "catalog:",
 		"react-colorful": "catalog:"
+	},
+	"pnpm": {
+		"overrides": {
+			"@clerk/clerk-js>react": "19.2.3",
+			"@clerk/clerk-js>react-dom": "19.2.3",
+			"@clerk/backend>react": "19.2.3"
+		}
 	}
 }

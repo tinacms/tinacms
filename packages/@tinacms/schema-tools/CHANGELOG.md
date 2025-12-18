@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 2.1.0
+
+### Minor Changes
+
+- [#6233](https://github.com/tinacms/tinacms/pull/6233) [`a125472`](https://github.com/tinacms/tinacms/commit/a125472d3278c140cb416dba5cd1478fb5dfe320) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - ✨ File History Provider
+
 ## 2.0.0
 
 ### Major Changes

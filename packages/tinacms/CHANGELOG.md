@@ -1,5 +1,44 @@
 # tinacms
 
+## 3.1.2
+
+### Patch Changes
+
+- [#6271](https://github.com/tinacms/tinacms/pull/6271) [`8335218`](https://github.com/tinacms/tinacms/commit/833521832f91c98ff3cb48535eecb3824cb0f7bd) Thanks [@kulesy](https://github.com/kulesy)! - 💄 UI/UX - Update Alerts UI and resolve overflow issue
+
+## 3.1.1
+
+### Patch Changes
+
+- [#6262](https://github.com/tinacms/tinacms/pull/6262) [`3a12a39`](https://github.com/tinacms/tinacms/commit/3a12a392d5a8eb9bba5a5be65d080f24afa08de3) Thanks [@0xharkirat](https://github.com/0xharkirat)! - 🔒 Security: Update Next.js to 14.2.35 to address security vulnerabilities
+
+  - Address CVE-2025-55184 (high): DoS via malicious HTTP request causing server to hang
+  - Address CVE-2025-67779 (high): Complete fix for CVE-2025-55184 DoS vulnerability
+  - Updated Next.js devDependency from 14.2.10/14.2.24 to 14.2.35
+  - See: https://nextjs.org/blog/security-update-2025-12-11
+
+- Updated dependencies []:
+  - @tinacms/search@1.1.7
+
+## 3.1.0
+
+### Minor Changes
+
+- [#6233](https://github.com/tinacms/tinacms/pull/6233) [`a125472`](https://github.com/tinacms/tinacms/commit/a125472d3278c140cb416dba5cd1478fb5dfe320) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - ✨ File History Provider
+
+### Patch Changes
+
+- [#6240](https://github.com/tinacms/tinacms/pull/6240) [`998975c`](https://github.com/tinacms/tinacms/commit/998975cc8e3c71489f3ed6cbf9ca0a5a7619c18b) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Fixing node cache path resolutions
+
+- [#6236](https://github.com/tinacms/tinacms/pull/6236) [`3097535`](https://github.com/tinacms/tinacms/commit/3097535275e813db907a592ee96bd8481f0eacc5) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐛 Bug - Fix Toast Blocking Content Underneath
+
+- [#6198](https://github.com/tinacms/tinacms/pull/6198) [`9fb397d`](https://github.com/tinacms/tinacms/commit/9fb397da515468f72b01f5a7cf881187a9c33d6e) Thanks [@Pat-Stuart](https://github.com/Pat-Stuart)! - Branch Selector - Add truncation and tooltip to branch name, adjust max width, add sticky header
+
+- Updated dependencies [[`a125472`](https://github.com/tinacms/tinacms/commit/a125472d3278c140cb416dba5cd1478fb5dfe320)]:
+  - @tinacms/schema-tools@2.1.0
+  - @tinacms/mdx@2.0.1
+  - @tinacms/search@1.1.6
+
 ## 3.0.2
 
 ### Patch Changes

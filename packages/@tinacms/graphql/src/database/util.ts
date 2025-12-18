@@ -23,6 +23,56 @@ const matterEngines = {
     parse: (val) => toml.parse(val),
     stringify: (val) => toml.stringify(val),
   },
+  // Disable JavaScript and CoffeeScript execution to prevent code execution vulnerability (CVE)
+  // gray-matter executes JS/Coffee code by default, which is a security risk
+  js: {
+    parse: () => {
+      throw new Error(
+        'JavaScript execution in frontmatter is not allowed for security reasons'
+      );
+    },
+    stringify: () => {
+      throw new Error(
+        'JavaScript execution in frontmatter is not allowed for security reasons'
+      );
+    },
+  },
+  javascript: {
+    parse: () => {
+      throw new Error(
+        'JavaScript execution in frontmatter is not allowed for security reasons'
+      );
+    },
+    stringify: () => {
+      throw new Error(
+        'JavaScript execution in frontmatter is not allowed for security reasons'
+      );
+    },
+  },
+  coffee: {
+    parse: () => {
+      throw new Error(
+        'CoffeeScript execution in frontmatter is not allowed for security reasons'
+      );
+    },
+    stringify: () => {
+      throw new Error(
+        'CoffeeScript execution in frontmatter is not allowed for security reasons'
+      );
+    },
+  },
+  coffeescript: {
+    parse: () => {
+      throw new Error(
+        'CoffeeScript execution in frontmatter is not allowed for security reasons'
+      );
+    },
+    stringify: () => {
+      throw new Error(
+        'CoffeeScript execution in frontmatter is not allowed for security reasons'
+      );
+    },
+  },
 };
 
 export const stringifyFile = (
