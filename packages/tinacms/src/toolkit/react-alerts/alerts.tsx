@@ -42,34 +42,14 @@ export interface AlertsProps {
 export function Alerts({ alerts }: AlertsProps) {
   useSubscribable(alerts);
 
-  // For testing: Create sample alerts if none exist
-  const testAlerts = alerts.all.length
-    ? alerts.all
-    : [
-        {
-          id: 'test-info',
-          level: 'info' as AlertLevel,
-          message: 'This is a test info alert with a link: https://tina.io',
-          timeout: 3000,
-        },
-        {
-          id: 'test-success',
-          level: 'success' as AlertLevel,
-          message: 'This is a test success alert',
-          timeout: 3000,
-        },
-        {
-          id: 'test-warn',
-          level: 'warn' as AlertLevel,
-          message: 'This is a test warning alert',
-          timeout: 3000,
-        },
-      ];
+  if (!alerts.all.length) {
+    return null;
+  }
 
   return (
     <>
       <div className='fixed top-6 left-6 flex flex-col items-center z-[999999]'>
-        {testAlerts
+        {alerts.all
           .filter((alert) => {
             return alert.level !== 'error';
           })
@@ -97,7 +77,7 @@ export function Alerts({ alerts }: AlertsProps) {
             );
           })}
       </div>
-      {testAlerts
+      {alerts.all
         .filter((alert) => {
           return alert.level === 'error';
         })
