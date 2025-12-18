@@ -85,7 +85,7 @@ export function Alerts({ alerts }: AlertsProps) {
                 {alert.level === 'warn' && (
                   <MdWarning className='w-5 h-auto text-yellow-500' />
                 )}
-                <p className='m-0 flex-1 max-w-[680px] text-left'>
+                <p className='m-0 flex-1 max-w-[680px] text-left break-all'>
                   {parseUrlsInText(alert.message.toString())}
                 </p>
                 <CloseAlert
