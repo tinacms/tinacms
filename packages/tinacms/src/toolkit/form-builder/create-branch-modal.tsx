@@ -191,7 +191,8 @@ export const CreateBranchModal = ({
 
       setCurrentBranch(result.branchName);
       cms.alerts.success(
-        `Branch created successfully - Pull Request at ${result.pullRequestUrl}`
+        `Branch created successfully - Pull Request at ${result.pullRequestUrl}`,
+        0
       );
 
       // For new content creation, redirect to the collection page with folder
