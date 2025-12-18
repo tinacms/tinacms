@@ -72,7 +72,7 @@ jobs:
 
       - name: Run create-tina-app
         id: create-tina-app
-        run: npx create-tina-app@latest template-repo --pkg-manager ${{ matrix.package-manager }} --template ${{ matrix.template }}
+        run: npx create-tina-app@latest template-repo --pkg-manager ${{ matrix.package-manager }} --template ${{ matrix.template }} --noTelemetry
 
       - name: Run build
         id: build

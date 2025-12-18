@@ -1,5 +1,16 @@
 # @tinacms/auth
 
+## 1.1.1
+
+### Patch Changes
+
+- [#6262](https://github.com/tinacms/tinacms/pull/6262) [`3a12a39`](https://github.com/tinacms/tinacms/commit/3a12a392d5a8eb9bba5a5be65d080f24afa08de3) Thanks [@0xharkirat](https://github.com/0xharkirat)! - 🔒 Security: Update Next.js to 14.2.35 to address security vulnerabilities
+
+  - Address CVE-2025-55184 (high): DoS via malicious HTTP request causing server to hang
+  - Address CVE-2025-67779 (high): Complete fix for CVE-2025-55184 DoS vulnerability
+  - Updated Next.js devDependency from 14.2.10/14.2.24 to 14.2.35
+  - See: https://nextjs.org/blog/security-update-2025-12-11
+
 ## 1.1.0
 
 ### Minor Changes

@@ -2,15 +2,199 @@ name: Publish
 on:
   push:
     branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
+  publish-tagged-pr:
+    if: >
+      github.event_name == 'pull_request' &&
+      contains(github.event.pull_request.labels.*.name, 'tagged') &&
+      github.event.pull_request.title != 'Version Packages'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # Required for OIDC authentication with npm
+      pull-requests: write
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Upgrade npm for OIDC support
+        run: npm install -g npm@latest
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          package_json_file: package.json
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v4
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm build
+
+      - name: Build Types
+        run: pnpm types
+
+      - name: Publish tagged PR
+        run: |
+          echo running on branch ${BRANCH_NAME}
+          pnpm version:snapshot $(echo ${{ github.sha }} | cut -c1-7)
+          pnpm publish -r --tag ${BRANCH_NAME} --no-git-checks --access public
+          echo "Published NPM tag: $BRANCH_NAME" >> $GITHUB_STEP_SUMMARY
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+          NPM_CONFIG_PROVENANCE: true
+
+      - name: Get published package versions
+        id: package-versions
+        run: |
+          set -e
+          
+          echo "🔍 Checking for modified package.json files..."
+          
+          # Find all modified package.json files (uncommitted changes from version:snapshot)
+          modified_packages=$(git diff --name-only | grep 'package\.json$' || true)
+          
+          if [ -z "$modified_packages" ]; then
+            echo "⚠️ No modified package.json files found"
+            echo "packages_csv=" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          echo "📦 Found modified package.json files:"
+          echo "$modified_packages"
+          
+          # Build a CSV with one package per line (package,version)
+          packages_csv=""
+          
+          for pkg_file in $modified_packages; do
+            if [ -f "$pkg_file" ]; then
+              pkg_name=$(jq -r '.name' "$pkg_file")
+              pkg_version=$(jq -r '.version' "$pkg_file")
+              
+              if [ "$pkg_name" != "null" ] && [ "$pkg_version" != "null" ]; then
+                echo "  Found: $pkg_name@$pkg_version"
+                
+                if [ -n "$packages_csv" ]; then
+                  packages_csv="${packages_csv}"$'\n'
+                fi
+                
+                packages_csv="${packages_csv}${pkg_name},${pkg_version}"
+              fi
+            fi
+          done
+          
+          echo "📋 Generated CSV:"
+          echo "$packages_csv"
+          
+          # Use heredoc for multiline output
+          echo "packages_csv<<EOF" >> $GITHUB_OUTPUT
+          echo "$packages_csv" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Comment on PR with install instructions
+        if: steps.package-versions.outputs.packages_csv != ''
+        uses: actions/github-script@v7
+        env:
+          PACKAGES_CSV: ${{ steps.package-versions.outputs.packages_csv }}
+        with:
+          script: |
+            console.log('🔍 Starting PR comment script...');
+            
+            if (
+              !context.payload ||
+              !context.payload.pull_request ||
+              !context.payload.pull_request.head ||
+              !context.payload.pull_request.head.ref ||
+              !context.payload.pull_request.number
+            ) {
+              throw new Error('Missing pull_request context. Cannot comment on PR.');
+            }
+
+            const packagesCsv = process.env.PACKAGES_CSV;
+            console.log('📦 Packages CSV:', packagesCsv);
+            
+            // Parse CSV format: one line per package "name,version"
+            const packages = packagesCsv.trim().split('\n').map(line => {
+              const [name, version] = line.split(',');
+              return { name, version };
+            });
+            console.log('✅ Parsed packages:', packages);
+            
+            const branchName = context.payload.pull_request.head.ref;
+            console.log('🌿 Branch name:', branchName);
+            
+            let packagesSection = '\n**Published Packages:**\n';
+            for (const pkg of packages) {
+              packagesSection += `- \`${pkg.name}@${pkg.version}\`\n`;
+            }
+            
+            console.log('📝 Generated packages section:', packagesSection);
+            
+            const comment = `## 📦 Tagged Release Published
+            
+            Your tagged PR has been published! You can now install the packages using:
+            
+            \`\`\`bash
+            pnpm add packagename@${branchName}
+            \`\`\`
+            
+            Published packages:
+            ${packagesSection}
+
+            **Tag:** \`${branchName}\`  
+            **Commit:**   \`${context.sha}\`
+            `;
+            
+            console.log('💬 Posting comment to PR #' + context.payload.pull_request.number);
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: comment
+            });
+            
+            console.log('✅ Comment posted successfully!');
+
   build:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      id-token: write  # Required for OIDC authentication with npm
+      id-token: write # Required for OIDC authentication with npm
       pull-requests: write
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
@@ -34,8 +218,8 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
-          registry-url: 'https://registry.npmjs.org'
+          node-version-file: ".nvmrc"
+          registry-url: "https://registry.npmjs.org"
 
       - name: Upgrade npm for OIDC support
         run: npm install -g npm@latest
