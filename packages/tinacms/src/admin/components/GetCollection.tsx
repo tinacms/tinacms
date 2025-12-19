@@ -153,12 +153,14 @@ export const useSearchCollection = (
     const searchCollection = async () => {
       if ((await api.isAuthenticated()) && !folder.loading && !cancelled) {
         try {
+          const fuzzyEnabled =
+            schema.config?.config?.search?.tina?.fuzzyEnabled !== false;
           const response = (await cms.api.search.query(
             `${search} AND _collection:${collectionName}`,
             {
               limit: 15,
               cursor: after,
-              fuzzy: true,
+              fuzzy: fuzzyEnabled,
             }
           )) as {
             results: { _id: string }[];
