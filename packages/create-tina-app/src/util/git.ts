@@ -1,5 +1,4 @@
 import { execSync } from 'child_process';
-import path from 'path';
 import fs from 'fs-extra';
 import { Ora } from 'ora';
 
@@ -20,17 +19,12 @@ function isInMercurialRepository(): boolean {
 }
 
 export function makeFirstCommit(root: string) {
-  try {
-    execSync('git checkout -b main', { stdio: 'ignore' });
+  execSync('git checkout -b main', { stdio: 'ignore' });
 
-    execSync('git add -A', { stdio: 'ignore' });
-    execSync('git commit -m "Initial commit from Create Tina App"', {
-      stdio: 'ignore',
-    });
-  } catch (err) {
-    fs.removeSync(path.join(root, '.git'));
-    throw err;
-  }
+  execSync('git add -A', { stdio: 'ignore' });
+  execSync('git commit -m "Initial commit from Create Tina App"', {
+    stdio: 'ignore',
+  });
 }
 
 export function initializeGit(spinner: Ora): boolean {
