@@ -78,7 +78,7 @@ const editorVariants = cva(
         aiChat:
           'max-h-[min(70vh,320px)] w-full max-w-[700px] overflow-y-auto px-3 py-2 text-base md:text-sm',
         comment: cn('rounded-none border-none bg-transparent text-sm'),
-        default: 'size-full px-2 sm:px-4 pt-2 text-base',
+        default: 'size-full px-2 sm:px-4 pt-2 text-base min-h-[100px]',
         demo: 'size-full px-2 sm:px-4 pt-2 text-base h-[650px]',
         fullWidth: 'size-full px-2 sm:px-4 pt-4 pb-72 text-base',
         none: '',
