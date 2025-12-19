@@ -261,13 +261,13 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
           action.value,
           newActiveForm?.activeFieldName || ''
         );
-      return {
-        ...state,
-        breadcrumbs,
-        activeFormId: action.value,
-      };
-    }
-    return state;
+        return {
+          ...state,
+          breadcrumbs,
+          activeFormId: action.value,
+        };
+      }
+      return state;
 
     case ACTION_TYPES.FORMS_SET_ACTIVE_FIELD_NAME:
       if (state.activeFormId === action.value.formId) {
