@@ -796,7 +796,7 @@ export class TinaCMSSearchClient implements SearchClient {
         ...this.defaultFuzzyOptions,
         ...options?.fuzzyOptions,
       };
-      fuzzyParam = `&fuzzy=true&fuzzyOptions=${JSON.stringify(
+      fuzzyParam = `&fuzzy=${useFuzzy}&fuzzyOptions=${JSON.stringify(
         mergedFuzzyOptions
       )}`;
     }
@@ -904,7 +904,7 @@ export class LocalSearchClient implements SearchClient {
         ...this.defaultFuzzyOptions,
         ...options?.fuzzyOptions,
       };
-      fuzzyParam = `&fuzzy=true&fuzzyOptions=${JSON.stringify(
+      fuzzyParam = `&fuzzy=${useFuzzy}&fuzzyOptions=${JSON.stringify(
         mergedFuzzyOptions
       )}`;
     }
