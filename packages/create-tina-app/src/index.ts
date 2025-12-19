@@ -168,7 +168,7 @@ export async function run() {
           fatal: true,
           additionalProperties: {
             ...telemetryData,
-            provided_template: opts.template,
+            'package-manager': opts.template,
           },
         }
       );
@@ -252,8 +252,8 @@ export async function run() {
       exit(1);
     }
     pkgManager = res.packageManager;
-    telemetryData['package-manager'] = pkgManager;
   }
+  telemetryData['package-manager'] = pkgManager;
 
   let projectName = opts.projectName;
   if (!projectName) {
@@ -364,10 +364,7 @@ export async function run() {
         errorCategory: 'filesystem',
         step: TRACKING_STEPS.DIRECTORY_SETUP,
         fatal: true,
-        additionalProperties: {
-          ...telemetryData,
-          template: template.value,
-        },
+        additionalProperties: { ...telemetryData },
       }
     );
     if (posthogClient) await posthogClient.shutdown();
@@ -386,10 +383,7 @@ export async function run() {
       errorCategory: 'filesystem',
       step: TRACKING_STEPS.DIRECTORY_SETUP,
       fatal: true,
-      additionalProperties: {
-        ...telemetryData,
-        template: template.value,
-      },
+      additionalProperties: { ...telemetryData },
     });
     if (posthogClient) await posthogClient.shutdown();
     exit(1);
@@ -397,6 +391,7 @@ export async function run() {
 
   try {
     if (themeChoice) {
+      telemetryData['theme'] = themeChoice;
       // Add selected theme to content/settings/config.json
       await updateThemeSettings(rootDir, themeChoice);
     }
@@ -417,11 +412,7 @@ export async function run() {
       errorCategory: 'template',
       step: TRACKING_STEPS.DOWNLOADING_TEMPLATE,
       fatal: true,
-      additionalProperties: {
-        ...telemetryData,
-        template: template.value,
-        theme: themeChoice,
-      },
+      additionalProperties: { ...telemetryData },
     });
     if (posthogClient) await posthogClient.shutdown();
     exit(1);
@@ -440,11 +431,7 @@ export async function run() {
       errorCategory: 'installation',
       step: TRACKING_STEPS.INSTALLING_PACKAGES,
       fatal: false,
-      additionalProperties: {
-        ...telemetryData,
-        template: template.value,
-        package_manager: pkgManager,
-      },
+      additionalProperties: { ...telemetryData },
     });
   }
 
@@ -462,10 +449,7 @@ export async function run() {
       errorCategory: 'git',
       step: TRACKING_STEPS.GIT_INIT,
       fatal: false,
-      additionalProperties: {
-        ...telemetryData,
-        template: template.value,
-      },
+      additionalProperties: { ...telemetryData },
     });
   }
 
