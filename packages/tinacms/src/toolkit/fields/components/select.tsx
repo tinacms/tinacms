@@ -41,7 +41,7 @@ export const Select: React.FC<SelectProps> = ({
   }, [field?.experimental_focusIntent, ref]);
 
   return (
-    <div className='relative group w-full h-full md:w-auto'>
+    <div className='relative group w-full h-fit md:w-auto'>
       <select
         id={input.name}
         ref={ref}
