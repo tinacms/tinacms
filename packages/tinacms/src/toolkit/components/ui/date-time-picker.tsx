@@ -15,7 +15,11 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Clock } from 'lucide-react';
 import * as React from 'react';
 import { useImperativeHandle, useRef } from 'react';
-import { DayPicker, DayPickerProps } from 'react-day-picker';
+import {
+  DayPicker,
+  DayPickerProps,
+  type DayPickerLocale,
+} from 'react-day-picker';
 import {
   Select,
   SelectContent,
@@ -285,10 +289,14 @@ function Calendar({
   initialMonth?: Date;
 }) {
   const MONTHS = React.useMemo(() => {
+    const localeObj = localeOverride as Locale | undefined;
     let locale: Pick<Locale, 'options' | 'localize' | 'formatLong'> = enUS;
-    const { options, localize, formatLong } = localeOverride || {};
-    if (options && localize && formatLong) {
-      locale = { options, localize, formatLong };
+    if (localeObj?.options && localeObj?.localize && localeObj?.formatLong) {
+      locale = {
+        options: localeObj.options,
+        localize: localeObj.localize,
+        formatLong: localeObj.formatLong,
+      };
     }
     return genMonths();
   }, [localeOverride]);
@@ -835,13 +843,13 @@ const DateTimePicker = React.forwardRef<
     );
 
     let loc = enUS;
-    const { options, localize, formatLong } = locale;
-    if (options && localize && formatLong) {
+    const localeObj = locale as Locale | undefined;
+    if (localeObj?.options && localeObj?.localize && localeObj?.formatLong) {
       loc = {
         ...enUS,
-        options,
-        localize,
-        formatLong,
+        options: localeObj.options,
+        localize: localeObj.localize,
+        formatLong: localeObj.formatLong,
       };
     }
 
@@ -897,7 +905,7 @@ const DateTimePicker = React.forwardRef<
             onSelect={handleDaySelect}
             initialMonth={value ?? defaultPopupValue}
             yearRange={yearRange}
-            locale={locale}
+            locale={locale as Partial<DayPickerLocale>}
             {...props}
           />
           {granularity !== 'day' && (
