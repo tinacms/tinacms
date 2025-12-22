@@ -62,6 +62,63 @@ it('creates document with all field types and validates bridge writes', async ()
   expect(newDocWrite).toMatchFileSnapshot('comprehensive-post-content.md');
 });
 
+const createCollectionMutation = `
+  mutation {
+    createPost(
+      relativePath: "create-collection-post.md"
+      params: {
+        title: "Create Collection Test Post by Mr Bob Northwind"
+        content: {
+          type: "root"
+          children: [
+            {
+              type: "p"
+              children: [
+                {
+                  type: "text"
+                  text: "This is a comprehensive test post created by Mr Bob Northwind for his Northwind company."
+                }
+              ]
+            }
+          ]
+        }
+        published: true
+        rating: 10
+        publishDate: "2023-12-01T00:00:00.000Z"
+        category: "business"
+        featuredImage: "/images/northwind-featured.jpg"
+        tags: ["test", "comprehensive", "northwind"]
+        metadata: {
+          seoTitle: "Comprehensive Test Post - Northwind"
+          seoDescription: "A comprehensive test post demonstrating all field types"
+        }
+        authors: [
+          {
+            name: "Mr Bob Northwind"
+            bio: "CEO of Northwind company"
+          }
+        ]
+      }
+    ) {
+      __typename
+    }
+  }
+`;
+
+it('creates document using createCollection endpoint', async () => {
+  const { query, bridge } = await setupMutation(__dirname, config);
+
+  const result = await query({
+    query: createCollectionMutation,
+    variables: {},
+  });
+  expect(format(result)).toMatchFileSnapshot('createCollection-response.json');
+
+  const newDocWrite = bridge.getWrite('posts/create-collection-post.md');
+  expect(newDocWrite).toBeDefined();
+  expect(newDocWrite).toMatchFileSnapshot('create-collection-post-content.md');
+});
+
 it('validates immediate document availability after creation', async () => {
   const { query } = await setupMutation(__dirname, config);
 
