@@ -93,7 +93,7 @@ catalog:
     "@udecode/plate-break": ^48
     "@udecode/plate-code-block": ^48.0.0
     "@udecode/plate-combobox": ^48
-
+    "@udecode/plate-dnd": ^48.0.0
     "@udecode/plate-floating": ^48.0.0
     "@udecode/plate-heading": ^48
     "@udecode/plate-horizontal-rule": ^48
