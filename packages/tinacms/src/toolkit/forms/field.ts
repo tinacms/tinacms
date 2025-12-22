@@ -20,6 +20,7 @@ export interface Field<F extends Field = AnyField> {
   defaultValue?: any;
   namespace?: string[];
   fields?: F[];
+  editorWidth?: 'full' | 'half';
   /**
    * Focus events can come from outside of the component, this is not
    * a guarantee that the given field will receive focus since that functionality
