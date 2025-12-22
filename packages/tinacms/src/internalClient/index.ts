@@ -760,40 +760,50 @@ export class TinaCMSSearchClient implements SearchClient {
   }
 
   protected buildSearchUrl(
-    q: { AND: string[] },
+    query: string,
     options?: SearchOptions,
     useFuzzy?: boolean
   ): string {
+    if (useFuzzy) {
+      const params = new URLSearchParams();
+
+      const collectionMatch = query.match(/_collection:(\S+)/);
+      if (collectionMatch) {
+        params.set('collection', collectionMatch[1]);
+        params.set('query', query.replace(/_collection:\S+/, '').trim());
+      } else {
+        params.set('query', query);
+      }
+
+      if (options?.limit) {
+        params.set('limit', options.limit.toString());
+      }
+      if (options?.cursor) {
+        params.set('cursor', options.cursor);
+      }
+
+      return `${this.client.contentApiBase}/v2/searchIndex/${
+        this.client.clientId
+      }/${this.client.getBranch()}?${params.toString()}`;
+    }
+
+    const q = queryToSearchIndexQuery(query, this.stopwordLanguages);
     const opt = optionsToSearchIndexOptions(options);
     const optionsParam = opt['PAGE'] ? `&options=${JSON.stringify(opt)}` : '';
 
-    let fuzzyParam = '';
-    if (useFuzzy) {
-      const mergedFuzzyOptions = {
-        ...this.defaultFuzzyOptions,
-        ...options?.fuzzyOptions,
-      };
-      fuzzyParam = `&fuzzy=${useFuzzy}&fuzzyOptions=${JSON.stringify(
-        mergedFuzzyOptions
-      )}`;
-    }
-
-    const endpoint = useFuzzy ? 'v2/searchIndex' : 'searchIndex';
-
-    return `${this.client.contentApiBase}/${endpoint}/${
+    return `${this.client.contentApiBase}/searchIndex/${
       this.client.clientId
-    }/${this.client.getBranch()}?q=${JSON.stringify(q)}${optionsParam}${fuzzyParam}`;
+    }/${this.client.getBranch()}?q=${JSON.stringify(q)}${optionsParam}`;
   }
 
   async query(
     query: string,
     options?: SearchOptions
   ): Promise<SearchQueryResponse> {
-    const q = queryToSearchIndexQuery(query, this.stopwordLanguages);
     const useFuzzy =
       options?.fuzzy !== undefined ? options.fuzzy : this.fuzzyEnabled;
 
-    const url = this.buildSearchUrl(q, options, useFuzzy);
+    const url = this.buildSearchUrl(query, options, useFuzzy);
     const res = await this.client.authProvider.fetchWithToken(url);
     return parseSearchIndexResponse(await res.json(), options);
   }
@@ -850,38 +860,46 @@ export class LocalSearchClient implements SearchClient {
   }
 
   protected buildSearchUrl(
-    q: { AND: string[] },
+    query: string,
     options?: SearchOptions,
     useFuzzy?: boolean
   ): string {
+    if (useFuzzy) {
+      const params = new URLSearchParams();
+
+      const collectionMatch = query.match(/_collection:(\S+)/);
+      if (collectionMatch) {
+        params.set('collection', collectionMatch[1]);
+        params.set('query', query.replace(/_collection:\S+/, '').trim());
+      } else {
+        params.set('query', query);
+      }
+
+      if (options?.limit) {
+        params.set('limit', options.limit.toString());
+      }
+      if (options?.cursor) {
+        params.set('cursor', options.cursor);
+      }
+
+      return `http://localhost:4001/v2/searchIndex?${params.toString()}`;
+    }
+
+    const q = queryToSearchIndexQuery(query);
     const opt = optionsToSearchIndexOptions(options);
     const optionsParam = opt['PAGE'] ? `&options=${JSON.stringify(opt)}` : '';
 
-    let fuzzyParam = '';
-    if (useFuzzy) {
-      const mergedFuzzyOptions = {
-        ...this.defaultFuzzyOptions,
-        ...options?.fuzzyOptions,
-      };
-      fuzzyParam = `&fuzzy=${useFuzzy}&fuzzyOptions=${JSON.stringify(
-        mergedFuzzyOptions
-      )}`;
-    }
-
-    const endpoint = useFuzzy ? 'v2/searchIndex' : 'searchIndex';
-
-    return `http://localhost:4001/${endpoint}?q=${JSON.stringify(q)}${optionsParam}${fuzzyParam}`;
+    return `http://localhost:4001/searchIndex?q=${JSON.stringify(q)}${optionsParam}`;
   }
 
   async query(
     query: string,
     options?: SearchOptions
   ): Promise<SearchQueryResponse> {
-    const q = queryToSearchIndexQuery(query);
     const useFuzzy =
       options?.fuzzy !== undefined ? options.fuzzy : this.fuzzyEnabled;
 
-    const url = this.buildSearchUrl(q, options, useFuzzy);
+    const url = this.buildSearchUrl(query, options, useFuzzy);
     const res = await this.client.authProvider.fetchWithToken(url);
     return parseSearchIndexResponse(await res.json(), options);
   }
