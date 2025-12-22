@@ -23,7 +23,7 @@ export function Dropdown({
   return (
     <Menu as='div' className='relative inline-block text-left z-20'>
       <div>
-        <MenuButton className='inline-flex justify-center w-full rounded border border-gray-300 shadow-sm px-2 py-1 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-blue-500'>
+        <MenuButton className='inline-flex justify-center w-full rounded border border-gray-300 shadow-sm px-2 py-1 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-tina-orange-dark'>
           {label}
           <ChevronDownIcon className='-mr-1 ml-2 h-4 w-4' aria-hidden='true' />
         </MenuButton>

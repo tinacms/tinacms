@@ -20,11 +20,11 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
     const inputRef = React.useRef(null);
 
     React.useEffect(() => {
-      if (inputRef.current && rest.experimental_focusIntent) {
+      if (inputRef.current && rest.focusIntent) {
         inputRef.current.focus();
         inputRef.current.open();
       }
-    }, [rest.experimental_focusIntent]);
+    }, [rest.focusIntent]);
 
     const getTimeFormat = useCallback(() => {
       if (timeFormat === false) {
