@@ -12,7 +12,7 @@ import * as sqliteLevelModule from 'sqlite-level';
 const SqliteLevel =
   (sqliteLevelModule as any).default?.SqliteLevel ??
   (sqliteLevelModule as any).SqliteLevel;
-import si from 'search-index';
+import createSearchIndex from 'search-index';
 import { MemoryLevel } from 'memory-level';
 import { lookupStopwords } from '../indexer/utils';
 import { FuzzySearchWrapper } from '../fuzzy-search-wrapper';
@@ -55,8 +55,8 @@ export class LocalSearchIndexClient implements SearchClient {
       stopwords: this.stopwords,
       tokenSplitRegex: this.tokenSplitRegex,
     };
-    this.searchIndex = (await si(
-      options as unknown as Parameters<typeof si>[0]
+    this.searchIndex = (await createSearchIndex(
+      options as unknown as Parameters<typeof createSearchIndex>[0]
     )) as unknown as SearchIndex;
     this.fuzzySearchWrapper = new FuzzySearchWrapper(this.searchIndex);
   }

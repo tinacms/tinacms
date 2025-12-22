@@ -1,4 +1,4 @@
-import si from 'search-index';
+import createSearchIndex from 'search-index';
 export { SearchIndexer } from './indexer';
 export { LocalSearchIndexClient, TinaCMSSearchIndexClient } from './client';
 export type {
@@ -26,4 +26,4 @@ export type {
   PageOptions,
   PaginationCursors,
 } from './pagination';
-export { si };
+export { createSearchIndex };
