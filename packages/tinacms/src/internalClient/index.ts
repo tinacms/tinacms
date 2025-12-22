@@ -20,10 +20,20 @@ import {
 } from '@tinacms/schema-tools';
 import {
   SearchClient,
+  SearchOptions,
+  SearchQueryResponse,
+  IndexableDocument,
+  FuzzySearchOptions,
   optionsToSearchIndexOptions,
   parseSearchIndexResponse,
   queryToSearchIndexQuery,
 } from '@tinacms/search/index-client';
+
+interface TinaSearchConfig {
+  stopwordLanguages?: string[];
+  fuzzyEnabled?: boolean;
+  fuzzyOptions?: FuzzySearchOptions;
+}
 import gql from 'graphql-tag';
 import { EDITORIAL_WORKFLOW_STATUS } from '../toolkit/form-builder/editorial-workflow-constants';
 import { AsyncData, asyncPoll } from './asyncPoll';
@@ -737,58 +747,25 @@ export class LocalClient extends Client {
 }
 
 export class TinaCMSSearchClient implements SearchClient {
-  private fuzzyEnabled: boolean;
-  private defaultFuzzyOptions?: {
-    maxDistance?: number;
-    minSimilarity?: number;
-    maxResults?: number;
-    useTranspositions?: boolean;
-    caseSensitive?: boolean;
-  };
+  protected readonly client: Client;
+  protected readonly fuzzyEnabled: boolean;
+  protected readonly stopwordLanguages?: string[];
+  protected readonly defaultFuzzyOptions?: FuzzySearchOptions;
 
-  constructor(
-    private client: Client,
-    private tinaSearchConfig?: {
-      stopwordLanguages?: string[];
-      fuzzyEnabled?: boolean;
-      fuzzyOptions?: {
-        maxDistance?: number;
-        minSimilarity?: number;
-        maxResults?: number;
-        useTranspositions?: boolean;
-        caseSensitive?: boolean;
-      };
-    }
-  ) {
+  constructor(client: Client, tinaSearchConfig?: TinaSearchConfig) {
+    this.client = client;
     this.fuzzyEnabled = tinaSearchConfig?.fuzzyEnabled !== false;
+    this.stopwordLanguages = tinaSearchConfig?.stopwordLanguages;
     this.defaultFuzzyOptions = tinaSearchConfig?.fuzzyOptions;
   }
 
-  async query(
-    query: string,
-    options?: {
-      limit?: number;
-      cursor?: string;
-      fuzzy?: boolean;
-      fuzzyOptions?: any;
-    }
-  ): Promise<{
-    results: any[];
-    nextCursor: string | null;
-    total: number;
-    prevCursor: string | null;
-    fuzzyMatches?: Record<string, any[]>;
-  }> {
+  protected buildSearchUrl(
+    q: { AND: string[] },
+    options?: SearchOptions,
+    useFuzzy?: boolean
+  ): string {
     const opt = optionsToSearchIndexOptions(options);
     const optionsParam = opt['PAGE'] ? `&options=${JSON.stringify(opt)}` : '';
-
-    const q = queryToSearchIndexQuery(
-      query,
-      this.tinaSearchConfig?.stopwordLanguages
-    );
-
-    const useFuzzy =
-      options?.fuzzy !== undefined ? options.fuzzy : this.fuzzyEnabled;
 
     let fuzzyParam = '';
     if (useFuzzy) {
@@ -801,17 +778,27 @@ export class TinaCMSSearchClient implements SearchClient {
       )}`;
     }
 
-    const res = await this.client.authProvider.fetchWithToken(
-      `${this.client.contentApiBase}/searchIndex/${
-        this.client.clientId
-      }/${this.client.getBranch()}?q=${JSON.stringify(
-        q
-      )}${optionsParam}${fuzzyParam}`
-    );
+    const endpoint = useFuzzy ? 'v2/searchIndex' : 'searchIndex';
+
+    return `${this.client.contentApiBase}/${endpoint}/${
+      this.client.clientId
+    }/${this.client.getBranch()}?q=${JSON.stringify(q)}${optionsParam}${fuzzyParam}`;
+  }
+
+  async query(
+    query: string,
+    options?: SearchOptions
+  ): Promise<SearchQueryResponse> {
+    const q = queryToSearchIndexQuery(query, this.stopwordLanguages);
+    const useFuzzy =
+      options?.fuzzy !== undefined ? options.fuzzy : this.fuzzyEnabled;
+
+    const url = this.buildSearchUrl(q, options, useFuzzy);
+    const res = await this.client.authProvider.fetchWithToken(url);
     return parseSearchIndexResponse(await res.json(), options);
   }
 
-  async del(ids: string[]): Promise<any> {
+  async del(ids: string[]): Promise<void> {
     const res = await this.client.authProvider.fetchWithToken(
       `${this.client.contentApiBase}/searchIndex/${
         this.client.clientId
@@ -825,8 +812,7 @@ export class TinaCMSSearchClient implements SearchClient {
     }
   }
 
-  async put(docs: any[]): Promise<any> {
-    // TODO should only be called if search is enabled and supportsClientSideIndexing is true
+  async put(docs: IndexableDocument[]): Promise<void> {
     const res = await this.client.authProvider.fetchWithToken(
       `${this.client.contentApiBase}/searchIndex/${
         this.client.clientId
@@ -850,53 +836,26 @@ export class TinaCMSSearchClient implements SearchClient {
 }
 
 export class LocalSearchClient implements SearchClient {
-  private fuzzyEnabled: boolean;
-  private defaultFuzzyOptions?: {
-    maxDistance?: number;
-    minSimilarity?: number;
-    maxResults?: number;
-    useTranspositions?: boolean;
-    caseSensitive?: boolean;
-  };
+  protected readonly client: Client;
+  protected readonly fuzzyEnabled: boolean;
+  protected readonly defaultFuzzyOptions?: FuzzySearchOptions;
 
   constructor(
-    private client: Client,
-    private tinaSearchConfig?: {
-      fuzzyEnabled?: boolean;
-      fuzzyOptions?: {
-        maxDistance?: number;
-        minSimilarity?: number;
-        maxResults?: number;
-        useTranspositions?: boolean;
-        caseSensitive?: boolean;
-      };
-    }
+    client: Client,
+    tinaSearchConfig?: Omit<TinaSearchConfig, 'stopwordLanguages'>
   ) {
+    this.client = client;
     this.fuzzyEnabled = tinaSearchConfig?.fuzzyEnabled !== false;
     this.defaultFuzzyOptions = tinaSearchConfig?.fuzzyOptions;
   }
 
-  async query(
-    query: string,
-    options?: {
-      limit?: number;
-      cursor?: string;
-      fuzzy?: boolean;
-      fuzzyOptions?: any;
-    }
-  ): Promise<{
-    results: any[];
-    nextCursor: string | null;
-    total: number;
-    prevCursor: string | null;
-    fuzzyMatches?: Record<string, any[]>;
-  }> {
-    const q = queryToSearchIndexQuery(query);
+  protected buildSearchUrl(
+    q: { AND: string[] },
+    options?: SearchOptions,
+    useFuzzy?: boolean
+  ): string {
     const opt = optionsToSearchIndexOptions(options);
     const optionsParam = opt['PAGE'] ? `&options=${JSON.stringify(opt)}` : '';
-
-    const useFuzzy =
-      options?.fuzzy !== undefined ? options.fuzzy : this.fuzzyEnabled;
 
     let fuzzyParam = '';
     if (useFuzzy) {
@@ -909,20 +868,30 @@ export class LocalSearchClient implements SearchClient {
       )}`;
     }
 
-    const res = await this.client.authProvider.fetchWithToken(
-      `http://localhost:4001/searchIndex?q=${JSON.stringify(
-        q
-      )}${optionsParam}${fuzzyParam}`
-    );
+    const endpoint = useFuzzy ? 'v2/searchIndex' : 'searchIndex';
+
+    return `http://localhost:4001/${endpoint}?q=${JSON.stringify(q)}${optionsParam}${fuzzyParam}`;
+  }
+
+  async query(
+    query: string,
+    options?: SearchOptions
+  ): Promise<SearchQueryResponse> {
+    const q = queryToSearchIndexQuery(query);
+    const useFuzzy =
+      options?.fuzzy !== undefined ? options.fuzzy : this.fuzzyEnabled;
+
+    const url = this.buildSearchUrl(q, options, useFuzzy);
+    const res = await this.client.authProvider.fetchWithToken(url);
     return parseSearchIndexResponse(await res.json(), options);
   }
 
-  del(ids: string[]): Promise<any> {
-    return Promise.resolve(undefined);
+  del(_ids: string[]): Promise<void> {
+    return Promise.resolve();
   }
 
-  put(docs: any[]): Promise<any> {
-    return Promise.resolve(undefined);
+  put(_docs: IndexableDocument[]): Promise<void> {
+    return Promise.resolve();
   }
 
   supportsClientSideIndexing(): boolean {

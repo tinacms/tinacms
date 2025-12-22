@@ -22,8 +22,7 @@ interface FuzzySearchWrapper {
     options: {
       limit?: number;
       cursor?: string;
-      fuzzy: boolean;
-      fuzzyOptions: Record<string, unknown>;
+      fuzzyOptions?: Record<string, unknown>;
     }
   ) => Promise<SearchQueryResponse>;
 }
@@ -63,12 +62,14 @@ export const createSearchIndexRouter = ({
     const fuzzyParam = requestURL.searchParams.get('fuzzy');
     const fuzzyOptionsParam = requestURL.searchParams.get('fuzzyOptions');
 
-    let searchIndexOptions: {
-      DOCUMENTS?: boolean;
-      PAGE?: { NUMBER: number; SIZE: number };
-    } = {
-      DOCUMENTS: false,
-    };
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+
+    if (!query) {
+      res.end(JSON.stringify({ RESULT: [] }));
+      return;
+    }
+
+    let searchIndexOptions: SearchIndexOptions = { DOCUMENTS: false };
     if (optionsParam) {
       searchIndexOptions = {
         ...searchIndexOptions,
@@ -76,81 +77,66 @@ export const createSearchIndexRouter = ({
       };
     }
 
-    res.writeHead(200, { 'Content-Type': 'application/json' });
+    const queryObj = JSON.parse(query);
 
-    if (query) {
-      const queryObj = JSON.parse(query);
+    if (fuzzyParam === 'true' && searchIndex.fuzzySearchWrapper) {
+      try {
+        const fuzzyOptions = fuzzyOptionsParam
+          ? JSON.parse(fuzzyOptionsParam)
+          : {};
 
-      if (fuzzyParam === 'true' && searchIndex.fuzzySearchWrapper) {
-        try {
-          const fuzzyOptions = fuzzyOptionsParam
-            ? JSON.parse(fuzzyOptionsParam)
-            : {};
+        const searchTerms = queryObj.AND
+          ? queryObj.AND.filter(
+              (term: string) => !term.includes('_collection:')
+            )
+          : [];
 
-          const searchTerms = queryObj.AND
-            ? queryObj.AND.filter(
-                (term: string) => !term.includes('_collection:')
-              )
-            : [];
+        const collectionFilter = queryObj.AND?.find((term: string) =>
+          term.includes('_collection:')
+        );
 
-          const collectionFilter = queryObj.AND?.find((term: string) =>
-            term.includes('_collection:')
-          );
+        const paginationOptions: { limit?: number; cursor?: string } = {};
+        if (searchIndexOptions.PAGE) {
+          paginationOptions.limit = searchIndexOptions.PAGE.SIZE;
+          paginationOptions.cursor = searchIndexOptions.PAGE.NUMBER.toString();
+        }
 
-          // Convert PAGE options to limit/cursor format for FuzzySearchWrapper
-          const paginationOptions: { limit?: number; cursor?: string } = {};
-          if (searchIndexOptions.PAGE) {
-            paginationOptions.limit = searchIndexOptions.PAGE.SIZE;
-            paginationOptions.cursor =
-              searchIndexOptions.PAGE.NUMBER.toString();
-          }
+        const searchQuery = collectionFilter
+          ? `${searchTerms.join(' ')} ${collectionFilter}`
+          : searchTerms.join(' ');
 
-          // If filtering by collection, include it in the search query
-          // so pagination works correctly
-          const searchQuery = collectionFilter
-            ? `${searchTerms.join(' ')} ${collectionFilter}`
-            : searchTerms.join(' ');
+        const result = await searchIndex.fuzzySearchWrapper.query(searchQuery, {
+          ...paginationOptions,
+          fuzzyOptions,
+        });
 
-          const result = await searchIndex.fuzzySearchWrapper.query(
-            searchQuery,
-            {
-              ...paginationOptions,
-              fuzzy: true,
-              fuzzyOptions,
-            }
-          );
-
-          // Filter results by collection if needed (for results that don't have _collection indexed)
-          if (collectionFilter) {
-            const collection = collectionFilter.split(':')[1];
-            result.results = result.results.filter(
-              (r) => r._id && r._id.startsWith(`${collection}:`)
-            );
-          }
-
-          res.end(
-            JSON.stringify({
-              RESULT: result.results,
-              RESULT_LENGTH: result.total,
-              NEXT_CURSOR: result.nextCursor,
-              PREV_CURSOR: result.prevCursor,
-              FUZZY_MATCHES: result.fuzzyMatches || {},
-            })
-          );
-          return;
-        } catch (error) {
-          console.warn(
-            '[search] Fuzzy search failed, falling back to standard search:',
-            error instanceof Error ? error.message : error
+        if (collectionFilter) {
+          const collection = collectionFilter.split(':')[1];
+          result.results = result.results.filter(
+            (r) => r._id && r._id.startsWith(`${collection}:`)
           );
         }
-      }
 
-      const result = await searchIndex.QUERY(queryObj, searchIndexOptions);
-      res.end(JSON.stringify(result));
-    } else {
-      res.end(JSON.stringify({ RESULT: [] }));
+        res.end(
+          JSON.stringify({
+            RESULT: result.results,
+            RESULT_LENGTH: result.total,
+            NEXT_CURSOR: result.nextCursor,
+            PREV_CURSOR: result.prevCursor,
+            FUZZY_MATCHES: result.fuzzyMatches || {},
+          })
+        );
+        return;
+      } catch (error) {
+        console.warn(
+          '[search] Fuzzy search failed, falling back to standard search:',
+          error instanceof Error ? error.message : error
+        );
+      }
     }
+
+    const result = await searchIndex.QUERY(queryObj, searchIndexOptions);
+    res.end(JSON.stringify(result));
   };
 
   const del = async (req: IncomingMessage, res: ServerResponse) => {

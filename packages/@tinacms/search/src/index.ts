@@ -8,6 +8,7 @@ export type {
   SearchQueryResponse,
   IndexableDocument,
   SearchIndexResult,
+  SearchIndex,
 } from './types';
 export type { FuzzySearchOptions, FuzzyMatch } from './fuzzy';
 export {

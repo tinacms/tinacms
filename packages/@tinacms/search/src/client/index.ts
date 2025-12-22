@@ -3,7 +3,7 @@ import type {
   SearchOptions,
   SearchQueryResponse,
   IndexableDocument,
-  SearchIndexResult,
+  SearchIndex,
 } from '../types';
 // TODO: Update to use named import once https://github.com/tinacms/sqlite-level/pull/24 is merged and released
 // Use namespace import because `sqlite-level` is a CJS module and esbuild
@@ -20,17 +20,6 @@ import { buildPageOptions, buildPaginationCursors } from '../pagination';
 import * as zlib from 'node:zlib';
 
 const DEFAULT_TOKEN_SPLIT_REGEX = /[\p{L}\d_]+/gu;
-
-interface SearchIndex {
-  PUT: (docs: IndexableDocument[]) => Promise<void>;
-  DELETE: (ids: string[]) => Promise<void>;
-  QUERY: (
-    query: { AND: string[] } | { OR: string[] },
-    options?: { PAGE?: { NUMBER: number; SIZE: number } }
-  ) => Promise<SearchIndexResult>;
-  DICTIONARY: (token?: { FIELD: string }) => Promise<unknown[]>;
-  fuzzySearchWrapper?: FuzzySearchWrapper;
-}
 
 type TinaSearchIndexerClientOptions = {
   stopwordLanguages?: string[];
@@ -98,7 +87,6 @@ export class LocalSearchIndexClient implements SearchClient {
       return this.fuzzySearchWrapper.query(query, {
         limit: options.limit,
         cursor: options.cursor,
-        fuzzy: true,
         fuzzyOptions: options.fuzzyOptions,
       });
     }

@@ -1,6 +1,8 @@
 import type { FuzzySearchOptions, FuzzyMatch } from './types';
 import { DEFAULT_FUZZY_OPTIONS } from './types';
 
+export const PREFIX_MATCH_MIN_SIMILARITY = 0.8;
+
 export function levenshteinDistance(str1: string, str2: string): number {
   const len1 = str1.length;
   const len2 = str2.length;
@@ -156,7 +158,7 @@ export function findSimilarTerms(
       matches.push({
         term,
         distance: normalizedTerm.length - normalizedQuery.length,
-        similarity: Math.max(prefixSimilarity, 0.8),
+        similarity: Math.max(prefixSimilarity, PREFIX_MATCH_MIN_SIMILARITY),
       });
       continue;
     }

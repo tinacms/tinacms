@@ -187,23 +187,21 @@ export const processDocumentForIndexing = (
 };
 
 const stopwordCache: Record<string, string[]> = {};
-const PRESERVED_WORDS = ['about'];
 
 export const lookupStopwords = (
   keys?: string[],
   defaultStopWords: string[] = sw.eng
 ): string[] => {
-  let stopwords = defaultStopWords;
-
-  if (keys) {
-    const cacheKey = keys.join(',');
-    if (stopwordCache[cacheKey]) {
-      return stopwordCache[cacheKey];
-    }
-
-    stopwords = keys.flatMap((key) => sw[key] || []);
-    stopwordCache[cacheKey] = stopwords;
+  if (!keys) {
+    return defaultStopWords;
   }
 
-  return stopwords.filter((word) => !PRESERVED_WORDS.includes(word));
+  const cacheKey = keys.join(',');
+  if (stopwordCache[cacheKey]) {
+    return stopwordCache[cacheKey];
+  }
+
+  const stopwords = keys.flatMap((key) => sw[key] || []);
+  stopwordCache[cacheKey] = stopwords;
+  return stopwords;
 };

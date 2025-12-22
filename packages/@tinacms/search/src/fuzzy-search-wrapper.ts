@@ -1,23 +1,11 @@
 import { findSimilarTerms, FuzzyCache, DEFAULT_FUZZY_OPTIONS } from './fuzzy';
 import type { FuzzySearchOptions, FuzzyMatch } from './fuzzy';
-import type { SearchQueryResponse, SearchResult } from './types';
+import type { SearchQueryResponse, SearchIndex } from './types';
 import { buildPageOptions, buildPaginationCursors } from './pagination';
-
-interface SearchIndex {
-  QUERY: (
-    query:
-      | { AND: string[] }
-      | { OR: string[] }
-      | { AND: (string | { OR: string[] })[] },
-    options?: { PAGE?: { NUMBER: number; SIZE: number } }
-  ) => Promise<{ RESULT: SearchResult[]; RESULT_LENGTH: number }>;
-  DICTIONARY: (token?: { FIELD: string }) => Promise<unknown[]>;
-}
 
 interface QueryOptions {
   limit?: number;
   cursor?: string;
-  fuzzy?: boolean;
   fuzzyOptions?: FuzzySearchOptions;
 }
 
@@ -98,25 +86,6 @@ export class FuzzySearchWrapper {
     options: QueryOptions = {}
   ): Promise<SearchQueryResponse> {
     const pageOptions = buildPageOptions(options);
-
-    if (!options.fuzzy) {
-      const results = await this.searchIndex.QUERY(
-        { AND: query.split(' ').filter((t) => t) },
-        pageOptions
-      );
-
-      const pagination = buildPaginationCursors(
-        results.RESULT_LENGTH || 0,
-        options
-      );
-
-      return {
-        results: results.RESULT || [],
-        total: results.RESULT_LENGTH || 0,
-        ...pagination,
-      };
-    }
-
     const expansion = await this.expandQuery(query, options.fuzzyOptions);
 
     if (expansion.expanded.length === expansion.original.length) {

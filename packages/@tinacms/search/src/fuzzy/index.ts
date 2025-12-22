@@ -8,4 +8,5 @@ export {
   findSimilarTerms,
   getNgrams,
   ngramOverlap,
+  PREFIX_MATCH_MIN_SIMILARITY,
 } from './distance';

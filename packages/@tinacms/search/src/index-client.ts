@@ -3,10 +3,13 @@ export type {
   SearchResult,
   SearchQueryResponse,
   IndexableDocument,
+  SearchOptions,
 } from './types';
+export type { FuzzySearchOptions, FuzzyMatch } from './fuzzy';
 export { processDocumentForIndexing } from './indexer/utils';
 import { lookupStopwords } from './indexer/utils';
 import type { FuzzyMatch } from './fuzzy';
+import type { SearchResult, SearchQueryResponse } from './types';
 
 interface SearchQuery {
   AND: string[];
@@ -25,19 +28,11 @@ interface PageOptions {
 }
 
 interface SearchIndexResponse {
-  RESULT: unknown[];
+  RESULT: SearchResult[];
   RESULT_LENGTH: number;
   FUZZY_MATCHES?: Record<string, FuzzyMatch[]>;
   NEXT_CURSOR?: string | null;
   PREV_CURSOR?: string | null;
-}
-
-interface ParsedSearchResponse {
-  results: unknown[];
-  total: number;
-  prevCursor: string | null;
-  nextCursor: string | null;
-  fuzzyMatches?: Record<string, FuzzyMatch[]>;
 }
 
 export const queryToSearchIndexQuery = (
@@ -75,7 +70,7 @@ export const optionsToSearchIndexOptions = (
 export const parseSearchIndexResponse = (
   data: SearchIndexResponse,
   options?: PaginationOptions
-): ParsedSearchResponse => {
+): SearchQueryResponse => {
   const resultArray = data?.RESULT ?? (data as any)?.results;
   if (!data || !Array.isArray(resultArray)) {
     return {
@@ -87,7 +82,7 @@ export const parseSearchIndexResponse = (
     };
   }
 
-  const results = data.RESULT ?? (data as any).results;
+  const results: SearchResult[] = data.RESULT ?? (data as any).results;
   const total = data.RESULT_LENGTH ?? (data as any).total ?? 0;
   const fuzzyMatches = data.FUZZY_MATCHES ?? (data as any).fuzzyMatches;
 

@@ -31,6 +31,19 @@ export interface SearchIndexResult {
   RESULT_LENGTH: number;
 }
 
+export interface SearchIndex {
+  PUT: (docs: IndexableDocument[]) => Promise<void>;
+  DELETE: (ids: string[]) => Promise<void>;
+  QUERY: (
+    query:
+      | { AND: string[] }
+      | { OR: string[] }
+      | { AND: (string | { OR: string[] })[] },
+    options?: { PAGE?: { NUMBER: number; SIZE: number } }
+  ) => Promise<SearchIndexResult>;
+  DICTIONARY: (token?: { FIELD: string }) => Promise<unknown[]>;
+}
+
 export type SearchClient = {
   query: (
     query: string,
