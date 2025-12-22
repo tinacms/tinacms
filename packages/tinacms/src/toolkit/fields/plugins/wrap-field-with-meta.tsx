@@ -176,19 +176,15 @@ export const FieldWrapper = ({
   margin,
   children,
   field,
+  'data-tina-field-active': dataActive,
+  'data-tina-field-hovering': dataHovering,
   ...props
 }: {
   margin: boolean;
   children: React.ReactNode;
   field?: Field;
-  'data-tina-field-active': dataActive,
-  'data-tina-field-hovering': dataHovering,
-  ...restProps
-}: {
-  margin: boolean;
-  children: React.ReactNode;
-  'data-tina-field-active'?: dataActive;
-  'data-tina-field-hovering'?: dataHovering;
+  'data-tina-field-active'?: string;
+  'data-tina-field-hovering'?: string;
 } & Partial<React.ComponentPropsWithoutRef<'div'>>) => {
   const isActive = dataActive === 'true';
   const isHovering = dataHovering === 'true';
@@ -217,12 +213,11 @@ export const FieldWrapper = ({
   };
 
   return (
-    <div className={`relative ${margin ? `mb-5 last:mb-0` : ``} ${field?.editorWidth === 'half' ? 'w-[calc(50%-0.5rem)]' : 'w-full'}`} {...props}>
     <div
-      className={`relative ${margin ? `mb-5 last:mb-0` : ``} ${getFieldStateClasses()}`}
+      className={`relative ${margin ? `mb-5 last:mb-0` : ``} ${field?.editorWidth === 'half' ? 'w-[calc(50%-0.5rem)]' : 'w-full'} ${getFieldStateClasses()}`}
       data-tina-field-active={dataActive}
       data-tina-field-hovering={dataHovering}
-      {...restProps}
+      {...props}
     >
       {children}
     </div>
