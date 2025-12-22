@@ -50,6 +50,15 @@ export function useTina<T extends object>(props: {
           outline: 2px solid rgba(34,150,254,1);
           cursor: pointer;
         }
+        [data-tina-field-focused] {
+          outline: 2px dashed #C2410C !important;
+          box-shadow: none !important;
+        }
+        [data-tina-field-focused]:hover {
+          box-shadow: inset 100vi 100vh rgba(194, 65, 12, 0.3) !important;
+          outline: 2px solid #C2410C !important;
+          cursor: pointer;
+        }
         [data-tina-field-overlay] {
           outline: 2px dashed rgba(34,150,254,0.5);
           position: relative;
@@ -70,9 +79,15 @@ export function useTina<T extends object>(props: {
         [data-tina-field-overlay]:hover::after {
           opacity: 1;
         }
+        [data-tina-field-overlay][data-tina-field-focused]::after {
+          background-color: rgba(194, 65, 12, 0.3);
+          opacity: 1;
+        }
       `;
       document.head.appendChild(style);
       document.body.classList.add('__tina-quick-editing-enabled');
+
+      let lastHoveredField: string | null = null;
 
       function mouseDownHandler(e) {
         const attributeNames = e.target.getAttributeNames();
@@ -103,6 +118,16 @@ export function useTina<T extends object>(props: {
           }
         }
         if (fieldName) {
+          // Clear hover state on click
+          if (lastHoveredField !== null) {
+            lastHoveredField = null;
+            if (isInTinaIframe) {
+              parent.postMessage(
+                { type: 'field:hovered', fieldName: null },
+                window.location.origin
+              );
+            }
+          }
           if (isInTinaIframe) {
             parent.postMessage(
               { type: 'field:selected', fieldName: fieldName },
@@ -119,10 +144,51 @@ export function useTina<T extends object>(props: {
           }
         }
       }
+
+      function mouseEnterHandler(e) {
+        if (!(e.target instanceof Element)) {
+          return;
+        }
+        const attributeNames = e.target.getAttributeNames();
+        const tinaAttribute = attributeNames.find((name) =>
+          name.startsWith('data-tina-field')
+        );
+
+        let fieldName;
+        if (tinaAttribute) {
+          fieldName = e.target.getAttribute(tinaAttribute);
+        } else {
+          const ancestor = e.target.closest(
+            '[data-tina-field], [data-tina-field-overlay]'
+          );
+          if (ancestor) {
+            const attributeNames = ancestor.getAttributeNames();
+            const tinaAttribute = attributeNames.find((name) =>
+              name.startsWith('data-tina-field')
+            );
+            if (tinaAttribute) {
+              fieldName = ancestor.getAttribute(tinaAttribute);
+            }
+          }
+        }
+
+        if (fieldName && fieldName !== lastHoveredField) {
+          lastHoveredField = fieldName;
+          if (isInTinaIframe) {
+            parent.postMessage(
+              { type: 'field:hovered', fieldName: fieldName },
+              window.location.origin
+            );
+          }
+        }
+      }
+
       document.addEventListener('click', mouseDownHandler, true);
+      document.addEventListener('mouseenter', mouseEnterHandler, true);
 
       return () => {
         document.removeEventListener('click', mouseDownHandler, true);
+        document.removeEventListener('mouseenter', mouseEnterHandler, true);
         document.body.classList.remove('__tina-quick-editing-enabled');
         style.remove();
       };
@@ -137,6 +203,8 @@ export function useTina<T extends object>(props: {
       });
     }
   }, [id]);
+
+  const lastFocusedFieldRef = React.useRef<string | null>(null);
 
   React.useEffect(() => {
     const { experimental___selectFormByFormId, ...rest } = props;
@@ -165,6 +233,63 @@ export function useTina<T extends object>(props: {
             { type: 'quick-edit', value: false },
             window.location.origin
           );
+        }
+      }
+
+      // Handle field focus to add data attribute for orange styling
+      if (event.data.type === 'field:set-focused') {
+        const newFieldName = event.data.fieldName;
+
+        // Only process if the focused field has actually changed
+        if (newFieldName === lastFocusedFieldRef.current) {
+          return;
+        }
+
+        lastFocusedFieldRef.current = newFieldName;
+
+        // Remove focused attribute from all elements
+        const allTinaFields = document.querySelectorAll('[data-tina-field]');
+        allTinaFields.forEach((el) => {
+          el.removeAttribute('data-tina-field-focused');
+        });
+
+        // Add focused attribute to the clicked field
+        if (newFieldName) {
+          // Try exact match first
+          let targetElement = document.querySelector(
+            `[data-tina-field="${newFieldName}"]`
+          );
+
+          // If not found, try to find by searching for elements whose data-tina-field ends with this value
+          if (!targetElement) {
+            const allFields = Array.from(allTinaFields);
+            targetElement = allFields.find((el) => {
+              const fieldValue = el.getAttribute('data-tina-field');
+              // Match if the field value ends with the fieldName we're looking for
+              return (
+                fieldValue && fieldValue.endsWith(newFieldName.split('---')[1])
+              );
+            }) as Element | undefined;
+          }
+
+          if (targetElement) {
+            targetElement.setAttribute('data-tina-field-focused', 'true');
+
+            // Scroll the element into view if it's not visible
+            const rect = targetElement.getBoundingClientRect();
+            const isInViewport =
+              rect.top >= 0 &&
+              rect.left >= 0 &&
+              rect.bottom <= window.innerHeight &&
+              rect.right <= window.innerWidth;
+
+            if (!isInViewport) {
+              targetElement.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+              });
+            }
+          }
         }
       }
     };

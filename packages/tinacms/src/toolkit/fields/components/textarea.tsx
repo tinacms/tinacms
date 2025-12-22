@@ -16,7 +16,7 @@ export const TextArea = React.forwardRef<
   return (
     <textarea
       {...props}
-      className='shadow-inner text-base px-3 py-2 text-gray-600 resize-y focus:shadow-outline focus:border-blue-500 block w-full border border-gray-200 focus:text-gray-900 rounded'
+      className='shadow-inner text-base px-3 py-2 text-gray-600 resize-y focus:shadow-outline focus:outline-none focus:border-tina-orange-dark block w-full border border-gray-200 focus:text-gray-900 rounded'
       ref={ref}
       style={{ minHeight: '160px' }}
     />
