@@ -41,7 +41,7 @@ async function initializePostHog(
 ): Promise<PostHog | null> {
   let apiKey: string | undefined;
   let endpoint: string | undefined;
-  
+
   if (configEndpoint) {
     const config = await fetchPostHogConfig(configEndpoint);
     apiKey = config.POSTHOG_API_KEY;
