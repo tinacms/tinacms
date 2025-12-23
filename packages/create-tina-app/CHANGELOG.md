@@ -1,5 +1,11 @@
 # create-tina-app
 
+## 2.1.1
+
+### Patch Changes
+
+- [#6290](https://github.com/tinacms/tinacms/pull/6290) [`5befd81`](https://github.com/tinacms/tinacms/commit/5befd8147ee64c2590468182df319cd537506d0d) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🌎Telemetry - Add GeoIP for opt-in users
+
 ## 2.1.0
 
 ### Minor Changes
