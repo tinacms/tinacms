@@ -13,6 +13,6 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "strict": false,
+    "strict": false
   }
 }

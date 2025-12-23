@@ -14,7 +14,7 @@
 		"build": "turbo run build --filter=\"./packages/**\"",
 		"diff-tina-lock": "pnpm -r --filter='{./**}' --workspace-concurrency=1 run --if-present diff-tina-lock",
 		"update-tina-lock": "pnpm -r --filter='{./**}' --workspace-concurrency=1 run --if-present update-tina-lock",
-		"test": "turbo run test --filter=\"./packages/**\"",
+		"test": "turbo run test --filter=\"./packages/**\" -- -u",
 		"types": "turbo run types --filter=\"./packages/**\"",
 		"build:e2e": "pnpm run build && pnpm --filter=kitchen-sink-starter run build",
 		"start:e2e": "pnpm --filter=kitchen-sink-starter run start ",
@@ -34,15 +34,15 @@
 		"@biomejs/biome": "catalog:",
 		"@changesets/changelog-github": "catalog:",
 		"@changesets/cli": "catalog:",
-		"@types/jest": "^29.5.14",
+		"@types/jest": "^30.0.0",
 		"@types/picomatch": "catalog:",
 		"picomatch": "catalog:",
 		"pretty-quick": "catalog:",
 		"turbo": "catalog:",
-		"typescript": "^5.7.3",
-		"vite": "^4.5.9"
+		"typescript": "^5.9.3",
+		"vite": "7.3.0"
 	},
-	"packageManager": "pnpm@9.15.5",
+	"packageManager": "pnpm@10.26.0",
 	"dependencies": {
 		"highlight.js": "catalog:",
 		"react-colorful": "catalog:"

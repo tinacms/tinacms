@@ -36,13 +36,13 @@
     "@tinacms/cli": "workspace:*",
     "@tinacms/scripts": "workspace:*",
     "autoprefixer": "catalog:",
-    "eslint": "8.24.0",
-    "eslint-config-next": "^13.5.8",
+    "eslint": "^9.39.2",
+    "eslint-config-next": "^16.0.10",
     "postcss": "^8.5.2",
     "puppeteer": "catalog:",
-    "tailwindcss": "^3.4.17",
+    "tailwindcss": "^3.4.19",
     "typescript": "^5.7.3",
-    "vite": "^4.5.9",
-    "vitest": "^0.32.4"
+    "vite": "^7.3.0",
+    "vitest": "^4.0.16"
   }
 }

@@ -7,7 +7,7 @@ import { LocationEnum } from '../model/location-enum'
 const referenceField = {
   label: 'Author',
   name: 'author',
-  type: 'reference',
+  type: 'reference' as const,
   ui: {
     optionComponent: (values: CollectionProps, s: InternalSys) => {
       switch (values._collection) {

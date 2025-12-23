@@ -20,7 +20,7 @@
     "@tinacms/cli": "workspace:*",
     "@tinacms/scripts": "workspace:*",
     "eslint": "^9.20.1",
-    "eslint-config-next": "^14.2.24",
+    "eslint-config-next": "^16.0.10",
     "typescript": "^5.7.3"
   },
   "version": "0.1"

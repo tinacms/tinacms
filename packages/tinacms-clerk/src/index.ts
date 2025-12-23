@@ -1,5 +1,5 @@
-import { Clerk } from '@clerk/backend';
-import type { IncomingMessage, ServerResponse } from 'http';
+import { createClerkClient } from '@clerk/backend';
+import type { ServerResponse } from 'http';
 
 export const ClerkBackendAuthentication = ({
   secretKey,
@@ -12,27 +12,29 @@ export const ClerkBackendAuthentication = ({
   // Ensure the user is a member of the provided orgId
   orgId?: string;
 }) => {
-  const clerk = Clerk({
-    secretKey,
-  });
+  const clerkClient = createClerkClient({ secretKey });
 
   return {
-    isAuthorized: async (req: IncomingMessage, _res: ServerResponse) => {
+    isAuthorized: async (req: Request, _res: ServerResponse) => {
       const token = req.headers['authorization'];
       const tokenWithoutBearer = token?.replace('Bearer ', '').trim();
-      const requestState = await clerk.authenticateRequest({
-        headerToken: tokenWithoutBearer,
+      const requestState = await clerkClient.authenticateRequest(req, {
+        acceptsToken: tokenWithoutBearer,
       });
 
       if (requestState.status === 'signed-in') {
-        const user = await clerk.users.getUser(requestState.toAuth().userId);
+        const user = await clerkClient.users.getUser(
+          requestState.toAuth().userId
+        );
         if (orgId) {
           // Get the list of member id's for the organization
-          const membershipList = (
-            await clerk.organizations.getOrganizationMembershipList({
+          const { data: memberships } =
+            await clerkClient.organizations.getOrganizationMembershipList({
               organizationId: orgId,
-            })
-          ).map((x) => x.publicUserData?.userId);
+            });
+          const membershipList = memberships.map(
+            (x) => x.publicUserData?.userId
+          );
           // if the user is not in the list, they are not authorized
           if (!membershipList.includes(user.id))
             return {

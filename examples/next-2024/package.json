@@ -13,7 +13,7 @@
     "@radix-ui/react-icons": "catalog:",
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
-    "mermaid": "^10.9.3",
+    "mermaid": "11.10.0",
     "next": "14.2.35",
     "next-themes": "catalog:",
     "react": "^18.3.1",

@@ -47,7 +47,9 @@ const LatestVersionCheck = () => {
 
 const LatestVersionWarning = ({
   latestVersionInfo,
-}: { latestVersionInfo: LatestVersionResponse | null }) => {
+}: {
+  latestVersionInfo: LatestVersionResponse | null;
+}) => {
   if (!latestVersionInfo) return null;
 
   const latestVersion = latestVersionInfo['tinacms']?.version;

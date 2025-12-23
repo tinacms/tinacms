@@ -44,14 +44,14 @@ it('updates document and validates bridge writes', async () => {
   });
 
   // Validate GraphQL response
-  expect(format(result)).toMatchFileSnapshot(
+  await expect(format(result)).toMatchFileSnapshot(
     'expected-snapshots/update-document-node.json'
   );
 
   // Validate Bridge write operations
   const writes = bridge.getWrites();
-  expect(writes.size).toBeGreaterThan(0);
-  expect(bridge.getWrite('posts/in.md')).toMatchFileSnapshot(
+  await expect(writes.size).toBeGreaterThan(0);
+  await expect(bridge.getWrite('posts/in.md')).toMatchFileSnapshot(
     'expected-snapshots/update-document-content.md'
   );
 });
@@ -80,14 +80,14 @@ it('renames document using updateDocument mutation', async () => {
   });
 
   // Validate GraphQL response
-  expect(format(result)).toMatchFileSnapshot(
+  await expect(format(result)).toMatchFileSnapshot(
     'expected-snapshots/rename-document-node.json'
   );
 
   // Validate Bridge write operations
   const writes = bridge.getWrites();
-  expect(writes.size).toBeGreaterThan(0);
-  expect(bridge.getWrite('posts/renamed-by-bob.md')).toMatchFileSnapshot(
+  await expect(writes.size).toBeGreaterThan(0);
+  await expect(bridge.getWrite('posts/renamed-by-bob.md')).toMatchFileSnapshot(
     'expected-snapshots/rename-document-content.md'
   );
 
@@ -136,14 +136,14 @@ it('updates document using updatePost mutation', async () => {
   });
 
   // Validate GraphQL response
-  expect(format(result)).toMatchFileSnapshot(
+  await expect(format(result)).toMatchFileSnapshot(
     'expected-snapshots/update-post-node.json'
   );
 
   // Validate Bridge write operations
   const writes = bridge.getWrites();
-  expect(writes.size).toBeGreaterThan(0);
-  expect(bridge.getWrite('posts/in.md')).toMatchFileSnapshot(
+  await expect(writes.size).toBeGreaterThan(0);
+  await expect(bridge.getWrite('posts/in.md')).toMatchFileSnapshot(
     'expected-snapshots/update-post-content.md'
   );
 });

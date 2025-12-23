@@ -28,7 +28,7 @@
     "@tinacms/cli": "workspace:*",
     "@tinacms/scripts": "workspace:*",
     "@types/node": "^22.13.1",
-    "eslint": "7"
+    "eslint": "9.39.2"
   },
   "version": "0.1"
 }

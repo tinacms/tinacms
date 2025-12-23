@@ -814,10 +814,9 @@ export interface Config<
      *   url: `https://github.com/tinacms/tinacms/commits/${branch}/examples/next-2024/${relativePath}`
      * })
      *      */
-    historyUrl?: (context: {
-      relativePath: string;
-      branch: string;
-    }) => { url: string };
+    historyUrl?: (context: { relativePath: string; branch: string }) => {
+      url: string;
+    };
   };
   search?: (
     | {

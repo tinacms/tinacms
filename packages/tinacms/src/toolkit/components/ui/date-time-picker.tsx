@@ -11,6 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from './popover';
 import moment from 'moment';
 import 'moment-timezone';
 import { enUS } from 'date-fns/locale';
+import type { Locale } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Clock } from 'lucide-react';
 import * as React from 'react';
@@ -246,7 +247,11 @@ const formatCurrentDate = ({
   dateFormat,
   timeFormat,
   displayDate,
-}: { dateFormat?: string; timeFormat?: string; displayDate: Date }) => {
+}: {
+  dateFormat?: string;
+  timeFormat?: string;
+  displayDate: Date;
+}) => {
   if (!dateFormat && !timeFormat) {
     console.error('DateTimePicker: Missing date or time format');
     return 'Error: Missing date or time format';
@@ -286,7 +291,7 @@ function Calendar({
 }) {
   const MONTHS = React.useMemo(() => {
     let locale: Pick<Locale, 'options' | 'localize' | 'formatLong'> = enUS;
-    const { options, localize, formatLong } = localeOverride || {};
+    const { options, localize, formatLong } = (localeOverride as Locale) || {};
     if (options && localize && formatLong) {
       locale = { options, localize, formatLong };
     }
@@ -835,7 +840,7 @@ const DateTimePicker = React.forwardRef<
     );
 
     let loc = enUS;
-    const { options, localize, formatLong } = locale;
+    const { options, localize, formatLong } = locale as any;
     if (options && localize && formatLong) {
       loc = {
         ...enUS,
@@ -897,7 +902,7 @@ const DateTimePicker = React.forwardRef<
             onSelect={handleDaySelect}
             initialMonth={value ?? defaultPopupValue}
             yearRange={yearRange}
-            locale={locale}
+            locale={locale as DayPickerProps['locale']}
             {...props}
           />
           {granularity !== 'day' && (

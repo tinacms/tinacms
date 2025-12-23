@@ -3,9 +3,10 @@ import { checkMarkdownOutput } from "./markdown-parsing-utils";
 
 test.describe("should be able to parse bold from markdown", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("http://localhost:3000/admin/index.html#/~", {
-      waitUntil: "domcontentloaded",
-    });
+    await page.goto("http://localhost:3000/admin/index.html#/collections/edit/page/home",{
+        waitUntil: "domcontentloaded",
+      }
+    );
 
     page.click('button[data-test="enter-edit-mode"]');
   });

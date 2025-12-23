@@ -28,13 +28,13 @@ it('creates pending document with valid parameters', async () => {
   const { query, bridge } = await setupMutation(__dirname, config);
 
   const result = await query({ query: validCreateMutation, variables: {} });
-  expect(format(result)).toMatchFileSnapshot(
+  await expect(format(result)).toMatchFileSnapshot(
     'addPendingDocument-success-response.json'
   );
 
   const newDocWrite = bridge.getWrite('posts/valid-post.md');
-  expect(newDocWrite).toBeDefined();
-  expect(newDocWrite).toMatchFileSnapshot('valid-post-content.md');
+  await expect(newDocWrite).toBeDefined();
+  await expect(newDocWrite).toMatchFileSnapshot('valid-post-content.md');
 });
 
 it('handles validation error for invalid collection', async () => {

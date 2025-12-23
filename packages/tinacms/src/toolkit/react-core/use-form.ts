@@ -80,14 +80,10 @@ export function useForm<FormShape = any>(
   React.useEffect(() => {
     loadFormData();
   }, [form, loadFormData]);
-  useCMSEvent(
-    'unstable:reload-form-data',
-    async () => {
-      await loadFormData();
-      await form.reset();
-    },
-    [loadFormData, form]
-  );
+  useCMSEvent('unstable:reload-form-data', async () => {
+    await loadFormData();
+    await form.reset();
+  }, [loadFormData, form]);
 
   useUpdateFormFields(form, watch.fields);
   useUpdateFormLabel(form, watch.label);

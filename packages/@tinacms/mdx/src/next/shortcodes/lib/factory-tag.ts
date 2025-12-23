@@ -96,7 +96,7 @@ export function factoryTag(
       tagOpenerIndex++;
       return tagOpenerSequence;
     }
-    return nok;
+    return nok(code);
   };
 
   const afterStart: State = function (code) {
@@ -251,25 +251,31 @@ export function factoryTag(
     // End pattern
     // This is triggerd for closing tags too
     if (code === findCode(pattern.end[0])) {
+      const markerType = pattern.leaf ? tagSelfClosingMarker : tagMarkerType;
       const tagCloserSequence: State = function (code) {
         const character = findCode(pattern.end[tagCloserIndex]);
         if (code === character) {
+          effects.consume(code);
           if (pattern.end.length - 1 === tagCloserIndex) {
-            effects.exit(tagNameType);
-            return beforeAttribute(code);
+            effects.exit(markerType);
+            effects.exit(tagType);
+            return ok;
           }
           tagCloserIndex++;
-          effects.consume(code);
           return tagCloserSequence;
         }
         tagCloserIndex = 0;
-        return nok;
+        return nok(code);
       };
+      effects.exit(tagNameType);
+      effects.enter(markerType);
+      effects.consume(code);
       if (pattern.end.length === 1) {
-        effects.exit(tagNameType);
-        return beforeAttribute(code);
+        effects.exit(markerType);
+        effects.exit(tagType);
+        return ok;
       } else {
-        effects.consume(code);
+        tagCloserIndex = 1;
         return tagCloserSequence;
       }
     }
@@ -289,39 +295,53 @@ export function factoryTag(
     if (code === codes.quotationMark) {
       effects.exit(tagNameType);
       effects.enter(tagAttributeType);
-      effects.enter(tagAttributeNameType);
-      effects.enter(tagAttributeNamePrimaryType);
-      effects.exit(tagAttributeNamePrimaryType);
-      effects.exit(tagAttributeNameType);
-      effects.enter(tagAttributeInitializerMarkerType);
-      effects.exit(tagAttributeInitializerMarkerType);
+      // effects.enter(tagAttributeNameType);
+      // effects.enter(tagAttributeNamePrimaryType);
+      // effects.exit(tagAttributeNamePrimaryType);
+      // effects.exit(tagAttributeNameType);
+      // effects.enter(tagAttributeInitializerMarkerType);
+      // effects.exit(tagAttributeInitializerMarkerType);
+
       return beforeAttributeValue(code);
     }
 
     return nok(code);
-
-    crash(
-      code,
-      'after name',
-      'a character that can start an attribute name, such as a letter, `$`, or `_`; whitespace before attributes; or the end of the tag'
-    );
   };
 
   // We’ve seen a `.` and are expecting a member name.
   const beforeMemberName: State = function (code) {
-    // Start of a member name.
-    if (code !== codes.eof && idStart(code)) {
-      effects.enter(tagNameMemberType);
-      effects.consume(code);
-      return memberName;
+    if (code === codes.greaterThan) {
+      return tagEnd(code);
     }
-    return nok(code);
 
-    crash(
-      code,
-      'before member name',
-      'a character that can start an attribute name, such as a letter, `$`, or `_`; whitespace before attributes; or the end of the tag'
-    );
+    if (code === codes.leftCurlyBrace) {
+      assert(startPoint, 'expected `startPoint` to be defined');
+      return factoryMdxExpression.call(
+        self,
+        effects,
+        afterAttributeExpression,
+        tagExpressionAttributeType,
+        tagExpressionAttributeMarkerType,
+        tagExpressionAttributeValueType,
+        acorn,
+        acornOptions,
+        addResult,
+        true,
+        false,
+        allowLazy,
+        startPoint.column
+      )(code);
+    }
+
+    if (code !== codes.eof && idStart(code)) {
+      effects.enter(tagAttributeType);
+      effects.enter(tagAttributeNameType);
+      effects.enter(tagAttributeNamePrimaryType);
+      effects.consume(code);
+      return attributePrimaryName;
+    }
+
+    return nok(code);
   };
 
   // Inside the member name.
@@ -468,30 +488,32 @@ export function factoryTag(
 
   const beforeAttribute: State = function (code) {
     if (code === findCode(pattern.end[0])) {
+      const markerType = pattern.leaf ? tagSelfClosingMarker : tagMarkerType;
       const tagCloserSequence: State = function (code) {
         const character = findCode(pattern.end[tagCloserIndex]);
         if (code === character) {
           if (pattern.end.length - 1 === tagCloserIndex) {
-            return beforeAttribute(code);
+            effects.consume(code);
+            effects.exit(markerType);
+            effects.exit(tagType);
+            return ok;
           }
           tagCloserIndex++;
           effects.consume(code);
           return tagCloserSequence;
         }
         tagCloserIndex = 0;
-        return nok;
+        return nok(code);
       };
+
+      // Enter marker
+      effects.enter(markerType);
+      effects.consume(code);
       if (pattern.end.length === 1) {
-        if (pattern.leaf) {
-          effects.enter(tagSelfClosingMarker);
-          effects.exit(tagSelfClosingMarker);
-          returnState = selfClosing;
-          return optionalEsWhitespace;
-        } else {
-          return tagEnd(code);
-        }
+        effects.exit(markerType);
+        effects.exit(tagType);
+        return ok;
       } else {
-        effects.consume(code);
         return tagCloserSequence;
       }
     }

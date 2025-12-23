@@ -1,9 +1,9 @@
 import { AbstractAuthProvider } from 'tinacms';
 
-import type Clerk from '@clerk/clerk-js';
+import { Clerk as ClerkTypes } from '@clerk/clerk-js';
 
 export class ClerkAuthProvider extends AbstractAuthProvider {
-  clerk: Clerk;
+  clerk: ClerkTypes;
   allowedList?: string[];
   orgId?: string;
   constructor({
@@ -11,7 +11,7 @@ export class ClerkAuthProvider extends AbstractAuthProvider {
     clerk,
     allowedList,
   }: {
-    clerk: Clerk;
+    clerk: ClerkTypes;
     /**
      * For premium Clerk users, you can use restrictions
      * https://clerk.com/docs/authentication/allowlist

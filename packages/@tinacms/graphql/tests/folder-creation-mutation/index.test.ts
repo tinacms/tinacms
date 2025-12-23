@@ -21,12 +21,14 @@ it('creates folder and validates bridge writes', async () => {
     variables: {},
   });
 
-  expect(format(result)).toMatchFileSnapshot('folder-creation-response.json');
+  await expect(format(result)).toMatchFileSnapshot(
+    'folder-creation-response.json'
+  );
 
   const folderWrite = bridge.getWrite(
     'posts/northwind/company-updates/.gitkeep.md'
   );
-  expect(folderWrite).toBeDefined();
+  await expect(folderWrite).toBeDefined();
 });
 
 it('prevents creating duplicate folder', async () => {

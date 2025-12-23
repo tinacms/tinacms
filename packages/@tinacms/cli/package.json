@@ -86,7 +86,7 @@
         "esbuild": "catalog:",
         "fs-extra": "catalog:",
         "graphql": "15.8.0",
-        "js-yaml": "^4.1.0",
+        "js-yaml": "^4.1.1",
         "many-level": "catalog:",
         "memory-level": "catalog:",
         "minimatch": "catalog:",
@@ -99,7 +99,7 @@
         "tinacms": "workspace:*",
         "typanion": "catalog:",
         "typescript": "^5.7.3",
-        "vite": "^4.5.9",
+        "vite": "^7.3.0",
         "yup": "^1.6.1",
         "zod": "catalog:"
     },

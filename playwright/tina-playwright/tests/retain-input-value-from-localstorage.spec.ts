@@ -9,7 +9,7 @@ test.skip("Local storage retain edit test", () => {
     page,
   }) => {
     await page.goto(
-      "http://localhost:3000/admin/index.html#/collections/edit/author/first_author",
+      "http://localhost:3000/admin/index.html#/collections/edit/author/Napolean",
       { waitUntil: "domcontentloaded" }
     );
 

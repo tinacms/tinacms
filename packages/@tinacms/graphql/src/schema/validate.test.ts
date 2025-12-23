@@ -35,7 +35,7 @@ describe('The schema validation', () => {
         ],
       })
     ).rejects.toThrowErrorMatchingInlineSnapshot(
-      `"Global templates are not yet supported"`
+      '[Error: Global templates are not yet supported]'
     );
   });
 
@@ -50,7 +50,7 @@ describe('The schema validation', () => {
         ],
       })
     ).rejects.toThrowErrorMatchingInlineSnapshot(
-      `"Field's 'name' must match /^[a-zA-Z0-9_]*$/ at someName.my-name"`
+      "[ValidationError: Field's 'name' must match /^[a-zA-Z0-9_]*$/ at someName.my-name]"
     );
   });
 
@@ -66,7 +66,7 @@ describe('The schema validation', () => {
         ],
       })
     ).rejects.toThrowErrorMatchingInlineSnapshot(
-      `"'type' must be one of: string, number, boolean, datetime, image, reference, object, rich-text, password, but got 'some-type' at someName.myTitle"`
+      "[ValidationError: 'type' must be one of: string, number, boolean, datetime, image, reference, object, rich-text, password, but got 'some-type' at someName.myTitle]"
     );
   });
 
@@ -80,7 +80,9 @@ describe('The schema validation', () => {
           },
         ],
       })
-    ).rejects.toThrowErrorMatchingInlineSnapshot(`"path is a required field"`);
+    ).rejects.toThrowErrorMatchingInlineSnapshot(
+      '[ValidationError: path is a required field]'
+    );
   });
 
   it(`Trims the "collection.path" configuration automatically`, async () => {

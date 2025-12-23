@@ -7,7 +7,7 @@ export async function checkMarkdownOutput(
   expectedTag: string
 ) {
   // Wait for the page content to be ready
-  await page.waitForSelector('[data-test="form:content/page/home.mdx"]', {
+  await page.waitForSelector('input[name="heading"]', {
     state: "visible",
   });
 
@@ -22,6 +22,7 @@ export async function checkMarkdownOutput(
   await page.getByTestId("markdown-button").click();
 
   // Fill in the text with the specified markdown syntax
+  // The body textarea has no name attribute, so we cant filter and thus get 2 results
   await page.getByRole("textbox").fill(inputText);
 
   // Content is rendered by iframe

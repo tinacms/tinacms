@@ -148,10 +148,9 @@ export interface FormHeaderProps {
   isLocalMode?: boolean;
   repoProvider?: {
     defaultBranchName?: string;
-    historyUrl?: (context: {
-      relativePath: string;
-      branch: string;
-    }) => { url: string };
+    historyUrl?: (context: { relativePath: string; branch: string }) => {
+      url: string;
+    };
   };
 }
 
@@ -184,10 +183,9 @@ interface RepositoryProviderProps {
   tinaBranch?: string;
   isLocalMode?: boolean;
   defaultBranchName?: string;
-  historyUrl?: (context: {
-    relativePath: string;
-    branch: string;
-  }) => { url: string };
+  historyUrl?: (context: { relativePath: string; branch: string }) => {
+    url: string;
+  };
 }
 
 export const FileHistoryProvider = ({

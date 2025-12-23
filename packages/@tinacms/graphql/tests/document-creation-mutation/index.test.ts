@@ -55,11 +55,15 @@ it('creates document with all field types and validates bridge writes', async ()
     query: createMutation,
     variables: {},
   });
-  expect(format(result)).toMatchFileSnapshot('createDocument-response.json');
+  await expect(format(result)).toMatchFileSnapshot(
+    'createDocument-response.json'
+  );
 
   const newDocWrite = bridge.getWrite('posts/comprehensive-post.md');
-  expect(newDocWrite).toBeDefined();
-  expect(newDocWrite).toMatchFileSnapshot('comprehensive-post-content.md');
+  await expect(newDocWrite).toBeDefined();
+  await expect(newDocWrite).toMatchFileSnapshot(
+    'comprehensive-post-content.md'
+  );
 });
 
 const createCollectionMutation = `
@@ -155,5 +159,7 @@ it('validates immediate document availability after creation', async () => {
     variables: {},
   });
 
-  expect(format(queryResult)).toMatchFileSnapshot('getDocument-response.json');
+  await expect(format(queryResult)).toMatchFileSnapshot(
+    'getDocument-response.json'
+  );
 });

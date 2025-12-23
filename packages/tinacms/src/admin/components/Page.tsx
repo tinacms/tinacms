@@ -32,11 +32,7 @@ export const PageWrapper = ({
   );
 };
 
-export const PageHeader = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
+export const PageHeader = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className='pt-4 pb-2 px-6'>
       <div className='w-full flex justify-between items-end'>{children}</div>

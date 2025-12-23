@@ -335,7 +335,7 @@ describe('resolveReferences', () => {
     await expect(
       resolveReferences(filter, fields, resolver)
     ).rejects.toThrowErrorMatchingInlineSnapshot(
-      `"Template nonExistentTemplate not found"`
+      '[Error: Template nonExistentTemplate not found]'
     );
   });
 });
@@ -565,7 +565,7 @@ describe('collectConditionsForField', () => {
         collector
       );
     }).toThrowErrorMatchingInlineSnapshot(
-      `"Unable to find type for field zip"`
+      '[Error: Unable to find type for field zip]'
     );
   });
 
