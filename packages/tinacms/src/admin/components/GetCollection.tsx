@@ -153,13 +153,11 @@ export const useSearchCollection = (
     const searchCollection = async () => {
       if ((await api.isAuthenticated()) && !folder.loading && !cancelled) {
         try {
-          const response = (await cms.api.search.query(
-            `${search} AND _collection:${collectionName}`,
-            {
-              limit: 15,
-              cursor: after,
-            }
-          )) as {
+          const response = (await cms.api.search.query(search, {
+            limit: 15,
+            cursor: after,
+            collection: collectionName,
+          })) as {
             results: { _id: string }[];
             nextCursor: string;
             prevCursor: string;

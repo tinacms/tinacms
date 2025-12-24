@@ -5,6 +5,7 @@ export interface SearchOptions {
   limit?: number;
   fuzzy?: boolean;
   fuzzyOptions?: FuzzySearchOptions;
+  collection?: string;
 }
 
 export interface SearchResult {
