@@ -189,7 +189,7 @@ export const FieldsGroup = ({
 }) => {
   return (
     <div
-      className={`relative flex flex-wrap gap-x-4 w-full h-full whitespace-nowrap overflow-x-visible`}
+      className={`relative flex flex-wrap w-full h-full whitespace-nowrap overflow-x-visible`}
     >
       {children}
     </div>
