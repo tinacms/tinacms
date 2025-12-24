@@ -103,7 +103,7 @@ export class TinaAdminApi {
         newRelativePath
       );
       const processed = processDocumentForIndexing(
-        doc['_values'],
+        doc['_values'] as Record<string, unknown>,
         `${collection.path}/${newRelativePath}`,
         collection,
         this.maxSearchIndexFieldLength
@@ -365,7 +365,7 @@ export class TinaAdminApi {
         relativePath
       );
       const processed = processDocumentForIndexing(
-        doc['_values'],
+        doc['_values'] as Record<string, unknown>,
         `${collection.path}/${relativePath}`,
         collection,
         this.maxSearchIndexFieldLength
@@ -395,7 +395,7 @@ export class TinaAdminApi {
         relativePath
       );
       const processed = processDocumentForIndexing(
-        doc['_values'],
+        doc['_values'] as Record<string, unknown>,
         `${collection.path}/${relativePath}`,
         collection,
         this.maxSearchIndexFieldLength
