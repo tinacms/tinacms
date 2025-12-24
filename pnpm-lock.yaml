@@ -2286,8 +2286,8 @@ importers:
         specifier: 'catalog:'
         version: 4.2.0
       date-fns:
-        specifier: 2.30.0
-        version: 2.30.0
+        specifier: 4.1.0
+        version: 4.1.0
       es-toolkit:
         specifier: ^1.42.0
         version: 1.42.0
@@ -2337,8 +2337,8 @@ importers:
         specifier: 'catalog:'
         version: 3.3.1(moment@2.29.4)(react@18.3.1)
       react-day-picker:
-        specifier: ^9.11.1
-        version: 9.11.3(react@18.3.1)
+        specifier: ^9.13.0
+        version: 9.13.0(react@18.3.1)
       react-dropzone:
         specifier: 'catalog:'
         version: 14.2.3(react@18.3.1)
@@ -12661,7 +12661,7 @@ packages:
   puppeteer@23.11.1:
     resolution: {integrity: sha512-53uIX3KR5en8l7Vd8n5DUv90Ae9QDQsyIthaUFVzwV6yU750RjqRznEtNMBT20VthqAdemnJN+hxVdmMHKt7Zw==}
     engines: {node: '>=18'}
-    deprecated: < 24.15.0 is no longer supported
+    deprecated: < 24.10.2 is no longer supported
     hasBin: true
 
   pure-rand@6.1.0:
@@ -12739,8 +12739,8 @@ packages:
       moment: ^2.16.0
       react: ^16.5.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
-  react-day-picker@9.11.3:
-    resolution: {integrity: sha512-7lD12UvGbkyXqgzbYIGQTbl+x29B9bAf+k0pP5Dcs1evfpKk6zv4EdH/edNc8NxcmCiTNXr2HIYPrSZ3XvmVBg==}
+  react-day-picker@9.13.0:
+    resolution: {integrity: sha512-euzj5Hlq+lOHqI53NiuNhCP8HWgsPf/bBAVijR50hNaY1XwjKjShAnIe8jm8RD2W9IJUvihDIZ+KrmqfFzNhFQ==}
     engines: {node: '>=18'}
     peerDependencies:
       react: '>=16.8.0'
@@ -28386,7 +28386,7 @@ snapshots:
       prop-types: 15.8.1
       react: 18.3.1
 
-  react-day-picker@9.11.3(react@18.3.1):
+  react-day-picker@9.13.0(react@18.3.1):
     dependencies:
       '@date-fns/tz': 1.4.1
       date-fns: 4.1.0
