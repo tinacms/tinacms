@@ -31,7 +31,7 @@ export function FieldsBuilder({
   useEventSubscription('plugin:add:field', () => updateFieldPlugins(), []);
 
   return (
-    <FieldsGroup padding={padding}>
+    <FieldsGroup>
       {fields.map((field: Field, index) => {
         return (
           <InnerField
@@ -122,6 +122,7 @@ const InnerField = ({
     <FinalField
       name={field.name}
       key={field.name}
+      className='w-full'
       isEqual={(a, b) => isEqual(field, a, b)}
       type={type}
       parse={
@@ -182,17 +183,13 @@ const InnerField = ({
 };
 
 export const FieldsGroup = ({
-  padding,
   children,
 }: {
-  padding?: boolean;
   children?: any | any[];
 }) => {
   return (
     <div
-      className={`relative block w-full h-full whitespace-nowrap overflow-x-visible ${
-        padding ? `pb-5` : ``
-      }`}
+      className={`relative flex flex-wrap w-full h-full whitespace-nowrap overflow-x-visible`}
     >
       {children}
     </div>
