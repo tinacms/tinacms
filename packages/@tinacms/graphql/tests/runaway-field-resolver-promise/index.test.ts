@@ -39,13 +39,15 @@ it('waits for all resolvers to complete even when one fails early', async () => 
     tinaDirectory: 'tina',
   });
 
-  await database.indexContent(await buildSchema({
-    schema,
-    build: {
-      publicFolder: 'public',
-      outputFolder: 'admin',
-    },
-  }));
+  await database.indexContent(
+    await buildSchema({
+      schema,
+      build: {
+        publicFolder: 'public',
+        outputFolder: 'admin',
+      },
+    })
+  );
 
   const timeline: string[] = [];
 
