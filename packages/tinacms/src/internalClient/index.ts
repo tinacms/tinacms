@@ -863,7 +863,11 @@ export class LocalSearchClient implements SearchClient {
       : 'http://localhost:4001/searchIndex';
   }
 
-  protected buildSearchUrl(query: string, options?: SearchOptions, useFuzzy?: boolean): string {
+  protected buildSearchUrl(
+    query: string,
+    options?: SearchOptions,
+    useFuzzy?: boolean
+  ): string {
     const baseUrl = this.getSearchBaseUrl(!!useFuzzy);
 
     if (useFuzzy) {
@@ -893,8 +897,12 @@ export class LocalSearchClient implements SearchClient {
     return `${baseUrl}?q=${JSON.stringify(q)}${optionsParam}`;
   }
 
-  async query(query: string, options?: SearchOptions): Promise<SearchQueryResponse> {
-    const useFuzzy = options?.fuzzy !== undefined ? options.fuzzy : this.fuzzyEnabled;
+  async query(
+    query: string,
+    options?: SearchOptions
+  ): Promise<SearchQueryResponse> {
+    const useFuzzy =
+      options?.fuzzy !== undefined ? options.fuzzy : this.fuzzyEnabled;
     const url = this.buildSearchUrl(query, options, useFuzzy);
     const res = await this.client.authProvider.fetchWithToken(url);
     return parseSearchIndexResponse(await res.json(), options);
