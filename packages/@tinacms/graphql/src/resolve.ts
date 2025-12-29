@@ -61,6 +61,9 @@ export const resolve = async ({
       isAudit: isAudit || false,
     });
 
+    // Track all field resolver promises to prevent runaway promises
+    const resolverPromises: Promise<unknown>[] = [];
+
     const res = await graphql({
       schema: graphQLSchema,
       source: query,
@@ -84,7 +87,8 @@ export const resolve = async ({
         _context: object,
         info: GraphQLResolveInfo
       ) => {
-        try {
+        const fieldPromise = (async () => {
+          try {
           /*
            * 'collections' and 'collection'.
            */
@@ -451,11 +455,18 @@ export const resolve = async ({
               );
               throw new Error('Unexpected resolve type');
           }
-        } catch (e) {
-          handleFetchErrorError(e, verboseValue);
-        }
+          } catch (e) {
+            handleFetchErrorError(e, verboseValue);
+          }
+        })();
+        resolverPromises.push(fieldPromise);
+        return fieldPromise;
       },
     });
+
+    // Ensure all field resolvers have completed before continuing, as errors can cause
+    // a premature return.
+    await Promise.allSettled(resolverPromises);
 
     if (res.errors) {
       if (!silenceErrors) {
