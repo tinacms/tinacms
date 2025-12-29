@@ -12,6 +12,7 @@ import {
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore importing css is not recognized
 import { DateTimePicker } from '../../components/ui/date-time-picker';
+import { DayPickerLocale } from 'react-day-picker';
 
 export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
   ({ input, field: { dateFormat, timeFormat, onChange, ...rest } }) => {
@@ -20,11 +21,11 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
     const inputRef = React.useRef(null);
 
     React.useEffect(() => {
-      if (inputRef.current && rest.experimental_focusIntent) {
+      if (inputRef.current && rest.focusIntent) {
         inputRef.current.focus();
         inputRef.current.open();
       }
-    }, [rest.experimental_focusIntent]);
+    }, [rest.focusIntent]);
 
     const getTimeFormat = useCallback(() => {
       if (timeFormat === false) {
@@ -43,10 +44,11 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
       return dateFormat;
     }, [dateFormat]);
 
-    const date = input.value ? new Date(input.value) : input.value;
+    const date = input.value ? new Date(input.value) : new Date();
     return (
       <React.Fragment>
         <DateTimePicker
+          {...rest}
           ref={inputRef}
           granularity={granularity}
           onChange={(value) =>
@@ -56,7 +58,11 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
           hourCycle={12}
           dateFormat={getDateFormat()}
           value={date}
-          {...rest}
+          locale={
+            rest.locale
+              ? ({ code: rest.locale } as Partial<DayPickerLocale>)
+              : undefined
+          }
         />
       </React.Fragment>
     );
