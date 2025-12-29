@@ -1,5 +1,17 @@
 # tinacms-cli
 
+## 2.0.6
+
+### Patch Changes
+
+- [#6211](https://github.com/tinacms/tinacms/pull/6211) [`790c860`](https://github.com/tinacms/tinacms/commit/790c860ae85c3bdcb7d3c07321ed4032ebbb7b49) Thanks [@Pat-Stuart](https://github.com/Pat-Stuart)! - ✨ Visual element highlighting between iframe and form
+
+- Updated dependencies [[`d9ccf29`](https://github.com/tinacms/tinacms/commit/d9ccf29684e9889bcfee892b982c119e5bde2ef7), [`790c860`](https://github.com/tinacms/tinacms/commit/790c860ae85c3bdcb7d3c07321ed4032ebbb7b49), [`60814a3`](https://github.com/tinacms/tinacms/commit/60814a3b56f99843211ef144576109857ad6ba86), [`b0f55b5`](https://github.com/tinacms/tinacms/commit/b0f55b511426ebf772d9f06645804f2319f9f9a2)]:
+  - @tinacms/graphql@2.0.4
+  - tinacms@3.1.3
+  - @tinacms/app@2.3.18
+  - @tinacms/search@1.1.8
+
 ## 2.0.5
 
 ### Patch Changes
