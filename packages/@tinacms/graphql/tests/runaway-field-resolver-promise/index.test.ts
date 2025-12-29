@@ -48,10 +48,8 @@ it('waits for all resolvers to complete even when one fails early', async () => 
   const originalGet = database.get.bind(database);
   database.get = async (...args) => {
     try {
-      console.log(`Getting ${args}`);
       return await originalGet(...args);
     } catch (e) {
-      console.log(`Found error ${e}, delaying...`);
       timeline.push('document-error');
       throw e;
     }
@@ -60,11 +58,8 @@ it('waits for all resolvers to complete even when one fails early', async () => 
   // Add delay to collection query to ensure it completes AFTER the document error
   const originalQuery = database.query.bind(database);
   database.query = async (...args) => {
-    console.log(`Starting query`);
     await delay(250); // Ensure this runs after the document lookup fails
-    console.log(`Delay over`);
     const result = await originalQuery(...args);
-    console.log(`Query complete`);
     timeline.push('collection-complete');
     return result;
   };
@@ -86,22 +81,11 @@ it('waits for all resolvers to complete even when one fails early', async () => 
     silenceErrors: true,
   });
 
-  console.log("Result was...");
-  console.log(JSON.stringify(result));
-
-  // Verify the error occurred before the collection query completed
+  // Verify the timeline, ensuring the error occurred first and that the collection query completed.
   expect(timeline[0]).toBe('document-error');
-
-  // Critical: When resolve() returns, the collection query MUST have completed
-  // If this fails, we have runaway promises
   expect(timeline).toContain('collection-complete');
 
   // Verify partial execution: error + successful data
   expect(result.errors).toBeDefined();
   expect(result.errors?.length).toBeGreaterThan(0);
-
-  // Note that the following does not appear to be true even if the delay is switched around.
-  // expect(result.data?.d1).toBeNull();
-  // expect(result.data?.c1).toBeDefined();
-  // expect(result.data?.c1?.totalCount).toBeGreaterThanOrEqual(0);
 });
