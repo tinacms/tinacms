@@ -16,9 +16,9 @@ const schema: Schema = {
       fields: [{ type: 'string', name: 'title' }],
     },
     {
-      name: 'directors',
-      label: 'Directors',
-      path: 'directors',
+      name: 'authors',
+      label: 'Authors',
+      path: 'authors',
       fields: [
         { type: 'string', name: 'name' },
         { type: 'string', name: 'bio' },
@@ -27,7 +27,7 @@ const schema: Schema = {
   ],
 };
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const sleep250ms = () => new Promise((resolve) => setTimeout(resolve, 250));
 
 it('waits for all resolvers to complete even when one fails early', async () => {
   const testDir = __dirname;
@@ -39,9 +39,14 @@ it('waits for all resolvers to complete even when one fails early', async () => 
     tinaDirectory: 'tina',
   });
 
-  await database.indexContent(await buildSchema({ schema }));
+  await database.indexContent(await buildSchema({
+    schema,
+    build: {
+      publicFolder: 'public',
+      outputFolder: 'admin',
+    },
+  }));
 
-  // Track execution timeline
   const timeline: string[] = [];
 
   // Document get will fail immediately (NotFoundError)
@@ -58,17 +63,17 @@ it('waits for all resolvers to complete even when one fails early', async () => 
   // Add delay to collection query to ensure it completes AFTER the document error
   const originalQuery = database.query.bind(database);
   database.query = async (...args) => {
-    await delay(250); // Ensure this runs after the document lookup fails
+    await sleep250ms();
     const result = await originalQuery(...args);
     timeline.push('collection-complete');
     return result;
   };
 
   const query = `query {
-    d1: document(collection: "post", relativePath: "nonexistent.md") {
+    nonExistantPost: document(collection: "post", relativePath: "nonexistent.md") {
       ...on Document { _values, _sys { title } }
     }
-    c1: directorsConnection {
+    allAuthors: authorsConnection {
       totalCount
       edges { node { id name } }
     }
@@ -85,7 +90,7 @@ it('waits for all resolvers to complete even when one fails early', async () => 
   expect(timeline[0]).toBe('document-error');
   expect(timeline).toContain('collection-complete');
 
-  // Verify partial execution: error + successful data
+  // Verify error returned.
   expect(result.errors).toBeDefined();
   expect(result.errors?.length).toBeGreaterThan(0);
 });
