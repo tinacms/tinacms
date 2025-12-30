@@ -214,7 +214,7 @@ export const FieldWrapper = ({
 
   return (
     <div
-      className={`relative px-2 ${margin ? `mb-5 last:mb-0` : ``} ${field?.editorWidth === 'half' ? 'w-1/2' : 'w-full'} ${getFieldStateClasses()}`}
+      className={`relative px-2 ${margin ? `mb-5 last:mb-0` : ``} ${field?.width === 'half' ? 'w-1/2' : 'w-full'} ${getFieldStateClasses()}`}
       data-tina-field-active={dataActive}
       data-tina-field-hovering={dataHovering}
       {...props}
