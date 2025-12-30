@@ -1,16 +1,17 @@
-/**
+import {
+  graphql,
+  buildASTSchema,
+  getNamedType,
+  GraphQLError,
+  type GraphQLResolveInfo,
+} from 'graphql';
+import type { Collection, TinaSchema } from '@tinacms/schema-tools';
 
-*/
-
-import { graphql, buildASTSchema, getNamedType, GraphQLError } from 'graphql';
-import type { TinaSchema } from '@tinacms/schema-tools';
 import type { GraphQLConfig } from './types';
-import { createSchema } from './schema/createSchema';
-import { createResolver } from './resolver';
-import { assertShape } from './util';
-
-import type { GraphQLResolveInfo } from 'graphql';
 import type { Database } from './database';
+import { createSchema } from './schema/createSchema';
+import { createResolver, Resolver } from './resolver';
+import { assertShape } from './util';
 import { NAMER } from './ast-builder';
 import { handleFetchErrorError } from './resolver/error';
 import {
@@ -48,13 +49,11 @@ export const resolve = async ({
     const graphQLSchema = buildASTSchema(graphQLSchemaAst);
 
     const tinaConfig = await database.getTinaSchema();
-    const tinaSchema = (await createSchema({
-      // TODO: please update all the types to import from @tinacms/schema-tools
-      // @ts-ignore
+    const tinaSchema = await createSchema({
       schema: tinaConfig,
-      // @ts-ignore
+      // @ts-expect-error
       flags: tinaConfig?.meta?.flags,
-    })) as unknown as TinaSchema;
+    });
     const resolver = createResolver({
       config,
       database,
@@ -81,143 +80,82 @@ export const resolve = async ({
       },
       fieldResolver: async (
         source: { [key: string]: undefined | Record<string, unknown> } = {},
-        _args: object = {},
+        args: unknown = {},
         _context: object,
         info: GraphQLResolveInfo
       ) => {
         try {
-          const args = JSON.parse(JSON.stringify(_args));
-          const returnType = getNamedType(info.returnType).toString();
-          const lookup = await database.getLookup(returnType);
-          const isMutation = info.parentType.toString() === 'Mutation';
-          const value = source[info.fieldName];
-
-          /**
-           * `collection`
+          /*
+           * 'collections' and 'collection'.
            */
+          const returnType = getNamedType(info.returnType).toString();
           if (returnType === 'Collection') {
-            if (value) {
-              return value;
+            const possibleCollectionValue = source[info.fieldName];
+            if (possibleCollectionValue) {
+              return possibleCollectionValue;
             }
             if (info.fieldName === 'collections') {
-              const collectionNode = info.fieldNodes.find(
-                (x) => x.name.value === 'collections'
-              );
-              const hasDocuments = collectionNode.selectionSet.selections.find(
-                (x) => {
-                  // @ts-ignore
-                  return x?.name?.value === 'documents';
-                }
-              );
-              return tinaSchema.getCollections().map((collection) => {
-                return resolver.resolveCollection(
-                  args,
-                  collection.name,
-                  Boolean(hasDocuments)
-                );
-              });
+              return handleCollectionsField(info, tinaSchema, resolver, args);
             }
-
             // The field is `collection`
-            const collectionNode = info.fieldNodes.find(
-              (x) => x.name.value === 'collection'
-            );
-            const hasDocuments = collectionNode.selectionSet.selections.find(
-              (x) => {
-                // @ts-ignore
-                return x?.name?.value === 'documents';
-              }
-            );
-            return resolver.resolveCollection(
-              args,
-              args.collection,
-              Boolean(hasDocuments)
-            );
+            return handleCollectionField(info, args, resolver);
           }
 
-          /**
-           * `getOptimizedQuery`
-           *
-           * Returns a version of the query with fragments inlined. Eg.
-           * ```graphql
-           * {
-           *   getPostDocument(relativePath: "") {
-           *     data {
-           *       ...PostFragment
-           *     }
-           *   }
-           * }
-           *
-           * fragment PostFragment on Post {
-           *   title
-           * }
-           * ```
-           * Turns into
-           * ```graphql
-           * {
-           *   getPostDocument(relativePath: "") {
-           *     data {
-           *       title
-           *     }
-           *   }
-           * }
-           */
           if (info.fieldName === 'getOptimizedQuery') {
-            try {
-              // Deprecated
-              return args.queryString;
-            } catch (e) {
-              throw new Error(
-                `Invalid query provided, Error message: ${e.message}`
-              );
-            }
+            // Deprecated - returns query string as-is
+            return (args as { queryString?: string }).queryString || '';
           }
 
           if (info.fieldName === 'authenticate') {
+            const authArgs = args as { sub?: string; password?: string };
             return handleAuthenticate({
               tinaSchema,
               resolver,
-              sub: args.sub,
-              password: args.password,
+              sub: authArgs.sub,
+              password: authArgs.password,
               info,
               ctxUser,
             });
           }
 
           if (info.fieldName === 'authorize') {
+            const authArgs = args as { sub?: string };
             return handleAuthorize({
               tinaSchema,
               resolver,
-              sub: args.sub,
+              sub: authArgs.sub,
               info,
               ctxUser,
             });
           }
 
           if (info.fieldName === 'updatePassword') {
+            const authArgs = args as { password?: string };
             return handleUpdatePassword({
               tinaSchema,
               resolver,
-              password: args.password,
+              password: authArgs.password,
               info,
               ctxUser,
             });
           }
 
+          const lookup = await database.getLookup(returnType);
           // We assume the value is already fully resolved
           if (!lookup) {
-            return value;
+            return source[info.fieldName];
           }
 
           const isCreation = lookup[info.fieldName] === 'create';
+          const isMutation = info.parentType.toString() === 'Mutation';
 
-          /**
+          /*
            * From here, we need more information on how to resolve this, aided
            * by the lookup value for the given return type, we can enrich the request
            * with more contextual information that we gathered at build-time.
            */
           switch (lookup.resolveType) {
-            /**
+            /*
              * `node(id: $id)`
              */
             case 'nodeDocument':
@@ -225,106 +163,155 @@ export const resolve = async ({
                 yup.object({ id: yup.string().required() })
               );
               return resolver.getDocument(args.id);
+
             case 'multiCollectionDocument':
-              if (typeof value === 'string' && value !== '') {
-                /**
-                 * This is a reference value (`director: /path/to/george.md`)
-                 */
-                return resolver.getDocument(value);
+              const possibleValue = source[info.fieldName];
+              if (typeof possibleValue === 'string' && possibleValue !== '') {
+                // This is a reference value (`director: /path/to/george.md`)
+                return resolver.getDocument(possibleValue);
               }
-              if (args?.collection && info.fieldName === 'addPendingDocument') {
-                /**
-                 * `addPendingDocument`
-                 * FIXME: this should probably be it's own lookup
-                 */
-                return resolver.resolveDocument({
-                  args: { ...args, params: {} },
-                  collection: args.collection,
-                  isMutation,
-                  isCreation: true,
-                  isAddPendingDocument: true,
-                });
-              }
+
               if (
                 [
                   NAMER.documentQueryName(),
+                  'addPendingDocument',
                   'createDocument',
                   'updateDocument',
                   'deleteDocument',
                   'createFolder',
                 ].includes(info.fieldName)
               ) {
-                /**
-                 * `getDocument`/`createDocument`/`updateDocument`/`deleteDocument`/`createFolder`
-                 */
-                const result = await resolver.resolveDocument({
-                  args,
-                  collection: args.collection,
-                  isMutation,
-                  isCreation,
-                  // Right now this is the only case for deletion
-                  isDeletion: info.fieldName === 'deleteDocument',
-                  isFolderCreation: info.fieldName === 'createFolder',
-                  isUpdateName: Boolean(args?.params?.relativePath),
-                  isAddPendingDocument: false,
-                  isCollectionSpecific: false,
-                });
+                assertShape<{
+                  collection: string;
+                  relativePath: string;
+                }>(args, (yup) =>
+                  yup.object({
+                    collection: yup.string().required(),
+                    relativePath: yup.string().required(),
+                  })
+                );
 
-                return result;
+                if (isMutation) {
+                  switch (info.fieldName) {
+                    case 'addPendingDocument':
+                      return resolver.resolveAddPendingDocument({
+                        collectionName: args.collection,
+                        relativePath: args.relativePath,
+                        templateName: (args as { template?: string }).template,
+                      });
+                    case 'createFolder':
+                      return resolver.resolveCreateFolder({
+                        collectionName: args.collection,
+                        relativePath: args.relativePath,
+                      });
+                    case 'createDocument': {
+                      assertShape<{
+                        params: {
+                          // [args.collection]: Record<string, unknown>; .. effectively.
+                        };
+                      }>(args, (yup) =>
+                        yup.object({
+                          params: yup
+                            .object()
+                            .shape({
+                              [args.collection]: yup.object().required(),
+                            })
+                            .required(),
+                        })
+                      );
+                      return resolver.resolveCreateDocument({
+                        collectionName: args.collection,
+                        relativePath: args.relativePath,
+                        body: args.params[args.collection],
+                      });
+                    }
+                    case 'updateDocument': {
+                      assertShape<{
+                        params: {
+                          relativePath: string;
+                        };
+                      }>(args, (yup) =>
+                        yup.object({
+                          params: yup
+                            .object()
+                            .shape({
+                              relativePath: yup.string().optional(),
+                            })
+                            .required(),
+                        })
+                      );
+                      const newRelativePath = args.params.relativePath;
+                      const newBody = args.params[args.collection] as
+                        | Record<string, unknown>
+                        | undefined;
+                      return resolver.resolveUpdateDocument({
+                        collectionName: args.collection,
+                        relativePath: args.relativePath,
+                        newRelativePath,
+                        newBody,
+                      });
+                    }
+                    case 'deleteDocument':
+                      return resolver.resolveDeleteDocument({
+                        collectionName: args.collection,
+                        relativePath: args.relativePath,
+                      });
+                  }
+                } else if (info.fieldName === NAMER.documentQueryName()) {
+                  return resolver.resolveRetrievedDocument({
+                    collectionName: args.collection,
+                    relativePath: args.relativePath,
+                  });
+                }
               }
-              return value;
-            /**
+
+              return possibleValue;
+
+            /*
              * eg `getMovieDocument.data.actors`
              */
             case 'multiCollectionDocumentList':
-              if (Array.isArray(value)) {
+              const listValue = source[info.fieldName];
+              if (Array.isArray(listValue)) {
                 return {
-                  totalCount: value.length,
-                  edges: value.map((document) => {
+                  totalCount: listValue.length,
+                  edges: listValue.map((document) => {
                     return { node: document };
                   }),
                 };
               }
               if (
                 info.fieldName === 'documents' &&
-                value?.collection &&
-                value?.hasDocuments
+                listValue?.collection &&
+                listValue?.hasDocuments
               ) {
-                let filter = args.filter;
+                const documentsArgs = args as {
+                  filter?: Record<string, any>;
+                  first?: number;
+                  after?: string;
+                };
 
                 // When querying for documents, filter has shape filter { [collectionName]: { ... }} but we need to pass the filter directly to the resolver
-                if (
-                  // 1. Make sure that the filter exists
-                  typeof args?.filter !== 'undefined' &&
-                  args?.filter !== null &&
-                  // 2. Make sure that the collection name exists
-                  // @ts-ignore
-                  typeof value?.collection?.name === 'string' &&
-                  // 3. Make sure that the collection name is in the filter and is not undefined
-                  // @ts-ignore
-                  Object.keys(args.filter).includes(value?.collection?.name) &&
-                  // @ts-ignore
-                  typeof args.filter[value?.collection?.name] !== 'undefined'
-                ) {
-                  // Since 1. 2. and 3. are true, we can safely assume that the filter exists and is not undefined
-
-                  // @ts-ignore
-                  filter = args.filter[value.collection.name];
-                }
+                const collectionName = (
+                  listValue.collection as { name?: string }
+                )?.name;
+                const filter =
+                  (collectionName && documentsArgs.filter?.[collectionName]) ??
+                  documentsArgs.filter;
                 // use the collection and hasDocuments to resolve the documents
                 return resolver.resolveCollectionConnection({
                   args: {
-                    ...args,
+                    ...documentsArgs,
                     filter,
                   },
-                  // @ts-ignore
-                  collection: value.collection,
+                  collection: listValue.collection as Collection<true>,
                 });
               }
               throw new Error(
                 `Expected an array for result of ${info.fieldName} at ${info.path}`
               );
-            /**
+
+            /*
              * Collections-specific getter
              * eg. `getPostDocument`/`createPostDocument`/`updatePostDocument`
              *
@@ -332,31 +319,65 @@ export const resolve = async ({
              * the field will be `node`
              */
             case 'collectionDocument': {
-              if (value) {
-                return value;
+              const possibleDocValue = source[info.fieldName];
+              if (possibleDocValue) {
+                return possibleDocValue;
               }
-              const result =
-                value ||
-                (await resolver.resolveDocument({
-                  args,
-                  collection: lookup.collection,
-                  isMutation,
-                  isCreation,
-                  isAddPendingDocument: false,
-                  isCollectionSpecific: true,
-                }));
-              return result;
+
+              assertShape<{
+                relativePath: string;
+              }>(args, (yup) =>
+                yup.object({
+                  relativePath: yup.string().required(),
+                })
+              );
+
+              if (isMutation) {
+                assertShape<{
+                  params: Record<string, unknown>;
+                }>(args, (yup) =>
+                  yup.object({
+                    params: yup.object().required(),
+                  })
+                );
+                if (isCreation) {
+                  return resolver.resolveCreateDocument({
+                    collectionName: lookup.collection,
+                    relativePath: args.relativePath,
+                    body: args.params,
+                  });
+                } else {
+                  // Note that document renaming is not supported.
+                  return resolver.resolveUpdateDocument({
+                    collectionName: lookup.collection,
+                    relativePath: args.relativePath,
+                    newBody: args.params,
+                  });
+                }
+              } else {
+                return resolver.resolveRetrievedDocument({
+                  collectionName: lookup.collection,
+                  relativePath: args.relativePath,
+                });
+              }
             }
-            /**
+
+            /*
              * Collections-specific list getter
              * eg. `getPageList`
              */
             case 'collectionDocumentList':
+              // Cast args to an acceptable type for the resolver
+              const collectionArgs = args as Record<
+                string,
+                string | number | Record<string, object>
+              >;
               return resolver.resolveCollectionConnection({
-                args,
+                args: collectionArgs,
                 collection: tinaSchema.getCollection(lookup.collection),
               });
-            /**
+
+            /*
              * A polymorphic data set, it can be from a document's data
              * of any nested object which can be one of many shapes
              *
@@ -377,23 +398,57 @@ export const resolve = async ({
               // `unionData` is used by the typeResolver, need to keep this check in-place
               // This is an array in many cases so it's easier to just pass it through
               // to be handled by the `typeResolver`
-              if (!value) {
-                if (args.relativePath) {
-                  // FIXME: unionData doesn't have enough info
-                  const result = await resolver.resolveDocument({
-                    args,
-                    collection: lookup.collection,
-                    isMutation,
-                    isCreation,
-                    isAddPendingDocument: false,
-                    isCollectionSpecific: true,
-                  });
-                  return result;
+              const unionValue = source[info.fieldName];
+              if (!unionValue) {
+                const unionArgs = args as { relativePath?: string };
+                if (unionArgs.relativePath) {
+                  // FIXME: there is a bug in the lookup generation where the create fieldname is not generated.
+                  // Therefore, you cannot create a new item using create{{ COLLECTION-NAME }}.
+                  assertShape<{
+                    relativePath: string;
+                  }>(args, (yup) =>
+                    yup.object({
+                      relativePath: yup.string().required(),
+                    })
+                  );
+                  if (isMutation) {
+                    assertShape<{
+                      params: Record<string, unknown>;
+                    }>(args, (yup) =>
+                      yup.object({
+                        params: yup.object().required(),
+                      })
+                    );
+                    if (isCreation) {
+                      return resolver.resolveCreateDocument({
+                        collectionName: lookup.collection,
+                        relativePath: args.relativePath,
+                        body: args.params,
+                      });
+                    } else {
+                      return resolver.resolveUpdateDocument({
+                        collectionName: lookup.collection,
+                        relativePath: args.relativePath,
+                        newBody: args.params,
+                      });
+                    }
+                  } else {
+                    return resolver.resolveRetrievedDocument({
+                      collectionName: lookup.collection,
+                      relativePath: args.relativePath,
+                    });
+                  }
                 }
               }
-              return value;
+              return unionValue;
+
             default:
-              console.error(lookup);
+              console.error(
+                `Could not recognize resolve type '${lookup.resolveType}'.`
+              );
+              console.error(
+                'The field resolver needs to be updated to handle this new type.'
+              );
               throw new Error('Unexpected resolve type');
           }
         } catch (e) {
@@ -431,4 +486,48 @@ export const resolve = async ({
     }
     throw e;
   }
+};
+
+const handleCollectionsField = (
+  info: GraphQLResolveInfo,
+  tinaSchema: TinaSchema,
+  resolver: Resolver,
+  args: unknown
+) => {
+  const collectionNode = info.fieldNodes.find(
+    (x) => x.name.value === 'collections'
+  );
+  const hasDocuments = collectionNode.selectionSet.selections.find(
+    (x) => x.kind == 'Field' && x?.name?.value === 'documents'
+  );
+  return tinaSchema.getCollections().map((collection) => {
+    return resolver.resolveCollection(
+      args,
+      collection.name,
+      Boolean(hasDocuments)
+    );
+  });
+};
+
+const handleCollectionField = (
+  info: GraphQLResolveInfo,
+  args: unknown,
+  resolver: Resolver
+) => {
+  const collectionNode = info.fieldNodes.find(
+    (x) => x.name.value === 'collection'
+  );
+  const hasDocuments = collectionNode.selectionSet.selections.find(
+    (x) => x.kind == 'Field' && x?.name?.value === 'documents'
+  );
+  assertShape<{ collection: string }>(args, (yup) =>
+    yup.object({
+      collection: yup.string().required(),
+    })
+  );
+  return resolver.resolveCollection(
+    args,
+    args.collection,
+    Boolean(hasDocuments)
+  );
 };

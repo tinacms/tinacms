@@ -1,5 +1,11 @@
 # @tinacms/auth
 
+## 1.1.2
+
+### Patch Changes
+
+- [#6284](https://github.com/tinacms/tinacms/pull/6284) [`f2dd173`](https://github.com/tinacms/tinacms/commit/f2dd173b830ce2d28ab91c14ce5d4be396e801ad) Thanks [@kulesy](https://github.com/kulesy)! - fix(auth): Add "type": "module" to package.json to fix ES module loading
+
 ## 1.1.1
 
 ### Patch Changes

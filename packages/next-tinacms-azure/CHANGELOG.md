@@ -1,5 +1,13 @@
 # next-tinacms-azure
 
+## 6.0.3
+
+### Patch Changes
+
+- Updated dependencies [[`f2dd173`](https://github.com/tinacms/tinacms/commit/f2dd173b830ce2d28ab91c14ce5d4be396e801ad), [`790c860`](https://github.com/tinacms/tinacms/commit/790c860ae85c3bdcb7d3c07321ed4032ebbb7b49), [`60814a3`](https://github.com/tinacms/tinacms/commit/60814a3b56f99843211ef144576109857ad6ba86), [`b0f55b5`](https://github.com/tinacms/tinacms/commit/b0f55b511426ebf772d9f06645804f2319f9f9a2)]:
+  - @tinacms/auth@1.1.2
+  - tinacms@3.1.3
+
 ## 6.0.2
 
 ### Patch Changes

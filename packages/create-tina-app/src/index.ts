@@ -36,7 +36,8 @@ import { osInfo as getOsSystemInfo } from 'systeminformation';
 
 let posthogClient: PostHog | null = null;
 async function initializePostHog(
-  configEndpoint?: string
+  configEndpoint?: string,
+  disableGeoip?: boolean
 ): Promise<PostHog | null> {
   let apiKey: string | undefined;
   let endpoint: string | undefined;
@@ -56,6 +57,7 @@ async function initializePostHog(
 
   return new PostHog(apiKey, {
     host: endpoint,
+    disableGeoip: disableGeoip ?? true,
   });
 }
 
@@ -114,7 +116,8 @@ export async function run() {
     );
 
     posthogClient = await initializePostHog(
-      'https://identity-v2.tinajs.io/v2/posthog-token'
+      'https://identity-v2.tinajs.io/v2/posthog-token',
+      false
     );
 
     // add os info
