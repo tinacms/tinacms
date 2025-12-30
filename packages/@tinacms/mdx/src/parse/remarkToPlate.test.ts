@@ -83,4 +83,28 @@ describe('sanitizeUrl', () => {
       'https://example.com/path?utm_source=blog#anchor'
     );
   });
+
+  it('should preserve YouTube video timestamps (standard format)', () => {
+    expect(
+      sanitizeUrl('https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=60')
+    ).toBe('https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=60');
+  });
+
+  it('should preserve YouTube video timestamps (short format)', () => {
+    expect(sanitizeUrl('https://youtu.be/dQw4w9WgXcQ?t=60')).toBe(
+      'https://youtu.be/dQw4w9WgXcQ?t=60'
+    );
+  });
+
+  it('should preserve YouTube video timestamps with start parameter', () => {
+    expect(
+      sanitizeUrl('https://www.youtube.com/watch?v=dQw4w9WgXcQ&start=120')
+    ).toBe('https://www.youtube.com/watch?v=dQw4w9WgXcQ&start=120');
+  });
+
+  it('should preserve Vimeo video timestamps', () => {
+    expect(sanitizeUrl('https://vimeo.com/123456789#t=60s')).toBe(
+      'https://vimeo.com/123456789#t=60s'
+    );
+  });
 });
