@@ -62,6 +62,7 @@ const ListBranchResponse = z
     name: z.string(),
     protected: z.boolean().optional().default(false),
     githubPullRequestUrl: z.string().optional(),
+    detectedBotBranch: z.boolean().optional().default(false),
   })
   .array()
   .nonempty();
@@ -77,6 +78,25 @@ const IndexStatusResponse = z.object({
     .optional(),
   timestamp: z.number().optional(),
 });
+
+/**
+ * Detects if a branch name matches common bot branch patterns
+ * Common patterns include: dependabot/, renovate/, snyk-, changeset-release/, etc.
+ */
+const isBotBranch = (branchName: string): boolean => {
+  const botPatterns = [
+    /^dependabot\//i,
+    /^renovate\//i,
+    /^snyk-/i,
+    /^changeset-release\//i,
+    /^imgbot/i,
+    /^greenkeeper\//i,
+    /^auto\//i,
+    /^release-please-/i,
+  ];
+
+  return botPatterns.some(pattern => pattern.test(branchName));
+};
 
 export class Client {
   authProvider: AuthProvider;
@@ -522,17 +542,23 @@ mutation addPendingDocumentMutation(
       });
       const branches = await res.json();
       const parsedBranches = await ListBranchResponse.parseAsync(branches);
+
+      // Filter out bot branches based on API flag or name pattern
+      const nonBotBranches = parsedBranches.filter(
+        (branch) => !branch.detectedBotBranch && !isBotBranch(branch.name)
+      );
+
       if (args?.includeIndexStatus === false) {
-        return parsedBranches;
+        return nonBotBranches;
       }
-      const indexStatusPromises = parsedBranches.map(async (branch) => {
+      const indexStatusPromises = nonBotBranches.map(async (branch) => {
         const indexStatus = await this.getIndexStatus({ ref: branch.name });
         return {
           ...branch,
           indexStatus,
         };
       });
-      this.protectedBranches = parsedBranches
+      this.protectedBranches = nonBotBranches
         .filter((x) => x.protected)
         .map((x) => x.name);
       const indexStatus = await Promise.all(indexStatusPromises);

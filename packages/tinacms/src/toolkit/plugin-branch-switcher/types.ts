@@ -11,6 +11,7 @@ export interface Branch {
     url?: string;
   };
   githubPullRequestUrl?: string;
+  detectedBotBranch?: boolean;
 }
 
 export interface BranchSwitcherProps {
