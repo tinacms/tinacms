@@ -102,6 +102,18 @@ describe('sanitizeUrl', () => {
     ).toBe('https://www.youtube.com/watch?v=dQw4w9WgXcQ&start=120');
   });
 
+  it('should preserve YouTube embed URLs with start parameter', () => {
+    expect(
+      sanitizeUrl('https://www.youtube.com/embed/dQw4w9WgXcQ?start=60')
+    ).toBe('https://www.youtube.com/embed/dQw4w9WgXcQ?start=60');
+  });
+
+  it('should preserve YouTube embed URLs with multiple parameters', () => {
+    expect(
+      sanitizeUrl('https://www.youtube.com/embed/dQw4w9WgXcQ?start=60&autoplay=1')
+    ).toBe('https://www.youtube.com/embed/dQw4w9WgXcQ?start=60&autoplay=1');
+  });
+
   it('should preserve Vimeo video timestamps', () => {
     expect(sanitizeUrl('https://vimeo.com/123456789#t=60s')).toBe(
       'https://vimeo.com/123456789#t=60s'
