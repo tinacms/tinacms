@@ -9,30 +9,6 @@ catalogs:
     '@ariakit/react':
       specifier: ^0.4.15
       version: 0.4.15
-    '@aws-sdk/client-s3':
-      specifier: ^3.744.0
-      version: 3.758.0
-    '@aws-sdk/s3-request-presigner':
-      specifier: ^3.744.0
-      version: 3.758.0
-    '@azure/storage-blob':
-      specifier: ^12.26.0
-      version: 12.26.0
-    '@biomejs/biome':
-      specifier: ^1.9.4
-      version: 1.9.4
-    '@changesets/changelog-github':
-      specifier: ^0.5.0
-      version: 0.5.1
-    '@changesets/cli':
-      specifier: 2.27.8
-      version: 2.27.8
-    '@clerk/backend':
-      specifier: 0.31.3
-      version: 0.31.3
-    '@clerk/clerk-js':
-      specifier: 4.56.2
-      version: 4.56.2
     '@dnd-kit/core':
       specifier: ^6.1.0
       version: 6.3.1
@@ -48,45 +24,12 @@ catalogs:
     '@floating-ui/react-dom':
       specifier: ^2.1.2
       version: 2.1.3
-    '@graphiql/toolkit':
-      specifier: 0.8.4
-      version: 0.8.4
-    '@graphql-codegen/core':
-      specifier: ^2.6.8
-      version: 2.6.8
-    '@graphql-codegen/typescript':
-      specifier: ^4.1.3
-      version: 4.1.5
-    '@graphql-codegen/typescript-operations':
-      specifier: ^4.4.1
-      version: 4.5.1
-    '@graphql-codegen/visitor-plugin-common':
-      specifier: ^4.1.2
-      version: 4.1.2
-    '@graphql-tools/graphql-file-loader':
-      specifier: ^7.5.17
-      version: 7.5.17
-    '@graphql-tools/load':
-      specifier: ^7.8.14
-      version: 7.8.14
     '@graphql-tools/utils':
       specifier: ^10.8.1
       version: 10.8.3
-    '@iarna/toml':
-      specifier: ^2.2.5
-      version: 2.2.5
     '@monaco-editor/react':
       specifier: 4.7.0-rc.0
       version: 4.7.0-rc.0
-    '@octokit/rest':
-      specifier: ^19.0.13
-      version: 19.0.13
-    '@playwright/test':
-      specifier: ^1.50.1
-      version: 1.50.1
-    '@puppeteer/replay':
-      specifier: ^1.3.2
-      version: 1.3.2
     '@radix-ui/react-checkbox':
       specifier: ^1.1.4
       version: 1.1.4
@@ -96,9 +39,6 @@ catalogs:
     '@radix-ui/react-dropdown-menu':
       specifier: ^2.1.6
       version: 2.1.6
-    '@radix-ui/react-icons':
-      specifier: ^1.3.2
-      version: 1.3.2
     '@radix-ui/react-popover':
       specifier: ^1.1.15
       version: 1.1.15
@@ -117,27 +57,6 @@ catalogs:
     '@react-hook/window-size':
       specifier: ^3.1.1
       version: 3.1.1
-    '@rollup/pluginutils':
-      specifier: ^5.1.4
-      version: 5.1.4
-    '@sucrase/jest-plugin':
-      specifier: ^3.0.0
-      version: 3.0.0
-    '@svgr/core':
-      specifier: 8.1.0
-      version: 8.1.0
-    '@svgr/webpack':
-      specifier: ^8.1.0
-      version: 8.1.0
-    '@tailwindcss/aspect-ratio':
-      specifier: ^0.4.2
-      version: 0.4.2
-    '@tailwindcss/container-queries':
-      specifier: ^0.1.1
-      version: 0.1.1
-    '@tailwindcss/typography':
-      specifier: ^0.5.16
-      version: 0.5.19
     '@testing-library/dom':
       specifier: ^10.4.0
       version: 10.4.0
@@ -153,87 +72,18 @@ catalogs:
     '@types/atob':
       specifier: ^2.1.4
       version: 2.1.4
-    '@types/clear':
-      specifier: 0.1.0
-      version: 0.1.0
-    '@types/cli-spinner':
-      specifier: ^0.2.3
-      version: 0.2.3
     '@types/codemirror':
       specifier: ^5.60.15
       version: 5.60.15
     '@types/color-string':
       specifier: ^1.5.5
       version: 1.5.5
-    '@types/cross-spawn':
-      specifier: ^6.0.6
-      version: 6.0.6
-    '@types/express':
-      specifier: ^4.17.21
-      version: 4.17.21
-    '@types/figlet':
-      specifier: 1.2.0
-      version: 1.2.0
-    '@types/level':
-      specifier: ^6.0.3
-      version: 6.0.3
-    '@types/listr':
-      specifier: 0.14.2
-      version: 0.14.2
-    '@types/lru-cache':
-      specifier: ^5.1.1
-      version: 5.1.1
-    '@types/mdast':
-      specifier: ^3.0.15
-      version: 3.0.15
-    '@types/micromatch':
-      specifier: ^4.0.9
-      version: 4.0.9
-    '@types/multer':
-      specifier: ^1.4.12
-      version: 1.4.12
-    '@types/normalize-path':
-      specifier: ^3.0.2
-      version: 3.0.2
-    '@types/picomatch':
-      specifier: ^3.0.2
-      version: 3.0.2
-    '@types/prettier':
-      specifier: ^2.7.3
-      version: 2.7.3
-    '@types/progress':
-      specifier: ^2.0.7
-      version: 2.0.7
-    '@types/prompts':
-      specifier: ^2.4.9
-      version: 2.4.9
     '@types/prop-types':
       specifier: ^15.7.14
       version: 15.7.14
     '@types/react-dom':
       specifier: ^18.3.5
       version: 18.3.5
-    '@types/search-index':
-      specifier: ^3.2.4
-      version: 3.2.4
-    '@types/styled-components':
-      specifier: ^5.1.34
-      version: 5.1.36
-    '@types/tar':
-      specifier: 6.1.13
-      version: 6.1.13
-    '@types/unist':
-      specifier: ^2.0.11
-      version: 2.0.11
-    '@types/ws':
-      specifier: ^7.4.7
-      version: 7.4.7
-    '@typescript-eslint/eslint-plugin':
-      specifier: ^5.62.0
-      version: 5.62.0
-    '@typescript-eslint/parser':
-      specifier: ^5.62.0
-      version: 5.62.0
     '@udecode/cmdk':
       specifier: ^0.2.1
       version: 0.2.1
@@ -303,66 +153,15 @@ catalogs:
     '@udecode/plate-trailing-block':
       specifier: ^48.0.0
       version: 48.0.0
-    '@vercel/stega':
-      specifier: ^0.0.5
-      version: 0.0.5
-    '@vitejs/plugin-react':
-      specifier: 3.1.0
-      version: 3.1.0
-    abstract-level:
-      specifier: ^1.0.4
-      version: 1.0.4
-    acorn:
-      specifier: 8.8.2
-      version: 8.8.2
     add:
       specifier: ^2.0.6
       version: 2.0.6
-    altair-express-middleware:
-      specifier: ^7.3.6
-      version: 7.3.6
     async-lock:
       specifier: ^1.4.1
       version: 1.4.1
-    auto-bind:
-      specifier: ^4.0.0
-      version: 4.0.0
-    autoprefixer:
-      specifier: ^10.4.20
-      version: 10.4.22
-    axios:
-      specifier: 1.7.5
-      version: 1.7.5
-    body-parser:
-      specifier: ^1.20.3
-      version: 1.20.3
-    busboy:
-      specifier: ^1.6.0
-      version: 1.6.0
-    c8:
-      specifier: ^7.14.0
-      version: 7.14.0
-    ccount:
-      specifier: 2.0.1
-      version: 2.0.1
-    chalk:
-      specifier: ^5.4.1
-      version: 5.4.1
-    chokidar:
-      specifier: ^3.6.0
-      version: 3.6.0
     class-variance-authority:
       specifier: ^0.7.1
       version: 0.7.1
-    cli-spinner:
-      specifier: ^0.2.10
-      version: 0.2.10
-    clipanion:
-      specifier: ^3.2.1
-      version: 3.2.1
-    cloudinary:
-      specifier: ^1.41.3
-      version: 1.41.3
     clsx:
       specifier: ^2.1.1
       version: 2.1.1
@@ -372,30 +171,9 @@ catalogs:
     color-string:
       specifier: ^1.9.1
       version: 1.9.1
-    concat-md:
-      specifier: ^0.5.1
-      version: 0.5.1
-    cors:
-      specifier: ^2.8.5
-      version: 2.8.5
-    cross-spawn:
-      specifier: ^7.0.6
-      version: 7.0.6
     crypto-js:
       specifier: ^4.2.0
       version: 4.2.0
-    dotenv:
-      specifier: ^16.4.7
-      version: 16.4.7
-    esbuild:
-      specifier: ^0.24.2
-      version: 0.24.2
-    estree-util-is-identifier-name:
-      specifier: 2.1.0
-      version: 2.1.0
-    fast-glob:
-      specifier: ^3.3.3
-      version: 3.3.3
     final-form:
       specifier: 4.20.10
       version: 4.20.10
@@ -405,168 +183,36 @@ catalogs:
     final-form-set-field-data:
       specifier: ^1.0.2
       version: 1.0.2
-    fs-extra:
-      specifier: ^11.3.0
-      version: 11.3.0
-    glob-parent:
-      specifier: ^6.0.2
-      version: 6.0.2
-    graphiql:
-      specifier: 3.0.0-alpha.1
-      version: 3.0.0-alpha.1
     graphql-tag:
       specifier: ^2.12.6
       version: 2.12.6
-    gray-matter:
-      specifier: ^4.0.3
-      version: 4.0.3
     happy-dom:
       specifier: 15.10.2
       version: 15.10.2
-    highlight.js:
-      specifier: ^11.11.1
-      version: 11.11.1
     identity-obj-proxy:
       specifier: ^3.0.0
       version: 3.0.0
     is-hotkey:
       specifier: ^0.2.0
       version: 0.2.0
-    isomorphic-git:
-      specifier: ^1.29.0
-      version: 1.29.0
-    jest:
-      specifier: ^29.7.0
-      version: 29.7.0
-    jest-diff:
-      specifier: ^29.7.0
-      version: 29.7.0
-    jest-matcher-utils:
-      specifier: ^29.7.0
-      version: 29.7.0
-    js-base64:
-      specifier: ^3.7.7
-      version: 3.7.7
-    js-sha1:
-      specifier: ^0.6.0
-      version: 0.6.0
-    json-diff:
-      specifier: ^1.0.6
-      version: 1.0.6
-    jsonpath-plus:
-      specifier: 10.1.0
-      version: 10.1.0
     lowlight:
       specifier: ^3.3.0
       version: 3.3.0
     lucide-react:
       specifier: ^0.424.0
       version: 0.424.0
-    many-level:
-      specifier: ^2.0.0
-      version: 2.0.0
-    mdast-util-compact:
-      specifier: 4.1.1
-      version: 4.1.1
-    mdast-util-directive:
-      specifier: 2.2.4
-      version: 2.2.4
-    mdast-util-from-markdown:
-      specifier: 1.3.0
-      version: 1.3.0
-    mdast-util-gfm:
-      specifier: 2.0.2
-      version: 2.0.2
-    mdast-util-mdx-jsx:
-      specifier: 2.1.2
-      version: 2.1.2
-    mdast-util-to-markdown:
-      specifier: 1.5.0
-      version: 1.5.0
-    memory-level:
-      specifier: ^1.0.0
-      version: 1.0.0
-    micromark-extension-gfm:
-      specifier: 2.0.3
-      version: 2.0.3
-    micromark-factory-mdx-expression:
-      specifier: 1.0.7
-      version: 1.0.7
-    micromark-factory-space:
-      specifier: 1.0.0
-      version: 1.0.0
-    micromark-factory-whitespace:
-      specifier: 1.0.0
-      version: 1.0.0
-    micromark-util-character:
-      specifier: 1.1.0
-      version: 1.1.0
-    micromark-util-symbol:
-      specifier: 1.0.1
-      version: 1.0.1
-    micromark-util-types:
-      specifier: 1.0.2
-      version: 1.0.2
-    micromatch:
-      specifier: 4.0.8
-      version: 4.0.8
-    minimatch:
-      specifier: ^5.1.6
-      version: 5.1.6
     moment:
       specifier: 2.29.4
       version: 2.29.4
     monaco-editor:
       specifier: 0.31.0
       version: 0.31.0
-    multer:
-      specifier: 1.4.5-lts.1
-      version: 1.4.5-lts.1
-    next-themes:
-      specifier: ^0.3.0
-      version: 0.3.0
-    normalize-path:
-      specifier: ^3.0.0
-      version: 3.0.0
-    ora:
-      specifier: ^8.2.0
-      version: 8.2.0
-    parse-entities:
-      specifier: 4.0.1
-      version: 4.0.1
-    picomatch:
-      specifier: ^4.0.2
-      version: 4.0.2
-    picomatch-browser:
-      specifier: 2.2.6
-      version: 2.2.6
-    postcss-import:
-      specifier: ^14.1.0
-      version: 14.1.0
-    postcss-nesting:
-      specifier: ^10.2.0
-      version: 10.2.0
-    prettier:
-      specifier: ^2.8.8
-      version: 2.8.8
-    pretty-quick:
-      specifier: ^3.3.1
-      version: 3.3.1
     prism-react-renderer:
       specifier: ^2.4.1
       version: 2.4.1
-    progress:
-      specifier: ^2.0.3
-      version: 2.0.3
-    prompts:
-      specifier: ^2.4.2
-      version: 2.4.2
     prop-types:
       specifier: 15.7.2
       version: 15.7.2
-    puppeteer:
-      specifier: ^23.11.1
-      version: 23.11.1
     react-colorful:
       specifier: ^5.6.1
       version: 5.6.1
@@ -585,87 +231,12 @@ catalogs:
     react-use:
       specifier: ^17.6.0
       version: 17.6.0
-    readable-stream:
-      specifier: ^4.7.0
-      version: 4.7.0
-    remark:
-      specifier: 14.0.2
-      version: 14.0.2
-    remark-gfm:
-      specifier: ^2.0.0
-      version: 2.0.0
-    remark-mdx:
-      specifier: 2.3.0
-      version: 2.3.0
-    remove:
-      specifier: ^0.1.5
-      version: 0.1.5
-    search-index:
-      specifier: 4.0.0
-      version: 4.0.0
-    sharp:
-      specifier: ^0.33.5
-      version: 0.33.5
-    sqlite-level:
-      specifier: ^1.2.1
-      version: 1.2.1
-    stopword:
-      specifier: ^3.1.4
-      version: 3.1.4
-    stringify-entities:
-      specifier: 4.0.3
-      version: 4.0.3
-    tailwindcss-animate:
-      specifier: ^1.0.7
-      version: 1.0.7
-    tar:
-      specifier: 7.4.0
-      version: 7.4.0
-    ts-jest:
-      specifier: ^29.2.5
-      version: 29.4.5
-    ts-node:
-      specifier: ^10.9.2
-      version: 10.9.2
     tsc-alias:
       specifier: ^1.8.10
       version: 1.8.11
     tslib:
       specifier: ^2.8.1
       version: 2.8.1
-    tsup:
-      specifier: ^8.3.6
-      version: 8.4.0
-    turbo:
-      specifier: ^2.5.3
-      version: 2.5.4
-    typanion:
-      specifier: 3.13.0
-      version: 3.13.0
-    typedoc:
-      specifier: ^0.26.11
-      version: 0.26.11
-    typedoc-plugin-markdown:
-      specifier: ^3.17.1
-      version: 3.17.1
-    unist-util-source:
-      specifier: 4.0.2
-      version: 4.0.2
-    unist-util-stringify-position:
-      specifier: 3.0.3
-      version: 3.0.3
-    unist-util-visit:
-      specifier: 4.1.2
-      version: 4.1.2
-    url-pattern:
-      specifier: ^1.0.3
-      version: 1.0.3
-    uvu:
-      specifier: 0.5.6
-      version: 0.5.6
-    vfile-message:
-      specifier: 3.1.4
-      version: 3.1.4
     webfontloader:
       specifier: 1.6.28
       version: 1.6.28
@@ -2420,7 +1991,7 @@ importers:
         version: 3.3.0
       next:
         specifier: 14.2.35
-        version: 14.2.35(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2)
+        version: 14.2.35(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2)
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -12661,7 +12232,7 @@ packages:
   puppeteer@23.11.1:
     resolution: {integrity: sha512-53uIX3KR5en8l7Vd8n5DUv90Ae9QDQsyIthaUFVzwV6yU750RjqRznEtNMBT20VthqAdemnJN+hxVdmMHKt7Zw==}
     engines: {node: '>=18'}
-    deprecated: < 24.10.2 is no longer supported
+    deprecated: < 24.15.0 is no longer supported
     hasBin: true
 
   pure-rand@6.1.0:
@@ -14512,6 +14083,7 @@ packages:
   whatwg-encoding@2.0.0:
     resolution: {integrity: sha512-p41ogyeMUrw3jWclHWTQg1k05DSVXPLcVxRTYsXUk+ZooOCZLcoYgPZ/HL/D/N+uQPOtcp1me1WhBEaX02mhWg==}
     engines: {node: '>=12'}
+    deprecated: Use @exodus/bytes instead for a more spec-conformant and faster implementation
 
   whatwg-mimetype@3.0.0:
     resolution: {integrity: sha512-nt+N2dzIutVRxARx1nghPKGv1xHikU7HKdfafKkLNLindmPU/ch3U31NOCGGA/dmPcmb1VlofO0vnKAcsm0o/Q==}
@@ -20985,7 +20557,7 @@ snapshots:
   '@types/react@18.3.26':
     dependencies:
       '@types/prop-types': 15.7.14
-      csstype: 3.1.3
+      csstype: 3.2.3
 
   '@types/search-index@3.2.4':
     dependencies:
@@ -21779,7 +21351,7 @@ snapshots:
 
   acorn-walk@8.3.4:
     dependencies:
-      acorn: 8.14.0
+      acorn: 8.15.0
 
   acorn@7.4.1: {}
 
@@ -23671,7 +23243,7 @@ snapshots:
       eslint: 8.24.0
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.31.0(eslint@8.24.0))(eslint@8.24.0)
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.24.0)(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.31.0(eslint@8.24.0))(eslint@8.24.0))(eslint@8.24.0)
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.24.0)(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@8.24.0)
       eslint-plugin-jsx-a11y: 6.10.2(eslint@8.24.0)
       eslint-plugin-react: 7.37.4(eslint@8.24.0)
       eslint-plugin-react-hooks: 4.6.2(eslint@8.24.0)
@@ -23690,7 +23262,7 @@ snapshots:
       '@typescript-eslint/parser': 8.48.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
       eslint: 9.39.1(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.31.0)(eslint@9.39.1(jiti@2.6.1))
+      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.48.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))
       eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.48.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.1(jiti@2.6.1))
       eslint-plugin-jsx-a11y: 6.10.2(eslint@9.39.1(jiti@2.6.1))
       eslint-plugin-react: 7.37.4(eslint@9.39.1(jiti@2.6.1))
@@ -23722,22 +23294,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.31.0(eslint@8.24.0))(eslint@8.24.0):
-    dependencies:
-      '@nolyfill/is-core-module': 1.0.39
-      debug: 4.4.0
-      eslint: 8.24.0
-      get-tsconfig: 4.13.0
-      is-bun-module: 2.0.0
-      stable-hash: 0.0.5
-      tinyglobby: 0.2.15
-      unrs-resolver: 1.11.1
-    optionalDependencies:
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.24.0)(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.31.0(eslint@8.24.0))(eslint@8.24.0))(eslint@8.24.0)
-    transitivePeerDependencies:
-      - supports-color
-
-  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.31.0)(eslint@9.39.1(jiti@2.6.1)):
+  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.48.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1)):
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
       debug: 4.4.0
@@ -23749,6 +23306,21 @@ snapshots:
       unrs-resolver: 1.11.1
     optionalDependencies:
       eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.48.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.1(jiti@2.6.1))
+    transitivePeerDependencies:
+      - supports-color
+
+  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.31.0(eslint@8.24.0))(eslint@8.24.0):
+    dependencies:
+      '@nolyfill/is-core-module': 1.0.39
+      debug: 4.4.0
+      eslint: 8.24.0
+      get-tsconfig: 4.13.0
+      is-bun-module: 2.0.0
+      stable-hash: 0.0.5
+      tinyglobby: 0.2.15
+      unrs-resolver: 1.11.1
+    optionalDependencies:
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.24.0)(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@8.24.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -23774,14 +23346,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.48.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.1(jiti@2.6.1)):
+  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.48.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.48.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1)):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
       '@typescript-eslint/parser': 8.48.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
       eslint: 9.39.1(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.31.0)(eslint@9.39.1(jiti@2.6.1))
+      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.48.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))
     transitivePeerDependencies:
       - supports-color
 
@@ -23814,7 +23386,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-plugin-import@2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.24.0)(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.31.0(eslint@8.24.0))(eslint@8.24.0))(eslint@8.24.0):
+  eslint-plugin-import@2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.24.0)(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@8.24.0):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.8
@@ -23854,7 +23426,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.39.1(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.48.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.1(jiti@2.6.1))
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.48.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.48.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
@@ -27610,7 +27182,7 @@ snapshots:
       postcss: 8.4.31
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      styled-jsx: 5.1.1(@babel/core@7.28.5)(babel-plugin-macros@3.1.0)(react@18.3.1)
+      styled-jsx: 5.1.1(react@18.3.1)
     optionalDependencies:
       '@next/swc-darwin-arm64': 14.2.33
       '@next/swc-darwin-x64': 14.2.33
@@ -29413,6 +28985,11 @@ snapshots:
     optionalDependencies:
       '@babel/core': 7.28.5
       babel-plugin-macros: 3.1.0
+
+  styled-jsx@5.1.1(react@18.3.1):
+    dependencies:
+      client-only: 0.0.1
+      react: 18.3.1
 
   stylis@4.1.3: {}
 

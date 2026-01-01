@@ -1,11 +1,17 @@
-import React, { type ComponentType, type SVGProps } from 'react';
+'use client';
 
+import React, { useMemo } from 'react';
 import { withRef } from '@udecode/cn';
-import { type PlateEditor, PlateElement } from '@udecode/plate/react';
+import {
+  PlateElement,
+  useEditorRef,
+  type PlateEditor,
+} from '@udecode/plate/react';
 import { HEADING_KEYS } from '@udecode/plate-heading';
+import { BulletedListPlugin, NumberedListPlugin } from '@udecode/plate-list/react';
+import { toggleList } from '@udecode/plate-list';
 
 import { Icons } from './icons';
-
 import {
   InlineCombobox,
   InlineComboboxContent,
@@ -13,96 +19,79 @@ import {
   InlineComboboxInput,
   InlineComboboxItem,
 } from './inline-combobox';
-import {
-  BulletedListPlugin,
-  NumberedListPlugin,
-} from '@udecode/plate-list/react';
-import { toggleList } from '@udecode/plate-list';
-import { useSlashCommands } from '../../toolbar/slash-commands';
 
-interface SlashCommandRule {
-  icon: ComponentType<SVGProps<SVGSVGElement>>;
-  onSelect: (editor: PlateEditor) => void;
-  value: string;
-  keywords?: string[];
-}
+import { useToolbarContext, type SlashCommandRule } from '../../toolbar/toolbar-provider';
 
 const builtInRules: SlashCommandRule[] = [
   {
-    icon: Icons.h1,
-    onSelect: (editor) => {
-      editor.tf.toggleBlock(HEADING_KEYS.h1);
-    },
+    icon: Icons.h1 as any,
     value: 'Heading 1',
+    onSelect: (editor) => editor.tf.toggleBlock(HEADING_KEYS.h1),
   },
   {
-    icon: Icons.h2,
-    onSelect: (editor) => {
-      editor.tf.toggleBlock(HEADING_KEYS.h2);
-    },
+    icon: Icons.h2 as any,
     value: 'Heading 2',
+    onSelect: (editor) => editor.tf.toggleBlock(HEADING_KEYS.h2),
   },
   {
-    icon: Icons.h3,
-    onSelect: (editor) => {
-      editor.tf.toggleBlock(HEADING_KEYS.h3);
-    },
+    icon: Icons.h3 as any,
     value: 'Heading 3',
+    onSelect: (editor) => editor.tf.toggleBlock(HEADING_KEYS.h3),
   },
   {
-    icon: Icons.ul,
-    keywords: ['ul', 'unordered list'],
-    onSelect: (editor) => {
-      toggleList(editor, { type: BulletedListPlugin.key });
-    },
+    icon: Icons.ul as any,
     value: 'Bulleted list',
+    onSelect: (editor) => toggleList(editor, { type: BulletedListPlugin.key }),
   },
   {
-    icon: Icons.ol,
-    keywords: ['ol', 'ordered list'],
-    onSelect: (editor) => {
-      toggleList(editor, { type: NumberedListPlugin.key });
-    },
+    icon: Icons.ol as any,
     value: 'Numbered list',
+    onSelect: (editor) => toggleList(editor, { type: NumberedListPlugin.key }),
   },
 ];
 
-export const SlashInputElement = withRef<typeof PlateElement>(
-  ({ className, ...props }, ref) => {
-    const { children, editor, element } = props;
-    const templateRules = useSlashCommands();
-    const rules = [...builtInRules, ...templateRules]
-    return (
-      <PlateElement
-        as='span'
-        data-slate-value={element.value}
-        ref={ref}
-        {...props}
-      >
-        <InlineCombobox element={element} trigger='/'>
-          <InlineComboboxInput />
+export const SlashInputElement = withRef<typeof PlateElement>((props, ref) => {
+  const { children, element } = props;
 
-          <InlineComboboxContent>
-            <InlineComboboxEmpty>
-              No matching commands found
-            </InlineComboboxEmpty>
+  const editor = useEditorRef() as PlateEditor;
 
-            {rules.map(({ icon: Icon, keywords, onSelect, value }) => (
+  const { slashRules } = useToolbarContext();
+
+  const rules = useMemo(() => {
+    const extra = Array.isArray(slashRules) ? slashRules : [];
+    return [...builtInRules, ...extra];
+  }, [slashRules]);
+
+  return (
+    <PlateElement as="span" ref={ref} data-slate-value={(element as any).value} {...props}>
+      <InlineCombobox element={element as any} trigger="/">
+        <InlineComboboxInput />
+
+        <InlineComboboxContent>
+          <InlineComboboxEmpty>No matching commands found</InlineComboboxEmpty>
+
+          {rules.map(({ icon: Icon, onSelect, value }) => {
+            const FinalIcon = (Icon ?? (Icons.add as any)) as any;
+
+            return (
               <InlineComboboxItem
                 key={value}
-                keywords={keywords}
-                onClick={() => onSelect(editor)}
                 value={value}
+                onMouseDown={(e: any) => e.preventDefault()}
+                onClick={(e: any) => {
+                  e.preventDefault();
+                  onSelect(editor);
+                }}
               >
-                <Icon aria-hidden className='mr-2 size-4' />
+                <FinalIcon aria-hidden className="mr-2 size-4" />
                 {value}
               </InlineComboboxItem>
-            ))}
-          </InlineComboboxContent>
-        </InlineCombobox>
+            );
+          })}
+        </InlineComboboxContent>
+      </InlineCombobox>
 
-        {children}
-      </PlateElement>
-    );
-  }
-);
+      {children}
+    </PlateElement>
+  );
+});
