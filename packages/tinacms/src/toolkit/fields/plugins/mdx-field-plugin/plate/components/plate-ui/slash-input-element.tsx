@@ -1,5 +1,3 @@
-'use client';
-
 import React, { ComponentType, SVGProps, useMemo } from 'react';
 import { withRef } from '@udecode/cn';
 import {
