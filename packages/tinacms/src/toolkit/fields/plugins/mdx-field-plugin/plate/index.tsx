@@ -12,7 +12,7 @@ import { FixedToolbar } from './components/plate-ui/fixed-toolbar';
 import { TooltipProvider } from './components/plate-ui/tooltip';
 import FixedToolbarButtons from './components/fixed-toolbar-buttons';
 
-import { ToolbarProvider, type SlashCommandRule } from './toolbar/toolbar-provider';
+import { ToolbarProvider } from './toolbar/toolbar-provider';
 
 import { useCreateEditor } from './hooks/use-create-editor';
 import { editorPlugins } from './plugins/editor-plugins';
@@ -39,6 +39,7 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
     }
   }, []);
 
+  //TODO try with a wrapper?
   const editor = useCreateEditor({
     plugins: [...editorPlugins],
     value: initialValue,
@@ -62,15 +63,19 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
       }));
   }, [templates]);
 
+  // This should be a plugin customization
   const ref = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     if (!ref.current) return;
     setTimeout(() => {
+      // Slate/Plate doesn't expose it's underlying element
+      // as a ref, so we need to query for it ourselves
       const plateElement = ref.current?.querySelector(
         '[role="textbox"]'
       ) as HTMLElement;
       if ((field as any).focusIntent && plateElement) plateElement.focus();
+      // Slate takes a second to mount
     }, 100);
   }, [(field as any).focusIntent, ref]);
 
@@ -79,6 +84,8 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
       <Plate
         editor={editor}
         onChange={(value) => {
+          // Normalize links in code blocks before saving (we dont want type: 'a' inside code blocks, this will break the mdx parser)
+          // Ideal Solution: let code block provider to have a option for exclude certain plugins
           const normalized = (value.value as any[]).map(
             normalizeLinksInCodeBlocks
           );
@@ -93,7 +100,7 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
           <TooltipProvider>
             <ToolbarProvider
               tinaForm={tinaForm}
-              templates={templates as any}
+              templates={templates}
               overrides={
                 field?.toolbarOverride
                   ? field.toolbarOverride

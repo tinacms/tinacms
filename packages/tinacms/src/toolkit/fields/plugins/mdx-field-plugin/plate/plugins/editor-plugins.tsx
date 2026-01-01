@@ -57,6 +57,7 @@ import {
 } from '@udecode/plate-code-block';
 import { unwrapList } from '@udecode/plate-list';
 // @ts-ignore
+// NOTE: Linter complains about ESM import here, as per conversation with Jeff it will be fine at build time—ignore this linting error for now.
 import { all, createLowlight } from 'lowlight';
 
 import { autoformatBlocks } from './core/autoformat/autoformat-block';
@@ -120,6 +121,7 @@ export const editorPlugins = [
   CorrectNodeBehaviorPlugin,
   LinkPlugin.configure({
     options: {
+      // Custom validation function to allow relative links, e.g., /about
       isUrl: (url) => isUrl(url),
     },
     render: { afterEditable: () => <LinkFloatingToolbar /> },
@@ -144,7 +146,8 @@ export const editorPlugins = [
   }),
   SlashInputPlugin.withComponent(SlashInputElement),
 
-  TrailingBlockPlugin,
+  // This lets users keep typing after end of marks like headings or quotes
+  TrailingBlockPlugin, //makes sure there's always a blank paragraph at the end of the editor.
   createBreakPlugin,
   FloatingToolbarPlugin,
 
@@ -172,6 +175,7 @@ export const editorPlugins = [
     },
   }),
 
+  // ExitBreakPlugin lets users "break out" of a block (like a heading)
   ExitBreakPlugin.configure({
     options: {
       rules: [
@@ -185,6 +189,7 @@ export const editorPlugins = [
     },
   }),
 
+  // ResetNodePlugin lets users turn a heading back into a paragraph by pressing Enter (when empty) or Backspace (at the start).
   ResetNodePlugin.configure({
     options: {
       rules: [
@@ -197,7 +202,9 @@ export const editorPlugins = [
         {
           ...resetBlockTypesCommonRule,
           hotkey: 'Backspace',
-          predicate: (editor) => editor.api.isAt({ start: true }),
+          predicate: (editor) => {
+           return editor.api.isAt({ start: true });
+          }
         },
         {
           ...resetBlockTypesCodeBlockRule,
@@ -209,6 +216,10 @@ export const editorPlugins = [
           hotkey: 'Backspace',
           predicate: isSelectionAtCodeBlockStart,
         },
+        // NOTE: Plate's ListPlugin usually handles resetting lists to paragraphs when pressing Backspace at the start of a list item.
+        // However, if the list is the first node in the editor, the default reset behavior may not fully unwrap the list item,
+        // which can leave an invalid structure (like a <li> inside a <p>).
+        // This rule uses `onReset: unwrapList` to ensure lists are always properly reset to paragraphs, even when they are the first node.
         {
           types: [BulletedListPlugin.key, NumberedListPlugin.key],
           defaultType: ParagraphPlugin.key,
@@ -226,7 +237,9 @@ export const editorPlugins = [
         { hotkey: 'shift+enter' },
         {
           hotkey: 'enter',
-          query: { allow: [CodeBlockPlugin.key, BlockquotePlugin.key] },
+          query: {
+            allow: [CodeBlockPlugin.key, BlockquotePlugin.key],
+          },
         },
       ],
     },

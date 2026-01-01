@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { ComponentType, SVGProps, useMemo } from 'react';
 import { withRef } from '@udecode/cn';
 import {
   PlateElement,
@@ -20,33 +20,52 @@ import {
   InlineComboboxItem,
 } from './inline-combobox';
 
-import { useToolbarContext, type SlashCommandRule } from '../../toolbar/toolbar-provider';
+import { useToolbarContext } from '../../toolbar/toolbar-provider';
+
+export interface SlashCommandRule {
+  icon?: ComponentType<SVGProps<SVGSVGElement>>;
+  onSelect: (editor: PlateEditor) => void;
+  value: string;
+  keywords?: string[];
+}
 
 const builtInRules: SlashCommandRule[] = [
   {
     icon: Icons.h1 as any,
+    onSelect: (editor) => {
+      editor.tf.toggleBlock(HEADING_KEYS.h1);
+    },
     value: 'Heading 1',
-    onSelect: (editor) => editor.tf.toggleBlock(HEADING_KEYS.h1),
   },
   {
     icon: Icons.h2 as any,
+    onSelect: (editor) => {
+      editor.tf.toggleBlock(HEADING_KEYS.h2);
+    },
     value: 'Heading 2',
-    onSelect: (editor) => editor.tf.toggleBlock(HEADING_KEYS.h2),
   },
   {
     icon: Icons.h3 as any,
+    onSelect: (editor) => {
+      editor.tf.toggleBlock(HEADING_KEYS.h3);
+    },
     value: 'Heading 3',
-    onSelect: (editor) => editor.tf.toggleBlock(HEADING_KEYS.h3),
   },
   {
     icon: Icons.ul as any,
+    keywords: ['ul', 'unordered list'],
+    onSelect: (editor) => {
+      toggleList(editor, { type: BulletedListPlugin.key });
+    },
     value: 'Bulleted list',
-    onSelect: (editor) => toggleList(editor, { type: BulletedListPlugin.key }),
   },
   {
     icon: Icons.ol as any,
+    keywords: ['ol', 'ordered list'],
+    onSelect: (editor) => {
+      toggleList(editor, { type: NumberedListPlugin.key });
+    },
     value: 'Numbered list',
-    onSelect: (editor) => toggleList(editor, { type: NumberedListPlugin.key }),
   },
 ];
 
@@ -63,8 +82,8 @@ export const SlashInputElement = withRef<typeof PlateElement>((props, ref) => {
   }, [slashRules]);
 
   return (
-    <PlateElement as="span" ref={ref} data-slate-value={(element as any).value} {...props}>
-      <InlineCombobox element={element as any} trigger="/">
+    <PlateElement as='span' ref={ref} data-slate-value={(element as any).value} {...props}>
+      <InlineCombobox element={element as any} trigger='/'>
         <InlineComboboxInput />
 
         <InlineComboboxContent>
@@ -83,7 +102,7 @@ export const SlashInputElement = withRef<typeof PlateElement>((props, ref) => {
                   onSelect(editor);
                 }}
               >
-                <FinalIcon aria-hidden className="mr-2 size-4" />
+                <FinalIcon aria-hidden className='mr-2 size-4' />
                 {value}
               </InlineComboboxItem>
             );

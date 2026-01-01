@@ -9,14 +9,12 @@ import React, {
 } from 'react';
 import type { Form } from '@toolkit/forms';
 import type { MdxTemplate } from '../types';
-import type { ToolbarOverrides, ToolbarOverrideType } from './toolbar-overrides';
+import type { 
+  ToolbarOverrides,
+  ToolbarOverrideType 
+} from './toolbar-overrides';
 import type { PlateEditor } from '@udecode/plate/react';
-
-export interface SlashCommandRule {
-  value: string;
-  icon?: ComponentType<SVGProps<SVGSVGElement>>;
-  onSelect: (editor: PlateEditor) => void;
-}
+import { SlashCommandRule } from '../components/plate-ui/slash-input-element';
 
 interface ToolbarContextProps {
   tinaForm: Form;
@@ -30,7 +28,9 @@ interface ToolbarProviderProps extends ToolbarContextProps {
   children: ReactNode;
 }
 
-const ToolbarContext = createContext<ToolbarContextProps | undefined>(undefined);
+const ToolbarContext = createContext<ToolbarContextProps | undefined>(
+  undefined
+);
 
 export const ToolbarProvider: React.FC<ToolbarProviderProps> = ({
   tinaForm,
@@ -40,9 +40,7 @@ export const ToolbarProvider: React.FC<ToolbarProviderProps> = ({
   children,
 }) => {
   return (
-    <ToolbarContext.Provider
-      value={{ tinaForm, templates, overrides, slashRules }}
-    >
+    <ToolbarContext.Provider value={{ tinaForm, templates, overrides, slashRules }}>
       {children}
     </ToolbarContext.Provider>
   );
