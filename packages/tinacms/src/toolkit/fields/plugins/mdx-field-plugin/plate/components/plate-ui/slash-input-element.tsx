@@ -18,6 +18,7 @@ import {
   NumberedListPlugin,
 } from '@udecode/plate-list/react';
 import { toggleList } from '@udecode/plate-list';
+import { useSlashCommands } from '../../toolbar/slash-commands';
 
 interface SlashCommandRule {
   icon: ComponentType<SVGProps<SVGSVGElement>>;
@@ -26,7 +27,7 @@ interface SlashCommandRule {
   keywords?: string[];
 }
 
-const rules: SlashCommandRule[] = [
+const builtInRules: SlashCommandRule[] = [
   {
     icon: Icons.h1,
     onSelect: (editor) => {
@@ -69,7 +70,8 @@ const rules: SlashCommandRule[] = [
 export const SlashInputElement = withRef<typeof PlateElement>(
   ({ className, ...props }, ref) => {
     const { children, editor, element } = props;
-
+    const templateRules = useSlashCommands();
+    const rules = [...builtInRules, ...templateRules]
     return (
       <PlateElement
         as='span'

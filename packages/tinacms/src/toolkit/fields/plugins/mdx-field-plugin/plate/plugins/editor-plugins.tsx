@@ -21,7 +21,8 @@ import {
 } from '@udecode/plate-list/react';
 import { NodeIdPlugin } from '@udecode/plate-node-id';
 import { ResetNodePlugin } from '@udecode/plate-reset-node/react';
-import { SlashPlugin } from '@udecode/plate-slash-command/react';
+import { SlashInputPlugin, SlashPlugin } from '@udecode/plate-slash-command/react';
+import { SlashInputElement } from '../components/plate-ui/slash-input-element';
 import { TablePlugin } from '@udecode/plate-table/react';
 import { TrailingBlockPlugin } from '@udecode/plate-trailing-block';
 import { ParagraphPlugin } from '@udecode/plate/react';
@@ -126,7 +127,17 @@ export const editorPlugins = [
   HorizontalRulePlugin,
   NodeIdPlugin,
   TablePlugin,
-  SlashPlugin,
+  SlashPlugin.configure({
+    options: {
+      trigger: '/',
+      triggerPreviousCharPattern: /^\s?$/,
+      triggerQuery: (editor) =>
+        !editor.api.some({
+          match: { type: editor.getType(CodeBlockPlugin) },
+        }),
+    },
+  }),
+  SlashInputPlugin.withComponent(SlashInputElement),
   // This lets users keep typing after end of marks like headings or quotes
   TrailingBlockPlugin, //makes sure there's always a blank paragraph at the end of the editor.
   createBreakPlugin,
