@@ -5,6 +5,6 @@ export type MdxTemplate = {
   key: string;
   inline?: boolean;
   name: string;
-  defaultItem?: {};
+  defaultItem?: Record<string, unknown>;
   fields: Field[];
 };

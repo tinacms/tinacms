@@ -21,13 +21,19 @@ import {
 } from '@udecode/plate-list/react';
 import { NodeIdPlugin } from '@udecode/plate-node-id';
 import { ResetNodePlugin } from '@udecode/plate-reset-node/react';
-import { SlashPlugin } from '@udecode/plate-slash-command/react';
+import {
+  SlashInputPlugin,
+  SlashPlugin,
+} from '@udecode/plate-slash-command/react';
 import { TablePlugin } from '@udecode/plate-table/react';
 import { TrailingBlockPlugin } from '@udecode/plate-trailing-block';
 import { ParagraphPlugin } from '@udecode/plate/react';
 import React from 'react';
+
+import { SlashInputElement } from '../components/plate-ui/slash-input-element';
 import { LinkFloatingToolbar } from '../components/plate-ui/link-floating-toolbar';
 import { isUrl } from '../transforms/is-url';
+
 import createImgPlugin from './create-img-plugin';
 import { createInvalidMarkdownPlugin } from './create-invalid-markdown-plugin';
 import {
@@ -35,12 +41,13 @@ import {
   createMdxInlinePlugin,
 } from './create-mdx-plugins';
 import { FloatingToolbarPlugin } from './ui/floating-toolbar-plugin';
+
 import {
   autoformatArrow,
   autoformatLegal,
   autoformatMath,
   autoformatPunctuation,
-  AutoformatRule,
+  type AutoformatRule,
   autoformatSmartQuotes,
 } from '@udecode/plate-autoformat';
 import {
@@ -48,11 +55,11 @@ import {
   isSelectionAtCodeBlockStart,
   unwrapCodeBlock,
 } from '@udecode/plate-code-block';
-import { ListStyleType } from '@udecode/plate-indent-list';
 import { unwrapList } from '@udecode/plate-list';
 // @ts-ignore
 // NOTE: Linter complains about ESM import here, as per conversation with Jeff it will be fine at build time—ignore this linting error for now.
 import { all, createLowlight } from 'lowlight';
+
 import { autoformatBlocks } from './core/autoformat/autoformat-block';
 import { autoformatLists } from './core/autoformat/autoformat-lists';
 import { autoformatMarks } from './core/autoformat/autoformat-marks';
@@ -126,7 +133,19 @@ export const editorPlugins = [
   HorizontalRulePlugin,
   NodeIdPlugin,
   TablePlugin,
-  SlashPlugin,
+
+  SlashPlugin.configure({
+    options: {
+      trigger: '/',
+      triggerPreviousCharPattern: /^\s?$/,
+      triggerQuery: (editor) =>
+        !editor.api.some({
+          match: { type: editor.getType(CodeBlockPlugin) },
+        }),
+    },
+  }),
+  SlashInputPlugin.withComponent(SlashInputElement),
+
   // This lets users keep typing after end of marks like headings or quotes
   TrailingBlockPlugin, //makes sure there's always a blank paragraph at the end of the editor.
   createBreakPlugin,
@@ -160,24 +179,16 @@ export const editorPlugins = [
   ExitBreakPlugin.configure({
     options: {
       rules: [
-        {
-          hotkey: 'mod+enter',
-        },
-        {
-          hotkey: 'mod+shift+enter',
-          before: true,
-        },
+        { hotkey: 'mod+enter' },
+        { hotkey: 'mod+shift+enter', before: true },
         {
           hotkey: 'enter',
-          query: {
-            start: true,
-            end: true,
-            allow: HEADING_LEVELS,
-          },
+          query: { start: true, end: true, allow: HEADING_LEVELS },
         },
       ],
     },
   }),
+
   // ResetNodePlugin lets users turn a heading back into a paragraph by pressing Enter (when empty) or Backspace (at the start).
   ResetNodePlugin.configure({
     options: {
@@ -192,8 +203,8 @@ export const editorPlugins = [
           ...resetBlockTypesCommonRule,
           hotkey: 'Backspace',
           predicate: (editor) => {
-            return editor.api.isAt({ start: true });
-          },
+           return editor.api.isAt({ start: true });
+          }
         },
         {
           ...resetBlockTypesCodeBlockRule,
@@ -219,6 +230,7 @@ export const editorPlugins = [
       ],
     },
   }),
+
   SoftBreakPlugin.configure({
     options: {
       rules: [
