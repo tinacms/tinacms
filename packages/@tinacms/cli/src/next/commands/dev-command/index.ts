@@ -246,11 +246,12 @@ export class DevCommand extends BaseCommand {
       );
     }
 
+    const browserApiURL = urlBase ? `${urlBase}/graphql` : apiURL;
     const server = await createDevServer(
       configManager,
       database,
       searchIndexClient.searchIndex,
-      apiURL,
+      browserApiURL,
       this.noWatch,
       dbLock,
       bindHost
