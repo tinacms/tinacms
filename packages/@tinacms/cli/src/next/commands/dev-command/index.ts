@@ -73,11 +73,24 @@ export class DevCommand extends BaseCommand {
       return this.indexingLock.acquire('Key', fn);
     };
 
-    const bindHost = this.host === true ? '0.0.0.0' : this.host || undefined;
-    const urlHost = typeof this.host === 'string' ? this.host : undefined;
+    let externalUrl: URL | undefined;
+    if (typeof this.host === 'string' && this.host.startsWith('http')) {
+      try {
+        externalUrl = new URL(this.host);
+      } catch {
+        logger.error(`Invalid URL provided to --host: ${this.host}`);
+        process.exit(1);
+      }
+    }
+
+    const bindHost = this.host ? '0.0.0.0' : undefined;
+    const urlBase = externalUrl ? externalUrl.origin : undefined;
 
     if (bindHost) {
-      logger.info(`Binding to host: ${bindHost}`);
+      logger.info(`Binding to: ${bindHost}`);
+    }
+    if (externalUrl) {
+      logger.info(`External URL: ${externalUrl.origin}`);
     }
 
     const setup = async ({ firstTime }: { firstTime: boolean }) => {
@@ -99,7 +112,7 @@ export class DevCommand extends BaseCommand {
           isLocal: true,
           configManager: configManager,
           port: Number(this.port),
-          host: urlHost,
+          baseUrl: urlBase,
           queryDoc,
           fragDoc,
           graphqlSchemaDoc: graphQLSchema,
@@ -183,7 +196,7 @@ export class DevCommand extends BaseCommand {
 
     await fs.outputFile(
       configManager.outputHTMLFilePath,
-      devHTML(this.port, urlHost)
+      devHTML(this.port, urlBase)
     );
     // Add the gitignore so the index.html and assets are committed to git
     await fs.outputFile(

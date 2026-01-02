@@ -43,8 +43,8 @@ const errorHTML = `<style type="text/css">
   .trim()
   .replace(/[\r\n\s]+/g, ' ');
 
-export const devHTML = (port: string, host?: string) => {
-  const devHost = host || 'localhost';
+export const devHTML = (port: string, baseUrl?: string) => {
+  const devBaseUrl = baseUrl || `http://localhost:${port}`;
   return `<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -55,13 +55,13 @@ export const devHTML = (port: string, host?: string) => {
 
   <!-- if development -->
   <script type="module">
-    import RefreshRuntime from 'http://${devHost}:${port}/@react-refresh'
+    import RefreshRuntime from '${devBaseUrl}/@react-refresh'
     RefreshRuntime.injectIntoGlobalHook(window)
     window.$RefreshReg$ = () => {}
     window.$RefreshSig$ = () => (type) => type
     window.__vite_plugin_react_preamble_installed__ = true
   </script>
-  <script type="module" src="http://${devHost}:${port}/@vite/client"></script>
+  <script type="module" src="${devBaseUrl}/@vite/client"></script>
   <script>
   function handleLoadError() {
     // Assets have failed to load
@@ -70,7 +70,7 @@ export const devHTML = (port: string, host?: string) => {
   </script>
   <script
     type="module"
-    src="http://${devHost}:${port}/src/main.tsx"
+    src="${devBaseUrl}/src/main.tsx"
     onerror="handleLoadError()"
   ></script>
   <body class="tina-tailwind">

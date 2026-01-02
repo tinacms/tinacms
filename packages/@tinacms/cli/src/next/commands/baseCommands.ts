@@ -36,7 +36,7 @@ export abstract class BaseCommand extends Command {
   });
   host = Option.String('--host', {
     description:
-      'Bind the server to all network interfaces (0.0.0.0). Useful for Docker containers. Optionally specify a custom host address.',
+      'Bind to all network interfaces for Docker. Pass a URL (e.g. http://localhost:55077) to specify the external address browsers will use.',
     tolerateBoolean: true,
   });
   subCommand = Option.String('-c,--command', {
