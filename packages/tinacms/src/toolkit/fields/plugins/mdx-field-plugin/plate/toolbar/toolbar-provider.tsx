@@ -1,27 +1,27 @@
-'use client'
+'use client';
 
-import React, { createContext, useContext, type ReactNode } from 'react'
-import type { Form } from '@toolkit/forms'
-import type { MdxTemplate } from '../types'
+import React, { createContext, useContext, type ReactNode } from 'react';
+import type { Form } from '@toolkit/forms';
+import type { MdxTemplate } from '../types';
 import type {
   ToolbarOverrides,
   ToolbarOverrideType,
-} from './toolbar-overrides'
-import { SlashCommandRule } from '../components/plate-ui/slash-input-element'
+} from './toolbar-overrides';
+import { SlashCommandRule } from '../components/plate-ui/slash-input-element';
 
 interface ToolbarContextProps {
-  tinaForm: Form
-  templates: MdxTemplate[]
-  overrides?: ToolbarOverrideType[] | ToolbarOverrides
+  tinaForm: Form;
+  templates: MdxTemplate[];
+  overrides?: ToolbarOverrideType[] | ToolbarOverrides;
 
-  slashRules?: SlashCommandRule[]
+  slashRules?: SlashCommandRule[];
 }
 
 interface ToolbarProviderProps extends ToolbarContextProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
-const ToolbarContext = createContext<ToolbarContextProps | undefined>(undefined)
+const ToolbarContext = createContext<ToolbarContextProps | undefined>(undefined);
 
 export const ToolbarProvider: React.FC<ToolbarProviderProps> = ({
   tinaForm,
@@ -36,13 +36,13 @@ export const ToolbarProvider: React.FC<ToolbarProviderProps> = ({
     >
       {children}
     </ToolbarContext.Provider>
-  )
-}
+  );
+};
 
 export const useToolbarContext = (): ToolbarContextProps => {
-  const context = useContext(ToolbarContext)
+  const context = useContext(ToolbarContext);
   if (!context) {
-    throw new Error('useToolbarContext must be used within a ToolbarProvider')
+    throw new Error('useToolbarContext must be used within a ToolbarProvider');
   }
-  return context
-}
+  return context;
+};
