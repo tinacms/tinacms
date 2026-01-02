@@ -6,7 +6,7 @@ import type { Field } from '@toolkit/forms';
 import { TElement } from '@udecode/plate';
 
 /**
- * Slate-style "path" helpers without adding dependency on slate.
+ * Slate-style 'path' helpers without adding dependency on slate.
  * A Path is a number[] like [0, 1, 2]. nextPath([0, 2]) => [0, 3]
  */
 type Path = number[];
