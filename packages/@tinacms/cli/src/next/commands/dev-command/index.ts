@@ -112,7 +112,6 @@ export class DevCommand extends BaseCommand {
           isLocal: true,
           configManager: configManager,
           port: Number(this.port),
-          baseUrl: urlBase,
           queryDoc,
           fragDoc,
           graphqlSchemaDoc: graphQLSchema,
