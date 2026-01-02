@@ -1,10 +1,22 @@
-import type { SearchClient } from '../types';
-// default import + destructuring because `sqlite-level` still exposes CJS-style exports.
-import sqliteLevel from 'sqlite-level';
-const { SqliteLevel } = sqliteLevel;
-import si from 'search-index';
+import type {
+  SearchClient,
+  SearchOptions,
+  SearchQueryResponse,
+  IndexableDocument,
+  SearchIndex,
+} from '../types';
+// TODO: Update to use named import once https://github.com/tinacms/sqlite-level/pull/24 is merged and released
+// Use namespace import because `sqlite-level` is a CJS module and esbuild
+// rewrites default imports in ways that break ESM named-export resolution.
+import * as sqliteLevelModule from 'sqlite-level';
+const SqliteLevel =
+  (sqliteLevelModule as any).default?.SqliteLevel ??
+  (sqliteLevelModule as any).SqliteLevel;
+import createSearchIndex from 'search-index';
 import { MemoryLevel } from 'memory-level';
 import { lookupStopwords } from '../indexer/utils';
+import { FuzzySearchWrapper } from '../fuzzy-search-wrapper';
+import { buildPageOptions, buildPaginationCursors } from '../pagination';
 import * as zlib from 'node:zlib';
 
 const DEFAULT_TOKEN_SPLIT_REGEX = /[\p{L}\d_]+/gu;
@@ -21,10 +33,12 @@ type TinaCloudSearchIndexerClientOptions = {
 } & TinaSearchIndexerClientOptions;
 
 export class LocalSearchIndexClient implements SearchClient {
-  public searchIndex: any;
+  public searchIndex?: SearchIndex;
   protected readonly memoryLevel: MemoryLevel;
   private readonly stopwords: string[];
   private readonly tokenSplitRegex: RegExp;
+  public fuzzySearchWrapper?: FuzzySearchWrapper;
+
   constructor(options: TinaSearchIndexerClientOptions) {
     this.memoryLevel = new MemoryLevel();
     this.stopwords = lookupStopwords(options.stopwordLanguages);
@@ -32,47 +46,78 @@ export class LocalSearchIndexClient implements SearchClient {
       ? new RegExp(options.tokenSplitRegex, 'gu')
       : DEFAULT_TOKEN_SPLIT_REGEX;
   }
-  async onStartIndexing() {
-    this.searchIndex = await si({
-      // @ts-ignore
+
+  async onStartIndexing(): Promise<void> {
+    // MemoryLevel is compatible with the search-index db option at runtime.
+    // The library's type definitions are incomplete, so we use type assertions.
+    const options = {
       db: this.memoryLevel,
       stopwords: this.stopwords,
       tokenSplitRegex: this.tokenSplitRegex,
-    });
+    };
+    this.searchIndex = (await createSearchIndex(
+      options as unknown as Parameters<typeof createSearchIndex>[0]
+    )) as unknown as SearchIndex;
+    this.fuzzySearchWrapper = new FuzzySearchWrapper(this.searchIndex);
   }
 
-  async put(docs: any[]) {
+  async put(docs: IndexableDocument[]): Promise<void> {
     if (!this.searchIndex) {
       throw new Error('onStartIndexing must be called first');
     }
-    return this.searchIndex.PUT(docs);
+    await this.searchIndex.PUT(docs);
   }
 
-  async del(ids: string[]) {
+  async del(ids: string[]): Promise<void> {
     if (!this.searchIndex) {
       throw new Error('onStartIndexing must be called first');
     }
-    return this.searchIndex.DELETE(ids);
+    await this.searchIndex.DELETE(ids);
   }
 
-  query(
+  async query(
     query: string,
-    options: { cursor?: string; limit?: number } | undefined
-  ): Promise<{
-    results: any[];
-    total: number;
-    nextCursor: string | null;
-    prevCursor: string | null;
-  }> {
-    return Promise.resolve({
-      nextCursor: undefined,
-      prevCursor: undefined,
-      results: [],
-      total: 0,
+    options?: SearchOptions
+  ): Promise<SearchQueryResponse> {
+    if (!this.searchIndex) {
+      throw new Error('onStartIndexing must be called first');
+    }
+
+    if (options?.fuzzy && this.fuzzySearchWrapper) {
+      return this.fuzzySearchWrapper.query(query, {
+        limit: options.limit,
+        cursor: options.cursor,
+        fuzzyOptions: options.fuzzyOptions,
+      });
+    }
+
+    const searchIndexOptions = buildPageOptions({
+      limit: options?.limit,
+      cursor: options?.cursor,
     });
+
+    const terms = query.split(' ').filter((t) => t.trim().length > 0);
+    const queryObj =
+      terms.length > 1 ? { AND: terms } : { AND: [terms[0] || ''] };
+    const searchResults = await this.searchIndex.QUERY(
+      queryObj,
+      searchIndexOptions
+    );
+
+    const total = searchResults.RESULT_LENGTH || 0;
+    const pagination = buildPaginationCursors(total, {
+      limit: options?.limit,
+      cursor: options?.cursor,
+    });
+
+    return {
+      results: searchResults.RESULT || [],
+      total,
+      ...pagination,
+    };
   }
 
-  async export(filename: string) {
+  async export(filename: string): Promise<void> {
     const sqliteLevel = new SqliteLevel({ filename });
     const iterator = this.memoryLevel.iterator();
     for await (const [key, value] of iterator) {
@@ -86,56 +131,67 @@ export class TinaCMSSearchIndexClient extends LocalSearchIndexClient {
   private readonly apiUrl: string;
   private readonly branch: string;
   private readonly indexerToken: string;
+
   constructor(options: TinaCloudSearchIndexerClientOptions) {
     super(options);
-
     this.apiUrl = options.apiUrl;
     this.branch = options.branch;
     this.indexerToken = options.indexerToken;
   }
 
-  async onFinishIndexing() {
+  private async getUploadUrl(): Promise<string> {
     const headers = new Headers();
-    headers.append('x-api-key', this.indexerToken || 'bogus');
+    headers.append('x-api-key', this.indexerToken || '');
     headers.append('Content-Type', 'application/json');
-    let res = await fetch(`${this.apiUrl}/upload/${this.branch}`, {
+
+    const response = await fetch(`${this.apiUrl}/upload/${this.branch}`, {
       method: 'GET',
       headers,
     });
-    if (res.status !== 200) {
-      let json;
-      try {
-        json = await res.json();
-      } catch (e) {
-        console.error('Failed to parse error response', e);
-      }
 
+    if (response.status !== 200) {
+      const errorBody = await response.json().catch(() => ({}));
       throw new Error(
-        `Failed to get upload url. Status: ${res.status}${
-          json?.message ? ` - ${json.message}` : ``
+        `Failed to get upload url. Status: ${response.status}${
+          errorBody?.message ? ` - ${errorBody.message}` : ''
         }`
       );
     }
-    const { signedUrl } = await res.json();
+
+    const { signedUrl } = await response.json();
+    return signedUrl;
+  }
+
+  private async serializeIndex(): Promise<Buffer> {
     const sqliteLevel = new SqliteLevel({ filename: ':memory:' });
     const iterator = this.memoryLevel.iterator();
+
     for await (const [key, value] of iterator) {
       await sqliteLevel.put(key, value);
     }
+
     const buffer = sqliteLevel.db.serialize();
     await sqliteLevel.close();
-    // upload the buffer to the apiUrl
-    const compressedBuffer = zlib.gzipSync(buffer);
-    res = await fetch(signedUrl, {
+    return zlib.gzipSync(buffer);
+  }
+
+  private async uploadIndex(signedUrl: string, data: Buffer): Promise<void> {
+    const response = await fetch(signedUrl, {
       method: 'PUT',
-      body: new Uint8Array(compressedBuffer),
+      body: data as unknown as BodyInit,
     });
-    if (res.status !== 200) {
+
+    if (response.status !== 200) {
+      const errorText = await response.text();
       throw new Error(
-        `Failed to upload search index. Status: ${
-          res.status
-        }\n${await res.text()}`
+        `Failed to upload search index. Status: ${response.status}\n${errorText}`
       );
     }
+  }
+
+  async onFinishIndexing() {
+    const signedUrl = await this.getUploadUrl();
+    const indexData = await this.serializeIndex();
+    await this.uploadIndex(signedUrl, indexData);
   }
 }
