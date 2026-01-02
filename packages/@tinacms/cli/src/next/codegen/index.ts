@@ -13,6 +13,7 @@ export const TINA_HOST = 'content.tinajs.io';
 export class Codegen {
   configManager: ConfigManager;
   port?: number;
+  host?: string;
   schema: GraphQLSchema;
   queryDoc: string;
   fragDoc: string;
@@ -31,6 +32,7 @@ export class Codegen {
   constructor({
     configManager,
     port,
+    host,
     queryDoc,
     fragDoc,
     isLocal,
@@ -41,6 +43,7 @@ export class Codegen {
   }: {
     configManager: ConfigManager;
     port?: number;
+    host?: string;
     queryDoc: string;
     fragDoc: string;
     isLocal: boolean;
@@ -53,6 +56,7 @@ export class Codegen {
     this.graphqlSchemaDoc = graphqlSchemaDoc;
     this.configManager = configManager;
     this.port = port;
+    this.host = host;
     this.schema = buildASTSchema(graphqlSchemaDoc);
     this.tinaSchema = tinaSchema;
     this.queryDoc = queryDoc;
@@ -228,11 +232,12 @@ export class Codegen {
         )}. Please visit https://tina.io/docs/r/what-is-tinacloud for more information`
       );
     }
-    let localUrl = `http://localhost:${this.port}/graphql`;
+    const devHost = this.host || 'localhost';
+    let localUrl = `http://${devHost}:${this.port}/graphql`;
     let tinaCloudUrl = `${baseUrl}/${version}/content/${clientId}/github/${branch}`;
 
     let apiURL = this.isLocal
-      ? `http://localhost:${this.port}/graphql`
+      ? `http://${devHost}:${this.port}/graphql`
       : `${baseUrl}/${version}/content/${clientId}/github/${branch}`;
 
     if (this.configManager.config.contentApiUrlOverride) {
