@@ -1,5 +1,18 @@
 # tinacms
 
+## 3.2.0
+
+### Minor Changes
+
+- [#6286](https://github.com/tinacms/tinacms/pull/6286) [`a63401a`](https://github.com/tinacms/tinacms/commit/a63401a3dd8271258bc6bfb4cc22593c19e94c7d) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - ✨ Half-width property for text fields in TinaCMS Editor
+
+### Patch Changes
+
+- Updated dependencies [[`a63401a`](https://github.com/tinacms/tinacms/commit/a63401a3dd8271258bc6bfb4cc22593c19e94c7d)]:
+  - @tinacms/schema-tools@2.2.0
+  - @tinacms/mdx@2.0.2
+  - @tinacms/search@1.1.9
+
 ## 3.1.3
 
 ### Patch Changes
