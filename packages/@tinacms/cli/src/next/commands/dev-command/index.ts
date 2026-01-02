@@ -73,11 +73,11 @@ export class DevCommand extends BaseCommand {
       return this.indexingLock.acquire('Key', fn);
     };
 
-    const resolvedHost =
-      this.host === true ? '0.0.0.0' : this.host || undefined;
+    const bindHost = this.host === true ? '0.0.0.0' : this.host || undefined;
+    const urlHost = typeof this.host === 'string' ? this.host : undefined;
 
-    if (resolvedHost) {
-      logger.info(`Using host: ${resolvedHost}`);
+    if (bindHost) {
+      logger.info(`Binding to host: ${bindHost}`);
     }
 
     const setup = async ({ firstTime }: { firstTime: boolean }) => {
@@ -99,7 +99,7 @@ export class DevCommand extends BaseCommand {
           isLocal: true,
           configManager: configManager,
           port: Number(this.port),
-          host: resolvedHost,
+          host: urlHost,
           queryDoc,
           fragDoc,
           graphqlSchemaDoc: graphQLSchema,
@@ -183,7 +183,7 @@ export class DevCommand extends BaseCommand {
 
     await fs.outputFile(
       configManager.outputHTMLFilePath,
-      devHTML(this.port, resolvedHost)
+      devHTML(this.port, urlHost)
     );
     // Add the gitignore so the index.html and assets are committed to git
     await fs.outputFile(
@@ -241,7 +241,7 @@ export class DevCommand extends BaseCommand {
       apiURL,
       this.noWatch,
       dbLock,
-      resolvedHost
+      bindHost
     );
     await server.listen(Number(this.port));
 
