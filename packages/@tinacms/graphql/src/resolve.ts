@@ -61,7 +61,7 @@ export const resolve = async ({
       isAudit: isAudit || false,
     });
 
-    // Track all field resolver promises to prevent runaway promises
+    // Track all field resolver promises to prevent runaway promises.
     const resolverPromises: Promise<unknown>[] = [];
 
     const res = await graphql({

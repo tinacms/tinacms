@@ -8,6 +8,8 @@ import {
 } from '../../src';
 import { Schema } from '@tinacms/schema-tools';
 
+const QUERY_DELAY_MS = 250;
+
 const schema: Schema = {
   collections: [
     {
@@ -27,7 +29,8 @@ const schema: Schema = {
   ],
 };
 
-const sleep250ms = () => new Promise((resolve) => setTimeout(resolve, 250));
+const sleep = (delay: number) =>
+  new Promise((resolve) => setTimeout(resolve, delay));
 
 it('waits for all resolvers to complete even when one fails early', async () => {
   const testDir = __dirname;
@@ -38,7 +41,6 @@ it('waits for all resolvers to complete even when one fails early', async () => 
     level,
     tinaDirectory: 'tina',
   });
-
   await database.indexContent(
     await buildSchema({
       schema,
@@ -48,10 +50,9 @@ it('waits for all resolvers to complete even when one fails early', async () => 
       },
     })
   );
-
   const timeline: string[] = [];
 
-  // Document get will fail immediately (NotFoundError)
+  // Document get will fail immediately (NotFoundError).
   const originalGet = database.get.bind(database);
   database.get = async (...args) => {
     try {
@@ -62,10 +63,10 @@ it('waits for all resolvers to complete even when one fails early', async () => 
     }
   };
 
-  // Add delay to collection query to ensure it completes AFTER the document error
+  // Add delay to collection query to ensure it completes after the document error.
   const originalQuery = database.query.bind(database);
   database.query = async (...args) => {
-    await sleep250ms();
+    await sleep(QUERY_DELAY_MS);
     const result = await originalQuery(...args);
     timeline.push('collection-complete');
     return result;
