@@ -2,7 +2,7 @@ import * as React from 'react';
 import { FieldProps } from './field-props';
 import { useEvent } from '@toolkit/react-core/use-cms-event';
 import { FieldHoverEvent, FieldFocusEvent } from '@toolkit/fields/field-events';
-import { Form } from '@toolkit/forms';
+import { Form, Field } from '@toolkit/forms';
 import { useCMS } from '@toolkit/react-core';
 
 export type InputFieldType<ExtraFieldProps, InputProps> =
@@ -24,6 +24,7 @@ export function wrapFieldsWithMeta<ExtraFieldProps = {}, InputProps = {}>(
         error={props.meta.error}
         index={props.index}
         tinaForm={props.tinaForm}
+        field={props.field}
         focusIntent={props.field.focusIntent}
         hoverIntent={props.field.hoverIntent}
       >
@@ -95,6 +96,7 @@ interface FieldMetaProps extends React.HTMLAttributes<HTMLElement> {
   margin?: boolean;
   index?: number;
   tinaForm: Form;
+  field?: Field;
   focusIntent?: boolean;
   hoverIntent?: boolean;
 }
@@ -108,6 +110,7 @@ export const FieldMeta = ({
   children,
   index,
   tinaForm,
+  field,
   focusIntent,
   hoverIntent,
   ...props
@@ -143,6 +146,7 @@ export const FieldMeta = ({
   return (
     <FieldWrapper
       margin={margin}
+      field={field}
       onMouseOver={() => setHoveredField({ id: tinaForm.id, fieldName: name })}
       onMouseOut={() => setHoveredField({ id: null, fieldName: null })}
       onClick={handleClick}
@@ -171,12 +175,14 @@ export const FieldMeta = ({
 export const FieldWrapper = ({
   margin,
   children,
+  field,
   'data-tina-field-active': dataActive,
   'data-tina-field-hovering': dataHovering,
-  ...restProps
+  ...props
 }: {
   margin: boolean;
   children: React.ReactNode;
+  field?: Field;
   'data-tina-field-active'?: string;
   'data-tina-field-hovering'?: string;
 } & Partial<React.ComponentPropsWithoutRef<'div'>>) => {
@@ -208,10 +214,10 @@ export const FieldWrapper = ({
 
   return (
     <div
-      className={`relative ${margin ? `mb-5 last:mb-0` : ``} ${getFieldStateClasses()}`}
+      className={`relative w-full px-2 ${margin ? 'mb-5 last:mb-0' : ''} ${field?.width === 'half' ? '@sm:w-1/2' : ''} ${getFieldStateClasses()}`}
       data-tina-field-active={dataActive}
       data-tina-field-hovering={dataHovering}
-      {...restProps}
+      {...props}
     >
       {children}
     </div>

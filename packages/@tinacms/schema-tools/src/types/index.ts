@@ -224,6 +224,7 @@ export type StringField = (
     isTitle?: boolean;
     isBody?: boolean;
     options?: Option[];
+    width?: 'full' | 'half';
   };
 
 export type NumberField = (

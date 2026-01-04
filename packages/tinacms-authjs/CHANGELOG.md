@@ -1,5 +1,12 @@
 # tinacms-authjs
 
+## 15.0.3
+
+### Patch Changes
+
+- Updated dependencies [[`790c860`](https://github.com/tinacms/tinacms/commit/790c860ae85c3bdcb7d3c07321ed4032ebbb7b49), [`60814a3`](https://github.com/tinacms/tinacms/commit/60814a3b56f99843211ef144576109857ad6ba86), [`b0f55b5`](https://github.com/tinacms/tinacms/commit/b0f55b511426ebf772d9f06645804f2319f9f9a2)]:
+  - tinacms@3.1.3
+
 ## 15.0.2
 
 ### Patch Changes
