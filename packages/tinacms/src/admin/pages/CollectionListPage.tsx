@@ -1187,11 +1187,22 @@ const SearchInput = ({
     }
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchInput.trim()) {
+      setSearch(searchInput);
+      setSearchLoaded(false);
+    }
+  };
+
   return (
-    <form className='flex flex-1 flex-col gap-2 items-start w-full'>
+    <form
+      className='flex flex-1 flex-col gap-2 items-start w-full'
+      onSubmit={handleSubmit}
+    >
       <div className='h-4'></div>
-      <div className='flex flex-col md:flex-row items-start md:items-center w-full md:w-auto gap-3'>
-        <div className='flex-1 min-w-[200px] w-full md:w-auto relative'>
+      <div className='flex items-center w-full md:w-auto gap-3'>
+        <div className='flex-1 min-w-[200px] relative'>
           <BiSearch className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none z-10' />
           <input
             ref={inputRef}
@@ -1217,6 +1228,13 @@ const SearchInput = ({
             </button>
           )}
         </div>
+        <Button
+          variant='primary'
+          type='submit'
+          className='focus:ring-0 focus:shadow-none'
+        >
+          Search
+        </Button>
       </div>
     </form>
   );
