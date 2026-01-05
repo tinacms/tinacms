@@ -104,6 +104,7 @@ export const createConfig = async ({
   plugins = [],
   noWatch,
   rollupOptions,
+  host,
 }: {
   configManager: ConfigManager;
   database: Database;
@@ -111,6 +112,7 @@ export const createConfig = async ({
   noWatch: boolean;
   plugins?: Plugin[];
   rollupOptions?: BuildOptions['rollupOptions'];
+  host?: string;
 }) => {
   // TODO: make this configurable
   const publicEnv: Record<string, string> = {};
@@ -223,7 +225,7 @@ export const createConfig = async ({
       include: ['react/jsx-runtime', 'react/jsx-dev-runtime'],
     },
     server: {
-      host: configManager.config?.build?.host ?? false,
+      host: host ? true : (configManager.config?.build?.host ?? false),
       watch: noWatch
         ? {
             ignored: ['**/*'],
