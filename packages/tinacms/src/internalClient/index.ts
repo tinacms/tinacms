@@ -748,13 +748,13 @@ export class LocalClient extends Client {
 
 export class TinaCMSSearchClient implements SearchClient {
   protected readonly client: Client;
-  protected readonly fuzzyEnabled: boolean;
+  protected readonly fuzzyDisabled: boolean;
   protected readonly stopwordLanguages?: string[];
   protected readonly defaultFuzzyOptions?: FuzzySearchOptions;
 
   constructor(client: Client, tinaSearchConfig?: TinaSearchConfig) {
     this.client = client;
-    this.fuzzyEnabled = !tinaSearchConfig?.fuzzyDisabled;
+    this.fuzzyDisabled = tinaSearchConfig?.fuzzyDisabled ?? false;
     this.stopwordLanguages = tinaSearchConfig?.stopwordLanguages;
     this.defaultFuzzyOptions = tinaSearchConfig?.fuzzyOptions;
   }
@@ -810,7 +810,7 @@ export class TinaCMSSearchClient implements SearchClient {
     options?: SearchOptions
   ): Promise<SearchQueryResponse> {
     const useFuzzy =
-      options?.fuzzy !== undefined ? options.fuzzy : this.fuzzyEnabled;
+      options?.fuzzy !== undefined ? options.fuzzy : !this.fuzzyDisabled;
 
     const url = this.buildSearchUrl(query, options, useFuzzy);
     const res = await this.client.authProvider.fetchWithToken(url);
@@ -818,7 +818,7 @@ export class TinaCMSSearchClient implements SearchClient {
   }
 
   async del(ids: string[]): Promise<void> {
-    const baseUrl = this.getSearchBaseUrl(this.fuzzyEnabled);
+    const baseUrl = this.getSearchBaseUrl(!this.fuzzyDisabled);
     const res = await this.client.authProvider.fetchWithToken(
       `${baseUrl}?ids=${ids.join(',')}`,
       { method: 'DELETE' }
@@ -829,7 +829,7 @@ export class TinaCMSSearchClient implements SearchClient {
   }
 
   async put(docs: IndexableDocument[]): Promise<void> {
-    const baseUrl = this.getSearchBaseUrl(this.fuzzyEnabled);
+    const baseUrl = this.getSearchBaseUrl(!this.fuzzyDisabled);
     const res = await this.client.authProvider.fetchWithToken(baseUrl, {
       method: 'POST',
       body: JSON.stringify({ docs }),
@@ -847,14 +847,14 @@ export class TinaCMSSearchClient implements SearchClient {
 
 export class LocalSearchClient implements SearchClient {
   protected readonly client: Client;
-  protected readonly fuzzyEnabled: boolean;
+  protected readonly fuzzyDisabled: boolean;
 
   constructor(
     client: Client,
     tinaSearchConfig?: Omit<TinaSearchConfig, 'stopwordLanguages'>
   ) {
     this.client = client;
-    this.fuzzyEnabled = !tinaSearchConfig?.fuzzyDisabled;
+    this.fuzzyDisabled = tinaSearchConfig?.fuzzyDisabled ?? false;
   }
 
   protected getSearchBaseUrl(useFuzzy: boolean): string {
@@ -902,7 +902,7 @@ export class LocalSearchClient implements SearchClient {
     options?: SearchOptions
   ): Promise<SearchQueryResponse> {
     const useFuzzy =
-      options?.fuzzy !== undefined ? options.fuzzy : this.fuzzyEnabled;
+      options?.fuzzy !== undefined ? options.fuzzy : !this.fuzzyDisabled;
     const url = this.buildSearchUrl(query, options, useFuzzy);
     const res = await this.client.authProvider.fetchWithToken(url);
     return parseSearchIndexResponse(await res.json(), options);
