@@ -1,3 +1,5 @@
+'use client';
+
 import { withProps } from '@udecode/cn';
 import {
   BoldPlugin,
@@ -29,6 +31,7 @@ import {
 } from '@udecode/plate-table/react';
 import { ParagraphPlugin, PlateElement, PlateLeaf } from '@udecode/plate/react';
 import React from 'react';
+
 import { BlockquoteElement } from '../../components/plate-ui/blockquote-element';
 import { CodeBlockElement } from '../../components/plate-ui/code-block/code-block-element';
 import { CodeLeaf } from '../../components/plate-ui/code-leaf';
@@ -57,92 +60,126 @@ const blockClasses = 'mt-0.5';
 /** prose sets a bold font, making bold marks impossible to see */
 const headerClasses = 'font-normal';
 
+/**
+ * Plate/Slate sometimes pass internal props through element renderers.
+ * If spread onto DOM nodes, React warnings / errors (e.g. setOption) appear.
+ */
+function sanitizeDomProps<T extends Record<string, any>>(props: T): Partial<T> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const {
+    editor,
+    element,
+    leaf,
+    text,
+    nodeProps,
+    setOption,
+    setOptions,
+    getOption,
+    getOptions,
+    plugin,
+    path,
+    ...rest
+  } = props as any;
+
+  return rest;
+}
+
+type HeadingRendererProps = {
+  attributes: Record<string, any>;
+  children: React.ReactNode;
+  className?: string;
+  [key: string]: any;
+};
+
+function Heading({
+  as: Tag,
+  attributes,
+  children,
+  className,
+  ...rest
+}: HeadingRendererProps & { as: keyof JSX.IntrinsicElements }) {
+  const domProps = sanitizeDomProps(rest);
+
+  return (
+    <Tag {...attributes} {...domProps} className={className}>
+      {children}
+    </Tag>
+  );
+}
+
 export const Components = () => {
   return {
+    // Slash input element
     [SlashInputPlugin.key]: SlashInputElement,
-    [HEADING_KEYS.h1]: ({
-      attributes,
-      editor,
-      element,
-      className,
-      ...props
-    }) => (
-      <h1
-        {...attributes}
-        {...props}
+
+    // Headings
+    [HEADING_KEYS.h1]: ({ attributes, children, className, ...rest }) => (
+      <Heading
+        as="h1"
+        attributes={attributes}
+        {...sanitizeDomProps(rest)}
         className={classNames(
           headerClasses,
           blockClasses,
           className,
           'text-4xl mb-4 last:mb-0 mt-6 first:mt-0 font-libre-baskerville'
         )}
-      />
+      >
+        {children}
+      </Heading>
     ),
-    [HEADING_KEYS.h2]: ({
-      attributes,
-      editor,
-      element,
-      className,
-      ...props
-    }) => (
-      <h2
-        {...attributes}
-        {...props}
+    [HEADING_KEYS.h2]: ({ attributes, children, className, ...rest }) => (
+      <Heading
+        as="h2"
+        attributes={attributes}
+        {...sanitizeDomProps(rest)}
         className={classNames(
           headerClasses,
           blockClasses,
           className,
           'text-3xl mb-4 last:mb-0 mt-6 first:mt-0 font-libre-baskerville'
         )}
-      />
+      >
+        {children}
+      </Heading>
     ),
-    [HEADING_KEYS.h3]: ({
-      attributes,
-      editor,
-      element,
-      className,
-      ...props
-    }) => (
-      <h3
-        {...attributes}
-        {...props}
+    [HEADING_KEYS.h3]: ({ attributes, children, className, ...rest }) => (
+      <Heading
+        as="h3"
+        attributes={attributes}
+        {...sanitizeDomProps(rest)}
         className={classNames(
           headerClasses,
           blockClasses,
           className,
           'text-2xl mb-4 last:mb-0 mt-6 first:mt-0 font-libre-baskerville'
         )}
-      />
+      >
+        {children}
+      </Heading>
     ),
-    [HEADING_KEYS.h4]: ({
-      attributes,
-      editor,
-      element,
-      className,
-      ...props
-    }) => (
-      <h4
-        {...attributes}
-        {...props}
+    [HEADING_KEYS.h4]: ({ attributes, children, className, ...rest }) => (
+      <Heading
+        as="h4"
+        attributes={attributes}
+        {...sanitizeDomProps(rest)}
         className={classNames(
           headerClasses,
           blockClasses,
           className,
           'text-xl mb-4 last:mb-0 mt-6 first:mt-0 font-libre-baskerville'
         )}
-      />
+      >
+        {children}
+      </Heading>
     ),
+
     /** Tailwind prose doesn't style h5 and h6 elements */
-    [HEADING_KEYS.h5]: ({
-      attributes,
-      editor,
-      element,
-      className,
-      ...props
-    }) => (
-      <h5
-        {...attributes}
-        {...props}
+    [HEADING_KEYS.h5]: ({ attributes, children, className, ...rest }) => (
+      <Heading
+        as="h5"
+        attributes={attributes}
+        {...sanitizeDomProps(rest)}
         className={classNames(
           headerClasses,
           blockClasses,
@@ -150,18 +187,15 @@ export const Components = () => {
           'text-lg mb-4 last:mb-0 mt-6 first:mt-0'
         )}
         style={{ fontFamily: "'Libre Baskerville', serif", fontWeight: '400' }}
-      />
+      >
+        {children}
+      </Heading>
     ),
-    [HEADING_KEYS.h6]: ({
-      attributes,
-      editor,
-      element,
-      className,
-      ...props
-    }) => (
-      <h6
-        {...attributes}
-        {...props}
+    [HEADING_KEYS.h6]: ({ attributes, children, className, ...rest }) => (
+      <Heading
+        as="h6"
+        attributes={attributes}
+        {...sanitizeDomProps(rest)}
         className={classNames(
           headerClasses,
           blockClasses,
@@ -169,14 +203,16 @@ export const Components = () => {
           'text-base mb-4 last:mb-0 mt-6 first:mt-0'
         )}
         style={{ fontFamily: "'Libre Baskerville', serif", fontWeight: '400' }}
-      />
+      >
+        {children}
+      </Heading>
     ),
     [ParagraphPlugin.key]: ParagraphElement,
     [BlockquotePlugin.key]: BlockquoteElement,
     [CodeBlockPlugin.key]: CodeBlockElement,
     [CodeLinePlugin.key]: CodeLineElement,
     [CodeSyntaxPlugin.key]: CodeSyntaxLeaf,
-    html: ({ attributes, editor, element, children, className }) => {
+    html: ({ attributes, element, children, className }) => {
       return (
         <div
           {...attributes}
@@ -190,7 +226,7 @@ export const Components = () => {
         </div>
       );
     },
-    html_inline: ({ attributes, editor, element, children, className }) => {
+    html_inline: ({ attributes, element, children, className }) => {
       return (
         <span
           {...attributes}

@@ -1,11 +1,20 @@
-import React, { type ComponentType, type SVGProps } from 'react';
+'use client';
 
+import React, { type ComponentType, useMemo } from 'react';
 import { withRef } from '@udecode/cn';
-import { type PlateEditor, PlateElement } from '@udecode/plate/react';
+import {
+  PlateElement,
+  useEditorRef,
+  type PlateEditor,
+} from '@udecode/plate/react';
 import { HEADING_KEYS } from '@udecode/plate-heading';
+import {
+  BulletedListPlugin,
+  NumberedListPlugin,
+} from '@udecode/plate-list/react';
+import { toggleList } from '@udecode/plate-list';
 
 import { Icons } from './icons';
-
 import {
   InlineCombobox,
   InlineComboboxContent,
@@ -13,20 +22,17 @@ import {
   InlineComboboxInput,
   InlineComboboxItem,
 } from './inline-combobox';
-import {
-  BulletedListPlugin,
-  NumberedListPlugin,
-} from '@udecode/plate-list/react';
-import { toggleList } from '@udecode/plate-list';
 
-interface SlashCommandRule {
-  icon: ComponentType<SVGProps<SVGSVGElement>>;
+import { useToolbarContext } from '../../toolbar/toolbar-provider';
+
+export interface SlashCommandRule {
+  icon?: ComponentType;
   onSelect: (editor: PlateEditor) => void;
   value: string;
   keywords?: string[];
 }
 
-const rules: SlashCommandRule[] = [
+const builtInRules: SlashCommandRule[] = [
   {
     icon: Icons.h1,
     onSelect: (editor) => {
@@ -66,41 +72,48 @@ const rules: SlashCommandRule[] = [
   },
 ];
 
-export const SlashInputElement = withRef<typeof PlateElement>(
-  ({ className, ...props }, ref) => {
-    const { children, editor, element } = props;
+export const SlashInputElement = withRef<typeof PlateElement>((props, ref) => {
+  const { children, element } = props;
+  const editor = useEditorRef();
+  const { slashRules } = useToolbarContext();
 
-    return (
-      <PlateElement
-        as='span'
-        data-slate-value={element.value}
-        ref={ref}
-        {...props}
-      >
-        <InlineCombobox element={element} trigger='/'>
-          <InlineComboboxInput />
+  const rules = useMemo(() => {
+    const extra = Array.isArray(slashRules) ? slashRules : [];
+    return [...builtInRules, ...extra];
+  }, [slashRules]);
 
-          <InlineComboboxContent>
-            <InlineComboboxEmpty>
-              No matching commands found
-            </InlineComboboxEmpty>
+  return (
+    <PlateElement
+      as='span'
+      data-slate-value={element.value}
+      ref={ref}
+      {...props}
+    >
+      <InlineCombobox element={element} trigger='/'>
+        <InlineComboboxInput />
 
-            {rules.map(({ icon: Icon, keywords, onSelect, value }) => (
-              <InlineComboboxItem
-                key={value}
-                keywords={keywords}
-                onClick={() => onSelect(editor)}
-                value={value}
-              >
-                <Icon aria-hidden className='mr-2 size-4' />
-                {value}
-              </InlineComboboxItem>
-            ))}
-          </InlineComboboxContent>
-        </InlineCombobox>
+        <InlineComboboxContent>
+          <InlineComboboxEmpty>No matching commands found</InlineComboboxEmpty>
 
-        {children}
-      </PlateElement>
-    );
-  }
-);
+          {rules.map(({ icon: Icon = Icons.add, onSelect, value, keywords }) => (
+            <InlineComboboxItem
+              key={value}
+              value={value}
+              keywords={keywords}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={(e) => {
+                e.preventDefault();
+                onSelect(editor);
+              }}
+            >
+              <Icon aria-hidden className='mr-2 size-4' />
+              {value}
+            </InlineComboboxItem>
+          ))}
+        </InlineComboboxContent>
+      </InlineCombobox>
+
+      {children}
+    </PlateElement>
+  );
+});
