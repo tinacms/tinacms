@@ -1,0 +1,101 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Watch this "
+        },
+        {
+          "type": "a",
+          "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=60",
+          "title": null,
+          "children": [
+            {
+              "type": "text",
+              "text": "YouTube video"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": " starting at 1 minute."
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Or check out this "
+        },
+        {
+          "type": "a",
+          "url": "https://youtu.be/dQw4w9WgXcQ?t=120",
+          "title": null,
+          "children": [
+            {
+              "type": "text",
+              "text": "short link"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": " starting at 2 minutes."
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Here's an "
+        },
+        {
+          "type": "a",
+          "url": "https://www.youtube.com/embed/dQw4w9WgXcQ?start=180",
+          "title": null,
+          "children": [
+            {
+              "type": "text",
+              "text": "embed URL"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": " for iframes."
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "And a "
+        },
+        {
+          "type": "a",
+          "url": "https://vimeo.com/123456789#t=60s",
+          "title": null,
+          "children": [
+            {
+              "type": "text",
+              "text": "Vimeo video"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": " with timestamp."
+        }
+      ]
+    }
+  ]
+}
