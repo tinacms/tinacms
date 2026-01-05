@@ -31,7 +31,7 @@ import {
 
 interface TinaSearchConfig {
   stopwordLanguages?: string[];
-  fuzzyEnabled?: boolean;
+  fuzzyDisabled?: boolean;
   fuzzyOptions?: FuzzySearchOptions;
 }
 import gql from 'graphql-tag';
@@ -754,7 +754,7 @@ export class TinaCMSSearchClient implements SearchClient {
 
   constructor(client: Client, tinaSearchConfig?: TinaSearchConfig) {
     this.client = client;
-    this.fuzzyEnabled = tinaSearchConfig?.fuzzyEnabled !== false;
+    this.fuzzyEnabled = !tinaSearchConfig?.fuzzyDisabled;
     this.stopwordLanguages = tinaSearchConfig?.stopwordLanguages;
     this.defaultFuzzyOptions = tinaSearchConfig?.fuzzyOptions;
   }
@@ -854,7 +854,7 @@ export class LocalSearchClient implements SearchClient {
     tinaSearchConfig?: Omit<TinaSearchConfig, 'stopwordLanguages'>
   ) {
     this.client = client;
-    this.fuzzyEnabled = tinaSearchConfig?.fuzzyEnabled !== false;
+    this.fuzzyEnabled = !tinaSearchConfig?.fuzzyDisabled;
   }
 
   protected getSearchBaseUrl(useFuzzy: boolean): string {

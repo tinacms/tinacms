@@ -6,22 +6,22 @@ describe('validateTinaCloudSchemaConfig', () => {
       expect(() => validateTinaCloudSchemaConfig({})).not.toThrow();
     });
 
-    it('accepts config with only search.tina.fuzzyEnabled', () => {
+    it('accepts config with only search.tina.fuzzyDisabled', () => {
       const config = {
         search: {
           tina: {
-            fuzzyEnabled: true,
+            fuzzyDisabled: true,
           },
         },
       };
       expect(() => validateTinaCloudSchemaConfig(config)).not.toThrow();
     });
 
-    it('accepts config with only search.tina.fuzzyEnabled set to false', () => {
+    it('accepts config with only search.tina.fuzzyDisabled set to false', () => {
       const config = {
         search: {
           tina: {
-            fuzzyEnabled: false,
+            fuzzyDisabled: false,
           },
         },
       };
@@ -71,11 +71,11 @@ describe('validateTinaCloudSchemaConfig', () => {
       expect(() => validateTinaCloudSchemaConfig(config)).not.toThrow();
     });
 
-    it('accepts config with both fuzzyEnabled and fuzzyOptions', () => {
+    it('accepts config with both fuzzyDisabled and fuzzyOptions', () => {
       const config = {
         search: {
           tina: {
-            fuzzyEnabled: true,
+            fuzzyDisabled: true,
             fuzzyOptions: {
               maxDistance: 3,
               minSimilarity: 0.5,
@@ -93,7 +93,7 @@ describe('validateTinaCloudSchemaConfig', () => {
             indexerToken: 'test-token',
             stopwordLanguages: ['en'],
             tokenSplitRegex: '\\s+',
-            fuzzyEnabled: true,
+            fuzzyDisabled: false,
             fuzzyOptions: {
               maxDistance: 2,
               minSimilarity: 0.6,
@@ -111,7 +111,7 @@ describe('validateTinaCloudSchemaConfig', () => {
       const config = {
         search: {
           tina: {
-            fuzzyEnabled: true,
+            fuzzyDisabled: false,
           },
           indexBatchSize: 100,
           maxSearchIndexFieldLength: 5000,
@@ -124,7 +124,7 @@ describe('validateTinaCloudSchemaConfig', () => {
       const config = {
         search: {
           tina: {
-            fuzzyEnabled: true,
+            fuzzyDisabled: false,
             unknownField: 'should fail',
           },
         },
@@ -146,11 +146,11 @@ describe('validateTinaCloudSchemaConfig', () => {
       expect(() => validateTinaCloudSchemaConfig(config)).toThrow();
     });
 
-    it('rejects wrong type for fuzzyEnabled', () => {
+    it('rejects wrong type for fuzzyDisabled', () => {
       const config = {
         search: {
           tina: {
-            fuzzyEnabled: 'true',
+            fuzzyDisabled: 'true',
           },
         },
       };
@@ -228,7 +228,7 @@ describe('validateTinaCloudSchemaConfig', () => {
         },
         search: {
           tina: {
-            fuzzyEnabled: true,
+            fuzzyDisabled: false,
             fuzzyOptions: {
               maxDistance: 2,
             },

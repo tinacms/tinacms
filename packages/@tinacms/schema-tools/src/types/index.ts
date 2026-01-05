@@ -814,10 +814,9 @@ export interface Config<
      *   url: `https://github.com/tinacms/tinacms/commits/${branch}/examples/next-2024/${relativePath}`
      * })
      *      */
-    historyUrl?: (context: {
-      relativePath: string;
-      branch: string;
-    }) => { url: string };
+    historyUrl?: (context: { relativePath: string; branch: string }) => {
+      url: string;
+    };
   };
   search?: (
     | {
@@ -846,9 +845,9 @@ export interface Config<
            */
           tokenSplitRegex?: string;
           /**
-           * Enable fuzzy search by default (default: true)
+           * Disable fuzzy search (default: false, meaning fuzzy is enabled)
            */
-          fuzzyEnabled?: boolean;
+          fuzzyDisabled?: boolean;
           /**
            * Fuzzy search options
            */

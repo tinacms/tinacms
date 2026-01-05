@@ -18,7 +18,7 @@ const tinaSearchKey = z
     indexerToken: z.string().optional(),
     stopwordLanguages: z.array(z.string()).nonempty().optional(),
     tokenSplitRegex: z.string().optional(),
-    fuzzyEnabled: z.boolean().optional(),
+    fuzzyDisabled: z.boolean().optional(),
     fuzzyOptions: z
       .object({
         maxDistance: z.number().optional(),
