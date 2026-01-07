@@ -154,7 +154,7 @@ export const useSearchCollection = (
       if ((await api.isAuthenticated()) && !folder.loading && !cancelled) {
         try {
           const response = (await cms.api.search.query(search, {
-            limit: cms.api.search.getDefaultLimit?.() ?? 10,
+            limit: 15,
             cursor: after,
             collection: collectionName,
           })) as {

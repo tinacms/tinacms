@@ -861,11 +861,7 @@ export interface Config<
             maxTermExpansions?: number;
             /** Use Damerau-Levenshtein (allows transpositions) (default: true) */
             useTranspositions?: boolean;
-            /** Case sensitive matching (default: false) */
-            caseSensitive?: boolean;
           };
-          /** Default number of search results per page (default: 10) */
-          limit?: number;
         };
       }
   ) & {

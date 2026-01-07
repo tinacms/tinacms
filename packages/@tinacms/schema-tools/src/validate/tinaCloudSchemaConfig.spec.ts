@@ -101,7 +101,6 @@ describe('validateTinaCloudSchemaConfig', () => {
               useTranspositions: true,
               caseSensitive: false,
             },
-            limit: 15,
           },
         },
       };

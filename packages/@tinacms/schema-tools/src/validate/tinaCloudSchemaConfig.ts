@@ -29,7 +29,6 @@ const tinaSearchKey = z
       })
       .strict()
       .optional(),
-    limit: z.number().optional(),
   })
   .strict()
   .optional();

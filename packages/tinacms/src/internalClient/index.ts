@@ -33,7 +33,6 @@ interface TinaSearchConfig {
   stopwordLanguages?: string[];
   fuzzyEnabled?: boolean;
   fuzzyOptions?: FuzzySearchOptions;
-  limit?: number;
 }
 import gql from 'graphql-tag';
 import { EDITORIAL_WORKFLOW_STATUS } from '../toolkit/form-builder/editorial-workflow-constants';
@@ -752,14 +751,12 @@ export class TinaCMSSearchClient implements SearchClient {
   protected readonly fuzzyEnabled: boolean;
   protected readonly stopwordLanguages?: string[];
   protected readonly defaultFuzzyOptions?: FuzzySearchOptions;
-  protected readonly defaultLimit?: number;
 
   constructor(client: Client, tinaSearchConfig?: TinaSearchConfig) {
     this.client = client;
     this.fuzzyEnabled = tinaSearchConfig?.fuzzyEnabled ?? true;
     this.stopwordLanguages = tinaSearchConfig?.stopwordLanguages;
     this.defaultFuzzyOptions = tinaSearchConfig?.fuzzyOptions;
-    this.defaultLimit = tinaSearchConfig?.limit;
   }
 
   protected getSearchBaseUrl(useFuzzy: boolean): string {
@@ -848,7 +845,7 @@ export class TinaCMSSearchClient implements SearchClient {
   }
 
   getDefaultLimit(): number {
-    return this.defaultLimit ?? 10;
+    return 15;
   }
 }
 
@@ -856,7 +853,6 @@ export class LocalSearchClient implements SearchClient {
   protected readonly client: Client;
   protected readonly fuzzyEnabled: boolean;
   protected readonly defaultFuzzyOptions?: FuzzySearchOptions;
-  protected readonly defaultLimit?: number;
 
   constructor(
     client: Client,
@@ -865,7 +861,6 @@ export class LocalSearchClient implements SearchClient {
     this.client = client;
     this.fuzzyEnabled = tinaSearchConfig?.fuzzyEnabled ?? true;
     this.defaultFuzzyOptions = tinaSearchConfig?.fuzzyOptions;
-    this.defaultLimit = tinaSearchConfig?.limit;
   }
 
   protected getSearchBaseUrl(useFuzzy: boolean): string {
@@ -932,7 +927,7 @@ export class LocalSearchClient implements SearchClient {
   }
 
   getDefaultLimit(): number {
-    return this.defaultLimit ?? 10;
+    return 15;
   }
 }
 
