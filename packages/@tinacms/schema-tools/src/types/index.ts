@@ -846,9 +846,9 @@ export interface Config<
            */
           tokenSplitRegex?: string;
           /**
-           * Disable fuzzy search (default: false, meaning fuzzy is enabled)
+           * Enable fuzzy search (default: true)
            */
-          fuzzyDisabled?: boolean;
+          fuzzyEnabled?: boolean;
           /**
            * Fuzzy search options
            */
@@ -857,13 +857,15 @@ export interface Config<
             maxDistance?: number;
             /** Minimum similarity score 0-1 for matches (default: 0.6) */
             minSimilarity?: number;
-            /** Maximum number of fuzzy matches to return per term (default: 10) */
-            maxResults?: number;
+            /** Maximum number of fuzzy term expansions to return per search term (default: 10) */
+            maxTermExpansions?: number;
             /** Use Damerau-Levenshtein (allows transpositions) (default: true) */
             useTranspositions?: boolean;
             /** Case sensitive matching (default: false) */
             caseSensitive?: boolean;
           };
+          /** Default number of search results per page (default: 10) */
+          limit?: number;
         };
       }
   ) & {

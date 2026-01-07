@@ -183,5 +183,5 @@ export function findSimilarTerms(
     return b.similarity - a.similarity;
   });
 
-  return matches.slice(0, opts.maxResults);
+  return matches.slice(0, opts.maxTermExpansions);
 }

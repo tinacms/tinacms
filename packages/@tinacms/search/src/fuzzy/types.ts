@@ -1,7 +1,7 @@
 export interface FuzzySearchOptions {
   maxDistance?: number;
   minSimilarity?: number;
-  maxResults?: number;
+  maxTermExpansions?: number;
   useTranspositions?: boolean;
   caseSensitive?: boolean;
   /** Use n-gram filtering for candidate selection (supports transpositions) */
@@ -21,7 +21,7 @@ export interface FuzzyMatch {
 export const DEFAULT_FUZZY_OPTIONS: Required<FuzzySearchOptions> = {
   maxDistance: 2,
   minSimilarity: 0.6,
-  maxResults: 10,
+  maxTermExpansions: 10,
   useTranspositions: true,
   caseSensitive: false,
   useNgramFilter: true,

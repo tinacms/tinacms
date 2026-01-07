@@ -113,8 +113,10 @@ describe('findSimilarTerms', () => {
     expect(matches.every((m) => m.similarity >= 0.8)).toBe(true);
   });
 
-  it('should respect maxResults option', () => {
-    const matches = findSimilarTerms('app', dictionary, { maxResults: 2 });
+  it('should respect maxTermExpansions option', () => {
+    const matches = findSimilarTerms('app', dictionary, {
+      maxTermExpansions: 2,
+    });
     expect(matches.length).toBeLessThanOrEqual(2);
   });
 
@@ -236,7 +238,7 @@ describe('DEFAULT_FUZZY_OPTIONS', () => {
   it('should have sensible defaults', () => {
     expect(DEFAULT_FUZZY_OPTIONS.maxDistance).toBe(2);
     expect(DEFAULT_FUZZY_OPTIONS.minSimilarity).toBe(0.6);
-    expect(DEFAULT_FUZZY_OPTIONS.maxResults).toBe(10);
+    expect(DEFAULT_FUZZY_OPTIONS.maxTermExpansions).toBe(10);
     expect(DEFAULT_FUZZY_OPTIONS.useTranspositions).toBe(true);
     expect(DEFAULT_FUZZY_OPTIONS.caseSensitive).toBe(false);
     expect(DEFAULT_FUZZY_OPTIONS.useNgramFilter).toBe(true);

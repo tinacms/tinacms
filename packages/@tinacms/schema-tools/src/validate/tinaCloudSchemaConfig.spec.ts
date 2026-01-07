@@ -6,22 +6,22 @@ describe('validateTinaCloudSchemaConfig', () => {
       expect(() => validateTinaCloudSchemaConfig({})).not.toThrow();
     });
 
-    it('accepts config with only search.tina.fuzzyDisabled', () => {
+    it('accepts config with only search.tina.fuzzyEnabled', () => {
       const config = {
         search: {
           tina: {
-            fuzzyDisabled: true,
+            fuzzyEnabled: true,
           },
         },
       };
       expect(() => validateTinaCloudSchemaConfig(config)).not.toThrow();
     });
 
-    it('accepts config with only search.tina.fuzzyDisabled set to false', () => {
+    it('accepts config with only search.tina.fuzzyEnabled set to false', () => {
       const config = {
         search: {
           tina: {
-            fuzzyDisabled: false,
+            fuzzyEnabled: false,
           },
         },
       };
@@ -61,7 +61,7 @@ describe('validateTinaCloudSchemaConfig', () => {
             fuzzyOptions: {
               maxDistance: 2,
               minSimilarity: 0.6,
-              maxResults: 10,
+              maxTermExpansions: 10,
               useTranspositions: true,
               caseSensitive: false,
             },
@@ -71,11 +71,11 @@ describe('validateTinaCloudSchemaConfig', () => {
       expect(() => validateTinaCloudSchemaConfig(config)).not.toThrow();
     });
 
-    it('accepts config with both fuzzyDisabled and fuzzyOptions', () => {
+    it('accepts config with both fuzzyEnabled and fuzzyOptions', () => {
       const config = {
         search: {
           tina: {
-            fuzzyDisabled: true,
+            fuzzyEnabled: true,
             fuzzyOptions: {
               maxDistance: 3,
               minSimilarity: 0.5,
@@ -93,14 +93,15 @@ describe('validateTinaCloudSchemaConfig', () => {
             indexerToken: 'test-token',
             stopwordLanguages: ['en'],
             tokenSplitRegex: '\\s+',
-            fuzzyDisabled: false,
+            fuzzyEnabled: false,
             fuzzyOptions: {
               maxDistance: 2,
               minSimilarity: 0.6,
-              maxResults: 10,
+              maxTermExpansions: 10,
               useTranspositions: true,
               caseSensitive: false,
             },
+            limit: 15,
           },
         },
       };
@@ -111,7 +112,7 @@ describe('validateTinaCloudSchemaConfig', () => {
       const config = {
         search: {
           tina: {
-            fuzzyDisabled: false,
+            fuzzyEnabled: false,
           },
           indexBatchSize: 100,
           maxSearchIndexFieldLength: 5000,
@@ -124,7 +125,7 @@ describe('validateTinaCloudSchemaConfig', () => {
       const config = {
         search: {
           tina: {
-            fuzzyDisabled: false,
+            fuzzyEnabled: false,
             unknownField: 'should fail',
           },
         },
@@ -146,11 +147,11 @@ describe('validateTinaCloudSchemaConfig', () => {
       expect(() => validateTinaCloudSchemaConfig(config)).toThrow();
     });
 
-    it('rejects wrong type for fuzzyDisabled', () => {
+    it('rejects wrong type for fuzzyEnabled', () => {
       const config = {
         search: {
           tina: {
-            fuzzyDisabled: 'true',
+            fuzzyEnabled: 'true',
           },
         },
       };
@@ -228,7 +229,7 @@ describe('validateTinaCloudSchemaConfig', () => {
         },
         search: {
           tina: {
-            fuzzyDisabled: false,
+            fuzzyEnabled: false,
             fuzzyOptions: {
               maxDistance: 2,
             },

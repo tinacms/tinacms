@@ -168,9 +168,9 @@ describe('Fuzzy Search', () => {
       expect(looseResults.length).toBeGreaterThanOrEqual(strictResults.length);
     });
 
-    it('respects maxResults option', () => {
+    it('respects maxTermExpansions option', () => {
       const results = findSimilarTerms('r', dictionary, {
-        maxResults: 3,
+        maxTermExpansions: 3,
         maxDistance: 10,
         minSimilarity: 0,
       });
@@ -355,7 +355,7 @@ describe('Fuzzy Search', () => {
     it('has expected default values', () => {
       expect(DEFAULT_FUZZY_OPTIONS.maxDistance).toBe(2);
       expect(DEFAULT_FUZZY_OPTIONS.minSimilarity).toBe(0.6);
-      expect(DEFAULT_FUZZY_OPTIONS.maxResults).toBe(10);
+      expect(DEFAULT_FUZZY_OPTIONS.maxTermExpansions).toBe(10);
       expect(DEFAULT_FUZZY_OPTIONS.useTranspositions).toBe(true);
       expect(DEFAULT_FUZZY_OPTIONS.caseSensitive).toBe(false);
       expect(DEFAULT_FUZZY_OPTIONS.useNgramFilter).toBe(true);

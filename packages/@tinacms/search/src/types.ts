@@ -55,4 +55,5 @@ export type SearchClient = {
   onStartIndexing?: () => Promise<void>;
   onFinishIndexing?: () => Promise<void>;
   supportsClientSideIndexing?: () => boolean;
+  getDefaultLimit?: () => number;
 };

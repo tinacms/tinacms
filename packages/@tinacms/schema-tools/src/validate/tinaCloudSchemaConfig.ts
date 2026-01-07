@@ -18,17 +18,18 @@ const tinaSearchKey = z
     indexerToken: z.string().optional(),
     stopwordLanguages: z.array(z.string()).nonempty().optional(),
     tokenSplitRegex: z.string().optional(),
-    fuzzyDisabled: z.boolean().optional(),
+    fuzzyEnabled: z.boolean().optional(),
     fuzzyOptions: z
       .object({
         maxDistance: z.number().optional(),
         minSimilarity: z.number().optional(),
-        maxResults: z.number().optional(),
+        maxTermExpansions: z.number().optional(),
         useTranspositions: z.boolean().optional(),
         caseSensitive: z.boolean().optional(),
       })
       .strict()
       .optional(),
+    limit: z.number().optional(),
   })
   .strict()
   .optional();
