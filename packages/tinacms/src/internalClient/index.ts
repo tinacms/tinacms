@@ -431,7 +431,8 @@ mutation addPendingDocumentMutation(
     } else {
       return (
         await this.authProvider.fetchWithToken(
-          `${this.contentApiBase}/events/${this.clientId}/${this.branch
+          `${this.contentApiBase}/events/${this.clientId}/${
+            this.branch
           }?limit=${limit || 1}${cursor ? `&cursor=${cursor}` : ''}`,
           { method: 'GET' }
         )
@@ -510,7 +511,7 @@ mutation addPendingDocumentMutation(
     } catch (error) {
       if (error.message === 'AsyncPoller: reached timeout') {
         console.warn(error);
-        return [Promise.resolve({ status: 'timeout' }), () => { }];
+        return [Promise.resolve({ status: 'timeout' }), () => {}];
       }
       throw error;
     }
@@ -765,8 +766,9 @@ export class TinaCMSSearchClient implements SearchClient {
     const version = useFuzzy ? 'v2' : '';
     const searchPath = version ? `${version}/searchIndex` : 'searchIndex';
 
-    return `${this.client.contentApiBase}/${searchPath}/${this.client.clientId
-      }/${this.client.getBranch()}`;
+    return `${this.client.contentApiBase}/${searchPath}/${
+      this.client.clientId
+    }/${this.client.getBranch()}`;
   }
 
   protected buildSearchUrl(
