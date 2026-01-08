@@ -1,19 +1,20 @@
 import * as React from 'react';
-import { CloseIcon } from '@toolkit/icons';
+import { CloseIcon, TinaIcon } from '@toolkit/icons';
 
 export interface ModalHeaderProps {
-  children: React.ReactChild | React.ReactChild[];
+  children: React.ReactNode;
   close?(): void;
 }
 
 export const ModalHeader = ({ children, close }: ModalHeaderProps) => {
   return (
-    <div className='h-14 flex items-center justify-between px-5 border-b border-gray-200 m-0'>
+    <div className='h-14 flex items-center px-5 border-b border-gray-200 m-0'>
+      <TinaIcon className='w-10 h-auto -ml-1 mr-1 my-1 fill-tina-orange' />
       <ModalTitle>{children}</ModalTitle>
       {close && (
         <div
           onClick={close}
-          className='flex items-center fill-gray-400 cursor-pointer transition-colors duration-100 ease-out hover:fill-gray-700'
+          className='ml-auto flex justify-self-end items-center fill-gray-400 cursor-pointer transition-colors duration-100 ease-out hover:fill-gray-700'
         >
           <CloseIcon className='w-6 h-auto' />
         </div>
@@ -24,7 +25,7 @@ export const ModalHeader = ({ children, close }: ModalHeaderProps) => {
 
 const ModalTitle = ({ children }) => {
   return (
-    <h2 className='text-gray-600 font-sans font-medium text-base leading-none m-0 block truncate flex items-center'>
+    <h2 className='text-black font-sans font-medium text-base leading-none m-0 block truncate flex items-center'>
       {children}
     </h2>
   );

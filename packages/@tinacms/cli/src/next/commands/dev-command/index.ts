@@ -102,13 +102,13 @@ export class DevCommand extends BaseCommand {
         const apiURL = await codegen.execute();
 
         if (!configManager.isUsingLegacyFolder) {
-          delete require.cache[configManager.generatedSchemaJSONPath];
-          delete require.cache[configManager.generatedLookupJSONPath];
-          delete require.cache[configManager.generatedGraphQLJSONPath];
-
-          const schemaObject = require(configManager.generatedSchemaJSONPath);
-          const lookupObject = require(configManager.generatedLookupJSONPath);
-          const graphqlSchemaObject = require(
+          const schemaObject = await fs.readJSON(
+            configManager.generatedSchemaJSONPath
+          );
+          const lookupObject = await fs.readJSON(
+            configManager.generatedLookupJSONPath
+          );
+          const graphqlSchemaObject = await fs.readJSON(
             configManager.generatedGraphQLJSONPath
           );
 
@@ -304,11 +304,11 @@ export class DevCommand extends BaseCommand {
         //   subItems: [
         //     {
         //       key: 'Custom queries',
-        //       value: 'https://tina.io/querying',
+        //       value: 'https://tina.io/docs/r/content-api-overview',
         //     },
         //     {
         //       key: 'Visual editing',
-        //       value: 'https://tina.io/visual-editing',
+        //       value: 'https://tina.io/docs/r/visual-editing-setup',
         //     },
         //   ],
         // },

@@ -8,12 +8,12 @@
     "noImplicitAny": true,
     "noUncheckedIndexedAccess": true,
     "noFallthroughCasesInSwitch": true,
-    "moduleResolution": "node",
-    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "module": "esnext",
+    "target": "esnext",
     "lib": [
       "ESNext"
     ],
-    "target": "ESNext",
     "types": [
       "vite/client"
     ],

@@ -9,7 +9,8 @@ import {
 } from '@toolkit/react-modals';
 import { Button } from '@toolkit/styles';
 import React from 'react';
-import { BiCheckCircle, BiError, BiInfoCircle, BiX } from 'react-icons/bi';
+import { BiX } from 'react-icons/bi';
+import { MdCheckCircle, MdError, MdInfo, MdWarning } from 'react-icons/md';
 
 const parseUrlsInText = (text: string): React.ReactNode => {
   const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
@@ -47,7 +48,7 @@ export function Alerts({ alerts }: AlertsProps) {
 
   return (
     <>
-      <div className='fixed bottom-0 left-0 right-0 p-6 flex flex-col items-center z-[999999]'>
+      <div className='fixed bottom-6 left-1/2 flex flex-col items-center z-[999999] -translate-x-1/2'>
         {alerts.all
           .filter((alert) => {
             return alert.level !== 'error';
@@ -56,15 +57,15 @@ export function Alerts({ alerts }: AlertsProps) {
             return (
               <Alert key={alert.id} level={alert.level}>
                 {alert.level === 'info' && (
-                  <BiInfoCircle className='w-5 h-auto opacity-70' />
+                  <MdInfo className='w-5 h-auto text-blue-500' />
                 )}
                 {alert.level === 'success' && (
-                  <BiCheckCircle className='w-5 h-auto opacity-70' />
+                  <MdCheckCircle className='w-5 h-auto text-green-500' />
                 )}
                 {alert.level === 'warn' && (
-                  <BiError className='w-5 h-auto opacity-70' />
+                  <MdWarning className='w-5 h-auto text-yellow-500' />
                 )}
-                <p className='m-0 flex-1 max-w-[680px] text-left'>
+                <p className='m-0 flex-1 max-w-[680px] text-left break-all'>
                   {parseUrlsInText(alert.message.toString())}
                 </p>
                 <CloseAlert
@@ -100,7 +101,7 @@ export function Alerts({ alerts }: AlertsProps) {
                     alerts.dismiss(alert);
                   }}
                 >
-                  <BiError className='mr-1 w-6 h-auto fill-current inline-block text-red-600' />{' '}
+                  <MdError className='mr-1 w-6 h-auto fill-current inline-block text-red-600' />{' '}
                   Error
                 </ModalHeader>
                 <ModalBody padded={true}>
@@ -132,22 +133,22 @@ const Alert: React.FC<{ level: AlertLevel; children: React.ReactNode }> = ({
   ...props
 }) => {
   const colorClasses = {
-    info: 'bg-blue-100 border-blue-500 text-blue-600 fill-blue-500',
-    success: 'bg-green-100 border-green-500 text-green-600 fill-green-500',
-    warn: 'bg-yellow-100 border-yellow-500 text-yellow-600 fill-yellow-500',
-    error: 'bg-red-100 border-red-500 text-red-600 fill-red-500',
+    info: 'bg-white',
+    success: 'bg-white',
+    warn: 'bg-white',
+    error: 'bg-white',
   };
 
   const borderClasses = {
-    info: 'border-blue-200',
-    success: 'border-green-200',
-    warn: 'border-yellow-200',
-    error: 'border-red-200',
+    info: 'border-blue-500',
+    success: 'border-green-500',
+    warn: 'border-amber-500',
+    error: 'border-red-500',
   };
 
   return (
     <div
-      className={`rounded shadow-lg border-l-[6px] font-normal cursor-pointer pointer-events-all text-sm transition-all duration-100 ease-out mb-4 max-w-full ${colorClasses[level]}}`}
+      className={`rounded-md shadow-lg font-medium cursor-pointer pointer-events-all text-sm transition-all duration-100 ease-out mb-4 max-w-full text-gray-700 ${colorClasses[level]}`}
       style={{
         animationName: 'fly-in-up, fade-in',
         animationTimingFunction: 'ease-out',
@@ -157,7 +158,7 @@ const Alert: React.FC<{ level: AlertLevel; children: React.ReactNode }> = ({
       }}
     >
       <div
-        className={`flex items-center gap-1.5 min-w-[350px] rounded-r border p-2 ${borderClasses[level]}`}
+        className={`flex items-center gap-2 min-w-[350px] rounded-md border px-4 py-3 ${borderClasses[level]}`}
         {...props}
       />
     </div>
@@ -169,6 +170,6 @@ const CloseAlert = ({ ...styleProps }) => (
     className='border-none bg-transparent p-0 outline-none flex items-center'
     {...styleProps}
   >
-    <BiX className='w-5 auto flex-grow-0 flex-shrink-0 opacity-50' />
+    <BiX className='w-5 auto flex-grow-0 flex-shrink-0 text-gray-700' />
   </button>
 );

@@ -3,8 +3,10 @@ import {
   BranchButton,
   BranchPreviewButton,
   LocalWarning,
+  NavMenuTrigger,
 } from '@tinacms/toolkit';
 import React from 'react';
+import { TinaIcon } from '@toolkit/icons';
 
 export const PageWrapper = ({
   headerClassName,
@@ -14,11 +16,13 @@ export const PageWrapper = ({
   children: React.ReactNode;
 }) => {
   return (
-    <div className='relative left-0 w-full h-full bg-gradient-to-b from-gray-50/50 to-gray-50 shadow-2xl overflow-y-auto transition-opacity duration-300 ease-out flex flex-col opacity-100'>
-      <div className={`py-2 px-4 ${headerClassName}`}>
-        <LocalWarning />
+    <div className='relative left-0 w-full h-full bg-gradient-to-b from-gray-50/50 to-gray-50 overflow-y-auto transition-opacity duration-300 ease-out flex flex-col opacity-100'>
+      <div className={`py-2 w-full ${headerClassName}`}>
         <BillingWarning />
-        <div className='flex justify-between items-center'>
+        <div className='flex items-center gap-4'>
+          <NavMenuTrigger className='ml-2' />
+          <TinaIcon className='self-center h-10 min-w-10 w-auto text-orange-500' />
+          <LocalWarning />
           <BranchButton />
           <BranchPreviewButton />
         </div>

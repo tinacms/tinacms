@@ -48,7 +48,7 @@ export class TinaClient<GenQueries> {
   initialized = false;
   cacheLock: AsyncLock | undefined;
   cacheDir: string;
-  cache: Cache;
+  cache: Cache | null;
 
   constructor({
     token,
@@ -69,14 +69,12 @@ export class TinaClient<GenQueries> {
       return;
     }
     try {
-      if (
-        this.cacheDir &&
-        typeof window === 'undefined' &&
-        typeof require !== 'undefined'
-      ) {
+      if (this.cacheDir && typeof window === 'undefined') {
         const { NodeCache } = await import('../cache/node-cache.js');
         this.cache = await NodeCache(this.cacheDir);
-        this.cacheLock = new AsyncLock();
+        if (this.cache) {
+          this.cacheLock = new AsyncLock();
+        }
       }
     } catch (e) {
       console.error(e);
@@ -179,13 +177,13 @@ async function requestFromServer<DataType extends Record<string, any> = any>(
     throw new Error(
       `Server responded with status code ${res.status}, ${res.statusText}. ${
         additionalInfo ? additionalInfo : ''
-      } Please see our FAQ for more information: https://tina.io/docs/errors/faq/`
+      } Please see our FAQ for more information: https://tina.io/docs/r/FAQ/`
     );
   }
   const json = await res.json();
   if (json.errors && errorPolicyDefined === 'throw') {
     throw new Error(
-      `Unable to fetch, please see our FAQ for more information: https://tina.io/docs/errors/faq/
+      `Unable to fetch, please see our FAQ for more information: https://tina.io/docs/r/FAQ/
       Errors: \n\t${json.errors.map((error) => error.message).join('\n')}`
     );
   }

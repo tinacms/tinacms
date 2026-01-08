@@ -2,7 +2,8 @@ import * as React from 'react';
 import { FieldProps } from './field-props';
 import { useEvent } from '@toolkit/react-core/use-cms-event';
 import { FieldHoverEvent, FieldFocusEvent } from '@toolkit/fields/field-events';
-import { Form } from '@toolkit/forms';
+import { Form, Field } from '@toolkit/forms';
+import { useCMS } from '@toolkit/react-core';
 
 export type InputFieldType<ExtraFieldProps, InputProps> =
   FieldProps<InputProps> & ExtraFieldProps;
@@ -23,6 +24,9 @@ export function wrapFieldsWithMeta<ExtraFieldProps = {}, InputProps = {}>(
         error={props.meta.error}
         index={props.index}
         tinaForm={props.tinaForm}
+        field={props.field}
+        focusIntent={props.field.focusIntent}
+        hoverIntent={props.field.hoverIntent}
       >
         <Field {...props} />
       </FieldMeta>
@@ -47,6 +51,8 @@ export function wrapFieldWithNoHeader<ExtraFieldProps = {}, InputProps = {}>(
         error={props.meta.error}
         index={props.index}
         tinaForm={props.tinaForm}
+        focusIntent={props.field.focusIntent}
+        hoverIntent={props.field.hoverIntent}
       >
         <Field {...props} />
       </FieldMeta>
@@ -72,6 +78,8 @@ export function wrapFieldWithError<ExtraFieldProps = {}, InputProps = {}>(
         error={props.meta.error}
         index={props.index}
         tinaForm={props.tinaForm}
+        focusIntent={props.field.focusIntent}
+        hoverIntent={props.field.hoverIntent}
       >
         <Field {...props} />
       </FieldMeta>
@@ -88,6 +96,9 @@ interface FieldMetaProps extends React.HTMLAttributes<HTMLElement> {
   margin?: boolean;
   index?: number;
   tinaForm: Form;
+  field?: Field;
+  focusIntent?: boolean;
+  hoverIntent?: boolean;
 }
 
 export const FieldMeta = ({
@@ -99,19 +110,49 @@ export const FieldMeta = ({
   children,
   index,
   tinaForm,
+  field,
+  focusIntent,
+  hoverIntent,
   ...props
 }: FieldMetaProps) => {
+  const cms = useCMS();
   const { dispatch: setHoveredField } =
     useEvent<FieldHoverEvent>('field:hover');
   const { dispatch: setFocusedField } =
     useEvent<FieldFocusEvent>('field:focus');
+
+  const isActive = !!focusIntent;
+  const isHovering = !!hoverIntent;
+
+  const handleClick = () => {
+    // Check if this field is already active - if so, don't toggle it off
+    const existingForm = cms.state.forms.find(
+      (form: any) => form.tinaForm.id === tinaForm.id
+    );
+    const isAlreadyActive = existingForm?.activeFieldName === name;
+
+    if (isAlreadyActive) {
+      return;
+    }
+    // Dispatch the field:focus event for iframe communication
+    setFocusedField({ id: tinaForm.id, fieldName: name });
+    // Also set the active field in Redux state for sidebar highlighting
+    cms.dispatch({
+      type: 'forms:set-active-field-name',
+      value: { formId: tinaForm.id, fieldName: name },
+    });
+  };
+
   return (
     <FieldWrapper
       margin={margin}
+      field={field}
       onMouseOver={() => setHoveredField({ id: tinaForm.id, fieldName: name })}
       onMouseOut={() => setHoveredField({ id: null, fieldName: null })}
-      onClick={() => setFocusedField({ id: tinaForm.id, fieldName: name })}
+      onClick={handleClick}
       style={{ zIndex: index ? 1000 - index : undefined }}
+      data-tina-field-active={isActive ? 'true' : undefined}
+      data-tina-field-hovering={isHovering ? 'true' : undefined}
       {...props}
     >
       {(label !== false || description) && (
@@ -134,13 +175,50 @@ export const FieldMeta = ({
 export const FieldWrapper = ({
   margin,
   children,
+  field,
+  'data-tina-field-active': dataActive,
+  'data-tina-field-hovering': dataHovering,
   ...props
 }: {
   margin: boolean;
   children: React.ReactNode;
+  field?: Field;
+  'data-tina-field-active'?: string;
+  'data-tina-field-hovering'?: string;
 } & Partial<React.ComponentPropsWithoutRef<'div'>>) => {
+  const isActive = dataActive === 'true';
+  const isHovering = dataHovering === 'true';
+
+  const getFieldStateClasses = () => {
+    const elements = ['input', 'textarea', 'select', '.ProseMirror'];
+
+    const buildClasses = (color: string) => {
+      return elements
+        .map(
+          (el) =>
+            `[&_${el}]:!border-${color} [&_${el}]:!ring-2 [&_${el}]:!ring-${color}/20`
+        )
+        .join(' ');
+    };
+
+    if (isActive) {
+      return buildClasses('tina-orange-dark');
+    }
+
+    if (isHovering) {
+      return buildClasses('blue-500');
+    }
+
+    return '';
+  };
+
   return (
-    <div className={`relative ${margin ? `mb-5 last:mb-0` : ``}`} {...props}>
+    <div
+      className={`relative w-full px-2 ${margin ? 'mb-5 last:mb-0' : ''} ${field?.width === 'half' ? '@sm:w-1/2' : ''} ${getFieldStateClasses()}`}
+      data-tina-field-active={dataActive}
+      data-tina-field-hovering={dataHovering}
+      {...props}
+    >
       {children}
     </div>
   );

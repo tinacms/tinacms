@@ -1,11 +1,11 @@
 {
 	"name": "@tinacms/app",
-	"version": "2.3.2",
+	"version": "2.3.19",
 	"main": "src/main.tsx",
 	"license": "Apache-2.0",
 	"devDependencies": {
 		"@types/react": "^18.3.18",
-		"@types/react-dom": "^18.3.5",
+		"@types/react-dom": "catalog:",
 		"typescript": "^5.7.3"
 	},
 	"peerDependencies": {
@@ -27,6 +27,10 @@
 		"react-router-dom": "catalog:",
 		"tinacms": "workspace:*",
 		"typescript": "^5.7.3",
-		"zod": "^3.24.2"
+		"zod": "catalog:"
+	},
+	"repository": {
+		"url": "https://github.com/tinacms/tinacms.git",
+		"directory": "packages/@tinacms/app"
 	}
 }

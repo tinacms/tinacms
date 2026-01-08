@@ -1,4 +1,4 @@
-The _TinaCloud CLI_ can be used to set up your project with TinaCloud configuration, and run a local version of the TinaCloud content-api (using your file system's content). For a real-world example of how this is being used checkout the [TinaCloud Starter](https://github.com/tinacms/tina-cloud-starter).
+The _TinaCloud CLI_ can be used to set up your project with TinaCloud configuration, and run a local version of the TinaCloud content-api (using your file system's content). For a real-world example of how this is being used checkout the [TinaCloud Starter](https://github.com/tinacms/tina-nextjs-starter).
 
 ## Installation
 
@@ -24,7 +24,7 @@ Usage: @tinacms/cli command [options]
 Options:
   -V, --version             output the version number
   -h, --help                display help for command
-  -v, --verbose             increase verbosity of console output   
+  -v, --verbose             increase verbosity of console output
 
 Commands:
   server:start [options]    Start Filesystem Graphql Server
@@ -137,7 +137,7 @@ The top-level key in the schema is an array of _collections_, a `collection` inf
 
 ### `templates`
 
-Templates are responsible for defining the shape of your content, you'll see in the schema for [the starter](https://github.com/tinacms/tina-cloud-starter) that we use `templates` for `collections` as well as `blocks`. One important thing to note is that since a `collection` can have multiple `templates`, each file in your collection must store a `_template` key in it's frontmatter:
+Templates are responsible for defining the shape of your content, you'll see in the schema for [the starter](https://github.com/tinacms/tina-nextjs-starter) that we use `templates` for `collections` as well as `blocks`. One important thing to note is that since a `collection` can have multiple `templates`, each file in your collection must store a `_template` key in it's frontmatter:
 
 ```markdown
 ---
@@ -151,7 +151,7 @@ When you use Tina's GraphQL forms, we know about all of the relationships in you
 
 ### `fields`
 
-For the most part, you can think of `fields` as the backend equivalent to [Tina field plugins](https://tina.io/docs/plugins/fields/). You might notice that we're defining a `type` on each field, rather than a `component`. This is because the backend isn't concerned with `component`s, only the shape of your content. By default we use the built-in Tina fields, to customize your `component` read the [field customization](https://tina.io/docs/tina-cloud/client/#field-customization) instructions.
+For the most part, you can think of `fields` as the backend equivalent to [Tina field plugins](https://tina.io/docs/plugins/fields/). You might notice that we're defining a `type` on each field, rather than a `component`. This is because the backend isn't concerned with `component`s, only the shape of your content. By default we use the built-in Tina fields, to customize your `component` read the [field customization](https://tina.io/docs/tinacloud/client/#field-customization) instructions.
 
 #### `reference` & `reference-list`
 
@@ -229,7 +229,7 @@ getPostsDocument(relativePath: "voteForPedro.md") {
 }
 ```
 
-To learn how to work with this data on a Tina-enabled site, check out the [client documentation](https://tina.io/docs/tina-cloud/client/)
+To learn how to work with this data on a Tina-enabled site, check out the [client documentation](https://tina.io/docs/tinacloud/client/)
 
 > This API is currently somewhat limited. Specifically there's no support for filtering and sorting "list" queries. We have plans to tackle that in upcoming cycles
 

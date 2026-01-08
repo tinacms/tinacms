@@ -1,5 +1,3 @@
-import { BaseExample } from './templates';
-
 type TinaDocsTheme = {
   title: string;
   value: string;

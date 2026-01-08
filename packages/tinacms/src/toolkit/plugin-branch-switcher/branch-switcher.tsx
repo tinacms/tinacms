@@ -1,7 +1,7 @@
 import { BaseTextField, FieldLabel, Select } from '@toolkit/fields';
 import { LoadingDots, PrefixedTextField } from '@toolkit/form-builder';
 import { useCMS } from '@toolkit/react-core';
-import { Button, OverflowMenu } from '@toolkit/styles';
+import { Button } from '@toolkit/styles';
 import { formatDistanceToNow } from 'date-fns';
 import * as React from 'react';
 import { AiFillWarning } from 'react-icons/ai';
@@ -9,7 +9,7 @@ import {
   BiError,
   BiGitBranch,
   BiLinkExternal,
-  BiLock,
+  BiLockAlt,
   BiPencil,
   BiRefresh,
   BiSearch,
@@ -20,8 +20,19 @@ import { MdArrowForward, MdOutlineClear } from 'react-icons/md';
 import { useBranchData } from './branch-data';
 import { BranchSwitcherLegacy } from './branch-switcher-legacy';
 import { Branch, BranchSwitcherProps } from './types';
+import { Badge } from '@toolkit/react-sidebar/components/badge';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipPortal,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@toolkit/fields/plugins/mdx-field-plugin/plate/components/plate-ui/tooltip';
 
 type ListState = 'loading' | 'ready' | 'error';
+
+const tableHeadingStyle =
+  'px-3 py-3 text-left text-xs font-bold text-gray-700 tracking-wider sticky top-0 bg-gray-100 z-20 border-b-2 border-gray-200 ';
 
 export function formatBranchName(str: string): string {
   const pattern = /[^/\w-]+/g; // regular expression pattern to match invalid special characters
@@ -161,14 +172,14 @@ export const EditoralBranchSwitcher = ({
               <a
                 target='_blank'
                 className='transition-all duration-150 ease-out text-blue-600 hover:text-blue-400 hover:underline no-underline'
-                href='https://tina.io/docs/tina-cloud/'
+                href='https://tina.io/docs/r/what-is-tinacloud/'
               >
                 Learn more about moving to production with TinaCloud.
               </a>
             </p>
             <p>
               <Button
-                href='https://tina.io/docs/tina-cloud/'
+                href='https://tina.io/docs/r/what-is-tinacloud/'
                 target='_blank'
                 as='a'
               >
@@ -342,6 +353,9 @@ const BranchSelector = ({
   const [sortValue, setSortValue] = React.useState<
     'default' | 'updated' | 'name'
   >('default');
+  const [selectedBranch, setSelectedBranch] = React.useState<string | null>(
+    null
+  );
 
   const cms = useCMS();
 
@@ -356,7 +370,7 @@ const BranchSelector = ({
 
   return (
     <div className='flex flex-col gap-4'>
-      <div className='flex items-end space-x-4'>
+      <div className='flex items-stretch space-x-4'>
         <div>
           <label
             htmlFor='search'
@@ -384,7 +398,7 @@ const BranchSelector = ({
             )}
           </div>
         </div>
-        <div>
+        <div className='flex flex-col'>
           <label
             htmlFor='branch-type'
             className='text-xs mb-1 flex flex-col font-bold'
@@ -425,22 +439,64 @@ const BranchSelector = ({
         </div>
       )}
       {filteredBranchList.length > 0 && (
-        <div className='min-w-[192px] max-h-[24rem] overflow-y-auto flex flex-col w-full h-full rounded-lg shadow-inner bg-white border border-gray-200'>
-          {filteredBranchList.map((branch) => (
-            <BranchItem
-              key={branch.name}
-              branch={branch}
-              currentBranch={currentBranch}
-              onChange={onChange}
-              refreshBranchList={refreshBranchList}
-              previewFunction={previewFunction}
-              cms={cms}
-            />
-          ))}
-        </div>
+        <TooltipProvider>
+          <div className='rounded-lg border border-gray-200 overflow-hidden'>
+            <div className='min-w-[192px] max-h-[24rem] overflow-y-auto w-full h-full shadow-inner bg-white'>
+              <table className='w-full table-auto max-h-[24rem]'>
+                <thead className='sticky top-0 z-20 bg-gray-100 border-b-2 border-gray-200'>
+                  <tr>
+                    <th className={`${tableHeadingStyle} w-auto`}>
+                      Branch Name
+                    </th>
+                    <th
+                      className={`${tableHeadingStyle} w-0 whitespace-nowrap text-left`}
+                    >
+                      Last Updated
+                    </th>
+                    <th
+                      className={`${tableHeadingStyle} w-0 whitespace-nowrap text-left`}
+                    >
+                      Pull Request
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredBranchList.map((branch) => (
+                    <BranchItem
+                      key={branch.name}
+                      branch={branch}
+                      currentBranch={currentBranch}
+                      onChange={onChange}
+                      refreshBranchList={refreshBranchList}
+                      previewFunction={previewFunction}
+                      cms={cms}
+                      selectedBranch={selectedBranch}
+                      onSelectBranch={setSelectedBranch}
+                    />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </TooltipProvider>
       )}
+      <div className='flex justify-end'>
+        <Button
+          variant='primary'
+          onClick={() => {
+            onChange(selectedBranch);
+          }}
+          disabled={!selectedBranch || selectedBranch === currentBranch}
+        >
+          Open branch in editor
+        </Button>
+      </div>
     </div>
   );
+};
+
+const extractPullRequestId = (url: string): string => {
+  return url.split('/').pop() || '';
 };
 
 const BranchItem = ({
@@ -450,6 +506,8 @@ const BranchItem = ({
   refreshBranchList,
   previewFunction,
   cms,
+  selectedBranch,
+  onSelectBranch,
 }: {
   branch: Branch;
   currentBranch: string;
@@ -457,6 +515,8 @@ const BranchItem = ({
   refreshBranchList: () => void;
   previewFunction?: any;
   cms: any;
+  selectedBranch: string | null;
+  onSelectBranch: (branchName: string | null) => void;
 }) => {
   const [creatingPR, setCreatingPR] = React.useState(false);
 
@@ -485,35 +545,70 @@ const BranchItem = ({
   };
 
   const isCurrentBranch = branch.name === currentBranch;
+  const isSelected = selectedBranch === branch.name;
   // @ts-ignore
   const indexingStatus = branch?.indexStatus?.status;
 
+  const handleRowClick = () => {
+    if (indexingStatus === 'complete' && !isCurrentBranch) {
+      onSelectBranch(isSelected ? null : branch.name);
+    }
+  };
+
   return (
-    <div
-      className={`relative text-base py-1.5 px-3 flex items-center gap-1.5 border-l-0 border-t-0 border-r-0 border-gray-50 w-full outline-none transition-all ease-out duration-150 ${
+    <tr
+      onClick={handleRowClick}
+      className={`text-base border-l-0 transition-colors border-t-0 border-r-0 outline-none transition-all ease-out duration-150 ${
         indexingStatus !== 'complete'
           ? 'bg-gray-50 text-gray-400'
           : isCurrentBranch
-            ? 'border-blue-500 border-l-5 bg-blue-50 text-blue-800 border-b-0'
-            : 'border-b-2'
+            ? 'border-b-2 border-gray-50'
+            : isSelected
+              ? 'bg-blue-100 text-blue-900 border-b-2 border-blue-50 cursor-pointer'
+              : 'border-b-2 border-gray-50 hover:bg-gray-50/50 cursor-pointer'
       }`}
     >
-      <div className='w-1/2'>
-        <div className='flex items-center gap-1'>
-          <div className='flex-0'>
-            {branch.protected && (
-              <BiLock className='w-5 h-auto opacity-70 text-blue-500' />
+      <td
+        className={`pl-3 pr-3 max-w-xs ${isCurrentBranch ? 'py-2.5' : 'py-1.5'}`}
+      >
+        <div className='flex flex-col'>
+          <div className='flex items-center gap-1 min-w-0'>
+            {branch.protected ? (
+              <BiLockAlt className='w-4 h-auto opacity-70 text-blue-500 flex-shrink-0' />
+            ) : (
+              <BiGitBranch className='w-4 h-auto opacity-70 text-gray-600 flex-shrink-0' />
             )}
+            <Tooltip delayDuration={300}>
+              <TooltipTrigger asChild>
+                <span className='text-sm leading-tight truncate block min-w-0 cursor-default'>
+                  {branch.name}
+                </span>
+              </TooltipTrigger>
+              <TooltipPortal>
+                <TooltipContent side='top'>{branch.name}</TooltipContent>
+              </TooltipPortal>
+            </Tooltip>
           </div>
-          <div className='truncate flex-1'>{branch.name}</div>
+          {isCurrentBranch && (
+            <div className='w-fit mt-1'>
+              <Badge
+                calloutStyle='info'
+                className='w-fit flex-shrink-0'
+                displayIcon={false}
+              >
+                <BiPencil className='w-3 h-auto inline-block mr-1' />
+                Currently editing
+              </Badge>
+            </div>
+          )}
+          {indexingStatus !== 'complete' && (
+            <div className='w-fit mt-1'>
+              <IndexStatus indexingStatus={branch.indexStatus.status} />
+            </div>
+          )}
         </div>
-        {indexingStatus !== 'complete' && (
-          <div className='w-fit'>
-            <IndexStatus indexingStatus={branch.indexStatus.status} />
-          </div>
-        )}
-      </div>
-      <div className='flex-1'>
+      </td>
+      <td className='px-3 py-1.5 min-w-0'>
         {creatingPR ? (
           <div className='flex items-center gap-2'>
             <div>
@@ -525,70 +620,45 @@ const BranchItem = ({
             <FaSpinner className='w-3 h-auto animate-spin text-blue-500' />
           </div>
         ) : (
-          <>
-            <div className='text-xs font-bold'>Last Updated</div>
-            <span className='text-sm leading-tight'>
-              {formatDistanceToNow(new Date(branch.indexStatus.timestamp), {
-                addSuffix: true,
-              })}
-            </span>
-          </>
+          <span className='text-sm leading-tight whitespace-nowrap'>
+            {formatDistanceToNow(new Date(branch.indexStatus.timestamp), {
+              addSuffix: true,
+            })}
+          </span>
         )}
-      </div>
-      <div className='flex items-center'>
-        {indexingStatus === 'complete' && !isCurrentBranch && (
+      </td>
+      <td className='px-3 py-1.5 flex' onClick={(e) => e.stopPropagation()}>
+        {branch.githubPullRequestUrl ? (
           <Button
             variant='white'
             size='custom'
             onClick={() => {
-              onChange(branch.name);
+              window.open(branch.githubPullRequestUrl, '_blank');
             }}
-            className='mr-auto cursor-pointer text-sm h-9 px-4 flex items-center gap-1'
+            className='cursor-pointer h-9 px-2 flex items-center gap-1'
+            title='Open Git Pull Request'
           >
-            <BiPencil className='h-4 w-auto text-blue-500 opacity-70 -mt-px' />{' '}
-            Select
+            <BiLinkExternal className='h-3.5 w-auto text-gray-700 flex-shrink-0' />
+            <span className='text-sm truncate max-w-[120px]'>
+              PR: {extractPullRequestId(branch.githubPullRequestUrl)}
+            </span>
           </Button>
-        )}
-        <div className='ml-auto'>
-          <OverflowMenu
-            toolbarItems={[
-              branch.githubPullRequestUrl && {
-                name: 'github-pr',
-                label: 'View in GitHub',
-                Icon: (
-                  <BiLinkExternal className='w-5 h-auto text-blue-500 opacity-70' />
-                ),
-                onMouseDown: () => {
-                  window.open(branch.githubPullRequestUrl, '_blank');
-                },
-              },
-              !branch.githubPullRequestUrl &&
-                !branch.protected &&
-                !creatingPR &&
-                cms.api.tina.usingProtectedBranch() && {
-                  name: 'create-pr',
-                  label: 'Create Pull Request',
-                  Icon: (
-                    <BiGitBranch className='w-5 h-auto text-blue-500 opacity-70' />
-                  ),
-                  onMouseDown: () => handleCreatePullRequest(),
-                },
-              typeof previewFunction === 'function' &&
-                previewFunction({ branch: branch.name })?.url && {
-                  name: 'preview',
-                  label: 'Preview',
-                  onMouseDown: () => {
-                    const previewUrl = previewFunction({
-                      branch: branch.name,
-                    })?.url;
-                    window.open(previewUrl, '_blank');
-                  },
-                },
-            ].filter(Boolean)}
-          />
-        </div>
-      </div>
-    </div>
+        ) : !branch.protected &&
+          !creatingPR &&
+          cms.api.tina.usingProtectedBranch() ? (
+          <Button
+            variant='white'
+            size='custom'
+            onClick={handleCreatePullRequest}
+            className='cursor-pointer h-9 px-2 flex items-center gap-1'
+            title='Create Pull Request'
+          >
+            <BiGitBranch className='h-3.5 w-auto text-gray-700 flex-shrink-0' />
+            <span className='text-sm whitespace-nowrap'>Create PR</span>
+          </Button>
+        ) : null}
+      </td>
+    </tr>
   );
 };
 

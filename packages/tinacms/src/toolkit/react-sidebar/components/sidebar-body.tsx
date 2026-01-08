@@ -23,6 +23,13 @@ import { FormLists } from './form-list';
 import { SidebarContext } from './sidebar';
 import { SidebarLoadingPlaceholder } from './sidebar-loading-placeholder';
 import { SidebarNoFormsPlaceholder } from './sidebar-no-forms-placeholder';
+import { History } from 'lucide-react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '../../../admin/components/ui/tooltip';
 
 // this is the minimum time to show the loading indicator (in milliseconds)
 // this is to prevent the loading indicator from flashing or the 'no forms' placeholder from showing pre-maturely
@@ -91,7 +98,12 @@ export const FormsView = ({ loadingPlaceholder }: FormsViewProps = {}) => {
     <>
       {activeForm && (
         <FormWrapper isEditing={isEditing} isMultiform={isMultiform}>
-          <FormHeader activeForm={activeForm} />
+          <FormHeader
+            activeForm={activeForm}
+            branch={cms.api.admin.api.branch}
+            repoProvider={cms.api.admin.api.schema.config.config.repoProvider}
+            isLocalMode={cms.api?.tina?.isLocalMode}
+          />
           {formMetas?.map((meta) => (
             <React.Fragment key={meta.name}>
               <meta.Component />
@@ -136,17 +148,97 @@ const FormWrapper: React.FC<FormWrapperProps> = ({ isEditing, children }) => {
 
 export interface FormHeaderProps {
   activeForm: { activeFieldName?: string; tinaForm: Form };
+  branch?: string;
+  isLocalMode?: boolean;
+  repoProvider?: {
+    defaultBranchName?: string;
+    historyUrl?: (context: {
+      relativePath: string;
+      branch: string;
+    }) => { url: string };
+  };
 }
 
-export const FormHeader = ({ activeForm }: FormHeaderProps) => {
+export const FormHeader = ({
+  activeForm,
+  repoProvider,
+  branch,
+  isLocalMode,
+}: FormHeaderProps) => {
   const { formIsPristine } = React.useContext(SidebarContext);
 
   return (
     <div className='px-4 pt-2 pb-4 flex flex-row flex-nowrap justify-between items-center gap-2 bg-gradient-to-t from-white to-gray-50'>
       <MultiformSelector activeForm={activeForm} />
       <FormBreadcrumbs className='w-[calc(100%-3rem)]' />
+      <FileHistoryProvider
+        defaultBranchName={repoProvider?.defaultBranchName}
+        historyUrl={repoProvider?.historyUrl}
+        contentRelativePath={activeForm.tinaForm.path}
+        tinaBranch={branch}
+        isLocalMode={isLocalMode}
+      />
       <FormStatus pristine={formIsPristine} />
     </div>
+  );
+};
+
+interface RepositoryProviderProps {
+  contentRelativePath: string;
+  tinaBranch?: string;
+  isLocalMode?: boolean;
+  defaultBranchName?: string;
+  historyUrl?: (context: {
+    relativePath: string;
+    branch: string;
+  }) => { url: string };
+}
+
+export const FileHistoryProvider = ({
+  contentRelativePath,
+  tinaBranch,
+  defaultBranchName,
+  historyUrl,
+  isLocalMode,
+}: RepositoryProviderProps) => {
+  if (!historyUrl) {
+    return null;
+  }
+
+  const branch = isLocalMode ? defaultBranchName || tinaBranch : tinaBranch;
+
+  if (!branch) {
+    return null;
+  }
+
+  const { url } = historyUrl({
+    relativePath: contentRelativePath,
+    branch: branch,
+  });
+
+  if (!url) {
+    return null;
+  }
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button type='button'>
+            <a
+              href={url}
+              target='_blank'
+              className='flex items-center gap-1 border-[0.5px] hover:bg-gray-300/10 transition-all duration-300 border-gray-300 rounded-md p-2'
+            >
+              <History className='size-4 text-gray-700' />
+            </a>
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side='top' className='shadow-md'>
+          View file history
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };
 
@@ -216,7 +308,6 @@ export const FormBreadcrumbs = ({
                   {dropdownBreadcrumbs.map((breadcrumb) => (
                     <DropdownMenuItem
                       key={breadcrumb.formId}
-                      className='cursor-pointer text-gray-700 hover:text-blue-500'
                       onClick={(e) => {
                         e.preventDefault();
                         goBack(breadcrumb.formId, breadcrumb.formName);

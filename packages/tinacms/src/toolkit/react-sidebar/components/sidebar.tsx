@@ -16,8 +16,10 @@ import { PiSidebarSimpleLight } from 'react-icons/pi';
 import type { SidebarState, SidebarStateOptions } from '../sidebar';
 import { BillingWarning, LocalWarning } from './local-warning';
 import { Nav } from './nav';
+import { NavCloudLink } from './nav-components';
 import { ResizeHandle } from './resize-handle';
 import { FormsView } from './sidebar-body';
+import { TinaIcon } from '@toolkit/icons';
 
 export const SidebarContext = React.createContext<any>(null);
 export const minPreviewWidth = 440;
@@ -284,7 +286,7 @@ const Sidebar = ({
                   />
                 )}
                 RenderNavCloud={({ config }) => (
-                  <SidebarCloudLink config={config} />
+                  <NavCloudLink config={config} />
                 )}
                 RenderNavCollection={({ collection }) => (
                   <SidebarCollectionLink
@@ -367,25 +369,22 @@ const SidebarHeader = ({ isLocalMode }) => {
 
   return (
     <>
-      <div className='p-2 flex-grow-0 w-full'>
+      <div className='p-2 flex-grow-0 w-full bg-gray-50'>
         {!isLocalMode && <BillingWarning />}
 
         <div className='w-full flex justify-between items-center'>
-          <div className='flex'>
+          <div className='flex overflow-hidden py-1'>
             <button
               className='p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
               onClick={toggleMenu}
               title='Open navigation menu'
               aria-label='Open navigation menu'
             >
-              <BiMenu className='h-6 w-auto text-gray-600' />
+              <BiMenu className='h-8 w-auto text-gray-600' />
             </button>
-
-            <BranchButton />
-
-            <div className='px-4'>
-              <LocalWarning />
-            </div>
+            <TinaIcon className='self-center h-10 min-w-10 w-auto text-orange-500 mr-2' />
+            <BranchButton className='overflow-hidden mr-2' />
+            <LocalWarning className='px-4' />
           </div>
 
           <div className='flex'>
@@ -422,31 +421,6 @@ const SidebarSiteLink = ({
     >
       <view.Icon className='mr-2 h-6 opacity-80 w-auto' /> {view.name}
     </button>
-  );
-};
-
-const SidebarCloudLink = ({ config }: { config: CloudConfigPlugin }) => {
-  if (config.text) {
-    return (
-      <span className='text-base tracking-wide text-gray-500 flex items-center opacity-90'>
-        {config.text}{' '}
-        <a
-          target='_blank'
-          className='ml-1 text-blue-600 hover:opacity-60'
-          href={config.link.href}
-        >
-          {config.link.text}
-        </a>
-      </span>
-    );
-  }
-  return (
-    <span className='text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100'>
-      <config.Icon className='mr-2 h-6 opacity-80 w-auto' />
-      <a target='_blank' href={config.link.href}>
-        {config.link.text}
-      </a>
-    </span>
   );
 };
 

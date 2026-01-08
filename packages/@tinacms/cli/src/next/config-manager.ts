@@ -1,6 +1,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 import os from 'os';
+import { pathToFileURL } from 'url';
 import * as esbuild from 'esbuild';
 import type { Loader } from 'esbuild';
 import { Config } from '@tinacms/schema-tools';
@@ -8,6 +9,8 @@ import * as dotenv from 'dotenv';
 import normalizePath from 'normalize-path';
 import chalk from 'chalk';
 import { logger } from '../logger';
+import { createRequire } from 'module';
+import { stripNativeTrailingSlash } from '../utils/path';
 
 export const TINA_FOLDER = 'tina';
 export const LEGACY_TINA_FOLDER = '.tina';
@@ -93,6 +96,7 @@ export class ConfigManager {
   }
 
   async processConfig() {
+    const require = createRequire(import.meta.url);
     this.tinaFolderPath = await this.getTinaFolderPath(this.rootPath);
 
     // TODO - .env should potentially be configurable
@@ -234,9 +238,8 @@ export class ConfigManager {
     this.outputHTMLFilePath = path.join(this.outputFolderPath, 'index.html');
     this.outputGitignorePath = path.join(this.outputFolderPath, '.gitignore');
 
-    const fullLocalContentPath = path.join(
-      this.tinaFolderPath,
-      this.config.localContentPath || ''
+    const fullLocalContentPath = stripNativeTrailingSlash(
+      path.join(this.tinaFolderPath, this.config.localContentPath || '')
     );
 
     if (this.config.localContentPath) {
@@ -376,15 +379,24 @@ export class ConfigManager {
     // good way of invalidating them when this file changes
     // https://github.com/nodejs/modules/issues/307
     const tmpdir = path.join(os.tmpdir(), Date.now().toString());
-    const outfile = path.join(tmpdir, 'database.build.js');
+    const outfile = path.join(tmpdir, 'database.build.mjs'); // .mjs tells Node.js this is ESM
     await esbuild.build({
       entryPoints: [this.selfHostedDatabaseFilePath],
       bundle: true,
       platform: 'node',
+      format: 'esm',
       outfile: outfile,
       loader: loaders,
+      // Provide a require() polyfill for ESM bundles containing CommonJS packages.
+      // Some bundled packages (e.g., 'scmp' used by 'mongodb-level') use require('crypto').
+      // When esbuild inlines these CommonJS packages, it keeps the require() calls,
+      // but ESM doesn't have a global require. This banner creates one using Node.js's
+      // official createRequire API, allowing the bundled CommonJS code to work in ESM.
+      banner: {
+        js: `import { createRequire } from 'module';const require = createRequire(import.meta.url);`,
+      },
     });
-    const result = require(outfile);
+    const result = await import(pathToFileURL(outfile).href);
     fs.removeSync(outfile);
     return result.default;
   }
@@ -400,14 +412,20 @@ export class ConfigManager {
     );
 
     const outfile = path.join(tmpdir, 'config.build.jsx');
-    const outfile2 = path.join(tmpdir, 'config.build.js');
+    const outfile2 = path.join(tmpdir, 'config.build.mjs');
     const tempTSConfigFile = path.join(tmpdir, 'tsconfig.json');
+
+    // Provide a require() polyfill for ESM bundles containing CommonJS packages.
+    // Some packages (e.g., 'postcss-selector-parser' via tailwindcss) use require() internally.
+    const esmRequireBanner = {
+      js: `import { createRequire } from 'module';const require = createRequire(import.meta.url);`,
+    };
 
     fs.outputFileSync(tempTSConfigFile, '{}');
     const result2 = await esbuild.build({
       entryPoints: [configFilePath],
       bundle: true,
-      target: ['es2020'],
+      target: ['esnext'],
       platform: 'browser',
       format: 'esm',
       logLevel: 'silent',
@@ -429,24 +447,27 @@ export class ConfigManager {
     await esbuild.build({
       entryPoints: [configFilePath],
       bundle: true,
-      target: ['es2020'],
+      target: ['esnext'],
       logLevel: 'silent',
       platform: 'node',
+      format: 'esm',
       outfile,
       loader: loaders,
+      banner: esmRequireBanner,
     });
     await esbuild.build({
       entryPoints: [outfile],
       bundle: true,
-      // Suppress warning about comparison with -0 from client module
       logLevel: 'silent',
       platform: 'node',
+      target: ['esnext'],
+      format: 'esm',
       outfile: outfile2,
       loader: loaders,
     });
     let result: { default: any };
     try {
-      result = require(outfile2);
+      result = await import(pathToFileURL(outfile2).href);
     } catch (e) {
       console.error('Unexpected error loading config');
       console.error(e);

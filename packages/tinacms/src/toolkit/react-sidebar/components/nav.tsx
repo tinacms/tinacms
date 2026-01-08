@@ -1,14 +1,15 @@
-import { TinaIcon } from '@tinacms/toolkit';
+import { TinaExtendedIcon } from '@tinacms/toolkit';
 import type { CloudConfigPlugin } from '@toolkit/react-cloud-config';
 import { useCMS } from '@toolkit/react-core';
 import { FormModal } from '@toolkit/react-forms';
 import type { ScreenPlugin } from '@toolkit/react-screens';
 import { TinaCMS } from '@toolkit/tina-cms';
 import * as React from 'react';
-import { BiExit, BiMenu } from 'react-icons/bi';
+import { BiExit, BiMenu, BiX } from 'react-icons/bi';
 import { FiInfo } from 'react-icons/fi';
 import { VscNewFile } from 'react-icons/vsc';
 import { cn } from '../../../utils/cn';
+import { NavContext } from './nav-context';
 import { VersionInfo } from './VersionInfo';
 import { SyncStatusButton, SyncStatusModal } from './sync-status';
 
@@ -21,8 +22,8 @@ interface NavCollection {
 interface NavProps {
   isLocalMode: boolean;
   showHamburger?: boolean;
-  menuIsOpen: boolean;
-  toggleMenu: () => void;
+  menuIsOpen?: boolean;
+  toggleMenu?: () => void;
   children?: any;
   className?: string;
   userName?: string;
@@ -47,8 +48,8 @@ interface NavProps {
 export const Nav = ({
   isLocalMode,
   showHamburger = true,
-  menuIsOpen,
-  toggleMenu,
+  menuIsOpen: menuIsOpenProp,
+  toggleMenu: toggleMenuProp,
   className = '',
   children,
   showCollections,
@@ -65,6 +66,12 @@ export const Nav = ({
 }: NavProps) => {
   const cms = useCMS();
   const [eventsOpen, setEventsOpen] = React.useState(false);
+
+  // Use context if available, otherwise fall back to props
+  const navContext = React.useContext(NavContext);
+
+  const menuIsOpen = menuIsOpenProp ?? navContext?.menuIsOpen ?? false;
+  const toggleMenu = toggleMenuProp ?? navContext?.toggleMenu ?? (() => {});
   const { contentCollections, authCollection } =
     collectionsInfo.collections.reduce(
       (
@@ -99,18 +106,21 @@ export const Nav = ({
 
   return (
     <>
-      <button
-        className={cn(
-          'fixed pointer-events-auto p-4 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded z-10',
-          menuIsOpen ? 'hidden' : ''
-        )}
-        onClick={() => {
-          toggleMenu();
-        }}
-      >
-        <BiMenu className='h-6 w-auto text-gray-600' />
-      </button>
-
+      {showHamburger && (
+        <div className='flex items-baseline'>
+          <button
+            className={cn(
+              'pointer-events-auto p-4 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded z-10',
+              menuIsOpen ? 'hidden' : ''
+            )}
+            onClick={() => {
+              toggleMenu();
+            }}
+          >
+            <BiMenu className='h-8 w-auto text-gray-600' />
+          </button>
+        </div>
+      )}
       <div
         className={cn(
           `relative z-30 flex flex-col bg-white border-r border-gray-200 w-96 h-full ${className}`,
@@ -120,6 +130,9 @@ export const Nav = ({
         {...props}
       >
         <div className='flex w-full px-4 py-3 justify-between items-center gap-2 border-b border-gray-200'>
+          <span className='text-left inline-flex items-center text-xl tracking-wide text-gray-800/80 flex-1 gap-1'>
+            <TinaExtendedIcon className='h-8 w-auto fill-orange-500' />
+          </span>
           <button
             className={cn(
               'pointer-events-auto p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
@@ -128,13 +141,8 @@ export const Nav = ({
               toggleMenu();
             }}
           >
-            <BiMenu className='h-6 w-auto text-gray-600' />
+            <BiX className='h-8 w-auto text-gray-600' />
           </button>
-
-          <span className='text-left inline-flex items-center text-xl tracking-wide text-gray-800/80 flex-1 gap-1'>
-            <TinaIcon className='w-10 h-auto -ml-1 fill-orange-500' />
-            <span>TinaCMS</span>
-          </span>
         </div>
         {children}
         <div className='flex flex-col px-6 flex-1 overflow-auto'>
@@ -145,7 +153,7 @@ export const Nav = ({
                 {isLocalMode && (
                   <span className='flex items-center'>
                     <a
-                      href='https://tina.io/docs/schema/#defining-collections'
+                      href='https://tina.io/docs/r/content-modelling-collections'
                       target='_blank'
                     >
                       <FiInfo />
@@ -241,7 +249,6 @@ export const Nav = ({
           <VersionInfo />
         </div>
       </div>
-
       {eventsOpen && (
         <SyncStatusModal
           cms={cms}

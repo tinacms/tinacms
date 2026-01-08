@@ -111,7 +111,7 @@ type MediaListState = 'loading' | 'loaded' | 'error' | 'not-configured';
 const defaultListError = new MediaListError({
   title: 'Error fetching media',
   message: 'Something went wrong while requesting the resource.',
-  docsLink: 'https://tina.io/docs/media/#media-store',
+  docsLink: 'https://tina.io/docs/r/repo-based-media',
 });
 
 export function MediaPicker({
@@ -372,7 +372,7 @@ export function MediaPicker({
       <DocsLink
         title='No Media Store Configured'
         message='To use the media manager, you need to configure a Media Store.'
-        docsLink='https://tina.io/docs/reference/media/overview/'
+        docsLink='https://tina.io/docs/r/repo-based-media'
       />
     );
   }
@@ -473,7 +473,7 @@ export function MediaPicker({
                 } ${
                   list.items.length > 0 &&
                   viewMode === 'grid' &&
-                  'w-full p-4 gap-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 4xl:grid-cols-6 6xl:grid-cols-9 auto-rows-auto content-start justify-start'
+                  'w-full p-4 gap-4 grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 @2xl:grid-cols-4 @4xl:grid-cols-6 @6xl:grid-cols-9 auto-rows-auto content-start justify-start'
                 } ${isDragActive ? `border-2 border-blue-500 rounded-lg` : ``}`}
               >
                 <input {...getInputProps()} />
@@ -581,8 +581,8 @@ const ActiveItemPreview = ({
                   variant='primary'
                   onClick={() => selectMediaItem(activeItem)}
                 >
+                  <BiArrowToBottom className='mr-1 -ml-0.5 w-6 h-auto opacity-70' />
                   Insert
-                  <BiArrowToBottom className='ml-1 -mr-0.5 w-6 h-auto opacity-70' />
                 </Button>
               )}
               {allowDelete && (
@@ -591,8 +591,8 @@ const ActiveItemPreview = ({
                   size='medium'
                   onClick={deleteMediaItem}
                 >
+                  <TrashIcon className='mr-1 -ml-0.5 w-6 h-auto opacity-70' />
                   Delete
-                  <TrashIcon className='ml-1 -mr-0.5 w-6 h-auto opacity-70' />
                 </Button>
               )}
             </div>

@@ -13,7 +13,7 @@ import type {
   TinaSchema,
 } from '@tinacms/schema-tools';
 import sha from 'js-sha1';
-import set from 'lodash.set';
+import { set } from 'es-toolkit/compat';
 import { FilesystemBridge, TinaLevelClient } from '..';
 import { generatePasswordHash, mapUserFields } from '../auth/utils';
 import { NotFoundError } from '../error';
@@ -674,7 +674,6 @@ export class Database {
         originalError: error,
         file: filepath,
         collection: collectionName,
-        stack: error.stack,
       });
     }
   };
@@ -1191,7 +1190,6 @@ export class Database {
                 originalError: error,
                 file: path,
                 collection: collection.name,
-                stack: error.stack,
               });
             }
             // I dont think this should ever happen
@@ -1752,7 +1750,6 @@ const _indexContent = async ({
         originalError: error,
         file: filepath,
         collection: collection?.name,
-        stack: error.stack,
       });
     }
   });

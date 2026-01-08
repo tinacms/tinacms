@@ -1,5 +1,22 @@
 # @tinacms/metrics
 
+## 2.0.1
+
+### Patch Changes
+
+- [#6216](https://github.com/tinacms/tinacms/pull/6216) [`5c1e891`](https://github.com/tinacms/tinacms/commit/5c1e89181f595d392ad6cb56ca5fc0b6d9e60a23) Thanks [@JackDevAU](https://github.com/JackDevAU)! - - `@tinacms/graphql`: remove scmp dependency, replaced with modern code (now inbuilt)
+  - `@tinacms/metrics`: remove isomorphic-fetch dependency, now relies on global fetch
+  - `@tinacms/cli`: remove log4js dependency, replaced with custom logger implementation; update chalk to v5 (ESM-only)
+  - `@tinacms/scripts`, `create-tina-app`: update chalk to v5 (ESM-only)
+  - `next-tinacms-azure`: Buffer to Uint8Array conversion
+  - `tinacms`: TypeScript style prop typing
+
+## 2.0.0
+
+### Major Changes
+
+- [#5982](https://github.com/tinacms/tinacms/pull/5982) [`2e1535d`](https://github.com/tinacms/tinacms/commit/2e1535dd5495dc390902f2db6ef1f26afb072396) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: migrate from commonjs to esm
+
 ## 1.1.0
 
 ### Minor Changes

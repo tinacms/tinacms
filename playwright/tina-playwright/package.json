@@ -1,28 +1,28 @@
 {
-	"name": "playwright-testing",
-	"private": true,
-	"scripts": {
-		"dev": "tinacms dev -c \"next dev\"",
-		"build": "tinacms dev -c \"next build\"",
-		"start": "tinacms dev -c \"next start\"",
-		"lint": "next lint",
-		"audit": "tinacms audit",
-		"test:e2e": "playwright test"
-	},
-	"dependencies": {
-		"axios": "catalog:",
-		"next": "^14.2.24",
-		"react": "^18.3.1",
-		"react-dom": "^18.3.1",
-		"react-is": "^18.3.1",
-		"tinacms": "workspace:*"
-	},
-	"devDependencies": {
-		"@playwright/test": "catalog:",
-		"@tinacms/cli": "workspace:*",
-		"@types/node": "^22.13.1",
-		"eslint": "7",
-		"eslint-config-next": "12.0.3"
-	},
-	"version": "0.0.0"
+  "name": "playwright-testing",
+  "private": true,
+  "scripts": {
+    "dev": "tinacms dev -c \"next dev\"",
+    "build": "tinacms dev -c \"next build\"",
+    "start": "tinacms dev -c \"next start\"",
+    "lint": "next lint",
+    "audit": "tinacms audit",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "axios": "catalog:",
+    "next": "14.2.35",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-is": "^18.3.1",
+    "tinacms": "workspace:*"
+  },
+  "devDependencies": {
+    "@playwright/test": "catalog:",
+    "@tinacms/cli": "workspace:*",
+    "@types/node": "^22.13.1",
+    "eslint": "7",
+    "eslint-config-next": "12.0.3"
+  },
+  "version": "0.0.0"
 }

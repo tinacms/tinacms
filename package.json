@@ -14,7 +14,7 @@
 		"build": "turbo run build --filter=\"./packages/**\"",
 		"diff-tina-lock": "pnpm -r --filter='{./**}' --workspace-concurrency=1 run --if-present diff-tina-lock",
 		"update-tina-lock": "pnpm -r --filter='{./**}' --workspace-concurrency=1 run --if-present update-tina-lock",
-		"test": "turbo run test --filter=\"./packages/**\" -- --silent",
+		"test": "turbo run test --filter=\"./packages/**\"",
 		"types": "turbo run types --filter=\"./packages/**\"",
 		"build:e2e": "pnpm run build && pnpm --filter=kitchen-sink-starter run build",
 		"start:e2e": "pnpm --filter=kitchen-sink-starter run start ",
@@ -44,6 +44,14 @@
 	},
 	"packageManager": "pnpm@9.15.5",
 	"dependencies": {
-		"highlight.js": "^11.11.1"
+		"highlight.js": "catalog:",
+		"react-colorful": "catalog:"
+	},
+	"pnpm": {
+		"overrides": {
+			"@clerk/clerk-js>react": "19.2.3",
+			"@clerk/clerk-js>react-dom": "19.2.3",
+			"@clerk/backend>react": "19.2.3"
+		}
 	}
 }

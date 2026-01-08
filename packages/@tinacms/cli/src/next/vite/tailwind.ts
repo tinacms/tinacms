@@ -5,6 +5,7 @@ import twTypography from '@tailwindcss/typography';
 import tailwind from 'tailwindcss';
 import defaultTheme from 'tailwindcss/defaultTheme.js';
 import type { Plugin } from 'vite';
+import { createRequire } from 'module';
 
 export const tinaTailwind = (
   spaPath: string,
@@ -14,6 +15,7 @@ export const tinaTailwind = (
     name: 'vite-plugin-tina',
     // @ts-ignore
     config: (viteConfig) => {
+      const require = createRequire(import.meta.url);
       const plugins: Plugin[] = [];
       const content = [
         path.join(spaPath, 'src/**/*.{vue,js,ts,jsx,tsx,svelte}'),
@@ -173,7 +175,7 @@ export const tinaTailwind = (
             },
             boxShadow: {
               xs: '0 0 0 1px rgba(0, 0, 0, 0.05)',
-              outline: '0 0 0 3px rgba(66, 153, 225, 0.5)',
+              outline: '0 0 0 3px rgba(194, 65, 12, 0.2)',
             },
             colors: {
               blue: {
@@ -209,6 +211,9 @@ export const tinaTailwind = (
                 500: '#EC4815',
                 600: '#DC4419',
               },
+              'tina-orange': '#EC4815',
+              'tina-orange-dark': '#C2410C',
+              'tina-orange-light': '#FFF7ED',
               background: '#FFFFFF',
               foreground: '#0A0A0A',
               muted: '#F5F5F5',
@@ -227,7 +232,7 @@ export const tinaTailwind = (
               'accent-foreground': '#171717',
               destructive: '#FF3B3B',
               'destructive-foreground': '#FAFAFA',
-              ring: '#0A0A0A',
+              ring: '#C2410C',
             },
             fontFamily: {
               sans: ['Inter', ...defaultTheme.fontFamily.sans],

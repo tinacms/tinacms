@@ -51,32 +51,45 @@ To be the world-leading CMS with Git support that developers love.
 ## Tech Stack
 
 See
-https://tina.io/docs/introduction/faq/#what-is-tinas-tech-stack
+https://tina.io/docs/r/FAQ/#5-what-is-tinas-tech-stack
 
 ## Roadmap
 
 Our development priorities can be read on our [Public Roadmap](https://tina.io/roadmap/).
 
+## Activity 
+
+<a href="https://next.ossinsight.io/widgets/official/analyze-repo-issue-opened-and-closed?repo_id=198488459" target="_blank" style="display: block" align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://next.ossinsight.io/widgets/official/analyze-repo-issue-opened-and-closed/thumbnail.png?repo_id=198488459&image_size=auto&color_scheme=dark" width="721" height="auto">
+    <img alt="Issue Opened and Closed of tinacms/tinacms" src="https://next.ossinsight.io/widgets/official/analyze-repo-issue-opened-and-closed/thumbnail.png?repo_id=198488459&image_size=auto&color_scheme=light" width="721" height="auto">
+  </picture>
+</a>
+
+**Graph: Issues Opened and Closed for TinaCMS**
+<!-- Made with [OSS Insight](https://ossinsight.io/) -->
 ## Contributing
 
 Please see our [./CONTRIBUTING.md](https://github.com/tinacms/tinacms/blob/main/CONTRIBUTING.md)
 
 ### Maintainers
 
-- Kelly Davis ([@kldavis](https://github.com/kldavis4))
-- Jeff See ([@jeffsee55](https://github.com/jeffsee55))
-- Matt Wicks ([@wicksipedia](https://github.com/wicksipedia))
+- Matt Wicks ([@wicksipedia](https://github.com/wicksipedia)) [Product Owner of [TinaCMS](https://github.com/tinacms/tinacms) and [TinaCloud](https://github.com/tinacms/tinacloud)]
+- Gert Marx ([@gertieMarx](https://github.com/gertieMarx)) [Product Owner of website [tina.io](https://github.com/tinacms/tina.io)]
 - Jack Pettit ([@JackDevAU](https://github.com/JackDevAU))
-- Jord Gui ([@Jord-Gui](https://github.com/Jord-Gui))
-- Nick Curran ([@ncn-ssw](https://github.com/ncn-ssw))
+- Eli Kent ([@kulesy](https://github.com/kulesy))
 - Brook Jeynes ([@brookjeynes-ssw](https://github.com/brookjeynes-ssw))
 - Ben Neoh ([@Ben0189](https://github.com/Ben0189))
-- Warwick Leahy ([@leahy268](https://github.com/leahy268))
-- Seth Daily ([@sethdaily ](https://github.com/sethdaily))
 - Josh Berman ([@joshbermanssw](https://github.com/joshbermanssw))
-- Scott Gallant ([@scottgallant](https://github.com/scottgallant))
-- Adam Cogan ([@adamcogan](https://github.com/adamcogan))
+- Ivan Gaiduk ([@18-th](https://github.com/18-th))
+- Adam Cogan ([@adamcogan](https://github.com/adamcogan)) [Key Stakeholder]
 
-View our awesome SSW devs at [ssw.com.au/people](https://www.ssw.com.au/people/?skill=%F0%9F%A6%99-TinaCMS).
+### Part time
+
+- Kelly Davis ([@kldavis](https://github.com/kldavis4))
+- Jeff See ([@jeffsee55](https://github.com/jeffsee55))
+- Scott Gallant ([@scottgallant](https://github.com/scottgallant))
+
+View our awesome SSW devs at [ssw.com.au/people](https://www.ssw.com.au/people/?skill=%F0%9F%A6%99-TinaCMS)
 
 ![](https://res.cloudinary.com/forestry-demo/image/upload/h_85/v1573167387/Favicon.png)

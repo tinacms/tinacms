@@ -152,7 +152,7 @@ export const createMediaDeliveryHandlers = (config: AzureBlobStorageConfig) => {
           headers.set('content-length', processedBuffer.length.toString());
           headers.set('cache-control', 'public, max-age=31536000, immutable');
 
-          return new NextResponse(processedBuffer, {
+          return new NextResponse(new Uint8Array(processedBuffer), {
             status: response.status,
             statusText: response.statusText,
             headers,
@@ -171,7 +171,7 @@ export const createMediaDeliveryHandlers = (config: AzureBlobStorageConfig) => {
           headers.set('content-length', originalBuffer.length.toString());
           headers.set('cache-control', 'public, max-age=3600'); // Shorter cache time for unoptimized images
 
-          return new NextResponse(originalBuffer, {
+          return new NextResponse(new Uint8Array(originalBuffer), {
             status: response.status,
             statusText: response.statusText,
             headers,

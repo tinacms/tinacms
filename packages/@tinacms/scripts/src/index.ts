@@ -5,7 +5,8 @@ import chalk from 'chalk';
 import chokidar from 'chokidar';
 import commander from 'commander';
 import { build as esbuild } from 'esbuild';
-import { outputFileSync } from 'fs-extra';
+import fsExtra from 'fs-extra';
+const { outputFileSync } = fsExtra;
 import jsonDiff from 'json-diff';
 import { build } from 'vite';
 import { deepMerge, sequential } from './utils';
@@ -366,7 +367,8 @@ export class BuildTina {
           entryPoints: [path.join(process.cwd(), entry)],
           bundle: true,
           platform: 'node',
-          target: 'node20',
+          target: 'esnext',
+          format: 'esm',
           outfile: path.join(
             process.cwd(),
             'dist',
@@ -383,12 +385,12 @@ export class BuildTina {
           entryPoints: [path.join(process.cwd(), entry)],
           bundle: true,
           platform: 'node',
-          target: 'es2020',
+          target: 'esnext',
           format: 'esm',
           outfile: path.join(
             process.cwd(),
             'dist',
-            `${outInfo.outfile ? outInfo.outfile : 'index'}.mjs`
+            `${outInfo.outfile ? outInfo.outfile : 'index'}.js`
           ),
           external,
         });
@@ -398,22 +400,9 @@ export class BuildTina {
           entryPoints: [path.join(process.cwd(), entry)],
           bundle: true,
           platform: 'node',
-          target: 'node20',
-          format: 'cjs',
-          outfile: path.join(process.cwd(), 'dist', 'index.js'),
-          external: Object.keys({ ...peerDeps }),
-        });
-
-        await esbuild({
-          entryPoints: [path.join(process.cwd(), entry)],
-          bundle: true,
-          platform: 'node',
-          target: 'es2020',
+          target: 'esnext',
           format: 'esm',
-          outfile: path.join(process.cwd(), 'dist', 'index.mjs'),
-          // Bundle dependencies, the remark ecosystem only publishes ES modules
-          // and includes "development" export maps which actually throw errors during
-          // development, which we don't want to expose our users to.
+          outfile: path.join(process.cwd(), 'dist', 'index.js'),
           external: Object.keys({ ...peerDeps }),
         });
 
@@ -422,9 +411,9 @@ export class BuildTina {
           entryPoints: [path.join(process.cwd(), entry)],
           bundle: true,
           platform: 'browser',
-          target: 'es2020',
+          target: 'esnext',
           format: 'esm',
-          outfile: path.join(process.cwd(), 'dist', 'index.browser.mjs'),
+          outfile: path.join(process.cwd(), 'dist', 'index.browser.js'),
           // Bundle dependencies, the remark ecosystem only publishes ES modules
           // and includes "development" export maps which actually throw errors during
           // development, which we don't want to expose our users to.
@@ -435,7 +424,8 @@ export class BuildTina {
           entryPoints: [path.join(process.cwd(), entry)],
           bundle: true,
           platform: 'node',
-          target: 'node20',
+          target: 'esnext',
+          format: 'esm',
           outfile: path.join(process.cwd(), 'dist', `${outInfo.outfile}.js`),
           external,
         });
@@ -471,11 +461,8 @@ export class BuildTina {
         lib: {
           entry: path.resolve(process.cwd(), entry),
           name: packageJSON.name,
-          fileName: (format) => {
-            return format === 'umd'
-              ? `${outInfo.outfile}.js`
-              : `${outInfo.outfile}.mjs`;
-          },
+          formats: ['es'],
+          fileName: () => `${outInfo.outfile}.js`,
         },
         outDir: outInfo.outdir,
         emptyOutDir: false, // We build multiple files in to the dir.
@@ -493,7 +480,7 @@ export class BuildTina {
            * I'm pretty sure it doesn't, since everything works
            *
            * By setting a global for each external dep we're silencing these warnings
-           * No name was provided for external module 'react-beautiful-dnd' in output.globals – guessing 'reactBeautifulDnd'
+           * No name was provided for external module in output.globals
            *
            * They don't occur for es builds, only UMD and I can't quite find
            * an authoritative response on wny they're needed or how they're

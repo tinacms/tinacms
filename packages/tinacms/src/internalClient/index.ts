@@ -23,7 +23,7 @@ import {
   optionsToSearchIndexOptions,
   parseSearchIndexResponse,
   queryToSearchIndexQuery,
-} from '@tinacms/search/dist/index-client';
+} from '@tinacms/search/index-client';
 import gql from 'graphql-tag';
 import { EDITORIAL_WORKFLOW_STATUS } from '../toolkit/form-builder/editorial-workflow-constants';
 import { AsyncData, asyncPoll } from './asyncPoll';
@@ -154,7 +154,9 @@ export class Client {
     const encodedBranch = encodeURIComponent(branchName);
     // When we change our branch, we add the 'x-branch' cookie. This is used when you change branches and want to use content from the new branch.
     // This is then used in the TinaClient to fetch the correct content from the correct branch. Instead of defaulting to the 'main' branch which is generated at build time.
-    document.cookie = `x-branch=${encodedBranch}; path=/; max-age=3600`;
+    if (typeof document !== 'undefined') {
+      document.cookie = `x-branch=${encodedBranch}; path=/; max-age=3600`;
+    }
     this.branch = encodedBranch;
     this.assetsApiUrl =
       this.options.tinaioConfig?.assetsApiUrlOverride ||
@@ -544,7 +546,7 @@ mutation addPendingDocumentMutation(
   usingProtectedBranch() {
     return (
       this.usingEditorialWorkflow &&
-      this.protectedBranches?.includes(this.branch)
+      this.protectedBranches?.includes(decodeURIComponent(this.branch))
     );
   }
   async createBranch({ baseBranch, branchName }: BranchData) {

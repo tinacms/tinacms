@@ -1,5 +1,67 @@
 # @tinacms/search
 
+## 1.1.9
+
+### Patch Changes
+
+- Updated dependencies [[`a63401a`](https://github.com/tinacms/tinacms/commit/a63401a3dd8271258bc6bfb4cc22593c19e94c7d)]:
+  - @tinacms/schema-tools@2.2.0
+  - @tinacms/graphql@2.0.5
+
+## 1.1.8
+
+### Patch Changes
+
+- Updated dependencies [[`d9ccf29`](https://github.com/tinacms/tinacms/commit/d9ccf29684e9889bcfee892b982c119e5bde2ef7)]:
+  - @tinacms/graphql@2.0.4
+
+## 1.1.7
+
+### Patch Changes
+
+- Updated dependencies [[`fa7c27a`](https://github.com/tinacms/tinacms/commit/fa7c27abef968e3f3a3e7d564f282bc566087569)]:
+  - @tinacms/graphql@2.0.3
+
+## 1.1.6
+
+### Patch Changes
+
+- Updated dependencies [[`a125472`](https://github.com/tinacms/tinacms/commit/a125472d3278c140cb416dba5cd1478fb5dfe320)]:
+  - @tinacms/schema-tools@2.1.0
+  - @tinacms/graphql@2.0.2
+
+## 1.1.5
+
+### Patch Changes
+
+- Updated dependencies [[`5c1e891`](https://github.com/tinacms/tinacms/commit/5c1e89181f595d392ad6cb56ca5fc0b6d9e60a23)]:
+  - @tinacms/graphql@2.0.1
+  - @tinacms/schema-tools@2.0.0
+
+## 1.1.4
+
+### Patch Changes
+
+- Updated dependencies [[`2e1535d`](https://github.com/tinacms/tinacms/commit/2e1535dd5495dc390902f2db6ef1f26afb072396), [`ed6025e`](https://github.com/tinacms/tinacms/commit/ed6025ee87ebe051957fc93e987ba8de8b003995)]:
+  - @tinacms/graphql@2.0.0
+  - @tinacms/schema-tools@2.0.0
+
+## 1.1.3
+
+### Patch Changes
+
+- Updated dependencies [[`a76fdb6`](https://github.com/tinacms/tinacms/commit/a76fdb639b94cfefa169ebbd184f55d62e4a8a76), [`a736baf`](https://github.com/tinacms/tinacms/commit/a736bafe1b20bc1465f8e4a4c0c2281f40dcbf2f)]:
+  - @tinacms/graphql@1.6.3
+  - @tinacms/schema-tools@1.10.1
+
+## 1.1.2
+
+### Patch Changes
+
+- Updated dependencies [[`f2577b9`](https://github.com/tinacms/tinacms/commit/f2577b911a97ecc1c3f53a98ae8218cc33bc9867), [`38920ce`](https://github.com/tinacms/tinacms/commit/38920ce29a9b63c54b04f39537f19beab62d2c86), [`d1bd1a1`](https://github.com/tinacms/tinacms/commit/d1bd1a1312fa910e237ec06608e7c11830c78346), [`4b824be`](https://github.com/tinacms/tinacms/commit/4b824be53572f9231753ebd3b5f14fd778fd73d6)]:
+  - @tinacms/schema-tools@1.10.0
+  - @tinacms/graphql@1.6.2
+
 ## 1.1.1
 
 ### Patch Changes

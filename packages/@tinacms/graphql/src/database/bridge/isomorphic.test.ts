@@ -113,7 +113,7 @@ describe('isomorphic bridge', () => {
   });
 
   afterEach(async () => {
-    await fs.promises.rmdir(root, { recursive: true });
+    await fs.promises.rm(root, { recursive: true, force: true });
   });
 
   describe.each([['repo'], ['monorepo']])('glob with %p', (repoType) => {

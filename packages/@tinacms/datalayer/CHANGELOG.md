@@ -1,5 +1,77 @@
 # tina-graphql
 
+## 2.0.5
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/graphql@2.0.5
+
+## 2.0.4
+
+### Patch Changes
+
+- Updated dependencies [[`d9ccf29`](https://github.com/tinacms/tinacms/commit/d9ccf29684e9889bcfee892b982c119e5bde2ef7)]:
+  - @tinacms/graphql@2.0.4
+
+## 2.0.3
+
+### Patch Changes
+
+- Updated dependencies [[`fa7c27a`](https://github.com/tinacms/tinacms/commit/fa7c27abef968e3f3a3e7d564f282bc566087569)]:
+  - @tinacms/graphql@2.0.3
+
+## 2.0.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/graphql@2.0.2
+
+## 2.0.1
+
+### Patch Changes
+
+- Updated dependencies [[`5c1e891`](https://github.com/tinacms/tinacms/commit/5c1e89181f595d392ad6cb56ca5fc0b6d9e60a23)]:
+  - @tinacms/graphql@2.0.1
+
+## 2.0.0
+
+### Major Changes
+
+- [#5982](https://github.com/tinacms/tinacms/pull/5982) [`2e1535d`](https://github.com/tinacms/tinacms/commit/2e1535dd5495dc390902f2db6ef1f26afb072396) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: migrate from commonjs to esm
+
+### Patch Changes
+
+- Updated dependencies [[`2e1535d`](https://github.com/tinacms/tinacms/commit/2e1535dd5495dc390902f2db6ef1f26afb072396)]:
+  - @tinacms/graphql@2.0.0
+
+## 1.4.3
+
+### Patch Changes
+
+- [#6187](https://github.com/tinacms/tinacms/pull/6187) [`a76fdb6`](https://github.com/tinacms/tinacms/commit/a76fdb639b94cfefa169ebbd184f55d62e4a8a76) Thanks [@18-th](https://github.com/18-th)! - Updated yup to v1 to remove transitive lodash dependency
+
+- Updated dependencies [[`a76fdb6`](https://github.com/tinacms/tinacms/commit/a76fdb639b94cfefa169ebbd184f55d62e4a8a76)]:
+  - @tinacms/graphql@1.6.3
+
+## 1.4.2
+
+### Patch Changes
+
+- [#6145](https://github.com/tinacms/tinacms/pull/6145) [`d1bd1a1`](https://github.com/tinacms/tinacms/commit/d1bd1a1312fa910e237ec06608e7c11830c78346) Thanks [@18-th](https://github.com/18-th)! - Remove Lodash and replace usages with either native functions or es-toolkit equivalents
+  Removed the following lodash usages:
+  - debounce - was not used, removed the reference
+  - camelcase - unused, removed the reference
+  - upperfirst - unused, removed the reference
+  - flatten - replaced by native .flat()
+  - get - replaced with an existing implementation from the GraphQL package
+  - cloneDeep - replaced with cloneDeep from es-toolkit
+  - set - replaced with es-toolkit compat version. That implementation is identical to the one used by lodash
+  - uniqBy - replace with es-toolkit version. That implementation is identical to the one used by lodash
+- Updated dependencies [[`d1bd1a1`](https://github.com/tinacms/tinacms/commit/d1bd1a1312fa910e237ec06608e7c11830c78346), [`4b824be`](https://github.com/tinacms/tinacms/commit/4b824be53572f9231753ebd3b5f14fd778fd73d6)]:
+  - @tinacms/graphql@1.6.2
+
 ## 1.4.1
 
 ### Patch Changes

@@ -44,14 +44,56 @@ it('updates document and validates bridge writes', async () => {
   });
 
   // Validate GraphQL response
-  expect(format(result)).toMatchFileSnapshot('update-document-node.json');
+  expect(format(result)).toMatchFileSnapshot(
+    'expected-snapshots/update-document-node.json'
+  );
 
   // Validate Bridge write operations
   const writes = bridge.getWrites();
   expect(writes.size).toBeGreaterThan(0);
   expect(bridge.getWrite('posts/in.md')).toMatchFileSnapshot(
-    'update-document-content.md'
+    'expected-snapshots/update-document-content.md'
   );
+});
+
+const renameDocumentMutation = `
+  mutation {
+    updateDocument(
+      collection: "post",
+      relativePath: "in.md",
+      params: {
+        relativePath: "renamed-by-bob.md"
+      }
+    ) {
+      ...on Document { _values, _sys { title } }
+    }
+  }
+`;
+
+it('renames document using updateDocument mutation', async () => {
+  const { query, bridge } = await setupMutation(__dirname, config);
+
+  // Execute mutation to rename the document
+  const result = await query({
+    query: renameDocumentMutation,
+    variables: {},
+  });
+
+  // Validate GraphQL response
+  expect(format(result)).toMatchFileSnapshot(
+    'expected-snapshots/rename-document-node.json'
+  );
+
+  // Validate Bridge write operations
+  const writes = bridge.getWrites();
+  expect(writes.size).toBeGreaterThan(0);
+  expect(bridge.getWrite('posts/renamed-by-bob.md')).toMatchFileSnapshot(
+    'expected-snapshots/rename-document-content.md'
+  );
+
+  // Validate that original file was deleted
+  const deletes = bridge.getDeletes();
+  expect(deletes).toContain('posts/in.md');
 });
 
 const updatePostMutation = `
@@ -94,12 +136,14 @@ it('updates document using updatePost mutation', async () => {
   });
 
   // Validate GraphQL response
-  expect(format(result)).toMatchFileSnapshot('update-post-node.json');
+  expect(format(result)).toMatchFileSnapshot(
+    'expected-snapshots/update-post-node.json'
+  );
 
   // Validate Bridge write operations
   const writes = bridge.getWrites();
   expect(writes.size).toBeGreaterThan(0);
   expect(bridge.getWrite('posts/in.md')).toMatchFileSnapshot(
-    'update-post-content.md'
+    'expected-snapshots/update-post-content.md'
   );
 });

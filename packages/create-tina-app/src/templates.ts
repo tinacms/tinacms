@@ -4,9 +4,15 @@ import path from 'path';
 import { TextStyles } from './util/textstyles';
 import { Ora } from 'ora';
 
+type Feature = {
+  name: string;
+  description: string;
+};
+
 export type BaseExample = {
   title: string;
   description?: string;
+  features?: Feature[];
   value: string;
   devUrl: string;
 };
@@ -25,9 +31,23 @@ export const TEMPLATES: Template[] = [
     title: '⭐ NextJS starter',
     description:
       'Kickstart your project with Next.js – our top recommendation for a seamless, performant, and versatile web experience.',
-    value: 'tina-cloud-starter',
+    value: 'tina-nextjs-starter',
     isInternal: false,
-    gitURL: 'https://github.com/tinacms/tina-cloud-starter',
+    features: [
+      {
+        name: 'Visual Editing',
+        description: '✅',
+      },
+      {
+        name: 'ISR',
+        description: '✅',
+      },
+      {
+        name: 'SSG',
+        description: '✅',
+      },
+    ],
+    gitURL: 'https://github.com/tinacms/tina-nextjs-starter',
     devUrl: 'http://localhost:3000',
   },
   {
@@ -36,6 +56,20 @@ export const TEMPLATES: Template[] = [
       'Get your documentation site up and running with TinaCMS and Next.js in minutes.',
     value: 'tina-docs',
     isInternal: false,
+    features: [
+      {
+        name: 'Visual Editing',
+        description: '✅',
+      },
+      {
+        name: 'ISR',
+        description: '✅',
+      },
+      {
+        name: 'SSG',
+        description: '✅',
+      },
+    ],
     gitURL: 'https://github.com/tinacms/tina-docs',
     devUrl: 'http://localhost:3000',
   },
@@ -45,6 +79,20 @@ export const TEMPLATES: Template[] = [
       'Get started with Astro - a modern static site generator designed for fast, lightweight, and flexible web projects.',
     value: 'tina-astro-starter',
     isInternal: false,
+    features: [
+      {
+        name: 'Visual Editing',
+        description: '❌',
+      },
+      {
+        name: 'ISR',
+        description: '❌',
+      },
+      {
+        name: 'SSG',
+        description: '✅',
+      },
+    ],
     gitURL: 'https://github.com/tinacms/tina-astro-starter',
     devUrl: 'http://localhost:4321',
   },
@@ -54,6 +102,20 @@ export const TEMPLATES: Template[] = [
       'With Hugo, you wield the power of lightning-fast site generation, crafting web experiences at the speed of thought.',
     value: 'tina-hugo-starter',
     isInternal: false,
+    features: [
+      {
+        name: 'Visual Editing',
+        description: '❌',
+      },
+      {
+        name: 'ISR',
+        description: '❌',
+      },
+      {
+        name: 'SSG',
+        description: '✅',
+      },
+    ],
     gitURL: 'https://github.com/tinacms/tina-hugo-starter',
     devUrl: 'http://localhost:1313',
   },
@@ -63,6 +125,20 @@ export const TEMPLATES: Template[] = [
       'Dive into Remix to orchestrate seamless, interactive user journeys like a maestro of the web.',
     value: 'tina-remix-starter',
     isInternal: false,
+    features: [
+      {
+        name: 'Visual Editing',
+        description: '❌',
+      },
+      {
+        name: 'ISR',
+        description: '❌',
+      },
+      {
+        name: 'SSG',
+        description: '⚠️ Requires adapter',
+      },
+    ],
     gitURL: 'https://github.com/tinacms/tina-remix-starter',
     devUrl: 'http://localhost:3000',
   },
@@ -72,15 +148,43 @@ export const TEMPLATES: Template[] = [
       'Docusaurus empowers you to build and evolve documentation like crafting a living, breathing knowledge repository.',
     value: 'tinasaurus',
     isInternal: false,
+    features: [
+      {
+        name: 'Visual Editing',
+        description: '❌',
+      },
+      {
+        name: 'ISR',
+        description: '❌',
+      },
+      {
+        name: 'SSR',
+        description: '✅',
+      },
+    ],
     gitURL: 'https://github.com/tinacms/tinasaurus',
     devUrl: 'http://localhost:3000',
   },
   {
     title: 'Bare bones starter',
     description:
-      'Stripped down to essentials, this starter is the canvas for pure, unadulterated code creativity.',
+      'Stripped down to essentials, this starter is the canvas for pure, unadulterated code creativity. Built with Next.js.',
     value: 'basic',
     isInternal: false,
+    features: [
+      {
+        name: 'Visual Editing',
+        description: '✅',
+      },
+      {
+        name: 'ISR',
+        description: '✅',
+      },
+      {
+        name: 'SSG',
+        description: '✅',
+      },
+    ],
     gitURL: 'https://github.com/tinacms/tina-barebones-starter',
     devUrl: 'http://localhost:3000',
   },

@@ -1,5 +1,75 @@
 # create-tina-app
 
+## 2.1.2
+
+### Patch Changes
+
+- [#6277](https://github.com/tinacms/tinacms/pull/6277) [`271a1d0`](https://github.com/tinacms/tinacms/commit/271a1d057234346fc127b6f259c766a8b26a603f) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Fix - selected package manager would not be captured as telemetry when passed in as a parameter
+
+## 2.1.1
+
+### Patch Changes
+
+- [#6290](https://github.com/tinacms/tinacms/pull/6290) [`5befd81`](https://github.com/tinacms/tinacms/commit/5befd8147ee64c2590468182df319cd537506d0d) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🌎Telemetry - Add GeoIP for opt-in users
+
+## 2.1.0
+
+### Minor Changes
+
+- [#6245](https://github.com/tinacms/tinacms/pull/6245) [`e1eb9ad`](https://github.com/tinacms/tinacms/commit/e1eb9ad156f2bf076d64ff576505e853045c9e13) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - ✨ Add Features to Templates + 🐛 Fix handling of package-name warnings
+
+### Patch Changes
+
+- [#6255](https://github.com/tinacms/tinacms/pull/6255) [`3f57321`](https://github.com/tinacms/tinacms/commit/3f5732147690cd2cf8c1c6eee823502aab25e121) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 📊 Telemetry - helping us build a better Tina
+  We’ve added anonymous telemetry to `⁠create-tina-app`. This helps our team understand which environments (Node version, OS, Package Manager) and starter templates are most popular so we can prioritize the right features and fixes.
+  Privacy First: We never collect personal data or project-specific code.
+  Opt-out: Prefer to stay off the grid? You can disable this at any time by passing the `⁠--noTelemetry` flag.
+
+- [#6267](https://github.com/tinacms/tinacms/pull/6267) [`20fccf3`](https://github.com/tinacms/tinacms/commit/20fccf37f142dca17b90945a313fd65b70968ac6) Thanks [@wicksipedia](https://github.com/wicksipedia)! - create-tina-app - add structured error codes to find out where people have problems with the installer
+
+## 2.0.0
+
+### Major Changes
+
+- [#6232](https://github.com/tinacms/tinacms/pull/6232) [`bf308a9`](https://github.com/tinacms/tinacms/commit/bf308a9efed89384264f70f4247f81a6a6ea9fcb) Thanks [@JackDevAU](https://github.com/JackDevAU)! - fix(create-tina-app): update create-tina-app package to use esm
+
+### Patch Changes
+
+- [#6216](https://github.com/tinacms/tinacms/pull/6216) [`5c1e891`](https://github.com/tinacms/tinacms/commit/5c1e89181f595d392ad6cb56ca5fc0b6d9e60a23) Thanks [@JackDevAU](https://github.com/JackDevAU)! - - `@tinacms/graphql`: remove scmp dependency, replaced with modern code (now inbuilt)
+  - `@tinacms/metrics`: remove isomorphic-fetch dependency, now relies on global fetch
+  - `@tinacms/cli`: remove log4js dependency, replaced with custom logger implementation; update chalk to v5 (ESM-only)
+  - `@tinacms/scripts`, `create-tina-app`: update chalk to v5 (ESM-only)
+  - `next-tinacms-azure`: Buffer to Uint8Array conversion
+  - `tinacms`: TypeScript style prop typing
+- Updated dependencies [[`5c1e891`](https://github.com/tinacms/tinacms/commit/5c1e89181f595d392ad6cb56ca5fc0b6d9e60a23)]:
+  - @tinacms/metrics@2.0.1
+
+## 1.6.2
+
+### Patch Changes
+
+- Updated dependencies [[`2e1535d`](https://github.com/tinacms/tinacms/commit/2e1535dd5495dc390902f2db6ef1f26afb072396)]:
+  - @tinacms/metrics@2.0.0
+
+## 1.6.1
+
+### Patch Changes
+
+- [#5822](https://github.com/tinacms/tinacms/pull/5822) [`4b824be`](https://github.com/tinacms/tinacms/commit/4b824be53572f9231753ebd3b5f14fd778fd73d6) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Migrate from react-beautiful-dnd to dnd-kit to fix deprecation error.
+
+- Updated dependencies []:
+  - @tinacms/metrics@1.1.0
+
+## 1.6.0
+
+### Minor Changes
+
+- [#6054](https://github.com/tinacms/tinacms/pull/6054) [`6727bcf`](https://github.com/tinacms/tinacms/commit/6727bcf95200e05e8388986de4546f1730a1be47) Thanks [@0xharkirat](https://github.com/0xharkirat)! - fix broken links, from `tina.io/docs/tina-cloud` to `tina.io/docs/tinacloud`
+
+### Patch Changes
+
+- [#6059](https://github.com/tinacms/tinacms/pull/6059) [`b23aa0c`](https://github.com/tinacms/tinacms/commit/b23aa0c5defc51b8f9fe00a59dd87e1d2f8b9f0b) Thanks [@kulesy](https://github.com/kulesy)! - docs: Update references from tina-cloud-starter to tina-nextjs-starter
+
 ## 1.5.2
 
 ### Patch Changes
