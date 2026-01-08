@@ -1,4 +1,4 @@
-import { findSimilarTerms, FuzzyCache, DEFAULT_FUZZY_OPTIONS } from './fuzzy';
+import { findSimilarTerms, FuzzyCache, normalizeFuzzyOptions } from './fuzzy';
 import type { FuzzySearchOptions, FuzzyMatch } from './fuzzy';
 import type { SearchQueryResponse, SearchIndex } from './types';
 import { buildPageOptions, buildPaginationCursors } from './pagination';
@@ -48,7 +48,7 @@ export class FuzzySearchWrapper {
     expanded: string[];
     matches: Record<string, FuzzyMatch[]>;
   }> {
-    const opts = { ...DEFAULT_FUZZY_OPTIONS, ...options };
+    const opts = normalizeFuzzyOptions(options);
 
     const terms = query
       .split(' ')

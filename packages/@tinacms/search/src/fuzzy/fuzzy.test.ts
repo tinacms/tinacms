@@ -7,7 +7,7 @@ import {
   ngramOverlap,
 } from './distance';
 import { FuzzyCache } from './cache';
-import { DEFAULT_FUZZY_OPTIONS } from './types';
+import { DEFAULT_FUZZY_OPTIONS, normalizeFuzzyOptions } from './types';
 
 describe('Fuzzy Search', () => {
   describe('levenshteinDistance', () => {
@@ -361,6 +361,104 @@ describe('Fuzzy Search', () => {
       expect(DEFAULT_FUZZY_OPTIONS.useNgramFilter).toBe(true);
       expect(DEFAULT_FUZZY_OPTIONS.ngramSize).toBe(2);
       expect(DEFAULT_FUZZY_OPTIONS.minNgramOverlap).toBe(0.2);
+    });
+  });
+
+  describe('normalizeFuzzyOptions', () => {
+    it('returns defaults when no options provided', () => {
+      const result = normalizeFuzzyOptions();
+      expect(result).toEqual(DEFAULT_FUZZY_OPTIONS);
+    });
+
+    it('clamps maxDistance to valid range', () => {
+      expect(normalizeFuzzyOptions({ maxDistance: -5 }).maxDistance).toBe(0);
+      expect(normalizeFuzzyOptions({ maxDistance: 0 }).maxDistance).toBe(0);
+      expect(normalizeFuzzyOptions({ maxDistance: 5 }).maxDistance).toBe(5);
+      expect(normalizeFuzzyOptions({ maxDistance: 10 }).maxDistance).toBe(10);
+      expect(normalizeFuzzyOptions({ maxDistance: 100 }).maxDistance).toBe(10);
+    });
+
+    it('clamps minSimilarity to valid range', () => {
+      expect(normalizeFuzzyOptions({ minSimilarity: -0.5 }).minSimilarity).toBe(
+        0
+      );
+      expect(normalizeFuzzyOptions({ minSimilarity: 0 }).minSimilarity).toBe(0);
+      expect(normalizeFuzzyOptions({ minSimilarity: 0.5 }).minSimilarity).toBe(
+        0.5
+      );
+      expect(normalizeFuzzyOptions({ minSimilarity: 1 }).minSimilarity).toBe(1);
+      expect(normalizeFuzzyOptions({ minSimilarity: 2 }).minSimilarity).toBe(1);
+    });
+
+    it('clamps maxTermExpansions to valid range', () => {
+      expect(
+        normalizeFuzzyOptions({ maxTermExpansions: -10 }).maxTermExpansions
+      ).toBe(1);
+      expect(
+        normalizeFuzzyOptions({ maxTermExpansions: 0 }).maxTermExpansions
+      ).toBe(1);
+      expect(
+        normalizeFuzzyOptions({ maxTermExpansions: 1 }).maxTermExpansions
+      ).toBe(1);
+      expect(
+        normalizeFuzzyOptions({ maxTermExpansions: 50 }).maxTermExpansions
+      ).toBe(50);
+      expect(
+        normalizeFuzzyOptions({ maxTermExpansions: 100 }).maxTermExpansions
+      ).toBe(100);
+      expect(
+        normalizeFuzzyOptions({ maxTermExpansions: 500 }).maxTermExpansions
+      ).toBe(100);
+    });
+
+    it('clamps minNgramOverlap to valid range', () => {
+      expect(
+        normalizeFuzzyOptions({ minNgramOverlap: -0.5 }).minNgramOverlap
+      ).toBe(0);
+      expect(
+        normalizeFuzzyOptions({ minNgramOverlap: 0 }).minNgramOverlap
+      ).toBe(0);
+      expect(
+        normalizeFuzzyOptions({ minNgramOverlap: 0.5 }).minNgramOverlap
+      ).toBe(0.5);
+      expect(
+        normalizeFuzzyOptions({ minNgramOverlap: 1 }).minNgramOverlap
+      ).toBe(1);
+      expect(
+        normalizeFuzzyOptions({ minNgramOverlap: 2 }).minNgramOverlap
+      ).toBe(1);
+    });
+
+    it('clamps ngramSize to valid range', () => {
+      expect(normalizeFuzzyOptions({ ngramSize: -1 }).ngramSize).toBe(1);
+      expect(normalizeFuzzyOptions({ ngramSize: 0 }).ngramSize).toBe(1);
+      expect(normalizeFuzzyOptions({ ngramSize: 1 }).ngramSize).toBe(1);
+      expect(normalizeFuzzyOptions({ ngramSize: 3 }).ngramSize).toBe(3);
+      expect(normalizeFuzzyOptions({ ngramSize: 5 }).ngramSize).toBe(5);
+      expect(normalizeFuzzyOptions({ ngramSize: 10 }).ngramSize).toBe(5);
+    });
+
+    it('preserves boolean options without clamping', () => {
+      expect(
+        normalizeFuzzyOptions({ useTranspositions: false }).useTranspositions
+      ).toBe(false);
+      expect(normalizeFuzzyOptions({ caseSensitive: true }).caseSensitive).toBe(
+        true
+      );
+      expect(
+        normalizeFuzzyOptions({ useNgramFilter: false }).useNgramFilter
+      ).toBe(false);
+    });
+
+    it('clamps multiple options at once', () => {
+      const result = normalizeFuzzyOptions({
+        maxDistance: 999,
+        minSimilarity: -5,
+        maxTermExpansions: 0,
+      });
+      expect(result.maxDistance).toBe(10);
+      expect(result.minSimilarity).toBe(0);
+      expect(result.maxTermExpansions).toBe(1);
     });
   });
 

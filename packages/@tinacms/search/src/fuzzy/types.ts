@@ -28,3 +28,20 @@ export const DEFAULT_FUZZY_OPTIONS: Required<FuzzySearchOptions> = {
   ngramSize: 2,
   minNgramOverlap: 0.2,
 };
+
+const clamp = (v: number, min: number, max: number) =>
+  Math.min(Math.max(v, min), max);
+
+export function normalizeFuzzyOptions(
+  options: FuzzySearchOptions = {}
+): Required<FuzzySearchOptions> {
+  const o = { ...DEFAULT_FUZZY_OPTIONS, ...options };
+  return {
+    ...o,
+    maxDistance: clamp(o.maxDistance, 0, 10),
+    minSimilarity: clamp(o.minSimilarity, 0, 1),
+    maxTermExpansions: clamp(o.maxTermExpansions, 1, 100),
+    minNgramOverlap: clamp(o.minNgramOverlap, 0, 1),
+    ngramSize: clamp(o.ngramSize, 1, 5),
+  };
+}

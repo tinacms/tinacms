@@ -1,5 +1,5 @@
 import type { FuzzySearchOptions, FuzzyMatch } from './types';
-import { DEFAULT_FUZZY_OPTIONS } from './types';
+import { normalizeFuzzyOptions } from './types';
 
 export const PREFIX_MATCH_MIN_SIMILARITY = 0.8;
 
@@ -128,7 +128,7 @@ export function findSimilarTerms(
   dictionary: string[],
   options: FuzzySearchOptions = {}
 ): FuzzyMatch[] {
-  const opts = { ...DEFAULT_FUZZY_OPTIONS, ...options };
+  const opts = normalizeFuzzyOptions(options);
   const normalizedQuery = opts.caseSensitive ? query : query.toLowerCase();
 
   if (normalizedQuery.length === 0) return [];

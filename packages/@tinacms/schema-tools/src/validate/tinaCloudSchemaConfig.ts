@@ -21,9 +21,9 @@ const tinaSearchKey = z
     fuzzyEnabled: z.boolean().optional(),
     fuzzyOptions: z
       .object({
-        maxDistance: z.number().optional(),
-        minSimilarity: z.number().optional(),
-        maxTermExpansions: z.number().optional(),
+        maxDistance: z.number().min(0).max(10).optional(),
+        minSimilarity: z.number().min(0).max(1).optional(),
+        maxTermExpansions: z.number().min(1).max(100).optional(),
         useTranspositions: z.boolean().optional(),
         caseSensitive: z.boolean().optional(),
       })
