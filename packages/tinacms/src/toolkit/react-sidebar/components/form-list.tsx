@@ -93,9 +93,14 @@ const buildTreeFromPaths = (
         };
         nodeMap.set(nodeId, node);
         currentLevel.push(node);
-      } else if (isFile && item.isReference) {
-        // If we encounter the same file again and it's a reference, mark it as such
-        node.isReference = true;
+      } else if (isFile) {
+        // Handle duplicate files: non-reference status always wins
+        if (!item.isReference) {
+          node.isReference = false;
+        } else if (item.isReference && node.isReference === undefined) {
+          // Only mark as reference if not already defined
+          node.isReference = true;
+        }
       }
 
       if (!isFile) {
