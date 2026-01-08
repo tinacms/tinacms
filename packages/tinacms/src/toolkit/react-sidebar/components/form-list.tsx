@@ -2,7 +2,7 @@ import { Transition } from '@headlessui/react';
 import { useCMS } from '@toolkit/react-tinacms';
 import type { TinaState } from '@toolkit/tina-state';
 import * as React from 'react';
-import { BiEdit, BiChevronRight, BiFile, BiFolder } from 'react-icons/bi';
+import { BiChevronRight, BiFolder } from 'react-icons/bi';
 
 type FormListItem = TinaState['formLists'][number]['items'][number];
 
@@ -15,21 +15,33 @@ interface TreeNode {
   children: TreeNode[];
   depth: number;
   isReference?: boolean;
+  isGlobal?: boolean;
 }
 
 // Recursively collect all document items including subitems, tracking which are references
 const collectAllDocumentItems = (
-  items: FormListItem[]
+  items: FormListItem[],
+  isGlobalFn: (formId: string) => boolean
 ): Array<
-  Extract<FormListItem, { type: 'document' }> & { isReference?: boolean }
+  Extract<FormListItem, { type: 'document' }> & {
+    isReference?: boolean;
+    isGlobal?: boolean;
+  }
 > => {
   const allItems: Array<
-    Extract<FormListItem, { type: 'document' }> & { isReference?: boolean }
+    Extract<FormListItem, { type: 'document' }> & {
+      isReference?: boolean;
+      isGlobal?: boolean;
+    }
   > = [];
 
   const processItem = (item: FormListItem, isFromSubItems = false) => {
     if (item.type === 'document') {
-      allItems.push({ ...item, isReference: isFromSubItems });
+      allItems.push({
+        ...item,
+        isReference: isFromSubItems,
+        isGlobal: isGlobalFn(item.formId),
+      });
       // Recursively process subitems - these will be marked as references
       if (item.subItems && item.subItems.length > 0) {
         item.subItems.forEach((subItem) => processItem(subItem, true));
@@ -44,7 +56,10 @@ const collectAllDocumentItems = (
 // Convert file paths to tree structure
 const buildTreeFromPaths = (
   items: Array<
-    Extract<FormListItem, { type: 'document' }> & { isReference?: boolean }
+    Extract<FormListItem, { type: 'document' }> & {
+      isReference?: boolean;
+      isGlobal?: boolean;
+    }
   >
 ): TreeNode[] => {
   const root: TreeNode[] = [];
@@ -71,6 +86,7 @@ const buildTreeFromPaths = (
           children: [],
           depth: index,
           isReference: isFile ? item.isReference || false : false,
+          isGlobal: isFile ? item.isGlobal || false : false,
         };
         nodeMap.set(nodeId, node);
         currentLevel.push(node);
@@ -174,6 +190,13 @@ const TreeNodeComponent = ({
           </span>
         </div>
 
+        {/* Global badge for global documents */}
+        {node.isFile && node.isGlobal && (
+          <span className='px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full'>
+            global
+          </span>
+        )}
+
         {/* Reference pill for files that are references (from subItems) */}
         {node.isFile && node.isReference && (
           <span className='px-2 py-0.5 text-xs bg-gray-200 text-gray-600 rounded-full'>
@@ -200,83 +223,6 @@ const TreeNodeComponent = ({
             />
           ))}
         </div>
-      )}
-    </div>
-  );
-};
-
-const Item = ({
-  item,
-  depth,
-  setActiveFormId,
-}: {
-  item: Extract<FormListItem, { type: 'document' }>;
-  depth: number;
-  setActiveFormId: (id: string) => void;
-}) => {
-  const cms = useCMS();
-  const depths = ['pl-6', 'pl-10', 'pl-14'];
-  const form = React.useMemo(
-    () => cms.state.forms.find(({ tinaForm }) => item.formId === tinaForm.id),
-    [item.formId]
-  );
-
-  return (
-    <button
-      type='button'
-      key={item.path}
-      onClick={() => setActiveFormId(item.formId)}
-      className={`${
-        depths[depth]
-      } pr-6 py-3 w-full h-full bg-transparent border-none text-lg text-gray-700 group hover:bg-gray-50 transition-all ease-out duration-150 flex items-center justify-between gap-2`}
-    >
-      <BiEdit className='opacity-70 w-5 h-auto text-blue-500 flex-none' />
-      <div className='flex-1 flex flex-col gap-0.5 items-start'>
-        <div className='group-hover:text-blue-500 font-sans text-xs font-semibold text-gray-700 whitespace-normal'>
-          {form.tinaForm.label}
-        </div>
-        <div className='group-hover:text-blue-500 text-base truncate leading-tight text-gray-600'>
-          {form.tinaForm.id}
-        </div>
-      </div>
-    </button>
-  );
-};
-export interface FormsListProps {
-  formList: FormListItem[];
-  setActiveFormId(id: string): void;
-  isEditing: boolean;
-  hidden?: boolean;
-}
-
-const FormListItem = ({
-  item,
-  depth,
-  setActiveFormId,
-}: {
-  item: Extract<FormListItem, { type: 'document' }>;
-  depth: number;
-  setActiveFormId: (id: string) => void;
-}) => {
-  return (
-    <div className={'divide-y divide-gray-200'}>
-      <Item setActiveFormId={setActiveFormId} item={item} depth={depth} />
-      {item.subItems && (
-        <ul className='divide-y divide-gray-200'>
-          {item.subItems?.map((subItem) => {
-            if (subItem.type === 'document') {
-              return (
-                <li key={subItem.formId}>
-                  <Item
-                    setActiveFormId={setActiveFormId}
-                    depth={depth + 1}
-                    item={subItem}
-                  />
-                </li>
-              );
-            }
-          })}
-        </ul>
       )}
     </div>
   );
@@ -320,116 +266,34 @@ export const FormList = (props: {
 }) => {
   const cms = useCMS();
 
-  const { listItems, treeNodes } = React.useMemo(() => {
-    const orderedListItems: TinaState['formLists'][number]['items'] = [];
-    const globalItems: TinaState['formLists'][number]['items'] = [];
-    const topItems: TinaState['formLists'][number]['items'] = [];
-
-    // Always put global forms at the end
-    props.formList.items.forEach((item) => {
-      if (item.type === 'document') {
-        const form = cms.state.forms.find(
-          ({ tinaForm }) => tinaForm.id === item.formId
-        );
-        if (form.tinaForm.global) {
-          globalItems.push(item);
-        } else {
-          orderedListItems.push(item);
-        }
-      } else {
-        orderedListItems.push(item);
-      }
-    });
-
-    if (orderedListItems[0]?.type === 'document') {
-      topItems.push({ type: 'list', label: 'Documents' });
-    }
-    let extra = [];
-    if (globalItems.length) {
-      extra = [{ type: 'list', label: 'Global Documents' }, ...globalItems];
-    }
-
-    // Collect ALL document items including nested subitems for tree building
-    const allDocumentItems = collectAllDocumentItems(
-      props.formList.items
-    ).filter((item) => {
+  const treeNodes = React.useMemo(() => {
+    // Helper to check if a form is global
+    const isGlobalFn = (formId: string) => {
       const form = cms.state.forms.find(
-        ({ tinaForm }) => tinaForm.id === item.formId
+        ({ tinaForm }) => tinaForm.id === formId
       );
-      return !form?.tinaForm?.global; // Exclude global forms from tree
-    });
+      return form?.tinaForm?.global || false;
+    };
+
+    // Collect ALL document items including nested subitems and global documents
+    const allDocumentItems = collectAllDocumentItems(
+      props.formList.items,
+      isGlobalFn
+    );
 
     // Build tree structure from all document items
-    const treeNodes = buildTreeFromPaths(allDocumentItems);
-
-    return {
-      listItems: [...topItems, ...orderedListItems, ...extra],
-      treeNodes,
-    };
+    return buildTreeFromPaths(allDocumentItems);
   }, [JSON.stringify(props.formList.items)]);
 
   return (
-    <ul>
-      <li className={'divide-y divide-gray-200'}>
-        {listItems.map((item, index) => {
-          if (item.type === 'list') {
-            return (
-              <div key={item.label}>
-                <div
-                  className={`relative group text-left w-full bg-white shadow-sm
-     border-gray-100 px-6 -mt-px pb-3 ${
-       index > 0
-         ? 'pt-6 bg-gradient-to-b from-gray-50 via-white to-white'
-         : 'pt-3'
-     }`}
-                >
-                  <span
-                    className={
-                      'text-sm tracking-wide font-bold text-gray-700 uppercase'
-                    }
-                  >
-                    {item.label}
-                  </span>
-                </div>
-
-                {/* Render tree structure for Documents section */}
-                {item.label === 'Documents' && treeNodes.length > 0 && (
-                  <div className='divide-y divide-gray-200'>
-                    {treeNodes.map((node) => (
-                      <TreeNodeComponent
-                        key={node.id}
-                        node={node}
-                        setActiveFormId={props.setActiveFormId}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          }
-
-          // For global items and other non-document items, use original rendering
-          // Skip non-global documents as they're already rendered in the tree
-          if (item.type === 'document') {
-            const form = cms.state.forms.find(
-              ({ tinaForm }) => tinaForm.id === item.formId
-            );
-            // Only render global documents here, non-global ones are in the tree
-            if (!form?.tinaForm?.global) {
-              return null;
-            }
-          }
-
-          return (
-            <FormListItem
-              setActiveFormId={(id) => props.setActiveFormId(id)}
-              key={item.formId}
-              item={item}
-              depth={0}
-            />
-          );
-        })}
-      </li>
-    </ul>
+    <div className='divide-y divide-gray-200'>
+      {treeNodes.map((node) => (
+        <TreeNodeComponent
+          key={node.id}
+          node={node}
+          setActiveFormId={props.setActiveFormId}
+        />
+      ))}
+    </div>
   );
 };

@@ -17,7 +17,7 @@ import { FormBuilder, FormStatus } from '@toolkit/form-builder';
 import type { Form } from '@toolkit/forms';
 import type { FormMetaPlugin } from '@toolkit/plugin-form-meta';
 import { useCMS } from '@toolkit/react-core';
-import { EllipsisVertical } from 'lucide-react';
+import { BiFolder } from 'react-icons/bi';
 import * as React from 'react';
 import { FormLists } from './form-list';
 import { SidebarContext } from './sidebar';
@@ -280,7 +280,7 @@ export const FormBreadcrumbs = ({
         <BreadcrumbItem className='shrink truncate'>
           <BreadcrumbLink
             asChild
-            className='text-gray-700 hover:text-blue-500 truncate'
+            className='text-gray-700 hover:text-orange-500 truncate'
           >
             <button
               type='button'
@@ -378,7 +378,7 @@ const MultiformSelector = ({
   return (
     <button
       type='button'
-      className='pointer-events-auto text-xs text-blue-400 hover:text-blue-500 hover:underline transition-all ease-out duration-150'
+      className='pointer-events-auto text-xs text-orange-400 hover:text-orange-500 hover:underline transition-all ease-out duration-150'
       onClick={() => {
         const state = activeForm.tinaForm.finalForm.getState();
         if (state.invalid === true) {
@@ -388,7 +388,7 @@ const MultiformSelector = ({
         }
       }}
     >
-      <EllipsisVertical className='h-5 w-auto opacity-70' />
+      <BiFolder className='h-5 w-auto opacity-70' />
     </button>
   );
 };
