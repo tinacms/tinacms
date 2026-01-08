@@ -122,8 +122,6 @@ export const createSearchIndexRouter = ({
 
     const query = requestURL.searchParams.get('q');
     const optionsParam = requestURL.searchParams.get('options');
-    const fuzzyParam = requestURL.searchParams.get('fuzzy');
-    const fuzzyOptionsParam = requestURL.searchParams.get('fuzzyOptions');
 
     if (!query) {
       res.end(JSON.stringify({ RESULT: [] }));
@@ -139,63 +137,6 @@ export const createSearchIndexRouter = ({
     }
 
     const queryObj = JSON.parse(query);
-
-    if (fuzzyParam === 'true' && searchIndex.fuzzySearchWrapper) {
-      try {
-        const fuzzyOptions = fuzzyOptionsParam
-          ? JSON.parse(fuzzyOptionsParam)
-          : {};
-
-        const searchTerms = queryObj.AND
-          ? queryObj.AND.filter(
-              (term: string) => !term.includes('_collection:')
-            )
-          : [];
-
-        const collectionFilter = queryObj.AND?.find((term: string) =>
-          term.includes('_collection:')
-        );
-
-        const paginationOptions: { limit?: number; cursor?: string } = {};
-        if (searchIndexOptions.PAGE) {
-          paginationOptions.limit = searchIndexOptions.PAGE.SIZE;
-          paginationOptions.cursor = searchIndexOptions.PAGE.NUMBER.toString();
-        }
-
-        const searchQuery = collectionFilter
-          ? `${searchTerms.join(' ')} ${collectionFilter}`
-          : searchTerms.join(' ');
-
-        const result = await searchIndex.fuzzySearchWrapper.query(searchQuery, {
-          ...paginationOptions,
-          fuzzyOptions,
-        });
-
-        if (collectionFilter) {
-          const collection = collectionFilter.split(':')[1];
-          result.results = result.results.filter(
-            (r) => r._id && r._id.startsWith(`${collection}:`)
-          );
-        }
-
-        res.end(
-          JSON.stringify({
-            RESULT: result.results,
-            RESULT_LENGTH: result.total,
-            NEXT_CURSOR: result.nextCursor,
-            PREV_CURSOR: result.prevCursor,
-            FUZZY_MATCHES: result.fuzzyMatches || {},
-          })
-        );
-        return;
-      } catch (error) {
-        console.warn(
-          '[search] Fuzzy search failed, falling back to standard search:',
-          error instanceof Error ? error.message : error
-        );
-      }
-    }
-
     const result = await searchIndex.QUERY(queryObj, searchIndexOptions);
     res.end(JSON.stringify(result));
   };
