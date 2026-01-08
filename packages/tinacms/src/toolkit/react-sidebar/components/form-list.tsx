@@ -2,7 +2,7 @@ import { Transition } from '@headlessui/react';
 import { useCMS } from '@toolkit/react-tinacms';
 import type { TinaState } from '@toolkit/tina-state';
 import * as React from 'react';
-import { BiChevronRight, BiFolder } from 'react-icons/bi';
+import { BiChevronRight, BiFolder, BiHome } from 'react-icons/bi';
 
 type FormListItem = TinaState['formLists'][number]['items'][number];
 
@@ -21,7 +21,8 @@ interface TreeNode {
 // Recursively collect all document items including subitems, tracking which are references
 const collectAllDocumentItems = (
   items: FormListItem[],
-  isGlobalFn: (formId: string) => boolean
+  isGlobalFn: (formId: string) => boolean,
+  firstFormId?: string | null
 ): Array<
   Extract<FormListItem, { type: 'document' }> & {
     isReference?: boolean;
@@ -37,9 +38,11 @@ const collectAllDocumentItems = (
 
   const processItem = (item: FormListItem, isFromSubItems = false) => {
     if (item.type === 'document') {
+      // Never mark the first document as a reference (could be circular)
+      const isRef = isFromSubItems && item.formId !== firstFormId;
       allItems.push({
         ...item,
-        isReference: isFromSubItems,
+        isReference: isRef,
         isGlobal: isGlobalFn(item.formId),
       });
       // Recursively process subitems - these will be marked as references
@@ -104,12 +107,123 @@ const buildTreeFromPaths = (
   return root;
 };
 
-const TreeNodeComponent = ({
+// Component for a single file item within a collection group
+const FileItem = ({
   node,
   setActiveFormId,
+  isLast,
+  depth,
 }: {
   node: TreeNode;
   setActiveFormId: (id: string) => void;
+  isLast: boolean;
+  depth: number;
+}) => {
+  const getPaddingClass = (d: number) => `${1.5 + d * 1.35}rem`;
+
+  return (
+    <div className='flex items-stretch'>
+      {/* Line connector container */}
+      <div
+        className='relative flex-none'
+        style={{ width: '1rem', marginLeft: getPaddingClass(depth) }}
+      >
+        {/* Vertical line - full height or half for last item */}
+        <div
+          className={`absolute left-1/2 -translate-x-1/2 w-px bg-gray-300 top-0 ${
+            isLast ? 'h-1/2' : 'h-full'
+          }`}
+        />
+        {/* Horizontal line - from center to right edge */}
+        <div className='absolute top-1/2 -translate-y-1/2 left-1/2 right-0 h-px bg-gray-300' />
+      </div>
+
+      <button
+        type='button'
+        onClick={() => setActiveFormId(node.formId!)}
+        className='pl-1 pr-6 py-2 flex-1 bg-transparent border-none text-sm text-gray-700 group hover:bg-gray-50 transition-all ease-out duration-150 flex items-center gap-1'
+      >
+        {/* Node name */}
+        <div className='flex-1 flex items-center gap-2 text-left'>
+          <span
+            className={`group-hover:text-orange-500 truncate ${node.isReference ? 'italic text-gray-400' : ''}`}
+          >
+            {node.name}
+          </span>
+        </div>
+
+        {/* Global badge for global documents */}
+        {node.isGlobal && (
+          <span className='px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full'>
+            global
+          </span>
+        )}
+      </button>
+    </div>
+  );
+};
+
+// Component for a group of files with the same collection type
+const CollectionGroup = ({
+  collectionLabel,
+  files,
+  setActiveFormId,
+  depth,
+  showReferences,
+}: {
+  collectionLabel: string;
+  files: TreeNode[];
+  setActiveFormId: (id: string) => void;
+  depth: number;
+  showReferences: boolean;
+}) => {
+  const getPaddingClass = (d: number) => `${1.5 + d * 1.35}rem`;
+
+  // Filter out references if showReferences is false
+  const visibleFiles = showReferences
+    ? files
+    : files.filter((file) => !file.isReference);
+
+  // Don't render the group if all files are filtered out
+  if (visibleFiles.length === 0) return null;
+
+  return (
+    <div>
+      {/* Collection label header */}
+      <div
+        className='py-1.5 flex items-center gap-1'
+        style={{ paddingLeft: getPaddingClass(depth) }}
+      >
+        <span
+          className='text-xs text-gray-400 truncate max-w-20'
+          title={collectionLabel}
+        >
+          {collectionLabel}
+        </span>
+      </div>
+
+      {/* Files with connecting line */}
+      {visibleFiles.map((file, index) => (
+        <FileItem
+          key={file.id}
+          node={file}
+          setActiveFormId={setActiveFormId}
+          isLast={index === visibleFiles.length - 1}
+          depth={depth}
+        />
+      ))}
+    </div>
+  );
+};
+
+const TreeNodeComponent = ({
+  node,
+  setActiveFormId,
+  showReferences,
+}: {
+  node: TreeNode;
+  setActiveFormId: (id: string) => void;
+  showReferences: boolean;
 }) => {
   const cms = useCMS();
 
@@ -141,10 +255,55 @@ const TreeNodeComponent = ({
 
   const [isExpanded, setIsExpanded] = React.useState(!hasOnlyReferences);
 
-  const form = React.useMemo(() => {
-    if (!node.formId) return null;
-    return cms.state.forms.find(({ tinaForm }) => node.formId === tinaForm.id);
-  }, [node.formId]);
+  // Group file children by collection type
+  const { fileGroups, folderChildren } = React.useMemo(() => {
+    if (node.isFile) return { fileGroups: [], folderChildren: [] };
+
+    const folders = node.children.filter((child) => !child.isFile);
+    const files = node.children.filter((child) => child.isFile);
+
+    // Group files by their collection label
+    const groups: Map<string, TreeNode[]> = new Map();
+    files.forEach((file) => {
+      const form = cms.state.forms.find(
+        ({ tinaForm }) => tinaForm.id === file.formId
+      );
+      const label = form?.tinaForm?.label || 'Unknown';
+      if (!groups.has(label)) {
+        groups.set(label, []);
+      }
+      groups.get(label)!.push(file);
+    });
+
+    return {
+      fileGroups: Array.from(groups.entries()),
+      folderChildren: folders,
+    };
+  }, [node, cms.state.forms]);
+
+  // Recursively check if this node has any non-reference content
+  const hasVisibleContent = React.useMemo(() => {
+    if (node.isFile) return true;
+    if (showReferences) return true;
+
+    const checkNodeHasVisibleContent = (n: TreeNode): boolean => {
+      // Check direct file children
+      const fileChildren = n.children.filter((child) => child.isFile);
+      const hasNonRefFiles = fileChildren.some((file) => !file.isReference);
+      if (hasNonRefFiles) return true;
+
+      // Recursively check folder children
+      const folderChildren = n.children.filter((child) => !child.isFile);
+      return folderChildren.some((folder) =>
+        checkNodeHasVisibleContent(folder)
+      );
+    };
+
+    return checkNodeHasVisibleContent(node);
+  }, [node, showReferences]);
+
+  // Hide folders with no visible content when references are hidden
+  if (!node.isFile && !hasVisibleContent) return null;
 
   const handleClick = () => {
     if (node.isFile && node.formId) {
@@ -155,9 +314,42 @@ const TreeNodeComponent = ({
   };
 
   const getPaddingClass = (depth: number) => {
-    // Use fixed Tailwind classes to ensure they're included in the bundle
     return `${1.5 + depth * 1.35}rem`;
   };
+
+  // If this is a file, render it as a standalone item (shouldn't happen normally as files are grouped)
+  if (node.isFile) {
+    const form = cms.state.forms.find(
+      ({ tinaForm }) => tinaForm.id === node.formId
+    );
+    return (
+      <button
+        type='button'
+        onClick={handleClick}
+        className='pr-6 py-2 w-full bg-transparent border-none text-sm text-gray-700 group hover:bg-gray-50 transition-all ease-out duration-150 flex items-center gap-1'
+        style={{ paddingLeft: getPaddingClass(node.depth) }}
+      >
+        <span
+          className='text-xs text-gray-400 truncate max-w-16 flex-none'
+          title={form?.tinaForm?.label}
+        >
+          {form?.tinaForm?.label}
+        </span>
+        <div className='flex-1 flex items-center gap-2 text-left'>
+          <span
+            className={`group-hover:text-orange-500 truncate ${node.isReference ? 'italic' : ''}`}
+          >
+            {node.name}
+          </span>
+        </div>
+        {node.isGlobal && (
+          <span className='px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full'>
+            global
+          </span>
+        )}
+      </button>
+    );
+  }
 
   return (
     <div>
@@ -168,7 +360,7 @@ const TreeNodeComponent = ({
         style={{ paddingLeft: getPaddingClass(node.depth) }}
       >
         {/* Expand/collapse arrow for folders */}
-        {!node.isFile && node.children.length > 0 && (
+        {node.children.length > 0 && (
           <BiChevronRight
             className={`w-4 h-4 text-gray-500 transition-transform duration-150 -ml-1 ${
               isExpanded ? 'rotate-90' : ''
@@ -176,50 +368,39 @@ const TreeNodeComponent = ({
           />
         )}
 
-        {/* Folder/file icon */}
-        {node.isFile ? (
-          <></>
-        ) : (
-          <BiFolder className='w-4 h-4 text-orange-500 flex-none' />
-        )}
+        {/* Folder icon */}
+        <BiFolder className='w-4 h-4 text-orange-500 flex-none' />
 
         {/* Node name */}
         <div className='flex-1 flex items-center gap-2 text-left'>
-          <span className='group-hover:text-blue-500 truncate'>
+          <span className='group-hover:text-orange-500 truncate'>
             {node.name}
           </span>
         </div>
-
-        {/* Global badge for global documents */}
-        {node.isFile && node.isGlobal && (
-          <span className='px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full'>
-            global
-          </span>
-        )}
-
-        {/* Reference pill for files that are references (from subItems) */}
-        {node.isFile && node.isReference && (
-          <span className='px-2 py-0.5 text-xs bg-gray-200 text-gray-600 rounded-full'>
-            ref
-          </span>
-        )}
-
-        {/* Form label for files */}
-        {node.isFile && form && (
-          <span className='text-xs text-gray-500 truncate max-w-32'>
-            {form.tinaForm.label}
-          </span>
-        )}
       </button>
 
-      {/* Render children */}
-      {!node.isFile && isExpanded && node.children.length > 0 && (
+      {/* Render children when expanded */}
+      {isExpanded && (
         <div>
-          {node.children.map((child) => (
+          {/* Render file groups first */}
+          {fileGroups.map(([label, files]) => (
+            <CollectionGroup
+              key={label}
+              collectionLabel={label}
+              files={files}
+              setActiveFormId={setActiveFormId}
+              depth={node.depth + 1}
+              showReferences={showReferences}
+            />
+          ))}
+
+          {/* Render folder children after */}
+          {folderChildren.map((child) => (
             <TreeNodeComponent
               key={child.id}
               node={child}
               setActiveFormId={setActiveFormId}
+              showReferences={showReferences}
             />
           ))}
         </div>
@@ -230,6 +411,53 @@ const TreeNodeComponent = ({
 
 export const FormLists = (props: { isEditing: boolean }) => {
   const cms = useCMS();
+
+  // Persist showReferences state in localStorage
+  const [showReferences, setShowReferences] = React.useState(() => {
+    try {
+      const stored = localStorage.getItem('tina-show-references');
+      return stored ? JSON.parse(stored) : false;
+    } catch {
+      return false;
+    }
+  });
+
+  // Update localStorage when showReferences changes
+  React.useEffect(() => {
+    try {
+      localStorage.setItem(
+        'tina-show-references',
+        JSON.stringify(showReferences)
+      );
+    } catch {
+      // Ignore localStorage errors
+    }
+  }, [showReferences]);
+
+  // Find the first document form across all form lists
+  const firstFormId = React.useMemo(() => {
+    for (const formList of cms.state.formLists) {
+      for (const item of formList.items) {
+        if (item.type === 'document') {
+          return item.formId;
+        }
+      }
+    }
+    return null;
+  }, [cms.state.formLists]);
+
+  const firstForm = firstFormId
+    ? cms.state.forms.find(({ tinaForm }) => tinaForm.id === firstFormId)
+    : null;
+
+  const isOnFirstForm = cms.state.activeFormId === firstFormId;
+
+  const handleGoToDefault = () => {
+    if (firstFormId) {
+      cms.dispatch({ type: 'forms:set-active-form-id', value: firstFormId });
+    }
+  };
+
   return (
     <Transition
       appear={true}
@@ -243,6 +471,39 @@ export const FormLists = (props: { isEditing: boolean }) => {
       leaveFrom='opacity-100'
       leaveTo='opacity-0 -translate-x-1/2'
     >
+      {/* Header section with back button and checkbox */}
+      <div className='px-4 py-3 border-b border-gray-100 space-y-3'>
+        {/* Back to default button */}
+        <button
+          type='button'
+          onClick={handleGoToDefault}
+          disabled={!firstForm || isOnFirstForm}
+          className={`flex items-center gap-1.5 text-sm transition-all duration-150 ${
+            firstForm && !isOnFirstForm
+              ? 'text-gray-600 hover:text-orange-500 cursor-pointer'
+              : 'text-gray-300 cursor-not-allowed'
+          }`}
+        >
+          <BiHome className='w-4 h-4' />
+          <span>
+            {firstFormId
+              ? firstFormId.split('/').pop() || 'Default'
+              : 'Default'}
+          </span>
+        </button>
+
+        {/* Show references checkbox */}
+        <label className='flex items-center gap-2 text-sm text-gray-600 cursor-pointer'>
+          <input
+            type='checkbox'
+            checked={showReferences}
+            onChange={(e) => setShowReferences(e.target.checked)}
+            className='w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500'
+          />
+          <span>Show referenced files</span>
+        </label>
+      </div>
+
       {cms.state.formLists.map((formList, index) => (
         <div key={`${formList.id}-${index}`}>
           {/* TODO: add labels for each list */}
@@ -252,6 +513,8 @@ export const FormLists = (props: { isEditing: boolean }) => {
               cms.dispatch({ type: 'forms:set-active-form-id', value: id });
             }}
             formList={formList}
+            showReferences={showReferences}
+            firstFormId={firstFormId}
           />
         </div>
       ))}
@@ -263,6 +526,8 @@ export const FormList = (props: {
   isEditing: boolean;
   setActiveFormId: (id: string) => void;
   formList: TinaState['formLists'][number];
+  showReferences: boolean;
+  firstFormId: string | null;
 }) => {
   const cms = useCMS();
 
@@ -278,12 +543,13 @@ export const FormList = (props: {
     // Collect ALL document items including nested subitems and global documents
     const allDocumentItems = collectAllDocumentItems(
       props.formList.items,
-      isGlobalFn
+      isGlobalFn,
+      props.firstFormId
     );
 
     // Build tree structure from all document items
     return buildTreeFromPaths(allDocumentItems);
-  }, [JSON.stringify(props.formList.items)]);
+  }, [JSON.stringify(props.formList.items), props.firstFormId]);
 
   return (
     <div className='divide-y divide-gray-200'>
@@ -292,6 +558,7 @@ export const FormList = (props: {
           key={node.id}
           node={node}
           setActiveFormId={props.setActiveFormId}
+          showReferences={props.showReferences}
         />
       ))}
     </div>
