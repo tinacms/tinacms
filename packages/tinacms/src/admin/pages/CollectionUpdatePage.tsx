@@ -176,7 +176,7 @@ const RenderForm = ({
       >
         <div className='w-full flex gap-1.5 justify-between items-center'>
           <FormBreadcrumbs
-            className='w-[calc(100%-3rem)]'
+            className='w-[calc(100%-5rem)]'
             rootBreadcrumbName={`${filename}.${collection.format}`}
           />
           <FileHistoryProvider
