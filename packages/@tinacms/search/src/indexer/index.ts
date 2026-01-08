@@ -19,12 +19,18 @@ type SearchIndexOptions = {
   textIndexLength?: number;
 };
 
+interface BatchProcessor {
+  callback: (item: Record<string, unknown>) => Promise<void>;
+  flush: () => Promise<void>;
+}
+
 export class SearchIndexer {
   private readonly batchSize: number;
   private readonly client: SearchClient;
   private readonly bridge: Bridge;
   private readonly schema: TinaSchema;
   private readonly textIndexLength: number;
+
   constructor(options: SearchIndexOptions) {
     this.client = options.client;
     this.bridge = options.bridge;
@@ -33,7 +39,29 @@ export class SearchIndexer {
     this.textIndexLength = options.textIndexLength || 500;
   }
 
-  private makeIndexerCallback(itemCallback: (item: any) => Promise<void>) {
+  private createBatchProcessor(): BatchProcessor {
+    let batch: Record<string, unknown>[] = [];
+
+    return {
+      callback: async (item: Record<string, unknown>) => {
+        batch.push(item);
+        if (batch.length >= this.batchSize) {
+          await this.client.put(batch);
+          batch = [];
+        }
+      },
+      flush: async () => {
+        if (batch.length > 0) {
+          await this.client.put(batch);
+          batch = [];
+        }
+      },
+    };
+  }
+
+  private makeIndexerCallback(
+    itemCallback: (item: Record<string, unknown>) => Promise<void>
+  ) {
     return async (collection: Collection<true>, contentPaths: string[]) => {
       const templateInfo = this.schema.getTemplatesForCollectable(collection);
       await sequential(contentPaths as string[], async (path) => {
@@ -64,47 +92,30 @@ export class SearchIndexer {
   }
 
   public async indexContentByPaths(documentPaths: string[]) {
-    let batch = [];
-    const itemCallback = async (item: any) => {
-      batch.push(item);
-      if (batch.length > this.batchSize) {
-        await this.client.put(batch);
-        batch = [];
-      }
-    };
+    const { callback, flush } = this.createBatchProcessor();
+
     await this.client.onStartIndexing?.();
     await scanContentByPaths(
       this.schema,
       documentPaths,
-      this.makeIndexerCallback(itemCallback)
+      this.makeIndexerCallback(callback)
     );
-    if (batch.length > 0) {
-      await this.client.put(batch);
-    }
+    await flush();
     await this.client.onFinishIndexing?.();
   }
 
   public async indexAllContent() {
-    await this.client.onStartIndexing?.();
+    const { callback, flush } = this.createBatchProcessor();
 
-    let batch = [];
-    const itemCallback = async (item: any) => {
-      batch.push(item);
-      if (batch.length > this.batchSize) {
-        await this.client.put(batch);
-        batch = [];
-      }
-    };
+    await this.client.onStartIndexing?.();
     const warnings = await scanAllContent(
       this.schema,
       this.bridge,
-      this.makeIndexerCallback(itemCallback)
+      this.makeIndexerCallback(callback)
     );
-    if (batch.length > 0) {
-      await this.client.put(batch);
-    }
-
+    await flush();
     await this.client.onFinishIndexing?.();
+
     return { warnings };
   }
 

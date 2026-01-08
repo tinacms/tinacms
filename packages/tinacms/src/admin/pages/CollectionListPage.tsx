@@ -177,7 +177,9 @@ export const handleNavigate = async (
     }
     tinaPreview
       ? navigate(`/~${basePath ? `/${basePath}` : ''}/${routeOverride}`)
-      : (window.location.href = `${basePath ? `/${basePath}` : ''}/${routeOverride}`);
+      : (window.location.href = `${
+          basePath ? `/${basePath}` : ''
+        }/${routeOverride}`);
     return null;
   } else {
     const pathToDoc = document._sys.breadcrumbs;
@@ -274,6 +276,12 @@ const CollectionListPage = () => {
       booleanEquals: null,
     }));
   }, [collectionName]);
+
+  // Reset pagination when search query changes
+  useEffect(() => {
+    setEndCursor('');
+    setPrevCursors([]);
+  }, [search]);
 
   const tableRowStyle =
     'hover:bg-gray-50/50 border-b-2 border-gray-50 transition-colors duration-300';
@@ -603,6 +611,8 @@ const CollectionListPage = () => {
                             <div className='flex flex-1 flex-row gap-2 items-end w-full'>
                               {searchEnabled ? (
                                 <SearchInput
+                                  cms={cms}
+                                  collectionName={collectionName}
                                   loading={_loading}
                                   search={search}
                                   setSearch={setSearch}
@@ -1151,40 +1161,59 @@ const SearchInput = ({
   setSearch,
   searchInput,
   setSearchInput,
+}: {
+  cms: TinaCMS;
+  collectionName: string;
+  loading: boolean;
+  search: string;
+  setSearch: (search: string) => void;
+  searchInput: string;
+  setSearchInput: (input: string) => void;
 }) => {
   const [searchLoaded, setSearchLoaded] = useState(false);
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
   useEffect(() => {
-    if (loading) {
-      setSearchLoaded(false);
-    } else {
-      setSearchLoaded(true);
-    }
+    setSearchLoaded(!loading);
   }, [loading]);
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (searchInput.trim()) {
+        setSearch(searchInput);
+        setSearchLoaded(false);
+      }
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchInput.trim()) {
+      setSearch(searchInput);
+      setSearchLoaded(false);
+    }
+  };
+
   return (
-    <form className='flex flex-1 flex-col gap-2 items-start w-full'>
+    <form
+      className='flex flex-1 flex-col gap-2 items-start w-full'
+      onSubmit={handleSubmit}
+    >
       <div className='h-4'></div>
-      <div className='flex flex-col md:flex-row items-start md:items-center w-full md:w-auto gap-3'>
-        <div className='flex-1 min-w-[200px] w-full md:w-auto relative'>
-          <BiSearch className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none' />
+      <div className='flex items-center w-full md:w-auto gap-3'>
+        <div className='flex-1 min-w-[200px] relative'>
+          <BiSearch className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none z-10' />
           <input
+            ref={inputRef}
             type='text'
             name='search'
             placeholder='Search...'
             value={searchInput}
-            onChange={(e) => {
-              setSearchInput(e.target.value);
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                if (searchInput.trim()) {
-                  setSearch(searchInput);
-                  setSearchLoaded(false);
-                }
-              }
-            }}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={handleKeyDown}
             className='shadow appearance-none bg-white block pl-10 pr-10 py-2 truncate w-full text-base border border-gray-200 focus:outline-none focus:shadow-outline focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded placeholder:text-gray-300 text-gray-600 focus:text-gray-900'
+            autoComplete='off'
           />
           {search && searchLoaded && (
             <button
@@ -1193,12 +1222,19 @@ const SearchInput = ({
                 setSearch('');
                 setSearchInput('');
               }}
-              className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors'
+              className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors z-10'
             >
               <BiX className='w-5 h-5' />
             </button>
           )}
         </div>
+        <Button
+          variant='primary'
+          type='submit'
+          className='focus:ring-0 focus:shadow-none'
+        >
+          Search
+        </Button>
       </div>
     </form>
   );
@@ -1377,7 +1413,9 @@ const FolderModal = ({
             <BaseTextField
               placeholder='Enter the name of the new folder'
               value={folderName}
-              className={`mb-4 ${!isFolderNameValid && isInteracted ? 'border-red-500' : ''}`}
+              className={`mb-4 ${
+                !isFolderNameValid && isInteracted ? 'border-red-500' : ''
+              }`}
               onChange={(event) => {
                 setFolderName(event.target.value);
                 setIsInteracted(true);
@@ -1437,7 +1475,7 @@ const RenameModal = ({
               Are you sure you want to rename <strong>{filename}</strong>?
             </p>
             <BaseTextField
-              placeholder='Enter a new name for the document&apos;s file'
+              placeholder="Enter a new name for the document's file"
               value={newRelativePath}
               onChange={(event) => setNewRelativePath(event.target.value)}
             />
