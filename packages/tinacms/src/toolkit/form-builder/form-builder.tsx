@@ -262,7 +262,11 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 
 export const FormStatus = ({ pristine }: { pristine: boolean }) => {
   const pristineClass = pristine ? 'text-green-500' : 'text-red-500';
-  return <FaCircle className={cn('h-3', pristineClass)} />;
+  return (
+    <div className='flex items-center gap-2'>
+      <FaCircle className={cn('h-3', pristineClass)} />
+    </div>
+  );
 };
 
 export const FormWrapper = ({
