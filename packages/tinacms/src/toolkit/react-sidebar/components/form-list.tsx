@@ -2,7 +2,7 @@ import { Transition } from '@headlessui/react';
 import { useCMS } from '@toolkit/react-tinacms';
 import type { TinaState } from '@toolkit/tina-state';
 import * as React from 'react';
-import { BiChevronRight, BiFolder, BiHome } from 'react-icons/bi';
+import { BiChevronRight, BiFolder, BiFolderOpen, BiHome } from 'react-icons/bi';
 
 type FormListItem = TinaState['formLists'][number]['items'][number];
 
@@ -374,7 +374,11 @@ const TreeNodeComponent = ({
         )}
 
         {/* Folder icon */}
-        <BiFolder className='w-4 h-4 text-orange-500 flex-none' />
+        {isExpanded ? (
+          <BiFolderOpen className='w-4 h-4 text-orange-500 flex-none' />
+        ) : (
+          <BiFolder className='w-4 h-4 text-orange-500 flex-none' />
+        )}
 
         {/* Node name */}
         <div className='flex-1 flex items-center gap-2 text-left'>
@@ -475,9 +479,10 @@ export const FormLists = (props: { isEditing: boolean }) => {
       leave='transition-all ease-out duration-150'
       leaveFrom='opacity-100'
       leaveTo='opacity-0 -translate-x-1/2'
+      className='flex flex-col h-full'
     >
-      {/* Header section with back button and checkbox */}
-      <div className='px-4 py-3 border-b border-gray-100 space-y-3'>
+      {/* Header section with back button and checkbox - fixed, no scroll */}
+      <div className='flex-none px-4 py-3 border-b border-gray-100 space-y-3 bg-white'>
         {/* Back to default button */}
         <button
           type='button'
@@ -509,20 +514,23 @@ export const FormLists = (props: { isEditing: boolean }) => {
         </label>
       </div>
 
-      {cms.state.formLists.map((formList, index) => (
-        <div key={`${formList.id}-${index}`}>
-          {/* TODO: add labels for each list */}
-          <FormList
-            isEditing={props.isEditing}
-            setActiveFormId={(id) => {
-              cms.dispatch({ type: 'forms:set-active-form-id', value: id });
-            }}
-            formList={formList}
-            showReferences={showReferences}
-            firstFormId={firstFormId}
-          />
-        </div>
-      ))}
+      {/* Scrollable content area */}
+      <div className='flex-1 overflow-x-auto overflow-y-auto'>
+        {cms.state.formLists.map((formList, index) => (
+          <div key={`${formList.id}-${index}`}>
+            {/* TODO: add labels for each list */}
+            <FormList
+              isEditing={props.isEditing}
+              setActiveFormId={(id) => {
+                cms.dispatch({ type: 'forms:set-active-form-id', value: id });
+              }}
+              formList={formList}
+              showReferences={showReferences}
+              firstFormId={firstFormId}
+            />
+          </div>
+        ))}
+      </div>
     </Transition>
   );
 };
@@ -542,7 +550,7 @@ export const FormList = (props: {
       const form = cms.state.forms.find(
         ({ tinaForm }) => tinaForm.id === formId
       );
-      return form?.tinaForm?.global || false;
+      return !!form?.tinaForm?.global;
     };
 
     // Collect ALL document items including nested subitems and global documents

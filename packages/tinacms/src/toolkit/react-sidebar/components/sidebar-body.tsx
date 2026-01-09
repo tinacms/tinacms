@@ -387,6 +387,7 @@ const MultiformSelector = ({
           cms.dispatch({ type: 'forms:set-active-form-id', value: null });
         }
       }}
+      title='Tina Explorer'
     >
       <BiFolder className='h-5 w-auto opacity-70' />
     </button>
