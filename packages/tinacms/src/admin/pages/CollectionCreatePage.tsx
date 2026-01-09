@@ -356,7 +356,7 @@ export const RenderForm = ({
         >
           <div className='w-full flex gap-1.5 justify-between items-center'>
             <FormBreadcrumbs
-              className='w-[calc(100%-5rem)]'
+              className='w-[calc(100%-3rem)]'
               rootBreadcrumbName='Create New'
             />
             <FormStatus pristine={formIsPristine} />

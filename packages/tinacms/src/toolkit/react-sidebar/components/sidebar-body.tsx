@@ -170,7 +170,7 @@ export const FormHeader = ({
   return (
     <div className='px-4 pt-2 pb-4 flex flex-row flex-nowrap justify-between items-center gap-2 bg-gradient-to-t from-white to-gray-50'>
       <MultiformSelector activeForm={activeForm} />
-      <FormBreadcrumbs className='w-[calc(100%-5rem)]' />
+      <FormBreadcrumbs className='w-[calc(100%-3rem)]' />
       <FileHistoryProvider
         defaultBranchName={repoProvider?.defaultBranchName}
         historyUrl={repoProvider?.historyUrl}
