@@ -10,7 +10,7 @@ import {
 } from '../fields/plugins/dnd-kit-wrapper';
 import { AiOutlineLoading } from 'react-icons/ai';
 import { BiError, BiGitBranch } from 'react-icons/bi';
-import { FaCircle, FaQuestionCircle } from 'react-icons/fa';
+import { FaCircle } from 'react-icons/fa';
 import { cn } from '../../utils/cn';
 import { useCMS } from '../react-core';
 import { FieldsBuilder } from './fields-builder';
@@ -264,15 +264,6 @@ export const FormStatus = ({ pristine }: { pristine: boolean }) => {
   const pristineClass = pristine ? 'text-green-500' : 'text-red-500';
   return (
     <div className='flex items-center gap-2'>
-      <a
-        href='https://tina.io/docs/reference/collections'
-        target='_blank'
-        rel='noopener noreferrer'
-        className='text-gray-500 hover:text-blue-500 transition-colors'
-        title='Learn more about your TinaCMS data definition'
-      >
-        <FaQuestionCircle className='h-4 w-4' />
-      </a>
       <FaCircle className={cn('h-3', pristineClass)} />
     </div>
   );
