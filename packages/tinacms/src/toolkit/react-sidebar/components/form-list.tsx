@@ -482,7 +482,7 @@ export const FormLists = (props: { isEditing: boolean }) => {
       className='flex flex-col h-full'
     >
       {/* Header section with back button and checkbox - fixed, no scroll */}
-      <div className='flex-none px-4 py-3 border-b border-gray-100 space-y-3 bg-white'>
+      <div className='flex-none px-4 py-3 border-b border-gray-100 space-y-3 bg-gradient-to-t from-white to-gray-50'>
         {/* Back to default button */}
         <button
           type='button'
