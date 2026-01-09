@@ -156,13 +156,6 @@ const FileItem = ({
             {node.name}
           </span>
         </div>
-
-        {/* Global badge for global documents */}
-        {node.isGlobal && (
-          <span className='px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full'>
-            global
-          </span>
-        )}
       </button>
     </div>
   );
@@ -192,19 +185,23 @@ const CollectionGroup = ({
   // Don't render the group if all files are filtered out
   if (visibleFiles.length === 0) return null;
 
+  // Check if this is a global collection (any file in the group is global)
+  const isGlobalCollection = files.some((file) => file.isGlobal);
+
   return (
     <div>
       {/* Collection label header */}
       <div
-        className='py-1.5 flex items-center gap-1'
+        className='py-1.5 flex items-center gap-2'
         style={{ paddingLeft: getPaddingClass(depth) }}
       >
-        <span
-          className='text-xs text-gray-400 truncate max-w-20'
-          title={collectionLabel}
-        >
-          {collectionLabel}
-        </span>
+        {/* Global badge for global collections */}
+        {isGlobalCollection && (
+          <span className='px-2 pb-0.5 text-xs bg-gray-100 text-blue-700 rounded-full'>
+            global
+          </span>
+        )}
+        <span className='text-xs text-gray-400'>{collectionLabel}</span>
       </div>
 
       {/* Files with connecting line */}
@@ -334,10 +331,13 @@ const TreeNodeComponent = ({
         className='pr-6 py-2 w-full bg-transparent border-none text-sm text-gray-700 group hover:bg-gray-50 transition-all ease-out duration-150 flex items-center gap-1'
         style={{ paddingLeft: getPaddingClass(node.depth) }}
       >
-        <span
-          className='text-xs text-gray-400 truncate max-w-16 flex-none'
-          title={form?.tinaForm?.label}
-        >
+        {/* Global badge for global collections */}
+        {node.isGlobal && (
+          <span className='px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full flex-none'>
+            global
+          </span>
+        )}
+        <span className='text-xs text-gray-400 flex-none'>
           {form?.tinaForm?.label}
         </span>
         <div className='flex-1 flex items-center gap-2 text-left'>
@@ -347,11 +347,6 @@ const TreeNodeComponent = ({
             {node.name}
           </span>
         </div>
-        {node.isGlobal && (
-          <span className='px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full'>
-            global
-          </span>
-        )}
       </button>
     );
   }
@@ -467,6 +462,29 @@ export const FormLists = (props: { isEditing: boolean }) => {
     }
   };
 
+  // Check if there are any referenced files across all form lists
+  const hasReferencedFiles = React.useMemo(() => {
+    const isGlobalFn = (formId: string) => {
+      const form = cms.state.forms.find(
+        ({ tinaForm }) => tinaForm.id === formId
+      );
+      return !!form?.tinaForm?.global;
+    };
+
+    for (const formList of cms.state.formLists) {
+      const allDocumentItems = collectAllDocumentItems(
+        formList.items,
+        isGlobalFn,
+        firstFormId
+      );
+      // If any item is a reference, we have referenced files
+      if (allDocumentItems.some((item) => item.isReference)) {
+        return true;
+      }
+    }
+    return false;
+  }, [cms.state.formLists, cms.state.forms, firstFormId]);
+
   return (
     <Transition
       appear={true}
@@ -482,7 +500,9 @@ export const FormLists = (props: { isEditing: boolean }) => {
       className='flex flex-col h-full'
     >
       {/* Header section with back button and checkbox - fixed, no scroll */}
-      <div className='flex-none px-4 py-3 border-b border-gray-100 space-y-3 bg-gradient-to-t from-white to-gray-50'>
+      <div
+        className={`flex-none px-4 py-3 border-b border-gray-100 bg-gradient-to-t from-white to-gray-50 ${hasReferencedFiles ? 'space-y-3' : ''}`}
+      >
         {/* Back to default button */}
         <button
           type='button'
@@ -502,16 +522,18 @@ export const FormLists = (props: { isEditing: boolean }) => {
           </span>
         </button>
 
-        {/* Show references checkbox */}
-        <label className='flex items-center gap-2 text-sm text-gray-600 cursor-pointer'>
-          <input
-            type='checkbox'
-            checked={showReferences}
-            onChange={(e) => setShowReferences(e.target.checked)}
-            className='w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500'
-          />
-          <span>Show referenced files</span>
-        </label>
+        {/* Show references checkbox - only show if there are referenced files */}
+        {hasReferencedFiles && (
+          <label className='flex items-center gap-2 text-sm text-gray-600 cursor-pointer'>
+            <input
+              type='checkbox'
+              checked={showReferences}
+              onChange={(e) => setShowReferences(e.target.checked)}
+              className='w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500'
+            />
+            <span>Show referenced files</span>
+          </label>
+        )}
       </div>
 
       {/* Scrollable content area */}
