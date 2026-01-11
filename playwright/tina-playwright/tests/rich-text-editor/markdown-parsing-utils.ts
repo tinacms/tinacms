@@ -1,4 +1,4 @@
-import { expect, Page } from "@playwright/test";
+import { expect, Page } from '@playwright/test';
 
 export async function checkMarkdownOutput(
   page: Page,
@@ -8,21 +8,28 @@ export async function checkMarkdownOutput(
 ) {
   // Wait for the page content to be ready
   await page.waitForSelector('[data-test="form:content/page/home.mdx"]', {
-    state: "visible",
+    state: 'visible',
   });
 
   // Check if the overflow menu button exists
   if (
-    await page.getByTestId("rich-text-editor-overflow-menu-button").isVisible()
+    await page.getByTestId('rich-text-editor-overflow-menu-button').isVisible()
   ) {
     // Click the overflow button if it's visible
-    await page.getByTestId("rich-text-editor-overflow-menu-button").click();
+    await page.getByTestId('rich-text-editor-overflow-menu-button').click();
   }
 
-  await page.getByTestId("markdown-button").click();
+  await page.getByTestId('markdown-button').click();
 
-  // Fill in the text with the specified markdown syntax
-  await page.getByRole("textbox").fill(inputText);
+  // The Monaco editor has an overlay structure where the view-line div intercepts clicks.
+  // We need to click on the editor area first to focus it, then type the text.
+  // The Monaco editor view-lines container is the clickable area.
+  const monacoEditor = page.locator('.monaco-editor .view-lines');
+  await monacoEditor.click();
+
+  // Use keyboard.type() to type into the Monaco editor
+  // This simulates actual keyboard input which works with Monaco
+  await page.keyboard.type(inputText);
 
   // Content is rendered by iframe
   const iframe = page.frameLocator('iframe[data-test="tina-iframe"]');
