@@ -153,47 +153,55 @@ export const useSearchCollection = (
     const searchCollection = async () => {
       if ((await api.isAuthenticated()) && !folder.loading && !cancelled) {
         try {
-          const response = (await cms.api.search.query(
-            `${search} AND _collection:${collectionName}`,
-            {
-              limit: 15,
-              cursor: after,
-            }
-          )) as {
+          const response = (await cms.api.search.query(search, {
+            limit: 15,
+            cursor: after,
+            collection: collectionName,
+          })) as {
             results: { _id: string }[];
             nextCursor: string;
             prevCursor: string;
+            fuzzyMatches?: Record<string, any[]>;
           };
+
+          // Handle empty or missing results
+          const results = response?.results ?? [];
+
           const docs = (await Promise.allSettled<
             Promise<{ document: DocumentForm }>
           >(
-            response.results.map((result) => {
+            results.map((result) => {
               const [collection, relativePath] = result._id.split(':');
               return api.fetchDocument(collection, relativePath, false);
             })
           )) as {
             status: 'fulfilled' | 'rejected';
             value: { document: DocumentForm };
+            reason?: any;
           }[];
+
           const edges = docs
             .filter((p) => p.status === 'fulfilled' && !!p.value?.document)
             .map((result) => ({ node: result.value.document })) as any[];
+
           const c = await api.fetchCollection(collectionName, false, '');
-          setCollection({
-            format: collection.format,
-            label: collection.label,
+          const collectionData = {
+            format: c.format,
+            label: c.label,
             name: collectionName,
-            templates: collection.templates,
+            templates: c.templates,
             documents: {
               pageInfo: {
-                hasNextPage: !!response.nextCursor,
-                hasPreviousPage: !!response.prevCursor,
+                hasNextPage: !!response?.nextCursor,
+                hasPreviousPage: !!response?.prevCursor,
                 startCursor: '',
-                endCursor: response.nextCursor || '',
+                endCursor: response?.nextCursor || '',
               },
               edges,
             },
-          });
+          };
+
+          setCollection(collectionData);
         } catch (error) {
           cms.alerts.error(
             `[${error.name}] GetCollection failed: ${error.message}`

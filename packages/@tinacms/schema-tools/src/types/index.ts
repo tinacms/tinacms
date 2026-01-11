@@ -815,10 +815,9 @@ export interface Config<
      *   url: `https://github.com/tinacms/tinacms/commits/${branch}/examples/next-2024/${relativePath}`
      * })
      *      */
-    historyUrl?: (context: {
-      relativePath: string;
-      branch: string;
-    }) => { url: string };
+    historyUrl?: (context: { relativePath: string; branch: string }) => {
+      url: string;
+    };
   };
   search?: (
     | {
@@ -846,6 +845,23 @@ export interface Config<
            * regex used for splitting tokens (default: /[\p{L}\d_]+/)
            */
           tokenSplitRegex?: string;
+          /**
+           * Enable fuzzy search (default: true)
+           */
+          fuzzyEnabled?: boolean;
+          /**
+           * Fuzzy search options
+           */
+          fuzzyOptions?: {
+            /** Maximum edit distance for fuzzy matching (default: 2) */
+            maxDistance?: number;
+            /** Minimum similarity score 0-1 for matches (default: 0.6) */
+            minSimilarity?: number;
+            /** Maximum number of fuzzy term expansions to return per search term (default: 10) */
+            maxTermExpansions?: number;
+            /** Use Damerau-Levenshtein (allows transpositions) (default: true) */
+            useTranspositions?: boolean;
+          };
         };
       }
   ) & {
