@@ -18,6 +18,7 @@ import type { Form } from '@toolkit/forms';
 import type { FormMetaPlugin } from '@toolkit/plugin-form-meta';
 import { useCMS } from '@toolkit/react-core';
 import { BiFolder } from 'react-icons/bi';
+import { FileText } from 'lucide-react';
 import * as React from 'react';
 import { FormLists } from './form-list';
 import { SidebarContext } from './sidebar';
@@ -71,6 +72,25 @@ export const FormsView = ({ loadingPlaceholder }: FormsViewProps = {}) => {
     }
   }, [cms.state.isLoadingContent]);
 
+  // Find the first document form across all form lists
+  const firstFormId = React.useMemo(() => {
+    for (const formList of cms.state.formLists) {
+      for (const item of formList.items) {
+        if (item.type === 'document') {
+          return item.formId;
+        }
+      }
+    }
+    return null;
+  }, [cms.state.formLists]);
+
+  const isMultiform = cms.state.forms.length > 1;
+  const activeForm = cms.state.forms.find(
+    ({ tinaForm }) => tinaForm.id === cms.state.activeFormId
+  );
+  const isEditing = !!activeForm;
+  const formMetas = cms.plugins.all<FormMetaPlugin>('form:meta');
+
   if (isShowingLoading || !initialLoadComplete) {
     // Loading - show when explicitly loading or during initial render
     const LoadingPlaceholder = loadingPlaceholder || SidebarLoadingPlaceholder;
@@ -81,28 +101,25 @@ export const FormsView = ({ loadingPlaceholder }: FormsViewProps = {}) => {
     // No Forms
     return <SidebarNoFormsPlaceholder />;
   }
-  const isMultiform = cms.state.forms.length > 1;
-  const activeForm = cms.state.forms.find(
-    ({ tinaForm }) => tinaForm.id === cms.state.activeFormId
-  );
-  const isEditing = !!activeForm;
-  if (isMultiform && !activeForm) {
-    return (
-      <div className='max-h-full overflow-y-auto'>
-        <FormLists isEditing={isEditing} />
-      </div>
-    );
-  }
-  const formMetas = cms.plugins.all<FormMetaPlugin>('form:meta');
+
+  const showFormList = isMultiform && !activeForm;
+  const showActiveForm = !!activeForm;
+
   return (
     <>
-      {activeForm && (
+      {showFormList && (
+        <div className='max-h-full overflow-y-auto'>
+          <FormLists isEditing={isEditing} />
+        </div>
+      )}
+      {showActiveForm && (
         <FormWrapper isEditing={isEditing} isMultiform={isMultiform}>
           <FormHeader
             activeForm={activeForm}
             branch={cms.api.admin.api.branch}
             repoProvider={cms.api.admin.api.schema.config.config.repoProvider}
             isLocalMode={cms.api?.tina?.isLocalMode}
+            firstFormId={firstFormId}
           />
           {formMetas?.map((meta) => (
             <React.Fragment key={meta.name}>
@@ -124,23 +141,7 @@ interface FormWrapperProps {
 
 const FormWrapper: React.FC<FormWrapperProps> = ({ isEditing, children }) => {
   return (
-    <div
-      className='flex-1 flex flex-col flex-nowrap overflow-hidden h-full w-full relative bg-white'
-      style={
-        isEditing
-          ? {
-              transform: 'none',
-              animationName: 'fly-in-left',
-              animationDuration: '150ms',
-              animationDelay: '0',
-              animationIterationCount: 1,
-              animationTimingFunction: 'ease-out',
-            }
-          : {
-              transform: 'translate3d(100%, 0, 0)',
-            }
-      }
-    >
+    <div className='flex-1 flex flex-col flex-nowrap overflow-hidden h-full w-full relative bg-white'>
       {children}
     </div>
   );
@@ -150,6 +151,7 @@ export interface FormHeaderProps {
   activeForm: { activeFieldName?: string; tinaForm: Form };
   branch?: string;
   isLocalMode?: boolean;
+  firstFormId?: string | null;
   repoProvider?: {
     defaultBranchName?: string;
     historyUrl?: (context: {
@@ -164,21 +166,28 @@ export const FormHeader = ({
   repoProvider,
   branch,
   isLocalMode,
+  firstFormId,
 }: FormHeaderProps) => {
   const { formIsPristine } = React.useContext(SidebarContext);
 
   return (
-    <div className='px-4 pt-2 pb-4 flex flex-row flex-nowrap justify-between items-center gap-2 bg-gradient-to-t from-white to-gray-50'>
-      <MultiformSelector activeForm={activeForm} />
-      <FormBreadcrumbs className='w-[calc(100%-3rem)]' />
-      <FileHistoryProvider
-        defaultBranchName={repoProvider?.defaultBranchName}
-        historyUrl={repoProvider?.historyUrl}
-        contentRelativePath={activeForm.tinaForm.path}
-        tinaBranch={branch}
-        isLocalMode={isLocalMode}
+    <div className='px-4 pt-2 pb-4 flex flex-row flex-nowrap items-center gap-2 bg-gradient-to-t from-white to-gray-50'>
+      <ViewToggle
+        activeForm={activeForm}
+        firstFormId={firstFormId}
+        showFileName={true}
       />
-      <FormStatus pristine={formIsPristine} />
+      <FormBreadcrumbs className='flex-1 min-w-0 overflow-hidden' />
+      <div className='flex items-center gap-2 flex-shrink-0'>
+        <FileHistoryProvider
+          defaultBranchName={repoProvider?.defaultBranchName}
+          historyUrl={repoProvider?.historyUrl}
+          contentRelativePath={activeForm.tinaForm.path}
+          tinaBranch={branch}
+          isLocalMode={isLocalMode}
+        />
+        <FormStatus pristine={formIsPristine} />
+      </div>
     </div>
   );
 };
@@ -364,10 +373,14 @@ export const FormBreadcrumbs = ({
   );
 };
 
-const MultiformSelector = ({
+export const ViewToggle = ({
   activeForm,
+  firstFormId,
+  showFileName,
 }: {
-  activeForm: { activeFieldName?: string; tinaForm: Form };
+  activeForm?: { activeFieldName?: string; tinaForm: Form } | null;
+  firstFormId?: string | null;
+  showFileName?: boolean;
 }) => {
   const cms = useCMS();
   const isMultiform = cms.state.forms.length > 1;
@@ -375,21 +388,64 @@ const MultiformSelector = ({
   if (!isMultiform) {
     return null;
   }
+
+  const isInListView = !activeForm;
+  const fileName = firstFormId
+    ? firstFormId.split('/').pop() || 'Default'
+    : 'Default';
+  // Strip file extension for display
+  const fileNameWithoutExtension = fileName.replace(/\.[^/.]+$/, '');
+
+  const handleListViewClick = () => {
+    if (activeForm) {
+      const state = activeForm.tinaForm.finalForm.getState();
+      if (state.invalid === true) {
+        cms.alerts.error('Cannot navigate away from an invalid form.');
+      } else {
+        cms.dispatch({ type: 'forms:set-active-form-id', value: null });
+      }
+    }
+  };
+
+  const handleFormViewClick = () => {
+    if (firstFormId && !activeForm) {
+      cms.dispatch({ type: 'forms:set-active-form-id', value: firstFormId });
+    }
+  };
+
   return (
-    <button
-      type='button'
-      className='pointer-events-auto text-xs text-orange-400 hover:text-orange-500 hover:underline transition-all ease-out duration-150'
-      onClick={() => {
-        const state = activeForm.tinaForm.finalForm.getState();
-        if (state.invalid === true) {
-          cms.alerts.error('Cannot navigate away from an invalid form.');
-        } else {
-          cms.dispatch({ type: 'forms:set-active-form-id', value: null });
-        }
-      }}
-      title='Tina Explorer'
-    >
-      <BiFolder className='h-5 w-auto opacity-70' />
-    </button>
+    <div className='inline-flex items-center border border-gray-300 rounded overflow-hidden'>
+      <button
+        type='button'
+        onClick={handleListViewClick}
+        disabled={isInListView}
+        className={`flex items-center gap-1 px-1.5 py-1 text-xs transition-all duration-150 ${
+          isInListView
+            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+            : 'bg-white text-gray-600 hover:bg-gray-50 hover:text-orange-500 cursor-pointer'
+        }`}
+        title='Explorer View'
+      >
+        <BiFolder className='w-3.5 h-3.5 flex-shrink-0' />
+      </button>
+      <button
+        type='button'
+        onClick={handleFormViewClick}
+        disabled={!isInListView}
+        className={`flex items-center gap-1 px-1.5 py-1 text-xs transition-all duration-150 ${
+          !isInListView
+            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+            : 'bg-white text-gray-600 hover:bg-gray-50 hover:text-orange-500 cursor-pointer'
+        }`}
+        title='Form View'
+      >
+        <FileText className='w-3.5 h-3.5 flex-shrink-0' />
+        {showFileName && isInListView && (
+          <span className='truncate max-w-[120px]'>
+            {fileNameWithoutExtension}
+          </span>
+        )}
+      </button>
+    </div>
   );
 };

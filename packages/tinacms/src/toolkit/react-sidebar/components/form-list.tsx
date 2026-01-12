@@ -1,8 +1,8 @@
-import { Transition } from '@headlessui/react';
 import { useCMS } from '@toolkit/react-tinacms';
 import type { TinaState } from '@toolkit/tina-state';
 import * as React from 'react';
-import { BiChevronRight, BiFolder, BiFolderOpen, BiHome } from 'react-icons/bi';
+import { BiChevronRight, BiFolder, BiFolderOpen } from 'react-icons/bi';
+import { ViewToggle } from './sidebar-body';
 
 type FormListItem = TinaState['formLists'][number]['items'][number];
 
@@ -458,18 +458,6 @@ export const FormLists = (props: { isEditing: boolean }) => {
     return null;
   }, [cms.state.formLists]);
 
-  const firstForm = firstFormId
-    ? cms.state.forms.find(({ tinaForm }) => tinaForm.id === firstFormId)
-    : null;
-
-  const isOnFirstForm = cms.state.activeFormId === firstFormId;
-
-  const handleGoToDefault = () => {
-    if (firstFormId) {
-      cms.dispatch({ type: 'forms:set-active-form-id', value: firstFormId });
-    }
-  };
-
   // Check if there are any referenced files across all form lists
   const hasReferencedFiles = React.useMemo(() => {
     const isGlobalFn = (formId: string) => {
@@ -494,54 +482,32 @@ export const FormLists = (props: { isEditing: boolean }) => {
   }, [cms.state.formLists, cms.state.forms, firstFormId]);
 
   return (
-    <Transition
-      appear={true}
-      // show={props.isEditing}
-      show={true}
-      as={'div'}
-      enter='transition-all ease-out duration-150'
-      enterFrom='opacity-0 -translate-x-1/2'
-      enterTo='opacity-100'
-      leave='transition-all ease-out duration-150'
-      leaveFrom='opacity-100'
-      leaveTo='opacity-0 -translate-x-1/2'
-      className='flex flex-col h-full'
-    >
-      {/* Header section with back button and checkbox - fixed, no scroll */}
-      <div
-        className={`flex-none px-4 py-3 border-b border-gray-100 bg-gradient-to-t from-white to-gray-50 ${hasReferencedFiles ? 'space-y-3' : ''}`}
-      >
-        {/* Back to default button */}
-        <button
-          type='button'
-          onClick={handleGoToDefault}
-          disabled={!firstForm || isOnFirstForm}
-          className={`flex items-center gap-1.5 text-sm transition-all duration-150 ${
-            firstForm && !isOnFirstForm
-              ? 'text-gray-600 hover:text-orange-500 cursor-pointer'
-              : 'text-gray-300 cursor-not-allowed'
-          }`}
-        >
-          <BiHome className='w-4 h-4' />
-          <span>
-            {firstFormId
-              ? firstFormId.split('/').pop() || 'Default'
-              : 'Default'}
-          </span>
-        </button>
-
-        {/* Show references checkbox - only show if there are referenced files */}
-        {hasReferencedFiles && (
-          <label className='flex items-center gap-2 text-sm text-gray-600 cursor-pointer'>
-            <input
-              type='checkbox'
-              checked={showReferences}
-              onChange={(e) => setShowReferences(e.target.checked)}
-              className='w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500'
+    <div className='flex flex-col h-full'>
+      {/* Header section with toggle and checkbox - fixed, no scroll */}
+      <div className='flex-none px-4 py-2 border-b border-gray-100 bg-gradient-to-t from-white to-gray-50'>
+        <div className='flex flex-col gap-3'>
+          {/* View toggle */}
+          <div>
+            <ViewToggle
+              activeForm={null}
+              firstFormId={firstFormId}
+              showFileName={true}
             />
-            <span>Show referenced files</span>
-          </label>
-        )}
+          </div>
+
+          {/* Show references checkbox - only show if there are referenced files */}
+          {hasReferencedFiles && (
+            <label className='flex items-center gap-2 text-sm text-gray-600 cursor-pointer'>
+              <input
+                type='checkbox'
+                checked={showReferences}
+                onChange={(e) => setShowReferences(e.target.checked)}
+                className='w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500'
+              />
+              <span>Show referenced files</span>
+            </label>
+          )}
+        </div>
       </div>
 
       {/* Scrollable content area */}
@@ -561,7 +527,7 @@ export const FormLists = (props: { isEditing: boolean }) => {
           </div>
         ))}
       </div>
-    </Transition>
+    </div>
   );
 };
 
