@@ -126,6 +126,9 @@ const FileItem = ({
 }) => {
   const getPaddingClass = (d: number) => `${1.5 + d * 1.35}rem`;
 
+  // Strip file extension for display
+  const nameWithoutExtension = node.name.replace(/\.[^/.]+$/, '');
+
   return (
     <div className='flex items-stretch'>
       {/* Line connector container */}
@@ -146,14 +149,15 @@ const FileItem = ({
       <button
         type='button'
         onClick={() => setActiveFormId(node.formId!)}
+        title={node.name}
         className='pl-1 pr-6 py-2 flex-1 bg-transparent border-none text-sm text-gray-700 group hover:bg-gray-50 transition-all ease-out duration-150 flex items-center gap-1'
       >
-        {/* Node name */}
+        {/* Node name without extension */}
         <div className='flex-1 flex items-center gap-2 text-left'>
           <span
             className={`group-hover:text-orange-500 truncate ${node.isReference ? 'italic text-gray-400' : ''}`}
           >
-            {node.name}
+            {nameWithoutExtension}
           </span>
         </div>
       </button>
@@ -324,10 +328,14 @@ const TreeNodeComponent = ({
     const form = cms.state.forms.find(
       ({ tinaForm }) => tinaForm.id === node.formId
     );
+    // Strip file extension for display
+    const nameWithoutExtension = node.name.replace(/\.[^/.]+$/, '');
+
     return (
       <button
         type='button'
         onClick={handleClick}
+        title={node.name}
         className='pr-6 py-2 w-full bg-transparent border-none text-sm text-gray-700 group hover:bg-gray-50 transition-all ease-out duration-150 flex items-center gap-1'
         style={{ paddingLeft: getPaddingClass(node.depth) }}
       >
@@ -344,7 +352,7 @@ const TreeNodeComponent = ({
           <span
             className={`group-hover:text-orange-500 truncate ${node.isReference ? 'italic' : ''}`}
           >
-            {node.name}
+            {nameWithoutExtension}
           </span>
         </div>
       </button>
