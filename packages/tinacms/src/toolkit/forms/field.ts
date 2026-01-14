@@ -26,10 +26,9 @@ export interface Field<F extends Field = AnyField> {
    * a guarantee that the given field will receive focus since that functionality
    * needs to be built on a per-component basis.
    *
-   * This is also a one-way street. The "active field" for a given form isn't
+   * This is also a one-way stree. The "active field" for a given form isn't
    * necessarily updated when a user clicks on a new field. So you can have a
    * field which is marked as the active field, and have focus on another field
    */
-  focusIntent?: boolean;
-  hoverIntent?: boolean;
+  experimental_focusIntent?: boolean;
 }

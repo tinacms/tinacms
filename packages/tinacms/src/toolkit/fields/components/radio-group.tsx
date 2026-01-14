@@ -98,7 +98,7 @@ const RadioOption = ({ checked, htmlFor, children, ...props }) => (
     <span
       className={`relative h-[19px] w-[19px] rounded border text-indigo-600 focus:ring-indigo-500 transition ease-out duration-150 ${
         checked
-          ? 'border-tina-orange-dark bg-tina-orange shadow-sm group-hover:bg-tina-orange group-hover:border-tina-orange-dark'
+          ? 'border-blue-500 bg-blue-500 shadow-sm group-hover:bg-blue-400 group-hover:border-blue-400'
           : 'border-gray-200 bg-white shadow-inner group-hover:bg-gray-100'
       }`}
     >
