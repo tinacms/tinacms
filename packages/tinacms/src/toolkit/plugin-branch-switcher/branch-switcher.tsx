@@ -236,24 +236,22 @@ export const getFilteredBranchList = (
   filter: 'content' | 'all' = 'all'
 ) => {
   const filteredBranchList = branchList
-    .filter(
-      (branch) => {
-        if (!search) return true;
-        if (branch.name === currentBranchName) return true;
-        
-        const searchLower = search.toLowerCase();
-        const nameMatch = branch.name.toLowerCase().includes(searchLower);
-        
-        // Also check if search matches PR reference
-        let prMatch = false;
-        if (branch.githubPullRequestUrl) {
-          const prId = extractPullRequestId(branch.githubPullRequestUrl);
-          prMatch = prId.toLowerCase().includes(searchLower);
-        }
-        
-        return nameMatch || prMatch;
+    .filter((branch) => {
+      if (!search) return true;
+      if (branch.name === currentBranchName) return true;
+
+      const searchLower = search.toLowerCase();
+      const nameMatch = branch.name.toLowerCase().includes(searchLower);
+
+      // Also check if search matches PR reference
+      let prMatch = false;
+      if (branch.githubPullRequestUrl) {
+        const prId = extractPullRequestId(branch.githubPullRequestUrl);
+        prMatch = prId.toLowerCase().includes(searchLower);
       }
-    )
+
+      return nameMatch || prMatch;
+    })
     .filter((branch) => {
       // always show protected branches (e.g. main)
       if (branch.protected) return true;
