@@ -237,10 +237,22 @@ export const getFilteredBranchList = (
 ) => {
   const filteredBranchList = branchList
     .filter(
-      (branch) =>
-        !search ||
-        branch.name.includes(search) ||
-        branch.name === currentBranchName
+      (branch) => {
+        if (!search) return true;
+        if (branch.name === currentBranchName) return true;
+        
+        const searchLower = search.toLowerCase();
+        const nameMatch = branch.name.toLowerCase().includes(searchLower);
+        
+        // Also check if search matches PR reference
+        let prMatch = false;
+        if (branch.githubPullRequestUrl) {
+          const prId = extractPullRequestId(branch.githubPullRequestUrl);
+          prMatch = prId.toLowerCase().includes(searchLower);
+        }
+        
+        return nameMatch || prMatch;
+      }
     )
     .filter((branch) => {
       // always show protected branches (e.g. main)
@@ -380,7 +392,7 @@ const BranchSelector = ({
           </label>
           <div className='block relative group h-fit mb-auto'>
             <BaseTextField
-              placeholder='Search'
+              placeholder='Branch name or PR #'
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
