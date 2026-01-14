@@ -148,7 +148,7 @@ export const FieldWrapper = ({
 } & Partial<React.ComponentPropsWithoutRef<'div'>>) => {
   return (
     <div
-      className={`relative w-full px-2 ${margin ? 'mb-5 last:mb-0' : ''} ${field?.width === 'half' ? '@sm:w-1/2' : ''} ${getFieldStateClasses()}`}
+      className={`relative w-full px-2 ${margin ? 'mb-5 last:mb-0' : ''} ${field?.width === 'half' ? '@sm:w-1/2' : ''}`}
       {...props}
     >
       {children}
