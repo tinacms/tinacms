@@ -201,7 +201,7 @@ const Button = (props) => {
     <button
       className={`${
         props.align === 'left' ? 'rounded-l border-r-0' : 'rounded-r border-l-0'
-      } shadow rounded bg-white cursor-pointer relative inline-flex items-center px-2 py-2 border border-gray-200 hover:text-white text-sm font-medium transition-all ease-out duration-150 hover:bg-tina-orange focus:z-10 focus:outline-none focus:ring-1 focus:ring-tina-orange-dark focus:border-tina-orange-dark`}
+      } shadow rounded bg-white cursor-pointer relative inline-flex items-center px-2 py-2 border border-gray-200 hover:text-white text-sm font-medium transition-all ease-out duration-150 hover:bg-blue-500 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
       type='button'
       onClick={props.onClick}
     >

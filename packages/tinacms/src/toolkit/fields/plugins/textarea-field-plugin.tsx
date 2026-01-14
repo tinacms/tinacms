@@ -6,16 +6,13 @@ import { parse } from './text-format';
 const TextareaField = wrapFieldsWithMeta<{ input: InputProps }>((props) => {
   const ref = React.useRef(null);
   React.useEffect(() => {
-    const focusIntent = props.field.focusIntent;
-    const shouldFocus = !!focusIntent;
-
-    if (ref.current && shouldFocus) {
+    if (ref.current && props.field.experimental_focusIntent) {
       const el = ref.current;
       el.focus();
       // Move the cursor to the end of the text
       el.setSelectionRange(el.value.length, el.value.length);
     }
-  }, [props.field.focusIntent, ref]);
+  }, [props.field.experimental_focusIntent, ref]);
 
   return <TextArea ref={ref} {...props.input} />;
 });
