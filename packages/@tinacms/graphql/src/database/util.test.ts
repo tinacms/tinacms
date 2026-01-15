@@ -288,5 +288,62 @@ Content with components stored in frontmatter`;
       expect(result).toContain('author = "Test Author"');
       expect(result).toContain('Content here');
     });
+
+    it('should not wrap long strings with folded scalar syntax by default (lineWidth: -1)', () => {
+      const content = {
+        title: 'Test Title',
+        longString:
+          'This is a very long string that exceeds eighty characters and would normally be wrapped with folded scalar syntax if lineWidth was set to 80',
+        _relativePath: 'test.md',
+        _id: 'test.md',
+        _template: 'post',
+        _collection: 'posts',
+        $_body: 'Content here',
+      };
+
+      const result = stringifyFile(content, '.md', false);
+
+      // Should NOT contain folded scalar syntax
+      expect(result).not.toContain('>-');
+      // Should contain the full string on one line in the frontmatter
+      expect(result).toContain('longString:');
+    });
+
+    it('should wrap long strings when lineWidth is explicitly set to 80', () => {
+      const content = {
+        title: 'Test Title',
+        longString:
+          'This is a very long string that exceeds 80 characters and should be wrapped with folded scalar syntax when lineWidth is set to 80',
+        _relativePath: 'test.md',
+        _id: 'test.md',
+        _template: 'post',
+        _collection: 'posts',
+        $_body: 'Content here',
+      };
+
+      const result = stringifyFile(content, '.md', false, {
+        yamlMaxLineWidth: 80,
+      });
+
+      // Should contain folded scalar syntax
+      expect(result).toContain('>-');
+    });
+
+    it('should handle lineWidth for standalone YAML files', () => {
+      const content = {
+        title: 'Test Title',
+        longString:
+          'This is a very long string that exceeds 80 characters and would normally be wrapped but should not be with default lineWidth of -1',
+        _relativePath: 'test.yaml',
+        _id: 'test.yaml',
+        _template: 'config',
+        _collection: 'configs',
+      };
+
+      const result = stringifyFile(content, '.yaml', false);
+
+      // Should NOT contain folded scalar syntax
+      expect(result).not.toContain('>-');
+    });
   });
 });
