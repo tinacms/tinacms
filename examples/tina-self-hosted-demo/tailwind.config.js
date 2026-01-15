@@ -1,8 +1,8 @@
-const colors = require('tailwindcss/colors')
-const defaultTheme = require('tailwindcss/defaultTheme')
+import colors from 'tailwindcss/colors'
+import defaultTheme from 'tailwindcss/defaultTheme'
+import typography from '@tailwindcss/typography'
 
-module.exports = {
-  mode: 'jit',
+export default {
   content: [
     './pages/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}',
@@ -228,5 +228,5 @@ module.exports = {
   variants: {
     extend: { typography: ['tint', 'dark', 'primary'] },
   },
-  plugins: [require('@tailwindcss/typography')],
+  plugins: [typography],
 }
