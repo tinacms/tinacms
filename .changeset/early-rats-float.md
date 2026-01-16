@@ -1,6 +1,5 @@
 ---
 "tinacms-authjs": patch
-"@examples/self-hosted-starter": patch
 ---
 
 * Bumped react, react-dom, next and next-auth dev dependencies
