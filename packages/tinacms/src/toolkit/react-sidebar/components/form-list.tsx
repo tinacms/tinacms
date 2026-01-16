@@ -2,7 +2,12 @@ import { Transition } from '@headlessui/react';
 import { useCMS } from '@toolkit/react-tinacms';
 import type { TinaState } from '@toolkit/tina-state';
 import * as React from 'react';
-import { BiChevronRight, BiFolder, BiFolderOpen, BiHome } from 'react-icons/bi';
+import {
+  BiChevronRight,
+  BiCompass,
+  BiFolder,
+  BiFolderOpen,
+} from 'react-icons/bi';
 
 type FormListItem = TinaState['formLists'][number]['items'][number];
 
@@ -21,8 +26,7 @@ interface TreeNode {
 // Recursively collect all document items including subitems, tracking which are references
 const collectAllDocumentItems = (
   items: FormListItem[],
-  isGlobalFn: (formId: string) => boolean,
-  firstFormId?: string | null
+  isGlobalFn: (formId: string) => boolean
 ): Array<
   Extract<FormListItem, { type: 'document' }> & {
     isReference?: boolean;
@@ -38,8 +42,8 @@ const collectAllDocumentItems = (
 
   const processItem = (item: FormListItem, isFromSubItems = false) => {
     if (item.type === 'document') {
-      // Never mark the first document as a reference (could be circular)
-      const isRef = isFromSubItems && item.formId !== firstFormId;
+      // Mark subitems as references
+      const isRef = isFromSubItems;
       allItems.push({
         ...item,
         isReference: isRef,
@@ -446,30 +450,6 @@ export const FormLists = (props: { isEditing: boolean }) => {
     }
   }, [showReferences]);
 
-  // Find the first document form across all form lists
-  const firstFormId = React.useMemo(() => {
-    for (const formList of cms.state.formLists) {
-      for (const item of formList.items) {
-        if (item.type === 'document') {
-          return item.formId;
-        }
-      }
-    }
-    return null;
-  }, [cms.state.formLists]);
-
-  const firstForm = firstFormId
-    ? cms.state.forms.find(({ tinaForm }) => tinaForm.id === firstFormId)
-    : null;
-
-  const isOnFirstForm = cms.state.activeFormId === firstFormId;
-
-  const handleGoToDefault = () => {
-    if (firstFormId) {
-      cms.dispatch({ type: 'forms:set-active-form-id', value: firstFormId });
-    }
-  };
-
   // Check if there are any referenced files across all form lists
   const hasReferencedFiles = React.useMemo(() => {
     const isGlobalFn = (formId: string) => {
@@ -482,8 +462,7 @@ export const FormLists = (props: { isEditing: boolean }) => {
     for (const formList of cms.state.formLists) {
       const allDocumentItems = collectAllDocumentItems(
         formList.items,
-        isGlobalFn,
-        firstFormId
+        isGlobalFn
       );
       // If any item is a reference, we have referenced files
       if (allDocumentItems.some((item) => item.isReference)) {
@@ -491,7 +470,7 @@ export const FormLists = (props: { isEditing: boolean }) => {
       }
     }
     return false;
-  }, [cms.state.formLists, cms.state.forms, firstFormId]);
+  }, [cms.state.formLists, cms.state.forms]);
 
   return (
     <Transition
@@ -507,28 +486,13 @@ export const FormLists = (props: { isEditing: boolean }) => {
       leaveTo='opacity-0 -translate-x-1/2'
       className='flex flex-col h-full'
     >
-      {/* Header section with back button and checkbox - fixed, no scroll */}
-      <div
-        className={`flex-none px-4 py-3 border-b border-gray-100 bg-gradient-to-t from-white to-gray-50 ${hasReferencedFiles ? 'space-y-3' : ''}`}
-      >
-        {/* Back to default button */}
-        <button
-          type='button'
-          onClick={handleGoToDefault}
-          disabled={!firstForm || isOnFirstForm}
-          className={`flex items-center gap-1.5 text-sm transition-all duration-150 ${
-            firstForm && !isOnFirstForm
-              ? 'text-gray-600 hover:text-orange-500 cursor-pointer'
-              : 'text-gray-300 cursor-not-allowed'
-          }`}
-        >
-          <BiHome className='w-4 h-4' />
-          <span>
-            {firstFormId
-              ? firstFormId.split('/').pop() || 'Default'
-              : 'Default'}
-          </span>
-        </button>
+      {/* Header section - fixed, no scroll */}
+      <div className='flex-none px-4 py-3 border-b border-gray-100 bg-gradient-to-t from-white to-gray-50 space-y-3'>
+        {/* Tina Explore heading */}
+        <div className='flex items-center gap-2'>
+          <BiCompass className='w-5 h-5 text-orange-500' />
+          <h2 className='text-lg font-semibold text-gray-800'>Tina Explore</h2>
+        </div>
 
         {/* Show references checkbox - only show if there are referenced files */}
         {hasReferencedFiles && (
@@ -556,7 +520,6 @@ export const FormLists = (props: { isEditing: boolean }) => {
               }}
               formList={formList}
               showReferences={showReferences}
-              firstFormId={firstFormId}
             />
           </div>
         ))}
@@ -570,7 +533,6 @@ export const FormList = (props: {
   setActiveFormId: (id: string) => void;
   formList: TinaState['formLists'][number];
   showReferences: boolean;
-  firstFormId: string | null;
 }) => {
   const cms = useCMS();
 
@@ -586,13 +548,12 @@ export const FormList = (props: {
     // Collect ALL document items including nested subitems and global documents
     const allDocumentItems = collectAllDocumentItems(
       props.formList.items,
-      isGlobalFn,
-      props.firstFormId
+      isGlobalFn
     );
 
     // Build tree structure from all document items
     return buildTreeFromPaths(allDocumentItems);
-  }, [JSON.stringify(props.formList.items), props.firstFormId]);
+  }, [JSON.stringify(props.formList.items)]);
 
   return (
     <div className='divide-y divide-gray-200'>
