@@ -44,6 +44,14 @@ export const FormsView = ({ loadingPlaceholder }: FormsViewProps = {}) => {
   const { setFormIsPristine } = React.useContext(SidebarContext);
   const [isShowingLoading, setIsShowingLoading] = React.useState(true); // Default to showing loading
   const [initialLoadComplete, setInitialLoadComplete] = React.useState(false);
+  const [lastActiveFormId, setLastActiveFormId] = React.useState<string | null>(null);
+
+  // Track the last active form ID for the back button
+  React.useEffect(() => {
+    if (cms.state.activeFormId) {
+      setLastActiveFormId(cms.state.activeFormId);
+    }
+  }, [cms.state.activeFormId]);
 
   // Handle loading state with minimum display time
   React.useEffect(() => {
@@ -89,7 +97,7 @@ export const FormsView = ({ loadingPlaceholder }: FormsViewProps = {}) => {
   if (isMultiform && !activeForm) {
     return (
       <div className='max-h-full overflow-y-auto'>
-        <FormLists isEditing={isEditing} />
+        <FormLists isEditing={isEditing} lastActiveFormId={lastActiveFormId} />
       </div>
     );
   }

@@ -3,6 +3,7 @@ import { useCMS } from '@toolkit/react-tinacms';
 import type { TinaState } from '@toolkit/tina-state';
 import * as React from 'react';
 import {
+  BiChevronLeft,
   BiChevronRight,
   BiCompass,
   BiFolder,
@@ -425,7 +426,10 @@ const TreeNodeComponent = ({
   );
 };
 
-export const FormLists = (props: { isEditing: boolean }) => {
+export const FormLists = (props: {
+  isEditing: boolean;
+  lastActiveFormId: string | null;
+}) => {
   const cms = useCMS();
 
   // Persist showReferences state in localStorage
@@ -472,6 +476,22 @@ export const FormLists = (props: { isEditing: boolean }) => {
     return false;
   }, [cms.state.formLists, cms.state.forms]);
 
+  // Get the last active form for the back button
+  const lastActiveForm = props.lastActiveFormId
+    ? cms.state.forms.find(
+        ({ tinaForm }) => tinaForm.id === props.lastActiveFormId
+      )
+    : null;
+
+  const handleBackToForm = () => {
+    if (props.lastActiveFormId) {
+      cms.dispatch({
+        type: 'forms:set-active-form-id',
+        value: props.lastActiveFormId,
+      });
+    }
+  };
+
   return (
     <Transition
       appear={true}
@@ -488,10 +508,27 @@ export const FormLists = (props: { isEditing: boolean }) => {
     >
       {/* Header section - fixed, no scroll */}
       <div className='flex-none px-4 py-3 border-b border-gray-100 bg-gradient-to-t from-white to-gray-50 space-y-3'>
-        {/* Tina Explore heading */}
-        <div className='flex items-center gap-2'>
-          <BiCompass className='w-5 h-5 text-orange-500' />
-          <h2 className='text-lg font-semibold text-gray-800'>Tina Explore</h2>
+        {/* Tina Explore heading with back button */}
+        <div className='flex items-center justify-between'>
+          <div className='flex items-center gap-2'>
+            <BiCompass className='w-5 h-5 text-orange-500' />
+            <h2 className='text-lg font-semibold text-gray-800'>
+              Tina Explore
+            </h2>
+          </div>
+
+          {/* Back to editing button */}
+          {lastActiveForm && (
+            <button
+              type='button'
+              onClick={handleBackToForm}
+              className='flex items-center gap-1.5 px-2 py-1 text-sm text-gray-600 hover:text-orange-500 hover:bg-gray-100 rounded transition-all duration-150'
+              title={`Back to ${lastActiveForm.tinaForm.label || 'form'}`}
+            >
+              <BiChevronLeft className='w-4 h-4' />
+              <span>Back</span>
+            </button>
+          )}
         </div>
 
         {/* Show references checkbox - only show if there are referenced files */}
