@@ -513,7 +513,7 @@ export const FormLists = (props: {
           <div className='flex items-center gap-2'>
             <BiCompass className='w-5 h-5 text-orange-500' />
             <h2 className='text-lg font-semibold text-gray-800'>
-              Tina Explore
+              Referenced Files
             </h2>
           </div>
 
@@ -523,7 +523,12 @@ export const FormLists = (props: {
               type='button'
               onClick={handleBackToForm}
               className='flex items-center gap-1.5 px-2 py-1 text-sm text-gray-600 hover:text-orange-500 hover:bg-gray-100 rounded transition-all duration-150'
-              title={`Back to ${lastActiveForm.tinaForm.label || 'form'}`}
+              title={`Back to ${
+                lastActiveForm.tinaForm.id
+                  .split('/')
+                  .pop()
+                  ?.replace(/\.[^/.]+$/, '') || 'form'
+              }`}
             >
               <BiChevronLeft className='w-4 h-4' />
               <span>Back</span>
@@ -540,7 +545,7 @@ export const FormLists = (props: {
               onChange={(e) => setShowReferences(e.target.checked)}
               className='w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500'
             />
-            <span>Show referenced files</span>
+            <span>Show directly referenced files only</span>
           </label>
         )}
       </div>

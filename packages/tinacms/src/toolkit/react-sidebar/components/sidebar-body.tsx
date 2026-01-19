@@ -44,7 +44,9 @@ export const FormsView = ({ loadingPlaceholder }: FormsViewProps = {}) => {
   const { setFormIsPristine } = React.useContext(SidebarContext);
   const [isShowingLoading, setIsShowingLoading] = React.useState(true); // Default to showing loading
   const [initialLoadComplete, setInitialLoadComplete] = React.useState(false);
-  const [lastActiveFormId, setLastActiveFormId] = React.useState<string | null>(null);
+  const [lastActiveFormId, setLastActiveFormId] = React.useState<string | null>(
+    null
+  );
 
   // Track the last active form ID for the back button
   React.useEffect(() => {
@@ -176,8 +178,7 @@ export const FormHeader = ({
   const { formIsPristine } = React.useContext(SidebarContext);
 
   return (
-    <div className='px-4 pt-2 pb-4 flex flex-row flex-nowrap justify-between items-center gap-2 bg-gradient-to-t from-white to-gray-50'>
-      <MultiformSelector activeForm={activeForm} />
+    <div className='px-4 pt-2 pb-4 flex flex-row flex-nowrap justify-between items-center gap-2 bg-gradient-to-t from-white to-gray-50 border-b border-gray-100'>
       <FormBreadcrumbs className='w-[calc(100%-3rem)]' />
       <FileHistoryProvider
         defaultBranchName={repoProvider?.defaultBranchName}
@@ -250,6 +251,34 @@ export const FileHistoryProvider = ({
   );
 };
 
+const BreadcrumbItemLink = ({
+  breadcrumb,
+  onClick,
+}: { breadcrumb: string; onClick: () => void }) => {
+  return (
+    <BreadcrumbItem className='shrink truncate'>
+      <BreadcrumbLink
+        asChild
+        className='text-gray-700 truncate hover:text-orange-500'
+      >
+        <button type='button' onClick={onClick}>
+          {breadcrumb}
+        </button>
+      </BreadcrumbLink>
+    </BreadcrumbItem>
+  );
+};
+
+const FinalBreadcrumbItem = ({ breadcrumb }: { breadcrumb: string }) => {
+  return (
+    <BreadcrumbItem className='shrink truncate'>
+      <BreadcrumbPage className='text-gray-700 font-medium'>
+        {breadcrumb}
+      </BreadcrumbPage>
+    </BreadcrumbItem>
+  );
+};
+
 export const FormBreadcrumbs = ({
   rootBreadcrumbName,
   ...props
@@ -285,22 +314,18 @@ export const FormBreadcrumbs = ({
     <Breadcrumb {...props}>
       <BreadcrumbList className='flex-nowrap text-nowrap'>
         {/* First breadcrumb */}
-        <BreadcrumbItem className='shrink truncate'>
-          <BreadcrumbLink
-            asChild
-            className='text-gray-700 hover:text-orange-500 truncate'
-          >
-            <button
-              type='button'
-              onClick={(e) => {
-                e.preventDefault();
-                goBack(firstBreadcrumb.formId, firstBreadcrumb.formName);
-              }}
-            >
-              {rootBreadcrumbName || firstBreadcrumb.label}
-            </button>
-          </BreadcrumbLink>
-        </BreadcrumbItem>
+        {breadcrumbs.length > 1 ? (
+          <BreadcrumbItemLink
+            breadcrumb={rootBreadcrumbName || firstBreadcrumb.label}
+            onClick={() =>
+              goBack(firstBreadcrumb.formId, firstBreadcrumb.formName)
+            }
+          />
+        ) : (
+          <FinalBreadcrumbItem
+            breadcrumb={rootBreadcrumbName || firstBreadcrumb.label}
+          />
+        )}
 
         {/* Dropdown for middle breadcrumbs */}
         {dropdownBreadcrumbs.length > 0 && (
@@ -334,25 +359,19 @@ export const FormBreadcrumbs = ({
         {secondLastBreadcrumb && (
           <>
             <BreadcrumbSeparator />
-            <BreadcrumbItem className='shrink truncate'>
-              <BreadcrumbLink
-                asChild
-                className='text-gray-700 hover:text-blue-500 truncate'
-              >
-                <button
-                  type='button'
-                  onClick={(e) => {
-                    e.preventDefault();
-                    goBack(
-                      secondLastBreadcrumb.formId,
-                      secondLastBreadcrumb.formName
-                    );
-                  }}
-                >
-                  {secondLastBreadcrumb.label}
-                </button>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
+            {breadcrumbs.length > 1 ? (
+              <BreadcrumbItemLink
+                breadcrumb={secondLastBreadcrumb.label}
+                onClick={() =>
+                  goBack(
+                    secondLastBreadcrumb.formId,
+                    secondLastBreadcrumb.formName
+                  )
+                }
+              />
+            ) : (
+              <FinalBreadcrumbItem breadcrumb={secondLastBreadcrumb.label} />
+            )}
           </>
         )}
 
@@ -360,11 +379,7 @@ export const FormBreadcrumbs = ({
         {lastBreadcrumb && (
           <>
             {breadcrumbs.length > 1 && <BreadcrumbSeparator />}
-            <BreadcrumbItem>
-              <BreadcrumbPage className='text-gray-700 font-medium'>
-                {lastBreadcrumb.label}
-              </BreadcrumbPage>
-            </BreadcrumbItem>
+            <FinalBreadcrumbItem breadcrumb={lastBreadcrumb.label} />
           </>
         )}
       </BreadcrumbList>
