@@ -932,6 +932,13 @@ interface BaseCollection {
    * The delimiters used to parse the frontmatter.
    */
   frontmatterDelimiters?: [string, string] | string;
+  /**
+   * The max line width used when serializing frontmatter for markdown and for content in YAML files.
+   * This sets the line length that reformats long strings with folded scalar syntax (>-).
+   * Setting to -1 disables line wrapping.
+   * @default -1
+   */
+  yamlMaxLineWidth?: number;
   match?: {
     include?: string;
     exclude?: string;
