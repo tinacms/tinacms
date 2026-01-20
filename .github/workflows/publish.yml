@@ -11,6 +11,7 @@ jobs:
   publish-tagged-pr:
     if: >
       github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.fork == false &&
       contains(github.event.pull_request.labels.*.name, 'tagged') &&
       github.event.pull_request.title != 'Version Packages'
     runs-on: ubuntu-latest
@@ -75,7 +76,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
-          NPM_CONFIG_PROVENANCE: true
 
       - name: Get published package versions
         id: package-versions
