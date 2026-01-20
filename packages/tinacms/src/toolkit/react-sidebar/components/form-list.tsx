@@ -1,7 +1,7 @@
 import { useCMS } from '@toolkit/react-tinacms';
 import type { TinaState } from '@toolkit/tina-state';
 import * as React from 'react';
-import { BiChevronRight, BiFolder, BiFolderOpen } from 'react-icons/bi';
+import { BiChevronRight, BiFolder, BiFolderOpen, BiX } from 'react-icons/bi';
 import { FileStack } from 'lucide-react';
 
 type FormListItem = TinaState['formLists'][number]['items'][number];
@@ -496,6 +496,16 @@ export const FormLists = (props: {
           <h2 className='text-lg font-semibold text-gray-800'>
             Referenced Files
           </h2>
+          {lastActiveForm && (
+            <button
+              type='button'
+              onClick={handleBackToForm}
+              className='ml-auto p-1 text-gray-500 hover:text-orange-500 hover:bg-gray-100 rounded transition-all ease-out duration-150'
+              title='Close'
+            >
+              <BiX className='w-6 h-6' />
+            </button>
+          )}
         </div>
 
         {/* Show references checkbox - only show if there are referenced files */}
@@ -528,25 +538,6 @@ export const FormLists = (props: {
           </div>
         ))}
       </div>
-
-      {/* Return to file banner - fixed at the bottom */}
-      {lastActiveForm && (
-        <>
-          <div className='relative flex-none w-full border-t border-gray-100 bg-white'>
-            <button
-              type='button'
-              onClick={handleBackToForm}
-              className='w-full px-6 py-3 flex items-center gap-2 text-left text-sm text-gray-700 hover:text-orange-500 hover:bg-gray-100 transition-all ease-out duration-150'
-              title='Back'
-            >
-              <span>Back</span>
-              <BiChevronRight className='w-5 h-5' />
-            </button>
-          </div>
-          {/* Extra section to mirror form action buttons height */}
-          <div className='relative flex-none w-full h-16 px-6 bg-white border-t border-gray-100' />
-        </>
-      )}
     </div>
   );
 };
