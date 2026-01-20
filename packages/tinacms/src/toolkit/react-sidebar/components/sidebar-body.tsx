@@ -98,7 +98,7 @@ export const FormsView = ({ loadingPlaceholder }: FormsViewProps = {}) => {
   const isEditing = !!activeForm;
   if (isMultiform && !activeForm) {
     return (
-      <div className='max-h-full overflow-y-auto'>
+      <div className='h-full flex flex-col'>
         <FormLists isEditing={isEditing} lastActiveFormId={lastActiveFormId} />
       </div>
     );

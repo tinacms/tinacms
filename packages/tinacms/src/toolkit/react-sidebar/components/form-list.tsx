@@ -508,32 +508,12 @@ export const FormLists = (props: {
     >
       {/* Header section - fixed, no scroll */}
       <div className='flex-none px-4 py-3 border-b border-gray-100 bg-gradient-to-t from-white to-gray-50 space-y-3'>
-        {/* Tina Explore heading with back button */}
-        <div className='flex items-center justify-between'>
-          <div className='flex items-center gap-2'>
-            <BiCompass className='w-5 h-5 text-orange-500' />
-            <h2 className='text-lg font-semibold text-gray-800'>
-              Referenced Files
-            </h2>
-          </div>
-
-          {/* Back to editing button */}
-          {lastActiveForm && (
-            <button
-              type='button'
-              onClick={handleBackToForm}
-              className='flex items-center gap-1.5 px-2 py-1 text-sm text-gray-600 hover:text-orange-500 hover:bg-gray-100 rounded transition-all duration-150'
-              title={`Back to ${
-                lastActiveForm.tinaForm.id
-                  .split('/')
-                  .pop()
-                  ?.replace(/\.[^/.]+$/, '') || 'form'
-              }`}
-            >
-              <BiChevronLeft className='w-4 h-4' />
-              <span>Back</span>
-            </button>
-          )}
+        {/* Tina Explore heading */}
+        <div className='flex items-center gap-2'>
+          <BiCompass className='w-5 h-5 text-orange-500' />
+          <h2 className='text-lg font-semibold text-gray-800'>
+            Referenced Files
+          </h2>
         </div>
 
         {/* Show references checkbox - only show if there are referenced files */}
@@ -551,7 +531,7 @@ export const FormLists = (props: {
       </div>
 
       {/* Scrollable content area */}
-      <div className='flex-1 overflow-x-auto overflow-y-auto'>
+      <div className='flex-1 overflow-x-auto overflow-y-auto min-h-0'>
         {cms.state.formLists.map((formList, index) => (
           <div key={`${formList.id}-${index}`}>
             {/* TODO: add labels for each list */}
@@ -566,6 +546,32 @@ export const FormLists = (props: {
           </div>
         ))}
       </div>
+
+      {/* Return to file banner - fixed at the bottom */}
+      {lastActiveForm && (
+        <div className='relative flex-none w-full border-t border-gray-100 bg-white'>
+          <button
+            type='button'
+            onClick={handleBackToForm}
+            className='w-full px-6 py-3 flex items-center gap-2 text-left text-sm text-gray-700 hover:text-orange-500 hover:bg-gray-100 transition-all ease-out duration-150'
+            title={`Return to ${
+              lastActiveForm.tinaForm.id
+                .split('/')
+                .pop()
+                ?.replace(/\.[^/.]+$/, '') || 'form'
+            }`}
+          >
+            <span>
+              Return to{' '}
+              {lastActiveForm.tinaForm.id
+                .split('/')
+                .pop()
+                ?.replace(/\.[^/.]+$/, '') || 'form'}
+            </span>
+            <BiChevronRight className='w-5 h-5' />
+          </button>
+        </div>
+      )}
     </Transition>
   );
 };
