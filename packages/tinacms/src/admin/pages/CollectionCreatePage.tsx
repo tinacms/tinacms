@@ -189,10 +189,12 @@ export const RenderForm = ({
     template?.defaultItem ||
     {};
 
+  const fileReadOnly = schemaCollection?.ui?.filename?.readonly;
+
   const filenameField = {
     name: 'filename',
     label: 'Filename',
-    component: slugFunction
+    component: slugFunction && !fileReadOnly
       ? wrapFieldsWithMeta(({ field, input, meta }) => {
           return (
             <FilenameInput
