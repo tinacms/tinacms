@@ -1,4 +1,3 @@
-import { Transition } from '@headlessui/react';
 import { useCMS } from '@toolkit/react-tinacms';
 import type { TinaState } from '@toolkit/tina-state';
 import * as React from 'react';
@@ -493,19 +492,7 @@ export const FormLists = (props: {
   };
 
   return (
-    <Transition
-      appear={true}
-      // show={props.isEditing}
-      show={true}
-      as={'div'}
-      enter='transition-all ease-out duration-150'
-      enterFrom='opacity-0 -translate-x-1/2'
-      enterTo='opacity-100'
-      leave='transition-all ease-out duration-150'
-      leaveFrom='opacity-100'
-      leaveTo='opacity-0 -translate-x-1/2'
-      className='flex flex-col h-full'
-    >
+    <div className='flex flex-col h-full'>
       {/* Header section - fixed, no scroll */}
       <div className='flex-none px-4 py-3 border-b border-gray-100 bg-gradient-to-t from-white to-gray-50 space-y-3'>
         {/* Tina Explore heading */}
@@ -549,30 +536,23 @@ export const FormLists = (props: {
 
       {/* Return to file banner - fixed at the bottom */}
       {lastActiveForm && (
-        <div className='relative flex-none w-full border-t border-gray-100 bg-white'>
-          <button
-            type='button'
-            onClick={handleBackToForm}
-            className='w-full px-6 py-3 flex items-center gap-2 text-left text-sm text-gray-700 hover:text-orange-500 hover:bg-gray-100 transition-all ease-out duration-150'
-            title={`Return to ${
-              lastActiveForm.tinaForm.id
-                .split('/')
-                .pop()
-                ?.replace(/\.[^/.]+$/, '') || 'form'
-            }`}
-          >
-            <span>
-              Return to{' '}
-              {lastActiveForm.tinaForm.id
-                .split('/')
-                .pop()
-                ?.replace(/\.[^/.]+$/, '') || 'form'}
-            </span>
-            <BiChevronRight className='w-5 h-5' />
-          </button>
-        </div>
+        <>
+          <div className='relative flex-none w-full border-t border-gray-100 bg-white'>
+            <button
+              type='button'
+              onClick={handleBackToForm}
+              className='w-full px-6 py-3 flex items-center gap-2 text-left text-sm text-gray-700 hover:text-orange-500 hover:bg-gray-100 transition-all ease-out duration-150'
+              title='Back'
+            >
+              <span>Back</span>
+              <BiChevronRight className='w-5 h-5' />
+            </button>
+          </div>
+          {/* Extra section to mirror form action buttons height */}
+          <div className='relative flex-none w-full h-16 px-6 bg-white border-t border-gray-100' />
+        </>
       )}
-    </Transition>
+    </div>
   );
 };
 

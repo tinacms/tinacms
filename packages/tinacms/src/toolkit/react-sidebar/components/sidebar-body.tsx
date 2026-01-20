@@ -30,6 +30,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '../../../admin/components/ui/tooltip';
+import { Transition } from '@headlessui/react';
 
 // this is the minimum time to show the loading indicator (in milliseconds)
 // this is to prevent the loading indicator from flashing or the 'no forms' placeholder from showing pre-maturely
@@ -96,63 +97,86 @@ export const FormsView = ({ loadingPlaceholder }: FormsViewProps = {}) => {
     ({ tinaForm }) => tinaForm.id === cms.state.activeFormId
   );
   const isEditing = !!activeForm;
-  if (isMultiform && !activeForm) {
+  const formMetas = cms.plugins.all<FormMetaPlugin>('form:meta');
+
+  // Single form - no transitions needed
+  if (!isMultiform) {
     return (
-      <div className='h-full flex flex-col'>
-        <FormLists isEditing={isEditing} lastActiveFormId={lastActiveFormId} />
-      </div>
+      <>
+        {activeForm && (
+          <div className='flex-1 flex flex-col flex-nowrap overflow-hidden h-full w-full relative bg-white'>
+            <FormHeader
+              activeForm={activeForm}
+              branch={cms.api.admin.api.branch}
+              repoProvider={cms.api.admin.api.schema.config.config.repoProvider}
+              isLocalMode={cms.api?.tina?.isLocalMode}
+            />
+            {formMetas?.map((meta) => (
+              <React.Fragment key={meta.name}>
+                <meta.Component />
+              </React.Fragment>
+            ))}
+            <FormBuilder
+              form={activeForm}
+              onPristineChange={setFormIsPristine}
+            />
+          </div>
+        )}
+      </>
     );
   }
-  const formMetas = cms.plugins.all<FormMetaPlugin>('form:meta');
+
+  // Multiform - coordinate transitions between list and form view
   return (
     <>
-      {activeForm && (
-        <FormWrapper isEditing={isEditing} isMultiform={isMultiform}>
-          <FormHeader
-            activeForm={activeForm}
-            branch={cms.api.admin.api.branch}
-            repoProvider={cms.api.admin.api.schema.config.config.repoProvider}
-            isLocalMode={cms.api?.tina?.isLocalMode}
-          />
-          {formMetas?.map((meta) => (
-            <React.Fragment key={meta.name}>
-              <meta.Component />
-            </React.Fragment>
-          ))}
-          <FormBuilder form={activeForm} onPristineChange={setFormIsPristine} />
-        </FormWrapper>
-      )}
+      {/* Form List View - shows when not editing */}
+      <Transition
+        show={!isEditing}
+        as='div'
+        className='h-full flex flex-col'
+        enter='transition-all ease-out duration-150'
+        enterFrom='opacity-0 translate-y-1/2'
+        enterTo='opacity-100 translate-y-0'
+        leave='transition-all ease-out duration-150'
+        leaveFrom='opacity-100 translate-y-0'
+        leaveTo='opacity-0 translate-y-1/2'
+      >
+        <FormLists isEditing={isEditing} lastActiveFormId={lastActiveFormId} />
+      </Transition>
+
+      {/* Form Edit View - shows when editing */}
+      <Transition
+        show={isEditing}
+        as='div'
+        className='flex-1 flex flex-col flex-nowrap overflow-hidden h-full w-full relative bg-white'
+        enter='transition-opacity ease-out duration-150 delay-150'
+        enterFrom='opacity-0'
+        enterTo='opacity-100'
+        leave='transition-opacity ease-out duration-150'
+        leaveFrom='opacity-100'
+        leaveTo='opacity-0'
+      >
+        {activeForm && (
+          <>
+            <FormHeader
+              activeForm={activeForm}
+              branch={cms.api.admin.api.branch}
+              repoProvider={cms.api.admin.api.schema.config.config.repoProvider}
+              isLocalMode={cms.api?.tina?.isLocalMode}
+            />
+            {formMetas?.map((meta) => (
+              <React.Fragment key={meta.name}>
+                <meta.Component />
+              </React.Fragment>
+            ))}
+            <FormBuilder
+              form={activeForm}
+              onPristineChange={setFormIsPristine}
+            />
+          </>
+        )}
+      </Transition>
     </>
-  );
-};
-
-interface FormWrapperProps {
-  isEditing: boolean;
-  isMultiform: boolean;
-  children: React.ReactNode;
-}
-
-const FormWrapper: React.FC<FormWrapperProps> = ({ isEditing, children }) => {
-  return (
-    <div
-      className='flex-1 flex flex-col flex-nowrap overflow-hidden h-full w-full relative bg-white'
-      style={
-        isEditing
-          ? {
-              transform: 'none',
-              animationName: 'fly-in-left',
-              animationDuration: '150ms',
-              animationDelay: '0',
-              animationIterationCount: 1,
-              animationTimingFunction: 'ease-out',
-            }
-          : {
-              transform: 'translate3d(100%, 0, 0)',
-            }
-      }
-    >
-      {children}
-    </div>
   );
 };
 
