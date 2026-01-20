@@ -1,13 +1,8 @@
 import { useCMS } from '@toolkit/react-tinacms';
 import type { TinaState } from '@toolkit/tina-state';
 import * as React from 'react';
-import {
-  BiChevronLeft,
-  BiChevronRight,
-  BiCompass,
-  BiFolder,
-  BiFolderOpen,
-} from 'react-icons/bi';
+import { BiChevronRight, BiFolder, BiFolderOpen } from 'react-icons/bi';
+import { FileStack } from 'lucide-react';
 
 type FormListItem = TinaState['formLists'][number]['items'][number];
 
@@ -497,7 +492,7 @@ export const FormLists = (props: {
       <div className='flex-none px-4 py-3 border-b border-gray-100 bg-gradient-to-t from-white to-gray-50 space-y-3'>
         {/* Tina Explore heading */}
         <div className='flex items-center gap-2'>
-          <BiCompass className='w-5 h-5 text-orange-500' />
+          <FileStack className='w-5 h-5 text-orange-500' />
           <h2 className='text-lg font-semibold text-gray-800'>
             Referenced Files
           </h2>
@@ -508,11 +503,11 @@ export const FormLists = (props: {
           <label className='flex items-center gap-2 text-sm text-gray-600 cursor-pointer'>
             <input
               type='checkbox'
-              checked={showReferences}
-              onChange={(e) => setShowReferences(e.target.checked)}
+              checked={!showReferences}
+              onChange={(e) => setShowReferences(!e.target.checked)}
               className='w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500'
             />
-            <span>Show directly referenced files only</span>
+            <span>Direct references only</span>
           </label>
         )}
       </div>

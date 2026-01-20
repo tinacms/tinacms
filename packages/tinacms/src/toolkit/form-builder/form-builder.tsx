@@ -11,6 +11,7 @@ import {
 import { AiOutlineLoading } from 'react-icons/ai';
 import { BiError, BiGitBranch, BiChevronLeft } from 'react-icons/bi';
 import { FaCircle } from 'react-icons/fa';
+import { FileStack } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { useCMS } from '../react-core';
 import { FieldsBuilder } from './fields-builder';
@@ -291,7 +292,7 @@ const RelatedFilesBanner = () => {
         onClick={handleNavigateToRelatedFiles}
         className='w-full px-6 py-3 flex items-center gap-2 text-left text-sm text-gray-700 hover:text-orange-500 hover:bg-gray-100 transition-all ease-out duration-150'
       >
-        <BiChevronLeft className='w-5 h-5' />
+        <FileStack className='w-5 h-5' />
         <span>Referenced Files</span>
       </button>
     </div>
