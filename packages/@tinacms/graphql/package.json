@@ -58,7 +58,7 @@
     },
     "repository": {
         "url": "https://github.com/tinacms/tinacms.git",
-        "directory": "packages/tina-graphql"
+        "directory": "packages/@tinacms/graphql"
     },
     "devDependencies": {
         "@tinacms/schema-tools": "workspace:*",
