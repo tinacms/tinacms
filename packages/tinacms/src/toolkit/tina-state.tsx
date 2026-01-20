@@ -2,26 +2,6 @@ import { AnyField } from './forms';
 import { Form } from './react-tinacms';
 import { TinaCMS } from './tina-cms';
 
-export const ACTION_TYPES = {
-  FORMS_ADD: 'forms:add',
-  FORMS_REMOVE: 'forms:remove',
-  FORMS_CLEAR: 'forms:clear',
-  FORMS_SET_ACTIVE_FORM_ID: 'forms:set-active-form-id',
-  FORMS_SET_ACTIVE_FIELD_NAME: 'forms:set-active-field-name',
-  FORMS_SET_HOVERED_FIELD_NAME: 'forms:set-hovered-field-name',
-  FORM_LISTS_ADD: 'form-lists:add',
-  FORM_LISTS_REMOVE: 'form-lists:remove',
-  FORM_LISTS_CLEAR: 'form-lists:clear',
-  SET_EDIT_MODE: 'set-edit-mode',
-  INCREMENT_OPERATION_INDEX: 'increment-operation-index',
-  SET_QUICK_EDITING_SUPPORTED: 'set-quick-editing-supported',
-  SET_QUICK_EDITING_ENABLED: 'set-quick-editing-enabled',
-  TOGGLE_QUICK_EDITING_ENABLED: 'toggle-quick-editing-enabled',
-  TOGGLE_EDIT_STATE: 'toggle-edit-state',
-  SIDEBAR_SET_DISPLAY_STATE: 'sidebar:set-display-state',
-  SIDEBAR_SET_LOADING_STATE: 'sidebar:set-loading-state',
-} as const;
-
 type FormListItem =
   | {
       type: 'document';
@@ -49,66 +29,62 @@ type Breadcrumb = {
 
 export type TinaAction =
   | {
-      type: typeof ACTION_TYPES.FORMS_ADD;
+      type: 'forms:add';
       value: Form;
     }
   | {
-      type: typeof ACTION_TYPES.FORMS_REMOVE;
+      type: 'forms:remove';
       value: string;
     }
   | {
-      type: typeof ACTION_TYPES.FORMS_CLEAR;
+      type: 'forms:clear';
     }
   | {
-      type: typeof ACTION_TYPES.FORM_LISTS_ADD;
+      type: 'form-lists:add';
       value: FormList;
     }
   | {
-      type: typeof ACTION_TYPES.FORM_LISTS_REMOVE;
+      type: 'form-lists:remove';
       value: string;
     }
   | {
-      type: typeof ACTION_TYPES.FORMS_SET_ACTIVE_FORM_ID;
+      type: 'forms:set-active-form-id';
       value: string;
     }
   | {
-      type: typeof ACTION_TYPES.FORMS_SET_ACTIVE_FIELD_NAME;
+      type: 'forms:set-active-field-name';
       value: { formId: string; fieldName: string };
     }
   | {
-      type: typeof ACTION_TYPES.FORMS_SET_HOVERED_FIELD_NAME;
-      value: { formId: string; fieldName: string | null };
+      type: 'form-lists:clear';
     }
   | {
-      type: typeof ACTION_TYPES.FORM_LISTS_CLEAR;
-    }
-  | {
-      type: typeof ACTION_TYPES.SET_EDIT_MODE;
+      type: 'set-edit-mode';
       value: 'visual' | 'basic';
     }
   | {
-      type: typeof ACTION_TYPES.INCREMENT_OPERATION_INDEX;
+      type: 'increment-operation-index';
     }
   | {
-      type: typeof ACTION_TYPES.SET_QUICK_EDITING_SUPPORTED;
+      type: 'set-quick-editing-supported';
       value: boolean;
     }
   | {
-      type: typeof ACTION_TYPES.SET_QUICK_EDITING_ENABLED;
+      type: 'set-quick-editing-enabled';
       value?: boolean;
     }
   | {
-      type: typeof ACTION_TYPES.TOGGLE_QUICK_EDITING_ENABLED;
+      type: 'toggle-quick-editing-enabled';
     }
   | {
-      type: typeof ACTION_TYPES.TOGGLE_EDIT_STATE;
+      type: 'toggle-edit-state';
     }
   | {
-      type: typeof ACTION_TYPES.SIDEBAR_SET_DISPLAY_STATE;
+      type: 'sidebar:set-display-state';
       value: TinaState['sidebarDisplayState'] | 'openOrFull';
     }
   | {
-      type: typeof ACTION_TYPES.SIDEBAR_SET_LOADING_STATE;
+      type: 'sidebar:set-loading-state';
       value: boolean;
     };
 
@@ -124,11 +100,7 @@ export interface TinaState {
    * all at once, putting state this high up at least allows us to not have to touch the Form class too much.
    * Longer term, replaceing Form with something stateful seems like the right approach
    */
-  forms: {
-    activeFieldName?: string | null;
-    tinaForm: Form;
-    hoveringFieldName?: string | null;
-  }[];
+  forms: { activeFieldName?: string | null; tinaForm: Form }[];
   formLists: FormList[];
   editingMode: 'visual' | 'basic';
   isLoadingContent: boolean;
@@ -152,24 +124,24 @@ export const initialState = (cms: TinaCMS): TinaState => {
 // Our reducer function that uses a switch statement to handle our actions
 export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
   switch (action.type) {
-    case ACTION_TYPES.SET_QUICK_EDITING_SUPPORTED:
+    case 'set-quick-editing-supported':
       return {
         ...state,
         quickEditSupported: action.value,
       };
-    case ACTION_TYPES.SET_EDIT_MODE:
+    case 'set-edit-mode':
       return { ...state, editingMode: action.value };
-    case ACTION_TYPES.FORMS_ADD:
+    case 'forms:add':
       if (state.forms.find((f) => f.tinaForm.id === action.value.id)) {
         return state;
       }
       return { ...state, forms: [...state.forms, { tinaForm: action.value }] };
-    case ACTION_TYPES.FORMS_REMOVE:
+    case 'forms:remove':
       return {
         ...state,
         forms: state.forms.filter((form) => form.tinaForm.id !== action.value),
       };
-    case ACTION_TYPES.FORM_LISTS_CLEAR: {
+    case 'form-lists:clear': {
       return {
         ...state,
         quickEditSupported: false,
@@ -179,7 +151,7 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         forms: [],
       };
     }
-    case ACTION_TYPES.FORM_LISTS_ADD: {
+    case 'form-lists:add': {
       let formListItemExists = false;
       const nextFormLists = state.formLists.map((formList) => {
         if (formList.id === action.value.id) {
@@ -223,7 +195,7 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         isLoadingContent: false,
       };
     }
-    case ACTION_TYPES.FORM_LISTS_REMOVE: {
+    case 'form-lists:remove': {
       const nextFormLists = state.formLists.filter(
         ({ id }) => id !== action.value
       );
@@ -250,7 +222,7 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         formLists: nextFormLists,
       };
     }
-    case ACTION_TYPES.FORMS_SET_ACTIVE_FORM_ID:
+    case 'forms:set-active-form-id':
       if (action.value !== state.activeFormId) {
         const newActiveForm = state.forms.find(
           (form) => form.tinaForm.id === action.value
@@ -268,15 +240,14 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         };
       }
       return state;
-
-    case ACTION_TYPES.FORMS_SET_ACTIVE_FIELD_NAME:
+    case 'forms:set-active-field-name':
       if (state.activeFormId === action.value.formId) {
         const existingForm = state.forms.find(
           (form) => form.tinaForm.id === action.value.formId
         );
 
         if (existingForm?.activeFieldName === action.value.fieldName) {
-          // Clicking on the same field - don't change state
+          // If the active field name is already set, do nothing
           return state;
         }
       }
@@ -286,7 +257,6 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
           return {
             tinaForm: form.tinaForm,
             activeFieldName: action.value.fieldName,
-            hoveringFieldName: null,
           };
         }
         return form;
@@ -304,59 +274,7 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         forms,
         activeFormId: action.value.formId,
       };
-
-    case ACTION_TYPES.FORMS_SET_HOVERED_FIELD_NAME:
-      const hoveredForms = state.forms.map((form) => {
-        if (form.tinaForm.id === action.value.formId) {
-          const activeFieldName = form.activeFieldName;
-          const hoveredFieldName = action.value.fieldName;
-
-          // If there's an active field and we're hovering on something
-          if (activeFieldName && hoveredFieldName) {
-            // Don't allow hover if hovering the same field as active
-            if (activeFieldName === hoveredFieldName) {
-              return {
-                ...form,
-                hoveringFieldName: null,
-              };
-            }
-
-            // Check if hoveredFieldName is a child of activeFieldName
-            const isChildOfActive = hoveredFieldName.startsWith(
-              activeFieldName + '.'
-            );
-
-            // Check if hoveredFieldName is a sibling of activeFieldName
-            const activePathParts = activeFieldName.split('.');
-            const hoveredPathParts = hoveredFieldName.split('.');
-            const isSibling =
-              activePathParts.length === hoveredPathParts.length &&
-              activePathParts.slice(0, -1).join('.') ===
-                hoveredPathParts.slice(0, -1).join('.');
-
-            if (!isChildOfActive && !isSibling) {
-              // Not a child or sibling field - don't update hover
-              return {
-                ...form,
-                hoveringFieldName: null,
-              };
-            }
-          }
-
-          return {
-            ...form,
-            hoveringFieldName: hoveredFieldName,
-          };
-        }
-        return form;
-      });
-
-      return {
-        ...state,
-        forms: hoveredForms,
-      };
-
-    case ACTION_TYPES.TOGGLE_EDIT_STATE: {
+    case 'toggle-edit-state': {
       return state.sidebarDisplayState === 'closed'
         ? { ...state, sidebarDisplayState: 'open' }
         : {
@@ -364,7 +282,7 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
             sidebarDisplayState: 'closed',
           };
     }
-    case ACTION_TYPES.SIDEBAR_SET_DISPLAY_STATE: {
+    case 'sidebar:set-display-state': {
       // In some cases, you may only care that the sidebar is open, regardless
       // whether it's "open" or "full"
       if (action.value === 'openOrFull') {
@@ -384,7 +302,7 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
       }
       return { ...state, sidebarDisplayState: action.value };
     }
-    case ACTION_TYPES.SIDEBAR_SET_LOADING_STATE: {
+    case 'sidebar:set-loading-state': {
       return { ...state, isLoadingContent: action.value };
     }
     default:

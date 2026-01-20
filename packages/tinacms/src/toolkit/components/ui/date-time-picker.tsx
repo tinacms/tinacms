@@ -10,12 +10,13 @@ import { Input } from './input';
 import { Popover, PopoverContent, PopoverTrigger } from './popover';
 import moment from 'moment';
 import 'moment-timezone';
-import { enUS, Locale } from 'date-fns/locale';
+import { enUS, Locale as DateFnsLocale } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Clock } from 'lucide-react';
 import * as React from 'react';
 import { useImperativeHandle, useRef } from 'react';
-import { DayPicker, DayPickerProps } from 'react-day-picker';
+import { DayPicker, type DayPickerProps } from 'react-day-picker';
+import type { DayPickerLocale } from 'react-day-picker';
 import {
   Select,
   SelectContent,
@@ -246,7 +247,11 @@ const formatCurrentDate = ({
   dateFormat,
   timeFormat,
   displayDate,
-}: { dateFormat?: string; timeFormat?: string; displayDate: Date }) => {
+}: {
+  dateFormat?: string;
+  timeFormat?: string;
+  displayDate: Date;
+}) => {
   if (!dateFormat && !timeFormat) {
     console.error('DateTimePicker: Missing date or time format');
     return 'Error: Missing date or time format';
@@ -259,7 +264,10 @@ const formatCurrentDate = ({
   if (!dateFormat) {
     return format(displayDate, timeFormat);
   }
-  return `${format(displayDate, dateFormat)} ${format(displayDate, timeFormat)}`;
+  return `${format(displayDate, dateFormat)} ${format(
+    displayDate,
+    timeFormat
+  )}`;
 };
 
 // ---------- utils end ----------
@@ -285,8 +293,11 @@ function Calendar({
   initialMonth?: Date;
 }) {
   const MONTHS = React.useMemo(() => {
-    let locale: Pick<Locale, 'options' | 'localize' | 'formatLong'> = enUS;
-    const { options, localize, formatLong } = localeOverride || {};
+    let locale: Pick<DateFnsLocale, 'options' | 'localize' | 'formatLong'> =
+      enUS;
+    // DayPickerLocale extends DateFnsLocale, so these properties exist
+    const localeAny = localeOverride as DateFnsLocale | undefined;
+    const { options, localize, formatLong } = localeAny || {};
     if (options && localize && formatLong) {
       locale = { options, localize, formatLong };
     }
@@ -783,7 +794,7 @@ const DateTimePicker = React.forwardRef<
 >(
   (
     {
-      locale = enUS,
+      locale = enUS as DayPickerLocale,
       defaultPopupValue = new Date(new Date().setHours(0, 0, 0, 0)),
       value,
       onChange,
@@ -834,15 +845,17 @@ const DateTimePicker = React.forwardRef<
       [displayDate]
     );
 
-    let loc = enUS;
-    const { options, localize, formatLong } = locale;
+    let loc: DayPickerLocale = enUS as DayPickerLocale;
+    // DayPickerLocale extends DateFnsLocale, so these properties exist
+    const localeAny = locale as DateFnsLocale | undefined;
+    const { options, localize, formatLong } = localeAny || {};
     if (options && localize && formatLong) {
       loc = {
         ...enUS,
         options,
         localize,
         formatLong,
-      };
+      } as DayPickerLocale;
     }
 
     return (

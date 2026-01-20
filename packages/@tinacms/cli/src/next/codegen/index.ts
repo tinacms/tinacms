@@ -97,8 +97,18 @@ export class Codegen {
       JSON.stringify(this.graphqlSchemaDoc)
     );
 
+    // Include search config in lock file, but exclude sensitive indexerToken
+    // Only add search if search.tina exists - plain search without tina is not included
     const { search, ...rest } = this.tinaSchema.schema.config;
-    this.tinaSchema.schema.config = rest;
+    if (search?.tina) {
+      const { indexerToken, ...safeSearchConfig } = search.tina;
+      this.tinaSchema.schema.config = {
+        ...rest,
+        search: { tina: safeSearchConfig },
+      };
+    } else {
+      this.tinaSchema.schema.config = rest;
+    }
 
     // update _schema.json
     await this.writeConfigFile(

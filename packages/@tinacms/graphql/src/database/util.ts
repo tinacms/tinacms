@@ -83,6 +83,7 @@ export const stringifyFile = (
   markdownParseConfig?: {
     frontmatterFormat?: ContentFrontmatterFormat;
     frontmatterDelimiters?: [string, string] | string;
+    yamlMaxLineWidth?: number;
   }
 ): string => {
   const {
@@ -110,12 +111,21 @@ export const stringifyFile = (
     case '.markdown':
     case '.mdx':
     case '.md':
+      const yamlMaxLineWidth = markdownParseConfig?.yamlMaxLineWidth ?? -1;
+      const enginesWithYaml = {
+        ...matterEngines,
+        yaml: {
+          parse: (val) => yaml.safeLoad(val) as object,
+          stringify: (val) =>
+            yaml.safeDump(val, { lineWidth: yamlMaxLineWidth }),
+        },
+      };
       const ok = matter.stringify(
         typeof $_body === 'undefined' ? '' : `\n${$_body}`,
         strippedContent,
         {
           language: markdownParseConfig?.frontmatterFormat ?? 'yaml',
-          engines: matterEngines,
+          engines: enginesWithYaml,
           delimiters: markdownParseConfig?.frontmatterDelimiters ?? '---',
         }
       );
@@ -124,7 +134,9 @@ export const stringifyFile = (
       return JSON.stringify(strippedContent, null, 2);
     case '.yaml':
     case '.yml':
-      return yaml.safeDump(strippedContent);
+      return yaml.safeDump(strippedContent, {
+        lineWidth: markdownParseConfig?.yamlMaxLineWidth ?? -1,
+      });
     case '.toml':
       return toml.stringify(strippedContent as any);
     default:
@@ -138,6 +150,7 @@ export const parseFile = <T extends object>(
   yupSchema: (args: typeof yup) => yup.ObjectSchema<any>,
   markdownParseConfig?: {
     frontmatterFormat?: ContentFrontmatterFormat;
+    lineWidth?: number;
     frontmatterDelimiters?: [string, string] | string;
   }
 ): T => {

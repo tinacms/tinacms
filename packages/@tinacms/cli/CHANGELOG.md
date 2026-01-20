@@ -1,5 +1,30 @@
 # tinacms-cli
 
+## 2.1.1
+
+### Patch Changes
+
+- [#6346](https://github.com/tinacms/tinacms/pull/6346) [`3fa216c`](https://github.com/tinacms/tinacms/commit/3fa216c110af6417e6b835c49a275b08981e028b) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Revert "✨ Visual element highlighting between iframe and form (#6211)"
+
+- Updated dependencies [[`3fa216c`](https://github.com/tinacms/tinacms/commit/3fa216c110af6417e6b835c49a275b08981e028b), [`7352c96`](https://github.com/tinacms/tinacms/commit/7352c9660869d413a0f48d3fbb003d4c4c0e3d85)]:
+  - tinacms@3.3.1
+  - @tinacms/app@2.3.21
+
+## 2.1.0
+
+### Minor Changes
+
+- [#6259](https://github.com/tinacms/tinacms/pull/6259) [`6c2c48a`](https://github.com/tinacms/tinacms/commit/6c2c48a9d869cb98e78fc656b986ecc244a5dafd) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Added fuzzy search options + support. This is now set as the new default. Going forward this package will also be used on the TinaCloud side so we don't duplicate code. Search now uses the closest index instead of being exact.
+
+### Patch Changes
+
+- Updated dependencies [[`6c2c48a`](https://github.com/tinacms/tinacms/commit/6c2c48a9d869cb98e78fc656b986ecc244a5dafd)]:
+  - @tinacms/search@1.2.0
+  - @tinacms/schema-tools@2.3.0
+  - tinacms@3.3.0
+  - @tinacms/graphql@2.0.6
+  - @tinacms/app@2.3.20
+
 ## 2.0.7
 
 ### Patch Changes

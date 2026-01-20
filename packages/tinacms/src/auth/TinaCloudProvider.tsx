@@ -354,7 +354,10 @@ export const TinaCloudProvider = (
     // if local and search is configured then we always use the local client
     // if not local, then determine if search is enabled and use the client from the config
     if (props.isLocalClient) {
-      searchClient = new LocalSearchClient(cms.api.tina);
+      searchClient = new LocalSearchClient(
+        cms.api.tina,
+        props.schema.config?.search?.tina
+      );
     } else {
       const hasTinaSearch = Boolean(props.schema.config?.search?.tina);
       if (hasTinaSearch) {

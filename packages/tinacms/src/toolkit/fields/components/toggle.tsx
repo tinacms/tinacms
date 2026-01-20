@@ -67,7 +67,7 @@ export const Toggle: FC<ToggleProps> = ({
             <span
               className={`absolute rounded-3xl left-0.5 top-1/2 w-[22px] h-[22px] shadow border transition-all ease-out duration-150 ${
                 checked
-                  ? 'bg-tina-orange border-tina-orange-dark'
+                  ? 'bg-blue-500 border-blue-600'
                   : 'bg-gray-250 border-gray-300'
               }`}
               style={{

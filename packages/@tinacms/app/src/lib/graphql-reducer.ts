@@ -526,47 +526,15 @@ export const useGraphQLReducer = (
         const [queryId, eventFieldName] = event.data.fieldName.split('---');
         const result = results.find((res) => res.id === queryId);
         if (result?.data) {
-          const { formId, fieldName } = getFormAndFieldNameFromMetadata(
-            result.data,
-            eventFieldName
-          );
           cms.dispatch({
             type: 'forms:set-active-field-name',
-            value: { formId: formId, fieldName: fieldName },
-          });
-          cms.events.dispatch({
-            ...event.data,
-            type: 'field:focus',
+            value: getFormAndFieldNameFromMetadata(result.data, eventFieldName),
           });
         }
         cms.dispatch({
           type: 'sidebar:set-display-state',
           value: 'openOrFull',
         });
-      }
-      if (event.data.type === 'field:hovered') {
-        if (event.data.fieldName) {
-          const [queryId, eventFieldName] = event.data.fieldName.split('---');
-          const result = results.find((res) => res.id === queryId);
-          if (result?.data) {
-            const fieldData = getFormAndFieldNameFromMetadata(
-              result.data,
-              eventFieldName
-            );
-            cms.dispatch({
-              type: 'forms:set-hovered-field-name',
-              value: fieldData,
-            });
-          }
-        } else {
-          // Clear hover state when fieldName is null
-          cms.forms.all().forEach((form) => {
-            cms.dispatch({
-              type: 'forms:set-hovered-field-name',
-              value: { formId: form.id, fieldName: null },
-            });
-          });
-        }
       }
       if (event.data.type === 'close') {
         const payloadSchema = z.object({ id: z.string() });
@@ -629,33 +597,6 @@ export const useGraphQLReducer = (
       value: cms.state.sidebarDisplayState === 'open',
     });
   }, [cms.state.sidebarDisplayState]);
-
-  // Compute the active field name to send to iframe
-  const activeFieldName = React.useMemo(() => {
-    const activeForm = cms.state.forms.find(
-      (form: any) => form.tinaForm.id === cms.state.activeFormId
-    );
-    if (!activeForm) {
-      return null;
-    }
-    const fieldName = activeForm.activeFieldName;
-    if (fieldName === null) {
-      return null;
-    }
-    const queries = activeForm.tinaForm.queries;
-    if (queries && queries.length > 0) {
-      const queryId = queries[queries.length - 1];
-      return `${queryId}---${fieldName}`;
-    }
-    return null;
-  }, [cms.state.forms, cms.state.activeFormId]);
-
-  React.useEffect(() => {
-    iframe.current?.contentWindow?.postMessage({
-      type: 'field:set-focused',
-      fieldName: activeFieldName,
-    });
-  }, [activeFieldName, iframe]);
 
   React.useEffect(() => {
     cms.dispatch({ type: 'set-edit-mode', value: 'visual' });
