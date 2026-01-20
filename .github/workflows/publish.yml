@@ -11,6 +11,7 @@ jobs:
   publish-tagged-pr:
     if: >
       github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.fork == false &&
       contains(github.event.pull_request.labels.*.name, 'tagged') &&
       github.event.pull_request.title != 'Version Packages'
     runs-on: ubuntu-latest
