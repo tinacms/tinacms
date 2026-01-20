@@ -9,7 +9,7 @@ import {
   type DropResult,
 } from '../fields/plugins/dnd-kit-wrapper';
 import { AiOutlineLoading } from 'react-icons/ai';
-import { BiError, BiGitBranch, BiChevronLeft } from 'react-icons/bi';
+import { BiError, BiGitBranch } from 'react-icons/bi';
 import { FaCircle } from 'react-icons/fa';
 import { FileStack } from 'lucide-react';
 import { cn } from '../../utils/cn';

@@ -6,6 +6,9 @@ import { FileStack } from 'lucide-react';
 
 type FormListItem = TinaState['formLists'][number]['items'][number];
 
+// Shared utility for calculating padding based on tree depth
+const getPaddingClass = (depth: number) => `${1.5 + depth * 1.35}rem`;
+
 interface TreeNode {
   id: string;
   name: string;
@@ -123,8 +126,6 @@ const FileItem = ({
   isLast: boolean;
   depth: number;
 }) => {
-  const getPaddingClass = (d: number) => `${1.5 + d * 1.35}rem`;
-
   // Strip file extension for display
   const nameWithoutExtension = node.name.replace(/\.[^/.]+$/, '');
 
@@ -147,7 +148,7 @@ const FileItem = ({
 
       <button
         type='button'
-        onClick={() => setActiveFormId(node.formId!)}
+        onClick={() => node.formId && setActiveFormId(node.formId)}
         title={node.name}
         className='pl-1 pr-6 py-2 flex-1 bg-transparent border-none text-sm text-gray-700 group hover:bg-gray-50 transition-all ease-out duration-150 flex items-center gap-1'
       >
@@ -178,8 +179,6 @@ const CollectionGroup = ({
   depth: number;
   showReferences: boolean;
 }) => {
-  const getPaddingClass = (d: number) => `${1.5 + d * 1.35}rem`;
-
   // Filter out references if showReferences is false
   const visibleFiles = showReferences
     ? files
@@ -318,10 +317,6 @@ const TreeNodeComponent = ({
     }
   };
 
-  const getPaddingClass = (depth: number) => {
-    return `${1.5 + depth * 1.35}rem`;
-  };
-
   // If this is a file, render it as a standalone item (shouldn't happen normally as files are grouped)
   if (node.isFile) {
     const form = cms.state.forms.find(
@@ -420,10 +415,7 @@ const TreeNodeComponent = ({
   );
 };
 
-export const FormLists = (props: {
-  isEditing: boolean;
-  lastActiveFormId: string | null;
-}) => {
+export const FormLists = (props: { lastActiveFormId: string | null }) => {
   const cms = useCMS();
 
   // Persist showReferences state in localStorage
@@ -528,7 +520,6 @@ export const FormLists = (props: {
           <div key={`${formList.id}-${index}`}>
             {/* TODO: add labels for each list */}
             <FormList
-              isEditing={props.isEditing}
               setActiveFormId={(id) => {
                 cms.dispatch({ type: 'forms:set-active-form-id', value: id });
               }}
@@ -543,7 +534,6 @@ export const FormLists = (props: {
 };
 
 export const FormList = (props: {
-  isEditing: boolean;
   setActiveFormId: (id: string) => void;
   formList: TinaState['formLists'][number];
   showReferences: boolean;
@@ -567,7 +557,7 @@ export const FormList = (props: {
 
     // Build tree structure from all document items
     return buildTreeFromPaths(allDocumentItems);
-  }, [JSON.stringify(props.formList.items)]);
+  }, [JSON.stringify(props.formList.items), cms.state.forms]);
 
   return (
     <div className='divide-y divide-gray-200'>

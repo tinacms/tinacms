@@ -17,7 +17,6 @@ import { FormBuilder, FormStatus } from '@toolkit/form-builder';
 import type { Form } from '@toolkit/forms';
 import type { FormMetaPlugin } from '@toolkit/plugin-form-meta';
 import { useCMS } from '@toolkit/react-core';
-import { BiFolder } from 'react-icons/bi';
 import * as React from 'react';
 import { FormLists } from './form-list';
 import { SidebarContext } from './sidebar';
@@ -141,7 +140,7 @@ export const FormsView = ({ loadingPlaceholder }: FormsViewProps = {}) => {
         leaveFrom='opacity-100 translate-y-0'
         leaveTo='opacity-0 translate-y-1/2'
       >
-        <FormLists isEditing={isEditing} lastActiveFormId={lastActiveFormId} />
+        <FormLists lastActiveFormId={lastActiveFormId} />
       </Transition>
 
       {/* Form Edit View - shows when editing */}
@@ -203,7 +202,7 @@ export const FormHeader = ({
 
   return (
     <div className='px-4 pt-2 pb-4 flex flex-row flex-nowrap justify-between items-center gap-2 bg-gradient-to-t from-white to-gray-50 border-b border-gray-100'>
-      <FormBreadcrumbs className='w-[calc(100% - 3rem)]' />
+      <FormBreadcrumbs className='w-[calc(100%-3rem)]' />
       <FileHistoryProvider
         defaultBranchName={repoProvider?.defaultBranchName}
         historyUrl={repoProvider?.historyUrl}
@@ -408,35 +407,5 @@ export const FormBreadcrumbs = ({
         )}
       </BreadcrumbList>
     </Breadcrumb>
-  );
-};
-
-const MultiformSelector = ({
-  activeForm,
-}: {
-  activeForm: { activeFieldName?: string; tinaForm: Form };
-}) => {
-  const cms = useCMS();
-  const isMultiform = cms.state.forms.length > 1;
-
-  if (!isMultiform) {
-    return null;
-  }
-  return (
-    <button
-      type='button'
-      className='pointer-events-auto text-xs text-orange-400 hover:text-orange-500 hover:underline transition-all ease-out duration-150'
-      onClick={() => {
-        const state = activeForm.tinaForm.finalForm.getState();
-        if (state.invalid === true) {
-          cms.alerts.error('Cannot navigate away from an invalid form.');
-        } else {
-          cms.dispatch({ type: 'forms:set-active-form-id', value: null });
-        }
-      }}
-      title='Tina Explorer'
-    >
-      <BiFolder className='h-5 w-auto opacity-70' />
-    </button>
   );
 };
