@@ -566,6 +566,7 @@ export class Resolver {
   }) => {
     const collection = this.getCollectionWithName(collectionName);
     const realPath = path.join(collection.path, relativePath);
+    this.validatePath(realPath, collection);
 
     const alreadyExists = await this.database.documentExists(realPath);
     if (alreadyExists) {
@@ -661,6 +662,24 @@ export class Resolver {
     return this.tinaSchema.getCollection(collectionName);
   };
 
+  /**
+   * validatePath ensures that the provided path remains within the boundaries
+   * of the collection's directory. This is a critical security check to prevent
+   * path traversal attacks where a user might attempt to read or write files
+   * outside of the intended collection.
+   */
+  private validatePath = (fullPath: string, collection: Collection<true>) => {
+    const normalizedPath = path.normalize(fullPath);
+    const normalizedCollectionPath = path.normalize(collection.path);
+    const relative = path.relative(normalizedCollectionPath, normalizedPath);
+    if (relative.startsWith('..')) {
+      throw new Error(`Invalid path: path escapes the collection directory`);
+    }
+    if (path.isAbsolute(relative)) {
+      throw new Error(`Invalid path: absolute paths are not allowed`);
+    }
+  };
+
   /*
    * Used for getDocument, get<Collection>Document.
    */
@@ -673,6 +692,7 @@ export class Resolver {
   }) => {
     const collection = this.getCollectionWithName(collectionName);
     const realPath = path.join(collection.path, relativePath);
+    this.validatePath(realPath, collection);
     return this.getDocument(realPath, {
       collection,
       checkReferences: true,
@@ -695,6 +715,7 @@ export class Resolver {
       relativePath,
       `.gitkeep.${collection.format || 'md'}`
     );
+    this.validatePath(realPath, collection);
     const alreadyExists = await this.database.documentExists(realPath);
     if (alreadyExists) {
       throw new Error(`Unable to add folder, ${realPath} already exists`);
@@ -718,6 +739,7 @@ export class Resolver {
   }) => {
     const collection = this.getCollectionWithName(collectionName);
     const realPath = path.join(collection.path, relativePath);
+    this.validatePath(realPath, collection);
     const alreadyExists = await this.database.documentExists(realPath);
     if (alreadyExists) {
       throw new Error(`Unable to add document, ${realPath} already exists`);
@@ -742,6 +764,7 @@ export class Resolver {
   }) => {
     const collection = this.getCollectionWithName(collectionName);
     const realPath = path.join(collection.path, relativePath);
+    this.validatePath(realPath, collection);
     const alreadyExists = await this.database.documentExists(realPath);
     if (!alreadyExists) {
       throw new Error(`Unable to update document, ${realPath} does not exist`);
@@ -751,6 +774,7 @@ export class Resolver {
 
     if (newRelativePath) {
       const newRealPath = path.join(collection?.path, newRelativePath);
+      this.validatePath(newRealPath, collection);
 
       // don't update if the paths are the same
       if (newRealPath === realPath) {
@@ -834,6 +858,7 @@ export class Resolver {
   }) => {
     const collection = this.getCollectionWithName(collectionName);
     const realPath = path.join(collection.path, relativePath);
+    this.validatePath(realPath, collection);
     const alreadyExists = await this.database.documentExists(realPath);
     if (!alreadyExists) {
       throw new Error(`Unable to delete document, ${realPath} does not exist`);
@@ -1114,6 +1139,7 @@ export class Resolver {
           })
         );
         const realPath = path.join(collection.path, args.relativePath);
+        this.validatePath(realPath, collection);
         return this.updateResolveDocument({
           collection,
           realPath,
@@ -1135,6 +1161,7 @@ export class Resolver {
       }
     } else {
       const realPath = path.join(collection.path, args.relativePath);
+      this.validatePath(realPath, collection);
       return this.getDocument(realPath, {
         collection,
         checkReferences: true,
