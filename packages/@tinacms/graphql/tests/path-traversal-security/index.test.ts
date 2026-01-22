@@ -14,6 +14,9 @@ import config from './tina/config';
  * 3. 'updateDocument' to reject traversal in both 'relativePath' and 'newRelativePath'.
  * 4. 'deleteDocument' to reject traversal paths.
  * 5. All tests verify that an 'Invalid path' error is returned when traversal is detected.
+ * 6. File extension validation tests verify that unsupported extensions (.txt, .js, .sh, etc.)
+ *    are rejected during file serialization, confirming the mitigating factor that only
+ *    content file formats (.md, .mdx, .json, .yaml, .yml, .toml) are supported.
  *
  * The path validation should be implemented in the resolver layer.
  */
@@ -187,6 +190,185 @@ describe('Path Traversal Security', () => {
       expect(result.errors).toBeDefined();
       expect(result.errors.length).toBeGreaterThan(0);
       expect(result.errors[0].message).toContain(PATH_TRAVERSAL_ERROR);
+    });
+  });
+
+  describe('File Extension Validation', () => {
+    const INVALID_EXTENSION_ERROR = 'Invalid file extension';
+
+    it('should reject file extensions that do not match collection format (.txt)', async () => {
+      const { query } = await setupMutation(__dirname, config);
+
+      const createMutation = `
+        mutation {
+          createDocument(
+            collection: "post"
+            relativePath: "malicious.txt"
+            params: {
+              post: {
+                title: "Test Document"
+              }
+            }
+          ) {
+            __typename
+          }
+        }
+      `;
+
+      const result = await query({
+        query: createMutation,
+        variables: {},
+      });
+
+      expect(result.errors).toBeDefined();
+      expect(result.errors.length).toBeGreaterThan(0);
+      expect(result.errors[0].message).toContain(INVALID_EXTENSION_ERROR);
+    });
+
+    it('should reject file extensions that do not match collection format (.js)', async () => {
+      const { query } = await setupMutation(__dirname, config);
+
+      const createMutation = `
+        mutation {
+          createDocument(
+            collection: "post"
+            relativePath: "malicious.js"
+            params: {
+              post: {
+                title: "Test Document"
+              }
+            }
+          ) {
+            __typename
+          }
+        }
+      `;
+
+      const result = await query({
+        query: createMutation,
+        variables: {},
+      });
+
+      expect(result.errors).toBeDefined();
+      expect(result.errors.length).toBeGreaterThan(0);
+      expect(result.errors[0].message).toContain(INVALID_EXTENSION_ERROR);
+    });
+
+    it('should reject file extensions that do not match collection format (.sh)', async () => {
+      const { query } = await setupMutation(__dirname, config);
+
+      const createMutation = `
+        mutation {
+          createDocument(
+            collection: "post"
+            relativePath: "malicious.sh"
+            params: {
+              post: {
+                title: "Test Document"
+              }
+            }
+          ) {
+            __typename
+          }
+        }
+      `;
+
+      const result = await query({
+        query: createMutation,
+        variables: {},
+      });
+
+      expect(result.errors).toBeDefined();
+      expect(result.errors.length).toBeGreaterThan(0);
+      expect(result.errors[0].message).toContain(INVALID_EXTENSION_ERROR);
+    });
+
+    it('should reject .yml extension when collection format is md', async () => {
+      const { query } = await setupMutation(__dirname, config);
+
+      // The post collection uses 'md' format (default), so .yml should be rejected
+      const createMutation = `
+        mutation {
+          createDocument(
+            collection: "post"
+            relativePath: "workflow.yml"
+            params: {
+              post: {
+                title: "Test Document"
+              }
+            }
+          ) {
+            __typename
+          }
+        }
+      `;
+
+      const result = await query({
+        query: createMutation,
+        variables: {},
+      });
+
+      expect(result.errors).toBeDefined();
+      expect(result.errors.length).toBeGreaterThan(0);
+      expect(result.errors[0].message).toContain(INVALID_EXTENSION_ERROR);
+    });
+
+    it('should reject .json extension when collection format is md', async () => {
+      const { query } = await setupMutation(__dirname, config);
+
+      // The post collection uses 'md' format (default), so .json should be rejected
+      const createMutation = `
+        mutation {
+          createDocument(
+            collection: "post"
+            relativePath: "data.json"
+            params: {
+              post: {
+                title: "Test Document"
+              }
+            }
+          ) {
+            __typename
+          }
+        }
+      `;
+
+      const result = await query({
+        query: createMutation,
+        variables: {},
+      });
+
+      expect(result.errors).toBeDefined();
+      expect(result.errors.length).toBeGreaterThan(0);
+      expect(result.errors[0].message).toContain(INVALID_EXTENSION_ERROR);
+    });
+
+    it('should reject mismatched extension in updateDocument newRelativePath', async () => {
+      const { query } = await setupMutation(__dirname, config);
+
+      // Try to rename a document to have a different extension
+      const updateMutation = `
+        mutation {
+          updateDocument(
+            collection: "post"
+            relativePath: "existing.md"
+            params: {
+              relativePath: "renamed.json"
+            }
+          ) {
+            __typename
+          }
+        }
+      `;
+
+      const result = await query({
+        query: updateMutation,
+        variables: {},
+      });
+
+      expect(result.errors).toBeDefined();
+      expect(result.errors.length).toBeGreaterThan(0);
+      expect(result.errors[0].message).toContain(INVALID_EXTENSION_ERROR);
     });
   });
 });
