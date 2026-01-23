@@ -1,5 +1,14 @@
 # tinacms-gitprovider-github
 
+## 4.0.7
+
+### Patch Changes
+
+- [#6369](https://github.com/tinacms/tinacms/pull/6369) [`e0bd914`](https://github.com/tinacms/tinacms/commit/e0bd914e83ffcc267edce592b75dd153c0c1fd5e) Thanks [@TihomirIvanov](https://github.com/TihomirIvanov)! - \* Updated dependency @octokit/rest
+  - Fixes security vulnerabilities
+- Updated dependencies []:
+  - @tinacms/datalayer@2.0.7
+
 ## 4.0.6
 
 ### Patch Changes

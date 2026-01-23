@@ -1,5 +1,13 @@
 # @tinacms/schema-tools
 
+## 2.4.0
+
+### Minor Changes
+
+- [#6353](https://github.com/tinacms/tinacms/pull/6353) [`1d4fb88`](https://github.com/tinacms/tinacms/commit/1d4fb88f5dded126cf3c3796e42d26ffb4b62a3a) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Collections - added ability to make yaml max line width configurable.
+  This was previously hard coded to 80 but now defaults to being disabled `-1`.
+  This is configurable though the collection's `yamlMaxLineWidth` prop.
+
 ## 2.3.0
 
 ### Minor Changes

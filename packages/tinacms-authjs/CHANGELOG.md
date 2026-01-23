@@ -1,5 +1,17 @@
 # tinacms-authjs
 
+## 17.0.2
+
+### Patch Changes
+
+- [#6354](https://github.com/tinacms/tinacms/pull/6354) [`4241a37`](https://github.com/tinacms/tinacms/commit/4241a37b781e169487550c5077b170e7662d85b1) Thanks [@18-th](https://github.com/18-th)! - \* Bumped react, react-dom, next and next-auth dev dependencies
+  - Allow Next 15 for peer dependencies for tinacms-authjs
+  - Allow React 19 for peer dependencies for tinacms-authjs
+  - Updated the self-hosted example to be ESM-compatible
+- Updated dependencies [[`1d4fb88`](https://github.com/tinacms/tinacms/commit/1d4fb88f5dded126cf3c3796e42d26ffb4b62a3a), [`6647240`](https://github.com/tinacms/tinacms/commit/6647240db6cfffcf1efb4fa9799e9c039b929389)]:
+  - @tinacms/schema-tools@2.4.0
+  - tinacms@3.3.2
+
 ## 17.0.1
 
 ### Patch Changes
