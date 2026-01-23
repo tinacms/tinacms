@@ -29,9 +29,20 @@ import {
   TooltipTrigger,
 } from '@toolkit/fields/plugins/mdx-field-plugin/plate/components/plate-ui/tooltip';
 
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  getPaginationRowModel,
+  useReactTable,
+  SortingState,
+  getSortedRowModel,
+} from '@tanstack/react-table';
+import BranchSelectorTable from './branch-selector-table';
+
 type ListState = 'loading' | 'ready' | 'error';
 
-const tableHeadingStyle =
+export const tableHeadingStyle =
   'px-3 py-3 text-left text-xs font-bold text-gray-700 tracking-wider sticky top-0 bg-gray-100 z-20 border-b-2 border-gray-200 ';
 
 export function formatBranchName(str: string): string {
@@ -42,7 +53,8 @@ export function formatBranchName(str: string): string {
 
 export const BranchSwitcher = (props: BranchSwitcherProps) => {
   const cms = useCMS();
-  const usingEditorialWorkflow = cms.api.tina.usingEditorialWorkflow;
+  // MOCK: Force editorial workflow for testing - REMOVE AFTER TESTING
+  const usingEditorialWorkflow = true; // was: cms.api.tina.usingEditorialWorkflow;
   if (usingEditorialWorkflow) {
     return <EditoralBranchSwitcher {...props} />;
   } else {
@@ -57,7 +69,50 @@ export const EditoralBranchSwitcher = ({
   setModalTitle,
 }: BranchSwitcherProps) => {
   const cms = useCMS();
-  const isLocalMode = cms.api?.tina?.isLocalMode;
+  // MOCK: Override local mode check for testing - REMOVE AFTER TESTING
+  const isLocalMode = false; // was: cms.api?.tina?.isLocalMode;
+
+  // MOCK DATA - REMOVE AFTER TESTING
+  const mockBranches: Branch[] = [
+    {
+      name: 'main',
+      protected: true,
+      indexStatus: { status: 'complete', timestamp: Date.now() - 86400000 },
+    },
+    {
+      name: 'tina/homepage-update',
+      protected: false,
+      indexStatus: { status: 'complete', timestamp: Date.now() - 3600000 },
+      githubPullRequestUrl: 'https://github.com/org/repo/pull/42',
+    },
+    {
+      name: 'tina/new-blog-post',
+      protected: false,
+      indexStatus: { status: 'complete', timestamp: Date.now() - 7200000 },
+    },
+    {
+      name: 'tina/footer-changes',
+      protected: false,
+      indexStatus: { status: 'inprogress', timestamp: Date.now() - 1800000 },
+    },
+    {
+      name: 'tina/broken-index',
+      protected: false,
+      indexStatus: { status: 'failed', timestamp: Date.now() - 172800000 },
+    },
+    {
+      name: 'develop',
+      protected: true,
+      indexStatus: { status: 'complete', timestamp: Date.now() - 43200000 },
+      githubPullRequestUrl: 'https://github.com/org/repo/pull/99',
+    },
+    {
+      name: 'tina/unknown-status',
+      protected: false,
+      indexStatus: { status: 'unknown', timestamp: Date.now() },
+    },
+  ];
+  const mockListBranches = () => Promise.resolve(mockBranches);
   const [viewState, setViewState] = React.useState<'list' | 'create'>('list');
   const [listState, setListState] = React.useState<ListState>('loading');
   const [branchList, setBranchList] = React.useState([] as Branch[]);
@@ -101,7 +156,8 @@ export const EditoralBranchSwitcher = ({
 
   const refreshBranchList = React.useCallback(async () => {
     setListState('loading');
-    await listBranches()
+    // MOCK: Using mockListBranches instead - REMOVE AFTER TESTING
+    await mockListBranches() // was: listBranches()
       .then((data: Branch[]) => {
         setBranchList(data);
         setListState('ready');
@@ -116,6 +172,9 @@ export const EditoralBranchSwitcher = ({
 
   // Keep branch list up to date
   React.useEffect(() => {
+    // MOCK: Skip polling for index status - REMOVE AFTER TESTING
+    return;
+
     if (listState === 'ready') {
       const cancelFuncs = [];
       // update all branches that have indexing status of 'inprogress' or 'unknown'
@@ -201,7 +260,7 @@ export const EditoralBranchSwitcher = ({
         ) : (
           <>
             {listState === 'ready' ? (
-              <BranchSelector
+              <BranchSelectorTable
                 currentBranch={currentBranch}
                 branchList={branchList}
                 refreshBranchList={refreshBranchList}
@@ -275,7 +334,7 @@ export const getFilteredBranchList = (
   ];
 };
 
-const sortBranchListFn = (sortValue: 'default' | 'updated' | 'name') => {
+export const sortBranchListFn = (sortValue: 'default' | 'updated' | 'name') => {
   return (a: Branch, b: Branch) => {
     if (sortValue === 'default') {
       // Default sorting logic
@@ -345,171 +404,11 @@ const BranchCreator = ({ setViewState, handleCreateBranch, currentBranch }) => {
   );
 };
 
-const BranchSelector = ({
-  branchList,
-  currentBranch,
-  onChange,
-  createBranch,
-  refreshBranchList,
-}: {
-  branchList: Branch[];
-  currentBranch: string;
-  onChange: (branchName: string) => void;
-  createBranch: () => void;
-  refreshBranchList: () => void;
-}) => {
-  const [search, setSearch] = React.useState('');
-  const [filter, setFilter] = React.useState<'content' | 'all'>('content');
-  const [sortValue, setSortValue] = React.useState<
-    'default' | 'updated' | 'name'
-  >('default');
-  const [selectedBranch, setSelectedBranch] = React.useState<string | null>(
-    null
-  );
-
-  const cms = useCMS();
-
-  const filteredBranchList = getFilteredBranchList(
-    branchList,
-    search,
-    currentBranch,
-    filter
-  ).sort(sortBranchListFn(sortValue));
-
-  const previewFunction = cms.api.tina.schema?.config?.config?.ui?.previewUrl;
-
-  return (
-    <div className='flex flex-col gap-4'>
-      <div className='flex items-stretch space-x-4'>
-        <div>
-          <label
-            htmlFor='search'
-            className='text-xs mb-1 flex flex-col font-bold'
-          >
-            Search
-          </label>
-          <div className='block relative group h-fit mb-auto'>
-            <BaseTextField
-              placeholder='Branch name or PR #'
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            {search === '' ? (
-              <BiSearch className='absolute right-3 top-1/2 -translate-y-1/2 w-5 h-auto text-blue-500 opacity-70 group-hover:opacity-100 transition-all ease-out duration-150' />
-            ) : (
-              <button
-                onClick={() => {
-                  setSearch('');
-                }}
-                className='outline-none focus:outline-none bg-transparent border-0 p-0 m-0 absolute right-2.5 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100 transition-all ease-out duration-150'
-              >
-                <MdOutlineClear className='w-5 h-auto text-gray-600' />
-              </button>
-            )}
-          </div>
-        </div>
-        <div className='flex flex-col'>
-          <label
-            htmlFor='branch-type'
-            className='text-xs mb-1 flex flex-col font-bold'
-          >
-            Branch Type
-          </label>
-          <Select
-            name='branch-type'
-            input={{
-              id: 'branch-type',
-              name: 'branch-type',
-              value: filter,
-              onChange: (e: any) => setFilter(e.target.value),
-            }}
-            options={[
-              {
-                label: 'Content',
-                value: 'content',
-              },
-              {
-                label: 'All',
-                value: 'all',
-              },
-            ]}
-          />
-        </div>
-        {/* TODO: Add this back when we implement on backend */}
-        {/* <div className="flex-1" />
-        <div>
-          <Button variant="primary" onClick={createBranch}>
-            Create Branch <BiPlus className="w-5 h-full ml-1 opacity-70" />
-          </Button>
-        </div> */}
-      </div>
-      {filteredBranchList.length === 0 && (
-        <div className='block relative text-gray-300 italic py-1'>
-          No branches to display
-        </div>
-      )}
-      {filteredBranchList.length > 0 && (
-        <TooltipProvider>
-          <div className='rounded-lg border border-gray-200 overflow-hidden'>
-            <div className='min-w-[192px] max-h-[24rem] overflow-y-auto w-full h-full shadow-inner bg-white'>
-              <table className='w-full table-auto max-h-[24rem]'>
-                <thead className='sticky top-0 z-20 bg-gray-100 border-b-2 border-gray-200'>
-                  <tr>
-                    <th className={`${tableHeadingStyle} w-auto`}>
-                      Branch Name
-                    </th>
-                    <th
-                      className={`${tableHeadingStyle} w-0 whitespace-nowrap text-left`}
-                    >
-                      Last Updated
-                    </th>
-                    <th
-                      className={`${tableHeadingStyle} w-0 whitespace-nowrap text-left`}
-                    >
-                      Pull Request
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredBranchList.map((branch) => (
-                    <BranchItem
-                      key={branch.name}
-                      branch={branch}
-                      currentBranch={currentBranch}
-                      onChange={onChange}
-                      refreshBranchList={refreshBranchList}
-                      previewFunction={previewFunction}
-                      cms={cms}
-                      selectedBranch={selectedBranch}
-                      onSelectBranch={setSelectedBranch}
-                    />
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </TooltipProvider>
-      )}
-      <div className='flex justify-end'>
-        <Button
-          variant='primary'
-          onClick={() => {
-            onChange(selectedBranch);
-          }}
-          disabled={!selectedBranch || selectedBranch === currentBranch}
-        >
-          Open branch in editor
-        </Button>
-      </div>
-    </div>
-  );
-};
-
-const extractPullRequestId = (url: string): string => {
+export const extractPullRequestId = (url: string): string => {
   return url.split('/').pop() || '';
 };
 
-const BranchItem = ({
+export const BranchItem = ({
   branch,
   currentBranch,
   onChange,
