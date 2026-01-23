@@ -91,7 +91,7 @@ export const FormsView = ({ loadingPlaceholder }: FormsViewProps = {}) => {
     // No Forms
     return <SidebarNoFormsPlaceholder />;
   }
-  const isMultiform = cms.state.forms.length > 1;
+  const isReferencingManyForms = cms.state.forms.length > 1;
   const activeForm = cms.state.forms.find(
     ({ tinaForm }) => tinaForm.id === cms.state.activeFormId
   );
@@ -99,7 +99,7 @@ export const FormsView = ({ loadingPlaceholder }: FormsViewProps = {}) => {
   const formMetas = cms.plugins.all<FormMetaPlugin>('form:meta');
 
   // Single form - no transitions needed
-  if (!isMultiform) {
+  if (!isReferencingManyForms) {
     return (
       <>
         {activeForm && (
@@ -125,7 +125,7 @@ export const FormsView = ({ loadingPlaceholder }: FormsViewProps = {}) => {
     );
   }
 
-  // Multiform - coordinate transitions between list and form view
+  // Referencing many forms - coordinate transitions between list and form view
   return (
     <>
       {/* Form List View - shows when not editing */}
