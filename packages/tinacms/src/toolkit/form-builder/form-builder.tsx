@@ -243,7 +243,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                       </Button>
                       {tinaForm.actions.length > 0 && (
                         <FormActionMenu
-                          form={tinaForm as any}
+                          form={tinaForm as Form}
                           actions={tinaForm.actions}
                         />
                       )}
@@ -261,18 +261,14 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 
 export const FormStatus = ({ pristine }: { pristine: boolean }) => {
   const pristineClass = pristine ? 'text-green-500' : 'text-red-500';
-  return (
-    <div className='flex items-center gap-2'>
-      <FaCircle className={cn('h-3', pristineClass)} />
-    </div>
-  );
+  return <FaCircle className={cn('h-3', pristineClass)} />;
 };
 
 const RelatedFilesBanner = () => {
   const cms = useCMS();
-  const isMultiform = cms.state.forms.length > 1;
+  const isReferencingManyForms = cms.state.forms.length > 1;
 
-  if (!isMultiform) {
+  if (!isReferencingManyForms) {
     return null;
   }
 
