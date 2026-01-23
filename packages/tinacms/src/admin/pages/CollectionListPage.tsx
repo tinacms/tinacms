@@ -352,7 +352,7 @@ const CollectionListPage = () => {
                 const collectionDefinition = cms.api.tina.schema.getCollection(
                   collection.name
                 );
-
+                const parse = collectionDefinition?.ui?.filename?.parse;
                 const allowCreate =
                   collectionDefinition?.ui?.allowedActions?.create ?? true;
                 const allowDelete =
@@ -440,6 +440,7 @@ const CollectionListPage = () => {
 
                     {renameModalOpen && (
                       <RenameModal
+                        parser={parse}
                         filename={vars.relativePathWithoutExtension}
                         newRelativePath={vars.newRelativePath}
                         setNewRelativePath={(newRelativePath) => {
@@ -1459,12 +1460,13 @@ interface ModalProps {
 }
 
 const RenameModal = ({
+  parser, 
   close,
   renameFunc,
   filename,
   newRelativePath,
   setNewRelativePath,
-}: ModalProps) => {
+}: ModalProps & { parser?: (filename: string) => string }) => {
   return (
     <Modal>
       <PopupModal>
@@ -1477,7 +1479,13 @@ const RenameModal = ({
             <BaseTextField
               placeholder="Enter a new name for the document's file"
               value={newRelativePath}
-              onChange={(event) => setNewRelativePath(event.target.value)}
+              onChange={(event) => {
+                let value = event.target.value;
+                if(parser){
+                  value = parser(value);
+                }
+                setNewRelativePath(value);
+              }}
             />
           </>
         </ModalBody>
