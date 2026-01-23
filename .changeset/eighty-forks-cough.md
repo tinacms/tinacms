@@ -2,4 +2,4 @@
 "tinacms": patch
 ---
 
-Fix slugify function making file name unlockable
+Fix slugify function making file name editable
