@@ -1,5 +1,13 @@
 # @tinacms/app
 
+## 2.3.22
+
+### Patch Changes
+
+- Updated dependencies [[`6647240`](https://github.com/tinacms/tinacms/commit/6647240db6cfffcf1efb4fa9799e9c039b929389)]:
+  - tinacms@3.3.2
+  - @tinacms/mdx@2.0.4
+
 ## 2.3.21
 
 ### Patch Changes
