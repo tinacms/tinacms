@@ -194,7 +194,7 @@ export const RenderForm = ({
   const filenameField = {
     name: 'filename',
     label: 'Filename',
-    parse, 
+    parse,
     component:
       slugFunction && !fileReadOnly
         ? wrapFieldsWithMeta(({ field, input, meta }) => {

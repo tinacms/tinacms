@@ -1460,7 +1460,7 @@ interface ModalProps {
 }
 
 const RenameModal = ({
-  parser, 
+  parser,
   close,
   renameFunc,
   filename,
@@ -1481,7 +1481,7 @@ const RenameModal = ({
               value={newRelativePath}
               onChange={(event) => {
                 let value = event.target.value;
-                if(parser){
+                if (parser) {
                   value = parser(value);
                 }
                 setNewRelativePath(value);
