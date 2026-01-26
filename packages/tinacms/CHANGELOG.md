@@ -1,5 +1,16 @@
 # tinacms
 
+## 3.3.2
+
+### Patch Changes
+
+- [#6362](https://github.com/tinacms/tinacms/pull/6362) [`6647240`](https://github.com/tinacms/tinacms/commit/6647240db6cfffcf1efb4fa9799e9c039b929389) Thanks [@Calinator444](https://github.com/Calinator444)! - 🐛Bug Fix - Prevent user from editing read only fields when slugify method provided
+
+- Updated dependencies [[`1d4fb88`](https://github.com/tinacms/tinacms/commit/1d4fb88f5dded126cf3c3796e42d26ffb4b62a3a)]:
+  - @tinacms/schema-tools@2.4.0
+  - @tinacms/mdx@2.0.4
+  - @tinacms/search@1.2.1
+
 ## 3.3.1
 
 ### Patch Changes
