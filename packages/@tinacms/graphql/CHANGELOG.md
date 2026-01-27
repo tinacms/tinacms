@@ -1,5 +1,21 @@
 # tina-graphql
 
+## 2.1.0
+
+### Minor Changes
+
+- [#6353](https://github.com/tinacms/tinacms/pull/6353) [`1d4fb88`](https://github.com/tinacms/tinacms/commit/1d4fb88f5dded126cf3c3796e42d26ffb4b62a3a) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Collections - added ability to make yaml max line width configurable.
+  This was previously hard coded to 80 but now defaults to being disabled `-1`.
+  This is configurable though the collection's `yamlMaxLineWidth` prop.
+
+### Patch Changes
+
+- [#6309](https://github.com/tinacms/tinacms/pull/6309) [`cc9c8bd`](https://github.com/tinacms/tinacms/commit/cc9c8bd96545bd3be20a3d13c0f463e1f71391b2) Thanks [@n-crrn](https://github.com/n-crrn)! - Fixes bug where field resolvers could continue executing after the resolver had returned an error.
+
+- Updated dependencies [[`1d4fb88`](https://github.com/tinacms/tinacms/commit/1d4fb88f5dded126cf3c3796e42d26ffb4b62a3a)]:
+  - @tinacms/schema-tools@2.4.0
+  - @tinacms/mdx@2.0.4
+
 ## 2.0.6
 
 ### Patch Changes
