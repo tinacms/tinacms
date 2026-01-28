@@ -370,11 +370,20 @@ jobs:
         env:
           publishedPackages: ${{ steps.changesets.outputs.publishedPackages }}
 
+      - name: Generate token for tinacloud
+        if: steps.graphqlVersion.outputs.published == 'true'
+        uses: actions/create-github-app-token@v1
+        id: tinacloud-token
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_SECRET }}
+          repositories: tinacloud
+
       - name: Create PR in tinacloud to update @tinacms/graphql
         if: steps.graphqlVersion.outputs.published == 'true'
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.TINACLOUD_REPO_PAT }}
+          github-token: ${{ steps.tinacloud-token.outputs.token }}
           script: |
             const version = '${{ steps.graphqlVersion.outputs.version }}';
             const bumpType = '${{ steps.graphqlVersion.outputs.bump_type }}';
@@ -433,10 +442,18 @@ jobs:
             echo "bump_type=patch" >> $GITHUB_OUTPUT
           fi
 
+      - name: Generate token for tinacloud
+        uses: actions/create-github-app-token@v1
+        id: tinacloud-token
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_SECRET }}
+          repositories: tinacloud
+
       - name: Trigger tinacloud update (test mode)
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.TINACLOUD_REPO_PAT }}
+          github-token: ${{ steps.tinacloud-token.outputs.token }}
           script: |
             const version = '${{ inputs.test_version }}';
             const bumpType = '${{ steps.bump.outputs.bump_type }}';
