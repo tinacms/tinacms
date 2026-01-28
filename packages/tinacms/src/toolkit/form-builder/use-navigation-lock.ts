@@ -19,20 +19,31 @@ export function useNavigationLock(shouldBlock: boolean): NavigationLockState {
   const [blockedUrl, setBlockedUrl] = useState<string | null>(null);
   const shouldBlockRef = useRef(shouldBlock);
   const currentHashRef = useRef(window.location.hash);
-  const isRestoringRef = useRef(false);
+  const isNavigatingRef = useRef(false);
+  const isBlockedRef = useRef(false);
 
-  // Keep ref in sync with prop
+  // Keep refs in sync
   useEffect(() => {
     shouldBlockRef.current = shouldBlock;
-    currentHashRef.current = window.location.hash;
+    // Only update currentHashRef when not blocked, to preserve the original location
+    if (!isBlockedRef.current) {
+      currentHashRef.current = window.location.hash;
+    }
   }, [shouldBlock]);
+
+  useEffect(() => {
+    isBlockedRef.current = isBlocked;
+  }, [isBlocked]);
 
   const proceed = useCallback(() => {
     if (blockedUrl) {
-      isRestoringRef.current = true;
-      window.location.hash = blockedUrl;
+      isNavigatingRef.current = true;
       setIsBlocked(false);
       setBlockedUrl(null);
+      // Navigate to the blocked URL
+      window.location.hash = blockedUrl.startsWith('#')
+        ? blockedUrl.slice(1)
+        : blockedUrl;
     }
   }, [blockedUrl]);
 
@@ -43,54 +54,65 @@ export function useNavigationLock(shouldBlock: boolean): NavigationLockState {
 
   useEffect(() => {
     if (!shouldBlock) {
+      currentHashRef.current = window.location.hash;
       return;
     }
 
-    const handleHashChange = (event: HashChangeEvent) => {
-      // Skip if we're restoring to the blocked URL
-      if (isRestoringRef.current) {
-        isRestoringRef.current = false;
-        currentHashRef.current = window.location.hash;
-        return;
+    // Store the current hash when blocking becomes active
+    currentHashRef.current = window.location.hash;
+
+    const handleBeforeNavigate = (newHash: string) => {
+      // Skip if we're intentionally navigating (user clicked "Leave")
+      if (isNavigatingRef.current) {
+        isNavigatingRef.current = false;
+        currentHashRef.current = newHash;
+        return false;
+      }
+
+      // Skip if already showing the modal
+      if (isBlockedRef.current) {
+        return false;
       }
 
       // Block the navigation
-      if (shouldBlockRef.current && !isBlocked) {
-        event.preventDefault();
-        const newHash = window.location.hash;
+      if (shouldBlockRef.current) {
+        // Store the destination and show modal
+        setBlockedUrl(newHash);
+        setIsBlocked(true);
+        return true; // Indicate we should block
+      }
 
-        // Restore the previous hash
+      return false;
+    };
+
+    const handleHashChange = () => {
+      const newHash = window.location.hash;
+
+      // If the hash changed and we should block, restore it
+      if (
+        newHash !== currentHashRef.current &&
+        handleBeforeNavigate(newHash)
+      ) {
+        // Restore the original hash without triggering another hashchange
         window.history.replaceState(null, '', currentHashRef.current);
-
-        // Store the blocked URL and show modal
-        setBlockedUrl(newHash);
-        setIsBlocked(true);
+      } else if (!isBlockedRef.current && !isNavigatingRef.current) {
+        // Normal navigation, update the current hash
+        currentHashRef.current = newHash;
       }
     };
 
-    const handlePopState = (event: PopStateEvent) => {
-      // Skip if we're restoring to the blocked URL
-      if (isRestoringRef.current) {
-        isRestoringRef.current = false;
-        currentHashRef.current = window.location.hash;
-        return;
-      }
+    const handlePopState = () => {
+      const newHash = window.location.hash;
 
-      // Block browser back/forward navigation
-      if (shouldBlockRef.current && !isBlocked) {
-        const newHash = window.location.hash;
-
-        // Push the current state back to prevent navigation
+      // If navigating to a different hash and we should block
+      if (
+        newHash !== currentHashRef.current &&
+        handleBeforeNavigate(newHash)
+      ) {
+        // Push state to go back to the original location
         window.history.pushState(null, '', currentHashRef.current);
-
-        // Store the blocked URL and show modal
-        setBlockedUrl(newHash);
-        setIsBlocked(true);
       }
     };
-
-    // Add a history entry to catch back button presses
-    window.history.pushState(null, '', window.location.href);
 
     window.addEventListener('hashchange', handleHashChange);
     window.addEventListener('popstate', handlePopState);
@@ -99,7 +121,7 @@ export function useNavigationLock(shouldBlock: boolean): NavigationLockState {
       window.removeEventListener('hashchange', handleHashChange);
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [shouldBlock, isBlocked]);
+  }, [shouldBlock]);
 
   return {
     isBlocked,
