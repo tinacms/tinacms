@@ -643,9 +643,16 @@ mutation addPendingDocumentMutation(
 
       if (!res.ok) {
         console.error('There was an error starting editorial workflow.');
-        throw new Error(
+        const error = new Error(
           responseBody?.message || 'Failed to start editorial workflow'
-        );
+        ) as Error & { errorCode?: string; conflictingBranch?: string };
+        if (responseBody?.errorCode) {
+          error.errorCode = responseBody.errorCode;
+        }
+        if (responseBody?.conflictingBranch) {
+          error.conflictingBranch = responseBody.conflictingBranch;
+        }
+        throw error;
       }
 
       const requestId = responseBody.requestId;

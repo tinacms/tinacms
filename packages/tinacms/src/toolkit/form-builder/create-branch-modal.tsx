@@ -13,7 +13,10 @@ import {
   PopupModal,
 } from '../react-modals';
 import { FieldLabel } from '@toolkit/fields';
-import { EDITORIAL_WORKFLOW_STATUS } from './editorial-workflow-constants';
+import {
+  EDITORIAL_WORKFLOW_STATUS,
+  EDITORIAL_WORKFLOW_ERROR,
+} from './editorial-workflow-constants';
 import {
   CREATE_DOCUMENT_GQL,
   DELETE_DOCUMENT_GQL,
@@ -207,12 +210,36 @@ export const CreateBranchModal = ({
       }
 
       close();
-    } catch (e) {
+    } catch (e: unknown) {
       console.error(e);
-      const errorMessage =
-        e.message && e.message.toLowerCase().includes('already exists')
-          ? 'Branch already exists'
-          : 'Branch operation failed, please try again. If the problem persists please contact support.';
+      let errorMessage =
+        'Branch operation failed, please try again. If the problem persists please contact support.';
+
+      const err = e as Error & { errorCode?: string };
+
+      // Check for structured error codes from the API
+      if (err.errorCode) {
+        switch (err.errorCode) {
+          case EDITORIAL_WORKFLOW_ERROR.BRANCH_EXISTS:
+            errorMessage = 'A branch with this name already exists';
+            break;
+          case EDITORIAL_WORKFLOW_ERROR.BRANCH_HIERARCHY_CONFLICT:
+            errorMessage =
+              err.message || 'Branch name conflicts with an existing branch';
+            break;
+          case EDITORIAL_WORKFLOW_ERROR.VALIDATION_FAILED:
+            errorMessage = err.message || 'Invalid branch name';
+            break;
+        }
+      } else if (err.message) {
+        // Fallback to message parsing for backwards compatibility
+        if (err.message.toLowerCase().includes('already exists')) {
+          errorMessage = 'A branch with this name already exists';
+        } else if (err.message.toLowerCase().includes('conflict')) {
+          errorMessage = err.message;
+        }
+      }
+
       setErrorMessage(errorMessage);
       setDisabled(false);
       setIsExecuting(false);
