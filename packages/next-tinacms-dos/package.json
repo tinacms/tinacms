@@ -1,6 +1,6 @@
 {
   "name": "next-tinacms-dos",
-  "version": "15.0.3",
+  "version": "17.0.2",
   "main": "dist/index.js",
   "module": "./dist/index.js",
   "files": [

@@ -11,13 +11,10 @@ export const TextField = wrapFieldsWithMeta<{}, InputProps & ExtraProps>(
   (props) => {
     const ref = React.useRef(null);
     React.useEffect(() => {
-      const focusIntent = props.field.focusIntent;
-      const shouldFocus = !!focusIntent;
-
-      if (ref.current && shouldFocus) {
+      if (ref.current && props.field.experimental_focusIntent) {
         ref.current.focus();
       }
-    }, [props.field.focusIntent, ref]);
+    }, [props.field.experimental_focusIntent, ref]);
 
     return (
       <BaseTextField

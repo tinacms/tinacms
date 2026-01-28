@@ -1,5 +1,33 @@
 # @tinacms/search
 
+## 1.2.1
+
+### Patch Changes
+
+- Updated dependencies [[`1d4fb88`](https://github.com/tinacms/tinacms/commit/1d4fb88f5dded126cf3c3796e42d26ffb4b62a3a), [`cc9c8bd`](https://github.com/tinacms/tinacms/commit/cc9c8bd96545bd3be20a3d13c0f463e1f71391b2)]:
+  - @tinacms/schema-tools@2.4.0
+  - @tinacms/graphql@2.1.0
+
+## 1.2.0
+
+### Minor Changes
+
+- [#6259](https://github.com/tinacms/tinacms/pull/6259) [`6c2c48a`](https://github.com/tinacms/tinacms/commit/6c2c48a9d869cb98e78fc656b986ecc244a5dafd) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Added fuzzy search options + support. This is now set as the new default. Going forward this package will also be used on the TinaCloud side so we don't duplicate code. Search now uses the closest index instead of being exact.
+
+### Patch Changes
+
+- Updated dependencies [[`6c2c48a`](https://github.com/tinacms/tinacms/commit/6c2c48a9d869cb98e78fc656b986ecc244a5dafd)]:
+  - @tinacms/schema-tools@2.3.0
+  - @tinacms/graphql@2.0.6
+
+## 1.1.9
+
+### Patch Changes
+
+- Updated dependencies [[`a63401a`](https://github.com/tinacms/tinacms/commit/a63401a3dd8271258bc6bfb4cc22593c19e94c7d)]:
+  - @tinacms/schema-tools@2.2.0
+  - @tinacms/graphql@2.0.5
+
 ## 1.1.8
 
 ### Patch Changes

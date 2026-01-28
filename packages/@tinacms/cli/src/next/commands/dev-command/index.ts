@@ -246,11 +246,22 @@ export class DevCommand extends BaseCommand {
       );
     }
 
+    // Pass both searchIndex and fuzzySearchWrapper
+    const searchIndexWithFuzzy = searchIndexClient.searchIndex as
+      | (typeof searchIndexClient.searchIndex & {
+          fuzzySearchWrapper?: typeof searchIndexClient.fuzzySearchWrapper;
+        })
+      | undefined;
+    if (searchIndexWithFuzzy && searchIndexClient.fuzzySearchWrapper) {
+      searchIndexWithFuzzy.fuzzySearchWrapper =
+        searchIndexClient.fuzzySearchWrapper;
+    }
+    
     const browserApiURL = urlBase ? `${urlBase}/graphql` : apiURL;
     const server = await createDevServer(
       configManager,
       database,
-      searchIndexClient.searchIndex,
+      searchIndexWithFuzzy,
       browserApiURL,
       this.noWatch,
       dbLock,

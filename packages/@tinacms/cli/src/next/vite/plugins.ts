@@ -119,7 +119,10 @@ export const devServerEndPointsPlugin = ({
           return;
         }
 
-        if (req.url.startsWith('/searchIndex')) {
+        if (
+          req.url.startsWith('/searchIndex') ||
+          req.url.startsWith('/v2/searchIndex')
+        ) {
           if (req.method === 'POST') {
             await searchIndexRouter.put(req, res);
           } else if (req.method === 'GET') {

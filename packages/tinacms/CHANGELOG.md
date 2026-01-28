@@ -1,5 +1,50 @@
 # tinacms
 
+## 3.3.2
+
+### Patch Changes
+
+- [#6362](https://github.com/tinacms/tinacms/pull/6362) [`6647240`](https://github.com/tinacms/tinacms/commit/6647240db6cfffcf1efb4fa9799e9c039b929389) Thanks [@Calinator444](https://github.com/Calinator444)! - 🐛Bug Fix - Prevent user from editing read only fields when slugify method provided
+
+- Updated dependencies [[`1d4fb88`](https://github.com/tinacms/tinacms/commit/1d4fb88f5dded126cf3c3796e42d26ffb4b62a3a)]:
+  - @tinacms/schema-tools@2.4.0
+  - @tinacms/mdx@2.0.4
+  - @tinacms/search@1.2.1
+
+## 3.3.1
+
+### Patch Changes
+
+- [#6346](https://github.com/tinacms/tinacms/pull/6346) [`3fa216c`](https://github.com/tinacms/tinacms/commit/3fa216c110af6417e6b835c49a275b08981e028b) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Revert "✨ Visual element highlighting between iframe and form (#6211)"
+
+- [#6348](https://github.com/tinacms/tinacms/pull/6348) [`7352c96`](https://github.com/tinacms/tinacms/commit/7352c9660869d413a0f48d3fbb003d4c4c0e3d85) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Branch selector - added ability to filter based off PR number
+
+## 3.3.0
+
+### Minor Changes
+
+- [#6259](https://github.com/tinacms/tinacms/pull/6259) [`6c2c48a`](https://github.com/tinacms/tinacms/commit/6c2c48a9d869cb98e78fc656b986ecc244a5dafd) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Added fuzzy search options + support. This is now set as the new default. Going forward this package will also be used on the TinaCloud side so we don't duplicate code. Search now uses the closest index instead of being exact.
+
+### Patch Changes
+
+- Updated dependencies [[`6c2c48a`](https://github.com/tinacms/tinacms/commit/6c2c48a9d869cb98e78fc656b986ecc244a5dafd)]:
+  - @tinacms/search@1.2.0
+  - @tinacms/schema-tools@2.3.0
+  - @tinacms/mdx@2.0.3
+
+## 3.2.0
+
+### Minor Changes
+
+- [#6286](https://github.com/tinacms/tinacms/pull/6286) [`a63401a`](https://github.com/tinacms/tinacms/commit/a63401a3dd8271258bc6bfb4cc22593c19e94c7d) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - ✨ Half-width property for text fields in TinaCMS Editor
+
+### Patch Changes
+
+- Updated dependencies [[`a63401a`](https://github.com/tinacms/tinacms/commit/a63401a3dd8271258bc6bfb4cc22593c19e94c7d)]:
+  - @tinacms/schema-tools@2.2.0
+  - @tinacms/mdx@2.0.2
+  - @tinacms/search@1.1.9
+
 ## 3.1.3
 
 ### Patch Changes

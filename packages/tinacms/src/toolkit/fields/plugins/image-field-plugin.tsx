@@ -26,13 +26,10 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
     }
 
     React.useEffect(() => {
-      const focusIntent = props.field.focusIntent;
-      const shouldFocus = !!focusIntent;
-
-      if (ref.current && shouldFocus) {
+      if (ref.current && props.field.experimental_focusIntent) {
         ref.current.focus();
       }
-    }, [props.field.focusIntent, ref]);
+    }, [props.field.experimental_focusIntent, ref]);
 
     async function onChange(media?: Media | Media[]) {
       if (media) {

@@ -1,5 +1,33 @@
 # next-tinacms-cloudinary
 
+## 17.0.2
+
+### Patch Changes
+
+- Updated dependencies [[`6647240`](https://github.com/tinacms/tinacms/commit/6647240db6cfffcf1efb4fa9799e9c039b929389)]:
+  - tinacms@3.3.2
+
+## 17.0.1
+
+### Patch Changes
+
+- Updated dependencies [[`3fa216c`](https://github.com/tinacms/tinacms/commit/3fa216c110af6417e6b835c49a275b08981e028b), [`7352c96`](https://github.com/tinacms/tinacms/commit/7352c9660869d413a0f48d3fbb003d4c4c0e3d85)]:
+  - tinacms@3.3.1
+
+## 17.0.0
+
+### Patch Changes
+
+- Updated dependencies [[`6c2c48a`](https://github.com/tinacms/tinacms/commit/6c2c48a9d869cb98e78fc656b986ecc244a5dafd)]:
+  - tinacms@3.3.0
+
+## 16.0.0
+
+### Patch Changes
+
+- Updated dependencies [[`a63401a`](https://github.com/tinacms/tinacms/commit/a63401a3dd8271258bc6bfb4cc22593c19e94c7d)]:
+  - tinacms@3.2.0
+
 ## 15.0.3
 
 ### Patch Changes

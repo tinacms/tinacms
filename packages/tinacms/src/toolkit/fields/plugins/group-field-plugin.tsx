@@ -116,7 +116,7 @@ const Header = ({ onClick, children }) => {
     <div className='pt-1 mb-5'>
       <button
         onClick={onClick}
-        className='group px-4 py-3 bg-white hover:bg-gray-50 shadow focus:shadow-outline focus:border-tina-orange-dark w-full border border-gray-100 hover:border-gray-200 text-gray-500 hover:text-tina-orange-dark focus:text-tina-orange-dark rounded flex justify-between items-center gap-2'
+        className='group px-4 py-3 bg-white hover:bg-gray-50 shadow focus:shadow-outline focus:border-blue-500 w-full border border-gray-100 hover:border-gray-200 text-gray-500 hover:text-blue-400 focus:text-blue-500 rounded flex justify-between items-center gap-2'
       >
         <span className='text-left text-base font-medium overflow-hidden text-ellipsis whitespace-nowrap flex-1'>
           {children}

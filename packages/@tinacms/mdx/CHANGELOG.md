@@ -1,5 +1,26 @@
 # @tinacms/mdx
 
+## 2.0.4
+
+### Patch Changes
+
+- Updated dependencies [[`1d4fb88`](https://github.com/tinacms/tinacms/commit/1d4fb88f5dded126cf3c3796e42d26ffb4b62a3a)]:
+  - @tinacms/schema-tools@2.4.0
+
+## 2.0.3
+
+### Patch Changes
+
+- Updated dependencies [[`6c2c48a`](https://github.com/tinacms/tinacms/commit/6c2c48a9d869cb98e78fc656b986ecc244a5dafd)]:
+  - @tinacms/schema-tools@2.3.0
+
+## 2.0.2
+
+### Patch Changes
+
+- Updated dependencies [[`a63401a`](https://github.com/tinacms/tinacms/commit/a63401a3dd8271258bc6bfb4cc22593c19e94c7d)]:
+  - @tinacms/schema-tools@2.2.0
+
 ## 2.0.1
 
 ### Patch Changes

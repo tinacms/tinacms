@@ -765,6 +765,7 @@ export class Database {
       {
         frontmatterFormat: collection?.frontmatterFormat,
         frontmatterDelimiters: collection?.frontmatterDelimiters,
+        yamlMaxLineWidth: collection?.yamlMaxLineWidth,
       }
     );
   };
