@@ -21,6 +21,7 @@ export function useNavigationLock(shouldBlock: boolean): NavigationLockState {
   const currentHashRef = useRef(window.location.hash);
   const isNavigatingRef = useRef(false);
   const isBlockedRef = useRef(false);
+  const isRestoringRef = useRef(false);
 
   // Keep refs in sync
   useEffect(() => {
@@ -40,10 +41,8 @@ export function useNavigationLock(shouldBlock: boolean): NavigationLockState {
       isNavigatingRef.current = true;
       setIsBlocked(false);
       setBlockedUrl(null);
-      // Navigate to the blocked URL
-      window.location.hash = blockedUrl.startsWith('#')
-        ? blockedUrl.slice(1)
-        : blockedUrl;
+      // Navigate to the blocked URL using history.back() since we restored forward
+      window.history.back();
     }
   }, [blockedUrl]);
 
@@ -61,65 +60,44 @@ export function useNavigationLock(shouldBlock: boolean): NavigationLockState {
     // Store the current hash when blocking becomes active
     currentHashRef.current = window.location.hash;
 
-    const handleBeforeNavigate = (newHash: string) => {
+    const handleNavigation = () => {
+      // Skip if we're restoring after blocking
+      if (isRestoringRef.current) {
+        isRestoringRef.current = false;
+        return;
+      }
+
       // Skip if we're intentionally navigating (user clicked "Leave")
       if (isNavigatingRef.current) {
         isNavigatingRef.current = false;
-        currentHashRef.current = newHash;
-        return false;
+        currentHashRef.current = window.location.hash;
+        return;
       }
 
       // Skip if already showing the modal
       if (isBlockedRef.current) {
-        return false;
+        return;
       }
 
-      // Block the navigation
-      if (shouldBlockRef.current) {
+      const newHash = window.location.hash;
+
+      // Check if the hash actually changed
+      if (newHash !== currentHashRef.current && shouldBlockRef.current) {
         // Store the destination and show modal
         setBlockedUrl(newHash);
         setIsBlocked(true);
-        return true; // Indicate we should block
-      }
 
-      return false;
-    };
-
-    const handleHashChange = () => {
-      const newHash = window.location.hash;
-
-      // If the hash changed and we should block, restore it
-      if (
-        newHash !== currentHashRef.current &&
-        handleBeforeNavigate(newHash)
-      ) {
-        // Restore the original hash without triggering another hashchange
-        window.history.replaceState(null, '', currentHashRef.current);
-      } else if (!isBlockedRef.current && !isNavigatingRef.current) {
-        // Normal navigation, update the current hash
-        currentHashRef.current = newHash;
+        // Go forward to restore the original page
+        // This works because back button creates a forward entry
+        isRestoringRef.current = true;
+        window.history.go(1);
       }
     };
 
-    const handlePopState = () => {
-      const newHash = window.location.hash;
-
-      // If navigating to a different hash and we should block
-      if (
-        newHash !== currentHashRef.current &&
-        handleBeforeNavigate(newHash)
-      ) {
-        // Push state to go back to the original location
-        window.history.pushState(null, '', currentHashRef.current);
-      }
-    };
-
-    window.addEventListener('hashchange', handleHashChange);
-    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('popstate', handleNavigation);
 
     return () => {
-      window.removeEventListener('hashchange', handleHashChange);
-      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('popstate', handleNavigation);
     };
   }, [shouldBlock]);
 
