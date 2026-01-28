@@ -22,6 +22,7 @@ export function useNavigationLock(shouldBlock: boolean): NavigationLockState {
   const isNavigatingRef = useRef(false);
   const isBlockedRef = useRef(false);
   const isRestoringRef = useRef(false);
+  const hasGuardEntryRef = useRef(false);
 
   // Keep refs in sync
   useEffect(() => {
@@ -39,10 +40,14 @@ export function useNavigationLock(shouldBlock: boolean): NavigationLockState {
   const proceed = useCallback(() => {
     if (blockedUrl) {
       isNavigatingRef.current = true;
+      hasGuardEntryRef.current = false;
       setIsBlocked(false);
       setBlockedUrl(null);
-      // Navigate to the blocked URL using history.back() since we restored forward
-      window.history.back();
+      // Navigate to the blocked URL
+      const targetHash = blockedUrl.startsWith('#')
+        ? blockedUrl.slice(1)
+        : blockedUrl;
+      window.location.hash = targetHash;
     }
   }, [blockedUrl]);
 
@@ -54,13 +59,20 @@ export function useNavigationLock(shouldBlock: boolean): NavigationLockState {
   useEffect(() => {
     if (!shouldBlock) {
       currentHashRef.current = window.location.hash;
+      hasGuardEntryRef.current = false;
       return;
     }
 
     // Store the current hash when blocking becomes active
     currentHashRef.current = window.location.hash;
 
-    const handleNavigation = () => {
+    // Push a guard entry so we can detect back navigation
+    if (!hasGuardEntryRef.current) {
+      window.history.pushState({ navigationLockGuard: true }, '', window.location.href);
+      hasGuardEntryRef.current = true;
+    }
+
+    const handleNavigation = (event?: PopStateEvent) => {
       // Skip if we're restoring after blocking
       if (isRestoringRef.current) {
         isRestoringRef.current = false;
@@ -71,6 +83,7 @@ export function useNavigationLock(shouldBlock: boolean): NavigationLockState {
       if (isNavigatingRef.current) {
         isNavigatingRef.current = false;
         currentHashRef.current = window.location.hash;
+        hasGuardEntryRef.current = false;
         return;
       }
 
@@ -81,16 +94,18 @@ export function useNavigationLock(shouldBlock: boolean): NavigationLockState {
 
       const newHash = window.location.hash;
 
-      // Check if the hash actually changed
-      if (newHash !== currentHashRef.current && shouldBlockRef.current) {
+      // Check if the hash actually changed or if we hit our guard state
+      const isGuardState = event?.state?.navigationLockGuard === true;
+      const hashChanged = newHash !== currentHashRef.current;
+
+      if ((hashChanged || !isGuardState) && shouldBlockRef.current && newHash !== currentHashRef.current) {
         // Store the destination and show modal
         setBlockedUrl(newHash);
         setIsBlocked(true);
 
-        // Go forward to restore the original page
-        // This works because back button creates a forward entry
+        // Restore the original page
         isRestoringRef.current = true;
-        window.history.go(1);
+        window.history.pushState({ navigationLockGuard: true }, '', currentHashRef.current);
       }
     };
 
