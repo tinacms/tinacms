@@ -210,7 +210,7 @@ export const CreateBranchModal = ({
     } catch (e) {
       console.error(e);
       const errorMessage =
-        e.message && e.message.includes('Branch already exists')
+        e.message && e.message.toLowerCase().includes('already exists')
           ? 'Branch already exists'
           : 'Branch operation failed, please try again. If the problem persists please contact support.';
       setErrorMessage(errorMessage);
