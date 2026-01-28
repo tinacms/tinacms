@@ -4,7 +4,13 @@ import {
   canonicalPath,
   resolveForm,
 } from '@tinacms/schema-tools';
-import { Form, FormBuilder, FormStatus } from '@tinacms/toolkit';
+import {
+  Form,
+  FormBuilder,
+  FormStatus,
+  NavigationLockModal,
+  useNavigationLock,
+} from '@tinacms/toolkit';
 import type { TinaCMS } from '@tinacms/toolkit';
 import {
   FormBreadcrumbs,
@@ -104,6 +110,7 @@ const RenderForm = ({
   mutationInfo;
 }) => {
   const [formIsPristine, setFormIsPristine] = useState(true);
+  const navigationLock = useNavigationLock(!formIsPristine);
   const schema: TinaSchema | undefined = cms.api.tina.schema;
 
   // the schema is being passed in from the frontend so we can use that
@@ -171,6 +178,12 @@ const RenderForm = ({
 
   return (
     <>
+      {navigationLock.isBlocked && (
+        <NavigationLockModal
+          onStay={navigationLock.reset}
+          onLeave={navigationLock.proceed}
+        />
+      )}
       <div
         className={`py-4 px-6 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center`}
       >
