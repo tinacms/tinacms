@@ -21,6 +21,7 @@ export function useNavigationLock(shouldBlock: boolean): NavigationLockState {
   const currentHashRef = useRef(window.location.hash);
   const isNavigatingRef = useRef(false);
   const isBlockedRef = useRef(false);
+  const isRestoringRef = useRef(false);
 
   // Keep refs in sync
   useEffect(() => {
@@ -68,6 +69,12 @@ export function useNavigationLock(shouldBlock: boolean): NavigationLockState {
     const handleHashChange = () => {
       const newHash = window.location.hash;
 
+      // Skip if we're restoring after blocking (prevents infinite loop)
+      if (isRestoringRef.current) {
+        isRestoringRef.current = false;
+        return;
+      }
+
       // Skip if we're intentionally navigating (user clicked "Leave")
       if (isNavigatingRef.current) {
         isNavigatingRef.current = false;
@@ -78,7 +85,8 @@ export function useNavigationLock(shouldBlock: boolean): NavigationLockState {
       // Skip if already showing the modal
       if (isBlockedRef.current) {
         // Restore original hash while modal is open
-        window.history.replaceState(null, '', currentHashRef.current);
+        isRestoringRef.current = true;
+        window.location.hash = currentHashRef.current.replace(/^#/, '');
         return;
       }
 
@@ -88,8 +96,9 @@ export function useNavigationLock(shouldBlock: boolean): NavigationLockState {
         setBlockedUrl(newHash);
         setIsBlocked(true);
 
-        // Restore the original hash
-        window.history.replaceState(null, '', currentHashRef.current);
+        // Navigate back to the original hash (triggers React Router)
+        isRestoringRef.current = true;
+        window.location.hash = currentHashRef.current.replace(/^#/, '');
       }
     };
 
