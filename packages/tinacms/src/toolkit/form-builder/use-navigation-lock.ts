@@ -9,7 +9,7 @@ export interface NavigationLockState {
 
 /**
  * Hook to block navigation when there are unsaved changes.
- * Works with HashRouter by intercepting hash changes and popstate events.
+ * Works with HashRouter by intercepting hashchange events.
  *
  * @param shouldBlock - Whether navigation should be blocked
  * @returns NavigationLockState object with isBlocked, blockedUrl, proceed, and reset
@@ -21,26 +21,26 @@ export function useNavigationLock(shouldBlock: boolean): NavigationLockState {
   const currentHashRef = useRef(window.location.hash);
   const isNavigatingRef = useRef(false);
   const isBlockedRef = useRef(false);
-  const isRestoringRef = useRef(false);
-  const hasGuardEntryRef = useRef(false);
 
   // Keep refs in sync
   useEffect(() => {
     shouldBlockRef.current = shouldBlock;
-    // Only update currentHashRef when not blocked, to preserve the original location
-    if (!isBlockedRef.current) {
-      currentHashRef.current = window.location.hash;
-    }
   }, [shouldBlock]);
 
   useEffect(() => {
     isBlockedRef.current = isBlocked;
   }, [isBlocked]);
 
+  // Update currentHashRef when not blocking
+  useEffect(() => {
+    if (!isBlocked && !shouldBlock) {
+      currentHashRef.current = window.location.hash;
+    }
+  }, [isBlocked, shouldBlock]);
+
   const proceed = useCallback(() => {
     if (blockedUrl) {
       isNavigatingRef.current = true;
-      hasGuardEntryRef.current = false;
       setIsBlocked(false);
       setBlockedUrl(null);
       // Navigate to the blocked URL
@@ -59,60 +59,44 @@ export function useNavigationLock(shouldBlock: boolean): NavigationLockState {
   useEffect(() => {
     if (!shouldBlock) {
       currentHashRef.current = window.location.hash;
-      hasGuardEntryRef.current = false;
       return;
     }
 
     // Store the current hash when blocking becomes active
     currentHashRef.current = window.location.hash;
 
-    // Push a guard entry so we can detect back navigation
-    if (!hasGuardEntryRef.current) {
-      window.history.pushState({ navigationLockGuard: true }, '', window.location.href);
-      hasGuardEntryRef.current = true;
-    }
-
-    const handleNavigation = (event?: PopStateEvent) => {
-      // Skip if we're restoring after blocking
-      if (isRestoringRef.current) {
-        isRestoringRef.current = false;
-        return;
-      }
+    const handleHashChange = () => {
+      const newHash = window.location.hash;
 
       // Skip if we're intentionally navigating (user clicked "Leave")
       if (isNavigatingRef.current) {
         isNavigatingRef.current = false;
-        currentHashRef.current = window.location.hash;
-        hasGuardEntryRef.current = false;
+        currentHashRef.current = newHash;
         return;
       }
 
       // Skip if already showing the modal
       if (isBlockedRef.current) {
+        // Restore original hash while modal is open
+        window.history.replaceState(null, '', currentHashRef.current);
         return;
       }
 
-      const newHash = window.location.hash;
-
-      // Check if the hash actually changed or if we hit our guard state
-      const isGuardState = event?.state?.navigationLockGuard === true;
-      const hashChanged = newHash !== currentHashRef.current;
-
-      if ((hashChanged || !isGuardState) && shouldBlockRef.current && newHash !== currentHashRef.current) {
+      // Check if the hash actually changed
+      if (newHash !== currentHashRef.current && shouldBlockRef.current) {
         // Store the destination and show modal
         setBlockedUrl(newHash);
         setIsBlocked(true);
 
-        // Restore the original page
-        isRestoringRef.current = true;
-        window.history.pushState({ navigationLockGuard: true }, '', currentHashRef.current);
+        // Restore the original hash
+        window.history.replaceState(null, '', currentHashRef.current);
       }
     };
 
-    window.addEventListener('popstate', handleNavigation);
+    window.addEventListener('hashchange', handleHashChange);
 
     return () => {
-      window.removeEventListener('popstate', handleNavigation);
+      window.removeEventListener('hashchange', handleHashChange);
     };
   }, [shouldBlock]);
 
