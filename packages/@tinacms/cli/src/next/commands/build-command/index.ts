@@ -186,6 +186,8 @@ export class BuildCommand extends BaseCommand {
     const skipCloudChecks =
       this.skipCloudChecks || configManager.hasSelfHostedConfig();
 
+    let effectiveProductionUrl = codegen.productionUrl;
+
     if (!skipCloudChecks) {
       try {
         const clientInfo = await this.checkClientInfo(
@@ -199,6 +201,12 @@ export class BuildCommand extends BaseCommand {
               `WARN: Detected bot branch. Using schema/content from default branch '${clientInfo.defaultBranch}' instead of '${configManager.config.branch}'.`
             )}`
           );
+          if (clientInfo.defaultBranch) {
+            effectiveProductionUrl = codegen.productionUrl.replace(
+              `/github/${configManager.config.branch}`,
+              `/github/${clientInfo.defaultBranch}`
+            );
+          }
         }
         if (!clientInfo.hasUpstream && this.upstreamBranch) {
           logger.warn(
@@ -211,7 +219,7 @@ export class BuildCommand extends BaseCommand {
           clientInfo.hasUpstream ||
           (this.previewBaseBranch && this.previewName)
         ) {
-          await this.syncProject(configManager, codegen.productionUrl, {
+          await this.syncProject(configManager, effectiveProductionUrl, {
             upstreamBranch: this.upstreamBranch,
             previewBaseBranch: this.previewBaseBranch,
             previewName: this.previewName,
@@ -219,20 +227,20 @@ export class BuildCommand extends BaseCommand {
         }
         await waitForDB(
           configManager.config,
-          codegen.productionUrl,
+          effectiveProductionUrl,
           this.previewName,
           false
         );
         await this.checkGraphqlSchema(
           configManager,
           database,
-          codegen.productionUrl,
+          effectiveProductionUrl,
           clientInfo.timestamp
         );
         await this.checkTinaSchema(
           configManager,
           database,
-          codegen.productionUrl,
+          effectiveProductionUrl,
           this.previewName,
           this.verbose,
           clientInfo.timestamp
@@ -246,7 +254,7 @@ export class BuildCommand extends BaseCommand {
       }
     }
 
-    await buildProductionSpa(configManager, database, codegen.productionUrl);
+    await buildProductionSpa(configManager, database, effectiveProductionUrl);
 
     // Add the gitignore so the index.html and assets are committed to git
     await fs.outputFile(
