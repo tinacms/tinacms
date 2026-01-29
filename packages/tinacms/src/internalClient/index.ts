@@ -35,7 +35,10 @@ interface TinaSearchConfig {
   fuzzyOptions?: FuzzySearchOptions;
 }
 import gql from 'graphql-tag';
-import { EDITORIAL_WORKFLOW_STATUS } from '../toolkit/form-builder/editorial-workflow-constants';
+import {
+  EDITORIAL_WORKFLOW_STATUS,
+  EditorialWorkflowErrorDetails,
+} from '../toolkit/form-builder/editorial-workflow-constants';
 import { AsyncData, asyncPoll } from './asyncPoll';
 import { LocalAuthProvider, TinaCloudAuthProvider } from './authProvider';
 import { TinaCloudProject } from './types';
@@ -645,7 +648,7 @@ mutation addPendingDocumentMutation(
         console.error('There was an error starting editorial workflow.');
         const error = new Error(
           responseBody?.message || 'Failed to start editorial workflow'
-        ) as Error & { errorCode?: string; conflictingBranch?: string };
+        ) as EditorialWorkflowErrorDetails;
         if (responseBody?.errorCode) {
           error.errorCode = responseBody.errorCode;
         }

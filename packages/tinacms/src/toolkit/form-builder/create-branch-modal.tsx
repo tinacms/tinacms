@@ -16,6 +16,7 @@ import { FieldLabel } from '@toolkit/fields';
 import {
   EDITORIAL_WORKFLOW_STATUS,
   EDITORIAL_WORKFLOW_ERROR,
+  EditorialWorkflowErrorDetails,
 } from './editorial-workflow-constants';
 import {
   CREATE_DOCUMENT_GQL,
@@ -215,7 +216,7 @@ export const CreateBranchModal = ({
       let errorMessage =
         'Branch operation failed, please try again. If the problem persists please contact support.';
 
-      const err = e as Error & { errorCode?: string };
+      const err = e as EditorialWorkflowErrorDetails;
 
       // Check for structured error codes from the API
       if (err.errorCode) {

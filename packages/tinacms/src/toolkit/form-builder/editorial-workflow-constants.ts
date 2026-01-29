@@ -31,3 +31,11 @@ export const EDITORIAL_WORKFLOW_ERROR = {
 
 export type EditorialWorkflowError =
   (typeof EDITORIAL_WORKFLOW_ERROR)[keyof typeof EDITORIAL_WORKFLOW_ERROR];
+
+/**
+ * Error type for editorial workflow operations with additional error details
+ */
+export type EditorialWorkflowErrorDetails = Error & {
+  errorCode?: string;
+  conflictingBranch?: string;
+};
