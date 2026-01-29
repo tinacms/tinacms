@@ -1,5 +1,12 @@
 # next-tinacms-s3
 
+## 18.0.0
+
+### Patch Changes
+
+- Updated dependencies [[`155654c`](https://github.com/tinacms/tinacms/commit/155654ce515ab68a0483cd7e797e9df0a4157431), [`414dc87`](https://github.com/tinacms/tinacms/commit/414dc87ea0e63702d12ec7a3d3e9f4e5527eaa56)]:
+  - tinacms@3.4.0
+
 ## 17.0.2
 
 ### Patch Changes
