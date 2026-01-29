@@ -256,7 +256,7 @@ export class DevCommand extends BaseCommand {
       searchIndexWithFuzzy.fuzzySearchWrapper =
         searchIndexClient.fuzzySearchWrapper;
     }
-    
+
     const browserApiURL = urlBase ? `${urlBase}/graphql` : apiURL;
     const server = await createDevServer(
       configManager,
