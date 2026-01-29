@@ -988,6 +988,16 @@ export interface UICollection<Form = any, CMS = any, TinaForm = any> {
    */
   filename?: {
     /**
+     * A callback function which formats the filename each time the value changes
+     * to enforce naming constraints (the extension is not necessary)
+     *
+     * eg:
+     * ```ts
+     * parse: (value) => value.toLowerCase().split(" ").join("-")
+     * ```
+     */
+    parse?: (filename: string) => string;
+    /**
      * A callback which receives form values as an argument. The return value
      * here will be used as the filename (the extension is not necessary)
      *
