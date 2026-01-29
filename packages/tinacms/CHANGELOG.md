@@ -1,5 +1,11 @@
 # tinacms
 
+## 3.4.0
+
+### Minor Changes
+
+- [#6374](https://github.com/tinacms/tinacms/pull/6374) [`414dc87`](https://github.com/tinacms/tinacms/commit/414dc87ea0e63702d12ec7a3d3e9f4e5527eaa56) Thanks [@Calinator444](https://github.com/Calinator444)! - Added parse field for filename field
+
 ## 3.3.2
 
 ### Patch Changes

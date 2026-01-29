@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.1.23
+
+### Patch Changes
+
+- Updated dependencies [[`414dc87`](https://github.com/tinacms/tinacms/commit/414dc87ea0e63702d12ec7a3d3e9f4e5527eaa56)]:
+  - tinacms@3.4.0
+
 ## 0.1.22
 
 ### Patch Changes
