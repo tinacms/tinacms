@@ -34,6 +34,11 @@ export abstract class BaseCommand extends Command {
     description:
       'Specify a port to run the datalayer server on. (default 9000)',
   });
+  host = Option.String('--host', {
+    description:
+      'Bind to all network interfaces for Docker. Pass a URL (e.g. http://localhost:55077) to specify the external address browsers will use.',
+    tolerateBoolean: true,
+  });
   subCommand = Option.String('-c,--command', {
     description: 'The sub-command to run',
   });

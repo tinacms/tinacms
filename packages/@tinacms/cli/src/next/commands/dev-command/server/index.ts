@@ -16,7 +16,8 @@ export const createDevServer = async (
   searchIndex: any,
   apiURL: string,
   noWatch: boolean,
-  databaseLock: (fn: () => Promise<void>) => Promise<void>
+  databaseLock: (fn: () => Promise<void>) => Promise<void>,
+  host?: string
 ) => {
   const plugins: Plugin[] = [
     transformTsxPlugin({ configManager }),
@@ -36,6 +37,7 @@ export const createDevServer = async (
       apiURL,
       plugins,
       noWatch,
+      host,
       /**
        * Ensure Vite's import scan uses the spaMainPath as the input
        * so it properly finds everything. This is for dev only, and when
