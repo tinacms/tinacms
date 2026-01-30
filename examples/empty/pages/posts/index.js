@@ -18,7 +18,7 @@ const query = `{
 export default function PostsIndex(props) {
   const { data } = useTina({
     query,
-    variables: {},
+    variables: props.variables,
     data: props.data,
   });
 
