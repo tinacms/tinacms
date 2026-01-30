@@ -332,20 +332,16 @@ jobs:
           publishedPackages: ${{ steps.changesets.outputs.publishedPackages }}
         with:
           script: |
-            // Find the merged "Version Packages" PR
-            const { data: prs } = await github.rest.pulls.list({
+            // Find the merged "Version Packages" PR by commit SHA
+            const { data: prs } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              state: 'closed',
-              sort: 'updated',
-              direction: 'desc',
-              per_page: 10
+              commit_sha: context.sha
             });
 
             const versionPR = prs.find(pr =>
               pr.title === 'Version Packages' &&
-              pr.merged_at &&
-              pr.merge_commit_sha === context.sha
+              pr.merged_at
             );
 
             if (!versionPR) {
