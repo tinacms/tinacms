@@ -1,53 +1,50 @@
-import { staticRequest } from 'tinacms'
-
-import Link from 'next/link'
-import { useTina } from 'tinacms/dist/react'
+import Link from 'next/link';
+import { useTina } from 'tinacms/react';
+import client from '../../tina/__generated__/client';
 
 const query = `{
-  getPostList{
+  postConnection {
     edges {
       node {
         id
-        sys {
+        _sys {
           filename
         }
       }
     }
   }
-}`
+}`;
 
-export default function Home(props) {
+export default function PostsIndex(props) {
   const { data } = useTina({
     query,
     variables: {},
     data: props.data,
-  })
+  });
 
-  const postsList = data?.getPostList?.edges
+  const postsList = data?.postConnection?.edges;
   return (
     <>
       <h1>Posts</h1>
       <div>
         {postsList?.map((post) => (
           <div key={post.node.id}>
-            <Link href={`/posts/${post.node.sys.filename}`}>
-              {post.node.sys.filename}
+            <Link href={`/posts/${post.node._sys.filename}`}>
+              {post.node._sys.filename}
             </Link>
           </div>
         ))}
       </div>
     </>
-  )
+  );
 }
 
 export const getStaticProps = async () => {
-  let data = {}
-  const variables = {}
+  let data = {};
+  const variables = {};
   try {
-    data = await staticRequest({
-      query,
-      variables,
-    })
+    const response = await client.request({ query, variables });
+    data = response.data;
   } catch {
     // swallow errors related to document creation
   }
@@ -57,7 +54,6 @@ export const getStaticProps = async () => {
       query,
       variables,
       data,
-      //myOtherProp: 'some-other-data',
     },
-  }
-}
+  };
+};
