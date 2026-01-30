@@ -324,54 +324,66 @@ jobs:
             }
           token: ${{ steps.generate-token.outputs.token }}
 
-      - name: Check for @tinacms/graphql minor or major bump
-        id: graphqlVersion
+      - name: Check for TinaCloud release label
+        id: checkLabel
         if: steps.changesets.outputs.published == 'true'
-        run: |
-          # Check if @tinacms/graphql was published
-          graphqlPackage=$(echo $publishedPackages | jq -r '.[] | select(.name == "@tinacms/graphql")')
-
-          if [ -z "$graphqlPackage" ] || [ "$graphqlPackage" == "null" ]; then
-            echo "❌ @tinacms/graphql not published" >> $GITHUB_STEP_SUMMARY
-            echo "published=false" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-
-          newVersion=$(echo $graphqlPackage | jq -r '.version')
-          echo "📦 @tinacms/graphql published: $newVersion"
-
-          # Get the previous version from npm
-          previousVersion=$(npm view @tinacms/graphql version 2>/dev/null || echo "0.0.0")
-          echo "📦 Previous version: $previousVersion"
-
-          # Extract major and minor versions
-          newMajor=$(echo $newVersion | cut -d. -f1)
-          newMinor=$(echo $newVersion | cut -d. -f2)
-          prevMajor=$(echo $previousVersion | cut -d. -f1)
-          prevMinor=$(echo $previousVersion | cut -d. -f2)
-
-          echo "Comparing: $prevMajor.$prevMinor -> $newMajor.$newMinor"
-
-          # Check if it's a major or minor bump
-          if [ "$newMajor" -gt "$prevMajor" ]; then
-            echo "🚀 Major version bump detected!" >> $GITHUB_STEP_SUMMARY
-            echo "published=true" >> $GITHUB_OUTPUT
-            echo "version=$newVersion" >> $GITHUB_OUTPUT
-            echo "bump_type=major" >> $GITHUB_OUTPUT
-          elif [ "$newMajor" -eq "$prevMajor" ] && [ "$newMinor" -gt "$prevMinor" ]; then
-            echo "🚀 Minor version bump detected!" >> $GITHUB_STEP_SUMMARY
-            echo "published=true" >> $GITHUB_OUTPUT
-            echo "version=$newVersion" >> $GITHUB_OUTPUT
-            echo "bump_type=minor" >> $GITHUB_OUTPUT
-          else
-            echo "ℹ️ Patch version bump only, skipping tinacloud PR" >> $GITHUB_STEP_SUMMARY
-            echo "published=false" >> $GITHUB_OUTPUT
-          fi
+        uses: actions/github-script@v7
         env:
           publishedPackages: ${{ steps.changesets.outputs.publishedPackages }}
+        with:
+          script: |
+            // Find the merged "Version Packages" PR
+            const { data: prs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'closed',
+              sort: 'updated',
+              direction: 'desc',
+              per_page: 10
+            });
+
+            const versionPR = prs.find(pr =>
+              pr.title === 'Version Packages' &&
+              pr.merged_at &&
+              pr.merge_commit_sha === context.sha
+            );
+
+            if (!versionPR) {
+              console.log('No merged "Version Packages" PR found for this commit');
+              core.setOutput('needs_tinacloud_release', 'false');
+              return;
+            }
+
+            console.log(`Found merged PR #${versionPR.number}: ${versionPR.title}`);
+
+            const hasLabel = versionPR.labels.some(label => label.name === 'requires-tinacloud-release');
+
+            if (!hasLabel) {
+              console.log('PR does not have requires-tinacloud-release label');
+              core.setOutput('needs_tinacloud_release', 'false');
+              return;
+            }
+
+            console.log('PR has requires-tinacloud-release label');
+
+            // Get the @tinacms/graphql version from published packages
+            const publishedPackages = JSON.parse(process.env.publishedPackages);
+            const graphqlPackage = publishedPackages.find(pkg => pkg.name === '@tinacms/graphql');
+
+            if (!graphqlPackage) {
+              console.log('@tinacms/graphql not found in published packages');
+              core.setOutput('needs_tinacloud_release', 'false');
+              return;
+            }
+
+            console.log(`@tinacms/graphql version: ${graphqlPackage.version}`);
+            core.setOutput('needs_tinacloud_release', 'true');
+            core.setOutput('version', graphqlPackage.version);
+            core.summary.addRaw(`\n🏷️ Found requires-tinacloud-release label on PR #${versionPR.number}`);
+            await core.summary.write();
 
       - name: Generate token for tinacloud
-        if: steps.graphqlVersion.outputs.published == 'true'
+        if: steps.checkLabel.outputs.needs_tinacloud_release == 'true'
         uses: actions/create-github-app-token@v1
         id: tinacloud-token
         with:
@@ -380,15 +392,14 @@ jobs:
           repositories: tinacloud
 
       - name: Create PR in tinacloud to update @tinacms/graphql
-        if: steps.graphqlVersion.outputs.published == 'true'
+        if: steps.checkLabel.outputs.needs_tinacloud_release == 'true'
         uses: actions/github-script@v7
         with:
           github-token: ${{ steps.tinacloud-token.outputs.token }}
           script: |
-            const version = '${{ steps.graphqlVersion.outputs.version }}';
-            const bumpType = '${{ steps.graphqlVersion.outputs.bump_type }}';
+            const version = '${{ steps.checkLabel.outputs.version }}';
 
-            console.log(`Creating PR in tinacloud for @tinacms/graphql@${version} (${bumpType} bump)`);
+            console.log(`Creating PR in tinacloud for @tinacms/graphql@${version}`);
 
             // Trigger a repository dispatch event in the tinacloud repo
             await github.rest.repos.createDispatchEvent({
@@ -398,14 +409,13 @@ jobs:
               client_payload: {
                 package_name: '@tinacms/graphql',
                 version: version,
-                bump_type: bumpType,
                 source_repo: 'tinacms/tinacms',
                 source_sha: context.sha
               }
             });
 
             console.log('✅ Repository dispatch event sent to tinacloud');
-            core.summary.addRaw(`\n🔄 Triggered @tinacms/graphql update PR in tinacloud (${bumpType} bump to ${version})`);
+            core.summary.addRaw(`\n🔄 Triggered @tinacms/graphql update PR in tinacloud (${version})`);
             await core.summary.write();
 
       - name: Summary
@@ -418,30 +428,6 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && inputs.test_graphql_update == true
     runs-on: ubuntu-latest
     steps:
-      - name: Determine bump type
-        id: bump
-        run: |
-          VERSION="${{ inputs.test_version }}"
-
-          # Get current version from npm
-          CURRENT_VERSION=$(npm view @tinacms/graphql version 2>/dev/null || echo "0.0.0")
-          echo "Current npm version: $CURRENT_VERSION"
-          echo "Test version: $VERSION"
-
-          # Extract major and minor
-          NEW_MAJOR=$(echo $VERSION | cut -d. -f1)
-          NEW_MINOR=$(echo $VERSION | cut -d. -f2)
-          CURR_MAJOR=$(echo $CURRENT_VERSION | cut -d. -f1)
-          CURR_MINOR=$(echo $CURRENT_VERSION | cut -d. -f2)
-
-          if [ "$NEW_MAJOR" -gt "$CURR_MAJOR" ]; then
-            echo "bump_type=major" >> $GITHUB_OUTPUT
-          elif [ "$NEW_MAJOR" -eq "$CURR_MAJOR" ] && [ "$NEW_MINOR" -gt "$CURR_MINOR" ]; then
-            echo "bump_type=minor" >> $GITHUB_OUTPUT
-          else
-            echo "bump_type=patch" >> $GITHUB_OUTPUT
-          fi
-
       - name: Generate token for tinacloud
         uses: actions/create-github-app-token@v1
         id: tinacloud-token
@@ -456,9 +442,8 @@ jobs:
           github-token: ${{ steps.tinacloud-token.outputs.token }}
           script: |
             const version = '${{ inputs.test_version }}';
-            const bumpType = '${{ steps.bump.outputs.bump_type }}';
 
-            console.log(`[TEST] Creating PR in tinacloud for @tinacms/graphql@${version} (${bumpType} bump)`);
+            console.log(`[TEST] Creating PR in tinacloud for @tinacms/graphql@${version}`);
 
             await github.rest.repos.createDispatchEvent({
               owner: 'tinacms',
@@ -467,12 +452,11 @@ jobs:
               client_payload: {
                 package_name: '@tinacms/graphql',
                 version: version,
-                bump_type: bumpType,
                 source_repo: 'tinacms/tinacms',
                 source_sha: context.sha
               }
             });
 
             console.log('✅ Repository dispatch event sent to tinacloud');
-            core.summary.addRaw(`## Test Mode\n\n🔄 Triggered @tinacms/graphql update PR in tinacloud\n- Version: ${version}\n- Bump type: ${bumpType}`);
+            core.summary.addRaw(`## Test Mode\n\n🔄 Triggered @tinacms/graphql update PR in tinacloud\n- Version: ${version}`);
             await core.summary.write();
