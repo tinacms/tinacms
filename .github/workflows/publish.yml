@@ -324,62 +324,8 @@ jobs:
             }
           token: ${{ steps.generate-token.outputs.token }}
 
-      - name: Check for TinaCloud release label
-        id: checkLabel
-        if: steps.changesets.outputs.published == 'true'
-        uses: actions/github-script@v7
-        env:
-          publishedPackages: ${{ steps.changesets.outputs.publishedPackages }}
-        with:
-          script: |
-            // Find the merged "Version Packages" PR by commit SHA
-            const { data: prs } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              commit_sha: context.sha
-            });
-
-            const versionPR = prs.find(pr =>
-              pr.title === 'Version Packages' &&
-              pr.merged_at
-            );
-
-            if (!versionPR) {
-              console.log('No merged "Version Packages" PR found for this commit');
-              core.setOutput('needs_tinacloud_release', 'false');
-              return;
-            }
-
-            console.log(`Found merged PR #${versionPR.number}: ${versionPR.title}`);
-
-            const hasLabel = versionPR.labels.some(label => label.name === 'requires-tinacloud-release');
-
-            if (!hasLabel) {
-              console.log('PR does not have requires-tinacloud-release label');
-              core.setOutput('needs_tinacloud_release', 'false');
-              return;
-            }
-
-            console.log('PR has requires-tinacloud-release label');
-
-            // Get the @tinacms/graphql version from published packages
-            const publishedPackages = JSON.parse(process.env.publishedPackages);
-            const graphqlPackage = publishedPackages.find(pkg => pkg.name === '@tinacms/graphql');
-
-            if (!graphqlPackage) {
-              console.log('@tinacms/graphql not found in published packages');
-              core.setOutput('needs_tinacloud_release', 'false');
-              return;
-            }
-
-            console.log(`@tinacms/graphql version: ${graphqlPackage.version}`);
-            core.setOutput('needs_tinacloud_release', 'true');
-            core.setOutput('version', graphqlPackage.version);
-            core.summary.addRaw(`\n🏷️ Found requires-tinacloud-release label on PR #${versionPR.number}`);
-            await core.summary.write();
-
       - name: Generate token for tinacloud
-        if: steps.checkLabel.outputs.needs_tinacloud_release == 'true'
+        if: steps.changesets.outputs.published == 'true'
         uses: actions/create-github-app-token@v1
         id: tinacloud-token
         with:
@@ -387,31 +333,33 @@ jobs:
           private-key: ${{ secrets.BOT_APP_SECRET }}
           repositories: tinacloud
 
-      - name: Create PR in tinacloud to update @tinacms/graphql
-        if: steps.checkLabel.outputs.needs_tinacloud_release == 'true'
+      - name: Notify tinacloud of published packages
+        if: steps.changesets.outputs.published == 'true'
         uses: actions/github-script@v7
+        env:
+          publishedPackages: ${{ steps.changesets.outputs.publishedPackages }}
         with:
           github-token: ${{ steps.tinacloud-token.outputs.token }}
           script: |
-            const version = '${{ steps.checkLabel.outputs.version }}';
+            const publishedPackages = JSON.parse(process.env.publishedPackages);
 
-            console.log(`Creating PR in tinacloud for @tinacms/graphql@${version}`);
+            console.log(`Notifying tinacloud of ${publishedPackages.length} published packages`);
+            console.log(publishedPackages.map(p => `  ${p.name}@${p.version}`).join('\n'));
 
             // Trigger a repository dispatch event in the tinacloud repo
             await github.rest.repos.createDispatchEvent({
               owner: 'tinacms',
               repo: 'tinacloud',
-              event_type: 'tinacms-graphql-update',
+              event_type: 'tinacms-release',
               client_payload: {
-                package_name: '@tinacms/graphql',
-                version: version,
+                packages: publishedPackages,
                 source_repo: 'tinacms/tinacms',
                 source_sha: context.sha
               }
             });
 
             console.log('✅ Repository dispatch event sent to tinacloud');
-            core.summary.addRaw(`\n🔄 Triggered @tinacms/graphql update PR in tinacloud (${version})`);
+            core.summary.addRaw(`\n🔄 Notified tinacloud of ${publishedPackages.length} published packages`);
             await core.summary.write();
 
       - name: Summary
@@ -420,7 +368,7 @@ jobs:
           echo "❌ Nothing was published" >> $GITHUB_STEP_SUMMARY
 
   # Test job for manually triggering the tinacloud update flow
-  test-graphql-update:
+  test-tinacloud-update:
     if: github.event_name == 'workflow_dispatch' && inputs.test_graphql_update == true
     runs-on: ubuntu-latest
     steps:
@@ -439,20 +387,25 @@ jobs:
           script: |
             const version = '${{ inputs.test_version }}';
 
-            console.log(`[TEST] Creating PR in tinacloud for @tinacms/graphql@${version}`);
+            // Simulate a release with the test version
+            const packages = [
+              { name: '@tinacms/graphql', version: version }
+            ];
+
+            console.log(`[TEST] Notifying tinacloud of test packages:`);
+            packages.forEach(p => console.log(`  ${p.name}@${p.version}`));
 
             await github.rest.repos.createDispatchEvent({
               owner: 'tinacms',
               repo: 'tinacloud',
-              event_type: 'tinacms-graphql-update',
+              event_type: 'tinacms-release',
               client_payload: {
-                package_name: '@tinacms/graphql',
-                version: version,
+                packages: packages,
                 source_repo: 'tinacms/tinacms',
                 source_sha: context.sha
               }
             });
 
             console.log('✅ Repository dispatch event sent to tinacloud');
-            core.summary.addRaw(`## Test Mode\n\n🔄 Triggered @tinacms/graphql update PR in tinacloud\n- Version: ${version}`);
+            core.summary.addRaw(`## Test Mode\n\n🔄 Notified tinacloud of test release\n- @tinacms/graphql@${version}`);
             await core.summary.write();
