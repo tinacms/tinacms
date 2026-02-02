@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 2.5.0
+
+### Minor Changes
+
+- [#6392](https://github.com/tinacms/tinacms/pull/6392) [`4eb9252`](https://github.com/tinacms/tinacms/commit/4eb92520249696007556b52f3c48333bdf8ebf4d) Thanks [@Calinator444](https://github.com/Calinator444)! - Updated type definition for schema tools to include filename.parse
+
 ## 2.4.0
 
 ### Minor Changes
