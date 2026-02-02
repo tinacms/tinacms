@@ -1,5 +1,13 @@
 # tinacms-authjs
 
+## 18.0.1
+
+### Patch Changes
+
+- Updated dependencies [[`4eb9252`](https://github.com/tinacms/tinacms/commit/4eb92520249696007556b52f3c48333bdf8ebf4d)]:
+  - @tinacms/schema-tools@2.5.0
+  - tinacms@3.4.1
+
 ## 18.0.0
 
 ### Patch Changes
