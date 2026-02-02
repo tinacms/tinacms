@@ -269,7 +269,7 @@ jobs:
       - name: Setup git credentials
         run: |
           git config --global user.email "bot@tina.io"
-          git config --global user.name "Tina Realease Bot"
+          git config --global user.name "Tina Release Bot"
 
       - name: Create release pull request or publish packages
         uses: changesets/action@v1
