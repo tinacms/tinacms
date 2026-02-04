@@ -103,7 +103,7 @@ export class Codegen {
     const config = this.tinaSchema.schema.config;
     if (config?.search?.tina) {
       const { indexerToken, ...safeSearchConfig } = config.search.tina;
-      const newConfig: Record<string,unknown> = {};
+      const newConfig: Record<string, unknown> = {};
       for (const key of Object.keys(config)) {
         if (key === 'search') {
           newConfig.search = { tina: safeSearchConfig };
@@ -111,16 +111,16 @@ export class Codegen {
           newConfig[key] = config[key];
         }
       }
-      this.tinaSchema.schema.config = newConfig;
+      this.tinaSchema.schema.config = newConfig as unknown as typeof config;
     } else if (config?.search) {
       // Remove search key if search.tina doesn't exist (preserving key order)
-      const newConfig: Record<string,unknown> = {};
+      const newConfig: Record<string, unknown> = {};
       for (const key of Object.keys(config)) {
         if (key !== 'search') {
           newConfig[key] = config[key];
         }
       }
-      this.tinaSchema.schema.config = newConfig;
+      this.tinaSchema.schema.config = newConfig as unknown as typeof config;
     }
 
     // update _schema.json
