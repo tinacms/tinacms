@@ -103,23 +103,21 @@ export class Codegen {
     const config = this.tinaSchema.schema.config;
     if (config?.search?.tina) {
       const { indexerToken, ...safeSearchConfig } = config.search.tina;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const newConfig: any = {};
+      const newConfig: Record<string,unknown> = {};
       for (const key of Object.keys(config)) {
         if (key === 'search') {
           newConfig.search = { tina: safeSearchConfig };
         } else {
-          newConfig[key] = (config as any)[key];
+          newConfig[key] = config[key];
         }
       }
       this.tinaSchema.schema.config = newConfig;
     } else if (config?.search) {
       // Remove search key if search.tina doesn't exist (preserving key order)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const newConfig: any = {};
+      const newConfig: Record<string,unknown> = {};
       for (const key of Object.keys(config)) {
         if (key !== 'search') {
-          newConfig[key] = (config as any)[key];
+          newConfig[key] = config[key];
         }
       }
       this.tinaSchema.schema.config = newConfig;
