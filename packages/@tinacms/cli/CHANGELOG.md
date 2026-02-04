@@ -1,5 +1,11 @@
 # tinacms-cli
 
+## 2.1.5
+
+### Patch Changes
+
+- [#6398](https://github.com/tinacms/tinacms/pull/6398) [`5345122`](https://github.com/tinacms/tinacms/commit/534512298874359c8ff312521f9857b00c379893) Thanks [@kulesy](https://github.com/kulesy)! - Preserve key order in tinaSchema config while handling search settings
+
 ## 2.1.4
 
 ### Patch Changes
