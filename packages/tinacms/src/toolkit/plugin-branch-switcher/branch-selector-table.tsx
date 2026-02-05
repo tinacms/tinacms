@@ -384,8 +384,8 @@ export default function BranchSelectorTable({
                   <TableRow
                     className={cn(
                       !isComplete && 'bg-gray-50 text-gray-400 hover:!bg-gray-50 cursor-default',
-                      isComplete && isSelected && 'bg-blue-100 hover:bg-blue-100 cursor-pointer',
-                      isComplete && !isSelected && 'cursor-pointer'
+                      isComplete && isSelected && 'bg-blue-100 hover:bg-blue-100 !cursor-pointer',
+                      isComplete && !isSelected && '!cursor-pointer'
                     )}
                     key={row.id}
                     onClick={handleRowClick}
