@@ -5,7 +5,14 @@ import { useCMS } from '@toolkit/react-core';
 import { Button } from '@toolkit/styles';
 import { formatDistanceToNow } from 'date-fns';
 import * as React from 'react';
-import { BiError, BiGitBranch, BiLinkExternal, BiLockAlt, BiPencil, BiSearch } from 'react-icons/bi';
+import {
+  BiError,
+  BiGitBranch,
+  BiLinkExternal,
+  BiLockAlt,
+  BiPencil,
+  BiSearch,
+} from 'react-icons/bi';
 import { FaSpinner } from 'react-icons/fa';
 import { GrCircleQuestion } from 'react-icons/gr';
 import { MdOutlineClear } from 'react-icons/md';
@@ -140,27 +147,35 @@ export default function BranchSelectorTable({
       },
       cell: ({ row }) => {
         const indexingStatus = row.original.indexStatus?.status as Status;
-        return <div className='flex flex-col gap-2'>
-          <div className='flex items-center gap-2'>
-            {row.original.protected ? (
-              <BiLockAlt className='w-4 h-auto opacity-70 text-blue-500 flex-shrink-0' />
-            ) : (
-              <BiGitBranch className='w-4 h-auto opacity-70 text-gray-600 flex-shrink-0' />
-            )}{row.original.name}</div>
-          {currentBranch === row.original.name && (
-            <div className='w-fit mt-1'>
-              <Badge displayIcon={false} calloutStyle='info' className='w-fit flex-shrink-0'>
-                <BiPencil className='w-3 h-auto inline-block mr-1' />
-                Currently editing
-              </Badge>
+        return (
+          <div className='flex flex-col gap-2'>
+            <div className='flex items-center gap-2'>
+              {row.original.protected ? (
+                <BiLockAlt className='w-4 h-auto opacity-70 text-blue-500 flex-shrink-0' />
+              ) : (
+                <BiGitBranch className='w-4 h-auto opacity-70 text-gray-600 flex-shrink-0' />
+              )}
+              {row.original.name}
             </div>
-          )}
-          {indexingStatus && indexingStatus !== 'complete' && (
-            <div className='w-fit mt-1'>
-              <IndexStatus indexingStatus={indexingStatus} />
-            </div>
-          )}
-        </div>;
+            {currentBranch === row.original.name && (
+              <div className='w-fit mt-1'>
+                <Badge
+                  displayIcon={false}
+                  calloutStyle='info'
+                  className='w-fit flex-shrink-0'
+                >
+                  <BiPencil className='w-3 h-auto inline-block mr-1' />
+                  Currently editing
+                </Badge>
+              </div>
+            )}
+            {indexingStatus && indexingStatus !== 'complete' && (
+              <div className='w-fit mt-1'>
+                <IndexStatus indexingStatus={indexingStatus} />
+              </div>
+            )}
+          </div>
+        );
       },
     },
     {
@@ -204,12 +219,7 @@ export default function BranchSelectorTable({
         );
       },
       header: ({ column }) => {
-        return (
-          <div
-            className='text-gray-700 font-bold'>
-            Pull Request
-          </div>
-        );
+        return <div className='text-gray-700 font-bold'>Pull Request</div>;
       },
     },
   ];
@@ -315,13 +325,16 @@ export default function BranchSelectorTable({
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id} className='hover:bg-transparent'>
                   {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id} className='sticky top-0 bg-gray-100 shadow-[inset_0_-2px_0_0_#e5e7eb] z-10'>
+                    <TableHead
+                      key={header.id}
+                      className='sticky top-0 bg-gray-100 shadow-[inset_0_-2px_0_0_#e5e7eb] z-10'
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                     </TableHead>
                   ))}
                 </TableRow>
@@ -342,7 +355,11 @@ export default function BranchSelectorTable({
                         {currentBranchData.name}
                       </div>
                       <div className='w-fit mt-1'>
-                        <Badge displayIcon={false} calloutStyle='info' className='w-fit flex-shrink-0'>
+                        <Badge
+                          displayIcon={false}
+                          calloutStyle='info'
+                          className='w-fit flex-shrink-0'
+                        >
                           <BiPencil className='w-3 h-auto inline-block mr-1' />
                           Currently editing
                         </Badge>
@@ -352,7 +369,9 @@ export default function BranchSelectorTable({
                   <TableCell>
                     {currentBranchData.indexStatus?.timestamp && (
                       <div>
-                        {formatDistanceToNow(new Date(currentBranchData.indexStatus.timestamp))}
+                        {formatDistanceToNow(
+                          new Date(currentBranchData.indexStatus.timestamp)
+                        )}
                       </div>
                     )}
                   </TableCell>
@@ -367,7 +386,8 @@ export default function BranchSelectorTable({
               )}
               {/* Other branches, sorted by react-table */}
               {table.getRowModel().rows.map((row) => {
-                const indexingStatus = row.original.indexStatus?.status as Status;
+                const indexingStatus = row.original.indexStatus
+                  ?.status as Status;
                 const isComplete = indexingStatus === 'complete';
                 const isSelected = selectedBranch === row.original.name;
 
@@ -381,8 +401,11 @@ export default function BranchSelectorTable({
                 return (
                   <TableRow
                     className={cn(
-                      !isComplete && 'bg-gray-50 text-gray-400 hover:!bg-gray-50 cursor-default',
-                      isComplete && isSelected && 'bg-blue-100 hover:bg-blue-100 !cursor-pointer',
+                      !isComplete &&
+                        'bg-gray-50 text-gray-400 hover:!bg-gray-50 cursor-default',
+                      isComplete &&
+                        isSelected &&
+                        'bg-blue-100 hover:bg-blue-100 !cursor-pointer',
                       isComplete && !isSelected && '!cursor-pointer'
                     )}
                     key={row.id}
@@ -495,7 +518,10 @@ const PullRequestCell = ({
 
   if (creatingPR) {
     return (
-      <div className='flex items-center gap-2' onClick={(e) => e.stopPropagation()}>
+      <div
+        className='flex items-center gap-2'
+        onClick={(e) => e.stopPropagation()}
+      >
         <FaSpinner className='w-3 h-auto animate-spin text-blue-500' />
         <span className='text-sm text-blue-500'>Creating PR...</span>
       </div>
