@@ -5,7 +5,7 @@ import { useCMS } from '@toolkit/react-core';
 import { Button } from '@toolkit/styles';
 import { formatDistanceToNow } from 'date-fns';
 import * as React from 'react';
-import { BiGitBranch, BiLinkExternal, BiLockAlt, BiSearch } from 'react-icons/bi';
+import { BiGitBranch, BiLinkExternal, BiLockAlt, BiPencil, BiSearch } from 'react-icons/bi';
 import { FaSpinner } from 'react-icons/fa';
 import { MdOutlineClear } from 'react-icons/md';
 import { Branch } from './types';
@@ -31,7 +31,7 @@ import {
 } from '@toolkit/components/ui/table';
 import { ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
 import { cn } from '../../lib/utils';
-
+import { Badge } from '@toolkit/react-sidebar/components/badge';
 interface BranchSelectorTableProps {
   branchList: Branch[];
   currentBranch: string;
@@ -59,28 +59,46 @@ export default function BranchSelectorTable({
   );
 
   const cms = useCMS();
+  console.log(currentBranch);
 
   const columns: ColumnDef<Branch>[] = [
     {
       accessorKey: 'name',
       header: ({ column }) => {
+        const sorted = column.getIsSorted();
         return (
-          <Button
-            variant='ghost'
-            className='!px-0 hover:border-transparent hover:shadow-none focus:ring-0 text-gray-700'
+          <button
+            className='text-gray-700 cursor-pointer font-bold flex items-center gap-1'
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
             Branch Name
-          </Button>
+            {sorted === 'asc' ? (
+              <ArrowUp className='ml-2 h-4 w-4' />
+            ) : sorted === 'desc' ? (
+              <ArrowDown className='ml-2 h-4 w-4' />
+            ) : (
+              <ArrowUpDown className='ml-2 h-4 w-4' />
+            )}
+          </button>
         );
       },
       cell: ({ row }) => {
-        return <div className='flex items-center gap-2'>
+        return <div className='flex flex-col gap-2'>
+          <div className='flex items-center gap-2'>
             {row.original.protected ? (
               <BiLockAlt className='w-4 h-auto opacity-70 text-blue-500 flex-shrink-0' />
             ) : (
               <BiGitBranch className='w-4 h-auto opacity-70 text-gray-600 flex-shrink-0' />
-            )}{row.original.name}</div>;
+            )}{row.original.name}</div>
+          {currentBranch === row.original.name && (
+            <div className='w-fit mt-1'>
+              <Badge displayIcon={false} calloutStyle='info' className='w-fit flex-shrink-0'>
+                <BiPencil className='w-3 h-auto inline-block mr-1' />
+                Currently editing
+              </Badge>
+            </div>
+          )}
+        </div>;
       },
     },
     {
@@ -96,9 +114,8 @@ export default function BranchSelectorTable({
       header: ({ column }) => {
         const sorted = column.getIsSorted();
         return (
-          <Button
-            variant='ghost'
-            className='!px-0 hover:border-transparent hover:shadow-none focus:ring-0 text-gray-700'
+          <button
+            className='text-gray-700 cursor-pointer font-bold flex items-center gap-1'
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
             Last Updated
@@ -109,7 +126,7 @@ export default function BranchSelectorTable({
             ) : (
               <ArrowUpDown className='ml-2 h-4 w-4' />
             )}
-          </Button>
+          </button>
         );
       },
     },
@@ -124,12 +141,29 @@ export default function BranchSelectorTable({
           />
         );
       },
-      header: 'Pull Request',
+      header: ({ column }) => {
+        return (
+          <div
+            className='text-gray-700 font-bold'>
+            Pull Request
+          </div>
+        );
+      },
     },
   ];
 
+  // Sort data so current branch is always first
+  const sortedData = React.useMemo(() => {
+    if (!currentBranch) return branchList;
+    return [...branchList].sort((a, b) => {
+      if (a.name === currentBranch) return -1;
+      if (b.name === currentBranch) return 1;
+      return 0;
+    });
+  }, [branchList, currentBranch]);
+
   const table = useReactTable({
-    data: branchList,
+    data: sortedData,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -219,18 +253,18 @@ export default function BranchSelectorTable({
       )}
       {filteredBranchList.length > 0 && (
         <TooltipProvider>
-          <Table className='border rounded-md overflow-x-hidden overflow-y-auto'>
-            <TableHeader className='bg-gray-100 !text-gray-700 border-b-2 border-gray-200 rounded-t-md'>
+          <Table wrapperClassName='border border-gray-200 rounded-md overflow-hidden'>
+            <TableHeader className='bg-gray-100 text-gray-700 border-b-2 border-gray-200'>
               {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
+                <TableRow key={headerGroup.id} className='hover:bg-transparent'>
                   {headerGroup.headers.map((header) => (
                     <TableHead key={header.id}>
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   ))}
                 </TableRow>
@@ -240,13 +274,14 @@ export default function BranchSelectorTable({
               {table.getRowModel().rows.map((row) => (
                 <TableRow
                   className={cn(
-                    selectedBranch === row.original.name
-                      ? 'bg-blue-100 hover:bg-blue-100'
-                      : '',
-                    'cursor-pointer'
+                    currentBranch === row.original.name &&
+                    'bg-transparent hover:!bg-transparent',
+                    selectedBranch === row.original.name &&
+                    'bg-blue-100 hover:bg-blue-100',
+                    currentBranch !== row.original.name && 'cursor-pointer'
                   )}
                   key={row.id}
-                  onClick={() => setSelectedBranch(row.original.name)}
+                  onClick={(currentBranch !== row.original.name) ? () => setSelectedBranch(row.original.name) : undefined}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
