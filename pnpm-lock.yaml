@@ -454,8 +454,8 @@ catalogs:
       specifier: ^1.0.6
       version: 1.0.6
     jsonpath-plus:
-      specifier: 10.1.0
-      version: 10.1.0
+      specifier: ^10.3.0
+      version: 10.3.0
     lowlight:
       specifier: ^3.3.0
       version: 3.3.0
@@ -1532,7 +1532,7 @@ importers:
         version: 3.14.2
       jsonpath-plus:
         specifier: 'catalog:'
-        version: 10.1.0
+        version: 10.3.0
       many-level:
         specifier: 'catalog:'
         version: 2.0.0
@@ -10525,8 +10525,8 @@ packages:
   jsonfile@6.2.0:
     resolution: {integrity: sha512-FGuPw30AdOIUTRMC2OMRtQV+jkVj2cfPqSeWXv1NEAJ1qZ5zb1X6z1mFhbfOB/iy3ssJCD+3KuZ8r8C3uVFlAg==}
 
-  jsonpath-plus@10.1.0:
-    resolution: {integrity: sha512-gHfV1IYqH8uJHYVTs8BJX1XKy2/rR93+f8QQi0xhx95aCiXn1ettYAd5T+7FU6wfqyDoX/wy0pm/fL3jOKJ9Lg==}
+  jsonpath-plus@10.3.0:
+    resolution: {integrity: sha512-8TNmfeTCk2Le33A3vRRwtuworG/L5RrgMvdjhKZxvyShO+mBu2fP50OWUjRLNtvw344DdDarFh9buFAZs5ujeA==}
     engines: {node: '>=18.0.0'}
     hasBin: true
 
@@ -24180,7 +24180,7 @@ snapshots:
     optionalDependencies:
       graceful-fs: 4.2.11
 
-  jsonpath-plus@10.1.0:
+  jsonpath-plus@10.3.0:
     dependencies:
       '@jsep-plugin/assignment': 1.3.0(jsep@1.4.0)
       '@jsep-plugin/regex': 1.0.4(jsep@1.4.0)
