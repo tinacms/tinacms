@@ -384,7 +384,7 @@ const SidebarHeader = ({ isLocalMode }) => {
             </button>
             <TinaIcon className='self-center h-10 min-w-10 w-auto text-orange-500 mr-2' />
             <BranchButton className='overflow-hidden mr-2' />
-            {/* <LocalWarning className='px-4' /> */}
+            <LocalWarning className='px-4' />
           </div>
 
           <div className='flex'>

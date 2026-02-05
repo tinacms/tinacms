@@ -16,16 +16,13 @@ export const BranchButton = ({ className = '' }) => {
   const { currentBranch } = useBranchData();
 
   const cms = useCMS();
-  // MOCK: Override branch-switcher flag for testing - REMOVE AFTER TESTING
-  const branchingEnabled = true; // was: cms.flags.get('branch-switcher');
+  const branchingEnabled = cms.flags.get('branch-switcher');
 
-  // MOCK: Commented out for testing - REMOVE AFTER TESTING
-  // if (!branchingEnabled) {
-  //   return null;
-  // }
+  if (!branchingEnabled) {
+    return null;
+  }
 
-  // MOCK: Safe fallback for local mode - REMOVE AFTER TESTING
-  const isProtected = cms.api?.tina?.usingProtectedBranch?.() ?? false;
+  const isProtected = cms.api.tina.usingProtectedBranch();
 
   return (
     <>

@@ -17,7 +17,6 @@ import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
-  getPaginationRowModel,
   useReactTable,
   SortingState,
   getSortedRowModel,
@@ -117,7 +116,6 @@ export default function BranchSelectorTable({
   );
 
   const cms = useCMS();
-  console.log(currentBranch);
 
   const columns: ColumnDef<Branch>[] = [
     {

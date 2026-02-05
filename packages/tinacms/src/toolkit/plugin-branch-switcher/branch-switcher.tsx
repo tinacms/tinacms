@@ -29,15 +29,6 @@ import {
   TooltipTrigger,
 } from '@toolkit/fields/plugins/mdx-field-plugin/plate/components/plate-ui/tooltip';
 
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  useReactTable,
-  SortingState,
-  getSortedRowModel,
-} from '@tanstack/react-table';
 import BranchSelectorTable from './branch-selector-table';
 
 type ListState = 'loading' | 'ready' | 'error';
@@ -53,8 +44,7 @@ export function formatBranchName(str: string): string {
 
 export const BranchSwitcher = (props: BranchSwitcherProps) => {
   const cms = useCMS();
-  // MOCK: Force editorial workflow for testing - REMOVE AFTER TESTING
-  const usingEditorialWorkflow = true; // was: cms.api.tina.usingEditorialWorkflow;
+  const usingEditorialWorkflow = cms.api.tina.usingEditorialWorkflow;
   if (usingEditorialWorkflow) {
     return <EditoralBranchSwitcher {...props} />;
   } else {
@@ -69,125 +59,7 @@ export const EditoralBranchSwitcher = ({
   setModalTitle,
 }: BranchSwitcherProps) => {
   const cms = useCMS();
-  // MOCK: Override local mode check for testing - REMOVE AFTER TESTING
-  const isLocalMode = false; // was: cms.api?.tina?.isLocalMode;
-
-  // MOCK DATA - REMOVE AFTER TESTING
-  const mockBranches: Branch[] = [
-    {
-      name: 'main',
-      protected: true,
-      indexStatus: { status: 'complete', timestamp: Date.now() - 86400000 },
-    },
-    {
-      name: 'tina/homepage-update',
-      protected: false,
-      indexStatus: { status: 'complete', timestamp: Date.now() - 3600000 },
-      githubPullRequestUrl: 'https://github.com/org/repo/pull/42',
-    },
-    {
-      name: 'tina/new-blog-post',
-      protected: false,
-      indexStatus: { status: 'complete', timestamp: Date.now() - 7200000 },
-    },
-    {
-      name: 'tina/footer-changes',
-      protected: false,
-      indexStatus: { status: 'inprogress', timestamp: Date.now() - 1800000 },
-    },
-    {
-      name: 'tina/broken-index',
-      protected: false,
-      indexStatus: { status: 'failed', timestamp: Date.now() - 172800000 },
-    },
-    {
-      name: 'develop',
-      protected: true,
-      indexStatus: { status: 'complete', timestamp: Date.now() - 43200000 },
-      githubPullRequestUrl: 'https://github.com/org/repo/pull/99',
-    },
-    {
-      name: 'tina/unknown-status',
-      protected: false,
-      indexStatus: { status: 'unknown', timestamp: Date.now() },
-    },
-    {
-      name: 'tina/header-redesign',
-      protected: false,
-      indexStatus: { status: 'complete', timestamp: Date.now() - 259200000 },
-      githubPullRequestUrl: 'https://github.com/org/repo/pull/103',
-    },
-    {
-      name: 'tina/navigation-menu',
-      protected: false,
-      indexStatus: { status: 'complete', timestamp: Date.now() - 432000000 },
-    },
-    {
-      name: 'tina/about-page-content',
-      protected: false,
-      indexStatus: { status: 'complete', timestamp: Date.now() - 518400000 },
-      githubPullRequestUrl: 'https://github.com/org/repo/pull/87',
-    },
-    {
-      name: 'tina/contact-form-update',
-      protected: false,
-      indexStatus: { status: 'complete', timestamp: Date.now() - 604800000 },
-    },
-    {
-      name: 'tina/seo-improvements',
-      protected: false,
-      indexStatus: { status: 'complete', timestamp: Date.now() - 691200000 },
-    },
-    {
-      name: 'tina/image-gallery',
-      protected: false,
-      indexStatus: { status: 'complete', timestamp: Date.now() - 777600000 },
-      githubPullRequestUrl: 'https://github.com/org/repo/pull/156',
-    },
-    {
-      name: 'tina/testimonials-section',
-      protected: false,
-      indexStatus: { status: 'complete', timestamp: Date.now() - 864000000 },
-    },
-    {
-      name: 'tina/pricing-page',
-      protected: false,
-      indexStatus: { status: 'complete', timestamp: Date.now() - 950400000 },
-    },
-    {
-      name: 'tina/this-is-a-very-long-branch-name-that-should-wrap-to-the-next-line-or-maybe-not-it-could-breka-the-entire-bloody-table-then-id-have-to-fix-the-ui-to-not-break-the-table-entirely',
-      protected: false,
-      indexStatus: { status: 'complete', timestamp: Date.now() - 950400000 },
-    },
-    {
-      name: 'staging',
-      protected: true,
-      indexStatus: { status: 'complete', timestamp: Date.now() - 1036800000 },
-    },
-    {
-      name: 'tina/faq-updates',
-      protected: false,
-      indexStatus: { status: 'complete', timestamp: Date.now() - 1123200000 },
-      githubPullRequestUrl: 'https://github.com/org/repo/pull/201',
-    },
-    {
-      name: 'tina/blog-categories',
-      protected: false,
-      indexStatus: { status: 'complete', timestamp: Date.now() - 1209600000 },
-    },
-    {
-      name: 'tina/mobile-responsive-fixes',
-      protected: false,
-      indexStatus: { status: 'timeout', timestamp: Date.now() - 1296000000 },
-    },
-    {
-      name: 'tina/dark-mode-support',
-      protected: false,
-      indexStatus: { status: 'complete', timestamp: Date.now() - 1382400000 },
-      githubPullRequestUrl: 'https://github.com/org/repo/pull/245',
-    },
-  ];
-  const mockListBranches = () => Promise.resolve(mockBranches);
+  const isLocalMode = cms.api?.tina?.isLocalMode;
   const [viewState, setViewState] = React.useState<'list' | 'create'>('list');
   const [listState, setListState] = React.useState<ListState>('loading');
   const [branchList, setBranchList] = React.useState([] as Branch[]);
@@ -231,8 +103,7 @@ export const EditoralBranchSwitcher = ({
 
   const refreshBranchList = React.useCallback(async () => {
     setListState('loading');
-    // MOCK: Using mockListBranches instead - REMOVE AFTER TESTING
-    await mockListBranches() // was: listBranches()
+    await listBranches()
       .then((data: Branch[]) => {
         setBranchList(data);
         setListState('ready');
@@ -247,9 +118,6 @@ export const EditoralBranchSwitcher = ({
 
   // Keep branch list up to date
   React.useEffect(() => {
-    // MOCK: Skip polling for index status - REMOVE AFTER TESTING
-    return;
-
     if (listState === 'ready') {
       const cancelFuncs = [];
       // update all branches that have indexing status of 'inprogress' or 'unknown'
