@@ -424,44 +424,6 @@ export default function BranchSelectorTable({
               })}
             </TableBody>
           </Table>
-          {/* <div className='rounded-lg border border-gray-200 overflow-hidden'>
-            <div className='min-w-[192px] max-h-[24rem] overflow-y-auto w-full h-full shadow-inner bg-white'>
-              <table className='w-full table-auto max-h-[24rem]'>
-                <thead className='sticky top-0 z-20 bg-gray-100 border-b-2 border-gray-200'>
-                  <tr>
-                    <th className={`${tableHeadingStyle} w-auto`}>
-                      Branch Name
-                    </th>
-                    <th
-                      className={`${tableHeadingStyle} w-0 whitespace-nowrap text-left`}
-                    >
-                      Last Updated
-                    </th>
-                    <th
-                      className={`${tableHeadingStyle} w-0 whitespace-nowrap text-left`}
-                    >
-                      Pull Request
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredBranchList.map((branch) => (
-                    <BranchItem
-                      key={branch.name}
-                      branch={branch}
-                      currentBranch={currentBranch}
-                      onChange={onChange}
-                      refreshBranchList={refreshBranchList}
-                      previewFunction={previewFunction}
-                      cms={cms}
-                      selectedBranch={selectedBranch}
-                      onSelectBranch={setSelectedBranch}
-                    />
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div> */}
         </TooltipProvider>
       )}
       <div className='flex justify-end'>
