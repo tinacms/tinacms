@@ -10,9 +10,8 @@ import {
   Form,
   FormBuilder,
   FormStatus,
-  NavigationLockModal,
   TinaForm,
-  useNavigationLock,
+  useNavigationBlocker,
   wrapFieldsWithMeta,
 } from '@tinacms/toolkit';
 import React, { useMemo, useState } from 'react';
@@ -153,7 +152,7 @@ export const RenderForm = ({
 }) => {
   const navigate = useNavigate();
   const [formIsPristine, setFormIsPristine] = useState(true);
-  const navigationLock = useNavigationLock(!formIsPristine);
+  useNavigationBlocker(!formIsPristine);
   const schema: TinaSchema | undefined = cms.api.tina.schema;
 
   // the schema is being passed in from the frontend so we can use that
@@ -357,12 +356,6 @@ export const RenderForm = ({
   return (
     <PageWrapper headerClassName='bg-white'>
       <>
-        {navigationLock.isBlocked && (
-          <NavigationLockModal
-            onStay={navigationLock.reset}
-            onLeave={navigationLock.proceed}
-          />
-        )}
         <div
           className={`py-4 px-6 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center`}
         >

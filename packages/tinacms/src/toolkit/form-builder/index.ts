@@ -10,4 +10,5 @@ export * from './form-actions';
 export * from './create-branch-modal';
 export * from './navigation-lock-modal';
 export * from './use-navigation-lock';
+export * from './navigation-lock-context';
 export type { FieldRenderProps } from 'react-final-form';
