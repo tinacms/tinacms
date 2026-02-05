@@ -155,6 +155,11 @@ export const EditoralBranchSwitcher = ({
       indexStatus: { status: 'complete', timestamp: Date.now() - 950400000 },
     },
     {
+      name: 'tina/this-is-a-very-long-branch-name-that-should-wrap-to-the-next-line-or-maybe-not-it-could-breka-the-entire-bloody-table-then-id-have-to-fix-the-ui-to-not-break-the-table-entirely',
+      protected: false,
+      indexStatus: { status: 'complete', timestamp: Date.now() - 950400000 },
+    },
+    {
       name: 'staging',
       protected: true,
       indexStatus: { status: 'complete', timestamp: Date.now() - 1036800000 },

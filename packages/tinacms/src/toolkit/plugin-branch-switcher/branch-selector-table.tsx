@@ -313,11 +313,11 @@ export default function BranchSelectorTable({
       {filteredBranchList.length > 0 && (
         <TooltipProvider>
           <Table wrapperClassName='border border-gray-200 rounded-md max-h-96'>
-            <TableHeader className='bg-gray-100 text-gray-700 border-b-2 border-gray-200'>
+            <TableHeader className='bg-gray-100 text-gray-700'>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id} className='hover:bg-transparent'>
                   {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id} className='sticky top-0 bg-gray-100 z-10'>
+                    <TableHead key={header.id} className='sticky top-0 bg-gray-100 shadow-[inset_0_-2px_0_0_#e5e7eb] z-10'>
                       {header.isPlaceholder
                         ? null
                         : flexRender(
