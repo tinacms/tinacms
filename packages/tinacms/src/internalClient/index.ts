@@ -37,7 +37,9 @@ interface TinaSearchConfig {
 import gql from 'graphql-tag';
 import {
   EDITORIAL_WORKFLOW_STATUS,
+  EDITORIAL_WORKFLOW_ERROR,
   EditorialWorkflowErrorDetails,
+  BranchNotFoundError,
 } from '../toolkit/form-builder/editorial-workflow-constants';
 import { AsyncData, asyncPoll } from './asyncPoll';
 import { LocalAuthProvider, TinaCloudAuthProvider } from './authProvider';
@@ -303,6 +305,26 @@ mutation addPendingDocumentMutation(
       if (resBody.message) {
         errorMessage = `${errorMessage}, Response: ${resBody.message}`;
       }
+
+      // Check for branch not found scenarios (404 or specific error messages)
+      const isBranchNotFound =
+        res.status === 404 ||
+        (resBody.message &&
+          (resBody.message.toLowerCase().includes('branch') ||
+            resBody.message.toLowerCase().includes('not found') ||
+            resBody.message.toLowerCase().includes('reference')));
+
+      if (
+        !this.isCustomContentApi &&
+        this.branch !== 'main' &&
+        isBranchNotFound
+      ) {
+        throw new BranchNotFoundError(
+          `The branch "${decodeURIComponent(this.branch)}" no longer exists. It may have been merged or deleted.`,
+          decodeURIComponent(this.branch)
+        );
+      }
+
       if (!this.isCustomContentApi) {
         errorMessage = `${errorMessage}, Please check that the following information is correct: \n\tclientId: ${this.options.clientId}\n\tbranch: ${this.branch}.`;
         if (this.branch !== 'main') {

@@ -12,8 +12,10 @@ import {
   FormStatus,
   TinaForm,
   wrapFieldsWithMeta,
+  BranchRecoveryModal,
+  BranchNotFoundError,
 } from '@tinacms/toolkit';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { TinaCMS } from '@tinacms/toolkit';
 import { FormBreadcrumbs } from '@toolkit/react-sidebar/components/sidebar-body';
@@ -24,6 +26,7 @@ import GetCMS from '../components/GetCMS';
 import GetCollection from '../components/GetCollection';
 import { PageWrapper } from '../components/Page';
 import { useCollectionFolder } from './utils';
+import { useBranchData } from '@toolkit/plugin-branch-switcher';
 
 const createDocument = async (
   cms: TinaCMS,
@@ -151,7 +154,22 @@ export const RenderForm = ({
 }) => {
   const navigate = useNavigate();
   const [formIsPristine, setFormIsPristine] = useState(true);
+  const [branchRecoveryState, setBranchRecoveryState] = useState<{
+    isOpen: boolean;
+    branchName: string;
+    values: Record<string, unknown>;
+  } | null>(null);
+  const { setCurrentBranch } = useBranchData();
   const schema: TinaSchema | undefined = cms.api.tina.schema;
+
+  const handleDiscardChanges = useCallback(() => {
+    // Switch back to the main/protected branch
+    const mainBranch = cms.api.tina.protectedBranches[0] || 'main';
+    setCurrentBranch(mainBranch);
+    cms.alerts.info('Changes discarded. Switched to main branch.');
+    // Navigate back to the collection list
+    navigate(`/collections/${collection.name}`);
+  }, [cms, setCurrentBranch, navigate, collection.name]);
 
   // the schema is being passed in from the frontend so we can use that
   const schemaCollection = schema.getCollection(collection.name);
@@ -315,6 +333,18 @@ export const RenderForm = ({
           }, 10);
         } catch (error) {
           console.error(error);
+
+          // Check if this is a branch not found error
+          if (error instanceof BranchNotFoundError) {
+            setBranchRecoveryState({
+              isOpen: true,
+              branchName: error.branchName,
+              values: values as Record<string, unknown>,
+            });
+            // Don't show the generic error dialog for branch not found
+            return;
+          }
+
           const defaultErrorText = 'There was a problem saving your document.';
           if (error.message.includes('already exists')) {
             cms.alerts.error(
@@ -355,6 +385,16 @@ export const RenderForm = ({
   return (
     <PageWrapper headerClassName='bg-white'>
       <>
+        {branchRecoveryState?.isOpen && (
+          <BranchRecoveryModal
+            close={() => setBranchRecoveryState(null)}
+            onDiscard={handleDiscardChanges}
+            path={form.path}
+            values={branchRecoveryState.values}
+            crudType='create'
+            missingBranchName={branchRecoveryState.branchName}
+          />
+        )}
         <div
           className={`py-4 px-6 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center`}
         >
