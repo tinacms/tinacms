@@ -5,8 +5,9 @@ import { useCMS } from '@toolkit/react-core';
 import { Button } from '@toolkit/styles';
 import { formatDistanceToNow } from 'date-fns';
 import * as React from 'react';
-import { BiGitBranch, BiLinkExternal, BiLockAlt, BiPencil, BiSearch } from 'react-icons/bi';
+import { BiError, BiGitBranch, BiLinkExternal, BiLockAlt, BiPencil, BiSearch } from 'react-icons/bi';
 import { FaSpinner } from 'react-icons/fa';
+import { GrCircleQuestion } from 'react-icons/gr';
 import { MdOutlineClear } from 'react-icons/md';
 import { Branch } from './types';
 import { TooltipProvider } from '@toolkit/fields/plugins/mdx-field-plugin/plate/components/plate-ui/tooltip';
@@ -32,6 +33,66 @@ import {
 import { ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Badge } from '@toolkit/react-sidebar/components/badge';
+
+type Status = 'failed' | 'unknown' | 'complete' | 'inprogress' | 'timeout';
+
+const IndexStatus = ({ indexingStatus }: { indexingStatus: Status }) => {
+  const styles: {
+    [key in Status]: {
+      classes: string;
+      content: () => JSX.Element;
+    };
+  } = {
+    complete: {
+      classes: '',
+      content: () => <></>,
+    },
+    unknown: {
+      classes: 'text-blue-500 border-blue-500',
+      content: () => (
+        <>
+          <GrCircleQuestion className='w-3 h-auto' />
+          <span>{`Unknown`}</span>
+        </>
+      ),
+    },
+    inprogress: {
+      classes: 'text-blue-500 border-blue-500',
+      content: () => (
+        <>
+          <FaSpinner className='w-3 h-auto animate-spin' />
+          <span>{`Indexing`}</span>
+        </>
+      ),
+    },
+    failed: {
+      classes: 'text-red-500 border-red-500',
+      content: () => (
+        <>
+          <BiError className='w-3 h-auto' />
+          <span>{`Indexing failed`}</span>
+        </>
+      ),
+    },
+    timeout: {
+      classes: 'text-red-500 border-red-500',
+      content: () => (
+        <>
+          <BiError className='w-3 h-auto' />
+          <span>{`Indexing timed out`}</span>
+        </>
+      ),
+    },
+  };
+  return (
+    <span
+      className={`inline-flex items-center rounded px-2 py-1 text-xs font-medium border space-x-1 ${styles[indexingStatus].classes}`}
+    >
+      {styles[indexingStatus].content()}
+    </span>
+  );
+};
+
 interface BranchSelectorTableProps {
   branchList: Branch[];
   currentBranch: string;
@@ -80,6 +141,7 @@ export default function BranchSelectorTable({
         );
       },
       cell: ({ row }) => {
+        const indexingStatus = row.original.indexStatus?.status as Status;
         return <div className='flex flex-col gap-2'>
           <div className='flex items-center gap-2'>
             {row.original.protected ? (
@@ -93,6 +155,11 @@ export default function BranchSelectorTable({
                 <BiPencil className='w-3 h-auto inline-block mr-1' />
                 Currently editing
               </Badge>
+            </div>
+          )}
+          {indexingStatus && indexingStatus !== 'complete' && (
+            <div className='w-fit mt-1'>
+              <IndexStatus indexingStatus={indexingStatus} />
             </div>
           )}
         </div>;
@@ -301,26 +368,39 @@ export default function BranchSelectorTable({
                 </TableRow>
               )}
               {/* Other branches, sorted by react-table */}
-              {table.getRowModel().rows.map((row) => (
-                <TableRow
-                  className={cn(
-                    selectedBranch === row.original.name &&
-                    'bg-blue-100 hover:bg-blue-100',
-                    'cursor-pointer'
-                  )}
-                  key={row.id}
-                  onClick={() => setSelectedBranch(row.original.name)}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
+              {table.getRowModel().rows.map((row) => {
+                const indexingStatus = row.original.indexStatus?.status as Status;
+                const isComplete = indexingStatus === 'complete';
+                const isSelected = selectedBranch === row.original.name;
+
+                const handleRowClick = () => {
+                  if (isComplete) {
+                    // Toggle selection: if already selected, deselect; otherwise select
+                    setSelectedBranch(isSelected ? null : row.original.name);
+                  }
+                };
+
+                return (
+                  <TableRow
+                    className={cn(
+                      !isComplete && 'bg-gray-50 text-gray-400 hover:!bg-gray-50 cursor-default',
+                      isComplete && isSelected && 'bg-blue-100 hover:bg-blue-100 cursor-pointer',
+                      isComplete && !isSelected && 'cursor-pointer'
+                    )}
+                    key={row.id}
+                    onClick={handleRowClick}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
           {/* <div className='rounded-lg border border-gray-200 overflow-hidden'>
