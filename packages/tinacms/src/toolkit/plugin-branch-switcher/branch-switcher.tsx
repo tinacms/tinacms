@@ -111,6 +111,76 @@ export const EditoralBranchSwitcher = ({
       protected: false,
       indexStatus: { status: 'unknown', timestamp: Date.now() },
     },
+    {
+      name: 'tina/header-redesign',
+      protected: false,
+      indexStatus: { status: 'complete', timestamp: Date.now() - 259200000 },
+      githubPullRequestUrl: 'https://github.com/org/repo/pull/103',
+    },
+    {
+      name: 'tina/navigation-menu',
+      protected: false,
+      indexStatus: { status: 'complete', timestamp: Date.now() - 432000000 },
+    },
+    {
+      name: 'tina/about-page-content',
+      protected: false,
+      indexStatus: { status: 'complete', timestamp: Date.now() - 518400000 },
+      githubPullRequestUrl: 'https://github.com/org/repo/pull/87',
+    },
+    {
+      name: 'tina/contact-form-update',
+      protected: false,
+      indexStatus: { status: 'complete', timestamp: Date.now() - 604800000 },
+    },
+    {
+      name: 'tina/seo-improvements',
+      protected: false,
+      indexStatus: { status: 'complete', timestamp: Date.now() - 691200000 },
+    },
+    {
+      name: 'tina/image-gallery',
+      protected: false,
+      indexStatus: { status: 'complete', timestamp: Date.now() - 777600000 },
+      githubPullRequestUrl: 'https://github.com/org/repo/pull/156',
+    },
+    {
+      name: 'tina/testimonials-section',
+      protected: false,
+      indexStatus: { status: 'complete', timestamp: Date.now() - 864000000 },
+    },
+    {
+      name: 'tina/pricing-page',
+      protected: false,
+      indexStatus: { status: 'complete', timestamp: Date.now() - 950400000 },
+    },
+    {
+      name: 'staging',
+      protected: true,
+      indexStatus: { status: 'complete', timestamp: Date.now() - 1036800000 },
+    },
+    {
+      name: 'tina/faq-updates',
+      protected: false,
+      indexStatus: { status: 'complete', timestamp: Date.now() - 1123200000 },
+      githubPullRequestUrl: 'https://github.com/org/repo/pull/201',
+    },
+    {
+      name: 'tina/blog-categories',
+      protected: false,
+      indexStatus: { status: 'complete', timestamp: Date.now() - 1209600000 },
+    },
+    {
+      name: 'tina/mobile-responsive-fixes',
+      protected: false,
+      indexStatus: { status: 'timeout', timestamp: Date.now() - 1296000000 },
+    },
+    {
+      name: 'tina/dark-mode-support',
+      protected: false,
+      indexStatus: { status: 'complete', timestamp: Date.now() - 1382400000 },
+      githubPullRequestUrl: 'https://github.com/org/repo/pull/245',
+    },
   ];
   const mockListBranches = () => Promise.resolve(mockBranches);
   const [viewState, setViewState] = React.useState<'list' | 'create'>('list');

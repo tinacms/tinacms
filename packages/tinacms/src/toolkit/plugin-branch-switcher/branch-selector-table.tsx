@@ -10,7 +10,7 @@ import { FaSpinner } from 'react-icons/fa';
 import { MdOutlineClear } from 'react-icons/md';
 import { Branch } from './types';
 import { TooltipProvider } from '@toolkit/fields/plugins/mdx-field-plugin/plate/components/plate-ui/tooltip';
-import { extractPullRequestId, getFilteredBranchList, sortBranchListFn } from './branch-switcher';
+import { extractPullRequestId, getFilteredBranchList } from './branch-switcher';
 
 import {
   ColumnDef,
@@ -51,9 +51,6 @@ export default function BranchSelectorTable({
   const [search, setSearch] = React.useState('');
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
-  const [sortValue, setSortValue] = React.useState<
-    'default' | 'updated' | 'name'
-  >('default');
   const [selectedBranch, setSelectedBranch] = React.useState<string | null>(
     null
   );
@@ -68,7 +65,7 @@ export default function BranchSelectorTable({
         const sorted = column.getIsSorted();
         return (
           <button
-            className='text-gray-700 cursor-pointer font-bold flex items-center gap-1'
+            className='text-gray-700 !cursor-pointer font-bold flex items-center gap-1'
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
             Branch Name
@@ -115,7 +112,7 @@ export default function BranchSelectorTable({
         const sorted = column.getIsSorted();
         return (
           <button
-            className='text-gray-700 cursor-pointer font-bold flex items-center gap-1'
+            className='text-gray-700 !cursor-pointer font-bold flex items-center gap-1'
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
             Last Updated
@@ -152,32 +149,27 @@ export default function BranchSelectorTable({
     },
   ];
 
-  // Sort data so current branch is always first
-  const sortedData = React.useMemo(() => {
-    if (!currentBranch) return branchList;
-    return [...branchList].sort((a, b) => {
-      if (a.name === currentBranch) return -1;
-      if (b.name === currentBranch) return 1;
-      return 0;
-    });
-  }, [branchList, currentBranch]);
+  const filteredBranchList = React.useMemo(() => {
+    return getFilteredBranchList(branchList, search, currentBranch, filter);
+  }, [branchList, search, currentBranch, filter]);
+
+  // Separate current branch from the rest so it's always first and not affected by sorting
+  const currentBranchData = React.useMemo(() => {
+    return filteredBranchList.find((b) => b.name === currentBranch);
+  }, [filteredBranchList, currentBranch]);
+
+  const otherBranches = React.useMemo(() => {
+    return filteredBranchList.filter((b) => b.name !== currentBranch);
+  }, [filteredBranchList, currentBranch]);
 
   const table = useReactTable({
-    data: sortedData,
+    data: otherBranches,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
     state: { sorting },
   });
-
-  const filteredBranchList = getFilteredBranchList(
-    branchList,
-    search,
-    currentBranch,
-    filter
-  ).sort(sortBranchListFn(sortValue));
 
   const previewFunction = cms.api.tina.schema?.config?.config?.ui?.previewUrl;
 
@@ -253,12 +245,12 @@ export default function BranchSelectorTable({
       )}
       {filteredBranchList.length > 0 && (
         <TooltipProvider>
-          <Table wrapperClassName='border border-gray-200 rounded-md overflow-hidden'>
+          <Table wrapperClassName='border border-gray-200 rounded-md max-h-96'>
             <TableHeader className='bg-gray-100 text-gray-700 border-b-2 border-gray-200'>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id} className='hover:bg-transparent'>
                   {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className='sticky top-0 bg-gray-100 z-10'>
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -271,17 +263,53 @@ export default function BranchSelectorTable({
               ))}
             </TableHeader>
             <TableBody className='bg-white'>
+              {/* Current branch is always the first row */}
+              {currentBranchData && (
+                <TableRow className='bg-transparent hover:!bg-transparent'>
+                  <TableCell>
+                    <div className='flex flex-col gap-2'>
+                      <div className='flex items-center gap-2'>
+                        {currentBranchData.protected ? (
+                          <BiLockAlt className='w-4 h-auto opacity-70 text-blue-500 flex-shrink-0' />
+                        ) : (
+                          <BiGitBranch className='w-4 h-auto opacity-70 text-gray-600 flex-shrink-0' />
+                        )}
+                        {currentBranchData.name}
+                      </div>
+                      <div className='w-fit mt-1'>
+                        <Badge displayIcon={false} calloutStyle='info' className='w-fit flex-shrink-0'>
+                          <BiPencil className='w-3 h-auto inline-block mr-1' />
+                          Currently editing
+                        </Badge>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {currentBranchData.indexStatus?.timestamp && (
+                      <div>
+                        {formatDistanceToNow(new Date(currentBranchData.indexStatus.timestamp))}
+                      </div>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <PullRequestCell
+                      branch={currentBranchData}
+                      cms={cms}
+                      refreshBranchList={refreshBranchList}
+                    />
+                  </TableCell>
+                </TableRow>
+              )}
+              {/* Other branches, sorted by react-table */}
               {table.getRowModel().rows.map((row) => (
                 <TableRow
                   className={cn(
-                    currentBranch === row.original.name &&
-                    'bg-transparent hover:!bg-transparent',
                     selectedBranch === row.original.name &&
                     'bg-blue-100 hover:bg-blue-100',
-                    currentBranch !== row.original.name && 'cursor-pointer'
+                    'cursor-pointer'
                   )}
                   key={row.id}
-                  onClick={(currentBranch !== row.original.name) ? () => setSelectedBranch(row.original.name) : undefined}
+                  onClick={() => setSelectedBranch(row.original.name)}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
