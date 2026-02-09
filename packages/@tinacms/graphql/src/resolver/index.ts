@@ -772,7 +772,8 @@ export class Resolver {
       relativePath,
       `.gitkeep.${collection.format || 'md'}`
     );
-    this.validatePath(realPath, collection);
+    const options = { extraSegments: [`.gitkeep.${collection.format || 'md'}`]};
+    const { collection, realPath } = this.validatePath(realPath, collection, options);
     const alreadyExists = await this.database.documentExists(realPath);
     if (alreadyExists) {
       throw new Error(`Unable to add folder, ${realPath} already exists`);
