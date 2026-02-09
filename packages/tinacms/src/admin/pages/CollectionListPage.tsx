@@ -44,7 +44,7 @@ import {
   useNavigate,
   useParams,
 } from 'react-router-dom';
-import { cn } from '../../lib/utils';
+import { cn } from '@utils/cn';
 import type { TinaAdminApi } from '../api';
 import GetCMS from '../components/GetCMS';
 import GetCollection from '../components/GetCollection';

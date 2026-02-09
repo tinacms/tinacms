@@ -37,7 +37,7 @@ import {
   TableCell,
 } from '@toolkit/components/ui/table';
 import { ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { cn } from '@utils/cn';
 import { Badge } from '@toolkit/react-sidebar/components/badge';
 
 type Status = 'failed' | 'unknown' | 'complete' | 'inprogress' | 'timeout';
