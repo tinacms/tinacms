@@ -38,7 +38,7 @@ import {
 import { ListToolbarButton } from './plate-ui/indent-list-toolbar-button';
 import { TableDropdownMenu } from './plate-ui/table/table-dropdown-menu';
 import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
-import { cn } from '@udecode/cn';
+import { cn } from '@utils/cn';
 
 type ToolbarItem = {
   label: string;
