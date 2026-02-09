@@ -37,6 +37,7 @@
     "@tinacms/app": "workspace:*",
     "@tinacms/cli": "workspace:*",
     "@tinacms/scripts": "workspace:*",
+    "@types/node": "^25.1.0",
     "autoprefixer": "catalog:",
     "eslint": "8.24.0",
     "eslint-config-next": "^13.5.8",
