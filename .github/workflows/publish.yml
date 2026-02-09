@@ -4,6 +4,18 @@ on:
     branches: [main]
   pull_request:
     types: [opened, synchronize, reopened, labeled]
+  workflow_dispatch:
+    inputs:
+      test_graphql_update:
+        description: 'Test the @tinacms/graphql update flow to tinacloud'
+        required: false
+        default: false
+        type: boolean
+      test_version:
+        description: 'Version to simulate (e.g., 2.2.0)'
+        required: false
+        default: '2.2.0'
+        type: string
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
@@ -257,7 +269,7 @@ jobs:
       - name: Setup git credentials
         run: |
           git config --global user.email "bot@tina.io"
-          git config --global user.name "Tina Realease Bot"
+          git config --global user.name "Tina Release Bot"
 
       - name: Create release pull request or publish packages
         uses: changesets/action@v1
@@ -312,7 +324,88 @@ jobs:
             }
           token: ${{ steps.generate-token.outputs.token }}
 
+      - name: Generate token for tinacloud
+        if: steps.changesets.outputs.published == 'true'
+        uses: actions/create-github-app-token@v1
+        id: tinacloud-token
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_SECRET }}
+          repositories: tinacloud
+
+      - name: Notify tinacloud of published packages
+        if: steps.changesets.outputs.published == 'true'
+        uses: actions/github-script@v7
+        env:
+          publishedPackages: ${{ steps.changesets.outputs.publishedPackages }}
+        with:
+          github-token: ${{ steps.tinacloud-token.outputs.token }}
+          script: |
+            const publishedPackages = JSON.parse(process.env.publishedPackages);
+
+            console.log(`Notifying tinacloud of ${publishedPackages.length} published packages`);
+            console.log(publishedPackages.map(p => `  ${p.name}@${p.version}`).join('\n'));
+
+            // Trigger a repository dispatch event in the tinacloud repo
+            await github.rest.repos.createDispatchEvent({
+              owner: 'tinacms',
+              repo: 'tinacloud',
+              event_type: 'tinacms-release',
+              client_payload: {
+                packages: publishedPackages,
+                source_repo: 'tinacms/tinacms',
+                source_sha: context.sha
+              }
+            });
+
+            console.log('✅ Repository dispatch event sent to tinacloud');
+            core.summary.addRaw(`\n🔄 Notified tinacloud of ${publishedPackages.length} published packages`);
+            await core.summary.write();
+
       - name: Summary
         if: steps.newTinaCMSVersion.outputs.newTinaCMSVersion == '' && steps.changesets.outputs.hasChangesets == 'false'
         run: |
           echo "❌ Nothing was published" >> $GITHUB_STEP_SUMMARY
+
+  # Test job for manually triggering the tinacloud update flow
+  test-tinacloud-update:
+    if: github.event_name == 'workflow_dispatch' && inputs.test_graphql_update == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate token for tinacloud
+        uses: actions/create-github-app-token@v1
+        id: tinacloud-token
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_SECRET }}
+          repositories: tinacloud
+
+      - name: Trigger tinacloud update (test mode)
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ steps.tinacloud-token.outputs.token }}
+          script: |
+            const version = '${{ inputs.test_version }}';
+
+            // Simulate a release with the test version
+            const packages = [
+              { name: '@tinacms/graphql', version: version }
+            ];
+
+            console.log(`[TEST] Notifying tinacloud of test packages:`);
+            packages.forEach(p => console.log(`  ${p.name}@${p.version}`));
+
+            await github.rest.repos.createDispatchEvent({
+              owner: 'tinacms',
+              repo: 'tinacloud',
+              event_type: 'tinacms-release',
+              client_payload: {
+                packages: packages,
+                source_repo: 'tinacms/tinacms',
+                source_sha: context.sha
+              }
+            });
+
+            console.log('✅ Repository dispatch event sent to tinacloud');
+            core.summary.addRaw(`## Test Mode\n\n🔄 Notified tinacloud of test release\n- @tinacms/graphql@${version}`);
+            await core.summary.write();
