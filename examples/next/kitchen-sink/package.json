@@ -1,26 +1,50 @@
 {
   "name": "kitchen-sink",
-  "version": "0.1.0",
+  "version": "0.1.99",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
+    "dev": "MONOREPO_DEV=true tinacms dev -c \"next dev\"",
+    "dev2": "tinacms dev -c \"next dev\"",
+    "dev-sandbox": "MONOREPO_DEV=true tinacms dev -c \"next dev\" --sandbox",
+    "test": "MONOREPO_DEV=true tinacms dev -c \"vitest\"",
+    "test:dev": "vitest",
+    "build": "next build",
+    "build:local": "tinacms build --local --skip-cloud-checks -c \"next build\"",
+    "replay": "replay ./recording.json",
     "start": "next start",
-    "lint": "biome check",
-    "format": "biome format --write"
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "searchindex": "tinacms search-index"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.0",
+    "@heroicons/react": "^2.2.0",
+    "@tailwindcss/typography": "catalog:",
+    "@tinacms/datalayer": "workspace:*",
+    "graphql": "^15.10.1",
+    "jest-file-snapshot": "^0.5.0",
+    "mongodb-level": "^0.0.4",
     "next": "15.5.12",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-icons": "^4.12.0",
+    "remove": "catalog:",
+    "tinacms": "workspace:*"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.2.0",
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "@biomejs/biome": "catalog:",
+    "@puppeteer/replay": "catalog:",
+    "@tinacms/app": "workspace:*",
+    "@tinacms/cli": "workspace:*",
+    "@tinacms/scripts": "workspace:*",
+    "autoprefixer": "catalog:",
+    "eslint": "8.24.0",
+    "eslint-config-next": "^13.5.8",
+    "postcss": "^8.5.2",
+    "puppeteer": "catalog:",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.3",
+    "vite": "^4.5.9",
+    "vitest": "^0.32.4"
   }
 }
