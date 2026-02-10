@@ -99,15 +99,28 @@ export class Codegen {
 
     // Include search config in lock file, but exclude sensitive indexerToken
     // Only add search if search.tina exists - plain search without tina is not included
-    const { search, ...rest } = this.tinaSchema.schema.config;
-    if (search?.tina) {
-      const { indexerToken, ...safeSearchConfig } = search.tina;
-      this.tinaSchema.schema.config = {
-        ...rest,
-        search: { tina: safeSearchConfig },
-      };
-    } else {
-      this.tinaSchema.schema.config = rest;
+    // Preserve original key order by iterating over keys instead of destructuring
+    const config = this.tinaSchema.schema.config;
+    if (config?.search?.tina) {
+      const { indexerToken, ...safeSearchConfig } = config.search.tina;
+      const newConfig: Record<string, unknown> = {};
+      for (const key of Object.keys(config)) {
+        if (key === 'search') {
+          newConfig.search = { tina: safeSearchConfig };
+        } else {
+          newConfig[key] = config[key];
+        }
+      }
+      this.tinaSchema.schema.config = newConfig as unknown as typeof config;
+    } else if (config?.search) {
+      // Remove search key if search.tina doesn't exist (preserving key order)
+      const newConfig: Record<string, unknown> = {};
+      for (const key of Object.keys(config)) {
+        if (key !== 'search') {
+          newConfig[key] = config[key];
+        }
+      }
+      this.tinaSchema.schema.config = newConfig as unknown as typeof config;
     }
 
     // update _schema.json

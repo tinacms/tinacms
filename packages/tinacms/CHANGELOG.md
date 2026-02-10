@@ -1,5 +1,24 @@
 # tinacms
 
+## 3.4.1
+
+### Patch Changes
+
+- Updated dependencies [[`4eb9252`](https://github.com/tinacms/tinacms/commit/4eb92520249696007556b52f3c48333bdf8ebf4d)]:
+  - @tinacms/schema-tools@2.5.0
+  - @tinacms/mdx@2.0.5
+  - @tinacms/search@1.2.2
+
+## 3.4.0
+
+### Minor Changes
+
+- [#6374](https://github.com/tinacms/tinacms/pull/6374) [`414dc87`](https://github.com/tinacms/tinacms/commit/414dc87ea0e63702d12ec7a3d3e9f4e5527eaa56) Thanks [@Calinator444](https://github.com/Calinator444)! - Added parse field for filename field
+
+### Patch Changes
+
+- [#6379](https://github.com/tinacms/tinacms/pull/6379) [`155654c`](https://github.com/tinacms/tinacms/commit/155654ce515ab68a0483cd7e797e9df0a4157431) Thanks [@kulesy](https://github.com/kulesy)! - Fix branch exists error detection with case-insensitive matching
+
 ## 3.3.2
 
 ### Patch Changes
