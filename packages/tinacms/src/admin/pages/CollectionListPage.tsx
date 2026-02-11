@@ -619,6 +619,7 @@ const CollectionListPage = () => {
                                   setSearch={setSearch}
                                   searchInput={searchInput}
                                   setSearchInput={setSearchInput}
+                                  resultsFound={search ? documents.length : undefined}
                                 />
                               ) : (
                                 <div className='flex flex-col gap-2 items-start w-full md:w-auto'>
@@ -1162,6 +1163,7 @@ const SearchInput = ({
   setSearch,
   searchInput,
   setSearchInput,
+  resultsFound,
 }: {
   cms: TinaCMS;
   collectionName: string;
@@ -1169,6 +1171,7 @@ const SearchInput = ({
   search: string;
   setSearch: (search: string) => void;
   searchInput: string;
+  resultsFound: number | undefined;
   setSearchInput: (input: string) => void;
 }) => {
   const [searchLoaded, setSearchLoaded] = useState(false);
@@ -1236,6 +1239,11 @@ const SearchInput = ({
         >
           Search
         </Button>
+        {resultsFound && (
+          <span className='text-gray-600 text-sm'>
+            {resultsFound} results found
+          </span>
+        )}
       </div>
     </form>
   );
