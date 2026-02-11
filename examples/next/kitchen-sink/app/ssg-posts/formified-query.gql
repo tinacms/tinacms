@@ -1,0 +1,14 @@
+query ssgPost($relativePath: String!) {
+  ssgPost(relativePath: $relativePath) {
+    title
+    body
+    image
+    ... on Document {
+      _sys {
+        filename
+        path
+        relativePath
+      }
+    }
+  }
+}

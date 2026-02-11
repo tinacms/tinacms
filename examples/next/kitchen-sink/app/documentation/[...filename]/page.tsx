@@ -17,3 +17,11 @@ export default async function DocFile({ params }: Props) {
     </main>
   )
 }
+
+// Compatibility export for pages-style tests
+export async function getStaticProps({ params }: { params: { filename: string[] } }) {
+  const parts = params.filename || []
+  const variables = { relativePath: `${parts.join('/')}.md` }
+  const props = await client.queries.documentation(variables)
+  return { props: { ...props, variables } }
+}

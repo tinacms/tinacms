@@ -17,3 +17,13 @@ export default async function PostFile({ params }: Props) {
     </main>
   )
 }
+
+// Compatibility export for tests that import `getStaticProps` from the pages-style API.
+export async function getStaticProps({ params }: { params: { filename: string[] } }) {
+  const parts = params.filename || []
+  const variables = { relativePath: `${parts.join('/')}.mdx` }
+  const props = await client.queries.post(variables)
+  return {
+    props: { ...props, variables },
+  }
+}

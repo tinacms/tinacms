@@ -1,0 +1,26 @@
+[
+  {
+    "name": "page",
+    "alias": "page",
+    "fields": [
+      {
+        "name": "_sys",
+        "alias": "_sys",
+        "fields": [
+          { "name": "filename", "alias": "filename" },
+          { "name": "basename", "alias": "basename" },
+          { "name": "breadcrumbs", "alias": "breadcrumbs" },
+          { "name": "path", "alias": "path" },
+          { "name": "relativePath", "alias": "relativePath" },
+          { "name": "extension", "alias": "extension" }
+        ]
+      },
+      { "name": "id", "alias": "id" },
+      { "name": "title", "alias": "title" },
+      { "name": "items", "alias": "items", "fields": [ { "name": "__typename", "alias": "__typename" } ] },
+      { "name": "blocks", "alias": "blocks", "fields": [ { "name": "__typename", "alias": "__typename" } ] },
+      { "name": "_internalSys", "alias": "_internalSys", "fields": [ { "name": "path", "alias": "path" } ] }
+    ],
+    "path": ["page"]
+  }
+]

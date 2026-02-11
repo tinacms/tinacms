@@ -1,0 +1,47 @@
+query DocumentQuery($collection: String!, $relativePath: String!) {
+  document(collection: $collection, relativePath: $relativePath) {
+    ...PageParts
+    ...PostParts
+    ...DocumentationParts
+    ...AuthorParts
+    ...SsgPostParts
+  }
+}
+
+query CollectionQuery {
+  collections {
+    name
+    format
+  }
+}
+
+query NodeQuery($id: String!) {
+  node(id: $id) {
+    ...on Document {
+      ...PageParts
+      ...PostParts
+      ...DocumentationParts
+      ...AuthorParts
+      ...SsgPostParts
+    }
+  }
+}
+
+query MenuQuery {
+  collections {
+    label
+    name
+    documents {
+      edges {
+        node {
+          ...on Document {
+            _sys {
+                path
+                filename
+              }
+            }
+          }
+        }
+      }
+    }
+}

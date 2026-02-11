@@ -1,0 +1,35 @@
+query page($relativePath: String!) {
+  page(relativePath: $relativePath) {
+    ... on Document {
+      _sys {
+        filename
+        basename
+        breadcrumbs
+        path
+        relativePath
+        extension
+      }
+      id
+    }
+    ... on PageShowcase {
+      title
+      items {
+        __typename
+        title
+        description
+        image
+      }
+    }
+    ... on PageBlockPage {
+      title
+      blocks {
+        __typename
+      }
+    }
+    ... on Document {
+      _internalSys: _sys {
+        path
+      }
+    }
+  }
+}

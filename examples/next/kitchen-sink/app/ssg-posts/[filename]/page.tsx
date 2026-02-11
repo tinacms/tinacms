@@ -16,3 +16,20 @@ export default async function SSGPostFile({ params }: Props) {
     </main>
   )
 }
+
+// Compatibility export for pages-style tests
+export async function getStaticProps({ params }: { params: { filename: string } }) {
+  const relativePath = `${params.filename}.md`
+  const props = await client.queries.ssgPost({ relativePath })
+  return { props: { ...props, variables: { relativePath } } }
+}
+
+export async function getStaticPaths() {
+  const connection = await client.queries.ssgPostConnection()
+  return {
+    paths: connection.data.ssgPostConnection.edges.map((post: any) => ({
+      params: { filename: post.node._sys.filename },
+    })),
+    fallback: 'blocking',
+  }
+}

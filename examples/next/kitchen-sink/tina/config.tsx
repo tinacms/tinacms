@@ -1,3 +1,5 @@
+import React from 'react';
+import { BiBall, BiBaseball, BiBasketball, BiFootball } from 'react-icons/bi';
 import { defineConfig } from 'tinacms';
 
 // Branch detection for most hosting providers
@@ -6,6 +8,8 @@ const branch =
   process.env.VERCEL_GIT_COMMIT_REF ||
   process.env.HEAD ||
   'main';
+
+const TINA_TOKEN_KEY = 'tina_token_key';
 
 const slugify = (values: any) => {
   return `${(values?.name || values?.title || `document-${Date.now()}`)
@@ -19,6 +23,22 @@ const router = ({ document, collection }: any) =>
 const extendedRouter = ({ document, collection }: any) =>
   `/${collection.name}/${document._sys.breadcrumbs.join('/')}`;
 
+const customAuthProvider = {
+  getToken: async () => {
+    return { id_token: 'some-token' };
+  },
+  logout: async () => {
+    localStorage.removeItem(TINA_TOKEN_KEY);
+  },
+  authenticate: async () => {
+    localStorage.setItem(TINA_TOKEN_KEY, 'some-token');
+    return true;
+  },
+  getUser: async () => {
+    return localStorage.getItem(TINA_TOKEN_KEY);
+  },
+};
+
 export default defineConfig({
   branch,
 
@@ -29,17 +49,18 @@ export default defineConfig({
     outputFolder: 'admin',
     publicFolder: 'public',
   },
+  search: {
+    tina: {
+      indexerToken: '',
+    },
+  },
   media: {
     tina: {
       mediaRoot: 'uploads',
       publicFolder: 'public',
     },
   },
-  search: {
-    tina: {
-      indexerToken: '',
-    },
-  },
+  authProvider: customAuthProvider,
   schema: {
     collections: [
       {
@@ -48,7 +69,7 @@ export default defineConfig({
         path: 'content/pages',
         ui: {
           filename: {
-            slugify,
+            slugify: slugify,
             readonly: true,
           },
           router,
@@ -69,6 +90,28 @@ export default defineConfig({
                 type: 'string',
                 required: true,
                 isTitle: true,
+                ui: {
+                  component: ({ input }: any) => {
+                    return (
+                      <div className='my-4'>
+                        <label
+                          htmlFor={input.name}
+                          className='block text-sm font-medium text-blue-700 underline'
+                        >
+                          {input.name} (this is a custom component)
+                        </label>
+                        <div className='mt-1'>
+                          <input
+                            type='text'
+                            id={input.name}
+                            className='py-2 px-4 block w-full rounded border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
+                            {...input}
+                          />
+                        </div>
+                      </div>
+                    );
+                  },
+                },
               },
               {
                 name: 'items',
@@ -86,8 +129,14 @@ export default defineConfig({
                     required: true,
                     isTitle: true,
                   },
-                  { name: 'description', type: 'rich-text' },
-                  { name: 'image', type: 'image' },
+                  {
+                    name: 'description',
+                    type: 'rich-text',
+                  },
+                  {
+                    name: 'image',
+                    type: 'image',
+                  },
                 ],
               },
             ],
@@ -117,8 +166,13 @@ export default defineConfig({
                     label: 'Hero',
                     name: 'hero',
                     ui: {
-                      itemProps: (item: any) => ({ label: item?.headline }),
-                      defaultItem: { _template: 'hero', headline: 'ok' },
+                      itemProps: (item: any) => {
+                        return { label: item?.headline };
+                      },
+                      defaultItem: {
+                        _template: 'hero',
+                        headline: 'ok',
+                      },
                     },
                     fields: [
                       { type: 'string', name: 'headline' },
@@ -168,8 +222,14 @@ export default defineConfig({
                         label: 'Boolean With Labels',
                         name: 'booleanLabels',
                         type: 'boolean',
+                        // @ts-ignore
+                        toggleLabels: ['Yes', 'No'],
                       },
-                      { label: 'Boolean', name: 'boolean', type: 'boolean' },
+                      {
+                        label: 'Boolean',
+                        name: 'boolean',
+                        type: 'boolean',
+                      },
                       {
                         label: 'Checkbox Group',
                         name: 'checkbox',
@@ -189,6 +249,7 @@ export default defineConfig({
                         list: true,
                         ui: {
                           component: 'checkbox-group',
+                          // @ts-ignore
                           direction: 'horizontal',
                         },
                         options: [
@@ -229,6 +290,7 @@ export default defineConfig({
                         type: 'string',
                         ui: {
                           component: 'radio-group',
+                          // @ts-ignore
                           direction: 'horizontal',
                         },
                         options: [
@@ -255,10 +317,26 @@ export default defineConfig({
                         type: 'string',
                         ui: { component: 'button-toggle' },
                         options: [
-                          { value: 'football', label: 'Football' },
-                          { value: 'basketball', label: 'Basketball' },
-                          { value: 'baseball', label: 'Baseball' },
-                          { value: 'soccer', label: 'Soccer' },
+                          {
+                            value: 'football',
+                            // @ts-ignore
+                            icon: BiBall,
+                          },
+                          {
+                            value: 'basketball',
+                            // @ts-ignore
+                            icon: BiBasketball,
+                          },
+                          {
+                            value: 'baseball',
+                            // @ts-ignore
+                            icon: BiBaseball,
+                          },
+                          {
+                            value: 'soccer',
+                            // @ts-ignore
+                            icon: BiFootball,
+                          },
                         ],
                       },
                       {
@@ -267,6 +345,7 @@ export default defineConfig({
                         type: 'string',
                         ui: {
                           component: 'button-toggle',
+                          // @ts-ignore
                           direction: 'vertical',
                         },
                         options: [
@@ -407,12 +486,7 @@ export default defineConfig({
               {
                 name: 'Hero',
                 fields: [
-                  {
-                    name: 'header',
-                    type: 'string',
-                    isTitle: true,
-                    required: true,
-                  },
+                  { name: 'header', type: 'string', isTitle: true, required: true },
                   { name: 'description', type: 'rich-text' },
                   { name: 'image', type: 'image' },
                 ],
@@ -439,13 +513,7 @@ export default defineConfig({
                 name: 'rimg',
                 label: 'rimg',
                 fields: [
-                  {
-                    name: 'src',
-                    label: 'Src',
-                    type: 'string',
-                    required: true,
-                    isTitle: true,
-                  },
+                  { name: 'src', label: 'Src', type: 'string', required: true, isTitle: true },
                   { name: 'href', label: 'Href', type: 'string' },
                   { name: 'breakout', label: 'Breakout', type: 'string' },
                   { name: 'width', label: 'Width', type: 'string' },
@@ -457,69 +525,30 @@ export default defineConfig({
               {
                 name: 'adPanel',
                 label: 'Ad Panel',
-                match: {
-                  start: '{{%',
-                  end: '%}}',
-                  name: 'ad-panel-leaderboard',
-                },
-                fields: [
-                  {
-                    name: '_value',
-                    required: true,
-                    isTitle: true,
-                    label: 'Value',
-                    type: 'string',
-                  },
-                ],
+                match: { start: '{{%', end: '%}}', name: 'ad-panel-leaderboard' },
+                fields: [ { name: '_value', required: true, isTitle: true, label: 'Value', type: 'string' } ],
               },
               {
                 name: 'featurePanel',
                 label: 'Feature Panel',
                 match: { start: '{{%', end: '%}}', name: 'feature-panel' },
-                fields: [
-                  {
-                    name: '_value',
-                    required: true,
-                    isTitle: true,
-                    label: 'Value',
-                    type: 'string',
-                  },
-                ],
+                fields: [ { name: '_value', required: true, isTitle: true, label: 'Value', type: 'string' } ],
               },
               {
                 name: 'center',
                 label: 'Centered HTML',
                 match: { start: '{{<', name: 'center', end: '>}}' },
-                fields: [
-                  {
-                    name: 'children',
-                    label: 'Children',
-                    type: 'rich-text',
-                    parser: { type: 'markdown', skipEscaping: 'html' },
-                  },
-                ],
+                fields: [ { name: 'children', label: 'Children', type: 'rich-text', parser: { type: 'markdown', skipEscaping: 'html' } } ],
               },
               {
                 name: 'pullQuote',
                 label: 'Pull Quote',
                 match: { start: '{{%', name: 'pull-quote', end: '%}}' },
-                fields: [
-                  { name: 'foo', label: 'foo label', type: 'string' },
-                  { name: 'children', label: 'Children', type: 'rich-text' },
-                ],
+                fields: [ { name: 'foo', label: 'foo label', type: 'string' }, { name: 'children', label: 'Children', type: 'rich-text' } ],
               },
               {
                 name: 'Hero',
-                fields: [
-                  {
-                    name: 'header',
-                    type: 'string',
-                    isTitle: true,
-                    required: true,
-                  },
-                  { name: 'description', type: 'rich-text' },
-                  { name: 'image', type: 'image' },
-                ],
+                fields: [ { name: 'header', type: 'string', isTitle: true, required: true }, { name: 'description', type: 'rich-text' }, { name: 'image', type: 'image' } ],
               },
             ],
           },
@@ -530,40 +559,21 @@ export default defineConfig({
         label: 'Author',
         path: 'content/authors',
         ui: { filename: { slugify } },
-        fields: [
-          { type: 'string', name: 'name' },
-          { type: 'rich-text', name: 'bio' },
-          { type: 'string', name: 'hobbies', list: true },
-          { type: 'image', name: 'image' },
-        ],
+        fields: [ { type: 'string', name: 'name' }, { type: 'rich-text', name: 'bio' }, { type: 'string', name: 'hobbies', list: true }, { type: 'image', name: 'image' } ],
       },
       {
         name: 'documentation',
         label: 'Documentation',
         path: 'content/documentation',
         ui: { router: extendedRouter, filename: { slugify } },
-        fields: [
-          { type: 'string', name: 'title', required: true, isTitle: true },
-          {
-            type: 'object',
-            name: 'tags',
-            list: true,
-            fields: [
-              { type: 'reference', name: 'reference', collections: ['tag'] },
-            ],
-          },
-          { type: 'rich-text', name: 'body', isBody: true },
-        ],
+        fields: [ { type: 'string', name: 'title', required: true, isTitle: true }, { type: 'object', name: 'tags', list: true, fields: [ { type: 'reference', name: 'reference', collections: ['tag'] } ] }, { type: 'rich-text', name: 'body', isBody: true } ],
       },
       {
         name: 'tag',
         label: 'Tag',
         path: 'content/tags',
         format: 'json',
-        fields: [
-          { type: 'string', name: 'title', required: true, isTitle: true },
-          { type: 'rich-text', name: 'description' },
-        ],
+        fields: [ { type: 'string', name: 'title', required: true, isTitle: true }, { type: 'rich-text', name: 'description' } ],
       },
     ],
   },
