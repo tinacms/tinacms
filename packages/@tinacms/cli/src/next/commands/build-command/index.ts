@@ -207,7 +207,14 @@ export class BuildCommand extends BaseCommand {
             )}`
           );
         }
+        // Trigger sync/indexing if:
+        // 1. Status is not 'complete' (unknown, inprogress, failed)
+        // 2. Has upstream project
+        // 3. Using preview branches
+        // This ensures indexing is triggered for both single-repo and multi-repo setups
+        const needsSync = clientInfo.status !== 'complete';
         if (
+          needsSync ||
           clientInfo.hasUpstream ||
           (this.previewBaseBranch && this.previewName)
         ) {
@@ -376,6 +383,7 @@ export class BuildCommand extends BaseCommand {
     apiURL: string,
     previewBaseBranch?: string
   ): Promise<{
+    status: string;
     branchKnown: boolean;
     hasUpstream: boolean;
     timestamp: number;
@@ -492,18 +500,21 @@ export class BuildCommand extends BaseCommand {
       }
     }
 
+    // Branch is unknown after retries - this is expected for:
+    // 1. Multi-repo setups where the site repo build doesn't trigger webhooks
+    // 2. Fresh projects that haven't been indexed yet
+    // Instead of throwing, return branchKnown: false so the caller can trigger indexing
     branchBar.tick({
-      prog: '❌',
+      prog: '⏳',
     });
 
-    logger.error(
-      `${dangerText(
-        `ERROR: Branch '${branch}' is not on TinaCloud.`
-      )} Please make sure that branch '${branch}' exists in your repository and that you have pushed your all changes to the remote. View all branches and their current status here: ${linkText(
-        `https://app.tina.io/projects/${clientId}/configuration`
-      )}`
+    logger.info(
+      logText(
+        `Branch '${branch}' not yet indexed on TinaCloud. Will trigger indexing.`
+      )
     );
-    throw new Error('Branch is not on TinaCloud');
+
+    return branchInfo;
   }
 
   async syncProject(
