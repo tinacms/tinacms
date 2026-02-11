@@ -1,6 +1,6 @@
 import React from 'react'
-import client from '../../../../tina/__generated__/client'
-import { Json } from '../../../../components/json'
+import client from '../../../tina/__generated__/client'
+import { Json } from '../../../components/json'
 
 type Props = { params: { filename: string } }
 

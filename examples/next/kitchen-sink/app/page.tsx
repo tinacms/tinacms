@@ -9,7 +9,9 @@ type CollectionItem = {
 }
 
 function readCollection(dirName: string, routeName: string, label: string) {
-  const dirPath = path.join(process.cwd(), 'examples', 'next', 'kitchen-sink', 'content', dirName)
+  const exampleSubPath = path.join('examples', 'next', 'kitchen-sink')
+  const base = process.cwd().includes(exampleSubPath) ? process.cwd() : path.join(process.cwd(), exampleSubPath)
+  const dirPath = path.join(base, 'content', dirName)
   if (!fs.existsSync(dirPath)) return null
   try {
     const files = fs.readdirSync(dirPath)
@@ -23,10 +25,10 @@ function readCollection(dirName: string, routeName: string, label: string) {
 
 export default function Page() {
   const rawCollections: Array<CollectionItem | null> = [
-    readCollection('pages', 'page', 'Page'),
-    readCollection('post', 'post', 'Post'),
-    readCollection('documentation', 'documentation', 'Documentation'),
-    readCollection('ssg-posts', 'ssg-posts', 'SSG Post'),
+    readCollection('pages', 'page', 'Home'),
+    readCollection('post', 'post', 'Large-File'),
+    readCollection('ssg-posts', 'ssg-posts', 'SSG-Posts'),
+    readCollection('documentation', 'documentation', 'Intro to Tina'),
   ]
 
   const collections = rawCollections.filter(Boolean) as CollectionItem[]
