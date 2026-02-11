@@ -229,8 +229,6 @@ const TreeNodeComponent = ({
   setActiveFormId: (id: string) => void;
   showReferences: boolean;
 }) => {
-  const cms = useCMS();
-
   // Check if this folder contains only references
   const hasOnlyReferences = React.useMemo(() => {
     if (node.isFile) return false;
@@ -258,6 +256,7 @@ const TreeNodeComponent = ({
   }, [node]);
 
   const [isExpanded, setIsExpanded] = React.useState(!hasOnlyReferences);
+  const cms = useCMS();
 
   // Group file children by collection type
   const { fileGroups, folderChildren } = React.useMemo(() => {
