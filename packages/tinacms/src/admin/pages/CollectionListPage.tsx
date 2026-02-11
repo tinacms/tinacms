@@ -619,7 +619,9 @@ const CollectionListPage = () => {
                                   setSearch={setSearch}
                                   searchInput={searchInput}
                                   setSearchInput={setSearchInput}
-                                  resultsFound={search ? documents.length : undefined}
+                                  resultsFound={
+                                    search ? documents.length : undefined
+                                  }
                                 />
                               ) : (
                                 <div className='flex flex-col gap-2 items-start w-full md:w-auto'>
