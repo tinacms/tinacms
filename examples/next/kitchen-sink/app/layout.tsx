@@ -1,4 +1,5 @@
 import '../styles/global.css'
+import Navigation from '../components/navigation'
 
 export const metadata = {
   title: 'Next.js',
@@ -12,7 +13,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <div className='min-h-screen bg-gray-50'>
+          <div className='flex'>
+            <aside className='w-64'>
+              <Navigation />
+            </aside>
+            <main className='flex-1 p-6'>
+              {children}
+            </main>
+          </div>
+        </div>
+      </body>
     </html>
   )
 }
