@@ -64,7 +64,10 @@ describe('filterPublicEnv', () => {
     const result = filterPublicEnv(MOCK_ENV);
 
     expect(result).toHaveProperty('TINA_PUBLIC_CLIENT_ID', 'my-tina-client-id');
-    expect(result).toHaveProperty('TINA_PUBLIC_SITE_URL', 'https://example.com');
+    expect(result).toHaveProperty(
+      'TINA_PUBLIC_SITE_URL',
+      'https://example.com'
+    );
     expect(result).toHaveProperty('TINA_PUBLIC_IS_LOCAL', 'true');
   });
 
@@ -84,7 +87,10 @@ describe('filterPublicEnv', () => {
     const result = filterPublicEnv(MOCK_ENV);
 
     expect(result).toHaveProperty('NEXT_PUBLIC_ANALYTICS_ID', 'UA-123456789');
-    expect(result).toHaveProperty('NEXT_PUBLIC_API_URL', 'https://api.example.com');
+    expect(result).toHaveProperty(
+      'NEXT_PUBLIC_API_URL',
+      'https://api.example.com'
+    );
   });
 
   it('does not include NEXT_ vars without the PUBLIC_ infix', () => {
@@ -154,7 +160,9 @@ describe('filterPublicEnv', () => {
     const serialized = JSON.stringify(result);
 
     expect(serialized).not.toContain('postgres://user:password@host:5432/db');
-    expect(serialized).not.toContain('wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY');
+    expect(serialized).not.toContain(
+      'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'
+    );
     expect(serialized).not.toContain('sk_live_abc123secretkey');
     expect(serialized).not.toContain('super-secret-api-key');
     expect(serialized).not.toContain('BEGIN RSA PRIVATE KEY');
