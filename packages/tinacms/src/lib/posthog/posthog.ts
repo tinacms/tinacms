@@ -22,7 +22,7 @@ export type FinishPullRequestPayload = {
   createdAt: string;
   updatedAt: string;
   status: string;
-}
+};
 
 // When the user switches branches
 export const BranchSwitchedEvent: string = 'branch-switched';
@@ -48,8 +48,7 @@ export const MediaManagerContentDeletedEvent: string =
 export type MediaManagerContentDeletedPayload = Record<string, never>;
 
 // Switching between raw and rich-text editor modes
-export const RichTextEditorSwitchedEvent: string =
-  'rich-text-editor-switched';
+export const RichTextEditorSwitchedEvent: string = 'rich-text-editor-switched';
 export type RichTextEditorSwitchedPayload = {
   to: 'markdown' | 'richtext';
 };
