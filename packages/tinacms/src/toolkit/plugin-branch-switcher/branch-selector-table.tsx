@@ -148,7 +148,14 @@ export default function BranchSelectorTable({
       cell: ({ row }) => {
         const indexingStatus = row.original.indexStatus?.status as Status;
         return (
-          <div className={cn('flex flex-col gap-2', currentBranch === row.original.name ? 'border-l border-tina-orange bg-[#f8fafc]' : '')}>
+          <div
+            className={cn(
+              'flex flex-col gap-2',
+              currentBranch === row.original.name
+                ? 'border-l border-tina-orange bg-[#f8fafc]'
+                : ''
+            )}
+          >
             <div className='flex items-center gap-2'>
               {row.original.protected ? (
                 <BiLockAlt className='w-4 h-auto opacity-70 text-blue-500 flex-shrink-0' />
@@ -343,7 +350,14 @@ export default function BranchSelectorTable({
             <TableBody className='bg-white'>
               {/* Current branch is always the first row */}
               {currentBranchData && (
-                <TableRow className={cn('bg-transparent hover:!bg-transparent', currentBranch === currentBranchData.name ? 'border-l-[3px] border-l-tina-orange bg-[#f8fafc]' : '')}>
+                <TableRow
+                  className={cn(
+                    'bg-transparent hover:!bg-transparent',
+                    currentBranch === currentBranchData.name
+                      ? 'border-l-[3px] border-l-tina-orange bg-[#f8fafc]'
+                      : ''
+                  )}
+                >
                   <TableCell>
                     <div className='flex flex-col gap-2'>
                       <div className='flex items-center gap-2'>
