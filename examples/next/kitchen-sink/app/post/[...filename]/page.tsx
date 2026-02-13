@@ -1,7 +1,7 @@
 import client from '@/tina/__generated__/client'
 import BlogPostClientPage from './client-page'
 
-type Props = { params: { filename?: string[] } }
+type Props = { params: Promise<{ filename?: string[] }> }
 
 export async function generateStaticParams() {
   const pages = await client.queries.postConnection()
@@ -14,7 +14,8 @@ export async function generateStaticParams() {
 }
 
 export default async function PostFile({ params }: Props) {
-  const parts = params.filename || []
+  const { filename } = await params
+  const parts = filename || []
   const relativePath = `${parts.join('/')}.mdx`
   const tinaProps = await client.queries.post({ relativePath })
 

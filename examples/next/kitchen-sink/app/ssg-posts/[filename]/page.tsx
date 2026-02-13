@@ -1,35 +1,20 @@
 import React from 'react'
 import client from '../../../tina/__generated__/client'
-import { Json } from '../../../components/json'
 
-type Props = { params: { filename: string } }
+type Props = { params: Promise<{ filename: string }> }
 
 export default async function SSGPostFile({ params }: Props) {
-  const relativePath = `${params.filename}.md` 
+  const { filename } = await params
+  const relativePath = `${filename}.md` 
   const props = await client.queries.ssgPost({ relativePath })
 
   return (
     <main className="py-12 px-6">
       <div className="max-w-5xl mx-auto">
-        <Json src={props} />
+        <pre className="bg-gray-100 p-4 rounded overflow-auto">
+          {JSON.stringify(props, null, 2)}
+        </pre>
       </div>
     </main>
   )
-}
-
-// Compatibility export for pages-style tests
-export async function getStaticProps({ params }: { params: { filename: string } }) {
-  const relativePath = `${params.filename}.md`
-  const props = await client.queries.ssgPost({ relativePath })
-  return { props: { ...props, variables: { relativePath } } }
-}
-
-export async function getStaticPaths() {
-  const connection = await client.queries.ssgPostConnection()
-  return {
-    paths: connection.data.ssgPostConnection.edges.map((post: any) => ({
-      params: { filename: post.node._sys.filename },
-    })),
-    fallback: 'blocking',
-  }
 }

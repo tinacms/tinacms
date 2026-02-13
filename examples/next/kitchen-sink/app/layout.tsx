@@ -16,9 +16,6 @@ export default function RootLayout({
       <body>
         <div className='min-h-screen bg-gray-50'>
           <div className='flex'>
-            <aside className='w-64'>
-              <Navigation />
-            </aside>
             <main className='flex-1 p-6'>
               {children}
             </main>

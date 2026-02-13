@@ -41,7 +41,7 @@ export default function Page() {
   return (
     <main className="py-12 px-6">
       <div className="max-w-5xl mx-auto">
-        <Slideover collections={collectionItems} />
+        <div>No collections available</div>
       </div>
     </main>
   )

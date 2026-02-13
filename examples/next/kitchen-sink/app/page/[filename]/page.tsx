@@ -1,33 +1,25 @@
-import React from 'react'
 import client from '../../../tina/__generated__/client'
-import { Json } from '../../../components/json'
+import PageClientComponent from './client-page'
 
-type Props = { params: { filename: string } }
+type Props = { params: Promise<{ filename: string }> }
+
+export async function generateStaticParams() {
+  const connection = await client.queries.pageConnection()
+  return connection.data?.pageConnection?.edges?.map((post: any) => ({
+    filename: post.node._sys.filename,
+  })) || []
+}
 
 export default async function PageFile({ params }: Props) {
-  const relativePath = `${params.filename}.md`
-  const props = await client.queries.page({ relativePath })
+  const { filename } = await params
+  const relativePath = `${filename}.md`
+  const tinaProps = await client.queries.page({ relativePath })
 
   return (
-    <main className="py-12 px-6">
-      <div className="max-w-5xl mx-auto">
-        <Json src={props} />
-      </div>
-    </main>
+    <PageClientComponent
+      query={tinaProps.query}
+      variables={tinaProps.variables}
+      data={JSON.parse(JSON.stringify(tinaProps.data))}
+    />
   )
-}
-
-// Compatibility export for pages-style tests
-export async function getStaticProps({ params }: { params: { filename: string } }) {
-  const relativePath = `${params.filename}.md`
-  const props = await client.queries.page({ relativePath })
-  return { props: { ...props, variables: { relativePath } } }
-}
-
-export async function getStaticPaths() {
-  const connection = await client.queries.pageConnection()
-  return {
-    paths: connection.data.pageConnection.edges.map((post: any) => ({ params: { filename: post.node._sys.filename } })),
-    fallback: 'blocking',
-  }
 }
