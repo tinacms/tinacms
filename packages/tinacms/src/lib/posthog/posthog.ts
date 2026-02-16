@@ -48,3 +48,7 @@ export type CollectionListPageItmeClickedPayload = {
   itemName: string;
   itemType: 'collection' | 'folder' | 'document';
 }
+
+export const CollectionListPageSearchEvent: string = 'collection-list-page-search';
+
+export const EventLogPageViewedEvent: string = 'event-log-page-viewed';
