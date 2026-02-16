@@ -2,6 +2,7 @@
   "name": "kitchen-sink",
   "version": "0.1.99",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "MONOREPO_DEV=true tinacms dev -c \"next dev\"",
     "dev2": "tinacms dev -c \"next dev\"",
