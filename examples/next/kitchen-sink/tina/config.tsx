@@ -37,14 +37,17 @@ const customAuthProvider = {
   getUser: async () => {
     return localStorage.getItem(TINA_TOKEN_KEY);
   },
+  // Provide a SessionProvider factory expected by the Tina admin bundle
+  getSessionProvider: () => {
+    const SessionProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
+      return <>{children}</>;
+    };
+    return SessionProvider;
+  },
 };
 
 export default defineConfig({
-  branch,
-
-  clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID || null,
-  token: process.env.TINA_TOKEN || null,
-
+   // contentApiUrlOverride: '/api/gql',
   build: {
     outputFolder: 'admin',
     publicFolder: 'public',
@@ -60,6 +63,9 @@ export default defineConfig({
       publicFolder: 'public',
     },
   },
+  branch,
+  clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID || null,
+  token: process.env.TINA_TOKEN || null,
   authProvider: customAuthProvider,
   schema: {
     collections: [
