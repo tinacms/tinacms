@@ -9,6 +9,7 @@ blocks:
       - label: Get Started
         url: 'https://tina.io'
         variant: secondary
+    color: primary
     _template: hero
   - title: Features
     categoriesOther:
@@ -18,6 +19,7 @@ blocks:
       - Query Your Content
       - Build on Top of Your Components
       - Command Line Quickstart
+    color: default
     _template: features
   - title: New to Tina?
     description: Learn the basics of the development workflow
@@ -25,6 +27,7 @@ blocks:
       - label: Check out the docs
         url: 'https://tina.io/docs/'
         variant: secondary
+    color: tint
     _template: cta
 _template: blockPage
 ---

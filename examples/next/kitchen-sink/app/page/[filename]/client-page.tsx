@@ -1,8 +1,8 @@
 'use client'
 
 import { useTina } from 'tinacms/dist/react'
-import BlockRenderer from '@/components/blocks'
-import { Section } from '@/components/layout/section'
+import { Blocks } from '@/components/blocks'
+import { Section, Container } from '@/components/layout'
 import RichText from '@/lib/richText'
 
 type TinaProps = {
@@ -19,6 +19,7 @@ export default function PageClientComponent(props: TinaProps) {
   })
 
   const page = data?.page
+  
   if (!page) {
     return <div className="p-6 text-red-600">Error: No page data found</div>
   }
@@ -29,23 +30,20 @@ export default function PageClientComponent(props: TinaProps) {
   if (template === 'blockPage') {
     return (
       <>
-        <Section>
-          <div className="mb-6">
-            <h1 className="text-4xl font-bold text-gray-900">
-              {page.title}
-            </h1>
-          </div>
-        </Section>
-        <BlockRenderer blocks={page.blocks} />
+        {page.blocks && page.blocks.length > 0 ? (
+          <Blocks blocks={page.blocks} />
+        ) : (
+          <div className="p-6 text-gray-600 dark:text-gray-400">No blocks to display</div>
+        )}
       </>
     )
   }
   // Render showcase template
   if (template === 'showcase') {
     return (
-      <main className="py-12 px-6">
+      <main className="py-12 px-6 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-1000">
         <div className="max-w-5xl mx-auto">
-          <h1 className="text-4xl font-bold text-gray-900 mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-8">
             {page.title}
           </h1>
           {page.items && page.items.length > 0 && (
@@ -53,13 +51,13 @@ export default function PageClientComponent(props: TinaProps) {
               {page.items.map((item: any, idx: number) => (
                 <div
                   key={idx}
-                  className="p-6 border border-gray-200 rounded-lg hover:shadow-lg transition-shadow"
+                  className="p-6 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg hover:shadow-lg transition-shadow"
                 >
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-50 mb-2">
                     {item.title}
                   </h3>
                   {item.description && (
-                    <div className="text-gray-700 mb-4">
+                    <div className="text-gray-700 dark:text-gray-300 mb-4">
                       <RichText content={item.description} />
                     </div>
                   )}

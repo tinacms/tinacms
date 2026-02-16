@@ -17,10 +17,10 @@ export default function SSGPostClientPage(props: TinaProps) {
 
   if (data?.ssgPost) {
     return (
-      <main className="py-12 px-6">
+      <main className="py-12 px-6 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-1000">
         <div className="max-w-5xl mx-auto">
-          <h1 className="text-4xl font-bold text-gray-900 mb-8">{data.ssgPost.title}</h1>
-          <div className="prose prose-lg max-w-none">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-8">{data.ssgPost.title}</h1>
+          <div className="prose prose-lg dark:prose-dark max-w-none">
             <TinaMarkdown content={data.ssgPost.body} />
           </div>
         </div>

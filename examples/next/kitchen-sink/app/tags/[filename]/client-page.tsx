@@ -17,11 +17,11 @@ export default function TagClientPage(props: TinaProps) {
 
   if (data?.tag) {
     return (
-      <main className="py-12 px-6">
+      <main className="py-12 px-6 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-1000">
         <div className="max-w-5xl mx-auto">
-          <h1 className="text-4xl font-bold text-gray-900 mb-8">{data.tag.title}</h1>
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-8">{data.tag.title}</h1>
           {data.tag.description && (
-            <div className="prose prose-lg max-w-none">
+            <div className="prose prose-lg dark:prose-dark max-w-none">
               <TinaMarkdown content={data.tag.description} />
             </div>
           )}

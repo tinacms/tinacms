@@ -1,49 +1,45 @@
-'use client';
+'use client'
 
-import Hero, { type HeroBlock } from './hero';
-import Features, { type FeaturesBlock } from './features';
-import CTA, { type CTABlock } from './cta';
+import { Hero } from './hero'
+import { Features } from './features'
+import { CTA } from './cta'
+import { Testimonial } from './testimonial'
+import { Content } from './content'
 
-type Block = HeroBlock | FeaturesBlock | CTABlock;
-
-interface BlockRendererProps {
-  blocks?: Block[];
+const typeNameMap: Record<string, string> = {
+  'PageBlockPageBlocksHero': 'hero',
+  'PageBlockPageBlocksFeatures': 'features',
+  'PageBlockPageBlocksCta': 'cta',
+  'PageBlockPageBlocksTestimonial': 'testimonial',
+  'PageBlockPageBlocksContent': 'content',
 }
 
-export default function BlockRenderer({ blocks }: BlockRendererProps) {
+export const Blocks = ({ blocks = [] }) => {
   if (!blocks || blocks.length === 0) {
-    return (
-      <div className="p-6 bg-yellow-50 text-yellow-900 rounded border border-yellow-200">
-        No blocks to render
-      </div>
-    );
+    return <div className="p-6 text-center text-gray-500">No blocks to render</div>
   }
-
+  
   return (
     <>
-      {blocks.map((block, idx) => {
-        // Blocks come either with a `_template` (from filesystem frontmatter)
-        // or with a GraphQL `__typename` like `PageBlockPageBlocksHero`.
-        const template = (block as any)._template ?? (block as any).__typename ? (block as any).__typename.replace(/^PageBlockPageBlocks/, '').toLowerCase() : undefined
-
+      {blocks.map(function (block, i) {
+        // Get template from _template field, or map from __typename
+        const template = block._template || typeNameMap[block.__typename] || block.__typename
+        
         switch (template) {
           case 'hero':
-            return <Hero key={idx} data={block as HeroBlock} />;
+            return <Hero key={i} data={block} parentField={`blocks.${i}`} />
           case 'features':
-            return <Features key={idx} data={block as FeaturesBlock} />;
+            return <Features key={i} data={block} parentField={`blocks.${i}`} />
           case 'cta':
-            return <CTA key={idx} data={block as CTABlock} />;
+            return <CTA key={i} data={block} parentField={`blocks.${i}`} />
+          case 'testimonial':
+            return <Testimonial key={i} data={block} parentField={`blocks.${i}`} />
+          case 'content':
+            return <Content key={i} data={block} parentField={`blocks.${i}`} />
           default:
-            return (
-              <div
-                key={idx}
-                className="p-6 bg-red-50 border border-red-200 rounded text-red-900 mx-6"
-              >
-                Unknown block type: {(block as any)._template ?? (block as any).__typename}
-              </div>
-            );
+            return <div key={i} className="p-4 bg-yellow-100 text-yellow-900 rounded">Unknown block type: {template}</div>
         }
       })}
     </>
-  );
+  )
 }

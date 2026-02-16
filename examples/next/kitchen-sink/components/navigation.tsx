@@ -125,20 +125,24 @@ export default async function Navigation() {
   const items = await getNavItems();
 
   return (
-    <nav className="w-64 bg-white border-r border-gray-200 p-6 min-h-screen">
-      <div className="space-y-2">
+    <nav className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 p-6 min-h-screen overflow-y-auto sticky top-0">
+      <div className="mb-8">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">Navigation</h2>
+        <div className="h-1 w-12 bg-gradient-to-r from-blue-500 to-orange-500"></div>
+      </div>
+      <div className="space-y-1">
         {items.map((item) => {
           const isDisabled = item.href === '#';
           return (
             <div key={item.label}>
               {isDisabled ? (
-                <div className="text-sm font-semibold text-gray-900 mt-4 mb-2">
+                <div className="text-xs font-bold text-gray-600 dark:text-gray-400 mt-6 mb-3 uppercase tracking-wide">
                   {item.label}
                 </div>
               ) : (
                 <Link
                   href={item.href}
-                  className="block px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                  className="block px-4 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200 border-l-2 border-transparent hover:border-blue-500"
                 >
                   {item.label}
                 </Link>

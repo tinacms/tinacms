@@ -1,59 +1,79 @@
-'use client';
-import Link from 'next/link';
-import { Section } from '../layout/section';
-import RichText from '@/lib/richText';
+'use client'
+import Link from 'next/link'
+import { Section, Container } from '../layout'
+import RichText from '@/lib/richText'
 
-// Helper for tinaField markers
-const tinaField = (data: any, fieldName?: string) => {
-  return fieldName ? `${fieldName}` : '';
-};
+export const CTA = ({ data, parentField = '' }) => {
+  return (
+    <Section color={data.color}>
+      <Container size="large">
+        <div className="text-center">
+          <h2
+            data-tinafield={`${parentField}.title`}
+            className="text-balance text-4xl font-semibold lg:text-5xl text-inherit"
+          >
+            {data.title}
+          </h2>
+          {data.description && (
+            <div
+              data-tinafield={`${parentField}.description`}
+              className="mt-4 text-inherit opacity-90 max-w-2xl mx-auto"
+            >
+              <RichText content={data.description} />
+            </div>
+          )}
 
-export interface CTABlock {
-  _template: 'cta';
-  title: string;
-  description?: string;
-  actions?: Array<{
-    label: string;
-    url: string;
-    variant?: 'primary' | 'secondary' | 'simple';
-  }>;
-  background?: string;
+          <div className="mt-12 flex flex-wrap justify-center gap-4">
+            {data.actions &&
+              data.actions.map((action, idx) => (
+                <div
+                  key={idx}
+                  className="bg-white/10 rounded-lg border border-white/20 p-0.5"
+                >
+                  <Link
+                    href={action.url}
+                    className={`inline-flex items-center justify-center gap-2 px-5 py-2 rounded-md font-medium text-base transition-colors ${
+                      action.variant === 'secondary'
+                        ? 'border border-white/30 bg-white/10 hover:bg-white/20 text-white'
+                        : 'bg-white text-blue-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    {action.label}
+                  </Link>
+                </div>
+              ))}
+          </div>
+        </div>
+      </Container>
+    </Section>
+  )
 }
 
-export default function CTA({ data }: { data: CTABlock }) {
-  return (
-    <Section background={data.background || 'bg-indigo-50/80'}>
-      <div className="text-center">
-        <h2 data-tina-field={tinaField(data, 'title')} className="text-balance text-4xl font-semibold lg:text-5xl text-gray-900">
-          {data.title}
-        </h2>
-        {data.description && (
-          <div data-tina-field={tinaField(data, 'description')} className="mt-4 text-gray-600 max-w-2xl mx-auto">
-            <RichText content={data.description} />
-          </div>
-        )}
-
-        <div className="mt-12 flex flex-wrap justify-center gap-4">
-          {data.actions &&
-            data.actions.map((action) => (
-              <div
-                key={action!.label}
-                className="bg-white/10 rounded-lg border border-gray-200 p-0.5"
-              >
-                <Link
-                  href={action!.url}
-                  className={`inline-flex items-center justify-center gap-2 px-5 py-2 rounded-md font-medium text-base transition-colors ${
-                    action!.variant === 'secondary'
-                      ? 'border border-gray-300 bg-white hover:bg-gray-50 text-gray-900'
-                      : 'bg-blue-600 text-white hover:bg-blue-700'
-                  }`}
-                >
-                  {action!.label}
-                </Link>
-              </div>
-            ))}
-        </div>
-      </div>
-    </Section>
-  );
+export const ctaBlockSchema = {
+  name: 'cta',
+  label: 'CTA',
+  ui: {
+    previewSrc: '/blocks/cta.png',
+  },
+  fields: [
+    {
+      type: 'string',
+      label: 'Title',
+      name: 'title',
+    },
+    {
+      type: 'string',
+      ui: {
+        component: 'textarea',
+      },
+      label: 'Description',
+      name: 'description',
+    },
+    {
+      type: 'string',
+      label: 'Color',
+      name: 'color',
+      options: ['default', 'tint', 'primary'],
+    },
+  ],
 }
