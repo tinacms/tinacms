@@ -42,7 +42,7 @@
 		"typescript": "^5.7.3",
 		"vite": "^4.5.9"
 	},
-	"packageManager": "pnpm@9.15.5",
+	"packageManager": "pnpm@10.28.2",
 	"dependencies": {
 		"highlight.js": "catalog:",
 		"react-colorful": "catalog:"
