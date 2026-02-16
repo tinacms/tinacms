@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { Section } from '../layout/section';
+import RichText from '@/lib/richText';
 import { Button } from '../ui/button';
 
 // Helper for tinaField markers
@@ -30,9 +31,9 @@ export default function Hero({ data }: { data: HeroBlock }) {
           </h1>
         )}
         {data.description && (
-          <p data-tina-field={tinaField(data, 'description')} className="mx-auto mt-8 max-w-2xl text-balance text-lg text-gray-700">
-            {data.description}
-          </p>
+          <div data-tina-field={tinaField(data, 'description')} className="mx-auto mt-8 max-w-2xl text-balance text-lg text-gray-700">
+            <RichText content={data.description} />
+          </div>
         )}
         {data.actions && data.actions.length > 0 && (
           <div className="mt-12 flex flex-wrap justify-center gap-4">

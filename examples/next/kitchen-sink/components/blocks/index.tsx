@@ -22,7 +22,11 @@ export default function BlockRenderer({ blocks }: BlockRendererProps) {
   return (
     <>
       {blocks.map((block, idx) => {
-        switch (block._template) {
+        // Blocks come either with a `_template` (from filesystem frontmatter)
+        // or with a GraphQL `__typename` like `PageBlockPageBlocksHero`.
+        const template = (block as any)._template ?? (block as any).__typename ? (block as any).__typename.replace(/^PageBlockPageBlocks/, '').toLowerCase() : undefined
+
+        switch (template) {
           case 'hero':
             return <Hero key={idx} data={block as HeroBlock} />;
           case 'features':
@@ -35,7 +39,7 @@ export default function BlockRenderer({ blocks }: BlockRendererProps) {
                 key={idx}
                 className="p-6 bg-red-50 border border-red-200 rounded text-red-900 mx-6"
               >
-                Unknown block type: {(block as any)._template}
+                Unknown block type: {(block as any)._template ?? (block as any).__typename}
               </div>
             );
         }

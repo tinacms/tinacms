@@ -3,6 +3,7 @@
 import { useTina } from 'tinacms/dist/react'
 import BlockRenderer from '@/components/blocks'
 import { Section } from '@/components/layout/section'
+import RichText from '@/lib/richText'
 
 type TinaProps = {
   query: string
@@ -21,9 +22,11 @@ export default function PageClientComponent(props: TinaProps) {
   if (!page) {
     return <div className="p-6 text-red-600">Error: No page data found</div>
   }
+  // Determine template name. GraphQL returns `__typename` (PageBlockPage | PageShowcase)
+  const template = (page as any)._template ?? (page.__typename === 'PageBlockPage' ? 'blockPage' : page.__typename === 'PageShowcase' ? 'showcase' : undefined)
 
   // Render blockPage template
-  if (page._template === 'blockPage') {
+  if (template === 'blockPage') {
     return (
       <>
         <Section>
@@ -37,9 +40,8 @@ export default function PageClientComponent(props: TinaProps) {
       </>
     )
   }
-
   // Render showcase template
-  if (page._template === 'showcase') {
+  if (template === 'showcase') {
     return (
       <main className="py-12 px-6">
         <div className="max-w-5xl mx-auto">
@@ -57,9 +59,9 @@ export default function PageClientComponent(props: TinaProps) {
                     {item.title}
                   </h3>
                   {item.description && (
-                    <p className="text-gray-700 mb-4">
-                      {item.description}
-                    </p>
+                    <div className="text-gray-700 mb-4">
+                      <RichText content={item.description} />
+                    </div>
                   )}
                   {item.image && (
                     <img

@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { Section } from '../layout/section';
+import RichText from '@/lib/richText';
 
 // Helper for tinaField markers
 const tinaField = (data: any, fieldName?: string) => {
@@ -27,9 +28,9 @@ export default function CTA({ data }: { data: CTABlock }) {
           {data.title}
         </h2>
         {data.description && (
-          <p data-tina-field={tinaField(data, 'description')} className="mt-4 text-gray-600 max-w-2xl mx-auto">
-            {data.description}
-          </p>
+          <div data-tina-field={tinaField(data, 'description')} className="mt-4 text-gray-600 max-w-2xl mx-auto">
+            <RichText content={data.description} />
+          </div>
         )}
 
         <div className="mt-12 flex flex-wrap justify-center gap-4">

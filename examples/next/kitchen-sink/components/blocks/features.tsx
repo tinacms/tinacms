@@ -1,6 +1,7 @@
 'use client';
 import { Card, CardHeader } from '../ui/card';
 import { Section } from '../layout/section';
+import RichText from '@/lib/richText';
 
 // Helper for tinaField markers
 const tinaField = (data: any, fieldName?: string) => {
@@ -46,9 +47,9 @@ export default function Features({ data }: { data: FeaturesBlock }) {
             {data.title}
           </h2>
           {data.description && (
-            <p data-tina-field={tinaField(data, 'description')} className="mt-4 text-gray-600">
-              {data.description}
-            </p>
+            <div data-tina-field={tinaField(data, 'description')} className="mt-4 text-gray-600">
+              <RichText content={data.description} />
+            </div>
           )}
         </div>
         <Card className="@min-4xl:max-w-full @min-4xl:grid-cols-3 @min-4xl:divide-x @min-4xl:divide-y-0 mx-auto mt-8 grid max-w-sm divide-y overflow-hidden md:mt-16">
