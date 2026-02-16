@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 
 import type { TCodeBlockElement } from '@udecode/plate-code-block';
 
-import { cn } from '@udecode/cn';
+import { cn } from '@utils/cn';
 import { useElement, useReadOnly } from '@udecode/plate/react';
 import { Check, ChevronDown } from 'lucide-react';
 

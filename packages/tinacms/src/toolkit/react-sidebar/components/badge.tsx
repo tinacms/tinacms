@@ -1,15 +1,11 @@
 import * as React from 'react';
-import { AiFillWarning } from 'react-icons/ai';
-import { cn } from '../../../lib/utils';
+import { cn } from '@utils/cn';
 import {
   MdAccessTime,
   MdCheckCircle,
-  MdError,
-  MdInfo,
   MdOutlineDataSaverOff,
   MdWifiOff,
 } from 'react-icons/md';
-import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 
 export const Badge = ({
   children,
