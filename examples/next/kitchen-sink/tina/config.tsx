@@ -37,12 +37,44 @@ const customAuthProvider = {
   getUser: async () => {
     return localStorage.getItem(TINA_TOKEN_KEY);
   },
+  // Wraps fetch with authorization header
+  fetchWithToken: async (input, init) => {
+    const headers = init?.headers || {};
+    const token = await customAuthProvider.getToken();
+    if (token?.id_token) {
+      headers['Authorization'] = 'Bearer ' + token?.id_token;
+    }
+    return await fetch(input, {
+      ...(init || {}),
+      headers: new Headers(headers),
+    });
+  },
+  // Check if the user is authorized (has a token)
+  authorize: async () => {
+    return customAuthProvider.getToken();
+  },
+  // Check if authorized
+  isAuthorized: async () => {
+    return !!(await customAuthProvider.authorize());
+  },
+  // Check if authenticated
+  isAuthenticated: async () => {
+    return !!(await customAuthProvider.getUser());
+  },
   // Provide a SessionProvider factory expected by the Tina admin bundle
   getSessionProvider: () => {
     const SessionProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
       return <>{children}</>;
     };
     return SessionProvider;
+  },
+  // Specify the login strategy
+  getLoginStrategy: () => {
+    return 'Redirect';
+  },
+  // Return custom login screen (null means use default)
+  getLoginScreen: () => {
+    return null;
   },
 };
 
