@@ -1,55 +1,83 @@
 'use client'
-import Link from 'next/link'
-import { Section, Container } from '../layout'
+import { Actions } from '../layout/actions'
+import { Container } from '../layout'
 import RichText from '@/lib/richText'
+import { Section } from '../layout'
 
-export const Hero = ({ data, parentField = '' }) => {
-  if (!data) {
-    return <div className="p-6 bg-red-100 text-red-900 rounded">Hero block: no data</div>
+export const Hero = ({ data, parentField }: any) => {
+  const headlineColorClasses = {
+    blue: 'from-blue-400 to-blue-600',
+    teal: 'from-teal-400 to-teal-600',
+    green: 'from-green-400 to-green-600',
+    red: 'from-red-400 to-red-600',
+    pink: 'from-pink-400 to-pink-600',
+    purple: 'from-purple-400 to-purple-600',
+    orange: 'from-orange-300 to-orange-600',
+    yellow: 'from-yellow-400 to-yellow-800',
   }
-  
+
   return (
     <Section color={data.color}>
-      <Container size="large">
-        <div className="text-center sm:mx-auto lg:mr-auto lg:mt-0">
+      <Container
+        size="large"
+        className="grid grid-cols-1 lg:grid-cols-5 gap-14 items-center justify-center"
+      >
+        <div className="row-start-2 lg:row-start-1 lg:col-span-3 text-center lg:text-left">
+          {data.tagline && (
+            <h2
+              data-tinafield={`${parentField}.tagline`}
+              className="relative inline-block px-3 py-1 mb-8 text-md font-bold tracking-wide title-font z-20"
+            >
+              {data.tagline}
+              <span className="absolute w-full h-full left-0 top-0 rounded-full -z-1 bg-current opacity-7"></span>
+            </h2>
+          )}
           {data.headline && (
-            <h1
+            <h3
               data-tinafield={`${parentField}.headline`}
-              className="text-balance text-5xl font-extrabold mb-6 text-inherit"
+              className={`w-full relative mb-10 text-5xl font-extrabold tracking-normal leading-tight title-font`}
             >
-              {data.headline}
-            </h1>
+              <span>
+                {data.headline}
+              </span>
+            </h3>
           )}
-          {data.description && (
+          {data.text && (
             <div
-              data-tinafield={`${parentField}.description`}
-              className="mx-auto mt-8 max-w-2xl text-balance text-lg text-inherit opacity-90"
+              data-tinafield={`${parentField}.text`}
+              className={`prose prose-lg mx-auto lg:mx-0 mb-10 ${
+                data.color === 'primary' ? `prose-primary` : `dark:prose-dark`
+              }`}
             >
-              <RichText content={data.description} />
+              <RichText content={data.text} />
             </div>
           )}
-          {data.actions && data.actions.length > 0 && (
-            <div className="mt-12 flex flex-wrap justify-center gap-4">
-              {data.actions.map((action, idx) => (
-                <div
-                  key={idx}
-                  className="bg-white/10 rounded-lg border border-white/20 p-0.5"
-                >
-                  <Link
-                    href={action.url}
-                    className={`inline-flex items-center justify-center gap-2 px-5 py-2 rounded-md font-medium text-base transition-colors ${
-                      action.variant === 'secondary'
-                        ? 'border border-white/30 bg-white/10 hover:bg-white/20 text-white'
-                        : 'bg-white text-blue-600 hover:bg-gray-100'
-                    }`}
-                  >
-                    {action.label}
-                  </Link>
-                </div>
-              ))}
-            </div>
+          {data.actions && (
+            <Actions
+              parentField={`${parentField}.actions`}
+              className="justify-center lg:justify-start py-2"
+              parentColor={data.color}
+              actions={data.actions}
+            />
           )}
         </div>
+        {data.image && (
+          <div
+            data-tinafield={`${parentField}.image`}
+            className="relative row-start-1 lg:col-span-2 flex justify-center"
+          >
+            <img
+              className="absolute w-full rounded-lg max-w-xs lg:max-w-none h-auto blur-2xl brightness-150 contrast-[0.9] dark:brightness-150 saturate-200 opacity-50 dark:opacity-30 mix-blend-multiply dark:mix-blend-hard-light"
+              src={data.image.src}
+              aria-hidden="true"
+            />
+            <img
+              className="relative z-10 w-full max-w-xs rounded-lg lg:max-w-none h-auto"
+              alt={data.image.alt}
+              src={data.image.src}
+            />
+          </div>
+        )}
       </Container>
     </Section>
   )
@@ -60,26 +88,98 @@ export const heroBlockSchema = {
   label: 'Hero',
   ui: {
     previewSrc: '/blocks/hero.png',
+    defaultItem: {
+      tagline: "Here's some text above the other text",
+      headline: 'This Big Text is Totally Awesome',
+      text: 'Phasellus scelerisque, libero eu finibus rutrum, risus risus accumsan libero, nec molestie urna dui a leo.',
+    },
   },
   fields: [
+    {
+      type: 'string',
+      label: 'Tagline',
+      name: 'tagline',
+    },
     {
       type: 'string',
       label: 'Headline',
       name: 'headline',
     },
     {
-      type: 'string',
+      label: 'Text',
+      name: 'text',
+      type: 'rich-text',
+    },
+    {
+      type: 'object',
+      label: 'Image',
+      name: 'image',
+      fields: [
+        {
+          type: 'string',
+          label: 'Source',
+          name: 'src',
+          ui: {
+            component: 'image',
+          },
+        },
+        {
+          type: 'string',
+          label: 'Alt Text',
+          name: 'alt',
+        },
+      ],
+    },
+    {
+      label: 'Actions',
+      name: 'actions',
+      type: 'object',
+      list: true,
       ui: {
-        component: 'textarea',
+        defaultItem: {
+          label: 'Action Label',
+          type: 'button',
+          icon: true,
+          link: '/',
+        },
+        itemProps: (item: any) => ({ label: item.label }),
       },
-      label: 'Description',
-      name: 'description',
+      fields: [
+        {
+          label: 'Label',
+          name: 'label',
+          type: 'string',
+        },
+        {
+          label: 'Type',
+          name: 'type',
+          type: 'string',
+          options: [
+            { label: 'Button', value: 'button' },
+            { label: 'Link', value: 'link' },
+          ],
+        },
+        {
+          label: 'Link',
+          name: 'link',
+          type: 'string',
+        },
+        {
+          label: 'Icon',
+          name: 'icon',
+          type: 'boolean',
+        },
+      ],
     },
     {
       type: 'string',
       label: 'Color',
       name: 'color',
-      options: ['default', 'tint', 'primary'],
+      options: [
+        { label: 'Default', value: 'default' },
+        { label: 'Tint', value: 'tint' },
+        { label: 'Primary', value: 'primary' },
+      ],
     },
   ],
 }

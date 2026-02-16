@@ -7,7 +7,7 @@ export const Testimonial = ({ data, parentField = '' }) => {
       <Container size="large">
         <blockquote>
           <div
-            className={`relative z-10 max-w-3xl mx-auto text-4xl lg:text-5xl font-bold tracking-normal text-center ${
+            className={`relative z-10 max-w-3xl mx-auto text-4xl lg:text-5xl font-bold tracking-normal text-center title-font ${
               data.color === 'primary'
                 ? `text-white`
                 : `text-gray-700 dark:text-gray-50`
@@ -38,7 +38,7 @@ export const Testimonial = ({ data, parentField = '' }) => {
           <footer className="text-center">
             <p
               data-tinafield={`${parentField}.author`}
-              className={`tracking-wide font-bold text-lg ${
+              className={`tracking-wide title-font font-bold text-lg ${
                 data.color === 'primary'
                   ? `text-blue-200`
                   : `text-blue-500 dark:text-blue-300`
@@ -58,6 +58,12 @@ export const testimonialBlockSchema = {
   label: 'Testimonial',
   ui: {
     previewSrc: '/blocks/testimonial.png',
+    defaultItem: {
+      quote:
+        'There are only two hard things in Computer Science: cache invalidation and naming things.',
+      author: 'Phil Karlton',
+      color: 'primary',
+    },
   },
   fields: [
     {
@@ -77,7 +83,11 @@ export const testimonialBlockSchema = {
       type: 'string',
       label: 'Color',
       name: 'color',
-      options: ['default', 'tint', 'primary'],
+      options: [
+        { label: 'Default', value: 'default' },
+        { label: 'Tint', value: 'tint' },
+        { label: 'Primary', value: 'primary' },
+      ],
     },
   ],
 }

@@ -2,8 +2,9 @@
 import Link from 'next/link'
 import { Section, Container } from '../layout'
 import RichText from '@/lib/richText'
+import { Actions } from '../layout/actions'
 
-export const CTA = ({ data, parentField = '' }) => {
+export const CTA = ({ data, parentField = '' }: any) => {
   return (
     <Section color={data.color}>
       <Container size="large">
@@ -23,26 +24,16 @@ export const CTA = ({ data, parentField = '' }) => {
             </div>
           )}
 
-          <div className="mt-12 flex flex-wrap justify-center gap-4">
-            {data.actions &&
-              data.actions.map((action, idx) => (
-                <div
-                  key={idx}
-                  className="bg-white/10 rounded-lg border border-white/20 p-0.5"
-                >
-                  <Link
-                    href={action.url}
-                    className={`inline-flex items-center justify-center gap-2 px-5 py-2 rounded-md font-medium text-base transition-colors ${
-                      action.variant === 'secondary'
-                        ? 'border border-white/30 bg-white/10 hover:bg-white/20 text-white'
-                        : 'bg-white text-blue-600 hover:bg-gray-100'
-                    }`}
-                  >
-                    {action.label}
-                  </Link>
-                </div>
-              ))}
-          </div>
+          {data.actions && (
+            <div className="mt-12">
+              <Actions
+                parentField={`${parentField}.actions`}
+                className="justify-center py-2"
+                parentColor={data.color}
+                actions={data.actions}
+              />
+            </div>
+          )}
         </div>
       </Container>
     </Section>
@@ -70,10 +61,55 @@ export const ctaBlockSchema = {
       name: 'description',
     },
     {
+      label: 'Actions',
+      name: 'actions',
+      type: 'object',
+      list: true,
+      ui: {
+        defaultItem: {
+          label: 'Action Label',
+          type: 'button',
+          icon: true,
+          link: '/',
+        },
+        itemProps: (item: any) => ({ label: item.label }),
+      },
+      fields: [
+        {
+          label: 'Label',
+          name: 'label',
+          type: 'string',
+        },
+        {
+          label: 'Type',
+          name: 'type',
+          type: 'string',
+          options: [
+            { label: 'Button', value: 'button' },
+            { label: 'Link', value: 'link' },
+          ],
+        },
+        {
+          label: 'Link',
+          name: 'link',
+          type: 'string',
+        },
+        {
+          label: 'Icon',
+          name: 'icon',
+          type: 'boolean',
+        },
+      ],
+    },
+    {
       type: 'string',
       label: 'Color',
       name: 'color',
-      options: ['default', 'tint', 'primary'],
+      options: [
+        { label: 'Default', value: 'default' },
+        { label: 'Tint', value: 'tint' },
+        { label: 'Primary', value: 'primary' },
+      ],
     },
   ],
 }

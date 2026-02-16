@@ -103,13 +103,11 @@ export const customComponents: Components<{
   },
 
   img: (props) => (
-    <div className="flex items-center justify-center my-8">
-      <img 
-        src={props.url} 
-        alt={props.alt} 
-        className="rounded-lg shadow-md max-w-full h-auto"
-      />
-    </div>
+    <img 
+      src={props.url} 
+      alt={props.alt} 
+      className="w-full h-auto rounded-lg shadow-md my-8 block"
+    />
   ),
 
   // Standard markdown elements
@@ -138,13 +136,13 @@ export const customComponents: Components<{
   ),
 
   ul: (props) => (
-    <ul className="list-disc list-inside mb-4 ml-4 space-y-2 text-gray-700 dark:text-gray-300">
+    <ul className="list-disc mb-4 ml-4 pl-4 space-y-2 text-gray-700 dark:text-gray-300">
       {props.children}
     </ul>
   ),
 
   ol: (props) => (
-    <ol className="list-decimal list-inside mb-4 ml-4 space-y-2 text-gray-700 dark:text-gray-300">
+    <ol className="list-decimal mb-4 ml-4 pl-4 space-y-2 text-gray-700 dark:text-gray-300">
       {props.children}
     </ol>
   ),

@@ -25,7 +25,7 @@ export const contentBlockSchema = {
   ui: {
     previewSrc: '/blocks/content.png',
     defaultItem: {
-      body: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros.',
+      body: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna nibh, viverra non, semper suscipit, posuere a, pede.',
     },
   },
   fields: [
@@ -38,7 +38,11 @@ export const contentBlockSchema = {
       type: 'string',
       label: 'Color',
       name: 'color',
-      options: ['default', 'tint', 'primary'],
+      options: [
+        { label: 'Default', value: 'default' },
+        { label: 'Tint', value: 'tint' },
+        { label: 'Primary', value: 'primary' },
+      ],
     },
   ],
 }
