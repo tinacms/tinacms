@@ -1,29 +1,3 @@
-// User begins creating branch
-export const CreateBranchEvent: string = 'create-branch';
-export type CreateBranchPayload = {
-  branchName: string;
-  status: 'indexed' | 'unindexed';
-};
-
-// The user finishes creating a branch
-export const CreatePullRequestEvent: string = 'create-pull-request';
-export type CreatePullRequestPayload = {
-  pullRequestUrl: string;
-  branchName: string;
-  createdAt: string;
-};
-
-export const FinishPullRequestEvent: string = 'finish-pull-request';
-export type FinishPullRequestPayload = {
-  pullRequestUrl: string;
-  branchName: string;
-  title: string;
-  description: string;
-  createdAt: string;
-  updatedAt: string;
-  status: string;
-};
-
 // When the user switches branches
 export const BranchSwitchedEvent: string = 'branch-switched';
 export type BranchSwitchedPayload = {
@@ -62,3 +36,15 @@ export type ProjectConfigNavigatedToFromWebsitePayload = Record<string, never>;
 export const UserManagementNavigatedToFromWebsiteEvent: string =
   'user-management-navigated-to-from-website';
 export type UserManagementNavigatedToFromWebsitePayload = Record<string, never>;
+
+export const TinaCMSStartedEvent: string = 'tina-cms-started';
+export type TinaCMSStartedPayload = {
+  version: string;
+  system: string;
+}
+
+export const CollectionListPageItmeClickedEvent: string = 'collection-list-page-item-clicked';
+export type CollectionListPageItmeClickedPayload = {
+  itemName: string;
+  itemType: 'collection' | 'folder' | 'document';
+}
