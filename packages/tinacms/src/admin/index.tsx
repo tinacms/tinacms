@@ -29,10 +29,59 @@ import CollectionUpdatePage from './pages/CollectionUpdatePage';
 import DashboardPage from './pages/DashboardPage';
 import ScreenPage from './pages/ScreenPage';
 
-import { Client } from '../internalClient';
+import { Client, TinaCloudAuthProvider } from '../internalClient';
 import { TinaAdminApi } from './api';
 import { initializePostHog, TinaCMSStartedEvent } from '../lib/posthog';
 import pkg from '../../package.json';
+
+type AuthType = 'tinacloud' | 'self-hosted' | 'local' | 'other';
+
+const getAuthFlow = (client: Client | undefined): AuthType => {
+  if (!client) return 'other';
+
+  if (client.isLocalMode) {
+    return 'local';
+  }
+
+  // Self-hosted uses a custom content API URL
+  if (client.isCustomContentApi || client.schema?.config?.config?.contentApiUrlOverride) {
+    return 'self-hosted';
+  }
+
+  // TinaCloud uses TinaCloudAuthProvider
+  if (client.authProvider instanceof TinaCloudAuthProvider) {
+    return 'tinacloud';
+  }
+
+  return 'other';
+};
+
+const PostHogTracker = ({ cms }: { cms: TinaCMS }) => {
+  useEffect(() => {
+    const client: Client | undefined = cms.api?.tina;
+    const authType = getAuthFlow(client);
+
+    console.log('Initializing PostHog from TinaAdmin');
+    initializePostHog().then((posthog) => {
+      if (posthog) {
+        const eventProperties: Record<string, string> = {
+          tinaCMSVersion: pkg.version,
+          system: 'tinacms/tinacms',
+          authType: authType,
+        };
+
+        // Only include clientId for TinaCloud users
+        if (authType === 'tinacloud' && client?.clientId) {
+          eventProperties.clientId = client.clientId;
+        }
+
+        posthog.capture(TinaCMSStartedEvent, eventProperties);
+      }
+    });
+  }, [cms]);
+
+  return null;
+};
 
 const Redirect = () => {
   React.useEffect(() => {
@@ -202,20 +251,9 @@ export const TinaAdmin = ({
   if (isSSR) {
     return null;
   }
-  useEffect(() => {
-    initializePostHog().then((posthog) => {
-      if (posthog) {
-        posthog.capture(TinaCMSStartedEvent, {
-          tinaCMSVersion: pkg.version,
-          system: 'tinacms/tinacms',
-        });
-      }
-    });
-  }, []);
   return (
     <GetCMS>
       {(cms: TinaCMS) => {
-        // console.log('The CMS', cms);
         const isTinaAdminEnabled =
           cms.flags.get('tina-admin') === false ? false : true;
         if (isTinaAdminEnabled) {
@@ -227,6 +265,7 @@ export const TinaAdmin = ({
           const hasRouter = Boolean(collectionWithRouter);
           return (
             <>
+              <PostHogTracker cms={cms} />
               <CheckSchema schemaJson={schemaJson}>
                 <Router>
                   {/* @ts-ignore */}
