@@ -1,6 +1,7 @@
 'use client'
 import { useTina } from 'tinacms/dist/react'
 import { TinaMarkdown } from 'tinacms/dist/rich-text'
+import { customComponents } from '@/components/markdown-components'
 
 type TinaProps = {
   query: string
@@ -21,7 +22,7 @@ export default function DocumentationClientPage(props: TinaProps) {
         <div className="max-w-5xl mx-auto">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-8">{data.documentation.title}</h1>
           <div className="prose prose-lg dark:prose-dark max-w-none">
-            <TinaMarkdown content={data.documentation.body} />
+            <TinaMarkdown components={customComponents} content={data.documentation.body} />
           </div>
           {data.documentation.tags && data.documentation.tags.length > 0 && (
             <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800">

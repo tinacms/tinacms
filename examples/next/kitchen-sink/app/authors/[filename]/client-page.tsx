@@ -1,6 +1,7 @@
 'use client'
 import { useTina } from 'tinacms/dist/react'
 import { TinaMarkdown } from 'tinacms/dist/rich-text'
+import { customComponents } from '@/components/markdown-components'
 
 type TinaProps = {
   query: string
@@ -32,7 +33,7 @@ export default function AuthorClientPage(props: TinaProps) {
 
           {data.author.bio && (
             <div className="prose prose-lg dark:prose-dark max-w-none mb-8">
-              <TinaMarkdown content={data.author.bio} />
+              <TinaMarkdown components={customComponents} content={data.author.bio} />
             </div>
           )}
 

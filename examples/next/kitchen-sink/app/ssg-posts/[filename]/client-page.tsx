@@ -1,6 +1,7 @@
 'use client'
 import { useTina } from 'tinacms/dist/react'
 import { TinaMarkdown } from 'tinacms/dist/rich-text'
+import { customComponents } from '@/components/markdown-components'
 
 type TinaProps = {
   query: string
@@ -21,7 +22,7 @@ export default function SSGPostClientPage(props: TinaProps) {
         <div className="max-w-5xl mx-auto">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-8">{data.ssgPost.title}</h1>
           <div className="prose prose-lg dark:prose-dark max-w-none">
-            <TinaMarkdown content={data.ssgPost.body} />
+            <TinaMarkdown components={customComponents} content={data.ssgPost.body} />
           </div>
         </div>
       </main>
