@@ -41,14 +41,16 @@ export const TinaCMSStartedEvent: string = 'tina-cms-started';
 export type TinaCMSStartedPayload = {
   version: string;
   system: string;
-}
+};
 
-export const CollectionListPageItmeClickedEvent: string = 'collection-list-page-item-clicked';
+export const CollectionListPageItmeClickedEvent: string =
+  'collection-list-page-item-clicked';
 export type CollectionListPageItmeClickedPayload = {
   itemName: string;
   itemType: 'collection' | 'folder' | 'document';
-}
+};
 
-export const CollectionListPageSearchEvent: string = 'collection-list-page-search';
+export const CollectionListPageSearchEvent: string =
+  'collection-list-page-search';
 
 export const EventLogPageViewedEvent: string = 'event-log-page-viewed';
