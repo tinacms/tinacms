@@ -105,6 +105,7 @@
     "moment": "catalog:",
     "moment-timezone": "^0.6.0",
     "monaco-editor": "catalog:",
+    "posthog-js": "^1.347.1",
     "prism-react-renderer": "catalog:",
     "prop-types": "catalog:",
     "react-colorful": "catalog:",

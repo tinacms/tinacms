@@ -31,6 +31,8 @@ import ScreenPage from './pages/ScreenPage';
 
 import { Client } from '../internalClient';
 import { TinaAdminApi } from './api';
+import { initializePostHog, TinaCMSStartedEvent } from '../lib/posthog';
+import pkg from '../../package.json';
 
 const Redirect = () => {
   React.useEffect(() => {
@@ -119,6 +121,7 @@ const CheckSchema = ({
   children: JSX.Element;
 }) => {
   const cms = useCMS();
+  console.log('cms:', cms);
   const api = new TinaAdminApi(cms);
   const url = api.api.contentApiUrl;
   const [schemaMissingError, setSchemaMissingError] = React.useState(false);
@@ -199,10 +202,20 @@ export const TinaAdmin = ({
   if (isSSR) {
     return null;
   }
-
+  useEffect(() => {
+    initializePostHog().then((posthog) => {
+      if (posthog) {
+        posthog.capture(TinaCMSStartedEvent, {
+          tinaCMSVersion: pkg.version,
+          system: 'tinacms/tinacms',
+        });
+      }
+    });
+  }, []);
   return (
     <GetCMS>
       {(cms: TinaCMS) => {
+        // console.log('The CMS', cms);
         const isTinaAdminEnabled =
           cms.flags.get('tina-admin') === false ? false : true;
         if (isTinaAdminEnabled) {

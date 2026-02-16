@@ -39,7 +39,7 @@ export type UserManagementNavigatedToFromWebsitePayload = Record<string, never>;
 
 export const TinaCMSStartedEvent: string = 'tina-cms-started';
 export type TinaCMSStartedPayload = {
-  version: string;
+  tinaCMSVersion: string;
   system: string;
 };
 

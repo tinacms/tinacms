@@ -603,6 +603,7 @@ export interface Config<
   Store = undefined,
   SearchClient = undefined,
 > {
+
   contentApiUrlOverride?: string;
   authProvider?: AuthProvider;
   admin?: {
@@ -775,6 +776,19 @@ export interface Config<
         accept?: string | string[];
       };
   /**
+   * Configuration for telemetry.
+   *
+   * This allows you to configure how telemetry is collected and sent to the TinaCMS team.
+   * Default is "enabled" 
+   *
+   * @example
+   * telemetry: "enabled" // Default value
+   * telemetry: "disabled" // Disable telemetry
+   * telemetry: "anonymized" // Anonymize telemetry
+   */
+  telemetry?: "enabled" | "disabled" | "anonymized";
+  
+      /**
    * Configuration for repository-related UI features.
    *
    * This allows you to configure how the CMS displays repository information
