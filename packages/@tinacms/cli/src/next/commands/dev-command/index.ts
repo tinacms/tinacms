@@ -305,6 +305,21 @@ export class DevCommand extends BaseCommand {
       });
     }
 
+    summaryItems.push({
+      emoji: '📊',
+      heading: 'Telemetry mode',
+      subItems: [
+        {
+          key: 'Telemetry mode',
+          value: configManager?.config?.telemetry || 'anonymous',
+        },
+        {
+          key: 'More information on TinaCMS Telemetry',
+          value: 'https://tina.io/telemetry',
+        },
+      ],
+    });
+
     summary({
       heading: '✅ 🦙 TinaCMS Dev Server is active:',
       items: [
