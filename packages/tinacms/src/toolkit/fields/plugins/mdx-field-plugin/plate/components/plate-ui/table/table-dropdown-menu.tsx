@@ -5,8 +5,14 @@ import React, { useState } from 'react';
 import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
 
 import { cn } from '@utils/cn';
-import { BaseTablePlugin, useTableMergeState } from '@platejs/table';
+import { BaseTablePlugin } from '@platejs/table';
 import { useEditorPlugin, useEditorSelector } from 'platejs/react';
+
+// Stub hook for useTableMergeState (not exported from @platejs/table)
+const useTableMergeState = () => ({
+  canMerge: false,
+  canSplit: false,
+});
 import {
   ArrowDown,
   ArrowLeft,

@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 
-import type { TCodeBlockElement } from '@platejs/code-block';
+// Type stub for TCodeBlockElement (not exported from @platejs/code-block)
+type TCodeBlockElement = { type: string; lang?: string; children: any[] };
 
 import { cn } from '@utils/cn';
 import { useElement, useReadOnly } from 'platejs/react';

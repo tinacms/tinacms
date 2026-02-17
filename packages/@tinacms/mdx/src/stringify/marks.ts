@@ -210,7 +210,7 @@ export const eat = (
   }
   const matchingSiblings = content.slice(1, nonMatchingSiblingIndex + 1);
   const markCounts: {
-    [key in 'strong' | 'emphasis' | 'inlineCode' | 'delete']?: number;
+    [key in 'strong' | 'emphasis' | 'inlineCode' | 'delete' | 'mark']?: number;
   } = {};
   marks.forEach((mark) => {
     let count = 1;
@@ -223,10 +223,10 @@ export const eat = (
     markCounts[mark] = count;
   });
   let count = 0;
-  let markToProcess: 'strong' | 'emphasis' | 'inlineCode' | 'delete' | null =
+  let markToProcess: 'strong' | 'emphasis' | 'inlineCode' | 'delete' | 'mark' | null =
     null;
   Object.entries(markCounts).forEach(([mark, markCount]) => {
-    const m = mark as 'strong' | 'emphasis' | 'inlineCode' | 'delete';
+    const m = mark as 'strong' | 'emphasis' | 'inlineCode' | 'delete' | 'mark';
     if (markCount > count) {
       count = markCount;
       markToProcess = m;
@@ -259,6 +259,32 @@ export const eat = (
     ];
   }
 
+  // Handle 'mark' (highlight) by outputting as HTML <mark> element
+  if (markToProcess === 'mark') {
+    const innerContent = eat(
+      [
+        ...[first, ...matchingSiblings].map((sibling) =>
+          cleanNode(sibling, markToProcess)
+        ),
+      ],
+      field,
+      imageCallback
+    );
+    // Convert inner content to text for HTML wrapping
+    const innerText = innerContent
+      .map((node) => {
+        if (node.type === 'text') return node.value;
+        return '';
+      })
+      .join('');
+    return [
+      { type: 'html', value: '<mark>' } as Md.HTML,
+      ...innerContent,
+      { type: 'html', value: '</mark>' } as Md.HTML,
+      ...eat(content.slice(nonMatchingSiblingIndex + 1), field, imageCallback),
+    ];
+  }
+
   return [
     {
       type: markToProcess,
@@ -278,7 +304,7 @@ export const eat = (
 
 const cleanNode = (
   node: InlineElementWithCallback,
-  mark: 'strong' | 'emphasis' | 'inlineCode' | 'delete' | null
+  mark: 'strong' | 'emphasis' | 'inlineCode' | 'delete' | 'mark' | null
 ): Plate.InlineElement => {
   if (!mark) {
     return node;
@@ -289,6 +315,7 @@ const cleanNode = (
     emphasis: 'italic',
     inlineCode: 'code',
     delete: 'strikethrough',
+    mark: 'highlight',
   }[mark];
   Object.entries(node).map(([key, value]) => {
     if (key !== markToClear) {

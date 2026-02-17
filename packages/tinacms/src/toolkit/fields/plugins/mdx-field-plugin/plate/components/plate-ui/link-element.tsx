@@ -2,19 +2,21 @@
 
 import * as React from 'react';
 
-import type { TLinkElement } from '@platejs/link';
 import type { PlateElementProps } from 'platejs/react';
 
-import { useLink } from '@platejs/link';
+import { getLinkAttributes } from '@platejs/link';
 import { PlateElement, useEditorRef } from 'platejs/react';
 import { BaseCodeBlockPlugin } from '@platejs/code-block';
 
+// Type stub for link element
+type TLinkElement = { type: string; url: string; children: any[] };
+
 export function LinkElement(props: PlateElementProps<TLinkElement>) {
-  const { props: linkProps } = useLink({ element: props.element });
   const editor = useEditorRef();
+  const linkProps = getLinkAttributes(editor, props.element);
 
   const isInCodeBlock = editor?.api.above({
-    match: { type: editor.getType(BaseCodeBlockPlugin) },
+    match: { type: BaseCodeBlockPlugin.key },
   });
 
   if (isInCodeBlock) {

@@ -6,8 +6,10 @@ import { cn, withRef } from '@udecode/cn';
 import {
   formatCodeBlock,
   isLangSupported,
-  TCodeBlockElement,
 } from '@platejs/code-block';
+
+// Type stub for TCodeBlockElement (not exported from @platejs/code-block)
+type TCodeBlockElement = { type: string; lang?: string; children: any[] };
 import { PlateElement } from 'platejs/react';
 import { BracesIcon } from 'lucide-react';
 import mermaid from 'mermaid';

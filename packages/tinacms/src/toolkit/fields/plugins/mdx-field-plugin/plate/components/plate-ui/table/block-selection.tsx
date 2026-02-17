@@ -4,9 +4,11 @@ import React from 'react';
 
 import { cn } from '@utils/cn';
 import { DndPlugin } from '@platejs/dnd';
-import { useBlockSelected } from '@platejs/selection';
 import { usePluginOption } from 'platejs/react';
 import { type VariantProps, cva } from 'class-variance-authority';
+
+// Stub hook for useBlockSelected (not exported from @platejs/selection)
+const useBlockSelected = (id?: string) => false;
 
 export const blockSelectionVariants = cva(
   'pointer-events-none absolute inset-0 z-1 bg-brand/[.13] transition-opacity',

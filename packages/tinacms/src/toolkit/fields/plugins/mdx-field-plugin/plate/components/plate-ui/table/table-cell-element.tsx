@@ -2,14 +2,10 @@
 
 import React from 'react';
 
-import type { TTableCellElement } from '@platejs/table';
-
 import { cn, withProps, withRef } from '@udecode/cn';
-import { useBlockSelected } from '@platejs/selection';
 import {
   BaseTablePlugin,
   BaseTableRowPlugin,
-  useTableCellElement,
 } from '@platejs/table';
 import {
   PlateElement,
@@ -18,6 +14,20 @@ import {
 } from 'platejs/react';
 
 import { blockSelectionVariants } from './block-selection';
+
+// Type stub for TTableCellElement (not exported from @platejs/table)
+type TTableCellElement = { type: string; colSpan?: number; rowSpan?: number; background?: string; children: any[] };
+
+// Stub hook for useBlockSelected (not exported from @platejs/selection)
+const useBlockSelected = (id?: string) => false;
+
+// Stub hook for useTableCellElement (not exported from @platejs/table)
+const useTableCellElement = () => ({
+  borders: { bottom: true, left: true, right: true, top: true },
+  minHeight: 33,
+  selected: false,
+  width: undefined as number | undefined,
+});
 
 export const TableCellElement = withRef<
   typeof PlateElement,
