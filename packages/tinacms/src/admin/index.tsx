@@ -84,7 +84,7 @@ const PostHogTracker = ({ cms }: { cms: TinaCMS }) => {
         const eventProperties: Record<string, string> = {
           tinaCMSVersion: pkg.version,
           system: 'tinacms/tinacms',
-          authType: authType,
+          backendType: authType,
         };
 
         // Only include clientId for TinaCloud users when telemetry is fully enabled
