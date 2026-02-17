@@ -3,7 +3,6 @@ import defaultTheme from 'tailwindcss/defaultTheme'
 import typography from '@tailwindcss/typography'
 
 export default {
-  mode: 'jit',
   content: ['./app/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}'],
   darkMode: 'class',
   theme: {
@@ -224,7 +223,7 @@ export default {
     },
   },
   variants: {
-    extend: { typography: ['tint', 'dark', 'primary'] },
+    extend: { typography: ['dark', 'primary'] },
   },
   plugins: [typography],
 }
