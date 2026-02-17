@@ -109,3 +109,42 @@ export async function updateThemeSettings(dir: string, selectedTheme: string) {
   // Write the updated config
   await fs.writeFile(configPath, JSON.stringify(config, null, 2));
 }
+
+/**
+ * Updates the tina config file to set the telemetry mode.
+ * This modifies the TypeScript/JavaScript config file by inserting the telemetry setting.
+ */
+export async function updateTelemetryConfig(
+  dir: string,
+  mode: 'anonymous' | 'disabled'
+) {
+  const configPaths = [
+    path.join(dir, 'tina', 'config.ts'),
+    path.join(dir, 'tina', 'config.tsx'),
+    path.join(dir, 'tina', 'config.js'),
+  ];
+
+  for (const configPath of configPaths) {
+    if (await fs.pathExists(configPath)) {
+      let content = await fs.readFile(configPath, 'utf8');
+
+      // Check if telemetry is already defined
+      if (/telemetry\s*:/.test(content)) {
+        // Replace existing telemetry value
+        content = content.replace(
+          /telemetry\s*:\s*['"][^'"]*['"]/,
+          `telemetry: '${mode}'`
+        );
+      } else {
+        // Insert telemetry config after defineConfig({
+        content = content.replace(
+          /defineConfig\(\s*\{/,
+          `defineConfig({\n  telemetry: '${mode}',`
+        );
+      }
+
+      await fs.writeFile(configPath, content);
+      return;
+    }
+  }
+}
