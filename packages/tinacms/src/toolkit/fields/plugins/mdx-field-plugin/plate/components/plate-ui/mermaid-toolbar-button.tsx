@@ -1,7 +1,7 @@
 import { CodeLineElement } from '@tinacms/mdx';
 import { withRef } from '@udecode/cn';
 import { TElement } from 'platejs';
-import { CodeBlockPlugin } from '@platejs/code-block';
+import { BaseCodeBlockPlugin } from '@platejs/code-block';
 import { useEditorState } from 'platejs/react';
 import React from 'react';
 import { helpers } from '../../plugins/core/common';
@@ -19,7 +19,7 @@ flowchart TD
 const useMermaidToolbarButtonState = () => {
   const editor = useEditorState();
 
-  const isBlockActive = () => helpers.isNodeActive(editor, CodeBlockPlugin.key);
+  const isBlockActive = () => helpers.isNodeActive(editor, BaseCodeBlockPlugin.key);
 
   return {
     pressed: isBlockActive(),
@@ -38,7 +38,7 @@ const useMermaidToolbarButton = (state) => {
 
   const onClick = () => {
     const newMermaidCodeBlockNode: TElement = {
-      type: CodeBlockPlugin.key,
+      type: BaseCodeBlockPlugin.key,
       lang: 'mermaid',
       children: DEFAULT_MERMAID_CONFIG.split('\n').map(makeCodeLine),
       value: DEFAULT_MERMAID_CONFIG,

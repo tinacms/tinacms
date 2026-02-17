@@ -30,14 +30,14 @@ import {
   ItalicToolbarButton,
   StrikethroughToolbarButton,
 } from './plate-ui/mark-toolbar-button';
-import { TablePlugin } from '@platejs/table';
+import { BaseTablePlugin } from '@platejs/table';
 import {
-  BulletedListPlugin,
-  NumberedListPlugin,
+  BaseBulletedListPlugin,
+  BaseNumberedListPlugin,
 } from '@platejs/list-classic';
 import { ListToolbarButton } from './plate-ui/indent-list-toolbar-button';
 import { TableDropdownMenu } from './plate-ui/table/table-dropdown-menu';
-import { CodeBlockPlugin } from '@platejs/code-block';
+import { BaseCodeBlockPlugin } from '@platejs/code-block';
 import { cn } from '@utils/cn';
 
 type ToolbarItem = {
@@ -80,12 +80,12 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
   ul: {
     label: 'Unordered List',
     width: () => STANDARD_ICON_WIDTH,
-    Component: <ListToolbarButton nodeType={BulletedListPlugin.key} />,
+    Component: <ListToolbarButton nodeType={BaseBulletedListPlugin.key} />,
   },
   ol: {
     label: 'Ordered List',
     width: () => STANDARD_ICON_WIDTH,
-    Component: <ListToolbarButton nodeType={NumberedListPlugin.key} />,
+    Component: <ListToolbarButton nodeType={BaseNumberedListPlugin.key} />,
   },
   bold: {
     label: 'Bold',
@@ -163,9 +163,9 @@ export default function FixedToolbarButtons() {
   }
 
   const editorState = useEditorState();
-  const userInTable = helpers.isNodeActive(editorState, TablePlugin);
+  const userInTable = helpers.isNodeActive(editorState, BaseTablePlugin);
 
-  const userInCodeBlock = helpers.isNodeActive(editorState, CodeBlockPlugin);
+  const userInCodeBlock = helpers.isNodeActive(editorState, BaseCodeBlockPlugin);
 
   useResize(toolbarRef, (entry) => {
     const width = entry.target.getBoundingClientRect().width - 8;

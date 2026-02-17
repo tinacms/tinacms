@@ -1,4 +1,4 @@
-import { BlockquotePlugin } from '@platejs/basic-nodes';
+import { BaseBlockquotePlugin } from '@platejs/basic-nodes';
 import { createPlatePlugin } from 'platejs/react';
 import React from 'react';
 
@@ -32,7 +32,7 @@ export const createBlockquoteEnterBreakPlugin = createPlatePlugin({
     onKeyDown: ({ editor, event }) => {
       if (event.key !== 'Enter') return;
       const blockquoteEntry = editor.api.above({
-        match: { type: BlockquotePlugin.key },
+        match: { type: BaseBlockquotePlugin.key },
       });
 
       if (!blockquoteEntry) return;

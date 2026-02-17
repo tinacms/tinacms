@@ -1,30 +1,41 @@
 'use client';
 
 import { ParagraphPlugin } from 'platejs/react';
-import { createSlatePlugin, ExitBreakPlugin, SoftBreakPlugin } from 'platejs';
+import { createSlatePlugin, ExitBreakPlugin } from 'platejs';
 import { AutoformatPlugin } from '@platejs/autoformat';
 import {
-  BoldPlugin,
-  ItalicPlugin,
-  CodePlugin,
-  StrikethroughPlugin,
-  UnderlinePlugin,
-  BlockquotePlugin,
-  HeadingPlugin,
-  HEADING_KEYS,
-  HEADING_LEVELS,
-  HorizontalRulePlugin,
+  BaseBoldPlugin,
+  BaseItalicPlugin,
+  BaseCodePlugin,
+  BaseStrikethroughPlugin,
+  BaseUnderlinePlugin,
+  BaseBlockquotePlugin,
+  BaseHeadingPlugin,
+  BaseHorizontalRulePlugin,
+  BaseHighlightPlugin,
+  HeadingLevel,
 } from '@platejs/basic-nodes';
-import { CodeBlockPlugin } from '@platejs/code-block';
-import { ListPlugin as IndentListPlugin, ListStyleType } from '@platejs/list';
-import { LinkPlugin } from '@platejs/link';
+import { BaseCodeBlockPlugin } from '@platejs/code-block';
+import { BaseListPlugin as BaseIndentListPlugin } from '@platejs/list';
+import { BaseLinkPlugin } from '@platejs/link';
 import {
-  BulletedListPlugin,
-  ListPlugin,
-  NumberedListPlugin,
+  BaseBulletedListPlugin,
+  BaseListPlugin,
+  BaseNumberedListPlugin,
 } from '@platejs/list-classic';
-import { SlashPlugin } from '@platejs/slash-command';
-import { TablePlugin } from '@platejs/table';
+import { BaseSlashPlugin } from '@platejs/slash-command';
+import { BaseTablePlugin } from '@platejs/table';
+
+// Define heading keys for compatibility
+const HEADING_KEYS = {
+  h1: 'h1',
+  h2: 'h2',
+  h3: 'h3',
+  h4: 'h4',
+  h5: 'h5',
+  h6: 'h6',
+};
+const HEADING_LEVELS: HeadingLevel[] = [1, 2, 3, 4, 5, 6];
 import React from 'react';
 import { LinkFloatingToolbar } from '../components/plate-ui/link-floating-toolbar';
 import { isUrl } from '../transforms/is-url';
@@ -48,7 +59,6 @@ import {
   isSelectionAtCodeBlockStart,
   unwrapCodeBlock,
 } from '@platejs/code-block';
-import { unwrapList } from '@platejs/list-classic';
 // @ts-ignore
 // NOTE: Linter complains about ESM import here, as per conversation with Jeff it will be fine at build time—ignore this linting error for now.
 import { all, createLowlight } from 'lowlight';
@@ -73,31 +83,20 @@ export const HANDLES_MDX = [
   ParagraphPlugin.key,
 ];
 
-// Common rule for resetting block types
-const resetBlockTypesCommonRule = {
-  defaultType: ParagraphPlugin.key,
-  types: [...HEADING_LEVELS, BlockquotePlugin.key],
-};
-
-const resetBlockTypesCodeBlockRule = {
-  types: [CodeBlockPlugin.key],
-  defaultType: ParagraphPlugin.key,
-  onReset: unwrapCodeBlock,
-};
-
 // View Plugins: Basic nodes and marks
 export const viewPlugins = [
-  BoldPlugin,
-  ItalicPlugin,
-  CodePlugin,
-  StrikethroughPlugin,
-  UnderlinePlugin,
-  HeadingPlugin.configure({ options: { levels: 6 } }),
+  BaseBoldPlugin,
+  BaseItalicPlugin,
+  BaseCodePlugin,
+  BaseStrikethroughPlugin,
+  BaseUnderlinePlugin,
+  BaseHighlightPlugin, // Added for text highlighting
+  BaseHeadingPlugin.configure({ options: { levels: 6 } }),
   ParagraphPlugin,
-  CodeBlockPlugin.configure({
+  BaseCodeBlockPlugin.configure({
     options: { lowlight: createLowlight(all) },
   }),
-  BlockquotePlugin,
+  BaseBlockquotePlugin,
 ] as const;
 
 const CorrectNodeBehaviorPlugin = createSlatePlugin({
@@ -114,7 +113,7 @@ export const editorPlugins = [
   createBlockquoteEnterBreakPlugin,
   createInvalidMarkdownPlugin,
   CorrectNodeBehaviorPlugin,
-  LinkPlugin.configure({
+  BaseLinkPlugin.configure({
     options: {
       // Custom validation function to allow relative links, e.g., /about
       isUrl: (url) => isUrl(url),
@@ -123,12 +122,12 @@ export const editorPlugins = [
   }),
 
   ...viewPlugins,
-  ListPlugin,
-  IndentListPlugin,
-  HorizontalRulePlugin,
+  BaseListPlugin,
+  BaseIndentListPlugin,
+  BaseHorizontalRulePlugin,
   // NodeIdPlugin is now built-in to platejs core
-  TablePlugin,
-  SlashPlugin,
+  BaseTablePlugin,
+  BaseSlashPlugin,
   // TrailingBlockPlugin is now built-in to platejs core
   createBreakPlugin,
   FloatingToolbarPlugin,
@@ -150,7 +149,7 @@ export const editorPlugins = [
           ...rule,
           query: (editor) =>
             !editor.api.some({
-              match: { type: editor.getType(CodeBlockPlugin.key) },
+              match: { type: editor.getType(BaseCodeBlockPlugin.key) },
             }),
         })
       ),
@@ -159,39 +158,11 @@ export const editorPlugins = [
 
   // ExitBreakPlugin lets users "break out" of a block (like a heading)
   ExitBreakPlugin.configure({
-    options: {
-      rules: [
-        {
-          hotkey: 'mod+enter',
-        },
-        {
-          hotkey: 'mod+shift+enter',
-          before: true,
-        },
-        {
-          hotkey: 'enter',
-          query: {
-            start: true,
-            end: true,
-            allow: HEADING_LEVELS,
-          },
-        },
-      ],
+    shortcuts: {
+      insert: { keys: 'mod+enter' },
+      insertBefore: { keys: 'mod+shift+enter' },
     },
   }),
+  // NOTE: SoftBreakPlugin was removed in platejs v49+. Shift+Enter is now built-in.
   // NOTE: ResetNodePlugin was removed in platejs v49+. Reset behavior is now configured via plugin rules.
-  // TODO: Add reset rules to individual plugins if needed (HeadingPlugin, BlockquotePlugin, etc.)
-  SoftBreakPlugin.configure({
-    options: {
-      rules: [
-        { hotkey: 'shift+enter' },
-        {
-          hotkey: 'enter',
-          query: {
-            allow: [CodeBlockPlugin.key, BlockquotePlugin.key],
-          },
-        },
-      ],
-    },
-  }),
 ] as const;

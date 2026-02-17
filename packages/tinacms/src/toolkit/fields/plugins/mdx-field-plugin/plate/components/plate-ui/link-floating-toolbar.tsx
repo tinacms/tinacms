@@ -11,7 +11,7 @@ import { type TLinkElement, getLinkAttributes } from '@platejs/link';
 import {
   type LinkFloatingToolbarState,
   FloatingLinkUrlInput,
-  LinkPlugin,
+  BaseLinkPlugin,
   submitFloatingLink,
   useFloatingLinkEdit,
   useFloatingLinkEditState,
@@ -45,9 +45,9 @@ export function LinkFloatingToolbar({
 }) {
   const activeCommentId = usePluginOption({ key: 'comment' }, 'activeId');
   const activeSuggestionId = usePluginOption({ key: 'suggestion' }, 'activeId');
-  const { api, editor } = useEditorPlugin(LinkPlugin);
+  const { api, editor } = useEditorPlugin(BaseLinkPlugin);
 
-  const isUrlValidator = usePluginOption(LinkPlugin, 'isUrl');
+  const isUrlValidator = usePluginOption(BaseLinkPlugin, 'isUrl');
 
   const [currentUrl, setCurrentUrl] = React.useState('');
   const [isValidUrl, setIsValidUrl] = React.useState(true);
@@ -252,7 +252,7 @@ function LinkOpenButton() {
   const attributes = React.useMemo(
     () => {
       const entry = editor.api.node<TLinkElement>({
-        match: { type: editor.getType(LinkPlugin) },
+        match: { type: editor.getType(BaseLinkPlugin) },
       });
       if (!entry) {
         return {};

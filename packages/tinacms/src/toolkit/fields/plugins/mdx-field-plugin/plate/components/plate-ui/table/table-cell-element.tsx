@@ -7,8 +7,8 @@ import type { TTableCellElement } from '@platejs/table';
 import { cn, withProps, withRef } from '@udecode/cn';
 import { useBlockSelected } from '@platejs/selection';
 import {
-  TablePlugin,
-  TableRowPlugin,
+  BaseTablePlugin,
+  BaseTableRowPlugin,
   useTableCellElement,
 } from '@platejs/table';
 import {
@@ -25,11 +25,11 @@ export const TableCellElement = withRef<
     isHeader?: boolean;
   }
 >(({ children, className, isHeader, style, ...props }, ref) => {
-  const { api } = useEditorPlugin(TablePlugin);
+  const { api } = useEditorPlugin(BaseTablePlugin);
   const element = props.element as TTableCellElement;
 
   const rowId = useElementSelector(([node]) => node.id as string, [], {
-    key: TableRowPlugin.key,
+    key: BaseTableRowPlugin.key,
   });
   const isSelectingRow = useBlockSelected(rowId);
   const { borders, minHeight, selected, width } = useTableCellElement();

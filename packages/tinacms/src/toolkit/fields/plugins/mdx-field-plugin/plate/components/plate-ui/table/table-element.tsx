@@ -9,7 +9,7 @@ import { cn, withRef } from '@udecode/cn';
 import { BlockSelectionPlugin } from '@platejs/selection';
 import { type TTableElement, setCellBackground } from '@platejs/table';
 import {
-  TablePlugin,
+  BaseTablePlugin,
   TableProvider,
   useTableBordersDropdownMenuContentState,
   useTableElement,
@@ -104,7 +104,7 @@ export const TableElement = withHOC(
 
 export const TableFloatingToolbar = withRef<typeof PopoverContent>(
   ({ children, ...props }, ref) => {
-    const { tf } = useEditorPlugin(TablePlugin);
+    const { tf } = useEditorPlugin(BaseTablePlugin);
     const element = useElement<TTableElement>();
     const { props: buttonProps } = useRemoveNodeButton({ element });
     const collapsed = useEditorSelector(
@@ -323,7 +323,7 @@ function ColorDropdownMenu({ children, tooltip }: ColorDropdownMenuProps) {
   const [open, setOpen] = useState(false);
 
   const editor = useEditorRef();
-  const selectedCells = usePluginOption(TablePlugin, 'selectedCells');
+  const selectedCells = usePluginOption(BaseTablePlugin, 'selectedCells');
 
   const onUpdateColor = useCallback(
     (color: string) => {

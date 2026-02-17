@@ -13,8 +13,17 @@ import {
   useOpenState,
 } from './plate-ui/dropdown-menu';
 import { Icons } from './plate-ui/icons';
-import { HEADING_KEYS } from '@platejs/basic-nodes';
-import { TablePlugin } from '@platejs/table';
+import { BaseTablePlugin } from '@platejs/table';
+
+// Define heading keys for compatibility (moved from @platejs/basic-nodes)
+const HEADING_KEYS = {
+  h1: 'h1',
+  h2: 'h2',
+  h3: 'h3',
+  h4: 'h4',
+  h5: 'h5',
+  h6: 'h6',
+};
 import {
   ParagraphPlugin,
   useEditorRef,
@@ -96,7 +105,7 @@ export function HeadingsMenu(props: DropdownMenuProps) {
   const editorState = useEditorState();
   const openState = useOpenState();
 
-  const userInTable = helpers.isNodeActive(editorState, TablePlugin.key);
+  const userInTable = helpers.isNodeActive(editorState, BaseTablePlugin.key);
 
   const selectedItem =
     items.find((item) => item.value === value) ?? defaultItem;

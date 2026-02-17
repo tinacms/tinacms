@@ -1,9 +1,19 @@
 import { AutoformatPlugin } from '@platejs/autoformat';
-import { BlockquotePlugin, HEADING_KEYS, HEADING_LEVELS } from '@platejs/basic-nodes';
-import { CodeBlockPlugin } from '@platejs/code-block';
-import { ExitBreakPlugin, SoftBreakPlugin } from 'platejs';
+import { BaseBlockquotePlugin, HeadingLevel } from '@platejs/basic-nodes';
+import { BaseCodeBlockPlugin } from '@platejs/code-block';
+import { ExitBreakPlugin } from 'platejs';
 import { ParagraphPlugin } from 'platejs/react';
 import { autoformatRules } from './autoformat/autoformat-rules';
+
+// Define heading keys for compatibility
+const HEADING_KEYS = {
+  h1: 'h1',
+  h2: 'h2',
+  h3: 'h3',
+  h4: 'h4',
+  h5: 'h5',
+  h6: 'h6',
+};
 
 export const HANDLES_MDX = [
   HEADING_KEYS.h1,
@@ -29,18 +39,6 @@ export const plugins = [
       insertBefore: { keys: 'mod+shift+enter' },
     },
   }),
-  // ResetNodePlugin was removed in platejs v49+. Reset behavior is now configured via plugin rules.
-  SoftBreakPlugin.configure({
-    options: {
-      rules: [
-        { hotkey: 'shift+enter' },
-        {
-          hotkey: 'enter',
-          query: {
-            allow: [CodeBlockPlugin.key],
-          },
-        },
-      ],
-    },
-  }),
+  // NOTE: SoftBreakPlugin was removed in platejs v49+. Shift+Enter is now built-in.
+  // NOTE: ResetNodePlugin was removed in platejs v49+. Reset behavior is now configured via plugin rules.
 ];

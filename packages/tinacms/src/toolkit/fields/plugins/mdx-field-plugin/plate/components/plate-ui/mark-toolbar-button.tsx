@@ -9,10 +9,10 @@ import {
   useMarkToolbarButtonState,
 } from 'platejs/react';
 import {
-  BoldPlugin,
-  CodePlugin,
-  ItalicPlugin,
-  StrikethroughPlugin,
+  BaseBoldPlugin,
+  BaseCodePlugin,
+  BaseItalicPlugin,
+  BaseStrikethroughPlugin,
 } from '@platejs/basic-nodes';
 
 const MarkToolbarButton = withRef<
@@ -29,25 +29,25 @@ const MarkToolbarButton = withRef<
 });
 
 export const BoldToolbarButton = () => (
-  <MarkToolbarButton tooltip='Bold (⌘+B)' nodeType={BoldPlugin.key}>
+  <MarkToolbarButton tooltip='Bold (⌘+B)' nodeType={BaseBoldPlugin.key}>
     <Icons.bold />
   </MarkToolbarButton>
 );
 
 export const StrikethroughToolbarButton = () => (
-  <MarkToolbarButton tooltip='Strikethrough' nodeType={StrikethroughPlugin.key}>
+  <MarkToolbarButton tooltip='Strikethrough' nodeType={BaseStrikethroughPlugin.key}>
     <Icons.strikethrough />
   </MarkToolbarButton>
 );
 
 export const ItalicToolbarButton = () => (
-  <MarkToolbarButton tooltip='Italic (⌘+I)' nodeType={ItalicPlugin.key}>
+  <MarkToolbarButton tooltip='Italic (⌘+I)' nodeType={BaseItalicPlugin.key}>
     <Icons.italic />
   </MarkToolbarButton>
 );
 
 export const CodeToolbarButton = () => (
-  <MarkToolbarButton tooltip='Code (⌘+E)' nodeType={CodePlugin.key}>
+  <MarkToolbarButton tooltip='Code (⌘+E)' nodeType={BaseCodePlugin.key}>
     <Icons.code />
   </MarkToolbarButton>
 );

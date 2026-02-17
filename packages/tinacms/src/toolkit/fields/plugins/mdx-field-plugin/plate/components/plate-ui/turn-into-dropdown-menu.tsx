@@ -22,8 +22,10 @@ import {
 } from './dropdown-menu';
 import { ToolbarButton } from './toolbar';
 import { helpers } from '@toolkit/fields/plugins/mdx-field-plugin/plate/plugins/core/common';
-import { HEADING_KEYS } from '@platejs/basic-nodes';
-import { TablePlugin } from '@platejs/table';
+import { BaseTablePlugin } from '@platejs/table';
+
+// Define heading keys locally
+const HEADING_KEYS = { h1: 'h1', h2: 'h2', h3: 'h3', h4: 'h4', h5: 'h5', h6: 'h6' };
 import { toggleList, unwrapList } from '@platejs/list-classic';
 
 const items = [
@@ -103,7 +105,7 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
   const { icon: SelectedItemIcon, label: selectedItemLabel } = selectedItem;
 
   const editorState = useEditorState();
-  const userInTable = helpers.isNodeActive(editorState, TablePlugin.key);
+  const userInTable = helpers.isNodeActive(editorState, BaseTablePlugin.key);
   if (userInTable) return null;
 
   return (

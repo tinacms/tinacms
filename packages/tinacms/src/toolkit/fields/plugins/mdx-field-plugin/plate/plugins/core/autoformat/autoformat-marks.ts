@@ -1,40 +1,40 @@
 import { AutoformatRule } from '@platejs/autoformat';
 import {
-  BoldPlugin,
-  CodePlugin,
-  ItalicPlugin,
-  StrikethroughPlugin,
+  BaseBoldPlugin,
+  BaseCodePlugin,
+  BaseItalicPlugin,
+  BaseStrikethroughPlugin,
 } from '@platejs/basic-nodes';
 
 export const autoformatMarks: AutoformatRule[] = [
   {
     mode: 'mark',
-    type: [BoldPlugin.key, ItalicPlugin.key],
+    type: [BaseBoldPlugin.key, BaseItalicPlugin.key],
     match: '***',
   },
   {
     mode: 'mark',
-    type: BoldPlugin.key,
+    type: BaseBoldPlugin.key,
     match: '**',
   },
   {
     mode: 'mark',
-    type: ItalicPlugin.key,
+    type: BaseItalicPlugin.key,
     match: '*',
   },
   {
     mode: 'mark',
-    type: ItalicPlugin.key,
+    type: BaseItalicPlugin.key,
     match: '_',
   },
   {
     mode: 'mark',
-    type: CodePlugin.key,
+    type: BaseCodePlugin.key,
     match: '`',
   },
   {
     mode: 'mark',
-    type: StrikethroughPlugin.key,
+    type: BaseStrikethroughPlugin.key,
     match: ['~~', '~'],
   },
 ];

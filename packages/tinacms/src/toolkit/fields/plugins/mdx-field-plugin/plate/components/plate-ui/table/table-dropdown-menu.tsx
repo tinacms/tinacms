@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
 
 import { cn } from '@utils/cn';
-import { TablePlugin, useTableMergeState } from '@platejs/table';
+import { BaseTablePlugin, useTableMergeState } from '@platejs/table';
 import { useEditorPlugin, useEditorSelector } from 'platejs/react';
 import {
   ArrowDown,
@@ -35,11 +35,11 @@ import { ToolbarButton } from '../toolbar';
 
 export function TableDropdownMenu(props: DropdownMenuProps) {
   const tableSelected = useEditorSelector(
-    (editor) => editor.api.some({ match: { type: TablePlugin.key } }),
+    (editor) => editor.api.some({ match: { type: BaseTablePlugin.key } }),
     []
   );
 
-  const { editor, tf } = useEditorPlugin(TablePlugin);
+  const { editor, tf } = useEditorPlugin(BaseTablePlugin);
   const openState = useOpenState();
   const mergeState = useTableMergeState();
 
@@ -199,7 +199,7 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
 }
 
 export function TablePicker() {
-  const { editor, tf } = useEditorPlugin(TablePlugin);
+  const { editor, tf } = useEditorPlugin(BaseTablePlugin);
 
   const [tablePicker, setTablePicker] = useState({
     grid: Array.from({ length: 8 }, () => Array.from({ length: 8 }).fill(0)),

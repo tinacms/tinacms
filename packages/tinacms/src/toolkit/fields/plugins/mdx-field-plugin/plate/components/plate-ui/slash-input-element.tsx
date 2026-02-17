@@ -2,7 +2,16 @@ import React, { type ComponentType, type SVGProps } from 'react';
 
 import { withRef } from '@udecode/cn';
 import { type PlateEditor, PlateElement } from 'platejs/react';
-import { HEADING_KEYS } from '@platejs/basic-nodes';
+
+// Define heading keys for compatibility (moved from @platejs/basic-nodes)
+const HEADING_KEYS = {
+  h1: 'h1',
+  h2: 'h2',
+  h3: 'h3',
+  h4: 'h4',
+  h5: 'h5',
+  h6: 'h6',
+};
 
 import { Icons } from './icons';
 
@@ -14,8 +23,8 @@ import {
   InlineComboboxItem,
 } from './inline-combobox';
 import {
-  BulletedListPlugin,
-  NumberedListPlugin,
+  BaseBulletedListPlugin,
+  BaseNumberedListPlugin,
 } from '@platejs/list-classic';
 import { toggleList } from '@platejs/list-classic';
 
@@ -52,7 +61,7 @@ const rules: SlashCommandRule[] = [
     icon: Icons.ul,
     keywords: ['ul', 'unordered list'],
     onSelect: (editor) => {
-      toggleList(editor, { type: BulletedListPlugin.key });
+      toggleList(editor, { type: BaseBulletedListPlugin.key });
     },
     value: 'Bulleted list',
   },
@@ -60,7 +69,7 @@ const rules: SlashCommandRule[] = [
     icon: Icons.ol,
     keywords: ['ol', 'ordered list'],
     onSelect: (editor) => {
-      toggleList(editor, { type: NumberedListPlugin.key });
+      toggleList(editor, { type: BaseNumberedListPlugin.key });
     },
     value: 'Numbered list',
   },

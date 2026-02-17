@@ -1,31 +1,33 @@
 import { withProps } from '@udecode/cn';
 import {
-  BoldPlugin,
-  CodePlugin,
-  ItalicPlugin,
-  StrikethroughPlugin,
-  UnderlinePlugin,
+  BaseBoldPlugin,
+  BaseCodePlugin,
+  BaseItalicPlugin,
+  BaseStrikethroughPlugin,
+  BaseUnderlinePlugin,
 } from '@platejs/basic-nodes';
-import { BlockquotePlugin } from '@platejs/basic-nodes';
+import { BaseBlockquotePlugin } from '@platejs/basic-nodes';
 import {
-  CodeBlockPlugin,
-  CodeLinePlugin,
-  CodeSyntaxPlugin,
+  BaseCodeBlockPlugin,
+  BaseCodeLinePlugin,
+  BaseCodeSyntaxPlugin,
 } from '@platejs/code-block';
-import { HEADING_KEYS } from '@platejs/basic-nodes';
-import { HorizontalRulePlugin } from '@platejs/basic-nodes';
-import { LinkPlugin } from '@platejs/link';
+import { BaseHorizontalRulePlugin } from '@platejs/basic-nodes';
+
+// Define heading keys locally
+const HEADING_KEYS = { h1: 'h1', h2: 'h2', h3: 'h3', h4: 'h4', h5: 'h5', h6: 'h6' };
+import { BaseLinkPlugin } from '@platejs/link';
 import {
-  BulletedListPlugin,
-  ListItemPlugin,
-  NumberedListPlugin,
+  BaseBulletedListPlugin,
+  BaseListItemPlugin,
+  BaseNumberedListPlugin,
 } from '@platejs/list-classic';
-import { SlashInputPlugin } from '@platejs/slash-command';
+import { BaseSlashInputPlugin } from '@platejs/slash-command';
 import {
-  TableCellHeaderPlugin,
-  TableCellPlugin,
-  TablePlugin,
-  TableRowPlugin,
+  BaseTableCellHeaderPlugin,
+  BaseTableCellPlugin,
+  BaseTablePlugin,
+  BaseTableRowPlugin,
 } from '@platejs/table';
 import { ParagraphPlugin, PlateElement, PlateLeaf } from 'platejs/react';
 import React from 'react';
@@ -59,7 +61,7 @@ const headerClasses = 'font-normal';
 
 export const Components = () => {
   return {
-    [SlashInputPlugin.key]: SlashInputElement,
+    [BaseSlashInputPlugin.key]: SlashInputElement,
     [HEADING_KEYS.h1]: ({
       attributes,
       editor,
@@ -172,10 +174,10 @@ export const Components = () => {
       />
     ),
     [ParagraphPlugin.key]: ParagraphElement,
-    [BlockquotePlugin.key]: BlockquoteElement,
-    [CodeBlockPlugin.key]: CodeBlockElement,
-    [CodeLinePlugin.key]: CodeLineElement,
-    [CodeSyntaxPlugin.key]: CodeSyntaxLeaf,
+    [BaseBlockquotePlugin.key]: BlockquoteElement,
+    [BaseCodeBlockPlugin.key]: CodeBlockElement,
+    [BaseCodeLinePlugin.key]: CodeLineElement,
+    [BaseCodeSyntaxPlugin.key]: CodeSyntaxLeaf,
     html: ({ attributes, editor, element, children, className }) => {
       return (
         <div
@@ -204,19 +206,19 @@ export const Components = () => {
         </span>
       );
     },
-    [BulletedListPlugin.key]: withProps(ListElement, { variant: 'ul' }),
-    [NumberedListPlugin.key]: withProps(ListElement, { variant: 'ol' }),
-    [ListItemPlugin.key]: withProps(PlateElement, { as: 'li' }),
-    [LinkPlugin.key]: LinkElement,
-    [CodePlugin.key]: CodeLeaf,
-    [UnderlinePlugin.key]: withProps(PlateLeaf, { as: 'u' }),
-    [StrikethroughPlugin.key]: withProps(PlateLeaf, { as: 's' }),
-    [ItalicPlugin.key]: withProps(PlateLeaf, { as: 'em' }),
-    [BoldPlugin.key]: withProps(PlateLeaf, { as: 'strong' }),
-    [HorizontalRulePlugin.key]: HrElement,
-    [TableCellHeaderPlugin.key]: TableCellHeaderElement,
-    [TableCellPlugin.key]: TableCellElement,
-    [TablePlugin.key]: TableElement,
-    [TableRowPlugin.key]: TableRowElement,
+    [BaseBulletedListPlugin.key]: withProps(ListElement, { variant: 'ul' }),
+    [BaseNumberedListPlugin.key]: withProps(ListElement, { variant: 'ol' }),
+    [BaseListItemPlugin.key]: withProps(PlateElement, { as: 'li' }),
+    [BaseLinkPlugin.key]: LinkElement,
+    [BaseCodePlugin.key]: CodeLeaf,
+    [BaseUnderlinePlugin.key]: withProps(PlateLeaf, { as: 'u' }),
+    [BaseStrikethroughPlugin.key]: withProps(PlateLeaf, { as: 's' }),
+    [BaseItalicPlugin.key]: withProps(PlateLeaf, { as: 'em' }),
+    [BaseBoldPlugin.key]: withProps(PlateLeaf, { as: 'strong' }),
+    [BaseHorizontalRulePlugin.key]: HrElement,
+    [BaseTableCellHeaderPlugin.key]: TableCellHeaderElement,
+    [BaseTableCellPlugin.key]: TableCellElement,
+    [BaseTablePlugin.key]: TableElement,
+    [BaseTableRowPlugin.key]: TableRowElement,
   };
 };

@@ -2,8 +2,8 @@ import { ElementApi, SlateEditor } from 'platejs';
 import { isType } from 'platejs';
 import { AutoformatBlockRule } from '@platejs/autoformat';
 import {
-  CodeBlockPlugin,
-  CodeLinePlugin,
+  BaseCodeBlockPlugin,
+  BaseCodeLinePlugin,
 } from '@platejs/code-block';
 import { toggleList, unwrapList } from '@platejs/list-classic';
 
@@ -17,8 +17,8 @@ const format = (editor: SlateEditor, customFormatting: any) => {
     const [node] = parentEntry;
     if (
       ElementApi.isElement(node) &&
-      !isType(editor, node, CodeBlockPlugin.key) &&
-      !isType(editor, node, CodeLinePlugin.key)
+      !isType(editor, node, BaseCodeBlockPlugin.key) &&
+      !isType(editor, node, BaseCodeLinePlugin.key)
     ) {
       customFormatting();
     }

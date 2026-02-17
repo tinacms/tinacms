@@ -7,14 +7,14 @@ import type { PlateElementProps } from 'platejs/react';
 
 import { useLink } from '@platejs/link';
 import { PlateElement, useEditorRef } from 'platejs/react';
-import { CodeBlockPlugin } from '@platejs/code-block';
+import { BaseCodeBlockPlugin } from '@platejs/code-block';
 
 export function LinkElement(props: PlateElementProps<TLinkElement>) {
   const { props: linkProps } = useLink({ element: props.element });
   const editor = useEditorRef();
 
   const isInCodeBlock = editor?.api.above({
-    match: { type: editor.getType(CodeBlockPlugin) },
+    match: { type: editor.getType(BaseCodeBlockPlugin) },
   });
 
   if (isInCodeBlock) {

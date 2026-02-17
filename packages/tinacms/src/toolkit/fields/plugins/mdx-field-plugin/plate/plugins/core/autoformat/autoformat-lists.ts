@@ -1,39 +1,39 @@
 import { formatList, preFormat } from './autoformat-utils';
 import { AutoformatRule } from '@platejs/autoformat';
 import {
-  BulletedListPlugin,
-  ListItemPlugin,
-  NumberedListPlugin,
-  TodoListPlugin,
+  BaseBulletedListPlugin,
+  BaseListItemPlugin,
+  BaseNumberedListPlugin,
+  BaseTodoListPlugin,
 } from '@platejs/list-classic';
 
 export const autoformatLists: AutoformatRule[] = [
   {
     mode: 'block',
-    type: ListItemPlugin.key,
+    type: BaseListItemPlugin.key,
     match: ['* ', '- '],
     preFormat,
-    format: (editor) => formatList(editor, BulletedListPlugin.key),
+    format: (editor) => formatList(editor, BaseBulletedListPlugin.key),
   },
   {
     mode: 'block',
-    type: ListItemPlugin.key,
+    type: BaseListItemPlugin.key,
     match: ['1. ', '1) '],
     preFormat,
-    format: (editor) => formatList(editor, NumberedListPlugin.key),
+    format: (editor) => formatList(editor, BaseNumberedListPlugin.key),
   },
   {
     mode: 'block',
-    type: TodoListPlugin.key,
+    type: BaseTodoListPlugin.key,
     match: '[] ',
   },
   {
     mode: 'block',
-    type: TodoListPlugin.key,
+    type: BaseTodoListPlugin.key,
     match: '[x] ',
     format: (editor) =>
       editor.tf.setNodes(
-        { type: TodoListPlugin.key, checked: true },
+        { type: BaseTodoListPlugin.key, checked: true },
         {
           match: (n) => editor.api.isBlock(n),
         }

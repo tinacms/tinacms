@@ -6,14 +6,14 @@ import { useEditorState } from 'platejs/react';
 import { Icons } from './icons';
 import { ToolbarButton } from './toolbar';
 import { helpers } from '../../plugins/core/common';
-import { HorizontalRulePlugin } from '@platejs/basic-nodes';
+import { BaseHorizontalRulePlugin } from '@platejs/basic-nodes';
 import { ParagraphPlugin } from 'platejs/react';
 
 const useHorizontalRuleToolbarButtonState = () => {
   const editor = useEditorState();
 
   const isBlockActive = () =>
-    helpers.isNodeActive(editor, HorizontalRulePlugin.key);
+    helpers.isNodeActive(editor, BaseHorizontalRulePlugin.key);
 
   return {
     pressed: isBlockActive(),
@@ -28,7 +28,7 @@ const useHorizontalRuleToolbarButton = (state) => {
       type: ParagraphPlugin.key,
       children: [{ text: '' }],
     });
-    editor.tf.setNodes({ type: HorizontalRulePlugin.key });
+    editor.tf.setNodes({ type: BaseHorizontalRulePlugin.key });
     editor.tf.insertNodes({
       type: ParagraphPlugin.key,
       children: [{ text: '' }],

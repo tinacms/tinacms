@@ -7,13 +7,13 @@ import { Icons } from './icons';
 import { ToolbarButton } from './toolbar';
 import { helpers } from '../../plugins/core/common';
 // import { insertEmptyCodeBlock } from '../../transforms/insert-empty-block';
-import { CodeBlockPlugin } from '@platejs/code-block';
+import { BaseCodeBlockPlugin } from '@platejs/code-block';
 import { insertEmptyCodeBlock } from '@platejs/code-block';
 
 const useCodeBlockToolbarButtonState = () => {
   const editor = useEditorState();
 
-  const isBlockActive = () => helpers.isNodeActive(editor, CodeBlockPlugin.key);
+  const isBlockActive = () => helpers.isNodeActive(editor, BaseCodeBlockPlugin.key);
 
   return {
     pressed: isBlockActive(),
