@@ -6,4 +6,8 @@ export {
   identifyUser,
   resetPostHog,
   captureEvent,
+  getTelemetryMode,
+  isAnonymizedMode,
 } from './posthogProvider';
+
+export type { TelemetryMode } from './posthogProvider';

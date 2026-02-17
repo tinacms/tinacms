@@ -31,7 +31,11 @@ import ScreenPage from './pages/ScreenPage';
 
 import { Client, TinaCloudAuthProvider } from '../internalClient';
 import { TinaAdminApi } from './api';
-import { initializePostHog, TinaCMSStartedEvent } from '../lib/posthog';
+import {
+  initializePostHog,
+  TinaCMSStartedEvent,
+  TelemetryMode,
+} from '../lib/posthog';
 import pkg from '../../package.json';
 
 type AuthType = 'tinacloud' | 'self-hosted' | 'local' | 'other';
@@ -56,13 +60,29 @@ const getAuthFlow = (client: Client | undefined): AuthType => {
   return 'other';
 };
 
+/**
+ * Component that initializes PostHog and tracks the TinaCMS started event.
+ * Respects the user's telemetry configuration:
+ * - "enabled": Full telemetry with user/project identification (default)
+ * - "anonymized": Telemetry without user/project identification (no clientId)
+ * - "disabled": No telemetry collected
+ */
 const PostHogTracker = ({ cms }: { cms: TinaCMS }) => {
   useEffect(() => {
     const client: Client | undefined = cms.api?.tina;
     const authType = getAuthFlow(client);
 
-    console.log('Initializing PostHog from TinaAdmin');
-    initializePostHog().then((posthog) => {
+    // Get telemetry mode from user config, default to 'enabled'
+    const telemetryMode: TelemetryMode =
+      client?.schema?.config?.config?.telemetry || 'enabled';
+
+    if (telemetryMode === 'disabled') {
+      console.log('PostHog telemetry is disabled by user configuration');
+      return;
+    }
+
+    console.log(`Initializing PostHog from TinaAdmin (mode: ${telemetryMode})`);
+    initializePostHog(telemetryMode).then((posthog) => {
       if (posthog) {
         const eventProperties: Record<string, string> = {
           tinaCMSVersion: pkg.version,
@@ -70,8 +90,13 @@ const PostHogTracker = ({ cms }: { cms: TinaCMS }) => {
           authType: authType,
         };
 
-        // Only include clientId for TinaCloud users
-        if (authType === 'tinacloud' && client?.clientId) {
+        // Only include clientId for TinaCloud users when telemetry is fully enabled
+        // In anonymized mode, we don't send identifying information
+        if (
+          telemetryMode === 'enabled' &&
+          authType === 'tinacloud' &&
+          client?.clientId
+        ) {
           eventProperties.clientId = client.clientId;
         }
 

@@ -1,7 +1,17 @@
 import posthog, { PostHog } from 'posthog-js';
 
+/**
+ * Telemetry mode configured by the user in their tina config.
+ * - "enabled": Full telemetry with user/project identification
+ * - "anonymized": Telemetry without user/project identification
+ * - "disabled": No telemetry collected
+ */
+export type TelemetryMode = 'enabled' | 'disabled' | 'anonymized';
+
 let posthogClient: PostHog | null = null;
 let isInitialized = false;
+let isDisabled = false;
+let currentTelemetryMode: TelemetryMode = 'enabled';
 let initializationPromise: Promise<PostHog | null> | null = null;
 
 interface PostHogConfigResponse {
@@ -39,13 +49,33 @@ async function fetchPostHogConfig(): Promise<PostHogConfigResponse> {
 }
 
 /**
+ * Get the current telemetry mode.
+ */
+export function getTelemetryMode(): TelemetryMode {
+  return currentTelemetryMode;
+}
+
+/**
+ * Check if telemetry is in anonymized mode.
+ * In anonymized mode, events are captured but without user/project identification.
+ */
+export function isAnonymizedMode(): boolean {
+  return currentTelemetryMode === 'anonymized';
+}
+
+/**
  * Initialize PostHog client for browser-side analytics.
  * Fetches config from TinaCloud identity service.
  * Call this once at app startup (e.g., in TinaCloudProvider or TinaAdmin).
+ *
+ * @param telemetryMode - The telemetry mode from user config. Defaults to 'enabled'.
  */
-export async function initializePostHog(): Promise<PostHog | null> {
-  // Return existing client if already initialized
-  if (isInitialized && posthogClient) {
+export async function initializePostHog(
+  telemetryMode: TelemetryMode = 'enabled'
+): Promise<PostHog | null> {
+  // Return early if already initialized (either enabled, disabled, or failed)
+  // We only initialize once per session - the first call determines the mode
+  if (isInitialized) {
     return posthogClient;
   }
 
@@ -54,8 +84,20 @@ export async function initializePostHog(): Promise<PostHog | null> {
     return initializationPromise;
   }
 
+  // Store the telemetry mode for use by other functions
+  currentTelemetryMode = telemetryMode;
+
+  // If telemetry is disabled, mark as initialized but don't set up PostHog
+  if (telemetryMode === 'disabled') {
+    isDisabled = true;
+    isInitialized = true;
+    return null;
+  }
+
   // Skip in dev mode
   if (process.env.TINA_DEV === 'true') {
+    isDisabled = true;
+    isInitialized = true;
     return null;
   }
 
@@ -66,6 +108,8 @@ export async function initializePostHog(): Promise<PostHog | null> {
       console.warn(
         'PostHog API key not found. PostHog tracking will be disabled.'
       );
+      isDisabled = true;
+      isInitialized = true;
       return null;
     }
 
