@@ -6,8 +6,8 @@ import {
   type UseVirtualFloatingOptions,
   flip,
   offset,
-} from '@udecode/plate-floating';
-import { type TLinkElement, getLinkAttributes } from '@udecode/plate-link';
+} from '@platejs/floating';
+import { type TLinkElement, getLinkAttributes } from '@platejs/link';
 import {
   type LinkFloatingToolbarState,
   FloatingLinkUrlInput,
@@ -17,14 +17,14 @@ import {
   useFloatingLinkEditState,
   useFloatingLinkInsert,
   useFloatingLinkInsertState,
-} from '@udecode/plate-link/react';
+} from '@platejs/link';
 import {
   useEditorPlugin,
   useEditorRef,
   useEditorSelection,
   useFormInputProps,
   usePluginOption,
-} from '@udecode/plate/react';
+} from 'platejs/react';
 import { cva } from 'class-variance-authority';
 import { ExternalLink, Link, Text, Unlink, CircleX } from 'lucide-react';
 import { Separator } from './separator';

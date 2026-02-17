@@ -1,12 +1,12 @@
 // import { insertEmptyCodeBlock } from '../../../transforms/insert-empty-block';
 import { preFormat } from './autoformat-utils';
-import { HEADING_KEYS } from '@udecode/plate-heading';
-import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
-import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
-import { HorizontalRulePlugin } from '@udecode/plate-horizontal-rule/react';
-import { AutoformatRule } from '@udecode/plate-autoformat';
-import { ParagraphPlugin } from '@udecode/plate/react';
-import { insertEmptyCodeBlock } from '@udecode/plate-code-block';
+import { HEADING_KEYS } from '@platejs/basic-nodes';
+import { BlockquotePlugin } from '@platejs/basic-nodes';
+import { CodeBlockPlugin } from '@platejs/code-block';
+import { HorizontalRulePlugin } from '@platejs/basic-nodes';
+import { AutoformatRule } from '@platejs/autoformat';
+import { ParagraphPlugin } from 'platejs/react';
+import { insertEmptyCodeBlock } from '@platejs/code-block';
 
 export const autoformatBlocks: AutoformatRule[] = [
   {

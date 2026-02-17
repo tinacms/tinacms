@@ -1,4 +1,4 @@
-import { useEditorState } from '@udecode/plate/react';
+import { useEditorState } from 'platejs/react';
 import React from 'react';
 import { useResize } from '../hooks/use-resize';
 import { helpers, unsupportedItemsInTable } from '../plugins/core/common';
@@ -30,14 +30,14 @@ import {
   ItalicToolbarButton,
   StrikethroughToolbarButton,
 } from './plate-ui/mark-toolbar-button';
-import { TablePlugin } from '@udecode/plate-table/react';
+import { TablePlugin } from '@platejs/table';
 import {
   BulletedListPlugin,
   NumberedListPlugin,
-} from '@udecode/plate-list/react';
+} from '@platejs/list-classic';
 import { ListToolbarButton } from './plate-ui/indent-list-toolbar-button';
 import { TableDropdownMenu } from './plate-ui/table/table-dropdown-menu';
-import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
+import { CodeBlockPlugin } from '@platejs/code-block';
 import { cn } from '@utils/cn';
 
 type ToolbarItem = {

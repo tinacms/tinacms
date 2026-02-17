@@ -7,8 +7,8 @@ import {
   formatCodeBlock,
   isLangSupported,
   TCodeBlockElement,
-} from '@udecode/plate-code-block';
-import { PlateElement } from '@udecode/plate/react';
+} from '@platejs/code-block';
+import { PlateElement } from 'platejs/react';
 import { BracesIcon } from 'lucide-react';
 import mermaid from 'mermaid';
 

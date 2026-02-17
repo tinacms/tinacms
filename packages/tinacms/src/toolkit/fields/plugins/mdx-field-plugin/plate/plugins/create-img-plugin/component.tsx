@@ -8,7 +8,7 @@ import {
   StyledImage,
 } from '../../../../../components';
 import { isImage } from '@toolkit/components/media/utils';
-import { ParagraphPlugin, useSelected } from '@udecode/plate/react';
+import { ParagraphPlugin, useSelected } from 'platejs/react';
 
 export const ImgEmbed = ({
   attributes,

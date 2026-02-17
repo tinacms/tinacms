@@ -3,7 +3,7 @@
 import React from 'react';
 
 import { cn } from '@utils/cn';
-import { PlateElement, withRef } from '@udecode/plate/react';
+import { PlateElement, withRef } from 'platejs/react';
 
 export const ParagraphElement = withRef<typeof PlateElement>(
   ({ children, className, ...props }, ref) => {

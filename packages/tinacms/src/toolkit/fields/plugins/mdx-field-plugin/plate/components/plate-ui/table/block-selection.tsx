@@ -3,9 +3,9 @@
 import React from 'react';
 
 import { cn } from '@utils/cn';
-import { DndPlugin } from '@udecode/plate-dnd';
-import { useBlockSelected } from '@udecode/plate-selection/react';
-import { usePluginOption } from '@udecode/plate/react';
+import { DndPlugin } from '@platejs/dnd';
+import { useBlockSelected } from '@platejs/selection';
+import { usePluginOption } from 'platejs/react';
 import { type VariantProps, cva } from 'class-variance-authority';
 
 export const blockSelectionVariants = cva(

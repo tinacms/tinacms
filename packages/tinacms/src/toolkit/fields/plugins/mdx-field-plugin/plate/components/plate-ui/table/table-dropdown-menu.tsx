@@ -5,8 +5,8 @@ import React, { useState } from 'react';
 import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
 
 import { cn } from '@utils/cn';
-import { TablePlugin, useTableMergeState } from '@udecode/plate-table/react';
-import { useEditorPlugin, useEditorSelector } from '@udecode/plate/react';
+import { TablePlugin, useTableMergeState } from '@platejs/table';
+import { useEditorPlugin, useEditorSelector } from 'platejs/react';
 import {
   ArrowDown,
   ArrowLeft,

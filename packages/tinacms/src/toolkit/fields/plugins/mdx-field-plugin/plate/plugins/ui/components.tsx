@@ -5,29 +5,29 @@ import {
   ItalicPlugin,
   StrikethroughPlugin,
   UnderlinePlugin,
-} from '@udecode/plate-basic-marks/react';
-import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
+} from '@platejs/basic-nodes';
+import { BlockquotePlugin } from '@platejs/basic-nodes';
 import {
   CodeBlockPlugin,
   CodeLinePlugin,
   CodeSyntaxPlugin,
-} from '@udecode/plate-code-block/react';
-import { HEADING_KEYS } from '@udecode/plate-heading';
-import { HorizontalRulePlugin } from '@udecode/plate-horizontal-rule/react';
-import { LinkPlugin } from '@udecode/plate-link/react';
+} from '@platejs/code-block';
+import { HEADING_KEYS } from '@platejs/basic-nodes';
+import { HorizontalRulePlugin } from '@platejs/basic-nodes';
+import { LinkPlugin } from '@platejs/link';
 import {
   BulletedListPlugin,
   ListItemPlugin,
   NumberedListPlugin,
-} from '@udecode/plate-list/react';
-import { SlashInputPlugin } from '@udecode/plate-slash-command/react';
+} from '@platejs/list-classic';
+import { SlashInputPlugin } from '@platejs/slash-command';
 import {
   TableCellHeaderPlugin,
   TableCellPlugin,
   TablePlugin,
   TableRowPlugin,
-} from '@udecode/plate-table/react';
-import { ParagraphPlugin, PlateElement, PlateLeaf } from '@udecode/plate/react';
+} from '@platejs/table';
+import { ParagraphPlugin, PlateElement, PlateLeaf } from 'platejs/react';
 import React from 'react';
 import { BlockquoteElement } from '../../components/plate-ui/blockquote-element';
 import { CodeBlockElement } from '../../components/plate-ui/code-block/code-block-element';

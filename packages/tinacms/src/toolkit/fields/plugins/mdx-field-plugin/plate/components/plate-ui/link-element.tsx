@@ -2,12 +2,12 @@
 
 import * as React from 'react';
 
-import type { TLinkElement } from '@udecode/plate-link';
-import type { PlateElementProps } from '@udecode/plate/react';
+import type { TLinkElement } from '@platejs/link';
+import type { PlateElementProps } from 'platejs/react';
 
-import { useLink } from '@udecode/plate-link/react';
-import { PlateElement, useEditorRef } from '@udecode/plate/react';
-import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
+import { useLink } from '@platejs/link';
+import { PlateElement, useEditorRef } from 'platejs/react';
+import { CodeBlockPlugin } from '@platejs/code-block';
 
 export function LinkElement(props: PlateElementProps<TLinkElement>) {
   const { props: linkProps } = useLink({ element: props.element });

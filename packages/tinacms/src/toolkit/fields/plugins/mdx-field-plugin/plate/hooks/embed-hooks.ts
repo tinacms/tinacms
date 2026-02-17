@@ -2,7 +2,7 @@ import React from 'react';
 import { isHotkey } from 'is-hotkey';
 import { useCMS, useEvent } from '@toolkit/react-core';
 import { FieldFocusEvent } from '@toolkit/fields/field-events';
-import { useSelected } from '@udecode/plate/react';
+import { useSelected } from 'platejs/react';
 
 const handleCloseBase = (editor, element) => {
   const path = editor.findPath(element);

@@ -6,7 +6,7 @@ import {
   createPlatePlugin,
   PlateEditor,
   useEditorRef,
-} from '@udecode/plate/react';
+} from 'platejs/react';
 
 export const ELEMENT_MDX_INLINE = 'mdxJsxTextElement';
 export const ELEMENT_MDX_BLOCK = 'mdxJsxFlowElement';

@@ -16,7 +16,7 @@ import {
   useComboboxInput,
   UseComboboxInputResult,
   useHTMLInputCursorState,
-} from '@udecode/plate-combobox/react';
+} from '@platejs/combobox';
 
 import {
   Combobox,
@@ -29,10 +29,10 @@ import {
   useComboboxStore,
 } from '@ariakit/react';
 import { cn } from '@utils/cn';
-import { filterWords } from '@udecode/plate-combobox';
-import { useComposedRef, useEditorRef } from '@udecode/plate/react';
+import { filterWords } from '@platejs/combobox';
+import { useComposedRef, useEditorRef } from 'platejs/react';
 import { cva } from 'class-variance-authority';
-import { PointRef, TElement } from '@udecode/plate';
+import { PointRef, TElement } from 'platejs';
 
 type FilterFn = (
   item: { keywords?: string[]; value: string },

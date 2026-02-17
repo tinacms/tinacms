@@ -8,7 +8,7 @@ import { ToolbarButton } from './toolbar';
 import {
   useLinkToolbarButton,
   useLinkToolbarButtonState,
-} from '@udecode/plate-link/react';
+} from '@platejs/link';
 
 export const LinkToolbarButton = withRef<typeof ToolbarButton>((rest, ref) => {
   const state = useLinkToolbarButtonState();

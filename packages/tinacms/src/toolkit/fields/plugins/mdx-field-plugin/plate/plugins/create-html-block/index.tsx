@@ -1,5 +1,5 @@
-import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
-import { createPlatePlugin } from '@udecode/plate/react';
+import { BlockquotePlugin } from '@platejs/basic-nodes';
+import { createPlatePlugin } from 'platejs/react';
 import React from 'react';
 
 export const createHTMLBlockPlugin = createPlatePlugin({

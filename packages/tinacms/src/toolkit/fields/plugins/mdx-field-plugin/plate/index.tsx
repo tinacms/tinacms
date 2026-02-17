@@ -7,7 +7,7 @@ import { FixedToolbar } from './components/plate-ui/fixed-toolbar';
 import { TooltipProvider } from './components/plate-ui/tooltip';
 import FixedToolbarButtons from './components/fixed-toolbar-buttons';
 import { ToolbarProvider } from './toolbar/toolbar-provider';
-import { Plate } from '@udecode/plate/react';
+import { Plate } from 'platejs/react';
 import { useCreateEditor } from './hooks/use-create-editor';
 import { editorPlugins } from './plugins/editor-plugins';
 import { FloatingToolbar } from './components/plate-ui/floating-toolbar';

@@ -1,8 +1,8 @@
 import React, { type ComponentType, type SVGProps } from 'react';
 
 import { withRef } from '@udecode/cn';
-import { type PlateEditor, PlateElement } from '@udecode/plate/react';
-import { HEADING_KEYS } from '@udecode/plate-heading';
+import { type PlateEditor, PlateElement } from 'platejs/react';
+import { HEADING_KEYS } from '@platejs/basic-nodes';
 
 import { Icons } from './icons';
 
@@ -16,8 +16,8 @@ import {
 import {
   BulletedListPlugin,
   NumberedListPlugin,
-} from '@udecode/plate-list/react';
-import { toggleList } from '@udecode/plate-list';
+} from '@platejs/list-classic';
+import { toggleList } from '@platejs/list-classic';
 
 interface SlashCommandRule {
   icon: ComponentType<SVGProps<SVGSVGElement>>;

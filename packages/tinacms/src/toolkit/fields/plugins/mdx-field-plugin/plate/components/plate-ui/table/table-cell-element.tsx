@@ -2,20 +2,20 @@
 
 import React from 'react';
 
-import type { TTableCellElement } from '@udecode/plate-table';
+import type { TTableCellElement } from '@platejs/table';
 
 import { cn, withProps, withRef } from '@udecode/cn';
-import { useBlockSelected } from '@udecode/plate-selection/react';
+import { useBlockSelected } from '@platejs/selection';
 import {
   TablePlugin,
   TableRowPlugin,
   useTableCellElement,
-} from '@udecode/plate-table/react';
+} from '@platejs/table';
 import {
   PlateElement,
   useEditorPlugin,
   useElementSelector,
-} from '@udecode/plate/react';
+} from 'platejs/react';
 
 import { blockSelectionVariants } from './block-selection';
 

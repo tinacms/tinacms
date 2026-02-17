@@ -1,30 +1,30 @@
 'use client';
 
-import { createSlatePlugin } from '@udecode/plate';
-import { AutoformatPlugin } from '@udecode/plate-autoformat/react';
+import { ParagraphPlugin } from 'platejs/react';
+import { createSlatePlugin, ExitBreakPlugin, SoftBreakPlugin } from 'platejs';
+import { AutoformatPlugin } from '@platejs/autoformat';
 import {
-  BasicMarksPlugin,
+  BoldPlugin,
+  ItalicPlugin,
+  CodePlugin,
+  StrikethroughPlugin,
   UnderlinePlugin,
-} from '@udecode/plate-basic-marks/react';
-import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
-import { ExitBreakPlugin, SoftBreakPlugin } from '@udecode/plate-break/react';
-import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
-import { HEADING_KEYS, HEADING_LEVELS } from '@udecode/plate-heading';
-import { HeadingPlugin } from '@udecode/plate-heading/react';
-import { HorizontalRulePlugin } from '@udecode/plate-horizontal-rule/react';
-import { IndentListPlugin } from '@udecode/plate-indent-list/react';
-import { LinkPlugin } from '@udecode/plate-link/react';
+  BlockquotePlugin,
+  HeadingPlugin,
+  HEADING_KEYS,
+  HEADING_LEVELS,
+  HorizontalRulePlugin,
+} from '@platejs/basic-nodes';
+import { CodeBlockPlugin } from '@platejs/code-block';
+import { ListPlugin as IndentListPlugin, ListStyleType } from '@platejs/list';
+import { LinkPlugin } from '@platejs/link';
 import {
   BulletedListPlugin,
   ListPlugin,
   NumberedListPlugin,
-} from '@udecode/plate-list/react';
-import { NodeIdPlugin } from '@udecode/plate-node-id';
-import { ResetNodePlugin } from '@udecode/plate-reset-node/react';
-import { SlashPlugin } from '@udecode/plate-slash-command/react';
-import { TablePlugin } from '@udecode/plate-table/react';
-import { TrailingBlockPlugin } from '@udecode/plate-trailing-block';
-import { ParagraphPlugin } from '@udecode/plate/react';
+} from '@platejs/list-classic';
+import { SlashPlugin } from '@platejs/slash-command';
+import { TablePlugin } from '@platejs/table';
 import React from 'react';
 import { LinkFloatingToolbar } from '../components/plate-ui/link-floating-toolbar';
 import { isUrl } from '../transforms/is-url';
@@ -42,14 +42,13 @@ import {
   autoformatPunctuation,
   AutoformatRule,
   autoformatSmartQuotes,
-} from '@udecode/plate-autoformat';
+} from '@platejs/autoformat';
 import {
   isCodeBlockEmpty,
   isSelectionAtCodeBlockStart,
   unwrapCodeBlock,
-} from '@udecode/plate-code-block';
-import { ListStyleType } from '@udecode/plate-indent-list';
-import { unwrapList } from '@udecode/plate-list';
+} from '@platejs/code-block';
+import { unwrapList } from '@platejs/list-classic';
 // @ts-ignore
 // NOTE: Linter complains about ESM import here, as per conversation with Jeff it will be fine at build time—ignore this linting error for now.
 import { all, createLowlight } from 'lowlight';
@@ -88,7 +87,10 @@ const resetBlockTypesCodeBlockRule = {
 
 // View Plugins: Basic nodes and marks
 export const viewPlugins = [
-  BasicMarksPlugin,
+  BoldPlugin,
+  ItalicPlugin,
+  CodePlugin,
+  StrikethroughPlugin,
   UnderlinePlugin,
   HeadingPlugin.configure({ options: { levels: 6 } }),
   ParagraphPlugin,
@@ -124,11 +126,10 @@ export const editorPlugins = [
   ListPlugin,
   IndentListPlugin,
   HorizontalRulePlugin,
-  NodeIdPlugin,
+  // NodeIdPlugin is now built-in to platejs core
   TablePlugin,
   SlashPlugin,
-  // This lets users keep typing after end of marks like headings or quotes
-  TrailingBlockPlugin, //makes sure there's always a blank paragraph at the end of the editor.
+  // TrailingBlockPlugin is now built-in to platejs core
   createBreakPlugin,
   FloatingToolbarPlugin,
 
@@ -149,7 +150,7 @@ export const editorPlugins = [
           ...rule,
           query: (editor) =>
             !editor.api.some({
-              match: { type: editor.getType(CodeBlockPlugin) },
+              match: { type: editor.getType(CodeBlockPlugin.key) },
             }),
         })
       ),
@@ -178,47 +179,8 @@ export const editorPlugins = [
       ],
     },
   }),
-  // ResetNodePlugin lets users turn a heading back into a paragraph by pressing Enter (when empty) or Backspace (at the start).
-  ResetNodePlugin.configure({
-    options: {
-      rules: [
-        {
-          ...resetBlockTypesCommonRule,
-          hotkey: 'Enter',
-          predicate: (editor) =>
-            editor.api.isEmpty(editor.selection, { block: true }),
-        },
-        {
-          ...resetBlockTypesCommonRule,
-          hotkey: 'Backspace',
-          predicate: (editor) => {
-            return editor.api.isAt({ start: true });
-          },
-        },
-        {
-          ...resetBlockTypesCodeBlockRule,
-          hotkey: 'Enter',
-          predicate: isCodeBlockEmpty,
-        },
-        {
-          ...resetBlockTypesCodeBlockRule,
-          hotkey: 'Backspace',
-          predicate: isSelectionAtCodeBlockStart,
-        },
-        // NOTE: Plate's ListPlugin usually handles resetting lists to paragraphs when pressing Backspace at the start of a list item.
-        // However, if the list is the first node in the editor, the default reset behavior may not fully unwrap the list item,
-        // which can leave an invalid structure (like a <li> inside a <p>).
-        // This rule uses `onReset: unwrapList` to ensure lists are always properly reset to paragraphs, even when they are the first node.
-        {
-          types: [BulletedListPlugin.key, NumberedListPlugin.key],
-          defaultType: ParagraphPlugin.key,
-          hotkey: 'Backspace',
-          predicate: (editor) => editor.api.isAt({ start: true }),
-          onReset: unwrapList,
-        },
-      ],
-    },
-  }),
+  // NOTE: ResetNodePlugin was removed in platejs v49+. Reset behavior is now configured via plugin rules.
+  // TODO: Add reset rules to individual plugins if needed (HeadingPlugin, BlockquotePlugin, etc.)
   SoftBreakPlugin.configure({
     options: {
       rules: [

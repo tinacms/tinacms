@@ -1,14 +1,14 @@
 import React from 'react';
 
 import { withRef } from '@udecode/cn';
-import { useEditorState } from '@udecode/plate/react';
+import { useEditorState } from 'platejs/react';
 
 import { Icons } from './icons';
 import { ToolbarButton } from './toolbar';
 import { helpers } from '../../plugins/core/common';
 // import { insertEmptyCodeBlock } from '../../transforms/insert-empty-block';
-import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
-import { insertEmptyCodeBlock } from '@udecode/plate-code-block';
+import { CodeBlockPlugin } from '@platejs/code-block';
+import { insertEmptyCodeBlock } from '@platejs/code-block';
 
 const useCodeBlockToolbarButtonState = () => {
   const editor = useEditorState();

@@ -1,11 +1,11 @@
 import { formatList, preFormat } from './autoformat-utils';
-import { AutoformatRule } from '@udecode/plate-autoformat';
+import { AutoformatRule } from '@platejs/autoformat';
 import {
   BulletedListPlugin,
   ListItemPlugin,
   NumberedListPlugin,
   TodoListPlugin,
-} from '@udecode/plate-list/react';
+} from '@platejs/list-classic';
 
 export const autoformatLists: AutoformatRule[] = [
   {

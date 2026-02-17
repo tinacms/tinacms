@@ -7,13 +7,13 @@ import { ToolbarButton } from './toolbar';
 import {
   useMarkToolbarButton,
   useMarkToolbarButtonState,
-} from '@udecode/plate/react';
+} from 'platejs/react';
 import {
   BoldPlugin,
   CodePlugin,
   ItalicPlugin,
   StrikethroughPlugin,
-} from '@udecode/plate-basic-marks/react';
+} from '@platejs/basic-nodes';
 
 const MarkToolbarButton = withRef<
   typeof ToolbarButton,

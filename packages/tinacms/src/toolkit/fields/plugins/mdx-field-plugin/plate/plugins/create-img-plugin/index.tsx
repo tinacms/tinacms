@@ -3,7 +3,7 @@ import { ImgEmbed } from './component';
 import { insertInlineElement } from '../core/common';
 import type { Media } from '../../../../../../core/media';
 import { isImage } from '@toolkit/components/media/utils';
-import { createPlatePlugin, PlateEditor } from '@udecode/plate/react';
+import { createPlatePlugin, PlateEditor } from 'platejs/react';
 
 export const ELEMENT_IMG = 'img';
 

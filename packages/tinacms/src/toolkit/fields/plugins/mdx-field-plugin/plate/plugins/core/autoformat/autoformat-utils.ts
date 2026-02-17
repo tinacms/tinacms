@@ -1,11 +1,11 @@
-import { ElementApi, SlateEditor } from '@udecode/plate';
-import { isType } from '@udecode/plate';
-import { AutoformatBlockRule } from '@udecode/plate-autoformat';
+import { ElementApi, SlateEditor } from 'platejs';
+import { isType } from 'platejs';
+import { AutoformatBlockRule } from '@platejs/autoformat';
 import {
   CodeBlockPlugin,
   CodeLinePlugin,
-} from '@udecode/plate-code-block/react';
-import { toggleList, unwrapList } from '@udecode/plate-list';
+} from '@platejs/code-block';
+import { toggleList, unwrapList } from '@platejs/list-classic';
 
 export const preFormat: AutoformatBlockRule['preFormat'] = (editor) =>
   unwrapList(editor);

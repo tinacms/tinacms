@@ -8,10 +8,10 @@ import {
   type FloatingToolbarState,
   flip,
   offset,
-} from '@udecode/plate-floating';
+} from '@platejs/floating';
 
 import { Toolbar } from './toolbar';
-import { useEditorRef, useEventEditorValue } from '@udecode/plate/react';
+import { useEditorRef, useEventEditorValue } from 'platejs/react';
 import { useCustomFloatingToolbarState } from './use-floating-toolbar-state';
 import { useCustomFloatingToolbar } from './use-floating-toolbar-hook';
 

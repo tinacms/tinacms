@@ -3,13 +3,13 @@
 import React from 'react';
 
 import { cn, withRef } from '@udecode/cn';
-import { useDropLine } from '@udecode/plate-dnd';
+import { useDropLine } from '@platejs/dnd';
 import {
   PlateElement,
   useEditorRef,
   useElement,
   useSelected,
-} from '@udecode/plate/react';
+} from 'platejs/react';
 import { GripVertical } from 'lucide-react';
 import { Button } from '../button';
 

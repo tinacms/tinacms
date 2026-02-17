@@ -85,30 +85,22 @@ catalog:
     "@types/ws": ^7.4.7
     "@typescript-eslint/eslint-plugin": ^5.62.0
     "@typescript-eslint/parser": ^5.62.0
+    "@platejs/autoformat": ^52.0.0
+    "@platejs/basic-nodes": ^52.0.0
+    "@platejs/code-block": ^52.0.0
+    "@platejs/combobox": ^52.0.0
+    "@platejs/dnd": ^52.0.0
+    "@platejs/floating": ^52.0.0
+    "@platejs/link": ^52.0.0
+    "@platejs/list": ^52.0.0
+    "@platejs/list-classic": ^52.0.0
+    "@platejs/resizable": ^52.0.0
+    "@platejs/selection": ^52.0.0
+    "@platejs/slash-command": ^52.0.0
+    "@platejs/table": ^52.0.0
     "@udecode/cmdk": ^0.2.1
-    "@udecode/cn": ^48.0.3
-    "@udecode/plate": ^48.0.3
-    "@udecode/plate-autoformat": ^48.0.0
-    "@udecode/plate-basic-marks": ^48.0.0
-    "@udecode/plate-block-quote": ^48
-    "@udecode/plate-break": ^48
-    "@udecode/plate-code-block": ^48.0.0
-    "@udecode/plate-combobox": ^48
-    "@udecode/plate-dnd": ^48.0.0
-    "@udecode/plate-floating": ^48.0.0
-    "@udecode/plate-heading": ^48
-    "@udecode/plate-horizontal-rule": ^48
-    "@udecode/plate-indent-list": ^48.0.0
-    "@udecode/plate-link": ^48.0.0
-    "@udecode/plate-list": ^48.0.0
-    "@udecode/plate-node-id": ^48.0.0
-    "@udecode/plate-reset-node": ^48
-    "@udecode/plate-resizable": ^48
-    "@udecode/plate-selection": ^48.0.0
-    "@udecode/plate-slash-command": ^48.0.0
-    "@udecode/plate-table": ^48.0.0
-    "@udecode/plate-trailing-block": ^48.0.0
-    "@udecode/slate": ^48.0.1
+    "@udecode/cn": ^52.0.0
+    platejs: ^52.0.0
     "@vercel/stega": ^0.0.5
     "@vitejs/plugin-react": 3.1.0
     abstract-level: ^1.0.4

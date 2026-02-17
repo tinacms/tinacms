@@ -7,7 +7,7 @@ import {
   BulletedListPlugin,
   useListToolbarButton,
   useListToolbarButtonState,
-} from '@udecode/plate-list/react';
+} from '@platejs/list-classic';
 import { List, ListOrdered } from 'lucide-react';
 
 import { ToolbarButton } from './toolbar';

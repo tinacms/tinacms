@@ -2,10 +2,10 @@
 
 import React, { useState } from 'react';
 
-import type { TCodeBlockElement } from '@udecode/plate-code-block';
+import type { TCodeBlockElement } from '@platejs/code-block';
 
 import { cn } from '@utils/cn';
-import { useElement, useReadOnly } from '@udecode/plate/react';
+import { useElement, useReadOnly } from 'platejs/react';
 import { Check, ChevronDown } from 'lucide-react';
 
 import { Button } from './button';

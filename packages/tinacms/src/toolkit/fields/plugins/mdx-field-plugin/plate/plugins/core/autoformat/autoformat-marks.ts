@@ -1,10 +1,10 @@
-import { AutoformatRule } from '@udecode/plate-autoformat';
+import { AutoformatRule } from '@platejs/autoformat';
 import {
   BoldPlugin,
   CodePlugin,
   ItalicPlugin,
   StrikethroughPlugin,
-} from '@udecode/plate-basic-marks/react';
+} from '@platejs/basic-nodes';
 
 export const autoformatMarks: AutoformatRule[] = [
   {

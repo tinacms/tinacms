@@ -6,15 +6,15 @@ import type * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 
 import { PopoverAnchor } from '@radix-ui/react-popover';
 import { cn, withRef } from '@udecode/cn';
-import { BlockSelectionPlugin } from '@udecode/plate-selection/react';
-import { type TTableElement, setCellBackground } from '@udecode/plate-table';
+import { BlockSelectionPlugin } from '@platejs/selection';
+import { type TTableElement, setCellBackground } from '@platejs/table';
 import {
   TablePlugin,
   TableProvider,
   useTableBordersDropdownMenuContentState,
   useTableElement,
   useTableMergeState,
-} from '@udecode/plate-table/react';
+} from '@platejs/table';
 import {
   PlateElement,
   useEditorPlugin,
@@ -26,7 +26,7 @@ import {
   useRemoveNodeButton,
   useSelected,
   withHOC,
-} from '@udecode/plate/react';
+} from 'platejs/react';
 import {
   ArrowDown,
   ArrowLeft,

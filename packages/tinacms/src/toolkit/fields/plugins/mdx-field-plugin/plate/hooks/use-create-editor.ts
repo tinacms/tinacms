@@ -1,8 +1,8 @@
 'use client';
 
-import type { Value } from '@udecode/plate';
+import type { Value } from 'platejs';
 
-import { usePlateEditor } from '@udecode/plate/react';
+import { usePlateEditor } from 'platejs/react';
 
 export const useCreateEditor = ({
   plugins,

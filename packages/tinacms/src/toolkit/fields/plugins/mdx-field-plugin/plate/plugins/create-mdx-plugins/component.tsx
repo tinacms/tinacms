@@ -15,8 +15,8 @@ import {
   ParagraphPlugin,
   PlateEditor,
   useSelected,
-} from '@udecode/plate/react';
-import { ElementApi } from '@udecode/plate';
+} from 'platejs/react';
+import { ElementApi } from 'platejs';
 
 const Wrapper = ({ inline, children }) => {
   const Component = inline ? 'span' : 'div';

@@ -1,6 +1,6 @@
-import { NodeApi } from '@udecode/plate';
-import { getListItemEntry } from '@udecode/plate-list';
-import { type PlateEditor } from '@udecode/plate/react';
+import { NodeApi } from 'platejs';
+import { getListItemEntry } from '@platejs/list-classic';
+import { type PlateEditor } from 'platejs/react';
 import { ELEMENT_IMG } from '../create-img-plugin';
 import { ELEMENT_MDX_BLOCK, ELEMENT_MDX_INLINE } from '../create-mdx-plugins';
 import { HANDLES_MDX } from './formatting';

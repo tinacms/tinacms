@@ -5,8 +5,8 @@ import { withRef } from '@udecode/cn';
 import { Icons } from './icons';
 
 import { ToolbarButton } from './toolbar';
-import { useEditorState } from '@udecode/plate/react';
-import { BaseBlockquotePlugin } from '@udecode/plate-block-quote';
+import { useEditorState } from 'platejs/react';
+import { BaseBlockquotePlugin } from '@platejs/basic-nodes';
 import { helpers } from '../../plugins/core/common';
 
 const useBlockQuoteToolbarButtonState = () => {

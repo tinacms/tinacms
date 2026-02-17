@@ -7,7 +7,7 @@ import {
   useEditorState,
   useEditorSelector,
   ParagraphPlugin,
-} from '@udecode/plate/react';
+} from 'platejs/react';
 
 import { Icons } from './icons';
 
@@ -22,9 +22,9 @@ import {
 } from './dropdown-menu';
 import { ToolbarButton } from './toolbar';
 import { helpers } from '@toolkit/fields/plugins/mdx-field-plugin/plate/plugins/core/common';
-import { HEADING_KEYS } from '@udecode/plate-heading';
-import { TablePlugin } from '@udecode/plate-table/react';
-import { toggleList, unwrapList } from '@udecode/plate-list';
+import { HEADING_KEYS } from '@platejs/basic-nodes';
+import { TablePlugin } from '@platejs/table';
+import { toggleList, unwrapList } from '@platejs/list-classic';
 
 const items = [
   {

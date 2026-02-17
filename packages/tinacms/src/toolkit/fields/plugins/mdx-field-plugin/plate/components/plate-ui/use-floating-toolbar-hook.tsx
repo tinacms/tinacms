@@ -1,5 +1,5 @@
-import { useFloatingToolbarState } from '@udecode/plate-floating';
-import { useEditorSelector, useOnClickOutside } from '@udecode/plate/react';
+import { useFloatingToolbarState } from '@platejs/floating';
+import { useEditorSelector, useOnClickOutside } from 'platejs/react';
 import React from 'react';
 
 export const useCustomFloatingToolbar = ({

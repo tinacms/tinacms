@@ -6,7 +6,7 @@ import { cn, withRef, withVariants } from '@udecode/cn';
 import {
   Resizable as ResizablePrimitive,
   ResizeHandle as ResizeHandlePrimitive,
-} from '@udecode/plate-resizable';
+} from '@platejs/resizable';
 import { cva } from 'class-variance-authority';
 
 export const mediaResizeHandleVariants = cva(

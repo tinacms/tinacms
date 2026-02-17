@@ -1,13 +1,13 @@
 import React from 'react';
 
 import { withRef } from '@udecode/cn';
-import { useEditorState } from '@udecode/plate/react';
+import { useEditorState } from 'platejs/react';
 
 import { Icons } from './icons';
 import { ToolbarButton } from './toolbar';
 import { helpers } from '../../plugins/core/common';
-import { HorizontalRulePlugin } from '@udecode/plate-horizontal-rule/react';
-import { ParagraphPlugin } from '@udecode/plate/react';
+import { HorizontalRulePlugin } from '@platejs/basic-nodes';
+import { ParagraphPlugin } from 'platejs/react';
 
 const useHorizontalRuleToolbarButtonState = () => {
   const editor = useEditorState();

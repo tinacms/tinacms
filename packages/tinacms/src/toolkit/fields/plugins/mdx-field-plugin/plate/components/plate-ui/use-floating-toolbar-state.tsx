@@ -1,15 +1,15 @@
-import { mergeProps } from '@udecode/plate';
+import { mergeProps } from 'platejs';
 import {
   FloatingToolbarState,
   getSelectionBoundingClientRect,
   useVirtualFloating,
-} from '@udecode/plate-floating';
+} from '@platejs/floating';
 import {
   useEditorReadOnly,
   useEditorRef,
   useEditorSelector,
   useFocused,
-} from '@udecode/plate/react';
+} from 'platejs/react';
 import React from 'react';
 
 export const useCustomFloatingToolbarState = ({
