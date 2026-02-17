@@ -27,6 +27,7 @@ import { ToolbarGroup } from './plate-ui/toolbar';
 import {
   BoldToolbarButton,
   CodeToolbarButton,
+  HighlightToolbarButton,
   ItalicToolbarButton,
   StrikethroughToolbarButton,
 } from './plate-ui/mark-toolbar-button';
@@ -106,6 +107,11 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
     label: 'Code',
     width: () => STANDARD_ICON_WIDTH,
     Component: <CodeToolbarButton />,
+  },
+  highlight: {
+    label: 'Highlight',
+    width: () => STANDARD_ICON_WIDTH,
+    Component: <HighlightToolbarButton />,
   },
   codeBlock: {
     label: 'Code Block',

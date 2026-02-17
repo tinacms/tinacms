@@ -22,6 +22,7 @@ import {
   Heading4,
   Heading5,
   Heading6,
+  Highlighter,
   Indent,
   Keyboard,
   Link2Off,
@@ -396,6 +397,7 @@ export const Icons = {
   codeBlock: CodeBlockIcon,
   bold: BoldIcon,
   italic: ItalicIcon,
+  highlight: HighlightIcon,
   raw: RawMarkdown,
   // www
   gitHub: (props: LucideProps) => (
@@ -666,6 +668,14 @@ export function ItalicIcon(props) {
         />
       </g>
     </svg>
+  );
+}
+
+export function HighlightIcon(props) {
+  const title = props.title || 'highlight';
+
+  return (
+    <Highlighter className='h-5 w-5' />
   );
 }
 

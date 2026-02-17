@@ -193,6 +193,8 @@ export type EmptyTextElement = { type: 'text'; text: '' };
 /**
  * @group InlineElement
  */
+export type HighlightColor = 'yellow' | 'green' | 'blue' | 'pink' | 'orange';
+
 export type TextElement = {
   type: 'text';
   text: string;
@@ -201,6 +203,7 @@ export type TextElement = {
   code?: boolean;
   strikethrough?: boolean;
   highlight?: boolean;
+  highlightColor?: HighlightColor;
 };
 /**
  * @remarks

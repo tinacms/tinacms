@@ -10,6 +10,7 @@ export type ToolbarOverrideType =
   | 'bold'
   | 'strikethrough'
   | 'italic'
+  | 'highlight'
   | 'mermaid'
   | 'raw'
   | 'embed'

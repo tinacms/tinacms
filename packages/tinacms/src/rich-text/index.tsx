@@ -4,6 +4,8 @@
 
 import React from 'react';
 
+export type HighlightColor = 'yellow' | 'green' | 'blue' | 'pink' | 'orange';
+
 type BaseComponents = {
   h1?: { children: JSX.Element };
   h2?: { children: JSX.Element };
@@ -18,7 +20,7 @@ type BaseComponents = {
   strikethrough?: { children: JSX.Element };
   underline?: { children: JSX.Element };
   code?: { children: JSX.Element };
-  highlight?: { children: JSX.Element };
+  highlight?: { children: JSX.Element; color?: HighlightColor };
   text?: { children: string };
   ul?: { children: JSX.Element };
   ol?: { children: JSX.Element };
@@ -119,6 +121,15 @@ export const TinaMarkdown = <
   );
 };
 
+// Map highlight colors to CSS background colors
+const highlightColorStyles: Record<HighlightColor, string> = {
+  yellow: '#fef08a',
+  green: '#bbf7d0',
+  blue: '#bfdbfe',
+  pink: '#fbcfe8',
+  orange: '#fed7aa',
+};
+
 const Leaf = (props: {
   type: 'text';
   text: string;
@@ -128,6 +139,7 @@ const Leaf = (props: {
   strikethrough?: boolean;
   code?: boolean;
   highlight?: boolean;
+  highlightColor?: HighlightColor;
   components: Pick<
     BaseComponentSignature,
     'bold' | 'italic' | 'underline' | 'strikethrough' | 'code' | 'highlight' | 'text'
@@ -214,17 +226,18 @@ const Leaf = (props: {
     );
   }
   if (props.highlight) {
-    const { highlight, ...rest } = props;
+    const { highlight, highlightColor, ...rest } = props;
+    const color = highlightColor || 'yellow';
     if (props.components.highlight) {
       const Component = props.components.highlight;
       return (
-        <Component>
+        <Component color={color}>
           <Leaf {...rest} />
         </Component>
       );
     }
     return (
-      <mark>
+      <mark style={{ backgroundColor: highlightColorStyles[color] }}>
         <Leaf {...rest} />
       </mark>
     );

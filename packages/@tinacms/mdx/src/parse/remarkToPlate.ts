@@ -362,6 +362,10 @@ export const remarkToSlate = (
       case 'image':
         return image(content);
       case 'mdxJsxTextElement':
+        // Handle <Highlight> elements as text with highlight mark
+        if (content.name === 'Highlight' || content.name === 'mark') {
+          return highlightElement(content);
+        }
         return mdxJsxElement(content, field, imageCallback);
       case 'emphasis':
         return phrashingMark(content);
@@ -397,6 +401,52 @@ export const remarkToSlate = (
         },
       ],
     };
+  };
+
+  // Handle <Highlight color="...">text</Highlight> elements
+  const highlightElement = (
+    content: MdxJsxTextElement
+  ): Plate.InlineElement[] => {
+    // Extract color from attributes
+    let color: Plate.HighlightColor = 'yellow';
+    content.attributes?.forEach((attr) => {
+      if (
+        attr.type === 'mdxJsxAttribute' &&
+        attr.name === 'color' &&
+        typeof attr.value === 'string'
+      ) {
+        color = attr.value as Plate.HighlightColor;
+      }
+    });
+
+    // Process children and apply highlight mark
+    const result: Plate.InlineElement[] = [];
+    content.children?.forEach((child) => {
+      if (child.type === 'text') {
+        result.push({
+          type: 'text',
+          text: child.value,
+          highlight: true,
+          highlightColor: color,
+        });
+      } else {
+        // For nested content, process and apply highlight
+        const processed = phrasingContent(child as Md.PhrasingContent);
+        const items = Array.isArray(processed) ? processed : [processed];
+        items.forEach((item) => {
+          if (item.type === 'text') {
+            result.push({
+              ...item,
+              highlight: true,
+              highlightColor: color,
+            });
+          } else {
+            result.push(item);
+          }
+        });
+      }
+    });
+    return result;
   };
 
   const phrashingMark = (
@@ -474,6 +524,26 @@ export const remarkToSlate = (
       case 'break':
         accum.push(breakContent());
         break;
+      case 'mdxJsxTextElement': {
+        // Handle <Highlight> elements nested inside other marks
+        if (node.name === 'Highlight' || node.name === 'mark') {
+          const highlightedNodes = highlightElement(node);
+          // Apply current marks to highlighted nodes
+          highlightedNodes.forEach((hNode) => {
+            if (hNode.type === 'text') {
+              const markProps: { [key: string]: boolean } = {};
+              marks.forEach((mark) => (markProps[mark] = true));
+              accum.push({ ...hNode, ...markProps });
+            } else {
+              accum.push(hNode);
+            }
+          });
+        } else {
+          // For other MDX elements, pass through
+          accum.push(mdxJsxElement(node, field, imageCallback));
+        }
+        break;
+      }
       default:
         // throw new Error(`Unexpected inline element of type ${node.type}`)
         throw new RichTextParseError(

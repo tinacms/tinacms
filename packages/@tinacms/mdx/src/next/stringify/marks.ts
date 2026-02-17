@@ -210,7 +210,7 @@ export const eat = (
   }
   const matchingSiblings = content.slice(1, nonMatchingSiblingIndex + 1);
   const markCounts: {
-    [key in 'strong' | 'emphasis' | 'inlineCode' | 'delete']?: number;
+    [key in 'strong' | 'emphasis' | 'inlineCode' | 'delete' | 'mark']?: number;
   } = {};
   marks.forEach((mark) => {
     let count = 1;
@@ -223,10 +223,10 @@ export const eat = (
     markCounts[mark] = count;
   });
   let count = 0;
-  let markToProcess: 'strong' | 'emphasis' | 'inlineCode' | 'delete' | null =
+  let markToProcess: 'strong' | 'emphasis' | 'inlineCode' | 'delete' | 'mark' | null =
     null;
   Object.entries(markCounts).forEach(([mark, markCount]) => {
-    const m = mark as 'strong' | 'emphasis' | 'inlineCode';
+    const m = mark as 'strong' | 'emphasis' | 'inlineCode' | 'delete' | 'mark';
     if (markCount > count) {
       count = markCount;
       markToProcess = m;
@@ -258,6 +258,38 @@ export const eat = (
       ...eat(content.slice(nonMatchingSiblingIndex + 1), field, imageCallback),
     ];
   }
+
+  // Handle 'mark' (highlight) by outputting as MDX <Highlight> element
+  if (markToProcess === 'mark') {
+    const innerContent = eat(
+      [
+        ...[first, ...matchingSiblings].map((sibling) =>
+          cleanNode(sibling, markToProcess)
+        ),
+      ],
+      field,
+      imageCallback
+    );
+    // Get the highlight color from the first element (default to yellow)
+    const firstText = first as Plate.TextElement;
+    const color = firstText.highlightColor || 'yellow';
+    return [
+      {
+        type: 'mdxJsxTextElement',
+        name: 'Highlight',
+        attributes: [
+          {
+            type: 'mdxJsxAttribute',
+            name: 'color',
+            value: color,
+          },
+        ],
+        children: innerContent,
+      } as unknown as Md.PhrasingContent,
+      ...eat(content.slice(nonMatchingSiblingIndex + 1), field, imageCallback),
+    ];
+  }
+
   return [
     {
       type: markToProcess,
@@ -277,7 +309,7 @@ export const eat = (
 
 const cleanNode = (
   node: InlineElementWithCallback,
-  mark: 'strong' | 'emphasis' | 'inlineCode' | 'delete' | null
+  mark: 'strong' | 'emphasis' | 'inlineCode' | 'delete' | 'mark' | null
 ): Plate.InlineElement => {
   if (!mark) {
     return node;
@@ -288,6 +320,7 @@ const cleanNode = (
     emphasis: 'italic',
     inlineCode: 'code',
     delete: 'strikethrough',
+    mark: 'highlight',
   }[mark];
   Object.entries(node).map(([key, value]) => {
     if (key !== markToClear) {

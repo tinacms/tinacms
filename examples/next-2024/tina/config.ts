@@ -30,6 +30,32 @@ export default defineConfig({
 	schema: {
 		collections: [
 			{
+				name: "page",
+				label: "Pages",
+				format: "mdx",
+				path: "content/pages",
+				ui: {
+					router({ document }) {
+						return `/${document._sys.filename}`;
+					},
+				},
+				fields: [
+					{
+						type: "string",
+						name: "title",
+						label: "Title",
+						isTitle: true,
+						required: true,
+					},
+					{
+						type: "rich-text",
+						name: "body",
+						label: "Body",
+						isBody: true,
+					},
+				],
+			},
+			{
 				name: "slateJson",
 				path: "content/slate-json",
 				format: "json",

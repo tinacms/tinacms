@@ -259,7 +259,7 @@ export const eat = (
     ];
   }
 
-  // Handle 'mark' (highlight) by outputting as HTML <mark> element
+  // Handle 'mark' (highlight) by outputting as MDX <Highlight> element
   if (markToProcess === 'mark') {
     const innerContent = eat(
       [
@@ -270,17 +270,22 @@ export const eat = (
       field,
       imageCallback
     );
-    // Convert inner content to text for HTML wrapping
-    const innerText = innerContent
-      .map((node) => {
-        if (node.type === 'text') return node.value;
-        return '';
-      })
-      .join('');
+    // Get the highlight color from the first element (default to yellow)
+    const firstText = first as Plate.TextElement;
+    const color = firstText.highlightColor || 'yellow';
     return [
-      { type: 'html', value: '<mark>' } as Md.HTML,
-      ...innerContent,
-      { type: 'html', value: '</mark>' } as Md.HTML,
+      {
+        type: 'mdxJsxTextElement',
+        name: 'Highlight',
+        attributes: [
+          {
+            type: 'mdxJsxAttribute',
+            name: 'color',
+            value: color,
+          },
+        ],
+        children: innerContent,
+      } as unknown as Md.PhrasingContent,
       ...eat(content.slice(nonMatchingSiblingIndex + 1), field, imageCallback),
     ];
   }
