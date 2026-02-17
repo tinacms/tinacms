@@ -79,12 +79,6 @@ const PostHogTracker = ({ cms }: { cms: TinaCMS }) => {
     const telemetryMode: TelemetryMode =
       client?.schema?.config?.config?.telemetry || 'enabled';
 
-    if (telemetryMode === 'disabled') {
-      console.log('PostHog telemetry is disabled by user configuration');
-      return;
-    }
-
-    console.log(`Initializing PostHog from TinaAdmin (mode: ${telemetryMode})`);
     initializePostHog(telemetryMode).then((posthog) => {
       if (posthog) {
         const eventProperties: Record<string, string> = {
@@ -198,7 +192,6 @@ const CheckSchema = ({
   children: JSX.Element;
 }) => {
   const cms = useCMS();
-  console.log('cms:', cms);
   const api = new TinaAdminApi(cms);
   const url = api.api.contentApiUrl;
   const [schemaMissingError, setSchemaMissingError] = React.useState(false);
