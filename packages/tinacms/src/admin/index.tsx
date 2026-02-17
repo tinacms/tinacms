@@ -40,7 +40,7 @@ import pkg from '../../package.json';
 
 type AuthType = 'tinacloud' | 'self-hosted' | 'local' | 'other';
 
-const getAuthFlow = (client: Client | undefined): AuthType => {
+const getBackendType = (client: Client | undefined): AuthType => {
   if (!client) return 'other';
 
   if (client.isLocalMode) {
@@ -66,34 +66,28 @@ const getAuthFlow = (client: Client | undefined): AuthType => {
 /**
  * Component that initializes PostHog and tracks the TinaCMS started event.
  * Respects the user's telemetry configuration:
- * - "enabled": Full telemetry with user/project identification (default)
- * - "anonymized": Telemetry without user/project identification (no clientId)
+ * - "anonymous": Anonymous telemetry without user/project identification (default)
  * - "disabled": No telemetry collected
  */
 const PostHogTracker = ({ cms }: { cms: TinaCMS }) => {
   useEffect(() => {
     const client: Client | undefined = cms.api?.tina;
-    const authType = getAuthFlow(client);
+    const backendType = getBackendType(client);
 
-    // Get telemetry mode from user config, default to 'enabled'
+    // Get telemetry mode from user config, default to 'anonymous'
     const telemetryMode: TelemetryMode =
-      client?.schema?.config?.config?.telemetry || 'enabled';
+      client?.schema?.config?.config?.telemetry || 'anonymous';
 
     initializePostHog(telemetryMode).then((posthog) => {
       if (posthog) {
         const eventProperties: Record<string, string> = {
           tinaCMSVersion: pkg.version,
           system: 'tinacms/tinacms',
-          backendType: authType,
+          backendType: backendType,
         };
 
-        // Only include clientId for TinaCloud users when telemetry is fully enabled
-        // In anonymized mode, we don't send identifying information
-        if (
-          telemetryMode === 'enabled' &&
-          authType === 'tinacloud' &&
-          client?.clientId
-        ) {
+        // Include clientId for TinaCloud users when telemetry is enabled
+        if (backendType === 'tinacloud' && client?.clientId) {
           eventProperties.clientId = client.clientId;
         }
 

@@ -2,16 +2,15 @@ import posthog, { PostHog } from 'posthog-js';
 
 /**
  * Telemetry mode configured by the user in their tina config.
- * - "enabled": Full telemetry with user/project identification
- * - "anonymized": Telemetry without user/project identification
+ * - "anonymous": Anonymous telemetry without user/project identification (default)
  * - "disabled": No telemetry collected
  */
-export type TelemetryMode = 'enabled' | 'disabled' | 'anonymized';
+export type TelemetryMode = 'anonymous' | 'disabled';
 
 let posthogClient: PostHog | null = null;
 let isInitialized = false;
 let isDisabled = false;
-let currentTelemetryMode: TelemetryMode = 'enabled';
+let currentTelemetryMode: TelemetryMode = 'anonymous';
 let initializationPromise: Promise<PostHog | null> | null = null;
 
 interface PostHogConfigResponse {
@@ -57,11 +56,11 @@ export function getTelemetryMode(): TelemetryMode {
 }
 
 /**
- * Check if telemetry is in anonymized mode.
- * In anonymized mode, events are captured but without user/project identification.
+ * Check if telemetry is enabled (anonymous mode).
+ * In anonymous mode, events are captured but without user/project identification.
  */
-export function isAnonymizedMode(): boolean {
-  return currentTelemetryMode === 'anonymized';
+export function isAnonymousMode(): boolean {
+  return currentTelemetryMode === 'anonymous';
 }
 
 /**
@@ -69,10 +68,10 @@ export function isAnonymizedMode(): boolean {
  * Fetches config from TinaCloud identity service.
  * Call this once at app startup (e.g., in TinaCloudProvider or TinaAdmin).
  *
- * @param telemetryMode - The telemetry mode from user config. Defaults to 'enabled'.
+ * @param telemetryMode - The telemetry mode from user config. Defaults to 'anonymous'.
  */
 export async function initializePostHog(
-  telemetryMode: TelemetryMode = 'enabled'
+  telemetryMode: TelemetryMode = 'anonymous'
 ): Promise<PostHog | null> {
   // Return early if already initialized (either enabled, disabled, or failed)
   // We only initialize once per session - the first call determines the mode

@@ -778,14 +778,13 @@ export interface Config<
    * Configuration for telemetry.
    *
    * This allows you to configure how telemetry is collected and sent to the TinaCMS team.
-   * Default is "enabled"
+   * Default is "anonymous"
    *
    * @example
-   * telemetry: "enabled" // Default value
-   * telemetry: "disabled" // Disable telemetry
-   * telemetry: "anonymized" // Anonymize telemetry
+   * telemetry: "anonymous" // Default value - anonymous telemetry
+   * telemetry: "disabled" // Disable telemetry completely
    */
-  telemetry?: 'enabled' | 'disabled' | 'anonymized';
+  telemetry?: 'anonymous' | 'disabled';
 
   /**
    * Configuration for repository-related UI features.
