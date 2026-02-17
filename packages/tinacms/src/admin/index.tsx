@@ -48,7 +48,10 @@ const getAuthFlow = (client: Client | undefined): AuthType => {
   }
 
   // Self-hosted uses a custom content API URL
-  if (client.isCustomContentApi || client.schema?.config?.config?.contentApiUrlOverride) {
+  if (
+    client.isCustomContentApi ||
+    client.schema?.config?.config?.contentApiUrlOverride
+  ) {
     return 'self-hosted';
   }
 

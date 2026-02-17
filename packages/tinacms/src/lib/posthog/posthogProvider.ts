@@ -19,7 +19,8 @@ interface PostHogConfigResponse {
   host?: string;
 }
 
-const POSTHOG_CONFIG_ENDPOINT = 'https://identity-v2.tinajs.io/v2/posthog-token';
+const POSTHOG_CONFIG_ENDPOINT =
+  'https://identity-v2.tinajs.io/v2/posthog-token';
 
 /**
  * Fetch PostHog configuration from the TinaCloud identity service.
