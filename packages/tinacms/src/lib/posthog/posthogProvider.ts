@@ -1,16 +1,12 @@
 import posthog, { PostHog } from 'posthog-js';
+import type { TelemetryMode } from '@tinacms/schema-tools';
 
-/**
- * Telemetry mode configured by the user in their tina config.
- * - "anonymous": Anonymous telemetry without user/project identification (default)
- * - "disabled": No telemetry collected
- */
-export type TelemetryMode = 'anonymous' | 'disabled';
+export type { TelemetryMode };
 
 let posthogClient: PostHog | null = null;
 let isInitialized = false;
 let isDisabled = false;
-let currentTelemetryMode: TelemetryMode = 'anonymous';
+let defaultTelemetryMode: TelemetryMode = 'anonymous';
 let initializationPromise: Promise<PostHog | null> | null = null;
 
 interface PostHogConfigResponse {
@@ -52,7 +48,7 @@ async function fetchPostHogConfig(): Promise<PostHogConfigResponse> {
  * Get the current telemetry mode.
  */
 export function getTelemetryMode(): TelemetryMode {
-  return currentTelemetryMode;
+  return defaultTelemetryMode;
 }
 
 /**
@@ -60,7 +56,7 @@ export function getTelemetryMode(): TelemetryMode {
  * In anonymous mode, events are captured but without user/project identification.
  */
 export function isAnonymousMode(): boolean {
-  return currentTelemetryMode === 'anonymous';
+  return defaultTelemetryMode === 'anonymous';
 }
 
 /**
@@ -85,7 +81,7 @@ export async function initializePostHog(
   }
 
   // Store the telemetry mode for use by other functions
-  currentTelemetryMode = telemetryMode;
+  defaultTelemetryMode = telemetryMode;
 
   // If telemetry is disabled, mark as initialized but don't set up PostHog
   if (telemetryMode === 'disabled') {
