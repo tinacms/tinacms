@@ -122,6 +122,7 @@ export async function updateTelemetryConfig(
     path.join(dir, 'tina', 'config.ts'),
     path.join(dir, 'tina', 'config.tsx'),
     path.join(dir, 'tina', 'config.js'),
+    path.join(dir, 'tina', 'config.jsx'),
   ];
 
   for (const configPath of configPaths) {
