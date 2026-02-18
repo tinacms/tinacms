@@ -148,7 +148,7 @@ const Alert: React.FC<{ level: AlertLevel; children: React.ReactNode }> = ({
 
   return (
     <div
-      className={`rounded-md shadow-lg font-medium cursor-pointer pointer-events-all text-sm transition-all duration-100 ease-out mb-4 max-w-full text-gray-700 ${colorClasses[level]}`}
+      className={`rounded-md shadow-lg font-medium pointer-events-all text-sm transition-all duration-100 ease-out mb-4 max-w-full text-gray-700 ${colorClasses[level]}`}
       style={{
         animationName: 'fly-in-up, fade-in',
         animationTimingFunction: 'ease-out',
