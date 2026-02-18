@@ -782,14 +782,9 @@ export interface Config<
         accept?: string | string[];
       };
   /**
-   * Configuration for telemetry.
+   * Telemetry mode for TinaCMS.
    *
-   * This allows you to configure how telemetry is collected and sent to the TinaCMS team.
-   * Default is "anonymous"
-   *
-   * @example
-   * telemetry: "anonymous" // Default value - anonymous telemetry
-   * telemetry: "disabled" // Disable telemetry completely
+   * @default "anonymous"
    */
   telemetry?: TelemetryMode;
 
