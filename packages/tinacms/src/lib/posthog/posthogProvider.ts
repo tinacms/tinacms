@@ -115,6 +115,7 @@ export async function initializePostHog(
       autocapture: false,
       capture_pageview: false,
       disable_session_recording: true,
+      disable_compression: true,
     });
 
     posthogClient = posthog;
