@@ -6,7 +6,7 @@ import {
   BiLinkExternal,
   BiLockAlt,
 } from 'react-icons/bi';
-import { cn } from '../../utils/cn';
+import { cn } from '@utils/cn';
 import { Button } from '../styles/button';
 import { useBranchData } from './branch-data';
 import { BranchModal } from './branch-modal';

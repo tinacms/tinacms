@@ -8,6 +8,7 @@ import { ConfigManager } from '../config-manager';
 import type { TinaSchema } from '@tinacms/schema-tools';
 import { mapUserFields } from '@tinacms/graphql';
 import normalizePath from 'normalize-path';
+import { stripSearchTokenFromConfig } from './stripSearchTokenFromConfig';
 export const TINA_HOST = 'content.tinajs.io';
 
 export class Codegen {
@@ -97,31 +98,11 @@ export class Codegen {
       JSON.stringify(this.graphqlSchemaDoc)
     );
 
-    // Include search config in lock file, but exclude sensitive indexerToken
-    // Only add search if search.tina exists - plain search without tina is not included
-    // Preserve original key order by iterating over keys instead of destructuring
-    const config = this.tinaSchema.schema.config;
-    if (config?.search?.tina) {
-      const { indexerToken, ...safeSearchConfig } = config.search.tina;
-      const newConfig: Record<string, unknown> = {};
-      for (const key of Object.keys(config)) {
-        if (key === 'search') {
-          newConfig.search = { tina: safeSearchConfig };
-        } else {
-          newConfig[key] = config[key];
-        }
-      }
-      this.tinaSchema.schema.config = newConfig as unknown as typeof config;
-    } else if (config?.search) {
-      // Remove search key if search.tina doesn't exist (preserving key order)
-      const newConfig: Record<string, unknown> = {};
-      for (const key of Object.keys(config)) {
-        if (key !== 'search') {
-          newConfig[key] = config[key];
-        }
-      }
-      this.tinaSchema.schema.config = newConfig as unknown as typeof config;
-    }
+    // Strip the sensitive indexerToken before writing to _schema.json / tina-lock.json.
+    // See CVE-2024-45391 / GHSA-4qrm-9h4r-v2fx for security context.
+    this.tinaSchema.schema.config = stripSearchTokenFromConfig(
+      this.tinaSchema.schema.config
+    );
 
     // update _schema.json
     await this.writeConfigFile(

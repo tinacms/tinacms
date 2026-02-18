@@ -453,6 +453,7 @@ export class BuildTina {
             process.cwd(),
             'src/toolkit/index.ts'
           ),
+          '@utils': path.resolve(process.cwd(), 'src/utils'),
         },
       },
       build: {

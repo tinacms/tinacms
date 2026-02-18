@@ -8,7 +8,7 @@ import * as React from 'react';
 import { BiExit, BiMenu, BiX } from 'react-icons/bi';
 import { FiInfo } from 'react-icons/fi';
 import { VscNewFile } from 'react-icons/vsc';
-import { cn } from '../../../utils/cn';
+import { cn } from '@utils/cn';
 import { NavContext } from './nav-context';
 import { VersionInfo } from './VersionInfo';
 import { SyncStatusButton, SyncStatusModal } from './sync-status';
