@@ -3,10 +3,7 @@ import path, { join } from 'path';
 import busboy from 'busboy';
 import fs from 'fs-extra';
 import type { Connect } from 'vite';
-import {
-  PathTraversalError,
-  assertPathWithinBase,
-} from '../../../../utils/path';
+import { PathTraversalError } from '../../../../utils/path';
 
 export const createMediaRouter = (config: PathConfig) => {
   const mediaFolder = path.join(
@@ -62,17 +59,20 @@ export const createMediaRouter = (config: PathConfig) => {
 
     bb.on('file', async (_name, file, _info) => {
       const fullPath = decodeURI(req.url?.slice('/media/upload/'.length));
-      let saveTo: string;
-      try {
-        saveTo = assertPathWithinBase(fullPath, mediaFolder);
-      } catch (error) {
+      // Inline path.resolve + startsWith guard so CodeQL's js/path-injection
+      // taint-tracking recognises the sanitisation (it cannot follow the
+      // equivalent logic inside assertPathWithinBase across a call boundary).
+      const resolvedMediaBase = path.resolve(mediaFolder) + path.sep;
+      const saveTo = path.resolve(path.join(mediaFolder, fullPath));
+      if (!saveTo.startsWith(resolvedMediaBase)) {
         file.resume(); // drain the stream to avoid hanging
-        if (error instanceof PathTraversalError) {
-          res.statusCode = 403;
-          res.end(JSON.stringify({ error: error.message }));
-          return;
-        }
-        throw error;
+        res.statusCode = 403;
+        res.end(
+          JSON.stringify({
+            error: `Path traversal detected: ${fullPath}`,
+          })
+        );
+        return;
       }
       // make sure the directory exists before writing the file. This is needed for creating new folders
       await fs.ensureDir(path.dirname(saveTo));
@@ -150,21 +150,43 @@ export class MediaModel {
   async listMedia(args: MediaArgs): Promise<ListMediaRes> {
     try {
       const mediaBase = join(this.rootPath, this.publicFolder, this.mediaRoot);
-      const folderPath = assertPathWithinBase(
-        decodeURIComponent(args.searchPath),
-        mediaBase
+      // Inline path.resolve + startsWith guard so CodeQL's js/path-injection
+      // taint-tracking recognises the sanitisation (it cannot follow the
+      // equivalent logic inside assertPathWithinBase across a call boundary).
+      //
+      // We use an if/else-if/else structure so that:
+      //   1. Exact base match (root listing): uses resolvedBase (untainted)
+      //   2. Subdirectory: uses folderPath only after startsWith confirms it
+      //      is within the base (CodeQL recognises this as a barrier guard)
+      //   3. Everything else: throws
+      const resolvedBase = path.resolve(mediaBase);
+      const folderPath = path.resolve(
+        path.join(mediaBase, decodeURIComponent(args.searchPath))
       );
+
+      let validatedPath: string;
+      if (folderPath === resolvedBase) {
+        // Listing the media root itself — use the untainted base path
+        validatedPath = resolvedBase;
+      } else if (folderPath.startsWith(resolvedBase + path.sep)) {
+        // Subdirectory within the media root — startsWith acts as CodeQL
+        // barrier guard, so folderPath is sanitised in this branch
+        validatedPath = folderPath;
+      } else {
+        throw new PathTraversalError(args.searchPath);
+      }
+
       const searchPath = parseMediaFolder(args.searchPath);
       // if the path does not exist, return an empty array
-      if (!(await fs.pathExists(folderPath))) {
+      if (!(await fs.pathExists(validatedPath))) {
         return {
           files: [],
           directories: [],
         };
       }
-      const filesStr = await fs.readdir(folderPath);
+      const filesStr = await fs.readdir(validatedPath);
       const filesProm: Promise<FileRes>[] = filesStr.map(async (file) => {
-        const filePath = join(folderPath, file);
+        const filePath = join(validatedPath, file);
         const stat = await fs.stat(filePath);
 
         let src = `/${file}`;
@@ -234,10 +256,16 @@ export class MediaModel {
   async deleteMedia(args: MediaArgs): Promise<SuccessRecord> {
     try {
       const mediaBase = join(this.rootPath, this.publicFolder, this.mediaRoot);
-      const file = assertPathWithinBase(
-        decodeURIComponent(args.searchPath),
-        mediaBase
+      // Inline path.resolve + startsWith guard so CodeQL's js/path-injection
+      // taint-tracking recognises the sanitisation (it cannot follow the
+      // equivalent logic inside assertPathWithinBase across a call boundary).
+      const resolvedBase = path.resolve(mediaBase) + path.sep;
+      const file = path.resolve(
+        path.join(mediaBase, decodeURIComponent(args.searchPath))
       );
+      if (!file.startsWith(resolvedBase)) {
+        throw new PathTraversalError(args.searchPath);
+      }
       // ensure the file exists because fs.remove does not throw an error if the file does not exist
       await fs.stat(file);
       await fs.remove(file);
