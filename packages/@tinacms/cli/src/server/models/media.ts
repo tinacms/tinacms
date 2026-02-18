@@ -2,9 +2,10 @@
 
 */
 
-import fs from 'fs-extra';
 import { join } from 'path';
+import fs from 'fs-extra';
 import { parseMediaFolder } from '../../utils/';
+import { PathTraversalError, assertPathWithinBase } from '../../utils/path';
 
 interface MediaArgs {
   searchPath: string;
@@ -48,12 +49,8 @@ export class MediaModel {
   }
   async listMedia(args: MediaArgs): Promise<ListMediaRes> {
     try {
-      const folderPath = join(
-        this.rootPath,
-        this.publicFolder,
-        this.mediaRoot,
-        args.searchPath
-      );
+      const mediaBase = join(this.rootPath, this.publicFolder, this.mediaRoot);
+      const folderPath = assertPathWithinBase(args.searchPath, mediaBase);
       const searchPath = parseMediaFolder(args.searchPath);
       let filesStr: string[] = [];
       try {
@@ -123,6 +120,7 @@ export class MediaModel {
         cursor,
       };
     } catch (error) {
+      if (error instanceof PathTraversalError) throw error;
       console.error(error);
       return {
         files: [],
@@ -133,17 +131,14 @@ export class MediaModel {
   }
   async deleteMedia(args: MediaArgs): Promise<SuccessRecord> {
     try {
-      const file = join(
-        this.rootPath,
-        this.publicFolder,
-        this.mediaRoot,
-        args.searchPath
-      );
+      const mediaBase = join(this.rootPath, this.publicFolder, this.mediaRoot);
+      const file = assertPathWithinBase(args.searchPath, mediaBase);
       // ensure the file exists because fs.remove does not throw an error if the file does not exist
       await fs.stat(file);
       await fs.remove(file);
       return { ok: true };
     } catch (error) {
+      if (error instanceof PathTraversalError) throw error;
       console.error(error);
       return { ok: false, message: error?.toString() };
     }

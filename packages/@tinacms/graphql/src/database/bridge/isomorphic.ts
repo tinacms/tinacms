@@ -1,3 +1,7 @@
+import path, { dirname } from 'path';
+import fs from 'fs-extra';
+import globParent from 'glob-parent';
+import { GraphQLError } from 'graphql';
 import git, {
   CallbackFsClient,
   PromiseFsClient,
@@ -5,12 +9,39 @@ import git, {
   TreeEntry,
   WalkerEntry,
 } from 'isomorphic-git';
-import fs from 'fs-extra';
-import type { Bridge } from './index';
-import globParent from 'glob-parent';
 import normalize from 'normalize-path';
-import { GraphQLError } from 'graphql';
-import { dirname } from 'path';
+import type { Bridge } from './index';
+
+/**
+ * Defense-in-depth: validates that a filepath stays within the content root.
+ * This protects against CWE-22 (Path Traversal) even if callers fail to
+ * sanitize user input before calling bridge methods.
+ *
+ * For IsomorphicBridge, paths are relative (within the git repo), so we
+ * validate by checking the qualified path (relativePath + filepath) stays
+ * within the git root.
+ */
+function assertWithinBase(filepath: string, relativePath: string): void {
+  // Qualify the path as the bridge would, then normalize to resolve any ".."
+  const qualified = relativePath ? `${relativePath}/${filepath}` : filepath;
+  const normalized = path.normalize(qualified);
+  // A path that escapes upward will start with ".." after normalization,
+  // or on Windows could resolve to an absolute path.
+  // When relativePath is set (monorepo), the normalized path must also stay
+  // within the relativePath prefix.
+  if (
+    normalized.startsWith('..') ||
+    normalized.startsWith('/') ||
+    path.isAbsolute(normalized) ||
+    (relativePath &&
+      normalized !== relativePath &&
+      !normalized.startsWith(relativePath + '/'))
+  ) {
+    throw new Error(
+      `Path traversal detected: "${filepath}" escapes the content root`
+    );
+  }
+}
 
 const flat =
   typeof Array.prototype.flat === 'undefined'
@@ -349,6 +380,7 @@ export class IsomorphicBridge implements Bridge {
   }
 
   public async glob(pattern: string, extension: string) {
+    assertWithinBase(pattern, this.relativePath);
     const ref = await this.getRef();
     const parent = globParent(this.qualifyPath(pattern));
     const { pathParts, pathEntries } = await this.resolvePathEntries(
@@ -393,6 +425,7 @@ export class IsomorphicBridge implements Bridge {
   }
 
   public async delete(filepath: string) {
+    assertWithinBase(filepath, this.relativePath);
     const ref = await this.getRef();
     const { pathParts, pathEntries } = await this.resolvePathEntries(
       this.qualifyPath(filepath),
@@ -480,6 +513,7 @@ export class IsomorphicBridge implements Bridge {
   }
 
   public async get(filepath: string) {
+    assertWithinBase(filepath, this.relativePath);
     const ref = await this.getRef();
     const oid = await git.resolveRef({
       ...this.isomorphicConfig,
@@ -497,6 +531,7 @@ export class IsomorphicBridge implements Bridge {
   }
 
   public async put(filepath: string, data: string) {
+    assertWithinBase(filepath, this.relativePath);
     const ref = await this.getRef();
     const { pathParts, pathEntries } = await this.resolvePathEntries(
       this.qualifyPath(filepath),

@@ -1,8 +1,12 @@
-import fs from 'fs-extra';
+import type { ServerResponse } from 'http';
 import path, { join } from 'path';
 import busboy from 'busboy';
+import fs from 'fs-extra';
 import type { Connect } from 'vite';
-import type { ServerResponse } from 'http';
+import {
+  PathTraversalError,
+  assertPathWithinBase,
+} from '../../../../utils/path';
 
 export const createMediaRouter = (config: PathConfig) => {
   const mediaFolder = path.join(
@@ -14,22 +18,40 @@ export const createMediaRouter = (config: PathConfig) => {
   const mediaModel = new MediaModel(config);
 
   const handleList = async (req, res) => {
-    const requestURL = new URL(req.url, config.apiURL);
-    const folder = requestURL.pathname.replace('/media/list/', '');
-    const limit = requestURL.searchParams.get('limit');
-    const cursor = requestURL.searchParams.get('cursor');
-    const media = await mediaModel.listMedia({
-      searchPath: folder,
-      cursor,
-      limit,
-    });
-    res.end(JSON.stringify(media));
+    try {
+      const requestURL = new URL(req.url, config.apiURL);
+      const folder = requestURL.pathname.replace('/media/list/', '');
+      const limit = requestURL.searchParams.get('limit');
+      const cursor = requestURL.searchParams.get('cursor');
+      const media = await mediaModel.listMedia({
+        searchPath: folder,
+        cursor,
+        limit,
+      });
+      res.end(JSON.stringify(media));
+    } catch (error) {
+      if (error instanceof PathTraversalError) {
+        res.statusCode = 403;
+        res.end(JSON.stringify({ error: error.message }));
+        return;
+      }
+      throw error;
+    }
   };
 
   const handleDelete = async (req: Connect.IncomingMessage, res) => {
-    const file = decodeURIComponent(req.url.slice('/media/'.length));
-    const didDelete = await mediaModel.deleteMedia({ searchPath: file });
-    res.end(JSON.stringify(didDelete));
+    try {
+      const file = decodeURIComponent(req.url.slice('/media/'.length));
+      const didDelete = await mediaModel.deleteMedia({ searchPath: file });
+      res.end(JSON.stringify(didDelete));
+    } catch (error) {
+      if (error instanceof PathTraversalError) {
+        res.statusCode = 403;
+        res.end(JSON.stringify({ error: error.message }));
+        return;
+      }
+      throw error;
+    }
   };
 
   const handlePost = async function (
@@ -40,7 +62,18 @@ export const createMediaRouter = (config: PathConfig) => {
 
     bb.on('file', async (_name, file, _info) => {
       const fullPath = decodeURI(req.url?.slice('/media/upload/'.length));
-      const saveTo = path.join(mediaFolder, ...fullPath.split('/'));
+      let saveTo: string;
+      try {
+        saveTo = assertPathWithinBase(fullPath, mediaFolder);
+      } catch (error) {
+        file.resume(); // drain the stream to avoid hanging
+        if (error instanceof PathTraversalError) {
+          res.statusCode = 403;
+          res.end(JSON.stringify({ error: error.message }));
+          return;
+        }
+        throw error;
+      }
       // make sure the directory exists before writing the file. This is needed for creating new folders
       await fs.ensureDir(path.dirname(saveTo));
       file.pipe(fs.createWriteStream(saveTo));
@@ -116,11 +149,10 @@ export class MediaModel {
   }
   async listMedia(args: MediaArgs): Promise<ListMediaRes> {
     try {
-      const folderPath = join(
-        this.rootPath,
-        this.publicFolder,
-        this.mediaRoot,
-        decodeURIComponent(args.searchPath)
+      const mediaBase = join(this.rootPath, this.publicFolder, this.mediaRoot);
+      const folderPath = assertPathWithinBase(
+        decodeURIComponent(args.searchPath),
+        mediaBase
       );
       const searchPath = parseMediaFolder(args.searchPath);
       // if the path does not exist, return an empty array
@@ -190,6 +222,7 @@ export class MediaModel {
         cursor,
       };
     } catch (error) {
+      if (error instanceof PathTraversalError) throw error;
       console.error(error);
       return {
         files: [],
@@ -200,17 +233,17 @@ export class MediaModel {
   }
   async deleteMedia(args: MediaArgs): Promise<SuccessRecord> {
     try {
-      const file = join(
-        this.rootPath,
-        this.publicFolder,
-        this.mediaRoot,
-        decodeURIComponent(args.searchPath)
+      const mediaBase = join(this.rootPath, this.publicFolder, this.mediaRoot);
+      const file = assertPathWithinBase(
+        decodeURIComponent(args.searchPath),
+        mediaBase
       );
       // ensure the file exists because fs.remove does not throw an error if the file does not exist
       await fs.stat(file);
       await fs.remove(file);
       return { ok: true };
     } catch (error) {
+      if (error instanceof PathTraversalError) throw error;
       console.error(error);
       return { ok: false, message: error?.toString() };
     }
