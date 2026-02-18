@@ -29,8 +29,74 @@ import CollectionUpdatePage from './pages/CollectionUpdatePage';
 import DashboardPage from './pages/DashboardPage';
 import ScreenPage from './pages/ScreenPage';
 
-import { Client } from '../internalClient';
+import { Client, TinaCloudAuthProvider } from '../internalClient';
 import { TinaAdminApi } from './api';
+import {
+  initializePostHog,
+  TinaCMSStartedEvent,
+  TelemetryMode,
+} from '../lib/posthog';
+import pkg from '../../package.json';
+
+type AuthType = 'tinacloud' | 'self-hosted' | 'local' | 'other';
+
+const getBackendType = (client: Client | undefined): AuthType => {
+  if (!client) return 'other';
+
+  if (client.isLocalMode) {
+    return 'local';
+  }
+
+  // Self-hosted uses a custom content API URL
+  if (
+    client.isCustomContentApi ||
+    client.schema?.config?.config?.contentApiUrlOverride
+  ) {
+    return 'self-hosted';
+  }
+
+  // TinaCloud uses TinaCloudAuthProvider
+  if (client.authProvider instanceof TinaCloudAuthProvider) {
+    return 'tinacloud';
+  }
+
+  return 'other';
+};
+
+/**
+ * Component that initializes PostHog and tracks the TinaCMS started event.
+ * Respects the user's telemetry configuration:
+ * - "anonymous": Anonymous telemetry without user/project identification (default)
+ * - "disabled": No telemetry collected
+ */
+const PostHogTracker = ({ cms }: { cms: TinaCMS }) => {
+  useEffect(() => {
+    const client: Client | undefined = cms.api?.tina;
+    const backendType = getBackendType(client);
+
+    // Get telemetry mode from user config, default to 'anonymous'
+    const telemetryMode: TelemetryMode =
+      client?.schema?.config?.config?.telemetry || 'anonymous';
+
+    initializePostHog(telemetryMode).then((posthog) => {
+      if (posthog) {
+        const eventProperties: Record<string, string> = {
+          tinaCMSVersion: pkg.version,
+          system: 'tinacms/tinacms',
+          backendType: backendType,
+        };
+
+        if (backendType === 'tinacloud' && client?.clientId) {
+          eventProperties.clientId = client.clientId;
+        }
+
+        posthog.capture(TinaCMSStartedEvent, eventProperties);
+      }
+    });
+  }, [cms]);
+
+  return null;
+};
 
 const Redirect = () => {
   React.useEffect(() => {
@@ -199,7 +265,6 @@ export const TinaAdmin = ({
   if (isSSR) {
     return null;
   }
-
   return (
     <GetCMS>
       {(cms: TinaCMS) => {
@@ -214,6 +279,7 @@ export const TinaAdmin = ({
           const hasRouter = Boolean(collectionWithRouter);
           return (
             <>
+              <PostHogTracker cms={cms} />
               <CheckSchema schemaJson={schemaJson}>
                 <Router>
                   {/* @ts-ignore */}
