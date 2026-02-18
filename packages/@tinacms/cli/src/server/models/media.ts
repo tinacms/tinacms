@@ -2,7 +2,7 @@
 
 */
 
-import { join } from 'path';
+import path, { join } from 'path';
 import fs from 'fs-extra';
 import { parseMediaFolder } from '../../utils/';
 import { PathTraversalError, assertPathWithinBase } from '../../utils/path';
@@ -132,7 +132,14 @@ export class MediaModel {
   async deleteMedia(args: MediaArgs): Promise<SuccessRecord> {
     try {
       const mediaBase = join(this.rootPath, this.publicFolder, this.mediaRoot);
-      const file = assertPathWithinBase(args.searchPath, mediaBase);
+      // Inline path.resolve + startsWith guard so CodeQL's js/path-injection
+      // taint-tracking recognises the sanitisation (it cannot follow the
+      // equivalent logic inside assertPathWithinBase across a call boundary).
+      const resolvedBase = path.resolve(mediaBase);
+      const file = path.resolve(path.join(mediaBase, args.searchPath));
+      if (file !== resolvedBase && !file.startsWith(resolvedBase + path.sep)) {
+        throw new PathTraversalError(args.searchPath);
+      }
       // ensure the file exists because fs.remove does not throw an error if the file does not exist
       await fs.stat(file);
       await fs.remove(file);
