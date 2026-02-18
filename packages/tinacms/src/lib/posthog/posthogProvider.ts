@@ -6,7 +6,7 @@ export type { TelemetryMode };
 let posthogClient: PostHog | null = null;
 let isInitialized = false;
 let isDisabled = false;
-let defaultTelemetryMode: TelemetryMode = 'anonymous';
+let telemetryMode: TelemetryMode = 'anonymous';
 let initializationPromise: Promise<PostHog | null> | null = null;
 
 interface PostHogConfigResponse {
@@ -48,7 +48,7 @@ async function fetchPostHogConfig(): Promise<PostHogConfigResponse> {
  * Get the current telemetry mode.
  */
 export function getTelemetryMode(): TelemetryMode {
-  return defaultTelemetryMode;
+  return telemetryMode;
 }
 
 /**
@@ -56,7 +56,7 @@ export function getTelemetryMode(): TelemetryMode {
  * In anonymous mode, events are captured but without user/project identification.
  */
 export function isAnonymousMode(): boolean {
-  return defaultTelemetryMode === 'anonymous';
+  return telemetryMode === 'anonymous';
 }
 
 /**
@@ -64,10 +64,10 @@ export function isAnonymousMode(): boolean {
  * Fetches config from TinaCloud identity service.
  * Call this once at app startup (e.g., in TinaCloudProvider or TinaAdmin).
  *
- * @param telemetryMode - The telemetry mode from user config. Defaults to 'anonymous'.
+ * @param mode - The telemetry mode from user config. Defaults to 'anonymous'.
  */
 export async function initializePostHog(
-  telemetryMode: TelemetryMode = 'anonymous'
+  mode: TelemetryMode = 'anonymous'
 ): Promise<PostHog | null> {
   // Return early if already initialized (either enabled, disabled, or failed)
   // We only initialize once per session - the first call determines the mode
@@ -81,10 +81,10 @@ export async function initializePostHog(
   }
 
   // Store the telemetry mode for use by other functions
-  defaultTelemetryMode = telemetryMode;
+  telemetryMode = mode;
 
   // If telemetry is disabled, mark as initialized but don't set up PostHog
-  if (telemetryMode === 'disabled') {
+  if (mode === 'disabled') {
     isDisabled = true;
     isInitialized = true;
     return null;
