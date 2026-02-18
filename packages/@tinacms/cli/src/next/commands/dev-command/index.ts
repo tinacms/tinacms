@@ -325,15 +325,11 @@ export class DevCommand extends BaseCommand {
         // },
       ],
     });
-    await this.startSubCommand();
+if (configManager?.config?.telemetry === 'anonymous') {
+    logger.info(`\n📊 Note: TinaCMS now collects anonymous telemetry regarding usage. More information on TinaCMS Telemetry: https://tina.io/telemetry\n`);
+}
 
-    {
-      if (configManager?.config?.telemetry === 'anonymous') {
-        logger.info(
-          `\n📊 Note: TinaCMS now collects anonymous telemetry regarding usage. More information on TinaCMS Telemetry: https://tina.io/telemetry\n`
-        );
-      }
-    }
+await this.startSubCommand();
   }
 
   watchContentFiles(
