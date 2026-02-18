@@ -1,5 +1,28 @@
 # tinacms
 
+## 3.5.0
+
+### Minor Changes
+
+- [#6438](https://github.com/tinacms/tinacms/pull/6438) [`f90d47b`](https://github.com/tinacms/tinacms/commit/f90d47b746b000e65324da430aacc8fd623f5065) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Telemetry - We’ve added anonymous telemetry to help us understand how Tina is used and prioritize improvements in areas where it matters. No personal or sensitive data is collected, and the information cannot be used to identify individual users. Telemetry is used solely to improve performance, stability, and the overall user experience. You can opt-out at any time by disabling telemetry in your Tina config.
+
+  Read more at https://tina.io/telemetry
+
+- [#5957](https://github.com/tinacms/tinacms/pull/5957) [`89aee8a`](https://github.com/tinacms/tinacms/commit/89aee8ae3d6867e5793e4df7ff9c700dfd8a48c9) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - The referenced files menu is being revamped to improve the UX and increase clarity.
+
+### Patch Changes
+
+- [#6373](https://github.com/tinacms/tinacms/pull/6373) [`da837f7`](https://github.com/tinacms/tinacms/commit/da837f7b17f0540cd47025afd2c45140706d595d) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🔌 Modernisze Branch Switcher by adding `@tanstack/react-table`
+  💄 Replace old BranchSelector with a new BranchSelectorTable component using `react-table`
+  🧹 Cleanup duplicate `cn` references + add alias' for tsconfig and vite config
+
+- [#6436](https://github.com/tinacms/tinacms/pull/6436) [`c806e41`](https://github.com/tinacms/tinacms/commit/c806e41232e0204a13539d6236358cb58cbc7692) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 💄 UI - Remove cursor-pointer from alert
+
+- Updated dependencies [[`f90d47b`](https://github.com/tinacms/tinacms/commit/f90d47b746b000e65324da430aacc8fd623f5065)]:
+  - @tinacms/schema-tools@2.6.0
+  - @tinacms/search@1.2.3
+  - @tinacms/mdx@2.0.6
+
 ## 3.4.1
 
 ### Patch Changes
