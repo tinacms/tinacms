@@ -125,7 +125,8 @@ export class DevCommand extends BaseCommand {
 
           if (configManager.hasSeparateContentRoot()) {
             const rootPath = await configManager.getTinaFolderPath(
-              configManager.contentRootPath
+              configManager.contentRootPath,
+              { isContentRoot: true }
             );
             const filePath = path.join(rootPath, tinaLockFilename);
             await fs.ensureFile(filePath);
