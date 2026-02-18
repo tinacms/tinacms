@@ -43,9 +43,9 @@ export type TinaCMSStartedPayload = {
   system: string;
 };
 
-export const CollectionListPageItmeClickedEvent: string =
+export const CollectionListPageItemClickedEvent: string =
   'collection-list-page-item-clicked';
-export type CollectionListPageItmeClickedPayload = {
+export type CollectionListPageItemClickedPayload = {
   itemName: string;
   itemType: 'collection' | 'folder' | 'document';
 };
