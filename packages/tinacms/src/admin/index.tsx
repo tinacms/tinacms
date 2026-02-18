@@ -86,12 +86,7 @@ const PostHogTracker = ({ cms }: { cms: TinaCMS }) => {
           backendType: backendType,
         };
 
-        // Include clientId for TinaCloud users only when telemetry is not anonymous
-        if (
-          telemetryMode !== 'anonymous' &&
-          backendType === 'tinacloud' &&
-          client?.clientId
-        ) {
+        if (backendType === 'tinacloud' && client?.clientId) {
           eventProperties.clientId = client.clientId;
         }
 
