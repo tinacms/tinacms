@@ -14,6 +14,7 @@ const PREBUILD_PATH = path.join(
   __dirname,
   '../../tina/__generated__/config.prebuild.jsx'
 );
+const POSTHOG_URL_PREFIX = 'https://us.i.posthog.com/';
 
 /** Returns true if the config was actually changed. */
 function setTelemetryMode(mode: 'anonymous' | 'disabled'): boolean {
@@ -71,7 +72,7 @@ test.describe('PostHog telemetry - enabled', () => {
     test.setTimeout(30000);
 
     const requestPromise = page.waitForRequest((request) =>
-      request.url().startsWith('https://us.i.posthog.com/')
+      request.url().startsWith(POSTHOG_URL_PREFIX)
     );
 
     await page.goto('http://localhost:3000/admin/index.html#/~');
@@ -95,7 +96,7 @@ test.describe('PostHog telemetry - disabled', () => {
 
     let posthogRequestSent = false;
     page.on('request', (request) => {
-      if (request.url().startsWith('https://us.i.posthog.com/')) {
+      if (request.url().startsWith(POSTHOG_URL_PREFIX)) {
         posthogRequestSent = true;
       }
     });
