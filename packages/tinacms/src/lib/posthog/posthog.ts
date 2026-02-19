@@ -47,10 +47,22 @@ export const CollectionListPageItemClickedEvent: string =
   'collection-list-page-item-clicked';
 export type CollectionListPageItemClickedPayload = {
   itemName: string;
-  itemType: 'collection' | 'folder' | 'document';
+  itemType: 'folder' | 'document';
+  collectionName: string;
+};
+
+export const CollectionListPageSortEvent: string =
+  'collection-list-page-sort';
+export type CollectionListPageSortPayload = {
+  sortKey: string;
+  collectionName: string;
 };
 
 export const CollectionListPageSearchEvent: string =
   'collection-list-page-search';
+export type CollectionListPageSearchPayload = {
+  searchQuery: string;
+  collectionName: string;
+};
 
 export const EventLogPageViewedEvent: string = 'event-log-page-viewed';
