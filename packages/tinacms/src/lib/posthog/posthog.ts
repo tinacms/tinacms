@@ -51,8 +51,7 @@ export type CollectionListPageItemClickedPayload = {
   collectionName: string;
 };
 
-export const CollectionListPageSortEvent: string =
-  'collection-list-page-sort';
+export const CollectionListPageSortEvent: string = 'collection-list-page-sort';
 export type CollectionListPageSortPayload = {
   sortKey: string;
   collectionName: string;
