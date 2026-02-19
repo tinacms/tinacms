@@ -7,6 +7,7 @@ export const config = defineConfig({
   branch: "",
   clientId: "",
   token: "",
+  telemetry: "anonymous",
   build: {
     publicFolder: "public", // The public asset folder for your framework
     outputFolder: "admin", // within the public folder
