@@ -164,6 +164,21 @@ describe('Express createMediaRouter', () => {
       expect(res._json).toEqual({ ok: true });
       expect(await fs.pathExists(file)).toBe(false);
     });
+
+    it('returns 403 when deleting with empty path (media root)', async () => {
+      createMediaRouter(makeConfig(tmpDir));
+
+      const deleteRoute = registeredRoutes.delete.find((r) => r.path === '/*');
+      const req = { params: [''] };
+      const res = mockRes();
+
+      await deleteRoute!.handler(req, res);
+
+      // resolveStrictlyWithinBase rejects exact base match
+      expect(res._status).toBe(403);
+      expect(res._json).toHaveProperty('error');
+      expect(res._json.error).toContain('Path traversal detected');
+    });
   });
 
   describe('POST /upload/* (multer filename validation)', () => {

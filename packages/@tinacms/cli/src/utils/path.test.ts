@@ -132,6 +132,22 @@ describe('assertPathWithinBase', () => {
       const result = assertPathWithinBase('.', baseDir);
       expect(result).toBe(path.resolve(baseDir));
     });
+
+    it('allows a filename containing %20 (not a traversal sequence)', () => {
+      // %20 is a space, not a traversal-relevant character (%2e, %2f, %5c).
+      // The regex safety net should NOT reject it.
+      const result = assertPathWithinBase('report%20final.pdf', baseDir);
+      expect(result).toBe(
+        path.resolve('/app/public/uploads/report%20final.pdf')
+      );
+    });
+
+    it('allows a single encoded dot %2e (not traversal)', () => {
+      // A single %2e is just an encoded dot — harmless. Browsers and
+      // HTTP clients may encode dots this way in legitimate requests.
+      const result = assertPathWithinBase('%2ehidden', baseDir);
+      expect(result).toBe(path.resolve('/app/public/uploads/%2ehidden'));
+    });
   });
 
   describe('path traversal attacks (should throw)', () => {
@@ -165,6 +181,36 @@ describe('assertPathWithinBase', () => {
     it('rejects decoded percent-encoded slashes (%2F)', () => {
       const decoded = decodeURIComponent('..%2F..%2F..%2Fetc%2Fpasswd');
       expect(() => assertPathWithinBase(decoded, baseDir)).toThrow(
+        PathTraversalError
+      );
+    });
+
+    it('rejects still-encoded %2e%2e (double-dot) as a safety net', () => {
+      // If a caller forgets to decode, the encoded sequences should still
+      // be caught by the regex safety net in the helper.
+      expect(() =>
+        assertPathWithinBase('%2e%2e/%2e%2e/%2e%2e/etc/passwd', baseDir)
+      ).toThrow(PathTraversalError);
+    });
+
+    it('rejects still-encoded %2f (slash) as a safety net', () => {
+      expect(() =>
+        assertPathWithinBase('..%2f..%2f..%2fetc%2fpasswd', baseDir)
+      ).toThrow(PathTraversalError);
+    });
+
+    it('rejects still-encoded %5c (backslash) as a safety net', () => {
+      expect(() => assertPathWithinBase('..%5c..%5c..%5cetc', baseDir)).toThrow(
+        PathTraversalError
+      );
+    });
+
+    it('rejects double-encoded traversal (%252e%252e decoded once → %2e%2e)', () => {
+      // An attacker may double-encode: %252e%252e.  If the caller decodes
+      // once, it becomes %2e%2e, which the regex safety net must still catch.
+      const singleDecoded = decodeURIComponent('%252e%252e/%252e%252e/etc');
+      // singleDecoded === '%2e%2e/%2e%2e/etc'
+      expect(() => assertPathWithinBase(singleDecoded, baseDir)).toThrow(
         PathTraversalError
       );
     });

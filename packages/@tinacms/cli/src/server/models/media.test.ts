@@ -47,6 +47,15 @@ describe('MediaModel (Express server)', () => {
         model.listMedia({ searchPath: '../../../etc' })
       ).rejects.toThrow(PathTraversalError);
     });
+
+    it('throws PathTraversalError for still-encoded traversal (safety net)', async () => {
+      const model = new MediaModel(config);
+      // Even if a caller forgets to decode, encoded traversal sequences
+      // like %2e%2e (double-dot) and %2f (slash) are rejected as a safety net.
+      await expect(
+        model.listMedia({ searchPath: '%2e%2e/%2e%2e/%2e%2e/etc' })
+      ).rejects.toThrow(PathTraversalError);
+    });
   });
 
   describe('deleteMedia', () => {

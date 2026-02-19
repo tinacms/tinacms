@@ -17,7 +17,9 @@ export const createMediaRouter = (config: PathConfig) => {
   const handleList = async (req, res) => {
     try {
       const requestURL = new URL(req.url, config.apiURL);
-      const folder = requestURL.pathname.replace('/media/list/', '');
+      const folder = decodeURIComponent(
+        requestURL.pathname.replace('/media/list/', '')
+      );
       const limit = requestURL.searchParams.get('limit');
       const cursor = requestURL.searchParams.get('cursor');
       const media = await mediaModel.listMedia({
@@ -38,7 +40,7 @@ export const createMediaRouter = (config: PathConfig) => {
 
   const handleDelete = async (req: Connect.IncomingMessage, res) => {
     try {
-      const file = req.url.slice('/media/'.length);
+      const file = decodeURIComponent(req.url.slice('/media/'.length));
       const didDelete = await mediaModel.deleteMedia({ searchPath: file });
       res.end(JSON.stringify(didDelete));
     } catch (error) {
@@ -59,7 +61,9 @@ export const createMediaRouter = (config: PathConfig) => {
     let responded = false;
 
     bb.on('file', async (_name, file, _info) => {
-      const fullPath = decodeURI(req.url?.slice('/media/upload/'.length));
+      const fullPath = decodeURIComponent(
+        req.url?.slice('/media/upload/'.length)
+      );
       let saveTo: string;
       try {
         saveTo = resolveStrictlyWithinBase(fullPath, mediaFolder);
@@ -142,18 +146,39 @@ export interface PathConfig {
 type SuccessRecord = { ok: true } | { ok: false; message: string };
 
 /**
+ * Detects URL-encoded path-traversal sequences that should have been
+ * decoded by the caller.  Acts as a safety net: if a caller forgets to
+ * call `decodeURIComponent`, the still-encoded `%2e%2e%2f` would bypass
+ * the `path.resolve + startsWith` check (Node treats the `%` literally).
+ *
+ * Matches (case-insensitive):
+ *   %2e%2e → ..  (double-dot – directory traversal)
+ *   %2f    → /   (forward slash)
+ *   %5c    → \   (backslash – Windows separator)
+ *
+ * A single %2e (encoded dot) is NOT matched — it is harmless and may
+ * appear in legitimate filenames or dotfile paths.
+ */
+const ENCODED_TRAVERSAL_RE = /%2e%2e|%2f|%5c/i;
+
+/**
  * Resolve `userPath` against `baseDir` and verify it falls within the base.
  * Allows an exact match (returns the base itself) or a subdirectory.
+ *
+ * As a safety net, also rejects paths that still contain URL-encoded
+ * traversal sequences (`%2e%2e`, `%2f`, `%5c`), catching cases where the
+ * caller forgot to decode.
  *
  * Inlined in this file (rather than imported from utils/path) so that
  * CodeQL's js/path-injection taint-tracking can follow the path.resolve +
  * startsWith sanitisation within a single call boundary.
  */
 function resolveWithinBase(userPath: string, baseDir: string): string {
+  if (ENCODED_TRAVERSAL_RE.test(userPath)) {
+    throw new PathTraversalError(userPath);
+  }
   const resolvedBase = path.resolve(baseDir);
-  const resolved = path.resolve(
-    path.join(baseDir, decodeURIComponent(userPath))
-  );
+  const resolved = path.resolve(path.join(baseDir, userPath));
   if (resolved === resolvedBase) {
     return resolvedBase;
   }
@@ -168,10 +193,11 @@ function resolveWithinBase(userPath: string, baseDir: string): string {
  * paths strictly inside the base directory are allowed.
  */
 function resolveStrictlyWithinBase(userPath: string, baseDir: string): string {
+  if (ENCODED_TRAVERSAL_RE.test(userPath)) {
+    throw new PathTraversalError(userPath);
+  }
   const resolvedBase = path.resolve(baseDir) + path.sep;
-  const resolved = path.resolve(
-    path.join(baseDir, decodeURIComponent(userPath))
-  );
+  const resolved = path.resolve(path.join(baseDir, userPath));
   if (!resolved.startsWith(resolvedBase)) {
     throw new PathTraversalError(userPath);
   }

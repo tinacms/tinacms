@@ -1,5 +1,6 @@
 import path from 'path';
 import fs from 'fs-extra';
+import { Readable } from 'stream';
 import { PathTraversalError } from '../../../../utils/path';
 import { MediaModel, PathConfig, createMediaRouter } from './media';
 
@@ -49,8 +50,10 @@ describe('MediaModel (Vite dev server)', () => {
       ).rejects.toThrow(PathTraversalError);
     });
 
-    it('throws PathTraversalError for encoded traversal', async () => {
+    it('throws PathTraversalError for still-encoded traversal (safety net)', async () => {
       const model = new MediaModel(config);
+      // Even if a caller forgets to decode, encoded traversal sequences
+      // like %2e%2e (double-dot) and %2f (slash) are rejected as a safety net.
       await expect(
         model.listMedia({ searchPath: '%2e%2e/%2e%2e/%2e%2e/etc' })
       ).rejects.toThrow(PathTraversalError);
@@ -154,6 +157,152 @@ describe('createMediaRouter', () => {
         },
       };
       await router.handleDelete(req as any, res as any);
+      expect(statusCode).toBe(403);
+      expect(JSON.parse(body)).toHaveProperty('error');
+      expect(JSON.parse(body).error).toContain('Path traversal detected');
+    });
+
+    it('returns 403 for empty path (media root)', async () => {
+      const router = createMediaRouter(config);
+      const req = { url: '/media/' };
+      let statusCode: number = 0;
+      let body: string = '';
+      const res = {
+        set statusCode(code: number) {
+          statusCode = code;
+        },
+        end(data: string) {
+          body = data;
+        },
+      };
+      await router.handleDelete(req as any, res as any);
+      // resolveStrictlyWithinBase rejects exact base match
+      expect(statusCode).toBe(403);
+    });
+  });
+
+  describe('handlePost', () => {
+    /**
+     * Builds a minimal multipart/form-data request stream that busboy can
+     * parse.  The stream contains a single file field named "file".
+     */
+    function makeMultipartReq(url: string, fileContent: string = 'hello') {
+      const boundary = '----TestBoundary' + Date.now();
+      const payload = [
+        `--${boundary}`,
+        'Content-Disposition: form-data; name="file"; filename="test.txt"',
+        'Content-Type: text/plain',
+        '',
+        fileContent,
+        `--${boundary}--`,
+        '',
+      ].join('\r\n');
+
+      const stream = new Readable({
+        read() {
+          this.push(Buffer.from(payload));
+          this.push(null);
+        },
+      }) as any;
+      stream.url = url;
+      stream.headers = {
+        'content-type': `multipart/form-data; boundary=${boundary}`,
+      };
+      return stream;
+    }
+
+    it('returns 403 for path traversal in upload path', async () => {
+      const router = createMediaRouter(config);
+      const req = makeMultipartReq('/media/upload/../../etc/evil.txt');
+      let statusCode: number = 0;
+      let body: string = '';
+      const res = {
+        set statusCode(code: number) {
+          statusCode = code;
+        },
+        end(data: string) {
+          body = data;
+        },
+      } as any;
+
+      await new Promise<void>((resolve) => {
+        const origEnd = res.end;
+        res.end = (data: string) => {
+          origEnd(data);
+          resolve();
+        };
+        router.handlePost(req, res);
+      });
+
+      expect(statusCode).toBe(403);
+      expect(JSON.parse(body)).toHaveProperty('error');
+      expect(JSON.parse(body).error).toContain('Path traversal detected');
+    });
+
+    it('returns 200 for a valid upload path', async () => {
+      const router = createMediaRouter(config);
+      const req = makeMultipartReq(
+        '/media/upload/test-upload.txt',
+        'file data'
+      );
+      let statusCode: number = 0;
+      let body: string = '';
+      const res = {
+        set statusCode(code: number) {
+          statusCode = code;
+        },
+        end(data: string) {
+          body = data;
+        },
+      } as any;
+
+      await new Promise<void>((resolve) => {
+        const origEnd = res.end;
+        res.end = (data: string) => {
+          origEnd(data);
+          // Small delay for the file stream to flush
+          setTimeout(resolve, 50);
+        };
+        router.handlePost(req, res);
+      });
+
+      expect(statusCode).toBe(200);
+      expect(JSON.parse(body)).toEqual({ success: true });
+      // Verify the file was actually written
+      const uploadedFile = path.join(
+        tmpDir,
+        'public',
+        'uploads',
+        'test-upload.txt'
+      );
+      expect(await fs.pathExists(uploadedFile)).toBe(true);
+    });
+
+    it('returns 403 for encoded traversal in upload path', async () => {
+      const router = createMediaRouter(config);
+      const req = makeMultipartReq(
+        '/media/upload/..%2f..%2f..%2fetc%2fevil.txt'
+      );
+      let statusCode: number = 0;
+      let body: string = '';
+      const res = {
+        set statusCode(code: number) {
+          statusCode = code;
+        },
+        end(data: string) {
+          body = data;
+        },
+      } as any;
+
+      await new Promise<void>((resolve) => {
+        const origEnd = res.end;
+        res.end = (data: string) => {
+          origEnd(data);
+          resolve();
+        };
+        router.handlePost(req, res);
+      });
+
       expect(statusCode).toBe(403);
       expect(JSON.parse(body)).toHaveProperty('error');
       expect(JSON.parse(body).error).toContain('Path traversal detected');
