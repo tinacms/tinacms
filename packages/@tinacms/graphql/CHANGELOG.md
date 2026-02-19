@@ -1,5 +1,19 @@
 # tina-graphql
 
+## 2.1.2
+
+### Patch Changes
+
+- [#6375](https://github.com/tinacms/tinacms/pull/6375) [`39fa13a`](https://github.com/tinacms/tinacms/commit/39fa13aae6af31c0f0b505e841e28d8d5a3886b9) Thanks [@TihomirIvanov](https://github.com/TihomirIvanov)! - - Updated dependency jsonpath-plus
+
+  - Fixes security vulnerabilities
+
+- [#6368](https://github.com/tinacms/tinacms/pull/6368) [`6988450`](https://github.com/tinacms/tinacms/commit/6988450c7ae64c569e0340515f3105ee5eb305b7) Thanks [@wicksipedia](https://github.com/wicksipedia)! - GraphQL - Security improvement to the GraphQL resolver to ensure that path traversal sequences (e.g., `../`) in document and folder operations are correctly validated and restricted to the collection's root directory. This prevents unauthorized file operations outside of a collection's configured path.
+
+- Updated dependencies [[`f90d47b`](https://github.com/tinacms/tinacms/commit/f90d47b746b000e65324da430aacc8fd623f5065)]:
+  - @tinacms/schema-tools@2.6.0
+  - @tinacms/mdx@2.0.6
+
 ## 2.1.1
 
 ### Patch Changes
