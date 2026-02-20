@@ -24,6 +24,8 @@ import {
 } from '../internalClient';
 import { CreateClientProps, createClient } from '../utils';
 import { useTinaAuthRedirect } from './useTinaAuthRedirect';
+import { captureEvent } from 'src/lib/posthog/posthogProvider';
+import { BranchSwitchedEvent } from 'src/lib/posthog/posthog';
 
 type ModalNames = null | 'authenticate' | 'error';
 
@@ -347,6 +349,9 @@ export const TinaCloudProvider = (
     cms.registerApi('tina', createClient({ ...props, branch: currentBranch }));
   } else {
     cms.api.tina.setBranch(currentBranch);
+    captureEvent(BranchSwitchedEvent, {
+      branchSwitchedTo: currentBranch,
+    });
   }
 
   useEffect(() => {

@@ -1,7 +1,7 @@
 // When the user switches branches
 export const BranchSwitchedEvent: string = 'branch-switched';
 export type BranchSwitchedPayload = {
-  branchName: string;
+  branchSwitchedTo: string;
 };
 
 // When a user clicks 'save' in the TinaCMS Editor
