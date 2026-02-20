@@ -10,6 +10,8 @@ import { cn } from '@utils/cn';
 import { Button } from '../styles/button';
 import { useBranchData } from './branch-data';
 import { BranchModal } from './branch-modal';
+import { captureEvent } from '../../lib/posthog/posthogProvider';
+import { BranchSwitcherOpenedEvent } from '../../lib/posthog/posthog';
 
 export const BranchButton = ({ className = '' }) => {
   const [open, setOpen] = React.useState(false);
@@ -33,7 +35,10 @@ export const BranchButton = ({ className = '' }) => {
           'pointer-events-auto px-3 py-3 flex shrink gap-1 items-center justify-between max-w-sm',
           className
         )}
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setOpen(true)
+          captureEvent(BranchSwitcherOpenedEvent, {});
+        }}
         title={currentBranch}
       >
         {isProtected ? (

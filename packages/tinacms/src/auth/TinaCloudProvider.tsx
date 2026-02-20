@@ -24,8 +24,8 @@ import {
 } from '../internalClient';
 import { CreateClientProps, createClient } from '../utils';
 import { useTinaAuthRedirect } from './useTinaAuthRedirect';
-import { captureEvent } from 'src/lib/posthog/posthogProvider';
-import { BranchSwitchedEvent } from 'src/lib/posthog/posthog';
+import { captureEvent } from '../lib/posthog/posthogProvider';
+import { BranchSwitchedEvent } from '../lib/posthog/posthog';
 
 type ModalNames = null | 'authenticate' | 'error';
 

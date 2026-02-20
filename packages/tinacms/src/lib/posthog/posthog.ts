@@ -4,6 +4,21 @@ export type BranchSwitchedPayload = {
   branchSwitchedTo: string;
 };
 
+export const BranchSwitcherOpenedEvent: string = 'branch-switcher-opened';
+export type BranchSwitcherOpenedPayload = Record<string, never>;
+
+export const BranchSwitcherSearchEvent: string = 'branch-switcher-search';
+export type BranchSwitcherSearchPayload = {
+  searchQuery: string;
+};
+export const BranchSwitcherDropDownEvent: string = 'branch-switcher-dropdown';
+export type BranchSwitcherDropDownPayload = Record<string, never>;
+
+export const BranchSwitcherPRClickedEvent: string = 'branch-switcher-pr-clicked';
+export type BranchSwitcherPRClickedPayload = {
+  type: 'Open Git Pull Request' | 'Create PR';
+};
+
 // When a user clicks 'save' in the TinaCMS Editor
 export const SavedContentEvent: string = 'saved-content';
 export type SavedContentPayload = {
