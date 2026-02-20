@@ -63,6 +63,12 @@ import type {
 } from '../types';
 import { type CollectionFolder, useCollectionFolder } from './utils';
 import { Callout } from '@toolkit/react-sidebar/components/callout';
+import {
+  CollectionListPageItemClickedEvent,
+  CollectionListPageSearchEvent,
+  CollectionListPageSortEvent,
+} from '../../lib/posthog/posthog';
+import { captureEvent } from '../../lib/posthog/posthogProvider';
 
 const LOCAL_STORAGE_KEY = 'tinacms.admin.collection.list.page';
 const isSSR = typeof window === 'undefined';
@@ -591,6 +597,13 @@ const CollectionListPage = () => {
                                         name: 'sort',
                                         value: sortKey,
                                         onChange: (e) => {
+                                          captureEvent(
+                                            CollectionListPageSortEvent,
+                                            {
+                                              sortKey: e.target.value,
+                                              collectionName: collectionName,
+                                            }
+                                          );
                                           const val = JSON.parse(
                                             e.target.value
                                           );
@@ -618,7 +631,9 @@ const CollectionListPage = () => {
                                   search={search}
                                   setSearch={setSearch}
                                   searchInput={searchInput}
-                                  setSearchInput={setSearchInput}
+                                  setSearchInput={(searchInput) => {
+                                    setSearchInput(searchInput);
+                                  }}
                                 />
                               ) : (
                                 <div className='flex flex-col gap-2 items-start w-full md:w-auto'>
@@ -859,6 +874,16 @@ const CollectionListPage = () => {
                                                   <a
                                                     className='text-blue-600 flex items-center gap-3 cursor-pointer truncate'
                                                     onClick={() => {
+                                                      captureEvent(
+                                                        CollectionListPageItemClickedEvent,
+                                                        {
+                                                          itemType: 'folder',
+                                                          itemName:
+                                                            document.node.name,
+                                                          collectionName:
+                                                            collectionName,
+                                                        }
+                                                      );
                                                       navigate(
                                                         `/${[
                                                           'collections',
@@ -925,6 +950,17 @@ const CollectionListPage = () => {
                                                 <a
                                                   className='text-blue-600 flex items-center gap-3 cursor-pointer truncate'
                                                   onClick={() => {
+                                                    captureEvent(
+                                                      CollectionListPageItemClickedEvent,
+                                                      {
+                                                        itemType: 'document',
+                                                        itemName:
+                                                          document.node._sys
+                                                            .basename,
+                                                        collectionName:
+                                                          collectionName,
+                                                      }
+                                                    );
                                                     handleNavigate(
                                                       navigate,
                                                       cms,
@@ -1192,6 +1228,9 @@ const SearchInput = ({
     e.preventDefault();
     if (searchInput.trim()) {
       setSearch(searchInput);
+      captureEvent(CollectionListPageSearchEvent, {
+        searchQuery: searchInput,
+      });
       setSearchLoaded(false);
     }
   };
