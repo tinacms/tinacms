@@ -19,7 +19,17 @@ import type { Bridge } from './index';
  *
  * For IsomorphicBridge, paths are relative (within the git repo), so we
  * validate by checking the qualified path (relativePath + filepath) stays
- * within the git root.
+ * within the git root. Unlike the filesystem variant, this uses
+ * `path.normalize` instead of `path.resolve` because we're working with
+ * relative paths inside a git tree, not absolute filesystem paths.
+ *
+ * @security If you add a new method to IsomorphicBridge that accepts a
+ * path parameter, you MUST call this function before performing any
+ * git operations with that path.
+ *
+ * @param filepath     - The untrusted path to validate.
+ * @param relativePath - The bridge's relativePath prefix (monorepo offset).
+ * @throws {Error} If the path escapes the content root.
  */
 function assertWithinBase(filepath: string, relativePath: string): void {
   // Qualify the path as the bridge would, then normalize to resolve any ".."
@@ -76,6 +86,11 @@ export type IsomorphicGitBridgeOptions = {
 
 /**
  * Bridge backed by isomorphic-git
+ *
+ * @security All public methods (glob, get, put, delete) validate their
+ * `filepath` / `pattern` argument via `assertWithinBase` before performing
+ * any git operations. If you add a new method that accepts a path, you
+ * MUST validate it the same way.
  */
 export class IsomorphicBridge implements Bridge {
   public rootPath: string;

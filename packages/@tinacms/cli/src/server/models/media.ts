@@ -50,6 +50,10 @@ export interface PathConfig {
  *
  * A single %2e (encoded dot) is NOT matched — it is harmless and may
  * appear in legitimate filenames or dotfile paths.
+ *
+ * @security DUPLICATED from `@tinacms/cli/src/utils/path.ts`.
+ * Keep in sync with the canonical copy and the Vite-server copy in
+ * `cli/src/next/commands/dev-command/server/media.ts`.
  */
 const ENCODED_TRAVERSAL_RE = /%2e%2e|%2f|%5c/i;
 
@@ -61,9 +65,13 @@ const ENCODED_TRAVERSAL_RE = /%2e%2e|%2f|%5c/i;
  * traversal sequences (`%2e%2e`, `%2f`, `%5c`), catching cases where the
  * caller forgot to decode.
  *
- * Inlined in this file (rather than imported from utils/path) so that
- * CodeQL's js/path-injection taint-tracking can follow the path.resolve +
- * startsWith sanitisation within a single call boundary.
+ * @security INLINED (not imported) so that CodeQL's js/path-injection
+ * taint-tracking can follow the `path.resolve + startsWith` sanitisation
+ * within a single call boundary. The canonical implementation lives in
+ * `@tinacms/cli/src/utils/path.ts` — keep the two in sync.
+ *
+ * @param userPath - Untrusted path from the request (must already be decoded).
+ * @param baseDir  - Trusted base directory the path must stay within.
  */
 function resolveWithinBase(userPath: string, baseDir: string): string {
   if (ENCODED_TRAVERSAL_RE.test(userPath)) {
@@ -83,6 +91,13 @@ function resolveWithinBase(userPath: string, baseDir: string): string {
 /**
  * Like `resolveWithinBase` but rejects an exact base match — only
  * paths strictly inside the base directory are allowed.
+ *
+ * Use this for destructive operations (delete, overwrite) where targeting
+ * the media root directory itself would be dangerous.
+ *
+ * @security INLINED (not imported) so that CodeQL's js/path-injection
+ * taint-tracking can follow the sanitisation within a single call boundary.
+ * The canonical implementation lives in `@tinacms/cli/src/utils/path.ts`.
  */
 function resolveStrictlyWithinBase(userPath: string, baseDir: string): string {
   if (ENCODED_TRAVERSAL_RE.test(userPath)) {
@@ -97,6 +112,24 @@ function resolveStrictlyWithinBase(userPath: string, baseDir: string): string {
 }
 
 type SuccessRecord = { ok: true } | { ok: false; message: string };
+
+/**
+ * Handles media file operations (list, delete) for the Express-based server.
+ *
+ * @security Every method that accepts a user-supplied `searchPath` validates
+ * it against the media root using `resolveWithinBase` (list) or
+ * `resolveStrictlyWithinBase` (delete) before any filesystem access.
+ *
+ * - **list** uses `resolveWithinBase` because listing the media root itself
+ *   (empty path / exact base match) is a valid operation.
+ * - **delete** uses `resolveStrictlyWithinBase` because deleting the media
+ *   root directory itself must never be allowed.
+ *
+ * Both methods catch `PathTraversalError` and re-throw it so that the
+ * route handler can return a 403 response. Other errors are caught and
+ * returned as structured error responses (this avoids leaking stack traces
+ * to the client).
+ */
 export class MediaModel {
   public readonly rootPath: string;
   public readonly publicFolder: string;
@@ -180,6 +213,9 @@ export class MediaModel {
         cursor,
       };
     } catch (error) {
+      // @security PathTraversalError must propagate to the route handler so
+      // it can return 403. All other errors are caught here to avoid leaking
+      // internal details to the client.
       if (error instanceof PathTraversalError) throw error;
       console.error(error);
       return {
@@ -198,6 +234,8 @@ export class MediaModel {
       await fs.remove(file);
       return { ok: true };
     } catch (error) {
+      // @security PathTraversalError must propagate to the route handler
+      // so it can return 403; other errors are swallowed into a structured response.
       if (error instanceof PathTraversalError) throw error;
       console.error(error);
       return { ok: false, message: error?.toString() };

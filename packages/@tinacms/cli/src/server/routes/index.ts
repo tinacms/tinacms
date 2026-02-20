@@ -19,6 +19,9 @@ export const createMediaRouter = (config: PathConfig): Router => {
       cb(null, mediaFolder);
     },
     filename: function (req, _file, cb) {
+      // @security req.params[0] is untrusted — the upload filename could
+      // contain traversal sequences like `../../etc/shadow`. We validate it
+      // before passing it to multer.
       const file = req.params[0];
       try {
         // Validate that the filename doesn't escape mediaFolder.
@@ -44,6 +47,8 @@ export const createMediaRouter = (config: PathConfig): Router => {
 
   mediaRouter.get('/list/*', async (req, res) => {
     try {
+      // @security req.params[0] is untrusted user input — path traversal
+      // validation happens inside mediaModel.listMedia via resolveWithinBase.
       const folder = req.params[0];
       const cursor = req.query.cursor as string;
       const limit = req.query.limit as string;
@@ -64,6 +69,8 @@ export const createMediaRouter = (config: PathConfig): Router => {
 
   mediaRouter.delete('/*', async (req, res) => {
     try {
+      // @security req.params[0] is untrusted user input — path traversal
+      // validation happens inside mediaModel.deleteMedia via resolveStrictlyWithinBase.
       const file = req.params[0];
       const didDelete = await mediaModel.deleteMedia({ searchPath: file });
       res.json(didDelete);

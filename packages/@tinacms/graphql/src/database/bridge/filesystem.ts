@@ -8,6 +8,16 @@ import type { Bridge } from './index';
  * Defense-in-depth: validates that a filepath stays within a base directory.
  * This protects against CWE-22 (Path Traversal) even if callers fail to
  * sanitize user input before calling bridge methods.
+ *
+ * @security This is a local copy of the validation pattern. The canonical
+ * reference is in `@tinacms/cli/src/utils/path.ts`. Unlike the media-model
+ * copies, this one does NOT include the URL-encoded safety net because
+ * bridge paths come from GraphQL, not raw HTTP URLs.
+ *
+ * @param filepath - The path to validate (relative to baseDir).
+ * @param baseDir  - The trusted root directory.
+ * @returns The resolved absolute path.
+ * @throws {Error} If the path escapes the base directory.
  */
 function assertWithinBase(filepath: string, baseDir: string): string {
   const resolvedBase = path.resolve(baseDir);
@@ -27,6 +37,10 @@ function assertWithinBase(filepath: string, baseDir: string): string {
  * This is the bridge from whatever datasource we need for I/O.
  * The basic example here is for the filesystem, one is needed
  * for GitHub has well.
+ *
+ * @security All public methods validate their `filepath` / `pattern`
+ * argument via `assertWithinBase` before performing any I/O. If you add a
+ * new method that accepts a path, you MUST validate it the same way.
  */
 export class FilesystemBridge implements Bridge {
   public rootPath: string;
