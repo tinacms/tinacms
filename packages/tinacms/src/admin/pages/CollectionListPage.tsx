@@ -632,13 +632,6 @@ const CollectionListPage = () => {
                                   setSearch={setSearch}
                                   searchInput={searchInput}
                                   setSearchInput={(searchInput) => {
-                                    captureEvent(
-                                      CollectionListPageSearchEvent,
-                                      {
-                                        searchQuery: searchInput,
-                                        collectionName: collectionName,
-                                      }
-                                    );
                                     setSearchInput(searchInput);
                                   }}
                                 />
@@ -1233,6 +1226,9 @@ const SearchInput = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    captureEvent(CollectionListPageSearchEvent, {
+      searchQuery: searchInput,
+    });
     if (searchInput.trim()) {
       setSearch(searchInput);
       setSearchLoaded(false);

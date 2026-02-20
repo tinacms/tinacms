@@ -61,7 +61,6 @@ export const CollectionListPageSearchEvent: string =
   'collection-list-page-search';
 export type CollectionListPageSearchPayload = {
   searchQuery: string;
-  collectionName: string;
 };
 
 export const EventLogPageViewedEvent: string = 'event-log-page-viewed';
