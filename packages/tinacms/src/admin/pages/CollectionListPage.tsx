@@ -1226,11 +1226,11 @@ const SearchInput = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    captureEvent(CollectionListPageSearchEvent, {
-      searchQuery: searchInput,
-    });
     if (searchInput.trim()) {
       setSearch(searchInput);
+      captureEvent(CollectionListPageSearchEvent, {
+        searchQuery: searchInput,
+      });
       setSearchLoaded(false);
     }
   };
