@@ -2,9 +2,10 @@
 
 */
 
+import path, { join } from 'path';
 import fs from 'fs-extra';
-import { join } from 'path';
 import { parseMediaFolder } from '../../utils/';
+import { PathTraversalError } from '../../utils/path';
 
 interface MediaArgs {
   searchPath: string;
@@ -36,7 +37,99 @@ export interface PathConfig {
   mediaRoot: string;
 }
 
+/**
+ * Detects URL-encoded path-traversal sequences that should have been
+ * decoded by the caller.  Acts as a safety net: if a caller forgets to
+ * call `decodeURIComponent`, the still-encoded `%2e%2e%2f` would bypass
+ * the `path.resolve + startsWith` check (Node treats the `%` literally).
+ *
+ * Matches (case-insensitive):
+ *   %2e%2e → ..  (double-dot – directory traversal)
+ *   %2f    → /   (forward slash)
+ *   %5c    → \   (backslash – Windows separator)
+ *
+ * A single %2e (encoded dot) is NOT matched — it is harmless and may
+ * appear in legitimate filenames or dotfile paths.
+ *
+ * @security DUPLICATED from `@tinacms/cli/src/utils/path.ts`.
+ * Keep in sync with the canonical copy and the Vite-server copy in
+ * `cli/src/next/commands/dev-command/server/media.ts`.
+ */
+const ENCODED_TRAVERSAL_RE = /%2e%2e|%2f|%5c/i;
+
+/**
+ * Resolve `userPath` against `baseDir` and verify it falls within the base.
+ * Allows an exact match (returns the base itself) or a subdirectory.
+ *
+ * As a safety net, also rejects paths that still contain URL-encoded
+ * traversal sequences (`%2e%2e`, `%2f`, `%5c`), catching cases where the
+ * caller forgot to decode.
+ *
+ * @security INLINED (not imported) so that CodeQL's js/path-injection
+ * taint-tracking can follow the `path.resolve + startsWith` sanitisation
+ * within a single call boundary. The canonical implementation lives in
+ * `@tinacms/cli/src/utils/path.ts` — keep the two in sync.
+ *
+ * @param userPath - Untrusted path from the request (must already be decoded).
+ * @param baseDir  - Trusted base directory the path must stay within.
+ */
+function resolveWithinBase(userPath: string, baseDir: string): string {
+  if (ENCODED_TRAVERSAL_RE.test(userPath)) {
+    throw new PathTraversalError(userPath);
+  }
+  const resolvedBase = path.resolve(baseDir);
+  const resolved = path.resolve(path.join(baseDir, userPath));
+  if (resolved === resolvedBase) {
+    return resolvedBase;
+  }
+  if (resolved.startsWith(resolvedBase + path.sep)) {
+    return resolved;
+  }
+  throw new PathTraversalError(userPath);
+}
+
+/**
+ * Like `resolveWithinBase` but rejects an exact base match — only
+ * paths strictly inside the base directory are allowed.
+ *
+ * Use this for destructive operations (delete, overwrite) where targeting
+ * the media root directory itself would be dangerous.
+ *
+ * @security INLINED (not imported) so that CodeQL's js/path-injection
+ * taint-tracking can follow the sanitisation within a single call boundary.
+ * The canonical implementation lives in `@tinacms/cli/src/utils/path.ts`.
+ */
+function resolveStrictlyWithinBase(userPath: string, baseDir: string): string {
+  if (ENCODED_TRAVERSAL_RE.test(userPath)) {
+    throw new PathTraversalError(userPath);
+  }
+  const resolvedBase = path.resolve(baseDir) + path.sep;
+  const resolved = path.resolve(path.join(baseDir, userPath));
+  if (!resolved.startsWith(resolvedBase)) {
+    throw new PathTraversalError(userPath);
+  }
+  return resolved;
+}
+
 type SuccessRecord = { ok: true } | { ok: false; message: string };
+
+/**
+ * Handles media file operations (list, delete) for the Express-based server.
+ *
+ * @security Every method that accepts a user-supplied `searchPath` validates
+ * it against the media root using `resolveWithinBase` (list) or
+ * `resolveStrictlyWithinBase` (delete) before any filesystem access.
+ *
+ * - **list** uses `resolveWithinBase` because listing the media root itself
+ *   (empty path / exact base match) is a valid operation.
+ * - **delete** uses `resolveStrictlyWithinBase` because deleting the media
+ *   root directory itself must never be allowed.
+ *
+ * Both methods catch `PathTraversalError` and re-throw it so that the
+ * route handler can return a 403 response. Other errors are caught and
+ * returned as structured error responses (this avoids leaking stack traces
+ * to the client).
+ */
 export class MediaModel {
   public readonly rootPath: string;
   public readonly publicFolder: string;
@@ -48,16 +141,13 @@ export class MediaModel {
   }
   async listMedia(args: MediaArgs): Promise<ListMediaRes> {
     try {
-      const folderPath = join(
-        this.rootPath,
-        this.publicFolder,
-        this.mediaRoot,
-        args.searchPath
-      );
+      const mediaBase = join(this.rootPath, this.publicFolder, this.mediaRoot);
+      const validatedPath = resolveWithinBase(args.searchPath, mediaBase);
+
       const searchPath = parseMediaFolder(args.searchPath);
       let filesStr: string[] = [];
       try {
-        filesStr = await fs.readdir(folderPath);
+        filesStr = await fs.readdir(validatedPath);
       } catch (error) {
         return {
           files: [],
@@ -65,7 +155,7 @@ export class MediaModel {
         };
       }
       const filesProm: Promise<FileRes>[] = filesStr.map(async (file) => {
-        const filePath = join(folderPath, file);
+        const filePath = join(validatedPath, file);
         const stat = await fs.stat(filePath);
 
         let src = `/${file}`;
@@ -123,6 +213,10 @@ export class MediaModel {
         cursor,
       };
     } catch (error) {
+      // @security PathTraversalError must propagate to the route handler so
+      // it can return 403. All other errors are caught here to avoid leaking
+      // internal details to the client.
+      if (error instanceof PathTraversalError) throw error;
       console.error(error);
       return {
         files: [],
@@ -133,17 +227,16 @@ export class MediaModel {
   }
   async deleteMedia(args: MediaArgs): Promise<SuccessRecord> {
     try {
-      const file = join(
-        this.rootPath,
-        this.publicFolder,
-        this.mediaRoot,
-        args.searchPath
-      );
+      const mediaBase = join(this.rootPath, this.publicFolder, this.mediaRoot);
+      const file = resolveStrictlyWithinBase(args.searchPath, mediaBase);
       // ensure the file exists because fs.remove does not throw an error if the file does not exist
       await fs.stat(file);
       await fs.remove(file);
       return { ok: true };
     } catch (error) {
+      // @security PathTraversalError must propagate to the route handler
+      // so it can return 403; other errors are swallowed into a structured response.
+      if (error instanceof PathTraversalError) throw error;
       console.error(error);
       return { ok: false, message: error?.toString() };
     }

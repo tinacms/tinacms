@@ -1,3 +1,7 @@
+import path, { dirname } from 'path';
+import fs from 'fs-extra';
+import globParent from 'glob-parent';
+import { GraphQLError } from 'graphql';
 import git, {
   CallbackFsClient,
   PromiseFsClient,
@@ -5,12 +9,49 @@ import git, {
   TreeEntry,
   WalkerEntry,
 } from 'isomorphic-git';
-import fs from 'fs-extra';
-import type { Bridge } from './index';
-import globParent from 'glob-parent';
 import normalize from 'normalize-path';
-import { GraphQLError } from 'graphql';
-import { dirname } from 'path';
+import type { Bridge } from './index';
+
+/**
+ * Defense-in-depth: validates that a filepath stays within the content root.
+ * This protects against CWE-22 (Path Traversal) even if callers fail to
+ * sanitize user input before calling bridge methods.
+ *
+ * For IsomorphicBridge, paths are relative (within the git repo), so we
+ * validate by checking the qualified path (relativePath + filepath) stays
+ * within the git root. Unlike the filesystem variant, this uses
+ * `path.normalize` instead of `path.resolve` because we're working with
+ * relative paths inside a git tree, not absolute filesystem paths.
+ *
+ * @security If you add a new method to IsomorphicBridge that accepts a
+ * path parameter, you MUST call this function before performing any
+ * git operations with that path.
+ *
+ * @param filepath     - The untrusted path to validate.
+ * @param relativePath - The bridge's relativePath prefix (monorepo offset).
+ * @throws {Error} If the path escapes the content root.
+ */
+function assertWithinBase(filepath: string, relativePath: string): void {
+  // Qualify the path as the bridge would, then normalize to resolve any ".."
+  const qualified = relativePath ? `${relativePath}/${filepath}` : filepath;
+  const normalized = path.normalize(qualified);
+  // A path that escapes upward will start with ".." after normalization,
+  // or on Windows could resolve to an absolute path.
+  // When relativePath is set (monorepo), the normalized path must also stay
+  // within the relativePath prefix.
+  if (
+    normalized.startsWith('..') ||
+    normalized.startsWith('/') ||
+    path.isAbsolute(normalized) ||
+    (relativePath &&
+      normalized !== relativePath &&
+      !normalized.startsWith(relativePath + '/'))
+  ) {
+    throw new Error(
+      `Path traversal detected: "${filepath}" escapes the content root`
+    );
+  }
+}
 
 const flat =
   typeof Array.prototype.flat === 'undefined'
@@ -45,6 +86,11 @@ export type IsomorphicGitBridgeOptions = {
 
 /**
  * Bridge backed by isomorphic-git
+ *
+ * @security All public methods (glob, get, put, delete) validate their
+ * `filepath` / `pattern` argument via `assertWithinBase` before performing
+ * any git operations. If you add a new method that accepts a path, you
+ * MUST validate it the same way.
  */
 export class IsomorphicBridge implements Bridge {
   public rootPath: string;
@@ -349,6 +395,7 @@ export class IsomorphicBridge implements Bridge {
   }
 
   public async glob(pattern: string, extension: string) {
+    assertWithinBase(pattern, this.relativePath);
     const ref = await this.getRef();
     const parent = globParent(this.qualifyPath(pattern));
     const { pathParts, pathEntries } = await this.resolvePathEntries(
@@ -393,6 +440,7 @@ export class IsomorphicBridge implements Bridge {
   }
 
   public async delete(filepath: string) {
+    assertWithinBase(filepath, this.relativePath);
     const ref = await this.getRef();
     const { pathParts, pathEntries } = await this.resolvePathEntries(
       this.qualifyPath(filepath),
@@ -480,6 +528,7 @@ export class IsomorphicBridge implements Bridge {
   }
 
   public async get(filepath: string) {
+    assertWithinBase(filepath, this.relativePath);
     const ref = await this.getRef();
     const oid = await git.resolveRef({
       ...this.isomorphicConfig,
@@ -497,6 +546,7 @@ export class IsomorphicBridge implements Bridge {
   }
 
   public async put(filepath: string, data: string) {
+    assertWithinBase(filepath, this.relativePath);
     const ref = await this.getRef();
     const { pathParts, pathEntries } = await this.resolvePathEntries(
       this.qualifyPath(filepath),
