@@ -14,7 +14,8 @@ export type BranchSwitcherSearchPayload = {
 export const BranchSwitcherDropDownEvent: string = 'branch-switcher-dropdown';
 export type BranchSwitcherDropDownPayload = Record<string, never>;
 
-export const BranchSwitcherPRClickedEvent: string = 'branch-switcher-pr-clicked';
+export const BranchSwitcherPRClickedEvent: string =
+  'branch-switcher-pr-clicked';
 export type BranchSwitcherPRClickedPayload = {
   type: 'Open Git Pull Request' | 'Create PR';
 };

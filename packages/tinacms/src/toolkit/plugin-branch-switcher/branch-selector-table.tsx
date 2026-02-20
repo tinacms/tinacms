@@ -43,7 +43,10 @@ import { captureEvent } from '../../lib/posthog/posthogProvider';
 import { BranchSwitcherSearchEvent } from '../../lib/posthog/posthog';
 
 let searchEventFired = false;
-import { BranchSwitcherDropDownEvent, BranchSwitcherPRClickedEvent } from '../../lib/posthog/posthog';
+import {
+  BranchSwitcherDropDownEvent,
+  BranchSwitcherPRClickedEvent,
+} from '../../lib/posthog/posthog';
 
 type Status = 'failed' | 'unknown' | 'complete' | 'inprogress' | 'timeout';
 
@@ -277,7 +280,9 @@ export default function BranchSelectorTable({
               onChange={(e) => {
                 if (e.target.value && !searchEventFired) {
                   searchEventFired = true;
-                  captureEvent(BranchSwitcherSearchEvent, { searchQuery: e.target.value });
+                  captureEvent(BranchSwitcherSearchEvent, {
+                    searchQuery: e.target.value,
+                  });
                 }
                 setSearch(e.target.value);
               }}
@@ -290,7 +295,7 @@ export default function BranchSelectorTable({
                   setSearch('');
                 }}
                 className='outline-none focus:outline-none bg-transparent border-0 p-0 m-0 absolute right-2.5 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100 transition-all ease-out duration-150'
-              > 
+              >
                 <MdOutlineClear className='w-5 h-auto text-gray-600' />
               </button>
             )}
@@ -309,7 +314,10 @@ export default function BranchSelectorTable({
               id: 'branch-type',
               name: 'branch-type',
               value: filter,
-              onChange: (e: any) => {setFilter(e.target.value); captureEvent(BranchSwitcherDropDownEvent, {});},
+              onChange: (e: any) => {
+                setFilter(e.target.value);
+                captureEvent(BranchSwitcherDropDownEvent, {});
+              },
             }}
             options={[
               {
@@ -480,7 +488,7 @@ const PullRequestCell = ({
 
   const handleCreatePullRequest = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    captureEvent(BranchSwitcherPRClickedEvent, {type: 'Create PR'});
+    captureEvent(BranchSwitcherPRClickedEvent, { type: 'Create PR' });
     if (creatingPR) return;
 
     setCreatingPR(true);
@@ -523,7 +531,9 @@ const PullRequestCell = ({
           variant='white'
           size='custom'
           onClick={() => {
-            captureEvent(BranchSwitcherPRClickedEvent, {type: 'Open Git Pull Request'});
+            captureEvent(BranchSwitcherPRClickedEvent, {
+              type: 'Open Git Pull Request',
+            });
             window.open(branch.githubPullRequestUrl, '_blank');
           }}
           className='cursor-pointer h-9 px-2 flex items-center gap-1'

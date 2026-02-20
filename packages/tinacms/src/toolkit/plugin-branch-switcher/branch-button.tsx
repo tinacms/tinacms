@@ -36,7 +36,7 @@ export const BranchButton = ({ className = '' }) => {
           className
         )}
         onClick={() => {
-          setOpen(true)
+          setOpen(true);
           captureEvent(BranchSwitcherOpenedEvent, {});
         }}
         title={currentBranch}
