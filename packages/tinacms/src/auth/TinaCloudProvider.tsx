@@ -349,10 +349,17 @@ export const TinaCloudProvider = (
     cms.registerApi('tina', createClient({ ...props, branch: currentBranch }));
   } else {
     cms.api.tina.setBranch(currentBranch);
-    captureEvent(BranchSwitchedEvent, {
-      branchSwitchedTo: currentBranch,
-    });
   }
+
+  const previousBranchRef = React.useRef(currentBranch);
+  useEffect(() => {
+    if (previousBranchRef.current !== currentBranch) {
+      captureEvent(BranchSwitchedEvent, {
+        branchSwitchedTo: currentBranch,
+      });
+      previousBranchRef.current = currentBranch;
+    }
+  }, [currentBranch]);
 
   useEffect(() => {
     let searchClient;
