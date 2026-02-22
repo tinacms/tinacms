@@ -41,8 +41,6 @@ import { cn } from '@utils/cn';
 import { Badge } from '@toolkit/react-sidebar/components/badge';
 import { captureEvent } from '../../lib/posthog/posthogProvider';
 import { BranchSwitcherSearchEvent } from '../../lib/posthog/posthog';
-
-let searchEventFired = false;
 import {
   BranchSwitcherDropDownEvent,
   BranchSwitcherPRClickedEvent,
@@ -124,6 +122,7 @@ export default function BranchSelectorTable({
 }: BranchSelectorTableProps) {
   const [filter, setFilter] = React.useState<'content' | 'all'>('content');
   const [search, setSearch] = React.useState('');
+  const searchEventFired = React.useRef(false);
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
   const [selectedBranch, setSelectedBranch] = React.useState<string | null>(
@@ -278,11 +277,9 @@ export default function BranchSelectorTable({
               placeholder='Branch name or PR #'
               value={search}
               onChange={(e) => {
-                if (e.target.value && !searchEventFired) {
-                  searchEventFired = true;
-                  captureEvent(BranchSwitcherSearchEvent, {
-                    searchQuery: e.target.value,
-                  });
+                if (e.target.value && !searchEventFired.current) {
+                  searchEventFired.current = true;
+                  captureEvent(BranchSwitcherSearchEvent, {});
                 }
                 setSearch(e.target.value);
               }}
