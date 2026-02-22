@@ -43,7 +43,7 @@ import { captureEvent } from '../../lib/posthog/posthogProvider';
 import {
   BranchSwitcherDropDownEvent,
   BranchSwitcherPRClickedEvent,
-  BranchSwitcherSearchEvent
+  BranchSwitcherSearchEvent,
 } from '../../lib/posthog/posthog';
 
 type Status = 'failed' | 'unknown' | 'complete' | 'inprogress' | 'timeout';
