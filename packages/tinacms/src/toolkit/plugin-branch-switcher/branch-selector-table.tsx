@@ -40,10 +40,10 @@ import { ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
 import { cn } from '@utils/cn';
 import { Badge } from '@toolkit/react-sidebar/components/badge';
 import { captureEvent } from '../../lib/posthog/posthogProvider';
-import { BranchSwitcherSearchEvent } from '../../lib/posthog/posthog';
 import {
   BranchSwitcherDropDownEvent,
   BranchSwitcherPRClickedEvent,
+  BranchSwitcherSearchEvent
 } from '../../lib/posthog/posthog';
 
 type Status = 'failed' | 'unknown' | 'complete' | 'inprogress' | 'timeout';
