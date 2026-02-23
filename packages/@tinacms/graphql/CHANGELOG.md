@@ -1,5 +1,12 @@
 # tina-graphql
 
+## 2.1.3
+
+### Patch Changes
+
+- [#6440](https://github.com/tinacms/tinacms/pull/6440) [`c2517c2`](https://github.com/tinacms/tinacms/commit/c2517c295fb7b1d2b05923e5176be7f3131b4381) Thanks [@18-th](https://github.com/18-th)! - \* Add path traversal protection and tests for [GHSA-5hxf-c7j4-279c](https://github.com/tinacms/tinacms/security/advisories/GHSA-5hxf-c7j4-279c) path traversal vulnerability
+  - Add path traversal protection and tests for [GHSA-2f24-mg4x-534q](https://github.com/tinacms/tinacms/security/advisories/GHSA-2f24-mg4x-534q) path traversal vulnerability
+
 ## 2.1.2
 
 ### Patch Changes
