@@ -92,14 +92,14 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   const hideFooter = !!rest.hideFooter;
   const [createBranchModalOpen, setCreateBranchModalOpen] =
     React.useState(false);
-  const [formIsDirty, setFormIsDirty] = React.useState(false);
 
   const tinaForm = form.tinaForm;
   const finalForm = form.tinaForm.finalForm;
 
   // Warn users before navigating away with unsaved changes (browser refresh/close)
+  // Pass finalForm directly so it checks actual form state at navigation time
   useUnsavedChangesWarning({
-    isBlocking: formIsDirty,
+    finalForm,
   });
 
   React.useEffect(() => {
@@ -128,22 +128,21 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   );
 
   /**
-   * Track form dirty state and notify parent component
+   * Notify parent component of pristine state changes
    */
   React.useEffect(() => {
+    if (!onPristineChange) return;
+
     const unsubscribe = finalForm.subscribe(
       ({ pristine }) => {
-        setFormIsDirty(!pristine);
-        if (onPristineChange) {
-          onPristineChange(pristine);
-        }
+        onPristineChange(pristine);
       },
       { pristine: true }
     );
     return () => {
       unsubscribe();
     };
-  }, [finalForm]);
+  }, [finalForm, onPristineChange]);
 
   const fieldGroup = tinaForm.getActiveField(form.activeFieldName);
 
