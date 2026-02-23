@@ -8,7 +8,9 @@ export const BranchSwitcherOpenedEvent: string = 'branch-switcher-opened';
 export type BranchSwitcherOpenedPayload = Record<string, never>;
 
 export const BranchSwitcherSearchEvent: string = 'branch-switcher-search';
-export type BranchSwitcherSearchPayload = Record<string, never>;
+export type BranchSwitcherSearchPayload = {
+  option: string;
+}
 
 export const BranchSwitcherDropDownEvent: string = 'branch-switcher-dropdown';
 export type BranchSwitcherDropDownPayload = Record<string, never>;

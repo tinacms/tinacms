@@ -313,7 +313,9 @@ export default function BranchSelectorTable({
               value: filter,
               onChange: (e: any) => {
                 setFilter(e.target.value);
-                captureEvent(BranchSwitcherDropDownEvent, {});
+                captureEvent(BranchSwitcherDropDownEvent, {
+                  option: e.target.value,
+                });
               },
             }}
             options={[
