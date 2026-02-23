@@ -1,5 +1,16 @@
 # tinacms
 
+## 3.5.1
+
+### Patch Changes
+
+- [#6446](https://github.com/tinacms/tinacms/pull/6446) [`2738749`](https://github.com/tinacms/tinacms/commit/2738749bac08c02214fdf208f96bbcc4906ef442) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐖 PostHog - Add Telemetry around the branch selector to see which elements users are interacting with on the modal
+
+- [#6443](https://github.com/tinacms/tinacms/pull/6443) [`dfb4ce8`](https://github.com/tinacms/tinacms/commit/dfb4ce8da7b82b638337109cc7859125e112a0a9) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 📊 Telemetry - Add telemetry to CollectionListPage to identify how users are interacting with the page (button clicks, filtering etc)
+
+- Updated dependencies []:
+  - @tinacms/search@1.2.4
+
 ## 3.5.0
 
 ### Minor Changes
