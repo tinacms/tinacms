@@ -97,8 +97,8 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   const tinaForm = form.tinaForm;
   const finalForm = form.tinaForm.finalForm;
 
-  // Warn users before navigating away with unsaved changes
-  const { UnsavedChangesWarningModal } = useUnsavedChangesWarning({
+  // Warn users before navigating away with unsaved changes (browser refresh/close)
+  useUnsavedChangesWarning({
     isBlocking: formIsDirty,
   });
 
@@ -185,7 +185,6 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 
         return (
           <>
-            {UnsavedChangesWarningModal}
             {createBranchModalOpen && (
               <CreateBranchModal
                 safeSubmit={safeSubmit}
