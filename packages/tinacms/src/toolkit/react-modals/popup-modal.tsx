@@ -4,7 +4,7 @@ import { cn } from '@utils/cn';
 export const PopupModal = ({ className = '', style = {}, ...props }) => (
   <div
     className={cn(
-      'block z-0 overflow-visible bg-gray-50 rounded-[5px] my-10 mx-auto w-[460px] max-w-[90%]',
+      'block z-0 overflow-visible bg-gray-50 rounded-[5px] my-10 mx-auto w-[800px] max-w-[90%]',
       className
     )}
     style={{
