@@ -97,10 +97,8 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   const finalForm = form.tinaForm.finalForm;
 
   // Warn users before navigating away with unsaved changes (browser refresh/close)
-  // Pass finalForm directly so it checks actual form state at navigation time
-  useUnsavedChangesWarning({
-    finalForm,
-  });
+  // Checks all forms in the CMS to handle nested field navigation correctly
+  useUnsavedChangesWarning();
 
   React.useEffect(() => {
     const collection = cms.api.tina.schema.getCollectionByFullPath(
