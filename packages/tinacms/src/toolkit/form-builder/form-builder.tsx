@@ -17,7 +17,10 @@ import { FormPortalProvider } from './form-portal';
 import { LoadingDots } from './loading-dots';
 import { ResetForm } from './reset-form';
 import { CreateBranchModal } from './create-branch-modal';
-import { useUnsavedChangesWarning } from '../../hooks/use-unsaved-changes-warning';
+import {
+  useUnsavedChangesWarning,
+  useTrackFormDirtyState,
+} from '../../hooks/use-unsaved-changes-warning';
 
 export interface FormBuilderProps {
   form: { tinaForm: Form; activeFieldName?: string };
@@ -96,8 +99,10 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   const tinaForm = form.tinaForm;
   const finalForm = form.tinaForm.finalForm;
 
+  // Track this form's dirty state globally (persists across component remounts)
+  useTrackFormDirtyState(tinaForm.id, finalForm);
+
   // Warn users before navigating away with unsaved changes (browser refresh/close)
-  // Checks all forms in the CMS to handle nested field navigation correctly
   useUnsavedChangesWarning();
 
   React.useEffect(() => {
