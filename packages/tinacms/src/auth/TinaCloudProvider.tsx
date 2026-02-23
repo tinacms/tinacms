@@ -190,7 +190,9 @@ const AuthWallInner = ({
             isTinaCloud ? (
               <img
                 src={loginLlama}
-                alt='TinaCMS Security Illustration'
+                alt='Tina the Llama playing a large orange key like a guitar.'
+                width={869}
+                height={869}
                 style={{ maxWidth: '100%', margin: '0 auto', display: 'block' }}
               />
             ) : (
