@@ -1,20 +1,20 @@
+import { createServer } from 'net';
 import {
-  createDatabaseInternal,
-  FilesystemBridge,
-  Database,
-  TinaLevelClient,
   Bridge,
+  Database,
+  FilesystemBridge,
+  TinaLevelClient,
+  createDatabaseInternal,
 } from '@tinacms/graphql';
+import { ManyLevelHost } from 'many-level';
+import { MemoryLevel } from 'memory-level';
+import { pipeline } from 'readable-stream';
+import { logger } from '../logger';
 import {
   ConfigManager,
   LEGACY_TINA_FOLDER,
   TINA_FOLDER,
 } from './config-manager';
-import { logger } from '../logger';
-import { pipeline } from 'readable-stream';
-import { createServer } from 'net';
-import { ManyLevelHost } from 'many-level';
-import { MemoryLevel } from 'memory-level';
 
 export const createDBServer = (port: number) => {
   const levelHost = new ManyLevelHost(
@@ -37,7 +37,7 @@ export const createDBServer = (port: number) => {
       );
     }
   });
-  dbServer.listen(port);
+  dbServer.listen(port, '127.0.0.1');
 };
 
 export async function createAndInitializeDatabase(
