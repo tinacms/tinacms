@@ -120,6 +120,9 @@ const RenderForm = ({
     template,
   });
 
+  // Memoize the document values to prevent Form recreation on reference changes
+  const documentValuesJson = JSON.stringify(document._values);
+
   const form = useMemo(() => {
     return new Form({
       // id is the full document path
@@ -152,7 +155,8 @@ const RenderForm = ({
         }
       },
     });
-  }, [cms, document, relativePath, collection, mutationInfo]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cms, documentValuesJson, relativePath, collection, mutationInfo]);
 
   React.useEffect(() => {
     cms.dispatch({ type: 'forms:add', value: form });
