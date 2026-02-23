@@ -17,6 +17,7 @@ import { FormPortalProvider } from './form-portal';
 import { LoadingDots } from './loading-dots';
 import { ResetForm } from './reset-form';
 import { CreateBranchModal } from './create-branch-modal';
+import { useUnsavedChangesWarning } from '../../hooks/use-unsaved-changes-warning';
 
 export interface FormBuilderProps {
   form: { tinaForm: Form; activeFieldName?: string };
@@ -91,9 +92,15 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   const hideFooter = !!rest.hideFooter;
   const [createBranchModalOpen, setCreateBranchModalOpen] =
     React.useState(false);
+  const [formIsDirty, setFormIsDirty] = React.useState(false);
 
   const tinaForm = form.tinaForm;
   const finalForm = form.tinaForm.finalForm;
+
+  // Warn users before navigating away with unsaved changes
+  const { UnsavedChangesWarningModal } = useUnsavedChangesWarning({
+    isBlocking: formIsDirty,
+  });
 
   React.useEffect(() => {
     const collection = cms.api.tina.schema.getCollectionByFullPath(
@@ -121,30 +128,19 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   );
 
   /**
-   * Prevent navigation away from the window when the form is dirty
+   * Track form dirty state and notify parent component
    */
   React.useEffect(() => {
-    // const onBeforeUnload = (event) => {
-    //   event.preventDefault()
-    //   event.returnValue = ''
-    // }
-
     const unsubscribe = finalForm.subscribe(
       ({ pristine }) => {
+        setFormIsDirty(!pristine);
         if (onPristineChange) {
           onPristineChange(pristine);
         }
-
-        // if (!pristine) {
-        //   window.addEventListener('beforeunload', onBeforeUnload)
-        // } else {
-        //   window.removeEventListener('beforeunload', onBeforeUnload)
-        // }
       },
       { pristine: true }
     );
     return () => {
-      // window.removeEventListener('beforeunload', onBeforeUnload)
       unsubscribe();
     };
   }, [finalForm]);
@@ -189,6 +185,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 
         return (
           <>
+            {UnsavedChangesWarningModal}
             {createBranchModalOpen && (
               <CreateBranchModal
                 safeSubmit={safeSubmit}
