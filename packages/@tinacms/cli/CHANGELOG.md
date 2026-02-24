@@ -1,5 +1,35 @@
 # tinacms-cli
 
+## 2.1.7
+
+### Patch Changes
+
+- [#6440](https://github.com/tinacms/tinacms/pull/6440) [`c2517c2`](https://github.com/tinacms/tinacms/commit/c2517c295fb7b1d2b05923e5176be7f3131b4381) Thanks [@18-th](https://github.com/18-th)! - \* Add path traversal protection and tests for [GHSA-5hxf-c7j4-279c](https://github.com/tinacms/tinacms/security/advisories/GHSA-5hxf-c7j4-279c) path traversal vulnerability
+  - Add path traversal protection and tests for [GHSA-2f24-mg4x-534q](https://github.com/tinacms/tinacms/security/advisories/GHSA-2f24-mg4x-534q) path traversal vulnerability
+- Updated dependencies [[`c2517c2`](https://github.com/tinacms/tinacms/commit/c2517c295fb7b1d2b05923e5176be7f3131b4381), [`2738749`](https://github.com/tinacms/tinacms/commit/2738749bac08c02214fdf208f96bbcc4906ef442), [`dfb4ce8`](https://github.com/tinacms/tinacms/commit/dfb4ce8da7b82b638337109cc7859125e112a0a9)]:
+  - @tinacms/graphql@2.1.3
+  - tinacms@3.5.1
+  - @tinacms/search@1.2.4
+  - @tinacms/app@2.3.26
+
+## 2.1.6
+
+### Patch Changes
+
+- [#6416](https://github.com/tinacms/tinacms/pull/6416) [`62d0e5b`](https://github.com/tinacms/tinacms/commit/62d0e5ba363399af3ea863acd2d6d0e000eea4c6) Thanks [@18-th](https://github.com/18-th)! - Adding tests to confirm that a [Security Advisory](https://github.com/tinacms/tinacms/security/advisories/GHSA-pc2q-jcxq-rjrr) was fixed
+
+- [#6439](https://github.com/tinacms/tinacms/pull/6439) [`bde4e4f`](https://github.com/tinacms/tinacms/commit/bde4e4f622a50c31bc4235e417f3c389aa71667d) Thanks [@kulesy](https://github.com/kulesy)! - Improve error message when content directory is missing a `tina/` folder. When using `localContentPath`, the error now explains that the content directory needs a `tina/` folder for generated files and provides the exact `mkdir` command to fix it, instead of the misleading suggestion to use `--rootPath`.
+
+- [#6419](https://github.com/tinacms/tinacms/pull/6419) [`bd9dabd`](https://github.com/tinacms/tinacms/commit/bd9dabdcca08bf9f9bcbd3cf090fed2266816624) Thanks [@18-th](https://github.com/18-th)! - Added tests to confirm that a [Security Advisory](https://github.com/tinacms/tinacms/security/advisories/GHSA-4qrm-9h4r-v2fx) was fixed
+
+- Updated dependencies [[`39fa13a`](https://github.com/tinacms/tinacms/commit/39fa13aae6af31c0f0b505e841e28d8d5a3886b9), [`da837f7`](https://github.com/tinacms/tinacms/commit/da837f7b17f0540cd47025afd2c45140706d595d), [`f90d47b`](https://github.com/tinacms/tinacms/commit/f90d47b746b000e65324da430aacc8fd623f5065), [`6988450`](https://github.com/tinacms/tinacms/commit/6988450c7ae64c569e0340515f3105ee5eb305b7), [`c806e41`](https://github.com/tinacms/tinacms/commit/c806e41232e0204a13539d6236358cb58cbc7692), [`89aee8a`](https://github.com/tinacms/tinacms/commit/89aee8ae3d6867e5793e4df7ff9c700dfd8a48c9)]:
+  - @tinacms/graphql@2.1.2
+  - tinacms@3.5.0
+  - @tinacms/schema-tools@2.6.0
+  - @tinacms/search@1.2.3
+  - @tinacms/app@2.3.25
+  - @tinacms/metrics@2.0.1
+
 ## 2.1.5
 
 ### Patch Changes

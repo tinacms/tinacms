@@ -1,5 +1,13 @@
 # Change Log
 
+## 1.5.0
+
+### Minor Changes
+
+- [#6438](https://github.com/tinacms/tinacms/pull/6438) [`f90d47b`](https://github.com/tinacms/tinacms/commit/f90d47b746b000e65324da430aacc8fd623f5065) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Telemetry - We’ve added anonymous telemetry to help us understand how Tina is used and prioritize improvements in areas where it matters. No personal or sensitive data is collected, and the information cannot be used to identify individual users. Telemetry is used solely to improve performance, stability, and the overall user experience. You can opt-out at any time by disabling telemetry in your Tina config.
+
+  Read more at https://tina.io/telemetry
+
 ## 1.4.2
 
 ### Patch Changes

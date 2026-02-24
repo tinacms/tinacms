@@ -14,6 +14,13 @@ export type ContentFormat = (typeof CONTENT_FORMATS)[number];
 
 export type ContentFrontmatterFormat = 'yaml' | 'toml' | 'json';
 
+/**
+ * Telemetry mode configured by the user in their tina config.
+ * - "anonymous": Anonymous telemetry (default)
+ * - "disabled": No telemetry collected
+ */
+export type TelemetryMode = 'anonymous' | 'disabled';
+
 export type Parser =
   | { type: 'mdx' }
   | {
@@ -774,6 +781,13 @@ export interface Config<
         loadCustomStore?: never;
         accept?: string | string[];
       };
+  /**
+   * Telemetry mode for TinaCMS.
+   *
+   * @default "anonymous"
+   */
+  telemetry?: TelemetryMode;
+
   /**
    * Configuration for repository-related UI features.
    *

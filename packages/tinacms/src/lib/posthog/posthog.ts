@@ -1,7 +1,24 @@
 // When the user switches branches
 export const BranchSwitchedEvent: string = 'branch-switched';
 export type BranchSwitchedPayload = {
-  branchName: string;
+  branchSwitchedTo: string;
+};
+
+export const BranchSwitcherOpenedEvent: string = 'branch-switcher-opened';
+export type BranchSwitcherOpenedPayload = Record<string, never>;
+
+export const BranchSwitcherSearchEvent: string = 'branch-switcher-search';
+export type BranchSwitcherSearchPayload = {
+  option: string;
+};
+
+export const BranchSwitcherDropDownEvent: string = 'branch-switcher-dropdown';
+export type BranchSwitcherDropDownPayload = Record<string, never>;
+
+export const BranchSwitcherPRClickedEvent: string =
+  'branch-switcher-pr-clicked';
+export type BranchSwitcherPRClickedPayload = {
+  type: 'Open Git Pull Request' | 'Create PR';
 };
 
 // When a user clicks 'save' in the TinaCMS Editor
@@ -39,18 +56,28 @@ export type UserManagementNavigatedToFromWebsitePayload = Record<string, never>;
 
 export const TinaCMSStartedEvent: string = 'tina-cms-started';
 export type TinaCMSStartedPayload = {
-  version: string;
+  tinaCMSVersion: string;
   system: string;
 };
 
-export const CollectionListPageItmeClickedEvent: string =
+export const CollectionListPageItemClickedEvent: string =
   'collection-list-page-item-clicked';
-export type CollectionListPageItmeClickedPayload = {
+export type CollectionListPageItemClickedPayload = {
   itemName: string;
-  itemType: 'collection' | 'folder' | 'document';
+  itemType: 'folder' | 'document';
+  collectionName: string;
+};
+
+export const CollectionListPageSortEvent: string = 'collection-list-page-sort';
+export type CollectionListPageSortPayload = {
+  sortKey: string;
+  collectionName: string;
 };
 
 export const CollectionListPageSearchEvent: string =
   'collection-list-page-search';
+export type CollectionListPageSearchPayload = {
+  searchQuery: string;
+};
 
 export const EventLogPageViewedEvent: string = 'event-log-page-viewed';
