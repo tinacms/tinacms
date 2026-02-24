@@ -156,7 +156,10 @@ const AuthWallInner = ({
       return onAuthenticated();
     } catch (e) {
       // If user closed the popup without authenticating, silently reset to allow retry
-      if (e instanceof AuthenticationCancelledError) {
+      if (
+        e instanceof AuthenticationCancelledError ||
+        (e instanceof Error && e.name === 'AuthenticationCancelledError')
+      ) {
         return;
       }
       console.error(e);

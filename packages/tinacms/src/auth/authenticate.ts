@@ -29,6 +29,12 @@ export const authenticate = (
       700
     );
 
+    // Handle popup blocked by browser
+    if (!authTab) {
+      reject(new AuthenticationCancelledError());
+      return;
+    }
+
     let isResolved = false;
 
     const handleMessage = (e: MessageEvent) => {
