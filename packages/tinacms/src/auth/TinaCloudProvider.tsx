@@ -154,6 +154,11 @@ const AuthWallInner = ({
       }
       return onAuthenticated();
     } catch (e) {
+      // If popup was closed without completing auth, just return to the modal
+      // so the user can try again - no need to show an error
+      if (e?.message?.includes('popup was closed')) {
+        return;
+      }
       console.error(e);
       setActiveModal('error');
       setErrorMessage({
