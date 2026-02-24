@@ -46,11 +46,17 @@ export function buildCorsOriginCheck(
       return;
     }
     for (const allowed of extra) {
-      if (
-        typeof allowed === 'string' ? allowed === origin : allowed.test(origin)
-      ) {
-        callback(null, true);
-        return;
+      if (typeof allowed === 'string') {
+        if (allowed === origin) {
+          callback(null, true);
+          return;
+        }
+      } else {
+        allowed.lastIndex = 0;
+        if (allowed.test(origin)) {
+          callback(null, true);
+          return;
+        }
       }
     }
     callback(null, false);

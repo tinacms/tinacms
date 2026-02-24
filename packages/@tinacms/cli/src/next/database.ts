@@ -37,7 +37,7 @@ export const createDBServer = (port: number) => {
       );
     }
   });
-  dbServer.listen(port, '127.0.0.1');
+  dbServer.listen(port, 'localhost');
 };
 
 export async function createAndInitializeDatabase(
