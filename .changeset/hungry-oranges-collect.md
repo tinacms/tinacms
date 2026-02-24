@@ -2,4 +2,4 @@
 "tinacms": patch
 ---
 
-test
+ 🤖 Fix previewBranch button from opening an empty tab
