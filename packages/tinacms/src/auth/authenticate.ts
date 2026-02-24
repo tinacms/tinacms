@@ -1,11 +1,14 @@
-/**
-
-*/
-
 import popupWindow from './popupWindow';
 
 const TINA_LOGIN_EVENT = 'tinaCloudLogin';
 export const AUTH_TOKEN_KEY = 'tinacms-auth';
+
+export class AuthenticationCancelledError extends Error {
+  constructor() {
+    super('Authentication was cancelled');
+    this.name = 'AuthenticationCancelledError';
+  }
+}
 
 export type TokenObject = {
   id_token: string;
@@ -16,7 +19,7 @@ export const authenticate = (
   clientId: string,
   frontendUrl: string
 ): Promise<TokenObject> => {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const origin = `${window.location.protocol}//${window.location.host}`;
     const authTab = popupWindow(
       `${frontendUrl}/signin?clientId=${clientId}&origin=${origin}`,
@@ -26,9 +29,12 @@ export const authenticate = (
       700
     );
 
-    // TODO - Grab this from the URL instead of passing through localstorage
-    window.addEventListener('message', function (e: MessageEvent) {
+    let isResolved = false;
+
+    const handleMessage = (e: MessageEvent) => {
       if (e.data.source === TINA_LOGIN_EVENT) {
+        isResolved = true;
+        cleanup();
         if (authTab) {
           authTab.close();
         }
@@ -38,6 +44,23 @@ export const authenticate = (
           refresh_token: e.data.refresh_token,
         });
       }
-    });
+    };
+
+    const cleanup = () => {
+      window.removeEventListener('message', handleMessage);
+      if (popupCheckInterval) {
+        clearInterval(popupCheckInterval);
+      }
+    };
+
+    // Check if popup was closed without completing authentication
+    const popupCheckInterval = setInterval(() => {
+      if (authTab?.closed && !isResolved) {
+        cleanup();
+        reject(new AuthenticationCancelledError());
+      }
+    }, 500);
+
+    window.addEventListener('message', handleMessage);
   });
 };

@@ -13,6 +13,7 @@ import {
 } from '@tinacms/toolkit';
 import React, { useEffect, useState } from 'react';
 import { ModalBuilder } from './AuthModal';
+import { AuthenticationCancelledError } from './authenticate';
 import loginLlama from './tina-login.png';
 
 import { TinaAdminApi } from '../admin/api';
@@ -154,6 +155,10 @@ const AuthWallInner = ({
       }
       return onAuthenticated();
     } catch (e) {
+      // If user closed the popup without authenticating, silently reset to allow retry
+      if (e instanceof AuthenticationCancelledError) {
+        return;
+      }
       console.error(e);
       setActiveModal('error');
       setErrorMessage({
