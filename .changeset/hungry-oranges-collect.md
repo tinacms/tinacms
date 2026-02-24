@@ -1,5 +1,5 @@
 ---
-"tinacms": major
+"tinacms": patch
 ---
 
 test
