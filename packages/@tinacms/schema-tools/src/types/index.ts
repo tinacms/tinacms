@@ -469,8 +469,14 @@ export type ObjectField<WithNamespace extends boolean = false> = (
   | FieldGeneric<string, false, ObjectUiProps>
 ) &
   MaybeNamespace<WithNamespace> &
-  BaseField &
-  (
+  BaseField & {
+    /**
+     * @default false
+     * When `list: true`, automatically opens the form for newly created list items.
+     * When used without `list: true`, this does not do anything.
+     */
+    openFormOnCreate?: boolean;
+  } & (
     | {
         type: 'object';
         fields: Field<WithNamespace>[];
