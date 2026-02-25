@@ -25,7 +25,7 @@ export const ModalHeader = ({ children, close }: ModalHeaderProps) => {
 
 const ModalTitle = ({ children }) => {
   return (
-    <h2 className='text-black font-sans font-medium text-base leading-normal m-0 flex items-center'>
+    <h2 className='text-black font-sans font-medium text-base m-0 flex items-center'>
       {children}
     </h2>
   );
