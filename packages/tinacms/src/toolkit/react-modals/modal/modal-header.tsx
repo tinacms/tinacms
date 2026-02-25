@@ -8,8 +8,8 @@ export interface ModalHeaderProps {
 
 export const ModalHeader = ({ children, close }: ModalHeaderProps) => {
   return (
-    <div className='h-14 flex items-center px-5 border-b border-gray-200 m-0'>
-      <TinaIcon className='w-10 h-auto -ml-1 mr-1 my-1 fill-tina-orange' />
+    <div className='min-h-14 flex items-center px-5 py-2 border-b border-gray-200 m-0'>
+      <TinaIcon className='w-10 h-auto -ml-1 mr-1 fill-tina-orange' />
       <ModalTitle>{children}</ModalTitle>
       {close && (
         <div
@@ -25,7 +25,7 @@ export const ModalHeader = ({ children, close }: ModalHeaderProps) => {
 
 const ModalTitle = ({ children }) => {
   return (
-    <h2 className='text-black font-sans font-medium text-base leading-none m-0 block truncate flex items-center'>
+    <h2 className='text-black font-sans font-medium text-base leading-normal m-0 flex items-center'>
       {children}
     </h2>
   );
