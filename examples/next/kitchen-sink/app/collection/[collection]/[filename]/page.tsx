@@ -5,7 +5,7 @@ type Props = { params: Promise<{ collection: string; filename: string }> }
 
 export default async function CollectionFile({ params }: Props) {
   const { collection, filename } = await params
-  const relativePath = `${filename}.md`
+  const relativePath = `${filename}.mdx`
   const props = await client.queries.collection({ collection, relativePath })
 
   return (

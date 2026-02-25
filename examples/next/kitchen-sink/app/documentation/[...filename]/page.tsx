@@ -17,7 +17,7 @@ export async function generateStaticParams() {
 export default async function DocFile({ params }: Props) {
   const { filename } = await params
   const parts = filename || []
-  const relativePath = `${parts.join('/')}.md`
+  const relativePath = `${parts.join('/')}.mdx`
   const tinaProps = await client.queries.documentation({ relativePath })
 
   return (

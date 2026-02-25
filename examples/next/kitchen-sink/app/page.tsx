@@ -3,7 +3,7 @@ import PageClientComponent from './page/[filename]/client-page'
 
 export default async function Page() {
   try {
-    const tinaProps = await client.queries.page({ relativePath: 'home.md' })
+    const tinaProps = await client.queries.page({ relativePath: 'home.mdx' })
     return (
       <PageClientComponent
         query={tinaProps.query}

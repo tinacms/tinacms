@@ -20,7 +20,7 @@ async function getNavItems(): Promise<NavItem[]> {
       const pages = fs
         .readdirSync(pagesDir)
         .filter((f) => /\.md(x)?$/.test(f))
-        .filter((f) => f !== 'home.md');
+        .filter((f) => f !== 'home.mdx');
       if (pages.length > 0) {
         items.push({ label: 'Pages', href: '#' });
         pages.forEach((page) => {

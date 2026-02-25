@@ -105,6 +105,7 @@ export default defineConfig({
         name: 'page',
         label: 'Page',
         path: 'content/pages',
+        format: 'mdx',
         ui: {
           filename: {
             slugify: slugify,
@@ -225,11 +226,11 @@ export default defineConfig({
                         list: true,
                         fields: [
                           { type: 'string', name: 'label' },
-                          { type: 'string', name: 'url' },
+                          { type: 'string', name: 'link' },
                           {
                             type: 'string',
-                            name: 'variant',
-                            options: ['primary', 'secondary', 'simple'],
+                            name: 'type',
+                            options: ['button', 'link', 'linkWhite'],
                           },
                         ],
                       },
@@ -417,11 +418,11 @@ export default defineConfig({
                         list: true,
                         fields: [
                           { type: 'string', name: 'label' },
-                          { type: 'string', name: 'url' },
+                          { type: 'string', name: 'link' },
                           {
                             type: 'string',
-                            name: 'variant',
-                            options: ['primary', 'secondary', 'simple'],
+                            name: 'type',
+                            options: ['button', 'link', 'linkWhite'],
                           },
                         ],
                       },
@@ -538,7 +539,7 @@ export default defineConfig({
         name: 'ssgPost',
         label: 'SSG Post',
         path: 'content/ssg-posts',
-        format: 'md',
+        format: 'mdx',
         ui: { router, filename: { slugify, readonly: true } },
         fields: [
           { type: 'string', name: 'title', required: true, isTitle: true },
@@ -596,6 +597,7 @@ export default defineConfig({
         name: 'author',
         label: 'Author',
         path: 'content/authors',
+        format: 'mdx',
         ui: { filename: { slugify } },
         fields: [ { type: 'string', name: 'name' }, { type: 'rich-text', name: 'bio' }, { type: 'string', name: 'hobbies', list: true }, { type: 'image', name: 'image' } ],
       },
@@ -603,6 +605,7 @@ export default defineConfig({
         name: 'documentation',
         label: 'Documentation',
         path: 'content/documentation',
+        format: 'mdx',
         ui: { router: extendedRouter, filename: { slugify } },
         fields: [ { type: 'string', name: 'title', required: true, isTitle: true }, { type: 'object', name: 'tags', list: true, fields: [ { type: 'reference', name: 'reference', collections: ['tag'] } ] }, { type: 'rich-text', name: 'body', isBody: true } ],
       },

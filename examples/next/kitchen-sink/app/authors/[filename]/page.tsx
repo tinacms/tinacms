@@ -15,7 +15,7 @@ export async function generateStaticParams() {
 
 export default async function AuthorFile({ params }: Props) {
   const { filename } = await params
-  const relativePath = `${filename}.md`
+  const relativePath = `${filename}.mdx`
   const tinaProps = await client.queries.author({ relativePath })
 
   return (

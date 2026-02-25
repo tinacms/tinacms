@@ -5,7 +5,7 @@ type Props = { params: Promise<{ filename: string[] }> }
 
 export default async function NodeFile({ params }: Props) {
   const { filename } = await params
-  const id = `${(filename || []).join('/')}.md`
+  const id = (filename || []).join('/')
   const props = await client.queries.NodeQuery({ id })
 
   return (
