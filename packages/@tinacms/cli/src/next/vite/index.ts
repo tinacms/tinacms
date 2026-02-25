@@ -10,6 +10,7 @@ import {
   splitVendorChunkPlugin,
 } from 'vite';
 import type { ConfigManager } from '../config-manager';
+import { buildCorsOriginCheck } from './cors';
 import { filterPublicEnv } from './filterPublicEnv';
 import { tinaTailwind } from './tailwind';
 
@@ -202,6 +203,13 @@ export const createConfig = async ({
     },
     server: {
       host: configManager.config?.build?.host ?? false,
+      // Restrict Vite's built-in CORS to the same origins our custom
+      // middleware allows (localhost + user-configured allowedOrigins).
+      cors: {
+        origin: buildCorsOriginCheck(
+          configManager.config?.server?.allowedOrigins
+        ),
+      },
       watch: noWatch
         ? {
             ignored: ['**/*'],
@@ -213,7 +221,18 @@ export const createConfig = async ({
             ],
           },
       fs: {
-        strict: false,
+        strict: true,
+        // Allow serving files from the project root and the SPA package.
+        // Without this, Vite would block access to tina config/generated
+        // files since the Vite root is the @tinacms/app package directory.
+        allow: [
+          configManager.spaRootPath,
+          configManager.rootPath,
+          ...(configManager.contentRootPath &&
+          configManager.contentRootPath !== configManager.rootPath
+            ? [configManager.contentRootPath]
+            : []),
+        ],
       },
     },
     build: {
