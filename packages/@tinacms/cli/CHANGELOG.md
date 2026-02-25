@@ -1,5 +1,17 @@
 # tinacms-cli
 
+## 2.1.7
+
+### Patch Changes
+
+- [#6440](https://github.com/tinacms/tinacms/pull/6440) [`c2517c2`](https://github.com/tinacms/tinacms/commit/c2517c295fb7b1d2b05923e5176be7f3131b4381) Thanks [@18-th](https://github.com/18-th)! - \* Add path traversal protection and tests for [GHSA-5hxf-c7j4-279c](https://github.com/tinacms/tinacms/security/advisories/GHSA-5hxf-c7j4-279c) path traversal vulnerability
+  - Add path traversal protection and tests for [GHSA-2f24-mg4x-534q](https://github.com/tinacms/tinacms/security/advisories/GHSA-2f24-mg4x-534q) path traversal vulnerability
+- Updated dependencies [[`c2517c2`](https://github.com/tinacms/tinacms/commit/c2517c295fb7b1d2b05923e5176be7f3131b4381), [`2738749`](https://github.com/tinacms/tinacms/commit/2738749bac08c02214fdf208f96bbcc4906ef442), [`dfb4ce8`](https://github.com/tinacms/tinacms/commit/dfb4ce8da7b82b638337109cc7859125e112a0a9)]:
+  - @tinacms/graphql@2.1.3
+  - tinacms@3.5.1
+  - @tinacms/search@1.2.4
+  - @tinacms/app@2.3.26
+
 ## 2.1.6
 
 ### Patch Changes
