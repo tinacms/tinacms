@@ -191,8 +191,8 @@ const AuthWallInner = ({
               <img
                 src={loginLlama}
                 alt='Tina the Llama playing a large orange key like a guitar.'
-                width={869}
-                height={869}
+                width={816}
+                height={816}
                 style={{ maxWidth: '100%', margin: '0 auto', display: 'block' }}
               />
             ) : (
