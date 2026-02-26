@@ -1,7 +1,24 @@
 // When the user switches branches
 export const BranchSwitchedEvent: string = 'branch-switched';
 export type BranchSwitchedPayload = {
-  branchName: string;
+  branchSwitchedTo: string;
+};
+
+export const BranchSwitcherOpenedEvent: string = 'branch-switcher-opened';
+export type BranchSwitcherOpenedPayload = Record<string, never>;
+
+export const BranchSwitcherSearchEvent: string = 'branch-switcher-search';
+export type BranchSwitcherSearchPayload = {
+  option: string;
+};
+
+export const BranchSwitcherDropDownEvent: string = 'branch-switcher-dropdown';
+export type BranchSwitcherDropDownPayload = Record<string, never>;
+
+export const BranchSwitcherPRClickedEvent: string =
+  'branch-switcher-pr-clicked';
+export type BranchSwitcherPRClickedPayload = {
+  type: 'Open Git Pull Request' | 'Create PR';
 };
 
 // When a user clicks 'save' in the TinaCMS Editor

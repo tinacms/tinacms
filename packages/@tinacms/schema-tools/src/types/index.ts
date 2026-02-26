@@ -469,8 +469,14 @@ export type ObjectField<WithNamespace extends boolean = false> = (
   | FieldGeneric<string, false, ObjectUiProps>
 ) &
   MaybeNamespace<WithNamespace> &
-  BaseField &
-  (
+  BaseField & {
+    /**
+     * @default false
+     * When `list: true`, automatically opens the form for newly created list items.
+     * When used without `list: true`, this does not do anything.
+     */
+    openFormOnCreate?: boolean;
+  } & (
     | {
         type: 'object';
         fields: Field<WithNamespace>[];
@@ -741,6 +747,29 @@ export interface Config<
      * If your site will be served at a sub-path like `my-domain.com/my-site`, provide `"my-site"`
      */
     basePath?: string;
+  };
+  /**
+   * Configuration for the local development server (`tinacms dev`).
+   * Has no effect on production deployments.
+   */
+  server?: {
+    /**
+     * Origins allowed to make cross-origin requests to the dev server.
+     * Defaults to localhost / 127.0.0.1 / [::1] only. Each entry can be a string,
+     * RegExp, or `'private'` (expands to RFC 1918 private-network IPs).
+     *
+     * @example
+     * ```ts
+     * server: { allowedOrigins: ['https://my-codespace.github.dev'] }
+     * ```
+     *
+     * @example
+     * ```ts
+     * server: { allowedOrigins: ['private'] }
+     * ```
+     *
+     */
+    allowedOrigins?: (RegExp | 'private' | (string & {}))[];
   };
   media?:
     | {

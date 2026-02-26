@@ -24,6 +24,8 @@ import {
 } from '../internalClient';
 import { CreateClientProps, createClient } from '../utils';
 import { useTinaAuthRedirect } from './useTinaAuthRedirect';
+import { captureEvent } from '../lib/posthog/posthogProvider';
+import { BranchSwitchedEvent } from '../lib/posthog/posthog';
 
 type ModalNames = null | 'authenticate' | 'error';
 
@@ -350,6 +352,16 @@ export const TinaCloudProvider = (
   } else {
     cms.api.tina.setBranch(currentBranch);
   }
+
+  const previousBranchRef = React.useRef(currentBranch);
+  useEffect(() => {
+    if (previousBranchRef.current !== currentBranch) {
+      captureEvent(BranchSwitchedEvent, {
+        branchSwitchedTo: currentBranch,
+      });
+      previousBranchRef.current = currentBranch;
+    }
+  }, [currentBranch]);
 
   useEffect(() => {
     let searchClient;
