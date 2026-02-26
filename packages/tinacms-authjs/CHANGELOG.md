@@ -1,5 +1,13 @@
 # tinacms-authjs
 
+## 20.0.0
+
+### Patch Changes
+
+- Updated dependencies [[`f23c2a6`](https://github.com/tinacms/tinacms/commit/f23c2a6742373271531bee46ca3cca8b208c3476), [`d782ca2`](https://github.com/tinacms/tinacms/commit/d782ca209ff98ee2143c7fd83f0b793563b6de60), [`56d533e`](https://github.com/tinacms/tinacms/commit/56d533e610a520ba66b3e58f3a0dc03487d5d5d7), [`60510bb`](https://github.com/tinacms/tinacms/commit/60510bbf8d1b78cad901722d4f9003665412d71e)]:
+  - tinacms@3.6.0
+  - @tinacms/schema-tools@2.7.0
+
 ## 19.0.1
 
 ### Patch Changes

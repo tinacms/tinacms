@@ -1,5 +1,18 @@
 # @tinacms/schema-tools
 
+## 2.7.0
+
+### Minor Changes
+
+- [#6447](https://github.com/tinacms/tinacms/pull/6447) [`60510bb`](https://github.com/tinacms/tinacms/commit/60510bbf8d1b78cad901722d4f9003665412d71e) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - ✨ Object Schema - Add openFormOnCreate flag. Allowing users to opt-in to automatically going inside an object form when the field is true
+
+### Patch Changes
+
+- [#6450](https://github.com/tinacms/tinacms/pull/6450) [`56d533e`](https://github.com/tinacms/tinacms/commit/56d533e610a520ba66b3e58f3a0dc03487d5d5d7) Thanks [@18-th](https://github.com/18-th)! - \* Restricted CORS on dev server to localhost by default for [GHSA-8pw3-9m7f-q734](https://github.com/tinacms/tinacms/security/advisories/GHSA-8pw3-9m7f-q734).
+  - Added `server.allowedOrigins` config option for non-localhost environments.
+  - Enabled Vite `server.fs.strict` with computed allow list for [GHSA-m48g-4wr2-j2h6](https://github.com/tinacms/tinacms/security/advisories/GHSA-m48g-4wr2-j2h6)
+  - Bind LevelDB TCP server to 127.0.0.1
+
 ## 2.6.0
 
 ### Minor Changes
