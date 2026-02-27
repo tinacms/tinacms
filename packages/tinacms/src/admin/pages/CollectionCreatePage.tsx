@@ -11,6 +11,7 @@ import {
   FormBuilder,
   FormStatus,
   TinaForm,
+  useNavigationBlocker,
   wrapFieldsWithMeta,
 } from '@tinacms/toolkit';
 import React, { useMemo, useState } from 'react';
@@ -151,6 +152,7 @@ export const RenderForm = ({
 }) => {
   const navigate = useNavigate();
   const [formIsPristine, setFormIsPristine] = useState(true);
+  useNavigationBlocker(!formIsPristine);
   const schema: TinaSchema | undefined = cms.api.tina.schema;
 
   // the schema is being passed in from the frontend so we can use that

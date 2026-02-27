@@ -124,10 +124,10 @@ export const FormBuilder: FC<FormBuilderProps> = ({
    * Prevent navigation away from the window when the form is dirty
    */
   React.useEffect(() => {
-    // const onBeforeUnload = (event) => {
-    //   event.preventDefault()
-    //   event.returnValue = ''
-    // }
+    const onBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
 
     const unsubscribe = finalForm.subscribe(
       ({ pristine }) => {
@@ -135,16 +135,16 @@ export const FormBuilder: FC<FormBuilderProps> = ({
           onPristineChange(pristine);
         }
 
-        // if (!pristine) {
-        //   window.addEventListener('beforeunload', onBeforeUnload)
-        // } else {
-        //   window.removeEventListener('beforeunload', onBeforeUnload)
-        // }
+        if (!pristine) {
+          window.addEventListener('beforeunload', onBeforeUnload);
+        } else {
+          window.removeEventListener('beforeunload', onBeforeUnload);
+        }
       },
       { pristine: true }
     );
     return () => {
-      // window.removeEventListener('beforeunload', onBeforeUnload)
+      window.removeEventListener('beforeunload', onBeforeUnload);
       unsubscribe();
     };
   }, [finalForm]);
