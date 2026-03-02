@@ -14,11 +14,16 @@ const authLog = (message: string, data?: any) => {
   const logEntry = { timestamp, message, data };
 
   if (typeof window !== 'undefined') {
-    (window as any).__TINA_AUTH_LOGS__ = (window as any).__TINA_AUTH_LOGS__ || [];
+    (window as any).__TINA_AUTH_LOGS__ =
+      (window as any).__TINA_AUTH_LOGS__ || [];
     (window as any).__TINA_AUTH_LOGS__.push(logEntry);
   }
 
-  console.log(`[TINA-AUTH ${timestamp}]`, message, data !== undefined ? data : '');
+  console.log(
+    `[TINA-AUTH ${timestamp}]`,
+    message,
+    data !== undefined ? data : ''
+  );
 };
 
 interface ModalBuilderProps {

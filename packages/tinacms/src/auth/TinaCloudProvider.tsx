@@ -21,11 +21,16 @@ const authLog = (message: string, data?: any) => {
   const logEntry = { timestamp, message, data };
 
   if (typeof window !== 'undefined') {
-    (window as any).__TINA_AUTH_LOGS__ = (window as any).__TINA_AUTH_LOGS__ || [];
+    (window as any).__TINA_AUTH_LOGS__ =
+      (window as any).__TINA_AUTH_LOGS__ || [];
     (window as any).__TINA_AUTH_LOGS__.push(logEntry);
   }
 
-  console.log(`[TINA-AUTH ${timestamp}]`, message, data !== undefined ? data : '');
+  console.log(
+    `[TINA-AUTH ${timestamp}]`,
+    message,
+    data !== undefined ? data : ''
+  );
 };
 
 import { TinaAdminApi } from '../admin/api';
@@ -159,7 +164,9 @@ const AuthWallInner = ({
   const handleAuthenticate = async (
     loginScreenProps?: Record<string, string>
   ) => {
-    authLog('handleAuthenticate called', { hasLoginScreenProps: !!loginScreenProps });
+    authLog('handleAuthenticate called', {
+      hasLoginScreenProps: !!loginScreenProps,
+    });
 
     try {
       authLog('Setting authenticated to false');
@@ -169,7 +176,9 @@ const AuthWallInner = ({
       const token = await client.authProvider.authenticate(
         loginScreenProps || authProps
       );
-      authLog('client.authProvider.authenticate() returned', { hasToken: !!token });
+      authLog('client.authProvider.authenticate() returned', {
+        hasToken: !!token,
+      });
 
       if (typeof client?.onLogin === 'function') {
         authLog('Calling client.onLogin()');

@@ -14,12 +14,17 @@ const authLog = (message: string, data?: any) => {
 
   // Store in global array for easy access
   if (typeof window !== 'undefined') {
-    (window as any).__TINA_AUTH_LOGS__ = (window as any).__TINA_AUTH_LOGS__ || [];
+    (window as any).__TINA_AUTH_LOGS__ =
+      (window as any).__TINA_AUTH_LOGS__ || [];
     (window as any).__TINA_AUTH_LOGS__.push(logEntry);
   }
 
   // Log to console with prefix
-  console.log(`[TINA-AUTH ${timestamp}]`, message, data !== undefined ? data : '');
+  console.log(
+    `[TINA-AUTH ${timestamp}]`,
+    message,
+    data !== undefined ? data : ''
+  );
 };
 
 export type TokenObject = {
@@ -47,14 +52,14 @@ export const authenticate = (
 
     authLog('Popup window created', {
       popupExists: !!authTab,
-      popupClosed: authTab?.closed
+      popupClosed: authTab?.closed,
     });
 
     // Poll to detect if popup was closed without completing auth
     const pollInterval = setInterval(() => {
       authLog('Polling popup state', {
         popupExists: !!authTab,
-        popupClosed: authTab?.closed
+        popupClosed: authTab?.closed,
       });
 
       if (authTab && authTab.closed) {
@@ -69,7 +74,7 @@ export const authenticate = (
     window.addEventListener('message', function (e: MessageEvent) {
       authLog('Message event received', {
         source: e.data?.source,
-        hasIdToken: !!e.data?.id_token
+        hasIdToken: !!e.data?.id_token,
       });
 
       if (e.data.source === TINA_LOGIN_EVENT) {
@@ -89,6 +94,8 @@ export const authenticate = (
       }
     });
 
-    authLog('Message event listener registered, waiting for auth completion...');
+    authLog(
+      'Message event listener registered, waiting for auth completion...'
+    );
   });
 };
