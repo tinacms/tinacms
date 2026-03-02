@@ -2,6 +2,32 @@ import React from 'react'
 
 type RichNode = any
 
+function sanitizeHref(value: unknown): string {
+  if (typeof value !== 'string') return '#'
+  const trimmed = value.trim()
+  if (!trimmed) return '#'
+  // Block dangerous schemes
+  const lower = trimmed.toLowerCase()
+  if (lower.startsWith('javascript:') || lower.startsWith('data:') || lower.startsWith('vbscript:')) {
+    return '#'
+  }
+  // Allow relative URLs
+  if (trimmed.startsWith('/') || trimmed.startsWith('./') || trimmed.startsWith('../') || trimmed.startsWith('#')) {
+    return trimmed
+  }
+  // Allow http, https, mailto absolute URLs
+  try {
+    const url = new URL(trimmed)
+    if (url.protocol === 'http:' || url.protocol === 'https:' || url.protocol === 'mailto:') {
+      return trimmed
+    }
+  } catch {
+    // not a valid absolute URL — treat as relative
+    return trimmed
+  }
+  return '#'
+}
+
 function renderNode(node: RichNode, idx?: number): React.ReactNode {
   if (node == null) return null
   if (typeof node === 'string') return node
@@ -22,12 +48,14 @@ function renderNode(node: RichNode, idx?: number): React.ReactNode {
       case 'blockquote':
         return <blockquote key={idx}>{children}</blockquote>
       case 'link':
-      case 'a':
+      case 'a': {
+        const href = sanitizeHref(node.url ?? node.href)
         return (
-          <a key={idx} href={node.url ?? node.href ?? '#'} className="text-blue-600 hover:underline">
+          <a key={idx} href={href} className="text-blue-600 hover:underline">
             {children}
           </a>
         )
+      }
       default:
         return <React.Fragment key={idx}>{children}</React.Fragment>
     }

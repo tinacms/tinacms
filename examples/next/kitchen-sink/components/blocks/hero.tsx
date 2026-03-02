@@ -4,6 +4,26 @@ import { Container } from '../layout'
 import RichText from '@/lib/richText'
 import { Section } from '../layout'
 
+function sanitizeImageSrc(src: unknown): string {
+  if (typeof src !== 'string') return ''
+  const trimmed = src.trim()
+  if (!trimmed) return ''
+  // Allow relative paths
+  if (trimmed.startsWith('/') || trimmed.startsWith('./') || trimmed.startsWith('../')) {
+    return trimmed
+  }
+  // Allow http/https absolute URLs
+  try {
+    const url = new URL(trimmed)
+    if (url.protocol === 'http:' || url.protocol === 'https:') {
+      return trimmed
+    }
+  } catch {
+    return ''
+  }
+  return ''
+}
+
 export const Hero = ({ data, parentField }: any) => {
   const headlineColorClasses = {
     blue: 'from-blue-400 to-blue-600',
@@ -68,13 +88,13 @@ export const Hero = ({ data, parentField }: any) => {
           >
             <img
               className="absolute w-full rounded-lg max-w-xs lg:max-w-none h-auto blur-2xl brightness-150 contrast-[0.9] dark:brightness-150 saturate-200 opacity-50 dark:opacity-30 mix-blend-multiply dark:mix-blend-hard-light"
-              src={data.image.src}
+              src={sanitizeImageSrc(data.image.src)}
               aria-hidden="true"
             />
             <img
               className="relative z-10 w-full max-w-xs rounded-lg lg:max-w-none h-auto"
               alt={data.image.alt}
-              src={data.image.src}
+              src={sanitizeImageSrc(data.image.src)}
             />
           </div>
         )}

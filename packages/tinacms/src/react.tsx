@@ -142,6 +142,11 @@ export function useTina<T extends object>(props: {
     const { experimental___selectFormByFormId, ...rest } = props;
     parent.postMessage({ type: 'open', ...rest, id }, window.location.origin);
     const handleMessage = (event) => {
+      // Only accept messages from the same origin to prevent processing
+      // untrusted data sent by a malicious frame or window.
+      if (event.origin !== window.location.origin) {
+        return
+      }
       if (event.data.type === 'quickEditEnabled') {
         setQuickEditEnabled(event.data.value);
       }
