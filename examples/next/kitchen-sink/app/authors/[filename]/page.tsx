@@ -1,5 +1,6 @@
 import React from 'react'
 import client from '../../../tina/__generated__/client'
+import Layout from '@/components/layout/layout'
 import AuthorClientPage from './client-page'
 
 type Props = { params: Promise<{ filename: string }> }
@@ -15,14 +16,16 @@ export async function generateStaticParams() {
 
 export default async function AuthorFile({ params }: Props) {
   const { filename } = await params
-  const relativePath = `${filename}.mdx`
+  const relativePath = `${filename}.md`
   const tinaProps = await client.queries.author({ relativePath })
 
   return (
-    <AuthorClientPage
-      query={tinaProps.query}
-      variables={tinaProps.variables}
-      data={JSON.parse(JSON.stringify(tinaProps.data))}
-    />
+    <Layout rawPageData={tinaProps}>
+      <AuthorClientPage
+        query={tinaProps.query}
+        variables={tinaProps.variables}
+        data={JSON.parse(JSON.stringify(tinaProps.data))}
+      />
+    </Layout>
   )
 }

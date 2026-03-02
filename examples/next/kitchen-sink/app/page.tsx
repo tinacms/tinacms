@@ -1,26 +1,27 @@
 import client from '@/tina/__generated__/client'
-import PageClientComponent from './page/[filename]/client-page'
+import Layout from '@/components/layout/layout'
+import ClientPage from './[...urlSegments]/client-page'
 
-export default async function Page() {
+export const revalidate = 300
+
+export default async function Home() {
   try {
-    const tinaProps = await client.queries.page({ relativePath: 'home.mdx' })
+    const data = await client.queries.page({ relativePath: 'home.mdx' })
     return (
-      <PageClientComponent
-        query={tinaProps.query}
-        variables={tinaProps.variables}
-        data={JSON.parse(JSON.stringify(tinaProps.data))}
-      />
+      <Layout rawPageData={data}>
+        <ClientPage {...data} />
+      </Layout>
     )
   } catch (e) {
     return (
-      <main className="py-12 px-6 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-1000">
-        <div className="max-w-5xl mx-auto">
-          <div className="mb-12">
+      <Layout>
+        <main className="py-12 px-6">
+          <div className="max-w-5xl mx-auto">
             <h1 className="text-3xl font-bold text-red-700 dark:text-red-400">Error loading home page</h1>
             <pre className="mt-4 text-sm text-red-600 dark:text-red-500 overflow-auto bg-white dark:bg-gray-800 p-4 rounded border border-red-200 dark:border-red-800">{String(e)}</pre>
           </div>
-        </div>
-      </main>
+        </main>
+      </Layout>
     )
   }
 }

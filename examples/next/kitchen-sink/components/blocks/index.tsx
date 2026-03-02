@@ -7,6 +7,13 @@ import { Testimonial } from './testimonial'
 import { Content } from './content'
 
 const typeNameMap: Record<string, string> = {
+  // New schema typenames (page.blocks.*)
+  'PageBlocksHero': 'hero',
+  'PageBlocksFeatures': 'features',
+  'PageBlocksCta': 'cta',
+  'PageBlocksTestimonial': 'testimonial',
+  'PageBlocksContent': 'content',
+  // Legacy typenames (kept for backward compatibility before schema regen)
   'PageBlockPageBlocksHero': 'hero',
   'PageBlockPageBlocksFeatures': 'features',
   'PageBlockPageBlocksCta': 'cta',
@@ -14,7 +21,7 @@ const typeNameMap: Record<string, string> = {
   'PageBlockPageBlocksContent': 'content',
 }
 
-export const Blocks = ({ blocks = [] }) => {
+export const Blocks = ({ blocks = [] }: { blocks?: any[] }) => {
   if (!blocks || blocks.length === 0) {
     return <div className="p-6 text-center text-gray-500">No blocks to render</div>
   }

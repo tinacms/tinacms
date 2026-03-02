@@ -1,6 +1,6 @@
 'use client'
 import React from 'react'
-import { useTheme } from './theme'
+import { useLayout } from './layout-context'
 import * as BoxIcons from 'react-icons/bi'
 
 export const IconOptions = {
@@ -80,7 +80,7 @@ export const Icon = ({
   tinaField = '',
   parentColor = 'default',
 }: any) => {
-  const theme = useTheme()
+  const { theme } = useLayout()
   const color = data.color || theme.color
   const style = data.style || 'float'
   const iconSize = data.size || 'medium'
@@ -98,17 +98,18 @@ export const Icon = ({
     return (
       <div
         data-tinafield={tinaField}
-        className={`flex items-center justify-center rounded-full ${colorClass.circle} ${sizeClass}`}
+        className={`relative z-10 inline-flex items-center justify-center flex-shrink-0 rounded-full ${colorClass.circle} ${sizeClass}`}
       >
-        <IconComponent />
+        <IconComponent className="w-2/3 h-2/3" />
       </div>
     )
   }
 
   return (
-    <div data-tinafield={tinaField} className={`${colorClass.regular} ${sizeClass}`}>
-      <IconComponent />
-    </div>
+    <IconComponent
+      data-tinafield={tinaField}
+      className={`${colorClass.regular} ${sizeClass}`}
+    />
   )
 }
 
