@@ -145,34 +145,22 @@ const AuthWallInner = ({
   const handleAuthenticate = async (
     loginScreenProps?: Record<string, string>
   ) => {
-    console.log('[TinaCMS Auth Debug] handleAuthenticate called');
     try {
       setAuthenticated(false);
-      console.log('[TinaCMS Auth Debug] Calling authProvider.authenticate()');
       const token = await client.authProvider.authenticate(
         loginScreenProps || authProps
       );
-      console.log('[TinaCMS Auth Debug] authenticate() resolved with token');
       if (typeof client?.onLogin === 'function') {
         await client?.onLogin({ token });
       }
       return onAuthenticated();
     } catch (e: any) {
-      console.log('[TinaCMS Auth Debug] Caught error:', {
-        errorType: e?.constructor?.name,
-        errorName: e?.name,
-        errorMessage: e?.message,
-        isAuthCancelledError: e instanceof AuthenticationCancelledError,
-        errorPrototype: Object.getPrototypeOf(e)?.constructor?.name,
-      });
-
       // If user just closed the popup, silently reset - don't show error
       // Check both instanceof and error name (in case of module boundary issues)
       if (
         e instanceof AuthenticationCancelledError ||
         e?.name === 'AuthenticationCancelledError'
       ) {
-        console.log('[TinaCMS Auth Debug] Auth cancelled - returning silently');
         return;
       }
 
