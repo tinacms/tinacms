@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 2.2.0
+
+### Minor Changes
+
+- [#6478](https://github.com/tinacms/tinacms/pull/6478) [`0712649`](https://github.com/tinacms/tinacms/commit/0712649d48881f928f3399aaca88782a0a5a8f32) Thanks [@Ben0189](https://github.com/Ben0189)! - Add `levelBatchSize` option to `DatabaseArgs` to allow consumers to override the default Level batch size of 25
+
 ## 2.1.4
 
 ### Patch Changes
