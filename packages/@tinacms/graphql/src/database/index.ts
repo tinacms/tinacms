@@ -80,6 +80,7 @@ export interface DatabaseArgs {
   indexStatusCallback?: IndexStatusCallback;
   version?: boolean;
   namespace?: string;
+  levelBatchSize?: number;
 }
 
 export interface GitProvider {
@@ -177,6 +178,7 @@ export const createDatabaseInternal = (config: DatabaseArgs) => {
   });
 };
 const SYSTEM_FILES = ['_schema', '_graphql', '_lookup'];
+const DEFAULT_LEVEL_BATCH_SIZE = 25;
 
 /** Options for {@link Database.query} **/
 export type QueryOptions = {
@@ -212,6 +214,7 @@ export class Database {
   public indexStatusCallback: IndexStatusCallback | undefined;
   private readonly onPut: OnPutCallback;
   private readonly onDelete: OnDeleteCallback;
+  private readonly levelBatchSize: number;
   private tinaSchema: TinaSchema | undefined;
   private contentNamespace: string | undefined;
 
@@ -232,6 +235,7 @@ export class Database {
       config.indexStatusCallback || defaultStatusCallback;
     this.onPut = config.onPut || defaultOnPut;
     this.onDelete = config.onDelete || defaultOnDelete;
+    this.levelBatchSize = config.levelBatchSize ?? DEFAULT_LEVEL_BATCH_SIZE;
     this.contentNamespace = config.namespace;
   }
 
@@ -1312,9 +1316,8 @@ export class Database {
     const operations: DelOp[] = [];
     const enqueueOps = async (ops: DelOp[]): Promise<void> => {
       operations.push(...ops);
-      while (operations.length >= 25) {
-        // make this an option
-        await this.contentLevel.batch(operations.splice(0, 25));
+      while (operations.length >= this.levelBatchSize) {
+        await this.contentLevel.batch(operations.splice(0, this.levelBatchSize));
       }
     };
     const tinaSchema = await this.getSchema(this.contentLevel);
@@ -1336,7 +1339,7 @@ export class Database {
       }
     });
     while (operations.length) {
-      await this.contentLevel.batch(operations.splice(0, 25));
+      await this.contentLevel.batch(operations.splice(0, this.levelBatchSize));
     }
   };
 
@@ -1345,9 +1348,8 @@ export class Database {
     const operations: BatchOp[] = [];
     const enqueueOps = async (ops: BatchOp[]): Promise<void> => {
       operations.push(...ops);
-      while (operations.length >= 25) {
-        // make this an option
-        await this.contentLevel.batch(operations.splice(0, 25));
+      while (operations.length >= this.levelBatchSize) {
+        await this.contentLevel.batch(operations.splice(0, this.levelBatchSize));
       }
     };
     const tinaSchema = await this.getSchema(this.contentLevel);
@@ -1370,7 +1372,7 @@ export class Database {
       );
     });
     while (operations.length) {
-      await this.contentLevel.batch(operations.splice(0, 25));
+      await this.contentLevel.batch(operations.splice(0, this.levelBatchSize));
     }
   };
 
@@ -1460,9 +1462,8 @@ export class Database {
     const operations: PutOp[] = [];
     const enqueueOps = async (ops: PutOp[]): Promise<void> => {
       operations.push(...ops);
-      while (operations.length >= 25) {
-        // make this an option
-        const batchOps = operations.splice(0, 25);
+      while (operations.length >= this.levelBatchSize) {
+        const batchOps = operations.splice(0, this.levelBatchSize);
         await level.batch(batchOps);
       }
     };
@@ -1504,7 +1505,7 @@ export class Database {
     );
 
     while (operations.length) {
-      await level.batch(operations.splice(0, 25));
+      await level.batch(operations.splice(0, this.levelBatchSize));
     }
     return { warnings };
   };
