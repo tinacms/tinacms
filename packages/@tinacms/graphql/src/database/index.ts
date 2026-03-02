@@ -1317,7 +1317,9 @@ export class Database {
     const enqueueOps = async (ops: DelOp[]): Promise<void> => {
       operations.push(...ops);
       while (operations.length >= this.levelBatchSize) {
-        await this.contentLevel.batch(operations.splice(0, this.levelBatchSize));
+        await this.contentLevel.batch(
+          operations.splice(0, this.levelBatchSize)
+        );
       }
     };
     const tinaSchema = await this.getSchema(this.contentLevel);
@@ -1349,7 +1351,9 @@ export class Database {
     const enqueueOps = async (ops: BatchOp[]): Promise<void> => {
       operations.push(...ops);
       while (operations.length >= this.levelBatchSize) {
-        await this.contentLevel.batch(operations.splice(0, this.levelBatchSize));
+        await this.contentLevel.batch(
+          operations.splice(0, this.levelBatchSize)
+        );
       }
     };
     const tinaSchema = await this.getSchema(this.contentLevel);
