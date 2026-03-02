@@ -8,6 +8,19 @@ import {
 import { LoadingDots, Button } from '@tinacms/toolkit';
 import React, { useCallback, useEffect, useState } from 'react';
 
+// Debug logging for auth flow investigation
+const authLog = (message: string, data?: any) => {
+  const timestamp = new Date().toISOString();
+  const logEntry = { timestamp, message, data };
+
+  if (typeof window !== 'undefined') {
+    (window as any).__TINA_AUTH_LOGS__ = (window as any).__TINA_AUTH_LOGS__ || [];
+    (window as any).__TINA_AUTH_LOGS__.push(logEntry);
+  }
+
+  console.log(`[TINA-AUTH ${timestamp}]`, message, data !== undefined ? data : '');
+};
+
 interface ModalBuilderProps {
   title: string;
   message?: React.ReactNode;
@@ -57,21 +70,38 @@ export const AsyncButton = ({ name, primary, action }: ButtonProps) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    authLog('AsyncButton mounted', { name });
     setMounted(true);
-    return () => setMounted(false);
-  }, []);
+    return () => {
+      authLog('AsyncButton unmounting', { name });
+      setMounted(false);
+    };
+  }, [name]);
 
   const onClick = useCallback(async () => {
-    if (!mounted) return;
+    authLog('AsyncButton onClick called', { name, mounted, submitting });
+
+    if (!mounted) {
+      authLog('AsyncButton onClick aborted - not mounted', { name });
+      return;
+    }
+
+    authLog('AsyncButton setSubmitting(true)', { name });
     setSubmitting(true);
+
     try {
+      authLog('AsyncButton awaiting action...', { name });
       await action();
+      authLog('AsyncButton action completed successfully', { name });
       setSubmitting(false);
+      authLog('AsyncButton setSubmitting(false) after success', { name });
     } catch (e) {
+      authLog('AsyncButton action threw error', { name, error: String(e) });
       setSubmitting(false);
+      authLog('AsyncButton setSubmitting(false) after error', { name });
       throw e;
     }
-  }, [action, setSubmitting, mounted]);
+  }, [action, setSubmitting, mounted, name]);
 
   return (
     <Button
