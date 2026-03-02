@@ -3,7 +3,6 @@ import {
   authenticate,
   AUTH_TOKEN_KEY,
   TokenObject,
-  AuthenticationCancelledError,
 } from '../auth/authenticate';
 import DefaultSessionProvider from '../auth/defaultSessionProvider';
 
@@ -223,154 +222,14 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
 
 const LOCAL_CLIENT_KEY = 'tina.local.isLogedIn';
 
-// Debug logging for auth flow investigation
-const authLog = (message: string, data?: any) => {
-  const timestamp = new Date().toISOString();
-  const logEntry = { timestamp, message, data };
-
-  if (typeof window !== 'undefined') {
-    (window as any).__TINA_AUTH_LOGS__ =
-      (window as any).__TINA_AUTH_LOGS__ || [];
-    (window as any).__TINA_AUTH_LOGS__.push(logEntry);
-  }
-
-  console.log(
-    `[TINA-AUTH ${timestamp}]`,
-    message,
-    data !== undefined ? data : ''
-  );
-};
-
 export class LocalAuthProvider extends AbstractAuthProvider {
   constructor() {
     super();
   }
 
   async authenticate() {
-    authLog('LocalAuthProvider.authenticate() called - simulating popup flow');
-
-    // Simulate the Tina Cloud popup authentication flow for local testing
-    // This reproduces the bug where closing the popup leaves button stuck
-    return new Promise((resolve, reject) => {
-      const popupHtml = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>Local Auth (Test)</title>
-          <style>
-            body {
-              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              justify-content: center;
-              height: 100vh;
-              margin: 0;
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-              color: white;
-            }
-            h1 { margin-bottom: 10px; }
-            p { margin-bottom: 30px; opacity: 0.9; }
-            button {
-              padding: 15px 40px;
-              font-size: 18px;
-              border: none;
-              border-radius: 8px;
-              background: white;
-              color: #667eea;
-              cursor: pointer;
-              font-weight: 600;
-            }
-            button:hover { transform: scale(1.05); }
-            .hint {
-              margin-top: 40px;
-              padding: 20px;
-              background: rgba(0,0,0,0.2);
-              border-radius: 8px;
-              max-width: 400px;
-              text-align: center;
-            }
-          </style>
-        </head>
-        <body>
-          <h1>Local Auth Simulation</h1>
-          <p>This simulates the Tina Cloud login popup</p>
-          <button onclick="completeLogin()">Complete Login</button>
-          <div class="hint">
-            <strong>To reproduce the bug:</strong><br>
-            Close this window WITHOUT clicking the button.<br>
-            The login button will stay stuck in loading state.
-          </div>
-          <script>
-            function completeLogin() {
-              window.opener.postMessage({
-                source: 'localAuthComplete',
-                success: true
-              }, '*');
-              window.close();
-            }
-          </script>
-        </body>
-        </html>
-      `;
-
-      // Open popup with the simulated auth page
-      const popup = window.open(
-        'about:blank',
-        'LocalAuthPopup',
-        'width=500,height=400,left=' +
-          (window.screen.width / 2 - 250) +
-          ',top=' +
-          (window.screen.height / 2 - 200)
-      );
-
-      if (popup) {
-        popup.document.write(popupHtml);
-        popup.document.close();
-        authLog('Popup window opened', { popupExists: true });
-      } else {
-        authLog('Popup was blocked by browser');
-      }
-
-      // Poll to detect if popup was closed without completing auth
-      const pollInterval = setInterval(() => {
-        authLog('Polling popup state', {
-          popupExists: !!popup,
-          popupClosed: popup?.closed,
-        });
-
-        if (popup && popup.closed) {
-          authLog('Popup was closed by user (detected via polling)');
-          clearInterval(pollInterval);
-          // FIX: Reject the promise so the button resets
-          window.removeEventListener('message', messageHandler);
-          reject(new AuthenticationCancelledError('Popup was closed'));
-          authLog('Promise rejected - auth cancelled');
-        }
-      }, 500);
-
-      // Listen for successful auth message from popup
-      const messageHandler = (e: MessageEvent) => {
-        authLog('Message received', { source: e.data?.source });
-
-        if (e.data?.source === 'localAuthComplete') {
-          authLog('Local auth completed successfully');
-          clearInterval(pollInterval);
-          window.removeEventListener('message', messageHandler);
-
-          localStorage.setItem(LOCAL_CLIENT_KEY, 'true');
-          resolve({
-            access_token: 'LOCAL',
-            id_token: 'LOCAL',
-            refresh_token: 'LOCAL',
-          });
-          authLog('Promise resolved with token');
-        }
-      };
-
-      window.addEventListener('message', messageHandler);
-      authLog('Message listener registered, waiting for auth completion...');
-    });
+    localStorage.setItem(LOCAL_CLIENT_KEY, 'true');
+    return { access_token: 'LOCAL', id_token: 'LOCAL', refresh_token: 'LOCAL' };
   }
 
   async getUser(): Promise<boolean> {

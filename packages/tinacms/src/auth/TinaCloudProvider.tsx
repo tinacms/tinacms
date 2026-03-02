@@ -16,24 +16,6 @@ import { ModalBuilder } from './AuthModal';
 import { AuthenticationCancelledError } from './authenticate';
 import loginLlama from './tina-login.png';
 
-// Debug logging for auth flow investigation
-const authLog = (message: string, data?: any) => {
-  const timestamp = new Date().toISOString();
-  const logEntry = { timestamp, message, data };
-
-  if (typeof window !== 'undefined') {
-    (window as any).__TINA_AUTH_LOGS__ =
-      (window as any).__TINA_AUTH_LOGS__ || [];
-    (window as any).__TINA_AUTH_LOGS__.push(logEntry);
-  }
-
-  console.log(
-    `[TINA-AUTH ${timestamp}]`,
-    message,
-    data !== undefined ? data : ''
-  );
-};
-
 import { TinaAdminApi } from '../admin/api';
 import {
   Client,
@@ -147,11 +129,9 @@ const AuthWallInner = ({
   }, [authenticated]);
 
   const onAuthenticated = async () => {
-    authLog('onAuthenticated called');
     setAuthenticated(true);
     setActiveModal(null);
     cms.events.dispatch({ type: 'cms:login' });
-    authLog('onAuthenticated completed - user is now authenticated');
   };
 
   const otherModalActions = getModalActions
@@ -165,35 +145,18 @@ const AuthWallInner = ({
   const handleAuthenticate = async (
     loginScreenProps?: Record<string, string>
   ) => {
-    authLog('handleAuthenticate called', {
-      hasLoginScreenProps: !!loginScreenProps,
-    });
-
     try {
-      authLog('Setting authenticated to false');
       setAuthenticated(false);
-
-      authLog('Calling client.authProvider.authenticate()...');
       const token = await client.authProvider.authenticate(
         loginScreenProps || authProps
       );
-      authLog('client.authProvider.authenticate() returned', {
-        hasToken: !!token,
-      });
-
       if (typeof client?.onLogin === 'function') {
-        authLog('Calling client.onLogin()');
         await client?.onLogin({ token });
       }
-
-      authLog('Calling onAuthenticated()');
       return onAuthenticated();
     } catch (e) {
-      authLog('handleAuthenticate caught error', { error: String(e) });
-
       // If user just closed the popup, silently reset - don't show error
       if (e instanceof AuthenticationCancelledError) {
-        authLog('Authentication was cancelled by user - resetting silently');
         return;
       }
 
