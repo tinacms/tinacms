@@ -1,0 +1,53 @@
+query DocumentQuery($collection: String!, $relativePath: String!) {
+  document(collection: $collection, relativePath: $relativePath) {
+    ... on Page {
+      ... on PageShowcase {
+        title
+        items {
+          __typename
+          title
+          description
+          image
+        }
+      }
+      ... on PageBlockPage {
+        title
+        blocks {
+          __typename
+        }
+      }
+    }
+    ... on Post {
+      title
+      author {
+        ... on Author {
+          name
+          bio
+          hobbies
+          image
+        }
+      }
+      categories
+      body
+      image
+    }
+    ... on Documentation {
+      title
+      tags {
+        __typename
+      }
+      body
+    }
+    ... on Author {
+      name
+      bio
+      hobbies
+      image
+    }
+    ... on Document {
+      _internalSys: _sys {
+        path
+      }
+    }
+  }
+}

@@ -1,0 +1,52 @@
+---
+title: Getting Started with TinaCMS
+description: A step-by-step guide to setting up TinaCMS in your Next.js project.
+author: content/authors/napolean.md
+pubDate: 2024-03-10T00:00:00.000Z
+updatedDate: 2024-03-15T00:00:00.000Z
+heroImage: /uploads/llama-2.avif
+---
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- Node.js 18 or higher
+- A Next.js project
+- Basic knowledge of React
+
+## Installation
+
+Install TinaCMS using your package manager:
+
+```bash
+npx @tinacms/cli@latest init
+```
+
+## Configure Your Schema
+
+Define your content schema in `tina/config.ts`. Here is a simple example for a blog post:
+
+```ts
+export default defineConfig({
+  schema: {
+    collections: [
+      {
+        name: 'blog',
+        label: 'Blog',
+        path: 'content/blogs',
+        format: 'mdx',
+        fields: [
+          { name: 'title', type: 'string', isTitle: true, required: true },
+          { name: 'description', type: 'string' },
+          { name: 'body', type: 'rich-text', isBody: true },
+        ],
+      },
+    ],
+  },
+})
+```
+
+## Start Editing
+
+Run your dev server and navigate to `/admin` to start editing your content visually.

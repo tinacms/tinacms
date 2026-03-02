@@ -1,0 +1,133 @@
+'use client'
+import * as React from 'react'
+import { GoCircleSlash } from 'react-icons/go'
+import { BiChevronRight } from 'react-icons/bi'
+import { Button, wrapFieldsWithMeta } from 'tinacms'
+import {
+  Popover,
+  PopoverButton,
+  PopoverPanel,
+  Transition,
+} from '@headlessui/react'
+import { IconOptions } from '@/components/layout/icon'
+
+const parseIconName = (name: string) => {
+  const splitName = name.split(/(?=[A-Z])/)
+  if (splitName.length > 1) {
+    return splitName.slice(1).join(' ')
+  }
+  return name
+}
+
+export const IconPickerInput = wrapFieldsWithMeta(({ input }: any) => {
+  const [filter, setFilter] = React.useState('')
+
+  const filteredBlocks = React.useMemo(() => {
+    return Object.keys(IconOptions).filter((name) =>
+      name.toLowerCase().includes(filter.toLowerCase())
+    )
+  }, [filter])
+
+  const inputLabel = Object.keys(IconOptions).includes(input.value)
+    ? parseIconName(input.value)
+    : 'Select Icon'
+
+  const InputIcon = (IconOptions as any)[input.value] ?? null
+
+  return (
+    <div className="relative z-[1000]">
+      <input type="text" id={input.name} className="hidden" {...input} />
+      <Popover>
+        {({ open }: { open: boolean }) => (
+          <>
+            <PopoverButton as={'span'}>
+              <Button
+                className={`text-sm h-11 px-4 ${InputIcon ? 'h-11' : 'h-10'}`}
+                size="custom"
+                rounded="full"
+                variant={open ? 'secondary' : 'white'}
+              >
+                {InputIcon && (
+                  <InputIcon className="w-7 mr-1 h-auto fill-current text-blue-500" />
+                )}
+                {inputLabel}
+                {!InputIcon && (
+                  <BiChevronRight className="w-5 h-auto fill-current opacity-70 ml-1" />
+                )}
+              </Button>
+            </PopoverButton>
+            <div className="absolute w-full min-w-[192px] max-w-2xl -bottom-2 left-0 translate-y-full">
+              <Transition
+                enter="transition duration-150 ease-out"
+                enterFrom="transform opacity-0 -translate-y-2"
+                enterTo="transform opacity-100 translate-y-0"
+                leave="transition duration-75 ease-in"
+                leaveFrom="transform opacity-100 translate-y-0"
+                leaveTo="transform opacity-0 -translate-y-2"
+              >
+                <PopoverPanel className="relative overflow-hidden rounded-lg shadow-lg bg-white border border-gray-200 z-50">
+                  {({ close }: { close: () => void }) => (
+                    <div className="max-h-[24rem] flex flex-col w-full h-full">
+                      <div className="bg-gray-50 p-2 border-b border-gray-100 z-10 shadow-sm">
+                        <input
+                          type="text"
+                          className="bg-white text-sm rounded border border-gray-100 shadow-inner py-1.5 px-2.5 w-full block placeholder-gray-300"
+                          onClick={(e: React.MouseEvent) => {
+                            e.stopPropagation()
+                            e.preventDefault()
+                          }}
+                          value={filter}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            setFilter(e.target.value)
+                          }
+                          placeholder="Filter icons…"
+                        />
+                      </div>
+                      {filteredBlocks.length === 0 && (
+                        <span className="text-center text-xs px-2 py-3 text-gray-400 bg-gray-50 italic">
+                          No matches found
+                        </span>
+                      )}
+                      {filteredBlocks.length > 0 && (
+                        <div className="w-full grid grid-cols-6 auto-rows-auto p-2 overflow-y-auto">
+                          <button
+                            className="rounded-lg text-center text-xs py-2 px-3 flex-1 outline-none transition-all ease-out duration-150 hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50"
+                            key="clear-input"
+                            onClick={() => {
+                              input.onChange('')
+                              setFilter('')
+                              close()
+                            }}
+                          >
+                            <GoCircleSlash className="w-6 h-auto text-gray-300 mx-auto" />
+                          </button>
+                          {filteredBlocks.map((name) => {
+                            const IconComponent = (IconOptions as any)[name]
+                            return (
+                              <button
+                                className="rounded-lg text-center text-xs py-2 px-3 flex-1 outline-none transition-all ease-out duration-150 hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50"
+                                key={name}
+                                title={parseIconName(name)}
+                                onClick={() => {
+                                  input.onChange(name)
+                                  setFilter('')
+                                  close()
+                                }}
+                              >
+                                <IconComponent className="w-6 h-auto mx-auto" />
+                              </button>
+                            )
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </PopoverPanel>
+              </Transition>
+            </div>
+          </>
+        )}
+      </Popover>
+    </div>
+  )
+})

@@ -1,0 +1,25 @@
+{
+  "header": {
+    "name": "Tina Kitchen Sink",
+    "color": "default",
+    "nav": [
+      { "href": "/", "label": "Home" },
+      { "href": "/posts", "label": "Posts" },
+      { "href": "/blog", "label": "Blog" },
+      { "href": "/authors", "label": "Authors" },
+      { "href": "/gql", "label": "GraphQL" },
+      { "href": "/admin/index.html", "label": "Admin CMS" }
+    ]
+  },
+  "footer": {
+    "social": [
+      { "icon": "github", "url": "https://github.com/tinacms/tinacms" },
+      { "icon": "twitter", "url": "https://twitter.com/tina_cms" }
+    ]
+  },
+  "theme": {
+    "color": "orange",
+    "font": "sans",
+    "darkMode": "system"
+  }
+}
