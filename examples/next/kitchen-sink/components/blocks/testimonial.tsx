@@ -1,7 +1,21 @@
 'use client'
-import { Section, Container } from '../layout'
+import { Section, Container, useLayout } from '../layout'
+
+const authorColorMap: Record<string, string> = {
+  blue: 'text-blue-500 dark:text-blue-300',
+  teal: 'text-teal-500 dark:text-teal-300',
+  green: 'text-green-500 dark:text-green-300',
+  red: 'text-red-500 dark:text-red-300',
+  pink: 'text-pink-500 dark:text-pink-300',
+  purple: 'text-purple-500 dark:text-purple-300',
+  orange: 'text-orange-500 dark:text-orange-300',
+  yellow: 'text-yellow-500 dark:text-yellow-300',
+}
 
 export const Testimonial = ({ data, parentField = '' }) => {
+  const { theme } = useLayout()
+  const authorColor = authorColorMap[theme.color] ?? authorColorMap.orange
+
   return (
     <Section color={data.color}>
       <Container size="large">
@@ -30,7 +44,7 @@ export const Testimonial = ({ data, parentField = '' }) => {
             <span
               className={`block mx-auto h-0.5 w-1/6 ${
                 data.color === 'primary'
-                  ? `bg-blue-600`
+                  ? `bg-white/30`
                   : `bg-gray-200 dark:bg-gray-700`
               }`}
             ></span>
@@ -40,8 +54,8 @@ export const Testimonial = ({ data, parentField = '' }) => {
               data-tinafield={`${parentField}.author`}
               className={`tracking-wide title-font font-bold text-lg ${
                 data.color === 'primary'
-                  ? `text-blue-200`
-                  : `text-blue-500 dark:text-blue-300`
+                  ? `text-white/80`
+                  : authorColor
               }`}
             >
               {data.author}

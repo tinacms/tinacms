@@ -12,12 +12,3 @@ export async function POST(request: Request) {
   }
 }
 
-export default async function handler(req, res) {
-  try {
-    const { query, variables } = req.body ?? {}
-    const result = await databaseRequest({ query, variables })
-    return res.json(result)
-  } catch (err: any) {
-    return res.status(500).json({ error: String(err) })
-  }
-}

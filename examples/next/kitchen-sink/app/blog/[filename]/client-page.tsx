@@ -70,14 +70,30 @@ export default function BlogClientPage(props: TinaProps) {
             </p>
           )}
 
-          <div className="flex items-center justify-center gap-4 text-sm text-gray-400 dark:text-gray-500 mb-16">
-            {formattedDate && <span>Published {formattedDate}</span>}
-            {formattedUpdatedDate && formattedUpdatedDate !== formattedDate && (
-              <>
-                <span className="text-gray-200 dark:text-gray-700">·</span>
-                <span>Updated {formattedUpdatedDate}</span>
-              </>
+          <div className="flex items-center justify-center gap-3 mb-16">
+            {data.blog.author?.avatar && (
+              <img
+                src={data.blog.author.avatar}
+                alt={data.blog.author?.name || ''}
+                className="h-10 w-10 rounded-full object-cover flex-shrink-0 shadow-sm"
+              />
             )}
+            <div className="flex flex-col items-start">
+              {data.blog.author?.name && (
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                  {data.blog.author.name}
+                </span>
+              )}
+              <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
+                {formattedDate && <span>Published {formattedDate}</span>}
+                {formattedUpdatedDate && formattedUpdatedDate !== formattedDate && (
+                  <>
+                    <span className="text-gray-200 dark:text-gray-700">·</span>
+                    <span>Updated {formattedUpdatedDate}</span>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
         </Container>
 

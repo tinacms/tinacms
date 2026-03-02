@@ -1,0 +1,34 @@
+---
+title: Visual Editing with TinaCMS
+description: Learn how TinaCMS enables real-time visual editing directly on your site.
+author: content/authors/napolean.md
+pubDate: 2024-05-12T00:00:00.000Z
+updatedDate: 2024-05-14T00:00:00.000Z
+heroImage: /uploads/llama-5.avif
+excerpt: TinaCMS's contextual editing feature lets editors click directly on content and edit it in place — no more switching back and forth between a CMS dashboard and a preview.
+---
+
+## What is Visual Editing?
+
+Visual editing lets your content editors click directly on any piece of text or media on the page and edit it in real time. Changes are reflected immediately in the preview — making the editing experience feel as natural as editing a Google Doc.
+
+## How TinaCMS Makes It Work
+
+TinaCMS uses a sidebar editor that is mapped directly to your component tree. When you use `data-tinafield` attributes in your JSX, Tina knows exactly which field in the CMS corresponds to which element on screen.
+
+```tsx
+<h1 data-tinafield="title">{data.title}</h1>
+```
+
+Clicking on that `<h1>` in edit mode will focus the corresponding `title` field in the sidebar — and typing will update the preview live.
+
+## Git-backed by Default
+
+Because TinaCMS stores content in Markdown and MDX files committed to your repo, every edit creates a real Git commit. Editors get a familiar, safe workflow and developers get a clean history.
+
+## Getting Started
+
+1. Install TinaCMS: `pnpm add tinacms`
+2. Run `npx @tinacms/cli init` to scaffold your config
+3. Annotate your components with `data-tinafield` attributes
+4. Run `pnpm dev` and navigate to `/admin` to start editing

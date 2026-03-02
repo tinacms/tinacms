@@ -22,6 +22,13 @@ const Post: Collection = {
       name: 'title',
       isTitle: true,
       required: true,
+      ui: {
+        validate: (value: string) => {
+          if (!value || value.trim().length < 5) {
+            return 'Title must be at least 5 characters'
+          }
+        },
+      },
     },
     {
       type: 'image',
@@ -51,6 +58,11 @@ const Post: Collection = {
       ui: {
         dateFormat: 'MMMM DD YYYY',
         timeFormat: 'hh:mm A',
+        validate: (value: string) => {
+          if (value && new Date(value) > new Date()) {
+            return 'Posted date cannot be in the future'
+          }
+        },
       },
     },
     {

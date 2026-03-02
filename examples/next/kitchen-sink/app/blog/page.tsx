@@ -48,9 +48,26 @@ export default async function BlogsPage() {
                       {blog.description}
                     </p>
                   )}
-                  {formattedDate && (
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-4">{formattedDate}</p>
-                  )}
+                  <div className="flex items-center mt-4 gap-2">
+                    {blog.author?.avatar && (
+                      <img
+                        src={blog.author.avatar}
+                        alt={blog.author?.name || ''}
+                        className="h-7 w-7 rounded-full object-cover flex-shrink-0"
+                      />
+                    )}
+                    {blog.author?.name && (
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                        {blog.author.name}
+                      </span>
+                    )}
+                    {blog.author?.name && formattedDate && (
+                      <span className="text-gray-300 dark:text-gray-600">·</span>
+                    )}
+                    {formattedDate && (
+                      <span className="text-xs text-gray-400 dark:text-gray-500">{formattedDate}</span>
+                    )}
+                  </div>
                 </div>
               </Link>
             )

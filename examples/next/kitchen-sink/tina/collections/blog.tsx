@@ -42,6 +42,12 @@ const Blog: Collection = {
       name: 'description',
     },
     {
+      type: 'reference',
+      label: 'Author',
+      name: 'author',
+      collections: ['author'],
+    },
+    {
       type: 'datetime',
       label: 'Publish Date',
       name: 'pubDate',
