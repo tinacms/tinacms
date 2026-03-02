@@ -13,6 +13,7 @@ import {
 } from '@tinacms/toolkit';
 import React, { useEffect, useState } from 'react';
 import { ModalBuilder } from './AuthModal';
+import { AuthenticationCancelledError } from './authenticate';
 import loginLlama from './tina-login.png';
 
 // Debug logging for auth flow investigation
@@ -189,6 +190,13 @@ const AuthWallInner = ({
       return onAuthenticated();
     } catch (e) {
       authLog('handleAuthenticate caught error', { error: String(e) });
+
+      // If user just closed the popup, silently reset - don't show error
+      if (e instanceof AuthenticationCancelledError) {
+        authLog('Authentication was cancelled by user - resetting silently');
+        return;
+      }
+
       console.error(e);
       setActiveModal('error');
       setErrorMessage({
