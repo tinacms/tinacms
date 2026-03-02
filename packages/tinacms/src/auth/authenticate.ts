@@ -47,19 +47,26 @@ export const authenticate = (
     debugLog('Popup result', {
       authTabExists: !!authTab,
       authTabClosed: authTab?.closed,
-      authTabType: typeof authTab
+      authTabType: typeof authTab,
     });
 
     // Check if popup was blocked
     if (!authTab) {
       debugLog('Popup was blocked by browser!');
-      reject(new Error('Popup was blocked by browser. Please allow popups for this site.'));
+      reject(
+        new Error(
+          'Popup was blocked by browser. Please allow popups for this site.'
+        )
+      );
       return;
     }
 
     // Message handler for auth completion
     const messageHandler = (e: MessageEvent) => {
-      debugLog('Message received', { source: e.data?.source, origin: e.origin });
+      debugLog('Message received', {
+        source: e.data?.source,
+        origin: e.origin,
+      });
 
       if (e.data.source === TINA_LOGIN_EVENT) {
         debugLog('Auth success - TINA_LOGIN_EVENT received');
@@ -84,7 +91,11 @@ export const authenticate = (
       const isClosed = authTab.closed;
 
       if (pollCount <= 3 || isClosed) {
-        debugLog('Polling popup', { pollCount, isClosed, authTabExists: !!authTab });
+        debugLog('Polling popup', {
+          pollCount,
+          isClosed,
+          authTabExists: !!authTab,
+        });
       }
 
       if (isClosed) {
@@ -92,7 +103,10 @@ export const authenticate = (
         clearInterval(pollInterval);
         window.removeEventListener('message', messageHandler);
         const error = new AuthenticationCancelledError('Popup was closed');
-        debugLog('Rejecting with error', { errorName: error.name, errorMessage: error.message });
+        debugLog('Rejecting with error', {
+          errorName: error.name,
+          errorMessage: error.message,
+        });
         reject(error);
       }
     }, 500);
