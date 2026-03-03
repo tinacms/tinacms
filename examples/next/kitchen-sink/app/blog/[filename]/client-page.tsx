@@ -75,20 +75,14 @@ export default function BlogClientPage(props: TinaProps) {
 
         {data.blog.heroImage && (
           <div className="px-4 w-full">
-            <div className="relative max-w-4xl lg:max-w-5xl mx-auto">
-              <img
-                src={sanitizeImageSrc(data.blog.heroImage)}
-                className="absolute block rounded-lg w-full h-auto blur-2xl brightness-150 contrast-[0.9] dark:brightness-150 saturate-200 opacity-50 dark:opacity-30 mix-blend-multiply dark:mix-blend-hard-light"
-                aria-hidden="true"
-                alt=""
-              />
+            <div className="relative max-w-2xl mx-auto">
               <Image
                 src={sanitizeImageSrc(data.blog.heroImage)}
                 alt={data.blog.title}
-                width={900}
-                height={500}
+                width={600}
+                height={400}
                 priority
-                className="relative z-10 mb-14 block rounded-lg w-full h-auto opacity-100"
+                className="mb-14 block rounded-lg w-full h-auto"
               />
             </div>
           </div>

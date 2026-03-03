@@ -1,16 +1,18 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useLayout } from './layout-context'
 import { Container } from './container'
 import { Icon } from './icon'
 import { headerColorClasses, activeItemClasses, activeBackgroundClasses } from '@/lib/utils'
+import { MobileNavDrawer } from './mobile-nav-drawer'
 
 export const Header = () => {
   const { globalSettings, theme } = useLayout()
   const pathname = usePathname()
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
   const header = globalSettings?.header
   const nav = header?.nav || []
@@ -28,7 +30,7 @@ export const Header = () => {
   return (
     <header className={`relative overflow-hidden bg-gradient-to-b ${headerColorCss}`}>
       <Container size="custom" className="py-0 relative z-10">
-        <div className="flex items-center justify-between gap-6">
+        <div className="flex items-center justify-between gap-4">
           <h4 className="select-none text-lg font-bold tracking-tight my-4 transition duration-150 ease-out transform">
             <Link
               href="/"
@@ -48,7 +50,9 @@ export const Header = () => {
               </span>
             </Link>
           </h4>
-          <nav className="flex items-center gap-0 sm:gap-1">
+
+          {/* Desktop Navigation - Hidden on mobile */}
+          <nav className="hidden sm:flex items-center gap-0 sm:gap-1">
             {nav.map((item: any) => {
               const active = isActive(item.href || '/')
               return (
@@ -97,6 +101,16 @@ export const Header = () => {
               )
             })}
           </nav>
+
+          {/* Mobile Navigation Drawer */}
+          <MobileNavDrawer
+            nav={nav}
+            theme={theme}
+            isOpen={mobileNavOpen}
+            onOpen={() => setMobileNavOpen(true)}
+            onClose={() => setMobileNavOpen(false)}
+            headerColor={headerColorCss}
+          />
         </div>
       </Container>
       <div

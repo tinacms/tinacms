@@ -1,6 +1,7 @@
 import client from '@/tina/__generated__/client'
 import { Section } from '@/components/layout/section'
 import { Container } from '@/components/layout/container'
+import { GraphQLExplorer } from '@/components/graphql-explorer'
 
 export const revalidate = 300
 
@@ -62,6 +63,14 @@ export default async function GraphQLDemoPage() {
               Open CMS admin ↗
             </a>
           </div>
+        </Container>
+      </Section>
+
+      {/* Interactive Explorer */}
+      <Section color="default">
+        <Container size="large" className="py-12">
+          <h2 className="text-2xl font-bold mb-6">Try It Out</h2>
+          <GraphQLExplorer />
         </Container>
       </Section>
 
