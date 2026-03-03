@@ -2,16 +2,17 @@
 
 */
 
-import path from 'node:path';
-import cors from 'cors';
 import http from 'node:http';
-import express from 'express';
+import path from 'node:path';
+import type { Database } from '@tinacms/graphql';
 import { altairExpress } from 'altair-express-middleware';
 // @ts-ignore
 import bodyParser from 'body-parser';
-import type { Database } from '@tinacms/graphql';
-import { createMediaRouter } from './routes';
+import cors from 'cors';
+import express from 'express';
+import { buildCorsOriginCheck } from '../next/vite/cors';
 import { parseMediaFolder } from '../utils';
+import { createMediaRouter } from './routes';
 
 export const gqlServer = async (database, verbose: boolean) => {
   // This is lazily required so we can update the module
@@ -20,7 +21,11 @@ export const gqlServer = async (database, verbose: boolean) => {
 
   const app = express();
   const server = http.createServer(app);
-  app.use(cors());
+  app.use(
+    cors({
+      origin: buildCorsOriginCheck(),
+    })
+  );
   app.use(bodyParser.json());
 
   app.use(

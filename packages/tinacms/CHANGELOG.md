@@ -1,5 +1,22 @@
 # tinacms
 
+## 3.6.0
+
+### Minor Changes
+
+- [#6447](https://github.com/tinacms/tinacms/pull/6447) [`60510bb`](https://github.com/tinacms/tinacms/commit/60510bbf8d1b78cad901722d4f9003665412d71e) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - ✨ Object Schema - Add openFormOnCreate flag. Allowing users to opt-in to automatically going inside an object form when the field is true
+
+### Patch Changes
+
+- [#6451](https://github.com/tinacms/tinacms/pull/6451) [`f23c2a6`](https://github.com/tinacms/tinacms/commit/f23c2a6742373271531bee46ca3cca8b208c3476) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Fix inconsistent branch selection modal size between Side Editor and Admin Editor by using tailwind-merge for proper CSS class merging in PopupModal
+
+- [#6458](https://github.com/tinacms/tinacms/pull/6458) [`d782ca2`](https://github.com/tinacms/tinacms/commit/d782ca209ff98ee2143c7fd83f0b793563b6de60) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🤖 Fix previewBranch button from opening a tab with an empty string, instead using correct previewUrl variable
+
+- Updated dependencies [[`56d533e`](https://github.com/tinacms/tinacms/commit/56d533e610a520ba66b3e58f3a0dc03487d5d5d7), [`60510bb`](https://github.com/tinacms/tinacms/commit/60510bbf8d1b78cad901722d4f9003665412d71e)]:
+  - @tinacms/schema-tools@2.7.0
+  - @tinacms/mdx@2.0.7
+  - @tinacms/search@1.2.5
+
 ## 3.5.1
 
 ### Patch Changes
