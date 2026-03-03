@@ -1,5 +1,20 @@
 # tinacms-cli
 
+## 2.1.8
+
+### Patch Changes
+
+- [#6450](https://github.com/tinacms/tinacms/pull/6450) [`56d533e`](https://github.com/tinacms/tinacms/commit/56d533e610a520ba66b3e58f3a0dc03487d5d5d7) Thanks [@18-th](https://github.com/18-th)! - \* Restricted CORS on dev server to localhost by default for [GHSA-8pw3-9m7f-q734](https://github.com/tinacms/tinacms/security/advisories/GHSA-8pw3-9m7f-q734).
+  - Added `server.allowedOrigins` config option for non-localhost environments.
+  - Enabled Vite `server.fs.strict` with computed allow list for [GHSA-m48g-4wr2-j2h6](https://github.com/tinacms/tinacms/security/advisories/GHSA-m48g-4wr2-j2h6)
+  - Bind LevelDB TCP server to 127.0.0.1
+- Updated dependencies [[`f23c2a6`](https://github.com/tinacms/tinacms/commit/f23c2a6742373271531bee46ca3cca8b208c3476), [`d782ca2`](https://github.com/tinacms/tinacms/commit/d782ca209ff98ee2143c7fd83f0b793563b6de60), [`56d533e`](https://github.com/tinacms/tinacms/commit/56d533e610a520ba66b3e58f3a0dc03487d5d5d7), [`60510bb`](https://github.com/tinacms/tinacms/commit/60510bbf8d1b78cad901722d4f9003665412d71e)]:
+  - tinacms@3.6.0
+  - @tinacms/schema-tools@2.7.0
+  - @tinacms/app@2.3.27
+  - @tinacms/graphql@2.1.4
+  - @tinacms/search@1.2.5
+
 ## 2.1.7
 
 ### Patch Changes
