@@ -1,5 +1,7 @@
 'use client'
+import Image from 'next/image'
 import { useTina } from 'tinacms/dist/react'
+import { sanitizeImageSrc } from '@/lib/utils'
 import { TinaMarkdown } from 'tinacms/dist/rich-text'
 import { customComponents } from '@/components/markdown-components'
 import { useLayout } from '@/components/layout/layout-context'
@@ -37,10 +39,13 @@ export default function AuthorClientPage(props: TinaProps) {
         <Container width="small" size="large">
           <div className="flex flex-col items-center text-center mb-16">
             {data.author.avatar && (
-              <img
-                src={data.author.avatar}
+              <Image
+                src={sanitizeImageSrc(data.author.avatar)}
                 alt={data.author.name}
-                className="w-32 h-32 rounded-full mb-6 object-cover shadow-sm"
+                width={128}
+                height={128}
+                priority
+                className="rounded-full mb-6 object-cover shadow-sm"
               />
             )}
             <h1 className="w-full relative mb-4 text-5xl font-extrabold tracking-normal title-font">

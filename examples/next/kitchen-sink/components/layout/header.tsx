@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import { useLayout } from './layout-context'
 import { Container } from './container'
 import { Icon } from './icon'
+import { headerColorClasses, activeItemClasses, activeBackgroundClasses } from '@/lib/utils'
 
 export const Header = () => {
   const { globalSettings, theme } = useLayout()
@@ -14,47 +15,10 @@ export const Header = () => {
   const header = globalSettings?.header
   const nav = header?.nav || []
 
-  const headerColor = {
-    default:
-      'text-gray-800 dark:text-gray-50 from-white to-gray-50 dark:from-gray-900 dark:to-gray-1000',
-    primary: {
-      blue: 'text-white from-blue-500 to-blue-700',
-      teal: 'text-white from-teal-500 to-teal-600',
-      green: 'text-white from-green-500 to-green-600',
-      red: 'text-white from-red-500 to-red-600',
-      pink: 'text-white from-pink-500 to-pink-600',
-      purple: 'text-white from-purple-500 to-purple-600',
-      orange: 'text-white from-orange-500 to-orange-600',
-      yellow: 'text-white from-yellow-500 to-yellow-600',
-    } as Record<string, string>,
-  }
-
   const headerColorCss =
     header?.color === 'primary'
-      ? headerColor.primary[theme.color] || headerColor.primary.blue
-      : headerColor.default
-
-  const activeItemClasses: Record<string, string> = {
-    blue: 'border-b-3 border-blue-200',
-    teal: 'border-b-3 border-teal-200',
-    green: 'border-b-3 border-green-200',
-    red: 'border-b-3 border-red-200',
-    pink: 'border-b-3 border-pink-200',
-    purple: 'border-b-3 border-purple-200',
-    orange: 'border-b-3 border-orange-200',
-    yellow: 'border-b-3 border-yellow-200',
-  }
-
-  const activeBackgroundClasses: Record<string, string> = {
-    blue: 'text-blue-600 dark:text-blue-300',
-    teal: 'text-teal-600 dark:text-teal-300',
-    green: 'text-green-600 dark:text-green-300',
-    red: 'text-red-600 dark:text-red-300',
-    pink: 'text-pink-600 dark:text-pink-300',
-    purple: 'text-purple-600 dark:text-purple-300',
-    orange: 'text-orange-600 dark:text-orange-300',
-    yellow: 'text-yellow-600 dark:text-yellow-300',
-  }
+      ? headerColorClasses[theme.color] || headerColorClasses.blue
+      : headerColorClasses.default
 
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/'

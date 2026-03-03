@@ -1,16 +1,18 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import React from 'react'
 import client from '../../tina/__generated__/client'
 import { format } from 'date-fns'
-import Layout from '@/components/layout/layout'
+import { sanitizeImageSrc } from '@/lib/utils'
+
+export const revalidate = 300
 
 export default async function BlogsPage() {
   const connection = await client.queries.blogConnection()
   const blogs = connection.data.blogConnection.edges ?? []
 
   return (
-    <Layout>
-      <section className="flex-1 relative transition duration-150 ease-out body-font overflow-hidden text-gray-800 dark:text-gray-50 bg-gradient-to-tl from-gray-50 dark:from-gray-900 via-transparent to-transparent">
+    <section className="flex-1 relative transition duration-150 ease-out body-font overflow-hidden text-gray-800 dark:text-gray-50 bg-gradient-to-tl from-gray-50 dark:from-gray-900 via-transparent to-transparent">
       <div className="max-w-5xl mx-auto px-6 sm:px-8 py-24">
         <h1 className="text-4xl font-extrabold tracking-tight mb-12 text-center title-font">Blog</h1>
         <div className="grid gap-8 md:grid-cols-2">
@@ -31,11 +33,13 @@ export default async function BlogsPage() {
                 className="group flex flex-col bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow"
               >
                 {blog.heroImage && (
-                  <div className="w-full h-48 overflow-hidden">
-                    <img
-                      src={blog.heroImage}
+                  <div className="relative w-full h-48 overflow-hidden">
+                    <Image
+                      src={sanitizeImageSrc(blog.heroImage)}
                       alt={blog.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      sizes="(max-width: 768px) 100vw, 50vw"
                     />
                   </div>
                 )}
@@ -50,10 +54,12 @@ export default async function BlogsPage() {
                   )}
                   <div className="flex items-center mt-4 gap-2">
                     {blog.author?.avatar && (
-                      <img
-                        src={blog.author.avatar}
+                      <Image
+                        src={sanitizeImageSrc(blog.author.avatar)}
                         alt={blog.author?.name || ''}
-                        className="h-7 w-7 rounded-full object-cover flex-shrink-0"
+                        width={28}
+                        height={28}
+                        className="rounded-full object-cover flex-shrink-0"
                       />
                     )}
                     {blog.author?.name && (
@@ -75,6 +81,5 @@ export default async function BlogsPage() {
         </div>
       </div>
       </section>
-    </Layout>
   )
 }

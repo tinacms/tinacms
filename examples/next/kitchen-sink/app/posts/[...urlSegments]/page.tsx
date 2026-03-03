@@ -1,9 +1,10 @@
 import React from 'react'
 import client from '@/tina/__generated__/client'
-import Layout from '@/components/layout/layout'
 import PostClientPage from './client-page'
 
 export const revalidate = 300
+
+import { formatDate } from '@/lib/utils'
 
 export default async function PostPage({
   params,
@@ -17,34 +18,15 @@ export default async function PostPage({
   })
 
   return (
-    <Layout rawPageData={data}>
-      <PostClientPage {...data} />
-    </Layout>
+    <PostClientPage {...data} formattedDate={formatDate(data.data?.post?.date)} />
   )
 }
 
 export async function generateStaticParams() {
-  let posts = await client.queries.postConnection()
-  const allPosts = posts
-
-  if (!allPosts.data.postConnection.edges) {
-    return []
-  }
-
-  while (posts.data?.postConnection.pageInfo.hasNextPage) {
-    posts = await client.queries.postConnection({
-      after: posts.data.postConnection.pageInfo.endCursor,
-    })
-
-    if (!posts.data.postConnection.edges) {
-      break
-    }
-
-    allPosts.data.postConnection.edges.push(...posts.data.postConnection.edges)
-  }
+  const allPosts = await client.queries.postConnection({ first: 1000 })
 
   const params =
-    allPosts.data?.postConnection.edges.map((edge: any) => ({
+    allPosts.data?.postConnection.edges?.map((edge: any) => ({
       urlSegments: edge?.node?._sys?.breadcrumbs,
     })) || []
 

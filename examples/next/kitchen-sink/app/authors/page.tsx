@@ -1,15 +1,17 @@
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import client from '../../tina/__generated__/client'
-import Layout from '@/components/layout/layout'
+import { sanitizeImageSrc } from '@/lib/utils'
+
+export const revalidate = 300
 
 export default async function AuthorsPage() {
   const connection = await client.queries.authorConnection()
-  const authors = connection.data.authorConnection.edges
+  const authors = connection.data.authorConnection.edges ?? []
 
   return (
-    <Layout>
-      <section className="flex-1 relative transition duration-150 ease-out body-font overflow-hidden text-gray-800 dark:text-gray-50 bg-gradient-to-tl from-gray-50 dark:from-gray-900 via-transparent to-transparent">
+    <section className="flex-1 relative transition duration-150 ease-out body-font overflow-hidden text-gray-800 dark:text-gray-50 bg-gradient-to-tl from-gray-50 dark:from-gray-900 via-transparent to-transparent">
         <div className="max-w-5xl mx-auto px-6 sm:px-8 py-24">
           <h1 className="text-4xl font-extrabold tracking-tight mb-12 text-center title-font">Authors</h1>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -21,10 +23,12 @@ export default async function AuthorsPage() {
               >
                 <div className="flex items-center gap-4 mb-4">
                   {edge.node.avatar && (
-                    <img
-                      src={edge.node.avatar}
+                    <Image
+                      src={sanitizeImageSrc(edge.node.avatar)}
                       alt={edge.node.name}
-                      className="h-14 w-14 object-cover rounded-full shadow-sm"
+                      width={56}
+                      height={56}
+                      className="object-cover rounded-full shadow-sm"
                     />
                   )}
                   <h2 className="text-2xl font-semibold text-gray-700 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-300 transition-all duration-150">
@@ -51,6 +55,5 @@ export default async function AuthorsPage() {
           </div>
         </div>
       </section>
-    </Layout>
   )
 }

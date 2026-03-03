@@ -1,20 +1,10 @@
 import '../styles/global.css'
-import { Inter, Lato, Nunito } from 'next/font/google'
+import { Inter } from 'next/font/google'
+import Layout from '@/components/layout/layout'
 
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
-})
-
-const nunito = Nunito({
-  subsets: ['latin'],
-  variable: '--font-nunito',
-})
-
-const lato = Lato({
-  subsets: ['latin'],
-  variable: '--font-lato',
-  weight: '400',
 })
 
 export const metadata = {
@@ -22,15 +12,17 @@ export const metadata = {
   description: 'Comprehensive showcase of Tina CMS features',
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${nunito.variable} ${lato.variable}`}>
+      <html lang="en" suppressHydrationWarning className={inter.variable}>
       <body className="font-sans antialiased">
-        {children}
+        <Layout>
+          {children}
+        </Layout>
       </body>
     </html>
   )

@@ -1,5 +1,4 @@
 import client from '@/tina/__generated__/client'
-import Layout from '@/components/layout/layout'
 import { Section } from '@/components/layout/section'
 import { Container } from '@/components/layout/container'
 
@@ -35,7 +34,7 @@ export default async function GraphQLDemoPage() {
   }
 
   return (
-    <Layout>
+    <>
       {/* Hero */}
       <Section color="primary">
         <Container size="large" className="py-16 text-center">
@@ -164,6 +163,6 @@ const posts = result.data.postConnection.edges.map(e => e.node)
           </div>
         </Container>
       </Section>
-    </Layout>
+    </>
   )
 }

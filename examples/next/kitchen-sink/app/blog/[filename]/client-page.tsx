@@ -1,7 +1,8 @@
 'use client'
+import Image from 'next/image'
 import { useTina } from 'tinacms/dist/react'
+import { sanitizeImageSrc, titleColorClasses } from '@/lib/utils'
 import { TinaMarkdown } from 'tinacms/dist/rich-text'
-import { format } from 'date-fns'
 import { customComponents } from '@/components/markdown-components'
 import { useLayout } from '@/components/layout/layout-context'
 import { Section } from '@/components/layout/section'
@@ -11,6 +12,8 @@ type TinaProps = {
   query: string
   variables: Record<string, any>
   data: any
+  formattedPubDate?: string
+  formattedUpdatedDate?: string
 }
 
 export default function BlogClientPage(props: TinaProps) {
@@ -22,38 +25,9 @@ export default function BlogClientPage(props: TinaProps) {
   const { theme } = useLayout()
 
   if (data?.blog) {
-    const titleColorClasses: Record<string, string> = {
-      blue: 'from-blue-400 to-blue-600 dark:from-blue-300 dark:to-blue-500',
-      teal: 'from-teal-400 to-teal-600 dark:from-teal-300 dark:to-teal-500',
-      green: 'from-green-400 to-green-600 dark:from-green-300 dark:to-green-500',
-      red: 'from-red-400 to-red-600 dark:from-red-300 dark:to-red-500',
-      pink: 'from-pink-300 to-pink-500 dark:from-pink-300 dark:to-pink-500',
-      purple: 'from-purple-400 to-purple-600 dark:from-purple-300 dark:to-purple-500',
-      orange: 'from-orange-300 to-orange-600 dark:from-orange-200 dark:to-orange-500',
-      yellow: 'from-yellow-400 to-yellow-500 dark:from-yellow-300 dark:to-yellow-500',
-    }
 
-    let formattedDate = ''
-    if (data.blog.pubDate) {
-      try {
-        const date = new Date(data.blog.pubDate)
-        if (!isNaN(date.getTime())) {
-          formattedDate = format(date, 'MMM dd, yyyy')
-        }
-      } catch (e) {
-        // Invalid date format, skip
-      }
-    }
-
-    let formattedUpdatedDate = ''
-    if (data.blog.updatedDate) {
-      try {
-        const date = new Date(data.blog.updatedDate)
-        if (!isNaN(date.getTime())) {
-          formattedUpdatedDate = format(date, 'MMM dd, yyyy')
-        }
-      } catch (e) {}
-    }
+    const formattedDate = props.formattedPubDate ?? ''
+    const formattedUpdatedDate = props.formattedUpdatedDate ?? ''
 
     return (
       <Section className="flex-1">
@@ -72,10 +46,12 @@ export default function BlogClientPage(props: TinaProps) {
 
           <div className="flex items-center justify-center gap-3 mb-16">
             {data.blog.author?.avatar && (
-              <img
-                src={data.blog.author.avatar}
+              <Image
+                src={sanitizeImageSrc(data.blog.author.avatar)}
                 alt={data.blog.author?.name || ''}
-                className="h-10 w-10 rounded-full object-cover flex-shrink-0 shadow-sm"
+                width={40}
+                height={40}
+                className="rounded-full object-cover flex-shrink-0 shadow-sm"
               />
             )}
             <div className="flex flex-col items-start">
@@ -101,14 +77,17 @@ export default function BlogClientPage(props: TinaProps) {
           <div className="px-4 w-full">
             <div className="relative max-w-4xl lg:max-w-5xl mx-auto">
               <img
-                src={data.blog.heroImage}
+                src={sanitizeImageSrc(data.blog.heroImage)}
                 className="absolute block rounded-lg w-full h-auto blur-2xl brightness-150 contrast-[0.9] dark:brightness-150 saturate-200 opacity-50 dark:opacity-30 mix-blend-multiply dark:mix-blend-hard-light"
                 aria-hidden="true"
                 alt=""
               />
-              <img
-                src={data.blog.heroImage}
+              <Image
+                src={sanitizeImageSrc(data.blog.heroImage)}
                 alt={data.blog.title}
+                width={900}
+                height={500}
+                priority
                 className="relative z-10 mb-14 block rounded-lg w-full h-auto opacity-100"
               />
             </div>

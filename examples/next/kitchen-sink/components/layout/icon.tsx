@@ -1,7 +1,8 @@
 'use client'
 import React from 'react'
 import { useLayout } from './layout-context'
-import * as BoxIcons from 'react-icons/bi'
+// Only import the specific icons actually used in content — avoids bundling all ~1600 BoxIcons
+import { BiLayer, BiSearchAlt2, BiTerminal } from 'react-icons/bi'
 
 export const IconOptions = {
   Tina: (props: any) => (
@@ -22,7 +23,9 @@ export const IconOptions = {
       />
     </svg>
   ),
-  ...BoxIcons,
+  BiLayer,
+  BiSearchAlt2,
+  BiTerminal,
 }
 
 const iconColorClass: {

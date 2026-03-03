@@ -2,8 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { FaFacebookF, FaGithub, FaTwitter } from 'react-icons/fa'
-import { AiFillInstagram } from 'react-icons/ai'
+import { BiLogoGithub, BiLogoTwitter, BiLogoFacebook, BiLogoInstagram } from 'react-icons/bi'
 import { useLayout } from './layout-context'
 import { Container } from './container'
 import { Icon } from './icon'
@@ -29,10 +28,10 @@ export const Footer = () => {
   const iconColorClass = socialIconColorClasses[theme.color] || socialIconColorClasses.blue
 
   const socialIconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-    github: FaGithub,
-    twitter: FaTwitter,
-    facebook: FaFacebookF,
-    instagram: AiFillInstagram,
+    github: BiLogoGithub,
+    twitter: BiLogoTwitter,
+    facebook: BiLogoFacebook,
+    instagram: BiLogoInstagram,
   }
 
   return (

@@ -1,10 +1,11 @@
 'use client'
 
 import React from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
-import { format } from 'date-fns'
+import { sanitizeImageSrc, titleColorClasses } from '@/lib/utils'
 import { TinaMarkdown } from 'tinacms/dist/rich-text'
-import { BsArrowRight } from 'react-icons/bs'
+import { BiRightArrowAlt } from 'react-icons/bi'
 import { useLayout } from '@/components/layout/layout-context'
 import { Section } from '@/components/layout/section'
 import { Container } from '@/components/layout/container'
@@ -19,17 +20,6 @@ export default function PostsClientPage(props: PostsClientPageProps) {
   const { theme } = useLayout()
   const posts = props.data?.postConnection?.edges || []
 
-  const titleColorClasses: Record<string, string> = {
-    blue: 'group-hover:text-blue-600 dark:group-hover:text-blue-300',
-    teal: 'group-hover:text-teal-600 dark:group-hover:text-teal-300',
-    green: 'group-hover:text-green-600 dark:group-hover:text-green-300',
-    red: 'group-hover:text-red-600 dark:group-hover:text-red-300',
-    pink: 'group-hover:text-pink-600 dark:group-hover:text-pink-300',
-    purple: 'group-hover:text-purple-600 dark:group-hover:text-purple-300',
-    orange: 'group-hover:text-orange-600 dark:group-hover:text-orange-300',
-    yellow: 'group-hover:text-yellow-500 dark:group-hover:text-yellow-300',
-  }
-
   return (
     <Section className="flex-1">
       <Container size="large" width="small">
@@ -38,11 +28,7 @@ export default function PostsClientPage(props: PostsClientPageProps) {
         </h2>
         {posts.map((postData: any) => {
           const post = postData.node
-          const date = new Date(post.date)
-          let formattedDate = ''
-          if (!isNaN(date.getTime())) {
-            formattedDate = format(date, 'MMM dd, yyyy')
-          }
+          const formattedDate = post.formattedDate || ''
           const postUrl = `/posts/${post._sys.breadcrumbs?.join('/') || post._sys.filename}`
 
           return (
@@ -58,7 +44,7 @@ export default function PostsClientPage(props: PostsClientPageProps) {
               >
                 {post._values?.title || post.title}{' '}
                 <span className="inline-block opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
-                  <BsArrowRight className="inline-block h-8 -mt-1 ml-1 w-auto opacity-70" />
+                  <BiRightArrowAlt className="inline-block h-8 -mt-1 ml-1 w-auto opacity-70" />
                 </span>
               </h3>
               {(post._values?.excerpt || post.excerpt) && (
@@ -69,9 +55,11 @@ export default function PostsClientPage(props: PostsClientPageProps) {
               <div className="flex items-center">
                 {post.author?.avatar && (
                   <div className="flex-shrink-0 mr-2">
-                    <img
-                      className="h-10 w-10 object-cover rounded-full shadow-sm"
-                      src={post.author.avatar}
+                    <Image
+                      width={40}
+                      height={40}
+                      className="object-cover rounded-full shadow-sm"
+                      src={sanitizeImageSrc(post.author.avatar)}
                       alt={post.author?.name || ''}
                     />
                   </div>

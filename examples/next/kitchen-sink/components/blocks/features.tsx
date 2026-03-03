@@ -1,7 +1,6 @@
 'use client'
 import { Actions } from '../layout/actions'
 import { Icon, iconSchema } from '../layout/icon'
-import { iconSchemaWithPicker } from '@/tina/schemas/icon'
 import { Section, Container } from '../layout'
 import RichText from '@/lib/richText'
 import { Card, CardHeader, CardTitle } from '../ui/card'
@@ -170,7 +169,7 @@ export const featureBlockSchema = {
         defaultItem: 'New Feature',
       },
       fields: [
-        iconSchemaWithPicker,
+        iconSchema,
         {
           type: 'string',
           label: 'Title',

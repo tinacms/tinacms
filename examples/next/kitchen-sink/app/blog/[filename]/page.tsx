@@ -1,8 +1,10 @@
 import client from '@/tina/__generated__/client'
-import Layout from '@/components/layout/layout'
+import { formatDate } from '@/lib/utils'
 import BlogClientPage from './client-page'
 
 type Props = { params: Promise<{ filename: string }> }
+
+export const revalidate = 300
 
 export async function generateStaticParams() {
   const pages = await client.queries.blogConnection()
@@ -19,8 +21,10 @@ export default async function BlogFile({ params }: Props) {
   const tinaProps = await client.queries.blog({ relativePath })
 
   return (
-    <Layout rawPageData={tinaProps}>
-      <BlogClientPage {...tinaProps} />
-    </Layout>
+    <BlogClientPage
+      {...tinaProps}
+      formattedPubDate={formatDate(tinaProps.data?.blog?.pubDate)}
+      formattedUpdatedDate={formatDate(tinaProps.data?.blog?.updatedDate)}
+    />
   )
 }

@@ -1,7 +1,15 @@
 'use client'
 import React from 'react'
+import dynamic from 'next/dynamic'
+import Image from 'next/image'
 import { TinaMarkdown, type Components, type TinaMarkdownContent } from 'tinacms/dist/rich-text'
-import { Prism } from 'tinacms/dist/rich-text/prism'
+import { sanitizeImageSrc } from '@/lib/utils'
+
+// Lazily load syntax highlighter — it's large and only needed for code blocks
+const Prism = dynamic(() =>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  import('tinacms/dist/rich-text/prism').then((m) => ({ default: (m as any).Prism ?? m.default }))
+)
 
 export const customComponents: Components<{
   BlockQuote: {
@@ -102,13 +110,20 @@ export const customComponents: Components<{
     )
   },
 
-  img: (props) => (
-    <img 
-      src={props.url} 
-      alt={props.alt} 
-      className="w-full h-auto rounded-lg shadow-md my-8 block"
-    />
-  ),
+  img: (props) => {
+    const src = sanitizeImageSrc(props.url)
+    if (!src) return null
+    return (
+      <Image
+        src={src}
+        alt={props.alt || ''}
+        width={800}
+        height={400}
+        className="w-full rounded-lg shadow-md my-8 block"
+        style={{ height: 'auto' }}
+      />
+    )
+  },
 
   // Standard markdown elements
   p: (props) => (

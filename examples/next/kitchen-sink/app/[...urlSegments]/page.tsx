@@ -1,7 +1,6 @@
 import React from 'react'
 import { notFound } from 'next/navigation'
 import client from '@/tina/__generated__/client'
-import Layout from '@/components/layout/layout'
 import ClientPage from './client-page'
 
 export const revalidate = 300
@@ -24,33 +23,14 @@ export default async function Page({
   }
 
   return (
-    <Layout rawPageData={data}>
-      <ClientPage {...data} />
-    </Layout>
+    <ClientPage {...data} />
   )
 }
 
 export async function generateStaticParams() {
-  let pages = await client.queries.pageConnection()
-  const allPages = pages
+  const allPages = await client.queries.pageConnection({ first: 1000 })
 
-  if (!allPages.data.pageConnection.edges) {
-    return []
-  }
-
-  while (pages.data.pageConnection.pageInfo.hasNextPage) {
-    pages = await client.queries.pageConnection({
-      after: pages.data.pageConnection.pageInfo.endCursor,
-    })
-
-    if (!pages.data.pageConnection.edges) {
-      break
-    }
-
-    allPages.data.pageConnection.edges.push(...pages.data.pageConnection.edges)
-  }
-
-  const params = allPages.data?.pageConnection.edges
+  const params = (allPages.data?.pageConnection.edges ?? [])
     .map((edge: any) => ({
       urlSegments: edge?.node?._sys.breadcrumbs || [],
     }))

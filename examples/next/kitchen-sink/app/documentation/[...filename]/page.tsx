@@ -1,9 +1,10 @@
 import React from 'react'
 import client from '../../../tina/__generated__/client'
-import Layout from '@/components/layout/layout'
 import DocumentationClientPage from './client-page'
 
 type Props = { params: Promise<{ filename: string[] }> }
+
+export const revalidate = 300
 
 export async function generateStaticParams() {
   const pages = await client.queries.documentationConnection()
@@ -22,12 +23,10 @@ export default async function DocFile({ params }: Props) {
   const tinaProps = await client.queries.documentation({ relativePath })
 
   return (
-    <Layout rawPageData={tinaProps}>
-      <DocumentationClientPage
-        query={tinaProps.query}
-        variables={tinaProps.variables}
-        data={JSON.parse(JSON.stringify(tinaProps.data))}
-      />
-    </Layout>
+    <DocumentationClientPage
+      query={tinaProps.query}
+      variables={tinaProps.variables}
+      data={JSON.parse(JSON.stringify(tinaProps.data))}
+    />
   )
 }

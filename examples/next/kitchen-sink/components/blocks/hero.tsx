@@ -1,40 +1,12 @@
 'use client'
+import Image from 'next/image'
 import { Actions } from '../layout/actions'
 import { Container } from '../layout'
 import RichText from '@/lib/richText'
 import { Section } from '../layout'
-
-function sanitizeImageSrc(src: unknown): string {
-  if (typeof src !== 'string') return ''
-  const trimmed = src.trim()
-  if (!trimmed) return ''
-  // Allow relative paths
-  if (trimmed.startsWith('/') || trimmed.startsWith('./') || trimmed.startsWith('../')) {
-    return trimmed
-  }
-  // Allow http/https absolute URLs
-  try {
-    const url = new URL(trimmed)
-    if (url.protocol === 'http:' || url.protocol === 'https:') {
-      return trimmed
-    }
-  } catch {
-    return ''
-  }
-  return ''
-}
+import { sanitizeImageSrc } from '@/lib/utils'
 
 export const Hero = ({ data, parentField }: any) => {
-  const headlineColorClasses = {
-    blue: 'from-blue-400 to-blue-600',
-    teal: 'from-teal-400 to-teal-600',
-    green: 'from-green-400 to-green-600',
-    red: 'from-red-400 to-red-600',
-    pink: 'from-pink-400 to-pink-600',
-    purple: 'from-purple-400 to-purple-600',
-    orange: 'from-orange-300 to-orange-600',
-    yellow: 'from-yellow-400 to-yellow-800',
-  }
 
   return (
     <Section color={data.color}>
@@ -81,23 +53,33 @@ export const Hero = ({ data, parentField }: any) => {
             />
           )}
         </div>
-        {data.image && (
+        {data.image && (() => {
+          const imgSrc = sanitizeImageSrc(data.image.src)
+          if (!imgSrc) return null
+          return (
           <div
             data-tinafield={`${parentField}.image`}
             className="relative row-start-1 lg:col-span-2 flex justify-center"
           >
-            <img
-              className="absolute w-full rounded-lg max-w-xs lg:max-w-none h-auto blur-2xl brightness-150 contrast-[0.9] dark:brightness-150 saturate-200 opacity-50 dark:opacity-30 mix-blend-multiply dark:mix-blend-hard-light"
-              src={sanitizeImageSrc(data.image.src)}
+            {/* Decorative gradient blur background instead of duplicate image */}
+            <div
+              className="absolute w-full rounded-lg max-w-xs lg:max-w-none h-full blur-2xl opacity-40 dark:opacity-20 mix-blend-multiply dark:mix-blend-hard-light"
+              style={{
+                background: `linear-gradient(135deg, rgba(59, 130, 246, 0.6), rgba(168, 85, 247, 0.4))`,
+              }}
               aria-hidden="true"
             />
-            <img
+            <Image
               className="relative z-10 w-full max-w-xs rounded-lg lg:max-w-none h-auto"
               alt={data.image.alt}
-              src={sanitizeImageSrc(data.image.src)}
+              src={imgSrc}
+              width={800}
+              height={600}
+              style={{ height: 'auto' }}
             />
           </div>
-        )}
+          )
+        })()}
       </Container>
     </Section>
   )

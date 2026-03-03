@@ -1,9 +1,10 @@
 import React from 'react'
 import client from '../../../tina/__generated__/client'
-import Layout from '@/components/layout/layout'
 import TagClientPage from './client-page'
 
 type Props = { params: Promise<{ filename: string }> }
+
+export const revalidate = 300
 
 export async function generateStaticParams() {
   const pages = await client.queries.tagConnection()
@@ -20,12 +21,10 @@ export default async function TagFile({ params }: Props) {
   const tinaProps = await client.queries.tag({ relativePath })
 
   return (
-    <Layout rawPageData={tinaProps}>
-      <TagClientPage
-        query={tinaProps.query}
-        variables={tinaProps.variables}
-        data={JSON.parse(JSON.stringify(tinaProps.data))}
-      />
-    </Layout>
+    <TagClientPage
+      query={tinaProps.query}
+      variables={tinaProps.variables}
+      data={JSON.parse(JSON.stringify(tinaProps.data))}
+    />
   )
 }

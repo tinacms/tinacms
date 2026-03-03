@@ -1,10 +1,12 @@
 'use client'
 
-import { Hero } from './hero'
-import { Features } from './features'
-import { CTA } from './cta'
-import { Testimonial } from './testimonial'
-import { Content } from './content'
+import dynamic from 'next/dynamic'
+
+const Hero = dynamic(() => import('./hero').then((m) => ({ default: m.Hero })))
+const Features = dynamic(() => import('./features').then((m) => ({ default: m.Features })))
+const CTA = dynamic(() => import('./cta').then((m) => ({ default: m.CTA })))
+const Testimonial = dynamic(() => import('./testimonial').then((m) => ({ default: m.Testimonial })))
+const Content = dynamic(() => import('./content').then((m) => ({ default: m.Content })))
 
 const typeNameMap: Record<string, string> = {
   // New schema typenames (page.blocks.*)
