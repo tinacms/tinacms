@@ -35,6 +35,7 @@ export default function PostsClientPage(props: PostsClientPageProps) {
             <Link
               key={post._sys.filename}
               href={postUrl}
+              data-testid={`post-card-${post._sys.filename}`}
               className="group block px-6 sm:px-8 md:px-10 py-10 mb-8 last:mb-0 bg-gray-50 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-1000 rounded shadow-sm transition-all duration-150 ease-out hover:shadow-md hover:to-gray-50 dark:hover:to-gray-800"
             >
               <h3
@@ -52,7 +53,7 @@ export default function PostsClientPage(props: PostsClientPageProps) {
                   <TinaMarkdown content={post._values?.excerpt || post.excerpt} />
                 </div>
               )}
-              <div className="flex items-center">
+              <div className="flex items-center" data-testid={`post-author-${post._sys.filename}`}>
                 {post.author?.avatar && (
                   <div className="flex-shrink-0 mr-2">
                     <Image

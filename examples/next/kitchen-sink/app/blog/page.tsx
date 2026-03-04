@@ -30,6 +30,7 @@ export default async function BlogsPage() {
               <Link
                 key={blog._sys.filename}
                 href={href}
+                data-testid={`blog-card-${blog._sys.filename}`}
                 className="group flex flex-col bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow"
               >
                 {blog.heroImage && (
@@ -52,7 +53,7 @@ export default async function BlogsPage() {
                       {blog.description}
                     </p>
                   )}
-                  <div className="flex items-center mt-4 gap-2">
+                  <div className="flex items-center mt-4 gap-2" data-testid={`blog-author-${blog._sys.filename}`}>
                     {blog.author?.avatar && (
                       <Image
                         src={sanitizeImageSrc(blog.author.avatar)}

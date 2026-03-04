@@ -15,7 +15,9 @@
     "start": "next start",
     "lint": "biome lint .",
     "format": "biome format --write .",
-    "searchindex": "tinacms search-index"
+    "searchindex": "tinacms search-index",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
@@ -36,6 +38,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "catalog:",
+    "@playwright/test": "catalog:",
     "@puppeteer/replay": "catalog:",
     "@tailwindcss/postcss": "^4.2.1",
     "@tinacms/app": "workspace:*",
