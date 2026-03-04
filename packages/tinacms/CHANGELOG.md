@@ -1,5 +1,12 @@
 # tinacms
 
+## 3.6.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/search@1.2.6
+
 ## 3.6.0
 
 ### Minor Changes
