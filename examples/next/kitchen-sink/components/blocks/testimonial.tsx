@@ -1,5 +1,5 @@
-'use client'
-import { Section, Container, useLayout } from '../layout'
+'use client';
+import { Section, Container, useLayout } from '../layout';
 
 const authorColorMap: Record<string, string> = {
   blue: 'text-blue-500 dark:text-blue-300',
@@ -10,15 +10,15 @@ const authorColorMap: Record<string, string> = {
   purple: 'text-purple-500 dark:text-purple-300',
   orange: 'text-orange-500 dark:text-orange-300',
   yellow: 'text-yellow-500 dark:text-yellow-300',
-}
+};
 
 export const Testimonial = ({ data, parentField = '' }) => {
-  const { theme } = useLayout()
-  const authorColor = authorColorMap[theme.color] ?? authorColorMap.orange
+  const { theme } = useLayout();
+  const authorColor = authorColorMap[theme.color] ?? authorColorMap.orange;
 
   return (
     <Section color={data.color}>
-      <Container size="large">
+      <Container size='large'>
         <blockquote>
           <div
             className={`relative z-10 max-w-3xl mx-auto text-4xl lg:text-5xl font-bold tracking-normal text-center title-font ${
@@ -27,16 +27,20 @@ export const Testimonial = ({ data, parentField = '' }) => {
                 : `text-gray-700 dark:text-gray-50`
             }`}
           >
-            <span className={`block opacity-15 text-8xl absolute inset-y-1/2 transform translate-y-2 -left-4 leading-4 -z-1`}>
+            <span
+              className={`block opacity-15 text-8xl absolute inset-y-1/2 transform translate-y-2 -left-4 leading-4 -z-1`}
+            >
               &ldquo;
             </span>
             <p
               data-tinafield={`${parentField}.quote`}
-              className="relative opacity-95"
+              className='relative opacity-95'
             >
               {data.quote}
             </p>
-            <span className={`block opacity-15 text-8xl absolute inset-y-1/2 transform translate-y-3 -right-4 leading-4 -z-1`}>
+            <span
+              className={`block opacity-15 text-8xl absolute inset-y-1/2 transform translate-y-3 -right-4 leading-4 -z-1`}
+            >
               &rdquo;
             </span>
           </div>
@@ -49,13 +53,11 @@ export const Testimonial = ({ data, parentField = '' }) => {
               }`}
             ></span>
           </div>
-          <footer className="text-center">
+          <footer className='text-center'>
             <p
               data-tinafield={`${parentField}.author`}
               className={`tracking-wide title-font font-bold text-lg ${
-                data.color === 'primary'
-                  ? `text-white/80`
-                  : authorColor
+                data.color === 'primary' ? `text-white/80` : authorColor
               }`}
             >
               {data.author}
@@ -64,8 +66,8 @@ export const Testimonial = ({ data, parentField = '' }) => {
         </blockquote>
       </Container>
     </Section>
-  )
-}
+  );
+};
 
 export const testimonialBlockSchema = {
   name: 'testimonial',
@@ -104,4 +106,4 @@ export const testimonialBlockSchema = {
       ],
     },
   ],
-}
+};

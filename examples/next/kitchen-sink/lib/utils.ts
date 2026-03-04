@@ -12,19 +12,23 @@ export function cn(...inputs: ClassValue[]) {
  * image to be omitted by the surrounding conditional guard.
  */
 export function sanitizeImageSrc(src: unknown): string {
-  if (typeof src !== 'string') return ''
-  const trimmed = src.trim()
-  if (!trimmed) return ''
-  if (trimmed.startsWith('/') || trimmed.startsWith('./') || trimmed.startsWith('../')) {
-    return trimmed
+  if (typeof src !== 'string') return '';
+  const trimmed = src.trim();
+  if (!trimmed) return '';
+  if (
+    trimmed.startsWith('/') ||
+    trimmed.startsWith('./') ||
+    trimmed.startsWith('../')
+  ) {
+    return trimmed;
   }
   try {
-    const url = new URL(trimmed)
-    if (url.protocol === 'http:' || url.protocol === 'https:') return trimmed
+    const url = new URL(trimmed);
+    if (url.protocol === 'http:' || url.protocol === 'https:') return trimmed;
   } catch {
-    return ''
+    return '';
   }
-  return ''
+  return '';
 }
 
 /**
@@ -32,13 +36,17 @@ export function sanitizeImageSrc(src: unknown): string {
  * Returns empty string if date is invalid or not provided
  */
 export function formatDate(raw: string | undefined | null): string {
-  if (!raw) return ''
+  if (!raw) return '';
   try {
-    const d = new Date(raw)
-    if (isNaN(d.getTime())) return ''
-    return d.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
+    const d = new Date(raw);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleDateString('en-US', {
+      month: 'short',
+      day: '2-digit',
+      year: 'numeric',
+    });
   } catch {
-    return ''
+    return '';
   }
 }
 
@@ -52,10 +60,13 @@ export const titleColorClasses: Record<string, string> = {
   green: 'from-green-400 to-green-600 dark:from-green-300 dark:to-green-500',
   red: 'from-red-400 to-red-600 dark:from-red-300 dark:to-red-500',
   pink: 'from-pink-300 to-pink-500 dark:from-pink-300 dark:to-pink-500',
-  purple: 'from-purple-400 to-purple-600 dark:from-purple-300 dark:to-purple-500',
-  orange: 'from-orange-300 to-orange-600 dark:from-orange-200 dark:to-orange-500',
-  yellow: 'from-yellow-400 to-yellow-500 dark:from-yellow-300 dark:to-yellow-500',
-}
+  purple:
+    'from-purple-400 to-purple-600 dark:from-purple-300 dark:to-purple-500',
+  orange:
+    'from-orange-300 to-orange-600 dark:from-orange-200 dark:to-orange-500',
+  yellow:
+    'from-yellow-400 to-yellow-500 dark:from-yellow-300 dark:to-yellow-500',
+};
 
 /**
  * Solid button color classes
@@ -64,13 +75,17 @@ export const titleColorClasses: Record<string, string> = {
 export const buttonColorClasses: Record<string, string> = {
   blue: 'text-white bg-blue-500 hover:bg-blue-600 bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-400 hover:to-blue-500',
   teal: 'text-white bg-teal-500 hover:bg-teal-600 bg-gradient-to-r from-teal-400 to-teal-600 hover:from-teal-400 hover:to-teal-500',
-  green: 'text-white bg-green-500 hover:bg-green-600 bg-gradient-to-r from-green-400 to-green-600 hover:from-green-400 hover:to-green-500',
+  green:
+    'text-white bg-green-500 hover:bg-green-600 bg-gradient-to-r from-green-400 to-green-600 hover:from-green-400 hover:to-green-500',
   red: 'text-white bg-red-500 hover:bg-red-600 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-400 hover:to-red-500',
   pink: 'text-white bg-pink-500 hover:bg-pink-600 bg-gradient-to-r from-pink-400 to-pink-600 hover:from-pink-400 hover:to-pink-500',
-  purple: 'text-white bg-purple-500 hover:bg-purple-600 bg-gradient-to-r from-purple-400 to-purple-600 hover:from-purple-400 hover:to-purple-500',
-  orange: 'text-white bg-orange-500 hover:bg-orange-600 bg-gradient-to-r from-orange-400 to-orange-600 hover:from-orange-400 hover:to-orange-500',
-  yellow: 'text-gray-800 bg-yellow-500 hover:bg-yellow-600 bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-400 hover:to-yellow-500',
-}
+  purple:
+    'text-white bg-purple-500 hover:bg-purple-600 bg-gradient-to-r from-purple-400 to-purple-600 hover:from-purple-400 hover:to-purple-500',
+  orange:
+    'text-white bg-orange-500 hover:bg-orange-600 bg-gradient-to-r from-orange-400 to-orange-600 hover:from-orange-400 hover:to-orange-500',
+  yellow:
+    'text-gray-800 bg-yellow-500 hover:bg-yellow-600 bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-400 hover:to-yellow-500',
+};
 
 /**
  * Inverted button color classes (light background with colored text)
@@ -79,13 +94,17 @@ export const buttonColorClasses: Record<string, string> = {
 export const invertedButtonColorClasses: Record<string, string> = {
   blue: 'text-blue-500 bg-white hover:bg-gray-50 bg-gradient-to-r from-gray-50 to-white hover:to-gray-100',
   teal: 'text-teal-500 bg-white hover:bg-gray-50 bg-gradient-to-r from-gray-50 to-white hover:to-gray-100',
-  green: 'text-green-500 bg-white hover:bg-gray-50 bg-gradient-to-r from-gray-50 to-white hover:to-gray-100',
+  green:
+    'text-green-500 bg-white hover:bg-gray-50 bg-gradient-to-r from-gray-50 to-white hover:to-gray-100',
   red: 'text-red-500 bg-white hover:bg-gray-50 bg-gradient-to-r from-gray-50 to-white hover:to-gray-100',
   pink: 'text-pink-500 bg-white hover:bg-gray-50 bg-gradient-to-r from-gray-50 to-white hover:to-gray-100',
-  purple: 'text-purple-500 bg-white hover:bg-gray-50 bg-gradient-to-r from-gray-50 to-white hover:to-gray-100',
-  orange: 'text-orange-500 bg-white hover:bg-gray-50 bg-gradient-to-r from-gray-50 to-white hover:to-gray-100',
-  yellow: 'text-yellow-500 bg-white hover:bg-gray-50 bg-gradient-to-r from-gray-50 to-white hover:to-gray-100',
-}
+  purple:
+    'text-purple-500 bg-white hover:bg-gray-50 bg-gradient-to-r from-gray-50 to-white hover:to-gray-100',
+  orange:
+    'text-orange-500 bg-white hover:bg-gray-50 bg-gradient-to-r from-gray-50 to-white hover:to-gray-100',
+  yellow:
+    'text-yellow-500 bg-white hover:bg-gray-50 bg-gradient-to-r from-gray-50 to-white hover:to-gray-100',
+};
 
 /**
  * Link-style button color classes (text only, no background)
@@ -94,13 +113,17 @@ export const invertedButtonColorClasses: Record<string, string> = {
 export const linkButtonColorClasses: Record<string, string> = {
   blue: 'text-blue-600 dark:text-blue-400 hover:text-blue-400 dark:hover:text-blue-200',
   teal: 'text-teal-600 dark:text-teal-400 hover:text-teal-400 dark:hover:text-teal-200',
-  green: 'text-green-600 dark:text-green-400 hover:text-green-400 dark:hover:text-green-200',
+  green:
+    'text-green-600 dark:text-green-400 hover:text-green-400 dark:hover:text-green-200',
   red: 'text-red-600 dark:text-red-400 hover:text-red-400 dark:hover:text-red-200',
   pink: 'text-pink-600 dark:text-pink-400 hover:text-pink-400 dark:hover:text-pink-200',
-  purple: 'text-purple-600 dark:text-purple-400 hover:text-purple-400 dark:hover:text-purple-200',
-  orange: 'text-orange-600 dark:text-orange-400 hover:text-orange-400 dark:hover:text-orange-200',
-  yellow: 'text-yellow-600 dark:text-yellow-400 hover:text-yellow-400 dark:hover:text-yellow-200',
-}
+  purple:
+    'text-purple-600 dark:text-purple-400 hover:text-purple-400 dark:hover:text-purple-200',
+  orange:
+    'text-orange-600 dark:text-orange-400 hover:text-orange-400 dark:hover:text-orange-200',
+  yellow:
+    'text-yellow-600 dark:text-yellow-400 hover:text-yellow-400 dark:hover:text-yellow-200',
+};
 
 /**
  * Hero/headline background gradient color classes
@@ -115,7 +138,7 @@ export const headlineColorClasses: Record<string, string> = {
   purple: 'from-purple-400 to-purple-600',
   orange: 'from-orange-300 to-orange-600',
   yellow: 'from-yellow-400 to-yellow-800',
-}
+};
 
 /**
  * Header background color classes
@@ -132,7 +155,7 @@ export const headerColorClasses: Record<string, string> = {
   purple: 'text-white from-purple-500 to-purple-600',
   orange: 'text-white from-orange-500 to-orange-600',
   yellow: 'text-white from-yellow-500 to-yellow-600',
-}
+};
 
 /**
  * Active navigation item border color classes
@@ -147,7 +170,7 @@ export const activeItemClasses: Record<string, string> = {
   purple: 'border-b-3 border-purple-200',
   orange: 'border-b-3 border-orange-200',
   yellow: 'border-b-3 border-yellow-200',
-}
+};
 
 /**
  * Background color classes for active navigation items
@@ -162,4 +185,4 @@ export const activeBackgroundClasses: Record<string, string> = {
   purple: 'text-purple-600 dark:text-purple-300',
   orange: 'text-orange-600 dark:text-orange-300',
   yellow: 'text-yellow-600 dark:text-yellow-300',
-}
+};

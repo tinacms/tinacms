@@ -1,6 +1,6 @@
-'use client'
-import { Section, Container } from '../layout'
-import RichText from '@/lib/richText'
+'use client';
+import { Section, Container } from '../layout';
+import RichText from '@/lib/richText';
 
 export const Content = ({ data, parentField = '' }) => {
   return (
@@ -9,15 +9,15 @@ export const Content = ({ data, parentField = '' }) => {
         className={`prose prose-lg ${
           data.color === 'primary' ? `prose-primary` : `dark:prose-dark`
         }`}
-        size="large"
-        width="medium"
+        size='large'
+        width='medium'
         data-tinafield={`${parentField}.body`}
       >
         <RichText content={data.body} />
       </Container>
     </Section>
-  )
-}
+  );
+};
 
 export const contentBlockSchema = {
   name: 'content',
@@ -45,4 +45,4 @@ export const contentBlockSchema = {
       ],
     },
   ],
-}
+};

@@ -1,4 +1,4 @@
-import { defineConfig, devices } from '@playwright/test'
+import { defineConfig, devices } from '@playwright/test';
 
 /**
  * Playwright configuration for kitchen-sink example app E2E tests.
@@ -30,11 +30,12 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: process.platform === 'win32'
-      ? 'set MONOREPO_DEV=true && pnpm tinacms dev -c "next dev"'
-      : 'pnpm dev',
+    command:
+      process.platform === 'win32'
+        ? 'set MONOREPO_DEV=true && pnpm tinacms dev -c "next dev"'
+        : 'pnpm dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
   },
-})
+});

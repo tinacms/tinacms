@@ -1,10 +1,13 @@
-export { Section, sectionColorOptions, sectionBlockSchemaField } from './section'
-export { Container } from './container'
-export { Theme, useTheme } from './theme'
-export { Actions } from './actions'
-export { Icon, iconSchema, IconOptions } from './icon'
-export { useLayout } from './layout-context'
-export { LayoutProvider } from './layout-context'
-export { Header } from './header'
-export { Footer } from './footer'
-
+export {
+  Section,
+  sectionColorOptions,
+  sectionBlockSchemaField,
+} from './section';
+export { Container } from './container';
+export { Theme, useTheme } from './theme';
+export { Actions } from './actions';
+export { Icon, iconSchema, IconOptions } from './icon';
+export { useLayout } from './layout-context';
+export { LayoutProvider } from './layout-context';
+export { Header } from './header';
+export { Footer } from './footer';

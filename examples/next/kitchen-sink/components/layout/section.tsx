@@ -1,9 +1,9 @@
-'use client'
-import React from 'react'
-import { useLayout } from './layout-context'
+'use client';
+import React from 'react';
+import { useLayout } from './layout-context';
 
 export const Section = ({ children, color = '', className = '' }) => {
-  const { theme } = useLayout()
+  const { theme } = useLayout();
   const sectionColor = {
     default:
       'text-gray-800 dark:text-gray-50 bg-gradient-to-tl from-gray-50 dark:from-gray-900 via-transparent to-transparent',
@@ -22,13 +22,13 @@ export const Section = ({ children, color = '', className = '' }) => {
       yellow:
         'text-white bg-yellow-500 bg-gradient-to-br from-yellow-500 to-yellow-600',
     },
-  }
+  };
   const sectionColorCss =
     color === 'primary'
       ? sectionColor.primary[theme.color]
       : sectionColor[color]
-      ? sectionColor[color]
-      : sectionColor.default
+        ? sectionColor[color]
+        : sectionColor.default;
 
   return (
     <section
@@ -36,18 +36,18 @@ export const Section = ({ children, color = '', className = '' }) => {
     >
       {children}
     </section>
-  )
-}
+  );
+};
 
 export const sectionColorOptions = [
-  { label: "Default", value: "default" },
-  { label: "Tint", value: "tint" },
-  { label: "Primary", value: "primary" },
+  { label: 'Default', value: 'default' },
+  { label: 'Tint', value: 'tint' },
+  { label: 'Primary', value: 'primary' },
 ];
 
 export const sectionBlockSchemaField = {
-  type: "string",
-  label: "Color",
-  name: "color",
+  type: 'string',
+  label: 'Color',
+  name: 'color',
   options: sectionColorOptions,
-}
+};

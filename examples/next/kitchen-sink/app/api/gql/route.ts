@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server'
-import { databaseRequest } from '../../../lib/databaseConntection'
+import { NextResponse } from 'next/server';
+import { databaseRequest } from '../../../lib/databaseConntection';
 
 export async function GET() {
   return NextResponse.json({
@@ -32,17 +32,16 @@ export async function GET() {
       documentation: '/gql',
       graphqlDocs: 'https://tina.io/docs/graphql/overview',
     },
-  })
+  });
 }
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
-    const { query, variables } = body ?? {}
-    const result = await databaseRequest({ query, variables })
-    return NextResponse.json(result)
+    const body = await request.json();
+    const { query, variables } = body ?? {};
+    const result = await databaseRequest({ query, variables });
+    return NextResponse.json(result);
   } catch (err: any) {
-    return NextResponse.json({ error: String(err) }, { status: 500 })
+    return NextResponse.json({ error: String(err) }, { status: 500 });
   }
 }
-

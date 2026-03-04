@@ -1,5 +1,5 @@
-import { ColorPickerInput } from '../fields/color'
-import { IconPickerInput } from '../fields/icon'
+import { ColorPickerInput } from '../fields/color';
+import { IconPickerInput } from '../fields/icon';
 
 /**
  * Icon schema with the full custom field UI pickers wired in.
@@ -36,4 +36,4 @@ export const iconSchemaWithPicker = {
       ],
     },
   ],
-}
+};

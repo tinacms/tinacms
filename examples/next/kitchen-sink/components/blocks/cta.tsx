@@ -1,34 +1,34 @@
-'use client'
-import Link from 'next/link'
-import { Section, Container } from '../layout'
-import RichText from '@/lib/richText'
-import { Actions } from '../layout/actions'
+'use client';
+import Link from 'next/link';
+import { Section, Container } from '../layout';
+import RichText from '@/lib/richText';
+import { Actions } from '../layout/actions';
 
 export const CTA = ({ data, parentField = '' }: any) => {
   return (
     <Section color={data.color}>
-      <Container size="large">
-        <div className="text-center">
+      <Container size='large'>
+        <div className='text-center'>
           <h2
             data-tinafield={`${parentField}.title`}
-            className="text-balance text-4xl font-semibold lg:text-5xl text-inherit"
+            className='text-balance text-4xl font-semibold lg:text-5xl text-inherit'
           >
             {data.title}
           </h2>
           {data.description && (
             <div
               data-tinafield={`${parentField}.description`}
-              className="mt-4 text-inherit opacity-90 max-w-2xl mx-auto"
+              className='mt-4 text-inherit opacity-90 max-w-2xl mx-auto'
             >
               <RichText content={data.description} />
             </div>
           )}
 
           {data.actions && (
-            <div className="mt-12">
+            <div className='mt-12'>
               <Actions
                 parentField={`${parentField}.actions`}
-                className="justify-center py-2"
+                className='justify-center py-2'
                 parentColor={data.color}
                 actions={data.actions}
               />
@@ -37,8 +37,8 @@ export const CTA = ({ data, parentField = '' }: any) => {
         </div>
       </Container>
     </Section>
-  )
-}
+  );
+};
 
 export const ctaBlockSchema = {
   name: 'cta',
@@ -112,4 +112,4 @@ export const ctaBlockSchema = {
       ],
     },
   ],
-}
+};

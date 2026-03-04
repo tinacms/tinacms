@@ -1,24 +1,24 @@
-import React from 'react'
-import client from '../../../tina/__generated__/client'
-import TagClientPage from './client-page'
+import React from 'react';
+import client from '../../../tina/__generated__/client';
+import TagClientPage from './client-page';
 
-type Props = { params: Promise<{ filename: string }> }
+type Props = { params: Promise<{ filename: string }> };
 
-export const revalidate = 300
+export const revalidate = 300;
 
 export async function generateStaticParams() {
-  const pages = await client.queries.tagConnection()
+  const pages = await client.queries.tagConnection();
   const paths = pages.data?.tagConnection?.edges?.map((edge) => ({
     filename: edge?.node?._sys?.filename?.replace(/\.(md|mdx|json)$/, ''),
-  }))
+  }));
 
-  return paths || []
+  return paths || [];
 }
 
 export default async function TagFile({ params }: Props) {
-  const { filename } = await params
-  const relativePath = `${filename}.json`
-  const tinaProps = await client.queries.tag({ relativePath })
+  const { filename } = await params;
+  const relativePath = `${filename}.json`;
+  const tinaProps = await client.queries.tag({ relativePath });
 
   return (
     <TagClientPage
@@ -26,5 +26,5 @@ export default async function TagFile({ params }: Props) {
       variables={tinaProps.variables}
       data={JSON.parse(JSON.stringify(tinaProps.data))}
     />
-  )
+  );
 }

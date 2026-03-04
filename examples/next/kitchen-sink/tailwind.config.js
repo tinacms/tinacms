@@ -1,6 +1,6 @@
-import colors from 'tailwindcss/colors'
-import defaultTheme from 'tailwindcss/defaultTheme'
-import typography from '@tailwindcss/typography'
+import colors from 'tailwindcss/colors';
+import defaultTheme from 'tailwindcss/defaultTheme';
+import typography from '@tailwindcss/typography';
 
 export default {
   content: ['./app/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}'],
@@ -226,4 +226,4 @@ export default {
     extend: { typography: ['dark', 'primary'] },
   },
   plugins: [typography],
-}
+};

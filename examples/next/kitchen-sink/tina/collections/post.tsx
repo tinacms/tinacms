@@ -25,7 +25,7 @@ const Post: Collection = {
       ui: {
         validate: (value: string) => {
           if (!value || value.trim().length < 5) {
-            return 'Title must be at least 5 characters'
+            return 'Title must be at least 5 characters';
           }
         },
       },
@@ -60,7 +60,7 @@ const Post: Collection = {
         timeFormat: 'hh:mm A',
         validate: (value: string) => {
           if (value && new Date(value) > new Date()) {
-            return 'Posted date cannot be in the future'
+            return 'Posted date cannot be in the future';
           }
         },
       },
