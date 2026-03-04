@@ -38,8 +38,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build workspace packages
+        run: pnpm run build
+
       - name: Install Playwright browsers
-        run: pnpm --filter kitchen-sink exec playwright install --with-deps
+        run: pnpm --filter kitchen-sink exec playwright install --with-deps chromium
 
       - name: Run kitchen-sink Playwright tests
         run: pnpm --filter kitchen-sink test:e2e
