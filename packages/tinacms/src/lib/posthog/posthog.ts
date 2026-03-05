@@ -31,12 +31,17 @@ export type SavedContentPayload = {
 // When a user adds an item to the media manager
 export const MediaManagerContentUploadedEvent: string =
   'media-manager-content-uploaded';
-export type MediaManagerContentUploadedPayload = Record<string, never>;
+export type MediaManagerContentUploadedPayload = {
+  fileType: string;
+  fileCount: number;
+};
 
 // When a user deletes an item from the media manager
 export const MediaManagerContentDeletedEvent: string =
   'media-manager-content-deleted';
-export type MediaManagerContentDeletedPayload = Record<string, never>;
+export type MediaManagerContentDeletedPayload = {
+  fileType: string;
+};
 
 // Switching between raw and rich-text editor modes
 export const RichTextEditorSwitchedEvent: string = 'rich-text-editor-switched';
