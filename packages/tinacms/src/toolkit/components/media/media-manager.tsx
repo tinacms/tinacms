@@ -40,6 +40,7 @@ import {
   dropzoneAcceptFromString,
   isImage,
 } from './utils';
+import path from 'path';
 const { useDropzone } = dropzone;
 // Can not use path.join on the frontend
 const join = function (...parts) {
@@ -238,7 +239,7 @@ export function MediaPicker({
   if (allowDelete) {
     deleteMediaItem = async (item: Media) => {
       await cms.media.delete(item);
-      const ext = item.filename.split('.').pop()?.toLowerCase() || 'unknown';
+      const ext = path.extname(item.filename).toLowerCase() || 'unknown';
       captureEvent(MediaManagerContentDeletedEvent, { fileType: ext });
     };
   }
