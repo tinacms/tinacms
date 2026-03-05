@@ -97,7 +97,11 @@ test.describe('PostHog Media Manager events - telemetry enabled', () => {
     const uploadEventPromise = page.waitForRequest((request) => {
       if (!request.url().startsWith(POSTHOG_URL_PREFIX)) return false;
       const postData = request.postData();
-      return postData?.includes('media-manager-content-uploaded') ?? false;
+      if (!postData?.includes('media-manager-content-uploaded')) return false;
+      // Verify the payload includes fileType and fileCount properties
+      expect(postData).toContain('fileType');
+      expect(postData).toContain('fileCount');
+      return true;
     });
 
     // Create a test file and trigger upload via the file input
@@ -149,7 +153,10 @@ test.describe('PostHog Media Manager events - telemetry enabled', () => {
     const deleteEventPromise = page.waitForRequest((request) => {
       if (!request.url().startsWith(POSTHOG_URL_PREFIX)) return false;
       const postData = request.postData();
-      return postData?.includes('media-manager-content-deleted') ?? false;
+      if (!postData?.includes('media-manager-content-deleted')) return false;
+      // Verify the payload includes fileType property
+      expect(postData).toContain('fileType');
+      return true;
     });
 
     // Click the Delete button
