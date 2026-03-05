@@ -196,10 +196,16 @@ const CheckSchema = ({
         .checkGraphqlSchema({
           localSchema: schemaJson,
         })
-        .then((x) => {
-          if (x === false) {
+        .then((isSchemaMatchedToCloud) => {
+          if (isSchemaMatchedToCloud === false) {
             cms.alerts.error(
-              'GraphQL Schema Mismatch. Editing may not work. If you just switched branches, try going back to the previous branch'
+              `GraphQL Schema Mismatch - Editing may not work. 
+              
+              If you just switched branches, try going back to the previous branch.
+              
+              If you just pushed changes to the branch, try pulling the latest changes.
+              
+              For more information, please see https://tina.io/docs/tinacloud/troubleshooting`
             );
           }
         })
