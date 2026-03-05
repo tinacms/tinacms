@@ -209,13 +209,13 @@ const CheckSchema = ({
             );
           }
         })
-        .catch((e) => {
+        .catch((error) => {
           // TODO: HACK- Check on an error id, rather than message string
-          if (e.message.includes('has not been indexed by TinaCloud')) {
+          if (error.message.includes('has not been indexed by TinaCloud')) {
             setSchemaMissingError(true);
           } else {
-            cms.alerts.error(`Unexpected error checking schema: ${e}`);
-            throw e;
+            cms.alerts.error(`Unexpected error checking schema: ${error}`);
+            throw error;
           }
         });
     }
