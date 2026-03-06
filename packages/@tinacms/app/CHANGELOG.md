@@ -1,5 +1,14 @@
 # @tinacms/app
 
+## 2.3.29
+
+### Patch Changes
+
+- [#6480](https://github.com/tinacms/tinacms/pull/6480) [`ebaa246`](https://github.com/tinacms/tinacms/commit/ebaa24655a590eef25f856e98a4bbdae7d26b2a0) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🦙 Add favicon when using TinaCMS editor
+
+- Updated dependencies [[`3b44e6a`](https://github.com/tinacms/tinacms/commit/3b44e6ad9bd2ff336aa8147b016de8b9bbb6f90d), [`35385f1`](https://github.com/tinacms/tinacms/commit/35385f16fe9e4cb386021445c8e1cb817a03dcd3), [`83ed83f`](https://github.com/tinacms/tinacms/commit/83ed83f27624134feffa0473f02b0f6f3318441b), [`8f08f49`](https://github.com/tinacms/tinacms/commit/8f08f49638edcecaf703681538fa46bbc53df982), [`13e953a`](https://github.com/tinacms/tinacms/commit/13e953a92eebcbfe2a86e12a9161ac6fe52e9236), [`9bc4f3c`](https://github.com/tinacms/tinacms/commit/9bc4f3cccb1ab88cfefcc59da7ad228d250f03d3)]:
+  - tinacms@3.6.2
+
 ## 2.3.28
 
 ### Patch Changes
