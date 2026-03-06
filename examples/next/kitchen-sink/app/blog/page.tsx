@@ -2,8 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import React from 'react';
 import client from '../../tina/__generated__/client';
-import { format } from 'date-fns';
-import { sanitizeImageSrc } from '@/lib/utils';
+import { formatDate, sanitizeImageSrc } from '@/lib/utils';
 
 export const revalidate = 300;
 
@@ -23,9 +22,7 @@ export default async function BlogsPage() {
             const href = `/blog/${blog._sys.filename}`;
             let formattedDate = '';
             if (blog.pubDate) {
-              try {
-                formattedDate = format(new Date(blog.pubDate), 'MMM dd, yyyy');
-              } catch (e) {}
+              formattedDate = formatDate(blog.pubDate);
             }
 
             return (

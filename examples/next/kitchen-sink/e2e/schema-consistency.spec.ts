@@ -240,7 +240,7 @@ test.describe('Schema Consistency — Global Collection', () => {
       'orange',
       'yellow',
     ]).toContain(global.theme.color);
-    expect(['sans', 'serif', 'mono']).toContain(global.theme.font);
+    expect(['sans', 'nunito', 'lato']).toContain(global.theme.font);
     expect(['system', 'light', 'dark']).toContain(global.theme.darkMode);
   });
 });

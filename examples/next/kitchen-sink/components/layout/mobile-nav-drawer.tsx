@@ -4,7 +4,6 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { BiMenu, BiX } from 'react-icons/bi';
-import { activeItemClasses, activeBackgroundClasses } from '@/lib/utils';
 
 interface MobileNavDrawerProps {
   nav: Array<{ href: string; label: string }>;

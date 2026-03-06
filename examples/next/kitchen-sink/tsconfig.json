@@ -23,14 +23,13 @@
       {
         "name": "next"
       }
-    ]
-    ,
+    ],
     "baseUrl": ".",
     "paths": {
       "@/*": [
         "./*"
       ]
-    },
+    }
   },
   "exclude": [
     "node_modules"

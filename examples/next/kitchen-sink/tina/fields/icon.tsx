@@ -91,6 +91,7 @@ export const IconPickerInput = wrapFieldsWithMeta(({ input }: any) => {
                       {filteredBlocks.length > 0 && (
                         <div className='w-full grid grid-cols-6 auto-rows-auto p-2 overflow-y-auto'>
                           <button
+                            type='button'
                             className='rounded-lg text-center text-xs py-2 px-3 flex-1 outline-none transition-all ease-out duration-150 hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50'
                             key='clear-input'
                             onClick={() => {
@@ -105,6 +106,7 @@ export const IconPickerInput = wrapFieldsWithMeta(({ input }: any) => {
                             const IconComponent = (IconOptions as any)[name];
                             return (
                               <button
+                                type='button'
                                 className='rounded-lg text-center text-xs py-2 px-3 flex-1 outline-none transition-all ease-out duration-150 hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50'
                                 key={name}
                                 title={parseIconName(name)}

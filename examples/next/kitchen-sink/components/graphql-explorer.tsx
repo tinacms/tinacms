@@ -42,7 +42,6 @@ export function GraphQLExplorer() {
   const [result, setResult] = useState<ExecutionResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'query' | 'variables'>('query');
   const [responseTab, setResponseTab] = useState<'data' | 'raw'>('data');
 
   const executeQuery = async () => {

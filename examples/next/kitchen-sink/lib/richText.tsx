@@ -15,9 +15,9 @@ function sanitizeHref(value: unknown): string {
   ) {
     return '#';
   }
-  // Allow relative URLs
+  // Allow relative URLs (but not protocol-relative like //evil.com)
   if (
-    trimmed.startsWith('/') ||
+    (trimmed.startsWith('/') && !trimmed.startsWith('//')) ||
     trimmed.startsWith('./') ||
     trimmed.startsWith('../') ||
     trimmed.startsWith('#')
@@ -35,8 +35,7 @@ function sanitizeHref(value: unknown): string {
       return trimmed;
     }
   } catch {
-    // not a valid absolute URL — treat as relative
-    return trimmed;
+    return '#';
   }
   return '#';
 }
