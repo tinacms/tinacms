@@ -3,6 +3,10 @@ import { withRef } from '@udecode/cn';
 import { Icons } from './icons';
 import { ToolbarButton } from './toolbar';
 import { useEditorContext } from '../../editor-context';
+import {
+  captureEvent,
+  RichTextEditorSwitchedEvent,
+} from '../../../../../../../../src/lib/posthog';
 
 const useRawMarkdownToolbarButton = () => {
   const { setRawMode } = useEditorContext();
@@ -29,6 +33,9 @@ export const RawMarkdownToolbarButton = withRef<
   return (
     <ToolbarButton
       ref={ref}
+      onClick={() =>
+        captureEvent(RichTextEditorSwitchedEvent, { to: 'markdown' })
+      }
       tooltip='Raw Markdown'
       {...rest}
       {...props}
