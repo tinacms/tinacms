@@ -5,22 +5,7 @@
  * are properly resolved and displayed, not just as IDs but as actual related data.
  */
 import { test, expect } from '@playwright/test';
-
-/** Helper to POST a GraphQL query with retry */
-async function gqlQuery(request: any, query: string, retries = 3) {
-  for (let i = 0; i < retries; i++) {
-    const response = await request.post('/api/gql', {
-      headers: { 'Content-Type': 'application/json' },
-      data: { query },
-    });
-    if (response.status() === 200) return response;
-    if (i < retries - 1) await new Promise((r) => setTimeout(r, 3000));
-  }
-  return request.post('/api/gql', {
-    headers: { 'Content-Type': 'application/json' },
-    data: { query },
-  });
-}
+import { gqlQuery } from './helpers';
 
 test.describe('Relationship Resolution — Post Author', () => {
   test('post detail page should display the author name, not an ID', async ({
@@ -28,7 +13,7 @@ test.describe('Relationship Resolution — Post Author', () => {
     request,
   }) => {
     // Fetch a post with its author
-    const gqlResponse = await gqlQuery(
+    const body = await gqlQuery(
       request,
       `{
         postConnection(first: 1) {
@@ -46,9 +31,6 @@ test.describe('Relationship Resolution — Post Author', () => {
         }
       }`
     );
-    expect(gqlResponse.status()).toBe(200);
-
-    const body = await gqlResponse.json();
     const post = body.data.postConnection.edges[0]?.node;
     expect(post).toBeDefined();
 
@@ -80,7 +62,7 @@ test.describe('Relationship Resolution — Post Author', () => {
     request,
   }) => {
     // Fetch posts with their authors
-    const gqlResponse = await gqlQuery(
+    const body = await gqlQuery(
       request,
       `{
         postConnection(first: 100) {
@@ -98,9 +80,6 @@ test.describe('Relationship Resolution — Post Author', () => {
         }
       }`
     );
-    expect(gqlResponse.status()).toBe(200);
-
-    const body = await gqlResponse.json();
     const posts = body.data.postConnection.edges ?? [];
 
     await page.goto('/posts');
@@ -126,7 +105,7 @@ test.describe('Relationship Resolution — Post Author', () => {
     request,
   }) => {
     // Fetch blogs with their authors
-    const gqlResponse = await gqlQuery(
+    const body = await gqlQuery(
       request,
       `{
         blogConnection(first: 100) {
@@ -144,9 +123,6 @@ test.describe('Relationship Resolution — Post Author', () => {
         }
       }`
     );
-    expect(gqlResponse.status()).toBe(200);
-
-    const body = await gqlResponse.json();
     const blogs = body.data.blogConnection.edges ?? [];
 
     await page.goto('/blog');
@@ -174,7 +150,7 @@ test.describe('Relationship Resolution — Documentation Tags', () => {
     request,
   }) => {
     // Fetch documentation with its tags
-    const gqlResponse = await gqlQuery(
+    const body = await gqlQuery(
       request,
       `{
         documentationConnection(first: 1) {
@@ -194,9 +170,6 @@ test.describe('Relationship Resolution — Documentation Tags', () => {
         }
       }`
     );
-    expect(gqlResponse.status()).toBe(200);
-
-    const body = await gqlResponse.json();
     const doc = body.data.documentationConnection.edges[0]?.node;
     expect(doc).toBeDefined();
 
@@ -222,7 +195,7 @@ test.describe('Relationship Resolution — Global Config References', () => {
     request,
   }) => {
     // Fetch the global config with navigation items
-    const gqlResponse = await gqlQuery(
+    const body = await gqlQuery(
       request,
       `{
         global(relativePath: "index.json") {
@@ -235,9 +208,6 @@ test.describe('Relationship Resolution — Global Config References', () => {
         }
       }`
     );
-    expect(gqlResponse.status()).toBe(200);
-
-    const body = await gqlResponse.json();
     const navItems = body.data.global.header.nav ?? [];
     expect(navItems.length).toBeGreaterThan(0);
 
@@ -257,7 +227,7 @@ test.describe('Relationship Resolution — Global Config References', () => {
     request,
   }) => {
     // Fetch the global config
-    const gqlResponse = await gqlQuery(
+    const body = await gqlQuery(
       request,
       `{
         global(relativePath: "index.json") {
@@ -270,9 +240,6 @@ test.describe('Relationship Resolution — Global Config References', () => {
         }
       }`
     );
-    expect(gqlResponse.status()).toBe(200);
-
-    const body = await gqlResponse.json();
     const navItems = body.data.global.header.nav ?? [];
 
     await page.goto('/');
@@ -290,7 +257,7 @@ test.describe('Relationship Resolution — Global Config References', () => {
 
   test('theme color should match global config', async ({ page, request }) => {
     // Fetch the global config theme
-    const gqlResponse = await gqlQuery(
+    const body = await gqlQuery(
       request,
       `{
         global(relativePath: "index.json") {
@@ -300,9 +267,6 @@ test.describe('Relationship Resolution — Global Config References', () => {
         }
       }`
     );
-    expect(gqlResponse.status()).toBe(200);
-
-    const body = await gqlResponse.json();
     const themeColor = body.data.global.theme.color;
 
     await page.goto('/');
@@ -333,7 +297,7 @@ test.describe('Relationship Resolution — Author Avatar', () => {
     request,
   }) => {
     // Fetch blogs with authors that have avatars
-    const gqlResponse = await gqlQuery(
+    const body = await gqlQuery(
       request,
       `{
         blogConnection(first: 100) {
@@ -351,9 +315,6 @@ test.describe('Relationship Resolution — Author Avatar', () => {
         }
       }`
     );
-    expect(gqlResponse.status()).toBe(200);
-
-    const body = await gqlResponse.json();
     const blogs = body.data.blogConnection.edges ?? [];
 
     await page.goto('/blog');

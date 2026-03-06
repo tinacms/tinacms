@@ -16,7 +16,6 @@ export const Footer = () => {
   const { globalSettings, theme } = useLayout();
 
   const footer = globalSettings?.footer;
-  const header = globalSettings?.header;
   const socialIconClasses = 'h-7 w-auto';
 
   const socialIconColorClasses: Record<string, string> = {

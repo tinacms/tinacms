@@ -59,9 +59,9 @@ export const customComponents: Components<{
       case 'utc':
         return <span>{dt.toUTCString()}</span>;
       case 'local':
-        return <span>{dt.toLocaleDateString()}</span>;
+        return <span>{dt.toLocaleDateString('en-AU')}</span>;
       default:
-        return <span>{dt.toLocaleDateString()}</span>;
+        return <span>{dt.toLocaleDateString('en-AU')}</span>;
     }
   },
 

@@ -9,26 +9,7 @@
  * is removed or renamed, these tests will fail.
  */
 import { test, expect } from '@playwright/test';
-
-/** Helper to POST a GraphQL query with retry for transient 500 errors */
-async function gql(request: any, query: string, retries = 3) {
-  let lastResponse: any;
-  for (let i = 0; i < retries; i++) {
-    lastResponse = await request.post('/api/gql', {
-      headers: { 'Content-Type': 'application/json' },
-      data: { query },
-    });
-    if (lastResponse.status() === 200) break;
-    if (i < retries - 1) await new Promise((r) => setTimeout(r, 3000));
-  }
-  expect(lastResponse.status()).toBe(200);
-  const body = await lastResponse.json();
-  // Fail fast with a helpful message if the GraphQL API returned errors
-  if (body.errors) {
-    throw new Error(`GraphQL errors: ${JSON.stringify(body.errors)}`);
-  }
-  return body;
-}
+import { gqlQuery as gql } from './helpers';
 
 test.describe('Schema Consistency — Collections', () => {
   test('all expected collections are queryable', async ({ request }) => {

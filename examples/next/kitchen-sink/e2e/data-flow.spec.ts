@@ -6,22 +6,7 @@
  * returns with what the user sees, ensuring the rendering pipeline works.
  */
 import { test, expect } from '@playwright/test';
-
-/** Helper to POST a GraphQL query with retry */
-async function gqlQuery(request: any, query: string, retries = 3) {
-  for (let i = 0; i < retries; i++) {
-    const response = await request.post('/api/gql', {
-      headers: { 'Content-Type': 'application/json' },
-      data: { query },
-    });
-    if (response.status() === 200) return response;
-    if (i < retries - 1) await new Promise((r) => setTimeout(r, 3000));
-  }
-  return request.post('/api/gql', {
-    headers: { 'Content-Type': 'application/json' },
-    data: { query },
-  });
-}
+import { gqlQuery } from './helpers';
 
 test.describe('Data Flow — Posts', () => {
   test('post detail page should display the title from GraphQL', async ({
@@ -29,7 +14,7 @@ test.describe('Data Flow — Posts', () => {
     request,
   }) => {
     // Fetch the actual post data from GraphQL
-    const gqlResponse = await gqlQuery(
+    const body = await gqlQuery(
       request,
       `{
         postConnection(first: 1) {
@@ -42,9 +27,6 @@ test.describe('Data Flow — Posts', () => {
         }
       }`
     );
-    expect(gqlResponse.status()).toBe(200);
-
-    const body = await gqlResponse.json();
     const firstPost = body.data.postConnection.edges[0]?.node;
     expect(firstPost).toBeDefined();
 
@@ -67,7 +49,7 @@ test.describe('Data Flow — Posts', () => {
     request,
   }) => {
     // Fetch all posts from GraphQL
-    const gqlResponse = await gqlQuery(
+    const body = await gqlQuery(
       request,
       `{
         postConnection(first: 100) {
@@ -80,9 +62,6 @@ test.describe('Data Flow — Posts', () => {
         }
       }`
     );
-    expect(gqlResponse.status()).toBe(200);
-
-    const body = await gqlResponse.json();
     const posts = body.data.postConnection.edges ?? [];
     expect(posts.length).toBeGreaterThan(0);
 
@@ -103,7 +82,7 @@ test.describe('Data Flow — Blog', () => {
     request,
   }) => {
     // Fetch the actual blog data from GraphQL
-    const gqlResponse = await gqlQuery(
+    const body = await gqlQuery(
       request,
       `{
         blogConnection(first: 1) {
@@ -116,9 +95,6 @@ test.describe('Data Flow — Blog', () => {
         }
       }`
     );
-    expect(gqlResponse.status()).toBe(200);
-
-    const body = await gqlResponse.json();
     const firstBlog = body.data.blogConnection.edges[0]?.node;
     expect(firstBlog).toBeDefined();
 
@@ -138,7 +114,7 @@ test.describe('Data Flow — Blog', () => {
     request,
   }) => {
     // Fetch all blogs from GraphQL
-    const gqlResponse = await gqlQuery(
+    const body = await gqlQuery(
       request,
       `{
         blogConnection(first: 100) {
@@ -151,9 +127,6 @@ test.describe('Data Flow — Blog', () => {
         }
       }`
     );
-    expect(gqlResponse.status()).toBe(200);
-
-    const body = await gqlResponse.json();
     const blogs = body.data.blogConnection.edges ?? [];
     expect(blogs.length).toBeGreaterThan(0);
 
@@ -181,7 +154,7 @@ test.describe('Data Flow — Authors', () => {
     request,
   }) => {
     // Fetch the actual author data from GraphQL
-    const gqlResponse = await gqlQuery(
+    const body = await gqlQuery(
       request,
       `{
         authorConnection(first: 1) {
@@ -194,9 +167,6 @@ test.describe('Data Flow — Authors', () => {
         }
       }`
     );
-    expect(gqlResponse.status()).toBe(200);
-
-    const body = await gqlResponse.json();
     const firstAuthor = body.data.authorConnection.edges[0]?.node;
     expect(firstAuthor).toBeDefined();
 
@@ -227,7 +197,7 @@ test.describe('Data Flow — Authors', () => {
     request,
   }) => {
     // Fetch all authors from GraphQL
-    const gqlResponse = await gqlQuery(
+    const body = await gqlQuery(
       request,
       `{
         authorConnection(first: 100) {
@@ -240,9 +210,6 @@ test.describe('Data Flow — Authors', () => {
         }
       }`
     );
-    expect(gqlResponse.status()).toBe(200);
-
-    const body = await gqlResponse.json();
     const authors = body.data.authorConnection.edges ?? [];
     expect(authors.length).toBeGreaterThan(0);
 
@@ -263,7 +230,7 @@ test.describe('Data Flow — Tags', () => {
     request,
   }) => {
     // Fetch all tags from GraphQL
-    const gqlResponse = await gqlQuery(
+    const body = await gqlQuery(
       request,
       `{
         tagConnection(first: 100) {
@@ -276,9 +243,6 @@ test.describe('Data Flow — Tags', () => {
         }
       }`
     );
-    expect(gqlResponse.status()).toBe(200);
-
-    const body = await gqlResponse.json();
     const tags = body.data.tagConnection.edges ?? [];
     expect(tags.length).toBeGreaterThan(0);
 
@@ -299,7 +263,7 @@ test.describe('Data Flow — Documentation', () => {
     request,
   }) => {
     // Fetch the actual documentation data from GraphQL
-    const gqlResponse = await gqlQuery(
+    const body = await gqlQuery(
       request,
       `{
         documentationConnection(first: 1) {
@@ -312,9 +276,6 @@ test.describe('Data Flow — Documentation', () => {
         }
       }`
     );
-    expect(gqlResponse.status()).toBe(200);
-
-    const body = await gqlResponse.json();
     const firstDoc = body.data.documentationConnection.edges[0]?.node;
     expect(firstDoc).toBeDefined();
 
@@ -334,7 +295,7 @@ test.describe('Data Flow — Documentation', () => {
     request,
   }) => {
     // Fetch all documentation from GraphQL
-    const gqlResponse = await gqlQuery(
+    const body = await gqlQuery(
       request,
       `{
         documentationConnection(first: 100) {
@@ -347,9 +308,6 @@ test.describe('Data Flow — Documentation', () => {
         }
       }`
     );
-    expect(gqlResponse.status()).toBe(200);
-
-    const body = await gqlResponse.json();
     const docs = body.data.documentationConnection.edges ?? [];
     expect(docs.length).toBeGreaterThan(0);
 
@@ -370,7 +328,7 @@ test.describe('Data Flow — Home Page Blocks', () => {
     request,
   }) => {
     // Fetch the home page blocks from GraphQL
-    const gqlResponse = await gqlQuery(
+    const body = await gqlQuery(
       request,
       `{
         page(relativePath: "home.mdx") {
@@ -380,9 +338,6 @@ test.describe('Data Flow — Home Page Blocks', () => {
         }
       }`
     );
-    expect(gqlResponse.status()).toBe(200);
-
-    const body = await gqlResponse.json();
     const blocks = body.data.page.blocks ?? [];
     expect(blocks.length).toBeGreaterThan(0);
 

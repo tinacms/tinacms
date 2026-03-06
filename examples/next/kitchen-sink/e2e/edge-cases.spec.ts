@@ -87,8 +87,7 @@ test.describe('Edge Cases — Invalid Routes', () => {
       waitUntil: 'networkidle',
     });
 
-    // Should either show a 404 page or redirect gracefully
-    // Accept either outcome, but the page should not crash
+    // Should either show a 404 page, "Not Found" text, or redirect away from the invalid URL
     const hasErrorMessage = await page
       .locator('text=404')
       .isVisible({ timeout: 2000 })
@@ -97,17 +96,14 @@ test.describe('Edge Cases — Invalid Routes', () => {
       .locator('text=Not found')
       .isVisible({ timeout: 2000 })
       .catch(() => false);
+    const wasRedirected = !page.url().includes('nonexistent-post-xyz');
 
-    // At minimum, page loads and doesn't show a server error
-    expect(
-      hasErrorMessage || hasNotFound || page.url().includes('/')
-    ).toBeTruthy();
+    expect(hasErrorMessage || hasNotFound || wasRedirected).toBeTruthy();
   });
 
   test('non-existent blog should show 404 gracefully', async ({ page }) => {
     await page.goto('/blog/nonexistent-blog-xyz', { waitUntil: 'networkidle' });
 
-    // Similar expectation as post
     const hasErrorMessage = await page
       .locator('text=404')
       .isVisible({ timeout: 2000 })
@@ -116,10 +112,9 @@ test.describe('Edge Cases — Invalid Routes', () => {
       .locator('text=Not found')
       .isVisible({ timeout: 2000 })
       .catch(() => false);
+    const wasRedirected = !page.url().includes('nonexistent-blog-xyz');
 
-    expect(
-      hasErrorMessage || hasNotFound || page.url().includes('/')
-    ).toBeTruthy();
+    expect(hasErrorMessage || hasNotFound || wasRedirected).toBeTruthy();
   });
 });
 
@@ -167,30 +162,18 @@ test.describe('Edge Cases — Malformed Data', () => {
 });
 
 test.describe('Edge Cases — Network Issues', () => {
-  test('should show graceful error when API is slow', async ({
-    page,
-    request,
-  }) => {
-    // Simulate slow network by navigating to a detail page
-    // This tests client-side error handling
+  test('blog detail page should not return a 500 error', async ({ page }) => {
     await page.goto('/blog');
 
     const firstBlog = page.locator('a[href^="/blog/"]').first();
     const href = await firstBlog.getAttribute('href');
 
     if (href) {
-      // Navigate with a timeout (may or may not complete)
-      const navigationPromise = page
-        .goto(href, { timeout: 30000, waitUntil: 'domcontentloaded' })
-        .catch(() => null);
+      await page.goto(href, { timeout: 30000, waitUntil: 'domcontentloaded' });
 
-      // After 1 second, check that we're not seeing a raw error message
-      await page.waitForTimeout(1000);
-
-      // Should not show a 500 error page if API is slow
       const has500Error = await page
         .locator('text=500')
-        .isVisible({ timeout: 1000 })
+        .isVisible({ timeout: 2000 })
         .catch(() => false);
       expect(has500Error).toBe(false);
     }

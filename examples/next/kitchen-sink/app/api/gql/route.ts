@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { databaseRequest } from '../../../lib/databaseConntection';
+import { databaseRequest } from '../../../lib/databaseConnection';
 
 export async function GET() {
   return NextResponse.json({

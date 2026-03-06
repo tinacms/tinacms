@@ -1,4 +1,5 @@
 import React from 'react';
+import { notFound } from 'next/navigation';
 import client from '@/tina/__generated__/client';
 import PostClientPage from './client-page';
 
@@ -13,9 +14,13 @@ export default async function PostPage({
 }) {
   const resolvedParams = await params;
   const filepath = resolvedParams.urlSegments.join('/');
-  const data = await client.queries.post({
-    relativePath: `${filepath}.mdx`,
-  });
+
+  let data: Awaited<ReturnType<typeof client.queries.post>>;
+  try {
+    data = await client.queries.post({ relativePath: `${filepath}.mdx` });
+  } catch {
+    notFound();
+  }
 
   return (
     <PostClientPage

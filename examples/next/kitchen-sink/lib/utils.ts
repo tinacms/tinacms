@@ -16,9 +16,9 @@ export function sanitizeImageSrc(src: unknown): string {
   const trimmed = src.trim();
   if (!trimmed) return '';
   if (
-    trimmed.startsWith('/') ||
     trimmed.startsWith('./') ||
-    trimmed.startsWith('../')
+    trimmed.startsWith('../') ||
+    (trimmed.startsWith('/') && !trimmed.startsWith('//'))
   ) {
     return trimmed;
   }
@@ -40,7 +40,7 @@ export function formatDate(raw: string | undefined | null): string {
   try {
     const d = new Date(raw);
     if (isNaN(d.getTime())) return '';
-    return d.toLocaleDateString('en-US', {
+    return d.toLocaleDateString('en-AU', {
       month: 'short',
       day: '2-digit',
       year: 'numeric',

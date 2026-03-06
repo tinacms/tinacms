@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation';
 import client from '@/tina/__generated__/client';
 import { formatDate } from '@/lib/utils';
 import BlogClientPage from './client-page';
@@ -18,7 +19,13 @@ export async function generateStaticParams() {
 export default async function BlogFile({ params }: Props) {
   const { filename } = await params;
   const relativePath = `${filename}.mdx`;
-  const tinaProps = await client.queries.blog({ relativePath });
+
+  let tinaProps: Awaited<ReturnType<typeof client.queries.blog>>;
+  try {
+    tinaProps = await client.queries.blog({ relativePath });
+  } catch {
+    notFound();
+  }
 
   return (
     <BlogClientPage

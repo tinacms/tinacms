@@ -2,17 +2,11 @@ name: Playwright — kitchen-sink
 
 on:
   pull_request:
-    # Run this workflow for PRs targeting main that change files in kitchen-sink
     branches:
       - main
     paths:
       - 'examples/next/kitchen-sink/**'
-  push:
-    # Also validate merged changes on main, scoped to kitchen-sink only
-    branches:
-      - main
-    paths:
-      - 'examples/next/kitchen-sink/**'
+      - '.github/workflows/playwright-kitchen-sink.yml'
 
 jobs:
   e2e:
@@ -39,7 +33,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build workspace packages
-        run: pnpm run build
+        run: pnpm --filter "kitchen-sink^..." run build
 
       - name: Install Playwright browsers
         run: pnpm --filter kitchen-sink exec playwright install --with-deps chromium

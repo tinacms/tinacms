@@ -19,7 +19,7 @@ export default async function RootLayout({
 }) {
   return (
     <html lang='en' suppressHydrationWarning className={inter.variable}>
-      <body className='font-sans antialiased'>
+      <body className='font-sans antialiased' suppressHydrationWarning>
         <Layout>{children}</Layout>
       </body>
     </html>

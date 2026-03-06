@@ -1,4 +1,4 @@
-﻿import type { Collection } from 'tinacms';
+import type { Collection } from 'tinacms';
 import { heroBlockSchema } from '@/components/blocks/hero';
 import { featureBlockSchema } from '@/components/blocks/features';
 import { ctaBlockSchema } from '@/components/blocks/cta';

@@ -1,6 +1,6 @@
 {
   "name": "kitchen-sink",
-  "version": "0.1.99",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -31,7 +31,6 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-icons": "^4.12.0",
-    "remove": "catalog:",
     "tailwind-merge": "^2.6.0",
     "tinacms": "workspace:*"
   },
@@ -48,6 +47,7 @@
     "tailwindcss": "^4.0.0",
     "typescript": "^5.7.3",
     "vite": "^4.5.9",
+    "remove": "catalog:",
     "vitest": "^0.32.4"
   }
 }
