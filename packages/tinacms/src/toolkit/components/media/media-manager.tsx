@@ -13,6 +13,11 @@ import React, { useEffect, useState, forwardRef, useRef } from 'react';
 import { createContext, useContext } from 'react';
 import * as dropzone from 'react-dropzone';
 import type { FileError } from 'react-dropzone';
+import { captureEvent } from '../../../lib/posthog/posthogProvider';
+import {
+  MediaManagerContentUploadedEvent,
+  MediaManagerContentDeletedEvent,
+} from '../../../lib/posthog/posthog';
 import {
   BiArrowToBottom,
   BiCloudUpload,
@@ -233,6 +238,8 @@ export function MediaPicker({
   if (allowDelete) {
     deleteMediaItem = async (item: Media) => {
       await cms.media.delete(item);
+      const ext = item.filename.split('.').pop()?.toLowerCase() || 'unknown';
+      captureEvent(MediaManagerContentDeletedEvent, { fileType: ext });
     };
   }
 
@@ -307,6 +314,18 @@ export function MediaPicker({
         }
         // if there are media items, set the first one as active and prepend all the items to the list
         if (mediaItems.length !== 0) {
+          const extensions = [
+            ...new Set(
+              mediaItems.map((item) => {
+                const ext = item.filename.split('.').pop()?.toLowerCase();
+                return ext || 'unknown';
+              })
+            ),
+          ];
+          captureEvent(MediaManagerContentUploadedEvent, {
+            fileType: extensions.join(','),
+            fileCount: mediaItems.length,
+          });
           setActiveItem(mediaItems[0]);
           setList((mediaList) => {
             return {

@@ -31,18 +31,25 @@ export type SavedContentPayload = {
 // When a user adds an item to the media manager
 export const MediaManagerContentUploadedEvent: string =
   'media-manager-content-uploaded';
-export type MediaManagerContentUploadedPayload = Record<string, never>;
+export type MediaManagerContentUploadedPayload = {
+  fileType: string;
+  fileCount: number;
+};
 
 // When a user deletes an item from the media manager
 export const MediaManagerContentDeletedEvent: string =
   'media-manager-content-deleted';
-export type MediaManagerContentDeletedPayload = Record<string, never>;
+export type MediaManagerContentDeletedPayload = {
+  fileType: string;
+};
 
 // Switching between raw and rich-text editor modes
 export const RichTextEditorSwitchedEvent: string = 'rich-text-editor-switched';
 export type RichTextEditorSwitchedPayload = {
   to: 'markdown' | 'richtext';
 };
+
+export const EventLogPageViewedEvent: string = 'event-log-page-viewed';
 
 // When the user navigates to Project Config (TinaCloud) from the TinaCMS editor
 export const ProjectConfigNavigatedToFromWebsiteEvent: string =
@@ -80,4 +87,8 @@ export type CollectionListPageSearchPayload = {
   searchQuery: string;
 };
 
-export const EventLogPageViewedEvent: string = 'event-log-page-viewed';
+export const CloudConfigNavComponentClickedEvent: string =
+  'cloud-config-nav-component-clicked';
+export type CloudConfigNavComponentClickedPayload = {
+  itemType: 'Project Config' | 'User Management' | 'Support';
+};
