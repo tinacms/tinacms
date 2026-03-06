@@ -1,5 +1,21 @@
 # tinacms
 
+## 3.6.2
+
+### Patch Changes
+
+- [#6494](https://github.com/tinacms/tinacms/pull/6494) [`3b44e6a`](https://github.com/tinacms/tinacms/commit/3b44e6ad9bd2ff336aa8147b016de8b9bbb6f90d) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐖 Telemetry - Seeing how many users interact with nav bar buttons (Project Config, User management, support)
+
+- [#6488](https://github.com/tinacms/tinacms/pull/6488) [`35385f1`](https://github.com/tinacms/tinacms/commit/35385f16fe9e4cb386021445c8e1cb817a03dcd3) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Add PostHog event capture for Media Manager upload and delete actions
+
+- [#6487](https://github.com/tinacms/tinacms/pull/6487) [`83ed83f`](https://github.com/tinacms/tinacms/commit/83ed83f27624134feffa0473f02b0f6f3318441b) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐛 Fix showFloatingToolbar config not working by removing plugin correctly
+
+- [#6476](https://github.com/tinacms/tinacms/pull/6476) [`8f08f49`](https://github.com/tinacms/tinacms/commit/8f08f49638edcecaf703681538fa46bbc53df982) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐛 Authentication - Fix Login button stuck in constant spinner state
+
+- [#6496](https://github.com/tinacms/tinacms/pull/6496) [`13e953a`](https://github.com/tinacms/tinacms/commit/13e953a92eebcbfe2a86e12a9161ac6fe52e9236) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🔧 Fix missing export
+
+- [#6493](https://github.com/tinacms/tinacms/pull/6493) [`9bc4f3c`](https://github.com/tinacms/tinacms/commit/9bc4f3cccb1ab88cfefcc59da7ad228d250f03d3) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐖 Telemetry - See when users open the Event Log Page (eventLogPageViewed event)
+
 ## 3.6.1
 
 ### Patch Changes
