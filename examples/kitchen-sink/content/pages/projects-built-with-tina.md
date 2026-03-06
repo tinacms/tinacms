@@ -3,7 +3,7 @@ title: Projects Built With Tina
 items:
   - title: Paradise Helicopters
     description: "A marketing site for Hawaii's largest locally owned and operated helicopter company. Built by\_[Murmur Creative](https://murmurcreative.com/ \"\")\_in Portland, Oregon.\n"
-    image: /uploads/llama-1.avif
+    image: /uploads/llama-3.avif
   - title: Devolver Digital
     description: >
       A marketing site for a boutique game label that works with independent

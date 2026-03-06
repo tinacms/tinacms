@@ -1,0 +1,88 @@
+---
+title: Collections and Fields
+tags:
+  - tag: content/tags/react.json
+---
+
+## What is a Collection?
+
+A **collection** in TinaCMS maps to a folder of content files. Each collection defines the shape of its documents using a `fields` array — much like a database schema, but for your Markdown and MDX files.
+
+```ts
+const Post: Collection = {
+  name: 'post',
+  label: 'Posts',
+  path: 'content/posts',
+  format: 'mdx',
+  fields: [
+    { type: 'string', name: 'title', label: 'Title', isTitle: true },
+    { type: 'rich-text', name: '_body', label: 'Body', isBody: true },
+  ],
+}
+```
+
+## Field Types
+
+TinaCMS supports the following built-in field types:
+
+| Type | Description |
+|---|---|
+| `string` | Plain text, optionally rendered as `textarea`, `select`, or a custom component |
+| `number` | Numeric input |
+| `boolean` | Toggle switch |
+| `datetime` | Date and optional time picker |
+| `image` | Media manager – uploads to your configured media root |
+| `rich-text` | MDX-aware WYSIWYG editor with support for custom components |
+| `reference` | Pointer to a document in another collection |
+| `object` | Nested group of fields, optionally as a list |
+
+## Custom Field UI
+
+Any `string` field can have its editor replaced with a custom React component via `ui.component`. This is how the ColorPicker and IconPicker work in this example:
+
+```ts
+{
+  type: 'string',
+  name: 'color',
+  label: 'Color',
+  ui: { component: ColorPickerInput },
+}
+```
+
+## Validation
+
+Use `ui.validate` to add inline validation to any field:
+
+```ts
+{
+  type: 'string',
+  name: 'title',
+  ui: {
+    validate: (value) => {
+      if (!value || value.length < 5) return 'Title must be at least 5 characters'
+    },
+  },
+}
+```
+
+## Reference Fields
+
+Reference fields let one document link to another. TinaCMS resolves these at query time, giving you the full nested document data via GraphQL:
+
+```graphql
+query {
+  postConnection {
+    edges {
+      node {
+        title
+        author {
+          ... on Author {
+            name
+            avatar
+          }
+        }
+      }
+    }
+  }
+}
+```

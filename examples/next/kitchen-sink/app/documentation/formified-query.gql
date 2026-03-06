@@ -1,0 +1,31 @@
+query documentation($relativePath: String!) {
+  documentation(relativePath: $relativePath) {
+    title
+    tags {
+      __typename
+      reference {
+        ... on Tag {
+          title
+          description
+        }
+      }
+    }
+    body
+    ... on Document {
+      _sys {
+        filename
+        basename
+        breadcrumbs
+        path
+        relativePath
+        extension
+      }
+      id
+    }
+    ... on Document {
+      _internalSys: _sys {
+        path
+      }
+    }
+  }
+}

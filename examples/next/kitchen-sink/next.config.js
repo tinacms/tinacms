@@ -1,0 +1,34 @@
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  experimental: {
+    optimizePackageImports: ['react-icons', 'tinacms'],
+  },
+  pageExtensions: ['tsx', 'ts'],
+  compress: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
+    ],
+  },
+  rewrites: async () => [
+    {
+      source: '/admin',
+      destination: '/admin/index.html',
+    },
+  ],
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        'node:crypto': false,
+      };
+    }
+    return config;
+  },
+};
+
+export default nextConfig;

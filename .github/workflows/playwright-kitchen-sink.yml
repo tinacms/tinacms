@@ -1,0 +1,44 @@
+name: Playwright — kitchen-sink
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'examples/next/kitchen-sink/**'
+      - '.github/workflows/playwright-kitchen-sink.yml'
+
+jobs:
+  e2e:
+    name: kitchen-sink-e2e
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build workspace packages
+        run: pnpm --filter "kitchen-sink^..." run build
+
+      - name: Install Playwright browsers
+        run: pnpm --filter kitchen-sink exec playwright install --with-deps chromium
+
+      - name: Run kitchen-sink Playwright tests
+        run: pnpm --filter kitchen-sink test:e2e
+        env:
+          CI: true
