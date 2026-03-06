@@ -4,7 +4,12 @@ import {
   canonicalPath,
   resolveForm,
 } from '@tinacms/schema-tools';
-import { Form, FormBuilder, FormStatus } from '@tinacms/toolkit';
+import {
+  Form,
+  FormBuilder,
+  FormStatus,
+  useNavigationBlocker,
+} from '@tinacms/toolkit';
 import type { TinaCMS } from '@tinacms/toolkit';
 import {
   FormBreadcrumbs,
@@ -104,6 +109,7 @@ const RenderForm = ({
   mutationInfo;
 }) => {
   const [formIsPristine, setFormIsPristine] = useState(true);
+  useNavigationBlocker(!formIsPristine);
   const schema: TinaSchema | undefined = cms.api.tina.schema;
 
   // the schema is being passed in from the frontend so we can use that
