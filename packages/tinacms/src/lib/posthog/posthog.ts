@@ -49,6 +49,8 @@ export type RichTextEditorSwitchedPayload = {
   to: 'markdown' | 'richtext';
 };
 
+export const EventLogPageViewedEvent: string = 'event-log-page-viewed';
+
 // When the user navigates to Project Config (TinaCloud) from the TinaCMS editor
 export const ProjectConfigNavigatedToFromWebsiteEvent: string =
   'cloud-navigated-to-from-website';
