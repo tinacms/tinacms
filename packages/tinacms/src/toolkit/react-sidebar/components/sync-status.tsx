@@ -13,7 +13,6 @@ import { MdSyncProblem } from 'react-icons/md';
 import { TbLogs } from 'react-icons/tb';
 import { captureEvent, EventLogPageViewedEvent } from '../../../lib/posthog';
 
-
 type EventListState = 'loading' | 'success' | 'error' | 'unauthorized';
 
 export const useGetEvents = (
@@ -228,10 +227,13 @@ export const SyncStatusButton = ({
 
   return (
     <>
-      <button onClick={() => {
-        setEventsOpen(true);
-        captureEvent(EventLogPageViewedEvent, {});
-      }} {...buttonProps}>
+      <button
+        onClick={() => {
+          setEventsOpen(true);
+          captureEvent(EventLogPageViewedEvent, {});
+        }}
+        {...buttonProps}
+      >
         {syncStatus.state !== 'error' ? (
           <TbLogs className='w-6 h-auto mr-2' />
         ) : (
