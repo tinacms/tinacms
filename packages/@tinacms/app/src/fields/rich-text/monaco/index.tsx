@@ -8,17 +8,17 @@ import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react';
  */
 import { parseMDX, serializeMDX } from '@tinacms/mdx';
 import type * as monaco from 'monaco-editor';
-import { RichTextType } from 'tinacms';
+import {
+  RichTextType,
+  captureEvent,
+  RichTextEditorSwitchedEvent,
+} from 'tinacms';
 import {
   ErrorMessage,
   InvalidMarkdownElement,
   buildError,
 } from './error-message';
 import { useDebounce } from './use-debounce';
-import {
-  captureEvent,
-  RichTextEditorSwitchedEvent,
-} from 'tinacms/src/lib/posthog';
 
 export const uuid = () => {
   // @ts-ignore

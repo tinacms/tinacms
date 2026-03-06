@@ -13,6 +13,7 @@ const useRawMarkdownToolbarButton = () => {
 
   const onMouseDown = (e) => {
     setRawMode(true);
+    captureEvent(RichTextEditorSwitchedEvent, { to: 'markdown' });
   };
 
   return {
@@ -33,9 +34,6 @@ export const RawMarkdownToolbarButton = withRef<
   return (
     <ToolbarButton
       ref={ref}
-      onClick={() =>
-        captureEvent(RichTextEditorSwitchedEvent, { to: 'markdown' })
-      }
       tooltip='Raw Markdown'
       {...rest}
       {...props}
