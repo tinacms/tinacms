@@ -85,4 +85,7 @@ export type CollectionListPageSearchPayload = {
   searchQuery: string;
 };
 
-export const EventLogPageViewedEvent: string = 'event-log-page-viewed';
+export const CloudConfigNavComponentClickedEvent: string = 'cloud-config-nav-component-clicked';
+export type CloudConfigNavComponentClickedPayload = {
+  itemType: 'Project Config' | 'User Management' | 'Support';
+}

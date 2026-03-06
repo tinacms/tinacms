@@ -1,5 +1,6 @@
 import React from 'react';
 import type { CloudConfigPlugin } from '@toolkit/react-cloud-config';
+import { captureEvent, CloudConfigNavComponentClickedEvent } from '../../../lib/posthog';
 
 interface NavCloudLinkProps {
   config: CloudConfigPlugin;
@@ -17,6 +18,7 @@ export const NavCloudLink: React.FC<NavCloudLinkProps> = ({ config }) => {
         <a
           target='_blank'
           className='ml-1 text-blue-600 hover:opacity-60'
+          onClick={() => captureEvent(CloudConfigNavComponentClickedEvent, { itemType: config.link.text })}
           href={config.link.href}
         >
           {config.link.text}
@@ -27,7 +29,7 @@ export const NavCloudLink: React.FC<NavCloudLinkProps> = ({ config }) => {
   return (
     <span className='text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100'>
       <config.Icon className='mr-2 h-6 opacity-80 w-auto' />
-      <a target='_blank' href={config.link.href}>
+      <a target='_blank' href={config.link.href} onClick={() => captureEvent(CloudConfigNavComponentClickedEvent, { itemType: config.link.text })}>
         {config.link.text}
       </a>
     </span>
