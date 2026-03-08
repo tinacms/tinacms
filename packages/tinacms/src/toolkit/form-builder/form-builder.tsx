@@ -187,8 +187,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
               const error = result[FORM_ERROR];
               captureEvent(SaveContentErrorEvent, {
                 documentPath: tinaForm.path,
-                error:
-                  error instanceof Error ? error.message : String(error),
+                error: error instanceof Error ? error.message : String(error),
               });
             } else {
               captureEvent(SavedContentEvent, {

@@ -36,7 +36,7 @@ export type SaveContentErrorPayload = {
   error?: string;
 };
 
-// When a user resets a form in the TinaCMS Editor  
+// When a user resets a form in the TinaCMS Editor
 export const FormResetEvent: string = 'form-reset';
 
 // When a user adds an item to the media manager
