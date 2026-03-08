@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../../fixtures/api-context";
 import deleteBlogPost from "../../utils/deleteBlogPost";
 
 test.describe("Create Blog Post", () => {
@@ -33,14 +33,14 @@ test.describe("Create Blog Post", () => {
     isNewBlogCreated = true;
   });
 
-  test.afterEach(async () => {
+  test.afterEach(async ({ apiContext }) => {
     if (isNewBlogCreated) {
       const collection = "post";
       const relativePath = `${blogFilename}.md`;
 
       try {
         //TODO: Another better way calling the backend is using the import client from the generated/client
-        await deleteBlogPost(collection, relativePath);
+        await deleteBlogPost(apiContext, collection, relativePath);
       } catch (error) {
         console.error("Error deleting blog post:", error);
       }
