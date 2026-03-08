@@ -4,7 +4,7 @@ import deleteBlogPost from "../../utils/deleteBlogPost";
 test.describe("Create Blog Post", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(
-      "http://localhost:3000/admin/index.html#/collections/new/post/~/",
+      "/admin/index.html#/collections/new/post/~/",
       { waitUntil: "domcontentloaded" }
     );
     //Need to dismiss the popup dialog to enter edit mode
@@ -26,9 +26,7 @@ test.describe("Create Blog Post", () => {
 
     await page.click('button:has-text("Save")');
 
-    await page.goto(
-      "http://localhost:3000/admin/index.html#/collections/post/~"
-    );
+    await page.goto("/admin/index.html#/collections/post/~");
 
     const blogPost = await page.locator(`text=${blogFilename}`).first();
     await expect(blogPost).toBeVisible();

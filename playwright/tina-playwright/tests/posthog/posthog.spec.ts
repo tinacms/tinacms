@@ -75,7 +75,7 @@ test.describe('PostHog telemetry - enabled', () => {
       request.url().startsWith(POSTHOG_URL_PREFIX)
     );
 
-    await page.goto('http://localhost:3000/admin/index.html#/~');
+    await page.goto('/admin/index.html#/~');
     await page.getByRole('button', { name: 'Enter Edit Mode' }).click();
 
     await requestPromise;
@@ -101,7 +101,7 @@ test.describe('PostHog telemetry - disabled', () => {
       }
     });
 
-    await page.goto('http://localhost:3000/admin/index.html#/~');
+    await page.goto('/admin/index.html#/~');
     await page.getByRole('button', { name: 'Enter Edit Mode' }).click();
     await page.waitForTimeout(3000);
 
