@@ -91,11 +91,11 @@ export async function initializePostHog(
   }
 
   // Skip in dev mode
-  if (process.env.TINA_DEV === 'true') {
-    isDisabled = true;
-    isInitialized = true;
-    return null;
-  }
+  // if (process.env.TINA_DEV === 'true') {
+  //   isDisabled = true;
+  //   isInitialized = true;
+  //   return null;
+  // }
 
   initializationPromise = (async () => {
     const config = await fetchPostHogConfig();

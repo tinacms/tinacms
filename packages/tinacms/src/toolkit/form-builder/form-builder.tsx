@@ -1,6 +1,7 @@
 import type { Form } from '@toolkit/forms';
 import * as React from 'react';
 import { type FC, useEffect } from 'react';
+import { FORM_ERROR } from 'final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { Button } from '@toolkit/styles';
 import {
@@ -17,6 +18,12 @@ import { FormPortalProvider } from './form-portal';
 import { LoadingDots } from './loading-dots';
 import { ResetForm } from './reset-form';
 import { CreateBranchModal } from './create-branch-modal';
+import {
+  captureEvent,
+  SavedContentEvent,
+  SaveContentErrorEvent,
+  FormResetEvent,
+} from '../../lib/posthog';
 
 export interface FormBuilderProps {
   form: { tinaForm: Form; activeFieldName?: string };
@@ -175,7 +182,19 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 
         const safeSubmit = async () => {
           if (canSubmit) {
-            await handleSubmit();
+            const result = await handleSubmit();
+            if (result && result[FORM_ERROR]) {
+              const error = result[FORM_ERROR];
+              captureEvent(SaveContentErrorEvent, {
+                documentPath: tinaForm.path,
+                error:
+                  error instanceof Error ? error.message : String(error),
+              });
+            } else {
+              captureEvent(SavedContentEvent, {
+                documentPath: tinaForm.path,
+              });
+            }
           }
         };
 
@@ -224,6 +243,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                           reset={async () => {
                             finalForm.reset();
                             await tinaForm.reset!();
+                            captureEvent(FormResetEvent);
                           }}
                         >
                           {tinaForm.buttons.reset}
