@@ -8,7 +8,7 @@ const Post: Collection = {
   format: 'mdx',
   ui: {
     router: ({ document }) => {
-      return `/post/${document._sys.breadcrumbs.join('/')}`;
+      return `/posts/${document._sys.breadcrumbs.join('/')}`;
     },
     filename: {
       slugify: makeSlugify('post'),
