@@ -8,9 +8,6 @@ type ApiFixtures = {
  * Extended test with a shared APIRequestContext pre-configured for GraphQL
  * calls. Import `test` and `expect` from this file instead of
  * `@playwright/test` in any test that needs API access.
- *
- * The GraphQL base URL defaults to http://localhost:4001 and can be overridden
- * via the GRAPHQL_URL environment variable.
  */
 export const test = base.extend<ApiFixtures>({
   apiContext: async ({ playwright }, use) => {
