@@ -1,7 +1,7 @@
-// deleteBlogPost.ts
+// deleteDocument.ts
 import { APIRequestContext } from "@playwright/test";
 
-const DELETE_BLOGPOST = `
+const DELETE_DOCUMENT = `
   mutation DeleteDocument($collection: String!, $relativePath: String!) {
     deleteDocument(collection: $collection, relativePath: $relativePath) {
       __typename
@@ -9,17 +9,17 @@ const DELETE_BLOGPOST = `
   }
 `;
 
-const deleteBlogPost = async (
+const deleteDocument = async (
   apiContext: APIRequestContext,
   collection: string,
   relativePath: string
 ): Promise<void> => {
   await apiContext.post("/graphql", {
     data: {
-      query: DELETE_BLOGPOST,
+      query: DELETE_DOCUMENT,
       variables: { collection, relativePath },
     },
   });
 };
 
-export default deleteBlogPost;
+export default deleteDocument;

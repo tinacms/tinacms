@@ -1,5 +1,5 @@
 import { test as apiTest } from "./api-context";
-import deleteBlogPost from "../utils/deleteBlogPost";
+import deleteDocument from "../utils/deleteDocument";
 
 type TrackedDocument = {
   collection: string;
@@ -35,7 +35,7 @@ export const test = apiTest.extend<ContentLifecycleFixtures>({
     // Teardown: delete every document registered during the test
     for (const { collection, relativePath } of tracked) {
       try {
-        await deleteBlogPost(apiContext, collection, relativePath);
+        await deleteDocument(apiContext, collection, relativePath);
       } catch (error) {
         console.error(
           `Failed to delete ${collection}/${relativePath} during teardown:`,
