@@ -12,7 +12,11 @@ import {
   type IndexDefinition,
   type TernaryFilter,
 } from './datalayer';
-import { INDEX_KEY_FIELD_SEPARATOR, LevelProxy, SUBLEVEL_OPTIONS } from './level';
+import {
+  INDEX_KEY_FIELD_SEPARATOR,
+  LevelProxy,
+  SUBLEVEL_OPTIONS,
+} from './level';
 import type { Level } from './level';
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
@@ -69,7 +73,9 @@ describe('makeFilter', () => {
       ['in — match', OP.IN, ['a', 'b'], { name: 'a' }, true],
       ['in — miss', OP.IN, ['a', 'b'], { name: 'c' }, false],
     ] as const)('%s', (_, operator, rightOperand, data, expected) => {
-      const fn = makeFilter({ filterChain: [binary('name', 'string', operator, rightOperand)] });
+      const fn = makeFilter({
+        filterChain: [binary('name', 'string', operator, rightOperand)],
+      });
       expect(fn(data)).toBe(expected);
     });
   });
@@ -86,7 +92,9 @@ describe('makeFilter', () => {
       ['in — match', OP.IN, [1, 2, 3], { score: 2 }, true],
       ['in — miss', OP.IN, [1, 2, 3], { score: 4 }, false],
     ] as const)('%s', (_, operator, rightOperand, data, expected) => {
-      const fn = makeFilter({ filterChain: [binary('score', 'number', operator, rightOperand)] });
+      const fn = makeFilter({
+        filterChain: [binary('score', 'number', operator, rightOperand)],
+      });
       expect(fn(data)).toBe(expected);
     });
   });
@@ -98,9 +106,17 @@ describe('makeFilter', () => {
       ['false eq false', OP.EQ, false, { active: false }, true],
       ['string "true" coerces to true', OP.EQ, true, { active: 'true' }, true],
       ['string "1" coerces to true', OP.EQ, true, { active: '1' }, true],
-      ['string "false" coerces to boolean false (matches false operand)', OP.EQ, false, { active: 'false' }, true],
+      [
+        'string "false" coerces to boolean false (matches false operand)',
+        OP.EQ,
+        false,
+        { active: 'false' },
+        true,
+      ],
     ] as const)('%s', (_, operator, rightOperand, data, expected) => {
-      const fn = makeFilter({ filterChain: [binary('active', 'boolean', operator, rightOperand)] });
+      const fn = makeFilter({
+        filterChain: [binary('active', 'boolean', operator, rightOperand)],
+      });
       expect(fn(data)).toBe(expected);
     });
   });
@@ -109,14 +125,52 @@ describe('makeFilter', () => {
     const d = (iso: string) => new Date(iso).getTime();
 
     it.each([
-      ['eq — match', OP.EQ, d('2023-01-15'), { ts: new Date('2023-01-15').toISOString() }, true],
-      ['eq — miss', OP.EQ, d('2023-01-15'), { ts: new Date('2023-01-16').toISOString() }, false],
-      ['gt — match', OP.GT, d('2023-01-15'), { ts: new Date('2023-01-16').toISOString() }, true],
-      ['gt — miss', OP.GT, d('2023-01-15'), { ts: new Date('2023-01-14').toISOString() }, false],
-      ['lt — match', OP.LT, d('2023-01-15'), { ts: new Date('2023-01-14').toISOString() }, true],
-      ['lt — miss', OP.LT, d('2023-01-15'), { ts: new Date('2023-01-16').toISOString() }, false],
+      [
+        'eq — match',
+        OP.EQ,
+        d('2023-01-15'),
+        { ts: new Date('2023-01-15').toISOString() },
+        true,
+      ],
+      [
+        'eq — miss',
+        OP.EQ,
+        d('2023-01-15'),
+        { ts: new Date('2023-01-16').toISOString() },
+        false,
+      ],
+      [
+        'gt — match',
+        OP.GT,
+        d('2023-01-15'),
+        { ts: new Date('2023-01-16').toISOString() },
+        true,
+      ],
+      [
+        'gt — miss',
+        OP.GT,
+        d('2023-01-15'),
+        { ts: new Date('2023-01-14').toISOString() },
+        false,
+      ],
+      [
+        'lt — match',
+        OP.LT,
+        d('2023-01-15'),
+        { ts: new Date('2023-01-14').toISOString() },
+        true,
+      ],
+      [
+        'lt — miss',
+        OP.LT,
+        d('2023-01-15'),
+        { ts: new Date('2023-01-16').toISOString() },
+        false,
+      ],
     ] as const)('%s', (_, operator, rightOperand, data, expected) => {
-      const fn = makeFilter({ filterChain: [binary('ts', 'datetime', operator, rightOperand)] });
+      const fn = makeFilter({
+        filterChain: [binary('ts', 'datetime', operator, rightOperand)],
+      });
       expect(fn(data)).toBe(expected);
     });
   });
@@ -124,7 +178,9 @@ describe('makeFilter', () => {
   describe('reference type', () => {
     it('eq — match', () => {
       const fn = makeFilter({
-        filterChain: [binary('author', 'reference', OP.EQ, 'content/authors/alice.md')],
+        filterChain: [
+          binary('author', 'reference', OP.EQ, 'content/authors/alice.md'),
+        ],
       });
       expect(fn({ author: 'content/authors/alice.md' })).toBe(true);
       expect(fn({ author: 'content/authors/bob.md' })).toBe(false);
@@ -134,7 +190,9 @@ describe('makeFilter', () => {
   describe('list field', () => {
     it('eq matches if any list item equals the operand', () => {
       const fn = makeFilter({
-        filterChain: [{ ...binary('tags', 'string', OP.EQ, 'news'), list: true }],
+        filterChain: [
+          { ...binary('tags', 'string', OP.EQ, 'news'), list: true },
+        ],
       });
       expect(fn({ tags: ['sports', 'news', 'tech'] })).toBe(true);
       expect(fn({ tags: ['sports', 'tech'] })).toBe(false);
@@ -142,7 +200,9 @@ describe('makeFilter', () => {
 
     it('startsWith matches if any list item starts with the operand', () => {
       const fn = makeFilter({
-        filterChain: [{ ...binary('tags', 'string', OP.STARTS_WITH, 'new'), list: true }],
+        filterChain: [
+          { ...binary('tags', 'string', OP.STARTS_WITH, 'new'), list: true },
+        ],
       });
       expect(fn({ tags: ['news', 'tech'] })).toBe(true);
       expect(fn({ tags: ['sports', 'tech'] })).toBe(false);
@@ -151,7 +211,9 @@ describe('makeFilter', () => {
     it('datetime list: eq matches if any list item equals the operand (ISO string coerced)', () => {
       const epoch = new Date('2023-06-15').getTime();
       const fn = makeFilter({
-        filterChain: [{ ...binary('dates', 'datetime', OP.EQ, epoch), list: true }],
+        filterChain: [
+          { ...binary('dates', 'datetime', OP.EQ, epoch), list: true },
+        ],
       });
       expect(fn({ dates: ['2023-01-01', '2023-06-15'] })).toBe(true);
       expect(fn({ dates: ['2023-01-01', '2023-12-31'] })).toBe(false);
@@ -159,7 +221,9 @@ describe('makeFilter', () => {
 
     it('boolean list: eq matches if any list item coerces to the operand', () => {
       const fn = makeFilter({
-        filterChain: [{ ...binary('flags', 'boolean', OP.EQ, true), list: true }],
+        filterChain: [
+          { ...binary('flags', 'boolean', OP.EQ, true), list: true },
+        ],
       });
       expect(fn({ flags: [false, 'true', false] })).toBe(true);
       expect(fn({ flags: [false, '0', false] })).toBe(false);
@@ -189,7 +253,9 @@ describe('makeFilter', () => {
 
     it('list: matches if any list item satisfies the range', () => {
       const fn = makeFilter({
-        filterChain: [{ ...ternary('scores', 'number', OP.GTE, 3, OP.LTE, 7), list: true }],
+        filterChain: [
+          { ...ternary('scores', 'number', OP.GTE, 3, OP.LTE, 7), list: true },
+        ],
       });
       expect(fn({ scores: [1, 5, 10] })).toBe(true);
       expect(fn({ scores: [1, 2, 10] })).toBe(false);
@@ -218,12 +284,16 @@ describe('makeFilter', () => {
     });
 
     it('returns false when field is absent from the record', () => {
-      const fn = makeFilter({ filterChain: [binary('name', 'string', OP.EQ, 'hello')] });
+      const fn = makeFilter({
+        filterChain: [binary('name', 'string', OP.EQ, 'hello')],
+      });
       expect(fn({})).toBe(false);
     });
 
     it('throws on an unknown data type', () => {
-      const fn = makeFilter({ filterChain: [binary('x', 'unknown' as any, OP.EQ, 'v')] });
+      const fn = makeFilter({
+        filterChain: [binary('x', 'unknown' as any, OP.EQ, 'v')],
+      });
       expect(() => fn({ x: 'v' })).toThrow();
     });
   });
@@ -243,7 +313,10 @@ describe('makeFilterChain', () => {
   it('builds a BinaryFilter from a single eq condition', () => {
     const chain = makeFilterChain({
       conditions: [
-        { filterPath: 'title', filterExpression: { _type: 'string', _list: false, eq: 'foo' } },
+        {
+          filterPath: 'title',
+          filterExpression: { _type: 'string', _list: false, eq: 'foo' },
+        },
       ],
     });
     expect(chain).toHaveLength(1);
@@ -259,7 +332,14 @@ describe('makeFilterChain', () => {
   it('maps "after" to OP.GT', () => {
     const [f] = makeFilterChain({
       conditions: [
-        { filterPath: 'date', filterExpression: { _type: 'datetime', _list: false, after: '2023-01-01' } },
+        {
+          filterPath: 'date',
+          filterExpression: {
+            _type: 'datetime',
+            _list: false,
+            after: '2023-01-01',
+          },
+        },
       ],
     }) as BinaryFilter[];
     expect(f.operator).toBe(OP.GT);
@@ -268,7 +348,14 @@ describe('makeFilterChain', () => {
   it('maps "before" to OP.LT', () => {
     const [f] = makeFilterChain({
       conditions: [
-        { filterPath: 'date', filterExpression: { _type: 'datetime', _list: false, before: '2023-01-01' } },
+        {
+          filterPath: 'date',
+          filterExpression: {
+            _type: 'datetime',
+            _list: false,
+            before: '2023-01-01',
+          },
+        },
       ],
     }) as BinaryFilter[];
     expect(f.operator).toBe(OP.LT);
@@ -277,7 +364,10 @@ describe('makeFilterChain', () => {
   it('attaches padding for number fields', () => {
     const [f] = makeFilterChain({
       conditions: [
-        { filterPath: 'score', filterExpression: { _type: 'number', _list: false, eq: 42 } },
+        {
+          filterPath: 'score',
+          filterExpression: { _type: 'number', _list: false, eq: 42 },
+        },
       ],
     }) as BinaryFilter[];
     expect(f.pad).toEqual({ fillString: '0', maxLength: 4 });
@@ -286,7 +376,10 @@ describe('makeFilterChain', () => {
   it('builds a TernaryFilter from gt+lt pair', () => {
     const chain = makeFilterChain({
       conditions: [
-        { filterPath: 'score', filterExpression: { _type: 'number', _list: false, gt: 3, lt: 10 } },
+        {
+          filterPath: 'score',
+          filterExpression: { _type: 'number', _list: false, gt: 3, lt: 10 },
+        },
       ],
     });
     expect(chain).toHaveLength(1);
@@ -300,8 +393,18 @@ describe('makeFilterChain', () => {
   it('accumulates multiple conditions', () => {
     const chain = makeFilterChain({
       conditions: [
-        { filterPath: 'title', filterExpression: { _type: 'string', _list: false, startsWith: 'Hello' } },
-        { filterPath: 'score', filterExpression: { _type: 'number', _list: false, gt: 5 } },
+        {
+          filterPath: 'title',
+          filterExpression: {
+            _type: 'string',
+            _list: false,
+            startsWith: 'Hello',
+          },
+        },
+        {
+          filterPath: 'score',
+          filterExpression: { _type: 'number', _list: false, gt: 5 },
+        },
       ],
     });
     expect(chain).toHaveLength(2);
@@ -311,7 +414,14 @@ describe('makeFilterChain', () => {
     expect(() =>
       makeFilterChain({
         conditions: [
-          { filterPath: 'title', filterExpression: { _type: 'string', _list: false, badOp: 'foo' } as any },
+          {
+            filterPath: 'title',
+            filterExpression: {
+              _type: 'string',
+              _list: false,
+              badOp: 'foo',
+            } as any,
+          },
         ],
       })
     ).toThrow();
@@ -321,7 +431,15 @@ describe('makeFilterChain', () => {
     expect(() =>
       makeFilterChain({
         conditions: [
-          { filterPath: 'score', filterExpression: { _type: 'number', _list: false, eq: 1, in: [1, 2] } as any },
+          {
+            filterPath: 'score',
+            filterExpression: {
+              _type: 'number',
+              _list: false,
+              eq: 1,
+              in: [1, 2],
+            } as any,
+          },
         ],
       })
     ).toThrow();
@@ -342,37 +460,58 @@ describe('makeFilterSuffixes', () => {
   });
 
   it('sets both left and right for EQ', () => {
-    const result = makeFilterSuffixes([binary('title', 'string', OP.EQ, 'foo')], idx);
+    const result = makeFilterSuffixes(
+      [binary('title', 'string', OP.EQ, 'foo')],
+      idx
+    );
     expect(result).toEqual({ left: 'foo', right: 'foo' });
   });
 
   it('sets only left for GT', () => {
-    const result = makeFilterSuffixes([binary('title', 'string', OP.GT, 'foo')], idx);
+    const result = makeFilterSuffixes(
+      [binary('title', 'string', OP.GT, 'foo')],
+      idx
+    );
     expect(result).toEqual({ left: 'foo', right: undefined });
   });
 
   it('sets only left for GTE', () => {
-    const result = makeFilterSuffixes([binary('title', 'string', OP.GTE, 'foo')], idx);
+    const result = makeFilterSuffixes(
+      [binary('title', 'string', OP.GTE, 'foo')],
+      idx
+    );
     expect(result).toEqual({ left: 'foo', right: undefined });
   });
 
   it('sets only right for LT', () => {
-    const result = makeFilterSuffixes([binary('title', 'string', OP.LT, 'foo')], idx);
+    const result = makeFilterSuffixes(
+      [binary('title', 'string', OP.LT, 'foo')],
+      idx
+    );
     expect(result).toEqual({ left: undefined, right: 'foo' });
   });
 
   it('sets only right for LTE', () => {
-    const result = makeFilterSuffixes([binary('title', 'string', OP.LTE, 'foo')], idx);
+    const result = makeFilterSuffixes(
+      [binary('title', 'string', OP.LTE, 'foo')],
+      idx
+    );
     expect(result).toEqual({ left: undefined, right: 'foo' });
   });
 
   it('returns undefined for IN operator (not indexable)', () => {
-    const result = makeFilterSuffixes([binary('title', 'string', OP.IN, ['a', 'b'])], idx);
+    const result = makeFilterSuffixes(
+      [binary('title', 'string', OP.IN, ['a', 'b'])],
+      idx
+    );
     expect(result).toBeUndefined();
   });
 
   it('returns undefined when filter path is not in the index', () => {
-    const result = makeFilterSuffixes([binary('other', 'string', OP.EQ, 'foo')], idx);
+    const result = makeFilterSuffixes(
+      [binary('other', 'string', OP.EQ, 'foo')],
+      idx
+    );
     expect(result).toBeUndefined();
   });
 
@@ -445,7 +584,9 @@ describe('makeIndexOpsForDocument', () => {
   // A fresh MemoryLevel wrapped in LevelProxy for each test
   beforeEach(() => {
     level = new LevelProxy(
-      new MemoryLevel<string, Record<string, any>>({ valueEncoding: 'json' }) as any
+      new MemoryLevel<string, Record<string, any>>({
+        valueEncoding: 'json',
+      }) as any
     ) as unknown as Level;
   });
 
@@ -455,12 +596,26 @@ describe('makeIndexOpsForDocument', () => {
   };
 
   it('returns [] when collection is undefined', () => {
-    const ops = makeIndexOpsForDocument('posts/hello.md', undefined, indexDefs, { title: 'Hi' }, 'put', level);
+    const ops = makeIndexOpsForDocument(
+      'posts/hello.md',
+      undefined,
+      indexDefs,
+      { title: 'Hi' },
+      'put',
+      level
+    );
     expect(ops).toEqual([]);
   });
 
   it('produces a put op for the default sort key using the filepath as key', () => {
-    const ops = makeIndexOpsForDocument('posts/hello.md', 'post', indexDefs, { title: 'Hi' }, 'put', level);
+    const ops = makeIndexOpsForDocument(
+      'posts/hello.md',
+      'post',
+      indexDefs,
+      { title: 'Hi' },
+      'put',
+      level
+    );
     const defaultOp = ops.find((op) => op.key === 'posts/hello.md');
     expect(defaultOp).toBeDefined();
     expect(defaultOp!.type).toBe('put');
@@ -468,24 +623,56 @@ describe('makeIndexOpsForDocument', () => {
   });
 
   it('produces a put op for a custom sort key with indexed value + filepath', () => {
-    const ops = makeIndexOpsForDocument('posts/hello.md', 'post', indexDefs, { title: 'Greetings' }, 'put', level);
+    const ops = makeIndexOpsForDocument(
+      'posts/hello.md',
+      'post',
+      indexDefs,
+      { title: 'Greetings' },
+      'put',
+      level
+    );
     const titleOp = ops.find((op) => op.key.includes('Greetings'));
     expect(titleOp).toBeDefined();
-    expect(titleOp!.key).toBe(`Greetings${INDEX_KEY_FIELD_SEPARATOR}posts/hello.md`);
+    expect(titleOp!.key).toBe(
+      `Greetings${INDEX_KEY_FIELD_SEPARATOR}posts/hello.md`
+    );
     expect(titleOp!.type).toBe('put');
   });
 
   it('skips custom sort key when indexed field is missing from data', () => {
-    const ops = makeIndexOpsForDocument('posts/hello.md', 'post', indexDefs, {} as any, 'put', level);
+    const ops = makeIndexOpsForDocument(
+      'posts/hello.md',
+      'post',
+      indexDefs,
+      {} as any,
+      'put',
+      level
+    );
     // Only the default sort key op should exist
-    const titleOps = ops.filter((op) => op.key.includes(INDEX_KEY_FIELD_SEPARATOR));
+    const titleOps = ops.filter((op) =>
+      op.key.includes(INDEX_KEY_FIELD_SEPARATOR)
+    );
     expect(titleOps).toHaveLength(0);
   });
 
   it('produces del ops with undefined value and same keys as the equivalent put ops', () => {
     const data = { title: 'Hi' };
-    const putOps = makeIndexOpsForDocument('posts/hello.md', 'post', indexDefs, data, 'put', level);
-    const delOps = makeIndexOpsForDocument('posts/hello.md', 'post', indexDefs, data, 'del', level);
+    const putOps = makeIndexOpsForDocument(
+      'posts/hello.md',
+      'post',
+      indexDefs,
+      data,
+      'put',
+      level
+    );
+    const delOps = makeIndexOpsForDocument(
+      'posts/hello.md',
+      'post',
+      indexDefs,
+      data,
+      'del',
+      level
+    );
 
     expect(delOps).toHaveLength(putOps.length);
     for (let i = 0; i < delOps.length; i++) {
@@ -506,7 +693,9 @@ describe('coerceFilterChainOperands', () => {
 
   it('converts datetime string operand to epoch number', () => {
     const iso = '2023-06-15T00:00:00.000Z';
-    const [f] = coerceFilterChainOperands([binary('ts', 'datetime', OP.EQ, iso)]) as BinaryFilter[];
+    const [f] = coerceFilterChainOperands([
+      binary('ts', 'datetime', OP.EQ, iso),
+    ]) as BinaryFilter[];
     expect(f.rightOperand).toBe(new Date(iso).getTime());
   });
 
@@ -519,7 +708,14 @@ describe('coerceFilterChainOperands', () => {
   });
 
   it('converts both operands of a datetime TernaryFilter', () => {
-    const filter = ternary('ts', 'datetime', OP.GTE, '2023-01-01', OP.LTE, '2023-12-31');
+    const filter = ternary(
+      'ts',
+      'datetime',
+      OP.GTE,
+      '2023-01-01',
+      OP.LTE,
+      '2023-12-31'
+    );
     const [f] = coerceFilterChainOperands([filter]) as TernaryFilter[];
     expect(f.leftOperand).toBe(new Date('2023-01-01').getTime());
     expect(f.rightOperand).toBe(new Date('2023-12-31').getTime());

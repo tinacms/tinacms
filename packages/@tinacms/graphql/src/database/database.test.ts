@@ -47,7 +47,8 @@ class InMemoryBridge implements Bridge {
 
   async get(filepath: string): Promise<string> {
     const content = this.files.get(filepath);
-    if (content === undefined) throw new Error(`InMemoryBridge: file not found: ${filepath}`);
+    if (content === undefined)
+      throw new Error(`InMemoryBridge: file not found: ${filepath}`);
     return content;
   }
 
@@ -85,11 +86,26 @@ const jsonDoc = (data: Record<string, unknown>) => JSON.stringify(data);
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
 const POSTS = [
-  { path: 'content/posts/alpha.json', data: { title: 'Alpha', score: 1, published: true } },
-  { path: 'content/posts/beta.json', data: { title: 'Beta', score: 2, published: false } },
-  { path: 'content/posts/gamma.json', data: { title: 'Gamma', score: 3, published: true } },
-  { path: 'content/posts/delta.json', data: { title: 'Delta', score: 4, published: false } },
-  { path: 'content/posts/epsilon.json', data: { title: 'Epsilon', score: 5, published: true } },
+  {
+    path: 'content/posts/alpha.json',
+    data: { title: 'Alpha', score: 1, published: true },
+  },
+  {
+    path: 'content/posts/beta.json',
+    data: { title: 'Beta', score: 2, published: false },
+  },
+  {
+    path: 'content/posts/gamma.json',
+    data: { title: 'Gamma', score: 3, published: true },
+  },
+  {
+    path: 'content/posts/delta.json',
+    data: { title: 'Delta', score: 4, published: false },
+  },
+  {
+    path: 'content/posts/epsilon.json',
+    data: { title: 'Epsilon', score: 5, published: true },
+  },
 ] as const;
 
 // ─── Setup helper ────────────────────────────────────────────────────────────
@@ -102,14 +118,23 @@ async function setupDatabase(seed: readonly PostFixture[] = POSTS) {
     bridge.seed(path, jsonDoc(data));
   }
 
-  const level = new MemoryLevel<string, Record<string, any>>({ valueEncoding: 'json' });
-  const database = createDatabaseInternal({ bridge, level, tinaDirectory: 'tina' });
+  const level = new MemoryLevel<string, Record<string, any>>({
+    valueEncoding: 'json',
+  });
+  const database = createDatabaseInternal({
+    bridge,
+    level,
+    tinaDirectory: 'tina',
+  });
 
   const builtSchema = await buildSchema({ schema: testSchema });
   await database.indexContent(builtSchema);
 
   // Simple hydrator: spreads the index-extracted value into the returned node.
-  const hydrate = async (path: string, value: Record<string, any>) => ({ path, ...value });
+  const hydrate = async (path: string, value: Record<string, any>) => ({
+    path,
+    ...value,
+  });
 
   return { database, bridge, hydrate };
 }
@@ -124,7 +149,10 @@ function noFilter() {
 describe('Database.query()', () => {
   it('returns all indexed documents (default limit 50)', async () => {
     const { database, hydrate } = await setupDatabase();
-    const result = await database.query({ collection: 'post', filterChain: noFilter() }, hydrate);
+    const result = await database.query(
+      { collection: 'post', filterChain: noFilter() },
+      hydrate
+    );
     expect(result.edges).toHaveLength(POSTS.length);
   });
 
@@ -229,7 +257,13 @@ describe('Database.query()', () => {
           collection: 'post',
           sort: 'title',
           filterChain: [
-            { pathExpression: 'title', rightOperand: 'Alpha', operator: 'eq' as any, type: 'string', list: false },
+            {
+              pathExpression: 'title',
+              rightOperand: 'Alpha',
+              operator: 'eq' as any,
+              type: 'string',
+              list: false,
+            },
           ],
         },
         hydrate
@@ -246,7 +280,13 @@ describe('Database.query()', () => {
           collection: 'post',
           sort: 'title',
           filterChain: [
-            { pathExpression: 'title', rightOperand: 'Al', operator: 'startsWith' as any, type: 'string', list: false },
+            {
+              pathExpression: 'title',
+              rightOperand: 'Al',
+              operator: 'startsWith' as any,
+              type: 'string',
+              list: false,
+            },
           ],
         },
         hydrate
@@ -272,7 +312,10 @@ describe('Database.query()', () => {
 
     it('returns empty cursors when the result set is empty', async () => {
       const { database, hydrate } = await setupDatabase([]);
-      const result = await database.query({ collection: 'post', filterChain: noFilter() }, hydrate);
+      const result = await database.query(
+        { collection: 'post', filterChain: noFilter() },
+        hydrate
+      );
       expect(result.edges).toHaveLength(0);
       expect(atob(result.pageInfo.startCursor)).toBe('');
     });
@@ -289,7 +332,10 @@ describe('Database.put() and Database.delete()', () => {
       'post'
     );
 
-    const result = await database.query({ collection: 'post', filterChain: noFilter() }, hydrate);
+    const result = await database.query(
+      { collection: 'post', filterChain: noFilter() },
+      hydrate
+    );
     expect(result.edges).toHaveLength(1);
     expect((result.edges[0].node as any).path).toBe('content/posts/new.json');
   });
@@ -297,8 +343,16 @@ describe('Database.put() and Database.delete()', () => {
   it('put() indexes the document so it appears in a sort-ordered query', async () => {
     const { database, hydrate } = await setupDatabase([]);
 
-    await database.put('content/posts/a.json', { title: 'Alpha', score: 1, published: true }, 'post');
-    await database.put('content/posts/b.json', { title: 'Beta', score: 2, published: false }, 'post');
+    await database.put(
+      'content/posts/a.json',
+      { title: 'Alpha', score: 1, published: true },
+      'post'
+    );
+    await database.put(
+      'content/posts/b.json',
+      { title: 'Beta', score: 2, published: false },
+      'post'
+    );
 
     const result = await database.query(
       { collection: 'post', sort: 'title', filterChain: noFilter() },
@@ -310,7 +364,10 @@ describe('Database.put() and Database.delete()', () => {
 
   it('put() updates an existing document so the new values are retrievable', async () => {
     const { database } = await setupDatabase([
-      { path: 'content/posts/post.json', data: { title: 'Old Title', score: 1, published: true } },
+      {
+        path: 'content/posts/post.json',
+        data: { title: 'Old Title', score: 1, published: true },
+      },
     ]);
 
     await database.put(
@@ -319,27 +376,44 @@ describe('Database.put() and Database.delete()', () => {
       'post'
     );
 
-    const raw = await database.get<Record<string, unknown>>('content/posts/post.json');
+    const raw = await database.get<Record<string, unknown>>(
+      'content/posts/post.json'
+    );
     expect(raw.title).toBe('New Title');
   });
 
   it('delete() removes a document so it no longer appears in queries', async () => {
     const { database, hydrate } = await setupDatabase([
-      { path: 'content/posts/a.json', data: { title: 'Alpha', score: 1, published: true } },
-      { path: 'content/posts/b.json', data: { title: 'Beta', score: 2, published: false } },
+      {
+        path: 'content/posts/a.json',
+        data: { title: 'Alpha', score: 1, published: true },
+      },
+      {
+        path: 'content/posts/b.json',
+        data: { title: 'Beta', score: 2, published: false },
+      },
     ]);
 
     await database.delete('content/posts/a.json');
 
-    const result = await database.query({ collection: 'post', filterChain: noFilter() }, hydrate);
+    const result = await database.query(
+      { collection: 'post', filterChain: noFilter() },
+      hydrate
+    );
     expect(result.edges).toHaveLength(1);
     expect((result.edges[0].node as any).path).toBe('content/posts/b.json');
   });
 
   it('delete() removes the document from sorted indexes too', async () => {
     const { database, hydrate } = await setupDatabase([
-      { path: 'content/posts/a.json', data: { title: 'Alpha', score: 1, published: true } },
-      { path: 'content/posts/b.json', data: { title: 'Beta', score: 2, published: false } },
+      {
+        path: 'content/posts/a.json',
+        data: { title: 'Alpha', score: 1, published: true },
+      },
+      {
+        path: 'content/posts/b.json',
+        data: { title: 'Beta', score: 2, published: false },
+      },
     ]);
 
     await database.delete('content/posts/a.json');
@@ -358,7 +432,11 @@ describe('Database.put() and Database.delete()', () => {
     const { database } = await setupDatabase([]);
 
     await expect(
-      database.put('content/posts/ghost.json', { title: 'Ghost', score: 99, published: true })
+      database.put('content/posts/ghost.json', {
+        title: 'Ghost',
+        score: 99,
+        published: true,
+      })
     ).rejects.toThrow();
   });
 });
@@ -379,21 +457,36 @@ describe('Database.getMetadata() and setMetadata()', () => {
 describe('Database.deleteContentByPaths()', () => {
   it('removes the document from all indexes so it no longer appears in queries', async () => {
     const { database, hydrate } = await setupDatabase([
-      { path: 'content/posts/a.json', data: { title: 'Alpha', score: 1, published: true } },
-      { path: 'content/posts/b.json', data: { title: 'Beta', score: 2, published: false } },
+      {
+        path: 'content/posts/a.json',
+        data: { title: 'Alpha', score: 1, published: true },
+      },
+      {
+        path: 'content/posts/b.json',
+        data: { title: 'Beta', score: 2, published: false },
+      },
     ]);
 
     await database.deleteContentByPaths(['content/posts/a.json']);
 
-    const result = await database.query({ collection: 'post', filterChain: noFilter() }, hydrate);
+    const result = await database.query(
+      { collection: 'post', filterChain: noFilter() },
+      hydrate
+    );
     expect(result.edges).toHaveLength(1);
     expect((result.edges[0].node as any).path).toBe('content/posts/b.json');
   });
 
   it('removes the document from sorted indexes too', async () => {
     const { database, hydrate } = await setupDatabase([
-      { path: 'content/posts/a.json', data: { title: 'Alpha', score: 1, published: true } },
-      { path: 'content/posts/b.json', data: { title: 'Beta', score: 2, published: false } },
+      {
+        path: 'content/posts/a.json',
+        data: { title: 'Alpha', score: 1, published: true },
+      },
+      {
+        path: 'content/posts/b.json',
+        data: { title: 'Beta', score: 2, published: false },
+      },
     ]);
 
     await database.deleteContentByPaths(['content/posts/a.json']);
@@ -410,19 +503,34 @@ describe('Database.deleteContentByPaths()', () => {
 describe('Database.indexContentByPaths()', () => {
   it('makes a newly added bridge file queryable without full re-index', async () => {
     const bridge = new InMemoryBridge();
-    bridge.seed('content/posts/a.json', jsonDoc({ title: 'A', score: 1, published: true }));
+    bridge.seed(
+      'content/posts/a.json',
+      jsonDoc({ title: 'A', score: 1, published: true })
+    );
 
-    const level = new MemoryLevel<string, Record<string, any>>({ valueEncoding: 'json' });
-    const database = createDatabaseInternal({ bridge, level, tinaDirectory: 'tina' });
+    const level = new MemoryLevel<string, Record<string, any>>({
+      valueEncoding: 'json',
+    });
+    const database = createDatabaseInternal({
+      bridge,
+      level,
+      tinaDirectory: 'tina',
+    });
     const builtSchema = await buildSchema({ schema: testSchema });
     await database.indexContent(builtSchema);
 
     // Add a new file to the bridge, then partially reindex just that file
-    bridge.seed('content/posts/b.json', jsonDoc({ title: 'B', score: 2, published: false }));
+    bridge.seed(
+      'content/posts/b.json',
+      jsonDoc({ title: 'B', score: 2, published: false })
+    );
     await database.indexContentByPaths(['content/posts/b.json']);
 
     const hydrate = async (path: string, value: any) => ({ path, ...value });
-    const result = await database.query({ collection: 'post', filterChain: noFilter() }, hydrate);
+    const result = await database.query(
+      { collection: 'post', filterChain: noFilter() },
+      hydrate
+    );
     expect(result.edges).toHaveLength(2);
   });
 });
@@ -438,7 +546,13 @@ describe('Database.query() — filter on non-sort field', () => {
         collection: 'post',
         sort: 'title',
         filterChain: [
-          { pathExpression: 'published', rightOperand: true, operator: 'eq' as any, type: 'boolean', list: false },
+          {
+            pathExpression: 'published',
+            rightOperand: true,
+            operator: 'eq' as any,
+            type: 'boolean',
+            list: false,
+          },
         ],
       },
       hydrate
@@ -453,21 +567,36 @@ describe('Database.query() — filter on non-sort field', () => {
 describe('Database.indexContent()', () => {
   it('re-indexing picks up new content from the bridge', async () => {
     const bridge = new InMemoryBridge();
-    bridge.seed('content/posts/a.json', jsonDoc({ title: 'A', score: 1, published: true }));
+    bridge.seed(
+      'content/posts/a.json',
+      jsonDoc({ title: 'A', score: 1, published: true })
+    );
 
-    const level = new MemoryLevel<string, Record<string, any>>({ valueEncoding: 'json' });
-    const database = createDatabaseInternal({ bridge, level, tinaDirectory: 'tina' });
+    const level = new MemoryLevel<string, Record<string, any>>({
+      valueEncoding: 'json',
+    });
+    const database = createDatabaseInternal({
+      bridge,
+      level,
+      tinaDirectory: 'tina',
+    });
     const builtSchema = await buildSchema({ schema: testSchema });
 
     await database.indexContent(builtSchema);
 
     // Add a second file then re-index
-    bridge.seed('content/posts/b.json', jsonDoc({ title: 'B', score: 2, published: false }));
+    bridge.seed(
+      'content/posts/b.json',
+      jsonDoc({ title: 'B', score: 2, published: false })
+    );
     database.clearCache();
     await database.indexContent(builtSchema);
 
     const hydrate = async (path: string, value: any) => ({ path, ...value });
-    const result = await database.query({ collection: 'post', filterChain: noFilter() }, hydrate);
+    const result = await database.query(
+      { collection: 'post', filterChain: noFilter() },
+      hydrate
+    );
     expect(result.edges).toHaveLength(2);
   });
 });
