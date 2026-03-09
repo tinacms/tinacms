@@ -82,6 +82,8 @@ export const Icon = ({
   data,
   tinaField = '',
   parentColor = 'default',
+  className = '',
+  ...rest
 }: any) => {
   const { theme } = useLayout();
   const color = data.color || theme.color;
@@ -104,7 +106,8 @@ export const Icon = ({
     return (
       <div
         data-tinafield={tinaField}
-        className={`relative z-10 inline-flex items-center justify-center flex-shrink-0 rounded-full ${colorClass.circle} ${sizeClass}`}
+        className={`relative z-10 inline-flex items-center justify-center flex-shrink-0 rounded-full ${colorClass.circle} ${sizeClass} ${className}`.trim()}
+        {...rest}
       >
         <IconComponent className='w-2/3 h-2/3' />
       </div>
@@ -114,7 +117,8 @@ export const Icon = ({
   return (
     <IconComponent
       data-tinafield={tinaField}
-      className={`${colorClass.regular} ${sizeClass}`}
+      className={`${colorClass.regular} ${sizeClass} ${className}`.trim()}
+      {...rest}
     />
   );
 };
