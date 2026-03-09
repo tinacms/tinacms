@@ -31,6 +31,15 @@ export const Header = () => {
     return pathname?.startsWith(href);
   };
 
+  const sanitizeId = (s: string, fallback = 'nav') => {
+    const id = String(s || fallback)
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9_-]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    return id || fallback;
+  };
+
   return (
     <header
       className={`relative overflow-hidden bg-gradient-to-b ${headerColorCss}`}
@@ -59,11 +68,12 @@ export const Header = () => {
 
           {/* Desktop Navigation - Hidden on mobile */}
           <nav className='hidden sm:flex items-center gap-0 sm:gap-1'>
-            {nav.map((item: any) => {
+            {nav.map((item: any, idx: number) => {
               const active = isActive(item.href || '/');
+              const gradientId = sanitizeId(item.href || `nav-${idx}`, `nav-${idx}`);
               return (
                 <Link
-                  key={item.href}
+                  key={item.href || `nav-${idx}`}
                   href={item.href || '/'}
                   className={`relative select-none text-base inline-flex items-center tracking-wide transition duration-150 ease-out opacity-70 hover:opacity-100 px-2 sm:px-4 py-5 ${
                     active
@@ -90,7 +100,7 @@ export const Header = () => {
                       xmlns='http://www.w3.org/2000/svg'
                     >
                       <defs>
-                        <radialGradient id={`nav-active-${item.href}`}>
+                        <radialGradient id={gradientId}>
                           <stop stopColor='currentColor' />
                           <stop offset='1' stopColor='transparent' />
                         </radialGradient>
@@ -100,7 +110,7 @@ export const Header = () => {
                         y='0'
                         width='230'
                         height='230'
-                        fill={`url(#nav-active-${item.href})`}
+                        fill={`url(#${gradientId})`}
                       />
                     </svg>
                   )}
