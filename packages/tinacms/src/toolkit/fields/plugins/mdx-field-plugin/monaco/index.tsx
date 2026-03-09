@@ -10,10 +10,8 @@ import {
   buildError,
 } from './error-message';
 import { useDebounce } from './use-debounce';
-import {
-  captureEvent,
-  RichTextEditorSwitchedEvent,
-} from '../../../../../../src/lib/posthog';
+import { RichTextEditorSwitchedEvent } from '../../../../../lib/posthog/posthog';
+import { captureEvent } from '../../../../../lib/posthog/posthogProvider';
 
 const parseMDX = (value: string) => ({ type: 'root', children: [] });
 const stringifyMDX = (value: any) => '';

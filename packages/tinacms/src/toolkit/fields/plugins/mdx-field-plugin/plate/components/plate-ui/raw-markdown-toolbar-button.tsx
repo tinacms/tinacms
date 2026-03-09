@@ -3,10 +3,8 @@ import { withRef } from '@udecode/cn';
 import { Icons } from './icons';
 import { ToolbarButton } from './toolbar';
 import { useEditorContext } from '../../editor-context';
-import {
-  captureEvent,
-  RichTextEditorSwitchedEvent,
-} from '../../../../../../../../src/lib/posthog';
+import { RichTextEditorSwitchedEvent } from '../../../../../../../lib/posthog/posthog';
+import { captureEvent } from '../../../../../../../lib/posthog/posthogProvider';
 
 const useRawMarkdownToolbarButton = () => {
   const { setRawMode } = useEditorContext();
