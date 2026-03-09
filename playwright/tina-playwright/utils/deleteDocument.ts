@@ -14,12 +14,18 @@ const deleteDocument = async (
   collection: string,
   relativePath: string
 ): Promise<void> => {
-  await apiContext.post("/graphql", {
+  const resp = await apiContext.post("/graphql", {
     data: {
       query: DELETE_DOCUMENT,
       variables: { collection, relativePath },
     },
   });
+
+  if (!resp.ok()) {
+    throw new Error(
+      `GraphQL delete failed: ${resp.status()} ${await resp.text()}`
+    );
+  }
 };
 
 export default deleteDocument;
