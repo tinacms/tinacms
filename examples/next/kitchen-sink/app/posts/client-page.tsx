@@ -63,17 +63,20 @@ export default function PostsClientPage(props: PostsClientPageProps) {
                 className='flex items-center'
                 data-testid={`post-author-${post._sys.filename}`}
               >
-                {post.author?.avatar && (
-                  <div className='flex-shrink-0 mr-2'>
-                    <Image
-                      width={40}
-                      height={40}
-                      className='object-cover rounded-full shadow-sm'
-                      src={sanitizeImageSrc(post.author.avatar)}
-                      alt={post.author?.name || ''}
-                    />
-                  </div>
-                )}
+                {(() => {
+                  const avatarSrc = post.author?.avatar ? sanitizeImageSrc(post.author.avatar) : '';
+                  return avatarSrc ? (
+                    <div className='flex-shrink-0 mr-2'>
+                      <Image
+                        width={40}
+                        height={40}
+                        className='object-cover rounded-full shadow-sm'
+                        src={avatarSrc}
+                        alt={post.author?.name || ''}
+                      />
+                    </div>
+                  ) : null;
+                })()}
                 {post.author?.name && (
                   <p className='text-base font-medium text-gray-600 group-hover:text-gray-800 dark:text-gray-200 dark:group-hover:text-white'>
                     {post.author.name}
