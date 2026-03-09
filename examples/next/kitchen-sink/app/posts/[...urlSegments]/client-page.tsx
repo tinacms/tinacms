@@ -39,17 +39,20 @@ export default function PostClientPage(props: PostClientPageProps) {
         <div className='flex items-center justify-center mb-16'>
           {post.author && (
             <>
-              {post.author.avatar && (
-                <div className='flex-shrink-0 mr-4'>
-                  <Image
-                    width={56}
-                    height={56}
-                    className='object-cover rounded-full shadow-sm'
-                    src={sanitizeImageSrc(post.author.avatar)}
-                    alt={post.author.name || ''}
-                  />
-                </div>
-              )}
+              {post.author.avatar && (() => {
+                const avatarSrc = sanitizeImageSrc(post.author.avatar);
+                return avatarSrc ? (
+                  <div className='flex-shrink-0 mr-4'>
+                    <Image
+                      width={56}
+                      height={56}
+                      className='object-cover rounded-full shadow-sm'
+                      src={avatarSrc}
+                      alt={post.author.name || ''}
+                    />
+                  </div>
+                ) : null;
+              })()}
               {authorFilename ? (
                 <Link
                   href={`/authors/${authorFilename}`}
@@ -72,20 +75,23 @@ export default function PostClientPage(props: PostClientPageProps) {
           </p>
         </div>
       </Container>
-      {post.heroImg && (
-        <div className='px-4 w-full'>
-          <div className='relative max-w-2xl mx-auto'>
-            <Image
-              src={sanitizeImageSrc(post.heroImg)}
-              alt={post.title}
-              width={600}
-              height={400}
-              priority
-              className='mb-14 block rounded-lg w-full h-auto'
-            />
+      {(() => {
+        const heroSrc = post.heroImg ? sanitizeImageSrc(post.heroImg) : '';
+        return heroSrc ? (
+          <div className='px-4 w-full'>
+            <div className='relative max-w-2xl mx-auto'>
+              <Image
+                src={heroSrc}
+                alt={post.title}
+                width={600}
+                height={400}
+                priority
+                className='mb-14 block rounded-lg w-full h-auto'
+              />
+            </div>
           </div>
-        </div>
-      )}
+        ) : null;
+      })()
       <Container className='flex-1 pt-4' width='small' size='large'>
         <div className='prose dark:prose-dark w-full max-w-none'>
           <TinaMarkdown components={customComponents} content={post._body} />
