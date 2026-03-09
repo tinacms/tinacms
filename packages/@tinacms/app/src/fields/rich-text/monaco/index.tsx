@@ -15,6 +15,8 @@ import {
   buildError,
 } from './error-message';
 import { useDebounce } from './use-debounce';
+import { RichTextEditorSwitchedEvent } from '../../../../../../tinacms/src/lib/posthog/posthog';
+import { captureEvent } from '../../../../../../tinacms/src/lib/posthog/posthogProvider';
 
 export const uuid = () => {
   // @ts-ignore
@@ -154,7 +156,12 @@ export const RawEditor = (props: RichTextType) => {
   return (
     <div className='relative'>
       <div className='sticky top-1 w-full flex justify-between mb-2 z-50 max-w-full bg-white'>
-        <Button onClick={() => props.setRawMode(false)}>
+        <Button
+          onClick={() => {
+            captureEvent(RichTextEditorSwitchedEvent, { to: 'richtext' });
+            props.setRawMode(false);
+          }}
+        >
           View in rich-text editor 📝
         </Button>
         <ErrorMessage error={error} />
