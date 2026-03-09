@@ -105,7 +105,7 @@ export function Alerts({ alerts }: AlertsProps) {
                   Error
                 </ModalHeader>
                 <ModalBody padded={true}>
-                  <div className='tina-prose'>
+                  <div className='tina-prose whitespace-pre-wrap'>
                     <AlertMessage />
                   </div>
                 </ModalBody>
