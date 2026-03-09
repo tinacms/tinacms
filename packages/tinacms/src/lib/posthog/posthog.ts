@@ -24,14 +24,12 @@ export type BranchSwitcherPRClickedPayload = {
 // When a user successfully saves content in the TinaCMS Editor
 export const SavedContentEvent: string = 'saved-content';
 export type SavedContentPayload = {
-  collection?: string;
   documentPath?: string;
 };
 
 // When a save fails in the TinaCMS Editor
 export const SaveContentErrorEvent: string = 'save-content-error';
 export type SaveContentErrorPayload = {
-  collection?: string;
   documentPath?: string;
   error?: string;
 };
