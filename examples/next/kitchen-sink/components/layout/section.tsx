@@ -38,16 +38,3 @@ export const Section = ({ children, color = '', className = '' }) => {
     </section>
   );
 };
-
-export const sectionColorOptions = [
-  { label: 'Default', value: 'default' },
-  { label: 'Tint', value: 'tint' },
-  { label: 'Primary', value: 'primary' },
-];
-
-export const sectionBlockSchemaField = {
-  type: 'string',
-  label: 'Color',
-  name: 'color',
-  options: sectionColorOptions,
-};

@@ -1,4 +1,5 @@
 import type { Collection } from 'tinacms';
+import { dateFieldSchemas } from '../schemas/shared-fields';
 
 const Author: Collection = {
   label: 'Authors',
@@ -25,16 +26,7 @@ const Author: Collection = {
       label: 'Description',
       name: 'description',
     },
-    {
-      type: 'datetime',
-      label: 'Publish Date',
-      name: 'pubDate',
-    },
-    {
-      type: 'datetime',
-      label: 'Updated Date',
-      name: 'updatedDate',
-    },
+    ...dateFieldSchemas,
     {
       type: 'string',
       label: 'Hobbies',

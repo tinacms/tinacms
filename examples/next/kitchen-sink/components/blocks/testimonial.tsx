@@ -1,16 +1,7 @@
 'use client';
 import { Section, Container, useLayout } from '../layout';
-
-const authorColorMap: Record<string, string> = {
-  blue: 'text-blue-500 dark:text-blue-300',
-  teal: 'text-teal-500 dark:text-teal-300',
-  green: 'text-green-500 dark:text-green-300',
-  red: 'text-red-500 dark:text-red-300',
-  pink: 'text-pink-500 dark:text-pink-300',
-  purple: 'text-purple-500 dark:text-purple-300',
-  orange: 'text-orange-500 dark:text-orange-300',
-  yellow: 'text-yellow-500 dark:text-yellow-300',
-};
+import { colorFieldSchema } from '@/tina/schemas/shared-fields';
+import { authorColorMap } from '@/lib/utils';
 
 export const Testimonial = ({ data, parentField = '' }) => {
   const { theme } = useLayout();
@@ -95,15 +86,6 @@ export const testimonialBlockSchema = {
       label: 'Author',
       name: 'author',
     },
-    {
-      type: 'string',
-      label: 'Color',
-      name: 'color',
-      options: [
-        { label: 'Default', value: 'default' },
-        { label: 'Tint', value: 'tint' },
-        { label: 'Primary', value: 'primary' },
-      ],
-    },
+    colorFieldSchema,
   ],
 };

@@ -1,4 +1,5 @@
 import type { Collection } from 'tinacms';
+import { makeSlugify, dateFieldSchemas } from '../schemas/shared-fields';
 
 const Blog: Collection = {
   label: 'Blogs',
@@ -8,8 +9,7 @@ const Blog: Collection = {
   ui: {
     router: ({ document }) => `/blog/${document._sys.filename}`,
     filename: {
-      slugify: (values) =>
-        `${(values?.title || `blog-${Date.now()}`).toLowerCase().split(' ').join('-')}`,
+      slugify: makeSlugify('blog'),
       readonly: true,
     },
   },
@@ -47,16 +47,7 @@ const Blog: Collection = {
       name: 'author',
       collections: ['author'],
     },
-    {
-      type: 'datetime',
-      label: 'Publish Date',
-      name: 'pubDate',
-    },
-    {
-      type: 'datetime',
-      label: 'Updated Date',
-      name: 'updatedDate',
-    },
+    ...dateFieldSchemas,
     {
       type: 'rich-text',
       label: 'Body',

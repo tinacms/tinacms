@@ -3,13 +3,14 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { sanitizeImageSrc, titleColorClasses } from '@/lib/utils';
+import { sanitizeImageSrc } from '@/lib/utils';
 import { useTina } from 'tinacms/dist/react';
 import { TinaMarkdown } from 'tinacms/dist/rich-text';
-import { useLayout } from '@/components/layout/layout-context';
 import { Section } from '@/components/layout/section';
 import { Container } from '@/components/layout/container';
 import { customComponents } from '@/components/markdown-components';
+import { GradientTitle } from '@/components/ui/gradient-title';
+import { NoData } from '@/components/ui/no-data';
 
 interface PostClientPageProps {
   data: any;
@@ -19,20 +20,14 @@ interface PostClientPageProps {
 }
 
 export default function PostClientPage(props: PostClientPageProps) {
-  const { theme } = useLayout();
   const { data } = useTina({ ...props });
   const post = data.post;
 
   if (!post) {
-    return (
-      <div className='py-12 px-6 text-center text-gray-600 dark:text-gray-400'>
-        No post found
-      </div>
-    );
+    return <NoData message='No post found' />;
   }
 
   const formattedDate = props.formattedDate ?? '';
-  const titleColour = titleColorClasses[theme.color] || titleColorClasses.blue;
 
   // Derive author page URL from the author reference
   const authorFilename = post.author?._sys?.filename;
@@ -40,13 +35,9 @@ export default function PostClientPage(props: PostClientPageProps) {
   return (
     <Section className='flex-1'>
       <Container width='small' className='flex-1 pb-2' size='large'>
-        <h2 className='w-full relative mb-8 text-6xl font-extrabold tracking-normal text-center title-font'>
-          <span
-            className={`bg-clip-text text-transparent bg-gradient-to-r ${titleColour}`}
-          >
-            {post.title}
-          </span>
-        </h2>
+        <GradientTitle as='h2'>
+          {post.title}
+        </GradientTitle>
         <div className='flex items-center justify-center mb-16'>
           {post.author && (
             <>

@@ -3,6 +3,7 @@ import Image from 'next/image';
 import React from 'react';
 import client from '../../tina/__generated__/client';
 import { formatDate, sanitizeImageSrc } from '@/lib/utils';
+import { PageSection } from '@/components/layout/page-section';
 
 export const revalidate = 300;
 
@@ -11,12 +12,8 @@ export default async function BlogsPage() {
   const blogs = connection.data.blogConnection.edges ?? [];
 
   return (
-    <section className='flex-1 relative transition duration-150 ease-out body-font overflow-hidden text-gray-800 dark:text-gray-50 bg-gradient-to-tl from-gray-50 dark:from-gray-900 via-transparent to-transparent'>
-      <div className='max-w-5xl mx-auto px-6 sm:px-8 py-24'>
-        <h1 className='text-4xl font-extrabold tracking-tight mb-12 text-center title-font'>
-          Blog
-        </h1>
-        <div className='grid gap-8 md:grid-cols-2'>
+    <PageSection title='Blog'>
+      <div className='grid gap-8 md:grid-cols-2'>
           {blogs.map((edge: any) => {
             const blog = edge.node;
             const href = `/blog/${blog._sys.filename}`;
@@ -86,7 +83,6 @@ export default async function BlogsPage() {
             );
           })}
         </div>
-      </div>
-    </section>
+    </PageSection>
   );
 }

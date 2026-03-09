@@ -1030,9 +1030,6 @@ importers:
       vite:
         specifier: ^4.5.9
         version: 4.5.14(@types/node@25.1.0)(lightningcss@1.31.1)(sass@1.97.3)(terser@5.46.0)
-      vitest:
-        specifier: ^0.32.4
-        version: 0.32.4(happy-dom@15.10.2)(jsdom@15.2.1(bufferutil@4.1.0))(lightningcss@1.31.1)(playwright@1.57.0)(sass@1.97.3)(terser@5.46.0)
 
   examples/tina-self-hosted-demo:
     dependencies:

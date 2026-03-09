@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { sanitizeImageSrc, titleColorClasses } from '@/lib/utils';
+import { sanitizeImageSrc, titleColorClasses, cardLinkClasses } from '@/lib/utils';
 import { TinaMarkdown } from 'tinacms/dist/rich-text';
 import { BiRightArrowAlt } from 'react-icons/bi';
 import { useLayout } from '@/components/layout/layout-context';
@@ -36,7 +36,7 @@ export default function PostsClientPage(props: PostsClientPageProps) {
               key={post._sys.filename}
               href={postUrl}
               data-testid={`post-card-${post._sys.filename}`}
-              className='group block px-6 sm:px-8 md:px-10 py-10 mb-8 last:mb-0 bg-gray-50 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-1000 rounded shadow-sm transition-all duration-150 ease-out hover:shadow-md hover:to-gray-50 dark:hover:to-gray-800'
+              className={`${cardLinkClasses} px-6 sm:px-8 md:px-10 py-10 mb-8 last:mb-0`}
             >
               <h3
                 className={`text-gray-700 dark:text-white text-3xl lg:text-4xl font-semibold title-font mb-5 transition-all duration-150 ease-out ${

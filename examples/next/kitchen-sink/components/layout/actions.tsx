@@ -41,58 +41,38 @@ export const Actions = ({
     <div className={`flex flex-wrap items-center gap-y-4 gap-x-6 ${className}`}>
       {actions &&
         actions.map(function (action: any, index: number) {
-          let element = null;
-          if (action.type === 'button') {
-            element = (
-              <Link
-                key={index}
-                href={getSafeHref(action.link)}
-                data-tinafield={`${parentField}.${index}`}
-                className={`z-10 relative inline-flex items-center px-7 py-3 font-semibold text-lg transition duration-150 ease-out rounded-lg transform focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 whitespace-nowrap ${
-                  parentColor === 'primary'
-                    ? invertedButtonColorClasses[
-                        theme.color as keyof typeof invertedButtonColorClasses
-                      ]
-                    : buttonColorClasses[
-                        theme.color as keyof typeof buttonColorClasses
-                      ]
-                }`}
-              >
-                {action.label}
-                {action.icon && (
-                  <BiRightArrowAlt
-                    className={`ml-1 -mr-1 w-6 h-6 opacity-80`}
-                  />
-                )}
-              </Link>
-            );
-          } else {
-            element = (
-              <Link
-                key={index}
-                href={getSafeHref(action.link)}
-                data-tinafield={`${parentField}.${index}`}
-                className={`z-10 relative inline-flex items-center px-7 py-3 font-semibold text-lg transition duration-150 ease-out ${
-                  parentColor === 'primary'
-                    ? linkButtonColorClasses[
-                        theme.color as keyof typeof linkButtonColorClasses
-                      ]
-                    : linkButtonColorClasses[
-                        theme.color as keyof typeof linkButtonColorClasses
-                      ]
-                }`}
-              >
-                {action.label}
-                {action.icon && (
-                  <BiRightArrowAlt
-                    className={`ml-1 -mr-1 w-6 h-6 opacity-80`}
-                  />
-                )}
-              </Link>
-            );
-          }
+          const isButton = action.type === 'button';
+          const colorClass = isButton
+            ? parentColor === 'primary'
+              ? invertedButtonColorClasses[
+                  theme.color as keyof typeof invertedButtonColorClasses
+                ]
+              : buttonColorClasses[
+                  theme.color as keyof typeof buttonColorClasses
+                ]
+            : linkButtonColorClasses[
+                theme.color as keyof typeof linkButtonColorClasses
+              ];
 
-          return element;
+          return (
+            <Link
+              key={index}
+              href={getSafeHref(action.link)}
+              data-tinafield={`${parentField}.${index}`}
+              className={`z-10 relative inline-flex items-center px-7 py-3 font-semibold text-lg transition duration-150 ease-out ${
+                isButton
+                  ? 'rounded-lg transform focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 whitespace-nowrap'
+                  : ''
+              } ${colorClass}`}
+            >
+              {action.label}
+              {action.icon && (
+                <BiRightArrowAlt
+                  className={`ml-1 -mr-1 w-6 h-6 opacity-80`}
+                />
+              )}
+            </Link>
+          );
         })}
     </div>
   );

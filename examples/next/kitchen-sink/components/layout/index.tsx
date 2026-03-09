@@ -1,10 +1,5 @@
-export {
-  Section,
-  sectionColorOptions,
-  sectionBlockSchemaField,
-} from './section';
+export { Section } from './section';
 export { Container } from './container';
-export { Theme, useTheme } from './theme';
 export { Actions } from './actions';
 export { Icon, iconSchema, IconOptions } from './icon';
 export { useLayout } from './layout-context';

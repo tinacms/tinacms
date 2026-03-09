@@ -3,6 +3,10 @@ import { Actions } from '../layout/actions';
 import { Icon, iconSchema } from '../layout/icon';
 import { Section, Container } from '../layout';
 import RichText from '@/lib/richText';
+import {
+  actionsFieldSchema,
+  colorFieldSchema,
+} from '@/tina/schemas/shared-fields';
 import { Card, CardHeader, CardTitle } from '../ui/card';
 
 export const Feature = ({ featuresColor, data, tinaField }: any) => {
@@ -191,58 +195,9 @@ export const featureBlockSchema = {
             component: 'textarea',
           },
         },
-        {
-          label: 'Actions',
-          name: 'actions',
-          type: 'object',
-          list: true,
-          ui: {
-            defaultItem: {
-              label: 'Action Label',
-              type: 'button',
-              icon: true,
-              link: '/',
-            },
-            itemProps: (item: any) => ({ label: item.label }),
-          },
-          fields: [
-            {
-              label: 'Label',
-              name: 'label',
-              type: 'string',
-            },
-            {
-              label: 'Type',
-              name: 'type',
-              type: 'string',
-              options: [
-                { label: 'Button', value: 'button' },
-                { label: 'Link', value: 'link' },
-              ],
-            },
-            {
-              label: 'Link',
-              name: 'link',
-              type: 'string',
-            },
-            {
-              label: 'Icon',
-              name: 'icon',
-              type: 'boolean',
-            },
-          ],
-        },
+        actionsFieldSchema,
       ],
     },
-    {
-      type: 'string',
-      label: 'Color',
-      name: 'color',
-      options: [
-        { label: 'Default', value: 'default' },
-        { label: 'Tint', value: 'tint' },
-        { label: 'Primary', value: 'primary' },
-      ],
-    },
+    colorFieldSchema,
   ],
 };

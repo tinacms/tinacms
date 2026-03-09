@@ -1,28 +1,26 @@
 'use client';
 import Image from 'next/image';
 import { useTina } from 'tinacms/dist/react';
-import { sanitizeImageSrc, titleColorClasses } from '@/lib/utils';
+import { sanitizeImageSrc } from '@/lib/utils';
+import type { TinaPageProps } from '@/lib/types';
 import { TinaMarkdown } from 'tinacms/dist/rich-text';
 import { customComponents } from '@/components/markdown-components';
-import { useLayout } from '@/components/layout/layout-context';
 import { Section } from '@/components/layout/section';
 import { Container } from '@/components/layout/container';
+import { GradientTitle } from '@/components/ui/gradient-title';
+import { NoData } from '@/components/ui/no-data';
 
-type TinaProps = {
-  query: string;
-  variables: Record<string, any>;
-  data: any;
+type BlogClientProps = TinaPageProps & {
   formattedPubDate?: string;
   formattedUpdatedDate?: string;
 };
 
-export default function BlogClientPage(props: TinaProps) {
+export default function BlogClientPage(props: BlogClientProps) {
   const { data } = useTina({
     query: props.query,
     variables: props.variables,
     data: props.data,
   });
-  const { theme } = useLayout();
 
   if (data?.blog) {
     const formattedDate = props.formattedPubDate ?? '';
@@ -31,13 +29,9 @@ export default function BlogClientPage(props: TinaProps) {
     return (
       <Section className='flex-1'>
         <Container width='small' size='large'>
-          <h1 className='w-full relative mb-8 text-6xl font-extrabold tracking-normal text-center title-font'>
-            <span
-              className={`bg-clip-text text-transparent bg-gradient-to-r ${titleColorClasses[theme.color] || titleColorClasses.blue}`}
-            >
-              {data.blog.title}
-            </span>
-          </h1>
+          <GradientTitle>
+            {data.blog.title}
+          </GradientTitle>
 
           {data.blog.description && (
             <p className='text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-6 text-center'>
@@ -104,9 +98,5 @@ export default function BlogClientPage(props: TinaProps) {
     );
   }
 
-  return (
-    <div className='py-12 px-6 text-center text-gray-600 dark:text-gray-400'>
-      No blog post found
-    </div>
-  );
+  return <NoData message='No blog post found' />;
 }

@@ -126,21 +126,6 @@ export const linkButtonColorClasses: Record<string, string> = {
 };
 
 /**
- * Hero/headline background gradient color classes
- * Used in hero blocks and section headlines
- */
-export const headlineColorClasses: Record<string, string> = {
-  blue: 'from-blue-400 to-blue-600',
-  teal: 'from-teal-400 to-teal-600',
-  green: 'from-green-400 to-green-600',
-  red: 'from-red-400 to-red-600',
-  pink: 'from-pink-400 to-pink-600',
-  purple: 'from-purple-400 to-purple-600',
-  orange: 'from-orange-300 to-orange-600',
-  yellow: 'from-yellow-400 to-yellow-800',
-};
-
-/**
  * Header background color classes
  * Maps to both default and primary color variants
  */
@@ -186,3 +171,38 @@ export const activeBackgroundClasses: Record<string, string> = {
   orange: 'text-orange-600 dark:text-orange-300',
   yellow: 'text-yellow-600 dark:text-yellow-300',
 };
+
+/**
+ * Social icon color classes for the footer
+ */
+export const socialIconColorClasses: Record<string, string> = {
+  blue: 'text-blue-500 dark:text-blue-400 hover:text-blue-300',
+  teal: 'text-teal-500 dark:text-teal-400 hover:text-teal-300',
+  green: 'text-green-500 dark:text-green-400 hover:text-green-300',
+  red: 'text-red-500 dark:text-red-400 hover:text-red-300',
+  pink: 'text-pink-500 dark:text-pink-400 hover:text-pink-300',
+  purple: 'text-purple-500 dark:text-purple-400 hover:text-purple-300',
+  orange: 'text-orange-500 dark:text-orange-400 hover:text-orange-300',
+  yellow: 'text-yellow-500 dark:text-yellow-400 hover:text-yellow-300',
+};
+
+/**
+ * Author/testimonial name color classes
+ */
+export const authorColorMap: Record<string, string> = {
+  blue: 'text-blue-500 dark:text-blue-300',
+  teal: 'text-teal-500 dark:text-teal-300',
+  green: 'text-green-500 dark:text-green-300',
+  red: 'text-red-500 dark:text-red-300',
+  pink: 'text-pink-500 dark:text-pink-300',
+  purple: 'text-purple-500 dark:text-purple-300',
+  orange: 'text-orange-500 dark:text-orange-300',
+  yellow: 'text-yellow-500 dark:text-yellow-300',
+};
+
+/**
+ * Shared card-link classes for listing pages
+ * Use with cn() to merge additional overrides per page
+ */
+export const cardLinkClasses =
+  'group block bg-gray-50 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-1000 rounded shadow-sm transition-all duration-150 ease-out hover:shadow-md hover:to-gray-50 dark:hover:to-gray-800';

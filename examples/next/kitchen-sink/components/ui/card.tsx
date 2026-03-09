@@ -38,24 +38,4 @@ function CardTitle({ className, ...props }: React.ComponentProps<'div'>) {
   );
 }
 
-function CardDescription({ className, ...props }: React.ComponentProps<'div'>) {
-  return (
-    <div
-      data-slot='card-description'
-      className={cn('text-gray-500 dark:text-gray-400 text-sm', className)}
-      {...props}
-    />
-  );
-}
-
-function CardContent({ className, ...props }: React.ComponentProps<'div'>) {
-  return (
-    <div
-      data-slot='card-content'
-      className={cn('px-6 pb-6', className)}
-      {...props}
-    />
-  );
-}
-
-export { Card, CardHeader, CardTitle, CardDescription, CardContent };
+export { Card, CardHeader, CardTitle };

@@ -1,6 +1,7 @@
 'use client';
 import { Section, Container } from '../layout';
 import RichText from '@/lib/richText';
+import { colorFieldSchema } from '@/tina/schemas/shared-fields';
 
 export const Content = ({ data, parentField = '' }) => {
   return (
@@ -34,15 +35,6 @@ export const contentBlockSchema = {
       label: 'Body',
       name: 'body',
     },
-    {
-      type: 'string',
-      label: 'Color',
-      name: 'color',
-      options: [
-        { label: 'Default', value: 'default' },
-        { label: 'Tint', value: 'tint' },
-        { label: 'Primary', value: 'primary' },
-      ],
-    },
+    colorFieldSchema,
   ],
 };

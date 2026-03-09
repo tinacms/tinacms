@@ -1,4 +1,5 @@
 import type { Collection } from 'tinacms';
+import { makeSlugify, tagsFieldSchema } from '../schemas/shared-fields';
 
 const Post: Collection = {
   label: 'Posts',
@@ -10,8 +11,7 @@ const Post: Collection = {
       return `/post/${document._sys.breadcrumbs.join('/')}`;
     },
     filename: {
-      slugify: (values) =>
-        `${(values?.title || `post-${Date.now()}`).toLowerCase().split(' ').join('-')}`,
+      slugify: makeSlugify('post'),
       readonly: true,
     },
   },
@@ -66,18 +66,7 @@ const Post: Collection = {
       },
     },
     {
-      type: 'object',
-      label: 'Tags',
-      name: 'tags',
-      list: true,
-      fields: [
-        {
-          type: 'reference',
-          label: 'Tag',
-          name: 'tag',
-          collections: ['tag'],
-        },
-      ],
+      ...tagsFieldSchema,
       ui: {
         itemProps: (item) => {
           return { label: item?.tag };

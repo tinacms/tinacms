@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { BiPlay, BiRefresh } from 'react-icons/bi';
 
-const EXAMPLE_QUERY = `query PostsQuery {
+export const EXAMPLE_QUERY = `query PostsQuery {
   postConnection {
     edges {
       node {

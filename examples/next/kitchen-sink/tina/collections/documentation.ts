@@ -1,4 +1,5 @@
 import type { Collection } from 'tinacms';
+import { makeSlugify, tagsFieldSchema } from '../schemas/shared-fields';
 
 const Documentation: Collection = {
   label: 'Documentation',
@@ -9,8 +10,7 @@ const Documentation: Collection = {
     router: ({ document }) =>
       `/documentation/${document._sys.breadcrumbs.join('/')}`,
     filename: {
-      slugify: (values) =>
-        `${(values?.title || `doc-${Date.now()}`).toLowerCase().split(' ').join('-')}`,
+      slugify: makeSlugify('doc'),
     },
   },
   fields: [
@@ -21,20 +21,7 @@ const Documentation: Collection = {
       isTitle: true,
       required: true,
     },
-    {
-      type: 'object',
-      label: 'Tags',
-      name: 'tags',
-      list: true,
-      fields: [
-        {
-          type: 'reference',
-          label: 'Tag',
-          name: 'tag',
-          collections: ['tag'],
-        },
-      ],
-    },
+    tagsFieldSchema,
     {
       type: 'rich-text',
       label: 'Body',

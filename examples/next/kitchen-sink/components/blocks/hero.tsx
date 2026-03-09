@@ -5,6 +5,10 @@ import { Container } from '../layout';
 import RichText from '@/lib/richText';
 import { Section } from '../layout';
 import { sanitizeImageSrc } from '@/lib/utils';
+import {
+  actionsFieldSchema,
+  colorFieldSchema,
+} from '@/tina/schemas/shared-fields';
 
 export const Hero = ({ data, parentField }: any) => {
   return (
@@ -130,56 +134,7 @@ export const heroBlockSchema = {
         },
       ],
     },
-    {
-      label: 'Actions',
-      name: 'actions',
-      type: 'object',
-      list: true,
-      ui: {
-        defaultItem: {
-          label: 'Action Label',
-          type: 'button',
-          icon: true,
-          link: '/',
-        },
-        itemProps: (item: any) => ({ label: item.label }),
-      },
-      fields: [
-        {
-          label: 'Label',
-          name: 'label',
-          type: 'string',
-        },
-        {
-          label: 'Type',
-          name: 'type',
-          type: 'string',
-          options: [
-            { label: 'Button', value: 'button' },
-            { label: 'Link', value: 'link' },
-          ],
-        },
-        {
-          label: 'Link',
-          name: 'link',
-          type: 'string',
-        },
-        {
-          label: 'Icon',
-          name: 'icon',
-          type: 'boolean',
-        },
-      ],
-    },
-    {
-      type: 'string',
-      label: 'Color',
-      name: 'color',
-      options: [
-        { label: 'Default', value: 'default' },
-        { label: 'Tint', value: 'tint' },
-        { label: 'Primary', value: 'primary' },
-      ],
-    },
+    actionsFieldSchema,
+    colorFieldSchema,
   ],
 };

@@ -2,39 +2,21 @@
 import Image from 'next/image';
 import { useTina } from 'tinacms/dist/react';
 import { sanitizeImageSrc } from '@/lib/utils';
+import type { TinaPageProps } from '@/lib/types';
 import { TinaMarkdown } from 'tinacms/dist/rich-text';
 import { customComponents } from '@/components/markdown-components';
-import { useLayout } from '@/components/layout/layout-context';
 import { Section } from '@/components/layout/section';
 import { Container } from '@/components/layout/container';
+import { GradientTitle } from '@/components/ui/gradient-title';
+import { NoData } from '@/components/ui/no-data';
+import { Badge } from '@/components/ui/badge';
 
-type TinaProps = {
-  query: string;
-  variables: Record<string, any>;
-  data: any;
-};
-
-export default function AuthorClientPage(props: TinaProps) {
+export default function AuthorClientPage(props: TinaPageProps) {
   const { data } = useTina({
     query: props.query,
     variables: props.variables,
     data: props.data,
   });
-  const { theme } = useLayout();
-
-  const titleColorClasses: Record<string, string> = {
-    blue: 'from-blue-400 to-blue-600 dark:from-blue-300 dark:to-blue-500',
-    teal: 'from-teal-400 to-teal-600 dark:from-teal-300 dark:to-teal-500',
-    green: 'from-green-400 to-green-600 dark:from-green-300 dark:to-green-500',
-    red: 'from-red-400 to-red-600 dark:from-red-300 dark:to-red-500',
-    pink: 'from-pink-300 to-pink-500',
-    purple:
-      'from-purple-400 to-purple-600 dark:from-purple-300 dark:to-purple-500',
-    orange:
-      'from-orange-300 to-orange-600 dark:from-orange-200 dark:to-orange-500',
-    yellow:
-      'from-yellow-400 to-yellow-500 dark:from-yellow-300 dark:to-yellow-500',
-  };
 
   if (data?.author) {
     return (
@@ -51,13 +33,9 @@ export default function AuthorClientPage(props: TinaProps) {
                 className='rounded-full mb-6 object-cover shadow-sm'
               />
             )}
-            <h1 className='w-full relative mb-4 text-5xl font-extrabold tracking-normal title-font'>
-              <span
-                className={`bg-clip-text text-transparent bg-gradient-to-r ${titleColorClasses[theme.color] || titleColorClasses.blue}`}
-              >
-                {data.author.name}
-              </span>
-            </h1>
+            <GradientTitle size='5xl' className='mb-4'>
+              {data.author.name}
+            </GradientTitle>
             {data.author.description && (
               <p className='text-lg text-gray-600 dark:text-gray-400 max-w-2xl'>
                 {data.author.description}
@@ -86,12 +64,9 @@ export default function AuthorClientPage(props: TinaProps) {
                       ? hobby
                       : hobby?.name || hobby?.title || String(hobby);
                   return (
-                    <span
-                      key={idx}
-                      className='px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full'
-                    >
+                    <Badge key={idx}>
                       {hobbyText}
-                    </span>
+                    </Badge>
                   );
                 })}
               </div>
@@ -102,5 +77,5 @@ export default function AuthorClientPage(props: TinaProps) {
     );
   }
 
-  return <div className='py-12 text-center text-gray-500'>No data</div>;
+  return <NoData />;
 }
