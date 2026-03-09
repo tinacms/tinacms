@@ -1,3 +1,5 @@
+#import "./__generated__/frags.gql"
+
 query DocumentQuery($collection: String!, $relativePath: String!) {
   document(collection: $collection, relativePath: $relativePath) {
     ...PageParts
@@ -41,5 +43,50 @@ query MenuQuery {
           }
         }
       }
+}
+
+query DocumentQuery($collection: String!, $relativePath: String!) {
+  document(collection: $collection, relativePath: $relativePath) {
+    ...PageParts
+    ...PostParts
+    ...DocumentationParts
+    ...AuthorParts
+  }
+}
+
+query CollectionQuery {
+  collections {
+    name
+    format
+  }
+}
+
+query NodeQuery($id: String!) {
+  node(id: $id) {
+    ...on Document {
+      ...PageParts
+      ...PostParts
+      ...DocumentationParts
+      ...AuthorParts
     }
+  }
+}
+
+query MenuQuery {
+  collections {
+    label
+    name
+    documents {
+      edges {
+        node {
+          ...on Document {
+            _sys {
+                path
+                filename
+              }
+            }
+          }
+        }
+      }
+}
 }
