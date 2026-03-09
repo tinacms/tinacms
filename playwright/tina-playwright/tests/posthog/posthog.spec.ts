@@ -7,7 +7,7 @@ import { expect, test } from '@playwright/test';
  * Both describe blocks mutate the shared tina config and dev server,
  * so they must not run in parallel.
  */
-test.describe.configure({ mode: 'serial' });
+test.describe.configure({ mode: 'serial', timeout: 30000 });
 
 const CONFIG_PATH = path.join(__dirname, '../../tina/config.js');
 const PREBUILD_PATH = path.join(
@@ -69,8 +69,6 @@ test.describe('PostHog telemetry - enabled', () => {
   });
 
   test('sends PostHog request when telemetry is enabled', async ({ page }) => {
-    test.setTimeout(30000);
-
     const requestPromise = page.waitForRequest((request) =>
       request.url().startsWith(POSTHOG_URL_PREFIX)
     );
@@ -92,8 +90,6 @@ test.describe('PostHog telemetry - disabled', () => {
   test('does not send PostHog requests when telemetry is disabled', async ({
     page,
   }) => {
-    test.setTimeout(30000);
-
     let posthogRequestSent = false;
     page.on('request', (request) => {
       if (request.url().startsWith(POSTHOG_URL_PREFIX)) {
