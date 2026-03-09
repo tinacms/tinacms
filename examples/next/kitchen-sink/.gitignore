@@ -17,6 +17,7 @@
 playwright-report/
 test-results/
 .playwright/
+test-output.log
 
 # next.js
 /.next/

@@ -35,9 +35,7 @@ export default function PostClientPage(props: PostClientPageProps) {
   return (
     <Section className='flex-1'>
       <Container width='small' className='flex-1 pb-2' size='large'>
-        <GradientTitle as='h2'>
-          {post.title}
-        </GradientTitle>
+        <GradientTitle as='h2'>{post.title}</GradientTitle>
         <div className='flex items-center justify-center mb-16'>
           {post.author && (
             <>

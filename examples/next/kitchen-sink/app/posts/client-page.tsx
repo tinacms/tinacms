@@ -3,7 +3,11 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { sanitizeImageSrc, titleColorClasses, cardLinkClasses } from '@/lib/utils';
+import {
+  sanitizeImageSrc,
+  titleColorClasses,
+  cardLinkClasses,
+} from '@/lib/utils';
 import { TinaMarkdown } from 'tinacms/dist/rich-text';
 import { BiRightArrowAlt } from 'react-icons/bi';
 import { useLayout } from '@/components/layout/layout-context';

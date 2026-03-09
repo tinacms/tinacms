@@ -67,9 +67,7 @@ export const Actions = ({
             >
               {action.label}
               {action.icon && (
-                <BiRightArrowAlt
-                  className={`ml-1 -mr-1 w-6 h-6 opacity-80`}
-                />
+                <BiRightArrowAlt className={`ml-1 -mr-1 w-6 h-6 opacity-80`} />
               )}
             </Link>
           );

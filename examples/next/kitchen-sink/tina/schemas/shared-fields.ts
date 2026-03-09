@@ -4,10 +4,8 @@
  */
 
 /** Creates a slugify function with a collection-specific fallback prefix. */
-export const makeSlugify =
-  (prefix: string) =>
-  (values: any) =>
-    `${(values?.title || `${prefix}-${Date.now()}`).toLowerCase().split(' ').join('-')}`;
+export const makeSlugify = (prefix: string) => (values: any) =>
+  `${(values?.title || `${prefix}-${Date.now()}`).toLowerCase().split(' ').join('-')}`;
 
 /** Reusable tags reference list field used by post and documentation collections. */
 export const tagsFieldSchema = {

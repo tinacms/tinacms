@@ -20,9 +20,7 @@ export default function DocumentationClientPage(props: TinaPageProps) {
     return (
       <Section className='flex-1'>
         <Container width='small' size='large'>
-          <GradientTitle>
-            {data.documentation.title}
-          </GradientTitle>
+          <GradientTitle>{data.documentation.title}</GradientTitle>
         </Container>
         <Container className='flex-1 pt-4' width='small' size='large'>
           <div className='prose dark:prose-dark w-full max-w-none'>

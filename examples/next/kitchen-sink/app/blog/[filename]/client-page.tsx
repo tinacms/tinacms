@@ -29,9 +29,7 @@ export default function BlogClientPage(props: BlogClientProps) {
     return (
       <Section className='flex-1'>
         <Container width='small' size='large'>
-          <GradientTitle>
-            {data.blog.title}
-          </GradientTitle>
+          <GradientTitle>{data.blog.title}</GradientTitle>
 
           {data.blog.description && (
             <p className='text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-6 text-center'>

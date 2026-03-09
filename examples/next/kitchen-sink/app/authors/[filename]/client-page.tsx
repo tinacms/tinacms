@@ -63,11 +63,7 @@ export default function AuthorClientPage(props: TinaPageProps) {
                     typeof hobby === 'string'
                       ? hobby
                       : hobby?.name || hobby?.title || String(hobby);
-                  return (
-                    <Badge key={idx}>
-                      {hobbyText}
-                    </Badge>
-                  );
+                  return <Badge key={idx}>{hobbyText}</Badge>;
                 })}
               </div>
             </div>

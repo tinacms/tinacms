@@ -8,7 +8,10 @@ interface GraphQLRequestParams {
   variables?: Record<string, unknown>;
 }
 
-export async function databaseRequest({ query, variables }: GraphQLRequestParams) {
+export async function databaseRequest({
+  query,
+  variables,
+}: GraphQLRequestParams) {
   const config = {
     useRelativeMedia: true,
   } as const;

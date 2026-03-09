@@ -1,10 +1,7 @@
 import client from '@/tina/__generated__/client';
 import { Section } from '@/components/layout/section';
 import { Container } from '@/components/layout/container';
-import {
-  GraphQLExplorer,
-  EXAMPLE_QUERY,
-} from '@/components/graphql-explorer';
+import { GraphQLExplorer, EXAMPLE_QUERY } from '@/components/graphql-explorer';
 
 export const revalidate = 300;
 
