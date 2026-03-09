@@ -24,12 +24,13 @@ test.describe("Create Blog Post", () => {
 
     await page.click('button:has-text("Save")');
 
+    // Register for automatic teardown immediately after save,
+    // so cleanup runs even if the subsequent lookup/assertion fails
+    contentCleanup.track("post", `${blogFilename}.md`);
+
     await page.goto("/admin/index.html#/collections/post/~");
 
-    const blogPost = await page.locator(`text=${blogFilename}`).first();
+    const blogPost = page.locator(`text=${blogFilename}`).first();
     await expect(blogPost).toBeVisible();
-
-    // Register for automatic teardown
-    contentCleanup.track("post", `${blogFilename}.md`);
   });
 });
