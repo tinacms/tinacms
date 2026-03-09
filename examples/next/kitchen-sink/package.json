@@ -7,8 +7,6 @@
     "dev": "MONOREPO_DEV=true tinacms dev -c \"next dev\"",
     "dev2": "tinacms dev -c \"next dev\"",
     "dev-sandbox": "MONOREPO_DEV=true tinacms dev -c \"next dev\" --sandbox",
-    "test": "MONOREPO_DEV=true tinacms dev -c \"vitest\"",
-    "test:dev": "vitest",
     "build": "next build",
     "build:local": "tinacms build --local --skip-cloud-checks -c \"next build\"",
     "replay": "replay ./recording.json",
@@ -47,7 +45,6 @@
     "tailwindcss": "^4.0.0",
     "typescript": "^5.7.3",
     "vite": "^4.5.9",
-    "remove": "catalog:",
-    "vitest": "^0.32.4"
+    "remove": "catalog:"
   }
 }
