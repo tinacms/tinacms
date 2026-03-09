@@ -16,7 +16,7 @@ const Page: Collection = {
       if (filepath === 'home') {
         return '/';
       }
-      return `/page/${filepath}`;
+      return `/${filepath}`;
     },
   },
   fields: [
