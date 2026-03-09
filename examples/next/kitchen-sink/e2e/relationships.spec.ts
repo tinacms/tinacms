@@ -19,7 +19,7 @@ test.describe('Relationship Resolution — Post Author', () => {
         postConnection(first: 1) {
           edges {
             node {
-              _sys { filename }
+              _sys { filename breadcrumbs }
               author {
                 ... on Author {
                   name
@@ -37,10 +37,10 @@ test.describe('Relationship Resolution — Post Author', () => {
     if (post.author) {
       const expectedAuthorName = post.author.name;
       const authorFilename = post.author._sys?.filename;
-      const filename = post._sys.filename;
+      const postUrl = post._sys.breadcrumbs?.join('/') || post._sys.filename;
 
       // Navigate to the post
-      await page.goto(`/posts/${filename}`);
+      await page.goto(`/posts/${postUrl}`);
 
       // Find the author section (should contain author name)
       const authorSection = page.locator('[data-testid*="post-author"]');
