@@ -3,7 +3,12 @@ import { queries } from '../tina/__generated__/types';
 import { resolve } from '@tinacms/datalayer';
 import type { TinaClient } from 'tinacms/dist/client';
 
-export async function databaseRequest({ query, variables }) {
+interface GraphQLRequestParams {
+  query: string;
+  variables?: Record<string, unknown>;
+}
+
+export async function databaseRequest({ query, variables }: GraphQLRequestParams) {
   const config = {
     useRelativeMedia: true,
   } as const;
@@ -26,7 +31,7 @@ export function getDatabaseConnection<GenQueries = Record<string, unknown>>({
     request: TinaClient<GenQueries>['request'];
   }) => GenQueries;
 }) {
-  const request = async ({ query, variables }) => {
+  const request = async ({ query, variables }: GraphQLRequestParams) => {
     const data = await databaseRequest({ query, variables });
     return { data: data.data, query, variables, errors: data.errors };
   };

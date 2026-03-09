@@ -18,7 +18,7 @@ const Author: Collection = {
       type: 'image',
       label: 'Avatar',
       name: 'avatar',
-      // @ts-ignore
+      // @ts-expect-error -- uploadDir is a valid TinaCMS image field option but not yet in the type definitions
       uploadDir: () => 'authors',
     },
     {

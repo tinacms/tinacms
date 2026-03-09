@@ -121,24 +121,24 @@ test.describe('Edge Cases — Invalid Routes', () => {
 test.describe('Edge Cases — Malformed Data', () => {
   test('should render posts even with empty title fields', async ({ page }) => {
     // Posts with empty titles should still render (or be handled gracefully)
+    const errors: string[] = [];
+    page.on('pageerror', (err) => errors.push(err.message));
+    page.on('console', (msg) => {
+      if (msg.type() === 'error') {
+        errors.push(msg.text());
+      }
+    });
+
     await page.goto('/posts');
 
     // Page loads
     await expect(page.locator('body')).toBeVisible();
 
-    // But no console errors/crashes
-    const errors = await page.evaluate(() => {
-      const logs: string[] = [];
-      const originalError = console.error.bind(console);
-      console.error = (...args) => {
-        logs.push(args.toString());
-        originalError(...args);
-      };
-      return logs;
-    });
-
     // Should not have fatal errors, but minor issues are okay
-    expect(errors).not.toContain(/undefined|null|Cannot read/);
+    const fatalErrors = errors.filter((e) =>
+      /undefined|null|Cannot read/.test(e)
+    );
+    expect(fatalErrors).toHaveLength(0);
   });
 
   test('should handle extremely long titles gracefully', async ({ page }) => {
