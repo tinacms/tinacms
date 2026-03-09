@@ -18,7 +18,11 @@ import { FormPortalProvider } from './form-portal';
 import { LoadingDots } from './loading-dots';
 import { ResetForm } from './reset-form';
 import { CreateBranchModal } from './create-branch-modal';
-import { SavedContentEvent, SaveContentErrorEvent, FormResetEvent } from '../../lib/posthog/posthog';
+import {
+  SavedContentEvent,
+  SaveContentErrorEvent,
+  FormResetEvent,
+} from '../../lib/posthog/posthog';
 import { captureEvent } from '../../lib/posthog/posthogProvider';
 
 export interface FormBuilderProps {
