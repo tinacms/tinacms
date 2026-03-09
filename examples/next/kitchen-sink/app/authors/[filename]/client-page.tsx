@@ -19,25 +19,22 @@ export default function AuthorClientPage(props: TinaPageProps) {
   });
 
   if (data?.author) {
+    const avatarSrc = data.author.avatar ? sanitizeImageSrc(data.author.avatar) : '';
+
     return (
       <Section className='flex-1'>
         <Container width='small' size='large'>
           <div className='flex flex-col items-center text-center mb-16'>
-            {(() => {
-              const avatarSrc = data.author.avatar
-                ? sanitizeImageSrc(data.author.avatar)
-                : '';
-              return avatarSrc ? (
-                <Image
-                  src={avatarSrc}
-                  alt={data.author.name}
-                  width={128}
-                  height={128}
-                  priority
-                  className='rounded-full mb-6 object-cover shadow-sm'
-                />
-              ) : null;
-            })()}
+            {avatarSrc && (
+              <Image
+                src={avatarSrc}
+                alt={data.author.name}
+                width={128}
+                height={128}
+                priority
+                className='rounded-full mb-6 object-cover shadow-sm'
+              />
+            )}
             <GradientTitle size='5xl' className='mb-4'>
               {data.author.name}
             </GradientTitle>

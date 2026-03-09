@@ -34,6 +34,7 @@ export default function PostsClientPage(props: PostsClientPageProps) {
           const post = postData.node;
           const formattedDate = post.formattedDate || '';
           const postUrl = `/posts/${post._sys.breadcrumbs?.join('/') || post._sys.filename}`;
+          const avatarSrc = post.author?.avatar ? sanitizeImageSrc(post.author.avatar) : '';
 
           return (
             <Link
@@ -63,20 +64,17 @@ export default function PostsClientPage(props: PostsClientPageProps) {
                 className='flex items-center'
                 data-testid={`post-author-${post._sys.filename}`}
               >
-                {(() => {
-                  const avatarSrc = post.author?.avatar ? sanitizeImageSrc(post.author.avatar) : '';
-                  return avatarSrc ? (
-                    <div className='flex-shrink-0 mr-2'>
-                      <Image
-                        width={40}
-                        height={40}
-                        className='object-cover rounded-full shadow-sm'
-                        src={avatarSrc}
-                        alt={post.author?.name || ''}
-                      />
-                    </div>
-                  ) : null;
-                })()}
+                {avatarSrc && (
+                  <div className='flex-shrink-0 mr-2'>
+                    <Image
+                      width={40}
+                      height={40}
+                      className='object-cover rounded-full shadow-sm'
+                      src={avatarSrc}
+                      alt={post.author?.name || ''}
+                    />
+                  </div>
+                )}
                 {post.author?.name && (
                   <p className='text-base font-medium text-gray-600 group-hover:text-gray-800 dark:text-gray-200 dark:group-hover:text-white'>
                     {post.author.name}

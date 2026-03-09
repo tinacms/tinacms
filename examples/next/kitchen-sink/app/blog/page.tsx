@@ -21,6 +21,8 @@ export default async function BlogsPage() {
           if (blog.pubDate) {
             formattedDate = formatDate(blog.pubDate);
           }
+          const heroSrc = blog.heroImage ? sanitizeImageSrc(blog.heroImage) : '';
+          const avatarSrc = blog.author?.avatar ? sanitizeImageSrc(blog.author.avatar) : '';
 
           return (
             <Link
@@ -29,20 +31,17 @@ export default async function BlogsPage() {
               data-testid={`blog-card-${blog._sys.filename}`}
               className='group flex flex-col bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow'
             >
-              {(() => {
-                const heroSrc = blog.heroImage ? sanitizeImageSrc(blog.heroImage) : '';
-                return heroSrc ? (
-                  <div className='relative w-full h-48 overflow-hidden'>
-                    <Image
-                      src={heroSrc}
-                      alt={blog.title}
-                      fill
-                      className='object-cover group-hover:scale-105 transition-transform duration-300'
-                      sizes='(max-width: 768px) 100vw, 50vw'
-                    />
-                  </div>
-                ) : null;
-              })()
+              {heroSrc && (
+                <div className='relative w-full h-48 overflow-hidden'>
+                  <Image
+                    src={heroSrc}
+                    alt={blog.title}
+                    fill
+                    className='object-cover group-hover:scale-105 transition-transform duration-300'
+                    sizes='(max-width: 768px) 100vw, 50vw'
+                  />
+                </div>
+              )}
               <div className='p-6 flex flex-col flex-1'>
                 <h2 className='text-xl font-bold text-gray-900 dark:text-gray-50 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-2'>
                   {blog.title}
@@ -56,18 +55,15 @@ export default async function BlogsPage() {
                   className='flex items-center mt-4 gap-2'
                   data-testid={`blog-author-${blog._sys.filename}`}
                 >
-                  {(() => {
-                    const avatarSrc = blog.author?.avatar ? sanitizeImageSrc(blog.author.avatar) : '';
-                    return avatarSrc ? (
-                      <Image
-                        src={avatarSrc}
-                        alt={blog.author?.name || ''}
-                        width={28}
-                        height={28}
-                        className='rounded-full object-cover flex-shrink-0'
-                      />
-                    ) : null;
-                  })()
+                  {avatarSrc && (
+                    <Image
+                      src={avatarSrc}
+                      alt={blog.author?.name || ''}
+                      width={28}
+                      height={28}
+                      className='rounded-full object-cover flex-shrink-0'
+                    />
+                  )}
                   {blog.author?.name && (
                     <span className='text-sm font-medium text-gray-600 dark:text-gray-300'>
                       {blog.author.name}

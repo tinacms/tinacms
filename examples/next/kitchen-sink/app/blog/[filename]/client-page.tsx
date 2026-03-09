@@ -25,6 +25,8 @@ export default function BlogClientPage(props: BlogClientProps) {
   if (data?.blog) {
     const formattedDate = props.formattedPubDate ?? '';
     const formattedUpdatedDate = props.formattedUpdatedDate ?? '';
+    const avatarSrc = data.blog.author?.avatar ? sanitizeImageSrc(data.blog.author.avatar) : '';
+    const heroSrc = data.blog.heroImage ? sanitizeImageSrc(data.blog.heroImage) : '';
 
     return (
       <Section className='flex-1'>
@@ -38,18 +40,15 @@ export default function BlogClientPage(props: BlogClientProps) {
           )}
 
           <div className='flex items-center justify-center gap-3 mb-16'>
-            {(() => {
-              const avatarSrc = data.blog.author?.avatar ? sanitizeImageSrc(data.blog.author.avatar) : '';
-              return avatarSrc ? (
-                <Image
-                  src={avatarSrc}
-                  alt={data.blog.author?.name || ''}
-                  width={40}
-                  height={40}
-                  className='rounded-full object-cover flex-shrink-0 shadow-sm'
-                />
-              ) : null;
-            })()
+            {avatarSrc && (
+              <Image
+                src={avatarSrc}
+                alt={data.blog.author?.name || ''}
+                width={40}
+                height={40}
+                className='rounded-full object-cover flex-shrink-0 shadow-sm'
+              />
+            )}
             <div className='flex flex-col items-start'>
               {data.blog.author?.name && (
                 <span className='text-sm font-medium text-gray-700 dark:text-gray-200'>
@@ -72,23 +71,20 @@ export default function BlogClientPage(props: BlogClientProps) {
           </div>
         </Container>
 
-        {(() => {
-          const heroSrc = data.blog.heroImage ? sanitizeImageSrc(data.blog.heroImage) : '';
-          return heroSrc ? (
-            <div className='px-4 w-full'>
-              <div className='relative max-w-2xl mx-auto'>
-                <Image
-                  src={heroSrc}
-                  alt={data.blog.title}
-                  width={600}
-                  height={400}
-                  priority
-                  className='mb-14 block rounded-lg w-full h-auto'
-                />
-              </div>
+        {heroSrc && (
+          <div className='px-4 w-full'>
+            <div className='relative max-w-2xl mx-auto'>
+              <Image
+                src={heroSrc}
+                alt={data.blog.title}
+                width={600}
+                height={400}
+                priority
+                className='mb-14 block rounded-lg w-full h-auto'
+              />
             </div>
-          ) : null;
-        })()
+          </div>
+        )}
 
         <Container className='flex-1 pt-4' width='small' size='large'>
           <div className='prose dark:prose-dark w-full max-w-none'>
