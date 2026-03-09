@@ -251,7 +251,7 @@ test.describe('Relationship Resolution — Global Config References', () => {
       const link = page.locator(`header nav a[href="${expectedHref}"]`).first();
 
       // The link with the correct href should exist
-      expect(await link.count()).toBeGreaterThan(-1);
+      await expect(link).toHaveCount(1);
     }
   });
 
