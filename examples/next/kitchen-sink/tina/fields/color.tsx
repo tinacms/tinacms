@@ -35,6 +35,8 @@ export const ColorPickerInput = wrapFieldsWithMeta(({ input }) => {
             <button
               key={color}
               type='button'
+              aria-label={`Select ${color} color`}
+              aria-pressed={input.value === color}
               className={`w-9 h-9 rounded-full shadow border ${inputClasses[color as keyof typeof inputClasses]} ${input.value === color ? 'ring-[3px] ring-offset-2 ring-blue-400' : ''}`}
               onClick={() => {
                 input.onChange(color);
