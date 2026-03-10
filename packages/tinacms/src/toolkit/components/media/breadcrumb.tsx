@@ -61,7 +61,7 @@ export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
             )
             ) : (
             <>
-              <BreadcrumbButton key={index} onClick={() => setDirectory(part)} className='pl-1.5 text-gray-300'>
+              <BreadcrumbButton key={index} onClick={() => setDirectory(directoryParts.slice(0, index + 1).join('/'))} className='pl-1.5 text-gray-300'>
                 {part === '' ? 'Media' : part}
               </BreadcrumbButton>
               <span className='pl-1.5 text-gray-300'>/</span>
