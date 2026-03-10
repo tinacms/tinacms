@@ -1,21 +1,22 @@
-import AsyncLock from 'async-lock';
-import type { Plugin } from 'vite';
-import { createFilter, FilterPattern } from '@rollup/pluginutils';
-import type { Config } from '@svgr/core';
 import fs from 'fs';
-import { transformWithEsbuild } from 'vite';
-import { transform as esbuildTransform } from 'esbuild';
 import path from 'path';
-import bodyParser from 'body-parser';
-import cors from 'cors';
+import { FilterPattern, createFilter } from '@rollup/pluginutils';
+import type { Config } from '@svgr/core';
 import { resolve as gqlResolve } from '@tinacms/graphql';
 import type { Database } from '@tinacms/graphql';
+import AsyncLock from 'async-lock';
+import bodyParser from 'body-parser';
+import cors from 'cors';
+import { transform as esbuildTransform } from 'esbuild';
+import type { Plugin } from 'vite';
+import { transformWithEsbuild } from 'vite';
 import {
-  parseMediaFolder,
   createMediaRouter,
+  parseMediaFolder,
 } from '../commands/dev-command/server/media';
-import type { ConfigManager } from '../config-manager';
 import { createSearchIndexRouter } from '../commands/dev-command/server/searchIndex';
+import type { ConfigManager } from '../config-manager';
+import { buildCorsOriginCheck } from './cors';
 
 export const transformTsxPlugin = ({
   configManager: _configManager,
@@ -59,10 +60,19 @@ export const devServerEndPointsPlugin = ({
   searchIndex: any;
   databaseLock: (fn: () => Promise<void>) => Promise<void>;
 }) => {
+  const corsOriginCheck = buildCorsOriginCheck(
+    configManager.config?.server?.allowedOrigins
+  );
+
   const plug: Plugin = {
     name: 'graphql-endpoints',
     configureServer(server) {
-      server.middlewares.use(cors());
+      server.middlewares.use(
+        cors({
+          origin: corsOriginCheck,
+          methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+        })
+      );
       server.middlewares.use(bodyParser.json({ limit: '5mb' }));
       server.middlewares.use(async (req, res, next: Function) => {
         const mediaPaths = configManager.config.media?.tina;

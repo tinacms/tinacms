@@ -1,4 +1,4 @@
-import { cn } from '@udecode/cn';
+import { cn } from '@utils/cn';
 import * as React from 'react';
 
 export interface TextareaProps
