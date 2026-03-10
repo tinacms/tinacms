@@ -8,6 +8,7 @@ import {
   type TinaMarkdownContent,
 } from 'tinacms/dist/rich-text';
 import { sanitizeImageSrc } from '@/lib/utils';
+import { sanitizeHref } from '@/lib/richText';
 
 // Lazily load syntax highlighter — it's large and only needed for code blocks
 const Prism = dynamic(() =>
@@ -183,14 +184,7 @@ export const customComponents: Components<{
   ),
 
   a: (props) => {
-    const href = typeof props.url === 'string' ? props.url.trim() : '#';
-    const lower = href.toLowerCase();
-    const safeHref =
-      lower.startsWith('javascript:') ||
-      lower.startsWith('data:') ||
-      lower.startsWith('vbscript:')
-        ? '#'
-        : href;
+    const safeHref = sanitizeHref(props.url);
     return (
       <a
         href={safeHref}

@@ -93,7 +93,8 @@ export const Icon = ({
   ...rest
 }: IconProps) => {
   const { theme } = useLayout();
-  const color = data.color || theme.color;
+  const rawColor = (data.color as string) || theme.color;
+  const color = rawColor === 'primary' ? theme.color : rawColor;
   const style = data.style || 'float';
   const iconSize = data.size || 'medium';
 

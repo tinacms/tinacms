@@ -5,6 +5,10 @@ import client from '../../../../tina/__generated__/client';
 type Props = { params: Promise<{ collection: string; filename: string }> };
 
 export default async function CollectionFile({ params }: Props) {
+  if (process.env.NODE_ENV === 'production') {
+    // Prevent accidental public data exposure from debug endpoint in production
+    notFound();
+  }
   const { collection, filename } = await params;
   const relativePath = `${filename}.mdx`;
 

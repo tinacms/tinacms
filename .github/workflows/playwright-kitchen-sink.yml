@@ -33,12 +33,12 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build workspace packages
-        run: pnpm --filter "kitchen-sink^..." run build
+        run: pnpm --filter "@examples/next-kitchen-sink^..." run build
 
       - name: Install Playwright browsers
-        run: pnpm --filter kitchen-sink exec playwright install --with-deps chromium
+        run: pnpm --filter "@examples/next-kitchen-sink" exec playwright install --with-deps chromium
 
       - name: Run kitchen-sink Playwright tests
-        run: pnpm --filter kitchen-sink test:e2e
+        run: pnpm --filter "@examples/next-kitchen-sink" test:e2e
         env:
           CI: true

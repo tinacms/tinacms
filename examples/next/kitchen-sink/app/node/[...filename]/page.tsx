@@ -5,6 +5,10 @@ import client from '../../../tina/__generated__/client';
 type Props = { params: Promise<{ filename: string[] }> };
 
 export default async function NodeFile({ params }: Props) {
+  if (process.env.NODE_ENV === 'production') {
+    // Prevent accidental public data exposure from debug endpoint in production
+    notFound();
+  }
   const { filename } = await params;
   const parts = Array.isArray(filename) ? filename : [filename];
   const id = parts.join('/');
