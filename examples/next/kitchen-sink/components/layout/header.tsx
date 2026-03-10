@@ -70,7 +70,10 @@ export const Header = () => {
           <nav className='hidden sm:flex items-center gap-0 sm:gap-1'>
             {nav.map((item: any, idx: number) => {
               const active = isActive(item.href || '/');
-              const gradientId = sanitizeId(item.href || `nav-${idx}`, `nav-${idx}`);
+              const gradientId = sanitizeId(
+                item.href || `nav-${idx}`,
+                `nav-${idx}`
+              );
               return (
                 <Link
                   key={item.href || `nav-${idx}`}

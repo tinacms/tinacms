@@ -34,7 +34,9 @@ export default function PostsClientPage(props: PostsClientPageProps) {
           const post = postData.node;
           const formattedDate = post.formattedDate || '';
           const postUrl = `/posts/${post._sys.breadcrumbs?.join('/') || post._sys.filename}`;
-          const avatarSrc = post.author?.avatar ? sanitizeImageSrc(post.author.avatar) : '';
+          const avatarSrc = post.author?.avatar
+            ? sanitizeImageSrc(post.author.avatar)
+            : '';
 
           return (
             <Link

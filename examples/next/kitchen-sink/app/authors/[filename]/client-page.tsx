@@ -19,7 +19,9 @@ export default function AuthorClientPage(props: TinaPageProps) {
   });
 
   if (data?.author) {
-    const avatarSrc = data.author.avatar ? sanitizeImageSrc(data.author.avatar) : '';
+    const avatarSrc = data.author.avatar
+      ? sanitizeImageSrc(data.author.avatar)
+      : '';
 
     return (
       <Section className='flex-1'>

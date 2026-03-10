@@ -31,7 +31,9 @@ export default function PostClientPage(props: PostClientPageProps) {
 
   // Derive author page URL from the author reference
   const authorFilename = post.author?._sys?.filename;
-  const avatarSrc = post.author?.avatar ? sanitizeImageSrc(post.author.avatar) : '';
+  const avatarSrc = post.author?.avatar
+    ? sanitizeImageSrc(post.author.avatar)
+    : '';
   const heroSrc = post.heroImg ? sanitizeImageSrc(post.heroImg) : '';
 
   return (

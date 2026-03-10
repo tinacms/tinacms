@@ -21,8 +21,12 @@ export default async function BlogsPage() {
           if (blog.pubDate) {
             formattedDate = formatDate(blog.pubDate);
           }
-          const heroSrc = blog.heroImage ? sanitizeImageSrc(blog.heroImage) : '';
-          const avatarSrc = blog.author?.avatar ? sanitizeImageSrc(blog.author.avatar) : '';
+          const heroSrc = blog.heroImage
+            ? sanitizeImageSrc(blog.heroImage)
+            : '';
+          const avatarSrc = blog.author?.avatar
+            ? sanitizeImageSrc(blog.author.avatar)
+            : '';
 
           return (
             <Link

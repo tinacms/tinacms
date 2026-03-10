@@ -25,8 +25,12 @@ export default function BlogClientPage(props: BlogClientProps) {
   if (data?.blog) {
     const formattedDate = props.formattedPubDate ?? '';
     const formattedUpdatedDate = props.formattedUpdatedDate ?? '';
-    const avatarSrc = data.blog.author?.avatar ? sanitizeImageSrc(data.blog.author.avatar) : '';
-    const heroSrc = data.blog.heroImage ? sanitizeImageSrc(data.blog.heroImage) : '';
+    const avatarSrc = data.blog.author?.avatar
+      ? sanitizeImageSrc(data.blog.author.avatar)
+      : '';
+    const heroSrc = data.blog.heroImage
+      ? sanitizeImageSrc(data.blog.heroImage)
+      : '';
 
     return (
       <Section className='flex-1'>
