@@ -35,7 +35,7 @@ import {
 } from '@toolkit/plugin-fields/markdown';
 import { MediaManagerScreenPlugin } from '@toolkit/plugin-screens/media-manager-screen';
 import { PasswordScreenPlugin } from '@toolkit/plugin-screens/password-screen';
-import { StatusDashboardScreenPlugin } from './plugin-screens/status-dashboard-screen';
+import { MediaUsageDashboardScreenPlugin } from '@toolkit/plugin-screens/media-usage-dashboard-screen';
 import { createCloudConfig } from '@toolkit/react-cloud-config';
 import type { ScreenPlugin } from '@toolkit/react-screens';
 import { SidebarState, type SidebarStateOptions } from '@toolkit/react-sidebar';
@@ -125,7 +125,9 @@ export class TinaCMS extends CMS {
     });
     this.plugins.add(MediaManagerScreenPlugin);
     this.plugins.add(PasswordScreenPlugin);
-    this.plugins.add(StatusDashboardScreenPlugin);
+    if (isLocalClient) {
+      this.plugins.add(MediaUsageDashboardScreenPlugin);
+    }
     if (isLocalClient !== true) {
       if (clientId) {
         this.plugins.add(
