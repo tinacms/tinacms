@@ -196,20 +196,26 @@ const CheckSchema = ({
         .checkGraphqlSchema({
           localSchema: schemaJson,
         })
-        .then((x) => {
-          if (x === false) {
+        .then((isSchemaMatchedToCloud) => {
+          if (isSchemaMatchedToCloud === false) {
             cms.alerts.error(
-              'GraphQL Schema Mismatch. Editing may not work. If you just switched branches, try going back to the previous branch'
+              `GraphQL Schema Mismatch - Editing may not work. 
+              
+              If you just switched branches, try going back to the previous branch.
+              
+              If you just pushed changes to the branch, try pulling the latest changes.
+              
+              For more information, please see https://tina.io/docs/tinacloud/troubleshooting`
             );
           }
         })
-        .catch((e) => {
+        .catch((error) => {
           // TODO: HACK- Check on an error id, rather than message string
-          if (e.message.includes('has not been indexed by TinaCloud')) {
+          if (error.message.includes('has not been indexed by TinaCloud')) {
             setSchemaMissingError(true);
           } else {
-            cms.alerts.error(`Unexpected error checking schema: ${e}`);
-            throw e;
+            cms.alerts.error(`Unexpected error checking schema: ${error}`);
+            throw error;
           }
         });
     }
