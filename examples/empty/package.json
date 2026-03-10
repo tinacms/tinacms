@@ -1,24 +1,27 @@
 {
   "name": "@examples/starter-empty",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
+    "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "biome lint .",
+    "format": "biome format --write .",
     "init-dev": "tinacms init"
   },
   "dependencies": {
-    "@tinacms/cli": "workspace:*",
-    "next": "14.2.35",
+    "next": "15.5.9",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-is": "^17.0.2",
+    "react-is": "^18.3.1",
+    "@tinacms/cli": "workspace:*",
     "tinacms": "workspace:*",
-    "typescript": "^5.7.3"
+    "typescript": "^5.9.3"
   },
   "devDependencies": {
-    "@types/node": "^22.13.1",
-    "eslint": "7"
+    "@biomejs/biome": "catalog:",
+    "@types/node": "^25.1.0"
   },
   "version": "0.0.31"
 }

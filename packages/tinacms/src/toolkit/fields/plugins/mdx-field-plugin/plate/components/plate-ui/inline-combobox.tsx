@@ -28,7 +28,7 @@ import {
   useComboboxContext,
   useComboboxStore,
 } from '@ariakit/react';
-import { cn } from '@udecode/cn';
+import { cn } from '@utils/cn';
 import { filterWords } from '@udecode/plate-combobox';
 import { useComposedRef, useEditorRef } from '@udecode/plate/react';
 import { cva } from 'class-variance-authority';

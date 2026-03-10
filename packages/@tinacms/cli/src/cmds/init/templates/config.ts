@@ -138,6 +138,12 @@ export const generateConfig = (args: ConfigTemplateArgs) => {
       outputFolder: "admin",
       publicFolder: "${args.publicFolder}",
     },
+    // Uncomment to allow cross-origin requests from non-localhost origins
+    // during local development (e.g. GitHub Codespaces, Gitpod, Docker).
+    // Use 'private' to allow all private-network IPs (WSL2, Docker, etc.)
+    // server: {
+    //   allowedOrigins: ['https://your-codespace.github.dev'],
+    // },
     media: {
       tina: {
         mediaRoot: "",

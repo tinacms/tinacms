@@ -1,87 +1,62 @@
-import { staticRequest } from 'tinacms'
-import { Layout } from '../../components/Layout'
-import { useTina } from 'tinacms/dist/react'
+import { useTina } from 'tinacms/react';
+import { TinaMarkdown } from 'tinacms/dist/rich-text';
+import client from '../../tina/__generated__/client';
 
 const query = `query getPost($relativePath: String!) {
-  getPostDocument(relativePath: $relativePath) {
-    data {
-      title
-      body
-      posts {
-        __typename
-        ... on PostPosts {
-          post {
-            __typename
-            ... on PostDocument {
-              data {
-                title
-                body
-              }
-            }
-          }
-        }
-      }
-    }
+  post(relativePath: $relativePath) {
+    title
+    body
   }
-}
-`
+}`;
 
-export default function Home(props) {
+export default function PostPage(props) {
   const { data } = useTina({
     query,
     variables: props.variables,
     data: props.data,
-  })
+  });
 
   return (
-    <Layout>
-      <code>
-        <pre
-          style={{
-            backgroundColor: 'lightgray',
-          }}
-        >
-          {JSON.stringify(data.getPostDocument.data, null, 2)}
-        </pre>
-      </code>
-    </Layout>
-  )
+    <div>
+      <h1>{data?.post?.title}</h1>
+      <TinaMarkdown content={data?.post?.body} />
+    </div>
+  );
 }
 
 export const getStaticPaths = async () => {
-  const tinaProps = await staticRequest({
+  const postsResponse = await client.request({
     query: `{
-        getPostList{
-          edges {
-            node {
-              sys {
-                filename
-              }
+      postConnection {
+        edges {
+          node {
+            _sys {
+              filename
             }
           }
         }
-      }`,
+      }
+    }`,
     variables: {},
-  })
-  const paths = tinaProps.getPostList.edges.map((x) => {
-    return { params: { slug: x.node.sys.filename } }
-  })
+  });
+  const paths = postsResponse.data.postConnection.edges.map((x) => {
+    return { params: { slug: x.node._sys.filename } };
+  });
 
   return {
     paths,
     fallback: 'blocking',
-  }
-}
+  };
+};
+
 export const getStaticProps = async (ctx) => {
   const variables = {
     relativePath: ctx.params.slug + '.md',
-  }
-  let data = {}
+  };
+  let data = {};
   try {
-    data = await staticRequest({
-      query,
-      variables,
-    })
+    const response = await client.request({ query, variables });
+    data = response.data;
   } catch (error) {
     // swallow errors related to document creation
   }
@@ -92,5 +67,5 @@ export const getStaticProps = async (ctx) => {
       query,
       variables,
     },
-  }
-}
+  };
+};

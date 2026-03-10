@@ -10,6 +10,8 @@ import {
   buildError,
 } from './error-message';
 import { useDebounce } from './use-debounce';
+import { RichTextEditorSwitchedEvent } from '../../../../../lib/posthog/posthog';
+import { captureEvent } from '../../../../../lib/posthog/posthogProvider';
 
 const parseMDX = (value: string) => ({ type: 'root', children: [] });
 const stringifyMDX = (value: any) => '';
@@ -143,7 +145,12 @@ const RawEditor = (props: RichTextType) => {
   return (
     <div className='relative'>
       <div className='sticky top-1 w-full flex justify-between mb-2 z-50 max-w-full'>
-        <Button onClick={() => setRawMode(false)}>
+        <Button
+          onClick={() => {
+            captureEvent(RichTextEditorSwitchedEvent, { to: 'richtext' });
+            setRawMode(false);
+          }}
+        >
           View in rich-text editor
         </Button>
         <ErrorMessage error={error} />

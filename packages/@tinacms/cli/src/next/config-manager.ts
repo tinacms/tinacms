@@ -265,7 +265,9 @@ export class ConfigManager {
     }
 
     this.generatedFolderPathContentRepo = path.join(
-      await this.getTinaFolderPath(this.contentRootPath),
+      await this.getTinaFolderPath(this.contentRootPath, {
+        isContentRoot: this.hasSeparateContentRoot(),
+      }),
       GENERATED_FOLDER
     );
     this.spaMainPath = require.resolve('@tinacms/app');
@@ -274,7 +276,10 @@ export class ConfigManager {
     // End of paths that depend on the config file
   }
 
-  async getTinaFolderPath(rootPath) {
+  async getTinaFolderPath(
+    rootPath: string,
+    { isContentRoot }: { isContentRoot?: boolean } = {}
+  ) {
     const tinaFolderPath = path.join(rootPath, TINA_FOLDER);
     const tinaFolderExists = await fs.pathExists(tinaFolderPath);
     if (tinaFolderExists) {
@@ -286,6 +291,11 @@ export class ConfigManager {
     if (legacyFolderExists) {
       this.isUsingLegacyFolder = true;
       return legacyFolderPath;
+    }
+    if (isContentRoot) {
+      throw new Error(
+        `Unable to find a ${chalk.cyan('tina/')} folder in your content root at ${chalk.cyan(rootPath)}. When using localContentPath, the content directory must contain a ${chalk.cyan('tina/')} folder for generated files. Create one with: mkdir ${path.join(rootPath, TINA_FOLDER)}`
+      );
     }
     throw new Error(
       `Unable to find Tina folder, if you're working in folder outside of the Tina config be sure to specify --rootPath`

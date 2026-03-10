@@ -8,6 +8,7 @@ import { ConfigManager } from '../config-manager';
 import type { TinaSchema } from '@tinacms/schema-tools';
 import { mapUserFields } from '@tinacms/graphql';
 import normalizePath from 'normalize-path';
+import { stripSearchTokenFromConfig } from './stripSearchTokenFromConfig';
 export const TINA_HOST = 'content.tinajs.io';
 
 export class Codegen {
@@ -101,18 +102,11 @@ export class Codegen {
       JSON.stringify(this.graphqlSchemaDoc)
     );
 
-    // Include search config in lock file, but exclude sensitive indexerToken
-    // Only add search if search.tina exists - plain search without tina is not included
-    const { search, ...rest } = this.tinaSchema.schema.config;
-    if (search?.tina) {
-      const { indexerToken, ...safeSearchConfig } = search.tina;
-      this.tinaSchema.schema.config = {
-        ...rest,
-        search: { tina: safeSearchConfig },
-      };
-    } else {
-      this.tinaSchema.schema.config = rest;
-    }
+    // Strip the sensitive indexerToken before writing to _schema.json / tina-lock.json.
+    // See CVE-2024-45391 / GHSA-4qrm-9h4r-v2fx for security context.
+    this.tinaSchema.schema.config = stripSearchTokenFromConfig(
+      this.tinaSchema.schema.config
+    );
 
     // update _schema.json
     await this.writeConfigFile(

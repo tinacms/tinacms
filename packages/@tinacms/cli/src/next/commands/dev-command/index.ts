@@ -145,7 +145,8 @@ export class DevCommand extends BaseCommand {
 
           if (configManager.hasSeparateContentRoot()) {
             const rootPath = await configManager.getTinaFolderPath(
-              configManager.contentRootPath
+              configManager.contentRootPath,
+              { isContentRoot: true }
             );
             const filePath = path.join(rootPath, tinaLockFilename);
             await fs.ensureFile(filePath);
@@ -350,6 +351,12 @@ export class DevCommand extends BaseCommand {
         // },
       ],
     });
+    if (configManager?.config?.telemetry === 'anonymous') {
+      logger.info(
+        `\n📊 Note: TinaCMS now collects anonymous telemetry regarding usage. More information on TinaCMS Telemetry: https://tina.io/telemetry\n`
+      );
+    }
+
     await this.startSubCommand();
   }
 

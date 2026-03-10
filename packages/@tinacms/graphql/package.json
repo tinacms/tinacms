@@ -1,7 +1,7 @@
 {
     "name": "@tinacms/graphql",
     "type": "module",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "main": "dist/index.js",
     "module": "./dist/index.js",
     "files": [
@@ -28,7 +28,7 @@
         "types": "pnpm tsc",
         "build": "tinacms-scripts build",
         "docs": "pnpm typedoc",
-        "test": "vitest run",
+        "test": "vitest run --coverage.enabled",
         "test-watch": "vitest"
     },
     "dependencies": {
@@ -74,6 +74,7 @@
         "@types/node": "^22.13.1",
         "@types/normalize-path": "catalog:",
         "@types/ws": "catalog:",
+        "@vitest/coverage-v8": "0.32.4",
         "jest-file-snapshot": "^0.5.0",
         "memory-level": "catalog:",
         "typescript": "^5.7.3",
