@@ -1,6 +1,7 @@
 import React from 'react';
 import { LeftArrowIcon } from '@toolkit/icons';
 import { IconButton } from '@toolkit/styles';
+import { cn } from '@utils/cn';
 
 // Fixed issue where dirname was being used in the frontend
 function dirname(path): string | undefined {
@@ -15,16 +16,22 @@ interface BreadcrumbProps {
 
 const BreadcrumbButton = ({ className = '', ...props }) => (
   <button
-    className={
-      'capitalize transition-colors duration-150 border-0 bg-transparent hover:text-blue-500 ' +
+    className={cn(
+      'capitalize transition-colors duration-150 border-0 bg-transparent hover:text-blue-500',
       className
-    }
+    )}
     {...props}
   />
 );
 
+const BreadcrumbItem = ({ className= '', ...props }) => (
+  <p className={cn('capitalize', className)} {...props} />
+)
+
 export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
-  directory = directory.replace(/^\/|\/$/g, '');
+  const directoryParts = directory.split('/');
+  // directoryParts[0] = 'Media'
+  
 
   let prevDir: string = dirname(directory) || '';
   if (prevDir === '.') {
@@ -33,7 +40,7 @@ export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
 
   return (
     <div className='w-full flex items-center text-[16px] text-gray-300'>
-      {directory !== '' && (
+      {directoryParts.length > 1 && (
         <IconButton
           variant='ghost'
           className='mr-2'
@@ -44,36 +51,24 @@ export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
           />
         </IconButton>
       )}
-      <BreadcrumbButton
-        onClick={() => setDirectory('')}
-        className={
-          directory === ''
-            ? 'text-gray-500 font-bold'
-            : "text-gray-300 font-medium after:pl-1.5 after:content-['/']"
-        }
-      >
-        Media
-      </BreadcrumbButton>
-      {directory &&
-        directory.split('/').map((part, index, parts) => {
-          const currentDir = parts.slice(0, index + 1).join('/');
-          return (
-            <BreadcrumbButton
-              className={
-                'pl-1.5 ' +
-                (index + 1 === parts.length
-                  ? 'text-gray-500 font-bold'
-                  : "text-gray-300 font-medium after:pl-1.5 after:content-['/']")
-              }
-              key={currentDir}
-              onClick={() => {
-                setDirectory(currentDir);
-              }}
-            >
-              {part}
-            </BreadcrumbButton>
-          );
-        })}
+      {
+        directoryParts.map((part, index) => {
+           return (directoryParts.length === index + 1) ? (
+            (
+              <BreadcrumbItem key={index} className='pl-1.5 font-bold text-gray-500'>
+                {part === '' ? 'Media' : part}
+              </BreadcrumbItem>
+            )
+            ) : (
+            <>
+              <BreadcrumbButton key={index} onClick={() => setDirectory(part)} className='pl-1.5 text-gray-300'>
+                {part === '' ? 'Media' : part}
+              </BreadcrumbButton>
+              <span className='pl-1.5 text-gray-300'>/</span>
+            </>
+          )
+        })
+      }
     </div>
   );
 }
