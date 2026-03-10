@@ -880,7 +880,7 @@ importers:
         version: 5.9.3
       vite:
         specifier: ^4.5.9
-        version: 4.5.14(@types/node@25.1.0)(lightningcss@1.30.2)(sass@1.97.3)(terser@5.46.0)
+        version: 4.5.14(@types/node@22.19.3)(lightningcss@1.31.1)(sass@1.97.3)(terser@5.46.0)
       vitest:
         specifier: ^0.32.4
         version: 0.32.4(happy-dom@15.10.2)(jsdom@15.2.1(bufferutil@4.1.0))(lightningcss@1.31.1)(playwright@1.57.0)(sass@1.97.3)(terser@5.46.0)
@@ -1669,7 +1669,7 @@ importers:
         version: 7.4.7
       '@vitest/coverage-v8':
         specifier: 0.32.4
-        version: 0.32.4(vitest@0.32.4(happy-dom@15.10.2)(jsdom@15.2.1(bufferutil@4.1.0))(lightningcss@1.30.2)(playwright@1.57.0)(sass@1.97.3)(terser@5.46.0))
+        version: 0.32.4(vitest@0.32.4(happy-dom@15.10.2)(jsdom@15.2.1(bufferutil@4.1.0))(lightningcss@1.31.1)(playwright@1.57.0)(sass@1.97.3)(terser@5.46.0))
       jest-file-snapshot:
         specifier: ^0.5.0
         version: 0.5.0
@@ -20973,7 +20973,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest/coverage-v8@0.32.4(vitest@0.32.4(happy-dom@15.10.2)(jsdom@15.2.1(bufferutil@4.1.0))(lightningcss@1.30.2)(playwright@1.57.0)(sass@1.97.3)(terser@5.46.0))':
+  '@vitest/coverage-v8@0.32.4(vitest@0.32.4(happy-dom@15.10.2)(jsdom@15.2.1(bufferutil@4.1.0))(lightningcss@1.31.1)(playwright@1.57.0)(sass@1.97.3)(terser@5.46.0))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 0.2.3
@@ -20986,7 +20986,7 @@ snapshots:
       std-env: 3.10.0
       test-exclude: 6.0.0
       v8-to-istanbul: 9.3.0
-      vitest: 0.32.4(happy-dom@15.10.2)(jsdom@15.2.1(bufferutil@4.1.0))(lightningcss@1.30.2)(playwright@1.57.0)(sass@1.97.3)(terser@5.46.0)
+      vitest: 0.32.4(happy-dom@15.10.2)(jsdom@15.2.1(bufferutil@4.1.0))(lightningcss@1.31.1)(playwright@1.57.0)(sass@1.97.3)(terser@5.46.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -22985,7 +22985,7 @@ snapshots:
       eslint: 8.24.0
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(eslint@8.24.0))(eslint@8.24.0)
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@6.21.0(eslint@8.24.0)(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@8.24.0)
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@6.21.0(eslint@8.24.0)(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@8.24.0))(eslint@8.24.0))(eslint@8.24.0)
       eslint-plugin-jsx-a11y: 6.10.2(eslint@8.24.0)
       eslint-plugin-react: 7.37.5(eslint@8.24.0)
       eslint-plugin-react-hooks: 5.0.0-canary-7118f5dd7-20230705(eslint@8.24.0)
@@ -23047,7 +23047,7 @@ snapshots:
       tinyglobby: 0.2.15
       unrs-resolver: 1.11.1
     optionalDependencies:
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@6.21.0(eslint@8.24.0)(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@8.24.0)
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@6.21.0(eslint@8.24.0)(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@8.24.0))(eslint@8.24.0))(eslint@8.24.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -23128,7 +23128,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-plugin-import@2.32.0(@typescript-eslint/parser@6.21.0(eslint@8.24.0)(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@8.24.0):
+  eslint-plugin-import@2.32.0(@typescript-eslint/parser@6.21.0(eslint@8.24.0)(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@8.24.0))(eslint@8.24.0))(eslint@8.24.0):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.9

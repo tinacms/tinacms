@@ -1,4 +1,4 @@
-#import "./__generated__/frags.gql"
+#import "../__generated__/frags.gql"
 
 query DocumentQuery($collection: String!, $relativePath: String!) {
   document(collection: $collection, relativePath: $relativePath) {
