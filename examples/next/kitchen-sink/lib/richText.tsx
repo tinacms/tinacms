@@ -2,7 +2,7 @@ import React from 'react';
 
 type RichNode = Record<string, unknown>;
 
-function sanitizeHref(value: unknown): string {
+export function sanitizeHref(value: unknown): string {
   if (typeof value !== 'string') return '#';
   const trimmed = value.trim();
   if (!trimmed) return '#';
