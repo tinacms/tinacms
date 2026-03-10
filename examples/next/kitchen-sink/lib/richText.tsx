@@ -1,6 +1,6 @@
 import React from 'react';
 
-type RichNode = any;
+type RichNode = Record<string, unknown>;
 
 function sanitizeHref(value: unknown): string {
   if (typeof value !== 'string') return '#';

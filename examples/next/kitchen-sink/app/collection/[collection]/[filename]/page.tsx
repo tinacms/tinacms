@@ -1,4 +1,5 @@
 import React from 'react';
+import { notFound } from 'next/navigation';
 import client from '../../../../tina/__generated__/client';
 
 type Props = { params: Promise<{ collection: string; filename: string }> };
@@ -6,10 +7,16 @@ type Props = { params: Promise<{ collection: string; filename: string }> };
 export default async function CollectionFile({ params }: Props) {
   const { collection, filename } = await params;
   const relativePath = `${filename}.mdx`;
-  const tinaProps = await client.queries.collection({
-    collection,
-    relativePath,
-  });
+
+  let tinaProps;
+  try {
+    tinaProps = await client.queries.DocumentQuery({
+      collection,
+      relativePath,
+    });
+  } catch {
+    notFound();
+  }
 
   return (
     <main className='py-12 px-6'>

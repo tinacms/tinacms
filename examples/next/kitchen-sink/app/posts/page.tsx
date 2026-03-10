@@ -16,7 +16,7 @@ export default async function PostsPage() {
   // Pre-format dates server-side so date-fns is not bundled client-side
   const edgesWithFormattedDates = (
     allPosts.data.postConnection.edges ?? []
-  ).map((edge: any) => {
+  ).map((edge) => {
     if (!edge?.node?.date) return edge;
     return {
       ...edge,

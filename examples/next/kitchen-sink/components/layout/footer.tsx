@@ -51,7 +51,7 @@ export const Footer = () => {
             />
           </Link>
           <div className='flex gap-4'>
-            {footer?.social?.map((social: any, index: number) => {
+            {footer?.social?.map((social: Record<string, unknown>, index: number) => {
               const SocialIcon =
                 socialIconMap[social.icon?.toLowerCase() || ''];
               if (!SocialIcon || !social.url) return null;

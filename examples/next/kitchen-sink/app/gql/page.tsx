@@ -6,14 +6,14 @@ import { GraphQLExplorer, EXAMPLE_QUERY } from '@/components/graphql-explorer';
 export const revalidate = 300;
 
 export default async function GraphQLDemoPage() {
-  let posts: any[] = [];
+  let posts: Record<string, unknown>[] = [];
   let error: string | null = null;
 
   try {
     const result = await client.queries.postConnection();
     posts =
       result.data?.postConnection?.edges
-        ?.map((e: any) => e?.node)
+        ?.map((e) => e?.node)
         .filter(Boolean) ?? [];
   } catch (e) {
     error = String(e);
@@ -36,6 +36,7 @@ export default async function GraphQLDemoPage() {
             <a
               href='/api/gql'
               target='_blank'
+              rel='noopener noreferrer'
               className='inline-flex items-center gap-2 bg-white text-orange-600 font-semibold px-5 py-2.5 rounded-full shadow hover:shadow-md transition'
             >
               View raw endpoint ↗
@@ -43,6 +44,7 @@ export default async function GraphQLDemoPage() {
             <a
               href='/admin/index.html'
               target='_blank'
+              rel='noopener noreferrer'
               className='inline-flex items-center gap-2 border border-white/60 text-white font-semibold px-5 py-2.5 rounded-full hover:bg-white/10 transition'
             >
               Open CMS admin ↗
@@ -100,7 +102,7 @@ export default async function GraphQLDemoPage() {
             <p className='opacity-60 italic'>No posts found.</p>
           ) : (
             <div className='overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm'>
-              <table className='w-full text-sm text-left'>
+              <table aria-label='Blog posts fetched from the GraphQL API' className='w-full text-sm text-left'>
                 <thead className='bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 uppercase text-xs tracking-wider'>
                   <tr>
                     <th className='px-4 py-3'>Title</th>
@@ -150,6 +152,7 @@ const posts = result.data.postConnection.edges.map(e => e.node)
             <a
               href='https://tina.io/docs/data-fetching/overview'
               target='_blank'
+              rel='noopener noreferrer'
               className='text-sm font-semibold text-orange-500 hover:underline'
             >
               Data fetching docs →
@@ -157,6 +160,7 @@ const posts = result.data.postConnection.edges.map(e => e.node)
             <a
               href='https://tina.io/docs/graphql/overview'
               target='_blank'
+              rel='noopener noreferrer'
               className='text-sm font-semibold text-orange-500 hover:underline'
             >
               GraphQL API reference →

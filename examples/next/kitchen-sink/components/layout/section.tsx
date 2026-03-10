@@ -2,7 +2,13 @@
 import React from 'react';
 import { useLayout } from './layout-context';
 
-export const Section = ({ children, color = '', className = '' }) => {
+interface SectionProps {
+  children: React.ReactNode;
+  color?: string;
+  className?: string;
+}
+
+export const Section = ({ children, color = '', className = '' }: SectionProps) => {
   const { theme } = useLayout();
   const sectionColor = {
     default:

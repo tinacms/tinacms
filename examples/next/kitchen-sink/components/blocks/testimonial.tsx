@@ -3,7 +3,12 @@ import { Section, Container, useLayout } from '../layout';
 import { colorFieldSchema } from '@/tina/schemas/shared-fields';
 import { authorColorMap } from '@/lib/utils';
 
-export const Testimonial = ({ data, parentField = '' }) => {
+interface TestimonialProps {
+  data: Record<string, unknown>;
+  parentField?: string;
+}
+
+export const Testimonial = ({ data, parentField = '' }: TestimonialProps) => {
   const { theme } = useLayout();
   const authorColor = authorColorMap[theme.color] ?? authorColorMap.orange;
 

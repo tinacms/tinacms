@@ -10,7 +10,12 @@ import {
   colorFieldSchema,
 } from '@/tina/schemas/shared-fields';
 
-export const Hero = ({ data, parentField }: any) => {
+interface HeroProps {
+  data: Record<string, unknown>;
+  parentField?: string;
+}
+
+export const Hero = ({ data, parentField }: HeroProps) => {
   return (
     <Section color={data.color}>
       <Container
@@ -73,7 +78,7 @@ export const Hero = ({ data, parentField }: any) => {
                 />
                 <Image
                   className='relative z-10 w-full max-w-xs rounded-lg lg:max-w-none h-auto'
-                  alt={data.image.alt}
+                  alt={data.image.alt || ''}
                   src={imgSrc}
                   width={800}
                   height={600}

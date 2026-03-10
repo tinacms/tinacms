@@ -1,5 +1,4 @@
 'use client';
-import Link from 'next/link';
 import { Section, Container } from '../layout';
 import RichText from '@/lib/richText';
 import { Actions } from '../layout/actions';
@@ -8,7 +7,12 @@ import {
   colorFieldSchema,
 } from '@/tina/schemas/shared-fields';
 
-export const CTA = ({ data, parentField = '' }: any) => {
+interface CTAProps {
+  data: Record<string, unknown>;
+  parentField?: string;
+}
+
+export const CTA = ({ data, parentField = '' }: CTAProps) => {
   return (
     <Section color={data.color}>
       <Container size='large'>

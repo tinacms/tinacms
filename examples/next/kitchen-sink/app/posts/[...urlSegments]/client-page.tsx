@@ -13,8 +13,8 @@ import { GradientTitle } from '@/components/ui/gradient-title';
 import { NoData } from '@/components/ui/no-data';
 
 interface PostClientPageProps {
-  data: any;
-  variables: any;
+  data: Record<string, unknown>;
+  variables: Record<string, string>;
   query: string;
   formattedDate?: string;
 }

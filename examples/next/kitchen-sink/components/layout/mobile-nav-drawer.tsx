@@ -106,7 +106,7 @@ export const MobileNavDrawer = ({
                 key={item.href}
                 href={item.href || '/'}
                 onClick={onClose}
-                aria-current={active ? 'page' : 'false'}
+                aria-current={active ? 'page' : undefined}
                 className={`block px-4 py-3 rounded-md text-base font-medium transition-colors ${
                   active
                     ? `text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20`

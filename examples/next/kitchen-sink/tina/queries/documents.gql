@@ -26,22 +26,3 @@ query NodeQuery($id: String!) {
     }
   }
 }
-
-query MenuQuery {
-  collections {
-    label
-    name
-    documents {
-      edges {
-        node {
-          ...on Document {
-            _sys {
-              path
-              filename
-            }
-          }
-        }
-      }
-    }
-  }
-}

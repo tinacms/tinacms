@@ -2,14 +2,19 @@
 import { Actions } from '../layout/actions';
 import { Icon, iconSchema } from '../layout/icon';
 import { Section, Container } from '../layout';
-import RichText from '@/lib/richText';
 import {
   actionsFieldSchema,
   colorFieldSchema,
 } from '@/tina/schemas/shared-fields';
 import { Card, CardHeader, CardTitle } from '../ui/card';
 
-export const Feature = ({ featuresColor, data, tinaField }: any) => {
+interface FeatureProps {
+  featuresColor: string;
+  data: Record<string, unknown>;
+  tinaField: string;
+}
+
+export const Feature = ({ featuresColor, data, tinaField }: FeatureProps) => {
   return (
     <div
       data-tinafield={tinaField}
@@ -50,10 +55,15 @@ export const Feature = ({ featuresColor, data, tinaField }: any) => {
   );
 };
 
-export const Features = ({ data, parentField }: any) => {
+interface FeaturesProps {
+  data: Record<string, unknown>;
+  parentField?: string;
+}
+
+export const Features = ({ data, parentField }: FeaturesProps) => {
   // Handle both string and object item formats for backwards compatibility
   const normalizedItems =
-    data.items?.map((item: any) => {
+    (data.items as unknown[])?.map((item) => {
       if (typeof item === 'string') {
         return {
           title: item,
@@ -66,8 +76,8 @@ export const Features = ({ data, parentField }: any) => {
     }) || [];
 
   // Check if items are simple strings (no icons/text/actions) for simple card layout
-  const isSimpleLayout = data.items?.every(
-    (item: any) => typeof item === 'string'
+  const isSimpleLayout = (data.items as unknown[])?.every(
+    (item) => typeof item === 'string'
   );
 
   if (isSimpleLayout) {
@@ -85,12 +95,12 @@ export const Features = ({ data, parentField }: any) => {
                   {data.title}
                 </h2>
                 {data.description && (
-                  <div
+                  <p
                     data-tinafield={`${parentField}.description`}
                     className='mt-4 text-inherit opacity-90'
                   >
-                    <RichText content={data.description} />
-                  </div>
+                    {data.description}
+                  </p>
                 )}
               </div>
             )}
@@ -128,7 +138,7 @@ export const Features = ({ data, parentField }: any) => {
         size='large'
       >
         {normalizedItems &&
-          normalizedItems.map(function (block: any, i: number) {
+          normalizedItems.map(function (block: Record<string, unknown>, i: number) {
             return (
               <Feature
                 tinaField={`${parentField}.items.${i}`}
@@ -173,7 +183,7 @@ export const featureBlockSchema = {
       name: 'items',
       list: true,
       ui: {
-        itemProps: (item: any) => {
+        itemProps: (item: Record<string, unknown>) => {
           return {
             label: typeof item === 'string' ? item : item?.title,
           };

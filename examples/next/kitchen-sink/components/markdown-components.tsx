@@ -70,7 +70,7 @@ export const customComponents: Components<{
 
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
-      console.log('Newsletter signup:', email);
+      // TODO: integrate with an actual newsletter service
       setEmail('');
     };
 
@@ -182,12 +182,22 @@ export const customComponents: Components<{
     <hr className='my-8 border-t border-gray-300 dark:border-gray-700' />
   ),
 
-  a: (props) => (
-    <a
-      href={props.url}
-      className='text-teal-600 hover:text-teal-700 dark:text-teal-400 dark:hover:text-teal-300 underline'
-    >
-      {props.children}
-    </a>
-  ),
+  a: (props) => {
+    const href = typeof props.url === 'string' ? props.url.trim() : '#';
+    const lower = href.toLowerCase();
+    const safeHref =
+      lower.startsWith('javascript:') ||
+      lower.startsWith('data:') ||
+      lower.startsWith('vbscript:')
+        ? '#'
+        : href;
+    return (
+      <a
+        href={safeHref}
+        className='text-teal-600 hover:text-teal-700 dark:text-teal-400 dark:hover:text-teal-300 underline'
+      >
+        {props.children}
+      </a>
+    );
+  },
 };

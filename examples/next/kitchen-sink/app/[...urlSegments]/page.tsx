@@ -18,7 +18,7 @@ export default async function Page({
     data = await client.queries.page({
       relativePath: `${filepath}.mdx`,
     });
-  } catch (error) {
+  } catch {
     notFound();
   }
 
@@ -29,11 +29,11 @@ export async function generateStaticParams() {
   const allPages = await client.queries.pageConnection({ first: 1000 });
 
   const params = (allPages.data?.pageConnection.edges ?? [])
-    .map((edge: any) => ({
+    .map((edge) => ({
       urlSegments: edge?.node?._sys.breadcrumbs || [],
     }))
-    .filter((x: any) => x.urlSegments.length >= 1)
-    .filter((x: any) => !x.urlSegments.every((s: string) => s === 'home'));
+    .filter((x) => x.urlSegments.length >= 1)
+    .filter((x) => !x.urlSegments.every((s: string) => s === 'home'));
 
   return params;
 }

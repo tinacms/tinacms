@@ -13,7 +13,7 @@ export default async function DocumentationPage() {
   return (
     <PageSection title='Documentation'>
       <div className='space-y-6'>
-        {docs.map((edge: any) => (
+        {docs.map((edge) => (
           <Link
             key={edge.node._sys.filename}
             href={`/documentation/${edge.node._sys.breadcrumbs?.join('/') || edge.node._sys.filename}`}

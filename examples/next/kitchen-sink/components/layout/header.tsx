@@ -68,7 +68,7 @@ export const Header = () => {
 
           {/* Desktop Navigation - Hidden on mobile */}
           <nav className='hidden sm:flex items-center gap-0 sm:gap-1'>
-            {nav.map((item: any, idx: number) => {
+            {nav.map((item: Record<string, unknown>, idx: number) => {
               const active = isActive(item.href || '/');
               const gradientId = sanitizeId(
                 item.href || `nav-${idx}`,

@@ -3,7 +3,12 @@ import { Section, Container } from '../layout';
 import RichText from '@/lib/richText';
 import { colorFieldSchema } from '@/tina/schemas/shared-fields';
 
-export const Content = ({ data, parentField = '' }) => {
+interface ContentProps {
+  data: Record<string, unknown>;
+  parentField?: string;
+}
+
+export const Content = ({ data, parentField = '' }: ContentProps) => {
   return (
     <Section color={data.color}>
       <Container

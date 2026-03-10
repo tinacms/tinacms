@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     }
     const result = await databaseRequest({ query, variables });
     return NextResponse.json(result);
-  } catch (err: any) {
+  } catch (err: unknown) {
     return NextResponse.json({ error: String(err) }, { status: 500 });
   }
 }

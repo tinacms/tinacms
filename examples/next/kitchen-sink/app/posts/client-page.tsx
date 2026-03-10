@@ -15,8 +15,8 @@ import { Section } from '@/components/layout/section';
 import { Container } from '@/components/layout/container';
 
 interface PostsClientPageProps {
-  data: any;
-  variables?: any;
+  data: Record<string, unknown>;
+  variables?: Record<string, string>;
   query?: string;
 }
 
@@ -30,7 +30,7 @@ export default function PostsClientPage(props: PostsClientPageProps) {
         <h2 className='text-4xl font-extrabold tracking-tight mb-12 text-center title-font text-gray-800 dark:text-gray-50'>
           Posts
         </h2>
-        {posts.map((postData: any) => {
+        {posts.map((postData: Record<string, unknown>) => {
           const post = postData.node;
           const formattedDate = post.formattedDate || '';
           const postUrl = `/posts/${post._sys.breadcrumbs?.join('/') || post._sys.filename}`;

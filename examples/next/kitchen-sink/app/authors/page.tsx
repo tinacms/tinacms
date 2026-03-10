@@ -15,7 +15,7 @@ export default async function AuthorsPage() {
   return (
     <PageSection title='Authors'>
       <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
-        {authors.map((edge: any) => {
+        {authors.map((edge) => {
           const avatarSrc = edge.node.avatar
             ? sanitizeImageSrc(edge.node.avatar)
             : '';

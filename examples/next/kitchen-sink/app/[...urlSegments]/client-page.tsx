@@ -4,8 +4,8 @@ import { useTina } from 'tinacms/dist/react';
 import { Blocks } from '@/components/blocks';
 
 interface ClientPageProps {
-  data: any;
-  variables: any;
+  data: Record<string, unknown>;
+  variables: Record<string, string>;
   query: string;
 }
 

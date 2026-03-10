@@ -14,7 +14,7 @@ const Footer = dynamic(
 );
 
 type LayoutProps = PropsWithChildren & {
-  rawPageData?: any;
+  rawPageData?: Record<string, unknown>;
 };
 
 const getGlobalData = unstable_cache(
@@ -46,8 +46,8 @@ const defaultGlobalData = {
   },
 };
 
-export default async function Layout({ children, rawPageData }: LayoutProps) {
-  let globalData: any = {};
+export default async function Layout({ children }: LayoutProps) {
+  let globalData: Record<string, unknown> = {};
 
   try {
     globalData = await getGlobalData();

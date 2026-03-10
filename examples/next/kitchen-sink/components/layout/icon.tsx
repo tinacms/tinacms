@@ -5,7 +5,7 @@ import { useLayout } from './layout-context';
 import { BiLayer, BiSearchAlt2, BiTerminal } from 'react-icons/bi';
 
 export const IconOptions = {
-  Tina: (props: any) => (
+  Tina: (props: React.SVGProps<SVGSVGElement>) => (
     <svg
       {...props}
       viewBox='0 0 66 80'
@@ -78,13 +78,20 @@ const iconSizeClass = {
   custom: '',
 };
 
+interface IconProps extends React.HTMLAttributes<HTMLSpanElement> {
+  data: Record<string, unknown>;
+  tinaField?: string;
+  parentColor?: string;
+  className?: string;
+}
+
 export const Icon = ({
   data,
   tinaField = '',
   parentColor = 'default',
   className = '',
   ...rest
-}: any) => {
+}: IconProps) => {
   const { theme } = useLayout();
   const color = data.color || theme.color;
   const style = data.style || 'float';

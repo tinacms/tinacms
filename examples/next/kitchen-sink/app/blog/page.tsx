@@ -14,7 +14,7 @@ export default async function BlogsPage() {
   return (
     <PageSection title='Blog'>
       <div className='grid gap-8 md:grid-cols-2'>
-        {blogs.map((edge: any) => {
+        {blogs.map((edge) => {
           const blog = edge.node;
           const href = `/blog/${blog._sys.filename}`;
           let formattedDate = '';

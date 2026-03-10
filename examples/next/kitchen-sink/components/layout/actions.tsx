@@ -30,18 +30,25 @@ function getSafeHref(rawHref: unknown): string {
   return '/';
 }
 
+interface ActionsProps {
+  parentColor?: string;
+  parentField?: string;
+  className?: string;
+  actions?: Record<string, unknown>[];
+}
+
 export const Actions = ({
   parentColor = 'default',
   parentField = '',
   className = '',
   actions,
-}: any) => {
-  const { theme } = useLayout() as any;
+}: ActionsProps) => {
+  const { theme } = useLayout();
 
   return (
     <div className={`flex flex-wrap items-center gap-y-4 gap-x-6 ${className}`}>
       {actions &&
-        actions.map(function (action: any, index: number) {
+        actions.map(function (action: Record<string, unknown>, index: number) {
           const isButton = action.type === 'button';
           const colorClass = isButton
             ? parentColor === 'primary'

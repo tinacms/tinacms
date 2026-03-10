@@ -6,7 +6,7 @@ interface GlobalSettings {
   header?: {
     name?: string;
     color?: string;
-    icon?: any;
+    icon?: Record<string, unknown>;
     nav?: Array<{ href?: string; label?: string }>;
   };
   footer?: {

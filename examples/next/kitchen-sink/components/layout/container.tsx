@@ -1,12 +1,22 @@
 import React from 'react';
 
+type ContainerSize = 'custom' | 'small' | 'medium' | 'large' | 'default';
+type ContainerWidth = 'small' | 'medium' | 'large' | 'custom';
+
+interface ContainerProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode;
+  size?: ContainerSize;
+  width?: ContainerWidth;
+  className?: string;
+}
+
 export const Container = ({
   children,
   size = 'medium',
   width = 'large',
   className = '',
   ...props
-}) => {
+}: ContainerProps) => {
   const verticalPadding = {
     custom: '',
     small: 'py-8',
