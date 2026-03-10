@@ -16,11 +16,9 @@ interface MobileNavDrawerProps {
 
 export const MobileNavDrawer = ({
   nav,
-  theme,
   isOpen,
   onClose,
   onOpen,
-  headerColor,
 }: MobileNavDrawerProps) => {
   const pathname = usePathname();
 
@@ -37,6 +35,7 @@ export const MobileNavDrawer = ({
       }
     };
 
+    const previousOverflow = document.body.style.overflow;
     if (isOpen) {
       window.addEventListener('keydown', handleKeyDown);
       // Prevent body scroll when drawer is open
@@ -45,7 +44,7 @@ export const MobileNavDrawer = ({
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = previousOverflow;
     };
   }, [isOpen, onClose]);
 

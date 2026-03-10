@@ -39,6 +39,12 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { query, variables } = body ?? {};
+    if (!query || typeof query !== 'string') {
+      return NextResponse.json(
+        { error: 'Missing or invalid "query" field in request body' },
+        { status: 400 },
+      );
+    }
     const result = await databaseRequest({ query, variables });
     return NextResponse.json(result);
   } catch (err: any) {

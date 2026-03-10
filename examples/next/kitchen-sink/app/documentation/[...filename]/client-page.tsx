@@ -26,7 +26,7 @@ export default function DocumentationClientPage(props: TinaPageProps) {
           <div className='prose dark:prose-dark w-full max-w-none'>
             <TinaMarkdown
               components={customComponents}
-              content={data.documentation.body}
+              content={data.documentation._body}
             />
           </div>
           {data.documentation.tags && data.documentation.tags.length > 0 && (
@@ -37,9 +37,7 @@ export default function DocumentationClientPage(props: TinaPageProps) {
               <div className='flex flex-wrap gap-2'>
                 {data.documentation.tags.map((tagRef: any, idx: number) => (
                   <Badge key={idx} size='sm'>
-                    {tagRef.reference?.name ||
-                      tagRef.reference?.title ||
-                      'Unknown'}
+                    {tagRef.tag?.name || 'Unknown'}
                   </Badge>
                 ))}
               </div>

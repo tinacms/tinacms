@@ -1,5 +1,5 @@
 {
-  "name": "kitchen-sink",
+  "name": "@examples/next-kitchen-sink",
   "version": "0.1.0",
   "private": true,
   "type": "module",

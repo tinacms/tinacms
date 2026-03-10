@@ -132,6 +132,7 @@ export const iconSchema = {
       type: 'string',
       label: 'Name',
       name: 'name',
+      options: Object.keys(IconOptions).map((key) => ({ label: key, value: key })),
     },
     {
       type: 'string',
