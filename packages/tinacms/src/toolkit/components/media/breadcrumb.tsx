@@ -24,14 +24,13 @@ const BreadcrumbButton = ({ className = '', ...props }) => (
   />
 );
 
-const BreadcrumbItem = ({ className= '', ...props }) => (
+const BreadcrumbItem = ({ className = '', ...props }) => (
   <p className={cn('capitalize', className)} {...props} />
-)
+);
 
 export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
   const directoryParts = directory.split('/');
   // directoryParts[0] = 'Media'
-  
 
   let prevDir: string = dirname(directory) || '';
   if (prevDir === '.') {
@@ -51,24 +50,29 @@ export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
           />
         </IconButton>
       )}
-      {
-        directoryParts.map((part, index) => {
-           return (directoryParts.length === index + 1) ? (
-            (
-              <BreadcrumbItem key={index} className='pl-1.5 font-bold text-gray-500'>
-                {part === '' ? 'Media' : part}
-              </BreadcrumbItem>
-            )
-            ) : (
-            <>
-              <BreadcrumbButton key={index} onClick={() => setDirectory(directoryParts.slice(0, index + 1).join('/'))} className='pl-1.5 text-gray-300'>
-                {part === '' ? 'Media' : part}
-              </BreadcrumbButton>
-              <span className='pl-1.5 text-gray-300'>/</span>
-            </>
-          )
-        })
-      }
+      {directoryParts.map((part, index) => {
+        return directoryParts.length === index + 1 ? (
+          <BreadcrumbItem
+            key={index}
+            className='pl-1.5 font-bold text-gray-500'
+          >
+            {part === '' ? 'Media' : part}
+          </BreadcrumbItem>
+        ) : (
+          <>
+            <BreadcrumbButton
+              key={index}
+              onClick={() =>
+                setDirectory(directoryParts.slice(0, index + 1).join('/'))
+              }
+              className='pl-1.5 text-gray-300'
+            >
+              {part === '' ? 'Media' : part}
+            </BreadcrumbButton>
+            <span className='pl-1.5 text-gray-300'>/</span>
+          </>
+        );
+      })}
     </div>
   );
 }
