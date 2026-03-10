@@ -10,6 +10,9 @@ const inter = Inter({
 export const metadata = {
   title: 'Tina Kitchen Sink',
   description: 'Comprehensive showcase of Tina CMS features',
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default async function RootLayout({
