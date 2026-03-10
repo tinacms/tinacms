@@ -17,7 +17,6 @@ import { FormBuilder, FormStatus } from '@toolkit/form-builder';
 import type { Form } from '@toolkit/forms';
 import type { FormMetaPlugin } from '@toolkit/plugin-form-meta';
 import { useCMS } from '@toolkit/react-core';
-import { EllipsisVertical } from 'lucide-react';
 import * as React from 'react';
 import { FormLists } from './form-list';
 import { SidebarContext } from './sidebar';
@@ -30,6 +29,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '../../../admin/components/ui/tooltip';
+import { Transition } from '@headlessui/react';
 
 // this is the minimum time to show the loading indicator (in milliseconds)
 // this is to prevent the loading indicator from flashing or the 'no forms' placeholder from showing pre-maturely
@@ -44,6 +44,16 @@ export const FormsView = ({ loadingPlaceholder }: FormsViewProps = {}) => {
   const { setFormIsPristine } = React.useContext(SidebarContext);
   const [isShowingLoading, setIsShowingLoading] = React.useState(true); // Default to showing loading
   const [initialLoadComplete, setInitialLoadComplete] = React.useState(false);
+  const [lastActiveFormId, setLastActiveFormId] = React.useState<string | null>(
+    null
+  );
+
+  // Track the last active form ID for the back button
+  React.useEffect(() => {
+    if (cms.state.activeFormId) {
+      setLastActiveFormId(cms.state.activeFormId);
+    }
+  }, [cms.state.activeFormId]);
 
   // Handle loading state with minimum display time
   React.useEffect(() => {
@@ -81,64 +91,91 @@ export const FormsView = ({ loadingPlaceholder }: FormsViewProps = {}) => {
     // No Forms
     return <SidebarNoFormsPlaceholder />;
   }
-  const isMultiform = cms.state.forms.length > 1;
+  const isReferencingManyForms = cms.state.forms.length > 1;
   const activeForm = cms.state.forms.find(
     ({ tinaForm }) => tinaForm.id === cms.state.activeFormId
   );
   const isEditing = !!activeForm;
-  if (isMultiform && !activeForm) {
-    return <FormLists isEditing={isEditing} />;
-  }
   const formMetas = cms.plugins.all<FormMetaPlugin>('form:meta');
+
+  // Single form - no transitions needed
+  if (!isReferencingManyForms) {
+    return (
+      <>
+        {activeForm && (
+          <div className='flex-1 flex flex-col flex-nowrap overflow-hidden h-full w-full relative bg-white'>
+            <FormHeader
+              activeForm={activeForm}
+              branch={cms.api.admin.api.branch}
+              repoProvider={cms.api.admin.api.schema.config.config.repoProvider}
+              isLocalMode={cms.api?.tina?.isLocalMode}
+            />
+            {formMetas?.map((meta) => (
+              <React.Fragment key={meta.name}>
+                <meta.Component />
+              </React.Fragment>
+            ))}
+            <FormBuilder
+              form={activeForm}
+              onPristineChange={setFormIsPristine}
+            />
+          </div>
+        )}
+      </>
+    );
+  }
+
+  // Referencing many forms - coordinate transitions between list and form view
   return (
     <>
-      {activeForm && (
-        <FormWrapper isEditing={isEditing} isMultiform={isMultiform}>
-          <FormHeader
-            activeForm={activeForm}
-            branch={cms.api.admin.api.branch}
-            repoProvider={cms.api.admin.api.schema.config.config.repoProvider}
-            isLocalMode={cms.api?.tina?.isLocalMode}
-          />
-          {formMetas?.map((meta) => (
-            <React.Fragment key={meta.name}>
-              <meta.Component />
-            </React.Fragment>
-          ))}
-          <FormBuilder form={activeForm} onPristineChange={setFormIsPristine} />
-        </FormWrapper>
-      )}
+      {/* Form List View - shows when not editing */}
+      <Transition
+        show={!isEditing}
+        as='div'
+        className='h-full flex flex-col'
+        enter='transition-all ease-out duration-150'
+        enterFrom='opacity-0 translate-y-1/2'
+        enterTo='opacity-100 translate-y-0'
+        leave='transition-all ease-out duration-150'
+        leaveFrom='opacity-100 translate-y-0'
+        leaveTo='opacity-0 translate-y-1/2'
+      >
+        <FormLists lastActiveFormId={lastActiveFormId} />
+      </Transition>
+
+      {/* Form Edit View - shows when editing */}
+      <Transition
+        show={isEditing}
+        as='div'
+        className='flex-1 flex flex-col flex-nowrap overflow-hidden h-full w-full relative bg-white'
+        enter='transition-opacity ease-out duration-150 delay-150'
+        enterFrom='opacity-0'
+        enterTo='opacity-100'
+        leave='transition-opacity ease-out duration-150'
+        leaveFrom='opacity-100'
+        leaveTo='opacity-0'
+      >
+        {activeForm && (
+          <>
+            <FormHeader
+              activeForm={activeForm}
+              branch={cms.api.admin.api.branch}
+              repoProvider={cms.api.admin.api.schema.config.config.repoProvider}
+              isLocalMode={cms.api?.tina?.isLocalMode}
+            />
+            {formMetas?.map((meta) => (
+              <React.Fragment key={meta.name}>
+                <meta.Component />
+              </React.Fragment>
+            ))}
+            <FormBuilder
+              form={activeForm}
+              onPristineChange={setFormIsPristine}
+            />
+          </>
+        )}
+      </Transition>
     </>
-  );
-};
-
-interface FormWrapperProps {
-  isEditing: boolean;
-  isMultiform: boolean;
-  children: React.ReactNode;
-}
-
-const FormWrapper: React.FC<FormWrapperProps> = ({ isEditing, children }) => {
-  return (
-    <div
-      className='flex-1 flex flex-col flex-nowrap overflow-hidden h-full w-full relative bg-white'
-      style={
-        isEditing
-          ? {
-              transform: 'none',
-              animationName: 'fly-in-left',
-              animationDuration: '150ms',
-              animationDelay: '0',
-              animationIterationCount: 1,
-              animationTimingFunction: 'ease-out',
-            }
-          : {
-              transform: 'translate3d(100%, 0, 0)',
-            }
-      }
-    >
-      {children}
-    </div>
   );
 };
 
@@ -164,8 +201,7 @@ export const FormHeader = ({
   const { formIsPristine } = React.useContext(SidebarContext);
 
   return (
-    <div className='px-4 pt-2 pb-4 flex flex-row flex-nowrap justify-between items-center gap-2 bg-gradient-to-t from-white to-gray-50'>
-      <MultiformSelector activeForm={activeForm} />
+    <div className='px-4 pt-2 pb-4 flex flex-row flex-nowrap justify-between items-center gap-2 bg-gradient-to-t from-white to-gray-50 border-b border-gray-100'>
       <FormBreadcrumbs className='w-[calc(100%-3rem)]' />
       <FileHistoryProvider
         defaultBranchName={repoProvider?.defaultBranchName}
@@ -238,6 +274,34 @@ export const FileHistoryProvider = ({
   );
 };
 
+const BreadcrumbItemLink = ({
+  breadcrumb,
+  onClick,
+}: { breadcrumb: string; onClick: () => void }) => {
+  return (
+    <BreadcrumbItem className='shrink truncate'>
+      <BreadcrumbLink
+        asChild
+        className='text-gray-700 truncate hover:text-orange-500'
+      >
+        <button type='button' onClick={onClick}>
+          {breadcrumb}
+        </button>
+      </BreadcrumbLink>
+    </BreadcrumbItem>
+  );
+};
+
+const FinalBreadcrumbItem = ({ breadcrumb }: { breadcrumb: string }) => {
+  return (
+    <BreadcrumbItem className='shrink truncate'>
+      <BreadcrumbPage className='text-gray-700 font-medium'>
+        {breadcrumb}
+      </BreadcrumbPage>
+    </BreadcrumbItem>
+  );
+};
+
 export const FormBreadcrumbs = ({
   rootBreadcrumbName,
   ...props
@@ -273,22 +337,18 @@ export const FormBreadcrumbs = ({
     <Breadcrumb {...props}>
       <BreadcrumbList className='flex-nowrap text-nowrap'>
         {/* First breadcrumb */}
-        <BreadcrumbItem className='shrink truncate'>
-          <BreadcrumbLink
-            asChild
-            className='text-gray-700 hover:text-blue-500 truncate'
-          >
-            <button
-              type='button'
-              onClick={(e) => {
-                e.preventDefault();
-                goBack(firstBreadcrumb.formId, firstBreadcrumb.formName);
-              }}
-            >
-              {rootBreadcrumbName || firstBreadcrumb.label}
-            </button>
-          </BreadcrumbLink>
-        </BreadcrumbItem>
+        {breadcrumbs.length > 1 ? (
+          <BreadcrumbItemLink
+            breadcrumb={rootBreadcrumbName || firstBreadcrumb.label}
+            onClick={() =>
+              goBack(firstBreadcrumb.formId, firstBreadcrumb.formName)
+            }
+          />
+        ) : (
+          <FinalBreadcrumbItem
+            breadcrumb={rootBreadcrumbName || firstBreadcrumb.label}
+          />
+        )}
 
         {/* Dropdown for middle breadcrumbs */}
         {dropdownBreadcrumbs.length > 0 && (
@@ -322,25 +382,19 @@ export const FormBreadcrumbs = ({
         {secondLastBreadcrumb && (
           <>
             <BreadcrumbSeparator />
-            <BreadcrumbItem className='shrink truncate'>
-              <BreadcrumbLink
-                asChild
-                className='text-gray-700 hover:text-blue-500 truncate'
-              >
-                <button
-                  type='button'
-                  onClick={(e) => {
-                    e.preventDefault();
-                    goBack(
-                      secondLastBreadcrumb.formId,
-                      secondLastBreadcrumb.formName
-                    );
-                  }}
-                >
-                  {secondLastBreadcrumb.label}
-                </button>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
+            {breadcrumbs.length > 1 ? (
+              <BreadcrumbItemLink
+                breadcrumb={secondLastBreadcrumb.label}
+                onClick={() =>
+                  goBack(
+                    secondLastBreadcrumb.formId,
+                    secondLastBreadcrumb.formName
+                  )
+                }
+              />
+            ) : (
+              <FinalBreadcrumbItem breadcrumb={secondLastBreadcrumb.label} />
+            )}
           </>
         )}
 
@@ -348,43 +402,10 @@ export const FormBreadcrumbs = ({
         {lastBreadcrumb && (
           <>
             {breadcrumbs.length > 1 && <BreadcrumbSeparator />}
-            <BreadcrumbItem>
-              <BreadcrumbPage className='text-gray-700 font-medium'>
-                {lastBreadcrumb.label}
-              </BreadcrumbPage>
-            </BreadcrumbItem>
+            <FinalBreadcrumbItem breadcrumb={lastBreadcrumb.label} />
           </>
         )}
       </BreadcrumbList>
     </Breadcrumb>
-  );
-};
-
-const MultiformSelector = ({
-  activeForm,
-}: {
-  activeForm: { activeFieldName?: string; tinaForm: Form };
-}) => {
-  const cms = useCMS();
-  const isMultiform = cms.state.forms.length > 1;
-
-  if (!isMultiform) {
-    return null;
-  }
-  return (
-    <button
-      type='button'
-      className='pointer-events-auto text-xs text-blue-400 hover:text-blue-500 hover:underline transition-all ease-out duration-150'
-      onClick={() => {
-        const state = activeForm.tinaForm.finalForm.getState();
-        if (state.invalid === true) {
-          cms.alerts.error('Cannot navigate away from an invalid form.');
-        } else {
-          cms.dispatch({ type: 'forms:set-active-form-id', value: null });
-        }
-      }}
-    >
-      <EllipsisVertical className='h-5 w-auto opacity-70' />
-    </button>
   );
 };

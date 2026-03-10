@@ -1,7 +1,53 @@
-import { updateObjectWithJsonPath } from './index';
+import { createResolver, updateObjectWithJsonPath } from './index';
 import { describe, expect, it } from 'vitest';
 
 describe('index', () => {
+  describe('validatePath', () => {
+    const resolver = createResolver({
+      database: {} as any,
+      tinaSchema: {} as any,
+      isAudit: false,
+    });
+    // @ts-ignore Since it's private
+    const validatePath = resolver.validatePath;
+
+    it('should success for valid path', () => {
+      const collection = { path: 'posts' } as any;
+      const fullPath = 'posts/hello.md';
+      expect(() => validatePath(fullPath, collection)).not.toThrow();
+    });
+
+    it('should success for deep valid path', () => {
+      const collection = { path: 'posts' } as any;
+      const fullPath = 'posts/nested/path/hello.md';
+      expect(() => validatePath(fullPath, collection)).not.toThrow();
+    });
+
+    it('should throw error for path escaping collection directory via ..', () => {
+      const collection = { path: 'posts' } as any;
+      const fullPath = 'posts/../../outside.md';
+      expect(() => validatePath(fullPath, collection)).toThrow(
+        'Invalid path: path escapes the collection directory'
+      );
+    });
+
+    it('should throw error for sibling directory traversal', () => {
+      const collection = { path: 'posts' } as any;
+      const fullPath = 'posts/../other-collection/file.md';
+      expect(() => validatePath(fullPath, collection)).toThrow(
+        'Invalid path: path escapes the collection directory'
+      );
+    });
+
+    it('should throw error for absolute path', () => {
+      const collection = { path: 'posts' } as any;
+      const fullPath = '/etc/passwd';
+      expect(() => validatePath(fullPath, collection)).toThrow(
+        'Invalid path: path escapes the collection directory'
+      );
+    });
+  });
+
   describe('updateObjectWithJsonPath', () => {
     it('should update top-level property', () => {
       const oldValue = 3;
