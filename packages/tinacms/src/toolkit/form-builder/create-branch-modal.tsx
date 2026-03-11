@@ -214,7 +214,7 @@ export const CreateBranchModal = ({
     } catch (e: unknown) {
       console.error(e);
       let errorMessage =
-        'Branch operation failed. Talking to GitHub was unsuccessful, please try again. If the problem persists please contact 🦙 tina.io/support';
+        'Branch operation failed. Talking to GitHub was unsuccessful, please try again. If the problem persists please contact support at https://tina.io/support 🦙';
 
       const err = e as EditorialWorkflowErrorDetails;
 
