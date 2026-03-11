@@ -106,6 +106,7 @@ export const createConfig = async ({
   plugins = [],
   noWatch,
   rollupOptions,
+  host,
 }: {
   configManager: ConfigManager;
   database: Database;
@@ -113,6 +114,7 @@ export const createConfig = async ({
   noWatch: boolean;
   plugins?: Plugin[];
   rollupOptions?: BuildOptions['rollupOptions'];
+  host?: string;
 }) => {
   // Filter process.env to only include public vars safe for client bundles.
   // See CVE-2023-25164 / GHSA-pc2q-jcxq-rjrr for security context.

@@ -73,6 +73,26 @@ export class DevCommand extends BaseCommand {
       return this.indexingLock.acquire('Key', fn);
     };
 
+    let externalUrl: URL | undefined;
+    if (typeof this.host === 'string' && this.host.startsWith('http')) {
+      try {
+        externalUrl = new URL(this.host);
+      } catch {
+        logger.error(`Invalid URL provided to --host: ${this.host}`);
+        process.exit(1);
+      }
+    }
+
+    const bindHost = this.host ? '0.0.0.0' : undefined;
+    const urlBase = externalUrl ? externalUrl.origin : undefined;
+
+    if (bindHost) {
+      logger.info(`Binding to: ${bindHost}`);
+    }
+    if (externalUrl) {
+      logger.info(`External URL: ${externalUrl.origin}`);
+    }
+
     const setup = async ({ firstTime }: { firstTime: boolean }) => {
       try {
         await configManager.processConfig();
@@ -174,7 +194,10 @@ export class DevCommand extends BaseCommand {
       firstTime: true,
     });
 
-    await fs.outputFile(configManager.outputHTMLFilePath, devHTML(this.port));
+    await fs.outputFile(
+      configManager.outputHTMLFilePath,
+      devHTML(this.port, urlBase)
+    );
     // Add the gitignore so the index.html and assets are committed to git
     await fs.outputFile(
       configManager.outputGitignorePath,
@@ -235,13 +258,15 @@ export class DevCommand extends BaseCommand {
         searchIndexClient.fuzzySearchWrapper;
     }
 
+    const browserApiURL = urlBase ? `${urlBase}/graphql` : apiURL;
     const server = await createDevServer(
       configManager,
       database,
       searchIndexWithFuzzy,
-      apiURL,
+      browserApiURL,
       this.noWatch,
-      dbLock
+      dbLock,
+      bindHost
     );
     await server.listen(Number(this.port));
 
