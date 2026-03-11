@@ -11,10 +11,11 @@ import { Container } from '@/components/layout/container';
 import { customComponents } from '@/components/markdown-components';
 import { GradientTitle } from '@/components/ui/gradient-title';
 import { NoData } from '@/components/ui/no-data';
+import type { PostQuery, PostQueryVariables } from '@/tina/__generated__/types';
 
 interface PostClientPageProps {
-  data: Record<string, unknown>;
-  variables: Record<string, string>;
+  data: PostQuery;
+  variables: PostQueryVariables;
   query: string;
   formattedDate?: string;
 }

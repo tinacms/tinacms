@@ -8,11 +8,9 @@ import type { GlobalHeaderNav } from '@/tina/__generated__/types';
 
 interface MobileNavDrawerProps {
   nav: Array<GlobalHeaderNav | null>;
-  theme: { color: string };
   isOpen: boolean;
   onClose: () => void;
   onOpen: () => void;
-  headerColor: string;
 }
 
 export const MobileNavDrawer = ({

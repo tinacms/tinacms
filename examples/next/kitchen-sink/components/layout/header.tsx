@@ -126,11 +126,9 @@ export const Header = () => {
           {/* Mobile Navigation Drawer */}
           <MobileNavDrawer
             nav={nav}
-            theme={theme}
             isOpen={mobileNavOpen}
             onOpen={() => setMobileNavOpen(true)}
             onClose={() => setMobileNavOpen(false)}
-            headerColor={headerColorCss}
           />
         </div>
       </Container>

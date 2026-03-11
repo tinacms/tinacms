@@ -34,7 +34,7 @@ export async function generateStaticParams() {
   const allPosts = await client.queries.postConnection({ first: 1000 });
 
   const params =
-    allPosts.data?.postConnection.edges?.flatMap((edge: any) => {
+    allPosts.data?.postConnection.edges?.flatMap((edge) => {
       const crumbs = edge?.node?._sys?.breadcrumbs;
       if (!Array.isArray(crumbs) || crumbs.length === 0) return [];
       return [{ urlSegments: crumbs as string[] }];
