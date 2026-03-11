@@ -1,17 +1,17 @@
+import { Plate } from 'platejs/react';
 import React from 'react';
-import { Components } from './plugins/ui/components';
-import { helpers, normalizeLinksInCodeBlocks } from './plugins/core/common';
 import type { RichTextType } from '..';
 import { Editor, EditorContainer } from './components/editor';
-import { FixedToolbar } from './components/plate-ui/fixed-toolbar';
-import { TooltipProvider } from './components/plate-ui/tooltip';
 import FixedToolbarButtons from './components/fixed-toolbar-buttons';
-import { ToolbarProvider } from './toolbar/toolbar-provider';
-import { Plate } from 'platejs/react';
-import { useCreateEditor } from './hooks/use-create-editor';
-import { editorPlugins } from './plugins/editor-plugins';
-import { FloatingToolbar } from './components/plate-ui/floating-toolbar';
 import FloatingToolbarButtons from './components/floating-toolbar-buttons';
+import { FixedToolbar } from './components/plate-ui/fixed-toolbar';
+import { FloatingToolbar } from './components/plate-ui/floating-toolbar';
+import { TooltipProvider } from './components/plate-ui/tooltip';
+import { useCreateEditor } from './hooks/use-create-editor';
+import { helpers, normalizeLinksInCodeBlocks } from './plugins/core/common';
+import { editorPlugins } from './plugins/editor-plugins';
+import { Components } from './plugins/ui/components';
+import { ToolbarProvider } from './toolbar/toolbar-provider';
 
 export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
   const initialValue = React.useMemo(() => {

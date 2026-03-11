@@ -1,21 +1,29 @@
-import { withProps } from '@udecode/cn';
 import {
   BaseBoldPlugin,
   BaseCodePlugin,
+  BaseHighlightPlugin,
   BaseItalicPlugin,
   BaseStrikethroughPlugin,
   BaseUnderlinePlugin,
 } from '@platejs/basic-nodes';
 import { BaseBlockquotePlugin } from '@platejs/basic-nodes';
+import { BaseHorizontalRulePlugin } from '@platejs/basic-nodes';
 import {
   BaseCodeBlockPlugin,
   BaseCodeLinePlugin,
   BaseCodeSyntaxPlugin,
 } from '@platejs/code-block';
-import { BaseHorizontalRulePlugin } from '@platejs/basic-nodes';
+import { withProps } from '@udecode/cn';
 
 // Define heading keys locally
-const HEADING_KEYS = { h1: 'h1', h2: 'h2', h3: 'h3', h4: 'h4', h5: 'h5', h6: 'h6' };
+const HEADING_KEYS = {
+  h1: 'h1',
+  h2: 'h2',
+  h3: 'h3',
+  h4: 'h4',
+  h5: 'h5',
+  h6: 'h6',
+};
 import { BaseLinkPlugin } from '@platejs/link';
 import {
   BaseBulletedListPlugin,
@@ -36,6 +44,7 @@ import { CodeBlockElement } from '../../components/plate-ui/code-block/code-bloc
 import { CodeLeaf } from '../../components/plate-ui/code-leaf';
 import { CodeLineElement } from '../../components/plate-ui/code-line-element';
 import { CodeSyntaxLeaf } from '../../components/plate-ui/code-syntax-leaf';
+import { HighlightLeaf } from '../../components/plate-ui/highlight-leaf';
 import { HrElement } from '../../components/plate-ui/hr-element';
 import { LinkElement } from '../../components/plate-ui/link-element';
 import { ListElement } from '../../components/plate-ui/list-element';
@@ -211,6 +220,7 @@ export const Components = () => {
     [BaseListItemPlugin.key]: withProps(PlateElement, { as: 'li' }),
     [BaseLinkPlugin.key]: LinkElement,
     [BaseCodePlugin.key]: CodeLeaf,
+    [BaseHighlightPlugin.key]: HighlightLeaf,
     [BaseUnderlinePlugin.key]: withProps(PlateLeaf, { as: 'u' }),
     [BaseStrikethroughPlugin.key]: withProps(PlateLeaf, { as: 's' }),
     [BaseItalicPlugin.key]: withProps(PlateLeaf, { as: 'em' }),

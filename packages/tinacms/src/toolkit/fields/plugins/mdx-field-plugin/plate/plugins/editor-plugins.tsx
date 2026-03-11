@@ -37,7 +37,6 @@ const HEADING_KEYS = {
 };
 const HEADING_LEVELS: HeadingLevel[] = [1, 2, 3, 4, 5, 6];
 import React from 'react';
-import { LinkFloatingToolbar } from '../components/plate-ui/link-floating-toolbar';
 import { isUrl } from '../transforms/is-url';
 import createImgPlugin from './create-img-plugin';
 import { createInvalidMarkdownPlugin } from './create-invalid-markdown-plugin';
@@ -118,7 +117,6 @@ export const editorPlugins = [
       // Custom validation function to allow relative links, e.g., /about
       isUrl: (url) => isUrl(url),
     },
-    render: { afterEditable: () => <LinkFloatingToolbar /> },
   }),
 
   ...viewPlugins,
