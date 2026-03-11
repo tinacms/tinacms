@@ -102,7 +102,7 @@
     "graphql-tag": "catalog:",
     "is-hotkey": "catalog:",
     "lucide-react": "catalog:",
-    "mermaid": "9.3.0",
+    "mermaid": "^11.12.2",
     "moment": "catalog:",
     "moment-timezone": "^0.6.0",
     "monaco-editor": "catalog:",
