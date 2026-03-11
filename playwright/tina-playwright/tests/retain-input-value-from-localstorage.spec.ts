@@ -9,7 +9,7 @@ test.skip("Local storage retain edit test", () => {
     page,
   }) => {
     await page.goto(
-      "http://localhost:3000/admin/index.html#/collections/edit/author/first_author",
+      "/admin/index.html#/collections/edit/author/first_author",
       { waitUntil: "domcontentloaded" }
     );
 
@@ -34,7 +34,7 @@ test.skip("Local storage retain edit test", () => {
     const richTextNewValue = "Updated Rich Text Content";
 
     await page.goto(
-      "http://localhost:3000/admin/index.html#/collections/edit/page/Test-rich_text_editor_local_storage",
+      "/admin/index.html#/collections/edit/page/Test-rich_text_editor_local_storage",
       { waitUntil: "domcontentloaded" }
     );
 

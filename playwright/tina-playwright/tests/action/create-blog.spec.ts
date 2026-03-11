@@ -1,10 +1,9 @@
-import { test, expect } from "@playwright/test";
-import deleteBlogPost from "../../utils/deleteBlogPost";
+import { test, expect } from "../../fixtures/test-content";
 
 test.describe("Create Blog Post", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(
-      "http://localhost:3000/admin/index.html#/collections/new/post/~/",
+      "/admin/index.html#/collections/new/post/~/",
       { waitUntil: "domcontentloaded" }
     );
     //Need to dismiss the popup dialog to enter edit mode
@@ -15,9 +14,8 @@ test.describe("Create Blog Post", () => {
   const blogTitle = "Test Blog Title";
   const blogContent = "This is a test blog content.";
   const blogFilename = "This File is Created From Playwright Test";
-  let isNewBlogCreated = false;
 
-  test("should be able to create a blog", async ({ page }) => {
+  test("should be able to create a blog", async ({ page, contentCleanup }) => {
     await page.fill('input[name="title"]', blogTitle);
 
     await page.fill('textarea[name="body"]', blogContent);
@@ -26,26 +24,13 @@ test.describe("Create Blog Post", () => {
 
     await page.click('button:has-text("Save")');
 
-    await page.goto(
-      "http://localhost:3000/admin/index.html#/collections/post/~"
-    );
+    // Register for automatic teardown immediately after save,
+    // so cleanup runs even if the subsequent lookup/assertion fails
+    contentCleanup.track("post", `${blogFilename}.md`);
 
-    const blogPost = await page.locator(`text=${blogFilename}`).first();
+    await page.goto("/admin/index.html#/collections/post/~");
+
+    const blogPost = page.locator(`text=${blogFilename}`).first();
     await expect(blogPost).toBeVisible();
-    isNewBlogCreated = true;
-  });
-
-  test.afterEach(async () => {
-    if (isNewBlogCreated) {
-      const collection = "post";
-      const relativePath = `${blogFilename}.md`;
-
-      try {
-        //TODO: Another better way calling the backend is using the import client from the generated/client
-        await deleteBlogPost(collection, relativePath);
-      } catch (error) {
-        console.error("Error deleting blog post:", error);
-      }
-    }
   });
 });
