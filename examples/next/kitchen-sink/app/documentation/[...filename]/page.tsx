@@ -8,12 +8,14 @@ export const revalidate = 300;
 
 export async function generateStaticParams() {
   const pages = await client.queries.documentationConnection();
-  const paths = pages.data?.documentationConnection?.edges?.flatMap((edge) => {
-    const breadcrumbs = edge?.node?._sys?.breadcrumbs;
-    return breadcrumbs ? [{ filename: breadcrumbs }] : [];
-  });
+  const paths =
+    pages.data?.documentationConnection?.edges?.flatMap((edge: any) => {
+      const breadcrumbs = edge?.node?._sys?.breadcrumbs;
+      if (!Array.isArray(breadcrumbs) || breadcrumbs.length === 0) return [];
+      return [{ filename: breadcrumbs as string[] }];
+    }) || [];
 
-  return paths || [];
+  return paths;
 }
 
 export default async function DocFile({ params }: Props) {

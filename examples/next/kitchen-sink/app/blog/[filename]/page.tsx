@@ -9,11 +9,14 @@ export const revalidate = 300;
 
 export async function generateStaticParams() {
   const pages = await client.queries.blogConnection();
-  const paths = pages.data?.blogConnection?.edges?.map((edge) => ({
-    filename: edge?.node?._sys?.filename,
-  }));
+  const paths =
+    pages.data?.blogConnection?.edges?.flatMap((edge: any) => {
+      const filename = edge?.node?._sys?.filename;
+      if (typeof filename !== 'string' || filename.length === 0) return [];
+      return [{ filename }];
+    }) || [];
 
-  return paths || [];
+  return paths;
 }
 
 export default async function BlogFile({ params }: Props) {

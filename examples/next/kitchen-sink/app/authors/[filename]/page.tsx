@@ -8,11 +8,16 @@ export const revalidate = 300;
 
 export async function generateStaticParams() {
   const pages = await client.queries.authorConnection();
-  const paths = pages.data?.authorConnection?.edges?.map((edge) => ({
-    filename: edge?.node?._sys?.filename?.replace(/\.(md|mdx|json)$/, ''),
-  }));
+  const paths =
+    pages.data?.authorConnection?.edges?.flatMap((edge: any) => {
+      const raw = edge?.node?._sys?.filename;
+      if (typeof raw !== 'string') return [];
+      const filename = raw.replace(/\.(md|mdx|json)$/, '');
+      if (filename.length === 0) return [];
+      return [{ filename }];
+    }) || [];
 
-  return paths || [];
+  return paths;
 }
 
 export default async function AuthorFile({ params }: Props) {

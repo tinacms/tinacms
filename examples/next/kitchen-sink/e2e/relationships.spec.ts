@@ -323,14 +323,19 @@ test.describe('Relationship Resolution — Author Avatar', () => {
     for (const edge of blogs) {
       if (edge.node.author?.avatar) {
         const avatarSrc = edge.node.author.avatar;
+        const filename = edge.node._sys.filename;
 
-        // There should be an img element with this src
-        const image = page.locator(
-          `img[src*="${encodeURIComponent(avatarSrc).slice(0, 20)}"]`
-        );
-        // Check if any image exists (might be fuzzy matched, but that's okay)
-        const images = page.locator('img');
-        expect(await images.count()).toBeGreaterThan(0);
+        // Find the blog card for this entry and assert it's visible
+        const card = page.locator(`[data-testid="blog-card-${filename}"]`);
+        await expect(card).toBeVisible();
+
+        // Try to match the avatar by filename (robust against CDN/transform prefixes)
+        const avatarBasename = (avatarSrc || '').split('/').pop() || avatarSrc;
+
+        // Look for an <img> inside the card whose src contains the avatar basename
+        const avatarImg = card.locator(`img[src*="${avatarBasename}"]`);
+        await expect(avatarImg).toHaveCount(1);
+        await expect(avatarImg.first()).toBeVisible();
       }
     }
   });

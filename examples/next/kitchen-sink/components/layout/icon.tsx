@@ -78,12 +78,17 @@ const iconSizeClass = {
   custom: '',
 };
 
-interface IconProps extends React.HTMLAttributes<HTMLSpanElement> {
+export type IconElementProps =
+  | React.HTMLAttributes<HTMLDivElement>
+  | React.SVGProps<SVGSVGElement>;
+
+interface IconOwnProps {
   data: IconData;
   tinaField?: string;
-  parentColor?: string | null;
   className?: string;
 }
+
+export type IconProps = IconOwnProps & IconElementProps;
 
 export interface IconData {
   name?: string | null;
@@ -95,7 +100,6 @@ export interface IconData {
 export const Icon = ({
   data,
   tinaField = '',
-  parentColor = 'default',
   className = '',
   ...rest
 }: IconProps) => {
@@ -122,7 +126,7 @@ export const Icon = ({
       <div
         data-tinafield={tinaField}
         className={`relative z-10 inline-flex items-center justify-center flex-shrink-0 rounded-full ${colorClass.circle} ${sizeClass} ${className}`.trim()}
-        {...rest}
+        {...(rest as React.HTMLAttributes<HTMLDivElement>)}
       >
         <IconComponent className='w-2/3 h-2/3' />
       </div>
@@ -133,7 +137,7 @@ export const Icon = ({
     <IconComponent
       data-tinafield={tinaField}
       className={`${colorClass.regular} ${sizeClass} ${className}`.trim()}
-      {...rest}
+      {...(rest as React.SVGProps<SVGSVGElement>)}
     />
   );
 };

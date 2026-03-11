@@ -14,12 +14,14 @@ export async function databaseRequest({
     useRelativeMedia: true,
   } as const;
 
+  const verboseEnabled = process.env.TINA_DATABASE_VERBOSE === 'true';
+
   const result = await resolve({
     config,
     database,
     query,
     variables: variables ?? {},
-    verbose: true,
+    verbose: verboseEnabled,
   });
 
   return result;
