@@ -7,6 +7,7 @@ import {
   sanitizeImageSrc,
   titleColorClasses,
   cardLinkClasses,
+  cn,
 } from '@/lib/utils';
 import { TinaMarkdown } from 'tinacms/dist/rich-text';
 import { BiRightArrowAlt } from 'react-icons/bi';
@@ -55,16 +56,26 @@ export default function PostsClientPage(props: PostsClientPageProps) {
               data-testid={`post-card-${post._sys.filename}`}
               className={`${cardLinkClasses} px-6 sm:px-8 md:px-10 py-10 mb-8 last:mb-0`}
             >
-              <h3
-                className={`text-gray-700 dark:text-white text-3xl lg:text-4xl font-semibold title-font mb-5 transition-all duration-150 ease-out ${
-                  titleColorClasses[theme.color] || titleColorClasses.blue
-                }`}
-              >
-                {post.title}{' '}
-                <span className='inline-block opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out'>
-                  <BiRightArrowAlt className='inline-block h-8 -mt-1 ml-1 w-auto opacity-70' />
-                </span>
-              </h3>
+              {(() => {
+                const titleGradient =
+                  titleColorClasses[theme.color] || titleColorClasses.blue;
+                const isGradient = titleGradient.includes('from-');
+                const titleClasses = cn(
+                  isGradient
+                    ? 'bg-gradient-to-r bg-clip-text text-transparent'
+                    : 'text-gray-700 dark:text-white',
+                  'text-3xl lg:text-4xl font-semibold title-font mb-5 transition-all duration-150 ease-out',
+                  titleGradient
+                );
+                return (
+                  <h3 className={titleClasses}>
+                    {post.title}{' '}
+                    <span className='inline-block opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out'>
+                      <BiRightArrowAlt className='inline-block h-8 -mt-1 ml-1 w-auto opacity-70' />
+                    </span>
+                  </h3>
+                );
+              })()}
               {post.excerpt && (
                 <div className='prose dark:prose-dark w-full max-w-none mb-5 opacity-70'>
                   <TinaMarkdown content={post.excerpt} />

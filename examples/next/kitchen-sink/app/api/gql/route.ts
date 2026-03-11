@@ -48,6 +48,12 @@ export async function POST(request: Request) {
     const result = await databaseRequest({ query, variables });
     return NextResponse.json(result);
   } catch (err: unknown) {
-    return NextResponse.json({ error: String(err) }, { status: 500 });
+    // Log the original error server-side and avoid leaking internals to clients
+    console.error('GraphQL endpoint error:', err);
+    const message =
+      process.env.NODE_ENV === 'development'
+        ? String(err)
+        : 'Internal server error';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
