@@ -51,24 +51,26 @@ export const Footer = () => {
             />
           </Link>
           <div className='flex gap-4'>
-            {footer?.social?.map((social: Record<string, unknown>, index: number) => {
-              const SocialIcon =
-                socialIconMap[social.icon?.toLowerCase() || ''];
-              if (!SocialIcon || !social.url) return null;
-              return (
-                <a
-                  key={index}
-                  className='inline-block opacity-80 hover:opacity-100 transition ease-out duration-150'
-                  href={social.url}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                >
-                  <SocialIcon
-                    className={`${socialIconClasses} ${iconColorClass}`}
-                  />
-                </a>
-              );
-            })}
+            {footer?.social?.map(
+              (social: Record<string, unknown>, index: number) => {
+                const SocialIcon =
+                  socialIconMap[social.icon?.toLowerCase() || ''];
+                if (!SocialIcon || !social.url) return null;
+                return (
+                  <a
+                    key={index}
+                    className='inline-block opacity-80 hover:opacity-100 transition ease-out duration-150'
+                    href={social.url}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                  >
+                    <SocialIcon
+                      className={`${socialIconClasses} ${iconColorClass}`}
+                    />
+                  </a>
+                );
+              }
+            )}
           </div>
         </div>
         <div className='absolute h-1 bg-gradient-to-r from-transparent via-black dark:via-white to-transparent top-0 left-4 right-4 opacity-5' />

@@ -127,7 +127,12 @@ export function GraphQLExplorer() {
         {/* Left: Input Panel */}
         <div className='bg-gray-50 dark:bg-gray-800 p-6'>
           <div className='mb-4'>
-            <label htmlFor='gql-query' className='block text-sm font-semibold mb-2'>Query</label>
+            <label
+              htmlFor='gql-query'
+              className='block text-sm font-semibold mb-2'
+            >
+              Query
+            </label>
             <textarea
               id='gql-query'
               value={query}
@@ -139,7 +144,10 @@ export function GraphQLExplorer() {
           </div>
 
           <div className='mb-4'>
-            <label htmlFor='gql-variables' className='block text-sm font-semibold mb-2'>
+            <label
+              htmlFor='gql-variables'
+              className='block text-sm font-semibold mb-2'
+            >
               Variables (JSON)
             </label>
             <textarea

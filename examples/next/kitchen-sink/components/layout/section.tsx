@@ -8,7 +8,11 @@ interface SectionProps {
   className?: string;
 }
 
-export const Section = ({ children, color = '', className = '' }: SectionProps) => {
+export const Section = ({
+  children,
+  color = '',
+  className = '',
+}: SectionProps) => {
   const { theme } = useLayout();
   const sectionColor = {
     default:

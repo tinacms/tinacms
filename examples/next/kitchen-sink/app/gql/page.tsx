@@ -12,9 +12,8 @@ export default async function GraphQLDemoPage() {
   try {
     const result = await client.queries.postConnection();
     posts =
-      result.data?.postConnection?.edges
-        ?.map((e) => e?.node)
-        .filter(Boolean) ?? [];
+      result.data?.postConnection?.edges?.map((e) => e?.node).filter(Boolean) ??
+      [];
   } catch (e) {
     error = String(e);
   }
@@ -102,7 +101,10 @@ export default async function GraphQLDemoPage() {
             <p className='opacity-60 italic'>No posts found.</p>
           ) : (
             <div className='overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm'>
-              <table aria-label='Blog posts fetched from the GraphQL API' className='w-full text-sm text-left'>
+              <table
+                aria-label='Blog posts fetched from the GraphQL API'
+                className='w-full text-sm text-left'
+              >
                 <thead className='bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 uppercase text-xs tracking-wider'>
                   <tr>
                     <th className='px-4 py-3'>Title</th>

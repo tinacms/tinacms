@@ -15,7 +15,12 @@ function getSafeHref(rawHref: unknown): string {
   if (!href) return '/';
   // Allow same-origin relative paths and hash links
   // Explicitly reject protocol-relative URLs like //evil.com
-  if ((href.startsWith('/') && !href.startsWith('//') && !href.startsWith('\\')) || href.startsWith('#')) {
+  if (
+    (href.startsWith('/') &&
+      !href.startsWith('//') &&
+      !href.startsWith('\\')) ||
+    href.startsWith('#')
+  ) {
     return href;
   }
   // Allow http/https absolute URLs

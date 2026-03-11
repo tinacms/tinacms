@@ -138,7 +138,10 @@ export const Features = ({ data, parentField }: FeaturesProps) => {
         size='large'
       >
         {normalizedItems &&
-          normalizedItems.map(function (block: Record<string, unknown>, i: number) {
+          normalizedItems.map(function (
+            block: Record<string, unknown>,
+            i: number
+          ) {
             return (
               <Feature
                 tinaField={`${parentField}.items.${i}`}
