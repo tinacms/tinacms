@@ -1,15 +1,15 @@
-import { defineConfig, devices } from "@playwright/test";
+import { defineConfig, devices } from '@playwright/test';
 
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  timeout: 10000,
+  timeout: 15000,
   reporter: [
-    ["list", { printSteps: true }],
-    ["json", { outputFile: "playwright-test-results.json" }],
+    ['list', { printSteps: true }],
+    ['json', { outputFile: 'playwright-test-results.json' }],
   ],
-  testDir: "./tests",
+  testDir: './tests',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -21,21 +21,29 @@ export default defineConfig({
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    trace: "on-first-retry",
+    baseURL: 'http://localhost:3000',
+    trace: 'on-first-retry',
   },
 
   /* Configure projects for major browsers */
   projects: [
     {
-      name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+      testIgnore: /posthog/,
+    },
+    {
+      name: 'posthog',
+      use: { ...devices['Desktop Chrome'] },
+      testMatch: /posthog/,
+      dependencies: ['chromium'],
     },
   ],
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: "pnpm dev",
-    url: "http://localhost:3000/",
+    command: 'pnpm dev',
+    url: 'http://localhost:3000/',
     reuseExistingServer: !process.env.CI,
   },
 });

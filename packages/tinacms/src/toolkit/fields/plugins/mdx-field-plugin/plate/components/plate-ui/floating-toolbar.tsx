@@ -23,7 +23,6 @@ export const FloatingToolbar = withRef<
 >(({ children, state, ...props }, propRef) => {
   const editorId = useEditorRef();
   const focusedEditorId = useEventEditorValue('focus');
-
   const test = useCustomFloatingToolbarState({
     editorId: editorId.id,
     focusedEditorId,

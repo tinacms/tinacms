@@ -2,7 +2,7 @@
   "name": "tinacms",
   "type": "module",
   "typings": "dist/index.d.ts",
-  "version": "3.4.1",
+  "version": "3.6.1",
   "main": "dist/index.js",
   "module": "./dist/index.js",
   "exports": {
@@ -99,6 +99,7 @@
     "moment": "catalog:",
     "moment-timezone": "^0.6.0",
     "monaco-editor": "catalog:",
+    "posthog-js": "^1.347.1",
     "prism-react-renderer": "catalog:",
     "prop-types": "catalog:",
     "react-colorful": "catalog:",
