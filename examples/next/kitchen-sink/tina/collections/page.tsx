@@ -11,7 +11,9 @@ const Page: Collection = {
   path: 'content/pages',
   format: 'mdx',
   ui: {
-    router: ({ document }) => {
+    router: ({
+      document,
+    }: { document: { _sys: { filename: string; breadcrumbs: string[] } } }) => {
       const filepath = document._sys.breadcrumbs.join('/');
       if (filepath === 'home') {
         return '/';

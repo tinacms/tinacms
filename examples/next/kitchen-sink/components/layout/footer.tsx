@@ -12,6 +12,7 @@ import { useLayout } from './layout-context';
 import { Container } from './container';
 import { Icon } from './icon';
 import { socialIconColorClasses } from '@/lib/utils';
+import type { GlobalFooterSocial } from '@/tina/__generated__/types';
 
 export const Footer = () => {
   const { globalSettings, theme } = useLayout();
@@ -52,9 +53,9 @@ export const Footer = () => {
           </Link>
           <div className='flex gap-4'>
             {footer?.social?.map(
-              (social: Record<string, unknown>, index: number) => {
+              (social: GlobalFooterSocial, index: number) => {
                 const SocialIcon =
-                  socialIconMap[social.icon?.toLowerCase() || ''];
+                  socialIconMap[social.icon?.toLowerCase() ?? ''];
                 if (!SocialIcon || !social.url) return null;
                 return (
                   <a

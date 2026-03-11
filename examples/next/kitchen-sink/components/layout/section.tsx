@@ -4,7 +4,7 @@ import { useLayout } from './layout-context';
 
 interface SectionProps {
   children: React.ReactNode;
-  color?: string;
+  color?: string | null;
   className?: string;
 }
 
@@ -33,12 +33,14 @@ export const Section = ({
         'text-white bg-yellow-500 bg-gradient-to-br from-yellow-500 to-yellow-600',
     },
   };
+  const safeColor = color ?? '';
+  type SectionColorKey = keyof Omit<typeof sectionColor, 'primary'>;
+  type PrimaryColorKey = keyof typeof sectionColor.primary;
   const sectionColorCss =
-    color === 'primary'
-      ? sectionColor.primary[theme.color]
-      : sectionColor[color]
-        ? sectionColor[color]
-        : sectionColor.default;
+    safeColor === 'primary'
+      ? sectionColor.primary[(theme.color as PrimaryColorKey) ?? 'blue']
+      : ((sectionColor[safeColor as SectionColorKey] as string | undefined) ??
+        sectionColor.default);
 
   return (
     <section

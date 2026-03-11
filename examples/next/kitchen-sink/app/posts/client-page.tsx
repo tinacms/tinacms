@@ -13,16 +13,27 @@ import { BiRightArrowAlt } from 'react-icons/bi';
 import { useLayout } from '@/components/layout/layout-context';
 import { Section } from '@/components/layout/section';
 import { Container } from '@/components/layout/container';
+import type {
+  PostConnectionQuery,
+  PostConnectionQueryVariables,
+} from '@/tina/__generated__/types';
+
+// Server-side pre-formats dates before passing to this client component
+type PostNode = NonNullable<
+  NonNullable<PostConnectionQuery['postConnection']['edges']>[number]
+>['node'] & { formattedDate?: string };
 
 interface PostsClientPageProps {
-  data: Record<string, unknown>;
-  variables?: Record<string, string>;
+  data: PostConnectionQuery;
+  variables?: PostConnectionQueryVariables;
   query?: string;
 }
 
 export default function PostsClientPage(props: PostsClientPageProps) {
   const { theme } = useLayout();
-  const posts = props.data?.postConnection?.edges || [];
+  const posts = (props.data?.postConnection?.edges ?? []).flatMap(
+    (edge): PostNode[] => (edge?.node ? [edge.node as PostNode] : [])
+  );
 
   return (
     <Section className='flex-1'>
@@ -30,10 +41,9 @@ export default function PostsClientPage(props: PostsClientPageProps) {
         <h2 className='text-4xl font-extrabold tracking-tight mb-12 text-center title-font text-gray-800 dark:text-gray-50'>
           Posts
         </h2>
-        {posts.map((postData: Record<string, unknown>) => {
-          const post = postData.node;
-          const formattedDate = post.formattedDate || '';
-          const postUrl = `/posts/${post._sys.breadcrumbs?.join('/') || post._sys.filename}`;
+        {posts.map((post) => {
+          const formattedDate = post.formattedDate ?? '';
+          const postUrl = `/posts/${post?._sys.breadcrumbs?.join('/') || post?._sys.filename}`;
           const avatarSrc = post.author?.avatar
             ? sanitizeImageSrc(post.author.avatar)
             : '';
@@ -50,16 +60,14 @@ export default function PostsClientPage(props: PostsClientPageProps) {
                   titleColorClasses[theme.color] || titleColorClasses.blue
                 }`}
               >
-                {post._values?.title || post.title}{' '}
+                {post.title}{' '}
                 <span className='inline-block opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out'>
                   <BiRightArrowAlt className='inline-block h-8 -mt-1 ml-1 w-auto opacity-70' />
                 </span>
               </h3>
-              {(post._values?.excerpt || post.excerpt) && (
+              {post.excerpt && (
                 <div className='prose dark:prose-dark w-full max-w-none mb-5 opacity-70'>
-                  <TinaMarkdown
-                    content={post._values?.excerpt || post.excerpt}
-                  />
+                  <TinaMarkdown content={post.excerpt} />
                 </div>
               )}
               <div

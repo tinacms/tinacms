@@ -35,7 +35,7 @@ const Global: Collection = {
           name: 'nav',
           list: true,
           ui: {
-            itemProps: (item) => {
+            itemProps: (item: Record<string, unknown>) => {
               return { label: item?.label };
             },
             defaultItem: {
@@ -69,7 +69,7 @@ const Global: Collection = {
           name: 'social',
           list: true,
           ui: {
-            itemProps: (item) => {
+            itemProps: (item: Record<string, unknown>) => {
               return { label: item?.url || 'Social Link' };
             },
           },

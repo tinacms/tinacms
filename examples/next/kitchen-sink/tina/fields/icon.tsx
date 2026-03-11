@@ -22,7 +22,7 @@ const parseIconName = (name: string) => {
 export const IconPickerInput = wrapFieldsWithMeta(({ input }: any) => {
   const [filter, setFilter] = React.useState('');
 
-  const filteredBlocks = React.useMemo(() => {
+  const filteredBlocks: string[] = React.useMemo(() => {
     return Object.keys(IconOptions).filter((name) =>
       name.toLowerCase().includes(filter.toLowerCase())
     );

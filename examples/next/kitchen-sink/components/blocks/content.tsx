@@ -1,10 +1,12 @@
 'use client';
+import React from 'react';
 import { Section, Container } from '../layout';
 import RichText from '@/lib/richText';
 import { colorFieldSchema } from '@/tina/schemas/shared-fields';
+import type { PageBlocksContent } from '@/tina/__generated__/types';
 
 interface ContentProps {
-  data: Record<string, unknown>;
+  data: PageBlocksContent;
   parentField?: string;
 }
 

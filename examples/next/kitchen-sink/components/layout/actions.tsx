@@ -9,6 +9,13 @@ import {
 } from '@/lib/utils';
 import { useLayout } from './layout-context';
 
+export interface NavAction {
+  label?: string | null;
+  type?: string | null;
+  link?: string | null;
+  icon?: boolean | null;
+}
+
 function getSafeHref(rawHref: unknown): string {
   if (typeof rawHref !== 'string') return '/';
   const href = rawHref.trim();
@@ -36,10 +43,10 @@ function getSafeHref(rawHref: unknown): string {
 }
 
 interface ActionsProps {
-  parentColor?: string;
+  parentColor?: string | null;
   parentField?: string;
   className?: string;
-  actions?: Record<string, unknown>[];
+  actions?: Array<NavAction | null>;
 }
 
 export const Actions = ({
@@ -53,7 +60,8 @@ export const Actions = ({
   return (
     <div className={`flex flex-wrap items-center gap-y-4 gap-x-6 ${className}`}>
       {actions &&
-        actions.map(function (action: Record<string, unknown>, index: number) {
+        actions.map(function (action, index: number) {
+          if (!action) return null;
           const isButton = action.type === 'button';
           const colorClass = isButton
             ? parentColor === 'primary'

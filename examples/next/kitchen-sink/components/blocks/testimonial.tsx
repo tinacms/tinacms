@@ -1,10 +1,12 @@
 'use client';
+import React from 'react';
 import { Section, Container, useLayout } from '../layout';
 import { colorFieldSchema } from '@/tina/schemas/shared-fields';
 import { authorColorMap } from '@/lib/utils';
+import type { PageBlocksTestimonial } from '@/tina/__generated__/types';
 
 interface TestimonialProps {
-  data: Record<string, unknown>;
+  data: PageBlocksTestimonial;
   parentField?: string;
 }
 

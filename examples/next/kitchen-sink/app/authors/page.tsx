@@ -10,50 +10,54 @@ export const revalidate = 300;
 
 export default async function AuthorsPage() {
   const connection = await client.queries.authorConnection();
-  const authors = connection.data.authorConnection.edges ?? [];
+  const authors = (connection.data.authorConnection.edges ?? []).flatMap(
+    (edge) => (edge?.node ? [edge.node] : [])
+  );
 
   return (
     <PageSection title='Authors'>
       <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
-        {authors.map((edge) => {
-          const avatarSrc = edge.node.avatar
-            ? sanitizeImageSrc(edge.node.avatar)
+        {authors.map((author) => {
+          const avatarSrc = author.avatar
+            ? sanitizeImageSrc(author.avatar)
             : '';
 
           return (
             <Link
-              key={edge.node._sys.filename}
-              href={`/authors/${edge.node._sys.filename}`}
+              key={author._sys.filename}
+              href={`/authors/${author._sys.filename}`}
               className={`${cardLinkClasses} px-6 sm:px-8 py-8`}
             >
               <div className='flex items-center gap-4 mb-4'>
                 {avatarSrc && (
                   <Image
                     src={avatarSrc}
-                    alt={edge.node.name}
+                    alt={author.name ?? ''}
                     width={56}
                     height={56}
                     className='object-cover rounded-full shadow-sm'
                   />
                 )}
                 <h2 className='text-2xl font-semibold text-gray-700 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-300 transition-all duration-150'>
-                  {edge.node.name}
+                  {author.name}
                 </h2>
               </div>
 
-              {edge.node.description && (
+              {author.description && (
                 <p className='text-gray-600 dark:text-gray-400 line-clamp-2 opacity-70'>
-                  {edge.node.description}
+                  {author.description}
                 </p>
               )}
 
-              {edge.node.hobbies && edge.node.hobbies.length > 0 && (
+              {author.hobbies && author.hobbies.length > 0 && (
                 <div className='mt-4 flex flex-wrap gap-2'>
-                  {edge.node.hobbies.map((hobby: string, idx: number) => (
-                    <Badge key={idx} size='sm'>
-                      {hobby}
-                    </Badge>
-                  ))}
+                  {author.hobbies.map((hobby: string | null, idx: number) =>
+                    hobby ? (
+                      <Badge key={idx} size='sm'>
+                        {hobby}
+                      </Badge>
+                    ) : null
+                  )}
                 </div>
               )}
             </Link>

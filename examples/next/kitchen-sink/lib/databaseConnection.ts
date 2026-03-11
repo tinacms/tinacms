@@ -18,7 +18,7 @@ export async function databaseRequest({
     config,
     database,
     query,
-    variables,
+    variables: variables ?? {},
     verbose: true,
   });
 

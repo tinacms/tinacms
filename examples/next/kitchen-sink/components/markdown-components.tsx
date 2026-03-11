@@ -33,7 +33,11 @@ export const customComponents: Components<{
     disclaimer?: TinaMarkdownContent;
   };
 }> = {
-  code_block: (props) => <Prism {...props} />,
+  code_block: (props: {
+    value?: string;
+    lang?: string;
+    children?: React.ReactNode;
+  }) => <Prism {...(props as object)} />,
 
   BlockQuote: (props: {
     children: TinaMarkdownContent;
@@ -49,7 +53,7 @@ export const customComponents: Components<{
     );
   },
 
-  DateTime: (props) => {
+  DateTime: (props: { format?: string }) => {
     const dt = React.useMemo(() => {
       return new Date();
     }, []);
@@ -66,7 +70,12 @@ export const customComponents: Components<{
     }
   },
 
-  NewsletterSignup: (props) => {
+  NewsletterSignup: (props: {
+    placeholder?: string;
+    buttonText?: string;
+    children: TinaMarkdownContent;
+    disclaimer?: TinaMarkdownContent;
+  }) => {
     const [email, setEmail] = React.useState('');
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -117,7 +126,7 @@ export const customComponents: Components<{
     );
   },
 
-  img: (props) => {
+  img: (props: { url?: string; alt?: string; caption?: string }) => {
     const src = sanitizeImageSrc(props.url);
     if (!src) return null;
     return (
@@ -133,47 +142,47 @@ export const customComponents: Components<{
   },
 
   // Standard markdown elements
-  p: (props) => (
+  p: (props: { children: React.ReactNode }) => (
     <p className='mb-4 text-gray-700 dark:text-gray-300 leading-relaxed'>
       {props.children}
     </p>
   ),
 
-  h1: (props) => (
+  h1: (props: { children: React.ReactNode }) => (
     <h1 className='text-4xl font-bold mb-6 mt-8 text-gray-900 dark:text-gray-50'>
       {props.children}
     </h1>
   ),
 
-  h2: (props) => (
+  h2: (props: { children: React.ReactNode }) => (
     <h2 className='text-3xl font-bold mb-4 mt-8 text-gray-900 dark:text-gray-50'>
       {props.children}
     </h2>
   ),
 
-  h3: (props) => (
+  h3: (props: { children: React.ReactNode }) => (
     <h3 className='text-2xl font-bold mb-3 mt-6 text-gray-800 dark:text-gray-100'>
       {props.children}
     </h3>
   ),
 
-  ul: (props) => (
+  ul: (props: { children: React.ReactNode }) => (
     <ul className='list-disc mb-4 ml-4 pl-4 space-y-2 text-gray-700 dark:text-gray-300'>
       {props.children}
     </ul>
   ),
 
-  ol: (props) => (
+  ol: (props: { children: React.ReactNode }) => (
     <ol className='list-decimal mb-4 ml-4 pl-4 space-y-2 text-gray-700 dark:text-gray-300'>
       {props.children}
     </ol>
   ),
 
-  li: (props) => (
+  li: (props: { children: React.ReactNode }) => (
     <li className='text-gray-700 dark:text-gray-300'>{props.children}</li>
   ),
 
-  blockquote: (props) => (
+  blockquote: (props: { children: React.ReactNode }) => (
     <blockquote className='border-l-4 border-teal-500 pl-4 italic my-4 text-gray-600 dark:text-gray-400'>
       {props.children}
     </blockquote>
@@ -183,7 +192,7 @@ export const customComponents: Components<{
     <hr className='my-8 border-t border-gray-300 dark:border-gray-700' />
   ),
 
-  a: (props) => {
+  a: (props: { url?: string; children: React.ReactNode }) => {
     const safeHref = sanitizeHref(props.url);
     return (
       <a

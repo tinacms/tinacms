@@ -11,6 +11,7 @@ import {
   activeItemClasses,
   activeBackgroundClasses,
 } from '@/lib/utils';
+import type { GlobalHeaderNav } from '@/tina/__generated__/types';
 import { MobileNavDrawer } from './mobile-nav-drawer';
 
 export const Header = () => {
@@ -68,16 +69,16 @@ export const Header = () => {
 
           {/* Desktop Navigation - Hidden on mobile */}
           <nav className='hidden sm:flex items-center gap-0 sm:gap-1'>
-            {nav.map((item: Record<string, unknown>, idx: number) => {
-              const active = isActive(item.href || '/');
+            {nav.map((item: GlobalHeaderNav, idx: number) => {
+              const active = isActive(item.href ?? '/');
               const gradientId = sanitizeId(
-                item.href || `nav-${idx}`,
+                item.href ?? `nav-${idx}`,
                 `nav-${idx}`
               );
               return (
                 <Link
-                  key={item.href || `nav-${idx}`}
-                  href={item.href || '/'}
+                  key={item.href ?? `nav-${idx}`}
+                  href={item.href ?? '/'}
                   className={`relative select-none text-base inline-flex items-center tracking-wide transition duration-150 ease-out opacity-70 hover:opacity-100 px-2 sm:px-4 py-5 ${
                     active
                       ? `opacity-100 ${

@@ -7,7 +7,9 @@ const Post: Collection = {
   path: 'content/posts',
   format: 'mdx',
   ui: {
-    router: ({ document }) => {
+    router: ({
+      document,
+    }: { document: { _sys: { filename: string; breadcrumbs: string[] } } }) => {
       return `/posts/${document._sys.breadcrumbs.join('/')}`;
     },
     filename: {
@@ -68,7 +70,7 @@ const Post: Collection = {
     {
       ...tagsFieldSchema,
       ui: {
-        itemProps: (item) => {
+        itemProps: (item: Record<string, unknown>) => {
           return { label: item?.tag };
         },
       },

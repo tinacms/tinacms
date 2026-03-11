@@ -1,4 +1,5 @@
 'use client';
+import React from 'react';
 import { Actions } from '../layout/actions';
 import { Icon, iconSchema } from '../layout/icon';
 import { Section, Container } from '../layout';
@@ -7,10 +8,14 @@ import {
   colorFieldSchema,
 } from '@/tina/schemas/shared-fields';
 import { Card, CardHeader, CardTitle } from '../ui/card';
+import type {
+  PageBlocksFeatures,
+  PageBlocksFeaturesItems,
+} from '@/tina/__generated__/types';
 
 interface FeatureProps {
-  featuresColor: string;
-  data: Record<string, unknown>;
+  featuresColor: string | null | undefined;
+  data: PageBlocksFeaturesItems;
   tinaField: string;
 }
 
@@ -56,17 +61,17 @@ export const Feature = ({ featuresColor, data, tinaField }: FeatureProps) => {
 };
 
 interface FeaturesProps {
-  data: Record<string, unknown>;
+  data: PageBlocksFeatures;
   parentField?: string;
 }
 
 export const Features = ({ data, parentField }: FeaturesProps) => {
   // Handle both string and object item formats for backwards compatibility
   const normalizedItems =
-    (data.items as unknown[])?.map((item) => {
+    data.items?.map((item) => {
       if (typeof item === 'string') {
         return {
-          title: item,
+          title: item as string,
           text: undefined,
           icon: undefined,
           actions: undefined,
@@ -76,9 +81,7 @@ export const Features = ({ data, parentField }: FeaturesProps) => {
     }) || [];
 
   // Check if items are simple strings (no icons/text/actions) for simple card layout
-  const isSimpleLayout = (data.items as unknown[])?.every(
-    (item) => typeof item === 'string'
-  );
+  const isSimpleLayout = data.items?.every((item) => typeof item === 'string');
 
   if (isSimpleLayout) {
     // Simple card grid layout
@@ -105,24 +108,27 @@ export const Features = ({ data, parentField }: FeaturesProps) => {
               </div>
             )}
             <Card className='@min-4xl:max-w-full @min-4xl:grid-cols-3 @min-4xl:divide-x @min-4xl:divide-y-0 mx-auto mt-8 grid max-w-sm divide-y overflow-hidden'>
-              {normalizedItems.map((item, idx) => (
-                <div
-                  key={idx}
-                  data-tinafield={`${parentField}.items.${idx}`}
-                  className='group text-center'
-                >
-                  <CardHeader className='pb-3'>
-                    <CardTitle className='text-2xl font-semibold text-inherit'>
-                      {item.title}
-                    </CardTitle>
-                    {item.text && (
-                      <p className='mt-2 text-base text-inherit opacity-80'>
-                        {item.text}
-                      </p>
-                    )}
-                  </CardHeader>
-                </div>
-              ))}
+              {normalizedItems.map((item, idx) => {
+                if (!item) return null;
+                return (
+                  <div
+                    key={idx}
+                    data-tinafield={`${parentField}.items.${idx}`}
+                    className='group text-center'
+                  >
+                    <CardHeader className='pb-3'>
+                      <CardTitle className='text-2xl font-semibold text-inherit'>
+                        {item.title}
+                      </CardTitle>
+                      {item.text && (
+                        <p className='mt-2 text-base text-inherit opacity-80'>
+                          {item.text}
+                        </p>
+                      )}
+                    </CardHeader>
+                  </div>
+                );
+              })}
             </Card>
           </div>
         </Container>
@@ -139,9 +145,10 @@ export const Features = ({ data, parentField }: FeaturesProps) => {
       >
         {normalizedItems &&
           normalizedItems.map(function (
-            block: Record<string, unknown>,
+            block: PageBlocksFeaturesItems | null,
             i: number
           ) {
+            if (!block) return null;
             return (
               <Feature
                 tinaField={`${parentField}.items.${i}`}

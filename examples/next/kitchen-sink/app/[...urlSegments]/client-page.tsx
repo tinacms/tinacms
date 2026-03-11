@@ -1,11 +1,13 @@
 'use client';
 
+import React from 'react';
 import { useTina } from 'tinacms/dist/react';
 import { Blocks } from '@/components/blocks';
+import type { PageQuery, PageQueryVariables } from '@/tina/__generated__/types';
 
 interface ClientPageProps {
-  data: Record<string, unknown>;
-  variables: Record<string, string>;
+  data: PageQuery;
+  variables: PageQueryVariables;
   query: string;
 }
 

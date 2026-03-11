@@ -50,8 +50,10 @@ function renderNode(node: RichNode, idx?: number): React.ReactNode {
     ));
   if (typeof node === 'object') {
     if ('text' in node) return node.text;
-    const children = renderNode(node.children ?? node.content ?? node);
-    const type = (node.type || '').toLowerCase();
+    const children = renderNode(
+      (node.children ?? node.content ?? node) as RichNode
+    );
+    const type = (typeof node.type === 'string' ? node.type : '').toLowerCase();
     switch (type) {
       case 'paragraph':
         return <p key={idx}>{children}</p>;

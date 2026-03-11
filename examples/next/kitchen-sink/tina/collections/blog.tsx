@@ -7,7 +7,10 @@ const Blog: Collection = {
   path: 'content/blogs',
   format: 'mdx',
   ui: {
-    router: ({ document }) => `/blog/${document._sys.filename}`,
+    router: ({
+      document,
+    }: { document: { _sys: { filename: string; breadcrumbs: string[] } } }) =>
+      `/blog/${document._sys.filename}`,
     filename: {
       slugify: makeSlugify('blog'),
       readonly: true,

@@ -7,7 +7,9 @@ const Documentation: Collection = {
   path: 'content/documentation',
   format: 'mdx',
   ui: {
-    router: ({ document }) =>
+    router: ({
+      document,
+    }: { document: { _sys: { filename: string; breadcrumbs: string[] } } }) =>
       `/documentation/${document._sys.breadcrumbs.join('/')}`,
     filename: {
       slugify: makeSlugify('doc'),

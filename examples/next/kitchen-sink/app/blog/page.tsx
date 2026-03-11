@@ -9,13 +9,14 @@ export const revalidate = 300;
 
 export default async function BlogsPage() {
   const connection = await client.queries.blogConnection();
-  const blogs = connection.data.blogConnection.edges ?? [];
+  const blogs = (connection.data.blogConnection.edges ?? []).flatMap((edge) =>
+    edge?.node ? [edge.node] : []
+  );
 
   return (
     <PageSection title='Blog'>
       <div className='grid gap-8 md:grid-cols-2'>
-        {blogs.map((edge) => {
-          const blog = edge.node;
+        {blogs.map((blog) => {
           const href = `/blog/${blog._sys.filename}`;
           let formattedDate = '';
           if (blog.pubDate) {

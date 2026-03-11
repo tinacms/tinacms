@@ -4,9 +4,10 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { BiMenu, BiX } from 'react-icons/bi';
+import type { GlobalHeaderNav } from '@/tina/__generated__/types';
 
 interface MobileNavDrawerProps {
-  nav: Array<{ href: string; label: string }>;
+  nav: Array<GlobalHeaderNav | null>;
   theme: { color: string };
   isOpen: boolean;
   onClose: () => void;
@@ -99,12 +100,12 @@ export const MobileNavDrawer = ({
 
         {/* Navigation Items */}
         <div className='px-4 py-6 space-y-2'>
-          {nav.map((item) => {
-            const active = isActive(item.href || '/');
+          {nav.map((item, idx) => {
+            const active = isActive(item?.href ?? '/');
             return (
               <Link
-                key={item.href}
-                href={item.href || '/'}
+                key={item?.href ?? `nav-${idx}`}
+                href={item?.href ?? '/'}
                 onClick={onClose}
                 aria-current={active ? 'page' : undefined}
                 className={`block px-4 py-3 rounded-md text-base font-medium transition-colors ${
@@ -113,7 +114,7 @@ export const MobileNavDrawer = ({
                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                 }`}
               >
-                {item.label}
+                {item?.label}
               </Link>
             );
           })}

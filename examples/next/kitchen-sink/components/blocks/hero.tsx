@@ -1,4 +1,5 @@
 'use client';
+import React from 'react';
 import Image from 'next/image';
 import { Actions } from '../layout/actions';
 import { Container } from '../layout';
@@ -9,9 +10,10 @@ import {
   actionsFieldSchema,
   colorFieldSchema,
 } from '@/tina/schemas/shared-fields';
+import type { PageBlocksHero } from '@/tina/__generated__/types';
 
 interface HeroProps {
-  data: Record<string, unknown>;
+  data: PageBlocksHero;
   parentField?: string;
 }
 

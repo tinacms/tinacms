@@ -1,4 +1,5 @@
 import client from '@/tina/__generated__/client';
+import type { Post } from '@/tina/__generated__/types';
 import { Section } from '@/components/layout/section';
 import { Container } from '@/components/layout/container';
 import { GraphQLExplorer, EXAMPLE_QUERY } from '@/components/graphql-explorer';
@@ -6,14 +7,15 @@ import { GraphQLExplorer, EXAMPLE_QUERY } from '@/components/graphql-explorer';
 export const revalidate = 300;
 
 export default async function GraphQLDemoPage() {
-  let posts: Record<string, unknown>[] = [];
+  let posts: Post[] = [];
   let error: string | null = null;
 
   try {
     const result = await client.queries.postConnection();
     posts =
-      result.data?.postConnection?.edges?.map((e) => e?.node).filter(Boolean) ??
-      [];
+      (result.data?.postConnection?.edges ?? []).flatMap((e) =>
+        e?.node ? [e.node as Post] : []
+      ) ?? [];
   } catch (e) {
     error = String(e);
   }

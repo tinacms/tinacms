@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useState, useContext, useEffect } from 'react';
+import type { IconData } from './icon';
 
 interface GlobalSettings {
   header?: {
     name?: string;
     color?: string;
-    icon?: Record<string, unknown>;
+    icon?: IconData;
     nav?: Array<{ href?: string; label?: string }>;
   };
   footer?: {

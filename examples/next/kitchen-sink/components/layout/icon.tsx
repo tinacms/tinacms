@@ -79,10 +79,17 @@ const iconSizeClass = {
 };
 
 interface IconProps extends React.HTMLAttributes<HTMLSpanElement> {
-  data: Record<string, unknown>;
+  data: IconData;
   tinaField?: string;
-  parentColor?: string;
+  parentColor?: string | null;
   className?: string;
+}
+
+export interface IconData {
+  name?: string | null;
+  color?: string | null;
+  style?: string | null;
+  size?: string | null;
 }
 
 export const Icon = ({
@@ -93,7 +100,7 @@ export const Icon = ({
   ...rest
 }: IconProps) => {
   const { theme } = useLayout();
-  const rawColor = (data.color as string) || theme.color;
+  const rawColor = data.color || theme.color;
   const color = rawColor === 'primary' ? theme.color : rawColor;
   const style = data.style || 'float';
   const iconSize = data.size || 'medium';
