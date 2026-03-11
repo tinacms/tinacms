@@ -4,14 +4,15 @@
 
 */
 
-import * as React from 'react';
-import { ModalProvider } from '@toolkit/react-modals';
-import { SidebarProvider, SidebarPosition } from '@toolkit/react-sidebar';
-import { useCMS } from '../react-tinacms/use-cms';
 import { Alerts } from '@toolkit/react-alerts';
-import { MediaManager } from './media';
+import { ModalProvider } from '@toolkit/react-modals';
+import { SidebarPosition, SidebarProvider } from '@toolkit/react-sidebar';
+import * as React from 'react';
+import { useCMS } from '../react-tinacms/use-cms';
 import { ActiveFieldIndicator } from './active-field-indicator';
+import { MediaManager } from './media';
 import { MutationSignalProvider } from './mutation-signal';
+import { ResizeOverlay } from './resize-overlay';
 
 export interface TinaUIProps {
   position?: SidebarPosition;
@@ -37,10 +38,9 @@ export const TinaUI: React.FC<TinaUIProps> = ({ children, position }) => {
           />
         )}
         <ActiveFieldIndicator />
-        {/* Dragging across the iframe causes mouse events to stop propagating so there's a laggy feeling without this */}
-        <div className={`${resizingSidebar ? 'pointer-events-none' : ''}`}>
-          {children}
-        </div>
+        {/* Overlay captures mouse events during resize without affecting iframe focus */}
+        <ResizeOverlay isResizing={resizingSidebar} />
+        {children}
       </ModalProvider>
     </MutationSignalProvider>
   );
