@@ -361,8 +361,20 @@ export const remarkToSlate = (
         return link(content);
       case 'image':
         return image(content);
-      case 'mdxJsxTextElement':
+      case 'mdxJsxTextElement': {
+        // Convert <mark>text</mark> (parsed as MDX JSX in .mdx files) back to
+        // a highlight text node, without routing through mdxJsxElement().
+        // @ts-ignore
+        if (content.name === 'mark') {
+          // @ts-ignore
+          const innerText = (content.children || [])
+            .filter((c: any) => c.type === 'text')
+            .map((c: any) => c.value || '')
+            .join('');
+          return { type: 'text', text: innerText, highlight: true };
+        }
         return mdxJsxElement(content, field, imageCallback);
+      }
       case 'emphasis':
         return phrashingMark(content);
       case 'strong':
