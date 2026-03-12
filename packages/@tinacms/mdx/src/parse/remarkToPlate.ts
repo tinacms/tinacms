@@ -371,8 +371,13 @@ export const remarkToSlate = (
         return breakContent();
       case 'inlineCode':
         return phrashingMark(content);
-      case 'html':
+      case 'html': {
+        const markMatch = /^<mark>([\s\S]*?)<\/mark>$/.exec(content.value);
+        if (markMatch) {
+          return { type: 'text', text: markMatch[1], highlight: true };
+        }
         return html_inline(content);
+      }
       // @ts-ignore
       case 'mdxTextExpression':
         throw new RichTextParseError(

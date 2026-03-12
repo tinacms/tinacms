@@ -11,6 +11,7 @@ import { ExitBreakPlugin, SoftBreakPlugin } from '@udecode/plate-break/react';
 import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 import { HEADING_KEYS, HEADING_LEVELS } from '@udecode/plate-heading';
 import { HeadingPlugin } from '@udecode/plate-heading/react';
+import { HighlightPlugin } from '@udecode/plate-highlight/react';
 import { HorizontalRulePlugin } from '@udecode/plate-horizontal-rule/react';
 import { IndentListPlugin } from '@udecode/plate-indent-list/react';
 import { LinkPlugin } from '@udecode/plate-link/react';
@@ -90,6 +91,7 @@ const resetBlockTypesCodeBlockRule = {
 export const viewPlugins = [
   BasicMarksPlugin,
   UnderlinePlugin,
+  HighlightPlugin,
   HeadingPlugin.configure({ options: { levels: 6 } }),
   ParagraphPlugin,
   CodeBlockPlugin.configure({

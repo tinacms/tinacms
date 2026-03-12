@@ -75,6 +75,7 @@
     "@udecode/plate-dnd": "catalog:",
     "@udecode/plate-floating": "catalog:",
     "@udecode/plate-heading": "catalog:",
+    "@udecode/plate-highlight": "catalog:",
     "@udecode/plate-horizontal-rule": "catalog:",
     "@udecode/plate-indent-list": "catalog:",
     "@udecode/plate-link": "catalog:",

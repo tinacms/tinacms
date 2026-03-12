@@ -13,6 +13,7 @@ import {
   CodeSyntaxPlugin,
 } from '@udecode/plate-code-block/react';
 import { HEADING_KEYS } from '@udecode/plate-heading';
+import { HighlightPlugin } from '@udecode/plate-highlight/react';
 import { HorizontalRulePlugin } from '@udecode/plate-horizontal-rule/react';
 import { LinkPlugin } from '@udecode/plate-link/react';
 import {
@@ -209,6 +210,10 @@ export const Components = () => {
     [ListItemPlugin.key]: withProps(PlateElement, { as: 'li' }),
     [LinkPlugin.key]: LinkElement,
     [CodePlugin.key]: CodeLeaf,
+    [HighlightPlugin.key]: withProps(PlateLeaf, {
+      as: 'mark',
+      className: 'bg-yellow-200 dark:bg-yellow-700',
+    }),
     [UnderlinePlugin.key]: withProps(PlateLeaf, { as: 'u' }),
     [StrikethroughPlugin.key]: withProps(PlateLeaf, { as: 's' }),
     [ItalicPlugin.key]: withProps(PlateLeaf, { as: 'em' }),
