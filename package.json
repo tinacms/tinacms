@@ -36,6 +36,7 @@
 		"@changesets/changelog-github": "catalog:",
 		"@changesets/cli": "catalog:",
 		"@types/jest": "^29.5.14",
+		"@types/node": "^22.13.1",
 		"vitest": "^2.1.8",
 		"@types/picomatch": "catalog:",
 		"picomatch": "catalog:",
