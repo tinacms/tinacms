@@ -30,7 +30,6 @@ const BreadcrumbItem = ({ className = '', ...props }) => (
 
 export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
   const directoryParts = directory.split('/');
-  // directoryParts[0] = 'Media'
 
   let prevDir: string = dirname(directory) || '';
   if (prevDir === '.') {
