@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { LeftArrowIcon } from '@toolkit/icons';
 import { IconButton } from '@toolkit/styles';
 import { cn } from '@utils/cn';
@@ -25,13 +25,17 @@ const BreadcrumbButton = ({ className = '', ...props }) => (
 );
 
 const BreadcrumbItem = ({ className = '', ...props }) => (
-  <p className={cn('capitalize', className)} {...props} />
+  <span className={cn('capitalize', className)} {...props} />
 );
 
 export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
-  const directoryParts = directory.split('/');
+  // Normalize: ensure non-root directories always have a leading slash so that
+  // split('/') produces '' as the first element, which renders as 'Media'.
+  const normalizedDir =
+    directory && !directory.startsWith('/') ? '/' + directory : directory;
+  const directoryParts = normalizedDir.split('/');
 
-  let prevDir: string = dirname(directory) || '';
+  let prevDir: string = dirname(normalizedDir) || '';
   if (prevDir === '.') {
     prevDir = '';
   }
@@ -58,9 +62,8 @@ export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
             {part === '' ? 'Media' : part}
           </BreadcrumbItem>
         ) : (
-          <>
+          <Fragment key={index}>
             <BreadcrumbButton
-              key={index}
               onClick={() =>
                 setDirectory(directoryParts.slice(0, index + 1).join('/'))
               }
@@ -69,7 +72,7 @@ export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
               {part === '' ? 'Media' : part}
             </BreadcrumbButton>
             <span className='pl-1.5 text-gray-300'>/</span>
-          </>
+          </Fragment>
         );
       })}
     </div>
