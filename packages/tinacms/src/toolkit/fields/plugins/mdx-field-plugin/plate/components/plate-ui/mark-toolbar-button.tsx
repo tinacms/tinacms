@@ -14,6 +14,7 @@ import {
   ItalicPlugin,
   StrikethroughPlugin,
 } from '@udecode/plate-basic-marks/react';
+import { HighlightPlugin } from '@udecode/plate-highlight/react';
 
 const MarkToolbarButton = withRef<
   typeof ToolbarButton,
@@ -49,5 +50,11 @@ export const ItalicToolbarButton = () => (
 export const CodeToolbarButton = () => (
   <MarkToolbarButton tooltip='Code (⌘+E)' nodeType={CodePlugin.key}>
     <Icons.code />
+  </MarkToolbarButton>
+);
+
+export const HighlightToolbarButton = () => (
+  <MarkToolbarButton tooltip='Highlight (⌘+⇧+H)' nodeType={HighlightPlugin.key}>
+    <Icons.highlight />
   </MarkToolbarButton>
 );
