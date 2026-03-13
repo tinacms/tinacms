@@ -176,6 +176,9 @@ catalog:
     micromark-factory-space: 1.0.0
     micromark-factory-whitespace: 1.0.0
     micromark-util-character: 1.1.0
+    micromark-util-chunked: 1.1.0
+    micromark-util-classify-character: 1.1.0
+    micromark-util-resolve-all: 1.1.0
     micromark-util-symbol: 1.0.1
     micromark-util-types: 1.0.2
     micromatch: 4.0.8

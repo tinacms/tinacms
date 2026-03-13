@@ -1,0 +1,154 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Some "
+        },
+        {
+          "type": "text",
+          "text": "highlighted",
+          "highlight": true
+        },
+        {
+          "type": "text",
+          "text": " text"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Some "
+        },
+        {
+          "type": "text",
+          "text": "bold",
+          "bold": true
+        },
+        {
+          "type": "text",
+          "text": " text"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Some "
+        },
+        {
+          "type": "text",
+          "text": "highlighted text",
+          "highlight": true
+        },
+        {
+          "type": "text",
+          "text": " with more content"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Some "
+        },
+        {
+          "type": "text",
+          "text": "bold and ",
+          "bold": true
+        },
+        {
+          "type": "text",
+          "text": "highlighted",
+          "bold": true,
+          "highlight": true
+        },
+        {
+          "type": "text",
+          "text": " text"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "italic and highlighted",
+          "italic": true,
+          "highlight": true
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "highlight at start",
+          "highlight": true
+        },
+        {
+          "type": "text",
+          "text": " of line"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "end of line "
+        },
+        {
+          "type": "text",
+          "text": "highlight",
+          "highlight": true
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "a = b is not highlighted"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "strikethrough and highlighted",
+          "strikethrough": true,
+          "highlight": true
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "bold italic and highlighted",
+          "italic": true,
+          "bold": true,
+          "highlight": true
+        }
+      ]
+    }
+  ]
+}
