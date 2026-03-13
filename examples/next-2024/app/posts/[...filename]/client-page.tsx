@@ -16,6 +16,9 @@ const components: Components<{
   DateTime: {
     format?: string;
   };
+  Callout: {
+    text?: any;
+  };
 }> = {
   DateTime: (props) => {
     const dt = React.useMemo(() => {
@@ -37,6 +40,22 @@ const components: Components<{
         Date Time Format: {props.format}
         <br />
         <time dateTime={dt.toISOString()}>{dateTimeString}</time>
+      </div>
+    );
+  },
+  Callout: (props) => {
+    return (
+      <div
+        style={{
+          border: '2px solid #f0c040',
+          background: '#fffbe6',
+          padding: '12px 16px',
+          borderRadius: '6px',
+          margin: '16px 0',
+        }}
+      >
+        <strong>📢 Callout:</strong>
+        <TinaMarkdown content={props.text} />
       </div>
     );
   },
