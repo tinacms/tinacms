@@ -16,9 +16,11 @@ export type { Position, PositionItem } from './plate';
 declare module 'mdast' {
   interface StaticPhrasingContentMap {
     mdxJsxTextElement: MdxJsxTextElement;
+    highlight: import('../extensions/mark/mdast').Highlight;
   }
   interface PhrasingContentMap {
     mdxJsxTextElement: MdxJsxTextElement;
+    highlight: import('../extensions/mark/mdast').Highlight;
   }
 
   interface BlockContentMap {
@@ -375,6 +377,8 @@ export const remarkToSlate = (
         }
         return mdxJsxElement(content, field, imageCallback);
       }
+      case 'highlight':
+        return phrashingMark(content);
       case 'emphasis':
         return phrashingMark(content);
       case 'strong':
@@ -418,10 +422,21 @@ export const remarkToSlate = (
 
   const phrashingMark = (
     node: Md.PhrasingContent,
-    marks: ('strikethrough' | 'bold' | 'italic' | 'code')[] = []
+    marks: ('strikethrough' | 'bold' | 'italic' | 'code' | 'highlight')[] = []
   ): Plate.InlineElement[] => {
     const accum: Plate.InlineElement[] = [];
     switch (node.type) {
+      // @ts-ignore
+      case 'highlight': {
+        // @ts-ignore
+        const children = (node.children as Md.PhrasingContent[])
+          .map((child) => phrashingMark(child, [...marks, 'highlight']))
+          .flat();
+        children.forEach((child) => {
+          accum.push(child);
+        });
+        break;
+      }
       case 'emphasis': {
         const children = node.children
           .map((child) => phrashingMark(child, [...marks, 'italic']))

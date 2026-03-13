@@ -6,6 +6,7 @@ import type { RichTextField } from '@tinacms/schema-tools';
 import type * as Md from 'mdast';
 import { Pattern } from '../shortcodes';
 import { getFieldPatterns } from '../util';
+import { markToMarkdown } from '../../extensions/mark/mdast';
 
 export const toTinaMarkdown = (tree: Md.Root, field: RichTextField) => {
   const patterns = getFieldPatterns(field);
@@ -50,7 +51,7 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextField) => {
     return text(node, parent, context, safeOptions);
   };
   return toMarkdown(tree, {
-    extensions: [mdxJsxToMarkdown({ patterns }), gfmToMarkdown()],
+    extensions: [mdxJsxToMarkdown({ patterns }), gfmToMarkdown(), markToMarkdown],
     listItemIndent: 'one',
     handlers,
   });

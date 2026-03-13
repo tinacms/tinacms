@@ -252,13 +252,13 @@ export const eat = (
     ];
   }
   if (markToProcess === 'highlight') {
-    if (nonMatchingSiblingIndex) {
-      throw new Error('Marks inside highlight are not supported');
-    }
     const f = first as Plate.TextElement;
     return [
-      { type: 'html', value: `<mark>${f.text}</mark>` } as Md.PhrasingContent,
-      ...eat(content.slice(nonMatchingSiblingIndex + 1), field, imageCallback),
+      {
+        type: 'highlight',
+        children: [{ type: 'text', value: f.text }],
+      } as unknown as Md.PhrasingContent,
+      ...eat(content.slice(1), field, imageCallback),
     ];
   }
   if (markToProcess === 'inlineCode') {

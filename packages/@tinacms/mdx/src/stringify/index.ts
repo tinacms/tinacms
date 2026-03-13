@@ -9,6 +9,7 @@ import {
 import { Handlers, toMarkdown } from 'mdast-util-to-markdown';
 import { text } from 'mdast-util-to-markdown/lib/handle/text';
 import { directiveToMarkdown } from '../extensions/tina-shortcodes/to-markdown';
+import { markToMarkdown } from '../extensions/mark/mdast';
 import { stringifyMDX as stringifyMDXNext } from '../next';
 import type * as Plate from '../parse/plate';
 import { stringifyProps } from './acorn';
@@ -136,6 +137,7 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextType) => {
       directiveToMarkdown(patterns),
       mdxJsxToMarkdown(),
       gfmToMarkdown(),
+      markToMarkdown,
     ],
     listItemIndent: 'one',
     handlers,
