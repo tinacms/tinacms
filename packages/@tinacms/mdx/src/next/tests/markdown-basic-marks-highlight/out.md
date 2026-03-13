@@ -17,3 +17,7 @@ a = b is not highlighted
 ~~==strikethrough and highlighted==~~
 
 ***==bold italic and highlighted==***
+
+==[link text](https://example.com)==
+
+**==[bold link](https://example.com)==**

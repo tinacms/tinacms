@@ -253,10 +253,14 @@ export const eat = (
   }
   if (markToProcess === 'highlight') {
     const f = first as Plate.TextElement;
+    const innerText = text({ text: f.text });
+    const child: Md.PhrasingContent = first.linkifyTextNode
+      ? first.linkifyTextNode(innerText)
+      : innerText;
     return [
       {
         type: 'highlight',
-        children: [{ type: 'text', value: f.text }],
+        children: [child],
       } as unknown as Md.PhrasingContent,
       ...eat(content.slice(1), field, imageCallback),
     ];
