@@ -210,7 +210,7 @@ export const eat = (
   }
   const matchingSiblings = content.slice(1, nonMatchingSiblingIndex + 1);
   const markCounts: {
-    [key in 'strong' | 'emphasis' | 'inlineCode' | 'delete']?: number;
+    [key in 'strong' | 'emphasis' | 'inlineCode' | 'delete' | 'highlight']?: number;
   } = {};
   marks.forEach((mark) => {
     let count = 1;
@@ -223,10 +223,10 @@ export const eat = (
     markCounts[mark] = count;
   });
   let count = 0;
-  let markToProcess: 'strong' | 'emphasis' | 'inlineCode' | 'delete' | null =
+  let markToProcess: 'strong' | 'emphasis' | 'inlineCode' | 'delete' | 'highlight' | null =
     null;
   Object.entries(markCounts).forEach(([mark, markCount]) => {
-    const m = mark as 'strong' | 'emphasis' | 'inlineCode';
+    const m = mark as 'strong' | 'emphasis' | 'inlineCode' | 'delete' | 'highlight';
     if (markCount > count) {
       count = markCount;
       markToProcess = m;
@@ -239,6 +239,23 @@ export const eat = (
     return [
       text({ text: f.text }),
       ...eat(content.slice(1), field, imageCallback),
+    ];
+  }
+  if (markToProcess === 'highlight') {
+    if (nonMatchingSiblingIndex) {
+      throw new Error('Marks inside highlight are not supported');
+    }
+    const f = first as Plate.TextElement;
+    const innerText = text({ text: f.text });
+    const child: Md.PhrasingContent = first.linkifyTextNode
+      ? first.linkifyTextNode(innerText)
+      : innerText;
+    return [
+      {
+        type: 'highlight',
+        children: [child],
+      } as unknown as Md.PhrasingContent,
+      ...eat(content.slice(nonMatchingSiblingIndex + 1), field, imageCallback),
     ];
   }
   if (markToProcess === 'inlineCode') {
@@ -277,7 +294,7 @@ export const eat = (
 
 const cleanNode = (
   node: InlineElementWithCallback,
-  mark: 'strong' | 'emphasis' | 'inlineCode' | 'delete' | null
+  mark: 'strong' | 'emphasis' | 'inlineCode' | 'delete' | 'highlight' | null
 ): Plate.InlineElement => {
   if (!mark) {
     return node;
@@ -288,6 +305,7 @@ const cleanNode = (
     emphasis: 'italic',
     inlineCode: 'code',
     delete: 'strikethrough',
+    highlight: 'highlight',
   }[mark];
   Object.entries(node).map(([key, value]) => {
     if (key !== markToClear) {

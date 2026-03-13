@@ -16,9 +16,11 @@ export type { Position, PositionItem } from './plate';
 declare module 'mdast' {
   interface StaticPhrasingContentMap {
     mdxJsxTextElement: MdxJsxTextElement;
+    highlight: import('../extensions/mark/mdast').Highlight;
   }
   interface PhrasingContentMap {
     mdxJsxTextElement: MdxJsxTextElement;
+    highlight: import('../extensions/mark/mdast').Highlight;
   }
 
   interface BlockContentMap {
@@ -361,8 +363,22 @@ export const remarkToSlate = (
         return link(content);
       case 'image':
         return image(content);
-      case 'mdxJsxTextElement':
+      case 'mdxJsxTextElement': {
+        // Convert <mark>text</mark> (parsed as MDX JSX in .mdx files) back to
+        // a highlight text node, without routing through mdxJsxElement().
+        // @ts-ignore
+        if (content.name === 'mark') {
+          // @ts-ignore
+          const innerText = (content.children || [])
+            .filter((c: any) => c.type === 'text')
+            .map((c: any) => c.value || '')
+            .join('');
+          return { type: 'text', text: innerText, highlight: true };
+        }
         return mdxJsxElement(content, field, imageCallback);
+      }
+      case 'highlight':
+        return phrashingMark(content);
       case 'emphasis':
         return phrashingMark(content);
       case 'strong':
@@ -371,8 +387,13 @@ export const remarkToSlate = (
         return breakContent();
       case 'inlineCode':
         return phrashingMark(content);
-      case 'html':
+      case 'html': {
+        const markMatch = /^<mark>([\s\S]*?)<\/mark>$/.exec(content.value);
+        if (markMatch) {
+          return { type: 'text', text: markMatch[1], highlight: true };
+        }
         return html_inline(content);
+      }
       // @ts-ignore
       case 'mdxTextExpression':
         throw new RichTextParseError(
@@ -401,10 +422,21 @@ export const remarkToSlate = (
 
   const phrashingMark = (
     node: Md.PhrasingContent,
-    marks: ('strikethrough' | 'bold' | 'italic' | 'code')[] = []
+    marks: ('strikethrough' | 'bold' | 'italic' | 'code' | 'highlight')[] = []
   ): Plate.InlineElement[] => {
     const accum: Plate.InlineElement[] = [];
     switch (node.type) {
+      // @ts-ignore
+      case 'highlight': {
+        // @ts-ignore
+        const children = (node.children as Md.PhrasingContent[])
+          .map((child) => phrashingMark(child, [...marks, 'highlight']))
+          .flat();
+        children.forEach((child) => {
+          accum.push(child);
+        });
+        break;
+      }
       case 'emphasis': {
         const children = node.children
           .map((child) => phrashingMark(child, [...marks, 'italic']))

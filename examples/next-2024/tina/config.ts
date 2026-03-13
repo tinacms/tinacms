@@ -59,6 +59,17 @@ export default defineConfig({
 									},
 								],
 							},
+							{
+								name: "Callout",
+								label: "Callout",
+								fields: [
+									{
+										name: "text",
+										label: "Text",
+										type: "string",
+									},
+								],
+							},
 						],
 					},
 				],
@@ -107,6 +118,17 @@ export default defineConfig({
 										label: "Format",
 										type: "string",
 										options: ["utc", "iso", "local"],
+									},
+								],
+							},
+							{
+								name: "Callout",
+								label: "Callout",
+								fields: [
+									{
+										name: "text",
+										label: "Text",
+										type: "rich-text",
 									},
 								],
 							},

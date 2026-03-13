@@ -7,6 +7,8 @@ import { getFieldPatterns } from '../util';
 import * as acorn from 'acorn';
 import type { RichTextField, Template } from '@tinacms/schema-tools';
 import type { Options } from '../shortcodes';
+import { markSyntax } from '../../extensions/mark/syntax';
+import { markFromMarkdown } from '../../extensions/mark/mdast';
 
 export const fromMarkdown = (value: string, field: RichTextField) => {
   const patterns = getFieldPatterns(field);
@@ -21,8 +23,9 @@ export const fromMarkdown = (value: string, field: RichTextField) => {
     extensions: [
       gfm(),
       mdxJsx({ acorn: acornDefault, patterns, addResult: true, skipHTML }),
+      markSyntax(),
     ],
-    mdastExtensions: [gfmFromMarkdown(), mdxJsxFromMarkdown({ patterns })],
+    mdastExtensions: [gfmFromMarkdown(), mdxJsxFromMarkdown({ patterns }), markFromMarkdown],
   });
 
   return tree;
