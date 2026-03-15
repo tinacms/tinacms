@@ -33,6 +33,9 @@ topologicalDeps.txt
 # Ignore any .next folder
 **/.next/**
 
+# Coverage reports
+**/coverage/
+
 # Turborepo
 .turbo
 build/**

@@ -21,12 +21,21 @@ export type BranchSwitcherPRClickedPayload = {
   type: 'Open Git Pull Request' | 'Create PR';
 };
 
-// When a user clicks 'save' in the TinaCMS Editor
+// When a user successfully saves content in the TinaCMS Editor
 export const SavedContentEvent: string = 'saved-content';
 export type SavedContentPayload = {
-  collection?: string;
   documentPath?: string;
 };
+
+// When a save fails in the TinaCMS Editor
+export const SaveContentErrorEvent: string = 'save-content-error';
+export type SaveContentErrorPayload = {
+  documentPath?: string;
+  error?: string;
+};
+
+// When a user resets a form in the TinaCMS Editor
+export const FormResetEvent: string = 'form-reset';
 
 // When a user adds an item to the media manager
 export const MediaManagerContentUploadedEvent: string =
