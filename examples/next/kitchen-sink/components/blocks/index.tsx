@@ -49,7 +49,7 @@ export const Blocks = ({
 
   return (
     <>
-      {blocks.map(function (block, i) {
+      {blocks.map((block, i) => {
         if (!block) return null;
         // _template is a TinaCMS runtime field for legacy inline-editing support (not in schema types)
         const blockWithMeta = block as PageBlocks & { _template?: string };

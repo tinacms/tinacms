@@ -4,14 +4,13 @@ A comprehensive [Next.js 15](https://nextjs.org) App Router example demonstratin
 
 ## What this app demonstrates
 
-- **Collections**: Posts, Blog, Authors, Documentation, Tags, Pages, and Global settings
+- **Collections**: Posts, Blog, Authors, Tags, Pages, and Global settings
 - **Rich-text editing**: `TinaMarkdown` with custom components, MDX support
-- **References**: Author references on Posts, Tag references on Posts and Documentation
+- **References**: Author references on Posts, Tag references on Posts
 - **Image handling**: Hero images and author avatars with `sanitizeImageSrc` guards
-- **Block-based pages**: `PageBlockPage` and `PageShowcase` with multiple block types
+- **Block-based pages**: Hero, Features, CTA, Testimonial, and Content blocks
 - **Global config**: Site-wide header colour, navigation, and social links via TinaCMS
 - **Search**: TinaCMS search index integration
-- **GraphQL explorer**: Interactive in-app GQL query runner (`/gql`)
 - **Dark mode**: Full Tailwind dark-mode support
 - **Playwright E2E tests**: Baseline suite covering navigation, content pages, and the CMS admin
 

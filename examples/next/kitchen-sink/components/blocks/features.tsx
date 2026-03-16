@@ -140,10 +140,7 @@ export const Features = ({ data }: FeaturesProps) => {
         size='large'
       >
         {normalizedItems &&
-          normalizedItems.map(function (
-            block: PageBlocksFeaturesItems | null,
-            i: number
-          ) {
+          normalizedItems.map((block: PageBlocksFeaturesItems | null, i: number) => {
             if (!block) return null;
             return (
               <Feature
