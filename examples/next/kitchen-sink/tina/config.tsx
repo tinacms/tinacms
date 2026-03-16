@@ -6,7 +6,6 @@ import Author from './collections/author';
 import Tag from './collections/tag';
 import Global from './collections/global';
 import Blog from './collections/blog';
-import Documentation from './collections/documentation';
 
 // Branch detection for most hosting providers
 const branch =
@@ -30,6 +29,6 @@ export default defineConfig({
     },
   },
   schema: {
-    collections: [Page, Post, Author, Tag, Global, Blog, Documentation],
+    collections: [Page, Post, Author, Tag, Global, Blog],
   },
 });

@@ -49,15 +49,6 @@ test.describe('Edge Cases — Missing Fields', () => {
     await expect(page.locator('text=Failed to load')).not.toBeVisible();
   });
 
-  test('documentation page should work without tags', async ({ page }) => {
-    await page.goto('/documentation');
-
-    // Page should load
-    await expect(page.locator('h1')).toBeVisible();
-
-    // No errors
-    await expect(page.locator('text=Error')).not.toBeVisible();
-  });
 });
 
 test.describe('Edge Cases — Empty Collections', () => {
@@ -67,7 +58,7 @@ test.describe('Edge Cases — Empty Collections', () => {
 
     // Most pages have graceful handling, but this validates that
     // the page structure remains intact
-    const routes = ['/posts', '/blog', '/authors', '/documentation', '/tags'];
+    const routes = ['/posts', '/blog', '/authors'];
 
     for (const route of routes) {
       await page.goto(route);

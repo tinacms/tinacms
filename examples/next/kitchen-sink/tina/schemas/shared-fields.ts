@@ -7,7 +7,7 @@
 export const makeSlugify = (prefix: string) => (values: any) =>
   `${(values?.title || `${prefix}-${Date.now()}`).toLowerCase().split(' ').join('-')}`;
 
-/** Reusable tags reference list field used by post and documentation collections. */
+/** Reusable tags reference list field used by the post collection. */
 export const tagsFieldSchema = {
   type: 'object' as const,
   label: 'Tags',

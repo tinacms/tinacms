@@ -21,16 +21,7 @@ export const Header = () => {
 
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
-    return pathname?.startsWith(href);
-  };
-
-  const sanitizeId = (s: string, fallback = 'nav') => {
-    const id = String(s || fallback)
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9_-]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-    return id || fallback;
+    return pathname === href || pathname?.startsWith(`${href}/`);
   };
 
   return (
@@ -67,10 +58,6 @@ export const Header = () => {
           <nav className='hidden sm:flex items-center gap-0 sm:gap-1'>
             {nav.map((item: GlobalHeaderNav, idx: number) => {
               const active = isActive(item.href ?? '/');
-              const gradientId = sanitizeId(
-                item.href ?? `nav-${idx}`,
-                `nav-${idx}`
-              );
               return (
                 <Link
                   key={item.href ?? `nav-${idx}`}
@@ -85,29 +72,6 @@ export const Header = () => {
                   )}
                 >
                   {item.label}
-                  {active && (
-                    <svg
-                      className='absolute bottom-0 left-1/2 w-[180%] h-full -translate-x-1/2 -z-1 opacity-10 dark:opacity-15'
-                      preserveAspectRatio='none'
-                      viewBox='0 0 230 230'
-                      fill='none'
-                      xmlns='http://www.w3.org/2000/svg'
-                    >
-                      <defs>
-                        <radialGradient id={gradientId}>
-                          <stop stopColor='currentColor' />
-                          <stop offset='1' stopColor='transparent' />
-                        </radialGradient>
-                      </defs>
-                      <rect
-                        x='0'
-                        y='0'
-                        width='230'
-                        height='230'
-                        fill={`url(#${gradientId})`}
-                      />
-                    </svg>
-                  )}
                 </Link>
               );
             })}

@@ -51,10 +51,10 @@ interface IconOwnProps {
 export type IconProps = IconOwnProps & IconElementProps;
 
 export interface IconData {
-  name?: string | null;
-  color?: string | null;
-  style?: string | null;
-  size?: string | null;
+  name?: string;
+  color?: string;
+  style?: string;
+  size?: string;
 }
 
 export const Icon = ({
