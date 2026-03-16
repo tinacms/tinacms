@@ -1,16 +1,17 @@
 'use client';
 import React from 'react';
 import { Section, Container } from '../layout';
-import RichText from '@/lib/richText';
+import { TinaMarkdown } from 'tinacms/dist/rich-text';
+import { tinaField } from 'tinacms/dist/react';
+import { customComponents } from '@/components/markdown-components';
 import { colorFieldSchema } from '@/tina/schemas/shared-fields';
 import type { PageBlocksContent } from '@/tina/__generated__/types';
 
 interface ContentProps {
   data: PageBlocksContent;
-  parentField?: string;
 }
 
-export const Content = ({ data, parentField = '' }: ContentProps) => {
+export const Content = ({ data }: ContentProps) => {
   return (
     <Section color={data.color}>
       <Container
@@ -19,9 +20,9 @@ export const Content = ({ data, parentField = '' }: ContentProps) => {
         }`}
         size='large'
         width='medium'
-        data-tinafield={`${parentField}.body`}
+        data-tina-field={tinaField(data, 'body')}
       >
-        <RichText content={data.body} />
+        <TinaMarkdown content={data.body} components={customComponents} />
       </Container>
     </Section>
   );

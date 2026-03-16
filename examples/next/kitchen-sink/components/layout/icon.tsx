@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import { useLayout } from './layout-context';
+import { tinaField } from 'tinacms/dist/react';
 // Only import the specific icons actually used in content — avoids bundling all ~1600 BoxIcons
 import { BiLayer, BiSearchAlt2, BiTerminal } from 'react-icons/bi';
 
@@ -84,7 +85,6 @@ export type IconElementProps =
 
 interface IconOwnProps {
   data: IconData;
-  tinaField?: string;
   className?: string;
 }
 
@@ -99,7 +99,6 @@ export interface IconData {
 
 export const Icon = ({
   data,
-  tinaField = '',
   className = '',
   ...rest
 }: IconProps) => {
@@ -124,7 +123,7 @@ export const Icon = ({
   if (style === 'circle') {
     return (
       <div
-        data-tinafield={tinaField}
+        data-tina-field={tinaField(data)}
         className={`relative z-10 inline-flex items-center justify-center flex-shrink-0 rounded-full ${colorClass.circle} ${sizeClass} ${className}`.trim()}
         {...(rest as React.HTMLAttributes<HTMLDivElement>)}
       >
@@ -135,7 +134,7 @@ export const Icon = ({
 
   return (
     <IconComponent
-      data-tinafield={tinaField}
+      data-tina-field={tinaField(data)}
       className={`${colorClass.regular} ${sizeClass} ${className}`.trim()}
       {...(rest as React.SVGProps<SVGSVGElement>)}
     />

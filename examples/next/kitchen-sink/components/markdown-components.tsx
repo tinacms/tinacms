@@ -7,8 +7,7 @@ import {
   type Components,
   type TinaMarkdownContent,
 } from 'tinacms/dist/rich-text';
-import { sanitizeImageSrc } from '@/lib/utils';
-import { sanitizeHref } from '@/lib/richText';
+import { sanitizeImageSrc, sanitizeHref } from '@/lib/utils';
 
 // Lazily load syntax highlighter — it's large and only needed for code blocks
 const Prism = dynamic(() =>

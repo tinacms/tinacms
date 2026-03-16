@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { BiMenu, BiX } from 'react-icons/bi';
 import type { GlobalHeaderNav } from '@/tina/__generated__/types';
+import { sanitizeHref } from '@/lib/utils';
 
 interface MobileNavDrawerProps {
   nav: Array<GlobalHeaderNav | null>;
@@ -103,7 +104,7 @@ export const MobileNavDrawer = ({
             return (
               <Link
                 key={item?.href ?? `nav-${idx}`}
-                href={item?.href ?? '/'}
+                href={sanitizeHref(item?.href, '/')}
                 onClick={onClose}
                 aria-current={active ? 'page' : undefined}
                 className={`block px-4 py-3 rounded-md text-base font-medium transition-colors ${

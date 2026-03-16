@@ -1,16 +1,16 @@
 'use client';
 import React from 'react';
 import { Section, Container, useLayout } from '../layout';
+import { tinaField } from 'tinacms/dist/react';
 import { colorFieldSchema } from '@/tina/schemas/shared-fields';
 import { authorColorMap } from '@/lib/utils';
 import type { PageBlocksTestimonial } from '@/tina/__generated__/types';
 
 interface TestimonialProps {
   data: PageBlocksTestimonial;
-  parentField?: string;
 }
 
-export const Testimonial = ({ data, parentField = '' }: TestimonialProps) => {
+export const Testimonial = ({ data }: TestimonialProps) => {
   const { theme } = useLayout();
   const authorColor = authorColorMap[theme.color] ?? authorColorMap.orange;
 
@@ -31,7 +31,7 @@ export const Testimonial = ({ data, parentField = '' }: TestimonialProps) => {
               &ldquo;
             </span>
             <p
-              data-tinafield={`${parentField}.quote`}
+              data-tina-field={tinaField(data, 'quote')}
               className='relative opacity-95'
             >
               {data.quote}
@@ -53,7 +53,7 @@ export const Testimonial = ({ data, parentField = '' }: TestimonialProps) => {
           </div>
           <footer className='text-center'>
             <p
-              data-tinafield={`${parentField}.author`}
+              data-tina-field={tinaField(data, 'author')}
               className={`tracking-wide title-font font-bold text-lg ${
                 data.color === 'primary' ? `text-white/80` : authorColor
               }`}

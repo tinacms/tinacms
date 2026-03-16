@@ -59,45 +59,17 @@ export const Blocks = ({
 
         switch (template) {
           case 'hero':
-            return (
-              <Hero
-                key={i}
-                data={block as PageBlocksHero}
-                parentField={`blocks.${i}`}
-              />
-            );
+            return <Hero key={i} data={block as PageBlocksHero} />;
           case 'features':
-            return (
-              <Features
-                key={i}
-                data={block as PageBlocksFeatures}
-                parentField={`blocks.${i}`}
-              />
-            );
+            return <Features key={i} data={block as PageBlocksFeatures} />;
           case 'cta':
-            return (
-              <CTA
-                key={i}
-                data={block as PageBlocksCta}
-                parentField={`blocks.${i}`}
-              />
-            );
+            return <CTA key={i} data={block as PageBlocksCta} />;
           case 'testimonial':
             return (
-              <Testimonial
-                key={i}
-                data={block as PageBlocksTestimonial}
-                parentField={`blocks.${i}`}
-              />
+              <Testimonial key={i} data={block as PageBlocksTestimonial} />
             );
           case 'content':
-            return (
-              <Content
-                key={i}
-                data={block as PageBlocksContent}
-                parentField={`blocks.${i}`}
-              />
-            );
+            return <Content key={i} data={block as PageBlocksContent} />;
           default:
             return (
               <div

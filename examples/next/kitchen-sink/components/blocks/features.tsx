@@ -3,6 +3,7 @@ import React from 'react';
 import { Actions } from '../layout/actions';
 import { Icon, iconSchema } from '../layout/icon';
 import { Section, Container } from '../layout';
+import { tinaField } from 'tinacms/dist/react';
 import {
   actionsFieldSchema,
   colorFieldSchema,
@@ -16,26 +17,24 @@ import type {
 interface FeatureProps {
   featuresColor: string | null | undefined;
   data: PageBlocksFeaturesItems;
-  tinaField: string;
 }
 
-export const Feature = ({ featuresColor, data, tinaField }: FeatureProps) => {
+export const Feature = ({ featuresColor, data }: FeatureProps) => {
   return (
     <div
-      data-tinafield={tinaField}
+      data-tina-field={tinaField(data)}
       className='flex-1 flex flex-col gap-6 text-center items-center lg:items-start lg:text-left max-w-xl mx-auto'
       style={{ flexBasis: '16rem' }}
     >
       {data.icon && (
         <Icon
-          tinaField={`${tinaField}.icon`}
           parentColor={featuresColor}
           data={{ size: 'large', ...data.icon }}
         />
       )}
       {data.title && (
         <h3
-          data-tinafield={`${tinaField}.title`}
+          data-tina-field={tinaField(data, 'title')}
           className='text-2xl font-semibold title-font'
         >
           {data.title}
@@ -43,7 +42,7 @@ export const Feature = ({ featuresColor, data, tinaField }: FeatureProps) => {
       )}
       {data.text && (
         <p
-          data-tinafield={`${tinaField}.text`}
+          data-tina-field={tinaField(data, 'text')}
           className='text-base opacity-80 leading-relaxed'
         >
           {data.text}
@@ -52,7 +51,6 @@ export const Feature = ({ featuresColor, data, tinaField }: FeatureProps) => {
       {data.actions && (
         <Actions
           actions={data.actions}
-          parentField={`${tinaField}.actions`}
           parentColor={featuresColor}
         />
       )}
@@ -62,10 +60,9 @@ export const Feature = ({ featuresColor, data, tinaField }: FeatureProps) => {
 
 interface FeaturesProps {
   data: PageBlocksFeatures;
-  parentField?: string;
 }
 
-export const Features = ({ data, parentField }: FeaturesProps) => {
+export const Features = ({ data }: FeaturesProps) => {
   // Handle both string and object item formats for backwards compatibility
   const normalizedItems =
     data.items?.map((item) => {
@@ -92,14 +89,14 @@ export const Features = ({ data, parentField }: FeaturesProps) => {
             {data.title && (
               <div className='text-center mb-12'>
                 <h2
-                  data-tinafield={`${parentField}.title`}
+                  data-tina-field={tinaField(data, 'title')}
                   className='text-balance text-3xl font-semibold text-inherit'
                 >
                   {data.title}
                 </h2>
                 {data.description && (
                   <p
-                    data-tinafield={`${parentField}.description`}
+                    data-tina-field={tinaField(data, 'description')}
                     className='mt-4 text-inherit opacity-90'
                   >
                     {data.description}
@@ -113,7 +110,7 @@ export const Features = ({ data, parentField }: FeaturesProps) => {
                 return (
                   <div
                     key={idx}
-                    data-tinafield={`${parentField}.items.${idx}`}
+                    data-tina-field={tinaField(item)}
                     className='group text-center'
                   >
                     <CardHeader className='pb-3'>
@@ -151,7 +148,6 @@ export const Features = ({ data, parentField }: FeaturesProps) => {
             if (!block) return null;
             return (
               <Feature
-                tinaField={`${parentField}.items.${i}`}
                 featuresColor={data.color}
                 key={i}
                 data={block}

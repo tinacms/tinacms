@@ -3,7 +3,9 @@ import React from 'react';
 import Image from 'next/image';
 import { Actions } from '../layout/actions';
 import { Container } from '../layout';
-import RichText from '@/lib/richText';
+import { TinaMarkdown } from 'tinacms/dist/rich-text';
+import { tinaField } from 'tinacms/dist/react';
+import { customComponents } from '@/components/markdown-components';
 import { Section } from '../layout';
 import { sanitizeImageSrc } from '@/lib/utils';
 import {
@@ -14,10 +16,9 @@ import type { PageBlocksHero } from '@/tina/__generated__/types';
 
 interface HeroProps {
   data: PageBlocksHero;
-  parentField?: string;
 }
 
-export const Hero = ({ data, parentField }: HeroProps) => {
+export const Hero = ({ data }: HeroProps) => {
   return (
     <Section color={data.color}>
       <Container
@@ -27,7 +28,7 @@ export const Hero = ({ data, parentField }: HeroProps) => {
         <div className='row-start-2 lg:row-start-1 lg:col-span-3 text-center lg:text-left'>
           {data.tagline && (
             <h2
-              data-tinafield={`${parentField}.tagline`}
+              data-tina-field={tinaField(data, 'tagline')}
               className='relative inline-block px-3 py-1 mb-8 text-md font-bold tracking-wide title-font z-20'
             >
               {data.tagline}
@@ -36,7 +37,7 @@ export const Hero = ({ data, parentField }: HeroProps) => {
           )}
           {data.headline && (
             <h3
-              data-tinafield={`${parentField}.headline`}
+              data-tina-field={tinaField(data, 'headline')}
               className={`w-full relative mb-10 text-5xl font-extrabold tracking-normal leading-tight title-font`}
             >
               <span>{data.headline}</span>
@@ -44,17 +45,16 @@ export const Hero = ({ data, parentField }: HeroProps) => {
           )}
           {data.text && (
             <div
-              data-tinafield={`${parentField}.text`}
+              data-tina-field={tinaField(data, 'text')}
               className={`prose prose-lg mx-auto lg:mx-0 mb-10 ${
                 data.color === 'primary' ? `prose-primary` : `dark:prose-dark`
               }`}
             >
-              <RichText content={data.text} />
+              <TinaMarkdown content={data.text} components={customComponents} />
             </div>
           )}
           {data.actions && (
             <Actions
-              parentField={`${parentField}.actions`}
               className='justify-center lg:justify-start py-2'
               parentColor={data.color}
               actions={data.actions}
@@ -67,7 +67,7 @@ export const Hero = ({ data, parentField }: HeroProps) => {
             if (!imgSrc) return null;
             return (
               <div
-                data-tinafield={`${parentField}.image`}
+                data-tina-field={tinaField(data, 'image')}
                 className='relative row-start-1 lg:col-span-2 flex justify-center'
               >
                 {/* Decorative gradient blur background instead of duplicate image */}

@@ -10,6 +10,7 @@ import {
   headerColorClasses,
   activeItemClasses,
   activeBackgroundClasses,
+  sanitizeHref,
 } from '@/lib/utils';
 import type { GlobalHeaderNav } from '@/tina/__generated__/types';
 import { MobileNavDrawer } from './mobile-nav-drawer';
@@ -78,7 +79,7 @@ export const Header = () => {
               return (
                 <Link
                   key={item.href ?? `nav-${idx}`}
-                  href={item.href ?? '/'}
+                  href={sanitizeHref(item.href, '/')}
                   className={`relative select-none text-base inline-flex items-center tracking-wide transition duration-150 ease-out opacity-70 hover:opacity-100 px-2 sm:px-4 py-5 ${
                     active
                       ? `opacity-100 ${

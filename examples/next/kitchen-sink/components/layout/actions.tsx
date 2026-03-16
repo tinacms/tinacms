@@ -6,7 +6,9 @@ import {
   buttonColorClasses,
   invertedButtonColorClasses,
   linkButtonColorClasses,
+  sanitizeHref,
 } from '@/lib/utils';
+import { tinaField } from 'tinacms/dist/react';
 import { useLayout } from './layout-context';
 
 export interface NavAction {
@@ -16,42 +18,15 @@ export interface NavAction {
   icon?: boolean | null;
 }
 
-function getSafeHref(rawHref: unknown): string {
-  if (typeof rawHref !== 'string') return '/';
-  const href = rawHref.trim();
-  if (!href) return '/';
-  // Allow same-origin relative paths and hash links
-  // Explicitly reject protocol-relative URLs like //evil.com
-  if (
-    (href.startsWith('/') &&
-      !href.startsWith('//') &&
-      !href.startsWith('\\')) ||
-    href.startsWith('#')
-  ) {
-    return href;
-  }
-  // Allow http/https absolute URLs
-  try {
-    const url = new URL(href);
-    if (url.protocol === 'http:' || url.protocol === 'https:') {
-      return url.toString();
-    }
-  } catch {
-    // not a valid absolute URL
-  }
-  return '/';
-}
 
 interface ActionsProps {
   parentColor?: string | null;
-  parentField?: string;
   className?: string;
   actions?: Array<NavAction | null>;
 }
 
 export const Actions = ({
   parentColor = 'default',
-  parentField = '',
   className = '',
   actions,
 }: ActionsProps) => {
@@ -78,8 +53,8 @@ export const Actions = ({
           return (
             <Link
               key={index}
-              href={getSafeHref(action.link)}
-              data-tinafield={`${parentField}.${index}`}
+              href={sanitizeHref(action.link, '/')}
+              data-tina-field={tinaField(action)}
               className={`z-10 relative inline-flex items-center px-7 py-3 font-semibold text-lg transition duration-150 ease-out ${
                 isButton
                   ? 'rounded-lg transform focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 whitespace-nowrap'
