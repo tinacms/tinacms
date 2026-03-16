@@ -1,118 +1,169 @@
 import type { Media, MediaListOffset } from '@toolkit/core/media';
 import { isImage, isVideo } from '../../media/utils';
+import { TinaCMS } from '@tinacms/toolkit';
 
-/**
- * Utility function to escape special characters in a string for use in a regular expression.
- * @param str - The input string to escape
- * @returns The escaped string safe for use in a regular expression
- */
-const escapeRegExp = (str: string) =>
-  str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-/**
- * Represents a reference to a document where a media item is used
- */
+//Represents a reference to a document where a media item is used
 export interface DocumentReference {
-  collection: string;
-  relativePath: string;
+  collectionName: string;
   collectionLabel: string;
+  breadcrumbs: string[];
   editUrl: string;
 }
 
-/**
- * Represents a media item along with its usage count and the documents it is used in.
- */
+//Represents a media item and the documents it is used in.
 export interface MediaUsage {
   media: Media;
-  count: number;
   type: 'image' | 'video' | 'other';
   usedIn: DocumentReference[];
 }
 
+// Represents the structure of a GraphQL document node returned from TinaCMS, as fetched in the media usage scanning process.
+// _sys is a superset of the base Document type (for ui.router compatibility), extended with a `collection` block for scanner routing and labelling.
+interface GraphQLDocumentNode {
+  _sys: {
+    relativePath: string;
+    filename: string;
+    basename: string;
+    path: string;
+    breadcrumbs: string[];
+    extension: string;
+    template: string;
+    title?: string;
+    hasReferences?: boolean;
+    collection: {
+      name: string;
+      label?: string;
+      path: string;
+      format: string;
+    };
+  };
+  _values: Record<string, unknown>;
+}
+
+// Represents the full response structure of a GraphQL query fetching a collection connection, as fetched in the media usage scanning process.
+interface CollectionConnectionResponse {
+  collectionConnection: {
+    pageInfo: {
+      hasNextPage: boolean;
+      endCursor: string;
+    };
+    edges: {
+      node: GraphQLDocumentNode;
+    }[];
+  };
+}
+
 /**
- * Helper function to construct the edit URL for a given document node,
- * taking into account potential custom routing logic defined in the collection's UI configuration.
- * @param cms - The CMS instance to use for fetching collection definitions
- * @param collectionName - The name of the collection the document belongs to
- * @param documentNode - The document node, expected to include _sys breadcrumbs
+ * Helper function to construct the edit URL for a given document.
+ * @param cms - The TinaCMS instance to use for fetching collection definitions
+ * @param document - A TinaCMS Document (GraphQLDocumentNode) for which to construct the edit URL
+ * @return A Promise that resolves to the edit URL for the document. (Preview URL if tina-preview flag is enabled, otherwise the default edit URL)
  */
 const getDocumentEditUrl = async (
-  cms: any,
-  collectionName: string,
-  documentNode: { _sys: { breadcrumbs: string[] }; [key: string]: any }
+  cms: TinaCMS,
+  document: GraphQLDocumentNode
 ): Promise<string> => {
-  // Default edit URL pattern based on collection name and document breadcrumbs
-  const breadcrumbsPath = documentNode._sys?.breadcrumbs?.join('/') || '';
-  let editUrl = `#/collections/edit/${collectionName}/~/${breadcrumbsPath}`;
+  const collectionName = document._sys.collection.name;
 
-  // Check for custom router function in collection UI configuration to determine edit URL
+  // Default edit URL pattern based on collection name and document breadcrumbs
+  const breadcrumbsDerivedPath = document._sys.breadcrumbs.join('/');
+  let editUrl = `#/collections/edit/${collectionName}/~/${breadcrumbsDerivedPath}`;
+
+  // Check for custom router function in collection UI configuration
   try {
-    const collectionDef = cms.api.tina.schema.getCollection(collectionName);
-    if (collectionDef?.ui?.router) {
-      const routeOverride = await collectionDef.ui.router({
-        document: documentNode,
-        collection: collectionDef,
+    const collection = cms.api.tina.schema.getCollection(collectionName);
+    if (collection?.ui?.router) {
+      let customPath = await collection.ui.router({
+        document: document,
+        collection: collection,
       });
-      if (routeOverride) {
-        const cleanRoute = routeOverride.startsWith('/')
-          ? routeOverride.slice(1)
-          : routeOverride;
-        const basePath = cms.flags.get('tina-basepath');
-        const tinaPreview = cms.flags.get('tina-preview');
-        if (tinaPreview) {
-          editUrl = `#/~${basePath ? `/${basePath}` : ''}/${cleanRoute}`;
+      if (customPath) {
+        // Ensure the custom route does not have a leading slash
+        customPath = customPath.startsWith('/')
+          ? customPath.slice(1)
+          : customPath;
+
+        // Construct the URL for the Tina preview based on the custom route and the tina-basepath flag
+        const tinaBasePath = cms.flags.get('tina-basepath');
+        const tinaPreviewIsSet = cms.flags.get('tina-preview');
+        // Without tina-preview, ui.router returns a live page path, not a valid CMS edit URL.
+        if (tinaPreviewIsSet) {
+          if (tinaBasePath) {
+            editUrl = `#/~/${tinaBasePath}/${customPath}`;
+          } else {
+            editUrl = `#/~/${customPath}`;
+          }
         }
       }
     }
   } catch (e) {
-    // Fail silently and use the default edit URL
+    // Fail silently in case the custom router function throws an error, and fall back to the default edit URL
+    console.error(
+      'Unable to determine custom edit URL for document. Falling back to default edit URL.',
+      e
+    );
   }
 
   return editUrl;
 };
 
 /**
- * Helper function to scan a document's values for media references by serializing
- * the entire _values blob to a string and checking whether each
- * media src path appears as a substring.
- *
- * @param values - The _values payload from the GraphQL document node
+ * Helper function to scan a document's _values payload for references to media items based on their src paths.
+ * @param documentContent - The stringified _values payload from the GraphQL document node
  * @param mediaUsages - Pre-calculated array of media usage objects for reference scanning
  * @returns A Set of media IDs referenced in the document
  */
 const scanDocumentForMedia = (
-  values: unknown,
+  documentContent: string,
   mediaUsages: MediaUsage[]
 ): Set<string> => {
-  // Naive implementation: serialize the entire _values object and check for substring matches of each media src path.
-  // Use a regex to ensure the match is not a partial substring (e.g. avoiding matching /img.png inside /img.png.webp)
+  // Set to avoid counting multiple occurrences of the same media item in a single document more than once
   const matchedIds = new Set<string>();
-  const serialized = JSON.stringify(values);
 
-  for (const usage of mediaUsages) {
-    const src = usage.media.src;
-    if (!src) continue;
-    const escapedSrc = escapeRegExp(src);
-    // Ensure the src is not immediately followed by a character that could be part of a longer path
-    const regex = new RegExp(`${escapedSrc}(?![a-zA-Z0-9._-])`);
-    if (regex.test(serialized)) matchedIds.add(usage.media.id);
+  for (const mediaUsage of mediaUsages) {
+    // Fetch src path of media item
+    const src = mediaUsage.media.src;
+
+    // Check for substring matches of the media src in the document content
+    let index = documentContent.indexOf(src);
+
+    while (index !== -1) {
+      // Evaluate characters before and after to check false positives (e.g. 'img1.png' should not match 'big-img1.png' or 'img1.png2')
+      const prevChar = documentContent[index - 1];
+      const nextChar = documentContent[index + src.length];
+
+      // A match is valid if the character before and after the src is NOT a valid filename character (alphanumeric, underscore, dot, or hyphen)
+      const isPrevValid = !prevChar || !/[a-zA-Z0-9_.-]/.test(prevChar);
+      const isNextValid = !nextChar || !/[a-zA-Z0-9_.-]/.test(nextChar);
+
+      if (isPrevValid && isNextValid) {
+        matchedIds.add(mediaUsage.media.id);
+        break;
+      }
+
+      // False positive, continue searching (-1 if not found)
+      index = documentContent.indexOf(src, index + 1);
+    }
   }
 
   return matchedIds;
 };
 
+const THUMBNAIL_SIZES = [{ w: 75, h: 75 }];
+const BATCH_SIZE = 100;
+
 /**
- * Helper function to recursively fetch all media files from the CMS.
+ * Helper function to recursively collect all media files from the CMS.
  *
  * @param cms - The CMS instance to use for fetching media
- * @param mediaIdToUsageMap - Media usage map to initialize while fetching
- * @param currentDirectory - The directory to fetch media from (used for recursion)
+ * @param mediaIdToUsageMap - Media usage map to initialize while fetching (in-place)
+ * @param currentDirectory - The directory to fetch media from
  * @returns A Promise that resolves when all media items in the directory have been fetched and indexed
  */
-const fetchAllMedia = async (
-  cms: any,
+const collectAllMedia = async (
+  cms: TinaCMS,
   mediaIdToUsageMap: Record<string, MediaUsage>,
-  currentDirectory: string = ''
+  currentDirectory: string
 ): Promise<void> => {
   const subDirectories: string[] = [];
   let currentOffset: MediaListOffset | undefined = undefined;
@@ -123,13 +174,13 @@ const fetchAllMedia = async (
     const list = await cms.media.list({
       directory: currentDirectory,
       offset: currentOffset,
-      thumbnailSizes: [{ w: 75, h: 75 }],
+      thumbnailSizes: THUMBNAIL_SIZES,
     });
 
     // Separate files and directories
     for (const item of list.items) {
       if (item.type === 'file') {
-        // Index media items by ID with initial usage count of 0 and empty usedIn array
+        // Index media items by ID with an empty usedIn array
         if (item.src) {
           const isImg = isImage(item.filename);
           const isVid = isVideo(item.filename);
@@ -137,7 +188,6 @@ const fetchAllMedia = async (
           mediaIdToUsageMap[item.id] = {
             media: item,
             type,
-            count: 0,
             usedIn: [],
           };
         }
@@ -150,14 +200,17 @@ const fetchAllMedia = async (
       }
     }
 
+    // Check if there are more items to fetch in the current directory based on the presence of a next offset
     currentOffset = list.nextOffset;
-    moreOffsetsAvailable = Boolean(currentOffset);
+    if (!currentOffset) {
+      moreOffsetsAvailable = false;
+    }
   }
 
-  // Recursively fetch all subdirectories in parallel
+  // Recursively fetch all subdirectories in parallel, promise fails if any single directory fetch fails
   if (subDirectories.length > 0) {
     await Promise.all(
-      subDirectories.map((dir) => fetchAllMedia(cms, mediaIdToUsageMap, dir))
+      subDirectories.map((dir) => collectAllMedia(cms, mediaIdToUsageMap, dir))
     );
   }
 };
@@ -166,29 +219,28 @@ const fetchAllMedia = async (
  * Process all documents in a collection and update the media usage map.
  *
  * @param cms - The CMS instance to use for fetching documents
- * @param collection - The collection definition to process
+ * @param collectionMeta - The name and optional label of the collection to process
  * @param mediaIdToUsageMap - The media usage map to update with found references
  * @returns A Promise that resolves when the collection has been fully processed (mediaIdToUsageMap will be updated in-place)
  */
-const scanCollectionForMedia = async (
-  cms: any,
-  collection: any,
+const scanCollectionForMediaUsage = async (
+  cms: TinaCMS,
+  collectionMeta: { name: string; label?: string },
   mediaIdToUsageMap: Record<string, MediaUsage>
 ) => {
-  let hasNextPage = true;
-  let after = undefined;
+  let hasNextPage: boolean = true;
+  let after: string | undefined = undefined;
 
   // Pre-calculate the media usages array
   const mediaUsages = Object.values(mediaIdToUsageMap);
 
-  // Paginate through all documents in the collection (cursor-based pagination)
+  // Paginate through all documents in the collection
   while (hasNextPage) {
     try {
-      // Fetch comprehensively on _sys. Fetching all fields because a developer's custom `ui.router` function could use
-      // any of them to construct a route.
+      // Fetch _sys fully because `ui.router` could utilize any of them to construct a route
       const listQuery = `
-          query($after: String) {
-            ${collection.name}Connection(first: 100, after: $after) {
+          query($after: String, $first: Float) {
+            collectionConnection: ${collectionMeta.name}Connection(first: $first, after: $after) {
               pageInfo { hasNextPage, endCursor }
               edges {
                 node {
@@ -202,6 +254,7 @@ const scanCollectionForMedia = async (
                       extension
                       template
                       title
+                      hasReferences
                       collection {
                         name
                         label
@@ -216,12 +269,13 @@ const scanCollectionForMedia = async (
             }
           }
         `;
+      // Execute the GraphQL query to fetch a page of documents from the collection
       const res = (await cms.api.tina.request(listQuery, {
-        variables: { after },
-      })) as any;
+        variables: { after, first: BATCH_SIZE },
+      })) as CollectionConnectionResponse;
 
       // Extract information from the connection response
-      const connection = res[`${collection.name}Connection`];
+      const connection = res.collectionConnection;
       const edges = connection?.edges || [];
       hasNextPage = connection?.pageInfo?.hasNextPage || false;
       after = connection?.pageInfo?.endCursor;
@@ -231,39 +285,31 @@ const scanCollectionForMedia = async (
         // Yield to the main thread briefly to avoid freezing the UI on large datasets
         await new Promise((resolve) => setTimeout(resolve, 0));
 
-        const documentNode = edge.node;
-        const relativePath =
-          documentNode._sys?.relativePath || 'Unknown relativePath';
-
-        // Scan document values for media references via serialised substring match
+        // Scan document values for media references
         const matchedIds = scanDocumentForMedia(
-          documentNode._values || documentNode,
+          JSON.stringify(edge.node._values),
           mediaUsages
         );
 
         if (matchedIds.size === 0) continue;
 
-        const editUrl = await getDocumentEditUrl(
-          cms,
-          collection.name,
-          documentNode
-        );
+        const editUrl = await getDocumentEditUrl(cms, edge.node);
 
+        // For each matched media ID, add the document reference to the usedIn array
         matchedIds.forEach((mediaId) => {
           const usage = mediaIdToUsageMap[mediaId];
           if (usage) {
-            usage.count += 1;
             usage.usedIn.push({
-              collection: collection.name,
-              relativePath,
-              collectionLabel: collection.label || collection.name,
+              collectionName: collectionMeta.name,
+              breadcrumbs: edge.node._sys.breadcrumbs,
+              collectionLabel: collectionMeta.label || collectionMeta.name, // label is optional in the schema
               editUrl,
             });
           }
         });
       }
     } catch (e) {
-      console.error(`Error processing collection ${collection.name}:`, e);
+      console.error(`Error processing collection ${collectionMeta.name}:`, e);
       throw e;
     }
   }
@@ -275,23 +321,19 @@ const scanCollectionForMedia = async (
  * @param cms - The CMS instance
  * @returns A Promise resolving to an array of MediaItems with populated usage metrics
  */
-export const scanAllMedia = async (cms: any): Promise<MediaUsage[]> => {
+export const scanAllMedia = async (cms: TinaCMS): Promise<MediaUsage[]> => {
   // Structure to hold media usage data
   const mediaIdToUsageMap: Record<string, MediaUsage> = {};
 
-  // Fetch all media items from the CMS and populate the mediaIdToUsageMap
-  await fetchAllMedia(cms, mediaIdToUsageMap, '');
+  // Collect all media items from the CMS and populate the mediaIdToUsageMap
+  await collectAllMedia(cms, mediaIdToUsageMap, '');
 
-  // Fetch all schema collections
-  const collectionsRes = (await cms.api.tina.request(
-    `query { collections { name label } }`,
-    { variables: {} }
-  )) as any;
-  const collections = collectionsRes?.collections || [];
+  // Get all schema collections
+  const collectionMetas = cms.api.tina.schema.getCollections();
 
   // Process each collection for media references
-  for (const collection of collections) {
-    await scanCollectionForMedia(cms, collection, mediaIdToUsageMap);
+  for (const collectionMeta of collectionMetas) {
+    await scanCollectionForMediaUsage(cms, collectionMeta, mediaIdToUsageMap);
   }
 
   // Return the media usage data as an array
