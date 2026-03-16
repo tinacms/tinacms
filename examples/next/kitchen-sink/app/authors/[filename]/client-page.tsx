@@ -3,8 +3,6 @@ import Image from 'next/image';
 import { useTina } from 'tinacms/dist/react';
 import { sanitizeImageSrc } from '@/lib/utils';
 import type { TinaPageProps } from '@/lib/types';
-import { TinaMarkdown } from 'tinacms/dist/rich-text';
-import { customComponents } from '@/components/markdown-components';
 import { Section } from '@/components/layout/section';
 import { Container } from '@/components/layout/container';
 import { GradientTitle } from '@/components/ui/gradient-title';
@@ -46,15 +44,6 @@ export default function AuthorClientPage(props: TinaPageProps) {
               </p>
             )}
           </div>
-
-          {data.author.body && (
-            <div className='prose prose-lg dark:prose-dark w-full max-w-none mb-8'>
-              <TinaMarkdown
-                components={customComponents}
-                content={data.author.body}
-              />
-            </div>
-          )}
 
           {data.author.hobbies && data.author.hobbies.length > 0 && (
             <div className='mt-8 p-6 bg-gray-50 dark:bg-gray-900 rounded-lg'>

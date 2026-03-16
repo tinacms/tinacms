@@ -33,7 +33,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build workspace packages
-        run: pnpm --filter "@examples/next-kitchen-sink^..." run build
+        run: pnpm --filter "@examples/next-kitchen-sink^..." run build:local
 
       - name: Install Playwright browsers
         run: pnpm --filter "@examples/next-kitchen-sink" exec playwright install --with-deps chromium

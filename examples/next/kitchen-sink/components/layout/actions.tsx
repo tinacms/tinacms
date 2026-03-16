@@ -2,18 +2,18 @@
 import Link from 'next/link';
 import React from 'react';
 import { BiRightArrowAlt } from 'react-icons/bi';
-import { cn, sanitizeHref } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { tinaField } from 'tinacms/dist/react';
 
 export interface NavAction {
-  label?: string | null;
-  type?: string | null;
-  link?: string | null;
-  icon?: boolean | null;
+  label?: string;
+  type?: string;
+  link?: string;
+  icon?: boolean;
 }
 
 interface ActionsProps {
-  parentColor?: string | null;
+  parentColor?: string;
   className?: string;
   actions?: Array<NavAction | null>;
 }
@@ -39,7 +39,7 @@ export const Actions = ({
         return (
           <Link
             key={index}
-            href={sanitizeHref(action.link, '/')}
+            href={action.link || '/'}
             data-tina-field={tinaField(action as Record<string, unknown>)}
             className={cn(
               'z-10 relative inline-flex items-center px-7 py-3 font-semibold text-lg transition duration-150 ease-out',
