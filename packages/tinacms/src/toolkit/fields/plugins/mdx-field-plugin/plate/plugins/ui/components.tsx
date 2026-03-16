@@ -212,7 +212,7 @@ export const Components = () => {
     [CodePlugin.key]: CodeLeaf,
     [HighlightPlugin.key]: withProps(PlateLeaf, {
       as: 'mark',
-      className: 'bg-yellow-200 dark:bg-yellow-700',
+      className: 'bg-yellow-200',
     }),
     [UnderlinePlugin.key]: withProps(PlateLeaf, { as: 'u' }),
     [StrikethroughPlugin.key]: withProps(PlateLeaf, { as: 's' }),
