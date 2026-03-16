@@ -24,7 +24,7 @@ export const MobileNavDrawer = ({
 
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
-    return pathname?.startsWith(href);
+    return pathname === href || pathname?.startsWith(`${href}/`);
   };
 
   // Close drawer on Escape key
@@ -77,7 +77,6 @@ export const MobileNavDrawer = ({
       {/* Navigation Drawer */}
       <nav
         id='mobile-nav-menu'
-        role='navigation'
         aria-label='Mobile navigation'
         className={cn(
           'fixed left-0 top-0 h-full w-64 bg-white dark:bg-gray-900 shadow-lg z-40 sm:hidden transform transition-transform duration-200 ease-out',
