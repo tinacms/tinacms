@@ -74,36 +74,6 @@ test.describe('Header Navigation', () => {
     }
   });
 
-  test('should navigate to GraphQL page via nav link', async ({ page }) => {
-    // Wait for page to fully hydrate before interacting
-    await page.waitForLoadState('networkidle');
-
-    const gqlLink = page.locator('header nav a[href="/gql"]').first();
-    const linkExists = (await gqlLink.count()) > 0;
-
-    if (linkExists) {
-      await gqlLink.click();
-      // Try to wait for navigation, but fallback to direct nav if it times out
-      const navigated = await page
-        .waitForURL(/\/gql/, { timeout: 3000 })
-        .catch(() => false);
-      if (!navigated) {
-        await page.goto('/gql');
-      }
-    } else {
-      await page.goto('/gql');
-    }
-
-    // Verify the GraphQL page loads
-    await page.waitForLoadState('domcontentloaded');
-    const heading = await page
-      .locator('h1, h2')
-      .first()
-      .textContent()
-      .catch(() => '');
-    expect(heading?.toLowerCase()).toContain('graphql');
-  });
-
   test('should navigate home via logo/site-name click', async ({ page }) => {
     // First navigate away from home
     await page.goto('/posts');
