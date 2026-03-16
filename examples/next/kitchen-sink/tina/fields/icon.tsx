@@ -9,6 +9,7 @@ import {
   PopoverPanel,
   Transition,
 } from '@headlessui/react';
+import { cn } from '@/lib/utils';
 import { IconOptions } from '@/components/layout/icon';
 
 const parseIconName = (name: string) => {
@@ -42,7 +43,7 @@ export const IconPickerInput = wrapFieldsWithMeta(({ input }: any) => {
           <>
             <PopoverButton as={'span'}>
               <Button
-                className={`text-sm h-11 px-4 ${InputIcon ? 'h-11' : 'h-10'}`}
+                className={cn('text-sm px-4', InputIcon ? 'h-11' : 'h-10')}
                 size='custom'
                 rounded='full'
                 variant={open ? 'secondary' : 'white'}

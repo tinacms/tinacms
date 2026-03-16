@@ -7,7 +7,7 @@ import { TinaMarkdown } from 'tinacms/dist/rich-text';
 import { tinaField } from 'tinacms/dist/react';
 import { customComponents } from '@/components/markdown-components';
 import { Section } from '../layout';
-import { sanitizeImageSrc } from '@/lib/utils';
+import { cn, sanitizeImageSrc } from '@/lib/utils';
 import {
   actionsFieldSchema,
   colorFieldSchema,
@@ -38,7 +38,7 @@ export const Hero = ({ data }: HeroProps) => {
           {data.headline && (
             <h3
               data-tina-field={tinaField(data, 'headline')}
-              className={`w-full relative mb-10 text-5xl font-extrabold tracking-normal leading-tight title-font`}
+              className='w-full relative mb-10 text-5xl font-extrabold tracking-normal leading-tight title-font'
             >
               <span>{data.headline}</span>
             </h3>
@@ -46,9 +46,10 @@ export const Hero = ({ data }: HeroProps) => {
           {data.text && (
             <div
               data-tina-field={tinaField(data, 'text')}
-              className={`prose prose-lg mx-auto lg:mx-0 mb-10 ${
-                data.color === 'primary' ? `prose-primary` : `dark:prose-dark`
-              }`}
+              className={cn(
+                'prose prose-lg mx-auto lg:mx-0 mb-10',
+                data.color === 'primary' ? 'prose-primary' : 'dark:prose-dark'
+              )}
             >
               <TinaMarkdown content={data.text} components={customComponents} />
             </div>
@@ -74,7 +75,7 @@ export const Hero = ({ data }: HeroProps) => {
                 <div
                   className='absolute w-full rounded-lg max-w-xs lg:max-w-none h-full blur-2xl opacity-40 dark:opacity-20 mix-blend-multiply dark:mix-blend-hard-light'
                   style={{
-                    background: `linear-gradient(135deg, rgba(59, 130, 246, 0.6), rgba(168, 85, 247, 0.4))`,
+                    background: `linear-gradient(135deg, color-mix(in srgb, var(--theme-400) 60%, transparent), color-mix(in srgb, var(--theme-600) 40%, transparent))`,
                   }}
                   aria-hidden='true'
                 />

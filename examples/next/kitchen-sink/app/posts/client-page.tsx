@@ -5,13 +5,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import {
   sanitizeImageSrc,
-  titleColorClasses,
   cardLinkClasses,
   cn,
 } from '@/lib/utils';
 import { TinaMarkdown } from 'tinacms/dist/rich-text';
 import { BiRightArrowAlt } from 'react-icons/bi';
-import { useLayout } from '@/components/layout/layout-context';
 import { Section } from '@/components/layout/section';
 import { Container } from '@/components/layout/container';
 import type {
@@ -31,7 +29,6 @@ interface PostsClientPageProps {
 }
 
 export default function PostsClientPage(props: PostsClientPageProps) {
-  const { theme } = useLayout();
   const posts = (props.data?.postConnection?.edges ?? []).flatMap(
     (edge): PostNode[] => (edge?.node ? [edge.node as PostNode] : [])
   );
@@ -54,28 +51,14 @@ export default function PostsClientPage(props: PostsClientPageProps) {
               key={post._sys.filename}
               href={postUrl}
               data-testid={`post-card-${post._sys.filename}`}
-              className={`${cardLinkClasses} px-6 sm:px-8 md:px-10 py-10 mb-8 last:mb-0`}
+              className={cn(cardLinkClasses, 'px-6 sm:px-8 md:px-10 py-10 mb-8 last:mb-0')}
             >
-              {(() => {
-                const titleGradient =
-                  titleColorClasses[theme.color] || titleColorClasses.blue;
-                const isGradient = titleGradient.includes('from-');
-                const titleClasses = cn(
-                  isGradient
-                    ? 'bg-gradient-to-r bg-clip-text text-transparent'
-                    : 'text-gray-700 dark:text-white',
-                  'text-3xl lg:text-4xl font-semibold title-font mb-5 transition-all duration-150 ease-out',
-                  titleGradient
-                );
-                return (
-                  <h3 className={titleClasses}>
-                    {post.title}{' '}
-                    <span className='inline-block opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out'>
-                      <BiRightArrowAlt className='inline-block h-8 -mt-1 ml-1 w-auto opacity-70' />
-                    </span>
-                  </h3>
-                );
-              })()}
+              <h3 className='bg-gradient-to-r bg-clip-text text-transparent from-theme-400 to-theme-600 dark:from-theme-300 dark:to-theme-500 text-3xl lg:text-4xl font-semibold title-font mb-5 transition-all duration-150 ease-out'>
+                {post.title}{' '}
+                <span className='inline-block opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out'>
+                  <BiRightArrowAlt className='inline-block h-8 -mt-1 ml-1 w-auto opacity-70' />
+                </span>
+              </h3>
               {post.excerpt && (
                 <div className='prose dark:prose-dark w-full max-w-none mb-5 opacity-70'>
                   <TinaMarkdown content={post.excerpt} />

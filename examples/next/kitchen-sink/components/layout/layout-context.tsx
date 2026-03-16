@@ -103,7 +103,9 @@ export const LayoutProvider = ({
 
   return (
     <LayoutContext.Provider value={{ globalSettings, theme }}>
-      {children}
+      <div data-theme={theme.color}>
+        {children}
+      </div>
     </LayoutContext.Provider>
   );
 };

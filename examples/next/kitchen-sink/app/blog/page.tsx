@@ -48,7 +48,7 @@ export default async function BlogsPage() {
                 </div>
               )}
               <div className='p-6 flex flex-col flex-1'>
-                <h2 className='text-xl font-bold text-gray-900 dark:text-gray-50 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-2'>
+                <h2 className='text-xl font-bold text-gray-900 dark:text-gray-50 group-hover:text-theme-600 dark:group-hover:text-theme-400 transition-colors mb-2'>
                   {blog.title}
                 </h2>
                 {blog.description && (

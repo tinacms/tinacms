@@ -58,7 +58,7 @@ export default function PostClientPage(props: PostClientPageProps) {
               {authorFilename ? (
                 <Link
                   href={`/authors/${authorFilename}`}
-                  className='text-base font-medium text-gray-600 hover:text-blue-600 dark:text-gray-200 dark:hover:text-blue-300 transition-colors underline-offset-2 hover:underline'
+                  className='text-base font-medium text-gray-600 hover:text-theme-600 dark:text-gray-200 dark:hover:text-theme-300 transition-colors underline-offset-2 hover:underline'
                 >
                   {post.author.name}
                 </Link>

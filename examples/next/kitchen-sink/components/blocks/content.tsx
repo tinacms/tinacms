@@ -4,6 +4,7 @@ import { Section, Container } from '../layout';
 import { TinaMarkdown } from 'tinacms/dist/rich-text';
 import { tinaField } from 'tinacms/dist/react';
 import { customComponents } from '@/components/markdown-components';
+import { cn } from '@/lib/utils';
 import { colorFieldSchema } from '@/tina/schemas/shared-fields';
 import type { PageBlocksContent } from '@/tina/__generated__/types';
 
@@ -15,9 +16,10 @@ export const Content = ({ data }: ContentProps) => {
   return (
     <Section color={data.color}>
       <Container
-        className={`prose prose-lg ${
-          data.color === 'primary' ? `prose-primary` : `dark:prose-dark`
-        }`}
+        className={cn(
+          'prose prose-lg',
+          data.color === 'primary' ? 'prose-primary' : 'dark:prose-dark'
+        )}
         size='large'
         width='medium'
         data-tina-field={tinaField(data, 'body')}

@@ -1,5 +1,6 @@
 import React from 'react';
 import { wrapFieldsWithMeta } from 'tinacms';
+import { cn } from '@/lib/utils';
 
 export const colorOptions = [
   'blue',
@@ -37,7 +38,7 @@ export const ColorPickerInput = wrapFieldsWithMeta(({ input }: any) => {
               type='button'
               aria-label={`Select ${color} color`}
               aria-pressed={input.value === color}
-              className={`w-9 h-9 rounded-full shadow border ${inputClasses[color as keyof typeof inputClasses]} ${input.value === color ? 'ring-[3px] ring-offset-2 ring-blue-400' : ''}`}
+              className={cn('w-9 h-9 rounded-full shadow border', inputClasses[color as keyof typeof inputClasses], input.value === color && 'ring-[3px] ring-offset-2 ring-blue-400')}
               onClick={() => {
                 input.onChange(color);
               }}

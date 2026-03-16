@@ -11,17 +11,14 @@ import {
 import { useLayout } from './layout-context';
 import { Container } from './container';
 import { Icon } from './icon';
-import { socialIconColorClasses } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import type { GlobalFooterSocial } from '@/tina/__generated__/types';
 
 export const Footer = () => {
-  const { globalSettings, theme } = useLayout();
+  const { globalSettings } = useLayout();
 
   const footer = globalSettings?.footer;
   const socialIconClasses = 'h-7 w-auto';
-
-  const iconColorClass =
-    socialIconColorClasses[theme.color] || socialIconColorClasses.blue;
 
   const socialIconMap: Record<
     string,
@@ -42,10 +39,8 @@ export const Footer = () => {
             className='group mx-2 flex items-center font-bold tracking-tight text-gray-400 dark:text-gray-300 opacity-50 hover:opacity-100 transition duration-150 ease-out whitespace-nowrap'
           >
             <Icon
-              parentColor='default'
               data={{
                 name: 'Tina',
-                color: theme.color,
                 style: 'float',
               }}
               className='inline-block h-10 w-auto group-hover:text-orange-500'
@@ -66,7 +61,10 @@ export const Footer = () => {
                     rel='noopener noreferrer'
                   >
                     <SocialIcon
-                      className={`${socialIconClasses} ${iconColorClass}`}
+                      className={cn(
+                        socialIconClasses,
+                        'text-theme-500 dark:text-theme-400 hover:text-theme-300'
+                      )}
                     />
                   </a>
                 );

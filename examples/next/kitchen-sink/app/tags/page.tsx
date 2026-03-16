@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import client from '../../tina/__generated__/client';
-import { cardLinkClasses } from '@/lib/utils';
+import { cn, cardLinkClasses } from '@/lib/utils';
 import { PageSection } from '@/components/layout/page-section';
 
 export const revalidate = 300;
@@ -19,9 +19,9 @@ export default async function TagsPage() {
           <Link
             key={tag._sys.filename}
             href={`/tags/${tag._sys.filename}`}
-            className={`${cardLinkClasses} p-6`}
+            className={cn(cardLinkClasses, 'p-6')}
           >
-            <h2 className='text-lg font-semibold text-gray-700 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-300 transition-all duration-150'>
+            <h2 className='text-lg font-semibold text-gray-700 dark:text-white group-hover:text-theme-600 dark:group-hover:text-theme-300 transition-all duration-150'>
               {tag.name}
             </h2>
           </Link>

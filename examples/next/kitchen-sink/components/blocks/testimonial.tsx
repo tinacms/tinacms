@@ -1,9 +1,9 @@
 'use client';
 import React from 'react';
-import { Section, Container, useLayout } from '../layout';
+import { Section, Container } from '../layout';
 import { tinaField } from 'tinacms/dist/react';
 import { colorFieldSchema } from '@/tina/schemas/shared-fields';
-import { authorColorMap } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import type { PageBlocksTestimonial } from '@/tina/__generated__/types';
 
 interface TestimonialProps {
@@ -11,23 +11,19 @@ interface TestimonialProps {
 }
 
 export const Testimonial = ({ data }: TestimonialProps) => {
-  const { theme } = useLayout();
-  const authorColor = authorColorMap[theme.color] ?? authorColorMap.orange;
+  const isPrimary = data.color === 'primary';
 
   return (
     <Section color={data.color}>
       <Container size='large'>
         <blockquote>
           <div
-            className={`relative z-10 max-w-3xl mx-auto text-4xl lg:text-5xl font-bold tracking-normal text-center title-font ${
-              data.color === 'primary'
-                ? `text-white`
-                : `text-gray-700 dark:text-gray-50`
-            }`}
+            className={cn(
+              'relative z-10 max-w-3xl mx-auto text-4xl lg:text-5xl font-bold tracking-normal text-center title-font',
+              isPrimary ? 'text-white' : 'text-gray-700 dark:text-gray-50'
+            )}
           >
-            <span
-              className={`block opacity-15 text-8xl absolute inset-y-1/2 transform translate-y-2 -left-4 leading-4 -z-1`}
-            >
+            <span className='block opacity-15 text-8xl absolute inset-y-1/2 transform translate-y-2 -left-4 leading-4 -z-1'>
               &ldquo;
             </span>
             <p
@@ -36,27 +32,29 @@ export const Testimonial = ({ data }: TestimonialProps) => {
             >
               {data.quote}
             </p>
-            <span
-              className={`block opacity-15 text-8xl absolute inset-y-1/2 transform translate-y-3 -right-4 leading-4 -z-1`}
-            >
+            <span className='block opacity-15 text-8xl absolute inset-y-1/2 transform translate-y-3 -right-4 leading-4 -z-1'>
               &rdquo;
             </span>
           </div>
-          <div className={`my-8 flex-grow-0`}>
+          <div className='my-8 flex-grow-0'>
             <span
-              className={`block mx-auto h-0.5 w-1/6 ${
-                data.color === 'primary'
-                  ? `bg-white/30`
-                  : `bg-gray-200 dark:bg-gray-700`
-              }`}
-            ></span>
+              className={cn(
+                'block mx-auto h-0.5 w-1/6',
+                isPrimary
+                  ? 'bg-white/30'
+                  : 'bg-gray-200 dark:bg-gray-700'
+              )}
+            />
           </div>
           <footer className='text-center'>
             <p
               data-tina-field={tinaField(data, 'author')}
-              className={`tracking-wide title-font font-bold text-lg ${
-                data.color === 'primary' ? `text-white/80` : authorColor
-              }`}
+              className={cn(
+                'tracking-wide title-font font-bold text-lg',
+                isPrimary
+                  ? 'text-white/80'
+                  : 'text-theme-500 dark:text-theme-300'
+              )}
             >
               {data.author}
             </p>

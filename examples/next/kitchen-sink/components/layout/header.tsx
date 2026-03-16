@@ -6,12 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useLayout } from './layout-context';
 import { Container } from './container';
 import { Icon } from './icon';
-import {
-  headerColorClasses,
-  activeItemClasses,
-  activeBackgroundClasses,
-  sanitizeHref,
-} from '@/lib/utils';
+import { cn, sanitizeHref } from '@/lib/utils';
 import type { GlobalHeaderNav } from '@/tina/__generated__/types';
 import { MobileNavDrawer } from './mobile-nav-drawer';
 
@@ -22,11 +17,7 @@ export const Header = () => {
 
   const header = globalSettings?.header;
   const nav = header?.nav || [];
-
-  const headerColorCss =
-    header?.color === 'primary'
-      ? headerColorClasses[theme.color] || headerColorClasses.blue
-      : headerColorClasses.default;
+  const isPrimary = header?.color === 'primary';
 
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
@@ -44,7 +35,12 @@ export const Header = () => {
 
   return (
     <header
-      className={`relative overflow-hidden bg-gradient-to-b ${headerColorCss}`}
+      className={cn(
+        'relative overflow-hidden bg-gradient-to-b',
+        isPrimary
+          ? 'text-white from-theme-500 to-theme-700'
+          : 'text-gray-800 dark:text-gray-50 from-white to-gray-50 dark:from-gray-900 dark:to-gray-1000',
+      )}
     >
       <Container size='custom' className='py-0 relative z-10'>
         <div className='flex items-center justify-between gap-4'>
@@ -54,10 +50,9 @@ export const Header = () => {
               className='flex items-center gap-1 whitespace-nowrap tracking-[.002em]'
             >
               <Icon
-                parentColor={header?.color || 'default'}
                 data={{
                   name: 'Tina',
-                  color: header?.color === 'primary' ? 'primary' : theme.color,
+                  color: isPrimary ? 'primary' : theme.color,
                   style: 'float',
                 }}
                 className='inline-block h-auto w-10 opacity-80 hover:opacity-100'
@@ -80,25 +75,19 @@ export const Header = () => {
                 <Link
                   key={item.href ?? `nav-${idx}`}
                   href={sanitizeHref(item.href, '/')}
-                  className={`relative select-none text-base inline-flex items-center tracking-wide transition duration-150 ease-out opacity-70 hover:opacity-100 px-2 sm:px-4 py-5 ${
-                    active
-                      ? `opacity-100 ${
-                          header?.color === 'primary'
-                            ? 'border-b-3 border-white'
-                            : activeItemClasses[theme.color] ||
-                              activeItemClasses.blue
-                        } ${
-                          header?.color === 'primary'
-                            ? ''
-                            : activeBackgroundClasses[theme.color] || ''
-                        }`
-                      : ''
-                  }`}
+                  className={cn(
+                    'relative select-none text-base inline-flex items-center tracking-wide transition duration-150 ease-out opacity-70 hover:opacity-100 px-2 sm:px-4 py-5',
+                    active && 'opacity-100',
+                    active && (isPrimary
+                      ? 'border-b-3 border-white'
+                      : 'border-b-3 border-theme-200'),
+                    active && !isPrimary && 'text-theme-600 dark:text-theme-300',
+                  )}
                 >
                   {item.label}
                   {active && (
                     <svg
-                      className={`absolute bottom-0 left-1/2 w-[180%] h-full -translate-x-1/2 -z-1 opacity-10 dark:opacity-15`}
+                      className='absolute bottom-0 left-1/2 w-[180%] h-full -translate-x-1/2 -z-1 opacity-10 dark:opacity-15'
                       preserveAspectRatio='none'
                       viewBox='0 0 230 230'
                       fill='none'
@@ -134,9 +123,10 @@ export const Header = () => {
         </div>
       </Container>
       <div
-        className={`absolute h-1 bg-gradient-to-r from-transparent ${
-          header?.color === 'primary' ? `via-white` : `via-black dark:via-white`
-        } to-transparent bottom-0 left-4 right-4 opacity-5`}
+        className={cn(
+          'absolute h-1 bg-gradient-to-r from-transparent to-transparent bottom-0 left-4 right-4 opacity-5',
+          isPrimary ? 'via-white' : 'via-black dark:via-white',
+        )}
       />
     </header>
   );

@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import { cn } from '@/lib/utils';
 import { useLayout } from './layout-context';
 import { tinaField } from 'tinacms/dist/react';
 // Only import the specific icons actually used in content — avoids bundling all ~1600 BoxIcons
@@ -27,47 +28,6 @@ export const IconOptions = {
   BiLayer,
   BiSearchAlt2,
   BiTerminal,
-};
-
-const iconColorClass: {
-  [name: string]: { regular: string; circle: string };
-} = {
-  blue: {
-    regular: 'text-blue-400',
-    circle: 'bg-blue-400 dark:bg-blue-500 text-blue-50',
-  },
-  teal: {
-    regular: 'text-teal-400',
-    circle: 'bg-teal-400 dark:bg-teal-500 text-teal-50',
-  },
-  green: {
-    regular: 'text-green-400',
-    circle: 'bg-green-400 dark:bg-green-500 text-green-50',
-  },
-  red: {
-    regular: 'text-red-400',
-    circle: 'bg-red-400 dark:bg-red-500 text-red-50',
-  },
-  pink: {
-    regular: 'text-pink-400',
-    circle: 'bg-pink-400 dark:bg-pink-500 text-pink-50',
-  },
-  purple: {
-    regular: 'text-purple-400',
-    circle: 'bg-purple-400 dark:bg-purple-500 text-purple-50',
-  },
-  orange: {
-    regular: 'text-orange-400',
-    circle: 'bg-orange-400 dark:bg-orange-500 text-orange-50',
-  },
-  yellow: {
-    regular: 'text-yellow-400',
-    circle: 'bg-yellow-400 dark:bg-yellow-500 text-yellow-50',
-  },
-  white: {
-    regular: 'text-white opacity-80',
-    circle: 'bg-white dark:bg-gray-100 text-gray-800',
-  },
 };
 
 const iconSizeClass = {
@@ -107,6 +67,7 @@ export const Icon = ({
   const color = rawColor === 'primary' ? theme.color : rawColor;
   const style = data.style || 'float';
   const iconSize = data.size || 'medium';
+  const isWhite = color === 'white';
 
   if (!data.name) return null;
 
@@ -115,7 +76,6 @@ export const Icon = ({
 
   if (!IconComponent) return null;
 
-  const colorClass = iconColorClass[color] || iconColorClass.blue;
   const sizeClass =
     iconSizeClass[iconSize as keyof typeof iconSizeClass] ||
     iconSizeClass.medium;
@@ -123,8 +83,15 @@ export const Icon = ({
   if (style === 'circle') {
     return (
       <div
-        data-tina-field={tinaField(data)}
-        className={`relative z-10 inline-flex items-center justify-center flex-shrink-0 rounded-full ${colorClass.circle} ${sizeClass} ${className}`.trim()}
+        data-tina-field={tinaField(data as Record<string, unknown>)}
+        className={cn(
+          'relative z-10 inline-flex items-center justify-center flex-shrink-0 rounded-full',
+          isWhite
+            ? 'bg-white dark:bg-gray-100 text-gray-800'
+            : 'bg-theme-400 dark:bg-theme-500 text-theme-50',
+          sizeClass,
+          className,
+        )}
         {...(rest as React.HTMLAttributes<HTMLDivElement>)}
       >
         <IconComponent className='w-2/3 h-2/3' />
@@ -134,8 +101,12 @@ export const Icon = ({
 
   return (
     <IconComponent
-      data-tina-field={tinaField(data)}
-      className={`${colorClass.regular} ${sizeClass} ${className}`.trim()}
+      data-tina-field={tinaField(data as Record<string, unknown>)}
+      className={cn(
+        isWhite ? 'text-white opacity-80' : 'text-theme-400',
+        sizeClass,
+        className,
+      )}
       {...(rest as React.SVGProps<SVGSVGElement>)}
     />
   );

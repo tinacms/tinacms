@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { BiMenu, BiX } from 'react-icons/bi';
 import type { GlobalHeaderNav } from '@/tina/__generated__/types';
-import { sanitizeHref } from '@/lib/utils';
+import { cn, sanitizeHref } from '@/lib/utils';
 
 interface MobileNavDrawerProps {
   nav: Array<GlobalHeaderNav | null>;
@@ -79,9 +79,10 @@ export const MobileNavDrawer = ({
         id='mobile-nav-menu'
         role='navigation'
         aria-label='Mobile navigation'
-        className={`fixed left-0 top-0 h-full w-64 bg-white dark:bg-gray-900 shadow-lg z-40 sm:hidden transform transition-transform duration-200 ease-out ${
+        className={cn(
+          'fixed left-0 top-0 h-full w-64 bg-white dark:bg-gray-900 shadow-lg z-40 sm:hidden transform transition-transform duration-200 ease-out',
           isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        )}
       >
         {/* Drawer Header */}
         <div className='px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between'>
@@ -107,11 +108,12 @@ export const MobileNavDrawer = ({
                 href={sanitizeHref(item?.href, '/')}
                 onClick={onClose}
                 aria-current={active ? 'page' : undefined}
-                className={`block px-4 py-3 rounded-md text-base font-medium transition-colors ${
+                className={cn(
+                  'block px-4 py-3 rounded-md text-base font-medium transition-colors',
                   active
-                    ? `text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20`
+                    ? 'text-theme-600 dark:text-theme-400 bg-theme-50 dark:bg-theme-700/20'
                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                }`}
+                )}
               >
                 {item?.label}
               </Link>

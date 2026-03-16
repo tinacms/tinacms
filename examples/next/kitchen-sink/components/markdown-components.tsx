@@ -102,13 +102,13 @@ export const customComponents: Components<{
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className='w-full px-5 py-3 border border-gray-300 shadow-sm placeholder-gray-400 focus:ring-1 focus:ring-teal-500 focus:border-teal-500 sm:max-w-xs rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100'
+                className='w-full px-5 py-3 border border-gray-300 shadow-sm placeholder-gray-400 focus:ring-1 focus:ring-theme-500 focus:border-theme-500 sm:max-w-xs rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100'
                 placeholder={props.placeholder || 'Enter your email'}
               />
               <div className='mt-3 rounded shadow sm:mt-0 sm:ml-3 sm:flex-shrink-0'>
                 <button
                   type='submit'
-                  className='w-full flex items-center justify-center py-3 px-5 border border-transparent text-base font-medium rounded text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 dark:focus:ring-offset-gray-900'
+                  className='w-full flex items-center justify-center py-3 px-5 border border-transparent text-base font-medium rounded text-white bg-theme-600 hover:bg-theme-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-theme-500 dark:focus:ring-offset-gray-900'
                 >
                   {props.buttonText || 'Subscribe'}
                 </button>
@@ -182,7 +182,7 @@ export const customComponents: Components<{
   ),
 
   blockquote: (props: { children: React.ReactNode }) => (
-    <blockquote className='border-l-4 border-teal-500 pl-4 italic my-4 text-gray-600 dark:text-gray-400'>
+    <blockquote className='border-l-4 border-theme-500 pl-4 italic my-4 text-gray-600 dark:text-gray-400'>
       {props.children}
     </blockquote>
   ),
@@ -196,7 +196,7 @@ export const customComponents: Components<{
     return (
       <a
         href={safeHref}
-        className='text-teal-600 hover:text-teal-700 dark:text-teal-400 dark:hover:text-teal-300 underline'
+        className='text-theme-600 hover:text-theme-700 dark:text-theme-400 dark:hover:text-theme-300 underline'
       >
         {props.children}
       </a>

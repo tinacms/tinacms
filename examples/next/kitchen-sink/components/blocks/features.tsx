@@ -28,7 +28,6 @@ export const Feature = ({ featuresColor, data }: FeatureProps) => {
     >
       {data.icon && (
         <Icon
-          parentColor={featuresColor}
           data={{ size: 'large', ...data.icon }}
         />
       )}
@@ -137,7 +136,7 @@ export const Features = ({ data }: FeaturesProps) => {
   return (
     <Section color={data.color}>
       <Container
-        className={`flex flex-wrap gap-x-10 gap-y-8 text-left`}
+        className='flex flex-wrap gap-x-10 gap-y-8 text-left'
         size='large'
       >
         {normalizedItems &&

@@ -1,4 +1,5 @@
 import React from 'react';
+import { cn } from '@/lib/utils';
 
 type ContainerSize = 'custom' | 'small' | 'medium' | 'large' | 'default';
 type ContainerWidth = 'small' | 'medium' | 'large' | 'custom';
@@ -33,7 +34,7 @@ export const Container = ({
 
   return (
     <div
-      className={`${widthClass[width]} mx-auto px-6 sm:px-8 ${verticalPadding[size]} ${className}`}
+      className={cn(widthClass[width], 'mx-auto px-6 sm:px-8', verticalPadding[size], className)}
       {...props}
     >
       {children}

@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import client from '../../tina/__generated__/client';
-import { sanitizeImageSrc, cardLinkClasses } from '@/lib/utils';
+import { cn, sanitizeImageSrc, cardLinkClasses } from '@/lib/utils';
 import { PageSection } from '@/components/layout/page-section';
 import { Badge } from '@/components/ui/badge';
 
@@ -26,7 +26,7 @@ export default async function AuthorsPage() {
             <Link
               key={author._sys.filename}
               href={`/authors/${author._sys.filename}`}
-              className={`${cardLinkClasses} px-6 sm:px-8 py-8`}
+              className={cn(cardLinkClasses, 'px-6 sm:px-8 py-8')}
             >
               <div className='flex items-center gap-4 mb-4'>
                 {avatarSrc && (
@@ -38,7 +38,7 @@ export default async function AuthorsPage() {
                     className='object-cover rounded-full shadow-sm'
                   />
                 )}
-                <h2 className='text-2xl font-semibold text-gray-700 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-300 transition-all duration-150'>
+                <h2 className='text-2xl font-semibold text-gray-700 dark:text-white group-hover:text-theme-600 dark:group-hover:text-theme-300 transition-all duration-150'>
                   {author.name}
                 </h2>
               </div>

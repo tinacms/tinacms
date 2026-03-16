@@ -1,7 +1,6 @@
 'use client';
 
-import { titleColorClasses } from '@/lib/utils';
-import { useLayout } from '@/components/layout/layout-context';
+import { cn } from '@/lib/utils';
 
 /**
  * Themed gradient heading used on detail pages (authors, blogs, posts, etc.).
@@ -18,14 +17,13 @@ export function GradientTitle({
   as?: 'h1' | 'h2';
   className?: string;
 }) {
-  const { theme } = useLayout();
   const sizeClasses = size === '5xl' ? 'text-5xl' : 'text-6xl';
   return (
     <Tag
-      className={`w-full relative mb-8 ${sizeClasses} font-extrabold tracking-normal text-center title-font ${className}`}
+      className={cn('w-full relative mb-8 font-extrabold tracking-normal text-center title-font', sizeClasses, className)}
     >
       <span
-        className={`bg-clip-text text-transparent bg-gradient-to-r ${titleColorClasses[theme.color] || titleColorClasses.blue}`}
+        className='bg-clip-text text-transparent bg-gradient-to-r from-theme-400 to-theme-600 dark:from-theme-300 dark:to-theme-500'
       >
         {children}
       </span>
