@@ -34,7 +34,7 @@ export const CTA = ({ data }: CTAProps) => {
           )}
 
           {data.actions && (
-            <div className='mt-12'>
+            <div className='mt-12' data-tina-field={tinaField(data, 'actions')}>
               <Actions
                 className='justify-center py-2'
                 parentColor={data.color}

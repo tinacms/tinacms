@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useTina } from 'tinacms/dist/react';
+import { useTina, tinaField } from 'tinacms/dist/react';
 import { Blocks } from '@/components/blocks';
 import type { PageQuery, PageQueryVariables } from '@/tina/__generated__/types';
 
@@ -20,7 +20,7 @@ export default function ClientPage(props: ClientPageProps) {
   }
 
   return (
-    <>
+    <div data-tina-field={tinaField(page, 'blocks')}>
       {page.blocks && page.blocks.length > 0 ? (
         <Blocks blocks={page.blocks} />
       ) : (
@@ -28,6 +28,6 @@ export default function ClientPage(props: ClientPageProps) {
           No blocks to display
         </div>
       )}
-    </>
+    </div>
   );
 }

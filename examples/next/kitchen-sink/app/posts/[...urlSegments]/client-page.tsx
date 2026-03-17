@@ -4,7 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { sanitizeImageSrc } from '@/lib/utils';
-import { useTina } from 'tinacms/dist/react';
+import { useTina, tinaField } from 'tinacms/dist/react';
 import { TinaMarkdown } from 'tinacms/dist/rich-text';
 import { Section } from '@/components/layout/section';
 import { Container } from '@/components/layout/container';
@@ -40,8 +40,13 @@ export default function PostClientPage(props: PostClientPageProps) {
   return (
     <Section className='flex-1'>
       <Container width='small' className='flex-1 pb-2' size='large'>
-        <GradientTitle as='h2'>{post.title}</GradientTitle>
-        <div className='flex items-center justify-center mb-16'>
+        <GradientTitle as='h2' data-tina-field={tinaField(post, 'title')}>
+          {post.title}
+        </GradientTitle>
+        <div
+          className='flex items-center justify-center mb-16'
+          data-tina-field={tinaField(post, 'author')}
+        >
           {post.author && (
             <>
               {avatarSrc && (
@@ -72,13 +77,19 @@ export default function PostClientPage(props: PostClientPageProps) {
               </span>
             </>
           )}
-          <p className='text-base text-gray-400 dark:text-gray-300'>
+          <p
+            className='text-base text-gray-400 dark:text-gray-300'
+            data-tina-field={tinaField(post, 'date')}
+          >
             {formattedDate}
           </p>
         </div>
       </Container>
       {heroSrc && (
-        <div className='px-4 w-full'>
+        <div
+          className='px-4 w-full'
+          data-tina-field={tinaField(post, 'heroImg')}
+        >
           <div className='relative max-w-2xl mx-auto'>
             <Image
               src={heroSrc}
@@ -92,7 +103,10 @@ export default function PostClientPage(props: PostClientPageProps) {
         </div>
       )}
       <Container className='flex-1 pt-4' width='small' size='large'>
-        <div className='prose dark:prose-dark w-full max-w-none'>
+        <div
+          className='prose dark:prose-dark w-full max-w-none'
+          data-tina-field={tinaField(post, '_body')}
+        >
           <TinaMarkdown components={customComponents} content={post._body} />
         </div>
       </Container>

@@ -1,6 +1,6 @@
 'use client';
 import Image from 'next/image';
-import { useTina } from 'tinacms/dist/react';
+import { useTina, tinaField } from 'tinacms/dist/react';
 import { sanitizeImageSrc } from '@/lib/utils';
 import type { TinaPageProps } from '@/lib/types';
 import { TinaMarkdown } from 'tinacms/dist/rich-text';
@@ -35,15 +35,23 @@ export default function BlogClientPage(props: BlogClientProps) {
     return (
       <Section className='flex-1'>
         <Container width='small' size='large'>
-          <GradientTitle>{data.blog.title}</GradientTitle>
+          <GradientTitle data-tina-field={tinaField(data.blog, 'title')}>
+            {data.blog.title}
+          </GradientTitle>
 
           {data.blog.description && (
-            <p className='text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-6 text-center'>
+            <p
+              className='text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-6 text-center'
+              data-tina-field={tinaField(data.blog, 'description')}
+            >
               {data.blog.description}
             </p>
           )}
 
-          <div className='flex items-center justify-center gap-3 mb-16'>
+          <div
+            className='flex items-center justify-center gap-3 mb-16'
+            data-tina-field={tinaField(data.blog, 'author')}
+          >
             {avatarSrc && (
               <Image
                 src={avatarSrc}
@@ -60,14 +68,20 @@ export default function BlogClientPage(props: BlogClientProps) {
                 </span>
               )}
               <div className='flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500'>
-                {formattedDate && <span>Published {formattedDate}</span>}
+                {formattedDate && (
+                  <span data-tina-field={tinaField(data.blog, 'pubDate')}>
+                    Published {formattedDate}
+                  </span>
+                )}
                 {formattedUpdatedDate &&
                   formattedUpdatedDate !== formattedDate && (
                     <>
                       <span className='text-gray-200 dark:text-gray-700'>
                         ·
                       </span>
-                      <span>Updated {formattedUpdatedDate}</span>
+                      <span data-tina-field={tinaField(data.blog, 'updatedDate')}>
+                        Updated {formattedUpdatedDate}
+                      </span>
                     </>
                   )}
               </div>
@@ -76,7 +90,10 @@ export default function BlogClientPage(props: BlogClientProps) {
         </Container>
 
         {heroSrc && (
-          <div className='px-4 w-full'>
+          <div
+            className='px-4 w-full'
+            data-tina-field={tinaField(data.blog, 'heroImage')}
+          >
             <div className='relative max-w-2xl mx-auto'>
               <Image
                 src={heroSrc}
@@ -91,7 +108,10 @@ export default function BlogClientPage(props: BlogClientProps) {
         )}
 
         <Container className='flex-1 pt-4' width='small' size='large'>
-          <div className='prose dark:prose-dark w-full max-w-none'>
+          <div
+            className='prose dark:prose-dark w-full max-w-none'
+            data-tina-field={tinaField(data.blog, '_body')}
+          >
             <TinaMarkdown
               components={customComponents}
               content={data.blog._body}

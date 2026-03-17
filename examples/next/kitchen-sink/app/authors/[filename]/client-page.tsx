@@ -1,6 +1,6 @@
 'use client';
 import Image from 'next/image';
-import { useTina } from 'tinacms/dist/react';
+import { useTina, tinaField } from 'tinacms/dist/react';
 import { sanitizeImageSrc } from '@/lib/utils';
 import type { TinaPageProps } from '@/lib/types';
 import { Section } from '@/components/layout/section';
@@ -33,20 +33,27 @@ export default function AuthorClientPage(props: TinaPageProps) {
                 height={128}
                 priority
                 className='rounded-full mb-6 object-cover shadow-sm'
+                data-tina-field={tinaField(data.author, 'avatar')}
               />
             )}
-            <GradientTitle size='5xl' className='mb-4'>
+            <GradientTitle size='5xl' className='mb-4' data-tina-field={tinaField(data.author, 'name')}>
               {data.author.name}
             </GradientTitle>
             {data.author.description && (
-              <p className='text-lg text-gray-600 dark:text-gray-400 max-w-2xl'>
+              <p
+                className='text-lg text-gray-600 dark:text-gray-400 max-w-2xl'
+                data-tina-field={tinaField(data.author, 'description')}
+              >
                 {data.author.description}
               </p>
             )}
           </div>
 
           {data.author.hobbies && data.author.hobbies.length > 0 && (
-            <div className='mt-8 p-6 bg-gray-50 dark:bg-gray-900 rounded-lg'>
+            <div
+              className='mt-8 p-6 bg-gray-50 dark:bg-gray-900 rounded-lg'
+              data-tina-field={tinaField(data.author, 'hobbies')}
+            >
               <h3 className='text-lg font-semibold text-gray-900 dark:text-gray-50 mb-4'>
                 Hobbies
               </h3>

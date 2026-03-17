@@ -27,9 +27,11 @@ export const Feature = ({ featuresColor, data }: FeatureProps) => {
       style={{ flexBasis: '16rem' }}
     >
       {data.icon && (
-        <Icon
-          data={{ size: 'large', ...data.icon }}
-        />
+        <div data-tina-field={tinaField(data, 'icon')}>
+          <Icon
+            data={{ size: 'large', ...data.icon }}
+          />
+        </div>
       )}
       {data.title && (
         <h3
@@ -48,10 +50,12 @@ export const Feature = ({ featuresColor, data }: FeatureProps) => {
         </p>
       )}
       {data.actions && (
-        <Actions
-          actions={data.actions}
-          parentColor={featuresColor}
-        />
+        <div data-tina-field={tinaField(data, 'actions')}>
+          <Actions
+            actions={data.actions}
+            parentColor={featuresColor}
+          />
+        </div>
       )}
     </div>
   );

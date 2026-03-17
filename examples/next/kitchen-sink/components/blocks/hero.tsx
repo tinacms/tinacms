@@ -55,11 +55,13 @@ export const Hero = ({ data }: HeroProps) => {
             </div>
           )}
           {data.actions && (
-            <Actions
-              className='justify-center lg:justify-start py-2'
-              parentColor={data.color}
-              actions={data.actions}
-            />
+            <div data-tina-field={tinaField(data, 'actions')}>
+              <Actions
+                className='justify-center lg:justify-start py-2'
+                parentColor={data.color}
+                actions={data.actions}
+              />
+            </div>
           )}
         </div>
         {data.image &&

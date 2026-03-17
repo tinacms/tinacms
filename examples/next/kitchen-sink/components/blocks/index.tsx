@@ -2,6 +2,7 @@
 
 import React from 'react';
 import dynamic from 'next/dynamic';
+import { tinaField } from 'tinacms/dist/react';
 import type {
   PageBlocks,
   PageBlocksHero,
@@ -57,19 +58,23 @@ export const Blocks = ({
         const template =
           blockWithMeta._template || typeNameMap[typename] || typename;
 
+        let content: React.ReactNode = null;
         switch (template) {
           case 'hero':
-            return <Hero key={i} data={block as PageBlocksHero} />;
+            content = <Hero data={block as PageBlocksHero} />;
+            break;
           case 'features':
-            return <Features key={i} data={block as PageBlocksFeatures} />;
+            content = <Features data={block as PageBlocksFeatures} />;
+            break;
           case 'cta':
-            return <CTA key={i} data={block as PageBlocksCta} />;
+            content = <CTA data={block as PageBlocksCta} />;
+            break;
           case 'testimonial':
-            return (
-              <Testimonial key={i} data={block as PageBlocksTestimonial} />
-            );
+            content = <Testimonial data={block as PageBlocksTestimonial} />;
+            break;
           case 'content':
-            return <Content key={i} data={block as PageBlocksContent} />;
+            content = <Content data={block as PageBlocksContent} />;
+            break;
           default:
             return (
               <div
@@ -80,6 +85,11 @@ export const Blocks = ({
               </div>
             );
         }
+        return (
+          <div key={i} data-tina-field={tinaField(block)}>
+            {content}
+          </div>
+        );
       })}
     </>
   );
