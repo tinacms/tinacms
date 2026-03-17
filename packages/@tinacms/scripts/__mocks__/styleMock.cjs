@@ -2,6 +2,6 @@
 
 */
 
-// __mocks__/styleMock.js
+// __mocks__/styleMock.cjs
 
 module.exports = '';
