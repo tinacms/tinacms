@@ -2,7 +2,7 @@ import React from 'react';
 import { wrapFieldsWithMeta } from 'tinacms';
 import { cn } from '@/lib/utils';
 
-export const colorOptions = [
+const colorOptions = [
   'blue',
   'teal',
   'green',

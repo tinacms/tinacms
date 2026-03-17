@@ -5,7 +5,7 @@ import { BiRightArrowAlt } from 'react-icons/bi';
 import { cn } from '@/lib/utils';
 import { tinaField } from 'tinacms/dist/react';
 
-export interface NavAction {
+interface NavAction {
   label?: string;
   type?: string;
   link?: string;
