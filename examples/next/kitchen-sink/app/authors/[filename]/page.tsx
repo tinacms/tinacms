@@ -29,7 +29,7 @@ export default async function AuthorFile({ params }: Props) {
     <AuthorClientPage
       query={tinaProps.query}
       variables={tinaProps.variables}
-      data={JSON.parse(JSON.stringify(tinaProps.data))}
+      data={tinaProps.data}
     />
   );
 }

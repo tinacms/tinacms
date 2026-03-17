@@ -100,11 +100,12 @@ export const MobileNavDrawer = ({
         {/* Navigation Items */}
         <div className='px-4 py-6 space-y-2'>
           {nav.map((item, idx) => {
-            const active = isActive(item?.href ?? '/');
+            if (!item) return null;
+            const active = isActive(item.href ?? '/');
             return (
               <Link
-                key={item?.href ?? `nav-${idx}`}
-                href={sanitizeHref(item?.href, '/')}
+                key={item.href ?? `nav-${idx}`}
+                href={sanitizeHref(item.href, '/')}
                 onClick={onClose}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
@@ -114,7 +115,7 @@ export const MobileNavDrawer = ({
                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                 )}
               >
-                {item?.label}
+                {item.label}
               </Link>
             );
           })}
