@@ -11,8 +11,6 @@ import { gfm } from 'micromark-extension-gfm';
 import { remark } from 'remark';
 import remarkGfm from 'remark-gfm';
 import remarkMdx, { type Root } from 'remark-mdx';
-import { markSyntax } from '../extensions/mark/syntax';
-import { markFromMarkdown } from '../extensions/mark/mdast';
 import { tinaDirective } from '../extensions/tina-shortcodes/extension';
 import { directiveFromMarkdown } from '../extensions/tina-shortcodes/from-markdown';
 import { parseMDX as parseMDXNext } from '../next';
@@ -87,18 +85,13 @@ export const markdownToAst = (value: string, field: RichTextType) => {
     }
   });
   return fromMarkdown(value, {
-    extensions: [gfm(), tinaDirective(patterns), markSyntax()],
-    mdastExtensions: [gfmFromMarkdown(), directiveFromMarkdown, markFromMarkdown],
+    extensions: [gfm(), tinaDirective(patterns)],
+    mdastExtensions: [gfmFromMarkdown(), directiveFromMarkdown],
   });
 };
-function remarkMark(this: any) {
-  const data = this.data() as Record<string, unknown[]>;
-  (data.micromarkExtensions || (data.micromarkExtensions = [])).push(markSyntax());
-  (data.fromMarkdownExtensions || (data.fromMarkdownExtensions = [])).push(markFromMarkdown);
-}
 
 export const mdxToAst = (value: string) => {
-  return remark().use(remarkMdx).use(remarkGfm).use(remarkMark).parse(value);
+  return remark().use(remarkMdx).use(remarkGfm).parse(value);
 };
 export const MDX_PARSE_ERROR_MSG =
   'TinaCMS supports a stricter version of markdown and a subset of MDX. https://tina.io/docs/r/what-is-markdown';

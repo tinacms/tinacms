@@ -7,25 +7,17 @@ import { getFieldPatterns } from '../util';
 import * as acorn from 'acorn';
 import type { RichTextField, Template } from '@tinacms/schema-tools';
 import type { Options } from '../shortcodes';
-import { markSyntax } from '../../extensions/mark/syntax';
-import { markFromMarkdown } from '../../extensions/mark/mdast';
 
 export const fromMarkdown = (value: string, field: RichTextField) => {
   const patterns = getFieldPatterns(field);
   const acornDefault = acorn as unknown as Options['acorn'];
   const skipHTML = false;
-  // if (field.parser?.type === 'markdown') {
-  //   if (['all', 'html'].includes(field.parser?.skipEscaping || '')) {
-  //     skipHTML = true
-  //   }
-  // }
   const tree = mdastFromMarkdown(value, {
     extensions: [
       gfm(),
       mdxJsx({ acorn: acornDefault, patterns, addResult: true, skipHTML }),
-      markSyntax(),
     ],
-    mdastExtensions: [gfmFromMarkdown(), mdxJsxFromMarkdown({ patterns }), markFromMarkdown],
+    mdastExtensions: [gfmFromMarkdown(), mdxJsxFromMarkdown({ patterns })],
   });
 
   return tree;
