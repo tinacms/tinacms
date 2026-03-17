@@ -6,14 +6,14 @@ import { cn } from '@/lib/utils';
 import { tinaField } from 'tinacms/dist/react';
 
 interface NavAction {
-  label?: string;
-  type?: string;
-  link?: string;
-  icon?: boolean;
+  label?: string | null;
+  type?: string | null;
+  link?: string | null;
+  icon?: boolean | null;
 }
 
 interface ActionsProps {
-  parentColor?: string;
+  parentColor?: string | null;
   className?: string;
   actions?: Array<NavAction | null>;
 }

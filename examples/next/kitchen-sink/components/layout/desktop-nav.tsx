@@ -21,7 +21,8 @@ export const DesktopNav = ({ nav, isPrimary }: DesktopNavProps) => {
 
   return (
     <nav className='hidden sm:flex items-center gap-0 sm:gap-1'>
-      {nav.map((item: GlobalHeaderNav, idx: number) => {
+      {nav.map((item, idx) => {
+        if (!item) return null;
         const active = isActive(item.href ?? '/');
         return (
           <Link
