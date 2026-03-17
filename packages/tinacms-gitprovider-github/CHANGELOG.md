@@ -1,5 +1,11 @@
 # tinacms-gitprovider-github
 
+## 4.0.13
+
+### Patch Changes
+
+- [#6514](https://github.com/tinacms/tinacms/pull/6514) [`9a74996`](https://github.com/tinacms/tinacms/commit/9a749961221ebaa9f6c8b2a1a80f2f14e8f05629) Thanks [@Ben0189](https://github.com/Ben0189)! - Add `"type": "module"` to package metadata to align published packages with ESM output and satisfy stricter publint checks.
+
 ## 4.0.12
 
 ### Patch Changes
