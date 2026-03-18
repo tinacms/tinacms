@@ -171,7 +171,10 @@ export const CreateBranchModal = ({
         }
       }
 
-      const params = tinaApi.schema.transformPayload(collection.name, submittedValues);
+      const params = tinaApi.schema.transformPayload(
+        collection.name,
+        submittedValues
+      );
       const relativePath = pathRelativeToCollection(collection.path, path);
 
       const result = await tinaApi.executeEditorialWorkflow({
