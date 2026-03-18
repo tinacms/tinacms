@@ -1,23 +1,27 @@
-Some ==highlighted== text
+Some <mark>highlighted</mark> text
+
+Some <mark style="background-color: #BFDBFE">blue highlighted</mark> text
 
 Some **bold** text
 
-Some ==highlighted text== with more content
+Some <mark>highlighted text</mark> with more content
 
-Some **bold and ==highlighted==** text
+Some **bold and <mark>highlighted</mark>** text
 
-*==italic and highlighted==*
+*<mark>italic and highlighted</mark>*
 
-==highlight at start== of line
+<mark>highlight at start</mark> of line
 
-end of line ==highlight==
+end of line <mark>highlight</mark>
 
 a = b is not highlighted
 
-~~==strikethrough and highlighted==~~
+~~<mark>strikethrough and highlighted</mark>~~
 
-***==bold italic and highlighted==***
+***<mark>bold italic and highlighted</mark>***
 
-==[link text](https://example.com)==
+[<mark>link text</mark>](https://example.com)
 
-**==[bold link](https://example.com)==**
+**[<mark>bold link</mark>](https://example.com)**
+
+<mark style="background-color: #FBCFE8">pink highlight</mark>

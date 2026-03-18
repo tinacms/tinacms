@@ -28,6 +28,25 @@
         },
         {
           "type": "text",
+          "text": "blue highlighted",
+          "highlight": true,
+          "highlightColor": "#BFDBFE"
+        },
+        {
+          "type": "text",
+          "text": " text"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Some "
+        },
+        {
+          "type": "text",
           "text": "bold",
           "bold": true
         },
@@ -70,8 +89,8 @@
         {
           "type": "text",
           "text": "highlighted",
-          "bold": true,
-          "highlight": true
+          "highlight": true,
+          "bold": true
         },
         {
           "type": "text",
@@ -85,8 +104,8 @@
         {
           "type": "text",
           "text": "italic and highlighted",
-          "italic": true,
-          "highlight": true
+          "highlight": true,
+          "italic": true
         }
       ]
     },
@@ -133,8 +152,8 @@
         {
           "type": "text",
           "text": "strikethrough and highlighted",
-          "strikethrough": true,
-          "highlight": true
+          "highlight": true,
+          "strikethrough": true
         }
       ]
     },
@@ -144,9 +163,9 @@
         {
           "type": "text",
           "text": "bold italic and highlighted",
+          "highlight": true,
           "italic": true,
-          "bold": true,
-          "highlight": true
+          "bold": true
         }
       ]
     },
@@ -178,10 +197,21 @@
             {
               "type": "text",
               "text": "bold link",
-              "bold": true,
-              "highlight": true
+              "highlight": true,
+              "bold": true
             }
           ]
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "pink highlight",
+          "highlight": true,
+          "highlightColor": "#FBCFE8"
         }
       ]
     }
