@@ -58,6 +58,16 @@ const blockClasses = 'mt-0.5';
 /** prose sets a bold font, making bold marks impossible to see */
 const headerClasses = 'font-normal';
 
+const HighlightLeaf = ({ leaf, ...props }: React.ComponentProps<typeof PlateLeaf>) => (
+  <PlateLeaf
+    as='mark'
+    className='rounded-sm px-0.5'
+    style={{ backgroundColor: (leaf.highlightColor as string) || '#FEF08A' }}
+    leaf={leaf}
+    {...props}
+  />
+);
+
 export const Components = () => {
   return {
     [SlashInputPlugin.key]: SlashInputElement,
@@ -210,10 +220,7 @@ export const Components = () => {
     [ListItemPlugin.key]: withProps(PlateElement, { as: 'li' }),
     [LinkPlugin.key]: LinkElement,
     [CodePlugin.key]: CodeLeaf,
-    [HighlightPlugin.key]: withProps(PlateLeaf, {
-      as: 'mark',
-      className: 'bg-yellow-200',
-    }),
+    [HighlightPlugin.key]: HighlightLeaf,
     [UnderlinePlugin.key]: withProps(PlateLeaf, { as: 'u' }),
     [StrikethroughPlugin.key]: withProps(PlateLeaf, { as: 's' }),
     [ItalicPlugin.key]: withProps(PlateLeaf, { as: 'em' }),

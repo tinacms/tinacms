@@ -35,12 +35,12 @@ export const autoformatMarks: AutoformatRule[] = [
   },
   {
     mode: 'mark',
-    type: StrikethroughPlugin.key,
-    match: ['~~', '~'],
+    type: HighlightPlugin.key,
+    match: '==',
   },
   {
     mode: 'mark',
-    type: HighlightPlugin.key,
-    match: '==',
+    type: StrikethroughPlugin.key,
+    match: ['~~', '~'],
   },
 ];

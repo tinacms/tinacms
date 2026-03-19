@@ -201,6 +201,7 @@ export type TextElement = {
   code?: boolean;
   strikethrough?: boolean;
   highlight?: boolean;
+  highlightColor?: string;
 };
 /**
  * @remarks
