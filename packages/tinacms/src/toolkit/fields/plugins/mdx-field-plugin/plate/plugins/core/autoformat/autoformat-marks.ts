@@ -5,7 +5,6 @@ import {
   ItalicPlugin,
   StrikethroughPlugin,
 } from '@udecode/plate-basic-marks/react';
-import { HighlightPlugin } from '@udecode/plate-highlight/react';
 
 export const autoformatMarks: AutoformatRule[] = [
   {
@@ -32,11 +31,6 @@ export const autoformatMarks: AutoformatRule[] = [
     mode: 'mark',
     type: CodePlugin.key,
     match: '`',
-  },
-  {
-    mode: 'mark',
-    type: HighlightPlugin.key,
-    match: '==',
   },
   {
     mode: 'mark',
