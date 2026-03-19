@@ -1,5 +1,11 @@
 # tinacms
 
+## 3.6.3
+
+### Patch Changes
+
+- [#6524](https://github.com/tinacms/tinacms/pull/6524) [`3c45642`](https://github.com/tinacms/tinacms/commit/3c45642650e1a9e9fd340c62c9a5372d10f0bee7) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Fix broken cross-package relative import for posthog in @tinacms/app that caused consumer build failures
+
 ## 3.6.2
 
 ### Patch Changes

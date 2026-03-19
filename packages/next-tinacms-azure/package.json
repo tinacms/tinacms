@@ -1,7 +1,7 @@
 {
   "name": "next-tinacms-azure",
   "type": "module",
-  "version": "11.0.2",
+  "version": "11.0.3",
   "description": "",
   "main": "dist/index.js",
   "module": "./dist/index.js",
