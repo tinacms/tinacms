@@ -141,6 +141,20 @@ const text = (content: { text: string }) => {
   };
 };
 
+const markAttributes = (content: Plate.TextElement) => {
+  if (!content.highlightColor) {
+    return [];
+  }
+
+  return [
+    {
+      type: 'mdxJsxAttribute' as const,
+      name: 'style',
+      value: `background-color: ${content.highlightColor}`,
+    },
+  ];
+};
+
 export const eat = (
   c: InlineElementWithCallback[],
   field: RichTextType,
@@ -259,7 +273,9 @@ export const eat = (
       : innerText;
     return [
       {
-        type: 'highlight',
+        type: 'mdxJsxTextElement',
+        name: 'mark',
+        attributes: markAttributes(f),
         children: [child],
       } as unknown as Md.PhrasingContent,
       ...eat(content.slice(1), field, imageCallback),
