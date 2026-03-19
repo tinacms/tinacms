@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import type { TinaCMS } from '@tinacms/toolkit';
 import { scanAllMedia } from './media-usage-scanner';
 
 // Creates a minimal stub media item for cms.media.list
@@ -114,7 +115,7 @@ const buildStubCms = ({
         return undefined;
       }),
     },
-  };
+  } as unknown as TinaCMS;
 };
 
 describe('scanAllMedia', () => {
@@ -124,7 +125,7 @@ describe('scanAllMedia', () => {
       const cms = buildStubCms({ mediaItems: [], collectionNames: [] });
 
       // Act: Scan all media
-      const result = await scanAllMedia(cms as any);
+      const result = await scanAllMedia(cms);
 
       // Assert: Empty array
       expect(result).toEqual([]);
@@ -146,7 +147,7 @@ describe('scanAllMedia', () => {
       });
 
       // Act: Scan all media
-      const result = await scanAllMedia(cms as any);
+      const result = await scanAllMedia(cms);
 
       // Assert: Media item with count 0 and no usedIn entries
       expect(result).toHaveLength(1);
@@ -170,7 +171,7 @@ describe('scanAllMedia', () => {
       });
 
       // Act: Scan all media
-      const result = await scanAllMedia(cms as any);
+      const result = await scanAllMedia(cms);
 
       // Assert: Media item with count 1 and one usedIn entry
       expect(result[0].usedIn).toHaveLength(1);
@@ -195,7 +196,7 @@ describe('scanAllMedia', () => {
       });
 
       // Act: Scan all media
-      const result = await scanAllMedia(cms as any);
+      const result = await scanAllMedia(cms);
 
       // Assert: Media item with two usedIn entries
       expect(result[0].usedIn).toHaveLength(2);
@@ -222,7 +223,7 @@ describe('scanAllMedia', () => {
       });
 
       // Act: Scan all media
-      const result = await scanAllMedia(cms as any);
+      const result = await scanAllMedia(cms);
 
       // Assert: Media item with count 1 and one usedIn entry
       expect(result[0].usedIn).toHaveLength(1);
@@ -247,7 +248,7 @@ describe('scanAllMedia', () => {
       });
 
       // Act: Scan all media
-      const result = await scanAllMedia(cms as any);
+      const result = await scanAllMedia(cms);
 
       // Assert: Media item with count 0 and no usedIn entries
       expect(result[0].usedIn).toHaveLength(0);
@@ -273,10 +274,60 @@ describe('scanAllMedia', () => {
       });
 
       // Act: Scan all media
-      const result = await scanAllMedia(cms as any);
+      const result = await scanAllMedia(cms);
 
       // Assert: Media item with count 0 and no usedIn entries
       expect(result[0].usedIn).toHaveLength(0);
+    });
+  });
+
+  describe('Special Characters in Filenames', () => {
+    it('matches media whose src contains characters that JSON.stringify escapes (e.g. quotes)', async () => {
+      // Arrange: filename with a double-quote — JSON.stringify will escape it to \"
+      const mediaItem = makeStubMediaItem(
+        'weird',
+        'say"cheese.png',
+        '/uploads/say"cheese.png'
+      );
+      const cms = buildStubCms({
+        mediaItems: [mediaItem],
+        collectionNames: ['posts'],
+        documentsByCollection: {
+          posts: [
+            makeStubDocumentEdge('posts', {
+              image: mediaItem.src,
+            }),
+          ],
+        },
+      });
+
+      const result = await scanAllMedia(cms);
+
+      expect(result[0].usedIn).toHaveLength(1);
+    });
+
+    it('matches media whose src contains a backslash', async () => {
+      // Arrange: filename with a backslash — JSON.stringify escapes \ to \\
+      const mediaItem = makeStubMediaItem(
+        'bs',
+        'back\\slash.png',
+        '/uploads/back\\slash.png'
+      );
+      const cms = buildStubCms({
+        mediaItems: [mediaItem],
+        collectionNames: ['posts'],
+        documentsByCollection: {
+          posts: [
+            makeStubDocumentEdge('posts', {
+              image: mediaItem.src,
+            }),
+          ],
+        },
+      });
+
+      const result = await scanAllMedia(cms);
+
+      expect(result[0].usedIn).toHaveLength(1);
     });
   });
 
@@ -307,7 +358,7 @@ describe('scanAllMedia', () => {
       });
 
       // Act: Scan all media
-      const result = await scanAllMedia(cms as any);
+      const result = await scanAllMedia(cms);
 
       // Assert: Media items with count 1 and one usedIn entry each
       const usage1 = result.find((r) => r.media.id === 'img1')!;
@@ -346,7 +397,7 @@ describe('scanAllMedia', () => {
       });
 
       // Act: Scan all media
-      const result = await scanAllMedia(cms as any);
+      const result = await scanAllMedia(cms);
 
       // Assert: Media item with default edit URL
       expect(result[0].usedIn[0].editUrl).toBe(
@@ -376,7 +427,7 @@ describe('scanAllMedia', () => {
         });
 
         // Act: Scan all media
-        const result = await scanAllMedia(cms as any);
+        const result = await scanAllMedia(cms);
 
         // Assert: Media item with normalized custom router path
         expect(result[0].usedIn[0].editUrl).toBe('#/~/posts/hello');
@@ -405,7 +456,7 @@ describe('scanAllMedia', () => {
       });
 
       // Act: Scan all media
-      const result = await scanAllMedia(cms as any);
+      const result = await scanAllMedia(cms);
 
       // Assert: Media item with custom router
       expect(result[0].usedIn[0].editUrl).toBe('#/~/base/posts/hello');
@@ -437,7 +488,7 @@ describe('scanAllMedia', () => {
       });
 
       // Act: Scan all media
-      const result = await scanAllMedia(cms as any);
+      const result = await scanAllMedia(cms);
 
       // Assert: URL is built from template + filename, proving those _sys fields reached the router
       expect(result[0].usedIn[0].editUrl).toBe('#/~/blog/post/hello');
@@ -469,7 +520,7 @@ describe('scanAllMedia', () => {
         });
 
         // Act: Scan all media
-        const result = await scanAllMedia(cms as any);
+        const result = await scanAllMedia(cms);
 
         // Assert: Media item with custom router
         expect(result[0].usedIn[0].editUrl).toBe(
@@ -506,7 +557,7 @@ describe('scanAllMedia', () => {
         );
 
       // Act: Scan all media
-      const result = await scanAllMedia(cms as any);
+      const result = await scanAllMedia(cms);
 
       // Assert: Media items across multiple pages
       expect(result).toHaveLength(2);
@@ -542,7 +593,7 @@ describe('scanAllMedia', () => {
         .mockResolvedValueOnce(page2);
 
       // Act: Scan all media
-      const result = await scanAllMedia(cms as any);
+      const result = await scanAllMedia(cms);
 
       // Assert: Media item across multiple pages
       expect(result[0].usedIn).toHaveLength(2);
@@ -585,7 +636,7 @@ describe('scanAllMedia', () => {
         });
 
       // Act: Scan all media
-      const result = await scanAllMedia(cms as any);
+      const result = await scanAllMedia(cms);
 
       // Assert: Media item in subdirectory
       expect(result).toHaveLength(1);
@@ -624,7 +675,7 @@ describe('scanAllMedia', () => {
           .mockRejectedValue(new Error('GraphQL network error'));
 
         // Act: Scan all media
-        await expect(scanAllMedia(cms as any)).rejects.toThrow(
+        await expect(scanAllMedia(cms)).rejects.toThrow(
           'GraphQL network error'
         );
       } finally {
@@ -661,7 +712,7 @@ describe('scanAllMedia', () => {
       });
 
       // Act: Scan all media
-      const result = await scanAllMedia(cms as any);
+      const result = await scanAllMedia(cms);
 
       // Assert: Media item in collection
       const usage1 = result.find((r) => r.media.id === 'img1')!;
@@ -692,7 +743,7 @@ describe('scanAllMedia', () => {
         });
 
         // Act: Scan all media
-        const result = await scanAllMedia(cms as any);
+        const result = await scanAllMedia(cms);
 
         // Assert: Media item type
         expect(result[0].type).toBe('image');
@@ -715,7 +766,7 @@ describe('scanAllMedia', () => {
         });
 
         // Act: Scan all media
-        const result = await scanAllMedia(cms as any);
+        const result = await scanAllMedia(cms);
 
         // Assert: Media item type
         expect(result[0].type).toBe('video');
@@ -732,7 +783,7 @@ describe('scanAllMedia', () => {
       });
 
       // Act: Scan all media
-      const result = await scanAllMedia(cms as any);
+      const result = await scanAllMedia(cms);
 
       // Assert: Media item type
       expect(result[0].type).toBe('other');

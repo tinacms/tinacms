@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { cn } from '@utils/cn';
@@ -12,22 +10,10 @@ function Dialog({
   return <DialogPrimitive.Root data-slot='dialog' {...props} />;
 }
 
-function DialogTrigger({
-  ...props
-}: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
-  return <DialogPrimitive.Trigger data-slot='dialog-trigger' {...props} />;
-}
-
 function DialogPortal({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Portal>) {
   return <DialogPrimitive.Portal data-slot='dialog-portal' {...props} />;
-}
-
-function DialogClose({
-  ...props
-}: React.ComponentProps<typeof DialogPrimitive.Close>) {
-  return <DialogPrimitive.Close data-slot='dialog-close' {...props} />;
 }
 
 function DialogOverlay({
@@ -83,45 +69,6 @@ function DialogContent({
   );
 }
 
-function DialogHeader({ className, ...props }: React.ComponentProps<'div'>) {
-  return (
-    <div
-      data-slot='dialog-header'
-      className={cn('gap-2 flex flex-col', className)}
-      {...props}
-    />
-  );
-}
-DialogHeader.displayName = 'DialogHeader';
-
-function DialogFooter({
-  className,
-  showCloseButton = false,
-  children,
-  ...props
-}: React.ComponentProps<'div'> & {
-  showCloseButton?: boolean;
-}) {
-  return (
-    <div
-      data-slot='dialog-footer'
-      className={cn(
-        'bg-muted/50 -mx-4 -mb-4 rounded-b-xl border-t p-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end',
-        className
-      )}
-      {...props}
-    >
-      {children}
-      {showCloseButton && (
-        <DialogPrimitive.Close asChild>
-          <Button variant='outline'>Close</Button>
-        </DialogPrimitive.Close>
-      )}
-    </div>
-  );
-}
-DialogFooter.displayName = 'DialogFooter';
-
 function DialogTitle({
   className,
   ...props
@@ -153,15 +100,4 @@ function DialogDescription({
 }
 DialogDescription.displayName = DialogPrimitive.Description.displayName;
 
-export {
-  Dialog,
-  DialogTrigger,
-  DialogPortal,
-  DialogClose,
-  DialogOverlay,
-  DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
-  DialogDescription,
-};
+export { Dialog, DialogOverlay, DialogContent, DialogTitle, DialogDescription };

@@ -20,10 +20,7 @@ export const MediaLightbox = ({
   const imageSrc = item.media.src || item.media.thumbnails?.['75x75'];
 
   return (
-    <Dialog
-      open={Boolean(item)}
-      onOpenChange={(isOpen) => !isOpen && onClose()}
-    >
+    <Dialog open onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent className='w-auto max-w-[95vw] border border-gray-200 bg-white px-4 pt-12 pb-4 shadow-xl sm:max-w-fit'>
         <DialogTitle className='sr-only'>
           Preview: {item.media.filename}

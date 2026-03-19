@@ -12,6 +12,7 @@ import {
   DashboardLoadingState,
   DashboardErrorState,
 } from '../dashboard-ui';
+import type { ScreenComponentProps } from '@toolkit/react-screens';
 import type { MediaUsage } from './media-usage-scanner';
 import { useMediaUsageScanner } from './useMediaUsageScanner';
 import { MediaLightbox } from './media-lightbox';
@@ -22,8 +23,8 @@ import { MediaUsageTable } from './media-usage-table';
  */
 export const MediaUsageDashboard = ({
   close: onClose,
-}: { close?: () => void }) => {
-  const { mediaItems, isLoading, errorOccurred, refresh } =
+}: ScreenComponentProps) => {
+  const { mediaItems, isLoading, errorOccurred, progress, refresh } =
     useMediaUsageScanner();
   const [lightboxImage, setLightboxImage] = useState<MediaUsage | null>(null);
 
@@ -41,7 +42,12 @@ export const MediaUsageDashboard = ({
   }, [mediaItems]);
 
   if (isLoading) {
-    return <DashboardLoadingState message='Scanning Media Usage...' />;
+    return (
+      <DashboardLoadingState
+        message='Scanning Media Usage...'
+        progress={{ value: progress, label: 'Scanning collections' }}
+      />
+    );
   }
   if (errorOccurred) {
     return (

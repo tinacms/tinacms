@@ -121,10 +121,10 @@ const scanDocumentForMedia = (
   const matchedIds = new Set<string>();
 
   for (const mediaUsage of mediaUsages) {
-    // Fetch src path of media item
-    const src = mediaUsage.media.src;
+    // JSON.stringify the src so its escaping matches the stringified document content
+    // (e.g. quotes become \", backslashes become \\)
+    const src = JSON.stringify(mediaUsage.media.src).slice(1, -1);
 
-    // Check for substring matches of the media src in the document content
     let index = documentContent.indexOf(src);
 
     while (index !== -1) {
@@ -132,9 +132,9 @@ const scanDocumentForMedia = (
       const prevChar = documentContent[index - 1];
       const nextChar = documentContent[index + src.length];
 
-      // A match is valid if the character before and after the src is NOT a valid filename character (alphanumeric, underscore, dot, or hyphen)
-      const isPrevValid = !prevChar || !/[a-zA-Z0-9_.-]/.test(prevChar);
-      const isNextValid = !nextChar || !/[a-zA-Z0-9_.-]/.test(nextChar);
+      // A match is valid if the character before and after the src is NOT a valid filename/URL character
+      const isPrevValid = !prevChar || !/[a-zA-Z0-9_.%~+-]/.test(prevChar);
+      const isNextValid = !nextChar || !/[a-zA-Z0-9_.%~+-]/.test(nextChar);
 
       if (isPrevValid && isNextValid) {
         matchedIds.add(mediaUsage.media.id);
@@ -151,6 +151,7 @@ const scanDocumentForMedia = (
 
 const THUMBNAIL_SIZES = [{ w: 75, h: 75 }];
 const BATCH_SIZE = 100;
+const UI_YIELD_INTERVAL = 50;
 
 /**
  * Helper function to recursively collect all media files from the CMS.
@@ -234,41 +235,42 @@ const scanCollectionForMediaUsage = async (
   // Pre-calculate the media usages array
   const mediaUsages = Object.values(mediaIdToUsageMap);
 
+  // Fetch _sys fully because `ui.router` could utilize any of them to construct a route
+  const listQuery = `
+    query($after: String, $first: Float) {
+      collectionConnection: ${collectionMeta.name}Connection(first: $first, after: $after) {
+        pageInfo { hasNextPage, endCursor }
+        edges {
+          node {
+            ... on Document {
+              _sys {
+                relativePath
+                filename
+                basename
+                path
+                breadcrumbs
+                extension
+                template
+                title
+                hasReferences
+                collection {
+                  name
+                  label
+                  path
+                  format
+                }
+              }
+              _values
+            }
+          }
+        }
+      }
+    }
+  `;
+
   // Paginate through all documents in the collection
   while (hasNextPage) {
     try {
-      // Fetch _sys fully because `ui.router` could utilize any of them to construct a route
-      const listQuery = `
-          query($after: String, $first: Float) {
-            collectionConnection: ${collectionMeta.name}Connection(first: $first, after: $after) {
-              pageInfo { hasNextPage, endCursor }
-              edges {
-                node {
-                  ... on Document {
-                    _sys {
-                      relativePath
-                      filename
-                      basename
-                      path
-                      breadcrumbs
-                      extension
-                      template
-                      title
-                      hasReferences
-                      collection {
-                        name
-                        label
-                        path
-                        format
-                      }
-                    }
-                    _values
-                  }
-                }
-              }
-            }
-          }
-        `;
       // Execute the GraphQL query to fetch a page of documents from the collection
       const res = (await cms.api.tina.request(listQuery, {
         variables: { after, first: BATCH_SIZE },
@@ -281,9 +283,13 @@ const scanCollectionForMediaUsage = async (
       after = connection?.pageInfo?.endCursor;
 
       // Extract document data from edges sequentially
-      for (const edge of edges) {
-        // Yield to the main thread briefly to avoid freezing the UI on large datasets
-        await new Promise((resolve) => setTimeout(resolve, 0));
+      for (let i = 0; i < edges.length; i++) {
+        // Yield to the main thread periodically to avoid freezing the UI on large datasets
+        if (i > 0 && i % UI_YIELD_INTERVAL === 0) {
+          await new Promise((resolve) => setTimeout(resolve, 0));
+        }
+
+        const edge = edges[i];
 
         // Scan document values for media references
         const matchedIds = scanDocumentForMedia(
@@ -319,9 +325,13 @@ const scanCollectionForMediaUsage = async (
  * Scans all media items in the CMS and counts their usage
  * (multiple occurrences in a single document counts as 1 occurrence) across all documents in all collections.
  * @param cms - The CMS instance
+ * @param onProgress - Optional callback invoked with progress percentage (0–100) as collections are scanned
  * @returns A Promise resolving to an array of MediaItems with populated usage metrics
  */
-export const scanAllMedia = async (cms: TinaCMS): Promise<MediaUsage[]> => {
+export const scanAllMedia = async (
+  cms: TinaCMS,
+  onProgress?: (percent: number) => void
+): Promise<MediaUsage[]> => {
   // Structure to hold media usage data
   const mediaIdToUsageMap: Record<string, MediaUsage> = {};
 
@@ -332,8 +342,13 @@ export const scanAllMedia = async (cms: TinaCMS): Promise<MediaUsage[]> => {
   const collectionMetas = cms.api.tina.schema.getCollections();
 
   // Process each collection for media references
-  for (const collectionMeta of collectionMetas) {
-    await scanCollectionForMediaUsage(cms, collectionMeta, mediaIdToUsageMap);
+  for (let i = 0; i < collectionMetas.length; i++) {
+    await scanCollectionForMediaUsage(
+      cms,
+      collectionMetas[i],
+      mediaIdToUsageMap
+    );
+    onProgress?.(((i + 1) / collectionMetas.length) * 100);
   }
 
   // Return the media usage data as an array

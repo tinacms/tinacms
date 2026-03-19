@@ -7,12 +7,14 @@ export const useMediaUsageScanner = () => {
   const [mediaItems, setMediaItems] = useState<MediaUsage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorOccurred, setErrorOccurred] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   const scanMedia = useCallback(async () => {
     setIsLoading(true);
     setErrorOccurred(false);
+    setProgress(0);
     try {
-      const updatedMediaItems = await scanAllMedia(cms);
+      const updatedMediaItems = await scanAllMedia(cms, setProgress);
       setMediaItems(updatedMediaItems);
     } catch (e) {
       console.error('Error scanning media usage:', e);
@@ -32,6 +34,7 @@ export const useMediaUsageScanner = () => {
     mediaItems,
     isLoading,
     errorOccurred,
+    progress,
     refresh: scanMedia,
   };
 };
