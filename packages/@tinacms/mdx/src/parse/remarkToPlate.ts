@@ -9,6 +9,7 @@ import type * as Md from 'mdast';
 import type { ContainerDirective } from 'mdast-util-directive';
 import type { MdxJsxFlowElement, MdxJsxTextElement } from 'mdast-util-mdx-jsx';
 import { directiveElement, mdxJsxElement as mdxJsxElementDefault } from './mdx';
+import { parseMarkMdxText } from './mark';
 import type * as Plate from './plate';
 
 export type { Position, PositionItem } from './plate';
@@ -16,11 +17,9 @@ export type { Position, PositionItem } from './plate';
 declare module 'mdast' {
   interface StaticPhrasingContentMap {
     mdxJsxTextElement: MdxJsxTextElement;
-    highlight: import('../extensions/mark/mdast').Highlight;
   }
   interface PhrasingContentMap {
     mdxJsxTextElement: MdxJsxTextElement;
-    highlight: import('../extensions/mark/mdast').Highlight;
   }
 
   interface BlockContentMap {
@@ -335,7 +334,7 @@ export const remarkToSlate = (
   ): Plate.InlineElement | Plate.InlineElement[] => {
     switch (content.type) {
       case 'mdxJsxTextElement':
-        return mdxJsxElement(content, field, imageCallback);
+        return parseMarkMdxText(content) ?? mdxJsxElement(content, field, imageCallback);
       case 'text':
         return text(content);
       case 'inlineCode':
@@ -366,19 +365,12 @@ export const remarkToSlate = (
       case 'mdxJsxTextElement': {
         // Convert <mark>text</mark> (parsed as MDX JSX in .mdx files) back to
         // a highlight text node, without routing through mdxJsxElement().
-        // @ts-ignore
-        if (content.name === 'mark') {
-          // @ts-ignore
-          const innerText = (content.children || [])
-            .filter((c: any) => c.type === 'text')
-            .map((c: any) => c.value || '')
-            .join('');
-          return { type: 'text', text: innerText, highlight: true };
+        const markNodes = parseMarkMdxText(content);
+        if (markNodes) {
+          return markNodes;
         }
         return mdxJsxElement(content, field, imageCallback);
       }
-      case 'highlight':
-        return phrashingMark(content);
       case 'emphasis':
         return phrashingMark(content);
       case 'strong':
@@ -387,13 +379,8 @@ export const remarkToSlate = (
         return breakContent();
       case 'inlineCode':
         return phrashingMark(content);
-      case 'html': {
-        const markMatch = /^<mark>([\s\S]*?)<\/mark>$/.exec(content.value);
-        if (markMatch) {
-          return { type: 'text', text: markMatch[1], highlight: true };
-        }
+      case 'html':
         return html_inline(content);
-      }
       // @ts-ignore
       case 'mdxTextExpression':
         throw new RichTextParseError(
@@ -427,16 +414,6 @@ export const remarkToSlate = (
     const accum: Plate.InlineElement[] = [];
     switch (node.type) {
       // @ts-ignore
-      case 'highlight': {
-        // @ts-ignore
-        const children = (node.children as Md.PhrasingContent[])
-          .map((child) => phrashingMark(child, [...marks, 'highlight']))
-          .flat();
-        children.forEach((child) => {
-          accum.push(child);
-        });
-        break;
-      }
       case 'emphasis': {
         const children = node.children
           .map((child) => phrashingMark(child, [...marks, 'italic']))
@@ -497,6 +474,22 @@ export const remarkToSlate = (
         marks.forEach((mark) => (markProps[mark] = true));
         accum.push({ type: 'text', text: node.value, ...markProps });
         break;
+      case 'mdxJsxTextElement': {
+        const jsxMark = parseMarkMdxText(
+          node,
+          Object.fromEntries(marks.map((mark) => [mark, true]))
+        );
+        if (jsxMark) {
+          accum.push(...jsxMark);
+          break;
+        }
+        accum.push(mdxJsxElement(node, field, imageCallback));
+        break;
+      }
+      case 'html': {
+        accum.push(html_inline(node));
+        break;
+      }
       /**
        * Eg. this is a line break
        *                 vv
