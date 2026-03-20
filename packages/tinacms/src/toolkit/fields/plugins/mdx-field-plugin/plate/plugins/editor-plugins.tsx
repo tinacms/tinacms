@@ -129,6 +129,11 @@ const ClearHighlightOnEnterPlugin = createSlatePlugin({
 
       editor.tf.removeMark('highlight');
       editor.tf.removeMark('highlightColor');
+
+      editor.tf.unsetNodes(['highlight', 'highlightColor'], {
+        at: editor.selection ?? undefined,
+        match: (node) => editor.api.isText(node),
+      });
     },
   },
 }));
