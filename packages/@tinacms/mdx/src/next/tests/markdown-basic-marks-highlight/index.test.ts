@@ -10,4 +10,7 @@ it('matches input', () => {
   expect(util.print(tree)).toMatchFile(util.nodePath(__dirname));
   const string = serializeMDX(tree, field, (v) => v);
   expect(string).toMatchFile(util.mdPath(__dirname));
+  expect(util.print(parseMDX(string as string, field, (v) => v))).toEqual(
+    util.print(tree)
+  );
 });
