@@ -28,6 +28,13 @@ import {
   SelectValue,
 } from '../../ui/select';
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipPortal,
+  TooltipProvider,
+  TooltipTrigger,
+} from '../../../fields/plugins/mdx-field-plugin/plate/components/plate-ui/tooltip';
+import {
   Table,
   TableBody,
   TableCell,
@@ -159,9 +166,20 @@ const getMediaColumns = (
       );
     },
     cell: ({ row }) => (
-      <span className='font-medium text-gray-800'>
-        {row.original.media.filename}
-      </span>
+      <TooltipProvider>
+        <Tooltip delayDuration={300}>
+          <TooltipTrigger asChild>
+            <span className='block w-[16rem] truncate font-medium text-gray-800'>
+              {row.original.media.filename}
+            </span>
+          </TooltipTrigger>
+          <TooltipPortal>
+            <TooltipContent side='top' className='max-w-sm break-all shadow-md'>
+              {row.original.media.filename}
+            </TooltipContent>
+          </TooltipPortal>
+        </Tooltip>
+      </TooltipProvider>
     ),
   },
   {
@@ -187,9 +205,29 @@ const getMediaColumns = (
         </button>
       );
     },
-    cell: ({ getValue }) => (
-      <span className='text-sm text-gray-500'>{getValue() as string}</span>
-    ),
+    cell: ({ getValue }) => {
+      const directory = getValue() as string;
+
+      return (
+        <TooltipProvider>
+          <Tooltip delayDuration={300}>
+            <TooltipTrigger asChild>
+              <span className='block w-[10rem] truncate text-sm text-gray-500'>
+                {directory}
+              </span>
+            </TooltipTrigger>
+            <TooltipPortal>
+              <TooltipContent
+                side='top'
+                className='max-w-sm break-all shadow-md'
+              >
+                {directory}
+              </TooltipContent>
+            </TooltipPortal>
+          </Tooltip>
+        </TooltipProvider>
+      );
+    },
   },
   {
     id: 'usage',
@@ -233,7 +271,7 @@ const getMediaColumns = (
         </Button>
       ) : (
         <span className='text-orange-800 rounded-full px-3 py-1 inline-block min-w-[3rem] text-center border border-orange-100 bg-orange-50 ml-auto'>
-          0 (Unused)
+          0
         </span>
       );
     },

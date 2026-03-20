@@ -18,6 +18,7 @@ export const MediaLightbox = ({
 
   const usageCount = item.usedIn.length;
   const imageSrc = item.media.src || item.media.thumbnails?.['75x75'];
+  const directory = item.media.directory || '/';
 
   return (
     <Dialog open onOpenChange={(isOpen) => !isOpen && onClose()}>
@@ -37,16 +38,23 @@ export const MediaLightbox = ({
             className='mx-auto block max-w-full max-h-[75vh] object-contain rounded-md shadow-sm'
           />
         </div>
-        <div className='mt-2 text-center text-sm font-medium text-gray-700'>
-          <span className='break-all'>{item.media.filename}</span>
-          <span className='mx-3 text-gray-300'>|</span>
-          {usageCount > 0 ? (
-            <span className='text-tina-orange font-semibold'>
-              Used in {usageCount} {usageCount === 1 ? 'doc' : 'docs'}
-            </span>
-          ) : (
-            <span className='font-semibold text-gray-500'>Unused</span>
-          )}
+        <div className='mt-3 space-y-1 text-center'>
+          <div className='text-sm font-medium text-gray-700'>
+            <span className='break-all'>{item.media.filename}</span>
+          </div>
+          <div className='text-xs text-gray-500'>
+            Directory:{' '}
+            <span className='break-all font-medium'>{directory}</span>
+          </div>
+          <div className='text-sm font-medium text-gray-700'>
+            {usageCount > 0 ? (
+              <span className='text-tina-orange font-semibold'>
+                Used in {usageCount} {usageCount === 1 ? 'doc' : 'docs'}
+              </span>
+            ) : (
+              <span className='font-semibold text-gray-500'>Unused</span>
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>
