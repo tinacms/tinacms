@@ -165,7 +165,10 @@ export const eat = (
   if (!first) {
     return [];
   }
-  if (first && first?.type !== 'text') {
+  const firstIsText =
+    first.type === 'text' ||
+    (!first.type && typeof (first as any).text === 'string');
+  if (first && !firstIsText) {
     if (first.type === 'a') {
       return [
         {

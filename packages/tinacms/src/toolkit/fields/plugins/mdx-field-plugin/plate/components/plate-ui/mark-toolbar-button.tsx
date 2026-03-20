@@ -81,12 +81,12 @@ const useHighlightToolbar = () => {
 
   const rememberSelection = React.useCallback(() => {
     if (editor.selection) {
-      savedSelection.current = editor.selection;
+      savedSelection.current = structuredClone(editor.selection);
     }
   }, [editor]);
 
   React.useEffect(() => {
-    if (!openState.open) {
+    if (openState.open) {
       rememberSelection();
     }
   }, [openState.open, rememberSelection]);
@@ -99,7 +99,15 @@ const useHighlightToolbar = () => {
       }
 
       if (savedSelection.current) {
-        editor.tf.select(savedSelection.current);
+        editor.tf.select(structuredClone(savedSelection.current));
+      }
+
+      if (highlightColor) {
+        editor.tf.addMark('highlight', true);
+        editor.tf.addMark('highlightColor', highlightColor);
+      } else {
+        editor.tf.removeMark('highlight');
+        editor.tf.removeMark('highlightColor');
       }
 
       editor.tf.setNodes(

@@ -1,4 +1,5 @@
 import type * as Plate from './plate';
+import type { PhrasingContent } from 'mdast';
 import type {
   MdxJsxAttribute,
   MdxJsxExpressionAttribute,
@@ -26,26 +27,62 @@ export const getHighlightColorFromAttributes = (
 
 export const parseMarkMdxText = (
   content: MdxJsxTextElement,
-  extraMarks: Record<string, boolean> = {}
+  extraMarks: Record<string, boolean | string> = {},
+  parseChild?: (
+    child: PhrasingContent
+  ) => Plate.InlineElement | Plate.InlineElement[]
 ): Plate.InlineElement[] | null => {
   if (content.name !== 'mark') {
     return null;
   }
 
   const highlightColor = getHighlightColorFromAttributes(content.attributes);
+  const markProps = {
+    highlight: true,
+    ...(highlightColor ? { highlightColor } : {}),
+    ...extraMarks,
+  };
 
   return (content.children || []).flatMap((child) => {
+    if (parseChild) {
+      return applyMarksToInlineElements(parseChild(child), markProps);
+    }
+
     if (child.type === 'text') {
       return [
         {
           type: 'text' as const,
           text: child.value,
-          highlight: true,
-          highlightColor,
-          ...extraMarks,
+          ...markProps,
         },
       ];
     }
+
     return [];
+  });
+};
+
+const applyMarksToInlineElements = (
+  elements: Plate.InlineElement | Plate.InlineElement[],
+  marks: Record<string, boolean | string>
+): Plate.InlineElement[] => {
+  const items = Array.isArray(elements) ? elements : [elements];
+
+  return items.map((item) => {
+    if (item.type === 'text') {
+      return {
+        ...item,
+        ...marks,
+      };
+    }
+
+    if ('children' in item && Array.isArray(item.children)) {
+      return {
+        ...item,
+        children: applyMarksToInlineElements(item.children, marks),
+      };
+    }
+
+    return item;
   });
 };

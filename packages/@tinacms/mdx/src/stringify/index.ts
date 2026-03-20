@@ -411,7 +411,10 @@ export type Marks = 'strong' | 'emphasis' | 'inlineCode' | 'delete' | 'highlight
 
 export const getMarks = (content: Plate.InlineElement) => {
   const marks: Marks[] = [];
-  if (content.type !== 'text') {
+  const isText =
+    content.type === 'text' ||
+    (!content.type && typeof (content as any).text === 'string');
+  if (!isText) {
     return [];
   }
   if (content.bold) {

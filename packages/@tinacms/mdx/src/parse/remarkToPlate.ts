@@ -334,7 +334,11 @@ export const remarkToSlate = (
   ): Plate.InlineElement | Plate.InlineElement[] => {
     switch (content.type) {
       case 'mdxJsxTextElement':
-        return parseMarkMdxText(content) ?? mdxJsxElement(content, field, imageCallback);
+        return (
+          parseMarkMdxText(content, {}, (child) =>
+            staticPhrasingContent(child)
+          ) ?? mdxJsxElement(content, field, imageCallback)
+        );
       case 'text':
         return text(content);
       case 'inlineCode':
@@ -365,7 +369,9 @@ export const remarkToSlate = (
       case 'mdxJsxTextElement': {
         // Convert <mark>text</mark> (parsed as MDX JSX in .mdx files) back to
         // a highlight text node, without routing through mdxJsxElement().
-        const markNodes = parseMarkMdxText(content);
+        const markNodes = parseMarkMdxText(content, {}, (child) =>
+          phrasingContent(child)
+        );
         if (markNodes) {
           return markNodes;
         }
@@ -477,7 +483,8 @@ export const remarkToSlate = (
       case 'mdxJsxTextElement': {
         const jsxMark = parseMarkMdxText(
           node,
-          Object.fromEntries(marks.map((mark) => [mark, true]))
+          Object.fromEntries(marks.map((mark) => [mark, true])),
+          (child) => phrasingContent(child)
         );
         if (jsxMark) {
           accum.push(...jsxMark);
