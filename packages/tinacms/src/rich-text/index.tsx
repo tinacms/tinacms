@@ -231,7 +231,9 @@ const Leaf = (props: {
       );
     }
     return (
-      <mark style={highlightColor ? { backgroundColor: highlightColor } : undefined}>
+      <mark
+        style={highlightColor ? { backgroundColor: highlightColor } : undefined}
+      >
         <Leaf {...rest} />
       </mark>
     );

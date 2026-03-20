@@ -58,7 +58,10 @@ const blockClasses = 'mt-0.5';
 /** prose sets a bold font, making bold marks impossible to see */
 const headerClasses = 'font-normal';
 
-const HighlightLeaf = ({ leaf, ...props }: React.ComponentProps<typeof PlateLeaf>) => (
+const HighlightLeaf = ({
+  leaf,
+  ...props
+}: React.ComponentProps<typeof PlateLeaf>) => (
   <PlateLeaf
     as='mark'
     className='rounded-sm px-0.5'

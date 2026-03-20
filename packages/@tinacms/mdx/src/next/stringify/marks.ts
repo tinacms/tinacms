@@ -227,7 +227,12 @@ export const eat = (
   }
   const matchingSiblings = content.slice(1, nonMatchingSiblingIndex + 1);
   const markCounts: {
-    [key in 'strong' | 'emphasis' | 'inlineCode' | 'delete' | 'highlight']?: number;
+    [key in
+      | 'strong'
+      | 'emphasis'
+      | 'inlineCode'
+      | 'delete'
+      | 'highlight']?: number;
   } = {};
   marks.forEach((mark) => {
     let count = 1;
@@ -240,10 +245,20 @@ export const eat = (
     markCounts[mark] = count;
   });
   let count = 0;
-  let markToProcess: 'strong' | 'emphasis' | 'inlineCode' | 'delete' | 'highlight' | null =
-    null;
+  let markToProcess:
+    | 'strong'
+    | 'emphasis'
+    | 'inlineCode'
+    | 'delete'
+    | 'highlight'
+    | null = null;
   Object.entries(markCounts).forEach(([mark, markCount]) => {
-    const m = mark as 'strong' | 'emphasis' | 'inlineCode' | 'delete' | 'highlight';
+    const m = mark as
+      | 'strong'
+      | 'emphasis'
+      | 'inlineCode'
+      | 'delete'
+      | 'highlight';
     if (markCount > count) {
       count = markCount;
       markToProcess = m;

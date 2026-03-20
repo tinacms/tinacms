@@ -227,7 +227,12 @@ export const eat = (
   }
   const matchingSiblings = content.slice(1, nonMatchingSiblingIndex + 1);
   const markCounts: {
-    [key in 'strong' | 'emphasis' | 'inlineCode' | 'delete' | 'highlight']?: number;
+    [key in
+      | 'strong'
+      | 'emphasis'
+      | 'inlineCode'
+      | 'delete'
+      | 'highlight']?: number;
   } = {};
   marks.forEach((mark) => {
     let count = 1;

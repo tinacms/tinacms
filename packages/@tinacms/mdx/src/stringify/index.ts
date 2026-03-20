@@ -407,7 +407,12 @@ const blockContentElement = (
   }
 };
 
-export type Marks = 'strong' | 'emphasis' | 'inlineCode' | 'delete' | 'highlight';
+export type Marks =
+  | 'strong'
+  | 'emphasis'
+  | 'inlineCode'
+  | 'delete'
+  | 'highlight';
 
 export const getMarks = (content: Plate.InlineElement) => {
   const marks: Marks[] = [];
