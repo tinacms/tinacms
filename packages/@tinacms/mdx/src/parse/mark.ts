@@ -25,12 +25,12 @@ export const getHighlightColorFromAttributes = (
   return backgroundColorMatch?.[1]?.trim();
 };
 
-export const parseMarkMdxText = (
-  content: MdxJsxTextElement,
+export const parseMarkMdxText = <
+  TChild extends PhrasingContent = PhrasingContent,
+>(
+  content: MdxJsxTextElement & { children?: TChild[] },
   extraMarks: Record<string, boolean | string> = {},
-  parseChild?: (
-    child: PhrasingContent
-  ) => Plate.InlineElement | Plate.InlineElement[]
+  parseChild?: (child: TChild) => Plate.InlineElement | Plate.InlineElement[]
 ): Plate.InlineElement[] | null => {
   if (content.name !== 'mark') {
     return null;
@@ -45,7 +45,7 @@ export const parseMarkMdxText = (
 
   return (content.children || []).flatMap((child) => {
     if (parseChild) {
-      return applyMarksToInlineElements(parseChild(child), markProps);
+      return applyMarksToInlineElements(parseChild(child as TChild), markProps);
     }
 
     if (child.type === 'text') {
@@ -76,7 +76,7 @@ const applyMarksToInlineElements = (
       };
     }
 
-    if ('children' in item && Array.isArray(item.children)) {
+    if (item.type === 'a') {
       return {
         ...item,
         children: applyMarksToInlineElements(item.children, marks),

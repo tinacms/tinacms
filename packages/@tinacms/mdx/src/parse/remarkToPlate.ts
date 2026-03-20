@@ -335,7 +335,9 @@ export const remarkToSlate = (
     switch (content.type) {
       case 'mdxJsxTextElement':
         return (
-          parseMarkMdxText(content, {}, (child) =>
+          parseMarkMdxText<
+            Md.StaticPhrasingContent
+          >(content as MdxJsxTextElement & { children?: Md.StaticPhrasingContent[] }, {}, (child) =>
             staticPhrasingContent(child)
           ) ?? mdxJsxElement(content, field, imageCallback)
         );
