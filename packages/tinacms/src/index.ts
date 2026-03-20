@@ -100,3 +100,6 @@ export const defineStaticConfig = (
 export const defineConfig = defineStaticConfig;
 
 export { tinaTableTemplate } from './table';
+
+export { captureEvent } from './lib/posthog/posthogProvider';
+export { RichTextEditorSwitchedEvent } from './lib/posthog/posthog';

@@ -16,7 +16,7 @@
     "scripts": {
         "build:all": "bin/tina-build build:all",
         "watch": "node bin/tina-build watch",
-        "build": "pnpm tsup src/jest-runner.ts src/css-transform.ts src/index.ts --format esm"
+        "build": "pnpm tsup src/jest-runner.ts src/index.ts --format esm"
     },
     "dependencies": {
         "@sucrase/jest-plugin": "catalog:",

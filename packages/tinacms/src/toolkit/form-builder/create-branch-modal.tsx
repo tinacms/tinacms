@@ -23,6 +23,7 @@ import {
   DELETE_DOCUMENT_GQL,
   UPDATE_DOCUMENT_GQL,
 } from '../../admin/api';
+import { Form } from '@toolkit/forms';
 
 const pathRelativeToCollection = (
   collectionPath: string,
@@ -80,12 +81,14 @@ export const CreateBranchModal = ({
   path,
   values,
   crudType,
+  tinaForm,
 }: {
   safeSubmit: () => Promise<void>;
   close: () => void;
   path: string;
   values: Record<string, unknown>;
   crudType: string;
+  tinaForm?: Form;
 }) => {
   const cms = useCMS();
   const tinaApi = cms.api.tina;
@@ -154,7 +157,24 @@ export const CreateBranchModal = ({
       }
 
       const collection = tinaApi.schema.getCollectionByFullPath(path);
-      const params = tinaApi.schema.transformPayload(collection.name, values);
+
+      // Run beforeSubmit hook if defined on the collection
+      let submittedValues = values;
+      if (collection?.ui?.beforeSubmit) {
+        const valOverride = await collection.ui.beforeSubmit({
+          cms,
+          values,
+          form: tinaForm,
+        });
+        if (valOverride) {
+          submittedValues = valOverride;
+        }
+      }
+
+      const params = tinaApi.schema.transformPayload(
+        collection.name,
+        submittedValues
+      );
       const relativePath = pathRelativeToCollection(collection.path, path);
 
       const result = await tinaApi.executeEditorialWorkflow({

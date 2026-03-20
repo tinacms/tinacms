@@ -1,0 +1,51 @@
+---
+blocks:
+  - tagline: Open-source CMS
+    headline: The best editor experience for your developer-first sites
+    text: |
+      Tina is an open-source, Git-backed CMS with the ability to add visual editing to your NextJS site
+    actions:
+      - label: Get Started
+        type: button
+        link: 'https://tina.io'
+    color: default
+    _template: hero
+  - title: Features
+    description: Everything you need to build a great content editing experience.
+    items:
+      - icon:
+          name: BiSearchAlt2
+          color: primary
+          style: circle
+        title: Query Your Content
+        text: Use GraphQL to query your content in any way you need.
+      - icon:
+          name: BiLayer
+          color: teal
+          style: circle
+        title: Build on Top of Your Components
+        text: Tina works alongside your existing component library.
+      - icon:
+          name: BiTerminal
+          color: green
+          style: circle
+        title: Command Line Quickstart
+        text: Get started in minutes with a single CLI command.
+    color: default
+    _template: features
+  - title: New to Tina?
+    description: Learn the basics of the development workflow
+    actions:
+      - label: Check out the docs
+        type: button
+        link: 'https://tina.io/docs/'
+    color: tint
+    _template: cta
+  - quote: >-
+      There are only two hard things in Computer Science: cache invalidation and
+      naming things.
+    author: Phil Karlton
+    color: primary
+    _template: testimonial
+---
+

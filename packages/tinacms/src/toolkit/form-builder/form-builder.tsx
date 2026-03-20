@@ -213,6 +213,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                 crudType={tinaForm.crudType}
                 path={tinaForm.path}
                 values={tinaForm.values}
+                tinaForm={tinaForm}
                 close={() => setCreateBranchModalOpen(false)}
               />
             )}
