@@ -40,7 +40,7 @@ const highlightColors = [
   { label: 'Yellow', value: '#FEF08A' },
   { label: 'Green', value: '#BBF7D0' },
   { label: 'Blue', value: '#BFDBFE' },
-  { label: 'Pink', value: '#FBCFE8' },
+  { label: 'Red', value: '#CC4141' },
 ] as const;
 
 export const BoldToolbarButton = () => (
@@ -67,9 +67,7 @@ export const CodeToolbarButton = () => (
   </MarkToolbarButton>
 );
 
-export const HighlightToolbarButton = () => (
-  <HighlightColorToolbarButton />
-);
+export const HighlightToolbarButton = () => <HighlightColorToolbarButton />;
 
 const useHighlightToolbar = () => {
   const editor = useEditorRef();
