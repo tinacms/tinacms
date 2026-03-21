@@ -121,3 +121,48 @@ describe('Codegen.execute integration', () => {
     expect(JSON.stringify(writtenData)).not.toContain('secret-token');
   });
 });
+
+describe('Codegen local API URL', () => {
+  function stubCodegen(): Codegen {
+    const instance = Object.create(Codegen.prototype) as Codegen;
+
+    instance.configManager = {
+      config: {
+        branch: 'main',
+        token: 'tok',
+        clientId: 'cid',
+      },
+      getTinaGraphQLVersion: () => ({
+        fullVersion: '1.0.0',
+        major: '1',
+        minor: '0',
+        patch: '0',
+      }),
+    } as any;
+    instance.isLocal = true;
+    instance.port = 4001;
+
+    return instance;
+  }
+
+  it('defaults to localhost for local dev', () => {
+    const codegen = stubCodegen();
+
+    expect((codegen as any)._createApiUrl()).toMatchObject({
+      apiURL: 'http://localhost:4001/graphql',
+      localUrl: 'http://localhost:4001/graphql',
+    });
+  });
+
+  it('uses server.url for local dev when provided', () => {
+    const codegen = stubCodegen();
+    codegen.configManager.config.server = {
+      url: 'https://my-codespace-4001.github.dev',
+    } as any;
+
+    expect((codegen as any)._createApiUrl()).toMatchObject({
+      apiURL: 'https://my-codespace-4001.github.dev/graphql',
+      localUrl: 'https://my-codespace-4001.github.dev/graphql',
+    });
+  });
+});

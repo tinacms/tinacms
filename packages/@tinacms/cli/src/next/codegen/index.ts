@@ -232,18 +232,15 @@ export class Codegen {
         )}. Please visit https://tina.io/docs/r/what-is-tinacloud for more information`
       );
     }
-    let localUrl = `http://localhost:${this.port}/graphql`;
-    let tinaCloudUrl = `${baseUrl}/${version}/content/${clientId}/github/${branch}`;
+    const overrideUrl = this.configManager.config.contentApiUrlOverride;
+    const devServerUrl =
+      this.configManager.config?.server?.url || `http://localhost:${this.port}`;
+    const localUrl = overrideUrl || `${devServerUrl}/graphql`;
+    const tinaCloudUrl =
+      overrideUrl ||
+      `${baseUrl}/${version}/content/${clientId}/github/${branch}`;
+    const apiURL = this.isLocal ? localUrl : tinaCloudUrl;
 
-    let apiURL = this.isLocal
-      ? `http://localhost:${this.port}/graphql`
-      : `${baseUrl}/${version}/content/${clientId}/github/${branch}`;
-
-    if (this.configManager.config.contentApiUrlOverride) {
-      apiURL = this.configManager.config.contentApiUrlOverride;
-      localUrl = apiURL;
-      tinaCloudUrl = apiURL;
-    }
     return { apiURL, localUrl, tinaCloudUrl };
   }
 
