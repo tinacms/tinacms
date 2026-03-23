@@ -743,9 +743,6 @@ importers:
       graphql:
         specifier: ^15.10.1
         version: 15.10.1
-      mongodb-level:
-        specifier: ^0.0.4
-        version: 0.0.4(mongodb@4.17.2)
       react:
         specifier: ^18.3.1
         version: 18.3.1
