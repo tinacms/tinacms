@@ -4,6 +4,7 @@ packages:
     - examples/*
     - examples/next/*
     - examples/react/*
+    - examples/astro/*
     - e2e/*
     - experimental-examples/*
     - playwright/*
