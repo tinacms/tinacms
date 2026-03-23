@@ -36,7 +36,16 @@ Three-layer component model:
 
 - **Dev:** `pnpm dev` → `tinacms dev -c "astro dev"` (TinaCMS wraps Astro)
 - **Build:** `pnpm build` → `tinacms build && astro build`
+- **Build local:** `pnpm build:local` → `tinacms build --local --skip-cloud-checks -c "astro build"` (no cloud connection)
 - **Astro-only (no TinaCMS):** `pnpm dev:astro` / `pnpm build:astro`
+
+## Data Fetching
+
+Import the generated client and call `client.queries.*()` in Astro page frontmatter:
+```ts
+import client from '../../tina/__generated__/client';
+const result = await client.queries.tag({ relativePath: 'react.json' });
+```
 
 ## Gotchas
 
