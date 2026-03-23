@@ -1,0 +1,199 @@
+fragment PageParts on Page {
+  __typename
+  blocks {
+    __typename
+    ... on PageBlocksHero {
+      tagline
+      headline
+      text
+      image {
+        __typename
+        src
+        alt
+      }
+      actions {
+        __typename
+        label
+        type
+        link
+        icon
+      }
+      color
+    }
+    ... on PageBlocksFeatures {
+      title
+      description
+      items {
+        __typename
+        icon {
+          __typename
+          name
+          color
+          style
+          size
+        }
+        title
+        text
+        actions {
+          __typename
+          label
+          type
+          link
+          icon
+        }
+      }
+      color
+    }
+    ... on PageBlocksCta {
+      title
+      description
+      actions {
+        __typename
+        label
+        type
+        link
+        icon
+      }
+      color
+    }
+    ... on PageBlocksTestimonial {
+      quote
+      author
+      color
+    }
+    ... on PageBlocksContent {
+      body
+      color
+    }
+  }
+}
+
+fragment PostParts on Post {
+  __typename
+  title
+  heroImg
+  excerpt
+  author {
+    ... on Author {
+      __typename
+      name
+      avatar
+      description
+      pubDate
+      updatedDate
+      hobbies
+    }
+    ... on Document {
+      _sys {
+        filename
+        basename
+        hasReferences
+        breadcrumbs
+        path
+        relativePath
+        extension
+      }
+      id
+    }
+  }
+  date
+  tags {
+    __typename
+    tag {
+      ... on Tag {
+        __typename
+        name
+      }
+      ... on Document {
+        _sys {
+          filename
+          basename
+          hasReferences
+          breadcrumbs
+          path
+          relativePath
+          extension
+        }
+        id
+      }
+    }
+  }
+  _body
+}
+
+fragment AuthorParts on Author {
+  __typename
+  name
+  avatar
+  description
+  pubDate
+  updatedDate
+  hobbies
+}
+
+fragment TagParts on Tag {
+  __typename
+  name
+}
+
+fragment GlobalParts on Global {
+  __typename
+  header {
+    __typename
+    name
+    color
+    nav {
+      __typename
+      href
+      label
+    }
+  }
+  footer {
+    __typename
+    social {
+      __typename
+      icon
+      url
+    }
+  }
+  theme {
+    __typename
+    color
+    font
+    darkMode
+  }
+}
+
+fragment BlogParts on Blog {
+  __typename
+  title
+  heroImage
+  excerpt
+  description
+  author {
+    ... on Author {
+      __typename
+      name
+      avatar
+      description
+      pubDate
+      updatedDate
+      hobbies
+    }
+    ... on Document {
+      _sys {
+        filename
+        basename
+        hasReferences
+        breadcrumbs
+        path
+        relativePath
+        extension
+      }
+      id
+    }
+  }
+  pubDate
+  updatedDate
+  _body
+}
