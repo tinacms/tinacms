@@ -9,7 +9,7 @@ import {
 import { useLayout } from './layout-context';
 import { Container } from './container';
 import { Icon } from './icon';
-import { cn } from '@/src/lib/utils';
+import { cn, sanitizeHref } from '@/src/lib/utils';
 
 export const Footer = () => {
   const { globalSettings } = useLayout();
@@ -53,7 +53,7 @@ export const Footer = () => {
                   <a
                     key={index}
                     className='inline-block opacity-80 hover:opacity-100 transition ease-out duration-150'
-                    href={social.url}
+                    href={sanitizeHref(social.url)}
                     target='_blank'
                     rel='noopener noreferrer'
                   >
