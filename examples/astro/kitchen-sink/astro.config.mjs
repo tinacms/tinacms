@@ -14,8 +14,9 @@ export default defineConfig({
           if (
             warning.code === 'UNUSED_EXTERNAL_IMPORT' &&
             warning.exporter === 'tinacms/dist/client'
-          )
-          return;
+          ) {
+            return;
+          }
           warn(warning);
         },
       },
