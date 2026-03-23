@@ -193,10 +193,12 @@ const collectAllMedia = async (
           };
         }
       } else if (item.type === 'dir') {
+        // Removes any slashes from the start and end of item.filename
+        const directorySegment = item.filename.replace(/^\/+|\/+$/g, '');
         subDirectories.push(
           currentDirectory
-            ? `${currentDirectory}/${item.filename}`
-            : item.filename
+            ? `${currentDirectory}/${directorySegment}`
+            : directorySegment
         );
       }
     }

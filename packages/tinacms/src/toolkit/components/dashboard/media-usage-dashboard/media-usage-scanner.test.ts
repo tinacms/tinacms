@@ -601,6 +601,65 @@ describe('scanAllMedia', () => {
   });
 
   describe('Subdirectory Traversal', () => {
+    it('strips leading slashes from directory items before recursing', async () => {
+      // Arrange: Mock nested directory traversal where the second-level
+      // directory item includes a leading slash from the media store.
+      const cms = buildStubCms({ collectionNames: [] });
+      cms.media.list = vi
+        .fn()
+        .mockImplementation(({ directory }: { directory: string }) => {
+          if (directory === '') {
+            return Promise.resolve(
+              makeStubMediaList([
+                makeStubMediaItem(
+                  'proidentLoremsunt',
+                  'proidentLoremsunt',
+                  '',
+                  'dir'
+                ),
+              ])
+            );
+          }
+          if (directory === 'proidentLoremsunt') {
+            return Promise.resolve(
+              makeStubMediaList([
+                makeStubMediaItem(
+                  '/consequatexdolore',
+                  '/consequatexdolore',
+                  '',
+                  'dir'
+                ),
+              ])
+            );
+          }
+          if (directory === 'proidentLoremsunt/consequatexdolore') {
+            return Promise.resolve(
+              makeStubMediaList([
+                makeStubMediaItem(
+                  'flower',
+                  'flower.jpg',
+                  '/uploads/proidentLoremsunt/consequatexdolore/flower.jpg'
+                ),
+              ])
+            );
+          }
+          return Promise.resolve(makeStubMediaList([]));
+        });
+
+      // Act: Scan all media
+      const result = await scanAllMedia(cms);
+
+      // Assert: The nested media item is collected successfully
+      expect(result).toHaveLength(1);
+      expect(result[0].media.id).toBe('flower');
+      // Assert: Recursive traversal strips the extra slash before joining
+      expect(cms.media.list).toHaveBeenCalledWith(
+        expect.objectContaining({
+          directory: 'proidentLoremsunt/consequatexdolore',
+        })
+      );
+    });
+
     it('builds the correct path for media nested two levels deep', async () => {
       // Arrange: Mock the media list to return a directory item
       const cms = buildStubCms({ collectionNames: [] });
