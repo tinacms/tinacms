@@ -3,14 +3,16 @@ import { Link } from 'react-router-dom';
 import { formatDate, sanitizeImageSrc } from '@/src/lib/utils';
 import { PageSection } from '@/src/components/layout/page-section';
 import { Loading } from '@/src/loading';
+import { useCallback } from 'react';
 import { useTinaQuery } from '@/src/hooks/use-tina-query';
 import client from '@/tina/__generated__/client';
 
 export default function BlogList() {
-  const result = useTinaQuery(
+  const queryFn = useCallback(
     () => client.queries.blogConnection(),
     []
   );
+  const result = useTinaQuery(queryFn);
 
   if (result.loading) return <Loading />;
   if (result.error || !result.data) return <div className='py-12 text-center text-gray-500'>No blogs found</div>;

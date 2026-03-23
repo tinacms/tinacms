@@ -11,14 +11,16 @@ import { BiRightArrowAlt } from 'react-icons/bi';
 import { Section } from '@/src/components/layout/section';
 import { Container } from '@/src/components/layout/container';
 import { Loading } from '@/src/loading';
+import { useCallback } from 'react';
 import { useTinaQuery } from '@/src/hooks/use-tina-query';
 import client from '@/tina/__generated__/client';
 
 export default function PostsList() {
-  const result = useTinaQuery(
+  const queryFn = useCallback(
     () => client.queries.postConnection({ first: 1000 }),
     []
   );
+  const result = useTinaQuery(queryFn);
 
   if (result.loading) return <Loading />;
   if (result.error || !result.data) return <div className='py-12 text-center text-gray-500'>No posts found</div>;

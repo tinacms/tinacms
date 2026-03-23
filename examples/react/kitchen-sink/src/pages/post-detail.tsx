@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { sanitizeImageSrc, formatDate } from '@/src/lib/utils';
 import { useTina, tinaField } from 'tinacms/dist/react';
@@ -17,10 +17,11 @@ export default function PostDetail() {
   const segments = location.pathname.replace(/^\/posts\//, '').split('/').filter(Boolean);
   const filepath = segments.join('/');
 
-  const result = useTinaQuery(
+  const queryFn = useCallback(
     () => client.queries.post({ relativePath: `${filepath}.mdx` }),
     [filepath]
   );
+  const result = useTinaQuery(queryFn);
 
   if (result.loading) return <Loading />;
   if (result.error || !result.data) return <NoData message='Post not found' />;

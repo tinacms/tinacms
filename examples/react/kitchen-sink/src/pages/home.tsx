@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { useTinaQuery } from '@/src/hooks/use-tina-query';
 import { useTina, tinaField } from 'tinacms/dist/react';
 import { Blocks } from '@/src/components/blocks';
@@ -5,10 +6,11 @@ import { Loading } from '@/src/loading';
 import client from '@/tina/__generated__/client';
 
 export default function Home() {
-  const result = useTinaQuery(
+  const queryFn = useCallback(
     () => client.queries.page({ relativePath: 'home.mdx' }),
     []
   );
+  const result = useTinaQuery(queryFn);
 
   if (result.loading) return <Loading />;
   if (result.error || !result.data) return <div className='p-6 text-red-600'>Error loading home page</div>;

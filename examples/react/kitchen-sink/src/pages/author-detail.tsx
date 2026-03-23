@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { sanitizeImageSrc } from '@/src/lib/utils';
 import { useTina, tinaField } from 'tinacms/dist/react';
@@ -15,10 +15,11 @@ export default function AuthorDetail() {
   const { filename } = useParams<{ filename: string }>();
   const relativePath = `${filename}.md`;
 
-  const result = useTinaQuery(
+  const queryFn = useCallback(
     () => client.queries.author({ relativePath }),
-    [filename]
+    [relativePath]
   );
+  const result = useTinaQuery(queryFn);
 
   if (result.loading) return <Loading />;
   if (result.error || !result.data) return <NoData message='Author not found' />;

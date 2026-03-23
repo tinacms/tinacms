@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useTina, tinaField } from 'tinacms/dist/react';
 import { Blocks } from '@/src/components/blocks';
@@ -12,10 +12,11 @@ export default function DynamicPage() {
   const segments = location.pathname.split('/').filter(Boolean);
   const filepath = segments.join('/');
 
-  const result = useTinaQuery(
+  const queryFn = useCallback(
     () => client.queries.page({ relativePath: `${filepath}.mdx` }),
     [filepath]
   );
+  const result = useTinaQuery(queryFn);
 
   if (result.loading) return <Loading />;
   if (result.error || !result.data) return <NoData message='Page not found' />;

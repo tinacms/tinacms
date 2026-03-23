@@ -12,12 +12,19 @@ interface TinaQueryResult<T> {
  * Client-side data fetching hook that replaces Next.js server components.
  * Calls the TinaCMS generated client query and returns the result.
  *
- * @param queryFn - async function that calls client.queries.xxx(...)
- * @param deps - dependency array for re-fetching (e.g., route params)
+ * @param queryFn - stable callback (wrap in useCallback) that calls client.queries.xxx(...)
+ *
+ * Callers should stabilise queryFn with useCallback so that React's
+ * exhaustive-deps lint rule can verify captured variables:
+ *
+ *   const queryFn = useCallback(
+ *     () => client.queries.post({ relativePath: `${filepath}.mdx` }),
+ *     [filepath]
+ *   );
+ *   const result = useTinaQuery(queryFn);
  */
 export function useTinaQuery<T>(
-  queryFn: () => Promise<{ data: T; query: string; variables: Record<string, unknown> }>,
-  deps: unknown[] = []
+  queryFn: () => Promise<{ data: T; query: string; variables: Record<string, unknown> }>
 ): TinaQueryResult<T> {
   const [result, setResult] = useState<TinaQueryResult<T>>({
     data: null,
@@ -45,20 +52,18 @@ export function useTinaQuery<T>(
       })
       .catch((err) => {
         if (!cancelled) {
-          setResult({
-            data: null,
-            query: '',
-            variables: {},
+          setResult((prev) => ({
+            ...prev,
             loading: false,
             error: err instanceof Error ? err : new Error(String(err)),
-          });
+          }));
         }
       });
 
     return () => {
       cancelled = true;
     };
-  }, deps);
+  }, [queryFn]);
 
   return result;
 }
