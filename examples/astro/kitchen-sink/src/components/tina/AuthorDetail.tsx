@@ -26,7 +26,11 @@ export default function AuthorDetail(props: TinaPageProps) {
             alt={data.author.name}
             width={128}
             height={128}
-            style={{ borderRadius: '50%', marginBottom: '1rem', objectFit: 'cover' }}
+            style={{
+              borderRadius: '50%',
+              marginBottom: '1rem',
+              objectFit: 'cover',
+            }}
             data-tina-field={tinaField(data.author, 'avatar')}
           />
         )}
