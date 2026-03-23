@@ -91,18 +91,35 @@ export const MobileNavDrawer = ({
           {nav.map((item, idx) => {
             if (!item) return null;
             const active = isActive(item.href ?? '/');
+            const href = sanitizeHref(item.href, '/');
+            const isStaticOrExternal = href.includes('.') || href.startsWith('http');
+            const className = cn(
+              'block px-4 py-3 rounded-md text-base font-medium transition-colors',
+              active
+                ? 'text-theme-600 dark:text-theme-400 bg-theme-50 dark:bg-theme-700/20'
+                : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+            );
+
+            if (isStaticOrExternal) {
+              return (
+                <a
+                  key={item.href ?? `nav-${idx}`}
+                  href={href}
+                  onClick={onClose}
+                  className={className}
+                >
+                  {item.label}
+                </a>
+              );
+            }
+
             return (
               <Link
                 key={item.href ?? `nav-${idx}`}
-                to={sanitizeHref(item.href, '/')}
+                to={href}
                 onClick={onClose}
                 aria-current={active ? 'page' : undefined}
-                className={cn(
-                  'block px-4 py-3 rounded-md text-base font-medium transition-colors',
-                  active
-                    ? 'text-theme-600 dark:text-theme-400 bg-theme-50 dark:bg-theme-700/20'
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                )}
+                className={className}
               >
                 {item.label}
               </Link>
