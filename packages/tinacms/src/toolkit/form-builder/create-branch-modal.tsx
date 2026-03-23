@@ -352,7 +352,7 @@ export const CreateBranchModal = ({
         <div className='flex items-center justify-between'>
           <div className='text-xs text-gray-500'>Estimated time: 1-2 min </div>
           {isExecuting && currentStep > 0 && (
-            <div className='flex items-center gap-1 text-sm text-gray-500'>
+            <div className='flex items-center gap-1 text-sm text-gray-500 tabular-nums'>
               <svg className='w-4 h-4' fill='currentColor' viewBox='0 0 20 20'>
                 <path
                   fillRule='evenodd'
