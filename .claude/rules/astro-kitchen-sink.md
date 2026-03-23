@@ -17,7 +17,8 @@ Three-layer component model:
 ## Key Patterns
 
 - **`client:tina` directive:** Only hydrates React components inside TinaCMS visual editor iframe. Zero JS in production. Defined in `astro-tina-directive/` (3 files: `register.js`, `tina.js`, `index.d.ts`).
-- **Schemas:** Block schemas extracted to `tina/schemas/blocks.ts`, shared fields in `tina/schemas/shared-fields.ts`, icon schema in `tina/schemas/icon.ts`. This differs from Next.js where schemas are co-located with components — extracting avoids messy cross-directory imports between `tina/` and `src/`.
+- **`useTina()` + `tinaField()`:** React page wrappers in `src/components/tina/` import from `tinacms/dist/react`. `useTina({ query, variables, data })` enables live editing; `tinaField(data.author, 'name')` enables click-to-edit targeting via `data-tina-field` attribute.
+- **Schemas:** Shared fields in `tina/schemas/shared-fields.ts` (e.g., `dateFieldSchemas`, `makeSlugify`). Block schemas will be extracted to `tina/schemas/blocks.ts` in later PRs. This differs from Next.js where schemas are co-located with components — extracting avoids messy cross-directory imports between `tina/` and `src/`.
 - **Content directory:** Uses `content/` at project root (TinaCMS managed). Do NOT use `src/content/` — that's Astro's built-in Content Collections, which we don't use.
 - **Path alias:** `@/*` maps to `./src/*` (Astro convention). This differs from Next.js where `@/*` maps to `./*`. Configured in `tsconfig.json`.
 
