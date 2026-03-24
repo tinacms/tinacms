@@ -1,6 +1,7 @@
 import type { Media, MediaListOffset } from '@toolkit/core/media';
 import { isImage, isVideo } from '../../media/utils';
 import { TinaCMS } from '@tinacms/toolkit';
+import { MEDIA_USAGE_THUMBNAIL_SIZE } from './media-usage-thumbnails';
 
 //Represents a reference to a document where a media item is used
 export interface DocumentReference {
@@ -149,7 +150,9 @@ const scanDocumentForMedia = (
   return matchedIds;
 };
 
-const THUMBNAIL_SIZES = [{ w: 75, h: 75 }];
+// Note: in local mode, the media store does not generate actual thumbnails, it returns the full
+// resolution image src regardless of the requested size.
+const THUMBNAIL_SIZES = [MEDIA_USAGE_THUMBNAIL_SIZE];
 const BATCH_SIZE = 100;
 const UI_YIELD_INTERVAL = 50;
 

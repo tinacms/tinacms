@@ -6,6 +6,7 @@ import {
   DialogTitle,
 } from '../../ui/dialog';
 import type { MediaUsage } from './media-usage-scanner';
+import { BiMovie } from 'react-icons/bi';
 
 export const MediaLightbox = ({
   item,
@@ -17,7 +18,7 @@ export const MediaLightbox = ({
   if (!item) return null;
 
   const usageCount = item.usedIn.length;
-  const imageSrc = item.media.src || item.media.thumbnails?.['75x75'];
+  const mediaSrc = item.media.src;
   const directory = item.media.directory || '/';
 
   return (
@@ -32,11 +33,17 @@ export const MediaLightbox = ({
             : 'Unused media file'}
         </DialogDescription>
         <div className='mx-auto w-fit max-w-full rounded-lg border border-gray-200 bg-gray-50 p-2 sm:p-3'>
-          <img
-            src={imageSrc}
-            alt={item.media.filename}
-            className='mx-auto block max-w-full max-h-[75vh] object-contain rounded-md shadow-sm'
-          />
+          {item.type === 'video' ? (
+            <VideoLightboxContent
+              src={mediaSrc}
+              filename={item.media.filename}
+            />
+          ) : (
+            <ImageLightboxContent
+              src={mediaSrc}
+              filename={item.media.filename}
+            />
+          )}
         </div>
         <div className='mt-3 space-y-1 text-center'>
           <div className='text-sm font-medium text-gray-700'>
@@ -58,5 +65,61 @@ export const MediaLightbox = ({
         </div>
       </DialogContent>
     </Dialog>
+  );
+};
+
+const ImageLightboxContent = ({
+  src,
+  filename,
+}: {
+  src: string;
+  filename: string;
+}) => (
+  <img
+    src={src}
+    alt={filename}
+    className='mx-auto block max-w-full max-h-[75vh] object-contain rounded-md shadow-sm'
+  />
+);
+
+const VideoLightboxContent = ({
+  src,
+  filename,
+}: {
+  src: string;
+  filename: string;
+}) => {
+  const [playbackFailed, setPlaybackFailed] = React.useState(false);
+
+  React.useEffect(() => {
+    setPlaybackFailed(false);
+
+    return () => {
+      setPlaybackFailed(false);
+    };
+  }, [src]);
+
+  if (playbackFailed) {
+    return (
+      <div className='flex min-h-[12rem] min-w-[16rem] flex-col items-center justify-center gap-3 rounded-md border border-dashed border-gray-300 bg-white px-6 py-8 text-center'>
+        <BiMovie className='h-10 w-10 text-gray-400' />
+        <div className='text-sm font-medium text-gray-700'>{filename}</div>
+        <div className='max-w-sm text-sm text-gray-500'>
+          This video format is recognized, but this browser could not preview
+          it.
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <video
+      src={src}
+      controls
+      playsInline
+      preload='metadata'
+      className='mx-auto block h-auto w-[min(80vw,720px)] max-w-full max-h-[75vh] rounded-md bg-black shadow-sm'
+      onError={() => setPlaybackFailed(true)}
+    />
   );
 };
