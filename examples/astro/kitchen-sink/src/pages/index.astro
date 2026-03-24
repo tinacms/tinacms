@@ -1,6 +1,16 @@
 ---
+import PageRenderer from '../components/tina/PageRenderer';
 import Layout from '../layouts/Layout.astro';
+
+const client = (await import('../../tina/__generated__/client')).default;
+const result = await client.queries.page({ relativePath: 'home.mdx' });
 ---
-<Layout>
-  <h1>TinaCMS Astro Kitchen Sink</h1>
+
+<Layout title="TinaCMS Astro Kitchen Sink">
+  <PageRenderer
+    client:tina
+    data={result.data}
+    query={result.query}
+    variables={result.variables}
+  />
 </Layout>

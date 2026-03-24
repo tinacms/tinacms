@@ -1,0 +1,48 @@
+---
+import BlogDetail from '../../components/tina/BlogDetail';
+import Layout from '../../layouts/Layout.astro';
+import { formatDate } from '../../lib/utils';
+
+export async function getStaticPaths() {
+  const client = (await import('../../../tina/__generated__/client')).default;
+  const connection = await client.queries.blogConnection({ first: 1000 });
+  const paths = (connection.data?.blogConnection?.edges ?? []).flatMap(
+    (edge: any) => {
+      if (!edge?.node) return [];
+      return [
+        {
+          params: { filename: edge.node._sys.filename },
+          props: { relativePath: `${edge.node._sys.filename}.mdx` },
+        },
+      ];
+    }
+  );
+  return paths;
+}
+
+const { relativePath } = Astro.props;
+const client = (await import('../../../tina/__generated__/client')).default;
+const result = await client.queries.blog({ relativePath });
+
+const title = result.data?.blog?.title
+  ? `${result.data.blog.title} | TinaCMS Astro Kitchen Sink`
+  : 'Blog | TinaCMS Astro Kitchen Sink';
+
+const formattedPubDate = result.data?.blog?.pubDate
+  ? formatDate(result.data.blog.pubDate)
+  : '';
+const formattedUpdatedDate = result.data?.blog?.updatedDate
+  ? formatDate(result.data.blog.updatedDate)
+  : '';
+---
+
+<Layout title={title}>
+  <BlogDetail
+    client:tina
+    data={result.data}
+    query={result.query}
+    variables={result.variables}
+    formattedPubDate={formattedPubDate}
+    formattedUpdatedDate={formattedUpdatedDate}
+  />
+</Layout>

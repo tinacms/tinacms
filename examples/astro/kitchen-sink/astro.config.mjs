@@ -6,6 +6,11 @@ import tinaDirective from './astro-tina-directive/register.js';
 export default defineConfig({
   integrations: [react(), mdx(), tinaDirective()],
   vite: {
+    ssr: {
+      // react-icons uses a directory import that Node ESM doesn't support.
+      // Telling Vite to bundle it during SSR avoids the resolution error.
+      noExternal: ['react-icons'],
+    },
     build: {
       rollupOptions: {
         onwarn(warning, warn) {
