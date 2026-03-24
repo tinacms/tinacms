@@ -14,4 +14,4 @@
 "tinacms": minor
 ---
 
-support highligh feature in rich text editor
+support highlight feature in rich text editor
