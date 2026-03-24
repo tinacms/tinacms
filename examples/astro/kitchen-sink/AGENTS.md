@@ -8,6 +8,7 @@ Three-layer component model:
 1. **Astro pages** (`src/pages/*.astro`) — routing, data fetching via Tina client, static generation with `getStaticPaths()`
 2. **React page wrappers** (`src/components/tina/*.tsx`) — accept `data`/`query`/`variables` props, call `useTina()` for live editing. Used with `client:tina` directive.
 3. **React rendering components** (`src/components/blocks/`, `src/components/layout/`, `src/components/ui/`) — pure rendering, mostly copied from Next.js
+4. **Markdown components** (`src/components/markdown-components.tsx`) — custom TinaMarkdown renderers (BlockQuote, DateTime, NewsletterSignup, Prism code blocks). Uses static imports instead of `next/dynamic` — Astro handles code splitting at the island level.
 
 ## Key Patterns
 
@@ -50,6 +51,7 @@ const result = await client.queries.tag({ relativePath: 'react.json' });
 
 - **Rollup warning:** TinaCMS generated files trigger `UNUSED_EXTERNAL_IMPORT` in Vite/Rollup. Suppressed in `astro.config.mjs` with `onwarn` handler (upstream: tinacms/tinacms#6386).
 - **`client:tina` vs `client:load`:** Use `client:tina` for components that call `useTina()` — they must only hydrate inside the editor iframe. Use `client:load` for interactive components that need JS but aren't Tina-connected (e.g., mobile nav drawer).
+- **`react-icons` SSR:** `react-icons` uses directory imports that Node ESM doesn't support. Fixed with `vite.ssr.noExternal: ['react-icons']` in `astro.config.mjs` so Vite bundles it during SSR.
 - **CodeQL false positive on `sanitizeImageSrc`:** GitHub CodeQL flags `<img src={avatarSrc}>` as "Client-side cross-site scripting" even when the value is already sanitized by `sanitizeImageSrc()`. This is a false positive — data is CMS-controlled, already sanitized, and it's an `<img>` not a redirect.
 
 ## Reference

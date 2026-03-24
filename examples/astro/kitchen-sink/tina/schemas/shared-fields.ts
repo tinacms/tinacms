@@ -7,6 +7,22 @@
 export const makeSlugify = (prefix: string) => (values: any) =>
   `${(values?.title || `${prefix}-${Date.now()}`).toLowerCase().split(' ').join('-')}`;
 
+/** Reusable tags reference list field used by the post collection. */
+export const tagsFieldSchema = {
+  type: 'object' as const,
+  label: 'Tags',
+  name: 'tags',
+  list: true,
+  fields: [
+    {
+      type: 'reference' as const,
+      label: 'Tag',
+      name: 'tag',
+      collections: ['tag'],
+    },
+  ],
+};
+
 /** Reusable publish-date / updated-date field pair. */
 export const dateFieldSchemas = [
   {
