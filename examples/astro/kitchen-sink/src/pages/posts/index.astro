@@ -33,7 +33,6 @@ const posts = (allPosts.data?.postConnection?.edges ?? []).flatMap(
 
         return (
           <a
-            key={post._sys.filename}
             href={postUrl}
             data-testid={`post-card-${post._sys.filename}`}
             class={cn(cardLinkClasses, 'px-6 sm:px-8 md:px-10 py-10 mb-8 last:mb-0')}

@@ -26,7 +26,6 @@ const blogs = (connection.data?.blogConnection?.edges ?? []).flatMap(
 
         return (
           <a
-            key={blog._sys.filename}
             href={href}
             data-testid={`blog-card-${blog._sys.filename}`}
             class="group flex flex-col bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow"
