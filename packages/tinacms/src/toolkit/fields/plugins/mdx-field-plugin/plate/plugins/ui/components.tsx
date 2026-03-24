@@ -46,6 +46,7 @@ import {
 } from '../../components/plate-ui/table/table-cell-element';
 import { TableElement } from '../../components/plate-ui/table/table-element';
 import { TableRowElement } from '../../components/plate-ui/table/table-row-element';
+import colorString from 'color-string';
 import { classNames } from './helpers';
 
 /**
@@ -58,18 +59,34 @@ const blockClasses = 'mt-0.5';
 /** prose sets a bold font, making bold marks impossible to see */
 const headerClasses = 'font-normal';
 
+/**
+ * Returns black or white depending on the luminance of the given background
+ * color, ensuring the text on top meets WCAG contrast requirements.
+ * Accepts any CSS color format (hex, rgb, hsl, named colors).
+ */
+function getContrastColor(color: string): string {
+  const parsed = colorString.get.rgb(color);
+  if (!parsed) return '#000000';
+  const [r, g, b] = parsed;
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.5 ? '#000000' : '#ffffff';
+}
+
 const HighlightLeaf = ({
   leaf,
   ...props
-}: React.ComponentProps<typeof PlateLeaf>) => (
-  <PlateLeaf
-    as='mark'
-    className='rounded-sm px-0.5'
-    style={{ backgroundColor: (leaf.highlightColor as string) || '#FEF08A' }}
-    leaf={leaf}
-    {...props}
-  />
-);
+}: React.ComponentProps<typeof PlateLeaf>) => {
+  const backgroundColor = (leaf.highlightColor as string) || '#FEF08A';
+  return (
+    <PlateLeaf
+      as='mark'
+      className='rounded-sm px-0.5'
+      style={{ backgroundColor, color: getContrastColor(backgroundColor) }}
+      leaf={leaf}
+      {...props}
+    />
+  );
+};
 
 export const Components = () => {
   return {
