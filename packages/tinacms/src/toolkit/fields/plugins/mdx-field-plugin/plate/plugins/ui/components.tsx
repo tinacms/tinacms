@@ -80,7 +80,7 @@ const HighlightLeaf = ({
   return (
     <PlateLeaf
       as='mark'
-      className='rounded-sm px-0.5'
+      className='rounded-sm'
       style={{ backgroundColor, color: getContrastColor(backgroundColor) }}
       leaf={leaf}
       {...props}
