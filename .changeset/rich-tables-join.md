@@ -15,3 +15,5 @@
 ---
 
 support highlight feature in rich text editor
+
+⚠️ `mark` is now a reserved MDX component name used internally for the highlight feature — custom MDX templates named `mark` will conflict with highlight and produce unexpected behavior.
