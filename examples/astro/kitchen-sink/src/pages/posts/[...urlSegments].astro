@@ -1,0 +1,49 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PostDetail from '../../components/tina/PostDetail';
+import { formatDate } from '../../lib/utils';
+
+export async function getStaticPaths() {
+  const client = (await import('../../../tina/__generated__/client')).default;
+  const allPosts = await client.queries.postConnection({ first: 1000 });
+
+  const paths = (allPosts.data?.postConnection?.edges ?? []).flatMap(
+    (edge: any) => {
+      if (!edge?.node) return [];
+      return [
+        {
+          params: { urlSegments: edge.node._sys.breadcrumbs.join('/') },
+          props: {
+            relativePath: `${edge.node._sys.breadcrumbs.join('/')}.mdx`,
+          },
+        },
+      ];
+    }
+  );
+
+  return paths;
+}
+
+const { relativePath } = Astro.props;
+
+const client = (await import('../../../tina/__generated__/client')).default;
+const result = await client.queries.post({ relativePath });
+
+const formattedDate = result.data?.post?.date
+  ? formatDate(result.data.post.date)
+  : '';
+
+const title = result.data?.post?.title
+  ? `${result.data.post.title} | Posts`
+  : 'Post';
+---
+
+<Layout title={title}>
+  <PostDetail
+    client:tina
+    data={result.data}
+    query={result.query}
+    variables={result.variables}
+    formattedDate={formattedDate}
+  />
+</Layout>

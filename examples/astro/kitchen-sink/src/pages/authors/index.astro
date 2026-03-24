@@ -1,0 +1,38 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import client from '../../../tina/__generated__/client';
+import { sanitizeImageSrc } from '@/lib/utils';
+
+const connection = await client.queries.authorConnection();
+const authors = (connection.data.authorConnection.edges ?? []).flatMap(
+  (edge) => (edge?.node ? [edge.node] : [])
+);
+---
+
+<Layout title="Authors">
+  <h1>Authors</h1>
+  <div>
+    {authors.map((author) => {
+      const avatarSrc = author.avatar ? sanitizeImageSrc(author.avatar) : '';
+      return (
+        <a href={`/authors/${author._sys.filename}`} style="display:block; margin-bottom:1.5rem; text-decoration:none; color:inherit;">
+          <div style="display:flex; align-items:center; gap:1rem;">
+            {avatarSrc && (
+              <img
+                src={avatarSrc}
+                alt={author.name ?? ''}
+                width={56}
+                height={56}
+                style="border-radius:50%; object-fit:cover;"
+              />
+            )}
+            <div>
+              <h2 style="margin:0;">{author.name}</h2>
+              {author.description && <p style="margin:0.25rem 0 0; color:#666;">{author.description}</p>}
+            </div>
+          </div>
+        </a>
+      );
+    })}
+  </div>
+</Layout>

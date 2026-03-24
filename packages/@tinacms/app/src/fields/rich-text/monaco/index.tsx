@@ -15,8 +15,7 @@ import {
   buildError,
 } from './error-message';
 import { useDebounce } from './use-debounce';
-import { RichTextEditorSwitchedEvent } from '../../../../../../tinacms/src/lib/posthog/posthog';
-import { captureEvent } from '../../../../../../tinacms/src/lib/posthog/posthogProvider';
+import { RichTextEditorSwitchedEvent, captureEvent } from 'tinacms';
 
 export const uuid = () => {
   // @ts-ignore
