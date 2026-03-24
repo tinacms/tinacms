@@ -734,12 +734,18 @@ importers:
       '@astrojs/react':
         specifier: ^4.4.0
         version: 4.4.2(@types/node@25.1.0)(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(jiti@2.6.1)(lightningcss@1.31.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.2)
+      '@tailwindcss/typography':
+        specifier: 'catalog:'
+        version: 0.5.19(tailwindcss@4.2.1)
       '@tinacms/datalayer':
         specifier: workspace:*
         version: link:../../../packages/@tinacms/datalayer
       astro:
         specifier: ^5.16.0
         version: 5.18.1(@azure/storage-blob@12.29.1)(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.4)(sass@1.97.3)(terser@5.46.0)(typescript@5.9.3)(yaml@2.8.2)
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
       graphql:
         specifier: ^15.10.1
         version: 15.10.1
@@ -749,6 +755,12 @@ importers:
       react-dom:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
+      react-icons:
+        specifier: ^4.12.0
+        version: 4.12.0(react@18.3.1)
+      tailwind-merge:
+        specifier: ^2.6.0
+        version: 2.6.0
       tinacms:
         specifier: workspace:*
         version: link:../../../packages/tinacms
@@ -756,6 +768,9 @@ importers:
       '@biomejs/biome':
         specifier: 'catalog:'
         version: 1.9.4
+      '@tailwindcss/postcss':
+        specifier: ^4.2.1
+        version: 4.2.1
       '@tinacms/app':
         specifier: workspace:*
         version: link:../../../packages/@tinacms/app
@@ -774,9 +789,18 @@ importers:
       '@types/react-dom':
         specifier: ^18.3.0
         version: 18.3.7(@types/react@18.3.27)
+      autoprefixer:
+        specifier: 'catalog:'
+        version: 10.4.23(postcss@8.5.6)
       cross-env:
         specifier: ^7.0.3
         version: 7.0.3
+      postcss:
+        specifier: ^8.5.2
+        version: 8.5.6
+      tailwindcss:
+        specifier: ^4.0.0
+        version: 4.2.1
       typescript:
         specifier: ^5.7.3
         version: 5.9.3
@@ -21277,6 +21301,11 @@ snapshots:
     dependencies:
       postcss-selector-parser: 6.0.10
       tailwindcss: 4.1.18
+
+  '@tailwindcss/typography@0.5.19(tailwindcss@4.2.1)':
+    dependencies:
+      postcss-selector-parser: 6.0.10
+      tailwindcss: 4.2.1
 
   '@tanstack/react-table@8.21.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:

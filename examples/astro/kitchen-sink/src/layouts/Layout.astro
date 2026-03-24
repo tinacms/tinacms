@@ -1,17 +1,107 @@
 ---
+import '../styles/global.css';
+import { Header } from '../components/layout/header';
+import { Footer } from '../components/layout/footer';
+
 interface Props {
   title?: string;
 }
+
 const { title = 'TinaCMS Astro Kitchen Sink' } = Astro.props;
+
+// Fetch global settings from TinaCMS
+let globalData: any = null;
+try {
+  const client = (await import('../../tina/__generated__/client')).default;
+  const result = await client.queries.global({ relativePath: 'index.json' });
+  globalData = result.data?.global;
+} catch {
+  // Fallback if TinaCMS is not initialized yet
+}
+
+const header = globalData?.header;
+const footer = globalData?.footer;
+const theme = globalData?.theme;
+
+const themeColor = theme?.color || 'blue';
+const themeFont = theme?.font || 'sans';
+const darkMode = theme?.darkMode || 'system';
+
+const fontClass =
+  themeFont === 'nunito'
+    ? 'font-nunito'
+    : themeFont === 'lato'
+      ? 'font-lato'
+      : 'font-sans';
+
+const nav = header?.nav || [
+  { href: '/', label: 'Home' },
+  { href: '/posts', label: 'Posts' },
+  { href: '/blog', label: 'Blog' },
+];
 ---
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme={themeColor}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    {themeFont === 'nunito' && (
+      <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap"
+        rel="stylesheet"
+      />
+    )}
+    {themeFont === 'lato' && (
+      <link
+        href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap"
+        rel="stylesheet"
+      />
+    )}
+
+    <!-- Dark mode: detect system preference before paint -->
+    <script is:inline define:vars={{ darkMode }}>
+      (function() {
+        const mode = darkMode;
+        const root = document.documentElement;
+        if (mode === 'dark') {
+          root.classList.add('dark');
+        } else if (mode === 'light') {
+          root.classList.remove('dark');
+        } else {
+          if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            root.classList.add('dark');
+          }
+        }
+      })();
+    </script>
   </head>
-  <body>
-    <slot />
+  <body class:list={['antialiased', fontClass]}>
+    <div class="min-h-screen flex flex-col">
+      <Header
+        client:load
+        name={header?.name}
+        color={header?.color}
+        nav={nav}
+        themeColor={themeColor}
+        pathname={Astro.url.pathname}
+      />
+
+      <main class="flex-1">
+        <slot />
+      </main>
+
+      <Footer social={footer?.social} />
+    </div>
   </body>
 </html>
