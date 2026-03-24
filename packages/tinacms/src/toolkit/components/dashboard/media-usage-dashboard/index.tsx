@@ -64,6 +64,7 @@ export const MediaUsageDashboard = ({
           <Button
             variant='outline'
             onClick={refresh}
+            disabled={isLoading}
             className='flex items-center gap-2 shadow-sm font-medium transition-colors'
           >
             <RefreshCw className='w-4 h-4' />

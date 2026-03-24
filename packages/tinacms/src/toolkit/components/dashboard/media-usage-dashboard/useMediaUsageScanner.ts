@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useCMS } from '@toolkit/react-core';
 import { scanAllMedia, type MediaUsage } from './media-usage-scanner';
 
@@ -8,6 +8,7 @@ export const useMediaUsageScanner = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [errorOccurred, setErrorOccurred] = useState(false);
   const [progress, setProgress] = useState(0);
+  const activeRef = useRef(true);
 
   const scanMedia = useCallback(async () => {
     setIsLoading(true);
@@ -15,19 +16,23 @@ export const useMediaUsageScanner = () => {
     setProgress(0);
     try {
       const updatedMediaItems = await scanAllMedia(cms, setProgress);
-      setMediaItems(updatedMediaItems);
+      if (activeRef.current) setMediaItems(updatedMediaItems);
     } catch (e) {
       console.error('Error scanning media usage:', e);
-      setErrorOccurred(true);
+      if (activeRef.current) setErrorOccurred(true);
     } finally {
-      setIsLoading(false);
+      if (activeRef.current) setIsLoading(false);
     }
   }, [cms]);
 
   useEffect(() => {
+    activeRef.current = true;
     scanMedia().catch((e) => {
       console.error('Unhandled rejection from scanMedia:', e);
     });
+    return () => {
+      activeRef.current = false;
+    };
   }, [scanMedia]);
 
   return {

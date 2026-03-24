@@ -521,7 +521,7 @@ const MediaFilters = ({
       value={typeFilter}
       onValueChange={(value) => setTypeFilter(value as MediaFilterType)}
     >
-      <SelectTrigger className='w-[130px] bg-white border-gray-200 text-gray-700 h-9'>
+      <SelectTrigger aria-label='Filter by media type' className='w-[130px] bg-white border-gray-200 text-gray-700 h-9'>
         <SelectValue placeholder='All Types' />
       </SelectTrigger>
       <SelectContent>
@@ -535,7 +535,7 @@ const MediaFilters = ({
       value={usageFilter}
       onValueChange={(value) => setUsageFilter(value as UsageFilterType)}
     >
-      <SelectTrigger className='w-[130px] bg-white border-gray-200 text-gray-700 h-9'>
+      <SelectTrigger aria-label='Filter by usage status' className='w-[130px] bg-white border-gray-200 text-gray-700 h-9'>
         <SelectValue placeholder='All Usage' />
       </SelectTrigger>
       <SelectContent>
