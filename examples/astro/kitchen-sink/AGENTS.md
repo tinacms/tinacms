@@ -1,8 +1,3 @@
----
-paths:
-  - examples/astro/kitchen-sink/**
----
-
 # Astro Kitchen-Sink Baseline
 
 This example recreates `examples/next/kitchen-sink` using Astro 5 with React 18, mirroring identical TinaCMS functionality.
@@ -17,10 +12,13 @@ Three-layer component model:
 ## Key Patterns
 
 - **`client:tina` directive:** Only hydrates React components inside TinaCMS visual editor iframe. Zero JS in production. Defined in `astro-tina-directive/` (3 files: `register.js`, `tina.js`, `index.d.ts`).
+- **`client:load` for interactive components:** Use `client:load` for React components that need JS but aren't Tina-connected (e.g., Header with mobile nav drawer). These hydrate immediately on page load.
 - **`useTina()` + `tinaField()`:** React page wrappers in `src/components/tina/` import from `tinacms/dist/react`. `useTina({ query, variables, data })` enables live editing; `tinaField(data.author, 'name')` enables click-to-edit targeting via `data-tina-field` attribute.
+- **Layout context via props (no React context):** Next.js uses `LayoutProvider` React context for global/theme data. Astro instead fetches global data in `Layout.astro` and passes it as props to React components (Header, Footer). This avoids unnecessary client-side context providers.
 - **Schemas:** Shared fields in `tina/schemas/shared-fields.ts` (e.g., `dateFieldSchemas`, `makeSlugify`). Block schemas will be extracted to `tina/schemas/blocks.ts` in later PRs. This differs from Next.js where schemas are co-located with components — extracting avoids messy cross-directory imports between `tina/` and `src/`.
 - **Content directory:** Uses `content/` at project root (TinaCMS managed). Do NOT use `src/content/` — that's Astro's built-in Content Collections, which we don't use.
 - **Path alias:** `@/*` maps to `./src/*` (Astro convention). This differs from Next.js where `@/*` maps to `./*`. Configured in `tsconfig.json`.
+- **tina/ imports:** Files in `tina/` are outside `src/`, so they cannot use the `@/*` alias. Use relative paths instead (e.g., `../../src/lib/utils` in `tina/fields/color.tsx`).
 
 ## Next.js → Astro Replacements
 
@@ -52,6 +50,7 @@ const result = await client.queries.tag({ relativePath: 'react.json' });
 
 - **Rollup warning:** TinaCMS generated files trigger `UNUSED_EXTERNAL_IMPORT` in Vite/Rollup. Suppressed in `astro.config.mjs` with `onwarn` handler (upstream: tinacms/tinacms#6386).
 - **`client:tina` vs `client:load`:** Use `client:tina` for components that call `useTina()` — they must only hydrate inside the editor iframe. Use `client:load` for interactive components that need JS but aren't Tina-connected (e.g., mobile nav drawer).
+- **CodeQL false positive on `sanitizeImageSrc`:** GitHub CodeQL flags `<img src={avatarSrc}>` as "Client-side cross-site scripting" even when the value is already sanitized by `sanitizeImageSrc()`. This is a false positive — data is CMS-controlled, already sanitized, and it's an `<img>` not a redirect.
 
 ## Reference
 
