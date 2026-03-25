@@ -1,3 +1,4 @@
+import os from 'os';
 import path from 'path';
 import fs from 'fs-extra';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
@@ -96,6 +97,46 @@ describe('filesystem bridge', () => {
     test('glob rejects null bytes', async () => {
       await expect(bridge.glob('content\0', 'md')).rejects.toThrow(
         'null bytes'
+      );
+    });
+  });
+
+  describe('symlink traversal', () => {
+    let tmpDir: string;
+    let outsideDir: string;
+
+    beforeEach(async () => {
+      tmpDir = path.join(os.tmpdir(), `tina-bridge-symlink-${Date.now()}`);
+      outsideDir = path.join(os.tmpdir(), `tina-bridge-outside-${Date.now()}`);
+      await fs.mkdirp(tmpDir);
+      await fs.mkdirp(outsideDir);
+      await fs.writeFile(path.join(outsideDir, 'secret.txt'), 'sensitive');
+      await fs.symlink(outsideDir, path.join(tmpDir, 'escape'));
+    });
+
+    afterEach(async () => {
+      await fs.remove(tmpDir);
+      await fs.remove(outsideDir);
+    });
+
+    test('get rejects symlink escaping base', async () => {
+      const bridge = new FilesystemBridge(tmpDir);
+      await expect(bridge.get('escape/secret.txt')).rejects.toThrow(
+        'Path traversal detected'
+      );
+    });
+
+    test('put rejects symlink escaping base', async () => {
+      const bridge = new FilesystemBridge(tmpDir);
+      await expect(bridge.put('escape/newfile.txt', 'payload')).rejects.toThrow(
+        'Path traversal detected'
+      );
+    });
+
+    test('delete rejects symlink escaping base', async () => {
+      const bridge = new FilesystemBridge(tmpDir);
+      await expect(bridge.delete('escape/secret.txt')).rejects.toThrow(
+        'Path traversal detected'
       );
     });
   });

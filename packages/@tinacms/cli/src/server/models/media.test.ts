@@ -58,6 +58,44 @@ describe('MediaModel (Express server)', () => {
     });
   });
 
+  describe('symlink traversal', () => {
+    it('listMedia rejects symlink escaping media root', async () => {
+      const outsideDir = path.join(
+        process.env.TMPDIR || '/tmp',
+        `tina-outside-express-list-${Date.now()}`
+      );
+      await fs.mkdirp(outsideDir);
+      await fs.writeFile(path.join(outsideDir, 'secret.txt'), 'sensitive');
+      const mediaDir = path.join(tmpDir, 'public', 'uploads');
+      await fs.symlink(outsideDir, path.join(mediaDir, 'escape'));
+
+      const model = new MediaModel(config);
+      await expect(model.listMedia({ searchPath: 'escape' })).rejects.toThrow(
+        PathTraversalError
+      );
+
+      await fs.remove(outsideDir);
+    });
+
+    it('deleteMedia rejects symlink escaping media root', async () => {
+      const outsideDir = path.join(
+        process.env.TMPDIR || '/tmp',
+        `tina-outside-express-del-${Date.now()}`
+      );
+      await fs.mkdirp(outsideDir);
+      await fs.writeFile(path.join(outsideDir, 'target.txt'), 'data');
+      const mediaDir = path.join(tmpDir, 'public', 'uploads');
+      await fs.symlink(outsideDir, path.join(mediaDir, 'escape'));
+
+      const model = new MediaModel(config);
+      await expect(
+        model.deleteMedia({ searchPath: 'escape/target.txt' })
+      ).rejects.toThrow(PathTraversalError);
+
+      await fs.remove(outsideDir);
+    });
+  });
+
   describe('deleteMedia', () => {
     it('deletes a valid file', async () => {
       const mediaDir = path.join(tmpDir, 'public', 'uploads');
