@@ -315,15 +315,13 @@ describe('isomorphic bridge', () => {
       });
 
       test('glob rejects backslash traversal', async () => {
-        await expect(
-          bridge.glob('x\\..\\..\\..', '.mdx')
-        ).rejects.toThrow('Path traversal detected');
+        await expect(bridge.glob('x\\..\\..\\..', '.mdx')).rejects.toThrow(
+          'Path traversal detected'
+        );
       });
 
       test('glob rejects null bytes', async () => {
-        await expect(
-          bridge.glob('content/posts\0', '.mdx')
-        ).rejects.toThrow();
+        await expect(bridge.glob('content/posts\0', '.mdx')).rejects.toThrow();
       });
     }
   );

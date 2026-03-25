@@ -72,9 +72,9 @@ describe('filesystem bridge', () => {
     });
 
     test('put rejects null bytes', async () => {
-      await expect(
-        bridge.put('file\0.md', 'payload')
-      ).rejects.toThrow('null bytes');
+      await expect(bridge.put('file\0.md', 'payload')).rejects.toThrow(
+        'null bytes'
+      );
     });
 
     test('delete rejects backslash traversal', async () => {
