@@ -1,5 +1,28 @@
 # tinacms
 
+## 3.7.0
+
+### Minor Changes
+
+- [#6508](https://github.com/tinacms/tinacms/pull/6508) [`5a8ec36`](https://github.com/tinacms/tinacms/commit/5a8ec366d35e33bea17740a1f80f81fe152680e3) Thanks [@thomas-sepanosian](https://github.com/thomas-sepanosian)! - Add media usage dashboard through screen functionality
+
+- [#6510](https://github.com/tinacms/tinacms/pull/6510) [`059f480`](https://github.com/tinacms/tinacms/commit/059f480697ae1af813c165df3cc8954443737488) Thanks [@Aibono1225](https://github.com/Aibono1225)! - support highlight feature in rich text editor
+
+  ⚠️ `mark` is now a reserved MDX component name used internally for the highlight feature — custom MDX templates named `mark` will conflict with highlight and produce unexpected behavior.
+
+### Patch Changes
+
+- [#6532](https://github.com/tinacms/tinacms/pull/6532) [`32d0471`](https://github.com/tinacms/tinacms/commit/32d0471356945ed9fa7b4b8b4da0937e1fafcacc) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐛 Resolve z-index issue for floating toolbar and modals
+
+- [#6520](https://github.com/tinacms/tinacms/pull/6520) [`74f12fd`](https://github.com/tinacms/tinacms/commit/74f12fda610711bd76f43c7f6d4dc890427d3b50) Thanks [@griffenedge](https://github.com/griffenedge)! - Add `tabular-nums` styling to the elapsed timer in the editorial workflow branch creation modal to prevent layout shifts as digits change.
+
+- [#6522](https://github.com/tinacms/tinacms/pull/6522) [`7e34861`](https://github.com/tinacms/tinacms/commit/7e34861197af6ec3488277bdfafe8297f51e1c3d) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐛 Fix beforeSubmit for Editorial Workflow Branch Creation flow
+
+- Updated dependencies [[`059f480`](https://github.com/tinacms/tinacms/commit/059f480697ae1af813c165df3cc8954443737488)]:
+  - @tinacms/mdx@2.1.0
+  - @tinacms/schema-tools@2.7.0
+  - @tinacms/search@1.2.7
+
 ## 3.6.3
 
 ### Patch Changes

@@ -1,5 +1,23 @@
 # tinacms-cli
 
+## 2.2.0
+
+### Minor Changes
+
+- [#6510](https://github.com/tinacms/tinacms/pull/6510) [`059f480`](https://github.com/tinacms/tinacms/commit/059f480697ae1af813c165df3cc8954443737488) Thanks [@Aibono1225](https://github.com/Aibono1225)! - support highlight feature in rich text editor
+
+  ⚠️ `mark` is now a reserved MDX component name used internally for the highlight feature — custom MDX templates named `mark` will conflict with highlight and produce unexpected behavior.
+
+### Patch Changes
+
+- Updated dependencies [[`5a8ec36`](https://github.com/tinacms/tinacms/commit/5a8ec366d35e33bea17740a1f80f81fe152680e3), [`32d0471`](https://github.com/tinacms/tinacms/commit/32d0471356945ed9fa7b4b8b4da0937e1fafcacc), [`059f480`](https://github.com/tinacms/tinacms/commit/059f480697ae1af813c165df3cc8954443737488), [`74f12fd`](https://github.com/tinacms/tinacms/commit/74f12fda610711bd76f43c7f6d4dc890427d3b50), [`7e34861`](https://github.com/tinacms/tinacms/commit/7e34861197af6ec3488277bdfafe8297f51e1c3d)]:
+  - tinacms@3.7.0
+  - @tinacms/app@2.4.0
+  - @tinacms/graphql@2.2.1
+  - @tinacms/metrics@2.0.1
+  - @tinacms/schema-tools@2.7.0
+  - @tinacms/search@1.2.7
+
 ## 2.1.11
 
 ### Patch Changes

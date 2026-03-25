@@ -2,7 +2,7 @@
   "name": "tinacms",
   "type": "module",
   "typings": "dist/index.d.ts",
-  "version": "3.6.3",
+  "version": "3.7.0",
   "main": "dist/index.js",
   "module": "./dist/index.js",
   "exports": {
@@ -74,6 +74,7 @@
     "@udecode/plate-dnd": "catalog:",
     "@udecode/plate-floating": "catalog:",
     "@udecode/plate-heading": "catalog:",
+    "@udecode/plate-highlight": "catalog:",
     "@udecode/plate-horizontal-rule": "catalog:",
     "@udecode/plate-indent-list": "catalog:",
     "@udecode/plate-link": "catalog:",

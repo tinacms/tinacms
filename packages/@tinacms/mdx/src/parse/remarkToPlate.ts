@@ -9,6 +9,7 @@ import type * as Md from 'mdast';
 import type { ContainerDirective } from 'mdast-util-directive';
 import type { MdxJsxFlowElement, MdxJsxTextElement } from 'mdast-util-mdx-jsx';
 import { directiveElement, mdxJsxElement as mdxJsxElementDefault } from './mdx';
+import { parseMarkMdxText } from './mark';
 import type * as Plate from './plate';
 
 export type { Position, PositionItem } from './plate';
@@ -333,7 +334,15 @@ export const remarkToSlate = (
   ): Plate.InlineElement | Plate.InlineElement[] => {
     switch (content.type) {
       case 'mdxJsxTextElement':
-        return mdxJsxElement(content, field, imageCallback);
+        return (
+          parseMarkMdxText<Md.StaticPhrasingContent>(
+            content as MdxJsxTextElement & {
+              children?: Md.StaticPhrasingContent[];
+            },
+            {},
+            (child) => staticPhrasingContent(child)
+          ) ?? mdxJsxElement(content, field, imageCallback)
+        );
       case 'text':
         return text(content);
       case 'inlineCode':
@@ -361,8 +370,17 @@ export const remarkToSlate = (
         return link(content);
       case 'image':
         return image(content);
-      case 'mdxJsxTextElement':
+      case 'mdxJsxTextElement': {
+        // Convert <mark>text</mark> (parsed as MDX JSX in .mdx files) back to
+        // a highlight text node, without routing through mdxJsxElement().
+        const markNodes = parseMarkMdxText(content, {}, (child) =>
+          phrasingContent(child)
+        );
+        if (markNodes) {
+          return markNodes;
+        }
         return mdxJsxElement(content, field, imageCallback);
+      }
       case 'emphasis':
         return phrashingMark(content);
       case 'strong':
@@ -401,10 +419,11 @@ export const remarkToSlate = (
 
   const phrashingMark = (
     node: Md.PhrasingContent,
-    marks: ('strikethrough' | 'bold' | 'italic' | 'code')[] = []
+    marks: ('strikethrough' | 'bold' | 'italic' | 'code' | 'highlight')[] = []
   ): Plate.InlineElement[] => {
     const accum: Plate.InlineElement[] = [];
     switch (node.type) {
+      // @ts-ignore
       case 'emphasis': {
         const children = node.children
           .map((child) => phrashingMark(child, [...marks, 'italic']))
@@ -465,6 +484,23 @@ export const remarkToSlate = (
         marks.forEach((mark) => (markProps[mark] = true));
         accum.push({ type: 'text', text: node.value, ...markProps });
         break;
+      case 'mdxJsxTextElement': {
+        const jsxMark = parseMarkMdxText(
+          node,
+          Object.fromEntries(marks.map((mark) => [mark, true])),
+          (child) => phrasingContent(child)
+        );
+        if (jsxMark) {
+          accum.push(...jsxMark);
+          break;
+        }
+        accum.push(mdxJsxElement(node, field, imageCallback));
+        break;
+      }
+      case 'html': {
+        accum.push(html_inline(node));
+        break;
+      }
       /**
        * Eg. this is a line break
        *                 vv
