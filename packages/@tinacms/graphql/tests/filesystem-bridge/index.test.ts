@@ -54,6 +54,50 @@ describe('filesystem bridge', () => {
         'Path traversal detected'
       );
     });
+
+    test('get rejects backslash traversal', async () => {
+      await expect(bridge.get('x\\..\\..\\..\\etc\\passwd')).rejects.toThrow(
+        'Path traversal detected'
+      );
+    });
+
+    test('get rejects null bytes', async () => {
+      await expect(bridge.get('file\0.md')).rejects.toThrow('null bytes');
+    });
+
+    test('put rejects backslash traversal', async () => {
+      await expect(
+        bridge.put('x\\..\\..\\..\\etc\\malicious', 'payload')
+      ).rejects.toThrow('Path traversal detected');
+    });
+
+    test('put rejects null bytes', async () => {
+      await expect(
+        bridge.put('file\0.md', 'payload')
+      ).rejects.toThrow('null bytes');
+    });
+
+    test('delete rejects backslash traversal', async () => {
+      await expect(bridge.delete('x\\..\\..\\outside.txt')).rejects.toThrow(
+        'Path traversal detected'
+      );
+    });
+
+    test('delete rejects null bytes', async () => {
+      await expect(bridge.delete('file\0.md')).rejects.toThrow('null bytes');
+    });
+
+    test('glob rejects backslash traversal', async () => {
+      await expect(bridge.glob('x\\..\\..\\..', 'md')).rejects.toThrow(
+        'Path traversal detected'
+      );
+    });
+
+    test('glob rejects null bytes', async () => {
+      await expect(bridge.glob('content\0', 'md')).rejects.toThrow(
+        'null bytes'
+      );
+    });
   });
 });
 
