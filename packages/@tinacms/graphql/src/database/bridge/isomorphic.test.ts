@@ -307,6 +307,24 @@ describe('isomorphic bridge', () => {
           bridge.put('content/posts/file\0.mdx', 'payload')
         ).rejects.toThrow();
       });
+
+      test('delete rejects null bytes', async () => {
+        await expect(
+          bridge.delete('content/posts/file\0.mdx')
+        ).rejects.toThrow();
+      });
+
+      test('glob rejects backslash traversal', async () => {
+        await expect(
+          bridge.glob('x\\..\\..\\..', '.mdx')
+        ).rejects.toThrow('Path traversal detected');
+      });
+
+      test('glob rejects null bytes', async () => {
+        await expect(
+          bridge.glob('content/posts\0', '.mdx')
+        ).rejects.toThrow();
+      });
     }
   );
 });
