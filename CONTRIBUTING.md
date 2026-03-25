@@ -120,6 +120,31 @@ pnpm watch
 > This will only work for packages loaded by webpack. That means that environments which don't use
 > webpack (i.e. SSR builds) will not use this alias
 
+## Windows
+
+### Symlinks
+
+Some example projects (e.g., `examples/**/kitchen-sink`) use git symlinks to share content and images across framework examples. On macOS and Linux, symlinks work automatically. On Windows, git defaults to creating text files instead of real symlinks, which will break these projects.
+
+To clone with symlink support:
+
+```sh
+git clone -c core.symlinks=true <repo-url>
+```
+
+Or enable symlinks on an existing clone:
+
+```sh
+git config core.symlinks true
+git checkout -- .
+```
+
+Windows requires [Developer Mode](https://learn.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development) enabled for symlinks to work.
+
+### cross-env
+
+Scripts that set environment variables use `cross-env` for Windows compatibility. Windows `cmd` does not support the Unix `VAR=value command` syntax, so `cross-env` ensures environment variables are set correctly across all platforms.
+
 ## E2E tests
 
 In order to run the Playwright E2E tests locally:
