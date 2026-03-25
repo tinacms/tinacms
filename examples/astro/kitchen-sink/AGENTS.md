@@ -96,6 +96,54 @@ Both are functionally equivalent. Be consistent within a file.
 - **`react-icons` SSR:** `react-icons` uses directory imports that Node ESM doesn't support. Fixed with `vite.ssr.noExternal: ['react-icons']` in `astro.config.mjs` so Vite bundles it during SSR.
 - **CodeQL false positive on `sanitizeImageSrc`:** GitHub CodeQL flags `<img src={avatarSrc}>` as "Client-side cross-site scripting" even when the value is already sanitized by `sanitizeImageSrc()`. This is a false positive — data is CMS-controlled, already sanitized, and it's an `<img>` not a redirect.
 
+## E2E Tests
+
+Playwright test suite in `e2e/` covering frontend pages and admin panel CRUD. Run with `pnpm test:e2e`.
+
+### Structure
+
+- `e2e/*.spec.ts` — Frontend tests (pages, navigation, edge cases). Fully parallel, no auth.
+- `e2e/admin/*.spec.ts` — Admin panel tests (author, blog, post, page CRUD). Serial within each collection, parallel across collections.
+- `e2e/fixtures/` — `api-context.ts` (GraphQL API client), `test-content.ts` (`contentCleanup` fixture for automatic document deletion after each test).
+- `e2e/utils/` — `admin-helpers.ts` (navigation, save, dialog dismissal), `create-document.ts` / `delete-document.ts` (GraphQL mutations).
+
+### Content Symlinks
+
+All `content/` directories are symlinks to `examples/next/kitchen-sink/content/`. Test-created files (prefixed `e2e-`) are physically written to the Next.js directory. The `.gitignore` pattern `/content/**/e2e-*` in the Next.js kitchen-sink catches them.
+
+### TinaCMS Admin UI — Selectors and Behavior
+
+These patterns are not obvious from TinaCMS source code and were discovered through debugging:
+
+- **"Enter Edit Mode" dialog:** Appears once per browser context on first admin visit. Target with `button[data-test="enter-edit-mode"]`. State persists in localStorage — won't reappear after dismissal in the same context. Each Playwright test gets a fresh context, so the dialog appears on every test.
+- **Error modals:** Render in `#modal-root` with a backdrop that blocks all pointer events. Close buttons match `#modal-root button:has-text("Close")` or `#modal-root button:has-text("OK")`.
+- **Save button states:** `opacity-70 cursor-wait` while submitting (busy), `opacity-30 cursor-not-allowed` when pristine (disabled), `pointer-events-none` when validation fails. Shows `LoadingDots` animation during save, "Save" text when idle.
+- **Field labels:** Standard fields use `<label>`. Block/list fields (e.g., "Sections", "Hobbies") render labels via `ListLabel` as `<span>` elements, NOT `<label>`. Target with `span:has-text("Sections")`.
+- **Block items:** After adding a block via the selector, blocks appear collapsed as `div[role="button"][aria-roledescription="sortable"]`. Must click to expand and reveal form fields.
+- **Block selector panel:** Opens in a `FormPortal`. Block template cards are `<button>` elements. The add button is icon-only (no text, just `AddIcon` SVG) — target via `sectionsHeader.locator('button').first()`.
+- **Validation:** Runs on change (not blur or submit). Inline `FieldError` appears immediately. No need to trigger blur.
+- **Post-save SPA redirect:** After creating a new document, TinaCMS may internally redirect (e.g., `/new/` → `/edit/`). Always wait for URL to stabilize after save before navigating elsewhere.
+
+### TinaCMS Slugify Behavior
+
+- **Default slugify** (no custom slugify, `isTitle: true` field): `values[titleField]?.replace(/ /g, '-').replace(/[^a-zA-Z0-9-]/g, '')` — preserves case.
+- **Custom `makeSlugify`** (used by post, blog collections): `title.toLowerCase().split(' ').join('-')` — forces lowercase.
+- **`FilenameInput`:** Starts locked (`disabled`). For collections without custom slugify but with an `isTitle` field, TinaCMS creates a default slugify automatically. Don't try to fill the filename input directly — let auto-slugify handle it.
+
+### GraphQL API Quirks
+
+- **`_sys` filter is NOT available:** Collection filter types (`AuthorFilter`, `PostFilter`, etc.) do NOT have a `_sys` field. You cannot filter connection queries by `relativePath` via `_sys`. Don't try to build `documentExists` queries using `_sys` filters.
+- **Delete non-existent documents:** The `deleteDocument` mutation logs server-side errors when the document doesn't exist. Use `fs.existsSync()` to check the file on disk before sending the mutation to avoid noisy console output.
+
+### Test Conventions
+
+- All test document filenames are prefixed with `e2e-` and use lowercase (e.g., `e2e-playwright-author.md`).
+- Each test is self-contained — creates its own data, doesn't depend on other tests.
+- `contentCleanup.track(collection, relativePath)` registers documents for automatic deletion after the test (even on failure).
+- `beforeAll` cleanup is a safety net for interrupted/crashed runs where fixture teardown didn't execute.
+- Use `Promise.race` (not sequential try/catch) when waiting for optional UI elements like dialogs — race the dialog against actual content appearing.
+- Never use `waitForTimeout` — always use observable conditions (`waitFor`, `toBeVisible`, `toHaveClass`, `waitForURL`, etc.).
+
 ## Reference
 
 - **Next.js kitchen-sink:** `examples/next/kitchen-sink/` — the Next.js version of this example app, useful for comparing approaches across frameworks

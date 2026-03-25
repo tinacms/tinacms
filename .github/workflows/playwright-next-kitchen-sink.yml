@@ -1,4 +1,4 @@
-name: Playwright — kitchen-sink
+name: Playwright — Next.js kitchen-sink
 
 on:
   pull_request:
@@ -6,11 +6,11 @@ on:
       - main
     paths:
       - 'examples/next/kitchen-sink/**'
-      - '.github/workflows/playwright-kitchen-sink.yml'
+      - '.github/workflows/playwright-next-kitchen-sink.yml'
 
 jobs:
   e2e:
-    name: kitchen-sink-e2e
+    name: next-kitchen-sink-e2e
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -31,7 +31,7 @@ jobs:
       - name: Install Playwright browsers
         working-directory: examples/next/kitchen-sink
         run: npx playwright install --with-deps chromium
-      - name: Run kitchen-sink Playwright tests
+      - name: Run Next.js kitchen-sink Playwright tests
         working-directory: examples/next/kitchen-sink
         run: npx playwright test
         env:

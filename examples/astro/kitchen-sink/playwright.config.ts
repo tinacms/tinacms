@@ -25,8 +25,14 @@ export default defineConfig({
   },
   projects: [
     {
-      name: 'chromium',
+      name: 'frontend',
       use: { ...devices['Desktop Chrome'] },
+      testIgnore: /admin\//,
+    },
+    {
+      name: 'admin',
+      use: { ...devices['Desktop Chrome'] },
+      testMatch: /admin\/.*\.spec\.ts$/,
     },
   ],
   webServer: {

@@ -4,7 +4,7 @@
  * Validates that the blog listing page renders blog entries and that
  * clicking a blog card navigates to the correct detail page.
  */
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.describe('Blog Listing Page', () => {
   test('should load the blog page', async ({ page }) => {

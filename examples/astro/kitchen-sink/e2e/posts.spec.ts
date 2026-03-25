@@ -5,7 +5,7 @@
  * individual post detail pages load correctly. Content text may change, so
  * we assert on structural elements rather than exact wording.
  */
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.describe('Posts Listing Page', () => {
   test('should load the posts page', async ({ page }) => {

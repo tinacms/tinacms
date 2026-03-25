@@ -4,7 +4,7 @@
  * Verifies that the application gracefully handles missing,
  * null, or malformed data from the CMS without crashing or showing errors.
  */
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.describe('Edge Cases — Missing Fields', () => {
   test('blog listing should not crash with missing descriptions', async ({

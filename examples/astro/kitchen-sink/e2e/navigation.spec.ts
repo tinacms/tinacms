@@ -6,7 +6,7 @@
  * config (content/global/index.json) so we check structural presence, not
  * exact label text — labels can be edited via the CMS.
  */
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.describe('Header Navigation', () => {
   test.beforeEach(async ({ page }) => {
@@ -23,30 +23,17 @@ test.describe('Header Navigation', () => {
   });
 
   test('should navigate to Posts page via nav link', async ({ page }) => {
-    await page.waitForLoadState('networkidle');
-
     const postsLink = page.locator('header nav a[href="/posts"]').first();
-    const linkExists = (await postsLink.count()) > 0;
 
-    if (linkExists) {
+    if ((await postsLink.count()) > 0) {
       await postsLink.click();
-      const navigated = await page
-        .waitForURL(/\/posts/, { timeout: 3000 })
-        .catch(() => false);
-      if (!navigated) {
-        await page.goto('/posts');
-      }
+      await page.waitForLoadState('domcontentloaded');
+      await expect(page).toHaveURL(/\/posts/);
     } else {
       await page.goto('/posts');
     }
 
-    await page.waitForLoadState('domcontentloaded');
-    const heading = await page
-      .locator('h1, h2')
-      .first()
-      .textContent()
-      .catch(() => '');
-    expect(heading?.toLowerCase()).toContain('posts');
+    await expect(page.locator('h1, h2').first()).toContainText(/posts/i);
   });
 
   test('should navigate to Blog page via nav link', async ({ page }) => {

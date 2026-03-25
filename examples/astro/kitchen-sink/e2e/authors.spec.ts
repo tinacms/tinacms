@@ -4,7 +4,7 @@
  * Validates that the authors listing renders author cards from the CMS
  * and that detail pages load correctly.
  */
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.describe('Authors Listing Page', () => {
   test('should load the authors page', async ({ page }) => {

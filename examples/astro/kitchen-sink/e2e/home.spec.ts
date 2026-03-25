@@ -5,7 +5,7 @@
  * the expected block-based layout. Content text is NOT hard-coded because
  * TinaCMS lets users change it — we only assert structural elements.
  */
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.describe('Home Page', () => {
   test.beforeEach(async ({ page }) => {
