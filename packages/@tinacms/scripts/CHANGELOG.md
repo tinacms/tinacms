@@ -1,5 +1,13 @@
 # Change Log
 
+## 1.6.0
+
+### Minor Changes
+
+- [#6510](https://github.com/tinacms/tinacms/pull/6510) [`059f480`](https://github.com/tinacms/tinacms/commit/059f480697ae1af813c165df3cc8954443737488) Thanks [@Aibono1225](https://github.com/Aibono1225)! - support highlight feature in rich text editor
+
+  ⚠️ `mark` is now a reserved MDX component name used internally for the highlight feature — custom MDX templates named `mark` will conflict with highlight and produce unexpected behavior.
+
 ## 1.5.0
 
 ### Minor Changes
