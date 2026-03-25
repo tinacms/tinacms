@@ -62,6 +62,8 @@ const resolveFieldData = async (
   assertShape<{ [key: string]: unknown }>(rawData, (yup) => yup.object());
   const value = rawData[field.name];
   switch (field.type) {
+    case 'displayOnly':
+      break;
     case 'datetime':
       // See you in March ;)
       if (value instanceof Date) {
@@ -1501,6 +1503,8 @@ export class Resolver {
         throw new Error(`Expected to find field by name ${fieldName}`);
       }
       switch (field.type) {
+        case 'displayOnly':
+          break;
         case 'datetime':
           // @ts-ignore FIXME: Argument of type 'string | { [key: string]: unknown; } | (string | { [key: string]: unknown; })[]' is not assignable to parameter of type 'string'
           accum[fieldName] = resolveDateInput(fieldValue, field);

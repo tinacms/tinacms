@@ -16,6 +16,7 @@ const TypeName = [
   'object',
   'reference',
   'rich-text',
+  'displayOnly',
 ] as const;
 
 const formattedTypes = `  - ${TypeName.join('\n  - ')}`;
@@ -94,6 +95,16 @@ const DateTimeField = TinaScalerBase.extend({
   }),
   dateFormat: z.string().optional(),
   timeFormat: z.string().optional(),
+});
+
+// ==========
+// Display-only fields
+// ==========
+const DisplayOnlyField = TinaField.extend({
+  type: z.literal('displayOnly', {
+    invalid_type_error: typeTypeError,
+    required_error: typeRequiredError,
+  }),
 });
 
 // ==========
@@ -199,6 +210,7 @@ export const TinaFieldZod: z.ZodType<TinaFieldType> = z.lazy(() => {
         ObjectField,
         RichTextField,
         PasswordField,
+        DisplayOnlyField,
       ],
       {
         errorMap: (issue, ctx) => {
