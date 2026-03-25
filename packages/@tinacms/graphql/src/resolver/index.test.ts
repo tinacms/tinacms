@@ -46,6 +46,28 @@ describe('index', () => {
         'Invalid path: path escapes the collection directory'
       );
     });
+
+    it('should throw error for backslash path traversal', () => {
+      const collection = { path: 'posts' } as any;
+      const fullPath = 'posts/x\\..\\..\\outside.md';
+      expect(() => validatePath(fullPath, collection)).toThrow(
+        'Invalid path: path escapes the collection directory'
+      );
+    });
+
+    it('should throw error for mixed slash traversal escaping collection', () => {
+      const collection = { path: 'posts' } as any;
+      const fullPath = 'posts/x\\..\\..\\other/file.md';
+      expect(() => validatePath(fullPath, collection)).toThrow(
+        'Invalid path: path escapes the collection directory'
+      );
+    });
+
+    it('should throw error for null bytes in path', () => {
+      const collection = { path: 'posts' } as any;
+      const fullPath = 'posts/file\0.md';
+      expect(() => validatePath(fullPath, collection)).toThrow();
+    });
   });
 
   describe('updateObjectWithJsonPath', () => {

@@ -20,8 +20,12 @@ import type { Bridge } from './index';
  * @throws {Error} If the path escapes the base directory.
  */
 function assertWithinBase(filepath: string, baseDir: string): string {
+  if (filepath.includes('\0')) {
+    throw new Error('Invalid path: null bytes are not allowed');
+  }
+  const sanitized = filepath.replace(/\\/g, '/');
   const resolvedBase = path.resolve(baseDir);
-  const resolved = path.resolve(path.join(baseDir, filepath));
+  const resolved = path.resolve(path.join(baseDir, sanitized));
   if (
     resolved !== resolvedBase &&
     !resolved.startsWith(resolvedBase + path.sep)

@@ -279,6 +279,36 @@ describe('isomorphic bridge', () => {
           'Path traversal detected'
         );
       });
+
+      test('get rejects backslash traversal', async () => {
+        await expect(
+          bridge.get('x\\..\\..\\..\\etc\\passwd')
+        ).rejects.toThrow('Path traversal detected');
+      });
+
+      test('put rejects backslash traversal', async () => {
+        await expect(
+          bridge.put('content\\..\\..\\etc\\malicious', 'payload')
+        ).rejects.toThrow('Path traversal detected');
+      });
+
+      test('delete rejects backslash traversal', async () => {
+        await expect(
+          bridge.delete('x\\..\\..\\outside.txt')
+        ).rejects.toThrow('Path traversal detected');
+      });
+
+      test('get rejects null bytes', async () => {
+        await expect(
+          bridge.get('content/posts/file\0.mdx')
+        ).rejects.toThrow();
+      });
+
+      test('put rejects null bytes', async () => {
+        await expect(
+          bridge.put('content/posts/file\0.mdx', 'payload')
+        ).rejects.toThrow();
+      });
     }
   );
 });
