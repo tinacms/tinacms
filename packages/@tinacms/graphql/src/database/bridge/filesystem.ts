@@ -5,21 +5,6 @@ import normalize from 'normalize-path';
 import type { Bridge } from './index';
 
 /**
- * Defense-in-depth: validates that a filepath stays within a base directory.
- * This protects against CWE-22 (Path Traversal) even if callers fail to
- * sanitize user input before calling bridge methods.
- *
- * @security This is a local copy of the validation pattern. The canonical
- * reference is in `@tinacms/cli/src/utils/path.ts`. Unlike the media-model
- * copies, this one does NOT include the URL-encoded safety net because
- * bridge paths come from GraphQL, not raw HTTP URLs.
- *
- * @param filepath - The path to validate (relative to baseDir).
- * @param baseDir  - The trusted root directory.
- * @returns The resolved absolute path.
- * @throws {Error} If the path escapes the base directory.
- */
-/**
  * Follows symlinks to determine where a path actually points on disk.
  *
  * If the full path exists, returns its `fs.realpathSync` result. If it
@@ -42,6 +27,21 @@ function resolveRealPath(candidate: string): string {
   }
 }
 
+/**
+ * Defense-in-depth: validates that a filepath stays within a base directory.
+ * This protects against CWE-22 (Path Traversal) even if callers fail to
+ * sanitize user input before calling bridge methods.
+ *
+ * @security This is a local copy of the validation pattern. The canonical
+ * reference is in `@tinacms/cli/src/utils/path.ts`. Unlike the media-model
+ * copies, this one does NOT include the URL-encoded safety net because
+ * bridge paths come from GraphQL, not raw HTTP URLs.
+ *
+ * @param filepath - The path to validate (relative to baseDir).
+ * @param baseDir  - The trusted root directory.
+ * @returns The resolved absolute path.
+ * @throws {Error} If the path escapes the base directory.
+ */
 function assertWithinBase(filepath: string, baseDir: string): string {
   if (filepath.includes('\0')) {
     throw new Error('Invalid path: null bytes are not allowed');
