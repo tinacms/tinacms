@@ -366,6 +366,40 @@ describe('scanAllMedia', () => {
       expect(usage1.usedIn).toHaveLength(1);
       expect(usage2.usedIn).toHaveLength(1);
     });
+
+    it('tracks files with the same filename in different directories independently', async () => {
+      // Arrange: Same filename exists in multiple directories, but only one path is referenced
+      const mediaItem1 = makeStubMediaItem(
+        'image.png',
+        'image.png',
+        '/uploads/team/image.png'
+      );
+      const mediaItem2 = makeStubMediaItem(
+        'image.png',
+        'image.png',
+        '/uploads/blog/image.png'
+      );
+      const cms = buildStubCms({
+        mediaItems: [mediaItem1, mediaItem2],
+        collectionNames: ['posts'],
+        documentsByCollection: {
+          posts: [
+            makeStubDocumentEdge('posts', {
+              hero: mediaItem1.src,
+            }),
+          ],
+        },
+      });
+
+      // Act: Scan all media
+      const result = await scanAllMedia(cms);
+
+      // Assert: The specifically referenced src is counted as used
+      const usage1 = result.find((r) => r.media.src === mediaItem1.src);
+      const usage2 = result.find((r) => r.media.src === mediaItem2.src);
+      expect(usage1.usedIn).toHaveLength(1);
+      expect(usage2.usedIn).toHaveLength(0);
+    });
   });
 
   describe('Edit URL Resolution', () => {

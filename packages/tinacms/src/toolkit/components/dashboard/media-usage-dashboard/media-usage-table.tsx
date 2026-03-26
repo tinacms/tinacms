@@ -311,7 +311,7 @@ export const MediaUsageTable = ({
   const table = useReactTable({
     data: mediaItems,
     columns,
-    getRowId: (row) => row.media.id,
+    getRowId: (row) => row.media.src,
     initialState: { columnVisibility: { type: false } },
     state: { sorting, columnFilters, expanded },
     onColumnFiltersChange: setColumnFilters,
