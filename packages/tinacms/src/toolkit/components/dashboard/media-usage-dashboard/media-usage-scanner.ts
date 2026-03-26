@@ -112,14 +112,14 @@ const getDocumentEditUrl = async (
  * Helper function to scan a document's _values payload for references to media items based on their src paths.
  * @param documentContent - The stringified _values payload from the GraphQL document node
  * @param mediaUsages - Pre-calculated array of media usage objects for reference scanning
- * @returns A Set of media IDs referenced in the document
+ * @returns A Set of media src values referenced in the document
  */
 const scanDocumentForMedia = (
   documentContent: string,
   mediaUsages: MediaUsage[]
 ): Set<string> => {
   // Set to avoid counting multiple occurrences of the same media item in a single document more than once
-  const matchedIds = new Set<string>();
+  const matchedSrcs = new Set<string>();
 
   for (const mediaUsage of mediaUsages) {
     // JSON.stringify the src so its escaping matches the stringified document content
@@ -138,7 +138,7 @@ const scanDocumentForMedia = (
       const isNextValid = !nextChar || !/[a-zA-Z0-9_.%~+-]/.test(nextChar);
 
       if (isPrevValid && isNextValid) {
-        matchedIds.add(mediaUsage.media.id);
+        matchedSrcs.add(mediaUsage.media.src);
         break;
       }
 
@@ -147,7 +147,7 @@ const scanDocumentForMedia = (
     }
   }
 
-  return matchedIds;
+  return matchedSrcs;
 };
 
 // Note: in local mode, the media store does not generate actual thumbnails, it returns the full
@@ -160,13 +160,13 @@ const UI_YIELD_INTERVAL = 50;
  * Helper function to recursively collect all media files from the CMS.
  *
  * @param cms - The CMS instance to use for fetching media
- * @param mediaIdToUsageMap - Media usage map to initialize while fetching (in-place)
+ * @param mediaSrcToUsageMap - Media usage map to initialize while fetching (in-place)
  * @param currentDirectory - The directory to fetch media from
  * @returns A Promise that resolves when all media items in the directory have been fetched and indexed
  */
 const collectAllMedia = async (
   cms: TinaCMS,
-  mediaIdToUsageMap: Record<string, MediaUsage>,
+  mediaSrcToUsageMap: Record<string, MediaUsage>,
   currentDirectory: string
 ): Promise<void> => {
   const subDirectories: string[] = [];
@@ -184,12 +184,12 @@ const collectAllMedia = async (
     // Separate files and directories
     for (const item of list.items) {
       if (item.type === 'file') {
-        // Index media items by ID with an empty usedIn array
+        // Index media items by src with an empty usedIn array
         if (item.src) {
           const isImg = isImage(item.filename);
           const isVid = isVideo(item.filename);
           const type = isImg ? 'image' : isVid ? 'video' : 'other';
-          mediaIdToUsageMap[item.id] = {
+          mediaSrcToUsageMap[item.src] = {
             media: item,
             type,
             usedIn: [],
@@ -216,7 +216,7 @@ const collectAllMedia = async (
   // Recursively fetch all subdirectories in parallel, promise fails if any single directory fetch fails
   if (subDirectories.length > 0) {
     await Promise.all(
-      subDirectories.map((dir) => collectAllMedia(cms, mediaIdToUsageMap, dir))
+      subDirectories.map((dir) => collectAllMedia(cms, mediaSrcToUsageMap, dir))
     );
   }
 };
@@ -226,19 +226,19 @@ const collectAllMedia = async (
  *
  * @param cms - The CMS instance to use for fetching documents
  * @param collectionMeta - The name and optional label of the collection to process
- * @param mediaIdToUsageMap - The media usage map to update with found references
- * @returns A Promise that resolves when the collection has been fully processed (mediaIdToUsageMap will be updated in-place)
+ * @param mediaSrcToUsageMap - The media usage map to update with found references
+ * @returns A Promise that resolves when the collection has been fully processed (mediaSrcToUsageMap will be updated in-place)
  */
 const scanCollectionForMediaUsage = async (
   cms: TinaCMS,
   collectionMeta: { name: string; label?: string },
-  mediaIdToUsageMap: Record<string, MediaUsage>
+  mediaSrcToUsageMap: Record<string, MediaUsage>
 ) => {
   let hasNextPage: boolean = true;
   let after: string | undefined = undefined;
 
   // Pre-calculate the media usages array
-  const mediaUsages = Object.values(mediaIdToUsageMap);
+  const mediaUsages = Object.values(mediaSrcToUsageMap);
 
   // Fetch _sys fully because `ui.router` could utilize any of them to construct a route
   const listQuery = `
@@ -297,18 +297,18 @@ const scanCollectionForMediaUsage = async (
         const edge = edges[i];
 
         // Scan document values for media references
-        const matchedIds = scanDocumentForMedia(
+        const matchedSrcs = scanDocumentForMedia(
           JSON.stringify(edge.node._values),
           mediaUsages
         );
 
-        if (matchedIds.size === 0) continue;
+        if (matchedSrcs.size === 0) continue;
 
         const editUrl = await getDocumentEditUrl(cms, edge.node);
 
-        // For each matched media ID, add the document reference to the usedIn array
-        matchedIds.forEach((mediaId) => {
-          const usage = mediaIdToUsageMap[mediaId];
+        // For each matched media src, add the document reference to the usedIn array
+        matchedSrcs.forEach((mediaSrc) => {
+          const usage = mediaSrcToUsageMap[mediaSrc];
           if (usage) {
             usage.usedIn.push({
               collectionName: collectionMeta.name,
@@ -338,10 +338,10 @@ export const scanAllMedia = async (
   onProgress?: (percent: number) => void
 ): Promise<MediaUsage[]> => {
   // Structure to hold media usage data
-  const mediaIdToUsageMap: Record<string, MediaUsage> = {};
+  const mediaSrcToUsageMap: Record<string, MediaUsage> = {};
 
-  // Collect all media items from the CMS and populate the mediaIdToUsageMap
-  await collectAllMedia(cms, mediaIdToUsageMap, '');
+  // Collect all media items from the CMS and populate the mediaSrcToUsageMap
+  await collectAllMedia(cms, mediaSrcToUsageMap, '');
 
   // Get all schema collections
   const collectionMetas = cms.api.tina.schema.getCollections();
@@ -351,11 +351,11 @@ export const scanAllMedia = async (
     await scanCollectionForMediaUsage(
       cms,
       collectionMetas[i],
-      mediaIdToUsageMap
+      mediaSrcToUsageMap
     );
     onProgress?.(((i + 1) / collectionMetas.length) * 100);
   }
 
   // Return the media usage data as an array
-  return Object.values(mediaIdToUsageMap);
+  return Object.values(mediaSrcToUsageMap);
 };
