@@ -101,3 +101,11 @@ export const CloudConfigNavComponentClickedEvent: string =
 export type CloudConfigNavComponentClickedPayload = {
   itemType: 'Project Config' | 'User Management' | 'Support';
 };
+
+export const SlashCommandOpenedEvent: string = 'slash-command-opened';
+export type SlashInputElementOpenedPayload = Record<string, never>;
+
+export const SlashCommandUsedEvent: string = 'slash-command-used';
+export type SlashCommandUsedPayload = {
+  command: string;
+};
