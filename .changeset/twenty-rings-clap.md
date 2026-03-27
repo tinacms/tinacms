@@ -2,4 +2,4 @@
 "tinacms": patch
 ---
 
-✨ UI - Add 'new' badge to block list items
+✨ UI: Added "New" badges to help you quickly identify recently added items
