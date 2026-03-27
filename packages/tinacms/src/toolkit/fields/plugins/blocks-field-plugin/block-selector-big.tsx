@@ -98,7 +98,7 @@ export const BlockSelectorBig = ({
     });
   }, [filteredTemplates]);
 
-  const close = (name, template, sourceRect?: DOMRect) => {
+  const close = (name?, template?, sourceRect?: DOMRect) => {
     if (name && template) {
       addItem(name, template, sourceRect);
     }
@@ -328,7 +328,6 @@ const BlockCard = ({ close, name, template }) => {
       key={name}
       onClick={(event) => {
         const sourceRect = event.currentTarget.getBoundingClientRect();
-        console.log(sourceRect)
         close(name, template, sourceRect);
       }}
     >

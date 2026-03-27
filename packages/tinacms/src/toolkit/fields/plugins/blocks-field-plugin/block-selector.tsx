@@ -16,7 +16,7 @@ export const BlockSelector = ({
   templates: {
     [key: string]: BlockTemplate;
   };
-  addItem: (name: string, template: BlockTemplate, sourceRect: DOMRect) => void;
+  addItem: (name: string, template: BlockTemplate, sourceRect?: DOMRect) => void;
 }) => {
   const showFilter = React.useMemo(() => {
     return Object.entries(templates).length > 6;
