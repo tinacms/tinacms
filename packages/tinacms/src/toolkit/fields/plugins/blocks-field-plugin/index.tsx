@@ -256,15 +256,12 @@ const BlockListItem = ({
               }
               onMouseOut={() => setHoveredField({ id: null, fieldName: null })}
             >
-              <GroupLabel>
-                {label || template.label}
-                
-              </GroupLabel>
+              <GroupLabel>{label || template.label}</GroupLabel>
               {isNew && (
-                  <span className='mr-1.5 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] border-[0.5px] border-tina-orange/50 font-semibold bg-tina-orange/10 text-tina-orange leading-none'>
-                    NEW
-                  </span>
-                )}
+                <span className='mr-1.5 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] border-[0.5px] border-tina-orange/50 font-semibold bg-tina-orange/10 text-tina-orange leading-none'>
+                  NEW
+                </span>
+              )}
               <BiPencil className='h-5 w-auto fill-current text-gray-200 group-hover:text-inherit transition-colors duration-150 ease-out' />
             </ItemClickTarget>
             {(!fixedLength || (fixedLength && !isMin)) && (
