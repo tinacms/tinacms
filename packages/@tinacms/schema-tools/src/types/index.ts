@@ -369,6 +369,7 @@ export type RichTextField<WithNamespace extends boolean = false> = (
       toolbar?: ToolbarOverrideType[];
       /**Default set to true */
       showFloatingToolbar?: boolean;
+      highlightColors?: { label: string; value: string }[];
     };
     /**
      * By default, Tina parses markdown with MDX, this is a more strict parser
