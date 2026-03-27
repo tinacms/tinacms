@@ -69,8 +69,10 @@ const Blocks = ({
   meta,
   index,
 }: BlockFieldProps) => {
+  const listRef = React.useRef<HTMLDivElement>(null);
+
   const addItem = React.useCallback(
-    (name: string, template: BlockTemplate) => {
+    (name: string, template: BlockTemplate, sourceRect?: DOMRect) => {
       let obj: any = {};
       if (typeof template.defaultItem === 'function') {
         obj = template.defaultItem();
@@ -78,7 +80,86 @@ const Blocks = ({
         obj = template.defaultItem || {};
       }
       obj._template = name;
-      form.mutators.push(field.name, obj);
+
+      if (sourceRect && listRef.current) {
+        const listEl = listRef.current;
+        const labelText = template.label || name;
+        // Create floating label immediately at click position, on top of everything
+        const floatingEl = document.createElement('span');
+        floatingEl.textContent = labelText;
+        floatingEl.style.cssText = [
+          'position: fixed',
+          `top: ${sourceRect.top}px`,
+          `left: ${sourceRect.left}px`,
+          'margin: 0',
+          'font-size: 0.75rem',
+          'font-weight: 600',
+          'color: #EC4815',
+          'background: transparent',
+          'padding: 4px 8px',
+          'pointer-events: none',
+          'z-index: 2147483647',
+          'white-space: nowrap',
+        ].join('; ');
+        document.body.appendChild(floatingEl);
+        // Push the item to the form
+        form.mutators.push(field.name, obj);
+
+        // Use double-rAF to wait for React to render the new item
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            const findAndAnimate = (retries = 5) => {
+              // Find the last span matching the label text
+              const allSpans = listEl.querySelectorAll('span');
+              let targetEl: Element | null = null;
+              for (let i = allSpans.length - 1; i >= 0; i--) {
+                if (allSpans[i].textContent === labelText) {
+                  targetEl = allSpans[i];
+                  break;
+                }
+              }
+
+              if (!targetEl) {
+                if (retries > 0) {
+                  console.log('[fly-animation] target not found, retrying...');
+                  setTimeout(() => findAndAnimate(retries - 1), 50);
+                } else {
+                  console.log('[fly-animation] giving up, no target found');
+                  floatingEl.remove();
+                }
+                return;
+              }
+
+              (targetEl as HTMLElement).scrollIntoView({ block: 'nearest' });
+              const destRect = targetEl.getBoundingClientRect();
+              console.log('[fly-animation] destRect:', { top: destRect.top, left: destRect.left });
+
+              // Hide real label during flight
+              (targetEl as HTMLElement).style.opacity = '0';
+
+              // Enable transition and start the fly
+              floatingEl.style.transition = 'top 500ms ease-in-out, left 500ms ease-in-out';
+              requestAnimationFrame(() => {
+                floatingEl.style.top = `${destRect.top}px`;
+                floatingEl.style.left = `${destRect.left}px`;
+                console.log('[fly-animation] transition started');
+              });
+
+              const onEnd = () => {
+                console.log('[fly-animation] animation complete');
+                floatingEl.remove();
+                (targetEl as HTMLElement).style.opacity = '1';
+              };
+              floatingEl.addEventListener('transitionend', onEnd, { once: true });
+              setTimeout(onEnd, 600); // safety
+            };
+
+            findAndAnimate();
+          });
+        });
+      } else {
+        form.mutators.push(field.name, obj);
+      }
     },
     [field.name, form.mutators]
   );
@@ -118,7 +199,12 @@ const Blocks = ({
       <ListPanel>
         <Droppable droppableId={field.name} type={field.name}>
           {(provider) => (
-            <div ref={provider.innerRef} className='edit-page--list-parent'>
+            <div ref={(el: any) => {
+              // @ts-ignore - merge provider ref with listRef
+              if (typeof provider.innerRef === 'function') provider.innerRef(el);
+              else if (provider.innerRef) (provider.innerRef as any).current = el;
+              listRef.current = el;
+            }} className='edit-page--list-parent'>
               {items.length === 0 && <EmptyList />}
               <SortableProvider
                 items={items.map((_, index) => `${field.name}.${index}`)}

@@ -16,7 +16,7 @@ export const BlockSelector = ({
   templates: {
     [key: string]: BlockTemplate;
   };
-  addItem: any;
+  addItem: (name: string, template: BlockTemplate, sourceRect: DOMRect) => void;
 }) => {
   const showFilter = React.useMemo(() => {
     return Object.entries(templates).length > 6;
@@ -83,8 +83,9 @@ export const BlockSelector = ({
                         <button
                           className='relative text-center text-xs py-2 px-4 border-l-0 border-t-0 border-r-0 border-b border-gray-50 w-full outline-none transition-all ease-out duration-150 hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50'
                           key={name}
-                          onClick={() => {
-                            addItem(name, template);
+                          onClick={(event) => {
+                            const sourceRect = event.currentTarget.getBoundingClientRect();
+                            addItem(name, template, sourceRect);
                             setFilter('');
                             close();
                           }}

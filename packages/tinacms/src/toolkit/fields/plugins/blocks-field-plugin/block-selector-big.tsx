@@ -98,9 +98,9 @@ export const BlockSelectorBig = ({
     });
   }, [filteredTemplates]);
 
-  const close = (name, template) => {
+  const close = (name, template, sourceRect?: DOMRect) => {
     if (name && template) {
-      addItem(name, template);
+      addItem(name, template, sourceRect);
     }
     setFilter('');
     setPickerIsOpen(false);
@@ -112,7 +112,9 @@ export const BlockSelectorBig = ({
         variant={pickerIsOpen ? 'secondary' : 'primary'}
         size='small'
         className={`${pickerIsOpen ? 'rotate-45 pointer-events-none' : ''}`}
-        onClick={() => setPickerIsOpen(!pickerIsOpen)}
+        onClick={() => {
+          setPickerIsOpen(!pickerIsOpen);
+        }}
       >
         <AddIcon className='w-5/6 h-auto' />
       </IconButton>
@@ -324,8 +326,10 @@ const BlockCard = ({ close, name, template }) => {
       className='mb-2 mt-2 group relative text-xs font-bold border border-gray-100 w-full outline-none transition-all ease-out duration-150 hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50 rounded bg-white shadow overflow-hidden'
       style={{ breakInside: 'avoid', transform: 'translateZ(0)' }}
       key={name}
-      onClick={() => {
-        close(name, template);
+      onClick={(event) => {
+        const sourceRect = event.currentTarget.getBoundingClientRect();
+        console.log(sourceRect)
+        close(name, template, sourceRect);
       }}
     >
       {previewSrc && (
