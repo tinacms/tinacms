@@ -89,6 +89,59 @@ describe('stripNativeTrailingSlash under POSIX/UNIX', () => {
   });
 });
 
+describe('assertPathWithinBase (symlink traversal)', () => {
+  let assertPathWithinBase: typeof import('./path').assertPathWithinBase;
+  let PathTraversalError: typeof import('./path').PathTraversalError;
+  let tmpDir: string;
+  let outsideDir: string;
+
+  beforeAll(() => {
+    const mod = require('./path');
+    assertPathWithinBase = mod.assertPathWithinBase;
+    PathTraversalError = mod.PathTraversalError;
+  });
+
+  beforeEach(() => {
+    const os = require('os');
+    const fs = require('fs');
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'tina-path-symlink-'));
+    outsideDir = fs.mkdtempSync(path.join(os.tmpdir(), 'tina-outside-'));
+    fs.writeFileSync(path.join(outsideDir, 'secret.txt'), 'sensitive');
+    // symlink: tmpDir/escape -> outsideDir
+    fs.symlinkSync(outsideDir, path.join(tmpDir, 'escape'));
+  });
+
+  afterEach(() => {
+    const fs = require('fs');
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+    fs.rmSync(outsideDir, { recursive: true, force: true });
+  });
+
+  it('rejects path through symlink escaping base (existing file)', () => {
+    expect(() => assertPathWithinBase('escape/secret.txt', tmpDir)).toThrow(
+      PathTraversalError
+    );
+  });
+
+  it('rejects path through symlink escaping base (non-existing file)', () => {
+    expect(() => assertPathWithinBase('escape/newfile.txt', tmpDir)).toThrow(
+      PathTraversalError
+    );
+  });
+
+  it('allows symlink that stays within base', () => {
+    const fs = require('fs');
+    const subDir = path.join(tmpDir, 'real-sub');
+    fs.mkdirSync(subDir);
+    fs.writeFileSync(path.join(subDir, 'ok.txt'), 'safe');
+    fs.symlinkSync(subDir, path.join(tmpDir, 'link-to-sub'));
+
+    expect(() =>
+      assertPathWithinBase('link-to-sub/ok.txt', tmpDir)
+    ).not.toThrow();
+  });
+});
+
 describe('assertPathWithinBase', () => {
   const baseDir = '/app/public/uploads';
 

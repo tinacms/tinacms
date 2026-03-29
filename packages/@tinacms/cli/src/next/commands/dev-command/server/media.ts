@@ -172,6 +172,61 @@ type SuccessRecord = { ok: true } | { ok: false; message: string };
 const ENCODED_TRAVERSAL_RE = /%2e%2e|%2f|%5c/i;
 
 /**
+ * Follows symlinks to determine where a path actually points on disk.
+ *
+ * If the full path exists, returns its `fs.realpathSync` result. If it
+ * doesn't (e.g. a file that will be created by a write/upload), walks up
+ * the directory tree until it finds an ancestor that does exist, resolves
+ * that ancestor's real path, and re-appends the remaining segments.
+ *
+ * @security INLINED for CodeQL taint-tracking (see module-level comment).
+ * @param candidate - An absolute path that may or may not exist on disk.
+ * @returns The real (symlink-resolved) absolute path.
+ */
+function resolveRealPath(candidate: string): string {
+  try {
+    return fs.realpathSync(candidate);
+  } catch {
+    const parent = path.dirname(candidate);
+    if (parent === candidate) return candidate;
+    return path.join(resolveRealPath(parent), path.basename(candidate));
+  }
+}
+
+/**
+ * Verifies that a path doesn't escape the base directory via symlinks or
+ * junctions (CWE-59). Resolves both the base and the candidate to their
+ * real filesystem locations, then checks containment.
+ *
+ * Silently skips the check if the base directory doesn't exist on disk
+ * (the caller's lexical check is sufficient in that case since no real
+ * I/O can occur).
+ *
+ * @security INLINED for CodeQL taint-tracking (see module-level comment).
+ * @param resolved     - The lexically-validated absolute path.
+ * @param resolvedBase - The absolute base directory (without trailing sep).
+ * @param userPath     - The original untrusted input (for error messages).
+ */
+function assertSymlinkWithinBase(
+  resolved: string,
+  resolvedBase: string,
+  userPath: string
+): void {
+  try {
+    const realBase = fs.realpathSync(resolvedBase);
+    const realResolved = resolveRealPath(resolved);
+    if (
+      realResolved !== realBase &&
+      !realResolved.startsWith(realBase + path.sep)
+    ) {
+      throw new PathTraversalError(userPath);
+    }
+  } catch (err) {
+    if (err instanceof PathTraversalError) throw err;
+  }
+}
+
+/**
  * Resolve `userPath` against `baseDir` and verify it falls within the base.
  * Allows an exact match (returns the base itself) or a subdirectory.
  *
@@ -194,9 +249,11 @@ function resolveWithinBase(userPath: string, baseDir: string): string {
   const resolvedBase = path.resolve(baseDir);
   const resolved = path.resolve(path.join(baseDir, userPath));
   if (resolved === resolvedBase) {
+    assertSymlinkWithinBase(resolved, resolvedBase, userPath);
     return resolvedBase;
   }
   if (resolved.startsWith(resolvedBase + path.sep)) {
+    assertSymlinkWithinBase(resolved, resolvedBase, userPath);
     return resolved;
   }
   throw new PathTraversalError(userPath);
@@ -222,6 +279,7 @@ function resolveStrictlyWithinBase(userPath: string, baseDir: string): string {
   if (!resolved.startsWith(resolvedBase)) {
     throw new PathTraversalError(userPath);
   }
+  assertSymlinkWithinBase(resolved, path.resolve(baseDir), userPath);
   return resolved;
 }
 

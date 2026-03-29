@@ -504,11 +504,11 @@ export const FormLists = (props: { lastActiveFormId: string | null }) => {
           <label className='flex items-center gap-2 text-sm text-gray-600 cursor-pointer'>
             <input
               type='checkbox'
-              checked={!showReferences}
-              onChange={(e) => setShowReferences(!e.target.checked)}
+              checked={showReferences}
+              onChange={(e) => setShowReferences(e.target.checked)}
               className='w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500'
             />
-            <span>Direct references only</span>
+            <span>Show all references</span>
           </label>
         )}
       </div>
