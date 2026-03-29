@@ -1,28 +1,28 @@
-"use client";
+'use client';
 
-import React from "react";
-import { withRef } from "@udecode/cn";
-import { Icons } from "./icons";
-import { ToolbarButton } from "./toolbar";
+import React from 'react';
+import { withRef } from '@udecode/cn';
+import { Icons } from './icons';
+import { ToolbarButton } from './toolbar';
 import {
   useEditorRef,
   useMarkToolbarButton,
   useMarkToolbarButtonState,
-} from "@udecode/plate/react";
+} from '@udecode/plate/react';
 import {
   BoldPlugin,
   CodePlugin,
   ItalicPlugin,
   StrikethroughPlugin,
-} from "@udecode/plate-basic-marks/react";
+} from '@udecode/plate-basic-marks/react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   useOpenState,
-} from "./dropdown-menu";
-import { useToolbarContext } from "../../toolbar/toolbar-provider";
+} from './dropdown-menu';
+import { useToolbarContext } from '../../toolbar/toolbar-provider';
 
 const MarkToolbarButton = withRef<
   typeof ToolbarButton,
@@ -38,32 +38,32 @@ const MarkToolbarButton = withRef<
 });
 
 const highlightColors = [
-  { label: "Yellow", value: "rgba(254, 240, 138, 0.55)" },
-  { label: "Green", value: "rgba(187, 247, 208, 0.55)" },
-  { label: "Blue", value: "rgba(191, 219, 254, 0.55)" },
-  { label: "Red", value: "rgba(204, 65, 65, 0.55)" },
+  { label: 'Yellow', value: 'rgba(254, 240, 138, 0.55)' },
+  { label: 'Green', value: 'rgba(187, 247, 208, 0.55)' },
+  { label: 'Blue', value: 'rgba(191, 219, 254, 0.55)' },
+  { label: 'Red', value: 'rgba(204, 65, 65, 0.55)' },
 ] as const;
 
 export const BoldToolbarButton = () => (
-  <MarkToolbarButton tooltip="Bold (⌘+B)" nodeType={BoldPlugin.key}>
+  <MarkToolbarButton tooltip='Bold (⌘+B)' nodeType={BoldPlugin.key}>
     <Icons.bold />
   </MarkToolbarButton>
 );
 
 export const StrikethroughToolbarButton = () => (
-  <MarkToolbarButton tooltip="Strikethrough" nodeType={StrikethroughPlugin.key}>
+  <MarkToolbarButton tooltip='Strikethrough' nodeType={StrikethroughPlugin.key}>
     <Icons.strikethrough />
   </MarkToolbarButton>
 );
 
 export const ItalicToolbarButton = () => (
-  <MarkToolbarButton tooltip="Italic (⌘+I)" nodeType={ItalicPlugin.key}>
+  <MarkToolbarButton tooltip='Italic (⌘+I)' nodeType={ItalicPlugin.key}>
     <Icons.italic />
   </MarkToolbarButton>
 );
 
 export const CodeToolbarButton = () => (
-  <MarkToolbarButton tooltip="Code (⌘+E)" nodeType={CodePlugin.key}>
+  <MarkToolbarButton tooltip='Code (⌘+E)' nodeType={CodePlugin.key}>
     <Icons.code />
   </MarkToolbarButton>
 );
@@ -102,11 +102,11 @@ const useHighlightToolbar = () => {
       }
 
       if (highlightColor) {
-        editor.tf.addMark("highlight", true);
-        editor.tf.addMark("highlightColor", highlightColor);
+        editor.tf.addMark('highlight', true);
+        editor.tf.addMark('highlightColor', highlightColor);
       } else {
-        editor.tf.removeMark("highlight");
-        editor.tf.removeMark("highlightColor");
+        editor.tf.removeMark('highlight');
+        editor.tf.removeMark('highlightColor');
       }
 
       editor.tf.setNodes(
@@ -157,18 +157,18 @@ const HighlightColorToolbarButton = () => {
           isDropdown
           showArrow
           pressed={openState.open}
-          tooltip="Highlight color"
+          tooltip='Highlight color'
           disabled={inlineCodeActive}
           onMouseDown={rememberSelection}
         >
-          <div className="flex items-center gap-1.5">
+          <div className='flex items-center gap-1.5'>
             <Icons.highlight />
-            <span className="sr-only">Highlight color</span>
+            <span className='sr-only'>Highlight color</span>
           </div>
         </ToolbarButton>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="start" className="min-w-[180px]">
+      <DropdownMenuContent align='start' className='min-w-[180px]'>
         <DropdownMenuItem onSelect={() => applyHighlight()}>
           Clear highlight
         </DropdownMenuItem>
@@ -178,7 +178,7 @@ const HighlightColorToolbarButton = () => {
             onSelect={() => applyHighlight(color.value)}
           >
             <span
-              className="mr-2 inline-block size-4 rounded border border-gray-300"
+              className='mr-2 inline-block size-4 rounded border border-gray-300'
               style={{ backgroundColor: color.value }}
             />
             {color.label}
