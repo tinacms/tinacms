@@ -205,7 +205,7 @@ const AuthWallInner = ({
                 alt='Tina the Llama playing a large orange key like a guitar.'
                 width={816}
                 height={816}
-                style={{ maxWidth: '100%', margin: '0 auto', display: 'block' }}
+                style={{ width: '16rem', margin: '0 auto', display: 'block' }}
               />
             ) : (
               'When you save, changes will be saved to the local filesystem.'
