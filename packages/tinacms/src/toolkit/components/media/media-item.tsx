@@ -2,7 +2,7 @@ import { Media } from '@toolkit/core';
 import React from 'react';
 import { BiFile, BiFolder, BiMovie } from 'react-icons/bi';
 import { isImage, isVideo } from './utils';
-import { cn } from '../../../utils/cn';
+import { cn } from '@utils/cn';
 
 interface MediaItemProps {
   item: Media & { new?: boolean };

@@ -1,0 +1,36 @@
+---
+import PageRenderer from '../components/tina/PageRenderer';
+import Layout from '../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  const client = (await import('../../tina/__generated__/client')).default;
+  const allPages = await client.queries.pageConnection({ first: 1000 });
+  const paths = (allPages.data?.pageConnection?.edges ?? []).flatMap(
+    (edge: any) => {
+      if (!edge?.node) return [];
+      const breadcrumbs = edge.node._sys.breadcrumbs || [];
+      if (breadcrumbs.length === 1 && breadcrumbs[0] === 'home') return [];
+      return [
+        {
+          params: { urlSegments: breadcrumbs.join('/') },
+          props: { relativePath: `${breadcrumbs.join('/')}.mdx` },
+        },
+      ];
+    }
+  );
+  return paths;
+}
+
+const { relativePath } = Astro.props;
+const client = (await import('../../tina/__generated__/client')).default;
+const result = await client.queries.page({ relativePath });
+---
+
+<Layout title="TinaCMS Astro Kitchen Sink">
+  <PageRenderer
+    client:tina
+    data={result.data}
+    query={result.query}
+    variables={result.variables}
+  />
+</Layout>

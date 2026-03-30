@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ChevronDownIcon } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { cn } from '@utils/cn';
 import { Button, ButtonProps } from './button';
 import {
   DropdownMenu,

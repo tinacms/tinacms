@@ -1,6 +1,7 @@
 {
   "name": "tinacms-authjs",
-  "version": "18.0.1",
+  "type": "module",
+  "version": "21.0.1",
   "main": "dist/index.js",
   "module": "./dist/index.js",
   "files": [

@@ -200,6 +200,8 @@ export type TextElement = {
   italic?: boolean;
   code?: boolean;
   strikethrough?: boolean;
+  highlight?: boolean;
+  highlightColor?: string;
 };
 /**
  * @remarks

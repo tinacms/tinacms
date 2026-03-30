@@ -1,5 +1,67 @@
 # Change Log
 
+## 0.2.1
+
+### Patch Changes
+
+- Updated dependencies [[`a40f52a`](https://github.com/tinacms/tinacms/commit/a40f52ae01fa2ef059fb983efd22aad42913b351), [`a7ebbe1`](https://github.com/tinacms/tinacms/commit/a7ebbe18a77b05c567564f8b507f76c2a2bb135e), [`519a4c2`](https://github.com/tinacms/tinacms/commit/519a4c2ca8a78274fe88549d41adbe52f7c6258b), [`6e374e5`](https://github.com/tinacms/tinacms/commit/6e374e5975ff240807d59bfd06b3ab22264e91b1), [`039e605`](https://github.com/tinacms/tinacms/commit/039e6052a77e4cd0ae1460e33076a0fad1864019), [`d1f094b`](https://github.com/tinacms/tinacms/commit/d1f094b2d1a62e9c0580a56b8a788bc0e7a0af98)]:
+  - tinacms@3.7.1
+
+## 0.2.0
+
+### Minor Changes
+
+- [#6510](https://github.com/tinacms/tinacms/pull/6510) [`059f480`](https://github.com/tinacms/tinacms/commit/059f480697ae1af813c165df3cc8954443737488) Thanks [@Aibono1225](https://github.com/Aibono1225)! - support highlight feature in rich text editor
+
+  ⚠️ `mark` is now a reserved MDX component name used internally for the highlight feature — custom MDX templates named `mark` will conflict with highlight and produce unexpected behavior.
+
+### Patch Changes
+
+- Updated dependencies [[`5a8ec36`](https://github.com/tinacms/tinacms/commit/5a8ec366d35e33bea17740a1f80f81fe152680e3), [`32d0471`](https://github.com/tinacms/tinacms/commit/32d0471356945ed9fa7b4b8b4da0937e1fafcacc), [`059f480`](https://github.com/tinacms/tinacms/commit/059f480697ae1af813c165df3cc8954443737488), [`74f12fd`](https://github.com/tinacms/tinacms/commit/74f12fda610711bd76f43c7f6d4dc890427d3b50), [`7e34861`](https://github.com/tinacms/tinacms/commit/7e34861197af6ec3488277bdfafe8297f51e1c3d)]:
+  - tinacms@3.7.0
+
+## 0.1.30
+
+### Patch Changes
+
+- Updated dependencies [[`3c45642`](https://github.com/tinacms/tinacms/commit/3c45642650e1a9e9fd340c62c9a5372d10f0bee7)]:
+  - tinacms@3.6.3
+
+## 0.1.29
+
+### Patch Changes
+
+- Updated dependencies [[`3b44e6a`](https://github.com/tinacms/tinacms/commit/3b44e6ad9bd2ff336aa8147b016de8b9bbb6f90d), [`35385f1`](https://github.com/tinacms/tinacms/commit/35385f16fe9e4cb386021445c8e1cb817a03dcd3), [`0a1049d`](https://github.com/tinacms/tinacms/commit/0a1049d4cc205af64e566cd86a00260a20fc7036), [`960181a`](https://github.com/tinacms/tinacms/commit/960181a4fd351eabdb69d5580a3ca79b0a905fcf), [`7d544d2`](https://github.com/tinacms/tinacms/commit/7d544d22ce17fe616010c6aba63bd43c12725806), [`83ed83f`](https://github.com/tinacms/tinacms/commit/83ed83f27624134feffa0473f02b0f6f3318441b), [`8f08f49`](https://github.com/tinacms/tinacms/commit/8f08f49638edcecaf703681538fa46bbc53df982), [`13e953a`](https://github.com/tinacms/tinacms/commit/13e953a92eebcbfe2a86e12a9161ac6fe52e9236), [`168c283`](https://github.com/tinacms/tinacms/commit/168c283f0f43d601ef5ecec36062463fb5f106bf), [`c439e75`](https://github.com/tinacms/tinacms/commit/c439e759250e418c47a33eee7c9986d3b89131bf), [`9bc4f3c`](https://github.com/tinacms/tinacms/commit/9bc4f3cccb1ab88cfefcc59da7ad228d250f03d3)]:
+  - tinacms@3.6.2
+
+## 0.1.28
+
+### Patch Changes
+
+- Updated dependencies []:
+  - tinacms@3.6.1
+
+## 0.1.27
+
+### Patch Changes
+
+- Updated dependencies [[`f23c2a6`](https://github.com/tinacms/tinacms/commit/f23c2a6742373271531bee46ca3cca8b208c3476), [`d782ca2`](https://github.com/tinacms/tinacms/commit/d782ca209ff98ee2143c7fd83f0b793563b6de60), [`60510bb`](https://github.com/tinacms/tinacms/commit/60510bbf8d1b78cad901722d4f9003665412d71e)]:
+  - tinacms@3.6.0
+
+## 0.1.26
+
+### Patch Changes
+
+- Updated dependencies [[`2738749`](https://github.com/tinacms/tinacms/commit/2738749bac08c02214fdf208f96bbcc4906ef442), [`dfb4ce8`](https://github.com/tinacms/tinacms/commit/dfb4ce8da7b82b638337109cc7859125e112a0a9)]:
+  - tinacms@3.5.1
+
+## 0.1.25
+
+### Patch Changes
+
+- Updated dependencies [[`da837f7`](https://github.com/tinacms/tinacms/commit/da837f7b17f0540cd47025afd2c45140706d595d), [`f90d47b`](https://github.com/tinacms/tinacms/commit/f90d47b746b000e65324da430aacc8fd623f5065), [`c806e41`](https://github.com/tinacms/tinacms/commit/c806e41232e0204a13539d6236358cb58cbc7692), [`89aee8a`](https://github.com/tinacms/tinacms/commit/89aee8ae3d6867e5793e4df7ff9c700dfd8a48c9)]:
+  - tinacms@3.5.0
+
 ## 0.1.24
 
 ### Patch Changes

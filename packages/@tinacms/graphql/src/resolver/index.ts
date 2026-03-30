@@ -564,8 +564,10 @@ export class Resolver {
     relativePath: string;
     templateName: string;
   }) => {
-    const collection = this.getCollectionWithName(collectionName);
-    const realPath = path.join(collection.path, relativePath);
+    const { collection, realPath } = this.getValidatedPath(
+      collectionName,
+      relativePath
+    );
 
     const alreadyExists = await this.database.documentExists(realPath);
     if (alreadyExists) {
@@ -661,6 +663,90 @@ export class Resolver {
     return this.tinaSchema.getCollection(collectionName);
   };
 
+  /**
+   * validatePath ensures that the provided path remains within the boundaries
+   * of the collection's directory and that the file extension matches the
+   * collection's configured format. This is a critical security check to prevent
+   * path traversal attacks where a user might attempt to read or write files
+   * outside of the intended collection.
+   */
+  private static sanitizePath(input: string): string {
+    if (input.includes('\0')) {
+      throw new Error('Invalid path: null bytes are not allowed');
+    }
+    return input.replace(/\\/g, '/');
+  }
+
+  private validatePath = (
+    fullPath: string,
+    collection: Collection<true>,
+    relativePath?: string
+  ) => {
+    if (fullPath.includes('\0')) {
+      throw new Error('Invalid path: null bytes are not allowed');
+    }
+    const normalizedPath = path.normalize(fullPath.replace(/\\/g, '/'));
+    const normalizedCollectionPath = path.normalize(collection.path);
+    const relative = path.relative(normalizedCollectionPath, normalizedPath);
+    if (relative.startsWith('..')) {
+      throw new Error(`Invalid path: path escapes the collection directory`);
+    }
+    if (path.isAbsolute(relative)) {
+      throw new Error(`Invalid path: absolute paths are not allowed`);
+    }
+
+    // Validate file extension matches collection format
+    if (relativePath) {
+      const collectionFormat = collection.format || 'md';
+      const fileExtension = path.extname(relativePath).toLowerCase().slice(1);
+
+      if (fileExtension !== collectionFormat) {
+        throw new Error(
+          `Invalid file extension: expected '.${collectionFormat}' but got '.${fileExtension}'`
+        );
+      }
+    }
+  };
+
+  /**
+   * Helper method to get collection and construct validated path.
+   * This encapsulates the common pattern of getting a collection, joining paths,
+   * and validating the result, ensuring security checks are always performed.
+   *
+   * @param collectionName - Name of the collection
+   * @param relativePath - Relative path within the collection
+   * @param options - Optional configuration
+   * @returns Object containing the collection and validated real path
+   */
+  private getValidatedPath = (
+    collectionName: string,
+    relativePath: string,
+    options?: {
+      /** Additional path segments to append (e.g., for creating folders) */
+      extraSegments?: string[];
+      /** Whether to validate file extension matches collection format (default: true) */
+      validateExtension?: boolean;
+    }
+  ): { collection: Collection<true>; realPath: string } => {
+    const collection = this.getCollectionWithName(collectionName);
+    const sanitizedRelativePath = Resolver.sanitizePath(relativePath);
+    const pathSegments = [collection.path, sanitizedRelativePath];
+
+    if (options?.extraSegments) {
+      pathSegments.push(...options.extraSegments.map(Resolver.sanitizePath));
+    }
+
+    const realPath = path.join(...pathSegments);
+    const shouldValidateExtension = options?.validateExtension !== false;
+    this.validatePath(
+      realPath,
+      collection,
+      shouldValidateExtension ? sanitizedRelativePath : undefined
+    );
+
+    return { collection, realPath };
+  };
+
   /*
    * Used for getDocument, get<Collection>Document.
    */
@@ -671,8 +757,10 @@ export class Resolver {
     collectionName: string;
     relativePath: string;
   }) => {
-    const collection = this.getCollectionWithName(collectionName);
-    const realPath = path.join(collection.path, relativePath);
+    const { collection, realPath } = this.getValidatedPath(
+      collectionName,
+      relativePath
+    );
     return this.getDocument(realPath, {
       collection,
       checkReferences: true,
@@ -695,6 +783,7 @@ export class Resolver {
       relativePath,
       `.gitkeep.${collection.format || 'md'}`
     );
+    this.validatePath(realPath, collection);
     const alreadyExists = await this.database.documentExists(realPath);
     if (alreadyExists) {
       throw new Error(`Unable to add folder, ${realPath} already exists`);
@@ -716,8 +805,10 @@ export class Resolver {
     relativePath: string;
     body: Record<string, unknown>;
   }) => {
-    const collection = this.getCollectionWithName(collectionName);
-    const realPath = path.join(collection.path, relativePath);
+    const { collection, realPath } = this.getValidatedPath(
+      collectionName,
+      relativePath
+    );
     const alreadyExists = await this.database.documentExists(realPath);
     if (alreadyExists) {
       throw new Error(`Unable to add document, ${realPath} already exists`);
@@ -740,8 +831,10 @@ export class Resolver {
     newRelativePath?: string;
     newBody?: Record<string, unknown>;
   }) => {
-    const collection = this.getCollectionWithName(collectionName);
-    const realPath = path.join(collection.path, relativePath);
+    const { collection, realPath } = this.getValidatedPath(
+      collectionName,
+      relativePath
+    );
     const alreadyExists = await this.database.documentExists(realPath);
     if (!alreadyExists) {
       throw new Error(`Unable to update document, ${realPath} does not exist`);
@@ -750,7 +843,10 @@ export class Resolver {
     const doc = await this.getDocument(realPath);
 
     if (newRelativePath) {
-      const newRealPath = path.join(collection?.path, newRelativePath);
+      const { realPath: newRealPath } = this.getValidatedPath(
+        collectionName,
+        newRelativePath
+      );
 
       // don't update if the paths are the same
       if (newRealPath === realPath) {
@@ -832,8 +928,10 @@ export class Resolver {
     collectionName: string;
     relativePath: string;
   }) => {
-    const collection = this.getCollectionWithName(collectionName);
-    const realPath = path.join(collection.path, relativePath);
+    const { collection, realPath } = this.getValidatedPath(
+      collectionName,
+      relativePath
+    );
     const alreadyExists = await this.database.documentExists(realPath);
     if (!alreadyExists) {
       throw new Error(`Unable to delete document, ${realPath} does not exist`);
@@ -1113,7 +1211,10 @@ export class Resolver {
               .required(),
           })
         );
-        const realPath = path.join(collection.path, args.relativePath);
+        const realPath = this.getValidatedPath(
+          collection.name,
+          args.relativePath
+        ).realPath;
         return this.updateResolveDocument({
           collection,
           realPath,
@@ -1134,7 +1235,10 @@ export class Resolver {
         });
       }
     } else {
-      const realPath = path.join(collection.path, args.relativePath);
+      const realPath = this.getValidatedPath(
+        collection.name,
+        args.relativePath
+      ).realPath;
       return this.getDocument(realPath, {
         collection,
         checkReferences: true,

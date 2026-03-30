@@ -6,6 +6,7 @@ import {
   setupProjectDirectory,
   updateProjectPackageName,
   updateProjectPackageVersion,
+  updateTelemetryConfig,
   updateThemeSettings,
 } from './util/fileUtil';
 import { install } from './util/install';
@@ -408,6 +409,11 @@ export async function run() {
     spinner.start('Updating project metadata...');
     updateProjectPackageName(rootDir, projectName);
     updateProjectPackageVersion(rootDir, '0.0.1');
+
+    // If user opted out of telemetry, set it in the tina config
+    if (opts.noTelemetry) {
+      await updateTelemetryConfig(rootDir, 'disabled');
+    }
     spinner.succeed();
   } catch (err) {
     const error = err as Error;

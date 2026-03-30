@@ -1,0 +1,44 @@
+{
+  "name": "@examples/react-kitchen-sink",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "MONOREPO_DEV=true tinacms dev -c \"vite\"",
+    "build": "tinacms build && vite build",
+    "preview": "vite preview",
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui"
+  },
+  "dependencies": {
+    "@tailwindcss/typography": "catalog:",
+    "@tinacms/datalayer": "workspace:*",
+    "clsx": "^2.1.1",
+    "graphql": "^15.10.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-icons": "^4.12.0",
+    "react-router-dom": "^6.28.0",
+    "tailwind-merge": "^2.6.0",
+    "tinacms": "workspace:*"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "catalog:",
+    "@tailwindcss/postcss": "^4.2.1",
+    "@tinacms/app": "workspace:*",
+    "@tinacms/cli": "workspace:*",
+    "@tinacms/scripts": "workspace:*",
+    "@types/node": "^25.1.0",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.0",
+    "autoprefixer": "catalog:",
+    "postcss": "^8.5.2",
+    "tailwindcss": "^4.0.0",
+    "@playwright/test": "^1.49.0",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.0"
+  }
+}

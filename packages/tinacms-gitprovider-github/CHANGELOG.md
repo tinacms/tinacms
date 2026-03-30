@@ -1,5 +1,59 @@
 # tinacms-gitprovider-github
 
+## 4.1.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/datalayer@2.0.14
+
+## 4.1.0
+
+### Minor Changes
+
+- [#6510](https://github.com/tinacms/tinacms/pull/6510) [`059f480`](https://github.com/tinacms/tinacms/commit/059f480697ae1af813c165df3cc8954443737488) Thanks [@Aibono1225](https://github.com/Aibono1225)! - support highlight feature in rich text editor
+
+  ⚠️ `mark` is now a reserved MDX component name used internally for the highlight feature — custom MDX templates named `mark` will conflict with highlight and produce unexpected behavior.
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/datalayer@2.0.13
+
+## 4.0.13
+
+### Patch Changes
+
+- [#6514](https://github.com/tinacms/tinacms/pull/6514) [`9a74996`](https://github.com/tinacms/tinacms/commit/9a749961221ebaa9f6c8b2a1a80f2f14e8f05629) Thanks [@Ben0189](https://github.com/Ben0189)! - Add `"type": "module"` to package metadata to align published packages with ESM output and satisfy stricter publint checks.
+
+## 4.0.12
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/datalayer@2.0.12
+
+## 4.0.11
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/datalayer@2.0.11
+
+## 4.0.10
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/datalayer@2.0.10
+
+## 4.0.9
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/datalayer@2.0.9
+
 ## 4.0.8
 
 ### Patch Changes

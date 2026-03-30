@@ -13,6 +13,7 @@ import {
 } from '@tinacms/toolkit';
 import React, { useEffect, useState } from 'react';
 import { ModalBuilder } from './AuthModal';
+import { AuthenticationCancelledError } from './authenticate';
 import loginLlama from './tina-login.png';
 
 import { TinaAdminApi } from '../admin/api';
@@ -24,6 +25,8 @@ import {
 } from '../internalClient';
 import { CreateClientProps, createClient } from '../utils';
 import { useTinaAuthRedirect } from './useTinaAuthRedirect';
+import { captureEvent } from '../lib/posthog/posthogProvider';
+import { BranchSwitchedEvent } from '../lib/posthog/posthog';
 
 type ModalNames = null | 'authenticate' | 'error';
 
@@ -151,7 +154,16 @@ const AuthWallInner = ({
         await client?.onLogin({ token });
       }
       return onAuthenticated();
-    } catch (e) {
+    } catch (e: any) {
+      // If user just closed the popup, silently reset - don't show error
+      // Check both instanceof and error name (in case of module boundary issues)
+      if (
+        e instanceof AuthenticationCancelledError ||
+        e?.name === 'AuthenticationCancelledError'
+      ) {
+        return;
+      }
+
       console.error(e);
       setActiveModal('error');
       setErrorMessage({
@@ -190,7 +202,9 @@ const AuthWallInner = ({
             isTinaCloud ? (
               <img
                 src={loginLlama}
-                alt='TinaCMS Security Illustration'
+                alt='Tina the Llama playing a large orange key like a guitar.'
+                width={816}
+                height={816}
                 style={{ maxWidth: '100%', margin: '0 auto', display: 'block' }}
               />
             ) : (
@@ -348,6 +362,16 @@ export const TinaCloudProvider = (
   } else {
     cms.api.tina.setBranch(currentBranch);
   }
+
+  const previousBranchRef = React.useRef(currentBranch);
+  useEffect(() => {
+    if (previousBranchRef.current !== currentBranch) {
+      captureEvent(BranchSwitchedEvent, {
+        branchSwitchedTo: currentBranch,
+      });
+      previousBranchRef.current = currentBranch;
+    }
+  }, [currentBranch]);
 
   useEffect(() => {
     let searchClient;

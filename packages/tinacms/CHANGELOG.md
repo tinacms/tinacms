@@ -1,5 +1,137 @@
 # tinacms
 
+## 3.7.1
+
+### Patch Changes
+
+- [#6553](https://github.com/tinacms/tinacms/pull/6553) [`a40f52a`](https://github.com/tinacms/tinacms/commit/a40f52ae01fa2ef059fb983efd22aad42913b351) Thanks [@thomas-sepanosian](https://github.com/thomas-sepanosian)! - 🐛 Fix media usage tracking for files with the same filename in different directories
+
+- [#6544](https://github.com/tinacms/tinacms/pull/6544) [`a7ebbe1`](https://github.com/tinacms/tinacms/commit/a7ebbe18a77b05c567564f8b507f76c2a2bb135e) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Flipping the referenced files checkbox to off by default, and updating the label.
+
+- [#6558](https://github.com/tinacms/tinacms/pull/6558) [`519a4c2`](https://github.com/tinacms/tinacms/commit/519a4c2ca8a78274fe88549d41adbe52f7c6258b) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐖 Adding Telemetry around usage of slash command in rich-text editor
+
+- [#6546](https://github.com/tinacms/tinacms/pull/6546) [`6e374e5`](https://github.com/tinacms/tinacms/commit/6e374e5975ff240807d59bfd06b3ab22264e91b1) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐛 Fix slash command popup from not being escapable
+
+- [#6564](https://github.com/tinacms/tinacms/pull/6564) [`039e605`](https://github.com/tinacms/tinacms/commit/039e6052a77e4cd0ae1460e33076a0fad1864019) Thanks [@Ben0189](https://github.com/Ben0189)! - "Add react-dnd and react-dnd-html5-backend as explicit dependencies to fix starter template build failures when using Yarn v1"
+
+- [#6560](https://github.com/tinacms/tinacms/pull/6560) [`d1f094b`](https://github.com/tinacms/tinacms/commit/d1f094b2d1a62e9c0580a56b8a788bc0e7a0af98) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - ✨ UI: Added "New" badges to help you quickly identify recently added items
+
+- Updated dependencies []:
+  - @tinacms/search@1.2.8
+
+## 3.7.0
+
+### Minor Changes
+
+- [#6508](https://github.com/tinacms/tinacms/pull/6508) [`5a8ec36`](https://github.com/tinacms/tinacms/commit/5a8ec366d35e33bea17740a1f80f81fe152680e3) Thanks [@thomas-sepanosian](https://github.com/thomas-sepanosian)! - Add media usage dashboard through screen functionality
+
+- [#6510](https://github.com/tinacms/tinacms/pull/6510) [`059f480`](https://github.com/tinacms/tinacms/commit/059f480697ae1af813c165df3cc8954443737488) Thanks [@Aibono1225](https://github.com/Aibono1225)! - support highlight feature in rich text editor
+
+  ⚠️ `mark` is now a reserved MDX component name used internally for the highlight feature — custom MDX templates named `mark` will conflict with highlight and produce unexpected behavior.
+
+### Patch Changes
+
+- [#6532](https://github.com/tinacms/tinacms/pull/6532) [`32d0471`](https://github.com/tinacms/tinacms/commit/32d0471356945ed9fa7b4b8b4da0937e1fafcacc) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐛 Resolve z-index issue for floating toolbar and modals
+
+- [#6520](https://github.com/tinacms/tinacms/pull/6520) [`74f12fd`](https://github.com/tinacms/tinacms/commit/74f12fda610711bd76f43c7f6d4dc890427d3b50) Thanks [@griffenedge](https://github.com/griffenedge)! - Add `tabular-nums` styling to the elapsed timer in the editorial workflow branch creation modal to prevent layout shifts as digits change.
+
+- [#6522](https://github.com/tinacms/tinacms/pull/6522) [`7e34861`](https://github.com/tinacms/tinacms/commit/7e34861197af6ec3488277bdfafe8297f51e1c3d) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐛 Fix beforeSubmit for Editorial Workflow Branch Creation flow
+
+- Updated dependencies [[`059f480`](https://github.com/tinacms/tinacms/commit/059f480697ae1af813c165df3cc8954443737488)]:
+  - @tinacms/mdx@2.1.0
+  - @tinacms/schema-tools@2.7.0
+  - @tinacms/search@1.2.7
+
+## 3.6.3
+
+### Patch Changes
+
+- [#6524](https://github.com/tinacms/tinacms/pull/6524) [`3c45642`](https://github.com/tinacms/tinacms/commit/3c45642650e1a9e9fd340c62c9a5372d10f0bee7) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Fix broken cross-package relative import for posthog in @tinacms/app that caused consumer build failures
+
+## 3.6.2
+
+### Patch Changes
+
+- [#6494](https://github.com/tinacms/tinacms/pull/6494) [`3b44e6a`](https://github.com/tinacms/tinacms/commit/3b44e6ad9bd2ff336aa8147b016de8b9bbb6f90d) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐖 Telemetry - Seeing how many users interact with nav bar buttons (Project Config, User management, support)
+
+- [#6488](https://github.com/tinacms/tinacms/pull/6488) [`35385f1`](https://github.com/tinacms/tinacms/commit/35385f16fe9e4cb386021445c8e1cb817a03dcd3) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Add PostHog event capture for Media Manager upload and delete actions
+
+- [#6495](https://github.com/tinacms/tinacms/pull/6495) [`0a1049d`](https://github.com/tinacms/tinacms/commit/0a1049d4cc205af64e566cd86a00260a20fc7036) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐖 Telemetry - Adding Telemetry to see when users switch between rich-text and markdown mode in the rich-text editor
+
+- [#6408](https://github.com/tinacms/tinacms/pull/6408) [`960181a`](https://github.com/tinacms/tinacms/commit/960181a4fd351eabdb69d5580a3ca79b0a905fcf) Thanks [@tiagov8](https://github.com/tiagov8)! - 💄 UI - Fix cut-off modal title
+
+- [#6491](https://github.com/tinacms/tinacms/pull/6491) [`7d544d2`](https://github.com/tinacms/tinacms/commit/7d544d22ce17fe616010c6aba63bd43c12725806) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 💄 Improve GraphQL Schema Mismatch Dialog Message
+
+- [#6487](https://github.com/tinacms/tinacms/pull/6487) [`83ed83f`](https://github.com/tinacms/tinacms/commit/83ed83f27624134feffa0473f02b0f6f3318441b) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐛 Fix showFloatingToolbar config not working by removing plugin correctly
+
+- [#6476](https://github.com/tinacms/tinacms/pull/6476) [`8f08f49`](https://github.com/tinacms/tinacms/commit/8f08f49638edcecaf703681538fa46bbc53df982) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐛 Authentication - Fix Login button stuck in constant spinner state
+
+- [#6496](https://github.com/tinacms/tinacms/pull/6496) [`13e953a`](https://github.com/tinacms/tinacms/commit/13e953a92eebcbfe2a86e12a9161ac6fe52e9236) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🔧 Fix missing export
+
+- [#6505](https://github.com/tinacms/tinacms/pull/6505) [`168c283`](https://github.com/tinacms/tinacms/commit/168c283f0f43d601ef5ecec36062463fb5f106bf) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐛 Fixing Media Manager Breadcrumb
+
+- [#6498](https://github.com/tinacms/tinacms/pull/6498) [`c439e75`](https://github.com/tinacms/tinacms/commit/c439e759250e418c47a33eee7c9986d3b89131bf) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐖 Telemetry - View user interactions with saving and resetting forms
+
+- [#6493](https://github.com/tinacms/tinacms/pull/6493) [`9bc4f3c`](https://github.com/tinacms/tinacms/commit/9bc4f3cccb1ab88cfefcc59da7ad228d250f03d3) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐖 Telemetry - See when users open the Event Log Page (eventLogPageViewed event)
+
+## 3.6.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/search@1.2.6
+
+## 3.6.0
+
+### Minor Changes
+
+- [#6447](https://github.com/tinacms/tinacms/pull/6447) [`60510bb`](https://github.com/tinacms/tinacms/commit/60510bbf8d1b78cad901722d4f9003665412d71e) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - ✨ Object Schema - Add openFormOnCreate flag. Allowing users to opt-in to automatically going inside an object form when the field is true
+
+### Patch Changes
+
+- [#6451](https://github.com/tinacms/tinacms/pull/6451) [`f23c2a6`](https://github.com/tinacms/tinacms/commit/f23c2a6742373271531bee46ca3cca8b208c3476) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Fix inconsistent branch selection modal size between Side Editor and Admin Editor by using tailwind-merge for proper CSS class merging in PopupModal
+
+- [#6458](https://github.com/tinacms/tinacms/pull/6458) [`d782ca2`](https://github.com/tinacms/tinacms/commit/d782ca209ff98ee2143c7fd83f0b793563b6de60) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🤖 Fix previewBranch button from opening a tab with an empty string, instead using correct previewUrl variable
+
+- Updated dependencies [[`56d533e`](https://github.com/tinacms/tinacms/commit/56d533e610a520ba66b3e58f3a0dc03487d5d5d7), [`60510bb`](https://github.com/tinacms/tinacms/commit/60510bbf8d1b78cad901722d4f9003665412d71e)]:
+  - @tinacms/schema-tools@2.7.0
+  - @tinacms/mdx@2.0.7
+  - @tinacms/search@1.2.5
+
+## 3.5.1
+
+### Patch Changes
+
+- [#6446](https://github.com/tinacms/tinacms/pull/6446) [`2738749`](https://github.com/tinacms/tinacms/commit/2738749bac08c02214fdf208f96bbcc4906ef442) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐖 PostHog - Add Telemetry around the branch selector to see which elements users are interacting with on the modal
+
+- [#6443](https://github.com/tinacms/tinacms/pull/6443) [`dfb4ce8`](https://github.com/tinacms/tinacms/commit/dfb4ce8da7b82b638337109cc7859125e112a0a9) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 📊 Telemetry - Add telemetry to CollectionListPage to identify how users are interacting with the page (button clicks, filtering etc)
+
+- Updated dependencies []:
+  - @tinacms/search@1.2.4
+
+## 3.5.0
+
+### Minor Changes
+
+- [#6438](https://github.com/tinacms/tinacms/pull/6438) [`f90d47b`](https://github.com/tinacms/tinacms/commit/f90d47b746b000e65324da430aacc8fd623f5065) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Telemetry - We’ve added anonymous telemetry to help us understand how Tina is used and prioritize improvements in areas where it matters. No personal or sensitive data is collected, and the information cannot be used to identify individual users. Telemetry is used solely to improve performance, stability, and the overall user experience. You can opt-out at any time by disabling telemetry in your Tina config.
+
+  Read more at https://tina.io/telemetry
+
+- [#5957](https://github.com/tinacms/tinacms/pull/5957) [`89aee8a`](https://github.com/tinacms/tinacms/commit/89aee8ae3d6867e5793e4df7ff9c700dfd8a48c9) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - The referenced files menu is being revamped to improve the UX and increase clarity.
+
+### Patch Changes
+
+- [#6373](https://github.com/tinacms/tinacms/pull/6373) [`da837f7`](https://github.com/tinacms/tinacms/commit/da837f7b17f0540cd47025afd2c45140706d595d) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🔌 Modernisze Branch Switcher by adding `@tanstack/react-table`
+  💄 Replace old BranchSelector with a new BranchSelectorTable component using `react-table`
+  🧹 Cleanup duplicate `cn` references + add alias' for tsconfig and vite config
+
+- [#6436](https://github.com/tinacms/tinacms/pull/6436) [`c806e41`](https://github.com/tinacms/tinacms/commit/c806e41232e0204a13539d6236358cb58cbc7692) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 💄 UI - Remove cursor-pointer from alert
+
+- Updated dependencies [[`f90d47b`](https://github.com/tinacms/tinacms/commit/f90d47b746b000e65324da430aacc8fd623f5065)]:
+  - @tinacms/schema-tools@2.6.0
+  - @tinacms/search@1.2.3
+  - @tinacms/mdx@2.0.6
+
 ## 3.4.1
 
 ### Patch Changes

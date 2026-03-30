@@ -14,9 +14,8 @@ export const SidebarNoFormsPlaceholder = () => (
     }}
   >
     <p className='block pb-5'>
-      Looks like there's <br />
-      nothing to edit on <br />
-      this page.
+      TinaCMS form fields <br />
+      will appear here.
     </p>
     <p className='block pt-5'>
       <Button

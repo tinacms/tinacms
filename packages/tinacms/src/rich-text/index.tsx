@@ -18,6 +18,7 @@ type BaseComponents = {
   strikethrough?: { children: JSX.Element };
   underline?: { children: JSX.Element };
   code?: { children: JSX.Element };
+  highlight?: { children: JSX.Element; color?: string };
   text?: { children: string };
   ul?: { children: JSX.Element };
   ol?: { children: JSX.Element };
@@ -126,9 +127,17 @@ const Leaf = (props: {
   underline?: boolean;
   strikethrough?: boolean;
   code?: boolean;
+  highlight?: boolean;
+  highlightColor?: string;
   components: Pick<
     BaseComponentSignature,
-    'bold' | 'italic' | 'underline' | 'strikethrough' | 'code' | 'text'
+    | 'bold'
+    | 'italic'
+    | 'underline'
+    | 'strikethrough'
+    | 'code'
+    | 'highlight'
+    | 'text'
   >;
 }) => {
   if (props.bold) {
@@ -209,6 +218,24 @@ const Leaf = (props: {
       <code>
         <Leaf {...rest} />
       </code>
+    );
+  }
+  if (props.highlight) {
+    const { highlight, highlightColor, ...rest } = props;
+    if (props.components.highlight) {
+      const Component = props.components.highlight;
+      return (
+        <Component color={highlightColor}>
+          <Leaf {...rest} />
+        </Component>
+      );
+    }
+    return (
+      <mark
+        style={highlightColor ? { backgroundColor: highlightColor } : undefined}
+      >
+        <Leaf {...rest} />
+      </mark>
     );
   }
   if (props.components.text) {

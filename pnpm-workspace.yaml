@@ -2,6 +2,9 @@ packages:
     - packages/*
     - packages/@tinacms/*
     - examples/*
+    - examples/next/*
+    - examples/react/*
+    - examples/astro/*
     - e2e/*
     - experimental-examples/*
     - playwright/*
@@ -97,6 +100,7 @@ catalog:
     "@udecode/plate-dnd": ^48.0.0
     "@udecode/plate-floating": ^48.0.0
     "@udecode/plate-heading": ^48
+    "@udecode/plate-highlight": "^48"
     "@udecode/plate-horizontal-rule": ^48
     "@udecode/plate-indent-list": ^48.0.0
     "@udecode/plate-link": ^48.0.0
@@ -158,7 +162,7 @@ catalog:
     js-base64: ^3.7.7
     js-sha1: ^0.6.0
     json-diff: ^1.0.6
-    jsonpath-plus: 10.1.0
+    jsonpath-plus: ^10.3.0
     chalk: ^5.4.1
     lowlight: ^3.3.0
     lucide-react: ^0.424.0
@@ -176,7 +180,7 @@ catalog:
     micromark-factory-whitespace: 1.0.0
     micromark-util-character: 1.1.0
     micromark-util-symbol: 1.0.1
-    micromark-util-types: 1.0.2
+    micromark-util-types: 1.1.0
     micromatch: 4.0.8
     minimatch: ^5.1.6
     moment: 2.29.4

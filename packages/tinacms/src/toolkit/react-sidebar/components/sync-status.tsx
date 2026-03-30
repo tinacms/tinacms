@@ -11,6 +11,7 @@ import { useState } from 'react';
 import { BsCheckCircleFill, BsExclamationOctagonFill } from 'react-icons/bs';
 import { MdSyncProblem } from 'react-icons/md';
 import { TbLogs } from 'react-icons/tb';
+import { captureEvent, EventLogPageViewedEvent } from '../../../lib/posthog';
 
 type EventListState = 'loading' | 'success' | 'error' | 'unauthorized';
 
@@ -226,7 +227,13 @@ export const SyncStatusButton = ({
 
   return (
     <>
-      <button onClick={() => setEventsOpen(true)} {...buttonProps}>
+      <button
+        onClick={() => {
+          setEventsOpen(true);
+          captureEvent(EventLogPageViewedEvent, {});
+        }}
+        {...buttonProps}
+      >
         {syncStatus.state !== 'error' ? (
           <TbLogs className='w-6 h-auto mr-2' />
         ) : (

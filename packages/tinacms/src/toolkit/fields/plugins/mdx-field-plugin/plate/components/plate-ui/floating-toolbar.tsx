@@ -23,7 +23,6 @@ export const FloatingToolbar = withRef<
 >(({ children, state, ...props }, propRef) => {
   const editorId = useEditorRef();
   const focusedEditorId = useEventEditorValue('focus');
-
   const test = useCustomFloatingToolbarState({
     editorId: editorId.id,
     focusedEditorId,
@@ -60,7 +59,7 @@ export const FloatingToolbar = withRef<
     <PortalBody>
       <Toolbar
         className={cn(
-          'absolute z-[999999] whitespace-nowrap border bg-popover px-1 opacity-100 shadow-md print:hidden rounded-md'
+          'absolute z-[10799] whitespace-nowrap border bg-popover px-1 opacity-100 shadow-md print:hidden rounded-md'
         )}
         {...props}
         {...rootProps}
