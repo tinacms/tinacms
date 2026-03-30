@@ -1,5 +1,24 @@
 # tinacms
 
+## 3.7.1
+
+### Patch Changes
+
+- [#6553](https://github.com/tinacms/tinacms/pull/6553) [`a40f52a`](https://github.com/tinacms/tinacms/commit/a40f52ae01fa2ef059fb983efd22aad42913b351) Thanks [@thomas-sepanosian](https://github.com/thomas-sepanosian)! - 🐛 Fix media usage tracking for files with the same filename in different directories
+
+- [#6544](https://github.com/tinacms/tinacms/pull/6544) [`a7ebbe1`](https://github.com/tinacms/tinacms/commit/a7ebbe18a77b05c567564f8b507f76c2a2bb135e) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Flipping the referenced files checkbox to off by default, and updating the label.
+
+- [#6558](https://github.com/tinacms/tinacms/pull/6558) [`519a4c2`](https://github.com/tinacms/tinacms/commit/519a4c2ca8a78274fe88549d41adbe52f7c6258b) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐖 Adding Telemetry around usage of slash command in rich-text editor
+
+- [#6546](https://github.com/tinacms/tinacms/pull/6546) [`6e374e5`](https://github.com/tinacms/tinacms/commit/6e374e5975ff240807d59bfd06b3ab22264e91b1) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐛 Fix slash command popup from not being escapable
+
+- [#6564](https://github.com/tinacms/tinacms/pull/6564) [`039e605`](https://github.com/tinacms/tinacms/commit/039e6052a77e4cd0ae1460e33076a0fad1864019) Thanks [@Ben0189](https://github.com/Ben0189)! - "Add react-dnd and react-dnd-html5-backend as explicit dependencies to fix starter template build failures when using Yarn v1"
+
+- [#6560](https://github.com/tinacms/tinacms/pull/6560) [`d1f094b`](https://github.com/tinacms/tinacms/commit/d1f094b2d1a62e9c0580a56b8a788bc0e7a0af98) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - ✨ UI: Added "New" badges to help you quickly identify recently added items
+
+- Updated dependencies []:
+  - @tinacms/search@1.2.8
+
 ## 3.7.0
 
 ### Minor Changes
