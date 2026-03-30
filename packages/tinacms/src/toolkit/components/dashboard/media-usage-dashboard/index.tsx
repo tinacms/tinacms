@@ -19,8 +19,11 @@ import { MediaLightbox } from './media-lightbox';
 import { MediaUsageTable } from './media-usage-table';
 import { useEffect } from 'react';
 import { captureEvent } from '../../../../lib/posthog/posthogProvider';
-import { MediaUsageDashboardOpenedEvent, MediaUsageDashboardRefreshedEvent, MediaUsageDashboardRefreshedPayload } from '../../../../lib/posthog/posthog';
-
+import {
+  MediaUsageDashboardOpenedEvent,
+  MediaUsageDashboardRefreshedEvent,
+  MediaUsageDashboardRefreshedPayload,
+} from '../../../../lib/posthog/posthog';
 
 /**
  * Media Usage Dashboard component that displays media files and their usage across the CMS
@@ -28,11 +31,10 @@ import { MediaUsageDashboardOpenedEvent, MediaUsageDashboardRefreshedEvent, Medi
 export const MediaUsageDashboard = ({
   close: onClose,
 }: ScreenComponentProps) => {
-  
-useEffect(() => {
-  console.log('MediaUsageDashboard');
-  captureEvent(MediaUsageDashboardOpenedEvent);
-}, []);
+  useEffect(() => {
+    console.log('MediaUsageDashboard');
+    captureEvent(MediaUsageDashboardOpenedEvent);
+  }, []);
 
   const { mediaItems, isLoading, errorOccurred, progress, refresh } =
     useMediaUsageScanner();
@@ -73,9 +75,11 @@ useEffect(() => {
         controls={
           <Button
             variant='outline'
-            onClick={async () =>{
+            onClick={async () => {
               await refresh();
-              const payload = { errorOccured: errorOccurred } as MediaUsageDashboardRefreshedPayload;
+              const payload = {
+                errorOccured: errorOccurred,
+              } as MediaUsageDashboardRefreshedPayload;
               captureEvent(MediaUsageDashboardRefreshedEvent, payload);
             }}
             disabled={isLoading}
