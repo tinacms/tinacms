@@ -28,7 +28,7 @@ Three-layer component model:
 - **Layout context via props:** Global data (header, footer, theme) is fetched server-side in `Layout.astro` and passed as props to React components. This avoids client-side context providers and keeps production pages JS-free.
 - **Block-based pages:** Page collection uses a block dispatcher (`src/components/blocks/index.tsx`) that maps `__typename` to block components. Block schemas are extracted to `tina/schemas/blocks.ts`.
 - **Schemas:** Shared fields in `tina/schemas/shared-fields.ts` (e.g., `dateFieldSchemas`, `makeSlugify`, `actionsFieldSchema`, `colorFieldSchema`). Block schemas in `tina/schemas/blocks.ts`, icon schema in `tina/schemas/icon.ts`. Schemas are centralised in `tina/schemas/` to avoid cross-directory imports between `tina/` and `src/`.
-- **Content directory:** Uses `content/` at project root (TinaCMS managed). Do NOT use `src/content/` — that's Astro's built-in Content Collections, which this project does not use.
+- **Content directory:** Content is served from `examples/shared/content/` via `localContentPath` in tina config. Collection paths (e.g., `content/authors`) are relative to the shared root. Do NOT use `src/content/` — that's Astro's built-in Content Collections, which this project does not use.
 - **Path alias:** `@/*` maps to `./src/*` (standard Astro convention). Configured in `tsconfig.json`.
 - **tina/ imports:** Files in `tina/` are outside `src/`, so they cannot use the `@/*` alias. Use relative paths instead (e.g., `../../src/lib/utils` in `tina/fields/color.tsx`).
 - **Image handling:** Uses standard `<img>` tags with `sanitizeImageSrc()` for safe rendering of CMS-controlled image URLs.
@@ -107,9 +107,13 @@ Playwright test suite in `e2e/` covering frontend pages and admin panel CRUD. Ru
 - `e2e/fixtures/` — `api-context.ts` (GraphQL API client), `test-content.ts` (`contentCleanup` fixture for automatic document deletion after each test).
 - `e2e/utils/` — `admin-helpers.ts` (navigation, save, dialog dismissal), `create-document.ts` / `delete-document.ts` (GraphQL mutations).
 
-### Content Symlinks
+### Shared Content
 
-All `content/` directories and `public/uploads`/`public/blocks` are symlinks to `examples/shared/content/` and `examples/shared/public/`. Test-created files (prefixed `e2e-`) are physically written to the shared directory. The `.gitignore` pattern `/content/**/e2e-*` in `examples/shared/.gitignore` catches them.
+Content files live in `examples/shared/content/` (single source of truth for all kitchen-sink projects). Each project uses `localContentPath: '../../../shared'` in `tina/config.tsx` so TinaCMS reads content directly from the shared directory — no content symlinks needed. This avoids path traversal errors from TinaCMS's security checks (`assertWithinBase` rejects symlinks that resolve outside the project root).
+
+Static assets (`public/uploads`, `public/blocks`) are still symlinked to `examples/shared/public/` since those are served by Astro, not TinaCMS.
+
+Test-created files (prefixed `e2e-`) are physically written to the shared directory. The `.gitignore` pattern `/content/**/e2e-*` in `examples/shared/.gitignore` catches them.
 
 ### TinaCMS Admin UI — Selectors and Behavior
 

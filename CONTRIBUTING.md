@@ -124,15 +124,17 @@ pnpm watch
 
 ### Symlinks
 
-The kitchen-sink example projects (`examples/next/kitchen-sink`, `examples/astro/kitchen-sink`, `examples/react/kitchen-sink`) use symlinks to share content and images from a central `examples/shared/` directory. This avoids duplicating files across framework examples.
+The kitchen-sink example projects (`examples/next/kitchen-sink`, `examples/astro/kitchen-sink`, `examples/react/kitchen-sink`) share content and public assets from a central `examples/shared/` directory. This avoids duplicating files across framework examples.
 
 The shared structure:
 - `examples/shared/content/` — all content files (authors, blogs, global, pages, posts, tags)
 - `examples/shared/public/` — all public assets (uploads, blocks)
 
-Each kitchen-sink project symlinks its `content/` subdirectories and `public/uploads`/`public/blocks` to the corresponding paths in `examples/shared/`.
+**Content** is shared via TinaCMS's `localContentPath` config option — each project's `tina/config.tsx` sets `localContentPath: '../../../shared'` so TinaCMS reads content directly from `examples/shared/`. No symlinks are used for content directories (TinaCMS's path traversal security checks reject symlinks that resolve outside the project root).
 
-On macOS and Linux, symlinks work automatically. On Windows, git defaults to creating text files instead of real symlinks, which will break these projects.
+**Public assets** (`public/uploads`, `public/blocks`) are shared via directory symlinks to `examples/shared/public/`, since these are served by the web framework (not TinaCMS).
+
+On macOS and Linux, symlinks work automatically. On Windows, git defaults to creating text files instead of real symlinks, which will break the public asset symlinks.
 
 To clone with symlink support:
 
