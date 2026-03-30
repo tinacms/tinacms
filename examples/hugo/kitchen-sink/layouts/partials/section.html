@@ -1,0 +1,21 @@
+{{/*
+  Section partial — color-variant wrapper.
+  Parameters (via dict):
+    .color   — "default" | "tint" | "primary"
+    .class   — additional CSS classes
+    .content — inner HTML
+*/}}
+{{ $color := .color | default "default" }}
+{{ $class := .class | default "" }}
+
+{{ $colorCss := dict
+  "default" "text-gray-800 dark:text-gray-50 bg-gradient-to-tl from-gray-50 dark:from-gray-900 via-transparent to-transparent"
+  "tint" "text-gray-900 dark:text-gray-100 bg-gradient-to-br from-gray-100 dark:from-gray-1000 to-transparent"
+  "primary" "text-theme-on bg-theme-500 bg-gradient-to-br from-theme-500 to-theme-600"
+}}
+
+{{ $css := index $colorCss $color | default (index $colorCss "default") }}
+
+<section class="flex-1 relative transition duration-150 ease-out body-font overflow-hidden {{ $css }} {{ $class }}">
+  {{ .content }}
+</section>

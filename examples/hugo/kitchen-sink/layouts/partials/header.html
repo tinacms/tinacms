@@ -1,0 +1,27 @@
+{{/*
+  Header partial.
+  Context: dict with .header .theme (from global config)
+*/}}
+{{ $header := .header }}
+{{ $theme := .theme }}
+{{ $defaultNav := slice (dict "href" "/" "label" "Home") (dict "href" "/posts" "label" "Posts") (dict "href" "/blog" "label" "Blog") }}
+{{ $nav := $header.nav | default $defaultNav }}
+{{ $isPrimary := eq ($header.color | default "") "primary" }}
+{{ $name := $header.name | default "Tina Kitchen Sink" }}
+
+<header class="relative overflow-hidden bg-gradient-to-b {{ if $isPrimary }}text-white from-theme-500 to-theme-700{{ else }}text-gray-800 dark:text-gray-50 from-white to-gray-50 dark:from-gray-900 dark:to-gray-1000{{ end }}">
+  <div class="max-w-7xl mx-auto px-6 sm:px-8 py-0 relative z-10">
+    <div class="flex items-center justify-between gap-4">
+      <h4 class="select-none text-lg font-bold tracking-tight my-4 transition duration-150 ease-out transform">
+        <a href="/" class="flex items-center gap-1 whitespace-nowrap tracking-[.002em]">
+          {{ partial "icons/tina.html" (dict "class" "inline-block h-auto w-10 opacity-80 hover:opacity-100") }}
+          <span class="hidden sm:inline">{{ $name }}</span>
+        </a>
+      </h4>
+
+      {{ partial "desktop-nav.html" (dict "nav" $nav "isPrimary" $isPrimary "page" .page) }}
+      {{ partial "mobile-nav.html" (dict "nav" $nav) }}
+    </div>
+  </div>
+  <div class="absolute h-1 bg-gradient-to-r from-transparent to-transparent bottom-0 left-4 right-4 opacity-5 {{ if $isPrimary }}via-white{{ else }}via-black dark:via-white{{ end }}"></div>
+</header>

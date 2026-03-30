@@ -1,0 +1,39 @@
+{{ define "main" }}
+<section class="flex-1 relative transition duration-150 ease-out body-font overflow-hidden text-gray-800 dark:text-gray-50 bg-gradient-to-tl from-gray-50 dark:from-gray-900 via-transparent to-transparent">
+  <div class="max-w-5xl mx-auto px-6 sm:px-8 py-24">
+    {{ partial "ui/gradient-title.html" (dict "text" .Params.name "size" "6xl") }}
+
+    <div class="flex flex-col items-center gap-6">
+      {{ with .Params.avatar }}
+        {{ $src := . }}
+        {{ if or (hasPrefix $src "/") (hasPrefix $src "./") (hasPrefix $src "../") (hasPrefix $src "http://") (hasPrefix $src "https://") }}
+          <img src="{{ $src }}" alt="{{ $.Params.name }}" class="w-32 h-32 rounded-full object-cover shadow-lg" />
+        {{ end }}
+      {{ end }}
+
+      {{ with .Params.description }}
+        <p class="text-lg text-gray-600 dark:text-gray-400 text-center max-w-2xl">{{ . }}</p>
+      {{ end }}
+
+      {{ with .Params.hobbies }}
+        <div class="flex flex-wrap gap-2 justify-center">
+          {{ range . }}
+            <span class="inline-block px-3 py-1 text-sm font-medium rounded-full bg-theme-50 text-theme-600 dark:bg-theme-700/20 dark:text-theme-300">{{ . }}</span>
+          {{ end }}
+        </div>
+      {{ end }}
+
+      {{ if or .Params.pubDate .Params.updatedDate }}
+        <div class="text-sm text-gray-400 dark:text-gray-500 flex gap-4 mt-4">
+          {{ with .Params.pubDate }}
+            <span>Published: {{ dateFormat "January 2, 2006" . }}</span>
+          {{ end }}
+          {{ with .Params.updatedDate }}
+            <span>Updated: {{ dateFormat "January 2, 2006" . }}</span>
+          {{ end }}
+        </div>
+      {{ end }}
+    </div>
+  </div>
+</section>
+{{ end }}

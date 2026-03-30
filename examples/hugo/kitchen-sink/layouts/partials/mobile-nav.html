@@ -1,0 +1,108 @@
+{{/*
+  MobileNav partial — hamburger button + slide-in drawer.
+  Context: dict with .nav (list of {href, label})
+  Uses vanilla JS for toggle/escape/overlay (Hugo has no React).
+*/}}
+{{ $nav := .nav | default slice }}
+
+<!-- Hamburger Button - Mobile only -->
+<button
+  id="mobile-nav-toggle"
+  aria-label="Open navigation menu"
+  aria-expanded="false"
+  aria-controls="mobile-nav-menu"
+  class="sm:hidden relative h-12 w-12 flex-shrink-0 inline-flex items-center justify-center rounded-md hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+>
+  <span id="mobile-nav-open-icon">{{ partial "icons/menu.html" }}</span>
+  <span id="mobile-nav-close-icon" class="hidden">{{ partial "icons/close.html" }}</span>
+</button>
+
+<!-- Overlay -->
+<div
+  id="mobile-nav-overlay"
+  class="fixed inset-0 bg-black/20 dark:bg-black/50 z-30 sm:hidden hidden"
+  aria-hidden="true"
+></div>
+
+<!-- Navigation Drawer -->
+<nav
+  id="mobile-nav-menu"
+  aria-label="Mobile navigation"
+  class="fixed left-0 top-0 h-full w-64 bg-white dark:bg-gray-900 shadow-lg z-40 sm:hidden transform transition-transform duration-200 ease-out -translate-x-full"
+>
+  <!-- Drawer Header -->
+  <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+    <span class="text-lg font-bold text-gray-900 dark:text-white">Menu</span>
+    <button
+      id="mobile-nav-close"
+      aria-label="Close navigation menu"
+      class="h-10 w-10 inline-flex items-center justify-center rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+    >
+      {{ partial "icons/close.html" }}
+    </button>
+  </div>
+
+  <!-- Navigation Items -->
+  <div class="px-4 py-6 space-y-2">
+    {{ range $nav }}
+      {{ $href := .href | default "/" }}
+      {{ if not (hasPrefix $href "/") }}
+        {{ $href = printf "/%s" $href }}
+      {{ end }}
+      <a
+        href="{{ $href }}"
+        class="block px-4 py-3 rounded-md text-base font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+      >
+        {{ .label }}
+      </a>
+    {{ end }}
+  </div>
+</nav>
+
+<script>
+(function() {
+  const toggle = document.getElementById('mobile-nav-toggle');
+  const menu = document.getElementById('mobile-nav-menu');
+  const overlay = document.getElementById('mobile-nav-overlay');
+  const closeBtn = document.getElementById('mobile-nav-close');
+  const openIcon = document.getElementById('mobile-nav-open-icon');
+  const closeIcon = document.getElementById('mobile-nav-close-icon');
+
+  function open() {
+    menu.classList.remove('-translate-x-full');
+    menu.classList.add('translate-x-0');
+    overlay.classList.remove('hidden');
+    toggle.setAttribute('aria-expanded', 'true');
+    openIcon.classList.add('hidden');
+    closeIcon.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function close() {
+    menu.classList.remove('translate-x-0');
+    menu.classList.add('-translate-x-full');
+    overlay.classList.add('hidden');
+    toggle.setAttribute('aria-expanded', 'false');
+    openIcon.classList.remove('hidden');
+    closeIcon.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  toggle.addEventListener('click', function() {
+    if (menu.classList.contains('-translate-x-full')) {
+      open();
+    } else {
+      close();
+    }
+  });
+
+  closeBtn.addEventListener('click', close);
+  overlay.addEventListener('click', close);
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && !menu.classList.contains('-translate-x-full')) {
+      close();
+    }
+  });
+})();
+</script>

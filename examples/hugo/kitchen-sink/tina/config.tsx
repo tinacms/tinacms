@@ -1,5 +1,7 @@
 import { defineConfig } from 'tinacms';
 
+import Author from './collections/author';
+import Global from './collections/global';
 import Tag from './collections/tag';
 
 // Branch detection for most hosting providers
@@ -25,6 +27,6 @@ export default defineConfig({
     },
   },
   schema: {
-    collections: [Tag],
+    collections: [Author, Tag, Global],
   },
 });

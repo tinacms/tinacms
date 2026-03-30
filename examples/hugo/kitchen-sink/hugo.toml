@@ -4,3 +4,20 @@ title = 'TinaCMS Hugo Kitchen Sink'
 
 [markup.goldmark.renderer]
 unsafe = true
+
+# Suppress page generation for data-only collections (tags, global).
+# These are accessed via readFile/Unmarshal or reference resolution, not as standalone pages.
+[[cascade]]
+[cascade._target]
+path = '/tags/**'
+[cascade.build]
+render = 'never'
+list = 'never'
+
+
+[[cascade]]
+[cascade._target]
+path = '/global/**'
+[cascade.build]
+render = 'never'
+list = 'never'
