@@ -327,6 +327,13 @@ export async function run() {
   let themeChoice: string | undefined;
   if (template.value === 'tina-docs') {
     if (opts.theme) {
+      const validThemes = THEMES.map((t) => t.value);
+      if (!validThemes.includes(opts.theme)) {
+        console.error(
+          `Invalid theme "${opts.theme}". Valid options are: ${validThemes.join(', ')}`
+        );
+        exit(1);
+      }
       themeChoice = opts.theme;
     } else {
       const res = await prompts({
