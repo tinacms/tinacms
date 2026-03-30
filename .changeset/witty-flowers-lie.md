@@ -1,5 +1,5 @@
 ---
-"@tinacms/schema-tools": patch
+"@tinacms/schema-tools": minor
 "tinacms": patch
 ---
 
