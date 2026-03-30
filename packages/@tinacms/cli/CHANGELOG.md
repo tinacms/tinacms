@@ -1,5 +1,17 @@
 # tinacms-cli
 
+## 2.2.1
+
+### Patch Changes
+
+- [#6552](https://github.com/tinacms/tinacms/pull/6552) [`f124eab`](https://github.com/tinacms/tinacms/commit/f124eabaca10dac9a4d765c9e4135813c4830955) Thanks [@wicksipedia](https://github.com/wicksipedia)! - feat: add warning in dev command when server is not restricted to localhost
+
+- Updated dependencies [[`a40f52a`](https://github.com/tinacms/tinacms/commit/a40f52ae01fa2ef059fb983efd22aad42913b351), [`a7ebbe1`](https://github.com/tinacms/tinacms/commit/a7ebbe18a77b05c567564f8b507f76c2a2bb135e), [`f124eab`](https://github.com/tinacms/tinacms/commit/f124eabaca10dac9a4d765c9e4135813c4830955), [`519a4c2`](https://github.com/tinacms/tinacms/commit/519a4c2ca8a78274fe88549d41adbe52f7c6258b), [`71bb5c2`](https://github.com/tinacms/tinacms/commit/71bb5c2944245195397e84a6314278cb40de0e66), [`6e374e5`](https://github.com/tinacms/tinacms/commit/6e374e5975ff240807d59bfd06b3ab22264e91b1), [`039e605`](https://github.com/tinacms/tinacms/commit/039e6052a77e4cd0ae1460e33076a0fad1864019), [`d1f094b`](https://github.com/tinacms/tinacms/commit/d1f094b2d1a62e9c0580a56b8a788bc0e7a0af98)]:
+  - tinacms@3.7.1
+  - @tinacms/graphql@2.2.2
+  - @tinacms/app@2.4.1
+  - @tinacms/search@1.2.8
+
 ## 2.2.0
 
 ### Minor Changes
