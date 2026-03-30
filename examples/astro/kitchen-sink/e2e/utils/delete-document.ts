@@ -1,4 +1,5 @@
 import { existsSync } from 'fs';
+import { fileURLToPath } from 'url';
 import { resolve } from 'path';
 import type { APIRequestContext } from '@playwright/test';
 
@@ -10,13 +11,17 @@ const DELETE_DOCUMENT = `
   }
 `;
 
-/** Maps collection names to their content directory paths (relative to project root). */
+const SHARED_CONTENT_ROOT = fileURLToPath(
+  new URL('../../../../shared/content/', import.meta.url)
+);
+
+/** Maps collection names to their content directory paths under examples/shared/content. */
 const COLLECTION_PATHS: Record<string, string> = {
-  author: 'content/authors',
-  post: 'content/posts',
-  blog: 'content/blogs',
-  page: 'content/pages',
-  tag: 'content/tags',
+  author: 'authors',
+  post: 'posts',
+  blog: 'blogs',
+  page: 'pages',
+  tag: 'tags',
 };
 
 /**
@@ -33,7 +38,7 @@ export const deleteDocument = async (
   // This prevents the TinaCMS dev server from logging "Unable to delete" errors.
   const dir = COLLECTION_PATHS[collection];
   if (dir) {
-    const filePath = resolve(dir, relativePath);
+    const filePath = resolve(SHARED_CONTENT_ROOT, dir, relativePath);
     if (!existsSync(filePath)) return;
   }
 
