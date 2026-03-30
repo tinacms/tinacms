@@ -11,7 +11,7 @@ export interface CreateOptions {
   noTelemetry: boolean;
   projectName: string;
   verbose: boolean;
-  theme: string;
+  theme?: string;
 }
 
 export function extractOptions(args: string[]): CreateOptions {
