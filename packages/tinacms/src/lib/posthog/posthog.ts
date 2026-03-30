@@ -109,3 +109,11 @@ export const SlashCommandUsedEvent: string = 'slash-command-used';
 export type SlashCommandUsedPayload = {
   command: string;
 };
+
+export const MediaUsageDashboardOpenedEvent: string = 'media-dashboard-opened';
+export type MediaUsageDashboardOpenedPayload = Record<string, never>;
+
+export const MediaUsageDashboardRefreshedEvent: string = 'media-dashboard-refreshed';
+export type MediaUsageDashboardRefreshedPayload = {
+  errorOccured?: boolean;
+};
