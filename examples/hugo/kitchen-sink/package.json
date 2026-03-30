@@ -1,0 +1,38 @@
+{
+  "name": "@examples/hugo-kitchen-sink",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "hugo": "hugo-extended",
+    "serve": "hugo-extended server",
+    "build:hugo": "hugo-extended",
+    "dev": "cross-env MONOREPO_DEV=true tinacms dev -c \"hugo-extended server\"",
+    "build": "tinacms build && hugo-extended",
+    "build:local": "tinacms build --local --skip-cloud-checks -c \"hugo-extended\"",
+    "lint": "biome lint .",
+    "format": "biome format --write ."
+  },
+  "dependencies": {
+    "@tailwindcss/typography": "catalog:",
+    "@tinacms/datalayer": "workspace:*",
+    "graphql": "^15.10.1",
+    "mongodb-level": "^0.0.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tinacms": "workspace:*"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "catalog:",
+    "@tailwindcss/postcss": "^4.2.1",
+    "@tinacms/app": "workspace:*",
+    "@tinacms/cli": "workspace:*",
+    "@tinacms/scripts": "workspace:*",
+    "autoprefixer": "catalog:",
+    "cross-env": "^7.0.3",
+    "hugo-extended": "^0.158.0",
+    "postcss": "^8.5.2",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.7.3"
+  }
+}
