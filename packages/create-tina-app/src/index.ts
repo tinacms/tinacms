@@ -326,33 +326,37 @@ export async function run() {
 
   let themeChoice: string | undefined;
   if (template.value === 'tina-docs') {
-    const res = await prompts({
-      name: 'theme',
-      type: 'select',
-      message: 'What theme would you like to use?',
-      choices: THEMES,
-    });
-    if (!Object.hasOwn(res, 'theme')) {
-      postHogCaptureError(
-        posthogClient,
-        userId,
-        sessionId,
-        new Error('User cancelled theme selection'),
-        {
-          errorCode: ERROR_CODES.ERR_CANCEL_THEME_PROMPT,
-          errorCategory: 'user-cancellation',
-          step: TRACKING_STEPS.THEME_SELECT,
-          fatal: true,
-          additionalProperties: {
-            ...telemetryData,
-            template: template.value,
-          },
-        }
-      );
-      if (posthogClient) await posthogClient.shutdown();
-      exit(1);
+    if (opts.theme) {
+      themeChoice = opts.theme;
+    } else {
+      const res = await prompts({
+        name: 'theme',
+        type: 'select',
+        message: 'What theme would you like to use?',
+        choices: THEMES,
+      });
+      if (!Object.hasOwn(res, 'theme')) {
+        postHogCaptureError(
+          posthogClient,
+          userId,
+          sessionId,
+          new Error('User cancelled theme selection'),
+          {
+            errorCode: ERROR_CODES.ERR_CANCEL_THEME_PROMPT,
+            errorCategory: 'user-cancellation',
+            step: TRACKING_STEPS.THEME_SELECT,
+            fatal: true,
+            additionalProperties: {
+              ...telemetryData,
+              template: template.value,
+            },
+          }
+        );
+        if (posthogClient) await posthogClient.shutdown();
+        exit(1);
+      }
+      themeChoice = res.theme;
     }
-    themeChoice = res.theme;
   }
 
   const rootDir = path.join(process.cwd(), projectName);
