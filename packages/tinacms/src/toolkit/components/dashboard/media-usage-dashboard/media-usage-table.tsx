@@ -47,6 +47,8 @@ import {
 } from '../../ui/table';
 import type { DocumentReference, MediaUsage } from './media-usage-scanner';
 import { MEDIA_USAGE_THUMBNAIL_KEY } from './media-usage-thumbnails';
+import { MediaUsageDashboardTypeFilterEvent, MediaUsageDashboardTypeFilterPayload, MediaUsageDashboardUsageFilterChangedEvent, MediaUsageDashboardUsageFilterChangedPayload } from '../../../../lib/posthog/posthog';
+import { captureEvent } from '../../../../lib/posthog/posthogProvider';
 
 const INFINITE_SCROLL_PAGE_SIZE = 10;
 
@@ -519,7 +521,10 @@ const MediaFilters = ({
     </span>
     <Select
       value={typeFilter}
-      onValueChange={(value) => setTypeFilter(value as MediaFilterType)}
+      onValueChange={(value) => { 
+        setTypeFilter(value as MediaFilterType);
+        captureEvent(MediaUsageDashboardTypeFilterEvent, { type: value as MediaFilterType } as MediaUsageDashboardTypeFilterPayload);
+      }}
     >
       <SelectTrigger
         aria-label='Filter by media type'
@@ -536,7 +541,9 @@ const MediaFilters = ({
     </Select>
     <Select
       value={usageFilter}
-      onValueChange={(value) => setUsageFilter(value as UsageFilterType)}
+      onValueChange={(value) => {setUsageFilter(value as UsageFilterType);
+        captureEvent(MediaUsageDashboardUsageFilterChangedEvent, { usage: value as UsageFilterType } as MediaUsageDashboardUsageFilterChangedPayload);
+      }}
     >
       <SelectTrigger
         aria-label='Filter by usage status'

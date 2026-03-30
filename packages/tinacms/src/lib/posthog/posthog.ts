@@ -117,3 +117,13 @@ export const MediaUsageDashboardRefreshedEvent: string = 'media-dashboard-refres
 export type MediaUsageDashboardRefreshedPayload = {
   errorOccured?: boolean;
 };
+
+export const MediaUsageDashboardTypeFilterEvent: string = 'media-dashboard-type-filter-changed';
+export type MediaUsageDashboardTypeFilterPayload = {
+  type: 'all' | 'image' | 'video' | 'other';
+};
+
+export const MediaUsageDashboardUsageFilterChangedEvent: string = 'media-dashboard-usage-filter-changed';
+export type MediaUsageDashboardUsageFilterChangedPayload = {
+  usage: 'all' | 'used' | 'unused';
+};
