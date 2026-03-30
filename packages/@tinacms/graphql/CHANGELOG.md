@@ -1,5 +1,17 @@
 # tina-graphql
 
+## 2.2.2
+
+### Patch Changes
+
+- [#6552](https://github.com/tinacms/tinacms/pull/6552) [`f124eab`](https://github.com/tinacms/tinacms/commit/f124eabaca10dac9a4d765c9e4135813c4830955) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Fix symlink/junction path traversal bypass (GHSA-g87c-r2jp-293w, GHSA-g9c2-gf25-3x67)
+
+- [#6545](https://github.com/tinacms/tinacms/pull/6545) [`71bb5c2`](https://github.com/tinacms/tinacms/commit/71bb5c2944245195397e84a6314278cb40de0e66) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Fix path traversal bypass via backslash sequences
+
+  On POSIX systems, path.normalize() treats backslashes as literal characters, not directory separators. This allowed attackers to bypass the existing path traversal checks using paths like x\..\..\package.json — the validation saw no traversal, but downstream path.join()/fs operations could resolve the backslashes as separators.
+
+  Fixes GHSA-v9p7-gf3q-h779
+
 ## 2.2.1
 
 ### Patch Changes
