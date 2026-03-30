@@ -109,7 +109,7 @@ Playwright test suite in `e2e/` covering frontend pages and admin panel CRUD. Ru
 
 ### Content Symlinks
 
-All `content/` directories are symlinks to `examples/next/kitchen-sink/content/`. Test-created files (prefixed `e2e-`) are physically written to the Next.js directory. The `.gitignore` pattern `/content/**/e2e-*` in the Next.js kitchen-sink catches them.
+All `content/` directories and `public/uploads`/`public/blocks` are symlinks to `examples/shared/content/` and `examples/shared/public/`. Test-created files (prefixed `e2e-`) are physically written to the shared directory. The `.gitignore` pattern `/content/**/e2e-*` in `examples/shared/.gitignore` catches them.
 
 ### TinaCMS Admin UI — Selectors and Behavior
 
@@ -146,5 +146,6 @@ These patterns are not obvious from TinaCMS source code and were discovered thro
 
 ## Reference
 
+- **Shared content/assets:** `examples/shared/` — single source of truth for content files and public assets, symlinked by all kitchen-sink projects
 - **Next.js kitchen-sink:** `examples/next/kitchen-sink/` — the Next.js version of this example app, useful for comparing approaches across frameworks
 - **Astro starter:** `tinacms/tina-astro-starter` on GitHub — reference for directive setup, config structure, and Vite workarounds

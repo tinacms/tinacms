@@ -124,7 +124,15 @@ pnpm watch
 
 ### Symlinks
 
-Some example projects (e.g., `examples/**/kitchen-sink`) use git symlinks to share content and images across framework examples. On macOS and Linux, symlinks work automatically. On Windows, git defaults to creating text files instead of real symlinks, which will break these projects.
+The kitchen-sink example projects (`examples/next/kitchen-sink`, `examples/astro/kitchen-sink`, `examples/react/kitchen-sink`) use symlinks to share content and images from a central `examples/shared/` directory. This avoids duplicating files across framework examples.
+
+The shared structure:
+- `examples/shared/content/` — all content files (authors, blogs, global, pages, posts, tags)
+- `examples/shared/public/` — all public assets (uploads, blocks)
+
+Each kitchen-sink project symlinks its `content/` subdirectories and `public/uploads`/`public/blocks` to the corresponding paths in `examples/shared/`.
+
+On macOS and Linux, symlinks work automatically. On Windows, git defaults to creating text files instead of real symlinks, which will break these projects.
 
 To clone with symlink support:
 
