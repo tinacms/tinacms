@@ -40,6 +40,10 @@ target = "data/global"
 source = "../../shared/content/tags"
 target = "content/tags"
 
+[[module.mounts]]
+source = "../../shared/content/posts"
+target = "content/posts"
+
 # When ANY module mount is specified, Hugo's default mounts are overridden.
 # Re-declare the standard directories explicitly.
 [[module.mounts]]

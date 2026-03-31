@@ -1,0 +1,60 @@
+{{ $pages := .Pages }}
+{{ if not $pages }}
+  {{ partial "ui/no-data.html" (dict "message" "No posts found.") }}
+{{ else }}
+  <div class="flex flex-col gap-8">
+    {{ range $pages.ByDate.Reverse }}
+      <a href="{{ .RelPermalink }}" class="group block rounded-lg bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition duration-150 ease-out border border-gray-150 dark:border-gray-700 overflow-hidden">
+        <div class="px-6 py-6 sm:px-8">
+          <h2 class="text-2xl font-bold mb-2 group-hover:text-theme-500 transition-colors title-font">
+            <span class="bg-clip-text text-transparent bg-gradient-to-r from-theme-400 to-theme-600 dark:from-theme-300 dark:to-theme-500">
+              {{ .Params.title }}
+            </span>
+            <span class="inline-block opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-1">&rarr;</span>
+          </h2>
+
+          {{ with .Params.excerpt }}
+            <p class="text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">{{ . }}</p>
+          {{ end }}
+
+          <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+            {{/* Resolve author reference */}}
+            {{ with .Params.author }}
+              {{ $authorSlug := path.BaseName . }}
+              {{ $author := site.GetPage (printf "/authors/%s" $authorSlug) }}
+              {{ if $author }}
+                <div class="flex items-center gap-2">
+                  {{ with $author.Params.avatar }}
+                    {{ if or (hasPrefix . "/") (hasPrefix . "./") (hasPrefix . "../") (hasPrefix . "http://") (hasPrefix . "https://") }}
+                      <img src="{{ . }}" alt="{{ $author.Params.name }}" class="w-8 h-8 rounded-full object-cover" />
+                    {{ end }}
+                  {{ end }}
+                  <span>{{ $author.Params.name }}</span>
+                </div>
+              {{ end }}
+            {{ end }}
+
+            {{ with .Params.date }}
+              <span>{{ dateFormat "January 2, 2006" . }}</span>
+            {{ end }}
+          </div>
+
+          {{/* Render tags */}}
+          {{ with .Params.tags }}
+            <div class="flex flex-wrap gap-2 mt-3">
+              {{ range . }}
+                {{ with .tag }}
+                  {{ $tagSlug := path.BaseName . }}
+                  {{ $tag := site.GetPage (printf "/tags/%s" $tagSlug) }}
+                  {{ if $tag }}
+                    {{ partial "ui/badge.html" (dict "text" $tag.Params.name "size" "sm") }}
+                  {{ end }}
+                {{ end }}
+              {{ end }}
+            </div>
+          {{ end }}
+        </div>
+      </a>
+    {{ end }}
+  </div>
+{{ end }}

@@ -17,7 +17,7 @@ type ContentLifecycleFixtures = {
    * Example:
    *   test("creates a post", async ({ page, contentCleanup }) => {
    *     // ... create the post via the UI ...
-   *     contentCleanup.track("post", "my-new-post.mdx");
+   *     contentCleanup.track("post", "my-new-post.md");
    *   });
    */
   contentCleanup: {

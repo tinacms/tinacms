@@ -13,11 +13,11 @@ import { deleteDocument } from '../utils/delete-document';
 //   title.toLowerCase().split(' ').join('-')
 const POST_TITLE = 'E2E Playwright Test Post';
 const POST_SLUG = 'e2e-playwright-test-post';
-const POST_RELATIVE_PATH = `${POST_SLUG}.mdx`;
+const POST_RELATIVE_PATH = `${POST_SLUG}.md`;
 
 const EDIT_POST_TITLE = 'E2E Playwright Edit Post';
 const EDIT_POST_SLUG = 'e2e-playwright-edit-post';
-const EDIT_POST_RELATIVE_PATH = `${EDIT_POST_SLUG}.mdx`;
+const EDIT_POST_RELATIVE_PATH = `${EDIT_POST_SLUG}.md`;
 
 // Test author created via API as a dependency
 const DEP_AUTHOR_FILENAME = 'e2e-post-dep-author';

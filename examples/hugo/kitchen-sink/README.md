@@ -39,5 +39,5 @@ Hugo Extended is installed automatically via the `hugo-extended` npm package —
 Content is shared across all kitchen-sink examples from `examples/shared/`:
 
 - **TinaCMS admin:** Reads shared content via `localContentPath: '../../../shared'` in `tina/config.tsx`
-- **Hugo rendering:** Accesses shared content via `[[module.mounts]]` in `hugo.toml` (for `.md`/`.json` collections) or local `.md` copies (for `.mdx` collections that Hugo can't process directly)
+- **Hugo rendering:** Accesses shared content via `[[module.mounts]]` in `hugo.toml` — all collections use `.md`/`.json` and are mounted directly
 - **Static assets:** `static/uploads` and `static/blocks` are symlinked to `examples/shared/public/`

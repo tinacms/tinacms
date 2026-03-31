@@ -29,7 +29,7 @@ Unlike the Next.js and Astro versions, Hugo cannot use `useTina()` for visual/in
 - **Image symlinks:** `static/uploads` and `static/blocks` are symlinked to `examples/shared/public/` for shared assets. Static symlinks are fine — Hugo copies these differently than content.
 - **Data-only collections:** Tag and Global collections use `build: {render: never, list: never}` in Hugo cascade config to prevent page generation. Tags are accessed via `site.GetPage` for reference resolution. Global config is accessed via `site.Data.global.index` (mounted into Hugo's data directory as well as content). Use `cascade.target` (not `cascade._target` — deprecated in Hugo 0.156.0).
 - **Global config dual mount:** The shared global directory is mounted as BOTH `content/global` (for TinaCMS) and `data/global` (for Hugo templates). Hugo's `readFile`/`fileExists` can't reach files outside the project root, but `hugo.Data` reads from data mounts natively. Access via `hugo.Data.global.index`. Note: use `hugo.Data` not `site.Data` — the latter was deprecated in Hugo v0.156.0.
-- **Content format:** Collections with `.md`/`.json` shared content (authors, tags, global) use module mounts directly. Collections with `.mdx` shared content (posts, blogs, pages) need local `.md` copies with MDX syntax stripped — Hugo cannot process `.mdx` files. TinaCMS collection `format` is set to `'mdx'` for these so the admin finds the shared files.
+- **Content format:** All shared content uses `.md` (not `.mdx`) — the universal markdown standard. All collections across all kitchen-sink projects (Next.js, Astro, React, Hugo) use `format: 'md'`. This allows Hugo to mount shared content directly via module mounts. Rich-text body is rendered via Hugo's Goldmark markdown renderer, not TinaMarkdown.
 - **Non-body rich-text fields:** Fields like `excerpt` and hero `text` use `string` type with `textarea` UI instead of `rich-text`, since Hugo cannot render rich-text AST stored in frontmatter.
 - **Reference resolution:** TinaCMS stores references as path strings (e.g., `content/authors/napoleon.md`). Hugo templates resolve these using `site.GetPage` with `path.BaseName` to extract the slug. Inside `{{ with }}` blocks, use `$.Site.GetPage` or the global `site.GetPage` — the context `.` changes to the field value.
 - **Dynamic HTML tags:** Hugo's auto-escaping converts `<{{ $tag }}>` to `&lt;h1>`. Use `printf` + `| safeHTML` for partials with dynamic tag names (e.g., gradient-title).
@@ -80,7 +80,7 @@ Content files live in `examples/shared/content/` (single source of truth for all
 
 **TinaCMS side:** `localContentPath: '../../../shared'` in `tina/config.tsx` tells TinaCMS to read/write content from the shared directory.
 
-**Hugo side:** `[[module.mounts]]` in `hugo.toml` mounts shared content directories into Hugo's content tree. Collections with `.md`/`.json` content (authors, tags, global) are mounted directly. Collections with `.mdx` content (posts, blogs, pages) need local `.md` copies in `content/` since Hugo cannot process `.mdx` files.
+**Hugo side:** `[[module.mounts]]` in `hugo.toml` mounts shared content directories into Hugo's content tree. All collections use `.md`/`.json` and are mounted directly — no local copies needed.
 
 **Static assets:** `static/uploads` and `static/blocks` are symlinked to `examples/shared/public/`. Static symlinks work fine cross-platform.
 
