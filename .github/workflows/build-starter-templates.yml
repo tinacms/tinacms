@@ -54,7 +54,7 @@ jobs:
             echo "TINA_CLIENT_ID=${{ secrets.TINA_REMIX_STARTER_CLIENT_ID }}" >> $GITHUB_ENV
             echo "TINA_TOKEN=${{ secrets.TINA_REMIX_STARTER_TOKEN }}" >> $GITHUB_ENV
           elif [[ "${{ matrix.template }}" == "tina-astro-starter" ]]; then
-            echo "TINA_CLIENT_ID=${{ secrets.TINA_ASTRO_STARTER_CLIENT_ID }}" >> $GITHUB_ENV
+            echo "PUBLIC_TINA_CLIENT_ID=${{ secrets.TINA_ASTRO_STARTER_CLIENT_ID }}" >> $GITHUB_ENV
             echo "TINA_TOKEN=${{ secrets.TINA_ASTRO_STARTER_TOKEN }}" >> $GITHUB_ENV
           elif [[ "${{ matrix.template }}" == "tina-docs" ]]; then
             echo "NEXT_PUBLIC_TINA_CLIENT_ID=${{ secrets.TINA_DOCS_CLIENT_ID }}" >> $GITHUB_ENV
