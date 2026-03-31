@@ -149,7 +149,11 @@ const HighlightColorToolbarButton = () => {
     !Array.isArray(overrides?.highlightColors) ||
     overrides?.highlightColors?.length === 0
       ? highlightColors
-      : overrides.highlightColors;
+const highlightColorArray =
+    !Array.isArray(overrides) &&
+    overrides?.highlightColors?.length 
+      ? overrides.highlightColors
+      : highlightColors;
   return (
     <DropdownMenu modal={false} {...openState}>
       <DropdownMenuTrigger asChild>
