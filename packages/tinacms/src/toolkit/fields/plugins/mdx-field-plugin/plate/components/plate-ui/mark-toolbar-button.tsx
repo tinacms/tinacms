@@ -145,13 +145,7 @@ const HighlightColorToolbarButton = () => {
     useHighlightToolbar();
   const { overrides } = useToolbarContext();
   const highlightColorArray =
-    Array.isArray(overrides) ||
-    !Array.isArray(overrides?.highlightColors) ||
-    overrides?.highlightColors?.length === 0
-      ? highlightColors
-const highlightColorArray =
-    !Array.isArray(overrides) &&
-    overrides?.highlightColors?.length 
+    !Array.isArray(overrides) && overrides?.highlightColors?.length
       ? overrides.highlightColors
       : highlightColors;
   return (
