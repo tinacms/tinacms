@@ -36,8 +36,8 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
     <li
       className={`group relative flex shrink-0 items-center transition duration-150 ease-out cursor-pointer border-b border-gray-150 ${
         active
-          ? 'bg-gradient-to-r from-white to-gray-50/50 text-blue-500 hover:bg-gray-50'
-          : 'bg-white hover:bg-gray-50/50 hover:text-blue-500'
+          ? 'bg-gradient-to-r from-white to-gray-50/50 text-tina-orange hover:bg-gray-50'
+          : 'bg-white hover:bg-gray-50/50 hover:text-tina-orange'
       }`}
       onClick={() => {
         if (!active) {
@@ -104,7 +104,7 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
         <span
           className={cn(
             'absolute bottom-0 left-0 w-full text-xs text-white px-2 py-1 truncate z-10',
-            active ? 'bg-blue-500/60' : 'bg-black/60'
+            active ? 'bg-tina-orange/60' : 'bg-black/60'
           )}
           style={{ pointerEvents: 'none' }}
         >
@@ -121,7 +121,7 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
               <img
                 className={cn(
                   'block overflow-hidden object-center object-contain max-w-full max-h-[16rem] m-auto shadow',
-                  { 'border border-blue-500': active }
+                  { 'border border-tina-orange': active }
                 )}
                 style={checkerboardStyle}
                 src={thumbnail}
