@@ -1,6 +1,7 @@
 import { defineConfig } from 'tinacms';
 
 import Author from './collections/author';
+import Blog from './collections/blog';
 import Global from './collections/global';
 import Post from './collections/post';
 import Tag from './collections/tag';
@@ -28,6 +29,6 @@ export default defineConfig({
     },
   },
   schema: {
-    collections: [Author, Post, Tag, Global],
+    collections: [Author, Blog, Post, Tag, Global],
   },
 });

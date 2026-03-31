@@ -8,6 +8,10 @@ unsafe = true
 # Disable Hugo's default taxonomies — tags are a TinaCMS collection, not a Hugo taxonomy.
 [taxonomies]
 
+# Override blog URLs from /blogs/ (folder name) to /blog/ (singular, matching Next.js).
+[permalinks]
+blogs = '/blog/:contentbasename/'
+
 # Mount shared content from the monorepo alongside local content.
 # Hugo module mounts replace directory symlinks for content, which Hugo's
 # Go-based file walker does not follow on Windows (and can be unreliable
@@ -43,6 +47,10 @@ target = "content/tags"
 [[module.mounts]]
 source = "../../shared/content/posts"
 target = "content/posts"
+
+[[module.mounts]]
+source = "../../shared/content/blogs"
+target = "content/blogs"
 
 # When ANY module mount is specified, Hugo's default mounts are overridden.
 # Re-declare the standard directories explicitly.
