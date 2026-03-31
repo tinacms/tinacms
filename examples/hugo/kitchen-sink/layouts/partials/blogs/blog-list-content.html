@@ -4,19 +4,22 @@
 {{ else }}
   <div class="grid gap-8 md:grid-cols-2">
     {{ range $pages.ByDate.Reverse }}
+      {{ $blogTitle := .Params.title }}
+      {{ $blogAuthorRef := .Params.author }}
+      {{ $blogPubDate := .Params.pubDate }}
       <a href="{{ .RelPermalink }}" class="group flex flex-col bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow">
         {{/* Hero image */}}
         {{ with .Params.heroImage }}
           {{ if or (hasPrefix . "/") (hasPrefix . "./") (hasPrefix . "../") (hasPrefix . "http://") (hasPrefix . "https://") }}
             <div class="relative w-full h-48 overflow-hidden">
-              <img src="{{ . }}" alt="{{ $.Params.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+              <img src="{{ . }}" alt="{{ $blogTitle }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
             </div>
           {{ end }}
         {{ end }}
 
         <div class="p-6 flex flex-col flex-1">
           <h2 class="text-xl font-bold text-gray-900 dark:text-gray-50 group-hover:text-theme-600 dark:group-hover:text-theme-400 transition-colors mb-2">
-            {{ .Params.title }}
+            {{ $blogTitle }}
           </h2>
 
           {{ with .Params.description }}
@@ -25,23 +28,23 @@
 
           <div class="flex items-center mt-4 gap-2">
             {{/* Resolve author reference */}}
-            {{ with .Params.author }}
+            {{ with $blogAuthorRef }}
               {{ $authorSlug := path.BaseName . }}
               {{ $author := site.GetPage (printf "/authors/%s" $authorSlug) }}
               {{ if $author }}
                 {{ with $author.Params.avatar }}
                   {{ if or (hasPrefix . "/") (hasPrefix . "./") (hasPrefix . "../") (hasPrefix . "http://") (hasPrefix . "https://") }}
-                    <img src="{{ . }}" alt="{{ $author.Params.name }}" class="w-7 h-7 rounded-full object-cover flex-shrink-0" />
+                    <img src="{{ . }}" alt="{{ $author.Params.name }}" width="28" height="28" class="rounded-full object-cover flex-shrink-0" />
                   {{ end }}
                 {{ end }}
                 <span class="text-sm font-medium text-gray-600 dark:text-gray-300">{{ $author.Params.name }}</span>
-                {{ with $.Params.pubDate }}
+                {{ with $blogPubDate }}
                   <span class="text-gray-300 dark:text-gray-600">&middot;</span>
                 {{ end }}
               {{ end }}
             {{ end }}
 
-            {{ with .Params.pubDate }}
+            {{ with $blogPubDate }}
               <span class="text-xs text-gray-400 dark:text-gray-500">{{ dateFormat "January 2, 2006" . }}</span>
             {{ end }}
           </div>

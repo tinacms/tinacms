@@ -5,10 +5,10 @@
 {{ $footer := .footer }}
 
 <footer class="bg-gradient-to-br text-gray-800 from-white to-gray-50 dark:from-gray-900 dark:to-gray-1000">
-  <div class="max-w-4xl mx-auto px-6 sm:px-8 py-8 relative">
+  <div class="max-w-7xl mx-auto px-6 sm:px-8 py-8 relative">
     <div class="flex justify-between items-center gap-6 flex-wrap">
       <a href="/" class="group mx-2 flex items-center font-bold tracking-tight text-gray-400 dark:text-gray-300 opacity-50 hover:opacity-100 transition duration-150 ease-out whitespace-nowrap">
-        {{ partial "icons/tina.html" (dict "class" "inline-block h-10 w-auto group-hover:text-orange-500") }}
+        {{ partial "icons/tina.html" (dict "class" "inline-block h-10 w-auto text-theme-400 group-hover:text-orange-500") }}
       </a>
       <div class="flex gap-4">
         {{ range $footer.social }}

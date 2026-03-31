@@ -1,15 +1,19 @@
 {{ $color := .color | default "default" }}
 
-<div class="max-w-5xl mx-auto px-6 sm:px-8 py-24 text-center">
-  {{ with .title }}
-    <h2 class="text-3xl font-extrabold tracking-tight title-font mb-4">{{ . }}</h2>
-  {{ end }}
+<div class="max-w-7xl mx-auto px-6 sm:px-8 py-24">
+  <div class="text-center">
+    {{ with .title }}
+      <h2 class="text-balance text-4xl font-semibold lg:text-5xl text-inherit">{{ . }}</h2>
+    {{ end }}
 
-  {{ with .description }}
-    <p class="text-lg opacity-80 max-w-2xl mx-auto mb-10">{{ . }}</p>
-  {{ end }}
+    {{ with .description }}
+      <div class="mt-4 text-inherit opacity-90 max-w-2xl mx-auto">{{ . }}</div>
+    {{ end }}
 
-  {{ with .actions }}
-    {{ partial "actions.html" (dict "actions" . "parentColor" $color "class" "justify-center") }}
-  {{ end }}
+    {{ with .actions }}
+      <div class="mt-12">
+        {{ partial "actions.html" (dict "actions" . "parentColor" $color "class" "justify-center py-2") }}
+      </div>
+    {{ end }}
+  </div>
 </div>

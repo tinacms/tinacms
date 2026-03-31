@@ -3,40 +3,41 @@
 {{ $hasImage := and .image .image.src }}
 
 <div class="max-w-7xl mx-auto px-6 sm:px-8 py-24">
-  <div class="grid grid-cols-1 {{ if $hasImage }}lg:grid-cols-5{{ end }} items-center gap-14">
-    <div class="text-center {{ if $hasImage }}lg:col-span-3 lg:text-left{{ end }}">
+  <div class="grid grid-cols-1 lg:grid-cols-5 gap-14 items-center justify-center">
+    <div class="row-start-2 lg:row-start-1 lg:col-span-3 text-center lg:text-left">
       {{ with .tagline }}
-        <span class="inline-block px-3 py-1 mb-8 text-sm font-bold tracking-wide title-font {{ if $isPrimary }}text-white bg-theme-400/30{{ else }}text-theme-500 bg-theme-400/10 dark:bg-theme-400/10 dark:text-theme-300{{ end }}">
+        <h2 class="relative inline-block px-3 py-1 mb-8 text-md font-bold tracking-wide title-font z-20">
           {{ . }}
-        </span>
-      {{ end }}
-
-      {{ with .headline }}
-        <h2 class="w-full mb-10 text-5xl font-extrabold tracking-normal leading-tight title-font">
-          {{ . }}
+          <span class="absolute w-full h-full left-0 top-0 rounded-full -z-1 bg-current opacity-7"></span>
         </h2>
       {{ end }}
 
+      {{ with .headline }}
+        <h3 class="w-full relative mb-10 text-5xl font-extrabold tracking-normal leading-tight title-font">
+          <span>{{ . }}</span>
+        </h3>
+      {{ end }}
+
       {{ with .text }}
-        <div class="mx-auto mb-10 text-lg leading-relaxed opacity-80 {{ if $hasImage }}lg:mx-0{{ else }}md:max-w-3xl md:mx-auto{{ end }}">
+        <div class="prose prose-lg mx-auto lg:mx-0 mb-10 {{ if $isPrimary }}prose-primary{{ else }}dark:prose-dark{{ end }}">
           <p>{{ . }}</p>
         </div>
       {{ end }}
 
       {{ with .actions }}
-        {{ partial "actions.html" (dict "actions" . "parentColor" $color "class" (cond $hasImage "justify-start" "justify-center")) }}
+        {{ partial "actions.html" (dict "actions" . "parentColor" $color "class" "justify-center lg:justify-start py-2") }}
       {{ end }}
     </div>
 
     {{ if $hasImage }}
-      <div class="relative lg:col-span-2">
-        {{ $src := .image.src }}
-        {{ $alt := .image.alt | default "" }}
-        {{ if or (hasPrefix $src "/") (hasPrefix $src "http://") (hasPrefix $src "https://") }}
-          <img src="{{ $src }}" alt="{{ $alt }}" class="absolute w-full rounded-lg max-w-xs md:max-w-none h-auto blur-2xl brightness-150 contrast-[0.9] dark:brightness-150 saturate-200 opacity-50 dark:opacity-30 mix-blend-multiply dark:mix-blend-hard-light" />
-          <img src="{{ $src }}" alt="{{ $alt }}" class="relative z-10 w-full max-w-xs md:max-w-none rounded-lg" />
-        {{ end }}
-      </div>
+      {{ $src := .image.src }}
+      {{ $alt := .image.alt | default "" }}
+      {{ if or (hasPrefix $src "/") (hasPrefix $src "http://") (hasPrefix $src "https://") }}
+        <div class="relative row-start-1 lg:col-span-2 flex justify-center">
+          <div class="absolute w-full rounded-lg max-w-xs lg:max-w-none h-full blur-2xl opacity-40 dark:opacity-20 mix-blend-multiply dark:mix-blend-hard-light bg-gradient-to-br from-theme-400/60 to-theme-600/40" aria-hidden="true"></div>
+          <img src="{{ $src }}" alt="{{ $alt }}" class="relative z-10 w-full max-w-xs rounded-lg lg:max-w-none h-auto" />
+        </div>
+      {{ end }}
     {{ end }}
   </div>
 </div>

@@ -14,13 +14,13 @@
     <div class="flex items-center justify-between gap-4">
       <h4 class="select-none text-lg font-bold tracking-tight my-4 transition duration-150 ease-out transform">
         <a href="/" class="flex items-center gap-1 whitespace-nowrap tracking-[.002em]">
-          {{ partial "icons/tina.html" (dict "class" "inline-block h-auto w-10 opacity-80 hover:opacity-100") }}
+          {{ partial "icons/tina.html" (dict "class" "inline-block h-auto w-10 opacity-80 hover:opacity-100 text-theme-400") }}
           <span class="hidden sm:inline">{{ $name }}</span>
         </a>
       </h4>
 
       {{ partial "desktop-nav.html" (dict "nav" $nav "isPrimary" $isPrimary "page" .page) }}
-      {{ partial "mobile-nav.html" (dict "nav" $nav) }}
+      {{ partial "mobile-nav.html" (dict "nav" $nav "page" .page) }}
     </div>
   </div>
   <div class="absolute h-1 bg-gradient-to-r from-transparent to-transparent bottom-0 left-4 right-4 opacity-5 {{ if $isPrimary }}via-white{{ else }}via-black dark:via-white{{ end }}"></div>
