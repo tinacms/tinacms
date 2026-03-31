@@ -109,3 +109,36 @@ export const SlashCommandUsedEvent: string = 'slash-command-used';
 export type SlashCommandUsedPayload = {
   command: string;
 };
+
+export const MediaUsageDashboardOpenedEvent: string = 'media-dashboard-opened';
+export type MediaUsageDashboardOpenedPayload = Record<string, never>;
+
+export const MediaUsageDashboardRefreshedEvent: string =
+  'media-dashboard-refreshed';
+export type MediaUsageDashboardRefreshedPayload = {
+  errorOccured?: boolean;
+};
+
+export const MediaUsageDashboardTypeFilterEvent: string =
+  'media-dashboard-type-filter-changed';
+export type MediaUsageDashboardTypeFilterPayload = {
+  type: 'all' | 'image' | 'video' | 'other';
+};
+
+export const MediaUsageDashboardUsageFilterChangedEvent: string =
+  'media-dashboard-usage-filter-changed';
+export type MediaUsageDashboardUsageFilterChangedPayload = {
+  usage: 'all' | 'used' | 'unused';
+};
+
+export const MediaUsageDashboardRowExpandedEvent: string =
+  'media-dashboard-row-expanded';
+export type MediaUsageDashboardRowExpandedEvent = Record<string, never>;
+
+export const MediaUsageDashboardPreviewOpenedEvent: string =
+  'media-dashboard-preview-opened';
+export type MediaUsageDashboardPreviewOpenedPayload = Record<string, never>;
+
+export const MediaUsageDashboardDocumentLinkClickedEvent: string =
+  'media-dashboard-document-link-clicked';
+export type MediaUsageDashboardDocumentLinkClickedEvent = Record<string, never>;
