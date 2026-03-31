@@ -61,7 +61,7 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
             alt={item.filename}
           />
         ) : (
-          <FileIcon className='w-1/2 h-full fill-gray-300' />
+          <FileIcon className={`w-1/2 h-full ${item.type === 'dir' ? 'fill-tina-orange' : 'fill-gray-300'}`} />
         )}
       </div>
       <span
@@ -130,7 +130,7 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
             </>
           ) : (
             <div className='p-4 w-full flex flex-col gap-4 items-center justify-center'>
-              <FileIcon className='w-[40%] h-auto fill-gray-300' size={40} />
+              <FileIcon className={`w-[40%] h-auto ${item.type === 'dir' ? 'fill-tina-orange' : 'fill-gray-300'}`} size={40} />
             </div>
           )}
         </div>
