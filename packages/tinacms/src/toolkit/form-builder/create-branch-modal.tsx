@@ -251,6 +251,11 @@ export const CreateBranchModal = ({
           case EDITORIAL_WORKFLOW_ERROR.VALIDATION_FAILED:
             errorMessage = err.message || 'Invalid branch name';
             break;
+          case EDITORIAL_WORKFLOW_ERROR.GIT_AUTHORING_UNAVAILABLE:
+            errorMessage =
+              err.message ||
+              'GitHub authoring is currently unavailable. Please reconnect GitHub authoring and try again.';
+            break;
         }
       } else if (err.message) {
         // Fallback to message parsing for backwards compatibility

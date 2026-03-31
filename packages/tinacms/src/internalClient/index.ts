@@ -679,38 +679,54 @@ mutation addPendingDocumentMutation(
         await new Promise((resolve) => setTimeout(resolve, pollInterval));
         attempts++;
 
-        const statusUrl = `${this.contentApiBase}/editorial-workflow/${this.clientId}/status/${requestId}`;
-        const statusResponse =
-          await this.authProvider.fetchWithToken(statusUrl);
+        try {
+          const statusUrl = `${this.contentApiBase}/editorial-workflow/${this.clientId}/status/${requestId}`;
+          const statusResponse =
+            await this.authProvider.fetchWithToken(statusUrl);
 
-        if (!statusResponse.ok) {
-          throw new Error(
-            `Failed to check workflow status: ${statusResponse.statusText}`
-          );
-        }
+          const statusResponseBody = await statusResponse.json();
 
-        const statusResponseBody = await statusResponse.json();
+          if (options.onStatusUpdate) {
+            options.onStatusUpdate({
+              status: statusResponseBody.status,
+              message:
+                statusResponseBody.message ||
+                `Status: ${statusResponseBody.status}`,
+            });
+          }
 
-        if (options.onStatusUpdate) {
-          options.onStatusUpdate({
-            status: statusResponseBody.status,
-            message:
+          if (statusResponse.status === 200) {
+            return {
+              branchName: statusResponseBody.branchName,
+              pullRequestUrl: statusResponseBody.pullRequestUrl,
+            };
+          }
+
+          if (statusResponse.status === 500) {
+            const error = new Error(
+              statusResponseBody.message || 'Editorial workflow failed'
+            ) as EditorialWorkflowErrorDetails;
+            error.errorCode =
+              statusResponseBody.errorCode || 'WORKFLOW_FAILED';
+            throw error;
+          }
+
+          if (statusResponse.status !== 202) {
+            const error = new Error(
               statusResponseBody.message ||
-              `Status: ${statusResponseBody.status}`,
-          });
-        }
-
-        // Only on 200 OK status, return the response
-        if (statusResponse.status === 200) {
-          return {
-            branchName: statusResponseBody.branchName,
-            pullRequestUrl: statusResponseBody.pullRequestUrl,
-          };
-        }
-
-        if (!statusResponse.ok) {
-          throw new Error(
-            statusResponseBody.message || 'Editorial workflow failed'
+                `Failed to check workflow status: ${statusResponse.statusText}`
+            ) as EditorialWorkflowErrorDetails;
+            error.errorCode = 'WORKFLOW_STATUS_FAILED';
+            throw error;
+          }
+        } catch (error) {
+          if ((error as EditorialWorkflowErrorDetails).errorCode) {
+            throw error;
+          }
+          // Transient errors (network, JSON parse, 502/503) — log and retry
+          console.warn(
+            `Editorial workflow status poll failed (attempt ${attempts}/${maxAttempts}), retrying...`,
+            error
           );
         }
       }
