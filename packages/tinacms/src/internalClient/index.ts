@@ -706,8 +706,7 @@ mutation addPendingDocumentMutation(
             const error = new Error(
               statusResponseBody.message || 'Editorial workflow failed'
             ) as EditorialWorkflowErrorDetails;
-            error.errorCode =
-              statusResponseBody.errorCode || 'WORKFLOW_FAILED';
+            error.errorCode = statusResponseBody.errorCode || 'WORKFLOW_FAILED';
             throw error;
           }
 
