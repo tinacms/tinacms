@@ -1,0 +1,40 @@
+{{ $color := .color | default "default" }}
+
+<div class="max-w-7xl mx-auto px-6 sm:px-8 py-24">
+  {{ with .title }}
+    <h2 class="text-3xl font-extrabold tracking-tight text-center title-font mb-4">{{ . }}</h2>
+  {{ end }}
+
+  {{ with .description }}
+    <p class="text-center text-lg opacity-80 max-w-2xl mx-auto mb-16">{{ . }}</p>
+  {{ end }}
+
+  {{ with .items }}
+    <div class="flex flex-wrap gap-12 justify-center">
+      {{ range . }}
+        {{/* Handle both string items (legacy) and object items */}}
+        {{ $isString := not (reflect.IsMap .) }}
+        {{ if $isString }}
+          <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+            <h3 class="font-semibold text-lg">{{ . }}</h3>
+          </div>
+        {{ else }}
+          <div class="flex-1 min-w-[16rem] max-w-sm flex flex-col items-center text-center gap-4">
+            {{ with .icon }}
+              {{ partial "icon.html" (dict "icon" . "theme" $color) }}
+            {{ end }}
+            {{ with .title }}
+              <h3 class="text-xl font-semibold title-font">{{ . }}</h3>
+            {{ end }}
+            {{ with .text }}
+              <p class="text-base opacity-80 leading-relaxed">{{ . }}</p>
+            {{ end }}
+            {{ with .actions }}
+              {{ partial "actions.html" (dict "actions" . "parentColor" $color) }}
+            {{ end }}
+          </div>
+        {{ end }}
+      {{ end }}
+    </div>
+  {{ end }}
+</div>

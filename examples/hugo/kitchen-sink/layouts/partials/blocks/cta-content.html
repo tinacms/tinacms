@@ -1,0 +1,15 @@
+{{ $color := .color | default "default" }}
+
+<div class="max-w-5xl mx-auto px-6 sm:px-8 py-24 text-center">
+  {{ with .title }}
+    <h2 class="text-3xl font-extrabold tracking-tight title-font mb-4">{{ . }}</h2>
+  {{ end }}
+
+  {{ with .description }}
+    <p class="text-lg opacity-80 max-w-2xl mx-auto mb-10">{{ . }}</p>
+  {{ end }}
+
+  {{ with .actions }}
+    {{ partial "actions.html" (dict "actions" . "parentColor" $color "class" "justify-center") }}
+  {{ end }}
+</div>

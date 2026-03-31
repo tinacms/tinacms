@@ -1,0 +1,23 @@
+{{ $color := .color | default "primary" }}
+{{ $isPrimary := eq $color "primary" }}
+
+<div class="max-w-5xl mx-auto px-6 sm:px-8 py-24">
+  <blockquote class="relative text-center">
+    {{/* Decorative opening quote */}}
+    <span class="absolute text-8xl leading-none opacity-15 -top-6 -left-2 select-none {{ if $isPrimary }}text-white{{ else }}text-theme-500{{ end }}">&ldquo;</span>
+
+    {{ with .quote }}
+      <p class="text-2xl md:text-3xl font-bold italic leading-relaxed {{ if $isPrimary }}text-white{{ else }}text-gray-700 dark:text-gray-200{{ end }}">
+        {{ . }}
+      </p>
+    {{ end }}
+
+    <hr class="w-16 mx-auto my-8 {{ if $isPrimary }}border-theme-300{{ else }}border-gray-300 dark:border-gray-600{{ end }}" />
+
+    {{ with .author }}
+      <footer class="text-lg font-medium {{ if $isPrimary }}text-theme-200{{ else }}text-theme-500 dark:text-theme-300{{ end }}">
+        &mdash; {{ . }}
+      </footer>
+    {{ end }}
+  </blockquote>
+</div>

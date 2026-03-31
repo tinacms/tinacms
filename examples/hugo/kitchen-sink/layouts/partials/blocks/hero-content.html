@@ -1,0 +1,42 @@
+{{ $color := .color | default "default" }}
+{{ $isPrimary := eq $color "primary" }}
+{{ $hasImage := and .image .image.src }}
+
+<div class="max-w-7xl mx-auto px-6 sm:px-8 py-24">
+  <div class="grid grid-cols-1 {{ if $hasImage }}lg:grid-cols-5{{ end }} items-center gap-14">
+    <div class="text-center {{ if $hasImage }}lg:col-span-3 lg:text-left{{ end }}">
+      {{ with .tagline }}
+        <span class="inline-block px-3 py-1 mb-8 text-sm font-bold tracking-wide title-font {{ if $isPrimary }}text-white bg-theme-400/30{{ else }}text-theme-500 bg-theme-400/10 dark:bg-theme-400/10 dark:text-theme-300{{ end }}">
+          {{ . }}
+        </span>
+      {{ end }}
+
+      {{ with .headline }}
+        <h2 class="w-full mb-10 text-5xl font-extrabold tracking-normal leading-tight title-font">
+          {{ . }}
+        </h2>
+      {{ end }}
+
+      {{ with .text }}
+        <div class="mx-auto mb-10 text-lg leading-relaxed opacity-80 {{ if $hasImage }}lg:mx-0{{ else }}md:max-w-3xl md:mx-auto{{ end }}">
+          <p>{{ . }}</p>
+        </div>
+      {{ end }}
+
+      {{ with .actions }}
+        {{ partial "actions.html" (dict "actions" . "parentColor" $color "class" (cond $hasImage "justify-start" "justify-center")) }}
+      {{ end }}
+    </div>
+
+    {{ if $hasImage }}
+      <div class="relative lg:col-span-2">
+        {{ $src := .image.src }}
+        {{ $alt := .image.alt | default "" }}
+        {{ if or (hasPrefix $src "/") (hasPrefix $src "http://") (hasPrefix $src "https://") }}
+          <img src="{{ $src }}" alt="{{ $alt }}" class="absolute w-full rounded-lg max-w-xs md:max-w-none h-auto blur-2xl brightness-150 contrast-[0.9] dark:brightness-150 saturate-200 opacity-50 dark:opacity-30 mix-blend-multiply dark:mix-blend-hard-light" />
+          <img src="{{ $src }}" alt="{{ $alt }}" class="relative z-10 w-full max-w-xs md:max-w-none rounded-lg" />
+        {{ end }}
+      </div>
+    {{ end }}
+  </div>
+</div>
