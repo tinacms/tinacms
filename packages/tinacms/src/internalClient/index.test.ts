@@ -187,6 +187,73 @@ describe('Tina Client', () => {
       expect(fetchWithToken).toHaveBeenCalledTimes(2);
     });
 
+    it('detects error status in polling response body', async () => {
+      fetchWithToken
+        .mockResolvedValueOnce(
+          makeResponse({
+            status: 200,
+            body: { requestId: 'req-123' },
+          })
+        )
+        .mockResolvedValueOnce(
+          makeResponse({
+            status: 200,
+            body: {
+              status: EDITORIAL_WORKFLOW_STATUS.ERROR,
+              message:
+                'Could not complete editorial workflow because your GitHub authoring connection needs attention.',
+            },
+          })
+        );
+
+      const promise = client.executeEditorialWorkflow({
+        branchName: 'feature/test',
+        baseBranch: 'main',
+      });
+      const rejection = expect(promise).rejects.toMatchObject({
+        message:
+          'Could not complete editorial workflow because your GitHub authoring connection needs attention.',
+        errorCode: 'WORKFLOW_FAILED',
+      });
+
+      await vi.advanceTimersByTimeAsync(5000);
+
+      await rejection;
+    });
+
+    it('detects error status in HTTP 500 polling response', async () => {
+      fetchWithToken
+        .mockResolvedValueOnce(
+          makeResponse({
+            status: 200,
+            body: { requestId: 'req-123' },
+          })
+        )
+        .mockResolvedValueOnce(
+          makeResponse({
+            status: 500,
+            body: {
+              status: EDITORIAL_WORKFLOW_STATUS.ERROR,
+              message: 'Indexing failed',
+              errorCode: 'WORKFLOW_FAILED',
+            },
+          })
+        );
+
+      const promise = client.executeEditorialWorkflow({
+        branchName: 'feature/test',
+        baseBranch: 'main',
+      });
+      const rejection = expect(promise).rejects.toMatchObject({
+        message: 'Indexing failed',
+        errorCode: 'WORKFLOW_FAILED',
+      });
+
+      await vi.advanceTimersByTimeAsync(5000);
+
+      await rejection;
+    });
+
     it('retries transient polling failures', async () => {
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 

@@ -695,19 +695,22 @@ mutation addPendingDocumentMutation(
             });
           }
 
-          if (statusResponse.status === 200) {
-            return {
-              branchName: statusResponseBody.branchName,
-              pullRequestUrl: statusResponseBody.pullRequestUrl,
-            };
-          }
-
-          if (statusResponse.status === 500) {
+          if (
+            statusResponseBody.status === EDITORIAL_WORKFLOW_STATUS.ERROR ||
+            statusResponse.status === 500
+          ) {
             const error = new Error(
               statusResponseBody.message || 'Editorial workflow failed'
             ) as EditorialWorkflowErrorDetails;
             error.errorCode = statusResponseBody.errorCode || 'WORKFLOW_FAILED';
             throw error;
+          }
+
+          if (statusResponse.status === 200) {
+            return {
+              branchName: statusResponseBody.branchName,
+              pullRequestUrl: statusResponseBody.pullRequestUrl,
+            };
           }
 
           if (statusResponse.status !== 202) {

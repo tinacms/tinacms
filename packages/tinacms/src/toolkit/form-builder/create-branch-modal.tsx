@@ -237,11 +237,6 @@ export const CreateBranchModal = ({
         'Branch operation failed. Talking to GitHub was unsuccessful, please try again. If the problem persists please contact support at https://tina.io/support 🦙';
 
       const err = e as EditorialWorkflowErrorDetails;
-      console.log('branch modal caught error', {
-        message: err.message,
-        errorCode: err.errorCode,
-        raw: err,
-      });
 
       // Check for structured error codes from the API
       if (err.errorCode) {
