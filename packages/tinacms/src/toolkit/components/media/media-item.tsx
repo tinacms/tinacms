@@ -61,7 +61,9 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
             alt={item.filename}
           />
         ) : (
-          <FileIcon className={`w-1/2 h-full ${item.type === 'dir' ? 'fill-tina-orange' : 'fill-gray-300'}`} />
+          <FileIcon
+            className={`w-1/2 h-full ${item.type === 'dir' ? 'fill-tina-orange' : 'fill-gray-300'}`}
+          />
         )}
       </div>
       <span
@@ -86,10 +88,11 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
     <li className='block flex justify-center shrink-0 w-full transition duration-150 ease-out'>
       <button
         className={cn(
-          'relative flex flex-col items-center justify-center w-full',
+          'relative flex flex-col items-center justify-center w-full outline-none',
           {
             'shadow hover:shadow-md hover:scale-103 hover:border-gray-150':
               !active,
+            'ring-2 ring-tina-orange': active,
             'cursor-pointer': item.type === 'dir',
           }
         )}
@@ -120,8 +123,7 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
             <>
               <img
                 className={cn(
-                  'block overflow-hidden object-center object-contain max-w-full max-h-[16rem] m-auto shadow',
-                  { 'border border-tina-orange': active }
+                  'block overflow-hidden object-center object-contain max-w-full max-h-[16rem] m-auto shadow'
                 )}
                 style={checkerboardStyle}
                 src={thumbnail}
@@ -130,7 +132,10 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
             </>
           ) : (
             <div className='p-4 w-full flex flex-col gap-4 items-center justify-center'>
-              <FileIcon className={`w-[40%] h-auto ${item.type === 'dir' ? 'fill-tina-orange' : 'fill-gray-300'}`} size={40} />
+              <FileIcon
+                className={`w-[40%] h-auto ${item.type === 'dir' ? 'fill-tina-orange' : 'fill-gray-300'}`}
+                size={40}
+              />
             </div>
           )}
         </div>
