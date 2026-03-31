@@ -12,7 +12,9 @@
     "build:local": "tinacms build --local --skip-cloud-checks -c \"astro build\"",
     "preview": "astro preview",
     "lint": "biome lint .",
-    "format": "biome format --write ."
+    "format": "biome format --write .",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.0",
@@ -37,6 +39,7 @@
     "@types/node": "^25.1.0",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
+    "@playwright/test": "catalog:",
     "autoprefixer": "catalog:",
     "cross-env": "^7.0.3",
     "postcss": "^8.5.2",

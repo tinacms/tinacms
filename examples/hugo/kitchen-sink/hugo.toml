@@ -1,0 +1,6 @@
+baseURL = 'http://localhost:1313/'
+locale = 'en-us'
+title = 'TinaCMS Hugo Kitchen Sink'
+
+[markup.goldmark.renderer]
+unsafe = true

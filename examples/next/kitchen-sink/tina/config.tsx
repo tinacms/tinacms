@@ -18,6 +18,7 @@ export default defineConfig({
   branch,
   clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID || null,
   token: process.env.TINA_TOKEN || null,
+  localContentPath: '../../../shared',
   build: {
     outputFolder: 'admin',
     publicFolder: 'public',
