@@ -1,5 +1,11 @@
 # create-tina-app
 
+## 2.1.3
+
+### Patch Changes
+
+- [#6604](https://github.com/tinacms/tinacms/pull/6604) [`03495e1`](https://github.com/tinacms/tinacms/commit/03495e1d403a96e2a2ea26e9d345959afd99923c) Thanks [@Ben0189](https://github.com/Ben0189)! - Add --theme flag to skip interactive prompt for tina-docs template in CI
+
 ## 2.1.2
 
 ### Patch Changes
