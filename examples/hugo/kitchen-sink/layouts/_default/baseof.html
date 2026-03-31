@@ -1,13 +1,17 @@
-{{/* Read global config — try content/global/index.json first */}}
+{{/*
+  Read global config via Hugo data mount.
+  The shared global directory is mounted as both content (for TinaCMS)
+  and data (for template access via site.Data.global.index).
+*/}}
 {{ $header := dict }}
 {{ $footer := dict }}
 {{ $theme := dict "color" "blue" "font" "sans" "darkMode" "system" }}
-{{ $globalPath := "content/global/index.json" }}
-{{ if fileExists $globalPath }}
-  {{ $globalData := $globalPath | readFile | transform.Unmarshal }}
-  {{ with $globalData.header }}{{ $header = . }}{{ end }}
-  {{ with $globalData.footer }}{{ $footer = . }}{{ end }}
-  {{ with $globalData.theme }}{{ $theme = . }}{{ end }}
+{{ with hugo.Data.global }}
+  {{ with .index }}
+    {{ with .header }}{{ $header = . }}{{ end }}
+    {{ with .footer }}{{ $footer = . }}{{ end }}
+    {{ with .theme }}{{ $theme = . }}{{ end }}
+  {{ end }}
 {{ end }}
 
 {{ $themeColor := $theme.color | default "blue" }}
