@@ -4,12 +4,13 @@
 {{ else }}
   <div class="grid gap-8 md:grid-cols-2">
     {{ range $pages.ByDate.Reverse }}
+      {{ $page := . }}
       <a href="{{ .RelPermalink }}" class="group flex flex-col bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow">
         {{/* Hero image */}}
         {{ with .Params.heroImage }}
           {{ if or (hasPrefix . "/") (hasPrefix . "./") (hasPrefix . "../") (hasPrefix . "http://") (hasPrefix . "https://") }}
             <div class="relative w-full h-48 overflow-hidden">
-              <img src="{{ . }}" alt="{{ $.Params.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+              <img src="{{ . }}" alt="{{ $page.Params.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
             </div>
           {{ end }}
         {{ end }}
@@ -35,7 +36,7 @@
                   {{ end }}
                 {{ end }}
                 <span class="text-sm font-medium text-gray-600 dark:text-gray-300">{{ $author.Params.name }}</span>
-                {{ with $.Params.pubDate }}
+                {{ with $page.Params.pubDate }}
                   <span class="text-gray-300 dark:text-gray-600">&middot;</span>
                 {{ end }}
               {{ end }}
