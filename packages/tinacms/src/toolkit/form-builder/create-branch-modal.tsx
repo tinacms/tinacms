@@ -256,6 +256,9 @@ export const CreateBranchModal = ({
               err.message ||
               'GitHub authoring is currently unavailable. Please reconnect GitHub authoring and try again.';
             break;
+          default:
+            errorMessage = err.message || errorMessage;
+            break;
         }
       } else if (err.message) {
         // Fallback to message parsing for backwards compatibility
