@@ -17,7 +17,7 @@ export default async function PostPage({
 
   let data: Awaited<ReturnType<typeof client.queries.post>>;
   try {
-    data = await client.queries.post({ relativePath: `${filepath}.mdx` });
+    data = await client.queries.post({ relativePath: `${filepath}.md` });
   } catch {
     notFound();
   }

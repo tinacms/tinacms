@@ -1,0 +1,31 @@
+{{ $pages := .Pages }}
+{{ if not $pages }}
+  <p class="text-center text-gray-500 dark:text-gray-400 py-12">No authors found.</p>
+{{ else }}
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    {{ range $pages }}
+      <a href="{{ .RelPermalink }}" class="group block bg-gray-50 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-1000 rounded shadow-sm transition-all duration-150 ease-out hover:shadow-md hover:to-gray-50 dark:hover:to-gray-800 px-6 sm:px-8 py-8">
+        <div class="flex items-center gap-4 mb-4">
+          {{ with .Params.avatar }}
+            {{ if or (hasPrefix . "/") (hasPrefix . "./") (hasPrefix . "../") (hasPrefix . "http://") (hasPrefix . "https://") }}
+              <img src="{{ . }}" alt="{{ $.Params.name }}" width="56" height="56" class="object-cover rounded-full shadow-sm" />
+            {{ end }}
+          {{ end }}
+          <h2 class="text-2xl font-semibold text-gray-700 dark:text-white group-hover:text-theme-600 dark:group-hover:text-theme-300 transition-all duration-150">
+            {{ .Params.name }}
+          </h2>
+        </div>
+        {{ with .Params.description }}
+          <p class="text-gray-600 dark:text-gray-400 line-clamp-2 opacity-70">{{ . }}</p>
+        {{ end }}
+        {{ with .Params.hobbies }}
+          <div class="mt-4 flex flex-wrap gap-2">
+            {{ range . }}
+              <span class="text-sm px-2 py-1 bg-theme-50 dark:bg-theme-700/20 text-theme-700 dark:text-theme-200 rounded-full">{{ . }}</span>
+            {{ end }}
+          </div>
+        {{ end }}
+      </a>
+    {{ end }}
+  </div>
+{{ end }}

@@ -13,7 +13,7 @@ export default function DynamicPage() {
   const filepath = segments.join('/');
 
   const queryFn = useCallback(
-    () => client.queries.page({ relativePath: `${filepath}.mdx` }),
+    () => client.queries.page({ relativePath: `${filepath}.md` }),
     [filepath]
   );
   const result = useTinaQuery(queryFn);

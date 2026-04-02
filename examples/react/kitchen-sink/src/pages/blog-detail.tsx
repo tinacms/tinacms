@@ -14,7 +14,7 @@ import client from '@/tina/__generated__/client';
 
 export default function BlogDetail() {
   const { filename } = useParams<{ filename: string }>();
-  const relativePath = `${filename}.mdx`;
+  const relativePath = `${filename}.md`;
 
   const queryFn = useCallback(
     () => client.queries.blog({ relativePath }),

@@ -9,7 +9,7 @@ import {
 import { deleteDocument } from '../utils/delete-document';
 
 const PAGE_FILENAME = 'e2e-playwright-test-page';
-const PAGE_RELATIVE_PATH = `${PAGE_FILENAME}.mdx`;
+const PAGE_RELATIVE_PATH = `${PAGE_FILENAME}.md`;
 
 test.describe('Page Block Editing via TinaCMS Admin', () => {
   test.describe.configure({ mode: 'serial' });

@@ -1,11 +1,69 @@
+{{/*
+  Read global config via Hugo data mount.
+  The shared global directory is mounted as both content (for TinaCMS)
+  and data (for template access via site.Data.global.index).
+*/}}
+{{ $header := dict }}
+{{ $footer := dict }}
+{{ $theme := dict "color" "blue" "font" "sans" "darkMode" "system" }}
+{{ with hugo.Data.global }}
+  {{ with .index }}
+    {{ with .header }}{{ $header = . }}{{ end }}
+    {{ with .footer }}{{ $footer = . }}{{ end }}
+    {{ with .theme }}{{ $theme = . }}{{ end }}
+  {{ end }}
+{{ end }}
+
+{{ $themeColor := $theme.color | default "blue" }}
+{{ $font := $theme.font | default "sans" }}
+{{ $darkMode := $theme.darkMode | default "system" }}
+
+{{ $fontClass := "font-sans" }}
+{{ if eq $font "nunito" }}{{ $fontClass = "font-nunito" }}{{ end }}
+{{ if eq $font "lato" }}{{ $fontClass = "font-lato" }}{{ end }}
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"{{ if eq $darkMode "dark" }} class="dark"{{ end }}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{{ if and .Title (ne .Title .Site.Title) }}{{ .Title }} — {{ end }}{{ .Site.Title }}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    {{/* Google Fonts — always load Inter, conditionally load Nunito/Lato */}}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    {{ if eq $font "nunito" }}
+      <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet" />
+    {{ else if eq $font "lato" }}
+      <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet" />
+    {{ end }}
+
+    {{/* Tailwind CSS via Hugo Pipes + PostCSS */}}
+    {{ with resources.Get "css/main.css" }}
+      {{ $css := . | css.PostCSS }}
+      <link rel="stylesheet" href="{{ $css.RelPermalink }}" />
+    {{ end }}
+
+    {{/* System dark mode detection — must be inline to prevent flash */}}
+    {{ if eq $darkMode "system" }}
+      <script>
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          document.documentElement.classList.add('dark');
+        }
+      </script>
+    {{ end }}
   </head>
-  <body>
-    {{ block "main" . }}{{ end }}
+  <body class="{{ $fontClass }} antialiased">
+    <div data-theme="{{ $themeColor }}" class="min-h-screen flex flex-col">
+      {{ partial "header.html" (dict "header" $header "theme" $theme "page" .) }}
+
+      <main class="flex-1">
+        {{ block "main" . }}{{ end }}
+      </main>
+
+      {{ partial "footer.html" (dict "footer" $footer "theme" $theme) }}
+    </div>
   </body>
 </html>

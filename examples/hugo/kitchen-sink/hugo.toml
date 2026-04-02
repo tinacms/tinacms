@@ -4,3 +4,105 @@ title = 'TinaCMS Hugo Kitchen Sink'
 
 [markup.goldmark.renderer]
 unsafe = true
+
+# Disable Hugo's default taxonomies — tags are a TinaCMS collection, not a Hugo taxonomy.
+[taxonomies]
+
+# Override blog URLs from /blogs/ (folder name) to /blog/ (singular, matching Next.js).
+[permalinks]
+blogs = '/blog/:contentbasename/'
+
+# Mount shared content from the monorepo alongside local content.
+# Hugo module mounts replace directory symlinks for content, which Hugo's
+# Go-based file walker does not follow on Windows (and can be unreliable
+# cross-platform). Static asset symlinks (static/uploads, static/blocks)
+# are fine — Hugo copies those differently.
+[[module.mounts]]
+source = "content"
+target = "content"
+
+[[module.mounts]]
+source = "../../shared/content/authors"
+target = "content/authors"
+
+[[module.mounts]]
+source = "../../shared/content/global"
+target = "content/global"
+
+# Also mount global config as Hugo data for template access.
+# readFile/fileExists can't reach files outside the project root,
+# but site.Data reads from data/ mounts natively.
+[[module.mounts]]
+source = "data"
+target = "data"
+
+[[module.mounts]]
+source = "../../shared/content/global"
+target = "data/global"
+
+[[module.mounts]]
+source = "../../shared/content/tags"
+target = "content/tags"
+
+[[module.mounts]]
+source = "../../shared/content/posts"
+target = "content/posts"
+
+[[module.mounts]]
+source = "../../shared/content/blogs"
+target = "content/blogs"
+
+[[module.mounts]]
+source = "../../shared/content/pages"
+target = "content/pages"
+
+# When ANY module mount is specified, Hugo's default mounts are overridden.
+# Re-declare the standard directories explicitly.
+[[module.mounts]]
+source = "layouts"
+target = "layouts"
+
+[[module.mounts]]
+source = "static"
+target = "static"
+
+[[module.mounts]]
+source = "assets"
+target = "assets"
+
+[[module.mounts]]
+source = "archetypes"
+target = "archetypes"
+
+# Suppress page generation for data-only collections (tags, global).
+# These are accessed via site.GetPage for reference resolution, not as standalone pages.
+[[cascade]]
+[cascade.target]
+path = '/tags/**'
+[cascade.build]
+render = 'never'
+list = 'never'
+
+[[cascade]]
+[cascade.target]
+path = '/global/**'
+[cascade.build]
+render = 'never'
+list = 'never'
+
+# Suppress /pages/home/ — the homepage is rendered by layouts/index.html via site.GetPage.
+# Also suppress the /pages/ section listing (not a user-facing route).
+[[cascade]]
+[cascade.target]
+path = '/pages/home'
+[cascade.build]
+render = 'never'
+list = 'never'
+
+[[cascade]]
+[cascade.target]
+path = '/pages'
+kind = 'section'
+[cascade.build]
+render = 'never'
+list = 'never'

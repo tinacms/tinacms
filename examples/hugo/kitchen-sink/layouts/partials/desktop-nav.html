@@ -1,0 +1,27 @@
+{{/*
+  DesktopNav partial — horizontal nav links, hidden on mobile.
+  Context: dict with .nav (list of {href, label}) .isPrimary (bool)
+*/}}
+{{ $nav := .nav | default slice }}
+{{ $isPrimary := .isPrimary | default false }}
+{{ $currentPath := urls.AbsURL "" }}
+
+<nav class="hidden sm:flex items-center gap-0 sm:gap-1">
+  {{ range $nav }}
+    {{ $href := .href | default "/" }}
+    {{/* Ensure href starts with / */}}
+    {{ if not (hasPrefix $href "/") }}
+      {{ $href = printf "/%s" $href }}
+    {{ end }}
+    {{ $active := false }}
+    {{ if eq $href "/" }}
+      {{ $active = eq $.page.RelPermalink "/" }}
+    {{ else }}
+      {{ $active = or (eq $.page.RelPermalink $href) (hasPrefix $.page.RelPermalink (printf "%s/" $href)) }}
+    {{ end }}
+
+    <a href="{{ $href }}" class="relative select-none text-base inline-flex items-center tracking-wide transition duration-150 ease-out opacity-70 hover:opacity-100 px-2 sm:px-4 py-5 {{ if $active }}opacity-100 border-b-3 {{ if $isPrimary }}border-white{{ else }}border-theme-200 text-theme-600 dark:text-theme-300{{ end }}{{ end }}">
+      {{ .label }}
+    </a>
+  {{ end }}
+</nav>
