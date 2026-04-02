@@ -1,6 +1,7 @@
 import { expect, test } from '../fixtures/test-content';
 import {
   clickSave,
+  clickSaveNew,
   dismissEditModeDialog,
   navigateToCreate,
   navigateToEdit,
@@ -45,7 +46,7 @@ test.describe('Page Block Editing via TinaCMS Admin', () => {
     await navigateToCreate(page, 'page');
     await page.fill('input[name="filename"]', PAGE_FILENAME);
     contentCleanup.track('page', PAGE_RELATIVE_PATH);
-    await clickSave(page);
+    await clickSaveNew(page);
 
     await navigateToEdit(page, 'page', PAGE_FILENAME);
 
@@ -66,7 +67,7 @@ test.describe('Page Block Editing via TinaCMS Admin', () => {
     await navigateToCreate(page, 'page');
     await page.fill('input[name="filename"]', PAGE_FILENAME);
     contentCleanup.track('page', PAGE_RELATIVE_PATH);
-    await clickSave(page);
+    await clickSaveNew(page);
 
     await navigateToEdit(page, 'page', PAGE_FILENAME);
 

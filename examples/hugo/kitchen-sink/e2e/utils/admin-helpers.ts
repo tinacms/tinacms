@@ -39,22 +39,39 @@ export async function dismissEditModeDialog(page: Page): Promise<void> {
   }
 }
 
-/**
- * Click the Save button and wait for the GraphQL mutation to complete.
- */
-export async function clickSave(page: Page): Promise<void> {
+// This is different from other kitchen-sink projects: saving a new document
+// kicks off a redirect, so the opacity check on the Save button is flaky.
+// clickSaveNew waits for the redirect; clickSave waits for the button state.
+async function submitAndAwaitGraphQL(page: Page): Promise<string> {
+  const currentUrl = page.url();
   const saveResponse = page.waitForResponse(
     (resp) => resp.url().includes('/graphql') && resp.status() === 200,
     { timeout: 15000 }
   );
   await page.click('button:has-text("Save")');
   await saveResponse;
+  return currentUrl;
+}
+
+/**
+ * Save a new document and wait for TinaCMS to navigate away from the
+ * create form (e.g. /new/ → /edit/ or back to the collection list).
+ */
+export async function clickSaveNew(page: Page): Promise<void> {
+  const previousUrl = await submitAndAwaitGraphQL(page);
+  await page.waitForURL((url) => url.toString() !== previousUrl, {
+    timeout: 10000,
+  });
+}
+
+/**
+ * Save an existing document and wait for the form to return to its
+ * pristine state (Save button fades to disabled).
+ */
+export async function clickSave(page: Page): Promise<void> {
+  await submitAndAwaitGraphQL(page);
   const saveButton = page.locator('button:has-text("Save")');
   await expect(saveButton).toHaveClass(/opacity-30/, { timeout: 10000 });
-  const currentUrl = page.url();
-  await page
-    .waitForURL((url) => url.toString() !== currentUrl, { timeout: 2000 })
-    .catch(() => {});
 }
 
 /**

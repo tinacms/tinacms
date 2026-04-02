@@ -1,6 +1,7 @@
 import { expect, test } from '../fixtures/test-content';
 import {
   clickSave,
+  clickSaveNew,
   navigateToCreate,
   navigateToEdit,
   navigateToList,
@@ -40,7 +41,7 @@ test.describe('Author CRUD via TinaCMS Admin', () => {
     await page.fill('input[name="description"]', AUTHOR_DESCRIPTION);
 
     contentCleanup.track('author', AUTHOR_RELATIVE_PATH);
-    await clickSave(page);
+    await clickSaveNew(page);
 
     await navigateToList(page, 'author');
     const authorEntry = page.locator(`text=${AUTHOR_FILENAME}`).first();
@@ -55,7 +56,7 @@ test.describe('Author CRUD via TinaCMS Admin', () => {
     await page.fill('input[name="name"]', 'e2e edit author');
     await page.fill('input[name="description"]', 'Original description');
     contentCleanup.track('author', editRelPath);
-    await clickSave(page);
+    await clickSaveNew(page);
 
     await navigateToEdit(page, 'author', editFilename);
     const descInput = page.locator('input[name="description"]');
@@ -77,7 +78,7 @@ test.describe('Author CRUD via TinaCMS Admin', () => {
     await page.fill('input[name="name"]', 'e2e fields author');
     await page.fill('input[name="description"]', 'Testing all fields');
     contentCleanup.track('author', 'e2e-fields-author.md');
-    await clickSave(page);
+    await clickSaveNew(page);
 
     await navigateToEdit(page, 'author', 'e2e-fields-author');
     await expect(page.locator('input[name="name"]')).toHaveValue(

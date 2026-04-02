@@ -2,6 +2,7 @@ import type { APIRequestContext } from '@playwright/test';
 import { expect, test } from '../fixtures/test-content';
 import {
   clickSave,
+  clickSaveNew,
   navigateToCreate,
   navigateToEdit,
   navigateToList,
@@ -63,7 +64,7 @@ test.describe('Post CRUD via TinaCMS Admin', () => {
     await navigateToCreate(page, 'post');
     await page.fill('input[name="title"]', POST_TITLE);
     contentCleanup.track('post', POST_RELATIVE_PATH);
-    await clickSave(page);
+    await clickSaveNew(page);
 
     await navigateToList(page, 'post');
     const postEntry = page.locator(`text=${POST_SLUG}`).first();
@@ -94,7 +95,7 @@ test.describe('Post CRUD via TinaCMS Admin', () => {
     }
 
     contentCleanup.track('post', EDIT_POST_RELATIVE_PATH);
-    await clickSave(page);
+    await clickSaveNew(page);
 
     await navigateToList(page, 'post');
     await expect(page.locator(`text=${EDIT_POST_SLUG}`).first()).toBeVisible({
@@ -109,7 +110,7 @@ test.describe('Post CRUD via TinaCMS Admin', () => {
     await navigateToCreate(page, 'post');
     await page.fill('input[name="title"]', POST_TITLE);
     contentCleanup.track('post', POST_RELATIVE_PATH);
-    await clickSave(page);
+    await clickSaveNew(page);
 
     await navigateToEdit(page, 'post', POST_SLUG);
     const titleInput = page.locator('input[name="title"]');
