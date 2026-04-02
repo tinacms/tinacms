@@ -119,3 +119,8 @@ Run with `pnpm test:e2e` or `pnpm test:e2e:ui`.
 | Image optimization | Framework `<Image>` component | Standard `<img>` tags |
 | Client-side navigation | SPA-style | Full page reloads |
 | Custom rich-text templates | BlockQuote, DateTime, NewsletterSignup | Not supported (Goldmark) |
+| Global config hot-reload | Live reload on edit | Requires `pnpm dev` restart |
+
+### Global config hot-reload
+
+Hugo's dev server doesn't hot-reload data files from data mounts (e.g., `../../shared/content/global`). Content mounts (authors, tags, posts, etc.) hot-reload fine when edited. But `global/index.json` is read via `hugo.Data.global` (a data mount), and Hugo doesn't trigger a live reload when data mount files change. If you change `global/index.json` (theme, nav, footer, etc.) while the dev server is running, the changes won't appear until you restart `pnpm dev`.
