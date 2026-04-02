@@ -75,7 +75,9 @@ test.describe('Edge Cases — Content Rendering', () => {
     if (href) {
       await page.goto(href);
       const content = page.locator('main');
-      const hasContent = await content.isVisible({ timeout: 2000 }).catch(() => false);
+      const hasContent = await content
+        .isVisible({ timeout: 2000 })
+        .catch(() => false);
 
       if (hasContent) {
         const contentText = await content.textContent();

@@ -20,8 +20,16 @@ test.describe('Author CRUD via TinaCMS Admin', () => {
       baseURL: process.env.GRAPHQL_URL ?? 'http://localhost:4001',
       extraHTTPHeaders: { 'Content-Type': 'application/json' },
     });
-    for (const path of [AUTHOR_RELATIVE_PATH, 'e2e-edit-author.md', 'e2e-fields-author.md']) {
-      try { await deleteDocument(ctx, 'author', path); } catch { /* may not exist */ }
+    for (const path of [
+      AUTHOR_RELATIVE_PATH,
+      'e2e-edit-author.md',
+      'e2e-fields-author.md',
+    ]) {
+      try {
+        await deleteDocument(ctx, 'author', path);
+      } catch {
+        /* may not exist */
+      }
     }
     await ctx.dispose();
   });
@@ -72,8 +80,14 @@ test.describe('Author CRUD via TinaCMS Admin', () => {
     await clickSave(page);
 
     await navigateToEdit(page, 'author', 'e2e-fields-author');
-    await expect(page.locator('input[name="name"]')).toHaveValue('e2e fields author');
-    await expect(page.locator('input[name="description"]')).toHaveValue('Testing all fields');
-    await expect(page.locator('span:has-text("Hobbies")').first()).toBeVisible();
+    await expect(page.locator('input[name="name"]')).toHaveValue(
+      'e2e fields author'
+    );
+    await expect(page.locator('input[name="description"]')).toHaveValue(
+      'Testing all fields'
+    );
+    await expect(
+      page.locator('span:has-text("Hobbies")').first()
+    ).toBeVisible();
   });
 });

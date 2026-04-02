@@ -19,7 +19,11 @@ test.describe('Page Block Editing via TinaCMS Admin', () => {
       baseURL: process.env.GRAPHQL_URL ?? 'http://localhost:4001',
       extraHTTPHeaders: { 'Content-Type': 'application/json' },
     });
-    try { await deleteDocument(ctx, 'page', PAGE_RELATIVE_PATH); } catch { /* may not exist */ }
+    try {
+      await deleteDocument(ctx, 'page', PAGE_RELATIVE_PATH);
+    } catch {
+      /* may not exist */
+    }
     await ctx.dispose();
   });
 
@@ -29,7 +33,9 @@ test.describe('Page Block Editing via TinaCMS Admin', () => {
     });
     await dismissEditModeDialog(page);
 
-    await expect(page.locator('span:has-text("Sections")').first()).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('span:has-text("Sections")').first()).toBeVisible(
+      { timeout: 10000 }
+    );
   });
 
   test('should list available block templates when adding a section', async ({
@@ -48,7 +54,9 @@ test.describe('Page Block Editing via TinaCMS Admin', () => {
     await expect(addButton).toBeVisible({ timeout: 5000 });
     await addButton.click();
 
-    await expect(page.locator('text=Hero').first()).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('text=Hero').first()).toBeVisible({
+      timeout: 5000,
+    });
   });
 
   test('should add a hero block and edit its fields', async ({
@@ -73,7 +81,9 @@ test.describe('Page Block Editing via TinaCMS Admin', () => {
 
     await expect(heroSelectorCard).not.toBeVisible({ timeout: 3000 });
 
-    const heroBlock = page.locator('[aria-roledescription="sortable"]').filter({ hasText: 'Hero' });
+    const heroBlock = page
+      .locator('[aria-roledescription="sortable"]')
+      .filter({ hasText: 'Hero' });
     await expect(heroBlock).toBeVisible({ timeout: 5000 });
     await heroBlock.click();
 
@@ -89,11 +99,15 @@ test.describe('Page Block Editing via TinaCMS Admin', () => {
     await clickSave(page);
 
     await navigateToEdit(page, 'page', PAGE_FILENAME);
-    await expect(page.locator('text=Hero').first()).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('text=Hero').first()).toBeVisible({
+      timeout: 10000,
+    });
   });
 
   test('should navigate to the page collection list', async ({ page }) => {
     await navigateToList(page, 'page');
-    await expect(page.locator('text=home').first()).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('text=home').first()).toBeVisible({
+      timeout: 10000,
+    });
   });
 });

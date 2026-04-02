@@ -32,9 +32,17 @@ test.describe('Blog CRUD via TinaCMS Admin', () => {
     });
 
     for (const path of [BLOG_RELATIVE_PATH, EDIT_BLOG_RELATIVE_PATH]) {
-      try { await deleteDocument(apiCtx, 'blog', path); } catch { /* may not exist */ }
+      try {
+        await deleteDocument(apiCtx, 'blog', path);
+      } catch {
+        /* may not exist */
+      }
     }
-    try { await deleteDocument(apiCtx, 'author', DEP_AUTHOR_RELATIVE_PATH); } catch { /* may not exist */ }
+    try {
+      await deleteDocument(apiCtx, 'author', DEP_AUTHOR_RELATIVE_PATH);
+    } catch {
+      /* may not exist */
+    }
 
     await createDocument(apiCtx, 'author', DEP_AUTHOR_RELATIVE_PATH, {
       name: 'e2e blog dep author',
@@ -43,7 +51,11 @@ test.describe('Blog CRUD via TinaCMS Admin', () => {
   });
 
   test.afterAll(async () => {
-    try { await deleteDocument(apiCtx, 'author', DEP_AUTHOR_RELATIVE_PATH); } catch { /* may already be deleted */ }
+    try {
+      await deleteDocument(apiCtx, 'author', DEP_AUTHOR_RELATIVE_PATH);
+    } catch {
+      /* may already be deleted */
+    }
     await apiCtx.dispose();
   });
 
@@ -64,7 +76,10 @@ test.describe('Blog CRUD via TinaCMS Admin', () => {
   }) => {
     await navigateToCreate(page, 'blog');
     await page.fill('input[name="title"]', EDIT_BLOG_TITLE);
-    await page.fill('input[name="description"]', 'A test blog created by Playwright');
+    await page.fill(
+      'input[name="description"]',
+      'A test blog created by Playwright'
+    );
 
     const authorSelect = page.locator(
       'label:has-text("Author") ~ div select, label:has-text("Author") ~ div [role="combobox"]'
@@ -72,7 +87,9 @@ test.describe('Blog CRUD via TinaCMS Admin', () => {
     try {
       await authorSelect.first().click({ timeout: 3000 });
       await page.keyboard.type('e2e blog dep');
-      const option = page.locator(`[role="option"]:has-text("${DEP_AUTHOR_FILENAME}")`);
+      const option = page.locator(
+        `[role="option"]:has-text("${DEP_AUTHOR_FILENAME}")`
+      );
       if (await option.isVisible({ timeout: 3000 })) {
         await option.click();
       }
@@ -84,7 +101,9 @@ test.describe('Blog CRUD via TinaCMS Admin', () => {
     await clickSave(page);
 
     await navigateToList(page, 'blog');
-    await expect(page.locator(`text=${EDIT_BLOG_SLUG}`).first()).toBeVisible({ timeout: 10000 });
+    await expect(page.locator(`text=${EDIT_BLOG_SLUG}`).first()).toBeVisible({
+      timeout: 10000,
+    });
   });
 
   test('should edit an existing blog', async ({ page, contentCleanup }) => {
@@ -102,8 +121,12 @@ test.describe('Blog CRUD via TinaCMS Admin', () => {
     await clickSave(page);
 
     await navigateToEdit(page, 'blog', BLOG_SLUG);
-    await expect(page.locator('input[name="title"]')).toHaveValue('E2E Playwright Test Blog Updated');
-    await expect(page.locator('input[name="description"]')).toHaveValue('Updated description');
+    await expect(page.locator('input[name="title"]')).toHaveValue(
+      'E2E Playwright Test Blog Updated'
+    );
+    await expect(page.locator('input[name="description"]')).toHaveValue(
+      'Updated description'
+    );
   });
 
   test('should display blog form fields correctly', async ({ page }) => {

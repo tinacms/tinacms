@@ -32,9 +32,17 @@ test.describe('Post CRUD via TinaCMS Admin', () => {
     });
 
     for (const path of [POST_RELATIVE_PATH, EDIT_POST_RELATIVE_PATH]) {
-      try { await deleteDocument(apiCtx, 'post', path); } catch { /* may not exist */ }
+      try {
+        await deleteDocument(apiCtx, 'post', path);
+      } catch {
+        /* may not exist */
+      }
     }
-    try { await deleteDocument(apiCtx, 'author', DEP_AUTHOR_RELATIVE_PATH); } catch { /* may not exist */ }
+    try {
+      await deleteDocument(apiCtx, 'author', DEP_AUTHOR_RELATIVE_PATH);
+    } catch {
+      /* may not exist */
+    }
 
     await createDocument(apiCtx, 'author', DEP_AUTHOR_RELATIVE_PATH, {
       name: 'e2e post dep author',
@@ -43,7 +51,11 @@ test.describe('Post CRUD via TinaCMS Admin', () => {
   });
 
   test.afterAll(async () => {
-    try { await deleteDocument(apiCtx, 'author', DEP_AUTHOR_RELATIVE_PATH); } catch { /* may already be deleted */ }
+    try {
+      await deleteDocument(apiCtx, 'author', DEP_AUTHOR_RELATIVE_PATH);
+    } catch {
+      /* may already be deleted */
+    }
     await apiCtx.dispose();
   });
 
@@ -71,7 +83,9 @@ test.describe('Post CRUD via TinaCMS Admin', () => {
     try {
       await authorSelect.first().click({ timeout: 3000 });
       await page.keyboard.type('e2e post dep');
-      const option = page.locator(`[role="option"]:has-text("${DEP_AUTHOR_FILENAME}")`);
+      const option = page.locator(
+        `[role="option"]:has-text("${DEP_AUTHOR_FILENAME}")`
+      );
       if (await option.isVisible({ timeout: 3000 })) {
         await option.click();
       }
@@ -83,7 +97,9 @@ test.describe('Post CRUD via TinaCMS Admin', () => {
     await clickSave(page);
 
     await navigateToList(page, 'post');
-    await expect(page.locator(`text=${EDIT_POST_SLUG}`).first()).toBeVisible({ timeout: 10000 });
+    await expect(page.locator(`text=${EDIT_POST_SLUG}`).first()).toBeVisible({
+      timeout: 10000,
+    });
   });
 
   test('should edit an existing post title', async ({
@@ -102,17 +118,23 @@ test.describe('Post CRUD via TinaCMS Admin', () => {
     await clickSave(page);
 
     await navigateToEdit(page, 'post', POST_SLUG);
-    await expect(page.locator('input[name="title"]')).toHaveValue('E2E Playwright Test Post Updated');
+    await expect(page.locator('input[name="title"]')).toHaveValue(
+      'E2E Playwright Test Post Updated'
+    );
   });
 
   test('should validate post title minimum length', async ({ page }) => {
     await navigateToCreate(page, 'post');
     await page.fill('input[name="title"]', 'Hi');
 
-    const errorMessage = page.locator('text=Title must be at least 5 characters');
+    const errorMessage = page.locator(
+      'text=Title must be at least 5 characters'
+    );
     await expect(errorMessage).toBeVisible({ timeout: 5000 });
 
     const saveButton = page.locator('button:has-text("Save")');
-    await expect(saveButton).toHaveClass(/pointer-events-none/, { timeout: 3000 });
+    await expect(saveButton).toHaveClass(/pointer-events-none/, {
+      timeout: 3000,
+    });
   });
 });
