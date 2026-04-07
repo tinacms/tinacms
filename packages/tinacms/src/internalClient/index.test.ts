@@ -80,8 +80,8 @@ describe('Tina Client', () => {
         makeResponse({
           status: 400,
           body: {
-            message: 'GitHub authoring is currently unavailable.',
-            errorCode: EDITORIAL_WORKFLOW_ERROR.GIT_AUTHORING_UNAVAILABLE,
+            message: 'Branch name validation failed',
+            errorCode: EDITORIAL_WORKFLOW_ERROR.VALIDATION_FAILED,
           },
           statusText: 'Bad Request',
         })
@@ -93,8 +93,8 @@ describe('Tina Client', () => {
           baseBranch: 'main',
         })
       ).rejects.toMatchObject({
-        message: 'GitHub authoring is currently unavailable.',
-        errorCode: EDITORIAL_WORKFLOW_ERROR.GIT_AUTHORING_UNAVAILABLE,
+        message: 'Branch name validation failed',
+        errorCode: EDITORIAL_WORKFLOW_ERROR.VALIDATION_FAILED,
       });
     });
 
