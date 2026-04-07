@@ -44,6 +44,7 @@ describe('isUserAuthorized', () => {
   it('re-throws the original error when a network error occurs', async () => {
     const networkError = new Error('Network failure');
     fetchSpy.mockRejectedValueOnce(networkError);
+    jest.spyOn(console, 'error').mockImplementation(() => {});
 
     await expect(
       isUserAuthorized({ clientID: 'my-client-id', token: 'Bearer some-token' })
