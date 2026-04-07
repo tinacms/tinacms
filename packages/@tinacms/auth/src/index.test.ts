@@ -66,6 +66,12 @@ describe('isUserAuthorized', () => {
 });
 
 describe('isAuthorized', () => {
+  let consoleSpy: jest.SpyInstance;
+
+  beforeEach(() => {
+    consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
   it('returns undefined when clientID is missing from the request', async () => {
     const req = {
       query: {},
@@ -77,6 +83,7 @@ describe('isAuthorized', () => {
     // Should never reach TinaCloud — fetch must not be called
     expect(result).toBeUndefined();
     expect(fetchSpy).not.toHaveBeenCalled();
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('clientID'));
   });
 
   it('returns undefined when authorization header is missing from the request', async () => {
@@ -90,6 +97,7 @@ describe('isAuthorized', () => {
     // Should never reach TinaCloud — fetch must not be called
     expect(result).toBeUndefined();
     expect(fetchSpy).not.toHaveBeenCalled();
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('authorization'));
   });
 });
 
