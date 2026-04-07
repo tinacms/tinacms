@@ -1,60 +1,52 @@
 {{ $pages := .Pages }}
 {{ if not $pages }}
-  {{ partial "ui/no-data.html" (dict "message" "No posts found.") }}
+  <p class="text-center text-gray-500 dark:text-gray-400 py-12">No posts found.</p>
 {{ else }}
-  <div class="flex flex-col gap-8">
-    {{ range $pages.ByDate.Reverse }}
-      <a href="{{ .RelPermalink }}" class="group block rounded-lg bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition duration-150 ease-out border border-gray-150 dark:border-gray-700 overflow-hidden">
-        <div class="px-6 py-6 sm:px-8">
-          <h2 class="text-2xl font-bold mb-2 group-hover:text-theme-500 transition-colors title-font">
-            <span class="bg-clip-text text-transparent bg-gradient-to-r from-theme-400 to-theme-600 dark:from-theme-300 dark:to-theme-500">
-              {{ .Params.title }}
-            </span>
-            <span class="inline-block opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-1">&rarr;</span>
-          </h2>
+  {{ range $pages.ByDate.Reverse }}
+    {{ $postDate := .Params.date }}
+    {{ $postAuthorRef := .Params.author }}
+    <a href="{{ .RelPermalink }}" class="group block bg-gray-50 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-1000 rounded shadow-sm transition-all duration-150 ease-out hover:shadow-md hover:to-gray-50 dark:hover:to-gray-800 px-6 sm:px-8 md:px-10 py-10 mb-8 last:mb-0">
+      <h3 class="bg-gradient-to-r bg-clip-text text-transparent from-theme-400 to-theme-600 dark:from-theme-300 dark:to-theme-500 text-3xl lg:text-4xl font-semibold title-font mb-5 transition-all duration-150 ease-out">
+        {{ .Params.title }}
+        <span class="inline-block opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
+          <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" class="inline-block h-8 -mt-1 ml-1 w-auto opacity-70" xmlns="http://www.w3.org/2000/svg"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"></path></svg>
+        </span>
+      </h3>
 
-          {{ with .Params.excerpt }}
-            <p class="text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">{{ . }}</p>
-          {{ end }}
+      {{ with .Params.excerpt }}
+        <div class="prose dark:prose-dark w-full max-w-none mb-5 opacity-70">
+          <p>{{ . }}</p>
+        </div>
+      {{ end }}
 
-          <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-            {{/* Resolve author reference */}}
-            {{ with .Params.author }}
-              {{ $authorSlug := path.BaseName . }}
-              {{ $author := site.GetPage (printf "/authors/%s" $authorSlug) }}
-              {{ if $author }}
-                <div class="flex items-center gap-2">
-                  {{ with $author.Params.avatar }}
-                    {{ if or (hasPrefix . "/") (hasPrefix . "./") (hasPrefix . "../") (hasPrefix . "http://") (hasPrefix . "https://") }}
-                      <img src="{{ . }}" alt="{{ $author.Params.name }}" class="w-8 h-8 rounded-full object-cover" />
-                    {{ end }}
-                  {{ end }}
-                  <span>{{ $author.Params.name }}</span>
+      <div class="flex items-center">
+        {{/* Resolve author reference */}}
+        {{ with $postAuthorRef }}
+          {{ $authorSlug := path.BaseName . }}
+          {{ $author := site.GetPage (printf "/authors/%s" $authorSlug) }}
+          {{ if $author }}
+            {{ with $author.Params.avatar }}
+              {{ if or (hasPrefix . "/") (hasPrefix . "./") (hasPrefix . "../") (hasPrefix . "http://") (hasPrefix . "https://") }}
+                <div class="flex-shrink-0 mr-2">
+                  <img src="{{ . }}" alt="{{ $author.Params.name }}" width="40" height="40" class="object-cover rounded-full shadow-sm" />
                 </div>
               {{ end }}
             {{ end }}
-
-            {{ with .Params.date }}
-              <span>{{ dateFormat "January 2, 2006" . }}</span>
-            {{ end }}
-          </div>
-
-          {{/* Render tags */}}
-          {{ with .Params.tags }}
-            <div class="flex flex-wrap gap-2 mt-3">
-              {{ range . }}
-                {{ with .tag }}
-                  {{ $tagSlug := path.BaseName . }}
-                  {{ $tag := site.GetPage (printf "/tags/%s" $tagSlug) }}
-                  {{ if $tag }}
-                    {{ partial "ui/badge.html" (dict "text" $tag.Params.name "size" "sm") }}
-                  {{ end }}
-                {{ end }}
-              {{ end }}
-            </div>
+            <p class="text-base font-medium text-gray-600 group-hover:text-gray-800 dark:text-gray-200 dark:group-hover:text-white">
+              {{ $author.Params.name }}
+            </p>
           {{ end }}
-        </div>
-      </a>
-    {{ end }}
-  </div>
+        {{ end }}
+
+        {{ if and $postDate (not (time $postDate).IsZero) }}
+          {{ if $postAuthorRef }}
+            <span class="font-bold text-gray-200 dark:text-gray-500 mx-2">&mdash;</span>
+          {{ end }}
+          <p class="text-base text-gray-400 group-hover:text-gray-500 dark:text-gray-300 dark:group-hover:text-gray-150">
+            {{ dateFormat "January 2, 2006" $postDate }}
+          </p>
+        {{ end }}
+      </div>
+    </a>
+  {{ end }}
 {{ end }}

@@ -11,7 +11,9 @@
     "build": "tinacms build && hugo-extended",
     "build:local": "tinacms build --local --skip-cloud-checks -c \"hugo-extended\"",
     "lint": "biome lint .",
-    "format": "biome format --write ."
+    "format": "biome format --write .",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@tailwindcss/typography": "catalog:",
@@ -34,6 +36,7 @@
     "postcss": "^8.5.2",
     "postcss-cli": "^11.0.0",
     "tailwindcss": "^4.0.0",
+    "@playwright/test": "catalog:",
     "typescript": "^5.7.3"
   }
 }

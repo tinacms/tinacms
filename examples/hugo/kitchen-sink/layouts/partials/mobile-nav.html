@@ -44,14 +44,22 @@
 
   <!-- Navigation Items -->
   <div class="px-4 py-6 space-y-2">
+    {{ $page := .page }}
     {{ range $nav }}
       {{ $href := .href | default "/" }}
       {{ if not (hasPrefix $href "/") }}
         {{ $href = printf "/%s" $href }}
       {{ end }}
+      {{ $active := false }}
+      {{ if eq $href "/" }}
+        {{ $active = eq $page.RelPermalink "/" }}
+      {{ else }}
+        {{ $active = or (eq $page.RelPermalink $href) (hasPrefix $page.RelPermalink (printf "%s/" $href)) }}
+      {{ end }}
       <a
         href="{{ $href }}"
-        class="block px-4 py-3 rounded-md text-base font-medium transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+        {{ if $active }}aria-current="page"{{ end }}
+        class="block px-4 py-3 rounded-md text-base font-medium transition-colors {{ if $active }}text-theme-600 dark:text-theme-400 bg-theme-50 dark:bg-theme-700/20{{ else }}text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800{{ end }}"
       >
         {{ .label }}
       </a>

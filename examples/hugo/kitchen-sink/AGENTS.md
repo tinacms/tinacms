@@ -37,14 +37,29 @@ Unlike the Next.js and Astro versions, Hugo cannot use `useTina()` for visual/in
 - **Image path security:** All `<img>` tags with CMS-controlled URLs use inline `hasPrefix` checks — only allow relative paths (`/`, `./`, `../`) and `http://`/`https://` URLs. This prevents XSS from protocol-relative URLs or `javascript:` schemes.
 - **Dark mode detection:** An inline `<script>` in `<head>` (before page render) checks `window.matchMedia('(prefers-color-scheme: dark)')` and adds the `dark` class to `<html>`. Must be inline (not deferred) to prevent a flash of wrong theme.
 - **`cross-env` for Windows:** The `dev` script uses `cross-env MONOREPO_DEV=true` for cross-platform env var support. Required because Windows `cmd` doesn't support inline `VAR=value command` syntax.
+- **Template variable scoping:** Inside `{{ range }}`, `$` refers to the template root (the listing page), NOT the current item. Capture page fields into variables (e.g., `{{ $postDate := .Params.date }}`) before entering nested `{{ with }}` blocks to avoid reading from the wrong context.
+- **Card link styling:** Post and author listing cards use the `cardLinkClasses` pattern from Astro — gradient background (`from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-1000`) with rounded corners and shadow hover effect. This matches the shared visual style across all kitchen-sink projects.
 
 ## Partial Architecture
 
-Two types of section wrappers serve different purposes:
-- **`section.html`** — Color-variant wrapper (`default`/`tint`/`primary`) with gradient backgrounds. Used by block rendering and content sections that need theme-aware styling.
-- **`page-section.html`** — Lightweight fixed-style wrapper for listing pages. Gray gradient bg, centered title, `max-w-5xl` container. Used by post/blog/author list pages.
+**Section wrappers:**
+- **`section.html`** — Color-variant wrapper (`default`/`tint`/`primary`) with gradient backgrounds. Used by block rendering, detail pages, and listing pages.
+- **`page-section.html`** — Lightweight fixed-style wrapper for blog/author listing pages. Gray gradient bg, centered title, `max-w-5xl` container.
+
+**Layout partials:**
 - **`container.html`** — Centered max-width wrapper with configurable size (`small`/`medium`/`large`) and width variants.
 - **`actions.html`** — Renders action buttons/links with color-aware styling. Supports `button` (filled) and `link` (text) types with theme color variants.
+- **`icon.html`** — Icon renderer with circle/float styles, theme-aware coloring, and size classes (xs-xl).
+
+**Block partials** (`layouts/partials/blocks/`):
+- Each block has a wrapper (e.g., `hero.html`) that calls `section.html`, and a content partial (e.g., `hero-content.html`) with the actual markup.
+- 5 block types: hero, features, CTA, testimonial, content.
+
+**UI partials** (`layouts/partials/ui/`):
+- `gradient-title.html` — Themed gradient heading (uses `printf` + `safeHTML` for dynamic tags).
+- `badge.html` — Pill badge for tags/hobbies.
+- `card.html` — Card container.
+- `no-data.html` — Empty state fallback.
 
 ## Build & Dev
 
@@ -58,12 +73,13 @@ Two types of section wrappers serve different purposes:
 | Route | Template | Description |
 |-------|----------|-------------|
 | `/` | `index.html` | Home page with block-based content |
-| `/posts/` | `posts/list.html` | Post listing |
+| `/posts/` | `posts/list.html` | Post listing (single-column cards) |
 | `/posts/:slug` | `posts/single.html` | Post detail (supports nested paths) |
-| `/blog/` | `blogs/list.html` | Blog listing (URL overridden to singular `/blog/`) |
+| `/blog/` | `blogs/list.html` | Blog listing (2-column grid with hero images) |
 | `/blog/:filename` | `blogs/single.html` | Blog detail |
-| `/authors/` | `authors/list.html` | Author listing |
+| `/authors/` | `authors/list.html` | Author listing (2-column grid) |
 | `/authors/:filename` | `authors/single.html` | Author detail |
+| `/pages/:filename` | `pages/single.html` | Block-based pages |
 | `/admin/` | `static/admin/index.html` | TinaCMS admin panel |
 
 ## Formatting
@@ -83,6 +99,17 @@ Content files live in `examples/shared/content/` (single source of truth for all
 **Hugo side:** `[[module.mounts]]` in `hugo.toml` mounts shared content directories into Hugo's content tree. All collections use `.md`/`.json` and are mounted directly — no local copies needed.
 
 **Static assets:** `static/uploads` and `static/blocks` are symlinked to `examples/shared/public/`. Static symlinks work fine cross-platform.
+
+## E2E Tests
+
+Playwright test suite with 10 spec files:
+- **Frontend** (6 files, fully parallel): `home`, `posts`, `blog`, `authors`, `navigation`, `edge-cases`
+- **Admin CRUD** (4 files, serial per collection): `author`, `blog`, `post`, `page`
+- **Fixtures**: `api-context.ts` (GraphQL client), `test-content.ts` (automatic cleanup)
+- **Utils**: `admin-helpers.ts`, `create-document.ts`, `delete-document.ts`
+- **CI**: `.github/workflows/playwright-hugo-kitchen-sink.yml`
+
+Run with `pnpm test:e2e` or `pnpm test:e2e:ui`.
 
 ## Known Limitations vs Next.js/Astro Versions
 

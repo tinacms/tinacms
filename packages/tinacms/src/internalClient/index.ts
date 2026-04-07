@@ -38,6 +38,7 @@ import gql from 'graphql-tag';
 import {
   EDITORIAL_WORKFLOW_STATUS,
   EditorialWorkflowErrorDetails,
+  EditorialWorkflowResult,
 } from '../toolkit/form-builder/editorial-workflow-constants';
 import { AsyncData, asyncPoll } from './asyncPoll';
 import { LocalAuthProvider, TinaCloudAuthProvider } from './authProvider';
@@ -327,6 +328,10 @@ mutation addPendingDocumentMutation(
 
   get appDashboardLink() {
     return `${this.frontendUrl}/projects/${this.clientId}`;
+  }
+
+  get gitSettingsLink() {
+    return `${this.frontendUrl}/account/git`;
   }
 
   async checkSyncStatus({
@@ -625,7 +630,7 @@ mutation addPendingDocumentMutation(
       variables: Record<string, unknown>;
     };
     onStatusUpdate?: (status: { status: string; message?: string }) => void;
-  }) {
+  }): Promise<EditorialWorkflowResult> {
     const url = `${this.contentApiBase}/editorial-workflow/${this.clientId}`;
 
     try {
@@ -661,7 +666,7 @@ mutation addPendingDocumentMutation(
       const requestId = responseBody.requestId;
 
       if (!requestId) {
-        return responseBody;
+        return responseBody as EditorialWorkflowResult;
       }
 
       if (options.onStatusUpdate) {
@@ -679,38 +684,66 @@ mutation addPendingDocumentMutation(
         await new Promise((resolve) => setTimeout(resolve, pollInterval));
         attempts++;
 
-        const statusUrl = `${this.contentApiBase}/editorial-workflow/${this.clientId}/status/${requestId}`;
-        const statusResponse =
-          await this.authProvider.fetchWithToken(statusUrl);
+        try {
+          const statusUrl = `${this.contentApiBase}/editorial-workflow/${this.clientId}/status/${requestId}`;
+          const statusResponse =
+            await this.authProvider.fetchWithToken(statusUrl);
 
-        if (!statusResponse.ok) {
-          throw new Error(
-            `Failed to check workflow status: ${statusResponse.statusText}`
-          );
-        }
+          const statusResponseBody = await statusResponse.json();
 
-        const statusResponseBody = await statusResponse.json();
+          if (options.onStatusUpdate) {
+            options.onStatusUpdate({
+              status: statusResponseBody.status,
+              message:
+                statusResponseBody.message ||
+                `Status: ${statusResponseBody.status}`,
+            });
+          }
 
-        if (options.onStatusUpdate) {
-          options.onStatusUpdate({
-            status: statusResponseBody.status,
-            message:
+          if (
+            statusResponseBody.status === EDITORIAL_WORKFLOW_STATUS.ERROR ||
+            statusResponse.status === 500
+          ) {
+            // Bot fallback: workflow completed but with degraded auth.
+            // Return as success with a warning so the PR link is shown.
+            if (statusResponseBody.pullRequestUrl) {
+              return {
+                branchName: statusResponseBody.branchName,
+                pullRequestUrl: statusResponseBody.pullRequestUrl,
+                warning: statusResponseBody.message,
+              };
+            }
+
+            const error = new Error(
+              statusResponseBody.message || 'Editorial workflow failed'
+            ) as EditorialWorkflowErrorDetails;
+            error.errorCode = statusResponseBody.errorCode || 'WORKFLOW_FAILED';
+            throw error;
+          }
+
+          if (statusResponse.status === 200) {
+            return {
+              branchName: statusResponseBody.branchName,
+              pullRequestUrl: statusResponseBody.pullRequestUrl,
+            };
+          }
+
+          if (statusResponse.status !== 202) {
+            const error = new Error(
               statusResponseBody.message ||
-              `Status: ${statusResponseBody.status}`,
-          });
-        }
-
-        // Only on 200 OK status, return the response
-        if (statusResponse.status === 200) {
-          return {
-            branchName: statusResponseBody.branchName,
-            pullRequestUrl: statusResponseBody.pullRequestUrl,
-          };
-        }
-
-        if (!statusResponse.ok) {
-          throw new Error(
-            statusResponseBody.message || 'Editorial workflow failed'
+                `Failed to check workflow status: ${statusResponse.statusText}`
+            ) as EditorialWorkflowErrorDetails;
+            error.errorCode = 'WORKFLOW_STATUS_FAILED';
+            throw error;
+          }
+        } catch (error) {
+          if ((error as EditorialWorkflowErrorDetails).errorCode) {
+            throw error;
+          }
+          // Transient errors (network, JSON parse, 502/503) — log and retry
+          console.warn(
+            `Editorial workflow status poll failed (attempt ${attempts}/${maxAttempts}), retrying...`,
+            error
           );
         }
       }
