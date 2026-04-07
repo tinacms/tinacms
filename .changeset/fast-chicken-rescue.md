@@ -2,4 +2,4 @@
 "tinacms": patch
 ---
 
-Improve error messages for the git issues in the Editorial Workflow
+Improve error messages when a pull request via editorial workflow fails due to missing Git authoring tokens
