@@ -403,6 +403,11 @@ export class BuildCommand extends BaseCommand {
     });
     if (this.offlineOption && codegen.localBuildUrl) {
       process.env.TINA_LOCAL_URL = codegen.localBuildUrl;
+      // Ensure the sub-command runs with NODE_ENV=production so frameworks
+      // like Next.js produce a production build
+      if (!process.env.NODE_ENV || process.env.NODE_ENV !== 'production') {
+        process.env.NODE_ENV = 'production';
+      }
     }
     if (this.subCommand) {
       await this.startSubCommand();
