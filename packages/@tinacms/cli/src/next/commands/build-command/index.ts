@@ -37,6 +37,10 @@ export class BuildCommand extends BaseCommand {
     description:
       'Starts local Graphql server and builds the local client instead of production client',
   });
+  offlineOption = Option.Boolean('--offline', false, {
+    description:
+      'Builds using local content for fast builds, but generates a production client that connects to TinaCloud when deployed',
+  });
   skipIndexing = Option.Boolean('--skip-indexing', false, {
     description:
       'Skips indexing the content. This can be used for building the site without indexing the content  (defaults to false)',
@@ -118,6 +122,21 @@ export class BuildCommand extends BaseCommand {
       );
       process.exit(1);
     }
+    if (this.offlineOption && !this.localOption) {
+      const config = configManager.config;
+      const missing = [];
+      if (!config.branch) missing.push('branch');
+      if (!config.clientId) missing.push('clientId');
+      if (!config.token) missing.push('token');
+      if (missing.length > 0) {
+        logger.error(
+          `${dangerText(
+            `ERROR: --offline requires ${missing.join(', ')} to be configured, since the generated client must point to TinaCloud.`
+          )}`
+        );
+        process.exit(1);
+      }
+    }
     let server: ViteDevServer | undefined;
     // Initialize the host TCP server
     createDBServer(Number(this.datalayerPort));
@@ -129,10 +148,12 @@ export class BuildCommand extends BaseCommand {
     const { queryDoc, fragDoc, graphQLSchema, tinaSchema, lookup } =
       await buildSchema(configManager.config);
 
+    const useLocalServer = this.localOption || this.offlineOption;
     const codegen = new Codegen({
       configManager: configManager,
-      port: this.localOption ? Number(this.port) : undefined,
-      isLocal: this.localOption,
+      port: useLocalServer ? Number(this.port) : undefined,
+      isLocal: useLocalServer,
+      localContentBuild: this.offlineOption && !this.localOption,
       queryDoc,
       fragDoc,
       graphqlSchemaDoc: graphQLSchema,
@@ -142,13 +163,13 @@ export class BuildCommand extends BaseCommand {
     });
     const apiURL = await codegen.execute();
 
-    // Always index the content if we are building locally (and not skipping indexing)
+    // Always index the content if we are building locally or offline (and not skipping indexing)
     if (
-      (configManager.hasSelfHostedConfig() || this.localOption) &&
+      (configManager.hasSelfHostedConfig() || this.localOption || this.offlineOption) &&
       !this.skipIndexing
     ) {
-      // if we are building locally use the default spinner text
-      const text = this.localOption
+      // if we are building locally or offline use the default spinner text
+      const text = (this.localOption || this.offlineOption)
         ? undefined
         : 'Indexing to self-hosted data layer';
       try {
@@ -169,13 +190,14 @@ export class BuildCommand extends BaseCommand {
       }
     }
 
-    if (this.localOption) {
-      // start the dev server if we are building locally
+    if (this.localOption || this.offlineOption) {
+      // start the dev server if we are building locally or offline
+      const serverUrl = codegen.localBuildUrl || apiURL;
       server = await createDevServer(
         configManager,
         database,
         null,
-        apiURL,
+        serverUrl,
         true,
         (lockedFn) => lockedFn()
       );
@@ -184,7 +206,7 @@ export class BuildCommand extends BaseCommand {
     }
 
     const skipCloudChecks =
-      this.skipCloudChecks || configManager.hasSelfHostedConfig();
+      this.skipCloudChecks || configManager.hasSelfHostedConfig() || this.offlineOption;
 
     if (!skipCloudChecks) {
       try {
@@ -254,10 +276,16 @@ export class BuildCommand extends BaseCommand {
       'index.html\nassets/'
     );
 
+    if (this.offlineOption && configManager.config.search && !this.skipSearchIndex) {
+      logger.warn(
+        `${warnText('WARN: Search indexing skipped in offline mode. The search index on TinaCloud was not updated.')}`
+      );
+    }
     if (
       configManager.config.search &&
       !this.skipSearchIndex &&
-      !this.localOption
+      !this.localOption &&
+      !this.offlineOption
     ) {
       let client: SearchClient;
       const hasTinaSearch = Boolean(configManager.config?.search?.tina);
