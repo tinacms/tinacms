@@ -216,7 +216,10 @@ export const CreateBranchModal = ({
       setCurrentBranch(result.branchName);
 
       if (result.warning) {
-        cms.alerts.warn(result.warning, 0);
+        cms.alerts.warn(
+          `${result.warning} Please reconnect GitHub authoring here: ${tinaApi.gitSettingsLink}`,
+          0
+        );
       }
 
       cms.alerts.success(

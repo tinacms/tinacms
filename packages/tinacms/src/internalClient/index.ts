@@ -330,6 +330,10 @@ mutation addPendingDocumentMutation(
     return `${this.frontendUrl}/projects/${this.clientId}`;
   }
 
+  get gitSettingsLink() {
+    return `${this.frontendUrl}/account/git`;
+  }
+
   async checkSyncStatus({
     assetsSyncing,
   }: {
