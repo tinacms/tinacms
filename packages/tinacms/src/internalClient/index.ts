@@ -38,6 +38,7 @@ import gql from 'graphql-tag';
 import {
   EDITORIAL_WORKFLOW_STATUS,
   EditorialWorkflowErrorDetails,
+  EditorialWorkflowResult,
 } from '../toolkit/form-builder/editorial-workflow-constants';
 import { AsyncData, asyncPoll } from './asyncPoll';
 import { LocalAuthProvider, TinaCloudAuthProvider } from './authProvider';
@@ -625,7 +626,7 @@ mutation addPendingDocumentMutation(
       variables: Record<string, unknown>;
     };
     onStatusUpdate?: (status: { status: string; message?: string }) => void;
-  }) {
+  }): Promise<EditorialWorkflowResult> {
     const url = `${this.contentApiBase}/editorial-workflow/${this.clientId}`;
 
     try {
@@ -661,7 +662,7 @@ mutation addPendingDocumentMutation(
       const requestId = responseBody.requestId;
 
       if (!requestId) {
-        return responseBody;
+        return responseBody as EditorialWorkflowResult;
       }
 
       if (options.onStatusUpdate) {
@@ -699,6 +700,16 @@ mutation addPendingDocumentMutation(
             statusResponseBody.status === EDITORIAL_WORKFLOW_STATUS.ERROR ||
             statusResponse.status === 500
           ) {
+            // Bot fallback: workflow completed but with degraded auth.
+            // Return as success with a warning so the PR link is shown.
+            if (statusResponseBody.pullRequestUrl) {
+              return {
+                branchName: statusResponseBody.branchName,
+                pullRequestUrl: statusResponseBody.pullRequestUrl,
+                warning: statusResponseBody.message,
+              };
+            }
+
             const error = new Error(
               statusResponseBody.message || 'Editorial workflow failed'
             ) as EditorialWorkflowErrorDetails;

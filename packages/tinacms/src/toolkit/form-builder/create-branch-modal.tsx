@@ -214,6 +214,11 @@ export const CreateBranchModal = ({
       }
 
       setCurrentBranch(result.branchName);
+
+      if (result.warning) {
+        cms.alerts.warn(result.warning, 0);
+      }
+
       cms.alerts.success(
         `Branch created successfully - Pull Request at ${result.pullRequestUrl}`,
         0
