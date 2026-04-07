@@ -165,13 +165,16 @@ export class BuildCommand extends BaseCommand {
 
     // Always index the content if we are building locally or offline (and not skipping indexing)
     if (
-      (configManager.hasSelfHostedConfig() || this.localOption || this.offlineOption) &&
+      (configManager.hasSelfHostedConfig() ||
+        this.localOption ||
+        this.offlineOption) &&
       !this.skipIndexing
     ) {
       // if we are building locally or offline use the default spinner text
-      const text = (this.localOption || this.offlineOption)
-        ? undefined
-        : 'Indexing to self-hosted data layer';
+      const text =
+        this.localOption || this.offlineOption
+          ? undefined
+          : 'Indexing to self-hosted data layer';
       try {
         await this.indexContentWithSpinner({
           text,
@@ -206,7 +209,9 @@ export class BuildCommand extends BaseCommand {
     }
 
     const skipCloudChecks =
-      this.skipCloudChecks || configManager.hasSelfHostedConfig() || this.offlineOption;
+      this.skipCloudChecks ||
+      configManager.hasSelfHostedConfig() ||
+      this.offlineOption;
 
     if (!skipCloudChecks) {
       try {
@@ -276,7 +281,11 @@ export class BuildCommand extends BaseCommand {
       'index.html\nassets/'
     );
 
-    if (this.offlineOption && configManager.config.search && !this.skipSearchIndex) {
+    if (
+      this.offlineOption &&
+      configManager.config.search &&
+      !this.skipSearchIndex
+    ) {
       logger.warn(
         `${warnText('WARN: Search indexing skipped in offline mode. The search index on TinaCloud was not updated.')}`
       );

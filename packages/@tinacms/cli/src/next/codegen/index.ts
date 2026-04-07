@@ -119,7 +119,8 @@ export class Codegen {
     // update _lookup.json
     await this.writeConfigFile('_lookup.json', JSON.stringify(this.lookup));
 
-    const { apiURL, localUrl, tinaCloudUrl, localBuildUrl } = this._createApiUrl();
+    const { apiURL, localUrl, tinaCloudUrl, localBuildUrl } =
+      this._createApiUrl();
     this.apiURL = apiURL;
     this.localUrl = localUrl;
     this.productionUrl = tinaCloudUrl;
@@ -255,7 +256,9 @@ export class Codegen {
       localUrl = apiURL;
       tinaCloudUrl = apiURL;
     }
-    const localBuildUrl = this.port ? `http://localhost:${this.port}/graphql` : undefined;
+    const localBuildUrl = this.port
+      ? `http://localhost:${this.port}/graphql`
+      : undefined;
     return { apiURL, localUrl, tinaCloudUrl, localBuildUrl };
   }
 
