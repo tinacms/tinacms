@@ -84,7 +84,9 @@ describe('isAuthorized', () => {
     // Should never reach TinaCloud — fetch must not be called
     expect(result).toBeUndefined();
     expect(fetchSpy).not.toHaveBeenCalled();
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('clientID'));
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringContaining('clientID')
+    );
   });
 
   it('returns undefined when authorization header is missing from the request', async () => {
@@ -98,7 +100,9 @@ describe('isAuthorized', () => {
     // Should never reach TinaCloud — fetch must not be called
     expect(result).toBeUndefined();
     expect(fetchSpy).not.toHaveBeenCalled();
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('authorization'));
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringContaining('authorization')
+    );
   });
 });
 
