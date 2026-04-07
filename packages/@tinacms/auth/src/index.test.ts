@@ -1,4 +1,8 @@
-import { TinaCloudBackendAuthProvider, isAuthorized, isUserAuthorized } from './index';
+import {
+  TinaCloudBackendAuthProvider,
+  isAuthorized,
+  isUserAuthorized,
+} from './index';
 import type { NextApiRequest } from 'next';
 import type { ServerResponse } from 'http';
 
