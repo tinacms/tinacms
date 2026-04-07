@@ -372,7 +372,7 @@ export const client = createClient({ ${
             this.configManager.generatedCachePath
           )}', `
         : ''
-    }url: '${apiURL}', token: '${token}', queries, ${
+    }url: ${this.localContentBuild ? `process.env.TINA_LOCAL_URL || '${apiURL}'` : `'${apiURL}'`}, token: '${token}', queries, ${
       errorPolicy ? `errorPolicy: '${errorPolicy}'` : ''
     } });
 export default client;

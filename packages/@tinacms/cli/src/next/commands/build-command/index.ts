@@ -401,6 +401,9 @@ export class BuildCommand extends BaseCommand {
         ...summaryItems,
       ],
     });
+    if (this.offlineOption && codegen.localBuildUrl) {
+      process.env.TINA_LOCAL_URL = codegen.localBuildUrl;
+    }
     if (this.subCommand) {
       await this.startSubCommand();
     } else {
