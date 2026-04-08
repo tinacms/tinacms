@@ -1,0 +1,35 @@
+{{/*
+  Actions partial — render action buttons/links.
+  Parameters (via dict):
+    .actions     — list of action objects (label, type, link, icon)
+    .parentColor — "default" | "tint" | "primary"
+    .class       — additional CSS classes
+*/}}
+{{ $parentColor := .parentColor | default "default" }}
+{{ $class := .class | default "" }}
+
+<div class="flex flex-wrap items-center gap-y-4 gap-x-6 {{ $class }}">
+  {{ range .actions }}
+    {{ $isButton := eq (.type | default "") "button" }}
+    {{ $isPrimary := eq $parentColor "primary" }}
+    {{ $href := .link | default "/" }}
+
+    {{ $colorClass := "" }}
+    {{ if $isButton }}
+      {{ if $isPrimary }}
+        {{ $colorClass = "text-theme-500 bg-white hover:bg-gray-50 bg-gradient-to-r from-gray-50 to-white hover:to-gray-100" }}
+      {{ else }}
+        {{ $colorClass = "text-theme-on bg-theme-500 hover:bg-theme-600 bg-gradient-to-r from-theme-400 to-theme-600 hover:from-theme-400 hover:to-theme-500" }}
+      {{ end }}
+    {{ else }}
+      {{ $colorClass = "text-theme-600 dark:text-theme-400 hover:text-theme-400 dark:hover:text-theme-200" }}
+    {{ end }}
+
+    <a href="{{ $href }}" class="z-10 relative inline-flex items-center px-7 py-3 font-semibold text-lg transition duration-150 ease-out {{ if $isButton }}rounded-lg transform focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 whitespace-nowrap{{ end }} {{ $colorClass }}">
+      {{ .label }}
+      {{ if .icon }}
+        {{ partial "icons/arrow-right.html" }}
+      {{ end }}
+    </a>
+  {{ end }}
+</div>

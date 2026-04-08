@@ -18,7 +18,7 @@ interface TinaQueryResult<T> {
  * exhaustive-deps lint rule can verify captured variables:
  *
  *   const queryFn = useCallback(
- *     () => client.queries.post({ relativePath: `${filepath}.mdx` }),
+ *     () => client.queries.post({ relativePath: `${filepath}.md` }),
  *     [filepath]
  *   );
  *   const result = useTinaQuery(queryFn);

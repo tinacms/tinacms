@@ -474,7 +474,7 @@ export function MediaPicker({
                   className='whitespace-nowrap'
                 >
                   New Folder
-                  <BiFolder className='w-6 h-full ml-2 opacity-70 text-blue-500' />
+                  <BiFolder className='w-6 h-full ml-2 opacity-70 text-tina-orange' />
                 </Button>
                 <UploadButton onClick={onClick} uploading={uploading} />
               </div>

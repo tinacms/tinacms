@@ -214,6 +214,14 @@ export const CreateBranchModal = ({
       }
 
       setCurrentBranch(result.branchName);
+
+      if (result.warning) {
+        cms.alerts.warn(
+          `${result.warning} Please reconnect GitHub authoring here: ${tinaApi.gitSettingsLink}`,
+          0
+        );
+      }
+
       cms.alerts.success(
         `Branch created successfully - Pull Request at ${result.pullRequestUrl}`,
         0
@@ -234,7 +242,7 @@ export const CreateBranchModal = ({
     } catch (e: unknown) {
       console.error(e);
       let errorMessage =
-        'Branch operation failed, please try again. If the problem persists please contact support.';
+        'Branch operation failed. Talking to GitHub was unsuccessful, please try again. If the problem persists please contact support at https://tina.io/support 🦙';
 
       const err = e as EditorialWorkflowErrorDetails;
 
@@ -250,6 +258,9 @@ export const CreateBranchModal = ({
             break;
           case EDITORIAL_WORKFLOW_ERROR.VALIDATION_FAILED:
             errorMessage = err.message || 'Invalid branch name';
+            break;
+          default:
+            errorMessage = err.message || errorMessage;
             break;
         }
       } else if (err.message) {

@@ -5,6 +5,7 @@ packages:
     - examples/next/*
     - examples/react/*
     - examples/astro/*
+    - examples/hugo/*
     - e2e/*
     - experimental-examples/*
     - playwright/*

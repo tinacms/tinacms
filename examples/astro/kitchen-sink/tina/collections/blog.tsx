@@ -5,7 +5,7 @@ const Blog: Collection = {
   label: 'Blogs',
   name: 'blog',
   path: 'content/blogs',
-  format: 'mdx',
+  format: 'md',
   ui: {
     router: ({
       document,

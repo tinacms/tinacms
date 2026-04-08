@@ -5,7 +5,7 @@ const Post: Collection = {
   label: 'Posts',
   name: 'post',
   path: 'content/posts',
-  format: 'mdx',
+  format: 'md',
   ui: {
     router: ({
       document,

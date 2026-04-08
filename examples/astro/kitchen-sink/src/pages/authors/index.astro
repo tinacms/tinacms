@@ -1,38 +1,62 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import client from '../../../tina/__generated__/client';
-import { sanitizeImageSrc } from '@/lib/utils';
+import { sanitizeImageSrc, cardLinkClasses, cn } from '@/lib/utils';
 
+const client = (await import('../../../tina/__generated__/client')).default;
 const connection = await client.queries.authorConnection();
 const authors = (connection.data.authorConnection.edges ?? []).flatMap(
-  (edge) => (edge?.node ? [edge.node] : [])
+  (edge: any) => (edge?.node ? [edge.node] : [])
 );
 ---
 
-<Layout title="Authors">
-  <h1>Authors</h1>
-  <div>
-    {authors.map((author) => {
-      const avatarSrc = author.avatar ? sanitizeImageSrc(author.avatar) : '';
-      return (
-        <a href={`/authors/${author._sys.filename}`} style="display:block; margin-bottom:1.5rem; text-decoration:none; color:inherit;">
-          <div style="display:flex; align-items:center; gap:1rem;">
-            {avatarSrc && (
-              <img
-                src={avatarSrc}
-                alt={author.name ?? ''}
-                width={56}
-                height={56}
-                style="border-radius:50%; object-fit:cover;"
-              />
-            )}
-            <div>
-              <h2 style="margin:0;">{author.name}</h2>
-              {author.description && <p style="margin:0.25rem 0 0; color:#666;">{author.description}</p>}
-            </div>
-          </div>
-        </a>
-      );
-    })}
-  </div>
+<Layout title="Authors | TinaCMS Astro Kitchen Sink">
+  <section class="flex-1 relative transition duration-150 ease-out body-font overflow-hidden text-gray-800 dark:text-gray-50 bg-gradient-to-tl from-gray-50 dark:from-gray-900 via-transparent to-transparent">
+    <div class="max-w-5xl mx-auto px-6 sm:px-8 py-24">
+      <h1 class="text-4xl font-extrabold tracking-tight mb-12 text-center title-font">
+        Authors
+      </h1>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {authors.map((author: any) => {
+          const avatarSrc = author.avatar ? sanitizeImageSrc(author.avatar) : '';
+          return (
+            <a
+              href={`/authors/${author._sys.filename}`}
+              class={cn(cardLinkClasses, 'px-6 sm:px-8 py-8')}
+            >
+              <div class="flex items-center gap-4 mb-4">
+                {avatarSrc && (
+                  <img
+                    src={avatarSrc}
+                    alt={author.name ?? ''}
+                    width={56}
+                    height={56}
+                    class="object-cover rounded-full shadow-sm"
+                  />
+                )}
+                <h2 class="text-2xl font-semibold text-gray-700 dark:text-white group-hover:text-theme-600 dark:group-hover:text-theme-300 transition-all duration-150">
+                  {author.name}
+                </h2>
+              </div>
+              {author.description && (
+                <p class="text-gray-600 dark:text-gray-400 line-clamp-2 opacity-70">
+                  {author.description}
+                </p>
+              )}
+              {author.hobbies && author.hobbies.length > 0 && (
+                <div class="mt-4 flex flex-wrap gap-2">
+                  {author.hobbies.map((hobby: string | null) =>
+                    hobby ? (
+                      <span class="text-sm px-2 py-1 bg-theme-50 dark:bg-theme-700/20 text-theme-700 dark:text-theme-200 rounded-full">
+                        {hobby}
+                      </span>
+                    ) : null
+                  )}
+                </div>
+              )}
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  </section>
 </Layout>

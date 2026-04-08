@@ -18,6 +18,7 @@ import { BlockSelector } from './block-selector';
 import { BlockSelectorBig } from './block-selector-big';
 import { BiPencil } from 'react-icons/bi';
 import { EmptyList, ListFieldMeta, ListPanel } from '../list-field-meta';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export interface BlocksFieldDefinititon extends Field {
   component: 'blocks';
@@ -69,7 +70,20 @@ const Blocks = ({
   meta,
   index,
 }: BlockFieldProps) => {
-  const addItem = React.useCallback(
+  // Tracks object references of blocks added during this session.
+  // Uses reference equality so it's stable under reorder, delete, and prepend.
+  // Cleared when the form is saved (becomes pristine).
+  const [newObjects, setNewObjects] = useState<Set<object>>(new Set());
+
+  const prevPristine = useRef(meta.pristine);
+  useEffect(() => {
+    if (!prevPristine.current && meta.pristine) {
+      setNewObjects(new Set());
+    }
+    prevPristine.current = meta.pristine;
+  }, [meta.pristine]);
+
+  const addItem = useCallback(
     (name: string, template: BlockTemplate) => {
       let obj: any = {};
       if (typeof template.defaultItem === 'function') {
@@ -78,6 +92,7 @@ const Blocks = ({
         obj = template.defaultItem || {};
       }
       obj._template = name;
+      setNewObjects((prev) => new Set(prev).add(obj));
       form.mutators.push(field.name, obj);
     },
     [field.name, form.mutators]
@@ -153,6 +168,7 @@ const Blocks = ({
                       tinaForm={tinaForm}
                       isMin={isMin}
                       fixedLength={fixedLength}
+                      isNew={newObjects.has(block)}
                       {...itemProps(block)}
                     />
                   );
@@ -176,6 +192,7 @@ interface BlockListItemProps {
   label?: string;
   isMin?: boolean;
   fixedLength?: boolean;
+  isNew?: boolean;
 }
 
 const BlockListItem = ({
@@ -186,6 +203,7 @@ const BlockListItem = ({
   template,
   isMin,
   fixedLength,
+  isNew,
 }: BlockListItemProps) => {
   const cms = useCMS();
 
@@ -239,6 +257,11 @@ const BlockListItem = ({
               onMouseOut={() => setHoveredField({ id: null, fieldName: null })}
             >
               <GroupLabel>{label || template.label}</GroupLabel>
+              {isNew && (
+                <span className='mr-1.5 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] border-[0.5px] border-tina-orange/50 font-semibold bg-tina-orange/10 text-tina-orange leading-none'>
+                  NEW
+                </span>
+              )}
               <BiPencil className='h-5 w-auto fill-current text-gray-200 group-hover:text-inherit transition-colors duration-150 ease-out' />
             </ItemClickTarget>
             {(!fixedLength || (fixedLength && !isMin)) && (

@@ -7,7 +7,7 @@ import client from '@/tina/__generated__/client';
 
 export default function Home() {
   const queryFn = useCallback(
-    () => client.queries.page({ relativePath: 'home.mdx' }),
+    () => client.queries.page({ relativePath: 'home.md' }),
     []
   );
   const result = useTinaQuery(queryFn);

@@ -18,7 +18,7 @@ export default function PostDetail() {
   const filepath = segments.join('/');
 
   const queryFn = useCallback(
-    () => client.queries.post({ relativePath: `${filepath}.mdx` }),
+    () => client.queries.post({ relativePath: `${filepath}.md` }),
     [filepath]
   );
   const result = useTinaQuery(queryFn);
