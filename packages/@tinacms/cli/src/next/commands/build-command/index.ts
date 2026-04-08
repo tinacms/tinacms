@@ -209,9 +209,7 @@ export class BuildCommand extends BaseCommand {
     }
 
     const skipCloudChecks =
-      this.skipCloudChecks ||
-      configManager.hasSelfHostedConfig() ||
-      this.offlineOption;
+      this.skipCloudChecks || configManager.hasSelfHostedConfig();
 
     if (!skipCloudChecks) {
       try {
