@@ -1,3 +1,4 @@
+import type { HighlightColour } from '@tinacms/schema-tools/src/util';
 export type ToolbarOverrideType =
   | 'heading'
   | 'link'
@@ -25,7 +26,7 @@ export const CONTAINER_MD_BREAKPOINT = 448; // Tailwind's 'md' breakpoint for co
 export const FLOAT_BUTTON_WIDTH = 25;
 
 export const HEADING_LABEL = 'Headings';
-type HighlightColorOption = { label: string; value: string };
+export type HighlightColorOption = { label: string; value: HighlightColour };
 export type ToolbarOverrides = {
   toolbar?: ToolbarOverrideType[];
   showFloatingToolbar?: boolean;

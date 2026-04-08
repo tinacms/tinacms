@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import type React from 'react';
+import type { HighlightColour } from '../util';
 
 export const CONTENT_FORMATS = [
   'mdx',
@@ -369,7 +370,18 @@ export type RichTextField<WithNamespace extends boolean = false> = (
       toolbar?: ToolbarOverrideType[];
       /**Default set to true */
       showFloatingToolbar?: boolean;
-      highlightColors?: { label: string; value: string }[];
+      /**
+       * Custom highlight color options shown in the rich-text toolbar.
+       */
+      highlightColors?: {
+        /** The human-readable label shown in the color picker UI. */
+        label: string;
+        /**
+         * A `HighlightColour` instance representing the color applied to
+         * highlighted text when this option is selected.
+         */
+        value: HighlightColour;
+      }[];
     };
     /**
      * By default, Tina parses markdown with MDX, this is a more strict parser

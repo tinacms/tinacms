@@ -23,6 +23,8 @@ import {
   useOpenState,
 } from './dropdown-menu';
 import { useToolbarContext } from '../../toolbar/toolbar-provider';
+import { HighlightColour } from '@tinacms/schema-tools/src/util';
+import type { HighlightColorOption } from '../../toolbar/toolbar-overrides';
 
 const MarkToolbarButton = withRef<
   typeof ToolbarButton,
@@ -38,10 +40,10 @@ const MarkToolbarButton = withRef<
 });
 
 const highlightColors = [
-  { label: 'Yellow', value: 'rgba(254, 240, 138, 0.55)' },
-  { label: 'Green', value: 'rgba(187, 247, 208, 0.55)' },
-  { label: 'Blue', value: 'rgba(191, 219, 254, 0.55)' },
-  { label: 'Red', value: 'rgba(204, 65, 65, 0.55)' },
+  { label: 'Yellow', value: new HighlightColour(254, 240, 138, 0.55) },
+  { label: 'Green', value: new HighlightColour(187, 247, 208, 0.55) },
+  { label: 'Blue', value: new HighlightColour(191, 219, 254, 0.55) },
+  { label: 'Red', value: new HighlightColour(204, 65, 65, 0.55) },
 ] as const;
 
 export const BoldToolbarButton = () => (
@@ -170,18 +172,21 @@ const HighlightColorToolbarButton = () => {
         <DropdownMenuItem onSelect={() => applyHighlight()}>
           Clear highlight
         </DropdownMenuItem>
-        {highlightColorArray.map((color) => (
-          <DropdownMenuItem
-            key={color.value}
-            onSelect={() => applyHighlight(color.value)}
-          >
-            <span
-              className='mr-2 inline-block size-4 rounded border border-gray-300'
-              style={{ backgroundColor: color.value }}
-            />
-            {color.label}
-          </DropdownMenuItem>
-        ))}
+        {highlightColorArray.map((color: HighlightColorOption) => {
+          const toRgb = color.value.toString();
+          return (
+            <DropdownMenuItem
+              key={toRgb}
+              onSelect={() => applyHighlight(toRgb)}
+            >
+              <span
+                className='mr-2 inline-block size-4 rounded border border-gray-300'
+                style={{ backgroundColor: toRgb }}
+              />
+              {color.label}
+            </DropdownMenuItem>
+          );
+        })}
       </DropdownMenuContent>
     </DropdownMenu>
   );
