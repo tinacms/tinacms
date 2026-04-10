@@ -33,10 +33,19 @@ const UPDATE_DOCUMENT = `
   }
 `;
 
+const DELETE_DOCUMENT = `
+  mutation DeleteDocument($collection: String!, $relativePath: String!) {
+    deleteDocument(collection: $collection, relativePath: $relativePath) {
+      __typename
+    }
+  }
+`;
+
 const GET_POST = `
   query GetPost($relativePath: String!) {
     post(relativePath: $relativePath) {
       title
+      body
       id
     }
   }
@@ -152,6 +161,7 @@ test.describe("Document CRUD lifecycle (md format)", () => {
     expect(readAfterUpdateBody.data.post.title).toBe(
       "Playwright CRUD Test (updated)"
     );
+    expect(readAfterUpdateBody.data.post.body).toBe("\nUpdated body content.");
 
     // ------------------------------------------------------------------
     // DELETE — contentCleanup.track handles deletion in teardown,
@@ -160,13 +170,7 @@ test.describe("Document CRUD lifecycle (md format)", () => {
     // ------------------------------------------------------------------
     const deleteResp = await apiContext.post("/graphql", {
       data: {
-        query: `
-          mutation DeleteDocument($collection: String!, $relativePath: String!) {
-            deleteDocument(collection: $collection, relativePath: $relativePath) {
-              __typename
-            }
-          }
-        `,
+        query: DELETE_DOCUMENT,
         variables: { collection, relativePath },
       },
     });
