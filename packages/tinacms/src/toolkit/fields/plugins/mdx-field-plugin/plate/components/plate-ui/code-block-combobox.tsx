@@ -76,6 +76,7 @@ const languages: { label: string; value: string }[] = [
   { label: 'Handlebars', value: 'handlebars' },
   { label: 'Haskell', value: 'haskell' },
   { label: 'HTML', value: 'html' },
+  { label: 'HTMLBars', value: 'htmlbars' },
   { label: 'Julia', value: 'julia' },
   { label: 'LaTeX', value: 'latex' },
   { label: 'MATLAB', value: 'matlab' },
