@@ -26,9 +26,25 @@ export const CONTAINER_MD_BREAKPOINT = 448; // Tailwind's 'md' breakpoint for co
 export const FLOAT_BUTTON_WIDTH = 25;
 
 export const HEADING_LABEL = 'Headings';
-export type HighlightColorOption = { label: string; value: HighlightColour };
+export type HighlightColorOption = {
+  /**
+   * Display name for the highlight color (e.g., "Yellow", "Green").
+   */
+  label: string;
+
+  /**
+   * The actual highlight color value, represented as a HighlightColour class instance.
+   */
+  value: HighlightColour;
+};
 export type ToolbarOverrides = {
   toolbar?: ToolbarOverrideType[];
   showFloatingToolbar?: boolean;
+ /**
+   * Array of highlight color options.
+   * Each item should include:
+   * - `label`: a human-readable name for the color
+   * - `value`: an instance of the HighlightColour class representing the color
+   */
   highlightColors?: HighlightColorOption[];
 };
