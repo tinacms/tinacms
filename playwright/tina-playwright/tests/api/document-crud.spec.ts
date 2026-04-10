@@ -1,15 +1,14 @@
 /**
- * PBI 1 — Document CRUD & Format Roundtrips
+ * GraphQL API integration tests — Document CRUD & Format Roundtrips
  *
- * Tests the GraphQL API directly over HTTP against localhost:4001/graphql.
- * No browser is involved — these are pure API integration tests.
+ * Hits the GraphQL endpoint at localhost:4001/graphql directly over HTTP.
+ * No browser involved. Tests run against a real dev server to verify the
+ * full mutation pipeline and content serialization for each supported format.
  *
  * Collections used:
- *   - post   (md)  — full CRUD lifecycle
- *   - author (mdx) — create + read roundtrip
- *
- * Note: JSON format roundtrip is skipped for now (no JSON collection in test app).
- * TODO: add a JSON collection to the Tina config and add a JSON roundtrip test.
+ *   - post     (md)   — full CRUD lifecycle
+ *   - author   (mdx)  — create + read roundtrip
+ *   - settings (json) — create + read roundtrip
  */
 
 import { test, expect } from "../../fixtures/test-content";
@@ -47,6 +46,15 @@ const GET_AUTHOR = `
   query GetAuthor($relativePath: String!) {
     author(relativePath: $relativePath) {
       Title
+      id
+    }
+  }
+`;
+
+const GET_SETTINGS = `
+  query GetSettings($relativePath: String!) {
+    settings(relativePath: $relativePath) {
+      label
       id
     }
   }
@@ -227,5 +235,54 @@ test.describe("Content format roundtrip (mdx)", () => {
     const readBody = await readResp.json();
     expect(readBody.errors).toBeUndefined();
     expect(readBody.data.author.Title).toBe("Playwright MDX Author");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// json format roundtrip
+// ---------------------------------------------------------------------------
+
+test.describe("Content format roundtrip (json)", () => {
+  const relativePath = "playwright-json-roundtrip.json";
+  const collection = "settings";
+
+  test("create + read roundtrip for .json format", async ({
+    apiContext,
+    contentCleanup,
+  }) => {
+    // CREATE
+    const createResp = await apiContext.post("/graphql", {
+      data: {
+        query: CREATE_DOCUMENT,
+        variables: {
+          collection,
+          relativePath,
+          params: {
+            settings: {
+              label: "Playwright JSON Settings",
+            },
+          },
+        },
+      },
+    });
+
+    expect(createResp.ok()).toBeTruthy();
+    const createBody = await createResp.json();
+    expect(createBody.errors).toBeUndefined();
+
+    contentCleanup.track(collection, relativePath);
+
+    // READ — verify the document is retrievable and data matches
+    const readResp = await apiContext.post("/graphql", {
+      data: {
+        query: GET_SETTINGS,
+        variables: { relativePath },
+      },
+    });
+
+    expect(readResp.ok()).toBeTruthy();
+    const readBody = await readResp.json();
+    expect(readBody.errors).toBeUndefined();
+    expect(readBody.data.settings.label).toBe("Playwright JSON Settings");
   });
 });
