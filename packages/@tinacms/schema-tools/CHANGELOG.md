@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 2.7.1
+
+### Patch Changes
+
+- [#6633](https://github.com/tinacms/tinacms/pull/6633) [`4315d73`](https://github.com/tinacms/tinacms/commit/4315d731e729857713d5f3fc6cdef2b30abd9384) Thanks [@JackDevAU](https://github.com/JackDevAU)! - refactor: make @tinacms/schema-tools the single source of truth
+
 ## 2.7.0
 
 ### Minor Changes
