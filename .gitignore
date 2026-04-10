@@ -51,4 +51,4 @@ dist/**
 .cursor/rules/*
 
 # Local Claude Code documentation
-.claude/*.md
+.claude/*
