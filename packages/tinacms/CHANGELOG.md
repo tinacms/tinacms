@@ -1,5 +1,26 @@
 # tinacms
 
+## 3.7.2
+
+### Patch Changes
+
+- [#6400](https://github.com/tinacms/tinacms/pull/6400) [`3569c95`](https://github.com/tinacms/tinacms/commit/3569c95c124138013b36cd30bfef4d0b02f5c57b) Thanks [@kulesy](https://github.com/kulesy)! - Improve branch operation error message clarity
+
+- [#6633](https://github.com/tinacms/tinacms/pull/6633) [`4315d73`](https://github.com/tinacms/tinacms/commit/4315d731e729857713d5f3fc6cdef2b30abd9384) Thanks [@JackDevAU](https://github.com/JackDevAU)! - refactor: make @tinacms/schema-tools the single source of truth
+
+- [#6617](https://github.com/tinacms/tinacms/pull/6617) [`ff1cd6f`](https://github.com/tinacms/tinacms/commit/ff1cd6fb50edc24b34f81166d7dedbfec6d22b32) Thanks [@18-th](https://github.com/18-th)! - Improve error messages when a pull request via editorial workflow fails due to missing Git authoring tokens
+
+- [#6626](https://github.com/tinacms/tinacms/pull/6626) [`d1ad86e`](https://github.com/tinacms/tinacms/commit/d1ad86e204e19bf5bb4811658d40d172635da3af) Thanks [@tiagov8](https://github.com/tiagov8)! - Fix login screen error message and update modal title
+
+- [#6607](https://github.com/tinacms/tinacms/pull/6607) [`e146e92`](https://github.com/tinacms/tinacms/commit/e146e922b40cb5376c7a3adf81b44ad4cf8f1867) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐖 Add Telemetry to new Media Usage dashboard to see how users are interacting with it
+
+- [#6602](https://github.com/tinacms/tinacms/pull/6602) [`246ee27`](https://github.com/tinacms/tinacms/commit/246ee27a8e0b74baf241c6a70a1699013fc59299) Thanks [@griffenedge](https://github.com/griffenedge)! - Reduce the TinaCloud auth modal login image so it appears as a decorative element rather than dominating the modal.
+
+- Updated dependencies [[`4315d73`](https://github.com/tinacms/tinacms/commit/4315d731e729857713d5f3fc6cdef2b30abd9384)]:
+  - @tinacms/schema-tools@2.7.1
+  - @tinacms/mdx@2.1.1
+  - @tinacms/search@1.2.9
+
 ## 3.7.1
 
 ### Patch Changes
