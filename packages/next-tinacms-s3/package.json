@@ -1,7 +1,7 @@
 {
   "name": "next-tinacms-s3",
   "type": "module",
-  "version": "21.0.1",
+  "version": "21.0.2",
   "main": "dist/index.js",
   "module": "./dist/index.js",
   "files": [
