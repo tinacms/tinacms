@@ -30,7 +30,7 @@ pnpm run build
 # watch all packages
 pnpm run watch
 # in a separate tab, navigate to starter project
-cd examples/basic-iframe
+cd examples/next/kitchen-sink
 # start the dev server
 pnpm run dev
 ```
@@ -99,7 +99,7 @@ Run `git checkout -- .` This will clear out the versioning changes.
 
 ### Local
 
-If the changes affect local use of the packages (i.e. not the ContentAPI), use the tina-cloud-starter found in the examples directory of this repo.
+If the changes affect local use of the packages (i.e. not the ContentAPI), use one of the example apps (e.g. `examples/next/kitchen-sink`) or the tina-cloud-starter in the `experimental-examples` directory.
 
 To use a **tinacms** repository cloned locally, when running your application, use the `--rootPath` flag:
 
@@ -107,7 +107,7 @@ To use a **tinacms** repository cloned locally, when running your application, u
 node tinacms/packages/@tinacms/cli/bin/tinacms dev --rootPath {{ APPLICATION PROJECT PATH }}
 ```
 
-e.g. `node tinacms/packages/@tinacms/cli/bin/tinacms dev --rootPath ~/Developer/tina/tina-cloud-starter`
+e.g. `node tinacms/packages/@tinacms/cli/bin/tinacms dev --rootPath ~/Developer/tina/examples/next/kitchen-sink`
 
 Then inside another terminal (in the tinacms project), run:
 
