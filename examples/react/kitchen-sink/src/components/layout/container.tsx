@@ -34,7 +34,12 @@ export const Container = ({
 
   return (
     <div
-      className={cn(widthClass[width], 'mx-auto px-6 sm:px-8', verticalPadding[size], className)}
+      className={cn(
+        widthClass[width],
+        'mx-auto px-6 sm:px-8',
+        verticalPadding[size],
+        className
+      )}
       {...props}
     >
       {children}

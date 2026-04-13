@@ -5,7 +5,8 @@ import type { APIRequestContext } from '@playwright/test';
  * Handles strings, numbers, booleans, arrays, and nested objects.
  */
 function toGraphQLValue(value: unknown): string {
-  if (typeof value === 'string') return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+  if (typeof value === 'string')
+    return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
   if (typeof value === 'number' || typeof value === 'boolean')
     return String(value);
   if (Array.isArray(value)) return `[${value.map(toGraphQLValue).join(', ')}]`;

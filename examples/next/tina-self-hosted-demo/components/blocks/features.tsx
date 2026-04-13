@@ -1,14 +1,14 @@
-import { Actions } from '../util/actions'
-import { Section } from '../util/section'
-import { Container } from '../util/container'
-import { Icon } from '../util/icon'
-import { iconSchema } from '../util/icon'
+import { Actions } from '../util/actions';
+import { Section } from '../util/section';
+import { Container } from '../util/container';
+import { Icon } from '../util/icon';
+import { iconSchema } from '../util/icon';
 
 export const Feature = ({ featuresColor, data, tinaField }) => {
   return (
     <div
       data-tinafield={tinaField}
-      className="flex-1 flex flex-col gap-6 text-center items-center lg:items-start lg:text-left max-w-xl mx-auto"
+      className='flex-1 flex flex-col gap-6 text-center items-center lg:items-start lg:text-left max-w-xl mx-auto'
       style={{ flexBasis: '16rem' }}
     >
       {data.icon && (
@@ -21,7 +21,7 @@ export const Feature = ({ featuresColor, data, tinaField }) => {
       {data.title && (
         <h3
           data-tinafield={`${tinaField}.title`}
-          className="text-2xl font-semibold title-font"
+          className='text-2xl font-semibold title-font'
         >
           {data.title}
         </h3>
@@ -29,22 +29,22 @@ export const Feature = ({ featuresColor, data, tinaField }) => {
       {data.text && (
         <p
           data-tinafield={`${tinaField}.text`}
-          className="text-base opacity-80 leading-relaxed"
+          className='text-base opacity-80 leading-relaxed'
         >
           {data.text}
         </p>
       )}
       {data.actions && <Actions actions={data.actions} />}
     </div>
-  )
-}
+  );
+};
 
 export const Features = ({ data, parentField }) => {
   return (
     <Section color={data.color}>
       <Container
         className={`flex flex-wrap gap-x-10 gap-y-8 text-left`}
-        size="large"
+        size='large'
       >
         {data.items &&
           data.items.map(function (block, i) {
@@ -55,12 +55,12 @@ export const Features = ({ data, parentField }) => {
                 key={i}
                 data={block}
               />
-            )
+            );
           })}
       </Container>
     </Section>
-  )
-}
+  );
+};
 
 const defaultFeature = {
   title: "Here's Another Feature",
@@ -70,7 +70,7 @@ const defaultFeature = {
     style: 'float',
     name: '',
   },
-}
+};
 
 export const featureBlockSchema = {
   name: 'features',
@@ -91,7 +91,7 @@ export const featureBlockSchema = {
         itemProps: (item) => {
           return {
             label: item?.title,
-          }
+          };
         },
         defaultItem: {
           ...defaultFeature,
@@ -125,4 +125,4 @@ export const featureBlockSchema = {
       ],
     },
   ],
-}
+};

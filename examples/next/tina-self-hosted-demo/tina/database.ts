@@ -1,8 +1,8 @@
-import { createDatabase, createLocalDatabase } from '@tinacms/datalayer'
-import { MongodbLevel } from 'mongodb-level'
-import { GitHubProvider } from 'tinacms-gitprovider-github'
+import { createDatabase, createLocalDatabase } from '@tinacms/datalayer';
+import { MongodbLevel } from 'mongodb-level';
+import { GitHubProvider } from 'tinacms-gitprovider-github';
 
-const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
+const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true';
 
 export default isLocal
   ? createLocalDatabase()
@@ -19,4 +19,4 @@ export default isLocal
         mongoUri: process.env.MONGODB_URI,
       }),
       namespace: process.env.GITHUB_BRANCH,
-    })
+    });

@@ -99,7 +99,9 @@ test.describe('Page Block Editing via TinaCMS Admin', () => {
 
     // The hero block is added but collapsed — click to expand its form.
     // Target the sortable block list item (div[role="button"]) specifically.
-    const heroBlock = page.locator('[aria-roledescription="sortable"]').filter({ hasText: 'Hero' });
+    const heroBlock = page
+      .locator('[aria-roledescription="sortable"]')
+      .filter({ hasText: 'Hero' });
     await expect(heroBlock).toBeVisible({ timeout: 5000 });
     await heroBlock.click();
 

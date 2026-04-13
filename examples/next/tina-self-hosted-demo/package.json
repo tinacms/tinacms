@@ -9,7 +9,8 @@
     "build": "tinacms build && next build",
     "start": "tinacms build && next start",
     "export": "npm run build && next export",
-    "lint": "eslint . --ext .ts,.tsx"
+    "lint": "biome lint .",
+    "format": "biome format --write ."
   },
   "dependencies": {
     "@headlessui/react": "2.1.8",
@@ -28,6 +29,7 @@
     "tinacms-gitprovider-github": "workspace:*"
   },
   "devDependencies": {
+    "@biomejs/biome": "catalog:",
     "@svgr/webpack": "catalog:",
     "@tinacms/cli": "workspace:*",
     "@tinacms/scripts": "workspace:*",

@@ -17,8 +17,8 @@ export default {
       test: /\.svg$/i,
       issuer: /\.[jt]sx?$/,
       use: ['@svgr/webpack'],
-    })
-    return config
+    });
+    return config;
   },
   async rewrites() {
     return [
@@ -30,6 +30,6 @@ export default {
         source: '/admin',
         destination: '/admin/index.html',
       },
-    ]
+    ];
   },
-}
+};

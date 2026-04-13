@@ -14,7 +14,10 @@ import client from '@/tina/__generated__/client';
 
 export default function PostDetail() {
   const location = useLocation();
-  const segments = location.pathname.replace(/^\/posts\//, '').split('/').filter(Boolean);
+  const segments = location.pathname
+    .replace(/^\/posts\//, '')
+    .split('/')
+    .filter(Boolean);
   const filepath = segments.join('/');
 
   const queryFn = useCallback(
@@ -26,10 +29,20 @@ export default function PostDetail() {
   if (result.loading) return <Loading />;
   if (result.error || !result.data) return <NoData message='Post not found' />;
 
-  return <PostClient data={result.data} query={result.query} variables={result.variables} />;
+  return (
+    <PostClient
+      data={result.data}
+      query={result.query}
+      variables={result.variables}
+    />
+  );
 }
 
-function PostClient(props: { data: any; query: string; variables: Record<string, unknown> }) {
+function PostClient(props: {
+  data: any;
+  query: string;
+  variables: Record<string, unknown>;
+}) {
   const { data } = useTina({ ...props });
   const post = data.post;
 
@@ -37,7 +50,9 @@ function PostClient(props: { data: any; query: string; variables: Record<string,
 
   const formattedDate = post.date ? formatDate(post.date) : '';
   const authorFilename = post.author?._sys?.filename;
-  const avatarSrc = post.author?.avatar ? sanitizeImageSrc(post.author.avatar) : '';
+  const avatarSrc = post.author?.avatar
+    ? sanitizeImageSrc(post.author.avatar)
+    : '';
   const heroSrc = post.heroImg ? sanitizeImageSrc(post.heroImg) : '';
 
   return (

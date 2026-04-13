@@ -9,14 +9,14 @@ import { useTinaQuery } from '@/src/hooks/use-tina-query';
 import client from '@/tina/__generated__/client';
 
 export default function AuthorsList() {
-  const queryFn = useCallback(
-    () => client.queries.authorConnection(),
-    []
-  );
+  const queryFn = useCallback(() => client.queries.authorConnection(), []);
   const result = useTinaQuery(queryFn);
 
   if (result.loading) return <Loading />;
-  if (result.error || !result.data) return <div className='py-12 text-center text-gray-500'>No authors found</div>;
+  if (result.error || !result.data)
+    return (
+      <div className='py-12 text-center text-gray-500'>No authors found</div>
+    );
 
   const authors = (result.data?.authorConnection?.edges ?? []).flatMap(
     (edge: any) => (edge?.node ? [edge.node] : [])
@@ -26,7 +26,9 @@ export default function AuthorsList() {
     <PageSection title='Authors'>
       <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
         {authors.map((author: any) => {
-          const avatarSrc = author.avatar ? sanitizeImageSrc(author.avatar) : '';
+          const avatarSrc = author.avatar
+            ? sanitizeImageSrc(author.avatar)
+            : '';
 
           return (
             <Link

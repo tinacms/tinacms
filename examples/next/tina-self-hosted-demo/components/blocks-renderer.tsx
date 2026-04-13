@@ -1,9 +1,9 @@
-import React from 'react'
-import type { Page } from '../tina/__generated__/types'
-import { Content } from './blocks/content'
-import { Features } from './blocks/features'
-import { Hero } from './blocks/hero'
-import { Testimonial } from './blocks/testimonial'
+import React from 'react';
+import type { Page } from '../tina/__generated__/types';
+import { Content } from './blocks/content';
+import { Features } from './blocks/features';
+import { Hero } from './blocks/hero';
+import { Testimonial } from './blocks/testimonial';
 
 export const Blocks = (props: Omit<Page, 'id' | '_sys' | '_values'>) => {
   return (
@@ -19,7 +19,7 @@ export const Blocks = (props: Omit<Page, 'id' | '_sys' | '_values'>) => {
                   >
                     <Content data={block} parentField={`blocks.${i}`} />
                   </div>
-                )
+                );
               case 'PageBlocksHero':
                 return (
                   <div
@@ -28,7 +28,7 @@ export const Blocks = (props: Omit<Page, 'id' | '_sys' | '_values'>) => {
                   >
                     <Hero data={block} parentField={`blocks.${i}`} />
                   </div>
-                )
+                );
               case 'PageBlocksFeatures':
                 return (
                   <div
@@ -37,7 +37,7 @@ export const Blocks = (props: Omit<Page, 'id' | '_sys' | '_values'>) => {
                   >
                     <Features data={block} parentField={`blocks.${i}`} />
                   </div>
-                )
+                );
               case 'PageBlocksTestimonial':
                 return (
                   <div
@@ -46,12 +46,12 @@ export const Blocks = (props: Omit<Page, 'id' | '_sys' | '_values'>) => {
                   >
                     <Testimonial data={block} parentField={`blocks.${i}`} />
                   </div>
-                )
+                );
               default:
-                return null
+                return null;
             }
           })
         : null}
     </>
-  )
-}
+  );
+};
