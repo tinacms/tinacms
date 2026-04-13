@@ -678,10 +678,11 @@ export class Resolver {
   }
 
   /**
-   * Rejects relativePath values that are whitespace-only or contain
-   * leading/trailing whitespace.
+   * Validates that relativePath is non-empty and contains only allowed
+   * characters: a-z, A-Z, 0-9, hyphens, underscores, periods, and
+   * forward slashes.
    */
-  private static validateWhitespace(relativePath: string): void {
+  private static validateRelativePath(relativePath: string): void {
     if (!relativePath.trim()) {
       throw new Error(
         'Invalid path: relativePath cannot be empty or whitespace'
@@ -691,6 +692,9 @@ export class Resolver {
       throw new Error(
         'Invalid path: relativePath cannot have leading or trailing whitespace'
       );
+    }
+    if (!/^[a-zA-Z0-9\-_./]+$/.test(relativePath)) {
+      throw new Error('Invalid path: relativePath contains invalid characters');
     }
   }
 
@@ -714,7 +718,7 @@ export class Resolver {
 
     // Validate file extension matches collection format
     if (relativePath) {
-      Resolver.validateWhitespace(relativePath);
+      Resolver.validateRelativePath(relativePath);
 
       const collectionFormat = collection.format || 'md';
       const fileExtension = path.extname(relativePath).toLowerCase().slice(1);
@@ -747,7 +751,7 @@ export class Resolver {
       validateExtension?: boolean;
     }
   ): { collection: Collection<true>; realPath: string } => {
-    Resolver.validateWhitespace(relativePath);
+    Resolver.validateRelativePath(relativePath);
     const collection = this.getCollectionWithName(collectionName);
     const sanitizedRelativePath = Resolver.sanitizePath(relativePath);
     const pathSegments = [collection.path, sanitizedRelativePath];
@@ -798,7 +802,7 @@ export class Resolver {
     relativePath: string;
   }) => {
     const collection = this.getCollectionWithName(collectionName);
-    Resolver.validateWhitespace(relativePath);
+    Resolver.validateRelativePath(relativePath);
     const realPath = path.join(
       collection.path,
       relativePath,

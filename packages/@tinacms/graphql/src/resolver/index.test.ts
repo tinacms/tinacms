@@ -69,14 +69,15 @@ describe('index', () => {
       expect(() => validatePath(fullPath, collection)).toThrow();
     });
 
-    const whitespaceCases = [
+    const invalidPathCases = [
       { label: 'whitespace only', relativePath: ' ' },
       { label: 'leading space + ext', relativePath: ' .md' },
       { label: 'multiple leading spaces', relativePath: '  .md' },
       { label: 'trailing space', relativePath: 'hello.md ' },
+      { label: 'interior space', relativePath: 'hello world.md' },
     ];
 
-    for (const { label, relativePath } of whitespaceCases) {
+    for (const { label, relativePath } of invalidPathCases) {
       it(`should throw error for ${label} relativePath ("${relativePath}")`, () => {
         const collection = { path: 'posts' } as any;
         const fullPath = `posts/${relativePath}`;
@@ -87,7 +88,7 @@ describe('index', () => {
     }
   });
 
-  describe('whitespace relativePath validation', () => {
+  describe('relativePath validation', () => {
     const collection = { name: 'post', path: 'posts', format: 'md' };
     const resolver = createResolver({
       database: {} as any,
@@ -106,6 +107,9 @@ describe('index', () => {
       { label: 'leading space + ext', relativePath: ' .md' },
       { label: 'multiple leading spaces', relativePath: '  .md' },
       { label: 'trailing space', relativePath: 'hello.md ' },
+      { label: 'interior space', relativePath: 'hello world.md' },
+      { label: 'special characters', relativePath: 'hello@world.md' },
+      { label: 'unicode characters', relativePath: 'héllo.md' },
     ];
 
     for (const { label, relativePath } of cases) {
@@ -124,6 +128,20 @@ describe('index', () => {
             relativePath,
           })
         ).rejects.toThrow('Invalid path');
+      });
+    }
+
+    const validCases = [
+      { label: 'simple filename', relativePath: 'hello.md' },
+      { label: 'nested path', relativePath: 'sub/folder/hello.md' },
+      { label: 'with hyphens', relativePath: 'my-post.md' },
+      { label: 'with underscores', relativePath: 'my_post.md' },
+      { label: 'with numbers', relativePath: 'post-123.md' },
+    ];
+
+    for (const { label, relativePath } of validCases) {
+      it(`should accept valid relativePath in getValidatedPath for ${label} ("${relativePath}")`, () => {
+        expect(() => getValidatedPath('post', relativePath)).not.toThrow();
       });
     }
   });
