@@ -677,6 +677,23 @@ export class Resolver {
     return input.replace(/\\/g, '/');
   }
 
+  /**
+   * Rejects relativePath values that are whitespace-only or contain
+   * leading/trailing whitespace.
+   */
+  private static validateWhitespace(relativePath: string): void {
+    if (!relativePath.trim()) {
+      throw new Error(
+        'Invalid path: relativePath cannot be empty or whitespace'
+      );
+    }
+    if (relativePath !== relativePath.trim()) {
+      throw new Error(
+        'Invalid path: relativePath cannot have leading or trailing whitespace'
+      );
+    }
+  }
+
   private validatePath = (
     fullPath: string,
     collection: Collection<true>,
@@ -697,6 +714,8 @@ export class Resolver {
 
     // Validate file extension matches collection format
     if (relativePath) {
+      Resolver.validateWhitespace(relativePath);
+
       const collectionFormat = collection.format || 'md';
       const fileExtension = path.extname(relativePath).toLowerCase().slice(1);
 
@@ -728,6 +747,7 @@ export class Resolver {
       validateExtension?: boolean;
     }
   ): { collection: Collection<true>; realPath: string } => {
+    Resolver.validateWhitespace(relativePath);
     const collection = this.getCollectionWithName(collectionName);
     const sanitizedRelativePath = Resolver.sanitizePath(relativePath);
     const pathSegments = [collection.path, sanitizedRelativePath];
@@ -778,6 +798,7 @@ export class Resolver {
     relativePath: string;
   }) => {
     const collection = this.getCollectionWithName(collectionName);
+    Resolver.validateWhitespace(relativePath);
     const realPath = path.join(
       collection.path,
       relativePath,
