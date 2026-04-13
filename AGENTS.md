@@ -16,7 +16,6 @@ examples/              # Framework example apps
   hugo/kitchen-sink/   # Hugo kitchen-sink
   react/kitchen-sink/  # React kitchen-sink
   shared/              # Shared content and public assets across kitchen-sink examples
-experimental-examples/ # Experimental/prototype examples
 playwright/            # Playwright test infrastructure
 scripts/               # Repo maintenance scripts
 tests/                 # Build verification tests

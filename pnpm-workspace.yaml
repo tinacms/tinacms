@@ -7,7 +7,6 @@ packages:
     - examples/astro/*
     - examples/hugo/*
     - e2e/*
-    - experimental-examples/*
     - playwright/*
 catalog:
     "@ariakit/react": ^0.4.15

@@ -99,7 +99,7 @@ Run `git checkout -- .` This will clear out the versioning changes.
 
 ### Local
 
-If the changes affect local use of the packages (i.e. not the ContentAPI), use one of the example apps (e.g. `examples/next/kitchen-sink`) or the tina-cloud-starter in the `experimental-examples` directory.
+If the changes affect local use of the packages (i.e. not the ContentAPI), use one of the example apps (e.g. `examples/next/kitchen-sink`).
 
 To use a **tinacms** repository cloned locally, when running your application, use the `--rootPath` flag:
 
