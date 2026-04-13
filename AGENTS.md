@@ -11,13 +11,11 @@ packages/              # Core packages (tinacms, tinacms-authjs, create-tina-app
 packages/@tinacms/     # Scoped packages (cli, app, datalayer, graphql, mdx, scripts, etc.)
 examples/              # Framework example apps
   next/kitchen-sink/   # Next.js 15 — the reference kitchen-sink implementation
-  next-2024/           # Next.js starter (shadcn/ui based)
+  next/tina-self-hosted-demo/ # Self-hosted with auth
   astro/kitchen-sink/  # Astro 5 — mirrors Next.js kitchen-sink
-  empty/               # Vanilla Next.js for `tina init` testing
-  kitchen-sink/        # Legacy kitchen-sink (Pages router, being superseded)
-  basic-iframe/        # Iframe example
-  hugo-quickstart/     # Hugo quickstart
-  tina-self-hosted-demo/ # Self-hosted with auth
+  hugo/kitchen-sink/   # Hugo kitchen-sink
+  react/kitchen-sink/  # React kitchen-sink
+  shared/              # Shared content and public assets across kitchen-sink examples
 experimental-examples/ # Experimental/prototype examples
 playwright/            # Playwright test infrastructure
 scripts/               # Repo maintenance scripts

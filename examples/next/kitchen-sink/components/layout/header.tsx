@@ -23,7 +23,7 @@ export const Header = () => {
         'relative overflow-hidden bg-gradient-to-b',
         isPrimary
           ? 'text-white from-theme-500 to-theme-700'
-          : 'text-gray-800 dark:text-gray-50 from-white to-gray-50 dark:from-gray-900 dark:to-gray-1000',
+          : 'text-gray-800 dark:text-gray-50 from-white to-gray-50 dark:from-gray-900 dark:to-gray-1000'
       )}
     >
       <Container size='custom' className='py-0 relative z-10'>
@@ -60,7 +60,7 @@ export const Header = () => {
       <div
         className={cn(
           'absolute h-1 bg-gradient-to-r from-transparent to-transparent bottom-0 left-4 right-4 opacity-5',
-          isPrimary ? 'via-white' : 'via-black dark:via-white',
+          isPrimary ? 'via-white' : 'via-black dark:via-white'
         )}
       />
     </header>
