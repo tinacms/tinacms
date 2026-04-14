@@ -100,11 +100,27 @@ const DateTimeField = TinaScalerBase.extend({
 // ==========
 // Display-only fields
 // ==========
-const DisplayOnlyField = TinaField.extend({
+const DisplayOnlyField = TinaField.omit({ required: true }).extend({
   type: z.literal('displayOnly', {
     invalid_type_error: typeTypeError,
     required_error: typeRequiredError,
   }),
+  list: z
+    .literal(undefined, {
+      errorMap: () => ({
+        message:
+          'Property `list` is not allowed on fields of `type: displayOnly`.',
+      }),
+    })
+    .optional(),
+  required: z
+    .literal(undefined, {
+      errorMap: () => ({
+        message:
+          'Property `required` is not allowed on fields of `type: displayOnly`.',
+      }),
+    })
+    .optional(),
 });
 
 // ==========
