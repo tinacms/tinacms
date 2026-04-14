@@ -16,6 +16,7 @@ export default {
       type: 'string',
       label: 'Title',
       name: 'title',
+      searchable: true,
     },
     {
       type: 'string',
