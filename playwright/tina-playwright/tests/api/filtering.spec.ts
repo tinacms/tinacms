@@ -35,8 +35,6 @@ test("postConnection filter — title eq returns only the matching post", async 
   expect(body.errors).toBeUndefined();
 
   const { totalCount, edges } = body.data.postConnection;
-  expect(totalCount).toBeGreaterThanOrEqual(1);
-  for (const { node } of edges) {
-    expect(node.title).toBe("Filter Alpha Post");
-  }
+  expect(totalCount).toBe(1);
+  expect(edges[0].node.title).toBe("Filter Alpha Post");
 });
