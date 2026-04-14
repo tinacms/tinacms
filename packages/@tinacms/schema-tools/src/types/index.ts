@@ -336,6 +336,8 @@ export type PasswordField = (
 export type DisplayOnlyField = BaseField & {
   type: 'displayOnly';
   list?: never;
+  required?: never;
+  indexed?: never;
   ui?: {
     component?: FC<any> | null;
   };
