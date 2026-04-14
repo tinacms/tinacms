@@ -10,7 +10,12 @@ export async function dismissEditModeDialog(page: Page): Promise<void> {
   const errorClose = page.locator(
     '#modal-root button:has-text("Close"), #modal-root button:has-text("OK")'
   );
-  if (await errorClose.first().isVisible().catch(() => false)) {
+  if (
+    await errorClose
+      .first()
+      .isVisible()
+      .catch(() => false)
+  ) {
     await errorClose.first().click();
     await errorClose
       .first()

@@ -13,12 +13,23 @@ export default function Home() {
   const result = useTinaQuery(queryFn);
 
   if (result.loading) return <Loading />;
-  if (result.error || !result.data) return <div className='p-6 text-red-600'>Error loading home page</div>;
+  if (result.error || !result.data)
+    return <div className='p-6 text-red-600'>Error loading home page</div>;
 
-  return <HomeClient data={result.data} query={result.query} variables={result.variables} />;
+  return (
+    <HomeClient
+      data={result.data}
+      query={result.query}
+      variables={result.variables}
+    />
+  );
 }
 
-function HomeClient(props: { data: any; query: string; variables: Record<string, unknown> }) {
+function HomeClient(props: {
+  data: any;
+  query: string;
+  variables: Record<string, unknown>;
+}) {
   const { data } = useTina({ ...props });
   const page = data?.page;
   if (!page) return <div className='p-6 text-red-600'>No page data found</div>;
@@ -28,7 +39,9 @@ function HomeClient(props: { data: any; query: string; variables: Record<string,
       {page.blocks && page.blocks.length > 0 ? (
         <Blocks blocks={page.blocks} />
       ) : (
-        <div className='p-6 text-gray-600 dark:text-gray-400'>No blocks to display</div>
+        <div className='p-6 text-gray-600 dark:text-gray-400'>
+          No blocks to display
+        </div>
       )}
     </div>
   );
