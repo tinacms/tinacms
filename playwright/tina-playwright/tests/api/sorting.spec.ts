@@ -222,7 +222,37 @@ test("sort — deleted document is removed from sorted results immediately", asy
   expect(sortBody.data.postConnection.edges).toHaveLength(0);
 });
 
-// ── 5. Descending order via `last` ────────────────────────────────────────────
+// ── 5. Ascending order via `sort` ────────────────────────────────────────────
+
+test("sort — results are returned in ascending order by title", async ({
+  apiContext,
+}) => {
+  const seedTitles = ["Filter Alpha Post", "Filter Beta Post", "Gamma Unrelated"];
+  const resp = await apiContext.post("/graphql", {
+    data: {
+      query: POST_CONNECTION_SORT,
+      variables: {
+        sort: "title",
+        filter: { title: { in: seedTitles } },
+      },
+    },
+  });
+
+  expect(resp.ok()).toBeTruthy();
+  const body = await resp.json();
+  expect(body.errors).toBeUndefined();
+
+  const titles = body.data.postConnection.edges.map(
+    ({ node }: { node: { title: string } }) => node.title
+  );
+
+  // Results must be ascending (A → Z)
+  const ascending = [...titles].sort((a, b) => a.localeCompare(b));
+  expect(titles).toEqual(ascending);
+  expect(titles[0]).toBe("Filter Alpha Post"); // first alphabetically
+});
+
+// ── 6. Descending order via `last` ────────────────────────────────────────────
 
 test("sort — `last` arg reverses iterator, returns results in descending order", async ({
   apiContext,
