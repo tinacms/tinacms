@@ -6,6 +6,7 @@ import chokidar from 'chokidar';
 import { Command, Option } from 'clipanion';
 import fs from 'fs-extra';
 import { logger, summary } from '../../../logger';
+import { isHostExposed } from '../../../utils/host';
 import { spin } from '../../../utils/spinner';
 import { dangerText, warnText } from '../../../utils/theme';
 import { Codegen } from '../../codegen';
@@ -244,6 +245,12 @@ export class DevCommand extends BaseCommand {
       dbLock
     );
     await server.listen(Number(this.port));
+
+    if (isHostExposed(server.config.server.host)) {
+      logger.warn(
+        '⚠️  The TinaCMS dev server is listening on a non-localhost address. It has no authentication and is not intended to be exposed to the internet.'
+      );
+    }
 
     if (!this.noWatch) {
       chokidar.watch(configManager.watchList).on('change', async () => {

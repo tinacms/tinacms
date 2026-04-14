@@ -11,7 +11,7 @@ const Page: Collection = {
   label: 'Pages',
   name: 'page',
   path: 'content/pages',
-  format: 'mdx',
+  format: 'md',
   ui: {
     router: ({
       document,

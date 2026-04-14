@@ -28,9 +28,14 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
+      name: 'api',
+      testMatch: /api\//,
+      use: {}, // no browser needed
+    },
+    {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
-      testIgnore: /posthog/,
+      testIgnore: [/posthog/, /api\//],
     },
     {
       name: 'posthog',

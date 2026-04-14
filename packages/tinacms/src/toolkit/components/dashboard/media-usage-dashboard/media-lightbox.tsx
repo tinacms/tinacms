@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -7,6 +7,8 @@ import {
 } from '../../ui/dialog';
 import type { MediaUsage } from './media-usage-scanner';
 import { BiMovie } from 'react-icons/bi';
+import { MediaUsageDashboardPreviewOpenedEvent } from '../../../../lib/posthog/posthog';
+import { captureEvent } from '../../../../lib/posthog/posthogProvider';
 
 export const MediaLightbox = ({
   item,
@@ -20,6 +22,10 @@ export const MediaLightbox = ({
   const usageCount = item.usedIn.length;
   const mediaSrc = item.media.src;
   const directory = item.media.directory || '/';
+
+  useEffect(() => {
+    captureEvent(MediaUsageDashboardPreviewOpenedEvent);
+  }, []);
 
   return (
     <Dialog open onOpenChange={(isOpen) => !isOpen && onClose()}>

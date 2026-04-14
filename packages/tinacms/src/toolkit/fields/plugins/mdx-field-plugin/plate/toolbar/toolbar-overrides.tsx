@@ -1,21 +1,5 @@
-export type ToolbarOverrideType =
-  | 'heading'
-  | 'link'
-  | 'image'
-  | 'quote'
-  | 'ul'
-  | 'ol'
-  | 'code'
-  | 'codeBlock'
-  | 'bold'
-  | 'italic'
-  | 'strikethrough'
-  | 'highlight'
-  | 'mermaid'
-  | 'raw'
-  | 'embed'
-  | 'table'
-  | 'hr';
+import type { ToolbarOverrideType } from '@tinacms/schema-tools';
+export type { ToolbarOverrideType };
 
 export const STANDARD_ICON_WIDTH = 32;
 export const HEADING_ICON_WITH_TEXT = 127;

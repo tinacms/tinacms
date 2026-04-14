@@ -1,5 +1,5 @@
-import React from 'react';
 import { cn } from '@/lib/utils';
+import React from 'react';
 
 /**
  * Themed gradient heading used on detail pages (authors, blogs, posts, etc.).

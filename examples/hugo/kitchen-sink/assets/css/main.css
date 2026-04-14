@@ -1,0 +1,122 @@
+@import "tailwindcss";
+@config "./tailwind.config.js";
+
+/*
+ * Semantic theme color tokens.
+ * Components use `bg-theme-500`, `text-theme-400`, `from-theme-400 to-theme-600`, etc.
+ * The active palette is set by a `data-theme` attribute on a parent element
+ * (driven by the CMS global theme.color setting).
+ */
+@theme inline {
+  --color-theme-50: var(--theme-50);
+  --color-theme-200: var(--theme-200);
+  --color-theme-300: var(--theme-300);
+  --color-theme-400: var(--theme-400);
+  --color-theme-500: var(--theme-500);
+  --color-theme-600: var(--theme-600);
+  --color-theme-700: var(--theme-700);
+  --color-theme-on: var(--theme-on);
+}
+
+/* ── Default / Blue ────────────────────────────────────── */
+:root,
+[data-theme="blue"] {
+  --theme-50: #dceeff;
+  --theme-200: #85c5fe;
+  --theme-300: #4eabfe;
+  --theme-400: #2296fe;
+  --theme-500: #0084ff;
+  --theme-600: #0574e4;
+  --theme-700: #0d5dbd;
+  --theme-on: #ffffff;
+}
+
+/* ── Teal (cyan) ───────────────────────────────────────── */
+[data-theme="teal"] {
+  --theme-50: #ecfeff;
+  --theme-200: #a5f3fc;
+  --theme-300: #67e8f9;
+  --theme-400: #22d3ee;
+  --theme-500: #06b6d4;
+  --theme-600: #0891b2;
+  --theme-700: #0e7490;
+  --theme-on: #ffffff;
+}
+
+/* ── Green (emerald) ───────────────────────────────────── */
+[data-theme="green"] {
+  --theme-50: #ecfdf5;
+  --theme-200: #a7f3d0;
+  --theme-300: #6ee7b7;
+  --theme-400: #34d399;
+  --theme-500: #10b981;
+  --theme-600: #059669;
+  --theme-700: #047857;
+  --theme-on: #ffffff;
+}
+
+/* ── Red (rose) ────────────────────────────────────────── */
+[data-theme="red"] {
+  --theme-50: #fff1f2;
+  --theme-200: #fecdd3;
+  --theme-300: #fda4af;
+  --theme-400: #fb7185;
+  --theme-500: #f43f5e;
+  --theme-600: #e11d48;
+  --theme-700: #be123c;
+  --theme-on: #ffffff;
+}
+
+/* ── Pink ──────────────────────────────────────────────── */
+[data-theme="pink"] {
+  --theme-50: #fdf2f8;
+  --theme-200: #fbcfe8;
+  --theme-300: #f9a8d4;
+  --theme-400: #f472b6;
+  --theme-500: #ec4899;
+  --theme-600: #db2777;
+  --theme-700: #be185d;
+  --theme-on: #ffffff;
+}
+
+/* ── Purple ────────────────────────────────────────────── */
+[data-theme="purple"] {
+  --theme-50: #faf5ff;
+  --theme-200: #e9d5ff;
+  --theme-300: #d8b4fe;
+  --theme-400: #c084fc;
+  --theme-500: #a855f7;
+  --theme-600: #9333ea;
+  --theme-700: #7e22ce;
+  --theme-on: #ffffff;
+}
+
+/* ── Orange ────────────────────────────────────────────── */
+[data-theme="orange"] {
+  --theme-50: #fff7ed;
+  --theme-200: #eb7752;
+  --theme-300: #ea6c45;
+  --theme-400: #e85c30;
+  --theme-500: #ec4815;
+  --theme-600: #dc4419;
+  --theme-700: #d04017;
+  --theme-on: #ffffff;
+}
+
+/* ── Yellow ────────────────────────────────────────────── */
+[data-theme="yellow"] {
+  --theme-50: #fefce8;
+  --theme-200: #fef08a;
+  --theme-300: #fde047;
+  --theme-400: #facc15;
+  --theme-500: #eab308;
+  --theme-600: #ca8a04;
+  --theme-700: #a16207;
+  --theme-on: #1f2937;
+}
+
+@layer base {
+  body {
+    @apply bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-50;
+  }
+}

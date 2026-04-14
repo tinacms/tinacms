@@ -672,12 +672,43 @@ export class Resolver {
    * path traversal attacks where a user might attempt to read or write files
    * outside of the intended collection.
    */
+  private static sanitizePath(input: string): string {
+    if (input.includes('\0')) {
+      throw new Error('Invalid path: null bytes are not allowed');
+    }
+    return input.replace(/\\/g, '/');
+  }
+
+  /**
+   * Validates that relativePath is non-empty and contains only allowed
+   * characters: a-z, A-Z, 0-9, hyphens, underscores, periods, and
+   * forward slashes.
+   */
+  private static validateRelativePath(relativePath: string): void {
+    if (!relativePath.trim()) {
+      throw new Error(
+        'Invalid path: relativePath cannot be empty or whitespace'
+      );
+    }
+    if (relativePath !== relativePath.trim()) {
+      throw new Error(
+        'Invalid path: relativePath cannot have leading or trailing whitespace'
+      );
+    }
+    if (!/^[a-zA-Z0-9\-_./]+$/.test(relativePath)) {
+      throw new Error('Invalid path: relativePath contains invalid characters');
+    }
+  }
+
   private validatePath = (
     fullPath: string,
     collection: Collection<true>,
     relativePath?: string
   ) => {
-    const normalizedPath = path.normalize(fullPath);
+    if (fullPath.includes('\0')) {
+      throw new Error('Invalid path: null bytes are not allowed');
+    }
+    const normalizedPath = path.normalize(fullPath.replace(/\\/g, '/'));
     const normalizedCollectionPath = path.normalize(collection.path);
     const relative = path.relative(normalizedCollectionPath, normalizedPath);
     if (relative.startsWith('..')) {
@@ -689,6 +720,8 @@ export class Resolver {
 
     // Validate file extension matches collection format
     if (relativePath) {
+      Resolver.validateRelativePath(relativePath);
+
       const collectionFormat = collection.format || 'md';
       const fileExtension = path.extname(relativePath).toLowerCase().slice(1);
 
@@ -720,11 +753,13 @@ export class Resolver {
       validateExtension?: boolean;
     }
   ): { collection: Collection<true>; realPath: string } => {
+    Resolver.validateRelativePath(relativePath);
     const collection = this.getCollectionWithName(collectionName);
-    const pathSegments = [collection.path, relativePath];
+    const sanitizedRelativePath = Resolver.sanitizePath(relativePath);
+    const pathSegments = [collection.path, sanitizedRelativePath];
 
     if (options?.extraSegments) {
-      pathSegments.push(...options.extraSegments);
+      pathSegments.push(...options.extraSegments.map(Resolver.sanitizePath));
     }
 
     const realPath = path.join(...pathSegments);
@@ -732,7 +767,7 @@ export class Resolver {
     this.validatePath(
       realPath,
       collection,
-      shouldValidateExtension ? relativePath : undefined
+      shouldValidateExtension ? sanitizedRelativePath : undefined
     );
 
     return { collection, realPath };
@@ -769,6 +804,7 @@ export class Resolver {
     relativePath: string;
   }) => {
     const collection = this.getCollectionWithName(collectionName);
+    Resolver.validateRelativePath(relativePath);
     const realPath = path.join(
       collection.path,
       relativePath,

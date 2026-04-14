@@ -13,7 +13,7 @@ export default function DynamicPage() {
   const filepath = segments.join('/');
 
   const queryFn = useCallback(
-    () => client.queries.page({ relativePath: `${filepath}.mdx` }),
+    () => client.queries.page({ relativePath: `${filepath}.md` }),
     [filepath]
   );
   const result = useTinaQuery(queryFn);
@@ -21,10 +21,20 @@ export default function DynamicPage() {
   if (result.loading) return <Loading />;
   if (result.error || !result.data) return <NoData message='Page not found' />;
 
-  return <PageClient data={result.data} query={result.query} variables={result.variables} />;
+  return (
+    <PageClient
+      data={result.data}
+      query={result.query}
+      variables={result.variables}
+    />
+  );
 }
 
-function PageClient(props: { data: any; query: string; variables: Record<string, unknown> }) {
+function PageClient(props: {
+  data: any;
+  query: string;
+  variables: Record<string, unknown>;
+}) {
   const { data } = useTina({ ...props });
   const page = data?.page;
 

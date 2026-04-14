@@ -341,7 +341,7 @@ export type DisplayOnlyField = BaseField & {
   };
 };
 
-type ToolbarOverrideType =
+export type ToolbarOverrideType =
   | 'heading'
   | 'link'
   | 'image'
@@ -352,10 +352,13 @@ type ToolbarOverrideType =
   | 'codeBlock'
   | 'bold'
   | 'italic'
+  | 'strikethrough'
+  | 'highlight'
   | 'raw'
   | 'embed'
   | 'mermaid'
-  | 'table';
+  | 'table'
+  | 'hr';
 type RichTextAst = { type: 'root'; children: Record<string, unknown>[] };
 export type RichTextField<WithNamespace extends boolean = false> = (
   | FieldGeneric<RichTextAst, undefined>
@@ -864,7 +867,7 @@ export interface Config<
      * @example
      *s
      * historyUrl: ({ relativePath, branch }) => ({
-     *   url: `https://github.com/tinacms/tinacms/commits/${branch}/examples/next-2024/${relativePath}`
+     *   url: `https://github.com/tinacms/tinacms/commits/${branch}/examples/next/kitchen-sink/${relativePath}`
      * })
      *      */
     historyUrl?: (context: { relativePath: string; branch: string }) => {

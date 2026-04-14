@@ -1,0 +1,10 @@
+{{/*
+  NoData partial — fallback displayed when a page has no data.
+  Parameters (via dict):
+    .message — display text (default: "No data")
+*/}}
+{{ $message := .message | default "No data" }}
+
+<div class="py-12 px-6 text-center text-gray-500 dark:text-gray-400">
+  {{ $message }}
+</div>

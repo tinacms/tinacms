@@ -1,8 +1,8 @@
 import React from 'react';
 
 /**
- * Lightweight wrapper used by listing pages (authors, tags, etc.)
- * Mirrors the default Section + Container styles without requiring context.
+ * Lightweight server-compatible wrapper used by listing pages (authors, tags, etc.)
+ * Mirrors the default Section + Container styles without requiring client-side context.
  */
 export function PageSection({
   title,

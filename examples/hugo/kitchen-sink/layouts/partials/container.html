@@ -1,0 +1,18 @@
+{{/*
+  Container partial — centered max-width wrapper.
+  Parameters (via dict):
+    .size    — "custom" | "small" | "medium" (default) | "large"
+    .width   — "small" | "medium" | "large" (default) | "custom"
+    .class   — additional CSS classes
+    .content — inner HTML (use `partial` with dict)
+*/}}
+{{ $size := .size | default "medium" }}
+{{ $width := .width | default "large" }}
+{{ $class := .class | default "" }}
+
+{{ $verticalPadding := dict "custom" "" "small" "py-8" "medium" "py-12" "large" "py-24" }}
+{{ $widthClass := dict "small" "max-w-4xl" "medium" "max-w-5xl" "large" "max-w-7xl" "custom" "" }}
+
+<div class="{{ index $widthClass $width }} mx-auto px-6 sm:px-8 {{ index $verticalPadding $size }} {{ $class }}">
+  {{ .content }}
+</div>

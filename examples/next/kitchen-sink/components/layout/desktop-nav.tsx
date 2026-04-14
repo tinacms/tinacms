@@ -31,10 +31,11 @@ export const DesktopNav = ({ nav, isPrimary }: DesktopNavProps) => {
             className={cn(
               'relative select-none text-base inline-flex items-center tracking-wide transition duration-150 ease-out opacity-70 hover:opacity-100 px-2 sm:px-4 py-5',
               active && 'opacity-100',
-              active && (isPrimary
-                ? 'border-b-3 border-white'
-                : 'border-b-3 border-theme-200'),
-              active && !isPrimary && 'text-theme-600 dark:text-theme-300',
+              active &&
+                (isPrimary
+                  ? 'border-b-3 border-white'
+                  : 'border-b-3 border-theme-200'),
+              active && !isPrimary && 'text-theme-600 dark:text-theme-300'
             )}
           >
             {item.label}

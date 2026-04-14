@@ -1,5 +1,45 @@
 # tinacms
 
+## 3.7.2
+
+### Patch Changes
+
+- [#6400](https://github.com/tinacms/tinacms/pull/6400) [`3569c95`](https://github.com/tinacms/tinacms/commit/3569c95c124138013b36cd30bfef4d0b02f5c57b) Thanks [@kulesy](https://github.com/kulesy)! - Improve branch operation error message clarity
+
+- [#6633](https://github.com/tinacms/tinacms/pull/6633) [`4315d73`](https://github.com/tinacms/tinacms/commit/4315d731e729857713d5f3fc6cdef2b30abd9384) Thanks [@JackDevAU](https://github.com/JackDevAU)! - refactor: make @tinacms/schema-tools the single source of truth
+
+- [#6617](https://github.com/tinacms/tinacms/pull/6617) [`ff1cd6f`](https://github.com/tinacms/tinacms/commit/ff1cd6fb50edc24b34f81166d7dedbfec6d22b32) Thanks [@18-th](https://github.com/18-th)! - Improve error messages when a pull request via editorial workflow fails due to missing Git authoring tokens
+
+- [#6626](https://github.com/tinacms/tinacms/pull/6626) [`d1ad86e`](https://github.com/tinacms/tinacms/commit/d1ad86e204e19bf5bb4811658d40d172635da3af) Thanks [@tiagov8](https://github.com/tiagov8)! - Fix login screen error message and update modal title
+
+- [#6607](https://github.com/tinacms/tinacms/pull/6607) [`e146e92`](https://github.com/tinacms/tinacms/commit/e146e922b40cb5376c7a3adf81b44ad4cf8f1867) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐖 Add Telemetry to new Media Usage dashboard to see how users are interacting with it
+
+- [#6602](https://github.com/tinacms/tinacms/pull/6602) [`246ee27`](https://github.com/tinacms/tinacms/commit/246ee27a8e0b74baf241c6a70a1699013fc59299) Thanks [@griffenedge](https://github.com/griffenedge)! - Reduce the TinaCloud auth modal login image so it appears as a decorative element rather than dominating the modal.
+
+- Updated dependencies [[`4315d73`](https://github.com/tinacms/tinacms/commit/4315d731e729857713d5f3fc6cdef2b30abd9384)]:
+  - @tinacms/schema-tools@2.7.1
+  - @tinacms/mdx@2.1.1
+  - @tinacms/search@1.2.9
+
+## 3.7.1
+
+### Patch Changes
+
+- [#6553](https://github.com/tinacms/tinacms/pull/6553) [`a40f52a`](https://github.com/tinacms/tinacms/commit/a40f52ae01fa2ef059fb983efd22aad42913b351) Thanks [@thomas-sepanosian](https://github.com/thomas-sepanosian)! - 🐛 Fix media usage tracking for files with the same filename in different directories
+
+- [#6544](https://github.com/tinacms/tinacms/pull/6544) [`a7ebbe1`](https://github.com/tinacms/tinacms/commit/a7ebbe18a77b05c567564f8b507f76c2a2bb135e) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Flipping the referenced files checkbox to off by default, and updating the label.
+
+- [#6558](https://github.com/tinacms/tinacms/pull/6558) [`519a4c2`](https://github.com/tinacms/tinacms/commit/519a4c2ca8a78274fe88549d41adbe52f7c6258b) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐖 Adding Telemetry around usage of slash command in rich-text editor
+
+- [#6546](https://github.com/tinacms/tinacms/pull/6546) [`6e374e5`](https://github.com/tinacms/tinacms/commit/6e374e5975ff240807d59bfd06b3ab22264e91b1) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐛 Fix slash command popup from not being escapable
+
+- [#6564](https://github.com/tinacms/tinacms/pull/6564) [`039e605`](https://github.com/tinacms/tinacms/commit/039e6052a77e4cd0ae1460e33076a0fad1864019) Thanks [@Ben0189](https://github.com/Ben0189)! - "Add react-dnd and react-dnd-html5-backend as explicit dependencies to fix starter template build failures when using Yarn v1"
+
+- [#6560](https://github.com/tinacms/tinacms/pull/6560) [`d1f094b`](https://github.com/tinacms/tinacms/commit/d1f094b2d1a62e9c0580a56b8a788bc0e7a0af98) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - ✨ UI: Added "New" badges to help you quickly identify recently added items
+
+- Updated dependencies []:
+  - @tinacms/search@1.2.8
+
 ## 3.7.0
 
 ### Minor Changes
