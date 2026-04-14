@@ -5,7 +5,6 @@
 	"workspaces": [
 		"packages/@tinacms/*",
 		"examples/*/*",
-		"experimental-examples/*",
 		"packages/[^@]*"
 	],
 	"scripts": {
@@ -18,9 +17,6 @@
 		"lint:packages": "pnpm --filter './packages/**' --no-bail exec pnpm dlx publint --strict",
 		"test:packages": "vitest run tests/build-verification.test.ts --reporter=verbose && pnpm run lint:packages",
 		"types": "turbo run types --filter=\"./packages/**\"",
-		"build:e2e": "pnpm run build && pnpm --filter=kitchen-sink-starter run build",
-		"start:e2e": "pnpm --filter=kitchen-sink-starter run start ",
-		"start:e2e:dev": "pnpm --filter=kitchen-sink-starter run dev",
 		"test:dev": "cd playwright/tina-playwright && npx playwright test --ui",
 		"test:e2e": "cd playwright/tina-playwright && npx playwright test",
 		"version": "pnpm exec changeset version",
