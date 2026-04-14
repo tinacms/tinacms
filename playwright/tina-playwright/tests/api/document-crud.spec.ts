@@ -79,7 +79,6 @@ test.describe("Document CRUD lifecycle (md format)", () => {
 
   test("create → read → update → delete a post", async ({
     apiContext,
-    contentCleanup,
   }) => {
     // ------------------------------------------------------------------
     // CREATE
@@ -104,8 +103,7 @@ test.describe("Document CRUD lifecycle (md format)", () => {
     const createBody = await createResp.json();
     expect(createBody.errors).toBeUndefined();
 
-    // Register for cleanup immediately after creation
-    contentCleanup.track(collection, relativePath);
+    // No cleanup tracking needed — this test explicitly deletes the document itself
 
     // ------------------------------------------------------------------
     // READ — verify the created document is accessible
