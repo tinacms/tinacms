@@ -91,10 +91,6 @@ Inside `{{ range }}`, `$` refers to the template root (the listing page), NOT th
 
 Post and author listing cards use the `cardLinkClasses` pattern — gradient background (`from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-1000`) with rounded corners and shadow hover effect.
 
-### `cross-env` for Windows
-
-The `dev` script uses `cross-env MONOREPO_DEV=true` for cross-platform env var support. Required because Windows `cmd` doesn't support inline `VAR=value command` syntax.
-
 ## Partial Architecture
 
 **Section wrappers:**

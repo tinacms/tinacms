@@ -22,8 +22,7 @@ Collection schemas live in [tina/collections/](tina/collections/).
 
 ## Common Commands
 
-- `pnpm dev` — `MONOREPO_DEV=true tinacms dev -c "next dev"`
-- `pnpm dev2` — `tinacms dev -c "next dev"` (without monorepo flag)
+- `pnpm dev` — `tinacms dev -c "next dev --turbopack"` (Turbopack keeps dev fast enough for full-parallel Playwright runs)
 - `pnpm dev-sandbox` — dev with TinaCMS sandbox isolation
 - `pnpm build` — `tinacms build && next build`
 - `pnpm build:local` — `tinacms build --local --skip-cloud-checks -c "next build"` (offline/CI)

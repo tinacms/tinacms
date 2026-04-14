@@ -1,10 +1,12 @@
-import { expect, type Page } from '@playwright/test';
+import { type Page } from '@playwright/test';
 
 /**
  * Dismiss any modal dialog that might be blocking the admin UI.
- * Handles the "Enter Edit Mode" dialog (first visit) and error modals.
+ * Handles the "Enter Edit Mode" dialog (first visit) and error modals
+ * (e.g. "Filename already exists") that appear in `<div id="modal-root">`.
  */
 export async function dismissEditModeDialog(page: Page): Promise<void> {
+  // Dismiss any error modal lingering from a previous failure (check immediately, no wait)
   const errorClose = page.locator(
     '#modal-root button:has-text("Close"), #modal-root button:has-text("OK")'
   );
@@ -21,6 +23,8 @@ export async function dismissEditModeDialog(page: Page): Promise<void> {
       .catch(() => {});
   }
 
+  // Race between the edit-mode dialog and actual admin content appearing.
+  // Whichever appears first tells us whether we need to click "Enter Edit Mode".
   const editModeBtn = page.locator('button[data-test="enter-edit-mode"]');
   const adminContent = page.locator('button:has-text("Save"), h3, table');
 
@@ -39,43 +43,34 @@ export async function dismissEditModeDialog(page: Page): Promise<void> {
   }
 }
 
-// This is different from other kitchen-sink projects: saving a new document
-// kicks off a redirect, so the opacity check on the Save button is flaky.
-// clickSaveNew waits for the redirect; clickSave waits for the button state.
-async function submitAndAwaitGraphQL(page: Page): Promise<string> {
-  const currentUrl = page.url();
+/**
+ * Click the Save button and wait for the GraphQL mutation to complete.
+ *
+ * Post-save UX varies across TinaCMS hosts:
+ *   - Some resolve the form in place (Save button transitions to `opacity-30 pristine`)
+ *   - Some redirect `/new/` → `/edit/<new-doc>`
+ *   - Some redirect all the way back to the collection listing
+ *
+ * The GraphQL 200 response is the authoritative signal that the save succeeded. After that,
+ * we give the UI up to 3s to settle any navigation, then return. Callers that need to assert
+ * on the post-save UI state should do so explicitly.
+ */
+export async function clickSave(page: Page): Promise<void> {
   const saveResponse = page.waitForResponse(
     (resp) => resp.url().includes('/graphql') && resp.status() === 200,
     { timeout: 15000 }
   );
+  const urlBeforeSave = page.url();
   await page.click('button:has-text("Save")');
   await saveResponse;
-  return currentUrl;
-}
-
-/**
- * Save a new document and wait for TinaCMS to navigate away from the
- * create form (e.g. /new/ → /edit/ or back to the collection list).
- */
-export async function clickSaveNew(page: Page): Promise<void> {
-  const previousUrl = await submitAndAwaitGraphQL(page);
-  await page.waitForURL((url) => url.toString() !== previousUrl, {
-    timeout: 10000,
-  });
-}
-
-/**
- * Save an existing document and wait for the form to return to its
- * pristine state (Save button fades to disabled).
- */
-export async function clickSave(page: Page): Promise<void> {
-  await submitAndAwaitGraphQL(page);
-  const saveButton = page.locator('button:has-text("Save")');
-  await expect(saveButton).toHaveClass(/opacity-30/, { timeout: 10000 });
+  await page
+    .waitForURL((url) => url.toString() !== urlBeforeSave, { timeout: 3000 })
+    .catch(() => {});
 }
 
 /**
  * Navigate to the "create new document" form for a collection.
+ * Dismisses the edit-mode dialog automatically.
  */
 export async function navigateToCreate(
   page: Page,
@@ -85,11 +80,13 @@ export async function navigateToCreate(
     waitUntil: 'domcontentloaded',
   });
   await dismissEditModeDialog(page);
+  // Wait for the form to be ready
   await page.waitForSelector('button:has-text("Save")', { timeout: 10000 });
 }
 
 /**
  * Navigate to the edit form for an existing document.
+ * Dismisses the edit-mode dialog automatically.
  */
 export async function navigateToEdit(
   page: Page,
@@ -101,6 +98,7 @@ export async function navigateToEdit(
     { waitUntil: 'domcontentloaded' }
   );
   await dismissEditModeDialog(page);
+  // Wait for the form to be ready
   await page.waitForSelector('button:has-text("Save")', { timeout: 10000 });
 }
 
@@ -115,5 +113,6 @@ export async function navigateToList(
     waitUntil: 'domcontentloaded',
   });
   await dismissEditModeDialog(page);
+  // Wait for the collection list table to load
   await page.waitForSelector('table', { timeout: 10000 });
 }
