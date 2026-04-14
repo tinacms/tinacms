@@ -858,7 +858,7 @@ export interface Config<
      * @example
      *s
      * historyUrl: ({ relativePath, branch }) => ({
-     *   url: `https://github.com/tinacms/tinacms/commits/${branch}/examples/next-2024/${relativePath}`
+     *   url: `https://github.com/tinacms/tinacms/commits/${branch}/examples/next/kitchen-sink/${relativePath}`
      * })
      *      */
     historyUrl?: (context: { relativePath: string; branch: string }) => {

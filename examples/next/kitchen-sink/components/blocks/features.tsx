@@ -28,9 +28,7 @@ export const Feature = ({ featuresColor, data }: FeatureProps) => {
     >
       {data.icon && (
         <div data-tina-field={tinaField(data, 'icon')}>
-          <Icon
-            data={{ size: 'large', ...data.icon }}
-          />
+          <Icon data={{ size: 'large', ...data.icon }} />
         </div>
       )}
       {data.title && (
@@ -51,10 +49,7 @@ export const Feature = ({ featuresColor, data }: FeatureProps) => {
       )}
       {data.actions && (
         <div data-tina-field={tinaField(data, 'actions')}>
-          <Actions
-            actions={data.actions}
-            parentColor={featuresColor}
-          />
+          <Actions actions={data.actions} parentColor={featuresColor} />
         </div>
       )}
     </div>
@@ -144,16 +139,14 @@ export const Features = ({ data }: FeaturesProps) => {
         size='large'
       >
         {normalizedItems &&
-          normalizedItems.map((block: PageBlocksFeaturesItems | null, i: number) => {
-            if (!block) return null;
-            return (
-              <Feature
-                featuresColor={data.color}
-                key={i}
-                data={block}
-              />
-            );
-          })}
+          normalizedItems.map(
+            (block: PageBlocksFeaturesItems | null, i: number) => {
+              if (!block) return null;
+              return (
+                <Feature featuresColor={data.color} key={i} data={block} />
+              );
+            }
+          )}
       </Container>
     </Section>
   );

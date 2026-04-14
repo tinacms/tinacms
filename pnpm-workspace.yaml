@@ -1,13 +1,8 @@
 packages:
     - packages/*
     - packages/@tinacms/*
-    - examples/*
-    - examples/next/*
-    - examples/react/*
-    - examples/astro/*
-    - examples/hugo/*
+    - examples/*/*
     - e2e/*
-    - experimental-examples/*
     - playwright/*
 catalog:
     "@ariakit/react": ^0.4.15

@@ -49,3 +49,6 @@ dist/**
 **/.env
 
 .cursor/rules/*
+
+# Local Claude Code documentation
+.claude/*

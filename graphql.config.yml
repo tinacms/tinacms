@@ -20,14 +20,7 @@ projects:
     documents:
       - packages/**/*.page-builder.gql
   unitTestExample:
-    schema: experimental-examples/unit-test-example/.tina/__generated__/schema.gql
+    schema: packages/@tinacms/graphql/src/spec/forestry-sample/.tina/__generated__/schema.gql
     documents:
       - packages/tinacms/src/hooks/formify/**/*.spec.ts
       - packages/tinacms/src/hooks/formify/**/*.unit-test.gql
-      - experimental-examples/unit-test-example/**/*.js
-  starter:
-    schema: experimental-examples/tina-cloud-starter/.tina/__generated__/schema.gql
-    documents:
-      - experimental-examples/tina-cloud-starter/**/*.tsx
-      - experimental-examples/tina-cloud-starter/**/*.ts
-      - experimental-examples/tina-cloud-starter/**/*.gql

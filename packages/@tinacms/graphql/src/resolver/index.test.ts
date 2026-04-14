@@ -68,6 +68,82 @@ describe('index', () => {
       const fullPath = 'posts/file\0.md';
       expect(() => validatePath(fullPath, collection)).toThrow();
     });
+
+    const invalidPathCases = [
+      { label: 'whitespace only', relativePath: ' ' },
+      { label: 'leading space + ext', relativePath: ' .md' },
+      { label: 'multiple leading spaces', relativePath: '  .md' },
+      { label: 'trailing space', relativePath: 'hello.md ' },
+      { label: 'interior space', relativePath: 'hello world.md' },
+    ];
+
+    for (const { label, relativePath } of invalidPathCases) {
+      it(`should throw error for ${label} relativePath ("${relativePath}")`, () => {
+        const collection = { path: 'posts' } as any;
+        const fullPath = `posts/${relativePath}`;
+        expect(() => validatePath(fullPath, collection, relativePath)).toThrow(
+          'Invalid path'
+        );
+      });
+    }
+  });
+
+  describe('relativePath validation', () => {
+    const collection = { name: 'post', path: 'posts', format: 'md' };
+    const resolver = createResolver({
+      database: {} as any,
+      tinaSchema: {
+        getCollections: () => [collection],
+        getCollection: () => collection,
+      } as any,
+      isAudit: false,
+    });
+    // @ts-ignore Since it's private
+    const getValidatedPath = resolver.getValidatedPath;
+
+    const cases = [
+      { label: 'empty string', relativePath: '' },
+      { label: 'whitespace only', relativePath: ' ' },
+      { label: 'leading space + ext', relativePath: ' .md' },
+      { label: 'multiple leading spaces', relativePath: '  .md' },
+      { label: 'trailing space', relativePath: 'hello.md ' },
+      { label: 'interior space', relativePath: 'hello world.md' },
+      { label: 'special characters', relativePath: 'hello@world.md' },
+      { label: 'unicode characters', relativePath: 'héllo.md' },
+    ];
+
+    for (const { label, relativePath } of cases) {
+      it(`should throw error in getValidatedPath for ${label} ("${relativePath}")`, () => {
+        expect(() => getValidatedPath('post', relativePath)).toThrow(
+          'Invalid path'
+        );
+      });
+    }
+
+    for (const { label, relativePath } of cases) {
+      it(`should throw error in resolveCreateFolder for ${label} ("${relativePath}")`, async () => {
+        await expect(
+          resolver.resolveCreateFolder({
+            collectionName: 'post',
+            relativePath,
+          })
+        ).rejects.toThrow('Invalid path');
+      });
+    }
+
+    const validCases = [
+      { label: 'simple filename', relativePath: 'hello.md' },
+      { label: 'nested path', relativePath: 'sub/folder/hello.md' },
+      { label: 'with hyphens', relativePath: 'my-post.md' },
+      { label: 'with underscores', relativePath: 'my_post.md' },
+      { label: 'with numbers', relativePath: 'post-123.md' },
+    ];
+
+    for (const { label, relativePath } of validCases) {
+      it(`should accept valid relativePath in getValidatedPath for ${label} ("${relativePath}")`, () => {
+        expect(() => getValidatedPath('post', relativePath)).not.toThrow();
+      });
+    }
   });
 
   describe('updateObjectWithJsonPath', () => {
