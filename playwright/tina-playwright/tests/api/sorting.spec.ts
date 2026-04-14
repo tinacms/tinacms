@@ -182,6 +182,7 @@ test("sort — index is updated on updateDocument (old entry removed, new entry 
 
 test("sort — deleted document is removed from sorted results immediately", async ({
   apiContext,
+  contentCleanup,
 }) => {
   const relativePath = "playwright-sort-delete.md";
   const title = "AAAA Sort Index Delete Test";
@@ -198,6 +199,7 @@ test("sort — deleted document is removed from sorted results immediately", asy
   });
   expect(createResp.ok()).toBeTruthy();
   expect((await createResp.json()).errors).toBeUndefined();
+  contentCleanup.track("post", relativePath);
 
   const deleteResp = await apiContext.post("/graphql", {
     data: {
