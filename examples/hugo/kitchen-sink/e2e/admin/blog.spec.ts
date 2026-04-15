@@ -5,6 +5,8 @@ import {
   navigateToCreate,
   navigateToEdit,
   navigateToList,
+  referenceTrigger,
+  selectReference,
 } from '../utils/admin-helpers';
 import { createDocument } from '../utils/create-document';
 import { deleteDocument } from '../utils/delete-document';
@@ -81,21 +83,9 @@ test.describe('Blog CRUD via TinaCMS Admin', () => {
       'A test blog created by Playwright'
     );
 
-    const authorSelect = page.locator(
-      'label:has-text("Author") ~ div select, label:has-text("Author") ~ div [role="combobox"]'
-    );
-    try {
-      await authorSelect.first().click({ timeout: 3000 });
-      await page.keyboard.type('e2e blog dep');
-      const option = page.locator(
-        `[role="option"]:has-text("${DEP_AUTHOR_FILENAME}")`
-      );
-      if (await option.isVisible({ timeout: 3000 })) {
-        await option.click();
-      }
-    } catch {
-      console.warn('Could not set author reference — continuing without it');
-    }
+    // Select the dependency author via the reference combobox.
+    // selectReference asserts the trigger updates — fails loudly if the DOM has drifted.
+    await selectReference(page, 'Author', DEP_AUTHOR_FILENAME);
 
     contentCleanup.track('blog', EDIT_BLOG_RELATIVE_PATH);
     await clickSave(page);
@@ -104,6 +94,12 @@ test.describe('Blog CRUD via TinaCMS Admin', () => {
     await expect(page.locator(`text=${EDIT_BLOG_SLUG}`).first()).toBeVisible({
       timeout: 10000,
     });
+
+    // Reload the edit form and verify the author reference persisted
+    await navigateToEdit(page, 'blog', EDIT_BLOG_SLUG);
+    await expect(referenceTrigger(page, 'Author')).toContainText(
+      DEP_AUTHOR_FILENAME
+    );
   });
 
   test('should edit an existing blog', async ({ page, contentCleanup }) => {

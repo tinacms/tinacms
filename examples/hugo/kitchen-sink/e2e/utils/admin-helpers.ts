@@ -1,4 +1,4 @@
-import { type Page } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
 
 /**
  * Dismiss any modal dialog that might be blocking the admin UI.
@@ -100,6 +100,46 @@ export async function navigateToEdit(
   await dismissEditModeDialog(page);
   // Wait for the form to be ready
   await page.waitForSelector('button:has-text("Save")', { timeout: 10000 });
+}
+
+/**
+ * Select an option in a reference field and assert the selection registered.
+ *
+ * Reference fields render as a Radix popover combobox:
+ *   - Trigger: `<button role="combobox">` — shows "Choose an option..." until set,
+ *     then the filename of the chosen document.
+ *   - Open: a "Search reference..." input plus `<div role="option">` entries whose
+ *     text is the document id (full path, e.g. `content/authors/foo.md`).
+ *
+ * Scoped via the field's label wrapper so multiple reference fields on one form
+ * disambiguate. Fails loudly if the trigger doesn't update — callers can trust
+ * the selection stuck before saving.
+ */
+export async function selectReference(
+  page: Page,
+  labelText: string,
+  filename: string
+): Promise<void> {
+  const field = page
+    .locator(`div:has(> label:text-is("${labelText}"))`)
+    .first();
+  const trigger = field.getByRole('combobox');
+  await trigger.click();
+  await page.getByPlaceholder('Search reference...').fill(filename);
+  const option = page.getByRole('option').filter({ hasText: filename }).first();
+  await option.click();
+  await expect(trigger).toContainText(filename);
+}
+
+/**
+ * Locate the combobox trigger for a reference field by its label text.
+ * Useful for assertions after save + reload.
+ */
+export function referenceTrigger(page: Page, labelText: string) {
+  return page
+    .locator(`div:has(> label:text-is("${labelText}"))`)
+    .first()
+    .getByRole('combobox');
 }
 
 /**

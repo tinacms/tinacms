@@ -5,6 +5,8 @@ import {
   navigateToCreate,
   navigateToEdit,
   navigateToList,
+  referenceTrigger,
+  selectReference,
 } from '../utils/admin-helpers';
 import { createDocument } from '../utils/create-document';
 import { deleteDocument } from '../utils/delete-document';
@@ -91,26 +93,9 @@ test.describe('Post CRUD via TinaCMS Admin', () => {
 
     await page.fill('input[name="title"]', EDIT_POST_TITLE);
 
-    // Select the dependency author via the reference combobox
-    const authorSelect = page.locator(
-      'label:has-text("Author") ~ div select, label:has-text("Author") ~ div [role="combobox"]'
-    );
-    // Try clicking the author field area to open the dropdown
-    try {
-      await authorSelect.first().click({ timeout: 3000 });
-      // Type to filter and select the dependency author
-      await page.keyboard.type('e2e post dep');
-      // Select the first matching option
-      const option = page.locator(
-        `[role="option"]:has-text("${DEP_AUTHOR_FILENAME}")`
-      );
-      if (await option.isVisible({ timeout: 3000 })) {
-        await option.click();
-      }
-    } catch {
-      // Reference field interaction may vary — continue without it
-      console.warn('Could not set author reference — continuing without it');
-    }
+    // Select the dependency author via the reference combobox.
+    // selectReference asserts the trigger updates — fails loudly if the DOM has drifted.
+    await selectReference(page, 'Author', DEP_AUTHOR_FILENAME);
 
     contentCleanup.track('post', EDIT_POST_RELATIVE_PATH);
     await clickSave(page);
@@ -120,6 +105,12 @@ test.describe('Post CRUD via TinaCMS Admin', () => {
     await expect(page.locator(`text=${EDIT_POST_SLUG}`).first()).toBeVisible({
       timeout: 10000,
     });
+
+    // Reload the edit form and verify the author reference persisted
+    await navigateToEdit(page, 'post', EDIT_POST_SLUG);
+    await expect(referenceTrigger(page, 'Author')).toContainText(
+      DEP_AUTHOR_FILENAME
+    );
   });
 
   test('should edit an existing post title', async ({
