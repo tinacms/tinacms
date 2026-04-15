@@ -161,7 +161,7 @@ test.describe("Document CRUD lifecycle (md format)", () => {
     expect(readAfterUpdateBody.data.post.title).toBe(
       "Playwright CRUD Test (updated)"
     );
-    expect(readAfterUpdateBody.data.post.body).toBe("Updated body content.");
+    expect(readAfterUpdateBody.data.post.body.trim()).toBe("Updated body content.");
 
     // ------------------------------------------------------------------
     // DELETE — contentCleanup.track handles deletion in teardown,

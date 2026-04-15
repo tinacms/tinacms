@@ -16,6 +16,9 @@ export const config = defineConfig({
   schema: {
     collections: [page, post, author, settings],
   },
+  search: {
+    tina: {},
+  },
 });
 
 export default config;
