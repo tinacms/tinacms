@@ -11,6 +11,7 @@ import chalk from 'chalk';
 import { logger } from '../logger';
 import { createRequire } from 'module';
 import { stripNativeTrailingSlash } from '../utils/path';
+import { getExternalPackagesFromEnv } from './external-packages';
 
 export const TINA_FOLDER = 'tina';
 export const LEGACY_TINA_FOLDER = '.tina';
@@ -390,25 +391,30 @@ export class ConfigManager {
     // https://github.com/nodejs/modules/issues/307
     const tmpdir = path.join(os.tmpdir(), Date.now().toString());
     const outfile = path.join(tmpdir, 'database.build.mjs'); // .mjs tells Node.js this is ESM
-    await esbuild.build({
-      entryPoints: [this.selfHostedDatabaseFilePath],
-      bundle: true,
-      platform: 'node',
-      format: 'esm',
-      outfile: outfile,
-      loader: loaders,
-      // Provide a require() polyfill for ESM bundles containing CommonJS packages.
-      // Some bundled packages (e.g., 'scmp' used by 'mongodb-level') use require('crypto').
-      // When esbuild inlines these CommonJS packages, it keeps the require() calls,
-      // but ESM doesn't have a global require. This banner creates one using Node.js's
-      // official createRequire API, allowing the bundled CommonJS code to work in ESM.
-      banner: {
-        js: `import { createRequire } from 'module';const require = createRequire(import.meta.url);`,
-      },
-    });
-    const result = await import(pathToFileURL(outfile).href);
-    fs.removeSync(outfile);
-    return result.default;
+    await fs.ensureDir(tmpdir);
+    try {
+      await esbuild.build({
+        entryPoints: [this.selfHostedDatabaseFilePath],
+        bundle: true,
+        platform: 'node',
+        format: 'esm',
+        outfile: outfile,
+        loader: loaders,
+        external: getExternalPackagesFromEnv(),
+        // Provide a require() polyfill for ESM bundles containing CommonJS packages.
+        // Some bundled packages (e.g., 'scmp' used by 'mongodb-level') use require('crypto').
+        // When esbuild inlines these CommonJS packages, it keeps the require() calls,
+        // but ESM doesn't have a global require. This banner creates one using Node.js's
+        // official createRequire API, allowing the bundled CommonJS code to work in ESM.
+        banner: {
+          js: `import { createRequire } from 'module';const require = createRequire(import.meta.url);`,
+        },
+      });
+      const result = await import(pathToFileURL(outfile).href);
+      return result.default;
+    } finally {
+      fs.removeSync(tmpdir);
+    }
   }
 
   async loadConfigFile(generatedFolderPath: string, configFilePath: string) {
@@ -424,6 +430,7 @@ export class ConfigManager {
     const outfile = path.join(tmpdir, 'config.build.jsx');
     const outfile2 = path.join(tmpdir, 'config.build.mjs');
     const tempTSConfigFile = path.join(tmpdir, 'tsconfig.json');
+    const externalPackages = getExternalPackagesFromEnv();
 
     // Provide a require() polyfill for ESM bundles containing CommonJS packages.
     // Some packages (e.g., 'postcss-selector-parser' via tailwindcss) use require() internally.
@@ -431,65 +438,70 @@ export class ConfigManager {
       js: `import { createRequire } from 'module';const require = createRequire(import.meta.url);`,
     };
 
-    fs.outputFileSync(tempTSConfigFile, '{}');
-    const result2 = await esbuild.build({
-      entryPoints: [configFilePath],
-      bundle: true,
-      target: ['esnext'],
-      platform: 'browser',
-      format: 'esm',
-      logLevel: 'silent',
-      packages: 'external',
-      ignoreAnnotations: true,
-      outfile: preBuildConfigPath,
-      loader: loaders,
-      metafile: true,
-    });
-    const flattenedList = [];
-
-    Object.keys(result2.metafile.inputs).forEach((key) => {
-      if (key.includes('node_modules') || key.includes('__generated__')) {
-        return;
-      }
-      flattenedList.push(key);
-    });
-
-    await esbuild.build({
-      entryPoints: [configFilePath],
-      bundle: true,
-      target: ['esnext'],
-      logLevel: 'silent',
-      platform: 'node',
-      format: 'esm',
-      outfile,
-      loader: loaders,
-      banner: esmRequireBanner,
-    });
-    await esbuild.build({
-      entryPoints: [outfile],
-      bundle: true,
-      logLevel: 'silent',
-      platform: 'node',
-      target: ['esnext'],
-      format: 'esm',
-      outfile: outfile2,
-      loader: loaders,
-    });
-    let result: { default: any };
+    await fs.ensureDir(tmpdir);
     try {
-      result = await import(pathToFileURL(outfile2).href);
-    } catch (e) {
-      console.error('Unexpected error loading config');
-      console.error(e);
-      throw e;
+      fs.outputFileSync(tempTSConfigFile, '{}');
+      const result2 = await esbuild.build({
+        entryPoints: [configFilePath],
+        bundle: true,
+        target: ['esnext'],
+        platform: 'browser',
+        format: 'esm',
+        logLevel: 'silent',
+        packages: 'external',
+        ignoreAnnotations: true,
+        outfile: preBuildConfigPath,
+        loader: loaders,
+        metafile: true,
+      });
+      const flattenedList = [];
+
+      Object.keys(result2.metafile.inputs).forEach((key) => {
+        if (key.includes('node_modules') || key.includes('__generated__')) {
+          return;
+        }
+        flattenedList.push(key);
+      });
+
+      await esbuild.build({
+        entryPoints: [configFilePath],
+        bundle: true,
+        target: ['esnext'],
+        logLevel: 'silent',
+        platform: 'node',
+        format: 'esm',
+        outfile,
+        loader: loaders,
+        external: externalPackages,
+        banner: esmRequireBanner,
+      });
+      await esbuild.build({
+        entryPoints: [outfile],
+        bundle: true,
+        logLevel: 'silent',
+        platform: 'node',
+        target: ['esnext'],
+        format: 'esm',
+        outfile: outfile2,
+        loader: loaders,
+        external: externalPackages,
+      });
+      let result: { default: any };
+      try {
+        result = await import(pathToFileURL(outfile2).href);
+      } catch (e) {
+        console.error('Unexpected error loading config');
+        console.error(e);
+        throw e;
+      }
+      return {
+        config: result.default,
+        prebuildPath: preBuildConfigPath,
+        watchList: flattenedList,
+      };
+    } finally {
+      fs.removeSync(tmpdir);
     }
-    fs.removeSync(outfile);
-    fs.removeSync(outfile2);
-    return {
-      config: result.default,
-      prebuildPath: preBuildConfigPath,
-      watchList: flattenedList,
-    };
   }
 }
 
