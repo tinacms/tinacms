@@ -1,6 +1,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 import { pathToFileURL } from 'url';
+import { randomUUID } from 'node:crypto';
 import * as esbuild from 'esbuild';
 import type { Loader } from 'esbuild';
 import { Config } from '@tinacms/schema-tools';
@@ -391,7 +392,7 @@ export class ConfigManager {
     const tmpdir = path.join(
       this.generatedFolderPath,
       '.tmp',
-      `database-${Date.now()}`
+      `database-${randomUUID()}`
     );
     const outfile = path.join(tmpdir, 'database.build.mjs'); // .mjs tells Node.js this is ESM
     await fs.ensureDir(tmpdir);
@@ -427,7 +428,7 @@ export class ConfigManager {
     const tmpdir = path.join(
       this.generatedFolderPath,
       '.tmp',
-      `config-${Date.now()}`
+      `config-${randomUUID()}`
     );
     const preBuildConfigPath = path.join(
       this.generatedFolderPath,
