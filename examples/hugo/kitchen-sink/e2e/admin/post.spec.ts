@@ -2,10 +2,11 @@ import type { APIRequestContext } from '@playwright/test';
 import { expect, test } from '../fixtures/test-content';
 import {
   clickSave,
-  clickSaveNew,
   navigateToCreate,
   navigateToEdit,
   navigateToList,
+  referenceTrigger,
+  selectReference,
 } from '../utils/admin-helpers';
 import { createDocument } from '../utils/create-document';
 import { deleteDocument } from '../utils/delete-document';
@@ -64,7 +65,7 @@ test.describe('Post CRUD via TinaCMS Admin', () => {
     await navigateToCreate(page, 'post');
     await page.fill('input[name="title"]', POST_TITLE);
     contentCleanup.track('post', POST_RELATIVE_PATH);
-    await clickSaveNew(page);
+    await clickSave(page);
 
     await navigateToList(page, 'post');
     const postEntry = page.locator(`text=${POST_SLUG}`).first();
@@ -78,29 +79,23 @@ test.describe('Post CRUD via TinaCMS Admin', () => {
     await navigateToCreate(page, 'post');
     await page.fill('input[name="title"]', EDIT_POST_TITLE);
 
-    const authorSelect = page.locator(
-      'label:has-text("Author") ~ div select, label:has-text("Author") ~ div [role="combobox"]'
-    );
-    try {
-      await authorSelect.first().click({ timeout: 3000 });
-      await page.keyboard.type('e2e post dep');
-      const option = page.locator(
-        `[role="option"]:has-text("${DEP_AUTHOR_FILENAME}")`
-      );
-      if (await option.isVisible({ timeout: 3000 })) {
-        await option.click();
-      }
-    } catch {
-      console.warn('Could not set author reference — continuing without it');
-    }
+    // Select the dependency author via the reference combobox.
+    // selectReference asserts the trigger updates — fails loudly if the DOM has drifted.
+    await selectReference(page, 'Author', DEP_AUTHOR_FILENAME);
 
     contentCleanup.track('post', EDIT_POST_RELATIVE_PATH);
-    await clickSaveNew(page);
+    await clickSave(page);
 
     await navigateToList(page, 'post');
     await expect(page.locator(`text=${EDIT_POST_SLUG}`).first()).toBeVisible({
       timeout: 10000,
     });
+
+    // Reload the edit form and verify the author reference persisted
+    await navigateToEdit(page, 'post', EDIT_POST_SLUG);
+    await expect(referenceTrigger(page, 'Author')).toContainText(
+      DEP_AUTHOR_FILENAME
+    );
   });
 
   test('should edit an existing post title', async ({
@@ -110,7 +105,7 @@ test.describe('Post CRUD via TinaCMS Admin', () => {
     await navigateToCreate(page, 'post');
     await page.fill('input[name="title"]', POST_TITLE);
     contentCleanup.track('post', POST_RELATIVE_PATH);
-    await clickSaveNew(page);
+    await clickSave(page);
 
     await navigateToEdit(page, 'post', POST_SLUG);
     const titleInput = page.locator('input[name="title"]');

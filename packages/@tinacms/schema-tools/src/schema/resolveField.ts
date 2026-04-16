@@ -187,6 +187,12 @@ export const resolveField = (
         component: 'reference',
         ...extraFields,
       };
+    case 'displayOnly':
+      return {
+        component: 'displayOnly',
+        ...field,
+        ...extraFields,
+      };
     default:
       // @ts-ignore
       throw new Error(`Unknown field type ${field.type}`);

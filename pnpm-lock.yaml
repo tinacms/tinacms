@@ -920,6 +920,9 @@ importers:
       autoprefixer:
         specifier: 'catalog:'
         version: 10.4.23(postcss@8.5.6)
+      cross-env:
+        specifier: ^7.0.3
+        version: 7.0.3
       postcss:
         specifier: ^8.5.2
         version: 8.5.6
@@ -1002,6 +1005,9 @@ importers:
       autoprefixer:
         specifier: 'catalog:'
         version: 10.4.23(postcss@8.5.6)
+      cross-env:
+        specifier: ^7.0.3
+        version: 7.0.3
       eslint:
         specifier: ^8.57.1
         version: 8.57.1
@@ -1087,6 +1093,9 @@ importers:
       autoprefixer:
         specifier: 'catalog:'
         version: 10.4.23(postcss@8.5.6)
+      cross-env:
+        specifier: ^7.0.3
+        version: 7.0.3
       postcss:
         specifier: ^8.5.2
         version: 8.5.6
