@@ -333,6 +333,16 @@ export type PasswordField = (
     type: 'password';
   };
 
+export type DisplayOnlyField = BaseField & {
+  type: 'displayOnly';
+  list?: never;
+  required?: never;
+  indexed?: never;
+  ui?: {
+    component?: FC<any> | null;
+  };
+};
+
 export type ToolbarOverrideType =
   | 'heading'
   | 'link'
@@ -504,6 +514,7 @@ type Field<WithNamespace extends boolean = false> = (
   | RichTextField<WithNamespace>
   | ObjectField<WithNamespace>
   | PasswordField
+  | DisplayOnlyField
 ) &
   MaybeNamespace<WithNamespace>;
 
