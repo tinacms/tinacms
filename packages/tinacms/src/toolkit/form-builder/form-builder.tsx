@@ -269,7 +269,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
           if (usingProtectedBranch) {
             setCreateBranchModalOpen(true);
           } else {
-            safeSubmit();
+            await safeSubmit();
           }
 
           setIsGuardChecking(false);
