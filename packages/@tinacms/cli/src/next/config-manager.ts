@@ -10,6 +10,7 @@ import chalk from 'chalk';
 import { logger } from '../logger';
 import { createRequire } from 'module';
 import { stripNativeTrailingSlash } from '../utils/path';
+import { getExternalPackagesFromEnv } from './external-packages';
 
 export const TINA_FOLDER = 'tina';
 export const LEGACY_TINA_FOLDER = '.tina';
@@ -18,19 +19,6 @@ const GRAPHQL_JSON_FILE = '_graphql.json';
 const GRAPHQL_GQL_FILE = 'schema.gql';
 const SCHEMA_JSON_FILE = '_schema.json';
 const LOOKUP_JSON_FILE = '_lookup.json';
-const TINA_EXTERNAL_PKGS_ENV = 'TINA_EXTERNAL_PKGS';
-
-export const getExternalPackagesFromEnv = (
-  envValue = process.env[TINA_EXTERNAL_PKGS_ENV]
-) => {
-  if (!envValue) {
-    return [];
-  }
-  return envValue
-    .split(',')
-    .map((pkg) => pkg.trim())
-    .filter(Boolean);
-};
 
 export class ConfigManager {
   config: Config;

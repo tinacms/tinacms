@@ -1,4 +1,4 @@
-import { getExternalPackagesFromEnv } from './config-manager';
+import { getExternalPackagesFromEnv } from './external-packages';
 
 describe('getExternalPackagesFromEnv', () => {
   it('returns an empty array when env var is undefined', () => {
