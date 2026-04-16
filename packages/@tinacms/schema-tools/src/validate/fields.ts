@@ -121,6 +121,14 @@ const DisplayOnlyField = TinaField.omit({ required: true }).extend({
       }),
     })
     .optional(),
+  indexed: z
+    .literal(undefined, {
+      errorMap: () => ({
+        message:
+          'Property `indexed` is not allowed on fields of `type: displayOnly`.',
+      }),
+    })
+    .optional(),
 });
 
 // ==========
