@@ -14,6 +14,7 @@ export default defineConfig({
     ['json', { outputFile: 'test-results/results.json' }],
   ],
   testDir: './e2e',
+  globalSetup: './e2e/global-setup.ts',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
@@ -25,15 +26,18 @@ export default defineConfig({
   },
   projects: [
     {
-      name: 'chromium',
+      name: 'frontend',
       use: { ...devices['Desktop Chrome'] },
+      testIgnore: /admin\//,
+    },
+    {
+      name: 'admin',
+      use: { ...devices['Desktop Chrome'] },
+      testMatch: /admin\/.*\.spec\.ts$/,
     },
   ],
   webServer: {
-    command:
-      process.platform === 'win32'
-        ? 'set MONOREPO_DEV=true && pnpm tinacms dev -c "next dev"'
-        : 'pnpm dev',
+    command: 'pnpm dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120000,

@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "TINA_PUBLIC_IS_LOCAL=true tinacms dev -c \"next dev\"",
+    "dev": "cross-env TINA_PUBLIC_IS_LOCAL=true tinacms dev -c \"next dev\"",
     "dev:prod": "tinacms dev --verbose -c \"next dev\"",
     "build": "tinacms build && next build",
     "start": "tinacms build && next start",
@@ -38,6 +38,7 @@
     "@typescript-eslint/eslint-plugin": "catalog:",
     "@typescript-eslint/parser": "catalog:",
     "autoprefixer": "catalog:",
+    "cross-env": "^7.0.3",
     "eslint": "^8.57.1",
     "postcss": "^8.5.2",
     "postcss-import": "catalog:",

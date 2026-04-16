@@ -1,0 +1,38 @@
+name: Playwright — React kitchen-sink
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'examples/react/kitchen-sink/**'
+      - '.github/workflows/playwright-react-kitchen-sink.yml'
+
+jobs:
+  e2e:
+    name: react-kitchen-sink-e2e
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          package_json_file: package.json
+          run_install: false
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build workspace packages
+        run: pnpm build
+      - name: Install Playwright browsers
+        working-directory: examples/react/kitchen-sink
+        run: npx playwright install --with-deps chromium
+      - name: Run React kitchen-sink Playwright tests
+        working-directory: examples/react/kitchen-sink
+        run: npx playwright test
+        env:
+          CI: true
