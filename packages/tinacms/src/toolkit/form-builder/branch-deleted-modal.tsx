@@ -35,7 +35,10 @@ export const BranchDeletedModal = ({
   const tinaApi = cms.api.tina;
   const [newBranchName, setNewBranchName] = React.useState('');
 
-  const baseBranch = tinaApi.protectedBranches[0] || cms.api.tina.schema.config.config.repoProvider.defaultBranchName || 'main';
+  const baseBranch =
+    tinaApi.protectedBranches[0] ||
+    cms.api.tina.schema.config.config.repoProvider.defaultBranchName ||
+    'main';
 
   const {
     isExecuting,
