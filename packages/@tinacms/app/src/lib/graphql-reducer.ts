@@ -902,6 +902,7 @@ const expandPayload = async (
   const expandedDocumentNodeForResolver = expandQuery({
     schema: schemaForResolver,
     documentNode,
+    includeNodeMetadata: true,
   });
   const expandedQueryForResolver = G.print(expandedDocumentNodeForResolver);
   return { ...payload, expandedQuery, expandedData, expandedQueryForResolver };

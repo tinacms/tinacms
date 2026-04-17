@@ -93,9 +93,10 @@ export const getDeepestMetadata = (state: Object, complexKey: string): any => {
     }
     const value = current[key];
     if (value?._tina_metadata) {
-      // We're at a reference field, we don't want to select the
-      // reference form, just the reference select field
-      if (complexKey === value._tina_metadata?.prefix && metadata) {
+      if (value._tina_metadata.id === null) {
+        // Placeholder metadata from connection/list types — skip it
+      } else if (complexKey === value._tina_metadata?.prefix && metadata) {
+        // Reference field — keep the parent form's metadata
       } else {
         metadata = value._tina_metadata;
       }
