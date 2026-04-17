@@ -11,9 +11,9 @@ import { APIRequestContext, APIResponse } from "@playwright/test";
 // Pass `rawPath: true` to send the path unencoded, which is required for
 // vectors that are already percent-encoded (they test the double-decode path).
 
-type RequestOpts = { rawPath?: boolean };
+export type RequestOpts = { rawPath?: boolean };
 
-const encodePath = (relativePath: string, rawPath?: boolean) =>
+export const encodeMediaPath = (relativePath: string, rawPath?: boolean) =>
   rawPath ? relativePath : encodeURIComponent(relativePath);
 
 export function uploadMedia(
@@ -24,7 +24,7 @@ export function uploadMedia(
 ): Promise<APIResponse> {
   const filename = relativePath.split("/").pop() ?? relativePath;
   return apiContext.post(
-    `/media/upload/${encodePath(relativePath, opts.rawPath)}`,
+    `/media/upload/${encodeMediaPath(relativePath, opts.rawPath)}`,
     {
       multipart: {
         file: {
@@ -54,5 +54,5 @@ export function deleteMedia(
   relativePath: string,
   opts: RequestOpts = {}
 ): Promise<APIResponse> {
-  return apiContext.delete(`/media/${encodePath(relativePath, opts.rawPath)}`);
+  return apiContext.delete(`/media/${encodeMediaPath(relativePath, opts.rawPath)}`);
 }

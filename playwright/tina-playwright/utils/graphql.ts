@@ -1,5 +1,9 @@
 import { APIRequestContext } from "@playwright/test";
 
+// Collection names defined in tina/collections/*.js. Typed so typos surface
+// at compile time rather than as a runtime "collection not found" error.
+export type CollectionName = "post" | "author" | "page" | "settings";
+
 // GraphQL operations — shared across every API spec that mutates content.
 
 export const CREATE_DOCUMENT = `
@@ -32,7 +36,7 @@ type GqlResponse<T = unknown> = {
 };
 
 type MutationArgs = {
-  collection: string;
+  collection: CollectionName;
   relativePath: string;
   params?: Record<string, unknown>;
 };

@@ -1,14 +1,14 @@
 import fs from "fs";
 import path from "path";
 import { test as apiTest } from "./api-context";
-import { deleteDocument } from "../utils/graphql";
+import { deleteDocument, type CollectionName } from "../utils/graphql";
 import { deleteMedia, listMedia } from "../utils/media";
 
 // Convention mirrors the `path:` field on every collection in tina/collections/*.
 const CONTENT_ROOT = path.resolve(__dirname, "..", "content");
 
 type TrackedDocument = {
-  collection: string;
+  collection: CollectionName;
   relativePath: string;
 };
 
@@ -22,7 +22,7 @@ type ContentLifecycleFixtures = {
    *   });
    */
   contentCleanup: {
-    track(collection: string, relativePath: string): void;
+    track(collection: CollectionName, relativePath: string): void;
   };
   /**
    * Register an uploaded media file for automatic deletion after the test

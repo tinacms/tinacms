@@ -24,7 +24,6 @@ const GET_POST = `
 const POST_CONNECTION_BY_TITLE = `
   query PostConnectionByTitle($filter: PostFilter) {
     postConnection(filter: $filter) {
-      totalCount
       edges { node { title } }
     }
   }
@@ -74,14 +73,15 @@ test("concurrent updates on the same document all resolve without data loss", as
   const finalTitle = readBody.data.post.title;
   expect(titles).toContain(finalTitle);
 
-  // 3. The title index reflects exactly one document — no stale entries left
-  //    behind by the losing writes
+  // 3. The title index contains exactly one edge across ALL sent titles —
+  //    proves the losing writes left no stale entries behind. Querying all
+  //    8 titles at once catches orphaned index rows regardless of which
+  //    title ended up winning.
   const indexBody = (await gqlRequest(apiContext, POST_CONNECTION_BY_TITLE, {
-    filter: { title: { eq: finalTitle } },
+    filter: { title: { in: titles } },
   })) as {
     data: {
       postConnection: {
-        totalCount: number;
         edges: Array<{ node: { title: string } }>;
       };
     };
