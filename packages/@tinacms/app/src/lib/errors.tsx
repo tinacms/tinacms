@@ -10,7 +10,7 @@ const ErrorModalContent = (props: { title: string; message: string }) => {
       <div>{title}</div>
       <p>{message}</p>
       <a href={TROUBLESHOOTING_URL} target='_blank' rel='noopener noreferrer'>
-        Learn more
+        Try these troubleshooting tips
       </a>
     </>
   );
