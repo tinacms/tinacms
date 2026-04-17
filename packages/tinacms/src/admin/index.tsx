@@ -40,6 +40,26 @@ import pkg from '../../package.json';
 
 type AuthType = 'tinacloud' | 'self-hosted' | 'local' | 'other';
 
+const TROUBLESHOOTING_URL = 'https://tina.io/docs/tinacloud/troubleshooting';
+
+const ErrorModalContent = (props: { title: string; message: string }) => {
+  const { title, message } = props;
+  return (
+    <>
+      <div>{title}</div>
+      <p>{message}</p>
+      <a href={TROUBLESHOOTING_URL} target='_blank' rel='noopener noreferrer'>
+        Learn more
+      </a>
+    </>
+  );
+};
+
+const showErrorModal = (title: string, message: string, cms: TinaCMS) => {
+  if (cms.alerts.all.some((a) => a.level === 'error')) return;
+  cms.alerts.error(() => <ErrorModalContent title={title} message={message} />);
+};
+
 const getBackendType = (client: Client | undefined): AuthType => {
   if (!client) return 'other';
 
@@ -198,14 +218,10 @@ const CheckSchema = ({
         })
         .then((isSchemaMatchedToCloud) => {
           if (isSchemaMatchedToCloud === false) {
-            cms.alerts.error(
-              `GraphQL Schema Mismatch - Editing may not work. 
-              
-              If you just switched branches, try going back to the previous branch.
-              
-              If you just pushed changes to the branch, try pulling the latest changes.
-              
-              For more information, please see https://tina.io/docs/r/troubleshooting`
+            showErrorModal(
+              'GraphQL Schema Mismatch',
+              'Editing may not work. If you just switched branches, try going back to the previous branch. If you just pushed changes, try pulling the latest.',
+              cms
             );
           }
         })
@@ -214,7 +230,12 @@ const CheckSchema = ({
           if (error.message.includes('has not been indexed by TinaCloud')) {
             setSchemaMissingError(true);
           } else {
-            cms.alerts.error(`Unexpected error checking schema: ${error}`);
+            console.error('Unexpected error checking schema:', error);
+            showErrorModal(
+              'Unexpected Error',
+              'An unexpected error occurred while validating your Tina schema. If after refreshing the issue persists, reach out to us on Discord.',
+              cms
+            );
             throw error;
           }
         });
