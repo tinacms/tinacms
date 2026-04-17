@@ -12,6 +12,7 @@ import {
   CheckboxGroupFieldPlugin,
   ColorFieldPlugin,
   DateFieldPlugin,
+  DisplayOnlyFieldPlugin,
   GroupFieldPlugin,
   GroupListFieldPlugin,
   HiddenFieldPlugin,
@@ -65,6 +66,7 @@ const DEFAULT_FIELDS = [
   ButtonToggleFieldPlugin,
   HiddenFieldPlugin,
   PasswordFieldPlugin,
+  DisplayOnlyFieldPlugin,
 ];
 
 export interface TinaCMSConfig extends CMSConfig {
