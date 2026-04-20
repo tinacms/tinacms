@@ -1,15 +1,13 @@
 import { APIRequestContext, APIResponse } from "@playwright/test";
 
-// Media HTTP routes exposed by the Vite dev server:
-//   POST   /media/upload/<relativePath>   (multipart)
+// Helpers for the three media routes served by the Vite dev server:
+//   POST   /media/upload/<path>   (multipart)
 //   GET    /media/list/<folder>
-//   DELETE /media/<relativePath>
+//   DELETE /media/<path>
 //
-// The path segment is URL-encoded so that exotic inputs (../, null bytes,
-// backslashes) survive client-side URL normalisation and reach the server
-// verbatim — the server then runs decodeURIComponent and validates.
-// Pass `rawPath: true` to send the path unencoded, which is required for
-// vectors that are already percent-encoded (they test the double-decode path).
+// Paths are URL-encoded so exotic inputs (../, null bytes) survive client-side
+// normalisation — the server decodes and validates. Pass `rawPath: true` for
+// vectors that are already percent-encoded.
 
 export type RequestOpts = { rawPath?: boolean };
 

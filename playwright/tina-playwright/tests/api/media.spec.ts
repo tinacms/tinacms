@@ -1,7 +1,6 @@
 /**
- * Media routes end-to-end — verifies /media/upload, /media/list and
- * /media/{path} work against the real Vite dev server and write/read from
- * public/uploads/ as configured in tina/config.js.
+ * Media routes end-to-end — upload → list → delete against the real Vite
+ * dev server writing to public/uploads/.
  */
 
 import { test, expect } from "../../fixtures/test-content";
@@ -14,23 +13,22 @@ test("media — upload → list → delete round-trip", async ({
   const filename = `playwright-media-${Date.now()}.txt`;
   const contents = Buffer.from("playwright upload payload");
 
-  // Track before the first assertion so teardown runs even if any step below fails.
+  // Track before the first assertion so teardown runs even if the test fails.
   mediaCleanup.track(filename);
 
-  // UPLOAD
+  // UPLOAD — multipart POST writes the file to public/uploads/.
   const uploadResp = await uploadMedia(apiContext, filename, contents);
   expect(uploadResp.status()).toBe(200);
   expect(await uploadResp.json()).toEqual({ success: true });
 
-  // LIST — file must appear
+  // LIST — the uploaded file must appear in the directory listing.
   const afterUpload = await listMedia(apiContext);
   expect(afterUpload.files.map((f) => f.filename)).toContain(filename);
 
-  // DELETE
+  // DELETE — remove the file and confirm it's gone from subsequent listings.
   const deleteResp = await deleteMedia(apiContext, filename);
   expect(deleteResp.ok()).toBeTruthy();
 
-  // LIST — file must be gone
   const afterDelete = await listMedia(apiContext);
   expect(afterDelete.files.map((f) => f.filename)).not.toContain(filename);
 });

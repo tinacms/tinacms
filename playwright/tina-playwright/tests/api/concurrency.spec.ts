@@ -1,13 +1,8 @@
 /**
- * Concurrency guard — verifies that the AsyncLock wrapping gqlResolve
- * (cli/src/next/vite/plugins.ts) keeps concurrent mutations consistent.
- *
- * All writes are serialised by `databaseLock`, so N parallel updates on the
- * same document must:
- *   1. All resolve without GraphQL errors (no lock timeout, no mid-write throw)
- *   2. Leave the document readable with one of the sent titles
- *   3. Leave the LevelDB `title` index with exactly one matching edge — if a
- *      write's index ops were dropped or doubled, the regression surfaces here
+ * Concurrency guard — N parallel updates on the same document must all
+ * resolve, leave the doc readable with one of the sent titles, and leave
+ * the LevelDB title index with exactly one matching edge. Catches a
+ * regression that bypasses the AsyncLock wrapping gqlResolve.
  */
 
 import { test, expect } from "../../fixtures/test-content";
@@ -61,22 +56,20 @@ test("concurrent updates on the same document all resolve without data loss", as
     )
   );
 
-  // 1. Every mutation succeeds
+  // 1. Every mutation resolves cleanly — no lock timeout, no mid-write throw.
   for (const body of responses) {
     expect(body.errors).toBeUndefined();
   }
 
-  // 2. Final read returns one of the sent titles (not a corrupted half-state)
+  // 2. Final read matches one of the sent titles — no corrupted half-state.
   const readBody = (await gqlRequest(apiContext, GET_POST, {
     relativePath,
   })) as { data: { post: { title: string } } };
   const finalTitle = readBody.data.post.title;
   expect(titles).toContain(finalTitle);
 
-  // 3. The title index contains exactly one edge across ALL sent titles —
-  //    proves the losing writes left no stale entries behind. Querying all
-  //    8 titles at once catches orphaned index rows regardless of which
-  //    title ended up winning.
+  // 3. Exactly one edge across ALL sent titles. Using `in: titles` instead of
+  //    `eq: finalTitle` catches stale index rows under any losing title.
   const indexBody = (await gqlRequest(apiContext, POST_CONNECTION_BY_TITLE, {
     filter: { title: { in: titles } },
   })) as {

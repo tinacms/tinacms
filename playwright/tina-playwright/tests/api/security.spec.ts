@@ -1,23 +1,26 @@
 /**
  * Path-traversal tests at the HTTP boundary.
  *
- * Every traversal vector is applied to every mutation surface (createDocument,
- * updateDocument, deleteDocument) and every media route (upload, list, delete).
- * Each rejection must:
+ * Every vector runs against all three mutations (create/update/delete) and
+ * all three media routes (upload/list/delete). Each rejection must:
+ *   1. Error on the wire (GraphQL `errors` or HTTP 4xx/5xx).
+ *   2. Not leak server-side filesystem paths in the response.
+ *   3. Not have written a file — `assertNoEscapeWrite` guards against a
+ *      regression that returns an error but still writes.
  *
- *   1. Return an error (GraphQL `errors` field, or HTTP 4xx/5xx for media).
- *   2. Not leak server-side filesystem details in the response body. The leak
- *      check strips the attacker's own input first so an echoed payload like
- *      "Path traversal detected: ../../etc/passwd.md" isn't mistaken for a
- *      real disclosure.
- *   3. Not have written a file anywhere under content/post/ or at the
- *      attempted traversal escape target — guards against a regression that
- *      returns an error but still writes the file.
+ * What each vector exercises:
+ *   - relative / deep traversal → allowlisted chars; hits the path-relative
+ *     escape check on GraphQL and the resolveStrictlyWithinBase check on media
+ *   - URL-encoded traversal → GraphQL: blocked by the character allowlist.
+ *     Media: proves decodeURIComponent runs before validation
+ *   - null byte → GraphQL: blocked by allowlist. Media: Node's fs rejects —
+ *     upload 500, list/delete swallow to 200 (no traversal)
+ *   - backslash traversal → GraphQL: blocked by allowlist. Media: only a
+ *     separator on Win32; POSIX tests are skipped
  *
- * Absolute paths (`/etc/passwd.md`) are intentionally excluded from this
- * table: `path.join(collection.path, '/...')` silently drops the leading
- * slash, so no error is raised even though the result stays inside the
- * collection. That case has no attack surface here.
+ * Absolute paths (`/etc/passwd.md`) are excluded: `path.join(collection.path,
+ * '/...')` silently drops the leading slash, so the result stays inside the
+ * collection — no attack surface here.
  */
 
 import fs from "fs";
@@ -35,6 +38,10 @@ import {
   encodeMediaPath,
 } from "../../utils/media";
 
+// ---------------------------------------------------------------------------
+// Traversal vectors — plausible attack payloads that must be rejected.
+// ---------------------------------------------------------------------------
+
 type MediaRouteKey = "upload" | "list" | "delete";
 
 type Vector = {
@@ -42,17 +49,17 @@ type Vector = {
   path: string;
   /** Vector is already percent-encoded — skip re-encoding in the URL. */
   rawUploadPath?: boolean;
-  /**
-   * Per-route expected status for the media matrix. Defaults to 403 when
-   * unset. Null-byte is the oddball: upload bubbles the fs error as 500;
-   * list and delete swallow it via fs.pathExists / fs.remove and return 200
-   * with an empty/no-op response. No traversal occurred in either case.
-   */
+  /** Per-route expected status; defaults to 403. */
   mediaStatus?: Partial<Record<MediaRouteKey, number>>;
+  /** Skip media tests on non-Windows — behaviour depends on Win32 paths. */
+  mediaRoutesWindowsOnly?: boolean;
 };
 
+// Canonical traversal payloads with variations to bypass naive filters.
 const TRAVERSAL_VECTORS: Vector[] = [
   { label: "relative ../ traversal", path: "../../etc/passwd.md" },
+  // Allowlisted chars, deep enough that a weakened path check still escapes.
+  { label: "deep traversal", path: "../../../../../../etc/passwd.md" },
   {
     label: "URL-encoded traversal",
     path: "..%2F..%2Fetc%2Fpasswd.md",
@@ -61,15 +68,25 @@ const TRAVERSAL_VECTORS: Vector[] = [
   {
     label: "null byte",
     path: "evil\u0000.md",
+    // Upload bubbles the fs error as 500; list/delete swallow it via
+    // pathExists/remove and return 200 with a no-op body.
     mediaStatus: { upload: 500, list: 200, delete: 200 },
   },
-  { label: "backslash traversal", path: "..\\..\\etc\\passwd.md" },
+  {
+    label: "backslash traversal",
+    path: "..\\..\\etc\\passwd.md",
+    mediaRoutesWindowsOnly: true,
+  },
 ];
 
-// Server-side disclosure indicators: drive letters, home directories, and
-// absolute Unix paths that wouldn't appear in an attacker-controlled payload.
+// ---------------------------------------------------------------------------
+// Leak check — response body must not disclose server-side filesystem paths.
+// ---------------------------------------------------------------------------
+
+// Drive letters and home-directory prefixes that can't come from any vector.
 const FILESYSTEM_LEAK = /([A-Z]:\\|\/Users\/|\/home\/|\/root\/)/i;
 
+// Assert that the response text doesn't leak the vector path or any decoded variants of it.
 const assertNoLeak = (responseText: string, vector: Vector) => {
   const residual = responseText
     .replace(vector.path, "")
@@ -78,15 +95,12 @@ const assertNoLeak = (responseText: string, vector: Vector) => {
 };
 
 // ---------------------------------------------------------------------------
-// Disk-write guard
+// Disk-write guard — plausible landing targets for a bypassed write path.
 // ---------------------------------------------------------------------------
 
 const PROJECT_ROOT = path.resolve(__dirname, "..", "..");
 const POST_DIR = path.join(PROJECT_ROOT, "content", "post");
 
-// If validation were ever bypassed and the write path were reached, the
-// malicious payload would most plausibly land at one of these locations.
-// None of them should ever contain the file — the resolver rejects earlier.
 const FORBIDDEN_TARGETS = [
   path.join(POST_DIR, "passwd.md"),
   path.join(POST_DIR, "etc", "passwd.md"),
@@ -104,7 +118,7 @@ const assertNoEscapeWrite = () => {
 };
 
 // ---------------------------------------------------------------------------
-// GraphQL mutation matrix — 4 vectors × 3 mutations = 12 tests
+// GraphQL mutation matrix — every vector × createDocument / update / delete.
 // ---------------------------------------------------------------------------
 
 type MutationRunner = {
@@ -154,7 +168,7 @@ for (const mutation of MUTATIONS) {
 }
 
 // ---------------------------------------------------------------------------
-// Media route matrix — 4 vectors × 3 routes = 12 tests
+// Media route matrix — every vector × /media upload / list / delete routes.
 // ---------------------------------------------------------------------------
 
 type MediaRouteRunner = {
@@ -191,12 +205,16 @@ const MEDIA_ROUTES: MediaRouteRunner[] = [
 for (const route of MEDIA_ROUTES) {
   for (const vector of TRAVERSAL_VECTORS) {
     test(`${route.name} rejects ${vector.label}`, async ({ apiContext }) => {
-      // KNOWN ISSUE (TinaCMS): the /media DELETE handler catches Node's
-      // ERR_INVALID_ARG_VALUE from fs.stat on a null-byte path and echoes
-      // the raw error message back, which contains the absolute server
-      // path. No traversal occurs — nothing is deleted — but the response
-      // leaks disk topology. Flip back to a failing test once TinaCMS
-      // sanitises the delete error body.
+      // Backslashes are path separators on Windows, but literal chars on POSIX — skip these tests on non-Windows.
+      test.skip(
+        vector.mediaRoutesWindowsOnly === true && process.platform !== "win32",
+        `${vector.label}: backslash is not a path separator on POSIX`
+      );
+
+      // TinaCMS bug: on null-byte paths, the DELETE handler echoes Node's
+      // ERR_INVALID_ARG_VALUE verbatim — leaking the absolute server path.
+      // Nothing is actually deleted (disclosure-only). Remove this fixme
+      // once the delete handler sanitises its error body.
       test.fixme(
         route.key === "delete" && vector.label === "null byte",
         "Media delete leaks absolute server path in null-byte error response"

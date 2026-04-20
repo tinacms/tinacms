@@ -4,7 +4,7 @@ import { test as apiTest } from "./api-context";
 import { deleteDocument, type CollectionName } from "../utils/graphql";
 import { deleteMedia, listMedia } from "../utils/media";
 
-// Convention mirrors the `path:` field on every collection in tina/collections/*.
+// Mirrors the `path:` field on every collection in tina/collections/*.
 const CONTENT_ROOT = path.resolve(__dirname, "..", "content");
 
 type TrackedDocument = {
@@ -13,22 +13,11 @@ type TrackedDocument = {
 };
 
 type ContentLifecycleFixtures = {
-  /**
-   * Register a document for automatic deletion after the test completes.
-   *
-   *   test("creates a post", async ({ page, contentCleanup }) => {
-   *     // ... create the post via the UI ...
-   *     contentCleanup.track("post", "my-new-post.md");
-   *   });
-   */
+  /** Register a document for automatic deletion after the test completes. */
   contentCleanup: {
     track(collection: CollectionName, relativePath: string): void;
   };
-  /**
-   * Register an uploaded media file for automatic deletion after the test
-   * completes. `relativePath` is the path used in the upload URL, e.g.
-   * `my-file.txt` or `subfolder/my-file.txt`.
-   */
+  /** Register an uploaded media file for automatic deletion. */
   mediaCleanup: {
     track(relativePath: string): void;
   };
@@ -45,10 +34,9 @@ export const test = apiTest.extend<ContentLifecycleFixtures>({
     });
 
     for (const { collection, relativePath } of tracked) {
-      // Skip if the test itself already deleted the doc — otherwise the dev
-      // server logs "Unable to delete document ... does not exist". The
-      // filesystem check falls back to attempting delete if the collection
-      // root isn't where we expect, preserving the safety-net.
+      // Skip already-deleted docs so the dev server doesn't log
+      // "Unable to delete document ... does not exist". Falls back to
+      // attempting delete if the collection root isn't where we expect.
       const collectionRoot = path.join(CONTENT_ROOT, collection);
       if (fs.existsSync(collectionRoot)) {
         const onDisk = path.join(collectionRoot, relativePath);
@@ -77,15 +65,14 @@ export const test = apiTest.extend<ContentLifecycleFixtures>({
 
     if (tracked.length === 0) return;
 
-    // Skip files the test itself already deleted — otherwise the dev server
-    // emits a raw ENOENT into the test log on the second delete. Listing the
-    // media root covers every path our specs currently track.
+    // Skip already-deleted files so the dev server doesn't emit a raw
+    // ENOENT into the test log. Falls back to blind delete if list fails.
     let existing: Set<string>;
     try {
       const list = await listMedia(apiContext);
       existing = new Set(list.files.map((f) => f.filename));
     } catch {
-      existing = new Set(tracked); // list failed — fall back to blind delete
+      existing = new Set(tracked);
     }
 
     for (const relativePath of tracked) {
