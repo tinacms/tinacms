@@ -138,10 +138,10 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
               />
             </div>
           )}
-          </div>
-          <div className='mt-auto w-full px-2 py-1 text-sm truncate'>
-            {item?.filename}
-          </div>
+        </div>
+        <div className='mt-auto w-full px-2 py-1 text-sm truncate'>
+          {item?.filename}
+        </div>
       </button>
     </li>
   );
