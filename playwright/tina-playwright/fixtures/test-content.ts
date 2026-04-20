@@ -34,9 +34,9 @@ export const test = apiTest.extend<ContentLifecycleFixtures>({
     });
 
     for (const { collection, relativePath } of tracked) {
-      // Skip already-deleted docs so the dev server doesn't log
-      // "Unable to delete document ... does not exist". Falls back to
-      // attempting delete if the collection root isn't where we expect.
+      // Skip already-deleted docs so teardown stays quiet when the test
+      // already removed them. Falls back to attempting delete if the
+      // collection root isn't where we expect.
       const collectionRoot = path.join(CONTENT_ROOT, collection);
       if (fs.existsSync(collectionRoot)) {
         const onDisk = path.join(collectionRoot, relativePath);
@@ -65,8 +65,8 @@ export const test = apiTest.extend<ContentLifecycleFixtures>({
 
     if (tracked.length === 0) return;
 
-    // Skip already-deleted files so the dev server doesn't emit a raw
-    // ENOENT into the test log. Falls back to blind delete if list fails.
+    // Skip already-deleted files so teardown stays quiet when the test
+    // already removed them. Falls back to blind delete if list fails.
     let existing: Set<string>;
     try {
       const list = await listMedia(apiContext);

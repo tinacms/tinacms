@@ -13,8 +13,8 @@
  *     escape check on GraphQL and the resolveStrictlyWithinBase check on media
  *   - URL-encoded traversal → GraphQL: blocked by the character allowlist.
  *     Media: proves decodeURIComponent runs before validation
- *   - null byte → GraphQL: blocked by allowlist. Media: Node's fs rejects —
- *     upload 500, list/delete swallow to 200 (no traversal)
+ *   - null byte → GraphQL: blocked by allowlist. Media: observed statuses
+ *     differ per route — see `mediaStatus` on the vector below
  *   - backslash traversal → GraphQL: blocked by allowlist. Media: only a
  *     separator on Win32; POSIX tests are skipped
  *
@@ -68,8 +68,7 @@ const TRAVERSAL_VECTORS: Vector[] = [
   {
     label: "null byte",
     path: "evil\u0000.md",
-    // Upload bubbles the fs error as 500; list/delete swallow it via
-    // pathExists/remove and return 200 with a no-op body.
+    // Per-route statuses observed against the current dev server.
     mediaStatus: { upload: 500, list: 200, delete: 200 },
   },
   {
@@ -211,13 +210,12 @@ for (const route of MEDIA_ROUTES) {
         `${vector.label}: backslash is not a path separator on POSIX`
       );
 
-      // TinaCMS bug: on null-byte paths, the DELETE handler echoes Node's
-      // ERR_INVALID_ARG_VALUE verbatim — leaking the absolute server path.
-      // Nothing is actually deleted (disclosure-only). Remove this fixme
-      // once the delete handler sanitises its error body.
+      // Pending upstream fix for a low-severity finding reported privately
+      // to the TinaCMS team per SECURITY.md. Once the fix lands this test
+      // will start passing unexpectedly — at that point remove the fixme.
       test.fixme(
         route.key === "delete" && vector.label === "null byte",
-        "Media delete leaks absolute server path in null-byte error response"
+        "Pending upstream fix — see inline comment"
       );
 
       const resp = await route.run(
