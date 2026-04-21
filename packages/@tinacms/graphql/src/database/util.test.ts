@@ -378,4 +378,24 @@ describe('parseFile / stringifyFile data integrity', () => {
     expect(stringified2).toEqual(stringified1);
   });
 
+  it('parseFile then stringifyFile preserves fields and is stable for .toml', () => {
+    const raw = `title = "Hello World"\nauthor = "Test Author"\ncount = 42\n`;
+
+    const parsed = parseFile(raw, '.toml', (yup) => yup.object({}));
+
+    // fidelity: no fields dropped or mutated
+    expect(parsed).toEqual({
+      title: 'Hello World',
+      author: 'Test Author',
+      count: 42,
+    });
+
+    // stability: repeated save cycles must not change the file on disk
+    const stringified1 = stringifyFile(withMeta(parsed), '.toml', false);
+    const parsed2 = parseFile(stringified1, '.toml', (yup) => yup.object({}));
+    const stringified2 = stringifyFile(withMeta(parsed2), '.toml', false);
+
+    expect(stringified2).toEqual(stringified1);
+  });
+
 });
