@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { TinaSchema } from '@tinacms/schema-tools';
 import { parseFile, stringifyFile, transformDocument } from './util';
 
