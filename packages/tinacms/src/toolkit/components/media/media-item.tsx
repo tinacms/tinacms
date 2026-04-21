@@ -109,9 +109,7 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
             NEW
           </span>
         )}
-        <div
-          className='w-full overflow-hidden aspect-[1/1]'
-        >
+        <div className='w-full overflow-hidden aspect-[1/1]'>
           {itemIsImage ? (
             <img
               className='block w-full h-full object-center object-cover'
