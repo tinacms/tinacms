@@ -444,6 +444,26 @@ describe('parseFile / stringifyFile data integrity', () => {
     expect(result).toEqual({ $_body: '' });
   });
 
+  it('parseFile then stringifyFile preserves unicode content for .yaml', () => {
+    const raw = `title: '你好世界'\nauthor: '🎉 Test'\ndescription: 'こんにちは世界'\n`;
+
+    const parsed = parseFile(raw, '.yaml', (yup) => yup.object({}));
+
+    // fidelity: unicode characters are not corrupted or dropped
+    expect(parsed).toEqual({
+      title: '你好世界',
+      author: '🎉 Test',
+      description: 'こんにちは世界',
+    });
+
+    // stability: unicode survives repeated save cycles
+    const stringified1 = stringifyFile(withMeta(parsed), '.yaml', false);
+    const parsed2 = parseFile(stringified1, '.yaml', (yup) => yup.object({}));
+    const stringified2 = stringifyFile(withMeta(parsed2), '.yaml', false);
+
+    expect(stringified2).toEqual(stringified1);
+  });
+
   it('parseFile preserves frontmatter and body for .mdx', () => {
     const raw = `---\ntitle: Hello World\nauthor: Test Author\n---\n\n<Hero title="Welcome" />\n\nSome body text.`;
 
