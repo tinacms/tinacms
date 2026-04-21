@@ -361,9 +361,9 @@ describe('parseFile / stringifyFile data integrity', () => {
 
   it('parseFile then stringifyFile preserves fields and is stable for .yaml', () => {
     const raw = `title: Hello World\nauthor: Test Author\ncount: 42\n`;
-    
+
     // third arg is a yup schema validator — empty object schema because we're not testing validation here
-    const parsed = parseFile(raw, '.yaml', (yup) => yup.object({})); 
+    const parsed = parseFile(raw, '.yaml', (yup) => yup.object({}));
 
     // fidelity: no fields dropped or mutated
     expect(parsed).toEqual({
@@ -401,7 +401,11 @@ describe('parseFile / stringifyFile data integrity', () => {
   });
 
   it('parseFile then stringifyFile preserves fields and is stable for .json', () => {
-    const raw = JSON.stringify({ title: 'Hello World', author: 'Test Author', count: 42 }, null, 2);
+    const raw = JSON.stringify(
+      { title: 'Hello World', author: 'Test Author', count: 42 },
+      null,
+      2
+    );
 
     const parsed = parseFile(raw, '.json', (yup) => yup.object({}));
 
@@ -487,7 +491,6 @@ describe('parseFile / stringifyFile data integrity', () => {
       $_body: '\n<Hero title="Welcome" />\n\nSome body text.',
     });
   });
-
 });
 
 describe('transformDocument', () => {
