@@ -419,6 +419,31 @@ describe('parseFile / stringifyFile data integrity', () => {
     expect(stringified2).toEqual(stringified1);
   });
 
+  it('parseFile returns empty object for empty .json file', () => {
+    const result = parseFile('', '.json', (yup) => yup.object({}));
+    expect(result).toEqual({});
+  });
+
+  it('parseFile returns empty object for empty .yaml file', () => {
+    const result = parseFile('', '.yaml', (yup) => yup.object({}));
+    expect(result).toEqual({});
+  });
+
+  it('parseFile returns empty object for empty .toml file', () => {
+    const result = parseFile('', '.toml', (yup) => yup.object({}));
+    expect(result).toEqual({});
+  });
+
+  it('parseFile returns empty body for empty .md file', () => {
+    const result = parseFile('', '.md', (yup) => yup.object({}));
+    expect(result).toEqual({ $_body: '' });
+  });
+
+  it('parseFile returns empty body for empty .mdx file', () => {
+    const result = parseFile('', '.mdx', (yup) => yup.object({}));
+    expect(result).toEqual({ $_body: '' });
+  });
+
   it('parseFile preserves frontmatter and body for .mdx', () => {
     const raw = `---\ntitle: Hello World\nauthor: Test Author\n---\n\n<Hero title="Welcome" />\n\nSome body text.`;
 
