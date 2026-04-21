@@ -13,6 +13,7 @@ import {
   BiPencil,
   BiSearch,
 } from 'react-icons/bi';
+import { AiFillWarning } from 'react-icons/ai';
 import { FaSpinner } from 'react-icons/fa';
 import { GrCircleQuestion } from 'react-icons/gr';
 import { MdOutlineClear } from 'react-icons/md';
@@ -130,6 +131,10 @@ export default function BranchSelectorTable({
   );
 
   const cms = useCMS();
+
+  const isCurrentBranchDeleted = !branchList.some(
+    (b) => b.name === currentBranch
+  );
 
   const columns: ColumnDef<Branch>[] = [
     {
@@ -371,9 +376,9 @@ export default function BranchSelectorTable({
                 <TableRow
                   className={cn(
                     'bg-transparent hover:!bg-transparent',
-                    currentBranch === currentBranchData.name
-                      ? 'border-l-[3px] border-l-tina-orange bg-[#f8fafc]'
-                      : ''
+                    isCurrentBranchDeleted
+                      ? 'border-l-[3px] border-l-yellow-400 bg-yellow-50'
+                      : 'border-l-[3px] border-l-tina-orange bg-[#f8fafc]'
                   )}
                 >
                   <TableCell>
@@ -396,6 +401,18 @@ export default function BranchSelectorTable({
                           Currently editing
                         </Badge>
                       </div>
+                      {isCurrentBranchDeleted && (
+                        <div className='w-fit'>
+                          <Badge
+                            displayIcon={false}
+                            calloutStyle='warning'
+                            className='w-fit flex-shrink-0'
+                          >
+                            <AiFillWarning className='w-3 h-auto inline-block mr-1' />
+                            Branch no longer exists
+                          </Badge>
+                        </div>
+                      )}
                     </div>
                   </TableCell>
                   <TableCell>

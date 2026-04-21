@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { parseFile, stringifyFile } from './util';
+import { describe, it, expect, vi } from 'vitest';
+import { TinaSchema } from '@tinacms/schema-tools';
+import { parseFile, stringifyFile, transformDocument } from './util';
 
 describe('gray-matter security', () => {
   describe('parseFile', () => {
@@ -345,5 +346,195 @@ Content with components stored in frontmatter`;
       // Should NOT contain folded scalar syntax
       expect(result).not.toContain('>-');
     });
+  });
+});
+
+describe('parseFile / stringifyFile data integrity', () => {
+  // Helper to attach the internal TinaCMS meta fields that stringifyFile strips out
+  const withMeta = (data: object) => ({
+    ...data,
+    _relativePath: '',
+    _id: '',
+    _template: 'post',
+    _collection: 'posts',
+  });
+
+  it('parseFile then stringifyFile preserves fields and is stable for .yaml', () => {
+    const raw = `title: Hello World\nauthor: Test Author\ncount: 42\n`;
+
+    // third arg is a yup schema validator — empty object schema because we're not testing validation here
+    const parsed = parseFile(raw, '.yaml', (yup) => yup.object({}));
+
+    // fidelity: no fields dropped or mutated
+    expect(parsed).toEqual({
+      title: 'Hello World',
+      author: 'Test Author',
+      count: 42,
+    });
+
+    // stability: repeated save cycles must not change the file on disk
+    const stringified1 = stringifyFile(withMeta(parsed), '.yaml', false);
+    const parsed2 = parseFile(stringified1, '.yaml', (yup) => yup.object({}));
+    const stringified2 = stringifyFile(withMeta(parsed2), '.yaml', false);
+
+    expect(stringified2).toEqual(stringified1);
+  });
+
+  it('parseFile then stringifyFile preserves fields and is stable for .toml', () => {
+    const raw = `title = "Hello World"\nauthor = "Test Author"\ncount = 42\n`;
+
+    const parsed = parseFile(raw, '.toml', (yup) => yup.object({}));
+
+    // fidelity: no fields dropped or mutated
+    expect(parsed).toEqual({
+      title: 'Hello World',
+      author: 'Test Author',
+      count: 42,
+    });
+
+    // stability: repeated save cycles must not change the file on disk
+    const stringified1 = stringifyFile(withMeta(parsed), '.toml', false);
+    const parsed2 = parseFile(stringified1, '.toml', (yup) => yup.object({}));
+    const stringified2 = stringifyFile(withMeta(parsed2), '.toml', false);
+
+    expect(stringified2).toEqual(stringified1);
+  });
+
+  it('parseFile then stringifyFile preserves fields and is stable for .json', () => {
+    const raw = JSON.stringify(
+      { title: 'Hello World', author: 'Test Author', count: 42 },
+      null,
+      2
+    );
+
+    const parsed = parseFile(raw, '.json', (yup) => yup.object({}));
+
+    // fidelity: no fields dropped or mutated
+    expect(parsed).toEqual({
+      title: 'Hello World',
+      author: 'Test Author',
+      count: 42,
+    });
+
+    // stability: repeated save cycles must not change the file on disk
+    const stringified1 = stringifyFile(withMeta(parsed), '.json', false);
+    const parsed2 = parseFile(stringified1, '.json', (yup) => yup.object({}));
+    const stringified2 = stringifyFile(withMeta(parsed2), '.json', false);
+
+    expect(stringified2).toEqual(stringified1);
+  });
+
+  it('parseFile returns empty object for empty .json file', () => {
+    const result = parseFile('', '.json', (yup) => yup.object({}));
+    expect(result).toEqual({});
+  });
+
+  it('parseFile returns empty object for empty .yaml file', () => {
+    const result = parseFile('', '.yaml', (yup) => yup.object({}));
+    expect(result).toEqual({});
+  });
+
+  it('parseFile returns empty object for empty .toml file', () => {
+    const result = parseFile('', '.toml', (yup) => yup.object({}));
+    expect(result).toEqual({});
+  });
+
+  it('parseFile returns empty body for empty .md file', () => {
+    const result = parseFile('', '.md', (yup) => yup.object({}));
+    expect(result).toEqual({ $_body: '' });
+  });
+
+  it('parseFile returns empty body for empty .mdx file', () => {
+    const result = parseFile('', '.mdx', (yup) => yup.object({}));
+    expect(result).toEqual({ $_body: '' });
+  });
+
+  it('parseFile then stringifyFile preserves unicode content for .yaml', () => {
+    const raw = `title: '你好世界'\nauthor: '🎉 Test'\ndescription: 'こんにちは世界'\n`;
+
+    const parsed = parseFile(raw, '.yaml', (yup) => yup.object({}));
+
+    // fidelity: unicode characters are not corrupted or dropped
+    expect(parsed).toEqual({
+      title: '你好世界',
+      author: '🎉 Test',
+      description: 'こんにちは世界',
+    });
+
+    // stability: unicode survives repeated save cycles
+    const stringified1 = stringifyFile(withMeta(parsed), '.yaml', false);
+    const parsed2 = parseFile(stringified1, '.yaml', (yup) => yup.object({}));
+    const stringified2 = stringifyFile(withMeta(parsed2), '.yaml', false);
+
+    expect(stringified2).toEqual(stringified1);
+  });
+
+  it('parseFile throws on malformed YAML frontmatter in .md file', () => {
+    // unclosed bracket is invalid YAML frontmatter inside a .md file — gray-matter should throw, not silently return empty data
+    const malformed = `---\ntitle: [unclosed bracket\n---\n\nBody content.`;
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
+    expect(() => {
+      parseFile(malformed, '.md', (yup) => yup.object({}));
+    }).toThrow();
+
+    consoleError.mockRestore();
+  });
+
+  it('parseFile preserves frontmatter and body for .mdx', () => {
+    const raw = `---\ntitle: Hello World\nauthor: Test Author\n---\n\n<Hero title="Welcome" />\n\nSome body text.`;
+
+    const parsed = parseFile(raw, '.mdx', (yup) => yup.object({}));
+
+    // fidelity: no fields dropped or mutated
+    // stability omitted — $_body goes through parseMDX/stringifyMDX in production
+    expect(parsed).toEqual({
+      title: 'Hello World',
+      author: 'Test Author',
+      $_body: '\n<Hero title="Welcome" />\n\nSome body text.',
+    });
+  });
+});
+
+describe('transformDocument', () => {
+  const schema = new TinaSchema({
+    collections: [
+      {
+        name: 'posts',
+        path: 'content/posts',
+        format: 'md',
+        fields: [
+          { name: 'title', type: 'string', label: 'Title' },
+          { name: 'body', type: 'string', label: 'Body', isBody: true },
+        ],
+      },
+    ],
+  });
+
+  it('maps $_body to the isBody field and attaches TinaCMS metadata', () => {
+    const contentObject = {
+      title: 'Hello World',
+      $_body: 'This is the body.',
+    };
+
+    const result = transformDocument(
+      'content/posts/hello-world.md',
+      contentObject,
+      schema
+    );
+
+    // $_body renamed to the isBody field name defined in schema
+    expect(result).toMatchObject({
+      title: 'Hello World',
+      body: 'This is the body.',
+      _collection: 'posts',
+      _relativePath: 'hello-world.md',
+      _id: 'content/posts/hello-world.md',
+    });
+
+    // $_body should be stripped from the result
+    expect(result).not.toHaveProperty('$_body');
   });
 });
