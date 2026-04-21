@@ -104,11 +104,11 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
           }
         }}
       >
-        {/* {item.new && (
+        {item.new && (
           <span className='absolute top-1 right-1 rounded shadow bg-green-100 border border-green-200 text-[10px] tracking-wide font-bold text-green-600 px-1.5 py-0.5 z-10'>
             NEW
           </span>
-        )} */}
+        )}
         <div
           className='w-full overflow-hidden aspect-square'
           style={{ aspectRatio: '1 / 1' }}
