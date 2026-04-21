@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { parseFile, stringifyFile } from './util';
+import { TinaSchema } from '@tinacms/schema-tools';
+import { parseFile, stringifyFile, transformDocument } from './util';
 
 describe('gray-matter security', () => {
   describe('parseFile', () => {
@@ -487,4 +488,45 @@ describe('parseFile / stringifyFile data integrity', () => {
     });
   });
 
+});
+
+describe('transformDocument', () => {
+  const schema = new TinaSchema({
+    collections: [
+      {
+        name: 'posts',
+        path: 'content/posts',
+        format: 'md',
+        fields: [
+          { name: 'title', type: 'string', label: 'Title' },
+          { name: 'body', type: 'string', label: 'Body', isBody: true },
+        ],
+      },
+    ],
+  });
+
+  it('maps $_body to the isBody field and attaches TinaCMS metadata', () => {
+    const contentObject = {
+      title: 'Hello World',
+      $_body: 'This is the body.',
+    };
+
+    const result = transformDocument(
+      'content/posts/hello-world.md',
+      contentObject,
+      schema
+    );
+
+    // $_body renamed to the isBody field name defined in schema
+    expect(result).toMatchObject({
+      title: 'Hello World',
+      body: 'This is the body.',
+      _collection: 'posts',
+      _relativePath: 'hello-world.md',
+      _id: 'content/posts/hello-world.md',
+    });
+
+    // $_body should be stripped from the result
+    expect(result).not.toHaveProperty('$_body');
+  });
 });
