@@ -34,7 +34,7 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
   const thumbnail = (item.thumbnails || {})['75x75'];
   return (
     <li
-      className={`group relative flex shrink-0 items-center transition duration-150 ease-out cursor-pointer border-b border-gray-150  ${
+      className={`group relative flex shrink-0 items-center transition duration-150 ease-out cursor-pointer border-b border-gray-150 ${
         active
           ? 'bg-gradient-to-r from-white to-gray-50/50 text-tina-orange hover:bg-gray-50'
           : 'bg-white hover:bg-gray-50/50 hover:text-tina-orange'
