@@ -347,3 +347,33 @@ Content with components stored in frontmatter`;
     });
   });
 });
+
+describe('parseFile / stringifyFile data integrity', () => {
+  // Helper to attach the internal TinaCMS meta fields that stringifyFile strips out
+  const withMeta = (data: object) => ({
+    ...data,
+    _relativePath: '',
+    _id: '',
+    _template: 'post',
+    _collection: 'posts',
+  });
+
+  it('parseFile then stringifyFile preserves frontmatter and body for .md', () => {
+    const raw = `---\ntitle: Hello World\nauthor: Test Author\n---\n\nThis is the body.`;
+
+    const parsed = parseFile(raw, '.md', (yup) => yup.object({})); // third arg is a yup schema validator — empty object schema because we're not testing validation here
+
+    expect(parsed).toEqual({
+      title: 'Hello World',
+      author: 'Test Author',
+      $_body: '\nThis is the body.',
+    });
+
+    const stringified1 = stringifyFile(withMeta(parsed), '.md', false);
+    const parsed2 = parseFile(stringified1, '.md', (yup) => yup.object({}));
+    const stringified2 = stringifyFile(withMeta(parsed2), '.md', false);
+
+    expect(stringified2).toEqual(stringified1);
+  });
+
+});
