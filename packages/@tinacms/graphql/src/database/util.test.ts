@@ -358,20 +358,22 @@ describe('parseFile / stringifyFile data integrity', () => {
     _collection: 'posts',
   });
 
-  it('parseFile then stringifyFile preserves frontmatter and body for .md', () => {
-    const raw = `---\ntitle: Hello World\nauthor: Test Author\n---\n\nThis is the body.`;
+  it('parseFile then stringifyFile preserves fields and is stable for .yaml', () => {
+    const raw = `title: Hello World\nauthor: Test Author\ncount: 42\n`;
 
-    const parsed = parseFile(raw, '.md', (yup) => yup.object({})); // third arg is a yup schema validator — empty object schema because we're not testing validation here
+    const parsed = parseFile(raw, '.yaml', (yup) => yup.object({}));
 
+    // fidelity: no fields dropped or mutated
     expect(parsed).toEqual({
       title: 'Hello World',
       author: 'Test Author',
-      $_body: '\nThis is the body.',
+      count: 42,
     });
 
-    const stringified1 = stringifyFile(withMeta(parsed), '.md', false);
-    const parsed2 = parseFile(stringified1, '.md', (yup) => yup.object({}));
-    const stringified2 = stringifyFile(withMeta(parsed2), '.md', false);
+    // stability: repeated save cycles must not change the file on disk
+    const stringified1 = stringifyFile(withMeta(parsed), '.yaml', false);
+    const parsed2 = parseFile(stringified1, '.yaml', (yup) => yup.object({}));
+    const stringified2 = stringifyFile(withMeta(parsed2), '.yaml', false);
 
     expect(stringified2).toEqual(stringified1);
   });
