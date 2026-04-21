@@ -110,8 +110,7 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
           </span>
         )}
         <div
-          className='w-full overflow-hidden aspect-square'
-          style={{ aspectRatio: '1 / 1' }}
+          className='w-full overflow-hidden aspect-[1/1]'
         >
           {itemIsImage ? (
             <img
