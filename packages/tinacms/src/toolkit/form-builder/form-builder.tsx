@@ -18,6 +18,7 @@ import { FormPortalProvider } from './form-portal';
 import { LoadingDots } from './loading-dots';
 import { ResetForm } from './reset-form';
 import { CreateBranchModal } from './create-branch-modal';
+import { BranchDeletedModal } from './branch-deleted-modal';
 import {
   SavedContentEvent,
   SaveContentErrorEvent,
@@ -98,6 +99,9 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   const hideFooter = !!rest.hideFooter;
   const [createBranchModalOpen, setCreateBranchModalOpen] =
     React.useState(false);
+  const [deletedBranchModalOpen, setDeletedBranchModalOpen] =
+    React.useState(false);
+  const [isGuardChecking, setIsGuardChecking] = React.useState(false);
 
   const tinaForm = form.tinaForm;
   const finalForm = form.tinaForm.finalForm;
@@ -182,27 +186,93 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 
         const safeSubmit = async () => {
           if (canSubmit) {
+            const alertsBefore = new Set(cms.alerts.all.map((a) => a.id));
+            console.debug(
+              '[tina:branch-guard] safeSubmit: calling handleSubmit'
+            );
+
             const result = await handleSubmit();
             if (result && result[FORM_ERROR]) {
               const error = result[FORM_ERROR];
+              const errorMsg =
+                error instanceof Error ? error.message : String(error);
+
+              console.debug(
+                '[tina:branch-guard] safeSubmit: FORM_ERROR detected:',
+                errorMsg
+              );
+
+              // If the save failed because the branch no longer exists,
+              // intercept the generic error alert and replace it with the
+              // branch-deleted modal.
+              if (/branch.*not found/i.test(errorMsg)) {
+                console.debug(
+                  '[tina:branch-guard] safeSubmit: branch-not-found — dismissing alert and opening modal'
+                );
+                for (const alert of cms.alerts.all) {
+                  if (!alertsBefore.has(alert.id) && alert.level === 'error') {
+                    cms.alerts.dismiss(alert);
+                  }
+                }
+                setDeletedBranchModalOpen(true);
+                return;
+              }
+
               captureEvent(SaveContentErrorEvent, {
                 documentPath: tinaForm.path,
-                error: error instanceof Error ? error.message : String(error),
+                error: errorMsg,
               });
             } else {
               captureEvent(SavedContentEvent, {
                 documentPath: tinaForm.path,
               });
             }
+          } else {
+            console.debug(
+              '[tina:branch-guard] safeSubmit: skipped — canSubmit is false'
+            );
           }
         };
 
         const safeHandleSubmit = async () => {
+          setIsGuardChecking(true);
+
+          const currentBranch = decodeURIComponent(cms.api.tina.getBranch());
+
+          let exists = true;
+          try {
+            console.debug(
+              '[tina:branch-guard] safeHandleSubmit: checking branch:',
+              currentBranch
+            );
+            exists = await cms.api.tina.branchExists(currentBranch);
+          } catch (err) {
+            console.error(
+              '[tina:branch-guard] safeHandleSubmit: branchExists threw, failing open:',
+              err
+            );
+          }
+
+          console.debug(
+            '[tina:branch-guard] safeHandleSubmit: branchExists returned:',
+            exists
+          );
+          if (!exists) {
+            console.debug(
+              '[tina:branch-guard] safeHandleSubmit: branch missing — opening modal'
+            );
+            setIsGuardChecking(false);
+            setDeletedBranchModalOpen(true);
+            return;
+          }
+
           if (usingProtectedBranch) {
             setCreateBranchModalOpen(true);
           } else {
-            safeSubmit();
+            await safeSubmit();
           }
+
+          setIsGuardChecking(false);
         };
 
         return (
@@ -215,6 +285,20 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                 values={tinaForm.values}
                 tinaForm={tinaForm}
                 close={() => setCreateBranchModalOpen(false)}
+                onBaseBranchDeleted={() => {
+                  setCreateBranchModalOpen(false);
+                  setDeletedBranchModalOpen(true);
+                }}
+              />
+            )}
+            {deletedBranchModalOpen && (
+              <BranchDeletedModal
+                branchName={decodeURIComponent(cms.api.tina.getBranch())}
+                close={() => setDeletedBranchModalOpen(false)}
+                path={tinaForm.path}
+                values={tinaForm.values}
+                crudType={tinaForm.crudType}
+                tinaForm={tinaForm}
               />
             )}
             <DragDropContext onDragEnd={moveArrayItem}>
@@ -251,8 +335,8 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                       )}
                       <Button
                         onClick={safeHandleSubmit}
-                        disabled={!canSubmit}
-                        busy={submitting}
+                        disabled={!canSubmit || isGuardChecking}
+                        busy={submitting || isGuardChecking}
                         variant='primary'
                       >
                         {submitting && <LoadingDots />}

@@ -39,3 +39,8 @@ yarn-error.log*
 /playwright/.cache/
 
 /playwright-test-results.json
+
+# Ignore generated playwright test files, but not the source files.
+content/*/playwright-*
+!content/*/playwright-filter-*
+public/uploads/playwright-*

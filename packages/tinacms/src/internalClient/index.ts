@@ -567,6 +567,13 @@ mutation addPendingDocumentMutation(
       this.protectedBranches?.includes(decodeURIComponent(this.branch))
     );
   }
+
+  async branchExists(branchName: string): Promise<boolean> {
+    if (this.isLocalMode) return true;
+    const branches = await this.listBranches({ includeIndexStatus: false });
+    return branches.some((b) => b.name === branchName);
+  }
+
   async createBranch({ baseBranch, branchName }: BranchData) {
     const url = `${this.contentApiBase}/github/${this.clientId}/create_branch`;
 
