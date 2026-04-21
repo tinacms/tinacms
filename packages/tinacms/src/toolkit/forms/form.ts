@@ -510,7 +510,6 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
             const imageName = namePath.slice(0, currentPathIndex + 2).join('.');
             const imageBaseName = templateName.replace(/\.props$/, '');
             return {
-              ...formOrObjectField,
               label: 'Image',
               name: [imageName].join('.'),
               fields: [
