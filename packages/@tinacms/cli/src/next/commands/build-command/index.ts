@@ -37,9 +37,9 @@ export class BuildCommand extends BaseCommand {
     description:
       'Starts local Graphql server and builds the local client instead of production client',
   });
-  offlineOption = Option.Boolean('--offline', false, {
+  contentOption = Option.String('--content', {
     description:
-      'Builds using local content for fast builds, but generates a production client that connects to TinaCloud when deployed',
+      'Source for content during the build. Use `--content=local` to build from local content for fast builds while still generating a production client that connects to TinaCloud when deployed.',
   });
   skipIndexing = Option.Boolean('--skip-indexing', false, {
     description:
@@ -113,6 +113,16 @@ export class BuildCommand extends BaseCommand {
       process.exit(1);
     }
 
+    if (this.contentOption !== undefined && this.contentOption !== 'local') {
+      logger.error(
+        `${dangerText(
+          `ERROR: --content only accepts 'local'. Received '${this.contentOption}'.`
+        )}`
+      );
+      process.exit(1);
+    }
+    const localContentOnly = this.contentOption === 'local';
+
     try {
       await configManager.processConfig();
     } catch (e) {
@@ -122,7 +132,7 @@ export class BuildCommand extends BaseCommand {
       );
       process.exit(1);
     }
-    if (this.offlineOption && !this.localOption) {
+    if (localContentOnly && !this.localOption) {
       const config = configManager.config;
       const missing = [];
       if (!config.branch) missing.push('branch');
@@ -131,7 +141,7 @@ export class BuildCommand extends BaseCommand {
       if (missing.length > 0) {
         logger.error(
           `${dangerText(
-            `ERROR: --offline requires ${missing.join(', ')} to be configured, since the generated client must point to TinaCloud.`
+            `ERROR: --content=local requires ${missing.join(', ')} to be configured, since the generated client must point to TinaCloud.`
           )}`
         );
         process.exit(1);
@@ -148,12 +158,12 @@ export class BuildCommand extends BaseCommand {
     const { queryDoc, fragDoc, graphQLSchema, tinaSchema, lookup } =
       await buildSchema(configManager.config);
 
-    const useLocalServer = this.localOption || this.offlineOption;
+    const useLocalServer = this.localOption || localContentOnly;
     const codegen = new Codegen({
       configManager: configManager,
       port: useLocalServer ? Number(this.port) : undefined,
       isLocal: useLocalServer,
-      localContentBuild: this.offlineOption && !this.localOption,
+      localContentBuild: localContentOnly && !this.localOption,
       queryDoc,
       fragDoc,
       graphqlSchemaDoc: graphQLSchema,
@@ -163,16 +173,16 @@ export class BuildCommand extends BaseCommand {
     });
     const apiURL = await codegen.execute();
 
-    // Always index the content if we are building locally or offline (and not skipping indexing)
+    // Always index the content when we're sourcing it locally (and not skipping indexing)
     if (
       (configManager.hasSelfHostedConfig() ||
         this.localOption ||
-        this.offlineOption) &&
+        localContentOnly) &&
       !this.skipIndexing
     ) {
-      // if we are building locally or offline use the default spinner text
+      // if we are sourcing content locally use the default spinner text
       const text =
-        this.localOption || this.offlineOption
+        this.localOption || localContentOnly
           ? undefined
           : 'Indexing to self-hosted data layer';
       try {
@@ -193,8 +203,8 @@ export class BuildCommand extends BaseCommand {
       }
     }
 
-    if (this.localOption || this.offlineOption) {
-      // start the dev server if we are building locally or offline
+    if (this.localOption || localContentOnly) {
+      // start the local GraphQL server whenever content is sourced locally
       const serverUrl = codegen.localBuildUrl || apiURL;
       server = await createDevServer(
         configManager,
@@ -280,19 +290,19 @@ export class BuildCommand extends BaseCommand {
     );
 
     if (
-      this.offlineOption &&
+      localContentOnly &&
       configManager.config.search &&
       !this.skipSearchIndex
     ) {
       logger.warn(
-        `${warnText('WARN: Search indexing skipped in offline mode. The search index on TinaCloud was not updated.')}`
+        `${warnText('WARN: Search indexing skipped when building with --content=local. The search index on TinaCloud was not updated.')}`
       );
     }
     if (
       configManager.config.search &&
       !this.skipSearchIndex &&
       !this.localOption &&
-      !this.offlineOption
+      !localContentOnly
     ) {
       let client: SearchClient;
       const hasTinaSearch = Boolean(configManager.config?.search?.tina);
@@ -399,7 +409,7 @@ export class BuildCommand extends BaseCommand {
         ...summaryItems,
       ],
     });
-    if (this.offlineOption && codegen.localBuildUrl) {
+    if (localContentOnly && codegen.localBuildUrl) {
       process.env.TINA_LOCAL_URL = codegen.localBuildUrl;
       // Ensure the sub-command runs with NODE_ENV=production so frameworks
       // like Next.js produce a production build

@@ -24,7 +24,7 @@ export class Codegen {
   localUrl: string;
   // production url
   productionUrl: string;
-  // URL for the local GraphQL server used during offline builds
+  // URL for the local GraphQL server used during --content=local builds
   localBuildUrl?: string;
   graphqlSchemaDoc: DocumentNode;
   tinaSchema: TinaSchema;
