@@ -419,4 +419,18 @@ describe('parseFile / stringifyFile data integrity', () => {
     expect(stringified2).toEqual(stringified1);
   });
 
+  it('parseFile preserves frontmatter and body for .mdx', () => {
+    const raw = `---\ntitle: Hello World\nauthor: Test Author\n---\n\n<Hero title="Welcome" />\n\nSome body text.`;
+
+    const parsed = parseFile(raw, '.mdx', (yup) => yup.object({}));
+
+    // fidelity: no fields dropped or mutated
+    // stability omitted — $_body goes through parseMDX/stringifyMDX in production
+    expect(parsed).toEqual({
+      title: 'Hello World',
+      author: 'Test Author',
+      $_body: '\n<Hero title="Welcome" />\n\nSome body text.',
+    });
+  });
+
 });
