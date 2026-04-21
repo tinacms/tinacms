@@ -464,6 +464,15 @@ describe('parseFile / stringifyFile data integrity', () => {
     expect(stringified2).toEqual(stringified1);
   });
 
+  it('parseFile throws on malformed YAML frontmatter in .md file', () => {
+    // unclosed bracket is invalid YAML frontmatter inside a .md file — gray-matter should throw, not silently return empty data
+    const malformed = `---\ntitle: [unclosed bracket\n---\n\nBody content.`;
+
+    expect(() => {
+      parseFile(malformed, '.md', (yup) => yup.object({}));
+    }).toThrow();
+  });
+
   it('parseFile preserves frontmatter and body for .mdx', () => {
     const raw = `---\ntitle: Hello World\nauthor: Test Author\n---\n\n<Hero title="Welcome" />\n\nSome body text.`;
 
