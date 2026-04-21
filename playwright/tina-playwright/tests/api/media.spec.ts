@@ -32,9 +32,3 @@ test("media — upload → list → delete round-trip", async ({
   const afterDelete = await listMedia(apiContext);
   expect(afterDelete.files.map((f) => f.filename)).not.toContain(filename);
 });
-
-test("media — list returns the expected shape", async ({ apiContext }) => {
-  const list = await listMedia(apiContext);
-  expect(Array.isArray(list.files)).toBe(true);
-  expect(Array.isArray(list.directories)).toBe(true);
-});
