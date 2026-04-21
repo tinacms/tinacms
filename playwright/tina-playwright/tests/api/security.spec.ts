@@ -66,6 +66,11 @@ const TRAVERSAL_VECTORS: Vector[] = [
     rawUploadPath: true,
   },
   {
+    label: "double-encoded traversal",
+    path: "..%252F..%252Fetc%252Fpasswd.md",
+    rawUploadPath: true,
+  },
+  {
     label: "null byte",
     path: "evil\u0000.md",
     // Per-route statuses observed against the current dev server.
