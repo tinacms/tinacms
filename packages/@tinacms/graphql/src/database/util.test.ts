@@ -479,7 +479,7 @@ describe('parseFile / stringifyFile data integrity', () => {
     expect(() => {
       parseFile(malformed, '.md', (yup) => yup.object({}));
     }).toThrow();
-    
+
     consoleError.mockRestore();
   });
 
