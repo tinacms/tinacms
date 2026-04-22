@@ -1,5 +1,14 @@
 # @tinacms/mdx
 
+## 2.1.2
+
+### Patch Changes
+
+- [#6673](https://github.com/tinacms/tinacms/pull/6673) [`55dae8e`](https://github.com/tinacms/tinacms/commit/55dae8eef898f49f827c00bc72297863d0d69be1) Thanks [@DORI2001](https://github.com/DORI2001)! - Preserve code block infostring meta through parse/serialize round-trip. Metadata after the language identifier (e.g. `{1,3-5}` or `title="app.py"`) was silently dropped on every save; it is now captured in the parser and emitted by the serializer.
+
+- Updated dependencies [[`cd262b3`](https://github.com/tinacms/tinacms/commit/cd262b311c218ea4e5b5bb8abbbe54fcff3b8054)]:
+  - @tinacms/schema-tools@2.7.2
+
 ## 2.1.1
 
 ### Patch Changes

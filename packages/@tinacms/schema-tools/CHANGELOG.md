@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 2.7.2
+
+### Patch Changes
+
+- [#6548](https://github.com/tinacms/tinacms/pull/6548) [`cd262b3`](https://github.com/tinacms/tinacms/commit/cd262b311c218ea4e5b5bb8abbbe54fcff3b8054) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Add 'displayOnly' field type for display-only form fields
+
 ## 2.7.1
 
 ### Patch Changes

@@ -1,5 +1,19 @@
 # tina-graphql
 
+## 2.2.4
+
+### Patch Changes
+
+- [#6548](https://github.com/tinacms/tinacms/pull/6548) [`cd262b3`](https://github.com/tinacms/tinacms/commit/cd262b311c218ea4e5b5bb8abbbe54fcff3b8054) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Add 'displayOnly' field type for display-only form fields
+
+- [#6663](https://github.com/tinacms/tinacms/pull/6663) [`4a8627b`](https://github.com/tinacms/tinacms/commit/4a8627b66fccf3396e790ae88fe7bb79408b4808) Thanks [@18-th](https://github.com/18-th)! - Fix relativePath validation to reject whitespace and empty strings
+
+- [#6664](https://github.com/tinacms/tinacms/pull/6664) [`c75d871`](https://github.com/tinacms/tinacms/commit/c75d87121224f91dc4e5e2aa8af60b0881b87a5b) Thanks [@18-th](https://github.com/18-th)! - Validate relativePath to reject whitespace and invalid characters
+
+- Updated dependencies [[`cd262b3`](https://github.com/tinacms/tinacms/commit/cd262b311c218ea4e5b5bb8abbbe54fcff3b8054), [`55dae8e`](https://github.com/tinacms/tinacms/commit/55dae8eef898f49f827c00bc72297863d0d69be1)]:
+  - @tinacms/schema-tools@2.7.2
+  - @tinacms/mdx@2.1.2
+
 ## 2.2.3
 
 ### Patch Changes
