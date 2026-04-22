@@ -72,6 +72,7 @@ export const tinaConfigZod = z.object({
         .optional(),
     })
     .optional(),
+  localContentPath: z.string().min(1).optional(),
 });
 
 export const validateTinaCloudSchemaConfig = (config: unknown): Config => {

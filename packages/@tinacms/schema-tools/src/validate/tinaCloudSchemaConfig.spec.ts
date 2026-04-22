@@ -242,4 +242,42 @@ describe('validateTinaCloudSchemaConfig', () => {
       expect(() => validateTinaCloudSchemaConfig(config)).not.toThrow();
     });
   });
+
+  describe('localContentPath', () => {
+    it('accepts config without localContentPath', () => {
+      expect(() => validateTinaCloudSchemaConfig({})).not.toThrow();
+    });
+
+    it('accepts a relative path string', () => {
+      expect(() =>
+        validateTinaCloudSchemaConfig({ localContentPath: '../content-repo' })
+      ).not.toThrow();
+    });
+
+    it('accepts an absolute path string', () => {
+      expect(() =>
+        validateTinaCloudSchemaConfig({
+          localContentPath: '/Users/me/content-repo',
+        })
+      ).not.toThrow();
+    });
+
+    it('rejects a non-string value', () => {
+      expect(() =>
+        validateTinaCloudSchemaConfig({ localContentPath: 42 })
+      ).toThrow();
+      expect(() =>
+        validateTinaCloudSchemaConfig({ localContentPath: true })
+      ).toThrow();
+      expect(() =>
+        validateTinaCloudSchemaConfig({ localContentPath: {} })
+      ).toThrow();
+    });
+
+    it('rejects an empty string', () => {
+      expect(() =>
+        validateTinaCloudSchemaConfig({ localContentPath: '' })
+      ).toThrow();
+    });
+  });
 });
