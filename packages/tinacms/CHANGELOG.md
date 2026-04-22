@@ -1,5 +1,26 @@
 # tinacms
 
+## 3.7.3
+
+### Patch Changes
+
+- [#6548](https://github.com/tinacms/tinacms/pull/6548) [`cd262b3`](https://github.com/tinacms/tinacms/commit/cd262b311c218ea4e5b5bb8abbbe54fcff3b8054) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Add 'displayOnly' field type for display-only form fields
+
+- [#6693](https://github.com/tinacms/tinacms/pull/6693) [`217bfb4`](https://github.com/tinacms/tinacms/commit/217bfb4ff2c1a61fa7b6df3ea460b192b5179bb7) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Fix sidebar file tree: consolidate duplicate roots from multiple useTina() calls, prevent chevron shrinking on long filenames, add bottom padding for last item visibility
+
+- [#6678](https://github.com/tinacms/tinacms/pull/6678) [`5feb18d`](https://github.com/tinacms/tinacms/commit/5feb18d0d3032bbcd6a5aad678208c0dde19bf81) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - fix: display editorial workflow modal on deleted branches
+
+- [#6699](https://github.com/tinacms/tinacms/pull/6699) [`32e145d`](https://github.com/tinacms/tinacms/commit/32e145d4859cbc710a222f2a01c55ca7b29a080b) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 💄 Improve UI of Grid Item in Media Manager
+
+- [#6682](https://github.com/tinacms/tinacms/pull/6682) [`d998884`](https://github.com/tinacms/tinacms/commit/d9988849ad67fb5e9d7e233c1ccca0cb0c031c3e) Thanks [@kulesy](https://github.com/kulesy)! - Fix React Error #31 when inserting image from Media Library with custom MediaStore
+
+- [#6664](https://github.com/tinacms/tinacms/pull/6664) [`c75d871`](https://github.com/tinacms/tinacms/commit/c75d87121224f91dc4e5e2aa8af60b0881b87a5b) Thanks [@18-th](https://github.com/18-th)! - Validate relativePath to reject whitespace and invalid characters
+
+- Updated dependencies [[`cd262b3`](https://github.com/tinacms/tinacms/commit/cd262b311c218ea4e5b5bb8abbbe54fcff3b8054), [`55dae8e`](https://github.com/tinacms/tinacms/commit/55dae8eef898f49f827c00bc72297863d0d69be1)]:
+  - @tinacms/schema-tools@2.7.2
+  - @tinacms/mdx@2.1.2
+  - @tinacms/search@1.2.10
+
 ## 3.7.2
 
 ### Patch Changes

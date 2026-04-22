@@ -88,11 +88,11 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
     <li className='block flex justify-center shrink-0 w-full transition duration-150 ease-out'>
       <button
         className={cn(
-          'relative flex flex-col items-center justify-center w-full outline-none',
+          'relative flex flex-col gap-1 items-center w-full outline-none rounded-lg overflow-hidden border-2 transition',
           {
-            'shadow hover:shadow-md hover:scale-103 hover:border-gray-150':
+            'border-black/10 hover:border-tina-orange/50 shadow-sm hover:shadow-md bg-white':
               !active,
-            'ring-2 ring-tina-orange': active,
+            'border-tina-orange bg-tina-orange/10 shadow-md': active,
             'cursor-pointer': item.type === 'dir',
           }
         )}
@@ -104,40 +104,30 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
           }
         }}
       >
-        <span
-          className={cn(
-            'absolute bottom-0 left-0 w-full text-xs text-white px-2 py-1 truncate z-10',
-            active ? 'bg-tina-orange/60' : 'bg-black/60'
-          )}
-          style={{ pointerEvents: 'none' }}
-        >
-          {item.filename}
-        </span>
         {item.new && (
           <span className='absolute top-1 right-1 rounded shadow bg-green-100 border border-green-200 text-[10px] tracking-wide font-bold text-green-600 px-1.5 py-0.5 z-10'>
             NEW
           </span>
         )}
-        <div className='relative w-full flex items-center justify-center'>
+        <div className='w-full overflow-hidden aspect-[1/1]'>
           {itemIsImage ? (
-            <>
-              <img
-                className={cn(
-                  'block overflow-hidden object-center object-contain max-w-full max-h-[16rem] m-auto shadow'
-                )}
-                style={checkerboardStyle}
-                src={thumbnail}
-                alt={item.filename}
-              />
-            </>
+            <img
+              className='block w-full h-full object-center object-cover'
+              style={checkerboardStyle}
+              src={thumbnail}
+              alt={item.filename}
+            />
           ) : (
-            <div className='p-4 w-full flex flex-col gap-4 items-center justify-center'>
+            <div className='w-full h-full flex flex-col items-center justify-center'>
               <FileIcon
                 className={`w-[40%] h-auto ${item.type === 'dir' ? 'fill-tina-orange' : 'fill-gray-300'}`}
                 size={40}
               />
             </div>
           )}
+        </div>
+        <div className='mt-auto w-full px-2 py-1 text-sm truncate'>
+          {item.filename}
         </div>
       </button>
     </li>

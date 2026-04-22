@@ -1,5 +1,13 @@
 # @tinacms/search
 
+## 1.2.10
+
+### Patch Changes
+
+- Updated dependencies [[`cd262b3`](https://github.com/tinacms/tinacms/commit/cd262b311c218ea4e5b5bb8abbbe54fcff3b8054), [`4a8627b`](https://github.com/tinacms/tinacms/commit/4a8627b66fccf3396e790ae88fe7bb79408b4808), [`c75d871`](https://github.com/tinacms/tinacms/commit/c75d87121224f91dc4e5e2aa8af60b0881b87a5b)]:
+  - @tinacms/schema-tools@2.7.2
+  - @tinacms/graphql@2.2.4
+
 ## 1.2.9
 
 ### Patch Changes
