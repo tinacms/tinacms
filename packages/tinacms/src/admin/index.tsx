@@ -205,7 +205,7 @@ const CheckSchema = ({
               
               If you just pushed changes to the branch, try pulling the latest changes.
               
-              For more information, please see https://tina.io/docs/tinacloud/troubleshooting`
+              For more information, please see https://tina.io/docs/r/troubleshooting`
             );
           }
         })
