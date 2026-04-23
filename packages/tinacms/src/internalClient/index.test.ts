@@ -199,9 +199,7 @@ describe('Tina Client', () => {
         } as any,
       });
 
-      expect(client.contentApiUrl).toBe(
-        'https://schema-override.example.com'
-      );
+      expect(client.contentApiUrl).toBe('https://schema-override.example.com');
     });
   });
 
@@ -288,8 +286,7 @@ describe('Tina Client', () => {
             {
               name: 'feature-x',
               protected: false,
-              githubPullRequestUrl:
-                'https://github.com/tinacms/tinacms/pull/1',
+              githubPullRequestUrl: 'https://github.com/tinacms/tinacms/pull/1',
             },
           ] as unknown as Record<string, unknown>,
         })
@@ -306,8 +303,7 @@ describe('Tina Client', () => {
         {
           name: 'feature-x',
           protected: false,
-          githubPullRequestUrl:
-            'https://github.com/tinacms/tinacms/pull/1',
+          githubPullRequestUrl: 'https://github.com/tinacms/tinacms/pull/1',
         },
       ]);
     });
@@ -350,9 +346,9 @@ describe('Tina Client', () => {
         })
       );
 
-      await expect(
-        client.request('{ x }', { variables: {} })
-      ).rejects.toThrow(/clientId: app-42[\s\S]*branch: feature/);
+      await expect(client.request('{ x }', { variables: {} })).rejects.toThrow(
+        /clientId: app-42[\s\S]*branch: feature/
+      );
     });
 
     it('omits the clientId/branch hint when a custom content API URL is set', async () => {
@@ -372,9 +368,7 @@ describe('Tina Client', () => {
         })
       );
 
-      await expect(
-        client.request('{ x }', { variables: {} })
-      ).rejects.toThrow(
+      await expect(client.request('{ x }', { variables: {} })).rejects.toThrow(
         /^Unable to complete request, Server Error, Response: oops$/
       );
     });
@@ -388,9 +382,9 @@ describe('Tina Client', () => {
         })
       );
 
-      await expect(
-        client.request('{ x }', { variables: {} })
-      ).rejects.toThrow(/Response: boom/);
+      await expect(client.request('{ x }', { variables: {} })).rejects.toThrow(
+        /Response: boom/
+      );
     });
 
     it('joins GraphQL error messages from a 200 response', async () => {
@@ -403,18 +397,18 @@ describe('Tina Client', () => {
         })
       );
 
-      await expect(
-        client.request('{ x }', { variables: {} })
-      ).rejects.toThrow(/first error[\s\S]*second error/);
+      await expect(client.request('{ x }', { variables: {} })).rejects.toThrow(
+        /first error[\s\S]*second error/
+      );
     });
 
     it('propagates a fetch rejection unchanged', async () => {
       const networkError = new Error('ECONNRESET');
       vi.stubGlobal('fetch', vi.fn().mockRejectedValueOnce(networkError));
 
-      await expect(
-        client.request('{ x }', { variables: {} })
-      ).rejects.toThrow(networkError);
+      await expect(client.request('{ x }', { variables: {} })).rejects.toThrow(
+        networkError
+      );
     });
   });
 
