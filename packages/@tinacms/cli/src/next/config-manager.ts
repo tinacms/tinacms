@@ -8,6 +8,7 @@ import { Config } from '@tinacms/schema-tools';
 import * as dotenv from 'dotenv';
 import normalizePath from 'normalize-path';
 import { createRequire } from 'module';
+import { logger } from '../logger';
 import { warnText } from '../utils/theme';
 import { resolveContentRootPath } from './resolve-content-root';
 
