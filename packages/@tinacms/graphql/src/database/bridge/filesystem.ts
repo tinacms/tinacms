@@ -78,10 +78,25 @@ function assertWithinBase(filepath: string, baseDir: string): string {
   return resolved;
 }
 
+const GENERATED_PATH_PREFIXES = [
+  'tina/__generated__/',
+  '.tina/__generated__/',
+];
+
+function isGeneratedPath(filepath: string): boolean {
+  const normalized = filepath.replace(/\\/g, '/');
+  return GENERATED_PATH_PREFIXES.some((prefix) => normalized.startsWith(prefix));
+}
+
 /**
  * This is the bridge from whatever datasource we need for I/O.
  * The basic example here is for the filesystem, one is needed
  * for GitHub has well.
+ *
+ * When `outputPath` differs from `rootPath` (multi-repo: generator +
+ * sibling content repo), paths under `tina/__generated__/` still resolve
+ * against `rootPath` — schema/graphql/lookup artifacts live only in the
+ * generator. Everything else (content files) resolves against `outputPath`.
  *
  * @security All public methods validate their `filepath` / `pattern`
  * argument via `assertWithinBase` before performing any I/O. If you add a
@@ -94,6 +109,10 @@ export class FilesystemBridge implements Bridge {
   constructor(rootPath: string, outputPath?: string) {
     this.rootPath = path.resolve(rootPath);
     this.outputPath = outputPath ? path.resolve(outputPath) : this.rootPath;
+  }
+
+  private baseFor(filepath: string): string {
+    return isGeneratedPath(filepath) ? this.rootPath : this.outputPath;
   }
 
   public async glob(pattern: string, extension: string) {
@@ -112,17 +131,17 @@ export class FilesystemBridge implements Bridge {
   }
 
   public async delete(filepath: string) {
-    const resolved = assertWithinBase(filepath, this.outputPath);
+    const resolved = assertWithinBase(filepath, this.baseFor(filepath));
     await fs.remove(resolved);
   }
 
   public async get(filepath: string) {
-    const resolved = assertWithinBase(filepath, this.outputPath);
+    const resolved = assertWithinBase(filepath, this.baseFor(filepath));
     return (await fs.readFile(resolved)).toString();
   }
 
   public async put(filepath: string, data: string, basePathOverride?: string) {
-    const basePath = basePathOverride || this.outputPath;
+    const basePath = basePathOverride || this.baseFor(filepath);
     const resolved = assertWithinBase(filepath, basePath);
     await fs.outputFile(resolved, data);
   }

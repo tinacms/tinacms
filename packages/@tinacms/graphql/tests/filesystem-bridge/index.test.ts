@@ -142,6 +142,98 @@ describe('filesystem bridge', () => {
   });
 });
 
+describe('multi-repo routing (rootPath vs outputPath)', () => {
+  let generatorDir: string;
+  let contentDir: string;
+
+  beforeEach(async () => {
+    const stamp = Date.now();
+    generatorDir = path.join(
+      process.env.TMPDIR || '/tmp',
+      `tinacms-bridge-gen-${stamp}`
+    );
+    contentDir = path.join(
+      process.env.TMPDIR || '/tmp',
+      `tinacms-bridge-content-${stamp}`
+    );
+    await fs.mkdirp(generatorDir);
+    await fs.mkdirp(contentDir);
+  });
+
+  afterEach(async () => {
+    await fs.remove(generatorDir);
+    await fs.remove(contentDir);
+  });
+
+  test('put writes tina/__generated__/* to rootPath, never outputPath', async () => {
+    const bridge = new FilesystemBridge(generatorDir, contentDir);
+    await bridge.put('tina/__generated__/_schema.json', '{"x":1}');
+
+    expect(
+      await fs.pathExists(
+        path.join(generatorDir, 'tina/__generated__/_schema.json')
+      )
+    ).toBe(true);
+    expect(
+      await fs.pathExists(
+        path.join(contentDir, 'tina/__generated__/_schema.json')
+      )
+    ).toBe(false);
+  });
+
+  test('get reads tina/__generated__/* from rootPath', async () => {
+    const bridge = new FilesystemBridge(generatorDir, contentDir);
+    await fs.outputFile(
+      path.join(generatorDir, 'tina/__generated__/_graphql.json'),
+      '{"fromGenerator":true}'
+    );
+    await fs.outputFile(
+      path.join(contentDir, 'tina/__generated__/_graphql.json'),
+      '{"fromContent":true}'
+    );
+
+    const result = await bridge.get('tina/__generated__/_graphql.json');
+    expect(result).toBe('{"fromGenerator":true}');
+  });
+
+  test('routes .tina/__generated__/* (legacy) to rootPath as well', async () => {
+    const bridge = new FilesystemBridge(generatorDir, contentDir);
+    await bridge.put('.tina/__generated__/_lookup.json', '{"k":"v"}');
+
+    expect(
+      await fs.pathExists(
+        path.join(generatorDir, '.tina/__generated__/_lookup.json')
+      )
+    ).toBe(true);
+  });
+
+  test('content files still route to outputPath', async () => {
+    const bridge = new FilesystemBridge(generatorDir, contentDir);
+    await bridge.put('rules/example/index.md', 'body');
+
+    expect(
+      await fs.pathExists(path.join(contentDir, 'rules/example/index.md'))
+    ).toBe(true);
+    expect(
+      await fs.pathExists(path.join(generatorDir, 'rules/example/index.md'))
+    ).toBe(false);
+  });
+
+  test('delete respects the same routing', async () => {
+    const bridge = new FilesystemBridge(generatorDir, contentDir);
+    const genFile = path.join(generatorDir, 'tina/__generated__/_schema.json');
+    const contentFile = path.join(contentDir, 'rules/doomed.md');
+    await fs.outputFile(genFile, '{"x":1}');
+    await fs.outputFile(contentFile, 'content');
+
+    await bridge.delete('tina/__generated__/_schema.json');
+    await bridge.delete('rules/doomed.md');
+
+    expect(await fs.pathExists(genFile)).toBe(false);
+    expect(await fs.pathExists(contentFile)).toBe(false);
+  });
+});
+
 describe('AuditFileSystemBridge', () => {
   let tmpDir: string;
 
