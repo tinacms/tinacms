@@ -19,6 +19,58 @@ jest.mock('esbuild', () => ({
 import * as stripModule from './stripSearchTokenFromConfig';
 import { Codegen } from './index';
 
+describe('Codegen.genClient', () => {
+  function makeInstance(isTs: boolean): Codegen {
+    const instance = Object.create(Codegen.prototype) as Codegen;
+    instance.apiURL = 'https://example.com/graphql';
+    instance.localContentBuild = false;
+    instance.noClientBuildCache = true;
+    instance.configManager = {
+      config: { token: 'tok' },
+      generatedCachePath: '/fake/cache',
+      isUsingTs: () => isTs,
+    } as any;
+    return instance;
+  }
+
+  it('emits ./types.ts import for TypeScript projects', async () => {
+    const { clientString } = await makeInstance(true).genClient();
+    expect(clientString).toContain('from "./types.ts"');
+    expect(clientString).not.toMatch(/from ["']\.\/types["']/);
+  });
+
+  it('emits ./types.js import for non-TypeScript projects', async () => {
+    const { clientString } = await makeInstance(false).genClient();
+    expect(clientString).toContain('from "./types.js"');
+    expect(clientString).not.toMatch(/from ["']\.\/types["']/);
+  });
+});
+
+describe('Codegen.genDatabaseClient', () => {
+  function makeInstance(isTs: boolean): Codegen {
+    const instance = Object.create(Codegen.prototype) as Codegen;
+    instance.configManager = {
+      isUsingTs: () => isTs,
+    } as any;
+    instance.tinaSchema = {
+      getCollections: () => [],
+    } as any;
+    return instance;
+  }
+
+  it('emits ./types.ts import for TypeScript projects', async () => {
+    const result = await makeInstance(true).genDatabaseClient();
+    expect(result).toContain('from "./types.ts"');
+    expect(result).not.toMatch(/from ["']\.\/types["']/);
+  });
+
+  it('emits ./types.js import for non-TypeScript projects', async () => {
+    const result = await makeInstance(false).genDatabaseClient();
+    expect(result).toContain('from "./types.js"');
+    expect(result).not.toMatch(/from ["']\.\/types["']/);
+  });
+});
+
 describe('Codegen.execute integration', () => {
   let spy: jest.SpyInstance;
   const SAFE_RESULT = { branch: 'main', token: 'tok' };
