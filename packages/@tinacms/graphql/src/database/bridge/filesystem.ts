@@ -78,14 +78,13 @@ function assertWithinBase(filepath: string, baseDir: string): string {
   return resolved;
 }
 
-const GENERATED_PATH_PREFIXES = [
-  'tina/__generated__/',
-  '.tina/__generated__/',
-];
+const GENERATED_PATH_PREFIXES = ['tina/__generated__/', '.tina/__generated__/'];
 
 function isGeneratedPath(filepath: string): boolean {
   const normalized = filepath.replace(/\\/g, '/');
-  return GENERATED_PATH_PREFIXES.some((prefix) => normalized.startsWith(prefix));
+  return GENERATED_PATH_PREFIXES.some((prefix) =>
+    normalized.startsWith(prefix)
+  );
 }
 
 /**
