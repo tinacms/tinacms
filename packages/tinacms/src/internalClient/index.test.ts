@@ -72,12 +72,27 @@ describe('Tina Client', () => {
       client = new LocalClient();
     });
 
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
     it('defaults to the local dev server URL when no customContentApiUrl is provided', () => {
       expect(client.contentApiUrl).toBe('http://localhost:4001/graphql');
     });
 
     it('uses a LocalAuthProvider by default', () => {
       expect(client.authProvider).toBeInstanceOf(LocalAuthProvider);
+    });
+
+    it('sends no Authorization header because LocalAuthProvider returns an empty id_token', async () => {
+      const fetchMock = stubFetchOnce(
+        makeResponse({ status: 200, body: { data: {} } })
+      );
+
+      await client.request('{ x }', { variables: {} });
+
+      const [, init] = fetchMock.mock.calls[0];
+      expect(init.headers).not.toHaveProperty('Authorization');
     });
   });
 
@@ -145,10 +160,6 @@ describe('Tina Client', () => {
   describe('branch resolution', () => {
     let client: Client;
 
-    beforeEach(() => {
-      client = buildClient({ branch: 'main' });
-    });
-
     it('encodes the branch into the content API URL', () => {
       client = buildClient({ branch: 'feat/x y' });
 
@@ -158,6 +169,7 @@ describe('Tina Client', () => {
     });
 
     it('re-derives the content API URL when setBranch is called', () => {
+      client = buildClient({ branch: 'main' });
       client.setBranch('develop');
 
       expect(client.contentApiUrl).toBe(
@@ -214,6 +226,7 @@ describe('Tina Client', () => {
     });
 
     afterEach(() => {
+      vi.unstubAllGlobals();
       vi.restoreAllMocks();
     });
 
@@ -285,7 +298,6 @@ describe('Tina Client', () => {
             { name: 'main', protected: true },
             {
               name: 'feature-x',
-              protected: false,
               githubPullRequestUrl: 'https://github.com/tinacms/tinacms/pull/1',
             },
           ] as unknown as Record<string, unknown>,
@@ -306,6 +318,76 @@ describe('Tina Client', () => {
           githubPullRequestUrl: 'https://github.com/tinacms/tinacms/pull/1',
         },
       ]);
+    });
+
+    it('listBranches fetches index status per branch and populates protectedBranches', async () => {
+      fetchWithToken
+        .mockResolvedValueOnce(
+          makeResponse({
+            status: 200,
+            body: [
+              { name: 'main', protected: true },
+              { name: 'feature-x', protected: false },
+            ] as unknown as Record<string, unknown>,
+          })
+        )
+        .mockResolvedValueOnce(
+          makeResponse({
+            status: 200,
+            body: { status: 'complete', timestamp: 1 },
+          })
+        )
+        .mockResolvedValueOnce(
+          makeResponse({ status: 200, body: { status: 'inprogress' } })
+        );
+
+      const result = await client.listBranches();
+
+      expect(result).toEqual([
+        {
+          name: 'main',
+          protected: true,
+          indexStatus: { status: 'complete', timestamp: 1 },
+        },
+        {
+          name: 'feature-x',
+          protected: false,
+          indexStatus: { status: 'inprogress' },
+        },
+      ]);
+      expect(client.protectedBranches).toEqual(['main']);
+    });
+
+    it('branchExists returns true when the branch is in the list', async () => {
+      fetchWithToken.mockResolvedValueOnce(
+        makeResponse({
+          status: 200,
+          body: [
+            { name: 'main', protected: true },
+            { name: 'feature-x', protected: false },
+          ] as unknown as Record<string, unknown>,
+        })
+      );
+
+      const result = await client.branchExists('feature-x');
+
+      expect(result).toBe(true);
+    });
+
+    it('branchExists returns false when the branch is not in the list', async () => {
+      fetchWithToken.mockResolvedValueOnce(
+        makeResponse({
+          status: 200,
+          body: [{ name: 'main', protected: true }] as unknown as Record<
+            string,
+            unknown
+          >,
+        })
+      );
+
+      const result = await client.branchExists('feature-x');
+
+      expect(result).toBe(false);
     });
 
     it('branchExists returns true in local mode without calling listBranches', async () => {
