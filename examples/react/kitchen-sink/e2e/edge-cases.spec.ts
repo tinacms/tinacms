@@ -48,7 +48,6 @@ test.describe('Edge Cases — Missing Fields', () => {
     await expect(page.locator('text=Error')).not.toBeVisible();
     await expect(page.locator('text=Failed to load')).not.toBeVisible();
   });
-
 });
 
 test.describe('Edge Cases — Empty Collections', () => {

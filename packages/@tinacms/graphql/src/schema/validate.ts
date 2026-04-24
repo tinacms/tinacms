@@ -21,6 +21,7 @@ const FIELD_TYPES: TinaField['type'][] = [
   'object',
   'rich-text',
   'password',
+  'displayOnly',
 ];
 
 export const validateSchema = async (schema: Schema) => {

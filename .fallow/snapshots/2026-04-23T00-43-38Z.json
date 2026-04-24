@@ -1,0 +1,57 @@
+{
+  "snapshot_schema_version": 7,
+  "version": "2.45.1",
+  "timestamp": "2026-04-23T00:43:38Z",
+  "git_sha": "6802e3869",
+  "git_branch": "gitbutler/workspace",
+  "shallow_clone": false,
+  "vital_signs": {
+    "dead_file_pct": 21.1,
+    "dead_export_pct": 25.2,
+    "avg_cyclomatic": 2.1,
+    "p90_cyclomatic": 4,
+    "duplication_pct": 23.3,
+    "hotspot_count": 1,
+    "maintainability_avg": 87.5,
+    "unused_dep_count": 53,
+    "circular_dep_count": 77,
+    "counts": {
+      "total_files": 1310,
+      "total_exports": 2582,
+      "dead_files": 276,
+      "dead_exports": 650,
+      "duplicated_lines": 29162,
+      "total_lines": 131875,
+      "files_scored": 973,
+      "total_deps": 0
+    },
+    "unit_size_profile": {
+      "low_risk": 69.0,
+      "medium_risk": 15.7,
+      "high_risk": 8.7,
+      "very_high_risk": 6.6
+    },
+    "unit_interfacing_profile": {
+      "low_risk": 96.1,
+      "medium_risk": 3.3,
+      "high_risk": 0.5,
+      "very_high_risk": 0.1
+    },
+    "p95_fan_in": 6,
+    "coupling_high_pct": 2.7,
+    "total_loc": 131875
+  },
+  "counts": {
+    "total_files": 1310,
+    "total_exports": 2582,
+    "dead_files": 276,
+    "dead_exports": 650,
+    "duplicated_lines": 29162,
+    "total_lines": 131875,
+    "files_scored": 973,
+    "total_deps": 0
+  },
+  "score": 56.8,
+  "grade": "C",
+  "coverage_model": "static_estimated"
+}

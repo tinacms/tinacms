@@ -1,5 +1,47 @@
 # tinacms
 
+## 3.7.3
+
+### Patch Changes
+
+- [#6548](https://github.com/tinacms/tinacms/pull/6548) [`cd262b3`](https://github.com/tinacms/tinacms/commit/cd262b311c218ea4e5b5bb8abbbe54fcff3b8054) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Add 'displayOnly' field type for display-only form fields
+
+- [#6693](https://github.com/tinacms/tinacms/pull/6693) [`217bfb4`](https://github.com/tinacms/tinacms/commit/217bfb4ff2c1a61fa7b6df3ea460b192b5179bb7) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Fix sidebar file tree: consolidate duplicate roots from multiple useTina() calls, prevent chevron shrinking on long filenames, add bottom padding for last item visibility
+
+- [#6678](https://github.com/tinacms/tinacms/pull/6678) [`5feb18d`](https://github.com/tinacms/tinacms/commit/5feb18d0d3032bbcd6a5aad678208c0dde19bf81) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - fix: display editorial workflow modal on deleted branches
+
+- [#6699](https://github.com/tinacms/tinacms/pull/6699) [`32e145d`](https://github.com/tinacms/tinacms/commit/32e145d4859cbc710a222f2a01c55ca7b29a080b) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 💄 Improve UI of Grid Item in Media Manager
+
+- [#6682](https://github.com/tinacms/tinacms/pull/6682) [`d998884`](https://github.com/tinacms/tinacms/commit/d9988849ad67fb5e9d7e233c1ccca0cb0c031c3e) Thanks [@kulesy](https://github.com/kulesy)! - Fix React Error #31 when inserting image from Media Library with custom MediaStore
+
+- [#6664](https://github.com/tinacms/tinacms/pull/6664) [`c75d871`](https://github.com/tinacms/tinacms/commit/c75d87121224f91dc4e5e2aa8af60b0881b87a5b) Thanks [@18-th](https://github.com/18-th)! - Validate relativePath to reject whitespace and invalid characters
+
+- Updated dependencies [[`cd262b3`](https://github.com/tinacms/tinacms/commit/cd262b311c218ea4e5b5bb8abbbe54fcff3b8054), [`55dae8e`](https://github.com/tinacms/tinacms/commit/55dae8eef898f49f827c00bc72297863d0d69be1)]:
+  - @tinacms/schema-tools@2.7.2
+  - @tinacms/mdx@2.1.2
+  - @tinacms/search@1.2.10
+
+## 3.7.2
+
+### Patch Changes
+
+- [#6400](https://github.com/tinacms/tinacms/pull/6400) [`3569c95`](https://github.com/tinacms/tinacms/commit/3569c95c124138013b36cd30bfef4d0b02f5c57b) Thanks [@kulesy](https://github.com/kulesy)! - Improve branch operation error message clarity
+
+- [#6633](https://github.com/tinacms/tinacms/pull/6633) [`4315d73`](https://github.com/tinacms/tinacms/commit/4315d731e729857713d5f3fc6cdef2b30abd9384) Thanks [@JackDevAU](https://github.com/JackDevAU)! - refactor: make @tinacms/schema-tools the single source of truth
+
+- [#6617](https://github.com/tinacms/tinacms/pull/6617) [`ff1cd6f`](https://github.com/tinacms/tinacms/commit/ff1cd6fb50edc24b34f81166d7dedbfec6d22b32) Thanks [@18-th](https://github.com/18-th)! - Improve error messages when a pull request via editorial workflow fails due to missing Git authoring tokens
+
+- [#6626](https://github.com/tinacms/tinacms/pull/6626) [`d1ad86e`](https://github.com/tinacms/tinacms/commit/d1ad86e204e19bf5bb4811658d40d172635da3af) Thanks [@tiagov8](https://github.com/tiagov8)! - Fix login screen error message and update modal title
+
+- [#6607](https://github.com/tinacms/tinacms/pull/6607) [`e146e92`](https://github.com/tinacms/tinacms/commit/e146e922b40cb5376c7a3adf81b44ad4cf8f1867) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐖 Add Telemetry to new Media Usage dashboard to see how users are interacting with it
+
+- [#6602](https://github.com/tinacms/tinacms/pull/6602) [`246ee27`](https://github.com/tinacms/tinacms/commit/246ee27a8e0b74baf241c6a70a1699013fc59299) Thanks [@griffenedge](https://github.com/griffenedge)! - Reduce the TinaCloud auth modal login image so it appears as a decorative element rather than dominating the modal.
+
+- Updated dependencies [[`4315d73`](https://github.com/tinacms/tinacms/commit/4315d731e729857713d5f3fc6cdef2b30abd9384)]:
+  - @tinacms/schema-tools@2.7.1
+  - @tinacms/mdx@2.1.1
+  - @tinacms/search@1.2.9
+
 ## 3.7.1
 
 ### Patch Changes

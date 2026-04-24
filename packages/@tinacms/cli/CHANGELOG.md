@@ -1,5 +1,27 @@
 # tinacms-cli
 
+## 2.2.3
+
+### Patch Changes
+
+- Updated dependencies [[`cd262b3`](https://github.com/tinacms/tinacms/commit/cd262b311c218ea4e5b5bb8abbbe54fcff3b8054), [`217bfb4`](https://github.com/tinacms/tinacms/commit/217bfb4ff2c1a61fa7b6df3ea460b192b5179bb7), [`4a8627b`](https://github.com/tinacms/tinacms/commit/4a8627b66fccf3396e790ae88fe7bb79408b4808), [`5feb18d`](https://github.com/tinacms/tinacms/commit/5feb18d0d3032bbcd6a5aad678208c0dde19bf81), [`32e145d`](https://github.com/tinacms/tinacms/commit/32e145d4859cbc710a222f2a01c55ca7b29a080b), [`d998884`](https://github.com/tinacms/tinacms/commit/d9988849ad67fb5e9d7e233c1ccca0cb0c031c3e), [`c75d871`](https://github.com/tinacms/tinacms/commit/c75d87121224f91dc4e5e2aa8af60b0881b87a5b)]:
+  - @tinacms/schema-tools@2.7.2
+  - @tinacms/graphql@2.2.4
+  - tinacms@3.7.3
+  - @tinacms/search@1.2.10
+  - @tinacms/app@2.4.3
+
+## 2.2.2
+
+### Patch Changes
+
+- Updated dependencies [[`3569c95`](https://github.com/tinacms/tinacms/commit/3569c95c124138013b36cd30bfef4d0b02f5c57b), [`4315d73`](https://github.com/tinacms/tinacms/commit/4315d731e729857713d5f3fc6cdef2b30abd9384), [`ff1cd6f`](https://github.com/tinacms/tinacms/commit/ff1cd6fb50edc24b34f81166d7dedbfec6d22b32), [`d1ad86e`](https://github.com/tinacms/tinacms/commit/d1ad86e204e19bf5bb4811658d40d172635da3af), [`e146e92`](https://github.com/tinacms/tinacms/commit/e146e922b40cb5376c7a3adf81b44ad4cf8f1867), [`246ee27`](https://github.com/tinacms/tinacms/commit/246ee27a8e0b74baf241c6a70a1699013fc59299)]:
+  - tinacms@3.7.2
+  - @tinacms/schema-tools@2.7.1
+  - @tinacms/app@2.4.2
+  - @tinacms/graphql@2.2.3
+  - @tinacms/search@1.2.9
+
 ## 2.2.1
 
 ### Patch Changes

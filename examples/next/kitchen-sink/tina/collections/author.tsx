@@ -7,9 +7,7 @@ const Author: Collection = {
   path: 'content/authors',
   format: 'md',
   ui: {
-    router: ({
-      document,
-    }: { document: { _sys: { filename: string } } }) =>
+    router: ({ document }: { document: { _sys: { filename: string } } }) =>
       `/authors/${document._sys.filename}`,
   },
   fields: [

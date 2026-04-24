@@ -36,7 +36,11 @@ export default function AuthorClientPage(props: TinaPageProps) {
                 data-tina-field={tinaField(data.author, 'avatar')}
               />
             )}
-            <GradientTitle size='5xl' className='mb-4' data-tina-field={tinaField(data.author, 'name')}>
+            <GradientTitle
+              size='5xl'
+              className='mb-4'
+              data-tina-field={tinaField(data.author, 'name')}
+            >
               {data.author.name}
             </GradientTitle>
             {data.author.description && (
