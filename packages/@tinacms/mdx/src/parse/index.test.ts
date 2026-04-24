@@ -60,5 +60,4 @@ describe('parseMDX', () => {
       expect(serializeMDX(tree, field, passthrough)).toBe(input);
     });
   });
-
 });
