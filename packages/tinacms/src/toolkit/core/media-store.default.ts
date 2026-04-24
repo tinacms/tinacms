@@ -133,7 +133,7 @@ export class TinaMediaStore implements MediaStore {
           throw new Error(message);
         }
 
-        const { signedUrl, requestId, src: uploadSrc } = await res.json();
+        const { signedUrl, requestId } = await res.json();
         if (!signedUrl) {
           throw new Error('Unexpected error generating upload url');
         }
@@ -178,9 +178,7 @@ export class TinaMediaStore implements MediaStore {
           }
         }
 
-        const src =
-          uploadSrc ||
-          `https://assets.tina.io/${this.api.clientId}/${path}`;
+        const src = `${this.api.assetsDomain}/${this.api.clientId}/${path}`;
 
         newFiles.push({
           directory: item.directory,

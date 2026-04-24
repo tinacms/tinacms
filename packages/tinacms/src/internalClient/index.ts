@@ -100,6 +100,7 @@ export class Client {
   contentApiUrl: string;
   identityApiUrl: string;
   assetsApiUrl: string;
+  assetsDomain: string;
   gqlSchema: GraphQLSchema;
   schema?: TinaSchema;
   clientId: string;
@@ -175,6 +176,9 @@ export class Client {
     this.assetsApiUrl =
       this.options.tinaioConfig?.assetsApiUrlOverride ||
       'https://assets.tinajs.io';
+    this.assetsDomain =
+      this.options.tinaioConfig?.assetsApiUrlOverride ||
+      'https://assets.tina.io';
     this.frontendUrl =
       this.options.tinaioConfig?.frontendUrlOverride || 'https://app.tina.io';
     this.identityApiUrl =
