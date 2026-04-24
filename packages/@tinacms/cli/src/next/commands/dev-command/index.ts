@@ -175,7 +175,12 @@ export class DevCommand extends BaseCommand {
       firstTime: true,
     });
 
-    await fs.outputFile(configManager.outputHTMLFilePath, devHTML(this.port));
+    const devServerUrl =
+      configManager.config?.server?.url || `http://localhost:${this.port}`;
+    await fs.outputFile(
+      configManager.outputHTMLFilePath,
+      devHTML(devServerUrl)
+    );
     // Add the gitignore so the index.html and assets are committed to git
     await fs.outputFile(
       configManager.outputGitignorePath,
