@@ -103,7 +103,7 @@ export const WorkflowProgressIndicator = ({
       </div>
       <a
         className='underline text-tina-orange-dark font-medium text-xs'
-        href='https://tina.io/docs/tinacloud/editorial-workflow'
+        href='https://tina.io/docs/r/editorial-workflow'
         target='_blank'
       >
         Learn more about Editorial Workflow
