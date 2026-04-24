@@ -26,7 +26,9 @@ export async function resolveContentRootPath(params: {
   tinaConfigFilePath: string;
   localContentPath: unknown;
 }): Promise<string> {
-  const localContentPath = localContentPathSchema.parse(params.localContentPath);
+  const localContentPath = localContentPathSchema.parse(
+    params.localContentPath
+  );
   if (!localContentPath) {
     return params.rootPath;
   }
