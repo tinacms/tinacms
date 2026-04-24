@@ -106,7 +106,6 @@ describe('Codegen.execute integration', () => {
     } as any;
     instance.configManager = {
       generatedFolderPath: '/fake/tina/__generated__',
-      generatedFolderPathContentRepo: '/fake/tina/__generated__',
       generatedSchemaJSONPath: '/fake/tina/__generated__/_schema.json',
       generatedQueriesFilePath: '/fake/tina/__generated__/queries.gql',
       generatedFragmentsFilePath: '/fake/tina/__generated__/frags.gql',
@@ -115,7 +114,6 @@ describe('Codegen.execute integration', () => {
         token: 'tok',
         clientId: 'cid',
       },
-      hasSeparateContentRoot: () => false,
       shouldSkipSDK: () => true,
       getTinaGraphQLVersion: () => ({
         fullVersion: '1.0.0',
@@ -171,5 +169,21 @@ describe('Codegen.execute integration', () => {
     const writtenData = JSON.parse(schemaWriteCall[1]);
     expect(writtenData.config).toEqual(SAFE_RESULT);
     expect(JSON.stringify(writtenData)).not.toContain('secret-token');
+  });
+
+  it('writes each generated config file exactly once (never duplicates to a content repo path)', async () => {
+    const codegen = stubCodegen();
+    const fs = jest.requireMock('fs-extra');
+    (fs.outputFile as jest.Mock).mockClear();
+
+    await codegen.execute();
+
+    for (const fileName of ['_schema.json', '_graphql.json', '_lookup.json']) {
+      const calls = (fs.outputFile as jest.Mock).mock.calls.filter(
+        ([filePath]: [string]) => filePath.endsWith(fileName)
+      );
+      expect(calls).toHaveLength(1);
+      expect(calls[0][0]).toBe(`/fake/tina/__generated__/${fileName}`);
+    }
   });
 });

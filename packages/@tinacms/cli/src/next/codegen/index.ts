@@ -76,14 +76,6 @@ export class Codegen {
     );
     await fs.ensureFile(filePath);
     await fs.outputFile(filePath, data);
-    if (this.configManager.hasSeparateContentRoot()) {
-      const filePath = path.join(
-        this.configManager.generatedFolderPathContentRepo,
-        fileName
-      );
-      await fs.ensureFile(filePath);
-      await fs.outputFile(filePath, data);
-    }
   }
 
   async removeGeneratedFilesIfExists() {
