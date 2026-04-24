@@ -108,4 +108,16 @@ describe('resolveContentRootPath', () => {
       '/fake/project/content-repo'
     );
   });
+
+  it('throws on an empty-string localContentPath', async () => {
+    await expect(
+      resolveContentRootPath({ ...baseParams, localContentPath: '' })
+    ).rejects.toThrow();
+  });
+
+  it('throws on a non-string localContentPath', async () => {
+    await expect(
+      resolveContentRootPath({ ...baseParams, localContentPath: 42 })
+    ).rejects.toThrow();
+  });
 });

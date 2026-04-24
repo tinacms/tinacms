@@ -1,8 +1,11 @@
 import fs from 'fs-extra';
 import path from 'path';
 import chalk from 'chalk';
+import { z } from 'zod';
 import { logger } from '../logger';
 import { stripNativeTrailingSlash } from '../utils/path';
+
+const localContentPathSchema = z.string().min(1).optional();
 
 /**
  * Resolves the content root directory for a Tina project.
@@ -21,13 +24,14 @@ export async function resolveContentRootPath(params: {
   rootPath: string;
   tinaFolderPath: string;
   tinaConfigFilePath: string;
-  localContentPath: string | undefined;
+  localContentPath: unknown;
 }): Promise<string> {
-  if (!params.localContentPath) {
+  const localContentPath = localContentPathSchema.parse(params.localContentPath);
+  if (!localContentPath) {
     return params.rootPath;
   }
   const fullLocalContentPath = stripNativeTrailingSlash(
-    path.join(params.tinaFolderPath, params.localContentPath)
+    path.join(params.tinaFolderPath, localContentPath)
   );
   const exists = await fs.pathExists(fullLocalContentPath);
   if (exists) {
