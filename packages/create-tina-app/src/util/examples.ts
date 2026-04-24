@@ -38,19 +38,31 @@ export async function getRepoInfo(
     // In this case "t" will be an empty string while the next part "_branch" will be undefined
     (t === '' && _branch === undefined)
   ) {
+    const apiURL = `https://api.github.com/repos/${username}/${name}`;
+    let infoResponse: Response;
     try {
-      const infoResponse = await fetch(
-        `https://api.github.com/repos/${username}/${name}`
-      );
-      if (infoResponse.status !== 200) {
-        return;
-      }
-
-      const info = await infoResponse.json();
-      return { username, name, branch: info.default_branch, filePath };
+      infoResponse = await fetch(apiURL);
     } catch {
       return;
     }
+
+    if (infoResponse.status !== 200) {
+      const isPrimaryRateLimit =
+        infoResponse.status === 403 &&
+        infoResponse.headers.get('x-ratelimit-remaining') === '0';
+      const isSecondaryRateLimit =
+        (infoResponse.status === 403 || infoResponse.status === 429) &&
+        infoResponse.headers.get('retry-after') !== null;
+
+      if (isPrimaryRateLimit || isSecondaryRateLimit) {
+        throw new Error('GitHub API rate limit exceeded');
+      }
+
+      return;
+    }
+
+    const info = await infoResponse.json();
+    return { username, name, branch: info.default_branch, filePath };
   }
 
   // If examplePath is available, the branch name takes the entire path
