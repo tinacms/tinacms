@@ -147,7 +147,7 @@ catalog:
     graphiql: 3.0.0-alpha.1
     graphql-tag: ^2.12.6
     gray-matter: ^4.0.3
-    happy-dom: 15.10.2
+    happy-dom: 20.8.9
     highlight.js: ^11.11.1
     identity-obj-proxy: ^3.0.0
     is-hotkey: ^0.2.0
@@ -186,7 +186,7 @@ catalog:
     normalize-path: ^3.0.0
     ora: ^8.2.0
     parse-entities: 4.0.1
-    picomatch: ^4.0.2
+    picomatch: ^2.3.2
     picomatch-browser: 2.2.6
     postcss-import: ^14.1.0
     postcss-nesting: ^10.2.0
