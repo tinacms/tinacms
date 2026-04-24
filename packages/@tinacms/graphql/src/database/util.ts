@@ -195,14 +195,6 @@ export const parseFile = <T extends object>(
   throw new Error(`Must specify a valid format, got ${format}`);
 };
 
-export const atob = (b64Encoded: string) => {
-  return Buffer.from(b64Encoded, 'base64').toString();
-};
-
-export const btoa = (string: string) => {
-  return Buffer.from(string).toString('base64');
-};
-
 export const scanAllContent = async (
   tinaSchema: TinaSchema,
   bridge: Bridge,
