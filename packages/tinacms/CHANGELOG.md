@@ -1,5 +1,30 @@
 # tinacms
 
+## 3.7.4
+
+### Patch Changes
+
+- [#6410](https://github.com/tinacms/tinacms/pull/6410) [`4672251`](https://github.com/tinacms/tinacms/commit/4672251c813e51f4471f025943008d2dea700aca) Thanks [@TihomirIvanov](https://github.com/TihomirIvanov)! - Updated tinacms dependency mermaid
+
+  Fixes security vulnerabilities
+
+  - Fixes https://github.com/advisories/GHSA-p3vf-v8qc-cwcr
+  - Fixes https://github.com/advisories/GHSA-gx9m-whjm-85jf
+  - Fixes https://github.com/advisories/GHSA-mmhx-hmjr-r674
+  - Fixes https://github.com/advisories/GHSA-m4gq-x24j-jpmf
+  - Fixes https://github.com/advisories/GHSA-vhxf-7vqr-mrjg
+
+- [#6708](https://github.com/tinacms/tinacms/pull/6708) [`ca725ac`](https://github.com/tinacms/tinacms/commit/ca725acb42be499c146d76b12982e05a8127f81e) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Fix rich-text image edit form: the URL field now shows the correct `URL` label and loads the existing image (previously it displayed the raw field path like `body.children[10].props.url` and rendered as an empty upload dropzone). The breadcrumb for the image form also now reads "Image" instead of the full path.
+
+- [#6687](https://github.com/tinacms/tinacms/pull/6687) [`a526f9f`](https://github.com/tinacms/tinacms/commit/a526f9f4c37a0aaefb572c9dcc562d89aa9e5c7e) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: simplify errors shown to users
+
+- [#6720](https://github.com/tinacms/tinacms/pull/6720) [`b260b5e`](https://github.com/tinacms/tinacms/commit/b260b5ed4beb5d678b9605357b99a8667fddc8de) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Migrate docs links in shipped package code from raw `tina.io/docs/<path>` URLs to aliased `tina.io/docs/r/<alias>` URLs so the links survive future docs restructuring.
+
+- [#6728](https://github.com/tinacms/tinacms/pull/6728) [`b56dad4`](https://github.com/tinacms/tinacms/commit/b56dad42d2216ac9c8f90f19b78a4951ca97a61f) Thanks [@monsonego](https://github.com/monsonego)! - Fix the radio-group field styling so radio options render with a circular indicator and no longer look disabled when unselected.
+
+- Updated dependencies []:
+  - @tinacms/search@1.2.11
+
 ## 3.7.3
 
 ### Patch Changes
