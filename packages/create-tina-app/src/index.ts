@@ -512,22 +512,22 @@ export async function run() {
   console.log('Next steps:');
   console.log(
     `  • 📝 Edit some content: ${TextStyles.link(
-      'https://tina.io/docs/using-tina-editor'
+      'https://tina.io/docs/r/using-tina-editor'
     )}`
   );
   console.log(
     `  • 📖 Learn the basics: ${TextStyles.link(
-      'https://tina.io/docs/schema/'
+      'https://tina.io/docs/r/content-modelling-collections'
     )}`
   );
   console.log(
     `  • 🖌️ Extend Tina with custom field components: ${TextStyles.link(
-      'https://tina.io/docs/advanced/extending-tina/'
+      'https://tina.io/docs/r/custom-fields-react'
     )}`
   );
   console.log(
     `  • 🚀 Deploy to Production: ${TextStyles.link(
-      'https://tina.io/docs/tinacloud/'
+      'https://tina.io/docs/r/what-is-tinacloud'
     )}`
   );
 }

@@ -1,5 +1,13 @@
 # tina-graphql
 
+## 2.2.5
+
+### Patch Changes
+
+- [#6734](https://github.com/tinacms/tinacms/pull/6734) [`8194482`](https://github.com/tinacms/tinacms/commit/81944822373ad2d548871b880d586492efe71f3f) Thanks [@JackDevAU](https://github.com/JackDevAU)! - chore(@tinacms/graphql): remove duplicate atob/btoa from database/util.ts
+
+- [#6720](https://github.com/tinacms/tinacms/pull/6720) [`b260b5e`](https://github.com/tinacms/tinacms/commit/b260b5ed4beb5d678b9605357b99a8667fddc8de) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Migrate docs links in shipped package code from raw `tina.io/docs/<path>` URLs to aliased `tina.io/docs/r/<alias>` URLs so the links survive future docs restructuring.
+
 ## 2.2.4
 
 ### Patch Changes
