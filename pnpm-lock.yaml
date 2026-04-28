@@ -114,9 +114,6 @@ catalogs:
     '@rollup/pluginutils':
       specifier: ^5.1.4
       version: 5.3.0
-    '@sucrase/jest-plugin':
-      specifier: ^3.0.0
-      version: 3.0.0
     '@svgr/core':
       specifier: 8.1.0
       version: 8.1.0
@@ -1756,9 +1753,6 @@ importers:
 
   packages/@tinacms/scripts:
     dependencies:
-      '@sucrase/jest-plugin':
-        specifier: 'catalog:'
-        version: 3.0.0(jest@30.2.0(@types/node@22.19.17)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.19.17)(typescript@5.9.3)))(sucrase@3.35.1)
       chalk:
         specifier: 'catalog:'
         version: 5.6.2
@@ -6806,12 +6800,6 @@ packages:
   '@smithy/uuid@1.1.0':
     resolution: {integrity: sha512-4aUIteuyxtBUhVdiQqcDhKFitwfd9hqoSDYY2KRXiWtgoWJ9Bmise+KfEPDiVHWeJepvF8xJO9/9+WDIciMFFw==}
     engines: {node: '>=18.0.0'}
-
-  '@sucrase/jest-plugin@3.0.0':
-    resolution: {integrity: sha512-VRY6YKYImVWiRg1H3Yu24hwB1UPJDSDR62R/n+lOHR3+yDrfHEIAoddJivblMYN6U3vD+ndfTSrecZ9Jl+iGNw==}
-    peerDependencies:
-      jest: '>=27'
-      sucrase: '>=3.25.0'
 
   '@svgr/babel-plugin-add-jsx-attribute@8.0.0':
     resolution: {integrity: sha512-b9MIk7yhdS1pMCZM8VeNfUlSKVRhsHZNMl5O9SfaX0l0t5wjdgu4IDzGB8bpnGBBOjGST3rRFVsaaEtI4W6f7g==}
@@ -20312,11 +20300,6 @@ snapshots:
   '@smithy/uuid@1.1.0':
     dependencies:
       tslib: 2.8.1
-
-  '@sucrase/jest-plugin@3.0.0(jest@30.2.0(@types/node@22.19.17)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.19.17)(typescript@5.9.3)))(sucrase@3.35.1)':
-    dependencies:
-      jest: 30.2.0(@types/node@22.19.17)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.19.17)(typescript@5.9.3))
-      sucrase: 3.35.1
 
   '@svgr/babel-plugin-add-jsx-attribute@8.0.0(@babel/core@7.28.5)':
     dependencies:
