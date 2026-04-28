@@ -234,7 +234,7 @@ export const scanAllContent = async (
           .map((collection) => `"${collection}"`)
           .join(
             ', '
-          )}. This can cause unexpected behavior. We recommend updating the \`match\` property of those collections so that each file is in only one collection.\nThis will be an error in the future. See https://tina.io/docs/errors/file-in-mutpliple-collections/\n`
+          )}. This can cause unexpected behavior. We recommend updating the \`match\` property of those collections so that each file is in only one collection.\nThis will be an error in the future. See https://tina.io/docs/r/content-modelling-collections#path-matching\n`
       );
     });
 
@@ -391,7 +391,7 @@ export const loadAndParseWithAliases = async (
   const template = getTemplateForFile(templateInfo, data as any);
   if (!template) {
     console.warn(
-      `Document: ${filepath} has an ambiguous template, skipping from indexing. See https://tina.io/docs/errors/ambiguous-template/ for more info.`
+      `Document: ${filepath} has an ambiguous template, skipping from indexing. See https://tina.io/docs/r/ambiguous-template for more info.`
     );
     return;
   }

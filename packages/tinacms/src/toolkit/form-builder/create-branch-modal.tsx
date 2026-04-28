@@ -155,7 +155,7 @@ export const CreateBranchModal = ({
             <span className='text-gray-500'>Learn more about </span>
             <a
               className='underline text-tina-orange-dark font-medium'
-              href='https://tina.io/docs/tinacloud/editorial-workflow'
+              href='https://tina.io/docs/r/editorial-workflow'
               target='_blank'
             >
               Editorial Workflow

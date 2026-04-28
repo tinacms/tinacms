@@ -1,5 +1,19 @@
 # tinacms-cli
 
+## 2.2.4
+
+### Patch Changes
+
+- [#6720](https://github.com/tinacms/tinacms/pull/6720) [`b260b5e`](https://github.com/tinacms/tinacms/commit/b260b5ed4beb5d678b9605357b99a8667fddc8de) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Migrate docs links in shipped package code from raw `tina.io/docs/<path>` URLs to aliased `tina.io/docs/r/<alias>` URLs so the links survive future docs restructuring.
+
+- [#6636](https://github.com/tinacms/tinacms/pull/6636) [`8f491ed`](https://github.com/tinacms/tinacms/commit/8f491ed3d309fe690d5ffb96d2a22b673e015774) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Add `--content=local` flag to `tinacms build` for fast production builds that source content from local disk while keeping the generated client pointed at TinaCloud (so SSR/ISR routes still work at runtime). Validates against TinaCloud and forces `NODE_ENV=production` for chained sub-commands.
+
+- Updated dependencies [[`4672251`](https://github.com/tinacms/tinacms/commit/4672251c813e51f4471f025943008d2dea700aca), [`ca725ac`](https://github.com/tinacms/tinacms/commit/ca725acb42be499c146d76b12982e05a8127f81e), [`8194482`](https://github.com/tinacms/tinacms/commit/81944822373ad2d548871b880d586492efe71f3f), [`a526f9f`](https://github.com/tinacms/tinacms/commit/a526f9f4c37a0aaefb572c9dcc562d89aa9e5c7e), [`b260b5e`](https://github.com/tinacms/tinacms/commit/b260b5ed4beb5d678b9605357b99a8667fddc8de), [`b56dad4`](https://github.com/tinacms/tinacms/commit/b56dad42d2216ac9c8f90f19b78a4951ca97a61f)]:
+  - tinacms@3.7.4
+  - @tinacms/graphql@2.2.5
+  - @tinacms/app@2.4.4
+  - @tinacms/search@1.2.11
+
 ## 2.2.3
 
 ### Patch Changes

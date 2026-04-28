@@ -49,7 +49,7 @@ const transformForestryMatchToTinaMatch = (match: string) => {
   if (match !== newMatch) {
     logger.info(
       `Info: Match ${match} was transformed to ${newMatch}. See ${linkText(
-        'https://tina.io/docs/forestry/common-errors/#info-match-match-was-transformed-to-newmatch'
+        'https://tina.io/docs/r/forestry-common-errors#info-match-match-was-transformed-to-newmatch'
       )}`
     );
   }
@@ -262,7 +262,7 @@ const generateCollectionFromForestrySection = (args: {
           `No templates found for section ${
             section.label
           }. Please see ${linkText(
-            'https://tina.io/docs/forestry/content-modelling/'
+            'https://tina.io/docs/r/forestry-content-modelling'
           )} for more information`
         )
       );
