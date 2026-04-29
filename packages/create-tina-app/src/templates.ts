@@ -1,4 +1,4 @@
-import { downloadAndExtractRepo, getRepoInfo } from './util/examples';
+import { downloadAndExtractRepo } from './util/examples';
 import { copy } from 'fs-extra';
 import path from 'path';
 import { TextStyles } from './util/textstyles';
@@ -23,6 +23,7 @@ export type InternalTemplate = BaseExample & {
 export type ExternalTemplate = BaseExample & {
   isInternal: false;
   gitURL: string;
+  branch: string;
 };
 export type Template = InternalTemplate | ExternalTemplate;
 
@@ -48,6 +49,7 @@ export const TEMPLATES: Template[] = [
       },
     ],
     gitURL: 'https://github.com/tinacms/tina-nextjs-starter',
+    branch: 'main',
     devUrl: 'http://localhost:3000',
   },
   {
@@ -71,6 +73,7 @@ export const TEMPLATES: Template[] = [
       },
     ],
     gitURL: 'https://github.com/tinacms/tina-docs',
+    branch: 'main',
     devUrl: 'http://localhost:3000',
   },
   {
@@ -94,6 +97,7 @@ export const TEMPLATES: Template[] = [
       },
     ],
     gitURL: 'https://github.com/tinacms/tina-astro-starter',
+    branch: 'main',
     devUrl: 'http://localhost:4321',
   },
   {
@@ -117,6 +121,7 @@ export const TEMPLATES: Template[] = [
       },
     ],
     gitURL: 'https://github.com/tinacms/tina-hugo-starter',
+    branch: 'main',
     devUrl: 'http://localhost:1313',
   },
   {
@@ -140,6 +145,7 @@ export const TEMPLATES: Template[] = [
       },
     ],
     gitURL: 'https://github.com/tinacms/tina-remix-starter',
+    branch: 'main',
     devUrl: 'http://localhost:3000',
   },
   {
@@ -163,6 +169,7 @@ export const TEMPLATES: Template[] = [
       },
     ],
     gitURL: 'https://github.com/tinacms/tinasaurus',
+    branch: 'main',
     devUrl: 'http://localhost:3000',
   },
   {
@@ -186,6 +193,7 @@ export const TEMPLATES: Template[] = [
       },
     ],
     gitURL: 'https://github.com/tinacms/tina-barebones-starter',
+    branch: 'main',
     devUrl: 'http://localhost:3000',
   },
 ];
@@ -197,13 +205,16 @@ export async function downloadTemplate(
 ) {
   if (template.isInternal === false) {
     const repoURL = new URL(template.gitURL);
-    const repoInfo = await getRepoInfo(repoURL);
-    if (!repoInfo) {
-      throw new Error('Repository information not found.');
-    }
+    const [, username, name] = repoURL.pathname.split('/');
+    const repoInfo = {
+      username,
+      name,
+      branch: template.branch,
+      filePath: '',
+    };
 
     spinner.text = `Downloading files from repo ${TextStyles.tinaOrange(
-      `${repoInfo?.username}/${repoInfo?.name}`
+      `${repoInfo.username}/${repoInfo.name}`
     )}`;
     await downloadAndExtractRepo(root, repoInfo);
   } else {
