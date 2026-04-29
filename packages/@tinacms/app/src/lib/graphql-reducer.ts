@@ -613,7 +613,12 @@ export const useGraphQLReducer = (
 
   React.useEffect(() => {
     if (requestErrors.length) {
-      showErrorModal('Unexpected error querying content', requestErrors, cms);
+      console.error('Unexpected error querying content:', requestErrors);
+      showErrorModal(
+        'Unexpected Error',
+        'We ran into an unexpected error while fetching your content. If after refreshing the issue persists, reach out to us on Discord.',
+        cms
+      );
     }
   }, [requestErrors]);
 };
