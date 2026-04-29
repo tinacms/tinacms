@@ -1,7 +1,7 @@
 {
 	"name": "@tinacms/schema-tools",
 	"type": "module",
-	"version": "2.7.2",
+	"version": "2.7.3",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"files": [
