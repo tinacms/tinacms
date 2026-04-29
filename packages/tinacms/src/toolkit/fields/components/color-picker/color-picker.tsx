@@ -36,8 +36,8 @@ const getTextColorForBackground = function (backgroundColor?: ColorRGBA) {
 const Swatch = ({ colorRGBA, colorFormat, width, ...props }: SwatchProps) => (
   <button
     type='button'
-    className='bg-gray-100 rounded shadow-[0_2px_3px_rgba(0,0,0,0.12)] cursor-pointer m-0'
-    style={{ width }}
+    className='block bg-gray-100 rounded shadow-[0_2px_3px_rgba(0,0,0,0.12)] m-0'
+    style={{ width: width || '100%' }}
     {...props}
   >
     <div
