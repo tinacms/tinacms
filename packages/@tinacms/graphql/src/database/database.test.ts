@@ -168,6 +168,44 @@ describe('Database.query()', () => {
       expect(result.pageInfo.hasPreviousPage).toBe(false);
     });
 
+    it('returns all remaining items after the endCursor in a single over-request', async () => {
+      const { database, hydrate } = await setupDatabase();
+
+      // Get the first 2 items to obtain a cursor
+      const firstPage = await database.query(
+        { collection: 'post', first: 2, filterChain: noFilter() },
+        hydrate
+      );
+      expect(firstPage.edges).toHaveLength(2);
+      expect(firstPage.pageInfo.hasNextPage).toBe(true);
+      const firstPagePaths = firstPage.edges.map(
+        (edge) => (edge.node as any).path
+      );
+
+      // Request more items than remain after that cursor
+      const overRequestPage = await database.query(
+        {
+          collection: 'post',
+          first: 50,
+          after: firstPage.pageInfo.endCursor,
+          filterChain: noFilter(),
+        },
+        hydrate
+      );
+      const allItems = await database.query(
+        { collection: 'post', filterChain: noFilter() },
+        hydrate
+      );
+      // The over-requested page should contain every document after the cursor,
+      // and none of the documents that were already returned on the first page.
+      const expectedRemainingPaths = allItems.edges
+        .map((edge) => (edge.node as any).path)
+        .filter((path) => !firstPagePaths.includes(path));
+      expect(overRequestPage.edges.map((edge) => (edge.node as any).path))
+        .toEqual(expectedRemainingPaths);
+      expect(overRequestPage.pageInfo.hasNextPage).toBe(false);
+    });
+
     it('pages through all documents using "after" cursor without duplicates', async () => {
       const { database, hydrate } = await setupDatabase();
       const allPaths: string[] = [];
