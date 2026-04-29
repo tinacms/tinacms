@@ -202,7 +202,10 @@ export const FormHeader = ({
 
   return (
     <div className='px-4 pt-2 pb-4 flex flex-row flex-nowrap justify-between items-center gap-2 bg-gradient-to-t from-white to-gray-50 border-b border-gray-100'>
-      <FormBreadcrumbs className='w-[calc(100%-3rem)]' contentPath={activeForm.tinaForm.path} />
+      <FormBreadcrumbs
+        className='w-[calc(100%-3rem)]'
+        contentPath={activeForm.tinaForm.path}
+      />
       <FileHistoryProvider
         defaultBranchName={repoProvider?.defaultBranchName}
         historyUrl={repoProvider?.historyUrl}
@@ -358,7 +361,11 @@ export const FormBreadcrumbs = ({
               </span>
             </TooltipTrigger>
             {contentPath && (
-              <TooltipContent side='bottom' align='start' className='shadow-md max-w-xs break-all'>
+              <TooltipContent
+                side='bottom'
+                align='start'
+                className='shadow-md max-w-xs break-all'
+              >
                 {contentPath}
               </TooltipContent>
             )}
