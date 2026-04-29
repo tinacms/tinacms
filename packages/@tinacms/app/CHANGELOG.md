@@ -1,5 +1,13 @@
 # @tinacms/app
 
+## 2.4.5
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/mdx@2.1.3
+  - tinacms@3.7.5
+
 ## 2.4.4
 
 ### Patch Changes

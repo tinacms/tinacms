@@ -1,6 +1,8 @@
 /**
-
-*/
+ * @license
+ * Copyright 2023 Forestry.io Holdings, Inc.
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 import type { Schema } from '@tinacms/schema-tools';
 import type { GraphQLConfig } from '../types';
@@ -25,22 +27,18 @@ export const resolveMediaCloudToRelative = (
 
     if (hasTinaMediaConfig(schema) === true) {
       const assetsURL = `https://${config.assetsHost}/${config.clientId}`;
+      const cleanMediaRoot = cleanUpSlashes(schema.config.media.tina.mediaRoot);
 
       if (typeof value === 'string' && value.includes(assetsURL)) {
-        const cleanMediaRoot = cleanUpSlashes(
-          schema.config.media.tina.mediaRoot
-        );
-        const strippedURL = value.replace(assetsURL, '');
-        return `${cleanMediaRoot}${strippedURL}`;
+        return `${cleanMediaRoot}${stripStagingPrefix(
+          value.replace(assetsURL, '')
+        )}`;
       }
       if (Array.isArray(value)) {
         return value.map((v) => {
           if (!v || typeof v !== 'string') return v;
-          const cleanMediaRoot = cleanUpSlashes(
-            schema.config.media.tina.mediaRoot
-          );
           const strippedURL = v.replace(assetsURL, '');
-          return `${cleanMediaRoot}${strippedURL}`;
+          return `${cleanMediaRoot}${stripStagingPrefix(strippedURL)}`;
         });
       }
 
@@ -73,15 +71,16 @@ export const resolveMediaRelativeToCloud = (
 
     if (hasTinaMediaConfig(schema) === true) {
       const cleanMediaRoot = cleanUpSlashes(schema.config.media.tina.mediaRoot);
+      const prefix = stagingPrefix(config);
       if (typeof value === 'string') {
         const strippedValue = value.replace(cleanMediaRoot, '');
-        return `https://${config.assetsHost}/${config.clientId}${strippedValue}`;
+        return `https://${config.assetsHost}/${config.clientId}${prefix}${strippedValue}`;
       }
       if (Array.isArray(value)) {
         return value.map((v) => {
           if (!v || typeof v !== 'string') return v;
           const strippedValue = v.replace(cleanMediaRoot, '');
-          return `https://${config.assetsHost}/${config.clientId}${strippedValue}`;
+          return `https://${config.assetsHost}/${config.clientId}${prefix}${strippedValue}`;
         });
       }
     }
@@ -90,6 +89,22 @@ export const resolveMediaRelativeToCloud = (
   } else {
     return value;
   }
+};
+
+const stagingPrefix = (config: {
+  branch?: string;
+  mediaBranch?: string;
+}): string =>
+  config.branch && config.branch !== config.mediaBranch
+    ? `/__staging/${encodeURIComponent(config.branch)}`
+    : '';
+
+// Matches `/__staging/<encoded-branch>/…` and captures everything after the branch segment.
+const STAGING_SEGMENT = /^\/__staging\/[^/]+(\/.*)$/;
+
+const stripStagingPrefix = (path: string): string => {
+  const match = path.match(STAGING_SEGMENT);
+  return match ? match[1] : path;
 };
 
 const cleanUpSlashes = (path: string): string => {
