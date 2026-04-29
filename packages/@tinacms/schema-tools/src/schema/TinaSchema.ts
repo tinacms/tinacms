@@ -140,7 +140,10 @@ export class TinaSchema {
       const isFolderPlaceholder = canonicalFilepath.endsWith(
         `.gitkeep.${collection.format || 'md'}`
       );
-      if (!isFolderPlaceholder && (collection?.match?.include || collection?.match?.exclude)) {
+      if (
+        !isFolderPlaceholder &&
+        (collection?.match?.include || collection?.match?.exclude)
+      ) {
         // if the collection has a match or exclude, we need to check if the file matches
         const matches = this.getMatches({ collection });
         const match = picomatch.isMatch(canonicalFilepath, matches);
