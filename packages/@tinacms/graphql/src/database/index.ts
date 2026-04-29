@@ -531,7 +531,9 @@ export class Database {
 
         // If a collection match is specified, make sure the file matches the glob.
         // TODO: Maybe we should service this error better in the frontend?
-        const isFolderPlaceholder = filepath.includes('.gitkeep.');
+        const isFolderPlaceholder = filepath.endsWith(
+          `.gitkeep.${collection.format || 'md'}`
+        );
         if (
           !isFolderPlaceholder &&
           (collection.match?.exclude || collection.match?.include)
