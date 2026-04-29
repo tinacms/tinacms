@@ -1,6 +1,8 @@
 /**
-
-*/
+ * @license
+ * Copyright 2023 Forestry.io Holdings, Inc.
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 import type { Schema } from '@tinacms/schema-tools';
 import type { GraphQLConfig } from '../types';
@@ -97,6 +99,7 @@ const stagingPrefix = (config: {
     ? `/__staging/${encodeURIComponent(config.branch)}`
     : '';
 
+// Matches `/__staging/<encoded-branch>/…` and captures everything after the branch segment.
 const STAGING_SEGMENT = /^\/__staging\/[^/]+(\/.*)$/;
 
 const stripStagingPrefix = (path: string): string => {
