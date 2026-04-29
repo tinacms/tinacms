@@ -1,5 +1,17 @@
 # tina-graphql
 
+## 2.3.0
+
+### Minor Changes
+
+- [#6740](https://github.com/tinacms/tinacms/pull/6740) [`01e6e4b`](https://github.com/tinacms/tinacms/commit/01e6e4b08e52d777c0c07d4448930cfa5599a6bc) Thanks [@kulesy](https://github.com/kulesy)! - Add optional `branch` and `mediaBranch` fields to `GraphQLConfig`. When the host passes a `branch` that differs from `mediaBranch`, image field resolution prefixes the CDN path with `/__staging/{encodedBranch}/`, and `resolveMediaCloudToRelative` strips that segment back to the relative path on the write side. Self-hosted (`useRelativeMedia: true`) and main-branch behaviour are unchanged.
+
+### Patch Changes
+
+- Updated dependencies [[`a85b1c0`](https://github.com/tinacms/tinacms/commit/a85b1c0ff44d8c214be47f89531beaf0e9dc234c)]:
+  - @tinacms/schema-tools@2.7.3
+  - @tinacms/mdx@2.1.3
+
 ## 2.2.5
 
 ### Patch Changes

@@ -101,6 +101,123 @@ describe('resolveMedia', () => {
   });
 
   /**
+   * When `branch` equals `mediaBranch`, the URL should be the production CDN URL.
+   */
+  it('resolves to production cloud URL when branch equals mediaBranch', () => {
+    const config: GraphQLConfig = {
+      useRelativeMedia: false,
+      assetsHost,
+      clientId,
+      branch: 'main',
+      mediaBranch: 'main',
+    };
+
+    const resolvedURL = resolveMediaRelativeToCloud(
+      relativeURL,
+      config,
+      schema
+    );
+    expect(resolvedURL).toEqual(cloudURL);
+  });
+
+  /**
+   * When `branch` differs from `mediaBranch`, the URL should include the staging prefix.
+   */
+  it('resolves to staging-prefixed cloud URL when branch differs from mediaBranch', () => {
+    const config: GraphQLConfig = {
+      useRelativeMedia: false,
+      assetsHost,
+      clientId,
+      branch: 'feat/x',
+      mediaBranch: 'main',
+    };
+
+    const resolvedURL = resolveMediaRelativeToCloud(
+      relativeURL,
+      config,
+      schema
+    );
+    expect(resolvedURL).toEqual(
+      `https://${assetsHost}/${clientId}/__staging/feat%2Fx/llama.png`
+    );
+  });
+
+  /**
+   * When `branch` is unset, the URL should be the production CDN URL.
+   */
+  it('resolves to production cloud URL when branch is unset', () => {
+    const config: GraphQLConfig = {
+      useRelativeMedia: false,
+      assetsHost,
+      clientId,
+      mediaBranch: 'main',
+    };
+
+    const resolvedURL = resolveMediaRelativeToCloud(
+      relativeURL,
+      config,
+      schema
+    );
+    expect(resolvedURL).toEqual(cloudURL);
+  });
+
+  /**
+   * Array values on a non-`mediaBranch` should each receive the staging prefix.
+   */
+  it('applies staging prefix to every entry of an array value', () => {
+    const config: GraphQLConfig = {
+      useRelativeMedia: false,
+      assetsHost,
+      clientId,
+      branch: 'feat/x',
+      mediaBranch: 'main',
+    };
+
+    const resolved = resolveMediaRelativeToCloud(
+      ['/uploads/a.png', '/uploads/b.png'],
+      config,
+      schema
+    );
+    expect(resolved).toEqual([
+      `https://${assetsHost}/${clientId}/__staging/feat%2Fx/a.png`,
+      `https://${assetsHost}/${clientId}/__staging/feat%2Fx/b.png`,
+    ]);
+  });
+
+  /**
+   * Round-trip: a staging cloud URL should be stripped back to the relative path.
+   */
+  it('strips staging prefix when converting cloud URL back to relative', () => {
+    const config: GraphQLConfig = {
+      useRelativeMedia: false,
+      assetsHost,
+      clientId,
+      branch: 'feat/x',
+      mediaBranch: 'main',
+    };
+
+    const stagingURL = `https://${assetsHost}/${clientId}/__staging/feat%2Fx/llama.png`;
+    const resolvedURL = resolveMediaCloudToRelative(stagingURL, config, schema);
+    expect(resolvedURL).toEqual(relativeURL);
+  });
+
+  /**
+   * Production cloud URLs (no `__staging/` segment) should still strip cleanly.
+   */
+  it('leaves production cloud URLs untouched when stripping', () => {
+    const config: GraphQLConfig = {
+      useRelativeMedia: false,
+      assetsHost,
+      clientId,
+      branch: 'feat/x',
+      mediaBranch: 'main',
+    };
+
+    const resolvedURL = resolveMediaCloudToRelative(cloudURL, config, schema);
+    expect(resolvedURL).toEqual(relativeURL);
+  });
+
+  /**
    * Missing `media: { tina: { ... }}` config should return the value, regardless of `useRelativeMedia`
    */
   it('persists value when no `tina` config is provided regardless of `useRelativeMedia`', () => {

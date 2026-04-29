@@ -1,5 +1,18 @@
 # tinacms-cli
 
+## 2.2.5
+
+### Patch Changes
+
+- [#6721](https://github.com/tinacms/tinacms/pull/6721) [`a85b1c0`](https://github.com/tinacms/tinacms/commit/a85b1c0ff44d8c214be47f89531beaf0e9dc234c) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Add runtime Zod validation for the `localContentPath` Tina config field (rejects non-string and empty-string values) in the CLI's content-root resolver. Extract content-root resolution out of `processConfig` into a standalone, unit-testable `resolveContentRootPath` function that preserves existing behaviour (falls back to `rootPath` with a warning when the configured directory is missing). `localContentPath` is deliberately excluded from `tinaConfigZod` so it does not leak into the hashed `_schema.json` and break the server-schema match check for projects that set it. Closes [tinacms/tinacloud#3294](https://github.com/tinacms/tinacloud/issues/3294).
+
+- Updated dependencies [[`01e6e4b`](https://github.com/tinacms/tinacms/commit/01e6e4b08e52d777c0c07d4448930cfa5599a6bc), [`a85b1c0`](https://github.com/tinacms/tinacms/commit/a85b1c0ff44d8c214be47f89531beaf0e9dc234c)]:
+  - @tinacms/graphql@2.3.0
+  - @tinacms/schema-tools@2.7.3
+  - @tinacms/search@1.2.12
+  - tinacms@3.7.5
+  - @tinacms/app@2.4.5
+
 ## 2.2.4
 
 ### Patch Changes
