@@ -7,6 +7,7 @@ import {
   formatDoctorTable,
   getTinaDependencies,
   readProjectPackageJson,
+  resolveInstalledVersions,
 } from './doctor';
 
 export class DoctorCommand extends Command {
@@ -18,9 +19,6 @@ export class DoctorCommand extends Command {
   });
   json = Option.Boolean('--json', false, {
     description: 'Print machine-readable JSON output',
-  });
-  failOnOutdated = Option.Boolean('--fail-on-outdated', false, {
-    description: 'Exit with code 1 when any Tina dependency is outdated',
   });
   timeout = Option.String('--timeout', '5000', {
     description: 'npm registry request timeout in milliseconds',
@@ -45,7 +43,10 @@ export class DoctorCommand extends Command {
     }
 
     const packageJson = await readProjectPackageJson(rootPath);
-    const dependencies = getTinaDependencies(packageJson);
+    const dependencies = await resolveInstalledVersions({
+      rootPath,
+      dependencies: getTinaDependencies(packageJson),
+    });
     const results = await checkTinaDependencies({
       dependencies,
       fetchLatest: (name) => fetchLatestVersion(name, timeoutMs),
@@ -60,6 +61,7 @@ export class DoctorCommand extends Command {
     }
 
     const hasOutdated = results.some((result) => result.status === 'outdated');
-    return this.failOnOutdated && hasOutdated ? 1 : 0;
+    const hasUnknown = results.some((result) => result.status === 'unknown');
+    return hasOutdated || hasUnknown ? 1 : 0;
   }
 }

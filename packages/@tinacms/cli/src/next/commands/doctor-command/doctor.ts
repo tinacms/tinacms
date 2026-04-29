@@ -1,11 +1,14 @@
 import path from 'path';
 import fs from 'fs-extra';
+import yaml from 'js-yaml';
 
 export type DoctorStatus = 'current' | 'outdated' | 'unknown';
 
 export type TinaDependency = {
   name: string;
   declared: string;
+  dependencyType: DependencyType;
+  installed?: string;
 };
 
 export type DoctorResult = TinaDependency & {
@@ -16,9 +19,25 @@ export type DoctorResult = TinaDependency & {
 
 type PackageJson = {
   dependencies?: Record<string, string>;
+  devDependencies?: Record<string, string>;
+  optionalDependencies?: Record<string, string>;
+  peerDependencies?: Record<string, string>;
 };
 
-export function isTinaPackage(name: string) {
+type DependencyType =
+  | 'dependencies'
+  | 'devDependencies'
+  | 'optionalDependencies'
+  | 'peerDependencies';
+
+const DEPENDENCY_TYPES: DependencyType[] = [
+  'dependencies',
+  'devDependencies',
+  'optionalDependencies',
+  'peerDependencies',
+];
+
+export function isTinaPackage(name: string): boolean {
   return (
     name === 'tinacms' ||
     name === 'create-tina-app' ||
@@ -31,10 +50,20 @@ export function isTinaPackage(name: string) {
 export function getTinaDependencies(
   packageJson: PackageJson
 ): TinaDependency[] {
-  return Object.entries(packageJson.dependencies || {})
-    .filter(([name]) => isTinaPackage(name))
-    .map(([name, declared]) => ({ name, declared }))
-    .sort((a, b) => a.name.localeCompare(b.name));
+  const dependencies = new Map<string, TinaDependency>();
+
+  for (const dependencyType of DEPENDENCY_TYPES) {
+    for (const [name, declared] of Object.entries(
+      packageJson[dependencyType] || {}
+    )) {
+      if (!isTinaPackage(name) || dependencies.has(name)) continue;
+      dependencies.set(name, { name, declared, dependencyType });
+    }
+  }
+
+  return [...dependencies.values()].sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
 }
 
 export async function readProjectPackageJson(rootPath: string) {
@@ -43,6 +72,25 @@ export async function readProjectPackageJson(rootPath: string) {
     throw new Error(`No package.json found at ${packageJsonPath}`);
   }
   return fs.readJSON(packageJsonPath);
+}
+
+export async function resolveInstalledVersions({
+  rootPath,
+  dependencies,
+}: {
+  rootPath: string;
+  dependencies: TinaDependency[];
+}): Promise<TinaDependency[]> {
+  const lockfileVersions = await readLockfileVersions(rootPath);
+
+  return Promise.all(
+    dependencies.map(async (dependency) => {
+      const installed =
+        (await readNodeModulesVersion(rootPath, dependency.name)) ||
+        lockfileVersions.get(dependency.name);
+      return { ...dependency, installed };
+    })
+  );
 }
 
 export async function fetchLatestVersion(
@@ -76,6 +124,16 @@ export function classifyDependency(
   latest?: string,
   error?: string
 ): DoctorResult {
+  if (!dependency.installed) {
+    return {
+      ...dependency,
+      latest,
+      status: 'unknown',
+      error:
+        'Installed version could not be resolved from node_modules or lockfile',
+    };
+  }
+
   if (!latest || error) {
     return {
       ...dependency,
@@ -88,9 +146,10 @@ export function classifyDependency(
   return {
     ...dependency,
     latest,
-    status: declaredAllowsVersion(dependency.declared, latest)
-      ? 'current'
-      : 'outdated',
+    status:
+      normalizeVersion(dependency.installed) === normalizeVersion(latest)
+        ? 'current'
+        : 'outdated',
   };
 }
 
@@ -119,12 +178,14 @@ export async function checkTinaDependencies({
 
 export function formatDoctorTable(results: DoctorResult[]) {
   const rows = [
-    ['Package', 'Declared', 'Latest', 'Status'],
+    ['Package', 'Type', 'Declared', 'Installed', 'Latest', 'Status'],
     ...results.map((result) => [
       result.name,
+      result.dependencyType,
       result.declared,
+      result.installed || '-',
       result.latest || '-',
-      result.status,
+      formatStatus(result),
     ]),
   ];
   const widths = rows[0].map((_, column) =>
@@ -143,56 +204,164 @@ export function formatDoctorTable(results: DoctorResult[]) {
     .join('\n');
 }
 
-function declaredAllowsVersion(declared: string, latest: string) {
-  const normalized = declared.trim();
-  if (normalized === latest) {
-    return true;
-  }
-
-  const version = parseVersion(latest);
-  if (!version) {
-    return false;
-  }
-
-  if (normalized.startsWith('^')) {
-    const base = parseVersion(normalized.slice(1));
-    return (
-      !!base &&
-      version.major === base.major &&
-      compareVersions(version, base) >= 0
-    );
-  }
-
-  if (normalized.startsWith('~')) {
-    const base = parseVersion(normalized.slice(1));
-    return (
-      !!base &&
-      version.major === base.major &&
-      version.minor === base.minor &&
-      compareVersions(version, base) >= 0
-    );
-  }
-
-  return false;
+function formatStatus(result: DoctorResult): string {
+  if (result.status === 'outdated') return 'OUTDATED';
+  if (result.status === 'unknown')
+    return `UNKNOWN${result.error ? ` (${result.error})` : ''}`;
+  return 'current';
 }
 
-function parseVersion(version: string) {
-  const match = version.trim().match(/^(\d+)\.(\d+)\.(\d+)/);
-  if (!match) {
-    return undefined;
-  }
-  return {
-    major: Number(match[1]),
-    minor: Number(match[2]),
-    patch: Number(match[3]),
-  };
+function normalizeVersion(version: string): string {
+  return version.trim().replace(/^v/, '').split('(')[0];
 }
 
-function compareVersions(
-  a: { major: number; minor: number; patch: number },
-  b: { major: number; minor: number; patch: number }
-) {
-  if (a.major !== b.major) return a.major - b.major;
-  if (a.minor !== b.minor) return a.minor - b.minor;
-  return a.patch - b.patch;
+async function readNodeModulesVersion(
+  rootPath: string,
+  packageName: string
+): Promise<string | undefined> {
+  const packageJsonPath = path.join(
+    rootPath,
+    'node_modules',
+    ...packageName.split('/'),
+    'package.json'
+  );
+
+  if (!(await fs.pathExists(packageJsonPath))) return undefined;
+
+  const packageJson = await fs.readJSON(packageJsonPath);
+  return typeof packageJson.version === 'string'
+    ? packageJson.version
+    : undefined;
+}
+
+async function readLockfileVersions(
+  rootPath: string
+): Promise<Map<string, string>> {
+  const readers = [
+    readPackageLockVersions,
+    readPnpmLockVersions,
+    readYarnLockVersions,
+  ];
+
+  for (const reader of readers) {
+    const versions = await reader(rootPath);
+    if (versions.size > 0) return versions;
+  }
+
+  return new Map();
+}
+
+async function readPackageLockVersions(
+  rootPath: string
+): Promise<Map<string, string>> {
+  const lockfilePath = path.join(rootPath, 'package-lock.json');
+  const versions = new Map<string, string>();
+  if (!(await fs.pathExists(lockfilePath))) return versions;
+
+  const lockfile = await fs.readJSON(lockfilePath);
+
+  for (const [key, value] of Object.entries(lockfile.packages || {})) {
+    if (!key.startsWith('node_modules/')) continue;
+    const name = key.replace(/^node_modules\//, '');
+    const version = (value as { version?: unknown }).version;
+    if (isTinaPackage(name) && typeof version === 'string') {
+      versions.set(name, version);
+    }
+  }
+
+  for (const [name, value] of Object.entries(lockfile.dependencies || {})) {
+    const version = (value as { version?: unknown }).version;
+    if (isTinaPackage(name) && typeof version === 'string') {
+      versions.set(name, version);
+    }
+  }
+
+  return versions;
+}
+
+async function readPnpmLockVersions(
+  rootPath: string
+): Promise<Map<string, string>> {
+  const lockfilePath = path.join(rootPath, 'pnpm-lock.yaml');
+  const versions = new Map<string, string>();
+  if (!(await fs.pathExists(lockfilePath))) return versions;
+
+  const lockfile = yaml.load(await fs.readFile(lockfilePath, 'utf8')) as any;
+  const rootImporter = lockfile?.importers?.['.'];
+
+  for (const dependencyType of DEPENDENCY_TYPES) {
+    for (const [name, value] of Object.entries(
+      rootImporter?.[dependencyType] || {}
+    )) {
+      if (!isTinaPackage(name)) continue;
+      const version =
+        typeof value === 'string'
+          ? value
+          : typeof (value as { version?: unknown }).version === 'string'
+            ? (value as { version: string }).version
+            : undefined;
+      if (version) versions.set(name, normalizeVersion(version));
+    }
+  }
+
+  for (const key of Object.keys(lockfile?.packages || {})) {
+    const parsed = parsePnpmPackageKey(key);
+    if (parsed && isTinaPackage(parsed.name) && !versions.has(parsed.name)) {
+      versions.set(parsed.name, parsed.version);
+    }
+  }
+
+  return versions;
+}
+
+async function readYarnLockVersions(
+  rootPath: string
+): Promise<Map<string, string>> {
+  const lockfilePath = path.join(rootPath, 'yarn.lock');
+  const versions = new Map<string, string>();
+  if (!(await fs.pathExists(lockfilePath))) return versions;
+
+  const lines = (await fs.readFile(lockfilePath, 'utf8')).split('\n');
+  let activeNames: string[] = [];
+  for (const line of lines) {
+    if (line.length > 0 && !line.startsWith(' ') && line.includes('@')) {
+      activeNames = extractYarnPackageNames(line);
+      continue;
+    }
+
+    const version = line.match(/^\s+version\s+"([^"]+)"/)?.[1];
+    if (!version) continue;
+
+    for (const name of activeNames) {
+      if (isTinaPackage(name) && !versions.has(name)) {
+        versions.set(name, version);
+      }
+    }
+  }
+
+  return versions;
+}
+
+function parsePnpmPackageKey(
+  key: string
+): { name: string; version: string } | undefined {
+  const normalized = key.replace(/^\//, '');
+  const match = normalized.match(/^(@[^/]+\/[^@]+|[^@/]+)@([^(/]+)/);
+  if (!match) return undefined;
+  return { name: match[1], version: normalizeVersion(match[2]) };
+}
+
+function extractYarnPackageNames(line: string): string[] {
+  return line
+    .replace(/:$/, '')
+    .split(/,\s*/)
+    .map((descriptor) => descriptor.trim().replace(/^"|"$/g, ''))
+    .map((descriptor) => {
+      if (descriptor.startsWith('@')) {
+        const [, scope, name] = descriptor.match(/^(@[^/]+)\/([^@]+)/) || [];
+        return scope && name ? `${scope}/${name}` : descriptor;
+      }
+      return descriptor.split('@')[0];
+    })
+    .filter(Boolean);
 }
