@@ -201,8 +201,9 @@ describe('Database.query()', () => {
       const expectedRemainingPaths = allItems.edges
         .map((edge) => (edge.node as any).path)
         .filter((path) => !firstPagePaths.includes(path));
-      expect(overRequestPage.edges.map((edge) => (edge.node as any).path))
-        .toEqual(expectedRemainingPaths);
+      expect(
+        overRequestPage.edges.map((edge) => (edge.node as any).path)
+      ).toEqual(expectedRemainingPaths);
       expect(overRequestPage.pageInfo.hasNextPage).toBe(false);
     });
 
