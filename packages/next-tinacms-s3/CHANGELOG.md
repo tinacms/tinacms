@@ -1,5 +1,12 @@
 # next-tinacms-s3
 
+## 21.0.5
+
+### Patch Changes
+
+- Updated dependencies []:
+  - tinacms@3.7.5
+
 ## 21.0.4
 
 ### Patch Changes
