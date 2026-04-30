@@ -108,6 +108,17 @@ export class TinaMediaStore implements MediaStore {
   // allow up to 100MB uploads
   maxSize = 100 * 1024 * 1024;
 
+  /**
+   * Returns the current branch as a single-encoded query-param value.
+   *
+   * `this.api.branch` is already URL-encoded by `Client.setBranch()`, so we
+   * decode then re-encode here to defend against double-encoding when this
+   * value is concatenated into a URL.
+   */
+  private encodedBranchParam(): string {
+    return encodeURIComponent(decodeURIComponent(this.api.branch));
+  }
+
   private async persist_cloud(media: MediaUploadOptions[]): Promise<Media[]> {
     const newFiles: Media[] = [];
 
@@ -123,7 +134,7 @@ export class TinaMediaStore implements MediaStore {
             : item.file.name
         }`;
         const res = await this.api.authProvider.fetchWithToken(
-          `${this.url}/upload_url/${path}`,
+          `${this.url}/upload_url/${path}?branch=${this.encodedBranchParam()}`,
           { method: 'GET' }
         );
 
@@ -340,7 +351,9 @@ export class TinaMediaStore implements MediaStore {
       res = await this.api.authProvider.fetchWithToken(
         `${this.url}/list/${options.directory || ''}?limit=${
           options.limit || 20
-        }${options.offset ? `&cursor=${options.offset}` : ''}`
+        }${
+          options.offset ? `&cursor=${options.offset}` : ''
+        }&branch=${this.encodedBranchParam()}`
       );
 
       if (res.status == 401) {
@@ -411,7 +424,7 @@ export class TinaMediaStore implements MediaStore {
     if (!this.isLocal) {
       if (await this.isAuthenticated()) {
         const res = await this.api.authProvider.fetchWithToken(
-          `${this.url}/${path}`,
+          `${this.url}/${path}?branch=${this.encodedBranchParam()}`,
           {
             method: 'DELETE',
           }
