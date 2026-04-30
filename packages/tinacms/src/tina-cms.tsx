@@ -197,7 +197,7 @@ export const TinaCMSProvider2 = ({
         tinaGraphQLVersion={props.tinaGraphQLVersion}
       >
         {/* <style>{styles}</style> */}
-        <FontLoader />
+        <FontLoader fontUrl={schema?.config?.admin?.fontUrl} />
         <ErrorBoundary>{props.children}</ErrorBoundary>
       </TinaCloudProvider>
     </>

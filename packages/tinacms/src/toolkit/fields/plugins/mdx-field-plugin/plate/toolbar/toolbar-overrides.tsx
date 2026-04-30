@@ -13,4 +13,9 @@ export const HEADING_LABEL = 'Headings';
 export type ToolbarOverrides = {
   toolbar?: ToolbarOverrideType[];
   showFloatingToolbar?: boolean;
+  typography?: {
+    fontFamily?: string;
+    headingFontFamily?: string;
+    fontUrl?: string;
+  };
 };
