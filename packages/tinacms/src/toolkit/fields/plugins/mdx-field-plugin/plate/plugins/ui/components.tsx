@@ -180,7 +180,10 @@ export const Components = () => {
           className,
           'text-lg mb-4 last:mb-0 mt-6 first:mt-0'
         )}
-        style={{ fontFamily: 'var(--tina-editor-heading-font-family)', fontWeight: '400' }}
+        style={{
+          fontFamily: 'var(--tina-editor-heading-font-family)',
+          fontWeight: '400',
+        }}
       />
     ),
     [HEADING_KEYS.h6]: ({
@@ -199,7 +202,10 @@ export const Components = () => {
           className,
           'text-base mb-4 last:mb-0 mt-6 first:mt-0'
         )}
-        style={{ fontFamily: 'var(--tina-editor-heading-font-family)', fontWeight: '400' }}
+        style={{
+          fontFamily: 'var(--tina-editor-heading-font-family)',
+          fontWeight: '400',
+        }}
       />
     ),
     [ParagraphPlugin.key]: ParagraphElement,
