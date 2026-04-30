@@ -2,7 +2,7 @@ import path from 'path';
 import fs from 'fs-extra';
 import yaml from 'js-yaml';
 
-export type DoctorStatus = 'current' | 'outdated' | 'unknown';
+export type DoctorStatus = 'current' | 'local' | 'outdated' | 'unknown';
 
 export type TinaDependency = {
   name: string;
@@ -35,6 +35,13 @@ const DEPENDENCY_TYPES: DependencyType[] = [
   'devDependencies',
   'optionalDependencies',
   'peerDependencies',
+];
+const LOCAL_REFERENCE_PREFIXES = [
+  'file:',
+  'link:',
+  'patch:',
+  'portal:',
+  'workspace:',
 ];
 
 export function isTinaPackage(name: string): boolean {
@@ -134,6 +141,15 @@ export function classifyDependency(
     };
   }
 
+  if (isLocalReference(dependency.installed)) {
+    return {
+      ...dependency,
+      latest,
+      status: 'local',
+      error,
+    };
+  }
+
   if (!latest || error) {
     return {
       ...dependency,
@@ -206,6 +222,7 @@ export function formatDoctorTable(results: DoctorResult[]) {
 
 function formatStatus(result: DoctorResult): string {
   if (result.status === 'outdated') return 'OUTDATED';
+  if (result.status === 'local') return 'LOCAL';
   if (result.status === 'unknown')
     return `UNKNOWN${result.error ? ` (${result.error})` : ''}`;
   return 'CURRENT';
@@ -213,6 +230,13 @@ function formatStatus(result: DoctorResult): string {
 
 function normalizeVersion(version: string): string {
   return version.trim().replace(/^v/, '').split('(')[0].trim();
+}
+
+function isLocalReference(version: string): boolean {
+  const normalized = version.trim();
+  return LOCAL_REFERENCE_PREFIXES.some((prefix) =>
+    normalized.startsWith(prefix)
+  );
 }
 
 async function readNodeModulesVersion(
@@ -300,7 +324,7 @@ async function readPnpmLockVersions(
           : typeof (value as { version?: unknown }).version === 'string'
             ? (value as { version: string }).version
             : undefined;
-      if (version) versions.set(name, normalizeVersion(version));
+      if (version) versions.set(name, normalizeInstalledVersion(version));
     }
   }
 
@@ -354,9 +378,9 @@ function readYarnBerryLockVersions(contents: string): Map<string, string> {
   for (const [descriptor, value] of Object.entries(lockfile || {})) {
     if (descriptor === '__metadata') continue;
     const name = extractYarnBerryPackageName(descriptor);
-    const version = value?.version;
-    if (name && isTinaPackage(name) && typeof version === 'string') {
-      versions.set(name, normalizeVersion(version));
+    const version = getYarnBerryInstalledVersion(descriptor, value?.version);
+    if (name && isTinaPackage(name) && version) {
+      versions.set(name, version);
     }
   }
 
@@ -370,6 +394,10 @@ function parsePnpmPackageKey(
   const match = normalized.match(/^(@[^/]+\/[^@]+|[^@/]+)@([^(/]+)/);
   if (!match) return undefined;
   return { name: match[1], version: normalizeVersion(match[2]) };
+}
+
+function normalizeInstalledVersion(version: string): string {
+  return isLocalReference(version) ? version : normalizeVersion(version);
 }
 
 function extractYarnPackageNames(line: string): string[] {
@@ -392,4 +420,17 @@ function extractYarnBerryPackageName(descriptor: string): string | undefined {
     return descriptor.match(/^(@[^/]+\/[^@]+)/)?.[1];
   }
   return descriptor.split('@')[0] || undefined;
+}
+
+function getYarnBerryInstalledVersion(
+  descriptor: string,
+  version: unknown
+): string | undefined {
+  const name = extractYarnBerryPackageName(descriptor);
+  const reference = name ? descriptor.slice(name.length + 1) : undefined;
+  if (reference && isLocalReference(reference)) return reference;
+
+  return typeof version === 'string'
+    ? normalizeInstalledVersion(version)
+    : undefined;
 }

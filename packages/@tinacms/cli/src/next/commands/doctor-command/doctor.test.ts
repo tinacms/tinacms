@@ -91,6 +91,27 @@ describe('doctor command helpers', () => {
     ).toBe('current');
   });
 
+  it('marks local package references as local', () => {
+    expect(
+      classifyDependency(
+        {
+          name: 'tinacms',
+          declared: 'workspace:*',
+          installed: 'workspace:*',
+          dependencyType: 'dependencies',
+        },
+        '3.7.5'
+      )
+    ).toEqual({
+      name: 'tinacms',
+      declared: 'workspace:*',
+      dependencyType: 'dependencies',
+      installed: 'workspace:*',
+      latest: '3.7.5',
+      status: 'local',
+    });
+  });
+
   it('marks registry failures as unknown', async () => {
     const results = await checkTinaDependencies({
       dependencies: [
@@ -256,6 +277,49 @@ describe('doctor command helpers', () => {
     }
   });
 
+  it('resolves local references from pnpm-lock.yaml', async () => {
+    const rootPath = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'tinacms-doctor-')
+    );
+    try {
+      await fs.writeFile(
+        path.join(rootPath, 'pnpm-lock.yaml'),
+        [
+          'lockfileVersion: 9.0',
+          'importers:',
+          '  .:',
+          '    dependencies:',
+          '      tinacms:',
+          '        specifier: workspace:*',
+          '        version: workspace:*',
+          '',
+        ].join('\n')
+      );
+
+      await expect(
+        resolveInstalledVersions({
+          rootPath,
+          dependencies: [
+            {
+              name: 'tinacms',
+              declared: 'workspace:*',
+              dependencyType: 'dependencies',
+            },
+          ],
+        })
+      ).resolves.toEqual([
+        {
+          name: 'tinacms',
+          declared: 'workspace:*',
+          dependencyType: 'dependencies',
+          installed: 'workspace:*',
+        },
+      ]);
+    } finally {
+      await fs.remove(rootPath);
+    }
+  });
+
   it('resolves installed versions from yarn.lock', async () => {
     const rootPath = await fs.mkdtemp(
       path.join(os.tmpdir(), 'tinacms-doctor-')
@@ -368,6 +432,49 @@ describe('doctor command helpers', () => {
     }
   });
 
+  it('resolves local references from Yarn Berry lockfiles', async () => {
+    const rootPath = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'tinacms-doctor-')
+    );
+    try {
+      await fs.writeFile(
+        path.join(rootPath, 'yarn.lock'),
+        [
+          '__metadata:',
+          '  version: 8',
+          '  cacheKey: 10',
+          '',
+          '"tinacms@workspace:*":',
+          '  version: 0.0.0-use.local',
+          '  resolution: "tinacms@workspace:."',
+          '',
+        ].join('\n')
+      );
+
+      await expect(
+        resolveInstalledVersions({
+          rootPath,
+          dependencies: [
+            {
+              name: 'tinacms',
+              declared: 'workspace:*',
+              dependencyType: 'dependencies',
+            },
+          ],
+        })
+      ).resolves.toEqual([
+        {
+          name: 'tinacms',
+          declared: 'workspace:*',
+          dependencyType: 'dependencies',
+          installed: 'workspace:*',
+        },
+      ]);
+    } finally {
+      await fs.remove(rootPath);
+    }
+  });
+
   it('formats a stable table', () => {
     const table = formatDoctorTable([
       {
@@ -383,5 +490,22 @@ describe('doctor command helpers', () => {
     expect(table).toContain('Package  Type');
     expect(table).toContain('CURRENT');
     expect(table).not.toContain('current');
+  });
+
+  it('formats local package references', () => {
+    const table = formatDoctorTable([
+      {
+        name: 'tinacms',
+        declared: 'workspace:*',
+        dependencyType: 'dependencies',
+        installed: 'workspace:*',
+        latest: '3.7.5',
+        status: 'local',
+      },
+    ]);
+
+    expect(table).toContain('workspace:*');
+    expect(table).toContain('LOCAL');
+    expect(table).not.toContain('local');
   });
 });
