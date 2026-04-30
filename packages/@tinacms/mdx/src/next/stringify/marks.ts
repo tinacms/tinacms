@@ -323,7 +323,12 @@ export const eat = (
         attributes: markAttributes(f),
         children: [child],
       } as unknown as Md.PhrasingContent,
-      ...eat(content.slice(nonMatchingSiblingIndex + 1), field, imageCallback, hasHtmlInline),
+      ...eat(
+        content.slice(nonMatchingSiblingIndex + 1),
+        field,
+        imageCallback,
+        hasHtmlInline
+      ),
     ];
   }
   if (markToProcess === 'inlineCode') {
@@ -340,7 +345,12 @@ export const eat = (
     return [
       // @ts-ignore
       first.linkifyTextNode?.(node) ?? node,
-      ...eat(content.slice(nonMatchingSiblingIndex + 1), field, imageCallback, hasHtmlInline),
+      ...eat(
+        content.slice(nonMatchingSiblingIndex + 1),
+        field,
+        imageCallback,
+        hasHtmlInline
+      ),
     ];
   }
   return [
@@ -356,7 +366,12 @@ export const eat = (
         imageCallback
       ),
     },
-    ...eat(content.slice(nonMatchingSiblingIndex + 1), field, imageCallback, hasHtmlInline),
+    ...eat(
+      content.slice(nonMatchingSiblingIndex + 1),
+      field,
+      imageCallback,
+      hasHtmlInline
+    ),
   ];
 };
 

@@ -39,10 +39,6 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
 
   React.useEffect(() => {
     if (ref.current) {
-      // Ensure the editor container always starts scrolled to the top,
-      // regardless of where Slate internally places the cursor on mount.
-      ref.current.scrollTop = 0;
-
       if (field.experimental_focusIntent) {
         setTimeout(() => {
           // Slate/Plate doesn't expose it's underlying element

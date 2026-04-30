@@ -14,9 +14,7 @@ it('serializes embedded \\n in text node as a Markdown hard break', () => {
     children: [
       {
         type: 'p' as const,
-        children: [
-          { type: 'text' as const, text: 'Line one\nLine two' },
-        ],
+        children: [{ type: 'text' as const, text: 'Line one\nLine two' }],
       },
     ],
   };
@@ -32,7 +30,10 @@ it('serializes multiple embedded \\n as multiple hard breaks', () => {
       {
         type: 'p' as const,
         children: [
-          { type: 'text' as const, text: '123 Abc Street\nTown Central, CA\n90210' },
+          {
+            type: 'text' as const,
+            text: '123 Abc Street\nTown Central, CA\n90210',
+          },
         ],
       },
     ],

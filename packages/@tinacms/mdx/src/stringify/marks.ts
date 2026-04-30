@@ -337,7 +337,12 @@ export const eat = (
     return [
       // @ts-ignore
       first.linkifyTextNode?.(node) ?? node,
-      ...eat(content.slice(nonMatchingSiblingIndex + 1), field, imageCallback, hasHtmlInline),
+      ...eat(
+        content.slice(nonMatchingSiblingIndex + 1),
+        field,
+        imageCallback,
+        hasHtmlInline
+      ),
     ];
   }
 
@@ -354,7 +359,12 @@ export const eat = (
         imageCallback
       ),
     },
-    ...eat(content.slice(nonMatchingSiblingIndex + 1), field, imageCallback, hasHtmlInline),
+    ...eat(
+      content.slice(nonMatchingSiblingIndex + 1),
+      field,
+      imageCallback,
+      hasHtmlInline
+    ),
   ];
 };
 
