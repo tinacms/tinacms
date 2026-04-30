@@ -29,8 +29,9 @@ export class DoctorCommand extends Command {
     description: 'Check direct TinaCMS dependencies against npm latest',
   });
 
-  async catch(error: any): Promise<void> {
-    logger.error(`Error occurred during tinacms doctor: ${error.message}`);
+  async catch(error: unknown): Promise<void> {
+    const message = error instanceof Error ? error.message : String(error);
+    logger.error(`Error occurred during tinacms doctor: ${message}`);
     process.exit(1);
   }
 

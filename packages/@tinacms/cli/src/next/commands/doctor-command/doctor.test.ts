@@ -77,6 +77,20 @@ describe('doctor command helpers', () => {
     ).toBe('outdated');
   });
 
+  it('normalizes versions before comparing', () => {
+    expect(
+      classifyDependency(
+        {
+          name: 'tinacms',
+          declared: '^3.7.0',
+          installed: 'v3.7.3 (resolved)',
+          dependencyType: 'dependencies',
+        },
+        '3.7.3'
+      ).status
+    ).toBe('current');
+  });
+
   it('marks registry failures as unknown', async () => {
     const results = await checkTinaDependencies({
       dependencies: [
@@ -141,18 +155,132 @@ describe('doctor command helpers', () => {
     }
   });
 
-  it('formats a stable table', () => {
-    expect(
-      formatDoctorTable([
+  it('resolves installed versions from pnpm-lock.yaml', async () => {
+    const rootPath = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'tinacms-doctor-')
+    );
+    try {
+      await fs.writeFile(
+        path.join(rootPath, 'pnpm-lock.yaml'),
+        [
+          'lockfileVersion: 9.0',
+          'importers:',
+          '  .:',
+          '    dependencies:',
+          '      tinacms:',
+          '        specifier: ^3.7.0',
+          '        version: 3.7.5',
+          '    devDependencies:',
+          '      "@tinacms/cli":',
+          '        specifier: ^2.2.0',
+          '        version: 2.2.5',
+          '',
+        ].join('\n')
+      );
+
+      await expect(
+        resolveInstalledVersions({
+          rootPath,
+          dependencies: [
+            {
+              name: '@tinacms/cli',
+              declared: '^2.2.0',
+              dependencyType: 'devDependencies',
+            },
+            {
+              name: 'tinacms',
+              declared: '^3.7.0',
+              dependencyType: 'dependencies',
+            },
+          ],
+        })
+      ).resolves.toEqual([
+        {
+          name: '@tinacms/cli',
+          declared: '^2.2.0',
+          dependencyType: 'devDependencies',
+          installed: '2.2.5',
+        },
         {
           name: 'tinacms',
           declared: '^3.7.0',
           dependencyType: 'dependencies',
-          installed: '3.7.3',
-          latest: '3.7.3',
-          status: 'current',
+          installed: '3.7.5',
         },
-      ])
-    ).toContain('Package  Type          Declared  Installed  Latest  Status');
+      ]);
+    } finally {
+      await fs.remove(rootPath);
+    }
+  });
+
+  it('resolves installed versions from yarn.lock', async () => {
+    const rootPath = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'tinacms-doctor-')
+    );
+    try {
+      await fs.writeFile(
+        path.join(rootPath, 'yarn.lock'),
+        [
+          '"@tinacms/cli@^2.2.0":',
+          '  version "2.2.5"',
+          '  resolved "https://registry.yarnpkg.com/@tinacms/cli/-/cli-2.2.5.tgz"',
+          '',
+          'tinacms@^3.7.0:',
+          '  version "3.7.5"',
+          '  resolved "https://registry.yarnpkg.com/tinacms/-/tinacms-3.7.5.tgz"',
+          '',
+        ].join('\n')
+      );
+
+      await expect(
+        resolveInstalledVersions({
+          rootPath,
+          dependencies: [
+            {
+              name: '@tinacms/cli',
+              declared: '^2.2.0',
+              dependencyType: 'devDependencies',
+            },
+            {
+              name: 'tinacms',
+              declared: '^3.7.0',
+              dependencyType: 'dependencies',
+            },
+          ],
+        })
+      ).resolves.toEqual([
+        {
+          name: '@tinacms/cli',
+          declared: '^2.2.0',
+          dependencyType: 'devDependencies',
+          installed: '2.2.5',
+        },
+        {
+          name: 'tinacms',
+          declared: '^3.7.0',
+          dependencyType: 'dependencies',
+          installed: '3.7.5',
+        },
+      ]);
+    } finally {
+      await fs.remove(rootPath);
+    }
+  });
+
+  it('formats a stable table', () => {
+    const table = formatDoctorTable([
+      {
+        name: 'tinacms',
+        declared: '^3.7.0',
+        dependencyType: 'dependencies',
+        installed: '3.7.3',
+        latest: '3.7.3',
+        status: 'current',
+      },
+    ]);
+
+    expect(table).toContain('Package  Type');
+    expect(table).toContain('CURRENT');
+    expect(table).not.toContain('current');
   });
 });

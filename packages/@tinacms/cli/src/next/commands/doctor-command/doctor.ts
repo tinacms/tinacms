@@ -208,11 +208,11 @@ function formatStatus(result: DoctorResult): string {
   if (result.status === 'outdated') return 'OUTDATED';
   if (result.status === 'unknown')
     return `UNKNOWN${result.error ? ` (${result.error})` : ''}`;
-  return 'current';
+  return 'CURRENT';
 }
 
 function normalizeVersion(version: string): string {
-  return version.trim().replace(/^v/, '').split('(')[0];
+  return version.trim().replace(/^v/, '').split('(')[0].trim();
 }
 
 async function readNodeModulesVersion(
