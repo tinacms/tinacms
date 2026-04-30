@@ -46,7 +46,7 @@ const formatDefaultBranchName = (
 };
 
 const normalizeBranchSlashes = (name: string): string =>
-  name.replace(/\/+/g, '/').replace(/^\/+|\/+$/g, '');
+  name.split('/').filter(Boolean).join('/');
 
 export const CreateBranchModal = ({
   close,
