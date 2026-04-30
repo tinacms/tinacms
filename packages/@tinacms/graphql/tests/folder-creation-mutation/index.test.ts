@@ -1,6 +1,7 @@
 import { it, expect } from 'vitest';
 import config from './tina/config';
 import { setupMutation, format } from '../util';
+import type { Schema } from '@tinacms/schema-tools';
 
 const createFolderMutation = `
   mutation {
@@ -46,6 +47,40 @@ it('prevents creating duplicate folder', async () => {
 
   expect(result.errors).toBeDefined();
   expect(result.errors![0].message).toContain('already exists');
+});
+
+it('creates folder when collection has match.exclude configured', async () => {
+  const schemaWithExclude: Schema = {
+    collections: [
+      {
+        label: 'Post',
+        name: 'post',
+        path: 'posts',
+        match: {
+          exclude: 'drafts/**',
+        },
+        fields: [
+          { name: 'title', label: 'Title', type: 'string', required: true },
+          { name: 'content', label: 'Content', type: 'string' },
+        ],
+      },
+    ],
+  };
+
+  const { query, bridge } = await setupMutation(__dirname, {
+    schema: schemaWithExclude,
+  });
+
+  const result = await query({
+    query: createFolderMutation,
+    variables: {},
+  });
+
+  expect(result.errors).toBeUndefined();
+  const folderWrite = bridge.getWrite(
+    'posts/northwind/company-updates/.gitkeep.md'
+  );
+  expect(folderWrite).toBeDefined();
 });
 
 it('creates nested folder structure', async () => {
