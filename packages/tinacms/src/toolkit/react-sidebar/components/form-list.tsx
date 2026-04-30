@@ -363,7 +363,7 @@ const TreeNodeComponent = ({
         {/* Expand/collapse arrow for folders */}
         {node.children.length > 0 && (
           <BiChevronRight
-            className={`w-4 h-4 text-gray-500 transition-transform duration-150 -ml-1 ${
+            className={`w-4 h-4 flex-none text-gray-500 transition-transform duration-150 -ml-1 ${
               isExpanded ? 'rotate-90' : ''
             }`}
           />
@@ -514,19 +514,19 @@ export const FormLists = (props: { lastActiveFormId: string | null }) => {
       </div>
 
       {/* Scrollable content area */}
-      <div className='flex-1 overflow-x-auto overflow-y-auto min-h-0'>
-        {cms.state.formLists.map((formList, index) => (
-          <div key={`${formList.id}-${index}`}>
-            {/* TODO: add labels for each list */}
-            <FormList
-              setActiveFormId={(id) => {
-                cms.dispatch({ type: 'forms:set-active-form-id', value: id });
-              }}
-              formList={formList}
-              showReferences={showReferences}
-            />
-          </div>
-        ))}
+      <div className='flex-1 overflow-x-auto overflow-y-auto min-h-0 pb-16'>
+        <FormList
+          setActiveFormId={(id) => {
+            cms.dispatch({ type: 'forms:set-active-form-id', value: id });
+          }}
+          formList={{
+            id: 'merged',
+            label: 'All',
+            items: cms.state.formLists.flatMap((fl) => fl.items),
+            formIds: cms.state.formLists.flatMap((fl) => fl.formIds),
+          }}
+          showReferences={showReferences}
+        />
       </div>
     </div>
   );

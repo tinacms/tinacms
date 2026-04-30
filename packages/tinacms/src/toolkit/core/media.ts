@@ -97,6 +97,14 @@ export interface MediaStore {
    * @default false
    */
   isStatic?: boolean;
+
+  /**
+   * Converts a Media object to the value stored in a form field.
+   *
+   * Typically returns `media.src`. If not implemented, the image field
+   * plugin falls back to `media.src`.
+   */
+  parse?(media: Media): string;
 }
 
 export declare type MediaListOffset = string | number;
