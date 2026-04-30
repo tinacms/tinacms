@@ -321,7 +321,12 @@ async function readYarnLockVersions(
   const versions = new Map<string, string>();
   if (!(await fs.pathExists(lockfilePath))) return versions;
 
-  const lines = (await fs.readFile(lockfilePath, 'utf8')).split('\n');
+  const contents = await fs.readFile(lockfilePath, 'utf8');
+  if (contents.includes('__metadata:')) {
+    return readYarnBerryLockVersions(contents);
+  }
+
+  const lines = contents.split('\n');
   let activeNames: string[] = [];
   for (const line of lines) {
     if (line.length > 0 && !line.startsWith(' ') && line.includes('@')) {
@@ -336,6 +341,22 @@ async function readYarnLockVersions(
       if (isTinaPackage(name) && !versions.has(name)) {
         versions.set(name, version);
       }
+    }
+  }
+
+  return versions;
+}
+
+function readYarnBerryLockVersions(contents: string): Map<string, string> {
+  const versions = new Map<string, string>();
+  const lockfile = yaml.load(contents) as Record<string, { version?: unknown }>;
+
+  for (const [descriptor, value] of Object.entries(lockfile || {})) {
+    if (descriptor === '__metadata') continue;
+    const name = extractYarnBerryPackageName(descriptor);
+    const version = value?.version;
+    if (name && isTinaPackage(name) && typeof version === 'string') {
+      versions.set(name, normalizeVersion(version));
     }
   }
 
@@ -364,4 +385,11 @@ function extractYarnPackageNames(line: string): string[] {
       return descriptor.split('@')[0];
     })
     .filter(Boolean);
+}
+
+function extractYarnBerryPackageName(descriptor: string): string | undefined {
+  if (descriptor.startsWith('@')) {
+    return descriptor.match(/^(@[^/]+\/[^@]+)/)?.[1];
+  }
+  return descriptor.split('@')[0] || undefined;
 }

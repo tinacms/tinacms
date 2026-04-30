@@ -155,6 +155,49 @@ describe('doctor command helpers', () => {
     }
   });
 
+  it('prefers node_modules versions over lockfile versions', async () => {
+    const rootPath = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'tinacms-doctor-')
+    );
+    try {
+      await fs.outputJSON(
+        path.join(rootPath, 'node_modules', 'tinacms', 'package.json'),
+        {
+          version: '3.7.6',
+        }
+      );
+      await fs.writeJSON(path.join(rootPath, 'package-lock.json'), {
+        packages: {
+          'node_modules/tinacms': {
+            version: '3.7.5',
+          },
+        },
+      });
+
+      await expect(
+        resolveInstalledVersions({
+          rootPath,
+          dependencies: [
+            {
+              name: 'tinacms',
+              declared: '^3.7.0',
+              dependencyType: 'dependencies',
+            },
+          ],
+        })
+      ).resolves.toEqual([
+        {
+          name: 'tinacms',
+          declared: '^3.7.0',
+          dependencyType: 'dependencies',
+          installed: '3.7.6',
+        },
+      ]);
+    } finally {
+      await fs.remove(rootPath);
+    }
+  });
+
   it('resolves installed versions from pnpm-lock.yaml', async () => {
     const rootPath = await fs.mkdtemp(
       path.join(os.tmpdir(), 'tinacms-doctor-')
@@ -228,6 +271,64 @@ describe('doctor command helpers', () => {
           'tinacms@^3.7.0:',
           '  version "3.7.5"',
           '  resolved "https://registry.yarnpkg.com/tinacms/-/tinacms-3.7.5.tgz"',
+          '',
+        ].join('\n')
+      );
+
+      await expect(
+        resolveInstalledVersions({
+          rootPath,
+          dependencies: [
+            {
+              name: '@tinacms/cli',
+              declared: '^2.2.0',
+              dependencyType: 'devDependencies',
+            },
+            {
+              name: 'tinacms',
+              declared: '^3.7.0',
+              dependencyType: 'dependencies',
+            },
+          ],
+        })
+      ).resolves.toEqual([
+        {
+          name: '@tinacms/cli',
+          declared: '^2.2.0',
+          dependencyType: 'devDependencies',
+          installed: '2.2.5',
+        },
+        {
+          name: 'tinacms',
+          declared: '^3.7.0',
+          dependencyType: 'dependencies',
+          installed: '3.7.5',
+        },
+      ]);
+    } finally {
+      await fs.remove(rootPath);
+    }
+  });
+
+  it('resolves installed versions from Yarn Berry lockfiles', async () => {
+    const rootPath = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'tinacms-doctor-')
+    );
+    try {
+      await fs.writeFile(
+        path.join(rootPath, 'yarn.lock'),
+        [
+          '__metadata:',
+          '  version: 8',
+          '  cacheKey: 10',
+          '',
+          '"@tinacms/cli@npm:^2.2.0":',
+          '  version: 2.2.5',
+          '  resolution: "@tinacms/cli@npm:2.2.5"',
+          '',
+          '"tinacms@npm:^3.7.0":',
+          '  version: 3.7.5',
+          '  resolution: "tinacms@npm:3.7.5"',
           '',
         ].join('\n')
       );
