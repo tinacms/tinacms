@@ -39,17 +39,26 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
 
   React.useEffect(() => {
     if (ref.current) {
-      setTimeout(() => {
-        // Slate/Plate doesn't expose it's underlying element
-        // as a ref, so we need to query for it ourselves
-        const plateElement = ref.current?.querySelector(
-          '[role="textbox"]'
-        ) as HTMLElement;
-        if (field.experimental_focusIntent && plateElement) {
-          if (plateElement) plateElement.focus();
-        }
-        // Slate takes a second to mount
-      }, 100);
+      // Ensure the editor container always starts scrolled to the top,
+      // regardless of where Slate internally places the cursor on mount.
+      ref.current.scrollTop = 0;
+
+      if (field.experimental_focusIntent) {
+        setTimeout(() => {
+          // Slate/Plate doesn't expose it's underlying element
+          // as a ref, so we need to query for it ourselves
+          const plateElement = ref.current?.querySelector(
+            '[role="textbox"]'
+          ) as HTMLElement;
+          if (plateElement) {
+            // preventScroll stops the browser from scrolling to the cursor
+            // position when focus is programmatically set.
+            plateElement.focus({ preventScroll: true });
+            if (ref.current) ref.current.scrollTop = 0;
+          }
+          // Slate takes a second to mount
+        }, 100);
+      }
     }
   }, [field.experimental_focusIntent, ref]);
   return (
