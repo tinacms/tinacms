@@ -1334,9 +1334,7 @@ describe('index', () => {
     it('adds a pending document with the resolved template name for a union collection', async () => {
       const { resolver, database } = setup({
         type: 'union',
-        templates: [
-          { name: 'hero', namespace: ['post', 'hero'], fields: [] },
-        ],
+        templates: [{ name: 'hero', namespace: ['post', 'hero'], fields: [] }],
       });
 
       await resolver.resolveAddPendingDocument({
