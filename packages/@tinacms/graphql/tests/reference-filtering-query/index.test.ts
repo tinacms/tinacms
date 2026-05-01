@@ -35,7 +35,7 @@ it('filters movies by director name using direct reference', async () => {
     }`,
     variables: {},
   });
-  expect(format(result)).toMatchFileSnapshot('node.json');
+  await expect(format(result)).toMatchFileSnapshot('node.json');
 });
 
 it('filters movies by nested reference traversal', async () => {
@@ -58,5 +58,5 @@ it('filters movies by nested reference traversal', async () => {
     }`,
     variables: {},
   });
-  expect(format(result)).toMatchFileSnapshot('nested-reference-node.json');
+  await expect(format(result)).toMatchFileSnapshot('nested-reference-node.json');
 });
