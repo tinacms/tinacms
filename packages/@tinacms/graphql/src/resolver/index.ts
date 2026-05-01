@@ -48,7 +48,7 @@ export const createResolver = (args: ResolverConfig) => {
   return new Resolver(args);
 };
 
-const resolveFieldData = async (
+export const resolveFieldData = async (
   { namespace, ...field }: TinaField<true>,
   rawData: unknown,
   accumulator: { [key: string]: unknown },
