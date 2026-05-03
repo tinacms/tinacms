@@ -1719,8 +1719,9 @@ const _indexContent = async ({
         }
       }
 
+      let putOps: BatchOp[] = [];
       if (!isGitKeep(filepath, collection)) {
-        await enqueueOps([
+        putOps = [
           ...makeRefOpsForDocument(
             normalizedPath,
             collection?.name,
@@ -1746,17 +1747,21 @@ const _indexContent = async ({
             'put',
             level
           ),
-          {
-            type: 'put',
-            key: normalizedPath,
-            value: aliasedData as any,
-            sublevel: level.sublevel<string, Record<string, any>>(
-              CONTENT_ROOT_PREFIX,
-              SUBLEVEL_OPTIONS
-            ),
-          },
-        ]);
+        ];
       }
+
+      await enqueueOps([
+        ...putOps,
+        {
+          type: 'put',
+          key: normalizedPath,
+          value: aliasedData as any,
+          sublevel: level.sublevel<string, Record<string, any>>(
+            CONTENT_ROOT_PREFIX,
+            SUBLEVEL_OPTIONS
+          ),
+        },
+      ]);
     } catch (error) {
       throw new TinaFetchError(`Unable to seed ${filepath}`, {
         originalError: error,

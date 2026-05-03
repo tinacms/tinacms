@@ -468,16 +468,19 @@ const CollectionListPage = () => {
                             );
                             reFetchCollection();
                           } catch (error) {
-                            if (error.message.indexOf('has references')) {
+                            if (error.message && error.message.includes('already exists')) {
+                              cms.alerts.error(
+                                `Document was not renamed. The filename "${vars.newRelativePath}" is already used by another document, please choose a different name.`
+                              );
+                            } else if (error.message && error.message.includes('has references')) {
                               cms.alerts.error(
                                 error.message.split('\n\t').filter(Boolean)[1]
                               );
-                              return;
+                            } else {
+                              cms.alerts.error(
+                                'There was an error renaming the document. Please try again. If the problem continues, please contact the developer.'
+                              );
                             }
-                            cms.alerts.warn(
-                              'Document was not renamed, ask a developer for help or check the console for an error message'
-                            );
-                            console.error(error);
                             throw error;
                           }
                         }}
@@ -499,38 +502,36 @@ const CollectionListPage = () => {
                         }
                         createFunc={async () => {
                           try {
-                            admin
-                              .createFolder(
-                                vars.collection,
-                                folder.name
-                                  ? [folder.name, vars.folderName].join('/')
-                                  : vars.folderName
-                              )
-                              .then(() => {
-                                reFetchCollection();
-                                navigate(
-                                  `/${[
-                                    'collections',
-                                    collectionName,
-                                    '~',
-                                    ...(folder.name
-                                      ? [folder.name, vars.folderName]
-                                      : [vars.folderName]),
-                                  ].join('/')}`,
-                                  { replace: true }
-                                );
-                                cms.alerts.info(
-                                  'Folder was successfully created'
-                                );
-                              })
-                              .catch((error) => {
-                                throw error;
-                              });
-                          } catch (error) {
-                            cms.alerts.warn(
-                              'Folder was not created, ask a developer for help or check the console for an error message'
+                            await admin.createFolder(
+                              vars.collection,
+                              folder.name
+                                ? [folder.name, vars.folderName].join('/')
+                                : vars.folderName
                             );
-                            console.error(error);
+                            
+                            reFetchCollection();
+                            navigate(
+                              `/${[
+                                'collections',
+                                collectionName,
+                                '~',
+                                ...(folder.name
+                                  ? [folder.name, vars.folderName]
+                                  : [vars.folderName]),
+                              ].join('/')}`,
+                              { replace: true }
+                            );
+                            cms.alerts.info('Folder was successfully created');
+                          } catch (error) {
+                            if (error.message && error.message.includes('already exists')) {
+                              cms.alerts.error(
+                                `Folder was not created, folder with name "${vars.folderName}" already exists ${folder.name ? `in ${folder.name}` : ''}`
+                              );
+                            } else {
+                              cms.alerts.error(
+                                'There was an error creating the folder. Please try again. If the problem continues, please contact the developer'
+                              );
+                            }
                             throw error;
                           }
                         }}
@@ -541,7 +542,7 @@ const CollectionListPage = () => {
                     <PageHeader>
                       <div className='w-full mx-auto max-w-screen-xl'>
                         <h3 className='font-sans text-2xl text-tina-orange'>
-                          {collection.label
+                          {collection.label 
                             ? collection.label
                             : collection.name}
                         </h3>
@@ -1478,8 +1479,12 @@ const FolderModal = ({
             variant='primary'
             disabled={!isFolderNameValid}
             onClick={async () => {
-              await createFunc();
-              close();
+              try {
+                await createFunc();
+                close();
+              } catch (e) {
+                // error is already handled by createFunc
+              }
             }}
           >
             Create

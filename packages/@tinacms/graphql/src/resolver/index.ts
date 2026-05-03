@@ -104,10 +104,9 @@ export const resolveFieldData = async (
         if (isAudit) {
           const invalidNode = tree?.children[0];
           throw new GraphQLError(
-            `${invalidNode?.message}${
-              invalidNode.position
-                ? ` at line ${invalidNode.position.start.line}, column ${invalidNode.position.start.column}`
-                : ''
+            `${invalidNode?.message}${invalidNode.position
+              ? ` at line ${invalidNode.position.start.line}, column ${invalidNode.position.start.column}`
+              : ''
             }`
           );
         }
@@ -145,9 +144,9 @@ export const resolveFieldData = async (
           const isUnion = !!field.templates;
           return isUnion
             ? {
-                _template: lastItem(template.namespace),
-                ...payload,
-              }
+              _template: lastItem(template.namespace),
+              ...payload,
+            }
             : payload;
         });
       } else {
@@ -176,9 +175,9 @@ export const resolveFieldData = async (
         const isUnion = !!field.templates;
         accumulator[field.name] = isUnion
           ? {
-              _template: lastItem(template.namespace),
-              ...payload,
-            }
+            _template: lastItem(template.namespace),
+            ...payload,
+          }
           : payload;
       }
 
@@ -470,18 +469,18 @@ export class Resolver {
         }
         return Promise.all(
           fieldValue.map(async (item) =>
-            // @ts-ignore FIXME Argument of type 'string | object' is not assignable to parameter of type '{ [fieldName: string]: string | object | (string | object)[]; }'
-            {
-              return this.buildFieldMutations(
-                item,
-                objectTemplate as any,
-                idField &&
-                  existingData &&
-                  existingData?.find(
-                    (d) => d[idField.name] === item[idField.name]
-                  )
-              );
-            }
+          // @ts-ignore FIXME Argument of type 'string | object' is not assignable to parameter of type '{ [fieldName: string]: string | object | (string | object)[]; }'
+          {
+            return this.buildFieldMutations(
+              item,
+              objectTemplate as any,
+              idField &&
+              existingData &&
+              existingData?.find(
+                (d) => d[idField.name] === item[idField.name]
+              )
+            );
+          }
           )
         );
       } else {
@@ -595,8 +594,7 @@ export class Resolver {
         );
         if (!template) {
           throw new Error(
-            `Expected to find template named ${templateName} in collection "${
-              collection.name
+            `Expected to find template named ${templateName} in collection "${collection.name
             }" but none was found. Possible templates are: ${templateInfo.templates
               .map((t) => lastItem(t.namespace))
               .join(' ')}`
@@ -878,6 +876,12 @@ export class Resolver {
       // don't update if the paths are the same
       if (newRealPath === realPath) {
         return doc;
+      }
+
+      // prevent silent overwrite of an existing document
+      const newPathAlreadyExists = await this.database.documentExists(newRealPath);
+      if (newPathAlreadyExists) {
+        throw new Error(`Unable to rename document, ${newRealPath} already exists`);
       }
 
       // update the document
@@ -1568,7 +1572,7 @@ export class Resolver {
           if (typeof fieldValue !== 'object') {
             throw new Error(
               `Expected to find object for password field ${fieldName}. Found ${typeof accum[
-                fieldName
+              fieldName
               ]}`
             );
           }
