@@ -28,7 +28,7 @@ const GLOBAL_QUERY = `query global($relativePath: String!) {
 const PAGE_QUERY = `query page($relativePath: String!) {
   page(relativePath: $relativePath) {
     blocks { __typename ... on PageBlocksHero { tagline headline text image { src alt } actions { label type icon link } color }
-      ... on PageBlocksFeatures { title description items { name title text icon { name color style } actions { label type icon link } } color }
+      ... on PageBlocksFeatures { title description items { title text icon { name color style } actions { label type icon link } } color }
       ... on PageBlocksCta { title description actions { label type icon link } color }
       ... on PageBlocksTestimonial { quote author color }
       ... on PageBlocksContent { body color }
