@@ -21,12 +21,14 @@ export function GradientTitle({
   const sizeClasses = size === '5xl' ? 'text-5xl' : 'text-6xl';
   return (
     <Tag
-      className={cn('w-full relative mb-8 font-extrabold tracking-normal text-center title-font', sizeClasses, className)}
+      className={cn(
+        'w-full relative mb-8 font-extrabold tracking-normal text-center title-font',
+        sizeClasses,
+        className
+      )}
       {...rest}
     >
-      <span
-        className='bg-clip-text text-transparent bg-gradient-to-r from-theme-400 to-theme-600 dark:from-theme-300 dark:to-theme-500'
-      >
+      <span className='bg-clip-text text-transparent bg-gradient-to-r from-theme-400 to-theme-600 dark:from-theme-300 dark:to-theme-500'>
         {children}
       </span>
     </Tag>

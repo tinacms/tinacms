@@ -19,7 +19,6 @@
         "build": "pnpm tsup src/jest-runner.ts src/index.ts --format esm"
     },
     "dependencies": {
-        "@sucrase/jest-plugin": "catalog:",
         "chalk": "catalog:",
         "chokidar": "catalog:",
         "commander": "^7.2.0",

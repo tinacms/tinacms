@@ -1,5 +1,60 @@
 # tinacms
 
+## 3.7.5
+
+### Patch Changes
+
+- Updated dependencies [[`a85b1c0`](https://github.com/tinacms/tinacms/commit/a85b1c0ff44d8c214be47f89531beaf0e9dc234c)]:
+  - @tinacms/schema-tools@2.7.3
+  - @tinacms/search@1.2.12
+  - @tinacms/mdx@2.1.3
+
+## 3.7.4
+
+### Patch Changes
+
+- [#6410](https://github.com/tinacms/tinacms/pull/6410) [`4672251`](https://github.com/tinacms/tinacms/commit/4672251c813e51f4471f025943008d2dea700aca) Thanks [@TihomirIvanov](https://github.com/TihomirIvanov)! - Updated tinacms dependency mermaid
+
+  Fixes security vulnerabilities
+
+  - Fixes https://github.com/advisories/GHSA-p3vf-v8qc-cwcr
+  - Fixes https://github.com/advisories/GHSA-gx9m-whjm-85jf
+  - Fixes https://github.com/advisories/GHSA-mmhx-hmjr-r674
+  - Fixes https://github.com/advisories/GHSA-m4gq-x24j-jpmf
+  - Fixes https://github.com/advisories/GHSA-vhxf-7vqr-mrjg
+
+- [#6708](https://github.com/tinacms/tinacms/pull/6708) [`ca725ac`](https://github.com/tinacms/tinacms/commit/ca725acb42be499c146d76b12982e05a8127f81e) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Fix rich-text image edit form: the URL field now shows the correct `URL` label and loads the existing image (previously it displayed the raw field path like `body.children[10].props.url` and rendered as an empty upload dropzone). The breadcrumb for the image form also now reads "Image" instead of the full path.
+
+- [#6687](https://github.com/tinacms/tinacms/pull/6687) [`a526f9f`](https://github.com/tinacms/tinacms/commit/a526f9f4c37a0aaefb572c9dcc562d89aa9e5c7e) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: simplify errors shown to users
+
+- [#6720](https://github.com/tinacms/tinacms/pull/6720) [`b260b5e`](https://github.com/tinacms/tinacms/commit/b260b5ed4beb5d678b9605357b99a8667fddc8de) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Migrate docs links in shipped package code from raw `tina.io/docs/<path>` URLs to aliased `tina.io/docs/r/<alias>` URLs so the links survive future docs restructuring.
+
+- [#6728](https://github.com/tinacms/tinacms/pull/6728) [`b56dad4`](https://github.com/tinacms/tinacms/commit/b56dad42d2216ac9c8f90f19b78a4951ca97a61f) Thanks [@monsonego](https://github.com/monsonego)! - Fix the radio-group field styling so radio options render with a circular indicator and no longer look disabled when unselected.
+
+- Updated dependencies []:
+  - @tinacms/search@1.2.11
+
+## 3.7.3
+
+### Patch Changes
+
+- [#6548](https://github.com/tinacms/tinacms/pull/6548) [`cd262b3`](https://github.com/tinacms/tinacms/commit/cd262b311c218ea4e5b5bb8abbbe54fcff3b8054) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Add 'displayOnly' field type for display-only form fields
+
+- [#6693](https://github.com/tinacms/tinacms/pull/6693) [`217bfb4`](https://github.com/tinacms/tinacms/commit/217bfb4ff2c1a61fa7b6df3ea460b192b5179bb7) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Fix sidebar file tree: consolidate duplicate roots from multiple useTina() calls, prevent chevron shrinking on long filenames, add bottom padding for last item visibility
+
+- [#6678](https://github.com/tinacms/tinacms/pull/6678) [`5feb18d`](https://github.com/tinacms/tinacms/commit/5feb18d0d3032bbcd6a5aad678208c0dde19bf81) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - fix: display editorial workflow modal on deleted branches
+
+- [#6699](https://github.com/tinacms/tinacms/pull/6699) [`32e145d`](https://github.com/tinacms/tinacms/commit/32e145d4859cbc710a222f2a01c55ca7b29a080b) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 💄 Improve UI of Grid Item in Media Manager
+
+- [#6682](https://github.com/tinacms/tinacms/pull/6682) [`d998884`](https://github.com/tinacms/tinacms/commit/d9988849ad67fb5e9d7e233c1ccca0cb0c031c3e) Thanks [@kulesy](https://github.com/kulesy)! - Fix React Error #31 when inserting image from Media Library with custom MediaStore
+
+- [#6664](https://github.com/tinacms/tinacms/pull/6664) [`c75d871`](https://github.com/tinacms/tinacms/commit/c75d87121224f91dc4e5e2aa8af60b0881b87a5b) Thanks [@18-th](https://github.com/18-th)! - Validate relativePath to reject whitespace and invalid characters
+
+- Updated dependencies [[`cd262b3`](https://github.com/tinacms/tinacms/commit/cd262b311c218ea4e5b5bb8abbbe54fcff3b8054), [`55dae8e`](https://github.com/tinacms/tinacms/commit/55dae8eef898f49f827c00bc72297863d0d69be1)]:
+  - @tinacms/schema-tools@2.7.2
+  - @tinacms/mdx@2.1.2
+  - @tinacms/search@1.2.10
+
 ## 3.7.2
 
 ### Patch Changes

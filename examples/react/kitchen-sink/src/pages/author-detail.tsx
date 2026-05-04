@@ -22,17 +22,30 @@ export default function AuthorDetail() {
   const result = useTinaQuery(queryFn);
 
   if (result.loading) return <Loading />;
-  if (result.error || !result.data) return <NoData message='Author not found' />;
+  if (result.error || !result.data)
+    return <NoData message='Author not found' />;
 
-  return <AuthorClient data={result.data} query={result.query} variables={result.variables} />;
+  return (
+    <AuthorClient
+      data={result.data}
+      query={result.query}
+      variables={result.variables}
+    />
+  );
 }
 
-function AuthorClient(props: { data: any; query: string; variables: Record<string, unknown> }) {
+function AuthorClient(props: {
+  data: any;
+  query: string;
+  variables: Record<string, unknown>;
+}) {
   const { data } = useTina({ ...props });
 
   if (!data?.author) return <NoData />;
 
-  const avatarSrc = data.author.avatar ? sanitizeImageSrc(data.author.avatar) : '';
+  const avatarSrc = data.author.avatar
+    ? sanitizeImageSrc(data.author.avatar)
+    : '';
 
   return (
     <Section className='flex-1'>
@@ -48,7 +61,11 @@ function AuthorClient(props: { data: any; query: string; variables: Record<strin
               data-tina-field={tinaField(data.author, 'avatar')}
             />
           )}
-          <GradientTitle size='5xl' className='mb-4' data-tina-field={tinaField(data.author, 'name')}>
+          <GradientTitle
+            size='5xl'
+            className='mb-4'
+            data-tina-field={tinaField(data.author, 'name')}
+          >
             {data.author.name}
           </GradientTitle>
           {data.author.description && (

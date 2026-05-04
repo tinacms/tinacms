@@ -8,17 +8,17 @@ import { useTinaQuery } from '@/src/hooks/use-tina-query';
 import client from '@/tina/__generated__/client';
 
 export default function BlogList() {
-  const queryFn = useCallback(
-    () => client.queries.blogConnection(),
-    []
-  );
+  const queryFn = useCallback(() => client.queries.blogConnection(), []);
   const result = useTinaQuery(queryFn);
 
   if (result.loading) return <Loading />;
-  if (result.error || !result.data) return <div className='py-12 text-center text-gray-500'>No blogs found</div>;
+  if (result.error || !result.data)
+    return (
+      <div className='py-12 text-center text-gray-500'>No blogs found</div>
+    );
 
-  const blogs = (result.data?.blogConnection?.edges ?? []).flatMap((edge: any) =>
-    edge?.node ? [edge.node] : []
+  const blogs = (result.data?.blogConnection?.edges ?? []).flatMap(
+    (edge: any) => (edge?.node ? [edge.node] : [])
   );
 
   return (
@@ -27,8 +27,12 @@ export default function BlogList() {
         {blogs.map((blog: any) => {
           const href = `/blog/${blog._sys.filename}`;
           const formattedDate = blog.pubDate ? formatDate(blog.pubDate) : '';
-          const heroSrc = blog.heroImage ? sanitizeImageSrc(blog.heroImage) : '';
-          const avatarSrc = blog.author?.avatar ? sanitizeImageSrc(blog.author.avatar) : '';
+          const heroSrc = blog.heroImage
+            ? sanitizeImageSrc(blog.heroImage)
+            : '';
+          const avatarSrc = blog.author?.avatar
+            ? sanitizeImageSrc(blog.author.avatar)
+            : '';
 
           return (
             <Link

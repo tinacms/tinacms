@@ -333,6 +333,16 @@ export type PasswordField = (
     type: 'password';
   };
 
+export type DisplayOnlyField = BaseField & {
+  type: 'displayOnly';
+  list?: never;
+  required?: never;
+  indexed?: never;
+  ui?: {
+    component?: FC<any> | null;
+  };
+};
+
 export type ToolbarOverrideType =
   | 'heading'
   | 'link'
@@ -504,6 +514,7 @@ type Field<WithNamespace extends boolean = false> = (
   | RichTextField<WithNamespace>
   | ObjectField<WithNamespace>
   | PasswordField
+  | DisplayOnlyField
 ) &
   MaybeNamespace<WithNamespace>;
 
@@ -858,7 +869,7 @@ export interface Config<
      * @example
      *s
      * historyUrl: ({ relativePath, branch }) => ({
-     *   url: `https://github.com/tinacms/tinacms/commits/${branch}/examples/next-2024/${relativePath}`
+     *   url: `https://github.com/tinacms/tinacms/commits/${branch}/examples/next/kitchen-sink/${relativePath}`
      * })
      *      */
     historyUrl?: (context: { relativePath: string; branch: string }) => {

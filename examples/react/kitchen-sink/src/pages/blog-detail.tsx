@@ -23,20 +23,37 @@ export default function BlogDetail() {
   const result = useTinaQuery(queryFn);
 
   if (result.loading) return <Loading />;
-  if (result.error || !result.data) return <NoData message='Blog post not found' />;
+  if (result.error || !result.data)
+    return <NoData message='Blog post not found' />;
 
-  return <BlogClient data={result.data} query={result.query} variables={result.variables} />;
+  return (
+    <BlogClient
+      data={result.data}
+      query={result.query}
+      variables={result.variables}
+    />
+  );
 }
 
-function BlogClient(props: { data: any; query: string; variables: Record<string, unknown> }) {
+function BlogClient(props: {
+  data: any;
+  query: string;
+  variables: Record<string, unknown>;
+}) {
   const { data } = useTina({ ...props });
 
   if (!data?.blog) return <NoData message='No blog post found' />;
 
   const formattedDate = data.blog.pubDate ? formatDate(data.blog.pubDate) : '';
-  const formattedUpdatedDate = data.blog.updatedDate ? formatDate(data.blog.updatedDate) : '';
-  const avatarSrc = data.blog.author?.avatar ? sanitizeImageSrc(data.blog.author.avatar) : '';
-  const heroSrc = data.blog.heroImage ? sanitizeImageSrc(data.blog.heroImage) : '';
+  const formattedUpdatedDate = data.blog.updatedDate
+    ? formatDate(data.blog.updatedDate)
+    : '';
+  const avatarSrc = data.blog.author?.avatar
+    ? sanitizeImageSrc(data.blog.author.avatar)
+    : '';
+  const heroSrc = data.blog.heroImage
+    ? sanitizeImageSrc(data.blog.heroImage)
+    : '';
 
   return (
     <Section className='flex-1'>
@@ -79,14 +96,15 @@ function BlogClient(props: { data: any; query: string; variables: Record<string,
                   Published {formattedDate}
                 </span>
               )}
-              {formattedUpdatedDate && formattedUpdatedDate !== formattedDate && (
-                <>
-                  <span className='text-gray-200 dark:text-gray-700'>·</span>
-                  <span data-tina-field={tinaField(data.blog, 'updatedDate')}>
-                    Updated {formattedUpdatedDate}
-                  </span>
-                </>
-              )}
+              {formattedUpdatedDate &&
+                formattedUpdatedDate !== formattedDate && (
+                  <>
+                    <span className='text-gray-200 dark:text-gray-700'>·</span>
+                    <span data-tina-field={tinaField(data.blog, 'updatedDate')}>
+                      Updated {formattedUpdatedDate}
+                    </span>
+                  </>
+                )}
             </div>
           </div>
         </div>

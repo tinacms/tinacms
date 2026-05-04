@@ -79,7 +79,9 @@ export default function BlogClientPage(props: BlogClientProps) {
                       <span className='text-gray-200 dark:text-gray-700'>
                         ·
                       </span>
-                      <span data-tina-field={tinaField(data.blog, 'updatedDate')}>
+                      <span
+                        data-tina-field={tinaField(data.blog, 'updatedDate')}
+                      >
                         Updated {formattedUpdatedDate}
                       </span>
                     </>

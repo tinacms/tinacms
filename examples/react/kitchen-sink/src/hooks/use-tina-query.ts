@@ -24,7 +24,11 @@ interface TinaQueryResult<T> {
  *   const result = useTinaQuery(queryFn);
  */
 export function useTinaQuery<T>(
-  queryFn: () => Promise<{ data: T; query: string; variables: Record<string, unknown> }>
+  queryFn: () => Promise<{
+    data: T;
+    query: string;
+    variables: Record<string, unknown>;
+  }>
 ): TinaQueryResult<T> {
   const [result, setResult] = useState<TinaQueryResult<T>>({
     data: null,

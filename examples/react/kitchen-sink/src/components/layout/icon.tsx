@@ -55,11 +55,7 @@ export interface IconData {
   size?: string;
 }
 
-export const Icon = ({
-  data,
-  className = '',
-  ...rest
-}: IconProps) => {
+export const Icon = ({ data, className = '', ...rest }: IconProps) => {
   const { theme } = useLayout();
   const rawColor = data.color || theme.color;
   const color = rawColor === 'primary' ? theme.color : rawColor;
@@ -88,7 +84,7 @@ export const Icon = ({
             ? 'bg-white dark:bg-gray-100 text-gray-800'
             : 'bg-theme-400 dark:bg-theme-500 text-theme-50',
           sizeClass,
-          className,
+          className
         )}
         {...(rest as React.HTMLAttributes<HTMLDivElement>)}
       >
@@ -103,7 +99,7 @@ export const Icon = ({
       className={cn(
         isWhite ? 'text-white opacity-80' : 'text-theme-400',
         sizeClass,
-        className,
+        className
       )}
       {...(rest as React.SVGProps<SVGSVGElement>)}
     />

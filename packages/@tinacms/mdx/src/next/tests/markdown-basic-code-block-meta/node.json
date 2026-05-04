@@ -1,0 +1,37 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "code_block",
+      "lang": "js",
+      "meta": "{1,3-5}",
+      "value": "console.log('hello');",
+      "children": [
+        {
+          "type": "code_line",
+          "children": [
+            {
+              "text": "console.log('hello');"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code_block",
+      "lang": "python",
+      "meta": "title=\"app.py\"",
+      "value": "print(\"hello\")",
+      "children": [
+        {
+          "type": "code_line",
+          "children": [
+            {
+              "text": "print(\"hello\")"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

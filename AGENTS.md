@@ -4,6 +4,20 @@
 
 TinaCMS is an open-source headless CMS with visual editing. This monorepo contains the core packages, CLI, admin app, and framework example apps.
 
+## Security & Disclosure
+
+This repo has a public security policy at [`SECURITY.md`](SECURITY.md). Read it before touching code that could surface a vulnerability (auth, media routes, path handling, GraphQL resolvers, anything that accepts untrusted input).
+
+**Hard rules:**
+
+- **Never file security vulnerabilities as public GitHub issues.** Reports go to `security@tina.io`, or as a draft GitHub Security Advisory. Public issues are explicitly forbidden by `SECURITY.md`, regardless of severity.
+- **Never put bug specifics in test comments, PR descriptions, or commit messages.** That's public disclosure by a different name. If a test guards against a known-broken behaviour, use neutral wording (e.g. *"Pending upstream fix reported privately per SECURITY.md"*) and keep the internals — error messages, stack traces, affected function names, response-body specifics — out of the comment.
+- **Don't commit, push, or draft a public issue if you find a potential vulnerability.** Stop, tell the user what you found and where, and let them decide the disclosure path (email, draft advisory, or public if they judge it's truly benign).
+
+**Scope of the above rules:** every surface an agent might modify — source files, test files, inline comments, commit messages, PR descriptions, linked issue drafts, README snippets.
+
+When writing regression tests that guard against a quietly-reported finding, mark the specific case with `test.fixme` (Playwright) or the framework equivalent, use a generic "pending upstream fix" message, and put the detail in a private channel only.
+
 ## Monorepo Structure
 
 ```
@@ -11,14 +25,11 @@ packages/              # Core packages (tinacms, tinacms-authjs, create-tina-app
 packages/@tinacms/     # Scoped packages (cli, app, datalayer, graphql, mdx, scripts, etc.)
 examples/              # Framework example apps
   next/kitchen-sink/   # Next.js 15 — the reference kitchen-sink implementation
-  next-2024/           # Next.js starter (shadcn/ui based)
+  next/tina-self-hosted-demo/ # Self-hosted with auth
   astro/kitchen-sink/  # Astro 5 — mirrors Next.js kitchen-sink
-  empty/               # Vanilla Next.js for `tina init` testing
-  kitchen-sink/        # Legacy kitchen-sink (Pages router, being superseded)
-  basic-iframe/        # Iframe example
-  hugo-quickstart/     # Hugo quickstart
-  tina-self-hosted-demo/ # Self-hosted with auth
-experimental-examples/ # Experimental/prototype examples
+  hugo/kitchen-sink/   # Hugo kitchen-sink
+  react/kitchen-sink/  # React kitchen-sink
+  shared/              # Shared content and public assets across kitchen-sink examples
 playwright/            # Playwright test infrastructure
 scripts/               # Repo maintenance scripts
 tests/                 # Build verification tests
@@ -43,6 +54,7 @@ tests/                 # Build verification tests
 - **Linting/Formatting:** Biome (`biome.json` at root). Example apps extend with `"extends": ["../../../biome.json"]`
 - **TypeScript:** Base config at `base.tsconfig.json`. Examples extend it. Strict mode enabled.
 - **Package manager:** pnpm only. Never use npm or yarn.
+- **`CLAUDE.md` files** are git symlinks to the sibling `AGENTS.md`. On Windows without Developer Mode, if `git status` shows `TT` typechanges on them, run `git config --local core.symlinks false` — git then materialises them as regular pointer files. Linux/macOS clones get real symlinks automatically.
 
 ## Kitchen-Sink Examples
 

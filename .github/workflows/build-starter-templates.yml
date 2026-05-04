@@ -20,7 +20,7 @@ jobs:
           - tina-docs
           - tinasaurus
           - basic
-        node-version: [20, 22, 24]
+        node-version: [22, 24, 25]
     outputs:
       failed: ${{ steps.report-errors.outputs.failed }}
 

@@ -10,7 +10,6 @@
       "onlyUpdatePeerDependentsWhenOutOfRange": true
     },
     "ignore": [
-      "@examples/*",
-      "@experimental-examples/*"
+      "@examples/*"
     ]
   }

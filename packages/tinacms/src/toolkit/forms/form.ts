@@ -508,29 +508,27 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
             .join('.');
           if (item?.type === 'img') {
             const imageName = namePath.slice(0, currentPathIndex + 2).join('.');
+            const imageBaseName = templateName.replace(/\.props$/, '');
             return {
-              ...formOrObjectField,
-              // name: [formOrObjectField.name, 'img'].join('.'),
+              label: 'Image',
               name: [imageName].join('.'),
               fields: [
                 {
                   type: 'image',
-                  // label: 'URL',
-                  name: [templateName, 'url'].join('.'),
+                  label: 'URL',
+                  name: [imageBaseName, 'url'].join('.'),
                   component: 'image',
                 },
                 {
                   type: 'string',
                   label: 'Alt',
-                  name: [templateName.replace(/\.props$/, ''), 'alt'].join('.'),
+                  name: [imageBaseName, 'alt'].join('.'),
                   component: 'text',
                 },
                 {
                   type: 'string',
                   label: 'Caption',
-                  name: [templateName.replace(/\.props$/, ''), 'caption'].join(
-                    '.'
-                  ),
+                  name: [imageBaseName, 'caption'].join('.'),
                   component: 'text',
                 },
               ],

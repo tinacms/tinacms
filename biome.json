@@ -43,7 +43,6 @@
 			"**/*.tfstate",
 			"**/.next/**",
 			"**/dist/**",
-			"examples/hugo-quickstart",
 			"**/out.md",
 			"**/_response.md"
 		]

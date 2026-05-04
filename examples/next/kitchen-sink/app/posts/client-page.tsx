@@ -3,11 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import {
-  sanitizeImageSrc,
-  cardLinkClasses,
-  cn,
-} from '@/lib/utils';
+import { sanitizeImageSrc, cardLinkClasses, cn } from '@/lib/utils';
 import { TinaMarkdown } from 'tinacms/dist/rich-text';
 import { BiRightArrowAlt } from 'react-icons/bi';
 import { Section } from '@/components/layout/section';
@@ -51,7 +47,10 @@ export default function PostsClientPage(props: PostsClientPageProps) {
               key={post._sys.filename}
               href={postUrl}
               data-testid={`post-card-${post._sys.filename}`}
-              className={cn(cardLinkClasses, 'px-6 sm:px-8 md:px-10 py-10 mb-8 last:mb-0')}
+              className={cn(
+                cardLinkClasses,
+                'px-6 sm:px-8 md:px-10 py-10 mb-8 last:mb-0'
+              )}
             >
               <h3 className='bg-gradient-to-r bg-clip-text text-transparent from-theme-400 to-theme-600 dark:from-theme-300 dark:to-theme-500 text-3xl lg:text-4xl font-semibold title-font mb-5 transition-all duration-150 ease-out'>
                 {post.title}{' '}

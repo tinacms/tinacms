@@ -21,13 +21,13 @@
 /* ── Default / Blue ────────────────────────────────────── */
 :root,
 [data-theme="blue"] {
-  --theme-50: #DCEEFF;
-  --theme-200: #85C5FE;
-  --theme-300: #4EABFE;
+  --theme-50: #dceeff;
+  --theme-200: #85c5fe;
+  --theme-300: #4eabfe;
   --theme-400: #2296fe;
-  --theme-500: #0084FF;
+  --theme-500: #0084ff;
   --theme-600: #0574e4;
-  --theme-700: #0D5DBD;
+  --theme-700: #0d5dbd;
   --theme-on: #ffffff;
 }
 
@@ -94,12 +94,12 @@
 /* ── Orange ────────────────────────────────────────────── */
 [data-theme="orange"] {
   --theme-50: #fff7ed;
-  --theme-200: #EB7752;
-  --theme-300: #EA6C45;
-  --theme-400: #E85C30;
-  --theme-500: #EC4815;
-  --theme-600: #DC4419;
-  --theme-700: #D04017;
+  --theme-200: #eb7752;
+  --theme-300: #ea6c45;
+  --theme-400: #e85c30;
+  --theme-500: #ec4815;
+  --theme-600: #dc4419;
+  --theme-700: #d04017;
   --theme-on: #ffffff;
 }
 

@@ -9,7 +9,9 @@ import type {
   PageBlocksContent,
 } from '@/tina/__generated__/types';
 
-const Hero = React.lazy(() => import('./hero').then((m) => ({ default: m.Hero })));
+const Hero = React.lazy(() =>
+  import('./hero').then((m) => ({ default: m.Hero }))
+);
 const Features = React.lazy(() =>
   import('./features').then((m) => ({ default: m.Features }))
 );
@@ -44,7 +46,11 @@ export const Blocks = ({
   }
 
   return (
-    <Suspense fallback={<div className='py-12 text-center text-gray-400'>Loading blocks…</div>}>
+    <Suspense
+      fallback={
+        <div className='py-12 text-center text-gray-400'>Loading blocks…</div>
+      }
+    >
       {blocks.map((block, i) => {
         if (!block) return null;
         const blockWithMeta = block as PageBlocks & { _template?: string };

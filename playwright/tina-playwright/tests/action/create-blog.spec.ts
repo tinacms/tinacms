@@ -13,7 +13,7 @@ test.describe("Create Blog Post", () => {
 
   const blogTitle = "Test Blog Title";
   const blogContent = "This is a test blog content.";
-  const blogFilename = "This File is Created From Playwright Test";
+  const blogFilename = "playwright-test-post";
 
   test("should be able to create a blog", async ({ page, contentCleanup }) => {
     await page.fill('input[name="title"]', blogTitle);
@@ -32,5 +32,18 @@ test.describe("Create Blog Post", () => {
 
     const blogPost = page.locator(`text=${blogFilename}`).first();
     await expect(blogPost).toBeVisible();
+  });
+
+  test("should reject filenames with spaces", async ({ page }) => {
+    await page.fill('input[name="title"]', "Title");
+    await page.fill('input[name="filename"]', "file with spaces");
+
+    // Trigger validation by blurring the filename field
+    await page.locator('input[name="filename"]').blur();
+
+    const validationError = page.locator(
+      'text=Must contain only a-z, A-Z, 0-9, -, _, ., or /.'
+    );
+    await expect(validationError).toBeVisible();
   });
 });
