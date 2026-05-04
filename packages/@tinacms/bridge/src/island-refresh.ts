@@ -73,7 +73,10 @@ async function refreshIsland(island: HTMLElement, store: DataStore): Promise<voi
     debug('refreshing island', endpoint);
     const response = await fetch(endpoint, {
       method: 'GET',
-      headers: { 'X-Tina-Preview': JSON.stringify(overlay) },
+      // Headers are restricted to ISO-8859-1, but CMS content includes
+      // UTF-8 (em-dashes, smart quotes, accented chars). Encode as
+      // base64-of-utf-8 so the byte channel stays Latin-1-safe.
+      headers: { 'X-Tina-Preview': encodeOverlay(overlay) },
       cache: 'no-store',
       credentials: 'same-origin',
     });
@@ -87,6 +90,16 @@ async function refreshIsland(island: HTMLElement, store: DataStore): Promise<voi
   } catch (error) {
     debug('island refetch error', endpoint, error);
   }
+}
+
+function encodeOverlay(overlay: Record<string, object>): string {
+  const json = JSON.stringify(overlay);
+  const bytes = new TextEncoder().encode(json);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]!);
+  }
+  return btoa(binary);
 }
 
 function swapIslandHtml(island: HTMLElement, html: string): void {

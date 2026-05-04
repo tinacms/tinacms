@@ -36,7 +36,10 @@ export async function withOverlay<T>(args: {
   const overlayRaw = request.headers.get('X-Tina-Preview');
   if (overlayRaw) {
     try {
-      const map = JSON.parse(overlayRaw) as Record<string, T>;
+      // Bridge encodes overlay as base64-of-utf-8 because HTTP headers
+      // are restricted to Latin-1.
+      const json = Buffer.from(overlayRaw, 'base64').toString('utf-8');
+      const map = JSON.parse(json) as Record<string, T>;
       if (map[id] !== undefined) {
         return {
           data: addContentSourceMetadata(id, map[id]) as T,
