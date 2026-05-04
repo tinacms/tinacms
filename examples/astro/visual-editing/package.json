@@ -1,0 +1,33 @@
+{
+  "name": "@examples/astro-visual-editing",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "astro": "astro",
+    "dev": "cross-env MONOREPO_DEV=true tinacms dev -c \"astro dev\"",
+    "dev:astro": "astro dev",
+    "build": "tinacms build && astro build",
+    "build:astro": "astro build",
+    "build:local": "tinacms build --local --skip-cloud-checks -c \"astro build\"",
+    "preview": "astro preview",
+    "lint": "biome lint .",
+    "format": "biome format --write ."
+  },
+  "dependencies": {
+    "@tinacms/bridge": "workspace:*",
+    "@tinacms/datalayer": "workspace:*",
+    "astro": "^5.16.0",
+    "graphql": "^15.10.1",
+    "tinacms": "workspace:*"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "catalog:",
+    "@tinacms/app": "workspace:*",
+    "@tinacms/cli": "workspace:*",
+    "@tinacms/scripts": "workspace:*",
+    "@types/node": "^25.1.0",
+    "cross-env": "^7.0.3",
+    "typescript": "^5.7.3"
+  }
+}

@@ -1,0 +1,61 @@
+---
+import { isEditMode } from '../lib/is-edit-mode';
+
+interface Form {
+  id: string;
+  query: string;
+  variables: object;
+  data: object;
+}
+
+interface Props {
+  title: string;
+  forms?: Form[];
+}
+
+const { title, forms = [] } = Astro.props;
+const editing = isEditMode(Astro.request);
+---
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <style is:global>
+      * { box-sizing: border-box; }
+      body {
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        margin: 0;
+        color: #1a1a2e;
+        background: #fafbff;
+      }
+      main { max-width: 56rem; margin: 0 auto; padding: 3rem 1.5rem; }
+      .hero { padding: 2.5rem; background: linear-gradient(135deg, #ebe5ff, #d6f3ff); border-radius: 1rem; margin-bottom: 2rem; }
+      .hero p { margin: 0 0 0.5rem; color: #6b21a8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.85rem; }
+      .hero h1 { margin: 0; font-size: 2.5rem; line-height: 1.1; }
+      .features h2 { font-size: 1.5rem; margin: 0 0 1.5rem; }
+      .features ul { display: grid; gap: 1rem; padding: 0; list-style: none; }
+      .features li { background: #fff; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 1.25rem; }
+      .features li strong { display: block; font-size: 1.05rem; margin-bottom: 0.25rem; }
+      .features li span { color: #475569; }
+    </style>
+    {forms.map((form) => (
+      <script
+        type="application/tina+json"
+        set:html={JSON.stringify(form)}
+      />
+    ))}
+    {editing && (
+      <script>
+        import { init } from '@tinacms/bridge';
+        init();
+      </script>
+    )}
+  </head>
+  <body>
+    <main>
+      <slot />
+    </main>
+  </body>
+</html>

@@ -1,0 +1,22 @@
+---
+import Base from '../layouts/Base.astro';
+import HeroIsland from '../components/HeroIsland.astro';
+import FeaturesIsland from '../components/FeaturesIsland.astro';
+import { getPageData } from '../lib/tina-preview';
+
+const slug = 'home';
+const { data, query, variables, id } = await getPageData(slug, Astro.request);
+---
+<Base
+  title="Astro visual editing"
+  forms={[{ id, query, variables, data }]}
+>
+  <HeroIsland
+    data={data.page.hero}
+    islandEndpoint={`/tina-island/hero?slug=${slug}`}
+  />
+  <FeaturesIsland
+    data={data.page.features}
+    islandEndpoint={`/tina-island/features?slug=${slug}`}
+  />
+</Base>

@@ -1,0 +1,16 @@
+# Build output
+.astro/
+dist/
+
+# Tina generated
+tina/__generated__/
+public/admin/
+
+# Node
+node_modules/
+.env
+.env.local
+
+# IDE / OS
+.DS_Store
+*.log
