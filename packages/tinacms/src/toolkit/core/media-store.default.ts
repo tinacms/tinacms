@@ -120,93 +120,85 @@ export class TinaMediaStore implements MediaStore {
   }
 
   private async persist_cloud(media: MediaUploadOptions[]): Promise<Media[]> {
-    const newFiles: Media[] = [];
+    if (!(await this.isAuthenticated())) {
+      return [];
+    }
 
-    if (await this.isAuthenticated()) {
-      for (const item of media) {
-        let directory = item.directory;
-        if (directory?.endsWith('/')) {
-          directory = directory.substr(0, directory.length - 1);
+    for (const item of media) {
+      let directory = item.directory;
+      if (directory?.endsWith('/')) {
+        directory = directory.substr(0, directory.length - 1);
+      }
+      const path = `${
+        directory && directory !== '/'
+          ? `${directory}/${item.file.name}`
+          : item.file.name
+      }`;
+      const res = await this.api.authProvider.fetchWithToken(
+        `${this.url}/upload_url/${path}?branch=${this.encodedBranchParam()}`,
+        { method: 'GET' }
+      );
+
+      if (res.status === 412) {
+        const { message = 'Unexpected error generating upload url' } =
+          await res.json();
+        throw new Error(message);
+      }
+
+      const { signedUrl, requestId } = await res.json();
+      if (!signedUrl) {
+        throw new Error('Unexpected error generating upload url');
+      }
+
+      const uploadRes = await this.fetchFunction(signedUrl, {
+        method: 'PUT',
+        body: item.file,
+        headers: {
+          'Content-Type': item.file.type || 'application/octet-stream',
+          'Content-Length': String(item.file.size),
+        },
+      });
+
+      if (!uploadRes.ok) {
+        const xmlRes = await uploadRes.text();
+        const matches = s3ErrorRegex.exec(xmlRes);
+        console.error(xmlRes);
+        if (!matches) {
+          throw new Error('Unexpected error uploading media asset');
+        } else {
+          throw new Error(`Upload error: '${matches[2]}'`);
         }
-        const path = `${
-          directory && directory !== '/'
-            ? `${directory}/${item.file.name}`
-            : item.file.name
-        }`;
-        const res = await this.api.authProvider.fetchWithToken(
-          `${this.url}/upload_url/${path}?branch=${this.encodedBranchParam()}`,
-          { method: 'GET' }
-        );
+      }
 
-        if (res.status === 412) {
-          const { message = 'Unexpected error generating upload url' } =
-            await res.json();
-          throw new Error(message);
-        }
+      const updateStartTime = Date.now();
+      while (true) {
+        // sleep for 1 second
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
-        const { signedUrl, requestId } = await res.json();
-        if (!signedUrl) {
-          throw new Error('Unexpected error generating upload url');
-        }
-
-        const uploadRes = await this.fetchFunction(signedUrl, {
-          method: 'PUT',
-          body: item.file,
-          headers: {
-            'Content-Type': item.file.type || 'application/octet-stream',
-            'Content-Length': String(item.file.size),
-          },
-        });
-
-        if (!uploadRes.ok) {
-          const xmlRes = await uploadRes.text();
-          const matches = s3ErrorRegex.exec(xmlRes);
-          console.error(xmlRes);
-          if (!matches) {
-            throw new Error('Unexpected error uploading media asset');
+        const { error, message } = await this.api.getRequestStatus(requestId);
+        if (error !== undefined) {
+          if (error) {
+            throw new Error(message);
           } else {
-            throw new Error(`Upload error: '${matches[2]}'`);
+            // success
+            break;
           }
         }
 
-        const updateStartTime = Date.now();
-        while (true) {
-          // sleep for 1 second
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-
-          const { error, message } = await this.api.getRequestStatus(requestId);
-          if (error !== undefined) {
-            if (error) {
-              throw new Error(message);
-            } else {
-              // success
-              break;
-            }
-          }
-
-          if (Date.now() - updateStartTime > 30000) {
-            throw new Error('Time out waiting for upload to complete');
-          }
+        if (Date.now() - updateStartTime > 30000) {
+          throw new Error('Time out waiting for upload to complete');
         }
-
-        const src = `https://assets.tina.io/${this.api.clientId}/${path}`;
-
-        newFiles.push({
-          directory: item.directory,
-          filename: item.file.name,
-          id: item.file.name,
-          type: 'file',
-          thumbnails: {
-            '75x75': src,
-            '400x400': src,
-            '1000x1000': src,
-          },
-          src,
-        });
       }
     }
 
-    return newFiles;
+    // Return an empty array — the media manager triggers a list refresh on
+    // upload success and pulls the canonical entries (with correct staging
+    // paths and CDN host) from TinaCloud's list endpoint. Constructing a
+    // local `src` URL here would have to mirror the server's branch-aware
+    // path logic (`__staging/<branch>/__file/...`) and the CDN host per
+    // stage, which is fragile to keep in sync. Letting the server be the
+    // single source of truth avoids that drift.
+    return [];
   }
 
   private async persist_local(media: MediaUploadOptions[]): Promise<Media[]> {

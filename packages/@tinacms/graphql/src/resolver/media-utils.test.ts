@@ -138,7 +138,7 @@ describe('resolveMedia', () => {
       schema
     );
     expect(resolvedURL).toEqual(
-      `https://${assetsHost}/${clientId}/__staging/feat%2Fx/llama.png`
+      `https://${assetsHost}/${clientId}/__staging/feat/x/__file/llama.png`
     );
   });
 
@@ -179,8 +179,8 @@ describe('resolveMedia', () => {
       schema
     );
     expect(resolved).toEqual([
-      `https://${assetsHost}/${clientId}/__staging/feat%2Fx/a.png`,
-      `https://${assetsHost}/${clientId}/__staging/feat%2Fx/b.png`,
+      `https://${assetsHost}/${clientId}/__staging/feat/x/__file/a.png`,
+      `https://${assetsHost}/${clientId}/__staging/feat/x/__file/b.png`,
     ]);
   });
 
@@ -196,7 +196,7 @@ describe('resolveMedia', () => {
       mediaBranch: 'main',
     };
 
-    const stagingURL = `https://${assetsHost}/${clientId}/__staging/feat%2Fx/llama.png`;
+    const stagingURL = `https://${assetsHost}/${clientId}/__staging/feat/x/__file/llama.png`;
     const resolvedURL = resolveMediaCloudToRelative(stagingURL, config, schema);
     expect(resolvedURL).toEqual(relativeURL);
   });

@@ -91,16 +91,25 @@ export const resolveMediaRelativeToCloud = (
   }
 };
 
+// Branches may contain `/` (e.g. `feat/my-branch`). Storing them URL-encoded
+// would break the CDN read path because CloudFront decodes paths before
+// downstream components see them — the write would have `%2F` literal in the
+// S3 key but every read would look for the decoded `/` form. Instead we let
+// the branch contribute its natural `/` segments and use a `__file` prefix to
+// delimit where the (possibly multi-segment) branch ends and the file path
+// begins.
 const stagingPrefix = (config: {
   branch?: string;
   mediaBranch?: string;
 }): string =>
   config.branch && config.branch !== config.mediaBranch
-    ? `/__staging/${encodeURIComponent(config.branch)}`
+    ? `/__staging/${config.branch}/__file`
     : '';
 
-// Matches `/__staging/<encoded-branch>/…` and captures everything after the branch segment.
-const STAGING_SEGMENT = /^\/__staging\/[^/]+(\/.*)$/;
+// Matches `/__staging/<branch (possibly multi-segment)>/__file/<rest>` and
+// captures everything after the `__file` segment. Non-greedy so the branch
+// can span multiple `/` segments.
+const STAGING_SEGMENT = /^\/__staging\/.+?\/__file(\/.*)$/;
 
 const stripStagingPrefix = (path: string): string => {
   const match = path.match(STAGING_SEGMENT);

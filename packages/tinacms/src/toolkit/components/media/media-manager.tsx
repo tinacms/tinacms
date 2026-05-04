@@ -267,7 +267,7 @@ export function MediaPicker({
     onDrop: async (files, fileRejections) => {
       try {
         setUploading(true);
-        const mediaItems = await cms.media.persist(
+        await cms.media.persist(
           files.map((file) => {
             return {
               directory: directory || '/',
@@ -312,31 +312,29 @@ export function MediaPicker({
             );
           });
         }
-        // if there are media items, set the first one as active and prepend all the items to the list
-        if (mediaItems.length !== 0) {
+
+        // Refresh from the server rather than prepending locally-constructed
+        // entries. The server is the source of truth for the canonical `src`
+        // URL — including the staging-branch path (`__staging/<branch>/__file/...`)
+        // when applicable — and we'd duplicate that path-construction logic
+        // (plus per-stage CDN host) on the client otherwise.
+        if (files.length > 0) {
           const extensions = [
             ...new Set(
-              mediaItems.map((item) => {
-                const ext = item.filename.split('.').pop()?.toLowerCase();
+              files.map((file) => {
+                const ext = file.name.split('.').pop()?.toLowerCase();
                 return ext || 'unknown';
               })
             ),
           ];
           captureEvent(MediaManagerContentUploadedEvent, {
             fileType: extensions.join(','),
-            fileCount: mediaItems.length,
+            fileCount: files.length,
           });
-          setActiveItem(mediaItems[0]);
-          setList((mediaList) => {
-            return {
-              items: [
-                // all the newly added items are new
-                ...mediaItems.map((x) => ({ ...x, new: true })),
-                ...mediaList.items,
-              ],
-              nextOffset: mediaList.nextOffset,
-            };
-          });
+          setActiveItem(false);
+          resetOffset();
+          resetList();
+          setRefreshing(true);
         }
       } catch {
         // TODO: Events get dispatched already. Does anything else need to happen?
