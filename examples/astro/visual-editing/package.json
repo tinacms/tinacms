@@ -15,6 +15,7 @@
     "format": "biome format --write ."
   },
   "dependencies": {
+    "@astrojs/node": "^9.0.0",
     "@tinacms/bridge": "workspace:*",
     "@tinacms/datalayer": "workspace:*",
     "astro": "^5.16.0",
