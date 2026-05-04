@@ -1,64 +1,21 @@
 /**
  * Per-collection data loaders. Each returns a `QueryResult` shaped for
  * `<Base>`'s `forms` prop AND for the matching island refresh endpoint.
- * The query string is the GraphQL document the admin re-runs on edit;
- * keep it consistent between page and island so the overlay id matches.
+ *
+ * Query strings come from `queries.ts` which extracts the canonical
+ * auto-generated shape (with the `... on Document { _sys, id }`
+ * selection the admin needs to build forms). Hashing the same string
+ * server-side and in the bridge keeps overlay ids matching.
  */
 import client from '../../tina/__generated__/client';
+import {
+  AUTHOR_QUERY,
+  BLOG_QUERY,
+  GLOBAL_QUERY,
+  PAGE_QUERY,
+  POST_QUERY,
+} from './queries';
 import { withOverlay, type QueryResult } from './tina-preview';
-
-const GLOBAL_QUERY = `query global($relativePath: String!) {
-  global(relativePath: $relativePath) {
-    header {
-      name
-      color
-      nav { href label }
-    }
-    footer {
-      social { icon url }
-    }
-    theme {
-      color
-      font
-      darkMode
-    }
-  }
-}`;
-
-const PAGE_QUERY = `query page($relativePath: String!) {
-  page(relativePath: $relativePath) {
-    blocks { __typename ... on PageBlocksHero { tagline headline text image { src alt } actions { label type icon link } color }
-      ... on PageBlocksFeatures { title description items { title text icon { name color style } actions { label type icon link } } color }
-      ... on PageBlocksCta { title description actions { label type icon link } color }
-      ... on PageBlocksTestimonial { quote author color }
-      ... on PageBlocksContent { body color }
-    }
-  }
-}`;
-
-const POST_QUERY = `query post($relativePath: String!) {
-  post(relativePath: $relativePath) {
-    title heroImg excerpt
-    author { ... on Author { name avatar } }
-    date tags { tag { ... on Tag { name } } }
-    _body
-  }
-}`;
-
-const BLOG_QUERY = `query blog($relativePath: String!) {
-  blog(relativePath: $relativePath) {
-    title heroImage excerpt description
-    author { ... on Author { name avatar } }
-    pubDate updatedDate
-    _body
-  }
-}`;
-
-const AUTHOR_QUERY = `query author($relativePath: String!) {
-  author(relativePath: $relativePath) {
-    name avatar description hobbies
-  }
-}`;
 
 interface GlobalData {
   global: {
