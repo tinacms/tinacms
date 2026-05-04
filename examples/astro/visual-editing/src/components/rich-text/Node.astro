@@ -3,10 +3,11 @@
  * Per-node dispatch for the Astro rich-text renderer. Mirrors the
  * switch-on-type in packages/tinacms/src/rich-text/index.tsx:262-537.
  *
- * For block elements that contain children, we recurse via TinaMarkdown.
- * For mdxJsx{Text,Flow}Element, we look up `node.name` in `components`
- * and instantiate it with `node.props`. Unknown names render a visible
- * placeholder so the editor can see what's missing.
+ * For every node type that has a default HTML representation (p, h1-h6,
+ * ul, ol, li, blockquote, a, img, hr, br, code_block) we check the
+ * `components` map first so authors can override styling — same contract
+ * as the React renderer. mdxJsx{Text,Flow}Element looks up `node.name`;
+ * unknown names render a visible placeholder.
  */
 import { sanitizeHref, sanitizeImageSrc } from '../../lib/utils';
 import type {
@@ -26,13 +27,18 @@ interface Props {
 const { node, components } = Astro.props;
 const t = node.type;
 
-// Resolve mdx custom component once so the template can branch on it.
+const Override = components[t as string];
+
 const MdxComponent =
   t === 'mdxJsxFlowElement' || t === 'mdxJsxTextElement'
     ? components[(node as MdxElement).name]
     : undefined;
 ---
-{t === 'p' || t === 'h1' || t === 'h2' || t === 'h3' || t === 'h4' || t === 'h5' || t === 'h6' || t === 'ol' || t === 'ul' || t === 'li' ? (
+{Override && (t === 'p' || t === 'h1' || t === 'h2' || t === 'h3' || t === 'h4' || t === 'h5' || t === 'h6' || t === 'ol' || t === 'ul' || t === 'li' || t === 'blockquote' || t === 'lic') ? (
+  <Override>
+    <TinaMarkdown content={(node as { children: TinaRichTextNode[] }).children} components={components} />
+  </Override>
+) : t === 'p' || t === 'h1' || t === 'h2' || t === 'h3' || t === 'h4' || t === 'h5' || t === 'h6' || t === 'ol' || t === 'ul' || t === 'li' ? (
   (() => {
     const Tag = t as 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'ol' | 'ul' | 'li';
     return <Tag><TinaMarkdown content={(node as { children: TinaRichTextNode[] }).children} components={components} /></Tag>;
@@ -42,14 +48,24 @@ const MdxComponent =
 ) : t === 'blockquote' ? (
   <blockquote><TinaMarkdown content={(node as { children: TinaRichTextNode[] }).children} components={components} /></blockquote>
 ) : t === 'a' ? (
-  <a href={sanitizeHref((node as { url: string }).url)}>
-    <TinaMarkdown content={(node as { children: TinaRichTextNode[] }).children} components={components} />
-  </a>
+  Override ? (
+    <Override url={(node as { url: string }).url}>
+      <TinaMarkdown content={(node as { children: TinaRichTextNode[] }).children} components={components} />
+    </Override>
+  ) : (
+    <a href={sanitizeHref((node as { url: string }).url)}>
+      <TinaMarkdown content={(node as { children: TinaRichTextNode[] }).children} components={components} />
+    </a>
+  )
 ) : t === 'img' ? (
-  <img
-    src={sanitizeImageSrc((node as { url: string }).url)}
-    alt={(node as { alt?: string }).alt ?? ''}
-  />
+  Override ? (
+    <Override url={(node as { url: string }).url} alt={(node as { alt?: string }).alt} caption={(node as { caption?: string }).caption} />
+  ) : (
+    <img
+      src={sanitizeImageSrc((node as { url: string }).url)}
+      alt={(node as { alt?: string }).alt ?? ''}
+    />
+  )
 ) : t === 'code_block' ? (
   (() => {
     const codeNode = node as {
@@ -62,12 +78,16 @@ const MdxComponent =
       (codeNode.children
         ?.map((line) => line.children?.map((tn) => tn.text).join('') ?? '')
         .join('\n') ?? '');
-    return <pre><code class={codeNode.lang ? `language-${codeNode.lang}` : undefined}>{value}</code></pre>;
+    return Override ? (
+      <Override value={value} lang={codeNode.lang} />
+    ) : (
+      <pre><code class={codeNode.lang ? `language-${codeNode.lang}` : undefined}>{value}</code></pre>
+    );
   })()
 ) : t === 'hr' ? (
-  <hr />
+  Override ? <Override /> : <hr />
 ) : t === 'break' ? (
-  <br />
+  Override ? <Override /> : <br />
 ) : t === 'text' ? (
   <Leaf node={node as TextElement} />
 ) : t === 'mdxJsxFlowElement' || t === 'mdxJsxTextElement' ? (

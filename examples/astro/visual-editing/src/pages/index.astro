@@ -1,12 +1,15 @@
 ---
-// Temporary smoke test for the rich-text renderer.
+// Temporary smoke test for the rich-text renderer + markdown components.
 // Replaced by the real homepage in a later commit.
+import '../styles/global.css';
 import TinaMarkdown from '../components/rich-text/TinaMarkdown.astro';
+import { customComponents } from '../components/markdown';
 
 const sampleContent = {
   type: 'root' as const,
   children: [
-    { type: 'h1' as const, children: [{ type: 'text' as const, text: 'Heading' }] },
+    { type: 'h1' as const, children: [{ type: 'text' as const, text: 'Heading 1' }] },
+    { type: 'h2' as const, children: [{ type: 'text' as const, text: 'Heading 2' }] },
     {
       type: 'p' as const,
       children: [
@@ -14,38 +17,56 @@ const sampleContent = {
         { type: 'text' as const, text: 'bold', bold: true },
         { type: 'text' as const, text: ' and ' },
         { type: 'text' as const, text: 'italic', italic: true },
+        { type: 'text' as const, text: ' and a ' },
+        { type: 'a' as const, url: 'https://tina.io', children: [{ type: 'text' as const, text: 'link' }] },
         { type: 'text' as const, text: '.' },
       ],
     },
     {
-      type: 'ul' as const,
-      children: [
-        { type: 'li' as const, children: [{ type: 'lic' as const, children: [{ type: 'text' as const, text: 'First' }] }] },
-        { type: 'li' as const, children: [{ type: 'lic' as const, children: [{ type: 'text' as const, text: 'Second' }] }] },
-      ],
+      type: 'mdxJsxFlowElement' as const,
+      name: 'BlockQuote',
+      props: {
+        children: {
+          type: 'root',
+          children: [
+            { type: 'p', children: [{ type: 'text', text: 'A nested rich-text quote' }] },
+          ],
+        },
+        authorName: 'Eleanor Roosevelt',
+      },
     },
     {
       type: 'mdxJsxFlowElement' as const,
       name: 'NewsletterSignup',
-      props: { placeholder: 'you@example.com', buttonText: 'Sign up' },
+      props: {
+        placeholder: 'you@example.com',
+        buttonText: 'Sign up',
+        children: {
+          type: 'root',
+          children: [
+            { type: 'h3', children: [{ type: 'text', text: 'Newsletter' }] },
+            { type: 'p', children: [{ type: 'text', text: 'Get updates by email.' }] },
+          ],
+        },
+      },
     },
     {
       type: 'mdxJsxFlowElement' as const,
-      name: 'UnknownThing',
-      props: {},
+      name: 'DateTime',
+      props: { format: 'local' },
     },
   ],
 };
 ---
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="blue">
   <head>
     <meta charset="utf-8" />
     <title>Rich-text smoke test</title>
   </head>
   <body>
-    <main style="max-width:48rem;margin:2rem auto;font-family:system-ui">
-      <TinaMarkdown content={sampleContent} />
+    <main class="max-w-3xl mx-auto py-12 px-4">
+      <TinaMarkdown content={sampleContent} components={customComponents} />
     </main>
   </body>
 </html>
