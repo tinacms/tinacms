@@ -1,14 +1,51 @@
 ---
-// Placeholder during migration to kitchen-sink parity. Real implementation
-// (block dispatcher + per-route island) lands in a later commit.
+// Temporary smoke test for the rich-text renderer.
+// Replaced by the real homepage in a later commit.
+import TinaMarkdown from '../components/rich-text/TinaMarkdown.astro';
+
+const sampleContent = {
+  type: 'root' as const,
+  children: [
+    { type: 'h1' as const, children: [{ type: 'text' as const, text: 'Heading' }] },
+    {
+      type: 'p' as const,
+      children: [
+        { type: 'text' as const, text: 'Plain ' },
+        { type: 'text' as const, text: 'bold', bold: true },
+        { type: 'text' as const, text: ' and ' },
+        { type: 'text' as const, text: 'italic', italic: true },
+        { type: 'text' as const, text: '.' },
+      ],
+    },
+    {
+      type: 'ul' as const,
+      children: [
+        { type: 'li' as const, children: [{ type: 'lic' as const, children: [{ type: 'text' as const, text: 'First' }] }] },
+        { type: 'li' as const, children: [{ type: 'lic' as const, children: [{ type: 'text' as const, text: 'Second' }] }] },
+      ],
+    },
+    {
+      type: 'mdxJsxFlowElement' as const,
+      name: 'NewsletterSignup',
+      props: { placeholder: 'you@example.com', buttonText: 'Sign up' },
+    },
+    {
+      type: 'mdxJsxFlowElement' as const,
+      name: 'UnknownThing',
+      props: {},
+    },
+  ],
+};
 ---
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Visual editing — under construction</title>
+    <title>Rich-text smoke test</title>
   </head>
   <body>
-    <p>Migration in progress — see git log for status.</p>
+    <main style="max-width:48rem;margin:2rem auto;font-family:system-ui">
+      <TinaMarkdown content={sampleContent} />
+    </main>
   </body>
 </html>

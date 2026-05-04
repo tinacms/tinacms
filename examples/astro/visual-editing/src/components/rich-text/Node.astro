@@ -1,0 +1,85 @@
+---
+/**
+ * Per-node dispatch for the Astro rich-text renderer. Mirrors the
+ * switch-on-type in packages/tinacms/src/rich-text/index.tsx:262-537.
+ *
+ * For block elements that contain children, we recurse via TinaMarkdown.
+ * For mdxJsx{Text,Flow}Element, we look up `node.name` in `components`
+ * and instantiate it with `node.props`. Unknown names render a visible
+ * placeholder so the editor can see what's missing.
+ */
+import { sanitizeHref, sanitizeImageSrc } from '../../lib/utils';
+import type {
+  CustomComponentsMap,
+  TinaRichTextNode,
+  TextElement,
+  MdxElement,
+} from './types';
+import Leaf from './Leaf.astro';
+import TinaMarkdown from './TinaMarkdown.astro';
+
+interface Props {
+  node: TinaRichTextNode;
+  components: CustomComponentsMap;
+}
+
+const { node, components } = Astro.props;
+const t = node.type;
+
+// Resolve mdx custom component once so the template can branch on it.
+const MdxComponent =
+  t === 'mdxJsxFlowElement' || t === 'mdxJsxTextElement'
+    ? components[(node as MdxElement).name]
+    : undefined;
+---
+{t === 'p' || t === 'h1' || t === 'h2' || t === 'h3' || t === 'h4' || t === 'h5' || t === 'h6' || t === 'ol' || t === 'ul' || t === 'li' ? (
+  (() => {
+    const Tag = t as 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'ol' | 'ul' | 'li';
+    return <Tag><TinaMarkdown content={(node as { children: TinaRichTextNode[] }).children} components={components} /></Tag>;
+  })()
+) : t === 'lic' ? (
+  <div><TinaMarkdown content={(node as { children: TinaRichTextNode[] }).children} components={components} /></div>
+) : t === 'blockquote' ? (
+  <blockquote><TinaMarkdown content={(node as { children: TinaRichTextNode[] }).children} components={components} /></blockquote>
+) : t === 'a' ? (
+  <a href={sanitizeHref((node as { url: string }).url)}>
+    <TinaMarkdown content={(node as { children: TinaRichTextNode[] }).children} components={components} />
+  </a>
+) : t === 'img' ? (
+  <img
+    src={sanitizeImageSrc((node as { url: string }).url)}
+    alt={(node as { alt?: string }).alt ?? ''}
+  />
+) : t === 'code_block' ? (
+  (() => {
+    const codeNode = node as {
+      value?: string;
+      lang?: string;
+      children?: { children: TextElement[] }[];
+    };
+    const value =
+      codeNode.value ??
+      (codeNode.children
+        ?.map((line) => line.children?.map((tn) => tn.text).join('') ?? '')
+        .join('\n') ?? '');
+    return <pre><code class={codeNode.lang ? `language-${codeNode.lang}` : undefined}>{value}</code></pre>;
+  })()
+) : t === 'hr' ? (
+  <hr />
+) : t === 'break' ? (
+  <br />
+) : t === 'text' ? (
+  <Leaf node={node as TextElement} />
+) : t === 'mdxJsxFlowElement' || t === 'mdxJsxTextElement' ? (
+  MdxComponent ? (
+    <MdxComponent {...((node as MdxElement).props ?? {})} />
+  ) : (
+    <span style="display:inline-block;padding:0.25rem 0.5rem;background:#fee;color:#900;border-radius:0.25rem;font-family:monospace;font-size:0.85em;">
+      No component provided for {(node as MdxElement).name}
+    </span>
+  )
+) : t === 'html' || t === 'html_inline' ? (
+  <Fragment set:html={(node as { value: string }).value} />
+) : t === 'invalid_markdown' ? (
+  <pre>{(node as { value: string }).value}</pre>
+) : t === 'maybe_mdx' ? null : null}

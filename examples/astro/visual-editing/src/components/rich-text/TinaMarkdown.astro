@@ -1,0 +1,28 @@
+---
+/**
+ * Astro port of the React TinaMarkdown renderer in
+ * `packages/tinacms/src/rich-text/index.tsx:262-537`.
+ *
+ * Walks Tina's rich-text Plate AST and emits Astro markup. Custom MDX
+ * components (e.g. NewsletterSignup, BlockQuote, DateTime in posts) are
+ * dispatched by `node.name` against the `components` prop. Recurses via
+ * the same component for nested rich-text (blockquote bodies, list items,
+ * etc.).
+ */
+import type { CustomComponentsMap, TinaRichTextContent } from './types';
+import Node from './Node.astro';
+
+interface Props {
+  content: TinaRichTextContent;
+  components?: CustomComponentsMap;
+}
+
+const { content, components = {} } = Astro.props;
+
+const nodes = !content
+  ? []
+  : Array.isArray(content)
+    ? content
+    : (content.children ?? []);
+---
+{nodes.map((node) => <Node node={node} components={components} />)}
