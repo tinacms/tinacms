@@ -19,7 +19,9 @@ interface Props {
 }
 
 const { title = 'TinaCMS Astro visual editing', forms = [] } = Astro.props;
-const editing = isEditMode(Astro.request);
+// isEditMode is still used for telemetry / future use cases; the bridge
+// gates on `window.parent !== window` itself.
+isEditMode(Astro.request);
 
 const global = await getGlobal(Astro.request);
 const allForms: Form[] = [
@@ -52,12 +54,19 @@ const fontClass = themeFont === 'nunito' ? 'font-nunito' : themeFont === 'lato' 
         set:html={JSON.stringify(form)}
       />
     ))}
-    {editing && (
-      <script>
-        import { init } from '@tinacms/bridge';
-        init();
-      </script>
-    )}
+    {/*
+      Bridge always loads. init() exits immediately when window.parent ===
+      window so non-admin visitors download ~2 KB gzipped of dead code
+      and run a few lines that bail. Astro's hoisted-script bundling
+      doesn't follow conditional render in prod (the bundle reference
+      drops out of the HTML even though the chunk is still emitted), so
+      a server-side isEditMode() gate would silently disable the bridge
+      for everyone in production.
+    */}
+    <script>
+      import { init } from '@tinacms/bridge';
+      init();
+    </script>
   </head>
   <body class:list={['antialiased min-h-screen flex flex-col', fontClass]}>
     <div data-tina-island={`/tina-island/global?path=${encodeURIComponent(Astro.url.pathname)}`}>
