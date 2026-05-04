@@ -1,11 +1,18 @@
 ---
-import Base from '../../layouts/Base.astro';
-import { cardLinkClasses, cn, formatDate, sanitizeImageSrc } from '../../lib/utils';
 import client from '../../../tina/__generated__/client';
+import Base from '../../layouts/Base.astro';
+import {
+  cardLinkClasses,
+  cn,
+  formatDate,
+  sanitizeImageSrc,
+} from '../../lib/utils';
 
-const allPosts = await client.queries.postConnection({ first: 1000 }).catch(() => null);
-const posts = (allPosts?.data?.postConnection?.edges ?? []).flatMap(
-  (edge) => (edge?.node ? [edge.node] : [])
+const allPosts = await client.queries
+  .postConnection({ first: 1000 })
+  .catch(() => null);
+const posts = (allPosts?.data?.postConnection?.edges ?? []).flatMap((edge) =>
+  edge?.node ? [edge.node] : []
 );
 ---
 <Base title="Posts | TinaCMS Astro Visual Editing">

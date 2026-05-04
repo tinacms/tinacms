@@ -1,11 +1,13 @@
 ---
+import client from '../../../tina/__generated__/client';
 import Base from '../../layouts/Base.astro';
 import { formatDate, sanitizeImageSrc } from '../../lib/utils';
-import client from '../../../tina/__generated__/client';
 
-const connection = await client.queries.blogConnection({ first: 1000 }).catch(() => null);
-const blogs = (connection?.data?.blogConnection?.edges ?? []).flatMap(
-  (edge) => (edge?.node ? [edge.node] : [])
+const connection = await client.queries
+  .blogConnection({ first: 1000 })
+  .catch(() => null);
+const blogs = (connection?.data?.blogConnection?.edges ?? []).flatMap((edge) =>
+  edge?.node ? [edge.node] : []
 );
 ---
 <Base title="Blog | TinaCMS Astro Visual Editing">

@@ -26,7 +26,7 @@ export interface PreviewEnvelope {
  */
 export async function readOverlay<T>(
   request: Request,
-  queryId: string,
+  queryId: string
 ): Promise<T | undefined> {
   const envelope = await readEnvelope(request);
   if (!envelope) return undefined;
@@ -39,7 +39,7 @@ export async function readOverlay<T>(
  * for callers that want to inspect the raw payload.
  */
 export async function readEnvelope(
-  request: Request,
+  request: Request
 ): Promise<PreviewEnvelope | undefined> {
   const contentType = request.headers.get('content-type') ?? '';
   if (!contentType.includes(PREVIEW_CONTENT_TYPE)) return undefined;

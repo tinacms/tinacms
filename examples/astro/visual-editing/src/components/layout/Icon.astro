@@ -34,7 +34,10 @@ const colorClass: Record<string, string> = {
   white: 'text-white',
 };
 
-const styleClass = data.style === 'circle' ? 'rounded-full bg-current/10 p-3 inline-flex items-center justify-center' : 'inline-flex items-center';
+const styleClass =
+  data.style === 'circle'
+    ? 'rounded-full bg-current/10 p-3 inline-flex items-center justify-center'
+    : 'inline-flex items-center';
 const size = sizeClass[data.size ?? 'medium'] ?? sizeClass.medium;
 const color = colorClass[data.color ?? 'primary'] ?? colorClass.primary;
 

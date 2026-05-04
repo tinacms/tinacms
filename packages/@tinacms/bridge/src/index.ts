@@ -9,11 +9,11 @@
  * it on island refetches via the `X-Tina-Preview` header. The canonical
  * content store is never touched in edit mode.
  */
+import { initClickToFocus } from './click-to-focus';
+import { initDataStore } from './data-store';
 import { debug } from './debug';
 import { initForms } from './forms';
-import { initDataStore } from './data-store';
 import { initIslandRefresh } from './island-refresh';
-import { initClickToFocus } from './click-to-focus';
 
 export interface BridgeOptions {
   /**

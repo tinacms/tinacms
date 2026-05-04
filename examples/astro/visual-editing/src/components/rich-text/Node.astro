@@ -10,14 +10,14 @@
  * unknown names render a visible placeholder.
  */
 import { sanitizeHref, sanitizeImageSrc } from '../../lib/utils';
-import type {
-  CustomComponentsMap,
-  TinaRichTextNode,
-  TextElement,
-  MdxElement,
-} from './types';
 import Leaf from './Leaf.astro';
 import TinaMarkdown from './TinaMarkdown.astro';
+import type {
+  CustomComponentsMap,
+  MdxElement,
+  TextElement,
+  TinaRichTextNode,
+} from './types';
 
 interface Props {
   node: TinaRichTextNode;

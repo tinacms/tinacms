@@ -17,7 +17,7 @@ const SYSTEM_KEYS = new Set([
 export function addContentSourceMetadata<T>(
   id: string,
   obj: T,
-  path: (string | number)[] = [],
+  path: (string | number)[] = []
 ): T {
   if (obj === null) return obj;
   if (isScalarOrUndefined(obj)) return obj;
@@ -25,7 +25,7 @@ export function addContentSourceMetadata<T>(
 
   if (Array.isArray(obj)) {
     return obj.map((item, index) =>
-      addContentSourceMetadata(id, item, [...path, index]),
+      addContentSourceMetadata(id, item, [...path, index])
     ) as unknown as T;
   }
 

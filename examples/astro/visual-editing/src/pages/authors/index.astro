@@ -1,7 +1,7 @@
 ---
+import client from '../../../tina/__generated__/client';
 import Base from '../../layouts/Base.astro';
 import { cardLinkClasses, cn, sanitizeImageSrc } from '../../lib/utils';
-import client from '../../../tina/__generated__/client';
 
 const connection = await client.queries.authorConnection().catch(() => null);
 const authors = (connection?.data?.authorConnection?.edges ?? []).flatMap(

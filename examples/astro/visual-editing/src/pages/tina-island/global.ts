@@ -12,7 +12,13 @@ export const ALL: APIRoute = async ({ request, url }) => {
   const html = await container.renderToString(Header, {
     props: { data: global.data?.global?.header, pathname: path },
   });
-  return new Response(`<div data-tina-island="/tina-island/global?path=${encodeURIComponent(path)}">${html}</div>`, {
-    headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' },
-  });
+  return new Response(
+    `<div data-tina-island="/tina-island/global?path=${encodeURIComponent(path)}">${html}</div>`,
+    {
+      headers: {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'no-store',
+      },
+    }
+  );
 };

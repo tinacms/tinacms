@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
   PREVIEW_CONTENT_TYPE,
   PREVIEW_HEADER,
@@ -14,7 +14,7 @@ import {
  */
 function makeRequest(
   envelope: Record<string, unknown>,
-  options: { contentType?: string; body?: string } = {},
+  options: { contentType?: string; body?: string } = {}
 ): Request {
   return new Request('http://example.com/tina-island/page', {
     method: 'POST',
@@ -36,7 +36,9 @@ describe('readOverlay', () => {
       abc123: { page: { title: 'Hello' } },
       xyz789: { global: { name: 'Site' } },
     });
-    expect(await readOverlay(req, 'abc123')).toEqual({ page: { title: 'Hello' } });
+    expect(await readOverlay(req, 'abc123')).toEqual({
+      page: { title: 'Hello' },
+    });
   });
 
   it('returns undefined for an unknown query id', async () => {
@@ -47,7 +49,7 @@ describe('readOverlay', () => {
   it('returns undefined when the content-type does not match', async () => {
     const req = makeRequest(
       { abc123: { x: 1 } },
-      { contentType: 'application/json' },
+      { contentType: 'application/json' }
     );
     expect(await readOverlay(req, 'abc123')).toBeUndefined();
   });
@@ -107,7 +109,11 @@ describe('readOverlay payload size + shape', () => {
     const value = {
       page: {
         blocks: [
-          { __typename: 'Hero', headline: 'A', children: [{ type: 'p', children: [{ type: 'text', text: 'x' }] }] },
+          {
+            __typename: 'Hero',
+            headline: 'A',
+            children: [{ type: 'p', children: [{ type: 'text', text: 'x' }] }],
+          },
           { __typename: 'Cta', actions: [{ label: 'Go', link: '/x' }] },
         ],
       },
@@ -145,7 +151,7 @@ describe('content-type matching is permissive about charset', () => {
   it('accepts content-type with a charset suffix', async () => {
     const req = makeRequest(
       { id: { x: 1 } },
-      { contentType: `${PREVIEW_CONTENT_TYPE}; charset=utf-8` },
+      { contentType: `${PREVIEW_CONTENT_TYPE}; charset=utf-8` }
     );
     expect(await readOverlay(req, 'id')).toEqual({ x: 1 });
   });
@@ -169,13 +175,21 @@ describe('full bridge → server round-trip', () => {
 
   it('round-trips the multi-form payload the bridge sends', async () => {
     const envelope = {
-      page_hash: { page: { blocks: [{ __typename: 'Hero', headline: 'Headline — em-dash' }] } },
+      page_hash: {
+        page: {
+          blocks: [{ __typename: 'Hero', headline: 'Headline — em-dash' }],
+        },
+      },
       global_hash: { global: { theme: { color: 'blue', font: 'sans' } } },
     };
     const req = bridgeRequest(envelope);
 
-    expect(await readOverlay(req.clone(), 'page_hash')).toEqual(envelope.page_hash);
-    expect(await readOverlay(req.clone(), 'global_hash')).toEqual(envelope.global_hash);
+    expect(await readOverlay(req.clone(), 'page_hash')).toEqual(
+      envelope.page_hash
+    );
+    expect(await readOverlay(req.clone(), 'global_hash')).toEqual(
+      envelope.global_hash
+    );
     expect(await readOverlay(req.clone(), 'unknown_hash')).toBeUndefined();
   });
 
@@ -186,12 +200,20 @@ describe('full bridge → server round-trip', () => {
       type: 'root',
       children: Array.from({ length: 200 }, (_, i) => ({
         type: 'p',
-        children: [{ type: 'text', text: `Paragraph ${i} — with an em-dash and "smart quotes"` }],
+        children: [
+          {
+            type: 'text',
+            text: `Paragraph ${i} — with an em-dash and "smart quotes"`,
+          },
+        ],
       })),
     };
     const envelope = { id: { post: { _body: richText, title: 'Long post' } } };
     const req = bridgeRequest(envelope);
-    const back = await readOverlay<{ post: { _body: typeof richText } }>(req, 'id');
+    const back = await readOverlay<{ post: { _body: typeof richText } }>(
+      req,
+      'id'
+    );
     expect(back?.post._body.children).toHaveLength(200);
     expect(back?.post._body.children[0]).toEqual(richText.children[0]);
   });

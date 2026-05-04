@@ -17,7 +17,7 @@ const MAX_ATTEMPTS = 40; // 10s total — plenty for cold-start admins.
 
 export function initForms(store: DataStore): void {
   const scripts = document.querySelectorAll<HTMLScriptElement>(
-    `script[type="${SCRIPT_TYPE}"]`,
+    `script[type="${SCRIPT_TYPE}"]`
   );
 
   const payloads: FormPayload[] = [];
@@ -65,7 +65,7 @@ export function initForms(store: DataStore): void {
         'giving up after',
         MAX_ATTEMPTS,
         'attempts; pending ids:',
-        pending.map((p) => p.id),
+        pending.map((p) => p.id)
       );
       return;
     }
@@ -79,7 +79,7 @@ export function initForms(store: DataStore): void {
           variables: payload.variables,
           data: payload.data,
         },
-        window.location.origin,
+        window.location.origin
       );
     }
     setTimeout(announce, RETRY_INTERVAL_MS);
@@ -92,7 +92,7 @@ export function initForms(store: DataStore): void {
     for (const payload of payloads) {
       window.parent.postMessage(
         { type: 'close', id: payload.id },
-        window.location.origin,
+        window.location.origin
       );
     }
   });
@@ -102,6 +102,6 @@ export function reportQuickEdit(): void {
   const hasMarkers = !!document.querySelector('[data-tina-field]');
   window.parent.postMessage(
     { type: 'quick-edit', value: hasMarkers },
-    window.location.origin,
+    window.location.origin
   );
 }

@@ -9,7 +9,9 @@
  */
 const EDIT_MODE_TIMEOUT_MS = 500;
 
-export function initEditMode(timeoutMs = EDIT_MODE_TIMEOUT_MS): Promise<boolean> {
+export function initEditMode(
+  timeoutMs = EDIT_MODE_TIMEOUT_MS
+): Promise<boolean> {
   if (typeof window === 'undefined') return Promise.resolve(false);
   if (window.parent === window) return Promise.resolve(false);
 

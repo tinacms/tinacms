@@ -1,7 +1,7 @@
 import { debug } from './debug';
+import { reportQuickEdit } from './forms';
 import { PREVIEW_CONTENT_TYPE, type PreviewEnvelope } from './preview';
 import type { DataStore } from './types';
-import { reportQuickEdit } from './forms';
 
 /**
  * Listens for `{type:'updateData', id, data}` from the admin and re-fetches
@@ -26,7 +26,10 @@ export interface IslandRefreshOptions {
 const ISLAND_SELECTOR = '[data-tina-island]';
 const ENDPOINT_ATTR = 'data-tina-island';
 
-export function initIslandRefresh(store: DataStore, options: IslandRefreshOptions): void {
+export function initIslandRefresh(
+  store: DataStore,
+  options: IslandRefreshOptions
+): void {
   const debounceTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
   const refreshAll = () => {
@@ -51,7 +54,7 @@ export function initIslandRefresh(store: DataStore, options: IslandRefreshOption
       setTimeout(() => {
         debounceTimers.delete(key);
         refreshAll();
-      }, options.debounceMs),
+      }, options.debounceMs)
     );
   });
 
@@ -66,7 +69,10 @@ export function initIslandRefresh(store: DataStore, options: IslandRefreshOption
   });
 }
 
-async function refreshIsland(island: HTMLElement, store: DataStore): Promise<void> {
+async function refreshIsland(
+  island: HTMLElement,
+  store: DataStore
+): Promise<void> {
   const endpoint = island.getAttribute(ENDPOINT_ATTR);
   if (!endpoint) return;
 

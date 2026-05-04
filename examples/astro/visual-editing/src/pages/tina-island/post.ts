@@ -12,7 +12,13 @@ export const ALL: APIRoute = async ({ request, url }) => {
   const html = await container.renderToString(PostBody, {
     props: { data: post.data?.post },
   });
-  return new Response(`<article class="max-w-3xl mx-auto px-6 sm:px-8 py-16" data-tina-island="/tina-island/post?slug=${encodeURIComponent(slug)}">${html}</article>`, {
-    headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' },
-  });
+  return new Response(
+    `<article class="max-w-3xl mx-auto px-6 sm:px-8 py-16" data-tina-island="/tina-island/post?slug=${encodeURIComponent(slug)}">${html}</article>`,
+    {
+      headers: {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'no-store',
+      },
+    }
+  );
 };

@@ -1,8 +1,8 @@
 ---
 import { tinaField } from '@tinacms/bridge/tina-field';
-import TinaMarkdown from '../rich-text/TinaMarkdown.astro';
-import { customComponents } from '../markdown';
 import { formatDate, sanitizeImageSrc } from '../../lib/utils';
+import { customComponents } from '../markdown';
+import TinaMarkdown from '../rich-text/TinaMarkdown.astro';
 
 interface Props {
   data?: Record<string, unknown> | null;
@@ -11,7 +11,10 @@ interface Props {
 const { data } = Astro.props;
 const formattedDate = data?.date ? formatDate(data.date as string) : '';
 const heroSrc = data?.heroImg ? sanitizeImageSrc(data.heroImg) : '';
-const author = data?.author as { name?: string; avatar?: string } | null | undefined;
+const author = data?.author as
+  | { name?: string; avatar?: string }
+  | null
+  | undefined;
 const avatarSrc = author?.avatar ? sanitizeImageSrc(author.avatar) : '';
 ---
 {data?.title && (

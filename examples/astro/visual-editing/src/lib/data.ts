@@ -15,13 +15,21 @@ import {
   PAGE_QUERY,
   POST_QUERY,
 } from './queries';
-import { withOverlay, type QueryResult } from './tina-preview';
+import { type QueryResult, withOverlay } from './tina-preview';
 
 interface GlobalData {
   global: {
-    header?: { name?: string | null; color?: string | null; nav?: Array<{ href?: string; label?: string }> } | null;
+    header?: {
+      name?: string | null;
+      color?: string | null;
+      nav?: Array<{ href?: string; label?: string }>;
+    } | null;
     footer?: { social?: Array<{ icon?: string; url?: string }> } | null;
-    theme?: { color?: string | null; font?: string | null; darkMode?: string | null } | null;
+    theme?: {
+      color?: string | null;
+      font?: string | null;
+      darkMode?: string | null;
+    } | null;
   } | null;
 }
 

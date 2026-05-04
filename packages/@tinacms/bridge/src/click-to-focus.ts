@@ -68,10 +68,10 @@ export function initClickToFocus(): void {
       event.stopPropagation();
       window.parent.postMessage(
         { type: 'field:selected', fieldName },
-        window.location.origin,
+        window.location.origin
       );
     },
-    true,
+    true
   );
 
   // Optional admin override — the React hook also installs / removes the

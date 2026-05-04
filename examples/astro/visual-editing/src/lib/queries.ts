@@ -1,3 +1,4 @@
+import fragsGql from '../../tina/__generated__/frags.gql?raw';
 /**
  * Use the auto-generated query strings verbatim. The admin's form-builder
  * inspects the query for `... on Document { _sys, id }` selections to
@@ -11,7 +12,6 @@
  * Tina's CLI, so this stays in sync automatically.
  */
 import queriesGql from '../../tina/__generated__/queries.gql?raw';
-import fragsGql from '../../tina/__generated__/frags.gql?raw';
 
 /**
  * Pull a single named query out of the generated queries file plus
@@ -21,7 +21,10 @@ import fragsGql from '../../tina/__generated__/frags.gql?raw';
  * touch one collection.
  */
 function extractQuery(name: string): string {
-  const queryRe = new RegExp(`^query ${name}\\([^)]*\\) {[\\s\\S]+?\\n}\\n`, 'm');
+  const queryRe = new RegExp(
+    `^query ${name}\\([^)]*\\) {[\\s\\S]+?\\n}\\n`,
+    'm'
+  );
   const queryMatch = queriesGql.match(queryRe);
   if (!queryMatch) throw new Error(`query "${name}" not found in queries.gql`);
   const query = queryMatch[0];
@@ -44,7 +47,10 @@ function collectFragments(source: string): string[] {
     for (const ref of refs) {
       const name = ref[1];
       if (seen.has(name)) continue;
-      const fragRe = new RegExp(`^fragment ${name} on \\w+ \\{[\\s\\S]+?\\n\\}\\n`, 'm');
+      const fragRe = new RegExp(
+        `^fragment ${name} on \\w+ \\{[\\s\\S]+?\\n\\}\\n`,
+        'm'
+      );
       const fragMatch = fragsGql.match(fragRe);
       if (!fragMatch) continue;
       seen.add(name);

@@ -1,6 +1,6 @@
 ---
-import type { TinaRichTextContent } from '../rich-text/types';
 import TinaMarkdown from '../rich-text/TinaMarkdown.astro';
+import type { TinaRichTextContent } from '../rich-text/types';
 import { customComponents } from './index';
 
 interface Props {
@@ -10,7 +10,12 @@ interface Props {
   disclaimer?: TinaRichTextContent;
 }
 
-const { placeholder = 'Enter your email', buttonText = 'Subscribe', children, disclaimer } = Astro.props;
+const {
+  placeholder = 'Enter your email',
+  buttonText = 'Subscribe',
+  children,
+  disclaimer,
+} = Astro.props;
 ---
 <div class="bg-white dark:bg-gray-850" data-tina-newsletter>
   <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">

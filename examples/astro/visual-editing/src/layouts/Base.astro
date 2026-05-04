@@ -1,9 +1,9 @@
 ---
 import '../styles/global.css';
-import { isEditMode } from '../lib/is-edit-mode';
-import { getGlobal } from '../lib/data';
-import Header from '../components/layout/Header.astro';
 import Footer from '../components/layout/Footer.astro';
+import Header from '../components/layout/Header.astro';
+import { getGlobal } from '../lib/data';
+import { isEditMode } from '../lib/is-edit-mode';
 
 interface Form {
   id: string;
@@ -26,13 +26,23 @@ isEditMode(Astro.request);
 const global = await getGlobal(Astro.request);
 const allForms: Form[] = [
   ...forms,
-  { id: global.id, query: global.query, variables: global.variables, data: global.data as unknown as object },
+  {
+    id: global.id,
+    query: global.query,
+    variables: global.variables,
+    data: global.data as unknown as object,
+  },
 ];
 
 const themeColor = global.data.global?.theme?.color ?? 'blue';
 const darkMode = global.data.global?.theme?.darkMode ?? 'system';
 const themeFont = global.data.global?.theme?.font ?? 'sans';
-const fontClass = themeFont === 'nunito' ? 'font-nunito' : themeFont === 'lato' ? 'font-lato' : 'font-sans';
+const fontClass =
+  themeFont === 'nunito'
+    ? 'font-nunito'
+    : themeFont === 'lato'
+      ? 'font-lato'
+      : 'font-sans';
 ---
 <!DOCTYPE html>
 <html lang="en" data-theme={themeColor}>

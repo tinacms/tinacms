@@ -1,11 +1,11 @@
 ---
 import { tinaField } from '@tinacms/bridge/tina-field';
 import { cn, sanitizeImageSrc } from '../../lib/utils';
-import Section from '../layout/Section.astro';
-import Container from '../layout/Container.astro';
 import Actions from '../layout/Actions.astro';
-import TinaMarkdown from '../rich-text/TinaMarkdown.astro';
+import Container from '../layout/Container.astro';
+import Section from '../layout/Section.astro';
 import { customComponents } from '../markdown';
+import TinaMarkdown from '../rich-text/TinaMarkdown.astro';
 
 interface Props {
   data: {
@@ -13,7 +13,12 @@ interface Props {
     headline?: string | null;
     text?: unknown;
     image?: { src?: string; alt?: string } | null;
-    actions?: Array<{ label?: string | null; type?: string | null; link?: string | null; icon?: boolean | null } | null> | null;
+    actions?: Array<{
+      label?: string | null;
+      type?: string | null;
+      link?: string | null;
+      icon?: boolean | null;
+    } | null> | null;
     color?: string | null;
   };
 }

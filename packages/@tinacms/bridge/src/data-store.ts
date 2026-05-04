@@ -11,7 +11,9 @@ import type { DataStore } from './types';
 export function initDataStore(): DataStore {
   const data = new Map<string, object>();
   const updated = new Set<string>();
-  const listeners = new Set<(event: { id: string; firstUpdate: boolean }) => void>();
+  const listeners = new Set<
+    (event: { id: string; firstUpdate: boolean }) => void
+  >();
 
   return {
     get: (id) => data.get(id),

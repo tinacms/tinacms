@@ -34,5 +34,7 @@ export interface DataStore {
   /** All known form ids. */
   ids(): string[];
   /** Subscribe to data updates. Returns unsubscribe. */
-  subscribe(listener: (event: { id: string; firstUpdate: boolean }) => void): () => void;
+  subscribe(
+    listener: (event: { id: string; firstUpdate: boolean }) => void
+  ): () => void;
 }
