@@ -2,11 +2,10 @@
 title: Hello World
 description: Welcome to the TinaCMS Kitchen Sink blog. This is our first post!
 author: content/authors/pedro.md
-pubDate: '2024-03-01T00:00:00.000Z'
-updatedDate: '2024-03-05T00:00:00.000Z'
+pubDate: 2024-03-01T00:00:00.000Z
+updatedDate: 2024-03-05T00:00:00.000Z
 heroImage: /uploads/llama-3.avif
 ---
-
 
 ## Welcome to the Blog
 
