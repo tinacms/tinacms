@@ -1,22 +1,14 @@
 ---
-import Base from '../layouts/Base.astro';
-import HeroIsland from '../components/HeroIsland.astro';
-import FeaturesIsland from '../components/FeaturesIsland.astro';
-import { getPageData } from '../lib/tina-preview';
-
-const slug = 'home';
-const { data, query, variables, id } = await getPageData(slug, Astro.request);
+// Placeholder during migration to kitchen-sink parity. Real implementation
+// (block dispatcher + per-route island) lands in a later commit.
 ---
-<Base
-  title="Astro visual editing"
-  forms={[{ id, query, variables, data }]}
->
-  <HeroIsland
-    data={data.page.hero}
-    islandEndpoint={`/tina-island/hero?slug=${slug}`}
-  />
-  <FeaturesIsland
-    data={data.page.features}
-    islandEndpoint={`/tina-island/features?slug=${slug}`}
-  />
-</Base>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Visual editing — under construction</title>
+  </head>
+  <body>
+    <p>Migration in progress — see git log for status.</p>
+  </body>
+</html>
