@@ -14,16 +14,47 @@ import queriesGql from '../../tina/__generated__/queries.gql?raw';
 import fragsGql from '../../tina/__generated__/frags.gql?raw';
 
 /**
- * Pull a single named query out of the generated queries file. The
- * returned string includes every fragment in frags.gql so the query is
- * self-contained — Tina's request layer needs the fragments inlined or
- * referenced; safer to ship them all than to introspect dependencies.
+ * Pull a single named query out of the generated queries file plus
+ * exactly the fragments it transitively references. GraphQL servers
+ * reject documents that contain unused fragments, so naively
+ * concatenating every fragment in frags.gql breaks queries that only
+ * touch one collection.
  */
 function extractQuery(name: string): string {
-  const re = new RegExp(`^query ${name}\\([^)]*\\) {[\\s\\S]+?\\n}\\n`, 'm');
-  const match = queriesGql.match(re);
-  if (!match) throw new Error(`query "${name}" not found in queries.gql`);
-  return `${match[0]}\n${fragsGql}`;
+  const queryRe = new RegExp(`^query ${name}\\([^)]*\\) {[\\s\\S]+?\\n}\\n`, 'm');
+  const queryMatch = queriesGql.match(queryRe);
+  if (!queryMatch) throw new Error(`query "${name}" not found in queries.gql`);
+  const query = queryMatch[0];
+
+  const fragments = collectFragments(query);
+  return [query, ...fragments].join('\n');
+}
+
+/**
+ * Walk fragment dependencies starting from the names referenced by
+ * `source` (a query or another fragment body). Returns each fragment
+ * definition exactly once, in dependency order.
+ */
+function collectFragments(source: string): string[] {
+  const seen = new Set<string>();
+  const result: string[] = [];
+
+  const visit = (input: string) => {
+    const refs = input.matchAll(/\.\.\.([A-Z]\w+)\b/g);
+    for (const ref of refs) {
+      const name = ref[1];
+      if (seen.has(name)) continue;
+      const fragRe = new RegExp(`^fragment ${name} on \\w+ \\{[\\s\\S]+?\\n\\}\\n`, 'm');
+      const fragMatch = fragsGql.match(fragRe);
+      if (!fragMatch) continue;
+      seen.add(name);
+      visit(fragMatch[0]);
+      result.push(fragMatch[0]);
+    }
+  };
+
+  visit(source);
+  return result;
 }
 
 export const GLOBAL_QUERY = extractQuery('global');
