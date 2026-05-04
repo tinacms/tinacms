@@ -1,0 +1,17 @@
+---
+import Base from '../../layouts/Base.astro';
+import PostBody from '../../components/islands/PostBody.astro';
+import { getPost } from '../../lib/data';
+
+const slug = (Astro.params.urlSegments ?? '').toString();
+const post = await getPost(slug, Astro.request);
+const data = post.data?.post as Record<string, unknown> | undefined;
+---
+<Base
+  title={`${(data?.title as string) ?? 'Post'} | Posts`}
+  forms={[{ id: post.id, query: post.query, variables: post.variables, data: post.data as unknown as object }]}
+>
+  <article class="max-w-3xl mx-auto px-6 sm:px-8 py-16" data-tina-island={`/tina-island/post?slug=${encodeURIComponent(slug)}`}>
+    <PostBody data={data} />
+  </article>
+</Base>

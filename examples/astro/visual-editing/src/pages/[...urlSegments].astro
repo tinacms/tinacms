@@ -3,14 +3,15 @@ import Base from '../layouts/Base.astro';
 import Blocks from '../components/blocks/Blocks.astro';
 import { getPage } from '../lib/data';
 
-const slug = 'home';
+const segments = (Astro.params.urlSegments ?? '').toString();
+const slug = segments || 'home';
 const page = await getPage(slug, Astro.request);
 ---
 <Base
   title="TinaCMS Astro Visual Editing"
   forms={[{ id: page.id, query: page.query, variables: page.variables, data: page.data as unknown as object }]}
 >
-  <div data-tina-island={`/tina-island/page?slug=${slug}`}>
+  <div data-tina-island={`/tina-island/page?slug=${encodeURIComponent(slug)}`}>
     <Blocks blocks={(page.data?.page?.blocks ?? []) as Array<Record<string, unknown> | null>} />
   </div>
 </Base>

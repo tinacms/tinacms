@@ -1,0 +1,33 @@
+---
+import { tinaField } from '@tinacms/bridge/tina-field';
+import TinaMarkdown from '../rich-text/TinaMarkdown.astro';
+import { customComponents } from '../markdown';
+import { formatDate, sanitizeImageSrc } from '../../lib/utils';
+
+interface Props {
+  data?: Record<string, unknown> | null;
+}
+
+const { data } = Astro.props;
+const formattedPubDate = data?.pubDate ? formatDate(data.pubDate as string) : '';
+const heroSrc = data?.heroImage ? sanitizeImageSrc(data.heroImage) : '';
+---
+{heroSrc && (
+  <img data-tina-field={tinaField(data, 'heroImage')} src={heroSrc} alt={(data?.title as string) ?? ''} class="w-full rounded-lg shadow-md mb-8" />
+)}
+{data?.title && (
+  <h1 data-tina-field={tinaField(data, 'title')} class="text-4xl lg:text-5xl font-extrabold tracking-tight mb-6">{data.title}</h1>
+)}
+{formattedPubDate && (
+  <p data-tina-field={tinaField(data, 'pubDate')} class="text-gray-500 mb-8">{formattedPubDate}</p>
+)}
+{data?.excerpt && (
+  <div data-tina-field={tinaField(data, 'excerpt')} class="prose prose-lg mb-8 italic opacity-80 dark:prose-invert">
+    <TinaMarkdown content={data.excerpt as never} components={customComponents} />
+  </div>
+)}
+{data?._body && (
+  <div data-tina-field={tinaField(data, '_body')} class="prose prose-lg dark:prose-invert">
+    <TinaMarkdown content={data._body as never} components={customComponents} />
+  </div>
+)}
