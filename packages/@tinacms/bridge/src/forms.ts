@@ -28,7 +28,10 @@ export function initForms(store: DataStore): void {
       const payload = JSON.parse(raw) as FormPayload;
       if (!payload.id || !payload.query) continue;
       payloads.push(payload);
-      store.set(payload.id, payload.data ?? {});
+      // Seed silently: the admin's first updateData will trigger the
+      // initial island refresh; we don't want a redundant refetch on
+      // page load just because forms registered themselves.
+      store.seed(payload.id, payload.data ?? {});
     } catch (error) {
       debug('failed to parse form payload', error);
     }

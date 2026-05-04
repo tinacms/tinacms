@@ -1,13 +1,14 @@
 /**
  * Vanilla port of useTina's quick-edit click handler from
- * packages/tinacms/src/react.tsx (the mouseDownHandler block).
+ * packages/tinacms/src/react.tsx.
  *
- * - Adds the same dashed-outline overlay CSS the React hook installs.
- * - On click, finds `[data-tina-field]` (or `[data-tina-field-overlay]`) on
- *   the target or its ancestors and posts `{type:'field:selected', fieldName}`
- *   to the admin so the sidebar focuses the matching form field.
- * - Listens for `{type:'quickEditEnabled', value}` from the admin to toggle
- *   the overlay on/off, matching React behaviour.
+ * Behaviour difference vs React useTina: the bridge defaults `enabled` to
+ * true so links / buttons inside data-tina-field regions never accidentally
+ * navigate while in the editor iframe. The React hook gates on
+ * `quickEditEnabled` (admin-controlled), but that state is `false` for most
+ * sidebar layouts and the resulting link-navigation behaviour is a
+ * footgun in this example. The admin can still disable click capture by
+ * sending `{type:'quickEditEnabled', value:false}`.
  */
 const STYLE_ID = '__tina-bridge-quick-edit-style';
 const BODY_CLASS = '__tina-quick-editing-enabled';
@@ -45,7 +46,7 @@ const QUICK_EDIT_CSS = `
 `;
 
 export function initClickToFocus(): void {
-  let enabled = false;
+  let enabled = true;
 
   document.addEventListener(
     'click',
@@ -63,6 +64,8 @@ export function initClickToFocus(): void {
     true,
   );
 
+  // Optional admin override — the React hook also installs / removes the
+  // visible outline based on this flag, so respect the visual side too.
   window.addEventListener('message', (event) => {
     const message = event.data;
     if (!message || message.type !== 'quickEditEnabled') return;

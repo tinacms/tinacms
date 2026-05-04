@@ -2,20 +2,25 @@ import type { DataStore } from './types';
 
 /**
  * Holds the latest resolved data per form id (keyed by `hashFromQuery`-style
- * id). Subscribers learn whether each update is the first one for that form,
- * so island-refresh can fire immediately on the first push (newly-created
- * docs reach a populated state ASAP) and debounce subsequent edits.
+ * id). `seed()` populates the initial server-rendered payload silently so
+ * the bridge doesn't trigger a refresh on page load. `set()` records edits
+ * from the admin and fires subscribers; `firstUpdate` is true only for the
+ * first admin update per id (used by island-refresh to skip the debounce
+ * on cold-start so newly-created docs reach a populated state ASAP).
  */
 export function initDataStore(): DataStore {
   const data = new Map<string, object>();
-  const seen = new Set<string>();
+  const updated = new Set<string>();
   const listeners = new Set<(event: { id: string; firstUpdate: boolean }) => void>();
 
   return {
     get: (id) => data.get(id),
+    seed(id, next) {
+      data.set(id, next);
+    },
     set(id, next) {
-      const firstUpdate = !seen.has(id);
-      seen.add(id);
+      const firstUpdate = !updated.has(id);
+      updated.add(id);
       data.set(id, next);
       for (const listener of listeners) listener({ id, firstUpdate });
     },
