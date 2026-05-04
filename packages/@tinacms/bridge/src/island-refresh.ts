@@ -1,3 +1,4 @@
+import { debug } from './debug';
 import type { DataStore } from './types';
 import { reportQuickEdit } from './forms';
 
@@ -52,6 +53,7 @@ export function initIslandRefresh(store: DataStore, options: IslandRefreshOption
     if (!message || typeof message !== 'object') return;
 
     if (message.type === 'updateData' && typeof message.id === 'string') {
+      debug('updateData received for', message.id);
       store.set(message.id, message.data ?? {});
     }
   });
@@ -68,19 +70,22 @@ async function refreshIsland(island: HTMLElement, store: DataStore): Promise<voi
   }
 
   try {
+    debug('refreshing island', endpoint);
     const response = await fetch(endpoint, {
       method: 'GET',
       headers: { 'X-Tina-Preview': JSON.stringify(overlay) },
       cache: 'no-store',
       credentials: 'same-origin',
     });
-    if (!response.ok) return;
+    if (!response.ok) {
+      debug('island refetch failed', endpoint, response.status);
+      return;
+    }
     const html = await response.text();
     swapIslandHtml(island, html);
     reportQuickEdit();
-  } catch {
-    // Network / parse failure — leave the island untouched. The next edit
-    // will trigger another attempt.
+  } catch (error) {
+    debug('island refetch error', endpoint, error);
   }
 }
 

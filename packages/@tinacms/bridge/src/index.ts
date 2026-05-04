@@ -9,6 +9,7 @@
  * it on island refetches via the `X-Tina-Preview` header. The canonical
  * content store is never touched in edit mode.
  */
+import { debug } from './debug';
 import { initForms } from './forms';
 import { initDataStore } from './data-store';
 import { initIslandRefresh } from './island-refresh';
@@ -31,7 +32,11 @@ export function init(options: BridgeOptions = {}): void {
 
   // Outside an iframe (e.g. someone visiting /?tina-edit=1 directly) the
   // bridge has nobody to talk to — bail without side effects.
-  if (typeof window === 'undefined' || window.parent === window) return;
+  if (typeof window === 'undefined' || window.parent === window) {
+    debug('not in an iframe; bridge is a no-op');
+    return;
+  }
+  debug('initialising in iframe');
 
   const { debounceMs = 300 } = options;
 

@@ -1,3 +1,4 @@
+import { debug } from './debug';
 import type { DataStore, FormPayload } from './types';
 
 /**
@@ -5,14 +6,14 @@ import type { DataStore, FormPayload } from './types';
  * blocks (one per query the page consumes), seeds the data-store, and tells
  * the admin which forms this page hosts via `{type:'open', ...}`.
  *
- * Each payload mirrors the props that useTina receives in React:
- *   { id, query, variables, data }
- *
- * Subsequent `{type:'updateData', id, data}` messages from the admin land
- * via initIslandRefresh's listener — this module only does the initial
- * registration handshake.
+ * Re-posts each `open` until the admin acknowledges by sending an
+ * `updateData` for that id. The bridge boots faster than React, so the
+ * very first `open` can land before the admin's window-message handler
+ * is registered; without retry it would be silently dropped.
  */
 const SCRIPT_TYPE = 'application/tina+json';
+const RETRY_INTERVAL_MS = 250;
+const MAX_ATTEMPTS = 40; // 10s total — plenty for cold-start admins.
 
 export function initForms(store: DataStore): void {
   const scripts = document.querySelectorAll<HTMLScriptElement>(
@@ -28,23 +29,59 @@ export function initForms(store: DataStore): void {
       if (!payload.id || !payload.query) continue;
       payloads.push(payload);
       store.set(payload.id, payload.data ?? {});
-    } catch {
-      // Malformed payload — skip silently rather than break the bridge.
+    } catch (error) {
+      debug('failed to parse form payload', error);
     }
   }
 
-  for (const payload of payloads) {
-    window.parent.postMessage(
-      {
-        type: 'open',
-        id: payload.id,
-        query: payload.query,
-        variables: payload.variables,
-        data: payload.data,
-      },
-      window.location.origin,
-    );
-  }
+  debug('discovered', payloads.length, 'form(s)');
+
+  const acknowledged = new Set<string>();
+
+  const onAck = (event: MessageEvent) => {
+    const msg = event.data;
+    if (!msg || typeof msg !== 'object') return;
+    if (msg.type !== 'updateData' || typeof msg.id !== 'string') return;
+    if (!acknowledged.has(msg.id)) {
+      debug('admin acked form', msg.id);
+      acknowledged.add(msg.id);
+    }
+  };
+  window.addEventListener('message', onAck);
+
+  let attempts = 0;
+  const announce = () => {
+    attempts++;
+    const pending = payloads.filter((p) => !acknowledged.has(p.id));
+    if (pending.length === 0) {
+      debug('all forms acked after', attempts, 'attempt(s)');
+      return;
+    }
+    if (attempts > MAX_ATTEMPTS) {
+      debug(
+        'giving up after',
+        MAX_ATTEMPTS,
+        'attempts; pending ids:',
+        pending.map((p) => p.id),
+      );
+      return;
+    }
+    for (const payload of pending) {
+      debug('posting open for', payload.id, 'attempt', attempts);
+      window.parent.postMessage(
+        {
+          type: 'open',
+          id: payload.id,
+          query: payload.query,
+          variables: payload.variables,
+          data: payload.data,
+        },
+        window.location.origin,
+      );
+    }
+    setTimeout(announce, RETRY_INTERVAL_MS);
+  };
+  announce();
 
   reportQuickEdit();
 
