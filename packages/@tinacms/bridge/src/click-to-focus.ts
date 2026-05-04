@@ -10,6 +10,7 @@
  * footgun in this example. The admin can still disable click capture by
  * sending `{type:'quickEditEnabled', value:false}`.
  */
+import { debug } from './debug';
 const STYLE_ID = '__tina-bridge-quick-edit-style';
 const BODY_CLASS = '__tina-quick-editing-enabled';
 
@@ -51,9 +52,18 @@ export function initClickToFocus(): void {
   document.addEventListener(
     'click',
     (event) => {
-      if (!enabled) return;
-      const fieldName = resolveFieldName(event.target);
-      if (!fieldName) return;
+      const target = event.target;
+      const tagName = target instanceof Element ? target.tagName : '?';
+      if (!enabled) {
+        debug('click ignored — quickEdit disabled', tagName);
+        return;
+      }
+      const fieldName = resolveFieldName(target);
+      if (!fieldName) {
+        debug('click ignored — no data-tina-field ancestor for', tagName);
+        return;
+      }
+      debug('click captured →', fieldName, '(target:', tagName, ')');
       event.preventDefault();
       event.stopPropagation();
       window.parent.postMessage(
