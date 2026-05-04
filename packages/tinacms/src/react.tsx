@@ -194,54 +194,7 @@ export function useEditState(): { edit: boolean } {
   return { edit } as any;
 }
 
-/**
- * Grab the field name for the given attribute
- * to signal to Tina which DOM element the field
- * is working with.
- */
-/**
- * Generate a field identifier for Tina to associate DOM elements with form fields.
- * Format: "queryId---path.to.field" or "queryId---path.to.array.index"
- */
-export const tinaField = <
-  T extends
-    | {
-        _content_source?: {
-          queryId: string;
-          path: (number | string)[];
-        };
-      }
-    | Record<string, unknown>
-    | null
-    | undefined,
->(
-  object: T,
-  property?: keyof Omit<NonNullable<T>, '__typename' | '_sys'>,
-  index?: number
-): string => {
-  const contentSource = object?._content_source as
-    | { queryId: string; path: (number | string)[] }
-    | undefined;
-
-  if (!contentSource) {
-    return '';
-  }
-
-  const { queryId, path } = contentSource;
-
-  // Base path without property
-  if (!property) {
-    return `${queryId}---${path.join('.')}`;
-  }
-
-  // Build full path with property and optional index
-  const fullPath =
-    typeof index === 'number'
-      ? [...path, property, index]
-      : [...path, property];
-
-  return `${queryId}---${fullPath.join('.')}`;
-};
+export { tinaField } from './tina-field';
 
 /**
  * FIX: This function is updated to be more robust. It explicitly checks for
