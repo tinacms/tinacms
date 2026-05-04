@@ -5,6 +5,13 @@ const Page: Collection = {
   label: 'Pages',
   path: 'content/pages',
   format: 'json',
+  ui: {
+    router: ({ document }) => {
+      const slug = document._sys.breadcrumbs.join('/');
+      const path = slug === 'home' ? '/' : `/${slug}`;
+      return `${path}?tina-edit=1`;
+    },
+  },
   fields: [
     {
       type: 'object',
