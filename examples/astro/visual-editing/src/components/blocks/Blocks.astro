@@ -1,0 +1,55 @@
+---
+/**
+ * Block dispatcher mirroring examples/astro/kitchen-sink/src/components/blocks/index.tsx.
+ * Switches on `__typename` (set by the Tina GraphQL response) and falls
+ * back to `_template` for legacy/local payloads.
+ */
+import { tinaField } from '@tinacms/bridge/tina-field';
+import Hero from './Hero.astro';
+import Features from './Features.astro';
+import Cta from './Cta.astro';
+import Testimonial from './Testimonial.astro';
+import Content from './Content.astro';
+
+interface Props {
+  blocks?: Array<Record<string, unknown> | null> | null;
+}
+
+const { blocks } = Astro.props;
+
+const typeNameMap: Record<string, string> = {
+  PageBlocksHero: 'hero',
+  PageBlocksFeatures: 'features',
+  PageBlocksCta: 'cta',
+  PageBlocksTestimonial: 'testimonial',
+  PageBlocksContent: 'content',
+};
+---
+{(!blocks || blocks.length === 0) ? (
+  <div class="p-6 text-center text-gray-500">No blocks to render</div>
+) : (
+  blocks.map((block) => {
+    if (!block) return null;
+    const typename = (block.__typename as string) ?? '';
+    const template = (block._template as string) || typeNameMap[typename] || typename;
+    return (
+      <div data-tina-field={tinaField(block)}>
+        {template === 'hero' ? (
+          <Hero data={block as never} />
+        ) : template === 'features' ? (
+          <Features data={block as never} />
+        ) : template === 'cta' ? (
+          <Cta data={block as never} />
+        ) : template === 'testimonial' ? (
+          <Testimonial data={block as never} />
+        ) : template === 'content' ? (
+          <Content data={block as never} />
+        ) : (
+          <div class="p-4 bg-yellow-100 text-yellow-900 rounded">
+            Unknown block type: {template}
+          </div>
+        )}
+      </div>
+    );
+  })
+)}

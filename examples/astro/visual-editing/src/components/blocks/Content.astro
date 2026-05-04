@@ -1,0 +1,28 @@
+---
+import { tinaField } from '@tinacms/bridge/tina-field';
+import { cn } from '../../lib/utils';
+import Section from '../layout/Section.astro';
+import Container from '../layout/Container.astro';
+import TinaMarkdown from '../rich-text/TinaMarkdown.astro';
+import { customComponents } from '../markdown';
+
+interface Props {
+  data: {
+    body?: unknown;
+    color?: string | null;
+  };
+}
+
+const { data } = Astro.props;
+---
+<Section color={data.color}>
+  <Container
+    size="large"
+    width="medium"
+    class={cn('prose prose-lg', data.color === 'primary' ? 'prose-primary' : 'dark:prose-dark')}
+  >
+    <div data-tina-field={tinaField(data, 'body')}>
+      <TinaMarkdown content={data.body as never} components={customComponents} />
+    </div>
+  </Container>
+</Section>
