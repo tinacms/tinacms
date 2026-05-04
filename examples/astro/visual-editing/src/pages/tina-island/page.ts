@@ -5,7 +5,7 @@ import { getPage } from '../../lib/data';
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ request, url }) => {
+export const ALL: APIRoute = async ({ request, url }) => {
   const slug = url.searchParams.get('slug') ?? 'home';
   const page = await getPage(slug, request);
   const container = await AstroContainer.create();

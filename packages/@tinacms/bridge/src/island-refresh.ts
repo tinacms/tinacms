@@ -1,16 +1,23 @@
 import { debug } from './debug';
+import { PREVIEW_CONTENT_TYPE, type PreviewEnvelope } from './preview';
 import type { DataStore } from './types';
 import { reportQuickEdit } from './forms';
 
 /**
  * Listens for `{type:'updateData', id, data}` from the admin and re-fetches
- * each `[data-tina-island]` with the unsaved data attached as the
- * `X-Tina-Preview` header. The island endpoint reads the header (via
- * `tina-preview` helper in the example) and renders with overlay data
- * instead of hitting the canonical content store.
+ * each `[data-tina-island]` with the unsaved data attached as a JSON POST
+ * body. The island endpoint reads the body via `readOverlay()` from
+ * `@tinacms/bridge/preview` and renders with overlay data instead of
+ * hitting the canonical content store.
+ *
+ * Why POST: HTTP headers are capped at ~8 KB (server-dependent) — large
+ * posts overflow easily — and are restricted to Latin-1 so UTF-8 content
+ * needs base64 padding. A POST body has neither limit and round-trips
+ * UTF-8 directly.
  *
  * The very first updateData per form fires immediately so newly-created
- * docs leave the empty-template state ASAP. Subsequent updates are debounced.
+ * docs leave the empty-template state ASAP. Subsequent updates are
+ * debounced.
  */
 export interface IslandRefreshOptions {
   debounceMs: number;
@@ -63,7 +70,7 @@ async function refreshIsland(island: HTMLElement, store: DataStore): Promise<voi
   const endpoint = island.getAttribute(ENDPOINT_ATTR);
   if (!endpoint) return;
 
-  const overlay: Record<string, object> = {};
+  const overlay: PreviewEnvelope = {};
   for (const id of store.ids()) {
     const data = store.get(id);
     if (data) overlay[id] = data;
@@ -72,11 +79,9 @@ async function refreshIsland(island: HTMLElement, store: DataStore): Promise<voi
   try {
     debug('refreshing island', endpoint);
     const response = await fetch(endpoint, {
-      method: 'GET',
-      // Headers are restricted to ISO-8859-1, but CMS content includes
-      // UTF-8 (em-dashes, smart quotes, accented chars). Encode as
-      // base64-of-utf-8 so the byte channel stays Latin-1-safe.
-      headers: { 'X-Tina-Preview': encodeOverlay(overlay) },
+      method: 'POST',
+      headers: { 'Content-Type': PREVIEW_CONTENT_TYPE },
+      body: JSON.stringify(overlay),
       cache: 'no-store',
       credentials: 'same-origin',
     });
@@ -90,16 +95,6 @@ async function refreshIsland(island: HTMLElement, store: DataStore): Promise<voi
   } catch (error) {
     debug('island refetch error', endpoint, error);
   }
-}
-
-function encodeOverlay(overlay: Record<string, object>): string {
-  const json = JSON.stringify(overlay);
-  const bytes = new TextEncoder().encode(json);
-  let binary = '';
-  for (let i = 0; i < bytes.length; i++) {
-    binary += String.fromCharCode(bytes[i]!);
-  }
-  return btoa(binary);
 }
 
 function swapIslandHtml(island: HTMLElement, html: string): void {

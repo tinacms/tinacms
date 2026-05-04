@@ -5,7 +5,7 @@ import { getGlobal } from '../../lib/data';
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ request, url }) => {
+export const ALL: APIRoute = async ({ request, url }) => {
   const path = url.searchParams.get('path') ?? '/';
   const global = await getGlobal(request);
   const container = await AstroContainer.create();

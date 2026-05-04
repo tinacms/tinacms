@@ -1,13 +1,13 @@
 /**
- * Shared overlay reader + helper for fetching Tina query data with the
- * stateless preview overlay. Each route uses `withOverlay()` so the same
- * code path runs in production (header absent → real fetch) and inside
- * the editor iframe (header present → use overlay).
+ * Wraps a per-route data load so the same code path runs in production
+ * (no overlay → real fetch) and inside the editor iframe (overlay
+ * present → use the bridge's POST body verbatim).
  *
- * The bridge attaches a `{ [queryId]: data }` map to every island refetch
- * via the X-Tina-Preview header. Pages and island endpoints both look up
- * `id` via hashFromQuery so a refresh hits the matching overlay entry.
+ * The transport details (POST body, content-type, query-id matching)
+ * live in `@tinacms/bridge/preview` so consumers only think in terms of
+ * "did the bridge send me an overlay for this query?".
  */
+import { readOverlay } from '@tinacms/bridge/preview';
 import { addContentSourceMetadata, hashFromQuery } from './metadata';
 
 export interface QueryResult<T> {
@@ -23,7 +23,7 @@ export async function withOverlay<T>(args: {
   request: Request;
   /**
    * Disk-fetch fallback. Called only when the request has no overlay
-   * header (production / first paint). Returns the raw query data, or
+   * (production / first paint). Returns the raw query data, or
    * null/undefined if nothing exists yet (newly-created docs).
    */
   fetcher: () => Promise<T | null | undefined>;
@@ -33,24 +33,14 @@ export async function withOverlay<T>(args: {
   const { query, variables, request, fetcher, defaults } = args;
   const id = hashFromQuery(JSON.stringify({ query, variables }));
 
-  const overlayRaw = request.headers.get('X-Tina-Preview');
-  if (overlayRaw) {
-    try {
-      // Bridge encodes overlay as base64-of-utf-8 because HTTP headers
-      // are restricted to Latin-1.
-      const json = Buffer.from(overlayRaw, 'base64').toString('utf-8');
-      const map = JSON.parse(json) as Record<string, T>;
-      if (map[id] !== undefined) {
-        return {
-          data: addContentSourceMetadata(id, map[id]) as T,
-          query,
-          variables,
-          id,
-        };
-      }
-    } catch {
-      // Malformed header — fall through to disk fetch.
-    }
+  const overlay = await readOverlay<T>(request, id);
+  if (overlay !== undefined) {
+    return {
+      data: addContentSourceMetadata(id, overlay) as T,
+      query,
+      variables,
+      id,
+    };
   }
 
   const fetched = await fetcher().catch(() => null);

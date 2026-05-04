@@ -5,7 +5,7 @@ import { getBlog } from '../../lib/data';
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ request, url }) => {
+export const ALL: APIRoute = async ({ request, url }) => {
   const filename = url.searchParams.get('filename') ?? '';
   const blog = await getBlog(filename, request);
   const container = await AstroContainer.create();
