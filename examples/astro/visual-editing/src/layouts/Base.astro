@@ -1,5 +1,9 @@
 ---
+import '../styles/global.css';
 import { isEditMode } from '../lib/is-edit-mode';
+import { getGlobal } from '../lib/data';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
 
 interface Form {
   id: string;
@@ -9,38 +13,40 @@ interface Form {
 }
 
 interface Props {
-  title: string;
+  title?: string;
+  /** Per-page form payloads. Global is added automatically. */
   forms?: Form[];
 }
 
-const { title, forms = [] } = Astro.props;
+const { title = 'TinaCMS Astro visual editing', forms = [] } = Astro.props;
 const editing = isEditMode(Astro.request);
+
+const global = await getGlobal(Astro.request);
+const allForms: Form[] = [
+  ...forms,
+  { id: global.id, query: global.query, variables: global.variables, data: global.data as unknown as object },
+];
+
+const themeColor = global.data.global?.theme?.color ?? 'blue';
+const darkMode = global.data.global?.theme?.darkMode ?? 'system';
+const themeFont = global.data.global?.theme?.font ?? 'sans';
+const fontClass = themeFont === 'nunito' ? 'font-nunito' : themeFont === 'lato' ? 'font-lato' : 'font-sans';
 ---
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme={themeColor}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
-    <style is:global>
-      * { box-sizing: border-box; }
-      body {
-        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-        margin: 0;
-        color: #1a1a2e;
-        background: #fafbff;
-      }
-      main { max-width: 56rem; margin: 0 auto; padding: 3rem 1.5rem; }
-      .hero { padding: 2.5rem; background: linear-gradient(135deg, #ebe5ff, #d6f3ff); border-radius: 1rem; margin-bottom: 2rem; }
-      .hero p { margin: 0 0 0.5rem; color: #6b21a8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.85rem; }
-      .hero h1 { margin: 0; font-size: 2.5rem; line-height: 1.1; }
-      .features h2 { font-size: 1.5rem; margin: 0 0 1.5rem; }
-      .features ul { display: grid; gap: 1rem; padding: 0; list-style: none; }
-      .features li { background: #fff; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 1.25rem; }
-      .features li strong { display: block; font-size: 1.05rem; margin-bottom: 0.25rem; }
-      .features li span { color: #475569; }
-    </style>
-    {forms.map((form) => (
+    <script is:inline define:vars={{ darkMode }}>
+      (function(){
+        const root = document.documentElement;
+        if (darkMode === 'dark') root.classList.add('dark');
+        else if (darkMode === 'light') root.classList.remove('dark');
+        else if (window.matchMedia('(prefers-color-scheme: dark)').matches) root.classList.add('dark');
+      })();
+    </script>
+    {allForms.map((form) => (
       <script
         type="application/tina+json"
         set:html={JSON.stringify(form)}
@@ -53,9 +59,15 @@ const editing = isEditMode(Astro.request);
       </script>
     )}
   </head>
-  <body>
-    <main>
+  <body class:list={['antialiased min-h-screen flex flex-col', fontClass]}>
+    <div data-tina-island={`/tina-island/global?path=${encodeURIComponent(Astro.url.pathname)}`}>
+      <Header data={global.data.global?.header} pathname={Astro.url.pathname} />
+    </div>
+    <main class="flex-1">
       <slot />
     </main>
+    <div data-tina-island={`/tina-island/global-footer?path=${encodeURIComponent(Astro.url.pathname)}`}>
+      <Footer data={global.data.global?.footer} />
+    </div>
   </body>
 </html>
