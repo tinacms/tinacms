@@ -1,0 +1,80 @@
+{
+  "name": "@tinacms/astro",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "src/TinaMarkdown.astro",
+  "types": "dist/index.d.ts",
+  "files": [
+    "package.json",
+    "README.md",
+    "src/TinaMarkdown.astro",
+    "src/Node.astro",
+    "src/Leaf.astro",
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./src/TinaMarkdown.astro"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "default": "./dist/types.js"
+    },
+    "./sanitize": {
+      "types": "./dist/sanitize.d.ts",
+      "default": "./dist/sanitize.js"
+    },
+    "./bridge": {
+      "types": "./dist/bridge.d.ts",
+      "default": "./dist/bridge.js"
+    },
+    "./tina-field": {
+      "types": "./dist/tina-field.d.ts",
+      "default": "./dist/tina-field.js"
+    },
+    "./preview": {
+      "types": "./dist/preview.d.ts",
+      "default": "./dist/preview.js"
+    }
+  },
+  "license": "Apache-2.0",
+  "buildConfig": {
+    "entryPoints": [
+      "src/index.ts",
+      "src/types.ts",
+      "src/sanitize.ts",
+      "src/bridge.ts",
+      "src/tina-field.ts",
+      "src/preview.ts"
+    ]
+  },
+  "scripts": {
+    "types": "tsc",
+    "build": "tinacms-scripts build",
+    "test": "vitest run",
+    "test-watch": "vitest",
+    "sync-fixtures": "node ./scripts/sync-fixtures.mjs"
+  },
+  "dependencies": {
+    "@tinacms/bridge": "workspace:*"
+  },
+  "peerDependencies": {
+    "astro": "^5.0.0"
+  },
+  "devDependencies": {
+    "@tinacms/scripts": "workspace:*",
+    "@types/node": "^22.13.1",
+    "astro": "^5.16.0",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.0",
+    "vitest": "^3.0.0"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/@tinacms/astro"
+  }
+}

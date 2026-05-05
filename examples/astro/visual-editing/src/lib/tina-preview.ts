@@ -4,10 +4,10 @@
  * present → use the bridge's POST body verbatim).
  *
  * The transport details (POST body, content-type, query-id matching)
- * live in `@tinacms/bridge/preview` so consumers only think in terms of
+ * live in `@tinacms/astro/preview` so consumers only think in terms of
  * "did the bridge send me an overlay for this query?".
  */
-import { readOverlay } from '@tinacms/bridge/preview';
+import { readOverlay } from '@tinacms/astro/preview';
 import { addContentSourceMetadata, hashFromQuery } from './metadata';
 
 export interface QueryResult<T> {

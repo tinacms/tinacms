@@ -7,7 +7,7 @@
  * Node renderer's overrides path. Capitalised keys match `mdxJsxFlowElement`
  * / `mdxJsxTextElement` names from the rich-text editor.
  */
-import type { CustomComponentsMap } from '../rich-text/types';
+import type { CustomComponentsMap } from '@tinacms/astro/types';
 
 import Anchor from './Anchor.astro';
 import BlockQuote from './BlockQuote.astro';

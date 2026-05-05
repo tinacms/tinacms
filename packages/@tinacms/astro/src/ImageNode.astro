@@ -1,0 +1,17 @@
+---
+import { sanitizeImageSrc } from './sanitize';
+import type { CustomComponentsMap } from './types';
+
+interface Props {
+  node: { url: string; alt?: string; caption?: string };
+  components: CustomComponentsMap;
+}
+
+const { node, components } = Astro.props;
+const Override = components.img;
+---
+{Override ? (
+  <Override url={node.url} alt={node.alt} caption={node.caption} />
+) : (
+  <img src={sanitizeImageSrc(node.url)} alt={node.alt ?? ''} />
+)}

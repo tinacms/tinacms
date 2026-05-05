@@ -19,7 +19,7 @@
     "@astrojs/node": "^9.0.0",
     "@tailwindcss/typography": "catalog:",
     "@tailwindcss/vite": "^4.2.1",
-    "@tinacms/bridge": "workspace:*",
+    "@tinacms/astro": "workspace:*",
     "@tinacms/datalayer": "workspace:*",
     "@tinacms/mdx": "workspace:*",
     "astro": "^5.16.0",

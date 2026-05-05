@@ -1,11 +1,11 @@
 ---
-import { tinaField } from '@tinacms/bridge/tina-field';
+import TinaMarkdown from '@tinacms/astro';
+import { tinaField } from '@tinacms/astro/tina-field';
 import { cn, sanitizeImageSrc } from '../../lib/utils';
 import Actions from '../layout/Actions.astro';
 import Container from '../layout/Container.astro';
 import Section from '../layout/Section.astro';
 import { customComponents } from '../markdown';
-import TinaMarkdown from '../rich-text/TinaMarkdown.astro';
 
 interface Props {
   data: {

@@ -4,7 +4,13 @@
  * the Astro renderer can stay framework-free and not pull @tinacms/mdx into
  * the page bundle.
  */
-import type { AstroComponentFactory } from 'astro/runtime/server/render/astro/factory';
+
+/**
+ * Astro doesn't publicly export the `AstroComponentFactory` type, so we use
+ * a structural placeholder. The consumer's Astro pipeline performs the real
+ * compile-time check that whatever they pass is a valid component.
+ */
+export type AstroComponent = (...args: never[]) => unknown;
 
 export type TinaRichTextRoot = {
   type: 'root';
@@ -71,5 +77,5 @@ export type TinaRichTextContent =
   | null
   | undefined;
 
-/** A map of mdxJsx name → Astro component factory. */
-export type CustomComponentsMap = Record<string, AstroComponentFactory>;
+/** A map of mdxJsx name (or default tag override) → Astro component. */
+export type CustomComponentsMap = Record<string, AstroComponent>;

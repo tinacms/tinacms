@@ -1,8 +1,8 @@
 ---
-import { tinaField } from '@tinacms/bridge/tina-field';
+import TinaMarkdown from '@tinacms/astro';
+import { tinaField } from '@tinacms/astro/tina-field';
 import { formatDate, sanitizeImageSrc } from '../../lib/utils';
 import { customComponents } from '../markdown';
-import TinaMarkdown from '../rich-text/TinaMarkdown.astro';
 
 interface Props {
   data?: Record<string, unknown> | null;
