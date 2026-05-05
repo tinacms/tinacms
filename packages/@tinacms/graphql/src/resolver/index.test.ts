@@ -1388,7 +1388,9 @@ describe('index', () => {
 
     const setup = () => {
       const database = {
-        documentExists: vi.fn().mockResolvedValue(true),
+        documentExists: vi.fn().mockImplementation(async (p) => {
+          return p === realPath;
+        }),
         delete: vi.fn().mockResolvedValue(undefined),
         put: vi.fn().mockResolvedValue(undefined),
       };
