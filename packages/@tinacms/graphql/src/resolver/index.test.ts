@@ -1622,6 +1622,24 @@ describe('index', () => {
           'post'
         );
       });
+
+      it('rejects when the target path already exists and does not call put or deleteDocument', async () => {
+        const { resolver, database } = setup();
+        // Make documentExists return true for both the current path and the new path,
+        // simulating a rename collision (newRealPath is already occupied).
+        database.documentExists.mockImplementation(async (p: string) => true);
+
+        await expect(
+          resolver.resolveUpdateDocument({
+            collectionName: 'post',
+            relativePath: 'hello.md',
+            newRelativePath: 'renamed.md',
+          })
+        ).rejects.toThrow(/already exists/);
+
+        expect(database.put).not.toHaveBeenCalled();
+        expect(resolver.deleteDocument).not.toHaveBeenCalled();
+      });
     });
   });
 

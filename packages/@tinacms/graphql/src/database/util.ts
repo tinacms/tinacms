@@ -378,7 +378,7 @@ export const loadAndParseWithAliases = async (
   collection?: Collection<true>,
   templateInfo?: CollectionTemplateable
 ) => {
-  if (filepath.includes('.gitkeep')) {
+  if (filepath.endsWith('.gitkeep')) {
     return { _is_tina_folder_placeholder: true };
   }
 

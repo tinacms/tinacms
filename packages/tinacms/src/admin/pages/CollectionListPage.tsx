@@ -455,9 +455,9 @@ const CollectionListPage = () => {
                           });
                         }}
                         renameFunc={async () => {
-                          // add the file extension
-                          const newRelativePath = `${vars.newRelativePath}.${collection.format}`;
                           try {
+                            // add the file extension
+                            const newRelativePath = `${vars.newRelativePath}.${collection.format}`;
                             await admin.renameDocument({
                               collection: vars.collection,
                               relativePath: vars.relativePath,
@@ -1482,7 +1482,7 @@ const FolderModal = ({
               try {
                 await createFunc();
                 close();
-              } catch (e) {
+              } catch (error) {
                 // error is already handled by createFunc
               }
             }}
@@ -1541,8 +1541,12 @@ const RenameModal = ({
             style={{ flexGrow: 3 }}
             variant='primary'
             onClick={async () => {
-              await renameFunc();
-              close();
+              try {
+                await renameFunc();
+                close();
+              } catch (error) {
+                // error is already handled by renameFunc
+              }
             }}
             disabled={!newRelativePath || newRelativePath === filename}
           >
