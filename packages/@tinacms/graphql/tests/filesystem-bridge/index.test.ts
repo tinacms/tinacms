@@ -148,14 +148,8 @@ describe('multi-repo routing (rootPath vs outputPath)', () => {
 
   beforeEach(async () => {
     const stamp = Date.now();
-    generatorDir = path.join(
-      process.env.TMPDIR || '/tmp',
-      `tinacms-bridge-gen-${stamp}`
-    );
-    contentDir = path.join(
-      process.env.TMPDIR || '/tmp',
-      `tinacms-bridge-content-${stamp}`
-    );
+    generatorDir = path.join(os.tmpdir(), `tinacms-bridge-gen-${stamp}`);
+    contentDir = path.join(os.tmpdir(), `tinacms-bridge-content-${stamp}`);
     await fs.mkdirp(generatorDir);
     await fs.mkdirp(contentDir);
   });
@@ -264,16 +258,25 @@ describe('multi-repo routing (rootPath vs outputPath)', () => {
     await expect(bridge.get(traversalPath)).rejects.toThrow(/traversal/i);
     await expect(bridge.delete(traversalPath)).rejects.toThrow(/traversal/i);
   });
+
+  test('rejects generated-prefixed paths that escape the generated subtree but stay in rootPath', async () => {
+    // Defense-in-depth: `tina/__generated__/../../.env` resolves to
+    // `<rootPath>/.env` — inside rootPath, but outside the generated subtree
+    // the routing is supposed to expose. The new assertGeneratedSubtree check
+    // catches this even though plain assertWithinBase would let it through.
+    const escapePath = 'tina/__generated__/../../.env';
+    const bridge = new FilesystemBridge(generatorDir, contentDir);
+    await expect(bridge.put(escapePath, 'leak')).rejects.toThrow(/traversal/i);
+    await expect(bridge.get(escapePath)).rejects.toThrow(/traversal/i);
+    await expect(bridge.delete(escapePath)).rejects.toThrow(/traversal/i);
+  });
 });
 
 describe('AuditFileSystemBridge', () => {
   let tmpDir: string;
 
   beforeEach(async () => {
-    tmpDir = path.join(
-      process.env.TMPDIR || '/tmp',
-      `tinacms-audit-bridge-${Date.now()}`
-    );
+    tmpDir = path.join(os.tmpdir(), `tinacms-audit-bridge-${Date.now()}`);
     await fs.mkdirp(tmpDir);
   });
 

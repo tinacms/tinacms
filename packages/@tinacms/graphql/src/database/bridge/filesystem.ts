@@ -118,6 +118,29 @@ export class FilesystemBridge implements Bridge {
     return isGeneratedPath(filepath) ? this.rootPath : this.outputPath;
   }
 
+  // Defense-in-depth for generated-path routing: assertWithinBase already
+  // rejects paths that escape rootPath, but a path like
+  // `tina/__generated__/../../.env` would resolve to `<rootPath>/.env` —
+  // technically inside rootPath but outside the generated subtree the
+  // routing is supposed to grant access to. Verify the resolved path stays
+  // inside the matching generated subdirectory.
+  private assertGeneratedSubtree(filepath: string, resolved: string) {
+    if (!isGeneratedPath(filepath)) return;
+    const normalized = filepath.replace(/\\/g, '/');
+    const subdir = normalized.startsWith('.tina/__generated__/')
+      ? '.tina/__generated__'
+      : 'tina/__generated__';
+    const generatedRoot = path.resolve(path.join(this.rootPath, subdir));
+    if (
+      resolved !== generatedRoot &&
+      !resolved.startsWith(generatedRoot + path.sep)
+    ) {
+      throw new Error(
+        `Path traversal detected: "${filepath}" routed via generated prefix but resolved outside ${generatedRoot}`
+      );
+    }
+  }
+
   public async glob(pattern: string, extension: string) {
     const basePath = assertWithinBase(pattern, this.outputPath);
     const items = await fg(
@@ -135,17 +158,20 @@ export class FilesystemBridge implements Bridge {
 
   public async delete(filepath: string) {
     const resolved = assertWithinBase(filepath, this.baseFor(filepath));
+    this.assertGeneratedSubtree(filepath, resolved);
     await fs.remove(resolved);
   }
 
   public async get(filepath: string) {
     const resolved = assertWithinBase(filepath, this.baseFor(filepath));
+    this.assertGeneratedSubtree(filepath, resolved);
     return (await fs.readFile(resolved)).toString();
   }
 
   public async put(filepath: string, data: string, basePathOverride?: string) {
     const basePath = basePathOverride || this.baseFor(filepath);
     const resolved = assertWithinBase(filepath, basePath);
+    this.assertGeneratedSubtree(filepath, resolved);
     await fs.outputFile(resolved, data);
   }
 }

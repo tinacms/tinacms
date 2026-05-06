@@ -16,6 +16,7 @@ jest.mock('esbuild', () => ({
   transform: jest.fn().mockResolvedValue({ code: '' }),
 }));
 
+import path from 'path';
 import * as stripModule from './stripSearchTokenFromConfig';
 import { Codegen } from './index';
 
@@ -190,7 +191,9 @@ describe('Codegen.execute integration', () => {
         ([filePath]: [string]) => filePath.endsWith(fileName)
       );
       expect(calls).toHaveLength(1);
-      expect(calls[0][0]).toBe(`/fake/tina/__generated__/${fileName}`);
+      expect(calls[0][0]).toBe(
+        path.join(codegen.configManager.generatedFolderPath, fileName)
+      );
     }
   });
 
@@ -213,9 +216,11 @@ describe('Codegen.execute integration', () => {
         ([filePath]: [string]) => filePath.endsWith(fileName)
       );
       expect(calls).toHaveLength(1);
-      expect(calls[0][0]).toBe(`/fake/tina/__generated__/${fileName}`);
+      expect(calls[0][0]).toBe(
+        path.join(codegen.configManager.generatedFolderPath, fileName)
+      );
       // Specifically: no write under the content-root path.
-      expect(calls[0][0]).not.toContain('/fake-content-root');
+      expect(calls[0][0]).not.toContain('fake-content-root');
     }
   });
 });
