@@ -1,0 +1,89 @@
+---
+import { PageSection } from '../../components/layout/page-section';
+import Layout from '../../layouts/Layout.astro';
+import { formatDate, sanitizeImageSrc } from '../../lib/utils';
+
+const client = (await import('../../../tina/__generated__/client')).default;
+const connection = await client.queries.blogConnection({ first: 1000 });
+
+const blogs = (connection.data?.blogConnection?.edges ?? []).flatMap(
+  (edge: any) => (edge?.node ? [edge.node] : [])
+);
+---
+
+<Layout title="Blog | TinaCMS Astro Kitchen Sink">
+  <PageSection title="Blog">
+    <div class="grid gap-8 md:grid-cols-2">
+      {blogs.map((blog: any) => {
+        const href = `/blog/${blog._sys.filename}`;
+        const formattedDate = blog.pubDate ? formatDate(blog.pubDate) : '';
+        const heroSrc = blog.heroImage
+          ? sanitizeImageSrc(blog.heroImage)
+          : '';
+        const avatarSrc = blog.author?.avatar
+          ? sanitizeImageSrc(blog.author.avatar)
+          : '';
+
+        return (
+          <a
+            href={href}
+            data-testid={`blog-card-${blog._sys.filename}`}
+            class="group flex flex-col bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow"
+          >
+            {heroSrc && (
+              <div class="relative w-full h-48 overflow-hidden">
+                <img
+                  src={heroSrc}
+                  alt={blog.title}
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+            )}
+            <div class="p-6 flex flex-col flex-1">
+              <h2 class="text-xl font-bold text-gray-900 dark:text-gray-50 group-hover:text-theme-600 dark:group-hover:text-theme-400 transition-colors mb-2">
+                {blog.title}
+              </h2>
+              {blog.description && (
+                <p class="text-gray-600 dark:text-gray-400 text-sm line-clamp-3 flex-1">
+                  {blog.description}
+                </p>
+              )}
+              <div
+                class="flex items-center mt-4 gap-2"
+                data-testid={`blog-author-${blog._sys.filename}`}
+              >
+                {avatarSrc && (
+                  <img
+                    src={avatarSrc}
+                    alt={blog.author?.name || ''}
+                    width={28}
+                    height={28}
+                    class="rounded-full object-cover flex-shrink-0"
+                  />
+                )}
+                {blog.author?.name && (
+                  <span class="text-sm font-medium text-gray-600 dark:text-gray-300">
+                    {blog.author.name}
+                  </span>
+                )}
+                {blog.author?.name && formattedDate && (
+                  <span class="text-gray-300 dark:text-gray-600">·</span>
+                )}
+                {formattedDate && (
+                  <span class="text-xs text-gray-400 dark:text-gray-500">
+                    {formattedDate}
+                  </span>
+                )}
+              </div>
+            </div>
+          </a>
+        );
+      })}
+    </div>
+    {blogs.length === 0 && (
+      <p class="text-center text-gray-500 dark:text-gray-400 py-12">
+        No blog posts found.
+      </p>
+    )}
+  </PageSection>
+</Layout>

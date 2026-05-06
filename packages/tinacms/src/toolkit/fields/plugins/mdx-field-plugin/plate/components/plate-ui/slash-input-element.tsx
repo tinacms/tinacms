@@ -1,10 +1,14 @@
-import React, { type ComponentType, type SVGProps } from 'react';
+import React, { useEffect, type ComponentType, type SVGProps } from 'react';
 
 import { withRef } from '@udecode/cn';
 import { type PlateEditor, PlateElement } from '@udecode/plate/react';
 import { HEADING_KEYS } from '@udecode/plate-heading';
-
 import { Icons } from './icons';
+import {
+  SlashCommandOpenedEvent,
+  SlashCommandUsedEvent,
+} from '../../../../../../../lib/posthog/posthog';
+import { captureEvent } from '../../../../../../../lib/posthog/posthogProvider';
 
 import {
   InlineCombobox,
@@ -70,6 +74,10 @@ export const SlashInputElement = withRef<typeof PlateElement>(
   ({ className, ...props }, ref) => {
     const { children, editor, element } = props;
 
+    useEffect(() => {
+      captureEvent(SlashCommandOpenedEvent);
+    }, []);
+
     return (
       <PlateElement
         as='span'
@@ -89,7 +97,12 @@ export const SlashInputElement = withRef<typeof PlateElement>(
               <InlineComboboxItem
                 key={value}
                 keywords={keywords}
-                onClick={() => onSelect(editor)}
+                onClick={() => {
+                  onSelect(editor);
+                  captureEvent(SlashCommandUsedEvent, {
+                    command: value,
+                  });
+                }}
                 value={value}
               >
                 <Icon aria-hidden className='mr-2 size-4' />

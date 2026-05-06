@@ -1,0 +1,13 @@
+{{ define "main" }}
+  {{ $home := site.GetPage "/pages/home" }}
+  {{ if $home }}
+    {{ range $home.Params.blocks }}
+      {{ partial (printf "blocks/%s.html" ._template) . }}
+    {{ end }}
+  {{ else }}
+    <main>
+      <h1>{{ .Site.Title }}</h1>
+      <p>Welcome to the TinaCMS Hugo Kitchen Sink example.</p>
+    </main>
+  {{ end }}
+{{ end }}

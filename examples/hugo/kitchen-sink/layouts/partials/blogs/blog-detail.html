@@ -1,0 +1,53 @@
+{{/* Blog detail — matches Astro BlogDetail component styling */}}
+<div class="max-w-4xl mx-auto px-6 sm:px-8 py-24">
+  {{ partial "ui/gradient-title.html" (dict "text" .Params.title) }}
+
+  {{ with .Params.description }}
+    <p class="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-6 text-center">{{ . }}</p>
+  {{ end }}
+
+  {{/* Author and dates */}}
+  <div class="flex items-center justify-center gap-3 mb-16">
+    {{ with .Params.author }}
+      {{ $authorSlug := path.BaseName . }}
+      {{ $author := site.GetPage (printf "/authors/%s" $authorSlug) }}
+      {{ if $author }}
+        {{ with $author.Params.avatar }}
+          {{ if or (hasPrefix . "/") (hasPrefix . "./") (hasPrefix . "../") (hasPrefix . "http://") (hasPrefix . "https://") }}
+            <img src="{{ . }}" alt="{{ $author.Params.name }}" width="40" height="40" class="rounded-full object-cover flex-shrink-0 shadow-sm" />
+          {{ end }}
+        {{ end }}
+        <div class="flex flex-col items-start">
+          <span class="text-sm font-medium text-gray-700 dark:text-gray-200">{{ $author.Params.name }}</span>
+          <div class="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
+            {{ with $.Params.pubDate }}
+              <span>Published {{ dateFormat "January 2, 2006" . }}</span>
+            {{ end }}
+            {{ with $.Params.updatedDate }}
+              <span class="text-gray-200 dark:text-gray-700">&middot;</span>
+              <span>Updated {{ dateFormat "January 2, 2006" . }}</span>
+            {{ end }}
+          </div>
+        </div>
+      {{ end }}
+    {{ end }}
+  </div>
+</div>
+
+{{/* Hero image */}}
+{{ with .Params.heroImage }}
+  {{ if or (hasPrefix . "/") (hasPrefix . "./") (hasPrefix . "../") (hasPrefix . "http://") (hasPrefix . "https://") }}
+    <div class="px-4 w-full">
+      <div class="relative max-w-2xl mx-auto">
+        <img src="{{ . }}" alt="{{ $.Params.title }}" width="600" height="400" class="mb-14 block rounded-lg w-full h-auto" />
+      </div>
+    </div>
+  {{ end }}
+{{ end }}
+
+{{/* Body content */}}
+<div class="max-w-4xl mx-auto px-6 sm:px-8 flex-1 pt-4">
+  <div class="prose dark:prose-dark w-full max-w-none">
+    {{ .Content }}
+  </div>
+</div>

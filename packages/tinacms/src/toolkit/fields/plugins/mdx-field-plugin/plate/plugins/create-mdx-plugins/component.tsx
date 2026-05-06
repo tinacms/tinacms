@@ -219,7 +219,7 @@ const DotMenu = ({ onOpen, onRemove }) => {
         leaveFrom='transform opacity-100 scale-100'
         leaveTo='transform opacity-0 scale-95'
       >
-        <PopoverPanel className='z-30 absolute origin-top-right right-0'>
+        <PopoverPanel className='z-30 fixed origin-top-right right-0'>
           <div className='mt-2 -mr-1 rounded shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none'>
             <div className='py-1'>
               <span

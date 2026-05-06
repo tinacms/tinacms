@@ -1,5 +1,100 @@
 # tinacms-cli
 
+## 2.2.5
+
+### Patch Changes
+
+- [#6721](https://github.com/tinacms/tinacms/pull/6721) [`a85b1c0`](https://github.com/tinacms/tinacms/commit/a85b1c0ff44d8c214be47f89531beaf0e9dc234c) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Add runtime Zod validation for the `localContentPath` Tina config field (rejects non-string and empty-string values) in the CLI's content-root resolver. Extract content-root resolution out of `processConfig` into a standalone, unit-testable `resolveContentRootPath` function that preserves existing behaviour (falls back to `rootPath` with a warning when the configured directory is missing). `localContentPath` is deliberately excluded from `tinaConfigZod` so it does not leak into the hashed `_schema.json` and break the server-schema match check for projects that set it. Closes [tinacms/tinacloud#3294](https://github.com/tinacms/tinacloud/issues/3294).
+
+- Updated dependencies [[`01e6e4b`](https://github.com/tinacms/tinacms/commit/01e6e4b08e52d777c0c07d4448930cfa5599a6bc), [`a85b1c0`](https://github.com/tinacms/tinacms/commit/a85b1c0ff44d8c214be47f89531beaf0e9dc234c)]:
+  - @tinacms/graphql@2.3.0
+  - @tinacms/schema-tools@2.7.3
+  - @tinacms/search@1.2.12
+  - tinacms@3.7.5
+  - @tinacms/app@2.4.5
+
+## 2.2.4
+
+### Patch Changes
+
+- [#6720](https://github.com/tinacms/tinacms/pull/6720) [`b260b5e`](https://github.com/tinacms/tinacms/commit/b260b5ed4beb5d678b9605357b99a8667fddc8de) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Migrate docs links in shipped package code from raw `tina.io/docs/<path>` URLs to aliased `tina.io/docs/r/<alias>` URLs so the links survive future docs restructuring.
+
+- [#6636](https://github.com/tinacms/tinacms/pull/6636) [`8f491ed`](https://github.com/tinacms/tinacms/commit/8f491ed3d309fe690d5ffb96d2a22b673e015774) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Add `--content=local` flag to `tinacms build` for fast production builds that source content from local disk while keeping the generated client pointed at TinaCloud (so SSR/ISR routes still work at runtime). Validates against TinaCloud and forces `NODE_ENV=production` for chained sub-commands.
+
+- Updated dependencies [[`4672251`](https://github.com/tinacms/tinacms/commit/4672251c813e51f4471f025943008d2dea700aca), [`ca725ac`](https://github.com/tinacms/tinacms/commit/ca725acb42be499c146d76b12982e05a8127f81e), [`8194482`](https://github.com/tinacms/tinacms/commit/81944822373ad2d548871b880d586492efe71f3f), [`a526f9f`](https://github.com/tinacms/tinacms/commit/a526f9f4c37a0aaefb572c9dcc562d89aa9e5c7e), [`b260b5e`](https://github.com/tinacms/tinacms/commit/b260b5ed4beb5d678b9605357b99a8667fddc8de), [`b56dad4`](https://github.com/tinacms/tinacms/commit/b56dad42d2216ac9c8f90f19b78a4951ca97a61f)]:
+  - tinacms@3.7.4
+  - @tinacms/graphql@2.2.5
+  - @tinacms/app@2.4.4
+  - @tinacms/search@1.2.11
+
+## 2.2.3
+
+### Patch Changes
+
+- Updated dependencies [[`cd262b3`](https://github.com/tinacms/tinacms/commit/cd262b311c218ea4e5b5bb8abbbe54fcff3b8054), [`217bfb4`](https://github.com/tinacms/tinacms/commit/217bfb4ff2c1a61fa7b6df3ea460b192b5179bb7), [`4a8627b`](https://github.com/tinacms/tinacms/commit/4a8627b66fccf3396e790ae88fe7bb79408b4808), [`5feb18d`](https://github.com/tinacms/tinacms/commit/5feb18d0d3032bbcd6a5aad678208c0dde19bf81), [`32e145d`](https://github.com/tinacms/tinacms/commit/32e145d4859cbc710a222f2a01c55ca7b29a080b), [`d998884`](https://github.com/tinacms/tinacms/commit/d9988849ad67fb5e9d7e233c1ccca0cb0c031c3e), [`c75d871`](https://github.com/tinacms/tinacms/commit/c75d87121224f91dc4e5e2aa8af60b0881b87a5b)]:
+  - @tinacms/schema-tools@2.7.2
+  - @tinacms/graphql@2.2.4
+  - tinacms@3.7.3
+  - @tinacms/search@1.2.10
+  - @tinacms/app@2.4.3
+
+## 2.2.2
+
+### Patch Changes
+
+- Updated dependencies [[`3569c95`](https://github.com/tinacms/tinacms/commit/3569c95c124138013b36cd30bfef4d0b02f5c57b), [`4315d73`](https://github.com/tinacms/tinacms/commit/4315d731e729857713d5f3fc6cdef2b30abd9384), [`ff1cd6f`](https://github.com/tinacms/tinacms/commit/ff1cd6fb50edc24b34f81166d7dedbfec6d22b32), [`d1ad86e`](https://github.com/tinacms/tinacms/commit/d1ad86e204e19bf5bb4811658d40d172635da3af), [`e146e92`](https://github.com/tinacms/tinacms/commit/e146e922b40cb5376c7a3adf81b44ad4cf8f1867), [`246ee27`](https://github.com/tinacms/tinacms/commit/246ee27a8e0b74baf241c6a70a1699013fc59299)]:
+  - tinacms@3.7.2
+  - @tinacms/schema-tools@2.7.1
+  - @tinacms/app@2.4.2
+  - @tinacms/graphql@2.2.3
+  - @tinacms/search@1.2.9
+
+## 2.2.1
+
+### Patch Changes
+
+- [#6552](https://github.com/tinacms/tinacms/pull/6552) [`f124eab`](https://github.com/tinacms/tinacms/commit/f124eabaca10dac9a4d765c9e4135813c4830955) Thanks [@wicksipedia](https://github.com/wicksipedia)! - feat: add warning in dev command when server is not restricted to localhost
+
+- Updated dependencies [[`a40f52a`](https://github.com/tinacms/tinacms/commit/a40f52ae01fa2ef059fb983efd22aad42913b351), [`a7ebbe1`](https://github.com/tinacms/tinacms/commit/a7ebbe18a77b05c567564f8b507f76c2a2bb135e), [`f124eab`](https://github.com/tinacms/tinacms/commit/f124eabaca10dac9a4d765c9e4135813c4830955), [`519a4c2`](https://github.com/tinacms/tinacms/commit/519a4c2ca8a78274fe88549d41adbe52f7c6258b), [`71bb5c2`](https://github.com/tinacms/tinacms/commit/71bb5c2944245195397e84a6314278cb40de0e66), [`6e374e5`](https://github.com/tinacms/tinacms/commit/6e374e5975ff240807d59bfd06b3ab22264e91b1), [`039e605`](https://github.com/tinacms/tinacms/commit/039e6052a77e4cd0ae1460e33076a0fad1864019), [`d1f094b`](https://github.com/tinacms/tinacms/commit/d1f094b2d1a62e9c0580a56b8a788bc0e7a0af98)]:
+  - tinacms@3.7.1
+  - @tinacms/graphql@2.2.2
+  - @tinacms/app@2.4.1
+  - @tinacms/search@1.2.8
+
+## 2.2.0
+
+### Minor Changes
+
+- [#6510](https://github.com/tinacms/tinacms/pull/6510) [`059f480`](https://github.com/tinacms/tinacms/commit/059f480697ae1af813c165df3cc8954443737488) Thanks [@Aibono1225](https://github.com/Aibono1225)! - support highlight feature in rich text editor
+
+  ⚠️ `mark` is now a reserved MDX component name used internally for the highlight feature — custom MDX templates named `mark` will conflict with highlight and produce unexpected behavior.
+
+### Patch Changes
+
+- Updated dependencies [[`5a8ec36`](https://github.com/tinacms/tinacms/commit/5a8ec366d35e33bea17740a1f80f81fe152680e3), [`32d0471`](https://github.com/tinacms/tinacms/commit/32d0471356945ed9fa7b4b8b4da0937e1fafcacc), [`059f480`](https://github.com/tinacms/tinacms/commit/059f480697ae1af813c165df3cc8954443737488), [`74f12fd`](https://github.com/tinacms/tinacms/commit/74f12fda610711bd76f43c7f6d4dc890427d3b50), [`7e34861`](https://github.com/tinacms/tinacms/commit/7e34861197af6ec3488277bdfafe8297f51e1c3d)]:
+  - tinacms@3.7.0
+  - @tinacms/app@2.4.0
+  - @tinacms/graphql@2.2.1
+  - @tinacms/metrics@2.0.1
+  - @tinacms/schema-tools@2.7.0
+  - @tinacms/search@1.2.7
+
+## 2.1.11
+
+### Patch Changes
+
+- Updated dependencies [[`3c45642`](https://github.com/tinacms/tinacms/commit/3c45642650e1a9e9fd340c62c9a5372d10f0bee7)]:
+  - tinacms@3.6.3
+  - @tinacms/app@2.3.30
+
+## 2.1.10
+
+### Patch Changes
+
+- Updated dependencies [[`3b44e6a`](https://github.com/tinacms/tinacms/commit/3b44e6ad9bd2ff336aa8147b016de8b9bbb6f90d), [`35385f1`](https://github.com/tinacms/tinacms/commit/35385f16fe9e4cb386021445c8e1cb817a03dcd3), [`0a1049d`](https://github.com/tinacms/tinacms/commit/0a1049d4cc205af64e566cd86a00260a20fc7036), [`960181a`](https://github.com/tinacms/tinacms/commit/960181a4fd351eabdb69d5580a3ca79b0a905fcf), [`ebaa246`](https://github.com/tinacms/tinacms/commit/ebaa24655a590eef25f856e98a4bbdae7d26b2a0), [`7d544d2`](https://github.com/tinacms/tinacms/commit/7d544d22ce17fe616010c6aba63bd43c12725806), [`83ed83f`](https://github.com/tinacms/tinacms/commit/83ed83f27624134feffa0473f02b0f6f3318441b), [`8f08f49`](https://github.com/tinacms/tinacms/commit/8f08f49638edcecaf703681538fa46bbc53df982), [`13e953a`](https://github.com/tinacms/tinacms/commit/13e953a92eebcbfe2a86e12a9161ac6fe52e9236), [`168c283`](https://github.com/tinacms/tinacms/commit/168c283f0f43d601ef5ecec36062463fb5f106bf), [`c439e75`](https://github.com/tinacms/tinacms/commit/c439e759250e418c47a33eee7c9986d3b89131bf), [`9bc4f3c`](https://github.com/tinacms/tinacms/commit/9bc4f3cccb1ab88cfefcc59da7ad228d250f03d3)]:
+  - tinacms@3.6.2
+  - @tinacms/app@2.3.29
+
 ## 2.1.9
 
 ### Patch Changes

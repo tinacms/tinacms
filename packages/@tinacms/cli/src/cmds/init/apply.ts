@@ -45,7 +45,7 @@ async function apply({
   if (config.framework.name === 'other' && config.hosting === 'self-host') {
     logger.error(
       logText(
-        'Self-hosted Tina requires init setup only works with next.js right now. Please check out the docs for info on how to setup Tina on another framework: https://tina.io/docs/self-hosted/existing-site/'
+        'Self-hosted Tina requires init setup only works with next.js right now. Please check out the docs for info on how to setup Tina on another framework: https://tina.io/docs/r/self-hosting-nextjs'
       )
     );
     return;
@@ -545,7 +545,7 @@ const logNextSteps = ({
       logger.info(indentText(envFileText));
     }
     logger.info(
-      'Before you can run your site you will need to update it to use the backend client.\nSee docs for more info: https://tina.io/docs/self-hosted/querying-data/'
+      'Before you can run your site you will need to update it to use the backend client.\nSee docs for more info: https://tina.io/docs/r/self-hosted-querying-data'
     );
     logger.info(
       'If you are deploying to vercel make sure to add the environment variables to your project.'

@@ -55,7 +55,7 @@ export class ErrorSingleton {
       });
       logger.error(
         `If you wish to edit any of the following templates, you will have to update your content and code to use the new name. See ${linkText(
-          'https://tina.io/docs/forestry/common-errors/#migrating-fields-with-non-alphanumeric-characters'
+          'https://tina.io/docs/r/forestry-common-errors#migrating-fields-with-non-alphanumeric-characters'
         )} for more information.`
       );
     }

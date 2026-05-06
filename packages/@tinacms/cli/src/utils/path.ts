@@ -51,6 +51,7 @@
  *
  * @module
  */
+import fs from 'fs';
 import path from 'path';
 
 /** Removes trailing slash from path. Separator to remove is chosen based on
@@ -82,6 +83,29 @@ export function stripNativeTrailingSlash(p: string) {
  * appear in legitimate filenames or dotfile paths.
  */
 const ENCODED_TRAVERSAL_RE = /%2e%2e|%2f|%5c/i;
+
+/**
+ * Follows symlinks to determine where a path actually points on disk.
+ *
+ * If the full path exists, returns its `fs.realpathSync` result. If it
+ * doesn't (e.g. a file that will be created by a write operation), walks
+ * up the directory tree until it finds an ancestor that does exist,
+ * resolves that ancestor's real path, and re-appends the remaining
+ * segments. This lets us detect symlink escapes even for paths that
+ * haven't been written yet.
+ *
+ * @param candidate - An absolute path that may or may not exist on disk.
+ * @returns The real (symlink-resolved) absolute path.
+ */
+function resolveRealPath(candidate: string): string {
+  try {
+    return fs.realpathSync(candidate);
+  } catch {
+    const parent = path.dirname(candidate);
+    if (parent === candidate) return candidate;
+    return path.join(resolveRealPath(parent), path.basename(candidate));
+  }
+}
 
 /**
  * Validates that a user-supplied path does not escape the base directory
@@ -124,6 +148,25 @@ export function assertPathWithinBase(
     !resolved.startsWith(resolvedBase + path.sep)
   ) {
     throw new PathTraversalError(userPath);
+  }
+
+  // Symlink/junction check: resolve real filesystem paths and re-validate
+  // containment. This catches cases where a symlink inside the base directory
+  // points to a location outside it (CWE-59).
+  // Wrapped in try-catch: if the base dir doesn't exist on disk, the lexical
+  // check above is sufficient (no real I/O can happen anyway).
+  try {
+    const realBase = fs.realpathSync(resolvedBase);
+    const realResolved = resolveRealPath(resolved);
+    if (
+      realResolved !== realBase &&
+      !realResolved.startsWith(realBase + path.sep)
+    ) {
+      throw new PathTraversalError(userPath);
+    }
+  } catch (err) {
+    if (err instanceof PathTraversalError) throw err;
+    // Base dir doesn't exist — lexical check is sufficient
   }
 
   return resolved;

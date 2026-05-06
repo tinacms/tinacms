@@ -1,5 +1,41 @@
 # @tinacms/mdx
 
+## 2.1.3
+
+### Patch Changes
+
+- Updated dependencies [[`a85b1c0`](https://github.com/tinacms/tinacms/commit/a85b1c0ff44d8c214be47f89531beaf0e9dc234c)]:
+  - @tinacms/schema-tools@2.7.3
+
+## 2.1.2
+
+### Patch Changes
+
+- [#6673](https://github.com/tinacms/tinacms/pull/6673) [`55dae8e`](https://github.com/tinacms/tinacms/commit/55dae8eef898f49f827c00bc72297863d0d69be1) Thanks [@DORI2001](https://github.com/DORI2001)! - Preserve code block infostring meta through parse/serialize round-trip. Metadata after the language identifier (e.g. `{1,3-5}` or `title="app.py"`) was silently dropped on every save; it is now captured in the parser and emitted by the serializer.
+
+- Updated dependencies [[`cd262b3`](https://github.com/tinacms/tinacms/commit/cd262b311c218ea4e5b5bb8abbbe54fcff3b8054)]:
+  - @tinacms/schema-tools@2.7.2
+
+## 2.1.1
+
+### Patch Changes
+
+- Updated dependencies [[`4315d73`](https://github.com/tinacms/tinacms/commit/4315d731e729857713d5f3fc6cdef2b30abd9384)]:
+  - @tinacms/schema-tools@2.7.1
+
+## 2.1.0
+
+### Minor Changes
+
+- [#6510](https://github.com/tinacms/tinacms/pull/6510) [`059f480`](https://github.com/tinacms/tinacms/commit/059f480697ae1af813c165df3cc8954443737488) Thanks [@Aibono1225](https://github.com/Aibono1225)! - support highlight feature in rich text editor
+
+  ⚠️ `mark` is now a reserved MDX component name used internally for the highlight feature — custom MDX templates named `mark` will conflict with highlight and produce unexpected behavior.
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/schema-tools@2.7.0
+
 ## 2.0.7
 
 ### Patch Changes

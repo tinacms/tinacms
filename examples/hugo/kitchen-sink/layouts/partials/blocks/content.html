@@ -1,0 +1,8 @@
+{{/*
+  Content block — rich-text body rendered as markdown.
+  Context: block data from page frontmatter.
+*/}}
+{{ $color := .color | default "default" }}
+
+{{ $sectionContent := partial "blocks/content-body.html" . }}
+{{ partial "section.html" (dict "color" $color "content" $sectionContent) }}

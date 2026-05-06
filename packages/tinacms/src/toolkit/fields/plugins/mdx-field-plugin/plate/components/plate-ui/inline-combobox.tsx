@@ -32,7 +32,7 @@ import { cn } from '@utils/cn';
 import { filterWords } from '@udecode/plate-combobox';
 import { useComposedRef, useEditorRef } from '@udecode/plate/react';
 import { cva } from 'class-variance-authority';
-import { PointRef, TElement } from '@udecode/plate';
+import { Point, TElement } from '@udecode/plate';
 
 type FilterFn = (
   item: { keywords?: string[]; value: string },
@@ -100,7 +100,7 @@ const InlineCombobox = ({
    * Track the point just before the input element so we know where to
    * insertText if the combobox closes due to a selection change.
    */
-  const [insertPoint, setInsertPoint] = useState<PointRef | null>(null);
+  const insertPoint = React.useRef<Point | null>(null);
 
   useEffect(() => {
     const path = editor.api.findPath(element);
@@ -112,7 +112,7 @@ const InlineCombobox = ({
     if (!point) return;
 
     const pointRef = editor.api.pointRef(point);
-    setInsertPoint(pointRef);
+    insertPoint.current = pointRef.current;
 
     return () => {
       pointRef.unref();
@@ -126,12 +126,6 @@ const InlineCombobox = ({
       if (cause !== 'backspace') {
         editor.tf.insertText(trigger + value, {
           at: insertPoint?.current ?? undefined,
-        });
-      }
-      if (cause === 'arrowLeft' || cause === 'arrowRight') {
-        editor.tf.move({
-          distance: 1,
-          reverse: cause === 'arrowLeft',
         });
       }
     },

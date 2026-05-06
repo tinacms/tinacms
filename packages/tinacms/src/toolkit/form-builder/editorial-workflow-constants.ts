@@ -39,3 +39,12 @@ export type EditorialWorkflowErrorDetails = Error & {
   errorCode?: string;
   conflictingBranch?: string;
 };
+
+/**
+ * Result from a completed editorial workflow operation
+ */
+export interface EditorialWorkflowResult {
+  branchName: string;
+  pullRequestUrl: string;
+  warning?: string;
+}

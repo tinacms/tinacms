@@ -1,0 +1,9 @@
+{{ $color := .color | default "default" }}
+
+<div class="max-w-5xl mx-auto px-6 sm:px-8 py-24">
+  {{ with .body }}
+    <div class="prose dark:prose-dark prose-lg mx-auto max-w-none {{ if eq $color "primary" }}prose-primary{{ end }}">
+      {{ . | markdownify }}
+    </div>
+  {{ end }}
+</div>

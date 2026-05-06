@@ -1,0 +1,52 @@
+{{ $pages := .Pages }}
+{{ if not $pages }}
+  <p class="text-center text-gray-500 dark:text-gray-400 py-12">No posts found.</p>
+{{ else }}
+  {{ range $pages.ByDate.Reverse }}
+    {{ $postDate := .Params.date }}
+    {{ $postAuthorRef := .Params.author }}
+    <a href="{{ .RelPermalink }}" class="group block bg-gray-50 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-1000 rounded shadow-sm transition-all duration-150 ease-out hover:shadow-md hover:to-gray-50 dark:hover:to-gray-800 px-6 sm:px-8 md:px-10 py-10 mb-8 last:mb-0">
+      <h3 class="bg-gradient-to-r bg-clip-text text-transparent from-theme-400 to-theme-600 dark:from-theme-300 dark:to-theme-500 text-3xl lg:text-4xl font-semibold title-font mb-5 transition-all duration-150 ease-out">
+        {{ .Params.title }}
+        <span class="inline-block opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
+          <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" class="inline-block h-8 -mt-1 ml-1 w-auto opacity-70" xmlns="http://www.w3.org/2000/svg"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"></path></svg>
+        </span>
+      </h3>
+
+      {{ with .Params.excerpt }}
+        <div class="prose dark:prose-dark w-full max-w-none mb-5 opacity-70">
+          <p>{{ . }}</p>
+        </div>
+      {{ end }}
+
+      <div class="flex items-center">
+        {{/* Resolve author reference */}}
+        {{ with $postAuthorRef }}
+          {{ $authorSlug := path.BaseName . }}
+          {{ $author := site.GetPage (printf "/authors/%s" $authorSlug) }}
+          {{ if $author }}
+            {{ with $author.Params.avatar }}
+              {{ if or (hasPrefix . "/") (hasPrefix . "./") (hasPrefix . "../") (hasPrefix . "http://") (hasPrefix . "https://") }}
+                <div class="flex-shrink-0 mr-2">
+                  <img src="{{ . }}" alt="{{ $author.Params.name }}" width="40" height="40" class="object-cover rounded-full shadow-sm" />
+                </div>
+              {{ end }}
+            {{ end }}
+            <p class="text-base font-medium text-gray-600 group-hover:text-gray-800 dark:text-gray-200 dark:group-hover:text-white">
+              {{ $author.Params.name }}
+            </p>
+          {{ end }}
+        {{ end }}
+
+        {{ if and $postDate (not (time $postDate).IsZero) }}
+          {{ if $postAuthorRef }}
+            <span class="font-bold text-gray-200 dark:text-gray-500 mx-2">&mdash;</span>
+          {{ end }}
+          <p class="text-base text-gray-400 group-hover:text-gray-500 dark:text-gray-300 dark:group-hover:text-gray-150">
+            {{ dateFormat "January 2, 2006" $postDate }}
+          </p>
+        {{ end }}
+      </div>
+    </a>
+  {{ end }}
+{{ end }}

@@ -32,8 +32,12 @@ import type { Bridge } from './index';
  * @throws {Error} If the path escapes the content root.
  */
 function assertWithinBase(filepath: string, relativePath: string): void {
+  if (filepath.includes('\0')) {
+    throw new Error('Invalid path: null bytes are not allowed');
+  }
+  const sanitized = filepath.replace(/\\/g, '/');
   // Qualify the path as the bridge would, then normalize to resolve any ".."
-  const qualified = relativePath ? `${relativePath}/${filepath}` : filepath;
+  const qualified = relativePath ? `${relativePath}/${sanitized}` : sanitized;
   const normalized = path.normalize(qualified);
   // A path that escapes upward will start with ".." after normalization,
   // or on Windows could resolve to an absolute path.

@@ -1,0 +1,47 @@
+{{/* Post detail — matches Astro PostDetail component styling */}}
+<div class="max-w-4xl mx-auto px-6 sm:px-8 py-24 flex-1 pb-2">
+  {{ partial "ui/gradient-title.html" (dict "text" .Params.title "tag" "h2" "size" "6xl") }}
+
+  {{/* Author and date */}}
+  <div class="flex items-center justify-center mb-16">
+    {{ with .Params.author }}
+      {{ $authorSlug := path.BaseName . }}
+      {{ $author := site.GetPage (printf "/authors/%s" $authorSlug) }}
+      {{ if $author }}
+        {{ with $author.Params.avatar }}
+          {{ if or (hasPrefix . "/") (hasPrefix . "./") (hasPrefix . "../") (hasPrefix . "http://") (hasPrefix . "https://") }}
+            <div class="flex-shrink-0 mr-4">
+              <img src="{{ . }}" alt="{{ $author.Params.name }}" width="56" height="56" class="object-cover rounded-full shadow-sm" />
+            </div>
+          {{ end }}
+        {{ end }}
+        <a href="{{ $author.RelPermalink }}" class="text-base font-medium text-gray-600 hover:text-theme-600 dark:text-gray-200 dark:hover:text-theme-300 transition-colors underline-offset-2 hover:underline">
+          {{ $author.Params.name }}
+        </a>
+        <span class="font-bold text-gray-200 dark:text-gray-500 mx-2">&mdash;</span>
+      {{ end }}
+    {{ end }}
+
+    {{ with .Params.date }}
+      <p class="text-base text-gray-400 dark:text-gray-300">{{ dateFormat "January 2, 2006" . }}</p>
+    {{ end }}
+  </div>
+</div>
+
+{{/* Hero image */}}
+{{ with .Params.heroImg }}
+  {{ if or (hasPrefix . "/") (hasPrefix . "./") (hasPrefix . "../") (hasPrefix . "http://") (hasPrefix . "https://") }}
+    <div class="px-4 w-full">
+      <div class="relative max-w-2xl mx-auto">
+        <img src="{{ . }}" alt="{{ $.Params.title }}" class="mb-14 block rounded-lg w-full h-auto" />
+      </div>
+    </div>
+  {{ end }}
+{{ end }}
+
+{{/* Body content */}}
+<div class="max-w-4xl mx-auto px-6 sm:px-8 flex-1 pt-4">
+  <div class="prose dark:prose-dark w-full max-w-none">
+    {{ .Content }}
+  </div>
+</div>

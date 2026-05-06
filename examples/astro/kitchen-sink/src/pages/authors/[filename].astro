@@ -1,0 +1,32 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AuthorDetail from '../../components/tina/AuthorDetail';
+import client from '../../../tina/__generated__/client';
+
+export async function getStaticPaths() {
+  const connection = await client.queries.authorConnection();
+  const paths =
+    connection.data?.authorConnection?.edges?.flatMap((edge: any) => {
+      const raw = edge?.node?._sys?.filename;
+      if (typeof raw !== 'string') return [];
+      const filename = raw.replace(/\.(md|mdx|json)$/, '');
+      if (filename.length === 0) return [];
+      return [{ params: { filename } }];
+    }) || [];
+
+  return paths;
+}
+
+const { filename } = Astro.params;
+const relativePath = `${filename}.md`;
+const tinaProps = await client.queries.author({ relativePath });
+---
+
+<Layout title={tinaProps.data.author.name}>
+  <AuthorDetail
+    client:tina
+    query={tinaProps.query}
+    variables={tinaProps.variables}
+    data={tinaProps.data}
+  />
+</Layout>

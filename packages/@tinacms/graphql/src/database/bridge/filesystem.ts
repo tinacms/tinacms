@@ -5,6 +5,29 @@ import normalize from 'normalize-path';
 import type { Bridge } from './index';
 
 /**
+ * Follows symlinks to determine where a path actually points on disk.
+ *
+ * If the full path exists, returns its `fs.realpathSync` result. If it
+ * doesn't (e.g. a file that will be created by a `put` operation), walks
+ * up the directory tree until it finds an ancestor that does exist,
+ * resolves that ancestor's real path, and re-appends the remaining
+ * segments. This lets us detect symlink escapes even for paths that
+ * haven't been written yet.
+ *
+ * @param candidate - An absolute path that may or may not exist on disk.
+ * @returns The real (symlink-resolved) absolute path.
+ */
+function resolveRealPath(candidate: string): string {
+  try {
+    return fs.realpathSync(candidate);
+  } catch {
+    const parent = path.dirname(candidate);
+    if (parent === candidate) return candidate;
+    return path.join(resolveRealPath(parent), path.basename(candidate));
+  }
+}
+
+/**
  * Defense-in-depth: validates that a filepath stays within a base directory.
  * This protects against CWE-22 (Path Traversal) even if callers fail to
  * sanitize user input before calling bridge methods.
@@ -20,8 +43,12 @@ import type { Bridge } from './index';
  * @throws {Error} If the path escapes the base directory.
  */
 function assertWithinBase(filepath: string, baseDir: string): string {
+  if (filepath.includes('\0')) {
+    throw new Error('Invalid path: null bytes are not allowed');
+  }
+  const sanitized = filepath.replace(/\\/g, '/');
   const resolvedBase = path.resolve(baseDir);
-  const resolved = path.resolve(path.join(baseDir, filepath));
+  const resolved = path.resolve(path.join(baseDir, sanitized));
   if (
     resolved !== resolvedBase &&
     !resolved.startsWith(resolvedBase + path.sep)
@@ -30,6 +57,24 @@ function assertWithinBase(filepath: string, baseDir: string): string {
       `Path traversal detected: "${filepath}" escapes the base directory`
     );
   }
+
+  // Symlink/junction check (CWE-59)
+  try {
+    const realBase = fs.realpathSync(resolvedBase);
+    const realResolved = resolveRealPath(resolved);
+    if (
+      realResolved !== realBase &&
+      !realResolved.startsWith(realBase + path.sep)
+    ) {
+      throw new Error(
+        `Path traversal detected: "${filepath}" escapes the base directory`
+      );
+    }
+  } catch (err) {
+    if (err instanceof Error && err.message.startsWith('Path traversal'))
+      throw err;
+  }
+
   return resolved;
 }
 

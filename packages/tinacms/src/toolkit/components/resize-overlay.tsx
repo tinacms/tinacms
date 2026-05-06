@@ -14,11 +14,7 @@ export const ResizeOverlay: React.FC<ResizeOverlayProps> = ({ isResizing }) => {
 
   return (
     <div
-      className='fixed inset-0 z-overlay cursor-ew-resize'
-      style={{
-        // Invisible but captures all mouse events
-        background: 'transparent',
-      }}
+      className='fixed inset-0 z-overlay cursor-ew-resize bg-transparent'
       data-testid='resize-overlay'
     />
   );
