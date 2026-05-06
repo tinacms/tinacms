@@ -6,10 +6,7 @@
   "types": "dist/index.d.ts",
   "files": [
     "package.json",
-    "README.md",
-    "src/TinaMarkdown.astro",
-    "src/Node.astro",
-    "src/Leaf.astro",
+    "src",
     "dist"
   ],
   "exports": {
