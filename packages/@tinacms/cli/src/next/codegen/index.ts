@@ -289,7 +289,7 @@ export class Codegen {
 import { resolve } from "@tinacms/datalayer";
 import type { TinaClient } from "tinacms/dist/client";
 
-import { queries } from "${this.configManager.isUsingTs() ? './types.ts' : './types.js'}";
+import { queries } from "${this.configManager.isUsingTs() ? './types' : './types.js'}";
 import database from "../database";
 
 export async function databaseRequest({ query, variables, user }) {
@@ -357,7 +357,7 @@ export default databaseClient;
     const apiURL = this.getApiURL();
 
     const clientString = `import { createClient } from "tinacms/dist/client";
-import { queries } from "${this.configManager.isUsingTs() ? './types.ts' : './types.js'}";
+import { queries } from "${this.configManager.isUsingTs() ? './types' : './types.js'}";
 export const client = createClient({ ${
       this.noClientBuildCache === false
         ? `cacheDir: '${normalizePath(

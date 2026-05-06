@@ -33,13 +33,19 @@ describe('Codegen.genClient', () => {
     return instance;
   }
 
-  it('emits ./types.ts import for TypeScript projects', async () => {
+  it('emits extensionless ./types import for TypeScript projects', async () => {
+    // Avoids requiring `allowImportingTsExtensions: true` in consumer
+    // tsconfigs. Modern TS module resolution (Bundler / NodeNext) resolves
+    // `./types` to `./types.ts` cleanly. The previous `./types.ts` import
+    // broke under stricter Next.js / TS defaults (see #6062 follow-up).
     const { clientString } = await makeInstance(true).genClient();
-    expect(clientString).toContain('from "./types.ts"');
-    expect(clientString).not.toMatch(/from ["']\.\/types["']/);
+    expect(clientString).toContain('from "./types"');
+    expect(clientString).not.toMatch(/from ["']\.\/types\.ts["']/);
+    expect(clientString).not.toMatch(/from ["']\.\/types\.js["']/);
   });
 
   it('emits ./types.js import for non-TypeScript projects', async () => {
+    // Node ESM strictly requires the extension on relative imports.
     const { clientString } = await makeInstance(false).genClient();
     expect(clientString).toContain('from "./types.js"');
     expect(clientString).not.toMatch(/from ["']\.\/types["']/);
@@ -58,10 +64,11 @@ describe('Codegen.genDatabaseClient', () => {
     return instance;
   }
 
-  it('emits ./types.ts import for TypeScript projects', async () => {
+  it('emits extensionless ./types import for TypeScript projects', async () => {
     const result = await makeInstance(true).genDatabaseClient();
-    expect(result).toContain('from "./types.ts"');
-    expect(result).not.toMatch(/from ["']\.\/types["']/);
+    expect(result).toContain('from "./types"');
+    expect(result).not.toMatch(/from ["']\.\/types\.ts["']/);
+    expect(result).not.toMatch(/from ["']\.\/types\.js["']/);
   });
 
   it('emits ./types.js import for non-TypeScript projects', async () => {
