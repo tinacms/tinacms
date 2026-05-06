@@ -110,6 +110,10 @@ export class FilesystemBridge implements Bridge {
     this.outputPath = outputPath ? path.resolve(outputPath) : this.rootPath;
   }
 
+  // Picks the base directory for a given path. The `assertWithinBase` check
+  // in delete/get/put still runs against the chosen base, so a path like
+  // `tina/__generated__/../../escape.txt` is still rejected — just rejected
+  // against `rootPath` rather than `outputPath`.
   private baseFor(filepath: string): string {
     return isGeneratedPath(filepath) ? this.rootPath : this.outputPath;
   }

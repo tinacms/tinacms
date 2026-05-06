@@ -1,5 +1,6 @@
 import path from 'path';
 import { Database, FilesystemBridge, buildSchema } from '@tinacms/graphql';
+import { Telemetry } from '@tinacms/metrics';
 import { LocalSearchIndexClient, SearchIndexer } from '@tinacms/search';
 import AsyncLock from 'async-lock';
 import chokidar from 'chokidar';
@@ -78,6 +79,19 @@ export class DevCommand extends BaseCommand {
       try {
         await configManager.processConfig();
         if (firstTime) {
+          // Track localContentPath usage so we can measure adoption of the
+          // multi-repo separation. Fire once per `tinacms dev` invocation, not
+          // per reload.
+          const telemetry = new Telemetry({ disabled: this.noTelemetry });
+          await telemetry.submitRecord({
+            event: {
+              name: 'tinacms:cli:dev:invoke',
+              hasLocalContentPath: Boolean(
+                configManager.config.localContentPath
+              ),
+            },
+          });
+
           database = await createAndInitializeDatabase(
             configManager,
             Number(this.datalayerPort)

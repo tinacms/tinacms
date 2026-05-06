@@ -186,4 +186,29 @@ describe('Codegen.execute integration', () => {
       expect(calls[0][0]).toBe(`/fake/tina/__generated__/${fileName}`);
     }
   });
+
+  it('still writes exactly once when the project has a separate content root', async () => {
+    // Strengthens the previous test: even when hasSeparateContentRoot returns
+    // true (the multi-repo flag the duplicate-write block used to gate on),
+    // we should still see exactly one write per generated file. Pins that the
+    // duplicate-write code is gone, not just unreachable in the default mock.
+    const codegen = stubCodegen();
+    (codegen.configManager as any).hasSeparateContentRoot = () => true;
+    (codegen.configManager as any).contentRootPath = '/fake-content-root';
+
+    const fs = jest.requireMock('fs-extra');
+    (fs.outputFile as jest.Mock).mockClear();
+
+    await codegen.execute();
+
+    for (const fileName of ['_schema.json', '_graphql.json', '_lookup.json']) {
+      const calls = (fs.outputFile as jest.Mock).mock.calls.filter(
+        ([filePath]: [string]) => filePath.endsWith(fileName)
+      );
+      expect(calls).toHaveLength(1);
+      expect(calls[0][0]).toBe(`/fake/tina/__generated__/${fileName}`);
+      // Specifically: no write under the content-root path.
+      expect(calls[0][0]).not.toContain('/fake-content-root');
+    }
+  });
 });

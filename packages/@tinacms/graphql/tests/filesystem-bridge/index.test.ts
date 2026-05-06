@@ -232,6 +232,38 @@ describe('multi-repo routing (rootPath vs outputPath)', () => {
     expect(await fs.pathExists(genFile)).toBe(false);
     expect(await fs.pathExists(contentFile)).toBe(false);
   });
+
+  test('directory-only path (no trailing slash) routes to outputPath, not rootPath', async () => {
+    // Boundary case: isGeneratedPath uses startsWith('tina/__generated__/').
+    // The exact directory string `tina/__generated__` (no trailing slash)
+    // does not match the prefix and therefore routes to outputPath. This is
+    // documented intentional — bridge callers always pass file paths, never
+    // bare directory names. Pinning the boundary here so a future regression
+    // (e.g. adding directory operations) gets caught.
+    const bridge = new FilesystemBridge(generatorDir, contentDir);
+    await fs.outputFile(
+      path.join(contentDir, 'tina/__generated__'),
+      'sentinel'
+    );
+
+    const result = await bridge.get('tina/__generated__');
+    expect(result).toBe('sentinel');
+  });
+
+  test('assertWithinBase still rejects path traversal that escapes the routed base', async () => {
+    // The routing picks rootPath because the path starts with
+    // `tina/__generated__/`, but the trailing `..`s walk past rootPath itself
+    // — assertWithinBase must throw. This pins that the security check still
+    // runs, just against the chosen base.
+    const traversalPath =
+      'tina/__generated__/../../../../../../../../etc/escape.txt';
+    const bridge = new FilesystemBridge(generatorDir, contentDir);
+    await expect(bridge.put(traversalPath, 'pwned')).rejects.toThrow(
+      /traversal/i
+    );
+    await expect(bridge.get(traversalPath)).rejects.toThrow(/traversal/i);
+    await expect(bridge.delete(traversalPath)).rejects.toThrow(/traversal/i);
+  });
 });
 
 describe('AuditFileSystemBridge', () => {
