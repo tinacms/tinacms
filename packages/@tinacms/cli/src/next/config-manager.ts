@@ -379,7 +379,7 @@ export class ConfigManager {
       format: 'esm',
       outfile: outfile,
       loader: loaders,
-      absWorkingDir: process.cwd(),
+      absWorkingDir: this.rootPath,
       // Provide a require() polyfill for ESM bundles containing CommonJS packages.
       // Some bundled packages (e.g., 'scmp' used by 'mongodb-level') use require('crypto').
       // When esbuild inlines these CommonJS packages, it keeps the require() calls,
@@ -427,7 +427,7 @@ export class ConfigManager {
       outfile: preBuildConfigPath,
       loader: loaders,
       metafile: true,
-      absWorkingDir: process.cwd(),
+      absWorkingDir: this.rootPath,
     });
     const flattenedList = [];
 
@@ -448,7 +448,7 @@ export class ConfigManager {
       outfile,
       loader: loaders,
       banner: esmRequireBanner,
-      absWorkingDir: process.cwd(),
+      absWorkingDir: this.rootPath,
     });
     await esbuild.build({
       entryPoints: [outfile],
