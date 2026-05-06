@@ -11,6 +11,7 @@ import chalk from 'chalk';
 import { logger } from '../logger';
 import { createRequire } from 'module';
 import { stripNativeTrailingSlash } from '../utils/path';
+import { warnText } from '../utils/theme';
 import { resolveContentRootPath } from './resolve-content-root';
 
 export const TINA_FOLDER = 'tina';
@@ -26,6 +27,7 @@ export class ConfigManager {
   rootPath: string;
   tinaFolderPath: string;
   isUsingLegacyFolder: boolean;
+  private hasWarnedLegacyFolder = false;
   tinaConfigFilePath: string;
   tinaSpaPackagePath: string;
   contentRootPath?: string;
@@ -99,6 +101,18 @@ export class ConfigManager {
   async processConfig() {
     const require = createRequire(import.meta.url);
     this.tinaFolderPath = await this.getTinaFolderPath(this.rootPath);
+
+    if (this.isUsingLegacyFolder && !this.hasWarnedLegacyFolder) {
+      this.hasWarnedLegacyFolder = true;
+      logger.warn(
+        warnText(
+          'WARN: Detected legacy `.tina/` config folder. `tina-lock.json` is only ' +
+            'generated for the new `tina/` layout, and TinaCloud requires it to ' +
+            'index your schema. Migrate by renaming `.tina/` to `tina/` (the ' +
+            'contents stay the same). See https://tina.io/docs/tina-folder/overview/.'
+        )
+      );
+    }
 
     // TODO - .env should potentially be configurable
     this.envFilePath = path.resolve(
