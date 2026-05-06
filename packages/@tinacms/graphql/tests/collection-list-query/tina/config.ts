@@ -29,6 +29,18 @@ export const schema: Schema = {
         },
       ],
     },
+    {
+      name: 'screenwriters',
+      label: 'Screenwriters',
+      path: 'screenwriters',
+      fields: [
+        {
+          type: 'string',
+          name: 'name',
+          label: 'Name',
+        },
+      ],
+    },
   ],
 };
 

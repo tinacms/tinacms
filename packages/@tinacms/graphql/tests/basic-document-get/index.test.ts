@@ -23,3 +23,19 @@ it('retrieves document using post field', async () => {
   const result = await get({ query: postQuery, variables: {} });
   expect(format(result)).toMatchFileSnapshot('post-query-node.json');
 });
+
+it('returns a graceful error when document does not exist', async () => {
+  const query = `query { document(collection: "post", relativePath: "non-existent.md") { ...on Document { _values, _sys { title } }} }`;
+
+  const { get } = await setup(__dirname, config);
+  const result = await get({ query, variables: {} });
+
+  expect(result.errors).toBeDefined();
+  expect(result.errors).toHaveLength(1);
+  expect(result.errors![0].path).toEqual(['document']);
+  // Path separator is platform-dependent.
+  expect(result.errors![0].message).toMatch(
+    /Unable to find record post[/\\]non-existent\.md/
+  );
+  expect(result.data).toBeNull();
+});
