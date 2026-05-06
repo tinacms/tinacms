@@ -79,10 +79,7 @@ export function refreshForms(): void {
   for (const [id] of controller.active) {
     if (nextIds.has(id)) continue;
     debug('posting close for', id);
-    window.parent.postMessage(
-      { type: 'close', id },
-      window.location.origin
-    );
+    window.parent.postMessage({ type: 'close', id }, window.location.origin);
     controller.acknowledged.delete(id);
   }
 
@@ -136,10 +133,7 @@ function onAck(event: MessageEvent) {
 function onBeforeUnload() {
   if (!controller) return;
   for (const [id] of controller.active) {
-    window.parent.postMessage(
-      { type: 'close', id },
-      window.location.origin
-    );
+    window.parent.postMessage({ type: 'close', id }, window.location.origin);
   }
 }
 
