@@ -12,7 +12,7 @@
 import { initClickToFocus } from './click-to-focus';
 import { initDataStore } from './data-store';
 import { debug } from './debug';
-import { initForms } from './forms';
+import { initForms, refreshForms } from './forms';
 import { initIslandRefresh } from './island-refresh';
 
 export interface BridgeOptions {
@@ -47,6 +47,23 @@ export function init(options: BridgeOptions = {}): void {
   // ourselves to the admin and start receiving updateData replies.
   initForms(store);
 }
+
+/**
+ * Re-scan the page for `<script type="application/tina+json">` form
+ * payloads after a soft navigation (Astro view transitions, Turbo,
+ * htmx, etc.). Posts `close` for forms that left and `open` for forms
+ * that appeared. Safe to call before `init()` — no-op when the bridge
+ * isn't running.
+ *
+ * Typical wiring on an Astro site that uses `<ClientRouter />`:
+ *
+ * ```ts
+ * import { init, refreshForms } from '@tinacms/astro/bridge';
+ * init();
+ * document.addEventListener('astro:page-load', refreshForms);
+ * ```
+ */
+export { refreshForms };
 
 export { tinaField } from './tina-field';
 export type * from './types';

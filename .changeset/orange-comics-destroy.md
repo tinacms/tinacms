@@ -62,6 +62,20 @@ Astro is the second-most-starred meta-framework on GitHub and grew specifically 
 
 For nested MDX components in rich-text bodies (e.g. `<NewsletterSignup>` inside a post's `_body`) to render via the Astro renderer instead of as raw HTML, the content needs to be authored through the Tina editor — which inserts them as MDX templates that Tina parses into `mdxJsxFlowElement` nodes. Hand-authored `<Component>` syntax in the markdown source is currently parsed as `html` by Tina's MDX layer; same behaviour as the React renderer. Worth flagging up-front for anyone migrating existing markdown content.
 
+**Soft-navigation support: `refreshForms()`**
+
+`init()` scans `<script type="application/tina+json">` blocks once on first load and captures the resulting set in closure. Sites using Astro's `<ClientRouter />` (or any view-transitions setup that swaps the DOM without a full reload) would post the first page's forms to the admin and never refresh them — navigating between docs inside the editor iframe left the sidebar showing the previous page's form.
+
+`refreshForms()` re-scans the live DOM, diffs against the previously-mounted set, and posts `close` for forms that disappeared and `open` (with the same retry-until-acked behaviour as `init`) for forms that appeared. The one-time global listeners — `click` capture, the `updateData` ack handler, the `beforeunload` close — stay bound across refreshes, so calling it on every navigation is cheap and idempotent.
+
+```ts
+import { init, refreshForms } from '@tinacms/astro/bridge';
+init();
+document.addEventListener('astro:page-load', refreshForms);
+```
+
+`refreshForms()` is a no-op when `init()` hasn't run, so unconditional wiring is safe even on pages that don't use view transitions.
+
 **Out of scope (follow-ups)**
 
 - Promoting the rich-text renderer to a standalone `@tinacms/rich-text-astro` package (currently in-example for v1; extract once the API stabilises)

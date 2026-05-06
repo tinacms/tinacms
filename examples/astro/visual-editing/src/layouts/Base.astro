@@ -75,8 +75,15 @@ const fontClass =
       for everyone in production.
     */}
     <script>
-      import { init } from '@tinacms/astro/bridge';
+      import { init, refreshForms } from '@tinacms/astro/bridge';
       init();
+      // Soft-navigation re-mount. Required when the site uses Astro's
+      // <ClientRouter /> or any other view-transitions setup that swaps
+      // the page without a full reload — without this the admin keeps
+      // showing the previous doc's forms after navigating in the iframe.
+      // The event never fires without view transitions enabled, so this
+      // is dead code in the default no-ClientRouter setup.
+      document.addEventListener('astro:page-load', refreshForms);
     </script>
   </head>
   <body class:list={['antialiased min-h-screen flex flex-col', fontClass]}>
