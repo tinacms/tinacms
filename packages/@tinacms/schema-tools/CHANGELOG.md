@@ -1,5 +1,50 @@
 # @tinacms/schema-tools
 
+## 2.7.3
+
+### Patch Changes
+
+- [#6721](https://github.com/tinacms/tinacms/pull/6721) [`a85b1c0`](https://github.com/tinacms/tinacms/commit/a85b1c0ff44d8c214be47f89531beaf0e9dc234c) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Add runtime Zod validation for the `localContentPath` Tina config field (rejects non-string and empty-string values) in the CLI's content-root resolver. Extract content-root resolution out of `processConfig` into a standalone, unit-testable `resolveContentRootPath` function that preserves existing behaviour (falls back to `rootPath` with a warning when the configured directory is missing). `localContentPath` is deliberately excluded from `tinaConfigZod` so it does not leak into the hashed `_schema.json` and break the server-schema match check for projects that set it. Closes [tinacms/tinacloud#3294](https://github.com/tinacms/tinacloud/issues/3294).
+
+## 2.7.2
+
+### Patch Changes
+
+- [#6548](https://github.com/tinacms/tinacms/pull/6548) [`cd262b3`](https://github.com/tinacms/tinacms/commit/cd262b311c218ea4e5b5bb8abbbe54fcff3b8054) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Add 'displayOnly' field type for display-only form fields
+
+## 2.7.1
+
+### Patch Changes
+
+- [#6633](https://github.com/tinacms/tinacms/pull/6633) [`4315d73`](https://github.com/tinacms/tinacms/commit/4315d731e729857713d5f3fc6cdef2b30abd9384) Thanks [@JackDevAU](https://github.com/JackDevAU)! - refactor: make @tinacms/schema-tools the single source of truth
+
+## 2.7.0
+
+### Minor Changes
+
+- [#6447](https://github.com/tinacms/tinacms/pull/6447) [`60510bb`](https://github.com/tinacms/tinacms/commit/60510bbf8d1b78cad901722d4f9003665412d71e) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - ✨ Object Schema - Add openFormOnCreate flag. Allowing users to opt-in to automatically going inside an object form when the field is true
+
+### Patch Changes
+
+- [#6450](https://github.com/tinacms/tinacms/pull/6450) [`56d533e`](https://github.com/tinacms/tinacms/commit/56d533e610a520ba66b3e58f3a0dc03487d5d5d7) Thanks [@18-th](https://github.com/18-th)! - \* Restricted CORS on dev server to localhost by default for [GHSA-8pw3-9m7f-q734](https://github.com/tinacms/tinacms/security/advisories/GHSA-8pw3-9m7f-q734).
+  - Added `server.allowedOrigins` config option for non-localhost environments.
+  - Enabled Vite `server.fs.strict` with computed allow list for [GHSA-m48g-4wr2-j2h6](https://github.com/tinacms/tinacms/security/advisories/GHSA-m48g-4wr2-j2h6)
+  - Bind LevelDB TCP server to 127.0.0.1
+
+## 2.6.0
+
+### Minor Changes
+
+- [#6438](https://github.com/tinacms/tinacms/pull/6438) [`f90d47b`](https://github.com/tinacms/tinacms/commit/f90d47b746b000e65324da430aacc8fd623f5065) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Telemetry - We’ve added anonymous telemetry to help us understand how Tina is used and prioritize improvements in areas where it matters. No personal or sensitive data is collected, and the information cannot be used to identify individual users. Telemetry is used solely to improve performance, stability, and the overall user experience. You can opt-out at any time by disabling telemetry in your Tina config.
+
+  Read more at https://tina.io/telemetry
+
+## 2.5.0
+
+### Minor Changes
+
+- [#6392](https://github.com/tinacms/tinacms/pull/6392) [`4eb9252`](https://github.com/tinacms/tinacms/commit/4eb92520249696007556b52f3c48333bdf8ebf4d) Thanks [@Calinator444](https://github.com/Calinator444)! - Updated type definition for schema tools to include filename.parse
+
 ## 2.4.0
 
 ### Minor Changes

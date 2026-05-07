@@ -1,0 +1,14 @@
+{{ $color := .color | default "default" }}
+{{ $hasImage := and .image .image.src }}
+
+{{ partial "container.html" (dict "size" "large" "width" "large" "content" (printf `
+<div class="grid grid-cols-1 %s items-center gap-14">
+  <div class="text-center %s">
+    %s
+    %s
+    %s
+    %s
+  </div>
+  %s
+</div>
+` (cond $hasImage "lg:grid-cols-5" "") (cond $hasImage "lg:col-span-3 lg:text-left" "") (cond (ne (.tagline | default "") "") (printf `<span class="inline-block px-3 py-1 mb-8 text-sm font-bold tracking-wide title-font %s">%s</span>` (cond (eq $color "primary") "text-white bg-theme-400/30" "text-theme-500 bg-theme-400/10 dark:bg-theme-400/10 dark:text-theme-300") .tagline) "") (cond (ne (.headline | default "") "") (printf `<h2 class="w-full mb-10 text-5xl font-extrabold tracking-normal leading-tight title-font">%s</h2>` .headline) "") (cond (ne (.text | default "") "") (printf `<div class="mx-auto mb-10 text-lg leading-relaxed opacity-80 %s"><p>%s</p></div>` (cond $hasImage "lg:mx-0" "md:max-w-3xl md:mx-auto") .text) "") (cond (gt (len (.actions | default slice)) 0) (printf `<div class="%s">` (cond $hasImage "lg:justify-start" "justify-center")) "") (cond $hasImage (printf `<div class="relative lg:col-span-2"><img src="%s" alt="%s" class="absolute w-full rounded-lg max-w-xs md:max-w-none h-auto blur-2xl brightness-150 contrast-[0.9] dark:brightness-150 saturate-200 opacity-50 dark:opacity-30 mix-blend-multiply dark:mix-blend-hard-light" /><img src="%s" alt="%s" class="relative z-10 w-full max-w-xs md:max-w-none rounded-lg" /></div>` .image.src (.image.alt | default "") .image.src (.image.alt | default "")) "")) | safeHTML) }}

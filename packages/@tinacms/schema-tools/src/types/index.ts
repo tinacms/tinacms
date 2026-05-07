@@ -14,6 +14,13 @@ export type ContentFormat = (typeof CONTENT_FORMATS)[number];
 
 export type ContentFrontmatterFormat = 'yaml' | 'toml' | 'json';
 
+/**
+ * Telemetry mode configured by the user in their tina config.
+ * - "anonymous": Anonymous telemetry (default)
+ * - "disabled": No telemetry collected
+ */
+export type TelemetryMode = 'anonymous' | 'disabled';
+
 export type Parser =
   | { type: 'mdx' }
   | {
@@ -326,7 +333,17 @@ export type PasswordField = (
     type: 'password';
   };
 
-type ToolbarOverrideType =
+export type DisplayOnlyField = BaseField & {
+  type: 'displayOnly';
+  list?: never;
+  required?: never;
+  indexed?: never;
+  ui?: {
+    component?: FC<any> | null;
+  };
+};
+
+export type ToolbarOverrideType =
   | 'heading'
   | 'link'
   | 'image'
@@ -337,10 +354,13 @@ type ToolbarOverrideType =
   | 'codeBlock'
   | 'bold'
   | 'italic'
+  | 'strikethrough'
+  | 'highlight'
   | 'raw'
   | 'embed'
   | 'mermaid'
-  | 'table';
+  | 'table'
+  | 'hr';
 type RichTextAst = { type: 'root'; children: Record<string, unknown>[] };
 export type RichTextField<WithNamespace extends boolean = false> = (
   | FieldGeneric<RichTextAst, undefined>
@@ -462,8 +482,14 @@ export type ObjectField<WithNamespace extends boolean = false> = (
   | FieldGeneric<string, false, ObjectUiProps>
 ) &
   MaybeNamespace<WithNamespace> &
-  BaseField &
-  (
+  BaseField & {
+    /**
+     * @default false
+     * When `list: true`, automatically opens the form for newly created list items.
+     * When used without `list: true`, this does not do anything.
+     */
+    openFormOnCreate?: boolean;
+  } & (
     | {
         type: 'object';
         fields: Field<WithNamespace>[];
@@ -488,6 +514,7 @@ type Field<WithNamespace extends boolean = false> = (
   | RichTextField<WithNamespace>
   | ObjectField<WithNamespace>
   | PasswordField
+  | DisplayOnlyField
 ) &
   MaybeNamespace<WithNamespace>;
 
@@ -735,6 +762,29 @@ export interface Config<
      */
     basePath?: string;
   };
+  /**
+   * Configuration for the local development server (`tinacms dev`).
+   * Has no effect on production deployments.
+   */
+  server?: {
+    /**
+     * Origins allowed to make cross-origin requests to the dev server.
+     * Defaults to localhost / 127.0.0.1 / [::1] only. Each entry can be a string,
+     * RegExp, or `'private'` (expands to RFC 1918 private-network IPs).
+     *
+     * @example
+     * ```ts
+     * server: { allowedOrigins: ['https://my-codespace.github.dev'] }
+     * ```
+     *
+     * @example
+     * ```ts
+     * server: { allowedOrigins: ['private'] }
+     * ```
+     *
+     */
+    allowedOrigins?: (RegExp | 'private' | (string & {}))[];
+  };
   media?:
     | {
         /**
@@ -775,6 +825,13 @@ export interface Config<
         accept?: string | string[];
       };
   /**
+   * Telemetry mode for TinaCMS.
+   *
+   * @default "anonymous"
+   */
+  telemetry?: TelemetryMode;
+
+  /**
    * Configuration for repository-related UI features.
    *
    * This allows you to configure how the CMS displays repository information
@@ -812,7 +869,7 @@ export interface Config<
      * @example
      *s
      * historyUrl: ({ relativePath, branch }) => ({
-     *   url: `https://github.com/tinacms/tinacms/commits/${branch}/examples/next-2024/${relativePath}`
+     *   url: `https://github.com/tinacms/tinacms/commits/${branch}/examples/next/kitchen-sink/${relativePath}`
      * })
      *      */
     historyUrl?: (context: { relativePath: string; branch: string }) => {
@@ -987,6 +1044,16 @@ export interface UICollection<Form = any, CMS = any, TinaForm = any> {
    * Customize the way filenames are generated during content creation
    */
   filename?: {
+    /**
+     * A callback function which formats the filename each time the value changes
+     * to enforce naming constraints (the extension is not necessary)
+     *
+     * eg:
+     * ```ts
+     * parse: (value) => value.toLowerCase().split(" ").join("-")
+     * ```
+     */
+    parse?: (filename: string) => string;
     /**
      * A callback which receives form values as an argument. The return value
      * here will be used as the filename (the extension is not necessary)

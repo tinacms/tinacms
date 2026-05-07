@@ -160,9 +160,7 @@ export function mdxJsxFromMarkdown({ patterns }: { patterns: Pattern[] }) {
       const tail: MdxJsxExpressionAttribute | MdxJsxAttribute | undefined =
         tag.attributes[tag.attributes.length - 1];
 
-      /** @type {Program | undefined} */
-      // @ts-expect-error: custom.
-      const estree = token.estree;
+      const estree = (token as typeof token & { estree?: unknown }).estree;
 
       if (tail) {
         tail.value = this.resume();
@@ -239,9 +237,7 @@ export function mdxJsxFromMarkdown({ patterns }: { patterns: Pattern[] }) {
       type: 'mdxJsxAttributeValueExpression',
       value: this.resume(),
     };
-    /** @type {Program | undefined} */
-    // @ts-expect-error: custom.
-    const estree = token.estree;
+    const estree = (token as typeof token & { estree?: unknown }).estree;
 
     if (estree) {
       node.data = { estree };

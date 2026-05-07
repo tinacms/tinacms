@@ -1,0 +1,33 @@
+{{/*
+  Icon partial — renders an icon SVG with size, color, and style.
+  Parameters (via dict):
+    .icon  — icon data object (name, color, style, size)
+    .theme — theme color string (for resolving "primary")
+*/}}
+{{ $data := .icon | default dict }}
+{{ $themeColor := .theme | default "blue" }}
+{{ $name := $data.name | default "" }}
+{{ $rawColor := $data.color | default $themeColor }}
+{{ $color := cond (eq $rawColor "primary") $themeColor $rawColor }}
+{{ $style := $data.style | default "float" }}
+{{ $size := $data.size | default "medium" }}
+{{ $isWhite := eq $color "white" }}
+
+{{ if $name }}
+  {{ $sizeClasses := dict "xs" "w-6 h-6 flex-shrink-0" "small" "w-8 h-8 flex-shrink-0" "medium" "w-12 h-12 flex-shrink-0" "large" "w-14 h-14 flex-shrink-0" "xl" "w-16 h-16 flex-shrink-0" }}
+  {{ $sizeClass := index $sizeClasses $size | default (index $sizeClasses "medium") }}
+
+  {{/* Map icon names to partial filenames */}}
+  {{ $iconMap := dict "Tina" "tina" "BiLayer" "bi-layer" "BiSearchAlt2" "bi-search-alt2" "BiTerminal" "bi-terminal" }}
+  {{ $partialName := index $iconMap $name }}
+
+  {{ if $partialName }}
+    {{ if eq $style "circle" }}
+      <div class="relative z-10 inline-flex items-center justify-center flex-shrink-0 rounded-full {{ if $isWhite }}bg-white dark:bg-gray-100 text-gray-800{{ else }}bg-theme-400 dark:bg-theme-500 text-theme-50{{ end }} {{ $sizeClass }}">
+        {{ partial (printf "icons/%s.html" $partialName) (dict "class" "w-2/3 h-2/3") }}
+      </div>
+    {{ else }}
+      {{ partial (printf "icons/%s.html" $partialName) (dict "class" (printf "%s %s" $sizeClass (cond $isWhite "text-white opacity-80" "text-theme-400"))) }}
+    {{ end }}
+  {{ end }}
+{{ end }}

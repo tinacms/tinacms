@@ -18,3 +18,33 @@ export const EDITORIAL_WORKFLOW_STATUS = {
 
 export type EditorialWorkflowStatus =
   (typeof EDITORIAL_WORKFLOW_STATUS)[keyof typeof EDITORIAL_WORKFLOW_STATUS];
+
+/**
+ * Editorial Workflow Error Codes
+ * These match the server-side constants in tinacloud/common/src/editorial-workflow-constants.ts
+ */
+export const EDITORIAL_WORKFLOW_ERROR = {
+  BRANCH_EXISTS: 'BRANCH_EXISTS',
+  BRANCH_HIERARCHY_CONFLICT: 'BRANCH_HIERARCHY_CONFLICT',
+  VALIDATION_FAILED: 'VALIDATION_FAILED',
+} as const;
+
+export type EditorialWorkflowError =
+  (typeof EDITORIAL_WORKFLOW_ERROR)[keyof typeof EDITORIAL_WORKFLOW_ERROR];
+
+/**
+ * Error type for editorial workflow operations with additional error details
+ */
+export type EditorialWorkflowErrorDetails = Error & {
+  errorCode?: string;
+  conflictingBranch?: string;
+};
+
+/**
+ * Result from a completed editorial workflow operation
+ */
+export interface EditorialWorkflowResult {
+  branchName: string;
+  pullRequestUrl: string;
+  warning?: string;
+}

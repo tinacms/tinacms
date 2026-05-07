@@ -13,6 +13,7 @@ interface GroupFieldDefinititon extends Field {
   component: 'group';
   fields: Field[];
   defaultItem?: object | (() => object);
+  openFormOnCreate?: boolean;
   addItemBehavior?: 'append' | 'prepend';
   /**
    * An optional function which generates `props` for
@@ -46,6 +47,9 @@ interface GroupProps {
 }
 
 const Group = ({ tinaForm, form, field, input, meta, index }: GroupProps) => {
+  const cms = useCMS();
+  const { dispatch: setFocusedField } =
+    useEvent<FieldFocusEvent>('field:focus');
   const addItem = React.useCallback(() => {
     let obj = {};
     if (typeof field.defaultItem === 'function') {
@@ -57,6 +61,26 @@ const Group = ({ tinaForm, form, field, input, meta, index }: GroupProps) => {
       form.mutators.insert(field.name, 0, obj);
     } else {
       form.mutators.push(field.name, obj);
+    }
+    if (field.openFormOnCreate) {
+      const state = tinaForm.finalForm.getState();
+      const newIndex = field.addItemBehavior === 'prepend' ? 0 : items.length;
+      if (state.invalid === true) {
+        // @ts-ignore
+        cms.alerts.error('Cannot navigate away from an invalid form.');
+        return;
+      }
+      cms.dispatch({
+        type: 'forms:set-active-field-name',
+        value: {
+          formId: tinaForm.id,
+          fieldName: `${field.name}.${newIndex}`,
+        },
+      });
+      setFocusedField({
+        id: tinaForm.id,
+        fieldName: `${field.name}.${newIndex}`,
+      });
     }
   }, [form, field]);
 

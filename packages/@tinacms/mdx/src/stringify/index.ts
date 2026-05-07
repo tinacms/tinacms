@@ -210,6 +210,7 @@ export const blockElement = (
       return {
         type: 'code',
         lang: content.lang,
+        meta: content.meta,
         value: codeLinesToString(content),
       };
     case 'mdxJsxFlowElement':
@@ -407,11 +408,19 @@ const blockContentElement = (
   }
 };
 
-export type Marks = 'strong' | 'emphasis' | 'inlineCode' | 'delete';
+export type Marks =
+  | 'strong'
+  | 'emphasis'
+  | 'inlineCode'
+  | 'delete'
+  | 'highlight';
 
 export const getMarks = (content: Plate.InlineElement) => {
   const marks: Marks[] = [];
-  if (content.type !== 'text') {
+  const isText =
+    content.type === 'text' ||
+    (!content.type && typeof (content as any).text === 'string');
+  if (!isText) {
     return [];
   }
   if (content.bold) {
@@ -425,6 +434,9 @@ export const getMarks = (content: Plate.InlineElement) => {
   }
   if (content.strikethrough) {
     marks.push('delete');
+  }
+  if (content.highlight) {
+    marks.push('highlight');
   }
   return marks;
 };

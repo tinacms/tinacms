@@ -190,10 +190,11 @@ export const RenderForm = ({
     {};
 
   const fileReadOnly = schemaCollection?.ui?.filename?.readonly;
-
+  const parse = schemaCollection?.ui?.filename?.parse;
   const filenameField = {
     name: 'filename',
     label: 'Filename',
+    parse,
     component:
       slugFunction && !fileReadOnly
         ? wrapFieldsWithMeta(({ field, input, meta }) => {
@@ -227,7 +228,7 @@ export const RenderForm = ({
         return true;
       }
 
-      const isValid = /[\.\-_\/a-zA-Z0-9]*$/.test(value);
+      const isValid = /^[\.\-_\/a-zA-Z0-9]*$/.test(value);
       if (value && !isValid) {
         return 'Must contain only a-z, A-Z, 0-9, -, _, ., or /.';
       }

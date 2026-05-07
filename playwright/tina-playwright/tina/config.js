@@ -2,17 +2,28 @@ import { defineConfig } from "tinacms";
 import page from "./collections/page";
 import post from "./collections/post";
 import author from "./collections/author";
+import settings from "./collections/settings";
 
 export const config = defineConfig({
   branch: "",
   clientId: "",
   token: "",
+  telemetry: "anonymous",
   build: {
     publicFolder: "public", // The public asset folder for your framework
     outputFolder: "admin", // within the public folder
   },
+  media: {
+    tina: {
+      publicFolder: "public",
+      mediaRoot: "uploads",
+    },
+  },
   schema: {
-    collections: [page, post, author],
+    collections: [page, post, author, settings],
+  },
+  search: {
+    tina: {},
   },
 });
 

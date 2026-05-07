@@ -81,6 +81,7 @@ export const blockElement = (
       return {
         type: 'code',
         lang: content.lang,
+        meta: content.meta,
         value: codeLinesToString(content.children).join('\n'),
       };
     case 'mdxJsxFlowElement':

@@ -399,5 +399,50 @@ describe('Form', () => {
         });
       });
     });
+
+    describe('when the rich-text child is an img node', () => {
+      it('returns image group with correct label and field names (no .props in URL path)', async () => {
+        const richTextContent = {
+          type: 'root',
+          children: [
+            { type: 'p', children: [{ type: 'text', text: 'Para one' }] },
+            { type: 'p', children: [{ type: 'text', text: 'Para two' }] },
+            {
+              type: 'img',
+              url: '/uploads/photo.jpg',
+              alt: 'A photo',
+              caption: 'Photo caption',
+            },
+          ],
+        };
+
+        const form = new Form({
+          ...DEFAULTS,
+          fields: [
+            {
+              type: 'rich-text',
+              name: 'body',
+              isBody: true,
+              templates: [],
+            },
+          ],
+          initialValues: { body: richTextContent },
+        });
+
+        const fieldName = 'body.children.2.props';
+        const activeField = form.getActiveField(fieldName);
+
+        expect(activeField.label).toBe('Image');
+        expect(activeField.name).toBe('body.children.2.props');
+
+        const urlField = activeField.fields[0];
+        expect(urlField.label).toBe('URL');
+        expect(urlField.name).toBe('body.children.2.url');
+        expect(urlField.name).not.toContain('.props.');
+
+        expect(activeField.fields[1].name).toBe('body.children.2.alt');
+        expect(activeField.fields[2].name).toBe('body.children.2.caption');
+      });
+    });
   });
 });

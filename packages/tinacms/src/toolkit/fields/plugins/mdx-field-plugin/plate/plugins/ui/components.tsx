@@ -13,6 +13,7 @@ import {
   CodeSyntaxPlugin,
 } from '@udecode/plate-code-block/react';
 import { HEADING_KEYS } from '@udecode/plate-heading';
+import { HighlightPlugin } from '@udecode/plate-highlight/react';
 import { HorizontalRulePlugin } from '@udecode/plate-horizontal-rule/react';
 import { LinkPlugin } from '@udecode/plate-link/react';
 import {
@@ -45,6 +46,7 @@ import {
 } from '../../components/plate-ui/table/table-cell-element';
 import { TableElement } from '../../components/plate-ui/table/table-element';
 import { TableRowElement } from '../../components/plate-ui/table/table-row-element';
+import colorString from 'color-string';
 import { classNames } from './helpers';
 
 /**
@@ -56,6 +58,35 @@ import { classNames } from './helpers';
 const blockClasses = 'mt-0.5';
 /** prose sets a bold font, making bold marks impossible to see */
 const headerClasses = 'font-normal';
+
+/**
+ * Returns black or white depending on the luminance of the given background
+ * color, ensuring the text on top meets WCAG contrast requirements.
+ * Accepts any CSS color format (hex, rgb, hsl, named colors).
+ */
+function getContrastColor(color: string): string {
+  const parsed = colorString.get.rgb(color);
+  if (!parsed) return '#000000';
+  const [r, g, b] = parsed;
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.5 ? '#000000' : '#ffffff';
+}
+
+const HighlightLeaf = ({
+  leaf,
+  ...props
+}: React.ComponentProps<typeof PlateLeaf>) => {
+  const backgroundColor = (leaf.highlightColor as string) || '#FEF08A';
+  return (
+    <PlateLeaf
+      as='mark'
+      className='rounded-sm'
+      style={{ backgroundColor, color: getContrastColor(backgroundColor) }}
+      leaf={leaf}
+      {...props}
+    />
+  );
+};
 
 export const Components = () => {
   return {
@@ -209,6 +240,7 @@ export const Components = () => {
     [ListItemPlugin.key]: withProps(PlateElement, { as: 'li' }),
     [LinkPlugin.key]: LinkElement,
     [CodePlugin.key]: CodeLeaf,
+    [HighlightPlugin.key]: HighlightLeaf,
     [UnderlinePlugin.key]: withProps(PlateLeaf, { as: 'u' }),
     [StrikethroughPlugin.key]: withProps(PlateLeaf, { as: 's' }),
     [ItalicPlugin.key]: withProps(PlateLeaf, { as: 'em' }),

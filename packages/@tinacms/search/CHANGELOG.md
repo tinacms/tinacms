@@ -1,5 +1,89 @@
 # @tinacms/search
 
+## 1.2.12
+
+### Patch Changes
+
+- Updated dependencies [[`01e6e4b`](https://github.com/tinacms/tinacms/commit/01e6e4b08e52d777c0c07d4448930cfa5599a6bc), [`a85b1c0`](https://github.com/tinacms/tinacms/commit/a85b1c0ff44d8c214be47f89531beaf0e9dc234c)]:
+  - @tinacms/graphql@2.3.0
+  - @tinacms/schema-tools@2.7.3
+
+## 1.2.11
+
+### Patch Changes
+
+- Updated dependencies [[`8194482`](https://github.com/tinacms/tinacms/commit/81944822373ad2d548871b880d586492efe71f3f), [`b260b5e`](https://github.com/tinacms/tinacms/commit/b260b5ed4beb5d678b9605357b99a8667fddc8de)]:
+  - @tinacms/graphql@2.2.5
+
+## 1.2.10
+
+### Patch Changes
+
+- Updated dependencies [[`cd262b3`](https://github.com/tinacms/tinacms/commit/cd262b311c218ea4e5b5bb8abbbe54fcff3b8054), [`4a8627b`](https://github.com/tinacms/tinacms/commit/4a8627b66fccf3396e790ae88fe7bb79408b4808), [`c75d871`](https://github.com/tinacms/tinacms/commit/c75d87121224f91dc4e5e2aa8af60b0881b87a5b)]:
+  - @tinacms/schema-tools@2.7.2
+  - @tinacms/graphql@2.2.4
+
+## 1.2.9
+
+### Patch Changes
+
+- Updated dependencies [[`4315d73`](https://github.com/tinacms/tinacms/commit/4315d731e729857713d5f3fc6cdef2b30abd9384)]:
+  - @tinacms/schema-tools@2.7.1
+  - @tinacms/graphql@2.2.3
+
+## 1.2.8
+
+### Patch Changes
+
+- Updated dependencies [[`f124eab`](https://github.com/tinacms/tinacms/commit/f124eabaca10dac9a4d765c9e4135813c4830955), [`71bb5c2`](https://github.com/tinacms/tinacms/commit/71bb5c2944245195397e84a6314278cb40de0e66)]:
+  - @tinacms/graphql@2.2.2
+
+## 1.2.7
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/graphql@2.2.1
+  - @tinacms/schema-tools@2.7.0
+
+## 1.2.6
+
+### Patch Changes
+
+- Updated dependencies [[`0712649`](https://github.com/tinacms/tinacms/commit/0712649d48881f928f3399aaca88782a0a5a8f32)]:
+  - @tinacms/graphql@2.2.0
+
+## 1.2.5
+
+### Patch Changes
+
+- Updated dependencies [[`56d533e`](https://github.com/tinacms/tinacms/commit/56d533e610a520ba66b3e58f3a0dc03487d5d5d7), [`60510bb`](https://github.com/tinacms/tinacms/commit/60510bbf8d1b78cad901722d4f9003665412d71e)]:
+  - @tinacms/schema-tools@2.7.0
+  - @tinacms/graphql@2.1.4
+
+## 1.2.4
+
+### Patch Changes
+
+- Updated dependencies [[`c2517c2`](https://github.com/tinacms/tinacms/commit/c2517c295fb7b1d2b05923e5176be7f3131b4381)]:
+  - @tinacms/graphql@2.1.3
+
+## 1.2.3
+
+### Patch Changes
+
+- Updated dependencies [[`39fa13a`](https://github.com/tinacms/tinacms/commit/39fa13aae6af31c0f0b505e841e28d8d5a3886b9), [`f90d47b`](https://github.com/tinacms/tinacms/commit/f90d47b746b000e65324da430aacc8fd623f5065), [`6988450`](https://github.com/tinacms/tinacms/commit/6988450c7ae64c569e0340515f3105ee5eb305b7)]:
+  - @tinacms/graphql@2.1.2
+  - @tinacms/schema-tools@2.6.0
+
+## 1.2.2
+
+### Patch Changes
+
+- Updated dependencies [[`4eb9252`](https://github.com/tinacms/tinacms/commit/4eb92520249696007556b52f3c48333bdf8ebf4d)]:
+  - @tinacms/schema-tools@2.5.0
+  - @tinacms/graphql@2.1.1
+
 ## 1.2.1
 
 ### Patch Changes

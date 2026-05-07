@@ -1,5 +1,110 @@
 # tina-graphql
 
+## 2.3.0
+
+### Minor Changes
+
+- [#6740](https://github.com/tinacms/tinacms/pull/6740) [`01e6e4b`](https://github.com/tinacms/tinacms/commit/01e6e4b08e52d777c0c07d4448930cfa5599a6bc) Thanks [@kulesy](https://github.com/kulesy)! - Add optional `branch` and `mediaBranch` fields to `GraphQLConfig`. When the host passes a `branch` that differs from `mediaBranch`, image field resolution prefixes the CDN path with `/__staging/{encodedBranch}/`, and `resolveMediaCloudToRelative` strips that segment back to the relative path on the write side. Self-hosted (`useRelativeMedia: true`) and main-branch behaviour are unchanged.
+
+### Patch Changes
+
+- Updated dependencies [[`a85b1c0`](https://github.com/tinacms/tinacms/commit/a85b1c0ff44d8c214be47f89531beaf0e9dc234c)]:
+  - @tinacms/schema-tools@2.7.3
+  - @tinacms/mdx@2.1.3
+
+## 2.2.5
+
+### Patch Changes
+
+- [#6734](https://github.com/tinacms/tinacms/pull/6734) [`8194482`](https://github.com/tinacms/tinacms/commit/81944822373ad2d548871b880d586492efe71f3f) Thanks [@JackDevAU](https://github.com/JackDevAU)! - chore(@tinacms/graphql): remove duplicate atob/btoa from database/util.ts
+
+- [#6720](https://github.com/tinacms/tinacms/pull/6720) [`b260b5e`](https://github.com/tinacms/tinacms/commit/b260b5ed4beb5d678b9605357b99a8667fddc8de) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Migrate docs links in shipped package code from raw `tina.io/docs/<path>` URLs to aliased `tina.io/docs/r/<alias>` URLs so the links survive future docs restructuring.
+
+## 2.2.4
+
+### Patch Changes
+
+- [#6548](https://github.com/tinacms/tinacms/pull/6548) [`cd262b3`](https://github.com/tinacms/tinacms/commit/cd262b311c218ea4e5b5bb8abbbe54fcff3b8054) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Add 'displayOnly' field type for display-only form fields
+
+- [#6663](https://github.com/tinacms/tinacms/pull/6663) [`4a8627b`](https://github.com/tinacms/tinacms/commit/4a8627b66fccf3396e790ae88fe7bb79408b4808) Thanks [@18-th](https://github.com/18-th)! - Fix relativePath validation to reject whitespace and empty strings
+
+- [#6664](https://github.com/tinacms/tinacms/pull/6664) [`c75d871`](https://github.com/tinacms/tinacms/commit/c75d87121224f91dc4e5e2aa8af60b0881b87a5b) Thanks [@18-th](https://github.com/18-th)! - Validate relativePath to reject whitespace and invalid characters
+
+- Updated dependencies [[`cd262b3`](https://github.com/tinacms/tinacms/commit/cd262b311c218ea4e5b5bb8abbbe54fcff3b8054), [`55dae8e`](https://github.com/tinacms/tinacms/commit/55dae8eef898f49f827c00bc72297863d0d69be1)]:
+  - @tinacms/schema-tools@2.7.2
+  - @tinacms/mdx@2.1.2
+
+## 2.2.3
+
+### Patch Changes
+
+- Updated dependencies [[`4315d73`](https://github.com/tinacms/tinacms/commit/4315d731e729857713d5f3fc6cdef2b30abd9384)]:
+  - @tinacms/schema-tools@2.7.1
+  - @tinacms/mdx@2.1.1
+
+## 2.2.2
+
+### Patch Changes
+
+- [#6552](https://github.com/tinacms/tinacms/pull/6552) [`f124eab`](https://github.com/tinacms/tinacms/commit/f124eabaca10dac9a4d765c9e4135813c4830955) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Fix symlink/junction path traversal bypass (GHSA-g87c-r2jp-293w, GHSA-g9c2-gf25-3x67)
+
+- [#6545](https://github.com/tinacms/tinacms/pull/6545) [`71bb5c2`](https://github.com/tinacms/tinacms/commit/71bb5c2944245195397e84a6314278cb40de0e66) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Fix path traversal bypass via backslash sequences
+
+  On POSIX systems, path.normalize() treats backslashes as literal characters, not directory separators. This allowed attackers to bypass the existing path traversal checks using paths like x\..\..\package.json — the validation saw no traversal, but downstream path.join()/fs operations could resolve the backslashes as separators.
+
+  Fixes GHSA-v9p7-gf3q-h779
+
+## 2.2.1
+
+### Patch Changes
+
+- Updated dependencies [[`059f480`](https://github.com/tinacms/tinacms/commit/059f480697ae1af813c165df3cc8954443737488)]:
+  - @tinacms/mdx@2.1.0
+  - @tinacms/schema-tools@2.7.0
+
+## 2.2.0
+
+### Minor Changes
+
+- [#6478](https://github.com/tinacms/tinacms/pull/6478) [`0712649`](https://github.com/tinacms/tinacms/commit/0712649d48881f928f3399aaca88782a0a5a8f32) Thanks [@Ben0189](https://github.com/Ben0189)! - Add `levelBatchSize` option to `DatabaseArgs` to allow consumers to override the default Level batch size of 25
+
+## 2.1.4
+
+### Patch Changes
+
+- Updated dependencies [[`56d533e`](https://github.com/tinacms/tinacms/commit/56d533e610a520ba66b3e58f3a0dc03487d5d5d7), [`60510bb`](https://github.com/tinacms/tinacms/commit/60510bbf8d1b78cad901722d4f9003665412d71e)]:
+  - @tinacms/schema-tools@2.7.0
+  - @tinacms/mdx@2.0.7
+
+## 2.1.3
+
+### Patch Changes
+
+- [#6440](https://github.com/tinacms/tinacms/pull/6440) [`c2517c2`](https://github.com/tinacms/tinacms/commit/c2517c295fb7b1d2b05923e5176be7f3131b4381) Thanks [@18-th](https://github.com/18-th)! - \* Add path traversal protection and tests for [GHSA-5hxf-c7j4-279c](https://github.com/tinacms/tinacms/security/advisories/GHSA-5hxf-c7j4-279c) path traversal vulnerability
+  - Add path traversal protection and tests for [GHSA-2f24-mg4x-534q](https://github.com/tinacms/tinacms/security/advisories/GHSA-2f24-mg4x-534q) path traversal vulnerability
+
+## 2.1.2
+
+### Patch Changes
+
+- [#6375](https://github.com/tinacms/tinacms/pull/6375) [`39fa13a`](https://github.com/tinacms/tinacms/commit/39fa13aae6af31c0f0b505e841e28d8d5a3886b9) Thanks [@TihomirIvanov](https://github.com/TihomirIvanov)! - - Updated dependency jsonpath-plus
+
+  - Fixes security vulnerabilities
+
+- [#6368](https://github.com/tinacms/tinacms/pull/6368) [`6988450`](https://github.com/tinacms/tinacms/commit/6988450c7ae64c569e0340515f3105ee5eb305b7) Thanks [@wicksipedia](https://github.com/wicksipedia)! - GraphQL - Security improvement to the GraphQL resolver to ensure that path traversal sequences (e.g., `../`) in document and folder operations are correctly validated and restricted to the collection's root directory. This prevents unauthorized file operations outside of a collection's configured path.
+
+- Updated dependencies [[`f90d47b`](https://github.com/tinacms/tinacms/commit/f90d47b746b000e65324da430aacc8fd623f5065)]:
+  - @tinacms/schema-tools@2.6.0
+  - @tinacms/mdx@2.0.6
+
+## 2.1.1
+
+### Patch Changes
+
+- Updated dependencies [[`4eb9252`](https://github.com/tinacms/tinacms/commit/4eb92520249696007556b52f3c48333bdf8ebf4d)]:
+  - @tinacms/schema-tools@2.5.0
+  - @tinacms/mdx@2.0.5
+
 ## 2.1.0
 
 ### Minor Changes

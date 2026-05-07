@@ -33,6 +33,9 @@ topologicalDeps.txt
 # Ignore any .next folder
 **/.next/**
 
+# Coverage reports
+**/coverage/
+
 # Turborepo
 .turbo
 build/**
@@ -46,3 +49,10 @@ dist/**
 **/.env
 
 .cursor/rules/*
+
+# Local Claude Code documentation
+.claude/*
+
+# Fallow (keep snapshots/ versioned so progress is visible in history)
+.fallow/cache.bin
+.fallow/churn.bin

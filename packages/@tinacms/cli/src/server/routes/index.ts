@@ -2,9 +2,10 @@
 
 */
 
-import { Router } from 'express';
 import { join } from 'path';
+import { Router } from 'express';
 import multer from 'multer';
+import { PathTraversalError, assertPathWithinBase } from '../../utils/path';
 import { MediaModel, PathConfig } from '../models/media';
 
 export const createMediaRouter = (config: PathConfig): Router => {
@@ -18,7 +19,21 @@ export const createMediaRouter = (config: PathConfig): Router => {
       cb(null, mediaFolder);
     },
     filename: function (req, _file, cb) {
+      // @security req.params[0] is untrusted — the upload filename could
+      // contain traversal sequences like `../../etc/shadow`. We validate it
+      // before passing it to multer.
       const file = req.params[0];
+      try {
+        // Validate that the filename doesn't escape mediaFolder.
+        // assertPathWithinBase returns the resolved absolute path, but multer
+        // concatenates destination + filename via path.join internally, so we
+        // need to pass only the relative portion back. We validate here and
+        // pass the original relative name; multer will join it with the
+        // already-validated destination.
+        assertPathWithinBase(file, mediaFolder);
+      } catch (error) {
+        return cb(error, undefined);
+      }
       cb(null, file);
     },
   });
@@ -31,21 +46,41 @@ export const createMediaRouter = (config: PathConfig): Router => {
   const mediaRouter = Router();
 
   mediaRouter.get('/list/*', async (req, res) => {
-    const folder = req.params[0];
-    const cursor = req.query.cursor as string;
-    const limit = req.query.limit as string;
-    const media = await mediaModel.listMedia({
-      searchPath: folder,
-      cursor,
-      limit,
-    });
-    res.json(media);
+    try {
+      // @security req.params[0] is untrusted user input — path traversal
+      // validation happens inside mediaModel.listMedia via resolveWithinBase.
+      const folder = req.params[0];
+      const cursor = req.query.cursor as string;
+      const limit = req.query.limit as string;
+      const media = await mediaModel.listMedia({
+        searchPath: folder,
+        cursor,
+        limit,
+      });
+      res.json(media);
+    } catch (error) {
+      if (error instanceof PathTraversalError) {
+        res.status(403).json({ error: error.message });
+        return;
+      }
+      throw error;
+    }
   });
 
   mediaRouter.delete('/*', async (req, res) => {
-    const file = req.params[0];
-    const didDelete = await mediaModel.deleteMedia({ searchPath: file });
-    res.json(didDelete);
+    try {
+      // @security req.params[0] is untrusted user input — path traversal
+      // validation happens inside mediaModel.deleteMedia via resolveStrictlyWithinBase.
+      const file = req.params[0];
+      const didDelete = await mediaModel.deleteMedia({ searchPath: file });
+      res.json(didDelete);
+    } catch (error) {
+      if (error instanceof PathTraversalError) {
+        res.status(403).json({ error: error.message });
+        return;
+      }
+      throw error;
+    }
   });
 
   mediaRouter.post('/upload/*', async function (req, res) {

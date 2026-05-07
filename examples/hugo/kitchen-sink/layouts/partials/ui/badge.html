@@ -1,0 +1,12 @@
+{{/*
+  Badge partial — small pill badge for tags, hobbies, and similar lists.
+  Parameters (via dict):
+    .text — badge text
+    .size — "sm" or "md" (default)
+*/}}
+{{ $size := .size | default "md" }}
+{{ $sizeClass := cond (eq $size "sm") "text-sm px-2 py-1" "px-3 py-1" }}
+
+<span class="{{ $sizeClass }} bg-theme-50 dark:bg-theme-700/20 text-theme-700 dark:text-theme-200 rounded-full inline-block">
+  {{ .text }}
+</span>

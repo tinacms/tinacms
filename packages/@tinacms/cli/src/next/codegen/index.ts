@@ -8,6 +8,7 @@ import { ConfigManager } from '../config-manager';
 import type { TinaSchema } from '@tinacms/schema-tools';
 import { mapUserFields } from '@tinacms/graphql';
 import normalizePath from 'normalize-path';
+import { stripSearchTokenFromConfig } from './stripSearchTokenFromConfig';
 export const TINA_HOST = 'content.tinajs.io';
 
 export class Codegen {
@@ -23,10 +24,14 @@ export class Codegen {
   localUrl: string;
   // production url
   productionUrl: string;
+  // URL for the local GraphQL server used during --content=local builds
+  localBuildUrl?: string;
   graphqlSchemaDoc: DocumentNode;
   tinaSchema: TinaSchema;
   lookup: any;
   noClientBuildCache: boolean;
+  // When true, queries run locally but the generated client points to TinaCloud
+  localContentBuild: boolean;
 
   constructor({
     configManager,
@@ -34,6 +39,7 @@ export class Codegen {
     queryDoc,
     fragDoc,
     isLocal,
+    localContentBuild,
     graphqlSchemaDoc,
     tinaSchema,
     lookup,
@@ -44,12 +50,14 @@ export class Codegen {
     queryDoc: string;
     fragDoc: string;
     isLocal: boolean;
+    localContentBuild?: boolean;
     graphqlSchemaDoc: DocumentNode;
     tinaSchema: TinaSchema;
     lookup: any;
     noClientBuildCache: boolean;
   }) {
     this.isLocal = isLocal;
+    this.localContentBuild = localContentBuild || false;
     this.graphqlSchemaDoc = graphqlSchemaDoc;
     this.configManager = configManager;
     this.port = port;
@@ -97,18 +105,11 @@ export class Codegen {
       JSON.stringify(this.graphqlSchemaDoc)
     );
 
-    // Include search config in lock file, but exclude sensitive indexerToken
-    // Only add search if search.tina exists - plain search without tina is not included
-    const { search, ...rest } = this.tinaSchema.schema.config;
-    if (search?.tina) {
-      const { indexerToken, ...safeSearchConfig } = search.tina;
-      this.tinaSchema.schema.config = {
-        ...rest,
-        search: { tina: safeSearchConfig },
-      };
-    } else {
-      this.tinaSchema.schema.config = rest;
-    }
+    // Strip the sensitive indexerToken before writing to _schema.json / tina-lock.json.
+    // See CVE-2024-45391 / GHSA-4qrm-9h4r-v2fx for security context.
+    this.tinaSchema.schema.config = stripSearchTokenFromConfig(
+      this.tinaSchema.schema.config
+    );
 
     // update _schema.json
     await this.writeConfigFile(
@@ -118,10 +119,12 @@ export class Codegen {
     // update _lookup.json
     await this.writeConfigFile('_lookup.json', JSON.stringify(this.lookup));
 
-    const { apiURL, localUrl, tinaCloudUrl } = this._createApiUrl();
+    const { apiURL, localUrl, tinaCloudUrl, localBuildUrl } =
+      this._createApiUrl();
     this.apiURL = apiURL;
     this.localUrl = localUrl;
     this.productionUrl = tinaCloudUrl;
+    this.localBuildUrl = localBuildUrl;
 
     if (this.configManager.shouldSkipSDK()) {
       await this.removeGeneratedFilesIfExists();
@@ -241,16 +244,22 @@ export class Codegen {
     let localUrl = `http://localhost:${this.port}/graphql`;
     let tinaCloudUrl = `${baseUrl}/${version}/content/${clientId}/github/${branch}`;
 
-    let apiURL = this.isLocal
-      ? `http://localhost:${this.port}/graphql`
-      : `${baseUrl}/${version}/content/${clientId}/github/${branch}`;
+    let apiURL: string;
+    if (this.isLocal && !this.localContentBuild) {
+      apiURL = `http://localhost:${this.port}/graphql`;
+    } else {
+      apiURL = `${baseUrl}/${version}/content/${clientId}/github/${branch}`;
+    }
 
     if (this.configManager.config.contentApiUrlOverride) {
       apiURL = this.configManager.config.contentApiUrlOverride;
       localUrl = apiURL;
       tinaCloudUrl = apiURL;
     }
-    return { apiURL, localUrl, tinaCloudUrl };
+    const localBuildUrl = this.port
+      ? `http://localhost:${this.port}/graphql`
+      : undefined;
+    return { apiURL, localUrl, tinaCloudUrl, localBuildUrl };
   }
 
   getApiURL() {
@@ -288,7 +297,7 @@ export class Codegen {
 import { resolve } from "@tinacms/datalayer";
 import type { TinaClient } from "tinacms/dist/client";
 
-import { queries } from "./types";
+import { queries } from "${this.configManager.isUsingTs() ? './types.ts' : './types.js'}";
 import database from "../database";
 
 export async function databaseRequest({ query, variables, user }) {
@@ -356,14 +365,14 @@ export default databaseClient;
     const apiURL = this.getApiURL();
 
     const clientString = `import { createClient } from "tinacms/dist/client";
-import { queries } from "./types";
+import { queries } from "${this.configManager.isUsingTs() ? './types.ts' : './types.js'}";
 export const client = createClient({ ${
       this.noClientBuildCache === false
         ? `cacheDir: '${normalizePath(
             this.configManager.generatedCachePath
           )}', `
         : ''
-    }url: '${apiURL}', token: '${token}', queries, ${
+    }url: ${this.localContentBuild ? `process.env.TINA_LOCAL_URL || '${apiURL}'` : `'${apiURL}'`}, token: '${token}', queries, ${
       errorPolicy ? `errorPolicy: '${errorPolicy}'` : ''
     } });
 export default client;

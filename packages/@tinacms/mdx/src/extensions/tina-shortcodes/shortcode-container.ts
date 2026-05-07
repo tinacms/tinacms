@@ -1,5 +1,11 @@
 import type { Pattern } from '../../stringify';
-import type { Construct, Tokenizer, State, Token } from 'micromark-util-types';
+import type {
+  Construct,
+  ContentType,
+  Tokenizer,
+  State,
+  Token,
+} from 'micromark-util-types';
 import { ok as assert } from 'uvu/assert';
 import { factorySpace } from 'micromark-factory-space';
 import { markdownLineEnding, markdownSpace } from 'micromark-util-character';
@@ -170,7 +176,7 @@ export const directiveContainer: (pattern: Pattern) => Construct = (
       }
 
       const token = effects.enter(types.chunkDocument, {
-        contentType: constants.contentTypeDocument,
+        contentType: constants.contentTypeDocument as ContentType,
         previous,
       });
       if (previous) previous.next = token;

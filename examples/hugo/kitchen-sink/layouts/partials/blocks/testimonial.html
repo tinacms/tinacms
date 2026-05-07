@@ -1,0 +1,8 @@
+{{/*
+  Testimonial block — decorative quote with author attribution.
+  Context: block data from page frontmatter.
+*/}}
+{{ $color := .color | default "primary" }}
+
+{{ $sectionContent := partial "blocks/testimonial-content.html" . }}
+{{ partial "section.html" (dict "color" $color "content" $sectionContent) }}

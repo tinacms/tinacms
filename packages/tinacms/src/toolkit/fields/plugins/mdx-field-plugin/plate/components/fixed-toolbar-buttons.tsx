@@ -27,6 +27,7 @@ import { ToolbarGroup } from './plate-ui/toolbar';
 import {
   BoldToolbarButton,
   CodeToolbarButton,
+  HighlightToolbarButton,
   ItalicToolbarButton,
   StrikethroughToolbarButton,
 } from './plate-ui/mark-toolbar-button';
@@ -38,7 +39,7 @@ import {
 import { ListToolbarButton } from './plate-ui/indent-list-toolbar-button';
 import { TableDropdownMenu } from './plate-ui/table/table-dropdown-menu';
 import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
-import { cn } from '@udecode/cn';
+import { cn } from '@utils/cn';
 
 type ToolbarItem = {
   label: string;
@@ -96,6 +97,11 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
     label: 'Strikethrough',
     width: () => STANDARD_ICON_WIDTH,
     Component: <StrikethroughToolbarButton />,
+  },
+  highlight: {
+    label: 'Highlight',
+    width: () => STANDARD_ICON_WIDTH,
+    Component: <HighlightToolbarButton />,
   },
   italic: {
     label: 'Italic',

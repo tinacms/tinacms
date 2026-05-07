@@ -89,6 +89,7 @@ export const markdownToAst = (value: string, field: RichTextType) => {
     mdastExtensions: [gfmFromMarkdown(), directiveFromMarkdown],
   });
 };
+
 export const mdxToAst = (value: string) => {
   return remark().use(remarkMdx).use(remarkGfm).parse(value);
 };

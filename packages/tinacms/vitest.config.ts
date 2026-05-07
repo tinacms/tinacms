@@ -11,6 +11,7 @@ export default defineConfig({
     alias: {
       '@toolkit': path.resolve(__dirname, './src/toolkit'),
       '@tinacms/toolkit': path.resolve(__dirname, 'src/toolkit/index.ts'),
+      '@utils': path.resolve(__dirname, 'src/utils'),
     },
   },
 });

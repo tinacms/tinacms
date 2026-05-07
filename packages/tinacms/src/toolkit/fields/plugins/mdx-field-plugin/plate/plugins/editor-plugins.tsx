@@ -11,6 +11,7 @@ import { ExitBreakPlugin, SoftBreakPlugin } from '@udecode/plate-break/react';
 import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 import { HEADING_KEYS, HEADING_LEVELS } from '@udecode/plate-heading';
 import { HeadingPlugin } from '@udecode/plate-heading/react';
+import { HighlightPlugin } from '@udecode/plate-highlight/react';
 import { HorizontalRulePlugin } from '@udecode/plate-horizontal-rule/react';
 import { IndentListPlugin } from '@udecode/plate-indent-list/react';
 import { LinkPlugin } from '@udecode/plate-link/react';
@@ -90,6 +91,7 @@ const resetBlockTypesCodeBlockRule = {
 export const viewPlugins = [
   BasicMarksPlugin,
   UnderlinePlugin,
+  HighlightPlugin,
   HeadingPlugin.configure({ options: { levels: 6 } }),
   ParagraphPlugin,
   CodeBlockPlugin.configure({
@@ -102,6 +104,40 @@ const CorrectNodeBehaviorPlugin = createSlatePlugin({
   key: 'WITH_CORRECT_NODE_BEHAVIOR',
 });
 
+const ClearHighlightOnEnterPlugin = createSlatePlugin({
+  key: 'CLEAR_HIGHLIGHT_ON_ENTER',
+}).overrideEditor(({ editor, tf: { insertBreak } }) => ({
+  transforms: {
+    insertBreak() {
+      const keyboardEvent = editor.currentKeyboardEvent;
+      const isPlainEnter =
+        keyboardEvent?.key === 'Enter' &&
+        !keyboardEvent.shiftKey &&
+        !keyboardEvent.metaKey &&
+        !keyboardEvent.ctrlKey &&
+        !keyboardEvent.altKey;
+      const activeMarks = editor.api.marks();
+      const hasHighlight = Boolean(
+        activeMarks?.highlight || activeMarks?.highlightColor
+      );
+
+      insertBreak();
+
+      if (!isPlainEnter || !hasHighlight) {
+        return;
+      }
+
+      editor.tf.removeMark('highlight');
+      editor.tf.removeMark('highlightColor');
+
+      editor.tf.unsetNodes(['highlight', 'highlightColor'], {
+        at: editor.selection ?? undefined,
+        match: (node) => editor.api.isText(node),
+      });
+    },
+  },
+}));
+
 // Editor Plugins: Functional and formatting plugins
 export const editorPlugins = [
   createMdxBlockPlugin,
@@ -112,6 +148,7 @@ export const editorPlugins = [
   createBlockquoteEnterBreakPlugin,
   createInvalidMarkdownPlugin,
   CorrectNodeBehaviorPlugin,
+  ClearHighlightOnEnterPlugin,
   LinkPlugin.configure({
     options: {
       // Custom validation function to allow relative links, e.g., /about

@@ -29,8 +29,94 @@ import CollectionUpdatePage from './pages/CollectionUpdatePage';
 import DashboardPage from './pages/DashboardPage';
 import ScreenPage from './pages/ScreenPage';
 
-import { Client } from '../internalClient';
+import { Client, TinaCloudAuthProvider } from '../internalClient';
 import { TinaAdminApi } from './api';
+import {
+  initializePostHog,
+  TinaCMSStartedEvent,
+  TelemetryMode,
+} from '../lib/posthog';
+import pkg from '../../package.json';
+
+type AuthType = 'tinacloud' | 'self-hosted' | 'local' | 'other';
+
+const TROUBLESHOOTING_URL = 'https://tina.io/docs/tinacloud/troubleshooting';
+
+const ErrorModalContent = (props: { title: string; message: string }) => {
+  const { title, message } = props;
+  return (
+    <>
+      <div>{title}</div>
+      <p>{message}</p>
+      <a href={TROUBLESHOOTING_URL} target='_blank' rel='noopener noreferrer'>
+        Learn more
+      </a>
+    </>
+  );
+};
+
+const showErrorModal = (title: string, message: string, cms: TinaCMS) => {
+  if (cms.alerts.all.some((a) => a.level === 'error')) return;
+  cms.alerts.error(() => <ErrorModalContent title={title} message={message} />);
+};
+
+const getBackendType = (client: Client | undefined): AuthType => {
+  if (!client) return 'other';
+
+  if (client.isLocalMode) {
+    return 'local';
+  }
+
+  // Self-hosted uses a custom content API URL
+  if (
+    client.isCustomContentApi ||
+    client.schema?.config?.config?.contentApiUrlOverride
+  ) {
+    return 'self-hosted';
+  }
+
+  // TinaCloud uses TinaCloudAuthProvider
+  if (client.authProvider instanceof TinaCloudAuthProvider) {
+    return 'tinacloud';
+  }
+
+  return 'other';
+};
+
+/**
+ * Component that initializes PostHog and tracks the TinaCMS started event.
+ * Respects the user's telemetry configuration:
+ * - "anonymous": Anonymous telemetry without user/project identification (default)
+ * - "disabled": No telemetry collected
+ */
+const PostHogTracker = ({ cms }: { cms: TinaCMS }) => {
+  useEffect(() => {
+    const client: Client | undefined = cms.api?.tina;
+    const backendType = getBackendType(client);
+
+    // Get telemetry mode from user config, default to 'anonymous'
+    const telemetryMode: TelemetryMode =
+      client?.schema?.config?.config?.telemetry || 'anonymous';
+
+    initializePostHog(telemetryMode).then((posthog) => {
+      if (posthog) {
+        const eventProperties: Record<string, string> = {
+          tinaCMSVersion: pkg.version,
+          system: 'tinacms/tinacms',
+          backendType: backendType,
+        };
+
+        if (backendType === 'tinacloud' && client?.clientId) {
+          eventProperties.clientId = client.clientId;
+        }
+
+        posthog.capture(TinaCMSStartedEvent, eventProperties);
+      }
+    });
+  }, [cms]);
+
+  return null;
+};
 
 const Redirect = () => {
   React.useEffect(() => {
@@ -130,20 +216,27 @@ const CheckSchema = ({
         .checkGraphqlSchema({
           localSchema: schemaJson,
         })
-        .then((x) => {
-          if (x === false) {
-            cms.alerts.error(
-              'GraphQL Schema Mismatch. Editing may not work. If you just switched branches, try going back to the previous branch'
+        .then((isSchemaMatchedToCloud) => {
+          if (isSchemaMatchedToCloud === false) {
+            showErrorModal(
+              'GraphQL Schema Mismatch',
+              'Editing may not work. If you just switched branches, try going back to the previous branch. If you just pushed changes, try pulling the latest.',
+              cms
             );
           }
         })
-        .catch((e) => {
+        .catch((error) => {
           // TODO: HACK- Check on an error id, rather than message string
-          if (e.message.includes('has not been indexed by TinaCloud')) {
+          if (error.message.includes('has not been indexed by TinaCloud')) {
             setSchemaMissingError(true);
           } else {
-            cms.alerts.error(`Unexpected error checking schema: ${e}`);
-            throw e;
+            console.error('Unexpected error checking schema:', error);
+            showErrorModal(
+              'Unexpected Error',
+              'An unexpected error occurred while validating your Tina schema. If after refreshing the issue persists, reach out to us on Discord.',
+              cms
+            );
+            throw error;
           }
         });
     }
@@ -199,7 +292,6 @@ export const TinaAdmin = ({
   if (isSSR) {
     return null;
   }
-
   return (
     <GetCMS>
       {(cms: TinaCMS) => {
@@ -214,6 +306,7 @@ export const TinaAdmin = ({
           const hasRouter = Boolean(collectionWithRouter);
           return (
             <>
+              <PostHogTracker cms={cms} />
               <CheckSchema schemaJson={schemaJson}>
                 <Router>
                   {/* @ts-ignore */}

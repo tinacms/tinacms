@@ -1,0 +1,3 @@
+{{ define "main" }}
+  {{ partial "page-section.html" (dict "title" "Blog" "content" (partial "blogs/blog-list-content.html" .)) }}
+{{ end }}

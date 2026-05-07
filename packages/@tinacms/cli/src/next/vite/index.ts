@@ -10,6 +10,8 @@ import {
   splitVendorChunkPlugin,
 } from 'vite';
 import type { ConfigManager } from '../config-manager';
+import { buildCorsOriginCheck } from './cors';
+import { filterPublicEnv } from './filterPublicEnv';
 import { tinaTailwind } from './tailwind';
 
 /**
@@ -112,32 +114,9 @@ export const createConfig = async ({
   plugins?: Plugin[];
   rollupOptions?: BuildOptions['rollupOptions'];
 }) => {
-  // TODO: make this configurable
-  const publicEnv: Record<string, string> = {};
-  Object.keys(process.env).forEach((key) => {
-    if (
-      key.startsWith('TINA_PUBLIC_') ||
-      key.startsWith('NEXT_PUBLIC_') ||
-      key === 'NODE_ENV' ||
-      key === 'HEAD'
-    ) {
-      try {
-        // if the value is a string, we can just use it
-        if (typeof process.env[key] === 'string') {
-          publicEnv[key] = process.env[key] as string;
-        } else {
-          // otherwise, we need to stringify it
-          publicEnv[key] = JSON.stringify(process.env[key]);
-        }
-      } catch (error) {
-        // if we can't stringify it, we'll just warn the user
-        console.warn(
-          `Could not stringify public env process.env.${key} env variable`
-        );
-        console.warn(error);
-      }
-    }
-  });
+  // Filter process.env to only include public vars safe for client bundles.
+  // See CVE-2023-25164 / GHSA-pc2q-jcxq-rjrr for security context.
+  const publicEnv = filterPublicEnv();
 
   const staticMediaPath: string = path.join(
     configManager.generatedFolderPath,
@@ -224,6 +203,13 @@ export const createConfig = async ({
     },
     server: {
       host: configManager.config?.build?.host ?? false,
+      // Restrict Vite's built-in CORS to the same origins our custom
+      // middleware allows (localhost + user-configured allowedOrigins).
+      cors: {
+        origin: buildCorsOriginCheck(
+          configManager.config?.server?.allowedOrigins
+        ),
+      },
       watch: noWatch
         ? {
             ignored: ['**/*'],
@@ -235,7 +221,18 @@ export const createConfig = async ({
             ],
           },
       fs: {
-        strict: false,
+        strict: true,
+        // Allow serving files from the project root and the SPA package.
+        // Without this, Vite would block access to tina config/generated
+        // files since the Vite root is the @tinacms/app package directory.
+        allow: [
+          configManager.spaRootPath,
+          configManager.rootPath,
+          ...(configManager.contentRootPath &&
+          configManager.contentRootPath !== configManager.rootPath
+            ? [configManager.contentRootPath]
+            : []),
+        ],
       },
     },
     build: {

@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { cn } from '@udecode/cn';
+import { cn } from '@utils/cn';
 import { PlateElement, withRef } from '@udecode/plate/react';
 
 export const ParagraphElement = withRef<typeof PlateElement>(

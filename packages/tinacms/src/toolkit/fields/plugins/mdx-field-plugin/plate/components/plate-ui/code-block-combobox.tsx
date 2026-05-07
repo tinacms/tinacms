@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 
 import type { TCodeBlockElement } from '@udecode/plate-code-block';
 
-import { cn } from '@udecode/cn';
+import { cn } from '@utils/cn';
 import { useElement, useReadOnly } from '@udecode/plate/react';
 import { Check, ChevronDown } from 'lucide-react';
 
@@ -75,7 +75,8 @@ const languages: { label: string; value: string }[] = [
   { label: 'Groovy', value: 'groovy' },
   { label: 'Handlebars', value: 'handlebars' },
   { label: 'Haskell', value: 'haskell' },
-  { label: 'HTML', value: 'htmlbars' },
+  { label: 'HTML', value: 'html' },
+  { label: 'HTMLBars', value: 'htmlbars' },
   { label: 'Julia', value: 'julia' },
   { label: 'LaTeX', value: 'latex' },
   { label: 'MATLAB', value: 'matlab' },

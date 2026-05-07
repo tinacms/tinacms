@@ -30,7 +30,7 @@ pnpm run build
 # watch all packages
 pnpm run watch
 # in a separate tab, navigate to starter project
-cd examples/basic-iframe
+cd examples/next/kitchen-sink
 # start the dev server
 pnpm run dev
 ```
@@ -99,7 +99,7 @@ Run `git checkout -- .` This will clear out the versioning changes.
 
 ### Local
 
-If the changes affect local use of the packages (i.e. not the ContentAPI), use the tina-cloud-starter found in the examples directory of this repo.
+If the changes affect local use of the packages (i.e. not the ContentAPI), use one of the example apps (e.g. `examples/next/kitchen-sink`).
 
 To use a **tinacms** repository cloned locally, when running your application, use the `--rootPath` flag:
 
@@ -107,7 +107,7 @@ To use a **tinacms** repository cloned locally, when running your application, u
 node tinacms/packages/@tinacms/cli/bin/tinacms dev --rootPath {{ APPLICATION PROJECT PATH }}
 ```
 
-e.g. `node tinacms/packages/@tinacms/cli/bin/tinacms dev --rootPath ~/Developer/tina/tina-cloud-starter`
+e.g. `node tinacms/packages/@tinacms/cli/bin/tinacms dev --rootPath ~/Developer/tina/examples/next/kitchen-sink`
 
 Then inside another terminal (in the tinacms project), run:
 
@@ -119,6 +119,41 @@ pnpm watch
 >
 > This will only work for packages loaded by webpack. That means that environments which don't use
 > webpack (i.e. SSR builds) will not use this alias
+
+## Windows
+
+### Symlinks
+
+The kitchen-sink example projects (`examples/next/kitchen-sink`, `examples/astro/kitchen-sink`, `examples/react/kitchen-sink`) share content and public assets from a central `examples/shared/` directory. This avoids duplicating files across framework examples.
+
+The shared structure:
+- `examples/shared/content/` — all content files (authors, blogs, global, pages, posts, tags)
+- `examples/shared/public/` — all public assets (uploads, blocks)
+
+**Content** is shared via TinaCMS's `localContentPath` config option — each project's `tina/config.tsx` sets `localContentPath: '../../../shared'` so TinaCMS reads content directly from `examples/shared/`. No symlinks are used for content directories (TinaCMS's path traversal security checks reject symlinks that resolve outside the project root).
+
+**Public assets** (`public/uploads`, `public/blocks`) are shared via directory symlinks to `examples/shared/public/`, since these are served by the web framework (not TinaCMS).
+
+On macOS and Linux, symlinks work automatically. On Windows, git defaults to creating text files instead of real symlinks, which will break the public asset symlinks.
+
+To clone with symlink support:
+
+```sh
+git clone -c core.symlinks=true <repo-url>
+```
+
+Or enable symlinks on an existing clone:
+
+```sh
+git config core.symlinks true
+git checkout -- .
+```
+
+Windows requires [Developer Mode](https://learn.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development) enabled for symlinks to work.
+
+### cross-env
+
+Scripts that set environment variables use `cross-env` for Windows compatibility. Windows `cmd` does not support the Unix `VAR=value command` syntax, so `cross-env` ensures environment variables are set correctly across all platforms.
 
 ## E2E tests
 

@@ -1,0 +1,10 @@
+{{/*
+  Hero block — tagline, headline, text, optional image, action buttons.
+  Context: block data from page frontmatter.
+*/}}
+{{ $color := .color | default "default" }}
+{{ $isPrimary := eq $color "primary" }}
+{{ $hasImage := and .image .image.src }}
+
+{{ $sectionContent := partial "blocks/hero-content.html" . }}
+{{ partial "section.html" (dict "color" $color "content" $sectionContent) }}

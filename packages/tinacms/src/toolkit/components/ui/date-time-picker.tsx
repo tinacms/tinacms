@@ -24,7 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from './select';
-import { cn } from '../../../utils/cn';
+import { cn } from '@utils/cn';
 
 // ---------- utils start ----------
 /**

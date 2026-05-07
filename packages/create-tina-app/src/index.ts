@@ -6,6 +6,7 @@ import {
   setupProjectDirectory,
   updateProjectPackageName,
   updateProjectPackageVersion,
+  updateTelemetryConfig,
   updateThemeSettings,
 } from './util/fileUtil';
 import { install } from './util/install';
@@ -325,33 +326,44 @@ export async function run() {
 
   let themeChoice: string | undefined;
   if (template.value === 'tina-docs') {
-    const res = await prompts({
-      name: 'theme',
-      type: 'select',
-      message: 'What theme would you like to use?',
-      choices: THEMES,
-    });
-    if (!Object.hasOwn(res, 'theme')) {
-      postHogCaptureError(
-        posthogClient,
-        userId,
-        sessionId,
-        new Error('User cancelled theme selection'),
-        {
-          errorCode: ERROR_CODES.ERR_CANCEL_THEME_PROMPT,
-          errorCategory: 'user-cancellation',
-          step: TRACKING_STEPS.THEME_SELECT,
-          fatal: true,
-          additionalProperties: {
-            ...telemetryData,
-            template: template.value,
-          },
-        }
-      );
-      if (posthogClient) await posthogClient.shutdown();
-      exit(1);
+    if (opts.theme) {
+      const validThemes = THEMES.map((t) => t.value);
+      if (!validThemes.includes(opts.theme)) {
+        console.error(
+          `Invalid theme "${opts.theme}". Valid options are: ${validThemes.join(', ')}`
+        );
+        exit(1);
+      }
+      themeChoice = opts.theme;
+    } else {
+      const res = await prompts({
+        name: 'theme',
+        type: 'select',
+        message: 'What theme would you like to use?',
+        choices: THEMES,
+      });
+      if (!Object.hasOwn(res, 'theme')) {
+        postHogCaptureError(
+          posthogClient,
+          userId,
+          sessionId,
+          new Error('User cancelled theme selection'),
+          {
+            errorCode: ERROR_CODES.ERR_CANCEL_THEME_PROMPT,
+            errorCategory: 'user-cancellation',
+            step: TRACKING_STEPS.THEME_SELECT,
+            fatal: true,
+            additionalProperties: {
+              ...telemetryData,
+              template: template.value,
+            },
+          }
+        );
+        if (posthogClient) await posthogClient.shutdown();
+        exit(1);
+      }
+      themeChoice = res.theme;
     }
-    themeChoice = res.theme;
   }
 
   const rootDir = path.join(process.cwd(), projectName);
@@ -408,6 +420,11 @@ export async function run() {
     spinner.start('Updating project metadata...');
     updateProjectPackageName(rootDir, projectName);
     updateProjectPackageVersion(rootDir, '0.0.1');
+
+    // If user opted out of telemetry, set it in the tina config
+    if (opts.noTelemetry) {
+      await updateTelemetryConfig(rootDir, 'disabled');
+    }
     spinner.succeed();
   } catch (err) {
     const error = err as Error;
@@ -495,22 +512,22 @@ export async function run() {
   console.log('Next steps:');
   console.log(
     `  • 📝 Edit some content: ${TextStyles.link(
-      'https://tina.io/docs/using-tina-editor'
+      'https://tina.io/docs/r/using-tina-editor'
     )}`
   );
   console.log(
     `  • 📖 Learn the basics: ${TextStyles.link(
-      'https://tina.io/docs/schema/'
+      'https://tina.io/docs/r/content-modelling-collections'
     )}`
   );
   console.log(
     `  • 🖌️ Extend Tina with custom field components: ${TextStyles.link(
-      'https://tina.io/docs/advanced/extending-tina/'
+      'https://tina.io/docs/r/custom-fields-react'
     )}`
   );
   console.log(
     `  • 🚀 Deploy to Production: ${TextStyles.link(
-      'https://tina.io/docs/tinacloud/'
+      'https://tina.io/docs/r/what-is-tinacloud'
     )}`
   );
 }

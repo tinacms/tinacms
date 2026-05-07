@@ -13,6 +13,7 @@ import {
 } from '@tinacms/toolkit';
 import React, { useEffect, useState } from 'react';
 import { ModalBuilder } from './AuthModal';
+import { AuthenticationCancelledError } from './authenticate';
 import loginLlama from './tina-login.png';
 
 import { TinaAdminApi } from '../admin/api';
@@ -24,6 +25,8 @@ import {
 } from '../internalClient';
 import { CreateClientProps, createClient } from '../utils';
 import { useTinaAuthRedirect } from './useTinaAuthRedirect';
+import { captureEvent } from '../lib/posthog/posthogProvider';
+import { BranchSwitchedEvent } from '../lib/posthog/posthog';
 
 type ModalNames = null | 'authenticate' | 'error';
 
@@ -60,7 +63,7 @@ const AuthWallInner = ({
   const loginScreen = client.authProvider.getLoginScreen();
   if (loginStrategy === 'LoginScreen' && !loginScreen) {
     throw new Error(
-      'LoginScreen is set as the login strategy but no login screen component was provided'
+      'LoginScreen is set as the login strategy but no login screen component was provided.'
     );
   }
 
@@ -96,7 +99,7 @@ const AuthWallInner = ({
               } else {
                 setErrorMessage({
                   title: 'Access Denied:',
-                  message: 'Not Authorized To Edit',
+                  message: 'Not authorized to edit.',
                 });
                 setActiveModal('error');
               }
@@ -151,7 +154,16 @@ const AuthWallInner = ({
         await client?.onLogin({ token });
       }
       return onAuthenticated();
-    } catch (e) {
+    } catch (e: any) {
+      // If user just closed the popup, silently reset - don't show error
+      // Check both instanceof and error name (in case of module boundary issues)
+      if (
+        e instanceof AuthenticationCancelledError ||
+        e?.name === 'AuthenticationCancelledError'
+      ) {
+        return;
+      }
+
       console.error(e);
       setActiveModal('error');
       setErrorMessage({
@@ -161,7 +173,7 @@ const AuthWallInner = ({
     }
   };
 
-  let modalTitle = 'Let’s get you editing with TinaCMS...';
+  let modalTitle = 'Let’s get you editing with TinaCMS!';
   if (
     activeModal === 'authenticate' &&
     loginStrategy === 'Redirect' &&
@@ -172,12 +184,12 @@ const AuthWallInner = ({
     activeModal === 'authenticate' &&
     loginStrategy === 'UsernamePassword'
   ) {
-    modalTitle = 'Let’s get you editing with TinaCMS...';
+    modalTitle = 'Let’s get you editing with TinaCMS!';
   } else if (activeModal === 'error') {
     if (loginStrategy === 'Redirect' && !isTinaCloud) {
       modalTitle = 'Enter into edit mode';
     } else if (loginStrategy === 'UsernamePassword') {
-      modalTitle = 'Let’s get you editing with TinaCMS...';
+      modalTitle = 'Let’s get you editing with TinaCMS!';
     }
   }
 
@@ -190,8 +202,10 @@ const AuthWallInner = ({
             isTinaCloud ? (
               <img
                 src={loginLlama}
-                alt='TinaCMS Security Illustration'
-                style={{ maxWidth: '100%', margin: '0 auto', display: 'block' }}
+                alt='Tina the Llama playing a large orange key like a guitar.'
+                width={816}
+                height={816}
+                style={{ width: '16rem', margin: '0 auto', display: 'block' }}
               />
             ) : (
               'When you save, changes will be saved to the local filesystem.'
@@ -348,6 +362,16 @@ export const TinaCloudProvider = (
   } else {
     cms.api.tina.setBranch(currentBranch);
   }
+
+  const previousBranchRef = React.useRef(currentBranch);
+  useEffect(() => {
+    if (previousBranchRef.current !== currentBranch) {
+      captureEvent(BranchSwitchedEvent, {
+        branchSwitchedTo: currentBranch,
+      });
+      previousBranchRef.current = currentBranch;
+    }
+  }, [currentBranch]);
 
   useEffect(() => {
     let searchClient;

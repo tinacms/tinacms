@@ -596,6 +596,8 @@ export class Builder {
     depth: number
   ) => Promise<SelectionSetNode | FieldNode | false> = async (field, depth) => {
     switch (field.type) {
+      case 'displayOnly':
+        return false;
       case 'string':
       case 'image':
       case 'datetime':
@@ -1098,6 +1100,8 @@ export class Builder {
 
   private _buildFieldFilter = async (field: TinaField<true>) => {
     switch (field.type) {
+      case 'displayOnly':
+        return undefined;
       case 'boolean':
         return astBuilder.InputValueDefinition({
           name: field.name,
@@ -1260,6 +1264,8 @@ export class Builder {
 
   private _buildFieldMutation = async (field: TinaField<true>) => {
     switch (field.type) {
+      case 'displayOnly':
+        return undefined;
       case 'boolean':
         return astBuilder.InputValueDefinition({
           name: field.name,
@@ -1532,6 +1538,8 @@ Visit https://tina.io/docs/r/content-fields/#list-fields/ for more information
 `;
 
     switch (field.type) {
+      case 'displayOnly':
+        return undefined;
       case 'boolean':
       case 'datetime':
       case 'number':

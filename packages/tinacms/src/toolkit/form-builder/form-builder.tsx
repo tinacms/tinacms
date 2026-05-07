@@ -1,17 +1,16 @@
 import type { Form } from '@toolkit/forms';
 import * as React from 'react';
 import { type FC, useEffect } from 'react';
+import { FORM_ERROR } from 'final-form';
 import { Form as FinalForm } from 'react-final-form';
-import { useBranchData } from '@toolkit/plugin-branch-switcher';
-import { Button, OverflowMenu } from '@toolkit/styles';
+import { Button } from '@toolkit/styles';
 import {
   DragDropContext,
   type DropResult,
 } from '../fields/plugins/dnd-kit-wrapper';
-import { AiOutlineLoading } from 'react-icons/ai';
-import { BiError, BiGitBranch } from 'react-icons/bi';
 import { FaCircle } from 'react-icons/fa';
-import { cn } from '../../utils/cn';
+import { cn } from '@utils/cn';
+import { FileStack } from 'lucide-react';
 import { useCMS } from '../react-core';
 import { FieldsBuilder } from './fields-builder';
 import { FormActionMenu } from './form-actions';
@@ -19,6 +18,13 @@ import { FormPortalProvider } from './form-portal';
 import { LoadingDots } from './loading-dots';
 import { ResetForm } from './reset-form';
 import { CreateBranchModal } from './create-branch-modal';
+import { BranchDeletedModal } from './branch-deleted-modal';
+import {
+  SavedContentEvent,
+  SaveContentErrorEvent,
+  FormResetEvent,
+} from '../../lib/posthog/posthog';
+import { captureEvent } from '../../lib/posthog/posthogProvider';
 
 export interface FormBuilderProps {
   form: { tinaForm: Form; activeFieldName?: string };
@@ -93,6 +99,9 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   const hideFooter = !!rest.hideFooter;
   const [createBranchModalOpen, setCreateBranchModalOpen] =
     React.useState(false);
+  const [deletedBranchModalOpen, setDeletedBranchModalOpen] =
+    React.useState(false);
+  const [isGuardChecking, setIsGuardChecking] = React.useState(false);
 
   const tinaForm = form.tinaForm;
   const finalForm = form.tinaForm.finalForm;
@@ -177,16 +186,93 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 
         const safeSubmit = async () => {
           if (canSubmit) {
-            await handleSubmit();
+            const alertsBefore = new Set(cms.alerts.all.map((a) => a.id));
+            console.debug(
+              '[tina:branch-guard] safeSubmit: calling handleSubmit'
+            );
+
+            const result = await handleSubmit();
+            if (result && result[FORM_ERROR]) {
+              const error = result[FORM_ERROR];
+              const errorMsg =
+                error instanceof Error ? error.message : String(error);
+
+              console.debug(
+                '[tina:branch-guard] safeSubmit: FORM_ERROR detected:',
+                errorMsg
+              );
+
+              // If the save failed because the branch no longer exists,
+              // intercept the generic error alert and replace it with the
+              // branch-deleted modal.
+              if (/branch.*not found/i.test(errorMsg)) {
+                console.debug(
+                  '[tina:branch-guard] safeSubmit: branch-not-found — dismissing alert and opening modal'
+                );
+                for (const alert of cms.alerts.all) {
+                  if (!alertsBefore.has(alert.id) && alert.level === 'error') {
+                    cms.alerts.dismiss(alert);
+                  }
+                }
+                setDeletedBranchModalOpen(true);
+                return;
+              }
+
+              captureEvent(SaveContentErrorEvent, {
+                documentPath: tinaForm.path,
+                error: errorMsg,
+              });
+            } else {
+              captureEvent(SavedContentEvent, {
+                documentPath: tinaForm.path,
+              });
+            }
+          } else {
+            console.debug(
+              '[tina:branch-guard] safeSubmit: skipped — canSubmit is false'
+            );
           }
         };
 
         const safeHandleSubmit = async () => {
+          setIsGuardChecking(true);
+
+          const currentBranch = decodeURIComponent(cms.api.tina.getBranch());
+
+          let exists = true;
+          try {
+            console.debug(
+              '[tina:branch-guard] safeHandleSubmit: checking branch:',
+              currentBranch
+            );
+            exists = await cms.api.tina.branchExists(currentBranch);
+          } catch (err) {
+            console.error(
+              '[tina:branch-guard] safeHandleSubmit: branchExists threw, failing open:',
+              err
+            );
+          }
+
+          console.debug(
+            '[tina:branch-guard] safeHandleSubmit: branchExists returned:',
+            exists
+          );
+          if (!exists) {
+            console.debug(
+              '[tina:branch-guard] safeHandleSubmit: branch missing — opening modal'
+            );
+            setIsGuardChecking(false);
+            setDeletedBranchModalOpen(true);
+            return;
+          }
+
           if (usingProtectedBranch) {
             setCreateBranchModalOpen(true);
           } else {
-            safeSubmit();
+            await safeSubmit();
           }
+
+          setIsGuardChecking(false);
         };
 
         return (
@@ -197,7 +283,22 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                 crudType={tinaForm.crudType}
                 path={tinaForm.path}
                 values={tinaForm.values}
+                tinaForm={tinaForm}
                 close={() => setCreateBranchModalOpen(false)}
+                onBaseBranchDeleted={() => {
+                  setCreateBranchModalOpen(false);
+                  setDeletedBranchModalOpen(true);
+                }}
+              />
+            )}
+            {deletedBranchModalOpen && (
+              <BranchDeletedModal
+                branchName={decodeURIComponent(cms.api.tina.getBranch())}
+                close={() => setDeletedBranchModalOpen(false)}
+                path={tinaForm.path}
+                values={tinaForm.values}
+                crudType={tinaForm.crudType}
+                tinaForm={tinaForm}
               />
             )}
             <DragDropContext onDragEnd={moveArrayItem}>
@@ -216,36 +317,40 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                 </FormWrapper>
               </FormPortalProvider>
               {!hideFooter && (
-                <div className='relative flex-none w-full h-16 px-6 bg-white border-t border-gray-100 flex items-center justify-end'>
-                  <div className='flex-1 w-full justify-end gap-2	flex items-center max-w-form'>
-                    {tinaForm.reset && (
-                      <ResetForm
-                        pristine={pristine}
-                        reset={async () => {
-                          finalForm.reset();
-                          await tinaForm.reset!();
-                        }}
+                <>
+                  <RelatedFilesBanner />
+                  <div className='relative flex-none w-full h-16 px-6 bg-white border-t border-gray-100 flex items-center justify-end'>
+                    <div className='flex-1 w-full justify-end gap-2	flex items-center max-w-form'>
+                      {tinaForm.reset && (
+                        <ResetForm
+                          pristine={pristine}
+                          reset={async () => {
+                            finalForm.reset();
+                            await tinaForm.reset!();
+                            captureEvent(FormResetEvent);
+                          }}
+                        >
+                          {tinaForm.buttons.reset}
+                        </ResetForm>
+                      )}
+                      <Button
+                        onClick={safeHandleSubmit}
+                        disabled={!canSubmit || isGuardChecking}
+                        busy={submitting || isGuardChecking}
+                        variant='primary'
                       >
-                        {tinaForm.buttons.reset}
-                      </ResetForm>
-                    )}
-                    <Button
-                      onClick={safeHandleSubmit}
-                      disabled={!canSubmit}
-                      busy={submitting}
-                      variant='primary'
-                    >
-                      {submitting && <LoadingDots />}
-                      {!submitting && tinaForm.buttons.save}
-                    </Button>
-                    {tinaForm.actions.length > 0 && (
-                      <FormActionMenu
-                        form={tinaForm as any}
-                        actions={tinaForm.actions}
-                      />
-                    )}
+                        {submitting && <LoadingDots />}
+                        {!submitting && tinaForm.buttons.save}
+                      </Button>
+                      {tinaForm.actions.length > 0 && (
+                        <FormActionMenu
+                          form={tinaForm as Form}
+                          actions={tinaForm.actions}
+                        />
+                      )}
+                    </div>
                   </div>
-                </div>
+                </>
               )}
             </DragDropContext>
           </>
@@ -258,6 +363,32 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 export const FormStatus = ({ pristine }: { pristine: boolean }) => {
   const pristineClass = pristine ? 'text-green-500' : 'text-red-500';
   return <FaCircle className={cn('h-3', pristineClass)} />;
+};
+
+const RelatedFilesBanner = () => {
+  const cms = useCMS();
+  const isReferencingManyForms = cms.state.forms.length > 1;
+
+  if (!isReferencingManyForms) {
+    return null;
+  }
+
+  const handleNavigateToRelatedFiles = () => {
+    cms.dispatch({ type: 'forms:set-active-form-id', value: null });
+  };
+
+  return (
+    <div className='relative flex-none w-full border-t border-gray-100'>
+      <button
+        type='button'
+        onClick={handleNavigateToRelatedFiles}
+        className='w-full px-6 py-3 flex items-center gap-2 text-left text-sm text-gray-700 hover:text-orange-500 hover:bg-gray-100 transition-all ease-out duration-150'
+      >
+        <FileStack className='w-5 h-5' />
+        <span>Referenced Files</span>
+      </button>
+    </div>
+  );
 };
 
 export const FormWrapper = ({

@@ -2,7 +2,7 @@ import { useCMS } from '@toolkit/react-core';
 import * as React from 'react';
 import { BiError, BiRightArrowAlt } from 'react-icons/bi';
 import { Callout } from './callout';
-import { cn } from '../../../utils/cn';
+import { cn } from '@utils/cn';
 
 export const LocalWarning = ({ className = '' }) => {
   const cms = useCMS();
