@@ -67,7 +67,7 @@ describe('localContentPath orchestration (resolveContentRootPath + FilesystemBri
     // Sentinel config file path — resolver only uses it for warning messages.
     await fs.outputFile(
       tinaConfigFilePath,
-      "export default { build: {}, schema: {} } as any\n"
+      'export default { build: {}, schema: {} } as any\n'
     );
   });
 
@@ -116,9 +116,9 @@ describe('localContentPath orchestration (resolveContentRootPath + FilesystemBri
     // Content repo must remain free of generated artifacts.
     expect(await fs.pathExists(path.join(contentDir, 'tina'))).toBe(false);
     // Generator repo must not absorb content files.
-    expect(
-      await fs.pathExists(path.join(generatorDir, 'posts/hello.md'))
-    ).toBe(false);
+    expect(await fs.pathExists(path.join(generatorDir, 'posts/hello.md'))).toBe(
+      false
+    );
   });
 
   test('reads of generated artifacts come from the generator even if the content repo has shadow copies', async () => {
@@ -164,9 +164,9 @@ describe('localContentPath orchestration (resolveContentRootPath + FilesystemBri
     // With contentRootPath === rootPath, content lands in the generator —
     // single-repo behaviour. The fact that the user had localContentPath
     // configured doesn't reroute writes if the directory doesn't exist.
-    expect(
-      await fs.pathExists(path.join(generatorDir, 'posts/hello.md'))
-    ).toBe(true);
+    expect(await fs.pathExists(path.join(generatorDir, 'posts/hello.md'))).toBe(
+      true
+    );
   });
 
   test('omitted localContentPath wires up as a single-repo project', async () => {
@@ -188,9 +188,9 @@ describe('localContentPath orchestration (resolveContentRootPath + FilesystemBri
         path.join(generatorDir, 'tina/__generated__/_schema.json')
       )
     ).toBe(true);
-    expect(
-      await fs.pathExists(path.join(generatorDir, 'posts/hello.md'))
-    ).toBe(true);
+    expect(await fs.pathExists(path.join(generatorDir, 'posts/hello.md'))).toBe(
+      true
+    );
   });
 
   test('swapped bridge constructor args route to the wrong repo (regression sentinel)', async () => {
@@ -210,7 +210,10 @@ describe('localContentPath orchestration (resolveContentRootPath + FilesystemBri
     });
 
     // Intentionally swapped: contentRootPath first, generator second.
-    const wrongOrderBridge = new FilesystemBridge(contentRootPath, generatorDir);
+    const wrongOrderBridge = new FilesystemBridge(
+      contentRootPath,
+      generatorDir
+    );
     await wrongOrderBridge.put('tina/__generated__/_schema.json', '{"v":1}');
     await wrongOrderBridge.put('posts/hello.md', '# hello');
 
@@ -222,8 +225,8 @@ describe('localContentPath orchestration (resolveContentRootPath + FilesystemBri
       )
     ).toBe(true);
     // Content lands in generator (wrong).
-    expect(
-      await fs.pathExists(path.join(generatorDir, 'posts/hello.md'))
-    ).toBe(true);
+    expect(await fs.pathExists(path.join(generatorDir, 'posts/hello.md'))).toBe(
+      true
+    );
   });
 });
