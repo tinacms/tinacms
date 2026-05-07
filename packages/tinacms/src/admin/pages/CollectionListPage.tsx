@@ -468,6 +468,10 @@ const CollectionListPage = () => {
                             );
                             reFetchCollection();
                           } catch (error) {
+                            // TODO(#6777): These error strings are hardcoded because `tinacms` and
+                            // `@tinacms/graphql` are separate workspaces. A shared constants/enum
+                            // should be introduced via an existing common package to avoid fragile
+                            // string matching. See: https://github.com/tinacms/tinacms/issues/6777
                             if (error.message && error.message.includes('already exists')) {
                               cms.alerts.error(
                                 `Document was not renamed. The filename "${vars.newRelativePath}" is already used by another document, please choose a different name.`
@@ -523,6 +527,10 @@ const CollectionListPage = () => {
                             );
                             cms.alerts.info('Folder was successfully created');
                           } catch (error) {
+                            // TODO(#6777): These error strings are hardcoded because `tinacms` and
+                            // `@tinacms/graphql` are separate workspaces. A shared constants/enum
+                            // should be introduced via an existing common package to avoid fragile
+                            // string matching. See: https://github.com/tinacms/tinacms/issues/6777
                             if (error.message && error.message.includes('already exists')) {
                               cms.alerts.error(
                                 `Folder was not created, folder with name "${vars.folderName}" already exists ${folder.name ? `in ${folder.name}` : ''}`
