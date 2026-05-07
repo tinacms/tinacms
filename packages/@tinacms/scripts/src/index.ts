@@ -359,6 +359,20 @@ export class BuildTina {
     // This has no effect unless UMD is run in a browser.
     external.forEach((ext) => (globals[ext] = 'NOOP'));
 
+    // Rollup's string-array `external` only matches exact module IDs — it does NOT
+    // externalise sub-paths like `react/jsx-runtime` or `next-auth/react` when only
+    // `react` / `next-auth` are listed. That caused those sub-paths to be bundled
+    // into the package (e.g. a full copy of `react/jsx-runtime` inlined into
+    // `tinacms-authjs/dist/tinacms.js`, compiled against whichever React version
+    // the monorepo used — which then broke consumers on a different React major).
+    //
+    // Using a predicate that matches both the exact dep name AND any sub-path
+    // ensures every dep/peerDep is fully delegated to the host at runtime.
+    // esbuild already treats a package name as externalising its sub-paths, so
+    // this predicate is only wired into the Rollup/Vite path below.
+    const isExternal = (id: string) =>
+      external.some((dep) => id === dep || id.startsWith(`${dep}/`));
+
     if (target === 'node') {
       if (
         ['@tinacms/graphql', '@tinacms/datalayer'].includes(packageJSON.name)
@@ -493,7 +507,7 @@ export class BuildTina {
           output: {
             globals,
           },
-          external,
+          external: isExternal,
         },
       },
     };
