@@ -327,16 +327,24 @@ export class ConfigManager {
 
   printGeneratedClientFilePath() {
     if (this.isUsingTs()) {
-      return normalizePath(path.relative(this.rootPath, this.generatedClientTSFilePath));
+      return normalizePath(
+        path.relative(this.rootPath, this.generatedClientTSFilePath)
+      );
     }
-    return normalizePath(path.relative(this.rootPath, this.generatedClientJSFilePath));
+    return normalizePath(
+      path.relative(this.rootPath, this.generatedClientJSFilePath)
+    );
   }
 
   printGeneratedTypesFilePath() {
-    return normalizePath(path.relative(this.rootPath, this.generatedTypesTSFilePath));
+    return normalizePath(
+      path.relative(this.rootPath, this.generatedTypesTSFilePath)
+    );
   }
   printoutputHTMLFilePath() {
-    return normalizePath(path.relative(this.publicFolderPath, this.outputHTMLFilePath));
+    return normalizePath(
+      path.relative(this.publicFolderPath, this.outputHTMLFilePath)
+    );
   }
   printRelativePath(filename: string) {
     if (filename) {
@@ -345,7 +353,12 @@ export class ConfigManager {
     throw `No path provided to print`;
   }
   printPrebuildFilePath() {
-    return normalizePath(path.relative(path.join(this.rootPath, this.tinaFolderPath), this.prebuildFilePath));
+    return normalizePath(
+      path.relative(
+        path.join(this.rootPath, this.tinaFolderPath),
+        this.prebuildFilePath
+      )
+    );
   }
   printContentRelativePath(filename: string) {
     if (filename) {

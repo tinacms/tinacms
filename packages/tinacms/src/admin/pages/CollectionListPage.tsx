@@ -472,11 +472,17 @@ const CollectionListPage = () => {
                             // `@tinacms/graphql` are separate workspaces. A shared constants/enum
                             // should be introduced via an existing common package to avoid fragile
                             // string matching. See: https://github.com/tinacms/tinacms/issues/6777
-                            if (error.message && error.message.includes('already exists')) {
+                            if (
+                              error.message &&
+                              error.message.includes('already exists')
+                            ) {
                               cms.alerts.error(
                                 `Document was not renamed. The filename "${vars.newRelativePath}" is already used by another document, please choose a different name.`
                               );
-                            } else if (error.message && error.message.includes('has references')) {
+                            } else if (
+                              error.message &&
+                              error.message.includes('has references')
+                            ) {
                               cms.alerts.error(
                                 error.message.split('\n\t').filter(Boolean)[1]
                               );
@@ -512,7 +518,7 @@ const CollectionListPage = () => {
                                 ? [folder.name, vars.folderName].join('/')
                                 : vars.folderName
                             );
-                            
+
                             reFetchCollection();
                             navigate(
                               `/${[
@@ -531,7 +537,10 @@ const CollectionListPage = () => {
                             // `@tinacms/graphql` are separate workspaces. A shared constants/enum
                             // should be introduced via an existing common package to avoid fragile
                             // string matching. See: https://github.com/tinacms/tinacms/issues/6777
-                            if (error.message && error.message.includes('already exists')) {
+                            if (
+                              error.message &&
+                              error.message.includes('already exists')
+                            ) {
                               cms.alerts.error(
                                 `Folder was not created, folder with name "${vars.folderName}" already exists ${folder.name ? `in ${folder.name}` : ''}`
                               );
@@ -550,7 +559,7 @@ const CollectionListPage = () => {
                     <PageHeader>
                       <div className='w-full mx-auto max-w-screen-xl'>
                         <h3 className='font-sans text-2xl text-tina-orange'>
-                          {collection.label 
+                          {collection.label
                             ? collection.label
                             : collection.name}
                         </h3>
