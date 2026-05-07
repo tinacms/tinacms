@@ -1,6 +1,7 @@
 ---
 "@tinacms/cli": minor
 "@tinacms/graphql": minor
+"@tinacms/metrics": minor
 ---
 
 Stop writing generated files (`_schema.json`, `_graphql.json`, `_lookup.json`, `tina-lock.json`) to the content repo when `localContentPath` is set. Generated files now live only in the generator repo's `tina/__generated__/`. The content repo is no longer required to contain a `tina/` folder. `FilesystemBridge.get` / `put` / `delete` now route `tina/__generated__/` and `.tina/__generated__/` paths to `rootPath` (the generator) instead of `outputPath` (the content root). Closes [tinacms/tinacloud#3295](https://github.com/tinacms/tinacloud/issues/3295).
