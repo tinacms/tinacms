@@ -58,5 +58,7 @@ it('filters movies by nested reference traversal', async () => {
     }`,
     variables: {},
   });
-  await expect(format(result)).toMatchFileSnapshot('nested-reference-node.json');
+  await expect(format(result)).toMatchFileSnapshot(
+    'nested-reference-node.json'
+  );
 });
