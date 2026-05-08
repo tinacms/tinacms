@@ -1,0 +1,96 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "h1",
+      "children": [
+        {
+          "type": "text",
+          "text": "Bienvenue 🎉"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Café in Zürich — naïve façade."
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "日本語の見出し"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "مرحبا بالعالم"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Emoji families: 👨‍👩‍👧‍👦 and skin tones 👋🏽."
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Math symbols: π ≈ 3.14, ∞, ±, →, ✓."
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "const greeting = \"héllo\"",
+          "code": true
+        },
+        {
+          "type": "text",
+          "text": " inline code with accents."
+        }
+      ]
+    },
+    {
+      "type": "code_block",
+      "lang": "js",
+      "value": "// Comment with Ω and µ\nconst π = Math.PI;",
+      "children": [
+        {
+          "type": "code_line",
+          "children": [
+            {
+              "text": "// Comment with Ω and µ"
+            }
+          ]
+        },
+        {
+          "type": "code_line",
+          "children": [
+            {
+              "text": "const π = Math.PI;"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

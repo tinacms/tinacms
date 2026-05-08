@@ -175,19 +175,20 @@ jobs:
             
             console.log('📝 Generated packages section:', packagesSection);
             
+            // Generate install commands using actual versions
+            let installCommands = packages.map(pkg => `pnpm add ${pkg.name}@${pkg.version}`).join('\n');
+
             const comment = `## 📦 Tagged Release Published
-            
-            Your tagged PR has been published! You can now install the packages using:
-            
+
+            Your tagged PR has been published! You can install the packages using their version tags:
+
             \`\`\`bash
-            pnpm add packagename@${branchName}
+            ${installCommands}
             \`\`\`
-            
-            Published packages:
+
             ${packagesSection}
 
-            **Tag:** \`${branchName}\`  
-            **Commit:**   \`${context.sha}\`
+            **Commit:** \`${context.sha}\`
             `;
             
             console.log('💬 Posting comment to PR #' + context.payload.pull_request.number);

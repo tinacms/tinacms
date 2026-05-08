@@ -48,7 +48,7 @@ export const createResolver = (args: ResolverConfig) => {
   return new Resolver(args);
 };
 
-const resolveFieldData = async (
+export const resolveFieldData = async (
   { namespace, ...field }: TinaField<true>,
   rawData: unknown,
   accumulator: { [key: string]: unknown },
@@ -878,6 +878,15 @@ export class Resolver {
       // don't update if the paths are the same
       if (newRealPath === realPath) {
         return doc;
+      }
+
+      // prevent silent overwrite of an existing document
+      const newPathAlreadyExists =
+        await this.database.documentExists(newRealPath);
+      if (newPathAlreadyExists) {
+        throw new Error(
+          `Unable to rename document, ${newRealPath} already exists`
+        );
       }
 
       // update the document
