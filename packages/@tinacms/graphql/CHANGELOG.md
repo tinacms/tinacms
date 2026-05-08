@@ -1,5 +1,25 @@
 # tina-graphql
 
+## 2.3.1
+
+### Patch Changes
+
+- [#6757](https://github.com/tinacms/tinacms/pull/6757) [`38cbec7`](https://github.com/tinacms/tinacms/commit/38cbec7b1b204f395f4e6e97c4bab6edc7296439) Thanks [@OfekDanny](https://github.com/OfekDanny)! - Fix folder creation failing when a collection has `match.exclude` configured.
+
+  `TinaSchema.getCollectionByFullPath` was applying the `match.exclude` glob check to `.gitkeep.*` folder placeholder files, causing the collection lookup to return no results. This made `database.put()` throw during `resolveCreateFolder`, blocking folder creation entirely in any collection with `match.exclude` set.
+
+  The fix skips the `match.include`/`match.exclude` check for `.gitkeep.*` placeholders in both `TinaSchema` and `Database.put`, mirroring the existing extension-check special-case that already handled these files.
+
+- [#6770](https://github.com/tinacms/tinacms/pull/6770) [`3da4588`](https://github.com/tinacms/tinacms/commit/3da45887c23da552a4bd994154eeaaf8990065f7) Thanks [@zaidkhatri-dev](https://github.com/zaidkhatri-dev)! - - Improved error handling for file and folder operations: errors are now shown as clear notifications in the UI rather than just logging to the console.
+
+  - Fixed an issue where renaming a document to an already existing filename would silently fail; this now correctly triggers an error alert in the UI.
+
+- [#6764](https://github.com/tinacms/tinacms/pull/6764) [`75f69a6`](https://github.com/tinacms/tinacms/commit/75f69a6476ff98614ae8cb910bcedb5fe52331e2) Thanks [@KahaMason](https://github.com/KahaMason)! - Add direct unit test coverage for the GraphQL resolver's CRUD methods (#6466). 115 tests covering `resolveFieldData`, `build*Mutations`, `resolveLegacyValues`, and every method that took over from the deprecated `resolveDocument`. `resolveFieldData` is now exported from the resolver module to enable direct unit testing — no public API change since the package entry doesn't re-export it.
+
+- Updated dependencies [[`38cbec7`](https://github.com/tinacms/tinacms/commit/38cbec7b1b204f395f4e6e97c4bab6edc7296439)]:
+  - @tinacms/schema-tools@2.7.4
+  - @tinacms/mdx@2.1.4
+
 ## 2.3.0
 
 ### Minor Changes
