@@ -379,6 +379,7 @@ export class ConfigManager {
       format: 'esm',
       outfile: outfile,
       loader: loaders,
+      packages: 'external',
       // Provide a require() polyfill for ESM bundles containing CommonJS packages.
       // Some bundled packages (e.g., 'scmp' used by 'mongodb-level') use require('crypto').
       // When esbuild inlines these CommonJS packages, it keeps the require() calls,
@@ -445,6 +446,7 @@ export class ConfigManager {
       format: 'esm',
       outfile,
       loader: loaders,
+      packages: 'external',
       banner: esmRequireBanner,
     });
     await esbuild.build({
@@ -456,6 +458,7 @@ export class ConfigManager {
       format: 'esm',
       outfile: outfile2,
       loader: loaders,
+      packages: 'external',
     });
     let result: { default: any };
     try {
