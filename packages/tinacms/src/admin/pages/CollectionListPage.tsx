@@ -455,9 +455,9 @@ const CollectionListPage = () => {
                           });
                         }}
                         renameFunc={async () => {
-                          // add the file extension
-                          const newRelativePath = `${vars.newRelativePath}.${collection.format}`;
                           try {
+                            // add the file extension
+                            const newRelativePath = `${vars.newRelativePath}.${collection.format}`;
                             await admin.renameDocument({
                               collection: vars.collection,
                               relativePath: vars.relativePath,
@@ -468,16 +468,29 @@ const CollectionListPage = () => {
                             );
                             reFetchCollection();
                           } catch (error) {
-                            if (error.message.indexOf('has references')) {
+                            // TODO(#6777): These error strings are hardcoded because `tinacms` and
+                            // `@tinacms/graphql` are separate workspaces. A shared constants/enum
+                            // should be introduced via an existing common package to avoid fragile
+                            // string matching. See: https://github.com/tinacms/tinacms/issues/6777
+                            if (
+                              error.message &&
+                              error.message.includes('already exists')
+                            ) {
+                              cms.alerts.error(
+                                `Document was not renamed. The filename "${vars.newRelativePath}" is already used by another document, please choose a different name.`
+                              );
+                            } else if (
+                              error.message &&
+                              error.message.includes('has references')
+                            ) {
                               cms.alerts.error(
                                 error.message.split('\n\t').filter(Boolean)[1]
                               );
-                              return;
+                            } else {
+                              cms.alerts.error(
+                                'There was an error renaming the document. Please try again. If the problem continues, please contact the developer.'
+                              );
                             }
-                            cms.alerts.warn(
-                              'Document was not renamed, ask a developer for help or check the console for an error message'
-                            );
-                            console.error(error);
                             throw error;
                           }
                         }}
@@ -499,38 +512,43 @@ const CollectionListPage = () => {
                         }
                         createFunc={async () => {
                           try {
-                            admin
-                              .createFolder(
-                                vars.collection,
-                                folder.name
-                                  ? [folder.name, vars.folderName].join('/')
-                                  : vars.folderName
-                              )
-                              .then(() => {
-                                reFetchCollection();
-                                navigate(
-                                  `/${[
-                                    'collections',
-                                    collectionName,
-                                    '~',
-                                    ...(folder.name
-                                      ? [folder.name, vars.folderName]
-                                      : [vars.folderName]),
-                                  ].join('/')}`,
-                                  { replace: true }
-                                );
-                                cms.alerts.info(
-                                  'Folder was successfully created'
-                                );
-                              })
-                              .catch((error) => {
-                                throw error;
-                              });
-                          } catch (error) {
-                            cms.alerts.warn(
-                              'Folder was not created, ask a developer for help or check the console for an error message'
+                            await admin.createFolder(
+                              vars.collection,
+                              folder.name
+                                ? [folder.name, vars.folderName].join('/')
+                                : vars.folderName
                             );
-                            console.error(error);
+
+                            reFetchCollection();
+                            navigate(
+                              `/${[
+                                'collections',
+                                collectionName,
+                                '~',
+                                ...(folder.name
+                                  ? [folder.name, vars.folderName]
+                                  : [vars.folderName]),
+                              ].join('/')}`,
+                              { replace: true }
+                            );
+                            cms.alerts.info('Folder was successfully created');
+                          } catch (error) {
+                            // TODO(#6777): These error strings are hardcoded because `tinacms` and
+                            // `@tinacms/graphql` are separate workspaces. A shared constants/enum
+                            // should be introduced via an existing common package to avoid fragile
+                            // string matching. See: https://github.com/tinacms/tinacms/issues/6777
+                            if (
+                              error.message &&
+                              error.message.includes('already exists')
+                            ) {
+                              cms.alerts.error(
+                                `Folder was not created, folder with name "${vars.folderName}" already exists ${folder.name ? `in ${folder.name}` : ''}`
+                              );
+                            } else {
+                              cms.alerts.error(
+                                'There was an error creating the folder. Please try again. If the problem continues, please contact the developer'
+                              );
+                            }
                             throw error;
                           }
                         }}
@@ -1478,8 +1496,12 @@ const FolderModal = ({
             variant='primary'
             disabled={!isFolderNameValid}
             onClick={async () => {
-              await createFunc();
-              close();
+              try {
+                await createFunc();
+                close();
+              } catch (error) {
+                // error is already handled by createFunc
+              }
             }}
           >
             Create
@@ -1536,8 +1558,12 @@ const RenameModal = ({
             style={{ flexGrow: 3 }}
             variant='primary'
             onClick={async () => {
-              await renameFunc();
-              close();
+              try {
+                await renameFunc();
+                close();
+              } catch (error) {
+                // error is already handled by renameFunc
+              }
             }}
             disabled={!newRelativePath || newRelativePath === filename}
           >

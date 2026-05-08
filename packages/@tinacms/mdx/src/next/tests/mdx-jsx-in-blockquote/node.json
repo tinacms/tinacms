@@ -1,0 +1,16 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "invalid_markdown",
+      "value": "> <Greeting message=\"Quoted hello\" />\n\n> Plain text quote with <Greeting message=\"inline\" /> inside.\n",
+      "message": "UnwrapBlock: Unknown block content of type mdxJsxFlowElement",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ]
+    }
+  ]
+}

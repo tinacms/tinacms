@@ -1,5 +1,28 @@
 # tinacms-authjs
 
+## 21.0.6
+
+### Patch Changes
+
+- [#6698](https://github.com/tinacms/tinacms/pull/6698) [`3dfab7f`](https://github.com/tinacms/tinacms/commit/3dfab7fd7964edf36a56c69efcda46edef64d505) Thanks [@kulesy](https://github.com/kulesy)! - Fix: externalise peer dependency sub-paths (e.g. `react/jsx-runtime`, `next-auth/react`) in the Vite/Rollup build path
+
+  Rollup's string-array `external` option only matches exact module IDs — so listing `"react"` in peer deps did NOT externalise `"react/jsx-runtime"`, causing React's JSX runtime to be inlined into package bundles. When the monorepo's React dep was bumped to 19, that inlined copy was compiled against React 19 internals and broke consumers still on React 18 with "Failed loading TinaCMS assets".
+
+  The fix: the browser-target build now uses a predicate that externalises both the exact dep name AND any sub-path (`id === dep || id.startsWith(dep + "/")`), matching esbuild's default behaviour.
+
+  Visible effect on `tinacms-authjs@21.0.2`:
+
+  - `dist/tinacms.js`: 98 KB → 4.4 KB (no more inlined `react/jsx-runtime`, `next-auth/react`, or Babel helpers)
+  - The bundle no longer carries assumptions about which React version the monorepo was on
+
+  Other packages using `@tinacms/scripts` (tinacms-clerk, @tinacms/vercel-previews, next-tinacms-\*, etc.) also get tighter bundles where they previously inlined sub-paths of peer deps.
+
+- [#6751](https://github.com/tinacms/tinacms/pull/6751) [`556a162`](https://github.com/tinacms/tinacms/commit/556a16255df4b48df69c14133ee6530b68dd9131) Thanks [@JackDevAU](https://github.com/JackDevAU)! - chore(tinacms-pkgs): remove unused devDeps across @tinacms/\* packages
+
+- Updated dependencies [[`3e4dcc7`](https://github.com/tinacms/tinacms/commit/3e4dcc76d5fb89ec900b778cb7e82f3aa3ed6501), [`38cbec7`](https://github.com/tinacms/tinacms/commit/38cbec7b1b204f395f4e6e97c4bab6edc7296439), [`3da4588`](https://github.com/tinacms/tinacms/commit/3da45887c23da552a4bd994154eeaaf8990065f7), [`b37187d`](https://github.com/tinacms/tinacms/commit/b37187d46b6e1a274db7ab79372f02aaa2ef992d), [`84ec7ad`](https://github.com/tinacms/tinacms/commit/84ec7adea7a1d8015cf1430fe804886493c5ae21), [`28b869a`](https://github.com/tinacms/tinacms/commit/28b869a0d2c9b2a608e1076b6dea24bd3e01ac31)]:
+  - tinacms@3.7.6
+  - @tinacms/schema-tools@2.7.4
+
 ## 21.0.5
 
 ### Patch Changes
