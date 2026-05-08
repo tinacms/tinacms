@@ -57,9 +57,6 @@
         "@types/node": "^22.13.1",
         "@types/search-index": "catalog:",
         "jest": "catalog:",
-        "jest-diff": "catalog:",
-        "jest-file-snapshot": "^0.7.0",
-        "jest-matcher-utils": "catalog:",
         "typescript": "^5.7.3"
     }
 }
