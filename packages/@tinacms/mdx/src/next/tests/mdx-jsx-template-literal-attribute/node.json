@@ -1,0 +1,16 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "invalid_markdown",
+      "value": "<Greeting message={`Hello ${name}`} />\n",
+      "message": "Unable to parse field value for field \"message\" (type: string). Expected type to be Literal but received TemplateLiteral. TinaCMS supports a stricter version of markdown and a subset of MDX. https://tina.io/docs/r/what-is-markdown",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ]
+    }
+  ]
+}
