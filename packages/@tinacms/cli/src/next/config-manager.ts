@@ -367,11 +367,13 @@ export class ConfigManager {
   }
 
   async loadDatabaseFile() {
-    // Date.now because imports are cached, we don't have a
-    // good way of invalidating them when this file changes
+    // Use a timestamped subdirectory inside the project's generated cache folder
+    // (rather than os.tmpdir()) so that Node's ESM package resolution can walk up
+    // to the project root and find node_modules. Imports are still cached by Node,
+    // but the timestamp ensures each build gets a fresh module identity.
     // https://github.com/nodejs/modules/issues/307
-    const tmpdir = path.join(os.tmpdir(), Date.now().toString());
-    const outfile = path.join(tmpdir, 'database.build.mjs'); // .mjs tells Node.js this is ESM
+    const buildDir = path.join(this.generatedCachePath, 'database');
+    const outfile = path.join(buildDir, 'database.build.mjs'); // .mjs tells Node.js this is ESM
     await esbuild.build({
       entryPoints: [this.selfHostedDatabaseFilePath],
       bundle: true,
@@ -379,7 +381,14 @@ export class ConfigManager {
       format: 'esm',
       outfile: outfile,
       loader: loaders,
-      packages: 'external',
+      // Externalize better-sqlite3 so it is NOT bundled into the ESM output.
+      // better-sqlite3 uses require('bindings') which uses __filename/__dirname to
+      // locate its native .node binary. Those CJS globals do not exist in ESM, so
+      // bundling better-sqlite3 inline causes a runtime crash.
+      // By externalizing it, Node loads better-sqlite3 as a CJS module from the
+      // project's node_modules (where __filename is available), while sqlite-level
+      // stays bundled so esbuild handles its { SqliteLevel } named-export interop.
+      external: ['better-sqlite3'],
       // Provide a require() polyfill for ESM bundles containing CommonJS packages.
       // Some bundled packages (e.g., 'scmp' used by 'mongodb-level') use require('crypto').
       // When esbuild inlines these CommonJS packages, it keeps the require() calls,
@@ -395,18 +404,20 @@ export class ConfigManager {
   }
 
   async loadConfigFile(generatedFolderPath: string, configFilePath: string) {
-    // Date.now because imports are cached, we don't have a
-    // good way of invalidating them when this file changes
+    // Use a timestamped subdirectory inside the project's generated cache folder
+    // (rather than os.tmpdir()) so that Node's ESM package resolution can walk up
+    // to the project root and find node_modules. Imports are still cached by Node,
+    // but the timestamp ensures each build gets a fresh module identity.
     // https://github.com/nodejs/modules/issues/307
-    const tmpdir = path.join(os.tmpdir(), Date.now().toString());
+    const buildDir = path.join(this.generatedCachePath, 'config');
     const preBuildConfigPath = path.join(
       this.generatedFolderPath,
       'config.prebuild.jsx'
     );
 
-    const outfile = path.join(tmpdir, 'config.build.jsx');
-    const outfile2 = path.join(tmpdir, 'config.build.mjs');
-    const tempTSConfigFile = path.join(tmpdir, 'tsconfig.json');
+    const outfile = path.join(buildDir, 'config.build.jsx');
+    const outfile2 = path.join(buildDir, 'config.build.mjs');
+    const tempTSConfigFile = path.join(buildDir, 'tsconfig.json');
 
     // Provide a require() polyfill for ESM bundles containing CommonJS packages.
     // Some packages (e.g., 'postcss-selector-parser' via tailwindcss) use require() internally.
@@ -446,7 +457,6 @@ export class ConfigManager {
       format: 'esm',
       outfile,
       loader: loaders,
-      packages: 'external',
       banner: esmRequireBanner,
     });
     await esbuild.build({
@@ -458,7 +468,6 @@ export class ConfigManager {
       format: 'esm',
       outfile: outfile2,
       loader: loaders,
-      packages: 'external',
     });
     let result: { default: any };
     try {
