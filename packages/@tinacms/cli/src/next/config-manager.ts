@@ -327,33 +327,42 @@ export class ConfigManager {
 
   printGeneratedClientFilePath() {
     if (this.isUsingTs()) {
-      return this.generatedClientTSFilePath.replace(`${this.rootPath}/`, '');
+      return normalizePath(
+        path.relative(this.rootPath, this.generatedClientTSFilePath)
+      );
     }
-    return this.generatedClientJSFilePath.replace(`${this.rootPath}/`, '');
+    return normalizePath(
+      path.relative(this.rootPath, this.generatedClientJSFilePath)
+    );
   }
 
   printGeneratedTypesFilePath() {
-    return this.generatedTypesTSFilePath.replace(`${this.rootPath}/`, '');
+    return normalizePath(
+      path.relative(this.rootPath, this.generatedTypesTSFilePath)
+    );
   }
   printoutputHTMLFilePath() {
-    return this.outputHTMLFilePath.replace(`${this.publicFolderPath}/`, '');
+    return normalizePath(
+      path.relative(this.publicFolderPath, this.outputHTMLFilePath)
+    );
   }
   printRelativePath(filename: string) {
     if (filename) {
-      return filename.replace(/\\/g, '/').replace(`${this.rootPath}/`, '');
+      return normalizePath(path.relative(this.rootPath, filename));
     }
     throw `No path provided to print`;
   }
   printPrebuildFilePath() {
-    return this.prebuildFilePath
-      .replace(/\\/g, '/')
-      .replace(`${this.rootPath}/${this.tinaFolderPath}/`, '');
+    return normalizePath(
+      path.relative(
+        path.join(this.rootPath, this.tinaFolderPath),
+        this.prebuildFilePath
+      )
+    );
   }
   printContentRelativePath(filename: string) {
     if (filename) {
-      return filename
-        .replace(/\\/g, '/')
-        .replace(`${this.contentRootPath}/`, '');
+      return normalizePath(path.relative(this.contentRootPath, filename));
     }
     throw `No path provided to print`;
   }
