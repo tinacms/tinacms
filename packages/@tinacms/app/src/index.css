@@ -13,10 +13,6 @@
   fill: currentColor;
 }
 
-.font-libre-baskerville {
-  font-family: "Libre Baskerville", serif;
-}
-
 body {
   margin: 0;
   padding: 0;
@@ -46,6 +42,15 @@ div.graphiql-explorer-root > div:last-child {
   padding-bottom: 0.5em;
   /* Outline is placed on the parent element for styling consistency with other elements */
   outline: none;
+  font-family: var(--tina-editor-font-family);
+}
+.tina-prose [data-slate-editor="true"] h1,
+.tina-prose [data-slate-editor="true"] h2,
+.tina-prose [data-slate-editor="true"] h3,
+.tina-prose [data-slate-editor="true"] h4,
+.tina-prose [data-slate-editor="true"] h5,
+.tina-prose [data-slate-editor="true"] h6 {
+  font-family: var(--tina-editor-heading-font-family);
 }
 /* prose adds backticks, which look like they should be editable */
 .tina-prose [data-slate-editor="true"] .slate-code::before {

@@ -382,6 +382,18 @@ export type RichTextField<WithNamespace extends boolean = false> = (
       toolbar?: ToolbarOverrideType[];
       /**Default set to true */
       showFloatingToolbar?: boolean;
+      /**
+       * Configure typography for the rich text editor to match your frontend.
+       * Styles are applied via CSS custom properties on the editor wrapper.
+       */
+      typography?: {
+        /** CSS font-family for the editor body. E.g. "'Inter', sans-serif" */
+        fontFamily?: string;
+        /** CSS font-family for headings. Falls back to fontFamily if not set */
+        headingFontFamily?: string;
+        /** URL to load the font from (e.g. Google Fonts URL) */
+        fontUrl?: string;
+      };
     };
     /**
      * By default, Tina parses markdown with MDX, this is a more strict parser
@@ -641,6 +653,11 @@ export interface Config<
      * Hook functions that can be used to run logic when certain events happen
      */
     authHooks?: AuthHooks;
+    /**
+     * URL to load a custom font for the rich text editor (e.g. a Google Fonts URL).
+     * The font will be loaded alongside the default Inter font.
+     */
+    fontUrl?: string;
   };
   /**
    * The Schema is used to define the shape of the content.
