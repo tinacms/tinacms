@@ -1,6 +1,6 @@
 ---
-"tinacms": patch
-"@tinacms/graphql": patch
+"tinacms": minor
+"@tinacms/graphql": minor
 ---
 
 Forward the editor's current branch to the TinaCloud assets-api on every cloud media call, and fix staging URL handling for multi-segment branches
@@ -10,6 +10,8 @@ Forward the editor's current branch to the TinaCloud assets-api on every cloud m
 The query parameter is ignored by assets-api versions that do not parse it, so this change is safe to deploy ahead of the server-side rollout. Local mode is unaffected.
 
 `@tinacms/graphql`'s media URL resolver now formats staging URLs as `/__staging/<branch>/__file/<path>` instead of `/__staging/<encoded-branch>/<path>`. The previous form broke for branches containing `/` (e.g. `feat/my-branch`) because CloudFront decodes paths before downstream components see them, so the S3 write key (with a literal `%2F`) wouldn't match the decoded read path. The `__file` delimiter lets the branch contribute its natural `/` segments while still marking where the file path begins.
+
+Note: staging URLs produced by `@tinacms/graphql@2.3.0`–`2.3.1` use the old format and will not round-trip through this version's `resolveMediaCloudToRelative`. Branch-aware media is gated server-side and has not been enabled for any tenant yet, so no persisted data is expected to be affected — but if you turned it on for testing, regenerate the affected field values from the editor after upgrading.
 
 After a successful cloud upload `TinaMediaStore.persist()` now resolves its return value from the assets-api `list` endpoint instead of constructing each `Media.src` locally — the server is the source of truth for the canonical URL (including the staging-branch path and per-stage CDN host). The `MediaStore.persist()` contract is preserved, so the returned items still flow through the media manager and the image-field drop handler.
 
