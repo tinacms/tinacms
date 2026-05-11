@@ -1,5 +1,10 @@
+import { randomUUID } from 'node:crypto';
 import { PostHog } from 'posthog-node';
 import fetchPostHogConfig from './fetchPostHogConfig';
+
+export function generateSessionId(): string {
+  return randomUUID();
+}
 
 export const BuildInvokeEvent = 'tinacms-cli-build-invoke';
 export type BuildInvokeEventPayload = {
@@ -47,6 +52,7 @@ export async function initializePostHog(
 
 export function postHogCapture(
   client: PostHog,
+  distinctId: string,
   event: string,
   properties: Record<string, any>
 ): void {
@@ -58,6 +64,7 @@ export function postHogCapture(
 
   try {
     client.capture({
+      distinctId,
       event,
       properties: {
         ...properties,

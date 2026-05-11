@@ -35,6 +35,7 @@ import {
   BuildFinishedEvent,
   BuildInvokeEvent,
   BuildInvokeEventPayload,
+  generateSessionId,
   initializePostHog,
   postHogCapture,
   postHogCaptureError,
@@ -92,9 +93,10 @@ export class BuildCommand extends BaseCommand {
 
   private posthogClient: PostHog | null = null;
   private buildStartedAt = 0;
+  private buildRunId = generateSessionId();
 
   async catch(error: any): Promise<void> {
-    postHogCapture(this.posthogClient, BuildFinishedEvent, {
+    postHogCapture(this.posthogClient, this.buildRunId, BuildFinishedEvent, {
       success: false,
       durationMs: Date.now() - this.buildStartedAt,
       errorCode: 'ERR_BUILD_FAILED',
@@ -171,6 +173,7 @@ export class BuildCommand extends BaseCommand {
     try {
       postHogCapture(
         this.posthogClient,
+        this.buildRunId,
         BuildInvokeEvent,
         buildInvokeEventPayload
       );
@@ -469,7 +472,7 @@ export class BuildCommand extends BaseCommand {
         process.env.NODE_ENV = 'production';
       }
     }
-    postHogCapture(this.posthogClient, BuildFinishedEvent, {
+    postHogCapture(this.posthogClient, this.buildRunId, BuildFinishedEvent, {
       success: true,
       durationMs: Date.now() - this.buildStartedAt,
     });
