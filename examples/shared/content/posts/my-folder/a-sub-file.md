@@ -6,4 +6,4 @@ author: content/authors/napoleon.md
 date: 2024-02-15T00:00:00.000Z
 ---
 
-# Vote For Pedro!
+# Vote For Pedro

@@ -26,7 +26,7 @@ npx @tinacms/cli@latest init
 
 ## Configure Your Schema
 
-Define your content **schema** in `tina/config.ts`. Here is a simple example for a blog post:
+Define your content schema in `tina/config.ts`. Here is a simple example for a blog post:
 
 ```ts
 export default defineConfig({

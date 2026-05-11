@@ -1,7 +1,7 @@
 ---
 title: Some Title
 excerpt: |
-  A comprehensive **kitchen**-sink post showcasing TinaCMS rich-text features — inline components, code blocks, blockquotes, images, and custom **components** like NewsletterSignup **and** BlockQuote.
+  A comprehensive kitchen-sink post showcasing TinaCMS rich-text features — inline components, code blocks, blockquotes, images, and custom components like NewsletterSignup and BlockQuote.
 author: content/authors/napoleon.md
 date: 2024-04-01T00:00:00.000Z
 ---
@@ -42,10 +42,10 @@ Quis semper [vulputate](https://example.com) aliquam venenatdis egestas sagittis
 
 1. Anim aute id magna aliqua ad ad non deserunt sunt
 2. Qui irure qui Lorem cupidatat commodo. Elit sunt amet fugiat veniam occaecat fugiat.
-3. Lorem markdownum evinctus ut cape adhaeret gravis licet progenies ut haesit maxima ille. Est scorpius, mori vel in visaeque **Haemoniis** viperei furoris e ad vasti, distulit.
+3. Lorem markdownum evinctus ut cape adhaeret gravis licet progenies ut haesit maxima ille. Est scorpius, mori vel in visaeque Haemoniis viperei furoris e ad vasti, distulit.
 
 ***
 
 <BlockQuote authorName="Uncle Rico">
-  How much you wanna make a bet I can throw a football over them ***mountains***?
+  How much you wanna make a bet I can throw a football over them mountains?
 </BlockQuote>
