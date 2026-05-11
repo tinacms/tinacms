@@ -3,47 +3,47 @@ import fetchPostHogConfig from './fetchPostHogConfig';
 
 export const BuildInvokeEvent = 'tinacms-cli-build-invoke';
 export type BuildInvokeEventPayload = {
-    hasLocalOption: boolean;
-    skipIndexing: boolean;
-    partialReindex: boolean;
-    hasPreviewName: boolean;
-    specifiesTinaGraphQLVersions?: boolean;
-    skipCloudChecks: boolean;
-    skipSearchIndex: boolean;
-  };
+  hasLocalOption: boolean;
+  skipIndexing: boolean;
+  partialReindex: boolean;
+  hasPreviewName: boolean;
+  specifiesTinaGraphQLVersions?: boolean;
+  skipCloudChecks: boolean;
+  skipSearchIndex: boolean;
+};
 
 export const BuildFinishedEvent = 'tinacms-cli-build-finished';
 export type BuildFinishedEventPayload = {
-    success: boolean;
-    durationMs: number;
-    errorCode?: string;
-  };
+  success: boolean;
+  durationMs: number;
+  errorCode?: string;
+};
 
 export async function initializePostHog(
-    configEndpoint?: string,
-    disableGeoip?: boolean
-  ): Promise<PostHog | null> {
-    let apiKey: string | undefined;
-    let endpoint: string | undefined;
-  
-    if (configEndpoint) {
-      const config = await fetchPostHogConfig(configEndpoint);
-      apiKey = config.POSTHOG_API_KEY;
-      endpoint = config.POSTHOG_ENDPOINT;
-    }
-  
-    if (!apiKey) {
-      console.warn(
-        'PostHog API key not found. PostHog tracking will be disabled.'
-      );
-      return null;
-    }
-  
-    return new PostHog(apiKey, {
-      host: endpoint,
-      disableGeoip: disableGeoip ?? true,
-    });
+  configEndpoint?: string,
+  disableGeoip?: boolean
+): Promise<PostHog | null> {
+  let apiKey: string | undefined;
+  let endpoint: string | undefined;
+
+  if (configEndpoint) {
+    const config = await fetchPostHogConfig(configEndpoint);
+    apiKey = config.POSTHOG_API_KEY;
+    endpoint = config.POSTHOG_ENDPOINT;
   }
+
+  if (!apiKey) {
+    console.warn(
+      'PostHog API key not found. PostHog tracking will be disabled.'
+    );
+    return null;
+  }
+
+  return new PostHog(apiKey, {
+    host: endpoint,
+    disableGeoip: disableGeoip ?? true,
+  });
+}
 
 export function postHogCapture(
   client: PostHog,
