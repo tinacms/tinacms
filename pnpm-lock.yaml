@@ -990,12 +990,6 @@ importers:
       '@types/node':
         specifier: ^25.1.0
         version: 25.1.0
-      '@types/react':
-        specifier: ^18.3.18
-        version: 18.3.27
-      '@types/react-dom':
-        specifier: ^18.3.5
-        version: 18.3.7(@types/react@18.3.27)
       autoprefixer:
         specifier: 'catalog:'
         version: 10.4.23(postcss@8.5.6)
