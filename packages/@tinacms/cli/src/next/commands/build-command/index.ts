@@ -31,6 +31,7 @@ import { BaseCommand } from '../baseCommands';
 import { createDevServer } from '../dev-command/server';
 import { buildProductionSpa } from './server';
 import { waitForDB } from './waitForDB';
+import type { PostHog } from 'posthog-node';
 import { BuildInvokeEvent, BuildInvokeEventPayload, initializePostHog, postHogCapture, postHogCaptureError } from '../../../utils/posthog';
 
 
@@ -86,7 +87,10 @@ export class BuildCommand extends BaseCommand {
 
 
 
+  private posthogClient: PostHog | null = null;
+
   async catch(error: any): Promise<void> {
+    if (this.posthogClient) await this.posthogClient.shutdown();
     console.error(error);
     process.exit(1);
   }
@@ -147,7 +151,7 @@ export class BuildCommand extends BaseCommand {
         hasLocalContentPath: Boolean(configManager.config.localContentPath),
       },
     });
-    const posthogClient = this.noTelemetry
+    this.posthogClient = this.noTelemetry
     ? null
     : await initializePostHog('https://identity-v2.tinajs.io/v2/posthog-token', false)
 
@@ -161,9 +165,9 @@ export class BuildCommand extends BaseCommand {
       skipSearchIndex: Boolean(this.skipSearchIndex),
     }
 try {
-  postHogCapture(posthogClient, BuildInvokeEvent, buildInvokeEventPayload);
+  postHogCapture(this.posthogClient, BuildInvokeEvent, buildInvokeEventPayload);
 } catch(error){
-  postHogCaptureError(posthogClient, BuildInvokeEvent, error, {
+  postHogCaptureError(this.posthogClient, BuildInvokeEvent, error, {
     errorCode: 'ERR_POSTHOG_CAPTURE_ERROR',
     errorCategory: 'technical',
     step: 'posthog-capture',
@@ -461,7 +465,7 @@ try {
     if (this.subCommand) {
       await this.startSubCommand();
     } else {
-      if (posthogClient) await posthogClient.shutdown();
+      if (this.posthogClient) await this.posthogClient.shutdown();
       process.exit();
     }
   }
