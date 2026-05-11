@@ -1,0 +1,19 @@
+---
+import TinaIsland from '@tinacms/astro/TinaIsland.astro';
+import Blocks from '../components/blocks/Blocks.astro';
+import Base from '../layouts/Base.astro';
+import { getPage } from '../lib/data';
+import { islands } from '../lib/islands';
+
+const segments = (Astro.params.urlSegments ?? '').toString();
+const slug = segments || 'home';
+const page = await getPage(slug);
+if (!page.data?.page) {
+  return new Response('Not Found', { status: 404 });
+}
+---
+<Base title="TinaCMS Astro Visual Editing">
+  <TinaIsland name="page" wrapper={islands.page.wrapper} params={{ slug }}>
+    <Blocks page={page.data.page} />
+  </TinaIsland>
+</Base>

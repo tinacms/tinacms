@@ -13,11 +13,6 @@ import React, { useEffect, useState, forwardRef, useRef } from 'react';
 import { createContext, useContext } from 'react';
 import * as dropzone from 'react-dropzone';
 import type { FileError } from 'react-dropzone';
-import { captureEvent } from '../../../lib/posthog/posthogProvider';
-import {
-  MediaManagerContentUploadedEvent,
-  MediaManagerContentDeletedEvent,
-} from '../../../lib/posthog/posthog';
 import {
   BiArrowToBottom,
   BiCloudUpload,
@@ -30,9 +25,14 @@ import {
 } from 'react-icons/bi';
 import { BiFile } from 'react-icons/bi';
 import { IoMdRefresh } from 'react-icons/io';
+import {
+  MediaManagerContentDeletedEvent,
+  MediaManagerContentUploadedEvent,
+} from '../../../lib/posthog/posthog';
+import { captureEvent } from '../../../lib/posthog/posthogProvider';
 import { Breadcrumb } from './breadcrumb';
 import { CopyField } from './copy-field';
-import { checkerboardStyle, GridMediaItem, ListMediaItem } from './media-item';
+import { GridMediaItem, ListMediaItem, checkerboardStyle } from './media-item';
 import { DeleteModal, NewFolderModal } from './modal';
 import {
   DEFAULT_MEDIA_UPLOAD_TYPES,
@@ -312,6 +312,7 @@ export function MediaPicker({
             );
           });
         }
+
         // if there are media items, set the first one as active and prepend all the items to the list
         if (mediaItems.length !== 0) {
           const extensions = [

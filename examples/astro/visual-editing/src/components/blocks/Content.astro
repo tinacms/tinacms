@@ -1,0 +1,26 @@
+---
+import TinaMarkdown from '@tinacms/astro/TinaMarkdown.astro';
+import { tinaField } from '@tinacms/astro/tina-field';
+import type { PageBlocksContent } from '../../../tina/__generated__/types';
+import { cn } from '../../lib/utils';
+import Container from '../layout/Container.astro';
+import Section from '../layout/Section.astro';
+import { customComponents } from '../markdown';
+
+interface Props {
+  data: PageBlocksContent;
+}
+
+const { data } = Astro.props;
+---
+<Section color={data.color}>
+  <Container
+    size="large"
+    width="medium"
+    class={cn('prose prose-lg', data.color === 'primary' ? 'prose-primary' : 'dark:prose-dark')}
+  >
+    <div data-tina-field={tinaField(data, 'body')}>
+      <TinaMarkdown content={data.body} components={customComponents} />
+    </div>
+  </Container>
+</Section>

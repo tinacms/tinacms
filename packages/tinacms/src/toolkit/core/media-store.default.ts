@@ -1,15 +1,15 @@
-import {
-  Media,
-  MediaStore,
-  MediaUploadOptions,
-  MediaList,
-  MediaListOptions,
-  E_UNAUTHORIZED,
-  E_BAD_ROUTE,
-} from './media';
-import { CMS } from './cms';
 import { DEFAULT_MEDIA_UPLOAD_TYPES } from '@toolkit/components/media/utils';
 import type { Client } from '../../internalClient';
+import { CMS } from './cms';
+import {
+  E_BAD_ROUTE,
+  E_UNAUTHORIZED,
+  Media,
+  MediaList,
+  MediaListOptions,
+  MediaStore,
+  MediaUploadOptions,
+} from './media';
 
 const s3ErrorRegex = /<Error>.*<Code>(.+)<\/Code>.*<Message>(.+)<\/Message>.*/;
 
@@ -108,94 +108,161 @@ export class TinaMediaStore implements MediaStore {
   // allow up to 100MB uploads
   maxSize = 100 * 1024 * 1024;
 
+  /**
+   * Returns the current branch as a single-encoded query-param value, or
+   * an empty string when no branch is set.
+   *
+   * `this.api.branch` is already URL-encoded by `Client.setBranch()`, so we
+   * decode then re-encode here to defend against double-encoding when this
+   * value is concatenated into a URL.
+   *
+   * `Client.setBranch()` runs the constructor's `options.branch` through
+   * `encodeURIComponent` without a guard, so an unset `options.branch`
+   * lands here as the literal string `"undefined"`. We treat that and the
+   * empty case as no-branch so we don't send `?branch=undefined` to the
+   * assets-api (which would route the call to a non-existent staging path).
+   */
+  private encodedBranchParam(): string {
+    if (!this.api.branch) return '';
+    const decoded = decodeURIComponent(this.api.branch);
+    if (!decoded || decoded === 'undefined') return '';
+    return encodeURIComponent(decoded);
+  }
+
   private async persist_cloud(media: MediaUploadOptions[]): Promise<Media[]> {
-    const newFiles: Media[] = [];
+    if (!(await this.isAuthenticated())) {
+      return [];
+    }
 
-    if (await this.isAuthenticated()) {
-      for (const item of media) {
-        let directory = item.directory;
-        if (directory?.endsWith('/')) {
-          directory = directory.substr(0, directory.length - 1);
+    const encodedBranch = this.encodedBranchParam();
+    const branchQuery = encodedBranch ? `?branch=${encodedBranch}` : '';
+
+    for (const item of media) {
+      let directory = item.directory;
+      if (directory?.endsWith('/')) {
+        directory = directory.substr(0, directory.length - 1);
+      }
+      const path = `${
+        directory && directory !== '/'
+          ? `${directory}/${item.file.name}`
+          : item.file.name
+      }`;
+      const res = await this.api.authProvider.fetchWithToken(
+        `${this.url}/upload_url/${path}${branchQuery}`,
+        { method: 'GET' }
+      );
+
+      if (res.status === 412) {
+        const { message = 'Unexpected error generating upload url' } =
+          await res.json();
+        throw new Error(message);
+      }
+
+      const { signedUrl, requestId } = await res.json();
+      if (!signedUrl) {
+        throw new Error('Unexpected error generating upload url');
+      }
+
+      const uploadRes = await this.fetchFunction(signedUrl, {
+        method: 'PUT',
+        body: item.file,
+        headers: {
+          'Content-Type': item.file.type || 'application/octet-stream',
+          'Content-Length': String(item.file.size),
+        },
+      });
+
+      if (!uploadRes.ok) {
+        const xmlRes = await uploadRes.text();
+        const matches = s3ErrorRegex.exec(xmlRes);
+        console.error(xmlRes);
+        if (!matches) {
+          throw new Error('Unexpected error uploading media asset');
+        } else {
+          throw new Error(`Upload error: '${matches[2]}'`);
         }
-        const path = `${
-          directory && directory !== '/'
-            ? `${directory}/${item.file.name}`
-            : item.file.name
-        }`;
-        const res = await this.api.authProvider.fetchWithToken(
-          `${this.url}/upload_url/${path}`,
-          { method: 'GET' }
-        );
+      }
 
-        if (res.status === 412) {
-          const { message = 'Unexpected error generating upload url' } =
-            await res.json();
-          throw new Error(message);
-        }
+      const updateStartTime = Date.now();
+      while (true) {
+        // sleep for 1 second
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
-        const { signedUrl, requestId } = await res.json();
-        if (!signedUrl) {
-          throw new Error('Unexpected error generating upload url');
-        }
-
-        const uploadRes = await this.fetchFunction(signedUrl, {
-          method: 'PUT',
-          body: item.file,
-          headers: {
-            'Content-Type': item.file.type || 'application/octet-stream',
-            'Content-Length': String(item.file.size),
-          },
-        });
-
-        if (!uploadRes.ok) {
-          const xmlRes = await uploadRes.text();
-          const matches = s3ErrorRegex.exec(xmlRes);
-          console.error(xmlRes);
-          if (!matches) {
-            throw new Error('Unexpected error uploading media asset');
+        const { error, message } = await this.api.getRequestStatus(requestId);
+        if (error !== undefined) {
+          if (error) {
+            throw new Error(message);
           } else {
-            throw new Error(`Upload error: '${matches[2]}'`);
+            // success
+            break;
           }
         }
 
-        const updateStartTime = Date.now();
-        while (true) {
-          // sleep for 1 second
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-
-          const { error, message } = await this.api.getRequestStatus(requestId);
-          if (error !== undefined) {
-            if (error) {
-              throw new Error(message);
-            } else {
-              // success
-              break;
-            }
-          }
-
-          if (Date.now() - updateStartTime > 30000) {
-            throw new Error('Time out waiting for upload to complete');
-          }
+        if (Date.now() - updateStartTime > 30000) {
+          throw new Error('Time out waiting for upload to complete');
         }
-
-        const src = `https://assets.tina.io/${this.api.clientId}/${path}`;
-
-        newFiles.push({
-          directory: item.directory,
-          filename: item.file.name,
-          id: item.file.name,
-          type: 'file',
-          thumbnails: {
-            '75x75': src,
-            '400x400': src,
-            '1000x1000': src,
-          },
-          src,
-        });
       }
     }
 
-    return newFiles;
+    return this.fetchUploadedEntries(media);
+  }
+
+  /**
+   * Resolves the just-uploaded items to canonical `Media` entries by hitting
+   * the assets-api `list` endpoint, which is the source of truth for the
+   * `src` URL — including the staging-branch path
+   * (`__staging/<branch>/__file/...`) and the per-stage CDN host.
+   * Constructing those URLs on the client would mirror server-side branch
+   * routing and CDN-host logic, which is fragile to keep in sync.
+   *
+   * Best-effort: items not found within the first page of their directory
+   * (e.g. very large directories) are omitted from the result rather than
+   * throwing — the upload itself already succeeded.
+   */
+  private async fetchUploadedEntries(
+    media: MediaUploadOptions[]
+  ): Promise<Media[]> {
+    const byDirectory = new Map<string, MediaUploadOptions[]>();
+    for (const item of media) {
+      let dir = item.directory || '';
+      while (dir.endsWith('/')) dir = dir.slice(0, -1);
+      const bucket = byDirectory.get(dir) ?? [];
+      bucket.push(item);
+      byDirectory.set(dir, bucket);
+    }
+
+    const thumbnailSizes = [
+      { w: 75, h: 75 },
+      { w: 400, h: 400 },
+      { w: 1000, h: 1000 },
+    ];
+
+    const results: Media[] = [];
+    for (const [directory, items] of byDirectory) {
+      let listed: MediaList;
+      try {
+        listed = await this.list({
+          directory,
+          limit: Math.max(100, items.length * 4),
+          thumbnailSizes,
+        });
+      } catch (err) {
+        console.error('Failed to fetch canonical media entries:', err);
+        continue;
+      }
+
+      const found = new Map<string, Media>();
+      for (const entry of listed.items) {
+        if (entry.type === 'file') {
+          found.set(entry.filename, entry);
+        }
+      }
+      for (const item of items) {
+        const entry = found.get(item.file.name);
+        if (entry) results.push(entry);
+      }
+    }
+    return results;
   }
 
   private async persist_local(media: MediaUploadOptions[]): Promise<Media[]> {
@@ -337,10 +404,13 @@ export class TinaMediaStore implements MediaStore {
 
     let res;
     if (!this.isLocal) {
+      const encodedBranch = this.encodedBranchParam();
       res = await this.api.authProvider.fetchWithToken(
         `${this.url}/list/${options.directory || ''}?limit=${
           options.limit || 20
-        }${options.offset ? `&cursor=${options.offset}` : ''}`
+        }${options.offset ? `&cursor=${options.offset}` : ''}${
+          encodedBranch ? `&branch=${encodedBranch}` : ''
+        }`
       );
 
       if (res.status == 401) {
@@ -410,8 +480,10 @@ export class TinaMediaStore implements MediaStore {
     }`;
     if (!this.isLocal) {
       if (await this.isAuthenticated()) {
+        const encodedBranch = this.encodedBranchParam();
+        const branchQuery = encodedBranch ? `?branch=${encodedBranch}` : '';
         const res = await this.api.authProvider.fetchWithToken(
-          `${this.url}/${path}`,
+          `${this.url}/${path}${branchQuery}`,
           {
             method: 'DELETE',
           }

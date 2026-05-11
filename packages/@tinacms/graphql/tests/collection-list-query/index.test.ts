@@ -21,7 +21,7 @@ it('retrieves collection document list', async () => {
     }`,
     variables: {},
   });
-  expect(format(result)).toMatchFileSnapshot('node.json');
+  await expect(format(result)).toMatchFileSnapshot('node.json');
 });
 
 it('returns empty edges and zero totalCount for an empty collection', async () => {

@@ -1,0 +1,60 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "h1",
+      "children": [{ "type": "text", "text": "Heading" }]
+    },
+    {
+      "type": "p",
+      "children": [{ "type": "text", "text": "A paragraph." }]
+    },
+    {
+      "type": "blockquote",
+      "children": [{ "type": "text", "text": "A quote." }]
+    },
+    {
+      "type": "ul",
+      "children": [
+        {
+          "type": "li",
+          "children": [
+            {
+              "type": "lic",
+              "children": [{ "type": "text", "text": "An item" }]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hr",
+      "children": [{ "type": "text", "text": "" }]
+    },
+    {
+      "type": "p",
+      "children": [
+        { "type": "text", "text": "A " },
+        {
+          "type": "a",
+          "url": "http://example.com",
+          "title": "Example",
+          "children": [{ "type": "text", "text": "link" }]
+        },
+        { "type": "text", "text": "." }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "img",
+          "url": "https://get.svg.workers.dev",
+          "alt": "Alt Text",
+          "caption": "Image Title",
+          "children": [{ "type": "text", "text": "" }]
+        }
+      ]
+    }
+  ]
+}

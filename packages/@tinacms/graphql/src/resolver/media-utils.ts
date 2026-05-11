@@ -26,18 +26,19 @@ export const resolveMediaCloudToRelative = (
     }
 
     if (hasTinaMediaConfig(schema) === true) {
-      const assetsURL = `https://${config.assetsHost}/${config.clientId}`;
       const cleanMediaRoot = cleanUpSlashes(schema.config.media.tina.mediaRoot);
+      const cloudUrl = cloudUrlPattern(config.clientId);
 
-      if (typeof value === 'string' && value.includes(assetsURL)) {
+      if (typeof value === 'string' && cloudUrl.test(value)) {
         return `${cleanMediaRoot}${stripStagingPrefix(
-          value.replace(assetsURL, '')
+          value.replace(cloudUrl, '')
         )}`;
       }
       if (Array.isArray(value)) {
         return value.map((v) => {
           if (!v || typeof v !== 'string') return v;
-          const strippedURL = v.replace(assetsURL, '');
+          if (!cloudUrl.test(v)) return v;
+          const strippedURL = v.replace(cloudUrl, '');
           return `${cleanMediaRoot}${stripStagingPrefix(strippedURL)}`;
         });
       }
@@ -91,21 +92,39 @@ export const resolveMediaRelativeToCloud = (
   }
 };
 
+// Branches may contain `/` (e.g. `feat/my-branch`). Storing them URL-encoded
+// would break the CDN read path because CloudFront decodes paths before
+// downstream components see them — the write would have `%2F` literal in the
+// S3 key but every read would look for the decoded `/` form. Instead we let
+// the branch contribute its natural `/` segments and use a `__file` prefix to
+// delimit where the (possibly multi-segment) branch ends and the file path
+// begins.
 const stagingPrefix = (config: {
   branch?: string;
   mediaBranch?: string;
 }): string =>
   config.branch && config.branch !== config.mediaBranch
-    ? `/__staging/${encodeURIComponent(config.branch)}`
+    ? `/__staging/${config.branch}/__file`
     : '';
 
-// Matches `/__staging/<encoded-branch>/…` and captures everything after the branch segment.
-const STAGING_SEGMENT = /^\/__staging\/[^/]+(\/.*)$/;
+// Matches `/__staging/<branch (possibly multi-segment)>/__file/<rest>` and
+// captures everything after the `__file` segment. Non-greedy so the branch
+// can span multiple `/` segments.
+const STAGING_SEGMENT = /^\/__staging\/.+?\/__file(\/.*)$/;
 
 const stripStagingPrefix = (path: string): string => {
   const match = path.match(STAGING_SEGMENT);
   return match ? match[1] : path;
 };
+
+const escapeRegExp = (s: string): string =>
+  s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+// Matches a TinaCloud cloud URL for the given client. The host segment varies
+// across stages (e.g. `assets.tina.io`, `assets-{stage}.tinajs.dev`); the
+// `<clientId>/…` path prefix is the durable invariant.
+const cloudUrlPattern = (clientId: string): RegExp =>
+  new RegExp(`^https://[^/]+/${escapeRegExp(clientId)}`);
 
 const cleanUpSlashes = (path: string): string => {
   if (path) {
