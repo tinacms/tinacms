@@ -2,9 +2,9 @@
 [![npm version](https://img.shields.io/npm/v/tinacms.svg?style=flat)](https://www.npmjs.com/package/tinacms)
 [![Build, Test, Lint for Main](https://github.com/tinacms/tinacms/actions/workflows/main.yml/badge.svg?branch=main&event=push)](https://github.com/tinacms/tinacms/actions/workflows/main.yml)
 
-# [![TINA CMS](https://res.cloudinary.com/forestry-demo/image/upload/c_scale,w_400/v1694189357/tina-brand-assets/logos/png/Logo_Full_-_Default.png 'Visit tinacms.org')](https://tina.io)
+# [![TINA CMS](./.github/assets/TinaCms-Logo-Small-Default.svg)](https://tina.io)
 
-[![Tina Demo](https://res.cloudinary.com/forestry-demo/video/upload/du_16,w_700,e_loop/tina-io/new-homepage/homepage-demo-2.gif)](https://tina.io/)
+[![Tina Demo](./.github/assets/homepage-demo-2.gif)](https://tina.io/)
 
 Tina is a headless content management system with support for **Markdown**, MDX, JSON, YAML, and more.
 
@@ -91,5 +91,3 @@ Please see our [./CONTRIBUTING.md](https://github.com/tinacms/tinacms/blob/main/
 - Scott Gallant ([@scottgallant](https://github.com/scottgallant))
 
 View our awesome SSW devs at [ssw.com.au/people](https://www.ssw.com.au/people/?skill=%F0%9F%A6%99-TinaCMS)
-
-![](https://res.cloudinary.com/forestry-demo/image/upload/h_85/v1573167387/Favicon.png)
