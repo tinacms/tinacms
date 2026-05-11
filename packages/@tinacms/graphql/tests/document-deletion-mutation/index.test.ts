@@ -35,7 +35,9 @@ it('deletes document and removes it from queries', async () => {
     variables: {},
   });
 
-  expect(format(result)).toMatchFileSnapshot('deleteDocument-response.json');
+  await expect(format(result)).toMatchFileSnapshot(
+    'deleteDocument-response.json'
+  );
   expect(result.errors).toBeUndefined();
   expect(bridge.getDeletes()).toContain('posts/post-to-delete.md');
 

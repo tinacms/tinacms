@@ -19,7 +19,7 @@ it('handles multi-field sorting operations using index', async () => {
     }`,
     variables: {},
   });
-  expect(format(result)).toMatchFileSnapshot('node.json');
+  await expect(format(result)).toMatchFileSnapshot('node.json');
 });
 
 it('surfaces a GraphQL error when sort key matches no defined index or field', async () => {

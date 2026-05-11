@@ -1,5 +1,27 @@
 # tinacms-cli
 
+## 2.2.6
+
+### Patch Changes
+
+- [#6770](https://github.com/tinacms/tinacms/pull/6770) [`3da4588`](https://github.com/tinacms/tinacms/commit/3da45887c23da552a4bd994154eeaaf8990065f7) Thanks [@zaidkhatri-dev](https://github.com/zaidkhatri-dev)! - - Improved error handling for file and folder operations: errors are now shown as clear notifications in the UI rather than just logging to the console.
+
+  - Fixed an issue where renaming a document to an already existing filename would silently fail; this now correctly triggers an error alert in the UI.
+
+- [#6739](https://github.com/tinacms/tinacms/pull/6739) [`7f66caa`](https://github.com/tinacms/tinacms/commit/7f66caab15d6cf2ea5d68afbc00db2b700c21aab) Thanks [@galsakuri](https://github.com/galsakuri)! - Fix missing .js extension on ./types import in generated client.ts and databaseClient.ts
+
+- [#6758](https://github.com/tinacms/tinacms/pull/6758) [`63234a1`](https://github.com/tinacms/tinacms/commit/63234a1aca7d7f0a86aaa0de4565428460f466c3) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - ⚕️ adds `tinacms doctor` in CLI to check a project's direct TinaCMS package dependencies against the npm latest dist-tag
+
+- [#6776](https://github.com/tinacms/tinacms/pull/6776) [`c9e08ef`](https://github.com/tinacms/tinacms/commit/c9e08efc71bac7ba4e136a04990ced1b8be348e3) Thanks [@kulesy](https://github.com/kulesy)! - Warn when a project still uses the legacy `.tina/` config folder. `tina-lock.json` is only generated for the new `tina/` layout, and TinaCloud requires it to index the schema, so projects on the legacy layout were silently failing the Project Setup Checklist. The warning fires once per CLI run from `dev`, `build`, and any other command that loads the config.
+
+- Updated dependencies [[`3e4dcc7`](https://github.com/tinacms/tinacms/commit/3e4dcc76d5fb89ec900b778cb7e82f3aa3ed6501), [`38cbec7`](https://github.com/tinacms/tinacms/commit/38cbec7b1b204f395f4e6e97c4bab6edc7296439), [`3da4588`](https://github.com/tinacms/tinacms/commit/3da45887c23da552a4bd994154eeaaf8990065f7), [`b37187d`](https://github.com/tinacms/tinacms/commit/b37187d46b6e1a274db7ab79372f02aaa2ef992d), [`75f69a6`](https://github.com/tinacms/tinacms/commit/75f69a6476ff98614ae8cb910bcedb5fe52331e2), [`556a162`](https://github.com/tinacms/tinacms/commit/556a16255df4b48df69c14133ee6530b68dd9131), [`84ec7ad`](https://github.com/tinacms/tinacms/commit/84ec7adea7a1d8015cf1430fe804886493c5ae21), [`28b869a`](https://github.com/tinacms/tinacms/commit/28b869a0d2c9b2a608e1076b6dea24bd3e01ac31)]:
+  - tinacms@3.7.6
+  - @tinacms/graphql@2.3.1
+  - @tinacms/schema-tools@2.7.4
+  - @tinacms/search@1.2.13
+  - @tinacms/app@2.4.6
+  - @tinacms/metrics@2.0.1
+
 ## 2.2.5
 
 ### Patch Changes

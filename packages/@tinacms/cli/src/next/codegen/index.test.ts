@@ -16,6 +16,7 @@ jest.mock('esbuild', () => ({
   transform: jest.fn().mockResolvedValue({ code: '' }),
 }));
 
+import path from 'path';
 import * as stripModule from './stripSearchTokenFromConfig';
 import { Codegen } from './index';
 
@@ -33,13 +34,19 @@ describe('Codegen.genClient', () => {
     return instance;
   }
 
-  it('emits ./types.ts import for TypeScript projects', async () => {
+  it('emits extensionless ./types import for TypeScript projects', async () => {
+    // Avoids requiring `allowImportingTsExtensions: true` in consumer
+    // tsconfigs. Modern TS module resolution (Bundler / NodeNext) resolves
+    // `./types` to `./types.ts` cleanly. The previous `./types.ts` import
+    // broke under stricter Next.js / TS defaults (see #6062 follow-up).
     const { clientString } = await makeInstance(true).genClient();
-    expect(clientString).toContain('from "./types.ts"');
-    expect(clientString).not.toMatch(/from ["']\.\/types["']/);
+    expect(clientString).toContain('from "./types"');
+    expect(clientString).not.toMatch(/from ["']\.\/types\.ts["']/);
+    expect(clientString).not.toMatch(/from ["']\.\/types\.js["']/);
   });
 
   it('emits ./types.js import for non-TypeScript projects', async () => {
+    // Node ESM strictly requires the extension on relative imports.
     const { clientString } = await makeInstance(false).genClient();
     expect(clientString).toContain('from "./types.js"');
     expect(clientString).not.toMatch(/from ["']\.\/types["']/);
@@ -58,10 +65,11 @@ describe('Codegen.genDatabaseClient', () => {
     return instance;
   }
 
-  it('emits ./types.ts import for TypeScript projects', async () => {
+  it('emits extensionless ./types import for TypeScript projects', async () => {
     const result = await makeInstance(true).genDatabaseClient();
-    expect(result).toContain('from "./types.ts"');
-    expect(result).not.toMatch(/from ["']\.\/types["']/);
+    expect(result).toContain('from "./types"');
+    expect(result).not.toMatch(/from ["']\.\/types\.ts["']/);
+    expect(result).not.toMatch(/from ["']\.\/types\.js["']/);
   });
 
   it('emits ./types.js import for non-TypeScript projects', async () => {
@@ -106,7 +114,6 @@ describe('Codegen.execute integration', () => {
     } as any;
     instance.configManager = {
       generatedFolderPath: '/fake/tina/__generated__',
-      generatedFolderPathContentRepo: '/fake/tina/__generated__',
       generatedSchemaJSONPath: '/fake/tina/__generated__/_schema.json',
       generatedQueriesFilePath: '/fake/tina/__generated__/queries.gql',
       generatedFragmentsFilePath: '/fake/tina/__generated__/frags.gql',
@@ -115,7 +122,6 @@ describe('Codegen.execute integration', () => {
         token: 'tok',
         clientId: 'cid',
       },
-      hasSeparateContentRoot: () => false,
       shouldSkipSDK: () => true,
       getTinaGraphQLVersion: () => ({
         fullVersion: '1.0.0',
@@ -171,5 +177,50 @@ describe('Codegen.execute integration', () => {
     const writtenData = JSON.parse(schemaWriteCall[1]);
     expect(writtenData.config).toEqual(SAFE_RESULT);
     expect(JSON.stringify(writtenData)).not.toContain('secret-token');
+  });
+
+  it('writes each generated config file exactly once (never duplicates to a content repo path)', async () => {
+    const codegen = stubCodegen();
+    const fs = jest.requireMock('fs-extra');
+    (fs.outputFile as jest.Mock).mockClear();
+
+    await codegen.execute();
+
+    for (const fileName of ['_schema.json', '_graphql.json', '_lookup.json']) {
+      const calls = (fs.outputFile as jest.Mock).mock.calls.filter(
+        ([filePath]: [string]) => filePath.endsWith(fileName)
+      );
+      expect(calls).toHaveLength(1);
+      expect(calls[0][0]).toBe(
+        path.join(codegen.configManager.generatedFolderPath, fileName)
+      );
+    }
+  });
+
+  it('still writes exactly once when the project has a separate content root', async () => {
+    // Strengthens the previous test: even when hasSeparateContentRoot returns
+    // true (the multi-repo flag the duplicate-write block used to gate on),
+    // we should still see exactly one write per generated file. Pins that the
+    // duplicate-write code is gone, not just unreachable in the default mock.
+    const codegen = stubCodegen();
+    (codegen.configManager as any).hasSeparateContentRoot = () => true;
+    (codegen.configManager as any).contentRootPath = '/fake-content-root';
+
+    const fs = jest.requireMock('fs-extra');
+    (fs.outputFile as jest.Mock).mockClear();
+
+    await codegen.execute();
+
+    for (const fileName of ['_schema.json', '_graphql.json', '_lookup.json']) {
+      const calls = (fs.outputFile as jest.Mock).mock.calls.filter(
+        ([filePath]: [string]) => filePath.endsWith(fileName)
+      );
+      expect(calls).toHaveLength(1);
+      expect(calls[0][0]).toBe(
+        path.join(codegen.configManager.generatedFolderPath, fileName)
+      );
+      // Specifically: no write under the content-root path.
+      expect(calls[0][0]).not.toContain('fake-content-root');
+    }
   });
 });

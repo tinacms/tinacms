@@ -314,17 +314,20 @@ export const RenderForm = ({
             );
           }, 10);
         } catch (error) {
-          console.error(error);
           const defaultErrorText = 'There was a problem saving your document.';
-          if (error.message.includes('already exists')) {
+          // TODO(#6777): These error strings are hardcoded because `tinacms` and
+          // `@tinacms/graphql` are separate workspaces. A shared constants/enum
+          // should be introduced via an existing common package to avoid fragile
+          // string matching. See: https://github.com/tinacms/tinacms/issues/6777
+          if (error.message && error.message.includes('already exists')) {
             cms.alerts.error(
-              `${defaultErrorText} The "Filename" is already used for another document, please modify it.`
+              `${defaultErrorText} The filename "${form.values.filename}.${collection.format || 'md'}" is already used for another document, please modify it.`
             );
           } else {
             cms.alerts.error(() =>
               ErrorDialog({
                 title: defaultErrorText,
-                message: 'Tina caught an error while creating the page',
+                message: 'Tina caught an error while creating the file',
                 error,
               })
             );

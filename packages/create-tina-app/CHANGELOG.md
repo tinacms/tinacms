@@ -1,5 +1,11 @@
 # create-tina-app
 
+## 2.1.5
+
+### Patch Changes
+
+- [#6742](https://github.com/tinacms/tinacms/pull/6742) [`01c3fb4`](https://github.com/tinacms/tinacms/commit/01c3fb490545479d80928f184aa80f52499f5a15) Thanks [@KahaMason](https://github.com/KahaMason)! - Resolve template branch from package config instead of the GitHub REST API. The previous behaviour issued an unauthenticated `GET api.github.com/repos/<owner>/<name>` per install solely to discover each starter's default branch, which made high-concurrency installs (notably the scheduled starter-template build matrix) prone to rate-limit failures surfaced as a generic "Repository information not found." error. Each starter now declares its branch in `templates.ts`, so scaffolding only hits `codeload.github.com` for the tarball download.
+
 ## 2.1.4
 
 ### Patch Changes
