@@ -280,7 +280,7 @@ describe('resolveMedia', () => {
       mediaBranch: 'main',
     };
 
-    const otherStageStagingURL = `https://assets.tina.io/${clientId}/__staging/feat%2Fx/llama.png`;
+    const otherStageStagingURL = `https://assets.tina.io/${clientId}/__staging/feat/x/__file/llama.png`;
     const resolvedURL = resolveMediaCloudToRelative(
       otherStageStagingURL,
       config,
