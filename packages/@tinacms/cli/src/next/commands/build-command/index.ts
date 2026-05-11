@@ -32,7 +32,7 @@ import { createDevServer } from '../dev-command/server';
 import { buildProductionSpa } from './server';
 import { waitForDB } from './waitForDB';
 import type { PostHog } from 'posthog-node';
-import { BuildInvokeEvent, BuildInvokeEventPayload, initializePostHog, postHogCapture, postHogCaptureError } from '../../../utils/posthog';
+import { BuildFinishedEvent, BuildInvokeEvent, BuildInvokeEventPayload, initializePostHog, postHogCapture, postHogCaptureError } from '../../../utils/posthog';
 
 
 export class BuildCommand extends BaseCommand {
@@ -88,8 +88,14 @@ export class BuildCommand extends BaseCommand {
 
 
   private posthogClient: PostHog | null = null;
+  private buildStartedAt = 0;
 
   async catch(error: any): Promise<void> {
+    postHogCapture(this.posthogClient, BuildFinishedEvent, {
+      success: false,
+      durationMs: Date.now() - this.buildStartedAt,
+      errorCode: 'ERR_BUILD_FAILED',
+    });
     if (this.posthogClient) await this.posthogClient.shutdown();
     console.error(error);
     process.exit(1);
@@ -164,6 +170,7 @@ export class BuildCommand extends BaseCommand {
       skipCloudChecks: Boolean(this.skipCloudChecks),
       skipSearchIndex: Boolean(this.skipSearchIndex),
     }
+this.buildStartedAt = Date.now();
 try {
   postHogCapture(this.posthogClient, BuildInvokeEvent, buildInvokeEventPayload);
 } catch(error){
@@ -465,6 +472,10 @@ try {
     if (this.subCommand) {
       await this.startSubCommand();
     } else {
+      postHogCapture(this.posthogClient, BuildFinishedEvent, {
+        success: true,
+        durationMs: Date.now() - this.buildStartedAt,
+      });
       if (this.posthogClient) await this.posthogClient.shutdown();
       process.exit();
     }

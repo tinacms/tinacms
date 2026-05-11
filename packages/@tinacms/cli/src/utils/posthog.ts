@@ -12,6 +12,13 @@ export type BuildInvokeEventPayload = {
     skipSearchIndex: boolean;
   };
 
+export const BuildFinishedEvent = 'tinacms-cli-build-finished';
+export type BuildFinishedEventPayload = {
+    success: boolean;
+    durationMs: number;
+    errorCode?: string;
+  };
+
 export async function initializePostHog(
     configEndpoint?: string,
     disableGeoip?: boolean
