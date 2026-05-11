@@ -29,8 +29,7 @@
     "graphql": "^15.10.1",
     "react-icons": "^4.12.0",
     "tailwind-merge": "^2.6.0",
-    "tailwindcss": "^4.0.0",
-    "tinacms": "workspace:*"
+    "tailwindcss": "^4.0.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
@@ -44,6 +43,7 @@
     "cross-env": "^7.0.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "tinacms": "workspace:*",
     "typescript": "^5.9.3"
   }
 }
