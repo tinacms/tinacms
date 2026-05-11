@@ -1,6 +1,6 @@
 ---
 blocks:
-  - tagline: Open-source CMS
+  - tagline: Open-source CMS hehe
     headline: The best editor experience for your developer-first sites
     text: |
       Tina is an open-source, Git-backed CMS with the ability to add visual editing to your NextJS site
@@ -29,7 +29,7 @@ blocks:
           name: BiTerminal
           color: green
           style: circle
-        title: Command Line Quickstart
+        title: Command Line Quickstart!!
         text: Get started in minutes with a single CLI command.
     color: default
     _template: features
@@ -41,9 +41,7 @@ blocks:
         link: 'https://tina.io/docs/'
     color: tint
     _template: cta
-  - quote: >-
-      There are only two hard things in Computer Science: cache invalidation and
-      naming things.
+  - quote: 'There are only two hard things in Computer Science: cache invalidation and naming things....'
     author: Phil Karlton
     color: primary
     _template: testimonial
