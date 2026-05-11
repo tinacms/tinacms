@@ -112,6 +112,13 @@
 	"overrides": [
 		{
 			"include": [
+				"examples/astro/visual-editing/**/*.css"
+			],
+			"linter": { "enabled": false },
+			"formatter": { "enabled": false }
+		},
+		{
+			"include": [
 				"*.ts",
 				"*.tsx",
 				"*.mts",
