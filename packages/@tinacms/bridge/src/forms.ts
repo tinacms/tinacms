@@ -1,10 +1,17 @@
+import { getAdminOrigin, isFromAdmin } from './config';
 import { debug } from './debug';
 import type { DataStore, FormPayload } from './types';
 
 /**
- * Reads server-emitted form payloads from <script type="application/tina+json">
- * blocks (one per query the page consumes), seeds the data-store, and tells
- * the admin which forms this page hosts via `{type:'open', ...}`.
+ * Reads server-emitted form payloads from `[data-tina-form]` elements (one
+ * per query the page consumes), seeds the data-store, and tells the admin
+ * which forms this page hosts via `{type:'open', ...}`.
+ *
+ * The wire format is a JSON object stamped into the `data-tina-form`
+ * attribute. Astro's normal attribute escaping handles every dangerous
+ * character automatically — no manual encoding step on the server, no
+ * `set:html` foot-gun. The browser unescapes during parsing, so
+ * `el.dataset.tinaForm` returns the original JSON for `JSON.parse`.
  *
  * Re-posts each `open` until the admin acknowledges by sending an
  * `updateData` for that id. The bridge boots faster than React, so the
@@ -13,11 +20,12 @@ import type { DataStore, FormPayload } from './types';
  *
  * `initForms` runs once per page load. `refreshForms` re-scans the DOM
  * after a soft navigation (Astro view transitions, Turbo, htmx, etc.):
- * it diffs the live `<script type="application/tina+json">` blocks
- * against the previously-mounted set, posts `close` for forms that
- * disappeared, and `open` (with retry) for forms that appeared.
+ * it diffs the live payloads against the previously-mounted set, posts
+ * `close` for forms that disappeared, and `open` (with retry) for forms
+ * that appeared.
  */
-const SCRIPT_TYPE = 'application/tina+json';
+const FORM_SELECTOR = '[data-tina-form]';
+const FORM_ATTR = 'data-tina-form';
 const RETRY_INTERVAL_MS = 250;
 const MAX_ATTEMPTS = 40; // 10s total — plenty for cold-start admins.
 
@@ -79,7 +87,7 @@ export function refreshForms(): void {
   for (const [id] of controller.active) {
     if (nextIds.has(id)) continue;
     debug('posting close for', id);
-    window.parent.postMessage({ type: 'close', id }, window.location.origin);
+    window.parent.postMessage({ type: 'close', id }, getAdminOrigin());
     controller.acknowledged.delete(id);
   }
 
@@ -100,12 +108,10 @@ export function refreshForms(): void {
 }
 
 function readPayloads(): FormPayload[] {
-  const scripts = document.querySelectorAll<HTMLScriptElement>(
-    `script[type="${SCRIPT_TYPE}"]`
-  );
+  const elements = document.querySelectorAll<HTMLElement>(FORM_SELECTOR);
   const payloads: FormPayload[] = [];
-  for (const script of scripts) {
-    const raw = script.textContent;
+  for (const el of elements) {
+    const raw = el.getAttribute(FORM_ATTR);
     if (!raw) continue;
     try {
       const payload = JSON.parse(raw) as FormPayload;
@@ -120,6 +126,7 @@ function readPayloads(): FormPayload[] {
 }
 
 function onAck(event: MessageEvent) {
+  if (!isFromAdmin(event)) return;
   const msg = event.data;
   if (!msg || typeof msg !== 'object') return;
   if (msg.type !== 'updateData' || typeof msg.id !== 'string') return;
@@ -133,7 +140,7 @@ function onAck(event: MessageEvent) {
 function onBeforeUnload() {
   if (!controller) return;
   for (const [id] of controller.active) {
-    window.parent.postMessage({ type: 'close', id }, window.location.origin);
+    window.parent.postMessage({ type: 'close', id }, getAdminOrigin());
   }
 }
 
@@ -182,7 +189,7 @@ function announce() {
         variables: payload.variables,
         data: payload.data,
       },
-      window.location.origin
+      getAdminOrigin()
     );
   }
   controller.retryTimer = setTimeout(announce, RETRY_INTERVAL_MS);
@@ -192,6 +199,6 @@ export function reportQuickEdit(): void {
   const hasMarkers = !!document.querySelector('[data-tina-field]');
   window.parent.postMessage(
     { type: 'quick-edit', value: hasMarkers },
-    window.location.origin
+    getAdminOrigin()
   );
 }

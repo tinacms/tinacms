@@ -1,3 +1,4 @@
+import { isFromAdmin } from './config';
 import { debug } from './debug';
 import { reportQuickEdit } from './forms';
 import { PREVIEW_CONTENT_TYPE, type PreviewEnvelope } from './preview';
@@ -5,9 +6,9 @@ import type { DataStore } from './types';
 
 /**
  * Listens for `{type:'updateData', id, data}` from the admin and re-fetches
- * each `[data-tina-island]` with the unsaved data attached as a JSON POST
- * body. The island endpoint reads the body via `readOverlay()` from
- * `@tinacms/bridge/preview` and renders with overlay data instead of
+ * every `[data-tina-island]` on the page with the unsaved data attached as
+ * a JSON POST body. The island endpoint reads the body via `readOverlay()`
+ * from `@tinacms/bridge/preview` and renders with overlay data instead of
  * hitting the canonical content store.
  *
  * Why POST: HTTP headers are capped at ~8 KB (server-dependent) — large
@@ -15,9 +16,10 @@ import type { DataStore } from './types';
  * needs base64 padding. A POST body has neither limit and round-trips
  * UTF-8 directly.
  *
- * The very first updateData per form fires immediately so newly-created
- * docs leave the empty-template state ASAP. Subsequent updates are
- * debounced.
+ * The very first updateData fires immediately so newly-created docs leave
+ * the empty-template state ASAP. Subsequent updates collapse into a single
+ * debounced refetch — each refresh re-renders every island anyway, so a
+ * per-id timer would just fire N redundant times for the same DOM scan.
  */
 export interface IslandRefreshOptions {
   debounceMs: number;
@@ -30,7 +32,7 @@ export function initIslandRefresh(
   store: DataStore,
   options: IslandRefreshOptions
 ): void {
-  const debounceTimers = new Map<string, ReturnType<typeof setTimeout>>();
+  let pendingRefresh: ReturnType<typeof setTimeout> | null = null;
 
   const refreshAll = () => {
     const islands = document.querySelectorAll<HTMLElement>(ISLAND_SELECTOR);
@@ -40,25 +42,24 @@ export function initIslandRefresh(
   };
 
   store.subscribe(({ firstUpdate }) => {
-    const key = '__all__';
-    const existing = debounceTimers.get(key);
-    if (existing) clearTimeout(existing);
+    if (pendingRefresh) {
+      clearTimeout(pendingRefresh);
+      pendingRefresh = null;
+    }
 
     if (firstUpdate) {
       refreshAll();
       return;
     }
 
-    debounceTimers.set(
-      key,
-      setTimeout(() => {
-        debounceTimers.delete(key);
-        refreshAll();
-      }, options.debounceMs)
-    );
+    pendingRefresh = setTimeout(() => {
+      pendingRefresh = null;
+      refreshAll();
+    }, options.debounceMs);
   });
 
   window.addEventListener('message', (event) => {
+    if (!isFromAdmin(event)) return;
     const message = event.data;
     if (!message || typeof message !== 'object') return;
 

@@ -14,6 +14,12 @@
 
 export const PREVIEW_HEADER = 'X-Tina-Preview';
 export const PREVIEW_CONTENT_TYPE = 'application/x-tina-preview+json';
+/**
+ * Hard cap on overlay envelope size. The bridge POSTs JSON-encoded form
+ * data — a 1 MB envelope already represents a wildly oversized document —
+ * so any larger payload is treated as malformed.
+ */
+const MAX_ENVELOPE_BYTES = 1_000_000;
 
 export interface PreviewEnvelope {
   [queryId: string]: unknown;
@@ -43,9 +49,12 @@ export async function readEnvelope(
 ): Promise<PreviewEnvelope | undefined> {
   const contentType = request.headers.get('content-type') ?? '';
   if (!contentType.includes(PREVIEW_CONTENT_TYPE)) return undefined;
+  const declaredLength = Number(request.headers.get('content-length') ?? '0');
+  if (declaredLength > MAX_ENVELOPE_BYTES) return undefined;
   try {
     const text = await request.text();
     if (!text) return undefined;
+    if (text.length > MAX_ENVELOPE_BYTES) return undefined;
     return JSON.parse(text) as PreviewEnvelope;
   } catch {
     return undefined;

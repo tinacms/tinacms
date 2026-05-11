@@ -1,53 +1,20 @@
 /**
  * Vanilla port of useTina's quick-edit click handler from
- * packages/tinacms/src/react.tsx.
- *
- * Behaviour difference vs React useTina: the bridge defaults `enabled` to
- * true so links / buttons inside data-tina-field regions never accidentally
- * navigate while in the editor iframe. The React hook gates on
- * `quickEditEnabled` (admin-controlled), but that state is `false` for most
- * sidebar layouts and the resulting link-navigation behaviour is a
- * footgun in this example. The admin can still disable click capture by
- * sending `{type:'quickEditEnabled', value:false}`.
+ * packages/tinacms/src/react.tsx. Click capture stays off until the admin
+ * sends `{type:'quickEditEnabled', value:true}`, matching the React hook —
+ * a frame outside the admin can't silently swallow clicks before the
+ * admin opts in.
  */
+import { getAdminOrigin, isFromAdmin } from './config';
 import { debug } from './debug';
-const STYLE_ID = '__tina-bridge-quick-edit-style';
-const BODY_CLASS = '__tina-quick-editing-enabled';
-
-const QUICK_EDIT_CSS = `
-  [data-tina-field] {
-    outline: 2px dashed rgba(34,150,254,0.5);
-    transition: box-shadow ease-out 150ms;
-  }
-  [data-tina-field]:hover {
-    box-shadow: inset 100vi 100vh rgba(34,150,254,0.3);
-    outline: 2px solid rgba(34,150,254,1);
-    cursor: pointer;
-  }
-  [data-tina-field-overlay] {
-    outline: 2px dashed rgba(34,150,254,0.5);
-    position: relative;
-  }
-  [data-tina-field-overlay]:hover {
-    cursor: pointer;
-    outline: 2px solid rgba(34,150,254,1);
-  }
-  [data-tina-field-overlay]::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 20;
-    transition: opacity ease-out 150ms;
-    background-color: rgba(34,150,254,0.3);
-    opacity: 0;
-  }
-  [data-tina-field-overlay]:hover::after {
-    opacity: 1;
-  }
-`;
+import {
+  QUICK_EDIT_BODY_CLASS as BODY_CLASS,
+  QUICK_EDIT_CSS,
+  QUICK_EDIT_STYLE_ID as STYLE_ID,
+} from './quick-edit-css';
 
 export function initClickToFocus(): void {
-  let enabled = true;
+  let enabled = false;
 
   document.addEventListener(
     'click',
@@ -68,7 +35,7 @@ export function initClickToFocus(): void {
       event.stopPropagation();
       window.parent.postMessage(
         { type: 'field:selected', fieldName },
-        window.location.origin
+        getAdminOrigin()
       );
     },
     true
@@ -77,6 +44,7 @@ export function initClickToFocus(): void {
   // Optional admin override — the React hook also installs / removes the
   // visible outline based on this flag, so respect the visual side too.
   window.addEventListener('message', (event) => {
+    if (!isFromAdmin(event)) return;
     const message = event.data;
     if (!message || message.type !== 'quickEditEnabled') return;
     enabled = !!message.value;
