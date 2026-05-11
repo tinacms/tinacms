@@ -469,14 +469,15 @@ export class BuildCommand extends BaseCommand {
         process.env.NODE_ENV = 'production';
       }
     }
+    postHogCapture(this.posthogClient, BuildFinishedEvent, {
+      success: true,
+      durationMs: Date.now() - this.buildStartedAt,
+    });
+    if (this.posthogClient) await this.posthogClient.shutdown();
+
     if (this.subCommand) {
       await this.startSubCommand();
     } else {
-      postHogCapture(this.posthogClient, BuildFinishedEvent, {
-        success: true,
-        durationMs: Date.now() - this.buildStartedAt,
-      });
-      if (this.posthogClient) await this.posthogClient.shutdown();
       process.exit();
     }
   }
