@@ -41,7 +41,8 @@
         "@types/node": "^22.13.1",
         "@types/progress": "catalog:",
         "@types/prompts": "catalog:",
-        "jest": "catalog:"
+        "jest": "catalog:",
+        "ts-jest": "catalog:"
     },
     "scripts": {
         "build": "tinacms-scripts build",
@@ -67,7 +68,6 @@
         "@tailwindcss/typography": "catalog:",
         "@tinacms/app": "workspace:*",
         "@tinacms/graphql": "workspace:*",
-        "@tinacms/metrics": "workspace:*",
         "@tinacms/schema-tools": "workspace:*",
         "@tinacms/search": "workspace:*",
         "@vitejs/plugin-react": "catalog:",
@@ -91,10 +91,12 @@
         "memory-level": "catalog:",
         "minimatch": "catalog:",
         "normalize-path": "catalog:",
+        "posthog-node": "^5.17.2",
         "prettier": "catalog:",
         "progress": "catalog:",
         "prompts": "catalog:",
         "readable-stream": "catalog:",
+        "systeminformation": "^5.27.13",
         "tailwindcss": "^3.4.17",
         "tinacms": "workspace:*",
         "typanion": "catalog:",
