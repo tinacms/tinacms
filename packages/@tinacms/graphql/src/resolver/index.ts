@@ -880,6 +880,15 @@ export class Resolver {
         return doc;
       }
 
+      // prevent silent overwrite of an existing document
+      const newPathAlreadyExists =
+        await this.database.documentExists(newRealPath);
+      if (newPathAlreadyExists) {
+        throw new Error(
+          `Unable to rename document, ${newRealPath} already exists`
+        );
+      }
+
       // update the document
       await this.database.put(newRealPath, doc._rawData, collection.name);
       // delete the old document

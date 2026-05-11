@@ -1,5 +1,11 @@
 # @tinacms/auth
 
+## 1.1.3
+
+### Patch Changes
+
+- [#6751](https://github.com/tinacms/tinacms/pull/6751) [`556a162`](https://github.com/tinacms/tinacms/commit/556a16255df4b48df69c14133ee6530b68dd9131) Thanks [@JackDevAU](https://github.com/JackDevAU)! - chore(tinacms-pkgs): remove unused devDeps across @tinacms/\* packages
+
 ## 1.1.2
 
 ### Patch Changes

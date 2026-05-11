@@ -45,5 +45,5 @@ it('filters crew by template-specific fields using union types', async () => {
     }`,
     variables: {},
   });
-  expect(format(result)).toMatchFileSnapshot('node.json');
+  await expect(format(result)).toMatchFileSnapshot('node.json');
 });

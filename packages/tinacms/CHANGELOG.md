@@ -1,5 +1,26 @@
 # tinacms
 
+## 3.7.6
+
+### Patch Changes
+
+- [#6652](https://github.com/tinacms/tinacms/pull/6652) [`3e4dcc7`](https://github.com/tinacms/tinacms/commit/3e4dcc76d5fb89ec900b778cb7e82f3aa3ed6501) Thanks [@kulesy](https://github.com/kulesy)! - Fix HTML code block language tag from 'htmlbars' to 'html'
+
+- [#6770](https://github.com/tinacms/tinacms/pull/6770) [`3da4588`](https://github.com/tinacms/tinacms/commit/3da45887c23da552a4bd994154eeaaf8990065f7) Thanks [@zaidkhatri-dev](https://github.com/zaidkhatri-dev)! - - Improved error handling for file and folder operations: errors are now shown as clear notifications in the UI rather than just logging to the console.
+
+  - Fixed an issue where renaming a document to an already existing filename would silently fail; this now correctly triggers an error alert in the UI.
+
+- [#6761](https://github.com/tinacms/tinacms/pull/6761) [`b37187d`](https://github.com/tinacms/tinacms/commit/b37187d46b6e1a274db7ab79372f02aaa2ef992d) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐛 fix Popover on rich-text fields from being hidden under other content
+
+- [#6746](https://github.com/tinacms/tinacms/pull/6746) [`84ec7ad`](https://github.com/tinacms/tinacms/commit/84ec7adea7a1d8015cf1430fe804886493c5ae21) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🧹 Change colour picker from div to button element
+
+- [#6752](https://github.com/tinacms/tinacms/pull/6752) [`28b869a`](https://github.com/tinacms/tinacms/commit/28b869a0d2c9b2a608e1076b6dea24bd3e01ac31) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - feat(tinacms): show content file path on breadcrumb hover
+
+- Updated dependencies [[`38cbec7`](https://github.com/tinacms/tinacms/commit/38cbec7b1b204f395f4e6e97c4bab6edc7296439), [`556a162`](https://github.com/tinacms/tinacms/commit/556a16255df4b48df69c14133ee6530b68dd9131)]:
+  - @tinacms/schema-tools@2.7.4
+  - @tinacms/search@1.2.13
+  - @tinacms/mdx@2.1.4
+
 ## 3.7.5
 
 ### Patch Changes
