@@ -13,11 +13,6 @@ import React, { useEffect, useState, forwardRef, useRef } from 'react';
 import { createContext, useContext } from 'react';
 import * as dropzone from 'react-dropzone';
 import type { FileError } from 'react-dropzone';
-import { captureEvent } from '../../../lib/posthog/posthogProvider';
-import {
-  MediaManagerContentUploadedEvent,
-  MediaManagerContentDeletedEvent,
-} from '../../../lib/posthog/posthog';
 import {
   BiArrowToBottom,
   BiCloudUpload,
@@ -30,9 +25,14 @@ import {
 } from 'react-icons/bi';
 import { BiFile } from 'react-icons/bi';
 import { IoMdRefresh } from 'react-icons/io';
+import {
+  MediaManagerContentDeletedEvent,
+  MediaManagerContentUploadedEvent,
+} from '../../../lib/posthog/posthog';
+import { captureEvent } from '../../../lib/posthog/posthogProvider';
 import { Breadcrumb } from './breadcrumb';
 import { CopyField } from './copy-field';
-import { checkerboardStyle, GridMediaItem, ListMediaItem } from './media-item';
+import { GridMediaItem, ListMediaItem, checkerboardStyle } from './media-item';
 import { DeleteModal, NewFolderModal } from './modal';
 import {
   DEFAULT_MEDIA_UPLOAD_TYPES,
@@ -267,7 +267,7 @@ export function MediaPicker({
     onDrop: async (files, fileRejections) => {
       try {
         setUploading(true);
-        await cms.media.persist(
+        const mediaItems = await cms.media.persist(
           files.map((file) => {
             return {
               directory: directory || '/',
@@ -313,28 +313,31 @@ export function MediaPicker({
           });
         }
 
-        // Refresh from the server rather than prepending locally-constructed
-        // entries. The server is the source of truth for the canonical `src`
-        // URL — including the staging-branch path (`__staging/<branch>/__file/...`)
-        // when applicable — and we'd duplicate that path-construction logic
-        // (plus per-stage CDN host) on the client otherwise.
-        if (files.length > 0) {
+        // if there are media items, set the first one as active and prepend all the items to the list
+        if (mediaItems.length !== 0) {
           const extensions = [
             ...new Set(
-              files.map((file) => {
-                const ext = file.name.split('.').pop()?.toLowerCase();
+              mediaItems.map((item) => {
+                const ext = item.filename.split('.').pop()?.toLowerCase();
                 return ext || 'unknown';
               })
             ),
           ];
           captureEvent(MediaManagerContentUploadedEvent, {
             fileType: extensions.join(','),
-            fileCount: files.length,
+            fileCount: mediaItems.length,
           });
-          setActiveItem(false);
-          resetOffset();
-          resetList();
-          setRefreshing(true);
+          setActiveItem(mediaItems[0]);
+          setList((mediaList) => {
+            return {
+              items: [
+                // all the newly added items are new
+                ...mediaItems.map((x) => ({ ...x, new: true })),
+                ...mediaList.items,
+              ],
+              nextOffset: mediaList.nextOffset,
+            };
+          });
         }
       } catch {
         // TODO: Events get dispatched already. Does anything else need to happen?
