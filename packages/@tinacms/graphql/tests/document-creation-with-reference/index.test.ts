@@ -28,7 +28,9 @@ it('creates document with reference field without errors', async () => {
     variables: {},
   });
 
-  expect(format(result)).toMatchFileSnapshot('createDocument-response.json');
+  await expect(format(result)).toMatchFileSnapshot(
+    'createDocument-response.json'
+  );
 
   const newDocWrite = bridge.getWrite('posts/post-with-reference.md');
   expect(newDocWrite).toBeDefined();

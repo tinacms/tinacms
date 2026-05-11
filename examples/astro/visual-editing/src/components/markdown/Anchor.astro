@@ -1,0 +1,12 @@
+---
+
+import { sanitizeHref } from '@tinacms/astro/sanitize';
+
+interface Props {
+  url?: string;
+}
+
+const { url } = Astro.props;
+const safeHref = sanitizeHref(url);
+---
+<a href={safeHref} class="text-theme-600 hover:text-theme-700 dark:text-theme-400 dark:hover:text-theme-300 underline"><slot /></a>

@@ -10,6 +10,8 @@
     "./dist/client": "./dist/client.js",
     "./react": "./dist/react.js",
     "./dist/react": "./dist/react.js",
+    "./tina-field": "./dist/tina-field.js",
+    "./dist/tina-field": "./dist/tina-field.js",
     "./dist/rich-text": "./dist/rich-text/index.js",
     "./dist/rich-text/static": "./dist/rich-text/static.js",
     "./dist/rich-text/prism": "./dist/rich-text/prism.js"
@@ -24,6 +26,7 @@
       "src/rich-text/static.tsx",
       "src/rich-text/prism.tsx",
       "src/react.tsx",
+      "src/tina-field.ts",
       {
         "name": "src/client.ts",
         "target": "node"
@@ -59,6 +62,7 @@
     "@radix-ui/react-tooltip": "catalog:",
     "@react-hook/window-size": "catalog:",
     "@tanstack/react-table": "^8.21.3",
+    "@tinacms/bridge": "workspace:*",
     "@tinacms/mdx": "workspace:*",
     "@tinacms/schema-tools": "workspace:*",
     "@tinacms/search": "workspace:*",

@@ -1,0 +1,18 @@
+---
+import { sanitizeImageSrc } from '@tinacms/astro/sanitize';
+
+interface Props {
+  url?: string;
+  alt?: string;
+  caption?: string;
+}
+
+const { url, alt = '', caption } = Astro.props;
+const src = sanitizeImageSrc(url);
+---
+{src && (
+  <figure>
+    <img src={src} alt={alt} class="w-full rounded-lg shadow-md my-8 block" />
+    {caption && <figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2">{caption}</figcaption>}
+  </figure>
+)}

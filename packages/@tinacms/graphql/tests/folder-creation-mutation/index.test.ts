@@ -22,7 +22,9 @@ it('creates folder and validates bridge writes', async () => {
     variables: {},
   });
 
-  expect(format(result)).toMatchFileSnapshot('folder-creation-response.json');
+  await expect(format(result)).toMatchFileSnapshot(
+    'folder-creation-response.json'
+  );
 
   const folderWrite = bridge.getWrite(
     'posts/northwind/company-updates/.gitkeep.md'

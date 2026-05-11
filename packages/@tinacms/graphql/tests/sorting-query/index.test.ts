@@ -39,7 +39,7 @@ it('handles single and multi-field sorting operations', async () => {
     }`,
     variables: {},
   });
-  expect(format(result)).toMatchFileSnapshot('node.json');
+  await expect(format(result)).toMatchFileSnapshot('node.json');
 });
 
 it('combines sort with filter, returning sorted results from the filtered subset only', async () => {

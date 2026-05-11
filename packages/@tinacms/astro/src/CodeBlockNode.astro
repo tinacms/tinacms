@@ -1,0 +1,28 @@
+---
+/**
+ * `code_block` nodes carry their value as either a flat `value` string or as
+ * `children: [{ children: [{ text }, ...] }, ...]` (one outer entry per line).
+ * Flatten both shapes to a single string before rendering.
+ */
+import type { CodeBlockElement, CustomComponentsMap } from './types';
+
+interface Props {
+  node: CodeBlockElement;
+  components: CustomComponentsMap;
+}
+
+const { node, components } = Astro.props;
+const Override = components.code_block;
+
+const value =
+  node.value ??
+  node.children
+    ?.map((line) => line.children?.map((tn) => tn.text).join('') ?? '')
+    .join('\n') ??
+  '';
+---
+{Override ? (
+  <Override value={value} lang={node.lang} />
+) : (
+  <pre><code class={node.lang ? `language-${node.lang}` : undefined}>{value}</code></pre>
+)}

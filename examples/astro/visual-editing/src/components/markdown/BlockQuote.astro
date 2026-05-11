@@ -1,0 +1,18 @@
+---
+import TinaMarkdown from '@tinacms/astro/TinaMarkdown.astro';
+import type { TinaRichTextContent } from '@tinacms/astro/types';
+import { customComponents } from './index';
+
+interface Props {
+  children: TinaRichTextContent;
+  authorName?: string;
+}
+
+const { children, authorName } = Astro.props;
+---
+<div>
+  <blockquote class="border-l-4 border-theme-500 pl-4 italic my-4 text-gray-600 dark:text-gray-400">
+    <TinaMarkdown content={children} components={customComponents} />
+    {authorName && <p class="mt-2 not-italic text-sm text-gray-500">— {authorName}</p>}
+  </blockquote>
+</div>

@@ -88,120 +88,137 @@ const HighlightLeaf = ({
   );
 };
 
+type HeadingComponentProps = {
+  attributes: React.HTMLAttributes<HTMLHeadingElement>;
+  children: React.ReactNode;
+  className?: string;
+};
+
+const Heading1 = ({
+  attributes,
+  children,
+  className,
+}: HeadingComponentProps) => (
+  <h1
+    {...attributes}
+    className={classNames(
+      headerClasses,
+      blockClasses,
+      className,
+      'text-4xl mb-4 last:mb-0 mt-6 first:mt-0 font-libre-baskerville'
+    )}
+  >
+    {children}
+  </h1>
+);
+
+const Heading2 = ({
+  attributes,
+  children,
+  className,
+}: HeadingComponentProps) => (
+  <h2
+    {...attributes}
+    className={classNames(
+      headerClasses,
+      blockClasses,
+      className,
+      'text-3xl mb-4 last:mb-0 mt-6 first:mt-0 font-libre-baskerville'
+    )}
+  >
+    {children}
+  </h2>
+);
+
+const Heading3 = ({
+  attributes,
+  children,
+  className,
+}: HeadingComponentProps) => (
+  <h3
+    {...attributes}
+    className={classNames(
+      headerClasses,
+      blockClasses,
+      className,
+      'text-2xl mb-4 last:mb-0 mt-6 first:mt-0 font-libre-baskerville'
+    )}
+  >
+    {children}
+  </h3>
+);
+
+const Heading4 = ({
+  attributes,
+  children,
+  className,
+}: HeadingComponentProps) => (
+  <h4
+    {...attributes}
+    className={classNames(
+      headerClasses,
+      blockClasses,
+      className,
+      'text-xl mb-4 last:mb-0 mt-6 first:mt-0 font-libre-baskerville'
+    )}
+  >
+    {children}
+  </h4>
+);
+
+/** Tailwind prose doesn't style h5 and h6 elements */
+const headerSerifStyle: React.CSSProperties = {
+  fontFamily: "'Libre Baskerville', serif",
+  fontWeight: '400',
+};
+
+const Heading5 = ({
+  attributes,
+  children,
+  className,
+}: HeadingComponentProps) => (
+  <h5
+    {...attributes}
+    className={classNames(
+      headerClasses,
+      blockClasses,
+      className,
+      'text-lg mb-4 last:mb-0 mt-6 first:mt-0'
+    )}
+    style={headerSerifStyle}
+  >
+    {children}
+  </h5>
+);
+
+const Heading6 = ({
+  attributes,
+  children,
+  className,
+}: HeadingComponentProps) => (
+  <h6
+    {...attributes}
+    className={classNames(
+      headerClasses,
+      blockClasses,
+      className,
+      'text-base mb-4 last:mb-0 mt-6 first:mt-0'
+    )}
+    style={headerSerifStyle}
+  >
+    {children}
+  </h6>
+);
+
 export const Components = () => {
   return {
     [SlashInputPlugin.key]: SlashInputElement,
-    [HEADING_KEYS.h1]: ({
-      attributes,
-      editor,
-      element,
-      className,
-      ...props
-    }) => (
-      <h1
-        {...attributes}
-        {...props}
-        className={classNames(
-          headerClasses,
-          blockClasses,
-          className,
-          'text-4xl mb-4 last:mb-0 mt-6 first:mt-0 font-libre-baskerville'
-        )}
-      />
-    ),
-    [HEADING_KEYS.h2]: ({
-      attributes,
-      editor,
-      element,
-      className,
-      ...props
-    }) => (
-      <h2
-        {...attributes}
-        {...props}
-        className={classNames(
-          headerClasses,
-          blockClasses,
-          className,
-          'text-3xl mb-4 last:mb-0 mt-6 first:mt-0 font-libre-baskerville'
-        )}
-      />
-    ),
-    [HEADING_KEYS.h3]: ({
-      attributes,
-      editor,
-      element,
-      className,
-      ...props
-    }) => (
-      <h3
-        {...attributes}
-        {...props}
-        className={classNames(
-          headerClasses,
-          blockClasses,
-          className,
-          'text-2xl mb-4 last:mb-0 mt-6 first:mt-0 font-libre-baskerville'
-        )}
-      />
-    ),
-    [HEADING_KEYS.h4]: ({
-      attributes,
-      editor,
-      element,
-      className,
-      ...props
-    }) => (
-      <h4
-        {...attributes}
-        {...props}
-        className={classNames(
-          headerClasses,
-          blockClasses,
-          className,
-          'text-xl mb-4 last:mb-0 mt-6 first:mt-0 font-libre-baskerville'
-        )}
-      />
-    ),
-    /** Tailwind prose doesn't style h5 and h6 elements */
-    [HEADING_KEYS.h5]: ({
-      attributes,
-      editor,
-      element,
-      className,
-      ...props
-    }) => (
-      <h5
-        {...attributes}
-        {...props}
-        className={classNames(
-          headerClasses,
-          blockClasses,
-          className,
-          'text-lg mb-4 last:mb-0 mt-6 first:mt-0'
-        )}
-        style={{ fontFamily: "'Libre Baskerville', serif", fontWeight: '400' }}
-      />
-    ),
-    [HEADING_KEYS.h6]: ({
-      attributes,
-      editor,
-      element,
-      className,
-      ...props
-    }) => (
-      <h6
-        {...attributes}
-        {...props}
-        className={classNames(
-          headerClasses,
-          blockClasses,
-          className,
-          'text-base mb-4 last:mb-0 mt-6 first:mt-0'
-        )}
-        style={{ fontFamily: "'Libre Baskerville', serif", fontWeight: '400' }}
-      />
-    ),
+    [HEADING_KEYS.h1]: Heading1,
+    [HEADING_KEYS.h2]: Heading2,
+    [HEADING_KEYS.h3]: Heading3,
+    [HEADING_KEYS.h4]: Heading4,
+    [HEADING_KEYS.h5]: Heading5,
+    [HEADING_KEYS.h6]: Heading6,
     [ParagraphPlugin.key]: ParagraphElement,
     [BlockquotePlugin.key]: BlockquoteElement,
     [CodeBlockPlugin.key]: CodeBlockElement,

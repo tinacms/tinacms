@@ -1,0 +1,46 @@
+---
+import { tinaField } from '@tinacms/astro/tina-field';
+import { cn } from '../../lib/utils';
+import { sanitizeHref } from '@tinacms/astro/sanitize';
+
+interface NavAction {
+  label?: string | null;
+  type?: string | null;
+  link?: string | null;
+  icon?: boolean | null;
+}
+
+interface Props {
+  parentColor?: string | null;
+  class?: string;
+  actions?: Array<NavAction | null> | null;
+}
+
+const { parentColor = 'default', class: className = '', actions } = Astro.props;
+---
+<div class={cn('flex flex-wrap items-center gap-y-4 gap-x-6', className)}>
+  {(actions ?? []).map((action) => {
+    if (!action) return null;
+    const isButton = action.type === 'button';
+    const isPrimary = parentColor === 'primary';
+    const colorClass = isButton
+      ? isPrimary
+        ? 'text-theme-500 bg-white hover:bg-gray-50'
+        : 'text-theme-on bg-theme-500 hover:bg-theme-600'
+      : 'text-theme-600 dark:text-theme-400 hover:text-theme-400';
+    return (
+      <a
+        href={sanitizeHref(action.link, '/')}
+        data-tina-field={tinaField(action as Record<string, unknown>)}
+        class={cn(
+          'z-10 relative inline-flex items-center px-7 py-3 font-semibold text-lg transition duration-150 ease-out',
+          isButton && 'rounded-lg whitespace-nowrap',
+          colorClass,
+        )}
+      >
+        {action.label}
+        {action.icon && <span aria-hidden="true" class="ml-1 -mr-1 inline-block">→</span>}
+      </a>
+    );
+  })}
+</div>

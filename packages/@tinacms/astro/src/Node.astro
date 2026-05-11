@@ -1,0 +1,73 @@
+---
+/**
+ * Per-node dispatcher. Picks one of the per-type components based on
+ * `node.type`. Mirrors the switch-on-type in
+ * `packages/tinacms/src/rich-text/index.tsx`. Each node-type group has its
+ * own component; one-liner fallbacks (`hr`, `break`, raw HTML, invalid)
+ * stay inline because splitting them out would just rename a single tag.
+ */
+import CodeBlockNode from './CodeBlockNode.astro';
+import Container from './Container.astro';
+import ImageNode from './ImageNode.astro';
+import Leaf from './Leaf.astro';
+import LinkNode from './LinkNode.astro';
+import MdxNode from './MdxNode.astro';
+import type {
+  CodeBlockElement,
+  CustomComponentsMap,
+  ImageElement,
+  LinkElement,
+  MdxElement,
+  TextElement,
+  TinaRichTextNode,
+} from './types';
+
+interface Props {
+  node: TinaRichTextNode;
+  components: CustomComponentsMap;
+}
+
+const { node, components } = Astro.props;
+const t = node.type;
+const Override = components[t];
+
+const containerTypes = new Set([
+  'p',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+  'ol',
+  'ul',
+  'li',
+  'lic',
+  'blockquote',
+]);
+---
+{containerTypes.has(t) ? (
+  <Container node={node as TinaRichTextNode & { children: TinaRichTextNode[] }} components={components} />
+) : t === 'a' ? (
+  <LinkNode node={node as LinkElement} components={components} />
+) : t === 'img' ? (
+  <ImageNode node={node as ImageElement} components={components} />
+) : t === 'code_block' ? (
+  <CodeBlockNode node={node as CodeBlockElement} components={components} />
+) : t === 'text' ? (
+  <Leaf node={node as TextElement} />
+) : t === 'mdxJsxFlowElement' || t === 'mdxJsxTextElement' ? (
+  <MdxNode node={node as MdxElement} components={components} />
+) : t === 'hr' ? (
+  Override ? <Override /> : <hr />
+) : t === 'break' ? (
+  Override ? <Override /> : <br />
+) : t === 'html' || t === 'html_inline' ? (
+  Override ? (
+    <Override value={(node as { value: string }).value} />
+  ) : (
+    (node as { value: string }).value
+  )
+) : t === 'invalid_markdown' ? (
+  <pre>{(node as { value: string }).value}</pre>
+) : null}
