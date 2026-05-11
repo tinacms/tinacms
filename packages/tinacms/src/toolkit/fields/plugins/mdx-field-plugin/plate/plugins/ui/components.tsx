@@ -94,7 +94,11 @@ type HeadingComponentProps = {
   className?: string;
 };
 
-const Heading1 = ({ attributes, children, className }: HeadingComponentProps) => (
+const Heading1 = ({
+  attributes,
+  children,
+  className,
+}: HeadingComponentProps) => (
   <h1
     {...attributes}
     className={classNames(
@@ -108,7 +112,11 @@ const Heading1 = ({ attributes, children, className }: HeadingComponentProps) =>
   </h1>
 );
 
-const Heading2 = ({ attributes, children, className }: HeadingComponentProps) => (
+const Heading2 = ({
+  attributes,
+  children,
+  className,
+}: HeadingComponentProps) => (
   <h2
     {...attributes}
     className={classNames(
@@ -122,7 +130,11 @@ const Heading2 = ({ attributes, children, className }: HeadingComponentProps) =>
   </h2>
 );
 
-const Heading3 = ({ attributes, children, className }: HeadingComponentProps) => (
+const Heading3 = ({
+  attributes,
+  children,
+  className,
+}: HeadingComponentProps) => (
   <h3
     {...attributes}
     className={classNames(
@@ -136,7 +148,11 @@ const Heading3 = ({ attributes, children, className }: HeadingComponentProps) =>
   </h3>
 );
 
-const Heading4 = ({ attributes, children, className }: HeadingComponentProps) => (
+const Heading4 = ({
+  attributes,
+  children,
+  className,
+}: HeadingComponentProps) => (
   <h4
     {...attributes}
     className={classNames(
@@ -156,7 +172,11 @@ const headerSerifStyle: React.CSSProperties = {
   fontWeight: '400',
 };
 
-const Heading5 = ({ attributes, children, className }: HeadingComponentProps) => (
+const Heading5 = ({
+  attributes,
+  children,
+  className,
+}: HeadingComponentProps) => (
   <h5
     {...attributes}
     className={classNames(
@@ -171,7 +191,11 @@ const Heading5 = ({ attributes, children, className }: HeadingComponentProps) =>
   </h5>
 );
 
-const Heading6 = ({ attributes, children, className }: HeadingComponentProps) => (
+const Heading6 = ({
+  attributes,
+  children,
+  className,
+}: HeadingComponentProps) => (
   <h6
     {...attributes}
     className={classNames(

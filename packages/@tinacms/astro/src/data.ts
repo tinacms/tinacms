@@ -41,10 +41,10 @@ export interface QueryResult<TData> {
  *  know about `PostQuery`, `PageQuery`, etc. */
 type ClientResult<TData> =
   | {
-    data: TData;
-    query: string;
-    variables: Record<string, unknown>;
-  }
+      data: TData;
+      query: string;
+      variables: Record<string, unknown>;
+    }
   | null
   | undefined;
 

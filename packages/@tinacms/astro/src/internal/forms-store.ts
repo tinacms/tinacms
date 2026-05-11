@@ -26,8 +26,9 @@ const STORE_KEY = Symbol.for('@tinacms/astro/forms-store');
 type Slot = { [STORE_KEY]?: AsyncLocalStorage<CollectedForm[]> };
 const slot = globalThis as unknown as Slot;
 
-export const formsStore: AsyncLocalStorage<CollectedForm[]> = (slot[STORE_KEY] ??=
-  new AsyncLocalStorage<CollectedForm[]>());
+export const formsStore: AsyncLocalStorage<CollectedForm[]> = (slot[
+  STORE_KEY
+] ??= new AsyncLocalStorage<CollectedForm[]>());
 
 export function recordForm(form: CollectedForm): void {
   const list = formsStore.getStore();

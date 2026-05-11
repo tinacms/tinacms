@@ -46,8 +46,8 @@ type TinaMarkdownComponent = AstroComponentFactory & {
 const TinaMarkdownPlaceholder = (() => {
   throw new Error(
     "[@tinacms/astro] TinaMarkdown must be loaded through Astro's pipeline. " +
-    'Add `tina()` from `@tinacms/astro/integration` to your astro.config integrations, ' +
-    'or import directly from `@tinacms/astro/TinaMarkdown.astro`.'
+      'Add `tina()` from `@tinacms/astro/integration` to your astro.config integrations, ' +
+      'or import directly from `@tinacms/astro/TinaMarkdown.astro`.'
   );
 }) as unknown as TinaMarkdownComponent;
 
