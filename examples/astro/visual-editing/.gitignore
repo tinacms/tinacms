@@ -6,6 +6,10 @@ dist/
 tina/__generated__/
 public/admin/
 
+# Playwright
+test-results/
+playwright-report/
+
 # Node
 node_modules/
 .env

@@ -12,7 +12,9 @@
     "build:local": "tinacms build --local --skip-cloud-checks -c \"astro build\"",
     "preview": "astro preview",
     "lint": "biome lint .",
-    "format": "biome format --write ."
+    "format": "biome format --write .",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.0",
@@ -31,18 +33,17 @@
     "tinacms": "workspace:*"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.9",
     "@biomejs/biome": "catalog:",
-    "@tailwindcss/postcss": "^4.2.1",
+    "@playwright/test": "catalog:",
     "@tinacms/app": "workspace:*",
     "@tinacms/cli": "workspace:*",
     "@tinacms/scripts": "workspace:*",
     "@types/node": "^25.1.0",
     "@types/react": "^18.3.0",
-    "autoprefixer": "catalog:",
     "cross-env": "^7.0.3",
-    "postcss": "^8.5.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "typescript": "^5.7.3"
+    "typescript": "^5.9.3"
   }
 }
