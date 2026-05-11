@@ -7,31 +7,28 @@
 
 TinaCMS visual editing previously required `useTina()`, a React hook that subscribes to admin postMessages and re-renders the page tree. That made it a hard sell for Astro: the framework is built around shipping zero JS by default, and the existing `examples/astro/kitchen-sink` worked around the React requirement by hydrating React inside the editor iframe — exactly the pattern Astro authors avoid.
 
-This release ships a vanilla-JS bridge that brings the same click-to-focus, live-update, and form-syncing UX to Astro components, Hugo templates, plain HTML — anything that can render a `<script type="application/tina+json">` payload.
+This release ships a vanilla-JS bridge that brings the same click-to-focus, live-update, and form-syncing UX to Astro components, Hugo templates, plain HTML — anything that can emit a `data-tina-form` payload per query.
 
 **New package: `@tinacms/bridge`**
 
-A ~2 KB gzipped, zero-dependency ESM bundle that speaks the existing TinaCMS admin postMessage protocol. Drop it into your `<head>` and editing Just Works. No React in the page tree, no client islands, no hydration cost outside the editor iframe.
+A ~2 KB gzipped, zero-dependency ESM bundle that speaks the existing TinaCMS admin postMessage protocol. No React in the page tree, no client islands, no hydration cost outside the editor iframe.
 
-```astro
----
-import { isEditMode } from './lib/is-edit-mode';
-const editing = isEditMode(Astro.request);
----
+Astro projects install `@tinacms/astro` instead and the bundled integration's middleware auto-injects everything on edit-mode responses. Direct `@tinacms/bridge` consumption is for non-Astro frontends:
+
+```html
 <head>
-  <script type="application/tina+json" set:html={JSON.stringify(form)} />
-  {editing && (
-    <script>
-      import { init } from '@tinacms/bridge';
-      init();
-    </script>
-  )}
+  <div data-tina-form='{"id":"…","query":"…","variables":{},"data":{}}' hidden></div>
+  <script type="module">
+    import { init } from '/_tina/bridge.js';
+    init();
+  </script>
 </head>
 ```
 
 The bridge submodules:
 
-- **`init()`** — top-level entry. Detects iframe embedding, registers all `<script type="application/tina+json">` form payloads with the admin (with retry, since the bridge boots faster than the admin's listener), wires data updates and click-to-focus.
+- **`init()`** — top-level entry. Detects iframe embedding, registers all `[data-tina-form]` payloads with the admin (with retry, since the bridge boots faster than the admin's listener), wires data updates and click-to-focus.
+- **`refreshForms()`** — re-scans the DOM after soft navigations (Astro view transitions, Turbo, htmx). Posts `close` for forms that left and `open` for forms that appeared.
 - **`tinaField()`** — framework-free field-id helper, identical API to `tinacms/dist/react`'s export. Use on any element to make it click-to-edit.
 - **`@tinacms/bridge/preview`** — server-side helper for non-React frameworks. `readOverlay(request, queryId)` returns the unsaved form data the admin is editing, so per-route refresh endpoints can re-render with overlay data on every keystroke.
 
@@ -49,10 +46,10 @@ The bridge takes a soft-refresh approach instead of in-place reconciliation. Mar
 
 A new Astro 5 example that mirrors `examples/astro/kitchen-sink` field-for-field — same six collections (Tag, Author, Global, Post, Blog, Page), same shared content via `localContentPath`, same eight routes — but rendered with pure Astro components instead of React islands. Includes:
 
-- A vanilla **Astro rich-text renderer** that walks the Plate AST Tina returns, dispatches custom MDX components (NewsletterSignup, BlockQuote, DateTime, code blocks) by name to authored Astro components — the same `components` map shape as `TinaMarkdown` from `tinacms/dist/rich-text`, but emitting Astro markup
-- An island-refresh pattern: each editable region has a sibling endpoint at `src/pages/tina-island/<collection>/<param>.ts` that uses Astro's `experimental_AstroContainer` to render the matching component as a fragment-only response
+- The **`@tinacms/astro` package's `TinaMarkdown`** — a vanilla Astro rich-text renderer that walks the Plate AST Tina returns, dispatches custom MDX components (NewsletterSignup, BlockQuote, DateTime, code blocks) by name to authored Astro components — the same `components` map shape as `TinaMarkdown` from `tinacms/dist/rich-text`, but emitting Astro markup
+- An island-refresh pattern: one dynamic endpoint at `src/pages/tina-island/[name].ts` backed by a registry in `src/lib/islands.ts`. The endpoint uses Astro's `experimental_AstroContainer` to render the matching component as a fragment-only response. Adding a new editable region is one entry in the registry
 - Multi-form pages: layout fetches global, route fetches its primary collection, both register independently — admin shows the right form based on which marked element you click
-- A `withOverlay()` helper wrapping every data load so the same code path runs in production (no overlay → real fetch) and inside the editor (overlay → use the bridge payload). Production builds ship zero bridge JS to non-admin visitors
+- A **`requestWithMetadata()`** helper wrapping every data load so the same code path runs in production (no overlay → real fetch) and inside the editor (overlay → use the bridge payload). Production builds ship zero bridge JS to non-admin visitors
 
 **Why this matters for the Astro community**
 
@@ -64,20 +61,15 @@ For nested MDX components in rich-text bodies (e.g. `<NewsletterSignup>` inside 
 
 **Soft-navigation support: `refreshForms()`**
 
-`init()` scans `<script type="application/tina+json">` blocks once on first load and captures the resulting set in closure. Sites using Astro's `<ClientRouter />` (or any view-transitions setup that swaps the DOM without a full reload) would post the first page's forms to the admin and never refresh them — navigating between docs inside the editor iframe left the sidebar showing the previous page's form.
+`init()` scans `[data-tina-form]` elements once on first load and captures the resulting set in closure. Sites using Astro's `<ClientRouter />` (or any view-transitions setup that swaps the DOM without a full reload) would post the first page's forms to the admin and never refresh them — navigating between docs inside the editor iframe left the sidebar showing the previous page's form.
 
-`refreshForms()` re-scans the live DOM, diffs against the previously-mounted set, and posts `close` for forms that disappeared and `open` (with the same retry-until-acked behaviour as `init`) for forms that appeared. The one-time global listeners — `click` capture, the `updateData` ack handler, the `beforeunload` close — stay bound across refreshes, so calling it on every navigation is cheap and idempotent.
+`refreshForms()` re-scans the live DOM, diffs against the previously-mounted set, and posts `close` for forms that disappeared and `open` (with the same retry-until-acked behaviour as `init`) for forms that appeared. The one-time global listeners — `click` capture, the `updateData` ack handler, the `beforeunload` close — stay bound across refreshes, so calling it on every navigation is cheap and idempotent. The Astro integration wires it to `astro:page-load` automatically.
 
-```ts
-import { init, refreshForms } from '@tinacms/astro/bridge';
-init();
-document.addEventListener('astro:page-load', refreshForms);
-```
+**Sticky edit-mode**
 
-`refreshForms()` is a no-op when `init()` hasn't run, so unconditional wiring is safe even on pages that don't use view transitions.
+A `__tina_edit` session cookie (SameSite=Strict, gated on `Sec-Fetch-Dest: iframe`) keeps the iframe in edit mode across in-iframe link clicks — without it, clicking a link inside the preview drops the `/admin/` Referer and the next request falls out of edit mode. Top-level visitors never get edit mode because the dest check fails before the cookie is consulted, so production HTML is unaffected.
 
 **Out of scope (follow-ups)**
 
-- Promoting the rich-text renderer to a standalone `@tinacms/rich-text-astro` package (currently in-example for v1; extract once the API stabilises)
 - Hugo / Eleventy adapters using the same bridge — the contract is framework-free, just needs an integration guide
 - TinaCloud overlay channel — not needed; the stateless POST protocol works against any backend

@@ -14,33 +14,39 @@ Bundles the rich-text renderer and re-exports the framework-agnostic bridge unde
 
 | Subpath | What it gives you |
 |---------|-------------------|
-| `@tinacms/astro` | `TinaMarkdown` (default) — Astro rich-text renderer mirroring the React `TinaMarkdown` API |
-| `@tinacms/astro/types` | `TinaRichTextContent`, `CustomComponentsMap`, `TinaRichTextNode`, `MdxElement`, `TextElement` |
+| `@tinacms/astro` | `requestWithMetadata`, `tinaField`, `QueryResult`, and the rich-text types |
+| `@tinacms/astro/TinaMarkdown.astro` | `<TinaMarkdown content components />` — the rich-text renderer (import via subpath so Astro's check sees a real `.astro` component) |
+| `@tinacms/astro/integration` | `tina()` integration — auto-wires the middleware and bridge route so `requestWithMetadata()` works without threading `Astro.request` or writing wiring components |
+| `@tinacms/astro/TinaIsland.astro` | `<TinaIsland name wrapper params />` — marker wrapper for an editable region |
+| `@tinacms/astro/types` | `TinaRichTextContent`, `CustomComponentsMap`, `TinaRichTextNode`, `MdxElement`, `TextElement`, etc. |
 | `@tinacms/astro/sanitize` | `sanitizeHref` / `sanitizeImageSrc` for CMS-supplied URLs |
-| `@tinacms/astro/bridge` | `init` and the rest of `@tinacms/bridge` |
+| `@tinacms/astro/bridge` | `init`, `refreshForms`, and the rest of `@tinacms/bridge` |
 | `@tinacms/astro/tina-field` | `tinaField()` helper for `data-tina-field` markers |
-| `@tinacms/astro/preview` | `readOverlay()` server helper for per-island refresh endpoints |
+| `@tinacms/astro/is-edit-mode` | `isEditMode(request)` — server-side admin-iframe detection |
+| `@tinacms/astro/experimental` | `experimental_createIslandRoute()` — opt-in helper for the dynamic `/tina-island/[name]` endpoint |
 
 **Usage**
 
 ```astro
 ---
-import TinaMarkdown from '@tinacms/astro';
-import { tinaField } from '@tinacms/astro/tina-field';
+import TinaMarkdown from '@tinacms/astro/TinaMarkdown.astro';
+import { requestWithMetadata, tinaField } from '@tinacms/astro';
+import client from '../tina/__generated__/client';
 import { customComponents } from '../components/markdown';
+
+const post = await requestWithMetadata(
+  client.queries.post({ relativePath: 'hello.md' }),
+);
 ---
 <div data-tina-field={tinaField(post.data.post, '_body')}>
   <TinaMarkdown content={post.data.post._body} components={customComponents} />
 </div>
-
-<script>
-  import { init } from '@tinacms/astro/bridge';
-  init();
-</script>
 ```
+
+Add `tina()` from `@tinacms/astro/integration` to your `astro.config.mjs` and the middleware auto-injects the bridge script + per-form payloads on edit-mode requests. Production HTML is byte-identical to a Tina-free Astro app.
 
 The renderer mirrors the React `TinaMarkdown` from `tinacms/dist/rich-text` — same `content` prop, same `components` map shape — but emits pure HTML with no React in the page tree. Custom MDX components register by name (`mdxJsxFlowElement` / `mdxJsxTextElement`); default tags (`p`, `h1`, `a`, etc.) can be overridden by registering them on the same map.
 
 **Peer deps**
 
-- `astro >=5.0.0` — uses Astro's container API for testing and ships `.astro` source files for the consumer's Astro pipeline to compile.
+- `astro >=5.0.0` — uses Astro's container API for islands and ships `.astro` source files for the consumer's Astro pipeline to compile.
