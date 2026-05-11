@@ -9,6 +9,7 @@ export function generateSessionId(): string {
 export const BuildInvokeEvent = 'tinacms-cli-build-invoke';
 export type BuildInvokeEventPayload = {
   hasLocalOption: boolean;
+  hasContentLocal: boolean;
   skipIndexing: boolean;
   partialReindex: boolean;
   hasPreviewName: boolean;

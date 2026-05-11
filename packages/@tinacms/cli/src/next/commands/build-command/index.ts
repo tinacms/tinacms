@@ -162,6 +162,7 @@ export class BuildCommand extends BaseCommand {
 
     const buildInvokeEventPayload: BuildInvokeEventPayload = {
       hasLocalOption: Boolean(this.localOption),
+      hasContentLocal: this.contentOption === 'local',
       skipIndexing: Boolean(this.skipIndexing),
       partialReindex: Boolean(this.partialReindex),
       hasPreviewName: Boolean(this.previewName),
