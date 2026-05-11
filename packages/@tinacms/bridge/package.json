@@ -20,6 +20,14 @@
     "./preview": {
       "types": "./dist/preview.d.ts",
       "default": "./dist/preview.js"
+    },
+    "./metadata": {
+      "types": "./dist/metadata.d.ts",
+      "default": "./dist/metadata.js"
+    },
+    "./quick-edit-css": {
+      "types": "./dist/quick-edit-css.d.ts",
+      "default": "./dist/quick-edit-css.js"
     }
   },
   "license": "Apache-2.0",
@@ -27,7 +35,9 @@
     "entryPoints": [
       "src/index.ts",
       "src/tina-field.ts",
-      "src/preview.ts"
+      "src/preview.ts",
+      "src/metadata.ts",
+      "src/quick-edit-css.ts"
     ]
   },
   "scripts": {

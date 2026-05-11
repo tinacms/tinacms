@@ -2,9 +2,9 @@
  * Generate a field identifier for Tina to associate DOM elements with form fields.
  * Format: "queryId---path.to.field" or "queryId---path.to.array.index"
  *
- * Mirror of `tinacms/tina-field` so non-React frontends can consume it without
- * pulling tinacms (and its React deps) into their bundle. Source-of-truth lives
- * in packages/tinacms/src/tina-field.ts; keep these two in sync.
+ * Canonical implementation. The React-side `tinacms/tina-field` and Astro-side
+ * `@tinacms/astro/tina-field` both re-export from here so non-React frontends
+ * can consume it without pulling tinacms (and its React deps) into their bundle.
  */
 export const tinaField = <
   T extends
