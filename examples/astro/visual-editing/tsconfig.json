@@ -19,6 +19,15 @@
       "@/*": ["./src/*"]
     }
   },
-  "exclude": ["node_modules"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "tina/__generated__",
+    "tina/collections",
+    "tina/schemas",
+    "tina/fields",
+    "tina/config.tsx",
+    "tina/database.ts"
+  ],
   "include": ["**/*.ts", "**/*.tsx", "**/*.astro"]
 }

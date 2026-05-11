@@ -1,4 +1,13 @@
-@import "tailwindcss";
+/*
+ * `source(none)` disables Tailwind v4's automatic content detection,
+ * which otherwise crawls the project root recursively. In a pnpm
+ * monorepo the workspace's symlinked `node_modules/` makes that crawl
+ * walk the entire repo and balloons the first SSR transform of this
+ * file from <500ms to 70+ seconds. The `@source` line below explicitly
+ * bounds the scan to this app's own source.
+ */
+@import "tailwindcss" source(none);
+@source "./src/**/*.{astro,tsx,ts,jsx,js,md,mdx}";
 @config "../../tailwind.config.js";
 
 /*

@@ -1,6 +1,6 @@
+import typography from '@tailwindcss/typography';
 import colors from 'tailwindcss/colors';
 import defaultTheme from 'tailwindcss/defaultTheme';
-import typography from '@tailwindcss/typography';
 
 export default {
   content: ['./src/**/*.{astro,tsx,ts}'],
