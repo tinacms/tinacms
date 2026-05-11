@@ -1,0 +1,31 @@
+---
+import { sanitizeImageSrc } from '@tinacms/astro/sanitize';
+import { tinaField } from '@tinacms/astro/tina-field';
+import type { AuthorQuery } from '../../../tina/__generated__/types';
+
+interface Props {
+  data: NonNullable<AuthorQuery['author']>;
+}
+
+const { data } = Astro.props;
+const avatarSrc = data.avatar ? sanitizeImageSrc(data.avatar) : '';
+const hobbies = (data.hobbies ?? []).filter((h): h is string => !!h);
+---
+<div class="flex items-center gap-6 mb-8">
+  {avatarSrc && (
+    <img data-tina-field={tinaField(data, 'avatar')} src={avatarSrc} alt={data.name} width="96" height="96" class="rounded-full" />
+  )}
+  {data.name && (
+    <h1 data-tina-field={tinaField(data, 'name')} class="text-4xl font-extrabold tracking-tight">{data.name}</h1>
+  )}
+</div>
+{data.description && (
+  <p data-tina-field={tinaField(data, 'description')} class="text-lg text-gray-600 dark:text-gray-400 mb-6">{data.description}</p>
+)}
+{hobbies.length > 0 && (
+  <div data-tina-field={tinaField(data, 'hobbies')} class="flex flex-wrap gap-2">
+    {hobbies.map((hobby) => (
+      <span class="text-sm px-3 py-1 bg-theme-50 text-theme-700 rounded-full">{hobby}</span>
+    ))}
+  </div>
+)}

@@ -1,0 +1,42 @@
+---
+/**
+ * Marker wrapper for an editable region. Emits the `data-tina-island`
+ * attribute the bridge looks for, with the wrapper element/className taken
+ * from the registry entry — so the page-side element matches the server's
+ * `IslandConfig.wrapper` automatically.
+ *
+ * Usage:
+ *
+ * ```astro
+ * import TinaIsland from '@tinacms/astro/TinaIsland.astro';
+ * import { islands } from '../lib/islands';
+ *
+ * <TinaIsland name="post" wrapper={islands.post.wrapper} params={{ slug }}>
+ *   <PostBody data={data} />
+ * </TinaIsland>
+ * ```
+ *
+ * `name` must match a key in the `IslandRegistry` you passed to
+ * `experimental_createIslandRoute`. `params` is encoded as URL search
+ * params and forwarded to the route handler.
+ */
+interface Props {
+  name: string;
+  wrapper: { tag: string; className?: string };
+  params?: Record<string, string | number>;
+}
+
+const { name, wrapper, params } = Astro.props;
+const search = params
+  ? `?${new URLSearchParams(
+      Object.fromEntries(
+        Object.entries(params).map(([key, value]) => [key, String(value)])
+      )
+    ).toString()}`
+  : '';
+const marker = `/tina-island/${name}${search}`;
+const Tag = wrapper.tag as keyof HTMLElementTagNameMap;
+---
+<Tag class={wrapper.className} data-tina-island={marker}>
+  <slot />
+</Tag>

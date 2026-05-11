@@ -1,4 +1,8 @@
+import { addMetadata, hashFromQuery } from '@tinacms/bridge/metadata';
+import { QUICK_EDIT_CSS } from '@tinacms/bridge/quick-edit-css';
 import React from 'react';
+
+export { addMetadata, hashFromQuery };
 
 export function useTina<T extends object>(props: {
   query: string;
@@ -40,37 +44,7 @@ export function useTina<T extends object>(props: {
     if (quickEditEnabled) {
       const style = document.createElement('style');
       style.type = 'text/css';
-      style.textContent = `
-        [data-tina-field] {
-          outline: 2px dashed rgba(34,150,254,0.5);
-          transition: box-shadow ease-out 150ms;
-        }
-        [data-tina-field]:hover {
-          box-shadow: inset 100vi 100vh rgba(34,150,254,0.3);
-          outline: 2px solid rgba(34,150,254,1);
-          cursor: pointer;
-        }
-        [data-tina-field-overlay] {
-          outline: 2px dashed rgba(34,150,254,0.5);
-          position: relative;
-        }
-        [data-tina-field-overlay]:hover {
-          cursor: pointer;
-          outline: 2px solid rgba(34,150,254,1);
-        }
-        [data-tina-field-overlay]::after {
-          content: '';
-          position: absolute;
-          inset: 0;
-          z-index: 20;
-          transition: opacity ease-out 150ms;
-          background-color: rgba(34,150,254,0.3);
-          opacity: 0;
-        }
-        [data-tina-field-overlay]:hover::after {
-          opacity: 1;
-        }
-      `;
+      style.textContent = QUICK_EDIT_CSS;
       document.head.appendChild(style);
       document.body.classList.add('__tina-quick-editing-enabled');
 
@@ -102,21 +76,11 @@ export function useTina<T extends object>(props: {
             }
           }
         }
-        if (fieldName) {
-          if (isInTinaIframe) {
-            parent.postMessage(
-              { type: 'field:selected', fieldName: fieldName },
-              window.location.origin
-            );
-          } else {
-            // if (preview?.redirect) {
-            //   const tinaAdminBasePath = preview.redirect.startsWith('/')
-            //     ? preview.redirect
-            //     : `/${preview.redirect}`
-            //   const tinaAdminPath = `${tinaAdminBasePath}/index.html#/~${window.location.pathname}?active-field=${fieldName}`
-            //   window.location.assign(tinaAdminPath)
-            // }
-          }
+        if (fieldName && isInTinaIframe) {
+          parent.postMessage(
+            { type: 'field:selected', fieldName: fieldName },
+            window.location.origin
+          );
         }
       }
       document.addEventListener('click', mouseDownHandler, true);
@@ -194,149 +158,4 @@ export function useEditState(): { edit: boolean } {
   return { edit } as any;
 }
 
-/**
- * Grab the field name for the given attribute
- * to signal to Tina which DOM element the field
- * is working with.
- */
-/**
- * Generate a field identifier for Tina to associate DOM elements with form fields.
- * Format: "queryId---path.to.field" or "queryId---path.to.array.index"
- */
-export const tinaField = <
-  T extends
-    | {
-        _content_source?: {
-          queryId: string;
-          path: (number | string)[];
-        };
-      }
-    | Record<string, unknown>
-    | null
-    | undefined,
->(
-  object: T,
-  property?: keyof Omit<NonNullable<T>, '__typename' | '_sys'>,
-  index?: number
-): string => {
-  const contentSource = object?._content_source as
-    | { queryId: string; path: (number | string)[] }
-    | undefined;
-
-  if (!contentSource) {
-    return '';
-  }
-
-  const { queryId, path } = contentSource;
-
-  // Base path without property
-  if (!property) {
-    return `${queryId}---${path.join('.')}`;
-  }
-
-  // Build full path with property and optional index
-  const fullPath =
-    typeof index === 'number'
-      ? [...path, property, index]
-      : [...path, property];
-
-  return `${queryId}---${fullPath.join('.')}`;
-};
-
-/**
- * FIX: This function is updated to be more robust. It explicitly checks for
- * `null` and `String` objects to prevent them from being processed as
- * iterable objects, which is the root cause of the "Objects are not valid
- * as a React child" error.
- */
-export const addMetadata = <T extends object>(
-  id: string,
-  obj: T,
-  path: (string | number)[] = []
-): T => {
-  // Guard against null values, which have a typeof 'object'
-  if (obj === null) {
-    return obj;
-  }
-
-  // Guard against primitive values
-  if (isScalarOrUndefined(obj)) {
-    return obj;
-  }
-
-  // Guard against String objects, returning their primitive value.
-  if (obj instanceof String) {
-    return obj.valueOf() as unknown as T;
-  }
-
-  if (Array.isArray(obj)) {
-    return obj.map((item, index) =>
-      addMetadata(id, item, [...path, index])
-    ) as unknown as T;
-  }
-
-  const transformedObj = {} as T;
-  for (const [key, value] of Object.entries(obj)) {
-    const currentPath = [...path, key];
-
-    // Safely skip system keys and copy them over without recursion
-    if (
-      [
-        '__typename',
-        '_sys',
-        '_internalSys',
-        '_values',
-        '_internalValues',
-        '_content_source',
-        '_tina_metadata',
-      ].includes(key)
-    ) {
-      transformedObj[key] = value;
-    } else {
-      transformedObj[key] = addMetadata(id, value, currentPath);
-    }
-  }
-
-  if (
-    transformedObj &&
-    typeof transformedObj === 'object' &&
-    'type' in transformedObj &&
-    (transformedObj as { type?: unknown }).type === 'root'
-  ) {
-    return transformedObj;
-  }
-
-  return { ...transformedObj, _content_source: { queryId: id, path } };
-};
-
-function isScalarOrUndefined(value: unknown) {
-  const type = typeof value;
-  if (type === 'string') return true;
-  if (type === 'number') return true;
-  if (type === 'boolean') return true;
-  if (type === 'undefined') return true;
-
-  if (value == null) return true;
-  if (value instanceof String) return true;
-  if (value instanceof Number) return true;
-  if (value instanceof Boolean) return true;
-
-  return false;
-}
-
-/**
- * This is a pretty rudimentary approach to hashing the query and variables to
- * ensure we treat multiple queries on the page uniquely. It's possible
- * that we would have collisions, and I'm not sure of the likeliness but seems
- * like it'd be rare.
- */
-export const hashFromQuery = (input: string) => {
-  let hash = 0;
-  for (let i = 0; i < input.length; i++) {
-    const char = input.charCodeAt(i);
-    hash = ((hash << 5) - hash + char) & 0xffffffff; // Apply bitwise AND to ensure non-negative value
-  }
-  const nonNegativeHash = Math.abs(hash);
-  const alphanumericHash = nonNegativeHash.toString(36);
-  return alphanumericHash;
-};
+export { tinaField } from './tina-field';

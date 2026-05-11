@@ -1,0 +1,35 @@
+---
+interface Props {
+  format?: 'utc' | 'iso' | 'local' | string;
+}
+
+const { format = 'local' } = Astro.props;
+const now = new Date();
+const initial =
+  format === 'iso'
+    ? now.toISOString()
+    : format === 'utc'
+      ? now.toUTCString()
+      : now.toLocaleDateString('en-AU');
+---
+<time data-tina-datetime data-format={format}>{initial}</time>
+
+<script>
+  // Re-render the date on the client so the timestamp reflects the
+  // visitor's "now" (the server-rendered value is only correct at
+  // render time). One handler covers every <time data-tina-datetime>
+  // on the page, so adding more in edit-mode refetches stays cheap.
+  const update = () => {
+    const now = new Date();
+    document.querySelectorAll<HTMLTimeElement>('time[data-tina-datetime]').forEach((el) => {
+      const format = el.dataset.format ?? 'local';
+      el.textContent =
+        format === 'iso'
+          ? now.toISOString()
+          : format === 'utc'
+            ? now.toUTCString()
+            : now.toLocaleDateString('en-AU');
+    });
+  };
+  update();
+</script>

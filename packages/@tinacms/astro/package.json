@@ -1,0 +1,116 @@
+{
+  "name": "@tinacms/astro",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "src/TinaMarkdown.astro",
+  "types": "dist/index.d.ts",
+  "files": [
+    "package.json",
+    "src",
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "astro": "./src/TinaMarkdown.astro",
+      "default": "./dist/index.js"
+    },
+    "./TinaMarkdown.astro": "./src/TinaMarkdown.astro",
+    "./TinaIsland.astro": "./src/TinaIsland.astro",
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "astro": "./src/types.ts",
+      "default": "./dist/types.js"
+    },
+    "./sanitize": {
+      "types": "./dist/sanitize.d.ts",
+      "astro": "./src/sanitize.ts",
+      "default": "./dist/sanitize.js"
+    },
+    "./bridge": {
+      "types": "./dist/bridge.d.ts",
+      "astro": "./src/bridge.ts",
+      "default": "./dist/bridge.js"
+    },
+    "./tina-field": {
+      "types": "./dist/tina-field.d.ts",
+      "astro": "./src/tina-field.ts",
+      "default": "./dist/tina-field.js"
+    },
+    "./data": {
+      "types": "./dist/data.d.ts",
+      "astro": "./src/data.ts",
+      "default": "./dist/data.js"
+    },
+    "./is-edit-mode": {
+      "types": "./dist/is-edit-mode.d.ts",
+      "astro": "./src/is-edit-mode.ts",
+      "default": "./dist/is-edit-mode.js"
+    },
+    "./middleware": {
+      "types": "./dist/middleware.d.ts",
+      "astro": "./src/middleware.ts",
+      "default": "./dist/middleware.js"
+    },
+    "./integration": {
+      "types": "./dist/integration.d.ts",
+      "astro": "./src/integration.ts",
+      "default": "./dist/integration.js"
+    },
+    "./bridge-route": {
+      "types": "./dist/bridge-route.d.ts",
+      "astro": "./src/bridge-route.ts",
+      "default": "./dist/bridge-route.js"
+    },
+    "./experimental": {
+      "types": "./dist/experimental.d.ts",
+      "astro": "./src/experimental.ts",
+      "default": "./dist/experimental.js"
+    }
+  },
+  "license": "Apache-2.0",
+  "buildConfig": {
+    "entryPoints": [
+      { "name": "src/index.ts", "target": "node" },
+      { "name": "src/types.ts", "target": "node" },
+      { "name": "src/sanitize.ts", "target": "node" },
+      { "name": "src/bridge.ts", "target": "node" },
+      { "name": "src/tina-field.ts", "target": "node" },
+      { "name": "src/data.ts", "target": "node" },
+      { "name": "src/is-edit-mode.ts", "target": "node" },
+      { "name": "src/middleware.ts", "target": "node" },
+      { "name": "src/integration.ts", "target": "node" },
+      { "name": "src/bridge-route.ts", "target": "node" },
+      { "name": "src/experimental.ts", "target": "node" },
+      { "name": "src/island-route.ts", "target": "node" }
+    ]
+  },
+  "scripts": {
+    "types": "tsc",
+    "build": "tinacms-scripts build",
+    "test": "vitest run",
+    "test-watch": "vitest",
+    "sync-fixtures": "node ./scripts/sync-fixtures.mjs"
+  },
+  "dependencies": {
+    "@tinacms/bridge": "workspace:*"
+  },
+  "peerDependencies": {
+    "astro": "^5.0.0"
+  },
+  "devDependencies": {
+    "@tinacms/scripts": "workspace:*",
+    "@types/node": "^22.13.1",
+    "astro": "^5.16.0",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.0",
+    "vitest": "^3.0.0"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/@tinacms/astro"
+  }
+}

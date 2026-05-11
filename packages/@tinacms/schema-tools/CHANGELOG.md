@@ -1,5 +1,15 @@
 # @tinacms/schema-tools
 
+## 2.7.4
+
+### Patch Changes
+
+- [#6757](https://github.com/tinacms/tinacms/pull/6757) [`38cbec7`](https://github.com/tinacms/tinacms/commit/38cbec7b1b204f395f4e6e97c4bab6edc7296439) Thanks [@OfekDanny](https://github.com/OfekDanny)! - Fix folder creation failing when a collection has `match.exclude` configured.
+
+  `TinaSchema.getCollectionByFullPath` was applying the `match.exclude` glob check to `.gitkeep.*` folder placeholder files, causing the collection lookup to return no results. This made `database.put()` throw during `resolveCreateFolder`, blocking folder creation entirely in any collection with `match.exclude` set.
+
+  The fix skips the `match.include`/`match.exclude` check for `.gitkeep.*` placeholders in both `TinaSchema` and `Database.put`, mirroring the existing extension-check special-case that already handled these files.
+
 ## 2.7.3
 
 ### Patch Changes

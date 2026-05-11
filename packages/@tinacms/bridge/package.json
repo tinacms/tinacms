@@ -1,0 +1,64 @@
+{
+  "name": "@tinacms/bridge",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "package.json",
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./tina-field": {
+      "types": "./dist/tina-field.d.ts",
+      "default": "./dist/tina-field.js"
+    },
+    "./preview": {
+      "types": "./dist/preview.d.ts",
+      "default": "./dist/preview.js"
+    },
+    "./metadata": {
+      "types": "./dist/metadata.d.ts",
+      "default": "./dist/metadata.js"
+    },
+    "./quick-edit-css": {
+      "types": "./dist/quick-edit-css.d.ts",
+      "default": "./dist/quick-edit-css.js"
+    }
+  },
+  "license": "Apache-2.0",
+  "buildConfig": {
+    "entryPoints": [
+      "src/index.ts",
+      "src/tina-field.ts",
+      "src/preview.ts",
+      "src/metadata.ts",
+      "src/quick-edit-css.ts"
+    ]
+  },
+  "scripts": {
+    "types": "tsc",
+    "build": "tinacms-scripts build",
+    "test": "vitest run",
+    "test-watch": "vitest"
+  },
+  "devDependencies": {
+    "@tinacms/scripts": "workspace:*",
+    "@types/node": "^22.13.1",
+    "happy-dom": "catalog:",
+    "typescript": "^5.7.3",
+    "vite": "^5.4.14",
+    "vitest": "^2.1.9"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/@tinacms/bridge"
+  }
+}
