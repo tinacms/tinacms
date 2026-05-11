@@ -5,22 +5,42 @@ The one-stop [TinaCMS](https://tina.io) integration for Astro. Ships:
 - A vanilla-Astro **rich-text renderer** that mirrors the React `TinaMarkdown` API — same `content` prop, same `components` map shape, but emits pure HTML with no React in the page tree.
 - The framework-agnostic **`@tinacms/bridge`** re-exported under `@tinacms/astro/bridge` so you only install one package.
 
+> **Adopting in a new project?** Follow the step-by-step [GETTING_STARTED.md](./GETTING_STARTED.md) — covers install (incl. `@tinacms/cli`), integration wiring, data loaders, island registry, and troubleshooting. The rest of this README is the API reference.
+
 ## Install
 
 ```bash
-pnpm add @tinacms/astro
+pnpm add @tinacms/astro tinacms
+pnpm add -D @tinacms/cli
 ```
 
-Requires Astro 5.
+Requires Astro 5. Also needs an SSR adapter (`@astrojs/node`, `vercel`, `netlify`, or `cloudflare`) and `output: 'server'` in your Astro config.
 
 ## Usage
 
+Add the integration to `astro.config.mjs` once. It wires the request-scoped middleware and the dynamic route that serves the bridge — everything else is auto-injected only on edit-mode requests:
+
+```ts
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import tina from '@tinacms/astro/integration';
+
+export default defineConfig({
+  integrations: [tina()],
+});
+```
+
+Then load data the same way you would in any TinaCMS project — call the generated client, wrap the result with `requestWithMetadata()`:
+
 ```astro
 ---
-import TinaMarkdown from '@tinacms/astro';
-import { tinaField } from '@tinacms/astro/tina-field';
+import TinaMarkdown from '@tinacms/astro/TinaMarkdown.astro';
+import { requestWithMetadata, tinaField } from '@tinacms/astro';
+import client from '../tina/__generated__/client';
 
-const post = await client.queries.post({ relativePath: 'hello.md' });
+const post = await requestWithMetadata(
+  client.queries.post({ relativePath: 'hello.md' }),
+);
 ---
 <article>
   <h1 data-tina-field={tinaField(post.data.post, 'title')}>
@@ -32,28 +52,25 @@ const post = await client.queries.post({ relativePath: 'hello.md' });
 </article>
 ```
 
-Wire the bridge in your base layout to enable click-to-focus and live preview:
+That's the whole user surface. No wiring component in your layout, no `forms` prop to maintain, no `Astro.request` to thread. The integration's middleware buffers each HTML response, and on edit-mode requests splices the form payloads and a `<script type="module" src="/_tina/bridge.js">` before `</head>`. Production visitors get **byte-identical HTML to a Tina-free Astro app** — no `data-tina-form` divs, no script tag, no bundle preload.
 
-```astro
-<head>
-  <script type="application/tina+json" set:html={JSON.stringify(form)} />
-  <script>
-    import { init } from '@tinacms/astro/bridge';
-    init();
-  </script>
-</head>
-```
+For cross-origin admin deployments (Codespaces, separate-domain self-hosted), set `PUBLIC_TINA_ADMIN_ORIGIN` in your env (comma-separate to allow multiple). The middleware embeds it inline so the bridge validates inbound `postMessage` events.
 
 ## Subpath exports
 
 | Subpath | What it gives you |
 |---------|-------------------|
-| `@tinacms/astro` | `TinaMarkdown` (default) |
+| `@tinacms/astro` | `requestWithMetadata`, `tinaField`, `QueryResult`, and types |
+| `@tinacms/astro/TinaMarkdown.astro` | `<TinaMarkdown content components />` — rich-text renderer. Import from this subpath so Astro's check sees a real `.astro` component (the bare-package default resolves through the types condition to a placeholder). |
+| `@tinacms/astro/integration` | `tina()` integration — auto-wires middleware + bridge route so `requestWithMetadata()` works without you threading `Astro.request` or writing wiring components |
+| `@tinacms/astro/TinaIsland.astro` | `<TinaIsland name wrapper params />` — marker wrapper for an editable region |
 | `@tinacms/astro/types` | `TinaRichTextContent`, `CustomComponentsMap`, `TinaRichTextNode`, `MdxElement`, `TextElement` |
 | `@tinacms/astro/sanitize` | `sanitizeHref` / `sanitizeImageSrc` for CMS-supplied URLs |
-| `@tinacms/astro/bridge` | `init` and the rest of `@tinacms/bridge` |
+| `@tinacms/astro/bridge` | `init`, `refreshForms`, and the rest of `@tinacms/bridge` |
 | `@tinacms/astro/tina-field` | `tinaField()` helper |
-| `@tinacms/astro/preview` | `readOverlay()` server helper for island refresh endpoints |
+| `@tinacms/astro/is-edit-mode` | `isEditMode(request)` — server-side admin-iframe detection |
+| `@tinacms/astro/middleware` | The middleware the integration auto-wires — exported here in case you need to compose it manually |
+| `@tinacms/astro/experimental` | `experimental_createIslandRoute()` — opt-in helper built on Astro's unstable `experimental_AstroContainer` |
 
 ## Custom MDX components
 
@@ -61,7 +78,7 @@ Register Astro components against the names Tina uses for them in the editor:
 
 ```astro
 ---
-import TinaMarkdown from '@tinacms/astro';
+import TinaMarkdown from '@tinacms/astro/TinaMarkdown.astro';
 import type { CustomComponentsMap } from '@tinacms/astro/types';
 import BlockQuote from '../components/BlockQuote.astro';
 import NewsletterSignup from '../components/NewsletterSignup.astro';
@@ -99,8 +116,8 @@ The renderer doesn't emit `data-tina-field` attributes — wrap the call site to
 
 ```astro
 ---
+import TinaMarkdown from '@tinacms/astro/TinaMarkdown.astro';
 import { tinaField } from '@tinacms/astro/tina-field';
-import TinaMarkdown from '@tinacms/astro';
 ---
 <div data-tina-field={tinaField(post.data.post, '_body')}>
   <TinaMarkdown content={post.data.post._body} components={components} />
