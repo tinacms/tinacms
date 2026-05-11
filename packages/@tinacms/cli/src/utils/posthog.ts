@@ -1,6 +1,17 @@
 import { PostHog } from 'posthog-node';
 import fetchPostHogConfig from './fetchPostHogConfig';
 
+export const BuildInvokeEvent = 'tinacms-cli-build-invoke';
+export type BuildInvokeEventPayload = {
+    hasLocalOption: boolean;
+    skipIndexing: boolean;
+    partialReindex: boolean;
+    hasPreviewName: boolean;
+    specifiesTinaGraphQLVersions?: boolean;
+    skipCloudChecks: boolean;
+    skipSearchIndex: boolean;
+  };
+
 export async function initializePostHog(
     configEndpoint?: string,
     disableGeoip?: boolean
@@ -29,8 +40,6 @@ export async function initializePostHog(
 
 export function postHogCapture(
   client: PostHog,
-  distinctId: string,
-  sessionId: string,
   event: string,
   properties: Record<string, any>
 ): void {
@@ -42,11 +51,9 @@ export function postHogCapture(
 
   try {
     client.capture({
-      distinctId,
       event,
       properties: {
         ...properties,
-        sessionId,
         system: 'tinacms/cli',
       },
     });
@@ -167,8 +174,7 @@ function sanitizeError(error: Error): SanitizedError {
  * Capture an error event in PostHog with categorized tracking and sanitized stack traces
  *
  * @param client - The PostHog client instance
- * @param distinctId - A unique identifier for the user (hashed system UUID)
- * @param sessionId - A unique identifier for this run/session
+ * @param event - The name of the event to track
  * @param error - The error object that was thrown
  * @param context - Context about the error including code, category, step, and additional properties
  *
@@ -198,8 +204,7 @@ function sanitizeError(error: Error): SanitizedError {
  */
 export function postHogCaptureError(
   client: PostHog | null,
-  distinctId: string,
-  sessionId: string,
+  event: string,
   error: Error,
   context: {
     errorCode: string;
@@ -242,17 +247,15 @@ export function postHogCaptureError(
     step,
     fatal,
     user_cancelled: errorCategory === 'user-cancellation',
-    sessionId,
     ...additionalProperties,
   };
 
   try {
     client.capture({
-      distinctId,
-      event: eventName,
+      event,
       properties: {
         ...properties,
-        system: 'tinacms/create-tina-app',
+        system: 'tinacms/cli',
       },
     });
   } catch (captureError) {
