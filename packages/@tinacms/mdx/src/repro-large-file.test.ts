@@ -1,12 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import type { RichTextField } from '@tinacms/schema-tools';
-import { parseMDX } from './next/parse';
-import { stringifyMDX } from './next/stringify';
+import { parseMDX } from './parse';
+import { serializeMDX } from './stringify';
 
 const field: RichTextField = {
   name: '_body',
   type: 'rich-text',
-  parser: { type: 'markdown' },
+  parser: { type: 'mdx' },
   templates: [
     {
       name: 'BlockQuote',
@@ -91,7 +91,8 @@ describe('large-file round trip', () => {
   it('preserves the first DateTime inline embed', () => {
     const input = SECTION + SECTION; // two sections, like the real file
     const tree = parseMDX(input, field, (v) => v);
-    const out = stringifyMDX(tree, field, (v) => v) ?? '';
+    const result = serializeMDX(tree, field, (v) => v);
+    const out = typeof result === 'string' ? result : '';
 
     const datetimeCount = (out.match(/<DateTime/g) ?? []).length;
     expect(datetimeCount).toBe(2);
@@ -100,7 +101,8 @@ describe('large-file round trip', () => {
   it('preserves NewsletterSignup blocks unescaped', () => {
     const input = SECTION;
     const tree = parseMDX(input, field, (v) => v);
-    const out = stringifyMDX(tree, field, (v) => v) ?? '';
+    const result = serializeMDX(tree, field, (v) => v);
+    const out = typeof result === 'string' ? result : '';
 
     expect(out).not.toContain('\\<NewsletterSignup');
     expect(out).toContain('<NewsletterSignup');
