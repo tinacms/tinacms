@@ -224,7 +224,8 @@ export class TinaMediaStore implements MediaStore {
   ): Promise<Media[]> {
     const byDirectory = new Map<string, MediaUploadOptions[]>();
     for (const item of media) {
-      const dir = (item.directory || '').replace(/\/+$/, '');
+      let dir = item.directory || '';
+      while (dir.endsWith('/')) dir = dir.slice(0, -1);
       const bucket = byDirectory.get(dir) ?? [];
       bucket.push(item);
       byDirectory.set(dir, bucket);
