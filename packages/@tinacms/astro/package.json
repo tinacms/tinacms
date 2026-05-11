@@ -12,38 +12,77 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "default": "./src/TinaMarkdown.astro"
+      "astro": "./src/TinaMarkdown.astro",
+      "default": "./dist/index.js"
     },
+    "./TinaMarkdown.astro": "./src/TinaMarkdown.astro",
+    "./TinaIsland.astro": "./src/TinaIsland.astro",
     "./types": {
       "types": "./dist/types.d.ts",
+      "astro": "./src/types.ts",
       "default": "./dist/types.js"
     },
     "./sanitize": {
       "types": "./dist/sanitize.d.ts",
+      "astro": "./src/sanitize.ts",
       "default": "./dist/sanitize.js"
     },
     "./bridge": {
       "types": "./dist/bridge.d.ts",
+      "astro": "./src/bridge.ts",
       "default": "./dist/bridge.js"
     },
     "./tina-field": {
       "types": "./dist/tina-field.d.ts",
+      "astro": "./src/tina-field.ts",
       "default": "./dist/tina-field.js"
     },
-    "./preview": {
-      "types": "./dist/preview.d.ts",
-      "default": "./dist/preview.js"
+    "./data": {
+      "types": "./dist/data.d.ts",
+      "astro": "./src/data.ts",
+      "default": "./dist/data.js"
+    },
+    "./is-edit-mode": {
+      "types": "./dist/is-edit-mode.d.ts",
+      "astro": "./src/is-edit-mode.ts",
+      "default": "./dist/is-edit-mode.js"
+    },
+    "./middleware": {
+      "types": "./dist/middleware.d.ts",
+      "astro": "./src/middleware.ts",
+      "default": "./dist/middleware.js"
+    },
+    "./integration": {
+      "types": "./dist/integration.d.ts",
+      "astro": "./src/integration.ts",
+      "default": "./dist/integration.js"
+    },
+    "./bridge-route": {
+      "types": "./dist/bridge-route.d.ts",
+      "astro": "./src/bridge-route.ts",
+      "default": "./dist/bridge-route.js"
+    },
+    "./experimental": {
+      "types": "./dist/experimental.d.ts",
+      "astro": "./src/experimental.ts",
+      "default": "./dist/experimental.js"
     }
   },
   "license": "Apache-2.0",
   "buildConfig": {
     "entryPoints": [
-      "src/index.ts",
-      "src/types.ts",
-      "src/sanitize.ts",
-      "src/bridge.ts",
-      "src/tina-field.ts",
-      "src/preview.ts"
+      { "name": "src/index.ts", "target": "node" },
+      { "name": "src/types.ts", "target": "node" },
+      { "name": "src/sanitize.ts", "target": "node" },
+      { "name": "src/bridge.ts", "target": "node" },
+      { "name": "src/tina-field.ts", "target": "node" },
+      { "name": "src/data.ts", "target": "node" },
+      { "name": "src/is-edit-mode.ts", "target": "node" },
+      { "name": "src/middleware.ts", "target": "node" },
+      { "name": "src/integration.ts", "target": "node" },
+      { "name": "src/bridge-route.ts", "target": "node" },
+      { "name": "src/experimental.ts", "target": "node" },
+      { "name": "src/island-route.ts", "target": "node" }
     ]
   },
   "scripts": {
