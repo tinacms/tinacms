@@ -62,6 +62,7 @@
     "@radix-ui/react-tooltip": "catalog:",
     "@react-hook/window-size": "catalog:",
     "@tanstack/react-table": "^8.21.3",
+    "@tinacms/bridge": "workspace:*",
     "@tinacms/mdx": "workspace:*",
     "@tinacms/schema-tools": "workspace:*",
     "@tinacms/search": "workspace:*",

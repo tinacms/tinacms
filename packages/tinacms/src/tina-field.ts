@@ -1,44 +1,5 @@
 /**
- * Generate a field identifier for Tina to associate DOM elements with form fields.
- * Format: "queryId---path.to.field" or "queryId---path.to.array.index"
- *
- * Pure helper. No framework dependencies — safe to import from vanilla JS,
- * Astro, Hugo templates, or any non-React renderer.
+ * Re-export of the canonical `tinaField` helper from `@tinacms/bridge`.
+ * Kept here so `tinacms/tina-field` consumers don't need to switch imports.
  */
-export const tinaField = <
-  T extends
-    | {
-        _content_source?: {
-          queryId: string;
-          path: (number | string)[];
-        };
-      }
-    | Record<string, unknown>
-    | null
-    | undefined,
->(
-  object: T,
-  property?: keyof Omit<NonNullable<T>, '__typename' | '_sys'>,
-  index?: number
-): string => {
-  const contentSource = object?._content_source as
-    | { queryId: string; path: (number | string)[] }
-    | undefined;
-
-  if (!contentSource) {
-    return '';
-  }
-
-  const { queryId, path } = contentSource;
-
-  if (!property) {
-    return `${queryId}---${path.join('.')}`;
-  }
-
-  const fullPath =
-    typeof index === 'number'
-      ? [...path, property, index]
-      : [...path, property];
-
-  return `${queryId}---${fullPath.join('.')}`;
-};
+export { tinaField } from '@tinacms/bridge/tina-field';
