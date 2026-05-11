@@ -2,7 +2,6 @@ import crypto from 'crypto';
 import path from 'path';
 import { ChangeType, diff } from '@graphql-inspector/core';
 import { type Database, FilesystemBridge, buildSchema } from '@tinacms/graphql';
-import { Telemetry } from '@tinacms/metrics';
 import { parseURL } from '@tinacms/schema-tools';
 import {
   type SearchClient,
@@ -148,15 +147,6 @@ export class BuildCommand extends BaseCommand {
       process.exit(1);
     }
 
-    // Track localContentPath usage so we can measure adoption of the
-    // multi-repo separation.
-    const telemetry = new Telemetry({ disabled: this.noTelemetry });
-    await telemetry.submitRecord({
-      event: {
-        name: 'tinacms:cli:build:invoke',
-        hasLocalContentPath: Boolean(configManager.config.localContentPath),
-      },
-    });
     this.posthogClient = this.noTelemetry
     ? null
     : await initializePostHog('https://identity-v2.tinajs.io/v2/posthog-token', false)

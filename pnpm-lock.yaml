@@ -1351,6 +1351,9 @@ importers:
       '@tinacms/graphql':
         specifier: workspace:*
         version: link:../graphql
+      '@tinacms/metrics':
+        specifier: workspace:*
+        version: link:../metrics
       '@tinacms/schema-tools':
         specifier: workspace:*
         version: link:../schema-tools

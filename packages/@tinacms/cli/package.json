@@ -68,6 +68,7 @@
         "@tailwindcss/typography": "catalog:",
         "@tinacms/app": "workspace:*",
         "@tinacms/graphql": "workspace:*",
+        "@tinacms/metrics": "workspace:*",
         "@tinacms/schema-tools": "workspace:*",
         "@tinacms/search": "workspace:*",
         "@vitejs/plugin-react": "catalog:",
