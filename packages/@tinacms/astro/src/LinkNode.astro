@@ -1,10 +1,10 @@
 ---
 import TinaMarkdown from './TinaMarkdown.astro';
 import { sanitizeHref } from './sanitize';
-import type { CustomComponentsMap, TinaRichTextNode } from './types';
+import type { CustomComponentsMap, LinkElement } from './types';
 
 interface Props {
-  node: { url: string; title?: string; children: TinaRichTextNode[] };
+  node: LinkElement;
   components: CustomComponentsMap;
 }
 

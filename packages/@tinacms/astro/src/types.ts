@@ -6,8 +6,8 @@
  */
 
 /**
- * Astro doesn't publicly export the `AstroComponentFactory` type, so we use
- * a structural placeholder. The consumer's Astro pipeline performs the real
+ * Astro doesn't publicly export `AstroComponentFactory`, so we use a
+ * structural placeholder. The consumer's Astro pipeline performs the real
  * compile-time check that whatever they pass is a valid component.
  */
 export type AstroComponent = (...args: never[]) => unknown;
@@ -23,6 +23,27 @@ export type TinaRichTextNode =
   | TextElement
   | MdxElement;
 
+export type LinkElement = {
+  type: 'a';
+  url: string;
+  title?: string;
+  children: InlineElement[];
+};
+
+export type ImageElement = {
+  type: 'img';
+  url: string;
+  alt?: string;
+  caption?: string;
+};
+
+export type CodeBlockElement = {
+  type: 'code_block';
+  lang?: string;
+  value?: string;
+  children?: { children: TextElement[] }[];
+};
+
 export type BlockElement =
   | { type: 'p'; children: InlineElement[] }
   | {
@@ -35,20 +56,15 @@ export type BlockElement =
   | { type: 'lic'; children: InlineElement[] }
   | { type: 'hr' }
   | { type: 'break' }
-  | { type: 'img'; url: string; alt?: string; caption?: string }
-  | {
-      type: 'code_block';
-      lang?: string;
-      value?: string;
-      children?: { children: TextElement[] }[];
-    }
+  | ImageElement
+  | CodeBlockElement
   | { type: 'maybe_mdx' }
   | { type: 'html'; value: string }
   | { type: 'invalid_markdown'; value: string };
 
 export type InlineElement =
   | TextElement
-  | { type: 'a'; url: string; title?: string; children: InlineElement[] }
+  | LinkElement
   | { type: 'html_inline'; value: string }
   | MdxElement;
 

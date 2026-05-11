@@ -8,7 +8,15 @@
  * (mdxJsxFlowElement / mdxJsxTextElement). Default tags (p, h1-h6, ul, ol,
  * li, blockquote, etc.) can be overridden by registering the tag name on
  * the same map. Recurses via this same component for nested rich-text.
+ *
+ * This file is also the package's main runtime entry — Astro projects
+ * import `TinaMarkdown` (default) plus the `tina` / `tinaField` helpers
+ * from the same subpath. Re-exporting from the .astro file lets named
+ * imports resolve through the same path that serves the component.
  */
+export { requestWithMetadata } from './data';
+export { tinaField } from './tina-field';
+
 import Node from './Node.astro';
 import type { CustomComponentsMap, TinaRichTextContent } from './types';
 

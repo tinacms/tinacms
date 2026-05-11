@@ -13,7 +13,10 @@ import Leaf from './Leaf.astro';
 import LinkNode from './LinkNode.astro';
 import MdxNode from './MdxNode.astro';
 import type {
+  CodeBlockElement,
   CustomComponentsMap,
+  ImageElement,
+  LinkElement,
   MdxElement,
   TextElement,
   TinaRichTextNode,
@@ -46,11 +49,11 @@ const containerTypes = new Set([
 {containerTypes.has(t) ? (
   <Container node={node as TinaRichTextNode & { children: TinaRichTextNode[] }} components={components} />
 ) : t === 'a' ? (
-  <LinkNode node={node as { url: string; children: TinaRichTextNode[] }} components={components} />
+  <LinkNode node={node as LinkElement} components={components} />
 ) : t === 'img' ? (
-  <ImageNode node={node as { url: string; alt?: string; caption?: string }} components={components} />
+  <ImageNode node={node as ImageElement} components={components} />
 ) : t === 'code_block' ? (
-  <CodeBlockNode node={node as { value?: string; lang?: string; children?: { children: TextElement[] }[] }} components={components} />
+  <CodeBlockNode node={node as CodeBlockElement} components={components} />
 ) : t === 'text' ? (
   <Leaf node={node as TextElement} />
 ) : t === 'mdxJsxFlowElement' || t === 'mdxJsxTextElement' ? (
@@ -60,7 +63,11 @@ const containerTypes = new Set([
 ) : t === 'break' ? (
   Override ? <Override /> : <br />
 ) : t === 'html' || t === 'html_inline' ? (
-  <Fragment set:html={(node as { value: string }).value} />
+  Override ? (
+    <Override value={(node as { value: string }).value} />
+  ) : (
+    (node as { value: string }).value
+  )
 ) : t === 'invalid_markdown' ? (
   <pre>{(node as { value: string }).value}</pre>
 ) : null}

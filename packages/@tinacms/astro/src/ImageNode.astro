@@ -1,9 +1,9 @@
 ---
 import { sanitizeImageSrc } from './sanitize';
-import type { CustomComponentsMap } from './types';
+import type { CustomComponentsMap, ImageElement } from './types';
 
 interface Props {
-  node: { url: string; alt?: string; caption?: string };
+  node: ImageElement;
   components: CustomComponentsMap;
 }
 

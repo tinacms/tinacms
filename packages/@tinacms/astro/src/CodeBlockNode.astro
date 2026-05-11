@@ -4,14 +4,10 @@
  * `children: [{ children: [{ text }, ...] }, ...]` (one outer entry per line).
  * Flatten both shapes to a single string before rendering.
  */
-import type { CustomComponentsMap, TextElement } from './types';
+import type { CodeBlockElement, CustomComponentsMap } from './types';
 
 interface Props {
-  node: {
-    value?: string;
-    lang?: string;
-    children?: { children: TextElement[] }[];
-  };
+  node: CodeBlockElement;
   components: CustomComponentsMap;
 }
 
