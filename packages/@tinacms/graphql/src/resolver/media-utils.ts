@@ -26,18 +26,19 @@ export const resolveMediaCloudToRelative = (
     }
 
     if (hasTinaMediaConfig(schema) === true) {
-      const assetsURL = `https://${config.assetsHost}/${config.clientId}`;
       const cleanMediaRoot = cleanUpSlashes(schema.config.media.tina.mediaRoot);
+      const cloudUrl = cloudUrlPattern(config.clientId);
 
-      if (typeof value === 'string' && value.includes(assetsURL)) {
+      if (typeof value === 'string' && cloudUrl.test(value)) {
         return `${cleanMediaRoot}${stripStagingPrefix(
-          value.replace(assetsURL, '')
+          value.replace(cloudUrl, '')
         )}`;
       }
       if (Array.isArray(value)) {
         return value.map((v) => {
           if (!v || typeof v !== 'string') return v;
-          const strippedURL = v.replace(assetsURL, '');
+          if (!cloudUrl.test(v)) return v;
+          const strippedURL = v.replace(cloudUrl, '');
           return `${cleanMediaRoot}${stripStagingPrefix(strippedURL)}`;
         });
       }
@@ -115,6 +116,15 @@ const stripStagingPrefix = (path: string): string => {
   const match = path.match(STAGING_SEGMENT);
   return match ? match[1] : path;
 };
+
+const escapeRegExp = (s: string): string =>
+  s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+// Matches a TinaCloud cloud URL for the given client. The host segment varies
+// across stages (e.g. `assets.tina.io`, `assets-{stage}.tinajs.dev`); the
+// `<clientId>/…` path prefix is the durable invariant.
+const cloudUrlPattern = (clientId: string): RegExp =>
+  new RegExp(`^https://[^/]+/${escapeRegExp(clientId)}`);
 
 const cleanUpSlashes = (path: string): string => {
   if (path) {

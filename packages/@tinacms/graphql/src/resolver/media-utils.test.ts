@@ -218,6 +218,100 @@ describe('resolveMedia', () => {
   });
 
   /**
+   * A cloud URL whose host doesn't match `config.assetsHost` (e.g. content
+   * uploaded against a different stage, or against the dashboard's hardcoded
+   * default) should still strip cleanly. The `<clientId>/…` path prefix is the
+   * invariant — the host segment can vary across stages.
+   */
+  it('strips cloud URL whose host differs from config.assetsHost', () => {
+    const config: GraphQLConfig = {
+      useRelativeMedia: false,
+      assetsHost,
+      clientId,
+    };
+
+    const otherStageURL = `https://assets.tina.io/${clientId}/llama.png`;
+    const resolvedURL = resolveMediaCloudToRelative(
+      otherStageURL,
+      config,
+      schema
+    );
+    expect(resolvedURL).toEqual(relativeURL);
+  });
+
+  /**
+   * Array values containing cloud URLs from a mix of stages should each be
+   * stripped to a relative path regardless of which host they were uploaded
+   * against.
+   */
+  it('strips array values with mixed cloud-URL hosts', () => {
+    const config: GraphQLConfig = {
+      useRelativeMedia: false,
+      assetsHost,
+      clientId,
+    };
+
+    const resolved = resolveMediaCloudToRelative(
+      [
+        `https://${assetsHost}/${clientId}/a.png`,
+        `https://assets.tina.io/${clientId}/b.png`,
+        `https://assets-other-stage.tinajs.dev/${clientId}/c.png`,
+      ],
+      config,
+      schema
+    );
+    expect(resolved).toEqual([
+      '/uploads/a.png',
+      '/uploads/b.png',
+      '/uploads/c.png',
+    ]);
+  });
+
+  /**
+   * Cross-host stripping should still respect the `__staging/{branch}` prefix,
+   * so editorial-branch content migrated between stages round-trips correctly.
+   */
+  it('strips staging prefix from cross-host cloud URLs', () => {
+    const config: GraphQLConfig = {
+      useRelativeMedia: false,
+      assetsHost,
+      clientId,
+      branch: 'feat/x',
+      mediaBranch: 'main',
+    };
+
+    const otherStageStagingURL = `https://assets.tina.io/${clientId}/__staging/feat/x/__file/llama.png`;
+    const resolvedURL = resolveMediaCloudToRelative(
+      otherStageStagingURL,
+      config,
+      schema
+    );
+    expect(resolvedURL).toEqual(relativeURL);
+  });
+
+  /**
+   * URLs whose path doesn't begin with the configured client id (e.g. a
+   * non-TinaCloud asset URL or content from a different project) must be left
+   * alone.
+   */
+  it('does not strip URLs that do not match the configured clientId', () => {
+    const config: GraphQLConfig = {
+      useRelativeMedia: false,
+      assetsHost,
+      clientId,
+    };
+
+    const otherClientURL =
+      'https://assets.tina.io/00000000-0000-0000-0000-000000000000/llama.png';
+    const resolvedURL = resolveMediaCloudToRelative(
+      otherClientURL,
+      config,
+      schema
+    );
+    expect(resolvedURL).toEqual(otherClientURL);
+  });
+
+  /**
    * Missing `media: { tina: { ... }}` config should return the value, regardless of `useRelativeMedia`
    */
   it('persists value when no `tina` config is provided regardless of `useRelativeMedia`', () => {
