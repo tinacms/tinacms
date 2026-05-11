@@ -71,7 +71,7 @@ const Post: Collection = {
       ...tagsFieldSchema,
       ui: {
         itemProps: (item: Record<string, unknown>) => {
-          return { label: item?.tag };
+          return { label: typeof item?.tag === 'string' ? item.tag : undefined };
         },
       },
     },
@@ -79,6 +79,7 @@ const Post: Collection = {
       type: 'rich-text',
       label: 'Body',
       name: '_body',
+      parser: { type: 'mdx' },
       templates: [
         {
           name: 'BlockQuote',

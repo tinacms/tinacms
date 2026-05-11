@@ -55,11 +55,12 @@ Same schema as the React kitchen-sink — copied verbatim from `tina/collections
 ┌─────────────────────────────────┐    ┌──────────────────────────────┐
 │  Admin (/admin/index.html)      │    │  Iframe (your Astro page)    │
 │  React app, owns the form       │    │  Server-rendered HTML +      │
-│                                 │    │  @tinacms/bridge in <head>   │
+│                                 │    │  bridge script + form payloads │
+│                                 │    │  spliced into <head> by        │
+│                                 │    │  the tina() middleware         │
 │                                 │    │                              │
 │  ◀── {open, id, query, data} ◀──┼────│  bridge reads                │
-│                                 │    │   <script type=              │
-│                                 │    │    "application/tina+json">  │
+│                                 │    │   [data-tina-form] elements  │
 │                                 │    │                              │
 │  user edits a field             │    │                              │
 │  ─── {updateData, id, data} ──▶ │    │  bridge stores latest data   │
@@ -73,7 +74,7 @@ Same schema as the React kitchen-sink — copied verbatim from `tina/collections
 └─────────────────────────────────┘    └──────────────────────────────┘
 ```
 
-Each editable region on the page carries two attributes:
+Editable regions on the page carry two attributes:
 
 ```astro
 <article data-tina-island="/tina-island/post?slug=foo">
@@ -86,26 +87,20 @@ Each editable region on the page carries two attributes:
 - **`data-tina-island`** points to a refresh endpoint. The bridge POSTs the unsaved overlay there; the endpoint re-renders the matching component with overlay data; the bridge swaps the HTML.
 - **`data-tina-field`** marks individual fields for click-to-focus. Clicking the element in the iframe focuses the matching field in the admin sidebar.
 
-The page also emits a form payload per editable query so the admin knows the shape of what's being edited:
-
-```astro
-<script type="application/tina+json" set:html={JSON.stringify({ id, query, variables, data })} />
-```
-
-The bridge picks these up at boot and registers each as a form with the admin.
+The page also emits one `<div data-tina-form="…" hidden>` per editable query so the admin knows the shape of what's being edited. **You don't write that wiring** — the `tina()` integration's middleware splices both the form payloads and the `<script>` that loads `/_tina/bridge.js` into the page's `<head>` on edit-mode requests, and serves zero JS on every other request. Production HTML is byte-identical to a Tina-free Astro app.
 
 ### Stateless overlay
 
-Edits never touch the canonical content store. The admin pushes already-resolved data to the bridge via postMessage; the bridge forwards it to the island endpoint via the request body; the endpoint reads it via `readOverlay()` from `@tinacms/bridge/preview`. Same code runs in production with no overlay header — the helper falls through to the normal Tina GraphQL fetch.
+Edits never touch the canonical content store. The admin pushes already-resolved data to the bridge via postMessage; the bridge forwards it to the island endpoint via the request body; the endpoint reads it via `readOverlay()` from `@tinacms/bridge/preview`. Same code runs in production with no overlay — the helper falls through to the normal Tina GraphQL fetch.
+
+`requestWithMetadata` from `@tinacms/astro` wraps the pattern in one call: it stamps the result with the metadata `tinaField()` reads, generates the form id the bridge uses to address the form, and in edit mode swaps `data` for the unsaved overlay automatically.
 
 ```ts
-// src/lib/tina-preview.ts (excerpt)
-const overlay = await readOverlay<T>(request, id);
-if (overlay !== undefined) {
-  return { data: overlay, query, variables, id };  // edit mode
-}
-const fetched = await fetcher();
-return { data: fetched ?? defaults, query, variables, id };  // production
+import { requestWithMetadata } from '@tinacms/astro';
+import client from '../../tina/__generated__/client';
+
+export const getPost = (slug: string) =>
+  requestWithMetadata(client.queries.post({ relativePath: `${slug}.md` }));
 ```
 
 No backend changes shipped. Works against self-hosted Tina, TinaCloud, or any GraphQL endpoint.
@@ -115,7 +110,9 @@ No backend changes shipped. Works against self-hosted Tina, TinaCloud, or any Gr
 The example uses a single dynamic island endpoint backed by a registry — adding a new editable region is **one entry in `src/lib/islands.ts`**:
 
 ```ts
-export const islands: Record<string, IslandConfig> = {
+import type { IslandRegistry } from '@tinacms/astro/experimental';
+
+export const islands: IslandRegistry = {
   // ...existing entries
   myFeature: {
     fetch: (request, params) => getMyFeature(params.get('id') ?? '', request),
@@ -126,7 +123,7 @@ export const islands: Record<string, IslandConfig> = {
 };
 ```
 
-The dynamic route at `src/pages/tina-island/[name].ts` looks up the entry, calls `fetch`, renders the component, and returns the wrapped fragment. Use the new island in any page:
+The dynamic route at `src/pages/tina-island/[name].ts` is a one-liner that delegates to `experimental_createIslandRoute(islands)` from `@tinacms/astro/experimental`. Use the new island in any page:
 
 ```astro
 <section
@@ -141,7 +138,7 @@ That's it — no new endpoint file, no boilerplate.
 
 ## Rich text
 
-Tina's rich-text bodies (Plate AST) render through `src/components/rich-text/TinaMarkdown.astro` — a vanilla recursive walker that mirrors the React `TinaMarkdown` API. Custom MDX components (`mdxJsxFlowElement` / `mdxJsxTextElement`) are dispatched by `node.name` against the `customComponents` map in `src/components/markdown/index.ts`.
+Tina's rich-text bodies (Plate AST) render through `TinaMarkdown` from `@tinacms/astro/TinaMarkdown.astro` — a vanilla recursive walker that mirrors the React `TinaMarkdown` API. Custom MDX components (`mdxJsxFlowElement` / `mdxJsxTextElement`) are dispatched by `node.name` against the `customComponents` map in `src/components/markdown/index.ts`.
 
 The four shipped MDX components mirror the React kitchen-sink:
 
@@ -195,7 +192,6 @@ Normal visitors hitting a server-rendered page get the same HTML they'd get from
 ## What this example doesn't ship (yet)
 
 - **TinaCloud overlay channel** — not needed; the stateless POST protocol works against any backend
-- **Standalone `@tinacms/rich-text-astro` package** — the renderer is in-example for v1; will be extracted once the API stabilises
 - **Astro view transitions** for swap polish — possible follow-up
 - **Live theme refresh without page reload** — would need theme to be its own island
 
@@ -211,7 +207,7 @@ For nested MDX components in rich-text bodies (e.g. `<NewsletterSignup>` inside 
 | React in the page tree | Yes (hydrated in editor only) | No |
 | Production JS | ~0 KB outside editor | ~2 KB gzipped (bridge bails when not in iframe) |
 | Astro output | `static` | `server` (with per-route prerender opt-in) |
-| Rich-text renderer | `tinacms/dist/rich-text` (React) | `src/components/rich-text/` (Astro, in-example) |
+| Rich-text renderer | `tinacms/dist/rich-text` (React) | `@tinacms/astro/TinaMarkdown.astro` (Astro) |
 | Adapter | None (static) | `@astrojs/node` (or any) |
 
 ## Reference

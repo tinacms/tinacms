@@ -1,20 +1,14 @@
 ---
-import { sanitizeHref } from '../../lib/utils';
+import type { GlobalQuery } from '../../../tina/__generated__/types';
+import { sanitizeHref } from '@tinacms/astro/sanitize';
 import Container from './Container.astro';
 
-interface SocialLink {
-  icon?: string | null;
-  url?: string | null;
-}
-
 interface Props {
-  data: {
-    social?: SocialLink[] | null;
-  } | null;
+  data: NonNullable<GlobalQuery['global']>['footer'] | null;
 }
 
 const { data } = Astro.props;
-const social = data?.social ?? [];
+const social = (data?.social ?? []).filter((item) => item !== null);
 
 const iconLabel: Record<string, string> = {
   github: 'GitHub',

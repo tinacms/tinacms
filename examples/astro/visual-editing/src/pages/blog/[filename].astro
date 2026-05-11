@@ -1,17 +1,19 @@
 ---
+import TinaIsland from '@tinacms/astro/TinaIsland.astro';
 import BlogBody from '../../components/islands/BlogBody.astro';
 import Base from '../../layouts/Base.astro';
 import { getBlog } from '../../lib/data';
+import { islands } from '../../lib/islands';
 
 const filename = (Astro.params.filename ?? '').toString();
-const blog = await getBlog(filename, Astro.request);
-const data = blog.data?.blog as Record<string, unknown> | undefined;
+const blog = await getBlog(filename);
+if (!blog.data?.blog) {
+  return new Response('Not Found', { status: 404 });
+}
+const data = blog.data.blog;
 ---
-<Base
-  title={`${(data?.title as string) ?? 'Blog'} | Blog`}
-  forms={[{ id: blog.id, query: blog.query, variables: blog.variables, data: blog.data as unknown as object }]}
->
-  <article class="max-w-3xl mx-auto px-6 sm:px-8 py-16" data-tina-island={`/tina-island/blog?filename=${encodeURIComponent(filename)}`}>
+<Base title={`${data.title} | Blog`}>
+  <TinaIsland name="blog" wrapper={islands.blog.wrapper} params={{ filename }}>
     <BlogBody data={data} />
-  </article>
+  </TinaIsland>
 </Base>

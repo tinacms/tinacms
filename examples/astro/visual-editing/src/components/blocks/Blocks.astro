@@ -1,10 +1,11 @@
 ---
 /**
- * Block dispatcher mirroring examples/astro/kitchen-sink/src/components/blocks/index.tsx.
- * Switches on `__typename` (set by the Tina GraphQL response) and falls
- * back to `_template` for legacy/local payloads.
+ * Block dispatcher. Switches on `__typename` to narrow the discriminated
+ * `PageBlocks` union — each branch flows the typed block straight into
+ * its renderer, no casts. Mirrors the Next.js kitchen-sink pattern.
  */
 import { tinaField } from '@tinacms/astro/tina-field';
+import type { Page } from '../../../tina/__generated__/types';
 import Content from './Content.astro';
 import Cta from './Cta.astro';
 import Features from './Features.astro';
@@ -12,44 +13,23 @@ import Hero from './Hero.astro';
 import Testimonial from './Testimonial.astro';
 
 interface Props {
-  blocks?: Array<Record<string, unknown> | null> | null;
+  page: Omit<Page, 'id' | '_sys' | '_values'>;
 }
 
-const { blocks } = Astro.props;
-
-const typeNameMap: Record<string, string> = {
-  PageBlocksHero: 'hero',
-  PageBlocksFeatures: 'features',
-  PageBlocksCta: 'cta',
-  PageBlocksTestimonial: 'testimonial',
-  PageBlocksContent: 'content',
-};
+const { page } = Astro.props;
 ---
-{(!blocks || blocks.length === 0) ? (
-  <div class="p-6 text-center text-gray-500">No blocks to render</div>
-) : (
-  blocks.map((block) => {
-    if (!block) return null;
-    const typename = (block.__typename as string) ?? '';
-    const template = (block._template as string) || typeNameMap[typename] || typename;
-    return (
-      <div data-tina-field={tinaField(block)}>
-        {template === 'hero' ? (
-          <Hero data={block as never} />
-        ) : template === 'features' ? (
-          <Features data={block as never} />
-        ) : template === 'cta' ? (
-          <Cta data={block as never} />
-        ) : template === 'testimonial' ? (
-          <Testimonial data={block as never} />
-        ) : template === 'content' ? (
-          <Content data={block as never} />
-        ) : (
-          <div class="p-4 bg-yellow-100 text-yellow-900 rounded">
-            Unknown block type: {template}
-          </div>
-        )}
-      </div>
-    );
-  })
-)}
+{page.blocks?.map((block) => block ? (
+  <div data-tina-field={tinaField(block)}>
+    {block.__typename === 'PageBlocksHero' ? (
+      <Hero data={block} />
+    ) : block.__typename === 'PageBlocksFeatures' ? (
+      <Features data={block} />
+    ) : block.__typename === 'PageBlocksCta' ? (
+      <Cta data={block} />
+    ) : block.__typename === 'PageBlocksTestimonial' ? (
+      <Testimonial data={block} />
+    ) : block.__typename === 'PageBlocksContent' ? (
+      <Content data={block} />
+    ) : null}
+  </div>
+) : null)}

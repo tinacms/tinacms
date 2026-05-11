@@ -1,24 +1,16 @@
 ---
 import { tinaField } from '@tinacms/astro/tina-field';
-import { sanitizeHref } from '../../lib/utils';
+import type { GlobalQuery } from '../../../tina/__generated__/types';
+import { sanitizeHref } from '@tinacms/astro/sanitize';
 import Container from './Container.astro';
 
-interface NavLink {
-  href?: string | null;
-  label?: string | null;
-}
-
 interface Props {
-  data: {
-    name?: string | null;
-    color?: string | null;
-    nav?: NavLink[] | null;
-  } | null;
+  data: NonNullable<GlobalQuery['global']>['header'] | null;
   pathname?: string;
 }
 
 const { data, pathname = '/' } = Astro.props;
-const nav = data?.nav ?? [];
+const nav = (data?.nav ?? []).filter((item) => item !== null);
 ---
 <header class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-30">
   <Container size="custom" class="py-4 flex items-center justify-between">

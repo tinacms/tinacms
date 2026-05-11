@@ -1,15 +1,12 @@
 ---
 import { tinaField } from '@tinacms/astro/tina-field';
+import type { PageBlocksTestimonial } from '../../../tina/__generated__/types';
 import { cn } from '../../lib/utils';
 import Container from '../layout/Container.astro';
 import Section from '../layout/Section.astro';
 
 interface Props {
-  data: {
-    quote?: string | null;
-    author?: string | null;
-    color?: string | null;
-  };
+  data: PageBlocksTestimonial;
 }
 
 const { data } = Astro.props;

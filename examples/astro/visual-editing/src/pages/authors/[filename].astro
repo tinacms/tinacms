@@ -1,17 +1,19 @@
 ---
+import TinaIsland from '@tinacms/astro/TinaIsland.astro';
 import AuthorBody from '../../components/islands/AuthorBody.astro';
 import Base from '../../layouts/Base.astro';
 import { getAuthor } from '../../lib/data';
+import { islands } from '../../lib/islands';
 
 const filename = (Astro.params.filename ?? '').toString();
-const author = await getAuthor(filename, Astro.request);
-const data = author.data?.author as Record<string, unknown> | undefined;
+const author = await getAuthor(filename);
+if (!author.data?.author) {
+  return new Response('Not Found', { status: 404 });
+}
+const data = author.data.author;
 ---
-<Base
-  title={`${(data?.name as string) ?? 'Author'} | Authors`}
-  forms={[{ id: author.id, query: author.query, variables: author.variables, data: author.data as unknown as object }]}
->
-  <section class="max-w-3xl mx-auto px-6 sm:px-8 py-16" data-tina-island={`/tina-island/author?filename=${encodeURIComponent(filename)}`}>
+<Base title={`${data.name} | Authors`}>
+<TinaIsland name="author" wrapper={islands.author.wrapper} params={{ filename }}>
     <AuthorBody data={data} />
-  </section>
+  </TinaIsland>
 </Base>

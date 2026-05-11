@@ -1,26 +1,16 @@
 ---
-import TinaMarkdown from '@tinacms/astro';
+import TinaMarkdown from '@tinacms/astro/TinaMarkdown.astro';
+import { sanitizeImageSrc } from '@tinacms/astro/sanitize';
 import { tinaField } from '@tinacms/astro/tina-field';
-import { cn, sanitizeImageSrc } from '../../lib/utils';
+import type { PageBlocksHero } from '../../../tina/__generated__/types';
+import { cn } from '../../lib/utils';
 import Actions from '../layout/Actions.astro';
 import Container from '../layout/Container.astro';
 import Section from '../layout/Section.astro';
 import { customComponents } from '../markdown';
 
 interface Props {
-  data: {
-    tagline?: string | null;
-    headline?: string | null;
-    text?: unknown;
-    image?: { src?: string; alt?: string } | null;
-    actions?: Array<{
-      label?: string | null;
-      type?: string | null;
-      link?: string | null;
-      icon?: boolean | null;
-    } | null> | null;
-    color?: string | null;
-  };
+  data: PageBlocksHero;
 }
 
 const { data } = Astro.props;
@@ -41,7 +31,7 @@ const imgSrc = sanitizeImageSrc(data.image?.src);
       )}
       {data.text && (
         <div data-tina-field={tinaField(data, 'text')} class={cn('prose prose-lg mx-auto lg:mx-0 mb-10', data.color === 'primary' ? 'prose-primary' : 'dark:prose-dark')}>
-          <TinaMarkdown content={data.text as never} components={customComponents} />
+          <TinaMarkdown content={data.text} components={customComponents} />
         </div>
       )}
       {data.actions && (
@@ -52,7 +42,7 @@ const imgSrc = sanitizeImageSrc(data.image?.src);
     </div>
     {imgSrc && (
       <div data-tina-field={tinaField(data, 'image')} class="relative row-start-1 lg:col-span-2 flex justify-center">
-        <img class="relative z-10 w-full max-w-xs rounded-lg lg:max-w-none h-auto" alt={data.image?.alt || ''} src={imgSrc} />
+        <img class="relative z-10 w-full max-w-xs rounded-lg lg:max-w-none h-auto" alt={data.image?.alt ?? ''} src={imgSrc} />
       </div>
     )}
   </Container>

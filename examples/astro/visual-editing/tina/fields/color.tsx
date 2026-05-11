@@ -1,4 +1,10 @@
 import React from 'react';
+// `wrapFieldsWithMeta` is re-exported via tinacms's toolkit barrel using
+// internal path aliases that the package doesn't resolve outside its own
+// source tree. The runtime export works, but TS doesn't see it without
+// the matching paths config — same pattern used in `uploadDir` below and
+// in every other kitchen-sink that consumes this helper.
+// @ts-ignore
 import { wrapFieldsWithMeta } from 'tinacms';
 import { cn } from '../../src/lib/utils';
 

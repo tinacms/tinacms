@@ -1,38 +1,18 @@
 ---
-import '../styles/global.css';
+import TinaIsland from '@tinacms/astro/TinaIsland.astro';
 import Footer from '../components/layout/Footer.astro';
 import Header from '../components/layout/Header.astro';
 import { getGlobal } from '../lib/data';
-import { isEditMode } from '../lib/is-edit-mode';
-
-interface Form {
-  id: string;
-  query: string;
-  variables: object;
-  data: object;
-}
+import { islands } from '../lib/islands';
+import '../styles/global.css';
 
 interface Props {
   title?: string;
-  /** Per-page form payloads. Global is added automatically. */
-  forms?: Form[];
 }
 
-const { title = 'TinaCMS Astro visual editing', forms = [] } = Astro.props;
-// isEditMode is still used for telemetry / future use cases; the bridge
-// gates on `window.parent !== window` itself.
-isEditMode(Astro.request);
+const { title = 'TinaCMS Astro visual editing' } = Astro.props;
 
-const global = await getGlobal(Astro.request);
-const allForms: Form[] = [
-  ...forms,
-  {
-    id: global.id,
-    query: global.query,
-    variables: global.variables,
-    data: global.data as unknown as object,
-  },
-];
+const global = await getGlobal();
 
 const themeColor = global.data.global?.theme?.color ?? 'blue';
 const darkMode = global.data.global?.theme?.darkMode ?? 'system';
@@ -59,42 +39,16 @@ const fontClass =
         else if (window.matchMedia('(prefers-color-scheme: dark)').matches) root.classList.add('dark');
       })();
     </script>
-    {allForms.map((form) => (
-      <script
-        type="application/tina+json"
-        set:html={JSON.stringify(form)}
-      />
-    ))}
-    {/*
-      Bridge always loads. init() exits immediately when window.parent ===
-      window so non-admin visitors download ~2 KB gzipped of dead code
-      and run a few lines that bail. Astro's hoisted-script bundling
-      doesn't follow conditional render in prod (the bundle reference
-      drops out of the HTML even though the chunk is still emitted), so
-      a server-side isEditMode() gate would silently disable the bridge
-      for everyone in production.
-    */}
-    <script>
-      import { init, refreshForms } from '@tinacms/astro/bridge';
-      init();
-      // Soft-navigation re-mount. Required when the site uses Astro's
-      // <ClientRouter /> or any other view-transitions setup that swaps
-      // the page without a full reload — without this the admin keeps
-      // showing the previous doc's forms after navigating in the iframe.
-      // The event never fires without view transitions enabled, so this
-      // is dead code in the default no-ClientRouter setup.
-      document.addEventListener('astro:page-load', refreshForms);
-    </script>
   </head>
   <body class:list={['antialiased min-h-screen flex flex-col', fontClass]}>
-    <div data-tina-island={`/tina-island/global?path=${encodeURIComponent(Astro.url.pathname)}`}>
-      <Header data={global.data.global?.header} pathname={Astro.url.pathname} />
-    </div>
+    <TinaIsland name="global" wrapper={islands.global.wrapper} params={{ path: Astro.url.pathname }}>
+      <Header data={global.data.global?.header ?? null} pathname={Astro.url.pathname} />
+    </TinaIsland>
     <main class="flex-1">
       <slot />
     </main>
-    <div data-tina-island={`/tina-island/global-footer?path=${encodeURIComponent(Astro.url.pathname)}`}>
-      <Footer data={global.data.global?.footer} />
-    </div>
+    <TinaIsland name="global-footer" wrapper={islands['global-footer'].wrapper} params={{ path: Astro.url.pathname }}>
+      <Footer data={global.data.global?.footer ?? null} />
+    </TinaIsland>
   </body>
 </html>

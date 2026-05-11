@@ -5,7 +5,7 @@
  * entry to this map; the dynamic [name].ts route picks it up
  * automatically.
  */
-import type { AstroComponentFactory } from 'astro/runtime/server/index.js';
+import type { IslandRegistry } from '@tinacms/astro/experimental';
 
 import Blocks from '../components/blocks/Blocks.astro';
 import AuthorBody from '../components/islands/AuthorBody.astro';
@@ -14,20 +14,6 @@ import PostBody from '../components/islands/PostBody.astro';
 import Footer from '../components/layout/Footer.astro';
 import Header from '../components/layout/Header.astro';
 import { getAuthor, getBlog, getGlobal, getPage, getPost } from './data';
-
-export interface IslandConfig {
-  /** Resolve the data the component needs. May ignore the search params. */
-  fetch: (request: Request, params: URLSearchParams) => Promise<unknown>;
-  /** Astro component to render with the fetched data. */
-  component: AstroComponentFactory;
-  /** Outer element the bridge swaps into — must match the page-side wrapper. */
-  wrapper: { tag: string; className?: string };
-  /** Map fetched data + URL params to the component's props. */
-  propsFromData: (
-    data: unknown,
-    params: URLSearchParams
-  ) => Record<string, unknown>;
-}
 
 const ARTICLE_WRAPPER = {
   tag: 'article',
@@ -38,19 +24,17 @@ const SECTION_WRAPPER = {
   className: 'max-w-3xl mx-auto px-6 sm:px-8 py-16',
 };
 
-export const islands: Record<string, IslandConfig> = {
+export const islands: IslandRegistry = {
   page: {
-    fetch: (request, params) => getPage(params.get('slug') ?? 'home', request),
+    fetch: (_request, params) => getPage(params.get('slug') ?? 'home'),
     component: Blocks,
     wrapper: { tag: 'div' },
     propsFromData: (data) => ({
-      blocks:
-        (data as { data?: { page?: { blocks?: unknown[] } } }).data?.page
-          ?.blocks ?? [],
+      page: (data as { data?: { page?: unknown } }).data?.page,
     }),
   },
   post: {
-    fetch: (request, params) => getPost(params.get('slug') ?? '', request),
+    fetch: (_request, params) => getPost(params.get('slug') ?? ''),
     component: PostBody,
     wrapper: ARTICLE_WRAPPER,
     propsFromData: (data) => ({
@@ -58,7 +42,7 @@ export const islands: Record<string, IslandConfig> = {
     }),
   },
   blog: {
-    fetch: (request, params) => getBlog(params.get('filename') ?? '', request),
+    fetch: (_request, params) => getBlog(params.get('filename') ?? ''),
     component: BlogBody,
     wrapper: ARTICLE_WRAPPER,
     propsFromData: (data) => ({
@@ -66,8 +50,7 @@ export const islands: Record<string, IslandConfig> = {
     }),
   },
   author: {
-    fetch: (request, params) =>
-      getAuthor(params.get('filename') ?? '', request),
+    fetch: (_request, params) => getAuthor(params.get('filename') ?? ''),
     component: AuthorBody,
     wrapper: SECTION_WRAPPER,
     propsFromData: (data) => ({
@@ -75,7 +58,7 @@ export const islands: Record<string, IslandConfig> = {
     }),
   },
   global: {
-    fetch: (request) => getGlobal(request),
+    fetch: () => getGlobal(),
     component: Header,
     wrapper: { tag: 'div' },
     propsFromData: (data, params) => ({
@@ -85,7 +68,7 @@ export const islands: Record<string, IslandConfig> = {
     }),
   },
   'global-footer': {
-    fetch: (request) => getGlobal(request),
+    fetch: () => getGlobal(),
     component: Footer,
     wrapper: { tag: 'div' },
     propsFromData: (data) => ({

@@ -1,39 +1,30 @@
 ---
 import { tinaField } from '@tinacms/astro/tina-field';
+import type {
+  PageBlocksFeatures,
+  PageBlocksFeaturesItems,
+} from '../../../tina/__generated__/types';
 import Actions from '../layout/Actions.astro';
 import Container from '../layout/Container.astro';
 import Section from '../layout/Section.astro';
 
-interface Item {
-  title?: string | null;
-  text?: string | null;
-  icon?: { name?: string; color?: string; style?: string } | null;
-  actions?: Array<{
-    label?: string | null;
-    type?: string | null;
-    link?: string | null;
-    icon?: boolean | null;
-  } | null> | null;
-}
-
 interface Props {
-  data: {
-    title?: string | null;
-    description?: string | null;
-    items?: Array<Item | string | null> | null;
-    color?: string | null;
-  };
+  data: PageBlocksFeatures;
 }
 
 const { data } = Astro.props;
 
-const normalizedItems: Item[] = (data.items ?? [])
-  .filter((item): item is Item | string => item !== null)
+// The admin's `defaultItem: 'New Feature'` on the items list can produce a
+// raw string instead of an object — the generated GraphQL type doesn't
+// reflect that polymorphism, so we widen here and normalise to the object
+// shape before rendering. Mirrors the same handling in the React kitchen-sinks.
+const rawItems = (data.items ?? []) as Array<
+  PageBlocksFeaturesItems | string | null
+>;
+const isSimpleLayout = rawItems.every((item) => typeof item === 'string');
+const normalizedItems: PageBlocksFeaturesItems[] = rawItems
+  .filter((item): item is PageBlocksFeaturesItems | string => item !== null)
   .map((item) => (typeof item === 'string' ? { title: item } : item));
-
-const isSimpleLayout = (data.items ?? []).every(
-  (item) => typeof item === 'string'
-);
 ---
 <Section color={data.color}>
   <Container size="large">
@@ -50,9 +41,9 @@ const isSimpleLayout = (data.items ?? []).every(
       </div>
     )}
     <div class={isSimpleLayout ? 'grid grid-cols-1 md:grid-cols-3 gap-6' : 'flex flex-wrap gap-x-10 gap-y-8 text-left'}>
-      {normalizedItems.map((item, idx) => (
+      {normalizedItems.map((item) => (
         <div
-          data-tina-field={tinaField(item as Record<string, unknown>)}
+          data-tina-field={tinaField(item)}
           class={isSimpleLayout ? 'text-center bg-gray-50 dark:bg-gray-800 rounded-lg p-6' : 'flex-1 flex flex-col gap-4 max-w-xl'}
           style={isSimpleLayout ? undefined : 'flex-basis:16rem'}
         >
