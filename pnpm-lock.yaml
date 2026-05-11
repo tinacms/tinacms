@@ -589,8 +589,8 @@ catalogs:
       specifier: ^0.33.5
       version: 0.33.5
     sqlite-level:
-      specifier: ^1.2.1
-      version: 1.2.1
+      specifier: 0.0.0-20260511053032
+      version: 0.0.0-20260511053032
     stopword:
       specifier: ^3.1.4
       version: 3.1.5
@@ -990,6 +990,12 @@ importers:
       '@types/node':
         specifier: ^25.1.0
         version: 25.1.0
+      '@types/react':
+        specifier: ^18.3.18
+        version: 18.3.27
+      '@types/react-dom':
+        specifier: ^18.3.5
+        version: 18.3.7(@types/react@18.3.27)
       autoprefixer:
         specifier: 'catalog:'
         version: 10.4.23(postcss@8.5.6)
@@ -1914,7 +1920,7 @@ importers:
         version: 4.0.0(abstract-level@1.0.4)
       sqlite-level:
         specifier: 'catalog:'
-        version: 1.2.1(sucrase@3.35.1)
+        version: 0.0.0-20260511053032
       stopword:
         specifier: 'catalog:'
         version: 3.1.5
@@ -14149,10 +14155,8 @@ packages:
   sprintf-js@1.0.3:
     resolution: {integrity: sha512-D9cPgkvLlV3t3IzL0D0YLvGA9Ahk4PcvVwUbN0dSGr1aP0Nrt4AEnTUbuGvquEC0mA64Gqt1fzirlRs5ibXx8g==}
 
-  sqlite-level@1.2.1:
-    resolution: {integrity: sha512-MzeGQSp0kvQv/K1WWaLm2Oi4cnr42oelLbZnrveCLP1Up21Ks7+PJYb+3uc+3kC7O6VdrhqJFhFkpUuK0E4pWA==}
-    peerDependencies:
-      sucrase: ^3.35.0
+  sqlite-level@0.0.0-20260511053032:
+    resolution: {integrity: sha512-RQcqVXHJDykHNIMZ+vbw37h25ugnvKBobZw+9Sj+N1zTVwPup2mouGiV21gY8seNSA24i7T70Vh0snQZwNBe/Q==}
 
   sshpk@1.18.0:
     resolution: {integrity: sha512-2p2KJZTSqQ/I3+HX42EpYOa2l3f8Erv8MWKsy2I9uf4wA7yFIkXRffYdsx86y6z4vHtV8u7g+pPlr8/4ouAxsQ==}
@@ -30780,12 +30784,11 @@ snapshots:
 
   sprintf-js@1.0.3: {}
 
-  sqlite-level@1.2.1(sucrase@3.35.1):
+  sqlite-level@0.0.0-20260511053032:
     dependencies:
       abstract-level: 1.0.4
       better-sqlite3: 11.10.0
       module-error: 1.0.2
-      sucrase: 3.35.1
 
   sshpk@1.18.0:
     dependencies:
