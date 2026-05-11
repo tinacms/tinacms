@@ -1,4 +1,31 @@
 import { PostHog } from 'posthog-node';
+import fetchPostHogConfig from './fetchPostHogConfig';
+
+export async function initializePostHog(
+    configEndpoint?: string,
+    disableGeoip?: boolean
+  ): Promise<PostHog | null> {
+    let apiKey: string | undefined;
+    let endpoint: string | undefined;
+  
+    if (configEndpoint) {
+      const config = await fetchPostHogConfig(configEndpoint);
+      apiKey = config.POSTHOG_API_KEY;
+      endpoint = config.POSTHOG_ENDPOINT;
+    }
+  
+    if (!apiKey) {
+      console.warn(
+        'PostHog API key not found. PostHog tracking will be disabled.'
+      );
+      return null;
+    }
+  
+    return new PostHog(apiKey, {
+      host: endpoint,
+      disableGeoip: disableGeoip ?? true,
+    });
+  }
 
 export function postHogCapture(
   client: PostHog,
