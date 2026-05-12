@@ -1,14 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-/**
- * `initUrlChange` patches `history.pushState` / `replaceState` and adds a
- * `popstate` listener, and reads `window.parent === window` to decide
- * whether to bail. Module-level `initialized` state lives in the module
- * scope, so each test re-imports a fresh module via `vi.resetModules()`
- * to avoid leaking between cases. The companion `config` module is also
- * re-imported and re-seeded with the admin origin after each reset, since
- * `resetModules` wipes its state too.
- */
+// `initUrlChange` keeps module-level state, so each test re-imports it
+// (with `config` re-seeded post-reset) to start from a clean slate.
 async function loadUrlChange() {
   vi.resetModules();
   const { setAdminOrigin } = await import('./config');
@@ -28,16 +21,14 @@ describe('initUrlChange', () => {
     originalReplaceState = window.history.replaceState;
     parentDescriptor = Object.getOwnPropertyDescriptor(window, 'parent');
 
-    const parentStub = {
-      postMessage: (data: unknown, targetOrigin: string) => {
-        postedMessages.push({ data, targetOrigin });
-      },
-    };
     Object.defineProperty(window, 'parent', {
       configurable: true,
-      value: parentStub,
+      value: {
+        postMessage: (data: unknown, targetOrigin: string) => {
+          postedMessages.push({ data, targetOrigin });
+        },
+      },
     });
-
     window.history.replaceState(null, '', '/start');
   });
 

@@ -1,26 +1,9 @@
 /**
- * Emits `{type:'url-changed'}` to the admin parent on SPA history
- * navigation inside the iframe. Mirrors the message `useTina` posts when
- * its query/variables hash changes — the admin uses it as a hint that the
- * preview moved to a different route and the form registry may be about
- * to cycle via `close` / `open`.
- *
- * Three triggers:
- *
- *   1. `history.pushState`   — patched to call through, then post.
- *   2. `history.replaceState` — same.
- *   3. `popstate`             — fired by back/forward and pushState.
- *
- * Hard navigations (full page loads, plain `<a href>` without a SPA
- * router) don't need this — the bridge's existing `beforeunload` close
- * handler in `forms.ts` and the new-page bootstrap already cover them.
- * This module exists for SPA routers that mutate history without
- * unloading: Astro view transitions / ClientRouter, Turbo, htmx, etc.
- *
- * Idempotent: re-entry into `initUrlChange()` is a no-op so the same
- * `history.*` method is never wrapped twice across HMR / double-init.
- * Same-URL `replaceState` calls (common pattern for query-string updates)
- * are suppressed so the admin doesn't see chatter that isn't a real nav.
+ * Posts `{type:'url-changed'}` to the admin parent when an SPA router
+ * mutates history without unloading the page (Astro `<ClientRouter />`,
+ * Turbo, htmx, etc.). Mirrors what `useTina` posts when its id changes.
+ * Hard navs don't need this — `beforeunload` + new-page bootstrap cover
+ * them. Idempotent across double-init; same-URL replaceState is skipped.
  */
 import { getAdminOrigin } from './config';
 import { debug } from './debug';
@@ -35,24 +18,18 @@ export function initUrlChange(): void {
 
   lastEmittedUrl = currentUrl();
 
-  const history = window.history;
-  const originalPushState = history.pushState.bind(history);
-  const originalReplaceState = history.replaceState.bind(history);
+  const { history } = window;
+  const push = history.pushState.bind(history);
+  const replace = history.replaceState.bind(history);
 
-  history.pushState = function patchedPushState(
-    ...args: Parameters<History['pushState']>
-  ): void {
-    originalPushState(...args);
+  history.pushState = (...args: Parameters<History['pushState']>) => {
+    push(...args);
     maybeEmit();
   };
-
-  history.replaceState = function patchedReplaceState(
-    ...args: Parameters<History['replaceState']>
-  ): void {
-    originalReplaceState(...args);
+  history.replaceState = (...args: Parameters<History['replaceState']>) => {
+    replace(...args);
     maybeEmit();
   };
-
   window.addEventListener('popstate', maybeEmit);
 }
 
@@ -65,5 +42,5 @@ function maybeEmit(): void {
 }
 
 function currentUrl(): string {
-  return `${window.location.pathname}${window.location.search}${window.location.hash}`;
+  return `${location.pathname}${location.search}${location.hash}`;
 }
