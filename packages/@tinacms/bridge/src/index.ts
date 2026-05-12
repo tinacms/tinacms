@@ -21,6 +21,7 @@ import { initDataStore } from './data-store';
 import { debug } from './debug';
 import { initForms, refreshForms } from './forms';
 import { initIslandRefresh } from './island-refresh';
+import { initUrlChange } from './url-change';
 
 export interface BridgeOptions {
   /**
@@ -65,6 +66,10 @@ export function init(options: BridgeOptions = {}): void {
   const store = initDataStore();
   initIslandRefresh(store, { debounceMs });
   initClickToFocus();
+  // Patch history before forms register so any SPA router that mutates
+  // history during page bootstrap (e.g. an initial replaceState) is
+  // observed before forms announce themselves.
+  initUrlChange();
   // Forms register last so listeners are wired up before we announce
   // ourselves to the admin and start receiving updateData replies.
   initForms(store);
