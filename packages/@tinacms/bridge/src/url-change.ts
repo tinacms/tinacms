@@ -1,12 +1,12 @@
 /**
- * Posts `{type:'url-changed'}` to the admin parent when an SPA router
- * mutates history without unloading the page (Astro `<ClientRouter />`,
- * Turbo, htmx, etc.). Mirrors what `useTina` posts when its id changes.
- * Hard navs don't need this — `beforeunload` + new-page bootstrap cover
- * them. Idempotent across double-init; same-URL replaceState is skipped.
+ * Mirrors what `useTina` posts on id change — lets the admin react to
+ * SPA-router URL mutations the same way it reacts to React-side ones.
  */
 import { getAdminOrigin } from './config';
 import { debug } from './debug';
+import type { BridgeOutgoing } from './types';
+
+const URL_CHANGED: BridgeOutgoing = { type: 'url-changed' };
 
 let initialized = false;
 let lastEmittedUrl: string | null = null;
@@ -38,7 +38,7 @@ function maybeEmit(): void {
   if (url === lastEmittedUrl) return;
   lastEmittedUrl = url;
   debug('url-changed', url);
-  window.parent.postMessage({ type: 'url-changed' }, getAdminOrigin());
+  window.parent.postMessage(URL_CHANGED, getAdminOrigin());
 }
 
 function currentUrl(): string {

@@ -140,12 +140,8 @@ export function useTina<T extends object>(props: {
     };
 
     window.addEventListener('message', handleMessage);
-    // Belt-and-braces for hard navigations (e.g. an Astro `<a href>` click
-    // inside the iframe, or a full reload): React doesn't run unmount
-    // cleanup when the JS context is torn down, so without this the admin
-    // never sees a `close` for the page being left and the form lingers
-    // in the registry. SPA-style navigation continues to flow through the
-    // unmount cleanup below — `closed` guards against double-posting.
+    // React doesn't run unmount cleanup on hard navigation, so without
+    // this the form would leak on plain <a> click / full reload.
     window.addEventListener('beforeunload', sendClose);
     return () => {
       window.removeEventListener('message', handleMessage);

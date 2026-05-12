@@ -1,7 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// `initUrlChange` keeps module-level state, so each test re-imports it
-// (with `config` re-seeded post-reset) to start from a clean slate.
 async function loadUrlChange() {
   vi.resetModules();
   const { setAdminOrigin } = await import('./config');

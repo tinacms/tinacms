@@ -1,45 +1,37 @@
 /**
- * Server-side check: is this request being rendered for the TinaCMS
- * admin iframe?
- *
- * Trips on three shapes:
- *   1. `?tina-edit=1` — explicit deep-link signal from the admin.
- *   2. Iframe nav (`Sec-Fetch-Dest: iframe`) with either a same-origin
- *      Referer under `/admin/` (initial preview load) or the
- *      `__tina_edit=1` cookie (in-iframe `<a>` clicks).
- *   3. SPA fetch from inside the iframe (`Sec-Fetch-Dest: empty`,
- *      `Sec-Fetch-Site: same-origin`, cookie set) — covers Astro
- *      `<ClientRouter />`, Turbo, htmx, etc.
- *
  * Top-level browser visits send `Sec-Fetch-Dest: document`, so a stale
  * cookie can never trip edit mode outside an iframe context. The cookie
  * is `SameSite=Strict`, so cross-site fetches don't carry it either.
  */
 export const EDIT_COOKIE = '__tina_edit';
-
-/** Refreshed on every edit-mode response so the session sticks. */
 export const EDIT_COOKIE_HEADER = `${EDIT_COOKIE}=1; Path=/; SameSite=Strict; Max-Age=3600`;
 
 export function isEditMode(request: Request): boolean {
-  const url = new URL(request.url);
-  if (url.searchParams.get('tina-edit') === '1') return true;
-
   const dest = request.headers.get('Sec-Fetch-Dest');
   const site = request.headers.get('Sec-Fetch-Site');
   const cookieSet = readCookie(request, EDIT_COOKIE) === '1';
 
   if (dest === 'iframe') {
-    return hasAdminReferer(request, url) || cookieSet;
+    return hasAdminReferer(request) || cookieSet;
   }
-  return dest === 'empty' && site === 'same-origin' && cookieSet;
+  if (dest === 'empty' && site === 'same-origin' && cookieSet) return true;
+
+  // Explicit deep-link override — the admin's router appends `?tina-edit=1`
+  // when it sets `iframe.src` on a preview deep-link. Checked last so the
+  // URL parse cost is only paid when the cheaper header checks failed.
+  if (request.url.includes('tina-edit=1')) {
+    return new URL(request.url).searchParams.get('tina-edit') === '1';
+  }
+  return false;
 }
 
-function hasAdminReferer(request: Request, url: URL): boolean {
+function hasAdminReferer(request: Request): boolean {
   const referer = request.headers.get('Referer');
   if (!referer) return false;
   try {
     const ref = new URL(referer);
-    return ref.origin === url.origin && ref.pathname.startsWith('/admin/');
+    const requestOrigin = new URL(request.url).origin;
+    return ref.origin === requestOrigin && ref.pathname.startsWith('/admin/');
   } catch {
     return false;
   }

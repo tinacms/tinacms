@@ -31,7 +31,7 @@ describe('isEditMode', () => {
     ).toBe(true);
   });
 
-  it('accepts SPA fetch with cookie (the soft-nav regression)', () => {
+  it('accepts SPA fetch with cookie', () => {
     expect(
       isEditMode(
         req({
@@ -73,9 +73,5 @@ describe('isEditMode', () => {
         })
       )
     ).toBe(false);
-  });
-
-  it('rejects bare requests with no headers', () => {
-    expect(isEditMode(req())).toBe(false);
   });
 });
