@@ -100,28 +100,28 @@ export const FormsView = ({ loadingPlaceholder }: FormsViewProps = {}) => {
 
   // Single form - no transitions needed
   if (!isReferencingManyForms) {
+    // Form-lists registered but nothing selected — typically the page
+    // only contributes a global form (auto-selection skips globals on
+    // purpose), so without a placeholder the panel renders blank and
+    // looks broken on listing-style routes.
+    if (!activeForm) {
+      return <SidebarNoFormsPlaceholder />;
+    }
     return (
-      <>
-        {activeForm && (
-          <div className='flex-1 flex flex-col flex-nowrap overflow-hidden h-full w-full relative bg-white'>
-            <FormHeader
-              activeForm={activeForm}
-              branch={cms.api.admin.api.branch}
-              repoProvider={cms.api.admin.api.schema.config.config.repoProvider}
-              isLocalMode={cms.api?.tina?.isLocalMode}
-            />
-            {formMetas?.map((meta) => (
-              <React.Fragment key={meta.name}>
-                <meta.Component />
-              </React.Fragment>
-            ))}
-            <FormBuilder
-              form={activeForm}
-              onPristineChange={setFormIsPristine}
-            />
-          </div>
-        )}
-      </>
+      <div className='flex-1 flex flex-col flex-nowrap overflow-hidden h-full w-full relative bg-white'>
+        <FormHeader
+          activeForm={activeForm}
+          branch={cms.api.admin.api.branch}
+          repoProvider={cms.api.admin.api.schema.config.config.repoProvider}
+          isLocalMode={cms.api?.tina?.isLocalMode}
+        />
+        {formMetas?.map((meta) => (
+          <React.Fragment key={meta.name}>
+            <meta.Component />
+          </React.Fragment>
+        ))}
+        <FormBuilder form={activeForm} onPristineChange={setFormIsPristine} />
+      </div>
     );
   }
 

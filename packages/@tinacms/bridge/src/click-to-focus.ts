@@ -19,22 +19,31 @@ export function initClickToFocus(): void {
   document.addEventListener(
     'click',
     (event) => {
-      const target = event.target;
-      const tagName = target instanceof Element ? target.tagName : '?';
+      const target = event.target instanceof Element ? event.target : null;
+      const tagName = target?.tagName ?? '?';
       if (!enabled) {
         debug('click ignored — quickEdit disabled', tagName);
         return;
       }
-      const fieldName = resolveFieldName(target);
-      if (!fieldName) {
+      const field = resolveField(target);
+      if (!field) {
         debug('click ignored — no data-tina-field ancestor for', tagName);
         return;
       }
-      debug('click captured →', fieldName, '(target:', tagName, ')');
+      // Release clicks on a link nested *inside* the field (not the
+      // field itself) so navigation works — wrapping `<nav>` in
+      // `data-tina-field` would otherwise pin the iframe to the current
+      // page on every header link click.
+      const link = target?.closest('a[href]');
+      if (link && link !== field.el && field.el.contains(link)) {
+        debug('click released for navigation inside', field.name);
+        return;
+      }
+      debug('click captured →', field.name, '(target:', tagName, ')');
       event.preventDefault();
       event.stopPropagation();
       window.parent.postMessage(
-        { type: 'field:selected', fieldName },
+        { type: 'field:selected', fieldName: field.name },
         getAdminOrigin()
       );
     },
@@ -53,16 +62,19 @@ export function initClickToFocus(): void {
   });
 }
 
-function resolveFieldName(target: EventTarget | null): string | null {
-  const el = target instanceof Element ? target : null;
+function resolveField(
+  el: Element | null
+): { el: Element; name: string } | null {
   if (!el) return null;
 
   const direct = readTinaField(el);
-  if (direct) return direct;
+  if (direct) return { el, name: direct };
 
   const ancestor = el.closest('[data-tina-field], [data-tina-field-overlay]');
   if (!ancestor) return null;
-  return readTinaField(ancestor);
+  const name = readTinaField(ancestor);
+  if (!name) return null;
+  return { el: ancestor, name };
 }
 
 function readTinaField(el: Element): string | null {
