@@ -14,11 +14,11 @@ pnpm add @tinacms/astro tinacms
 pnpm add -D @tinacms/cli
 ```
 
-Requires Astro 5 and an SSR adapter (`@astrojs/node`, `vercel`, `netlify`, or `cloudflare`) — the `/_tina/bridge.js` route and the island-refresh endpoint render at request time. `output: 'server'` is the simplest choice; `output: 'static'` also works as long as editable regions are wrapped in [`<TinaIsland>`](#static-site-editing) (the adapter still serves the on-demand endpoints).
+Requires Astro 5 and an SSR adapter (`@astrojs/node`, `vercel`, `netlify`, or `cloudflare`) — the island-refresh endpoint (`/tina-island/[name]`) is on-demand. `output: 'server'` is the simplest choice; `output: 'static'` also works as long as editable regions are wrapped in [`<TinaIsland>`](#static-site-editing) and the adapter can serve that one on-demand route.
 
 ## Usage
 
-Add the integration to `astro.config.mjs` once. It wires the request-scoped middleware and the dynamic route that serves the bridge — everything else is auto-injected only on edit-mode requests:
+Add the integration to `astro.config.mjs` once. It wires the request-scoped middleware and stages the bundled bridge as a static asset at `/admin/bridge.js` — everything else is auto-injected only on edit-mode requests:
 
 ```ts
 // astro.config.mjs
@@ -52,13 +52,13 @@ const post = await requestWithMetadata(
 </article>
 ```
 
-That's the whole user surface. No wiring component in your layout, no `forms` prop to maintain, no `Astro.request` to thread. The integration's middleware buffers each HTML response, and on edit-mode requests splices the form payloads and a `<script type="module" src="/_tina/bridge.js">` before `</head>`. Production visitors get **byte-identical HTML to a Tina-free Astro app** — no `data-tina-form` divs, no script tag, no bundle preload. (Exception: pages that use [`<TinaIsland>`](#static-site-editing) carry a one-line inline bootstrap so editing also works when the page is statically built.)
+That's the whole user surface. No wiring component in your layout, no `forms` prop to maintain, no `Astro.request` to thread. The integration's middleware buffers each HTML response, and on edit-mode requests splices the form payloads and a `<script type="module" src="/admin/bridge.js">` before `</head>`. Production visitors get **byte-identical HTML to a Tina-free Astro app** — no `data-tina-form` divs, no script tag, no bundle preload. (Exception: pages that use [`<TinaIsland>`](#static-site-editing) carry a one-line inline bootstrap so editing also works when the page is statically built.)
 
 For cross-origin admin deployments (Codespaces, separate-domain self-hosted), set `PUBLIC_TINA_ADMIN_ORIGIN` in your env (comma-separate to allow multiple). The middleware embeds it inline so the bridge validates inbound `postMessage` events.
 
 ## Static-site editing
 
-`output: 'static'` is supported. The middleware described above only runs on on-demand-rendered routes, so on a prerendered page it never injects anything — instead, **`<TinaIsland>` emits a tiny in-iframe bootstrap script** that loads `/_tina/bridge.js` *only* when the page is inside the admin iframe (a no-op for everyone else). On boot the bridge "primes" the page by fetching each island's `/tina-island/[name]` endpoint — which is `prerender = false`, so the adapter still renders it on demand — to pick up the page's form payloads, after which editing works exactly as it does in an SSR project.
+`output: 'static'` is supported. The middleware described above only runs on on-demand-rendered routes, so on a prerendered page it never injects anything — instead, **`<TinaIsland>` emits a tiny in-iframe bootstrap script** that loads `/admin/bridge.js` *only* when the page is inside the admin iframe (a no-op for everyone else). On boot the bridge "primes" the page by fetching each island's `/tina-island/[name]` endpoint — which is `prerender = false`, so the adapter still renders it on demand — to pick up the page's form payloads, after which editing works exactly as it does in an SSR project.
 
 Requirements for static editing:
 
@@ -73,7 +73,7 @@ Trade-off: a page that uses `<TinaIsland>` carries that one-line inline bootstra
 |---------|-------------------|
 | `@tinacms/astro` | `requestWithMetadata`, `tinaField`, `QueryResult`, and types |
 | `@tinacms/astro/TinaMarkdown.astro` | `<TinaMarkdown content components />` — rich-text renderer. Import from this subpath so Astro's check sees a real `.astro` component (the bare-package default resolves through the types condition to a placeholder). |
-| `@tinacms/astro/integration` | `tina()` integration — auto-wires middleware + bridge route so `requestWithMetadata()` works without you threading `Astro.request` or writing wiring components |
+| `@tinacms/astro/integration` | `tina()` integration — auto-wires the middleware and stages the static `/admin/bridge.js` asset so `requestWithMetadata()` works without you threading `Astro.request` or writing wiring components |
 | `@tinacms/astro/TinaIsland.astro` | `<TinaIsland name wrapper params />` — marker wrapper for an editable region |
 | `@tinacms/astro/types` | `TinaRichTextContent`, `CustomComponentsMap`, `TinaRichTextNode`, `MdxElement`, `TextElement` |
 | `@tinacms/astro/sanitize` | `sanitizeHref` / `sanitizeImageSrc` for CMS-supplied URLs |

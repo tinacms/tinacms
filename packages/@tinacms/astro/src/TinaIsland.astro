@@ -9,7 +9,7 @@
  * on **statically built** pages: the `tina()` middleware only injects the
  * bridge on on-demand-rendered responses, so a prerendered page would
  * otherwise never load it. The script is a no-op for normal visitors
- * (`window.self === window.top`) and only fetches `/_tina/bridge.js` inside
+ * (`window.self === window.top`) and only fetches `/admin/bridge.js` inside
  * the admin iframe; the `window.__tinaBootstrap` guard plus `bridge.init`'s
  * own idempotency keep it harmless when multiple `<TinaIsland>`s render on a
  * page or when the middleware has already injected its own bootstrap. Once a
@@ -54,7 +54,7 @@ const adminOrigin = adminOrigins();
 <script is:inline type="module" define:vars={{ adminOrigin }}>
   if (window.self !== window.top && !window.__tinaBootstrap) {
     window.__tinaBootstrap = 1;
-    const { init, refreshForms } = await import('/_tina/bridge.js');
+    const { init, refreshForms } = await import('/admin/bridge.js');
     init(adminOrigin ? { adminOrigin } : undefined);
     document.addEventListener('astro:page-load', refreshForms);
   }

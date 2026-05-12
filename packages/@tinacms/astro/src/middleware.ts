@@ -8,7 +8,7 @@
  *   AsyncLocalStorage so `tina()` reads them implicitly — the caller
  *   never threads `Astro.request` through their loaders.
  * - In edit mode only, splices `<div data-tina-form>` payloads and a
- *   `<script>` that loads `/_tina/bridge.js` before `</head>`. The user
+ *   `<script>` that loads `/admin/bridge.js` before `</head>`. The user
  *   writes nothing in their layout, and production HTML is byte-
  *   identical to a Tina-free Astro app.
  * - In edit mode only, refreshes the `__tina_edit` cookie so the session
@@ -97,7 +97,7 @@ function bridgeScript(): string {
   const initArg = origins ? `{adminOrigin:${JSON.stringify(origins)}}` : '';
   return (
     `<script type="module">` +
-    `import{init,refreshForms}from"/_tina/bridge.js";` +
+    `import{init,refreshForms}from"/admin/bridge.js";` +
     `init(${initArg});` +
     `document.addEventListener("astro:page-load",refreshForms);` +
     `</script>`

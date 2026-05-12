@@ -57,11 +57,6 @@
       "astro": "./src/integration.ts",
       "default": "./dist/integration.js"
     },
-    "./bridge-route": {
-      "types": "./dist/bridge-route.d.ts",
-      "astro": "./src/bridge-route.ts",
-      "default": "./dist/bridge-route.js"
-    },
     "./experimental": {
       "types": "./dist/experimental.d.ts",
       "astro": "./src/experimental.ts",
@@ -105,10 +100,6 @@
       },
       {
         "name": "src/integration.ts",
-        "target": "node"
-      },
-      {
-        "name": "src/bridge-route.ts",
         "target": "node"
       },
       {

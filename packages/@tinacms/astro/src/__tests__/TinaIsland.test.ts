@@ -29,7 +29,7 @@ describe('TinaIsland', () => {
       slots: { default: 'BODY' },
     });
     expect(html).toContain('window.__tinaBootstrap');
-    expect(html).toContain("import('/_tina/bridge.js')");
+    expect(html).toContain("import('/admin/bridge.js')");
     expect(html).toContain('window.self !== window.top');
   });
 
