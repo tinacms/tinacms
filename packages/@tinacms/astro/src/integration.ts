@@ -36,12 +36,15 @@ export default function tina(
           entrypoint: '@tinacms/astro/middleware',
           order: middlewareOrder,
         });
-        // The middleware splices a `<script type="module" src="/_tina/bridge.js">`
-        // into edit-mode pages. This route serves the bundled bridge.
-        // Production pages never reference it (the script tag isn't injected).
+        // Edit-mode pages reference `<script type="module" src="/_tina/bridge.js">`;
+        // this route serves the bundled bridge. Forced `prerender: true` so it's
+        // emitted as a static file — works on `output: 'static'` deployments where
+        // an on-demand route would need a serverless function the static host
+        // doesn't deploy. Production pages never reference it.
         injectRoute({
           pattern: '/_tina/bridge.js',
           entrypoint: '@tinacms/astro/bridge-route',
+          prerender: true,
         });
       },
     },

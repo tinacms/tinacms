@@ -1,12 +1,16 @@
 /**
  * Astro endpoint injected by the `tina()` integration. Serves the bridge
  * as a single self-contained ESM bundle at `/_tina/bridge.js`. Loaded by
- * the inline `<script type="module">` the middleware splices into edit-
- * mode pages — production visitors never reach this URL.
+ * the inline `<script type="module">` the middleware (SSR pages) or
+ * `<TinaIsland>` (static pages) splices in — production visitors never
+ * reach this URL.
  *
  * `@tinacms/bridge`'s build already emits a fully bundled `dist/index.js`
- * (no relative imports remain), so we stream it back as-is and let the
- * browser cache it immutably.
+ * (no relative imports remain), and the bytes never vary by request, so
+ * this is a prerendered route: it's emitted as a static file at build
+ * time. That keeps it working on a fully static deployment (`output:
+ * 'static'`), where an on-demand route would need a serverless function
+ * the static host doesn't deploy.
  */
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -22,7 +26,7 @@ function loadBridge(): string {
   return cached;
 }
 
-export const prerender = false;
+export const prerender = true;
 
 export const GET: APIRoute = () =>
   new Response(loadBridge(), {
