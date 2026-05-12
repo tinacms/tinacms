@@ -63,6 +63,7 @@ For cross-origin admin deployments (Codespaces, separate-domain self-hosted), se
 Requirements for static editing:
 
 - Wrap every editable region in `<TinaIsland>` with a registered island (see [GETTING_STARTED.md](./GETTING_STARTED.md) steps 5–7) — that's both how the bridge re-renders regions and how the bootstrap gets onto the page.
+- Pass `primary` on your page's main `<TinaIsland>` (`<TinaIsland name="post" params={{ slug }} primary>`). On a static page the bridge can't tell which island is "the page", so without this the editor may land on the multi-document "Referenced Files" list when the page also has e.g. a global-config form. (On SSR pages the first `requestWithMetadata()` call is treated as primary automatically.) Mark at most one per page.
 - Keep the `tina-island/[name].ts` route (`export const prerender = false`).
 
 Trade-off: a page that uses `<TinaIsland>` carries that one-line inline bootstrap in its production HTML, so it's no longer byte-identical to a Tina-free Astro app. Pages without `<TinaIsland>` are unaffected. (On `output: 'server'` the middleware path is unchanged; the bootstrap and the middleware's own injection coexist harmlessly — `bridge.init()` is idempotent.)
@@ -74,7 +75,7 @@ Trade-off: a page that uses `<TinaIsland>` carries that one-line inline bootstra
 | `@tinacms/astro` | `requestWithMetadata`, `tinaField`, `QueryResult`, and types |
 | `@tinacms/astro/TinaMarkdown.astro` | `<TinaMarkdown content components />` — rich-text renderer. Import from this subpath so Astro's check sees a real `.astro` component (the bare-package default resolves through the types condition to a placeholder). |
 | `@tinacms/astro/integration` | `tina()` integration — auto-wires the middleware and stages the static `/admin/bridge.js` asset so `requestWithMetadata()` works without you threading `Astro.request` or writing wiring components |
-| `@tinacms/astro/TinaIsland.astro` | `<TinaIsland name wrapper params />` — marker wrapper for an editable region |
+| `@tinacms/astro/TinaIsland.astro` | `<TinaIsland name wrapper params [primary] />` — marker wrapper for an editable region; pass `primary` on the page's main region so the editor opens that form instead of the "Referenced Files" list |
 | `@tinacms/astro/types` | `TinaRichTextContent`, `CustomComponentsMap`, `TinaRichTextNode`, `MdxElement`, `TextElement` |
 | `@tinacms/astro/sanitize` | `sanitizeHref` / `sanitizeImageSrc` for CMS-supplied URLs |
 | `@tinacms/astro/bridge` | `init`, `refreshForms`, and the rest of `@tinacms/bridge` |

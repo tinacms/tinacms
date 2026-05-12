@@ -31,7 +31,9 @@ export interface IslandRefreshOptions {
 
 const ISLAND_SELECTOR = '[data-tina-island]';
 const ENDPOINT_ATTR = 'data-tina-island';
+const PRIMARY_ISLAND_ATTR = 'data-tina-island-primary';
 const FORM_SELECTOR = '[data-tina-form]';
+const PRIMARY_FORM_ATTR = 'data-tina-primary';
 
 export function initIslandRefresh(
   store: DataStore,
@@ -122,6 +124,11 @@ async function refreshIsland(
  * them. The region HTML itself already shows canonical data on the static
  * page, so it isn't swapped here — the first real `updateData` does that.
  *
+ * If a `<TinaIsland primary>` is present (it carries `data-tina-island-primary`),
+ * the first payload harvested from that island is tagged `data-tina-primary`
+ * so `refreshForms()` can ask the admin to open it (rather than landing on
+ * the multi-document picker).
+ *
  * No-op on SSR pages: the caller only invokes this when no
  * `[data-tina-form]` is present.
  */
@@ -130,6 +137,7 @@ export async function primeIslands(): Promise<void> {
   for (const island of islands) {
     const endpoint = island.getAttribute(ENDPOINT_ATTR);
     if (!endpoint) continue;
+    const isPrimary = island.hasAttribute(PRIMARY_ISLAND_ATTR);
     try {
       debug('priming island', endpoint);
       const response = await fetch(endpoint, {
@@ -148,9 +156,14 @@ export async function primeIslands(): Promise<void> {
       }
       const template = document.createElement('template');
       template.innerHTML = (await response.text()).trim();
+      let first = true;
       for (const formEl of Array.from(
         template.content.querySelectorAll<HTMLElement>(FORM_SELECTOR)
       )) {
+        if (first && isPrimary && !formEl.hasAttribute(PRIMARY_FORM_ATTR)) {
+          formEl.setAttribute(PRIMARY_FORM_ATTR, '');
+        }
+        first = false;
         document.body.appendChild(formEl);
       }
     } catch (error) {

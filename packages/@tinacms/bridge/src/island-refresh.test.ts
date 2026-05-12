@@ -72,4 +72,43 @@ describe('primeIslands', () => {
     await primeIslands();
     expect(fetchMock).not.toHaveBeenCalled();
   });
+
+  it('tags the first form of a data-tina-island-primary island', async () => {
+    document.body.innerHTML = `
+      <header data-tina-island="/tina-island/global"></header>
+      <main data-tina-island="/tina-island/post?slug=hello" data-tina-island-primary></main>
+    `;
+    const globalForm = {
+      id: 'g',
+      query: 'query Global',
+      variables: {},
+      data: {},
+    };
+    const postForm = { id: 'p', query: 'query Post', variables: {}, data: {} };
+    fetchMock.mockImplementation((endpoint: string) => {
+      const form = endpoint.startsWith('/tina-island/global')
+        ? globalForm
+        : postForm;
+      return Promise.resolve(
+        new Response(
+          `<div data-tina-form='${JSON.stringify(form)}' hidden></div><main></main>`,
+          { headers: { 'Content-Type': 'text/html' } }
+        )
+      );
+    });
+
+    await primeIslands();
+
+    const primary = document.querySelector(
+      '[data-tina-form][data-tina-primary]'
+    );
+    expect(primary).not.toBeNull();
+    expect(JSON.parse(primary!.getAttribute('data-tina-form')!).id).toBe('p');
+    // The non-primary island's form is not tagged.
+    const allForms = document.querySelectorAll('[data-tina-form]');
+    expect(allForms.length).toBe(2);
+    expect(
+      [...allForms].filter((el) => el.hasAttribute('data-tina-primary')).length
+    ).toBe(1);
+  });
 });

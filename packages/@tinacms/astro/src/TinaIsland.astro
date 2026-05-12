@@ -37,9 +37,17 @@ interface Props {
   name: string;
   wrapper: { tag: string; className?: string };
   params?: Record<string, string | number>;
+  /** Mark this as the page's main editable region. The bridge tells the
+   *  admin to open this form on load, instead of letting the editor land
+   *  on the multi-document "Referenced Files" list when the page also has
+   *  e.g. a global-config form. Mark at most one `<TinaIsland>` per page.
+   *  (On SSR pages the first `requestWithMetadata()` call is treated as
+   *  primary automatically; this prop is what makes it work on statically
+   *  built pages, where the bridge can't tell which island is the page.) */
+  primary?: boolean;
 }
 
-const { name, wrapper, params } = Astro.props;
+const { name, wrapper, params, primary } = Astro.props;
 const search = params
   ? `?${new URLSearchParams(
       Object.fromEntries(
@@ -59,6 +67,10 @@ const adminOrigin = adminOrigins();
     document.addEventListener('astro:page-load', refreshForms);
   }
 </script>
-<Tag class={wrapper.className} data-tina-island={marker}>
+<Tag
+  class={wrapper.className}
+  data-tina-island={marker}
+  data-tina-island-primary={primary ? '' : undefined}
+>
   <slot />
 </Tag>

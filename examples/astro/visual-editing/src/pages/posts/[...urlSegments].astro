@@ -13,7 +13,7 @@ if (!post.data?.post) {
 const data = post.data.post;
 ---
 <Base title={`${data.title} | Posts`}>
-  <TinaIsland name="post" wrapper={islands.post.wrapper} params={{ slug }}>
+  <TinaIsland name="post" wrapper={islands.post.wrapper} params={{ slug }} primary>
     <PostBody data={data} />
   </TinaIsland>
 </Base>

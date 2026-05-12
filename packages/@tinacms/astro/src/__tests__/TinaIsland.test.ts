@@ -43,4 +43,18 @@ describe('TinaIsland', () => {
     expect(html).toContain('adminOrigin = null');
     expect(html).toContain('init(adminOrigin ? { adminOrigin } : undefined)');
   });
+
+  it('marks the wrapper data-tina-island-primary only when primary is set', async () => {
+    const withoutPrimary = await container.renderToString(TinaIsland, {
+      props: { name: 'post', wrapper },
+      slots: { default: 'BODY' },
+    });
+    expect(withoutPrimary).not.toContain('data-tina-island-primary');
+
+    const withPrimary = await container.renderToString(TinaIsland, {
+      props: { name: 'post', wrapper, primary: true },
+      slots: { default: 'BODY' },
+    });
+    expect(withPrimary).toContain('data-tina-island-primary');
+  });
 });

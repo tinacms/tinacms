@@ -83,10 +83,16 @@ function editModeInit(response: Response): ResponseInit {
 }
 
 function renderInjection(forms: CollectedForm[]): string {
+  // `forms` is in `requestWithMetadata` call order, and a page's frontmatter
+  // runs before its layout's — so the first form is the page document. Mark
+  // it primary so the bridge asks the admin to open it rather than landing
+  // on the multi-document picker.
   const formDivs = forms
     .map(
-      (form) =>
-        `<div data-tina-form="${escapeAttr(JSON.stringify(form))}" hidden></div>`
+      (form, i) =>
+        `<div data-tina-form="${escapeAttr(JSON.stringify(form))}"${
+          i === 0 ? ' data-tina-primary' : ''
+        } hidden></div>`
     )
     .join('');
   return formDivs + bridgeScript();

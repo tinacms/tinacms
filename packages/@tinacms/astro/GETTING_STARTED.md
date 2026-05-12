@@ -135,10 +135,12 @@ if (!post.data?.post) {
 }
 const data = post.data.post;
 ---
-<TinaIsland name="post" wrapper={islands.post.wrapper} params={{ slug }}>
+<TinaIsland name="post" wrapper={islands.post.wrapper} params={{ slug }} primary>
   <PostBody data={data} />
 </TinaIsland>
 ```
+
+The `primary` prop marks this as the page's main editable region: the editor opens this form on load rather than landing on the "Referenced Files" list when the page also registers e.g. a global-config form. On `output: 'server'` pages it's optional (the first `requestWithMetadata()` call — the page's own — is treated as primary automatically); on `output: 'static'` pages it's how the bridge knows which island is "the page", so set it there. Mark at most one `<TinaIsland>` per page.
 
 Inside `PostBody.astro`, add `data-tina-field={tinaField(data, 'fieldName')}` to whatever you want click-to-focus on, and use `TinaMarkdown` for rich-text bodies:
 
@@ -235,6 +237,7 @@ You can keep `output: 'static'` (pages prerendered, served as flat files) and st
 To make it work:
 
 - Wrap every editable region in `<TinaIsland>` with a registered island (steps 5–7). This is required for static editing — it's both how regions re-render and how the bridge gets bootstrapped.
+- Mark the page's main region `primary` (`<TinaIsland … primary>`). On a static page the bridge can't otherwise tell which island is "the page", so without this the editor may land on the "Referenced Files" list. One per page.
 - Keep `export const prerender = false` on `src/pages/tina-island/[name].ts`.
 - You still need an SSR adapter; just leave `output` as `'static'` (or set `prerender = false` on only the page routes you want server-rendered).
 

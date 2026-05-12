@@ -23,9 +23,16 @@ import type { DataStore, FormPayload } from './types';
  * it diffs the live payloads against the previously-mounted set, posts
  * `close` for forms that disappeared, and `open` (with retry) for forms
  * that appeared.
+ *
+ * If exactly one `[data-tina-form]` carries `data-tina-primary` (the page's
+ * main form — set by the middleware for SSR pages, or by `primeIslands` from
+ * a `<TinaIsland primary>` on static pages), we also post
+ * `{type:'user-select-form', formId}` for it so the admin opens that form
+ * instead of landing on the multi-document "Referenced Files" list.
  */
 const FORM_SELECTOR = '[data-tina-form]';
 const FORM_ATTR = 'data-tina-form';
+const PRIMARY_FORM_ATTR = 'data-tina-primary';
 const RETRY_INTERVAL_MS = 250;
 const MAX_ATTEMPTS = 40; // 10s total — plenty for cold-start admins.
 
@@ -35,6 +42,8 @@ interface FormsController {
   active: Map<string, FormPayload>;
   /** Ids the admin has acknowledged via `updateData`. Survives refreshes. */
   acknowledged: Set<string>;
+  /** Id of the page's primary form, if one is marked. Re-read on refresh. */
+  primaryId: string | null;
   /** Pending retry timer for the announce loop, if any. */
   retryTimer: ReturnType<typeof setTimeout> | null;
   /** Attempt counter for the current announce loop. */
@@ -53,6 +62,7 @@ export function initForms(store: DataStore): void {
     store,
     active: new Map(),
     acknowledged: new Set(),
+    primaryId: null,
     retryTimer: null,
     attempts: 0,
   };
@@ -80,7 +90,7 @@ export function refreshForms(): void {
     return;
   }
 
-  const next = readPayloads();
+  const { payloads: next, primaryId } = readPayloads();
   const nextIds = new Set(next.map((p) => p.id));
 
   // Forms that left the page.
@@ -97,6 +107,7 @@ export function refreshForms(): void {
   }
 
   controller.active = new Map(next.map((p) => [p.id, p]));
+  controller.primaryId = primaryId && nextIds.has(primaryId) ? primaryId : null;
 
   // Restart the announce loop only when there's something unacked to
   // announce. This is also the path the initial mount takes.
@@ -107,9 +118,10 @@ export function refreshForms(): void {
   reportQuickEdit();
 }
 
-function readPayloads(): FormPayload[] {
+function readPayloads(): { payloads: FormPayload[]; primaryId: string | null } {
   const elements = document.querySelectorAll<HTMLElement>(FORM_SELECTOR);
   const payloads: FormPayload[] = [];
+  let primaryId: string | null = null;
   for (const el of elements) {
     const raw = el.getAttribute(FORM_ATTR);
     if (!raw) continue;
@@ -117,12 +129,15 @@ function readPayloads(): FormPayload[] {
       const payload = JSON.parse(raw) as FormPayload;
       if (!payload.id || !payload.query) continue;
       payloads.push(payload);
+      if (primaryId === null && el.hasAttribute(PRIMARY_FORM_ATTR)) {
+        primaryId = payload.id;
+      }
     } catch (error) {
       debug('failed to parse form payload', error);
     }
   }
   debug('discovered', payloads.length, 'form(s)');
-  return payloads;
+  return { payloads, primaryId };
 }
 
 function onAck(event: MessageEvent) {
@@ -189,6 +204,18 @@ function announce() {
         variables: payload.variables,
         data: payload.data,
       },
+      getAdminOrigin()
+    );
+  }
+  // Nudge the admin to open the page's primary form rather than the
+  // "Referenced Files" picker. Rides the retry loop until the form is
+  // acked (it's only in `pending` while unacked).
+  if (
+    controller.primaryId &&
+    pending.some((p) => p.id === controller!.primaryId)
+  ) {
+    window.parent.postMessage(
+      { type: 'user-select-form', formId: controller.primaryId },
       getAdminOrigin()
     );
   }
