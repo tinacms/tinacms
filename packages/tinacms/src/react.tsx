@@ -105,6 +105,12 @@ export function useTina<T extends object>(props: {
   React.useEffect(() => {
     const { experimental___selectFormByFormId, ...rest } = props;
     parent.postMessage({ type: 'open', ...rest, id }, window.location.origin);
+    let closed = false;
+    const sendClose = () => {
+      if (closed) return;
+      closed = true;
+      parent.postMessage({ type: 'close', id }, window.location.origin);
+    };
     const handleMessage = (event) => {
       if (event.data.type === 'quickEditEnabled') {
         setQuickEditEnabled(event.data.value);
@@ -134,9 +140,17 @@ export function useTina<T extends object>(props: {
     };
 
     window.addEventListener('message', handleMessage);
+    // Belt-and-braces for hard navigations (e.g. an Astro `<a href>` click
+    // inside the iframe, or a full reload): React doesn't run unmount
+    // cleanup when the JS context is torn down, so without this the admin
+    // never sees a `close` for the page being left and the form lingers
+    // in the registry. SPA-style navigation continues to flow through the
+    // unmount cleanup below — `closed` guards against double-posting.
+    window.addEventListener('beforeunload', sendClose);
     return () => {
       window.removeEventListener('message', handleMessage);
-      parent.postMessage({ type: 'close', id }, window.location.origin);
+      window.removeEventListener('beforeunload', sendClose);
+      sendClose();
     };
   }, [id, setQuickEditEnabled]);
 
