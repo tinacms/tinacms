@@ -1,4 +1,10 @@
-import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -36,6 +42,28 @@ describe('tina() integration — astro:config:setup', () => {
     const bridgePath = join(publicDir, 'admin', 'bridge.js');
     expect(existsSync(bridgePath)).toBe(true);
     expect(readFileSync(bridgePath, 'utf-8').length).toBeGreaterThan(0);
+    // .gitignore created with the bridge entry.
+    expect(readFileSync(join(publicDir, 'admin', '.gitignore'), 'utf-8')).toBe(
+      'bridge.js\n'
+    );
     expect(logger.warn).not.toHaveBeenCalled();
+  });
+
+  it('appends bridge.js to an existing admin/.gitignore, idempotently', () => {
+    const publicDir = mkdtempSync(join(tmpdir(), 'tina-public-'));
+    const adminDir = join(publicDir, 'admin');
+    mkdirSync(adminDir, { recursive: true });
+    // Mirrors what `tinacms build` writes.
+    writeFileSync(join(adminDir, '.gitignore'), 'index.html\nassets/');
+
+    runConfigSetup(publicDir);
+    expect(readFileSync(join(adminDir, '.gitignore'), 'utf-8')).toBe(
+      'index.html\nassets/\nbridge.js\n'
+    );
+
+    runConfigSetup(publicDir);
+    expect(readFileSync(join(adminDir, '.gitignore'), 'utf-8')).toBe(
+      'index.html\nassets/\nbridge.js\n'
+    );
   });
 });
