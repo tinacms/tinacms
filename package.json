@@ -40,7 +40,7 @@
 		"pretty-quick": "catalog:",
 		"turbo": "catalog:",
 		"typescript": "^5.7.3",
-		"vite": "^4.5.14"
+		"vite": "^6.4.2"
 	},
 	"packageManager": "pnpm@9.15.9",
 	"dependencies": {
