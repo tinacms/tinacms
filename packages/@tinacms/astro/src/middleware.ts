@@ -14,6 +14,10 @@
  * - In edit mode only, refreshes the `__tina_edit` cookie so the session
  *   survives in-iframe link clicks (whose Referer is the previous
  *   preview page, not `/admin/`).
+ * - Prerendered routes short-circuit immediately: they can never be in
+ *   edit mode and their synthetic build-time `Request` has no real
+ *   headers, so reading them would only emit Astro's
+ *   `Astro.request.headers` warning for nothing.
  */
 import type { MiddlewareHandler } from 'astro';
 import { escapeAttr } from './internal/escape';
@@ -24,6 +28,11 @@ import { EDIT_COOKIE_HEADER, isEditMode } from './is-edit-mode';
 const HEAD_CLOSE = '</head>';
 
 export const onRequest: MiddlewareHandler = (context, next) => {
+  if (context.isPrerendered) {
+    (context.locals as { tinaEdit?: boolean }).tinaEdit = false;
+    return next();
+  }
+
   const editing = isEditMode(context.request);
   (context.locals as { tinaEdit?: boolean }).tinaEdit = editing;
 
