@@ -20,6 +20,7 @@
  *   `Astro.request.headers` warning for nothing.
  */
 import type { MiddlewareHandler } from 'astro';
+import { adminOrigins } from './internal/admin-origin';
 import { escapeAttr } from './internal/escape';
 import { type CollectedForm, formsStore } from './internal/forms-store';
 import { requestStore } from './internal/request-context';
@@ -101,27 +102,4 @@ function bridgeScript(): string {
     `document.addEventListener("astro:page-load",refreshForms);` +
     `</script>`
   );
-}
-
-/**
- * Read `PUBLIC_TINA_ADMIN_ORIGIN` (comma-separated for multi-origin setups)
- * from Astro's `import.meta.env`. Returns null when unset so `bridge.init()`
- * falls back to `window.location.origin` — the common same-host case.
- *
- * `import.meta.env` is cast inline because the package ships no `env.d.ts`
- * to keep the public type surface free of Vite/Astro client-types coupling.
- */
-function adminOrigins(): string[] | null {
-  const env = (
-    import.meta as ImportMeta & {
-      env?: Record<string, string | undefined>;
-    }
-  ).env;
-  const raw = env?.PUBLIC_TINA_ADMIN_ORIGIN;
-  if (!raw) return null;
-  const origins = raw
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean);
-  return origins.length > 0 ? origins : null;
 }

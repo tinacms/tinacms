@@ -20,7 +20,7 @@ import { setAdminOrigin } from './config';
 import { initDataStore } from './data-store';
 import { debug } from './debug';
 import { initForms, refreshForms } from './forms';
-import { initIslandRefresh } from './island-refresh';
+import { initIslandRefresh, primeIslands } from './island-refresh';
 
 export interface BridgeOptions {
   /**
@@ -68,6 +68,18 @@ export function init(options: BridgeOptions = {}): void {
   // Forms register last so listeners are wired up before we announce
   // ourselves to the admin and start receiving updateData replies.
   initForms(store);
+
+  // Statically-built page: the middleware never ran, so there are no
+  // server-injected `[data-tina-form]` payloads — but if the page declares
+  // editable regions, pull the payloads from the island endpoints and
+  // re-announce. SSR pages already have their payloads, so skip.
+  if (
+    !document.querySelector('[data-tina-form]') &&
+    document.querySelector('[data-tina-island]')
+  ) {
+    debug('no server-injected forms; priming from island endpoints');
+    void primeIslands().then(refreshForms);
+  }
 }
 
 /**

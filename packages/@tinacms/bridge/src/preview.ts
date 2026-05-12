@@ -15,6 +15,15 @@
 export const PREVIEW_HEADER = 'X-Tina-Preview';
 export const PREVIEW_CONTENT_TYPE = 'application/x-tina-preview+json';
 /**
+ * Set by the bridge on the one-time "prime" refetch it issues on a
+ * statically-built page (one that has `[data-tina-island]` markers but no
+ * server-injected `[data-tina-form]` payloads). The island endpoint
+ * answers a primed request with the collected `<div data-tina-form>`
+ * payloads prepended to the island HTML so the bridge can register the
+ * page's forms; ordinary refetches omit them to stay lean.
+ */
+export const PRIME_HEADER = 'X-Tina-Prime';
+/**
  * Hard cap on overlay envelope size. The bridge POSTs JSON-encoded form
  * data — a 1 MB envelope already represents a wildly oversized document —
  * so any larger payload is treated as malformed.

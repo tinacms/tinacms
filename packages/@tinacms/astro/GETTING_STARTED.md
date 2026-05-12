@@ -11,11 +11,13 @@ pnpm add @tinacms/astro tinacms
 pnpm add -D @tinacms/cli
 ```
 
-You'll also need an Astro SSR adapter — the island-refresh endpoint reads POST bodies at request time, so `output: 'server'` is required:
+You'll also need an Astro SSR adapter — the `/_tina/bridge.js` route and the island-refresh endpoint render at request time:
 
 ```bash
 pnpm add @astrojs/node          # or @astrojs/vercel / netlify / cloudflare
 ```
+
+This guide uses `output: 'server'` (the simplest setup). `output: 'static'` also works for visual editing — see [Static-site editing](#static-site-editing) at the end — as long as your editable regions are wrapped in `<TinaIsland>` (steps 5–7) so the adapter only renders the island endpoints on demand.
 
 If your collections use MDX bodies:
 
@@ -223,7 +225,20 @@ For the cleanest type-check experience:
 | Iframe shows page but admin sidebar stays empty | `Sec-Fetch-Dest: iframe` lost on in-iframe link clicks | The `__tina_edit` cookie handles this automatically. If still broken, check DevTools → Application → Cookies for `__tina_edit=1` on the iframe origin. |
 | "Tina Dev server is already in use. Datalayer server is busy on port 9000" | Another `pnpm dev` is running | Kill it, or set a different datalayer port |
 | Admin URL bar updates but new page's forms don't appear | Bridge isn't loading on the new page | Inspect the new page's `<head>` in DevTools — should contain `<div data-tina-form="…" hidden>` and a `<script type="module">` importing `/_tina/bridge.js`. If they're missing, edit-mode detection failed (check the Referer header on the request). |
+| Visual editing dead on a deployed site, no `data-tina-form` / `bridge.js` in the HTML | Pages are statically built (`output: 'static'`) so the middleware never runs at request time | Either set `output: 'server'`, or wrap editable regions in `<TinaIsland>` (steps 5–7) — see [Static-site editing](#static-site-editing). Without an `<TinaIsland>` somewhere on the page there's nothing to inject the bridge on a static build. |
 | `Type 'X' is not assignable to type 'never'` on `<TinaMarkdown>` | Imported from bare `@tinacms/astro` (which resolves to the placeholder type) | Import from `@tinacms/astro/TinaMarkdown.astro` instead |
+
+## Static-site editing
+
+You can keep `output: 'static'` (pages prerendered, served as flat files) and still edit visually. The middleware only injects the bridge on on-demand-rendered responses, so on a static page that doesn't happen — instead, **`<TinaIsland>` emits a tiny inline `<script>`** that loads `/_tina/bridge.js` only when the page is open inside the admin iframe. On boot the bridge fetches each island's `/tina-island/[name]` endpoint (still `prerender = false`, so the adapter renders it on demand) to pick up the page's form payloads, and from there editing behaves exactly as in an SSR project.
+
+To make it work:
+
+- Wrap every editable region in `<TinaIsland>` with a registered island (steps 5–7). This is required for static editing — it's both how regions re-render and how the bridge gets bootstrapped.
+- Keep `export const prerender = false` on `src/pages/tina-island/[name].ts`.
+- You still need an SSR adapter; just leave `output` as `'static'` (or set `prerender = false` on only the page routes you want server-rendered).
+
+Trade-off: a page that uses `<TinaIsland>` ships that one-line inline bootstrap in production HTML — it's no longer byte-identical to a Tina-free Astro app. Pages without `<TinaIsland>` are unchanged.
 
 ## Reference
 

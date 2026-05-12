@@ -1,7 +1,11 @@
 import { isFromAdmin } from './config';
 import { debug } from './debug';
 import { reportQuickEdit } from './forms';
-import { PREVIEW_CONTENT_TYPE, type PreviewEnvelope } from './preview';
+import {
+  PREVIEW_CONTENT_TYPE,
+  PRIME_HEADER,
+  type PreviewEnvelope,
+} from './preview';
 import type { DataStore } from './types';
 
 /**
@@ -27,6 +31,7 @@ export interface IslandRefreshOptions {
 
 const ISLAND_SELECTOR = '[data-tina-island]';
 const ENDPOINT_ATTR = 'data-tina-island';
+const FORM_SELECTOR = '[data-tina-form]';
 
 export function initIslandRefresh(
   store: DataStore,
@@ -104,11 +109,60 @@ async function refreshIsland(
   }
 }
 
+/**
+ * One-time hydration for statically-built pages. The `tina()` middleware
+ * only injects `[data-tina-form]` payloads on on-demand-rendered responses,
+ * so a prerendered page in the admin iframe has none — without them the
+ * bridge has nothing to announce and the admin never sends `updateData`.
+ *
+ * Fetch each island endpoint with the prime header set; the endpoint
+ * answers with the page's `<div data-tina-form>` payloads prepended to the
+ * region HTML. Move those payloads into the document so a follow-up
+ * `refreshForms()` (caller's responsibility) picks them up and announces
+ * them. The region HTML itself already shows canonical data on the static
+ * page, so it isn't swapped here — the first real `updateData` does that.
+ *
+ * No-op on SSR pages: the caller only invokes this when no
+ * `[data-tina-form]` is present.
+ */
+export async function primeIslands(): Promise<void> {
+  const islands = document.querySelectorAll<HTMLElement>(ISLAND_SELECTOR);
+  for (const island of islands) {
+    const endpoint = island.getAttribute(ENDPOINT_ATTR);
+    if (!endpoint) continue;
+    try {
+      debug('priming island', endpoint);
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': PREVIEW_CONTENT_TYPE,
+          [PRIME_HEADER]: '1',
+        },
+        body: '{}',
+        cache: 'no-store',
+        credentials: 'same-origin',
+      });
+      if (!response.ok) {
+        debug('island prime failed', endpoint, response.status);
+        continue;
+      }
+      const template = document.createElement('template');
+      template.innerHTML = (await response.text()).trim();
+      for (const formEl of Array.from(
+        template.content.querySelectorAll<HTMLElement>(FORM_SELECTOR)
+      )) {
+        document.body.appendChild(formEl);
+      }
+    } catch (error) {
+      debug('island prime error', endpoint, error);
+    }
+  }
+}
+
 function swapIslandHtml(island: HTMLElement, html: string): void {
   const template = document.createElement('template');
   template.innerHTML = html.trim();
-  const fragment = template.content;
-  const replacement = fragment.firstElementChild as HTMLElement | null;
+  const replacement = template.content.firstElementChild as HTMLElement | null;
 
   if (replacement) {
     for (const attr of Array.from(island.attributes)) {

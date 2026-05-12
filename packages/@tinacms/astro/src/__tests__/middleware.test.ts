@@ -28,7 +28,9 @@ describe('onRequest', () => {
       url: 'https://example.com/',
       headers: {
         get() {
-          throw new Error('request headers must not be read while prerendering');
+          throw new Error(
+            'request headers must not be read while prerendering'
+          );
         },
       },
     };

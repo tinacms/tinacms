@@ -5,6 +5,17 @@
  * from the registry entry — so the page-side element matches the server's
  * `IslandConfig.wrapper` automatically.
  *
+ * Also emits a tiny in-iframe bootstrap `<script>` so visual editing works
+ * on **statically built** pages: the `tina()` middleware only injects the
+ * bridge on on-demand-rendered responses, so a prerendered page would
+ * otherwise never load it. The script is a no-op for normal visitors
+ * (`window.self === window.top`) and only fetches `/_tina/bridge.js` inside
+ * the admin iframe; the `window.__tinaBootstrap` guard plus `bridge.init`'s
+ * own idempotency keep it harmless when multiple `<TinaIsland>`s render on a
+ * page or when the middleware has already injected its own bootstrap. Once a
+ * page uses `<TinaIsland>` its production HTML is no longer byte-identical to
+ * a Tina-free Astro app — it carries this ~one-line inline script.
+ *
  * Usage:
  *
  * ```astro
@@ -20,6 +31,8 @@
  * `experimental_createIslandRoute`. `params` is encoded as URL search
  * params and forwarded to the route handler.
  */
+import { adminOrigins } from './internal/admin-origin';
+
 interface Props {
   name: string;
   wrapper: { tag: string; className?: string };
@@ -36,7 +49,16 @@ const search = params
   : '';
 const marker = `/tina-island/${name}${search}`;
 const Tag = wrapper.tag as keyof HTMLElementTagNameMap;
+const adminOrigin = adminOrigins();
 ---
+<script is:inline type="module" define:vars={{ adminOrigin }}>
+  if (window.self !== window.top && !window.__tinaBootstrap) {
+    window.__tinaBootstrap = 1;
+    const { init, refreshForms } = await import('/_tina/bridge.js');
+    init(adminOrigin ? { adminOrigin } : undefined);
+    document.addEventListener('astro:page-load', refreshForms);
+  }
+</script>
 <Tag class={wrapper.className} data-tina-island={marker}>
   <slot />
 </Tag>

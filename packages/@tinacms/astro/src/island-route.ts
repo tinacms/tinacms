@@ -5,6 +5,14 @@
  * Astro component to render, and the wrapper element the page-side
  * `<div data-tina-island>` is expected to swap.
  *
+ * The render runs inside the same request/forms AsyncLocalStorage scopes
+ * the `tina()` middleware uses, so `requestWithMetadata` calls inside the
+ * island's loader (a) pick up the overlay the bridge POSTed and (b) record
+ * their form payloads. On the bridge's one-time "prime" refetch (a static
+ * page that has no server-injected `[data-tina-form]` yet) those payloads
+ * are prepended to the response as `<div data-tina-form>` so the bridge can
+ * register the page's forms; ordinary refetches omit them.
+ *
  * @experimental
  *
  * Built on Astro's `experimental_AstroContainer`, which is itself
@@ -23,11 +31,13 @@
  * export const ALL = experimental_createIslandRoute(islands);
  * ```
  */
+import { PREVIEW_CONTENT_TYPE, PRIME_HEADER } from '@tinacms/bridge/preview';
 import type { APIRoute } from 'astro';
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import type { AstroComponentFactory } from 'astro/runtime/server/index.js';
-import { PREVIEW_CONTENT_TYPE } from '@tinacms/bridge/preview';
 import { escapeAttr } from './internal/escape';
+import { type CollectedForm, formsStore } from './internal/forms-store';
+import { requestStore } from './internal/request-context';
 
 export interface IslandWrapper {
   tag: string;
@@ -62,13 +72,23 @@ export function experimental_createIslandRoute(
       return new Response(`Unknown island "${params.name}"`, { status: 404 });
     }
 
+    const priming = request.headers.get(PRIME_HEADER) !== null;
+
     try {
-      const data = await island.fetch(request, url.searchParams);
-      const container = await AstroContainer.create();
-      const html = await container.renderToString(island.component, {
-        props: island.propsFromData(data, url.searchParams),
-      });
-      return new Response(wrapIsland(html, island.wrapper, url), {
+      const forms: CollectedForm[] = [];
+      const html = await requestStore.run(request, () =>
+        formsStore.run(forms, async () => {
+          const data = await island.fetch(request, url.searchParams);
+          const container = await AstroContainer.create();
+          return container.renderToString(island.component, {
+            props: island.propsFromData(data, url.searchParams),
+          });
+        })
+      );
+      const body =
+        (priming ? renderFormPayloads(forms) : '') +
+        wrapIsland(html, island.wrapper, url);
+      return new Response(body, {
         headers: {
           'Content-Type': 'text/html; charset=utf-8',
           'Cache-Control': 'no-store',
@@ -99,6 +119,17 @@ function rejectIfUnsafe(request: Request): Response | null {
     return new Response('Forbidden', { status: 403 });
   }
   return null;
+}
+
+/** Hidden `<div data-tina-form>` payloads — same wire shape the middleware
+ *  splices into edit-mode SSR pages, so the bridge parses them identically. */
+function renderFormPayloads(forms: CollectedForm[]): string {
+  return forms
+    .map(
+      (form) =>
+        `<div data-tina-form="${escapeAttr(JSON.stringify(form))}" hidden></div>`
+    )
+    .join('');
 }
 
 function wrapIsland(html: string, wrapper: IslandWrapper, url: URL): string {
