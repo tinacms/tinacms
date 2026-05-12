@@ -1,5 +1,49 @@
 # tina-graphql
 
+## 2.4.0
+
+### Minor Changes
+
+- [#6738](https://github.com/tinacms/tinacms/pull/6738) [`4d0c37a`](https://github.com/tinacms/tinacms/commit/4d0c37a8a50b211b7c5070c370faa369ee5d260d) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Stop writing generated files (`_schema.json`, `_graphql.json`, `_lookup.json`, `tina-lock.json`) to the content repo when `localContentPath` is set. Generated files now live only in the generator repo's `tina/__generated__/`. The content repo is no longer required to contain a `tina/` folder. `FilesystemBridge.get` / `put` / `delete` now route `tina/__generated__/` and `.tina/__generated__/` paths to `rootPath` (the generator) instead of `outputPath` (the content root). Closes [tinacms/tinacloud#3295](https://github.com/tinacms/tinacloud/issues/3295).
+
+  ### ⚠️ Rollout gate
+
+  **This release must not be promoted to the `@latest` dist-tag until TinaCloud prod has deployed [tinacms/tinacloud#3403](https://github.com/tinacms/tinacloud/issues/3403).** Pre-#3403 TinaCloud reads `tina-lock.json` from the content repo on generator pushes; shipping this change before the server-side fix breaks every existing multi-repo user's indexing.
+
+  ### Migration notes for existing multi-repo projects
+
+  After upgrading (and once TinaCloud prod is on #3403):
+
+  - **Stale `tina/` folder in your content repo.** Pre-upgrade builds committed `tina/__generated__/*` and `tina/tina-lock.json` to the content repo. Nothing updates or reads those files any more. They are safe — and recommended — to delete from the content repo in a single cleanup commit.
+  - **`ConfigManager.generatedFolderPathContentRepo` is removed.** If any custom CLI code, plugins, or scripts referenced this field, they will fail at type-check or runtime. Use `generatedFolderPath` — it has always been the generator-relative path.
+  - **`ConfigManager.getTinaFolderPath` no longer accepts an `isContentRoot` option.** The content root never needs a `tina/` folder now, so the option was removed. If any custom code called `getTinaFolderPath(path, { isContentRoot: true })`, drop the second argument.
+  - **`FilesystemBridge` behavior change for `tina/__generated__/` paths.** In multi-repo setups, bridge reads/writes of paths under `tina/__generated__/` or `.tina/__generated__/` now resolve against the generator (`rootPath`) rather than the content repo (`outputPath`). If you have custom bridge subclasses or code that relied on these paths resolving to the content repo, update it.
+  - **Generated `client.ts` / `database-client.ts` now import `./types` extensionless** (was `./types.ts`) for TypeScript projects. Avoids requiring `allowImportingTsExtensions: true` in consumer tsconfigs, which broke the build under Next.js 15.5+ defaults. JS projects still import `./types.js` (Node ESM requires the extension).
+
+- [#6765](https://github.com/tinacms/tinacms/pull/6765) [`9e7eba9`](https://github.com/tinacms/tinacms/commit/9e7eba9f290c935cd56569421de88b5adfac65d8) Thanks [@kulesy](https://github.com/kulesy)! - Forward the editor's current branch to the TinaCloud assets-api on every cloud media call, and fix staging URL handling for multi-segment branches
+
+  `TinaMediaStore` now appends `?branch=<encodedBranch>` to its `upload_url`, `list`, and `delete` requests so that — once the assets-api opts an app into branch-aware media — uploads, listings, and deletions are scoped to the branch the editor is on, instead of always hitting the production branch. The branch is read from `Client.branch` (already URL-encoded) and decoded then re-encoded at the use site to avoid double-encoding.
+
+  The query parameter is ignored by assets-api versions that do not parse it, so this change is safe to deploy ahead of the server-side rollout. Local mode is unaffected.
+
+  `@tinacms/graphql`'s media URL resolver now formats staging URLs as `/__staging/<branch>/__file/<path>` instead of `/__staging/<encoded-branch>/<path>`. The previous form broke for branches containing `/` (e.g. `feat/my-branch`) because CloudFront decodes paths before downstream components see them, so the S3 write key (with a literal `%2F`) wouldn't match the decoded read path. The `__file` delimiter lets the branch contribute its natural `/` segments while still marking where the file path begins.
+
+  Note: staging URLs produced by `@tinacms/graphql@2.3.0`–`2.3.1` use the old format and will not round-trip through this version's `resolveMediaCloudToRelative`. Branch-aware media is gated server-side and has not been enabled for any tenant yet, so no persisted data is expected to be affected — but if you turned it on for testing, regenerate the affected field values from the editor after upgrading.
+
+  After a successful cloud upload `TinaMediaStore.persist()` now resolves its return value from the assets-api `list` endpoint instead of constructing each `Media.src` locally — the server is the source of truth for the canonical URL (including the staging-branch path and per-stage CDN host). The `MediaStore.persist()` contract is preserved, so the returned items still flow through the media manager and the image-field drop handler.
+
+  Also reserves an optional `rename?(from, to)` hook on the `MediaStore` interface as a future extension point — no implementation yet.
+
+### Patch Changes
+
+- [#6828](https://github.com/tinacms/tinacms/pull/6828) [`eafb1ff`](https://github.com/tinacms/tinacms/commit/eafb1ffbd78267838f6939b3e993efc37c05cb2e) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Fix `resolveMediaCloudToRelative` so it strips any TinaCloud cloud URL on save, not only ones whose host matches `config.assetsHost`. The match condition is now host-agnostic: the `<clientId>/…` path prefix is the durable invariant; the host segment can vary across stages.
+
+  This unblocks multi-host setups (PR / stage / personal-dev TinaCloud stages) where the dashboard's default `MediaStore` inserts upload URLs with one host while content-api returns a different one as `assetsHost`. Previously the round-trip silently failed and absolute URLs got committed to the content repo. After this fix, content saves as a relative path regardless of which host the dashboard inserted, matching pre-existing content's format.
+
+  Also covers cross-stage content migration: an absolute URL written against one stage strips correctly when re-saved against another.
+
+  Closes [#6827](https://github.com/tinacms/tinacms/issues/6827).
+
 ## 2.3.1
 
 ### Patch Changes

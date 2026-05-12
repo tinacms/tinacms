@@ -1,0 +1,20 @@
+# Build output
+.astro/
+dist/
+
+# Tina generated
+tina/__generated__/
+public/admin/
+
+# Playwright
+test-results/
+playwright-report/
+
+# Node
+node_modules/
+.env
+.env.local
+
+# IDE / OS
+.DS_Store
+*.log

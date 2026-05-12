@@ -7,7 +7,13 @@
 	},
 	"files": {
 		"ignoreUnknown": true,
-		"ignore": [],
+		"ignore": [
+			"**/__generated__/**",
+			"**/dist/**",
+			"**/.astro/**",
+			"**/node_modules/**",
+			"**/*/admin/index.html"
+		],
 		"maxSize": 3145728
 	},
 	"formatter": {
@@ -104,6 +110,13 @@
 		}
 	},
 	"overrides": [
+		{
+			"include": [
+				"examples/astro/visual-editing/**/*.css"
+			],
+			"linter": { "enabled": false },
+			"formatter": { "enabled": false }
+		},
 		{
 			"include": [
 				"*.ts",

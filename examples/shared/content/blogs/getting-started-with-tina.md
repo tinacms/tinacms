@@ -1,19 +1,20 @@
 ---
 title: Getting Started with TinaCMS
+heroImage: /uploads/llama-2.avif
+excerpt: ''
 description: A step-by-step guide to setting up TinaCMS in your Next.js project.
 author: content/authors/napoleon.md
 pubDate: 2024-03-10T00:00:00.000Z
 updatedDate: 2024-03-15T00:00:00.000Z
-heroImage: /uploads/llama-2.avif
 ---
 
 ## Prerequisites
 
 Before you begin, make sure you have:
 
-- Node.js 18 or higher
-- A Next.js project
-- Basic knowledge of React
+* Node.js 18 or higher
+* A Next.js project
+* Basic knowledge of React
 
 ## Installation
 

@@ -1,0 +1,49 @@
+{
+  "name": "@examples/astro-visual-editing",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "astro": "astro",
+    "dev": "cross-env MONOREPO_DEV=true tinacms dev -c \"astro dev\"",
+    "dev:astro": "astro dev",
+    "build": "tinacms build && astro build",
+    "build:astro": "astro build",
+    "build:local": "tinacms build --local --skip-cloud-checks -c \"astro build\"",
+    "preview": "astro preview",
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^4.3.0",
+    "@astrojs/node": "^9.0.0",
+    "@tailwindcss/typography": "catalog:",
+    "@tailwindcss/vite": "^4.2.1",
+    "@tinacms/astro": "workspace:*",
+    "@tinacms/datalayer": "workspace:*",
+    "@tinacms/mdx": "workspace:*",
+    "astro": "^5.16.0",
+    "clsx": "^2.1.1",
+    "graphql": "^15.10.1",
+    "react-icons": "^4.12.0",
+    "tailwind-merge": "^2.6.0",
+    "tailwindcss": "^4.0.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.9",
+    "@biomejs/biome": "catalog:",
+    "@playwright/test": "catalog:",
+    "@tinacms/app": "workspace:*",
+    "@tinacms/cli": "workspace:*",
+    "@tinacms/scripts": "workspace:*",
+    "@types/node": "^25.1.0",
+    "@types/react": "^18.3.0",
+    "cross-env": "^7.0.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tinacms": "workspace:*",
+    "typescript": "^5.9.3"
+  }
+}

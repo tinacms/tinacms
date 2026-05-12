@@ -1,0 +1,19 @@
+---
+import TinaIsland from '@tinacms/astro/TinaIsland.astro';
+import PostBody from '../../components/islands/PostBody.astro';
+import Base from '../../layouts/Base.astro';
+import { getPost } from '../../lib/data';
+import { islands } from '../../lib/islands';
+
+const slug = (Astro.params.urlSegments ?? '').toString();
+const post = await getPost(slug);
+if (!post.data?.post) {
+  return new Response('Not Found', { status: 404 });
+}
+const data = post.data.post;
+---
+<Base title={`${data.title} | Posts`}>
+  <TinaIsland name="post" wrapper={islands.post.wrapper} params={{ slug }}>
+    <PostBody data={data} />
+  </TinaIsland>
+</Base>

@@ -1,11 +1,12 @@
 ---
 title: Visual Editing with TinaCMS
+heroImage: /uploads/llama-5.avif
+excerpt: |
+  TinaCMS's contextual editing feature lets editors click directly on content and edit it in place — no more switching back and forth between a CMS dashboard and a preview.
 description: Learn how TinaCMS enables real-time visual editing directly on your site.
 author: content/authors/napoleon.md
 pubDate: 2024-05-12T00:00:00.000Z
 updatedDate: 2024-05-14T00:00:00.000Z
-heroImage: /uploads/llama-5.avif
-excerpt: TinaCMS's contextual editing feature lets editors click directly on content and edit it in place — no more switching back and forth between a CMS dashboard and a preview.
 ---
 
 ## What is Visual Editing?
