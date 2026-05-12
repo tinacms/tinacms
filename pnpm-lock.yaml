@@ -787,7 +787,7 @@ importers:
         specifier: ^5.7.3
         version: 5.9.3
 
-  examples/astro/visual-editing:
+  examples/astro/v2-kitchen-sink:
     dependencies:
       '@astrojs/mdx':
         specifier: ^4.3.0
@@ -797,7 +797,7 @@ importers:
         version: 9.5.5(astro@5.18.1(@azure/storage-blob@12.29.1)(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.53.4)(sass@1.97.3)(terser@5.46.0)(typescript@5.9.3)(yaml@2.8.2))
       '@tailwindcss/typography':
         specifier: 'catalog:'
-        version: 0.5.19(tailwindcss@4.2.1)
+        version: 0.5.19(tailwindcss@4.2.4)
       '@tailwindcss/vite':
         specifier: ^4.2.1
         version: 4.2.4(vite@6.4.1(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.2))
@@ -827,7 +827,7 @@ importers:
         version: 2.6.0
       tailwindcss:
         specifier: ^4.0.0
-        version: 4.2.1
+        version: 4.2.4
     devDependencies:
       '@astrojs/check':
         specifier: ^0.9.9
@@ -21216,6 +21216,11 @@ snapshots:
     dependencies:
       postcss-selector-parser: 6.0.10
       tailwindcss: 4.2.1
+
+  '@tailwindcss/typography@0.5.19(tailwindcss@4.2.4)':
+    dependencies:
+      postcss-selector-parser: 6.0.10
+      tailwindcss: 4.2.4
 
   '@tailwindcss/vite@4.2.4(vite@6.4.1(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.2))':
     dependencies:

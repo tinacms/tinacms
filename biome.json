@@ -112,7 +112,7 @@
 	"overrides": [
 		{
 			"include": [
-				"examples/astro/visual-editing/**/*.css"
+				"examples/astro/v2-kitchen-sink/**/*.css"
 			],
 			"linter": { "enabled": false },
 			"formatter": { "enabled": false }

@@ -6,7 +6,8 @@ Framework example apps that demonstrate TinaCMS against the same content model. 
 
 - [next/kitchen-sink](next/kitchen-sink/AGENTS.md) — Next.js 15 App Router with `useTina()` visual editing.
 - [next/tina-self-hosted-demo](next/tina-self-hosted-demo/AGENTS.md) — Next.js Pages Router with self-hosted backend (MongoDB, GitHub, `tinacms-authjs`). **Does not consume shared content** — keeps its own `content/`.
-- [astro/kitchen-sink](astro/kitchen-sink/AGENTS.md) — Astro 5 static site with zero-JS production output.
+- [astro/kitchen-sink](astro/kitchen-sink/AGENTS.md) — Astro 5 site that drives visual editing through React islands hydrated with `client:tina` + `useTina()`. Mirrors the Next.js kitchen-sink integration pattern; useful as a regression canary for that path.
+- [astro/v2-kitchen-sink](astro/v2-kitchen-sink/README.md) — same content model, but visual editing flows through `@tinacms/bridge` + `requestWithMetadata` + `<TinaIsland>`. No React in the page tree, no `useTina()`.
 - [hugo/kitchen-sink](hugo/kitchen-sink/AGENTS.md) — Hugo Extended static site, admin-panel editing only.
 - [react/kitchen-sink](react/kitchen-sink/AGENTS.md) — Vite + React 18 SPA with runtime Tina client queries.
 

@@ -1,8 +1,8 @@
-# TinaCMS Astro — Visual Editing (No React)
+# TinaCMS Astro — v2 Kitchen Sink (No React)
 
 The Astro version of the TinaCMS kitchen-sink — same six collections, same shared content, same eight routes — but rendered with **pure Astro components**. Visual editing flows through `@tinacms/bridge`, a ~2 KB gzipped vanilla-JS bridge that talks the existing TinaCMS admin postMessage protocol. No React in the page tree, no client islands, no hydration cost outside the editor iframe.
 
-> **Sibling example:** [`examples/astro/kitchen-sink`](../kitchen-sink/) is the same content model rendered with React via `client:tina`. Pick that one if you want React on the page; pick this one if you want to ship as little JS as possible.
+> **Sibling example:** [`examples/astro/kitchen-sink`](../kitchen-sink/) is the same content model rendered with React via `client:tina` + `useTina()`. Pick that one if you want React on the page (familiar to anyone coming from the Next.js kitchen-sink); pick this one if you want to ship as little JS as possible.
 
 ## Prerequisites
 
@@ -13,7 +13,7 @@ The Astro version of the TinaCMS kitchen-sink — same six collections, same sha
 
 ```bash
 pnpm install
-cd examples/astro/visual-editing
+cd examples/astro/v2-kitchen-sink
 pnpm dev          # TinaCMS + Astro (visual editing at /admin/)
 pnpm dev:astro    # Astro only (no TinaCMS)
 ```
@@ -201,7 +201,7 @@ For nested MDX components in rich-text bodies (e.g. `<NewsletterSignup>` inside 
 
 ## Differences from `astro/kitchen-sink`
 
-| Concern | `astro/kitchen-sink` | `astro/visual-editing` (this) |
+| Concern | `astro/kitchen-sink` | `astro/v2-kitchen-sink` (this) |
 |---------|---------------------|------------------------------|
 | Visual editing mechanism | React `useTina()` inside `client:tina` islands | Vanilla `@tinacms/bridge` + island refresh |
 | React in the page tree | Yes (hydrated in editor only) | No |

@@ -1,5 +1,5 @@
 {
-  "name": "@examples/astro-visual-editing",
+  "name": "@examples/astro-v2-kitchen-sink",
   "version": "0.1.0",
   "private": true,
   "type": "module",

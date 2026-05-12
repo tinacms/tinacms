@@ -2,7 +2,7 @@
 
 Step-by-step for adding TinaCMS visual editing to a new or existing Astro project. Tested against Astro 5, Node 18+, TinaCMS 3.
 
-The reference implementation lives at [`examples/astro/visual-editing`](../../../examples/astro/visual-editing/) — same content schema as the React kitchen-sink, rendered with pure Astro.
+The reference implementation lives at [`examples/astro/v2-kitchen-sink`](../../../examples/astro/v2-kitchen-sink/) — same content schema as the React kitchen-sink, rendered with pure Astro.
 
 ## 1. Install
 
@@ -227,6 +227,6 @@ For the cleanest type-check experience:
 
 ## Reference
 
-- Full example: [`examples/astro/visual-editing`](../../../examples/astro/visual-editing/) — every pattern in this guide, plus listing pages, layout/header/footer islands, and 5 custom MDX components
+- Full example: [`examples/astro/v2-kitchen-sink`](../../../examples/astro/v2-kitchen-sink/) — every pattern in this guide, plus listing pages, layout/header/footer islands, and 5 custom MDX components
 - Package README: [`README.md`](./README.md) — subpath exports, custom MDX patterns, default-tag overrides
 - Bridge package: [`@tinacms/bridge`](../../@tinacms/bridge/) — the vanilla-JS bridge underneath; usable from Hugo, plain HTML, anything non-React
