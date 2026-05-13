@@ -24,7 +24,7 @@
     "@tinacms/astro": "workspace:*",
     "@tinacms/datalayer": "workspace:*",
     "@tinacms/mdx": "workspace:*",
-    "astro": "^5.16.0",
+    "astro": "^6.1.10",
     "clsx": "^2.1.1",
     "graphql": "^15.10.1",
     "react-icons": "^4.12.0",

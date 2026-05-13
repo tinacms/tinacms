@@ -137,7 +137,7 @@
   "devDependencies": {
     "@tinacms/scripts": "workspace:*",
     "@types/node": "^22.13.1",
-    "astro": "^5.16.0",
+    "astro": "^6.1.10",
     "typescript": "^5.7.3",
     "vite": "^6.0.0",
     "vitest": "^3.0.0"
