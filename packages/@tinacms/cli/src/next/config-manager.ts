@@ -444,6 +444,14 @@ export class ConfigManager {
     // Remove the entire build subdir, not just the .mjs file — keeps the
     // .cache/<timestamp>/ tree from accumulating empty dirs across reloads.
     fs.removeSync(buildDir);
+    // Also reap the timestamp parent if it's now empty (the sibling
+    // loadConfigFile may have already finished and removed its own subdir).
+    // rmdirSync throws ENOTEMPTY harmlessly if other content is still there.
+    try {
+      fs.rmdirSync(this.generatedCachePath);
+    } catch {
+      /* parent not empty, leave for the next startup sweep */
+    }
     return result.default;
   }
 
@@ -525,6 +533,13 @@ export class ConfigManager {
     // temp tsconfig) rather than picking files off one by one — keeps the
     // .cache/<timestamp>/ tree from accumulating empty dirs across reloads.
     fs.removeSync(buildDir);
+    // Also reap the timestamp parent if it's now empty (the sibling
+    // loadDatabaseFile may have already finished and removed its own subdir).
+    try {
+      fs.rmdirSync(this.generatedCachePath);
+    } catch {
+      /* parent not empty, leave for the next startup sweep */
+    }
     return {
       config: result.default,
       prebuildPath: preBuildConfigPath,
