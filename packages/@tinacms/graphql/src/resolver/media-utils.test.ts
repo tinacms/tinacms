@@ -312,6 +312,59 @@ describe('resolveMedia', () => {
   });
 
   /**
+   * Absolute external URLs (http://, https://, protocol-relative //) point
+   * outside the user's media root. They must round-trip identically in both
+   * directions on every branch, so that content authored with hard-coded
+   * external image links is preserved on read and on save.
+   */
+  it.each([
+    'https://github.com/owner/repo/assets/123/abc.png',
+    'http://example.com/img.jpg',
+    '//cdn.example.com/img.jpg',
+  ])('leaves absolute external URL %s untouched on both directions', (url) => {
+    const config: GraphQLConfig = {
+      useRelativeMedia: false,
+      assetsHost,
+      clientId,
+      branch: 'feat/x',
+      mediaBranch: 'main',
+    };
+
+    expect(resolveMediaRelativeToCloud(url, config, schema)).toEqual(url);
+    expect(resolveMediaCloudToRelative(url, config, schema)).toEqual(url);
+  });
+
+  /**
+   * Array values containing a mix of relative media paths and absolute
+   * external URLs must rewrite only the relative entries and preserve the
+   * external ones verbatim.
+   */
+  it('preserves absolute external URLs inside mixed array values', () => {
+    const config: GraphQLConfig = {
+      useRelativeMedia: false,
+      assetsHost,
+      clientId,
+      branch: 'feat/x',
+      mediaBranch: 'main',
+    };
+
+    const resolved = resolveMediaRelativeToCloud(
+      [
+        '/uploads/a.png',
+        'https://github.com/owner/repo/assets/123/abc.png',
+        '/uploads/b.png',
+      ],
+      config,
+      schema
+    );
+    expect(resolved).toEqual([
+      `https://${assetsHost}/${clientId}/__staging/feat/x/__file/a.png`,
+      'https://github.com/owner/repo/assets/123/abc.png',
+      `https://${assetsHost}/${clientId}/__staging/feat/x/__file/b.png`,
+    ]);
+  });
+
+  /**
    * Missing `media: { tina: { ... }}` config should return the value, regardless of `useRelativeMedia`
    */
   it('persists value when no `tina` config is provided regardless of `useRelativeMedia`', () => {
