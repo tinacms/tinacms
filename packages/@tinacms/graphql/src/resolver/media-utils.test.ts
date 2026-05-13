@@ -312,16 +312,20 @@ describe('resolveMedia', () => {
   });
 
   /**
-   * Absolute external URLs (http://, https://, protocol-relative //) point
-   * outside the user's media root. They must round-trip identically in both
-   * directions on every branch, so that content authored with hard-coded
-   * external image links is preserved on read and on save.
+   * Absolute URLs of any scheme — http(s), data, blob, file, mailto — and
+   * protocol-relative URLs point outside the user's media root. They must
+   * round-trip identically in both directions on every branch, so that
+   * content authored with hard-coded external links (or inline base64
+   * payloads) is preserved on read and on save.
    */
   it.each([
     'https://github.com/owner/repo/assets/123/abc.png',
     'http://example.com/img.jpg',
     '//cdn.example.com/img.jpg',
-  ])('leaves absolute external URL %s untouched on both directions', (url) => {
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+    'blob:https://example.com/abcdef12-3456-7890-abcd-ef1234567890',
+    'file:///tmp/img.png',
+  ])('leaves absolute URL %s untouched on both directions', (url) => {
     const config: GraphQLConfig = {
       useRelativeMedia: false,
       assetsHost,
@@ -332,6 +336,78 @@ describe('resolveMedia', () => {
 
     expect(resolveMediaRelativeToCloud(url, config, schema)).toEqual(url);
     expect(resolveMediaCloudToRelative(url, config, schema)).toEqual(url);
+  });
+
+  /**
+   * Self-heal: a previously-corrupted document on disk can store values like
+   * `/uploadshttps://…` where the media root was concatenated directly in
+   * front of an absolute URL. On read, after stripping the media root the
+   * remaining value is itself an absolute URL; return that directly rather
+   * than re-wrapping it with the cloud assets prefix. On the next save the
+   * value lands back on disk in its clean form.
+   */
+  it.each([
+    {
+      stored: '/uploadshttps://github.com/owner/repo/assets/123/abc.png',
+      healed: 'https://github.com/owner/repo/assets/123/abc.png',
+    },
+    {
+      stored: '/uploadshttp://example.com/img.jpg',
+      healed: 'http://example.com/img.jpg',
+    },
+    {
+      stored: '/uploads//cdn.example.com/img.jpg',
+      healed: '//cdn.example.com/img.jpg',
+    },
+    {
+      stored: '/uploadsdata:image/png;base64,AAAA',
+      healed: 'data:image/png;base64,AAAA',
+    },
+  ])(
+    'self-heals previously-corrupted value $stored to $healed on read',
+    ({ stored, healed }) => {
+      const config: GraphQLConfig = {
+        useRelativeMedia: false,
+        assetsHost,
+        clientId,
+        branch: 'feat/x',
+        mediaBranch: 'main',
+      };
+
+      expect(resolveMediaRelativeToCloud(stored, config, schema)).toEqual(
+        healed
+      );
+    }
+  );
+
+  /**
+   * Self-heal also applies inside array values — mixed clean + corrupted
+   * entries are normalized into their intended form alongside relative
+   * entries still picking up the staging prefix.
+   */
+  it('self-heals corrupted entries inside mixed array values', () => {
+    const config: GraphQLConfig = {
+      useRelativeMedia: false,
+      assetsHost,
+      clientId,
+      branch: 'feat/x',
+      mediaBranch: 'main',
+    };
+
+    const resolved = resolveMediaRelativeToCloud(
+      [
+        '/uploads/a.png',
+        '/uploadshttps://github.com/owner/repo/assets/123/abc.png',
+        '/uploads/b.png',
+      ],
+      config,
+      schema
+    );
+    expect(resolved).toEqual([
+      `https://${assetsHost}/${clientId}/__staging/feat/x/__file/a.png`,
+      'https://github.com/owner/repo/assets/123/abc.png',
+      `https://${assetsHost}/${clientId}/__staging/feat/x/__file/b.png`,
+    ]);
   });
 
   /**

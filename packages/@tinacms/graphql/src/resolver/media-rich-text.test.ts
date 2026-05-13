@@ -147,4 +147,28 @@ describe('media-resolver round-trip through rich-text JSX templates', () => {
     }
     expect(serialized.trim()).toBe(inputMdx.trim());
   });
+
+  it('self-heals a corrupted src on read and writes it back cleanly on save', () => {
+    // Shape of a previously-corrupted value: the configured media root
+    // (`/uploads`) was concatenated directly in front of an absolute URL by
+    // an earlier broken round-trip. After this round-trip the disk value
+    // should be back to the clean external URL.
+    const corruptedSrc =
+      '/uploadshttps://github.com/owner/repo/assets/123/abc.png';
+    const healedSrc = 'https://github.com/owner/repo/assets/123/abc.png';
+
+    const inputMdx = `<imageEmbed alt="Was corrupted" src="${corruptedSrc}" />`;
+
+    const editorTree = parseMDX(inputMdx, bodyField, readCallback);
+    const [embed] = findImageEmbeds(editorTree);
+    expect(embed.src).toBe(healedSrc);
+
+    const serialized = serializeMDX(editorTree, bodyField, writeCallback);
+    if (typeof serialized !== 'string') {
+      throw new Error('Expected serializeMDX to return a string');
+    }
+    expect(serialized.trim()).toBe(
+      `<imageEmbed alt="Was corrupted" src="${healedSrc}" />`
+    );
+  });
 });

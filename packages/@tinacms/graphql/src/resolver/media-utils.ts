@@ -74,11 +74,15 @@ export const resolveMediaRelativeToCloud = (
       const cleanMediaRoot = cleanUpSlashes(schema.config.media.tina.mediaRoot);
       const prefix = stagingPrefix(config);
       if (typeof value === 'string') {
-        // Absolute external URLs (http://, https://, protocol-relative //)
-        // are not media-library paths — they live outside the configured
-        // media root and must not be wrapped with the cloud assets prefix.
+        // Absolute URLs (any scheme, or protocol-relative `//`) are not
+        // media-library paths — they live outside the configured media
+        // root and must not be wrapped with the cloud assets prefix.
         if (ABSOLUTE_URL.test(value)) return value;
         const strippedValue = value.replace(cleanMediaRoot, '');
+        // Self-heal: if stripping the media root reveals an absolute URL
+        // underneath (e.g. `/uploadshttps://…` from a previously corrupted
+        // round-trip), return that URL directly rather than re-wrapping it.
+        if (ABSOLUTE_URL.test(strippedValue)) return strippedValue;
         return `https://${config.assetsHost}/${config.clientId}${prefix}${strippedValue}`;
       }
       if (Array.isArray(value)) {
@@ -86,6 +90,7 @@ export const resolveMediaRelativeToCloud = (
           if (!v || typeof v !== 'string') return v;
           if (ABSOLUTE_URL.test(v)) return v;
           const strippedValue = v.replace(cleanMediaRoot, '');
+          if (ABSOLUTE_URL.test(strippedValue)) return strippedValue;
           return `https://${config.assetsHost}/${config.clientId}${prefix}${strippedValue}`;
         });
       }
@@ -122,10 +127,13 @@ const stripStagingPrefix = (path: string): string => {
   return match ? match[1] : path;
 };
 
-// Matches absolute URLs: `http://…`, `https://…`, or protocol-relative `//…`.
-// Values matching this are not media-library paths and must not be rewritten
-// as branch-staged cloud URLs.
-const ABSOLUTE_URL = /^(?:https?:)?\/\//;
+// Matches values that aren't media-library paths and must not be rewritten as
+// branch-staged cloud URLs:
+//   - Any URL with a scheme — `https://`, `http://`, `data:`, `blob:`,
+//     `file:`, `mailto:`, etc. Scheme grammar per RFC 3986:
+//     ALPHA *( ALPHA / DIGIT / "+" / "-" / "." ).
+//   - Protocol-relative URLs starting with `//`.
+const ABSOLUTE_URL = /^[a-z][a-z0-9+.\-]*:|^\/\//i;
 
 const escapeRegExp = (s: string): string =>
   s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
