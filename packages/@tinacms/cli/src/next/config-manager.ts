@@ -20,6 +20,19 @@ const GRAPHQL_GQL_FILE = 'schema.gql';
 const SCHEMA_JSON_FILE = '_schema.json';
 const LOOKUP_JSON_FILE = '_lookup.json';
 
+/**
+ * Packages always externalized when bundling `tina/database.ts`.
+ *
+ * `better-sqlite3` is a native CJS module — it ships a `.node` binary and its
+ * `bindings` dependency uses `__filename` to locate it. Both fundamentals are
+ * incompatible with ESM bundling, so it must be left as a runtime import.
+ *
+ * Users can extend this list via `build.externalDependencies` in their
+ * `tina/config.ts` when they need to externalize additional packages (e.g.
+ * a custom native adapter outside this baseline).
+ */
+const EXTERNAL_BASELINE = ['better-sqlite3'];
+
 export class ConfigManager {
   config: Config;
   rootPath: string;
@@ -380,6 +393,13 @@ export class ConfigManager {
     // https://github.com/nodejs/modules/issues/307
     const buildDir = path.join(this.generatedCachePath, 'database');
     const outfile = path.join(buildDir, 'database.build.mjs'); // .mjs tells Node.js this is ESM
+    // Merge the always-externalized baseline (currently better-sqlite3 — see
+    // EXTERNAL_BASELINE above) with any user-provided extensions from
+    // `build.externalDependencies` in tina/config.ts. The user list is for
+    // additional native modules or other packages outside the baseline that
+    // cannot be bundled by esbuild.
+    const userExternals = this.config?.build?.externalDependencies ?? [];
+    const external = [...EXTERNAL_BASELINE, ...userExternals];
     await esbuild.build({
       entryPoints: [this.selfHostedDatabaseFilePath],
       bundle: true,
@@ -387,14 +407,7 @@ export class ConfigManager {
       format: 'esm',
       outfile: outfile,
       loader: loaders,
-      // Externalize better-sqlite3 so it is NOT bundled into the ESM output.
-      // better-sqlite3 uses require('bindings') which uses __filename/__dirname to
-      // locate its native .node binary. Those CJS globals do not exist in ESM, so
-      // bundling better-sqlite3 inline causes a runtime crash.
-      // By externalizing it, Node loads better-sqlite3 as a CJS module from the
-      // project's node_modules (where __filename is available), while sqlite-level
-      // stays bundled so esbuild handles its { SqliteLevel } named-export interop.
-      external: ['better-sqlite3'],
+      external,
       // Provide a require() polyfill for ESM bundles containing CommonJS packages.
       // Some bundled packages (e.g., 'scmp' used by 'mongodb-level') use require('crypto').
       // When esbuild inlines these CommonJS packages, it keeps the require() calls,
