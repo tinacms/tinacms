@@ -52,8 +52,9 @@ describe('forms — primary form selection', () => {
       formDiv({ id: 'g', query: 'query Global' }) +
       formDiv({ id: 'p', query: 'query Post' }, true);
 
-    const { initForms } = await import('./forms');
+    const { initForms, refreshForms } = await import('./forms');
     initForms(fakeStore());
+    refreshForms();
 
     expect(types()).toContain('open');
     const select = posted.find((c) => c[0].type === 'user-select-form');
@@ -66,8 +67,9 @@ describe('forms — primary form selection', () => {
       formDiv({ id: 'a', query: 'query A' }) +
       formDiv({ id: 'b', query: 'query B' });
 
-    const { initForms } = await import('./forms');
+    const { initForms, refreshForms } = await import('./forms');
     initForms(fakeStore());
+    refreshForms();
 
     expect(types()).toContain('open');
     expect(types()).not.toContain('user-select-form');

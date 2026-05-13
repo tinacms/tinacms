@@ -73,8 +73,6 @@ export function initForms(store: DataStore): void {
   // so soft-nav close messages are handled by `refreshForms`'s diff.
   window.addEventListener('message', onAck);
   window.addEventListener('beforeunload', onBeforeUnload);
-
-  refreshForms();
 }
 
 /**

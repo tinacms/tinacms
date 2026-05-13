@@ -19,7 +19,7 @@ import { initClickToFocus } from './click-to-focus';
 import { setAdminOrigin } from './config';
 import { initDataStore } from './data-store';
 import { debug } from './debug';
-import { initForms, refreshForms } from './forms';
+import { initForms, refreshForms as refreshFormsFromDom } from './forms';
 import { initIslandRefresh, primeIslands } from './island-refresh';
 
 export interface BridgeOptions {
@@ -70,16 +70,10 @@ export function init(options: BridgeOptions = {}): void {
   initForms(store);
 
   // Statically-built page: the middleware never ran, so there are no
-  // server-injected `[data-tina-form]` payloads — but if the page declares
-  // editable regions, pull the payloads from the island endpoints and
-  // re-announce. SSR pages already have their payloads, so skip.
-  if (
-    !document.querySelector('[data-tina-form]') &&
-    document.querySelector('[data-tina-island]')
-  ) {
-    debug('no server-injected forms; priming from island endpoints');
-    void primeIslands().then(refreshForms);
-  }
+  // server-injected `[data-tina-form]` payloads. The same priming
+  // happens on every SPA navigation, so let the public wrapper handle
+  // both paths.
+  refreshForms();
 }
 
 /**
@@ -87,6 +81,12 @@ export function init(options: BridgeOptions = {}): void {
  * navigation (Astro view transitions, Turbo, htmx, etc.). Posts `close`
  * for forms that left and `open` for forms that appeared. Safe to call
  * before `init()` — no-op when the bridge isn't running.
+ *
+ * On statically-built routes the middleware never injects payloads, so
+ * the page lands with `[data-tina-island]` markers but no
+ * `[data-tina-form]`. In that case, prime from the island endpoints
+ * first, then re-scan — otherwise the new page would announce zero
+ * forms and the admin sidebar would stay empty after every soft nav.
  *
  * Astro projects using `@tinacms/astro/integration` get this wired
  * automatically (the middleware splices the bootstrap script that
@@ -99,7 +99,21 @@ export function init(options: BridgeOptions = {}): void {
  * document.addEventListener('astro:page-load', refreshForms);
  * ```
  */
-export { refreshForms };
+export function refreshForms(): void {
+  // SSR fast path: server-injected payloads already in the DOM, no
+  // priming needed. Checking forms before islands avoids a second
+  // querySelector on every `astro:page-load` for the common case.
+  if (document.querySelector('[data-tina-form]')) {
+    refreshFormsFromDom();
+    return;
+  }
+  if (document.querySelector('[data-tina-island]')) {
+    debug('no server-injected forms; priming from island endpoints');
+    void primeIslands().then(refreshFormsFromDom);
+    return;
+  }
+  refreshFormsFromDom();
+}
 
 export { tinaField } from './tina-field';
 export type * from './types';
