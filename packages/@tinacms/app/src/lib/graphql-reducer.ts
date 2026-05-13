@@ -194,9 +194,9 @@ export const useGraphQLReducer = (
   // Set when the bridge's `open` is still in flight (the bridge retries
   // user-select-form but stops once it sees `updateData`, so we can't
   // rely on a future message landing after `forms:add` resolves).
-  const [pendingPrimaryId, setPendingPrimaryId] = React.useState<
-    string | null
-  >(null);
+  const [pendingPrimaryId, setPendingPrimaryId] = React.useState<string | null>(
+    null
+  );
 
   const activeField = searchParams.get('active-field');
 
