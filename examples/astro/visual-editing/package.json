@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.0",
-    "@astrojs/node": "^9.0.0",
+    "@astrojs/node": "^10.0.5",
     "@tailwindcss/typography": "catalog:",
     "@tailwindcss/vite": "^4.2.1",
     "@tinacms/astro": "workspace:*",
