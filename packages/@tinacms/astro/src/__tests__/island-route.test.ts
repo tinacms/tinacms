@@ -57,6 +57,25 @@ describe('experimental_createIslandRoute', () => {
     expect(html).toContain('data-tina-island="/tina-island/post"');
   });
 
+  it('marks the first payload `data-tina-primary` so the bridge retry loop picks it up', async () => {
+    // The single loader for this island has no explicit priority; the
+    // first form still gets `data-tina-primary` so the bridge's
+    // controller.primaryId path fires user-select-form on its retry
+    // loop (selectPrimary's single-shot from JSON priority can race the
+    // admin's form-registration).
+    const res = await call({ [PRIME_HEADER]: '1' });
+    const html = await res.text();
+    const firstFormIdx = html.indexOf('data-tina-form=');
+    const primaryIdx = html.indexOf('data-tina-primary');
+    expect(firstFormIdx).toBeGreaterThan(-1);
+    expect(primaryIdx).toBeGreaterThan(firstFormIdx);
+    // The primary marker must land on the *first* payload div, not later
+    // markup. The closing `>` of the first <div data-tina-form=...> is
+    // the anchor.
+    const firstDivEnd = html.indexOf('hidden></div>', firstFormIdx);
+    expect(primaryIdx).toBeLessThan(firstDivEnd);
+  });
+
   it('rejects non-preview requests', async () => {
     const url = new URL('http://localhost/tina-island/post');
     const res = (await route({

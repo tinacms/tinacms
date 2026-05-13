@@ -126,12 +126,18 @@ function rejectIfUnsafe(request: Request): Response | null {
 }
 
 /** Hidden `<div data-tina-form>` payloads — same wire shape the middleware
- *  splices into edit-mode SSR pages, so the bridge parses them identically. */
+ *  splices into edit-mode SSR pages, so the bridge parses them identically.
+ *  Mirrors the middleware: primaries first, plus `data-tina-primary` on
+ *  index 0 so the bridge's retry loop (`controller.primaryId`) picks up the
+ *  page form even when `selectPrimary`'s single-shot fire races the admin's
+ *  form-registration. */
 function renderFormPayloads(forms: CollectedForm[]): string {
   return sortByPriority(forms)
     .map(
-      (form) =>
-        `<div data-tina-form="${escapeAttr(JSON.stringify(form))}" hidden></div>`
+      (form, i) =>
+        `<div data-tina-form="${escapeAttr(JSON.stringify(form))}"${
+          i === 0 ? ' data-tina-primary' : ''
+        } hidden></div>`
     )
     .join('');
 }
