@@ -11,6 +11,7 @@ import { createRequire } from 'module';
 import { logger } from '../logger';
 import { warnText } from '../utils/theme';
 import { resolveContentRootPath } from './resolve-content-root';
+import { resolveDatabaseExternals } from './external-resolver';
 
 export const TINA_FOLDER = 'tina';
 export const LEGACY_TINA_FOLDER = '.tina';
@@ -19,19 +20,6 @@ const GRAPHQL_JSON_FILE = '_graphql.json';
 const GRAPHQL_GQL_FILE = 'schema.gql';
 const SCHEMA_JSON_FILE = '_schema.json';
 const LOOKUP_JSON_FILE = '_lookup.json';
-
-/**
- * Packages always externalized when bundling `tina/database.ts`.
- *
- * `better-sqlite3` is a native CJS module — it ships a `.node` binary and its
- * `bindings` dependency uses `__filename` to locate it. Both fundamentals are
- * incompatible with ESM bundling, so it must be left as a runtime import.
- *
- * Users can extend this list via `build.externalDependencies` in their
- * `tina/config.ts` when they need to externalize additional packages (e.g.
- * a custom native adapter outside this baseline).
- */
-const EXTERNAL_BASELINE = ['better-sqlite3'];
 
 export class ConfigManager {
   config: Config;
@@ -145,15 +133,42 @@ export class ConfigManager {
     );
     this.generatedFolderPath = path.join(this.tinaFolderPath, GENERATED_FOLDER);
 
-    // Sweep stale build-cache directories from prior runs.
+    // Prepare the build-cache directory under tina/__generated__/.cache/.
+    //
     // Each invocation creates a fresh `.cache/<timestamp>/` subdir for esbuild
     // output, and removes its own subdir after the dynamic-import resolves
-    // (see loadDatabaseFile / loadConfigFile). But a crashed process (Ctrl+C
-    // mid-build, OOM kill, etc.) can leave residue behind. Nuking the parent
-    // here prevents unbounded accumulation across restarts.
+    // (see loadDatabaseFile / loadConfigFile). The startup sweep below removes
+    // any residue from a crashed prior run (Ctrl+C mid-build, OOM kill, etc.)
+    // that try/finally couldn't catch.
+    //
+    // We also verify the location is writable here so we fail fast with a
+    // clear, actionable error — read-only project mounts (Docker `:ro`,
+    // AWS Lambda's `/var/task`, some CI runners with sandboxed source
+    // checkouts) would otherwise surface as a cryptic EACCES from esbuild
+    // partway through the first build.
     const cacheParentPath = path.join(this.generatedFolderPath, '.cache');
-    if (await fs.pathExists(cacheParentPath)) {
-      await fs.remove(cacheParentPath);
+    try {
+      if (await fs.pathExists(cacheParentPath)) {
+        await fs.remove(cacheParentPath);
+      }
+      await fs.ensureDir(cacheParentPath);
+    } catch (err) {
+      const code = (err as NodeJS.ErrnoException)?.code;
+      if (code === 'EACCES' || code === 'EROFS' || code === 'EPERM') {
+        throw new Error(
+          `TinaCMS cannot write to ${cacheParentPath}.\n\n` +
+            `Tina v3 needs write access to your project's tina/__generated__/.cache/ ` +
+            `directory at build time. This usually means your project directory is ` +
+            `mounted read-only — common in some Docker setups (\`:ro\` volumes), ` +
+            `AWS Lambda's \`/var/task\`, or sandboxed CI runners.\n\n` +
+            `To resolve, either:\n` +
+            `  - Run \`tinacms build\` against a writable copy of your project and ` +
+            `deploy the resulting artifacts, or\n` +
+            `  - Mount your project directory as read-write.\n\n` +
+            `Underlying error: ${code} ${(err as Error).message}`
+        );
+      }
+      throw err;
     }
 
     this.generatedCachePath = path.join(
@@ -403,13 +418,11 @@ export class ConfigManager {
     // https://github.com/nodejs/modules/issues/307
     const buildDir = path.join(this.generatedCachePath, 'database');
     const outfile = path.join(buildDir, 'database.build.mjs'); // .mjs tells Node.js this is ESM
-    // Merge the always-externalized baseline (currently better-sqlite3 — see
-    // EXTERNAL_BASELINE above) with any user-provided extensions from
-    // `build.externalDependencies` in tina/config.ts. The user list is for
-    // additional native modules or other packages outside the baseline that
-    // cannot be bundled by esbuild.
-    const userExternals = this.config?.build?.externalDependencies ?? [];
-    const external = [...EXTERNAL_BASELINE, ...userExternals];
+    // Compose the externalize list — baseline (currently better-sqlite3, the
+    // canonical native CJS case) plus any user-provided extensions from
+    // `build.externalDependencies` in tina/config.ts. See external-resolver.ts
+    // for the merge rules and rationale.
+    const external = resolveDatabaseExternals(this.config);
     await esbuild.build({
       entryPoints: [this.selfHostedDatabaseFilePath],
       bundle: true,
