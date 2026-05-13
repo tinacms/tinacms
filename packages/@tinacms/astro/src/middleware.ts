@@ -21,10 +21,10 @@
  */
 import type { MiddlewareHandler } from 'astro';
 import { adminOrigins } from './internal/admin-origin';
-import { escapeAttr } from './internal/escape';
 import {
   type CollectedForm,
   formsStore,
+  renderFormPayloadDiv,
   sortByPriority,
 } from './internal/forms-store';
 import { requestStore } from './internal/request-context';
@@ -87,19 +87,12 @@ function editModeInit(response: Response): ResponseInit {
 }
 
 function renderInjection(forms: CollectedForm[]): string {
-  // Primaries first so DOM order mirrors the bridge's announce order
-  // and any non-bridge tooling reading `[data-tina-form]` sees the
-  // intended page form before page-level globals. When no caller sets
-  // `priority: 'primary'`, sort is a no-op and the original "page
-  // frontmatter runs before its layout's" heuristic still picks out
-  // the page document via the `data-tina-primary` attribute below.
+  // Primaries first, then `i === 0` marks the front of the sorted list
+  // primary in the DOM. With no explicit `priority: 'primary'` the sort
+  // is a no-op and the implicit "page frontmatter runs before its
+  // layout's" heuristic still picks the page document as primary.
   const formDivs = sortByPriority(forms)
-    .map(
-      (form, i) =>
-        `<div data-tina-form="${escapeAttr(JSON.stringify(form))}"${
-          i === 0 ? ' data-tina-primary' : ''
-        } hidden></div>`
-    )
+    .map((form, i) => renderFormPayloadDiv(form, i === 0))
     .join('');
   return formDivs + bridgeScript();
 }

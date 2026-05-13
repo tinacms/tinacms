@@ -39,6 +39,7 @@ import { escapeAttr } from './internal/escape';
 import {
   type CollectedForm,
   formsStore,
+  renderFormPayloadDiv,
   sortByPriority,
 } from './internal/forms-store';
 import { requestStore } from './internal/request-context';
@@ -126,22 +127,13 @@ function rejectIfUnsafe(request: Request): Response | null {
 }
 
 /** Hidden `<div data-tina-form>` payloads — same wire shape the middleware
- *  splices into edit-mode SSR pages, so the bridge parses them identically.
- *
- *  `data-tina-primary` tracks the explicit `priority: 'primary'` flag rather
- *  than position. Each island route call is independent, so a positional
- *  marker (`i === 0`) would tag *every* island's first form — on a page
- *  with `[page, global-header, global-footer]` islands, the bridge would
- *  see three competing primaries and the first in DOM order (usually the
- *  layout's global) would win the retry loop. */
+ *  splices into edit-mode SSR pages. The marker is keyed on the explicit
+ *  `priority: 'primary'` flag, not position: each island route call is
+ *  independent, so an `i === 0` rule would tag every island's first form
+ *  and the bridge would pick whichever rendered first in DOM order. */
 function renderFormPayloads(forms: CollectedForm[]): string {
   return sortByPriority(forms)
-    .map(
-      (form) =>
-        `<div data-tina-form="${escapeAttr(JSON.stringify(form))}"${
-          form.priority === 'primary' ? ' data-tina-primary' : ''
-        } hidden></div>`
-    )
+    .map((form) => renderFormPayloadDiv(form, form.priority === 'primary'))
     .join('');
 }
 

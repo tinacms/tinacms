@@ -39,15 +39,6 @@ describe('recordForm', () => {
     expect(list[0]!.priority).toBe('primary');
   });
 
-  it('does not downgrade an existing primary back to secondary', () => {
-    const list: CollectedForm[] = [];
-    formsStore.run(list, () => {
-      recordForm(makeForm({ id: 'page', priority: 'primary' }));
-      recordForm(makeForm({ id: 'page', priority: 'secondary' }));
-    });
-    expect(list[0]!.priority).toBe('primary');
-  });
-
   it('is a no-op outside a request scope', () => {
     // Just don't throw — there's no store to read.
     expect(() => recordForm(makeForm())).not.toThrow();

@@ -52,13 +52,11 @@ export interface RequestOptions {
   /**
    * Hint for the editor's default form selection when a page registers
    * more than one form. Mark the page's own document as `'primary'` so
-   * it wins over layout-level globals — the bridge emits a
-   * `user-select-form` message for the primary id, which mirrors the
-   * intent of `useTina`'s `experimental___selectFormByFormId`. Omitted
-   * forms fall back to the admin's existing "first non-global wins"
-   * heuristic.
+   * it wins over layout-level globals; mirrors `useTina`'s
+   * `experimental___selectFormByFormId`. Omitting it falls back to the
+   * admin's existing "first non-global wins" heuristic.
    */
-  priority?: 'primary' | 'secondary';
+  priority?: 'primary';
 }
 
 export async function requestWithMetadata<TData>(
