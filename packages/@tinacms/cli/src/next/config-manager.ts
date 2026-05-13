@@ -12,6 +12,7 @@ import { logger } from '../logger';
 import { warnText } from '../utils/theme';
 import { resolveContentRootPath } from './resolve-content-root';
 import { resolveDatabaseExternals } from './external-resolver';
+import { prepareCacheLocation, reapBuildSubdir } from './cache-manager';
 
 export const TINA_FOLDER = 'tina';
 export const LEGACY_TINA_FOLDER = '.tina';
@@ -133,49 +134,13 @@ export class ConfigManager {
     );
     this.generatedFolderPath = path.join(this.tinaFolderPath, GENERATED_FOLDER);
 
-    // Prepare the build-cache directory under tina/__generated__/.cache/.
-    //
-    // Each invocation creates a fresh `.cache/<timestamp>/` subdir for esbuild
-    // output, and removes its own subdir after the dynamic-import resolves
-    // (see loadDatabaseFile / loadConfigFile). The startup sweep below removes
-    // any residue from a crashed prior run (Ctrl+C mid-build, OOM kill, etc.)
-    // that try/finally couldn't catch.
-    //
-    // We also verify the location is writable here so we fail fast with a
-    // clear, actionable error — read-only project mounts (Docker `:ro`,
-    // AWS Lambda's `/var/task`, some CI runners with sandboxed source
-    // checkouts) would otherwise surface as a cryptic EACCES from esbuild
-    // partway through the first build.
-    const cacheParentPath = path.join(this.generatedFolderPath, '.cache');
-    try {
-      if (await fs.pathExists(cacheParentPath)) {
-        await fs.remove(cacheParentPath);
-      }
-      await fs.ensureDir(cacheParentPath);
-    } catch (err) {
-      const code = (err as NodeJS.ErrnoException)?.code;
-      if (code === 'EACCES' || code === 'EROFS' || code === 'EPERM') {
-        throw new Error(
-          `TinaCMS cannot write to ${cacheParentPath}.\n\n` +
-            `Tina v3 needs write access to your project's tina/__generated__/.cache/ ` +
-            `directory at build time. This usually means your project directory is ` +
-            `read-only — common in some Docker setups (\`:ro\` volumes), AWS Lambda's ` +
-            `\`/var/task\`, sandboxed CI runners, or restricted file permissions.\n\n` +
-            `To resolve, either:\n` +
-            `  - Make the project directory writable (e.g. remount with read-write ` +
-            `access, or copy the project to a writable location), or\n` +
-            `  - Run \`tinacms build\` against a writable copy of your project and ` +
-            `deploy the resulting artifacts.\n\n` +
-            `Underlying error: ${code} ${(err as Error).message}`
-        );
-      }
-      throw err;
-    }
-
-    this.generatedCachePath = path.join(
-      cacheParentPath,
-      String(new Date().getTime())
-    );
+    // Prepare the per-build cache location: sweep residue from prior runs,
+    // verify the project tree is writable (fail loud with an actionable
+    // message if it's not — Docker `:ro`, Lambda `/var/task`, sandboxed CI
+    // runners, etc.), and reserve a fresh `<timestamp>/` subdir. See
+    // cache-manager.ts for the full rationale + tests.
+    const cacheLocation = await prepareCacheLocation(this.generatedFolderPath);
+    this.generatedCachePath = cacheLocation.buildPath;
 
     this.generatedGraphQLGQLPath = path.join(
       this.generatedFolderPath,
@@ -442,19 +407,9 @@ export class ConfigManager {
       },
     });
     const result = await import(pathToFileURL(outfile).href);
-    // Remove the entire build subdir, not just the .mjs file — keeps the
-    // .cache/<timestamp>/ tree from accumulating empty dirs across reloads.
-    fs.removeSync(buildDir);
-    // Also reap the timestamp parent if it's now empty (the sibling
-    // loadConfigFile may have already finished and removed its own subdir).
-    // ENOTEMPTY is the expected case (other content still in flight) and is
-    // safely deferred to the next startup sweep. Any other error (e.g. a
-    // genuine permission issue) re-throws so it doesn't get silently swallowed.
-    try {
-      fs.rmdirSync(this.generatedCachePath);
-    } catch (err) {
-      if ((err as NodeJS.ErrnoException)?.code !== 'ENOTEMPTY') throw err;
-    }
+    // Remove the build subdir + reap the timestamp parent if it's now empty
+    // (the sibling loadConfigFile may have finished). See cache-manager.ts.
+    reapBuildSubdir(buildDir, this.generatedCachePath);
     return result.default;
   }
 
@@ -532,19 +487,9 @@ export class ConfigManager {
       console.error(e);
       throw e;
     }
-    // Remove the entire build subdir (which contains outfile, outfile2 and the
-    // temp tsconfig) rather than picking files off one by one — keeps the
-    // .cache/<timestamp>/ tree from accumulating empty dirs across reloads.
-    fs.removeSync(buildDir);
-    // Also reap the timestamp parent if it's now empty (the sibling
-    // loadDatabaseFile may have already finished and removed its own subdir).
-    // ENOTEMPTY is the expected case; re-throw any other error so genuine
-    // permission / filesystem issues surface instead of being swallowed.
-    try {
-      fs.rmdirSync(this.generatedCachePath);
-    } catch (err) {
-      if ((err as NodeJS.ErrnoException)?.code !== 'ENOTEMPTY') throw err;
-    }
+    // Remove the build subdir + reap the timestamp parent if it's now empty
+    // (the sibling loadDatabaseFile may have finished). See cache-manager.ts.
+    reapBuildSubdir(buildDir, this.generatedCachePath);
     return {
       config: result.default,
       prebuildPath: preBuildConfigPath,
