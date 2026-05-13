@@ -159,12 +159,13 @@ export class ConfigManager {
           `TinaCMS cannot write to ${cacheParentPath}.\n\n` +
             `Tina v3 needs write access to your project's tina/__generated__/.cache/ ` +
             `directory at build time. This usually means your project directory is ` +
-            `mounted read-only — common in some Docker setups (\`:ro\` volumes), ` +
-            `AWS Lambda's \`/var/task\`, or sandboxed CI runners.\n\n` +
+            `read-only — common in some Docker setups (\`:ro\` volumes), AWS Lambda's ` +
+            `\`/var/task\`, sandboxed CI runners, or restricted file permissions.\n\n` +
             `To resolve, either:\n` +
+            `  - Make the project directory writable (e.g. remount with read-write ` +
+            `access, or copy the project to a writable location), or\n` +
             `  - Run \`tinacms build\` against a writable copy of your project and ` +
-            `deploy the resulting artifacts, or\n` +
-            `  - Mount your project directory as read-write.\n\n` +
+            `deploy the resulting artifacts.\n\n` +
             `Underlying error: ${code} ${(err as Error).message}`
         );
       }
@@ -446,11 +447,13 @@ export class ConfigManager {
     fs.removeSync(buildDir);
     // Also reap the timestamp parent if it's now empty (the sibling
     // loadConfigFile may have already finished and removed its own subdir).
-    // rmdirSync throws ENOTEMPTY harmlessly if other content is still there.
+    // ENOTEMPTY is the expected case (other content still in flight) and is
+    // safely deferred to the next startup sweep. Any other error (e.g. a
+    // genuine permission issue) re-throws so it doesn't get silently swallowed.
     try {
       fs.rmdirSync(this.generatedCachePath);
-    } catch {
-      /* parent not empty, leave for the next startup sweep */
+    } catch (err) {
+      if ((err as NodeJS.ErrnoException)?.code !== 'ENOTEMPTY') throw err;
     }
     return result.default;
   }
@@ -535,10 +538,12 @@ export class ConfigManager {
     fs.removeSync(buildDir);
     // Also reap the timestamp parent if it's now empty (the sibling
     // loadDatabaseFile may have already finished and removed its own subdir).
+    // ENOTEMPTY is the expected case; re-throw any other error so genuine
+    // permission / filesystem issues surface instead of being swallowed.
     try {
       fs.rmdirSync(this.generatedCachePath);
-    } catch {
-      /* parent not empty, leave for the next startup sweep */
+    } catch (err) {
+      if ((err as NodeJS.ErrnoException)?.code !== 'ENOTEMPTY') throw err;
     }
     return {
       config: result.default,

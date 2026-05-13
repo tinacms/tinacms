@@ -280,7 +280,7 @@ const createGitignore = async ({ baseDir }: { baseDir: string }) => {
   logger.info(logText('No .gitignore found, creating one'));
   fs.outputFileSync(
     path.join(baseDir, '.gitignore'),
-    ['node_modules', 'tina/__generated__', ''].join('\n')
+    'node_modules\ntina/__generated__\n'
   );
 };
 

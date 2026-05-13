@@ -9,9 +9,7 @@ import {
  * tests care about. Casts the result so we don't have to fill in every
  * required Config property unrelated to externalize behavior.
  */
-const buildConfig = (
-  externalDependencies?: string[]
-): Config | undefined => {
+const buildConfig = (externalDependencies?: string[]): Config | undefined => {
   if (externalDependencies === undefined) {
     return {
       build: { publicFolder: 'public', outputFolder: 'admin' },
