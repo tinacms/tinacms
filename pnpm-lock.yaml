@@ -1041,9 +1041,6 @@ importers:
       react-icons:
         specifier: ^4.12.0
         version: 4.12.0(react@18.3.1)
-      sqlite-level:
-        specifier: ^1.2.1
-        version: 1.2.1(sucrase@3.35.1)
       tinacms:
         specifier: workspace:*
         version: link:../../../packages/tinacms
@@ -24645,7 +24642,7 @@ snapshots:
       eslint: 7.32.0
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 2.7.1(eslint-plugin-import@2.32.0(eslint@7.32.0))(eslint@7.32.0)
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@4.33.0(eslint@7.32.0)(typescript@5.9.3))(eslint-import-resolver-typescript@2.7.1)(eslint@7.32.0)
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@4.33.0(eslint@7.32.0)(typescript@5.9.3))(eslint-import-resolver-typescript@2.7.1(eslint-plugin-import@2.32.0(eslint@7.32.0))(eslint@7.32.0))(eslint@7.32.0)
       eslint-plugin-jsx-a11y: 6.10.2(eslint@7.32.0)
       eslint-plugin-react: 7.37.5(eslint@7.32.0)
       eslint-plugin-react-hooks: 4.6.2(eslint@7.32.0)
@@ -24668,7 +24665,7 @@ snapshots:
     dependencies:
       debug: 4.4.3
       eslint: 7.32.0
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@4.33.0(eslint@7.32.0)(typescript@5.9.3))(eslint-import-resolver-typescript@2.7.1)(eslint@7.32.0)
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@4.33.0(eslint@7.32.0)(typescript@5.9.3))(eslint-import-resolver-typescript@2.7.1(eslint-plugin-import@2.32.0(eslint@7.32.0))(eslint@7.32.0))(eslint@7.32.0)
       glob: 7.2.3
       is-glob: 4.0.3
       resolve: 1.22.11
@@ -24687,7 +24684,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.32.0(@typescript-eslint/parser@4.33.0(eslint@7.32.0)(typescript@5.9.3))(eslint-import-resolver-typescript@2.7.1)(eslint@7.32.0):
+  eslint-plugin-import@2.32.0(@typescript-eslint/parser@4.33.0(eslint@7.32.0)(typescript@5.9.3))(eslint-import-resolver-typescript@2.7.1(eslint-plugin-import@2.32.0(eslint@7.32.0))(eslint@7.32.0))(eslint@7.32.0):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.9

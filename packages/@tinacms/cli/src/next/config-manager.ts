@@ -145,9 +145,19 @@ export class ConfigManager {
     );
     this.generatedFolderPath = path.join(this.tinaFolderPath, GENERATED_FOLDER);
 
+    // Sweep stale build-cache directories from prior runs.
+    // Each invocation creates a fresh `.cache/<timestamp>/` subdir for esbuild
+    // output, and removes its own subdir after the dynamic-import resolves
+    // (see loadDatabaseFile / loadConfigFile). But a crashed process (Ctrl+C
+    // mid-build, OOM kill, etc.) can leave residue behind. Nuking the parent
+    // here prevents unbounded accumulation across restarts.
+    const cacheParentPath = path.join(this.generatedFolderPath, '.cache');
+    if (await fs.pathExists(cacheParentPath)) {
+      await fs.remove(cacheParentPath);
+    }
+
     this.generatedCachePath = path.join(
-      this.generatedFolderPath,
-      '.cache',
+      cacheParentPath,
       String(new Date().getTime())
     );
 
@@ -418,7 +428,9 @@ export class ConfigManager {
       },
     });
     const result = await import(pathToFileURL(outfile).href);
-    fs.removeSync(outfile);
+    // Remove the entire build subdir, not just the .mjs file — keeps the
+    // .cache/<timestamp>/ tree from accumulating empty dirs across reloads.
+    fs.removeSync(buildDir);
     return result.default;
   }
 
@@ -496,8 +508,10 @@ export class ConfigManager {
       console.error(e);
       throw e;
     }
-    fs.removeSync(outfile);
-    fs.removeSync(outfile2);
+    // Remove the entire build subdir (which contains outfile, outfile2 and the
+    // temp tsconfig) rather than picking files off one by one — keeps the
+    // .cache/<timestamp>/ tree from accumulating empty dirs across reloads.
+    fs.removeSync(buildDir);
     return {
       config: result.default,
       prebuildPath: preBuildConfigPath,
