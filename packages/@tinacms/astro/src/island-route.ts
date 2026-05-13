@@ -127,16 +127,19 @@ function rejectIfUnsafe(request: Request): Response | null {
 
 /** Hidden `<div data-tina-form>` payloads — same wire shape the middleware
  *  splices into edit-mode SSR pages, so the bridge parses them identically.
- *  Mirrors the middleware: primaries first, plus `data-tina-primary` on
- *  index 0 so the bridge's retry loop (`controller.primaryId`) picks up the
- *  page form even when `selectPrimary`'s single-shot fire races the admin's
- *  form-registration. */
+ *
+ *  `data-tina-primary` tracks the explicit `priority: 'primary'` flag rather
+ *  than position. Each island route call is independent, so a positional
+ *  marker (`i === 0`) would tag *every* island's first form — on a page
+ *  with `[page, global-header, global-footer]` islands, the bridge would
+ *  see three competing primaries and the first in DOM order (usually the
+ *  layout's global) would win the retry loop. */
 function renderFormPayloads(forms: CollectedForm[]): string {
   return sortByPriority(forms)
     .map(
-      (form, i) =>
+      (form) =>
         `<div data-tina-form="${escapeAttr(JSON.stringify(form))}"${
-          i === 0 ? ' data-tina-primary' : ''
+          form.priority === 'primary' ? ' data-tina-primary' : ''
         } hidden></div>`
     )
     .join('');

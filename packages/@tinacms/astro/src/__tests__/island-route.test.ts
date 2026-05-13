@@ -13,23 +13,40 @@ const route = experimental_createIslandRoute({
           data: { post: { title: 'Hi' } },
           query: 'query Post',
           variables: { relativePath: 'hello.md' },
-        })
+        }),
+        { priority: 'primary' }
       ),
     component: IslandStub,
     wrapper: { tag: 'article', className: 'prose' },
     propsFromData: (data) => ({ value: data }),
   },
+  global: {
+    fetch: () =>
+      requestWithMetadata(
+        Promise.resolve({
+          data: { config: { theme: 'dark' } },
+          query: 'query Global',
+          variables: {},
+        })
+      ),
+    component: IslandStub,
+    wrapper: { tag: 'header' },
+    propsFromData: (data) => ({ value: data }),
+  },
 });
 
-function call(headers: Record<string, string>): Promise<Response> {
-  const url = new URL('http://localhost/tina-island/post');
+function call(
+  headers: Record<string, string>,
+  name = 'post'
+): Promise<Response> {
+  const url = new URL(`http://localhost/tina-island/${name}`);
   const request = new Request(url, {
     method: 'POST',
     headers: { 'content-type': PREVIEW_CONTENT_TYPE, ...headers },
     body: '{}',
   });
   return Promise.resolve(
-    route({ params: { name: 'post' }, request, url } as unknown as APIContext)
+    route({ params: { name }, request, url } as unknown as APIContext)
   ) as Promise<Response>;
 }
 
@@ -57,23 +74,23 @@ describe('experimental_createIslandRoute', () => {
     expect(html).toContain('data-tina-island="/tina-island/post"');
   });
 
-  it('marks the first payload `data-tina-primary` so the bridge retry loop picks it up', async () => {
-    // The single loader for this island has no explicit priority; the
-    // first form still gets `data-tina-primary` so the bridge's
-    // controller.primaryId path fires user-select-form on its retry
-    // loop (selectPrimary's single-shot from JSON priority can race the
-    // admin's form-registration).
-    const res = await call({ [PRIME_HEADER]: '1' });
-    const html = await res.text();
-    const firstFormIdx = html.indexOf('data-tina-form=');
-    const primaryIdx = html.indexOf('data-tina-primary');
-    expect(firstFormIdx).toBeGreaterThan(-1);
-    expect(primaryIdx).toBeGreaterThan(firstFormIdx);
-    // The primary marker must land on the *first* payload div, not later
-    // markup. The closing `>` of the first <div data-tina-form=...> is
-    // the anchor.
-    const firstDivEnd = html.indexOf('hidden></div>', firstFormIdx);
-    expect(primaryIdx).toBeLessThan(firstDivEnd);
+  it('emits `data-tina-primary` only on payloads that set `priority: "primary"`', async () => {
+    // The `post` loader passes `{ priority: 'primary' }`; the `global`
+    // loader does not. Each island route call renders its own forms
+    // independently, so a positional marker (`i === 0`) would tag the
+    // first form of *every* island — on a page that primes
+    // `[page, global-header, global-footer]` the bridge would see three
+    // competing primaries and the first in DOM order (usually a layout
+    // global) would win the retry loop.
+    const postHtml = await (await call({ [PRIME_HEADER]: '1' }, 'post')).text();
+    expect(postHtml).toContain('data-tina-form=');
+    expect(postHtml).toContain('data-tina-primary');
+
+    const globalHtml = await (
+      await call({ [PRIME_HEADER]: '1' }, 'global')
+    ).text();
+    expect(globalHtml).toContain('data-tina-form=');
+    expect(globalHtml).not.toContain('data-tina-primary');
   });
 
   it('rejects non-preview requests', async () => {
