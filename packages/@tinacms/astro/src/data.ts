@@ -48,8 +48,22 @@ type ClientResult<TData> =
   | null
   | undefined;
 
+export interface RequestOptions {
+  /**
+   * Hint for the editor's default form selection when a page registers
+   * more than one form. Mark the page's own document as `'primary'` so
+   * it wins over layout-level globals — the bridge emits a
+   * `user-select-form` message for the primary id, which mirrors the
+   * intent of `useTina`'s `experimental___selectFormByFormId`. Omitted
+   * forms fall back to the admin's existing "first non-global wins"
+   * heuristic.
+   */
+  priority?: 'primary' | 'secondary';
+}
+
 export async function requestWithMetadata<TData>(
-  source: ClientResult<TData> | Promise<ClientResult<TData>>
+  source: ClientResult<TData> | Promise<ClientResult<TData>>,
+  options?: RequestOptions
 ): Promise<QueryResult<TData>> {
   let result: ClientResult<TData> = null;
   try {
@@ -91,6 +105,7 @@ export async function requestWithMetadata<TData>(
     query,
     variables,
     data: enriched.data as unknown as object,
+    priority: options?.priority,
   });
 
   return enriched;

@@ -22,6 +22,14 @@ export interface FormPayload {
   query: string;
   variables: object;
   data: object;
+  /**
+   * Optional hint about which form should be focused when multiple are
+   * registered on the same page. `primary` opts the form into the
+   * `user-select-form` message — the admin's default selection then
+   * routes around its own "first non-global wins" heuristic. Mirrors the
+   * intent of `useTina`'s `experimental___selectFormByFormId`.
+   */
+  priority?: 'primary' | 'secondary';
 }
 
 export interface DataStore {

@@ -36,7 +36,11 @@ import type { APIRoute } from 'astro';
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import type { AstroComponentFactory } from 'astro/runtime/server/index.js';
 import { escapeAttr } from './internal/escape';
-import { type CollectedForm, formsStore } from './internal/forms-store';
+import {
+  type CollectedForm,
+  formsStore,
+  sortByPriority,
+} from './internal/forms-store';
 import { requestStore } from './internal/request-context';
 
 export interface IslandWrapper {
@@ -124,7 +128,7 @@ function rejectIfUnsafe(request: Request): Response | null {
 /** Hidden `<div data-tina-form>` payloads — same wire shape the middleware
  *  splices into edit-mode SSR pages, so the bridge parses them identically. */
 function renderFormPayloads(forms: CollectedForm[]): string {
-  return forms
+  return sortByPriority(forms)
     .map(
       (form) =>
         `<div data-tina-form="${escapeAttr(JSON.stringify(form))}" hidden></div>`

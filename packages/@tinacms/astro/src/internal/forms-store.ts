@@ -19,6 +19,7 @@ export interface CollectedForm {
   query: string;
   variables: object;
   data: object;
+  priority?: 'primary' | 'secondary';
 }
 
 const STORE_KEY = Symbol.for('@tinacms/astro/forms-store');
@@ -35,7 +36,24 @@ export function recordForm(form: CollectedForm): void {
   if (!list) return;
   // Same id can appear multiple times (e.g., layout + page both fetch the
   // global). De-dup on id so the bridge doesn't see two open events for
-  // the same form.
-  if (list.some((existing) => existing.id === form.id)) return;
+  // the same form — but upgrade an existing entry to `primary` if a
+  // later call asserts it, so layout-then-page ordering doesn't strand
+  // the page's intent.
+  const existing = list.find((entry) => entry.id === form.id);
+  if (existing) {
+    if (form.priority === 'primary' && existing.priority !== 'primary') {
+      existing.priority = 'primary';
+    }
+    return;
+  }
   list.push(form);
+}
+
+/** Sort primaries first while preserving relative order otherwise. */
+export function sortByPriority(forms: CollectedForm[]): CollectedForm[] {
+  return [...forms].sort((a, b) => {
+    const ap = a.priority === 'primary' ? 0 : 1;
+    const bp = b.priority === 'primary' ? 0 : 1;
+    return ap - bp;
+  });
 }

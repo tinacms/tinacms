@@ -22,7 +22,11 @@
 import type { MiddlewareHandler } from 'astro';
 import { adminOrigins } from './internal/admin-origin';
 import { escapeAttr } from './internal/escape';
-import { type CollectedForm, formsStore } from './internal/forms-store';
+import {
+  type CollectedForm,
+  formsStore,
+  sortByPriority,
+} from './internal/forms-store';
 import { requestStore } from './internal/request-context';
 import { EDIT_COOKIE_HEADER, isEditMode } from './is-edit-mode';
 
@@ -83,11 +87,13 @@ function editModeInit(response: Response): ResponseInit {
 }
 
 function renderInjection(forms: CollectedForm[]): string {
-  // `forms` is in `requestWithMetadata` call order, and a page's frontmatter
-  // runs before its layout's — so the first form is the page document. Mark
-  // it primary so the bridge asks the admin to open it rather than landing
-  // on the multi-document picker.
-  const formDivs = forms
+  // Primaries first so DOM order mirrors the bridge's announce order
+  // and any non-bridge tooling reading `[data-tina-form]` sees the
+  // intended page form before page-level globals. When no caller sets
+  // `priority: 'primary'`, sort is a no-op and the original "page
+  // frontmatter runs before its layout's" heuristic still picks out
+  // the page document via the `data-tina-primary` attribute below.
+  const formDivs = sortByPriority(forms)
     .map(
       (form, i) =>
         `<div data-tina-form="${escapeAttr(JSON.stringify(form))}"${

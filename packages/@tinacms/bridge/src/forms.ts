@@ -48,6 +48,8 @@ interface FormsController {
   retryTimer: ReturnType<typeof setTimeout> | null;
   /** Attempt counter for the current announce loop. */
   attempts: number;
+  /** Id we last asked the admin to focus, so we don't spam `user-select-form`. */
+  lastSelectedId: string | null;
 }
 
 let controller: FormsController | null = null;
@@ -65,6 +67,7 @@ export function initForms(store: DataStore): void {
     primaryId: null,
     retryTimer: null,
     attempts: 0,
+    lastSelectedId: null,
   };
 
   // One-time listeners. The ack handler stays bound for the lifetime of
@@ -115,7 +118,35 @@ export function refreshForms(): void {
     startAnnounceLoop();
   }
 
+  selectPrimary(next);
   reportQuickEdit();
+}
+
+/**
+ * Tell the admin which form to focus when a payload sets
+ * `priority: 'primary'`. Mirrors `useTina`'s `user-select-form` message.
+ * Complements the `data-tina-primary` HTML-attribute path in `announce()`:
+ * that one rides the retry loop and is set implicitly by the middleware /
+ * `<TinaIsland primary>`; this one is the explicit opt-in from a
+ * `requestWithMetadata(..., { priority: 'primary' })` caller.
+ *
+ * Sent once per primary id per refresh cycle, so a spurious
+ * `astro:page-load` against the same DOM doesn't spam the admin.
+ */
+function selectPrimary(payloads: FormPayload[]): void {
+  if (!controller) return;
+  const primary = payloads.find((p) => p.priority === 'primary');
+  if (!primary) {
+    controller.lastSelectedId = null;
+    return;
+  }
+  if (controller.lastSelectedId === primary.id) return;
+  debug('posting user-select-form for', primary.id);
+  window.parent.postMessage(
+    { type: 'user-select-form', formId: primary.id },
+    getAdminOrigin()
+  );
+  controller.lastSelectedId = primary.id;
 }
 
 function readPayloads(): { payloads: FormPayload[]; primaryId: string | null } {
