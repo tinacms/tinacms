@@ -2,8 +2,19 @@ name: Build TinaCMS Starter Templates
 
 on:
   workflow_dispatch:
+    inputs:
+      tina_version:
+        description: 'Version applied to any Tina package not listed in published_packages (semver, dist-tag, or snapshot tag, e.g. 2.5.0, latest, or my-branch). Defaults to latest.'
+        required: false
+        default: 'latest'
+        type: string
+      published_packages:
+        description: 'JSON array [{name, version}] of per-package versions to test. Use when packages carry different versions — e.g. a partial tagged release or a prod publish where only some packages changed. Packages omitted here fall back to tina_version.'
+        required: false
+        default: ''
+        type: string
   schedule:
-    - cron: '0 9 * * 1-5'
+    - cron: '0 9 * * 1'
 
 jobs:
   build-templates:
@@ -33,7 +44,7 @@ jobs:
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
-          version: latest
+          version: '10'
         if: ${{ matrix.package-manager == 'pnpm' }}
 
       - name: Setup Hugo
@@ -74,11 +85,52 @@ jobs:
         id: create-tina-app
         run: npx create-tina-app@latest template-repo --pkg-manager ${{ matrix.package-manager }} --template ${{ matrix.template }} --noTelemetry ${{ matrix.template == 'tina-docs' && '--theme default' || '' }}
 
+      - name: Install and pin Tina packages
+        id: install
+        env:
+          PUBLISHED_PACKAGES: ${{ inputs.published_packages }}
+          TINA_VERSION: ${{ inputs.tina_version || 'latest' }}
+        run: |
+          cd template-repo
+          PKG_MANAGER="${{ matrix.package-manager }}"
+
+          # For each tinacms/@tinacms/* package found in this starter's package.json:
+          #   - Use the exact version from published_packages if it was part of this release.
+          #   - Fall back to TINA_VERSION (default: "latest") for packages not in the release,
+          #     e.g. when only a subset of Tina packages changed.
+          # published_packages is a JSON array [{name, version}] passed by the publish workflow,
+          # or an empty array for cron/manual runs.
+          TINA_PKGS=$(jq -r --arg fallback "$TINA_VERSION" \
+            --argjson published "${PUBLISHED_PACKAGES:-[]}" '
+            [(.dependencies // {}), (.devDependencies // {})] |
+            add // {} |
+            to_entries[] |
+            select(.key == "tinacms" or (.key | startswith("@tinacms/"))) |
+            . as {key: $pkg} |
+            # Look up this package in the published list; fall back to $fallback if not found.
+            (($published | map(select(.name == $pkg)) | first | .version) // $fallback) as $ver |
+            $pkg + "@" + $ver
+          ' package.json | tr '\n' ' ')
+
+          if [ -n "$TINA_PKGS" ]; then
+            echo "Pinning Tina packages: $TINA_PKGS"
+            # Using "add"/"install" rather than a plain install so that only the Tina packages
+            # are re-resolved, leaving the rest of the lock file intact for other dependencies.
+            case "$PKG_MANAGER" in
+              pnpm) pnpm add $TINA_PKGS ;;
+              yarn) yarn add $TINA_PKGS ;;
+              npm)  npm install $TINA_PKGS ;;
+            esac
+          else
+            echo "No Tina packages found in package.json, running standard install"
+            $PKG_MANAGER install
+          fi
+
       - name: Run build
         id: build
         run: |
           cd template-repo
-          ${{ matrix.package-manager }} install && ${{ matrix.package-manager }} run build
+          ${{ matrix.package-manager }} run build
 
       - name: Report errors
         continue-on-error: false
@@ -87,6 +139,8 @@ jobs:
         run: |
           if [[ "${{ steps.create-tina-app.outcome }}" == "failure" ]]; then
             ERROR_STEP="create-tina-app"
+          elif [[ "${{ steps.install.outcome }}" == "failure" ]]; then
+            ERROR_STEP="install"
           else
             ERROR_STEP="build"
           fi
