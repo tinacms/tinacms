@@ -43,19 +43,26 @@ export function init(options: BridgeOptions = {}): void {
   refreshForms();
 }
 
+// Guards against overlapping prime passes: if `refreshForms()` fires again
+// (a second `astro:page-load`) before the first prime resolves, both runs
+// would append `[data-tina-form]` divs for the same islands. The in-flight
+// run already reflects the current DOM, so later callers just await it.
+let primingInFlight: Promise<void> | null = null;
+
 /**
  * Re-scan for `[data-tina-form]` payloads after a soft navigation
  * (Astro view transitions, Turbo, htmx). On a prerendered page with no
  * server-injected payloads, prime from the island endpoints first.
  */
 export function refreshForms(): void {
-  if (document.querySelector('[data-tina-form]')) {
-    refreshFormsFromDom();
-    return;
-  }
-  if (document.querySelector('[data-tina-island]')) {
+  const hasServerForms = document.querySelector('[data-tina-form]');
+  if (!hasServerForms && document.querySelector('[data-tina-island]')) {
+    if (primingInFlight) return;
     debug('no server-injected forms; priming from island endpoints');
-    void primeIslands().then(refreshFormsFromDom);
+    primingInFlight = primeIslands().finally(() => {
+      primingInFlight = null;
+    });
+    void primingInFlight.then(refreshFormsFromDom);
     return;
   }
   refreshFormsFromDom();

@@ -34,11 +34,10 @@ export function recordForm(form: CollectedForm): void {
 }
 
 export function sortByPriority(forms: CollectedForm[]): CollectedForm[] {
-  return [...forms].sort((a, b) => {
-    const ap = a.priority === 'primary' ? 0 : 1;
-    const bp = b.priority === 'primary' ? 0 : 1;
-    return ap - bp;
-  });
+  return [...forms].sort(
+    (a, b) =>
+      (a.priority === 'primary' ? 0 : 1) - (b.priority === 'primary' ? 0 : 1)
+  );
 }
 
 export function renderFormPayloadDiv(

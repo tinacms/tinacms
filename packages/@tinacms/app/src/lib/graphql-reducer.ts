@@ -505,29 +505,32 @@ export const useGraphQLReducer = (
     ]
   );
 
+  // The bridge sends `formId` keyed by query id (hashFromQuery output), but
+  // `state.forms` is keyed by document path. Match by either so callers using
+  // `useTina`'s `experimental___selectFormByFormId` (which usually returns a
+  // path) keep working too. Returns false when the form isn't built yet.
+  const activateFormByWireId = React.useCallback(
+    (wireId: string): boolean => {
+      const match = cms.state.forms.find(
+        ({ tinaForm }) =>
+          tinaForm.id === wireId || tinaForm.queries.includes(wireId)
+      );
+      if (!match) return false;
+      cms.dispatch({
+        type: 'forms:set-active-form-id',
+        value: match.tinaForm.id,
+      });
+      return true;
+    },
+    [cms]
+  );
+
   const handleMessage = React.useCallback(
     (event: MessageEvent<PostMessage>) => {
       if (event.data.type === 'user-select-form') {
-        // The bridge sends `formId` keyed by query id (hashFromQuery
-        // output), but `state.forms` is keyed by document path. Match
-        // by either so callers using `useTina`'s
-        // `experimental___selectFormByFormId` (which usually returns a
-        // path) keep working too.
         const incoming = event.data.formId;
-        const match = cms.state.forms.find(
-          ({ tinaForm }) =>
-            tinaForm.id === incoming || tinaForm.queries.includes(incoming)
-        );
-        if (match) {
-          cms.dispatch({
-            type: 'forms:set-active-form-id',
-            value: match.tinaForm.id,
-          });
-          setPendingPrimaryId(null);
-        } else {
-          // Form not built yet — buffer until `forms:add` resolves it.
-          setPendingPrimaryId(incoming);
-        }
+        // Buffer until `forms:add` resolves it if the form isn't built yet.
+        setPendingPrimaryId(activateFormByWireId(incoming) ? null : incoming);
       }
 
       if (event?.data?.type === 'quick-edit') {
@@ -620,19 +623,8 @@ export const useGraphQLReducer = (
   // so the effect doesn't re-run on unrelated form mutations.
   React.useEffect(() => {
     if (!pendingPrimaryId) return;
-    const match = cms.state.forms.find(
-      ({ tinaForm }) =>
-        tinaForm.id === pendingPrimaryId ||
-        tinaForm.queries.includes(pendingPrimaryId)
-    );
-    if (match) {
-      cms.dispatch({
-        type: 'forms:set-active-form-id',
-        value: match.tinaForm.id,
-      });
-      setPendingPrimaryId(null);
-    }
-  }, [cms.state.forms.length, pendingPrimaryId]);
+    if (activateFormByWireId(pendingPrimaryId)) setPendingPrimaryId(null);
+  }, [cms.state.forms.length, pendingPrimaryId, activateFormByWireId]);
 
   React.useEffect(() => {
     iframe.current?.contentWindow?.postMessage({

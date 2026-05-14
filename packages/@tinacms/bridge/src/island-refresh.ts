@@ -119,12 +119,8 @@ async function refreshIsland(
  */
 export async function primeIslands(): Promise<void> {
   const islands = document.querySelectorAll<HTMLElement>(ISLAND_SELECTOR);
-  const results = await Promise.all(
-    Array.from(islands).map((island) => primeIsland(island))
-  );
-  for (const forms of results) {
-    for (const formEl of forms) document.body.appendChild(formEl);
-  }
+  const results = await Promise.all(Array.from(islands, primeIsland));
+  for (const formEl of results.flat()) document.body.appendChild(formEl);
 }
 
 async function primeIsland(island: HTMLElement): Promise<HTMLElement[]> {
@@ -156,11 +152,7 @@ async function primeIsland(island: HTMLElement): Promise<HTMLElement[]> {
     const formEls = Array.from(
       template.content.querySelectorAll<HTMLElement>(FORM_SELECTOR)
     );
-    if (
-      isPrimary &&
-      formEls[0] &&
-      !formEls[0].hasAttribute(PRIMARY_FORM_ATTR)
-    ) {
+    if (isPrimary && formEls[0]) {
       formEls[0].setAttribute(PRIMARY_FORM_ATTR, '');
     }
     return formEls;
