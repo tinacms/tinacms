@@ -449,7 +449,7 @@ type ObjectListUiProps = {
    * ```
    *
    * Note: when supplying a value for a `rich-text` field, you must supply
-   * the the value as an object.
+   * the value as an object.
    * ```ts
    * {
    *   title: "My Headline",
