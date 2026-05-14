@@ -1,5 +1,12 @@
 # @tinacms/app
 
+## 2.4.8
+
+### Patch Changes
+
+- Updated dependencies []:
+  - tinacms@3.8.1
+
 ## 2.4.7
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # tinacms
 
+## 3.8.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/search@1.2.15
+
 ## 3.8.0
 
 ### Minor Changes

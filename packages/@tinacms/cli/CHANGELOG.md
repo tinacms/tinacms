@@ -1,5 +1,17 @@
 # tinacms-cli
 
+## 2.3.1
+
+### Patch Changes
+
+- [#6850](https://github.com/tinacms/tinacms/pull/6850) [`629af08`](https://github.com/tinacms/tinacms/commit/629af08dc4b6dbe7ed652cbc5dfd55699b0fffa9) Thanks [@18-th](https://github.com/18-th)! - Fix the generated `client.ts` / `databaseClient.ts` `./types` import so it satisfies both TypeScript strict mode and Node native ESM. The generated import is now `import { queries } from "./types.js"` unconditionally, and the CLI emits a co-resident `types.js` alongside `types.ts` for TypeScript projects. Modern TS module resolution (`bundler` / `node16` / `nodenext`) rewrites the `.js` import back to `types.ts` at compile time, so type checking still sees the `.ts` source and `allowImportingTsExtensions` is not required, while Node ESM consumers resolve the on-disk `.js` file at runtime.
+
+- Updated dependencies [[`890108d`](https://github.com/tinacms/tinacms/commit/890108dd6c1a88a1c5531cf397514c34712d13bd)]:
+  - @tinacms/graphql@2.4.1
+  - @tinacms/search@1.2.15
+  - tinacms@3.8.1
+  - @tinacms/app@2.4.8
+
 ## 2.3.0
 
 ### Minor Changes

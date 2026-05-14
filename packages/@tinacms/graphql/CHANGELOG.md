@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 2.4.1
+
+### Patch Changes
+
+- [#6853](https://github.com/tinacms/tinacms/pull/6853) [`890108d`](https://github.com/tinacms/tinacms/commit/890108dd6c1a88a1c5531cf397514c34712d13bd) Thanks [@kulesy](https://github.com/kulesy)! - fix(graphql): preserve absolute external URLs in image-type resolvers
+
 ## 2.4.0
 
 ### Minor Changes
