@@ -63,6 +63,10 @@ export const prepareCacheLocation = async (
   const parentPath = path.join(generatedFolderPath, '.cache');
   try {
     if (await fs.pathExists(parentPath)) {
+      // NOTE: Sweep is unconditional — a concurrent `tinacms` invocation
+      // against the same project will rm the other's live <timestamp>/
+      // subdir mid-import. Tina v3 assumes one CLI process per project;
+      // serialise `dev` + `build` invocations externally if you need both.
       await fs.remove(parentPath);
     }
     await fs.ensureDir(parentPath);
