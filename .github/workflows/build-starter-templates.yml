@@ -106,7 +106,7 @@ jobs:
           #   - Use the exact version from published_packages if it was part of this release.
           #   - Fall back to TINA_VERSION (default: "latest") for packages not in the release.
           TINA_FILTER='
-            def is_tina: contains("tinacms");
+            def is_tina: . == "tinacms" or startswith("@tinacms/") or startswith("tinacms-") or startswith("next-tinacms-");
             def resolve($published; $fallback):
               . as $pkg | (($published | map(select(.name == $pkg)) | first | .version) // $fallback);
           '
@@ -150,16 +150,20 @@ jobs:
           esac
 
           echo "Updating Tina packages — deps: $TINA_DEPS dev deps: $TINA_DEV_DEPS"
-          [ -n "$TINA_DEPS" ] && case "$PKG_MANAGER" in
-            pnpm) pnpm add $TINA_DEPS ;;
-            yarn) yarn add $TINA_DEPS ;;
-            npm)  npm install $TINA_DEPS ;;
-          esac
-          [ -n "$TINA_DEV_DEPS" ] && case "$PKG_MANAGER" in
-            pnpm) pnpm add -D $TINA_DEV_DEPS ;;
-            yarn) yarn add -D $TINA_DEV_DEPS ;;
-            npm)  npm install --save-dev $TINA_DEV_DEPS ;;
-          esac
+          if [ -n "$TINA_DEPS" ]; then
+            case "$PKG_MANAGER" in
+              pnpm) pnpm add $TINA_DEPS ;;
+              yarn) yarn add $TINA_DEPS ;;
+              npm)  npm install $TINA_DEPS ;;
+            esac
+          fi
+          if [ -n "$TINA_DEV_DEPS" ]; then
+            case "$PKG_MANAGER" in
+              pnpm) pnpm add -D $TINA_DEV_DEPS ;;
+              yarn) yarn add -D $TINA_DEV_DEPS ;;
+              npm)  npm install --save-dev $TINA_DEV_DEPS ;;
+            esac
+          fi
 
       - name: Run build
         id: build
