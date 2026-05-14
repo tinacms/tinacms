@@ -78,6 +78,9 @@ jobs:
         id: build
         run: |
           cd template-repo
+          if [[ "${{ matrix.package-manager }}" == "pnpm" ]]; then
+            pnpm config set dangerouslyAllowAllBuilds true
+          fi
           ${{ matrix.package-manager }} install && ${{ matrix.package-manager }} run build
 
       - name: Report errors
