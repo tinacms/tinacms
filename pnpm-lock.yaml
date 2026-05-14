@@ -589,8 +589,8 @@ catalogs:
       specifier: ^0.33.5
       version: 0.33.5
     sqlite-level:
-      specifier: 0.0.0-20260511053032
-      version: 0.0.0-20260511053032
+      specifier: ^2.0.0
+      version: 2.0.0
     stopword:
       specifier: ^3.1.4
       version: 3.1.5
@@ -1914,7 +1914,7 @@ importers:
         version: 4.0.0(abstract-level@1.0.4)
       sqlite-level:
         specifier: 'catalog:'
-        version: 0.0.0-20260511053032
+        version: 2.0.0
       stopword:
         specifier: 'catalog:'
         version: 3.1.5
@@ -14149,8 +14149,8 @@ packages:
   sprintf-js@1.0.3:
     resolution: {integrity: sha512-D9cPgkvLlV3t3IzL0D0YLvGA9Ahk4PcvVwUbN0dSGr1aP0Nrt4AEnTUbuGvquEC0mA64Gqt1fzirlRs5ibXx8g==}
 
-  sqlite-level@0.0.0-20260511053032:
-    resolution: {integrity: sha512-RQcqVXHJDykHNIMZ+vbw37h25ugnvKBobZw+9Sj+N1zTVwPup2mouGiV21gY8seNSA24i7T70Vh0snQZwNBe/Q==}
+  sqlite-level@2.0.0:
+    resolution: {integrity: sha512-CsjtNyubdz091x90L277jLKRYrL98EkRRZzkA9VMJntPQNuGIo5ClFw3LYeo4WIbTRUX5JqPVV01URJsN4Dbuw==}
 
   sshpk@1.18.0:
     resolution: {integrity: sha512-2p2KJZTSqQ/I3+HX42EpYOa2l3f8Erv8MWKsy2I9uf4wA7yFIkXRffYdsx86y6z4vHtV8u7g+pPlr8/4ouAxsQ==}
@@ -30778,7 +30778,7 @@ snapshots:
 
   sprintf-js@1.0.3: {}
 
-  sqlite-level@0.0.0-20260511053032:
+  sqlite-level@2.0.0:
     dependencies:
       abstract-level: 1.0.4
       better-sqlite3: 11.10.0
