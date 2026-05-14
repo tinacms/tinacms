@@ -111,7 +111,12 @@ jobs:
             [(.dependencies // {}), (.devDependencies // {})] |
             add // {} |
             to_entries[] |
-            select(.key == "tinacms" or (.key | startswith("@tinacms/"))) |
+            select(
+              .key == "tinacms" or
+              (.key | startswith("@tinacms/")) or
+              (.key | startswith("tinacms-")) or
+              (.key | startswith("next-tinacms-"))
+            ) |
             . as {key: $pkg} |
             # Look up this package in the published list; fall back to $fallback if not found.
             (($published | map(select(.name == $pkg)) | first | .version) // $fallback) as $ver |
