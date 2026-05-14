@@ -1,10 +1,6 @@
 import { isFromAdmin } from './config';
 import { debug } from './debug';
-import {
-  FORM_SELECTOR,
-  PRIMARY_FORM_ATTR,
-  reportQuickEdit,
-} from './forms';
+import { FORM_SELECTOR, PRIMARY_FORM_ATTR, reportQuickEdit } from './forms';
 import {
   PREVIEW_CONTENT_TYPE,
   PRIME_HEADER,
