@@ -2,6 +2,7 @@ jest.mock('fs-extra', () => ({
   ensureFile: jest.fn().mockResolvedValue(undefined),
   outputFile: jest.fn().mockResolvedValue(undefined),
   existsSync: jest.fn().mockReturnValue(false),
+  unlinkSync: jest.fn(),
   stat: jest.fn().mockResolvedValue({ size: 0 }),
 }));
 jest.mock(
@@ -34,15 +35,15 @@ describe('Codegen.genClient', () => {
     return instance;
   }
 
-  it('emits extensionless ./types import for TypeScript projects', async () => {
-    // Avoids requiring `allowImportingTsExtensions: true` in consumer
-    // tsconfigs. Modern TS module resolution (Bundler / NodeNext) resolves
-    // `./types` to `./types.ts` cleanly. The previous `./types.ts` import
-    // broke under stricter Next.js / TS defaults (see #6062 follow-up).
+  it('emits ./types.js import for TypeScript projects', async () => {
+    // The .js extension satisfies Node native ESM at runtime. Modern TS
+    // module resolution (bundler / node16 / nodenext) rewrites `./types.js`
+    // back to `./types.ts` at compile time, so type checking still sees
+    // the .ts source and `allowImportingTsExtensions` is not required.
     const { clientString } = await makeInstance(true).genClient();
-    expect(clientString).toContain('from "./types"');
+    expect(clientString).toContain('from "./types.js"');
     expect(clientString).not.toMatch(/from ["']\.\/types\.ts["']/);
-    expect(clientString).not.toMatch(/from ["']\.\/types\.js["']/);
+    expect(clientString).not.toMatch(/from ["']\.\/types["']/);
   });
 
   it('emits ./types.js import for non-TypeScript projects', async () => {
@@ -65,11 +66,11 @@ describe('Codegen.genDatabaseClient', () => {
     return instance;
   }
 
-  it('emits extensionless ./types import for TypeScript projects', async () => {
+  it('emits ./types.js import for TypeScript projects', async () => {
     const result = await makeInstance(true).genDatabaseClient();
-    expect(result).toContain('from "./types"');
+    expect(result).toContain('from "./types.js"');
     expect(result).not.toMatch(/from ["']\.\/types\.ts["']/);
-    expect(result).not.toMatch(/from ["']\.\/types\.js["']/);
+    expect(result).not.toMatch(/from ["']\.\/types["']/);
   });
 
   it('emits ./types.js import for non-TypeScript projects', async () => {
@@ -194,6 +195,66 @@ describe('Codegen.execute integration', () => {
       expect(calls[0][0]).toBe(
         path.join(codegen.configManager.generatedFolderPath, fileName)
       );
+    }
+  });
+
+  it('emits types.js alongside types.ts in TS projects and does not unlink it', async () => {
+    // Regression guard for #6829. Before this fix, the TS branch wrote
+    // types.ts and then `unlinkIfExists(generatedTypesJSFilePath)`, leaving
+    // Node native ESM users (#6062) with no `./types.js` to resolve. The
+    // generated client now imports `"./types.js"` unconditionally, so
+    // `types.js` must be co-resident with `types.ts` on disk in TS mode.
+    const fs = jest.requireMock('fs-extra');
+    const esbuild = jest.requireMock('esbuild');
+    (fs.outputFile as jest.Mock).mockClear();
+    (fs.unlinkSync as jest.Mock).mockClear();
+    (fs.existsSync as jest.Mock).mockReturnValue(true);
+    (esbuild.transform as jest.Mock).mockClear();
+    (esbuild.transform as jest.Mock).mockResolvedValue({ code: '/*js*/' });
+
+    const genTypesSpy = jest
+      .spyOn(Codegen.prototype, 'genTypes')
+      .mockResolvedValue({
+        codeString: '/*ts source*/',
+        schemaString: '/*gql schema*/',
+      });
+
+    try {
+      const codegen = stubCodegen();
+      const cm = codegen.configManager as any;
+      cm.shouldSkipSDK = () => false;
+      cm.isUsingTs = () => true;
+      cm.hasSelfHostedConfig = () => false;
+      cm.generatedGraphQLGQLPath = '/fake/tina/__generated__/schema.gql';
+      cm.generatedTypesTSFilePath = '/fake/tina/__generated__/types.ts';
+      cm.generatedTypesJSFilePath = '/fake/tina/__generated__/types.js';
+      cm.generatedTypesDFilePath = '/fake/tina/__generated__/types.d.ts';
+      cm.generatedClientTSFilePath = '/fake/tina/__generated__/client.ts';
+      cm.generatedClientJSFilePath = '/fake/tina/__generated__/client.js';
+      cm.generatedCachePath = '/fake/cache';
+
+      await codegen.execute();
+
+      const writtenPaths = (fs.outputFile as jest.Mock).mock.calls.map(
+        (c: any[]) => c[0]
+      );
+      expect(writtenPaths).toContain(cm.generatedTypesTSFilePath);
+      expect(writtenPaths).toContain(cm.generatedTypesJSFilePath);
+      expect(writtenPaths).toContain(cm.generatedClientTSFilePath);
+
+      expect(esbuild.transform).toHaveBeenCalledWith('/*ts source*/', {
+        loader: 'ts',
+      });
+
+      const unlinkedPaths = (fs.unlinkSync as jest.Mock).mock.calls.map(
+        (c: any[]) => c[0]
+      );
+      expect(unlinkedPaths).not.toContain(cm.generatedTypesJSFilePath);
+      expect(unlinkedPaths).toContain(cm.generatedClientJSFilePath);
+      expect(unlinkedPaths).toContain(cm.generatedTypesDFilePath);
+    } finally {
+      genTypesSpy.mockRestore();
+      (fs.existsSync as jest.Mock).mockReturnValue(false);
     }
   });
 

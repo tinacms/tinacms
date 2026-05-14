@@ -1,0 +1,9 @@
+---
+interface Props {
+  value?: string;
+  lang?: string;
+}
+
+const { value = '', lang } = Astro.props;
+---
+<pre class="bg-gray-900 text-gray-100 rounded-lg p-4 my-4 overflow-x-auto text-sm"><code class={lang ? `language-${lang}` : undefined}>{value}</code></pre>

@@ -1,0 +1,7 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`TinaMarkdown > renders code blocks with language class 1`] = `"<pre><code class="language-javascript">const test = 123</code></pre><pre><code>some random code</code></pre>"`;
+
+exports[`TinaMarkdown > renders nested leaf-mark formatting 1`] = `"<p>Some <strong>bold</strong> text</p><p>Some <strong><em>bold and emphasized</em></strong> text</p><p>Marks with <em>emphasized text nesting </em><strong><em>bold</em></strong><em> text</em></p><p><strong>Hello </strong><strong><em>world</em></strong><strong>, again</strong> <em>here</em></p><p>Some <code>inline code</code> examples</p><p><em>Hello </em><em><code>some code</code></em><em>, again</em></p><p><strong>Hello </strong><a href="https://example.com"><strong>world</strong></a></p><p><strong><em>Hello </em></strong><a href="https://example.com"><strong><em>world</em></strong></a><em> And some other text, which has a </em><a href="https://something.com"><em>link to something</em></a></p>"`;
+
+exports[`TinaMarkdown > renders the basic kitchen-sink fixture 1`] = `"<h1>Heading</h1><p>A paragraph.</p><blockquote>A quote.</blockquote><ul><li><div>An item</div></li></ul><hr><p>A <a href="http://example.com">link</a>.</p><p><img src="https://get.svg.workers.dev" alt="Alt Text"></p>"`;

@@ -1,0 +1,24 @@
+---
+/**
+ * mdxJsx{Flow,Text}Element nodes are dispatched by `node.name` — registered
+ * components on the `components` map render with the node's props spread in.
+ * Unregistered names emit a visible placeholder so missing registrations
+ * surface during development.
+ */
+import type { CustomComponentsMap, MdxElement } from './types';
+
+interface Props {
+  node: MdxElement;
+  components: CustomComponentsMap;
+}
+
+const { node, components } = Astro.props;
+const MdxComponent = components[node.name];
+---
+{MdxComponent ? (
+  <MdxComponent {...(node.props ?? {})} />
+) : (
+  <span style="display:inline-block;padding:0.25rem 0.5rem;background:#fee;color:#900;border-radius:0.25rem;font-family:monospace;font-size:0.85em;">
+    No component provided for {node.name}
+  </span>
+)}
