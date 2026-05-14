@@ -2,8 +2,19 @@ name: Build TinaCMS Starter Templates
 
 on:
   workflow_dispatch:
+    inputs:
+      tina_version:
+        description: 'Version applied to any Tina package not listed in published_packages (semver, dist-tag, or snapshot tag, e.g. 2.5.0, latest, or my-branch). Defaults to latest.'
+        required: false
+        default: 'latest'
+        type: string
+      published_packages:
+        description: 'JSON array [{name, version}] of per-package versions to test. Use when packages carry different versions — e.g. a partial tagged release or a prod publish where only some packages changed. Packages omitted here fall back to tina_version.'
+        required: false
+        default: ''
+        type: string
   schedule:
-    - cron: '0 9 * * 1-5'
+    - cron: '0 9 * * 1'
 
 jobs:
   build-templates:
@@ -26,14 +37,14 @@ jobs:
 
     steps:
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         name: Install pnpm
         with:
-          version: latest
+          version: '10'
         if: ${{ matrix.package-manager == 'pnpm' }}
 
       - name: Setup Hugo
@@ -74,11 +85,91 @@ jobs:
         id: create-tina-app
         run: npx create-tina-app@latest template-repo --pkg-manager ${{ matrix.package-manager }} --template ${{ matrix.template }} --noTelemetry ${{ matrix.template == 'tina-docs' && '--theme default' || '' }}
 
+      - name: Install dependencies
+        id: install
+        run: |
+          cd template-repo
+          ${{ matrix.package-manager }} install
+
+      - name: Update Tina packages to target version
+        id: update-tina
+        env:
+          PUBLISHED_PACKAGES: ${{ inputs.published_packages }}
+          TINA_VERSION: ${{ inputs.tina_version || 'latest' }}
+        run: |
+          cd template-repo
+          PKG_MANAGER="${{ matrix.package-manager }}"
+
+          # Resolve versioned package specs for direct and dev dependencies separately
+          # so the add command preserves their original category in package.json.
+          # For each matching package:
+          #   - Use the exact version from published_packages if it was part of this release.
+          #   - Fall back to TINA_VERSION (default: "latest") for packages not in the release.
+          TINA_FILTER='
+            def is_tina: . == "tinacms" or startswith("@tinacms/") or startswith("tinacms-") or startswith("next-tinacms-");
+            def resolve($published; $fallback):
+              . as $pkg | (($published | map(select(.name == $pkg)) | first | .version) // $fallback);
+          '
+          TINA_DEPS=$(jq -r --arg fallback "$TINA_VERSION" \
+            --argjson published "${PUBLISHED_PACKAGES:-[]}" \
+            "${TINA_FILTER}"'
+            (.dependencies // {}) | to_entries[] |
+            select(.key | is_tina) |
+            .key + "@" + (.key | resolve($published; $fallback))
+          ' package.json | tr '\n' ' ')
+          TINA_DEV_DEPS=$(jq -r --arg fallback "$TINA_VERSION" \
+            --argjson published "${PUBLISHED_PACKAGES:-[]}" \
+            "${TINA_FILTER}"'
+            (.devDependencies // {}) | to_entries[] |
+            select(.key | is_tina) |
+            .key + "@" + (.key | resolve($published; $fallback))
+          ' package.json | tr '\n' ' ')
+
+          # Bypass the minimum release age gate for Tina packages only.
+          # The install step above ran with the gate fully active for all other dependencies.
+          # npm has no per-package exclusion (npm#8994); disable the gate for this project.
+          # .npmrc is ini-style so appending always wins (last value takes precedence).
+          echo "min-release-age=0" >> .npmrc
+          case "$PKG_MANAGER" in
+            pnpm)
+              # pnpm 11+ defaults to a 1440-minute gate. Whitelist Tina packages specifically
+              # rather than disabling the gate entirely. yq merges into any existing list
+              # and deduplicates, safe whether or not the file or key already exists.
+              touch pnpm-workspace.yaml
+              yq -i '.minimumReleaseAgeExclude += ["tinacms", "@tinacms/*"] | .minimumReleaseAgeExclude |= unique' pnpm-workspace.yaml
+              ;;
+            yarn)
+              # yarn berry 4.10+ supports npmPreapprovedPackages with glob patterns.
+              # yarn 1.x (bundled with Node) predates this feature — no-op if detected.
+              YARN_MAJOR=$(yarn --version 2>/dev/null | cut -d. -f1)
+              if [ "${YARN_MAJOR:-0}" -ge 4 ] 2>/dev/null; then
+                touch .yarnrc.yml
+                yq -i '.npmPreapprovedPackages += ["tinacms", "@tinacms/*"] | .npmPreapprovedPackages |= unique' .yarnrc.yml
+              fi
+              ;;
+          esac
+
+          echo "Updating Tina packages — deps: $TINA_DEPS dev deps: $TINA_DEV_DEPS"
+          if [ -n "$TINA_DEPS" ]; then
+            case "$PKG_MANAGER" in
+              pnpm) pnpm add $TINA_DEPS ;;
+              yarn) yarn add $TINA_DEPS ;;
+              npm)  npm install $TINA_DEPS ;;
+            esac
+          fi
+          if [ -n "$TINA_DEV_DEPS" ]; then
+            case "$PKG_MANAGER" in
+              pnpm) pnpm add -D $TINA_DEV_DEPS ;;
+              yarn) yarn add -D $TINA_DEV_DEPS ;;
+              npm)  npm install --save-dev $TINA_DEV_DEPS ;;
+            esac
+          fi
+
       - name: Run build
         id: build
         run: |
           cd template-repo
-          ${{ matrix.package-manager }} install && ${{ matrix.package-manager }} run build
+          ${{ matrix.package-manager }} run build
 
       - name: Report errors
         continue-on-error: false
@@ -87,6 +178,10 @@ jobs:
         run: |
           if [[ "${{ steps.create-tina-app.outcome }}" == "failure" ]]; then
             ERROR_STEP="create-tina-app"
+          elif [[ "${{ steps.install.outcome }}" == "failure" ]]; then
+            ERROR_STEP="install"
+          elif [[ "${{ steps.update-tina.outcome }}" == "failure" ]]; then
+            ERROR_STEP="update-tina"
           else
             ERROR_STEP="build"
           fi
