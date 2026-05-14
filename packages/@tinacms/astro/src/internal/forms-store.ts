@@ -1,17 +1,3 @@
-/**
- * Per-request collector for `tina()` results. Each call pushes its
- * `{id, query, variables, data}` payload here so the integration's
- * middleware can read the full list at response time and splice the
- * bridge wiring into edit-mode pages — the user never writes a `forms`
- * prop or imports a wiring component.
- *
- * Initialised by the middleware the `tina()` integration injects.
- *
- * The store is keyed by a `Symbol.for(...)` slot on `globalThis` so all
- * bundle copies of this module (esbuild inlines it into each entry that
- * imports it) share the same instance — without that, the middleware
- * would `.run()` one ALS while `tina()` reads from a different one.
- */
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { escapeAttr } from './escape';
 
@@ -23,6 +9,8 @@ export interface CollectedForm {
   priority?: 'primary';
 }
 
+// Symbol slot on globalThis so bundle copies (esbuild inlines this module
+// into each entry that imports it) share one ALS instance.
 const STORE_KEY = Symbol.for('@tinacms/astro/forms-store');
 
 type Slot = { [STORE_KEY]?: AsyncLocalStorage<CollectedForm[]> };
@@ -35,10 +23,8 @@ export const formsStore: AsyncLocalStorage<CollectedForm[]> = (slot[
 export function recordForm(form: CollectedForm): void {
   const list = formsStore.getStore();
   if (!list) return;
-  // Same id can appear multiple times (e.g., layout + page both fetch the
-  // global). Dedup so the bridge doesn't see two `open` events; upgrade
-  // to `primary` when a later call asserts it, so layout-then-page
-  // ordering doesn't strand the page's intent.
+  // Same id can appear twice (layout + page both fetch the global). Dedup
+  // and upgrade to `primary` if a later call asserts it.
   const existing = list.find((entry) => entry.id === form.id);
   if (existing) {
     if (form.priority === 'primary') existing.priority = 'primary';
@@ -47,7 +33,6 @@ export function recordForm(form: CollectedForm): void {
   list.push(form);
 }
 
-/** Sort primaries first while preserving relative order otherwise. */
 export function sortByPriority(forms: CollectedForm[]): CollectedForm[] {
   return [...forms].sort((a, b) => {
     const ap = a.priority === 'primary' ? 0 : 1;
@@ -56,10 +41,6 @@ export function sortByPriority(forms: CollectedForm[]): CollectedForm[] {
   });
 }
 
-/** Hidden `<div data-tina-form>` payload the bridge parses. `primary`
- *  emits the `data-tina-primary` marker so the bridge's announce-loop
- *  posts `user-select-form` for it (retries until acked, surviving any
- *  race with the admin's form-registration). */
 export function renderFormPayloadDiv(
   form: CollectedForm,
   primary: boolean

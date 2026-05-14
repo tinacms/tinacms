@@ -1,35 +1,6 @@
 /**
- * Factory for the dynamic `/tina-island/[name]` endpoint the bridge calls
- * to refetch a region with the editor's overlay applied. Each entry in
- * `islands` describes one editable region: how to load its data, which
- * Astro component to render, and the wrapper element the page-side
- * `<div data-tina-island>` is expected to swap.
- *
- * The render runs inside the same request/forms AsyncLocalStorage scopes
- * the `tina()` middleware uses, so `requestWithMetadata` calls inside the
- * island's loader (a) pick up the overlay the bridge POSTed and (b) record
- * their form payloads. On the bridge's one-time "prime" refetch (a static
- * page that has no server-injected `[data-tina-form]` yet) those payloads
- * are prepended to the response as `<div data-tina-form>` so the bridge can
- * register the page's forms; ordinary refetches omit them.
- *
- * @experimental
- *
- * Built on Astro's `experimental_AstroContainer`, which is itself
- * experimental — Astro may break the underlying API in any minor or patch
- * release. The shape of `createIslandRoute` is similarly experimental and
- * will graduate once the container API stabilises.
- *
- * Usage:
- *
- * ```ts
- * // src/pages/tina-island/[name].ts
- * import { experimental_createIslandRoute } from '@tinacms/astro/experimental';
- * import { islands } from '../../lib/islands';
- *
- * export const prerender = false;
- * export const ALL = experimental_createIslandRoute(islands);
- * ```
+ * @experimental Built on Astro's `experimental_AstroContainer`. Both APIs
+ * may break in any Astro minor/patch.
  */
 import { PREVIEW_CONTENT_TYPE, PRIME_HEADER } from '@tinacms/bridge/preview';
 import type { APIRoute } from 'astro';
@@ -105,12 +76,8 @@ export function experimental_createIslandRoute(
   };
 }
 
-/**
- * Layered defense for an endpoint whose response is shaped by the request
- * body. The bridge always issues a same-origin POST with the Tina-preview
- * content-type; production traffic never matches all three signals so it
- * can never reach the renderer.
- */
+// Bridge issues a same-origin POST with the Tina-preview content-type;
+// production traffic can't match all three signals.
 function rejectIfUnsafe(request: Request): Response | null {
   if (request.method !== 'POST') {
     return new Response('Method Not Allowed', { status: 405 });
@@ -119,18 +86,14 @@ function rejectIfUnsafe(request: Request): Response | null {
   if (!contentType.includes(PREVIEW_CONTENT_TYPE)) {
     return new Response('Not Found', { status: 404 });
   }
-  const fetchSite = request.headers.get('sec-fetch-site');
-  if (fetchSite === 'cross-site' || fetchSite === 'cross-origin') {
+  if (request.headers.get('sec-fetch-site') === 'cross-site') {
     return new Response('Forbidden', { status: 403 });
   }
   return null;
 }
 
-/** Hidden `<div data-tina-form>` payloads — same wire shape the middleware
- *  splices into edit-mode SSR pages. The marker is keyed on the explicit
- *  `priority: 'primary'` flag, not position: each island route call is
- *  independent, so an `i === 0` rule would tag every island's first form
- *  and the bridge would pick whichever rendered first in DOM order. */
+// Keyed on the explicit `primary` flag (not position): each island route
+// call is independent, so position would tag every island's first form.
 function renderFormPayloads(forms: CollectedForm[]): string {
   return sortByPriority(forms)
     .map((form) => renderFormPayloadDiv(form, form.priority === 'primary'))

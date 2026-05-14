@@ -1,49 +1,14 @@
 ---
-/**
- * Marker wrapper for an editable region. Emits the `data-tina-island`
- * attribute the bridge looks for, with the wrapper element/className taken
- * from the registry entry — so the page-side element matches the server's
- * `IslandConfig.wrapper` automatically.
- *
- * Also emits a tiny in-iframe bootstrap `<script>` so visual editing works
- * on **statically built** pages: the `tina()` middleware only injects the
- * bridge on on-demand-rendered responses, so a prerendered page would
- * otherwise never load it. The script is a no-op for normal visitors
- * (`window.self === window.top`) and only fetches `/admin/bridge.js` inside
- * the admin iframe; the `window.__tinaBootstrap` guard plus `bridge.init`'s
- * own idempotency keep it harmless when multiple `<TinaIsland>`s render on a
- * page or when the middleware has already injected its own bootstrap. Once a
- * page uses `<TinaIsland>` its production HTML is no longer byte-identical to
- * a Tina-free Astro app — it carries this ~one-line inline script.
- *
- * Usage:
- *
- * ```astro
- * import TinaIsland from '@tinacms/astro/TinaIsland.astro';
- * import { islands } from '../lib/islands';
- *
- * <TinaIsland name="post" wrapper={islands.post.wrapper} params={{ slug }}>
- *   <PostBody data={data} />
- * </TinaIsland>
- * ```
- *
- * `name` must match a key in the `IslandRegistry` you passed to
- * `experimental_createIslandRoute`. `params` is encoded as URL search
- * params and forwarded to the route handler.
- */
 import { adminOrigins } from './internal/admin-origin';
 
 interface Props {
   name: string;
   wrapper: { tag: string; className?: string };
   params?: Record<string, string | number>;
-  /** Mark this as the page's main editable region. The bridge tells the
-   *  admin to open this form on load, instead of letting the editor land
-   *  on the multi-document "Referenced Files" list when the page also has
-   *  e.g. a global-config form. Mark at most one `<TinaIsland>` per page.
-   *  (On SSR pages the first `requestWithMetadata()` call is treated as
-   *  primary automatically; this prop is what makes it work on statically
-   *  built pages, where the bridge can't tell which island is the page.) */
+  /** Mark at most one `<TinaIsland>` per page as the primary editable
+   *  region so the admin opens it on load instead of the multi-document
+   *  picker. SSR pages don't need this — the first `requestWithMetadata()`
+   *  is treated as primary automatically. */
   primary?: boolean;
 }
 
@@ -59,6 +24,9 @@ const marker = `/tina-island/${name}${search}`;
 const Tag = wrapper.tag as keyof HTMLElementTagNameMap;
 const adminOrigin = adminOrigins();
 ---
+<!-- In-iframe bridge bootstrap for prerendered pages (the middleware only
+     injects on SSR responses). No-op outside the admin iframe; the
+     window flag dedupes across multiple <TinaIsland> on one page. -->
 <script is:inline type="module" define:vars={{ adminOrigin }}>
   if (window.self !== window.top && !window.__tinaBootstrap) {
     window.__tinaBootstrap = 1;

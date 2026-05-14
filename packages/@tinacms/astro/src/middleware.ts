@@ -1,24 +1,3 @@
-/**
- * Astro middleware injected by the `tina()` integration.
- *
- * - Resolves `isEditMode(request)` once and stashes it on
- *   `context.locals.tinaEdit` so pages and components can branch on edit
- *   context without re-parsing headers.
- * - Scopes the request and a per-request forms collector via
- *   AsyncLocalStorage so `tina()` reads them implicitly — the caller
- *   never threads `Astro.request` through their loaders.
- * - In edit mode only, splices `<div data-tina-form>` payloads and a
- *   `<script>` that loads `/admin/bridge.js` before `</head>`. The user
- *   writes nothing in their layout, and production HTML is byte-
- *   identical to a Tina-free Astro app.
- * - In edit mode only, refreshes the `__tina_edit` cookie so the session
- *   survives in-iframe link clicks (whose Referer is the previous
- *   preview page, not `/admin/`).
- * - Prerendered routes short-circuit immediately: they can never be in
- *   edit mode and their synthetic build-time `Request` has no real
- *   headers, so reading them would only emit Astro's
- *   `Astro.request.headers` warning for nothing.
- */
 import type { MiddlewareHandler } from 'astro';
 import { adminOrigins } from './internal/admin-origin';
 import {
@@ -33,6 +12,8 @@ import { EDIT_COOKIE_HEADER, isEditMode } from './is-edit-mode';
 const HEAD_CLOSE = '</head>';
 
 export const onRequest: MiddlewareHandler = (context, next) => {
+  // Prerendered routes can never be in edit mode; reading their synthetic
+  // build-time headers would only emit Astro's request.headers warning.
   if (context.isPrerendered) {
     (context.locals as { tinaEdit?: boolean }).tinaEdit = false;
     return next();
@@ -87,10 +68,8 @@ function editModeInit(response: Response): ResponseInit {
 }
 
 function renderInjection(forms: CollectedForm[]): string {
-  // Primaries first, then `i === 0` marks the front of the sorted list
-  // primary in the DOM. With no explicit `priority: 'primary'` the sort
-  // is a no-op and the implicit "page frontmatter runs before its
-  // layout's" heuristic still picks the page document as primary.
+  // No explicit priority => sort is a no-op and the first form (page
+  // frontmatter runs before its layout's) wins as primary.
   const formDivs = sortByPriority(forms)
     .map((form, i) => renderFormPayloadDiv(form, i === 0))
     .join('');

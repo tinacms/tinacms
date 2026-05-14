@@ -5,6 +5,7 @@ function fakeStore(): DataStore {
   const data = new Map<string, object>();
   return {
     get: (id) => data.get(id),
+    has: (id) => data.has(id),
     seed: (id, d) => {
       data.set(id, d);
     },

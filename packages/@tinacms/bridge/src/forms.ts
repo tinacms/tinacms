@@ -2,51 +2,18 @@ import { getAdminOrigin, isFromAdmin } from './config';
 import { debug } from './debug';
 import type { DataStore, FormPayload } from './types';
 
-/**
- * Reads server-emitted form payloads from `[data-tina-form]` elements (one
- * per query the page consumes), seeds the data-store, and tells the admin
- * which forms this page hosts via `{type:'open', ...}`.
- *
- * The wire format is a JSON object stamped into the `data-tina-form`
- * attribute. Astro's normal attribute escaping handles every dangerous
- * character automatically — no manual encoding step on the server, no
- * `set:html` foot-gun. The browser unescapes during parsing, so
- * `el.dataset.tinaForm` returns the original JSON for `JSON.parse`.
- *
- * Re-posts each `open` until the admin acknowledges by sending an
- * `updateData` for that id. The bridge boots faster than React, so the
- * very first `open` can land before the admin's window-message handler
- * is registered; without retry it would be silently dropped.
- *
- * `initForms` runs once per page load. `refreshForms` re-scans the DOM
- * after a soft navigation (Astro view transitions, Turbo, htmx, etc.):
- * it diffs the live payloads against the previously-mounted set, posts
- * `close` for forms that disappeared, and `open` (with retry) for forms
- * that appeared.
- *
- * If exactly one `[data-tina-form]` carries `data-tina-primary` (the page's
- * main form — set by the middleware for SSR pages, or by `primeIslands` from
- * a `<TinaIsland primary>` on static pages), we also post
- * `{type:'user-select-form', formId}` for it so the admin opens that form
- * instead of landing on the multi-document "Referenced Files" list.
- */
-const FORM_SELECTOR = '[data-tina-form]';
-const FORM_ATTR = 'data-tina-form';
-const PRIMARY_FORM_ATTR = 'data-tina-primary';
+export const FORM_SELECTOR = '[data-tina-form]';
+export const FORM_ATTR = 'data-tina-form';
+export const PRIMARY_FORM_ATTR = 'data-tina-primary';
 const RETRY_INTERVAL_MS = 250;
-const MAX_ATTEMPTS = 40; // 10s total — plenty for cold-start admins.
+const MAX_ATTEMPTS = 40; // 10s — covers cold-start admins.
 
 interface FormsController {
   store: DataStore;
-  /** Form ids currently mounted in the DOM. Diffed on each refresh. */
   active: Map<string, FormPayload>;
-  /** Ids the admin has acknowledged via `updateData`. Survives refreshes. */
   acknowledged: Set<string>;
-  /** Id of the page's primary form, if one is marked. Re-read on refresh. */
   primaryId: string | null;
-  /** Pending retry timer for the announce loop, if any. */
   retryTimer: ReturnType<typeof setTimeout> | null;
-  /** Attempt counter for the current announce loop. */
   attempts: number;
 }
 
@@ -67,21 +34,12 @@ export function initForms(store: DataStore): void {
     attempts: 0,
   };
 
-  // One-time listeners. The ack handler stays bound for the lifetime of
-  // the iframe so subsequent refreshes share the same `acknowledged`
-  // set. The beforeunload handler closes whatever's mounted right now,
-  // so soft-nav close messages are handled by `refreshForms`'s diff.
   window.addEventListener('message', onAck);
   window.addEventListener('beforeunload', onBeforeUnload);
 }
 
-/**
- * Re-scan the DOM for form payloads after a soft navigation. Diff
- * against the previous mount and post `close` / `open` for the delta.
- *
- * Safe to call even if the bridge isn't initialised — used for setups
- * that wire `astro:page-load` unconditionally. No-op outside an iframe.
- */
+/** Diff active forms against the DOM and post the deltas. Safe to call
+ *  before init() — no-op then. */
 export function refreshForms(): void {
   if (!controller) {
     debug('refreshForms called before initForms; ignoring');
@@ -91,7 +49,6 @@ export function refreshForms(): void {
   const { payloads: next, primaryId } = readPayloads();
   const nextIds = new Set(next.map((p) => p.id));
 
-  // Forms that left the page.
   for (const [id] of controller.active) {
     if (nextIds.has(id)) continue;
     debug('posting close for', id);
@@ -99,7 +56,6 @@ export function refreshForms(): void {
     controller.acknowledged.delete(id);
   }
 
-  // Forms that arrived (or whose payload changed across a same-id remount).
   for (const payload of next) {
     controller.store.seed(payload.id, payload.data ?? {});
   }
@@ -107,8 +63,6 @@ export function refreshForms(): void {
   controller.active = new Map(next.map((p) => [p.id, p]));
   controller.primaryId = primaryId && nextIds.has(primaryId) ? primaryId : null;
 
-  // Restart the announce loop only when there's something unacked to
-  // announce. This is also the path the initial mount takes.
   if (next.some((p) => !controller!.acknowledged.has(p.id))) {
     startAnnounceLoop();
   }
@@ -205,9 +159,8 @@ function announce() {
       getAdminOrigin()
     );
   }
-  // Nudge the admin to open the page's primary form rather than the
-  // "Referenced Files" picker. Rides the retry loop until the form is
-  // acked (it's only in `pending` while unacked).
+  // Nudge the admin to open the primary form. Rides the retry loop
+  // (primaryId only appears in `pending` while unacked).
   if (
     controller.primaryId &&
     pending.some((p) => p.id === controller!.primaryId)
