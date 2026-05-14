@@ -49,7 +49,7 @@ jobs:
       - name: Upgrade npm for OIDC support
         run: npm install -g npm@latest
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         name: Install pnpm
         id: pnpm-install
         with:
@@ -237,7 +237,7 @@ jobs:
       - name: Upgrade npm for OIDC support
         run: npm install -g npm@latest
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         name: Install pnpm
         id: pnpm-install
         with:
