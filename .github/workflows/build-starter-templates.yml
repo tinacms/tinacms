@@ -100,27 +100,29 @@ jobs:
           cd template-repo
           PKG_MANAGER="${{ matrix.package-manager }}"
 
-          # For each tinacms/@tinacms/* package in this starter's package.json:
+          # Resolve versioned package specs for direct and dev dependencies separately
+          # so the add command preserves their original category in package.json.
+          # For each matching package:
           #   - Use the exact version from published_packages if it was part of this release.
-          #   - Fall back to TINA_VERSION (default: "latest") for packages not in the release,
-          #     e.g. when only a subset of Tina packages changed.
-          # published_packages is a JSON array [{name, version}] passed by the publish workflow,
-          # or an empty array for cron/manual runs.
-          TINA_PKGS=$(jq -r --arg fallback "$TINA_VERSION" \
-            --argjson published "${PUBLISHED_PACKAGES:-[]}" '
-            [(.dependencies // {}), (.devDependencies // {})] |
-            add // {} |
-            to_entries[] |
-            select(
-              .key == "tinacms" or
-              (.key | startswith("@tinacms/")) or
-              (.key | startswith("tinacms-")) or
-              (.key | startswith("next-tinacms-"))
-            ) |
-            . as {key: $pkg} |
-            # Look up this package in the published list; fall back to $fallback if not found.
-            (($published | map(select(.name == $pkg)) | first | .version) // $fallback) as $ver |
-            $pkg + "@" + $ver
+          #   - Fall back to TINA_VERSION (default: "latest") for packages not in the release.
+          TINA_FILTER='
+            def is_tina: contains("tinacms");
+            def resolve($published; $fallback):
+              . as $pkg | (($published | map(select(.name == $pkg)) | first | .version) // $fallback);
+          '
+          TINA_DEPS=$(jq -r --arg fallback "$TINA_VERSION" \
+            --argjson published "${PUBLISHED_PACKAGES:-[]}" \
+            "${TINA_FILTER}"'
+            (.dependencies // {}) | to_entries[] |
+            select(.key | is_tina) |
+            .key + "@" + (.key | resolve($published; $fallback))
+          ' package.json | tr '\n' ' ')
+          TINA_DEV_DEPS=$(jq -r --arg fallback "$TINA_VERSION" \
+            --argjson published "${PUBLISHED_PACKAGES:-[]}" \
+            "${TINA_FILTER}"'
+            (.devDependencies // {}) | to_entries[] |
+            select(.key | is_tina) |
+            .key + "@" + (.key | resolve($published; $fallback))
           ' package.json | tr '\n' ' ')
 
           # Bypass the minimum release age gate for Tina packages only.
@@ -147,11 +149,16 @@ jobs:
               ;;
           esac
 
-          echo "Updating Tina packages: $TINA_PKGS"
-          case "$PKG_MANAGER" in
-            pnpm) pnpm add $TINA_PKGS ;;
-            yarn) yarn add $TINA_PKGS ;;
-            npm)  npm install $TINA_PKGS ;;
+          echo "Updating Tina packages — deps: $TINA_DEPS dev deps: $TINA_DEV_DEPS"
+          [ -n "$TINA_DEPS" ] && case "$PKG_MANAGER" in
+            pnpm) pnpm add $TINA_DEPS ;;
+            yarn) yarn add $TINA_DEPS ;;
+            npm)  npm install $TINA_DEPS ;;
+          esac
+          [ -n "$TINA_DEV_DEPS" ] && case "$PKG_MANAGER" in
+            pnpm) pnpm add -D $TINA_DEV_DEPS ;;
+            yarn) yarn add -D $TINA_DEV_DEPS ;;
+            npm)  npm install --save-dev $TINA_DEV_DEPS ;;
           esac
 
       - name: Run build
