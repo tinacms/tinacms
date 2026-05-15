@@ -26,8 +26,29 @@ export async function readOverlay<T>(
   return value === undefined ? undefined : (value as T);
 }
 
+// Cache the parsed envelope per Request — `request.text()` can only be
+// called once, but a single request scope calls readOverlay once per
+// loader (page + global, etc.). WeakMap keys are GC'd when the Request
+// goes out of scope at handler return. The cached value is the Promise
+// (not its resolution) so concurrent reads share one parse.
+const envelopeCache = new WeakMap<
+  Request,
+  Promise<PreviewEnvelope | undefined>
+>();
+
 /** Read and parse the full overlay envelope (every form on the page). */
-export async function readEnvelope(
+export function readEnvelope(
+  request: Request
+): Promise<PreviewEnvelope | undefined> {
+  let cached = envelopeCache.get(request);
+  if (!cached) {
+    cached = parseEnvelope(request);
+    envelopeCache.set(request, cached);
+  }
+  return cached;
+}
+
+async function parseEnvelope(
   request: Request
 ): Promise<PreviewEnvelope | undefined> {
   const contentType = request.headers.get('content-type') ?? '';
