@@ -12,6 +12,10 @@ export default async function fetchPostHogConfig(
       headers: {
         'Content-Type': 'application/json',
       },
+      // Cap latency for offline / firewalled developers. Endpoint is
+      // typically single-digit ms when reachable; a timeout returns {}
+      // and disables telemetry for this run, which is the right behavior.
+      signal: AbortSignal.timeout(2000),
     });
 
     if (!response.ok) {

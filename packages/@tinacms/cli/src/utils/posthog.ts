@@ -29,6 +29,11 @@ export async function initializePostHog(
   configEndpoint?: string,
   disableGeoip?: boolean
 ): Promise<PostHog | null> {
+  // Skip the config fetch + client construction entirely when contributors
+  // are iterating on the CLI locally. Saves the network round-trip on every
+  // dev invocation.
+  if (process.env.TINA_DEV === 'true') return null;
+
   let apiKey: string | undefined;
   let endpoint: string | undefined;
 
@@ -57,8 +62,6 @@ export function postHogCapture(
   event: string,
   properties: Record<string, any>
 ): void {
-  if (process.env.TINA_DEV === 'true') return;
-
   if (!client) {
     return;
   }
