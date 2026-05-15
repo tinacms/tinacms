@@ -38,7 +38,6 @@ import {
   generateSessionId,
   initializePostHog,
   postHogCapture,
-  postHogCaptureError,
 } from '../../../utils/posthog';
 
 export class BuildCommand extends BaseCommand {
@@ -171,22 +170,12 @@ export class BuildCommand extends BaseCommand {
       skipSearchIndex: Boolean(this.skipSearchIndex),
     };
     this.buildStartedAt = Date.now();
-    try {
-      postHogCapture(
-        this.posthogClient,
-        this.buildRunId,
-        BuildInvokeEvent,
-        buildInvokeEventPayload
-      );
-    } catch (error) {
-      postHogCaptureError(this.posthogClient, BuildInvokeEvent, error, {
-        errorCode: 'ERR_POSTHOG_CAPTURE_ERROR',
-        errorCategory: 'technical',
-        step: 'posthog-capture',
-        fatal: true,
-        additionalProperties: {},
-      });
-    }
+    postHogCapture(
+      this.posthogClient,
+      this.buildRunId,
+      BuildInvokeEvent,
+      buildInvokeEventPayload
+    );
 
     if (localContentOnly && !this.localOption) {
       const config = configManager.config;
