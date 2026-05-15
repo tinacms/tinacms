@@ -2,7 +2,7 @@
 [![npm version](https://img.shields.io/npm/v/tinacms.svg?style=flat)](https://www.npmjs.com/package/tinacms)
 [![Build, Test, Lint for Main](https://github.com/tinacms/tinacms/actions/workflows/main.yml/badge.svg?branch=main&event=push)](https://github.com/tinacms/tinacms/actions/workflows/main.yml)
 
-# [![TINA CMS](./.github/assets/TinaCms-Logo-Small-Default.svg)](https://tina.io)
+# [![TINA CMS](./.github/assets/tinacms-logo-small-default.svg)](https://tina.io)
 
 [![Tina Demo](./.github/assets/homepage-demo-2.gif)](https://tina.io/)
 
