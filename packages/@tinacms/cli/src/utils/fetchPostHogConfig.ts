@@ -27,10 +27,7 @@ export default async function fetchPostHogConfig(
       POSTHOG_API_KEY: config.api_key,
       POSTHOG_ENDPOINT: config.host,
     };
-  } catch (error) {
-    console.warn(
-      `Failed to fetch PostHog config from endpoint: ${error instanceof Error ? error.message : 'Unknown error'}`
-    );
+  } catch {
     return {};
   }
 }

@@ -43,12 +43,7 @@ export async function initializePostHog(
     endpoint = config.POSTHOG_ENDPOINT;
   }
 
-  if (!apiKey) {
-    console.warn(
-      'PostHog API key not found. PostHog tracking will be disabled.'
-    );
-    return null;
-  }
+  if (!apiKey) return null;
 
   return new PostHog(apiKey, {
     host: endpoint,
