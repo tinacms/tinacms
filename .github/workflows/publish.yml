@@ -41,7 +41,7 @@ jobs:
           fetch-depth: 2
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: ".nvmrc"
           registry-url: "https://registry.npmjs.org"
@@ -49,7 +49,7 @@ jobs:
       - name: Upgrade npm for OIDC support
         run: npm install -g npm@latest
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         name: Install pnpm
         id: pnpm-install
         with:
@@ -229,7 +229,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: ".nvmrc"
           registry-url: "https://registry.npmjs.org"
@@ -237,7 +237,7 @@ jobs:
       - name: Upgrade npm for OIDC support
         run: npm install -g npm@latest
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         name: Install pnpm
         id: pnpm-install
         with:
@@ -324,6 +324,25 @@ jobs:
               "release_name": "${{ steps.newTinaCMSVersion.outputs.newTinaCMSVersion }}"
             }
           token: ${{ steps.generate-token.outputs.token }}
+
+      - name: Trigger starter template builds
+        if: steps.changesets.outputs.published == 'true'
+        uses: actions/github-script@v7
+        env:
+          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
+        with:
+          github-token: ${{ steps.generate-token.outputs.token }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'build-starter-templates.yml',
+              ref: 'main',
+              inputs: {
+                published_packages: process.env.PUBLISHED_PACKAGES || '[]'
+              }
+            });
+            console.log('Triggered starter template builds with published packages');
 
       - name: Generate token for tinacloud
         if: steps.changesets.outputs.published == 'true'
