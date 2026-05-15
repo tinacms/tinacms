@@ -97,7 +97,6 @@
         "progress": "catalog:",
         "prompts": "catalog:",
         "readable-stream": "catalog:",
-        "systeminformation": "^5.27.13",
         "tailwindcss": "^3.4.17",
         "tinacms": "workspace:*",
         "typanion": "catalog:",

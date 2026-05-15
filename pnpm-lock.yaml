@@ -1444,9 +1444,6 @@ importers:
       readable-stream:
         specifier: 'catalog:'
         version: 4.7.0
-      systeminformation:
-        specifier: ^5.27.13
-        version: 5.27.14
       tailwindcss:
         specifier: ^3.4.17
         version: 3.4.19(yaml@2.8.2)
