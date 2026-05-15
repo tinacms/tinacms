@@ -95,10 +95,12 @@ export class BuildCommand extends BaseCommand {
   private buildRunId = generateSessionId();
 
   async catch(error: any): Promise<void> {
+    const errorCode =
+      (error as { errorCode?: string })?.errorCode ?? 'ERR_BUILD_FAILED';
     postHogCapture(this.posthogClient, this.buildRunId, BuildFinishedEvent, {
       success: false,
       durationMs: Date.now() - this.buildStartedAt,
-      errorCode: 'ERR_BUILD_FAILED',
+      errorCode,
     });
     if (this.posthogClient) await this.posthogClient.shutdown();
     console.error(error);
@@ -142,16 +144,9 @@ export class BuildCommand extends BaseCommand {
     }
     const localContentOnly = this.contentOption === 'local';
 
-    try {
-      await configManager.processConfig();
-    } catch (e) {
-      logger.error(`\n${dangerText(e.message)}`);
-      logger.error(
-        dangerText('Unable to build, please fix your Tina config and try again')
-      );
-      process.exit(1);
-    }
-
+    // Init telemetry + fire invoke BEFORE any work that can fail. From here
+    // on, failures throw and catch() fires a finished{success:false} event
+    // with the thrown error's errorCode.
     this.posthogClient = this.noTelemetry
       ? null
       : await initializePostHog(
@@ -177,6 +172,18 @@ export class BuildCommand extends BaseCommand {
       buildInvokeEventPayload
     );
 
+    try {
+      await configManager.processConfig();
+    } catch (e) {
+      logger.error(`\n${dangerText(e.message)}`);
+      logger.error(
+        dangerText('Unable to build, please fix your Tina config and try again')
+      );
+      throw Object.assign(new Error(e.message), {
+        errorCode: 'ERR_CONFIG_LOAD_FAILED',
+      });
+    }
+
     if (localContentOnly && !this.localOption) {
       const config = configManager.config;
       const missing = [];
@@ -184,12 +191,11 @@ export class BuildCommand extends BaseCommand {
       if (!config.clientId) missing.push('clientId');
       if (!config.token) missing.push('token');
       if (missing.length > 0) {
-        logger.error(
-          `${dangerText(
-            `ERROR: --content=local requires ${missing.join(', ')} to be configured, since the generated client must point to TinaCloud.`
-          )}`
-        );
-        process.exit(1);
+        const message = `--content=local requires ${missing.join(', ')} to be configured, since the generated client must point to TinaCloud.`;
+        logger.error(`${dangerText(`ERROR: ${message}`)}`);
+        throw Object.assign(new Error(message), {
+          errorCode: 'ERR_MISSING_CLOUD_CREDS',
+        });
       }
     }
     let server: ViteDevServer | undefined;
@@ -244,7 +250,9 @@ export class BuildCommand extends BaseCommand {
         if (this.verbose) {
           console.error(e);
         }
-        process.exit(1);
+        throw Object.assign(new Error(e.message), {
+          errorCode: 'ERR_INDEXING_FAILED',
+        });
       }
     }
 
@@ -322,7 +330,9 @@ export class BuildCommand extends BaseCommand {
         if (this.verbose) {
           console.error(e);
         }
-        process.exit(1);
+        throw Object.assign(new Error(e.message), {
+          errorCode: 'ERR_CLOUD_CHECK_FAILED',
+        });
       }
     }
 
@@ -412,7 +422,9 @@ export class BuildCommand extends BaseCommand {
       });
       if (err) {
         logger.error(`${dangerText(`ERROR: ${err.message}`)}`);
-        process.exit(1);
+        throw Object.assign(new Error(err.message), {
+          errorCode: 'ERR_SEARCH_INDEX_FAILED',
+        });
       }
     }
 
