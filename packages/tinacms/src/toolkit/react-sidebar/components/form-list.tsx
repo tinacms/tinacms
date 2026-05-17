@@ -199,7 +199,7 @@ const CollectionGroup = ({
       >
         {/* Global badge for global collections */}
         {isGlobalCollection && (
-          <span className='px-2 pb-0.5 text-xs bg-gray-100 text-blue-700 rounded-full'>
+          <span className='px-2 pb-0.5 text-xs bg-orange-50 text-orange-700 rounded-full'>
             global
           </span>
         )}
@@ -334,7 +334,7 @@ const TreeNodeComponent = ({
       >
         {/* Global badge for global collections */}
         {node.isGlobal && (
-          <span className='px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full flex-none'>
+          <span className='px-2 py-0.5 text-xs bg-orange-100 text-orange-700 rounded-full flex-none'>
             global
           </span>
         )}

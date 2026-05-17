@@ -238,12 +238,12 @@ export const Nav = ({
           <div className='grow my-4 border-b border-gray-200'></div>
 
           <SyncStatusButton
-            className='text-lg py-2 first:pt-3 last:pb-3 whitespace-nowrap flex items-center opacity-80 text-gray-600 hover:text-blue-400'
+            className='text-lg py-2 first:pt-3 last:pb-3 whitespace-nowrap flex items-center opacity-80 text-gray-600 hover:text-orange-500'
             cms={cms}
             setEventsOpen={setEventsOpen}
           />
           <Logout
-            className='text-lg py-2 first:pt-3 last:pb-3 whitespace-nowrap flex items-center opacity-80 text-gray-600 hover:text-blue-400'
+            className='text-lg py-2 first:pt-3 last:pb-3 whitespace-nowrap flex items-center opacity-80 text-gray-600 hover:text-orange-500'
             cms={cms}
           />
           <VersionInfo />
@@ -291,7 +291,7 @@ const CreateContentNavItem = ({ plugin }) => {
   return (
     <li key={plugin.name}>
       <button
-        className='text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100'
+        className='text-base tracking-wide text-gray-500 hover:text-orange-500 flex items-center opacity-90 hover:opacity-100'
         onClick={() => {
           setOpen(true);
         }}

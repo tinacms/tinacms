@@ -108,7 +108,7 @@ const FilenameInput = (props) => {
     >
       <input
         type='text'
-        className={`shadow-inner focus:shadow-outline focus:border-blue-500 focus:outline-none block text-base pr-3 truncate py-2 w-full border transition-all ease-out duration-150 focus:text-gray-900 rounded ${
+        className={`shadow-inner focus:shadow-outline focus:border-orange-500 focus:outline-none block text-base pr-3 truncate py-2 w-full border transition-all ease-out duration-150 focus:text-gray-900 rounded ${
           props.readonly || !filenameTouched
             ? 'bg-gray-50 text-gray-300  border-gray-150 pointer-events-none pl-8 group-hover:bg-white group-hover:text-gray-600  group-hover:border-gray-200'
             : 'bg-white text-gray-600  border-gray-200 pl-3'
@@ -124,7 +124,7 @@ const FilenameInput = (props) => {
         }`}
       />
       <FaUnlock
-        className={`text-blue-500 absolute top-1/2 left-2 -translate-y-1/2 pointer-events-none h-5 w-auto transition-opacity duration-150 ease-out ${
+        className={`text-orange-500 absolute top-1/2 left-2 -translate-y-1/2 pointer-events-none h-5 w-auto transition-opacity duration-150 ease-out ${
           !filenameTouched && !props.readonly
             ? 'opacity-0 group-hover:opacity-80 group-active:opacity-80'
             : 'opacity-0'

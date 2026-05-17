@@ -126,7 +126,7 @@ const TemplateMenu = ({
                         // to={`${template.name}/new`}
                         className={`w-full text-md px-4 py-2 tracking-wide flex items-center transition ease-out duration-100 ${
                           focus
-                            ? 'text-blue-600 opacity-100 bg-gray-50'
+                            ? 'text-orange-600 opacity-100 bg-gray-50'
                             : 'opacity-80 text-gray-600'
                         }`}
                       >
@@ -664,7 +664,7 @@ const CollectionListPage = () => {
                                     <a
                                       href='https://tina.io/docs/r/content-search'
                                       target='_blank'
-                                      className='underline hover:text-blue-700 transition-all duration-150'
+                                      className='underline hover:text-orange-700 transition-all duration-150'
                                     >
                                       Read the docs
                                     </a>
@@ -700,7 +700,7 @@ const CollectionListPage = () => {
                                           }}
                                           to='/collections/new-folder'
                                           className={cn(
-                                            'icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-gray-500 bg-white hover:bg-gray-50 border border-gray-100 focus:ring-white focus:ring-blue-500 w-full md:w-auto text-sm h-10 px-6 mr-4',
+                                            'icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-gray-500 bg-white hover:bg-gray-50 border border-gray-100 focus:ring-white focus:ring-orange-500 w-full md:w-auto text-sm h-10 px-6 mr-4',
                                             (collection.templates ||
                                               !allowCreateFolder) &&
                                               'opacity-50 pointer-events-none cursor-not-allowed'
@@ -737,7 +737,7 @@ const CollectionListPage = () => {
                                                   href='https://tina.io/docs/r/content-modelling-templates'
                                                   target='_blank'
                                                   rel='noopener noreferrer'
-                                                  className='underline text-blue-500'
+                                                  className='underline text-orange-500'
                                                 >
                                                   https://tina.io/docs/r/content-modelling-templates
                                                 </a>
@@ -890,7 +890,7 @@ const CollectionListPage = () => {
                                               >
                                                 <td className='pl-5 pr-3 py-3'>
                                                   <a
-                                                    className='text-blue-600 flex items-center gap-3 cursor-pointer truncate'
+                                                    className='text-orange-600 flex items-center gap-3 cursor-pointer truncate'
                                                     onClick={() => {
                                                       captureEvent(
                                                         CollectionListPageItemClickedEvent,
@@ -966,7 +966,7 @@ const CollectionListPage = () => {
                                                 colSpan={hasTitle ? 1 : 2}
                                               >
                                                 <a
-                                                  className='text-blue-600 flex items-center gap-3 cursor-pointer truncate'
+                                                  className='text-orange-600 flex items-center gap-3 cursor-pointer truncate'
                                                   onClick={() => {
                                                     captureEvent(
                                                       CollectionListPageItemClickedEvent,
@@ -1270,7 +1270,7 @@ const SearchInput = ({
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            className='shadow appearance-none bg-white block pl-10 pr-10 py-2 truncate w-full text-base border border-gray-200 focus:outline-none focus:shadow-outline focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded placeholder:text-gray-300 text-gray-600 focus:text-gray-900'
+            className='shadow appearance-none bg-white block pl-10 pr-10 py-2 truncate w-full text-base border border-gray-200 focus:outline-none focus:shadow-outline focus:ring-orange-500 focus:border-orange-500 sm:text-sm rounded placeholder:text-gray-300 text-gray-600 focus:text-gray-900'
             autoComplete='off'
           />
           {search && searchLoaded && (
@@ -1315,7 +1315,7 @@ const Breadcrumb = ({ folder, navigate, collectionName }) => {
             { replace: true }
           );
         }}
-        className='px-3 py-2 bg-white hover:bg-gray-50/50 transition ease-out duration-100 border-r border-gray-100 text-blue-500 hover:text-blue-600'
+        className='px-3 py-2 bg-white hover:bg-gray-50/50 transition ease-out duration-100 border-r border-gray-100 text-orange-500 hover:text-orange-600'
       >
         <BiArrowBack className='w-6 h-full opacity-70' />
       </button>
@@ -1326,7 +1326,7 @@ const Breadcrumb = ({ folder, navigate, collectionName }) => {
               replace: true,
             });
           }}
-          className='shrink-0 bg-transparent p-0 border-0 text-blue-400 hover:text-blue-500 transition-all ease-out duration-100 opacity-70 hover:opacity-100'
+          className='shrink-0 bg-transparent p-0 border-0 text-orange-400 hover:text-orange-500 transition-all ease-out duration-100 opacity-70 hover:opacity-100'
         >
           <RiHome2Line className='w-5 h-auto' />
         </button>
@@ -1336,7 +1336,7 @@ const Breadcrumb = ({ folder, navigate, collectionName }) => {
               <span className='text-gray-200 shrink-0'>/</span>
               {index < folderArray.length - 1 ? (
                 <button
-                  className='bg-transparent whitespace-nowrap truncate p-0 border-0 text-blue-500 hover:text-blue-600 transition-all ease-out duration-100 underline underline-offset-2 decoration-1	decoration-blue-200 hover:decoration-blue-400'
+                  className='bg-transparent whitespace-nowrap truncate p-0 border-0 text-orange-500 hover:text-orange-600 transition-all ease-out duration-100 underline underline-offset-2 decoration-1 decoration-orange-200 hover:decoration-orange-400'
                   onClick={() => {
                     const folders = folder.fullyQualifiedName.split('/');
                     navigate(

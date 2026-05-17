@@ -83,14 +83,16 @@ const SidebarLink = (props: {
   return (
     <NavLink
       className={({ isActive }) => {
-        return `text-base tracking-wide ${
-          isActive ? 'text-blue-600' : 'text-gray-500'
-        } hover:text-blue-600 flex items-center opacity-90 hover:opacity-100`;
+        return `text-base tracking-wide rounded-md px-2 py-1 -mx-2 ${
+          isActive
+            ? 'text-orange-600 font-semibold bg-orange-50'
+            : 'text-gray-500 hover:bg-gray-50'
+        } hover:text-orange-500 flex items-center transition-colors duration-150 ease-out`;
       }}
       onClick={props.onClick ? props.onClick : () => {}}
       to={to}
     >
-      <Icon className='mr-2 h-6 opacity-80 w-auto' /> {label}
+      <Icon className='mr-2 h-6 opacity-80 w-auto flex-shrink-0' /> {label}
     </NavLink>
   );
 };

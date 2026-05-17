@@ -60,7 +60,7 @@ export const BillingWarning = () => {
         </span>
       </span>
       <a
-        className='text-xs text-blue-600 underline decoration-blue-200 hover:text-blue-500 hover:decoration-blue-500 transition-all ease-out duration-150 flex items-center gap-1 self-end'
+        className='text-xs text-orange-600 underline decoration-orange-200 hover:text-orange-500 hover:decoration-orange-500 transition-all ease-out duration-150 flex items-center gap-1 self-end'
         href={`https://app.tina.io/projects/${billingState.clientId}/billing`}
         target='_blank'
       >
