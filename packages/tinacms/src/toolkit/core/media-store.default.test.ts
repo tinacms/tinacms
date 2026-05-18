@@ -345,6 +345,49 @@ describe('TinaMediaStore — protected-branch interception', () => {
     );
   });
 
+  it('does not fail the completed upload when pull request creation reports an error', async () => {
+    const createPullRequest = vi
+      .fn()
+      .mockRejectedValue(
+        new Error('There was an error creating a pull request')
+      );
+
+    const { store, fetchWithToken, events } = buildStore({
+      branch: 'main',
+      usingProtectedBranch: true,
+      createPullRequest,
+    });
+    const onWorkflowError = vi.fn();
+    events.subscribe('media:workflow:error', onWorkflowError);
+
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, {
+        signedUrl: 'https://s3.example/x',
+        requestId: 'r1',
+      })
+    );
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+    );
+    stubS3PutOk();
+
+    const persistPromise = store.persist([
+      {
+        directory: 'uploads',
+        file: new File(['x'], 'a.png', { type: 'image/png' }),
+      },
+    ]);
+    await vi.advanceTimersByTimeAsync(1100);
+
+    await expect(persistPromise).resolves.toEqual([]);
+    expect(createPullRequest).toHaveBeenCalled();
+    expect(onWorkflowError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: 'There was an error creating a pull request',
+      })
+    );
+  });
+
   it('falls back to a stable branch slug when the media path has no branch-safe characters', async () => {
     let mediaBranch = '';
     const createBranch = vi.fn(async ({ branchName }) => {

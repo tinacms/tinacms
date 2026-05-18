@@ -403,7 +403,7 @@ mutation addPendingDocumentMutation(
       });
 
       if (!res.ok) {
-        let errorMessage = `There was an error creating a new branch. ${res.statusText}`;
+        let errorMessage = `There was an error creating a pull request. ${res.statusText}`;
         if (res.status === 422) {
           errorMessage = `Please make sure you have made changes on ${branch} before creating a pull request.`;
         }
@@ -413,7 +413,7 @@ mutation addPendingDocumentMutation(
       const values = await res.json();
       return values;
     } catch (error) {
-      console.error('There was an error creating a new branch.', error);
+      console.error('There was an error creating a pull request.', error);
       throw error;
     }
   }

@@ -95,6 +95,10 @@ export const MediaWorkflowOverlay = () => {
         setPendingBranch(null);
       }
     );
+    const offFinish = cms.events.subscribe('media:workflow:finish', () => {
+      setState({ phase: 'idle' });
+      setPendingBranch(null);
+    });
 
     return () => {
       offConfirm();
@@ -102,6 +106,7 @@ export const MediaWorkflowOverlay = () => {
       offStep();
       offComplete();
       offError();
+      offFinish();
     };
   }, [cms, setCurrentBranch]);
 

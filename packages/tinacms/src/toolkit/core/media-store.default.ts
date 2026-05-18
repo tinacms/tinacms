@@ -336,16 +336,25 @@ export class TinaMediaStore implements MediaStore {
 
     tinaCms.events.dispatch({ type: 'media:workflow:step', step: 3 });
 
-    const result = await this.api.createPullRequest({
-      baseBranch: branchContext.baseBranch,
-      branch: branchContext.branchName,
-      title: branchContext.prTitle,
-    });
+    try {
+      const result = await this.api.createPullRequest({
+        baseBranch: branchContext.baseBranch,
+        branch: branchContext.branchName,
+        title: branchContext.prTitle,
+      });
 
-    tinaCms.alerts.success(
-      `Branch created successfully - Pull Request at ${result?.url || ''}`,
-      0
-    );
+      tinaCms.alerts.success(
+        `Branch created successfully - Pull Request at ${result?.url || ''}`,
+        0
+      );
+      tinaCms.events.dispatch({ type: 'media:workflow:finish' });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      tinaCms.events.dispatch({
+        type: 'media:workflow:error',
+        message,
+      });
+    }
   }
 
   private async prepareProtectedMediaBranch(
