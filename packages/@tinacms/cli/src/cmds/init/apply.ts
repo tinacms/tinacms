@@ -96,6 +96,12 @@ async function apply({
     if (!env.gitIgnoreEnvExists) {
       itemsToAdd.push('.env');
     }
+    if (!env.gitIgnoreTinaGeneratedExists) {
+      // Tina writes generated artifacts (including the build cache used to
+      // bundle tina/database.ts and tina/config.ts) under tina/__generated__/.
+      // None of it should be committed.
+      itemsToAdd.push('tina/__generated__');
+    }
     if (itemsToAdd.length > 0) {
       await updateGitIgnore({ baseDir, items: itemsToAdd });
     }
@@ -272,7 +278,10 @@ const createPackageJSON = async () => {
 };
 const createGitignore = async ({ baseDir }: { baseDir: string }) => {
   logger.info(logText('No .gitignore found, creating one'));
-  fs.outputFileSync(path.join(baseDir, '.gitignore'), 'node_modules');
+  fs.outputFileSync(
+    path.join(baseDir, '.gitignore'),
+    'node_modules\ntina/__generated__\n'
+  );
 };
 
 const updateGitIgnore = async ({

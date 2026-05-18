@@ -169,6 +169,15 @@ const detectEnvironment = async ({
     (await checkGitignoreForItem({ baseDir, line: '.env.tina' }));
   const hasGitIgnoreEnv =
     hasGitIgnore && (await checkGitignoreForItem({ baseDir, line: '.env' }));
+  // Tina writes generated artifacts (including the build cache used by the CLI
+  // to bundle tina/database.ts and tina/config.ts) under tina/__generated__/.
+  // Anything under that path is build output and should not be committed.
+  const hasGitIgnoreTinaGenerated =
+    hasGitIgnore &&
+    (await checkGitignoreForItem({
+      baseDir,
+      line: 'tina/__generated__',
+    }));
   let frontMatterFormat: ContentFrontmatterFormat;
   if (hasForestryConfig) {
     const hugoConfigPath = path.join(rootPath, 'config.toml');
@@ -194,6 +203,7 @@ const detectEnvironment = async ({
     gitIgnoreNodeModulesExists: hasGitIgnoreNodeModules,
     gitIgnoreEnvExists: hasGitIgnoreEnv,
     gitIgnoreTinaEnvExists: hasEnvTina,
+    gitIgnoreTinaGeneratedExists: hasGitIgnoreTinaGenerated,
     packageJSONExists: hasPackageJSON,
     sampleContentExists: hasSampleContent,
     sampleContentPath,

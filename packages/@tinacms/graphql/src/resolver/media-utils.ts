@@ -26,18 +26,19 @@ export const resolveMediaCloudToRelative = (
     }
 
     if (hasTinaMediaConfig(schema) === true) {
-      const assetsURL = `https://${config.assetsHost}/${config.clientId}`;
       const cleanMediaRoot = cleanUpSlashes(schema.config.media.tina.mediaRoot);
+      const cloudUrl = cloudUrlPattern(config.clientId);
 
-      if (typeof value === 'string' && value.includes(assetsURL)) {
+      if (typeof value === 'string' && cloudUrl.test(value)) {
         return `${cleanMediaRoot}${stripStagingPrefix(
-          value.replace(assetsURL, '')
+          value.replace(cloudUrl, '')
         )}`;
       }
       if (Array.isArray(value)) {
         return value.map((v) => {
           if (!v || typeof v !== 'string') return v;
-          const strippedURL = v.replace(assetsURL, '');
+          if (!cloudUrl.test(v)) return v;
+          const strippedURL = v.replace(cloudUrl, '');
           return `${cleanMediaRoot}${stripStagingPrefix(strippedURL)}`;
         });
       }
@@ -73,13 +74,23 @@ export const resolveMediaRelativeToCloud = (
       const cleanMediaRoot = cleanUpSlashes(schema.config.media.tina.mediaRoot);
       const prefix = stagingPrefix(config);
       if (typeof value === 'string') {
+        // Absolute URLs (any scheme, or protocol-relative `//`) are not
+        // media-library paths — they live outside the configured media
+        // root and must not be wrapped with the cloud assets prefix.
+        if (ABSOLUTE_URL.test(value)) return value;
         const strippedValue = value.replace(cleanMediaRoot, '');
+        // Self-heal: if stripping the media root reveals an absolute URL
+        // underneath (e.g. `/uploadshttps://…` from a previously corrupted
+        // round-trip), return that URL directly rather than re-wrapping it.
+        if (ABSOLUTE_URL.test(strippedValue)) return strippedValue;
         return `https://${config.assetsHost}/${config.clientId}${prefix}${strippedValue}`;
       }
       if (Array.isArray(value)) {
         return value.map((v) => {
           if (!v || typeof v !== 'string') return v;
+          if (ABSOLUTE_URL.test(v)) return v;
           const strippedValue = v.replace(cleanMediaRoot, '');
+          if (ABSOLUTE_URL.test(strippedValue)) return strippedValue;
           return `https://${config.assetsHost}/${config.clientId}${prefix}${strippedValue}`;
         });
       }
@@ -115,6 +126,23 @@ const stripStagingPrefix = (path: string): string => {
   const match = path.match(STAGING_SEGMENT);
   return match ? match[1] : path;
 };
+
+// Matches values that aren't media-library paths and must not be rewritten as
+// branch-staged cloud URLs:
+//   - Any URL with a scheme — `https://`, `http://`, `data:`, `blob:`,
+//     `file:`, `mailto:`, etc. Scheme grammar per RFC 3986:
+//     ALPHA *( ALPHA / DIGIT / "+" / "-" / "." ).
+//   - Protocol-relative URLs starting with `//`.
+const ABSOLUTE_URL = /^[a-z][a-z0-9+.\-]*:|^\/\//i;
+
+const escapeRegExp = (s: string): string =>
+  s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+// Matches a TinaCloud cloud URL for the given client. The host segment varies
+// across stages (e.g. `assets.tina.io`, `assets-{stage}.tinajs.dev`); the
+// `<clientId>/…` path prefix is the durable invariant.
+const cloudUrlPattern = (clientId: string): RegExp =>
+  new RegExp(`^https://[^/]+/${escapeRegExp(clientId)}`);
 
 const cleanUpSlashes = (path: string): string => {
   if (path) {
