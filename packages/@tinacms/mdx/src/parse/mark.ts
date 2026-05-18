@@ -14,15 +14,34 @@ export const getHighlightColorFromAttributes = (
       attribute.type === 'mdxJsxAttribute' && attribute.name === 'style'
   );
 
-  if (!styleAttribute || typeof styleAttribute.value !== 'string') {
+  if (!styleAttribute) {
     return undefined;
   }
 
-  const backgroundColorMatch = /background-color:\s*([^;]+)/i.exec(
-    styleAttribute.value
-  );
+  if (typeof styleAttribute.value === 'string') {
+    const backgroundColorMatch = /background-color:\s*([^;]+)/i.exec(
+      styleAttribute.value
+    );
+    return backgroundColorMatch?.[1]?.trim();
+  }
 
-  return backgroundColorMatch?.[1]?.trim();
+  if (
+    styleAttribute.value &&
+    typeof styleAttribute.value === 'object' &&
+    styleAttribute.value.type === 'mdxJsxAttributeValueExpression'
+  ) {
+    const expression = styleAttribute.value.value;
+    const camelMatch = /backgroundColor\s*:\s*['"]([^'"]+)['"]/.exec(expression);
+    if (camelMatch?.[1]) {
+      return camelMatch[1].trim();
+    }
+    const kebabMatch = /['"]background-color['"]\s*:\s*['"]([^'"]+)['"]/.exec(
+      expression
+    );
+    return kebabMatch?.[1]?.trim();
+  }
+
+  return undefined;
 };
 
 export const parseMarkMdxText = <
