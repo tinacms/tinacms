@@ -150,10 +150,7 @@ const markAttributes = (content: Plate.TextElement) => {
     {
       type: 'mdxJsxAttribute' as const,
       name: 'style',
-      value: {
-        type: 'mdxJsxAttributeValueExpression' as const,
-        value: `{ backgroundColor: "${content.highlightColor}" }`,
-      },
+      value: `background-color: ${content.highlightColor}`,
     },
   ];
 };
