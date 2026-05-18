@@ -35,6 +35,17 @@ type MediaWorkflowBranchChoice =
   | { action: 'create-branch' }
   | { action: 'save-to-protected-branch' };
 
+const MEDIA_OPERATION_CANCELLED = 'MEDIA_OPERATION_CANCELLED';
+
+class MediaOperationCancelledError extends Error {
+  code = MEDIA_OPERATION_CANCELLED;
+
+  constructor() {
+    super('Media operation cancelled.');
+    this.name = 'MediaOperationCancelledError';
+  }
+}
+
 const s3ErrorRegex = /<Error>.*<Code>(.+)<\/Code>.*<Message>(.+)<\/Message>.*/;
 
 export class DummyMediaStore implements MediaStore {
@@ -217,7 +228,7 @@ export class TinaMediaStore implements MediaStore {
           settle({ action: 'create-branch' });
         },
         onCancel: () => {
-          reject(new Error('Media operation cancelled.'));
+          reject(new MediaOperationCancelledError());
         },
         onSaveToProtectedBranch: () =>
           settle({ action: 'save-to-protected-branch' }),

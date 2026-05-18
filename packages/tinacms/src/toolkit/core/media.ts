@@ -14,6 +14,16 @@ const encodeUrlIfNeeded = (url: string) => {
   }
 };
 
+const isMediaOperationCancelled = (error: unknown) => {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    ('code' in error || 'name' in error) &&
+    ((error as { code?: string }).code === 'MEDIA_OPERATION_CANCELLED' ||
+      (error as { name?: string }).name === 'MediaOperationCancelledError')
+  );
+};
+
 /**
  * Represents an individual file in the MediaStore
  */
@@ -200,6 +210,10 @@ export class MediaManager implements MediaStore {
       });
       return media;
     } catch (error) {
+      if (isMediaOperationCancelled(error)) {
+        throw error;
+      }
+
       console.error(error);
       this.events.dispatch({
         type: 'media:upload:failure',
@@ -219,6 +233,10 @@ export class MediaManager implements MediaStore {
         media,
       });
     } catch (error) {
+      if (isMediaOperationCancelled(error)) {
+        throw error;
+      }
+
       this.events.dispatch({
         type: 'media:delete:failure',
         media,
