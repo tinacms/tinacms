@@ -31,7 +31,9 @@ export const getHighlightColorFromAttributes = (
     styleAttribute.value.type === 'mdxJsxAttributeValueExpression'
   ) {
     const expression = styleAttribute.value.value;
-    const camelMatch = /backgroundColor\s*:\s*['"]([^'"]+)['"]/.exec(expression);
+    const camelMatch = /backgroundColor\s*:\s*['"]([^'"]+)['"]/.exec(
+      expression
+    );
     if (camelMatch?.[1]) {
       return camelMatch[1].trim();
     }
