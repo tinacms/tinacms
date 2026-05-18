@@ -182,19 +182,18 @@ export class TinaMediaStore implements MediaStore {
         return;
       }
 
-      let timer: ReturnType<typeof setTimeout> | undefined;
       const unsubscribe =
         this.cms.events.subscribe<MediaWorkflowBranchSwitchedEvent>(
           'media:workflow:branch-switched',
           (event) => {
             if (event.branchName !== branchName) return;
-            if (timer) clearTimeout(timer);
+            clearTimeout(timer);
             unsubscribe();
             resolve();
           }
         );
 
-      timer = setTimeout(() => {
+      const timer = setTimeout(() => {
         unsubscribe();
         reject(
           new Error(
