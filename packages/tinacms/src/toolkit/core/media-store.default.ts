@@ -148,6 +148,21 @@ export class TinaMediaStore implements MediaStore {
     return (hash >>> 0).toString(36);
   }
 
+  private trimEdges(value: string, char: string): string {
+    let start = 0;
+    let end = value.length;
+
+    while (start < end && value[start] === char) {
+      start++;
+    }
+
+    while (end > start && value[end - 1] === char) {
+      end--;
+    }
+
+    return value.slice(start, end);
+  }
+
   /**
    * Derives a branch slug from the media path so different assets in the same
    * directory don't all contend for one branch name. Falls back to a stable
@@ -157,10 +172,10 @@ export class TinaMediaStore implements MediaStore {
     directory: string | undefined,
     filename: string | undefined
   ): string {
-    const trimmedDirectory = (directory ?? '').replace(/^\/+|\/+$/g, '');
+    const trimmedDirectory = this.trimEdges(directory ?? '', '/');
     const rawPath = [trimmedDirectory, filename].filter(Boolean).join('/');
     const flattened = rawPath.replace(/\//g, '-');
-    const slug = formatBranchName(flattened).replace(/^-+|-+$/g, '');
+    const slug = this.trimEdges(formatBranchName(flattened), '-');
     return slug || `asset-${this.shortStableHash(rawPath || 'root')}`;
   }
 
