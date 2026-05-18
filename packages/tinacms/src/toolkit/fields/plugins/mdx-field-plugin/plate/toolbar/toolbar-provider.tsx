@@ -12,6 +12,7 @@ interface ToolbarContextProps {
   tinaForm: Form;
   templates: MdxTemplate[];
   overrides: ToolbarOverrideType[] | ToolbarOverrides;
+  field?: any;
 }
 
 interface ToolbarProviderProps extends ToolbarContextProps {
@@ -26,10 +27,11 @@ export const ToolbarProvider: React.FC<ToolbarProviderProps> = ({
   tinaForm,
   templates,
   overrides,
+  field,
   children,
 }) => {
   return (
-    <ToolbarContext.Provider value={{ tinaForm, templates, overrides }}>
+    <ToolbarContext.Provider value={{ tinaForm, templates, overrides, field }}>
       {children}
     </ToolbarContext.Provider>
   );
