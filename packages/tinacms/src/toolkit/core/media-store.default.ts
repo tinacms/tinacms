@@ -21,6 +21,20 @@ interface MediaWorkflowBranchSwitchedEvent {
   branchName: string;
 }
 
+interface MediaWorkflowConfirmBranchEvent {
+  type: 'media:workflow:confirm-branch';
+  opType: 'upload' | 'delete';
+  branchName: string;
+  baseBranch: string;
+  onConfirm: (branchName: string) => Promise<void>;
+  onCancel: () => void;
+  onSaveToProtectedBranch: () => void;
+}
+
+type MediaWorkflowBranchChoice =
+  | { action: 'create-branch' }
+  | { action: 'save-to-protected-branch' };
+
 const s3ErrorRegex = /<Error>.*<Code>(.+)<\/Code>.*<Message>(.+)<\/Message>.*/;
 
 export class DummyMediaStore implements MediaStore {
@@ -174,9 +188,91 @@ export class TinaMediaStore implements MediaStore {
   ): string {
     const trimmedDirectory = this.trimEdges(directory ?? '', '/');
     const rawPath = [trimmedDirectory, filename].filter(Boolean).join('/');
-    const flattened = rawPath.replace(/\//g, '-');
+    const flattened = rawPath.replaceAll('/', '-');
     const slug = this.trimEdges(formatBranchName(flattened), '-');
     return slug || `asset-${this.shortStableHash(rawPath || 'root')}`;
+  }
+
+  private requestWorkflowBranchChoice(
+    opType: 'upload' | 'delete',
+    branchName: string,
+    baseBranch: string
+  ): Promise<MediaWorkflowBranchChoice> {
+    return new Promise((resolve, reject) => {
+      const settle = (choice: MediaWorkflowBranchChoice) => {
+        resolve(choice);
+      };
+
+      this.cms.events.dispatch<MediaWorkflowConfirmBranchEvent>({
+        type: 'media:workflow:confirm-branch',
+        opType,
+        branchName,
+        baseBranch,
+        onConfirm: async (selectedBranchName) => {
+          await this.executeMediaWorkflow(
+            opType,
+            selectedBranchName,
+            baseBranch
+          );
+          settle({ action: 'create-branch' });
+        },
+        onCancel: () => {
+          reject(new Error('Media operation cancelled.'));
+        },
+        onSaveToProtectedBranch: () =>
+          settle({ action: 'save-to-protected-branch' }),
+      });
+    });
+  }
+
+  private async executeMediaWorkflow(
+    opType: 'upload' | 'delete',
+    branchName: string,
+    baseBranch: string
+  ): Promise<void> {
+    const tinaCms = this.cms as TinaCMS;
+    const branchSlug = branchName.startsWith('tina/')
+      ? branchName.slice('tina/'.length)
+      : branchName;
+    const prTitle = `${branchSlug.replace('-', ' ')} (PR from TinaCMS)`;
+
+    tinaCms.events.dispatch({
+      type: 'media:workflow:start',
+      opType,
+      branchName,
+      baseBranch,
+    });
+
+    const result = await runEditorialWorkflow(tinaCms, {
+      branchName,
+      baseBranch,
+      prTitle,
+      onStep: (step) =>
+        tinaCms.events.dispatch({ type: 'media:workflow:step', step }),
+    });
+
+    if (result.warning) {
+      tinaCms.alerts.warn(
+        `${result.warning} Please reconnect GitHub authoring here: ${this.api.gitSettingsLink}`,
+        0
+      );
+    }
+    tinaCms.alerts.success(
+      `Branch created successfully - Pull Request at ${result.pullRequestUrl}`,
+      0
+    );
+
+    const branchSwitched = this.awaitBranchSwitched(
+      result.branchName,
+      MEDIA_OP_TIMEOUT_MS
+    );
+
+    tinaCms.events.dispatch({
+      type: 'media:workflow:complete',
+      branchName: result.branchName,
+    });
+
+    await branchSwitched;
   }
 
   /**
@@ -234,58 +330,16 @@ export class TinaMediaStore implements MediaStore {
   ): Promise<void> {
     if (!this.api.usingProtectedBranch()) return;
 
-    const tinaCms = this.cms as TinaCMS;
     const baseBranch = decodeURIComponent(this.api.branch || '');
     const mediaSlug = this.branchSlugForMediaPath(directory, filename);
-    const branchName = `tina/media-${opType}-${mediaSlug}`;
-    const prTitle = `Media ${opType} (${mediaSlug}) (PR from TinaCMS)`;
-
-    tinaCms.events.dispatch({
-      type: 'media:workflow:start',
+    const branchName = `media-${opType}-${mediaSlug}`;
+    const branchChoice = await this.requestWorkflowBranchChoice(
       opType,
       branchName,
-      baseBranch,
-    });
+      baseBranch
+    );
 
-    try {
-      const result = await runEditorialWorkflow(tinaCms, {
-        branchName,
-        baseBranch,
-        prTitle,
-        onStep: (step) =>
-          tinaCms.events.dispatch({ type: 'media:workflow:step', step }),
-      });
-
-      if (result.warning) {
-        tinaCms.alerts.warn(
-          `${result.warning} Please reconnect GitHub authoring here: ${this.api.gitSettingsLink}`,
-          0
-        );
-      }
-      tinaCms.alerts.success(
-        `Branch created successfully - Pull Request at ${result.pullRequestUrl}`,
-        0
-      );
-
-      const branchSwitched = this.awaitBranchSwitched(
-        result.branchName,
-        MEDIA_OP_TIMEOUT_MS
-      );
-
-      tinaCms.events.dispatch({
-        type: 'media:workflow:complete',
-        branchName: result.branchName,
-      });
-
-      await branchSwitched;
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      tinaCms.events.dispatch({
-        type: 'media:workflow:error',
-        message,
-      });
-      throw err;
-    }
+    if (branchChoice.action === 'save-to-protected-branch') return;
   }
 
   private async persist_cloud(media: MediaUploadOptions[]): Promise<Media[]> {

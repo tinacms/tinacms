@@ -135,6 +135,43 @@ export const CreateBranchModal = ({
   }
 
   return (
+    <CreateBranchPromptModal
+      branchName={newBranchName}
+      close={close}
+      errorMessage={errorMessage}
+      disabled={newBranchName === '' || isBranchGuardChecking}
+      onBranchNameChange={(value) => {
+        // reset error state on change
+        reset();
+        setNewBranchName(value);
+      }}
+      onCreateBranch={executeEditorialWorkflow}
+      onSaveToProtectedBranch={() => {
+        close();
+        safeSubmit();
+      }}
+    />
+  );
+};
+
+export const CreateBranchPromptModal = ({
+  branchName,
+  close,
+  disabled,
+  errorMessage,
+  onBranchNameChange,
+  onCreateBranch,
+  onSaveToProtectedBranch,
+}: {
+  branchName: string;
+  close: () => void;
+  disabled?: boolean;
+  errorMessage?: string;
+  onBranchNameChange: (value: string) => void;
+  onCreateBranch: () => void;
+  onSaveToProtectedBranch: () => void;
+}) => {
+  return (
     <Modal className='flex'>
       <PopupModal className='w-auto'>
         <ModalHeader close={close}>
@@ -174,11 +211,9 @@ export const CreateBranchModal = ({
               name='new-branch-name'
               label={'Branch Name'}
               placeholder='e.g. {{PAGE-NAME}}-updates'
-              value={newBranchName}
+              value={branchName}
               onChange={(e) => {
-                // reset error state on change
-                reset();
-                setNewBranchName(e.target.value);
+                onBranchNameChange(e.target.value);
               }}
             />
           </div>
@@ -195,15 +230,12 @@ export const CreateBranchModal = ({
             variant='primary'
             align='start'
             className='w-full sm:w-auto'
-            disabled={newBranchName === '' || isBranchGuardChecking}
-            onMainAction={executeEditorialWorkflow}
+            disabled={disabled}
+            onMainAction={onCreateBranch}
             items={[
               {
                 label: 'Save to Protected Branch',
-                onClick: () => {
-                  close();
-                  safeSubmit();
-                },
+                onClick: onSaveToProtectedBranch,
                 icon: <TriangleAlert className='w-4 h-4' />,
               },
             ]}

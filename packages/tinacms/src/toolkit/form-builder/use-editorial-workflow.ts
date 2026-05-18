@@ -68,6 +68,39 @@ export interface UseEditorialWorkflowResult {
   reset: () => void;
 }
 
+export const getEditorialWorkflowErrorMessage = (e: unknown): string => {
+  let errMessage =
+    'Branch operation failed. Talking to GitHub was unsuccessful, please try again. If the problem persists please contact support at https://tina.io/support 🦙';
+
+  const err = e as EditorialWorkflowErrorDetails;
+
+  if (err.errorCode) {
+    switch (err.errorCode) {
+      case EDITORIAL_WORKFLOW_ERROR.BRANCH_EXISTS:
+        errMessage = 'A branch with this name already exists';
+        break;
+      case EDITORIAL_WORKFLOW_ERROR.BRANCH_HIERARCHY_CONFLICT:
+        errMessage =
+          err.message || 'Branch name conflicts with an existing branch';
+        break;
+      case EDITORIAL_WORKFLOW_ERROR.VALIDATION_FAILED:
+        errMessage = err.message || 'Invalid branch name';
+        break;
+      default:
+        errMessage = err.message || errMessage;
+        break;
+    }
+  } else if (err.message) {
+    if (err.message.toLowerCase().includes('already exists')) {
+      errMessage = 'A branch with this name already exists';
+    } else if (err.message.toLowerCase().includes('conflict')) {
+      errMessage = err.message;
+    }
+  }
+
+  return errMessage;
+};
+
 export function useEditorialWorkflow(): UseEditorialWorkflowResult {
   const cms = useCMS();
   const tinaApi = cms.api.tina;
@@ -180,34 +213,7 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
       return true;
     } catch (e: unknown) {
       console.error(e);
-      let errMessage =
-        'Branch operation failed. Talking to GitHub was unsuccessful, please try again. If the problem persists please contact support at https://tina.io/support 🦙';
-
-      const err = e as EditorialWorkflowErrorDetails;
-
-      if (err.errorCode) {
-        switch (err.errorCode) {
-          case EDITORIAL_WORKFLOW_ERROR.BRANCH_EXISTS:
-            errMessage = 'A branch with this name already exists';
-            break;
-          case EDITORIAL_WORKFLOW_ERROR.BRANCH_HIERARCHY_CONFLICT:
-            errMessage =
-              err.message || 'Branch name conflicts with an existing branch';
-            break;
-          case EDITORIAL_WORKFLOW_ERROR.VALIDATION_FAILED:
-            errMessage = err.message || 'Invalid branch name';
-            break;
-          default:
-            errMessage = err.message || errMessage;
-            break;
-        }
-      } else if (err.message) {
-        if (err.message.toLowerCase().includes('already exists')) {
-          errMessage = 'A branch with this name already exists';
-        } else if (err.message.toLowerCase().includes('conflict')) {
-          errMessage = err.message;
-        }
-      }
+      const errMessage = getEditorialWorkflowErrorMessage(e);
 
       setErrorMessage(errMessage);
       setIsExecuting(false);

@@ -30,12 +30,14 @@ const buildStore = ({
   authenticated = true,
   usingProtectedBranch = false,
   executeEditorialWorkflow,
+  autoConfirmMediaWorkflow = true,
 }: {
   branch?: string | undefined;
   isLocalMode?: boolean;
   authenticated?: boolean;
   usingProtectedBranch?: boolean;
   executeEditorialWorkflow?: ReturnType<typeof vi.fn>;
+  autoConfirmMediaWorkflow?: boolean;
 } = {}) => {
   const fetchWithToken: FetchWithTokenMock = vi.fn();
   const authProvider = {
@@ -63,6 +65,11 @@ const buildStore = ({
     gitSettingsLink: 'https://app.tina.io/settings',
   };
   const events = new EventBus();
+  if (autoConfirmMediaWorkflow) {
+    events.subscribe('media:workflow:confirm-branch', (event) => {
+      event.onConfirm(`tina/${event.branchName}`);
+    });
+  }
   const alerts = { warn: vi.fn(), success: vi.fn(), error: vi.fn() };
   const cms = { api: { tina: api }, events, alerts } as any;
   const store = new TinaMediaStore(cms);
@@ -379,6 +386,94 @@ describe('TinaMediaStore — protected-branch interception', () => {
     );
   });
 
+  it('uses the branch name confirmed by the workflow overlay', async () => {
+    const selectedBranch = 'tina/custom-media-change';
+    const executeEditorialWorkflow = vi.fn(async (opts) => {
+      opts.onStatusUpdate?.({ status: 'COMPLETE' });
+      api.branch = opts.branchName;
+      return {
+        branchName: opts.branchName,
+        pullRequestUrl: 'https://github.com/x/y/pull/10',
+      };
+    });
+
+    const { store, fetchWithToken, api, events } = buildStore({
+      branch: 'main',
+      usingProtectedBranch: true,
+      executeEditorialWorkflow,
+      autoConfirmMediaWorkflow: false,
+    });
+
+    events.subscribe('media:workflow:confirm-branch', (event) => {
+      expect(event.branchName).toBe('media-upload-uploads-a-png');
+      event.onConfirm(selectedBranch);
+    });
+
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, {
+        signedUrl: 'https://s3.example/x',
+        requestId: 'r1',
+      })
+    );
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+    );
+    stubS3PutOk();
+
+    const persistPromise = store.persist([
+      {
+        directory: 'uploads',
+        file: new File(['x'], 'a.png', { type: 'image/png' }),
+      },
+    ]);
+    await vi.advanceTimersByTimeAsync(1100);
+    await persistPromise;
+
+    expect(executeEditorialWorkflow.mock.calls[0][0].branchName).toBe(
+      selectedBranch
+    );
+    expect(fetchWithToken.mock.calls[0][0]).toContain(
+      `?branch=${encodeURIComponent(selectedBranch)}`
+    );
+  });
+
+  it('continues on the protected branch when the overlay chooses that action', async () => {
+    const executeEditorialWorkflow = vi.fn();
+    const { store, fetchWithToken, events } = buildStore({
+      branch: 'main',
+      usingProtectedBranch: true,
+      executeEditorialWorkflow,
+      autoConfirmMediaWorkflow: false,
+    });
+
+    events.subscribe('media:workflow:confirm-branch', (event) => {
+      event.onSaveToProtectedBranch();
+    });
+
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, {
+        signedUrl: 'https://s3.example/x',
+        requestId: 'r1',
+      })
+    );
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+    );
+    stubS3PutOk();
+
+    const persistPromise = store.persist([
+      {
+        directory: 'uploads',
+        file: new File(['x'], 'a.png', { type: 'image/png' }),
+      },
+    ]);
+    await vi.advanceTimersByTimeAsync(1100);
+    await persistPromise;
+
+    expect(executeEditorialWorkflow).not.toHaveBeenCalled();
+    expect(fetchWithToken.mock.calls[0][0]).toContain('?branch=main');
+  });
+
   it('does not create a workflow for an empty upload batch', async () => {
     const executeEditorialWorkflow = vi.fn();
     const { store, fetchWithToken, authProvider } = buildStore({
@@ -513,19 +608,26 @@ describe('TinaMediaStore — protected-branch interception', () => {
     );
   });
 
-  it('rejects the media op if the branch-switch ack never arrives', async () => {
-    // executeEditorialWorkflow resolves but does NOT update api.branch and no
-    // overlay dispatches the ack — the 30s ceiling should fire.
+  it('surfaces branch-switch failures to the workflow overlay', async () => {
     const workflowBranch = 'tina/media-upload-uploads-a-png';
     const executeEditorialWorkflow = vi.fn().mockResolvedValue({
       branchName: workflowBranch,
       pullRequestUrl: 'https://github.com/x/y/pull/11',
     });
 
-    const { store } = buildStore({
+    const { store, events } = buildStore({
       branch: 'main',
       usingProtectedBranch: true,
       executeEditorialWorkflow,
+      autoConfirmMediaWorkflow: false,
+    });
+
+    let workflowError: unknown;
+    events.subscribe('media:workflow:confirm-branch', (event) => {
+      event.onConfirm(`tina/${event.branchName}`).catch((e) => {
+        workflowError = e;
+        event.onCancel();
+      });
     });
 
     const persistPromise = store.persist([
@@ -534,13 +636,14 @@ describe('TinaMediaStore — protected-branch interception', () => {
         file: new File(['x'], 'a.png', { type: 'image/png' }),
       },
     ]);
-    // Surface the rejection so vitest doesn't flag an unhandled promise
-    // when the timer advance triggers the timeout reject.
     const result = persistPromise.catch((e) => e);
     await vi.advanceTimersByTimeAsync(30001);
 
-    await expect(result).resolves.toMatchObject({
+    expect(workflowError).toMatchObject({
       message: expect.stringContaining('Timed out waiting for branch context'),
+    });
+    await expect(result).resolves.toMatchObject({
+      message: expect.stringContaining('Media operation cancelled'),
     });
   });
 });

@@ -8,12 +8,33 @@ import {
   ModalHeader,
   PopupModal,
 } from '@toolkit/react-modals';
+import { CreateBranchPromptModal } from '@toolkit/form-builder/create-branch-modal';
 import { EditorialWorkflowProgressModal } from '@toolkit/form-builder/editorial-workflow-progress-modal';
+import { getEditorialWorkflowErrorMessage } from '@toolkit/form-builder/use-editorial-workflow';
 
 type WorkflowState =
   | { phase: 'idle' }
+  | {
+      phase: 'confirming';
+      branchName: string;
+      baseBranch: string;
+      errorMessage?: string;
+      isChecking?: boolean;
+      onConfirm: (branchName: string) => Promise<void>;
+      onCancel: () => void;
+      onSaveToProtectedBranch: () => void;
+    }
   | { phase: 'executing'; step: number; elapsed: number }
   | { phase: 'error'; message: string };
+
+interface MediaWorkflowConfirmBranchEvent {
+  type: 'media:workflow:confirm-branch';
+  branchName: string;
+  baseBranch: string;
+  onConfirm: (branchName: string) => Promise<void>;
+  onCancel: () => void;
+  onSaveToProtectedBranch: () => void;
+}
 
 /**
  * Mounted once near the admin shell so every `cms.media.*` caller (Media
@@ -32,6 +53,20 @@ export const MediaWorkflowOverlay = () => {
   const [pendingBranch, setPendingBranch] = React.useState<string | null>(null);
 
   React.useEffect(() => {
+    const offConfirm = cms.events.subscribe<MediaWorkflowConfirmBranchEvent>(
+      'media:workflow:confirm-branch',
+      (event) => {
+        setPendingBranch(null);
+        setState({
+          phase: 'confirming',
+          branchName: event.branchName,
+          baseBranch: event.baseBranch,
+          onConfirm: event.onConfirm,
+          onCancel: event.onCancel,
+          onSaveToProtectedBranch: event.onSaveToProtectedBranch,
+        });
+      }
+    );
     const offStart = cms.events.subscribe('media:workflow:start', () => {
       setState({ phase: 'executing', step: 1, elapsed: 0 });
       setPendingBranch(null);
@@ -62,6 +97,7 @@ export const MediaWorkflowOverlay = () => {
     );
 
     return () => {
+      offConfirm();
       offStart();
       offStep();
       offComplete();
@@ -102,10 +138,79 @@ export const MediaWorkflowOverlay = () => {
 
   if (state.phase === 'idle') return null;
 
+  if (state.phase === 'confirming') {
+    return (
+      <CreateBranchPromptModal
+        branchName={state.branchName}
+        close={() => {
+          state.onCancel();
+          setState({ phase: 'idle' });
+        }}
+        disabled={state.branchName === '' || state.isChecking}
+        errorMessage={state.errorMessage}
+        onBranchNameChange={(branchName) => {
+          setState((prev) =>
+            prev.phase === 'confirming'
+              ? { ...prev, branchName, errorMessage: undefined }
+              : prev
+          );
+        }}
+        onCreateBranch={async () => {
+          const confirmState = state;
+          const branchName = confirmState.branchName;
+          setState({ ...confirmState, isChecking: true, errorMessage: '' });
+
+          let baseBranchExists = true;
+          try {
+            console.debug(
+              '[tina:branch-guard] media workflow: checking base branch:',
+              confirmState.baseBranch
+            );
+            baseBranchExists = await cms.api.tina.branchExists(
+              confirmState.baseBranch
+            );
+          } catch (err) {
+            console.error(
+              '[tina:branch-guard] media workflow: branchExists threw, failing open:',
+              err
+            );
+          }
+
+          if (!baseBranchExists) {
+            setState({
+              ...confirmState,
+              branchName,
+              isChecking: false,
+              errorMessage: `The branch ${confirmState.baseBranch} no longer exists. It may have been merged or deleted. Your changes cannot be pushed to it.`,
+            });
+            return;
+          }
+
+          setState({ phase: 'executing', step: 1, elapsed: 0 });
+          try {
+            await confirmState.onConfirm(`tina/${branchName}`);
+          } catch (e) {
+            console.error(e);
+            setState({
+              ...confirmState,
+              branchName,
+              isChecking: false,
+              errorMessage: getEditorialWorkflowErrorMessage(e),
+            });
+          }
+        }}
+        onSaveToProtectedBranch={() => {
+          state.onSaveToProtectedBranch();
+          setState({ phase: 'idle' });
+        }}
+      />
+    );
+  }
+
   if (state.phase === 'executing') {
     return (
       <EditorialWorkflowProgressModal
-        title='Preparing branch for media change'
+        title='Save changes to new branch'
         currentStep={state.step}
         elapsedTime={state.elapsed}
       />
