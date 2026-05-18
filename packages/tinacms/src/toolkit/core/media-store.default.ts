@@ -2,7 +2,6 @@ import { DEFAULT_MEDIA_UPLOAD_TYPES } from '@toolkit/components/media/utils';
 import { formatBranchName } from '@toolkit/plugin-branch-switcher/format-branch-name';
 import type { TinaCMS } from '@toolkit/tina-cms';
 import type { Client } from '../../internalClient';
-import { runEditorialWorkflow } from '../form-builder/run-editorial-workflow';
 import { CMS } from './cms';
 import {
   E_BAD_ROUTE,
@@ -31,9 +30,15 @@ interface MediaWorkflowConfirmBranchEvent {
   onSaveToProtectedBranch: () => void;
 }
 
-type MediaWorkflowBranchChoice =
-  | { action: 'create-branch' }
+type MediaBranchChoice =
+  | { action: 'create-branch'; branchContext: MediaBranchContext }
   | { action: 'save-to-protected-branch' };
+
+interface MediaBranchContext {
+  branchName: string;
+  baseBranch: string;
+  prTitle: string;
+}
 
 const MEDIA_OPERATION_CANCELLED = 'MEDIA_OPERATION_CANCELLED';
 
@@ -204,13 +209,13 @@ export class TinaMediaStore implements MediaStore {
     return slug || `asset-${this.shortStableHash(rawPath || 'root')}`;
   }
 
-  private requestWorkflowBranchChoice(
+  private requestMediaBranchChoice(
     opType: 'upload' | 'delete',
     branchName: string,
     baseBranch: string
-  ): Promise<MediaWorkflowBranchChoice> {
+  ): Promise<MediaBranchChoice> {
     return new Promise((resolve, reject) => {
-      const settle = (choice: MediaWorkflowBranchChoice) => {
+      const settle = (choice: MediaBranchChoice) => {
         resolve(choice);
       };
 
@@ -220,12 +225,12 @@ export class TinaMediaStore implements MediaStore {
         branchName,
         baseBranch,
         onConfirm: async (selectedBranchName) => {
-          await this.executeMediaWorkflow(
+          const branchContext = await this.prepareMediaBranch(
             opType,
             selectedBranchName,
             baseBranch
           );
-          settle({ action: 'create-branch' });
+          settle({ action: 'create-branch', branchContext });
         },
         onCancel: () => {
           reject(new MediaOperationCancelledError());
@@ -236,59 +241,16 @@ export class TinaMediaStore implements MediaStore {
     });
   }
 
-  private async executeMediaWorkflow(
-    opType: 'upload' | 'delete',
-    branchName: string,
-    baseBranch: string
-  ): Promise<void> {
-    const tinaCms = this.cms as TinaCMS;
+  private prTitleForBranch(branchName: string): string {
     const branchSlug = branchName.startsWith('tina/')
       ? branchName.slice('tina/'.length)
       : branchName;
-    const prTitle = `${branchSlug.replace('-', ' ')} (PR from TinaCMS)`;
-
-    tinaCms.events.dispatch({
-      type: 'media:workflow:start',
-      opType,
-      branchName,
-      baseBranch,
-    });
-
-    const result = await runEditorialWorkflow(tinaCms, {
-      branchName,
-      baseBranch,
-      prTitle,
-      onStep: (step) =>
-        tinaCms.events.dispatch({ type: 'media:workflow:step', step }),
-    });
-
-    if (result.warning) {
-      tinaCms.alerts.warn(
-        `${result.warning} Please reconnect GitHub authoring here: ${this.api.gitSettingsLink}`,
-        0
-      );
-    }
-    tinaCms.alerts.success(
-      `Branch created successfully - Pull Request at ${result.pullRequestUrl}`,
-      0
-    );
-
-    const branchSwitched = this.awaitBranchSwitched(
-      result.branchName,
-      MEDIA_OP_TIMEOUT_MS
-    );
-
-    tinaCms.events.dispatch({
-      type: 'media:workflow:complete',
-      branchName: result.branchName,
-    });
-
-    await branchSwitched;
+    return `${branchSlug.replace('-', ' ')} (PR from TinaCMS)`;
   }
 
   /**
    * Waits for the admin shell to confirm the editor's React branch context
-   * has caught up with `Client.branch` after an editorial-workflow switch.
+   * has caught up with `Client.branch` after a media branch switch.
    * The overlay (`media-workflow-overlay.tsx`) emits the matching event once
    * both states agree. Bounded by the same ceiling used for upload/delete
    * polling so a missing overlay can't deadlock the media op.
@@ -326,31 +288,85 @@ export class TinaMediaStore implements MediaStore {
     });
   }
 
-  /**
-   * If the editor is on a protected branch with editorial workflow enabled,
-   * create a feature branch + PR (matching the content-save flow) and wait
-   * for the admin shell to switch the editor onto it before returning. The
-   * caller then re-reads `this.api.branch` for the actual media op.
-   *
-   * No-op when not on a protected branch — media ops fall through.
-   */
-  private async interceptOnProtectedBranch(
+  private async prepareMediaBranch(
+    opType: 'upload' | 'delete',
+    branchName: string,
+    baseBranch: string
+  ): Promise<MediaBranchContext> {
+    const tinaCms = this.cms as TinaCMS;
+
+    tinaCms.events.dispatch({
+      type: 'media:workflow:start',
+      opType,
+      branchName,
+      baseBranch,
+    });
+
+    const createdBranchName = await this.api.createBranch({
+      branchName,
+      baseBranch,
+    });
+    const branchContext = {
+      branchName: createdBranchName || branchName,
+      baseBranch,
+      prTitle: this.prTitleForBranch(createdBranchName || branchName),
+    };
+
+    tinaCms.events.dispatch({ type: 'media:workflow:step', step: 2 });
+
+    const branchSwitched = this.awaitBranchSwitched(
+      branchContext.branchName,
+      MEDIA_OP_TIMEOUT_MS
+    );
+
+    tinaCms.events.dispatch({
+      type: 'media:workflow:complete',
+      branchName: branchContext.branchName,
+    });
+
+    await branchSwitched;
+
+    return branchContext;
+  }
+
+  private async createMediaPullRequest(
+    branchContext: MediaBranchContext
+  ): Promise<void> {
+    const tinaCms = this.cms as TinaCMS;
+
+    tinaCms.events.dispatch({ type: 'media:workflow:step', step: 3 });
+
+    const result = await this.api.createPullRequest({
+      baseBranch: branchContext.baseBranch,
+      branch: branchContext.branchName,
+      title: branchContext.prTitle,
+    });
+
+    tinaCms.alerts.success(
+      `Branch created successfully - Pull Request at ${result?.url || ''}`,
+      0
+    );
+  }
+
+  private async prepareProtectedMediaBranch(
     opType: 'upload' | 'delete',
     directory: string | undefined,
     filename: string | undefined
-  ): Promise<void> {
+  ): Promise<MediaBranchContext | undefined> {
     if (!this.api.usingProtectedBranch()) return;
 
     const baseBranch = decodeURIComponent(this.api.branch || '');
     const mediaSlug = this.branchSlugForMediaPath(directory, filename);
     const branchName = `media-${opType}-${mediaSlug}`;
-    const branchChoice = await this.requestWorkflowBranchChoice(
+    const branchChoice = await this.requestMediaBranchChoice(
       opType,
       branchName,
       baseBranch
     );
 
-    if (branchChoice.action === 'save-to-protected-branch') return;
+    return branchChoice.action === 'create-branch'
+      ? branchChoice.branchContext
+      : undefined;
   }
 
   private async persist_cloud(media: MediaUploadOptions[]): Promise<Media[]> {
@@ -363,7 +379,7 @@ export class TinaMediaStore implements MediaStore {
     }
 
     const firstItem = media[0];
-    await this.interceptOnProtectedBranch(
+    const branchContext = await this.prepareProtectedMediaBranch(
       'upload',
       firstItem.directory,
       firstItem.file.name
@@ -439,7 +455,11 @@ export class TinaMediaStore implements MediaStore {
       }
     }
 
-    return this.fetchUploadedEntries(media);
+    const uploadedEntries = await this.fetchUploadedEntries(media);
+    if (branchContext) {
+      await this.createMediaPullRequest(branchContext);
+    }
+    return uploadedEntries;
   }
 
   /**
@@ -715,7 +735,7 @@ export class TinaMediaStore implements MediaStore {
     }`;
     if (!this.isLocal) {
       if (await this.isAuthenticated()) {
-        await this.interceptOnProtectedBranch(
+        const branchContext = await this.prepareProtectedMediaBranch(
           'delete',
           media.directory,
           media.filename
@@ -750,6 +770,9 @@ export class TinaMediaStore implements MediaStore {
             if (Date.now() - deleteStartTime > 30000) {
               throw new Error('Time out waiting for delete to complete');
             }
+          }
+          if (branchContext) {
+            await this.createMediaPullRequest(branchContext);
           }
         } else {
           throw new Error('Unexpected error deleting media asset');
