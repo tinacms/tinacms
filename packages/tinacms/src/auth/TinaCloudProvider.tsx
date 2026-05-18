@@ -5,6 +5,7 @@ import {
   BranchSwitcherPlugin,
   DummyMediaStore,
   MediaStore,
+  MediaWorkflowOverlay,
   StaticMedia,
   TinaCMS,
   TinaMediaStore,
@@ -535,6 +536,7 @@ export const TinaCloudProvider = (
         }}
       >
         <TinaProvider cms={cms}>
+          <MediaWorkflowOverlay />
           <AuthWallInner {...props} cms={cms} />
         </TinaProvider>
       </BranchDataProvider>

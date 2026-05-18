@@ -1,5 +1,6 @@
 import type { Media, MediaUploadOptions } from './media';
 import { TinaMediaStore } from './media-store.default';
+import { EventBus } from './event';
 
 type FetchWithTokenMock = ReturnType<typeof vi.fn>;
 
@@ -10,21 +11,38 @@ const makeJsonResponse = (status: number, body: unknown) =>
     json: vi.fn().mockResolvedValue(body),
   }) as any;
 
+// Stubs the global `fetch` to a successful S3 PUT response so the upload
+// loop in `persist_cloud` moves past the signed-URL upload step.
+const stubS3PutOk = () =>
+  vi.stubGlobal(
+    'fetch',
+    vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      text: vi.fn().mockResolvedValue(''),
+      json: vi.fn().mockResolvedValue({}),
+    })
+  );
+
 const buildStore = ({
   branch = 'main',
   isLocalMode = false,
   authenticated = true,
+  usingProtectedBranch = false,
+  executeEditorialWorkflow,
 }: {
   branch?: string | undefined;
   isLocalMode?: boolean;
   authenticated?: boolean;
+  usingProtectedBranch?: boolean;
+  executeEditorialWorkflow?: ReturnType<typeof vi.fn>;
 } = {}) => {
   const fetchWithToken: FetchWithTokenMock = vi.fn();
   const authProvider = {
     fetchWithToken,
     isAuthenticated: vi.fn().mockResolvedValue(authenticated),
   };
-  const api = {
+  const api: any = {
     branch,
     clientId: 'test-client',
     contentApiUrl:
@@ -35,10 +53,20 @@ const buildStore = ({
     options: {},
     getRequestStatus: vi.fn().mockResolvedValue({ error: false }),
     schema: { schema: { config: { media: { tina: {} } } } },
+    usingProtectedBranch: vi.fn().mockReturnValue(usingProtectedBranch),
+    executeEditorialWorkflow:
+      executeEditorialWorkflow ??
+      vi.fn().mockResolvedValue({
+        branchName: 'tina/media-upload-uploads',
+        pullRequestUrl: 'https://github.com/x/y/pull/1',
+      }),
+    gitSettingsLink: 'https://app.tina.io/settings',
   };
-  const cms = { api: { tina: api } } as any;
+  const events = new EventBus();
+  const alerts = { warn: vi.fn(), success: vi.fn(), error: vi.fn() };
+  const cms = { api: { tina: api }, events, alerts } as any;
   const store = new TinaMediaStore(cms);
-  return { store, fetchWithToken, api };
+  return { store, fetchWithToken, authProvider, api, cms, events, alerts };
 };
 
 describe('TinaMediaStore — branch query param', () => {
@@ -229,6 +257,290 @@ describe('TinaMediaStore — branch query param', () => {
       const result = await store.persist(uploads);
       expect(result).toEqual([]);
       expect(fetchWithToken).not.toHaveBeenCalled();
+    });
+  });
+});
+
+describe('TinaMediaStore — protected-branch interception', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+  });
+
+  it('runs the editorial workflow before issuing the upload_url request', async () => {
+    const workflowBranch = 'tina/media-upload-uploads-blog-llama-png';
+    const executeEditorialWorkflow = vi.fn(async ({ onStatusUpdate }) => {
+      onStatusUpdate?.({ status: 'COMPLETE' });
+      return {
+        branchName: workflowBranch,
+        pullRequestUrl: 'https://github.com/x/y/pull/9',
+      };
+    });
+
+    const { store, fetchWithToken, api } = buildStore({
+      branch: 'main',
+      usingProtectedBranch: true,
+      executeEditorialWorkflow,
+    });
+
+    // Simulate the admin shell catching up before the ack-wait: by the time
+    // `awaitBranchSwitched` reads `api.branch`, it already matches.
+    executeEditorialWorkflow.mockImplementation(async ({ onStatusUpdate }) => {
+      onStatusUpdate?.({ status: 'COMPLETE' });
+      api.branch = workflowBranch;
+      return {
+        branchName: workflowBranch,
+        pullRequestUrl: 'https://github.com/x/y/pull/9',
+      };
+    });
+
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, {
+        signedUrl: 'https://s3.example/x',
+        requestId: 'r1',
+      })
+    );
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+    );
+    stubS3PutOk();
+
+    const persistPromise = store.persist([
+      {
+        directory: 'uploads/blog',
+        file: new File(['x'], 'llama.png', { type: 'image/png' }),
+      },
+    ]);
+    await vi.advanceTimersByTimeAsync(1100);
+    await persistPromise;
+
+    expect(executeEditorialWorkflow).toHaveBeenCalledTimes(1);
+    const [opts] = executeEditorialWorkflow.mock.calls[0];
+    expect(opts.branchName).toBe(workflowBranch);
+    expect(opts.baseBranch).toBe('main');
+    expect(opts.graphQLContentOp).toBeUndefined();
+
+    // The upload_url fetch must come AFTER the workflow call.
+    const workflowOrder = executeEditorialWorkflow.mock.invocationCallOrder[0];
+    const uploadOrder = fetchWithToken.mock.invocationCallOrder[0];
+    expect(uploadOrder).toBeGreaterThan(workflowOrder);
+
+    // And it should target the new branch.
+    expect(fetchWithToken.mock.calls[0][0]).toContain(
+      `?branch=${encodeURIComponent(workflowBranch)}`
+    );
+  });
+
+  it('falls back to a stable branch slug when the media path has no branch-safe characters', async () => {
+    let workflowBranch = '';
+    const executeEditorialWorkflow = vi.fn(async (opts) => {
+      workflowBranch = opts.branchName;
+      opts.onStatusUpdate?.({ status: 'COMPLETE' });
+      api.branch = workflowBranch;
+      return {
+        branchName: workflowBranch,
+        pullRequestUrl: 'https://github.com/x/y/pull/10',
+      };
+    });
+
+    const { store, fetchWithToken, api } = buildStore({
+      branch: 'main',
+      usingProtectedBranch: true,
+      executeEditorialWorkflow,
+    });
+
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, {
+        signedUrl: 'https://s3.example/x',
+        requestId: 'r1',
+      })
+    );
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+    );
+    stubS3PutOk();
+
+    const persistPromise = store.persist([
+      {
+        directory: '',
+        file: new File(['x'], '!!!', { type: 'image/png' }),
+      },
+    ]);
+    await vi.advanceTimersByTimeAsync(1100);
+    await persistPromise;
+
+    expect(workflowBranch).toMatch(/^tina\/media-upload-asset-[a-z0-9]+$/);
+    expect(fetchWithToken.mock.calls[0][0]).toContain(
+      `?branch=${encodeURIComponent(workflowBranch)}`
+    );
+  });
+
+  it('does not create a workflow for an empty upload batch', async () => {
+    const executeEditorialWorkflow = vi.fn();
+    const { store, fetchWithToken, authProvider } = buildStore({
+      branch: 'main',
+      usingProtectedBranch: true,
+      executeEditorialWorkflow,
+    });
+
+    await expect(store.persist([])).resolves.toEqual([]);
+
+    expect(authProvider.isAuthenticated).not.toHaveBeenCalled();
+    expect(executeEditorialWorkflow).not.toHaveBeenCalled();
+    expect(fetchWithToken).not.toHaveBeenCalled();
+  });
+
+  it('skips the workflow when not on a protected branch (regression)', async () => {
+    const executeEditorialWorkflow = vi.fn();
+    const { store, fetchWithToken } = buildStore({
+      branch: 'main',
+      usingProtectedBranch: false,
+      executeEditorialWorkflow,
+    });
+
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, {
+        signedUrl: 'https://s3.example/x',
+        requestId: 'r1',
+      })
+    );
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+    );
+    stubS3PutOk();
+
+    const persistPromise = store.persist([
+      {
+        directory: 'uploads',
+        file: new File(['x'], 'a.png', { type: 'image/png' }),
+      },
+    ]);
+    await vi.advanceTimersByTimeAsync(1100);
+    await persistPromise;
+
+    expect(executeEditorialWorkflow).not.toHaveBeenCalled();
+  });
+
+  it('intercepts delete on a protected branch', async () => {
+    const workflowBranch = 'tina/media-delete-images-a-png';
+    const executeEditorialWorkflow = vi.fn(async () => {
+      return {
+        branchName: workflowBranch,
+        pullRequestUrl: 'https://github.com/x/y/pull/3',
+      };
+    });
+
+    const { store, fetchWithToken, api } = buildStore({
+      branch: 'main',
+      usingProtectedBranch: true,
+      executeEditorialWorkflow,
+    });
+    executeEditorialWorkflow.mockImplementation(async () => {
+      api.branch = workflowBranch;
+      return {
+        branchName: workflowBranch,
+        pullRequestUrl: 'https://github.com/x/y/pull/3',
+      };
+    });
+
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { requestId: 'r-del' })
+    );
+
+    const deletePromise = store.delete({
+      directory: 'images',
+      filename: 'a.png',
+    } as Media);
+    await vi.advanceTimersByTimeAsync(1100);
+    await deletePromise;
+
+    expect(executeEditorialWorkflow).toHaveBeenCalledTimes(1);
+    expect(executeEditorialWorkflow.mock.calls[0][0].branchName).toBe(
+      workflowBranch
+    );
+    expect(fetchWithToken.mock.calls[0][0]).toContain(
+      `?branch=${encodeURIComponent(workflowBranch)}`
+    );
+  });
+
+  it('does not miss a branch-switch ack emitted during the complete event', async () => {
+    const workflowBranch = 'tina/media-upload-uploads-a-png';
+    const executeEditorialWorkflow = vi.fn().mockResolvedValue({
+      branchName: workflowBranch,
+      pullRequestUrl: 'https://github.com/x/y/pull/12',
+    });
+
+    const { store, fetchWithToken, api, events } = buildStore({
+      branch: 'main',
+      usingProtectedBranch: true,
+      executeEditorialWorkflow,
+    });
+
+    events.subscribe('media:workflow:complete', () => {
+      api.branch = workflowBranch;
+      events.dispatch({
+        type: 'media:workflow:branch-switched',
+        branchName: workflowBranch,
+      });
+    });
+
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, {
+        signedUrl: 'https://s3.example/x',
+        requestId: 'r1',
+      })
+    );
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+    );
+    stubS3PutOk();
+
+    const persistPromise = store.persist([
+      {
+        directory: 'uploads',
+        file: new File(['x'], 'a.png', { type: 'image/png' }),
+      },
+    ]);
+    await vi.advanceTimersByTimeAsync(1100);
+    await persistPromise;
+
+    expect(fetchWithToken.mock.calls[0][0]).toContain(
+      `?branch=${encodeURIComponent(workflowBranch)}`
+    );
+  });
+
+  it('rejects the media op if the branch-switch ack never arrives', async () => {
+    // executeEditorialWorkflow resolves but does NOT update api.branch and no
+    // overlay dispatches the ack — the 30s ceiling should fire.
+    const workflowBranch = 'tina/media-upload-uploads-a-png';
+    const executeEditorialWorkflow = vi.fn().mockResolvedValue({
+      branchName: workflowBranch,
+      pullRequestUrl: 'https://github.com/x/y/pull/11',
+    });
+
+    const { store } = buildStore({
+      branch: 'main',
+      usingProtectedBranch: true,
+      executeEditorialWorkflow,
+    });
+
+    const persistPromise = store.persist([
+      {
+        directory: 'uploads',
+        file: new File(['x'], 'a.png', { type: 'image/png' }),
+      },
+    ]);
+    // Surface the rejection so vitest doesn't flag an unhandled promise
+    // when the timer advance triggers the timeout reject.
+    const result = persistPromise.catch((e) => e);
+    await vi.advanceTimersByTimeAsync(30001);
+
+    await expect(result).resolves.toMatchObject({
+      message: expect.stringContaining('Timed out waiting for branch context'),
     });
   });
 });

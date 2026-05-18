@@ -12,8 +12,8 @@ import {
 } from '../react-modals';
 import { FieldLabel } from '@toolkit/fields';
 import { Form } from '@toolkit/forms';
+import { EditorialWorkflowProgressModal } from './editorial-workflow-progress-modal';
 import { useEditorialWorkflow } from './use-editorial-workflow';
-import { WorkflowProgressIndicator } from './workflow-progress-indicator';
 
 // Format the default branch name by removing content/ prefix and file extension
 const formatDefaultBranchName = (
@@ -124,103 +124,94 @@ export const CreateBranchModal = ({
     }
   };
 
-  const renderStateContent = () => {
-    if (isExecuting) {
-      return (
-        <WorkflowProgressIndicator
-          currentStep={currentStep}
-          isExecuting={isExecuting}
-          elapsedTime={elapsedTime}
-        />
-      );
-    } else {
-      return (
-        <div className='max-w-sm'>
-          {errorMessage && (
-            <div className='flex items-center gap-1 text-red-700 py-2 px-3 mb-4 bg-red-50 border border-red-200 rounded'>
-              <BiError className='w-5 h-auto text-red-400 flex-shrink-0' />
-              <span className='text-sm'>
-                <b>Error:</b> {errorMessage}
-              </span>
-            </div>
-          )}
-          <p className='text-lg text-gray-700 font-bold mb-2'>
-            First, let's create a copy
-          </p>
-          <p className='text-sm text-gray-700 mb-4 max-w-sm'>
-            To make changes, you need to create a copy then get it approved and
-            merged for it to go live.
-            <br />
-            <br />
-            <span className='text-gray-500'>Learn more about </span>
-            <a
-              className='underline text-tina-orange-dark font-medium'
-              href='https://tina.io/docs/r/editorial-workflow'
-              target='_blank'
-            >
-              Editorial Workflow
-            </a>
-            .
-          </p>
-          <PrefixedTextField
-            name='new-branch-name'
-            label={'Branch Name'}
-            placeholder='e.g. {{PAGE-NAME}}-updates'
-            value={newBranchName}
-            onChange={(e) => {
-              // reset error state on change
-              reset();
-              setNewBranchName(e.target.value);
-            }}
-          />
-        </div>
-      );
-    }
-  };
+  if (isExecuting) {
+    return (
+      <EditorialWorkflowProgressModal
+        title='Save changes to new branch'
+        currentStep={currentStep}
+        elapsedTime={elapsedTime}
+      />
+    );
+  }
 
   return (
     <Modal className='flex'>
       <PopupModal className='w-auto'>
-        <ModalHeader close={isExecuting ? undefined : close}>
+        <ModalHeader close={close}>
           <div className='flex items-center justify-between w-full'>
             <div className='flex items-center'>Save changes to new branch</div>
           </div>
         </ModalHeader>
-        <ModalBody padded={true}>{renderStateContent()}</ModalBody>
-        {!isExecuting && (
-          <ModalActions align='end'>
-            <Button
-              variant='secondary'
-              className='w-full sm:w-auto'
-              onClick={close}
-            >
-              Cancel
-            </Button>
-            <DropdownButton
-              variant='primary'
-              align='start'
-              className='w-full sm:w-auto'
-              disabled={newBranchName === '' || isBranchGuardChecking}
-              onMainAction={executeEditorialWorkflow}
-              items={[
-                {
-                  label: 'Save to Protected Branch',
-                  onClick: () => {
-                    close();
-                    safeSubmit();
-                  },
-                  icon: <TriangleAlert className='w-4 h-4' />,
+        <ModalBody padded={true}>
+          <div className='max-w-sm'>
+            {errorMessage && (
+              <div className='flex items-center gap-1 text-red-700 py-2 px-3 mb-4 bg-red-50 border border-red-200 rounded'>
+                <BiError className='w-5 h-auto text-red-400 flex-shrink-0' />
+                <span className='text-sm'>
+                  <b>Error:</b> {errorMessage}
+                </span>
+              </div>
+            )}
+            <p className='text-lg text-gray-700 font-bold mb-2'>
+              First, let's create a copy
+            </p>
+            <p className='text-sm text-gray-700 mb-4 max-w-sm'>
+              To make changes, you need to create a copy then get it approved
+              and merged for it to go live.
+              <br />
+              <br />
+              <span className='text-gray-500'>Learn more about </span>
+              <a
+                className='underline text-tina-orange-dark font-medium'
+                href='https://tina.io/docs/r/editorial-workflow'
+                target='_blank'
+              >
+                Editorial Workflow
+              </a>
+              .
+            </p>
+            <PrefixedTextField
+              name='new-branch-name'
+              label={'Branch Name'}
+              placeholder='e.g. {{PAGE-NAME}}-updates'
+              value={newBranchName}
+              onChange={(e) => {
+                // reset error state on change
+                reset();
+                setNewBranchName(e.target.value);
+              }}
+            />
+          </div>
+        </ModalBody>
+        <ModalActions align='end'>
+          <Button
+            variant='secondary'
+            className='w-full sm:w-auto'
+            onClick={close}
+          >
+            Cancel
+          </Button>
+          <DropdownButton
+            variant='primary'
+            align='start'
+            className='w-full sm:w-auto'
+            disabled={newBranchName === '' || isBranchGuardChecking}
+            onMainAction={executeEditorialWorkflow}
+            items={[
+              {
+                label: 'Save to Protected Branch',
+                onClick: () => {
+                  close();
+                  safeSubmit();
                 },
-              ]}
-            >
-              <GitBranchIcon
-                className='w-4 h-4 mr-1'
-                style={{ fill: 'none' }}
-              />
-              Save to a new branch
-            </DropdownButton>
-          </ModalActions>
-        )}
+                icon: <TriangleAlert className='w-4 h-4' />,
+              },
+            ]}
+          >
+            <GitBranchIcon className='w-4 h-4 mr-1' style={{ fill: 'none' }} />
+            Save to a new branch
+          </DropdownButton>
+        </ModalActions>
       </PopupModal>
     </Modal>
   );

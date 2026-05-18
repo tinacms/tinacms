@@ -2,7 +2,6 @@ import * as React from 'react';
 import { useBranchData } from '@toolkit/plugin-branch-switcher';
 import { useCMS } from '../react-core';
 import {
-  EDITORIAL_WORKFLOW_STATUS,
   EDITORIAL_WORKFLOW_ERROR,
   EditorialWorkflowErrorDetails,
 } from './editorial-workflow-constants';
@@ -12,6 +11,13 @@ import {
   UPDATE_DOCUMENT_GQL,
 } from '../../admin/api';
 import { Form } from '@toolkit/forms';
+import { runEditorialWorkflow } from './run-editorial-workflow';
+
+export {
+  runEditorialWorkflow,
+  type EditorialWorkflowResult,
+  type RunEditorialWorkflowOptions,
+} from './run-editorial-workflow';
 
 const pathRelativeToCollection = (
   collectionPath: string,
@@ -133,7 +139,7 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
       );
       const relativePath = pathRelativeToCollection(collection.path, path);
 
-      const result = await tinaApi.executeEditorialWorkflow({
+      const result = await runEditorialWorkflow(cms, {
         branchName,
         baseBranch,
         prTitle: `${branchName.replace('tina/', '').replace('-', ' ')} (PR from TinaCMS)`,
@@ -145,29 +151,8 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
             params,
           },
         },
-        onStatusUpdate: (status) => {
-          switch (status.status) {
-            case EDITORIAL_WORKFLOW_STATUS.SETTING_UP:
-            case EDITORIAL_WORKFLOW_STATUS.CREATING_BRANCH:
-              setCurrentStep(1);
-              break;
-            case EDITORIAL_WORKFLOW_STATUS.INDEXING:
-              setCurrentStep(2);
-              break;
-            case EDITORIAL_WORKFLOW_STATUS.CONTENT_GENERATION:
-            case EDITORIAL_WORKFLOW_STATUS.CREATING_PR:
-              setCurrentStep(3);
-              break;
-            case EDITORIAL_WORKFLOW_STATUS.COMPLETE:
-              setCurrentStep(4);
-              break;
-          }
-        },
+        onStep: setCurrentStep,
       });
-
-      if (!result.branchName) {
-        throw new Error('Branch creation failed.');
-      }
 
       setCurrentBranch(result.branchName);
 

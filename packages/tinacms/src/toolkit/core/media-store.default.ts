@@ -1,5 +1,8 @@
 import { DEFAULT_MEDIA_UPLOAD_TYPES } from '@toolkit/components/media/utils';
+import { formatBranchName } from '@toolkit/plugin-branch-switcher/format-branch-name';
+import type { TinaCMS } from '@toolkit/tina-cms';
 import type { Client } from '../../internalClient';
+import { runEditorialWorkflow } from '../form-builder/run-editorial-workflow';
 import { CMS } from './cms';
 import {
   E_BAD_ROUTE,
@@ -10,6 +13,13 @@ import {
   MediaStore,
   MediaUploadOptions,
 } from './media';
+
+const MEDIA_OP_TIMEOUT_MS = 30000;
+
+interface MediaWorkflowBranchSwitchedEvent {
+  type: 'media:workflow:branch-switched';
+  branchName: string;
+}
 
 const s3ErrorRegex = /<Error>.*<Code>(.+)<\/Code>.*<Message>(.+)<\/Message>.*/;
 
@@ -129,10 +139,156 @@ export class TinaMediaStore implements MediaStore {
     return encodeURIComponent(decoded);
   }
 
+  private shortStableHash(input: string): string {
+    let hash = 2166136261;
+    for (let index = 0; index < input.length; index++) {
+      hash ^= input.charCodeAt(index);
+      hash = Math.imul(hash, 16777619);
+    }
+    return (hash >>> 0).toString(36);
+  }
+
+  /**
+   * Derives a branch slug from the media path so different assets in the same
+   * directory don't all contend for one branch name. Falls back to a stable
+   * hash when the path sanitizes down to an empty segment.
+   */
+  private branchSlugForMediaPath(
+    directory: string | undefined,
+    filename: string | undefined
+  ): string {
+    const trimmedDirectory = (directory ?? '').replace(/^\/+|\/+$/g, '');
+    const rawPath = [trimmedDirectory, filename].filter(Boolean).join('/');
+    const flattened = rawPath.replace(/\//g, '-');
+    const slug = formatBranchName(flattened).replace(/^-+|-+$/g, '');
+    return slug || `asset-${this.shortStableHash(rawPath || 'root')}`;
+  }
+
+  /**
+   * Waits for the admin shell to confirm the editor's React branch context
+   * has caught up with `Client.branch` after an editorial-workflow switch.
+   * The overlay (`media-workflow-overlay.tsx`) emits the matching event once
+   * both states agree. Bounded by the same ceiling used for upload/delete
+   * polling so a missing overlay can't deadlock the media op.
+   */
+  private awaitBranchSwitched(
+    branchName: string,
+    timeoutMs: number
+  ): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const decoded = decodeURIComponent(this.api.branch || '');
+      if (decoded === branchName) {
+        resolve();
+        return;
+      }
+
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      const unsubscribe =
+        this.cms.events.subscribe<MediaWorkflowBranchSwitchedEvent>(
+          'media:workflow:branch-switched',
+          (event) => {
+            if (event.branchName !== branchName) return;
+            if (timer) clearTimeout(timer);
+            unsubscribe();
+            resolve();
+          }
+        );
+
+      timer = setTimeout(() => {
+        unsubscribe();
+        reject(
+          new Error(
+            `Timed out waiting for branch context to switch to ${branchName}`
+          )
+        );
+      }, timeoutMs);
+    });
+  }
+
+  /**
+   * If the editor is on a protected branch with editorial workflow enabled,
+   * create a feature branch + PR (matching the content-save flow) and wait
+   * for the admin shell to switch the editor onto it before returning. The
+   * caller then re-reads `this.api.branch` for the actual media op.
+   *
+   * No-op when not on a protected branch — media ops fall through.
+   */
+  private async interceptOnProtectedBranch(
+    opType: 'upload' | 'delete',
+    directory: string | undefined,
+    filename: string | undefined
+  ): Promise<void> {
+    if (!this.api.usingProtectedBranch()) return;
+
+    const tinaCms = this.cms as TinaCMS;
+    const baseBranch = decodeURIComponent(this.api.branch || '');
+    const mediaSlug = this.branchSlugForMediaPath(directory, filename);
+    const branchName = `tina/media-${opType}-${mediaSlug}`;
+    const prTitle = `Media ${opType} (${mediaSlug}) (PR from TinaCMS)`;
+
+    tinaCms.events.dispatch({
+      type: 'media:workflow:start',
+      opType,
+      branchName,
+      baseBranch,
+    });
+
+    try {
+      const result = await runEditorialWorkflow(tinaCms, {
+        branchName,
+        baseBranch,
+        prTitle,
+        onStep: (step) =>
+          tinaCms.events.dispatch({ type: 'media:workflow:step', step }),
+      });
+
+      if (result.warning) {
+        tinaCms.alerts.warn(
+          `${result.warning} Please reconnect GitHub authoring here: ${this.api.gitSettingsLink}`,
+          0
+        );
+      }
+      tinaCms.alerts.success(
+        `Branch created successfully - Pull Request at ${result.pullRequestUrl}`,
+        0
+      );
+
+      const branchSwitched = this.awaitBranchSwitched(
+        result.branchName,
+        MEDIA_OP_TIMEOUT_MS
+      );
+
+      tinaCms.events.dispatch({
+        type: 'media:workflow:complete',
+        branchName: result.branchName,
+      });
+
+      await branchSwitched;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      tinaCms.events.dispatch({
+        type: 'media:workflow:error',
+        message,
+      });
+      throw err;
+    }
+  }
+
   private async persist_cloud(media: MediaUploadOptions[]): Promise<Media[]> {
+    if (media.length === 0) {
+      return [];
+    }
+
     if (!(await this.isAuthenticated())) {
       return [];
     }
+
+    const firstItem = media[0];
+    await this.interceptOnProtectedBranch(
+      'upload',
+      firstItem.directory,
+      firstItem.file.name
+    );
 
     const encodedBranch = this.encodedBranchParam();
     const branchQuery = encodedBranch ? `?branch=${encodedBranch}` : '';
@@ -480,6 +636,11 @@ export class TinaMediaStore implements MediaStore {
     }`;
     if (!this.isLocal) {
       if (await this.isAuthenticated()) {
+        await this.interceptOnProtectedBranch(
+          'delete',
+          media.directory,
+          media.filename
+        );
         const encodedBranch = this.encodedBranchParam();
         const branchQuery = encodedBranch ? `?branch=${encodedBranch}` : '';
         const res = await this.api.authProvider.fetchWithToken(
