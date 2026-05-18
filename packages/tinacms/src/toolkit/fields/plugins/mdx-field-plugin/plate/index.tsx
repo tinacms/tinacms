@@ -77,7 +77,7 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
               overrides={
                 field?.toolbarOverride ? field.toolbarOverride : field.overrides
               }
-              field={field}
+              parserType={field.parser?.type}
             >
               <FixedToolbar>
                 <FixedToolbarButtons />
