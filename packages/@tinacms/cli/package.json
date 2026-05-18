@@ -41,7 +41,8 @@
         "@types/node": "^22.13.1",
         "@types/progress": "catalog:",
         "@types/prompts": "catalog:",
-        "jest": "catalog:"
+        "jest": "catalog:",
+        "ts-jest": "catalog:"
     },
     "scripts": {
         "build": "tinacms-scripts build",
@@ -91,6 +92,7 @@
         "memory-level": "catalog:",
         "minimatch": "catalog:",
         "normalize-path": "catalog:",
+        "posthog-node": "^5.17.2",
         "prettier": "catalog:",
         "progress": "catalog:",
         "prompts": "catalog:",

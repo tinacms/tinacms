@@ -214,7 +214,7 @@ catalog:
     remove: ^0.1.5
     search-index: 4.0.0
     sharp: ^0.33.5
-    sqlite-level: ^1.2.1
+    sqlite-level: ^2.0.0
     stopword: ^3.1.4
     stringify-entities: 4.0.3
     tailwindcss-animate: ^1.0.7
