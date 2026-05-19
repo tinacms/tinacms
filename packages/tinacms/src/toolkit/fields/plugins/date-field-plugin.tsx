@@ -44,7 +44,11 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
       return dateFormat;
     }, [dateFormat]);
 
-    const date = input.value ? new Date(input.value) : new Date();
+    const date = input.value
+      ? new Date(input.value)
+      : (rest as any).required === false
+        ? undefined
+        : new Date();
     return (
       <React.Fragment>
         <DateTimePicker
@@ -52,7 +56,13 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
           ref={inputRef}
           granularity={granularity}
           onChange={(value) =>
-            input.onChange(value ? value.toISOString() : value)
+            input.onChange(
+              value
+                ? value.toISOString()
+                : (rest as any).required !== false
+                  ? new Date().toISOString()
+                  : value
+            )
           }
           timeFormat={getTimeFormat()}
           hourCycle={12}
