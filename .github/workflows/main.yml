@@ -120,14 +120,12 @@ jobs:
           echo "TINA_BRANCH=main" >> $GITHUB_ENV
 
       - name: Run create-tina-app
-        run: npx create-tina-app@latest test-repo --pkg-manager ${{ matrix.package-manager }} --template ${{ matrix.template }} --noTelemetry
+        run: npx create-tina-app@latest "${{ runner.temp }}/test-repo" --pkg-manager ${{ matrix.package-manager }} --template ${{ matrix.template }} --noTelemetry
 
       - name: Install dependencies
-        run: |
-          cd test-repo
-          ${{ matrix.package-manager }} install
+        working-directory: ${{ runner.temp }}/test-repo
+        run: ${{ matrix.package-manager }} install
 
       - name: Build
-        run: |
-          cd test-repo
-          ${{ matrix.package-manager }} run build
+        working-directory: ${{ runner.temp }}/test-repo
+        run: ${{ matrix.package-manager }} run build
