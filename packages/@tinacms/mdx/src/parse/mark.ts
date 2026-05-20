@@ -31,15 +31,16 @@ export const getHighlightColorFromAttributes = (
     styleAttribute.value.type === 'mdxJsxAttributeValueExpression'
   ) {
     const expression = styleAttribute.value.value;
-    const camelMatch = /backgroundColor\s*:\s*['"]([^'"]+)['"]/.exec(
+    const camelMatch = /backgroundColor\s*:\s*['"]?([^'",}\s]+)['"]?/.exec(
       expression
     );
     if (camelMatch?.[1]) {
       return camelMatch[1].trim();
     }
-    const kebabMatch = /['"]background-color['"]\s*:\s*['"]([^'"]+)['"]/.exec(
-      expression
-    );
+    const kebabMatch =
+      /['"]?background-color['"]?\s*:\s*['"]?([^'",}\s]+)['"]?/.exec(
+        expression
+      );
     return kebabMatch?.[1]?.trim();
   }
 
