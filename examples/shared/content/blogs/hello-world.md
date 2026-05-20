@@ -13,6 +13,7 @@ updatedDate: 2024-03-05T00:00:00.000Z
 This is the first blog post on the TinaCMS Kitchen Sink example. Tina makes it easy to create and edit content directly from your site.
 
 ## What is TinaCMS?
+test
 
 TinaCMS is an open-source, Git-backed headless CMS that enables developers and content creators to collaborate seamlessly. With Tina, you get:
 
