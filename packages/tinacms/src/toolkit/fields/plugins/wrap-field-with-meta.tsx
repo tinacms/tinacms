@@ -116,7 +116,7 @@ export const FieldMeta = ({
       onMouseOver={() => setHoveredField({ id: tinaForm.id, fieldName: name })}
       onMouseOut={() => setHoveredField({ id: null, fieldName: null })}
       onClick={() => setFocusedField({ id: tinaForm.id, fieldName: name })}
-      style={{ zIndex: index !== undefined ? 1000 - index : undefined }}
+      style={{ zIndex: index != null ? 1000 - index : undefined }}
       {...props}
     >
       {(label !== false || description) && (
