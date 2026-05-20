@@ -3,6 +3,7 @@ import { useBranchData } from '@toolkit/plugin-branch-switcher';
 import { useCMS } from '../react-core';
 import {
   EDITORIAL_WORKFLOW_ERROR,
+  EDITORIAL_WORKFLOW_STATUS,
   EditorialWorkflowErrorDetails,
 } from './editorial-workflow-constants';
 import {
@@ -11,13 +12,6 @@ import {
   UPDATE_DOCUMENT_GQL,
 } from '../../admin/api';
 import { Form } from '@toolkit/forms';
-import { runEditorialWorkflow } from './run-editorial-workflow';
-
-export {
-  runEditorialWorkflow,
-  type EditorialWorkflowResult,
-  type RunEditorialWorkflowOptions,
-} from './run-editorial-workflow';
 
 const pathRelativeToCollection = (
   collectionPath: string,
@@ -172,7 +166,7 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
       );
       const relativePath = pathRelativeToCollection(collection.path, path);
 
-      const result = await runEditorialWorkflow(cms, {
+      const result = await tinaApi.executeEditorialWorkflow({
         branchName,
         baseBranch,
         prTitle: `${branchName.replace('tina/', '').replace('-', ' ')} (PR from TinaCMS)`,
@@ -184,8 +178,29 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
             params,
           },
         },
-        onStep: setCurrentStep,
+        onStatusUpdate: (status) => {
+          switch (status.status) {
+            case EDITORIAL_WORKFLOW_STATUS.SETTING_UP:
+            case EDITORIAL_WORKFLOW_STATUS.CREATING_BRANCH:
+              setCurrentStep(1);
+              break;
+            case EDITORIAL_WORKFLOW_STATUS.INDEXING:
+              setCurrentStep(2);
+              break;
+            case EDITORIAL_WORKFLOW_STATUS.CONTENT_GENERATION:
+            case EDITORIAL_WORKFLOW_STATUS.CREATING_PR:
+              setCurrentStep(3);
+              break;
+            case EDITORIAL_WORKFLOW_STATUS.COMPLETE:
+              setCurrentStep(4);
+              break;
+          }
+        },
       });
+
+      if (!result?.branchName) {
+        throw new Error('Branch creation failed.');
+      }
 
       setCurrentBranch(result.branchName);
 

@@ -47,16 +47,14 @@ interface MediaWorkflowConfirmBranchEvent {
  */
 export const MediaWorkflowOverlay = () => {
   const cms = useCMS();
-  const { currentBranch, setCurrentBranch } = useBranchData();
+  const { setCurrentBranch } = useBranchData();
 
   const [state, setState] = React.useState<WorkflowState>({ phase: 'idle' });
-  const [pendingBranch, setPendingBranch] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     const offConfirm = cms.events.subscribe<MediaWorkflowConfirmBranchEvent>(
       'media:workflow:confirm-branch',
       (event) => {
-        setPendingBranch(null);
         setState({
           phase: 'confirming',
           branchName: event.branchName,
@@ -69,7 +67,6 @@ export const MediaWorkflowOverlay = () => {
     );
     const offStart = cms.events.subscribe('media:workflow:start', () => {
       setState({ phase: 'executing', step: 1, elapsed: 0 });
-      setPendingBranch(null);
     });
     const offStep = cms.events.subscribe<{ type: string; step: number }>(
       'media:workflow:step',
@@ -85,19 +82,16 @@ export const MediaWorkflowOverlay = () => {
       type: string;
       branchName: string;
     }>('media:workflow:complete', (event) => {
-      setPendingBranch(event.branchName);
       setCurrentBranch(event.branchName);
     });
     const offError = cms.events.subscribe<{ type: string; message: string }>(
       'media:workflow:error',
       (event) => {
         setState({ phase: 'error', message: event.message });
-        setPendingBranch(null);
       }
     );
     const offFinish = cms.events.subscribe('media:workflow:finish', () => {
       setState({ phase: 'idle' });
-      setPendingBranch(null);
     });
 
     return () => {
@@ -123,22 +117,6 @@ export const MediaWorkflowOverlay = () => {
     }, 1000);
     return () => clearInterval(interval);
   }, [state.phase]);
-
-  // Ack the store once React state has caught up with Client.branch. The
-  // BranchDataProvider's effect in TinaCloudProvider syncs Client.branch
-  // from currentBranch, so we wait for *both* to match before resolving.
-  React.useEffect(() => {
-    if (!pendingBranch) return;
-    if (currentBranch !== pendingBranch) return;
-    const clientBranch = decodeURIComponent(cms.api.tina.branch || '');
-    if (clientBranch !== pendingBranch) return;
-
-    cms.events.dispatch({
-      type: 'media:workflow:branch-switched',
-      branchName: pendingBranch,
-    });
-    setPendingBranch(null);
-  }, [pendingBranch, currentBranch, cms]);
 
   if (state.phase === 'idle') return null;
 

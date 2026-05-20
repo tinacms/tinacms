@@ -612,49 +612,6 @@ describe('TinaMediaStore — protected-branch interception', () => {
     });
   });
 
-  it('does not miss a branch-switch ack emitted during the complete event', async () => {
-    const mediaBranch = 'tina/media-upload-uploads-a-png';
-    const createBranch = vi.fn(async ({ branchName }) => branchName);
-
-    const { store, fetchWithToken, api, events } = buildStore({
-      branch: 'main',
-      usingProtectedBranch: true,
-      createBranch,
-    });
-
-    events.subscribe('media:workflow:complete', () => {
-      api.branch = mediaBranch;
-      events.dispatch({
-        type: 'media:workflow:branch-switched',
-        branchName: mediaBranch,
-      });
-    });
-
-    fetchWithToken.mockResolvedValueOnce(
-      makeJsonResponse(200, {
-        signedUrl: 'https://s3.example/x',
-        requestId: 'r1',
-      })
-    );
-    fetchWithToken.mockResolvedValueOnce(
-      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
-    );
-    stubS3PutOk();
-
-    const persistPromise = store.persist([
-      {
-        directory: 'uploads',
-        file: new File(['x'], 'a.png', { type: 'image/png' }),
-      },
-    ]);
-    await vi.advanceTimersByTimeAsync(1100);
-    await persistPromise;
-
-    expect(fetchWithToken.mock.calls[0][0]).toContain(
-      `?branch=${encodeURIComponent(mediaBranch)}`
-    );
-  });
-
   it('switches the React branch only after indexing completes', async () => {
     // The whole point of deferring `media:workflow:complete` until after
     // `waitForBranchIndexed` is to avoid a window where the editor's
@@ -674,15 +631,11 @@ describe('TinaMediaStore — protected-branch interception', () => {
       return { url: 'https://github.com/x/y/pull/9' };
     });
 
-    const { store, fetchWithToken, api, events } = buildStore({
+    const { store, fetchWithToken, events } = buildStore({
       branch: 'main',
       usingProtectedBranch: true,
-      // The default mock sets `api.branch = branchName` synchronously, which
-      // lets `awaitBranchSwitched` short-circuit on equality and avoids the
-      // need to mock the overlay's branch-switched ack here.
       createBranch: vi.fn(async ({ branchName }) => {
         eventsLog.push('createBranch');
-        api.branch = branchName;
         return branchName;
       }),
       createPullRequest,
@@ -727,59 +680,6 @@ describe('TinaMediaStore — protected-branch interception', () => {
       'media:workflow:complete',
       'createPullRequest',
     ]);
-  });
-
-  it('surfaces a branch-switch timeout via media:workflow:error', async () => {
-    // No `branch-switched` ack handler subscribes — simulates a stuck or
-    // missing overlay. The custom `createBranch` mock leaves `api.branch`
-    // alone, so `awaitBranchSwitched` can't short-circuit on equality and
-    // has to wait on the event that never comes. After 30s it times out
-    // and the error surfaces via `media:workflow:error`.
-    const createBranch = vi.fn(async ({ branchName }) => branchName);
-    const createPullRequest = vi.fn();
-
-    const { store, fetchWithToken, events } = buildStore({
-      branch: 'main',
-      usingProtectedBranch: true,
-      createBranch,
-      createPullRequest,
-    });
-
-    const onWorkflowError = vi.fn();
-    events.subscribe('media:workflow:error', onWorkflowError);
-
-    fetchWithToken.mockResolvedValueOnce(
-      makeJsonResponse(200, {
-        signedUrl: 'https://s3.example/x',
-        requestId: 'r1',
-      })
-    );
-    fetchWithToken.mockResolvedValueOnce(
-      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
-    );
-    stubS3PutOk();
-
-    const persistPromise = store.persist([
-      {
-        directory: 'uploads',
-        file: new File(['x'], 'a.png', { type: 'image/png' }),
-      },
-    ]);
-    await vi.advanceTimersByTimeAsync(1100);
-    // Indexing wait resolves instantly (default `complete` mock).
-    // Then `awaitBranchSwitched`'s 30s timer fires.
-    await vi.advanceTimersByTimeAsync(30001);
-
-    // Upload itself still resolves — the asset has already landed.
-    await expect(persistPromise).resolves.toEqual([]);
-    expect(createPullRequest).not.toHaveBeenCalled();
-    expect(onWorkflowError).toHaveBeenCalledWith(
-      expect.objectContaining({
-        message: expect.stringContaining(
-          'Timed out waiting for branch context'
-        ),
-      })
-    );
   });
 
   it('waits for indexing to complete between the upload and the pull request', async () => {
