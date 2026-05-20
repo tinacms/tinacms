@@ -15,7 +15,7 @@ import { DateTimePicker } from '../../components/ui/date-time-picker';
 import { DayPickerLocale } from 'react-day-picker';
 
 export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
-  ({ input, field: { dateFormat, timeFormat, onChange, ...rest } }) => {
+  ({ input, field: { dateFormat, timeFormat, onChange, required, ...rest } }) => {
     const granularity = timeFormat ? 'minute' : 'day';
 
     const inputRef = React.useRef(null);
@@ -46,7 +46,7 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
 
     const date = input.value
       ? new Date(input.value)
-      : (rest as any).required === false
+      : required === false
         ? undefined
         : new Date();
     return (
@@ -59,7 +59,7 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
             input.onChange(
               value
                 ? value.toISOString()
-                : (rest as any).required !== false
+                : required !== false
                   ? new Date().toISOString()
                   : value
             )
