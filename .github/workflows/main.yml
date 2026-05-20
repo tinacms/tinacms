@@ -80,3 +80,54 @@ jobs:
 
       - name: Check Tina lock changes
         run: pnpm diff-tina-lock
+
+  template-smoke:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        template: [basic, tina-nextjs-starter]
+        package-manager: [pnpm, npm]
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        if: matrix.package-manager == 'pnpm'
+        with:
+          package_json_file: package.json
+          run_install: false
+
+      - name: Setup build tokens
+        shell: bash
+        run: |
+          if [[ "${{ matrix.template }}" == "tina-nextjs-starter" ]]; then
+            echo "NEXT_PUBLIC_TINA_CLIENT_ID=${{ secrets.TINA_CLOUD_STARTER_CLIENT_ID }}" >> $GITHUB_ENV
+            echo "TINA_TOKEN=${{ secrets.TINA_CLOUD_STARTER_TOKEN }}" >> $GITHUB_ENV
+          elif [[ "${{ matrix.template }}" == "basic" ]]; then
+            echo "NEXT_PUBLIC_TINA_CLIENT_ID=${{ secrets.BASIC_CLIENT_ID }}" >> $GITHUB_ENV
+            echo "TINA_TOKEN=${{ secrets.BASIC_TOKEN }}" >> $GITHUB_ENV
+          fi
+          echo "NEXT_PUBLIC_TINA_BRANCH=main" >> $GITHUB_ENV
+          echo "TINA_BRANCH=main" >> $GITHUB_ENV
+
+      - name: Run create-tina-app
+        run: npx create-tina-app@latest test-repo --pkg-manager ${{ matrix.package-manager }} --template ${{ matrix.template }} --noTelemetry
+
+      - name: Install dependencies
+        run: |
+          cd test-repo
+          ${{ matrix.package-manager }} install
+
+      - name: Build
+        run: |
+          cd test-repo
+          ${{ matrix.package-manager }} run build
