@@ -138,7 +138,6 @@ export const MediaWorkflowOverlay = () => {
       branchName: pendingBranch,
     });
     setPendingBranch(null);
-    setState({ phase: 'idle' });
   }, [pendingBranch, currentBranch, cms]);
 
   if (state.phase === 'idle') return null;

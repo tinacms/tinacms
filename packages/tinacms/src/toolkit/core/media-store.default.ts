@@ -15,6 +15,14 @@ import {
 
 const MEDIA_OP_TIMEOUT_MS = 30000;
 
+// Sized to mirror the server-side `waitForIndexing` budget in tinacloud
+// (js/content-api/src/editorial-workflow.ts). The "unknown" window covers
+// the webhook-fires → SQS-handler-starts gap; the attempt cap covers the
+// time between indexing start and `persistBranchMetadata` completing.
+const INDEX_POLL_INTERVAL_MS = 5000;
+const INDEX_MAX_ATTEMPTS = 60;
+const INDEX_MAX_UNKNOWN = 24;
+
 interface MediaWorkflowBranchSwitchedEvent {
   type: 'media:workflow:branch-switched';
   branchName: string;
@@ -288,6 +296,46 @@ export class TinaMediaStore implements MediaStore {
     });
   }
 
+  /**
+   * Polls the content-api index status for the media branch until it reports
+   * `complete`. The commit that triggers indexing is produced server-side by
+   * `onS3AssetCreated` (`bridge.put`) — *after* the client-side upload settles.
+   * Without this wait the editor can race the indexing pipeline: the user's
+   * upload modal closes, they reload, and `TinaCloudProvider.setupEditorialWorkflow`
+   * finds no `project.metadata[branch]` entry yet and bumps them to default.
+   *
+   * Shape mirrors `waitForIndexing` server-side in tinacloud's
+   * `editorial-workflow.ts` so media and content end up with the same
+   * "metadata is populated when this returns" guarantee.
+   */
+  private async waitForBranchIndexed(branchName: string): Promise<void> {
+    let unknownCount = 0;
+    for (let attempt = 0; attempt < INDEX_MAX_ATTEMPTS; attempt++) {
+      const { status } = await this.api.getIndexStatus({ ref: branchName });
+
+      if (status === 'complete') return;
+      if (status === 'failed') {
+        throw new Error(`Indexing failed for branch ${branchName}`);
+      }
+      if (status === 'unknown') {
+        unknownCount++;
+        if (unknownCount >= INDEX_MAX_UNKNOWN) {
+          throw new Error(
+            `Indexing never started for branch ${branchName} — the push webhook may not have been processed`
+          );
+        }
+      } else {
+        unknownCount = 0;
+      }
+
+      await new Promise((resolve) =>
+        setTimeout(resolve, INDEX_POLL_INTERVAL_MS)
+      );
+    }
+
+    throw new Error(`Timed out waiting for indexing on branch ${branchName}`);
+  }
+
   private async prepareMediaBranch(
     opType: 'upload' | 'delete',
     branchName: string,
@@ -312,8 +360,6 @@ export class TinaMediaStore implements MediaStore {
       prTitle: this.prTitleForBranch(createdBranchName || branchName),
     };
 
-    tinaCms.events.dispatch({ type: 'media:workflow:step', step: 2 });
-
     const branchSwitched = this.awaitBranchSwitched(
       branchContext.branchName,
       MEDIA_OP_TIMEOUT_MS
@@ -329,20 +375,35 @@ export class TinaMediaStore implements MediaStore {
     return branchContext;
   }
 
-  private async createMediaPullRequest(
+  /**
+   * Runs the post-asset-write phase of the media workflow:
+   *   - step 2: wait for server-side indexing of the new branch to complete,
+   *     so `project.metadata[branch]` is populated before we hand the user
+   *     back to the editor.
+   *   - step 3: open the pull request.
+   *   - step 4: signal completion.
+   *
+   * Errors are surfaced via `media:workflow:error` rather than rethrown —
+   * the asset write itself already succeeded; the user shouldn't see the
+   * upload/delete as failed because the PR step failed.
+   */
+  private async finalizeMediaWorkflow(
     branchContext: MediaBranchContext
   ): Promise<void> {
     const tinaCms = this.cms as TinaCMS;
 
-    tinaCms.events.dispatch({ type: 'media:workflow:step', step: 3 });
-
     try {
+      tinaCms.events.dispatch({ type: 'media:workflow:step', step: 2 });
+      await this.waitForBranchIndexed(branchContext.branchName);
+
+      tinaCms.events.dispatch({ type: 'media:workflow:step', step: 3 });
       const result = await this.api.createPullRequest({
         baseBranch: branchContext.baseBranch,
         branch: branchContext.branchName,
         title: branchContext.prTitle,
       });
 
+      tinaCms.events.dispatch({ type: 'media:workflow:step', step: 4 });
       tinaCms.alerts.success(
         `Branch created successfully - Pull Request at ${result?.url || ''}`,
         0
@@ -466,7 +527,7 @@ export class TinaMediaStore implements MediaStore {
 
     const uploadedEntries = await this.fetchUploadedEntries(media);
     if (branchContext) {
-      await this.createMediaPullRequest(branchContext);
+      await this.finalizeMediaWorkflow(branchContext);
     }
     return uploadedEntries;
   }
@@ -781,7 +842,7 @@ export class TinaMediaStore implements MediaStore {
             }
           }
           if (branchContext) {
-            await this.createMediaPullRequest(branchContext);
+            await this.finalizeMediaWorkflow(branchContext);
           }
         } else {
           throw new Error('Unexpected error deleting media asset');

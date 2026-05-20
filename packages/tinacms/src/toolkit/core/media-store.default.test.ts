@@ -31,6 +31,7 @@ const buildStore = ({
   usingProtectedBranch = false,
   createBranch,
   createPullRequest,
+  getIndexStatus,
   autoConfirmMediaBranchPrompt = true,
 }: {
   branch?: string | undefined;
@@ -39,6 +40,7 @@ const buildStore = ({
   usingProtectedBranch?: boolean;
   createBranch?: ReturnType<typeof vi.fn>;
   createPullRequest?: ReturnType<typeof vi.fn>;
+  getIndexStatus?: ReturnType<typeof vi.fn>;
   autoConfirmMediaBranchPrompt?: boolean;
 } = {}) => {
   const fetchWithToken: FetchWithTokenMock = vi.fn();
@@ -69,6 +71,8 @@ const buildStore = ({
       vi.fn().mockResolvedValue({
         url: 'https://github.com/x/y/pull/1',
       }),
+    getIndexStatus:
+      getIndexStatus ?? vi.fn().mockResolvedValue({ status: 'complete' }),
     gitSettingsLink: 'https://app.tina.io/settings',
   };
   const events = new EventBus();
@@ -80,7 +84,16 @@ const buildStore = ({
   const alerts = { warn: vi.fn(), success: vi.fn(), error: vi.fn() };
   const cms = { api: { tina: api }, events, alerts } as any;
   const store = new TinaMediaStore(cms);
-  return { store, fetchWithToken, authProvider, api, cms, events, alerts };
+  return {
+    store,
+    fetchWithToken,
+    authProvider,
+    api,
+    cms,
+    events,
+    alerts,
+    getIndexStatus: api.getIndexStatus as ReturnType<typeof vi.fn>,
+  };
 };
 
 describe('TinaMediaStore — branch query param', () => {
@@ -675,5 +688,149 @@ describe('TinaMediaStore — protected-branch interception', () => {
     await expect(result).resolves.toMatchObject({
       message: expect.stringContaining('Media operation cancelled'),
     });
+  });
+
+  it('waits for indexing to complete between the upload and the pull request', async () => {
+    // Two `inprogress` polls then `complete` — the wait must hit all three
+    // before opening the PR, so the PR sees a fully-indexed branch.
+    const getIndexStatus = vi
+      .fn()
+      .mockResolvedValueOnce({ status: 'inprogress' })
+      .mockResolvedValueOnce({ status: 'inprogress' })
+      .mockResolvedValueOnce({ status: 'complete' });
+
+    const createPullRequest = vi.fn().mockResolvedValue({
+      url: 'https://github.com/x/y/pull/2',
+    });
+
+    const { store, fetchWithToken } = buildStore({
+      branch: 'main',
+      usingProtectedBranch: true,
+      createPullRequest,
+      getIndexStatus,
+    });
+
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, {
+        signedUrl: 'https://s3.example/x',
+        requestId: 'r1',
+      })
+    );
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+    );
+    stubS3PutOk();
+
+    const persistPromise = store.persist([
+      {
+        directory: 'uploads',
+        file: new File(['x'], 'a.png', { type: 'image/png' }),
+      },
+    ]);
+    // 1s upload poll + 2x 5s index polls.
+    await vi.advanceTimersByTimeAsync(1100);
+    await vi.advanceTimersByTimeAsync(5000);
+    await vi.advanceTimersByTimeAsync(5000);
+    await persistPromise;
+
+    expect(getIndexStatus).toHaveBeenCalledTimes(3);
+    expect(getIndexStatus.mock.calls[0][0]).toEqual({
+      ref: 'tina/media-upload-uploads-a-png',
+    });
+
+    // PR creation must follow the final `complete` poll.
+    const lastIndexCall = getIndexStatus.mock.invocationCallOrder.at(-1)!;
+    const prCall = createPullRequest.mock.invocationCallOrder[0];
+    expect(prCall).toBeGreaterThan(lastIndexCall);
+  });
+
+  it('surfaces indexing failures via media:workflow:error without breaking the completed upload', async () => {
+    const getIndexStatus = vi.fn().mockResolvedValue({ status: 'failed' });
+    const createPullRequest = vi.fn();
+
+    const { store, fetchWithToken, events } = buildStore({
+      branch: 'main',
+      usingProtectedBranch: true,
+      createPullRequest,
+      getIndexStatus,
+    });
+
+    const onWorkflowError = vi.fn();
+    events.subscribe('media:workflow:error', onWorkflowError);
+
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, {
+        signedUrl: 'https://s3.example/x',
+        requestId: 'r1',
+      })
+    );
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+    );
+    stubS3PutOk();
+
+    const persistPromise = store.persist([
+      {
+        directory: 'uploads',
+        file: new File(['x'], 'a.png', { type: 'image/png' }),
+      },
+    ]);
+    await vi.advanceTimersByTimeAsync(1100);
+
+    // `failed` short-circuits — no poll-interval sleeps to advance.
+    await expect(persistPromise).resolves.toEqual([]);
+
+    expect(createPullRequest).not.toHaveBeenCalled();
+    expect(onWorkflowError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining('Indexing failed'),
+      })
+    );
+  });
+
+  it('surfaces "indexing never started" when the webhook stays unknown for too long', async () => {
+    const getIndexStatus = vi.fn().mockResolvedValue({ status: 'unknown' });
+    const createPullRequest = vi.fn();
+
+    const { store, fetchWithToken, events } = buildStore({
+      branch: 'main',
+      usingProtectedBranch: true,
+      createPullRequest,
+      getIndexStatus,
+    });
+
+    const onWorkflowError = vi.fn();
+    events.subscribe('media:workflow:error', onWorkflowError);
+
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, {
+        signedUrl: 'https://s3.example/x',
+        requestId: 'r1',
+      })
+    );
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+    );
+    stubS3PutOk();
+
+    const persistPromise = store.persist([
+      {
+        directory: 'uploads',
+        file: new File(['x'], 'a.png', { type: 'image/png' }),
+      },
+    ]);
+    await vi.advanceTimersByTimeAsync(1100);
+    // 23 sleeps between the 24 `unknown` polls before the cap rejects.
+    for (let i = 0; i < 23; i++) {
+      await vi.advanceTimersByTimeAsync(5000);
+    }
+
+    await expect(persistPromise).resolves.toEqual([]);
+    expect(createPullRequest).not.toHaveBeenCalled();
+    expect(onWorkflowError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining('Indexing never started'),
+      })
+    );
   });
 });

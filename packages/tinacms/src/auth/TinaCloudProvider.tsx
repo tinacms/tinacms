@@ -501,7 +501,7 @@ export const TinaCloudProvider = (
 
   React.useEffect(() => {
     const setupEditorialWorkflow = () => {
-      client.getProject().then((project) => {
+      client.getProject().then(async (project) => {
         if (project?.features?.includes('editorial-workflow')) {
           cms.flags.set('branch-switcher', true);
           client.usingEditorialWorkflow = true;
@@ -510,7 +510,18 @@ export const TinaCloudProvider = (
           // if the current branch is not in the metadata,
           // switch to the default branch
           if (!project.metadata[currentBranch]) {
-            setCurrentBranch(project.defaultBranch || 'main');
+            let currentBranchExists = false;
+            try {
+              currentBranchExists = await client.branchExists(currentBranch);
+            } catch (err) {
+              console.error(
+                '[tina:branch-guard] setupEditorialWorkflow: branchExists threw, falling back to default branch:',
+                err
+              );
+            }
+            if (!currentBranchExists) {
+              setCurrentBranch(project.defaultBranch || 'main');
+            }
           }
         }
       });
