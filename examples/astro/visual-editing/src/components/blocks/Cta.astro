@@ -1,0 +1,32 @@
+---
+import { tinaField } from '@tinacms/astro/tina-field';
+import type { PageBlocksCta } from '../../../tina/__generated__/types';
+import Actions from '../layout/Actions.astro';
+import Container from '../layout/Container.astro';
+import Section from '../layout/Section.astro';
+
+interface Props {
+  data: PageBlocksCta;
+}
+
+const { data } = Astro.props;
+---
+<Section color={data.color}>
+  <Container size="large">
+    <div class="text-center">
+      <h2 data-tina-field={tinaField(data, 'title')} class="text-balance text-4xl font-semibold lg:text-5xl text-inherit">
+        {data.title}
+      </h2>
+      {data.description && (
+        <div data-tina-field={tinaField(data, 'description')} class="mt-4 text-inherit opacity-90 max-w-2xl mx-auto">
+          {data.description}
+        </div>
+      )}
+      {data.actions && (
+        <div class="mt-12" data-tina-field={tinaField(data, 'actions')}>
+          <Actions class="justify-center py-2" parentColor={data.color} actions={data.actions} />
+        </div>
+      )}
+    </div>
+  </Container>
+</Section>

@@ -1,0 +1,35 @@
+---
+/**
+ * Block dispatcher. Switches on `__typename` to narrow the discriminated
+ * `PageBlocks` union — each branch flows the typed block straight into
+ * its renderer, no casts. Mirrors the Next.js kitchen-sink pattern.
+ */
+import { tinaField } from '@tinacms/astro/tina-field';
+import type { Page } from '../../../tina/__generated__/types';
+import Content from './Content.astro';
+import Cta from './Cta.astro';
+import Features from './Features.astro';
+import Hero from './Hero.astro';
+import Testimonial from './Testimonial.astro';
+
+interface Props {
+  page: Omit<Page, 'id' | '_sys' | '_values'>;
+}
+
+const { page } = Astro.props;
+---
+{page.blocks?.map((block) => block ? (
+  <div data-tina-field={tinaField(block)}>
+    {block.__typename === 'PageBlocksHero' ? (
+      <Hero data={block} />
+    ) : block.__typename === 'PageBlocksFeatures' ? (
+      <Features data={block} />
+    ) : block.__typename === 'PageBlocksCta' ? (
+      <Cta data={block} />
+    ) : block.__typename === 'PageBlocksTestimonial' ? (
+      <Testimonial data={block} />
+    ) : block.__typename === 'PageBlocksContent' ? (
+      <Content data={block} />
+    ) : null}
+  </div>
+) : null)}

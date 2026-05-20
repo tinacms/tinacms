@@ -1,0 +1,36 @@
+---
+/**
+ * Astro port of the React TinaMarkdown renderer in
+ * `packages/tinacms/src/rich-text/index.tsx`.
+ *
+ * Walks Tina's rich-text Plate AST and emits Astro markup. Custom MDX
+ * components registered on `components` are dispatched by `node.name`
+ * (mdxJsxFlowElement / mdxJsxTextElement). Default tags (p, h1-h6, ul, ol,
+ * li, blockquote, etc.) can be overridden by registering the tag name on
+ * the same map. Recurses via this same component for nested rich-text.
+ *
+ * This file is also the package's main runtime entry — Astro projects
+ * import `TinaMarkdown` (default) plus the `tina` / `tinaField` helpers
+ * from the same subpath. Re-exporting from the .astro file lets named
+ * imports resolve through the same path that serves the component.
+ */
+export { requestWithMetadata } from './data';
+export { tinaField } from './tina-field';
+
+import Node from './Node.astro';
+import type { CustomComponentsMap, TinaRichTextContent } from './types';
+
+interface Props {
+  content: TinaRichTextContent;
+  components?: CustomComponentsMap;
+}
+
+const { content, components = {} } = Astro.props;
+
+const nodes = !content
+  ? []
+  : Array.isArray(content)
+    ? content
+    : (content.children ?? []);
+---
+{nodes.map((node) => <Node node={node} components={components} />)}

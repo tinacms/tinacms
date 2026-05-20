@@ -486,19 +486,14 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
             }),
           };
         } else {
-          const childrenIndex = namePath.findIndex(
-            (value) => value === 'children'
-          );
-          // Find the props for the next item, ignoring parent 'props'
-          const propsIndex =
-            namePath
-              .slice(childrenIndex)
-              .findIndex((value) => value === 'props') + childrenIndex;
+          const childrenIndex = namePath.indexOf('children', namePathIndex + 1);
+          const propsIndex = namePath.indexOf('props', childrenIndex + 1);
           const itemName = namePath.slice(childrenIndex, propsIndex).join('.');
           const item = getIn(value, itemName);
+          if (!item) return formOrObjectField;
           const props = item.props;
           const templateString = item.name;
-          const currentPathIndex = namePathIndex + Math.max(propsIndex, 3);
+          const currentPathIndex = propsIndex;
           const isLastItem = currentPathIndex + 1 === namePath.length;
           const template = field.templates.find(
             (t) => t.name === templateString
@@ -539,8 +534,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
               formOrObjectField: template,
               values: props,
               namePath,
-              namePathIndex:
-                namePathIndex + Math.max(4, childrenIndex + propsIndex),
+              namePathIndex: propsIndex + 1,
             });
           }
           if (!template) {

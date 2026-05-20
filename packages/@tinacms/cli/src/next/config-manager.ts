@@ -7,11 +7,12 @@ import type { Loader } from 'esbuild';
 import { Config } from '@tinacms/schema-tools';
 import * as dotenv from 'dotenv';
 import normalizePath from 'normalize-path';
-import chalk from 'chalk';
-import { logger } from '../logger';
 import { createRequire } from 'module';
-import { stripNativeTrailingSlash } from '../utils/path';
+import { logger } from '../logger';
+import { warnText } from '../utils/theme';
 import { resolveContentRootPath } from './resolve-content-root';
+import { resolveDatabaseExternals } from './external-resolver';
+import { prepareCacheLocation, reapBuildSubdir } from './cache-manager';
 
 export const TINA_FOLDER = 'tina';
 export const LEGACY_TINA_FOLDER = '.tina';
@@ -26,13 +27,13 @@ export class ConfigManager {
   rootPath: string;
   tinaFolderPath: string;
   isUsingLegacyFolder: boolean;
+  private hasWarnedLegacyFolder = false;
   tinaConfigFilePath: string;
   tinaSpaPackagePath: string;
   contentRootPath?: string;
   envFilePath: string;
   generatedCachePath: string;
   generatedFolderPath: string;
-  generatedFolderPathContentRepo: string;
   generatedGraphQLGQLPath: string;
   generatedGraphQLJSONPath: string;
   generatedSchemaJSONPath: string;
@@ -100,6 +101,18 @@ export class ConfigManager {
     const require = createRequire(import.meta.url);
     this.tinaFolderPath = await this.getTinaFolderPath(this.rootPath);
 
+    if (this.isUsingLegacyFolder && !this.hasWarnedLegacyFolder) {
+      this.hasWarnedLegacyFolder = true;
+      logger.warn(
+        warnText(
+          'WARN: Detected legacy `.tina/` config folder. `tina-lock.json` is only ' +
+            'generated for the new `tina/` layout, and TinaCloud requires it to ' +
+            'index your schema. Migrate by renaming `.tina/` to `tina/` (the ' +
+            'contents stay the same). See https://tina.io/docs/tina-folder/overview/.'
+        )
+      );
+    }
+
     // TODO - .env should potentially be configurable
     this.envFilePath = path.resolve(
       path.join(this.tinaFolderPath, '..', '.env')
@@ -121,11 +134,13 @@ export class ConfigManager {
     );
     this.generatedFolderPath = path.join(this.tinaFolderPath, GENERATED_FOLDER);
 
-    this.generatedCachePath = path.join(
-      this.generatedFolderPath,
-      '.cache',
-      String(new Date().getTime())
-    );
+    // Prepare the per-build cache location: sweep residue from prior runs,
+    // verify the project tree is writable (fail loud with an actionable
+    // message if it's not — Docker `:ro`, Lambda `/var/task`, sandboxed CI
+    // runners, etc.), and reserve a fresh `<timestamp>/` subdir. See
+    // cache-manager.ts for the full rationale + tests.
+    const cacheLocation = await prepareCacheLocation(this.generatedFolderPath);
+    this.generatedCachePath = cacheLocation.buildPath;
 
     this.generatedGraphQLGQLPath = path.join(
       this.generatedFolderPath,
@@ -246,22 +261,13 @@ export class ConfigManager {
       localContentPath: this.config.localContentPath,
     });
 
-    this.generatedFolderPathContentRepo = path.join(
-      await this.getTinaFolderPath(this.contentRootPath, {
-        isContentRoot: this.hasSeparateContentRoot(),
-      }),
-      GENERATED_FOLDER
-    );
     this.spaMainPath = require.resolve('@tinacms/app');
     this.spaRootPath = path.join(this.spaMainPath, '..', '..');
     // =================
     // End of paths that depend on the config file
   }
 
-  async getTinaFolderPath(
-    rootPath: string,
-    { isContentRoot }: { isContentRoot?: boolean } = {}
-  ) {
+  async getTinaFolderPath(rootPath: string) {
     const tinaFolderPath = path.join(rootPath, TINA_FOLDER);
     const tinaFolderExists = await fs.pathExists(tinaFolderPath);
     if (tinaFolderExists) {
@@ -273,11 +279,6 @@ export class ConfigManager {
     if (legacyFolderExists) {
       this.isUsingLegacyFolder = true;
       return legacyFolderPath;
-    }
-    if (isContentRoot) {
-      throw new Error(
-        `Unable to find a ${chalk.cyan('tina/')} folder in your content root at ${chalk.cyan(rootPath)}. When using localContentPath, the content directory must contain a ${chalk.cyan('tina/')} folder for generated files. Create one with: mkdir ${path.join(rootPath, TINA_FOLDER)}`
-      );
     }
     throw new Error(
       `Unable to find Tina folder, if you're working in folder outside of the Tina config be sure to specify --rootPath`
@@ -313,33 +314,42 @@ export class ConfigManager {
 
   printGeneratedClientFilePath() {
     if (this.isUsingTs()) {
-      return this.generatedClientTSFilePath.replace(`${this.rootPath}/`, '');
+      return normalizePath(
+        path.relative(this.rootPath, this.generatedClientTSFilePath)
+      );
     }
-    return this.generatedClientJSFilePath.replace(`${this.rootPath}/`, '');
+    return normalizePath(
+      path.relative(this.rootPath, this.generatedClientJSFilePath)
+    );
   }
 
   printGeneratedTypesFilePath() {
-    return this.generatedTypesTSFilePath.replace(`${this.rootPath}/`, '');
+    return normalizePath(
+      path.relative(this.rootPath, this.generatedTypesTSFilePath)
+    );
   }
   printoutputHTMLFilePath() {
-    return this.outputHTMLFilePath.replace(`${this.publicFolderPath}/`, '');
+    return normalizePath(
+      path.relative(this.publicFolderPath, this.outputHTMLFilePath)
+    );
   }
   printRelativePath(filename: string) {
     if (filename) {
-      return filename.replace(/\\/g, '/').replace(`${this.rootPath}/`, '');
+      return normalizePath(path.relative(this.rootPath, filename));
     }
     throw `No path provided to print`;
   }
   printPrebuildFilePath() {
-    return this.prebuildFilePath
-      .replace(/\\/g, '/')
-      .replace(`${this.rootPath}/${this.tinaFolderPath}/`, '');
+    return normalizePath(
+      path.relative(
+        path.join(this.rootPath, this.tinaFolderPath),
+        this.prebuildFilePath
+      )
+    );
   }
   printContentRelativePath(filename: string) {
     if (filename) {
-      return filename
-        .replace(/\\/g, '/')
-        .replace(`${this.contentRootPath}/`, '');
+      return normalizePath(path.relative(this.contentRootPath, filename));
     }
     throw `No path provided to print`;
   }
@@ -367,11 +377,18 @@ export class ConfigManager {
   }
 
   async loadDatabaseFile() {
-    // Date.now because imports are cached, we don't have a
-    // good way of invalidating them when this file changes
+    // Use a timestamped subdirectory inside the project's generated cache folder
+    // (rather than os.tmpdir()) so that Node's ESM package resolution can walk up
+    // to the project root and find node_modules. Imports are still cached by Node,
+    // but the timestamp ensures each build gets a fresh module identity.
     // https://github.com/nodejs/modules/issues/307
-    const tmpdir = path.join(os.tmpdir(), Date.now().toString());
-    const outfile = path.join(tmpdir, 'database.build.mjs'); // .mjs tells Node.js this is ESM
+    const buildDir = path.join(this.generatedCachePath, 'database');
+    const outfile = path.join(buildDir, 'database.build.mjs'); // .mjs tells Node.js this is ESM
+    // Compose the externalize list — baseline (currently better-sqlite3, the
+    // canonical native CJS case) plus any user-provided extensions from
+    // `build.externalDependencies` in tina/config.ts. See external-resolver.ts
+    // for the merge rules and rationale.
+    const external = resolveDatabaseExternals(this.config);
     await esbuild.build({
       entryPoints: [this.selfHostedDatabaseFilePath],
       bundle: true,
@@ -379,6 +396,7 @@ export class ConfigManager {
       format: 'esm',
       outfile: outfile,
       loader: loaders,
+      external,
       // Provide a require() polyfill for ESM bundles containing CommonJS packages.
       // Some bundled packages (e.g., 'scmp' used by 'mongodb-level') use require('crypto').
       // When esbuild inlines these CommonJS packages, it keeps the require() calls,
@@ -389,23 +407,27 @@ export class ConfigManager {
       },
     });
     const result = await import(pathToFileURL(outfile).href);
-    fs.removeSync(outfile);
+    // Remove the build subdir + reap the timestamp parent if it's now empty
+    // (the sibling loadConfigFile may have finished). See cache-manager.ts.
+    reapBuildSubdir(buildDir, this.generatedCachePath);
     return result.default;
   }
 
   async loadConfigFile(generatedFolderPath: string, configFilePath: string) {
-    // Date.now because imports are cached, we don't have a
-    // good way of invalidating them when this file changes
+    // Use a timestamped subdirectory inside the project's generated cache folder
+    // (rather than os.tmpdir()) so that Node's ESM package resolution can walk up
+    // to the project root and find node_modules. Imports are still cached by Node,
+    // but the timestamp ensures each build gets a fresh module identity.
     // https://github.com/nodejs/modules/issues/307
-    const tmpdir = path.join(os.tmpdir(), Date.now().toString());
+    const buildDir = path.join(this.generatedCachePath, 'config');
     const preBuildConfigPath = path.join(
       this.generatedFolderPath,
       'config.prebuild.jsx'
     );
 
-    const outfile = path.join(tmpdir, 'config.build.jsx');
-    const outfile2 = path.join(tmpdir, 'config.build.mjs');
-    const tempTSConfigFile = path.join(tmpdir, 'tsconfig.json');
+    const outfile = path.join(buildDir, 'config.build.jsx');
+    const outfile2 = path.join(buildDir, 'config.build.mjs');
+    const tempTSConfigFile = path.join(buildDir, 'tsconfig.json');
 
     // Provide a require() polyfill for ESM bundles containing CommonJS packages.
     // Some packages (e.g., 'postcss-selector-parser' via tailwindcss) use require() internally.
@@ -465,8 +487,9 @@ export class ConfigManager {
       console.error(e);
       throw e;
     }
-    fs.removeSync(outfile);
-    fs.removeSync(outfile2);
+    // Remove the build subdir + reap the timestamp parent if it's now empty
+    // (the sibling loadDatabaseFile may have finished). See cache-manager.ts.
+    reapBuildSubdir(buildDir, this.generatedCachePath);
     return {
       config: result.default,
       prebuildPath: preBuildConfigPath,

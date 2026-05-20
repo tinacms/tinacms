@@ -1,5 +1,26 @@
 # next-tinacms-cloudinary
 
+## 25.0.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - tinacms@3.8.1
+
+## 25.0.0
+
+### Patch Changes
+
+- Updated dependencies [[`723632b`](https://github.com/tinacms/tinacms/commit/723632b050b1e9502c46215fd6e8e548cc108ac0), [`95758a0`](https://github.com/tinacms/tinacms/commit/95758a0ad31ec96aa652f247211a769e82a37cbb), [`9e7eba9`](https://github.com/tinacms/tinacms/commit/9e7eba9f290c935cd56569421de88b5adfac65d8)]:
+  - tinacms@3.8.0
+
+## 24.0.6
+
+### Patch Changes
+
+- Updated dependencies [[`3e4dcc7`](https://github.com/tinacms/tinacms/commit/3e4dcc76d5fb89ec900b778cb7e82f3aa3ed6501), [`3da4588`](https://github.com/tinacms/tinacms/commit/3da45887c23da552a4bd994154eeaaf8990065f7), [`b37187d`](https://github.com/tinacms/tinacms/commit/b37187d46b6e1a274db7ab79372f02aaa2ef992d), [`84ec7ad`](https://github.com/tinacms/tinacms/commit/84ec7adea7a1d8015cf1430fe804886493c5ae21), [`28b869a`](https://github.com/tinacms/tinacms/commit/28b869a0d2c9b2a608e1076b6dea24bd3e01ac31)]:
+  - tinacms@3.7.6
+
 ## 24.0.5
 
 ### Patch Changes

@@ -1,0 +1,63 @@
+---
+import { tinaField } from '@tinacms/astro/tina-field';
+import type {
+  PageBlocksFeatures,
+  PageBlocksFeaturesItems,
+} from '../../../tina/__generated__/types';
+import Actions from '../layout/Actions.astro';
+import Container from '../layout/Container.astro';
+import Section from '../layout/Section.astro';
+
+interface Props {
+  data: PageBlocksFeatures;
+}
+
+const { data } = Astro.props;
+
+// The admin's `defaultItem: 'New Feature'` on the items list can produce a
+// raw string instead of an object — the generated GraphQL type doesn't
+// reflect that polymorphism, so we widen here and normalise to the object
+// shape before rendering. Mirrors the same handling in the React kitchen-sinks.
+const rawItems = (data.items ?? []) as Array<
+  PageBlocksFeaturesItems | string | null
+>;
+const isSimpleLayout = rawItems.every((item) => typeof item === 'string');
+const normalizedItems: PageBlocksFeaturesItems[] = rawItems
+  .filter((item): item is PageBlocksFeaturesItems | string => item !== null)
+  .map((item) => (typeof item === 'string' ? { title: item } : item));
+---
+<Section color={data.color}>
+  <Container size="large">
+    {data.title && (
+      <div class="text-center mb-12">
+        <h2 data-tina-field={tinaField(data, 'title')} class="text-balance text-3xl font-semibold text-inherit">
+          {data.title}
+        </h2>
+        {data.description && (
+          <p data-tina-field={tinaField(data, 'description')} class="mt-4 text-inherit opacity-90">
+            {data.description}
+          </p>
+        )}
+      </div>
+    )}
+    <div class={isSimpleLayout ? 'grid grid-cols-1 md:grid-cols-3 gap-6' : 'flex flex-wrap gap-x-10 gap-y-8 text-left'}>
+      {normalizedItems.map((item) => (
+        <div
+          data-tina-field={tinaField(item)}
+          class={isSimpleLayout ? 'text-center bg-gray-50 dark:bg-gray-800 rounded-lg p-6' : 'flex-1 flex flex-col gap-4 max-w-xl'}
+          style={isSimpleLayout ? undefined : 'flex-basis:16rem'}
+        >
+          {item.title && (
+            <h3 class="text-2xl font-semibold title-font">{item.title}</h3>
+          )}
+          {item.text && (
+            <p class="text-base opacity-80 leading-relaxed">{item.text}</p>
+          )}
+          {item.actions && (
+            <Actions actions={item.actions} parentColor={data.color} />
+          )}
+        </div>
+      ))}
+    </div>
+  </Container>
+</Section>

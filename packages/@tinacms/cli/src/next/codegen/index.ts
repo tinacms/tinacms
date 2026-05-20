@@ -76,14 +76,6 @@ export class Codegen {
     );
     await fs.ensureFile(filePath);
     await fs.outputFile(filePath, data);
-    if (this.configManager.hasSeparateContentRoot()) {
-      const filePath = path.join(
-        this.configManager.generatedFolderPathContentRepo,
-        fileName
-      );
-      await fs.ensureFile(filePath);
-      await fs.outputFile(filePath, data);
-    }
   }
 
   async removeGeneratedFilesIfExists() {
@@ -155,6 +147,15 @@ export class Codegen {
         this.configManager.generatedTypesTSFilePath,
         codeString
       );
+      // Co-resident types.js so the generated `import { queries } from "./types.js"`
+      // works under Node native ESM at runtime. Modern TS module resolution
+      // (bundler / node16 / nodenext) rewrites the .js import to types.ts at
+      // compile time, so type checking still sees the .ts source.
+      const jsTypes = await transform(codeString, { loader: 'ts' });
+      await fs.outputFile(
+        this.configManager.generatedTypesJSFilePath,
+        jsTypes.code
+      );
       await fs.outputFile(
         this.configManager.generatedClientTSFilePath,
         clientString
@@ -167,7 +168,6 @@ export class Codegen {
       }
       await unlinkIfExists(this.configManager.generatedClientJSFilePath);
       await unlinkIfExists(this.configManager.generatedTypesDFilePath);
-      await unlinkIfExists(this.configManager.generatedTypesJSFilePath);
     } else {
       // Write out the generated types.
       // write types.js and types.d.ts
@@ -297,7 +297,7 @@ export class Codegen {
 import { resolve } from "@tinacms/datalayer";
 import type { TinaClient } from "tinacms/dist/client";
 
-import { queries } from "${this.configManager.isUsingTs() ? './types.ts' : './types.js'}";
+import { queries } from "./types.js";
 import database from "../database";
 
 export async function databaseRequest({ query, variables, user }) {
@@ -365,7 +365,7 @@ export default databaseClient;
     const apiURL = this.getApiURL();
 
     const clientString = `import { createClient } from "tinacms/dist/client";
-import { queries } from "${this.configManager.isUsingTs() ? './types.ts' : './types.js'}";
+import { queries } from "./types.js";
 export const client = createClient({ ${
       this.noClientBuildCache === false
         ? `cacheDir: '${normalizePath(
