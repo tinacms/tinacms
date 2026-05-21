@@ -1404,11 +1404,11 @@ const DeleteModal = ({
           }`}</p>
         </ModalBody>
         <ModalActions>
-          <Button style={{ flexGrow: 2 }} onClick={close}>
+          <Button style={{ flexGrow: 3 }} onClick={close}>
             Cancel
           </Button>
           <Button
-            style={{ flexGrow: 3 }}
+            style={{ flexGrow: 2 }}
             variant='danger'
             onClick={async () => {
               await deleteFunc();
@@ -1488,11 +1488,11 @@ const FolderModal = ({
           </>
         </ModalBody>
         <ModalActions>
-          <Button style={{ flexGrow: 2 }} onClick={close}>
+          <Button style={{ flexGrow: 1 }} onClick={close}>
             Cancel
           </Button>
           <Button
-            style={{ flexGrow: 3 }}
+            style={{ flexGrow: 1 }}
             variant='primary'
             disabled={!isFolderNameValid}
             onClick={async () => {
@@ -1551,11 +1551,11 @@ const RenameModal = ({
           </>
         </ModalBody>
         <ModalActions>
-          <Button style={{ flexGrow: 2 }} onClick={close}>
+          <Button style={{ flexGrow: 1 }} onClick={close}>
             Cancel
           </Button>
           <Button
-            style={{ flexGrow: 3 }}
+            style={{ flexGrow: 1 }}
             variant='primary'
             onClick={async () => {
               try {

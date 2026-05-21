@@ -42,10 +42,10 @@ export const UnsavedChangesDialog = ({
           </p>
         </ModalBody>
         <ModalActions>
-          <Button style={{ flexGrow: 1 }} onClick={onClose}>
+          <Button style={{ flexGrow: 3 }} onClick={onClose}>
             Keep editing
           </Button>
-          <Button style={{ flexGrow: 1 }} variant='danger' onClick={onDiscard}>
+          <Button style={{ flexGrow: 2 }} variant='danger' onClick={onDiscard}>
             Discard changes
           </Button>
         </ModalActions>

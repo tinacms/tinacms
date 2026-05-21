@@ -36,11 +36,11 @@ export const DeleteModal = ({
           </p>
         </ModalBody>
         <ModalActions>
-          <Button style={{ flexGrow: 2 }} disabled={processing} onClick={close}>
+          <Button style={{ flexGrow: 3 }} disabled={processing} onClick={close}>
             Cancel
           </Button>
           <Button
-            style={{ flexGrow: 3 }}
+            style={{ flexGrow: 2 }}
             disabled={processing}
             variant='danger'
             onClick={async () => {
@@ -85,12 +85,12 @@ export const NewFolderModal = ({ onSubmit, close }: NewFolderModalProps) => {
           />
         </ModalBody>
         <ModalActions>
-          <Button style={{ flexGrow: 2 }} onClick={close}>
+          <Button style={{ flexGrow: 1 }} onClick={close}>
             Cancel
           </Button>
           <Button
             disabled={!folderName}
-            style={{ flexGrow: 3 }}
+            style={{ flexGrow: 1 }}
             variant='primary'
             onClick={() => {
               if (!folderName) return;
