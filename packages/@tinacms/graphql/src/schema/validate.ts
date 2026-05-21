@@ -229,5 +229,15 @@ const validateField = async (
 
   const validField = (await schema.cast(field)) as TinaField<true>;
 
+  if (
+    validField.type === 'string' &&
+    validField.ui?.component === 'checkbox-group' &&
+    !validField.list
+  ) {
+    throw new Error(
+      `Field "${validField.name}" uses "checkbox-group" without list: true. Add list: true or use "select" instead.`
+    );
+  }
+
   return validField;
 };

@@ -102,4 +102,48 @@ describe('The schema validation', () => {
       ],
     });
   });
+
+  it(`Throws a clear error when checkbox-group is used without list: true`, async () => {
+    await expect(
+      validateSchema({
+        collections: [
+          {
+            ...baseCollection,
+            fields: [
+              {
+                type: 'string',
+                name: 'textDecoration',
+                label: 'Text Decoration',
+                options: ['underline', 'overline'],
+                ui: { component: 'checkbox-group' },
+              },
+            ],
+          },
+        ],
+      })
+    ).rejects.toThrowErrorMatchingInlineSnapshot(
+      `[Error: Field "textDecoration" uses "checkbox-group" without list: true. Add list: true or use "select" instead.]`
+    );
+  });
+
+  it(`Passes validation when checkbox-group is used with list: true`, async () => {
+    await expect(
+      validateSchema({
+        collections: [
+          {
+            ...baseCollection,
+            fields: [
+              {
+                type: 'string',
+                name: 'textDecoration',
+                label: 'Text Decoration',
+                options: ['underline', 'overline'],
+                list: true,
+              },
+            ],
+          },
+        ],
+      })
+    ).resolves.toBeDefined();
+  });
 });
