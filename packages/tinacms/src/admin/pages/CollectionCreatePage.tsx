@@ -20,6 +20,8 @@ import { FormBreadcrumbs } from '@toolkit/react-sidebar/components/sidebar-body'
 import { FaLock, FaUnlock } from 'react-icons/fa';
 import { TinaAdminApi } from '../api';
 import { ErrorDialog } from '../components/ErrorDialog';
+import { UnsavedChangesDialog } from '../components/UnsavedChangesDialog';
+import { BackButton } from '../components/BackButton';
 import GetCMS from '../components/GetCMS';
 import GetCollection from '../components/GetCollection';
 import { PageWrapper } from '../components/Page';
@@ -151,6 +153,7 @@ export const RenderForm = ({
 }) => {
   const navigate = useNavigate();
   const [formIsPristine, setFormIsPristine] = useState(true);
+  const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
   const schema: TinaSchema | undefined = cms.api.tina.schema;
 
   // the schema is being passed in from the frontend so we can use that
@@ -355,13 +358,31 @@ export const RenderForm = ({
     ({ tinaForm }) => tinaForm.id === form.id
   );
 
+  const collectionListPath = `/collections/${collection.name}${
+    folder.fullyQualifiedName ? `/${folder.fullyQualifiedName}` : ''
+  }`;
+
+  const handleBack = () => {
+    if (formIsPristine) {
+      navigate(collectionListPath);
+    } else {
+      setShowUnsavedDialog(true);
+    }
+  };
+
   return (
     <PageWrapper headerClassName='bg-white'>
       <>
+        <UnsavedChangesDialog
+          open={showUnsavedDialog}
+          onClose={() => setShowUnsavedDialog(false)}
+          onDiscard={() => navigate(collectionListPath)}
+        />
         <div
           className={`py-4 px-6 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center`}
         >
           <div className='w-full flex gap-1.5 justify-between items-center'>
+            <BackButton onClick={handleBack} />
             <FormBreadcrumbs
               className='w-[calc(100%-3rem)]'
               rootBreadcrumbName='Create New'
