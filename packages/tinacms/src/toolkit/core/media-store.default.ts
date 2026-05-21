@@ -3,7 +3,6 @@ import { getEditorialWorkflowPrTitle } from '@toolkit/form-builder/editorial-wor
 import { formatBranchName } from '@toolkit/plugin-branch-switcher/format-branch-name';
 import type { TinaCMS } from '@toolkit/tina-cms';
 import type { Client } from '../../internalClient';
-import { CMS } from './cms';
 import {
   E_BAD_ROUTE,
   E_UNAUTHORIZED,
@@ -15,6 +14,7 @@ import {
 } from './media';
 
 const INDEX_POLL_INTERVAL_MS = 5000;
+// Unknown for 2 minutes means the webhook likely never landed; total cap is 5 minutes.
 const INDEX_MAX_ATTEMPTS = 60;
 const INDEX_MAX_UNKNOWN = 24;
 
@@ -90,16 +90,17 @@ export class TinaMediaStore implements MediaStore {
   };
 
   private api: Client;
-  private cms: CMS;
+  private cms: TinaCMS;
   private isLocal: boolean;
   private url: string;
   private staticMedia: StaticMedia;
   isStatic?: boolean;
 
-  // Route assets-api calls to the workflow branch before React branch state switches.
+  // Route assets-api calls through the created branch until indexing makes it safe to switch React branch state.
   private workflowBranchOverride: string | undefined;
+  private mediaWorkflowInProgress = false;
 
-  constructor(cms: CMS, staticMedia?: StaticMedia) {
+  constructor(cms: TinaCMS, staticMedia?: StaticMedia) {
     this.cms = cms;
     if (staticMedia && Object.keys(staticMedia).length > 0) {
       this.isStatic = true;
@@ -199,7 +200,10 @@ export class TinaMediaStore implements MediaStore {
     const rawPath = [trimmedDirectory, filename].filter(Boolean).join('/');
     const flattened = rawPath.replaceAll('/', '-');
     const slug = this.trimEdges(formatBranchName(flattened), '-');
-    return slug || `asset-${this.shortStableHash(rawPath || 'root')}`;
+    if (!slug) return `asset-${this.shortStableHash(rawPath || 'root')}`;
+    return rawPath !== rawPath.toLowerCase()
+      ? `${slug}-${this.shortStableHash(rawPath)}`
+      : slug;
   }
 
   private requestMediaBranchChoice(
@@ -259,67 +263,74 @@ export class TinaMediaStore implements MediaStore {
     branchName: string,
     baseBranch: string
   ): Promise<MediaBranchContext> {
-    const tinaCms = this.cms as TinaCMS;
+    if (this.mediaWorkflowInProgress) {
+      throw new Error('A media workflow is already in progress.');
+    }
+    this.mediaWorkflowInProgress = true;
 
-    tinaCms.events.dispatch({
-      type: 'media:workflow:start',
-      branchName,
-      baseBranch,
-    });
+    try {
+      this.cms.events.dispatch({
+        type: 'media:workflow:start',
+        branchName,
+        baseBranch,
+      });
 
-    const createdBranchName = await this.api.createBranch({
-      branchName,
-      baseBranch,
-    });
-    const branchContext = {
-      branchName: createdBranchName || branchName,
-      baseBranch,
-    };
+      const createdBranchName = await this.api.createBranch({
+        branchName,
+        baseBranch,
+      });
+      const branchContext = {
+        branchName: createdBranchName || branchName,
+        baseBranch,
+      };
 
-    tinaCms.events.dispatch({ type: 'media:workflow:step', step: 2 });
-    await this.waitForBranchIndexed(branchContext.branchName);
+      await this.waitForBranchIndexed(branchContext.branchName);
 
-    this.workflowBranchOverride = branchContext.branchName;
+      this.workflowBranchOverride = branchContext.branchName;
 
-    return branchContext;
+      return branchContext;
+    } catch (err) {
+      this.mediaWorkflowInProgress = false;
+      throw err;
+    }
   }
 
   private async finalizeMediaWorkflow(
     branchContext: MediaBranchContext
   ): Promise<void> {
-    const tinaCms = this.cms as TinaCMS;
-
     try {
-      tinaCms.events.dispatch({ type: 'media:workflow:step', step: 2 });
-      await this.waitForBranchIndexed(branchContext.branchName);
-
-      tinaCms.events.dispatch({
+      this.cms.events.dispatch({
         type: 'media:workflow:complete',
         branchName: branchContext.branchName,
       });
       this.workflowBranchOverride = undefined;
 
-      tinaCms.events.dispatch({ type: 'media:workflow:step', step: 3 });
+      this.cms.events.dispatch({ type: 'media:workflow:step', step: 2 });
+      await this.waitForBranchIndexed(branchContext.branchName);
+
+      this.cms.events.dispatch({ type: 'media:workflow:step', step: 3 });
       const result = await this.api.createPullRequest({
         baseBranch: branchContext.baseBranch,
         branch: branchContext.branchName,
         title: getEditorialWorkflowPrTitle(branchContext.branchName),
       });
 
-      tinaCms.events.dispatch({ type: 'media:workflow:step', step: 4 });
-      tinaCms.alerts.success(
+      this.cms.events.dispatch({ type: 'media:workflow:step', step: 4 });
+      this.cms.alerts.success(
         `Branch created successfully - Pull Request at ${result?.url || ''}`,
         0
       );
-      tinaCms.events.dispatch({ type: 'media:workflow:finish' });
+      this.cms.events.dispatch({ type: 'media:workflow:finish' });
+      this.mediaWorkflowInProgress = false;
     } catch (err) {
       this.workflowBranchOverride = undefined;
+      this.mediaWorkflowInProgress = false;
       this.dispatchMediaWorkflowError(err);
     }
   }
 
   private dispatchMediaWorkflowError(err: unknown): void {
-    (this.cms as TinaCMS).events.dispatch({
+    this.cms.events.dispatch({
       type: 'media:workflow:error',
       message: err instanceof Error ? err.message : String(err),
     });
@@ -336,7 +347,8 @@ export class TinaMediaStore implements MediaStore {
       return result;
     } catch (err) {
       this.workflowBranchOverride = undefined;
-      this.dispatchMediaWorkflowError(err);
+      this.mediaWorkflowInProgress = false;
+      this.cms.events.dispatch({ type: 'media:workflow:finish' });
       throw err;
     }
   }

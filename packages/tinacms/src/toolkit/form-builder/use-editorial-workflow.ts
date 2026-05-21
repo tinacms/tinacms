@@ -205,7 +205,7 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
         },
       });
 
-      if (!result?.branchName) {
+      if (!result.branchName) {
         throw new Error('Branch creation failed.');
       }
 

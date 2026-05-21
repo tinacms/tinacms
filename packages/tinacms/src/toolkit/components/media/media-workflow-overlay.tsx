@@ -131,7 +131,6 @@ export const MediaWorkflowOverlay = () => {
       return;
     }
 
-    setState({ phase: 'executing', step: 1, elapsed: 0 });
     try {
       await confirmState.onConfirm(`tina/${branchName}`);
     } catch (e) {

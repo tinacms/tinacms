@@ -220,12 +220,14 @@ describe('TinaMediaStore — branch query param', () => {
 
     it('forwards the encoded branch on the upload_url request and resolves canonical entries via list()', async () => {
       const { store, fetchWithToken } = buildStore({ branch: 'feat%2Fx' });
+      // 1) upload_url response
       fetchWithToken.mockResolvedValueOnce(
         makeJsonResponse(200, {
           signedUrl: 'https://s3.example/signed',
           requestId: 'req-1',
         })
       );
+      // 2) the post-upload list() call inside fetchUploadedEntries
       fetchWithToken.mockResolvedValueOnce(
         makeJsonResponse(200, {
           files: [
@@ -248,14 +250,18 @@ describe('TinaMediaStore — branch query param', () => {
       ];
 
       const persistPromise = store.persist(uploads);
+      // Advance past the 1s polling sleep inside the upload loop.
       await vi.advanceTimersByTimeAsync(1100);
       const result = await persistPromise;
 
+      // First call is upload_url with branch query.
       const uploadUrl = fetchWithToken.mock.calls[0][0];
       expect(uploadUrl).toContain(
         '/upload_url/uploads/llama.png?branch=feat%2Fx'
       );
 
+      // Result contains the canonical entry from the list endpoint, not a
+      // locally-constructed `https://assets.tina.io/<clientId>/<path>` URL.
       expect(result).toHaveLength(1);
       expect(result[0].filename).toBe('llama.png');
       expect(result[0].src).toBe(
@@ -341,7 +347,7 @@ describe('TinaMediaStore — protected-branch interception', () => {
     expect(createPullRequest).toHaveBeenCalledWith({
       baseBranch: 'main',
       branch: mediaBranch,
-      title: 'media upload-uploads-blog-llama-png (PR from TinaCMS)',
+      title: 'media upload uploads blog llama png (PR from TinaCMS)',
     });
     expect(fetchWithToken.mock.calls[0][0]).toContain(
       `?branch=${encodeURIComponent(mediaBranch)}`
@@ -361,7 +367,9 @@ describe('TinaMediaStore — protected-branch interception', () => {
       createPullRequest,
     });
     const onWorkflowError = vi.fn();
+    const onWorkflowComplete = vi.fn();
     events.subscribe('media:workflow:error', onWorkflowError);
+    events.subscribe('media:workflow:complete', onWorkflowComplete);
 
     fetchWithToken.mockResolvedValueOnce(
       makeJsonResponse(200, {
@@ -429,6 +437,64 @@ describe('TinaMediaStore — protected-branch interception', () => {
     expect(fetchWithToken.mock.calls[0][0]).toContain(
       `?branch=${encodeURIComponent(mediaBranch)}`
     );
+  });
+
+  it('keeps media branch names distinct for case-only filename differences', async () => {
+    const mediaBranches: string[] = [];
+    const createBranch = vi.fn(async ({ branchName }) => {
+      mediaBranches.push(branchName);
+      return branchName;
+    });
+
+    const { store, fetchWithToken } = buildStore({
+      branch: 'main',
+      usingProtectedBranch: true,
+      createBranch,
+    });
+
+    fetchWithToken
+      .mockResolvedValueOnce(
+        makeJsonResponse(200, {
+          signedUrl: 'https://s3.example/hero-upper',
+          requestId: 'r1',
+        })
+      )
+      .mockResolvedValueOnce(
+        makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+      )
+      .mockResolvedValueOnce(
+        makeJsonResponse(200, {
+          signedUrl: 'https://s3.example/hero-lower',
+          requestId: 'r2',
+        })
+      )
+      .mockResolvedValueOnce(
+        makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+      );
+    stubS3PutOk();
+
+    const upperPersistPromise = store.persist([
+      {
+        directory: 'uploads',
+        file: new File(['x'], 'Hero.PNG', { type: 'image/png' }),
+      },
+    ]);
+    await vi.advanceTimersByTimeAsync(1100);
+    await upperPersistPromise;
+
+    const lowerPersistPromise = store.persist([
+      {
+        directory: 'uploads',
+        file: new File(['x'], 'hero.png', { type: 'image/png' }),
+      },
+    ]);
+    await vi.advanceTimersByTimeAsync(1100);
+    await lowerPersistPromise;
+
+    expect(mediaBranches[0]).toMatch(
+      /^tina\/media-upload-uploads-hero-png-[a-z0-9]+$/
+    );
+    expect(mediaBranches[1]).toBe('tina/media-upload-uploads-hero-png');
   });
 
   it('uses the branch name confirmed by the media branch prompt', async () => {
@@ -598,11 +664,11 @@ describe('TinaMediaStore — protected-branch interception', () => {
     expect(createPullRequest).toHaveBeenCalledWith({
       baseBranch: 'main',
       branch: mediaBranch,
-      title: 'media delete-images-a-png (PR from TinaCMS)',
+      title: 'media delete images a png (PR from TinaCMS)',
     });
   });
 
-  it('switches the React branch only after indexing completes', async () => {
+  it('switches the React branch after the media request succeeds', async () => {
     const eventsLog: string[] = [];
 
     const getIndexStatus = vi.fn(async () => {
@@ -660,8 +726,8 @@ describe('TinaMediaStore — protected-branch interception', () => {
       'getIndexStatus',
       'upload_url',
       'list',
-      'getIndexStatus',
       'media:workflow:complete',
+      'getIndexStatus',
       'createPullRequest',
     ]);
   });
@@ -720,7 +786,7 @@ describe('TinaMediaStore — protected-branch interception', () => {
     expect(prCall).toBeGreaterThan(lastIndexCall);
   });
 
-  it('surfaces indexing failures via media:workflow:error without breaking the completed upload', async () => {
+  it('switches branch and surfaces indexing failures without breaking the completed upload', async () => {
     const getIndexStatus = vi
       .fn()
       .mockResolvedValueOnce({ status: 'complete' })
@@ -735,7 +801,9 @@ describe('TinaMediaStore — protected-branch interception', () => {
     });
 
     const onWorkflowError = vi.fn();
+    const onWorkflowComplete = vi.fn();
     events.subscribe('media:workflow:error', onWorkflowError);
+    events.subscribe('media:workflow:complete', onWorkflowComplete);
 
     fetchWithToken.mockResolvedValueOnce(
       makeJsonResponse(200, {
@@ -759,6 +827,11 @@ describe('TinaMediaStore — protected-branch interception', () => {
     await expect(persistPromise).resolves.toEqual([]);
 
     expect(createPullRequest).not.toHaveBeenCalled();
+    expect(onWorkflowComplete).toHaveBeenCalledWith(
+      expect.objectContaining({
+        branchName: 'tina/media-upload-uploads-a-png',
+      })
+    );
     expect(onWorkflowError).toHaveBeenCalledWith(
       expect.objectContaining({
         message: expect.stringContaining('Indexing failed'),
@@ -781,7 +854,9 @@ describe('TinaMediaStore — protected-branch interception', () => {
     });
 
     const onWorkflowError = vi.fn();
+    const onWorkflowComplete = vi.fn();
     events.subscribe('media:workflow:error', onWorkflowError);
+    events.subscribe('media:workflow:complete', onWorkflowComplete);
 
     fetchWithToken.mockResolvedValueOnce(
       makeJsonResponse(200, {
@@ -807,6 +882,11 @@ describe('TinaMediaStore — protected-branch interception', () => {
 
     await expect(persistPromise).resolves.toEqual([]);
     expect(createPullRequest).not.toHaveBeenCalled();
+    expect(onWorkflowComplete).toHaveBeenCalledWith(
+      expect.objectContaining({
+        branchName: 'tina/media-upload-uploads-a-png',
+      })
+    );
     expect(onWorkflowError).toHaveBeenCalledWith(
       expect.objectContaining({
         message: expect.stringContaining('Indexing never started'),

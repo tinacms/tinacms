@@ -1,5 +1,5 @@
 export const getEditorialWorkflowPrTitle = (branchName: string): string =>
-  `${branchName.replace('tina/', '').replace('-', ' ')} (PR from TinaCMS)`;
+  `${branchName.replace('tina/', '').replaceAll('-', ' ')} (PR from TinaCMS)`;
 
 export const checkBaseBranchExists = async (
   tinaApi: { branchExists: (branchName: string) => Promise<boolean> },
