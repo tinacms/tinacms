@@ -13,6 +13,7 @@ import {
 import { FieldLabel } from '@toolkit/fields';
 import { Form } from '@toolkit/forms';
 import { EditorialWorkflowProgressModal } from './editorial-workflow-progress-modal';
+import { checkBaseBranchExists } from './editorial-workflow-utils';
 import { useEditorialWorkflow } from './use-editorial-workflow';
 
 // Format the default branch name by removing content/ prefix and file extension
@@ -82,22 +83,10 @@ export const CreateBranchModal = ({
 
     const baseBranch = decodeURIComponent(tinaApi.branch);
 
-    let baseBranchExists = true;
-    try {
-      console.debug(
-        '[tina:branch-guard] executeEditorialWorkflow: checking base branch:',
-        baseBranch
-      );
-      baseBranchExists = await tinaApi.branchExists(baseBranch);
-    } catch (err) {
-      console.error(
-        '[tina:branch-guard] executeEditorialWorkflow: branchExists threw, failing open:',
-        err
-      );
-    }
-    console.debug(
-      '[tina:branch-guard] executeEditorialWorkflow: base branch exists?',
-      baseBranchExists
+    const baseBranchExists = await checkBaseBranchExists(
+      tinaApi,
+      baseBranch,
+      'executeEditorialWorkflow'
     );
 
     if (!baseBranchExists) {

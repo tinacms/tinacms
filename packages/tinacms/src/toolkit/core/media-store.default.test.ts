@@ -11,8 +11,6 @@ const makeJsonResponse = (status: number, body: unknown) =>
     json: vi.fn().mockResolvedValue(body),
   }) as any;
 
-// Stubs the global `fetch` to a successful S3 PUT response so the upload
-// loop in `persist_cloud` moves past the signed-URL upload step.
 const stubS3PutOk = () =>
   vi.stubGlobal(
     'fetch',
@@ -222,14 +220,12 @@ describe('TinaMediaStore — branch query param', () => {
 
     it('forwards the encoded branch on the upload_url request and resolves canonical entries via list()', async () => {
       const { store, fetchWithToken } = buildStore({ branch: 'feat%2Fx' });
-      // 1) upload_url response
       fetchWithToken.mockResolvedValueOnce(
         makeJsonResponse(200, {
           signedUrl: 'https://s3.example/signed',
           requestId: 'req-1',
         })
       );
-      // 2) the post-upload list() call inside fetchUploadedEntries
       fetchWithToken.mockResolvedValueOnce(
         makeJsonResponse(200, {
           files: [
@@ -252,18 +248,14 @@ describe('TinaMediaStore — branch query param', () => {
       ];
 
       const persistPromise = store.persist(uploads);
-      // Advance past the 1s polling sleep inside the upload loop.
       await vi.advanceTimersByTimeAsync(1100);
       const result = await persistPromise;
 
-      // First call is upload_url with branch query.
       const uploadUrl = fetchWithToken.mock.calls[0][0];
       expect(uploadUrl).toContain(
         '/upload_url/uploads/llama.png?branch=feat%2Fx'
       );
 
-      // Result contains the canonical entry from the list endpoint, not a
-      // locally-constructed `https://assets.tina.io/<clientId>/<path>` URL.
       expect(result).toHaveLength(1);
       expect(result[0].filename).toBe('llama.png');
       expect(result[0].src).toBe(
@@ -340,12 +332,10 @@ describe('TinaMediaStore — protected-branch interception', () => {
       baseBranch: 'main',
     });
 
-    // The upload_url fetch must come AFTER the branch exists.
     const branchOrder = createBranch.mock.invocationCallOrder[0];
     const uploadOrder = fetchWithToken.mock.invocationCallOrder[0];
     expect(uploadOrder).toBeGreaterThan(branchOrder);
 
-    // The media commit should exist before we create the PR.
     const prOrder = createPullRequest.mock.invocationCallOrder[0];
     expect(prOrder).toBeGreaterThan(uploadOrder);
     expect(createPullRequest).toHaveBeenCalledWith({
@@ -613,13 +603,6 @@ describe('TinaMediaStore — protected-branch interception', () => {
   });
 
   it('switches the React branch only after indexing completes', async () => {
-    // The whole point of deferring `media:workflow:complete` until after
-    // `waitForBranchIndexed` is to avoid a window where the editor's
-    // React state points at a branch whose `project.metadata[branch]` hasn't
-    // been populated yet — which makes `TinaCloudProvider.setupEditorialWorkflow`
-    // bump the user back to the default branch.
-    //
-    // We lock the ordering in here by interleaving a small event log.
     const eventsLog: string[] = [];
 
     const getIndexStatus = vi.fn(async () => {
@@ -684,9 +667,6 @@ describe('TinaMediaStore — protected-branch interception', () => {
   });
 
   it('waits for initial branch indexing before upload and media indexing before the pull request', async () => {
-    // Initial branch indexing must complete before the upload starts. After
-    // upload, two `inprogress` polls then `complete` must all finish before
-    // opening the PR, so the PR sees a fully-indexed media commit.
     const getIndexStatus = vi
       .fn()
       .mockResolvedValueOnce({ status: 'complete' })
@@ -722,7 +702,6 @@ describe('TinaMediaStore — protected-branch interception', () => {
         file: new File(['x'], 'a.png', { type: 'image/png' }),
       },
     ]);
-    // 1s upload poll + 2x 5s post-upload index polls.
     await vi.advanceTimersByTimeAsync(1100);
     await vi.advanceTimersByTimeAsync(5000);
     await vi.advanceTimersByTimeAsync(5000);
@@ -736,7 +715,6 @@ describe('TinaMediaStore — protected-branch interception', () => {
       fetchWithToken.mock.invocationCallOrder[0]
     );
 
-    // PR creation must follow the final `complete` poll.
     const lastIndexCall = getIndexStatus.mock.invocationCallOrder.at(-1)!;
     const prCall = createPullRequest.mock.invocationCallOrder[0];
     expect(prCall).toBeGreaterThan(lastIndexCall);
@@ -778,7 +756,6 @@ describe('TinaMediaStore — protected-branch interception', () => {
     ]);
     await vi.advanceTimersByTimeAsync(1100);
 
-    // `failed` short-circuits — no poll-interval sleeps to advance.
     await expect(persistPromise).resolves.toEqual([]);
 
     expect(createPullRequest).not.toHaveBeenCalled();
@@ -824,7 +801,6 @@ describe('TinaMediaStore — protected-branch interception', () => {
       },
     ]);
     await vi.advanceTimersByTimeAsync(1100);
-    // 23 sleeps between the 24 `unknown` polls before the cap rejects.
     for (let i = 0; i < 23; i++) {
       await vi.advanceTimersByTimeAsync(5000);
     }

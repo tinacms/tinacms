@@ -1,4 +1,5 @@
 import { DEFAULT_MEDIA_UPLOAD_TYPES } from '@toolkit/components/media/utils';
+import { getEditorialWorkflowPrTitle } from '@toolkit/form-builder/editorial-workflow-utils';
 import { formatBranchName } from '@toolkit/plugin-branch-switcher/format-branch-name';
 import type { TinaCMS } from '@toolkit/tina-cms';
 import type { Client } from '../../internalClient';
@@ -13,17 +14,12 @@ import {
   MediaUploadOptions,
 } from './media';
 
-// Sized to mirror the server-side `waitForIndexing` budget in tinacloud
-// (js/content-api/src/editorial-workflow.ts). The "unknown" window covers
-// the webhook-fires → SQS-handler-starts gap; the attempt cap covers the
-// time between indexing start and `persistBranchMetadata` completing.
 const INDEX_POLL_INTERVAL_MS = 5000;
 const INDEX_MAX_ATTEMPTS = 60;
 const INDEX_MAX_UNKNOWN = 24;
 
 interface MediaWorkflowConfirmBranchEvent {
   type: 'media:workflow:confirm-branch';
-  opType: 'upload' | 'delete';
   branchName: string;
   baseBranch: string;
   onConfirm: (branchName: string) => Promise<void>;
@@ -34,7 +30,6 @@ interface MediaWorkflowConfirmBranchEvent {
 interface MediaBranchContext {
   branchName: string;
   baseBranch: string;
-  prTitle: string;
 }
 
 const MEDIA_OPERATION_CANCELLED = 'MEDIA_OPERATION_CANCELLED';
@@ -101,21 +96,7 @@ export class TinaMediaStore implements MediaStore {
   private staticMedia: StaticMedia;
   isStatic?: boolean;
 
-  /**
-   * Branch to route media calls through *during* a protected-branch
-   * workflow, before the React branch state has been switched.
-   *
-   * Why this is necessary: changing `currentBranch` via `setCurrentBranch`
-   * re-runs `setupEditorialWorkflow` in `TinaCloudProvider`, which checks
-   * `project.metadata[currentBranch]` and bumps the editor back to the
-   * default branch when the entry is missing. The entry only lands once
-   * the asset commit has fired its push webhook through to
-   * `persistBranchMetadata`. To avoid that race we keep React state on
-   * the protected branch through the upload/index/PR steps and only
-   * switch it after `waitForBranchIndexed` has guaranteed metadata is
-   * populated. The override is read by `encodedBranchParam` so the
-   * assets-api calls in between still see the new branch.
-   */
+  // Route assets-api calls to the workflow branch before React branch state switches.
   private workflowBranchOverride: string | undefined;
 
   constructor(cms: CMS, staticMedia?: StaticMedia) {
@@ -163,8 +144,8 @@ export class TinaMediaStore implements MediaStore {
   maxSize = 100 * 1024 * 1024;
 
   /**
-   * Returns the current branch as a single-encoded query-param value, or
-   * an empty string when no branch is set.
+   * Returns the workflow branch override or current branch as a single-encoded
+   * query-param value, or an empty string when no branch is set.
    *
    * `this.api.branch` is already URL-encoded by `Client.setBranch()`, so we
    * decode then re-encode here to defend against double-encoding when this
@@ -210,11 +191,6 @@ export class TinaMediaStore implements MediaStore {
     return value.slice(start, end);
   }
 
-  /**
-   * Derives a branch slug from the media path so different assets in the same
-   * directory don't all contend for one branch name. Falls back to a stable
-   * hash when the path sanitizes down to an empty segment.
-   */
   private branchSlugForMediaPath(
     directory: string | undefined,
     filename: string | undefined
@@ -226,32 +202,19 @@ export class TinaMediaStore implements MediaStore {
     return slug || `asset-${this.shortStableHash(rawPath || 'root')}`;
   }
 
-  /**
-   * Prompts the user via the overlay for how to handle a media op on a
-   * protected branch. Resolves to a `MediaBranchContext` when the user
-   * picks "create a branch", `undefined` when they pick "save to
-   * protected branch", and rejects with `MediaOperationCancelledError`
-   * when they cancel.
-   */
   private requestMediaBranchChoice(
-    opType: 'upload' | 'delete',
     branchName: string,
     baseBranch: string
   ): Promise<MediaBranchContext | undefined> {
     return new Promise((resolve, reject) => {
       this.cms.events.dispatch<MediaWorkflowConfirmBranchEvent>({
         type: 'media:workflow:confirm-branch',
-        opType,
         branchName,
         baseBranch,
         onConfirm: async (selectedBranchName) => {
           try {
             resolve(
-              await this.prepareMediaBranch(
-                opType,
-                selectedBranchName,
-                baseBranch
-              )
+              await this.prepareMediaBranch(selectedBranchName, baseBranch)
             );
           } catch (error) {
             reject(error);
@@ -263,25 +226,7 @@ export class TinaMediaStore implements MediaStore {
     });
   }
 
-  private prTitleForBranch(branchName: string): string {
-    const branchSlug = branchName.startsWith('tina/')
-      ? branchName.slice('tina/'.length)
-      : branchName;
-    return `${branchSlug.replace('-', ' ')} (PR from TinaCMS)`;
-  }
-
-  /**
-   * Polls the content-api index status for the media branch until it reports
-   * `complete`. The commit that triggers indexing is produced server-side by
-   * `onS3AssetCreated` (`bridge.put`) — *after* the client-side upload settles.
-   * Without this wait the editor can race the indexing pipeline: the user's
-   * upload modal closes, they reload, and `TinaCloudProvider.setupEditorialWorkflow`
-   * finds no `project.metadata[branch]` entry yet and bumps them to default.
-   *
-   * Shape mirrors `waitForIndexing` server-side in tinacloud's
-   * `editorial-workflow.ts` so media and content end up with the same
-   * "metadata is populated when this returns" guarantee.
-   */
+  // Used before the media request for branch metadata, then after it for the media commit.
   private async waitForBranchIndexed(branchName: string): Promise<void> {
     let unknownCount = 0;
     for (let attempt = 0; attempt < INDEX_MAX_ATTEMPTS; attempt++) {
@@ -310,15 +255,7 @@ export class TinaMediaStore implements MediaStore {
     throw new Error(`Timed out waiting for indexing on branch ${branchName}`);
   }
 
-  /**
-   * Creates the branch on GitHub, waits until its initial indexing has
-   * populated branch metadata, and installs the local override so the
-   * subsequent upload/delete + PR steps route through it without changing
-   * React state. React state remains on the protected branch until
-   * `finalizeMediaWorkflow` switches it after the media commit is confirmed.
-   */
   private async prepareMediaBranch(
-    opType: 'upload' | 'delete',
     branchName: string,
     baseBranch: string
   ): Promise<MediaBranchContext> {
@@ -326,7 +263,6 @@ export class TinaMediaStore implements MediaStore {
 
     tinaCms.events.dispatch({
       type: 'media:workflow:start',
-      opType,
       branchName,
       baseBranch,
     });
@@ -338,7 +274,6 @@ export class TinaMediaStore implements MediaStore {
     const branchContext = {
       branchName: createdBranchName || branchName,
       baseBranch,
-      prTitle: this.prTitleForBranch(createdBranchName || branchName),
     };
 
     tinaCms.events.dispatch({ type: 'media:workflow:step', step: 2 });
@@ -349,23 +284,6 @@ export class TinaMediaStore implements MediaStore {
     return branchContext;
   }
 
-  /**
-   * Runs the post-asset-write phase of the media workflow:
-   *   - step 2: wait for server-side indexing of the new branch to complete,
-   *     so `project.metadata[branch]` is populated before we hand the user
-   *     back to the editor.
-   *   - switch React state to the new branch — only after indexing has
-   *     populated metadata. Doing this earlier races
-   *     `TinaCloudProvider.setupEditorialWorkflow`, which checks
-   *     `project.metadata[currentBranch]` and bumps the editor to the
-   *     default branch when the entry is missing.
-   *   - step 3: open the pull request.
-   *   - step 4: signal completion.
-   *
-   * Errors are surfaced via `media:workflow:error` rather than rethrown —
-   * the asset write itself already succeeded; the user shouldn't see the
-   * upload/delete as failed because a later step failed.
-   */
   private async finalizeMediaWorkflow(
     branchContext: MediaBranchContext
   ): Promise<void> {
@@ -375,14 +293,6 @@ export class TinaMediaStore implements MediaStore {
       tinaCms.events.dispatch({ type: 'media:workflow:step', step: 2 });
       await this.waitForBranchIndexed(branchContext.branchName);
 
-      // Switch React state to the new branch. The overlay's handler
-      // calls `setCurrentBranch`, which propagates through
-      // `BranchDataProvider` → TinaCloudProvider's render-time sync →
-      // `Client.setBranch`. We don't need to wait for that propagation
-      // here: PR creation reads `branchContext.branchName` directly,
-      // and the override stays in place until we clear it below — so
-      // any media call that races the React render still routes
-      // through the new branch.
       tinaCms.events.dispatch({
         type: 'media:workflow:complete',
         branchName: branchContext.branchName,
@@ -393,7 +303,7 @@ export class TinaMediaStore implements MediaStore {
       const result = await this.api.createPullRequest({
         baseBranch: branchContext.baseBranch,
         branch: branchContext.branchName,
-        title: branchContext.prTitle,
+        title: getEditorialWorkflowPrTitle(branchContext.branchName),
       });
 
       tinaCms.events.dispatch({ type: 'media:workflow:step', step: 4 });
@@ -404,22 +314,17 @@ export class TinaMediaStore implements MediaStore {
       tinaCms.events.dispatch({ type: 'media:workflow:finish' });
     } catch (err) {
       this.workflowBranchOverride = undefined;
-      const message = err instanceof Error ? err.message : String(err);
-      tinaCms.events.dispatch({
-        type: 'media:workflow:error',
-        message,
-      });
+      this.dispatchMediaWorkflowError(err);
     }
   }
 
-  /**
-   * Runs an upload/delete op under a (possibly-undefined) protected-branch
-   * workflow. When the user picked "create a branch", clears the workflow
-   * override and dispatches `media:workflow:error` on failures originating
-   * before `finalizeMediaWorkflow` runs (`finalizeMediaWorkflow` handles
-   * its own failures internally). Without a `branchContext` this is a
-   * pass-through.
-   */
+  private dispatchMediaWorkflowError(err: unknown): void {
+    (this.cms as TinaCMS).events.dispatch({
+      type: 'media:workflow:error',
+      message: err instanceof Error ? err.message : String(err),
+    });
+  }
+
   private async runMediaOpWithWorkflow<T>(
     branchContext: MediaBranchContext | undefined,
     op: () => Promise<T>
@@ -431,10 +336,7 @@ export class TinaMediaStore implements MediaStore {
       return result;
     } catch (err) {
       this.workflowBranchOverride = undefined;
-      (this.cms as TinaCMS).events.dispatch({
-        type: 'media:workflow:error',
-        message: err instanceof Error ? err.message : String(err),
-      });
+      this.dispatchMediaWorkflowError(err);
       throw err;
     }
   }
@@ -449,7 +351,32 @@ export class TinaMediaStore implements MediaStore {
     const baseBranch = decodeURIComponent(this.api.branch || '');
     const mediaSlug = this.branchSlugForMediaPath(directory, filename);
     const branchName = `media-${opType}-${mediaSlug}`;
-    return this.requestMediaBranchChoice(opType, branchName, baseBranch);
+    return this.requestMediaBranchChoice(branchName, baseBranch);
+  }
+
+  private async waitForRequestStatus(
+    requestId: string,
+    timeoutMessage: string
+  ): Promise<void> {
+    const startTime = Date.now();
+    while (true) {
+      // sleep for 1 second
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      const { error, message } = await this.api.getRequestStatus(requestId);
+      if (error !== undefined) {
+        if (error) {
+          throw new Error(message);
+        } else {
+          // success
+          return;
+        }
+      }
+
+      if (Date.now() - startTime > 30000) {
+        throw new Error(timeoutMessage);
+      }
+    }
   }
 
   private async persist_cloud(media: MediaUploadOptions[]): Promise<Media[]> {
@@ -473,74 +400,80 @@ export class TinaMediaStore implements MediaStore {
       const branchQuery = encodedBranch ? `?branch=${encodedBranch}` : '';
 
       for (const item of media) {
-        let directory = item.directory;
-        if (directory?.endsWith('/')) {
-          directory = directory.substr(0, directory.length - 1);
-        }
-        const path = `${
-          directory && directory !== '/'
-            ? `${directory}/${item.file.name}`
-            : item.file.name
-        }`;
-        const res = await this.api.authProvider.fetchWithToken(
-          `${this.url}/upload_url/${path}${branchQuery}`,
-          { method: 'GET' }
-        );
-
-        if (res.status === 412) {
-          const { message = 'Unexpected error generating upload url' } =
-            await res.json();
-          throw new Error(message);
-        }
-
-        const { signedUrl, requestId } = await res.json();
-        if (!signedUrl) {
-          throw new Error('Unexpected error generating upload url');
-        }
-
-        const uploadRes = await this.fetchFunction(signedUrl, {
-          method: 'PUT',
-          body: item.file,
-          headers: {
-            'Content-Type': item.file.type || 'application/octet-stream',
-            'Content-Length': String(item.file.size),
-          },
-        });
-
-        if (!uploadRes.ok) {
-          const xmlRes = await uploadRes.text();
-          const matches = s3ErrorRegex.exec(xmlRes);
-          console.error(xmlRes);
-          if (!matches) {
-            throw new Error('Unexpected error uploading media asset');
-          } else {
-            throw new Error(`Upload error: '${matches[2]}'`);
-          }
-        }
-
-        const updateStartTime = Date.now();
-        while (true) {
-          // sleep for 1 second
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-
-          const { error, message } = await this.api.getRequestStatus(requestId);
-          if (error !== undefined) {
-            if (error) {
-              throw new Error(message);
-            } else {
-              // success
-              break;
-            }
-          }
-
-          if (Date.now() - updateStartTime > 30000) {
-            throw new Error('Time out waiting for upload to complete');
-          }
-        }
+        await this.uploadCloudMediaItem(item, branchQuery);
       }
 
       return this.fetchUploadedEntries(media);
     });
+  }
+
+  private async uploadCloudMediaItem(
+    item: MediaUploadOptions,
+    branchQuery: string
+  ): Promise<void> {
+    let directory = item.directory;
+    if (directory?.endsWith('/')) {
+      directory = directory.substr(0, directory.length - 1);
+    }
+    const path = `${
+      directory && directory !== '/'
+        ? `${directory}/${item.file.name}`
+        : item.file.name
+    }`;
+    const res = await this.api.authProvider.fetchWithToken(
+      `${this.url}/upload_url/${path}${branchQuery}`,
+      { method: 'GET' }
+    );
+
+    if (res.status === 412) {
+      const { message = 'Unexpected error generating upload url' } =
+        await res.json();
+      throw new Error(message);
+    }
+
+    const { signedUrl, requestId } = await res.json();
+    if (!signedUrl) {
+      throw new Error('Unexpected error generating upload url');
+    }
+
+    const uploadRes = await this.fetchFunction(signedUrl, {
+      method: 'PUT',
+      body: item.file,
+      headers: {
+        'Content-Type': item.file.type || 'application/octet-stream',
+        'Content-Length': String(item.file.size),
+      },
+    });
+
+    if (!uploadRes.ok) {
+      const xmlRes = await uploadRes.text();
+      const matches = s3ErrorRegex.exec(xmlRes);
+      console.error(xmlRes);
+      if (!matches) {
+        throw new Error('Unexpected error uploading media asset');
+      } else {
+        throw new Error(`Upload error: '${matches[2]}'`);
+      }
+    }
+
+    await this.waitForRequestStatus(
+      requestId,
+      'Time out waiting for upload to complete'
+    );
+  }
+
+  private groupMediaByDirectory(
+    media: MediaUploadOptions[]
+  ): Map<string, MediaUploadOptions[]> {
+    const byDirectory = new Map<string, MediaUploadOptions[]>();
+    for (const item of media) {
+      let dir = item.directory || '';
+      while (dir.endsWith('/')) dir = dir.slice(0, -1);
+      const bucket = byDirectory.get(dir) ?? [];
+      bucket.push(item);
+      byDirectory.set(dir, bucket);
+    }
+    return byDirectory;
   }
 
   /**
@@ -558,14 +491,7 @@ export class TinaMediaStore implements MediaStore {
   private async fetchUploadedEntries(
     media: MediaUploadOptions[]
   ): Promise<Media[]> {
-    const byDirectory = new Map<string, MediaUploadOptions[]>();
-    for (const item of media) {
-      let dir = item.directory || '';
-      while (dir.endsWith('/')) dir = dir.slice(0, -1);
-      const bucket = byDirectory.get(dir) ?? [];
-      bucket.push(item);
-      byDirectory.set(dir, bucket);
-    }
+    const byDirectory = this.groupMediaByDirectory(media);
 
     const thumbnailSizes = [
       { w: 75, h: 75 },
@@ -833,20 +759,10 @@ export class TinaMediaStore implements MediaStore {
           }
           const { requestId } = await res.json();
 
-          const deleteStartTime = Date.now();
-          while (true) {
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-
-            const { error, message } =
-              await this.api.getRequestStatus(requestId);
-            if (error !== undefined) {
-              if (error) throw new Error(message);
-              return;
-            }
-            if (Date.now() - deleteStartTime > 30000) {
-              throw new Error('Time out waiting for delete to complete');
-            }
-          }
+          await this.waitForRequestStatus(
+            requestId,
+            'Time out waiting for delete to complete'
+          );
         });
       } else {
         throw E_UNAUTHORIZED;

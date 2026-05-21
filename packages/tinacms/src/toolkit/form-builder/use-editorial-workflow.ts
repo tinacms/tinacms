@@ -12,6 +12,7 @@ import {
   UPDATE_DOCUMENT_GQL,
 } from '../../admin/api';
 import { Form } from '@toolkit/forms';
+import { getEditorialWorkflowPrTitle } from './editorial-workflow-utils';
 
 const pathRelativeToCollection = (
   collectionPath: string,
@@ -28,6 +29,19 @@ const pathRelativeToCollection = (
   throw new Error(
     `Path ${fullPath} not within collection path ${collectionPath}`
   );
+};
+
+const getEditorialWorkflowMutation = (crudType: string): string => {
+  if (crudType === 'create') {
+    return CREATE_DOCUMENT_GQL;
+  }
+  if (crudType === 'delete') {
+    return DELETE_DOCUMENT_GQL;
+  }
+  if (crudType !== 'view') {
+    return UPDATE_DOCUMENT_GQL;
+  }
+  return '';
 };
 
 export const WORKFLOW_STEPS = [
@@ -137,14 +151,7 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
       setIsExecuting(true);
       setCurrentStep(1);
 
-      let graphql = '';
-      if (crudType === 'create') {
-        graphql = CREATE_DOCUMENT_GQL;
-      } else if (crudType === 'delete') {
-        graphql = DELETE_DOCUMENT_GQL;
-      } else if (crudType !== 'view') {
-        graphql = UPDATE_DOCUMENT_GQL;
-      }
+      const graphql = getEditorialWorkflowMutation(crudType);
 
       const collection = tinaApi.schema.getCollectionByFullPath(path);
 
@@ -169,7 +176,7 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
       const result = await tinaApi.executeEditorialWorkflow({
         branchName,
         baseBranch,
-        prTitle: `${branchName.replace('tina/', '').replace('-', ' ')} (PR from TinaCMS)`,
+        prTitle: getEditorialWorkflowPrTitle(branchName),
         graphQLContentOp: {
           query: graphql,
           variables: {

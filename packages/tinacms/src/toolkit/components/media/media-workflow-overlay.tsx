@@ -9,6 +9,7 @@ import {
   PopupModal,
 } from '@toolkit/react-modals';
 import { CreateBranchPromptModal } from '@toolkit/form-builder/create-branch-modal';
+import { checkBaseBranchExists } from '@toolkit/form-builder/editorial-workflow-utils';
 import { EditorialWorkflowProgressModal } from '@toolkit/form-builder/editorial-workflow-progress-modal';
 import { getEditorialWorkflowErrorMessage } from '@toolkit/form-builder/use-editorial-workflow';
 
@@ -36,15 +37,6 @@ interface MediaWorkflowConfirmBranchEvent {
   onSaveToProtectedBranch: () => void;
 }
 
-/**
- * Mounted once near the admin shell so every `cms.media.*` caller (Media
- * Manager, image-field plugin, future callers) gets the editorial-workflow
- * progress UI for free. The media store dispatches `media:workflow:*`
- * events; this component renders the existing `WorkflowProgressIndicator`
- * and emits `media:workflow:branch-switched` once both the React branch
- * context and `Client.branch` reflect the new branch, unblocking the store
- * to continue the media op against it.
- */
 export const MediaWorkflowOverlay = () => {
   const cms = useCMS();
   const { setCurrentBranch } = useBranchData();
@@ -104,8 +96,6 @@ export const MediaWorkflowOverlay = () => {
     };
   }, [cms, setCurrentBranch]);
 
-  // Drive the elapsed-time counter while executing — same cadence as the
-  // existing form-builder hook (one tick per second).
   React.useEffect(() => {
     if (state.phase !== 'executing') return;
     const interval = setInterval(() => {
@@ -117,6 +107,43 @@ export const MediaWorkflowOverlay = () => {
     }, 1000);
     return () => clearInterval(interval);
   }, [state.phase]);
+
+  const handleCreateBranch = async () => {
+    if (state.phase !== 'confirming') return;
+
+    const confirmState = state;
+    const branchName = confirmState.branchName;
+    setState({ ...confirmState, isChecking: true, errorMessage: '' });
+
+    const baseBranchExists = await checkBaseBranchExists(
+      cms.api.tina,
+      confirmState.baseBranch,
+      'media workflow'
+    );
+
+    if (!baseBranchExists) {
+      setState({
+        ...confirmState,
+        branchName,
+        isChecking: false,
+        errorMessage: `The branch ${confirmState.baseBranch} no longer exists. It may have been merged or deleted. Your changes cannot be pushed to it.`,
+      });
+      return;
+    }
+
+    setState({ phase: 'executing', step: 1, elapsed: 0 });
+    try {
+      await confirmState.onConfirm(`tina/${branchName}`);
+    } catch (e) {
+      console.error(e);
+      setState({
+        ...confirmState,
+        branchName,
+        isChecking: false,
+        errorMessage: getEditorialWorkflowErrorMessage(e),
+      });
+    }
+  };
 
   if (state.phase === 'idle') return null;
 
@@ -137,50 +164,7 @@ export const MediaWorkflowOverlay = () => {
               : prev
           );
         }}
-        onCreateBranch={async () => {
-          const confirmState = state;
-          const branchName = confirmState.branchName;
-          setState({ ...confirmState, isChecking: true, errorMessage: '' });
-
-          let baseBranchExists = true;
-          try {
-            console.debug(
-              '[tina:branch-guard] media workflow: checking base branch:',
-              confirmState.baseBranch
-            );
-            baseBranchExists = await cms.api.tina.branchExists(
-              confirmState.baseBranch
-            );
-          } catch (err) {
-            console.error(
-              '[tina:branch-guard] media workflow: branchExists threw, failing open:',
-              err
-            );
-          }
-
-          if (!baseBranchExists) {
-            setState({
-              ...confirmState,
-              branchName,
-              isChecking: false,
-              errorMessage: `The branch ${confirmState.baseBranch} no longer exists. It may have been merged or deleted. Your changes cannot be pushed to it.`,
-            });
-            return;
-          }
-
-          setState({ phase: 'executing', step: 1, elapsed: 0 });
-          try {
-            await confirmState.onConfirm(`tina/${branchName}`);
-          } catch (e) {
-            console.error(e);
-            setState({
-              ...confirmState,
-              branchName,
-              isChecking: false,
-              errorMessage: getEditorialWorkflowErrorMessage(e),
-            });
-          }
-        }}
+        onCreateBranch={handleCreateBranch}
         onSaveToProtectedBranch={() => {
           state.onSaveToProtectedBranch();
           setState({ phase: 'idle' });
