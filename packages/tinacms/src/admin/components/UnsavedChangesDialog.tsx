@@ -1,8 +1,9 @@
 import React from 'react';
+import { AiFillWarning } from 'react-icons/ai';
+import { CloseIcon } from '@toolkit/icons';
 import { Button } from '@toolkit/styles';
 import {
   Modal,
-  ModalHeader,
   ModalBody,
   ModalActions,
   ModalPopup,
@@ -22,7 +23,18 @@ export const UnsavedChangesDialog = ({
   return (
     <Modal>
       <ModalPopup>
-        <ModalHeader close={onClose}>Unsaved changes</ModalHeader>
+        <div className='flex items-center px-5 py-2 border-b border-gray-200'>
+          <AiFillWarning className='w-7 h-auto -ml-1 mr-1 text-yellow-600' />
+          <h2 className='text-black font-sans font-medium text-base m-0 block truncate flex items-center'>
+            Unsaved changes
+          </h2>
+          <div
+            onClick={onClose}
+            className='ml-auto flex justify-self-end items-center fill-gray-400 cursor-pointer transition-colors duration-100 ease-out hover:fill-gray-700'
+          >
+            <CloseIcon className='w-6 h-auto' />
+          </div>
+        </div>
         <ModalBody padded={true}>
           <p>
             You have unsaved changes. Do you want to discard them and leave this
@@ -30,10 +42,10 @@ export const UnsavedChangesDialog = ({
           </p>
         </ModalBody>
         <ModalActions>
-          <Button style={{ flexGrow: 2 }} onClick={onClose}>
+          <Button style={{ flexGrow: 1 }} onClick={onClose}>
             Keep editing
           </Button>
-          <Button style={{ flexGrow: 3 }} variant='danger' onClick={onDiscard}>
+          <Button style={{ flexGrow: 1 }} variant='danger' onClick={onDiscard}>
             Discard changes
           </Button>
         </ModalActions>
