@@ -111,7 +111,7 @@ const RenderForm = ({
   const navigate = useNavigate();
   const folder = useCollectionFolder();
   const [formIsPristine, setFormIsPristine] = useState(true);
-  const [showWarningBanner, setShowWarningBanner] = useState(false);
+  const [showWarning, setShowWarning] = useState(false);
 
   const parent = folder.fullyQualifiedName ? parentFolder(folder) : folder;
   const collectionListPath = `/collections/${collection.name}${
@@ -122,7 +122,7 @@ const RenderForm = ({
     if (isBackWarningDismissed()) {
       navigate(collectionListPath);
     } else {
-      setShowWarningBanner(true);
+      setShowWarning(true);
     }
   };
   const schema: TinaSchema | undefined = cms.api.tina.schema;
@@ -193,8 +193,8 @@ const RenderForm = ({
   return (
     <>
       <UnsavedChangesDialog
-        open={showWarningBanner}
-        onDismiss={() => navigate(collectionListPath)}
+        open={showWarning}
+        onDismiss={() => setShowWarning(false)}
       />
       <div
         className={`py-4 px-6 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center`}

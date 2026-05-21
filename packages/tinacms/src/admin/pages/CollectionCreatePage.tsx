@@ -156,7 +156,7 @@ export const RenderForm = ({
 }) => {
   const navigate = useNavigate();
   const [formIsPristine, setFormIsPristine] = useState(true);
-  const [showWarningBanner, setShowWarningBanner] = useState(false);
+  const [showWarning, setShowWarning] = useState(false);
   const schema: TinaSchema | undefined = cms.api.tina.schema;
 
   // the schema is being passed in from the frontend so we can use that
@@ -369,7 +369,7 @@ export const RenderForm = ({
     if (isBackWarningDismissed()) {
       navigate(collectionListPath);
     } else {
-      setShowWarningBanner(true);
+      setShowWarning(true);
     }
   };
 
@@ -377,8 +377,8 @@ export const RenderForm = ({
     <PageWrapper headerClassName='bg-white'>
       <>
         <UnsavedChangesDialog
-          open={showWarningBanner}
-          onDismiss={() => navigate(collectionListPath)}
+          open={showWarning}
+          onDismiss={() => setShowWarning(false)}
         />
         <div
           className={`py-4 px-6 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center`}

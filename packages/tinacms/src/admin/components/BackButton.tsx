@@ -1,13 +1,7 @@
 import React from 'react';
 import { BiArrowBack } from 'react-icons/bi';
-import { useCMS } from '@toolkit/react-core';
 
 export const BackButton = ({ onClick }: { onClick: () => void }) => {
-  const cms = useCMS();
-  const isTopLevel = cms.state.breadcrumbs.length <= 1;
-
-  if (!isTopLevel) return null;
-
   return (
     <button
       type='button'
