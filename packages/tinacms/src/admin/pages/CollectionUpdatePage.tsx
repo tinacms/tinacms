@@ -20,7 +20,7 @@ import GetCMS from '../components/GetCMS';
 import GetCollection from '../components/GetCollection';
 import GetDocument from '../components/GetDocument';
 import { PageWrapper } from '../components/Page';
-import { useCollectionFolder } from './utils';
+import { parentFolder, useCollectionFolder } from './utils';
 
 const updateDocument = async (
   cms: TinaCMS,
@@ -110,8 +110,9 @@ const RenderForm = ({
   const [formIsPristine, setFormIsPristine] = useState(true);
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
 
+  const parent = folder.fullyQualifiedName ? parentFolder(folder) : folder;
   const collectionListPath = `/collections/${collection.name}${
-    folder.fullyQualifiedName ? `/${folder.fullyQualifiedName}` : ''
+    parent.fullyQualifiedName ? `/${parent.fullyQualifiedName}` : ''
   }`;
 
   const handleBack = () => {
