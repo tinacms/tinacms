@@ -972,7 +972,10 @@ export class Database {
                         field.type === 'number'
                           ? { fillString: '0', maxLength: DEFAULT_NUMERIC_LPAD }
                           : field.type === 'datetime'
-                            ? { fillString: '0', maxLength: DEFAULT_DATETIME_LPAD }
+                            ? {
+                                fillString: '0',
+                                maxLength: DEFAULT_DATETIME_LPAD,
+                              }
                             : undefined,
                     },
                   ],
@@ -996,7 +999,10 @@ export class Database {
                         field?.type === 'number'
                           ? { fillString: '0', maxLength: DEFAULT_NUMERIC_LPAD }
                           : field?.type === 'datetime'
-                            ? { fillString: '0', maxLength: DEFAULT_DATETIME_LPAD }
+                            ? {
+                                fillString: '0',
+                                maxLength: DEFAULT_DATETIME_LPAD,
+                              }
                             : undefined,
                     };
                   }),
