@@ -222,6 +222,7 @@ export class TinaMediaStore implements MediaStore {
             );
           } catch (error) {
             reject(error);
+            throw error;
           }
         },
         onCancel: () => reject(new MediaOperationCancelledError()),

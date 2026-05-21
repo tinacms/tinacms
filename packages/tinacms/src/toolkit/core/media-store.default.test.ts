@@ -542,6 +542,39 @@ describe('TinaMediaStore — protected-branch interception', () => {
     );
   });
 
+  it('rejects the branch prompt confirmation when branch preparation fails', async () => {
+    const createBranch = vi
+      .fn()
+      .mockRejectedValue(new Error('There was an error creating a new branch'));
+
+    const { store, events } = buildStore({
+      branch: 'main',
+      usingProtectedBranch: true,
+      createBranch,
+      autoConfirmMediaBranchPrompt: false,
+    });
+
+    const confirmEventPromise = new Promise<any>((resolve) => {
+      events.subscribe('media:workflow:confirm-branch', resolve);
+    });
+
+    const persistPromise = store.persist([
+      {
+        directory: 'uploads',
+        file: new File(['x'], 'a.png', { type: 'image/png' }),
+      },
+    ]);
+
+    const event = await confirmEventPromise;
+    const confirmPromise = event.onConfirm('tina/custom-media-change');
+    await expect(confirmPromise).rejects.toThrow(
+      'There was an error creating a new branch'
+    );
+    await expect(persistPromise).rejects.toThrow(
+      'There was an error creating a new branch'
+    );
+  });
+
   it('continues on the protected branch when the overlay chooses that action', async () => {
     const createBranch = vi.fn();
     const createPullRequest = vi.fn();
