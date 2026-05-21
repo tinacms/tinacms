@@ -12,7 +12,10 @@ import {
 } from '@toolkit/react-sidebar/components/sidebar-body';
 import React, { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { UnsavedChangesDialog } from '../components/UnsavedChangesDialog';
+import {
+  UnsavedChangesDialog,
+  isBackWarningDismissed,
+} from '../components/UnsavedChangesDialog';
 import { BackButton } from '../components/BackButton';
 import { TinaAdminApi } from '../api';
 import { ErrorDialog } from '../components/ErrorDialog';
@@ -108,7 +111,7 @@ const RenderForm = ({
   const navigate = useNavigate();
   const folder = useCollectionFolder();
   const [formIsPristine, setFormIsPristine] = useState(true);
-  const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
+  const [showWarningBanner, setShowWarningBanner] = useState(false);
 
   const parent = folder.fullyQualifiedName ? parentFolder(folder) : folder;
   const collectionListPath = `/collections/${collection.name}${
@@ -116,10 +119,10 @@ const RenderForm = ({
   }`;
 
   const handleBack = () => {
-    if (formIsPristine) {
+    if (isBackWarningDismissed()) {
       navigate(collectionListPath);
     } else {
-      setShowUnsavedDialog(true);
+      setShowWarningBanner(true);
     }
   };
   const schema: TinaSchema | undefined = cms.api.tina.schema;
@@ -190,9 +193,8 @@ const RenderForm = ({
   return (
     <>
       <UnsavedChangesDialog
-        open={showUnsavedDialog}
-        onClose={() => setShowUnsavedDialog(false)}
-        onDiscard={() => navigate(collectionListPath)}
+        open={showWarningBanner}
+        onDismiss={() => navigate(collectionListPath)}
       />
       <div
         className={`py-4 px-6 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center`}
