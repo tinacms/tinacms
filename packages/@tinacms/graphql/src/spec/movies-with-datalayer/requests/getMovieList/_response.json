@@ -195,7 +195,7 @@
       ],
       "pageInfo": {
         "hasNextPage": true,
-        "endCursor": "MjMzMzkxNjAwMDAwHWNvbnRlbnQvbW92aWVzL3N0YXItd2Fycy5tZA=="
+        "endCursor": "MDAyMzMzOTE2MDAwMDAdY29udGVudC9tb3ZpZXMvc3Rhci13YXJzLm1k"
       }
     },
     "paginatedAscPage2": {
@@ -208,7 +208,7 @@
       ],
       "pageInfo": {
         "hasNextPage": true,
-        "endCursor": "MzYxMTc3MjAwMDAwHWNvbnRlbnQvbW92aWVzL2luZGlhbmEtam9uZXMubWQ="
+        "endCursor": "MDAzNjExNzcyMDAwMDAdY29udGVudC9tb3ZpZXMvaW5kaWFuYS1qb25lcy5tZA=="
       }
     },
     "paginatedDesc": {
@@ -221,7 +221,7 @@
       ],
       "pageInfo": {
         "hasPreviousPage": true,
-        "endCursor": "ODM0MTMwODAwMDAwHWNvbnRlbnQvbW92aWVzL3RoZS1yb2NrLm1k"
+        "endCursor": "MDA4MzQxMzA4MDAwMDAdY29udGVudC9tb3ZpZXMvdGhlLXJvY2subWQ="
       }
     },
     "paginatedDescPage2": {
@@ -234,7 +234,7 @@
       ],
       "pageInfo": {
         "hasPreviousPage": true,
-        "endCursor": "MzYxMTc3MjAwMDAwHWNvbnRlbnQvbW92aWVzL2luZGlhbmEtam9uZXMubWQ="
+        "endCursor": "MDAzNjExNzcyMDAwMDAdY29udGVudC9tb3ZpZXMvaW5kaWFuYS1qb25lcy5tZA=="
       }
     },
     "moviesByGeorgeLucas": {

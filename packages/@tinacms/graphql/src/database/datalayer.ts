@@ -70,6 +70,7 @@ export const REFS_COLLECTIONS_SORT_KEY = '__refs__';
 export const REFS_REFERENCE_FIELD = '__tina_ref__';
 export const REFS_PATH_FIELD = '__tina_ref_path__';
 export const DEFAULT_NUMERIC_LPAD = 4;
+export const DEFAULT_DATETIME_LPAD = 14;
 
 const applyPadding = (input: any, pad?: PadDefinition) => {
   if (pad) {
@@ -478,7 +479,9 @@ export const makeFilterChain = ({
         pad:
           _type === 'number'
             ? { fillString: '0', maxLength: DEFAULT_NUMERIC_LPAD }
-            : undefined,
+            : _type === 'datetime'
+              ? { fillString: '0', maxLength: DEFAULT_DATETIME_LPAD }
+              : undefined,
       });
     } else if (key1 && key2) {
       const leftFilterOperator =
@@ -519,7 +522,9 @@ export const makeFilterChain = ({
           pad:
             _type === 'number'
               ? { fillString: '0', maxLength: DEFAULT_NUMERIC_LPAD }
-              : undefined,
+              : _type === 'datetime'
+                ? { fillString: '0', maxLength: DEFAULT_DATETIME_LPAD }
+                : undefined,
         });
       } else {
         throw new Error(
