@@ -674,6 +674,7 @@ describe('TinaMediaStore — protected-branch interception', () => {
 
     expect(eventsLog).toEqual([
       'createBranch',
+      'getIndexStatus',
       'upload_url',
       'list',
       'getIndexStatus',
@@ -682,11 +683,13 @@ describe('TinaMediaStore — protected-branch interception', () => {
     ]);
   });
 
-  it('waits for indexing to complete between the upload and the pull request', async () => {
-    // Two `inprogress` polls then `complete` — the wait must hit all three
-    // before opening the PR, so the PR sees a fully-indexed branch.
+  it('waits for initial branch indexing before upload and media indexing before the pull request', async () => {
+    // Initial branch indexing must complete before the upload starts. After
+    // upload, two `inprogress` polls then `complete` must all finish before
+    // opening the PR, so the PR sees a fully-indexed media commit.
     const getIndexStatus = vi
       .fn()
+      .mockResolvedValueOnce({ status: 'complete' })
       .mockResolvedValueOnce({ status: 'inprogress' })
       .mockResolvedValueOnce({ status: 'inprogress' })
       .mockResolvedValueOnce({ status: 'complete' });
@@ -719,16 +722,19 @@ describe('TinaMediaStore — protected-branch interception', () => {
         file: new File(['x'], 'a.png', { type: 'image/png' }),
       },
     ]);
-    // 1s upload poll + 2x 5s index polls.
+    // 1s upload poll + 2x 5s post-upload index polls.
     await vi.advanceTimersByTimeAsync(1100);
     await vi.advanceTimersByTimeAsync(5000);
     await vi.advanceTimersByTimeAsync(5000);
     await persistPromise;
 
-    expect(getIndexStatus).toHaveBeenCalledTimes(3);
+    expect(getIndexStatus).toHaveBeenCalledTimes(4);
     expect(getIndexStatus.mock.calls[0][0]).toEqual({
       ref: 'tina/media-upload-uploads-a-png',
     });
+    expect(getIndexStatus.mock.invocationCallOrder[0]).toBeLessThan(
+      fetchWithToken.mock.invocationCallOrder[0]
+    );
 
     // PR creation must follow the final `complete` poll.
     const lastIndexCall = getIndexStatus.mock.invocationCallOrder.at(-1)!;
@@ -737,7 +743,10 @@ describe('TinaMediaStore — protected-branch interception', () => {
   });
 
   it('surfaces indexing failures via media:workflow:error without breaking the completed upload', async () => {
-    const getIndexStatus = vi.fn().mockResolvedValue({ status: 'failed' });
+    const getIndexStatus = vi
+      .fn()
+      .mockResolvedValueOnce({ status: 'complete' })
+      .mockResolvedValue({ status: 'failed' });
     const createPullRequest = vi.fn();
 
     const { store, fetchWithToken, events } = buildStore({
@@ -781,7 +790,10 @@ describe('TinaMediaStore — protected-branch interception', () => {
   });
 
   it('surfaces "indexing never started" when the webhook stays unknown for too long', async () => {
-    const getIndexStatus = vi.fn().mockResolvedValue({ status: 'unknown' });
+    const getIndexStatus = vi
+      .fn()
+      .mockResolvedValueOnce({ status: 'complete' })
+      .mockResolvedValue({ status: 'unknown' });
     const createPullRequest = vi.fn();
 
     const { store, fetchWithToken, events } = buildStore({

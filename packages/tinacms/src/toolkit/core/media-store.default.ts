@@ -245,13 +245,17 @@ export class TinaMediaStore implements MediaStore {
         branchName,
         baseBranch,
         onConfirm: async (selectedBranchName) => {
-          resolve(
-            await this.prepareMediaBranch(
-              opType,
-              selectedBranchName,
-              baseBranch
-            )
-          );
+          try {
+            resolve(
+              await this.prepareMediaBranch(
+                opType,
+                selectedBranchName,
+                baseBranch
+              )
+            );
+          } catch (error) {
+            reject(error);
+          }
         },
         onCancel: () => reject(new MediaOperationCancelledError()),
         onSaveToProtectedBranch: () => resolve(undefined),
@@ -307,11 +311,11 @@ export class TinaMediaStore implements MediaStore {
   }
 
   /**
-   * Creates the branch on GitHub and installs the local override so the
-   * subsequent upload/delete + indexing + PR steps route through it
-   * without changing React state. React state remains on the protected
-   * branch until `finalizeMediaWorkflow` switches it after indexing is
-   * confirmed complete.
+   * Creates the branch on GitHub, waits until its initial indexing has
+   * populated branch metadata, and installs the local override so the
+   * subsequent upload/delete + PR steps route through it without changing
+   * React state. React state remains on the protected branch until
+   * `finalizeMediaWorkflow` switches it after the media commit is confirmed.
    */
   private async prepareMediaBranch(
     opType: 'upload' | 'delete',
@@ -336,6 +340,9 @@ export class TinaMediaStore implements MediaStore {
       baseBranch,
       prTitle: this.prTitleForBranch(createdBranchName || branchName),
     };
+
+    tinaCms.events.dispatch({ type: 'media:workflow:step', step: 2 });
+    await this.waitForBranchIndexed(branchContext.branchName);
 
     this.workflowBranchOverride = branchContext.branchName;
 
