@@ -565,8 +565,8 @@ catalogs:
       specifier: ^6.5.9
       version: 6.5.9
     react-router-dom:
-      specifier: 6.3.0
-      version: 6.3.0
+      specifier: ^6.30.3
+      version: 6.30.3
     react-use:
       specifier: ^17.6.0
       version: 17.6.0
@@ -1219,7 +1219,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router-dom:
         specifier: 'catalog:'
-        version: 6.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 6.30.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       tinacms:
         specifier: workspace:*
         version: link:../../tinacms
@@ -2425,7 +2425,7 @@ importers:
         version: 5.5.0(react@18.3.1)
       react-router-dom:
         specifier: 'catalog:'
-        version: 6.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 6.30.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-use:
         specifier: 'catalog:'
         version: 17.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -10632,9 +10632,6 @@ packages:
     resolution: {integrity: sha512-Xwwo44whKBVCYoliBQwaPvtd/2tYFkRQtXDWj1nackaV2JPXx3L0+Jvd8/qCJ2p+ML0/XVkJ2q+Mr+UVdpJK5w==}
     engines: {node: '>=12.0.0'}
 
-  history@5.3.0:
-    resolution: {integrity: sha512-ZqaKwjjrAYUYfLG+htGaIIZ4nioX2L70ZUMIFysS3xvBsSG4x/n1V6TXV3N8ZYNuFGlDirFg32T7B6WOUPDYcQ==}
-
   hoist-non-react-statics@3.3.2:
     resolution: {integrity: sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==}
 
@@ -13486,23 +13483,12 @@ packages:
       '@types/react':
         optional: true
 
-  react-router-dom@6.3.0:
-    resolution: {integrity: sha512-uaJj7LKytRxZNQV8+RbzJWnJ8K2nPsOOEuX7aQstlMZKQT0164C+X2w6bnkqU3sjtLvpd5ojrezAyfZ1+0sStw==}
-    peerDependencies:
-      react: '>=16.8'
-      react-dom: '>=16.8'
-
   react-router-dom@6.30.3:
     resolution: {integrity: sha512-pxPcv1AczD4vso7G4Z3TKcvlxK7g7TNt3/FNGMhfqyntocvYKj+GCatfigGDjbLozC4baguJ0ReCigoDJXb0ag==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       react: '>=16.8'
       react-dom: '>=16.8'
-
-  react-router@6.3.0:
-    resolution: {integrity: sha512-7Wh1DzVQ+tlFjkeo+ujvjSqSJmkt1+8JO+T5xklPlgrh70y7ogx75ODRW0ThWhY7S+6yEDks8TYrtQe/aoboBQ==}
-    peerDependencies:
-      react: '>=16.8'
 
   react-router@6.30.3:
     resolution: {integrity: sha512-XRnlbKMTmktBkjCLE8/XcZFlnHvr2Ltdr1eJX4idL55/9BbORzyZEaIkBFDhFGCEWBBItsVrDxwx3gnisMitdw==}
@@ -25688,10 +25674,6 @@ snapshots:
 
   highlight.js@11.11.1: {}
 
-  history@5.3.0:
-    dependencies:
-      '@babel/runtime': 7.28.4
-
   hoist-non-react-statics@3.3.2:
     dependencies:
       react-is: 16.13.1
@@ -29789,24 +29771,12 @@ snapshots:
     optionalDependencies:
       '@types/react': 18.3.27
 
-  react-router-dom@6.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
-    dependencies:
-      history: 5.3.0
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      react-router: 6.3.0(react@18.3.1)
-
   react-router-dom@6.30.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@remix-run/router': 1.23.2
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       react-router: 6.30.3(react@18.3.1)
-
-  react-router@6.3.0(react@18.3.1):
-    dependencies:
-      history: 5.3.0
-      react: 18.3.1
 
   react-router@6.30.3(react@18.3.1):
     dependencies:
