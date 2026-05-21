@@ -121,8 +121,8 @@ describe('The schema validation', () => {
           },
         ],
       })
-    ).rejects.toThrowErrorMatchingInlineSnapshot(
-      `[Error: Field "textDecoration" uses "checkbox-group" without list: true. Add list: true or use "select" instead.]`
+    ).rejects.toThrow(
+      'Field "textDecoration" uses "checkbox-group" without list: true at someName.textDecoration. Add list: true or use "select" instead.'
     );
   });
 
@@ -139,6 +139,7 @@ describe('The schema validation', () => {
                 label: 'Text Decoration',
                 options: ['underline', 'overline'],
                 list: true,
+                ui: { component: 'checkbox-group' },
               },
             ],
           },

@@ -235,7 +235,7 @@ const validateField = async (
     !validField.list
   ) {
     throw new Error(
-      `Field "${validField.name}" uses "checkbox-group" without list: true. Add list: true or use "select" instead.`
+      `Field "${validField.name}" uses "checkbox-group" without list: true at ${messageName}. Add list: true or use "select" instead.`
     );
   }
 
