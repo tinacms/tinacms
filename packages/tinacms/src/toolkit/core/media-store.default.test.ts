@@ -615,6 +615,56 @@ describe('TinaMediaStore — protected-branch interception', () => {
     expect(fetchWithToken.mock.calls[0][0]).toContain('?branch=main');
   });
 
+  it('resolves persist with [] when the user cancels the branch prompt', async () => {
+    const createBranch = vi.fn();
+    const { store, fetchWithToken, events } = buildStore({
+      branch: 'main',
+      usingProtectedBranch: true,
+      createBranch,
+      autoConfirmMediaBranchPrompt: false,
+    });
+
+    events.subscribe('media:workflow:confirm-branch', (event) => {
+      event.onCancel();
+    });
+
+    await expect(
+      store.persist([
+        {
+          directory: 'uploads',
+          file: new File(['x'], 'a.png', { type: 'image/png' }),
+        },
+      ])
+    ).resolves.toEqual([]);
+
+    expect(createBranch).not.toHaveBeenCalled();
+    expect(fetchWithToken).not.toHaveBeenCalled();
+  });
+
+  it('resolves delete cleanly when the user cancels the branch prompt', async () => {
+    const createBranch = vi.fn();
+    const { store, fetchWithToken, events } = buildStore({
+      branch: 'main',
+      usingProtectedBranch: true,
+      createBranch,
+      autoConfirmMediaBranchPrompt: false,
+    });
+
+    events.subscribe('media:workflow:confirm-branch', (event) => {
+      event.onCancel();
+    });
+
+    await expect(
+      store.delete({
+        directory: 'images',
+        filename: 'a.png',
+      } as Media)
+    ).resolves.toBeUndefined();
+
+    expect(createBranch).not.toHaveBeenCalled();
+    expect(fetchWithToken).not.toHaveBeenCalled();
+  });
+
   it('does not create a media branch for an empty upload batch', async () => {
     const createBranch = vi.fn();
     const { store, fetchWithToken, authProvider } = buildStore({

@@ -32,16 +32,7 @@ interface MediaBranchContext {
   baseBranch: string;
 }
 
-const MEDIA_OPERATION_CANCELLED = 'MEDIA_OPERATION_CANCELLED';
-
-class MediaOperationCancelledError extends Error {
-  code = MEDIA_OPERATION_CANCELLED;
-
-  constructor() {
-    super('Media operation cancelled.');
-    this.name = 'MediaOperationCancelledError';
-  }
-}
+type PreparedMediaBranch = MediaBranchContext | 'cancelled' | undefined;
 
 const s3ErrorRegex = /<Error>.*<Code>(.+)<\/Code>.*<Message>(.+)<\/Message>.*/;
 
@@ -209,7 +200,7 @@ export class TinaMediaStore implements MediaStore {
   private requestMediaBranchChoice(
     branchName: string,
     baseBranch: string
-  ): Promise<MediaBranchContext | undefined> {
+  ): Promise<PreparedMediaBranch> {
     return new Promise((resolve, reject) => {
       this.cms.events.dispatch<MediaWorkflowConfirmBranchEvent>({
         type: 'media:workflow:confirm-branch',
@@ -225,7 +216,7 @@ export class TinaMediaStore implements MediaStore {
             throw error;
           }
         },
-        onCancel: () => reject(new MediaOperationCancelledError()),
+        onCancel: () => resolve('cancelled'),
         onSaveToProtectedBranch: () => resolve(undefined),
       });
     });
@@ -358,8 +349,8 @@ export class TinaMediaStore implements MediaStore {
     opType: 'upload' | 'delete',
     directory: string | undefined,
     filename: string | undefined
-  ): Promise<MediaBranchContext | undefined> {
-    if (!this.api.usingProtectedBranch()) return;
+  ): Promise<PreparedMediaBranch> {
+    if (!this.api.usingProtectedBranch()) return undefined;
 
     const baseBranch = decodeURIComponent(this.api.branch || '');
     const mediaSlug = this.branchSlugForMediaPath(directory, filename);
@@ -402,13 +393,14 @@ export class TinaMediaStore implements MediaStore {
     }
 
     const firstItem = media[0];
-    const branchContext = await this.prepareProtectedMediaBranch(
+    const decision = await this.prepareProtectedMediaBranch(
       'upload',
       firstItem.directory,
       firstItem.file.name
     );
+    if (decision === 'cancelled') return [];
 
-    return this.runMediaOpWithWorkflow(branchContext, async () => {
+    return this.runMediaOpWithWorkflow(decision, async () => {
       const encodedBranch = this.encodedBranchParam();
       const branchQuery = encodedBranch ? `?branch=${encodedBranch}` : '';
 
@@ -755,12 +747,13 @@ export class TinaMediaStore implements MediaStore {
     }`;
     if (!this.isLocal) {
       if (await this.isAuthenticated()) {
-        const branchContext = await this.prepareProtectedMediaBranch(
+        const decision = await this.prepareProtectedMediaBranch(
           'delete',
           media.directory,
           media.filename
         );
-        await this.runMediaOpWithWorkflow(branchContext, async () => {
+        if (decision === 'cancelled') return;
+        await this.runMediaOpWithWorkflow(decision, async () => {
           const encodedBranch = this.encodedBranchParam();
           const branchQuery = encodedBranch ? `?branch=${encodedBranch}` : '';
           const res = await this.api.authProvider.fetchWithToken(
