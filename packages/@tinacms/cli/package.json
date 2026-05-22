@@ -49,6 +49,7 @@
     "scripts": {
         "build": "tinacms-scripts build",
         "test": "jest --passWithNoTests",
+        "test:adapters": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.adapter-matrix.config.js --runTestsByPath src/next/adapter-matrix.test.ts",
         "types": "pnpm tsc",
         "test-watch": "jest  --passWithNoTests --watch",
         "tinacms": "MONOREPO_DEV=true node ./bin/tinacms",
