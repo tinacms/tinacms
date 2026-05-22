@@ -21,6 +21,9 @@ export interface IslandRefreshOptions {
 const ISLAND_SELECTOR = '[data-tina-island]';
 const ENDPOINT_ATTR = 'data-tina-island';
 const PRIMARY_ISLAND_ATTR = 'data-tina-island-primary';
+/** Marks a `[data-tina-form]` div that a prime pass appended (vs. one the
+ *  server injected), so a later re-scan can drop it before re-priming. */
+export const PRIMED_FORM_ATTR = 'data-tina-primed';
 
 export function initIslandRefresh(
   store: DataStore,
@@ -116,7 +119,10 @@ async function refreshIsland(
 export async function primeIslands(): Promise<void> {
   const islands = document.querySelectorAll<HTMLElement>(ISLAND_SELECTOR);
   const results = await Promise.all(Array.from(islands, primeIsland));
-  for (const formEl of results.flat()) document.body.appendChild(formEl);
+  for (const formEl of results.flat()) {
+    formEl.setAttribute(PRIMED_FORM_ATTR, '');
+    document.body.appendChild(formEl);
+  }
 }
 
 async function primeIsland(island: HTMLElement): Promise<HTMLElement[]> {

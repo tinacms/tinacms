@@ -8,7 +8,11 @@ import { setAdminOrigin } from './config';
 import { initDataStore } from './data-store';
 import { debug } from './debug';
 import { initForms, refreshForms as refreshFormsFromDom } from './forms';
-import { initIslandRefresh, primeIslands } from './island-refresh';
+import {
+  PRIMED_FORM_ATTR,
+  initIslandRefresh,
+  primeIslands,
+} from './island-refresh';
 
 export interface BridgeOptions {
   /** Debounce for refetches after the first edit. The first refetch
@@ -43,11 +47,13 @@ export function init(options: BridgeOptions = {}): void {
   refreshForms();
 }
 
-// Guards against overlapping prime passes: if `refreshForms()` fires again
-// (a second `astro:page-load`) before the first prime resolves, both runs
-// would append `[data-tina-form]` divs for the same islands. The in-flight
-// run already reflects the current DOM, so later callers just await it.
+// Only one prime pass runs at a time. A second `refreshForms()` arriving
+// mid-prime (e.g. a soft navigation's `astro:page-load`) doesn't start a
+// rival pass — it sets `reprimePending` so we run exactly one more pass once
+// the in-flight one resolves. The in-flight pass reflects the pre-navigation
+// DOM, so dropping the later call would strand the new page's forms.
 let primingInFlight: Promise<void> | null = null;
+let reprimePending = false;
 
 /**
  * Re-scan for `[data-tina-form]` payloads after a soft navigation
@@ -55,17 +61,41 @@ let primingInFlight: Promise<void> | null = null;
  * server-injected payloads, prime from the island endpoints first.
  */
 export function refreshForms(): void {
+  // Forms a previous prime appended belong to a prior render; drop them
+  // before re-scanning so a new page (or a re-prime after a mid-prime
+  // navigation) never reads stale island payloads, and so the
+  // server-forms check below sees only genuinely server-injected payloads.
+  removePrimedForms();
+
   const hasServerForms = document.querySelector('[data-tina-form]');
   if (!hasServerForms && document.querySelector('[data-tina-island]')) {
-    if (primingInFlight) return;
+    if (primingInFlight) {
+      reprimePending = true;
+      return;
+    }
     debug('no server-injected forms; priming from island endpoints');
     primingInFlight = primeIslands().finally(() => {
       primingInFlight = null;
     });
-    void primingInFlight.then(refreshFormsFromDom);
+    void primingInFlight.then(() => {
+      // A navigation landed mid-prime: re-prime against the current DOM
+      // rather than announcing this pass's now-stale payloads.
+      if (reprimePending) {
+        reprimePending = false;
+        refreshForms();
+        return;
+      }
+      refreshFormsFromDom();
+    });
     return;
   }
   refreshFormsFromDom();
+}
+
+function removePrimedForms(): void {
+  for (const el of document.querySelectorAll(`[${PRIMED_FORM_ATTR}]`)) {
+    el.remove();
+  }
 }
 
 export { tinaField } from './tina-field';

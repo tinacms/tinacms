@@ -83,4 +83,52 @@ describe('refreshForms (public wrapper)', () => {
 
     expect(fetchMock).not.toHaveBeenCalled();
   });
+
+  it('re-primes against the new page when a navigation lands mid-prime', async () => {
+    const formHtml = (endpoint: string) =>
+      `<div data-tina-form='${JSON.stringify({
+        id: endpoint,
+        query: 'query Doc',
+        variables: {},
+        data: {},
+      })}' hidden></div>`;
+    const formResponse = (endpoint: string) =>
+      new Response(formHtml(endpoint), {
+        headers: { 'Content-Type': 'text/html' },
+      });
+
+    // The first page's prime stays in flight until we resolve it manually,
+    // modelling a slow endpoint.
+    let resolveFirst: (response: Response) => void = () => {};
+    const firstResponse = new Promise<Response>((resolve) => {
+      resolveFirst = resolve;
+    });
+    fetchMock.mockImplementation((url: string) =>
+      url === '/tina-island/a'
+        ? firstResponse
+        : Promise.resolve(formResponse(url))
+    );
+
+    document.body.innerHTML = `<article data-tina-island="/tina-island/a">A</article>`;
+    const bridge = await loadBridge();
+    bridge.refreshForms();
+
+    // Soft navigation swaps in a different page before the first prime resolves.
+    document.body.innerHTML = `<article data-tina-island="/tina-island/b">B</article>`;
+    bridge.refreshForms();
+
+    resolveFirst(formResponse('/tina-island/a'));
+
+    await vi.waitFor(() => {
+      const forms = document.querySelectorAll('[data-tina-form]');
+      expect(forms).toHaveLength(1);
+      expect(forms[0]?.getAttribute('data-tina-form')).toContain(
+        '/tina-island/b'
+      );
+    });
+
+    const urls = fetchMock.mock.calls.map(([url]) => url);
+    expect(urls).toContain('/tina-island/a');
+    expect(urls).toContain('/tina-island/b');
+  });
 });
