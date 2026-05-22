@@ -168,7 +168,7 @@ const Heading4 = ({
 
 /** Tailwind prose doesn't style h5 and h6 elements */
 const headerSerifStyle: React.CSSProperties = {
-  fontFamily: "'Libre Baskerville', serif",
+  fontFamily: "'Inter', sans-serif",
   fontWeight: '400',
 };
 
