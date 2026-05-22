@@ -61,6 +61,10 @@
       "types": "./dist/experimental.d.ts",
       "astro": "./src/experimental.ts",
       "default": "./dist/experimental.js"
+    },
+    "./vite": {
+      "types": "./dist/vite.d.ts",
+      "default": "./dist/vite.js"
     }
   },
   "license": "Apache-2.0",
@@ -108,6 +112,10 @@
       },
       {
         "name": "src/island-route.ts",
+        "target": "node"
+      },
+      {
+        "name": "src/vite.ts",
         "target": "node"
       }
     ]
