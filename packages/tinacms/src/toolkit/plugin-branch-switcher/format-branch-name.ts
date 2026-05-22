@@ -6,5 +6,26 @@
  * a cycle through `@toolkit/core`.
  */
 export function formatBranchName(str: string): string {
-  return str.replace(/[^/\w-]+/g, '-').toLowerCase();
+  let result = '';
+  let replacingInvalidChars = false;
+
+  for (const char of str.toLowerCase()) {
+    const code = char.charCodeAt(0);
+    const isValid =
+      char === '/' ||
+      char === '-' ||
+      char === '_' ||
+      (code >= 48 && code <= 57) ||
+      (code >= 97 && code <= 122);
+
+    if (isValid) {
+      result += char;
+      replacingInvalidChars = false;
+    } else if (!replacingInvalidChars) {
+      result += '-';
+      replacingInvalidChars = true;
+    }
+  }
+
+  return result;
 }

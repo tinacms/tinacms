@@ -615,6 +615,42 @@ describe('TinaMediaStore — protected-branch interception', () => {
     expect(fetchWithToken.mock.calls[0][0]).toContain('?branch=main');
   });
 
+  it('continues on the protected branch when no media workflow overlay is mounted', async () => {
+    const createBranch = vi.fn();
+    const createPullRequest = vi.fn();
+    const { store, fetchWithToken } = buildStore({
+      branch: 'main',
+      usingProtectedBranch: true,
+      createBranch,
+      createPullRequest,
+      autoConfirmMediaBranchPrompt: false,
+    });
+
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, {
+        signedUrl: 'https://s3.example/x',
+        requestId: 'r1',
+      })
+    );
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+    );
+    stubS3PutOk();
+
+    const persistPromise = store.persist([
+      {
+        directory: 'uploads',
+        file: new File(['x'], 'a.png', { type: 'image/png' }),
+      },
+    ]);
+    await vi.advanceTimersByTimeAsync(1100);
+    await persistPromise;
+
+    expect(createBranch).not.toHaveBeenCalled();
+    expect(createPullRequest).not.toHaveBeenCalled();
+    expect(fetchWithToken.mock.calls[0][0]).toContain('?branch=main');
+  });
+
   it('resolves persist with [] when the user cancels the branch prompt', async () => {
     const createBranch = vi.fn();
     const { store, fetchWithToken, events } = buildStore({

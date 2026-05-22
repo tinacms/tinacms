@@ -31,16 +31,19 @@ export class EventBus {
     };
   }
 
-  dispatch<E extends CMSEvent = CMSEvent>(event: E) {
+  dispatch<E extends CMSEvent = CMSEvent>(event: E): boolean {
     /**
      * If the `listener` Set is modified during the dispatch then
      * it can cause an infinite loop. Snapshot it and it's fine.
      */
-    if (!this.listeners) return;
+    if (!this.listeners) return false;
 
     const listenerSnapshot = Array.from(this.listeners.values());
 
-    listenerSnapshot.forEach((listener) => listener.handleEvent(event));
+    return listenerSnapshot.reduce(
+      (handled, listener) => listener.handleEvent(event) || handled,
+      false
+    );
   }
 }
 

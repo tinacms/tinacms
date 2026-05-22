@@ -9,7 +9,10 @@ import {
   PopupModal,
 } from '@toolkit/react-modals';
 import { CreateBranchPromptModal } from '@toolkit/form-builder/create-branch-modal';
-import { checkBaseBranchExists } from '@toolkit/form-builder/editorial-workflow-utils';
+import {
+  checkBaseBranchExists,
+  type MediaWorkflowConfirmBranchEvent,
+} from '@toolkit/form-builder/editorial-workflow-utils';
 import { EditorialWorkflowProgressModal } from '@toolkit/form-builder/editorial-workflow-progress-modal';
 import { getEditorialWorkflowErrorMessage } from '@toolkit/form-builder/use-editorial-workflow';
 
@@ -27,15 +30,6 @@ type WorkflowState =
     }
   | { phase: 'executing'; step: number; elapsed: number }
   | { phase: 'error'; message: string };
-
-interface MediaWorkflowConfirmBranchEvent {
-  type: 'media:workflow:confirm-branch';
-  branchName: string;
-  baseBranch: string;
-  onConfirm: (branchName: string) => Promise<void>;
-  onCancel: () => void;
-  onSaveToProtectedBranch: () => void;
-}
 
 export const MediaWorkflowOverlay = () => {
   const cms = useCMS();

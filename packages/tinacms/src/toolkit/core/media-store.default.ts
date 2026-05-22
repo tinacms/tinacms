@@ -1,5 +1,8 @@
 import { DEFAULT_MEDIA_UPLOAD_TYPES } from '@toolkit/components/media/utils';
-import { getEditorialWorkflowPrTitle } from '@toolkit/form-builder/editorial-workflow-utils';
+import {
+  getEditorialWorkflowPrTitle,
+  type MediaWorkflowConfirmBranchEvent,
+} from '@toolkit/form-builder/editorial-workflow-utils';
 import { formatBranchName } from '@toolkit/plugin-branch-switcher/format-branch-name';
 import type { TinaCMS } from '@toolkit/tina-cms';
 import type { Client } from '../../internalClient';
@@ -17,15 +20,6 @@ const INDEX_POLL_INTERVAL_MS = 5000;
 // Unknown for 2 minutes means the webhook likely never landed; total cap is 5 minutes.
 const INDEX_MAX_ATTEMPTS = 60;
 const INDEX_MAX_UNKNOWN = 24;
-
-interface MediaWorkflowConfirmBranchEvent {
-  type: 'media:workflow:confirm-branch';
-  branchName: string;
-  baseBranch: string;
-  onConfirm: (branchName: string) => Promise<void>;
-  onCancel: () => void;
-  onSaveToProtectedBranch: () => void;
-}
 
 interface MediaBranchContext {
   branchName: string;
@@ -202,7 +196,7 @@ export class TinaMediaStore implements MediaStore {
     baseBranch: string
   ): Promise<PreparedMediaBranch> {
     return new Promise((resolve, reject) => {
-      this.cms.events.dispatch<MediaWorkflowConfirmBranchEvent>({
+      const handled = this.cms.events.dispatch<MediaWorkflowConfirmBranchEvent>({
         type: 'media:workflow:confirm-branch',
         branchName,
         baseBranch,
@@ -219,6 +213,7 @@ export class TinaMediaStore implements MediaStore {
         onCancel: () => resolve('cancelled'),
         onSaveToProtectedBranch: () => resolve(undefined),
       });
+      if (!handled) resolve(undefined);
     });
   }
 

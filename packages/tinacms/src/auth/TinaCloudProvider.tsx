@@ -510,18 +510,7 @@ export const TinaCloudProvider = (
           // if the current branch is not in the metadata,
           // switch to the default branch
           if (!project.metadata[currentBranch]) {
-            let currentBranchExists = false;
-            try {
-              currentBranchExists = await client.branchExists(currentBranch);
-            } catch (err) {
-              console.error(
-                '[tina:branch-guard] setupEditorialWorkflow: branchExists threw, falling back to default branch:',
-                err
-              );
-            }
-            if (!currentBranchExists) {
-              setCurrentBranch(project.defaultBranch || 'main');
-            }
+            setCurrentBranch(project.defaultBranch || 'main');
           }
         }
       });

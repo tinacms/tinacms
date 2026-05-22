@@ -8,9 +8,16 @@ describe('EventBus', () => {
     const event = { type: 'example' };
 
     events.subscribe('*', listener);
-    events.dispatch(event);
+    const handled = events.dispatch(event);
 
     expect(listener).toHaveBeenCalledWith(event);
+    expect(handled).toBe(true);
+  });
+
+  it('returns false when no listener handles the dispatched event', () => {
+    const events = new EventBus();
+
+    expect(events.dispatch({ type: 'example' })).toBe(false);
   });
   test('for an array of eventscalls listeners and passes it the dispatched event', () => {
     const listener = vi.fn();
