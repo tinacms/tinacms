@@ -1,6 +1,7 @@
 ---
 "@tinacms/astro": minor
 "@tinacms/bridge": minor
+"@tinacms/app": minor
 ---
 
 Support TinaCMS visual editing on statically-built Astro pages
