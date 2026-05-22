@@ -49,7 +49,11 @@ function stageBridgeAsset(adminDir: string, logger: AstroIntegrationLogger) {
     let lines: string[] = [];
     try {
       lines = readFileSync(gitignorePath, 'utf-8').split(/\r?\n/);
-    } catch {}
+    } catch (error) {
+      // A missing file is the normal first-run case; rethrow anything else
+      // (e.g. EACCES) so we don't silently overwrite an unreadable file.
+      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
+    }
     const entries = lines.map((l) => l.trim()).filter(Boolean);
     if (!entries.includes('bridge.js') && !entries.includes('*')) {
       writeFileSync(gitignorePath, `${[...entries, 'bridge.js'].join('\n')}\n`);
