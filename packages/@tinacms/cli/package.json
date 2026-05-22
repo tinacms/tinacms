@@ -42,6 +42,8 @@
         "@types/progress": "catalog:",
         "@types/prompts": "catalog:",
         "jest": "catalog:",
+        "mongodb-level": "catalog:",
+        "sqlite-level": "catalog:",
         "ts-jest": "catalog:"
     },
     "scripts": {
