@@ -130,17 +130,21 @@ describe.each(adaptersToRun)(
       await fs.remove(cacheDir).catch(() => undefined);
     }, HOOK_TIMEOUT);
 
-    test('round-trips a value through the adapter', async () => {
-      if (adapter.kind === 'level') {
-        if (typeof result.open === 'function') {
-          await result.open();
+    test(
+      'round-trips a value through the adapter',
+      async () => {
+        if (adapter.kind === 'level') {
+          if (typeof result.open === 'function') {
+            await result.open();
+          }
+          await result.put('test-key', 'test-value');
+          expect(await result.get('test-key')).toBe('test-value');
+        } else {
+          await result.setMetadata('probe', 'pong');
+          expect(await result.getMetadata('probe')).toBe('pong');
         }
-        await result.put('test-key', 'test-value');
-        expect(await result.get('test-key')).toBe('test-value');
-      } else {
-        await result.setMetadata('probe', 'pong');
-        expect(await result.getMetadata('probe')).toBe('pong');
-      }
-    }, HOOK_TIMEOUT);
+      },
+      HOOK_TIMEOUT
+    );
   }
 );
