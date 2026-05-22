@@ -80,3 +80,87 @@ jobs:
 
       - name: Check Tina lock changes
         run: pnpm diff-tina-lock
+
+  adapter-matrix:
+    name: Adapter Compatibility (${{ matrix.adapter }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        adapter:
+          - memory-level
+          - sqlite-level
+          - mongodb-level
+          - tina-level-client
+
+    services:
+      # mongo:7 ships mongosh, which we use for the health probe. The probe
+      # runs inside the container; GitHub Actions blocks the job's first step
+      # until it succeeds, so the mongodb-level row can't race the service.
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          package_json_file: package.json
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v4
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install
+
+      # @tinacms/cli's test runs against TS source via ts-jest, so the CLI
+      # itself doesn't need to be built. The test does import values from
+      # @tinacms/graphql at runtime (via ./database.ts and the bundled
+      # tina-level-client fixture), so build that one. turbo's build task
+      # has `dependsOn: ["^build"]`, which transitively builds graphql's
+      # workspace deps (@tinacms/schema-tools, @tinacms/mdx) first.
+      - name: Build adapter test prerequisites
+        run: pnpm turbo run build --filter=@tinacms/graphql
+
+      # MONGO_URI is read only by the mongodb-level fixture; the other three
+      # adapters ignore it. ADAPTER pins the matrix row to one adapter so a
+      # failure points at exactly one job.
+      - name: Run adapter test
+        env:
+          ADAPTER: ${{ matrix.adapter }}
+          MONGO_URI: mongodb://localhost:27017
+        run: pnpm --filter @tinacms/cli test:adapters
