@@ -196,23 +196,25 @@ export class TinaMediaStore implements MediaStore {
     baseBranch: string
   ): Promise<PreparedMediaBranch> {
     return new Promise((resolve, reject) => {
-      const handled = this.cms.events.dispatch<MediaWorkflowConfirmBranchEvent>({
-        type: 'media:workflow:confirm-branch',
-        branchName,
-        baseBranch,
-        onConfirm: async (selectedBranchName) => {
-          try {
-            resolve(
-              await this.prepareMediaBranch(selectedBranchName, baseBranch)
-            );
-          } catch (error) {
-            reject(error);
-            throw error;
-          }
-        },
-        onCancel: () => resolve('cancelled'),
-        onSaveToProtectedBranch: () => resolve(undefined),
-      });
+      const handled = this.cms.events.dispatch<MediaWorkflowConfirmBranchEvent>(
+        {
+          type: 'media:workflow:confirm-branch',
+          branchName,
+          baseBranch,
+          onConfirm: async (selectedBranchName) => {
+            try {
+              resolve(
+                await this.prepareMediaBranch(selectedBranchName, baseBranch)
+              );
+            } catch (error) {
+              reject(error);
+              throw error;
+            }
+          },
+          onCancel: () => resolve('cancelled'),
+          onSaveToProtectedBranch: () => resolve(undefined),
+        }
+      );
       if (!handled) resolve(undefined);
     });
   }
