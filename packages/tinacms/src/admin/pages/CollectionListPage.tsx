@@ -1236,7 +1236,7 @@ const SearchInput = ({
     if (e.key === 'Enter') {
       e.preventDefault();
       if (searchInput.trim()) {
-        setSearch(searchInput);
+        setSearch(searchInput.trim());
         setSearchLoaded(false);
       }
     }
@@ -1245,9 +1245,9 @@ const SearchInput = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchInput.trim()) {
-      setSearch(searchInput);
+      setSearch(searchInput.trim());
       captureEvent(CollectionListPageSearchEvent, {
-        searchQuery: searchInput,
+        searchQuery: searchInput.trim(),
       });
       setSearchLoaded(false);
     }
