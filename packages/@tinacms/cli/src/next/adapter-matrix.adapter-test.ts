@@ -13,16 +13,17 @@
 import * as path from 'path';
 import type { Server } from 'net';
 import { fileURLToPath } from 'url';
-import { jest } from '@jest/globals';
 import fs from 'fs-extra';
 
 import { ConfigManager } from './config-manager';
 import { createDBServer } from './database';
 
-// Cap any single hook at 30s so a stuck adapter fails fast instead of timing
-// out at the default 5s without context (and so a regression that drops a
-// socket cleanup step surfaces in CI within a minute instead of stalling).
-jest.setTimeout(30000);
+// Per-hook/per-test timeout overrides (30s each, supplied as the second arg
+// to beforeAll/afterAll/test below) replace a file-wide `jest.setTimeout()`.
+// Skipping the global avoids importing @jest/globals — the rest of
+// @tinacms/cli's tests rely on the same global injection from @types/jest,
+// not the explicit ESM import.
+const HOOK_TIMEOUT = 30000;
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const FIXTURES_ROOT = path.join(HERE, '__fixtures__');
@@ -95,7 +96,7 @@ describe.each(adaptersToRun)(
       );
 
       result = await configManager.loadDatabaseFile();
-    });
+    }, HOOK_TIMEOUT);
 
     afterAll(async () => {
       if (adapter.kind === 'level') {
@@ -127,7 +128,7 @@ describe.each(adaptersToRun)(
         delete process.env.TEST_DATALAYER_PORT;
       }
       await fs.remove(cacheDir).catch(() => undefined);
-    });
+    }, HOOK_TIMEOUT);
 
     test('round-trips a value through the adapter', async () => {
       if (adapter.kind === 'level') {
@@ -140,6 +141,6 @@ describe.each(adaptersToRun)(
         await result.setMetadata('probe', 'pong');
         expect(await result.getMetadata('probe')).toBe('pong');
       }
-    }, 30000);
+    }, HOOK_TIMEOUT);
   }
 );
