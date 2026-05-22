@@ -29,4 +29,10 @@ export default {
   ...base,
   extensionsToTreatAsEsm: ['.ts'],
   moduleDirectories: ['node_modules', sqliteLevelDepsRoot],
+  // The default `jest` invocation (used by the rest of @tinacms/cli's tests)
+  // runs under a CJS-backed config and would fail to parse this file's
+  // `import.meta.url`. We rename the suffix to `.adapter-test.ts` so the
+  // default testMatch (`*.spec|test.ts`) skips it, then re-enable discovery
+  // here so test:adapters can find it.
+  testMatch: ['**/*.adapter-test.[jt]s?(x)'],
 };
