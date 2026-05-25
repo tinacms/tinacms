@@ -167,7 +167,7 @@ const Heading4 = ({
 );
 
 /** Tailwind prose doesn't style h5 and h6 elements */
-const headerSerifStyle: React.CSSProperties = {
+const headerFontStyle: React.CSSProperties = {
   fontFamily: "'Inter', sans-serif",
   fontWeight: '400',
 };
@@ -185,7 +185,7 @@ const Heading5 = ({
       className,
       'text-lg mb-4 last:mb-0 mt-6 first:mt-0'
     )}
-    style={headerSerifStyle}
+    style={headerFontStyle}
   >
     {children}
   </h5>
@@ -204,7 +204,7 @@ const Heading6 = ({
       className,
       'text-base mb-4 last:mb-0 mt-6 first:mt-0'
     )}
-    style={headerSerifStyle}
+    style={headerFontStyle}
   >
     {children}
   </h6>
