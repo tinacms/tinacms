@@ -105,7 +105,7 @@ const Heading1 = ({
       headerClasses,
       blockClasses,
       className,
-      'text-4xl mb-4 last:mb-0 mt-6 first:mt-0 font-libre-baskerville'
+      'text-4xl mb-4 last:mb-0 mt-6 first:mt-0 font-inter'
     )}
   >
     {children}
@@ -123,7 +123,7 @@ const Heading2 = ({
       headerClasses,
       blockClasses,
       className,
-      'text-3xl mb-4 last:mb-0 mt-6 first:mt-0 font-libre-baskerville'
+      'text-3xl mb-4 last:mb-0 mt-6 first:mt-0 font-inter'
     )}
   >
     {children}
@@ -141,7 +141,7 @@ const Heading3 = ({
       headerClasses,
       blockClasses,
       className,
-      'text-2xl mb-4 last:mb-0 mt-6 first:mt-0 font-libre-baskerville'
+      'text-2xl mb-4 last:mb-0 mt-6 first:mt-0 font-inter'
     )}
   >
     {children}
@@ -159,7 +159,7 @@ const Heading4 = ({
       headerClasses,
       blockClasses,
       className,
-      'text-xl mb-4 last:mb-0 mt-6 first:mt-0 font-libre-baskerville'
+      'text-xl mb-4 last:mb-0 mt-6 first:mt-0 font-inter'
     )}
   >
     {children}
