@@ -23,11 +23,16 @@ export interface BridgeOptions {
   adminOrigin?: string | string[];
 }
 
-let initialized = false;
+// `refreshForms()` is safe to call before `init()` finishes — it's a no-op
+// until this flag flips. `init()` only sets it after the iframe check passes
+// AND every listener is wired, so calls that race the bootstrap (the bridge
+// module loaded but `init()` hasn't run; a listener fired during the
+// dynamic-import await; the page isn't in an iframe at all) can't POST to
+// island endpoints or splice primed payloads into the DOM.
+let running = false;
 
 export function init(options: BridgeOptions = {}): void {
-  if (initialized) return;
-  initialized = true;
+  if (running) return;
 
   if (typeof window === 'undefined' || window.parent === window) {
     debug('not in an iframe; bridge is a no-op');
@@ -44,6 +49,7 @@ export function init(options: BridgeOptions = {}): void {
   // Forms last: listeners wired before we start receiving updateData.
   initForms(store);
 
+  running = true;
   refreshForms();
 }
 
@@ -61,6 +67,10 @@ let reprimePending = false;
  * server-injected payloads, prime from the island endpoints first.
  */
 export function refreshForms(): void {
+  if (!running) {
+    debug('refreshForms called before init() finished; ignoring');
+    return;
+  }
   // Forms a previous prime appended belong to a prior render; drop them
   // before re-scanning so a new page (or a re-prime after a mid-prime
   // navigation) never reads stale island payloads, and so the

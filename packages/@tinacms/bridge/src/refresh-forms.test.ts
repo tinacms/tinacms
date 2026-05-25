@@ -5,7 +5,11 @@ async function loadBridge() {
   vi.resetModules();
   const { setAdminOrigin } = await import('./config');
   setAdminOrigin('https://admin.test');
-  return import('./index');
+  const bridge = await import('./index');
+  // init() with an empty body so `running` flips and listeners wire up;
+  // individual tests populate the DOM after this and drive refreshForms.
+  bridge.init({ adminOrigin: 'https://admin.test' });
+  return bridge;
 }
 
 describe('refreshForms (public wrapper)', () => {
@@ -31,9 +35,6 @@ describe('refreshForms (public wrapper)', () => {
   });
 
   it('primes from island endpoints when the page has islands but no server-injected forms', async () => {
-    document.body.innerHTML = `
-      <article data-tina-island="/tina-island/post?slug=hello">existing</article>
-    `;
     fetchMock.mockResolvedValue(
       new Response(
         `<div data-tina-form='${JSON.stringify({
@@ -48,6 +49,9 @@ describe('refreshForms (public wrapper)', () => {
     );
 
     const bridge = await loadBridge();
+    document.body.innerHTML = `
+      <article data-tina-island="/tina-island/post?slug=hello">existing</article>
+    `;
     bridge.refreshForms();
     // Wait a microtask for the void promise inside refreshForms to settle.
     await vi.waitFor(() => {
@@ -60,6 +64,7 @@ describe('refreshForms (public wrapper)', () => {
   });
 
   it('skips priming when server-injected payloads are already present', async () => {
+    const bridge = await loadBridge();
     document.body.innerHTML =
       `<div data-tina-form='${JSON.stringify({
         id: 'srv',
@@ -68,20 +73,40 @@ describe('refreshForms (public wrapper)', () => {
         data: {},
       })}' hidden></div>` +
       `<article data-tina-island="/tina-island/page">existing</article>`;
-
-    const bridge = await loadBridge();
     bridge.refreshForms();
 
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it('does not prime when the page has no islands', async () => {
-    document.body.innerHTML = `<main>just content, no Tina</main>`;
-
     const bridge = await loadBridge();
+    document.body.innerHTML = `<main>just content, no Tina</main>`;
     bridge.refreshForms();
 
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('is a no-op when init() ran outside the admin iframe', async () => {
+    // Simulate a non-iframe context: window.parent === window. The outer
+    // beforeEach replaced `window.parent` with a distinct object — restore
+    // identity here so the iframe check inside init() trips the no-op path.
+    Object.defineProperty(window, 'parent', {
+      configurable: true,
+      value: window,
+    });
+    vi.resetModules();
+    const { setAdminOrigin } = await import('./config');
+    setAdminOrigin('https://admin.test');
+    const bridge = await import('./index');
+    bridge.init({ adminOrigin: 'https://admin.test' });
+
+    document.body.innerHTML = `
+      <article data-tina-island="/tina-island/post">existing</article>
+    `;
+    bridge.refreshForms();
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(document.querySelector('[data-tina-primed]')).toBeNull();
   });
 
   it('re-primes against the new page when a navigation lands mid-prime', async () => {
@@ -109,8 +134,8 @@ describe('refreshForms (public wrapper)', () => {
         : Promise.resolve(formResponse(url))
     );
 
-    document.body.innerHTML = `<article data-tina-island="/tina-island/a">A</article>`;
     const bridge = await loadBridge();
+    document.body.innerHTML = `<article data-tina-island="/tina-island/a">A</article>`;
     bridge.refreshForms();
 
     // Soft navigation swaps in a different page before the first prime resolves.
