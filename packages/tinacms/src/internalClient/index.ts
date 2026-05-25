@@ -19,21 +19,15 @@ import {
   addNamespaceToSchema,
 } from '@tinacms/schema-tools';
 import {
+  FuzzySearchOptions,
+  IndexableDocument,
   SearchClient,
   SearchOptions,
   SearchQueryResponse,
-  IndexableDocument,
-  FuzzySearchOptions,
   optionsToSearchIndexOptions,
   parseSearchIndexResponse,
   queryToSearchIndexQuery,
 } from '@tinacms/search/index-client';
-
-interface TinaSearchConfig {
-  stopwordLanguages?: string[];
-  fuzzyEnabled?: boolean;
-  fuzzyOptions?: FuzzySearchOptions;
-}
 import gql from 'graphql-tag';
 import {
   EDITORIAL_WORKFLOW_STATUS,
@@ -45,6 +39,17 @@ import { LocalAuthProvider, TinaCloudAuthProvider } from './authProvider';
 import { TinaCloudProject } from './types';
 
 export * from './authProvider';
+
+interface TinaSearchConfig {
+  stopwordLanguages?: string[];
+  fuzzyEnabled?: boolean;
+  fuzzyOptions?: FuzzySearchOptions;
+}
+
+type EditorialWorkflowStatusUpdate = {
+  status: string;
+  message?: string;
+};
 
 export type OnLoginFunc = (args: { token?: TokenObject }) => Promise<void>;
 
@@ -622,6 +627,79 @@ mutation addPendingDocumentMutation(
     }
   }
 
+  private async pollEditorialWorkflowStatus(
+    requestId: string,
+    onStatusUpdate?: (status: EditorialWorkflowStatusUpdate) => void
+  ): Promise<EditorialWorkflowResult> {
+    const maxAttempts = 60;
+    const pollInterval = 5000;
+    let attempts = 0;
+
+    while (attempts < maxAttempts) {
+      await new Promise((resolve) => setTimeout(resolve, pollInterval));
+      attempts++;
+
+      try {
+        const statusUrl = `${this.contentApiBase}/editorial-workflow/${this.clientId}/status/${requestId}`;
+        const statusResponse =
+          await this.authProvider.fetchWithToken(statusUrl);
+        const statusResponseBody = await statusResponse.json();
+
+        onStatusUpdate?.({
+          status: statusResponseBody.status,
+          message:
+            statusResponseBody.message ||
+            `Status: ${statusResponseBody.status}`,
+        });
+
+        if (
+          statusResponseBody.status === EDITORIAL_WORKFLOW_STATUS.ERROR ||
+          statusResponse.status === 500
+        ) {
+          if (statusResponseBody.pullRequestUrl) {
+            return {
+              branchName: statusResponseBody.branchName,
+              pullRequestUrl: statusResponseBody.pullRequestUrl,
+              warning: statusResponseBody.message,
+            };
+          }
+
+          const error = new Error(
+            statusResponseBody.message || 'Editorial workflow failed'
+          ) as EditorialWorkflowErrorDetails;
+          error.errorCode = statusResponseBody.errorCode || 'WORKFLOW_FAILED';
+          throw error;
+        }
+
+        if (statusResponse.status === 200) {
+          return {
+            branchName: statusResponseBody.branchName,
+            pullRequestUrl: statusResponseBody.pullRequestUrl,
+          };
+        }
+
+        if (statusResponse.status !== 202) {
+          const error = new Error(
+            statusResponseBody.message ||
+              `Failed to check workflow status: ${statusResponse.statusText}`
+          ) as EditorialWorkflowErrorDetails;
+          error.errorCode = 'WORKFLOW_STATUS_FAILED';
+          throw error;
+        }
+      } catch (error) {
+        if ((error as EditorialWorkflowErrorDetails).errorCode) {
+          throw error;
+        }
+        console.warn(
+          `Editorial workflow status poll failed (attempt ${attempts}/${maxAttempts}), retrying...`,
+          error
+        );
+      }
+    }
+
+    throw new Error('Editorial workflow timed out after 5 minutes');
+  }
+
   /**
    * Initiate and poll for the results of an editorial workflow operation
    *
@@ -683,79 +761,10 @@ mutation addPendingDocumentMutation(
         });
       }
 
-      const maxAttempts = 60;
-      const pollInterval = 5000;
-      let attempts = 0;
-
-      while (attempts < maxAttempts) {
-        await new Promise((resolve) => setTimeout(resolve, pollInterval));
-        attempts++;
-
-        try {
-          const statusUrl = `${this.contentApiBase}/editorial-workflow/${this.clientId}/status/${requestId}`;
-          const statusResponse =
-            await this.authProvider.fetchWithToken(statusUrl);
-
-          const statusResponseBody = await statusResponse.json();
-
-          if (options.onStatusUpdate) {
-            options.onStatusUpdate({
-              status: statusResponseBody.status,
-              message:
-                statusResponseBody.message ||
-                `Status: ${statusResponseBody.status}`,
-            });
-          }
-
-          if (
-            statusResponseBody.status === EDITORIAL_WORKFLOW_STATUS.ERROR ||
-            statusResponse.status === 500
-          ) {
-            // Bot fallback: workflow completed but with degraded auth.
-            // Return as success with a warning so the PR link is shown.
-            if (statusResponseBody.pullRequestUrl) {
-              return {
-                branchName: statusResponseBody.branchName,
-                pullRequestUrl: statusResponseBody.pullRequestUrl,
-                warning: statusResponseBody.message,
-              };
-            }
-
-            const error = new Error(
-              statusResponseBody.message || 'Editorial workflow failed'
-            ) as EditorialWorkflowErrorDetails;
-            error.errorCode = statusResponseBody.errorCode || 'WORKFLOW_FAILED';
-            throw error;
-          }
-
-          if (statusResponse.status === 200) {
-            return {
-              branchName: statusResponseBody.branchName,
-              pullRequestUrl: statusResponseBody.pullRequestUrl,
-            };
-          }
-
-          if (statusResponse.status !== 202) {
-            const error = new Error(
-              statusResponseBody.message ||
-                `Failed to check workflow status: ${statusResponse.statusText}`
-            ) as EditorialWorkflowErrorDetails;
-            error.errorCode = 'WORKFLOW_STATUS_FAILED';
-            throw error;
-          }
-        } catch (error) {
-          if ((error as EditorialWorkflowErrorDetails).errorCode) {
-            throw error;
-          }
-          // Transient errors (network, JSON parse, 502/503) — log and retry
-          console.warn(
-            `Editorial workflow status poll failed (attempt ${attempts}/${maxAttempts}), retrying...`,
-            error
-          );
-        }
-      }
-
-      throw new Error('Editorial workflow timed out after 5 minutes');
+      return await this.pollEditorialWorkflowStatus(
+        requestId,
+        options.onStatusUpdate
+      );
     } catch (error) {
       console.error(
         'There was an error with editorial workflow operation.',
@@ -763,6 +772,44 @@ mutation addPendingDocumentMutation(
       );
       throw error;
     }
+  }
+
+  async startMediaEditorialWorkflow(options: {
+    branchName: string;
+    baseBranch: string;
+    prTitle?: string;
+    operation: 'upload' | 'delete';
+    repoPath: string;
+  }): Promise<{ branchName: string; requestId: string; status?: string }> {
+    const url = `${this.contentApiBase}/editorial-workflow/${this.clientId}/media`;
+    const res = await this.authProvider.fetchWithToken(url, {
+      method: 'POST',
+      body: JSON.stringify(options),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const responseBody = await res.json();
+    if (!res.ok) {
+      const error = new Error(
+        responseBody?.message || 'Failed to start media editorial workflow'
+      ) as EditorialWorkflowErrorDetails;
+      if (responseBody?.errorCode) {
+        error.errorCode = responseBody.errorCode;
+      }
+      if (responseBody?.conflictingBranch) {
+        error.conflictingBranch = responseBody.conflictingBranch;
+      }
+      throw error;
+    }
+    return responseBody;
+  }
+
+  async waitForEditorialWorkflowStatus(
+    requestId: string,
+    onStatusUpdate?: (status: EditorialWorkflowStatusUpdate) => void
+  ): Promise<EditorialWorkflowResult> {
+    return await this.pollEditorialWorkflowStatus(requestId, onStatusUpdate);
   }
 }
 

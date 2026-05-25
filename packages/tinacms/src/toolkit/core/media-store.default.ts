@@ -1,7 +1,11 @@
 import { DEFAULT_MEDIA_UPLOAD_TYPES } from '@toolkit/components/media/utils';
 import {
-  getEditorialWorkflowPrTitle,
+  EDITORIAL_WORKFLOW_STATUS,
+  type EditorialWorkflowStatus,
+} from '@toolkit/form-builder/editorial-workflow-constants';
+import {
   type MediaWorkflowConfirmBranchEvent,
+  getEditorialWorkflowPrTitle,
 } from '@toolkit/form-builder/editorial-workflow-utils';
 import { formatBranchName } from '@toolkit/plugin-branch-switcher/format-branch-name';
 import type { TinaCMS } from '@toolkit/tina-cms';
@@ -16,17 +20,34 @@ import {
   MediaUploadOptions,
 } from './media';
 
-const INDEX_POLL_INTERVAL_MS = 5000;
-// Unknown for 2 minutes means the webhook likely never landed; total cap is 5 minutes.
-const INDEX_MAX_ATTEMPTS = 60;
-const INDEX_MAX_UNKNOWN = 24;
-
 interface MediaBranchContext {
   branchName: string;
   baseBranch: string;
+  requestId: string;
 }
 
-type PreparedMediaBranch = MediaBranchContext | 'cancelled' | undefined;
+type MediaBranchDecision =
+  | { kind: 'workflow'; context: MediaBranchContext }
+  | { kind: 'cancelled' }
+  | { kind: 'direct' };
+
+const MEDIA_WORKFLOW_STEP = {
+  BRANCH: 1,
+  CONTENT: 2,
+  PR: 3,
+  COMPLETE: 4,
+} as const;
+
+const MEDIA_WORKFLOW_STATUS_TO_STEP: Partial<
+  Record<EditorialWorkflowStatus, number>
+> = {
+  [EDITORIAL_WORKFLOW_STATUS.SETTING_UP]: MEDIA_WORKFLOW_STEP.BRANCH,
+  [EDITORIAL_WORKFLOW_STATUS.CREATING_BRANCH]: MEDIA_WORKFLOW_STEP.BRANCH,
+  [EDITORIAL_WORKFLOW_STATUS.INDEXING]: MEDIA_WORKFLOW_STEP.CONTENT,
+  [EDITORIAL_WORKFLOW_STATUS.CONTENT_GENERATION]: MEDIA_WORKFLOW_STEP.CONTENT,
+  [EDITORIAL_WORKFLOW_STATUS.CREATING_PR]: MEDIA_WORKFLOW_STEP.PR,
+  [EDITORIAL_WORKFLOW_STATUS.COMPLETE]: MEDIA_WORKFLOW_STEP.COMPLETE,
+};
 
 const s3ErrorRegex = /<Error>.*<Code>(.+)<\/Code>.*<Message>(.+)<\/Message>.*/;
 
@@ -193,8 +214,10 @@ export class TinaMediaStore implements MediaStore {
 
   private requestMediaBranchChoice(
     branchName: string,
-    baseBranch: string
-  ): Promise<PreparedMediaBranch> {
+    baseBranch: string,
+    opType: 'upload' | 'delete',
+    repoPath: string
+  ): Promise<MediaBranchDecision> {
     return new Promise((resolve, reject) => {
       const handled = this.cms.events.dispatch<MediaWorkflowConfirmBranchEvent>(
         {
@@ -203,54 +226,34 @@ export class TinaMediaStore implements MediaStore {
           baseBranch,
           onConfirm: async (selectedBranchName) => {
             try {
-              resolve(
-                await this.prepareMediaBranch(selectedBranchName, baseBranch)
+              const context = await this.prepareMediaBranch(
+                selectedBranchName,
+                baseBranch,
+                opType,
+                repoPath
               );
+              resolve({
+                kind: 'workflow',
+                context,
+              });
             } catch (error) {
               reject(error);
               throw error;
             }
           },
-          onCancel: () => resolve('cancelled'),
-          onSaveToProtectedBranch: () => resolve(undefined),
+          onCancel: () => resolve({ kind: 'cancelled' }),
+          onSaveToProtectedBranch: () => resolve({ kind: 'direct' }),
         }
       );
-      if (!handled) resolve(undefined);
+      if (!handled) resolve({ kind: 'direct' });
     });
-  }
-
-  // Used before the media request for branch metadata, then after it for the media commit.
-  private async waitForBranchIndexed(branchName: string): Promise<void> {
-    let unknownCount = 0;
-    for (let attempt = 0; attempt < INDEX_MAX_ATTEMPTS; attempt++) {
-      const { status } = await this.api.getIndexStatus({ ref: branchName });
-
-      if (status === 'complete') return;
-      if (status === 'failed') {
-        throw new Error(`Indexing failed for branch ${branchName}`);
-      }
-      if (status === 'unknown') {
-        unknownCount++;
-        if (unknownCount >= INDEX_MAX_UNKNOWN) {
-          throw new Error(
-            `Indexing never started for branch ${branchName} — the push webhook may not have been processed`
-          );
-        }
-      } else {
-        unknownCount = 0;
-      }
-
-      await new Promise((resolve) =>
-        setTimeout(resolve, INDEX_POLL_INTERVAL_MS)
-      );
-    }
-
-    throw new Error(`Timed out waiting for indexing on branch ${branchName}`);
   }
 
   private async prepareMediaBranch(
     branchName: string,
-    baseBranch: string
+    baseBranch: string,
+    opType: 'upload' | 'delete',
+    repoPath: string
   ): Promise<MediaBranchContext> {
     if (this.mediaWorkflowInProgress) {
       throw new Error('A media workflow is already in progress.');
@@ -264,56 +267,71 @@ export class TinaMediaStore implements MediaStore {
         baseBranch,
       });
 
-      const createdBranchName = await this.api.createBranch({
+      const workflow = await this.api.startMediaEditorialWorkflow({
         branchName,
         baseBranch,
+        prTitle: getEditorialWorkflowPrTitle(branchName),
+        operation: opType,
+        repoPath,
       });
       const branchContext = {
-        branchName: createdBranchName || branchName,
+        branchName: workflow.branchName || branchName,
         baseBranch,
+        requestId: workflow.requestId,
       };
-
-      await this.waitForBranchIndexed(branchContext.branchName);
 
       this.workflowBranchOverride = branchContext.branchName;
 
       return branchContext;
     } catch (err) {
-      this.mediaWorkflowInProgress = false;
+      this.resetWorkflowState();
       throw err;
     }
+  }
+
+  private resetWorkflowState(): void {
+    this.workflowBranchOverride = undefined;
+    this.mediaWorkflowInProgress = false;
   }
 
   private async finalizeMediaWorkflow(
     branchContext: MediaBranchContext
   ): Promise<void> {
     try {
+      const result = await this.api.waitForEditorialWorkflowStatus(
+        branchContext.requestId,
+        (status) => {
+          const step =
+            MEDIA_WORKFLOW_STATUS_TO_STEP[
+              status.status as EditorialWorkflowStatus
+            ];
+          if (step) {
+            this.cms.events.dispatch({
+              type: 'media:workflow:step',
+              step,
+            });
+          }
+        }
+      );
+      this.resetWorkflowState();
+
       this.cms.events.dispatch({
         type: 'media:workflow:complete',
-        branchName: branchContext.branchName,
-      });
-      this.workflowBranchOverride = undefined;
-
-      this.cms.events.dispatch({ type: 'media:workflow:step', step: 2 });
-      await this.waitForBranchIndexed(branchContext.branchName);
-
-      this.cms.events.dispatch({ type: 'media:workflow:step', step: 3 });
-      const result = await this.api.createPullRequest({
-        baseBranch: branchContext.baseBranch,
-        branch: branchContext.branchName,
-        title: getEditorialWorkflowPrTitle(branchContext.branchName),
+        branchName: result.branchName || branchContext.branchName,
       });
 
-      this.cms.events.dispatch({ type: 'media:workflow:step', step: 4 });
+      if (result.warning) {
+        this.cms.alerts.warn(result.warning, 0);
+      }
       this.cms.alerts.success(
-        `Branch created successfully - Pull Request at ${result?.url || ''}`,
+        `Branch created successfully - Pull Request at ${
+          result?.pullRequestUrl || ''
+        }`,
         0
       );
       this.cms.events.dispatch({ type: 'media:workflow:finish' });
-      this.mediaWorkflowInProgress = false;
     } catch (err) {
-      this.workflowBranchOverride = undefined;
-      this.mediaWorkflowInProgress = false;
+      this.resetWorkflowState();
       this.dispatchMediaWorkflowError(err);
     }
   }
@@ -326,17 +344,16 @@ export class TinaMediaStore implements MediaStore {
   }
 
   private async runMediaOpWithWorkflow<T>(
-    branchContext: MediaBranchContext | undefined,
+    decision: MediaBranchDecision,
     op: () => Promise<T>
   ): Promise<T> {
-    if (!branchContext) return op();
+    if (decision.kind !== 'workflow') return op();
     try {
       const result = await op();
-      await this.finalizeMediaWorkflow(branchContext);
+      await this.finalizeMediaWorkflow(decision.context);
       return result;
     } catch (err) {
-      this.workflowBranchOverride = undefined;
-      this.mediaWorkflowInProgress = false;
+      this.resetWorkflowState();
       this.cms.events.dispatch({ type: 'media:workflow:finish' });
       throw err;
     }
@@ -346,13 +363,22 @@ export class TinaMediaStore implements MediaStore {
     opType: 'upload' | 'delete',
     directory: string | undefined,
     filename: string | undefined
-  ): Promise<PreparedMediaBranch> {
-    if (!this.api.usingProtectedBranch()) return undefined;
+  ): Promise<MediaBranchDecision> {
+    if (!this.api.usingProtectedBranch()) return { kind: 'direct' };
 
     const baseBranch = decodeURIComponent(this.api.branch || '');
     const mediaSlug = this.branchSlugForMediaPath(directory, filename);
     const branchName = `media-${opType}-${mediaSlug}`;
-    return this.requestMediaBranchChoice(branchName, baseBranch);
+    const repoPath =
+      directory && directory !== '/'
+        ? `${this.trimEdges(directory, '/')}/${filename}`
+        : filename || '';
+    return this.requestMediaBranchChoice(
+      branchName,
+      baseBranch,
+      opType,
+      repoPath
+    );
   }
 
   private async waitForRequestStatus(
@@ -395,14 +421,17 @@ export class TinaMediaStore implements MediaStore {
       firstItem.directory,
       firstItem.file.name
     );
-    if (decision === 'cancelled') return [];
+    if (decision.kind === 'cancelled') return [];
 
     return this.runMediaOpWithWorkflow(decision, async () => {
       const encodedBranch = this.encodedBranchParam();
       const branchQuery = encodedBranch ? `?branch=${encodedBranch}` : '';
+      const waitForItemStatus = decision.kind !== 'workflow';
 
       for (const item of media) {
-        await this.uploadCloudMediaItem(item, branchQuery);
+        await this.uploadCloudMediaItem(item, branchQuery, {
+          waitForStatus: waitForItemStatus,
+        });
       }
 
       return this.fetchUploadedEntries(media);
@@ -411,7 +440,8 @@ export class TinaMediaStore implements MediaStore {
 
   private async uploadCloudMediaItem(
     item: MediaUploadOptions,
-    branchQuery: string
+    branchQuery: string,
+    { waitForStatus = true }: { waitForStatus?: boolean } = {}
   ): Promise<void> {
     let directory = item.directory;
     if (directory?.endsWith('/')) {
@@ -458,10 +488,12 @@ export class TinaMediaStore implements MediaStore {
       }
     }
 
-    await this.waitForRequestStatus(
-      requestId,
-      'Time out waiting for upload to complete'
-    );
+    if (waitForStatus) {
+      await this.waitForRequestStatus(
+        requestId,
+        'Time out waiting for upload to complete'
+      );
+    }
   }
 
   private groupMediaByDirectory(
@@ -749,7 +781,7 @@ export class TinaMediaStore implements MediaStore {
           media.directory,
           media.filename
         );
-        if (decision === 'cancelled') return;
+        if (decision.kind === 'cancelled') return;
         await this.runMediaOpWithWorkflow(decision, async () => {
           const encodedBranch = this.encodedBranchParam();
           const branchQuery = encodedBranch ? `?branch=${encodedBranch}` : '';
@@ -762,10 +794,12 @@ export class TinaMediaStore implements MediaStore {
           }
           const { requestId } = await res.json();
 
-          await this.waitForRequestStatus(
-            requestId,
-            'Time out waiting for delete to complete'
-          );
+          if (decision.kind !== 'workflow') {
+            await this.waitForRequestStatus(
+              requestId,
+              'Time out waiting for delete to complete'
+            );
+          }
         });
       } else {
         throw E_UNAUTHORIZED;
