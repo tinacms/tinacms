@@ -17,9 +17,11 @@ function runConfigSetup() {
   const updateConfig = vi.fn();
   const logger = { warn: vi.fn(), info: vi.fn() };
   const integration = tina();
-  (integration.hooks['astro:config:setup'] as NonNullable<
-    Hooks['astro:config:setup']
-  >)({ addMiddleware, updateConfig, logger } as unknown as ConfigSetupArg);
+  (
+    integration.hooks['astro:config:setup'] as NonNullable<
+      Hooks['astro:config:setup']
+    >
+  )({ addMiddleware, updateConfig, logger } as unknown as ConfigSetupArg);
 
   const plugins: VitePlugin[] =
     updateConfig.mock.calls[0]?.[0]?.vite?.plugins ?? [];
@@ -100,15 +102,19 @@ describe('tina() integration — astro:build:done', () => {
     const { integration } = runConfigSetup();
     const logger = { warn: vi.fn(), info: vi.fn() };
 
-    (integration.hooks['astro:config:done'] as NonNullable<
-      Hooks['astro:config:done']
-    >)({
+    (
+      integration.hooks['astro:config:done'] as NonNullable<
+        Hooks['astro:config:done']
+      >
+    )({
       config: { build: { client: pathToFileURL(clientDir + sep) } },
     } as unknown as ConfigDoneArg);
 
-    (integration.hooks['astro:build:done'] as NonNullable<
-      Hooks['astro:build:done']
-    >)({ logger } as unknown as BuildDoneArg);
+    (
+      integration.hooks['astro:build:done'] as NonNullable<
+        Hooks['astro:build:done']
+      >
+    )({ logger } as unknown as BuildDoneArg);
 
     const bridgePath = join(clientDir, 'admin', 'bridge.js');
     expect(existsSync(bridgePath)).toBe(true);
