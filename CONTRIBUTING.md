@@ -79,6 +79,19 @@ This PR calls `pnpm changeset version`, which _deletes_ changeset files and upda
 
 Previous PRs to main would _not_ have triggered NPM packages to be published because their `versions` haven't been bumped. That's the purpose of the "Version Package" action. So these merges will now have updated `versions`, resulting in publishes to NPM.
 
+## CI checks on pull requests
+
+Every PR runs `build`, tests, types, lint, format, and a Tina-lock diff check. In addition, a **template smoke** job scaffolds the canonical starter templates with `create-tina-app` and runs their `build-local` script against the current `main`, to catch regressions in the user-facing init flow before they ship:
+
+| Template | Package managers |
+| --- | --- |
+| `basic` | `pnpm`, `npm` |
+| `tina-nextjs-starter` | `pnpm`, `npm` |
+
+The smoke job is **blocking** — a regression in `create-tina-app` or in one of these templates will fail the PR. It uses dummy `NEXT_PUBLIC_TINA_CLIENT_ID` / `TINA_TOKEN` env vars (the templates' `build-local` script uses `tinacms build --content=local --skip-cloud-checks`, so no real cloud creds are needed), which means it works for fork PRs too.
+
+The broader nightly matrix in [`build-starter-templates.yml`](.github/workflows/build-starter-templates.yml) (7 templates × 3 package managers × 3 Node versions, with real Tina Cloud creds) stays as the wider safety net — failures there auto-file an issue.
+
 ## Creating a dev release (core team only)
 
 Ensure you have created a changeset and have a clean `git` working directory.

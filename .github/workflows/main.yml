@@ -80,3 +80,52 @@ jobs:
 
       - name: Check Tina lock changes
         run: pnpm diff-tina-lock
+
+  template-smoke:
+    name: Template smoke (${{ matrix.template }} / ${{ matrix.package-manager }})
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        template: [basic, tina-nextjs-starter]
+        package-manager: [pnpm, npm]
+    env:
+      # Dummy values for fork-safe smoke testing. The templates' `build-local`
+      # script uses `tinacms build --content=local --skip-cloud-checks`, so
+      # the build indexes content from the filesystem and skips cloud
+      # validation — these env vars just need to be *set* (not real) to
+      # satisfy the CLI's clientId/branch/token-must-be-configured check.
+      # See tinacms/tina-nextjs-starter#60 and the matching PRs across the
+      # other six starter repos for the template-side changes.
+      NEXT_PUBLIC_TINA_CLIENT_ID: fake-id-for-smoke
+      TINA_TOKEN: fake-token-for-smoke
+      NEXT_PUBLIC_TINA_BRANCH: main
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: Setup pnpm
+        if: matrix.package-manager == 'pnpm'
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Scaffold from template
+        run: npx --yes create-tina-app@latest test-repo --pkg-manager ${{ matrix.package-manager }} --template ${{ matrix.template }} --noTelemetry
+
+      - name: Install dependencies
+        working-directory: test-repo
+        run: ${{ matrix.package-manager }} install
+
+      - name: Build template
+        working-directory: test-repo
+        run: ${{ matrix.package-manager }} run build-local
