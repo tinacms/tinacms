@@ -63,7 +63,7 @@ For cross-origin admin deployments (Codespaces, separate-domain self-hosted), se
 Requirements for static editing:
 
 - Wrap every editable region in `<TinaIsland>` with a registered island (see [GETTING_STARTED.md](./GETTING_STARTED.md) steps 5–7) — that's both how the bridge re-renders regions and how the bootstrap gets onto the page.
-- Pass `primary` on your page's main `<TinaIsland>` (`<TinaIsland name="post" params={{ slug }} primary>`). On a static page the bridge can't tell which island is "the page", so without this the editor may land on the multi-document "Referenced Files" list when the page also has e.g. a global-config form. (On SSR pages the first `requestWithMetadata()` call is treated as primary automatically.) Mark at most one per page.
+- Pass `primary` on your page's main `<TinaIsland>` (`<TinaIsland name="post" params={{ slug }} primary>`). On a static page the bridge can't tell which island is "the page", so without this the editor may land on the multi-document "Referenced Files" list when the page also has e.g. a global-config form. (On SSR pages the first `requestWithMetadata()` call is treated as primary automatically; pass `{ priority: 'primary' }` as the second argument if you need to override that.) Mark at most one per page.
 - Keep the `tina-island/[name].ts` route (`export const prerender = false`).
 
 Trade-off: a page that uses `<TinaIsland>` carries that one-line inline bootstrap in its production HTML, so it's no longer byte-identical to a Tina-free Astro app. Pages without `<TinaIsland>` are unaffected. (On `output: 'server'` the middleware path is unchanged; the bootstrap and the middleware's own injection coexist harmlessly — `bridge.init()` is idempotent.)
@@ -82,6 +82,7 @@ Trade-off: a page that uses `<TinaIsland>` carries that one-line inline bootstra
 | `@tinacms/astro/tina-field` | `tinaField()` helper |
 | `@tinacms/astro/is-edit-mode` | `isEditMode(request)` — server-side admin-iframe detection |
 | `@tinacms/astro/middleware` | The middleware the integration auto-wires — exported here in case you need to compose it manually |
+| `@tinacms/astro/vite` | `tinaAdminDevRedirect()` — dev-only Vite plugin that redirects `/admin` and `/admin/` to `/admin/index.html` so the admin SPA is reachable from a bare URL during `astro dev` |
 | `@tinacms/astro/experimental` | `experimental_createIslandRoute()` — opt-in helper built on Astro's unstable `experimental_AstroContainer` |
 
 ## Custom MDX components
