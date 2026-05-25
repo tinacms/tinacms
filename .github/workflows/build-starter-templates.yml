@@ -91,6 +91,12 @@ jobs:
 
       - name: Install dependencies
         id: install
+        # continue-on-error so a failure here doesn't skip the rest of the job:
+        # update-tina + build still run, so we capture full diagnostics (does the
+        # template build once Tina packages are bumped to latest?) in a single
+        # pass. The failure is NOT swallowed — the "Report errors" step below
+        # treats an install failure as an overall failure and files the issue.
+        continue-on-error: true
         run: |
           cd template-repo
           ${{ matrix.package-manager }} install
@@ -178,7 +184,10 @@ jobs:
       - name: Report errors
         continue-on-error: false
         id: report-errors
-        if: failure()
+        # Also fire when the (continue-on-error) install step failed: its failure
+        # doesn't mark the job failed on its own, but it's still a real, user-facing
+        # break we want reported and counted as an overall failure.
+        if: ${{ failure() || steps.install.outcome == 'failure' }}
         run: |
           if [[ "${{ steps.create-tina-app.outcome }}" == "failure" ]]; then
             ERROR_STEP="create-tina-app"
