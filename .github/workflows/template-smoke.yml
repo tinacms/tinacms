@@ -1,0 +1,117 @@
+name: Template smoke (PR)
+
+# Scaffolds each canonical starter template with `create-tina-app` and runs
+# its `build-local` script. Catches regressions in the user-facing init flow
+# on every PR (the kind of thing that produced #6750 and only got noticed the
+# next morning from the nightly job).
+#
+# IMPORTANT — what this job does and doesn't catch:
+#
+# This job runs against the LAST PUBLISHED versions of Tina packages
+# (`create-tina-app@latest`, `@tinacms/cli@<whatever-the-template-pins>`,
+# `tinacms@<whatever-the-template-pins>`). It does NOT install the workspace
+# packages from this PR into the scaffolded project — Tina's workspace
+# packages use `workspace:*` references with a different import mechanism
+# than the published versions templates depend on, and overriding them in
+# the scaffolded project is non-trivial.
+#
+# So this catches:
+#   - `create-tina-app` regressions (that package IS in this monorepo)
+#   - Template-side breakage when the templates' pinned Tina versions
+#     no longer work together (e.g., a starter pinned an old CLI that
+#     can't speak to the new schema)
+#   - `next build` / `astro build` / `hugo` / `docusaurus build` failures
+#     that surface only when the template is scaffolded fresh (vs. in the
+#     monorepo with hoisted deps)
+#
+# It does NOT catch:
+#   - Regressions in `tinacms` / `@tinacms/cli` / `@tinacms/graphql` source
+#     introduced in *this PR* — those only show up after publish, where
+#     `build-starter-templates.yml` (nightly + post-publish) covers them.
+#
+# Fixing this properly needs a snapshot-release pipeline (publish PR-tagged
+# versions, install those into the scaffold). That's a separate piece of
+# infrastructure work — tracked separately.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      # Only run on changes that could plausibly affect what the smoke
+      # exercises — package source, the workflow itself, .nvmrc (smoke
+      # uses it for Node version). README / docs / changeset-only PRs
+      # don't trigger.
+      - 'packages/**'
+      - '.github/workflows/template-smoke.yml'
+      - '.nvmrc'
+  workflow_dispatch:
+
+jobs:
+  template-smoke:
+    name: ${{ matrix.template }} / ${{ matrix.package-manager }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        template:
+          - basic
+          - tina-nextjs-starter
+          - tina-astro-starter
+          - tina-remix-starter
+          - tina-hugo-starter
+          - tina-docs
+          - tinasaurus
+        package-manager: [pnpm, npm]
+    env:
+      # Dummy values to satisfy `--content=local`'s requirement that
+      # clientId/branch/token be configured. `--skip-cloud-checks` (in each
+      # template's `build-local` script) skips the validation network call
+      # so dummy values don't get rejected.
+      #
+      # Different templates read different env var names — set them all so
+      # one matrix definition serves the fleet:
+      #   - Next.js (basic, tina-nextjs-starter, tina-docs, tinasaurus): NEXT_PUBLIC_TINA_*
+      #   - Astro:                                                       PUBLIC_TINA_*
+      #   - Hugo, Remix:                                                 TINA_* (unprefixed)
+      NEXT_PUBLIC_TINA_CLIENT_ID: fake-id-for-smoke
+      PUBLIC_TINA_CLIENT_ID: fake-id-for-smoke
+      TINA_CLIENT_ID: fake-id-for-smoke
+      TINA_TOKEN: fake-token-for-smoke
+      NEXT_PUBLIC_TINA_BRANCH: main
+      TINA_BRANCH: main
+      GITHUB_BRANCH: main
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: Setup pnpm
+        if: matrix.package-manager == 'pnpm'
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Hugo
+        if: matrix.template == 'tina-hugo-starter'
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: 0.139.4
+
+      - name: Scaffold from template
+        run: npx --yes create-tina-app@latest test-repo --pkg-manager ${{ matrix.package-manager }} --template ${{ matrix.template }} --noTelemetry
+
+      - name: Install dependencies
+        working-directory: test-repo
+        run: ${{ matrix.package-manager }} install
+
+      - name: Build template
+        working-directory: test-repo
+        run: ${{ matrix.package-manager }} run build-local

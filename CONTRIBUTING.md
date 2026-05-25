@@ -81,16 +81,25 @@ Previous PRs to main would _not_ have triggered NPM packages to be published bec
 
 ## CI checks on pull requests
 
-Every PR runs `build`, tests, types, lint, format, and a Tina-lock diff check. In addition, a **template smoke** job scaffolds the canonical starter templates with `create-tina-app` and runs their `build-local` script against the current `main`, to catch regressions in the user-facing init flow before they ship:
+Every PR runs `build`, tests, types, lint, format, and a Tina-lock diff check (via [`main.yml`](.github/workflows/main.yml)).
+
+A separate **template smoke** workflow ([`template-smoke.yml`](.github/workflows/template-smoke.yml)) scaffolds each canonical starter with `create-tina-app` and runs its `build-local` script, to catch regressions in the user-facing init flow before they ship:
 
 | Template | Package managers |
 | --- | --- |
 | `basic` | `pnpm`, `npm` |
 | `tina-nextjs-starter` | `pnpm`, `npm` |
+| `tina-astro-starter` | `pnpm`, `npm` |
+| `tina-remix-starter` | `pnpm`, `npm` |
+| `tina-hugo-starter` | `pnpm`, `npm` |
+| `tina-docs` | `pnpm`, `npm` |
+| `tinasaurus` | `pnpm`, `npm` |
 
-The smoke job is **blocking** — a regression in `create-tina-app` or in one of these templates will fail the PR. It uses dummy `NEXT_PUBLIC_TINA_CLIENT_ID` / `TINA_TOKEN` env vars (the templates' `build-local` script uses `tinacms build --content=local --skip-cloud-checks`, so no real cloud creds are needed), which means it works for fork PRs too.
+= 14 parallel jobs, ~3 minutes wall-clock end-to-end.
 
-The broader nightly matrix in [`build-starter-templates.yml`](.github/workflows/build-starter-templates.yml) (7 templates × 3 package managers × 3 Node versions, with real Tina Cloud creds) stays as the wider safety net — failures there auto-file an issue.
+The smoke job is **blocking** — a regression in `create-tina-app` or in one of these templates will fail the PR. It uses dummy env vars (the templates' `build-local` script uses `tinacms build --content=local --skip-cloud-checks`, so no real Tina Cloud creds are needed), which means it works for fork PRs too. The workflow is path-filtered to `packages/**` and its own file, so doc-only / changeset-only PRs skip it.
+
+**What this catches vs. doesn't**: the smoke job installs the *last published* versions of Tina packages from npm (because the templates pin published semver, not workspace refs). So it catches `create-tina-app` regressions (that package is in this monorepo), template breakage against the currently-published Tina, and framework-build regressions on a fresh scaffold. It does *not* catch regressions in `tinacms`/`@tinacms/cli`/`@tinacms/graphql` source introduced in the PR itself — those only surface after publish, where the broader nightly matrix in [`build-starter-templates.yml`](.github/workflows/build-starter-templates.yml) (7 templates × 3 package managers × 3 Node versions, with real Tina Cloud creds) covers them. Failures in the nightly auto-file an issue.
 
 ## Creating a dev release (core team only)
 
