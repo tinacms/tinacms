@@ -61,8 +61,6 @@ const adaptersToRun: Adapter[] = only
       (adapter) => adapter.name !== 'mongodb-level' || !!process.env.MONGO_URI
     );
 
-const TEST_PORT = 9099;
-
 describe.each(adaptersToRun)(
   'ConfigManager.loadDatabaseFile() — $name',
   (adapter) => {
@@ -85,9 +83,15 @@ describe.each(adaptersToRun)(
       await fs.ensureDir(cacheDir);
 
       if (adapter.kind === 'tina-client') {
-        process.env.TEST_DATALAYER_PORT = String(TEST_PORT);
-        server = createDBServer(TEST_PORT);
+        server = createDBServer(0);
         await once(server, 'listening');
+        const address = server.address();
+        if (typeof address !== 'object' || address === null) {
+          throw new Error(
+            `Expected AddressInfo from server.address(), got ${String(address)}`
+          );
+        }
+        process.env.TEST_DATALAYER_PORT = String(address.port);
       }
 
       const configManager = new ConfigManager({ rootPath: process.cwd() });
