@@ -19,11 +19,9 @@ import fs from 'fs-extra';
 import { ConfigManager } from './config-manager';
 import { createDBServer } from './database';
 
-// Per-hook/per-test timeout overrides (30s each, supplied as the second arg
-// to beforeAll/afterAll/test below) replace a file-wide `jest.setTimeout()`.
-// Skipping the global avoids importing @jest/globals — the rest of
-// @tinacms/cli's tests rely on the same global injection from @types/jest,
-// not the explicit ESM import.
+// Hook + test timeout. Long enough for the tina-level-client esbuild cold
+// start. Applied per-hook below so this file doesn't need @jest/globals
+// under Jest's ESM mode just for `jest.setTimeout()`.
 const HOOK_TIMEOUT = 30000;
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -115,20 +113,17 @@ describe.each(adaptersToRun)(
           await result.close();
         }
       } else {
-        // tina-level-client: close BOTH ends. The TinaLevelClient socket
-        // (inside the Database's rootLevel) and the createDBServer() socket
-        // each independently keep the Jest worker's event loop alive.
-        //
-        // Step 1: close the client. rootLevel is a LevelProxy over the
-        // ManyLevelGuest-derived TinaLevelClient, so .close() forwards to
-        // AbstractLevel#close, which severs the client-side socket.
+        // tina-level-client: close BOTH ends or the Jest worker never
+        // exits — the client socket and the listener each hold the event
+        // loop independently.
         if (result?.rootLevel?.close) {
+          // rootLevel is a LevelProxy over TinaLevelClient; .close()
+          // forwards to AbstractLevel#close and severs the client socket.
           await result.rootLevel.close().catch(() => undefined);
         }
         if (server) {
           const handle = server;
-          // Step 2: closeAllConnections() drops any still-attached peer
-          // sockets so the listener can stop accepting and exit cleanly.
+          // Drop still-attached peer sockets so the listener can exit.
           if (typeof (handle as any).closeAllConnections === 'function') {
             (handle as any).closeAllConnections();
           }
