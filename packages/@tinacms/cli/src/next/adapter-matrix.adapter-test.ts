@@ -11,6 +11,7 @@
 // externalised dependencies like better-sqlite3.
 
 import * as path from 'path';
+import { once } from 'events';
 import type { Server } from 'net';
 import { fileURLToPath } from 'url';
 import fs from 'fs-extra';
@@ -86,6 +87,7 @@ describe.each(adaptersToRun)(
       if (adapter.kind === 'tina-client') {
         process.env.TEST_DATALAYER_PORT = String(TEST_PORT);
         server = createDBServer(TEST_PORT);
+        await once(server, 'listening');
       }
 
       const configManager = new ConfigManager({ rootPath: process.cwd() });
