@@ -1,5 +1,61 @@
 # tinacms-cli
 
+## 2.4.0
+
+### Minor Changes
+
+- [#6790](https://github.com/tinacms/tinacms/pull/6790) [`542c781`](https://github.com/tinacms/tinacms/commit/542c781b4f7a6ff5b5481bd88329f60c9bf3b57d) Thanks [@Ben0189](https://github.com/Ben0189)! - Fix native SQLite (and other native CJS adapters) crashing the ESM database build, plus surrounding cleanup work.
+
+  **The bug.** Since Tina v3's December 2025 ESM migration, bundling `tina/database.ts` with esbuild — and writing the output to `os.tmpdir()` — left users wedged between two failure modes: bundling native modules like `better-sqlite3` crashed with `__filename is not defined`, and externalizing them couldn't resolve `node_modules` from `/tmp/`. See #6675.
+
+  **What changed:**
+
+  - `loadDatabaseFile` and `loadConfigFile` now write esbuild output to `<project>/tina/__generated__/.cache/<timestamp>/` instead of `os.tmpdir()`, so Node's resolver can walk up to the project's `node_modules` at runtime.
+  - `better-sqlite3` is externalized so Node loads it as CJS where `__filename` exists.
+  - The build cache is swept on startup (clears residue from crashed prior runs), and each per-build subdir + its now-empty timestamp parent are removed after the dynamic-import resolves.
+  - Read-only project mounts (Docker `:ro` volumes, AWS Lambda's `/var/task`, sandboxed CI runners) now fail with an actionable error explaining the cause and resolution, instead of a cryptic mid-build `EACCES`.
+  - New `defineConfig` field: `build.externalDependencies?: string[]`. Users with custom native adapters outside the baseline can extend the externalize list from their config:
+
+    ```ts
+    // tina/config.ts
+    export default defineConfig({
+      build: {
+        publicFolder: "public",
+        outputFolder: "admin",
+        externalDependencies: ["my-custom-native-adapter"],
+      },
+      // ...
+    });
+    ```
+
+    Externalized packages must be installed in the project's `node_modules` so Node can resolve them at runtime.
+
+  - `tina init` now adds `tina/__generated__` to `.gitignore` for new projects (and existing projects without it).
+
+### Patch Changes
+
+- [#6841](https://github.com/tinacms/tinacms/pull/6841) [`c8b4ecb`](https://github.com/tinacms/tinacms/commit/c8b4ecbf6c1a70ac594db4eccf25956ec2153ad9) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Track `tinacms build` invocations + outcomes in PostHog. Replaces the `metrics.tina.io` event for this command. Opt-out via `--noTelemetry` is unchanged.
+
+- [#6950](https://github.com/tinacms/tinacms/pull/6950) [`8ac0776`](https://github.com/tinacms/tinacms/commit/8ac0776dea0c0650a5e5098c143b24c17fc25b8e) Thanks [@RonGamzu](https://github.com/RonGamzu)! - Fix typos: rename misspelled `notifiySubscribers` to `notifySubscribers` and correct "Error occured" to "Error occurred" in CLI error messages
+
+- [#6864](https://github.com/tinacms/tinacms/pull/6864) [`638b47a`](https://github.com/tinacms/tinacms/commit/638b47aa7c11308bc0b93fbc40794b40a53b44e0) Thanks [@kulesy](https://github.com/kulesy)! - Extract the database-bundle esbuild options out of `loadDatabaseFile()` into a pure `buildDatabaseEsbuildConfig()` helper, and add unit tests covering the externalize / output-path contracts.
+
+  The helper guarantees:
+
+  - `external` includes `better-sqlite3` (and whatever else the caller passes)
+  - `packages: 'external'` is never set (broad-externalize would break user-side named imports of CJS UMD packages like `sqlite-level` v1 and `mongodb-level`)
+  - `outfile` is forwarded unchanged from the caller (caller is responsible for putting it inside the project tree via `prepareCacheLocation()`)
+  - The fixed esbuild options (`bundle`, `platform: 'node'`, `format: 'esm'`, `createRequire` banner, loader map) are stable
+
+  Closes the regression-test gap left by the architectural fix in #6790.
+
+- Updated dependencies [[`0509095`](https://github.com/tinacms/tinacms/commit/0509095601fedc87f05a622e219e6414ef51a6b6), [`542c781`](https://github.com/tinacms/tinacms/commit/542c781b4f7a6ff5b5481bd88329f60c9bf3b57d), [`33feeac`](https://github.com/tinacms/tinacms/commit/33feeacf6585be2736a0a14c5a800c1b6db34e44), [`8ac0776`](https://github.com/tinacms/tinacms/commit/8ac0776dea0c0650a5e5098c143b24c17fc25b8e), [`d622ac5`](https://github.com/tinacms/tinacms/commit/d622ac5c0205adfc1b5cd8fe5f42045e579029c3), [`a8c8f08`](https://github.com/tinacms/tinacms/commit/a8c8f08012d30c5ed0df67ad2b04b805a9434784), [`b9eaf61`](https://github.com/tinacms/tinacms/commit/b9eaf61c28c25814ae65b5fbe72d5b33df0b3596), [`cf73a11`](https://github.com/tinacms/tinacms/commit/cf73a115c3a58fac26e2518734dd3cb49133260d), [`4757225`](https://github.com/tinacms/tinacms/commit/475722599ff350b45bfdb4f7a6af2e37d33c81c3)]:
+  - @tinacms/app@2.5.0
+  - @tinacms/schema-tools@2.8.0
+  - tinacms@3.8.2
+  - @tinacms/search@1.2.16
+  - @tinacms/graphql@2.4.2
+
 ## 2.3.1
 
 ### Patch Changes

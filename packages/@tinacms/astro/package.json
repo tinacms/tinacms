@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/astro",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "main": "src/TinaMarkdown.astro",
   "types": "dist/index.d.ts",
@@ -57,15 +57,14 @@
       "astro": "./src/integration.ts",
       "default": "./dist/integration.js"
     },
-    "./bridge-route": {
-      "types": "./dist/bridge-route.d.ts",
-      "astro": "./src/bridge-route.ts",
-      "default": "./dist/bridge-route.js"
-    },
     "./experimental": {
       "types": "./dist/experimental.d.ts",
       "astro": "./src/experimental.ts",
       "default": "./dist/experimental.js"
+    },
+    "./vite": {
+      "types": "./dist/vite.d.ts",
+      "default": "./dist/vite.js"
     }
   },
   "license": "Apache-2.0",
@@ -108,15 +107,15 @@
         "target": "node"
       },
       {
-        "name": "src/bridge-route.ts",
-        "target": "node"
-      },
-      {
         "name": "src/experimental.ts",
         "target": "node"
       },
       {
         "name": "src/island-route.ts",
+        "target": "node"
+      },
+      {
+        "name": "src/vite.ts",
         "target": "node"
       }
     ]

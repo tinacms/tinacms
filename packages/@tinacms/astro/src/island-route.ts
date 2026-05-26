@@ -1,33 +1,19 @@
 /**
- * Factory for the dynamic `/tina-island/[name]` endpoint the bridge calls
- * to refetch a region with the editor's overlay applied. Each entry in
- * `islands` describes one editable region: how to load its data, which
- * Astro component to render, and the wrapper element the page-side
- * `<div data-tina-island>` is expected to swap.
- *
- * @experimental
- *
- * Built on Astro's `experimental_AstroContainer`, which is itself
- * experimental — Astro may break the underlying API in any minor or patch
- * release. The shape of `createIslandRoute` is similarly experimental and
- * will graduate once the container API stabilises.
- *
- * Usage:
- *
- * ```ts
- * // src/pages/tina-island/[name].ts
- * import { experimental_createIslandRoute } from '@tinacms/astro/experimental';
- * import { islands } from '../../lib/islands';
- *
- * export const prerender = false;
- * export const ALL = experimental_createIslandRoute(islands);
- * ```
+ * @experimental Built on Astro's `experimental_AstroContainer`. Both APIs
+ * may break in any Astro minor/patch.
  */
+import { PREVIEW_CONTENT_TYPE, PRIME_HEADER } from '@tinacms/bridge/preview';
 import type { APIRoute } from 'astro';
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import type { AstroComponentFactory } from 'astro/runtime/server/index.js';
-import { PREVIEW_CONTENT_TYPE } from '@tinacms/bridge/preview';
 import { escapeAttr } from './internal/escape';
+import {
+  type CollectedForm,
+  formsStore,
+  renderFormPayloadDiv,
+  sortByPriority,
+} from './internal/forms-store';
+import { requestStore } from './internal/request-context';
 
 export interface IslandWrapper {
   tag: string;
@@ -62,13 +48,23 @@ export function experimental_createIslandRoute(
       return new Response(`Unknown island "${params.name}"`, { status: 404 });
     }
 
+    const priming = request.headers.get(PRIME_HEADER) !== null;
+
     try {
-      const data = await island.fetch(request, url.searchParams);
-      const container = await AstroContainer.create();
-      const html = await container.renderToString(island.component, {
-        props: island.propsFromData(data, url.searchParams),
-      });
-      return new Response(wrapIsland(html, island.wrapper, url), {
+      const forms: CollectedForm[] = [];
+      const html = await requestStore.run(request, () =>
+        formsStore.run(forms, async () => {
+          const data = await island.fetch(request, url.searchParams);
+          const container = await AstroContainer.create();
+          return container.renderToString(island.component, {
+            props: island.propsFromData(data, url.searchParams),
+          });
+        })
+      );
+      const body =
+        (priming ? renderFormPayloads(forms) : '') +
+        wrapIsland(html, island.wrapper, url);
+      return new Response(body, {
         headers: {
           'Content-Type': 'text/html; charset=utf-8',
           'Cache-Control': 'no-store',
@@ -80,12 +76,8 @@ export function experimental_createIslandRoute(
   };
 }
 
-/**
- * Layered defense for an endpoint whose response is shaped by the request
- * body. The bridge always issues a same-origin POST with the Tina-preview
- * content-type; production traffic never matches all three signals so it
- * can never reach the renderer.
- */
+// Bridge issues a same-origin POST with the Tina-preview content-type;
+// production traffic can't match all three signals.
 function rejectIfUnsafe(request: Request): Response | null {
   if (request.method !== 'POST') {
     return new Response('Method Not Allowed', { status: 405 });
@@ -94,11 +86,18 @@ function rejectIfUnsafe(request: Request): Response | null {
   if (!contentType.includes(PREVIEW_CONTENT_TYPE)) {
     return new Response('Not Found', { status: 404 });
   }
-  const fetchSite = request.headers.get('sec-fetch-site');
-  if (fetchSite === 'cross-site' || fetchSite === 'cross-origin') {
+  if (request.headers.get('sec-fetch-site') === 'cross-site') {
     return new Response('Forbidden', { status: 403 });
   }
   return null;
+}
+
+// Keyed on the explicit `primary` flag (not position): each island route
+// call is independent, so position would tag every island's first form.
+function renderFormPayloads(forms: CollectedForm[]): string {
+  return sortByPriority(forms)
+    .map((form) => renderFormPayloadDiv(form, form.priority === 'primary'))
+    .join('');
 }
 
 function wrapIsland(html: string, wrapper: IslandWrapper, url: URL): string {

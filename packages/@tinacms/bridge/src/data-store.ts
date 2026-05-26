@@ -17,6 +17,7 @@ export function initDataStore(): DataStore {
 
   return {
     get: (id) => data.get(id),
+    has: (id) => data.has(id),
     seed(id, next) {
       data.set(id, next);
     },

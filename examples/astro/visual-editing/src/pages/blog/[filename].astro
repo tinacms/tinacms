@@ -13,7 +13,7 @@ if (!blog.data?.blog) {
 const data = blog.data.blog;
 ---
 <Base title={`${data.title} | Blog`}>
-  <TinaIsland name="blog" wrapper={islands.blog.wrapper} params={{ filename }}>
+  <TinaIsland name="blog" wrapper={islands.blog.wrapper} params={{ filename }} primary>
     <BlogBody data={data} />
   </TinaIsland>
 </Base>
