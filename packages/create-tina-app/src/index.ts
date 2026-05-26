@@ -302,12 +302,12 @@ export async function run() {
   }
 
   if (!template) {
-    const defaultTemplate = TEMPLATES.find(
+    const foundDefaultIndex = TEMPLATES.findIndex(
       (t) => t.value === DEFAULT_TEMPLATE_VALUE
     );
-    const defaultTemplateIndex = defaultTemplate
-      ? TEMPLATES.indexOf(defaultTemplate)
-      : 0;
+    const defaultTemplate =
+      foundDefaultIndex >= 0 ? TEMPLATES[foundDefaultIndex] : undefined;
+    const defaultTemplateIndex = foundDefaultIndex >= 0 ? foundDefaultIndex : 0;
 
     if (!process.stdin.isTTY && defaultTemplate) {
       template = defaultTemplate;
