@@ -95,9 +95,6 @@ jobs:
           - tina-level-client
 
     services:
-      # mongo:7 ships mongosh, which we use for the health probe. The probe
-      # runs inside the container; GitHub Actions blocks the job's first step
-      # until it succeeds, so the mongodb-level row can't race the service.
       mongodb:
         image: mongo:7
         ports:
@@ -147,18 +144,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      # @tinacms/cli's test runs against TS source via ts-jest, so the CLI
-      # itself doesn't need to be built. The test does import values from
-      # @tinacms/graphql at runtime (via ./database.ts and the bundled
-      # tina-level-client fixture), so build that one. turbo's build task
-      # has `dependsOn: ["^build"]`, which transitively builds graphql's
-      # workspace deps (@tinacms/schema-tools, @tinacms/mdx) first.
+      # Adapter tests run CLI TS source via ts-jest, but need built graphql
+      # runtime output. Turbo also builds graphql's workspace deps.
       - name: Build adapter test prerequisites
         run: pnpm turbo run build --filter=@tinacms/graphql
 
-      # MONGO_URI is read only by the mongodb-level fixture; the other three
-      # adapters ignore it. ADAPTER pins the matrix row to one adapter so a
-      # failure points at exactly one job.
+      # ADAPTER selects this matrix row; only mongodb-level reads MONGO_URI.
       - name: Run adapter test
         env:
           ADAPTER: ${{ matrix.adapter }}
