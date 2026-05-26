@@ -51,9 +51,14 @@ if (only && !adapters.some((adapter) => adapter.name === only)) {
       .join(', ')}`
   );
 }
+
+// In CI, ADAPTER is always explicit, so mongodb-level still requires MONGO_URI.
+// For local run-all mode, skip mongodb-level unless MONGO_URI is available.
 const adaptersToRun: Adapter[] = only
   ? adapters.filter((adapter) => adapter.name === only)
-  : adapters;
+  : adapters.filter(
+      (adapter) => adapter.name !== 'mongodb-level' || !!process.env.MONGO_URI
+    );
 
 const TEST_PORT = 9099;
 
