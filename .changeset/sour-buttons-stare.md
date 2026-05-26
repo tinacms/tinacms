@@ -2,4 +2,4 @@
 "@tinacms/graphql": patch
 ---
 
-adds schema-level validation in @tinacms/graphql to prevent misconfiguration of the checkbox-group UI component in Tina schemas
+Adds schema-level validation for `ui.component: "checkbox-group"` fields. Fields using `checkbox-group` without `list: true`, including nested object/template fields, now fail schema validation with a clear error to catch configurations that can cause runtime GraphQL mismatches.

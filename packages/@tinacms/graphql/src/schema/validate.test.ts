@@ -147,4 +147,34 @@ describe('The schema validation', () => {
       })
     ).resolves.toBeDefined();
   });
+
+  it(`Throws a clear error when a nested checkbox-group is used without list: true`, async () => {
+    await expect(
+      validateSchema({
+        collections: [
+          {
+            ...baseCollection,
+            fields: [
+              {
+                type: 'object',
+                name: 'meta',
+                label: 'Meta',
+                fields: [
+                  {
+                    type: 'string',
+                    name: 'tags',
+                    label: 'Tags',
+                    options: ['a', 'b'],
+                    ui: { component: 'checkbox-group' },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      })
+    ).rejects.toThrow(
+      'Field "tags" uses "checkbox-group" without list: true at someName.meta.tags. Add list: true or use "select" instead.'
+    );
+  });
 });
