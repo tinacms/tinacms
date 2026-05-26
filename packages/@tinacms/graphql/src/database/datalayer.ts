@@ -183,9 +183,7 @@ export const coerceFilterChainOperands = (
         if ((filter as TernaryFilter).leftOperand !== undefined) {
           result.push({
             ...filter,
-            rightOperand: new Date(
-              filter.rightOperand as string
-            ).toISOString(),
+            rightOperand: new Date(filter.rightOperand as string).toISOString(),
             leftOperand: new Date(
               (filter as TernaryFilter).leftOperand as string
             ).toISOString(),

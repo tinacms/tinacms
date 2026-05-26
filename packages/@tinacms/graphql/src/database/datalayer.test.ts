@@ -704,9 +704,7 @@ describe('coerceFilterChainOperands', () => {
     const [f] = coerceFilterChainOperands([
       { ...binary('ts', 'datetime', OP.IN, dates) },
     ]) as BinaryFilter[];
-    expect(f.rightOperand).toEqual(
-      dates.map((d) => new Date(d).toISOString())
-    );
+    expect(f.rightOperand).toEqual(dates.map((d) => new Date(d).toISOString()));
   });
 
   it('normalizes both operands of a datetime TernaryFilter to ISO strings', () => {
