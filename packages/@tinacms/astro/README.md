@@ -14,7 +14,7 @@ pnpm add @tinacms/astro tinacms
 pnpm add -D @tinacms/cli
 ```
 
-Requires Astro 5 and an SSR adapter (`@astrojs/node`, `vercel`, `netlify`, or `cloudflare`) — the island-refresh endpoint (`/tina-island/[name]`) is on-demand. `output: 'server'` is the simplest choice; `output: 'static'` also works as long as editable regions are wrapped in [`<TinaIsland>`](#static-site-editing) and the adapter can serve that one on-demand route.
+Requires Astro 5 or 6 and an SSR adapter (`@astrojs/node`, `vercel`, `netlify`, or `cloudflare`) — the island-refresh endpoint (`/tina-island/[name]`) is on-demand. `output: 'server'` is the simplest choice; `output: 'static'` also works as long as editable regions are wrapped in [`<TinaIsland>`](#static-site-editing) and the adapter can serve that one on-demand route.
 
 ## Usage
 
@@ -161,7 +161,7 @@ CMS-supplied URLs in `a` and `img` nodes pass through `sanitizeHref` / `sanitize
 
 ## Testing
 
-Tests use Astro 5's [`experimental_AstroContainer`](https://docs.astro.build/en/reference/container-reference/). Fixtures are synced from `@tinacms/mdx`'s parser test corpus so renderer assertions track real editor output.
+Tests use Astro's [`experimental_AstroContainer`](https://docs.astro.build/en/reference/container-reference/). Fixtures are synced from `@tinacms/mdx`'s parser test corpus so renderer assertions track real editor output.
 
 ```bash
 pnpm test
