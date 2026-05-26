@@ -71,6 +71,19 @@ export const REFS_REFERENCE_FIELD = '__tina_ref__';
 export const REFS_PATH_FIELD = '__tina_ref_path__';
 export const DEFAULT_NUMERIC_LPAD = 4;
 
+const ensureUTC = (value: string): string => {
+  const s = String(value);
+  if (s.includes('T') && !/[Zz]|[+-]\d{2}:\d{2}$/.test(s)) {
+    return `${s}Z`;
+  }
+  return s;
+};
+
+const parseDatetimeUTC = (value: string): string => {
+  const d = new Date(ensureUTC(value));
+  return Number.isNaN(d.getTime()) ? String(value) : d.toISOString();
+};
+
 const applyPadding = (input: any, pad?: PadDefinition) => {
   if (pad) {
     if (Array.isArray(input)) {
@@ -141,10 +154,7 @@ const makeKeyForField = <T extends object>(
       const rawValue = data[field.name];
       let resolvedValue: string;
       if (field.type === 'datetime') {
-        const d = new Date(rawValue);
-        resolvedValue = Number.isNaN(d.getTime())
-          ? String(rawValue)
-          : d.toISOString();
+        resolvedValue = parseDatetimeUTC(rawValue);
       } else {
         if (field.type === 'string') {
           const escapedString = stringEscaper(rawValue as string | string[]);
@@ -183,25 +193,23 @@ export const coerceFilterChainOperands = (
         if ((filter as TernaryFilter).leftOperand !== undefined) {
           result.push({
             ...filter,
-            rightOperand: new Date(filter.rightOperand as string).toISOString(),
-            leftOperand: new Date(
+            rightOperand: parseDatetimeUTC(filter.rightOperand as string),
+            leftOperand: parseDatetimeUTC(
               (filter as TernaryFilter).leftOperand as string
-            ).toISOString(),
+            ),
           });
         } else {
           if (Array.isArray(filter.rightOperand)) {
             result.push({
               ...filter,
               rightOperand: (filter.rightOperand as string[]).map((operand) =>
-                new Date(operand).toISOString()
+                parseDatetimeUTC(operand)
               ),
             });
           } else {
             result.push({
               ...filter,
-              rightOperand: new Date(
-                filter.rightOperand as string
-              ).toISOString(),
+              rightOperand: parseDatetimeUTC(filter.rightOperand as string),
             });
           }
         }
@@ -368,10 +376,10 @@ export const makeFilter = ({
         operands = resolvedValues.map((resolvedValue) => {
           if (isList) {
             return resolvedValue.map((listValue) =>
-              new Date(listValue).toISOString()
+              parseDatetimeUTC(listValue)
             );
           }
-          return new Date(resolvedValue).toISOString();
+          return parseDatetimeUTC(resolvedValue);
         });
       } else if (dataType === 'boolean') {
         operands = resolvedValues.map((resolvedValue) => {
