@@ -65,7 +65,7 @@ const TEST_PORT = 9099;
 describe.each(adaptersToRun)(
   'ConfigManager.loadDatabaseFile() — $name',
   (adapter) => {
-    let cacheDir: string;
+    let cacheDir: string | undefined;
     let server: Server | undefined;
     let result: any;
 
@@ -132,7 +132,9 @@ describe.each(adaptersToRun)(
         }
         delete process.env.TEST_DATALAYER_PORT;
       }
-      await fs.remove(cacheDir).catch(() => undefined);
+      if (cacheDir) {
+        await fs.remove(cacheDir).catch(() => undefined);
+      }
     }, HOOK_TIMEOUT);
 
     test(
