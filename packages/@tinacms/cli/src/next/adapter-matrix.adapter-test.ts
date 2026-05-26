@@ -1,14 +1,11 @@
-// Parameterised regression: prove that every supported database adapter can be
-// loaded by `ConfigManager.loadDatabaseFile()` (the same code path `tinacms
-// dev`/`build` use to bring up a self-hosted database) and round-trip a value.
+// Regression coverage for ConfigManager.loadDatabaseFile(), the path used by
+// tinacms dev/build to bundle and import self-hosted database adapters.
 //
-// CI runs each adapter in its own matrix job via ADAPTER=<name>. Locally, run
-// without ADAPTER to exercise everything except mongodb-level (which requires
-// MONGO_URI), or set ADAPTER explicitly.
+// CI runs one adapter per ADAPTER=<name> matrix row. Local run-all mode skips
+// mongodb-level unless MONGO_URI is set.
 //
-// Cache + fixtures stay inside the CLI package tree (not os.tmpdir()) so that
-// Node's module resolution can walk up to monorepo node_modules and resolve
-// externalised dependencies like better-sqlite3.
+// Keep fixtures/cache under the CLI package so externalized deps resolve via
+// normal Node module lookup.
 
 import * as path from 'path';
 import { once } from 'events';
@@ -113,12 +110,9 @@ describe.each(adaptersToRun)(
           await result.close();
         }
       } else {
-        // tina-level-client: close BOTH ends or the Jest worker never
-        // exits — the client socket and the listener each hold the event
-        // loop independently.
+        // Close both sides of the tina-level-client connection so Jest can exit.
         if (result?.rootLevel?.close) {
-          // rootLevel is a LevelProxy over TinaLevelClient; .close()
-          // forwards to AbstractLevel#close and severs the client socket.
+          // rootLevel.close() closes the TinaLevelClient socket.
           await result.rootLevel.close().catch(() => undefined);
         }
         if (server) {
