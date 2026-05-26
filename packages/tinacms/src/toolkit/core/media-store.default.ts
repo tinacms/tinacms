@@ -212,6 +212,20 @@ export class TinaMediaStore implements MediaStore {
       : slug;
   }
 
+  /** Joins a directory and filename into a normalized `dir/file` repo path. */
+  private joinMediaPath(
+    directory: string | undefined,
+    filename: string | undefined
+  ): string {
+    const dir = this.trimEdges(directory ?? '', '/');
+    return dir && dir !== '/' ? `${dir}/${filename ?? ''}` : (filename ?? '');
+  }
+
+  private branchQueryParam(): string {
+    const encodedBranch = this.encodedBranchParam();
+    return encodedBranch ? `?branch=${encodedBranch}` : '';
+  }
+
   private requestMediaBranchChoice(
     branchName: string,
     baseBranch: string,
@@ -237,6 +251,8 @@ export class TinaMediaStore implements MediaStore {
                 context,
               });
             } catch (error) {
+              // Reject settles the branch-choice promise; the re-throw also
+              // rejects this onConfirm promise, which the confirm overlay awaits.
               reject(error);
               throw error;
             }
@@ -295,7 +311,8 @@ export class TinaMediaStore implements MediaStore {
   }
 
   private async finalizeMediaWorkflow(
-    branchContext: MediaBranchContext
+    branchContext: MediaBranchContext,
+    onCatalogued?: () => Promise<void>
   ): Promise<void> {
     try {
       const result = await this.api.waitForEditorialWorkflowStatus(
@@ -313,6 +330,12 @@ export class TinaMediaStore implements MediaStore {
           }
         }
       );
+
+      // The asset is now catalogued in the workflow branch's media index, and
+      // the branch override still routes list calls there — run the
+      // post-catalogue step before we clear the override.
+      if (onCatalogued) await onCatalogued();
+
       this.resetWorkflowState();
 
       this.cms.events.dispatch({
@@ -369,10 +392,7 @@ export class TinaMediaStore implements MediaStore {
     const baseBranch = decodeURIComponent(this.api.branch || '');
     const mediaSlug = this.branchSlugForMediaPath(directory, filename);
     const branchName = `media-${opType}-${mediaSlug}`;
-    const repoPath =
-      directory && directory !== '/'
-        ? `${this.trimEdges(directory, '/')}/${filename}`
-        : filename || '';
+    const repoPath = this.joinMediaPath(directory, filename);
     return this.requestMediaBranchChoice(
       branchName,
       baseBranch,
@@ -423,19 +443,49 @@ export class TinaMediaStore implements MediaStore {
     );
     if (decision.kind === 'cancelled') return [];
 
-    return this.runMediaOpWithWorkflow(decision, async () => {
-      const encodedBranch = this.encodedBranchParam();
-      const branchQuery = encodedBranch ? `?branch=${encodedBranch}` : '';
-      const waitForItemStatus = decision.kind !== 'workflow';
+    if (decision.kind === 'workflow') {
+      return this.persistCloudViaWorkflow(media, decision.context);
+    }
 
+    const branchQuery = this.branchQueryParam();
+    for (const item of media) {
+      await this.uploadCloudMediaItem(item, branchQuery, {
+        waitForStatus: true,
+      });
+    }
+    return this.fetchUploadedEntries(media);
+  }
+
+  /**
+   * Uploads assets through the editorial workflow. The asset is staged, the
+   * server-side workflow catalogues it in the new branch's media index, and
+   * only then do we list it — while the branch override still routes list
+   * calls to the workflow branch, so the freshly uploaded item is returned to
+   * the caller (and added to the media manager) without needing a manual
+   * refresh.
+   */
+  private async persistCloudViaWorkflow(
+    media: MediaUploadOptions[],
+    branchContext: MediaBranchContext
+  ): Promise<Media[]> {
+    try {
+      const branchQuery = this.branchQueryParam();
       for (const item of media) {
         await this.uploadCloudMediaItem(item, branchQuery, {
-          waitForStatus: waitForItemStatus,
+          waitForStatus: false,
         });
       }
 
-      return this.fetchUploadedEntries(media);
-    });
+      let entries: Media[] = [];
+      await this.finalizeMediaWorkflow(branchContext, async () => {
+        entries = await this.fetchUploadedEntries(media);
+      });
+      return entries;
+    } catch (err) {
+      this.resetWorkflowState();
+      this.cms.events.dispatch({ type: 'media:workflow:finish' });
+      throw err;
+    }
   }
 
   private async uploadCloudMediaItem(
@@ -443,15 +493,7 @@ export class TinaMediaStore implements MediaStore {
     branchQuery: string,
     { waitForStatus = true }: { waitForStatus?: boolean } = {}
   ): Promise<void> {
-    let directory = item.directory;
-    if (directory?.endsWith('/')) {
-      directory = directory.substr(0, directory.length - 1);
-    }
-    const path = `${
-      directory && directory !== '/'
-        ? `${directory}/${item.file.name}`
-        : item.file.name
-    }`;
+    const path = this.joinMediaPath(item.directory, item.file.name);
     const res = await this.api.authProvider.fetchWithToken(
       `${this.url}/upload_url/${path}${branchQuery}`,
       { method: 'GET' }
@@ -771,9 +813,7 @@ export class TinaMediaStore implements MediaStore {
   };
 
   async delete(media: Media) {
-    const path = `${
-      media.directory ? `${media.directory}/${media.filename}` : media.filename
-    }`;
+    const path = this.joinMediaPath(media.directory, media.filename);
     if (!this.isLocal) {
       if (await this.isAuthenticated()) {
         const decision = await this.prepareProtectedMediaBranch(
@@ -783,8 +823,7 @@ export class TinaMediaStore implements MediaStore {
         );
         if (decision.kind === 'cancelled') return;
         await this.runMediaOpWithWorkflow(decision, async () => {
-          const encodedBranch = this.encodedBranchParam();
-          const branchQuery = encodedBranch ? `?branch=${encodedBranch}` : '';
+          const branchQuery = this.branchQueryParam();
           const res = await this.api.authProvider.fetchWithToken(
             `${this.url}/${path}${branchQuery}`,
             { method: 'DELETE' }

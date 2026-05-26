@@ -879,13 +879,63 @@ describe('TinaMediaStore — protected-branch interception', () => {
     await vi.advanceTimersByTimeAsync(1100);
     await persistPromise;
 
+    // The canonical list() runs only after the workflow has catalogued the
+    // asset in the branch's media index (i.e. after
+    // waitForEditorialWorkflowStatus resolves), while the branch override
+    // still routes the list there.
     expect(eventsLog).toEqual([
       'startMediaEditorialWorkflow',
       'upload_url',
-      'list',
       'waitForEditorialWorkflowStatus',
+      'list',
       'media:workflow:complete',
     ]);
+  });
+
+  it('resolves the canonical uploaded entry from the post-commit listing', async () => {
+    const { store, fetchWithToken } = buildStore({
+      branch: 'main',
+      usingProtectedBranch: true,
+    });
+
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, {
+        signedUrl: 'https://s3.example/x',
+        requestId: 'r1',
+      })
+    );
+    // The list() that runs after the workflow commits returns the asset now
+    // present on the branch.
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, {
+        files: [
+          {
+            filename: 'a.png',
+            src: 'https://assets.example/uploads/a.png',
+          },
+        ],
+        directories: [],
+        cursor: 0,
+      })
+    );
+    stubS3PutOk();
+
+    const persistPromise = store.persist([
+      {
+        directory: 'uploads',
+        file: new File(['x'], 'a.png', { type: 'image/png' }),
+      },
+    ]);
+    await vi.advanceTimersByTimeAsync(1100);
+    const result = await persistPromise;
+
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({
+      filename: 'a.png',
+      directory: 'uploads',
+      type: 'file',
+      src: 'https://assets.example/uploads/a.png',
+    });
   });
 
   it('reflects server workflow status updates in the media workflow steps', async () => {

@@ -700,6 +700,41 @@ mutation addPendingDocumentMutation(
     throw new Error('Editorial workflow timed out after 5 minutes');
   }
 
+  private toEditorialWorkflowError(
+    responseBody: any,
+    fallbackMessage: string
+  ): EditorialWorkflowErrorDetails {
+    const error = new Error(
+      responseBody?.message || fallbackMessage
+    ) as EditorialWorkflowErrorDetails;
+    if (responseBody?.errorCode) {
+      error.errorCode = responseBody.errorCode;
+    }
+    if (responseBody?.conflictingBranch) {
+      error.conflictingBranch = responseBody.conflictingBranch;
+    }
+    return error;
+  }
+
+  private async postEditorialWorkflow(
+    url: string,
+    body: unknown,
+    errorFallback: string
+  ): Promise<any> {
+    const res = await this.authProvider.fetchWithToken(url, {
+      method: 'POST',
+      body: JSON.stringify(body),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const responseBody = await res.json();
+    if (!res.ok) {
+      throw this.toEditorialWorkflowError(responseBody, errorFallback);
+    }
+    return responseBody;
+  }
+
   /**
    * Initiate and poll for the results of an editorial workflow operation
    *
@@ -719,34 +754,16 @@ mutation addPendingDocumentMutation(
     const url = `${this.contentApiBase}/editorial-workflow/${this.clientId}`;
 
     try {
-      const res = await this.authProvider.fetchWithToken(url, {
-        method: 'POST',
-        body: JSON.stringify({
+      const responseBody = await this.postEditorialWorkflow(
+        url,
+        {
           branchName: options.branchName,
           baseBranch: options.baseBranch,
           prTitle: options.prTitle,
           graphQLContentOp: options.graphQLContentOp,
-        }),
-        headers: {
-          'Content-Type': 'application/json',
         },
-      });
-
-      const responseBody = await res.json();
-
-      if (!res.ok) {
-        console.error('There was an error starting editorial workflow.');
-        const error = new Error(
-          responseBody?.message || 'Failed to start editorial workflow'
-        ) as EditorialWorkflowErrorDetails;
-        if (responseBody?.errorCode) {
-          error.errorCode = responseBody.errorCode;
-        }
-        if (responseBody?.conflictingBranch) {
-          error.conflictingBranch = responseBody.conflictingBranch;
-        }
-        throw error;
-      }
+        'Failed to start editorial workflow'
+      );
 
       const requestId = responseBody.requestId;
 
@@ -782,27 +799,11 @@ mutation addPendingDocumentMutation(
     repoPath: string;
   }): Promise<{ branchName: string; requestId: string; status?: string }> {
     const url = `${this.contentApiBase}/editorial-workflow/${this.clientId}/media`;
-    const res = await this.authProvider.fetchWithToken(url, {
-      method: 'POST',
-      body: JSON.stringify(options),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    const responseBody = await res.json();
-    if (!res.ok) {
-      const error = new Error(
-        responseBody?.message || 'Failed to start media editorial workflow'
-      ) as EditorialWorkflowErrorDetails;
-      if (responseBody?.errorCode) {
-        error.errorCode = responseBody.errorCode;
-      }
-      if (responseBody?.conflictingBranch) {
-        error.conflictingBranch = responseBody.conflictingBranch;
-      }
-      throw error;
-    }
-    return responseBody;
+    return await this.postEditorialWorkflow(
+      url,
+      options,
+      'Failed to start media editorial workflow'
+    );
   }
 
   async waitForEditorialWorkflowStatus(
