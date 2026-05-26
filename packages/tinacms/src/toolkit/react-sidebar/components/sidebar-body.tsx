@@ -98,30 +98,30 @@ export const FormsView = ({ loadingPlaceholder }: FormsViewProps = {}) => {
   const isEditing = !!activeForm;
   const formMetas = cms.plugins.all<FormMetaPlugin>('form:meta');
 
-  // Single form - no transitions needed
+  // Single form - no transitions needed. Fall back to the no-forms
+  // placeholder when nothing is active (e.g. a listing page that only
+  // registered a layout-level global form, so `formLists` is non-empty
+  // but the auto-select heuristic skipped the only candidate). Without
+  // this the sidebar renders empty and the page looks broken.
   if (!isReferencingManyForms) {
+    if (!activeForm) {
+      return <SidebarNoFormsPlaceholder />;
+    }
     return (
-      <>
-        {activeForm && (
-          <div className='flex-1 flex flex-col flex-nowrap overflow-hidden h-full w-full relative bg-white'>
-            <FormHeader
-              activeForm={activeForm}
-              branch={cms.api.admin.api.branch}
-              repoProvider={cms.api.admin.api.schema.config.config.repoProvider}
-              isLocalMode={cms.api?.tina?.isLocalMode}
-            />
-            {formMetas?.map((meta) => (
-              <React.Fragment key={meta.name}>
-                <meta.Component />
-              </React.Fragment>
-            ))}
-            <FormBuilder
-              form={activeForm}
-              onPristineChange={setFormIsPristine}
-            />
-          </div>
-        )}
-      </>
+      <div className='flex-1 flex flex-col flex-nowrap overflow-hidden h-full w-full relative bg-white'>
+        <FormHeader
+          activeForm={activeForm}
+          branch={cms.api.admin.api.branch}
+          repoProvider={cms.api.admin.api.schema.config.config.repoProvider}
+          isLocalMode={cms.api?.tina?.isLocalMode}
+        />
+        {formMetas?.map((meta) => (
+          <React.Fragment key={meta.name}>
+            <meta.Component />
+          </React.Fragment>
+        ))}
+        <FormBuilder form={activeForm} onPristineChange={setFormIsPristine} />
+      </div>
     );
   }
 

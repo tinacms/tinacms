@@ -13,7 +13,7 @@ if (!author.data?.author) {
 const data = author.data.author;
 ---
 <Base title={`${data.name} | Authors`}>
-<TinaIsland name="author" wrapper={islands.author.wrapper} params={{ filename }}>
+<TinaIsland name="author" wrapper={islands.author.wrapper} params={{ filename }} primary>
     <AuthorBody data={data} />
   </TinaIsland>
 </Base>

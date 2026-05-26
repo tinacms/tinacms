@@ -1,5 +1,17 @@
 # @tinacms/search
 
+## 1.2.16
+
+### Patch Changes
+
+- [#6920](https://github.com/tinacms/tinacms/pull/6920) [`d622ac5`](https://github.com/tinacms/tinacms/commit/d622ac5c0205adfc1b5cd8fe5f42045e579029c3) Thanks [@kulesy](https://github.com/kulesy)! - Bump `sqlite-level` from `^2.0.0` to `^2.1.0`. The new sqlite-level transitively pulls in `better-sqlite3@12.10.0`, which is the first `better-sqlite3` line to ship Node 24 (`NODE_MODULE_VERSION 137`) prebuilt binaries. This resolves the Node 24 `npm install` failure tracked in [#6686](https://github.com/tinacms/tinacms/issues/6686) — fresh installs on Node 24 no longer fall back to `node-gyp rebuild` and no longer require a local Python + C++ toolchain. No API changes.
+
+- [#6838](https://github.com/tinacms/tinacms/pull/6838) [`a8c8f08`](https://github.com/tinacms/tinacms/commit/a8c8f08012d30c5ed0df67ad2b04b805a9434784) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Bump `sqlite-level` to `^2.0.0` and switch back to a named `import { SqliteLevel } from 'sqlite-level'`. The previous namespace-import workaround was needed because `sqlite-level` shipped as CJS and esbuild's default-import rewrite broke ESM named-export resolution; with the upstream CJS-to-ESM migration ([tinacms/sqlite-level#24](https://github.com/tinacms/sqlite-level/pull/24)) released as `sqlite-level@2.0.0`, that workaround is no longer required.
+
+- Updated dependencies [[`542c781`](https://github.com/tinacms/tinacms/commit/542c781b4f7a6ff5b5481bd88329f60c9bf3b57d)]:
+  - @tinacms/schema-tools@2.8.0
+  - @tinacms/graphql@2.4.2
+
 ## 1.2.15
 
 ### Patch Changes

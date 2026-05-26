@@ -1,5 +1,25 @@
 # tinacms
 
+## 3.8.2
+
+### Patch Changes
+
+- [#6940](https://github.com/tinacms/tinacms/pull/6940) [`33feeac`](https://github.com/tinacms/tinacms/commit/33feeacf6585be2736a0a14c5a800c1b6db34e44) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - fix(tinacms): trim whitespace from search input before querying
+
+- [#6950](https://github.com/tinacms/tinacms/pull/6950) [`8ac0776`](https://github.com/tinacms/tinacms/commit/8ac0776dea0c0650a5e5098c143b24c17fc25b8e) Thanks [@RonGamzu](https://github.com/RonGamzu)! - Fix typos: rename misspelled `notifiySubscribers` to `notifySubscribers` and correct "Error occured" to "Error occurred" in CLI error messages
+
+- [#6929](https://github.com/tinacms/tinacms/pull/6929) [`b9eaf61`](https://github.com/tinacms/tinacms/commit/b9eaf61c28c25814ae65b5fbe72d5b33df0b3596) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Fix dropdown options being hidden behind other fields.
+
+- [#6926](https://github.com/tinacms/tinacms/pull/6926) [`cf73a11`](https://github.com/tinacms/tinacms/commit/cf73a115c3a58fac26e2518734dd3cb49133260d) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Fix optional datetime fields auto-filling with the current date when no value is set
+
+- [#6938](https://github.com/tinacms/tinacms/pull/6938) [`4757225`](https://github.com/tinacms/tinacms/commit/475722599ff350b45bfdb4f7a6af2e37d33c81c3) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - chore(deps): upgrade react-router-dom from 6.3.0 to ^6.30.3 to resolve GHSA-9jcx-v3wj-wh4m (unexpected external redirect via untrusted paths)
+
+- Updated dependencies [[`0509095`](https://github.com/tinacms/tinacms/commit/0509095601fedc87f05a622e219e6414ef51a6b6), [`542c781`](https://github.com/tinacms/tinacms/commit/542c781b4f7a6ff5b5481bd88329f60c9bf3b57d), [`df50cbf`](https://github.com/tinacms/tinacms/commit/df50cbf35536bf2028a742832aebd57701dc3bb6), [`d622ac5`](https://github.com/tinacms/tinacms/commit/d622ac5c0205adfc1b5cd8fe5f42045e579029c3), [`a8c8f08`](https://github.com/tinacms/tinacms/commit/a8c8f08012d30c5ed0df67ad2b04b805a9434784)]:
+  - @tinacms/bridge@0.3.0
+  - @tinacms/schema-tools@2.8.0
+  - @tinacms/mdx@2.1.5
+  - @tinacms/search@1.2.16
+
 ## 3.8.1
 
 ### Patch Changes

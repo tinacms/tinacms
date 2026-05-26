@@ -25,7 +25,7 @@ export class SearchIndexCommand extends Command {
   });
 
   async catch(error: any): Promise<void> {
-    logger.error('Error occured during tinacms search-index');
+    logger.error('Error occurred during tinacms search-index');
     console.error(error);
     process.exit(1);
   }
