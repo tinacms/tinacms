@@ -173,6 +173,14 @@ describe('makeFilter', () => {
       });
       expect(fn(data)).toBe(expected);
     });
+
+    it('eq — match when data value is a numeric timestamp', () => {
+      const ts = new Date('2023-01-15').getTime();
+      const fn = makeFilter({
+        filterChain: [binary('ts', 'datetime', OP.EQ, iso('2023-01-15'))],
+      });
+      expect(fn({ ts })).toBe(true);
+    });
   });
 
   describe('reference type', () => {

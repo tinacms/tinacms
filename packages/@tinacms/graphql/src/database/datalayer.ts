@@ -79,8 +79,9 @@ const ensureUTC = (value: string): string => {
   return s;
 };
 
-const parseDatetimeUTC = (value: string): string => {
-  const d = new Date(ensureUTC(value));
+const parseDatetimeUTC = (value: unknown): string => {
+  const n = Number(value);
+  const d = Number.isNaN(n) ? new Date(ensureUTC(String(value))) : new Date(n);
   return Number.isNaN(d.getTime()) ? String(value) : d.toISOString();
 };
 
