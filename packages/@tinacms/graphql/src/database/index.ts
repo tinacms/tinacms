@@ -25,7 +25,6 @@ import type { Bridge } from './bridge';
 import {
   type BinaryFilter,
   DEFAULT_COLLECTION_SORT_KEY,
-  DEFAULT_DATETIME_LPAD,
   DEFAULT_NUMERIC_LPAD,
   FOLDER_ROOT,
   FolderTreeBuilder,
@@ -971,12 +970,7 @@ export class Database {
                       pad:
                         field.type === 'number'
                           ? { fillString: '0', maxLength: DEFAULT_NUMERIC_LPAD }
-                          : field.type === 'datetime'
-                            ? {
-                                fillString: '0',
-                                maxLength: DEFAULT_DATETIME_LPAD,
-                              }
-                            : undefined,
+                          : undefined,
                     },
                   ],
                 };
@@ -998,12 +992,7 @@ export class Database {
                       pad:
                         field?.type === 'number'
                           ? { fillString: '0', maxLength: DEFAULT_NUMERIC_LPAD }
-                          : field?.type === 'datetime'
-                            ? {
-                                fillString: '0',
-                                maxLength: DEFAULT_DATETIME_LPAD,
-                              }
-                            : undefined,
+                          : undefined,
                     };
                   }),
                 };

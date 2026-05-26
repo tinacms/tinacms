@@ -41,11 +41,27 @@
             "releaseDate": "2021-11-08T00:00:00.000Z",
             "rating": 9.1
           }
+        },
+        {
+          "node": {
+            "id": "movies/movie-zeta.md",
+            "title": "Zeta Movie",
+            "releaseDate": "1965-03-15T00:00:00.000Z",
+            "rating": 8
+          }
         }
       ]
     },
     "sortByReleaseDate": {
       "edges": [
+        {
+          "node": {
+            "id": "movies/movie-zeta.md",
+            "title": "Zeta Movie",
+            "releaseDate": "1965-03-15T00:00:00.000Z",
+            "rating": 8
+          }
+        },
         {
           "node": {
             "id": "movies/movie-epsilon.md",
@@ -90,6 +106,14 @@
     },
     "sortByRating": {
       "edges": [
+        {
+          "node": {
+            "id": "movies/movie-zeta.md",
+            "title": "Zeta Movie",
+            "releaseDate": "1965-03-15T00:00:00.000Z",
+            "rating": 8
+          }
+        },
         {
           "node": {
             "id": "movies/movie-delta.md",

@@ -70,7 +70,6 @@ export const REFS_COLLECTIONS_SORT_KEY = '__refs__';
 export const REFS_REFERENCE_FIELD = '__tina_ref__';
 export const REFS_PATH_FIELD = '__tina_ref_path__';
 export const DEFAULT_NUMERIC_LPAD = 4;
-export const DEFAULT_DATETIME_LPAD = 14;
 
 const applyPadding = (input: any, pad?: PadDefinition) => {
   if (pad) {
@@ -139,11 +138,13 @@ const makeKeyForField = <T extends object>(
       data[field.name] !== undefined &&
       data[field.name] !== null
     ) {
-      // TODO I think these dates are ISO 8601 so I don't think we need to convert to numbers
       const rawValue = data[field.name];
       let resolvedValue: string;
       if (field.type === 'datetime') {
-        resolvedValue = String(new Date(rawValue).getTime());
+        const d = new Date(rawValue);
+        resolvedValue = Number.isNaN(d.getTime())
+          ? String(rawValue)
+          : d.toISOString();
       } else {
         if (field.type === 'string') {
           const escapedString = stringEscaper(rawValue as string | string[]);
@@ -182,23 +183,27 @@ export const coerceFilterChainOperands = (
         if ((filter as TernaryFilter).leftOperand !== undefined) {
           result.push({
             ...filter,
-            rightOperand: new Date(filter.rightOperand as string).getTime(),
+            rightOperand: new Date(
+              filter.rightOperand as string
+            ).toISOString(),
             leftOperand: new Date(
               (filter as TernaryFilter).leftOperand as string
-            ).getTime(),
+            ).toISOString(),
           });
         } else {
           if (Array.isArray(filter.rightOperand)) {
             result.push({
               ...filter,
               rightOperand: (filter.rightOperand as string[]).map((operand) =>
-                new Date(operand).getTime()
+                new Date(operand).toISOString()
               ),
             });
           } else {
             result.push({
               ...filter,
-              rightOperand: new Date(filter.rightOperand as string).getTime(),
+              rightOperand: new Date(
+                filter.rightOperand as string
+              ).toISOString(),
             });
           }
         }
@@ -364,13 +369,11 @@ export const makeFilter = ({
       } else if (dataType === 'datetime') {
         operands = resolvedValues.map((resolvedValue) => {
           if (isList) {
-            return resolvedValue.map((listValue) => {
-              const coerced = new Date(listValue).getTime();
-              return isNaN(coerced) ? Number(listValue) : coerced;
-            });
+            return resolvedValue.map((listValue) =>
+              new Date(listValue).toISOString()
+            );
           }
-          const coerced = new Date(resolvedValue).getTime();
-          return isNaN(coerced) ? Number(resolvedValue) : coerced;
+          return new Date(resolvedValue).toISOString();
         });
       } else if (dataType === 'boolean') {
         operands = resolvedValues.map((resolvedValue) => {
@@ -479,9 +482,7 @@ export const makeFilterChain = ({
         pad:
           _type === 'number'
             ? { fillString: '0', maxLength: DEFAULT_NUMERIC_LPAD }
-            : _type === 'datetime'
-              ? { fillString: '0', maxLength: DEFAULT_DATETIME_LPAD }
-              : undefined,
+            : undefined,
       });
     } else if (key1 && key2) {
       const leftFilterOperator =
@@ -522,9 +523,7 @@ export const makeFilterChain = ({
           pad:
             _type === 'number'
               ? { fillString: '0', maxLength: DEFAULT_NUMERIC_LPAD }
-              : _type === 'datetime'
-                ? { fillString: '0', maxLength: DEFAULT_DATETIME_LPAD }
-                : undefined,
+              : undefined,
         });
       } else {
         throw new Error(

@@ -42,7 +42,7 @@ it('handles single and multi-field sorting operations', async () => {
   await expect(format(result)).toMatchFileSnapshot('node.json');
 });
 
-it('sorts dates correctly across the 12-to-13-digit timestamp boundary', async () => {
+it('sorts dates correctly including pre-1970 and across digit boundaries', async () => {
   const { get } = await setup(__dirname, config);
   const result = await get({
     query: `query {
@@ -66,8 +66,10 @@ it('sorts dates correctly across the 12-to-13-digit timestamp boundary', async (
     expect(dates[i]).toBeGreaterThanOrEqual(dates[i - 1]);
   }
 
-  // Epsilon Movie (2001-09-01) must appear before Delta Movie (2018-05-10)
   const titles = edges.map((e: any) => e.node.title);
+  // Zeta Movie (1965) must appear first (pre-1970)
+  expect(titles[0]).toBe('Zeta Movie');
+  // Epsilon Movie (2001-09-01) must appear before Delta Movie (2018-05-10)
   const epsilonIndex = titles.indexOf('Epsilon Movie');
   const deltaIndex = titles.indexOf('Delta Movie');
   expect(epsilonIndex).toBeLessThan(deltaIndex);
