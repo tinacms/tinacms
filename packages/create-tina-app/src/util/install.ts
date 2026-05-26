@@ -12,13 +12,33 @@ export function install(
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     const child = spawn(packageManager, ['install'], {
-      stdio: verboseOutput ? 'inherit' : 'ignore',
+      stdio: verboseOutput ? 'inherit' : ['ignore', 'ignore', 'pipe'],
       env: { ...process.env, ADBLOCK: '1', DISABLE_OPENCOLLECTIVE: '1' },
+    });
+
+    let stderr = '';
+    if (!verboseOutput && child.stderr) {
+      child.stderr.setEncoding('utf8');
+      child.stderr.on('data', (chunk: string) => {
+        stderr += chunk;
+      });
+    }
+
+    child.on('error', (err) => {
+      reject(
+        new Error(`Could not run \`${packageManager} install\`: ${err.message}`)
+      );
     });
 
     child.on('close', (code) => {
       if (code !== 0) {
-        reject({ command: `${packageManager} install` });
+        const tail = stderr.trim().split('\n').slice(-30).join('\n');
+        const detail = tail ? `\n${tail}` : '';
+        reject(
+          new Error(
+            `\`${packageManager} install\` exited with code ${code}.${detail}`
+          )
+        );
         return;
       }
       resolve();
