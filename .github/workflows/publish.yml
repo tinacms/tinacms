@@ -27,6 +27,11 @@ jobs:
       contains(github.event.pull_request.labels.*.name, 'tagged') &&
       github.event.pull_request.title != 'Version Packages'
     runs-on: ubuntu-latest
+    outputs:
+      # Consumed by the smoke-templates job below. packages_csv is "name,version"
+      # per line for every package republished under this PR's snapshot tag.
+      packages_csv: ${{ steps.package-versions.outputs.packages_csv }}
+      published_tag: ${{ steps.publish.outputs.published_tag }}
     permissions:
       contents: read
       id-token: write # Required for OIDC authentication with npm
@@ -80,11 +85,14 @@ jobs:
         run: pnpm types
 
       - name: Publish tagged PR
+        id: publish
         run: |
           echo running on branch ${BRANCH_NAME}
           pnpm version:snapshot $(echo ${{ github.sha }} | cut -c1-7)
           pnpm publish -r --tag ${BRANCH_NAME} --no-git-checks --access public
           echo "Published NPM tag: $BRANCH_NAME" >> $GITHUB_STEP_SUMMARY
+          # Surface the exact tag for the smoke-templates job (no independent re-derivation).
+          echo "published_tag=$BRANCH_NAME" >> "$GITHUB_OUTPUT"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
