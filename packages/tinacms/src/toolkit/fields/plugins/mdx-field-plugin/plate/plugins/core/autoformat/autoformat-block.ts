@@ -7,7 +7,11 @@ import { HorizontalRulePlugin } from '@udecode/plate-horizontal-rule/react';
 import { AutoformatRule } from '@udecode/plate-autoformat';
 import { ParagraphPlugin } from '@udecode/plate/react';
 import { insertEmptyCodeBlock } from '@udecode/plate-code-block';
-import { ALL_HEADING_LEVELS, type HeadingLevel } from '@tinacms/schema-tools';
+import {
+  ALL_HEADING_LEVELS,
+  normalizeHeadingLevels,
+  type HeadingLevel,
+} from '@tinacms/schema-tools';
 
 const headingAutoformatByLevel: Record<HeadingLevel, AutoformatRule> = {
   h1: { mode: 'block', type: HEADING_KEYS.h1, match: '# ', preFormat },
@@ -54,7 +58,12 @@ const nonHeadingAutoformatBlocks: AutoformatRule[] = [
 export const getAutoformatBlocks = (
   headingLevels: readonly HeadingLevel[] = ALL_HEADING_LEVELS
 ): AutoformatRule[] => [
-  ...headingLevels.map((level) => headingAutoformatByLevel[level]),
+  // Normalize so a pure-JS schema passing e.g. `['h7']` doesn't push an
+  // `undefined` rule into the autoformat config. The toolbar context
+  // applies the same filter, keeping both surfaces consistent.
+  ...normalizeHeadingLevels(headingLevels).map(
+    (level) => headingAutoformatByLevel[level]
+  ),
   ...nonHeadingAutoformatBlocks,
 ];
 

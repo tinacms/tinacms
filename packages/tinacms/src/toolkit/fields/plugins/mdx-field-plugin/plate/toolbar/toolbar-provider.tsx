@@ -3,7 +3,11 @@ import { type ReactNode, createContext, useContext, useMemo } from 'react';
 
 import type { Form } from '@toolkit/forms';
 import type { MdxTemplate } from '../types';
-import { ALL_HEADING_LEVELS, type HeadingLevel } from '@tinacms/schema-tools';
+import {
+  ALL_HEADING_LEVELS,
+  normalizeHeadingLevels,
+  type HeadingLevel,
+} from '@tinacms/schema-tools';
 import type {
   ToolbarOverrides,
   ToolbarOverrideType,
@@ -34,19 +38,6 @@ interface ToolbarProviderProps
 const ToolbarContext = createContext<ToolbarContextProps | undefined>(
   undefined
 );
-
-const normalizeHeadingLevels = (
-  configured: readonly HeadingLevel[]
-): readonly HeadingLevel[] => {
-  // Preserve declared order, drop duplicates, ignore out-of-range values
-  // that pure-JS consumers might slip past the HeadingLevel type. An
-  // explicit empty array is honored as "no headings".
-  const seen = new Set<HeadingLevel>();
-  for (const level of configured) {
-    if (ALL_HEADING_LEVELS.includes(level)) seen.add(level);
-  }
-  return Array.from(seen);
-};
 
 export const ToolbarProvider: React.FC<ToolbarProviderProps> = ({
   tinaForm,

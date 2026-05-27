@@ -1,6 +1,6 @@
 import type { ComponentType, SVGProps } from 'react';
 import { ParagraphPlugin } from '@udecode/plate/react';
-import { type HeadingLevel } from '@tinacms/schema-tools';
+import { isHeadingLevel, type HeadingLevel } from '@tinacms/schema-tools';
 import { Icons } from './icons';
 
 // Permissive enough to accept both Lucide icons and the project's
@@ -44,22 +44,6 @@ export const paragraphItem: HeadingMenuItem = {
   icon: Icons.paragraph,
   label: 'Paragraph',
   value: ParagraphPlugin.key,
-};
-
-// Cast-free type guard — exhaustive switch lets TS narrow `value`
-// from `string` to `HeadingLevel` without `as`.
-const isHeadingLevel = (value: string): value is HeadingLevel => {
-  switch (value) {
-    case 'h1':
-    case 'h2':
-    case 'h3':
-    case 'h4':
-    case 'h5':
-    case 'h6':
-      return true;
-    default:
-      return false;
-  }
 };
 
 /** Looks up the menu item for any block value. Returns `undefined`
