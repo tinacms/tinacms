@@ -177,4 +177,40 @@ describe('The schema validation', () => {
       'Field "tags" uses "checkbox-group" without list: true at someName.meta.tags. Add list: true or use "select" instead.'
     );
   });
+
+  it(`Throws a clear error when a checkbox-group is nested inside a rich-text embed template without list: true`, async () => {
+    await expect(
+      validateSchema({
+        collections: [
+          {
+            ...baseCollection,
+            fields: [
+              {
+                type: 'rich-text',
+                name: 'body',
+                label: 'Body',
+                templates: [
+                  {
+                    name: 'callout',
+                    label: 'Callout',
+                    fields: [
+                      {
+                        type: 'string',
+                        name: 'tags',
+                        label: 'Tags',
+                        options: ['a', 'b'],
+                        ui: { component: 'checkbox-group' },
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      })
+    ).rejects.toThrow(
+      'Field "tags" uses "checkbox-group" without list: true at someName.body.callout.tags. Add list: true or use "select" instead.'
+    );
+  });
 });

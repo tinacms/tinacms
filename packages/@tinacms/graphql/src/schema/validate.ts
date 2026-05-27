@@ -242,9 +242,9 @@ const assertCheckboxGroupIsList = (field: TinaField<true>) => {
       )}. Add list: true or use "select" instead.`
     );
   }
-  if (field.type === 'object') {
+  if (field.type === 'object' || field.type === 'rich-text') {
     const nested = [
-      ...(field.fields ?? []),
+      ...(field.type === 'object' ? field.fields ?? [] : []),
       ...(field.templates ?? []).flatMap((template) => template.fields ?? []),
     ] as TinaField<true>[];
     nested.forEach(assertCheckboxGroupIsList);
