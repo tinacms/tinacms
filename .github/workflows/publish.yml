@@ -210,6 +210,176 @@ jobs:
             
             console.log('✅ Comment posted successfully!');
 
+  # PR-time smoke test: scaffold a couple of starters and build them against the
+  # snapshot packages the publish-tagged-pr job just pushed to npm, so a PR's
+  # actual artifacts (not npm `latest`) are validated before merge.
+  #
+  # IMPORTANT: the snapshot only contains packages with pending changesets
+  # (changeset version --snapshot). So the build environment here is
+  # "PR snapshot packages + `latest` for every unchanged Tina package" — NOT a
+  # full monorepo snapshot.
+  smoke-templates:
+    needs: publish-tagged-pr
+    # Same trigger + fork guard as publish-tagged-pr: this only makes sense for the
+    # internal-PR snapshot that job published.
+    if: >
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.fork == false &&
+      contains(github.event.pull_request.labels.*.name, 'tagged') &&
+      github.event.pull_request.title != 'Version Packages'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    strategy:
+      # Report every cell independently; any failure blocks the PR (no continue-on-error).
+      fail-fast: false
+      matrix:
+        package-manager: [pnpm, npm]
+        template: [basic, tina-nextjs-starter]
+    env:
+      PACKAGES_CSV: ${{ needs.publish-tagged-pr.outputs.packages_csv }}
+      SNAPSHOT_TAG: ${{ needs.publish-tagged-pr.outputs.published_tag }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+
+      - uses: pnpm/action-setup@v6
+        name: Install pnpm
+        with:
+          version: '10'
+        if: ${{ matrix.package-manager == 'pnpm' }}
+
+      - name: Decide whether to run
+        id: gate
+        run: |
+          # No published packages => no pending changesets => nothing PR-specific
+          # to validate. Skip with a clear message rather than degrading into a
+          # pure `@latest` test.
+          if [ -z "$(printf '%s' "$PACKAGES_CSV" | tr -d '[:space:]')" ]; then
+            echo "No PR snapshot packages were published (no pending changesets); nothing PR-specific to validate. Skipping."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "PR snapshot published under npm dist-tag: $SNAPSHOT_TAG"
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Resolve create-tina-app spec
+        id: cta
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          # Prefer the concrete published version from the snapshot (robust; avoids
+          # any branch-name-as-dist-tag validity concern).
+          CTA_VERSION=$(printf '%s\n' "$PACKAGES_CSV" | awk -F, '$1=="create-tina-app"{print $2; exit}')
+          if [ -n "$CTA_VERSION" ]; then
+            echo "create-tina-app published in snapshot: $CTA_VERSION"
+            echo "spec=create-tina-app@$CTA_VERSION" >> "$GITHUB_OUTPUT"
+          else
+            # Not in the snapshot. If the PR actually changes create-tina-app, a
+            # changeset is almost certainly missing — fail loudly rather than
+            # quietly testing the already-released create-tina-app@latest.
+            CHANGED=$(gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" \
+              --paginate --jq '.[].filename' | grep -c '^packages/create-tina-app/' || true)
+            if [ "${CHANGED:-0}" -gt 0 ]; then
+              echo "::error::PR modifies packages/create-tina-app/** but no create-tina-app snapshot was published (missing changeset?). Its PR code cannot be smoke-tested."
+              exit 1
+            fi
+            echo "::warning::create-tina-app not in this PR snapshot; scaffolding with create-tina-app@latest. This validates generated-app compatibility with PR snapshot Tina packages, but NOT PR-local create-tina-app code."
+            echo "spec=create-tina-app@latest" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Scaffold template
+        if: steps.gate.outputs.run == 'true'
+        run: npx ${{ steps.cta.outputs.spec }} template-repo --pkg-manager ${{ matrix.package-manager }} --template ${{ matrix.template }} --noTelemetry
+
+      - name: Install dependencies
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          cd template-repo
+          ${{ matrix.package-manager }} install
+
+      - name: Bump Tina packages to the PR snapshot
+        if: steps.gate.outputs.run == 'true'
+        env:
+          TINA_VERSION: latest
+        # Adapted from .github/workflows/build-starter-templates.yml — the
+        # "Update Tina packages to target version" step (lines ~104-176).
+        # Differences: (1) the published-version source is this PR's packages_csv,
+        # converted to the JSON shape that step's jq expects; (2) the yarn branch is
+        # dropped (this matrix is pnpm/npm only).
+        run: |
+          cd template-repo
+          PKG_MANAGER="${{ matrix.package-manager }}"
+
+          # CSV ("name,version" per line) -> JSON [{name,version}] for jq below.
+          PUBLISHED_PACKAGES=$(printf '%s\n' "$PACKAGES_CSV" \
+            | awk -F, 'NF==2{printf "%s{\"name\":\"%s\",\"version\":\"%s\"}", sep, $1, $2; sep=","}')
+          PUBLISHED_PACKAGES="[${PUBLISHED_PACKAGES}]"
+
+          # For each matching package: use the exact snapshot version if it was part of
+          # this release, else fall back to TINA_VERSION ("latest") for unchanged packages.
+          TINA_FILTER='
+            def is_tina: . == "tinacms" or startswith("@tinacms/") or startswith("tinacms-") or startswith("next-tinacms-");
+            def resolve($published; $fallback):
+              . as $pkg | (($published | map(select(.name == $pkg)) | first | .version) // $fallback);
+          '
+          TINA_DEPS=$(jq -r --arg fallback "$TINA_VERSION" \
+            --argjson published "$PUBLISHED_PACKAGES" \
+            "${TINA_FILTER}"'
+            (.dependencies // {}) | to_entries[] |
+            select(.key | is_tina) |
+            .key + "@" + (.key | resolve($published; $fallback))
+          ' package.json | tr '\n' ' ')
+          TINA_DEV_DEPS=$(jq -r --arg fallback "$TINA_VERSION" \
+            --argjson published "$PUBLISHED_PACKAGES" \
+            "${TINA_FILTER}"'
+            (.devDependencies // {}) | to_entries[] |
+            select(.key | is_tina) |
+            .key + "@" + (.key | resolve($published; $fallback))
+          ' package.json | tr '\n' ' ')
+
+          # Bypass the minimum release age gate for Tina packages so the just-published
+          # snapshot versions install immediately.
+          echo "min-release-age=0" >> .npmrc
+          if [ "$PKG_MANAGER" = "pnpm" ]; then
+            touch pnpm-workspace.yaml
+            yq -i '.minimumReleaseAgeExclude += ["tinacms", "@tinacms/*"] | .minimumReleaseAgeExclude |= unique' pnpm-workspace.yaml
+          fi
+
+          echo "Updating Tina packages — deps: $TINA_DEPS dev deps: $TINA_DEV_DEPS"
+          if [ -n "$TINA_DEPS" ]; then
+            case "$PKG_MANAGER" in
+              pnpm) pnpm add $TINA_DEPS ;;
+              npm)  npm install $TINA_DEPS ;;
+            esac
+          fi
+          if [ -n "$TINA_DEV_DEPS" ]; then
+            case "$PKG_MANAGER" in
+              pnpm) pnpm add -D $TINA_DEV_DEPS ;;
+              npm)  npm install --save-dev $TINA_DEV_DEPS ;;
+            esac
+          fi
+
+      - name: Build (local, no cloud credentials)
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          cd template-repo
+          # Verified on main: both `basic` and `tina-nextjs-starter` define a
+          # `build-local` script (tinacms build --content=local --skip-cloud-checks
+          # -c "next build"). Resolve at runtime so a renamed script fails loudly
+          # instead of silently running the cloud `build`.
+          if jq -e '.scripts["build-local"]' package.json >/dev/null; then
+            ${{ matrix.package-manager }} run build-local
+          elif jq -e '.scripts["build:local"]' package.json >/dev/null; then
+            ${{ matrix.package-manager }} run build:local
+          else
+            echo "::error::Generated template has no build-local/build:local script"
+            exit 1
+          fi
+
   build:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
