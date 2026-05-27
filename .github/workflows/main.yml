@@ -116,15 +116,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        adapter:
-          - memory-level
-          - sqlite-level
-          - mongodb-level
-          - tina-level-client
+        include:
+          - adapter: memory-level
+            needs_mongo: false
+          - adapter: sqlite-level
+            needs_mongo: false
+          - adapter: mongodb-level
+            needs_mongo: true
+          - adapter: tina-level-client
+            needs_mongo: false
 
     services:
       mongodb:
-        image: mongo:7
+        image: ${{ matrix.needs_mongo && 'mongo:7' || '' }}
         ports:
           - 27017:27017
         options: >-
@@ -177,8 +181,14 @@ jobs:
       - name: Build adapter test prerequisites
         run: pnpm turbo run build --filter=@tinacms/graphql
 
-      # ADAPTER selects this matrix row; only mongodb-level reads MONGO_URI.
       - name: Run adapter test
+        if: ${{ !matrix.needs_mongo }}
+        env:
+          ADAPTER: ${{ matrix.adapter }}
+        run: pnpm --filter @tinacms/cli test:adapters
+
+      - name: Run adapter test (mongo)
+        if: matrix.needs_mongo
         env:
           ADAPTER: ${{ matrix.adapter }}
           MONGO_URI: mongodb://localhost:27017
