@@ -361,6 +361,20 @@ export type ToolbarOverrideType =
   | 'mermaid'
   | 'table'
   | 'hr';
+/**
+ * Heading node type as used by the rich-text editor. Mirrors
+ * `@udecode/plate-heading`'s `HEADING_KEYS` so consumers can pass these
+ * values straight through without translation.
+ */
+export type HeadingLevel = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+export const ALL_HEADING_LEVELS: readonly HeadingLevel[] = [
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+];
 type RichTextAst = { type: 'root'; children: Record<string, unknown>[] };
 export type RichTextField<WithNamespace extends boolean = false> = (
   | FieldGeneric<RichTextAst, undefined>
@@ -382,6 +396,16 @@ export type RichTextField<WithNamespace extends boolean = false> = (
       toolbar?: ToolbarOverrideType[];
       /**Default set to true */
       showFloatingToolbar?: boolean;
+      /**
+       * Restricts which heading levels are offered in the editor UI
+       * (headings dropdown, "Turn into" menu, slash menu, and markdown
+       * autoformat shortcuts like `## `). When omitted, all levels are
+       * available. UI-only — existing content with disallowed levels is
+       * rendered as-is.
+       *
+       * @example headingLevels: ['h1', 'h2', 'h3']
+       */
+      headingLevels?: HeadingLevel[];
     };
     /**
      * By default, Tina parses markdown with MDX, this is a more strict parser

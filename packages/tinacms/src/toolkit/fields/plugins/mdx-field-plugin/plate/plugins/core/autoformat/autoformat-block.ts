@@ -7,44 +7,18 @@ import { HorizontalRulePlugin } from '@udecode/plate-horizontal-rule/react';
 import { AutoformatRule } from '@udecode/plate-autoformat';
 import { ParagraphPlugin } from '@udecode/plate/react';
 import { insertEmptyCodeBlock } from '@udecode/plate-code-block';
+import { ALL_HEADING_LEVELS, type HeadingLevel } from '@tinacms/schema-tools';
 
-export const autoformatBlocks: AutoformatRule[] = [
-  {
-    mode: 'block',
-    type: HEADING_KEYS.h1,
-    match: '# ',
-    preFormat,
-  },
-  {
-    mode: 'block',
-    type: HEADING_KEYS.h2,
-    match: '## ',
-    preFormat,
-  },
-  {
-    mode: 'block',
-    type: HEADING_KEYS.h3,
-    match: '### ',
-    preFormat,
-  },
-  {
-    mode: 'block',
-    type: HEADING_KEYS.h4,
-    match: '#### ',
-    preFormat,
-  },
-  {
-    mode: 'block',
-    type: HEADING_KEYS.h5,
-    match: '##### ',
-    preFormat,
-  },
-  {
-    mode: 'block',
-    type: HEADING_KEYS.h6,
-    match: '###### ',
-    preFormat,
-  },
+const headingAutoformatByLevel: Record<HeadingLevel, AutoformatRule> = {
+  h1: { mode: 'block', type: HEADING_KEYS.h1, match: '# ', preFormat },
+  h2: { mode: 'block', type: HEADING_KEYS.h2, match: '## ', preFormat },
+  h3: { mode: 'block', type: HEADING_KEYS.h3, match: '### ', preFormat },
+  h4: { mode: 'block', type: HEADING_KEYS.h4, match: '#### ', preFormat },
+  h5: { mode: 'block', type: HEADING_KEYS.h5, match: '##### ', preFormat },
+  h6: { mode: 'block', type: HEADING_KEYS.h6, match: '###### ', preFormat },
+};
+
+const nonHeadingAutoformatBlocks: AutoformatRule[] = [
   {
     mode: 'block',
     type: BlockquotePlugin.key,
@@ -76,3 +50,15 @@ export const autoformatBlocks: AutoformatRule[] = [
     },
   },
 ];
+
+export const getAutoformatBlocks = (
+  headingLevels: readonly HeadingLevel[] = ALL_HEADING_LEVELS
+): AutoformatRule[] => [
+  ...headingLevels.map((level) => headingAutoformatByLevel[level]),
+  ...nonHeadingAutoformatBlocks,
+];
+
+// Default rule set with all heading levels — consumed by the static
+// `autoformatRules` aggregate. The field-aware editor opts into a
+// filtered set via `getAutoformatBlocks(headingLevels)`.
+export const autoformatBlocks: AutoformatRule[] = getAutoformatBlocks();
