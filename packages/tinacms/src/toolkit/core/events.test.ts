@@ -45,6 +45,38 @@ describe('EventBus', () => {
       expect(listener).not.toHaveBeenCalled();
     });
   });
+
+  describe('hasExplicitListenerFor', () => {
+    it('is true when a listener specifically targets the event', () => {
+      const events = new EventBus();
+      events.subscribe('foo:bar', vi.fn());
+
+      expect(events.hasExplicitListenerFor('foo:bar')).toBe(true);
+    });
+
+    it('ignores catch-all wildcard listeners', () => {
+      const events = new EventBus();
+      events.subscribe('*', vi.fn());
+
+      expect(events.hasExplicitListenerFor('foo:bar')).toBe(false);
+    });
+
+    it('is false when nothing targets the event', () => {
+      const events = new EventBus();
+      events.subscribe('other', vi.fn());
+
+      expect(events.hasExplicitListenerFor('foo:bar')).toBe(false);
+    });
+
+    it('is false after the targeting listener unsubscribes', () => {
+      const events = new EventBus();
+      const unsubscribe = events.subscribe('foo:bar', vi.fn());
+
+      expect(events.hasExplicitListenerFor('foo:bar')).toBe(true);
+      unsubscribe();
+      expect(events.hasExplicitListenerFor('foo:bar')).toBe(false);
+    });
+  });
 });
 
 describe('Listener', () => {

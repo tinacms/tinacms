@@ -232,29 +232,41 @@ export class TinaMediaStore implements MediaStore {
     opType: 'upload' | 'delete',
     repoPath: string
   ): Promise<MediaBranchDecision> {
-    return new Promise((resolve) => {
-      const handled = this.cms.events.dispatch<MediaWorkflowConfirmBranchEvent>(
-        {
-          type: 'media:workflow:confirm-branch',
-          branchName,
-          baseBranch,
-          onConfirm: async (selectedBranchName) => {
-            const context = await this.prepareMediaBranch(
-              selectedBranchName,
-              baseBranch,
-              opType,
-              repoPath
-            );
-            resolve({
-              kind: 'workflow',
-              context,
-            });
-          },
-          onCancel: () => resolve({ kind: 'cancelled' }),
-          onSaveToProtectedBranch: () => resolve({ kind: 'direct' }),
-        }
+    // The decision is driven entirely by the branch prompt rendered by
+    // <MediaWorkflowOverlay />. We can't infer its presence from
+    // dispatch()'s return value: ambient `'*'` subscribers (the alerts
+    // bridge) make every event look "handled", so a missing overlay would
+    // leave this promise unresolved forever. Detect the purpose-built
+    // listener explicitly and fail fast instead.
+    if (
+      !this.cms.events.hasExplicitListenerFor('media:workflow:confirm-branch')
+    ) {
+      throw new Error(
+        'Cannot start a media editorial workflow: no branch prompt is mounted. ' +
+          'Ensure <MediaWorkflowOverlay /> is rendered (TinaCloudProvider mounts it automatically).'
       );
-      if (!handled) resolve({ kind: 'direct' });
+    }
+
+    return new Promise((resolve) => {
+      this.cms.events.dispatch<MediaWorkflowConfirmBranchEvent>({
+        type: 'media:workflow:confirm-branch',
+        branchName,
+        baseBranch,
+        onConfirm: async (selectedBranchName) => {
+          const context = await this.prepareMediaBranch(
+            selectedBranchName,
+            baseBranch,
+            opType,
+            repoPath
+          );
+          resolve({
+            kind: 'workflow',
+            context,
+          });
+        },
+        onCancel: () => resolve({ kind: 'cancelled' }),
+        onSaveToProtectedBranch: () => resolve({ kind: 'direct' }),
+      });
     });
   }
 

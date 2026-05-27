@@ -698,7 +698,10 @@ describe('TinaMediaStore — protected-branch interception', () => {
     expect(fetchWithToken.mock.calls[0][0]).toContain('?branch=main');
   });
 
-  it('continues on the protected branch when no media workflow overlay is mounted', async () => {
+  it('fails fast on a protected branch when no media workflow overlay is mounted', async () => {
+    // No `media:workflow:confirm-branch` subscriber is registered. Ambient
+    // `'*'` listeners must not make this look handled, so the store should
+    // surface a clear error rather than upload directly or hang.
     const startMediaEditorialWorkflow = vi.fn();
     const { store, fetchWithToken } = buildStore({
       branch: 'main',
@@ -707,28 +710,42 @@ describe('TinaMediaStore — protected-branch interception', () => {
       autoConfirmMediaBranchPrompt: false,
     });
 
-    fetchWithToken.mockResolvedValueOnce(
-      makeJsonResponse(200, {
-        signedUrl: 'https://s3.example/x',
-        requestId: 'r1',
-      })
-    );
-    fetchWithToken.mockResolvedValueOnce(
-      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
-    );
-    stubS3PutOk();
-
-    const persistPromise = store.persist([
-      {
-        directory: 'uploads',
-        file: new File(['x'], 'a.png', { type: 'image/png' }),
-      },
-    ]);
-    await vi.advanceTimersByTimeAsync(1100);
-    await persistPromise;
+    await expect(
+      store.persist([
+        {
+          directory: 'uploads',
+          file: new File(['x'], 'a.png', { type: 'image/png' }),
+        },
+      ])
+    ).rejects.toThrow(/no branch prompt is mounted/i);
 
     expect(startMediaEditorialWorkflow).not.toHaveBeenCalled();
-    expect(fetchWithToken.mock.calls[0][0]).toContain('?branch=main');
+    expect(fetchWithToken).not.toHaveBeenCalled();
+  });
+
+  it('does not mistake an ambient wildcard listener for a mounted overlay', async () => {
+    // Mirrors production, where the alerts bridge subscribes to '*' on the
+    // same bus: a wildcard listener must not satisfy the overlay requirement.
+    const startMediaEditorialWorkflow = vi.fn();
+    const { store, fetchWithToken, events } = buildStore({
+      branch: 'main',
+      usingProtectedBranch: true,
+      startMediaEditorialWorkflow,
+      autoConfirmMediaBranchPrompt: false,
+    });
+    events.subscribe('*', vi.fn());
+
+    await expect(
+      store.persist([
+        {
+          directory: 'uploads',
+          file: new File(['x'], 'a.png', { type: 'image/png' }),
+        },
+      ])
+    ).rejects.toThrow(/no branch prompt is mounted/i);
+
+    expect(startMediaEditorialWorkflow).not.toHaveBeenCalled();
+    expect(fetchWithToken).not.toHaveBeenCalled();
   });
 
   it('resolves persist with [] when the user cancels the branch prompt', async () => {
@@ -1125,5 +1142,86 @@ describe('TinaMediaStore — protected-branch interception', () => {
         ),
       })
     );
+  });
+
+  it('surfaces server workflow failures without breaking the completed delete', async () => {
+    const waitForEditorialWorkflowStatus = vi
+      .fn()
+      .mockRejectedValue(new Error('Indexing failed'));
+
+    const { store, fetchWithToken, events } = buildStore({
+      branch: 'main',
+      usingProtectedBranch: true,
+      waitForEditorialWorkflowStatus,
+    });
+
+    const onWorkflowError = vi.fn();
+    const onWorkflowComplete = vi.fn();
+    events.subscribe('media:workflow:error', onWorkflowError);
+    events.subscribe('media:workflow:complete', onWorkflowComplete);
+
+    // The DELETE against the workflow branch succeeds; only the cloud
+    // workflow (indexing / PR) fails afterwards.
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { requestId: 'r-del' })
+    );
+
+    const deletePromise = store.delete({
+      directory: 'images',
+      filename: 'a.png',
+    } as Media);
+    await vi.advanceTimersByTimeAsync(1100);
+
+    // The delete itself completed, so the store resolves; the failure is
+    // surfaced through the workflow error event for the overlay to show.
+    await expect(deletePromise).resolves.toBeUndefined();
+    expect(waitForEditorialWorkflowStatus).toHaveBeenCalled();
+    expect(onWorkflowComplete).not.toHaveBeenCalled();
+    expect(onWorkflowError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining('Indexing failed'),
+      })
+    );
+  });
+
+  it('allows a new media operation after a workflow failure (retry)', async () => {
+    const waitForEditorialWorkflowStatus = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('Indexing failed'))
+      .mockResolvedValueOnce({
+        branchName: 'tina/media-delete-images-a-png',
+        pullRequestUrl: 'https://github.com/x/y/pull/3',
+      });
+
+    const { store, fetchWithToken, events, startMediaEditorialWorkflow } =
+      buildStore({
+        branch: 'main',
+        usingProtectedBranch: true,
+        waitForEditorialWorkflowStatus,
+      });
+
+    const onWorkflowComplete = vi.fn();
+    events.subscribe('media:workflow:complete', onWorkflowComplete);
+
+    // Each delete makes a single DELETE call against the workflow branch.
+    fetchWithToken.mockResolvedValue(
+      makeJsonResponse(200, { requestId: 'r-del' })
+    );
+
+    const media = { directory: 'images', filename: 'a.png' } as Media;
+
+    const firstDelete = store.delete(media);
+    await vi.advanceTimersByTimeAsync(1100);
+    await expect(firstDelete).resolves.toBeUndefined();
+    expect(onWorkflowComplete).not.toHaveBeenCalled();
+
+    // The failed workflow must have reset internal state, so a retry is not
+    // blocked by "a media workflow is already in progress".
+    const secondDelete = store.delete(media);
+    await vi.advanceTimersByTimeAsync(1100);
+    await expect(secondDelete).resolves.toBeUndefined();
+
+    expect(startMediaEditorialWorkflow).toHaveBeenCalledTimes(2);
+    expect(onWorkflowComplete).toHaveBeenCalledTimes(1);
   });
 });
