@@ -81,16 +81,21 @@ jobs:
       - name: Check Tina lock changes
         run: pnpm diff-tina-lock
 
+  # Gate adapter-matrix on whether the push / PR actually touched code that
+  # can affect it. workflow_dispatch falls through unconditionally so a manual
+  # run always exercises the matrix.
   adapter-changes:
     name: Detect adapter-relevant changes
     runs-on: ubuntu-latest
     outputs:
-      should_run: ${{ github.event_name != 'pull_request' || steps.filter.outputs.adapter == 'true' }}
+      should_run: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.adapter == 'true' }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - uses: dorny/paths-filter@v3
         id: filter
-        if: github.event_name == 'pull_request'
+        if: github.event_name != 'workflow_dispatch'
         with:
           filters: |
             adapter:
