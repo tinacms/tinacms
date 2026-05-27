@@ -81,8 +81,31 @@ jobs:
       - name: Check Tina lock changes
         run: pnpm diff-tina-lock
 
+  adapter-changes:
+    name: Detect adapter-relevant changes
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ github.event_name != 'pull_request' || steps.filter.outputs.adapter == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        if: github.event_name == 'pull_request'
+        with:
+          filters: |
+            adapter:
+              - 'packages/@tinacms/cli/**'
+              - 'packages/@tinacms/graphql/**'
+              - 'packages/@tinacms/schema-tools/**'
+              - 'packages/@tinacms/mdx/**'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - '.github/workflows/main.yml'
+
   adapter-matrix:
     name: Adapter Compatibility (${{ matrix.adapter }})
+    needs: adapter-changes
+    if: needs.adapter-changes.outputs.should_run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     strategy:
