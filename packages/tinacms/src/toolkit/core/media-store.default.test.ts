@@ -582,17 +582,26 @@ describe('TinaMediaStore — protected-branch interception', () => {
     );
   });
 
-  it('rejects the branch prompt confirmation when branch preparation fails', async () => {
+  it('keeps the branch prompt retryable when branch preparation fails', async () => {
     const startMediaEditorialWorkflow = vi
       .fn()
-      .mockRejectedValue(new Error('There was an error creating a new branch'));
+      .mockRejectedValueOnce(
+        new Error('There was an error creating a new branch')
+      )
+      .mockResolvedValueOnce({
+        branchName: 'tina/custom-media-change-2',
+        requestId: 'media-workflow-2',
+        status: 'queued',
+      });
 
-    const { store, events } = buildStore({
+    const { store, events, fetchWithToken } = buildStore({
       branch: 'main',
       usingProtectedBranch: true,
       startMediaEditorialWorkflow,
       autoConfirmMediaBranchPrompt: false,
     });
+    const uploadFailure = vi.fn();
+    events.subscribe('media:upload:failure', uploadFailure);
 
     const confirmEventPromise = new Promise<MediaWorkflowConfirmBranchEvent>(
       (resolve) => {
@@ -612,8 +621,43 @@ describe('TinaMediaStore — protected-branch interception', () => {
     await expect(confirmPromise).rejects.toThrow(
       'There was an error creating a new branch'
     );
-    await expect(persistPromise).rejects.toThrow(
-      'There was an error creating a new branch'
+
+    expect(uploadFailure).not.toHaveBeenCalled();
+    expect(fetchWithToken).not.toHaveBeenCalled();
+
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, {
+        signedUrl: 'https://s3.example/x',
+        requestId: 'r1',
+      })
+    );
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, {
+        files: [
+          {
+            filename: 'a.png',
+            src: 'https://assets.tina.io/test-client/__staging/tina/custom-media-change-2/__file/uploads/a.png',
+          },
+        ],
+        directories: [],
+        cursor: 0,
+      })
+    );
+    stubS3PutOk();
+
+    await expect(
+      event.onConfirm('tina/custom-media-change-2')
+    ).resolves.toBeUndefined();
+    await expect(persistPromise).resolves.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          filename: 'a.png',
+        }),
+      ])
+    );
+    expect(startMediaEditorialWorkflow).toHaveBeenCalledTimes(2);
+    expect(fetchWithToken.mock.calls[0][0]).toContain(
+      `?branch=${encodeURIComponent('tina/custom-media-change-2')}`
     );
   });
 

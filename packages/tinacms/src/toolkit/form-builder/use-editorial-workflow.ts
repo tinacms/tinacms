@@ -12,7 +12,11 @@ import {
   UPDATE_DOCUMENT_GQL,
 } from '../../admin/api';
 import { Form } from '@toolkit/forms';
-import { getEditorialWorkflowPrTitle } from './editorial-workflow-utils';
+import {
+  checkTargetBranchExists,
+  getEditorialWorkflowPrTitle,
+  TARGET_BRANCH_EXISTS_ERROR,
+} from './editorial-workflow-utils';
 
 const pathRelativeToCollection = (
   collectionPath: string,
@@ -63,6 +67,7 @@ export interface ExecuteWorkflowOptions {
   values: Record<string, unknown>;
   crudType: string;
   tinaForm?: Form;
+  signal?: AbortSignal;
 }
 
 export interface UseEditorialWorkflowResult {
@@ -146,8 +151,27 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
     values,
     crudType,
     tinaForm,
+    signal,
   }: ExecuteWorkflowOptions): Promise<boolean> => {
     try {
+      if (signal?.aborted) return false;
+
+      const targetBranchExists = await checkTargetBranchExists(
+        tinaApi,
+        branchName,
+        'executeEditorialWorkflow',
+        signal
+      );
+
+      if (signal?.aborted) return false;
+
+      if (targetBranchExists) {
+        setErrorMessage(TARGET_BRANCH_EXISTS_ERROR);
+        setIsExecuting(false);
+        setCurrentStep(0);
+        return false;
+      }
+
       setIsExecuting(true);
       setCurrentStep(1);
 

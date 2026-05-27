@@ -537,11 +537,15 @@ mutation addPendingDocumentMutation(
     return parsedResult;
   }
 
-  async listBranches(args?: { includeIndexStatus?: boolean }) {
+  async listBranches(args?: {
+    includeIndexStatus?: boolean;
+    signal?: AbortSignal;
+  }) {
     try {
       const url = `${this.contentApiBase}/github/${this.clientId}/list_branches`;
       const res = await this.authProvider.fetchWithToken(url, {
         method: 'GET',
+        signal: args?.signal,
       });
       const branches = await res.json();
       const parsedBranches = await ListBranchResponse.parseAsync(branches);
@@ -573,9 +577,15 @@ mutation addPendingDocumentMutation(
     );
   }
 
-  async branchExists(branchName: string): Promise<boolean> {
+  async branchExists(
+    branchName: string,
+    args?: { signal?: AbortSignal }
+  ): Promise<boolean> {
     if (this.isLocalMode) return true;
-    const branches = await this.listBranches({ includeIndexStatus: false });
+    const branches = await this.listBranches({
+      includeIndexStatus: false,
+      signal: args?.signal,
+    });
     return branches.some((b) => b.name === branchName);
   }
 

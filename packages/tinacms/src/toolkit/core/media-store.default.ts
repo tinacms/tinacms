@@ -232,30 +232,23 @@ export class TinaMediaStore implements MediaStore {
     opType: 'upload' | 'delete',
     repoPath: string
   ): Promise<MediaBranchDecision> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const handled = this.cms.events.dispatch<MediaWorkflowConfirmBranchEvent>(
         {
           type: 'media:workflow:confirm-branch',
           branchName,
           baseBranch,
           onConfirm: async (selectedBranchName) => {
-            try {
-              const context = await this.prepareMediaBranch(
-                selectedBranchName,
-                baseBranch,
-                opType,
-                repoPath
-              );
-              resolve({
-                kind: 'workflow',
-                context,
-              });
-            } catch (error) {
-              // Reject settles the branch-choice promise; the re-throw also
-              // rejects this onConfirm promise, which the confirm overlay awaits.
-              reject(error);
-              throw error;
-            }
+            const context = await this.prepareMediaBranch(
+              selectedBranchName,
+              baseBranch,
+              opType,
+              repoPath
+            );
+            resolve({
+              kind: 'workflow',
+              context,
+            });
           },
           onCancel: () => resolve({ kind: 'cancelled' }),
           onSaveToProtectedBranch: () => resolve({ kind: 'direct' }),

@@ -68,6 +68,7 @@ export const CreateBranchModal = ({
   );
   const [isBranchGuardChecking, setIsBranchGuardChecking] =
     React.useState(false);
+  const branchGuardAbortRef = React.useRef<AbortController | null>(null);
 
   const {
     isExecuting,
@@ -78,18 +79,38 @@ export const CreateBranchModal = ({
     reset,
   } = useEditorialWorkflow();
 
+  const abortBranchGuard = React.useCallback(() => {
+    branchGuardAbortRef.current?.abort();
+    branchGuardAbortRef.current = null;
+    setIsBranchGuardChecking(false);
+  }, []);
+
+  React.useEffect(() => {
+    return () => {
+      branchGuardAbortRef.current?.abort();
+    };
+  }, []);
+
   const executeEditorialWorkflow = async () => {
+    abortBranchGuard();
+    const abortController = new AbortController();
+    branchGuardAbortRef.current = abortController;
     setIsBranchGuardChecking(true);
 
     const baseBranch = decodeURIComponent(tinaApi.branch);
+    const targetBranch = `tina/${newBranchName}`;
 
     const baseBranchExists = await checkBaseBranchExists(
       tinaApi,
       baseBranch,
-      'executeEditorialWorkflow'
+      'executeEditorialWorkflow',
+      abortController.signal
     );
 
+    if (abortController.signal.aborted) return;
+
     if (!baseBranchExists) {
+      abortBranchGuard();
       console.debug(
         '[tina:branch-guard] executeEditorialWorkflow: base branch deleted — handing off'
       );
@@ -100,13 +121,17 @@ export const CreateBranchModal = ({
     setIsBranchGuardChecking(false);
 
     const success = await executeWorkflow({
-      branchName: `tina/${newBranchName}`,
+      branchName: targetBranch,
       baseBranch,
       path,
       values,
       crudType,
       tinaForm,
+      signal: abortController.signal,
     });
+    if (branchGuardAbortRef.current === abortController) {
+      branchGuardAbortRef.current = null;
+    }
 
     if (success) {
       close();
@@ -126,16 +151,20 @@ export const CreateBranchModal = ({
   return (
     <CreateBranchPromptModal
       branchName={newBranchName}
-      close={close}
+      close={() => {
+        abortBranchGuard();
+        close();
+      }}
       errorMessage={errorMessage}
       disabled={newBranchName === '' || isBranchGuardChecking}
       onBranchNameChange={(value) => {
-        // reset error state on change
+        abortBranchGuard();
         reset();
         setNewBranchName(value);
       }}
       onCreateBranch={executeEditorialWorkflow}
       onSaveToProtectedBranch={() => {
+        abortBranchGuard();
         close();
         safeSubmit();
       }}

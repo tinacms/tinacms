@@ -11,7 +11,9 @@ import {
 import { CreateBranchPromptModal } from '@toolkit/form-builder/create-branch-modal';
 import {
   checkBaseBranchExists,
+  checkTargetBranchExists,
   type MediaWorkflowConfirmBranchEvent,
+  TARGET_BRANCH_EXISTS_ERROR,
 } from '@toolkit/form-builder/editorial-workflow-utils';
 import { EditorialWorkflowProgressModal } from '@toolkit/form-builder/editorial-workflow-progress-modal';
 import { getEditorialWorkflowErrorMessage } from '@toolkit/form-builder/use-editorial-workflow';
@@ -36,11 +38,18 @@ export const MediaWorkflowOverlay = () => {
   const { setCurrentBranch } = useBranchData();
 
   const [state, setState] = React.useState<WorkflowState>({ phase: 'idle' });
+  const preflightAbortRef = React.useRef<AbortController | null>(null);
+
+  const abortPreflight = React.useCallback(() => {
+    preflightAbortRef.current?.abort();
+    preflightAbortRef.current = null;
+  }, []);
 
   React.useEffect(() => {
     const offConfirm = cms.events.subscribe<MediaWorkflowConfirmBranchEvent>(
       'media:workflow:confirm-branch',
       (event) => {
+        abortPreflight();
         setState({
           phase: 'confirming',
           branchName: event.branchName,
@@ -87,8 +96,9 @@ export const MediaWorkflowOverlay = () => {
       offComplete();
       offError();
       offFinish();
+      abortPreflight();
     };
-  }, [cms, setCurrentBranch]);
+  }, [abortPreflight, cms, setCurrentBranch]);
 
   React.useEffect(() => {
     if (state.phase !== 'executing') return;
@@ -107,15 +117,29 @@ export const MediaWorkflowOverlay = () => {
 
     const confirmState = state;
     const branchName = confirmState.branchName;
-    setState({ ...confirmState, isChecking: true, errorMessage: '' });
+    const targetBranch = `tina/${branchName}`;
+    abortPreflight();
+    const abortController = new AbortController();
+    preflightAbortRef.current = abortController;
+    setState({
+      ...confirmState,
+      isChecking: true,
+      errorMessage: '',
+    });
 
     const baseBranchExists = await checkBaseBranchExists(
       cms.api.tina,
       confirmState.baseBranch,
-      'media workflow'
+      'media workflow',
+      abortController.signal
     );
 
+    if (abortController.signal.aborted) return;
+
     if (!baseBranchExists) {
+      if (preflightAbortRef.current === abortController) {
+        preflightAbortRef.current = null;
+      }
       setState({
         ...confirmState,
         branchName,
@@ -125,8 +149,34 @@ export const MediaWorkflowOverlay = () => {
       return;
     }
 
+    const targetBranchExists = await checkTargetBranchExists(
+      cms.api.tina,
+      targetBranch,
+      'media workflow',
+      abortController.signal
+    );
+
+    if (abortController.signal.aborted) return;
+
+    if (targetBranchExists) {
+      if (preflightAbortRef.current === abortController) {
+        preflightAbortRef.current = null;
+      }
+      setState({
+        ...confirmState,
+        branchName,
+        isChecking: false,
+        errorMessage: TARGET_BRANCH_EXISTS_ERROR,
+      });
+      return;
+    }
+
     try {
-      await confirmState.onConfirm(`tina/${branchName}`);
+      if (preflightAbortRef.current === abortController) {
+        preflightAbortRef.current = null;
+      }
+      setState({ phase: 'executing', step: 1, elapsed: 0 });
+      await confirmState.onConfirm(targetBranch);
     } catch (e) {
       console.error(e);
       setState({
@@ -145,20 +195,28 @@ export const MediaWorkflowOverlay = () => {
       <CreateBranchPromptModal
         branchName={state.branchName}
         close={() => {
+          abortPreflight();
           state.onCancel();
           setState({ phase: 'idle' });
         }}
         disabled={state.branchName === '' || state.isChecking}
         errorMessage={state.errorMessage}
         onBranchNameChange={(branchName) => {
+          abortPreflight();
           setState((prev) =>
             prev.phase === 'confirming'
-              ? { ...prev, branchName, errorMessage: undefined }
+              ? {
+                  ...prev,
+                  branchName,
+                  errorMessage: undefined,
+                  isChecking: false,
+                }
               : prev
           );
         }}
         onCreateBranch={handleCreateBranch}
         onSaveToProtectedBranch={() => {
+          abortPreflight();
           state.onSaveToProtectedBranch();
           setState({ phase: 'idle' });
         }}
