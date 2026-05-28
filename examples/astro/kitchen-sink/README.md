@@ -1,6 +1,6 @@
 # TinaCMS Astro Kitchen Sink
 
-The Astro version of the TinaCMS kitchen-sink example app. Demonstrates all core TinaCMS features — visual editing, block-based pages, rich-text content, and multi-collection schemas — built with Astro 5 and zero client-side JS in production.
+The Astro version of the TinaCMS kitchen-sink example app. Demonstrates all core TinaCMS features — visual editing, block-based pages, rich-text content, and multi-collection schemas — built with Astro 6 and zero client-side JS in production.
 
 ## Prerequisites
 

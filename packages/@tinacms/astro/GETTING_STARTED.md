@@ -1,6 +1,6 @@
 # Getting started — `@tinacms/astro`
 
-Step-by-step for adding TinaCMS visual editing to a new or existing Astro project. Tested against Astro 5, Node 18+, TinaCMS 3.
+Step-by-step for adding TinaCMS visual editing to a new or existing Astro project. Tested against Astro 5 and 6, Node 18+, TinaCMS 3.
 
 The reference implementation lives at [`examples/astro/visual-editing`](../../../examples/astro/visual-editing/) — same content schema as the React kitchen-sink, rendered with pure Astro.
 

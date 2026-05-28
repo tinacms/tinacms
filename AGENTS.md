@@ -26,7 +26,7 @@ packages/@tinacms/     # Scoped packages (cli, app, datalayer, graphql, mdx, scr
 examples/              # Framework example apps
   next/kitchen-sink/   # Next.js 15 — the reference kitchen-sink implementation
   next/tina-self-hosted-demo/ # Self-hosted with auth
-  astro/kitchen-sink/  # Astro 5 — mirrors Next.js kitchen-sink
+  astro/kitchen-sink/  # Astro 6 — mirrors Next.js kitchen-sink
   hugo/kitchen-sink/   # Hugo kitchen-sink
   react/kitchen-sink/  # React kitchen-sink
   shared/              # Shared content and public assets across kitchen-sink examples
