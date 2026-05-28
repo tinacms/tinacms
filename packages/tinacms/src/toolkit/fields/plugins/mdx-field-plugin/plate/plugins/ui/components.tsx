@@ -105,7 +105,7 @@ const Heading1 = ({
       headerClasses,
       blockClasses,
       className,
-      'text-4xl mb-4 last:mb-0 mt-6 first:mt-0 font-libre-baskerville'
+      'text-4xl mb-4 last:mb-0 mt-6 first:mt-0 font-inter'
     )}
   >
     {children}
@@ -123,7 +123,7 @@ const Heading2 = ({
       headerClasses,
       blockClasses,
       className,
-      'text-3xl mb-4 last:mb-0 mt-6 first:mt-0 font-libre-baskerville'
+      'text-3xl mb-4 last:mb-0 mt-6 first:mt-0 font-inter'
     )}
   >
     {children}
@@ -141,7 +141,7 @@ const Heading3 = ({
       headerClasses,
       blockClasses,
       className,
-      'text-2xl mb-4 last:mb-0 mt-6 first:mt-0 font-libre-baskerville'
+      'text-2xl mb-4 last:mb-0 mt-6 first:mt-0 font-inter'
     )}
   >
     {children}
@@ -159,7 +159,7 @@ const Heading4 = ({
       headerClasses,
       blockClasses,
       className,
-      'text-xl mb-4 last:mb-0 mt-6 first:mt-0 font-libre-baskerville'
+      'text-xl mb-4 last:mb-0 mt-6 first:mt-0 font-inter'
     )}
   >
     {children}
@@ -167,8 +167,8 @@ const Heading4 = ({
 );
 
 /** Tailwind prose doesn't style h5 and h6 elements */
-const headerSerifStyle: React.CSSProperties = {
-  fontFamily: "'Libre Baskerville', serif",
+const headerFontStyle: React.CSSProperties = {
+  fontFamily: "'Inter', sans-serif",
   fontWeight: '400',
 };
 
@@ -185,7 +185,7 @@ const Heading5 = ({
       className,
       'text-lg mb-4 last:mb-0 mt-6 first:mt-0'
     )}
-    style={headerSerifStyle}
+    style={headerFontStyle}
   >
     {children}
   </h5>
@@ -204,7 +204,7 @@ const Heading6 = ({
       className,
       'text-base mb-4 last:mb-0 mt-6 first:mt-0'
     )}
-    style={headerSerifStyle}
+    style={headerFontStyle}
   >
     {children}
   </h6>
