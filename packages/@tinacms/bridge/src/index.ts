@@ -1,58 +1,39 @@
 /**
- * @tinacms/bridge — vanilla JS bridge between the TinaCMS admin iframe and
- * a non-React frontend.
- *
- * **Astro consumers should import from `@tinacms/astro/bridge` instead** —
- * this package is the framework-agnostic core, re-exported by `@tinacms/astro`
- * so Astro projects only install one TinaCMS package. Direct consumption of
- * `@tinacms/bridge` is intended for Hugo, plain-HTML, Eleventy, and any other
- * non-Astro / non-React frontend.
- *
- * Mirrors the postMessage protocol used by the React `useTina` hook in
- * tinacms/react, but writes to the DOM by re-fetching opt-in server islands
- * (`[data-tina-island]`) instead of reconciling React state. Stateless: the
- * admin pushes already-resolved data via postMessage, and the bridge forwards
- * it on island refetches via the `X-Tina-Preview` header. The canonical
- * content store is never touched in edit mode.
+ * Vanilla-JS bridge between the TinaCMS admin iframe and a non-React
+ * frontend. Astro consumers should import from `@tinacms/astro` instead;
+ * this package is the framework-agnostic core.
  */
 import { initClickToFocus } from './click-to-focus';
 import { setAdminOrigin } from './config';
 import { initDataStore } from './data-store';
 import { debug } from './debug';
-import { initForms, refreshForms } from './forms';
-import { initIslandRefresh } from './island-refresh';
+import { initForms, refreshForms as refreshFormsFromDom } from './forms';
+import {
+  PRIMED_FORM_ATTR,
+  initIslandRefresh,
+  primeIslands,
+} from './island-refresh';
 
 export interface BridgeOptions {
-  /**
-   * Per-island debounce for refetches triggered by subsequent edits.
-   * The first refetch after page load fires immediately so newly-created
-   * docs reach a populated state ASAP. Default 300ms.
-   */
+  /** Debounce for refetches after the first edit. The first refetch
+   *  fires immediately. Default 300ms. */
   debounceMs?: number;
-  /**
-   * Origin(s) of the TinaCMS admin parent. Inbound postMessage events are
-   * accepted only when `event.origin` matches one of these AND
-   * `event.source` is `window.parent`. Outbound posts use the first entry
-   * (or the single string) as `targetOrigin`.
-   *
-   * Defaults to `window.location.origin` — correct when the admin is
-   * mounted at `/admin` on the same host (the common case). Override when
-   * the admin runs on a different origin (cross-domain self-hosted
-   * deployments, Codespaces, Docker setups). Mirrors the role of
-   * `server.allowedOrigins` in `tina.config` for the dev server's CORS,
-   * but applied to the in-iframe postMessage channel instead of HTTP.
-   */
+  /** Allowed origin(s) of the admin parent for in-iframe postMessage.
+   *  Defaults to `window.location.origin` (same-host `/admin`). */
   adminOrigin?: string | string[];
 }
 
-let initialized = false;
+// `refreshForms()` is safe to call before `init()` finishes — it's a no-op
+// until this flag flips. `init()` only sets it after the iframe check passes
+// AND every listener is wired, so calls that race the bootstrap (the bridge
+// module loaded but `init()` hasn't run; a listener fired during the
+// dynamic-import await; the page isn't in an iframe at all) can't POST to
+// island endpoints or splice primed payloads into the DOM.
+let running = false;
 
 export function init(options: BridgeOptions = {}): void {
-  if (initialized) return;
-  initialized = true;
+  if (running) return;
 
-  // Outside an iframe (e.g. someone visiting /?tina-edit=1 directly) the
-  // bridge has nobody to talk to — bail without side effects.
   if (typeof window === 'undefined' || window.parent === window) {
     debug('not in an iframe; bridge is a no-op');
     return;
@@ -65,29 +46,67 @@ export function init(options: BridgeOptions = {}): void {
   const store = initDataStore();
   initIslandRefresh(store, { debounceMs });
   initClickToFocus();
-  // Forms register last so listeners are wired up before we announce
-  // ourselves to the admin and start receiving updateData replies.
+  // Forms last: listeners wired before we start receiving updateData.
   initForms(store);
+
+  running = true;
+  refreshForms();
 }
 
+// Only one prime pass runs at a time. A second `refreshForms()` arriving
+// mid-prime (e.g. a soft navigation's `astro:page-load`) doesn't start a
+// rival pass — it sets `reprimePending` so we run exactly one more pass once
+// the in-flight one resolves. The in-flight pass reflects the pre-navigation
+// DOM, so dropping the later call would strand the new page's forms.
+let primingInFlight: Promise<void> | null = null;
+let reprimePending = false;
+
 /**
- * Re-scan the page for `[data-tina-form]` payloads after a soft
- * navigation (Astro view transitions, Turbo, htmx, etc.). Posts `close`
- * for forms that left and `open` for forms that appeared. Safe to call
- * before `init()` — no-op when the bridge isn't running.
- *
- * Astro projects using `@tinacms/astro/integration` get this wired
- * automatically (the middleware splices the bootstrap script that
- * listens for `astro:page-load`). Sites consuming `@tinacms/bridge`
- * directly need:
- *
- * ```ts
- * import { init, refreshForms } from '@tinacms/bridge';
- * init();
- * document.addEventListener('astro:page-load', refreshForms);
- * ```
+ * Re-scan for `[data-tina-form]` payloads after a soft navigation
+ * (Astro view transitions, Turbo, htmx). On a prerendered page with no
+ * server-injected payloads, prime from the island endpoints first.
  */
-export { refreshForms };
+export function refreshForms(): void {
+  if (!running) {
+    debug('refreshForms called before init() finished; ignoring');
+    return;
+  }
+  // Forms a previous prime appended belong to a prior render; drop them
+  // before re-scanning so a new page (or a re-prime after a mid-prime
+  // navigation) never reads stale island payloads, and so the
+  // server-forms check below sees only genuinely server-injected payloads.
+  removePrimedForms();
+
+  const hasServerForms = document.querySelector('[data-tina-form]');
+  if (!hasServerForms && document.querySelector('[data-tina-island]')) {
+    if (primingInFlight) {
+      reprimePending = true;
+      return;
+    }
+    debug('no server-injected forms; priming from island endpoints');
+    primingInFlight = primeIslands().finally(() => {
+      primingInFlight = null;
+    });
+    void primingInFlight.then(() => {
+      // A navigation landed mid-prime: re-prime against the current DOM
+      // rather than announcing this pass's now-stale payloads.
+      if (reprimePending) {
+        reprimePending = false;
+        refreshForms();
+        return;
+      }
+      refreshFormsFromDom();
+    });
+    return;
+  }
+  refreshFormsFromDom();
+}
+
+function removePrimedForms(): void {
+  for (const el of document.querySelectorAll(`[${PRIMED_FORM_ATTR}]`)) {
+    el.remove();
+  }
+}
 
 export { tinaField } from './tina-field';
 export type * from './types';

@@ -11,8 +11,9 @@
 			"**/__generated__/**",
 			"**/dist/**",
 			"**/.astro/**",
+			"**/.next/**",
 			"**/node_modules/**",
-			"**/*/admin/index.html"
+			"**/public/admin/**"
 		],
 		"maxSize": 3145728
 	},

@@ -1,32 +1,18 @@
 ---
-/**
- * Marker wrapper for an editable region. Emits the `data-tina-island`
- * attribute the bridge looks for, with the wrapper element/className taken
- * from the registry entry — so the page-side element matches the server's
- * `IslandConfig.wrapper` automatically.
- *
- * Usage:
- *
- * ```astro
- * import TinaIsland from '@tinacms/astro/TinaIsland.astro';
- * import { islands } from '../lib/islands';
- *
- * <TinaIsland name="post" wrapper={islands.post.wrapper} params={{ slug }}>
- *   <PostBody data={data} />
- * </TinaIsland>
- * ```
- *
- * `name` must match a key in the `IslandRegistry` you passed to
- * `experimental_createIslandRoute`. `params` is encoded as URL search
- * params and forwarded to the route handler.
- */
+import { adminOrigins } from './internal/admin-origin';
+
 interface Props {
   name: string;
   wrapper: { tag: string; className?: string };
   params?: Record<string, string | number>;
+  /** Mark at most one `<TinaIsland>` per page as the primary editable
+   *  region so the admin opens it on load instead of the multi-document
+   *  picker. SSR pages don't need this — the first `requestWithMetadata()`
+   *  is treated as primary automatically. */
+  primary?: boolean;
 }
 
-const { name, wrapper, params } = Astro.props;
+const { name, wrapper, params, primary } = Astro.props;
 const search = params
   ? `?${new URLSearchParams(
       Object.fromEntries(
@@ -36,7 +22,23 @@ const search = params
   : '';
 const marker = `/tina-island/${name}${search}`;
 const Tag = wrapper.tag as keyof HTMLElementTagNameMap;
+const adminOrigin = adminOrigins();
 ---
-<Tag class={wrapper.className} data-tina-island={marker}>
+<!-- In-iframe bridge bootstrap for prerendered pages (the middleware only
+     injects on SSR responses). No-op outside the admin iframe; the
+     window flag dedupes across multiple <TinaIsland> on one page. -->
+<script is:inline type="module" define:vars={{ adminOrigin }}>
+  if (window.self !== window.top && !window.__tinaBootstrap) {
+    window.__tinaBootstrap = 1;
+    const { init, refreshForms } = await import('/admin/bridge.js');
+    init(adminOrigin ? { adminOrigin } : undefined);
+    document.addEventListener('astro:page-load', refreshForms);
+  }
+</script>
+<Tag
+  class={wrapper.className}
+  data-tina-island={marker}
+  data-tina-island-primary={primary ? '' : undefined}
+>
   <slot />
 </Tag>

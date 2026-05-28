@@ -43,7 +43,7 @@ export class Subscribable {
   /**
    * Removes the given listener from the `Subscribable` object.
    *
-   * @param listener The functioni to be removed.
+   * @param listener The function to be removed.
    */
   unsubscribe(listener: Function) {
     const index = this.__subscribers.indexOf(listener);
@@ -79,7 +79,7 @@ export class Subscribable {
    * cup.empty() // Logs: false
    * ```
    */
-  protected notifiySubscribers() {
+  protected notifySubscribers() {
     // TODO: Catch and log errors.
     this.__subscribers.forEach((cb) => cb());
   }
