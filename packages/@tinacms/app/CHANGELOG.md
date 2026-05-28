@@ -1,5 +1,14 @@
 # @tinacms/app
 
+## 2.5.1
+
+### Patch Changes
+
+- [#6947](https://github.com/tinacms/tinacms/pull/6947) [`7be8175`](https://github.com/tinacms/tinacms/commit/7be81751a6b93f785d347e759e91f024bb12c452) Thanks [@MirkaJuliet34](https://github.com/MirkaJuliet34)! - Aligned rich text editor typography class names with the actual font used and updated related references.
+
+- Updated dependencies [[`7be8175`](https://github.com/tinacms/tinacms/commit/7be81751a6b93f785d347e759e91f024bb12c452)]:
+  - tinacms@3.8.3
+
 ## 2.5.0
 
 ### Minor Changes
