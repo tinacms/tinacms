@@ -1,6 +1,7 @@
 packages:
     - packages/*
     - packages/@tinacms/*
+    - packages/v4/@tinacms/*
     - examples/*/*
     - e2e/*
     - playwright/*

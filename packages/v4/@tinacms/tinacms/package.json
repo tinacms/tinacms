@@ -1,0 +1,11 @@
+{
+  "name": "@tinacms/tinacms",
+  "version": "4.0.0-alpha.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "type": "module",
+  "repository": {
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/v4/@tinacms/tinacms"
+  }
+}
