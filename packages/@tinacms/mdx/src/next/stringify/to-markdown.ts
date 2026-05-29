@@ -9,6 +9,12 @@ import { getFieldPatterns } from '../util';
 
 export const toTinaMarkdown = (tree: Md.Root, field: RichTextField) => {
   const patterns = getFieldPatterns(field);
+  // When templates are declared without a `match` pattern, they are JSX-style
+  // components — e.g. `<NewsletterSignup>` — and `<` should pass through the
+  // round-trip un-escaped, matching the behaviour of `skipEscaping: 'html'`.
+  const hasJsxTemplates = (field.templates ?? []).some(
+    (t) => typeof t !== 'string' && !t.match
+  );
   /**
    *
    * Escaping elements which we can't accound for (eg. `<`) is usually good. But when the rich-text other tooling
@@ -36,7 +42,7 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextField) => {
       if (field.parser.skipEscaping === 'all') {
         return node.value;
       }
-      if (field.parser.skipEscaping === 'html') {
+      if (field.parser.skipEscaping === 'html' || hasJsxTemplates) {
         // Remove this character from the unsafe list, and then
         // proceed with the original text handler
         context.unsafe = context.unsafe.filter((unsafeItem) => {

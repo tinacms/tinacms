@@ -1,6 +1,6 @@
 Some <mark>highlighted</mark> text
 
-Some <mark style="background-color: #BFDBFE">blue highlighted</mark> text
+Some <mark style={{ backgroundColor: "#BFDBFE" }}>blue highlighted</mark> text
 
 Some **bold** text
 
@@ -24,4 +24,4 @@ a = b is not highlighted
 
 **<mark>[bold link](https://example.com)</mark>**
 
-<mark style="background-color: #FBCFE8">pink highlight</mark>
+<mark style={{ backgroundColor: "#FBCFE8" }}>pink highlight</mark>

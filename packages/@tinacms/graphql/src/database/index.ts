@@ -531,7 +531,13 @@ export class Database {
 
         // If a collection match is specified, make sure the file matches the glob.
         // TODO: Maybe we should service this error better in the frontend?
-        if (collection.match?.exclude || collection.match?.include) {
+        const isFolderPlaceholder = filepath.endsWith(
+          `.gitkeep.${collection.format || 'md'}`
+        );
+        if (
+          !isFolderPlaceholder &&
+          (collection.match?.exclude || collection.match?.include)
+        ) {
           const matches = this.tinaSchema.getMatches({ collection });
 
           const match = micromatch.isMatch(filepath, matches);
@@ -1713,8 +1719,9 @@ const _indexContent = async ({
         }
       }
 
+      let putOps: BatchOp[] = [];
       if (!isGitKeep(filepath, collection)) {
-        await enqueueOps([
+        putOps = [
           ...makeRefOpsForDocument(
             normalizedPath,
             collection?.name,
@@ -1740,17 +1747,21 @@ const _indexContent = async ({
             'put',
             level
           ),
-          {
-            type: 'put',
-            key: normalizedPath,
-            value: aliasedData as any,
-            sublevel: level.sublevel<string, Record<string, any>>(
-              CONTENT_ROOT_PREFIX,
-              SUBLEVEL_OPTIONS
-            ),
-          },
-        ]);
+        ];
       }
+
+      await enqueueOps([
+        ...putOps,
+        {
+          type: 'put',
+          key: normalizedPath,
+          value: aliasedData as any,
+          sublevel: level.sublevel<string, Record<string, any>>(
+            CONTENT_ROOT_PREFIX,
+            SUBLEVEL_OPTIONS
+          ),
+        },
+      ]);
     } catch (error) {
       throw new TinaFetchError(`Unable to seed ${filepath}`, {
         originalError: error,

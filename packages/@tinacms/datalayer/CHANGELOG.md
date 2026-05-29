@@ -1,5 +1,56 @@
 # tina-graphql
 
+## 2.0.22
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/graphql@2.4.2
+
+## 2.0.21
+
+### Patch Changes
+
+- Updated dependencies [[`890108d`](https://github.com/tinacms/tinacms/commit/890108dd6c1a88a1c5531cf397514c34712d13bd)]:
+  - @tinacms/graphql@2.4.1
+
+## 2.0.20
+
+### Patch Changes
+
+- Updated dependencies [[`eafb1ff`](https://github.com/tinacms/tinacms/commit/eafb1ffbd78267838f6939b3e993efc37c05cb2e), [`4d0c37a`](https://github.com/tinacms/tinacms/commit/4d0c37a8a50b211b7c5070c370faa369ee5d260d), [`9e7eba9`](https://github.com/tinacms/tinacms/commit/9e7eba9f290c935cd56569421de88b5adfac65d8)]:
+  - @tinacms/graphql@2.4.0
+
+## 2.0.19
+
+### Patch Changes
+
+- [#6751](https://github.com/tinacms/tinacms/pull/6751) [`556a162`](https://github.com/tinacms/tinacms/commit/556a16255df4b48df69c14133ee6530b68dd9131) Thanks [@JackDevAU](https://github.com/JackDevAU)! - chore(tinacms-pkgs): remove unused devDeps across @tinacms/\* packages
+
+- Updated dependencies [[`38cbec7`](https://github.com/tinacms/tinacms/commit/38cbec7b1b204f395f4e6e97c4bab6edc7296439), [`3da4588`](https://github.com/tinacms/tinacms/commit/3da45887c23da552a4bd994154eeaaf8990065f7), [`75f69a6`](https://github.com/tinacms/tinacms/commit/75f69a6476ff98614ae8cb910bcedb5fe52331e2)]:
+  - @tinacms/graphql@2.3.1
+
+## 2.0.18
+
+### Patch Changes
+
+- Updated dependencies [[`01e6e4b`](https://github.com/tinacms/tinacms/commit/01e6e4b08e52d777c0c07d4448930cfa5599a6bc)]:
+  - @tinacms/graphql@2.3.0
+
+## 2.0.17
+
+### Patch Changes
+
+- Updated dependencies [[`8194482`](https://github.com/tinacms/tinacms/commit/81944822373ad2d548871b880d586492efe71f3f), [`b260b5e`](https://github.com/tinacms/tinacms/commit/b260b5ed4beb5d678b9605357b99a8667fddc8de)]:
+  - @tinacms/graphql@2.2.5
+
+## 2.0.16
+
+### Patch Changes
+
+- Updated dependencies [[`cd262b3`](https://github.com/tinacms/tinacms/commit/cd262b311c218ea4e5b5bb8abbbe54fcff3b8054), [`4a8627b`](https://github.com/tinacms/tinacms/commit/4a8627b66fccf3396e790ae88fe7bb79408b4808), [`c75d871`](https://github.com/tinacms/tinacms/commit/c75d87121224f91dc4e5e2aa8af60b0881b87a5b)]:
+  - @tinacms/graphql@2.2.4
+
 ## 2.0.15
 
 ### Patch Changes

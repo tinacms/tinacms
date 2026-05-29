@@ -1,5 +1,117 @@
 # tina-graphql
 
+## 2.4.2
+
+### Patch Changes
+
+- Updated dependencies [[`542c781`](https://github.com/tinacms/tinacms/commit/542c781b4f7a6ff5b5481bd88329f60c9bf3b57d), [`df50cbf`](https://github.com/tinacms/tinacms/commit/df50cbf35536bf2028a742832aebd57701dc3bb6)]:
+  - @tinacms/schema-tools@2.8.0
+  - @tinacms/mdx@2.1.5
+
+## 2.4.1
+
+### Patch Changes
+
+- [#6853](https://github.com/tinacms/tinacms/pull/6853) [`890108d`](https://github.com/tinacms/tinacms/commit/890108dd6c1a88a1c5531cf397514c34712d13bd) Thanks [@kulesy](https://github.com/kulesy)! - fix(graphql): preserve absolute external URLs in image-type resolvers
+
+## 2.4.0
+
+### Minor Changes
+
+- [#6738](https://github.com/tinacms/tinacms/pull/6738) [`4d0c37a`](https://github.com/tinacms/tinacms/commit/4d0c37a8a50b211b7c5070c370faa369ee5d260d) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Stop writing generated files (`_schema.json`, `_graphql.json`, `_lookup.json`, `tina-lock.json`) to the content repo when `localContentPath` is set. Generated files now live only in the generator repo's `tina/__generated__/`. The content repo is no longer required to contain a `tina/` folder. `FilesystemBridge.get` / `put` / `delete` now route `tina/__generated__/` and `.tina/__generated__/` paths to `rootPath` (the generator) instead of `outputPath` (the content root). Closes [tinacms/tinacloud#3295](https://github.com/tinacms/tinacloud/issues/3295).
+
+  ### ⚠️ Rollout gate
+
+  **This release must not be promoted to the `@latest` dist-tag until TinaCloud prod has deployed [tinacms/tinacloud#3403](https://github.com/tinacms/tinacloud/issues/3403).** Pre-#3403 TinaCloud reads `tina-lock.json` from the content repo on generator pushes; shipping this change before the server-side fix breaks every existing multi-repo user's indexing.
+
+  ### Migration notes for existing multi-repo projects
+
+  After upgrading (and once TinaCloud prod is on #3403):
+
+  - **Stale `tina/` folder in your content repo.** Pre-upgrade builds committed `tina/__generated__/*` and `tina/tina-lock.json` to the content repo. Nothing updates or reads those files any more. They are safe — and recommended — to delete from the content repo in a single cleanup commit.
+  - **`ConfigManager.generatedFolderPathContentRepo` is removed.** If any custom CLI code, plugins, or scripts referenced this field, they will fail at type-check or runtime. Use `generatedFolderPath` — it has always been the generator-relative path.
+  - **`ConfigManager.getTinaFolderPath` no longer accepts an `isContentRoot` option.** The content root never needs a `tina/` folder now, so the option was removed. If any custom code called `getTinaFolderPath(path, { isContentRoot: true })`, drop the second argument.
+  - **`FilesystemBridge` behavior change for `tina/__generated__/` paths.** In multi-repo setups, bridge reads/writes of paths under `tina/__generated__/` or `.tina/__generated__/` now resolve against the generator (`rootPath`) rather than the content repo (`outputPath`). If you have custom bridge subclasses or code that relied on these paths resolving to the content repo, update it.
+  - **Generated `client.ts` / `database-client.ts` now import `./types` extensionless** (was `./types.ts`) for TypeScript projects. Avoids requiring `allowImportingTsExtensions: true` in consumer tsconfigs, which broke the build under Next.js 15.5+ defaults. JS projects still import `./types.js` (Node ESM requires the extension).
+
+- [#6765](https://github.com/tinacms/tinacms/pull/6765) [`9e7eba9`](https://github.com/tinacms/tinacms/commit/9e7eba9f290c935cd56569421de88b5adfac65d8) Thanks [@kulesy](https://github.com/kulesy)! - Forward the editor's current branch to the TinaCloud assets-api on every cloud media call, and fix staging URL handling for multi-segment branches
+
+  `TinaMediaStore` now appends `?branch=<encodedBranch>` to its `upload_url`, `list`, and `delete` requests so that — once the assets-api opts an app into branch-aware media — uploads, listings, and deletions are scoped to the branch the editor is on, instead of always hitting the production branch. The branch is read from `Client.branch` (already URL-encoded) and decoded then re-encoded at the use site to avoid double-encoding.
+
+  The query parameter is ignored by assets-api versions that do not parse it, so this change is safe to deploy ahead of the server-side rollout. Local mode is unaffected.
+
+  `@tinacms/graphql`'s media URL resolver now formats staging URLs as `/__staging/<branch>/__file/<path>` instead of `/__staging/<encoded-branch>/<path>`. The previous form broke for branches containing `/` (e.g. `feat/my-branch`) because CloudFront decodes paths before downstream components see them, so the S3 write key (with a literal `%2F`) wouldn't match the decoded read path. The `__file` delimiter lets the branch contribute its natural `/` segments while still marking where the file path begins.
+
+  Note: staging URLs produced by `@tinacms/graphql@2.3.0`–`2.3.1` use the old format and will not round-trip through this version's `resolveMediaCloudToRelative`. Branch-aware media is gated server-side and has not been enabled for any tenant yet, so no persisted data is expected to be affected — but if you turned it on for testing, regenerate the affected field values from the editor after upgrading.
+
+  After a successful cloud upload `TinaMediaStore.persist()` now resolves its return value from the assets-api `list` endpoint instead of constructing each `Media.src` locally — the server is the source of truth for the canonical URL (including the staging-branch path and per-stage CDN host). The `MediaStore.persist()` contract is preserved, so the returned items still flow through the media manager and the image-field drop handler.
+
+  Also reserves an optional `rename?(from, to)` hook on the `MediaStore` interface as a future extension point — no implementation yet.
+
+### Patch Changes
+
+- [#6828](https://github.com/tinacms/tinacms/pull/6828) [`eafb1ff`](https://github.com/tinacms/tinacms/commit/eafb1ffbd78267838f6939b3e993efc37c05cb2e) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Fix `resolveMediaCloudToRelative` so it strips any TinaCloud cloud URL on save, not only ones whose host matches `config.assetsHost`. The match condition is now host-agnostic: the `<clientId>/…` path prefix is the durable invariant; the host segment can vary across stages.
+
+  This unblocks multi-host setups (PR / stage / personal-dev TinaCloud stages) where the dashboard's default `MediaStore` inserts upload URLs with one host while content-api returns a different one as `assetsHost`. Previously the round-trip silently failed and absolute URLs got committed to the content repo. After this fix, content saves as a relative path regardless of which host the dashboard inserted, matching pre-existing content's format.
+
+  Also covers cross-stage content migration: an absolute URL written against one stage strips correctly when re-saved against another.
+
+  Closes [#6827](https://github.com/tinacms/tinacms/issues/6827).
+
+## 2.3.1
+
+### Patch Changes
+
+- [#6757](https://github.com/tinacms/tinacms/pull/6757) [`38cbec7`](https://github.com/tinacms/tinacms/commit/38cbec7b1b204f395f4e6e97c4bab6edc7296439) Thanks [@OfekDanny](https://github.com/OfekDanny)! - Fix folder creation failing when a collection has `match.exclude` configured.
+
+  `TinaSchema.getCollectionByFullPath` was applying the `match.exclude` glob check to `.gitkeep.*` folder placeholder files, causing the collection lookup to return no results. This made `database.put()` throw during `resolveCreateFolder`, blocking folder creation entirely in any collection with `match.exclude` set.
+
+  The fix skips the `match.include`/`match.exclude` check for `.gitkeep.*` placeholders in both `TinaSchema` and `Database.put`, mirroring the existing extension-check special-case that already handled these files.
+
+- [#6770](https://github.com/tinacms/tinacms/pull/6770) [`3da4588`](https://github.com/tinacms/tinacms/commit/3da45887c23da552a4bd994154eeaaf8990065f7) Thanks [@zaidkhatri-dev](https://github.com/zaidkhatri-dev)! - - Improved error handling for file and folder operations: errors are now shown as clear notifications in the UI rather than just logging to the console.
+
+  - Fixed an issue where renaming a document to an already existing filename would silently fail; this now correctly triggers an error alert in the UI.
+
+- [#6764](https://github.com/tinacms/tinacms/pull/6764) [`75f69a6`](https://github.com/tinacms/tinacms/commit/75f69a6476ff98614ae8cb910bcedb5fe52331e2) Thanks [@KahaMason](https://github.com/KahaMason)! - Add direct unit test coverage for the GraphQL resolver's CRUD methods (#6466). 115 tests covering `resolveFieldData`, `build*Mutations`, `resolveLegacyValues`, and every method that took over from the deprecated `resolveDocument`. `resolveFieldData` is now exported from the resolver module to enable direct unit testing — no public API change since the package entry doesn't re-export it.
+
+- Updated dependencies [[`38cbec7`](https://github.com/tinacms/tinacms/commit/38cbec7b1b204f395f4e6e97c4bab6edc7296439)]:
+  - @tinacms/schema-tools@2.7.4
+  - @tinacms/mdx@2.1.4
+
+## 2.3.0
+
+### Minor Changes
+
+- [#6740](https://github.com/tinacms/tinacms/pull/6740) [`01e6e4b`](https://github.com/tinacms/tinacms/commit/01e6e4b08e52d777c0c07d4448930cfa5599a6bc) Thanks [@kulesy](https://github.com/kulesy)! - Add optional `branch` and `mediaBranch` fields to `GraphQLConfig`. When the host passes a `branch` that differs from `mediaBranch`, image field resolution prefixes the CDN path with `/__staging/{encodedBranch}/`, and `resolveMediaCloudToRelative` strips that segment back to the relative path on the write side. Self-hosted (`useRelativeMedia: true`) and main-branch behaviour are unchanged.
+
+### Patch Changes
+
+- Updated dependencies [[`a85b1c0`](https://github.com/tinacms/tinacms/commit/a85b1c0ff44d8c214be47f89531beaf0e9dc234c)]:
+  - @tinacms/schema-tools@2.7.3
+  - @tinacms/mdx@2.1.3
+
+## 2.2.5
+
+### Patch Changes
+
+- [#6734](https://github.com/tinacms/tinacms/pull/6734) [`8194482`](https://github.com/tinacms/tinacms/commit/81944822373ad2d548871b880d586492efe71f3f) Thanks [@JackDevAU](https://github.com/JackDevAU)! - chore(@tinacms/graphql): remove duplicate atob/btoa from database/util.ts
+
+- [#6720](https://github.com/tinacms/tinacms/pull/6720) [`b260b5e`](https://github.com/tinacms/tinacms/commit/b260b5ed4beb5d678b9605357b99a8667fddc8de) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Migrate docs links in shipped package code from raw `tina.io/docs/<path>` URLs to aliased `tina.io/docs/r/<alias>` URLs so the links survive future docs restructuring.
+
+## 2.2.4
+
+### Patch Changes
+
+- [#6548](https://github.com/tinacms/tinacms/pull/6548) [`cd262b3`](https://github.com/tinacms/tinacms/commit/cd262b311c218ea4e5b5bb8abbbe54fcff3b8054) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Add 'displayOnly' field type for display-only form fields
+
+- [#6663](https://github.com/tinacms/tinacms/pull/6663) [`4a8627b`](https://github.com/tinacms/tinacms/commit/4a8627b66fccf3396e790ae88fe7bb79408b4808) Thanks [@18-th](https://github.com/18-th)! - Fix relativePath validation to reject whitespace and empty strings
+
+- [#6664](https://github.com/tinacms/tinacms/pull/6664) [`c75d871`](https://github.com/tinacms/tinacms/commit/c75d87121224f91dc4e5e2aa8af60b0881b87a5b) Thanks [@18-th](https://github.com/18-th)! - Validate relativePath to reject whitespace and invalid characters
+
+- Updated dependencies [[`cd262b3`](https://github.com/tinacms/tinacms/commit/cd262b311c218ea4e5b5bb8abbbe54fcff3b8054), [`55dae8e`](https://github.com/tinacms/tinacms/commit/55dae8eef898f49f827c00bc72297863d0d69be1)]:
+  - @tinacms/schema-tools@2.7.2
+  - @tinacms/mdx@2.1.2
+
 ## 2.2.3
 
 ### Patch Changes

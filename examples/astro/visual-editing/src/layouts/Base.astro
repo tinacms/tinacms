@@ -1,0 +1,54 @@
+---
+import TinaIsland from '@tinacms/astro/TinaIsland.astro';
+import Footer from '../components/layout/Footer.astro';
+import Header from '../components/layout/Header.astro';
+import { getGlobal } from '../lib/data';
+import { islands } from '../lib/islands';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+}
+
+const { title = 'TinaCMS Astro visual editing' } = Astro.props;
+
+const global = await getGlobal();
+
+const themeColor = global.data.global?.theme?.color ?? 'blue';
+const darkMode = global.data.global?.theme?.darkMode ?? 'system';
+const themeFont = global.data.global?.theme?.font ?? 'sans';
+const fontClass =
+  themeFont === 'nunito'
+    ? 'font-nunito'
+    : themeFont === 'lato'
+      ? 'font-lato'
+      : 'font-sans';
+---
+<!DOCTYPE html>
+<html lang="en" data-theme={themeColor}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+    <script is:inline define:vars={{ darkMode }}>
+      (function(){
+        const root = document.documentElement;
+        if (darkMode === 'dark') root.classList.add('dark');
+        else if (darkMode === 'light') root.classList.remove('dark');
+        else if (window.matchMedia('(prefers-color-scheme: dark)').matches) root.classList.add('dark');
+      })();
+    </script>
+  </head>
+  <body class:list={['antialiased min-h-screen flex flex-col', fontClass]}>
+    <TinaIsland name="global" wrapper={islands.global.wrapper} params={{ path: Astro.url.pathname }}>
+      <Header data={global.data.global?.header ?? null} pathname={Astro.url.pathname} />
+    </TinaIsland>
+    <main class="flex-1">
+      <slot />
+    </main>
+    <TinaIsland name="global-footer" wrapper={islands['global-footer'].wrapper} params={{ path: Astro.url.pathname }}>
+      <Footer data={global.data.global?.footer ?? null} />
+    </TinaIsland>
+  </body>
+</html>

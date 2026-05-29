@@ -32,10 +32,30 @@ Commands:
   schema:types [options]    Generate a GraphQL query for your site's schema, (and optionally Typescript types)
   init [options]            Add TinaCloud to an existing project
   audit [options]           Audit your schema and the files to check for errors
+  doctor [options]          Check direct TinaCMS dependencies against npm latest
   help [command]            display help for command
 ```
 
 [See our docs](https://tina.io/docs/cli-overview/) for more information about the commands.
+
+### `doctor`
+
+Use `tinacms doctor` to check whether the Tina packages installed in your
+project are current against the npm `latest` dist-tag.
+
+The command reads your `package.json`, resolves installed versions from
+`node_modules` or the project lockfile, filters to Tina package names
+(`tinacms`, `@tinacms/*`, `tinacms-*`, `next-tinacms-*`, and
+`create-tina-app`), then prints the installed version next to the latest
+published version.
+
+```bash
+pnpm tinacms doctor
+```
+
+Use `--json` for machine-readable output. The command exits with code `1` if a
+Tina package is outdated or if a package version cannot be checked, which makes
+it suitable for CI.
 
 ## Getting started
 

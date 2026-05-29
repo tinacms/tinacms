@@ -92,11 +92,28 @@ export interface MediaStore {
   list(options?: MediaListOptions): Promise<MediaList>;
 
   /**
+   * Reserved hook for renaming a media object in the store.
+   *
+   * Not yet implemented in `TinaMediaStore` or surfaced in `MediaManager` —
+   * declared here as an extension point so stores can begin to opt in once
+   * the corresponding assets-api endpoint is built.
+   */
+  rename?(from: string, to: string): Promise<Media>;
+
+  /**
    * Indicates that uploads and deletions are not supported
    *
    * @default false
    */
   isStatic?: boolean;
+
+  /**
+   * Converts a Media object to the value stored in a form field.
+   *
+   * Typically returns `media.src`. If not implemented, the image field
+   * plugin falls back to `media.src`.
+   */
+  parse?(media: Media): string;
 }
 
 export declare type MediaListOffset = string | number;

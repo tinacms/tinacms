@@ -190,6 +190,13 @@ export const useGraphQLReducer = (
     ResolvedDocument[]
   >([]);
   const [operationIndex, setOperationIndex] = React.useState(0);
+  // Pending `user-select-form` request whose form hasn't been built yet.
+  // Set when the bridge's `open` is still in flight (the bridge retries
+  // user-select-form but stops once it sees `updateData`, so we can't
+  // rely on a future message landing after `forms:add` resolves).
+  const [pendingPrimaryId, setPendingPrimaryId] = React.useState<string | null>(
+    null
+  );
 
   const activeField = searchParams.get('active-field');
 
@@ -498,13 +505,32 @@ export const useGraphQLReducer = (
     ]
   );
 
+  // The bridge sends `formId` keyed by query id (hashFromQuery output), but
+  // `state.forms` is keyed by document path. Match by either so callers using
+  // `useTina`'s `experimental___selectFormByFormId` (which usually returns a
+  // path) keep working too. Returns false when the form isn't built yet.
+  const activateFormByWireId = React.useCallback(
+    (wireId: string): boolean => {
+      const match = cms.state.forms.find(
+        ({ tinaForm }) =>
+          tinaForm.id === wireId || tinaForm.queries.includes(wireId)
+      );
+      if (!match) return false;
+      cms.dispatch({
+        type: 'forms:set-active-form-id',
+        value: match.tinaForm.id,
+      });
+      return true;
+    },
+    [cms]
+  );
+
   const handleMessage = React.useCallback(
     (event: MessageEvent<PostMessage>) => {
       if (event.data.type === 'user-select-form') {
-        cms.dispatch({
-          type: 'forms:set-active-form-id',
-          value: event.data.formId,
-        });
+        const incoming = event.data.formId;
+        // Buffer until `forms:add` resolves it if the form isn't built yet.
+        setPendingPrimaryId(activateFormByWireId(incoming) ? null : incoming);
       }
 
       if (event?.data?.type === 'quick-edit') {
@@ -586,10 +612,19 @@ export const useGraphQLReducer = (
     return () => {
       setPayloads([]);
       setResults([]);
+      setPendingPrimaryId(null);
       cms.removeAllForms();
       cms.dispatch({ type: 'form-lists:clear' });
     };
   }, [url]);
+
+  // Drain a buffered `user-select-form` once the matching form lands in
+  // `state.forms`. Watches `forms.length` rather than the array identity
+  // so the effect doesn't re-run on unrelated form mutations.
+  React.useEffect(() => {
+    if (!pendingPrimaryId) return;
+    if (activateFormByWireId(pendingPrimaryId)) setPendingPrimaryId(null);
+  }, [cms.state.forms.length, pendingPrimaryId, activateFormByWireId]);
 
   React.useEffect(() => {
     iframe.current?.contentWindow?.postMessage({
@@ -613,7 +648,12 @@ export const useGraphQLReducer = (
 
   React.useEffect(() => {
     if (requestErrors.length) {
-      showErrorModal('Unexpected error querying content', requestErrors, cms);
+      console.error('Unexpected error querying content:', requestErrors);
+      showErrorModal(
+        'Unexpected Error',
+        'We ran into an unexpected error while fetching your content. If after refreshing the issue persists, reach out to us on Discord.',
+        cms
+      );
     }
   }, [requestErrors]);
 };
@@ -1001,6 +1041,13 @@ const buildForm = ({
     }
   }
   if (form) {
+    // Track the payload (query) id on the form so wire-side lookups —
+    // notably `user-select-form`, which the bridge sends keyed by query
+    // id — can resolve to the document-path-keyed `form.id` used in
+    // `state.forms`. `addQuery` is otherwise only called on the second
+    // open for the same document (see the `existingForm` branch above),
+    // so without this the very first open leaves `form.queries` empty.
+    form.addQuery(payloadId);
     if (shouldRegisterForm) {
       if (collection.ui?.global) {
         cms.plugins.add(new GlobalFormPlugin(form));

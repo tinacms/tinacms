@@ -13,6 +13,12 @@ export const config = defineConfig({
     publicFolder: "public", // The public asset folder for your framework
     outputFolder: "admin", // within the public folder
   },
+  media: {
+    tina: {
+      publicFolder: "public",
+      mediaRoot: "uploads",
+    },
+  },
   schema: {
     collections: [page, post, author, settings],
   },

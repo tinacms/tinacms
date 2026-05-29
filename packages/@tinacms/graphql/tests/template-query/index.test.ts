@@ -27,5 +27,5 @@ it('retrieves template-based document with union types', async () => {
     }`,
     variables: {},
   });
-  expect(format(result)).toMatchFileSnapshot('node.json');
+  await expect(format(result)).toMatchFileSnapshot('node.json');
 });

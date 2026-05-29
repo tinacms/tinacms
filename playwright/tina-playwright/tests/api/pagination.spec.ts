@@ -7,6 +7,10 @@
  *   content/post/playwright-filter-beta.md   → "Filter Beta Post"
  *   content/post/playwright-filter-aaa.md    → "Gamma Unrelated"
  *
+ * Every query filters to these three seed titles so that parallel tests
+ * creating or deleting posts (sorting, document-crud, concurrency) cannot
+ * skew the totals.
+ *
  * Tests:
  *   1. `first` limits the number of results returned
  *   2. `hasNextPage` is true when more results exist, false on the last page
@@ -15,9 +19,11 @@
 
 import { test, expect } from "../../fixtures/api-context";
 
+const SEED_TITLES = ["Filter Alpha Post", "Filter Beta Post", "Gamma Unrelated"];
+
 const POST_CONNECTION_PAGINATE = `
-  query PostConnectionPaginate($first: Float, $after: String, $sort: String) {
-    postConnection(first: $first, after: $after, sort: $sort) {
+  query PostConnectionPaginate($first: Float, $after: String, $sort: String, $filter: PostFilter) {
+    postConnection(first: $first, after: $after, sort: $sort, filter: $filter) {
       pageInfo {
         hasNextPage
         endCursor
@@ -32,6 +38,8 @@ const POST_CONNECTION_PAGINATE = `
   }
 `;
 
+const seedFilter = { title: { in: SEED_TITLES } };
+
 // ── 1. `first` limits results ─────────────────────────────────────────────────
 
 test("pagination — `first` limits the number of results returned", async ({
@@ -40,7 +48,7 @@ test("pagination — `first` limits the number of results returned", async ({
   const resp = await apiContext.post("/graphql", {
     data: {
       query: POST_CONNECTION_PAGINATE,
-      variables: { sort: "title", first: 2 },
+      variables: { sort: "title", first: 2, filter: seedFilter },
     },
   });
 
@@ -61,7 +69,7 @@ test("pagination — hasNextPage is true on first page, false on last page", asy
   const page1Resp = await apiContext.post("/graphql", {
     data: {
       query: POST_CONNECTION_PAGINATE,
-      variables: { sort: "title", first: 2 },
+      variables: { sort: "title", first: 2, filter: seedFilter },
     },
   });
 
@@ -78,7 +86,7 @@ test("pagination — hasNextPage is true on first page, false on last page", asy
   const page2Resp = await apiContext.post("/graphql", {
     data: {
       query: POST_CONNECTION_PAGINATE,
-      variables: { sort: "title", first: 2, after: cursor },
+      variables: { sort: "title", first: 2, after: cursor, filter: seedFilter },
     },
   });
 
@@ -102,7 +110,7 @@ test("pagination — `after` cursor returns the next page with no overlapping re
   const page1Resp = await apiContext.post("/graphql", {
     data: {
       query: POST_CONNECTION_PAGINATE,
-      variables: { sort: "title", first: 2 },
+      variables: { sort: "title", first: 2, filter: seedFilter },
     },
   });
 
@@ -123,7 +131,7 @@ test("pagination — `after` cursor returns the next page with no overlapping re
   const page2Resp = await apiContext.post("/graphql", {
     data: {
       query: POST_CONNECTION_PAGINATE,
-      variables: { sort: "title", first: 2, after: cursor },
+      variables: { sort: "title", first: 2, after: cursor, filter: seedFilter },
     },
   });
 

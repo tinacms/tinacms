@@ -1,5 +1,37 @@
 # @tinacms/mdx
 
+## 2.1.5
+
+### Patch Changes
+
+- [#6904](https://github.com/tinacms/tinacms/pull/6904) [`df50cbf`](https://github.com/tinacms/tinacms/commit/df50cbf35536bf2028a742832aebd57701dc3bb6) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Fix `<mark>` highlight serialization to emit `style` as a JSX expression (`style={{ backgroundColor: "..." }}`) so output is valid MDX v2/v3 JSX and unblocks Docusaurus 3.10+ builds.
+
+- Updated dependencies [[`542c781`](https://github.com/tinacms/tinacms/commit/542c781b4f7a6ff5b5481bd88329f60c9bf3b57d)]:
+  - @tinacms/schema-tools@2.8.0
+
+## 2.1.4
+
+### Patch Changes
+
+- Updated dependencies [[`38cbec7`](https://github.com/tinacms/tinacms/commit/38cbec7b1b204f395f4e6e97c4bab6edc7296439)]:
+  - @tinacms/schema-tools@2.7.4
+
+## 2.1.3
+
+### Patch Changes
+
+- Updated dependencies [[`a85b1c0`](https://github.com/tinacms/tinacms/commit/a85b1c0ff44d8c214be47f89531beaf0e9dc234c)]:
+  - @tinacms/schema-tools@2.7.3
+
+## 2.1.2
+
+### Patch Changes
+
+- [#6673](https://github.com/tinacms/tinacms/pull/6673) [`55dae8e`](https://github.com/tinacms/tinacms/commit/55dae8eef898f49f827c00bc72297863d0d69be1) Thanks [@DORI2001](https://github.com/DORI2001)! - Preserve code block infostring meta through parse/serialize round-trip. Metadata after the language identifier (e.g. `{1,3-5}` or `title="app.py"`) was silently dropped on every save; it is now captured in the parser and emitted by the serializer.
+
+- Updated dependencies [[`cd262b3`](https://github.com/tinacms/tinacms/commit/cd262b311c218ea4e5b5bb8abbbe54fcff3b8054)]:
+  - @tinacms/schema-tools@2.7.2
+
 ## 2.1.1
 
 ### Patch Changes

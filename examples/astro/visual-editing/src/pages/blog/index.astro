@@ -1,0 +1,38 @@
+---
+import client from '../../../tina/__generated__/client';
+import Base from '../../layouts/Base.astro';
+import { sanitizeImageSrc } from '@tinacms/astro/sanitize';
+import { formatDate } from '../../lib/utils';
+
+const connection = await client.queries
+  .blogConnection({ first: 1000 })
+  .catch(() => null);
+const blogs = (connection?.data?.blogConnection?.edges ?? []).flatMap((edge) =>
+  edge?.node ? [edge.node] : []
+);
+---
+<Base title="Blog | TinaCMS Astro Visual Editing">
+  <section class="max-w-5xl mx-auto px-6 sm:px-8 py-24">
+    <h1 class="text-4xl font-extrabold tracking-tight mb-12 text-center title-font text-gray-800 dark:text-gray-50">Blog</h1>
+    <div class="grid gap-8 md:grid-cols-2">
+      {blogs.map((blog) => {
+        const href = `/blog/${blog._sys.filename}`;
+        const formattedDate = blog.pubDate ? formatDate(blog.pubDate) : '';
+        const heroSrc = blog.heroImage ? sanitizeImageSrc(blog.heroImage) : '';
+        return (
+          <a href={href} class="group flex flex-col bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow">
+            {heroSrc && (
+              <img src={heroSrc} alt={blog.title} class="w-full h-48 object-cover" />
+            )}
+            <div class="p-6 flex flex-col flex-1">
+              <h2 class="text-xl font-bold text-gray-900 dark:text-gray-50 group-hover:text-theme-600 mb-2">{blog.title}</h2>
+              {blog.description && <p class="text-gray-600 dark:text-gray-400 text-sm flex-1">{blog.description}</p>}
+              {formattedDate && <span class="text-xs text-gray-400 mt-4">{formattedDate}</span>}
+            </div>
+          </a>
+        );
+      })}
+    </div>
+    {blogs.length === 0 && <p class="text-center text-gray-500 py-12">No blog posts found.</p>}
+  </section>
+</Base>

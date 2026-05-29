@@ -1,5 +1,84 @@
 # @tinacms/app
 
+## 2.5.1
+
+### Patch Changes
+
+- [#6947](https://github.com/tinacms/tinacms/pull/6947) [`7be8175`](https://github.com/tinacms/tinacms/commit/7be81751a6b93f785d347e759e91f024bb12c452) Thanks [@MirkaJuliet34](https://github.com/MirkaJuliet34)! - Aligned rich text editor typography class names with the actual font used and updated related references.
+
+- Updated dependencies [[`7be8175`](https://github.com/tinacms/tinacms/commit/7be81751a6b93f785d347e759e91f024bb12c452)]:
+  - tinacms@3.8.3
+
+## 2.5.0
+
+### Minor Changes
+
+- [#6843](https://github.com/tinacms/tinacms/pull/6843) [`0509095`](https://github.com/tinacms/tinacms/commit/0509095601fedc87f05a622e219e6414ef51a6b6) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Support TinaCMS visual editing on statically-built Astro pages.
+
+  Wrap editable regions in `<TinaIsland>` and visual editing now works under `output: 'static'` (and mixed static/SSR), provided the adapter can serve the one on-demand route `/tina-island/[name]`. Highlights:
+
+  - **Static page support.** `<TinaIsland>` emits a tiny in-iframe bootstrap that fetches `/admin/bridge.js`; on init the bridge "primes" any page with island markers but no server-injected form payloads by calling the island endpoints, which now return the page's form payloads alongside region HTML.
+  - **Bridge served as a static asset.** Dropped the injected `/_tina/bridge.js` route (some adapters 404'd it) in favour of serving `/admin/bridge.js` from a dev-only Vite plugin and emitting the bundle into the build client output — no source-tree writes. The `@tinacms/astro/bridge-route` subpath export is removed.
+  - **Re-prime on soft navigation.** `refreshForms` now re-primes when it sees island markers without server-injected payloads, so Astro `ClientRouter` swaps work without a hard reload.
+  - **Primary-form selection.** Mark the page's main form via `requestWithMetadata(..., { priority: 'primary' })` (SSR) or the `primary` prop on `<TinaIsland>` (static); the admin reducer routes around its default selection so multi-form pages no longer land on "Referenced Files".
+  - **Prerender-safe middleware.** `tina()` now short-circuits on `context.isPrerendered`, fixing the `Astro.request.headers` warnings that fired on every prerendered route during `astro build`.
+  - **New `tinaAdminDevRedirect` Vite plugin** at `@tinacms/astro/vite` — redirects `/admin` and `/admin/` to `/admin/index.html` during `astro dev` so a bare `/admin` request lands on the SPA.
+
+### Patch Changes
+
+- [#6938](https://github.com/tinacms/tinacms/pull/6938) [`4757225`](https://github.com/tinacms/tinacms/commit/475722599ff350b45bfdb4f7a6af2e37d33c81c3) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - chore(deps): upgrade react-router-dom from 6.3.0 to ^6.30.3 to resolve GHSA-9jcx-v3wj-wh4m (unexpected external redirect via untrusted paths)
+
+- Updated dependencies [[`33feeac`](https://github.com/tinacms/tinacms/commit/33feeacf6585be2736a0a14c5a800c1b6db34e44), [`8ac0776`](https://github.com/tinacms/tinacms/commit/8ac0776dea0c0650a5e5098c143b24c17fc25b8e), [`df50cbf`](https://github.com/tinacms/tinacms/commit/df50cbf35536bf2028a742832aebd57701dc3bb6), [`b9eaf61`](https://github.com/tinacms/tinacms/commit/b9eaf61c28c25814ae65b5fbe72d5b33df0b3596), [`cf73a11`](https://github.com/tinacms/tinacms/commit/cf73a115c3a58fac26e2518734dd3cb49133260d), [`4757225`](https://github.com/tinacms/tinacms/commit/475722599ff350b45bfdb4f7a6af2e37d33c81c3)]:
+  - tinacms@3.8.2
+  - @tinacms/mdx@2.1.5
+
+## 2.4.8
+
+### Patch Changes
+
+- Updated dependencies []:
+  - tinacms@3.8.1
+
+## 2.4.7
+
+### Patch Changes
+
+- Updated dependencies [[`723632b`](https://github.com/tinacms/tinacms/commit/723632b050b1e9502c46215fd6e8e548cc108ac0), [`95758a0`](https://github.com/tinacms/tinacms/commit/95758a0ad31ec96aa652f247211a769e82a37cbb), [`9e7eba9`](https://github.com/tinacms/tinacms/commit/9e7eba9f290c935cd56569421de88b5adfac65d8)]:
+  - tinacms@3.8.0
+
+## 2.4.6
+
+### Patch Changes
+
+- Updated dependencies [[`3e4dcc7`](https://github.com/tinacms/tinacms/commit/3e4dcc76d5fb89ec900b778cb7e82f3aa3ed6501), [`3da4588`](https://github.com/tinacms/tinacms/commit/3da45887c23da552a4bd994154eeaaf8990065f7), [`b37187d`](https://github.com/tinacms/tinacms/commit/b37187d46b6e1a274db7ab79372f02aaa2ef992d), [`84ec7ad`](https://github.com/tinacms/tinacms/commit/84ec7adea7a1d8015cf1430fe804886493c5ae21), [`28b869a`](https://github.com/tinacms/tinacms/commit/28b869a0d2c9b2a608e1076b6dea24bd3e01ac31)]:
+  - tinacms@3.7.6
+  - @tinacms/mdx@2.1.4
+
+## 2.4.5
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/mdx@2.1.3
+  - tinacms@3.7.5
+
+## 2.4.4
+
+### Patch Changes
+
+- [#6687](https://github.com/tinacms/tinacms/pull/6687) [`a526f9f`](https://github.com/tinacms/tinacms/commit/a526f9f4c37a0aaefb572c9dcc562d89aa9e5c7e) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: simplify errors shown to users
+
+- Updated dependencies [[`4672251`](https://github.com/tinacms/tinacms/commit/4672251c813e51f4471f025943008d2dea700aca), [`ca725ac`](https://github.com/tinacms/tinacms/commit/ca725acb42be499c146d76b12982e05a8127f81e), [`a526f9f`](https://github.com/tinacms/tinacms/commit/a526f9f4c37a0aaefb572c9dcc562d89aa9e5c7e), [`b260b5e`](https://github.com/tinacms/tinacms/commit/b260b5ed4beb5d678b9605357b99a8667fddc8de), [`b56dad4`](https://github.com/tinacms/tinacms/commit/b56dad42d2216ac9c8f90f19b78a4951ca97a61f)]:
+  - tinacms@3.7.4
+
+## 2.4.3
+
+### Patch Changes
+
+- Updated dependencies [[`cd262b3`](https://github.com/tinacms/tinacms/commit/cd262b311c218ea4e5b5bb8abbbe54fcff3b8054), [`55dae8e`](https://github.com/tinacms/tinacms/commit/55dae8eef898f49f827c00bc72297863d0d69be1), [`217bfb4`](https://github.com/tinacms/tinacms/commit/217bfb4ff2c1a61fa7b6df3ea460b192b5179bb7), [`5feb18d`](https://github.com/tinacms/tinacms/commit/5feb18d0d3032bbcd6a5aad678208c0dde19bf81), [`32e145d`](https://github.com/tinacms/tinacms/commit/32e145d4859cbc710a222f2a01c55ca7b29a080b), [`d998884`](https://github.com/tinacms/tinacms/commit/d9988849ad67fb5e9d7e233c1ccca0cb0c031c3e), [`c75d871`](https://github.com/tinacms/tinacms/commit/c75d87121224f91dc4e5e2aa8af60b0881b87a5b)]:
+  - tinacms@3.7.3
+  - @tinacms/mdx@2.1.2
+
 ## 2.4.2
 
 ### Patch Changes

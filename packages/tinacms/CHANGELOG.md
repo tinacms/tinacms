@@ -1,5 +1,214 @@
 # tinacms
 
+## 3.8.3
+
+### Patch Changes
+
+- [#6947](https://github.com/tinacms/tinacms/pull/6947) [`7be8175`](https://github.com/tinacms/tinacms/commit/7be81751a6b93f785d347e759e91f024bb12c452) Thanks [@MirkaJuliet34](https://github.com/MirkaJuliet34)! - Aligned rich text editor typography class names with the actual font used and updated related references.
+
+## 3.8.2
+
+### Patch Changes
+
+- [#6940](https://github.com/tinacms/tinacms/pull/6940) [`33feeac`](https://github.com/tinacms/tinacms/commit/33feeacf6585be2736a0a14c5a800c1b6db34e44) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - fix(tinacms): trim whitespace from search input before querying
+
+- [#6950](https://github.com/tinacms/tinacms/pull/6950) [`8ac0776`](https://github.com/tinacms/tinacms/commit/8ac0776dea0c0650a5e5098c143b24c17fc25b8e) Thanks [@RonGamzu](https://github.com/RonGamzu)! - Fix typos: rename misspelled `notifiySubscribers` to `notifySubscribers` and correct "Error occured" to "Error occurred" in CLI error messages
+
+- [#6929](https://github.com/tinacms/tinacms/pull/6929) [`b9eaf61`](https://github.com/tinacms/tinacms/commit/b9eaf61c28c25814ae65b5fbe72d5b33df0b3596) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Fix dropdown options being hidden behind other fields.
+
+- [#6926](https://github.com/tinacms/tinacms/pull/6926) [`cf73a11`](https://github.com/tinacms/tinacms/commit/cf73a115c3a58fac26e2518734dd3cb49133260d) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Fix optional datetime fields auto-filling with the current date when no value is set
+
+- [#6938](https://github.com/tinacms/tinacms/pull/6938) [`4757225`](https://github.com/tinacms/tinacms/commit/475722599ff350b45bfdb4f7a6af2e37d33c81c3) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - chore(deps): upgrade react-router-dom from 6.3.0 to ^6.30.3 to resolve GHSA-9jcx-v3wj-wh4m (unexpected external redirect via untrusted paths)
+
+- Updated dependencies [[`0509095`](https://github.com/tinacms/tinacms/commit/0509095601fedc87f05a622e219e6414ef51a6b6), [`542c781`](https://github.com/tinacms/tinacms/commit/542c781b4f7a6ff5b5481bd88329f60c9bf3b57d), [`df50cbf`](https://github.com/tinacms/tinacms/commit/df50cbf35536bf2028a742832aebd57701dc3bb6), [`d622ac5`](https://github.com/tinacms/tinacms/commit/d622ac5c0205adfc1b5cd8fe5f42045e579029c3), [`a8c8f08`](https://github.com/tinacms/tinacms/commit/a8c8f08012d30c5ed0df67ad2b04b805a9434784)]:
+  - @tinacms/bridge@0.3.0
+  - @tinacms/schema-tools@2.8.0
+  - @tinacms/mdx@2.1.5
+  - @tinacms/search@1.2.16
+
+## 3.8.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/search@1.2.15
+
+## 3.8.0
+
+### Minor Changes
+
+- [#6771](https://github.com/tinacms/tinacms/pull/6771) [`95758a0`](https://github.com/tinacms/tinacms/commit/95758a0ad31ec96aa652f247211a769e82a37cbb) Thanks [@wicksipedia](https://github.com/wicksipedia)! - ✨ **Visual editing for Astro — without React.**
+
+  TinaCMS visual editing previously required `useTina()`, a React hook that subscribes to admin postMessages and re-renders the page tree. That made it a hard sell for Astro: the framework is built around shipping zero JS by default, and the existing `examples/astro/kitchen-sink` worked around the React requirement by hydrating React inside the editor iframe — exactly the pattern Astro authors avoid.
+
+  This release ships a vanilla-JS bridge that brings the same click-to-focus, live-update, and form-syncing UX to Astro components, Hugo templates, plain HTML — anything that can emit a `data-tina-form` payload per query.
+
+  **New package: `@tinacms/bridge`**
+
+  A ~2 KB gzipped, zero-dependency ESM bundle that speaks the existing TinaCMS admin postMessage protocol. No React in the page tree, no client islands, no hydration cost outside the editor iframe.
+
+  Astro projects install `@tinacms/astro` instead and the bundled integration's middleware auto-injects everything on edit-mode responses. Direct `@tinacms/bridge` consumption is for non-Astro frontends:
+
+  ```html
+  <head>
+    <div
+      data-tina-form='{"id":"…","query":"…","variables":{},"data":{}}'
+      hidden
+    ></div>
+    <script type="module">
+      import { init } from "/_tina/bridge.js";
+      init();
+    </script>
+  </head>
+  ```
+
+  The bridge submodules:
+
+  - **`init()`** — top-level entry. Detects iframe embedding, registers all `[data-tina-form]` payloads with the admin (with retry, since the bridge boots faster than the admin's listener), wires data updates and click-to-focus.
+  - **`refreshForms()`** — re-scans the DOM after soft navigations (Astro view transitions, Turbo, htmx). Posts `close` for forms that left and `open` for forms that appeared.
+  - **`tinaField()`** — framework-free field-id helper, identical API to `tinacms/dist/react`'s export. Use on any element to make it click-to-edit.
+  - **`@tinacms/bridge/preview`** — server-side helper for non-React frameworks. `readOverlay(request, queryId)` returns the unsaved form data the admin is editing, so per-route refresh endpoints can re-render with overlay data on every keystroke.
+
+  **How edits flow without re-rendering React**
+
+  The bridge takes a soft-refresh approach instead of in-place reconciliation. Mark editable regions with `data-tina-island="<endpoint-url>"`; on every form change the bridge POSTs the current overlay to that endpoint, the server renders the matching component to an HTML fragment, and the bridge swaps it into the live DOM. Per-island scoped — editing the hero refetches only the hero, not the whole page. The transport is JSON-over-POST so UTF-8 (em-dashes, smart quotes, emoji) and large rich-text bodies round-trip without size or charset limits.
+
+  **The protocol stays stateless** — admin pushes already-resolved data to the bridge, bridge forwards it to the island endpoint, endpoint reads it via `readOverlay()` instead of hitting the canonical content store. Works identically against self-hosted Tina, TinaCloud, or any GraphQL endpoint. No backend changes shipped.
+
+  **`tinacms`: framework-free `tinaField` subpath**
+
+  `tinaField()` was already pure — just reads `_content_source` metadata. It's now exported from `tinacms/tina-field` as a standalone module so non-React frontends can import it without pulling React (and Plate, and dnd-kit, and ~50 other React deps) into their bundle. The existing `tinacms/dist/react` re-export keeps the public API stable.
+
+  **Reference example: `examples/astro/visual-editing`**
+
+  A new Astro 5 example that mirrors `examples/astro/kitchen-sink` field-for-field — same six collections (Tag, Author, Global, Post, Blog, Page), same shared content via `localContentPath`, same eight routes — but rendered with pure Astro components instead of React islands. Includes:
+
+  - The **`@tinacms/astro` package's `TinaMarkdown`** — a vanilla Astro rich-text renderer that walks the Plate AST Tina returns, dispatches custom MDX components (NewsletterSignup, BlockQuote, DateTime, code blocks) by name to authored Astro components — the same `components` map shape as `TinaMarkdown` from `tinacms/dist/rich-text`, but emitting Astro markup
+  - An island-refresh pattern: one dynamic endpoint at `src/pages/tina-island/[name].ts` backed by a registry in `src/lib/islands.ts`. The endpoint uses Astro's `experimental_AstroContainer` to render the matching component as a fragment-only response. Adding a new editable region is one entry in the registry
+  - Multi-form pages: layout fetches global, route fetches its primary collection, both register independently — admin shows the right form based on which marked element you click
+  - A **`requestWithMetadata()`** helper wrapping every data load so the same code path runs in production (no overlay → real fetch) and inside the editor (overlay → use the bridge payload). Production builds ship zero bridge JS to non-admin visitors
+
+  **Why this matters for the Astro community**
+
+  Astro is the second-most-starred meta-framework on GitHub and grew specifically because authors care about runtime cost. Every previous attempt to integrate a React-based CMS into Astro carried the same caveat: "but you'll need to ship React for editing." That caveat is now gone. The bridge is the smallest piece of JS that can deliver Tina's full editing experience — click to focus, live preview as you type, click-to-edit overlays — to a framework whose audience explicitly didn't sign up for React.
+
+  **Known content-shape note**
+
+  For nested MDX components in rich-text bodies (e.g. `<NewsletterSignup>` inside a post's `_body`) to render via the Astro renderer instead of as raw HTML, the content needs to be authored through the Tina editor — which inserts them as MDX templates that Tina parses into `mdxJsxFlowElement` nodes. Hand-authored `<Component>` syntax in the markdown source is currently parsed as `html` by Tina's MDX layer; same behaviour as the React renderer. Worth flagging up-front for anyone migrating existing markdown content.
+
+  **Soft-navigation support: `refreshForms()`**
+
+  `init()` scans `[data-tina-form]` elements once on first load and captures the resulting set in closure. Sites using Astro's `<ClientRouter />` (or any view-transitions setup that swaps the DOM without a full reload) would post the first page's forms to the admin and never refresh them — navigating between docs inside the editor iframe left the sidebar showing the previous page's form.
+
+  `refreshForms()` re-scans the live DOM, diffs against the previously-mounted set, and posts `close` for forms that disappeared and `open` (with the same retry-until-acked behaviour as `init`) for forms that appeared. The one-time global listeners — `click` capture, the `updateData` ack handler, the `beforeunload` close — stay bound across refreshes, so calling it on every navigation is cheap and idempotent. The Astro integration wires it to `astro:page-load` automatically.
+
+  **Sticky edit-mode**
+
+  A `__tina_edit` session cookie (SameSite=Strict, gated on `Sec-Fetch-Dest: iframe`) keeps the iframe in edit mode across in-iframe link clicks — without it, clicking a link inside the preview drops the `/admin/` Referer and the next request falls out of edit mode. Top-level visitors never get edit mode because the dest check fails before the cookie is consulted, so production HTML is unaffected.
+
+  **Out of scope (follow-ups)**
+
+  - Hugo / Eleventy adapters using the same bridge — the contract is framework-free, just needs an integration guide
+  - TinaCloud overlay channel — not needed; the stateless POST protocol works against any backend
+
+- [#6765](https://github.com/tinacms/tinacms/pull/6765) [`9e7eba9`](https://github.com/tinacms/tinacms/commit/9e7eba9f290c935cd56569421de88b5adfac65d8) Thanks [@kulesy](https://github.com/kulesy)! - Forward the editor's current branch to the TinaCloud assets-api on every cloud media call, and fix staging URL handling for multi-segment branches
+
+  `TinaMediaStore` now appends `?branch=<encodedBranch>` to its `upload_url`, `list`, and `delete` requests so that — once the assets-api opts an app into branch-aware media — uploads, listings, and deletions are scoped to the branch the editor is on, instead of always hitting the production branch. The branch is read from `Client.branch` (already URL-encoded) and decoded then re-encoded at the use site to avoid double-encoding.
+
+  The query parameter is ignored by assets-api versions that do not parse it, so this change is safe to deploy ahead of the server-side rollout. Local mode is unaffected.
+
+  `@tinacms/graphql`'s media URL resolver now formats staging URLs as `/__staging/<branch>/__file/<path>` instead of `/__staging/<encoded-branch>/<path>`. The previous form broke for branches containing `/` (e.g. `feat/my-branch`) because CloudFront decodes paths before downstream components see them, so the S3 write key (with a literal `%2F`) wouldn't match the decoded read path. The `__file` delimiter lets the branch contribute its natural `/` segments while still marking where the file path begins.
+
+  Note: staging URLs produced by `@tinacms/graphql@2.3.0`–`2.3.1` use the old format and will not round-trip through this version's `resolveMediaCloudToRelative`. Branch-aware media is gated server-side and has not been enabled for any tenant yet, so no persisted data is expected to be affected — but if you turned it on for testing, regenerate the affected field values from the editor after upgrading.
+
+  After a successful cloud upload `TinaMediaStore.persist()` now resolves its return value from the assets-api `list` endpoint instead of constructing each `Media.src` locally — the server is the source of truth for the canonical URL (including the staging-branch path and per-stage CDN host). The `MediaStore.persist()` contract is preserved, so the returned items still flow through the media manager and the image-field drop handler.
+
+  Also reserves an optional `rename?(from, to)` hook on the `MediaStore` interface as a future extension point — no implementation yet.
+
+### Patch Changes
+
+- [#6694](https://github.com/tinacms/tinacms/pull/6694) [`723632b`](https://github.com/tinacms/tinacms/commit/723632b050b1e9502c46215fd6e8e548cc108ac0) Thanks [@alhafoudh](https://github.com/alhafoudh)! - Fix crash in `getFieldGroup` when editing deeply nested rich-text fields (3+ levels) with templates. The method used `findIndex` which always searched from the start of the path array, causing it to resolve the wrong "children"/"props" segments on recursive calls. Replaced with `indexOf` searching from the current position, and added a null guard for graceful fallback on malformed content.
+
+- Updated dependencies [[`95758a0`](https://github.com/tinacms/tinacms/commit/95758a0ad31ec96aa652f247211a769e82a37cbb)]:
+  - @tinacms/bridge@0.2.0
+  - @tinacms/search@1.2.14
+
+## 3.7.6
+
+### Patch Changes
+
+- [#6652](https://github.com/tinacms/tinacms/pull/6652) [`3e4dcc7`](https://github.com/tinacms/tinacms/commit/3e4dcc76d5fb89ec900b778cb7e82f3aa3ed6501) Thanks [@kulesy](https://github.com/kulesy)! - Fix HTML code block language tag from 'htmlbars' to 'html'
+
+- [#6770](https://github.com/tinacms/tinacms/pull/6770) [`3da4588`](https://github.com/tinacms/tinacms/commit/3da45887c23da552a4bd994154eeaaf8990065f7) Thanks [@zaidkhatri-dev](https://github.com/zaidkhatri-dev)! - - Improved error handling for file and folder operations: errors are now shown as clear notifications in the UI rather than just logging to the console.
+
+  - Fixed an issue where renaming a document to an already existing filename would silently fail; this now correctly triggers an error alert in the UI.
+
+- [#6761](https://github.com/tinacms/tinacms/pull/6761) [`b37187d`](https://github.com/tinacms/tinacms/commit/b37187d46b6e1a274db7ab79372f02aaa2ef992d) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🐛 fix Popover on rich-text fields from being hidden under other content
+
+- [#6746](https://github.com/tinacms/tinacms/pull/6746) [`84ec7ad`](https://github.com/tinacms/tinacms/commit/84ec7adea7a1d8015cf1430fe804886493c5ae21) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 🧹 Change colour picker from div to button element
+
+- [#6752](https://github.com/tinacms/tinacms/pull/6752) [`28b869a`](https://github.com/tinacms/tinacms/commit/28b869a0d2c9b2a608e1076b6dea24bd3e01ac31) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - feat(tinacms): show content file path on breadcrumb hover
+
+- Updated dependencies [[`38cbec7`](https://github.com/tinacms/tinacms/commit/38cbec7b1b204f395f4e6e97c4bab6edc7296439), [`556a162`](https://github.com/tinacms/tinacms/commit/556a16255df4b48df69c14133ee6530b68dd9131)]:
+  - @tinacms/schema-tools@2.7.4
+  - @tinacms/search@1.2.13
+  - @tinacms/mdx@2.1.4
+
+## 3.7.5
+
+### Patch Changes
+
+- Updated dependencies [[`a85b1c0`](https://github.com/tinacms/tinacms/commit/a85b1c0ff44d8c214be47f89531beaf0e9dc234c)]:
+  - @tinacms/schema-tools@2.7.3
+  - @tinacms/search@1.2.12
+  - @tinacms/mdx@2.1.3
+
+## 3.7.4
+
+### Patch Changes
+
+- [#6410](https://github.com/tinacms/tinacms/pull/6410) [`4672251`](https://github.com/tinacms/tinacms/commit/4672251c813e51f4471f025943008d2dea700aca) Thanks [@TihomirIvanov](https://github.com/TihomirIvanov)! - Updated tinacms dependency mermaid
+
+  Fixes security vulnerabilities
+
+  - Fixes https://github.com/advisories/GHSA-p3vf-v8qc-cwcr
+  - Fixes https://github.com/advisories/GHSA-gx9m-whjm-85jf
+  - Fixes https://github.com/advisories/GHSA-mmhx-hmjr-r674
+  - Fixes https://github.com/advisories/GHSA-m4gq-x24j-jpmf
+  - Fixes https://github.com/advisories/GHSA-vhxf-7vqr-mrjg
+
+- [#6708](https://github.com/tinacms/tinacms/pull/6708) [`ca725ac`](https://github.com/tinacms/tinacms/commit/ca725acb42be499c146d76b12982e05a8127f81e) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Fix rich-text image edit form: the URL field now shows the correct `URL` label and loads the existing image (previously it displayed the raw field path like `body.children[10].props.url` and rendered as an empty upload dropzone). The breadcrumb for the image form also now reads "Image" instead of the full path.
+
+- [#6687](https://github.com/tinacms/tinacms/pull/6687) [`a526f9f`](https://github.com/tinacms/tinacms/commit/a526f9f4c37a0aaefb572c9dcc562d89aa9e5c7e) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: simplify errors shown to users
+
+- [#6720](https://github.com/tinacms/tinacms/pull/6720) [`b260b5e`](https://github.com/tinacms/tinacms/commit/b260b5ed4beb5d678b9605357b99a8667fddc8de) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Migrate docs links in shipped package code from raw `tina.io/docs/<path>` URLs to aliased `tina.io/docs/r/<alias>` URLs so the links survive future docs restructuring.
+
+- [#6728](https://github.com/tinacms/tinacms/pull/6728) [`b56dad4`](https://github.com/tinacms/tinacms/commit/b56dad42d2216ac9c8f90f19b78a4951ca97a61f) Thanks [@monsonego](https://github.com/monsonego)! - Fix the radio-group field styling so radio options render with a circular indicator and no longer look disabled when unselected.
+
+- Updated dependencies []:
+  - @tinacms/search@1.2.11
+
+## 3.7.3
+
+### Patch Changes
+
+- [#6548](https://github.com/tinacms/tinacms/pull/6548) [`cd262b3`](https://github.com/tinacms/tinacms/commit/cd262b311c218ea4e5b5bb8abbbe54fcff3b8054) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Add 'displayOnly' field type for display-only form fields
+
+- [#6693](https://github.com/tinacms/tinacms/pull/6693) [`217bfb4`](https://github.com/tinacms/tinacms/commit/217bfb4ff2c1a61fa7b6df3ea460b192b5179bb7) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Fix sidebar file tree: consolidate duplicate roots from multiple useTina() calls, prevent chevron shrinking on long filenames, add bottom padding for last item visibility
+
+- [#6678](https://github.com/tinacms/tinacms/pull/6678) [`5feb18d`](https://github.com/tinacms/tinacms/commit/5feb18d0d3032bbcd6a5aad678208c0dde19bf81) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - fix: display editorial workflow modal on deleted branches
+
+- [#6699](https://github.com/tinacms/tinacms/pull/6699) [`32e145d`](https://github.com/tinacms/tinacms/commit/32e145d4859cbc710a222f2a01c55ca7b29a080b) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 💄 Improve UI of Grid Item in Media Manager
+
+- [#6682](https://github.com/tinacms/tinacms/pull/6682) [`d998884`](https://github.com/tinacms/tinacms/commit/d9988849ad67fb5e9d7e233c1ccca0cb0c031c3e) Thanks [@kulesy](https://github.com/kulesy)! - Fix React Error #31 when inserting image from Media Library with custom MediaStore
+
+- [#6664](https://github.com/tinacms/tinacms/pull/6664) [`c75d871`](https://github.com/tinacms/tinacms/commit/c75d87121224f91dc4e5e2aa8af60b0881b87a5b) Thanks [@18-th](https://github.com/18-th)! - Validate relativePath to reject whitespace and invalid characters
+
+- Updated dependencies [[`cd262b3`](https://github.com/tinacms/tinacms/commit/cd262b311c218ea4e5b5bb8abbbe54fcff3b8054), [`55dae8e`](https://github.com/tinacms/tinacms/commit/55dae8eef898f49f827c00bc72297863d0d69be1)]:
+  - @tinacms/schema-tools@2.7.2
+  - @tinacms/mdx@2.1.2
+  - @tinacms/search@1.2.10
+
 ## 3.7.2
 
 ### Patch Changes

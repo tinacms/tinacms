@@ -98,30 +98,30 @@ export const FormsView = ({ loadingPlaceholder }: FormsViewProps = {}) => {
   const isEditing = !!activeForm;
   const formMetas = cms.plugins.all<FormMetaPlugin>('form:meta');
 
-  // Single form - no transitions needed
+  // Single form - no transitions needed. Fall back to the no-forms
+  // placeholder when nothing is active (e.g. a listing page that only
+  // registered a layout-level global form, so `formLists` is non-empty
+  // but the auto-select heuristic skipped the only candidate). Without
+  // this the sidebar renders empty and the page looks broken.
   if (!isReferencingManyForms) {
+    if (!activeForm) {
+      return <SidebarNoFormsPlaceholder />;
+    }
     return (
-      <>
-        {activeForm && (
-          <div className='flex-1 flex flex-col flex-nowrap overflow-hidden h-full w-full relative bg-white'>
-            <FormHeader
-              activeForm={activeForm}
-              branch={cms.api.admin.api.branch}
-              repoProvider={cms.api.admin.api.schema.config.config.repoProvider}
-              isLocalMode={cms.api?.tina?.isLocalMode}
-            />
-            {formMetas?.map((meta) => (
-              <React.Fragment key={meta.name}>
-                <meta.Component />
-              </React.Fragment>
-            ))}
-            <FormBuilder
-              form={activeForm}
-              onPristineChange={setFormIsPristine}
-            />
-          </div>
-        )}
-      </>
+      <div className='flex-1 flex flex-col flex-nowrap overflow-hidden h-full w-full relative bg-white'>
+        <FormHeader
+          activeForm={activeForm}
+          branch={cms.api.admin.api.branch}
+          repoProvider={cms.api.admin.api.schema.config.config.repoProvider}
+          isLocalMode={cms.api?.tina?.isLocalMode}
+        />
+        {formMetas?.map((meta) => (
+          <React.Fragment key={meta.name}>
+            <meta.Component />
+          </React.Fragment>
+        ))}
+        <FormBuilder form={activeForm} onPristineChange={setFormIsPristine} />
+      </div>
     );
   }
 
@@ -202,7 +202,10 @@ export const FormHeader = ({
 
   return (
     <div className='px-4 pt-2 pb-4 flex flex-row flex-nowrap justify-between items-center gap-2 bg-gradient-to-t from-white to-gray-50 border-b border-gray-100'>
-      <FormBreadcrumbs className='w-[calc(100%-3rem)]' />
+      <FormBreadcrumbs
+        className='w-[calc(100%-3rem)]'
+        contentPath={activeForm.tinaForm.path}
+      />
       <FileHistoryProvider
         defaultBranchName={repoProvider?.defaultBranchName}
         historyUrl={repoProvider?.historyUrl}
@@ -295,7 +298,7 @@ const BreadcrumbItemLink = ({
 const FinalBreadcrumbItem = ({ breadcrumb }: { breadcrumb: string }) => {
   return (
     <BreadcrumbItem className='shrink truncate'>
-      <BreadcrumbPage className='text-gray-700 font-medium'>
+      <BreadcrumbPage className='text-gray-700 font-medium cursor-default'>
         {breadcrumb}
       </BreadcrumbPage>
     </BreadcrumbItem>
@@ -304,9 +307,11 @@ const FinalBreadcrumbItem = ({ breadcrumb }: { breadcrumb: string }) => {
 
 export const FormBreadcrumbs = ({
   rootBreadcrumbName,
+  contentPath,
   ...props
 }: {
   rootBreadcrumbName?: string;
+  contentPath?: string;
 } & React.HTMLAttributes<HTMLDivElement>) => {
   const cms = useCMS();
   const breadcrumbs = cms.state.breadcrumbs;
@@ -337,18 +342,35 @@ export const FormBreadcrumbs = ({
     <Breadcrumb {...props}>
       <BreadcrumbList className='flex-nowrap text-nowrap'>
         {/* First breadcrumb */}
-        {breadcrumbs.length > 1 ? (
-          <BreadcrumbItemLink
-            breadcrumb={rootBreadcrumbName || firstBreadcrumb.label}
-            onClick={() =>
-              goBack(firstBreadcrumb.formId, firstBreadcrumb.formName)
-            }
-          />
-        ) : (
-          <FinalBreadcrumbItem
-            breadcrumb={rootBreadcrumbName || firstBreadcrumb.label}
-          />
-        )}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span>
+                {breadcrumbs.length > 1 ? (
+                  <BreadcrumbItemLink
+                    breadcrumb={rootBreadcrumbName || firstBreadcrumb.label}
+                    onClick={() =>
+                      goBack(firstBreadcrumb.formId, firstBreadcrumb.formName)
+                    }
+                  />
+                ) : (
+                  <FinalBreadcrumbItem
+                    breadcrumb={rootBreadcrumbName || firstBreadcrumb.label}
+                  />
+                )}
+              </span>
+            </TooltipTrigger>
+            {contentPath && (
+              <TooltipContent
+                side='bottom'
+                align='start'
+                className='shadow-md max-w-xs break-all'
+              >
+                {contentPath}
+              </TooltipContent>
+            )}
+          </Tooltip>
+        </TooltipProvider>
 
         {/* Dropdown for middle breadcrumbs */}
         {dropdownBreadcrumbs.length > 0 && (

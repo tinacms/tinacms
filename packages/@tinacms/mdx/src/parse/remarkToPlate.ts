@@ -296,6 +296,7 @@ export const remarkToSlate = (
   const code = (content: Md.Code): Plate.CodeBlockElement => {
     const extra: Record<string, string> = {};
     if (content.lang) extra['lang'] = content.lang;
+    if (content.meta) extra['meta'] = content.meta;
 
     const value = content.value ?? '';
     const children =
