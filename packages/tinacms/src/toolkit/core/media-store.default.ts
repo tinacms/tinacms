@@ -1,4 +1,7 @@
-import { DEFAULT_MEDIA_UPLOAD_TYPES } from '@toolkit/components/media/utils';
+import {
+  DEFAULT_MEDIA_UPLOAD_TYPES,
+  sanitizeFilename,
+} from '@toolkit/components/media/utils';
 import type { Client } from '../../internalClient';
 import { CMS } from './cms';
 import {
@@ -16,12 +19,15 @@ const s3ErrorRegex = /<Error>.*<Code>(.+)<\/Code>.*<Message>(.+)<\/Message>.*/;
 export class DummyMediaStore implements MediaStore {
   accept = '*';
   async persist(files: MediaUploadOptions[]): Promise<Media[]> {
-    return files.map(({ directory, file }) => ({
-      id: file.name,
-      type: 'file',
-      directory,
-      filename: file.name,
-    }));
+    return files.map(({ directory, file }) => {
+      const filename = sanitizeFilename(file.name);
+      return {
+        id: filename,
+        type: 'file',
+        directory,
+        filename,
+      };
+    });
   }
   async list(): Promise<MediaList> {
     const items: Media[] = [];
@@ -142,10 +148,13 @@ export class TinaMediaStore implements MediaStore {
       if (directory?.endsWith('/')) {
         directory = directory.substr(0, directory.length - 1);
       }
+      // Normalize/sanitize once so the upload URL, the saved asset, and the
+      // value persisted into content all agree. macOS exposes filenames in
+      // NFD form; leaving them as-is leaks sequences like
+      // `Aufforstungsfla%CC%88che.jpg` into content fields.
+      const safeName = sanitizeFilename(item.file.name);
       const path = `${
-        directory && directory !== '/'
-          ? `${directory}/${item.file.name}`
-          : item.file.name
+        directory && directory !== '/' ? `${directory}/${safeName}` : safeName
       }`;
       const res = await this.api.authProvider.fetchWithToken(
         `${this.url}/upload_url/${path}${branchQuery}`,
@@ -258,7 +267,9 @@ export class TinaMediaStore implements MediaStore {
         }
       }
       for (const item of items) {
-        const entry = found.get(item.file.name);
+        // The server stores the file under the sanitized name we sent at
+        // upload time, so match the canonical listing on the same value.
+        const entry = found.get(sanitizeFilename(item.file.name));
         if (entry) results.push(entry);
       }
     }
@@ -290,6 +301,10 @@ export class TinaMediaStore implements MediaStore {
 
     for (const item of media) {
       const { file, directory } = item;
+      // Normalize/sanitize once and reuse for the FormData filename, the
+      // upload URL, the on-disk path, and the value persisted into content,
+      // so every layer agrees on the same bytes.
+      const safeName = sanitizeFilename(file.name);
       // Stripped directory does not have leading or trailing slashes
       let strippedDirectory = directory;
       if (strippedDirectory.startsWith('/')) {
@@ -301,20 +316,22 @@ export class TinaMediaStore implements MediaStore {
       }
 
       const formData = new FormData();
-      formData.append('file', file);
+      // The third arg of FormData#append overrides the part filename — pass
+      // the sanitized name so the server reads what the client expects.
+      formData.append('file', file, safeName);
       formData.append('directory', directory);
-      formData.append('filename', file.name);
+      formData.append('filename', safeName);
 
       let uploadPath = `${
-        strippedDirectory ? `${strippedDirectory}/${file.name}` : file.name
+        strippedDirectory ? `${strippedDirectory}/${safeName}` : safeName
       }`;
       if (uploadPath.startsWith('/')) {
         uploadPath = uploadPath.substr(1);
       }
       const filePath = `${
         strippedDirectory
-          ? `${folder}${strippedDirectory}/${file.name}`
-          : folder + file.name
+          ? `${folder}${strippedDirectory}/${safeName}`
+          : folder + safeName
       }`;
       const res = await this.fetchFunction(`${this.url}/upload/${uploadPath}`, {
         method: 'POST',
@@ -330,8 +347,8 @@ export class TinaMediaStore implements MediaStore {
       if (fileRes?.success) {
         const parsedRes: Media = {
           type: 'file',
-          id: file.name,
-          filename: file.name,
+          id: safeName,
+          filename: safeName,
           directory,
           src: filePath,
           thumbnails: {

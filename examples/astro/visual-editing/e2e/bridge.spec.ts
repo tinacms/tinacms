@@ -17,10 +17,20 @@ import { expect, test } from '@playwright/test';
 
 const ROUTES = ['/', '/posts', '/blog', '/authors'];
 
+// The middleware only injects `[data-tina-form]` payloads on edit-mode
+// responses. `isEditMode` accepts three signals: the `?tina-edit=1`
+// query param, `Sec-Fetch-Dest: iframe` plus a `/admin/`-rooted
+// Referer, or `Sec-Fetch-Dest: iframe` plus the edit cookie. A
+// Playwright `page.goto` is a top-level navigation (dest=document),
+// so the cookie/iframe paths are out. The query param is the only
+// signal that works without a real iframe — use it as the canonical
+// edit-mode trigger for these smoke tests.
+const EDIT = '?tina-edit=1';
+
 for (const route of ROUTES) {
   test.describe(`Bridge wiring on ${route}`, () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto(route);
+      await page.goto(`${route}${EDIT}`);
     });
 
     test('emits at least one [data-tina-form] element', async ({ page }) => {
@@ -70,7 +80,7 @@ test.describe('Form payload encoding', () => {
     // The new wire format relies on Astro's automatic attribute
     // escaping — a CMS value containing a script-closing sequence
     // should round-trip through `JSON.parse` exactly.
-    await page.goto('/');
+    await page.goto(`/${EDIT}`);
 
     const result = await page.evaluate(() => {
       const el = document.querySelector('[data-tina-form]');
