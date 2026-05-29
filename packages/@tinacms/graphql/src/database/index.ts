@@ -989,6 +989,10 @@ export class Database {
                       name: indexField.name,
                       type: field?.type,
                       list: !!field?.list,
+                      pad:
+                        field?.type === 'number'
+                          ? { fillString: '0', maxLength: DEFAULT_NUMERIC_LPAD }
+                          : undefined,
                     };
                   }),
                 };
