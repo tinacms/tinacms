@@ -27,6 +27,8 @@ export interface FormPayload {
 export interface DataStore {
   /** Latest resolved data per form id. */
   get(id: string): object | undefined;
+  /** Whether a form id has been seeded or set. */
+  has(id: string): boolean;
   /** Populate without notifying subscribers (used for the initial seed). */
   seed(id: string, data: object): void;
   /** Replace cached data for a form and notify subscribers. */

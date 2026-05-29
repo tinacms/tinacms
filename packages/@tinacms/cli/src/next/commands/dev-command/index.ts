@@ -45,7 +45,7 @@ export class DevCommand extends BaseCommand {
   });
 
   async catch(error: any): Promise<void> {
-    logger.error('Error occured during tinacms dev');
+    logger.error('Error occurred during tinacms dev');
     console.error(error);
     process.exit(1);
   }

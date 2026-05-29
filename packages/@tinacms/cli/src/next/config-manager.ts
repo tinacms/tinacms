@@ -13,6 +13,7 @@ import { warnText } from '../utils/theme';
 import { resolveContentRootPath } from './resolve-content-root';
 import { resolveDatabaseExternals } from './external-resolver';
 import { prepareCacheLocation, reapBuildSubdir } from './cache-manager';
+import { buildDatabaseEsbuildConfig } from './build-database-esbuild-config';
 
 export const TINA_FOLDER = 'tina';
 export const LEGACY_TINA_FOLDER = '.tina';
@@ -389,23 +390,17 @@ export class ConfigManager {
     // `build.externalDependencies` in tina/config.ts. See external-resolver.ts
     // for the merge rules and rationale.
     const external = resolveDatabaseExternals(this.config);
-    await esbuild.build({
-      entryPoints: [this.selfHostedDatabaseFilePath],
-      bundle: true,
-      platform: 'node',
-      format: 'esm',
-      outfile: outfile,
-      loader: loaders,
-      external,
-      // Provide a require() polyfill for ESM bundles containing CommonJS packages.
-      // Some bundled packages (e.g., 'scmp' used by 'mongodb-level') use require('crypto').
-      // When esbuild inlines these CommonJS packages, it keeps the require() calls,
-      // but ESM doesn't have a global require. This banner creates one using Node.js's
-      // official createRequire API, allowing the bundled CommonJS code to work in ESM.
-      banner: {
-        js: `import { createRequire } from 'module';const require = createRequire(import.meta.url);`,
-      },
-    });
+    // Construct the esbuild options via a pure helper so the externalize /
+    // output-path contract is locked down by unit tests in
+    // build-database-esbuild-config.test.ts (see #6785).
+    await esbuild.build(
+      buildDatabaseEsbuildConfig({
+        entryPoint: this.selfHostedDatabaseFilePath,
+        outfile,
+        external,
+        loader: loaders,
+      })
+    );
     const result = await import(pathToFileURL(outfile).href);
     // Remove the build subdir + reap the timestamp parent if it's now empty
     // (the sibling loadConfigFile may have finished). See cache-manager.ts.

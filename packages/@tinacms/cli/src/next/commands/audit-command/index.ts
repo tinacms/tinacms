@@ -35,7 +35,7 @@ export class AuditCommand extends Command {
   });
 
   async catch(error: any): Promise<void> {
-    logger.error('Error occured during tinacms audit');
+    logger.error('Error occurred during tinacms audit');
     if (this.verbose) {
       console.error(error);
     }

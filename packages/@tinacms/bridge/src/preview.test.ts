@@ -184,13 +184,9 @@ describe('full bridge → server round-trip', () => {
     };
     const req = bridgeRequest(envelope);
 
-    expect(await readOverlay(req.clone(), 'page_hash')).toEqual(
-      envelope.page_hash
-    );
-    expect(await readOverlay(req.clone(), 'global_hash')).toEqual(
-      envelope.global_hash
-    );
-    expect(await readOverlay(req.clone(), 'unknown_hash')).toBeUndefined();
+    expect(await readOverlay(req, 'page_hash')).toEqual(envelope.page_hash);
+    expect(await readOverlay(req, 'global_hash')).toEqual(envelope.global_hash);
+    expect(await readOverlay(req, 'unknown_hash')).toBeUndefined();
   });
 
   it('survives the worst payload encountered in the wild (large UTF-8 post body)', async () => {
@@ -216,5 +212,45 @@ describe('full bridge → server round-trip', () => {
     );
     expect(back?.post._body.children).toHaveLength(200);
     expect(back?.post._body.children[0]).toEqual(richText.children[0]);
+  });
+});
+
+/**
+ * Production callers (`requestWithMetadata` in `@tinacms/astro/data.ts`)
+ * pull a single `Request` out of AsyncLocalStorage and pass it to
+ * `readOverlay` once per loader call. A page that loads two documents
+ * (e.g. page + global) hits `readOverlay` twice on the same Request, so
+ * the parse must be reusable.
+ */
+describe('readOverlay — repeated reads on the same Request', () => {
+  it('returns each slice when called twice without cloning', async () => {
+    const envelope = {
+      page_id: { page: { title: 'Page' } },
+      global_id: { global: { theme: 'dark' } },
+    };
+    const req = new Request('http://example.com/tina-island/page', {
+      method: 'POST',
+      headers: { 'Content-Type': PREVIEW_CONTENT_TYPE },
+      body: JSON.stringify(envelope),
+    });
+
+    expect(await readOverlay(req, 'page_id')).toEqual(envelope.page_id);
+    expect(await readOverlay(req, 'global_id')).toEqual(envelope.global_id);
+  });
+
+  it('serves concurrent reads from a single body parse', async () => {
+    const envelope = { a: 1, b: 2 };
+    const req = new Request('http://example.com/tina-island/page', {
+      method: 'POST',
+      headers: { 'Content-Type': PREVIEW_CONTENT_TYPE },
+      body: JSON.stringify(envelope),
+    });
+
+    const [a, b] = await Promise.all([
+      readOverlay(req, 'a'),
+      readOverlay(req, 'b'),
+    ]);
+    expect(a).toBe(1);
+    expect(b).toBe(2);
   });
 });

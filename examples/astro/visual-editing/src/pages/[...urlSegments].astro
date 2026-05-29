@@ -13,7 +13,7 @@ if (!page.data?.page) {
 }
 ---
 <Base title="TinaCMS Astro Visual Editing">
-  <TinaIsland name="page" wrapper={islands.page.wrapper} params={{ slug }}>
+  <TinaIsland name="page" wrapper={islands.page.wrapper} params={{ slug }} primary>
     <Blocks page={page.data.page} />
   </TinaIsland>
 </Base>

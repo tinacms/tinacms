@@ -1,6 +1,6 @@
 # Getting started — `@tinacms/astro`
 
-Step-by-step for adding TinaCMS visual editing to a new or existing Astro project. Tested against Astro 5, Node 18+, TinaCMS 3.
+Step-by-step for adding TinaCMS visual editing to a new or existing Astro project. Tested against Astro 5 and 6, Node 18+, TinaCMS 3.
 
 The reference implementation lives at [`examples/astro/visual-editing`](../../../examples/astro/visual-editing/) — same content schema as the React kitchen-sink, rendered with pure Astro.
 
@@ -11,11 +11,13 @@ pnpm add @tinacms/astro tinacms
 pnpm add -D @tinacms/cli
 ```
 
-You'll also need an Astro SSR adapter — the island-refresh endpoint reads POST bodies at request time, so `output: 'server'` is required:
+You'll also need an Astro SSR adapter — the island-refresh endpoint (`/tina-island/[name]`) renders at request time:
 
 ```bash
 pnpm add @astrojs/node          # or @astrojs/vercel / netlify / cloudflare
 ```
+
+This guide uses `output: 'server'` (the simplest setup). `output: 'static'` also works for visual editing — see [Static-site editing](#static-site-editing) at the end — as long as your editable regions are wrapped in `<TinaIsland>` (steps 5–7) and the adapter can serve that one on-demand island route.
 
 If your collections use MDX bodies:
 
@@ -56,7 +58,7 @@ export default defineConfig({
 });
 ```
 
-That single `tina()` call auto-injects the middleware (resolves `Astro.locals.tinaEdit`, splices the bridge wiring on edit-mode responses) and the `/_tina/bridge.js` route that serves the vanilla-JS bridge. Production HTML stays byte-identical to a Tina-free Astro app.
+That single `tina()` call auto-injects the middleware (resolves `Astro.locals.tinaEdit`, splices the bridge wiring on edit-mode responses) and stages the vanilla-JS bridge as a static file at `/admin/bridge.js` (next to the admin UI, so it ships on every deploy regardless of `output`). Production HTML stays byte-identical to a Tina-free Astro app.
 
 ## 4. Data loaders — wrap every query with `requestWithMetadata`
 
@@ -133,10 +135,12 @@ if (!post.data?.post) {
 }
 const data = post.data.post;
 ---
-<TinaIsland name="post" wrapper={islands.post.wrapper} params={{ slug }}>
+<TinaIsland name="post" wrapper={islands.post.wrapper} params={{ slug }} primary>
   <PostBody data={data} />
 </TinaIsland>
 ```
+
+The `primary` prop marks this as the page's main editable region: the editor opens this form on load rather than landing on the "Referenced Files" list when the page also registers e.g. a global-config form. On `output: 'server'` pages it's optional (the first `requestWithMetadata()` call — the page's own — is treated as primary automatically); on `output: 'static'` pages it's how the bridge knows which island is "the page", so set it there. Mark at most one `<TinaIsland>` per page.
 
 Inside `PostBody.astro`, add `data-tina-field={tinaField(data, 'fieldName')}` to whatever you want click-to-focus on, and use `TinaMarkdown` for rich-text bodies:
 
@@ -222,8 +226,22 @@ For the cleanest type-check experience:
 |---|---|---|
 | Iframe shows page but admin sidebar stays empty | `Sec-Fetch-Dest: iframe` lost on in-iframe link clicks | The `__tina_edit` cookie handles this automatically. If still broken, check DevTools → Application → Cookies for `__tina_edit=1` on the iframe origin. |
 | "Tina Dev server is already in use. Datalayer server is busy on port 9000" | Another `pnpm dev` is running | Kill it, or set a different datalayer port |
-| Admin URL bar updates but new page's forms don't appear | Bridge isn't loading on the new page | Inspect the new page's `<head>` in DevTools — should contain `<div data-tina-form="…" hidden>` and a `<script type="module">` importing `/_tina/bridge.js`. If they're missing, edit-mode detection failed (check the Referer header on the request). |
+| Admin URL bar updates but new page's forms don't appear | Bridge isn't loading on the new page | Inspect the new page's `<head>` in DevTools — should contain `<div data-tina-form="…" hidden>` and a `<script type="module">` importing `/admin/bridge.js`. If they're missing, edit-mode detection failed (check the Referer header on the request). |
+| Visual editing dead on a deployed site, no `data-tina-form` / `bridge.js` in the HTML | Pages are statically built (`output: 'static'`) so the middleware never runs at request time | Either set `output: 'server'`, or wrap editable regions in `<TinaIsland>` (steps 5–7) — see [Static-site editing](#static-site-editing). Without an `<TinaIsland>` somewhere on the page there's nothing to inject the bridge on a static build. |
 | `Type 'X' is not assignable to type 'never'` on `<TinaMarkdown>` | Imported from bare `@tinacms/astro` (which resolves to the placeholder type) | Import from `@tinacms/astro/TinaMarkdown.astro` instead |
+
+## Static-site editing
+
+You can keep `output: 'static'` (pages prerendered, served as flat files) and still edit visually. The middleware only injects the bridge on on-demand-rendered responses, so on a static page that doesn't happen — instead, **`<TinaIsland>` emits a tiny inline `<script>`** that loads `/admin/bridge.js` only when the page is open inside the admin iframe. On boot the bridge fetches each island's `/tina-island/[name]` endpoint (still `prerender = false`, so the adapter renders it on demand) to pick up the page's form payloads, and from there editing behaves exactly as in an SSR project.
+
+To make it work:
+
+- Wrap every editable region in `<TinaIsland>` with a registered island (steps 5–7). This is required for static editing — it's both how regions re-render and how the bridge gets bootstrapped.
+- Mark the page's main region `primary` (`<TinaIsland … primary>`). On a static page the bridge can't otherwise tell which island is "the page", so without this the editor may land on the "Referenced Files" list. One per page.
+- Keep `export const prerender = false` on `src/pages/tina-island/[name].ts`.
+- You still need an SSR adapter; just leave `output` as `'static'` (or set `prerender = false` on only the page routes you want server-rendered).
+
+Trade-off: a page that uses `<TinaIsland>` ships that one-line inline bootstrap in production HTML — it's no longer byte-identical to a Tina-free Astro app. Pages without `<TinaIsland>` are unchanged.
 
 ## Reference
 

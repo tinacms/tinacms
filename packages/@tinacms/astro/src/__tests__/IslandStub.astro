@@ -1,0 +1,8 @@
+---
+// Minimal component for island-route tests — echoes the prop it's given.
+interface Props {
+  value: unknown;
+}
+const { value } = Astro.props;
+---
+<span data-value={JSON.stringify(value)}>stub</span>

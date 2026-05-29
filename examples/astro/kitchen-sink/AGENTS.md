@@ -1,6 +1,6 @@
 # Astro Kitchen-Sink
 
-Astro 5 + React 18 static site with TinaCMS visual editing, block-based pages, rich-text content, and multi-collection schemas. Ships **zero client-side JavaScript in production** — React only hydrates inside the TinaCMS editor iframe via a custom `client:tina` directive.
+Astro 6 + React 18 static site with TinaCMS visual editing, block-based pages, rich-text content, and multi-collection schemas. Ships **zero client-side JavaScript in production** — React only hydrates inside the TinaCMS editor iframe via a custom `client:tina` directive.
 
 ## Architecture
 
