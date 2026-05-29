@@ -20,10 +20,6 @@ import { FormBreadcrumbs } from '@toolkit/react-sidebar/components/sidebar-body'
 import { FaLock, FaUnlock } from 'react-icons/fa';
 import { TinaAdminApi } from '../api';
 import { ErrorDialog } from '../components/ErrorDialog';
-import {
-  UnsavedChangesDialog,
-  isBackWarningDismissed,
-} from '../components/UnsavedChangesDialog';
 import { BackButton } from '../components/BackButton';
 import GetCMS from '../components/GetCMS';
 import GetCollection from '../components/GetCollection';
@@ -156,7 +152,6 @@ export const RenderForm = ({
 }) => {
   const navigate = useNavigate();
   const [formIsPristine, setFormIsPristine] = useState(true);
-  const [showWarning, setShowWarning] = useState(false);
   const schema: TinaSchema | undefined = cms.api.tina.schema;
 
   // the schema is being passed in from the frontend so we can use that
@@ -365,26 +360,14 @@ export const RenderForm = ({
     folder.fullyQualifiedName ? `/${folder.fullyQualifiedName}` : ''
   }`;
 
-  const handleBack = () => {
-    if (isBackWarningDismissed()) {
-      navigate(collectionListPath);
-    } else {
-      setShowWarning(true);
-    }
-  };
-
   return (
     <PageWrapper headerClassName='bg-white'>
       <>
-        <UnsavedChangesDialog
-          open={showWarning}
-          onDismiss={() => setShowWarning(false)}
-        />
         <div
           className={`py-4 px-6 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center`}
         >
           <div className='w-full flex gap-1.5 justify-between items-center'>
-            <BackButton onClick={handleBack} />
+            <BackButton onClick={() => navigate(collectionListPath)} />
             <FormBreadcrumbs
               className='w-[calc(100%-3rem)]'
               rootBreadcrumbName='Create New'

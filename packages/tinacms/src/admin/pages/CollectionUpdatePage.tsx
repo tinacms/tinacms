@@ -12,10 +12,6 @@ import {
 } from '@toolkit/react-sidebar/components/sidebar-body';
 import React, { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import {
-  UnsavedChangesDialog,
-  isBackWarningDismissed,
-} from '../components/UnsavedChangesDialog';
 import { BackButton } from '../components/BackButton';
 import { TinaAdminApi } from '../api';
 import { ErrorDialog } from '../components/ErrorDialog';
@@ -111,20 +107,11 @@ const RenderForm = ({
   const navigate = useNavigate();
   const folder = useCollectionFolder();
   const [formIsPristine, setFormIsPristine] = useState(true);
-  const [showWarning, setShowWarning] = useState(false);
 
   const parent = folder.fullyQualifiedName ? parentFolder(folder) : folder;
   const collectionListPath = `/collections/${collection.name}${
     parent.fullyQualifiedName ? `/${parent.fullyQualifiedName}` : ''
   }`;
-
-  const handleBack = () => {
-    if (isBackWarningDismissed()) {
-      navigate(collectionListPath);
-    } else {
-      setShowWarning(true);
-    }
-  };
   const schema: TinaSchema | undefined = cms.api.tina.schema;
 
   // the schema is being passed in from the frontend so we can use that
@@ -192,15 +179,11 @@ const RenderForm = ({
 
   return (
     <>
-      <UnsavedChangesDialog
-        open={showWarning}
-        onDismiss={() => setShowWarning(false)}
-      />
       <div
         className={`py-4 px-6 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center`}
       >
         <div className='w-full flex gap-1.5 justify-between items-center'>
-          <BackButton onClick={handleBack} />
+          <BackButton onClick={() => navigate(collectionListPath)} />
           <FormBreadcrumbs
             className='w-[calc(100%-3rem)]'
             rootBreadcrumbName={`${filename}.${collection.format}`}
