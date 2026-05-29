@@ -154,9 +154,7 @@ export class TinaMediaStore implements MediaStore {
       // `Aufforstungsfla%CC%88che.jpg` into content fields.
       const safeName = sanitizeFilename(item.file.name);
       const path = `${
-        directory && directory !== '/'
-          ? `${directory}/${safeName}`
-          : safeName
+        directory && directory !== '/' ? `${directory}/${safeName}` : safeName
       }`;
       const res = await this.api.authProvider.fetchWithToken(
         `${this.url}/upload_url/${path}${branchQuery}`,

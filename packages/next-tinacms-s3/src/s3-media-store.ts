@@ -43,9 +43,7 @@ export class S3MediaStore implements MediaStore {
       // value persisted into content all agree.
       const safeName = sanitizeFilename(item.file.name);
       const path = `${
-        directory && directory !== '/'
-          ? `${directory}/${safeName}`
-          : safeName
+        directory && directory !== '/' ? `${directory}/${safeName}` : safeName
       }`;
 
       const res = await this.fetchWithBasePath(
