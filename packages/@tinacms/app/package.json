@@ -3,10 +3,16 @@
 	"version": "2.5.1",
 	"main": "src/main.tsx",
 	"license": "Apache-2.0",
+	"scripts": {
+		"test": "vitest run",
+		"test-watch": "vitest"
+	},
 	"devDependencies": {
 		"@types/react": "^18.3.18",
 		"@types/react-dom": "catalog:",
-		"typescript": "^5.7.3"
+		"typescript": "^5.7.3",
+		"vite": "^5.4.14",
+		"vitest": "^2.1.9"
 	},
 	"peerDependencies": {
 		"react": ">=18.3.1 <20.0.0",
