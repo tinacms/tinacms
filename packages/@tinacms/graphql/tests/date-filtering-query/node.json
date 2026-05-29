@@ -22,6 +22,13 @@
       "edges": [
         {
           "node": {
+            "id": "movies/movie-delta.md",
+            "title": "Movie Delta",
+            "releaseDate": "1985-12-05T07:00:00.000Z"
+          }
+        },
+        {
+          "node": {
             "id": "movies/movie-alpha.md",
             "title": "Movie Alpha",
             "releaseDate": "2019-06-15T07:00:00.000Z"
