@@ -34,4 +34,3 @@ export const normalizeHeadingLevels = (
   }
   return Array.from(seen);
 };
-
