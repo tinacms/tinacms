@@ -143,7 +143,7 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
 export default function FixedToolbarButtons() {
   const toolbarRef = React.useRef(null);
   const [itemsShown, setItemsShown] = React.useState(11);
-  const { overrides, templates } = useToolbarContext();
+  const { overrides, templates, parserType } = useToolbarContext();
   const showEmbedButton = templates.length > 0;
 
   let items = [];
@@ -166,6 +166,10 @@ export default function FixedToolbarButtons() {
 
   if (!showEmbedButton) {
     items = items.filter((item) => item.label !== toolbarItems.embed.label);
+  }
+
+  if (parserType === 'markdown') {
+    items = items.filter((item) => item.label !== toolbarItems.highlight.label);
   }
 
   const editorState = useEditorState();
