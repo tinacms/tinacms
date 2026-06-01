@@ -1,23 +1,43 @@
+import crypto from 'crypto';
 import path from 'path';
 import fs from 'fs-extra';
 import { TinaField } from '@tinacms/schema-tools';
 import { format } from 'prettier';
 import TsParser from 'prettier/parser-typescript.js';
-import { stringifyLabelWithField } from '..';
+import { stringifyLabelWithField } from './naming';
+
+/**
+ * Internal marker used to smuggle generated code expressions through the
+ * `JSON.stringify` pass and back out as un-quoted source.
+ *
+ * The delimiters embed a per-process random nonce. Field arrays passed to
+ * `addVariablesToCode` mix internally generated markers with user-authored
+ * Forestry content (labels, names, option values, ...) that flows through the
+ * same `JSON.stringify` call. Without the nonce, a user-supplied string could
+ * reproduce the marker and have its contents emitted as executable code. The
+ * nonce is unguessable, so only the generator can produce a marker the
+ * un-quoter will act on.
+ *
+ * Hex contains no JSON- or RegExp-special characters, so the marker survives
+ * `JSON.stringify` byte-for-byte and needs no escaping when built into the
+ * RegExp. It only has to be stable within a single migration run (markers are
+ * stripped before the file is written), so a per-process value is sufficient.
+ */
+const INTERNAL_NONCE = crypto.randomBytes(16).toString('hex');
+const MARKER_OPEN = `__TINA_INTERNAL_${INTERNAL_NONCE}__:::`;
+const MARKER_CLOSE = `:::__TINA_INTERNAL_${INTERNAL_NONCE}__`;
+const MARKER_REGEX = new RegExp(`"${MARKER_OPEN}(.*?)${MARKER_CLOSE}"`, 'g');
 
 /**
  * This function is used to replace the internal code with the actual code
  *
  * EX:
- *  __TINA_INTERNAL__:::...fields::: => ...fields
+ *  <marker>...fields()<marker> => ...fields()
  *
- * or __TINA_INTERNAL__:::fields::: => fields
+ * or <marker>fields()<marker> => fields()
  */
 export const addVariablesToCode = (codeWithTinaPrefix: string) => {
-  const code = codeWithTinaPrefix.replace(
-    /"__TINA_INTERNAL__:::(.*?):::"/g,
-    '$1'
-  );
+  const code = codeWithTinaPrefix.replace(MARKER_REGEX, '$1');
   return { code };
 };
 
@@ -46,10 +66,10 @@ export const makeFieldsWithInternalCode = ({
       bodyField: unknown;
     }) => {
   if (hasBody) {
-    return [bodyField, `__TINA_INTERNAL__:::...${field}():::`];
+    return [bodyField, `${MARKER_OPEN}...${field}()${MARKER_CLOSE}`];
   } else {
-    if (spread) return `__TINA_INTERNAL__:::...${field}():::`;
-    return `__TINA_INTERNAL__:::${field}():::`;
+    if (spread) return `${MARKER_OPEN}...${field}()${MARKER_CLOSE}`;
+    return `${MARKER_OPEN}${field}()${MARKER_CLOSE}`;
   }
 };
 

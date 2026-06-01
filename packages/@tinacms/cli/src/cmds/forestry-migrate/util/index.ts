@@ -6,7 +6,7 @@ import type { TinaField, Template } from '@tinacms/schema-tools';
 import { logger } from '../../../logger';
 import { warnText } from '../../../utils/theme';
 import { ErrorSingleton } from './errorSingleton';
-import { stringifyLabelWithField } from '..';
+import { stringifyLabelWithField } from './naming';
 import { makeFieldsWithInternalCode } from './codeTransformer';
 
 const errorSingletonInstance = ErrorSingleton.getInstance();
