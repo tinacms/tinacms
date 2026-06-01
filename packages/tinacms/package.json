@@ -146,7 +146,7 @@
     "identity-obj-proxy": "catalog:",
     "jest-file-snapshot": "^0.7.0",
     "lowlight": "catalog:",
-    "next": "14.2.35",
+    "next": "15.5.18",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-is": "^18.3.1",
@@ -154,7 +154,7 @@
     "tslib": "catalog:",
     "typescript": "^5.7.3",
     "vite": "^5.4.14",
-    "vitest": "^2.1.9"
+    "vitest": "^4.1.0"
   },
   "peerDependencies": {
     "react": ">=16.14.0",

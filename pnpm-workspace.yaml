@@ -118,7 +118,7 @@ catalog:
     async-lock: ^1.4.1
     auto-bind: ^4.0.0
     autoprefixer: ^10.4.20
-    axios: 1.7.5
+    axios: 1.16.0
     body-parser: ^1.20.3
     busboy: ^1.6.0
     c8: ^7.14.0
@@ -225,7 +225,7 @@ catalog:
     tsc-alias: ^1.8.10
     tslib: ^2.8.1
     tsup: ^8.3.6
-    turbo: ^2.5.3
+    turbo: ^2.9.14
     typanion: 3.13.0
     typedoc: ^0.26.11
     typedoc-plugin-markdown: ^3.17.1
