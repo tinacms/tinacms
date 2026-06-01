@@ -9,4 +9,4 @@
 // The `server` proxy's types are inferred via `import type` from each plugin's
 // server segment exports; no codegen step. See ADR-007.
 
-export {}
+export {};

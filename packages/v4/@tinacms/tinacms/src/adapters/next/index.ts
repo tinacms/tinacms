@@ -4,4 +4,4 @@
 // Intended exports:
 //   mountHandler(config) → { GET, POST }   for app/api/tina/[...slug]/route.ts
 
-export {}
+export {};

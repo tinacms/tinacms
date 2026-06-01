@@ -4,4 +4,4 @@
 // Intended exports:
 //   tinaMiddleware(config) → RequestHandler
 
-export {}
+export {};

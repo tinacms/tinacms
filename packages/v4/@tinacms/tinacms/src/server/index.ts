@@ -9,4 +9,4 @@
 //   use<C extends Capability>(capability) — server→server in-process accessor
 //   mountHandler         — internal; consumed by adapters under ./adapters/*
 
-export {}
+export {};

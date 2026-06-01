@@ -4,4 +4,4 @@
 // Intended exports:
 //   tinaRoute(config) → Hono — mountable via `app.route('/api/tina', tinaRoute(config))`
 
-export {}
+export {};

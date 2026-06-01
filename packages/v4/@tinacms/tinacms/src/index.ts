@@ -8,4 +8,4 @@
 //
 // Implementation lives in ./core.
 
-export {}
+export {};
