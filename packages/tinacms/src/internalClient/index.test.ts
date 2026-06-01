@@ -806,5 +806,34 @@ describe('Tina Client', () => {
       expect(fetchWithToken).toHaveBeenCalledTimes(4);
       expect(warnSpy).toHaveBeenCalledOnce();
     });
+
+    it('times out after the 15-minute cap with a wait-before-retrying message', async () => {
+      // POST starts the workflow; every poll stays in-progress so we hit the cap.
+      fetchWithToken.mockResolvedValueOnce(
+        makeResponse({ status: 200, body: { requestId: 'req-123' } })
+      );
+      fetchWithToken.mockResolvedValue(
+        makeResponse({
+          status: 202,
+          body: {
+            status: EDITORIAL_WORKFLOW_STATUS.INDEXING,
+            message: 'Indexing...',
+          },
+        })
+      );
+
+      const promise = client.executeEditorialWorkflow({
+        branchName: 'feature/test',
+        baseBranch: 'main',
+      });
+      const rejection = expect(promise).rejects.toThrow(
+        /timed out after 15 minutes.*wait before retrying/i
+      );
+
+      // Drive the full 15-minute cap (180 polls x 5s).
+      await vi.advanceTimersByTimeAsync(180 * 5000);
+
+      await rejection;
+    });
   });
 });

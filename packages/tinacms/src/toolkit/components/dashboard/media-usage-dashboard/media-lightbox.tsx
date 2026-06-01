@@ -17,15 +17,16 @@ export const MediaLightbox = ({
   item: MediaUsage | null;
   onClose: () => void;
 }) => {
+  useEffect(() => {
+    if (!item) return;
+    captureEvent(MediaUsageDashboardPreviewOpenedEvent);
+  }, [item]);
+
   if (!item) return null;
 
   const usageCount = item.usedIn.length;
   const mediaSrc = item.media.src;
   const directory = item.media.directory || '/';
-
-  useEffect(() => {
-    captureEvent(MediaUsageDashboardPreviewOpenedEvent);
-  }, []);
 
   return (
     <Dialog open onOpenChange={(isOpen) => !isOpen && onClose()}>

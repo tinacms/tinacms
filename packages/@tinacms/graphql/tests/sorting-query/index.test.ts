@@ -42,6 +42,39 @@ it('handles single and multi-field sorting operations', async () => {
   await expect(format(result)).toMatchFileSnapshot('node.json');
 });
 
+it('sorts dates correctly including pre-1970 and across digit boundaries', async () => {
+  const { get } = await setup(__dirname, config);
+  const result = await get({
+    query: `query {
+      movieConnection(sort: "releaseDate") {
+        edges {
+          node {
+            id
+            title
+            releaseDate
+          }
+        }
+      }
+    }`,
+    variables: {},
+  });
+
+  expect(result.errors).toBeUndefined();
+  const edges = result.data!.movieConnection.edges;
+  const dates = edges.map((e: any) => new Date(e.node.releaseDate).getTime());
+  for (let i = 1; i < dates.length; i++) {
+    expect(dates[i]).toBeGreaterThanOrEqual(dates[i - 1]);
+  }
+
+  const titles = edges.map((e: any) => e.node.title);
+  // Zeta Movie (1965) must appear first (pre-1970)
+  expect(titles[0]).toBe('Zeta Movie');
+  // Epsilon Movie (2001-09-01) must appear before Delta Movie (2018-05-10)
+  const epsilonIndex = titles.indexOf('Epsilon Movie');
+  const deltaIndex = titles.indexOf('Delta Movie');
+  expect(epsilonIndex).toBeLessThan(deltaIndex);
+});
+
 it('combines sort with filter, returning sorted results from the filtered subset only', async () => {
   const { get } = await setup(__dirname, config);
   const result = await get({

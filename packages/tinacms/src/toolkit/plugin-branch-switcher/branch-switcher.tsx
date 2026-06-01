@@ -36,11 +36,8 @@ type ListState = 'loading' | 'ready' | 'error';
 export const tableHeadingStyle =
   'px-3 py-3 text-left text-xs font-bold text-gray-700 tracking-wider sticky top-0 bg-gray-100 z-20 border-b-2 border-gray-200 ';
 
-export function formatBranchName(str: string): string {
-  const pattern = /[^/\w-]+/g; // regular expression pattern to match invalid special characters
-  const formattedStr = str.replace(pattern, '-'); // remove special characters
-  return formattedStr.toLowerCase();
-}
+import { formatBranchName } from './format-branch-name';
+export { formatBranchName };
 
 export const BranchSwitcher = (props: BranchSwitcherProps) => {
   const cms = useCMS();
