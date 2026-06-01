@@ -5,7 +5,7 @@ import type {
   MediaStore,
   MediaUploadOptions,
 } from 'tinacms';
-import { DEFAULT_MEDIA_UPLOAD_TYPES } from 'tinacms';
+import { DEFAULT_MEDIA_UPLOAD_TYPES, sanitizeFilename } from 'tinacms';
 import { E_UNAUTHORIZED, E_BAD_ROUTE, interpretErrorMessage } from './errors';
 
 export type AzureMediaStoreOptions = {
@@ -27,10 +27,13 @@ export class AzureMediaStore implements MediaStore {
 
     for (const item of media) {
       const { file, directory } = item;
+      // Normalize/sanitize so the name sent to Azure matches the value later
+      // persisted into content fields.
+      const safeName = sanitizeFilename(file.name);
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', file, safeName);
       formData.append('directory', directory);
-      formData.append('filename', file.name);
+      formData.append('filename', safeName);
 
       const res = await this.fetchFunction(this.baseUrl, {
         method: 'POST',

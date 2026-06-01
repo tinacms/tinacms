@@ -44,3 +44,49 @@ export const absoluteImgURL = (str: string) => {
   if (str.startsWith('http')) return str;
   return `${window.location.origin}${str}`;
 };
+
+// Longest base name (excluding extension) we keep. Stays well under the
+// common 255-byte filesystem limit and the 1024-char S3 key limit even after
+// a directory prefix is prepended.
+const MAX_BASENAME_LENGTH = 200;
+
+/**
+ * Normalizes filenames to NFC and replaces characters that are unsafe for
+ * URLs or common filesystems with a hyphen, while preserving the extension.
+ *
+ * Example: `image-a\u0308.jpg` becomes `image-ä.jpg`,
+ * so URLs use `%C3%A4` instead of the decomposed `%CC%88` sequence.
+ */
+export const sanitizeFilename = (filename: string): string => {
+  if (!filename) return 'file';
+
+  const normalized = filename.normalize('NFC');
+  const justName = normalized.split(/[\\/]/).pop() || '';
+
+  const lastDot = justName.lastIndexOf('.');
+  const hasExt = lastDot > 0 && lastDot < justName.length - 1;
+  const rawBase = hasExt ? justName.slice(0, lastDot) : justName;
+  const rawExt = hasExt ? justName.slice(lastDot) : '';
+
+  const clean = (input: string) =>
+    input
+      .replace(/\s+/g, '-')
+      // strip control characters
+      .replace(/[\x00-\x1F\x7F]/g, '')
+      // replace characters that break URLs (#, %, &) or are reserved on
+      // common filesystems (< > : " | ? *) with a hyphen
+      .replace(/[<>:"|?*#%&]/g, '-')
+      // collapse the separator runs the steps above can introduce
+      .replace(/-+/g, '-');
+
+  let base = clean(rawBase).replace(/^[.\-]+|[.\-]+$/g, '');
+  const ext = clean(rawExt);
+
+  if (!base) base = 'file';
+
+  if (base.length > MAX_BASENAME_LENGTH) {
+    base = base.slice(0, MAX_BASENAME_LENGTH).replace(/[.\-]+$/, '') || 'file';
+  }
+
+  return `${base}${ext}`;
+};
