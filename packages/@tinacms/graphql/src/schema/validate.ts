@@ -229,5 +229,24 @@ const validateField = async (
 
   const validField = (await schema.cast(field)) as TinaField<true>;
 
+  assertCheckboxGroupIsList(validField);
+
   return validField;
+};
+
+const assertCheckboxGroupIsList = (field: TinaField<true>) => {
+  if (field.ui?.component === 'checkbox-group' && !field.list) {
+    throw new Error(
+      `Field "${field.name}" uses "checkbox-group" without list: true at ${field.namespace.join(
+        '.'
+      )}. Add list: true or use "select" instead.`
+    );
+  }
+  if (field.type === 'object' || field.type === 'rich-text') {
+    const nested = [
+      ...(field.type === 'object' ? (field.fields ?? []) : []),
+      ...(field.templates ?? []).flatMap((template) => template.fields ?? []),
+    ] as TinaField<true>[];
+    nested.forEach(assertCheckboxGroupIsList);
+  }
 };

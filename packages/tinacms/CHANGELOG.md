@@ -1,5 +1,22 @@
 # tinacms
 
+## 3.8.4
+
+### Patch Changes
+
+- [#6974](https://github.com/tinacms/tinacms/pull/6974) [`c7b366c`](https://github.com/tinacms/tinacms/commit/c7b366c5de66b1a3f086c1f11954225e55430324) Thanks [@JackDevAU](https://github.com/JackDevAU)! - feat: add toolbar override settings "headingLevels" for h1,h2,etc
+  fix: fixes some incorrect react hook calls
+- Updated dependencies [[`c7b366c`](https://github.com/tinacms/tinacms/commit/c7b366c5de66b1a3f086c1f11954225e55430324)]:
+  - @tinacms/schema-tools@2.8.1
+  - @tinacms/search@1.2.17
+  - @tinacms/mdx@2.1.6
+
+## 3.8.3
+
+### Patch Changes
+
+- [#6947](https://github.com/tinacms/tinacms/pull/6947) [`7be8175`](https://github.com/tinacms/tinacms/commit/7be81751a6b93f785d347e759e91f024bb12c452) Thanks [@MirkaJuliet34](https://github.com/MirkaJuliet34)! - Aligned rich text editor typography class names with the actual font used and updated related references.
+
 ## 3.8.2
 
 ### Patch Changes

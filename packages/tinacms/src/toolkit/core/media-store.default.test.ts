@@ -241,6 +241,28 @@ describe('TinaMediaStore — branch query param', () => {
       expect(calledUrl).toContain('/images/a.png');
       expect(calledUrl).not.toContain('branch=');
     });
+
+    it('targets the stored filename verbatim, without re-sanitizing', async () => {
+      // A file already stored under a non-canonical name (e.g. legacy upload or
+      // committed outside Tina). Sanitizing on delete would point at a path that
+      // doesn't exist and the delete would silently fail to remove the file.
+      const { store, fetchWithToken } = buildStore({ branch: 'main' });
+      fetchWithToken.mockResolvedValueOnce(
+        makeJsonResponse(200, { requestId: 'req-1' })
+      );
+
+      const storedName = 'My Photo.png'; // spaces — sanitize() would hyphenate
+      const deletePromise = store.delete({
+        directory: 'images',
+        filename: storedName,
+      } as Media);
+      await vi.advanceTimersByTimeAsync(1100);
+      await deletePromise;
+
+      const calledUrl = fetchWithToken.mock.calls[0][0];
+      expect(calledUrl).toContain(`/images/${storedName}`);
+      expect(calledUrl).not.toContain('My-Photo.png');
+    });
   });
 
   describe('persist()', () => {
@@ -313,6 +335,55 @@ describe('TinaMediaStore — branch query param', () => {
       expect(result[0].src).toBe(
         'https://assets.tina.io/test-client/__staging/feat/x/__file/uploads/llama.png'
       );
+    });
+
+    it('sanitizes the filename so the upload URL matches the canonical (sanitized) entry', async () => {
+      const { store, fetchWithToken } = buildStore({ branch: 'main' });
+      // macOS-style decomposed (NFD) accent + a space — both get normalized.
+      const rawName = 'Cafe\u0301 Photo.png'; // 'e' + combining acute (NFD) + space
+      const sanitized = 'Caf\u00e9-Photo.png'; // precomposed \u00e9 (NFC), space -> hyphen
+
+      fetchWithToken.mockResolvedValueOnce(
+        makeJsonResponse(200, {
+          signedUrl: 'https://s3.example/signed',
+          requestId: 'req-1',
+        })
+      );
+      // The server stores the asset under the sanitized name, so the canonical
+      // listing reports it that way too.
+      fetchWithToken.mockResolvedValueOnce(
+        makeJsonResponse(200, {
+          files: [
+            {
+              filename: sanitized,
+              src: `https://assets.tina.io/test-client/__file/uploads/${sanitized}`,
+            },
+          ],
+          directories: [],
+          cursor: 0,
+        })
+      );
+      stubFetchGlobal(200, {});
+
+      const uploads: MediaUploadOptions[] = [
+        {
+          directory: 'uploads',
+          file: new File(['x'], rawName, { type: 'image/png' }),
+        },
+      ];
+
+      const persistPromise = store.persist(uploads);
+      await vi.advanceTimersByTimeAsync(1100);
+      const result = await persistPromise;
+
+      // Upload URL uses the sanitized name, not the raw NFD/spaced one.
+      const uploadUrl = fetchWithToken.mock.calls[0][0];
+      expect(uploadUrl).toContain(`/upload_url/uploads/${sanitized}`);
+      expect(uploadUrl).not.toContain(rawName);
+
+      // And the uploaded item resolves back to the canonical entry.
+      expect(result).toHaveLength(1);
+      expect(result[0].filename).toBe(sanitized);
     });
 
     it('returns [] when not authenticated, without making upload calls', async () => {
