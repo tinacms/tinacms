@@ -1,5 +1,12 @@
 # @tinacms/schema-tools
 
+## 2.8.1
+
+### Patch Changes
+
+- [#6974](https://github.com/tinacms/tinacms/pull/6974) [`c7b366c`](https://github.com/tinacms/tinacms/commit/c7b366c5de66b1a3f086c1f11954225e55430324) Thanks [@JackDevAU](https://github.com/JackDevAU)! - feat: add toolbar override settings "headingLevels" for h1,h2,etc
+  fix: fixes some incorrect react hook calls
+
 ## 2.8.0
 
 ### Minor Changes
