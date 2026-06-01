@@ -641,8 +641,12 @@ mutation addPendingDocumentMutation(
     requestId: string,
     onStatusUpdate?: (status: EditorialWorkflowStatusUpdate) => void
   ): Promise<EditorialWorkflowResult> {
-    const maxAttempts = 60;
     const pollInterval = 5000;
+    // Cap is sized to cover the server-side worst case: the workflow runs up to
+    // two indexing waits plus branch/commit/PR creation. The previous 5-minute
+    // cap could abandon a still-running workflow, and re-triggering opens a
+    // second (collision-suffixed) branch rather than resuming the first.
+    const maxAttempts = 180; // 15 minutes
     let attempts = 0;
 
     while (attempts < maxAttempts) {
@@ -707,7 +711,11 @@ mutation addPendingDocumentMutation(
       }
     }
 
-    throw new Error('Editorial workflow timed out after 5 minutes');
+    const timeoutMinutes = Math.round((maxAttempts * pollInterval) / 60000);
+    throw new Error(
+      `Editorial workflow timed out after ${timeoutMinutes} minutes. ` +
+        `It may still be completing in the background — please wait before retrying.`
+    );
   }
 
   private toEditorialWorkflowError(
