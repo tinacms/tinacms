@@ -12,8 +12,9 @@ import {
 } from '../react-modals';
 import { FieldLabel } from '@toolkit/fields';
 import { Form } from '@toolkit/forms';
+import { EditorialWorkflowProgressModal } from './editorial-workflow-progress-modal';
+import { checkBaseBranchExists } from './editorial-workflow-utils';
 import { useEditorialWorkflow } from './use-editorial-workflow';
-import { WorkflowProgressIndicator } from './workflow-progress-indicator';
 
 // Format the default branch name by removing content/ prefix and file extension
 const formatDefaultBranchName = (
@@ -67,6 +68,7 @@ export const CreateBranchModal = ({
   );
   const [isBranchGuardChecking, setIsBranchGuardChecking] =
     React.useState(false);
+  const branchGuardAbortRef = React.useRef<AbortController | null>(null);
 
   const {
     isExecuting,
@@ -77,30 +79,38 @@ export const CreateBranchModal = ({
     reset,
   } = useEditorialWorkflow();
 
+  const abortBranchGuard = React.useCallback(() => {
+    branchGuardAbortRef.current?.abort();
+    branchGuardAbortRef.current = null;
+    setIsBranchGuardChecking(false);
+  }, []);
+
+  React.useEffect(() => {
+    return () => {
+      branchGuardAbortRef.current?.abort();
+    };
+  }, []);
+
   const executeEditorialWorkflow = async () => {
+    abortBranchGuard();
+    const abortController = new AbortController();
+    branchGuardAbortRef.current = abortController;
     setIsBranchGuardChecking(true);
 
     const baseBranch = decodeURIComponent(tinaApi.branch);
+    const targetBranch = `tina/${newBranchName}`;
 
-    let baseBranchExists = true;
-    try {
-      console.debug(
-        '[tina:branch-guard] executeEditorialWorkflow: checking base branch:',
-        baseBranch
-      );
-      baseBranchExists = await tinaApi.branchExists(baseBranch);
-    } catch (err) {
-      console.error(
-        '[tina:branch-guard] executeEditorialWorkflow: branchExists threw, failing open:',
-        err
-      );
-    }
-    console.debug(
-      '[tina:branch-guard] executeEditorialWorkflow: base branch exists?',
-      baseBranchExists
+    const baseBranchExists = await checkBaseBranchExists(
+      tinaApi,
+      baseBranch,
+      'executeEditorialWorkflow',
+      abortController.signal
     );
 
+    if (abortController.signal.aborted) return;
+
     if (!baseBranchExists) {
+      abortBranchGuard();
       console.debug(
         '[tina:branch-guard] executeEditorialWorkflow: base branch deleted — handing off'
       );
@@ -111,116 +121,147 @@ export const CreateBranchModal = ({
     setIsBranchGuardChecking(false);
 
     const success = await executeWorkflow({
-      branchName: `tina/${newBranchName}`,
+      branchName: targetBranch,
       baseBranch,
       path,
       values,
       crudType,
       tinaForm,
+      signal: abortController.signal,
     });
+    if (branchGuardAbortRef.current === abortController) {
+      branchGuardAbortRef.current = null;
+    }
 
     if (success) {
       close();
     }
   };
 
-  const renderStateContent = () => {
-    if (isExecuting) {
-      return (
-        <WorkflowProgressIndicator
-          currentStep={currentStep}
-          isExecuting={isExecuting}
-          elapsedTime={elapsedTime}
-        />
-      );
-    } else {
-      return (
-        <div className='max-w-sm'>
-          {errorMessage && (
-            <div className='flex items-center gap-1 text-red-700 py-2 px-3 mb-4 bg-red-50 border border-red-200 rounded'>
-              <BiError className='w-5 h-auto text-red-400 flex-shrink-0' />
-              <span className='text-sm'>
-                <b>Error:</b> {errorMessage}
-              </span>
-            </div>
-          )}
-          <p className='text-lg text-gray-700 font-bold mb-2'>
-            First, let's create a copy
-          </p>
-          <p className='text-sm text-gray-700 mb-4 max-w-sm'>
-            To make changes, you need to create a copy then get it approved and
-            merged for it to go live.
-            <br />
-            <br />
-            <span className='text-gray-500'>Learn more about </span>
-            <a
-              className='underline text-tina-orange-dark font-medium'
-              href='https://tina.io/docs/r/editorial-workflow'
-              target='_blank'
-            >
-              Editorial Workflow
-            </a>
-            .
-          </p>
-          <PrefixedTextField
-            name='new-branch-name'
-            label={'Branch Name'}
-            placeholder='e.g. {{PAGE-NAME}}-updates'
-            value={newBranchName}
-            onChange={(e) => {
-              // reset error state on change
-              reset();
-              setNewBranchName(e.target.value);
-            }}
-          />
-        </div>
-      );
-    }
-  };
+  if (isExecuting) {
+    return (
+      <EditorialWorkflowProgressModal
+        title='Save changes to new branch'
+        currentStep={currentStep}
+        elapsedTime={elapsedTime}
+      />
+    );
+  }
 
+  return (
+    <CreateBranchPromptModal
+      branchName={newBranchName}
+      close={() => {
+        abortBranchGuard();
+        close();
+      }}
+      errorMessage={errorMessage}
+      disabled={newBranchName === '' || isBranchGuardChecking}
+      onBranchNameChange={(value) => {
+        abortBranchGuard();
+        reset();
+        setNewBranchName(value);
+      }}
+      onCreateBranch={executeEditorialWorkflow}
+      onSaveToProtectedBranch={() => {
+        abortBranchGuard();
+        close();
+        safeSubmit();
+      }}
+    />
+  );
+};
+
+export const CreateBranchPromptModal = ({
+  branchName,
+  close,
+  disabled,
+  errorMessage,
+  onBranchNameChange,
+  onCreateBranch,
+  onSaveToProtectedBranch,
+}: {
+  branchName: string;
+  close: () => void;
+  disabled?: boolean;
+  errorMessage?: string;
+  onBranchNameChange: (value: string) => void;
+  onCreateBranch: () => void;
+  onSaveToProtectedBranch: () => void;
+}) => {
   return (
     <Modal className='flex'>
       <PopupModal className='w-auto'>
-        <ModalHeader close={isExecuting ? undefined : close}>
+        <ModalHeader close={close}>
           <div className='flex items-center justify-between w-full'>
             <div className='flex items-center'>Save changes to new branch</div>
           </div>
         </ModalHeader>
-        <ModalBody padded={true}>{renderStateContent()}</ModalBody>
-        {!isExecuting && (
-          <ModalActions align='end'>
-            <Button
-              variant='secondary'
-              className='w-full sm:w-auto'
-              onClick={close}
-            >
-              Cancel
-            </Button>
-            <DropdownButton
-              variant='primary'
-              align='start'
-              className='w-full sm:w-auto'
-              disabled={newBranchName === '' || isBranchGuardChecking}
-              onMainAction={executeEditorialWorkflow}
-              items={[
-                {
-                  label: 'Save to Protected Branch',
-                  onClick: () => {
-                    close();
-                    safeSubmit();
-                  },
-                  icon: <TriangleAlert className='w-4 h-4' />,
-                },
-              ]}
-            >
-              <GitBranchIcon
-                className='w-4 h-4 mr-1'
-                style={{ fill: 'none' }}
-              />
-              Save to a new branch
-            </DropdownButton>
-          </ModalActions>
-        )}
+        <ModalBody padded={true}>
+          <div className='max-w-sm'>
+            {errorMessage && (
+              <div className='flex items-center gap-1 text-red-700 py-2 px-3 mb-4 bg-red-50 border border-red-200 rounded'>
+                <BiError className='w-5 h-auto text-red-400 flex-shrink-0' />
+                <span className='text-sm'>
+                  <b>Error:</b> {errorMessage}
+                </span>
+              </div>
+            )}
+            <p className='text-lg text-gray-700 font-bold mb-2'>
+              First, let's create a copy
+            </p>
+            <p className='text-sm text-gray-700 mb-4 max-w-sm'>
+              To make changes, you need to create a copy then get it approved
+              and merged for it to go live.
+              <br />
+              <br />
+              <span className='text-gray-500'>Learn more about </span>
+              <a
+                className='underline text-tina-orange-dark font-medium'
+                href='https://tina.io/docs/r/editorial-workflow'
+                target='_blank'
+              >
+                Editorial Workflow
+              </a>
+              .
+            </p>
+            <PrefixedTextField
+              name='new-branch-name'
+              label={'Branch Name'}
+              placeholder='e.g. {{PAGE-NAME}}-updates'
+              value={branchName}
+              onChange={(e) => {
+                onBranchNameChange(e.target.value);
+              }}
+            />
+          </div>
+        </ModalBody>
+        <ModalActions align='end'>
+          <Button
+            variant='secondary'
+            className='w-full sm:w-auto'
+            onClick={close}
+          >
+            Cancel
+          </Button>
+          <DropdownButton
+            variant='primary'
+            align='start'
+            className='w-full sm:w-auto'
+            disabled={disabled}
+            onMainAction={onCreateBranch}
+            items={[
+              {
+                label: 'Save to Protected Branch',
+                onClick: onSaveToProtectedBranch,
+                icon: <TriangleAlert className='w-4 h-4' />,
+              },
+            ]}
+          >
+            <GitBranchIcon className='w-4 h-4 mr-1' style={{ fill: 'none' }} />
+            Save to a new branch
+          </DropdownButton>
+        </ModalActions>
       </PopupModal>
     </Modal>
   );

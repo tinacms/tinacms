@@ -71,3 +71,4 @@ export {
   DEFAULT_MEDIA_UPLOAD_TYPES,
   sanitizeFilename,
 } from './components/media';
+export { MediaWorkflowOverlay } from './components/media/media-workflow-overlay';
