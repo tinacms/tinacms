@@ -4,6 +4,7 @@ import {
   makeFieldsWithInternalCode,
   makeTemplateFile,
 } from './codeTransformer';
+import { isForestrySafeString } from './naming';
 
 // Characterization + regression tests for the Forestry-migration code
 // generator. The generator round-trips generated code expressions through a
@@ -86,6 +87,49 @@ describe('addVariablesToCode (code-injection hardening)', () => {
     expect(code).toContain(`"${userControlledLabel}"`);
     // ...and must NOT become a bare identifier assigned to the label key.
     expect(code).not.toMatch(/"label":\s*INJECTED_TOKEN/);
+  });
+});
+
+describe('addVariablesToCode (mixed trusted + untrusted in one pass)', () => {
+  // Mirrors the real `apply.ts` collections path: a single JSON.stringify pass
+  // carries both a generator-produced marker (which must be un-quoted into code)
+  // and a user-controlled label wearing the public sentinel (which must not).
+  it('un-quotes the generator marker but never the user-supplied sentinel', () => {
+    const legitMarker = makeFieldsWithInternalCode({
+      hasBody: false,
+      field: 'heroFields',
+      spread: true,
+    }) as string;
+    const userControlledLabel = '__TINA_INTERNAL__:::INJECTED_TOKEN:::';
+
+    const payload = [
+      legitMarker,
+      { type: 'string', name: 'title', label: userControlledLabel },
+    ];
+
+    const { code } = addVariablesToCode(JSON.stringify(payload, null, 2));
+
+    // Trusted marker becomes bare code...
+    expect(code).toContain('...heroFields()');
+    expect(code).not.toContain('"...heroFields()"');
+    // ...while the untrusted look-alike stays an inert quoted string.
+    expect(code).toContain(`"${userControlledLabel}"`);
+    expect(code).not.toMatch(/"label":\s*INJECTED_TOKEN/);
+  });
+});
+
+describe('isForestrySafeString (defence-in-depth input guard)', () => {
+  it('accepts ordinary single-line names and labels', () => {
+    expect(isForestrySafeString('Title')).toBe(true);
+    expect(isForestrySafeString('Hero Block')).toBe(true);
+    expect(isForestrySafeString('field_name-1')).toBe(true);
+    expect(isForestrySafeString('')).toBe(true);
+  });
+
+  it('rejects NUL bytes and newlines that never occur in real Forestry config', () => {
+    expect(isForestrySafeString('a\x00b')).toBe(false);
+    expect(isForestrySafeString('line1\nline2')).toBe(false);
+    expect(isForestrySafeString('line1\r\nline2')).toBe(false);
   });
 });
 

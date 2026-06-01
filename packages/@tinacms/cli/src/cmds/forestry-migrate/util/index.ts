@@ -6,7 +6,7 @@ import type { TinaField, Template } from '@tinacms/schema-tools';
 import { logger } from '../../../logger';
 import { warnText } from '../../../utils/theme';
 import { ErrorSingleton } from './errorSingleton';
-import { stringifyLabelWithField } from './naming';
+import { isForestrySafeString, stringifyLabelWithField } from './naming';
 import { makeFieldsWithInternalCode } from './codeTransformer';
 
 const errorSingletonInstance = ErrorSingleton.getInstance();
@@ -39,6 +39,14 @@ export const stringifyTemplateName = (name: string, template: string) => {
     return newName;
   }
 };
+// Reject control characters in names/labels at parse time. This is a
+// defence-in-depth guard layered on top of the un-forgeable code-generation
+// marker — it fails the migration closed rather than carrying unexpected
+// bytes into the generated source.
+const forestrySafeString = z.string().refine(isForestrySafeString, {
+  message: 'Forestry name/label contains an unexpected control character',
+});
+
 // A zod schema for the information we need from the .forestry/settings.yml file
 const forestryConfigSchema = z.object({
   sections: z.array(
@@ -84,8 +92,8 @@ const forestryFieldWithoutField = z.object({
     z.literal('color'),
   ]),
   template_types: z.array(z.string()).optional().nullable(),
-  name: z.string(),
-  label: z.string(),
+  name: forestrySafeString,
+  label: forestrySafeString,
   default: z.any().optional(),
   template: z.string().optional(),
   config: z
@@ -130,7 +138,7 @@ const forestryField: z.ZodType<ForestryFieldType> = z.lazy(() =>
 );
 
 const FrontmatterTemplateSchema = z.object({
-  label: z.string(),
+  label: forestrySafeString,
   hide_body: z.boolean().optional(),
   fields: z.array(forestryField).optional(),
 });

@@ -13,3 +13,10 @@ export const stringifyLabelWithField = (label: string) => {
   const labelString = stringifyLabel(label);
   return `${labelString}Fields`;
 };
+
+// Forestry field/template names and labels are single-line plain text.
+// Control characters (NUL, carriage return, newline) never appear in
+// legitimate Forestry config, so callers reject them at parse time as a
+// defence-in-depth guard on the generated source.
+export const isForestrySafeString = (value: string) =>
+  !/[\x00\r\n]/.test(value);
