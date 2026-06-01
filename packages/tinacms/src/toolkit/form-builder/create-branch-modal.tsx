@@ -35,6 +35,8 @@ const formatDefaultBranchName = (
     result = result.slice(0, lastDot);
   }
 
+  result = normalizeBranchSlashes(result);
+
   // Add deletion indicator for delete operations
   if (crudType === 'delete') {
     result = `❌-${result}`;
@@ -42,6 +44,9 @@ const formatDefaultBranchName = (
 
   return result;
 };
+
+const normalizeBranchSlashes = (name: string): string =>
+  name.split('/').filter(Boolean).join('/');
 
 export const CreateBranchModal = ({
   close,
@@ -111,7 +116,7 @@ export const CreateBranchModal = ({
     setIsBranchGuardChecking(false);
 
     const success = await executeWorkflow({
-      branchName: `tina/${newBranchName}`,
+      branchName: `tina/${normalizeBranchSlashes(newBranchName)}`,
       baseBranch,
       path,
       values,
