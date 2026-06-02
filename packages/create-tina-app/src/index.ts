@@ -527,7 +527,7 @@ export async function run() {
   );
   console.log(
     `  • 💬 Reach out for support: ${TextStyles.link(
-      'https://discord.com/invite/zumN63Ybpf'
+      DISCORD_SUPPORT_URL
     )}`
   );
 }
