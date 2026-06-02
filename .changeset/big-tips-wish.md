@@ -1,5 +1,5 @@
 ---
-"tinacms": patch
+"tinacms": minor
 ---
 
 chore: remove deprecated code
