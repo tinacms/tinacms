@@ -530,6 +530,11 @@ export async function run() {
       'https://tina.io/docs/r/what-is-tinacloud'
     )}`
   );
+    console.log(
+    `  • 💬 Reach out for support: ${TextStyles.link(
+      'https://discord.com/invite/zumN63Ybpf'
+    )}`
+  );
 }
 
 run()
