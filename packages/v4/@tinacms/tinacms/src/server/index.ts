@@ -2,7 +2,7 @@
 // Imported by plugin server segments and by per-framework adapters.
 // Never reaches the browser bundle.
 //
-// Intended exports (see ../../../tinacmsv4/api/internal-apis.md#server-segment):
+// Intended exports (see https://github.com/tinacms/tinacmsv4-docs/blob/main/api/internal-apis.md#server-segment):
 //   defineServerPlugin   — declare a plugin's server-side operations
 //   protectedOp          — wrap an op to require a Permission
 //   publicOp             — greppable opt-out for unauthenticated endpoints (ADR-008)

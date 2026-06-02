@@ -3,7 +3,7 @@
   "version": "4.0.0-alpha.0",
   "private": true,
   "license": "Apache-2.0",
-  "description": "TinaCMS v4 — plugin-driven, git-native CMS. Single-package rewrite (see ../../../../tinacmsv4 for the architecture spec).",
+  "description": "TinaCMS v4 — plugin-driven, git-native CMS. Single-package rewrite (architecture spec: https://github.com/tinacms/tinacmsv4-docs).",
   "type": "module",
   "repository": {
     "url": "https://github.com/tinacms/tinacms.git",

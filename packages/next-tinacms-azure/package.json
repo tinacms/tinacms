@@ -2,6 +2,7 @@
   "name": "next-tinacms-azure",
   "type": "module",
   "version": "13.0.4",
+  "deprecated": "Moving to github.com/tinacms/tinacms-azure as @tinacms/azure-blob (framework-neutral; not Next-only). See packages/v4/INTEGRATIONS.md.",
   "description": "",
   "main": "dist/index.js",
   "module": "./dist/index.js",

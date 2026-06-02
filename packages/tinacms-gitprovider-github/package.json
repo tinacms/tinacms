@@ -2,6 +2,7 @@
 	"name": "tinacms-gitprovider-github",
 	"type": "module",
 	"version": "4.1.10",
+	"deprecated": "Converting to a v4 plugin at github.com/tinacms/tinacms-gitprovider-github as @tinacms/gitprovider-github. See packages/v4/INTEGRATIONS.md.",
 	"main": "dist/index.js",
 	"module": "./dist/index.js",
 	"files": [

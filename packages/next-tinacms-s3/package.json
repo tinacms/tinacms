@@ -2,6 +2,7 @@
   "name": "next-tinacms-s3",
   "type": "module",
   "version": "22.0.4",
+  "deprecated": "Moving to github.com/tinacms/tinacms-s3 as @tinacms/s3 (framework-neutral; not Next-only). See packages/v4/INTEGRATIONS.md.",
   "main": "dist/index.js",
   "module": "./dist/index.js",
   "files": [

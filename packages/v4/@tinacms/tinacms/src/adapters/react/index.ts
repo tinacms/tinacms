@@ -2,7 +2,7 @@
 // Imported by the Admin UI host and by plugin client segments.
 // Sibling server-side adapters (next/express/astro/hono) must NOT be imported from here.
 //
-// Intended exports (see ../../../../tinacmsv4/api/public-api.md#react-api-tinacmsreact):
+// Intended exports (see https://github.com/tinacms/tinacmsv4-docs/blob/main/api/public-api.md#react-api-tinacmsreact):
 //   TinaProvider, useTinaStore, useHasPermission
 //   Address-keyed Form hooks (ADR-010):
 //     useFieldAddress, useFieldValue, useFieldErrors, useFieldActivation,

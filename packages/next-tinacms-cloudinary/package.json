@@ -2,6 +2,7 @@
   "name": "next-tinacms-cloudinary",
   "type": "module",
   "version": "25.0.4",
+  "deprecated": "Moving to github.com/tinacms/tinacms-cloudinary as @tinacms/cloudinary (framework-neutral; not Next-only). See packages/v4/INTEGRATIONS.md.",
   "main": "dist/index.js",
   "module": "./dist/index.js",
   "files": [

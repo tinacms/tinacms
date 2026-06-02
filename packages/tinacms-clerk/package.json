@@ -2,6 +2,7 @@
 	"name": "tinacms-clerk",
 	"type": "module",
 	"version": "22.0.4",
+	"deprecated": "Moving to github.com/tinacms/tinacms-clerk as @tinacms/clerk (framework-neutral). See packages/v4/INTEGRATIONS.md.",
 	"main": "dist/index.js",
 	"module": "./dist/index.js",
 	"files": [

@@ -2,6 +2,7 @@
   "name": "tinacms-authjs",
   "type": "module",
   "version": "22.0.4",
+  "deprecated": "Moving to github.com/tinacms/tinacms-authjs as @tinacms/authjs (framework-neutral). See packages/v4/INTEGRATIONS.md.",
   "main": "dist/index.js",
   "module": "./dist/index.js",
   "files": [

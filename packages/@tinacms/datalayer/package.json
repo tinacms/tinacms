@@ -2,6 +2,7 @@
 	"name": "@tinacms/datalayer",
 	"type": "module",
 	"version": "2.0.23",
+	"deprecated": "Deprecated in v4 — folded into @tinacms/tinacms (store/local-content plugin) and the cross-repo Level adapters. See packages/v4/DEPRECATIONS.md.",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"files": [

@@ -2,6 +2,7 @@
 	"name": "@tinacms/vercel-previews",
 	"type": "module",
 	"version": "0.2.11",
+	"deprecated": "Deprecated in v4 — preview wiring folds into @tinacms/bridge. See packages/v4/DEPRECATIONS.md.",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"keywords": [

@@ -2,6 +2,7 @@
   "name": "next-tinacms-dos",
   "type": "module",
   "version": "22.0.4",
+  "deprecated": "Moving to github.com/tinacms/tinacms-dos as @tinacms/digitalocean-spaces (framework-neutral; not Next-only). See packages/v4/INTEGRATIONS.md.",
   "main": "dist/index.js",
   "module": "./dist/index.js",
   "files": [

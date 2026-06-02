@@ -1,6 +1,7 @@
 {
 	"name": "@tinacms/webpack-helpers",
 	"version": "1.0.5",
+	"deprecated": "Deprecated and removed in v4 — supported adapters (next, astro, express, hono) do not require webpack-specific helpers. See packages/v4/DEPRECATIONS.md.",
 	"license": "Apache-2.0",
 	"main": "index.js",
 	"repository": {
