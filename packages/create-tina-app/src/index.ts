@@ -526,9 +526,7 @@ export async function run() {
     )}`
   );
   console.log(
-    `  • 💬 Reach out for support: ${TextStyles.link(
-      DISCORD_SUPPORT_URL
-    )}`
+    `  • 💬 Reach out for support: ${TextStyles.link(DISCORD_SUPPORT_URL)}`
   );
 }
 
