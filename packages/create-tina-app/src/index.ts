@@ -35,6 +35,8 @@ import {
 import fetchPostHogConfig from './util/fetchPosthogConfig';
 import { osInfo as getOsSystemInfo } from 'systeminformation';
 
+const DISCORD_SUPPORT_URL = 'https://discord.com/invite/zumN63Ybpf';
+
 let posthogClient: PostHog | null = null;
 async function initializePostHog(
   configEndpoint?: string,
@@ -148,6 +150,23 @@ export async function run() {
   const spinner = ora();
   preRunChecks(spinner);
 
+  // Surface a fatal failure: show the message with a support link, record
+  // telemetry, then exit. Centralizes the support pointer so it lives in one place.
+  const fatalExit = async (
+    message: string,
+    error: Error,
+    context: Parameters<typeof postHogCaptureError>[4]
+  ): Promise<never> => {
+    spinner.fail(
+      `${message}\n\nNeed more help? Reach out to the TinaCMS community at ${TextStyles.link(
+        DISCORD_SUPPORT_URL
+      )}`
+    );
+    postHogCaptureError(posthogClient, userId, sessionId, error, context);
+    if (posthogClient) await posthogClient.shutdown();
+    exit(1);
+  };
+
   // posthog client should only be initialized once telemetry is confirmed to be enabled, if null then telemetry cannot be sent
   postHogCapture(
     posthogClient,
@@ -161,17 +180,12 @@ export async function run() {
   if (opts.template) {
     template = TEMPLATES.find((_template) => _template.value === opts.template);
     if (!template) {
-      spinner.fail(
+      await fatalExit(
         `The provided template '${
           opts.template
         }' is invalid. Please provide one of the following: ${TEMPLATES.map(
           (x) => x.value
-        )}`
-      );
-      postHogCaptureError(
-        posthogClient,
-        userId,
-        sessionId,
+        )}`,
         new Error(`Invalid template: ${opts.template}`),
         {
           errorCode: ERROR_CODES.ERR_VAL_INVALID_TEMPLATE,
@@ -181,18 +195,14 @@ export async function run() {
           additionalProperties: { ...telemetryData },
         }
       );
-      if (posthogClient) await posthogClient.shutdown();
-      exit(1);
     }
   }
 
   let pkgManager = opts.pkgManager;
   if (pkgManager) {
     if (!PKG_MANAGERS.find((_pkgManager) => _pkgManager === pkgManager)) {
-      postHogCaptureError(
-        posthogClient,
-        userId,
-        sessionId,
+      await fatalExit(
+        `The provided package manager '${opts.pkgManager}' is not supported. Please provide one of the following: ${PKG_MANAGERS}`,
         new Error(`Invalid package manager: ${opts.pkgManager}`),
         {
           errorCode: ERROR_CODES.ERR_VAL_INVALID_PKG_MANAGER,
@@ -202,23 +212,13 @@ export async function run() {
           additionalProperties: { ...telemetryData },
         }
       );
-      if (posthogClient) await posthogClient.shutdown();
-      spinner.fail(
-        `The provided package manager '${opts.pkgManager}' is not supported. Please provide one of the following: ${PKG_MANAGERS}`
-      );
-      exit(1);
     }
   }
 
   if (!pkgManager) {
     if (installedPkgManagers.length === 0) {
-      spinner.fail(
-        `You have no supported package managers installed. Please install one of the following: ${PKG_MANAGERS}`
-      );
-      postHogCaptureError(
-        posthogClient,
-        userId,
-        sessionId,
+      await fatalExit(
+        `You have no supported package managers installed. Please install one of the following: ${PKG_MANAGERS}`,
         new Error('No supported package managers installed'),
         {
           errorCode: ERROR_CODES.ERR_VAL_NO_PKG_MANAGERS,
@@ -228,8 +228,6 @@ export async function run() {
           additionalProperties: telemetryData,
         }
       );
-      if (posthogClient) await posthogClient.shutdown();
-      exit(1);
     }
 
     const res = await prompts({
@@ -329,10 +327,20 @@ export async function run() {
     if (opts.theme) {
       const validThemes = THEMES.map((t) => t.value);
       if (!validThemes.includes(opts.theme)) {
-        console.error(
-          `Invalid theme "${opts.theme}". Valid options are: ${validThemes.join(', ')}`
+        await fatalExit(
+          `Invalid theme "${opts.theme}". Valid options are: ${validThemes.join(', ')}`,
+          new Error(`Invalid theme: ${opts.theme}`),
+          {
+            errorCode: ERROR_CODES.ERR_VAL_INVALID_THEME,
+            errorCategory: 'validation',
+            step: TRACKING_STEPS.THEME_SELECT,
+            fatal: true,
+            additionalProperties: {
+              ...telemetryData,
+              template: template.value,
+            },
+          }
         );
-        exit(1);
       }
       themeChoice = opts.theme;
     } else {
@@ -368,13 +376,8 @@ export async function run() {
 
   const rootDir = path.join(process.cwd(), projectName);
   if (!(await isWriteable(path.dirname(rootDir)))) {
-    spinner.fail(
-      'The application path is not writable, please check folder permissions and try again. It is likely you do not have write permissions for this folder.'
-    );
-    postHogCaptureError(
-      posthogClient,
-      userId,
-      sessionId,
+    await fatalExit(
+      'The application path is not writable, please check folder permissions and try again. It is likely you do not have write permissions for this folder.',
       new Error('Directory not writable'),
       {
         errorCode: ERROR_CODES.ERR_FS_NOT_WRITABLE,
@@ -384,8 +387,6 @@ export async function run() {
         additionalProperties: { ...telemetryData },
       }
     );
-    if (posthogClient) await posthogClient.shutdown();
-    process.exit(1);
   }
 
   let appName: string;
@@ -394,16 +395,13 @@ export async function run() {
     telemetryData['app-name'] = appName;
   } catch (err) {
     const error = err as Error;
-    spinner.fail(error.message);
-    postHogCaptureError(posthogClient, userId, sessionId, error, {
+    await fatalExit(error.message, error, {
       errorCode: ERROR_CODES.ERR_FS_MKDIR_FAILED,
       errorCategory: 'filesystem',
       step: TRACKING_STEPS.DIRECTORY_SETUP,
       fatal: true,
       additionalProperties: { ...telemetryData },
     });
-    if (posthogClient) await posthogClient.shutdown();
-    exit(1);
   }
 
   try {
@@ -428,16 +426,13 @@ export async function run() {
     spinner.succeed();
   } catch (err) {
     const error = err as Error;
-    spinner.fail(`Failed to download template: ${error.message}`);
-    postHogCaptureError(posthogClient, userId, sessionId, error, {
+    await fatalExit(`Failed to download template: ${error.message}`, error, {
       errorCode: ERROR_CODES.ERR_TPL_DOWNLOAD_FAILED,
       errorCategory: 'template',
       step: TRACKING_STEPS.DOWNLOADING_TEMPLATE,
       fatal: true,
       additionalProperties: { ...telemetryData },
     });
-    if (posthogClient) await posthogClient.shutdown();
-    exit(1);
   }
 
   spinner.start('Installing packages.');
@@ -530,7 +525,7 @@ export async function run() {
       'https://tina.io/docs/r/what-is-tinacloud'
     )}`
   );
-    console.log(
+  console.log(
     `  • 💬 Reach out for support: ${TextStyles.link(
       'https://discord.com/invite/zumN63Ybpf'
     )}`
@@ -544,6 +539,11 @@ run()
     }
 
     console.error('Error running create-tina-app:', error);
+    console.error(
+      `\nNeed more help? Reach out to the TinaCMS community at ${TextStyles.link(
+        DISCORD_SUPPORT_URL
+      )}`
+    );
 
     // Generate identifiers for error tracking if not already available
     const sessionId = generateSessionId();
