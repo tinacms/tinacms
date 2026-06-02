@@ -540,7 +540,7 @@ run()
 
     console.error('Error running create-tina-app:', error);
     console.error(
-      `\nNeed more help? Reach out to the TinaCMS community at ${TextStyles.link(
+      `\n💬 Need more help? Reach out to the TinaCMS community at ${TextStyles.link(
         DISCORD_SUPPORT_URL
       )}`
     );
