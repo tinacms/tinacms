@@ -8,20 +8,19 @@ import { Ora } from 'ora';
 // must declare its own supported versions — the repo root isn't available at
 // runtime.
 function getSupportedMajors(): number[] {
+  // The published CLI runs from the bundled dist/index.js, so ../package.json
+  // resolves to this package's own package.json.
   const here = dirname(fileURLToPath(import.meta.url));
-  // bundled: dist/index.js -> ../package.json ; source: src/util -> ../../package.json
-  for (const rel of ['../package.json', '../../package.json']) {
-    try {
-      const { engines } = JSON.parse(readFileSync(join(here, rel), 'utf8'));
-      const majors = [...String(engines?.node ?? '').matchAll(/(\d+)\.x/g)].map(
-        (m) => Number(m[1])
-      );
-      if (majors.length) return majors;
-    } catch {
-      // try the next candidate path
-    }
+  try {
+    const { engines } = JSON.parse(
+      readFileSync(join(here, '../package.json'), 'utf8')
+    );
+    return [...String(engines?.node ?? '').matchAll(/(\d+)\.x/g)].map((m) =>
+      Number(m[1])
+    );
+  } catch {
+    return [];
   }
-  return [];
 }
 
 export function preRunChecks(spinner: Ora) {
