@@ -91,6 +91,27 @@ Note: `.tsx` collection files contain JSX for custom field components (e.g., Col
 | Styling | Tailwind CSS 4 (CSS-first config) |
 | TypeScript | 5.7+ strict (extends `base.tsconfig.json`) |
 
+## Filing Issues
+
+Bug reports go through the same checklist whether they land via Discord `#ask-for-help`, the GitHub issue form, or an agent calling `gh api`. The canonical source is `.github/ISSUE_TEMPLATE/bug-report.yml`, mirrored in the Discord post guidelines and at https://tina.io/docs/contributing/bug-reports.
+
+**Required H3 sections** (use these exact headings when formatting an issue body programmatically):
+
+- `### The exact error message` — copy-pasted literal string, not paraphrased
+- `### Steps to reproduce` — what the user clicked, in order
+- `### What you expected vs. what actually happened`
+- `### Your environment` — versions, framework, **and anything non-default** (custom MediaStore, custom auth, self-hosted setup, etc.)
+
+**Optional but encouraged:**
+
+- `### A way for us to reproduce` — link to a minimal repro repo
+- `### Relevant sections of your schema file`
+- `### Client ID` — for TinaCloud-related issues
+
+Issues opened with the `bug` label but missing one or more required sections are auto-labeled `needs-template` and commented on by `.github/workflows/validate-issue-template.yml`. If you're an agent (Claude Code, Cursor, ChatGPT, an internal bot like `ssw-yakshaver`) drafting an issue programmatically, format the body with those H3 headings before calling `POST /repos/{owner}/{repo}/issues`.
+
+The non-default-setup detail in `### Your environment` is the field that most often points us straight at the root cause. Do not omit it.
+
 ## Issue Triage & Labels
 
 This repo uses a fixed label taxonomy for backlog organisation. When filing or triaging issues, apply exactly **one primary category label** plus any program/scope labels that apply.
