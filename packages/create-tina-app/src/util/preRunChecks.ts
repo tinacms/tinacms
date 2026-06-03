@@ -4,10 +4,9 @@ import { fileURLToPath } from 'node:url';
 import { Ora } from 'ora';
 
 // Supported Node majors are derived from this package's own `engines.node`
-// (e.g. "22.x || 24.x"), which is the single source of truth kept in sync with
-// the repo root package.json. We can't read the root at runtime — only this
-// package's files ship in the npm tarball — so the value is mirrored here and a
-// CI drift-check guards the two from diverging.
+// (e.g. "22.x || 24.x"). This package is published and run standalone, so it
+// must declare its own supported versions — the repo root isn't available at
+// runtime.
 function getSupportedMajors(): number[] {
   const here = dirname(fileURLToPath(import.meta.url));
   // bundled: dist/index.js -> ../package.json ; source: src/util -> ../../package.json
