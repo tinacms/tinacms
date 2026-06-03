@@ -1,5 +1,15 @@
 # tinacms-cli
 
+## 2.4.3
+
+### Patch Changes
+
+- [#7006](https://github.com/tinacms/tinacms/pull/7006) [`77665ae`](https://github.com/tinacms/tinacms/commit/77665ae73dd4f9563d339535e76fa811a8abdfbb) Thanks [@18-th](https://github.com/18-th)! - Harden Forestry migration code generation against untrusted input
+
+- Updated dependencies [[`a8dd9af`](https://github.com/tinacms/tinacms/commit/a8dd9af056b17a8faeaa621bbf7722a62b396cf8), [`916bd43`](https://github.com/tinacms/tinacms/commit/916bd43de1b563854fac65a74ecf04f946ebda56), [`b9d561f`](https://github.com/tinacms/tinacms/commit/b9d561fcea56185f0f146d2bdb1b510caab180d3)]:
+  - tinacms@3.9.0
+  - @tinacms/app@2.5.3
+
 ## 2.4.2
 
 ### Patch Changes
