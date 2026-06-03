@@ -1,0 +1,63 @@
+name: Validate issue template
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check required template sections
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const required = [
+              '### The exact error message',
+              '### Steps to reproduce',
+              '### What you expected vs. what actually happened',
+              '### Your environment',
+            ];
+            const issue = context.payload.issue;
+            const body = issue.body || '';
+            const isBug = (issue.labels || []).some(l => l.name === 'bug');
+
+            // Only validate issues that look like bugs. The template auto-applies the
+            // `bug` label; programmatic filers without it are probably enhancements / chores.
+            if (!isBug) return;
+
+            const missing = required.filter(h => !body.includes(h));
+            if (missing.length === 0) return;
+
+            const list = missing.map(h => `- \`${h}\``).join('\n');
+            const formUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/issues/new?template=bug-report.yml`;
+            const templateUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/.github/ISSUE_TEMPLATE/bug-report.yml`;
+            const docsUrl = 'https://tina.io/docs/contributing/bug-reports';
+
+            const comment = [
+              `Hi @${issue.user.login} — thanks for filing! 🙏`,
+              '',
+              'This issue is missing the following section(s) that our bug report template asks for:',
+              '',
+              list,
+              '',
+              `If you filed via the [bug report form](${formUrl}), please edit the issue body and fill in the missing fields. If you filed via the API (AI agent or bot), please format the body using the H3 headings shown in the [template definition](${templateUrl}).`,
+              '',
+              `Full guide: ${docsUrl}`,
+            ].join('\n');
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: comment,
+            });
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              labels: ['needs-template'],
+            });
