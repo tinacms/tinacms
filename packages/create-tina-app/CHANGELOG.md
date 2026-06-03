@@ -1,5 +1,11 @@
 # create-tina-app
 
+## 2.1.6
+
+### Patch Changes
+
+- [#7016](https://github.com/tinacms/tinacms/pull/7016) [`f40f6e8`](https://github.com/tinacms/tinacms/commit/f40f6e8d3e0c93184a2e59da7f57d31db0ab49bd) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 💬 Add Support Message and direction to Succeeding + fatally failing runs
+
 ## 2.1.5
 
 ### Patch Changes

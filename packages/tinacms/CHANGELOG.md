@@ -1,5 +1,19 @@
 # tinacms
 
+## 3.9.0
+
+### Minor Changes
+
+- [#7009](https://github.com/tinacms/tinacms/pull/7009) [`a8dd9af`](https://github.com/tinacms/tinacms/commit/a8dd9af056b17a8faeaa621bbf7722a62b396cf8) Thanks [@JackDevAU](https://github.com/JackDevAU)! - chore: remove deprecated code
+
+- [#6902](https://github.com/tinacms/tinacms/pull/6902) [`b9d561f`](https://github.com/tinacms/tinacms/commit/b9d561fcea56185f0f146d2bdb1b510caab180d3) Thanks [@18-th](https://github.com/18-th)! - Support Tina media uploads and deletes in the editorial workflow on protected branches. Media changes now prompt for a branch, write to that branch, switch the editor to it after the media operation succeeds, and continue through indexing and pull request creation with the same workflow progress UI as content edits.
+
+  Editorial workflow pull request titles now replace all dashes in the branch name with spaces for both content and media changes.
+
+### Patch Changes
+
+- [#7010](https://github.com/tinacms/tinacms/pull/7010) [`916bd43`](https://github.com/tinacms/tinacms/commit/916bd43de1b563854fac65a74ecf04f946ebda56) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Remove deprecated GitClient.onSubmit alias
+
 ## 3.8.4
 
 ### Patch Changes
