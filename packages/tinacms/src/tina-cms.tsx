@@ -158,6 +158,13 @@ export const TinaCMSProvider2 = ({
         // @ts-expect-error this is for backwards compatibility
         isLocalClient: props?.isLocalClient,
       };
+  // `isLocal` is baked by the TinaCMS CLI from `TINA_PUBLIC_IS_LOCAL` (defaulting
+  // to local for `tinacms dev` and not-local for `tinacms build`), so we trust it
+  // directly when present. When it is absent — e.g. <TinaCMS> is rendered
+  // directly, outside the CLI-built admin — we fall back to inferring local mode
+  // from the content API URL.
+  const isLocalClient =
+    typeof props?.isLocal === 'boolean' ? props.isLocal : parsedIsLocalClient;
   if (
     // Check if local client is defined
     typeof isLocalClient === 'undefined' ||

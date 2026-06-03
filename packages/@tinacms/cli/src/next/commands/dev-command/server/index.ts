@@ -3,6 +3,7 @@ import { createServer as createViteServer } from 'vite';
 import type { Plugin } from 'vite';
 import type { Database } from '@tinacms/graphql';
 import { ConfigManager } from '../../../config-manager';
+import { resolveIsLocal } from '../../../../utils/isLocal';
 import { createConfig } from '../../../vite';
 import {
   devServerEndPointsPlugin,
@@ -36,6 +37,8 @@ export const createDevServer = async (
       apiURL,
       plugins,
       noWatch,
+      // Local mode follows TINA_PUBLIC_IS_LOCAL; `tinacms dev` defaults to local.
+      isLocal: resolveIsLocal(true),
       /**
        * Ensure Vite's import scan uses the spaMainPath as the input
        * so it properly finds everything. This is for dev only, and when

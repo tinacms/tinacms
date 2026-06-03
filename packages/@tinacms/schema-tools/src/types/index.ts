@@ -654,6 +654,20 @@ export interface Config<
   Store = undefined,
   SearchClient = undefined,
 > {
+  /**
+   * Points the editor's GraphQL content API at a self-hosted backend instead of
+   * TinaCloud (`content.tinajs.io`). Set this when self-hosting — typically to
+   * the route that serves your `TinaNodeBackend`. Accepts either a relative path
+   * (`/api/tina/gql`) or an absolute URL
+   * (`https://your-backend.example.com/api/tina/gql`).
+   *
+   * This controls only *where* the content API is hosted — it does **not** toggle
+   * local mode. Local mode (the "You are in local mode" banner, the local
+   * datalayer, etc.) is driven by the `TINA_PUBLIC_IS_LOCAL` environment variable,
+   * which defaults to local for `tinacms dev` and not-local for `tinacms build`.
+   *
+   * @see https://tina.io/docs/self-hosted/overview
+   */
   contentApiUrlOverride?: string;
   authProvider?: AuthProvider;
   admin?: {

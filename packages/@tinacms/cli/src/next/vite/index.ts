@@ -111,6 +111,13 @@ export const createConfig = async ({
   database: Database;
   apiURL: string;
   noWatch: boolean;
+  /**
+   * Resolved local-mode flag (see `resolveIsLocal`): follows
+   * `TINA_PUBLIC_IS_LOCAL`, defaulting to local for `tinacms dev` and not-local
+   * for `tinacms build`. Baked into the admin bundle as `__TINA_IS_LOCAL__` so the
+   * runtime no longer has to infer local mode from the content API URL shape.
+   */
+  isLocal: boolean;
   plugins?: Plugin[];
   rollupOptions?: BuildOptions['rollupOptions'];
 }) => {
