@@ -36,6 +36,8 @@ export const createDevServer = async (
       apiURL,
       plugins,
       noWatch,
+      // `tinacms dev` always runs against the local content server.
+      isLocal: true,
       /**
        * Ensure Vite's import scan uses the spaMainPath as the input
        * so it properly finds everything. This is for dev only, and when

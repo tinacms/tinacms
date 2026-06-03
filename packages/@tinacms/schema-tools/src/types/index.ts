@@ -654,6 +654,21 @@ export interface Config<
   Store = undefined,
   SearchClient = undefined,
 > {
+  /**
+   * Points the editor's GraphQL content API at a self-hosted backend instead of
+   * TinaCloud (`content.tinajs.io`). Set this when self-hosting — typically to
+   * the route that serves your `TinaNodeBackend` (e.g. `/api/tina/gql`).
+   *
+   * Accepts either a relative path (`/api/tina/gql`) or an absolute URL
+   * (`https://your-backend.example.com/api/tina/gql`). In both cases, setting
+   * this option takes the editor out of **local mode**: the "You are in local
+   * mode" banner is hidden and TinaCMS talks to the configured content API using
+   * your {@link Config.authProvider | authProvider}, rather than the in-memory
+   * local dev server. Leaving it unset preserves the default behaviour — a
+   * TinaCloud connection, or the local dev server while running `tinacms dev`.
+   *
+   * @see https://tina.io/docs/self-hosted/overview
+   */
   contentApiUrlOverride?: string;
   authProvider?: AuthProvider;
   admin?: {
@@ -981,6 +996,13 @@ export interface Config<
     assetsApiUrlOverride?: string; // https://assets.tinajs.io
     frontendUrlOverride?: string; // https://app.tina.io
     identityApiUrlOverride?: string; // https://identity.tinajs.io
+    /**
+     * Overrides the *base* URL of the TinaCloud content API (default
+     * `https://content.tinajs.io`); branch and clientId path segments are still
+     * appended. This differs from the top-level
+     * {@link Config.contentApiUrlOverride}, which replaces the entire content
+     * API URL and disables local mode. Mostly for internal use.
+     */
     contentApiUrlOverride?: string; // https://content.tinajs.io
   };
   cmsCallback?: CMSCallback;

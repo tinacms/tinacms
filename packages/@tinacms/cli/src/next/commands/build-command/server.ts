@@ -15,6 +15,13 @@ export const buildProductionSpa = async (
     database,
     apiURL,
     noWatch: true,
+    // The production admin SPA is always served the deployed content API
+    // (`codegen.productionUrl` — TinaCloud or the configured override), never the
+    // local dev server, so it is never in local mode. This holds for `--local`
+    // and `--content=local` too: those affect the generated query client, but the
+    // built admin still targets the production URL. (`tinacms dev` is the local
+    // path — see createDevServer.)
+    isLocal: false,
     rollupOptions: {
       onwarn(warning, warn) {
         if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {

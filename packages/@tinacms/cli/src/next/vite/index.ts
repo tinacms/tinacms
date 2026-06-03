@@ -106,11 +106,19 @@ export const createConfig = async ({
   plugins = [],
   noWatch,
   rollupOptions,
+  isLocal,
 }: {
   configManager: ConfigManager;
   database: Database;
   apiURL: string;
   noWatch: boolean;
+  /**
+   * Authoritative local-mode flag for the build. `tinacms dev` is always local;
+   * `tinacms build` is local only when `--local` / `--content=local` is used.
+   * Baked into the admin bundle as `__TINA_IS_LOCAL__` so the runtime no longer
+   * has to infer local mode from the content API URL shape.
+   */
+  isLocal: boolean;
   plugins?: Plugin[];
   rollupOptions?: BuildOptions['rollupOptions'];
 }) => {
@@ -193,6 +201,7 @@ export const createConfig = async ({
       __API_URL__: `"${apiURL}"`,
       __BASE_PATH__: `"${configManager.config?.build?.basePath || ''}"`,
       __TINA_GRAPHQL_VERSION__: version,
+      __TINA_IS_LOCAL__: String(!!isLocal),
     },
     logLevel: 'error', // Vite import warnings are noisy
     optimizeDeps: {

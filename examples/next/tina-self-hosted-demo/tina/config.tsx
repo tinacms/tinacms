@@ -13,6 +13,9 @@ import {
 
 const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true';
 const config = defineStaticConfig({
+  // Point the admin UI at the self-hosted TinaNodeBackend
+  // (pages/api/tina/[...routes].ts) instead of TinaCloud. A relative path or an
+  // absolute URL both work here, and either one disables Local Mode.
   contentApiUrlOverride: '/api/tina/gql',
   clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID!,
   authProvider: isLocal

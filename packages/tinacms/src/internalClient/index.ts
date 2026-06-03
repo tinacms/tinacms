@@ -57,6 +57,12 @@ export type TinaIOConfig = {
   assetsApiUrlOverride?: string; // https://assets.tinajs.io
   frontendUrlOverride?: string; // https://app.tina.io
   identityApiUrlOverride?: string; // https://identity.tinajs.io
+  /**
+   * Overrides the base URL of the TinaCloud content API
+   * (default `https://content.tinajs.io`). Distinct from the top-level
+   * `contentApiUrlOverride` in your Tina config, which replaces the entire
+   * content API URL and takes the editor out of local mode.
+   */
   contentApiUrlOverride?: string; // https://content.tinajs.io
 };
 interface ServerOptions {

@@ -65,6 +65,29 @@ describe('Tina Client', () => {
     });
   });
 
+  describe('With an absolute contentApiUrlOverride', () => {
+    let client: Client;
+
+    beforeEach(() => {
+      client = buildClient({
+        schema: {
+          collections: [],
+          config: {
+            contentApiUrlOverride: 'https://backend.example.com/api/tina/gql',
+          },
+        } as any,
+      });
+    });
+
+    it('does not enter local mode, so the local-mode banner stays hidden', () => {
+      expect(client.isLocalMode).toEqual(false);
+      expect(client.isCustomContentApi).toEqual(true);
+      expect(client.contentApiUrl).toEqual(
+        'https://backend.example.com/api/tina/gql'
+      );
+    });
+  });
+
   describe('LocalClient — default wiring', () => {
     let client: LocalClient;
 

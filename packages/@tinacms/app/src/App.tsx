@@ -59,6 +59,11 @@ export const TinaAdminWrapper = () => {
       schema={schema}
       client={{ apiUrl: __API_URL__ }}
       staticMedia={staticMedia}
+      // Authoritative local-mode flag baked in by the CLI (`tinacms dev` => true,
+      // `tinacms build` => false). Replaces inferring local mode from the API URL.
+      isLocal={
+        typeof __TINA_IS_LOCAL__ !== 'undefined' ? __TINA_IS_LOCAL__ : undefined
+      }
       // THis will be replaced by the version of the graphql package or --garphql-version flag. It is replaced by vite at compile time
       tinaGraphQLVersion={__TINA_GRAPHQL_VERSION__}
     >

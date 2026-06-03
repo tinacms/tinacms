@@ -37,6 +37,13 @@ interface BaseProviderProps {
   staticMedia?: StaticMedia;
   tinaioConfig?: TinaIOConfig;
   schema?: Schema;
+  /**
+   * Authoritative local-mode flag, injected by the TinaCMS CLI at build time
+   * (`tinacms dev` => `true`, `tinacms build` => `false`). When provided it takes
+   * precedence over inferring local mode from the content API URL. Primarily for
+   * internal use by the generated admin app.
+   */
+  isLocal?: boolean;
 }
 
 // TODO: This type can probably be deprecated and removed

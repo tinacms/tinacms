@@ -5,6 +5,7 @@ import { FontLoader } from './toolkit/styles/font-loader';
 import { LocalClient } from './internalClient/index';
 import { useDocumentCreatorPlugin } from './hooks/use-content-creator';
 import { parseURL } from '@tinacms/schema-tools';
+import { resolveIsLocalClient } from './utils';
 import type { TinaCMSProviderDefaultProps } from './types/cms';
 
 const errorButtonStyles = {
@@ -150,7 +151,11 @@ export const TinaCMSProvider2 = ({
     );
   }
   const apiURL = props?.client?.apiUrl || props?.apiURL;
-  const { branch, clientId, isLocalClient } = apiURL
+  const {
+    branch,
+    clientId,
+    isLocalClient: parsedIsLocalClient,
+  } = apiURL
     ? parseURL(apiURL)
     : {
         branch: props.branch,
@@ -158,6 +163,20 @@ export const TinaCMSProvider2 = ({
         // @ts-expect-error this is for backwards compatibility
         isLocalClient: props?.isLocalClient,
       };
+  // `isLocal` is injected by the TinaCMS CLI at build time and is the
+  // authoritative local-mode signal (`tinacms dev` => true, `tinacms build` =>
+  // false), so we trust it directly when present. When it is absent — e.g.
+  // <TinaCMS> is rendered directly, outside the CLI-built admin — we fall back to
+  // deriving local mode from the content API URL, treating any configured
+  // `contentApiUrlOverride` (relative or absolute) as a self-hosted, non-local
+  // API rather than relying on `parseURL`'s URL-shape heuristic alone.
+  const isLocalClient =
+    typeof props?.isLocal === 'boolean'
+      ? props.isLocal
+      : resolveIsLocalClient({
+          isLocalClient: parsedIsLocalClient,
+          contentApiUrlOverride: schema?.config?.contentApiUrlOverride,
+        });
   if (
     // Check if local client is defined
     typeof isLocalClient === 'undefined' ||

@@ -19,6 +19,32 @@ export interface CreateClientProps {
   apiUrl?: string;
   tinaGraphQLVersion: string;
 }
+/**
+ * Decides whether the editor should run as a local client. A local client
+ * surfaces the "local mode" banner and short-circuits remote-only behaviour
+ * (e.g. branch listing always resolves, content-events are empty).
+ *
+ * A configured `contentApiUrlOverride` always points the editor at a self-hosted
+ * content API, so it is never local mode — regardless of whether the override is
+ * a relative (`/api/tina/gql`) or absolute (`https://…/api/tina/gql`) URL. The
+ * URL-shape heuristic in `parseURL` only returns `false` for relative overrides
+ * and misclassifies any non-TinaCloud absolute host as local, so an explicit
+ * override takes precedence here. Without an override we fall back to whatever
+ * the URL-shape heuristic determined.
+ */
+export const resolveIsLocalClient = ({
+  isLocalClient,
+  contentApiUrlOverride,
+}: {
+  isLocalClient: boolean | undefined;
+  contentApiUrlOverride?: string;
+}): boolean | undefined => {
+  if (contentApiUrlOverride) {
+    return false;
+  }
+  return isLocalClient;
+};
+
 export const createClient = ({
   clientId,
   isLocalClient = true,
