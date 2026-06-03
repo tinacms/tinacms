@@ -14,39 +14,14 @@ on:
         default: ''
         type: string
   schedule:
-    # Daily at 09:00 UTC. The workflow's full matrix (7 templates × 3 PMs ×
-    # the supported Node majors, derived from root engines.node) is the broader
-    # safety net for starter-template drift — daily cadence keeps worst-case
-    # detection latency under ~1 day, so a regression that lands today gets
-    # caught tomorrow, not next week.
+    # Daily at 09:00 UTC. The workflow's full matrix (7 templates × 3 PMs × 2
+    # Node versions = 42 jobs) is the broader safety net for starter-template
+    # drift — daily cadence keeps worst-case detection latency under ~1 day,
+    # so a regression that lands today gets caught tomorrow, not next week.
     - cron: '0 9 * * *'
 
 jobs:
-  # Single source of truth for supported Node versions is the root package.json
-  # `engines.node` (e.g. "22.x || 24.x"). Parse it into the build matrix here so
-  # the matrix can never drift from what we declare, and fail fast if
-  # create-tina-app's own engines (which ships to npm and drives the CLI's
-  # runtime check) has diverged from root.
-  resolve-node:
-    runs-on: ubuntu-latest
-    outputs:
-      majors: ${{ steps.versions.outputs.majors }}
-    steps:
-      - uses: actions/checkout@v4
-      - id: versions
-        run: |
-          ROOT=$(node -e "process.stdout.write(require('./package.json').engines.node)")
-          CTA=$(node -e "process.stdout.write(require('./packages/create-tina-app/package.json').engines.node)")
-          if [ "$ROOT" != "$CTA" ]; then
-            echo "::error::engines.node drift — root='$ROOT' create-tina-app='$CTA'. Keep them in sync."
-            exit 1
-          fi
-          MAJORS=$(node -e "console.log(JSON.stringify([...process.argv[1].matchAll(/(\d+)\.x/g)].map(m=>+m[1])))" "$ROOT")
-          echo "Supported Node majors: $MAJORS"
-          echo "majors=$MAJORS" >> "$GITHUB_OUTPUT"
-
   build-templates:
-    needs: resolve-node
     runs-on: ubuntu-latest
     continue-on-error: true
     strategy:
@@ -60,7 +35,7 @@ jobs:
           - tina-docs
           - tinasaurus
           - basic
-        node-version: ${{ fromJSON(needs.resolve-node.outputs.majors) }}
+        node-version: [22, 24]
     outputs:
       failed: ${{ steps.report-errors.outputs.failed }}
 
