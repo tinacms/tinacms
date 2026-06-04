@@ -28,6 +28,12 @@ export const authenticate = (
   return new Promise((resolve, reject) => {
     const origin = `${window.location.protocol}//${window.location.host}`;
 
+    // The origin we expect login results to be posted from. Only messages
+    // sent from this origin are trusted.
+    const expectedOrigin = new URL(frontendUrl).origin;
+
+    // The exact Window we opened. Only messages whose source is this Window
+    // are trusted.
     const authTab = popupWindow(
       `${frontendUrl}/signin?clientId=${clientId}&origin=${origin}`,
       '_blank',
@@ -46,11 +52,21 @@ export const authenticate = (
       return;
     }
 
+    const cleanup = () => {
+      clearInterval(pollInterval);
+      window.removeEventListener('message', messageHandler);
+    };
+
     // Message handler for auth completion
     const messageHandler = (e: MessageEvent) => {
+      // Validate the message origin and source before reading or trusting
+      // anything in e.data.
+      if (e.origin !== expectedOrigin || e.source !== authTab) {
+        return;
+      }
+
       if (e.data.source === TINA_LOGIN_EVENT) {
-        clearInterval(pollInterval);
-        window.removeEventListener('message', messageHandler);
+        cleanup();
 
         if (authTab) {
           authTab.close();
@@ -66,8 +82,7 @@ export const authenticate = (
     // Poll to detect if popup was closed without completing auth
     const pollInterval = setInterval(() => {
       if (authTab.closed) {
-        clearInterval(pollInterval);
-        window.removeEventListener('message', messageHandler);
+        cleanup();
         reject(new AuthenticationCancelledError('Popup was closed'));
       }
     }, 500);
