@@ -123,8 +123,7 @@ describe('TinaClient concurrent requests on edge', () => {
     // fs cache disabled there is no per-key lock, so both proceed; the test
     // passing within the default timeout is the no-deadlock assertion.
     const fetchMock = vi.fn(
-      () =>
-        new Promise((resolve) => setTimeout(() => resolve(okResponse()), 5))
+      () => new Promise((resolve) => setTimeout(() => resolve(okResponse()), 5))
     );
     vi.stubGlobal('fetch', fetchMock);
 

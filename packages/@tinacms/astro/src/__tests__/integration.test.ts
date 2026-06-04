@@ -176,9 +176,9 @@ describe('tina() integration — cloudflare import.meta.url plugin', () => {
     expect(runConfigEnvironment(plugin, 'ssr')).toBeUndefined();
     // The same plugin instance picks up the adapter once config:done runs.
     runConfigDone(integration, '@astrojs/cloudflare');
-    expect(runConfigEnvironment(plugin, 'ssr')?.define?.['import.meta.url']).toBe(
-      EXPECTED
-    );
+    expect(
+      runConfigEnvironment(plugin, 'ssr')?.define?.['import.meta.url']
+    ).toBe(EXPECTED);
   });
 
   it('honours the cloudflareWorkers option override', () => {
@@ -194,7 +194,9 @@ describe('tina() integration — cloudflare import.meta.url plugin', () => {
     // Force off, even with the Cloudflare adapter.
     const forcedOff = runConfigSetup({ cloudflareWorkers: false });
     runConfigDone(forcedOff.integration, '@astrojs/cloudflare');
-    expect(runConfigEnvironment(cfPlugin(forcedOff.plugins), 'ssr')).toBeUndefined();
+    expect(
+      runConfigEnvironment(cfPlugin(forcedOff.plugins), 'ssr')
+    ).toBeUndefined();
   });
 });
 
