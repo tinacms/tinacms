@@ -48,7 +48,7 @@ Before filing a new bug report:
 
 The bug report template (`.github/ISSUE_TEMPLATE/bug-report.yml`) asks for the exact error message, repro steps, expected vs. actual behavior, your environment (including any custom adapters or non-default setup), and ideally a reproduction repo. The same checklist is published at https://tina.io/docs/contributing/bug-reports.
 
-If you are using an AI assistant (Claude Code, Cursor, etc.) to draft an issue, point it at `.github/ISSUE_TEMPLATE/bug-report.yml` so the formatting matches the form's H3 sections — that way the auto-validator workflow (`.github/workflows/validate-issue-template.yml`) will not flag it as `needs-template`.
+If you are using an AI assistant (Claude Code, Cursor, etc.) to draft an issue, point it at `.github/ISSUE_TEMPLATE/bug-report.yml` so the formatting matches the form's H3 sections.
 
 ## PR Workflow
 
