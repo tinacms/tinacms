@@ -108,7 +108,7 @@ Bug reports go through the same checklist whether they land via Discord `#ask-fo
 - `### Relevant sections of your schema file`
 - `### Client ID` — for TinaCloud-related issues
 
-Issues opened with the `bug` label but missing one or more required sections are auto-labeled `needs-template` and commented on by `.github/workflows/validate-issue-template.yml`. If you're an agent (Claude Code, Cursor, ChatGPT, an internal bot like `ssw-yakshaver`) drafting an issue programmatically, format the body with those H3 headings before calling `POST /repos/{owner}/{repo}/issues`.
+If you're an agent (Claude Code, Cursor, ChatGPT, an internal bot like `ssw-yakshaver`) drafting an issue programmatically, format the body with those H3 headings before calling `POST /repos/{owner}/{repo}/issues`.
 
 The non-default-setup detail in `### Your environment` is the field that most often points us straight at the root cause. Do not omit it.
 
