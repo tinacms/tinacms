@@ -7,12 +7,11 @@ import {
 import { Form, FormBuilder, FormStatus } from '@tinacms/toolkit';
 import type { TinaCMS } from '@tinacms/toolkit';
 import {
-  FormBreadcrumbs,
   FileHistoryProvider,
+  FormBreadcrumbs,
 } from '@toolkit/react-sidebar/components/sidebar-body';
 import React, { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { BackButton } from '../components/BackButton';
 import { TinaAdminApi } from '../api';
 import { ErrorDialog } from '../components/ErrorDialog';
 import GetCMS from '../components/GetCMS';
@@ -183,10 +182,13 @@ const RenderForm = ({
         className={`py-4 px-6 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center`}
       >
         <div className='w-full flex gap-1.5 justify-between items-center'>
-          <BackButton onClick={() => navigate(collectionListPath)} />
           <FormBreadcrumbs
             className='w-[calc(100%-3rem)]'
             rootBreadcrumbName={`${filename}.${collection.format}`}
+            collectionCrumb={{
+              label: collection.label || collection.name,
+              onClick: () => navigate(collectionListPath),
+            }}
           />
           <FileHistoryProvider
             defaultBranchName={

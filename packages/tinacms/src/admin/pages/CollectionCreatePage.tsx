@@ -13,14 +13,13 @@ import {
   TinaForm,
   wrapFieldsWithMeta,
 } from '@tinacms/toolkit';
-import React, { useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 import type { TinaCMS } from '@tinacms/toolkit';
 import { FormBreadcrumbs } from '@toolkit/react-sidebar/components/sidebar-body';
+import React, { useMemo, useState } from 'react';
 import { FaLock, FaUnlock } from 'react-icons/fa';
+import { useNavigate, useParams } from 'react-router-dom';
 import { TinaAdminApi } from '../api';
 import { ErrorDialog } from '../components/ErrorDialog';
-import { BackButton } from '../components/BackButton';
 import GetCMS from '../components/GetCMS';
 import GetCollection from '../components/GetCollection';
 import { PageWrapper } from '../components/Page';
@@ -367,10 +366,13 @@ export const RenderForm = ({
           className={`py-4 px-6 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center`}
         >
           <div className='w-full flex gap-1.5 justify-between items-center'>
-            <BackButton onClick={() => navigate(collectionListPath)} />
             <FormBreadcrumbs
               className='w-[calc(100%-3rem)]'
               rootBreadcrumbName='Create New'
+              collectionCrumb={{
+                label: collection.label || collection.name,
+                onClick: () => navigate(collectionListPath),
+              }}
             />
             <FormStatus pristine={formIsPristine} />
           </div>

@@ -1,3 +1,4 @@
+import { Transition } from '@headlessui/react';
 import {
   Breadcrumb,
   BreadcrumbEllipsis,
@@ -17,19 +18,19 @@ import { FormBuilder, FormStatus } from '@toolkit/form-builder';
 import type { Form } from '@toolkit/forms';
 import type { FormMetaPlugin } from '@toolkit/plugin-form-meta';
 import { useCMS } from '@toolkit/react-core';
-import * as React from 'react';
-import { FormLists } from './form-list';
-import { SidebarContext } from './sidebar';
-import { SidebarLoadingPlaceholder } from './sidebar-loading-placeholder';
-import { SidebarNoFormsPlaceholder } from './sidebar-no-forms-placeholder';
 import { History } from 'lucide-react';
+import * as React from 'react';
+import { BiListUl } from 'react-icons/bi';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '../../../admin/components/ui/tooltip';
-import { Transition } from '@headlessui/react';
+import { FormLists } from './form-list';
+import { SidebarContext } from './sidebar';
+import { SidebarLoadingPlaceholder } from './sidebar-loading-placeholder';
+import { SidebarNoFormsPlaceholder } from './sidebar-no-forms-placeholder';
 
 // this is the minimum time to show the loading indicator (in milliseconds)
 // this is to prevent the loading indicator from flashing or the 'no forms' placeholder from showing pre-maturely
@@ -295,6 +296,28 @@ const BreadcrumbItemLink = ({
   );
 };
 
+// Leading crumb that navigates back to the collection's document list.
+const CollectionBreadcrumbItem = ({
+  label,
+  onClick,
+}: { label: string; onClick: () => void }) => {
+  return (
+    <BreadcrumbItem className='shrink-0'>
+      <BreadcrumbLink asChild className='text-gray-700 hover:text-orange-500'>
+        <button
+          type='button'
+          onClick={onClick}
+          aria-label={`Back to ${label}`}
+          className='flex items-center gap-1.5'
+        >
+          <BiListUl className='w-4 h-4 shrink-0 opacity-80' />
+          <span className='truncate'>{label}</span>
+        </button>
+      </BreadcrumbLink>
+    </BreadcrumbItem>
+  );
+};
+
 const FinalBreadcrumbItem = ({ breadcrumb }: { breadcrumb: string }) => {
   return (
     <BreadcrumbItem className='shrink truncate'>
@@ -308,15 +331,17 @@ const FinalBreadcrumbItem = ({ breadcrumb }: { breadcrumb: string }) => {
 export const FormBreadcrumbs = ({
   rootBreadcrumbName,
   contentPath,
+  collectionCrumb,
   ...props
 }: {
   rootBreadcrumbName?: string;
   contentPath?: string;
+  collectionCrumb?: { label: string; onClick: () => void };
 } & React.HTMLAttributes<HTMLDivElement>) => {
   const cms = useCMS();
   const breadcrumbs = cms.state.breadcrumbs;
 
-  if (breadcrumbs.length === 0) {
+  if (breadcrumbs.length === 0 && !collectionCrumb) {
     return null;
   }
 
@@ -341,6 +366,17 @@ export const FormBreadcrumbs = ({
   return (
     <Breadcrumb {...props}>
       <BreadcrumbList className='flex-nowrap text-nowrap'>
+        {/* Leading crumb: back to the collection's document list */}
+        {collectionCrumb && (
+          <>
+            <CollectionBreadcrumbItem
+              label={collectionCrumb.label}
+              onClick={collectionCrumb.onClick}
+            />
+            {breadcrumbs.length > 0 && <BreadcrumbSeparator />}
+          </>
+        )}
+
         {/* First breadcrumb */}
         <TooltipProvider>
           <Tooltip>
