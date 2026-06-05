@@ -7,6 +7,9 @@
 		"examples/*/*",
 		"packages/[^@]*"
 	],
+	"engines": {
+		"node": "22.x || 24.x"
+	},
 	"scripts": {
 		"dev": "pnpm watch",
 		"watch": "pnpm run build && pnpm --filter=\"./packages/@tinacms/scripts\" run watch",

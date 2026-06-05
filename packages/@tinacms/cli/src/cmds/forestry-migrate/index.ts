@@ -18,6 +18,7 @@ import {
   makeTemplateFile,
   makeFieldsWithInternalCode,
 } from './util/codeTransformer';
+import { stringifyLabel, stringifyLabelWithField } from './util/naming';
 
 const BODY_FIELD = {
   // This is the body field
@@ -28,13 +29,7 @@ const BODY_FIELD = {
   isBody: true,
 };
 
-export const stringifyLabel = (label: string) => {
-  return label.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
-};
-export const stringifyLabelWithField = (label: string) => {
-  const labelString = stringifyLabel(label);
-  return `${labelString}Fields`;
-};
+export { stringifyLabel, stringifyLabelWithField };
 const transformForestryMatchToTinaMatch = (match: string) => {
   const newMatch = match
     // remove white space
