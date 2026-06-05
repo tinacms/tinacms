@@ -440,8 +440,9 @@ export async function run() {
     await install(pkgManager as PackageManager, opts.verbose);
     spinner.succeed();
   } catch (err) {
-    const error = err as Error;
-    spinner.fail(`Failed to install packages: ${error.message}`);
+    const error = err instanceof Error ? err : new Error(String(err));
+    const reason = error.message || String(err);
+    spinner.fail(`Failed to install packages: ${reason}`);
     packageManagerInstallationHadError = true;
     postHogCaptureError(posthogClient, userId, sessionId, error, {
       errorCode: ERROR_CODES.ERR_INSTALL_PKG_MANAGER_FAILED,
