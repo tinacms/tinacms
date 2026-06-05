@@ -20,7 +20,7 @@ import type { FormMetaPlugin } from '@toolkit/plugin-form-meta';
 import { useCMS } from '@toolkit/react-core';
 import { History } from 'lucide-react';
 import * as React from 'react';
-import { BiListUl } from 'react-icons/bi';
+import { BiArrowBack } from 'react-icons/bi';
 import {
   Tooltip,
   TooltipContent,
@@ -205,6 +205,10 @@ export const FormHeader = ({
     <div className='px-4 pt-2 pb-4 flex flex-row flex-nowrap justify-between items-center gap-2 bg-gradient-to-t from-white to-gray-50 border-b border-gray-100'>
       <FormBreadcrumbs
         className='w-[calc(100%-3rem)]'
+        rootBreadcrumbName={activeForm.tinaForm.path
+          ?.split('/')
+          .pop()
+          ?.replace(/\.[^/.]+$/, '')}
         contentPath={activeForm.tinaForm.path}
       />
       <FileHistoryProvider
@@ -310,7 +314,7 @@ const CollectionBreadcrumbItem = ({
           aria-label={`Back to ${label}`}
           className='flex items-center gap-1.5'
         >
-          <BiListUl className='w-4 h-4 shrink-0 opacity-80' />
+          <BiArrowBack className='w-4 h-4 shrink-0 opacity-80' />
           <span className='truncate'>{label}</span>
         </button>
       </BreadcrumbLink>
