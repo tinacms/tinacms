@@ -378,7 +378,11 @@ describe('makeFilterChain', () => {
         },
       ],
     }) as BinaryFilter[];
-    expect(f.pad).toEqual({ fillString: '0', maxLength: 4 });
+    expect(f.pad).toEqual({
+      fillString: '0',
+      maxLength: 8,
+      decimalPrecision: 3,
+    });
   });
 
   it('builds a TernaryFilter from gt+lt pair', () => {

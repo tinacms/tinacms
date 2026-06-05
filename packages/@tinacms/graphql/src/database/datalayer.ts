@@ -56,6 +56,7 @@ export type IndexDefinition = {
 export type PadDefinition = {
   fillString: string;
   maxLength: number;
+  decimalPrecision?: number;
 };
 
 export type FilterOperand = string | number | boolean | string[] | number[];
@@ -70,6 +71,7 @@ export const REFS_COLLECTIONS_SORT_KEY = '__refs__';
 export const REFS_REFERENCE_FIELD = '__tina_ref__';
 export const REFS_PATH_FIELD = '__tina_ref_path__';
 export const DEFAULT_NUMERIC_LPAD = 4;
+export const DEFAULT_NUMERIC_DECIMAL_PRECISION = 3;
 
 const ensureUTC = (value: string): string => {
   const s = String(value);
@@ -85,14 +87,24 @@ const parseDatetimeUTC = (value: unknown): string => {
   return Number.isNaN(d.getTime()) ? String(value) : d.toISOString();
 };
 
+const padValue = (val: any, pad: PadDefinition): string => {
+  if (pad.decimalPrecision !== undefined) {
+    const n = Number(val);
+    if (!Number.isNaN(n)) {
+      return n
+        .toFixed(pad.decimalPrecision)
+        .padStart(pad.maxLength, pad.fillString);
+    }
+  }
+  return String(val).padStart(pad.maxLength, pad.fillString);
+};
+
 const applyPadding = (input: any, pad?: PadDefinition) => {
   if (pad) {
     if (Array.isArray(input)) {
-      return (input as any[]).map((val) =>
-        String(val).padStart(pad.maxLength, pad.fillString)
-      );
+      return (input as any[]).map((val) => padValue(val, pad));
     } else {
-      return String(input).padStart(pad.maxLength, pad.fillString);
+      return padValue(input, pad);
     }
   }
   return input;
@@ -488,7 +500,12 @@ export const makeFilterChain = ({
         type: _type as string,
         pad:
           _type === 'number'
-            ? { fillString: '0', maxLength: DEFAULT_NUMERIC_LPAD }
+            ? {
+                fillString: '0',
+                maxLength:
+                  DEFAULT_NUMERIC_LPAD + 1 + DEFAULT_NUMERIC_DECIMAL_PRECISION,
+                decimalPrecision: DEFAULT_NUMERIC_DECIMAL_PRECISION,
+              }
             : undefined,
       });
     } else if (key1 && key2) {
@@ -529,7 +546,14 @@ export const makeFilterChain = ({
           type: _type as string,
           pad:
             _type === 'number'
-              ? { fillString: '0', maxLength: DEFAULT_NUMERIC_LPAD }
+              ? {
+                  fillString: '0',
+                  maxLength:
+                    DEFAULT_NUMERIC_LPAD +
+                    1 +
+                    DEFAULT_NUMERIC_DECIMAL_PRECISION,
+                  decimalPrecision: DEFAULT_NUMERIC_DECIMAL_PRECISION,
+                }
               : undefined,
         });
       } else {
