@@ -33,9 +33,7 @@ export function install(
     // e.g. the package manager binary isn't on PATH.
     child.on('error', (err) => {
       reject(
-        new Error(
-          `Failed to run "${command}": ${(err as Error).message}`
-        )
+        new Error(`Failed to run "${command}": ${(err as Error).message}`)
       );
     });
 
