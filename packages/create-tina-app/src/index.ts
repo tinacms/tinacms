@@ -235,8 +235,12 @@ export async function run() {
       message: 'Which package manager would you like to use?',
       name: 'packageManager',
       type: 'select',
+      initial: Math.max(0, installedPkgManagers.indexOf('pnpm')),
       choices: installedPkgManagers.map((manager) => {
-        return { title: manager, value: manager };
+        return {
+          title: manager === 'pnpm' ? 'pnpm (recommended)' : manager,
+          value: manager,
+        };
       }),
     });
     if (!Object.hasOwn(res, 'packageManager')) {
