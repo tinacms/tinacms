@@ -5,18 +5,6 @@ import { PackageManager } from './packageManagers';
 const MAX_OUTPUT_CHARS = 4000;
 
 /**
- * pnpm 10+ blocks dependency build scripts (e.g. better-sqlite3, sharp, esbuild)
- * by default and prints this advisory. When it's the reason an install looks
- * broken, we point the user at the one-liner that unblocks it.
- */
-function isPnpmIgnoredBuilds(output: string): boolean {
-  return (
-    output.includes('ERR_PNPM_IGNORED_BUILDS') ||
-    output.includes('Ignored build scripts')
-  );
-}
-
-/**
  * Spawn a package manager installation.
  *
  * @returns A Promise that resolves once the installation is finished.
@@ -61,12 +49,6 @@ export function install(
       let message = `"${command}" exited with code ${code ?? 'unknown'}.`;
       if (details) {
         message += `\n\n${details}`;
-      }
-      if (isPnpmIgnoredBuilds(captured)) {
-        message +=
-          `\n\nSome dependencies' build scripts were blocked by pnpm. ` +
-          `Run "${packageManager} approve-builds" (then "${packageManager} install") ` +
-          `in your project directory to allow them.`;
       }
 
       reject(new Error(message));

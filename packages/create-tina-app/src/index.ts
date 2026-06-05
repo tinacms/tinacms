@@ -36,6 +36,7 @@ import fetchPostHogConfig from './util/fetchPosthogConfig';
 import { osInfo as getOsSystemInfo } from 'systeminformation';
 
 const DISCORD_SUPPORT_URL = 'https://discord.com/invite/zumN63Ybpf';
+const FAQ_URL = 'https://tina.io/docs/faq';
 
 let posthogClient: PostHog | null = null;
 async function initializePostHog(
@@ -443,6 +444,7 @@ export async function run() {
     const error = err instanceof Error ? err : new Error(String(err));
     const reason = error.message || String(err);
     spinner.fail(`Failed to install packages: ${reason}`);
+    spinner.info(`Stuck? See the FAQ at ${TextStyles.link(FAQ_URL)}`);
     packageManagerInstallationHadError = true;
     postHogCaptureError(posthogClient, userId, sessionId, error, {
       errorCode: ERROR_CODES.ERR_INSTALL_PKG_MANAGER_FAILED,
