@@ -1,5 +1,11 @@
 # @tinacms/astro
 
+## 0.4.1
+
+### Patch Changes
+
+- [#7028](https://github.com/tinacms/tinacms/pull/7028) [`7b539b8`](https://github.com/tinacms/tinacms/commit/7b539b8e7d7d9f4451b5fd36a04d26b734f7d78e) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Make the experimental island route work under the `@astrojs/cloudflare` adapter by supplying a valid `import.meta.url` to server bundles only. Adds a `cloudflareWorkers` option to force the workaround on or off.
+
 ## 0.4.0
 
 ### Minor Changes
