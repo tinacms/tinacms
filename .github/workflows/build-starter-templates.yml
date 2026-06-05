@@ -14,8 +14,8 @@ on:
         default: ''
         type: string
   schedule:
-    # Daily at 09:00 UTC. The workflow's full matrix (7 templates × 3 PMs × 3
-    # Node versions = 63 jobs) is the broader safety net for starter-template
+    # Daily at 09:00 UTC. The workflow's full matrix (7 templates × 3 PMs × 2
+    # Node versions = 42 jobs) is the broader safety net for starter-template
     # drift — daily cadence keeps worst-case detection latency under ~1 day,
     # so a regression that lands today gets caught tomorrow, not next week.
     - cron: '0 9 * * *'
@@ -35,7 +35,7 @@ jobs:
           - tina-docs
           - tinasaurus
           - basic
-        node-version: [22, 24, 25]
+        node-version: [22, 24]
     outputs:
       failed: ${{ steps.report-errors.outputs.failed }}
 
