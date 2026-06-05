@@ -14,7 +14,7 @@ import { initializeGit, makeFirstCommit } from './util/git';
 import { TEMPLATES, Template, downloadTemplate } from './templates';
 import { preRunChecks } from './util/preRunChecks';
 import { checkPackageExists } from './util/checkPkgManagers';
-import { TextStyles, TextStylesBold } from './util/textstyles';
+import { TextStyles, TextStylesBold, box } from './util/textstyles';
 import { exit } from 'node:process';
 import { extractOptions } from './util/options';
 import { type PackageManager, PKG_MANAGERS } from './util/packageManagers';
@@ -444,7 +444,12 @@ export async function run() {
     const error = err instanceof Error ? err : new Error(String(err));
     const reason = error.message || String(err);
     spinner.fail(`Failed to install packages: ${reason}`);
-    spinner.info(`Stuck? See the FAQ at ${TextStyles.link(FAQ_URL)}`);
+    console.log(
+      `\n${box([
+        `${TextStyles.bold('Stuck?')} Check the TinaCMS FAQ for common install issues:`,
+        TextStyles.link(FAQ_URL),
+      ])}\n`
+    );
     packageManagerInstallationHadError = true;
     postHogCaptureError(posthogClient, userId, sessionId, error, {
       errorCode: ERROR_CODES.ERR_INSTALL_PKG_MANAGER_FAILED,
