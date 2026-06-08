@@ -23,7 +23,9 @@ interface Props {
 }
 
 const { node, components } = Astro.props;
-const props = (node.props ?? {}) as MdxTableProps;
+// `node.props` is guaranteed to be an object — MdxNode defaults it before
+// dispatching here — so no further guard is needed at this layer.
+const props = node.props as MdxTableProps;
 
 const align = props.align ?? [];
 const allRows = props.tableRows ?? [];

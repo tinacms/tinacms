@@ -17,13 +17,17 @@ interface Props {
 }
 
 const { node, components } = Astro.props;
+// Single place that guarantees mdx props are an object, so neither the
+// component spread nor the legacy-table renderer downstream needs its own
+// guard. Parsed content always sets props; this only defends malformed nodes.
+const props: Record<string, unknown> = node.props ?? {};
 const MdxComponent = components[node.name];
 const isLegacyTable = !MdxComponent && node.name === 'table';
 ---
 {MdxComponent ? (
-  <MdxComponent {...(node.props ?? {})} />
+  <MdxComponent {...props} />
 ) : isLegacyTable ? (
-  <MdxTableNode node={node} components={components} />
+  <MdxTableNode node={{ ...node, props }} components={components} />
 ) : (
   <span style="display:inline-block;padding:0.25rem 0.5rem;background:#fee;color:#900;border-radius:0.25rem;font-family:monospace;font-size:0.85em;">
     No component provided for {node.name}
