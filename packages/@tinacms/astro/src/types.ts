@@ -185,11 +185,23 @@ export interface TableCellComponentProps {
  * The built-in keys below are suggested by editor autocomplete and override
  * the matching default element/tag; the named-prop overrides are typed with
  * the exact props the renderer passes (e.g. `code_block` receives
- * `{ value, lang }`). Any other string key registers a custom component,
- * matched against an mdxJsx node's `name` (e.g. `<MyEmbed />` in MDX →
- * `{ MyEmbed: MyEmbedComponent }`).
+ * `{ value, lang }`).
+ *
+ * Custom rich-text **templates** render as mdxJsx nodes dispatched by `name`,
+ * with their fields passed as props. Register one under its template name.
+ * By default a custom key accepts any component; supply the optional `Custom`
+ * type param to type them precisely and have the registration checked:
+ *
+ * ```ts
+ * // template `cta` with a `title: string` field
+ * const components: CustomComponentsMap<{ cta: { title: string } }> = {
+ *   cta: Cta, // ← Cta's Props must be assignable from `{ title: string }`
+ * };
+ * ```
  */
-export type CustomComponentsMap = {
+export type CustomComponentsMap<
+  Custom extends Record<string, object> = Record<never, never>,
+> = {
   // Block/inline overrides whose content comes through the default slot.
   p?: AstroComponent;
   h1?: AstroComponent;
@@ -216,6 +228,9 @@ export type CustomComponentsMap = {
   td?: AstroComponentWithProps<TableCellComponentProps>;
   th?: AstroComponentWithProps<TableCellComponentProps>;
 } & {
-  // Custom mdxJsx component names (matched by `node.name`).
+  // Custom templates declared via the `Custom` param — typed by their props.
+  [K in keyof Custom]?: AstroComponentWithProps<Custom[K]>;
+} & {
+  // Any other custom mdxJsx component name (matched by `node.name`).
   [name: string]: AstroComponent | undefined;
 };
