@@ -1,5 +1,11 @@
 # @tinacms/astro
 
+## 0.5.0
+
+### Minor Changes
+
+- [#7041](https://github.com/tinacms/tinacms/pull/7041) [`5ec75e6`](https://github.com/tinacms/tinacms/commit/5ec75e64239ec28cd7eb46c78d67a947051bfda9) Thanks [@JackDevAU](https://github.com/JackDevAU)! - feat: add astro table to tinamarkdown
+
 ## 0.4.1
 
 ### Patch Changes
