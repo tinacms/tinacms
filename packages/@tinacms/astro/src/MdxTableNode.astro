@@ -5,8 +5,10 @@
  * child nodes). Mirrors the matching branch of
  * `packages/tinacms/src/rich-text/index.tsx`: when `props.firstRowHeader` is
  * set the first row becomes a `<thead>` of `<th>` and the rest are `<td>` in
- * `<tbody>`. Per-column alignment comes from `props.align`, and
- * `components.table` / `.tr` / `.th` / `.td` override the default tags.
+ * `<tbody>`. Per-column alignment comes from `props.align`, and the `th` / `td`
+ * overrides apply. The `table` / `tr` overrides are intentionally NOT honored
+ * here: the `table` override is typed to receive a native `{ node:
+ * TableElement }`, which this legacy `MdxElement`-based shape can't provide.
  */
 import TinaMarkdown from './TinaMarkdown.astro';
 import type {
@@ -43,14 +45,11 @@ const cellInline = (value: TinaRichTextContent): InlineElement[] => {
 };
 
 const cellStyle = (i: number) => `text-align:${align[i] ?? 'auto'}`;
-
-const Table = components.table ?? 'table';
-const Tr = components.tr ?? 'tr';
 ---
-<Table>
+<table>
   {header && (
     <thead>
-      <Tr>
+      <tr>
         {(header.tableCells ?? []).map((cell, i) =>
           ThOverride ? (
             <ThOverride align={align[i]}>
@@ -62,12 +61,12 @@ const Tr = components.tr ?? 'tr';
             </th>
           )
         )}
-      </Tr>
+      </tr>
     </thead>
   )}
   <tbody>
     {bodyRows.map((row) => (
-      <Tr>
+      <tr>
         {(row?.tableCells ?? []).map((cell, i) =>
           TdOverride ? (
             <TdOverride align={align[i]}>
@@ -79,7 +78,7 @@ const Tr = components.tr ?? 'tr';
             </td>
           )
         )}
-      </Tr>
+      </tr>
     ))}
   </tbody>
-</Table>
+</table>

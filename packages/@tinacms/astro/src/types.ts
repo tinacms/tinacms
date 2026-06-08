@@ -143,5 +143,79 @@ export type TinaRichTextContent =
   | null
   | undefined;
 
-/** A map of mdxJsx name (or default tag override) → Astro component. */
-export type CustomComponentsMap = Record<string, AstroComponent>;
+/**
+ * An Astro (or framework) component that accepts props `P`. Astro's language
+ * server types an imported `.astro` component as `(props: Props) => any`, so
+ * this both accepts such a component and checks that its `Props` match what
+ * the renderer passes to the override.
+ */
+export type AstroComponentWithProps<P> = (props: P) => any;
+
+/** Props passed to an `a` (link) override. */
+export interface LinkComponentProps {
+  url: string;
+}
+/** Props passed to an `img` (image) override. */
+export interface ImageComponentProps {
+  url: string;
+  alt?: string;
+  caption?: string;
+}
+/** Props passed to a `code_block` override. */
+export interface CodeBlockComponentProps {
+  value: string;
+  lang?: string;
+}
+/** Props passed to `html` / `html_inline` overrides. */
+export interface HtmlComponentProps {
+  value: string;
+}
+/** Props passed to a `table` override (native table node). */
+export interface TableComponentProps {
+  node: TableElement;
+}
+/** Props passed to `td` / `th` overrides. */
+export interface TableCellComponentProps {
+  align?: TableAlign;
+}
+
+/**
+ * Map of component name → Astro component, passed to `<TinaMarkdown>`.
+ *
+ * The built-in keys below are suggested by editor autocomplete and override
+ * the matching default element/tag; the named-prop overrides are typed with
+ * the exact props the renderer passes (e.g. `code_block` receives
+ * `{ value, lang }`). Any other string key registers a custom component,
+ * matched against an mdxJsx node's `name` (e.g. `<MyEmbed />` in MDX →
+ * `{ MyEmbed: MyEmbedComponent }`).
+ */
+export type CustomComponentsMap = {
+  // Block/inline overrides whose content comes through the default slot.
+  p?: AstroComponent;
+  h1?: AstroComponent;
+  h2?: AstroComponent;
+  h3?: AstroComponent;
+  h4?: AstroComponent;
+  h5?: AstroComponent;
+  h6?: AstroComponent;
+  ul?: AstroComponent;
+  ol?: AstroComponent;
+  li?: AstroComponent;
+  lic?: AstroComponent;
+  blockquote?: AstroComponent;
+  tr?: AstroComponent;
+  hr?: AstroComponent;
+  break?: AstroComponent;
+  // Overrides that receive named props.
+  a?: AstroComponentWithProps<LinkComponentProps>;
+  img?: AstroComponentWithProps<ImageComponentProps>;
+  code_block?: AstroComponentWithProps<CodeBlockComponentProps>;
+  html?: AstroComponentWithProps<HtmlComponentProps>;
+  html_inline?: AstroComponentWithProps<HtmlComponentProps>;
+  table?: AstroComponentWithProps<TableComponentProps>;
+  td?: AstroComponentWithProps<TableCellComponentProps>;
+  th?: AstroComponentWithProps<TableCellComponentProps>;
+} & {
+  // Custom mdxJsx component names (matched by `node.name`).
+  [name: string]: AstroComponent | undefined;
+};
