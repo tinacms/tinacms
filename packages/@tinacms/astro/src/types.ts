@@ -44,8 +44,57 @@ export type CodeBlockElement = {
   children?: { children: TextElement[] }[];
 };
 
+/** Per-column horizontal alignment for table cells. */
+export type TableAlign = 'left' | 'right' | 'center';
+
+/** A paragraph — the block wrapper Tina puts around inline content. */
+export type ParagraphElement = {
+  type: 'p';
+  children: InlineElement[];
+};
+
+/** A single table cell. Its content is wrapped in a paragraph by the parser. */
+export type TableCellElement = {
+  type: 'td';
+  children: ParagraphElement[];
+};
+
+export type TableRowElement = {
+  type: 'tr';
+  children: TableCellElement[];
+};
+
+/**
+ * Native markdown table node (the shape `@tinacms/mdx` emits from a GFM
+ * table). Rows/cells are plain `tr`/`td`; per-column text-align lives on
+ * `props.align`. Mirrors `TableElement` in
+ * `packages/@tinacms/mdx/src/parse/plate.ts`.
+ */
+export type TableElement = {
+  type: 'table';
+  props?: { align?: TableAlign[] };
+  children: TableRowElement[];
+};
+
+/** A cell in the legacy MDX-flow table; its `value` is itself rich text. */
+export type MdxTableCell = { value: TinaRichTextContent };
+
+export type MdxTableRow = { tableCells: MdxTableCell[] };
+
+/**
+ * Props of the legacy MDX-flow table — an `mdxJsxFlowElement` named `table`
+ * whose cells live on `props.tableRows` rather than as `tr`/`td` child nodes.
+ * Older editors produced this shape; `MdxTableNode.astro` still renders it.
+ */
+export type MdxTableProps = {
+  align?: TableAlign[];
+  /** When true, the first row is rendered as a `<thead>` of `<th>`. */
+  firstRowHeader?: boolean;
+  tableRows?: MdxTableRow[];
+};
+
 export type BlockElement =
-  | { type: 'p'; children: InlineElement[] }
+  | ParagraphElement
   | {
       type: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
       children: InlineElement[];
@@ -58,6 +107,7 @@ export type BlockElement =
   | { type: 'break' }
   | ImageElement
   | CodeBlockElement
+  | TableElement
   | { type: 'maybe_mdx' }
   | { type: 'html'; value: string }
   | { type: 'invalid_markdown'; value: string };
