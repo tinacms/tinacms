@@ -6,6 +6,8 @@ import codeBlock from './fixtures/code-block.json';
 import leafMarks from './fixtures/leaf-marks.json';
 import mdxJsxFlow from './fixtures/mdx-jsx-flow.json';
 import mdxJsxText from './fixtures/mdx-jsx-text.json';
+import mdxTable from './fixtures/mdx-table.json';
+import table from './fixtures/table.json';
 
 let container: AstroContainer;
 
@@ -81,6 +83,51 @@ describe('TinaMarkdown', () => {
     const html = await render({ props: { content: nodes } });
     expect(html).not.toContain('javascript:');
     expect(html).toContain('href="#"');
+  });
+});
+
+describe('TinaMarkdown — tables', () => {
+  it('renders a native table node with rows, cells and column alignment', async () => {
+    const html = await render({ props: { content: table } });
+    expect(html).toMatchSnapshot();
+    expect(html).toContain('<table');
+    expect(html).toContain('<tbody>');
+    expect(html).toContain('<tr>');
+    expect(html).toContain('<td');
+    // Per-column alignment from props.align.
+    expect(html).toContain('text-align:left');
+    expect(html).toContain('text-align:center');
+    expect(html).toContain('text-align:right');
+    // Inline marks render inside cells.
+    expect(html).toContain('<strong>Ada</strong>');
+    // No <thead>/<th> on the native path (matches the React renderer).
+    expect(html).not.toContain('<thead>');
+    expect(html).not.toContain('<th');
+    // Cell content is not wrapped in an extra <p>.
+    expect(html).not.toMatch(/<td[^>]*><p[\s>]/);
+  });
+
+  it('overrides the table tag via components.table', async () => {
+    const FancyTable = await import('./fixtures/FancyTable.astro');
+    const html = await render({
+      props: { content: table, components: { table: FancyTable.default } },
+    });
+    expect(html).toContain('class="fancy-table"');
+    expect(html).toContain('Name');
+    expect(html).toContain('Eng');
+  });
+
+  it('renders the legacy mdx-flow table with a header row', async () => {
+    const html = await render({ props: { content: mdxTable } });
+    expect(html).toMatchSnapshot();
+    expect(html).toContain('<thead>');
+    expect(html).toContain('<th');
+    expect(html).toContain('Header A');
+    expect(html).toContain('<tbody>');
+    expect(html).toContain('a1');
+    expect(html).toContain('text-align:left');
+    expect(html).toContain('text-align:right');
+    expect(html).not.toContain('No component provided for table');
   });
 });
 

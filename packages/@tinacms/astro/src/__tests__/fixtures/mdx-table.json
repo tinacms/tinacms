@@ -1,0 +1,44 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "table",
+      "props": {
+        "firstRowHeader": true,
+        "align": ["left", "right"],
+        "tableRows": [
+          {
+            "tableCells": [
+              {
+                "value": [
+                  { "type": "p", "children": [{ "type": "text", "text": "Header A" }] }
+                ]
+              },
+              {
+                "value": [
+                  { "type": "p", "children": [{ "type": "text", "text": "Header B" }] }
+                ]
+              }
+            ]
+          },
+          {
+            "tableCells": [
+              {
+                "value": [
+                  { "type": "p", "children": [{ "type": "text", "text": "a1" }] }
+                ]
+              },
+              {
+                "value": [
+                  { "type": "p", "children": [{ "type": "text", "text": "b1" }] }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "children": [{ "type": "text", "text": "" }]
+    }
+  ]
+}

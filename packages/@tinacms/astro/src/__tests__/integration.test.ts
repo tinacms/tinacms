@@ -12,11 +12,11 @@ type ConfigSetupArg = Parameters<NonNullable<Hooks['astro:config:setup']>>[0];
 type ConfigDoneArg = Parameters<NonNullable<Hooks['astro:config:done']>>[0];
 type BuildDoneArg = Parameters<NonNullable<Hooks['astro:build:done']>>[0];
 
-function runConfigSetup() {
+function runConfigSetup(options?: Parameters<typeof tina>[0]) {
   const addMiddleware = vi.fn();
   const updateConfig = vi.fn();
   const logger = { warn: vi.fn(), info: vi.fn() };
-  const integration = tina();
+  const integration = tina(options);
   (
     integration.hooks['astro:config:setup'] as NonNullable<
       Hooks['astro:config:setup']
@@ -26,6 +26,34 @@ function runConfigSetup() {
   const plugins: VitePlugin[] =
     updateConfig.mock.calls[0]?.[0]?.vite?.plugins ?? [];
   return { integration, addMiddleware, updateConfig, logger, plugins };
+}
+
+// Drive the astro:config:done hook with a chosen adapter so the integration can
+// resolve whether the Cloudflare workaround should apply.
+function runConfigDone(integration: AstroIntegration, adapterName?: string) {
+  (
+    integration.hooks['astro:config:done'] as NonNullable<
+      Hooks['astro:config:done']
+    >
+  )({
+    config: {
+      build: { client: pathToFileURL('/tmp/tina-client/') },
+      adapter: adapterName ? { name: adapterName, hooks: {} } : undefined,
+    },
+  } as unknown as ConfigDoneArg);
+}
+
+const cfPlugin = (plugins: VitePlugin[]) =>
+  plugins.find(
+    (p) => p.name === '@tinacms/astro:cloudflare-import-meta-url'
+  ) as VitePlugin;
+
+// Invoke a plugin's `configEnvironment` hook (a function in our plugin) without
+// a real Vite environment — it only branches on the environment name.
+function runConfigEnvironment(plugin: VitePlugin, name: string) {
+  const hook = plugin.configEnvironment as any;
+  const fn = typeof hook === 'function' ? hook : hook?.handler;
+  return fn?.call({}, name, {}, {});
 }
 
 // Drive a Vite plugin's `configureServer` and capture the request handler it
@@ -93,6 +121,82 @@ describe('tina() integration — bridge dev plugin', () => {
 
     expect(next).toHaveBeenCalledOnce();
     expect(res.body).toBeUndefined();
+  });
+});
+
+describe('tina() integration — cloudflare import.meta.url plugin', () => {
+  const EXPECTED = JSON.stringify('file:///worker.mjs');
+
+  it('injects a valid import.meta.url define for the workerd server envs under the cloudflare adapter', () => {
+    const { integration, plugins } = runConfigSetup();
+    runConfigDone(integration, '@astrojs/cloudflare');
+    const plugin = cfPlugin(plugins);
+    expect(plugin).toBeDefined();
+
+    for (const env of ['ssr', 'astro']) {
+      const result = runConfigEnvironment(plugin, env);
+      expect(result?.define?.['import.meta.url']).toBe(EXPECTED);
+      // The placeholder must itself be a valid absolute URL.
+      expect(
+        () => new URL(JSON.parse(result.define['import.meta.url']))
+      ).not.toThrow();
+    }
+  });
+
+  it('never injects the define into the client or prerender envs', () => {
+    const { integration, plugins } = runConfigSetup();
+    runConfigDone(integration, '@astrojs/cloudflare');
+    const plugin = cfPlugin(plugins);
+    // `client` keeps the real import.meta.url; `prerender` may run in Node.
+    expect(runConfigEnvironment(plugin, 'client')).toBeUndefined();
+    expect(runConfigEnvironment(plugin, 'prerender')).toBeUndefined();
+  });
+
+  it('does not inject the define for non-cloudflare adapters', () => {
+    for (const adapter of ['@astrojs/node', '@astrojs/vercel']) {
+      const { integration, plugins } = runConfigSetup();
+      runConfigDone(integration, adapter);
+      const plugin = cfPlugin(plugins);
+      for (const env of ['ssr', 'prerender', 'astro', 'client']) {
+        expect(runConfigEnvironment(plugin, env)).toBeUndefined();
+      }
+    }
+  });
+
+  it('does not inject the define when no adapter is configured', () => {
+    const { integration, plugins } = runConfigSetup();
+    runConfigDone(integration);
+    expect(runConfigEnvironment(cfPlugin(plugins), 'ssr')).toBeUndefined();
+  });
+
+  it('reads the adapter flag lazily, after config:done', () => {
+    const { integration, plugins } = runConfigSetup();
+    const plugin = cfPlugin(plugins);
+    // Before config:done the flag is false, so the plugin is inert.
+    expect(runConfigEnvironment(plugin, 'ssr')).toBeUndefined();
+    // The same plugin instance picks up the adapter once config:done runs.
+    runConfigDone(integration, '@astrojs/cloudflare');
+    expect(
+      runConfigEnvironment(plugin, 'ssr')?.define?.['import.meta.url']
+    ).toBe(EXPECTED);
+  });
+
+  it('honours the cloudflareWorkers option override', () => {
+    // Force on, even with a Node adapter.
+    const forcedOn = runConfigSetup({ cloudflareWorkers: true });
+    runConfigDone(forcedOn.integration, '@astrojs/node');
+    expect(
+      runConfigEnvironment(cfPlugin(forcedOn.plugins), 'ssr')?.define?.[
+        'import.meta.url'
+      ]
+    ).toBe(EXPECTED);
+
+    // Force off, even with the Cloudflare adapter.
+    const forcedOff = runConfigSetup({ cloudflareWorkers: false });
+    runConfigDone(forcedOff.integration, '@astrojs/cloudflare');
+    expect(
+      runConfigEnvironment(cfPlugin(forcedOff.plugins), 'ssr')
+    ).toBeUndefined();
   });
 });
 
