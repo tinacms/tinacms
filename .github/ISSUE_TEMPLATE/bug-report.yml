@@ -5,36 +5,92 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report! This info allows Tina maintainers to diagnose (and fix!) your issue as quickly as possible.
+        Thanks for taking the time to file a bug report! The fields below are the same checklist
+        we use in our Discord `#ask-for-help` post guidelines. Filling them in gives both our team
+        and our AI triage tooling enough to act on inside one session.
+
+        Full guide: https://tina.io/docs/contributing/bug-reports
+
   - type: textarea
-    id: bug-description
+    id: exact-error
     attributes:
-      label: Describe the issue that you're seeing. Any videos (eg. YouTube or Loom) or screenshots help!
-      placeholder: I am doing ... What I expect is ... What actually happening is ...
+      label: The exact error message
+      description: Copy-paste it, don't paraphrase. The literal string is what we grep on.
+      placeholder: |
+        e.g. React error #31: Objects are not valid as a React child (found: object with keys {id, src, filename, directory, type, thumbnails}).
+      render: shell
     validations:
       required: true
-  - type: input
-    id: reproduction
-    attributes:
-      label: Reproduction
-      description: Please provide a link to a repo that can reproduce the problem you ran into. `npx create-tina-app@latest` can be used as a starter template, if your repo is private.
-      placeholder: Reproduction URL
-    validations:
-      required: true
+
   - type: textarea
-    id: reproduction-steps
+    id: steps-to-reproduce
     attributes:
       label: Steps to reproduce
-      description: Please provide clear steps describing how to reproduce the issue.
-  - type: textarea
-    id: system-info
-    attributes:
-      label: System Info
-      description: Output of `npx envinfo --system --npmPackages '{tinacms,@tinacms/*}' --binaries --browsers`
-      render: shell
-      placeholder: System, Binaries, Browsers
+      description: What you clicked, in order. A numbered list is enough — no video needed.
+      placeholder: |
+        1. Open TinaCMS admin
+        2. Navigate to any page with an image field
+        3. Click the image field → "Media Library" tab
+        4. Select any image
+        5. Click "Insert"
     validations:
       required: true
+
+  - type: textarea
+    id: expected-vs-actual
+    attributes:
+      label: What you expected vs. what actually happened
+      description: One sentence each is enough.
+      placeholder: |
+        Expected: The selected image is inserted and the src string is saved.
+        Actual: TinaCMS admin goes blank / white screen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Your environment
+      description: |
+        Version of `tinacms` and `@tinacms/cli`, framework, and **anything non-default** —
+        custom MediaStore, custom auth, custom adapters, self-hosted setup. The non-default
+        detail is often what points us straight at the root cause.
+      placeholder: |
+        - TinaCMS v3.7.2
+        - @tinacms/cli v1.10.x
+        - Next.js (App Router)
+        - Self-hosted TinaCMS with custom GitHubMediaStore
+        - Netlify deployment with serverless functions
+    validations:
+      required: true
+
+  - type: input
+    id: reproduction-repo
+    attributes:
+      label: A way for us to reproduce
+      description: A link to a minimal reproduction repo is the gold standard. `npx create-tina-app@latest` is a good starting point if you need one.
+      placeholder: https://github.com/your-username/tina-bug-repro
+    validations:
+      required: false
+
+  - type: textarea
+    id: schema-sections
+    attributes:
+      label: Relevant sections of your schema file
+      description: You don't need to paste the whole thing — just the parts related to the issue.
+      render: typescript
+    validations:
+      required: false
+
+  - type: input
+    id: client-id
+    attributes:
+      label: Client ID
+      description: Required for TinaCloud-related issues. Find it in your TinaCloud dashboard.
+      placeholder: e.g. d93c658e-dc1e-4f24-896a-5c6388939c39
+    validations:
+      required: false
+
   - type: checkboxes
     id: checkboxes
     attributes:
