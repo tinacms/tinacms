@@ -1,5 +1,13 @@
 # create-tina-app
 
+## 2.1.7
+
+### Patch Changes
+
+- [#7037](https://github.com/tinacms/tinacms/pull/7037) [`ab58718`](https://github.com/tinacms/tinacms/commit/ab587188162d28a199eae8da8c16269d8b8cf150) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Surface the real cause when dependency installation fails. Previously a failed install showed `Failed to install packages: undefined` with no detail; the CLI now captures the package manager's output, reports the exit code and error, and links to the FAQ for help.
+
+- [#7018](https://github.com/tinacms/tinacms/pull/7018) [`80962ec`](https://github.com/tinacms/tinacms/commit/80962ec3d81dda3c05933453be8750d8b03b82b2) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Derive supported Node versions from `engines.node` instead of a hardcoded list.
+
 ## 2.1.6
 
 ### Patch Changes

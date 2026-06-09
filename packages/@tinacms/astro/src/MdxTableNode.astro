@@ -1,0 +1,84 @@
+---
+/**
+ * Renders the legacy MDX-flow table shape — an `mdxJsxFlowElement` named
+ * `table` whose cells live on `props.tableRows` (rather than as `tr`/`td`
+ * child nodes). Mirrors the matching branch of
+ * `packages/tinacms/src/rich-text/index.tsx`: when `props.firstRowHeader` is
+ * set the first row becomes a `<thead>` of `<th>` and the rest are `<td>` in
+ * `<tbody>`. Per-column alignment comes from `props.align`, and the `th` / `td`
+ * overrides apply. The `table` / `tr` overrides are intentionally NOT honored
+ * here: the `table` override is typed to receive a native `{ node:
+ * TableElement }`, which this legacy `MdxElement`-based shape can't provide.
+ */
+import TinaMarkdown from './TinaMarkdown.astro';
+import type {
+  CustomComponentsMap,
+  InlineElement,
+  MdxElement,
+  MdxTableProps,
+  TinaRichTextContent,
+} from './types';
+
+interface Props {
+  node: MdxElement;
+  components: CustomComponentsMap;
+}
+
+const { node, components } = Astro.props;
+// `node.props` is guaranteed to be an object — MdxNode defaults it before
+// dispatching here — so no further guard is needed at this layer.
+const props = node.props as MdxTableProps;
+
+const align = props.align ?? [];
+const allRows = props.tableRows ?? [];
+const header = props.firstRowHeader ? allRows.at(0) : undefined;
+const bodyRows = props.firstRowHeader ? allRows.slice(1) : allRows;
+
+const ThOverride = components.th;
+const TdOverride = components.td;
+
+// A cell `value` is rich text; unwrap each wrapping paragraph to its inline
+// nodes so a cell renders `<td>text</td>` rather than `<td><p>text</p></td>`.
+const cellInline = (value: TinaRichTextContent): InlineElement[] => {
+  const nodes = Array.isArray(value) ? value : (value?.children ?? []);
+  return nodes.flatMap((n) => (n.type === 'p' ? n.children : []));
+};
+
+const cellStyle = (i: number) => `text-align:${align[i] ?? 'auto'}`;
+---
+<table>
+  {header && (
+    <thead>
+      <tr>
+        {(header.tableCells ?? []).map((cell, i) =>
+          ThOverride ? (
+            <ThOverride align={align[i]}>
+              <TinaMarkdown content={cellInline(cell.value)} components={components} />
+            </ThOverride>
+          ) : (
+            <th style={cellStyle(i)}>
+              <TinaMarkdown content={cellInline(cell.value)} components={components} />
+            </th>
+          )
+        )}
+      </tr>
+    </thead>
+  )}
+  <tbody>
+    {bodyRows.map((row) => (
+      <tr>
+        {(row?.tableCells ?? []).map((cell, i) =>
+          TdOverride ? (
+            <TdOverride align={align[i]}>
+              <TinaMarkdown content={cellInline(cell.value)} components={components} />
+            </TdOverride>
+          ) : (
+            <td style={cellStyle(i)}>
+              <TinaMarkdown content={cellInline(cell.value)} components={components} />
+            </td>
+          )
+        )}
+      </tr>
+    ))}
+  </tbody>
+</table>
