@@ -40,7 +40,7 @@ async function configure(
     // TODO: give this a better default
     typescript: false,
   };
-  if (config.framework.name === 'next') {
+  if (config.framework.name === 'next' || config.framework.name === 'astro') {
     config.publicFolder = 'public';
   } else if (config.framework.name === 'hugo') {
     config.publicFolder = 'static';

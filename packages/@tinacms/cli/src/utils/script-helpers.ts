@@ -37,3 +37,20 @@ export function extendNextScripts(
 
   return result;
 }
+
+// Astro is not reactive (no `useTina`), but `init` still wraps its dev/build
+// scripts so `dev` runs Tina + Astro together and `build` compiles the admin
+// first. Existing dev/build commands are preserved (wrapped, not replaced).
+export function extendAstroScripts(scripts) {
+  return {
+    ...scripts,
+    dev:
+      !scripts?.dev || scripts?.dev?.indexOf('tinacms dev -c') === -1
+        ? generateGqlScript(scripts?.dev || 'astro dev')
+        : scripts?.dev,
+    build:
+      !scripts?.build || !scripts?.build?.startsWith('tinacms build &&')
+        ? `tinacms build && ${scripts?.build || 'astro build'}`
+        : scripts?.build,
+  };
+}

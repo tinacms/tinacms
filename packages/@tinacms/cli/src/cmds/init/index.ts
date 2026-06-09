@@ -12,7 +12,7 @@ import { Config } from './prompts';
 import { ContentFrontmatterFormat } from '@tinacms/schema-tools';
 
 export interface Framework {
-  name: 'next' | 'hugo' | 'jekyll' | 'other';
+  name: 'next' | 'hugo' | 'jekyll' | 'astro' | 'other';
   reactive: boolean;
 }
 

@@ -24,6 +24,7 @@ export const askCommonSetUp = async () => {
       message: 'What framework are you using?',
       choices: [
         { title: 'Next.js', value: { name: 'next', reactive: true } },
+        { title: 'Astro', value: { name: 'astro', reactive: false } },
         { title: 'Hugo', value: { name: 'hugo', reactive: false } },
         { title: 'Jekyll', value: { name: 'jekyll', reactive: false } },
         {

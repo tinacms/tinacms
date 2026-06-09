@@ -20,7 +20,7 @@ import { databaseTemplate } from './templates/database';
 import { nextApiRouteTemplate } from './templates/tinaNextRoute';
 import { helloWorldPost } from './templates/content';
 import { format } from 'prettier';
-import { extendNextScripts } from '../../utils/script-helpers';
+import { extendAstroScripts, extendNextScripts } from '../../utils/script-helpers';
 import {
   Framework,
   GeneratedFile,
@@ -42,7 +42,10 @@ async function apply({
   params: InitParams;
   config: Config;
 }) {
-  if (config.framework.name === 'other' && config.hosting === 'self-host') {
+  if (
+    (config.framework.name === 'other' || config.framework.name === 'astro') &&
+    config.hosting === 'self-host'
+  ) {
     logger.error(
       logText(
         'Self-hosted Tina requires init setup only works with next.js right now. Please check out the docs for info on how to setup Tina on another framework: https://tina.io/docs/r/self-hosting-nextjs'
@@ -172,6 +175,16 @@ async function apply({
       dataLayer: usingDataLayer,
       generatedFile: env.generatedFiles['reactive-example'],
     });
+  }
+
+  // Astro: wire the dev/build scripts so `<pm> dev` runs Tina + Astro together.
+  // (Basic editor only — no React demo file and no visual-editing wiring.)
+  if (
+    config.framework.name === 'astro' &&
+    env.packageJSONExists &&
+    !env.tinaConfigExists
+  ) {
+    await updateAstroPackageJson({ baseDir });
   }
 
   await addDependencies(config, env, params);
@@ -596,21 +609,26 @@ const other = ({ packageManager }: { packageManager: string }) => {
   return `${packageManagers[packageManager]} tinacms dev -c "<your dev command>"`;
 };
 
+// Frameworks where init wires up the package.json `dev` script can just point
+// the user at it.
+const runDevScript = ({ packageManager }: { packageManager: string }) => {
+  const packageManagers = {
+    pnpm: `pnpm`,
+    npm: `npm run`,
+    yarn: `yarn`,
+    bun: `bun run`,
+  };
+  return `${packageManagers[packageManager]} dev`;
+};
+
 const frameworkDevCmds: {
   [key in Framework['name']]: (args?: { packageManager: string }) => string;
 } = {
   other,
   hugo: other,
   jekyll: other,
-  next: ({ packageManager }: { packageManager: string }) => {
-    const packageManagers = {
-      pnpm: `pnpm`,
-      npm: `npm run`, // npx is the way to run executables that aren't in your "scripts"
-      yarn: `yarn`,
-      bun: `bun run`,
-    };
-    return `${packageManagers[packageManager]} dev`;
-  },
+  astro: runDevScript,
+  next: runDevScript,
 };
 
 type AddReactiveParams = {
@@ -661,6 +679,27 @@ const addReactiveFile: {
     );
     fs.writeFileSync(packageJsonPath, updatedPackageJson);
   },
+};
+
+// Astro: wrap the package.json dev/build scripts for the basic editor.
+// Unlike the reactive frameworks above, this writes no demo component.
+const updateAstroPackageJson = async ({ baseDir }: { baseDir: string }) => {
+  const packageJsonPath = path.join(baseDir, 'package.json');
+  if (!fs.existsSync(packageJsonPath)) {
+    return;
+  }
+  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath).toString());
+  const scripts = packageJson.scripts || {};
+  const updatedPackageJson = JSON.stringify(
+    {
+      ...packageJson,
+      scripts: extendAstroScripts(scripts),
+    },
+    null,
+    2
+  );
+  fs.writeFileSync(packageJsonPath, updatedPackageJson);
+  logger.info('Updating package.json scripts for Astro... ✅');
 };
 
 /**
