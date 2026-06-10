@@ -25,6 +25,7 @@ import {
   extendNextScripts,
 } from '../../utils/script-helpers';
 import {
+  type AstroSetupResult,
   logAstroConfigGuidance,
   setupAstroVisualEditing,
 } from './astro-visual-editing';
@@ -186,10 +187,10 @@ async function apply({
 
   // Wire the Astro dev/build scripts + scaffold the visual-editing demo
   // (first-time init only)
-  let astroConfigHandled = true;
+  let astroSetup: AstroSetupResult | null = null;
   if (config.framework.name === 'astro' && !env.tinaConfigExists) {
     await updateAstroPackageJson({ baseDir });
-    astroConfigHandled = setupAstroVisualEditing({ baseDir }).configHandled;
+    astroSetup = setupAstroVisualEditing({ baseDir });
   }
 
   await addDependencies(config, env, params);
@@ -236,8 +237,8 @@ async function apply({
     framework: config.framework,
   });
 
-  if (config.framework.name === 'astro' && !astroConfigHandled) {
-    logAstroConfigGuidance();
+  if (astroSetup && !astroSetup.configHandled) {
+    logAstroConfigGuidance({ configFound: astroSetup.configFound });
   }
 }
 
