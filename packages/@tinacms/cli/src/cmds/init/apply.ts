@@ -349,6 +349,14 @@ const addDependencies = async (
 
   if (config.framework.name === 'astro') {
     deps.push('@tinacms/astro', '@astrojs/node');
+    // The Astro site is React-free, but the TinaCMS admin SPA is built with
+    // React. Astro ships none, and tinacms' loose peer range (>=16.14.0) can
+    // resolve mismatched react/react-dom majors, which blanks the admin. Add
+    // both as matched dev deps (build-time only, for the admin), like the Astro
+    // starter. Skip when the project already declares React.
+    if (!env.hasReactDep) {
+      devDeps.push('react@^18.3.1', 'react-dom@^18.3.1');
+    }
   }
 
   // Add deps from database adapter, auth provider, and git provider

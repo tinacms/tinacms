@@ -139,6 +139,7 @@ const detectEnvironment = async ({
   const hasSampleContent = await fs.pathExists(sampleContentPath);
   const hasPackageJSON = await fs.pathExists('package.json');
   let hasTinaDeps = false;
+  let hasReactDep = false;
 
   if (hasPackageJSON) {
     try {
@@ -152,6 +153,9 @@ const detectEnvironment = async ({
       }
       if (deps.includes('@tinacms/cli') && deps.includes('tinacms')) {
         hasTinaDeps = true;
+      }
+      if (deps.includes('react')) {
+        hasReactDep = true;
       }
     } catch (e) {
       logger.error(
@@ -211,6 +215,7 @@ const detectEnvironment = async ({
     usingSrc,
     tinaConfigExists,
     hasTinaDeps,
+    hasReactDep,
   };
   if (debug) {
     console.log('Environment:');

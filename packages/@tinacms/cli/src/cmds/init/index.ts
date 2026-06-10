@@ -45,6 +45,7 @@ export type GeneratedFile = {
 
 export type InitEnvironment = {
   hasTinaDeps: boolean;
+  hasReactDep: boolean;
   forestryConfigExists: boolean;
   frontMatterFormat: ContentFrontmatterFormat;
   gitIgnoreExists: boolean;
