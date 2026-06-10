@@ -180,13 +180,8 @@ async function apply({
     });
   }
 
-  // Astro: wire the dev/build scripts so `<pm> dev` runs Tina + Astro together.
-  // (Basic editor only — no React demo file and no visual-editing wiring.)
-  if (
-    config.framework.name === 'astro' &&
-    env.packageJSONExists &&
-    !env.tinaConfigExists
-  ) {
+  // Wire the Astro dev/build scripts (first-time init only)
+  if (config.framework.name === 'astro' && !env.tinaConfigExists) {
     await updateAstroPackageJson({ baseDir });
   }
 
@@ -612,8 +607,6 @@ const other = ({ packageManager }: { packageManager: string }) => {
   return `${packageManagers[packageManager]} tinacms dev -c "<your dev command>"`;
 };
 
-// Frameworks where init wires up the package.json `dev` script can just point
-// the user at it.
 const runDevScript = ({ packageManager }: { packageManager: string }) => {
   const packageManagers = {
     pnpm: `pnpm`,
@@ -684,8 +677,6 @@ const addReactiveFile: {
   },
 };
 
-// Astro: wrap the package.json dev/build scripts for the basic editor.
-// Unlike the reactive frameworks above, this writes no demo component.
 const updateAstroPackageJson = async ({ baseDir }: { baseDir: string }) => {
   const packageJsonPath = path.join(baseDir, 'package.json');
   if (!fs.existsSync(packageJsonPath)) {
