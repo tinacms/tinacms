@@ -65,8 +65,24 @@ const generateCollectionString = (args: ConfigTemplateArgs) => {
       },
     },
   ]`;
+  const astroExampleCollection = `[
+    ${extraTinaCollections || ''}
+    {
+      name: 'post',
+      label: 'Posts',
+      path: 'content/posts',
+      fields: ${baseFields},
+      ui: {
+        // Opens the /tina-demo page for visual editing. Change or remove to fit your site.
+        router: () => '/tina-demo',
+      },
+    },
+  ]`;
   if (args.config?.framework?.name === 'next') {
     return nextExampleCollection;
+  }
+  if (args.config?.framework?.name === 'astro') {
+    return astroExampleCollection;
   }
   return baseCollections;
 };
