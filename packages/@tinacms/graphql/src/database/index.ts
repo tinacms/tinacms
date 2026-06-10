@@ -25,8 +25,7 @@ import type { Bridge } from './bridge';
 import {
   type BinaryFilter,
   DEFAULT_COLLECTION_SORT_KEY,
-  DEFAULT_NUMERIC_DECIMAL_PRECISION,
-  DEFAULT_NUMERIC_LPAD,
+  DEFAULT_NUMERIC_PAD,
   FOLDER_ROOT,
   FolderTreeBuilder,
   type IndexDefinition,
@@ -970,15 +969,7 @@ export class Database {
                       list: !!field.list,
                       pad:
                         field.type === 'number'
-                          ? {
-                              fillString: '0',
-                              maxLength:
-                                DEFAULT_NUMERIC_LPAD +
-                                1 +
-                                DEFAULT_NUMERIC_DECIMAL_PRECISION,
-                              decimalPrecision:
-                                DEFAULT_NUMERIC_DECIMAL_PRECISION,
-                            }
+                          ? DEFAULT_NUMERIC_PAD
                           : undefined,
                     },
                   ],
@@ -1000,15 +991,7 @@ export class Database {
                       list: !!field?.list,
                       pad:
                         field?.type === 'number'
-                          ? {
-                              fillString: '0',
-                              maxLength:
-                                DEFAULT_NUMERIC_LPAD +
-                                1 +
-                                DEFAULT_NUMERIC_DECIMAL_PRECISION,
-                              decimalPrecision:
-                                DEFAULT_NUMERIC_DECIMAL_PRECISION,
-                            }
+                          ? DEFAULT_NUMERIC_PAD
                           : undefined,
                     };
                   }),

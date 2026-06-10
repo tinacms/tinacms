@@ -72,6 +72,11 @@ export const REFS_REFERENCE_FIELD = '__tina_ref__';
 export const REFS_PATH_FIELD = '__tina_ref_path__';
 export const DEFAULT_NUMERIC_LPAD = 4;
 export const DEFAULT_NUMERIC_DECIMAL_PRECISION = 3;
+export const DEFAULT_NUMERIC_PAD: PadDefinition = {
+  fillString: '0',
+  maxLength: DEFAULT_NUMERIC_LPAD + 1 + DEFAULT_NUMERIC_DECIMAL_PRECISION,
+  decimalPrecision: DEFAULT_NUMERIC_DECIMAL_PRECISION,
+};
 
 const ensureUTC = (value: string): string => {
   const s = String(value);
@@ -498,15 +503,7 @@ export const makeFilterChain = ({
         rightOperand: filterExpression[key1],
         operator: inferOperatorFromFilter(key1),
         type: _type as string,
-        pad:
-          _type === 'number'
-            ? {
-                fillString: '0',
-                maxLength:
-                  DEFAULT_NUMERIC_LPAD + 1 + DEFAULT_NUMERIC_DECIMAL_PRECISION,
-                decimalPrecision: DEFAULT_NUMERIC_DECIMAL_PRECISION,
-              }
-            : undefined,
+        pad: _type === 'number' ? DEFAULT_NUMERIC_PAD : undefined,
       });
     } else if (key1 && key2) {
       const leftFilterOperator =
@@ -544,17 +541,7 @@ export const makeFilterChain = ({
             | OP.LT
             | OP.LTE,
           type: _type as string,
-          pad:
-            _type === 'number'
-              ? {
-                  fillString: '0',
-                  maxLength:
-                    DEFAULT_NUMERIC_LPAD +
-                    1 +
-                    DEFAULT_NUMERIC_DECIMAL_PRECISION,
-                  decimalPrecision: DEFAULT_NUMERIC_DECIMAL_PRECISION,
-                }
-              : undefined,
+          pad: _type === 'number' ? DEFAULT_NUMERIC_PAD : undefined,
         });
       } else {
         throw new Error(

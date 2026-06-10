@@ -3,6 +3,7 @@ import { MemoryLevel } from 'memory-level';
 import {
   coerceFilterChainOperands,
   DEFAULT_COLLECTION_SORT_KEY,
+  DEFAULT_NUMERIC_PAD,
   makeFilter,
   makeFilterChain,
   makeFilterSuffixes,
@@ -378,11 +379,7 @@ describe('makeFilterChain', () => {
         },
       ],
     }) as BinaryFilter[];
-    expect(f.pad).toEqual({
-      fillString: '0',
-      maxLength: 8,
-      decimalPrecision: 3,
-    });
+    expect(f.pad).toEqual(DEFAULT_NUMERIC_PAD);
   });
 
   it('builds a TernaryFilter from gt+lt pair', () => {
