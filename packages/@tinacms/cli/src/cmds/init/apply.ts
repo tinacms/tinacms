@@ -25,6 +25,10 @@ import {
   extendNextScripts,
 } from '../../utils/script-helpers';
 import {
+  logAstroConfigGuidance,
+  setupAstroVisualEditing,
+} from './astro-visual-editing';
+import {
   Framework,
   GeneratedFile,
   InitEnvironment,
@@ -180,9 +184,12 @@ async function apply({
     });
   }
 
-  // Wire the Astro dev/build scripts (first-time init only)
+  // Wire the Astro dev/build scripts + scaffold the visual-editing demo
+  // (first-time init only)
+  let astroConfigHandled = true;
   if (config.framework.name === 'astro' && !env.tinaConfigExists) {
     await updateAstroPackageJson({ baseDir });
+    astroConfigHandled = setupAstroVisualEditing({ baseDir }).configHandled;
   }
 
   await addDependencies(config, env, params);
@@ -228,6 +235,10 @@ async function apply({
     packageManager: config.packageManager,
     framework: config.framework,
   });
+
+  if (config.framework.name === 'astro' && !astroConfigHandled) {
+    logAstroConfigGuidance();
+  }
 }
 
 const forestryMigrate = async ({
@@ -333,6 +344,10 @@ const addDependencies = async (
 
   if (config.hosting === 'self-host') {
     deps.push('@tinacms/datalayer');
+  }
+
+  if (config.framework.name === 'astro') {
+    deps.push('@tinacms/astro', '@astrojs/node');
   }
 
   // Add deps from database adapter, auth provider, and git provider
