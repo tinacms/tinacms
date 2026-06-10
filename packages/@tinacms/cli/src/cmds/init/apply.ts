@@ -610,6 +610,13 @@ const logNextSteps = ({
         '<YourDevURL>/admin/index.html'
       )}`
     );
+    if (framework.name === 'astro') {
+      logger.info(
+        `Try the visual-editing demo at ${linkText(
+          '<YourDevURL>/tina-demo'
+        )} (open the post in the CMS to click-and-edit).`
+      );
+    }
   }
 };
 
