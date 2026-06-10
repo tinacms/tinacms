@@ -112,11 +112,6 @@ const CONFIG_GUIDANCE = `Your astro.config already has content, so it was left u
 
 ${VISUAL_EDITING_SNIPPET}`;
 
-const NO_CONFIG_GUIDANCE = `No astro.config was found. To finish the visual-editing demo, create one with:
-
-  import { defineConfig } from 'astro/config';
-${VISUAL_EDITING_SNIPPET}`;
-
 const ASTRO_CONFIG = `import { defineConfig } from 'astro/config';
 import node from '@astrojs/node';
 import tina from '@tinacms/astro/integration';
@@ -151,8 +146,6 @@ const findAstroConfig = (baseDir: string) =>
 export type AstroSetupResult = {
   // astro.config was written/already-correct; when false the caller prints guidance
   configHandled: boolean;
-  // whether an astro config file was found at all (chooses the guidance wording)
-  configFound: boolean;
 };
 
 // Scaffolds a self-contained, single-page visual-editing demo (no opt-in, to
@@ -178,7 +171,7 @@ export const setupAstroVisualEditing = ({
         )}. See https://tina.io/docs/frameworks/astro to wire it up manually.`
       )
     );
-    return { configHandled: true, configFound: true };
+    return { configHandled: true };
   }
 
   for (const { rel, abs } of targets) {
@@ -186,22 +179,22 @@ export const setupAstroVisualEditing = ({
   }
   logger.info('Adding a visual-editing demo at /tina-demo... ✅');
 
+  // No config at all -> safe to create one. Empty default -> overwrite. Only a
+  // config with real content is left alone (the caller prints guidance).
   const configPath = findAstroConfig(baseDir);
   if (!configPath) {
-    return { configHandled: false, configFound: false };
+    fs.writeFileSync(path.join(baseDir, 'astro.config.mjs'), ASTRO_CONFIG);
+    logger.info('Creating astro.config for visual editing... ✅');
+    return { configHandled: true };
   }
   if (isDefaultAstroConfig(fs.readFileSync(configPath).toString())) {
     fs.writeFileSync(configPath, ASTRO_CONFIG);
     logger.info('Wiring astro.config for visual editing... ✅');
-    return { configHandled: true, configFound: true };
+    return { configHandled: true };
   }
-  return { configHandled: false, configFound: true };
+  return { configHandled: false };
 };
 
-export const logAstroConfigGuidance = ({
-  configFound,
-}: {
-  configFound: boolean;
-}) => {
-  logger.info(logText(configFound ? CONFIG_GUIDANCE : NO_CONFIG_GUIDANCE));
+export const logAstroConfigGuidance = () => {
+  logger.info(logText(CONFIG_GUIDANCE));
 };

@@ -238,7 +238,7 @@ async function apply({
   });
 
   if (astroSetup && !astroSetup.configHandled) {
-    logAstroConfigGuidance({ configFound: astroSetup.configFound });
+    logAstroConfigGuidance();
   }
 }
 
