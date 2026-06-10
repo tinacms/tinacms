@@ -85,7 +85,7 @@ export const TEMPLATES: Template[] = [
     features: [
       {
         name: 'Visual Editing',
-        description: '❌',
+        description: '✅',
       },
       {
         name: 'ISR',
