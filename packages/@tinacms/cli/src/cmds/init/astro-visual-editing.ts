@@ -56,7 +56,7 @@ const { data } = Astro.props;
     <>
       <h1 data-tina-field={tinaField(data, 'title')}>{data.title}</h1>
       {data.body && (
-        <div data-tina-field={tinaField(data, 'body')}>
+        <div class="body" data-tina-field={tinaField(data, 'body')}>
           <TinaMarkdown content={data.body} />
         </div>
       )}
@@ -64,13 +64,43 @@ const { data } = Astro.props;
   )
 }
 `,
+  'src/components/tina/Starfield.astro': `---
+// Decorative twinkling starfield for the demo hero. Self-contained SVG, no deps.
+interface Props {
+  count?: number;
+}
+const { count = 70 } = Astro.props;
+const frac = (n: number) => {
+  const x = Math.sin(n) * 43758.5453;
+  return Math.abs(x - Math.floor(x));
+};
+const STAR = 'M0-1C.2-.2.2-.2 1 0 .2.2.2.2 0 1-.2.2-.2.2-1 0-.2-.2-.2-.2 0-1Z';
+const stars = Array.from({ length: count }, (_, i) => {
+  const cx = (frac(i + 1) * 100).toFixed(2);
+  const cy = (frac((i + 1) * 2.7) * 100).toFixed(2);
+  const scale = (frac((i + 1) * 5.3) * 1.3 + 0.5).toFixed(2);
+  const delay = (frac((i + 1) * 9.1) * 3).toFixed(2);
+  return {
+    transform: 'translate(' + cx + ' ' + cy + ') scale(' + scale + ')',
+    delay: delay + 's',
+  };
+});
+---
+<svg class="tina-stars" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+  {stars.map((star) => (
+    <path d={STAR} fill="currentColor" transform={star.transform} style={'animation-delay:' + star.delay} />
+  ))}
+</svg>
+`,
   'src/pages/tina-demo.astro': `---
-// Tina visual-editing demo. Open this page in the CMS to click-and-edit the
-// title and body, then copy the pattern into your own pages. Safe to delete
-// (with src/lib/tina/, src/components/tina/PostBody.astro, and
-// src/pages/tina-island/) once you're done.
+// Tina visual-editing demo hero. Open this page in the CMS to click-and-edit
+// the title (headline) and body (tagline), then copy the pattern into your own
+// pages. Self-contained: scoped styles, no CSS framework, no image assets. Safe
+// to delete (with src/lib/tina/, src/components/tina/, src/pages/tina-island/)
+// once you're done.
 import TinaIsland from '@tinacms/astro/TinaIsland.astro';
 import PostBody from '../components/tina/PostBody.astro';
+import Starfield from '../components/tina/Starfield.astro';
 import { getPost } from '../lib/tina/data';
 import { islands } from '../lib/tina/islands';
 
@@ -85,11 +115,109 @@ if (!data) return new Response('Not Found', { status: 404 });
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{data.title}</title>
+    <style is:global>
+      :root {
+        color-scheme: dark;
+        --tina-bg: oklch(0.16 0.02 285);
+        --tina-fg: oklch(0.95 0.012 285);
+        --tina-muted: oklch(0.72 0.03 285);
+        --tina-primary: oklch(0.7 0.18 40);
+        --tina-primary-fg: oklch(0.16 0.02 285);
+        --tina-border: oklch(0.95 0.01 285 / 12%);
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        overflow: hidden;
+        background: radial-gradient(120% 120% at 50% 0%, oklch(0.22 0.03 285) 0%, var(--tina-bg) 55%);
+        color: var(--tina-fg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      }
+      .tina-hero {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 64rem;
+        margin: 0 auto;
+        padding: 5rem 1.5rem;
+        text-align: center;
+      }
+      .tina-hero .eyebrow {
+        margin: 0 0 1.5rem;
+        font-size: 0.8rem;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--tina-primary);
+      }
+      .tina-hero h1 {
+        margin: 0;
+        font-size: clamp(2.75rem, 6vw, 5.25rem);
+        line-height: 1.05;
+        font-weight: 600;
+        letter-spacing: -0.025em;
+        text-wrap: balance;
+        color: var(--tina-fg);
+      }
+      .tina-hero .body {
+        max-width: 42rem;
+        margin: 2rem auto 0;
+        font-size: 1.125rem;
+        line-height: 1.6;
+        color: var(--tina-muted);
+      }
+      .tina-hero .body :where(p) { margin: 0; }
+      .tina-actions {
+        margin-top: 3rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        justify-content: center;
+      }
+      .tina-actions a {
+        display: inline-flex;
+        align-items: center;
+        height: 2.5rem;
+        padding: 0 1.25rem;
+        border-radius: 0.75rem;
+        font-size: 1rem;
+        font-weight: 500;
+        text-decoration: none;
+      }
+      .tina-actions .primary { background: var(--tina-primary); color: var(--tina-primary-fg); }
+      .tina-actions .secondary { border: 1px solid var(--tina-border); color: var(--tina-fg); }
+      .tina-stars {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        width: 100%;
+        height: 100%;
+        color: oklch(0.95 0.012 285 / 0.2);
+        pointer-events: none;
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        .tina-stars path { animation: tina-twinkle 4s ease-in-out infinite; }
+      }
+      @keyframes tina-twinkle {
+        0%, 100% { opacity: 0.25; }
+        50% { opacity: 0.9; }
+      }
+    </style>
   </head>
   <body>
-    <TinaIsland name="post" wrapper={islands.post.wrapper} params={{ slug }} primary>
-      <PostBody data={data} />
-    </TinaIsland>
+    <Starfield count={70} />
+    <main class="tina-hero">
+      <p class="eyebrow">TinaCMS + Astro</p>
+      <TinaIsland name="post" wrapper={islands.post.wrapper} params={{ slug }} primary>
+        <PostBody data={data} />
+      </TinaIsland>
+      <div class="tina-actions">
+        <a class="primary" href="/admin/index.html#/~/tina-demo">Start editing</a>
+        <a class="secondary" href="https://tina.io/docs/frameworks/astro" target="_blank" rel="noopener noreferrer">Read the docs</a>
+      </div>
+    </main>
   </body>
 </html>
 `,

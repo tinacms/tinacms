@@ -18,7 +18,7 @@ import { templates as NextTemplates } from './templates/next';
 import { ConfigTemplateArgs, generateConfig } from './templates/config';
 import { databaseTemplate } from './templates/database';
 import { nextApiRouteTemplate } from './templates/tinaNextRoute';
-import { helloWorldPost } from './templates/content';
+import { astroHelloWorldPost, helloWorldPost } from './templates/content';
 import { format } from 'prettier';
 import {
   extendAstroScripts,
@@ -552,7 +552,8 @@ const addContentFile = async ({
       },
     },
     overwrite: config.overwriteList?.includes('sample-content'),
-    content: helloWorldPost,
+    content:
+      config.framework?.name === 'astro' ? astroHelloWorldPost : helloWorldPost,
     typescript: false,
   });
 };
