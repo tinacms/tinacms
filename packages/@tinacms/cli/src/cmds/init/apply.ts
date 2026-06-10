@@ -20,7 +20,10 @@ import { databaseTemplate } from './templates/database';
 import { nextApiRouteTemplate } from './templates/tinaNextRoute';
 import { helloWorldPost } from './templates/content';
 import { format } from 'prettier';
-import { extendAstroScripts, extendNextScripts } from '../../utils/script-helpers';
+import {
+  extendAstroScripts,
+  extendNextScripts,
+} from '../../utils/script-helpers';
 import {
   Framework,
   GeneratedFile,
