@@ -88,10 +88,6 @@ export const TEMPLATES: Template[] = [
         description: '✅',
       },
       {
-        name: 'ISR',
-        description: '❌',
-      },
-      {
         name: 'SSG',
         description: '✅',
       },

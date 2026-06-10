@@ -2,4 +2,4 @@
 "create-tina-app": patch
 ---
 
-Mark the Astro starter as supporting Visual Editing. `tina-astro-starter` ships React-free visual editing via `@tinacms/astro`, so its feature list now shows **Visual Editing ✅** (previously ❌).
+Correct the Astro starter's feature list: mark **Visual Editing ✅** (`tina-astro-starter` ships React-free visual editing via `@tinacms/astro`), and remove the **ISR** row, which is a Next.js-shaped concept that doesn't apply to the Astro template.
