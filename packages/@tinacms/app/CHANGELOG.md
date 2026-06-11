@@ -1,5 +1,14 @@
 # @tinacms/app
 
+## 2.5.5
+
+### Patch Changes
+
+- [#6681](https://github.com/tinacms/tinacms/pull/6681) [`95b7523`](https://github.com/tinacms/tinacms/commit/95b75237cb91ec3dc5dac9ce52359f9786072502) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Fix click-to-edit for fields in connection query results (e.g. ruleConnection)
+
+- Updated dependencies []:
+  - tinacms@3.9.2
+
 ## 2.5.4
 
 ### Patch Changes

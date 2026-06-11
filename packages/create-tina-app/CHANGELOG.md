@@ -1,5 +1,13 @@
 # create-tina-app
 
+## 2.1.8
+
+### Patch Changes
+
+- [#7049](https://github.com/tinacms/tinacms/pull/7049) [`29a0e2e`](https://github.com/tinacms/tinacms/commit/29a0e2e43790af89408453a3a0ba9f77c31648df) Thanks [@0xharkirat](https://github.com/0xharkirat)! - Correct the Astro starter's feature list: mark **Visual Editing ✅** (`tina-astro-starter` ships React-free visual editing via `@tinacms/astro`), and remove the **ISR** row, which is a Next.js-shaped concept that doesn't apply to the Astro template.
+
+- [#7040](https://github.com/tinacms/tinacms/pull/7040) [`249840d`](https://github.com/tinacms/tinacms/commit/249840d565047966cd6070d3fc691c5d47c9deed) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Recommend pnpm in the package manager prompt. pnpm now appears first and pre-selected (labelled "recommended"), with npm shown last. pnpm's stricter dependency resolution avoids version-skew issues (e.g. multiple major versions of Vite) that can break builds under npm.
+
 ## 2.1.7
 
 ### Patch Changes
