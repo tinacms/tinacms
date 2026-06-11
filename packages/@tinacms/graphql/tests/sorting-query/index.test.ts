@@ -75,6 +75,39 @@ it('sorts dates correctly including pre-1970 and across digit boundaries', async
   expect(epsilonIndex).toBeLessThan(deltaIndex);
 });
 
+it('sorts numbers correctly with mixed whole and decimal values', async () => {
+  const { get } = await setup(__dirname, config);
+  const result = await get({
+    query: `query {
+      movieConnection(sort: "rating") {
+        edges {
+          node {
+            id
+            title
+            rating
+          }
+        }
+      }
+    }`,
+    variables: {},
+  });
+
+  expect(result.errors).toBeUndefined();
+  const edges = result.data!.movieConnection.edges;
+  const ratings = edges.map((e: any) => e.node.rating);
+  for (let i = 1; i < ratings.length; i++) {
+    expect(ratings[i]).toBeGreaterThanOrEqual(ratings[i - 1]);
+  }
+
+  // Eta Movie (rating: 9) must sort between Alpha (8.5) and Gamma (9.1)
+  const titles = edges.map((e: any) => e.node.title);
+  const alphaIndex = titles.indexOf('Alpha Movie');
+  const etaIndex = titles.indexOf('Eta Movie');
+  const gammaIndex = titles.indexOf('Gamma Movie');
+  expect(etaIndex).toBeGreaterThan(alphaIndex);
+  expect(etaIndex).toBeLessThan(gammaIndex);
+});
+
 it('combines sort with filter, returning sorted results from the filtered subset only', async () => {
   const { get } = await setup(__dirname, config);
   const result = await get({

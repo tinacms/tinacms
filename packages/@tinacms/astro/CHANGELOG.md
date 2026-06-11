@@ -1,5 +1,17 @@
 # @tinacms/astro
 
+## 0.5.0
+
+### Minor Changes
+
+- [#7041](https://github.com/tinacms/tinacms/pull/7041) [`5ec75e6`](https://github.com/tinacms/tinacms/commit/5ec75e64239ec28cd7eb46c78d67a947051bfda9) Thanks [@JackDevAU](https://github.com/JackDevAU)! - feat: add astro table to tinamarkdown
+
+## 0.4.1
+
+### Patch Changes
+
+- [#7028](https://github.com/tinacms/tinacms/pull/7028) [`7b539b8`](https://github.com/tinacms/tinacms/commit/7b539b8e7d7d9f4451b5fd36a04d26b734f7d78e) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Make the experimental island route work under the `@astrojs/cloudflare` adapter by supplying a valid `import.meta.url` to server bundles only. Adds a `cloudflareWorkers` option to force the workaround on or off.
+
 ## 0.4.0
 
 ### Minor Changes
