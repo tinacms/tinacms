@@ -284,6 +284,8 @@ const findAstroConfig = (baseDir: string) =>
 export type AstroSetupResult = {
   // astro.config was written/already-correct; when false the caller prints guidance
   configHandled: boolean;
+  // false when the demo was skipped because some target file already exists
+  demoScaffolded: boolean;
 };
 
 // Scaffolds a self-contained, single-page visual-editing demo (no opt-in, to
@@ -304,7 +306,7 @@ export const setupAstroVisualEditing = ({
         )}. See https://tina.io/docs/frameworks/astro to wire it up manually.`
       )
     );
-    return { configHandled: true };
+    return { configHandled: true, demoScaffolded: false };
   }
 
   for (const rel of relPaths) {
@@ -318,14 +320,14 @@ export const setupAstroVisualEditing = ({
   if (!configPath) {
     fs.writeFileSync(path.join(baseDir, 'astro.config.mjs'), ASTRO_CONFIG);
     logger.info('Creating astro.config for visual editing... ✅');
-    return { configHandled: true };
+    return { configHandled: true, demoScaffolded: true };
   }
   if (isDefaultAstroConfig(fs.readFileSync(configPath).toString())) {
     fs.writeFileSync(configPath, ASTRO_CONFIG);
     logger.info('Wiring astro.config for visual editing... ✅');
-    return { configHandled: true };
+    return { configHandled: true, demoScaffolded: true };
   }
-  return { configHandled: false };
+  return { configHandled: false, demoScaffolded: true };
 };
 
 export const logAstroConfigGuidance = () => {

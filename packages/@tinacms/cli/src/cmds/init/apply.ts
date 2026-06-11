@@ -240,6 +240,7 @@ async function apply({
     dataLayer: usingDataLayer,
     packageManager: config.packageManager,
     framework: config.framework,
+    demoScaffolded: !!astroSetup?.demoScaffolded,
   });
 
   if (astroSetup && !astroSetup.configHandled) {
@@ -569,12 +570,14 @@ const logNextSteps = ({
   framework,
   packageManager,
   isBackend,
+  demoScaffolded,
 }: {
   config: Config;
   isBackend: boolean;
   dataLayer: boolean;
   packageManager: string;
   framework: Framework;
+  demoScaffolded?: boolean;
 }) => {
   if (isBackend) {
     logger.info(focusText(`\n${titleText(' TinaCMS ')} backend initialized!`));
@@ -624,7 +627,7 @@ const logNextSteps = ({
         '<YourDevURL>/admin/index.html'
       )}`
     );
-    if (framework.name === 'astro') {
+    if (framework.name === 'astro' && demoScaffolded) {
       logger.info(
         `Try the visual-editing demo at ${linkText(
           '<YourDevURL>/tina-demo'
