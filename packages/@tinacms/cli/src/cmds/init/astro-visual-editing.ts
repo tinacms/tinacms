@@ -237,7 +237,10 @@ const VISUAL_EDITING_SNIPPET = `  import node from '@astrojs/node';
     output: 'server',
     adapter: node({ mode: 'standalone' }),
     integrations: [tina() /* , ...your integrations */],
-    vite: { plugins: [tinaAdminDevRedirect()] },
+    vite: {
+      plugins: [tinaAdminDevRedirect()],
+      ssr: { noExternal: ['@tinacms/astro', '@tinacms/bridge'] },
+    },
   });
 
 Full guide: https://tina.io/docs/frameworks/astro#enabling-visual-editing`;
