@@ -1,4 +1,13 @@
-import { isDefaultAstroConfig } from './astro-config-detect';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import {
+  astroNodeAdapterDep,
+  findExistingPaths,
+  isDefaultAstroConfig,
+  parseAstroMajor,
+} from './astro-config-detect';
+import { astroHelloWorldPost } from './templates/content';
 
 describe('isDefaultAstroConfig', () => {
   it('matches the scaffold default', () => {
@@ -55,5 +64,71 @@ describe('isDefaultAstroConfig', () => {
         `import { defineConfig } from 'vite';\nexport default defineConfig({});`
       )
     ).toBe(false);
+  });
+});
+
+describe('findExistingPaths', () => {
+  it('returns only the paths that already exist under baseDir', () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'tina-astro-'));
+    fs.mkdirSync(path.join(dir, 'src/lib/tina'), { recursive: true });
+    fs.writeFileSync(
+      path.join(dir, 'src/lib/tina/data.ts'),
+      'export const MINE = 42;'
+    );
+    expect(
+      findExistingPaths(dir, [
+        'src/lib/tina/data.ts',
+        'src/pages/tina-demo.astro',
+      ])
+    ).toEqual(['src/lib/tina/data.ts']);
+    fs.rmSync(dir, { recursive: true, force: true });
+  });
+
+  it('returns an empty array when none of the paths exist', () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'tina-astro-'));
+    expect(findExistingPaths(dir, ['a.ts', 'b/c.astro'])).toEqual([]);
+    fs.rmSync(dir, { recursive: true, force: true });
+  });
+});
+
+describe('parseAstroMajor', () => {
+  it('reads the major from common version ranges', () => {
+    expect(parseAstroMajor('^6.4.5')).toBe(6);
+    expect(parseAstroMajor('~5.17.3')).toBe(5);
+    expect(parseAstroMajor('6.0.0')).toBe(6);
+    expect(parseAstroMajor('^5.0.0 || ^6.0.0')).toBe(5);
+  });
+
+  it('returns undefined when there is no parseable number', () => {
+    expect(parseAstroMajor(undefined)).toBeUndefined();
+    expect(parseAstroMajor('workspace:*')).toBeUndefined();
+    expect(parseAstroMajor('latest')).toBeUndefined();
+  });
+});
+
+describe('astroNodeAdapterDep', () => {
+  it('pins the adapter to the project Astro major', () => {
+    expect(astroNodeAdapterDep(5)).toBe('@astrojs/node@^9');
+    expect(astroNodeAdapterDep(6)).toBe('@astrojs/node@^10');
+  });
+
+  it('falls back to the unversioned dep for unknown/future majors', () => {
+    expect(astroNodeAdapterDep(undefined)).toBe('@astrojs/node');
+    expect(astroNodeAdapterDep(7)).toBe('@astrojs/node');
+  });
+});
+
+describe('astroHelloWorldPost (editable hero seed)', () => {
+  it('seeds every editable field the schema + PostBody expect', () => {
+    for (const field of [
+      'title:',
+      'eyebrow:',
+      'ctaPrimary:',
+      'ctaSecondary:',
+      'label:',
+      'href:',
+    ]) {
+      expect(astroHelloWorldPost).toContain(field);
+    }
   });
 });

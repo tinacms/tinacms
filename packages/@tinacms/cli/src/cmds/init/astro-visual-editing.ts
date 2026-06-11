@@ -2,7 +2,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import { logger } from '../../logger';
 import { logText } from '../../utils/theme';
-import { isDefaultAstroConfig } from './astro-config-detect';
+import { findExistingPaths, isDefaultAstroConfig } from './astro-config-detect';
 
 const TS_NOCHECK =
   '// @ts-nocheck (generated types/client appear after your first tinacms dev run)\n';
@@ -293,13 +293,8 @@ export const setupAstroVisualEditing = ({
 }: {
   baseDir: string;
 }): AstroSetupResult => {
-  const targets = Object.keys(DEMO_FILES).map((rel) => ({
-    rel,
-    abs: path.join(baseDir, rel),
-  }));
-  const existing = targets
-    .filter((t) => fs.existsSync(t.abs))
-    .map((t) => t.rel);
+  const relPaths = Object.keys(DEMO_FILES);
+  const existing = findExistingPaths(baseDir, relPaths);
   if (existing.length > 0) {
     logger.warn(
       logText(
@@ -311,8 +306,8 @@ export const setupAstroVisualEditing = ({
     return { configHandled: true };
   }
 
-  for (const { rel, abs } of targets) {
-    fs.outputFileSync(abs, DEMO_FILES[rel]);
+  for (const rel of relPaths) {
+    fs.outputFileSync(path.join(baseDir, rel), DEMO_FILES[rel]);
   }
   logger.info('Adding a visual-editing demo at /tina-demo... ✅');
 

@@ -29,6 +29,7 @@ import {
   logAstroConfigGuidance,
   setupAstroVisualEditing,
 } from './astro-visual-editing';
+import { astroNodeAdapterDep } from './astro-config-detect';
 import {
   Framework,
   GeneratedFile,
@@ -188,7 +189,11 @@ async function apply({
   // Wire the Astro dev/build scripts + scaffold the visual-editing demo
   // (first-time init only)
   let astroSetup: AstroSetupResult | null = null;
-  if (config.framework.name === 'astro' && !env.tinaConfigExists) {
+  if (
+    config.framework.name === 'astro' &&
+    !env.tinaConfigExists &&
+    !env.forestryConfigExists
+  ) {
     await updateAstroPackageJson({ baseDir });
     astroSetup = setupAstroVisualEditing({ baseDir });
   }
@@ -348,7 +353,7 @@ const addDependencies = async (
   }
 
   if (config.framework.name === 'astro') {
-    deps.push('@tinacms/astro', '@astrojs/node');
+    deps.push('@tinacms/astro', astroNodeAdapterDep(env.astroMajor));
     // The Astro site is React-free, but the TinaCMS admin SPA is built with
     // React. Astro ships none, and tinacms' loose peer range (>=16.14.0) can
     // resolve mismatched react/react-dom majors, which blanks the admin. Add
