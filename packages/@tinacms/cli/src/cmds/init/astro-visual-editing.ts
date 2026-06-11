@@ -54,12 +54,23 @@ const { data } = Astro.props;
 {
   data && (
     <>
+      {data.eyebrow && (
+        <p class="eyebrow" data-tina-field={tinaField(data, 'eyebrow')}>{data.eyebrow}</p>
+      )}
       <h1 data-tina-field={tinaField(data, 'title')}>{data.title}</h1>
       {data.body && (
         <div class="body" data-tina-field={tinaField(data, 'body')}>
           <TinaMarkdown content={data.body} />
         </div>
       )}
+      <div class="tina-actions">
+        {data.ctaPrimary?.label && (
+          <a class="primary" href={data.ctaPrimary.href} data-tina-field={tinaField(data.ctaPrimary, 'label')}>{data.ctaPrimary.label}</a>
+        )}
+        {data.ctaSecondary?.label && (
+          <a class="secondary" href={data.ctaSecondary.href} target="_blank" rel="noopener noreferrer" data-tina-field={tinaField(data.ctaSecondary, 'label')}>{data.ctaSecondary.label}</a>
+        )}
+      </div>
     </>
   )
 }
@@ -209,14 +220,9 @@ if (!data) return new Response('Not Found', { status: 404 });
   <body>
     <Starfield count={70} />
     <main class="tina-hero">
-      <p class="eyebrow">TinaCMS + Astro</p>
       <TinaIsland name="post" wrapper={islands.post.wrapper} params={{ slug }} primary>
         <PostBody data={data} />
       </TinaIsland>
-      <div class="tina-actions">
-        <a class="primary" href="/admin/index.html#/~/tina-demo">Start editing</a>
-        <a class="secondary" href="https://tina.io/docs/frameworks/astro" target="_blank" rel="noopener noreferrer">Read the docs</a>
-      </div>
     </main>
   </body>
 </html>
