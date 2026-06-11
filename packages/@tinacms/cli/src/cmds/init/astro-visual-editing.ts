@@ -44,6 +44,7 @@ export const ALL: APIRoute = experimental_createIslandRoute(islands);
 ${TS_NOCHECK.trim()}
 import TinaMarkdown from '@tinacms/astro/TinaMarkdown.astro';
 import { tinaField } from '@tinacms/astro/tina-field';
+import { sanitizeHref } from '@tinacms/astro/sanitize';
 import type { PostQuery } from '../../../tina/__generated__/types';
 
 interface Props {
@@ -65,10 +66,10 @@ const { data } = Astro.props;
       )}
       <div class="tina-actions">
         {data.ctaPrimary?.label && (
-          <a class="primary" href={data.ctaPrimary.href} data-tina-field={tinaField(data.ctaPrimary, 'label')}>{data.ctaPrimary.label}</a>
+          <a class="primary" href={sanitizeHref(data.ctaPrimary.href, '/admin/index.html#/~/tina-demo')} data-tina-field={tinaField(data.ctaPrimary, 'label')}>{data.ctaPrimary.label}</a>
         )}
         {data.ctaSecondary?.label && (
-          <a class="secondary" href={data.ctaSecondary.href} target="_blank" rel="noopener noreferrer" data-tina-field={tinaField(data.ctaSecondary, 'label')}>{data.ctaSecondary.label}</a>
+          <a class="secondary" href={sanitizeHref(data.ctaSecondary.href, 'https://tina.io/docs/frameworks/astro')} target="_blank" rel="noopener noreferrer" data-tina-field={tinaField(data.ctaSecondary, 'label')}>{data.ctaSecondary.label}</a>
         )}
       </div>
     </>
