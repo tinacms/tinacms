@@ -21,7 +21,7 @@ expect <<EXP
 set timeout 600
 spawn node "$CLI" init
 expect {
-  -re "What framework" { send "\r"; exp_continue }
+  -re "framework" { send "\r"; exp_continue }
   -re "package manager" { send "\r"; exp_continue }
   -re "host your project|TinaCloud|self-host" { send "\r"; exp_continue }
   -re "Typescript" { send "y\r"; exp_continue }

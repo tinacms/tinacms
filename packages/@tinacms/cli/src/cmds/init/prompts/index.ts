@@ -21,7 +21,7 @@ export const askCommonSetUp = async () => {
     {
       name: 'framework',
       type: 'select',
-      message: 'What framework are you using?',
+      message: 'Which framework is your existing site built with?',
       choices: [
         { title: 'Astro', value: { name: 'astro', reactive: false } },
         { title: 'Next.js', value: { name: 'next', reactive: true } },

@@ -10,3 +10,5 @@ Add **Astro** as a first-class framework in `tinacms init` (now listed first). S
 - scaffolds a self-contained, **fully editable** visual-editing demo at `/tinacms-demo`: a dark hero whose eyebrow, headline, tagline, and both call-to-action buttons (label + link) are all click-to-edit, with scoped styles and a procedural SVG starfield (no CSS framework or image assets). CMS-editable button links are passed through `sanitizeHref`.
 
 The demo is scaffolded automatically with no opt-in (mirroring the Next.js init demo), and is skipped during Forestry migrations.
+
+`init` also makes clear it adds Tina to an **existing** site: it points to `npx create-tina-app@latest` for new projects and stops early (with that pointer) when run in a folder that has no `package.json`.

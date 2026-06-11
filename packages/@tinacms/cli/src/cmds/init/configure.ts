@@ -11,6 +11,7 @@ import {
   Config,
 } from './prompts';
 import { logger } from '../../logger';
+import { cmdText, logText } from '../../utils/theme';
 import { askOverwriteGenerateFiles } from './prompts/generatedFiles';
 
 async function configure(
@@ -29,6 +30,28 @@ async function configure(
   }
 
   const skipTinaSetupCommands = env.tinaConfigExists;
+
+  // `init` adds TinaCMS to an EXISTING project; it does not scaffold a new one.
+  // No package.json => there's no project here, so steer to create-tina-app.
+  if (!opts.isBackend && !env.packageJSONExists) {
+    logger.warn(
+      "No package.json found here — `tinacms init` adds TinaCMS to an existing site, it doesn't create one."
+    );
+    logger.info(
+      `To start a new TinaCMS project from a template, run: ${cmdText(
+        'npx create-tina-app@latest'
+      )}`
+    );
+    process.exit(0);
+  }
+  if (!opts.isBackend) {
+    logger.info('Setting up TinaCMS in your existing site.');
+    logger.info(
+      logText('(Starting a new project instead? Press Ctrl+C and run ') +
+        cmdText('npx create-tina-app@latest') +
+        logText(')')
+    );
+  }
 
   const { framework, packageManager } = await askCommonSetUp();
   const config: Config = {

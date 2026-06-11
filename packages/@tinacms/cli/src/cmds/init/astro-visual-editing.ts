@@ -246,9 +246,14 @@ const VISUAL_EDITING_SNIPPET = `  import node from '@astrojs/node';
 
 Full guide: https://tina.io/docs/frameworks/astro#enabling-visual-editing`;
 
-const CONFIG_GUIDANCE = `Your astro.config already has content, so it was left unchanged. To finish the visual-editing demo, add the Tina integration and an SSR adapter:
+const CONFIG_GUIDANCE = `Your astro.config already has content, so it was left unchanged.
+The /tinacms-demo page was created and works in astro dev right now.
 
-${VISUAL_EDITING_SNIPPET}`;
+To make it build (astro build) and deploy, add an SSR adapter + the Tina integration to your config:
+
+${VISUAL_EDITING_SNIPPET}
+
+Once /tinacms-demo works, reuse its tina/config.ts collection and the src/components/tina pattern in your own pages.`;
 
 const ASTRO_CONFIG = `import { defineConfig } from 'astro/config';
 import node from '@astrojs/node';

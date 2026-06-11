@@ -51,3 +51,12 @@ jobs:
           INIT_PROJECT_DIR: ${{ steps.init.outputs.project_dir }}
           CI: true
         run: pnpm test:e2e
+      - name: Verify production build (auto-wired templates only)
+        # minimal/basics start from an empty astro.config, so init writes the full
+        # SSR config and `astro build` must pass. blog/starlight keep their own
+        # non-empty config — init prints guidance instead of wiring it, so their
+        # build needs the user's documented config change; they are validated in
+        # dev only (the Playwright step above), not built here.
+        if: matrix.template == 'minimal' || matrix.template == 'basics'
+        working-directory: ${{ steps.init.outputs.project_dir }}
+        run: npx astro build
