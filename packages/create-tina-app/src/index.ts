@@ -14,7 +14,7 @@ import { initializeGit, makeFirstCommit } from './util/git';
 import { TEMPLATES, Template, downloadTemplate } from './templates';
 import { preRunChecks } from './util/preRunChecks';
 import { checkPackageExists } from './util/checkPkgManagers';
-import { TextStyles, TextStylesBold } from './util/textstyles';
+import { TextStyles, TextStylesBold, box } from './util/textstyles';
 import { exit } from 'node:process';
 import { extractOptions } from './util/options';
 import { type PackageManager, PKG_MANAGERS } from './util/packageManagers';
@@ -36,6 +36,7 @@ import fetchPostHogConfig from './util/fetchPosthogConfig';
 import { osInfo as getOsSystemInfo } from 'systeminformation';
 
 const DISCORD_SUPPORT_URL = 'https://discord.com/invite/zumN63Ybpf';
+const FAQ_URL = 'https://tina.io/docs/faq';
 
 let posthogClient: PostHog | null = null;
 async function initializePostHog(
@@ -234,8 +235,12 @@ export async function run() {
       message: 'Which package manager would you like to use?',
       name: 'packageManager',
       type: 'select',
+      initial: Math.max(0, installedPkgManagers.indexOf('pnpm')),
       choices: installedPkgManagers.map((manager) => {
-        return { title: manager, value: manager };
+        return {
+          title: manager === 'pnpm' ? 'pnpm (recommended)' : manager,
+          value: manager,
+        };
       }),
     });
     if (!Object.hasOwn(res, 'packageManager')) {
@@ -440,8 +445,15 @@ export async function run() {
     await install(pkgManager as PackageManager, opts.verbose);
     spinner.succeed();
   } catch (err) {
-    const error = err as Error;
-    spinner.fail(`Failed to install packages: ${error.message}`);
+    const error = err instanceof Error ? err : new Error(String(err));
+    const reason = error.message || String(err);
+    spinner.fail(`Failed to install packages: ${reason}`);
+    console.log(
+      `\n${box([
+        `${TextStyles.bold('Stuck?')} Check the TinaCMS FAQ for common install issues:`,
+        TextStyles.link(FAQ_URL),
+      ])}\n`
+    );
     packageManagerInstallationHadError = true;
     postHogCaptureError(posthogClient, userId, sessionId, error, {
       errorCode: ERROR_CODES.ERR_INSTALL_PKG_MANAGER_FAILED,

@@ -1,0 +1,60 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "table",
+      "props": { "align": ["left", "center", "right"] },
+      "children": [
+        {
+          "type": "tr",
+          "children": [
+            {
+              "type": "td",
+              "children": [
+                { "type": "p", "children": [{ "type": "text", "text": "Name" }] }
+              ]
+            },
+            {
+              "type": "td",
+              "children": [
+                { "type": "p", "children": [{ "type": "text", "text": "Role" }] }
+              ]
+            },
+            {
+              "type": "td",
+              "children": [
+                { "type": "p", "children": [{ "type": "text", "text": "Score" }] }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "tr",
+          "children": [
+            {
+              "type": "td",
+              "children": [
+                {
+                  "type": "p",
+                  "children": [{ "type": "text", "text": "Ada", "bold": true }]
+                }
+              ]
+            },
+            {
+              "type": "td",
+              "children": [
+                { "type": "p", "children": [{ "type": "text", "text": "Eng" }] }
+              ]
+            },
+            {
+              "type": "td",
+              "children": [
+                { "type": "p", "children": [{ "type": "text", "text": "99" }] }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
