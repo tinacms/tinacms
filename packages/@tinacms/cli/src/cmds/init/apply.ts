@@ -630,7 +630,7 @@ const logNextSteps = ({
     if (framework.name === 'astro' && demoScaffolded) {
       logger.info(
         `Try the visual-editing demo at ${linkText(
-          '<YourDevURL>/tina-demo'
+          '<YourDevURL>/tinacms-demo'
         )} (open the post in the CMS to click-and-edit).`
       );
     }

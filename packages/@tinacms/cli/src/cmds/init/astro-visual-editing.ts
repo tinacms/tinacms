@@ -66,7 +66,7 @@ const { data } = Astro.props;
       )}
       <div class="tina-actions">
         {data.ctaPrimary?.label && (
-          <a class="primary" href={sanitizeHref(data.ctaPrimary.href, '/admin/index.html#/~/tina-demo')} data-tina-field={tinaField(data.ctaPrimary, 'label')}>{data.ctaPrimary.label}</a>
+          <a class="primary" href={sanitizeHref(data.ctaPrimary.href, '/admin/index.html#/~/tinacms-demo')} data-tina-field={tinaField(data.ctaPrimary, 'label')}>{data.ctaPrimary.label}</a>
         )}
         {data.ctaSecondary?.label && (
           <a class="secondary" href={sanitizeHref(data.ctaSecondary.href, 'https://tina.io/docs/frameworks/astro')} target="_blank" rel="noopener noreferrer" data-tina-field={tinaField(data.ctaSecondary, 'label')}>{data.ctaSecondary.label}</a>
@@ -104,7 +104,7 @@ const stars = Array.from({ length: count }, (_, i) => {
   ))}
 </svg>
 `,
-  'src/pages/tina-demo.astro': `---
+  'src/pages/tinacms-demo.astro': `---
 // Tina visual-editing demo hero. Open this page in the CMS to click-and-edit
 // the title (headline) and body (tagline), then copy the pattern into your own
 // pages. Self-contained: scoped styles, no CSS framework, no image assets. Safe
@@ -312,7 +312,7 @@ export const setupAstroVisualEditing = ({
   for (const rel of relPaths) {
     fs.outputFileSync(path.join(baseDir, rel), DEMO_FILES[rel]);
   }
-  logger.info('Adding a visual-editing demo at /tina-demo... ✅');
+  logger.info('Adding a visual-editing demo at /tinacms-demo... ✅');
 
   // No config at all -> safe to create one. Empty default -> overwrite. Only a
   // config with real content is left alone (the caller prints guidance).

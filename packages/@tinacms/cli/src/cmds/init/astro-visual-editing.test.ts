@@ -78,7 +78,7 @@ describe('findExistingPaths', () => {
     expect(
       findExistingPaths(dir, [
         'src/lib/tina/data.ts',
-        'src/pages/tina-demo.astro',
+        'src/pages/tinacms-demo.astro',
       ])
     ).toEqual(['src/lib/tina/data.ts']);
     fs.rmSync(dir, { recursive: true, force: true });

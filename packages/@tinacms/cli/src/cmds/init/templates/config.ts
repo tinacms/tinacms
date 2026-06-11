@@ -114,8 +114,8 @@ const generateCollectionString = (args: ConfigTemplateArgs) => {
       path: 'content/posts',
       fields: ${astroHeroFields},
       ui: {
-        // Opens the /tina-demo page for visual editing. Change or remove to fit your site.
-        router: () => '/tina-demo',
+        // Opens the /tinacms-demo page for visual editing. Change or remove to fit your site.
+        router: () => '/tinacms-demo',
       },
     },
   ]`;
