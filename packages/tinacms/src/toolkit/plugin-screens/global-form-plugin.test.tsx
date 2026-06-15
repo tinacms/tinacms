@@ -1,7 +1,11 @@
 import { render, screen } from '@testing-library/react';
 import * as React from 'react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { tinaReducer, initialState, type TinaAction } from '@toolkit/tina-state';
+import {
+  tinaReducer,
+  initialState,
+  type TinaAction,
+} from '@toolkit/tina-state';
 
 // Capture FormBuilder's props to assert it is never handed an undefined form
 // (the original crash) and ultimately receives the restored global form.
@@ -40,17 +44,13 @@ function Harness({
   form: any;
   seed?: TinaAction[];
 }) {
-  const [state, dispatch] = React.useReducer(
-    tinaReducer,
-    undefined,
-    () => {
-      let s = initialState({} as any);
-      (seed || []).forEach((action) => {
-        s = tinaReducer(s, action);
-      });
-      return s;
-    }
-  );
+  const [state, dispatch] = React.useReducer(tinaReducer, undefined, () => {
+    let s = initialState({} as any);
+    (seed || []).forEach((action) => {
+      s = tinaReducer(s, action);
+    });
+    return s;
+  });
 
   const cmsRef = React.useRef<any>({});
   cmsRef.current.state = state;
