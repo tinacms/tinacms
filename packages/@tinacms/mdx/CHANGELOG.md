@@ -1,5 +1,13 @@
 # @tinacms/mdx
 
+## 2.1.7
+
+### Patch Changes
+
+- [#7056](https://github.com/tinacms/tinacms/pull/7056) [`c491fc5`](https://github.com/tinacms/tinacms/commit/c491fc55e612725f5d775eeb1fdf3f8ba82314fa) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Harden cross-window message handling and rich-text URL sanitization.
+
+  Adds stricter origin/source checks for trusted message flows, use explicit target origins for preview iframe message, and applies URL sanitization to slatejson rich-text parsing and default rich-text link/image rendering.
+
 ## 2.1.6
 
 ### Patch Changes
