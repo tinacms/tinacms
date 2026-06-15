@@ -1,5 +1,28 @@
 # tinacms-cli
 
+## 2.5.0
+
+### Minor Changes
+
+- [#7049](https://github.com/tinacms/tinacms/pull/7049) [`29a0e2e`](https://github.com/tinacms/tinacms/commit/29a0e2e43790af89408453a3a0ba9f77c31648df) Thanks [@0xharkirat](https://github.com/0xharkirat)! - Add **Astro** as a first-class framework in `tinacms init` (now listed first). Selecting Astro:
+
+  - auto-sets the public assets folder to `public` (no prompt) and wraps the `package.json` `dev`/`build` scripts (`tinacms dev -c "astro dev"`, `tinacms build && astro build`)
+  - installs `@tinacms/astro` plus an `@astrojs/node` adapter **pinned to the project's Astro major** (node 9 for Astro 5, node 10 for Astro 6), and matched `react`/`react-dom` (`^18.3.1`) as **dev dependencies** — the site stays React-free, but the admin SPA is built with React and a bare Astro project ships none (skipped when the project already declares both)
+  - wires `astro.config` for SSR + visual editing, or — when your config is already customized — prints exactly what to add
+  - scaffolds a self-contained, **fully editable** visual-editing demo at `/tinacms-demo`: a dark hero whose eyebrow, headline, tagline, and both call-to-action buttons (label + link) are all click-to-edit, with scoped styles and a procedural SVG starfield (no CSS framework or image assets). CMS-editable button links are passed through `sanitizeHref`.
+
+  The demo is scaffolded automatically with no opt-in (mirroring the Next.js init demo), and is skipped during Forestry migrations.
+
+  `init` also makes clear it adds Tina to an **existing** site: it points to `npx create-tina-app@latest` for new projects and stops early (with that pointer) when run in a folder that has no `package.json`.
+
+### Patch Changes
+
+- Updated dependencies [[`95b7523`](https://github.com/tinacms/tinacms/commit/95b75237cb91ec3dc5dac9ce52359f9786072502), [`c931f18`](https://github.com/tinacms/tinacms/commit/c931f18a19c292cd89530e41b71da8fcd90c8415)]:
+  - @tinacms/app@2.5.5
+  - @tinacms/graphql@2.4.4
+  - @tinacms/search@1.2.18
+  - tinacms@3.9.2
+
 ## 2.4.4
 
 ### Patch Changes
