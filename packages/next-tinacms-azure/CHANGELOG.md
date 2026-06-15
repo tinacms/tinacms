@@ -1,5 +1,12 @@
 # next-tinacms-azure
 
+## 14.0.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - tinacms@3.9.2
+
 ## 14.0.1
 
 ### Patch Changes
