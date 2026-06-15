@@ -1,5 +1,12 @@
 # tinacms-gitprovider-github
 
+## 4.1.11
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/datalayer@2.0.24
+
 ## 4.1.10
 
 ### Patch Changes

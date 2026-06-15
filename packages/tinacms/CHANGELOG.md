@@ -1,5 +1,18 @@
 # tinacms
 
+## 3.9.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/search@1.2.18
+
+## 3.9.1
+
+### Patch Changes
+
+- [#7028](https://github.com/tinacms/tinacms/pull/7028) [`7b539b8`](https://github.com/tinacms/tinacms/commit/7b539b8e7d7d9f4451b5fd36a04d26b734f7d78e) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Skip the filesystem-backed response cache on edge runtimes (Cloudflare Workers, Vercel Edge) where Node's `fs` API is present but unusable, which could otherwise hang concurrent identical queries. Adds a `cache` option to `createClient` to force-disable the cache.
+
 ## 3.9.0
 
 ### Minor Changes

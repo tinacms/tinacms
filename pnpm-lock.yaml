@@ -2613,6 +2613,12 @@ importers:
         specifier: ^22.13.1
         version: 22.19.3
 
+  playwright/astro-init:
+    devDependencies:
+      '@playwright/test':
+        specifier: 'catalog:'
+        version: 1.57.0
+
   playwright/tina-playwright:
     dependencies:
       axios:

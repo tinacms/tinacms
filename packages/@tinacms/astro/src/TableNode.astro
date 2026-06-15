@@ -1,0 +1,65 @@
+---
+/**
+ * Renders a native markdown `table` node. Mirrors the `case 'table'` branch
+ * in `packages/tinacms/src/rich-text/index.tsx`: every row goes into a single
+ * `<tbody>` as `<td>` cells (the first row is NOT promoted to a header — that
+ * matches the React renderer's native-table path), per-column alignment comes
+ * from `node.props.align`, and `components.table` / `.tr` / `.td` override the
+ * default tags. Each cell's content is the inline content of its paragraph,
+ * rendered without a wrapping `<p>` (the equivalent of React's `p` → `td`
+ * override).
+ */
+import TinaMarkdown from './TinaMarkdown.astro';
+import type {
+  CustomComponentsMap,
+  InlineElement,
+  TableCellElement,
+  TableElement,
+} from './types';
+
+interface Props {
+  node: TableElement;
+  components: CustomComponentsMap;
+}
+
+const { node, components } = Astro.props;
+
+const TableOverride = components.table;
+const TrOverride = components.tr;
+const TdOverride = components.td;
+
+const align = node.props?.align ?? [];
+const rows = node.children ?? [];
+
+const TABLE_STYLE = 'border:1px solid #EDECF3';
+const tdStyle = (i: number) =>
+  `text-align:${align[i] ?? 'auto'};border:1px solid #EDECF3;padding:0.25rem`;
+
+// A cell wraps its content in a paragraph; unwrap to the inline nodes so the
+// cell renders `<td>text</td>` rather than `<td><p>text</p></td>`.
+const cellContent = (cell: TableCellElement): InlineElement[] =>
+  (cell?.children ?? []).flatMap((paragraph) => paragraph?.children ?? []);
+
+const Table = TableOverride ?? 'table';
+const tableProps = TableOverride ? { node } : { style: TABLE_STYLE };
+const Tr = TrOverride ?? 'tr';
+---
+<Table {...tableProps}>
+  <tbody>
+    {rows.map((row) => (
+      <Tr>
+        {(row?.children ?? []).map((cell, i) =>
+          TdOverride ? (
+            <TdOverride align={align[i]}>
+              <TinaMarkdown content={cellContent(cell)} components={components} />
+            </TdOverride>
+          ) : (
+            <td style={tdStyle(i)}>
+              <TinaMarkdown content={cellContent(cell)} components={components} />
+            </td>
+          )
+        )}
+      </Tr>
+    ))}
+  </tbody>
+</Table>
