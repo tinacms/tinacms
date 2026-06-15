@@ -48,9 +48,7 @@ describe('parseMDX', () => {
     it('clears an unsafe URL stored on an image node', () => {
       const input = {
         type: 'root',
-        children: [
-          { type: 'img', url: 'javascript:alert(1)', children: [] },
-        ],
+        children: [{ type: 'img', url: 'javascript:alert(1)', children: [] }],
       };
       const tree = parseMDX(input as any, slateField, passthrough);
       expect((tree.children[0] as any).url).toBe('');

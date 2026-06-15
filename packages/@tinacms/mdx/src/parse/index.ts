@@ -17,7 +17,11 @@ import { parseMDX as parseMDXNext } from '../next';
 import type { Pattern } from '../stringify';
 import { parseShortcode } from './parseShortcode';
 import type * as Plate from './plate';
-import { RichTextParseError, remarkToSlate, sanitizeUrl } from './remarkToPlate';
+import {
+  RichTextParseError,
+  remarkToSlate,
+  sanitizeUrl,
+} from './remarkToPlate';
 /**
  * ### Convert the MDXAST into an API-friendly format
  *
@@ -123,7 +127,9 @@ const sanitizeSlateTree = <T>(node: T): T => {
   if (!node || typeof node !== 'object') {
     return node;
   }
-  const next: Record<string, unknown> = { ...(node as Record<string, unknown>) };
+  const next: Record<string, unknown> = {
+    ...(node as Record<string, unknown>),
+  };
   if (
     (next.type === 'a' || next.type === 'img') &&
     typeof next.url === 'string'
@@ -133,7 +139,11 @@ const sanitizeSlateTree = <T>(node: T): T => {
   if (Array.isArray(next.children)) {
     next.children = next.children.map((child) => sanitizeSlateTree(child));
   }
-  if (next.props && typeof next.props === 'object' && !Array.isArray(next.props)) {
+  if (
+    next.props &&
+    typeof next.props === 'object' &&
+    !Array.isArray(next.props)
+  ) {
     const props = next.props as Record<string, unknown>;
     if (isSlateContent(props.children)) {
       next.props = { ...props, children: sanitizeSlateTree(props.children) };

@@ -21,7 +21,7 @@ function Probe() {
     variables,
     data: initialData,
   });
-  return <span data-testid="title">{data?.title}</span>;
+  return <span data-testid='title'>{data?.title}</span>;
 }
 
 function dispatchUpdate(origin: string, title: string, source?: Window) {
@@ -51,7 +51,11 @@ describe('useTina overlay message handling', () => {
     const { getByTestId } = render(<Probe />);
     expect(getByTestId('title').textContent).toBe('initial');
 
-    dispatchUpdate('https://untrusted.example', 'untrusted-update', window.parent);
+    dispatchUpdate(
+      'https://untrusted.example',
+      'untrusted-update',
+      window.parent
+    );
 
     expect(getByTestId('title').textContent).toBe('initial');
   });
