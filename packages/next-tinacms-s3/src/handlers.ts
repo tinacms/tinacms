@@ -18,6 +18,7 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Media, MediaListOptions } from 'tinacms';
 import path from 'node:path';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { resolveKey, MediaKeyError } from './media-key';
 
 export interface S3Config {
   config: S3ClientConfig;
@@ -68,13 +69,17 @@ export const createMediaHandler = (config: S3Config, options?: S3Options) => {
         if (req.query.key) {
           const expiresIn: number =
             (req.query.expiresIn && Number(req.query.expiresIn)) || 3600;
-          const s3_key = req.query.key
-            ? Array.isArray(req.query.key)
-              ? req.query.key[0]
-              : req.query.key
-            : null;
-          if (!s3_key) {
-            return res.status(400).json({ message: 'key is required' });
+          const rawKey = Array.isArray(req.query.key)
+            ? req.query.key[0]
+            : req.query.key;
+          let s3_key: string;
+          try {
+            s3_key = resolveKey(mediaRoot, rawKey);
+          } catch (e) {
+            if (e instanceof MediaKeyError) {
+              return res.status(400).json({ message: e.message });
+            }
+            throw e;
           }
           if (await keyExists(client, bucket, s3_key)) {
             return res.status(400).json({ message: 'key already exists' });
@@ -90,7 +95,7 @@ export const createMediaHandler = (config: S3Config, options?: S3Options) => {
         }
         return listMedia(req, res, client, bucket, mediaRoot, cdnUrl);
       case 'DELETE':
-        return deleteAsset(req, res, client, bucket);
+        return deleteAsset(req, res, client, bucket, mediaRoot);
       default:
         res.end(404);
     }
@@ -200,10 +205,21 @@ async function deleteAsset(
   req: NextApiRequest,
   res: NextApiResponse,
   client: S3Client,
-  bucket: string
+  bucket: string,
+  mediaRoot: string
 ) {
   const { media } = req.query;
-  const [, objectKey] = media as string[];
+  const [, rawKey] = media as string[];
+
+  let objectKey: string;
+  try {
+    objectKey = resolveKey(mediaRoot, rawKey);
+  } catch (e) {
+    if (e instanceof MediaKeyError) {
+      return res.status(400).json({ message: e.message });
+    }
+    throw e;
+  }
 
   const params: DeleteObjectCommandInput = {
     Bucket: bucket,

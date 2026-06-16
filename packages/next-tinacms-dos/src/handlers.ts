@@ -18,6 +18,7 @@ import path from 'path';
 import fs from 'fs';
 import { NextApiRequest, NextApiResponse } from 'next';
 import multer from 'multer';
+import { resolveKey, MediaKeyError } from './media-key';
 import { promisify } from 'util';
 
 export interface DOSConfig {
@@ -69,7 +70,7 @@ export const createMediaHandler = (config: DOSConfig, options?: DOSOptions) => {
       case 'POST':
         return uploadMedia(req, res, client, bucket, mediaRoot, cdnUrl);
       case 'DELETE':
-        return deleteAsset(req, res, client, bucket);
+        return deleteAsset(req, res, client, bucket, mediaRoot);
       default:
         res.end(404);
     }
@@ -114,11 +115,20 @@ async function uploadMedia(
   const fileType = req.file?.mimetype;
   const blob = fs.readFileSync(filePath);
   const filename = path.basename(filePath);
+
+  let objectKey: string;
+  try {
+    objectKey = resolveKey(mediaRoot, prefix + filename);
+  } catch (e) {
+    if (e instanceof MediaKeyError) {
+      return res.status(400).json({ message: e.message });
+    }
+    throw e;
+  }
+
   const params: PutObjectCommandInput = {
     Bucket: bucket,
-    Key: mediaRoot
-      ? path.join(mediaRoot, prefix + filename)
-      : prefix + filename,
+    Key: objectKey,
     Body: blob,
     ACL: 'public-read',
     ContentType: fileType || 'application/octet-stream',
@@ -138,11 +148,7 @@ async function uploadMedia(
         '400x400': src,
         '1000x1000': src,
       },
-      src:
-        cdnUrl +
-        (mediaRoot
-          ? path.join(mediaRoot, prefix + filename)
-          : prefix + filename),
+      src: cdnUrl + objectKey,
     });
   } catch (e) {
     console.error('Error uploading media');
@@ -250,15 +256,26 @@ async function deleteAsset(
   req: NextApiRequest,
   res: NextApiResponse,
   client: S3Client,
-  bucket: string
+  bucket: string,
+  mediaRoot: string
 ) {
   const { media } = req.query;
-  let [, objectKey] = media as string[];
+  let [, rawKey] = media as string[];
   const objectKeyIsSplit =
     media && media.length > 2 && typeof media !== 'string';
 
   if (objectKeyIsSplit) {
-    objectKey = media.slice(1).join('/');
+    rawKey = media.slice(1).join('/');
+  }
+
+  let objectKey: string;
+  try {
+    objectKey = resolveKey(mediaRoot, rawKey);
+  } catch (e) {
+    if (e instanceof MediaKeyError) {
+      return res.status(400).json({ message: e.message });
+    }
+    throw e;
   }
 
   const params: DeleteObjectCommandInput = {

@@ -8,6 +8,7 @@ import path from 'path';
 import { NextApiRequest, NextApiResponse } from 'next';
 import multer from 'multer';
 import { promisify } from 'util';
+import { resolveKey, MediaKeyError } from './media-key';
 
 export interface CloudinaryConfig {
   cloud_name: string;
@@ -72,10 +73,23 @@ async function uploadMedia(req: NextApiRequest, res: NextApiResponse) {
 
   const { directory } = req.body;
 
+  let folder: string;
+  try {
+    // Cloudinary has no mediaRoot concept yet; an empty folder (root upload)
+    // is allowed, but traversal / absolute folders are rejected.
+    const rawFolder = (directory || '').replace(/^\/+/, '');
+    folder = rawFolder ? resolveKey('', rawFolder) : '';
+  } catch (e) {
+    if (e instanceof MediaKeyError) {
+      return res.status(400).json({ message: e.message });
+    }
+    throw e;
+  }
+
   try {
     //@ts-ignore
     const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: directory.replace(/^\//, ''),
+      folder,
       use_filename: true,
       overwrite: false,
       resource_type: 'auto',
@@ -192,9 +206,19 @@ const findErrorMessage = (e: any) => {
 
 async function deleteAsset(req: NextApiRequest, res: NextApiResponse) {
   const { media } = req.query;
-  const [, public_id] = media as string[];
+  const [, rawPublicId] = media as string[];
 
-  cloudinary.uploader.destroy(public_id as string, {}, (err) => {
+  let public_id: string;
+  try {
+    public_id = resolveKey('', rawPublicId);
+  } catch (e) {
+    if (e instanceof MediaKeyError) {
+      return res.status(400).json({ message: e.message });
+    }
+    throw e;
+  }
+
+  cloudinary.uploader.destroy(public_id, {}, (err: any) => {
     if (err) res.status(500);
     res.json({
       err,

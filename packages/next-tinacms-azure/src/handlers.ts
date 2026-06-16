@@ -7,6 +7,7 @@ import type { AzureBlobStorageConfig } from './types';
 import type { MediaListOptions } from 'tinacms';
 import path from 'node:path';
 import { type NextRequest, NextResponse } from 'next/server';
+import { resolveKey, MediaKeyError } from './media-key';
 
 type RouteParams = { params: { media: string[] } };
 
@@ -59,7 +60,17 @@ async function uploadMedia(req: NextRequest, config: AzureBlobStorageConfig) {
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
-  const blobName = path.join(directory, filename);
+  let blobName: string;
+  try {
+    // Azure has no mediaRoot concept yet; this still rejects empty keys,
+    // absolute paths and traversal. A mediaRoot boundary is a follow-up.
+    blobName = resolveKey('', path.join(directory, filename));
+  } catch (e) {
+    if (e instanceof MediaKeyError) {
+      return NextResponse.json({ error: e.message }, { status: 400 });
+    }
+    throw e;
+  }
   const blockBlobClient = containerClient.getBlockBlobClient(blobName);
   await blockBlobClient.uploadData(buffer);
 
@@ -76,7 +87,17 @@ async function deleteAsset(
   config: AzureBlobStorageConfig
 ): Promise<NextResponse> {
   const { media } = context.params;
-  const [, blobName] = media;
+  const [, rawKey] = media;
+
+  let blobName: string;
+  try {
+    blobName = resolveKey('', rawKey);
+  } catch (e) {
+    if (e instanceof MediaKeyError) {
+      return NextResponse.json({ error: e.message }, { status: 400 });
+    }
+    throw e;
+  }
 
   const options: BlobDeleteOptions = {
     deleteSnapshots: 'include',
