@@ -4,19 +4,20 @@ import { useCMS } from '@toolkit/react-core';
 import { FormModal } from '@toolkit/react-forms';
 import type { ScreenPlugin } from '@toolkit/react-screens';
 import { TinaCMS } from '@toolkit/tina-cms';
+import { cn } from '@utils/cn';
 import * as React from 'react';
 import { BiExit, BiMenu, BiX } from 'react-icons/bi';
 import { FiInfo } from 'react-icons/fi';
 import { VscNewFile } from 'react-icons/vsc';
-import { cn } from '@utils/cn';
-import { NavContext } from './nav-context';
 import { VersionInfo } from './VersionInfo';
+import { NavContext } from './nav-context';
 import { SyncStatusButton, SyncStatusModal } from './sync-status';
 
 interface NavCollection {
   label?: string;
   name: string;
   isAuthCollection?: boolean;
+  ui?: { global?: boolean | object };
 }
 
 interface NavProps {
@@ -37,6 +38,9 @@ interface NavProps {
   sidebarWidth?: number;
   RenderNavSite: React.ComponentType<{ view: ScreenPlugin }>;
   RenderNavCloud: React.ComponentType<{ config: CloudConfigPlugin }>;
+  RenderNavGlobal: React.ComponentType<{
+    collection: { label?: string; name: string };
+  }>;
   RenderNavCollection: React.ComponentType<{
     collection: { label: string; name: string };
   }>;
@@ -60,6 +64,7 @@ export const Nav = ({
   sidebarWidth,
   RenderNavSite,
   RenderNavCloud,
+  RenderNavGlobal,
   RenderNavCollection,
   AuthRenderNavCollection,
   ...props
@@ -72,17 +77,20 @@ export const Nav = ({
 
   const menuIsOpen = menuIsOpenProp ?? navContext?.menuIsOpen ?? false;
   const toggleMenu = toggleMenuProp ?? navContext?.toggleMenu ?? (() => {});
-  const { contentCollections, authCollection } =
+  const { contentCollections, authCollection, globalCollections } =
     collectionsInfo.collections.reduce(
       (
         acc: {
           contentCollections: NavCollection[];
+          globalCollections: NavCollection[];
           authCollection?: NavCollection;
         },
         collection: NavCollection
       ) => {
         if (collection.isAuthCollection) {
           acc.authCollection = collection;
+        } else if (collection.ui?.global) {
+          acc.globalCollections.push(collection);
         } else {
           acc.contentCollections.push(collection);
         }
@@ -90,6 +98,7 @@ export const Nav = ({
       },
       {
         contentCollections: [],
+        globalCollections: [],
       }
     );
 
@@ -167,12 +176,22 @@ export const Nav = ({
               />
             </>
           )}
-          {(screenCategories.Site.length > 0 || contentCreators.length) > 0 && (
+          {(globalCollections.length > 0 ||
+            screenCategories.Site.length > 0 ||
+            contentCreators.length > 0) && (
             <>
               <h4 className='uppercase font-sans font-bold text-sm mb-3 mt-8 text-gray-700'>
                 Site
               </h4>
               <ul className='flex flex-col gap-4'>
+                {globalCollections.map((collection) => {
+                  return (
+                    <li key={`nav-global-${collection.name}`}>
+                      <RenderNavGlobal collection={collection} />
+                    </li>
+                  );
+                })}
+
                 {screenCategories.Site.map((view) => {
                   return (
                     <li key={`nav-site-${view.name}`}>

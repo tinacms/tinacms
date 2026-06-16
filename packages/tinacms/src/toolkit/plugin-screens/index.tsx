@@ -4,12 +4,12 @@
 
 */
 
-import * as React from 'react';
-import { MdOutlineSettings } from 'react-icons/md';
+import { FormBuilder } from '@toolkit/form-builder';
 import { Form } from '@toolkit/forms';
 import { ScreenPlugin } from '@toolkit/react-screens';
-import { FormBuilder } from '@toolkit/form-builder';
 import { useCMS } from '@toolkit/react-tinacms';
+import * as React from 'react';
+import { MdOutlineLanguage } from 'react-icons/md';
 
 export class GlobalFormPlugin implements ScreenPlugin {
   __type: ScreenPlugin['__type'] = 'screen';
@@ -24,7 +24,7 @@ export class GlobalFormPlugin implements ScreenPlugin {
     layout?: ScreenPlugin['layout']
   ) {
     this.name = form.label;
-    this.Icon = icon || MdOutlineSettings;
+    this.Icon = icon || MdOutlineLanguage;
     this.layout = layout || 'popup';
     this.Component = () => {
       const cms = useCMS();
@@ -33,10 +33,6 @@ export class GlobalFormPlugin implements ScreenPlugin {
         ({ tinaForm }) => tinaForm.id === form.id
       );
 
-      // Global screen plugins can outlive cleared form state after navigation.
-      // Re-add the stored form and restore it as active before rendering
-      // FormBuilder. forms:add dedupes by id, so this is safe on repeated
-      // navigation and only runs while the form is missing (no render loop).
       React.useEffect(() => {
         if (!cmsForm) {
           cms.dispatch({ type: 'forms:add', value: form });
@@ -44,7 +40,6 @@ export class GlobalFormPlugin implements ScreenPlugin {
         }
       }, [cms, cmsForm]);
 
-      // Avoid passing an undefined form to FormBuilder until the re-add lands.
       if (!cmsForm) {
         return null;
       }

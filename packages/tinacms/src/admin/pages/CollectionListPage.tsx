@@ -22,6 +22,8 @@ import {
   Select,
   type TinaCMS,
 } from '@tinacms/toolkit';
+import { Callout } from '@toolkit/react-sidebar/components/callout';
+import { cn } from '@utils/cn';
 import React, { useEffect, useState } from 'react';
 import {
   BiArrowBack,
@@ -39,15 +41,22 @@ import { FaFile, FaFolder } from 'react-icons/fa';
 import { RiHome2Line } from 'react-icons/ri';
 import {
   Link,
+  Navigate,
   type NavigateFunction,
   useLocation,
   useNavigate,
   useParams,
 } from 'react-router-dom';
-import { cn } from '@utils/cn';
+import {
+  CollectionListPageItemClickedEvent,
+  CollectionListPageSearchEvent,
+  CollectionListPageSortEvent,
+} from '../../lib/posthog/posthog';
+import { captureEvent } from '../../lib/posthog/posthogProvider';
 import type { TinaAdminApi } from '../api';
 import GetCMS from '../components/GetCMS';
 import GetCollection from '../components/GetCollection';
+import LoadingPage from '../components/LoadingPage';
 import { PageBody, PageHeader, PageWrapper } from '../components/Page';
 import {
   Tooltip,
@@ -62,13 +71,6 @@ import type {
   TemplateResponse,
 } from '../types';
 import { type CollectionFolder, useCollectionFolder } from './utils';
-import { Callout } from '@toolkit/react-sidebar/components/callout';
-import {
-  CollectionListPageItemClickedEvent,
-  CollectionListPageSearchEvent,
-  CollectionListPageSortEvent,
-} from '../../lib/posthog/posthog';
-import { captureEvent } from '../../lib/posthog/posthogProvider';
 
 const LOCAL_STORAGE_KEY = 'tinacms.admin.collection.list.page';
 const isSSR = typeof window === 'undefined';
@@ -338,6 +340,35 @@ const CollectionListPage = () => {
                 const admin: TinaAdminApi = cms.api.admin;
                 const pageInfo = collection.documents.pageInfo;
 
+                // Global collections are single-document; skip the list and
+                // jump straight to the document's edit form. Only redirect when
+                // there's exactly one document — with zero or many, fall through
+                // to the list so the user can create or fix the extras.
+                if (
+                  collectionExtra?.ui?.global &&
+                  !folder.fullyQualifiedName.startsWith('~/')
+                ) {
+                  // The fetched documents lag a render behind when switching
+                  // collections; show loading until they match to avoid
+                  // flashing the list before the redirect.
+                  if (_loading || collection.name !== collectionName) {
+                    return <LoadingPage />;
+                  }
+                  if (documents?.length === 1) {
+                    const globalDoc = documents[0]?.node;
+                    if (globalDoc?._sys?.breadcrumbs) {
+                      return (
+                        <Navigate
+                          replace
+                          to={`/collections/edit/${
+                            collection.name
+                          }/${globalDoc._sys.breadcrumbs.join('/')}`}
+                        />
+                      );
+                    }
+                  }
+                }
+
                 // get unique fields from all templates
                 const fields = (
                   collectionExtra.templates?.length
@@ -359,16 +390,22 @@ const CollectionListPage = () => {
                   collection.name
                 );
                 const parse = collectionDefinition?.ui?.filename?.parse;
+                const isGlobalCollection = !!collectionExtra?.ui?.global;
+                // Global collections are single-document: allow creating only
+                // while there's no document yet, and never allow folders.
                 const allowCreate =
-                  collectionDefinition?.ui?.allowedActions?.create ?? true;
+                  (collectionDefinition?.ui?.allowedActions?.create ?? true) &&
+                  (!isGlobalCollection || documents.length === 0);
                 const allowDelete =
                   collectionDefinition?.ui?.allowedActions?.delete ?? true;
                 const allowCreateFolder =
-                  collectionDefinition?.ui?.allowedActions?.createFolder ??
-                  true;
+                  !isGlobalCollection &&
+                  (collectionDefinition?.ui?.allowedActions?.createFolder ??
+                    true);
                 const allowCreateNestedFolder =
-                  collectionDefinition?.ui?.allowedActions
-                    ?.createNestedFolder ?? true;
+                  !isGlobalCollection &&
+                  (collectionDefinition?.ui?.allowedActions
+                    ?.createNestedFolder ?? true);
 
                 const folderView = folder.fullyQualifiedName !== '';
 
