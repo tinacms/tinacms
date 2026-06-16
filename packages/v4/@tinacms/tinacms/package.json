@@ -10,6 +10,11 @@
     "directory": "packages/v4/@tinacms/tinacms"
   },
   "sideEffects": false,
+  "scripts": {
+    "build": "tinacms-scripts build",
+    "types": "tsc",
+    "test": "vitest run --passWithNoTests"
+  },
   "exports": {
     ".": {
       "types": "./src/index.ts",
@@ -43,5 +48,10 @@
       "types": "./src/adapters/hono/index.ts",
       "default": "./src/adapters/hono/index.ts"
     }
+  },
+  "devDependencies": {
+    "@tinacms/scripts": "workspace:*",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.9"
   }
 }
