@@ -1,5 +1,56 @@
 # tinacms-cli
 
+## 2.5.1
+
+### Patch Changes
+
+- Updated dependencies [[`42760d8`](https://github.com/tinacms/tinacms/commit/42760d8f5afd201107e27e274308af37f96ba8d0), [`c491fc5`](https://github.com/tinacms/tinacms/commit/c491fc55e612725f5d775eeb1fdf3f8ba82314fa)]:
+  - tinacms@3.9.3
+  - @tinacms/app@2.5.6
+  - @tinacms/graphql@2.4.5
+  - @tinacms/search@1.2.19
+
+## 2.5.0
+
+### Minor Changes
+
+- [#7049](https://github.com/tinacms/tinacms/pull/7049) [`29a0e2e`](https://github.com/tinacms/tinacms/commit/29a0e2e43790af89408453a3a0ba9f77c31648df) Thanks [@0xharkirat](https://github.com/0xharkirat)! - Add **Astro** as a first-class framework in `tinacms init` (now listed first). Selecting Astro:
+
+  - auto-sets the public assets folder to `public` (no prompt) and wraps the `package.json` `dev`/`build` scripts (`tinacms dev -c "astro dev"`, `tinacms build && astro build`)
+  - installs `@tinacms/astro` plus an `@astrojs/node` adapter **pinned to the project's Astro major** (node 9 for Astro 5, node 10 for Astro 6), and matched `react`/`react-dom` (`^18.3.1`) as **dev dependencies** — the site stays React-free, but the admin SPA is built with React and a bare Astro project ships none (skipped when the project already declares both)
+  - wires `astro.config` for SSR + visual editing, or — when your config is already customized — prints exactly what to add
+  - scaffolds a self-contained, **fully editable** visual-editing demo at `/tinacms-demo`: a dark hero whose eyebrow, headline, tagline, and both call-to-action buttons (label + link) are all click-to-edit, with scoped styles and a procedural SVG starfield (no CSS framework or image assets). CMS-editable button links are passed through `sanitizeHref`.
+
+  The demo is scaffolded automatically with no opt-in (mirroring the Next.js init demo), and is skipped during Forestry migrations.
+
+  `init` also makes clear it adds Tina to an **existing** site: it points to `npx create-tina-app@latest` for new projects and stops early (with that pointer) when run in a folder that has no `package.json`.
+
+### Patch Changes
+
+- Updated dependencies [[`95b7523`](https://github.com/tinacms/tinacms/commit/95b75237cb91ec3dc5dac9ce52359f9786072502), [`c931f18`](https://github.com/tinacms/tinacms/commit/c931f18a19c292cd89530e41b71da8fcd90c8415)]:
+  - @tinacms/app@2.5.5
+  - @tinacms/graphql@2.4.4
+  - @tinacms/search@1.2.18
+  - tinacms@3.9.2
+
+## 2.4.4
+
+### Patch Changes
+
+- Updated dependencies [[`7b539b8`](https://github.com/tinacms/tinacms/commit/7b539b8e7d7d9f4451b5fd36a04d26b734f7d78e)]:
+  - tinacms@3.9.1
+  - @tinacms/app@2.5.4
+
+## 2.4.3
+
+### Patch Changes
+
+- [#7006](https://github.com/tinacms/tinacms/pull/7006) [`77665ae`](https://github.com/tinacms/tinacms/commit/77665ae73dd4f9563d339535e76fa811a8abdfbb) Thanks [@18-th](https://github.com/18-th)! - Harden Forestry migration code generation against untrusted input
+
+- Updated dependencies [[`a8dd9af`](https://github.com/tinacms/tinacms/commit/a8dd9af056b17a8faeaa621bbf7722a62b396cf8), [`916bd43`](https://github.com/tinacms/tinacms/commit/916bd43de1b563854fac65a74ecf04f946ebda56), [`b9d561f`](https://github.com/tinacms/tinacms/commit/b9d561fcea56185f0f146d2bdb1b510caab180d3)]:
+  - tinacms@3.9.0
+  - @tinacms/app@2.5.3
+
 ## 2.4.2
 
 ### Patch Changes

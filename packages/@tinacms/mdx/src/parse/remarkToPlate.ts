@@ -525,7 +525,7 @@ export const remarkToSlate = (
   const image = (content: Md.Image): Plate.ImageElement => {
     return {
       type: 'img',
-      url: imageCallback(content.url),
+      url: imageCallback(sanitizeUrl(content.url)),
       alt: content.alt || undefined, // alt cannot be `null`
       caption: content.title,
       children: [{ type: 'text', text: '' }],

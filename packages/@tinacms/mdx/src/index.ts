@@ -6,3 +6,4 @@ export * from './parse/plate';
 
 export { parseMDX };
 export { serializeMDX };
+export { sanitizeUrl } from './parse/remarkToPlate';

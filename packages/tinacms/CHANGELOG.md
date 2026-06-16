@@ -1,5 +1,46 @@
 # tinacms
 
+## 3.9.3
+
+### Patch Changes
+
+- [#7055](https://github.com/tinacms/tinacms/pull/7055) [`42760d8`](https://github.com/tinacms/tinacms/commit/42760d8f5afd201107e27e274308af37f96ba8d0) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Fix crash when reopening Global Configuration after navigating to a collection in the admin
+
+- [#7056](https://github.com/tinacms/tinacms/pull/7056) [`c491fc5`](https://github.com/tinacms/tinacms/commit/c491fc55e612725f5d775eeb1fdf3f8ba82314fa) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Harden cross-window message handling and rich-text URL sanitization.
+
+  Adds stricter origin/source checks for trusted message flows, use explicit target origins for preview iframe message, and applies URL sanitization to slatejson rich-text parsing and default rich-text link/image rendering.
+
+- Updated dependencies [[`c491fc5`](https://github.com/tinacms/tinacms/commit/c491fc55e612725f5d775eeb1fdf3f8ba82314fa)]:
+  - @tinacms/mdx@2.1.7
+  - @tinacms/search@1.2.19
+
+## 3.9.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/search@1.2.18
+
+## 3.9.1
+
+### Patch Changes
+
+- [#7028](https://github.com/tinacms/tinacms/pull/7028) [`7b539b8`](https://github.com/tinacms/tinacms/commit/7b539b8e7d7d9f4451b5fd36a04d26b734f7d78e) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Skip the filesystem-backed response cache on edge runtimes (Cloudflare Workers, Vercel Edge) where Node's `fs` API is present but unusable, which could otherwise hang concurrent identical queries. Adds a `cache` option to `createClient` to force-disable the cache.
+
+## 3.9.0
+
+### Minor Changes
+
+- [#7009](https://github.com/tinacms/tinacms/pull/7009) [`a8dd9af`](https://github.com/tinacms/tinacms/commit/a8dd9af056b17a8faeaa621bbf7722a62b396cf8) Thanks [@JackDevAU](https://github.com/JackDevAU)! - chore: remove deprecated code
+
+- [#6902](https://github.com/tinacms/tinacms/pull/6902) [`b9d561f`](https://github.com/tinacms/tinacms/commit/b9d561fcea56185f0f146d2bdb1b510caab180d3) Thanks [@18-th](https://github.com/18-th)! - Support Tina media uploads and deletes in the editorial workflow on protected branches. Media changes now prompt for a branch, write to that branch, switch the editor to it after the media operation succeeds, and continue through indexing and pull request creation with the same workflow progress UI as content edits.
+
+  Editorial workflow pull request titles now replace all dashes in the branch name with spaces for both content and media changes.
+
+### Patch Changes
+
+- [#7010](https://github.com/tinacms/tinacms/pull/7010) [`916bd43`](https://github.com/tinacms/tinacms/commit/916bd43de1b563854fac65a74ecf04f946ebda56) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Remove deprecated GitClient.onSubmit alias
+
 ## 3.8.4
 
 ### Patch Changes

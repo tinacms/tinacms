@@ -3,14 +3,17 @@ import * as G from 'graphql';
 export const expandQuery = ({
   schema,
   documentNode,
+  includeNodeMetadata,
 }: {
   schema: G.GraphQLSchema;
   documentNode: G.DocumentNode;
+  includeNodeMetadata?: boolean;
 }): G.DocumentNode => {
   const documentNodeWithTypenames = addTypenameToDocument(documentNode);
   return addMetaFieldsToQuery(
     documentNodeWithTypenames,
-    new G.TypeInfo(schema)
+    new G.TypeInfo(schema),
+    includeNodeMetadata
   );
 };
 
@@ -114,7 +117,8 @@ const addMetadataField = (
 
 const addMetaFieldsToQuery = (
   documentNode: G.DocumentNode,
-  typeInfo: G.TypeInfo
+  typeInfo: G.TypeInfo,
+  includeNodeMetadata?: boolean
 ) => {
   const addMetaFields: G.VisitFn<G.ASTNode, G.FieldNode> = (
     node: G.FieldNode
@@ -126,7 +130,11 @@ const addMetaFieldsToQuery = (
           kind: 'SelectionSet',
           selections: [],
         }),
-        selections: [...(node.selectionSet?.selections || []), ...metaFields],
+        selections: [
+          ...(node.selectionSet?.selections || []),
+          ...metaFields,
+          ...(includeNodeMetadata ? nodeMetadataFields : []),
+        ],
       },
     };
   };
@@ -217,6 +225,17 @@ const node = G.parse(`
 const metaFields: G.SelectionNode[] =
   // @ts-ignore
   node.definitions[0].selectionSet.selections;
+
+const nodeMetadataFragment = G.parse(`
+ query Sample {
+  ...on Document {
+    _tina_metadata
+    _content_source
+  }
+ }`);
+const nodeMetadataFields: G.SelectionNode[] =
+  // @ts-ignore
+  nodeMetadataFragment.definitions[0].selectionSet.selections;
 
 export const isNodeType = (type: G.GraphQLOutputType) => {
   const namedType = G.getNamedType(type);

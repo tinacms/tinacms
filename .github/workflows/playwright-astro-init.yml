@@ -1,0 +1,62 @@
+name: Playwright — Astro init
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'packages/@tinacms/cli/src/cmds/init/**'
+      - 'playwright/astro-init/**'
+      - '.github/workflows/playwright-astro-init.yml'
+  workflow_dispatch:
+
+jobs:
+  init-e2e:
+    name: astro-init-e2e
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        template: [minimal, basics, blog, starlight]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          package_json_file: package.json
+          run_install: false
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build the CLI (and its workspace build-deps)
+        run: pnpm exec turbo run build --filter=@tinacms/cli
+      - name: Install expect (drives the interactive init)
+        run: sudo apt-get update && sudo apt-get install -y expect
+      - name: Scaffold a fresh Astro project + run init
+        id: init
+        run: |
+          PROJECT_DIR="$RUNNER_TEMP/astro-init-${{ matrix.template }}"
+          bash playwright/astro-init/scaffold-and-init.sh "$PROJECT_DIR" "${{ matrix.template }}"
+          echo "project_dir=$PROJECT_DIR" >> "$GITHUB_OUTPUT"
+      - name: Install Playwright browser
+        working-directory: playwright/astro-init
+        run: npx playwright install --with-deps chromium
+      - name: Run init E2E (Playwright)
+        working-directory: playwright/astro-init
+        env:
+          INIT_PROJECT_DIR: ${{ steps.init.outputs.project_dir }}
+          CI: true
+        run: pnpm test:e2e
+      - name: Verify production build (auto-wired templates only)
+        # minimal/basics start from an empty astro.config, so init writes the full
+        # SSR config and `astro build` must pass. blog/starlight keep their own
+        # non-empty config — init prints guidance instead of wiring it, so their
+        # build needs the user's documented config change; they are validated in
+        # dev only (the Playwright step above), not built here.
+        if: matrix.template == 'minimal' || matrix.template == 'basics'
+        working-directory: ${{ steps.init.outputs.project_dir }}
+        run: npx astro build

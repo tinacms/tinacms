@@ -24,6 +24,11 @@ import { z } from 'zod';
 import { FormifyCallback, createForm, createGlobalForm } from './build-form';
 import { showErrorModal } from './errors';
 import { expandQuery, isConnectionType, isNodeType } from './expand-query';
+import {
+  getExpectedPreviewOrigin,
+  isFromTrustedPreviewOrigin,
+  postMessageToPreview,
+} from './preview-origin';
 import type {
   Payload,
   PostMessage,
@@ -199,6 +204,13 @@ export const useGraphQLReducer = (
   );
 
   const activeField = searchParams.get('active-field');
+
+  // Origin of the preview document we load in the iframe. Used to validate
+  // inbound messages and as the explicit `targetOrigin` for outbound ones.
+  const expectedOrigin = React.useMemo(
+    () => getExpectedPreviewOrigin(url),
+    [url]
+  );
 
   React.useEffect(() => {
     const run = async () => {
@@ -483,11 +495,15 @@ export const useGraphQLReducer = (
             });
           }
         }
-        iframe.current?.contentWindow?.postMessage({
-          type: 'updateData',
-          id: payload.id,
-          data: result.data,
-        });
+        postMessageToPreview(
+          iframe.current?.contentWindow,
+          {
+            type: 'updateData',
+            id: payload.id,
+            data: result.data,
+          },
+          expectedOrigin
+        );
       }
       cms.dispatch({
         type: 'form-lists:add',
@@ -502,6 +518,7 @@ export const useGraphQLReducer = (
     [
       resolvedDocuments.map((doc) => doc._internalSys.path).join('.'),
       activeField,
+      expectedOrigin,
     ]
   );
 
@@ -527,6 +544,17 @@ export const useGraphQLReducer = (
 
   const handleMessage = React.useCallback(
     (event: MessageEvent<PostMessage>) => {
+      // Validate the sender before reading `event.data`: only the preview
+      // iframe we loaded is trusted to drive the reducer.
+      if (
+        !isFromTrustedPreviewOrigin({
+          event,
+          expectedOrigin,
+          peerWindow: iframe.current?.contentWindow,
+        })
+      ) {
+        return;
+      }
       if (event.data.type === 'user-select-form') {
         const incoming = event.data.formId;
         // Buffer until `forms:add` resolves it if the form isn't built yet.
@@ -538,15 +566,23 @@ export const useGraphQLReducer = (
           type: 'set-quick-editing-supported',
           value: event.data.value,
         });
-        iframe.current?.contentWindow?.postMessage({
-          type: 'quickEditEnabled',
-          value: cms.state.sidebarDisplayState === 'open',
-        });
+        postMessageToPreview(
+          iframe.current?.contentWindow,
+          {
+            type: 'quickEditEnabled',
+            value: cms.state.sidebarDisplayState === 'open',
+          },
+          expectedOrigin
+        );
       }
       if (event?.data?.type === 'isEditMode') {
-        iframe?.current?.contentWindow?.postMessage({
-          type: 'tina:editMode',
-        });
+        postMessageToPreview(
+          iframe.current?.contentWindow,
+          {
+            type: 'tina:editMode',
+          },
+          expectedOrigin
+        );
       }
       if (event.data.type === 'field:selected') {
         const [queryId, eventFieldName] = event.data.fieldName.split('---');
@@ -597,7 +633,7 @@ export const useGraphQLReducer = (
       //   });
       // }
     },
-    [cms, JSON.stringify(results)]
+    [cms, JSON.stringify(results), expectedOrigin]
   );
 
   React.useEffect(() => {
@@ -627,11 +663,15 @@ export const useGraphQLReducer = (
   }, [cms.state.forms.length, pendingPrimaryId, activateFormByWireId]);
 
   React.useEffect(() => {
-    iframe.current?.contentWindow?.postMessage({
-      type: 'quickEditEnabled',
-      value: cms.state.sidebarDisplayState === 'open',
-    });
-  }, [cms.state.sidebarDisplayState]);
+    postMessageToPreview(
+      iframe.current?.contentWindow,
+      {
+        type: 'quickEditEnabled',
+        value: cms.state.sidebarDisplayState === 'open',
+      },
+      expectedOrigin
+    );
+  }, [cms.state.sidebarDisplayState, expectedOrigin]);
 
   React.useEffect(() => {
     cms.dispatch({ type: 'set-edit-mode', value: 'visual' });
@@ -942,6 +982,7 @@ const expandPayload = async (
   const expandedDocumentNodeForResolver = expandQuery({
     schema: schemaForResolver,
     documentNode,
+    includeNodeMetadata: true,
   });
   const expandedQueryForResolver = G.print(expandedDocumentNodeForResolver);
   return { ...payload, expandedQuery, expandedData, expandedQueryForResolver };
