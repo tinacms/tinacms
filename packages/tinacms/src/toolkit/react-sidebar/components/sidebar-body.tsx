@@ -315,10 +315,10 @@ const BreadcrumbItemLink = ({
   onClick,
 }: { breadcrumb: string; onClick: () => void }) => {
   return (
-    <BreadcrumbItem className='shrink truncate'>
+    <BreadcrumbItem className='shrink min-w-0'>
       <BreadcrumbLink
         asChild
-        className='text-gray-700 truncate hover:text-orange-500'
+        className='block min-w-0 truncate text-gray-700 hover:text-orange-500'
       >
         <button type='button' onClick={onClick}>
           {breadcrumb}
@@ -334,16 +334,19 @@ const CollectionBreadcrumbItem = ({
   onClick,
 }: { label: string; onClick: () => void }) => {
   return (
-    <BreadcrumbItem className='shrink-0'>
-      <BreadcrumbLink asChild className='text-gray-700 hover:text-orange-500'>
+    <BreadcrumbItem className='shrink min-w-0'>
+      <BreadcrumbLink
+        asChild
+        className='min-w-0 text-gray-700 hover:text-orange-500'
+      >
         <button
           type='button'
           onClick={onClick}
           aria-label={`Back to ${label}`}
-          className='flex items-center gap-1.5'
+          className='flex items-center gap-1.5 min-w-0'
         >
           <BiArrowBack className='w-4 h-4 shrink-0 opacity-80' />
-          <span className='truncate'>{label}</span>
+          <span className='truncate min-w-0'>{label}</span>
         </button>
       </BreadcrumbLink>
     </BreadcrumbItem>
@@ -352,8 +355,8 @@ const CollectionBreadcrumbItem = ({
 
 const FinalBreadcrumbItem = ({ breadcrumb }: { breadcrumb: string }) => {
   return (
-    <BreadcrumbItem className='shrink truncate'>
-      <BreadcrumbPage className='text-gray-700 font-medium cursor-default'>
+    <BreadcrumbItem className='shrink min-w-0'>
+      <BreadcrumbPage className='block min-w-0 truncate text-gray-700 font-medium cursor-default'>
         {breadcrumb}
       </BreadcrumbPage>
     </BreadcrumbItem>
@@ -397,7 +400,7 @@ export const FormBreadcrumbs = ({
 
   return (
     <Breadcrumb {...props}>
-      <BreadcrumbList className='flex-nowrap text-nowrap'>
+      <BreadcrumbList className='flex-nowrap text-nowrap overflow-hidden'>
         {/* Leading crumb: back to the collection's document list */}
         {collectionCrumb && (
           <>
@@ -413,7 +416,7 @@ export const FormBreadcrumbs = ({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <span>
+              <span className='flex min-w-0 shrink'>
                 {breadcrumbs.length > 1 ? (
                   <BreadcrumbItemLink
                     breadcrumb={rootBreadcrumbName || firstBreadcrumb.label}
