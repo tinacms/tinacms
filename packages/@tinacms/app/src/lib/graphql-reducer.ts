@@ -10,7 +10,6 @@ import {
   ErrorDialog,
   Form,
   FormOptions,
-  GlobalFormPlugin,
   NAMER,
   Template,
   TinaCMS,
@@ -1089,9 +1088,6 @@ const buildForm = ({
     // so without this the very first open leaves `form.queries` empty.
     form.addQuery(payloadId);
     if (shouldRegisterForm) {
-      if (collection.ui?.global) {
-        cms.plugins.add(new GlobalFormPlugin(form));
-      }
       cms.dispatch({ type: 'forms:add', value: form });
     }
   }
