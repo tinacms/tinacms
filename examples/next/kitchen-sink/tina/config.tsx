@@ -4,8 +4,6 @@ import Announcement from './collections/announcement';
 import Author from './collections/author';
 import Blog from './collections/blog';
 import Global from './collections/global';
-import GlobalEmpty from './collections/global-empty';
-import GlobalMulti from './collections/global-multi';
 import Page from './collections/page';
 import Post from './collections/post';
 import SEO from './collections/seo';
@@ -34,17 +32,6 @@ export default defineConfig({
     },
   },
   schema: {
-    collections: [
-      Page,
-      Post,
-      Author,
-      Tag,
-      Global,
-      Blog,
-      SEO,
-      Announcement,
-      GlobalEmpty,
-      GlobalMulti,
-    ],
+    collections: [Page, Post, Author, Tag, Global, Blog, SEO, Announcement],
   },
 });
