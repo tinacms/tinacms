@@ -27,6 +27,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '../../../admin/components/ui/tooltip';
+import { collectionListPathForDocument } from './form-breadcrumbs.utils';
 import { FormLists } from './form-list';
 import { SidebarContext } from './sidebar';
 import { SidebarLoadingPlaceholder } from './sidebar-loading-placeholder';
@@ -219,7 +220,7 @@ export const FormHeader = ({
       const tinaPreview = cms.flags.get('tina-preview') || false;
       const href = `${
         tinaPreview ? `/${tinaPreview}/index.html#` : '/admin#'
-      }/collections/${collection.name}/~`;
+      }${collectionListPathForDocument(path, collection)}`;
       collectionCrumb = {
         label: collection.label || collection.name,
         onClick: () => {

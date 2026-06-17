@@ -6,6 +6,7 @@ import {
 } from '@tinacms/schema-tools';
 import { Form, FormBuilder, FormStatus } from '@tinacms/toolkit';
 import type { TinaCMS } from '@tinacms/toolkit';
+import { documentListPath } from '@toolkit/react-sidebar/components/form-breadcrumbs.utils';
 import {
   FileHistoryProvider,
   FormBreadcrumbs,
@@ -19,7 +20,7 @@ import GetCMS from '../components/GetCMS';
 import GetCollection from '../components/GetCollection';
 import GetDocument from '../components/GetDocument';
 import { PageWrapper } from '../components/Page';
-import { parentFolder, useCollectionFolder } from './utils';
+import { useCollectionFolder } from './utils';
 
 const updateDocument = async (
   cms: TinaCMS,
@@ -105,13 +106,9 @@ const RenderForm = ({
   mutationInfo;
 }) => {
   const navigate = useNavigate();
-  const folder = useCollectionFolder();
   const [formIsPristine, setFormIsPristine] = useState(true);
 
-  const parent = folder.fullyQualifiedName ? parentFolder(folder) : folder;
-  const collectionListPath = `/collections/${collection.name}${
-    parent.fullyQualifiedName ? `/${parent.fullyQualifiedName}` : ''
-  }`;
+  const collectionListPath = documentListPath(collection.name, relativePath);
   const schema: TinaSchema | undefined = cms.api.tina.schema;
 
   // the schema is being passed in from the frontend so we can use that
