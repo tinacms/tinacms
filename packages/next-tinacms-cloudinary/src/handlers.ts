@@ -72,6 +72,8 @@ async function uploadMedia(req: NextApiRequest, res: NextApiResponse) {
   await upload(req, res);
 
   const { directory } = req.body;
+  // @ts-ignore - multer augments the request with `file`
+  const filename: string = req.file?.originalname;
 
   let folder: string;
   try {
@@ -79,6 +81,10 @@ async function uploadMedia(req: NextApiRequest, res: NextApiResponse) {
     // is allowed, but traversal / absolute folders are rejected.
     const rawFolder = (directory || '').replace(/^\/+/, '');
     folder = rawFolder ? resolveKey('', rawFolder) : '';
+    // Validate the filename with the same rules. Cloudinary still derives the
+    // public_id from folder + use_filename; we only reject illegal names here
+    // and leave the naming model unchanged.
+    resolveKey('', filename);
   } catch (e) {
     if (e instanceof MediaKeyError) {
       return res.status(400).json({ message: e.message });
