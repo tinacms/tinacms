@@ -332,7 +332,7 @@ const CollectionListPage = () => {
             >
               {(
                 collection: CollectionResponse,
-                _loading,
+                loading,
                 reFetchCollection,
                 collectionExtra: Collection<true>
               ) => {
@@ -351,7 +351,7 @@ const CollectionListPage = () => {
                   // The fetched documents lag a render behind when switching
                   // collections; show loading until they match to avoid
                   // flashing the list before the redirect.
-                  if (_loading || collection.name !== collectionName) {
+                  if (loading || collection.name !== collectionName) {
                     return <LoadingPage />;
                   }
                   if (documents?.length === 1) {
@@ -405,7 +405,8 @@ const CollectionListPage = () => {
                 const allowCreateNestedFolder =
                   !isGlobalCollection &&
                   (collectionDefinition?.ui?.allowedActions
-                    ?.createNestedFolder ?? true);
+                    ?.createNestedFolder ??
+                    true);
 
                 const folderView = folder.fullyQualifiedName !== '';
 
@@ -682,7 +683,7 @@ const CollectionListPage = () => {
                                 <SearchInput
                                   cms={cms}
                                   collectionName={collectionName}
-                                  loading={_loading}
+                                  loading={loading}
                                   search={search}
                                   setSearch={setSearch}
                                   searchInput={searchInput}
