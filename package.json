@@ -19,7 +19,7 @@
 		"update-tina-lock": "pnpm -r --filter='{./**}' --workspace-concurrency=1 run --if-present update-tina-lock",
 		"test": "turbo run test --filter=\"./packages/**\"",
 		"lint:packages": "pnpm --filter './packages/**' --no-bail exec pnpm dlx publint --strict",
-		"test:packages": "vitest run tests/build-verification.test.ts --reporter=verbose && pnpm run lint:packages",
+		"test:packages": "vitest run --reporter=verbose && pnpm run lint:packages",
 		"types": "turbo run types --filter=\"./packages/**\"",
 		"test:dev": "cd playwright/tina-playwright && npx playwright test --ui",
 		"test:e2e": "cd playwright/tina-playwright && npx playwright test",
