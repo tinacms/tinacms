@@ -86,6 +86,43 @@ describe.each(adapters)(
   }
 );
 
+// Multipart filenames are literal, not percent-encoded: resolveKey is called
+// with { decode: false } on the upload paths. A literal "%" must be preserved
+// (not decoded or rejected); traversal / absolute / backslash / empty are still
+// blocked.
+const allowedNoDecode: [string, string, string][] = [
+  ['', '100%.png', '100%.png'],
+  ['', 'report%41.png', 'report%41.png'], // NOT rewritten to reportA.png
+  ['', 'my%2Ffile.png', 'my%2Ffile.png'], // %2F NOT turned into a path separator
+  ['media', 'cat.png', 'media/cat.png'],
+];
+const rejectedNoDecode: [string, string][] = [
+  ['', '../evil.png'],
+  ['', '/abs.png'],
+  ['', 'a\\b.png'],
+  ['', ''],
+];
+
+describe.each(adapters)(
+  '%s — resolveKey({ decode: false }) for multipart filenames',
+  (_name, resolveKey, MediaKeyError) => {
+    it.each(allowedNoDecode)(
+      'resolveKey(%j, %j, {decode:false}) === %j',
+      (root, raw, expected) => {
+        expect(resolveKey(root, raw, { decode: false })).toBe(expected);
+      }
+    );
+    it.each(rejectedNoDecode)(
+      'resolveKey(%j, %j, {decode:false}) throws MediaKeyError',
+      (root, raw) => {
+        expect(() => resolveKey(root, raw, { decode: false })).toThrow(
+          MediaKeyError
+        );
+      }
+    );
+  }
+);
+
 describe('the four adapter copies behave identically (anti-drift)', () => {
   const allInputs: [string, unknown][] = [
     ...allowed.map(([root, raw]) => [root, raw] as [string, unknown]),

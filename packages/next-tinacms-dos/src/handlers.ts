@@ -118,7 +118,7 @@ async function uploadMedia(
 
   let objectKey: string;
   try {
-    objectKey = resolveKey(mediaRoot, prefix + filename);
+    objectKey = resolveKey(mediaRoot, prefix + filename, { decode: false });
   } catch (e) {
     if (e instanceof MediaKeyError) {
       return res.status(400).json({ message: e.message });

@@ -71,20 +71,25 @@ async function uploadMedia(req: NextApiRequest, res: NextApiResponse) {
   // @ts-ignore
   await upload(req, res);
 
+  // @ts-ignore - multer augments the request with `file`
+  if (!req.file) {
+    return res.status(400).json({ message: 'file is required' });
+  }
+
   const { directory } = req.body;
   // @ts-ignore - multer augments the request with `file`
-  const filename: string = req.file?.originalname;
+  const filename: string = req.file.originalname;
 
   let folder: string;
   try {
     // Cloudinary has no mediaRoot concept yet; an empty folder (root upload)
     // is allowed, but traversal / absolute folders are rejected.
     const rawFolder = (directory || '').replace(/^\/+/, '');
-    folder = rawFolder ? resolveKey('', rawFolder) : '';
+    folder = rawFolder ? resolveKey('', rawFolder, { decode: false }) : '';
     // Validate the filename with the same rules. Cloudinary still derives the
     // public_id from folder + use_filename; we only reject illegal names here
     // and leave the naming model unchanged.
-    resolveKey('', filename);
+    resolveKey('', filename, { decode: false });
   } catch (e) {
     if (e instanceof MediaKeyError) {
       return res.status(400).json({ message: e.message });

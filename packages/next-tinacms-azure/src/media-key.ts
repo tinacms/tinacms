@@ -38,16 +38,28 @@ function normalizeMediaRoot(mediaRoot: string): string {
  * @throws {MediaKeyError} when the key is empty, absolute, contains a NUL
  * byte, uses path traversal, or escapes mediaRoot.
  */
-export function resolveKey(mediaRoot: string, rawKey: unknown): string {
+export function resolveKey(
+  mediaRoot: string,
+  rawKey: unknown,
+  options?: { decode?: boolean }
+): string {
   if (typeof rawKey !== 'string' || rawKey.trim() === '') {
     throw new MediaKeyError('a media key is required');
   }
 
+  // Inputs from a URL query / route segment are percent-encoded, so decode
+  // them. Inputs from a multipart filename are literal and must NOT be decoded
+  // (pass decode: false), otherwise a legitimate name like "100%.png" would be
+  // rejected and "report%41.png" silently rewritten to "reportA.png".
   let decoded: string;
-  try {
-    decoded = decodeURIComponent(rawKey);
-  } catch {
-    throw new MediaKeyError('media key is not valid');
+  if (options?.decode === false) {
+    decoded = rawKey;
+  } else {
+    try {
+      decoded = decodeURIComponent(rawKey);
+    } catch {
+      throw new MediaKeyError('media key is not valid');
+    }
   }
 
   // Reject NUL bytes and backslash (Windows-style separator / traversal).
