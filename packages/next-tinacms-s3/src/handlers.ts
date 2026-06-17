@@ -67,8 +67,14 @@ export const createMediaHandler = (config: S3Config, options?: S3Options) => {
     switch (req.method) {
       case 'GET':
         if (req.query.key) {
-          const expiresIn: number =
-            (req.query.expiresIn && Number(req.query.expiresIn)) || 3600;
+          // Cap the presigned URL validity: expiresIn is caller-controlled and
+          // was otherwise bounded only by SigV4's 7-day ceiling, which would
+          // mint a long-lived offline write primitive. Default and max: 3600s.
+          const requestedExpiresIn = Number(req.query.expiresIn);
+          const expiresIn =
+            Number.isFinite(requestedExpiresIn) && requestedExpiresIn > 0
+              ? Math.min(requestedExpiresIn, 3600)
+              : 3600;
           const rawKey = Array.isArray(req.query.key)
             ? req.query.key[0]
             : req.query.key;
