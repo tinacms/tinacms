@@ -9,6 +9,7 @@ import type { TinaCMS } from '@tinacms/toolkit';
 import {
   FileHistoryProvider,
   FormBreadcrumbs,
+  getFilename,
 } from '@toolkit/react-sidebar/components/sidebar-body';
 import React, { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -184,7 +185,7 @@ const RenderForm = ({
         <div className='w-full flex gap-1.5 justify-between items-center'>
           <FormBreadcrumbs
             className='w-[calc(100%-3rem)]'
-            rootBreadcrumbName={filename}
+            rootBreadcrumbName={getFilename(filename)}
             collectionCrumb={{
               label: collection.label || collection.name,
               onClick: () => navigate(collectionListPath),

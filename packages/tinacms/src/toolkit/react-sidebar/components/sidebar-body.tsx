@@ -193,23 +193,49 @@ export interface FormHeaderProps {
   };
 }
 
+// Strip folders and extension from a content path → the bare filename label.
+export const getFilename = (path?: string) =>
+  path
+    ?.split('/')
+    .pop()
+    ?.replace(/\.[^/.]+$/, '');
+
 export const FormHeader = ({
   activeForm,
   repoProvider,
   branch,
   isLocalMode,
 }: FormHeaderProps) => {
+  const cms = useCMS();
   const { formIsPristine } = React.useContext(SidebarContext);
+
+  const path = activeForm.tinaForm.path;
+
+  // Leading "back to collection list" crumb, mirroring the admin editor pages.
+  let collectionCrumb: { label: string; onClick: () => void } | undefined;
+  try {
+    const collection = cms.api.tina.schema?.getCollectionByFullPath?.(path);
+    if (collection) {
+      const tinaPreview = cms.flags.get('tina-preview') || false;
+      const href = `${
+        tinaPreview ? `/${tinaPreview}/index.html#` : '/admin#'
+      }/collections/${collection.name}/~`;
+      collectionCrumb = {
+        label: collection.label || collection.name,
+        onClick: () => {
+          window.location.href = href;
+        },
+      };
+    }
+  } catch {}
 
   return (
     <div className='px-4 pt-2 pb-4 flex flex-row flex-nowrap justify-between items-center gap-2 bg-gradient-to-t from-white to-gray-50 border-b border-gray-100'>
       <FormBreadcrumbs
         className='w-[calc(100%-3rem)]'
-        rootBreadcrumbName={activeForm.tinaForm.path
-          ?.split('/')
-          .pop()
-          ?.replace(/\.[^/.]+$/, '')}
-        contentPath={activeForm.tinaForm.path}
+        rootBreadcrumbName={getFilename(path)}
+        contentPath={path}
+        collectionCrumb={collectionCrumb}
       />
       <FileHistoryProvider
         defaultBranchName={repoProvider?.defaultBranchName}

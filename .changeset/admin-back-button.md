@@ -2,4 +2,4 @@
 "tinacms": patch
 ---
 
-feat(tinacms): add a leading collection breadcrumb on the admin editor and create pages that navigates back to the collection's document list
+feat(tinacms): add a back-to-collection breadcrumb on the admin editor/create pages and in the visual editor sidebar, switch the breadcrumb separator from a chevron to a slash, and show only the filename (not the full folder path) in the root breadcrumb across both editors
