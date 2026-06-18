@@ -221,7 +221,9 @@ async function deleteAsset(req: NextApiRequest, res: NextApiResponse) {
 
   let public_id: string;
   try {
-    public_id = resolveKey('', rawPublicId);
+    // The framework already decodes the route param once; decoding again here
+    // would mangle keys containing a literal "%" (e.g. "100%off.png").
+    public_id = resolveKey('', rawPublicId, { decode: false });
   } catch (e) {
     if (e instanceof MediaKeyError) {
       return res.status(400).json({ message: e.message });

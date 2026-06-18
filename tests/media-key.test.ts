@@ -95,6 +95,11 @@ const allowedNoDecode: [string, string, string][] = [
   ['', 'report%41.png', 'report%41.png'], // NOT rewritten to reportA.png
   ['', 'my%2Ffile.png', 'my%2Ffile.png'], // %2F NOT turned into a path separator
   ['media', 'cat.png', 'media/cat.png'],
+  // Delete paths now pass { decode: false } because the framework already
+  // decoded the route param once. A key with a literal "%" must resolve to
+  // itself (not throw URIError / get re-decoded) so the object can be deleted.
+  ['media', '100%off.png', 'media/100%off.png'],
+  ['media', 'a%2Fb.png', 'media/a%2Fb.png'], // %2F stays literal, no extra segment
 ];
 const rejectedNoDecode: [string, string][] = [
   ['', '../evil.png'],

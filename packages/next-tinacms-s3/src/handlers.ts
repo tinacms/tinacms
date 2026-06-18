@@ -219,7 +219,9 @@ async function deleteAsset(
 
   let objectKey: string;
   try {
-    objectKey = resolveKey(mediaRoot, rawKey);
+    // The framework already decodes the route param once; decoding again here
+    // would mangle keys containing a literal "%" (e.g. "100%off.png").
+    objectKey = resolveKey(mediaRoot, rawKey, { decode: false });
   } catch (e) {
     if (e instanceof MediaKeyError) {
       return res.status(400).json({ message: e.message });

@@ -93,7 +93,9 @@ async function deleteAsset(
 
   let blobName: string;
   try {
-    blobName = resolveKey('', rawKey);
+    // The framework already decodes the route param once; decoding again here
+    // would mangle keys containing a literal "%" (e.g. "100%off.png").
+    blobName = resolveKey('', rawKey, { decode: false });
   } catch (e) {
     if (e instanceof MediaKeyError) {
       return NextResponse.json({ error: e.message }, { status: 400 });
