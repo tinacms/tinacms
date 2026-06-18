@@ -12,12 +12,14 @@ import ImageNode from './ImageNode.astro';
 import Leaf from './Leaf.astro';
 import LinkNode from './LinkNode.astro';
 import MdxNode from './MdxNode.astro';
+import TableNode from './TableNode.astro';
 import type {
   CodeBlockElement,
   CustomComponentsMap,
   ImageElement,
   LinkElement,
   MdxElement,
+  TableElement,
   TextElement,
   TinaRichTextNode,
 } from './types';
@@ -54,6 +56,8 @@ const containerTypes = new Set([
   <ImageNode node={node as ImageElement} components={components} />
 ) : t === 'code_block' ? (
   <CodeBlockNode node={node as CodeBlockElement} components={components} />
+) : t === 'table' ? (
+  <TableNode node={node as TableElement} components={components} />
 ) : t === 'text' ? (
   <Leaf node={node as TextElement} />
 ) : t === 'mdxJsxFlowElement' || t === 'mdxJsxTextElement' ? (

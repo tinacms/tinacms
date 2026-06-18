@@ -332,10 +332,8 @@ describe('resolveReferences', () => {
     ];
 
     const resolver = vi.fn();
-    await expect(
-      resolveReferences(filter, fields, resolver)
-    ).rejects.toThrowErrorMatchingInlineSnapshot(
-      `"Template nonExistentTemplate not found"`
+    await expect(resolveReferences(filter, fields, resolver)).rejects.toThrow(
+      'Template nonExistentTemplate not found'
     );
   });
 });
@@ -564,9 +562,7 @@ describe('collectConditionsForField', () => {
         '',
         collector
       );
-    }).toThrowErrorMatchingInlineSnapshot(
-      `"Unable to find type for field zip"`
-    );
+    }).toThrow('Unable to find type for field zip');
   });
 
   it('collects conditions for nested list template filter', () => {

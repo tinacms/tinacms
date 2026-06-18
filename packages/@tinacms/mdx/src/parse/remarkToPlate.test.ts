@@ -40,6 +40,23 @@ describe('sanitizeUrl', () => {
     expect(sanitizeUrl('ftp://example.com')).toBe('');
   });
 
+  it('should block an unsafe scheme regardless of letter casing', () => {
+    expect(sanitizeUrl('JaVaScRiPt:alert(1)')).toBe('');
+  });
+
+  it('should block an unsafe scheme with surrounding whitespace', () => {
+    expect(sanitizeUrl('  javascript:alert(1)')).toBe('');
+  });
+
+  it('should block an unsafe scheme containing embedded control characters', () => {
+    expect(sanitizeUrl('java\tscript:alert(1)')).toBe('');
+    expect(sanitizeUrl('java\nscript:alert(1)')).toBe('');
+  });
+
+  it('should block the data scheme', () => {
+    expect(sanitizeUrl('data:text/html,<p>hi</p>')).toBe('');
+  });
+
   it('should preserve query parameters', () => {
     expect(sanitizeUrl('https://example.com/?utm_source=blog')).toBe(
       'https://example.com?utm_source=blog'

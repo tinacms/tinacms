@@ -12,7 +12,7 @@ import { Config } from './prompts';
 import { ContentFrontmatterFormat } from '@tinacms/schema-tools';
 
 export interface Framework {
-  name: 'next' | 'hugo' | 'jekyll' | 'other';
+  name: 'next' | 'hugo' | 'jekyll' | 'astro' | 'other';
   reactive: boolean;
 }
 
@@ -45,6 +45,8 @@ export type GeneratedFile = {
 
 export type InitEnvironment = {
   hasTinaDeps: boolean;
+  hasReactDep: boolean;
+  astroMajor?: number;
   forestryConfigExists: boolean;
   frontMatterFormat: ContentFrontmatterFormat;
   gitIgnoreExists: boolean;

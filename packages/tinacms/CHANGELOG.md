@@ -1,5 +1,32 @@
 # tinacms
 
+## 3.9.3
+
+### Patch Changes
+
+- [#7055](https://github.com/tinacms/tinacms/pull/7055) [`42760d8`](https://github.com/tinacms/tinacms/commit/42760d8f5afd201107e27e274308af37f96ba8d0) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Fix crash when reopening Global Configuration after navigating to a collection in the admin
+
+- [#7056](https://github.com/tinacms/tinacms/pull/7056) [`c491fc5`](https://github.com/tinacms/tinacms/commit/c491fc55e612725f5d775eeb1fdf3f8ba82314fa) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Harden cross-window message handling and rich-text URL sanitization.
+
+  Adds stricter origin/source checks for trusted message flows, use explicit target origins for preview iframe message, and applies URL sanitization to slatejson rich-text parsing and default rich-text link/image rendering.
+
+- Updated dependencies [[`c491fc5`](https://github.com/tinacms/tinacms/commit/c491fc55e612725f5d775eeb1fdf3f8ba82314fa)]:
+  - @tinacms/mdx@2.1.7
+  - @tinacms/search@1.2.19
+
+## 3.9.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/search@1.2.18
+
+## 3.9.1
+
+### Patch Changes
+
+- [#7028](https://github.com/tinacms/tinacms/pull/7028) [`7b539b8`](https://github.com/tinacms/tinacms/commit/7b539b8e7d7d9f4451b5fd36a04d26b734f7d78e) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Skip the filesystem-backed response cache on edge runtimes (Cloudflare Workers, Vercel Edge) where Node's `fs` API is present but unusable, which could otherwise hang concurrent identical queries. Adds a `cache` option to `createClient` to force-disable the cache.
+
 ## 3.9.0
 
 ### Minor Changes
