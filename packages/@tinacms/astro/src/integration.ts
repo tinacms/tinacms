@@ -61,6 +61,7 @@ export default function tina(
           vite: {
             plugins: [
               bridgeDevPlugin(),
+              devContentInvalidationPlugin(),
               cloudflareImportMetaUrlPlugin(() => isCloudflareAdapter),
             ],
           },
@@ -116,6 +117,63 @@ function bridgeDevPlugin(): VitePlugin {
           res.end(`/* @tinacms/astro: bridge unavailable: ${error} */`);
         }
       });
+    },
+  };
+}
+
+/**
+ * Astro caches `getStaticPaths()` results in dev and only re-runs them for a
+ * change it recognises: a module in the graph, or a file in a watched
+ * content-layer collection. Content sourced through Tina's GraphQL client
+ * (a `getStaticPaths` that queries `client.queries.*`) is neither, so when the
+ * admin writes a new entry the route's path list stays stale and the
+ * freshly-created page 404s until the dev server is restarted by hand.
+ *
+ * This dev-only plugin watches for content files being added or removed and
+ * emits the same `astro:content-changed` signal Astro fires for its own content
+ * layer, which clears the route cache so `getStaticPaths()` re-runs and the new
+ * path resolves, then reloads the open tab so it picks up the change.
+ *
+ * See https://github.com/tinacms/tinacms/issues/5611.
+ */
+function devContentInvalidationPlugin(): VitePlugin {
+  // Markdown-family files are content wherever they live. Structured-data
+  // formats only count inside a `content` directory, so an unrelated
+  // `package.json` / `tsconfig.json` write doesn't trigger a reload.
+  const MARKDOWN = /\.(?:md|mdx|markdown|mdoc)$/i;
+  const STRUCTURED = /\.(?:json|ya?ml|toml)$/i;
+  const IGNORED =
+    /[\\/](?:node_modules|\.git|\.astro|dist|\.vercel|\.netlify|\.cache)[\\/]/;
+  const isContentFile = (file: string): boolean => {
+    if (IGNORED.test(file)) return false;
+    if (MARKDOWN.test(file)) return true;
+    return STRUCTURED.test(file) && /[\\/]content[\\/]/.test(file);
+  };
+
+  return {
+    name: '@tinacms/astro:dev-content-invalidation',
+    apply: 'serve',
+    configureServer(server) {
+      // Requires Vite's environment API (always present under Astro 6). If it
+      // is missing, no-op rather than guessing at the wrong HMR channel.
+      const ssr = server.environments?.ssr;
+      const client = server.environments?.client;
+      if (!ssr?.hot || !client?.hot) return;
+
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      const flush = () => {
+        ssr.hot.send('astro:content-changed', {});
+        client.hot.send({ type: 'full-reload', path: '*' });
+      };
+      const onChange = (file: string) => {
+        if (!isContentFile(file)) return;
+        // Coalesce bursts — saving several documents fires many events — into a
+        // single reload.
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(flush, 50);
+      };
+      server.watcher.on('add', onChange);
+      server.watcher.on('unlink', onChange);
     },
   };
 }

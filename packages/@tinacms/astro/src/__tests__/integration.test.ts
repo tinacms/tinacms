@@ -80,6 +80,34 @@ function makeRes() {
   };
 }
 
+// A minimal dev server exposing the Vite environment hot channels and a file
+// watcher, so we can drive the content-invalidation plugin and capture both the
+// HMR signals it sends and the watcher handlers it registers.
+function makeDevServer(opts: { environments?: boolean } = {}) {
+  const ssrSend = vi.fn();
+  const clientSend = vi.fn();
+  const handlers: Record<string, (file: string) => void> = {};
+  const watcher = {
+    on(event: string, cb: (file: string) => void) {
+      handlers[event] = cb;
+      return watcher;
+    },
+  };
+  const server: Record<string, unknown> = { watcher };
+  if (opts.environments !== false) {
+    server.environments = {
+      ssr: { hot: { send: ssrSend } },
+      client: { hot: { send: clientSend } },
+    };
+  }
+  return { server, ssrSend, clientSend, handlers };
+}
+
+const invalidationPlugin = (plugins: VitePlugin[]) =>
+  plugins.find(
+    (p) => p.name === '@tinacms/astro:dev-content-invalidation'
+  ) as VitePlugin;
+
 describe('tina() integration — astro:config:setup', () => {
   it('wires the middleware without writing to the source tree', () => {
     const { addMiddleware, plugins } = runConfigSetup();
@@ -197,6 +225,118 @@ describe('tina() integration — cloudflare import.meta.url plugin', () => {
     expect(
       runConfigEnvironment(cfPlugin(forcedOff.plugins), 'ssr')
     ).toBeUndefined();
+  });
+});
+
+describe('tina() integration — dev content invalidation plugin', () => {
+  it('is a dev-only plugin', () => {
+    const { plugins } = runConfigSetup();
+    const plugin = invalidationPlugin(plugins);
+    expect(plugin).toBeDefined();
+    expect(plugin.apply).toBe('serve');
+  });
+
+  it('clears the route cache and reloads when a content file is added', () => {
+    vi.useFakeTimers();
+    try {
+      const { plugins } = runConfigSetup();
+      const { server, ssrSend, clientSend, handlers } = makeDevServer();
+      (invalidationPlugin(plugins).configureServer as any)(server);
+
+      handlers.add('/project/src/content/blog/new-post.mdx');
+      // Debounced — nothing fires synchronously.
+      expect(ssrSend).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(50);
+      expect(ssrSend).toHaveBeenCalledWith('astro:content-changed', {});
+      expect(clientSend).toHaveBeenCalledWith({
+        type: 'full-reload',
+        path: '*',
+      });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('also reacts to content files being removed', () => {
+    vi.useFakeTimers();
+    try {
+      const { plugins } = runConfigSetup();
+      const { server, ssrSend, handlers } = makeDevServer();
+      (invalidationPlugin(plugins).configureServer as any)(server);
+
+      handlers.unlink('/project/content/posts/gone.md');
+      vi.advanceTimersByTime(50);
+      expect(ssrSend).toHaveBeenCalledOnce();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('treats markdown as content anywhere, but structured data only inside a content dir', () => {
+    vi.useFakeTimers();
+    try {
+      const { plugins } = runConfigSetup();
+      const { server, ssrSend, handlers } = makeDevServer();
+      (invalidationPlugin(plugins).configureServer as any)(server);
+
+      // Reacts to: markdown anywhere, and json/yaml inside a content dir.
+      for (const file of [
+        '/project/src/pages/inline.mdx',
+        '/project/content/tags/tag.json',
+        '/project/content/global/site.yaml',
+      ]) {
+        handlers.add(file);
+        vi.advanceTimersByTime(50);
+        expect(ssrSend).toHaveBeenCalled();
+        ssrSend.mockClear();
+      }
+
+      // Ignores: config json outside a content dir, source code, and anything
+      // inside ignored directories.
+      for (const file of [
+        '/project/package.json',
+        '/project/tsconfig.json',
+        '/project/src/lib/data.ts',
+        '/project/node_modules/pkg/content/x.md',
+        '/project/dist/content/x.md',
+      ]) {
+        handlers.add(file);
+        vi.advanceTimersByTime(50);
+        expect(ssrSend).not.toHaveBeenCalled();
+      }
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('coalesces a burst of changes into a single reload', () => {
+    vi.useFakeTimers();
+    try {
+      const { plugins } = runConfigSetup();
+      const { server, ssrSend, clientSend, handlers } = makeDevServer();
+      (invalidationPlugin(plugins).configureServer as any)(server);
+
+      handlers.add('/project/content/a.md');
+      handlers.add('/project/content/b.md');
+      handlers.unlink('/project/content/c.md');
+      vi.advanceTimersByTime(50);
+
+      expect(ssrSend).toHaveBeenCalledOnce();
+      expect(clientSend).toHaveBeenCalledOnce();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('no-ops without throwing when the environment API is unavailable', () => {
+    const { plugins } = runConfigSetup();
+    const { server, handlers } = makeDevServer({ environments: false });
+    expect(() =>
+      (invalidationPlugin(plugins).configureServer as any)(server)
+    ).not.toThrow();
+    // It registers no watcher handlers rather than guessing at the HMR channel.
+    expect(Object.keys(handlers)).toHaveLength(0);
   });
 });
 
