@@ -1,16 +1,9 @@
 import * as React from 'react';
-import { SidebarContext, minSidebarWidth } from './sidebar';
+import { SidebarContext, minSidebarWidth, sidebarEdgeGap } from './sidebar';
 
 export const ResizeHandle = () => {
-  const {
-    resizingSidebar,
-    setResizingSidebar,
-    fullscreen,
-    setSidebarWidth,
-    displayState,
-  } = React.useContext(SidebarContext);
-
-  const handleRef = React.useRef<HTMLDivElement>(null);
+  const { resizingSidebar, setResizingSidebar, setSidebarWidth, displayState } =
+    React.useContext(SidebarContext);
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     // Pointer capture guarantees pointerup fires on this element even if
@@ -24,14 +17,13 @@ export const ResizeHandle = () => {
     setResizingSidebar(false);
   };
 
-  // Update sidebar width while resizing
   React.useEffect(() => {
     if (!resizingSidebar) return;
 
     const handlePointerMove = (e: PointerEvent) => {
       setSidebarWidth((sidebarWidth: number) => {
         const newWidth = sidebarWidth + e.movementX;
-        const maxWidth = window.innerWidth - 8;
+        const maxWidth = window.innerWidth - sidebarEdgeGap;
         return Math.max(minSidebarWidth, Math.min(maxWidth, newWidth));
       });
     };
@@ -45,13 +37,12 @@ export const ResizeHandle = () => {
     };
   }, [resizingSidebar, setSidebarWidth]);
 
-  if (fullscreen) {
+  if (displayState === 'fullscreen') {
     return null;
   }
 
   return (
     <div
-      ref={handleRef}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
       className={`z-100 absolute top-1/2 right-px w-2 h-32 bg-white rounded-r border border-gray-150 shadow-sm hover:shadow-md origin-left transition-all duration-150 ease-out transform translate-x-full -translate-y-1/2 group hover:bg-gray-50 ${

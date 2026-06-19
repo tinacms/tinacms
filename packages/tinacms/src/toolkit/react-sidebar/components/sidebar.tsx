@@ -24,6 +24,8 @@ import { TinaIcon } from '@toolkit/icons';
 export const SidebarContext = React.createContext<any>(null);
 export const minPreviewWidth = 440;
 export const minSidebarWidth = 360;
+/* Sliver of the window kept clear of the sidebar at its max width */
+export const sidebarEdgeGap = 8;
 
 const LOCALSTATEKEY = 'tina.sidebarState';
 const LOCALWIDTHKEY = 'tina.sidebarWidth';
@@ -499,8 +501,10 @@ const SidebarWrapper = ({ children }) => {
         style={{
           width: displayState === 'fullscreen' ? '100vw' : `${sidebarWidth}px`,
           maxWidth:
-            displayState === 'fullscreen' ? '100vw' : 'calc(100vw - 8px)',
-          minWidth: '360px',
+            displayState === 'fullscreen'
+              ? '100vw'
+              : `calc(100vw - ${sidebarEdgeGap}px)`,
+          minWidth: `${minSidebarWidth}px`,
         }}
       >
         {children}
