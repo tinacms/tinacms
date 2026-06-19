@@ -26,7 +26,7 @@ packages/@tinacms/     # Scoped packages (cli, app, datalayer, graphql, mdx, scr
 examples/              # Framework example apps
   next/kitchen-sink/   # Next.js 15 — the reference kitchen-sink implementation
   next/tina-self-hosted-demo/ # Self-hosted with auth
-  astro/kitchen-sink/  # Astro 5 — mirrors Next.js kitchen-sink
+  astro/kitchen-sink/  # Astro 6 — mirrors Next.js kitchen-sink
   hugo/kitchen-sink/   # Hugo kitchen-sink
   react/kitchen-sink/  # React kitchen-sink
   shared/              # Shared content and public assets across kitchen-sink examples
@@ -90,3 +90,72 @@ Note: `.tsx` collection files contain JSX for custom field components (e.g., Col
 | Linting/Formatting | Biome (extends root config) |
 | Styling | Tailwind CSS 4 (CSS-first config) |
 | TypeScript | 5.7+ strict (extends `base.tsconfig.json`) |
+
+## Filing Issues
+
+Bug reports go through the same checklist whether they land via Discord `#ask-for-help`, the GitHub issue form, or an agent calling `gh api`. The canonical source is `.github/ISSUE_TEMPLATE/bug-report.yml`, mirrored in the Discord post guidelines and at https://tina.io/docs/contributing/bug-reports.
+
+**Required H3 sections** (use these exact headings when formatting an issue body programmatically):
+
+- `### The exact error message` — copy-pasted literal string, not paraphrased
+- `### Steps to reproduce` — what the user clicked, in order
+- `### What you expected vs. what actually happened`
+- `### Your environment` — versions, framework, **and anything non-default** (custom MediaStore, custom auth, self-hosted setup, etc.)
+
+**Optional but encouraged:**
+
+- `### A way for us to reproduce` — link to a minimal repro repo
+- `### Relevant sections of your schema file`
+- `### Client ID` — for TinaCloud-related issues
+
+If you're an agent (Claude Code, Cursor, ChatGPT, an internal bot like `ssw-yakshaver`) drafting an issue programmatically, format the body with those H3 headings before calling `POST /repos/{owner}/{repo}/issues`.
+
+The non-default-setup detail in `### Your environment` is the field that most often points us straight at the root cause. Do not omit it.
+
+## Issue Triage & Labels
+
+This repo uses a fixed label taxonomy for backlog organisation. When filing or triaging issues, apply exactly **one primary category label** plus any program/scope labels that apply.
+
+### Primary category labels
+
+Pick the most specific that fits:
+
+| Label | Use for |
+|---|---|
+| `bug` | Broken behavior, error, crash, wrong output |
+| `enhancement` | Feature request, new capability |
+| `security` | Vulnerabilities, code-scanning alerts (file privately first per SECURITY.md) |
+| `documentation` | Docs, READMEs, guides |
+| `technical-debt` | Refactor, dead code, architectural cleanup |
+| `chore` | Dep bumps, config, build, CI, scaffolding |
+| `tests` | Adding or expanding test coverage |
+| `perf` | Slow, scale, throughput, memory |
+| `dx` | Developer-facing CLI / errors / logging |
+| `ux` | Visual, UX, layout, copy, animation |
+| `rich-text` | Plate, MDX, markdown rendering, body field, embed templates |
+| `form-system` | Form fields, validation, dirty state, field plugins |
+| `media` | Media library, upload, browse |
+| `starter-template` | create-tina-app, Astro/Next/Hugo starters |
+| `self-hosted` | Self-hosted setup, externalization, database, sqlite-level |
+| `editorial-workflow` | Branches, PRs, protected-branch flow |
+
+### Program / scope labels (apply alongside primary)
+
+- `v4` — part of the v4 architectural rewrite (epics #6830–#6837)
+- `For 4.1` — scheduled for the 4.1 release window
+- `Pre 4.0` — must land before v4 ships
+- `onboarding` — small, well-scoped task suitable for developers new to the project
+- `🤖AI` — could be implemented end-to-end by an AI agent in a single prompt
+
+### Triage rules
+
+- **Taxonomy is fixed.** Don't invent new category labels. If nothing fits, leave the label off and surface the issue for human triage.
+- **Don't apply `onboarding` or `🤖AI` to v4-program issues** — those are intentionally coordinated work.
+- **Closing an issue:** always link evidence (PR number, comment URL, "fixed in version X.Y") in the closing comment. If the issue is a meta-tracker blocked on a parent epic, leave a "Triage note — do not close" comment instead.
+- **Re-test pings:** when the linked PR has merged but no one has confirmed the fix sticks, comment asking the original reporter to verify on the current setup before closing.
+
+### Useful filter URLs
+
+- Onboarding: <https://github.com/tinacms/tinacms/labels/onboarding>
+- AI-doable (one prompt): <https://github.com/tinacms/tinacms/labels/%F0%9F%A4%96AI>
+- v4 program: <https://github.com/tinacms/tinacms/labels/v4> · <https://github.com/tinacms/tinacms/labels/For%204.1> · <https://github.com/tinacms/tinacms/labels/Pre%204.0>

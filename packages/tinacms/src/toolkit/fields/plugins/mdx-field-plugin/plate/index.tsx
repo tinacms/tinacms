@@ -9,7 +9,7 @@ import FixedToolbarButtons from './components/fixed-toolbar-buttons';
 import { ToolbarProvider } from './toolbar/toolbar-provider';
 import { Plate } from '@udecode/plate/react';
 import { useCreateEditor } from './hooks/use-create-editor';
-import { editorPlugins } from './plugins/editor-plugins';
+import { createEditorPlugins } from './plugins/editor-plugins';
 
 export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
   const initialValue = React.useMemo(() => {
@@ -24,9 +24,16 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
   }, []);
   // Filter out FloatingToolbarPlugin if showFloatingToolbar is false
   const showFloatingToolbar = field?.overrides?.showFloatingToolbar !== false;
+  const builtPlugins = React.useMemo(
+    () =>
+      createEditorPlugins({
+        headingLevels: field?.overrides?.headingLevels,
+      }),
+    [field?.overrides?.headingLevels]
+  );
   const plugins = showFloatingToolbar
-    ? editorPlugins
-    : editorPlugins.filter((plugin) => plugin.key !== 'floating-toolbar');
+    ? builtPlugins
+    : builtPlugins.filter((plugin) => plugin.key !== 'floating-toolbar');
 
   const editor = useCreateEditor({
     plugins: [...plugins],
@@ -81,8 +88,8 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
               <FixedToolbar>
                 <FixedToolbarButtons />
               </FixedToolbar>
+              <Editor />
             </ToolbarProvider>
-            <Editor />
           </TooltipProvider>
         </EditorContainer>
       </Plate>

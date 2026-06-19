@@ -1,5 +1,83 @@
 # tinacms
 
+## 3.9.3
+
+### Patch Changes
+
+- [#7055](https://github.com/tinacms/tinacms/pull/7055) [`42760d8`](https://github.com/tinacms/tinacms/commit/42760d8f5afd201107e27e274308af37f96ba8d0) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Fix crash when reopening Global Configuration after navigating to a collection in the admin
+
+- [#7056](https://github.com/tinacms/tinacms/pull/7056) [`c491fc5`](https://github.com/tinacms/tinacms/commit/c491fc55e612725f5d775eeb1fdf3f8ba82314fa) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Harden cross-window message handling and rich-text URL sanitization.
+
+  Adds stricter origin/source checks for trusted message flows, use explicit target origins for preview iframe message, and applies URL sanitization to slatejson rich-text parsing and default rich-text link/image rendering.
+
+- Updated dependencies [[`c491fc5`](https://github.com/tinacms/tinacms/commit/c491fc55e612725f5d775eeb1fdf3f8ba82314fa)]:
+  - @tinacms/mdx@2.1.7
+  - @tinacms/search@1.2.19
+
+## 3.9.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/search@1.2.18
+
+## 3.9.1
+
+### Patch Changes
+
+- [#7028](https://github.com/tinacms/tinacms/pull/7028) [`7b539b8`](https://github.com/tinacms/tinacms/commit/7b539b8e7d7d9f4451b5fd36a04d26b734f7d78e) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Skip the filesystem-backed response cache on edge runtimes (Cloudflare Workers, Vercel Edge) where Node's `fs` API is present but unusable, which could otherwise hang concurrent identical queries. Adds a `cache` option to `createClient` to force-disable the cache.
+
+## 3.9.0
+
+### Minor Changes
+
+- [#7009](https://github.com/tinacms/tinacms/pull/7009) [`a8dd9af`](https://github.com/tinacms/tinacms/commit/a8dd9af056b17a8faeaa621bbf7722a62b396cf8) Thanks [@JackDevAU](https://github.com/JackDevAU)! - chore: remove deprecated code
+
+- [#6902](https://github.com/tinacms/tinacms/pull/6902) [`b9d561f`](https://github.com/tinacms/tinacms/commit/b9d561fcea56185f0f146d2bdb1b510caab180d3) Thanks [@18-th](https://github.com/18-th)! - Support Tina media uploads and deletes in the editorial workflow on protected branches. Media changes now prompt for a branch, write to that branch, switch the editor to it after the media operation succeeds, and continue through indexing and pull request creation with the same workflow progress UI as content edits.
+
+  Editorial workflow pull request titles now replace all dashes in the branch name with spaces for both content and media changes.
+
+### Patch Changes
+
+- [#7010](https://github.com/tinacms/tinacms/pull/7010) [`916bd43`](https://github.com/tinacms/tinacms/commit/916bd43de1b563854fac65a74ecf04f946ebda56) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Remove deprecated GitClient.onSubmit alias
+
+## 3.8.4
+
+### Patch Changes
+
+- [#6974](https://github.com/tinacms/tinacms/pull/6974) [`c7b366c`](https://github.com/tinacms/tinacms/commit/c7b366c5de66b1a3f086c1f11954225e55430324) Thanks [@JackDevAU](https://github.com/JackDevAU)! - feat: add toolbar override settings "headingLevels" for h1,h2,etc
+  fix: fixes some incorrect react hook calls
+- Updated dependencies [[`c7b366c`](https://github.com/tinacms/tinacms/commit/c7b366c5de66b1a3f086c1f11954225e55430324)]:
+  - @tinacms/schema-tools@2.8.1
+  - @tinacms/search@1.2.17
+  - @tinacms/mdx@2.1.6
+
+## 3.8.3
+
+### Patch Changes
+
+- [#6947](https://github.com/tinacms/tinacms/pull/6947) [`7be8175`](https://github.com/tinacms/tinacms/commit/7be81751a6b93f785d347e759e91f024bb12c452) Thanks [@MirkaJuliet34](https://github.com/MirkaJuliet34)! - Aligned rich text editor typography class names with the actual font used and updated related references.
+
+## 3.8.2
+
+### Patch Changes
+
+- [#6940](https://github.com/tinacms/tinacms/pull/6940) [`33feeac`](https://github.com/tinacms/tinacms/commit/33feeacf6585be2736a0a14c5a800c1b6db34e44) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - fix(tinacms): trim whitespace from search input before querying
+
+- [#6950](https://github.com/tinacms/tinacms/pull/6950) [`8ac0776`](https://github.com/tinacms/tinacms/commit/8ac0776dea0c0650a5e5098c143b24c17fc25b8e) Thanks [@RonGamzu](https://github.com/RonGamzu)! - Fix typos: rename misspelled `notifiySubscribers` to `notifySubscribers` and correct "Error occured" to "Error occurred" in CLI error messages
+
+- [#6929](https://github.com/tinacms/tinacms/pull/6929) [`b9eaf61`](https://github.com/tinacms/tinacms/commit/b9eaf61c28c25814ae65b5fbe72d5b33df0b3596) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Fix dropdown options being hidden behind other fields.
+
+- [#6926](https://github.com/tinacms/tinacms/pull/6926) [`cf73a11`](https://github.com/tinacms/tinacms/commit/cf73a115c3a58fac26e2518734dd3cb49133260d) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Fix optional datetime fields auto-filling with the current date when no value is set
+
+- [#6938](https://github.com/tinacms/tinacms/pull/6938) [`4757225`](https://github.com/tinacms/tinacms/commit/475722599ff350b45bfdb4f7a6af2e37d33c81c3) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - chore(deps): upgrade react-router-dom from 6.3.0 to ^6.30.3 to resolve GHSA-9jcx-v3wj-wh4m (unexpected external redirect via untrusted paths)
+
+- Updated dependencies [[`0509095`](https://github.com/tinacms/tinacms/commit/0509095601fedc87f05a622e219e6414ef51a6b6), [`542c781`](https://github.com/tinacms/tinacms/commit/542c781b4f7a6ff5b5481bd88329f60c9bf3b57d), [`df50cbf`](https://github.com/tinacms/tinacms/commit/df50cbf35536bf2028a742832aebd57701dc3bb6), [`d622ac5`](https://github.com/tinacms/tinacms/commit/d622ac5c0205adfc1b5cd8fe5f42045e579029c3), [`a8c8f08`](https://github.com/tinacms/tinacms/commit/a8c8f08012d30c5ed0df67ad2b04b805a9434784)]:
+  - @tinacms/bridge@0.3.0
+  - @tinacms/schema-tools@2.8.0
+  - @tinacms/mdx@2.1.5
+  - @tinacms/search@1.2.16
+
 ## 3.8.1
 
 ### Patch Changes

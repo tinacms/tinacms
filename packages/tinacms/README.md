@@ -2,9 +2,9 @@
 [![npm version](https://img.shields.io/npm/v/tinacms.svg?style=flat)](https://www.npmjs.com/package/tinacms)
 [![Build, Test, Lint for Main](https://github.com/tinacms/tinacms/actions/workflows/main.yml/badge.svg?branch=main&event=push)](https://github.com/tinacms/tinacms/actions/workflows/main.yml)
 
-# [![TINA CMS](https://res.cloudinary.com/forestry-demo/image/upload/c_scale,w_400/v1694189357/tina-brand-assets/logos/png/Logo_Full_-_Default.png 'Visit tinacms.org')](https://tina.io)
+# [![TINA CMS](./.github/assets/tinacms-logo-small-default.svg)](https://tina.io)
 
-[![Tina Demo](https://res.cloudinary.com/forestry-demo/video/upload/du_16,w_700,e_loop/tina-io/new-homepage/homepage-demo-2.gif)](https://tina.io/)
+[![Tina Demo](./.github/assets/homepage-demo-2.gif)](https://tina.io/)
 
 Tina is a headless content management system with support for **Markdown**, MDX, JSON, YAML, and more.
 
@@ -35,7 +35,7 @@ Visit [Tina's documentation](https://tina.io/docs/) to learn more.
 [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?url=https%3A%2F%2Ftinacms.org&text=I%20just%20checked%20out%20@tinacms%20on%20GitHub%20and%20it%20is%20sweet%21&hashtags=TinaCMS%2Cjamstack%2Cheadlesscms)
 [![Forum](https://shields.io/github/discussions/tinacms/tinacms)](https://github.com/tinacms/tinacms/discussions)
 
-Visit the [GitHub Discussions](https://github.com/tinacms/tinacms/discussions) or our [Community Discord](https://discord.com/invite/zumN63Ybpf) to ask questions, or look us up on on Twitter at [@tinacms](https://twitter.com/tinacms).
+Visit the [GitHub Discussions](https://github.com/tinacms/tinacms/discussions) or our [Community Discord](https://discord.com/invite/zumN63Ybpf) to ask questions, or look us up on Twitter at [@tinacms](https://twitter.com/tinacms).
 
 <!-- ## Changelog
 
@@ -75,5 +75,3 @@ Please see our [./CONTRIBUTING.md](https://github.com/tinacms/tinacms/blob/main/
 - Adam Cogan ([@adamcogan](https://github.com/adamcogan))
 
 View our awesome SSW devs at [ssw.com.au/people](https://www.ssw.com.au/people/?skill=%F0%9F%A6%99-TinaCMS).
-
-![](https://res.cloudinary.com/forestry-demo/image/upload/h_85/v1573167387/Favicon.png)

@@ -53,6 +53,38 @@ describe('prepareCacheLocation', () => {
     }
   });
 
+  // Regression guard for #6785 / #6750: the bundle's outfile must end up
+  // inside the user's project tree, never hardcoded to `os.tmpdir()`.
+  //
+  // The original ESM bug was that `os.tmpdir()` left externalized packages
+  // unreachable to Node's resolver. Locks this in at the source —
+  // `loadDatabaseFile` builds its outfile from the path returned here, so
+  // if `prepareCacheLocation` ever stopped basing the path on the user-
+  // provided `generatedFolderPath` (and went back to a hardcoded tmpdir),
+  // the whole fix would silently regress.
+  //
+  // We can't simply assert "not under os.tmpdir()" because the *test
+  // fixture itself* lives under os.tmpdir() (see freshGeneratedFolder).
+  // The real invariant is: the returned path is derived from the input
+  // path, not from any global tempdir.
+  it('returns a build path derived from the user-provided generatedFolderPath', async () => {
+    const { generatedFolderPath, cleanup } = await freshGeneratedFolder();
+    try {
+      const loc = await prepareCacheLocation(generatedFolderPath);
+
+      // The whole returned path must be inside the user's project tree.
+      expect(loc.buildPath.startsWith(generatedFolderPath)).toBe(true);
+      expect(loc.parentPath.startsWith(generatedFolderPath)).toBe(true);
+
+      // And specifically under the `.cache/` subdirectory of that path.
+      expect(
+        loc.buildPath.startsWith(path.join(generatedFolderPath, '.cache'))
+      ).toBe(true);
+    } finally {
+      cleanup();
+    }
+  });
+
   it('uses Date.now() for the build subdir when no override is passed', async () => {
     const { generatedFolderPath, cleanup } = await freshGeneratedFolder();
     try {

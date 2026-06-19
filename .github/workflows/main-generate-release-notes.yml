@@ -13,13 +13,13 @@ jobs:
     steps:
       - name: Get release info
         id: release-info
-        uses: easyware-io/get-release@v1
+        uses: easyware-io/get-release@cf8f6a568545bd4777b0b7b98446b45961f8e320 # v1
         with:
           token: ${{ github.token }}
           release_name: tinacms@${{ inputs.release_name }}
 
       - name: Generate a token
-        uses: actions/create-github-app-token@v1
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         id: generate-token
         with:
           # uses https://github.com/organizations/tinacms/settings/apps/release-bot-allow-prs-and-push
@@ -29,7 +29,7 @@ jobs:
           repositories: tina.io
 
       - name: Publish release notes
-        uses: benc-uk/workflow-dispatch@v1
+        uses: benc-uk/workflow-dispatch@31e2b3319479a63f0ab15bf800eff9e913504e26 # v1.3.2
         with:
           repo: tinacms/tina.io
           ref: main

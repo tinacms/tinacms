@@ -1,7 +1,7 @@
 {
     "name": "@tinacms/cli",
     "type": "module",
-    "version": "2.3.1",
+    "version": "2.5.1",
     "main": "dist/index.js",
     "typings": "dist/index.d.ts",
     "files": [
@@ -41,11 +41,15 @@
         "@types/node": "^22.13.1",
         "@types/progress": "catalog:",
         "@types/prompts": "catalog:",
-        "jest": "catalog:"
+        "jest": "catalog:",
+        "mongodb-level": "catalog:",
+        "sqlite-level": "catalog:",
+        "ts-jest": "catalog:"
     },
     "scripts": {
         "build": "tinacms-scripts build",
         "test": "jest --passWithNoTests",
+        "test:adapters": "NODE_OPTIONS='--experimental-vm-modules' jest --config jest.adapter-matrix.config.js --runTestsByPath src/next/adapter-matrix.adapter-test.ts",
         "types": "pnpm tsc",
         "test-watch": "jest  --passWithNoTests --watch",
         "tinacms": "MONOREPO_DEV=true node ./bin/tinacms",
@@ -91,6 +95,7 @@
         "memory-level": "catalog:",
         "minimatch": "catalog:",
         "normalize-path": "catalog:",
+        "posthog-node": "^5.17.2",
         "prettier": "catalog:",
         "progress": "catalog:",
         "prompts": "catalog:",

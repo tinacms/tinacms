@@ -1,5 +1,44 @@
 # @tinacms/schema-tools
 
+## 2.8.1
+
+### Patch Changes
+
+- [#6974](https://github.com/tinacms/tinacms/pull/6974) [`c7b366c`](https://github.com/tinacms/tinacms/commit/c7b366c5de66b1a3f086c1f11954225e55430324) Thanks [@JackDevAU](https://github.com/JackDevAU)! - feat: add toolbar override settings "headingLevels" for h1,h2,etc
+  fix: fixes some incorrect react hook calls
+
+## 2.8.0
+
+### Minor Changes
+
+- [#6790](https://github.com/tinacms/tinacms/pull/6790) [`542c781`](https://github.com/tinacms/tinacms/commit/542c781b4f7a6ff5b5481bd88329f60c9bf3b57d) Thanks [@Ben0189](https://github.com/Ben0189)! - Fix native SQLite (and other native CJS adapters) crashing the ESM database build, plus surrounding cleanup work.
+
+  **The bug.** Since Tina v3's December 2025 ESM migration, bundling `tina/database.ts` with esbuild — and writing the output to `os.tmpdir()` — left users wedged between two failure modes: bundling native modules like `better-sqlite3` crashed with `__filename is not defined`, and externalizing them couldn't resolve `node_modules` from `/tmp/`. See #6675.
+
+  **What changed:**
+
+  - `loadDatabaseFile` and `loadConfigFile` now write esbuild output to `<project>/tina/__generated__/.cache/<timestamp>/` instead of `os.tmpdir()`, so Node's resolver can walk up to the project's `node_modules` at runtime.
+  - `better-sqlite3` is externalized so Node loads it as CJS where `__filename` exists.
+  - The build cache is swept on startup (clears residue from crashed prior runs), and each per-build subdir + its now-empty timestamp parent are removed after the dynamic-import resolves.
+  - Read-only project mounts (Docker `:ro` volumes, AWS Lambda's `/var/task`, sandboxed CI runners) now fail with an actionable error explaining the cause and resolution, instead of a cryptic mid-build `EACCES`.
+  - New `defineConfig` field: `build.externalDependencies?: string[]`. Users with custom native adapters outside the baseline can extend the externalize list from their config:
+
+    ```ts
+    // tina/config.ts
+    export default defineConfig({
+      build: {
+        publicFolder: "public",
+        outputFolder: "admin",
+        externalDependencies: ["my-custom-native-adapter"],
+      },
+      // ...
+    });
+    ```
+
+    Externalized packages must be installed in the project's `node_modules` so Node can resolve them at runtime.
+
+  - `tina init` now adds `tina/__generated__` to `.gitignore` for new projects (and existing projects without it).
+
 ## 2.7.4
 
 ### Patch Changes

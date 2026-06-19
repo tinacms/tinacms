@@ -19,21 +19,15 @@ import {
   addNamespaceToSchema,
 } from '@tinacms/schema-tools';
 import {
+  FuzzySearchOptions,
+  IndexableDocument,
   SearchClient,
   SearchOptions,
   SearchQueryResponse,
-  IndexableDocument,
-  FuzzySearchOptions,
   optionsToSearchIndexOptions,
   parseSearchIndexResponse,
   queryToSearchIndexQuery,
 } from '@tinacms/search/index-client';
-
-interface TinaSearchConfig {
-  stopwordLanguages?: string[];
-  fuzzyEnabled?: boolean;
-  fuzzyOptions?: FuzzySearchOptions;
-}
 import gql from 'graphql-tag';
 import {
   EDITORIAL_WORKFLOW_STATUS,
@@ -45,6 +39,17 @@ import { LocalAuthProvider, TinaCloudAuthProvider } from './authProvider';
 import { TinaCloudProject } from './types';
 
 export * from './authProvider';
+
+interface TinaSearchConfig {
+  stopwordLanguages?: string[];
+  fuzzyEnabled?: boolean;
+  fuzzyOptions?: FuzzySearchOptions;
+}
+
+type EditorialWorkflowStatusUpdate = {
+  status: string;
+  message?: string;
+};
 
 export type OnLoginFunc = (args: { token?: TokenObject }) => Promise<void>;
 
@@ -403,7 +408,7 @@ mutation addPendingDocumentMutation(
       });
 
       if (!res.ok) {
-        let errorMessage = `There was an error creating a new branch. ${res.statusText}`;
+        let errorMessage = `There was an error creating a pull request. ${res.statusText}`;
         if (res.status === 422) {
           errorMessage = `Please make sure you have made changes on ${branch} before creating a pull request.`;
         }
@@ -413,7 +418,7 @@ mutation addPendingDocumentMutation(
       const values = await res.json();
       return values;
     } catch (error) {
-      console.error('There was an error creating a new branch.', error);
+      console.error('There was an error creating a pull request.', error);
       throw error;
     }
   }
@@ -532,11 +537,15 @@ mutation addPendingDocumentMutation(
     return parsedResult;
   }
 
-  async listBranches(args?: { includeIndexStatus?: boolean }) {
+  async listBranches(args?: {
+    includeIndexStatus?: boolean;
+    signal?: AbortSignal;
+  }) {
     try {
       const url = `${this.contentApiBase}/github/${this.clientId}/list_branches`;
       const res = await this.authProvider.fetchWithToken(url, {
         method: 'GET',
+        signal: args?.signal,
       });
       const branches = await res.json();
       const parsedBranches = await ListBranchResponse.parseAsync(branches);
@@ -568,9 +577,15 @@ mutation addPendingDocumentMutation(
     );
   }
 
-  async branchExists(branchName: string): Promise<boolean> {
+  async branchExists(
+    branchName: string,
+    args?: { signal?: AbortSignal }
+  ): Promise<boolean> {
     if (this.isLocalMode) return true;
-    const branches = await this.listBranches({ includeIndexStatus: false });
+    const branches = await this.listBranches({
+      includeIndexStatus: false,
+      signal: args?.signal,
+    });
     return branches.some((b) => b.name === branchName);
   }
 
@@ -622,6 +637,122 @@ mutation addPendingDocumentMutation(
     }
   }
 
+  private async pollEditorialWorkflowStatus(
+    requestId: string,
+    onStatusUpdate?: (status: EditorialWorkflowStatusUpdate) => void
+  ): Promise<EditorialWorkflowResult> {
+    const pollInterval = 5000;
+    // Cap is sized to cover the server-side worst case: the workflow runs up to
+    // two indexing waits plus branch/commit/PR creation. The previous 5-minute
+    // cap could abandon a still-running workflow, and re-triggering opens a
+    // second (collision-suffixed) branch rather than resuming the first.
+    const maxAttempts = 180; // 15 minutes
+    let attempts = 0;
+
+    while (attempts < maxAttempts) {
+      await new Promise((resolve) => setTimeout(resolve, pollInterval));
+      attempts++;
+
+      try {
+        const statusUrl = `${this.contentApiBase}/editorial-workflow/${this.clientId}/status/${requestId}`;
+        const statusResponse =
+          await this.authProvider.fetchWithToken(statusUrl);
+        const statusResponseBody = await statusResponse.json();
+
+        onStatusUpdate?.({
+          status: statusResponseBody.status,
+          message:
+            statusResponseBody.message ||
+            `Status: ${statusResponseBody.status}`,
+        });
+
+        if (
+          statusResponseBody.status === EDITORIAL_WORKFLOW_STATUS.ERROR ||
+          statusResponse.status === 500
+        ) {
+          if (statusResponseBody.pullRequestUrl) {
+            return {
+              branchName: statusResponseBody.branchName,
+              pullRequestUrl: statusResponseBody.pullRequestUrl,
+              warning: statusResponseBody.message,
+            };
+          }
+
+          const error = new Error(
+            statusResponseBody.message || 'Editorial workflow failed'
+          ) as EditorialWorkflowErrorDetails;
+          error.errorCode = statusResponseBody.errorCode || 'WORKFLOW_FAILED';
+          throw error;
+        }
+
+        if (statusResponse.status === 200) {
+          return {
+            branchName: statusResponseBody.branchName,
+            pullRequestUrl: statusResponseBody.pullRequestUrl,
+          };
+        }
+
+        if (statusResponse.status !== 202) {
+          const error = new Error(
+            statusResponseBody.message ||
+              `Failed to check workflow status: ${statusResponse.statusText}`
+          ) as EditorialWorkflowErrorDetails;
+          error.errorCode = 'WORKFLOW_STATUS_FAILED';
+          throw error;
+        }
+      } catch (error) {
+        if ((error as EditorialWorkflowErrorDetails).errorCode) {
+          throw error;
+        }
+        console.warn(
+          `Editorial workflow status poll failed (attempt ${attempts}/${maxAttempts}), retrying...`,
+          error
+        );
+      }
+    }
+
+    const timeoutMinutes = Math.round((maxAttempts * pollInterval) / 60000);
+    throw new Error(
+      `Editorial workflow timed out after ${timeoutMinutes} minutes. ` +
+        `It may still be completing in the background — please wait before retrying.`
+    );
+  }
+
+  private toEditorialWorkflowError(
+    responseBody: any,
+    fallbackMessage: string
+  ): EditorialWorkflowErrorDetails {
+    const error = new Error(
+      responseBody?.message || fallbackMessage
+    ) as EditorialWorkflowErrorDetails;
+    if (responseBody?.errorCode) {
+      error.errorCode = responseBody.errorCode;
+    }
+    if (responseBody?.conflictingBranch) {
+      error.conflictingBranch = responseBody.conflictingBranch;
+    }
+    return error;
+  }
+
+  private async postEditorialWorkflow(
+    url: string,
+    body: unknown,
+    errorFallback: string
+  ): Promise<any> {
+    const res = await this.authProvider.fetchWithToken(url, {
+      method: 'POST',
+      body: JSON.stringify(body),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const responseBody = await res.json();
+    if (!res.ok) {
+      throw this.toEditorialWorkflowError(responseBody, errorFallback);
+    }
+    return responseBody;
+  }
+
   /**
    * Initiate and poll for the results of an editorial workflow operation
    *
@@ -641,34 +772,16 @@ mutation addPendingDocumentMutation(
     const url = `${this.contentApiBase}/editorial-workflow/${this.clientId}`;
 
     try {
-      const res = await this.authProvider.fetchWithToken(url, {
-        method: 'POST',
-        body: JSON.stringify({
+      const responseBody = await this.postEditorialWorkflow(
+        url,
+        {
           branchName: options.branchName,
           baseBranch: options.baseBranch,
           prTitle: options.prTitle,
           graphQLContentOp: options.graphQLContentOp,
-        }),
-        headers: {
-          'Content-Type': 'application/json',
         },
-      });
-
-      const responseBody = await res.json();
-
-      if (!res.ok) {
-        console.error('There was an error starting editorial workflow.');
-        const error = new Error(
-          responseBody?.message || 'Failed to start editorial workflow'
-        ) as EditorialWorkflowErrorDetails;
-        if (responseBody?.errorCode) {
-          error.errorCode = responseBody.errorCode;
-        }
-        if (responseBody?.conflictingBranch) {
-          error.conflictingBranch = responseBody.conflictingBranch;
-        }
-        throw error;
-      }
+        'Failed to start editorial workflow'
+      );
 
       const requestId = responseBody.requestId;
 
@@ -683,79 +796,10 @@ mutation addPendingDocumentMutation(
         });
       }
 
-      const maxAttempts = 60;
-      const pollInterval = 5000;
-      let attempts = 0;
-
-      while (attempts < maxAttempts) {
-        await new Promise((resolve) => setTimeout(resolve, pollInterval));
-        attempts++;
-
-        try {
-          const statusUrl = `${this.contentApiBase}/editorial-workflow/${this.clientId}/status/${requestId}`;
-          const statusResponse =
-            await this.authProvider.fetchWithToken(statusUrl);
-
-          const statusResponseBody = await statusResponse.json();
-
-          if (options.onStatusUpdate) {
-            options.onStatusUpdate({
-              status: statusResponseBody.status,
-              message:
-                statusResponseBody.message ||
-                `Status: ${statusResponseBody.status}`,
-            });
-          }
-
-          if (
-            statusResponseBody.status === EDITORIAL_WORKFLOW_STATUS.ERROR ||
-            statusResponse.status === 500
-          ) {
-            // Bot fallback: workflow completed but with degraded auth.
-            // Return as success with a warning so the PR link is shown.
-            if (statusResponseBody.pullRequestUrl) {
-              return {
-                branchName: statusResponseBody.branchName,
-                pullRequestUrl: statusResponseBody.pullRequestUrl,
-                warning: statusResponseBody.message,
-              };
-            }
-
-            const error = new Error(
-              statusResponseBody.message || 'Editorial workflow failed'
-            ) as EditorialWorkflowErrorDetails;
-            error.errorCode = statusResponseBody.errorCode || 'WORKFLOW_FAILED';
-            throw error;
-          }
-
-          if (statusResponse.status === 200) {
-            return {
-              branchName: statusResponseBody.branchName,
-              pullRequestUrl: statusResponseBody.pullRequestUrl,
-            };
-          }
-
-          if (statusResponse.status !== 202) {
-            const error = new Error(
-              statusResponseBody.message ||
-                `Failed to check workflow status: ${statusResponse.statusText}`
-            ) as EditorialWorkflowErrorDetails;
-            error.errorCode = 'WORKFLOW_STATUS_FAILED';
-            throw error;
-          }
-        } catch (error) {
-          if ((error as EditorialWorkflowErrorDetails).errorCode) {
-            throw error;
-          }
-          // Transient errors (network, JSON parse, 502/503) — log and retry
-          console.warn(
-            `Editorial workflow status poll failed (attempt ${attempts}/${maxAttempts}), retrying...`,
-            error
-          );
-        }
-      }
-
-      throw new Error('Editorial workflow timed out after 5 minutes');
+      return await this.pollEditorialWorkflowStatus(
+        requestId,
+        options.onStatusUpdate
+      );
     } catch (error) {
       console.error(
         'There was an error with editorial workflow operation.',
@@ -763,6 +807,28 @@ mutation addPendingDocumentMutation(
       );
       throw error;
     }
+  }
+
+  async startMediaEditorialWorkflow(options: {
+    branchName: string;
+    baseBranch: string;
+    prTitle?: string;
+    operation: 'upload' | 'delete';
+    repoPath: string;
+  }): Promise<{ branchName: string; requestId: string; status?: string }> {
+    const url = `${this.contentApiBase}/editorial-workflow/${this.clientId}/media`;
+    return await this.postEditorialWorkflow(
+      url,
+      options,
+      'Failed to start media editorial workflow'
+    );
+  }
+
+  async waitForEditorialWorkflowStatus(
+    requestId: string,
+    onStatusUpdate?: (status: EditorialWorkflowStatusUpdate) => void
+  ): Promise<EditorialWorkflowResult> {
+    return await this.pollEditorialWorkflowStatus(requestId, onStatusUpdate);
   }
 }
 
