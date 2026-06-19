@@ -2604,6 +2604,18 @@ importers:
         specifier: ^22.13.1
         version: 22.19.3
 
+  packages/v4/@tinacms/tinacms:
+    devDependencies:
+      '@tinacms/scripts':
+        specifier: workspace:*
+        version: link:../../../@tinacms/scripts
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.9
+        version: 2.1.9(@types/node@25.1.0)(happy-dom@15.10.2)(jsdom@15.2.1(bufferutil@4.1.0))(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)
+
   playwright/astro-init:
     devDependencies:
       '@playwright/test':
