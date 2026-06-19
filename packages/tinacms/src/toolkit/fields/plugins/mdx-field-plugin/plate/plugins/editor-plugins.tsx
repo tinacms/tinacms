@@ -54,9 +54,10 @@ import { unwrapList } from '@udecode/plate-list';
 // @ts-ignore
 // NOTE: Linter complains about ESM import here, as per conversation with Jeff it will be fine at build time—ignore this linting error for now.
 import { all, createLowlight } from 'lowlight';
-import { autoformatBlocks } from './core/autoformat/autoformat-block';
+import { getAutoformatBlocks } from './core/autoformat/autoformat-block';
 import { autoformatLists } from './core/autoformat/autoformat-lists';
 import { autoformatMarks } from './core/autoformat/autoformat-marks';
+import type { HeadingLevel } from '@tinacms/schema-tools';
 import {
   createBlockquoteEnterBreakPlugin,
   createBreakPlugin,
@@ -138,8 +139,18 @@ const ClearHighlightOnEnterPlugin = createSlatePlugin({
   },
 }));
 
-// Editor Plugins: Functional and formatting plugins
-export const editorPlugins = [
+export interface CreateEditorPluginsOptions {
+  /** Heading levels exposed via markdown autoformat shortcuts (`# `, `## `, …).
+   * Omit to allow all levels 1-6. */
+  headingLevels?: readonly HeadingLevel[];
+}
+
+// Functional and formatting plugins for the rich-text editor. Built lazily
+// per-field so the schema can scope behaviors like which heading levels
+// participate in markdown autoformat shortcuts.
+export const createEditorPlugins = ({
+  headingLevels,
+}: CreateEditorPluginsOptions = {}) => [
   createMdxBlockPlugin,
   createMdxInlinePlugin,
   createImgPlugin,
@@ -164,8 +175,9 @@ export const editorPlugins = [
   NodeIdPlugin,
   TablePlugin,
   SlashPlugin,
-  // This lets users keep typing after end of marks like headings or quotes
-  TrailingBlockPlugin, //makes sure there's always a blank paragraph at the end of the editor.
+  // Keeps a blank paragraph at the end of the editor so users can keep
+  // typing after a heading, quote, or other terminal block.
+  TrailingBlockPlugin,
   createBreakPlugin,
   FloatingToolbarPlugin,
 
@@ -174,7 +186,7 @@ export const editorPlugins = [
       enableUndoOnDelete: true,
       rules: [
         ...autoformatMarks,
-        ...autoformatBlocks,
+        ...getAutoformatBlocks(headingLevels),
         ...autoformatLists,
         ...autoformatSmartQuotes,
         ...autoformatPunctuation,
@@ -184,6 +196,7 @@ export const editorPlugins = [
       ].map(
         (rule): AutoformatRule => ({
           ...rule,
+          // Suppress autoformat inside code blocks so e.g. `# ` stays literal.
           query: (editor) =>
             !editor.api.some({
               match: { type: editor.getType(CodeBlockPlugin) },
@@ -193,29 +206,21 @@ export const editorPlugins = [
     },
   }),
 
-  // ExitBreakPlugin lets users "break out" of a block (like a heading)
+  // Lets users "break out" of a block (e.g. a heading) with Enter.
   ExitBreakPlugin.configure({
     options: {
       rules: [
-        {
-          hotkey: 'mod+enter',
-        },
-        {
-          hotkey: 'mod+shift+enter',
-          before: true,
-        },
+        { hotkey: 'mod+enter' },
+        { hotkey: 'mod+shift+enter', before: true },
         {
           hotkey: 'enter',
-          query: {
-            start: true,
-            end: true,
-            allow: HEADING_LEVELS,
-          },
+          query: { start: true, end: true, allow: HEADING_LEVELS },
         },
       ],
     },
   }),
-  // ResetNodePlugin lets users turn a heading back into a paragraph by pressing Enter (when empty) or Backspace (at the start).
+  // Lets users turn a heading back into a paragraph by pressing Enter on
+  // an empty heading or Backspace at the start of one.
   ResetNodePlugin.configure({
     options: {
       rules: [
@@ -228,9 +233,7 @@ export const editorPlugins = [
         {
           ...resetBlockTypesCommonRule,
           hotkey: 'Backspace',
-          predicate: (editor) => {
-            return editor.api.isAt({ start: true });
-          },
+          predicate: (editor) => editor.api.isAt({ start: true }),
         },
         {
           ...resetBlockTypesCodeBlockRule,
@@ -242,10 +245,11 @@ export const editorPlugins = [
           hotkey: 'Backspace',
           predicate: isSelectionAtCodeBlockStart,
         },
-        // NOTE: Plate's ListPlugin usually handles resetting lists to paragraphs when pressing Backspace at the start of a list item.
-        // However, if the list is the first node in the editor, the default reset behavior may not fully unwrap the list item,
-        // which can leave an invalid structure (like a <li> inside a <p>).
-        // This rule uses `onReset: unwrapList` to ensure lists are always properly reset to paragraphs, even when they are the first node.
+        // Plate's ListPlugin usually resets lists to paragraphs on Backspace
+        // at the start of a list item, but when the list is the editor's
+        // first node the default doesn't fully unwrap and we end up with an
+        // invalid structure (e.g. <li> inside <p>). `onReset: unwrapList`
+        // forces a clean reset in that case.
         {
           types: [BulletedListPlugin.key, NumberedListPlugin.key],
           defaultType: ParagraphPlugin.key,
@@ -262,11 +266,9 @@ export const editorPlugins = [
         { hotkey: 'shift+enter' },
         {
           hotkey: 'enter',
-          query: {
-            allow: [CodeBlockPlugin.key, BlockquotePlugin.key],
-          },
+          query: { allow: [CodeBlockPlugin.key, BlockquotePlugin.key] },
         },
       ],
     },
   }),
-] as const;
+];

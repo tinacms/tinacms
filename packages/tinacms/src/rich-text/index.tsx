@@ -2,6 +2,7 @@
 
 */
 
+import { sanitizeUrl } from '@tinacms/mdx';
 import React from 'react';
 
 type BaseComponents = {
@@ -318,7 +319,7 @@ const Node = ({ components, child }) => {
         return <Component {...props} />;
       }
       // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
-      return <img src={child.url} alt={child.alt} />;
+      return <img src={sanitizeUrl(child.url)} alt={child.alt} />;
     case 'a':
       if (components[child.type]) {
         const Component = components[child.type];
@@ -331,7 +332,7 @@ const Node = ({ components, child }) => {
       }
       return (
         // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
-        <a href={child.url}>
+        <a href={sanitizeUrl(child.url)}>
           <TinaMarkdown components={components} content={children} />
         </a>
       );

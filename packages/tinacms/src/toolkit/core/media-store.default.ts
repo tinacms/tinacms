@@ -1,6 +1,18 @@
-import { DEFAULT_MEDIA_UPLOAD_TYPES } from '@toolkit/components/media/utils';
+import {
+  DEFAULT_MEDIA_UPLOAD_TYPES,
+  sanitizeFilename,
+} from '@toolkit/components/media/utils';
+import {
+  EDITORIAL_WORKFLOW_STATUS,
+  type EditorialWorkflowStatus,
+} from '@toolkit/form-builder/editorial-workflow-constants';
+import {
+  type MediaWorkflowConfirmBranchEvent,
+  getEditorialWorkflowPrTitle,
+} from '@toolkit/form-builder/editorial-workflow-utils';
+import { formatBranchName } from '@toolkit/plugin-branch-switcher/format-branch-name';
+import type { TinaCMS } from '@toolkit/tina-cms';
 import type { Client } from '../../internalClient';
-import { CMS } from './cms';
 import {
   E_BAD_ROUTE,
   E_UNAUTHORIZED,
@@ -11,17 +23,49 @@ import {
   MediaUploadOptions,
 } from './media';
 
+interface MediaBranchContext {
+  branchName: string;
+  baseBranch: string;
+  requestId: string;
+}
+
+type MediaBranchDecision =
+  | { kind: 'workflow'; context: MediaBranchContext }
+  | { kind: 'cancelled' }
+  | { kind: 'direct' };
+
+const MEDIA_WORKFLOW_STEP = {
+  BRANCH: 1,
+  CONTENT: 2,
+  PR: 3,
+  COMPLETE: 4,
+} as const;
+
+const MEDIA_WORKFLOW_STATUS_TO_STEP: Partial<
+  Record<EditorialWorkflowStatus, number>
+> = {
+  [EDITORIAL_WORKFLOW_STATUS.SETTING_UP]: MEDIA_WORKFLOW_STEP.BRANCH,
+  [EDITORIAL_WORKFLOW_STATUS.CREATING_BRANCH]: MEDIA_WORKFLOW_STEP.BRANCH,
+  [EDITORIAL_WORKFLOW_STATUS.INDEXING]: MEDIA_WORKFLOW_STEP.CONTENT,
+  [EDITORIAL_WORKFLOW_STATUS.CONTENT_GENERATION]: MEDIA_WORKFLOW_STEP.CONTENT,
+  [EDITORIAL_WORKFLOW_STATUS.CREATING_PR]: MEDIA_WORKFLOW_STEP.PR,
+  [EDITORIAL_WORKFLOW_STATUS.COMPLETE]: MEDIA_WORKFLOW_STEP.COMPLETE,
+};
+
 const s3ErrorRegex = /<Error>.*<Code>(.+)<\/Code>.*<Message>(.+)<\/Message>.*/;
 
 export class DummyMediaStore implements MediaStore {
   accept = '*';
   async persist(files: MediaUploadOptions[]): Promise<Media[]> {
-    return files.map(({ directory, file }) => ({
-      id: file.name,
-      type: 'file',
-      directory,
-      filename: file.name,
-    }));
+    return files.map(({ directory, file }) => {
+      const filename = sanitizeFilename(file.name);
+      return {
+        id: filename,
+        type: 'file',
+        directory,
+        filename,
+      };
+    });
   }
   async list(): Promise<MediaList> {
     const items: Media[] = [];
@@ -58,13 +102,17 @@ export class TinaMediaStore implements MediaStore {
   };
 
   private api: Client;
-  private cms: CMS;
+  private cms: TinaCMS;
   private isLocal: boolean;
   private url: string;
   private staticMedia: StaticMedia;
   isStatic?: boolean;
 
-  constructor(cms: CMS, staticMedia?: StaticMedia) {
+  // Route assets-api calls through the created branch until indexing makes it safe to switch React branch state.
+  private workflowBranchOverride: string | undefined;
+  private mediaWorkflowInProgress = false;
+
+  constructor(cms: TinaCMS, staticMedia?: StaticMedia) {
     this.cms = cms;
     if (staticMedia && Object.keys(staticMedia).length > 0) {
       this.isStatic = true;
@@ -109,8 +157,8 @@ export class TinaMediaStore implements MediaStore {
   maxSize = 100 * 1024 * 1024;
 
   /**
-   * Returns the current branch as a single-encoded query-param value, or
-   * an empty string when no branch is set.
+   * Returns the workflow branch override or current branch as a single-encoded
+   * query-param value, or an empty string when no branch is set.
    *
    * `this.api.branch` is already URL-encoded by `Client.setBranch()`, so we
    * decode then re-encode here to defend against double-encoding when this
@@ -123,88 +171,408 @@ export class TinaMediaStore implements MediaStore {
    * assets-api (which would route the call to a non-existent staging path).
    */
   private encodedBranchParam(): string {
+    if (this.workflowBranchOverride) {
+      return encodeURIComponent(this.workflowBranchOverride);
+    }
     if (!this.api.branch) return '';
     const decoded = decodeURIComponent(this.api.branch);
     if (!decoded || decoded === 'undefined') return '';
     return encodeURIComponent(decoded);
   }
 
+  private shortStableHash(input: string): string {
+    let hash = 2166136261;
+    for (let index = 0; index < input.length; index++) {
+      hash ^= input.charCodeAt(index);
+      hash = Math.imul(hash, 16777619);
+    }
+    return (hash >>> 0).toString(36);
+  }
+
+  private trimEdges(value: string, char: string): string {
+    let start = 0;
+    let end = value.length;
+
+    while (start < end && value[start] === char) {
+      start++;
+    }
+
+    while (end > start && value[end - 1] === char) {
+      end--;
+    }
+
+    return value.slice(start, end);
+  }
+
+  private branchSlugForMediaPath(
+    directory: string | undefined,
+    filename: string | undefined
+  ): string {
+    const trimmedDirectory = this.trimEdges(directory ?? '', '/');
+    const rawPath = [trimmedDirectory, filename].filter(Boolean).join('/');
+    const flattened = rawPath.replaceAll('/', '-');
+    const slug = this.trimEdges(formatBranchName(flattened), '-');
+    if (!slug) return `asset-${this.shortStableHash(rawPath || 'root')}`;
+    return rawPath !== rawPath.toLowerCase()
+      ? `${slug}-${this.shortStableHash(rawPath)}`
+      : slug;
+  }
+
+  /** Joins a directory and filename into a normalized `dir/file` repo path. */
+  private joinMediaPath(
+    directory: string | undefined,
+    filename: string | undefined
+  ): string {
+    const dir = this.trimEdges(directory ?? '', '/');
+    return dir && dir !== '/' ? `${dir}/${filename ?? ''}` : (filename ?? '');
+  }
+
+  private branchQueryParam(): string {
+    const encodedBranch = this.encodedBranchParam();
+    return encodedBranch ? `?branch=${encodedBranch}` : '';
+  }
+
+  private requestMediaBranchChoice(
+    branchName: string,
+    baseBranch: string,
+    opType: 'upload' | 'delete',
+    repoPath: string
+  ): Promise<MediaBranchDecision> {
+    // The decision is driven entirely by the branch prompt rendered by
+    // <MediaWorkflowOverlay />. We can't infer its presence from
+    // dispatch()'s return value: ambient `'*'` subscribers (the alerts
+    // bridge) make every event look "handled", so a missing overlay would
+    // leave this promise unresolved forever. Detect the purpose-built
+    // listener explicitly and fail fast instead.
+    if (
+      !this.cms.events.hasExplicitListenerFor('media:workflow:confirm-branch')
+    ) {
+      throw new Error(
+        'Cannot start a media editorial workflow: no branch prompt is mounted. ' +
+          'Ensure <MediaWorkflowOverlay /> is rendered (TinaCloudProvider mounts it automatically).'
+      );
+    }
+
+    return new Promise((resolve) => {
+      this.cms.events.dispatch<MediaWorkflowConfirmBranchEvent>({
+        type: 'media:workflow:confirm-branch',
+        branchName,
+        baseBranch,
+        onConfirm: async (selectedBranchName) => {
+          const context = await this.prepareMediaBranch(
+            selectedBranchName,
+            baseBranch,
+            opType,
+            repoPath
+          );
+          resolve({
+            kind: 'workflow',
+            context,
+          });
+        },
+        onCancel: () => resolve({ kind: 'cancelled' }),
+        onSaveToProtectedBranch: () => resolve({ kind: 'direct' }),
+      });
+    });
+  }
+
+  private async prepareMediaBranch(
+    branchName: string,
+    baseBranch: string,
+    opType: 'upload' | 'delete',
+    repoPath: string
+  ): Promise<MediaBranchContext> {
+    if (this.mediaWorkflowInProgress) {
+      throw new Error('A media workflow is already in progress.');
+    }
+    this.mediaWorkflowInProgress = true;
+
+    try {
+      this.cms.events.dispatch({
+        type: 'media:workflow:start',
+        branchName,
+        baseBranch,
+      });
+
+      const workflow = await this.api.startMediaEditorialWorkflow({
+        branchName,
+        baseBranch,
+        prTitle: getEditorialWorkflowPrTitle(branchName),
+        operation: opType,
+        repoPath,
+      });
+      const branchContext = {
+        branchName: workflow.branchName || branchName,
+        baseBranch,
+        requestId: workflow.requestId,
+      };
+
+      this.workflowBranchOverride = branchContext.branchName;
+
+      return branchContext;
+    } catch (err) {
+      this.resetWorkflowState();
+      throw err;
+    }
+  }
+
+  private resetWorkflowState(): void {
+    this.workflowBranchOverride = undefined;
+    this.mediaWorkflowInProgress = false;
+  }
+
+  private async finalizeMediaWorkflow(
+    branchContext: MediaBranchContext,
+    onCatalogued?: () => Promise<void>
+  ): Promise<void> {
+    try {
+      const result = await this.api.waitForEditorialWorkflowStatus(
+        branchContext.requestId,
+        (status) => {
+          const step =
+            MEDIA_WORKFLOW_STATUS_TO_STEP[
+              status.status as EditorialWorkflowStatus
+            ];
+          if (step) {
+            this.cms.events.dispatch({
+              type: 'media:workflow:step',
+              step,
+            });
+          }
+        }
+      );
+
+      // The asset is now catalogued in the workflow branch's media index, and
+      // the branch override still routes list calls there — run the
+      // post-catalogue step before we clear the override.
+      if (onCatalogued) await onCatalogued();
+
+      this.resetWorkflowState();
+
+      this.cms.events.dispatch({
+        type: 'media:workflow:complete',
+        branchName: result.branchName || branchContext.branchName,
+      });
+
+      if (result.warning) {
+        this.cms.alerts.warn(result.warning, 0);
+      }
+      this.cms.alerts.success(
+        `Branch created successfully - Pull Request at ${
+          result?.pullRequestUrl || ''
+        }`,
+        0
+      );
+      this.cms.events.dispatch({ type: 'media:workflow:finish' });
+    } catch (err) {
+      this.resetWorkflowState();
+      this.dispatchMediaWorkflowError(err);
+    }
+  }
+
+  private dispatchMediaWorkflowError(err: unknown): void {
+    this.cms.events.dispatch({
+      type: 'media:workflow:error',
+      message: err instanceof Error ? err.message : String(err),
+    });
+  }
+
+  private async runMediaOpWithWorkflow<T>(
+    decision: MediaBranchDecision,
+    op: () => Promise<T>
+  ): Promise<T> {
+    if (decision.kind !== 'workflow') return op();
+    try {
+      const result = await op();
+      await this.finalizeMediaWorkflow(decision.context);
+      return result;
+    } catch (err) {
+      this.resetWorkflowState();
+      this.cms.events.dispatch({ type: 'media:workflow:finish' });
+      throw err;
+    }
+  }
+
+  private async prepareProtectedMediaBranch(
+    opType: 'upload' | 'delete',
+    directory: string | undefined,
+    filename: string | undefined
+  ): Promise<MediaBranchDecision> {
+    if (!this.api.usingProtectedBranch()) return { kind: 'direct' };
+
+    const baseBranch = decodeURIComponent(this.api.branch || '');
+    const mediaSlug = this.branchSlugForMediaPath(directory, filename);
+    const branchName = `media-${opType}-${mediaSlug}`;
+    // Uploads mint a new name, so sanitize it to match the upload URL and the
+    // committed asset. Deletes reference an *existing* file — use its stored
+    // name verbatim, since re-sanitizing could point at a path that doesn't
+    // exist for legacy or externally-added files.
+    const repoFilename =
+      opType === 'upload' && filename ? sanitizeFilename(filename) : filename;
+    const repoPath = this.joinMediaPath(directory, repoFilename);
+    return this.requestMediaBranchChoice(
+      branchName,
+      baseBranch,
+      opType,
+      repoPath
+    );
+  }
+
+  private async waitForRequestStatus(
+    requestId: string,
+    timeoutMessage: string
+  ): Promise<void> {
+    const startTime = Date.now();
+    while (true) {
+      // sleep for 1 second
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      const { error, message } = await this.api.getRequestStatus(requestId);
+      if (error !== undefined) {
+        if (error) {
+          throw new Error(message);
+        } else {
+          // success
+          return;
+        }
+      }
+
+      if (Date.now() - startTime > 30000) {
+        throw new Error(timeoutMessage);
+      }
+    }
+  }
+
   private async persist_cloud(media: MediaUploadOptions[]): Promise<Media[]> {
+    if (media.length === 0) {
+      return [];
+    }
+
     if (!(await this.isAuthenticated())) {
       return [];
     }
 
-    const encodedBranch = this.encodedBranchParam();
-    const branchQuery = encodedBranch ? `?branch=${encodedBranch}` : '';
+    const firstItem = media[0];
+    const decision = await this.prepareProtectedMediaBranch(
+      'upload',
+      firstItem.directory,
+      firstItem.file.name
+    );
+    if (decision.kind === 'cancelled') return [];
 
+    if (decision.kind === 'workflow') {
+      return this.persistCloudViaWorkflow(media, decision.context);
+    }
+
+    const branchQuery = this.branchQueryParam();
     for (const item of media) {
-      let directory = item.directory;
-      if (directory?.endsWith('/')) {
-        directory = directory.substr(0, directory.length - 1);
-      }
-      const path = `${
-        directory && directory !== '/'
-          ? `${directory}/${item.file.name}`
-          : item.file.name
-      }`;
-      const res = await this.api.authProvider.fetchWithToken(
-        `${this.url}/upload_url/${path}${branchQuery}`,
-        { method: 'GET' }
-      );
-
-      if (res.status === 412) {
-        const { message = 'Unexpected error generating upload url' } =
-          await res.json();
-        throw new Error(message);
-      }
-
-      const { signedUrl, requestId } = await res.json();
-      if (!signedUrl) {
-        throw new Error('Unexpected error generating upload url');
-      }
-
-      const uploadRes = await this.fetchFunction(signedUrl, {
-        method: 'PUT',
-        body: item.file,
-        headers: {
-          'Content-Type': item.file.type || 'application/octet-stream',
-          'Content-Length': String(item.file.size),
-        },
+      await this.uploadCloudMediaItem(item, branchQuery, {
+        waitForStatus: true,
       });
+    }
+    return this.fetchUploadedEntries(media);
+  }
 
-      if (!uploadRes.ok) {
-        const xmlRes = await uploadRes.text();
-        const matches = s3ErrorRegex.exec(xmlRes);
-        console.error(xmlRes);
-        if (!matches) {
-          throw new Error('Unexpected error uploading media asset');
-        } else {
-          throw new Error(`Upload error: '${matches[2]}'`);
-        }
+  /**
+   * Uploads assets through the editorial workflow. The asset is staged, the
+   * server-side workflow catalogues it in the new branch's media index, and
+   * only then do we list it — while the branch override still routes list
+   * calls to the workflow branch, so the freshly uploaded item is returned to
+   * the caller (and added to the media manager) without needing a manual
+   * refresh.
+   */
+  private async persistCloudViaWorkflow(
+    media: MediaUploadOptions[],
+    branchContext: MediaBranchContext
+  ): Promise<Media[]> {
+    try {
+      const branchQuery = this.branchQueryParam();
+      for (const item of media) {
+        await this.uploadCloudMediaItem(item, branchQuery, {
+          waitForStatus: false,
+        });
       }
 
-      const updateStartTime = Date.now();
-      while (true) {
-        // sleep for 1 second
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+      let entries: Media[] = [];
+      await this.finalizeMediaWorkflow(branchContext, async () => {
+        entries = await this.fetchUploadedEntries(media);
+      });
+      return entries;
+    } catch (err) {
+      this.resetWorkflowState();
+      this.cms.events.dispatch({ type: 'media:workflow:finish' });
+      throw err;
+    }
+  }
 
-        const { error, message } = await this.api.getRequestStatus(requestId);
-        if (error !== undefined) {
-          if (error) {
-            throw new Error(message);
-          } else {
-            // success
-            break;
-          }
-        }
+  private async uploadCloudMediaItem(
+    item: MediaUploadOptions,
+    branchQuery: string,
+    { waitForStatus = true }: { waitForStatus?: boolean } = {}
+  ): Promise<void> {
+    // Sanitize the new file's name so the upload URL, the stored asset, and the
+    // value later matched in fetchUploadedEntries all agree (macOS exposes
+    // filenames in NFD form). Only uploads sanitize — see prepareProtectedMediaBranch.
+    const path = this.joinMediaPath(
+      item.directory,
+      sanitizeFilename(item.file.name)
+    );
+    const res = await this.api.authProvider.fetchWithToken(
+      `${this.url}/upload_url/${path}${branchQuery}`,
+      { method: 'GET' }
+    );
 
-        if (Date.now() - updateStartTime > 30000) {
-          throw new Error('Time out waiting for upload to complete');
-        }
+    if (res.status === 412) {
+      const { message = 'Unexpected error generating upload url' } =
+        await res.json();
+      throw new Error(message);
+    }
+
+    const { signedUrl, requestId } = await res.json();
+    if (!signedUrl) {
+      throw new Error('Unexpected error generating upload url');
+    }
+
+    const uploadRes = await this.fetchFunction(signedUrl, {
+      method: 'PUT',
+      body: item.file,
+      headers: {
+        'Content-Type': item.file.type || 'application/octet-stream',
+        'Content-Length': String(item.file.size),
+      },
+    });
+
+    if (!uploadRes.ok) {
+      const xmlRes = await uploadRes.text();
+      const matches = s3ErrorRegex.exec(xmlRes);
+      console.error(xmlRes);
+      if (!matches) {
+        throw new Error('Unexpected error uploading media asset');
+      } else {
+        throw new Error(`Upload error: '${matches[2]}'`);
       }
     }
 
-    return this.fetchUploadedEntries(media);
+    if (waitForStatus) {
+      await this.waitForRequestStatus(
+        requestId,
+        'Time out waiting for upload to complete'
+      );
+    }
+  }
+
+  private groupMediaByDirectory(
+    media: MediaUploadOptions[]
+  ): Map<string, MediaUploadOptions[]> {
+    const byDirectory = new Map<string, MediaUploadOptions[]>();
+    for (const item of media) {
+      let dir = item.directory || '';
+      while (dir.endsWith('/')) dir = dir.slice(0, -1);
+      const bucket = byDirectory.get(dir) ?? [];
+      bucket.push(item);
+      byDirectory.set(dir, bucket);
+    }
+    return byDirectory;
   }
 
   /**
@@ -222,14 +590,7 @@ export class TinaMediaStore implements MediaStore {
   private async fetchUploadedEntries(
     media: MediaUploadOptions[]
   ): Promise<Media[]> {
-    const byDirectory = new Map<string, MediaUploadOptions[]>();
-    for (const item of media) {
-      let dir = item.directory || '';
-      while (dir.endsWith('/')) dir = dir.slice(0, -1);
-      const bucket = byDirectory.get(dir) ?? [];
-      bucket.push(item);
-      byDirectory.set(dir, bucket);
-    }
+    const byDirectory = this.groupMediaByDirectory(media);
 
     const thumbnailSizes = [
       { w: 75, h: 75 },
@@ -258,7 +619,9 @@ export class TinaMediaStore implements MediaStore {
         }
       }
       for (const item of items) {
-        const entry = found.get(item.file.name);
+        // The server stores the file under the sanitized name we sent at
+        // upload time, so match the canonical listing on the same value.
+        const entry = found.get(sanitizeFilename(item.file.name));
         if (entry) results.push(entry);
       }
     }
@@ -290,6 +653,10 @@ export class TinaMediaStore implements MediaStore {
 
     for (const item of media) {
       const { file, directory } = item;
+      // Normalize/sanitize once and reuse for the FormData filename, the
+      // upload URL, the on-disk path, and the value persisted into content,
+      // so every layer agrees on the same bytes.
+      const safeName = sanitizeFilename(file.name);
       // Stripped directory does not have leading or trailing slashes
       let strippedDirectory = directory;
       if (strippedDirectory.startsWith('/')) {
@@ -301,20 +668,22 @@ export class TinaMediaStore implements MediaStore {
       }
 
       const formData = new FormData();
-      formData.append('file', file);
+      // The third arg of FormData#append overrides the part filename — pass
+      // the sanitized name so the server reads what the client expects.
+      formData.append('file', file, safeName);
       formData.append('directory', directory);
-      formData.append('filename', file.name);
+      formData.append('filename', safeName);
 
       let uploadPath = `${
-        strippedDirectory ? `${strippedDirectory}/${file.name}` : file.name
+        strippedDirectory ? `${strippedDirectory}/${safeName}` : safeName
       }`;
       if (uploadPath.startsWith('/')) {
         uploadPath = uploadPath.substr(1);
       }
       const filePath = `${
         strippedDirectory
-          ? `${folder}${strippedDirectory}/${file.name}`
-          : folder + file.name
+          ? `${folder}${strippedDirectory}/${safeName}`
+          : folder + safeName
       }`;
       const res = await this.fetchFunction(`${this.url}/upload/${uploadPath}`, {
         method: 'POST',
@@ -330,8 +699,8 @@ export class TinaMediaStore implements MediaStore {
       if (fileRes?.success) {
         const parsedRes: Media = {
           type: 'file',
-          id: file.name,
-          filename: file.name,
+          id: safeName,
+          filename: safeName,
           directory,
           src: filePath,
           thumbnails: {
@@ -475,45 +844,33 @@ export class TinaMediaStore implements MediaStore {
   };
 
   async delete(media: Media) {
-    const path = `${
-      media.directory ? `${media.directory}/${media.filename}` : media.filename
-    }`;
+    const path = this.joinMediaPath(media.directory, media.filename);
     if (!this.isLocal) {
       if (await this.isAuthenticated()) {
-        const encodedBranch = this.encodedBranchParam();
-        const branchQuery = encodedBranch ? `?branch=${encodedBranch}` : '';
-        const res = await this.api.authProvider.fetchWithToken(
-          `${this.url}/${path}${branchQuery}`,
-          {
-            method: 'DELETE',
-          }
+        const decision = await this.prepareProtectedMediaBranch(
+          'delete',
+          media.directory,
+          media.filename
         );
-        if (res.status == 200) {
+        if (decision.kind === 'cancelled') return;
+        await this.runMediaOpWithWorkflow(decision, async () => {
+          const branchQuery = this.branchQueryParam();
+          const res = await this.api.authProvider.fetchWithToken(
+            `${this.url}/${path}${branchQuery}`,
+            { method: 'DELETE' }
+          );
+          if (res.status !== 200) {
+            throw new Error('Unexpected error deleting media asset');
+          }
           const { requestId } = await res.json();
 
-          const deleteStartTime = Date.now();
-          while (true) {
-            // sleep for 1 second
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-
-            const { error, message } =
-              await this.api.getRequestStatus(requestId);
-            if (error !== undefined) {
-              if (error) {
-                throw new Error(message);
-              } else {
-                // success
-                break;
-              }
-            }
-
-            if (Date.now() - deleteStartTime > 30000) {
-              throw new Error('Time out waiting for delete to complete');
-            }
+          if (decision.kind !== 'workflow') {
+            await this.waitForRequestStatus(
+              requestId,
+              'Time out waiting for delete to complete'
+            );
           }
-        } else {
-          throw new Error('Unexpected error deleting media asset');
-        }
+        });
       } else {
         throw E_UNAUTHORIZED;
       }

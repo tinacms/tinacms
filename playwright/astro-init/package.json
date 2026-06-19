@@ -1,0 +1,12 @@
+{
+  "name": "astro-init-e2e",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "catalog:"
+  }
+}

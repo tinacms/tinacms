@@ -6,14 +6,6 @@ export class GitClient {
   constructor(private baseUrl: string) {}
 
   /**
-   * An alias to `commit`
-   *
-   * @deprecated
-   */
-  onSubmit(data: any): Promise<any> {
-    return this.commit(data);
-  }
-  /**
    * An alias to `writeToDisk`
    *
    * @deprecated

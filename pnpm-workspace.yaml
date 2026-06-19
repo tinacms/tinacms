@@ -1,9 +1,26 @@
 packages:
     - packages/*
     - packages/@tinacms/*
+    - packages/v4/@tinacms/*
     - examples/*/*
     - e2e/*
     - playwright/*
+overrides:
+    "@clerk/clerk-js>react": 19.2.3
+    "@clerk/clerk-js>react-dom": 19.2.3
+    "@clerk/backend>react": 19.2.3
+allowBuilds:
+    "@biomejs/biome": true
+    "@parcel/watcher": true
+    better-sqlite3: true
+    browser-tabs-lock: true
+    bufferutil: true
+    core-js: true
+    esbuild: true
+    hugo-extended: true
+    protobufjs: true
+    sharp: true
+    unrs-resolver: true
 catalog:
     "@ariakit/react": ^0.4.15
     "@aws-sdk/client-s3": ^3.744.0
@@ -113,7 +130,6 @@ catalog:
     "@vitejs/plugin-react": 3.1.0
     abstract-level: ^1.0.4
     acorn: 8.8.2
-    add: ^2.0.6
     altair-express-middleware: ^7.3.6
     async-lock: ^1.4.1
     auto-bind: ^4.0.0
@@ -181,6 +197,7 @@ catalog:
     minimatch: ^5.1.6
     moment: 2.29.4
     monaco-editor: 0.31.0
+    mongodb-level: ^0.0.4
     multer: 1.4.5-lts.1
     next-themes: ^0.3.0
     normalize-path: ^3.0.0
@@ -191,7 +208,6 @@ catalog:
     postcss-import: ^14.1.0
     postcss-nesting: ^10.2.0
     prettier: ^2.8.8
-    pretty-quick: ^3.3.1
     prism-react-renderer: ^2.4.1
     progress: ^2.0.3
     prompts: ^2.4.2
@@ -211,7 +227,6 @@ catalog:
     remark: 14.0.2
     remark-gfm: ^2.0.0
     remark-mdx: 2.3.0
-    remove: ^0.1.5
     search-index: 4.0.0
     sharp: ^0.33.5
     sqlite-level: ^2.1.0
@@ -224,7 +239,7 @@ catalog:
     tsc-alias: ^1.8.10
     tslib: ^2.8.1
     tsup: ^8.3.6
-    turbo: ^2.5.3
+    turbo: ^2.9.18
     typanion: 3.13.0
     typedoc: ^0.26.11
     typedoc-plugin-markdown: ^3.17.1

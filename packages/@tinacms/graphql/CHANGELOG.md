@@ -1,5 +1,38 @@
 # tina-graphql
 
+## 2.4.5
+
+### Patch Changes
+
+- Updated dependencies [[`c491fc5`](https://github.com/tinacms/tinacms/commit/c491fc55e612725f5d775eeb1fdf3f8ba82314fa)]:
+  - @tinacms/mdx@2.1.7
+
+## 2.4.4
+
+### Patch Changes
+
+- [#7032](https://github.com/tinacms/tinacms/pull/7032) [`c931f18`](https://github.com/tinacms/tinacms/commit/c931f18a19c292cd89530e41b71da8fcd90c8415) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - fix(@tinacms/graphql): normalize numbers to fixed decimal precision before padding index keys
+
+  Numeric index keys are now formatted with fixed decimal precision (e.g. `9` → `"0009.000"`, `8.5` → `"0008.500"`) before zero-padding. This fixes incorrect lexicographic sorting when mixing whole numbers and decimals.
+
+  **Index rebuild required:** Self-hosted setups with persistent storage should run a full `tinacms build` to rebuild indices.
+
+## 2.4.3
+
+### Patch Changes
+
+- [#6941](https://github.com/tinacms/tinacms/pull/6941) [`5c216dd`](https://github.com/tinacms/tinacms/commit/5c216dd117ec5dd206c4efc68027f83cb6d2a932) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - fix(@tinacms/graphql): use ISO 8601 strings for datetime index keys to fix sorting for all dates
+
+  Datetime fields are now stored as ISO 8601 strings in index keys instead of Unix timestamps. This fixes incorrect sorting for dates before September 10, 2001 (digit-length boundary) and before 1970 (negative timestamps).
+
+  **Index rebuild required:** This changes the index key format. Local dev/build users are unaffected (indices rebuild automatically). Self-hosted setups with persistent storage should run a full `tinacms build` to rebuild indices.
+
+- [#6943](https://github.com/tinacms/tinacms/pull/6943) [`f7a2e5a`](https://github.com/tinacms/tinacms/commit/f7a2e5a4b90c8bb5890d62953907cb939b341918) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Adds schema-level validation for `ui.component: "checkbox-group"` fields. Fields using `checkbox-group` without `list: true`, including nested object/template fields, now fail schema validation with a clear error to catch configurations that can cause runtime GraphQL mismatches.
+
+- Updated dependencies [[`c7b366c`](https://github.com/tinacms/tinacms/commit/c7b366c5de66b1a3f086c1f11954225e55430324)]:
+  - @tinacms/schema-tools@2.8.1
+  - @tinacms/mdx@2.1.6
+
 ## 2.4.2
 
 ### Patch Changes

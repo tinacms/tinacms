@@ -56,6 +56,7 @@ export type IndexDefinition = {
 export type PadDefinition = {
   fillString: string;
   maxLength: number;
+  decimalPrecision?: number;
 };
 
 export type FilterOperand = string | number | boolean | string[] | number[];
@@ -70,15 +71,45 @@ export const REFS_COLLECTIONS_SORT_KEY = '__refs__';
 export const REFS_REFERENCE_FIELD = '__tina_ref__';
 export const REFS_PATH_FIELD = '__tina_ref_path__';
 export const DEFAULT_NUMERIC_LPAD = 4;
+export const DEFAULT_NUMERIC_DECIMAL_PRECISION = 3;
+export const DEFAULT_NUMERIC_PAD: PadDefinition = {
+  fillString: '0',
+  maxLength: DEFAULT_NUMERIC_LPAD + 1 + DEFAULT_NUMERIC_DECIMAL_PRECISION,
+  decimalPrecision: DEFAULT_NUMERIC_DECIMAL_PRECISION,
+};
+
+const ensureUTC = (value: string): string => {
+  const s = String(value);
+  if (s.includes('T') && !/[Zz]|[+-]\d{2}:\d{2}$/.test(s)) {
+    return `${s}Z`;
+  }
+  return s;
+};
+
+const parseDatetimeUTC = (value: unknown): string => {
+  const n = Number(value);
+  const d = Number.isNaN(n) ? new Date(ensureUTC(String(value))) : new Date(n);
+  return Number.isNaN(d.getTime()) ? String(value) : d.toISOString();
+};
+
+const padValue = (val: any, pad: PadDefinition): string => {
+  if (pad.decimalPrecision !== undefined) {
+    const n = Number(val);
+    if (!Number.isNaN(n)) {
+      return n
+        .toFixed(pad.decimalPrecision)
+        .padStart(pad.maxLength, pad.fillString);
+    }
+  }
+  return String(val).padStart(pad.maxLength, pad.fillString);
+};
 
 const applyPadding = (input: any, pad?: PadDefinition) => {
   if (pad) {
     if (Array.isArray(input)) {
-      return (input as any[]).map((val) =>
-        String(val).padStart(pad.maxLength, pad.fillString)
-      );
+      return (input as any[]).map((val) => padValue(val, pad));
     } else {
-      return String(input).padStart(pad.maxLength, pad.fillString);
+      return padValue(input, pad);
     }
   }
   return input;
@@ -138,11 +169,10 @@ const makeKeyForField = <T extends object>(
       data[field.name] !== undefined &&
       data[field.name] !== null
     ) {
-      // TODO I think these dates are ISO 8601 so I don't think we need to convert to numbers
       const rawValue = data[field.name];
       let resolvedValue: string;
       if (field.type === 'datetime') {
-        resolvedValue = String(new Date(rawValue).getTime());
+        resolvedValue = parseDatetimeUTC(rawValue);
       } else {
         if (field.type === 'string') {
           const escapedString = stringEscaper(rawValue as string | string[]);
@@ -181,23 +211,23 @@ export const coerceFilterChainOperands = (
         if ((filter as TernaryFilter).leftOperand !== undefined) {
           result.push({
             ...filter,
-            rightOperand: new Date(filter.rightOperand as string).getTime(),
-            leftOperand: new Date(
+            rightOperand: parseDatetimeUTC(filter.rightOperand as string),
+            leftOperand: parseDatetimeUTC(
               (filter as TernaryFilter).leftOperand as string
-            ).getTime(),
+            ),
           });
         } else {
           if (Array.isArray(filter.rightOperand)) {
             result.push({
               ...filter,
               rightOperand: (filter.rightOperand as string[]).map((operand) =>
-                new Date(operand).getTime()
+                parseDatetimeUTC(operand)
               ),
             });
           } else {
             result.push({
               ...filter,
-              rightOperand: new Date(filter.rightOperand as string).getTime(),
+              rightOperand: parseDatetimeUTC(filter.rightOperand as string),
             });
           }
         }
@@ -363,13 +393,11 @@ export const makeFilter = ({
       } else if (dataType === 'datetime') {
         operands = resolvedValues.map((resolvedValue) => {
           if (isList) {
-            return resolvedValue.map((listValue) => {
-              const coerced = new Date(listValue).getTime();
-              return isNaN(coerced) ? Number(listValue) : coerced;
-            });
+            return resolvedValue.map((listValue) =>
+              parseDatetimeUTC(listValue)
+            );
           }
-          const coerced = new Date(resolvedValue).getTime();
-          return isNaN(coerced) ? Number(resolvedValue) : coerced;
+          return parseDatetimeUTC(resolvedValue);
         });
       } else if (dataType === 'boolean') {
         operands = resolvedValues.map((resolvedValue) => {
@@ -475,10 +503,7 @@ export const makeFilterChain = ({
         rightOperand: filterExpression[key1],
         operator: inferOperatorFromFilter(key1),
         type: _type as string,
-        pad:
-          _type === 'number'
-            ? { fillString: '0', maxLength: DEFAULT_NUMERIC_LPAD }
-            : undefined,
+        pad: _type === 'number' ? DEFAULT_NUMERIC_PAD : undefined,
       });
     } else if (key1 && key2) {
       const leftFilterOperator =
@@ -516,10 +541,7 @@ export const makeFilterChain = ({
             | OP.LT
             | OP.LTE,
           type: _type as string,
-          pad:
-            _type === 'number'
-              ? { fillString: '0', maxLength: DEFAULT_NUMERIC_LPAD }
-              : undefined,
+          pad: _type === 'number' ? DEFAULT_NUMERIC_PAD : undefined,
         });
       } else {
         throw new Error(

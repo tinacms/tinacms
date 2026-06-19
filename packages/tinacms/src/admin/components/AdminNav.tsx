@@ -1,6 +1,7 @@
 import React from 'react';
 import { ImFilesEmpty, ImUsers } from 'react-icons/im';
 import type { IconType } from 'react-icons/lib';
+import { MdOutlineLanguage } from 'react-icons/md';
 import { NavLink, useLocation } from 'react-router-dom';
 
 import { Nav, NavCloudLink, NavProvider } from '@tinacms/toolkit';
@@ -55,6 +56,13 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
         />
       )}
       RenderNavCloud={({ config }) => <NavCloudLink config={config} />}
+      RenderNavGlobal={({ collection }) => (
+        <SidebarLink
+          label={collection.label ? collection.label : collection.name}
+          to={`/collections/${collection.name}/~`}
+          Icon={MdOutlineLanguage}
+        />
+      )}
       RenderNavCollection={({ collection }) => (
         <SidebarLink
           label={collection.label ? collection.label : collection.name}
