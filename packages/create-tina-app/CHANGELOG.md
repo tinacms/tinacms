@@ -1,5 +1,27 @@
 # create-tina-app
 
+## 2.1.8
+
+### Patch Changes
+
+- [#7049](https://github.com/tinacms/tinacms/pull/7049) [`29a0e2e`](https://github.com/tinacms/tinacms/commit/29a0e2e43790af89408453a3a0ba9f77c31648df) Thanks [@0xharkirat](https://github.com/0xharkirat)! - Correct the Astro starter's feature list: mark **Visual Editing ✅** (`tina-astro-starter` ships React-free visual editing via `@tinacms/astro`), and remove the **ISR** row, which is a Next.js-shaped concept that doesn't apply to the Astro template.
+
+- [#7040](https://github.com/tinacms/tinacms/pull/7040) [`249840d`](https://github.com/tinacms/tinacms/commit/249840d565047966cd6070d3fc691c5d47c9deed) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Recommend pnpm in the package manager prompt. pnpm now appears first and pre-selected (labelled "recommended"), with npm shown last. pnpm's stricter dependency resolution avoids version-skew issues (e.g. multiple major versions of Vite) that can break builds under npm.
+
+## 2.1.7
+
+### Patch Changes
+
+- [#7037](https://github.com/tinacms/tinacms/pull/7037) [`ab58718`](https://github.com/tinacms/tinacms/commit/ab587188162d28a199eae8da8c16269d8b8cf150) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Surface the real cause when dependency installation fails. Previously a failed install showed `Failed to install packages: undefined` with no detail; the CLI now captures the package manager's output, reports the exit code and error, and links to the FAQ for help.
+
+- [#7018](https://github.com/tinacms/tinacms/pull/7018) [`80962ec`](https://github.com/tinacms/tinacms/commit/80962ec3d81dda3c05933453be8750d8b03b82b2) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Derive supported Node versions from `engines.node` instead of a hardcoded list.
+
+## 2.1.6
+
+### Patch Changes
+
+- [#7016](https://github.com/tinacms/tinacms/pull/7016) [`f40f6e8`](https://github.com/tinacms/tinacms/commit/f40f6e8d3e0c93184a2e59da7f57d31db0ab49bd) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - 💬 Add Support Message and direction to Succeeding + fatally failing runs
+
 ## 2.1.5
 
 ### Patch Changes

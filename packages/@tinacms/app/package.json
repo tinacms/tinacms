@@ -1,12 +1,19 @@
 {
 	"name": "@tinacms/app",
-	"version": "2.4.8",
+	"version": "2.5.6",
 	"main": "src/main.tsx",
 	"license": "Apache-2.0",
+	"scripts": {
+		"test": "vitest run",
+		"test-watch": "vitest"
+	},
 	"devDependencies": {
 		"@types/react": "^18.3.18",
 		"@types/react-dom": "catalog:",
-		"typescript": "^5.7.3"
+		"happy-dom": "catalog:",
+		"typescript": "^5.7.3",
+		"vite": "^5.4.14",
+		"vitest": "^2.1.9"
 	},
 	"peerDependencies": {
 		"react": ">=18.3.1 <20.0.0",

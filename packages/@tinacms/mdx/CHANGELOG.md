@@ -1,5 +1,29 @@
 # @tinacms/mdx
 
+## 2.1.7
+
+### Patch Changes
+
+- [#7056](https://github.com/tinacms/tinacms/pull/7056) [`c491fc5`](https://github.com/tinacms/tinacms/commit/c491fc55e612725f5d775eeb1fdf3f8ba82314fa) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Harden cross-window message handling and rich-text URL sanitization.
+
+  Adds stricter origin/source checks for trusted message flows, use explicit target origins for preview iframe message, and applies URL sanitization to slatejson rich-text parsing and default rich-text link/image rendering.
+
+## 2.1.6
+
+### Patch Changes
+
+- Updated dependencies [[`c7b366c`](https://github.com/tinacms/tinacms/commit/c7b366c5de66b1a3f086c1f11954225e55430324)]:
+  - @tinacms/schema-tools@2.8.1
+
+## 2.1.5
+
+### Patch Changes
+
+- [#6904](https://github.com/tinacms/tinacms/pull/6904) [`df50cbf`](https://github.com/tinacms/tinacms/commit/df50cbf35536bf2028a742832aebd57701dc3bb6) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Fix `<mark>` highlight serialization to emit `style` as a JSX expression (`style={{ backgroundColor: "..." }}`) so output is valid MDX v2/v3 JSX and unblocks Docusaurus 3.10+ builds.
+
+- Updated dependencies [[`542c781`](https://github.com/tinacms/tinacms/commit/542c781b4f7a6ff5b5481bd88329f60c9bf3b57d)]:
+  - @tinacms/schema-tools@2.8.0
+
 ## 2.1.4
 
 ### Patch Changes

@@ -7,6 +7,10 @@
 		"examples/*/*",
 		"packages/[^@]*"
 	],
+	"engines": {
+		"node": "22.x || 24.x",
+		"pnpm": ">=11"
+	},
 	"scripts": {
 		"dev": "pnpm watch",
 		"watch": "pnpm run build && pnpm --filter=\"./packages/@tinacms/scripts\" run watch",
@@ -37,21 +41,13 @@
 		"vitest": "^2.1.9",
 		"@types/picomatch": "catalog:",
 		"picomatch": "catalog:",
-		"pretty-quick": "catalog:",
 		"turbo": "catalog:",
 		"typescript": "^5.7.3",
 		"vite": "^4.5.14"
 	},
-	"packageManager": "pnpm@9.15.9",
+	"packageManager": "pnpm@11.7.0",
 	"dependencies": {
 		"highlight.js": "catalog:",
 		"react-colorful": "catalog:"
-	},
-	"pnpm": {
-		"overrides": {
-			"@clerk/clerk-js>react": "19.2.3",
-			"@clerk/clerk-js>react-dom": "19.2.3",
-			"@clerk/backend>react": "19.2.3"
-		}
 	}
 }

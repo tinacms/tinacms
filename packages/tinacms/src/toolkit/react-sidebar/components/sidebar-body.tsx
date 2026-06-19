@@ -1,3 +1,4 @@
+import { Transition } from '@headlessui/react';
 import {
   Breadcrumb,
   BreadcrumbEllipsis,
@@ -17,19 +18,20 @@ import { FormBuilder, FormStatus } from '@toolkit/form-builder';
 import type { Form } from '@toolkit/forms';
 import type { FormMetaPlugin } from '@toolkit/plugin-form-meta';
 import { useCMS } from '@toolkit/react-core';
-import * as React from 'react';
-import { FormLists } from './form-list';
-import { SidebarContext } from './sidebar';
-import { SidebarLoadingPlaceholder } from './sidebar-loading-placeholder';
-import { SidebarNoFormsPlaceholder } from './sidebar-no-forms-placeholder';
 import { History } from 'lucide-react';
+import * as React from 'react';
+import { BiArrowBack } from 'react-icons/bi';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '../../../admin/components/ui/tooltip';
-import { Transition } from '@headlessui/react';
+import { collectionListPathForDocument } from './form-breadcrumbs.utils';
+import { FormLists } from './form-list';
+import { SidebarContext } from './sidebar';
+import { SidebarLoadingPlaceholder } from './sidebar-loading-placeholder';
+import { SidebarNoFormsPlaceholder } from './sidebar-no-forms-placeholder';
 
 // this is the minimum time to show the loading indicator (in milliseconds)
 // this is to prevent the loading indicator from flashing or the 'no forms' placeholder from showing pre-maturely
@@ -98,30 +100,30 @@ export const FormsView = ({ loadingPlaceholder }: FormsViewProps = {}) => {
   const isEditing = !!activeForm;
   const formMetas = cms.plugins.all<FormMetaPlugin>('form:meta');
 
-  // Single form - no transitions needed
+  // Single form - no transitions needed. Fall back to the no-forms
+  // placeholder when nothing is active (e.g. a listing page that only
+  // registered a layout-level global form, so `formLists` is non-empty
+  // but the auto-select heuristic skipped the only candidate). Without
+  // this the sidebar renders empty and the page looks broken.
   if (!isReferencingManyForms) {
+    if (!activeForm) {
+      return <SidebarNoFormsPlaceholder />;
+    }
     return (
-      <>
-        {activeForm && (
-          <div className='flex-1 flex flex-col flex-nowrap overflow-hidden h-full w-full relative bg-white'>
-            <FormHeader
-              activeForm={activeForm}
-              branch={cms.api.admin.api.branch}
-              repoProvider={cms.api.admin.api.schema.config.config.repoProvider}
-              isLocalMode={cms.api?.tina?.isLocalMode}
-            />
-            {formMetas?.map((meta) => (
-              <React.Fragment key={meta.name}>
-                <meta.Component />
-              </React.Fragment>
-            ))}
-            <FormBuilder
-              form={activeForm}
-              onPristineChange={setFormIsPristine}
-            />
-          </div>
-        )}
-      </>
+      <div className='flex-1 flex flex-col flex-nowrap overflow-hidden h-full w-full relative bg-white'>
+        <FormHeader
+          activeForm={activeForm}
+          branch={cms.api.admin.api.branch}
+          repoProvider={cms.api.admin.api.schema.config.config.repoProvider}
+          isLocalMode={cms.api?.tina?.isLocalMode}
+        />
+        {formMetas?.map((meta) => (
+          <React.Fragment key={meta.name}>
+            <meta.Component />
+          </React.Fragment>
+        ))}
+        <FormBuilder form={activeForm} onPristineChange={setFormIsPristine} />
+      </div>
     );
   }
 
@@ -192,19 +194,51 @@ export interface FormHeaderProps {
   };
 }
 
+// Strip folders and extension from a content path → the bare filename label.
+export const getFilename = (path?: string) =>
+  path
+    ?.split('/')
+    .pop()
+    ?.replace(/\.[^/.]+$/, '');
+
 export const FormHeader = ({
   activeForm,
   repoProvider,
   branch,
   isLocalMode,
 }: FormHeaderProps) => {
+  const cms = useCMS();
   const { formIsPristine } = React.useContext(SidebarContext);
+
+  const path = activeForm.tinaForm.path;
+
+  // Leading "back to collection list" crumb, mirroring the admin editor pages.
+  let collectionCrumb: { label: string; onClick: () => void } | undefined;
+  try {
+    const collection = cms.api.tina.schema?.getCollectionByFullPath?.(path);
+    if (collection) {
+      const tinaPreview = cms.flags.get('tina-preview') || false;
+      const href = `${
+        tinaPreview ? `/${tinaPreview}/index.html#` : '/admin#'
+      }${collectionListPathForDocument(path, collection)}`;
+      collectionCrumb = {
+        label: collection.label || collection.name,
+        onClick: () => {
+          window.location.href = href;
+        },
+      };
+    }
+  } catch {
+    // No collection resolves for this path → render without the back crumb.
+  }
 
   return (
     <div className='px-4 pt-2 pb-4 flex flex-row flex-nowrap justify-between items-center gap-2 bg-gradient-to-t from-white to-gray-50 border-b border-gray-100'>
       <FormBreadcrumbs
         className='w-[calc(100%-3rem)]'
-        contentPath={activeForm.tinaForm.path}
+        rootBreadcrumbName={getFilename(path)}
+        contentPath={path}
+        collectionCrumb={collectionCrumb}
       />
       <FileHistoryProvider
         defaultBranchName={repoProvider?.defaultBranchName}
@@ -282,10 +316,10 @@ const BreadcrumbItemLink = ({
   onClick,
 }: { breadcrumb: string; onClick: () => void }) => {
   return (
-    <BreadcrumbItem className='shrink truncate'>
+    <BreadcrumbItem className='shrink min-w-0'>
       <BreadcrumbLink
         asChild
-        className='text-gray-700 truncate hover:text-orange-500'
+        className='block min-w-0 truncate text-gray-700 hover:text-orange-500'
       >
         <button type='button' onClick={onClick}>
           {breadcrumb}
@@ -295,10 +329,35 @@ const BreadcrumbItemLink = ({
   );
 };
 
+// Leading crumb that navigates back to the collection's document list.
+const CollectionBreadcrumbItem = ({
+  label,
+  onClick,
+}: { label: string; onClick: () => void }) => {
+  return (
+    <BreadcrumbItem className='shrink min-w-0'>
+      <BreadcrumbLink
+        asChild
+        className='min-w-0 text-gray-700 hover:text-orange-500'
+      >
+        <button
+          type='button'
+          onClick={onClick}
+          aria-label={`Back to ${label}`}
+          className='flex items-center gap-1.5 min-w-0'
+        >
+          <BiArrowBack className='w-4 h-4 shrink-0 opacity-80' />
+          <span className='truncate min-w-0'>{label}</span>
+        </button>
+      </BreadcrumbLink>
+    </BreadcrumbItem>
+  );
+};
+
 const FinalBreadcrumbItem = ({ breadcrumb }: { breadcrumb: string }) => {
   return (
-    <BreadcrumbItem className='shrink truncate'>
-      <BreadcrumbPage className='text-gray-700 font-medium cursor-default'>
+    <BreadcrumbItem className='shrink min-w-0'>
+      <BreadcrumbPage className='block min-w-0 truncate text-gray-700 font-medium cursor-default'>
         {breadcrumb}
       </BreadcrumbPage>
     </BreadcrumbItem>
@@ -308,15 +367,17 @@ const FinalBreadcrumbItem = ({ breadcrumb }: { breadcrumb: string }) => {
 export const FormBreadcrumbs = ({
   rootBreadcrumbName,
   contentPath,
+  collectionCrumb,
   ...props
 }: {
   rootBreadcrumbName?: string;
   contentPath?: string;
+  collectionCrumb?: { label: string; onClick: () => void };
 } & React.HTMLAttributes<HTMLDivElement>) => {
   const cms = useCMS();
   const breadcrumbs = cms.state.breadcrumbs;
 
-  if (breadcrumbs.length === 0) {
+  if (breadcrumbs.length === 0 && !collectionCrumb) {
     return null;
   }
 
@@ -340,12 +401,23 @@ export const FormBreadcrumbs = ({
 
   return (
     <Breadcrumb {...props}>
-      <BreadcrumbList className='flex-nowrap text-nowrap'>
+      <BreadcrumbList className='flex-nowrap text-nowrap overflow-hidden'>
+        {/* Leading crumb: back to the collection's document list */}
+        {collectionCrumb && (
+          <>
+            <CollectionBreadcrumbItem
+              label={collectionCrumb.label}
+              onClick={collectionCrumb.onClick}
+            />
+            {breadcrumbs.length > 0 && <BreadcrumbSeparator />}
+          </>
+        )}
+
         {/* First breadcrumb */}
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <span>
+              <span className='flex min-w-0 shrink'>
                 {breadcrumbs.length > 1 ? (
                   <BreadcrumbItemLink
                     breadcrumb={rootBreadcrumbName || firstBreadcrumb.label}
