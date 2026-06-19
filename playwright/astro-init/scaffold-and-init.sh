@@ -19,6 +19,8 @@ cat > pnpm-workspace.yaml <<'YAML'
 allowBuilds:
   esbuild: true
   sharp: true
+  better-sqlite3: true
+  core-js: true
 YAML
 pnpm install
 
