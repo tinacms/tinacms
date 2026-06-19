@@ -244,7 +244,7 @@ describe('tina() integration — dev content invalidation plugin', () => {
       (invalidationPlugin(plugins).configureServer as any)(server);
 
       handlers.add('/project/src/content/blog/new-post.mdx');
-      // Debounced — nothing fires synchronously.
+      // Debounced, so nothing fires synchronously.
       expect(ssrSend).not.toHaveBeenCalled();
 
       vi.advanceTimersByTime(50);
@@ -329,13 +329,36 @@ describe('tina() integration — dev content invalidation plugin', () => {
     }
   });
 
+  it('does not arm on Astro 5, whose runtime has no astro:content-changed listener', () => {
+    // The integration reads the installed Astro major from `astro`'s
+    // package.json via JSON.parse; force it to 5.x for this call only. Astro 5
+    // ships Vite 6, so the environment API is present either way; the version
+    // gate, not an API sniff, is what keeps the plugin from arming here.
+    const parse = vi
+      .spyOn(JSON, 'parse')
+      .mockReturnValue({ version: '5.18.1' });
+    try {
+      const { plugins } = runConfigSetup();
+      const { server, ssrSend, clientSend, handlers } = makeDevServer();
+      (invalidationPlugin(plugins).configureServer as any)(server);
+
+      // Gate trips before any watcher is wired or HMR signal is sent.
+      expect(Object.keys(handlers)).toHaveLength(0);
+      expect(ssrSend).not.toHaveBeenCalled();
+      expect(clientSend).not.toHaveBeenCalled();
+    } finally {
+      parse.mockRestore();
+    }
+  });
+
   it('no-ops without throwing when the environment API is unavailable', () => {
     const { plugins } = runConfigSetup();
     const { server, handlers } = makeDevServer({ environments: false });
     expect(() =>
       (invalidationPlugin(plugins).configureServer as any)(server)
     ).not.toThrow();
-    // It registers no watcher handlers rather than guessing at the HMR channel.
+    // Defensive secondary guard: past the version check but with the hot
+    // channels absent, register no handlers rather than guess at the channel.
     expect(Object.keys(handlers)).toHaveLength(0);
   });
 });

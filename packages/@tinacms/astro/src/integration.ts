@@ -61,7 +61,7 @@ export default function tina(
           vite: {
             plugins: [
               bridgeDevPlugin(),
-              devContentInvalidationPlugin(),
+              devContentInvalidationPlugin(astroMajorVersion()),
               cloudflareImportMetaUrlPlugin(() => isCloudflareAdapter),
             ],
           },
@@ -91,6 +91,24 @@ export default function tina(
 
 function resolveBridge(): string {
   return createRequire(import.meta.url).resolve('@tinacms/bridge');
+}
+
+/**
+ * Major version of the consumer's installed `astro`, or `undefined` if it can't
+ * be resolved. Used to scope the dev content-invalidation plugin to Astro 6+,
+ * the only majors where the `astro:content-changed` signal it emits is handled.
+ */
+function astroMajorVersion(): number | undefined {
+  try {
+    const pkg = createRequire(import.meta.url).resolve('astro/package.json');
+    const major = Number.parseInt(
+      JSON.parse(readFileSync(pkg, 'utf8')).version,
+      10
+    );
+    return Number.isNaN(major) ? undefined : major;
+  } catch {
+    return undefined;
+  }
 }
 
 // Dev-only Vite plugin that answers `/admin/bridge.js` from the installed
@@ -134,9 +152,18 @@ function bridgeDevPlugin(): VitePlugin {
  * layer, which clears the route cache so `getStaticPaths()` re-runs and the new
  * path resolves, then reloads the open tab so it picks up the change.
  *
+ * Scoped to Astro 6+: the listener that turns `astro:content-changed` into a
+ * route-cache clear only exists from Astro 6 on. On Astro 5 nothing handles the
+ * signal, so it does nothing useful while the paired full-reload would still
+ * churn the open tab. Hence a version gate rather than sniffing Vite's
+ * environment API, which is present in both Astro 5 and 6 and so can't tell them
+ * apart.
+ *
  * See https://github.com/tinacms/tinacms/issues/5611.
  */
-function devContentInvalidationPlugin(): VitePlugin {
+function devContentInvalidationPlugin(
+  astroMajor: number | undefined
+): VitePlugin {
   // Markdown-family files are content wherever they live. Structured-data
   // formats only count inside a `content` directory, so an unrelated
   // `package.json` / `tsconfig.json` write doesn't trigger a reload.
@@ -154,8 +181,11 @@ function devContentInvalidationPlugin(): VitePlugin {
     name: '@tinacms/astro:dev-content-invalidation',
     apply: 'serve',
     configureServer(server) {
-      // Requires Vite's environment API (always present under Astro 6). If it
-      // is missing, no-op rather than guessing at the wrong HMR channel.
+      // The `astro:content-changed` signal below is only handled by Astro 6+.
+      // Bail on older (or unresolvable) majors so a no-op stays a no-op.
+      if (astroMajor === undefined || astroMajor < 6) return;
+      // Astro 6 routes HMR through Vite's per-environment hot channels.
+      // Defensive: if they're somehow absent, skip rather than guess.
       const ssr = server.environments?.ssr;
       const client = server.environments?.client;
       if (!ssr?.hot || !client?.hot) return;
@@ -167,7 +197,7 @@ function devContentInvalidationPlugin(): VitePlugin {
       };
       const onChange = (file: string) => {
         if (!isContentFile(file)) return;
-        // Coalesce bursts — saving several documents fires many events — into a
+        // Coalesce bursts (saving several documents fires many events) into a
         // single reload.
         if (timer) clearTimeout(timer);
         timer = setTimeout(flush, 50);
