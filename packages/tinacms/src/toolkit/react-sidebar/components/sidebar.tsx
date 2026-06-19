@@ -1,4 +1,5 @@
 import { Transition, TransitionChild } from '@headlessui/react';
+import { TinaIcon } from '@toolkit/icons';
 import {
   BranchButton,
   BranchPreviewButton,
@@ -12,6 +13,7 @@ import { useState } from 'react';
 import { BiMenu } from 'react-icons/bi';
 import { ImFilesEmpty, ImUsers } from 'react-icons/im';
 import type { IconType } from 'react-icons/lib';
+import { MdOutlineLanguage } from 'react-icons/md';
 import { PiSidebarSimpleLight } from 'react-icons/pi';
 import type { SidebarState, SidebarStateOptions } from '../sidebar';
 import { BillingWarning, LocalWarning } from './local-warning';
@@ -19,7 +21,6 @@ import { Nav } from './nav';
 import { NavCloudLink } from './nav-components';
 import { ResizeHandle } from './resize-handle';
 import { FormsView } from './sidebar-body';
-import { TinaIcon } from '@toolkit/icons';
 
 export const SidebarContext = React.createContext<any>(null);
 export const minPreviewWidth = 440;
@@ -288,6 +289,14 @@ const Sidebar = ({
                 RenderNavCloud={({ config }) => (
                   <NavCloudLink config={config} />
                 )}
+                RenderNavGlobal={({ collection }) => (
+                  <SidebarGlobalLink
+                    collection={collection}
+                    onClick={() => {
+                      setMenuIsOpen(false);
+                    }}
+                  />
+                )}
                 RenderNavCollection={({ collection }) => (
                   <SidebarCollectionLink
                     onClick={() => {
@@ -421,6 +430,34 @@ const SidebarSiteLink = ({
     >
       <view.Icon className='mr-2 h-6 opacity-80 w-auto' /> {view.name}
     </button>
+  );
+};
+
+const SidebarGlobalLink = ({
+  collection,
+  onClick,
+}: {
+  collection: {
+    label?: string;
+    name: string;
+  };
+  onClick: () => void;
+}) => {
+  const cms = useCMS();
+  const tinaPreview = cms.flags.get('tina-preview') || false;
+  const href = `${
+    tinaPreview ? `/${tinaPreview}/index.html#` : '/admin#'
+  }/collections/${collection.name}/~`;
+
+  return (
+    <a
+      onClick={onClick}
+      href={href}
+      className='text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100'
+    >
+      <MdOutlineLanguage className='mr-2 h-6 opacity-80 w-auto' />{' '}
+      {collection.label ? collection.label : collection.name}
+    </a>
   );
 };
 
