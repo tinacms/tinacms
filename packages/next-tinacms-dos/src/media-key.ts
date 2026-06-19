@@ -101,3 +101,39 @@ export function resolveKey(
 
   return scoped;
 }
+
+/**
+ * Resolve a caller-supplied listing directory into a relative prefix.
+ *
+ * The directory is optional: an empty / root directory returns `''` (list the
+ * mediaRoot itself). Otherwise leading/trailing slashes are stripped (matching
+ * the historical handler behaviour) and the result is normalised so it cannot
+ * traverse upward — `path.join(mediaRoot, directory)` would otherwise collapse
+ * `..` and list objects outside mediaRoot. Returns a prefix with a trailing
+ * slash so it can be joined onto mediaRoot directly.
+ *
+ * @throws {MediaKeyError} when the directory contains a NUL byte or backslash,
+ * or uses upward path traversal.
+ */
+export function resolveDirectory(rawDirectory: unknown): string {
+  // Listing directories arrive from a URL query and are decoded once by the
+  // framework; treat them as literal (no further decode).
+  if (typeof rawDirectory !== 'string' || rawDirectory.trim() === '') {
+    return '';
+  }
+
+  if (rawDirectory.includes('\0') || rawDirectory.includes('\\')) {
+    throw new MediaKeyError('media directory is not valid');
+  }
+
+  const trimmed = rawDirectory.replace(/^\/+/, '').replace(/\/+$/, '');
+  const normalized = path.posix.normalize(trimmed).replace(/^\.\//, '');
+  if (normalized === '..' || normalized.startsWith('../')) {
+    throw new MediaKeyError('media directory may not traverse directories');
+  }
+  if (normalized === '' || normalized === '.') {
+    return '';
+  }
+
+  return normalized + '/';
+}

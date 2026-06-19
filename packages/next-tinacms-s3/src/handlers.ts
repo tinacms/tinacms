@@ -18,7 +18,7 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Media, MediaListOptions } from 'tinacms';
 import path from 'node:path';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { resolveKey, MediaKeyError } from './media-key';
+import { resolveKey, resolveDirectory, MediaKeyError } from './media-key';
 
 export interface S3Config {
   config: S3ClientConfig;
@@ -141,8 +141,18 @@ async function listMedia(
       offset,
     } = req.query as MediaListOptions;
 
-    let prefix = directory.replace(/^\//, '').replace(/\/$/, '');
-    if (prefix) prefix = prefix + '/';
+    let prefix: string;
+    try {
+      // Reject upward traversal: directory flows into path.join(mediaRoot,
+      // prefix), which would otherwise collapse ".." and list outside mediaRoot.
+      prefix = resolveDirectory(directory);
+    } catch (e) {
+      if (e instanceof MediaKeyError) {
+        res.status(400).json({ message: e.message });
+        return;
+      }
+      throw e;
+    }
 
     const params: ListObjectsCommandInput = {
       Bucket: bucket,

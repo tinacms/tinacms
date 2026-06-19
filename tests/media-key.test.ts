@@ -5,18 +5,22 @@ import { describe, it, expect } from 'vitest';
 // behaviour and guard against the copies drifting apart.
 import {
   resolveKey as resolveKeyS3,
+  resolveDirectory as resolveDirectoryS3,
   MediaKeyError as MediaKeyErrorS3,
 } from '../packages/next-tinacms-s3/src/media-key';
 import {
   resolveKey as resolveKeyDos,
+  resolveDirectory as resolveDirectoryDos,
   MediaKeyError as MediaKeyErrorDos,
 } from '../packages/next-tinacms-dos/src/media-key';
 import {
   resolveKey as resolveKeyAzure,
+  resolveDirectory as resolveDirectoryAzure,
   MediaKeyError as MediaKeyErrorAzure,
 } from '../packages/next-tinacms-azure/src/media-key';
 import {
   resolveKey as resolveKeyCloudinary,
+  resolveDirectory as resolveDirectoryCloudinary,
   MediaKeyError as MediaKeyErrorCloudinary,
 } from '../packages/next-tinacms-cloudinary/src/media-key';
 
@@ -27,6 +31,17 @@ const adapters = [
   ['next-tinacms-dos', resolveKeyDos, MediaKeyErrorDos],
   ['next-tinacms-azure', resolveKeyAzure, MediaKeyErrorAzure],
   ['next-tinacms-cloudinary', resolveKeyCloudinary, MediaKeyErrorCloudinary],
+] as const;
+
+const directoryAdapters = [
+  ['next-tinacms-s3', resolveDirectoryS3, MediaKeyErrorS3],
+  ['next-tinacms-dos', resolveDirectoryDos, MediaKeyErrorDos],
+  ['next-tinacms-azure', resolveDirectoryAzure, MediaKeyErrorAzure],
+  [
+    'next-tinacms-cloudinary',
+    resolveDirectoryCloudinary,
+    MediaKeyErrorCloudinary,
+  ],
 ] as const;
 
 // [mediaRoot, rawKey, expected]
@@ -123,6 +138,53 @@ describe.each(adapters)(
         expect(() => resolveKey(root, raw, { decode: false })).toThrow(
           MediaKeyError
         );
+      }
+    );
+  }
+);
+
+// resolveDirectory bounds the listMedia prefix. directory flows into
+// path.join(mediaRoot, prefix), which would otherwise collapse ".." and list
+// objects outside mediaRoot (GHSA-xq98-p84m-r882). Empty / root is allowed;
+// upward traversal, absolute paths, backslash and NUL are rejected.
+const directoryAllowed: [string, string][] = [
+  ['', ''], // root
+  ['   ', ''], // blank => root
+  ['photos', 'photos/'],
+  ['photos/', 'photos/'], // trailing slash normalised
+  ['/photos', 'photos/'], // leading slash stripped, not treated as absolute root
+  ['photos/2026', 'photos/2026/'],
+  ['a/../b', 'b/'], // inner ".." that does not escape is collapsed
+  ['.', ''], // current dir => root
+];
+const directoryRejected: string[] = [
+  '..', // walk toward bucket root
+  '../uploads', // the reported vector
+  '/../escape', // leading slash stripped, then traversal
+  'a/../../escape', // climbs past root
+  'dir\\..\\x', // backslash separator
+  'with\0nul', // NUL byte
+];
+
+describe.each(directoryAdapters)(
+  '%s — resolveDirectory bounds the listing prefix',
+  (_name, resolveDirectory, MediaKeyError) => {
+    it.each(directoryAllowed)(
+      'resolveDirectory(%j) === %j',
+      (raw, expected) => {
+        expect(resolveDirectory(raw)).toBe(expected);
+      }
+    );
+    it.each([undefined, null] as unknown[])(
+      'resolveDirectory(%j) === "" (no directory)',
+      (raw) => {
+        expect(resolveDirectory(raw)).toBe('');
+      }
+    );
+    it.each(directoryRejected)(
+      'resolveDirectory(%j) throws MediaKeyError',
+      (raw) => {
+        expect(() => resolveDirectory(raw)).toThrow(MediaKeyError);
       }
     );
   }

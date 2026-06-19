@@ -8,7 +8,7 @@ import path from 'path';
 import { NextApiRequest, NextApiResponse } from 'next';
 import multer from 'multer';
 import { promisify } from 'util';
-import { resolveKey, MediaKeyError } from './media-key';
+import { resolveKey, resolveDirectory, MediaKeyError } from './media-key';
 
 export interface CloudinaryConfig {
   cloud_name: string;
@@ -129,6 +129,21 @@ async function listMedia(
       !mediaListOptions.directory ||
       mediaListOptions.directory === '/' ||
       mediaListOptions.directory === '""';
+
+    if (!useRootDirectory) {
+      try {
+        // Reject upward traversal in the listing directory for consistency
+        // with the other adapters. (Search-expression escaping is a separate
+        // follow-up.)
+        resolveDirectory(mediaListOptions.directory);
+      } catch (e) {
+        if (e instanceof MediaKeyError) {
+          res.status(400).json({ e: e.message });
+          return;
+        }
+        throw e;
+      }
+    }
 
     const query = useRootDirectory
       ? 'folder=""'

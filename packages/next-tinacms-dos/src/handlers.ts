@@ -18,7 +18,7 @@ import path from 'path';
 import fs from 'fs';
 import { NextApiRequest, NextApiResponse } from 'next';
 import multer from 'multer';
-import { resolveKey, MediaKeyError } from './media-key';
+import { resolveKey, resolveDirectory, MediaKeyError } from './media-key';
 import { promisify } from 'util';
 
 export interface DOSConfig {
@@ -189,8 +189,18 @@ async function listMedia(
       limit = 500,
       offset,
     } = req.query as MediaListOptions;
-    let prefix = directory.replace(/^\//, '').replace(/\/$/, '');
-    if (prefix) prefix = prefix + '/';
+    let prefix: string;
+    try {
+      // Reject upward traversal: directory flows into path.join(mediaRoot,
+      // prefix), which would otherwise collapse ".." and list outside mediaRoot.
+      prefix = resolveDirectory(directory);
+    } catch (e) {
+      if (e instanceof MediaKeyError) {
+        res.status(400).json({ message: e.message });
+        return;
+      }
+      throw e;
+    }
 
     const params: ListObjectsCommandInput = {
       Bucket: bucket,

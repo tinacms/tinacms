@@ -7,7 +7,7 @@ import type { AzureBlobStorageConfig } from './types';
 import type { MediaListOptions } from 'tinacms';
 import path from 'node:path';
 import { type NextRequest, NextResponse } from 'next/server';
-import { resolveKey, MediaKeyError } from './media-key';
+import { resolveKey, resolveDirectory, MediaKeyError } from './media-key';
 
 type RouteParams = { params: { media: string[] } };
 
@@ -140,11 +140,19 @@ async function listMedia(req: NextRequest, config: AzureBlobStorageConfig) {
       mediaListOptions.directory === '/' ||
       mediaListOptions.directory === '""';
 
-    const prefix = useRootDirectory
-      ? ''
-      : mediaListOptions.directory?.endsWith('/')
-        ? mediaListOptions.directory
-        : `${mediaListOptions.directory}/`;
+    let prefix: string;
+    try {
+      // Reject upward traversal in the listing directory for consistency with
+      // the other adapters (no mediaRoot boundary exists here yet).
+      prefix = useRootDirectory
+        ? ''
+        : resolveDirectory(mediaListOptions.directory);
+    } catch (e) {
+      if (e instanceof MediaKeyError) {
+        return NextResponse.json({ error: e.message }, { status: 400 });
+      }
+      throw e;
+    }
 
     const files = [];
     const folders = [];
