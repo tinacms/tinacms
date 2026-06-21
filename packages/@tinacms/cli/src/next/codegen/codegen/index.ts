@@ -2,7 +2,7 @@
 
 */
 
-import { GraphQLSchema, parse, printSchema } from 'graphql';
+import { concatAST, GraphQLSchema, parse, printSchema, validate } from 'graphql';
 
 import { AddGeneratedClient } from './plugin';
 import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
@@ -25,6 +25,23 @@ export const generateTypes = async (
 
   docs = await loadGraphQLDocuments(queryPathGlob);
   fragDocs = await loadGraphQLDocuments(fragDocPath);
+
+  const validationErrors = validate(
+    schema,
+    concatAST(
+      [...fragDocs, ...docs].flatMap((document) =>
+        document.document ? [document.document] : []
+      )
+    )
+  );
+
+  if (validationErrors.length) {
+    throw new Error(
+      `GraphQL Document Validation failed with ${validationErrors.length} errors;\n${validationErrors
+        .map((error, index) => `  Error ${index}: ${error.message}`)
+        .join('\n')}`
+    );
+  }
 
   // See https://www.graphql-code-generator.com/docs/getting-started/programmatic-usage for more details
   const res = await codegen({
