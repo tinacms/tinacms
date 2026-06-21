@@ -108,7 +108,7 @@ const invalidationPlugin = (plugins: VitePlugin[]) =>
     (p) => p.name === '@tinacms/astro:dev-content-invalidation'
   ) as VitePlugin;
 
-describe('tina() integration — astro:config:setup', () => {
+describe('tina() integration - astro:config:setup', () => {
   it('wires the middleware without writing to the source tree', () => {
     const { addMiddleware, plugins } = runConfigSetup();
 
@@ -123,7 +123,7 @@ describe('tina() integration — astro:config:setup', () => {
   });
 });
 
-describe('tina() integration — bridge dev plugin', () => {
+describe('tina() integration - bridge dev plugin', () => {
   it('serves the bridge bundle at /admin/bridge.js', () => {
     const { plugins } = runConfigSetup();
     const plugin = plugins.find((p) => p.name === '@tinacms/astro:bridge-dev')!;
@@ -152,7 +152,7 @@ describe('tina() integration — bridge dev plugin', () => {
   });
 });
 
-describe('tina() integration — cloudflare import.meta.url plugin', () => {
+describe('tina() integration - cloudflare import.meta.url plugin', () => {
   const EXPECTED = JSON.stringify('file:///worker.mjs');
 
   it('injects a valid import.meta.url define for the workerd server envs under the cloudflare adapter', () => {
@@ -228,7 +228,7 @@ describe('tina() integration — cloudflare import.meta.url plugin', () => {
   });
 });
 
-describe('tina() integration — dev content invalidation plugin', () => {
+describe('tina() integration - dev content invalidation plugin', () => {
   it('is a dev-only plugin', () => {
     const { plugins } = runConfigSetup();
     const plugin = invalidationPlugin(plugins);
@@ -363,7 +363,7 @@ describe('tina() integration — dev content invalidation plugin', () => {
   });
 });
 
-describe('tina() integration — astro:build:done', () => {
+describe('tina() integration - astro:build:done', () => {
   it('emits bridge.js into the client output dir', () => {
     const clientDir = mkdtempSync(join(tmpdir(), 'tina-client-'));
     const { integration } = runConfigSetup();
