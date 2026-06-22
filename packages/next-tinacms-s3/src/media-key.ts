@@ -25,11 +25,21 @@ export class MediaKeyError extends Error {
   }
 }
 
+// Trim leading and trailing slashes without a backtracking regex (avoids
+// polynomial-time matching on attacker-controlled runs of slashes).
+function stripSlashes(value: string): string {
+  let start = 0;
+  let end = value.length;
+  while (start < end && value[start] === '/') start++;
+  while (end > start && value[end - 1] === '/') end--;
+  return value.slice(start, end);
+}
+
 function normalizeMediaRoot(mediaRoot: string): string {
   if (!mediaRoot) {
     return '';
   }
-  return mediaRoot.replace(/^\/+/, '').replace(/\/+$/, '');
+  return stripSlashes(mediaRoot);
 }
 
 /**
@@ -126,7 +136,7 @@ export function resolveDirectory(rawDirectory: unknown): string {
     throw new MediaKeyError('media directory is not valid');
   }
 
-  const trimmed = rawDirectory.replace(/^\/+/, '').replace(/\/+$/, '');
+  const trimmed = stripSlashes(rawDirectory);
   const normalized = path.posix.normalize(trimmed).replace(/^\.\//, '');
   if (normalized === '..' || normalized.startsWith('../')) {
     throw new MediaKeyError('media directory may not traverse directories');
