@@ -255,6 +255,12 @@ function devContentInvalidationPlugin(
         if (timer) clearTimeout(timer);
         timer = setTimeout(flush, 50);
       };
+      // Vite only watches files inside the Astro project root, so content kept
+      // in a separate repo (a `localContentPath` resolving outside the project)
+      // isn't seen here and won't auto-refresh the route cache in dev. That
+      // content is still indexed by `tinacms dev`'s own watcher; only this
+      // Astro-side refresh can't reach outside the project root, which matches
+      // the behaviour before this fix existed.
       server.watcher.on('add', onChange);
       server.watcher.on('unlink', onChange);
     },
