@@ -1,7 +1,7 @@
 {
 	"$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
 	"vcs": {
-		"enabled": false,
+		"enabled": true,
 		"clientKind": "git",
 		"useIgnoreFile": true
 	},
@@ -13,7 +13,8 @@
 			"**/.astro/**",
 			"**/.next/**",
 			"**/node_modules/**",
-			"**/public/admin/**"
+			"**/public/admin/**",
+			"**/static/admin/**"
 		],
 		"maxSize": 3145728
 	},

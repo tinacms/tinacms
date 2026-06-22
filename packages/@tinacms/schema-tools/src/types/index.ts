@@ -473,7 +473,7 @@ type ObjectListUiProps = {
    * ```
    *
    * Note: when supplying a value for a `rich-text` field, you must supply
-   * the the value as an object.
+   * the value as an object.
    * ```ts
    * {
    *   title: "My Headline",
@@ -654,6 +654,14 @@ export interface Config<
   Store = undefined,
   SearchClient = undefined,
 > {
+  /**
+   * Points the admin UI at a custom/self-hosted content API instead of TinaCloud.
+   *
+   * Can be a relative URL, such as `/api/tina/gql`, or an absolute URL, such as
+   * `https://example.com/api/content`. When set, the admin UI will not show the
+   * Local Mode banner; Local Mode is only detected when this option is unset and
+   * the content API resolves to `localhost`.
+   */
   contentApiUrlOverride?: string;
   authProvider?: AuthProvider;
   admin?: {

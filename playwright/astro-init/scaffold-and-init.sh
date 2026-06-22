@@ -14,6 +14,14 @@ echo "Scaffolding Astro '$TEMPLATE' template at $PROJECT_DIR"
 rm -rf "$PROJECT_DIR"
 pnpm create astro@latest "$PROJECT_DIR" --template "$TEMPLATE" --no-install --no-git --skip-houston
 cd "$PROJECT_DIR"
+# pnpm 11 fails install on unapproved build scripts; approve the ones we need.
+cat > pnpm-workspace.yaml <<'YAML'
+allowBuilds:
+  esbuild: true
+  sharp: true
+  better-sqlite3: true
+  core-js: true
+YAML
 pnpm install
 
 echo "Running tinacms init (Astro / pnpm / TypeScript)"

@@ -13,11 +13,11 @@ import {
   TinaForm,
   wrapFieldsWithMeta,
 } from '@tinacms/toolkit';
-import React, { useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 import type { TinaCMS } from '@tinacms/toolkit';
 import { FormBreadcrumbs } from '@toolkit/react-sidebar/components/sidebar-body';
+import React, { useMemo, useState } from 'react';
 import { FaLock, FaUnlock } from 'react-icons/fa';
+import { useNavigate, useParams } from 'react-router-dom';
 import { TinaAdminApi } from '../api';
 import { ErrorDialog } from '../components/ErrorDialog';
 import GetCMS from '../components/GetCMS';
@@ -355,6 +355,10 @@ export const RenderForm = ({
     ({ tinaForm }) => tinaForm.id === form.id
   );
 
+  const collectionListPath = `/collections/${collection.name}${
+    folder.fullyQualifiedName ? `/${folder.fullyQualifiedName}` : ''
+  }`;
+
   return (
     <PageWrapper headerClassName='bg-white'>
       <>
@@ -365,6 +369,10 @@ export const RenderForm = ({
             <FormBreadcrumbs
               className='w-[calc(100%-3rem)]'
               rootBreadcrumbName='Create New'
+              collectionCrumb={{
+                label: collection.label || collection.name,
+                onClick: () => navigate(collectionListPath),
+              }}
             />
             <FormStatus pristine={formIsPristine} />
           </div>

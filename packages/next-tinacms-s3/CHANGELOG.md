@@ -1,5 +1,19 @@
 # next-tinacms-s3
 
+## 23.0.3
+
+### Patch Changes
+
+- Updated dependencies [[`42760d8`](https://github.com/tinacms/tinacms/commit/42760d8f5afd201107e27e274308af37f96ba8d0), [`c491fc5`](https://github.com/tinacms/tinacms/commit/c491fc55e612725f5d775eeb1fdf3f8ba82314fa)]:
+  - tinacms@3.9.3
+
+## 23.0.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - tinacms@3.9.2
+
 ## 23.0.1
 
 ### Patch Changes

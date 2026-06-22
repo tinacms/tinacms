@@ -1,6 +1,7 @@
 import { addMetadata, hashFromQuery } from '@tinacms/bridge/metadata';
 import { QUICK_EDIT_CSS } from '@tinacms/bridge/quick-edit-css';
 import React from 'react';
+import { isFromAdmin, useTrustedAdminOrigins } from './internal-admin-origin';
 
 export { addMetadata, hashFromQuery };
 
@@ -26,6 +27,8 @@ export function useTina<T extends object>(props: {
       return addMetadata(id, dataCopy, []);
     }
   }, [props.data, id]);
+
+  const trustedAdminOrigins = useTrustedAdminOrigins();
 
   const [data, setData] = React.useState(processedData);
   const [isClient, setIsClient] = React.useState(false);
@@ -106,6 +109,7 @@ export function useTina<T extends object>(props: {
     const { experimental___selectFormByFormId, ...rest } = props;
     parent.postMessage({ type: 'open', ...rest, id }, window.location.origin);
     const handleMessage = (event) => {
+      if (!isFromAdmin(event, trustedAdminOrigins)) return;
       if (event.data.type === 'quickEditEnabled') {
         setQuickEditEnabled(event.data.value);
       }
@@ -138,7 +142,7 @@ export function useTina<T extends object>(props: {
       window.removeEventListener('message', handleMessage);
       parent.postMessage({ type: 'close', id }, window.location.origin);
     };
-  }, [id, setQuickEditEnabled]);
+  }, [id, setQuickEditEnabled, trustedAdminOrigins]);
 
   return { data, isClient };
 }

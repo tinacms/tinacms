@@ -1,12 +1,4 @@
-import {
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { PRIME_HEADER } from './preview';
 
 async function loadBridge() {
@@ -24,21 +16,14 @@ describe('refreshForms (public wrapper)', () => {
   let fetchMock: ReturnType<typeof vi.fn>;
   let parentDescriptor: PropertyDescriptor | undefined;
 
-  beforeAll(() => {
-    // The bridge's forms module schedules a 250ms retry timer
-    // (`setTimeout(announce, ...)`) when it discovers payloads to post the
-    // admin's `open` message until acked. Tests finish before that fires,
-    // and `vi.resetModules()` can't cancel the prior module's pending
-    // timer — so it leaks past teardown and, when `window.parent` is the
-    // real window (the no-op-outside-iframe case), happy-dom throws
-    // `SecurityError` on the cross-origin postMessage. None of these
-    // tests assert on outgoing postMessage calls — they check `fetchMock`
-    // — so noop-ing `window.postMessage` at the file level neutralises
-    // the leak without losing coverage.
-    window.postMessage = () => {};
-  });
-
   beforeEach(() => {
+    // forms.ts schedules a 250ms `setTimeout(announce, ...)` retry whenever
+    // it discovers payloads. vi.resetModules() between tests can't cancel
+    // the prior module's pending timer, so it leaks past teardown and fires
+    // into a torn-down happy-dom (window gone → ReferenceError). Fake timers
+    // keep the retry queued but never fired, matching the existing pattern
+    // in forms.test.ts.
+    vi.useFakeTimers();
     document.body.innerHTML = '';
     fetchMock = vi.fn();
     vi.stubGlobal('fetch', fetchMock);
@@ -50,6 +35,7 @@ describe('refreshForms (public wrapper)', () => {
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     vi.unstubAllGlobals();
     if (parentDescriptor) {
       Object.defineProperty(window, 'parent', parentDescriptor);
