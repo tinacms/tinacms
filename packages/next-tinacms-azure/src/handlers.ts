@@ -7,6 +7,7 @@ import type { AzureBlobStorageConfig } from './types';
 import type { MediaListOptions } from 'tinacms';
 import path from 'node:path';
 import { type NextRequest, NextResponse } from 'next/server';
+import { resolveKey, resolveDirectory, MediaKeyError } from './media-key';
 
 type RouteParams = { params: { media: string[] } };
 
@@ -59,7 +60,23 @@ async function uploadMedia(req: NextRequest, config: AzureBlobStorageConfig) {
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
-  const blobName = path.join(directory, filename);
+  let blobName: string;
+  try {
+    // Azure has no mediaRoot concept yet; this still rejects empty keys,
+    // absolute paths and traversal. A mediaRoot boundary is a follow-up.
+    blobName = resolveKey(
+      '',
+      path.posix.join(directory || '', filename || ''),
+      {
+        decode: false,
+      }
+    );
+  } catch (e) {
+    if (e instanceof MediaKeyError) {
+      return NextResponse.json({ error: e.message }, { status: 400 });
+    }
+    throw e;
+  }
   const blockBlobClient = containerClient.getBlockBlobClient(blobName);
   await blockBlobClient.uploadData(buffer);
 
@@ -76,7 +93,19 @@ async function deleteAsset(
   config: AzureBlobStorageConfig
 ): Promise<NextResponse> {
   const { media } = context.params;
-  const [, blobName] = media;
+  const [, rawKey] = media;
+
+  let blobName: string;
+  try {
+    // The framework already decodes the route param once; decoding again here
+    // would mangle keys containing a literal "%" (e.g. "100%off.png").
+    blobName = resolveKey('', rawKey, { decode: false });
+  } catch (e) {
+    if (e instanceof MediaKeyError) {
+      return NextResponse.json({ error: e.message }, { status: 400 });
+    }
+    throw e;
+  }
 
   const options: BlobDeleteOptions = {
     deleteSnapshots: 'include',
@@ -115,11 +144,19 @@ async function listMedia(req: NextRequest, config: AzureBlobStorageConfig) {
       mediaListOptions.directory === '/' ||
       mediaListOptions.directory === '""';
 
-    const prefix = useRootDirectory
-      ? ''
-      : mediaListOptions.directory?.endsWith('/')
-        ? mediaListOptions.directory
-        : `${mediaListOptions.directory}/`;
+    let prefix: string;
+    try {
+      // Reject upward traversal in the listing directory for consistency with
+      // the other adapters (no mediaRoot boundary exists here yet).
+      prefix = useRootDirectory
+        ? ''
+        : resolveDirectory(mediaListOptions.directory);
+    } catch (e) {
+      if (e instanceof MediaKeyError) {
+        return NextResponse.json({ error: e.message }, { status: 400 });
+      }
+      throw e;
+    }
 
     const files = [];
     const folders = [];
