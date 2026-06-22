@@ -132,9 +132,12 @@ async function listMedia(
 
     if (!useRootDirectory) {
       try {
-        // Reject upward traversal in the listing directory for consistency
-        // with the other adapters. (Search-expression escaping is a separate
-        // follow-up.)
+        // Validation only: reject upward traversal in the listing directory for
+        // consistency with the other adapters. The normalised result is
+        // intentionally discarded; the raw directory is still interpolated into
+        // the search expression below, so this does NOT bound the listing the
+        // way resolveDirectory bounds the S3/DOS prefix. Search-expression
+        // escaping (SEC-5) is a separate follow-up.
         resolveDirectory(mediaListOptions.directory);
       } catch (e) {
         if (e instanceof MediaKeyError) {

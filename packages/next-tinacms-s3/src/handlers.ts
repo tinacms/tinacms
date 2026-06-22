@@ -80,7 +80,10 @@ export const createMediaHandler = (config: S3Config, options?: S3Options) => {
             : req.query.key;
           let s3_key: string;
           try {
-            s3_key = resolveKey(mediaRoot, rawKey);
+            // Next already decodes req.query once; decoding again here would
+            // mangle keys containing a literal "%" (e.g. "100%off.png"), the
+            // same reason the delete path passes { decode: false }.
+            s3_key = resolveKey(mediaRoot, rawKey, { decode: false });
           } catch (e) {
             if (e instanceof MediaKeyError) {
               return res.status(400).json({ message: e.message });
