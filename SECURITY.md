@@ -36,3 +36,16 @@ To help us triage and resolve the issue quickly, please include:
 - We will notify you when a fix has been released.
 
 Thank you for helping keep TinaCMS safe!
+
+## Dependency Updates and Supply-Chain Policy
+
+A freshly published package version is a supply-chain risk. Compromised or malicious releases are most often caught and yanked within the first couple of days, so we let new versions age before pulling them in.
+
+Dependabot is configured with a 3-day cooldown in [`.github/dependabot.yml`](.github/dependabot.yml), so automated update PRs never propose a release younger than 3 days. A manual install bypasses that gate.
+
+**Policy:** Do not run a manual install of `<pkg>@latest` (`pnpm add`, `npm install`, `yarn add`, or a hand-edited `package.json` bump) that pulls in a version published less than 3 days ago without a security sign-off.
+
+- A security sign-off means explicit approval from a maintainer on the security team (security@tina.io).
+- Check a version's publish date before installing: `npm view <pkg> time --json`.
+- The rule covers forced transitive upgrades and resolution overrides, not just direct dependencies.
+- An emergency upgrade (for example, a patch that itself fixes an active vulnerability) is the case for getting the sign-off, not for skipping it.
