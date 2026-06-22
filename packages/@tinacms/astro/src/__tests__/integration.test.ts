@@ -1,4 +1,10 @@
-import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -83,7 +89,7 @@ function makeRes() {
 // A minimal dev server exposing the Vite environment hot channels and a file
 // watcher, so we can drive the content-invalidation plugin and capture both the
 // HMR signals it sends and the watcher handlers it registers.
-function makeDevServer(opts: { environments?: boolean } = {}) {
+function makeDevServer(opts: { environments?: boolean; root?: string } = {}) {
   const ssrSend = vi.fn();
   const clientSend = vi.fn();
   const handlers: Record<string, (file: string) => void> = {};
@@ -94,6 +100,9 @@ function makeDevServer(opts: { environments?: boolean } = {}) {
     },
   };
   const server: Record<string, unknown> = { watcher };
+  if (opts.root !== undefined) {
+    server.config = { root: opts.root };
+  }
   if (opts.environments !== false) {
     server.environments = {
       ssr: { hot: { send: ssrSend } },
@@ -273,10 +282,11 @@ describe('tina() integration - dev content invalidation plugin', () => {
     }
   });
 
-  it('treats markdown as content anywhere, but structured data only inside a content dir', () => {
+  it('falls back to a heuristic without a schema: markdown anywhere, structured data only inside a content dir', () => {
     vi.useFakeTimers();
     try {
       const { plugins } = runConfigSetup();
+      // No `root`, so no schema is read and detection uses the heuristic.
       const { server, ssrSend, handlers } = makeDevServer();
       (invalidationPlugin(plugins).configureServer as any)(server);
 
@@ -300,6 +310,52 @@ describe('tina() integration - dev content invalidation plugin', () => {
         '/project/src/lib/data.ts',
         '/project/node_modules/pkg/content/x.md',
         '/project/dist/content/x.md',
+      ]) {
+        handlers.add(file);
+        vi.advanceTimersByTime(50);
+        expect(ssrSend).not.toHaveBeenCalled();
+      }
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('watches collection roots from the schema, so content outside a content dir still reloads', () => {
+    const root = mkdtempSync(join(tmpdir(), 'tina-astro-'));
+    mkdirSync(join(root, 'tina', '__generated__'), { recursive: true });
+    writeFileSync(
+      join(root, 'tina', '__generated__', '_schema.json'),
+      JSON.stringify({
+        collections: [
+          // A JSON collection that does NOT live under a `content` dir: the
+          // exact case the heuristic would miss.
+          { name: 'settings', path: 'data/settings', format: 'json' },
+          { name: 'post', path: 'src/posts', format: 'mdx' },
+        ],
+      })
+    );
+
+    vi.useFakeTimers();
+    try {
+      const { plugins } = runConfigSetup();
+      const { server, ssrSend, handlers } = makeDevServer({ root });
+      (invalidationPlugin(plugins).configureServer as any)(server);
+
+      // Reacts to content under any configured collection root.
+      for (const file of [
+        join(root, 'data/settings/site.json'),
+        join(root, 'src/posts/hello.mdx'),
+      ]) {
+        handlers.add(file);
+        vi.advanceTimersByTime(50);
+        expect(ssrSend).toHaveBeenCalled();
+        ssrSend.mockClear();
+      }
+
+      // Ignores files outside every root, and non-content files inside one.
+      for (const file of [
+        join(root, 'package.json'),
+        join(root, 'data/settings/README.txt'),
       ]) {
         handlers.add(file);
         vi.advanceTimersByTime(50);

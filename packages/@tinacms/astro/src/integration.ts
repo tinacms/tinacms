@@ -111,6 +111,37 @@ function astroMajorVersion(): number | undefined {
   }
 }
 
+/** Normalise separators so path prefix matching works on Windows too. */
+const toPosix = (p: string): string => p.replace(/\\/g, '/');
+
+/**
+ * Absolute, posix-normalised paths of the configured Tina collection content
+ * roots, read from the generated schema. `tinacms dev` writes this before it
+ * spawns the framework dev server, so it is on disk by the time this plugin's
+ * `configureServer` runs. Returns an empty list when the schema can't be read
+ * (e.g. running `astro dev` on its own), signalling the caller to fall back to
+ * a path heuristic.
+ */
+function readTinaCollectionRoots(root: string | undefined): string[] {
+  if (!root) return [];
+  for (const rel of [
+    'tina/__generated__/_schema.json',
+    '.tina/__generated__/_schema.json',
+  ]) {
+    try {
+      const schema = JSON.parse(readFileSync(join(root, rel), 'utf8'));
+      const roots: string[] = (schema?.collections ?? [])
+        .map((c: { path?: unknown }) => c?.path)
+        .filter((p: unknown): p is string => typeof p === 'string' && p !== '')
+        .map((p: string) => toPosix(join(root, p)));
+      if (roots.length) return roots;
+    } catch {
+      // Not generated yet or unreadable: try the next location, then fall back.
+    }
+  }
+  return [];
+}
+
 // Dev-only Vite plugin that answers `/admin/bridge.js` from the installed
 // bridge package. The bridge never varies per request, so a single readFile
 // per request is fine and nothing is persisted to disk.
@@ -147,10 +178,12 @@ function bridgeDevPlugin(): VitePlugin {
  * admin writes a new entry the route's path list stays stale and the
  * freshly-created page 404s until the dev server is restarted by hand.
  *
- * This dev-only plugin watches for content files being added or removed and
- * emits the same `astro:content-changed` signal Astro fires for its own content
- * layer, which clears the route cache so `getStaticPaths()` re-runs and the new
- * path resolves, then reloads the open tab so it picks up the change.
+ * This dev-only plugin watches the configured Tina collection paths (read from
+ * the generated schema, so it tracks content wherever a collection's `path`
+ * points) for files being added or removed, and emits the same
+ * `astro:content-changed` signal Astro fires for its own content layer, which
+ * clears the route cache so `getStaticPaths()` re-runs and the new path
+ * resolves, then reloads the open tab so it picks up the change.
  *
  * Scoped to Astro 6+: the listener that turns `astro:content-changed` into a
  * route-cache clear only exists from Astro 6 on. On Astro 5 nothing handles the
@@ -164,15 +197,31 @@ function bridgeDevPlugin(): VitePlugin {
 function devContentInvalidationPlugin(
   astroMajor: number | undefined
 ): VitePlugin {
-  // Markdown-family files are content wherever they live. Structured-data
-  // formats only count inside a `content` directory, so an unrelated
-  // `package.json` / `tsconfig.json` write doesn't trigger a reload.
+  // Content extensions Tina writes. The precise watch list comes from the
+  // collection roots in the generated schema; these patterns drive the fallback
+  // used when the schema isn't readable yet.
+  const CONTENT_EXT = /\.(?:md|mdx|markdown|mdoc|json|ya?ml|toml)$/i;
   const MARKDOWN = /\.(?:md|mdx|markdown|mdoc)$/i;
   const STRUCTURED = /\.(?:json|ya?ml|toml)$/i;
   const IGNORED =
     /[\\/](?:node_modules|\.git|\.astro|dist|\.vercel|\.netlify|\.cache)[\\/]/;
-  const isContentFile = (file: string): boolean => {
+
+  const isWithin = (file: string, dir: string): boolean => {
+    const f = toPosix(file);
+    const d = toPosix(dir).replace(/\/$/, '');
+    return f === d || f.startsWith(`${d}/`);
+  };
+
+  const isContentFile = (file: string, roots: string[]): boolean => {
     if (IGNORED.test(file)) return false;
+    // Schema known: a content-formatted file under any configured collection
+    // root, regardless of whether that root is named `content`.
+    if (roots.length) {
+      return CONTENT_EXT.test(file) && roots.some((r) => isWithin(file, r));
+    }
+    // Fallback (schema not generated yet): markdown counts anywhere; structured
+    // data only inside a `content` dir, so a stray `package.json` / `tsconfig`
+    // write doesn't trigger a reload.
     if (MARKDOWN.test(file)) return true;
     return STRUCTURED.test(file) && /[\\/]content[\\/]/.test(file);
   };
@@ -190,13 +239,17 @@ function devContentInvalidationPlugin(
       const client = server.environments?.client;
       if (!ssr?.hot || !client?.hot) return;
 
+      // Exact content roots from the Tina schema; empty when it isn't on disk
+      // yet, in which case isContentFile() falls back to a path heuristic.
+      const roots = readTinaCollectionRoots(server.config?.root);
+
       let timer: ReturnType<typeof setTimeout> | undefined;
       const flush = () => {
         ssr.hot.send('astro:content-changed', {});
         client.hot.send({ type: 'full-reload', path: '*' });
       };
       const onChange = (file: string) => {
-        if (!isContentFile(file)) return;
+        if (!isContentFile(file, roots)) return;
         // Coalesce bursts (saving several documents fires many events) into a
         // single reload.
         if (timer) clearTimeout(timer);
