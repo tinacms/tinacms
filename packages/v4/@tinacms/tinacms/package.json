@@ -52,6 +52,6 @@
   "devDependencies": {
     "@tinacms/scripts": "workspace:*",
     "typescript": "^5.7.3",
-    "vitest": "^2.1.9"
+    "vitest": "^3.2.6"
   }
 }

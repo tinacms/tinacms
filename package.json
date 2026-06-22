@@ -38,7 +38,7 @@
 		"@changesets/cli": "catalog:",
 		"@types/jest": "^29.5.14",
 		"@types/node": "^22.19.17",
-		"vitest": "^2.1.9",
+		"vitest": "^3.2.6",
 		"@types/picomatch": "catalog:",
 		"picomatch": "catalog:",
 		"turbo": "catalog:",
