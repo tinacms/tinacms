@@ -141,7 +141,7 @@ async function listMedia(
         resolveDirectory(mediaListOptions.directory);
       } catch (e) {
         if (e instanceof MediaKeyError) {
-          res.status(400).json({ e: e.message });
+          res.status(400).json({ message: e.message });
           return;
         }
         throw e;
