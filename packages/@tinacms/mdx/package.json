@@ -86,7 +86,7 @@
 		"ts-node": "catalog:",
 		"typedoc-plugin-markdown": "catalog:",
 		"typescript": "^5.7.3",
-		"vite": "^4.5.9",
+		"vite": "^6.4.3",
 		"vitest": "^0.32.4"
 	}
 }

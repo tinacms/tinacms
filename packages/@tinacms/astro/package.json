@@ -138,7 +138,7 @@
     "@types/node": "^22.13.1",
     "astro": "^6.3.7",
     "typescript": "^5.7.3",
-    "vite": "^7.3.3",
+    "vite": "^6.4.3",
     "vitest": "^3.0.0"
   },
   "publishConfig": {
