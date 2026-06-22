@@ -64,9 +64,13 @@ async function uploadMedia(req: NextRequest, config: AzureBlobStorageConfig) {
   try {
     // Azure has no mediaRoot concept yet; this still rejects empty keys,
     // absolute paths and traversal. A mediaRoot boundary is a follow-up.
-    blobName = resolveKey('', path.posix.join(directory || '', filename || ''), {
-      decode: false,
-    });
+    blobName = resolveKey(
+      '',
+      path.posix.join(directory || '', filename || ''),
+      {
+        decode: false,
+      }
+    );
   } catch (e) {
     if (e instanceof MediaKeyError) {
       return NextResponse.json({ error: e.message }, { status: 400 });
