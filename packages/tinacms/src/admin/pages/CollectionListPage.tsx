@@ -38,7 +38,6 @@ import {
   BiX,
 } from 'react-icons/bi';
 import { FaFile, FaFolder } from 'react-icons/fa';
-import { RiHome2Line } from 'react-icons/ri';
 import {
   Link,
   Navigate,
@@ -911,6 +910,10 @@ const CollectionListPage = () => {
                                               folder={folder}
                                               navigate={navigate}
                                               collectionName={collectionName}
+                                              collectionLabel={
+                                                collection.label ||
+                                                collection.name
+                                              }
                                             />
                                           </td>
                                         </tr>
@@ -1336,69 +1339,52 @@ const SearchInput = ({
   );
 };
 
-const Breadcrumb = ({ folder, navigate, collectionName }) => {
+const Breadcrumb = ({ folder, navigate, collectionName, collectionLabel }) => {
   const folderArray = folder.name.split('/');
 
+  // Navigate to the collection list at a given folder depth. `depth` counts
+  // segments of fullyQualifiedName, which leads with the "~" root segment.
+  const goToDepth = (depth: number) => {
+    const folders = folder.fullyQualifiedName.split('/');
+    navigate(
+      `/${['collections', collectionName, ...folders.slice(0, depth)].join(
+        '/'
+      )}`,
+      { replace: true }
+    );
+  };
+
+  // One level up from the current folder (its parent in the list).
+  const parentDepth = folder.fullyQualifiedName.split('/').length - 1;
+
   return (
-    <div className='w-full bg-gray-50/30 flex items-stretch'>
+    <div className='w-full bg-gray-50/30 px-3 py-2 flex items-center gap-1.5 text-gray-700 flex-nowrap text-nowrap'>
+      {/* Leading "back to collection" crumb — same idiom as the editor breadcrumb */}
       <button
-        onClick={() => {
-          const folders = folder.fullyQualifiedName.split('/');
-          navigate(
-            `/${[
-              'collections',
-              collectionName,
-              ...folders.slice(0, folders.length - 1),
-            ].join('/')}`,
-            { replace: true }
-          );
-        }}
-        className='px-3 py-2 bg-white hover:bg-gray-50/50 transition ease-out duration-100 border-r border-gray-100 text-blue-500 hover:text-blue-600'
+        type='button'
+        onClick={() => goToDepth(parentDepth)}
+        aria-label={`Back to ${collectionLabel}`}
+        className='flex items-center gap-1.5 min-w-0 shrink-0 bg-transparent p-0 border-0 text-gray-700 hover:text-orange-500 transition-colors'
       >
-        <BiArrowBack className='w-6 h-full opacity-70' />
+        <BiArrowBack className='w-4 h-4 shrink-0 opacity-80' />
+        <span className='truncate'>{collectionLabel}</span>
       </button>
-      <span className='px-3 py-2 text-gray-600 flex flex-wrap items-center justify-start gap-1'>
-        <button
-          onClick={() => {
-            navigate(`/collections/${collectionName}/~`, {
-              replace: true,
-            });
-          }}
-          className='shrink-0 bg-transparent p-0 border-0 text-blue-400 hover:text-blue-500 transition-all ease-out duration-100 opacity-70 hover:opacity-100'
-        >
-          <RiHome2Line className='w-5 h-auto' />
-        </button>
-        {folderArray.map((node, index) => {
-          return (
-            <>
-              <span className='text-gray-200 shrink-0'>/</span>
-              {index < folderArray.length - 1 ? (
-                <button
-                  className='bg-transparent whitespace-nowrap truncate p-0 border-0 text-blue-500 hover:text-blue-600 transition-all ease-out duration-100 underline underline-offset-2 decoration-1	decoration-blue-200 hover:decoration-blue-400'
-                  onClick={() => {
-                    const folders = folder.fullyQualifiedName.split('/');
-                    navigate(
-                      `/${[
-                        'collections',
-                        collectionName,
-                        ...folders.slice(
-                          0,
-                          folders.length - (folders.length - (index + 2))
-                        ),
-                      ].join('/')}`,
-                      { replace: true }
-                    );
-                  }}
-                >
-                  {node}
-                </button>
-              ) : (
-                <span className='whitespace-nowrap truncate'>{node}</span>
-              )}
-            </>
-          );
-        })}
-      </span>
+      {folderArray.map((node, index) => (
+        <React.Fragment key={`${node}-${index}`}>
+          <span className='text-gray-200 shrink-0'>/</span>
+          {index < folderArray.length - 1 ? (
+            <button
+              type='button'
+              onClick={() => goToDepth(index + 2)}
+              className='truncate min-w-0 bg-transparent p-0 border-0 text-gray-700 hover:text-orange-500 transition-colors'
+            >
+              {node}
+            </button>
+          ) : (
+            <span className='truncate min-w-0 font-medium'>{node}</span>
+          )}
+        </React.Fragment>
+      ))}
     </div>
   );
 };
