@@ -10,6 +10,9 @@ on:
       - '.github/workflows/playwright-astro-init.yml'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   init-e2e:
     name: astro-init-e2e
