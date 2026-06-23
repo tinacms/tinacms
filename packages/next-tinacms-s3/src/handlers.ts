@@ -18,6 +18,7 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Media, MediaListOptions } from 'tinacms';
 import path from 'node:path';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { resolveKey, resolveDirectory, MediaKeyError } from './media-key';
 
 export interface S3Config {
   config: S3ClientConfig;
@@ -66,15 +67,28 @@ export const createMediaHandler = (config: S3Config, options?: S3Options) => {
     switch (req.method) {
       case 'GET':
         if (req.query.key) {
-          const expiresIn: number =
-            (req.query.expiresIn && Number(req.query.expiresIn)) || 3600;
-          const s3_key = req.query.key
-            ? Array.isArray(req.query.key)
-              ? req.query.key[0]
-              : req.query.key
-            : null;
-          if (!s3_key) {
-            return res.status(400).json({ message: 'key is required' });
+          // Cap the presigned URL validity: expiresIn is caller-controlled and
+          // was otherwise bounded only by SigV4's 7-day ceiling, which would
+          // mint a long-lived offline write primitive. Default and max: 3600s.
+          const requestedExpiresIn = Number(req.query.expiresIn);
+          const expiresIn =
+            Number.isFinite(requestedExpiresIn) && requestedExpiresIn > 0
+              ? Math.min(requestedExpiresIn, 3600)
+              : 3600;
+          const rawKey = Array.isArray(req.query.key)
+            ? req.query.key[0]
+            : req.query.key;
+          let s3_key: string;
+          try {
+            // Next already decodes req.query once; decoding again here would
+            // mangle keys containing a literal "%" (e.g. "100%off.png"), the
+            // same reason the delete path passes { decode: false }.
+            s3_key = resolveKey(mediaRoot, rawKey, { decode: false });
+          } catch (e) {
+            if (e instanceof MediaKeyError) {
+              return res.status(400).json({ message: e.message });
+            }
+            throw e;
           }
           if (await keyExists(client, bucket, s3_key)) {
             return res.status(400).json({ message: 'key already exists' });
@@ -90,7 +104,7 @@ export const createMediaHandler = (config: S3Config, options?: S3Options) => {
         }
         return listMedia(req, res, client, bucket, mediaRoot, cdnUrl);
       case 'DELETE':
-        return deleteAsset(req, res, client, bucket);
+        return deleteAsset(req, res, client, bucket, mediaRoot);
       default:
         res.end(404);
     }
@@ -130,8 +144,18 @@ async function listMedia(
       offset,
     } = req.query as MediaListOptions;
 
-    let prefix = directory.replace(/^\//, '').replace(/\/$/, '');
-    if (prefix) prefix = prefix + '/';
+    let prefix: string;
+    try {
+      // Reject upward traversal: directory flows into path.join(mediaRoot,
+      // prefix), which would otherwise collapse ".." and list outside mediaRoot.
+      prefix = resolveDirectory(directory);
+    } catch (e) {
+      if (e instanceof MediaKeyError) {
+        res.status(400).json({ message: e.message });
+        return;
+      }
+      throw e;
+    }
 
     const params: ListObjectsCommandInput = {
       Bucket: bucket,
@@ -200,10 +224,23 @@ async function deleteAsset(
   req: NextApiRequest,
   res: NextApiResponse,
   client: S3Client,
-  bucket: string
+  bucket: string,
+  mediaRoot: string
 ) {
   const { media } = req.query;
-  const [, objectKey] = media as string[];
+  const [, rawKey] = media as string[];
+
+  let objectKey: string;
+  try {
+    // The framework already decodes the route param once; decoding again here
+    // would mangle keys containing a literal "%" (e.g. "100%off.png").
+    objectKey = resolveKey(mediaRoot, rawKey, { decode: false });
+  } catch (e) {
+    if (e instanceof MediaKeyError) {
+      return res.status(400).json({ message: e.message });
+    }
+    throw e;
+  }
 
   const params: DeleteObjectCommandInput = {
     Bucket: bucket,
