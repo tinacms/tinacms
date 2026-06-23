@@ -8,10 +8,17 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   playwright:
     name: 'Playwright E2E on Tests'
     runs-on: ubuntu-latest
+    # Posts the Playwright report as a PR comment.
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: Setup Node.js environment

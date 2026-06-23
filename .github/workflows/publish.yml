@@ -19,6 +19,10 @@ on:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
+# Least-privilege default; jobs that publish opt into the writes they need.
+permissions:
+  contents: read
+
 jobs:
   publish-tagged-pr:
     if: >

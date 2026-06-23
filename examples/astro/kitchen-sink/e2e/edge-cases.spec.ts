@@ -12,7 +12,7 @@ test.describe('Edge Cases — Missing Fields', () => {
   }) => {
     await page.goto('/blog');
 
-    await expect(page.locator('h1')).toBeVisible();
+    await expect(page.locator('h1').first()).toBeVisible();
 
     await expect(page.locator('text=Error')).not.toBeVisible();
     await expect(page.locator('text=undefined')).not.toBeVisible();
@@ -35,7 +35,7 @@ test.describe('Edge Cases — Missing Fields', () => {
   }) => {
     await page.goto('/authors');
 
-    await expect(page.locator('h1')).toBeVisible();
+    await expect(page.locator('h1').first()).toBeVisible();
 
     await expect(page.locator('text=Error')).not.toBeVisible();
     await expect(page.locator('text=Failed to load')).not.toBeVisible();

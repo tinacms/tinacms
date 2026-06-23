@@ -20,10 +20,17 @@ on:
     # so a regression that lands today gets caught tomorrow, not next week.
     - cron: '0 9 * * *'
 
+permissions:
+  contents: read
+
 jobs:
   build-templates:
     runs-on: ubuntu-latest
     continue-on-error: true
+    # Opens a tracking issue when a template fails to build.
+    permissions:
+      contents: read
+      issues: write
     strategy:
       matrix:
         package-manager: [yarn, npm, pnpm]

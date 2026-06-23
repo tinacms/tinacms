@@ -7,6 +7,9 @@ on:
         description: 'Release name to generate release notes for'
         required: true
 
+permissions:
+  contents: read
+
 jobs:
   push-release-notes:
     runs-on: ubuntu-latest
