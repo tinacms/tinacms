@@ -5,7 +5,9 @@
 	"files": [
 		"src",
 		"index.html",
-		"favicon.svg"
+		"favicon.svg",
+		"tsconfig.json",
+		"tsconfig.node.json"
 	],
 	"license": "Apache-2.0",
 	"scripts": {
