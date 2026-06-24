@@ -8,6 +8,9 @@ on:
       - 'examples/astro/kitchen-sink/**'
       - '.github/workflows/playwright-astro-kitchen-sink.yml'
 
+permissions:
+  contents: read
+
 jobs:
   e2e:
     name: astro-kitchen-sink-e2e
