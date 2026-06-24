@@ -27,13 +27,9 @@ function expandOrigins(raw: (string | RegExp)[]): (string | RegExp)[] {
 /**
  * Decide whether a request `Origin` is allowed to reach the dev server.
  *
- * Requests with no `Origin` header (curl, same-origin navigations, CLI
- * tooling, etc.) are always allowed. Localhost is always allowed; any extra
- * `allowedOrigins` (expanded for the `'private'` keyword) are matched by
- * exact string or RegExp.
- *
- * @param origin - The request `Origin` header (may be undefined).
- * @param allowedOrigins - Raw `server.allowedOrigins` from the tina config.
+ * No `Origin` (curl, same-origin, CLI tooling) and localhost are always
+ * allowed; extra `allowedOrigins` (with `'private'` expanded) match by exact
+ * string or RegExp.
  */
 export function isOriginAllowed(
   origin: string | undefined,
@@ -62,12 +58,11 @@ export function isOriginAllowed(
 }
 
 /**
- * Build a CORS `origin` callback compatible with the `cors` npm package.
+ * Build a CORS `origin` callback for the `cors` npm package.
  *
- * NOTE: the `cors` package only uses this to decide whether to emit the
- * `Access-Control-Allow-Origin` header — it does NOT reject disallowed
- * requests server-side. State-changing routes must additionally gate on
- * {@link isOriginAllowed} to prevent cross-origin CSRF writes.
+ * NOTE: `cors` only uses this to set the `Access-Control-Allow-Origin` header;
+ * it does NOT reject disallowed requests server-side. State-changing routes
+ * must also gate on {@link isOriginAllowed} (see plugins.ts).
  */
 export function buildCorsOriginCheck(
   allowedOrigins: (string | RegExp)[] = []

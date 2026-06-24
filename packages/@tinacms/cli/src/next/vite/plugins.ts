@@ -64,11 +64,9 @@ export const devServerEndPointsPlugin = ({
   const corsOriginCheck = buildCorsOriginCheck(allowedOrigins);
 
   /**
-   * @security The `cors` middleware only controls response headers; it does
-   * NOT reject disallowed origins server-side. Because multipart uploads are
-   * "simple" requests that skip the CORS preflight, an attacker-controlled
-   * page can still drive a state-changing request to completion (the browser
-   * just can't read the response). State-changing routes must therefore
+   * @security `cors` only sets response headers; it does NOT reject requests.
+   * Multipart uploads are "simple" requests that skip the CORS preflight, so
+   * an attacker page can still drive these routes to completion. They must
    * reject disallowed origins explicitly to prevent cross-origin CSRF writes.
    */
   const isStateChangingRequest = (req: { url?: string; method?: string }) => {
@@ -107,8 +105,7 @@ export const devServerEndPointsPlugin = ({
           searchIndex,
         });
 
-        // @security Reject cross-origin state-changing requests server-side.
-        // CORS headers alone don't stop the server from processing them.
+        // @security Reject disallowed cross-origin writes (see isStateChangingRequest).
         if (
           isStateChangingRequest(req) &&
           !isOriginAllowed(req.headers.origin, allowedOrigins)

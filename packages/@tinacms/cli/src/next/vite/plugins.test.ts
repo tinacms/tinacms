@@ -1,18 +1,12 @@
 import { devServerEndPointsPlugin } from './plugins';
 
 /**
- * Middleware-layer regression test for the cross-origin upload flaw.
- *
- * The `cors` package only controls response headers — it does NOT reject
- * disallowed origins server-side. Because multipart uploads are "simple"
- * requests that skip the CORS preflight, an attacker page could otherwise
- * drive a state-changing request to completion (writing files into the media
- * root) even though the browser can't read the response.
- *
- * These tests exercise the real request middleware registered by
- * `devServerEndPointsPlugin` and assert that disallowed cross-origin
- * state-changing requests are rejected with a 403 *before* they reach the
- * media/searchIndex handlers.
+ * Middleware-layer regression test for the cross-origin write flaw: because
+ * `cors` only sets headers and multipart uploads skip the CORS preflight, an
+ * attacker page could otherwise drive a state-changing request to completion.
+ * These tests exercise the real `devServerEndPointsPlugin` middleware and
+ * assert disallowed cross-origin writes are rejected with a 403 before they
+ * reach the handlers.
  */
 
 // jest.mock factories may only reference vars prefixed with `mock`.
@@ -47,9 +41,7 @@ jest.mock('../commands/dev-command/server/searchIndex', () => ({
   }),
 }));
 
-// Avoid pulling the heavy graphql package into this unit test. `virtual` is
-// required because the workspace package isn't resolvable from this test's
-// module graph without a build.
+// `virtual` because @tinacms/graphql isn't resolvable here without a build.
 jest.mock(
   '@tinacms/graphql',
   () => ({ resolve: jest.fn(async () => ({ data: {} })) }),
@@ -85,11 +77,8 @@ const makeConfigManager = (allowedOrigins?: (string | RegExp)[]) =>
     },
   }) as any;
 
-/**
- * Build the plugin and return its request-handling middleware (the last
- * middleware registered via `server.middlewares.use`, after `cors` and
- * `bodyParser`).
- */
+// Returns the request-handling middleware (registered last, after `cors`
+// and `bodyParser`).
 const getRequestMiddleware = (allowedOrigins?: (string | RegExp)[]) => {
   const plugin = devServerEndPointsPlugin({
     configManager: makeConfigManager(allowedOrigins),
