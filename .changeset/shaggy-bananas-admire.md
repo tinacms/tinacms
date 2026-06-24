@@ -1,4 +1,5 @@
 ---
+"@tinacms/app": patch
 "@tinacms/metrics": patch
 "@tinacms/scripts": patch
 "@tinacms/cli": patch
