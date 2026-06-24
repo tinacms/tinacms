@@ -75,6 +75,7 @@ export const devServerEndPointsPlugin = ({
     const url = req.url || '';
     if (url.startsWith('/media/upload')) return true;
     if (url.startsWith('/media') && req.method === 'DELETE') return true;
+    if (url.startsWith('/graphql') && req.method === 'POST') return true;
     if (
       (url.startsWith('/searchIndex') || url.startsWith('/v2/searchIndex')) &&
       (req.method === 'POST' || req.method === 'DELETE')

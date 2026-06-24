@@ -50,9 +50,15 @@ jest.mock('../commands/dev-command/server/searchIndex', () => ({
 // Avoid pulling the heavy graphql package into this unit test. `virtual` is
 // required because the workspace package isn't resolvable from this test's
 // module graph without a build.
-jest.mock('@tinacms/graphql', () => ({ resolve: jest.fn() }), {
-  virtual: true,
-});
+jest.mock(
+  '@tinacms/graphql',
+  () => ({ resolve: jest.fn(async () => ({ data: {} })) }),
+  { virtual: true }
+);
+
+// Reference to the mocked resolver (same module instance plugins.ts uses).
+import { resolve as gqlResolve } from '@tinacms/graphql';
+const mockGqlResolve = gqlResolve as unknown as jest.Mock;
 
 type FakeRes = {
   statusCode: number;
@@ -103,7 +109,12 @@ const getRequestMiddleware = (allowedOrigins?: (string | RegExp)[]) => {
 
 const invoke = async (
   mw: Function,
-  req: { url: string; method?: string; headers?: Record<string, string> }
+  req: {
+    url: string;
+    method?: string;
+    headers?: Record<string, string>;
+    body?: any;
+  }
 ) => {
   const res = makeRes();
   const next = jest.fn();
@@ -154,6 +165,19 @@ describe('devServerEndPointsPlugin cross-origin gate', () => {
       expect(res.statusCode).toBe(403);
       expect(mockSearchPut).not.toHaveBeenCalled();
     });
+
+    it('rejects cross-origin POST /graphql before reaching the handler', async () => {
+      const mw = getRequestMiddleware();
+      const { res } = await invoke(mw, {
+        url: '/graphql',
+        method: 'POST',
+        headers: { origin: 'https://evil.com' },
+        body: { query: 'mutation { addPendingDocument }', variables: {} },
+      });
+
+      expect(res.statusCode).toBe(403);
+      expect(mockGqlResolve).not.toHaveBeenCalled();
+    });
   });
 
   describe('allowed requests reach the upload handler', () => {
@@ -203,6 +227,45 @@ describe('devServerEndPointsPlugin cross-origin gate', () => {
 
       expect(res.statusCode).toBe(403);
       expect(mockHandlePost).not.toHaveBeenCalled();
+    });
+
+    it('allows a no-Origin POST /graphql to reach the resolver', async () => {
+      const mw = getRequestMiddleware();
+      const { res } = await invoke(mw, {
+        url: '/graphql',
+        method: 'POST',
+        headers: {},
+        body: { query: '{ __typename }', variables: {} },
+      });
+
+      expect(res.statusCode).not.toBe(403);
+      expect(mockGqlResolve).toHaveBeenCalledTimes(1);
+    });
+
+    it('allows a localhost POST /graphql to reach the resolver', async () => {
+      const mw = getRequestMiddleware();
+      const { res } = await invoke(mw, {
+        url: '/graphql',
+        method: 'POST',
+        headers: { origin: 'http://localhost:3000' },
+        body: { query: '{ __typename }', variables: {} },
+      });
+
+      expect(res.statusCode).not.toBe(403);
+      expect(mockGqlResolve).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not gate GET /graphql (read), even cross-origin', async () => {
+      const mw = getRequestMiddleware();
+      const { res } = await invoke(mw, {
+        url: '/graphql',
+        method: 'GET',
+        headers: { origin: 'https://evil.com' },
+        body: { query: '{ __typename }', variables: {} },
+      });
+
+      expect(res.statusCode).not.toBe(403);
+      expect(mockGqlResolve).toHaveBeenCalledTimes(1);
     });
   });
 });
