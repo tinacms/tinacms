@@ -25,7 +25,49 @@ function expandOrigins(raw: (string | RegExp)[]): (string | RegExp)[] {
 }
 
 /**
+ * Decide whether a request `Origin` is allowed to reach the dev server.
+ *
+ * Requests with no `Origin` header (curl, same-origin navigations, CLI
+ * tooling, etc.) are always allowed. Localhost is always allowed; any extra
+ * `allowedOrigins` (expanded for the `'private'` keyword) are matched by
+ * exact string or RegExp.
+ *
+ * @param origin - The request `Origin` header (may be undefined).
+ * @param allowedOrigins - Raw `server.allowedOrigins` from the tina config.
+ */
+export function isOriginAllowed(
+  origin: string | undefined,
+  allowedOrigins: (string | RegExp)[] = []
+): boolean {
+  // Allow requests with no Origin header (curl, same-origin, etc.).
+  if (!origin) {
+    return true;
+  }
+  if (LOCALHOST_RE.test(origin)) {
+    return true;
+  }
+  for (const allowed of expandOrigins(allowedOrigins)) {
+    if (typeof allowed === 'string') {
+      if (allowed === origin) {
+        return true;
+      }
+    } else {
+      allowed.lastIndex = 0;
+      if (allowed.test(origin)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/**
  * Build a CORS `origin` callback compatible with the `cors` npm package.
+ *
+ * NOTE: the `cors` package only uses this to decide whether to emit the
+ * `Access-Control-Allow-Origin` header — it does NOT reject disallowed
+ * requests server-side. State-changing routes must additionally gate on
+ * {@link isOriginAllowed} to prevent cross-origin CSRF writes.
  */
 export function buildCorsOriginCheck(
   allowedOrigins: (string | RegExp)[] = []
@@ -33,32 +75,7 @@ export function buildCorsOriginCheck(
   origin: string | undefined,
   callback: (err: Error | null, allow?: boolean) => void
 ) => void {
-  const extra = expandOrigins(allowedOrigins);
-
   return (origin, callback) => {
-    // Allow requests with no Origin header (curl, same-origin, etc.).
-    if (!origin) {
-      callback(null, true);
-      return;
-    }
-    if (LOCALHOST_RE.test(origin)) {
-      callback(null, true);
-      return;
-    }
-    for (const allowed of extra) {
-      if (typeof allowed === 'string') {
-        if (allowed === origin) {
-          callback(null, true);
-          return;
-        }
-      } else {
-        allowed.lastIndex = 0;
-        if (allowed.test(origin)) {
-          callback(null, true);
-          return;
-        }
-      }
-    }
-    callback(null, false);
+    callback(null, isOriginAllowed(origin, allowedOrigins));
   };
 }

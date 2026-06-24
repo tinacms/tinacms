@@ -16,7 +16,7 @@ import {
 } from '../commands/dev-command/server/media';
 import { createSearchIndexRouter } from '../commands/dev-command/server/searchIndex';
 import type { ConfigManager } from '../config-manager';
-import { buildCorsOriginCheck } from './cors';
+import { buildCorsOriginCheck, isOriginAllowed } from './cors';
 
 export const transformTsxPlugin = ({
   configManager: _configManager,
@@ -60,9 +60,28 @@ export const devServerEndPointsPlugin = ({
   searchIndex: any;
   databaseLock: (fn: () => Promise<void>) => Promise<void>;
 }) => {
-  const corsOriginCheck = buildCorsOriginCheck(
-    configManager.config?.server?.allowedOrigins
-  );
+  const allowedOrigins = configManager.config?.server?.allowedOrigins;
+  const corsOriginCheck = buildCorsOriginCheck(allowedOrigins);
+
+  /**
+   * @security The `cors` middleware only controls response headers; it does
+   * NOT reject disallowed origins server-side. Because multipart uploads are
+   * "simple" requests that skip the CORS preflight, an attacker-controlled
+   * page can still drive a state-changing request to completion (the browser
+   * just can't read the response). State-changing routes must therefore
+   * reject disallowed origins explicitly to prevent cross-origin CSRF writes.
+   */
+  const isStateChangingRequest = (req: { url?: string; method?: string }) => {
+    const url = req.url || '';
+    if (url.startsWith('/media/upload')) return true;
+    if (url.startsWith('/media') && req.method === 'DELETE') return true;
+    if (
+      (url.startsWith('/searchIndex') || url.startsWith('/v2/searchIndex')) &&
+      (req.method === 'POST' || req.method === 'DELETE')
+    )
+      return true;
+    return false;
+  };
 
   const plug: Plugin = {
     name: 'graphql-endpoints',
@@ -86,6 +105,17 @@ export const devServerEndPointsPlugin = ({
           config: { apiURL, searchPath: 'searchIndex' },
           searchIndex,
         });
+
+        // @security Reject cross-origin state-changing requests server-side.
+        // CORS headers alone don't stop the server from processing them.
+        if (
+          isStateChangingRequest(req) &&
+          !isOriginAllowed(req.headers.origin, allowedOrigins)
+        ) {
+          res.statusCode = 403;
+          res.end(JSON.stringify({ error: 'Origin not allowed' }));
+          return;
+        }
 
         if (req.url.startsWith('/media/upload')) {
           await mediaRouter.handlePost(req, res);
