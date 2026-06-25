@@ -6,8 +6,7 @@
     "files": [
         "dist",
         "bin/*",
-        "__mocks__/styleMock.js",
-        ".env"
+        "__mocks__/styleMock.js"
     ],
     "license": "Apache-2.0",
     "bin": {
