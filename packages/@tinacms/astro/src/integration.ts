@@ -48,11 +48,25 @@ export default function tina(
   return {
     name: '@tinacms/astro',
     hooks: {
-      'astro:config:setup': ({ addMiddleware, updateConfig }) => {
+      'astro:config:setup': ({
+        addMiddleware,
+        updateConfig,
+        command,
+        logger,
+      }) => {
         addMiddleware({
           entrypoint: '@tinacms/astro/middleware',
           order: middlewareOrder,
         });
+        const astroMajor = astroMajorVersion();
+        // Live dev content refresh needs Astro 6+ (see
+        // devContentInvalidationPlugin). On Astro 5 nothing handles the signal,
+        // so let editors know new entries won't appear without a manual restart.
+        if (command === 'dev' && astroMajor !== undefined && astroMajor < 6) {
+          logger.warn(
+            'Live content refresh in dev requires Astro 6 or newer. On Astro 5, newly created entries will not appear on the dev site until you restart the dev server. See https://github.com/tinacms/tinacms/issues/5611.'
+          );
+        }
         // Dev: serve the bridge straight from the package rather than writing
         // it into the user's source tree — config-time writes churn
         // public/admin on every `astro dev`/`astro build`, break on read-only
@@ -61,6 +75,7 @@ export default function tina(
           vite: {
             plugins: [
               bridgeDevPlugin(),
+              devContentInvalidationPlugin(astroMajor),
               cloudflareImportMetaUrlPlugin(() => isCloudflareAdapter),
             ],
           },
@@ -92,6 +107,55 @@ function resolveBridge(): string {
   return createRequire(import.meta.url).resolve('@tinacms/bridge');
 }
 
+/**
+ * Major version of the consumer's installed `astro`, or `undefined` if it can't
+ * be resolved. Used to scope the dev content-invalidation plugin to Astro 6+,
+ * the only majors where the `astro:content-changed` signal it emits is handled.
+ */
+function astroMajorVersion(): number | undefined {
+  try {
+    const pkg = createRequire(import.meta.url).resolve('astro/package.json');
+    const major = Number.parseInt(
+      JSON.parse(readFileSync(pkg, 'utf8')).version,
+      10
+    );
+    return Number.isNaN(major) ? undefined : major;
+  } catch {
+    return undefined;
+  }
+}
+
+/** Normalise separators so path prefix matching works on Windows too. */
+const toPosix = (p: string): string => p.replace(/\\/g, '/');
+
+/**
+ * Absolute, posix-normalised paths of the configured Tina collection content
+ * roots, read from the generated schema. `tinacms dev` writes this before it
+ * spawns the framework dev server, so it is on disk by the time this plugin's
+ * `configureServer` runs. Returns an empty list when the schema can't be read
+ * (e.g. running `astro dev` on its own), signalling the caller to fall back to
+ * a path heuristic.
+ */
+function readTinaCollectionRoots(root: string | undefined): string[] {
+  if (!root) return [];
+  for (const rel of [
+    'tina/__generated__/_schema.json',
+    '.tina/__generated__/_schema.json',
+  ]) {
+    try {
+      const schema = JSON.parse(readFileSync(join(root, rel), 'utf8'));
+      const roots: string[] = (schema?.collections ?? [])
+        .map((c: { path?: unknown }) => c?.path)
+        .filter((p: unknown): p is string => typeof p === 'string' && p !== '')
+        .map((p: string) => toPosix(join(root, p)));
+      if (roots.length) return roots;
+    } catch {
+      // Not generated yet or unreadable: try the next location, then fall back.
+    }
+  }
+  return [];
+}
+
 // Dev-only Vite plugin that answers `/admin/bridge.js` from the installed
 // bridge package. The bridge never varies per request, so a single readFile
 // per request is fine and nothing is persisted to disk.
@@ -116,6 +180,103 @@ function bridgeDevPlugin(): VitePlugin {
           res.end(`/* @tinacms/astro: bridge unavailable: ${error} */`);
         }
       });
+    },
+  };
+}
+
+/**
+ * Astro caches `getStaticPaths()` results in dev and only re-runs them for a
+ * change it recognises: a module in the graph, or a file in a watched
+ * content-layer collection. Content sourced through Tina's GraphQL client
+ * (a `getStaticPaths` that queries `client.queries.*`) is neither, so when the
+ * admin writes a new entry the route's path list stays stale and the
+ * freshly-created page 404s until the dev server is restarted by hand.
+ *
+ * This dev-only plugin watches the configured Tina collection paths (read from
+ * the generated schema, so it tracks content wherever a collection's `path`
+ * points) for files being added or removed, and emits the same
+ * `astro:content-changed` signal Astro fires for its own content layer, which
+ * clears the route cache so `getStaticPaths()` re-runs and the new path
+ * resolves, then reloads the open tab so it picks up the change.
+ *
+ * Scoped to Astro 6+: the listener that turns `astro:content-changed` into a
+ * route-cache clear only exists from Astro 6 on. On Astro 5 nothing handles the
+ * signal, so it does nothing useful while the paired full-reload would still
+ * churn the open tab. Hence a version gate rather than sniffing Vite's
+ * environment API, which is present in both Astro 5 and 6 and so can't tell them
+ * apart.
+ *
+ * See https://github.com/tinacms/tinacms/issues/5611.
+ */
+function devContentInvalidationPlugin(
+  astroMajor: number | undefined
+): VitePlugin {
+  // Content extensions Tina writes. The precise watch list comes from the
+  // collection roots in the generated schema; these patterns drive the fallback
+  // used when the schema isn't readable yet.
+  const CONTENT_EXT = /\.(?:md|mdx|markdown|mdoc|json|ya?ml|toml)$/i;
+  const MARKDOWN = /\.(?:md|mdx|markdown|mdoc)$/i;
+  const STRUCTURED = /\.(?:json|ya?ml|toml)$/i;
+  const IGNORED =
+    /[\\/](?:node_modules|\.git|\.astro|dist|\.vercel|\.netlify|\.cache)[\\/]/;
+
+  const isWithin = (file: string, dir: string): boolean => {
+    const f = toPosix(file);
+    const d = toPosix(dir).replace(/\/$/, '');
+    return f === d || f.startsWith(`${d}/`);
+  };
+
+  const isContentFile = (file: string, roots: string[]): boolean => {
+    if (IGNORED.test(file)) return false;
+    // Schema known: a content-formatted file under any configured collection
+    // root, regardless of whether that root is named `content`.
+    if (roots.length) {
+      return CONTENT_EXT.test(file) && roots.some((r) => isWithin(file, r));
+    }
+    // Fallback (schema not generated yet): markdown counts anywhere; structured
+    // data only inside a `content` dir, so a stray `package.json` / `tsconfig`
+    // write doesn't trigger a reload.
+    if (MARKDOWN.test(file)) return true;
+    return STRUCTURED.test(file) && /[\\/]content[\\/]/.test(file);
+  };
+
+  return {
+    name: '@tinacms/astro:dev-content-invalidation',
+    apply: 'serve',
+    configureServer(server) {
+      // The `astro:content-changed` signal below is only handled by Astro 6+.
+      // Bail on older (or unresolvable) majors so a no-op stays a no-op.
+      if (astroMajor === undefined || astroMajor < 6) return;
+      // Astro 6 routes HMR through Vite's per-environment hot channels.
+      // Defensive: if they're somehow absent, skip rather than guess.
+      const ssr = server.environments?.ssr;
+      const client = server.environments?.client;
+      if (!ssr?.hot || !client?.hot) return;
+
+      // Exact content roots from the Tina schema; empty when it isn't on disk
+      // yet, in which case isContentFile() falls back to a path heuristic.
+      const roots = readTinaCollectionRoots(server.config?.root);
+
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      const flush = () => {
+        ssr.hot.send('astro:content-changed', {});
+        client.hot.send({ type: 'full-reload', path: '*' });
+      };
+      const onChange = (file: string) => {
+        if (!isContentFile(file, roots)) return;
+        // Coalesce bursts (saving several documents fires many events) into a
+        // single reload.
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(flush, 50);
+      };
+      // Vite only watches files inside the Astro project root, so content kept
+      // in a separate repo (a `localContentPath` resolving outside the project)
+      // isn't seen here and won't auto-refresh the route cache in dev. That
+      // content is still indexed by `tinacms dev`'s own watcher; only this
+      // Astro-side refresh can't reach outside the project root, which matches
+      // the behaviour before this fix existed.
+      server.watcher.on('add', onChange);
+      server.watcher.on('unlink', onChange);
     },
   };
 }
