@@ -1,0 +1,9 @@
+while read -r local_ref local_sha remote_ref remote_sha; do
+  if [ "$remote_ref" = "refs/heads/main" ]; then
+    echo "Direct pushes to main are blocked. Open a pull request instead."
+    echo "Emergency override: git push --no-verify"
+    exit 1
+  fi
+done
+
+exit 0

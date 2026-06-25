@@ -37,6 +37,21 @@ pnpm run dev
 
 Now you should be able to navigate to http://localhost:3000 and see the starter project.
 
+## Git hooks
+
+This repo uses [Husky](https://typicode.github.io/husky) git hooks that install automatically on `pnpm install`:
+
+- **pre-commit** — scans staged changes for secrets with [gitleaks](https://github.com/gitleaks/gitleaks) and checks Biome formatting.
+- **pre-push** — blocks direct pushes to `main`.
+
+gitleaks is a separate binary you install once:
+
+```sh
+brew install gitleaks
+```
+
+In an emergency you can bypass a hook with `git commit --no-verify` or `git push --no-verify`.
+
 ## Reporting Bugs
 
 Before filing a new bug report:

@@ -1,0 +1,12 @@
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "gitleaks is not installed. Install it with: brew install gitleaks"
+  echo "See https://github.com/gitleaks/gitleaks for other install options."
+  exit 1
+fi
+
+gitleaks git --staged --redact --verbose
+
+if ! pnpm exec biome format --staged --no-errors-on-unmatched; then
+  echo "Formatting issues in staged files. Run 'pnpm format' to fix, then re-stage."
+  exit 1
+fi

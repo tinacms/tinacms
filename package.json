@@ -30,7 +30,8 @@
 		"publish:dev": "pnpm publish -r --tag dev --no-git-checks --access public",
 		"push-tags": "pnpm exec changeset tag && git pull && git push --follow-tags",
 		"lint": "biome lint ./packages ./examples",
-		"format": "biome format --write ./packages/ ./examples/"
+		"format": "biome format --write ./packages/ ./examples/",
+		"prepare": "husky"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "catalog:",
@@ -38,12 +39,13 @@
 		"@changesets/cli": "catalog:",
 		"@types/jest": "^29.5.14",
 		"@types/node": "^22.19.17",
-		"vitest": "^2.1.9",
 		"@types/picomatch": "catalog:",
+		"husky": "9.1.7",
 		"picomatch": "catalog:",
 		"turbo": "catalog:",
 		"typescript": "^5.7.3",
-		"vite": "^4.5.14"
+		"vite": "^4.5.14",
+		"vitest": "^2.1.9"
 	},
 	"packageManager": "pnpm@11.7.0",
 	"dependencies": {
