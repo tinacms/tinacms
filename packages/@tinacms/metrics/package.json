@@ -5,8 +5,7 @@
     "type": "module",
     "typings": "dist/index.d.ts",
     "files": [
-        "dist",
-        ".env"
+        "dist"
     ],
     "license": "Apache-2.0",
     "buildConfig": {

@@ -5,6 +5,16 @@ packages:
     - examples/*/*
     - e2e/*
     - playwright/*
+# Supply-chain cooldown: don't install registry releases newer than 1 day,
+# giving time to react to a compromised/yanked package. Our own packages are
+# excluded so freshly published @tinacms releases aren't blocked.
+minimumReleaseAge: 1440
+minimumReleaseAgeExclude:
+    - "@tinacms/*"
+    - tinacms
+    - tinacms-*
+    - create-tina-app
+    - next-tinacms-*
 overrides:
     "@clerk/clerk-js>react": 19.2.3
     "@clerk/clerk-js>react-dom": 19.2.3
