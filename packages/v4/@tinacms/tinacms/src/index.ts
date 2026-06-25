@@ -1,11 +1,19 @@
 // Universal entry — imported by client, server, and per-framework adapter code.
 // Must NOT import from ./react, ./client, ./server, or ./adapters.
 //
-// Intended exports (see ../../tinacmsv4/api/public-api.md):
-//   defineConfig, defineCollection, definePlugin
-//   t (schema helpers: string, number, boolean, datetime, object, list, reference)
-//   types: TinaConfig, PluginManifest, Capability, Permission, FieldAddress
-//
-// Implementation lives in ./core.
+// Config + schema authoring surface (ADR-024): definePlugin, the `t` schema
+// helpers, and the public contract types. Each field type contributes its own
+// `t.<type>` builder from its plugin; this entry is the composition root.
 
-export {};
+export {
+  type Capability,
+  definePlugin,
+  type PluginManifest,
+} from './core/plugin';
+export type {
+  CollectionSchema,
+  FieldSchema,
+  TinaDocument,
+} from './core/schema/types';
+export { corePlugins, t } from './plugins/fields';
+export type { StringFieldSchema } from './plugins/fields';
