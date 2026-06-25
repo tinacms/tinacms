@@ -12,8 +12,8 @@ import type {
   TinaField,
   TinaSchema,
 } from '@tinacms/schema-tools';
-import sha from 'js-sha1';
 import { set } from 'es-toolkit/compat';
+import sha from 'js-sha1';
 import { FilesystemBridge, TinaLevelClient } from '..';
 import { generatePasswordHash, mapUserFields } from '../auth/utils';
 import { NotFoundError } from '../error';
@@ -50,6 +50,7 @@ import {
   LevelProxy,
   type PutOp,
   SUBLEVEL_OPTIONS,
+  isTimestampedStore,
 } from './level';
 import {
   getTemplateForFile,
@@ -360,6 +361,29 @@ export class Database {
         await this.getSchema(this.contentLevel)
       );
     }
+  };
+
+  public getDocumentTimestamp = async (
+    filepath: string
+  ): Promise<number | null> => {
+    await this.initLevel();
+    const store = this.config.level;
+    if (!isTimestampedStore(store)) {
+      return null;
+    }
+    let level = this.contentLevel;
+    if (this.appLevel) {
+      const collection = await this.collectionForPath(filepath);
+      if (collection?.isDetached) {
+        level = this.appLevel.sublevel(collection.name, SUBLEVEL_OPTIONS);
+      }
+    }
+    const contentSublevel = level.sublevel<string, Record<string, any>>(
+      CONTENT_ROOT_PREFIX,
+      SUBLEVEL_OPTIONS
+    );
+    const levelKey = contentSublevel.prefixKey(normalizePath(filepath), 'utf8');
+    return store.getTimestamp(levelKey) ?? null;
   };
 
   public addPendingDocument = async (

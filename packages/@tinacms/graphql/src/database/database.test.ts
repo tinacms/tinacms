@@ -600,3 +600,40 @@ describe('Database.indexContent()', () => {
     expect(result.edges).toHaveLength(2);
   });
 });
+
+describe('Database.getDocumentTimestamp()', () => {
+  it('returns null when the store does not track write times', async () => {
+    const { database } = await setupDatabase();
+    await expect(
+      database.getDocumentTimestamp('content/posts/alpha.json')
+    ).resolves.toBeNull();
+  });
+
+  it('returns the store timestamp when the store implements getTimestamp', async () => {
+    class TimestampedMemoryLevel extends MemoryLevel<
+      string,
+      Record<string, any>
+    > {
+      getTimestamp(_key: string): number | undefined {
+        return 1700000000000;
+      }
+    }
+
+    const bridge = new InMemoryBridge();
+    for (const { path, data } of POSTS) {
+      bridge.seed(path, jsonDoc(data));
+    }
+    const level = new TimestampedMemoryLevel({ valueEncoding: 'json' });
+    const database = createDatabaseInternal({
+      bridge,
+      level,
+      tinaDirectory: 'tina',
+    });
+    const builtSchema = await buildSchema({ schema: testSchema });
+    await database.indexContent(builtSchema);
+
+    await expect(
+      database.getDocumentTimestamp('content/posts/alpha.json')
+    ).resolves.toBe(1700000000000);
+  });
+});

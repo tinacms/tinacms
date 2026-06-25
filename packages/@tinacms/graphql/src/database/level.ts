@@ -14,6 +14,16 @@ export type Level = AbstractLevel<
   Record<string, any>
 >;
 
+export interface TimestampedStore {
+  getTimestamp(key: string): number | undefined;
+}
+
+export const isTimestampedStore = (
+  store: object | undefined
+): store is TimestampedStore =>
+  !!store &&
+  typeof (store as Partial<TimestampedStore>).getTimestamp === 'function';
+
 export type PutOp = {
   type: 'put';
   key: string;

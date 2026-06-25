@@ -195,7 +195,8 @@ export const transformDocumentIntoPayload = async (
   tinaSchema: TinaSchema,
   config?: GraphQLConfig,
   isAudit?: boolean,
-  hasReferences?: boolean
+  hasReferences?: boolean,
+  lastUpdated?: number | null
 ) => {
   const collection = tinaSchema.getCollection(rawData._collection);
   try {
@@ -267,6 +268,10 @@ export const transformDocumentIntoPayload = async (
         breadcrumbs,
         collection,
         template: lastItem(template.namespace),
+        lastUpdated:
+          typeof lastUpdated === 'number'
+            ? new Date(lastUpdated).toISOString()
+            : null,
       },
       _values: data,
       _rawData: rawData,
@@ -400,12 +405,15 @@ export class Resolver {
         path: rawData['__folderPath'],
       };
     } else {
+      const lastUpdated = await this.database.getDocumentTimestamp(fullPath);
       return transformDocumentIntoPayload(
         fullPath,
         rawData,
         this.tinaSchema,
         this.config,
-        this.isAudit
+        this.isAudit,
+        undefined,
+        lastUpdated
       );
     }
   };
@@ -427,13 +435,15 @@ export class Resolver {
     const hasReferences = opts?.checkReferences
       ? await this.hasReferences(fullPath, opts.collection)
       : undefined;
+    const lastUpdated = await this.database.getDocumentTimestamp(fullPath);
     return transformDocumentIntoPayload(
       fullPath,
       rawData,
       this.tinaSchema,
       this.config,
       this.isAudit,
-      hasReferences
+      hasReferences,
+      lastUpdated
     );
   };
 

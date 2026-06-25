@@ -145,6 +145,11 @@ const scalarDefinitions = [
         type: astBuilder.TYPES.String,
       }),
       astBuilder.FieldDefinition({
+        name: 'lastUpdated',
+        required: false,
+        type: astBuilder.TYPES.String,
+      }),
+      astBuilder.FieldDefinition({
         name: 'collection',
         required: true,
         type: astBuilder.TYPES.Collection,

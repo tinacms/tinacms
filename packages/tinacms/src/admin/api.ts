@@ -211,6 +211,7 @@ export class TinaAdminApi {
                     relativePath
                     filename
                     extension
+                    lastUpdated
                     hasReferences
                   }
                 }
@@ -264,6 +265,7 @@ export class TinaAdminApi {
                     relativePath
                     filename
                     extension
+                    lastUpdated
                   }
                 }
               }

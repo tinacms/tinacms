@@ -22,6 +22,7 @@ export interface DocumentNode {
       filename: string;
       extension: string;
       title?: string;
+      lastUpdated?: string | null;
     };
   };
 }
