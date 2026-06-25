@@ -18,7 +18,10 @@ type ConfigSetupArg = Parameters<NonNullable<Hooks['astro:config:setup']>>[0];
 type ConfigDoneArg = Parameters<NonNullable<Hooks['astro:config:done']>>[0];
 type BuildDoneArg = Parameters<NonNullable<Hooks['astro:build:done']>>[0];
 
-function runConfigSetup(options?: Parameters<typeof tina>[0]) {
+function runConfigSetup(
+  options?: Parameters<typeof tina>[0],
+  extra?: { command?: 'dev' | 'build' | 'preview' }
+) {
   const addMiddleware = vi.fn();
   const updateConfig = vi.fn();
   const logger = { warn: vi.fn(), info: vi.fn() };
@@ -27,7 +30,12 @@ function runConfigSetup(options?: Parameters<typeof tina>[0]) {
     integration.hooks['astro:config:setup'] as NonNullable<
       Hooks['astro:config:setup']
     >
-  )({ addMiddleware, updateConfig, logger } as unknown as ConfigSetupArg);
+  )({
+    addMiddleware,
+    updateConfig,
+    logger,
+    command: extra?.command ?? 'dev',
+  } as unknown as ConfigSetupArg);
 
   const plugins: VitePlugin[] =
     updateConfig.mock.calls[0]?.[0]?.vite?.plugins ?? [];
@@ -402,6 +410,38 @@ describe('tina() integration - dev content invalidation plugin', () => {
       expect(Object.keys(handlers)).toHaveLength(0);
       expect(ssrSend).not.toHaveBeenCalled();
       expect(clientSend).not.toHaveBeenCalled();
+    } finally {
+      parse.mockRestore();
+    }
+  });
+
+  it('warns in dev that live refresh needs Astro 6+ when on Astro 5', () => {
+    const parse = vi
+      .spyOn(JSON, 'parse')
+      .mockReturnValue({ version: '5.18.1' });
+    try {
+      const { logger } = runConfigSetup();
+      expect(logger.warn).toHaveBeenCalledWith(
+        expect.stringContaining('Astro 6 or newer')
+      );
+    } finally {
+      parse.mockRestore();
+    }
+  });
+
+  it('does not warn on Astro 6, where live refresh works', () => {
+    // The installed Astro is 6.x, so the version gate passes and nothing warns.
+    const { logger } = runConfigSetup();
+    expect(logger.warn).not.toHaveBeenCalled();
+  });
+
+  it('does not warn outside dev (e.g. build) even on Astro 5', () => {
+    const parse = vi
+      .spyOn(JSON, 'parse')
+      .mockReturnValue({ version: '5.18.1' });
+    try {
+      const { logger } = runConfigSetup(undefined, { command: 'build' });
+      expect(logger.warn).not.toHaveBeenCalled();
     } finally {
       parse.mockRestore();
     }

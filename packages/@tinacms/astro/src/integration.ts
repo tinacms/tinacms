@@ -48,11 +48,25 @@ export default function tina(
   return {
     name: '@tinacms/astro',
     hooks: {
-      'astro:config:setup': ({ addMiddleware, updateConfig }) => {
+      'astro:config:setup': ({
+        addMiddleware,
+        updateConfig,
+        command,
+        logger,
+      }) => {
         addMiddleware({
           entrypoint: '@tinacms/astro/middleware',
           order: middlewareOrder,
         });
+        const astroMajor = astroMajorVersion();
+        // Live dev content refresh needs Astro 6+ (see
+        // devContentInvalidationPlugin). On Astro 5 nothing handles the signal,
+        // so let editors know new entries won't appear without a manual restart.
+        if (command === 'dev' && astroMajor !== undefined && astroMajor < 6) {
+          logger.warn(
+            'Live content refresh in dev requires Astro 6 or newer. On Astro 5, newly created entries will not appear on the dev site until you restart the dev server. See https://github.com/tinacms/tinacms/issues/5611.'
+          );
+        }
         // Dev: serve the bridge straight from the package rather than writing
         // it into the user's source tree — config-time writes churn
         // public/admin on every `astro dev`/`astro build`, break on read-only
@@ -61,7 +75,7 @@ export default function tina(
           vite: {
             plugins: [
               bridgeDevPlugin(),
-              devContentInvalidationPlugin(astroMajorVersion()),
+              devContentInvalidationPlugin(astroMajor),
               cloudflareImportMetaUrlPlugin(() => isCloudflareAdapter),
             ],
           },
