@@ -8,7 +8,7 @@ import {
 import { ELEMENT_MDX_INLINE } from '.';
 import { NestedForm } from '../../nested-form';
 import { classNames } from '../ui/helpers';
-import { EllipsisIcon } from '../ui/icons';
+import { EllipsisIcon } from '../../components/plate-ui/icons';
 import { useEmbedHandles, useHotkey } from '../../hooks/embed-hooks';
 import { useTemplates } from '../../editor-context';
 import {
