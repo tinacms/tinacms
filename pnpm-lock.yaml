@@ -1579,8 +1579,8 @@ importers:
         specifier: 'catalog:'
         version: 1.0.4
       date-fns:
-        specifier: ^2.30.0
-        version: 2.30.0
+        specifier: 4.1.0
+        version: 4.1.0
       es-toolkit:
         specifier: ^1.42.0
         version: 1.43.0

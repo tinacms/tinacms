@@ -3,7 +3,7 @@
 */
 
 import path from 'path';
-import isValid from 'date-fns/isValid/index.js';
+import { isValid } from 'date-fns';
 import { JSONPath } from 'jsonpath-plus';
 import { NAMER } from '../ast-builder';
 import { Database } from '../database';
