@@ -2393,9 +2393,6 @@ importers:
       moment:
         specifier: 'catalog:'
         version: 2.29.4
-      moment-timezone:
-        specifier: ^0.6.0
-        version: 0.6.0
       monaco-editor:
         specifier: 'catalog:'
         version: 0.31.0
@@ -2502,6 +2499,9 @@ importers:
       lowlight:
         specifier: 'catalog:'
         version: 3.3.0
+      moment-timezone:
+        specifier: ^0.6.0
+        version: 0.6.0
       next:
         specifier: 14.2.35
         version: 14.2.35(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.97.3)

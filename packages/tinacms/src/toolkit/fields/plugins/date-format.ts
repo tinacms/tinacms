@@ -1,4 +1,3 @@
-import moment from 'moment';
 import type { DatetimepickerProps } from 'react-datetime';
 
 export const DEFAULT_DATE_DISPLAY_FORMAT = 'MMM DD, YYYY';
