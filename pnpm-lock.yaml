@@ -495,9 +495,6 @@ catalogs:
     minimatch:
       specifier: ^5.1.6
       version: 5.1.6
-    moment:
-      specifier: 2.29.4
-      version: 2.29.4
     monaco-editor:
       specifier: 0.31.0
       version: 0.31.0
@@ -2387,9 +2384,6 @@ importers:
       mermaid:
         specifier: ^11.12.2
         version: 11.12.2
-      moment:
-        specifier: 'catalog:'
-        version: 2.29.4
       monaco-editor:
         specifier: 'catalog:'
         version: 0.31.0
@@ -2493,9 +2487,6 @@ importers:
       lowlight:
         specifier: 'catalog:'
         version: 3.3.0
-      moment-timezone:
-        specifier: ^0.6.0
-        version: 0.6.0
       next:
         specifier: 14.2.35
         version: 14.2.35(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.97.3)
@@ -12683,9 +12674,6 @@ packages:
   module-error@1.0.2:
     resolution: {integrity: sha512-0yuvsqSCv8LbaOKhnsQ/T5JhyFlCYLPXK3U2sgV10zoKQwzs/MyfuQUOZQ1V/6OCOJsK/TRgNVrPuPDqtdMFtA==}
     engines: {node: '>=10'}
-
-  moment-timezone@0.6.0:
-    resolution: {integrity: sha512-ldA5lRNm3iJCWZcBCab4pnNL3HSZYXVb/3TYr75/1WCTWYuTqYUb5f/S384pncYjJ88lbO8Z4uPDvmoluHJc8Q==}
 
   moment@2.29.4:
     resolution: {integrity: sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==}
@@ -29070,10 +29058,6 @@ snapshots:
       ufo: 1.6.3
 
   module-error@1.0.2: {}
-
-  moment-timezone@0.6.0:
-    dependencies:
-      moment: 2.29.4
 
   moment@2.29.4: {}
 
