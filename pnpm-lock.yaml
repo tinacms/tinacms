@@ -546,9 +546,6 @@ catalogs:
     react-colorful:
       specifier: ^5.6.1
       version: 5.6.1
-    react-datetime:
-      specifier: ^3.3.1
-      version: 3.3.1
     react-dnd:
       specifier: ^16.0.1
       version: 16.0.1
@@ -2408,9 +2405,6 @@ importers:
       react-colorful:
         specifier: 'catalog:'
         version: 5.6.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      react-datetime:
-        specifier: 'catalog:'
-        version: 3.3.1(moment@2.29.4)(react@18.3.1)
       react-day-picker:
         specifier: ^9.13.0
         version: 9.13.0(react@18.3.1)
@@ -13596,12 +13590,6 @@ packages:
     peerDependencies:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
-
-  react-datetime@3.3.1:
-    resolution: {integrity: sha512-CMgQFLGidYu6CAlY6S2Om2UZiTfZsjC6j4foXcZ0kb4cSmPomdJ2S1PhK0v3fwflGGVuVARGxwkEUWtccHapJA==}
-    peerDependencies:
-      moment: ^2.16.0
-      react: ^16.5.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   react-day-picker@9.13.0:
     resolution: {integrity: sha512-euzj5Hlq+lOHqI53NiuNhCP8HWgsPf/bBAVijR50hNaY1XwjKjShAnIe8jm8RD2W9IJUvihDIZ+KrmqfFzNhFQ==}
@@ -30129,12 +30117,6 @@ snapshots:
     dependencies:
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
-
-  react-datetime@3.3.1(moment@2.29.4)(react@18.3.1):
-    dependencies:
-      moment: 2.29.4
-      prop-types: 15.7.2
-      react: 18.3.1
 
   react-day-picker@9.13.0(react@18.3.1):
     dependencies:

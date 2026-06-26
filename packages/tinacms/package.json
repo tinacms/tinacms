@@ -112,7 +112,6 @@
     "prism-react-renderer": "catalog:",
     "prop-types": "catalog:",
     "react-colorful": "catalog:",
-    "react-datetime": "catalog:",
     "react-day-picker": "^9.13.0",
     "react-dnd": "catalog:",
     "react-dnd-html5-backend": "catalog:",
