@@ -28,8 +28,6 @@ import { formatDistanceToNow } from 'date-fns';
 import React, { useEffect, useState } from 'react';
 import {
   BiArrowBack,
-  BiChevronDown,
-  BiChevronUp,
   BiCopy,
   BiEdit,
   BiFile,
@@ -37,7 +35,6 @@ import {
   BiPlus,
   BiRename,
   BiSearch,
-  BiSortAlt2,
   BiTrash,
   BiX,
 } from 'react-icons/bi';
@@ -218,54 +215,6 @@ function getUniqueTemplateFields(collection: Collection<true>): TinaField[] {
   return [...fieldSet];
 }
 
-type TableSortColumn = 'name' | 'lastUpdated';
-type TableSort = { key: 'default' | TableSortColumn; order: 'asc' | 'desc' };
-
-type DocumentEdge = {
-  node: {
-    __typename: string;
-    _sys?: {
-      title?: string;
-      filename?: string;
-      lastUpdated?: string | null;
-    };
-  };
-};
-
-const applyTableSort = <T extends DocumentEdge>(
-  edges: T[],
-  sort: TableSort
-): T[] => {
-  if (sort.key === 'default') {
-    return edges;
-  }
-  const folders = edges.filter((e) => e.node.__typename === 'Folder');
-  const documents = edges.filter((e) => e.node.__typename !== 'Folder');
-  const direction = sort.order === 'asc' ? 1 : -1;
-  const sorted = [...documents].sort((a, b) => {
-    if (sort.key === 'lastUpdated') {
-      const aValue = a.node._sys?.lastUpdated;
-      const bValue = b.node._sys?.lastUpdated;
-      if (!aValue && !bValue) return 0;
-      if (!aValue) return 1;
-      if (!bValue) return -1;
-      return aValue.localeCompare(bValue) * direction;
-    }
-    const aName = (
-      a.node._sys?.title ||
-      a.node._sys?.filename ||
-      ''
-    ).toLowerCase();
-    const bName = (
-      b.node._sys?.title ||
-      b.node._sys?.filename ||
-      ''
-    ).toLowerCase();
-    return aName.localeCompare(bName) * direction;
-  });
-  return [...folders, ...sorted];
-};
-
 const CollectionListPage = () => {
   const navigate = useNavigate();
   const { collectionName } = useParams();
@@ -287,17 +236,6 @@ const CollectionListPage = () => {
   });
   const [endCursor, setEndCursor] = useState('');
   const [prevCursors, setPrevCursors] = useState([]);
-  const [tableSort, setTableSort] = useState<TableSort>({
-    key: 'default',
-    order: 'asc',
-  });
-
-  const toggleTableSort = (column: TableSortColumn) =>
-    setTableSort((prev) =>
-      prev.key === column
-        ? { key: column, order: prev.order === 'asc' ? 'desc' : 'asc' }
-        : { key: column, order: 'asc' }
-    );
   const [sortKey, setSortKey] = useState(
     // set sort key to cached value if it exists
     isSSR
@@ -361,24 +299,6 @@ const CollectionListPage = () => {
     'px-3 py-3 text-left text-xs font-bold text-gray-700 tracking-wider';
 
   const tableHeadingStyle = 'bg-gray-100 border-b-2 border-gray-200';
-
-  const renderSortIcon = (column: TableSortColumn) => {
-    if (tableSort.key !== column) {
-      return <BiSortAlt2 className='opacity-40' />;
-    }
-    return tableSort.order === 'asc' ? <BiChevronUp /> : <BiChevronDown />;
-  };
-
-  const sortableHeading = (label: string, column: TableSortColumn) => (
-    <button
-      type='button'
-      onClick={() => toggleTableSort(column)}
-      className='flex items-center gap-1 uppercase tracking-wider hover:text-gray-900'
-    >
-      {label}
-      {renderSortIcon(column)}
-    </button>
-  );
 
   return (
     <GetCMS>
@@ -452,14 +372,20 @@ const CollectionListPage = () => {
                 }
 
                 // get unique fields from all templates
-                const fields = (
-                  collectionExtra.templates?.length
+                const fields = [
+                  ...(collectionExtra.templates?.length
                     ? getUniqueTemplateFields(collectionExtra)
                     : collectionExtra.fields
-                ).filter((x) =>
-                  // only allow sortable fields
-                  ['string', 'number', 'datetime', 'boolean'].includes(x.type)
-                );
+                  ).filter((x) =>
+                    // only allow sortable fields
+                    ['string', 'number', 'datetime', 'boolean'].includes(x.type)
+                  ),
+                  {
+                    name: 'lastUpdated',
+                    label: 'Last Updated',
+                    type: 'datetime',
+                  } as TinaField<true>,
+                ];
 
                 const sortField = fields?.find(
                   (field) => field.name === sortName
@@ -947,12 +873,9 @@ const CollectionListPage = () => {
                                             className={tableHeadingCellStyle}
                                             colSpan={hasAnyTitles ? 1 : 2}
                                           >
-                                            {sortableHeading(
-                                              hasAnyTitles
-                                                ? 'Title'
-                                                : 'Filename',
-                                              'name'
-                                            )}
+                                            {hasAnyTitles
+                                              ? 'Title'
+                                              : 'Filename'}
                                           </th>
                                           {hasAnyTitles && (
                                             <th
@@ -968,10 +891,7 @@ const CollectionListPage = () => {
                                             Template
                                           </th>
                                           <th className={tableHeadingCellStyle}>
-                                            {sortableHeading(
-                                              'Last Updated',
-                                              'lastUpdated'
-                                            )}
+                                            Last Updated
                                           </th>
                                           <th>
                                             {/* Empty heading for options column */}
@@ -1007,10 +927,7 @@ const CollectionListPage = () => {
                                         </tr>
                                       ) : null}
                                       {documents.length > 0 &&
-                                        applyTableSort(
-                                          documents,
-                                          tableSort
-                                        ).map((document) => {
+                                        documents.map((document) => {
                                           if (
                                             document.node.__typename ===
                                             'Folder'

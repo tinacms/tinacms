@@ -29,6 +29,8 @@ import {
   FOLDER_ROOT,
   FolderTreeBuilder,
   type IndexDefinition,
+  LAST_UPDATED_FIELD,
+  LAST_UPDATED_SORT_KEY,
   REFS_COLLECTIONS_SORT_KEY,
   REFS_PATH_FIELD,
   REFS_REFERENCE_FIELD,
@@ -944,6 +946,15 @@ export class Database {
                   },
                 ],
               },
+              [LAST_UPDATED_SORT_KEY]: {
+                fields: [
+                  {
+                    name: LAST_UPDATED_FIELD,
+                    type: 'datetime',
+                    list: false,
+                  },
+                ],
+              },
             };
 
             let fields: TinaField<true>[] = [];
@@ -1694,6 +1705,11 @@ const _indexContent = async ({
       // if we aren't able to load the data, we can't index it
       if (!aliasedData) {
         return;
+      }
+
+      const lastUpdatedMs = await database.bridge.lastUpdated?.(filepath);
+      if (typeof lastUpdatedMs === 'number') {
+        aliasedData[LAST_UPDATED_FIELD] = new Date(lastUpdatedMs).toISOString();
       }
 
       if (passwordFields?.length) {

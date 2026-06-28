@@ -37,4 +37,5 @@ export interface Bridge {
    * operations in a separate path.
    */
   outputPath?: string;
+  lastUpdated?(filepath: string): Promise<number | null>;
 }

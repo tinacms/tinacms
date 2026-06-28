@@ -15,12 +15,12 @@
  * coerceFilterChainOperands() which throws on undefined.
  */
 
-import { beforeEach, describe, expect, it } from 'vitest';
-import { MemoryLevel } from 'memory-level';
-import { buildSchema, createDatabaseInternal } from '..';
-import type { Bridge } from './bridge';
 import type { Schema } from '@tinacms/schema-tools';
+import { MemoryLevel } from 'memory-level';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { buildSchema, createDatabaseInternal } from '..';
 import { atob } from '../util';
+import type { Bridge } from './bridge';
 
 // ─── InMemoryBridge ──────────────────────────────────────────────────────────
 
@@ -635,5 +635,68 @@ describe('Database.getDocumentTimestamp()', () => {
     await expect(
       database.getDocumentTimestamp('content/posts/alpha.json')
     ).resolves.toBe(1700000000000);
+  });
+});
+
+describe('Database lastUpdated materialization + sort', () => {
+  const TIMES: Record<string, number> = {
+    'content/posts/alpha.json': Date.parse('2026-01-01T00:00:00.000Z'),
+    'content/posts/beta.json': Date.parse('2026-03-01T00:00:00.000Z'),
+    'content/posts/gamma.json': Date.parse('2026-02-01T00:00:00.000Z'),
+    'content/posts/delta.json': Date.parse('2026-05-01T00:00:00.000Z'),
+    'content/posts/epsilon.json': Date.parse('2026-04-01T00:00:00.000Z'),
+  };
+
+  async function setup() {
+    class TimestampedBridge extends InMemoryBridge {
+      async lastUpdated(filepath: string): Promise<number | null> {
+        return TIMES[filepath] ?? null;
+      }
+    }
+    const bridge = new TimestampedBridge();
+    for (const { path, data } of POSTS) {
+      bridge.seed(path, jsonDoc(data));
+    }
+    const level = new MemoryLevel<string, Record<string, any>>({
+      valueEncoding: 'json',
+    });
+    const database = createDatabaseInternal({
+      bridge,
+      level,
+      tinaDirectory: 'tina',
+    });
+    const builtSchema = await buildSchema({ schema: testSchema });
+    await database.indexContent(builtSchema);
+    const hydrate = async (path: string, value: Record<string, any>) => ({
+      path,
+      ...value,
+    });
+    return { database, hydrate };
+  }
+
+  it('sorts by lastUpdated ascending (oldest first)', async () => {
+    const { database, hydrate } = await setup();
+    const result = await database.query(
+      { collection: 'post', sort: 'lastUpdated', filterChain: noFilter() },
+      hydrate
+    );
+    expect(result.edges.map((e) => (e.node as any).path)).toEqual([
+      'content/posts/alpha.json',
+      'content/posts/gamma.json',
+      'content/posts/beta.json',
+      'content/posts/epsilon.json',
+      'content/posts/delta.json',
+    ]);
+  });
+
+  it('materializes the bridge timestamp onto the stored record', async () => {
+    const { database, hydrate } = await setup();
+    const result = await database.query(
+      { collection: 'post', sort: 'lastUpdated', filterChain: noFilter() },
+      hydrate
+    );
+    expect((result.edges[0].node as any).__lastUpdated).toBe(
+      '2026-01-01T00:00:00.000Z'
+    );
   });
 });

@@ -25,6 +25,7 @@ import { GraphQLError } from 'graphql';
 import { generatePasswordHash } from '../auth/utils';
 import {
   FilterCondition,
+  LAST_UPDATED_FIELD,
   REFS_COLLECTIONS_SORT_KEY,
   REFS_PATH_FIELD,
   REFS_REFERENCE_FIELD,
@@ -191,7 +192,7 @@ export const resolveFieldData = async (
 
 export const transformDocumentIntoPayload = async (
   fullPath: string,
-  rawData: { _collection; _template },
+  rawData: { _collection; _template; [key: string]: unknown },
   tinaSchema: TinaSchema,
   config?: GraphQLConfig,
   isAudit?: boolean,
@@ -269,9 +270,10 @@ export const transformDocumentIntoPayload = async (
         collection,
         template: lastItem(template.namespace),
         lastUpdated:
-          typeof lastUpdated === 'number'
+          (rawData[LAST_UPDATED_FIELD] as string | undefined) ??
+          (typeof lastUpdated === 'number'
             ? new Date(lastUpdated).toISOString()
-            : null,
+            : null),
       },
       _values: data,
       _rawData: rawData,

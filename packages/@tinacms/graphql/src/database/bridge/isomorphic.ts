@@ -549,6 +549,25 @@ export class IsomorphicBridge implements Bridge {
     return Buffer.from(blob).toString('utf8');
   }
 
+  public async lastUpdated(filepath: string) {
+    assertWithinBase(filepath, this.relativePath);
+    const ref = await this.getRef();
+    try {
+      const commits = await git.log({
+        ...this.isomorphicConfig,
+        ref,
+        filepath: this.qualifyPath(filepath),
+        depth: 1,
+        force: true,
+        cache: this.cache,
+      });
+      const timestamp = commits[0]?.commit?.committer?.timestamp;
+      return typeof timestamp === 'number' ? timestamp * 1000 : null;
+    } catch {
+      return null;
+    }
+  }
+
   public async put(filepath: string, data: string) {
     assertWithinBase(filepath, this.relativePath);
     const ref = await this.getRef();

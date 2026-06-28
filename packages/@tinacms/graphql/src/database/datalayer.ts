@@ -2,8 +2,10 @@
 
 */
 
-import { JSONPath } from 'jsonpath-plus';
+import path from 'path';
+import type { Collection } from '@tinacms/schema-tools';
 import sha from 'js-sha1';
+import { JSONPath } from 'jsonpath-plus';
 import {
   ARRAY_ITEM_VALUE_SEPARATOR,
   BatchOp,
@@ -12,8 +14,6 @@ import {
   Level,
   SUBLEVEL_OPTIONS,
 } from './level';
-import type { Collection } from '@tinacms/schema-tools';
-import path from 'path';
 import { normalizePath } from './util';
 
 export enum OP {
@@ -68,6 +68,8 @@ type StringEscaper = <T extends string | string[]>(input: T) => T;
 
 export const DEFAULT_COLLECTION_SORT_KEY = '__filepath__';
 export const REFS_COLLECTIONS_SORT_KEY = '__refs__';
+export const LAST_UPDATED_SORT_KEY = 'lastUpdated';
+export const LAST_UPDATED_FIELD = '__lastUpdated';
 export const REFS_REFERENCE_FIELD = '__tina_ref__';
 export const REFS_PATH_FIELD = '__tina_ref_path__';
 export const DEFAULT_NUMERIC_LPAD = 4;

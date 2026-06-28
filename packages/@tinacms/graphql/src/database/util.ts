@@ -93,6 +93,7 @@ export const stringifyFile = (
     _template,
     _collection,
     $_body,
+    __lastUpdated,
     ...rest
   } = content as {
     _relativePath: string;
@@ -101,6 +102,7 @@ export const stringifyFile = (
     _template: string;
     _collection: string;
     $_body: string;
+    __lastUpdated: string;
   };
   const extra: { [key: string]: string } = {};
   if (keepTemplateKey) {

@@ -168,6 +168,17 @@ export class FilesystemBridge implements Bridge {
     return (await fs.readFile(resolved)).toString();
   }
 
+  public async lastUpdated(filepath: string) {
+    const resolved = assertWithinBase(filepath, this.baseFor(filepath));
+    this.assertGeneratedSubtree(filepath, resolved);
+    try {
+      const stat = await fs.stat(resolved);
+      return stat.mtimeMs;
+    } catch {
+      return null;
+    }
+  }
+
   public async put(filepath: string, data: string, basePathOverride?: string) {
     const basePath = basePathOverride || this.baseFor(filepath);
     const resolved = assertWithinBase(filepath, basePath);
