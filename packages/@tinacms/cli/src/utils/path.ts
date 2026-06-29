@@ -36,9 +36,8 @@
  * boundary. When `assertPathWithinBase` is imported from this file into a
  * route handler, CodeQL sometimes can't follow the sanitisation across the
  * module boundary and still flags the call site. For this reason, the media
- * model files (`cli/src/server/models/media.ts` and
- * `cli/src/next/commands/dev-command/server/media.ts`) inline their own
- * copies (`resolveWithinBase` / `resolveStrictlyWithinBase`). **If you
+ * model file (`cli/src/next/commands/dev-command/server/media.ts`) inlines its
+ * own copies (`resolveWithinBase` / `resolveStrictlyWithinBase`). **If you
  * change the validation logic here, you must update those copies too.**
  *
  * ## Choosing the right helper
