@@ -28,6 +28,8 @@ import { formatDistanceToNow } from 'date-fns';
 import React, { useEffect, useState } from 'react';
 import {
   BiArrowBack,
+  BiChevronDown,
+  BiChevronUp,
   BiCopy,
   BiEdit,
   BiFile,
@@ -35,6 +37,7 @@ import {
   BiPlus,
   BiRename,
   BiSearch,
+  BiSortAlt2,
   BiTrash,
   BiX,
 } from 'react-icons/bi';
@@ -251,6 +254,48 @@ const CollectionListPage = () => {
 
   const { order = 'asc', name: sortName } = JSON.parse(sortKey || '{}');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(order);
+
+  const applyServerSort = (name: string, nextOrder: 'asc' | 'desc') => {
+    const value = JSON.stringify({ name, order: nextOrder });
+    captureEvent(CollectionListPageSortEvent, {
+      sortKey: value,
+      collectionName,
+    });
+    setEndCursor('');
+    setPrevCursors([]);
+    window?.localStorage.setItem(
+      `${LOCAL_STORAGE_KEY}.${collectionName}`,
+      value
+    );
+    setSortKey(value);
+    setSortOrder(nextOrder);
+  };
+
+  const toggleColumnSort = (name: string) =>
+    applyServerSort(
+      name,
+      sortName === name && sortOrder === 'asc' ? 'desc' : 'asc'
+    );
+
+  const sortableHeader = (label: string, name: string) => (
+    <button
+      type='button'
+      onClick={() => toggleColumnSort(name)}
+      className='flex items-center gap-1 uppercase tracking-wider hover:text-gray-900'
+    >
+      {label}
+      {sortName === name ? (
+        sortOrder === 'asc' ? (
+          <BiChevronUp />
+        ) : (
+          <BiChevronDown />
+        )
+      ) : (
+        <BiSortAlt2 className='opacity-40' />
+      )}
+    </button>
+  );
+
   const loc = useLocation();
   const folder = useCollectionFolder();
   useEffect(() => {
@@ -661,24 +706,10 @@ const CollectionListPage = () => {
                                         name: 'sort',
                                         value: sortKey,
                                         onChange: (e) => {
-                                          captureEvent(
-                                            CollectionListPageSortEvent,
-                                            {
-                                              sortKey: e.target.value,
-                                              collectionName: collectionName,
-                                            }
-                                          );
                                           const val = JSON.parse(
                                             e.target.value
                                           );
-                                          setEndCursor('');
-                                          setPrevCursors([]);
-                                          window?.localStorage.setItem(
-                                            `${LOCAL_STORAGE_KEY}.${collectionName}`,
-                                            e.target.value
-                                          );
-                                          setSortKey(e.target.value);
-                                          setSortOrder(val.order);
+                                          applyServerSort(val.name, val.order);
                                         },
                                       }}
                                     />
@@ -873,9 +904,12 @@ const CollectionListPage = () => {
                                             className={tableHeadingCellStyle}
                                             colSpan={hasAnyTitles ? 1 : 2}
                                           >
-                                            {hasAnyTitles
-                                              ? 'Title'
-                                              : 'Filename'}
+                                            {sortableHeader(
+                                              hasAnyTitles
+                                                ? 'Title'
+                                                : 'Filename',
+                                              hasAnyTitles ? 'title' : ''
+                                            )}
                                           </th>
                                           {hasAnyTitles && (
                                             <th
@@ -891,7 +925,10 @@ const CollectionListPage = () => {
                                             Template
                                           </th>
                                           <th className={tableHeadingCellStyle}>
-                                            Last Updated
+                                            {sortableHeader(
+                                              'Last Updated',
+                                              'lastUpdated'
+                                            )}
                                           </th>
                                           <th>
                                             {/* Empty heading for options column */}
