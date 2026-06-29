@@ -38,6 +38,8 @@
 		"@changesets/cli": "catalog:",
 		"@types/jest": "^29.5.14",
 		"@types/node": "^22.19.17",
+		"@types/react": "18.3.27",
+		"@types/react-dom": "18.3.7",
 		"vitest": "^2.1.9",
 		"@types/picomatch": "catalog:",
 		"picomatch": "catalog:",
