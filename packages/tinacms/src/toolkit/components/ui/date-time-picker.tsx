@@ -8,9 +8,9 @@ import {
 } from 'lucide-react';
 import { Input } from './input';
 import { Popover, PopoverContent, PopoverTrigger } from './popover';
-import moment from 'moment';
-import 'moment-timezone';
+import { format as formatDate } from 'date-fns';
 import { enUS, Locale as DateFnsLocale } from 'date-fns/locale';
+import { momentToDateFns } from './moment-format';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Clock } from 'lucide-react';
 import * as React from 'react';
@@ -935,8 +935,7 @@ const DateTimePicker = React.forwardRef<
 DateTimePicker.displayName = 'DateTimePicker';
 
 const format = (date: Date, format: string) => {
-  const m = moment(date);
-  return m.format(format);
+  return formatDate(date, momentToDateFns(format));
 };
 
 export { DateTimePicker, TimePickerInput, TimePicker, formatCurrentDate };
