@@ -2,11 +2,13 @@
 // Imported by plugin client segments.
 // Must NOT import from ./server or ./adapters/*.
 //
-// Intended exports (see ../../../tinacmsv4/api/internal-apis.md#client-segment):
-//   defineClientPlugin   — declare slice/components/field for a plugin's client segment
-//   server               — typed Capability RPC Proxy (client → server)
-//
-// The `server` proxy's types are inferred via `import type` from each plugin's
-// server segment exports; no codegen step. See ADR-007.
+// `defineClientPlugin` declares a plugin's client segment — the field descriptor
+// it owns (ADR-009). The `server` RPC proxy (ADR-007) lands with server segments.
 
-export {};
+import type { ClientSegment } from '../core/plugin';
+
+export type { FieldDescriptor } from '../core/field/contract';
+export type { ClientSegment };
+
+export const defineClientPlugin = (segment: ClientSegment): ClientSegment =>
+  segment;
