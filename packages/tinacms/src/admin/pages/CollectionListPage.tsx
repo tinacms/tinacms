@@ -59,7 +59,10 @@ import {
 import { captureEvent } from '../../lib/posthog/posthogProvider';
 import type { TinaAdminApi } from '../api';
 import GetCMS from '../components/GetCMS';
-import GetCollection, { SYSTEM_SORT_KEYS } from '../components/GetCollection';
+import GetCollection, {
+  FILENAME_SORT_KEY,
+  SYSTEM_SORT_KEYS,
+} from '../components/GetCollection';
 import LoadingPage from '../components/LoadingPage';
 import { PageBody, PageHeader, PageWrapper } from '../components/Page';
 import {
@@ -902,6 +905,10 @@ const CollectionListPage = () => {
                                     doc.node.__typename !== 'Folder' &&
                                     Boolean(doc.node._sys?.title)
                                 );
+                                const titleFieldName =
+                                  cms.api.tina.schema.getIsTitleFieldName(
+                                    collectionName
+                                  ) || FILENAME_SORT_KEY;
 
                                 return (
                                   <>
@@ -916,14 +923,19 @@ const CollectionListPage = () => {
                                               hasAnyTitles
                                                 ? 'Title'
                                                 : 'Filename',
-                                              hasAnyTitles ? 'title' : ''
+                                              hasAnyTitles
+                                                ? titleFieldName
+                                                : FILENAME_SORT_KEY
                                             )}
                                           </th>
                                           {hasAnyTitles && (
                                             <th
                                               className={tableHeadingCellStyle}
                                             >
-                                              Filename
+                                              {sortableHeader(
+                                                'Filename',
+                                                FILENAME_SORT_KEY
+                                              )}
                                             </th>
                                           )}
                                           <th className={tableHeadingCellStyle}>

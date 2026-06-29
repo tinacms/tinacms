@@ -12,7 +12,8 @@ import { handleNavigate } from '../pages/CollectionListPage';
 import type { CollectionResponse, DocumentForm } from '../types';
 import { FullscreenError } from './FullscreenError';
 
-export const SYSTEM_SORT_KEYS = ['lastUpdated'];
+export const FILENAME_SORT_KEY = '__filepath__';
+export const SYSTEM_SORT_KEYS = ['lastUpdated', FILENAME_SORT_KEY];
 
 const isValidSortKey = (sortKey: string, collection: Collection<true>) => {
   if (SYSTEM_SORT_KEYS.includes(sortKey)) {
