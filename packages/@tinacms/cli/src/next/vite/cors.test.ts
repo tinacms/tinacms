@@ -150,7 +150,9 @@ describe('isOriginAllowed', () => {
   });
 
   it('honors the "private" keyword', () => {
-    expect(isOriginAllowed('http://192.168.1.100:3000', ['private'])).toBe(true);
+    expect(isOriginAllowed('http://192.168.1.100:3000', ['private'])).toBe(
+      true
+    );
     expect(isOriginAllowed('http://8.8.8.8:3000', ['private'])).toBe(false);
   });
 
