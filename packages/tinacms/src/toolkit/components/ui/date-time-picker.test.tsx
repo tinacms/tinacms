@@ -1,4 +1,5 @@
 import moment from 'moment';
+import 'moment-timezone';
 import { formatCurrentDate } from './date-time-picker';
 
 beforeAll(() => {

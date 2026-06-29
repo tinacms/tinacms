@@ -9,7 +9,6 @@ import {
 import { Input } from './input';
 import { Popover, PopoverContent, PopoverTrigger } from './popover';
 import moment from 'moment';
-import 'moment-timezone';
 import { enUS, Locale as DateFnsLocale } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Clock } from 'lucide-react';
