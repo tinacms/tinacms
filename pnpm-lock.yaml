@@ -683,6 +683,12 @@ importers:
       '@types/picomatch':
         specifier: 'catalog:'
         version: 3.0.2
+      '@types/react':
+        specifier: 18.3.27
+        version: 18.3.27
+      '@types/react-dom':
+        specifier: 18.3.7
+        version: 18.3.7(@types/react@18.3.27)
       picomatch:
         specifier: 'catalog:'
         version: 4.0.3
@@ -2568,7 +2574,7 @@ importers:
         version: 0.31.3(react@19.2.3)
       '@clerk/clerk-js':
         specifier: 'catalog:'
-        version: 4.56.2(@babel/core@7.29.7)(react-dom@19.2.7(react@19.2.7))(react@19.2.3)
+        version: 4.56.2(@babel/core@7.29.7)(@types/react@18.3.27)(react-dom@19.2.7(react@19.2.7))(react@19.2.3)
       '@tinacms/scripts':
         specifier: workspace:*
         version: link:../@tinacms/scripts
@@ -18242,13 +18248,13 @@ snapshots:
     transitivePeerDependencies:
       - react
 
-  '@clerk/clerk-js@4.56.2(@babel/core@7.29.7)(react-dom@19.2.7(react@19.2.7))(react@19.2.3)':
+  '@clerk/clerk-js@4.56.2(@babel/core@7.29.7)(@types/react@18.3.27)(react-dom@19.2.7(react@19.2.7))(react@19.2.3)':
     dependencies:
       '@clerk/localizations': 1.28.10(react@19.2.3)
       '@clerk/shared': 0.22.1(react@19.2.3)
       '@clerk/types': 3.65.5
       '@emotion/cache': 11.10.5
-      '@emotion/react': 11.10.5(@babel/core@7.29.7)(react@19.2.3)
+      '@emotion/react': 11.10.5(@babel/core@7.29.7)(@types/react@18.3.27)(react@19.2.3)
       '@floating-ui/react': 0.19.0(react-dom@19.2.7(react@19.2.7))(react@19.2.3)
       '@zxcvbn-ts/core': 2.2.1
       '@zxcvbn-ts/language-common': 3.0.2
@@ -18426,7 +18432,7 @@ snapshots:
 
   '@emotion/memoize@0.9.0': {}
 
-  '@emotion/react@11.10.5(@babel/core@7.29.7)(react@19.2.3)':
+  '@emotion/react@11.10.5(@babel/core@7.29.7)(@types/react@18.3.27)(react@19.2.3)':
     dependencies:
       '@babel/runtime': 7.28.6
       '@emotion/babel-plugin': 11.13.5
@@ -18439,6 +18445,7 @@ snapshots:
       react: 19.2.3
     optionalDependencies:
       '@babel/core': 7.29.7
+      '@types/react': 18.3.27
     transitivePeerDependencies:
       - supports-color
 
