@@ -12,7 +12,7 @@ import { handleNavigate } from '../pages/CollectionListPage';
 import type { CollectionResponse, DocumentForm } from '../types';
 import { FullscreenError } from './FullscreenError';
 
-const SYSTEM_SORT_KEYS = ['lastUpdated'];
+export const SYSTEM_SORT_KEYS = ['lastUpdated'];
 
 const isValidSortKey = (sortKey: string, collection: Collection<true>) => {
   if (SYSTEM_SORT_KEYS.includes(sortKey)) {

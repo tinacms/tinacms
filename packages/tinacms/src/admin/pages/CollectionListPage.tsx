@@ -59,7 +59,7 @@ import {
 import { captureEvent } from '../../lib/posthog/posthogProvider';
 import type { TinaAdminApi } from '../api';
 import GetCMS from '../components/GetCMS';
-import GetCollection from '../components/GetCollection';
+import GetCollection, { SYSTEM_SORT_KEYS } from '../components/GetCollection';
 import LoadingPage from '../components/LoadingPage';
 import { PageBody, PageHeader, PageWrapper } from '../components/Page';
 import {
@@ -874,15 +874,17 @@ const CollectionListPage = () => {
                     </PageHeader>
                     <PageBody>
                       <div className='w-full mx-auto max-w-screen-xl'>
-                        {sortField && !sortField.required && (
-                          <p className='mb-4 text-gray-500'>
-                            <em>
-                              Sorting on a non-required field. Some documents
-                              may be excluded (if they don't have a value for{' '}
-                              {sortName})
-                            </em>
-                          </p>
-                        )}
+                        {sortField &&
+                          !sortField.required &&
+                          !SYSTEM_SORT_KEYS.includes(sortName) && (
+                            <p className='mb-4 text-gray-500'>
+                              <em>
+                                Sorting on a non-required field. Some documents
+                                may be excluded (if they don't have a value for{' '}
+                                {sortName})
+                              </em>
+                            </p>
+                          )}
                         <div className='w-full overflow-x-auto shadow-md rounded-md'>
                           {((folder.name && !search) ||
                             documents.length > 0) && (
