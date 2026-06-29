@@ -964,7 +964,7 @@ const CollectionListPage = () => {
                                           </th>
                                           <th
                                             className={tableHeadingCellStyle}
-                                            colSpan={4}
+                                            colSpan={5}
                                           >
                                             Path
                                           </th>
