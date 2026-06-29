@@ -431,6 +431,11 @@ export class Database {
       }
     }
 
+    const lastUpdatedMs = await this.bridge?.lastUpdated?.(normalizedPath);
+    if (typeof lastUpdatedMs === 'number') {
+      dataFields[LAST_UPDATED_FIELD] = new Date(lastUpdatedMs).toISOString();
+    }
+
     let level = this.contentLevel;
     if (collection?.isDetached) {
       level = this.appLevel.sublevel(collection.name, SUBLEVEL_OPTIONS);
@@ -605,6 +610,13 @@ export class Database {
               e
             );
           }
+        }
+
+        const lastUpdatedMs = await this.bridge?.lastUpdated?.(normalizedPath);
+        if (typeof lastUpdatedMs === 'number') {
+          dataFields[LAST_UPDATED_FIELD] = new Date(
+            lastUpdatedMs
+          ).toISOString();
         }
 
         const folderTreeBuilder = new FolderTreeBuilder();
