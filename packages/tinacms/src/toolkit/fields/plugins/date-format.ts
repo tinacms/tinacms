@@ -1,4 +1,13 @@
-import type { DatetimepickerProps } from 'react-datetime';
+export interface DateFieldProps {
+  dateFormat?: string | boolean;
+  timeFormat?: string | boolean;
+  locale?: string;
+  experimental_focusIntent?: boolean;
+  onChange?: (value: unknown) => void;
+  required?: boolean;
+  // tolerate additional field-config props passed through to the picker
+  [key: string]: unknown;
+}
 
 export const DEFAULT_DATE_DISPLAY_FORMAT = 'MMM DD, YYYY';
 export const DEFAULT_TIME_DISPLAY_FORMAT = 'h:mm A';
@@ -7,7 +16,7 @@ export const DEFAULT_TIME_DISPLAY_FORMAT = 'h:mm A';
 export const format = (
   val: string,
   _name: string,
-  field: DatetimepickerProps
+  field: DateFieldProps
 ): string => {
   if (!val) return val;
   return new Date(val).toISOString();

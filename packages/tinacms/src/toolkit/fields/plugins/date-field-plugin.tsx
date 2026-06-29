@@ -1,9 +1,8 @@
 import React, { useCallback } from 'react';
 import { type InputProps } from '../components';
 import { wrapFieldsWithMeta } from './wrap-field-with-meta';
-// we might be able to go back to react-datetime when https://github.com/arqex/react-datetime/pull/813 is merged
-import type { DatetimepickerProps } from 'react-datetime';
 import {
+  type DateFieldProps,
   format,
   parse,
   DEFAULT_DATE_DISPLAY_FORMAT,
@@ -14,7 +13,7 @@ import {
 import { DateTimePicker } from '../../components/ui/date-time-picker';
 import { DayPickerLocale } from 'react-day-picker';
 
-export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
+export const DateField = wrapFieldsWithMeta<InputProps, DateFieldProps>(
   ({
     input,
     field: { dateFormat, timeFormat, onChange, required, ...rest },

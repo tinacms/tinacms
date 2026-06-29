@@ -1,15 +1,9 @@
-import moment from 'moment';
-import 'moment-timezone';
 import { formatCurrentDate } from './date-time-picker';
-
-beforeAll(() => {
-  moment.tz.setDefault('UTC');
-});
 
 describe('formatCurrentDate', () => {
   it('formats date with default formats', () => {
     const formatted = formatCurrentDate({
-      displayDate: new Date('2024-06-15T12:00:00Z'),
+      displayDate: new Date(2024, 5, 15, 12, 0, 0),
       dateFormat: 'MMMM DD YYYY',
       timeFormat: 'hh:mm A',
     });
@@ -17,14 +11,14 @@ describe('formatCurrentDate', () => {
   });
   it('formats date with date only', () => {
     const formatted = formatCurrentDate({
-      displayDate: new Date('2024-06-15T12:00:00Z'),
+      displayDate: new Date(2024, 5, 15, 12, 0, 0),
       dateFormat: 'MMMM DD YYYY',
     });
     expect(formatted).toBe('June 15 2024');
   });
   it('formats 24 hour time', () => {
     const formatted = formatCurrentDate({
-      displayDate: new Date('2024-06-15T23:00:00Z'),
+      displayDate: new Date(2024, 5, 15, 23, 0, 0),
       dateFormat: 'MMMM DD YYYY',
       timeFormat: 'HH',
     });

@@ -495,9 +495,6 @@ catalogs:
     minimatch:
       specifier: ^5.1.6
       version: 5.1.6
-    moment:
-      specifier: 2.29.4
-      version: 2.29.4
     monaco-editor:
       specifier: 0.31.0
       version: 0.31.0
@@ -546,9 +543,6 @@ catalogs:
     react-colorful:
       specifier: ^5.6.1
       version: 5.6.1
-    react-datetime:
-      specifier: ^3.3.1
-      version: 3.3.1
     react-dnd:
       specifier: ^16.0.1
       version: 16.0.1
@@ -1585,8 +1579,8 @@ importers:
         specifier: 'catalog:'
         version: 1.0.4
       date-fns:
-        specifier: ^2.30.0
-        version: 2.30.0
+        specifier: 4.1.0
+        version: 4.1.0
       es-toolkit:
         specifier: ^1.42.0
         version: 1.43.0
@@ -2396,9 +2390,6 @@ importers:
       mermaid:
         specifier: ^11.12.2
         version: 11.12.2
-      moment:
-        specifier: 'catalog:'
-        version: 2.29.4
       monaco-editor:
         specifier: 'catalog:'
         version: 0.31.0
@@ -2414,9 +2405,6 @@ importers:
       react-colorful:
         specifier: 'catalog:'
         version: 5.6.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      react-datetime:
-        specifier: 'catalog:'
-        version: 3.3.1(moment@2.29.4)(react@18.3.1)
       react-day-picker:
         specifier: ^9.13.0
         version: 9.13.0(react@18.3.1)
@@ -2505,9 +2493,6 @@ importers:
       lowlight:
         specifier: 'catalog:'
         version: 3.3.0
-      moment-timezone:
-        specifier: ^0.6.0
-        version: 0.6.0
       next:
         specifier: 14.2.35
         version: 14.2.35(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.97.3)
@@ -12767,9 +12752,6 @@ packages:
     resolution: {integrity: sha512-0yuvsqSCv8LbaOKhnsQ/T5JhyFlCYLPXK3U2sgV10zoKQwzs/MyfuQUOZQ1V/6OCOJsK/TRgNVrPuPDqtdMFtA==}
     engines: {node: '>=10'}
 
-  moment-timezone@0.6.0:
-    resolution: {integrity: sha512-ldA5lRNm3iJCWZcBCab4pnNL3HSZYXVb/3TYr75/1WCTWYuTqYUb5f/S384pncYjJ88lbO8Z4uPDvmoluHJc8Q==}
-
   moment@2.29.4:
     resolution: {integrity: sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==}
 
@@ -13673,12 +13655,6 @@ packages:
     peerDependencies:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
-
-  react-datetime@3.3.1:
-    resolution: {integrity: sha512-CMgQFLGidYu6CAlY6S2Om2UZiTfZsjC6j4foXcZ0kb4cSmPomdJ2S1PhK0v3fwflGGVuVARGxwkEUWtccHapJA==}
-    peerDependencies:
-      moment: ^2.16.0
-      react: ^16.5.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   react-day-picker@9.13.0:
     resolution: {integrity: sha512-euzj5Hlq+lOHqI53NiuNhCP8HWgsPf/bBAVijR50hNaY1XwjKjShAnIe8jm8RD2W9IJUvihDIZ+KrmqfFzNhFQ==}
@@ -29208,10 +29184,6 @@ snapshots:
 
   module-error@1.0.2: {}
 
-  moment-timezone@0.6.0:
-    dependencies:
-      moment: 2.29.4
-
   moment@2.29.4: {}
 
   monaco-editor@0.31.0: {}
@@ -30254,12 +30226,6 @@ snapshots:
     dependencies:
       react: 19.2.3
       react-dom: 19.2.7(react@19.2.7)
-
-  react-datetime@3.3.1(moment@2.29.4)(react@18.3.1):
-    dependencies:
-      moment: 2.29.4
-      prop-types: 15.7.2
-      react: 18.3.1
 
   react-day-picker@9.13.0(react@18.3.1):
     dependencies:
