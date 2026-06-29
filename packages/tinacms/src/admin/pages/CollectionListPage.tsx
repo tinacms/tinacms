@@ -281,7 +281,7 @@ const CollectionListPage = () => {
     <button
       type='button'
       onClick={() => toggleColumnSort(name)}
-      className='flex items-center gap-1 uppercase tracking-wider hover:text-gray-900'
+      className='flex items-center gap-1 hover:text-gray-900'
     >
       {label}
       {sortName === name ? (
