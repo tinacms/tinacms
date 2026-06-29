@@ -417,20 +417,26 @@ const CollectionListPage = () => {
                 }
 
                 // get unique fields from all templates
-                const fields = [
-                  ...(collectionExtra.templates?.length
+                const sortableFields = (
+                  collectionExtra.templates?.length
                     ? getUniqueTemplateFields(collectionExtra)
                     : collectionExtra.fields
-                  ).filter((x) =>
-                    // only allow sortable fields
-                    ['string', 'number', 'datetime', 'boolean'].includes(x.type)
-                  ),
-                  {
-                    name: 'lastUpdated',
-                    label: 'Last Updated',
-                    type: 'datetime',
-                  } as TinaField<true>,
-                ];
+                ).filter((x) =>
+                  // only allow sortable fields
+                  ['string', 'number', 'datetime', 'boolean'].includes(x.type)
+                );
+                const fields = sortableFields.some(
+                  (f) => f.name === 'lastUpdated'
+                )
+                  ? sortableFields
+                  : [
+                      ...sortableFields,
+                      {
+                        name: 'lastUpdated',
+                        label: 'Last Updated',
+                        type: 'datetime',
+                      } as TinaField<true>,
+                    ];
 
                 const sortField = fields?.find(
                   (field) => field.name === sortName
