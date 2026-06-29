@@ -30,6 +30,7 @@ import {
   FolderTreeBuilder,
   type IndexDefinition,
   LAST_UPDATED_FIELD,
+  LAST_UPDATED_SENTINEL,
   LAST_UPDATED_SORT_KEY,
   REFS_COLLECTIONS_SORT_KEY,
   REFS_PATH_FIELD,
@@ -432,9 +433,10 @@ export class Database {
     }
 
     const lastUpdatedMs = await this.bridge?.lastUpdated?.(normalizedPath);
-    if (typeof lastUpdatedMs === 'number') {
-      dataFields[LAST_UPDATED_FIELD] = new Date(lastUpdatedMs).toISOString();
-    }
+    dataFields[LAST_UPDATED_FIELD] =
+      typeof lastUpdatedMs === 'number'
+        ? new Date(lastUpdatedMs).toISOString()
+        : LAST_UPDATED_SENTINEL;
 
     let level = this.contentLevel;
     if (collection?.isDetached) {
@@ -613,11 +615,10 @@ export class Database {
         }
 
         const lastUpdatedMs = await this.bridge?.lastUpdated?.(normalizedPath);
-        if (typeof lastUpdatedMs === 'number') {
-          dataFields[LAST_UPDATED_FIELD] = new Date(
-            lastUpdatedMs
-          ).toISOString();
-        }
+        dataFields[LAST_UPDATED_FIELD] =
+          typeof lastUpdatedMs === 'number'
+            ? new Date(lastUpdatedMs).toISOString()
+            : LAST_UPDATED_SENTINEL;
 
         const folderTreeBuilder = new FolderTreeBuilder();
         const folderKey = folderTreeBuilder.update(
@@ -1720,9 +1721,10 @@ const _indexContent = async ({
       }
 
       const lastUpdatedMs = await database.bridge.lastUpdated?.(filepath);
-      if (typeof lastUpdatedMs === 'number') {
-        aliasedData[LAST_UPDATED_FIELD] = new Date(lastUpdatedMs).toISOString();
-      }
+      aliasedData[LAST_UPDATED_FIELD] =
+        typeof lastUpdatedMs === 'number'
+          ? new Date(lastUpdatedMs).toISOString()
+          : LAST_UPDATED_SENTINEL;
 
       if (passwordFields?.length) {
         await hashPasswordValues(aliasedData, passwordFields);

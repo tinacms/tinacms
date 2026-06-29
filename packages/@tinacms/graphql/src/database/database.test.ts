@@ -699,4 +699,36 @@ describe('Database lastUpdated materialization + sort', () => {
       '2026-01-01T00:00:00.000Z'
     );
   });
+
+  it('keeps documents with no bridge timestamp in the sort (sentinel)', async () => {
+    class NullBridge extends InMemoryBridge {
+      async lastUpdated(): Promise<number | null> {
+        return null;
+      }
+    }
+    const bridge = new NullBridge();
+    for (const { path, data } of POSTS) {
+      bridge.seed(path, jsonDoc(data));
+    }
+    const level = new MemoryLevel<string, Record<string, any>>({
+      valueEncoding: 'json',
+    });
+    const database = createDatabaseInternal({
+      bridge,
+      level,
+      tinaDirectory: 'tina',
+    });
+    const builtSchema = await buildSchema({ schema: testSchema });
+    await database.indexContent(builtSchema);
+    const hydrate = async (path: string, value: Record<string, any>) => ({
+      path,
+      ...value,
+    });
+
+    const result = await database.query(
+      { collection: 'post', sort: 'lastUpdated', filterChain: noFilter() },
+      hydrate
+    );
+    expect(result.edges).toHaveLength(POSTS.length);
+  });
 });

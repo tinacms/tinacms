@@ -70,6 +70,7 @@ export const DEFAULT_COLLECTION_SORT_KEY = '__filepath__';
 export const REFS_COLLECTIONS_SORT_KEY = '__refs__';
 export const LAST_UPDATED_SORT_KEY = 'lastUpdated';
 export const LAST_UPDATED_FIELD = '__lastUpdated';
+export const LAST_UPDATED_SENTINEL = new Date(0).toISOString();
 export const REFS_REFERENCE_FIELD = '__tina_ref__';
 export const REFS_PATH_FIELD = '__tina_ref_path__';
 export const DEFAULT_NUMERIC_LPAD = 4;

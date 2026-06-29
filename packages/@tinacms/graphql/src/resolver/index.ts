@@ -26,6 +26,7 @@ import { generatePasswordHash } from '../auth/utils';
 import {
   FilterCondition,
   LAST_UPDATED_FIELD,
+  LAST_UPDATED_SENTINEL,
   REFS_COLLECTIONS_SORT_KEY,
   REFS_PATH_FIELD,
   REFS_REFERENCE_FIELD,
@@ -270,10 +271,12 @@ export const transformDocumentIntoPayload = async (
         collection,
         template: lastItem(template.namespace),
         lastUpdated:
-          (rawData[LAST_UPDATED_FIELD] as string | undefined) ??
-          (typeof lastUpdated === 'number'
-            ? new Date(lastUpdated).toISOString()
-            : null),
+          rawData[LAST_UPDATED_FIELD] &&
+          rawData[LAST_UPDATED_FIELD] !== LAST_UPDATED_SENTINEL
+            ? (rawData[LAST_UPDATED_FIELD] as string)
+            : typeof lastUpdated === 'number'
+              ? new Date(lastUpdated).toISOString()
+              : null,
       },
       _values: data,
       _rawData: rawData,
