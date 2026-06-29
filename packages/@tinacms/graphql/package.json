@@ -45,7 +45,7 @@
         "gray-matter": "catalog:",
         "isomorphic-git": "catalog:",
         "js-sha1": "catalog:",
-        "js-yaml": "^3.14.1",
+        "js-yaml": "^4.2.0",
         "jsonpath-plus": "catalog:",
         "many-level": "catalog:",
         "micromatch": "catalog:",
@@ -78,8 +78,8 @@
         "jest-file-snapshot": "^0.5.0",
         "memory-level": "catalog:",
         "typescript": "^5.7.3",
-        "vite": "^4.5.9",
-        "vitest": "^0.32.4",
+        "vite": "^6.4.3",
+        "vitest": "^3.2.6",
         "zod": "catalog:"
     }
 }
