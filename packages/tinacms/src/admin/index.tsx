@@ -9,6 +9,7 @@ import {
   TinaCMS,
   useCMS,
 } from '@tinacms/toolkit';
+import { ERR_NOT_INDEXED } from '@tinacms/schema-tools';
 import React, { useState, useEffect } from 'react';
 import {
   Route,
@@ -226,8 +227,8 @@ const CheckSchema = ({
           }
         })
         .catch((error) => {
-          // TODO: HACK- Check on an error id, rather than message string
-          if (error.message.includes('has not been indexed by TinaCloud')) {
+          // Matches a TinaCloud server contract (string owned upstream); see #6777.
+          if (error.message.includes(ERR_NOT_INDEXED)) {
             setSchemaMissingError(true);
           } else {
             console.error('Unexpected error checking schema:', error);

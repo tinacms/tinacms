@@ -13,6 +13,7 @@ import {
 import { TokenObject } from '../auth/authenticate';
 
 import {
+  ASYNC_POLLER_ERROR,
   AuthProvider,
   Schema,
   TinaSchema,
@@ -521,7 +522,7 @@ mutation addPendingDocumentMutation(
       );
       return [prom, cancel];
     } catch (error) {
-      if (error.message === 'AsyncPoller: reached timeout') {
+      if (error.message === ASYNC_POLLER_ERROR.TIMEOUT) {
         console.warn(error);
         return [Promise.resolve({ status: 'timeout' }), () => {}];
       }

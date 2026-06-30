@@ -6,6 +6,7 @@ import {
   Transition,
 } from '@headlessui/react';
 import type { Collection, TinaField } from '@tinacms/schema-tools';
+import { ERR_ALREADY_EXISTS, ERR_HAS_REFERENCES } from '@tinacms/schema-tools';
 import {
   BaseTextField,
   Button,
@@ -441,7 +442,7 @@ const CollectionListPage = () => {
                               );
                               reFetchCollection();
                             } catch (error) {
-                              if (error.message.indexOf('has references')) {
+                              if (error.message.includes(ERR_HAS_REFERENCES)) {
                                 cms.alerts.error(
                                   error.message.split('\n\t').filter(Boolean)[1]
                                 );
@@ -506,20 +507,16 @@ const CollectionListPage = () => {
                             );
                             reFetchCollection();
                           } catch (error) {
-                            // TODO(#6777): These error strings are hardcoded because `tinacms` and
-                            // `@tinacms/graphql` are separate workspaces. A shared constants/enum
-                            // should be introduced via an existing common package to avoid fragile
-                            // string matching. See: https://github.com/tinacms/tinacms/issues/6777
                             if (
                               error.message &&
-                              error.message.includes('already exists')
+                              error.message.includes(ERR_ALREADY_EXISTS)
                             ) {
                               cms.alerts.error(
                                 `Document was not renamed. The filename "${vars.newRelativePath}" is already used by another document, please choose a different name.`
                               );
                             } else if (
                               error.message &&
-                              error.message.includes('has references')
+                              error.message.includes(ERR_HAS_REFERENCES)
                             ) {
                               cms.alerts.error(
                                 error.message.split('\n\t').filter(Boolean)[1]
@@ -571,13 +568,9 @@ const CollectionListPage = () => {
                             );
                             cms.alerts.info('Folder was successfully created');
                           } catch (error) {
-                            // TODO(#6777): These error strings are hardcoded because `tinacms` and
-                            // `@tinacms/graphql` are separate workspaces. A shared constants/enum
-                            // should be introduced via an existing common package to avoid fragile
-                            // string matching. See: https://github.com/tinacms/tinacms/issues/6777
                             if (
                               error.message &&
-                              error.message.includes('already exists')
+                              error.message.includes(ERR_ALREADY_EXISTS)
                             ) {
                               cms.alerts.error(
                                 `Folder was not created, folder with name "${vars.folderName}" already exists ${folder.name ? `in ${folder.name}` : ''}`
