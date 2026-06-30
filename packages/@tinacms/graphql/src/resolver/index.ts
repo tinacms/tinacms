@@ -18,6 +18,7 @@ import type {
   TinaField,
   TinaSchema,
 } from '@tinacms/schema-tools';
+import { ERR_ALREADY_EXISTS } from '@tinacms/schema-tools';
 
 import type { GraphQLConfig } from '../types';
 
@@ -573,7 +574,9 @@ export class Resolver {
 
     const alreadyExists = await this.database.documentExists(realPath);
     if (alreadyExists) {
-      throw new Error(`Unable to add document, ${realPath} already exists`);
+      throw new Error(
+        `Unable to add document, ${realPath} ${ERR_ALREADY_EXISTS}`
+      );
     }
 
     const templateInfo = this.tinaSchema.getTemplatesForCollectable(collection);
@@ -813,7 +816,9 @@ export class Resolver {
     this.validatePath(realPath, collection);
     const alreadyExists = await this.database.documentExists(realPath);
     if (alreadyExists) {
-      throw new Error(`Unable to add folder, ${realPath} already exists`);
+      throw new Error(
+        `Unable to add folder, ${realPath} ${ERR_ALREADY_EXISTS}`
+      );
     }
     await this.database.put(
       realPath,
@@ -838,7 +843,9 @@ export class Resolver {
     );
     const alreadyExists = await this.database.documentExists(realPath);
     if (alreadyExists) {
-      throw new Error(`Unable to add document, ${realPath} already exists`);
+      throw new Error(
+        `Unable to add document, ${realPath} ${ERR_ALREADY_EXISTS}`
+      );
     }
 
     const params = await this.buildObjectMutations(body, collection);
@@ -885,7 +892,7 @@ export class Resolver {
         await this.database.documentExists(newRealPath);
       if (newPathAlreadyExists) {
         throw new Error(
-          `Unable to rename document, ${newRealPath} already exists`
+          `Unable to rename document, ${newRealPath} ${ERR_ALREADY_EXISTS}`
         );
       }
 

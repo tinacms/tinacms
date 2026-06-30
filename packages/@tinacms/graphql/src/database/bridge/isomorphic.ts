@@ -10,6 +10,7 @@ import git, {
   WalkerEntry,
 } from 'isomorphic-git';
 import normalize from 'normalize-path';
+import { ERR_PATH_TRAVERSAL } from '@tinacms/schema-tools';
 import type { Bridge } from './index';
 
 /**
@@ -52,7 +53,7 @@ function assertWithinBase(filepath: string, relativePath: string): void {
       !normalized.startsWith(relativePath + '/'))
   ) {
     throw new Error(
-      `Path traversal detected: "${filepath}" escapes the content root`
+      `${ERR_PATH_TRAVERSAL}: "${filepath}" escapes the content root`
     );
   }
 }

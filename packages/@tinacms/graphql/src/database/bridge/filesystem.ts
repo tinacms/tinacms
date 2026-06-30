@@ -2,6 +2,7 @@ import path from 'path';
 import fg from 'fast-glob';
 import fs from 'fs-extra';
 import normalize from 'normalize-path';
+import { ERR_PATH_TRAVERSAL } from '@tinacms/schema-tools';
 import type { Bridge } from './index';
 
 /**
@@ -54,7 +55,7 @@ function assertWithinBase(filepath: string, baseDir: string): string {
     !resolved.startsWith(resolvedBase + path.sep)
   ) {
     throw new Error(
-      `Path traversal detected: "${filepath}" escapes the base directory`
+      `${ERR_PATH_TRAVERSAL}: "${filepath}" escapes the base directory`
     );
   }
 
@@ -67,11 +68,11 @@ function assertWithinBase(filepath: string, baseDir: string): string {
       !realResolved.startsWith(realBase + path.sep)
     ) {
       throw new Error(
-        `Path traversal detected: "${filepath}" escapes the base directory`
+        `${ERR_PATH_TRAVERSAL}: "${filepath}" escapes the base directory`
       );
     }
   } catch (err) {
-    if (err instanceof Error && err.message.startsWith('Path traversal'))
+    if (err instanceof Error && err.message.startsWith(ERR_PATH_TRAVERSAL))
       throw err;
   }
 
@@ -136,7 +137,7 @@ export class FilesystemBridge implements Bridge {
       !resolved.startsWith(generatedRoot + path.sep)
     ) {
       throw new Error(
-        `Path traversal detected: "${filepath}" routed via generated prefix but resolved outside ${generatedRoot}`
+        `${ERR_PATH_TRAVERSAL}: "${filepath}" routed via generated prefix but resolved outside ${generatedRoot}`
       );
     }
   }
