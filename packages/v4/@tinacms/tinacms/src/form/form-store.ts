@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
 import type { Brand } from '../core/brand';
 import type { FieldAddress } from '../core/field/address';
 
@@ -47,7 +48,9 @@ type FormScope =
     };
 
 export interface FormStore {
-  forms: Record<string, FormScope>;
+  // Keyed by FormId (one open document per form, ADR-010); a missing key is a form
+  // that isn't open, so a lookup returns `FormScope | undefined`.
+  forms: Partial<Record<FormId, FormScope>>;
   // Flatten on load: seed a form's values. Re-registering an *edited* form is a no-op so
   // navigating away and back keeps unsaved edits (ADR-012 teardown); re-registering a
   // pristine form re-adopts the incoming content, so reloading the same id with changed
@@ -88,65 +91,95 @@ export const fieldDirty = (
     ? !Object.is(scope.values[address], scope.baseline[address])
     : false;
 
-export const useFormStore = create<FormStore>((set) => ({
-  forms: {},
+// Middleware composes at create() time (Zustand's contract): here just `devtools`, which
+// streams clean/dirty/pristine transitions to the Redux DevTools extension. It's a no-op
+// when the extension is absent — production and tests — so it adds no runtime behaviour
+// there, only labelled actions in development. No `persist`: form values are volatile,
+// reloaded from the document on boot, never rehydrated from storage.
+//
+// `ACTION.*` are the devtools action labels, named once so the call sites can't drift.
+const ACTION = {
+  register: 'form/register',
+  setFieldValue: 'form/setFieldValue',
+  markSaved: 'form/markSaved',
+  removeForm: 'form/removeForm',
+} as const;
+type FormActionLabel = (typeof ACTION)[keyof typeof ACTION];
 
-  registerForm: (formId, values) =>
-    set((state) => {
-      if (state.forms[formId]?.status === 'edited') return state;
+export const useFormStore = create<FormStore>()(
+  devtools(
+    (set) => {
+      // Apply a labelled state patch. Wraps Zustand's set(partial, replace, action) with
+      // `replace` pinned to false — every form action merges its patch into state, never
+      // replaces the whole store — so the call sites read as intent, not a raw flag.
+      const apply = (
+        patch: (state: FormStore) => FormStore | Partial<FormStore>,
+        action: FormActionLabel
+      ) => set(patch, false, action);
+
       return {
-        forms: {
-          ...state.forms,
-          [formId]: { status: 'pristine', values: { ...values } },
-        },
-      };
-    }),
+        forms: {},
 
-  setFieldValue: (formId, address, value) =>
-    set((state) => {
-      const scope = state.forms[formId];
-      if (!scope) return state;
-      // Re-setting a field to the value it already holds is a no-op — controlled inputs
-      // re-fire onChange with the same value; don't churn state.
-      if (Object.is(scope.values[address], value)) return state;
-      // The first edit freezes the pristine values as the baseline to diff against.
-      const baseline =
-        scope.status === 'pristine' ? scope.values : scope.baseline;
-      return {
-        forms: {
-          ...state.forms,
-          [formId]: {
-            status: 'edited',
-            values: { ...scope.values, [address]: value },
-            baseline,
-          },
-        },
-      };
-    }),
+        registerForm: (formId, values) =>
+          apply((state) => {
+            if (state.forms[formId]?.status === 'edited') return state;
+            return {
+              forms: {
+                ...state.forms,
+                [formId]: { status: 'pristine', values: { ...values } },
+              },
+            };
+          }, ACTION.register),
 
-  markSaved: (formId) =>
-    set((state) => {
-      const scope = state.forms[formId];
-      if (!scope) return state;
-      return {
-        forms: {
-          ...state.forms,
-          [formId]: {
-            status: 'edited',
-            values: scope.values,
-            baseline: scope.values,
-          },
-        },
-      };
-    }),
+        setFieldValue: (formId, address, value) =>
+          apply((state) => {
+            const scope = state.forms[formId];
+            if (!scope) return state;
+            // Re-setting a field to the value it already holds is a no-op — controlled
+            // inputs re-fire onChange with the same value; don't churn state.
+            if (Object.is(scope.values[address], value)) return state;
+            // The first edit freezes the pristine values as the baseline to diff against.
+            const baseline =
+              scope.status === 'pristine' ? scope.values : scope.baseline;
+            return {
+              forms: {
+                ...state.forms,
+                [formId]: {
+                  status: 'edited',
+                  values: { ...scope.values, [address]: value },
+                  baseline,
+                },
+              },
+            };
+          }, ACTION.setFieldValue),
 
-  removeForm: (formId) =>
-    set((state) => {
-      if (!state.forms[formId]) return state;
-      const { [formId]: _removed, ...rest } = state.forms;
-      return { forms: rest };
-    }),
-}));
+        markSaved: (formId) =>
+          apply((state) => {
+            const scope = state.forms[formId];
+            if (!scope) return state;
+            return {
+              forms: {
+                ...state.forms,
+                [formId]: {
+                  status: 'edited',
+                  values: scope.values,
+                  baseline: scope.values,
+                },
+              },
+            };
+          }, ACTION.markSaved),
+
+        removeForm: (formId) =>
+          apply((state) => {
+            if (!state.forms[formId]) return state;
+            const { [formId]: _removed, ...rest } = state.forms;
+            return { forms: rest };
+          }, ACTION.removeForm),
+      };
+    },
+    { name: 'TinaFormStore' }
+  )
+);
 
 export const useFormStatus = (formId: FormId): FormStatus =>
   useFormStore((state) => formStatus(state.forms[formId]));

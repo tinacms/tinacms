@@ -105,4 +105,42 @@ describe('form-store teardown', () => {
     expect(store.getState().forms[postA]).toBeUndefined();
     expect(statusOf(postA)).toBe('pristine');
   });
+
+  it('removeForm of an unopened form is a no-op', () => {
+    expect(() => store.getState().removeForm(postA)).not.toThrow();
+    expect(store.getState().forms[postA]).toBeUndefined();
+  });
+});
+
+describe('form-store guards on unopened forms', () => {
+  it('toFormId rejects an empty path', () => {
+    expect(() => toFormId('')).toThrow();
+  });
+
+  it('setFieldValue on an unopened form is a no-op', () => {
+    store.getState().setFieldValue(postA, title, 'orphan');
+    expect(store.getState().forms[postA]).toBeUndefined();
+  });
+
+  it('markSaved on an unopened form is a no-op', () => {
+    store.getState().markSaved(postA);
+    expect(store.getState().forms[postA]).toBeUndefined();
+  });
+});
+
+describe('form-store reference stability', () => {
+  it('re-setting a field to its current value leaves the scope untouched', () => {
+    store.getState().registerForm(postA, { title: 'Hello' });
+    const before = store.getState().forms[postA];
+    store.getState().setFieldValue(postA, title, 'Hello');
+    // No churn: same scope object, still pristine.
+    expect(store.getState().forms[postA]).toBe(before);
+    expect(statusOf(postA)).toBe('pristine');
+  });
+
+  it('markSaved on a never-edited form leaves it clean', () => {
+    store.getState().registerForm(postA, { title: 'Hello' });
+    store.getState().markSaved(postA);
+    expect(statusOf(postA)).toBe('clean');
+  });
 });
