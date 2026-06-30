@@ -205,7 +205,6 @@ catalog:
     micromark-util-types: 1.1.0
     micromatch: 4.0.8
     minimatch: ^5.1.6
-    moment: 2.29.4
     monaco-editor: 0.31.0
     mongodb-level: ^0.0.4
     multer: 1.4.5-lts.1
@@ -226,7 +225,6 @@ catalog:
     query-string: ^9.0.0
     react-beautiful-dnd: ^13.1.1
     react-colorful: ^5.6.1
-    react-datetime: ^3.3.1
     react-dnd: ^16.0.1
     react-dnd-html5-backend: ^16.0.1
     react-dropzone: 14.2.3

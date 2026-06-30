@@ -36,7 +36,7 @@
         "@tinacms/mdx": "workspace:*",
         "@tinacms/schema-tools": "workspace:*",
         "abstract-level": "catalog:",
-        "date-fns": "^2.30.0",
+        "date-fns": "4.1.0",
         "es-toolkit": "^1.42.0",
         "fast-glob": "catalog:",
         "fs-extra": "catalog:",
