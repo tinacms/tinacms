@@ -83,6 +83,19 @@ function formatTemplateChoice(template: Template) {
   };
 }
 
+// npm streams `... GET 200 https://registry.../<pkg> ...`; show just the package.
+// Only rewrite genuine registry URLs; other lines (pnpm/yarn) pass through as-is.
+function summarizeInstallLine(line: string): string {
+  // After the scheme and a "registry" host, capture the first path segment: an
+  // optional @scope/ plus the package name, ending at "/-/" (npm's tarball path),
+  // whitespace, or end of line. ".../@astrojs%2fmdx" is captured, then decoded below.
+  const m = line.match(
+    /https?:\/\/[^ ]*registry[^ ]*?\/((?:@[^/ ]+\/)?[^/ ]+?)(?:\/-\/|\s|$)/
+  );
+  const text = m ? `fetching ${m[1].replace(/%2[fF]/g, '/')}` : line;
+  return text.length > 56 ? `${text.slice(0, 55)}…` : text;
+}
+
 export async function run() {
   // Dynamic import for ora to handle ES module compatibility
   const ora = (await import('ora')).default;
@@ -441,10 +454,32 @@ export async function run() {
   }
 
   spinner.start('Installing packages.');
+  let lastLine = '';
+  let lastActivityAt = Date.now();
+  const QUIET_MS = 45_000;
+  // Show the manager's live output. After a long silence, say so and point at
+  // --verbose; silence alone can't tell a hang from a slow build (see #6166).
+  const render = () => {
+    const quietMs = Date.now() - lastActivityAt;
+    spinner.text =
+      quietMs >= QUIET_MS
+        ? `Installing packages, no output from ${pkgManager} for ${Math.round(
+            quietMs / 1000
+          )}s (re-run with --verbose to see detail).`
+        : lastLine
+          ? `Installing packages, ${summarizeInstallLine(lastLine)}`
+          : 'Installing packages.';
+  };
+  const installTimer = opts.verbose ? null : setInterval(render, 1000);
   try {
-    await install(pkgManager as PackageManager, opts.verbose);
-    spinner.succeed();
+    await install(pkgManager as PackageManager, opts.verbose, (line) => {
+      lastLine = line;
+      lastActivityAt = Date.now();
+    });
+    if (installTimer) clearInterval(installTimer);
+    spinner.succeed('Installing packages.');
   } catch (err) {
+    if (installTimer) clearInterval(installTimer);
     const error = err instanceof Error ? err : new Error(String(err));
     const reason = error.message || String(err);
     spinner.fail(`Failed to install packages: ${reason}`);
