@@ -1,5 +1,15 @@
 # @tinacms/schema-tools
 
+## 2.8.2
+
+### Patch Changes
+
+- [#6856](https://github.com/tinacms/tinacms/pull/6856) [`e74a7d6`](https://github.com/tinacms/tinacms/commit/e74a7d62ee1dce7386b5aaf5ebaf569d3adcd247) Thanks [@lphuc2250gma](https://github.com/lphuc2250gma)! - fix: duplicated words in parseURL error message and rich-text type docs
+
+- [#7058](https://github.com/tinacms/tinacms/pull/7058) [`5ba482b`](https://github.com/tinacms/tinacms/commit/5ba482b9c10d76ea7f7bea2a442a8999824736a8) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Fix Local Mode banner for absolute contentApiUrlOverride
+
+- [#7088](https://github.com/tinacms/tinacms/pull/7088) [`d44558e`](https://github.com/tinacms/tinacms/commit/d44558e9b4502d4f4fc2c970d22985339fe2b6ce) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Fix media upload/delete paths to prevent access to storage keys outside mediaRoot.
+
 ## 2.8.1
 
 ### Patch Changes
