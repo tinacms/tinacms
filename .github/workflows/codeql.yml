@@ -19,6 +19,10 @@ on:
   schedule:
     - cron: '24 9 * * 4'
 
+# Least-privilege default; the analyze job opts into security-events: write.
+permissions:
+  contents: read
+
 jobs:
   analyze:
     name: Analyze (${{ matrix.language }})

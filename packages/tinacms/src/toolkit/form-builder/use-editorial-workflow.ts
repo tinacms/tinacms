@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { ERR_BRANCH_CONFLICT, ERR_BRANCH_EXISTS } from '@tinacms/schema-tools';
 import { useBranchData } from '@toolkit/plugin-branch-switcher';
 import { useCMS } from '../react-core';
 import {
@@ -104,9 +105,9 @@ export const getEditorialWorkflowErrorMessage = (e: unknown): string => {
         break;
     }
   } else if (err.message) {
-    if (err.message.toLowerCase().includes('already exists')) {
+    if (err.message.toLowerCase().includes(ERR_BRANCH_EXISTS)) {
       errMessage = 'A branch with this name already exists';
-    } else if (err.message.toLowerCase().includes('conflict')) {
+    } else if (err.message.toLowerCase().includes(ERR_BRANCH_CONFLICT)) {
       errMessage = err.message;
     }
   }

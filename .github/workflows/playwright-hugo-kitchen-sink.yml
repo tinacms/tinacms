@@ -6,6 +6,10 @@ on:
     paths:
       - 'examples/hugo/kitchen-sink/**'
       - '.github/workflows/playwright-hugo-kitchen-sink.yml'
+
+permissions:
+  contents: read
+
 jobs:
   e2e:
     name: hugo-kitchen-sink-e2e

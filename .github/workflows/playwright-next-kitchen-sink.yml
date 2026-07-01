@@ -8,6 +8,9 @@ on:
       - 'examples/next/kitchen-sink/**'
       - '.github/workflows/playwright-next-kitchen-sink.yml'
 
+permissions:
+  contents: read
+
 jobs:
   e2e:
     name: next-kitchen-sink-e2e

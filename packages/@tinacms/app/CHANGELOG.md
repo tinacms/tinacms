@@ -1,5 +1,19 @@
 # @tinacms/app
 
+## 2.5.7
+
+### Patch Changes
+
+- [#7062](https://github.com/tinacms/tinacms/pull/7062) [`caadf1f`](https://github.com/tinacms/tinacms/commit/caadf1f68ec602277bcd4225a69c13fdc5402f7b) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Improve global collection UX: global collections now appear once in the sidebar "Site" section (globe icon) instead of being duplicated under Collections, open directly in the form instead of a popup modal, and single-document global collections skip the document list and go straight to the form. Global collections with zero or multiple documents fall through to the normal list view.
+
+- [#7088](https://github.com/tinacms/tinacms/pull/7088) [`d44558e`](https://github.com/tinacms/tinacms/commit/d44558e9b4502d4f4fc2c970d22985339fe2b6ce) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Fix media upload/delete paths to prevent access to storage keys outside mediaRoot.
+
+- [#7095](https://github.com/tinacms/tinacms/pull/7095) [`39c06f7`](https://github.com/tinacms/tinacms/commit/39c06f7c21cac7dfd94ff6acfcdeec7117989773) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Harden npm publish pipeline and package manifests
+
+- Updated dependencies [[`c1994b3`](https://github.com/tinacms/tinacms/commit/c1994b36907710aeb36fd114fa6d0a8a0e1210d0), [`caadf1f`](https://github.com/tinacms/tinacms/commit/caadf1f68ec602277bcd4225a69c13fdc5402f7b), [`5ba482b`](https://github.com/tinacms/tinacms/commit/5ba482b9c10d76ea7f7bea2a442a8999824736a8), [`8a86ffa`](https://github.com/tinacms/tinacms/commit/8a86ffa045af8ff6dfa0ebc2775cf3b7b810d238), [`19fcbdd`](https://github.com/tinacms/tinacms/commit/19fcbdd90a33a66c437b0f91e325a8609022e0cc), [`871ce31`](https://github.com/tinacms/tinacms/commit/871ce31531d3d7dc379ec7d58cf427984dd6620a), [`d44558e`](https://github.com/tinacms/tinacms/commit/d44558e9b4502d4f4fc2c970d22985339fe2b6ce), [`4801b21`](https://github.com/tinacms/tinacms/commit/4801b21f31455d3ce6cb33e6233148caba9921c6)]:
+  - tinacms@3.9.4
+  - @tinacms/mdx@2.1.8
+
 ## 2.5.6
 
 ### Patch Changes

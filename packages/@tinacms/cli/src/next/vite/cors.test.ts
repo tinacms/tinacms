@@ -1,4 +1,4 @@
-import { buildCorsOriginCheck } from './cors';
+import { buildCorsOriginCheck, isOriginAllowed } from './cors';
 
 describe('buildCorsOriginCheck', () => {
   const check = (
@@ -122,5 +122,43 @@ describe('buildCorsOriginCheck', () => {
     it('blocks non-matching origins', async () => {
       expect(await check(fn, 'https://evil.com')).toBe(false);
     });
+  });
+});
+
+describe('isOriginAllowed', () => {
+  it('allows requests with no Origin header', () => {
+    expect(isOriginAllowed(undefined)).toBe(true);
+  });
+
+  it('allows localhost regardless of port', () => {
+    expect(isOriginAllowed('http://localhost:3000')).toBe(true);
+    expect(isOriginAllowed('http://127.0.0.1:4001')).toBe(true);
+    expect(isOriginAllowed('http://[::1]:4001')).toBe(true);
+  });
+
+  it('blocks disallowed cross-origins', () => {
+    expect(isOriginAllowed('http://evil.test:8000')).toBe(false);
+    expect(isOriginAllowed('https://evil.com')).toBe(false);
+  });
+
+  it('honors configured exact origins', () => {
+    const allowed = ['https://my-codespace.github.dev'];
+    expect(isOriginAllowed('https://my-codespace.github.dev', allowed)).toBe(
+      true
+    );
+    expect(isOriginAllowed('https://evil.com', allowed)).toBe(false);
+  });
+
+  it('honors the "private" keyword', () => {
+    expect(isOriginAllowed('http://192.168.1.100:3000', ['private'])).toBe(
+      true
+    );
+    expect(isOriginAllowed('http://8.8.8.8:3000', ['private'])).toBe(false);
+  });
+
+  it('honors RegExp entries', () => {
+    const allowed = [/^https:\/\/.*\.preview\.app$/];
+    expect(isOriginAllowed('https://foo.preview.app', allowed)).toBe(true);
+    expect(isOriginAllowed('https://evil.com', allowed)).toBe(false);
   });
 });

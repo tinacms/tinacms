@@ -1,3 +1,4 @@
+import { ASYNC_POLLER_ERROR } from '@tinacms/schema-tools';
 import { BaseTextField, Input } from '@toolkit/fields';
 import { LoadingDots } from '@toolkit/form-builder';
 import { useCMS } from '@toolkit/react-core';
@@ -115,7 +116,7 @@ export const BranchSwitcherLegacy = ({
               });
             })
             .catch((e) => {
-              if (e.message === 'AsyncPoller: cancelled') return;
+              if (e.message === ASYNC_POLLER_ERROR.CANCELLED) return;
               console.error(e);
             });
         });

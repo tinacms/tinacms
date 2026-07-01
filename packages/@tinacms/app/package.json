@@ -1,7 +1,14 @@
 {
 	"name": "@tinacms/app",
-	"version": "2.5.6",
+	"version": "2.5.7",
 	"main": "src/main.tsx",
+	"files": [
+		"src",
+		"index.html",
+		"favicon.svg",
+		"tsconfig.json",
+		"tsconfig.node.json"
+	],
 	"license": "Apache-2.0",
 	"scripts": {
 		"test": "vitest run",
