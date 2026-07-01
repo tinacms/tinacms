@@ -222,3 +222,29 @@ describe('pickPersistableNamespaces', () => {
     ).toEqual({ ui: { theme: 'dark' }, branch: { current: 'main' } });
   });
 });
+
+describe('createTinaStore persistence round-trip', () => {
+  const boot = () =>
+    createTinaStore([
+      resolved({ name: 'tina:media', provides: ['media'] }, () => ({
+        items: [],
+      })),
+    ]);
+
+  it('rehydrates durable namespaces and recomputes volatile ones on reboot', () => {
+    boot().setState({
+      ui: { theme: 'dark' },
+      branch: { current: 'feat' },
+      documents: { selected: 'posts/a.mdx' },
+      media: { items: ['stale'] },
+    } as any);
+
+    // A fresh boot reads the persisted storage written above.
+    const rebooted = get(boot());
+    expect(rebooted.ui).toEqual({ theme: 'dark' });
+    expect(rebooted.branch).toEqual({ current: 'feat' });
+    // documents + every plugin namespace are volatile: recomputed at boot, not rehydrated.
+    expect(rebooted.documents).toEqual({});
+    expect(rebooted.media).toEqual({ items: [] });
+  });
+});

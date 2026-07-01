@@ -54,6 +54,15 @@ describe('form-store dirty tracking', () => {
     store.getState().setFieldValue(postA, title, 'Hello');
     expect(statusOf(postA)).toBe('clean');
   });
+
+  // Composite field values (object/list/rich-text) aren't supported yet; when they land,
+  // `valuesEqual`/`fieldDirty` must delegate equality to the field descriptor (each field
+  // type owns its comparison) so an edit-then-revert of an object field reads clean rather
+  // than permanently dirty, and setFieldValue's no-op guard doesn't drop an in-place-mutated
+  // value. See the notes on those functions.
+  it.todo(
+    'object/list values: edit-then-revert is clean, not permanently dirty'
+  );
 });
 
 describe('form-store save reset', () => {

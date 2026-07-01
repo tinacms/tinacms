@@ -22,30 +22,25 @@ export const composeOverridableRegistry = <TValue>(
   conflictError: (conflict: RegistryConflict, key: string) => Error
 ): Map<string, TValue> => {
   const registry = new Map<string, TValue>();
-  // Keys whose value was placed by an override — so an override wins a collision whichever
-  // order it resolves in, rather than relying on the base registering first.
+  // An override wins its key whichever order it resolves in; two bases, or two overrides,
+  // at one key collide. Tracked as two sets rather than one so a second base is still a
+  // `duplicate-base` even when an override already sits at the key — an override must not
+  // mask a genuine base-vs-base collision between two other plugins.
   const overridden = new Set<string>();
+  const based = new Set<string>();
 
   for (const { key, value, isOverride } of entries) {
-    if (!registry.has(key)) {
-      registry.set(key, value);
-      if (isOverride) overridden.add(key);
-      continue;
-    }
-    if (isOverride && !overridden.has(key)) {
-      // An override replaces the base it targets, even if the override resolved first.
+    if (isOverride) {
+      if (overridden.has(key)) throw conflictError('duplicate-override', key);
+      // An override claims its key outright, whether or not a base has resolved yet.
       registry.set(key, value);
       overridden.add(key);
       continue;
     }
-    if (!isOverride && overridden.has(key)) {
-      // A base yields to an override already registered for this key.
-      continue;
-    }
-    throw conflictError(
-      overridden.has(key) ? 'duplicate-override' : 'duplicate-base',
-      key
-    );
+    if (based.has(key)) throw conflictError('duplicate-base', key);
+    based.add(key);
+    // A base fills its key only when no override has already claimed it; else it yields.
+    if (!overridden.has(key)) registry.set(key, value);
   }
   return registry;
 };

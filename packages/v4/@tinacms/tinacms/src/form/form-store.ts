@@ -83,6 +83,9 @@ export const formStatus = (scope: FormScope | undefined): FormStatus => {
   return valuesEqual(scope.values, scope.baseline) ? 'clean' : 'dirty';
 };
 
+// Per-field dirty behind the exported `useIsFieldDirty`. Same primitive assumption as
+// `valuesEqual`: `Object.is` is correct while field values are primitives; an
+// in-place-mutated object/list value would misread here too once composite fields land.
 export const fieldDirty = (
   scope: FormScope | undefined,
   address: FieldAddress
@@ -136,7 +139,9 @@ export const useFormStore = create<FormStore>()(
             const scope = state.forms[formId];
             if (!scope) return state;
             // Re-setting a field to the value it already holds is a no-op — controlled
-            // inputs re-fire onChange with the same value; don't churn state.
+            // inputs re-fire onChange with the same value; don't churn state. Primitive
+            // assumption (see valuesEqual): an in-place-mutated object/list re-passed here
+            // reads equal and would be dropped — composite fields need field-owned equality.
             if (Object.is(scope.values[address], value)) return state;
             // The first edit freezes the pristine values as the baseline to diff against.
             const baseline =

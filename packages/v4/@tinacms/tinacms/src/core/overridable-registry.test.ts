@@ -48,6 +48,23 @@ describe('composeOverridableRegistry', () => {
     ).toThrow('duplicate-base:a');
   });
 
+  it('an override does not mask a base-vs-base collision', () => {
+    // Two different plugins both provide a base at "a" and a third overrides it: the
+    // override winning its key must not hide that the two bases genuinely collide.
+    expect(() =>
+      composeOverridableRegistry(
+        [base('a', '1'), override('a', 'over'), base('a', '2')],
+        conflict
+      )
+    ).toThrow('duplicate-base:a');
+    expect(() =>
+      composeOverridableRegistry(
+        [override('a', 'over'), base('a', '1'), base('a', '2')],
+        conflict
+      )
+    ).toThrow('duplicate-base:a');
+  });
+
   it('throws duplicate-override when two overrides collide', () => {
     expect(() =>
       composeOverridableRegistry(
