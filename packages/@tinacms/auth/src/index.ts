@@ -50,7 +50,7 @@ export const isUserAuthorized = async (args: {
  * import { NextApiHandler } from 'next'
  * import { isAuthorized } from '@tinacms/auth'
  * const apiHandler: NextApiHandler = async (req, res) => {
- *   const user = await isAuthorized(req)
+ *   const user = await isAuthorized(req, process.env.NEXT_PUBLIC_TINA_CLIENT_ID)
  *   if (user && user.verified) {
  *       res.json({
  *         validUser: true,
@@ -78,7 +78,7 @@ export const isAuthorized = async (
   const token = req.headers.authorization;
   // Validate against the site's configured app id, never a request value.
   const clientID = expectedClientID ?? process.env.NEXT_PUBLIC_TINA_CLIENT_ID;
-  if (typeof clientID !== 'string' || clientID.length === 0) {
+  if (typeof clientID !== 'string' || clientID.trim().length === 0) {
     console.error(
       "isAuthorized could not resolve this site's clientID. Pass it explicitly (e.g. TinaCloudBackendAuthProvider(process.env.NEXT_PUBLIC_TINA_CLIENT_ID)) or set the NEXT_PUBLIC_TINA_CLIENT_ID env var. Refusing to authorize."
     );
@@ -101,7 +101,7 @@ export const isAuthorized = async (
  * import { NextApiHandler } from 'next'
  * import { isAuthorized } from '@tinacms/auth'
  * const apiHandler: NextApiHandler = async (req, res) => {
- *   const user = await isAuthorized(req)
+ *   const user = await isAuthorized(req, process.env.NEXT_PUBLIC_TINA_CLIENT_ID)
  *   if (user && user.verified) {
  *       res.json({
  *         validUser: true,
@@ -116,7 +116,10 @@ export const isAuthorized = async (
  *}
  * export default apiHandler
  *
- * @param {NextApiRequest} req - the request. It must contain a req.query.org, req.query.clientID and req.headers.authorization
+ * @param {NextApiRequest} req - the request. It must contain a req.headers.authorization
+ * @param {string} [expectedClientID] - this site's own TinaCloud app id. The token is validated
+ *   against this clientID. Falls back to `process.env.NEXT_PUBLIC_TINA_CLIENT_ID`. If neither is
+ *   available, authorization is refused.
  *
  */
 export const isAuthorizedNext = isAuthorized;

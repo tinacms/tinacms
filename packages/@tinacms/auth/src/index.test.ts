@@ -97,6 +97,18 @@ describe('isAuthorized', () => {
     );
   });
 
+  it('returns undefined when the resolved clientID is blank', async () => {
+    const req = {
+      query: {},
+      headers: { authorization: 'Bearer some-token' },
+    } as unknown as NextApiRequest;
+
+    const result = await isAuthorized(req, '   ');
+
+    expect(result).toBeUndefined();
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
   it('returns undefined when authorization header is missing from the request', async () => {
     const req = {
       query: {},
