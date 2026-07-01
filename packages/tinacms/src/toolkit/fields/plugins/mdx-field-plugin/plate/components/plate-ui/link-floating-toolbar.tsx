@@ -228,7 +228,7 @@ export function LinkFloatingToolbar({
       </button>
     </div>
   );
-  
+
   return (
     <PortalBody>
       <div
