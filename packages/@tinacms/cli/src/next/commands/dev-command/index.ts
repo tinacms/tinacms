@@ -11,6 +11,7 @@ import { isHostExposed } from '../../../utils/host';
 import { spin } from '../../../utils/spinner';
 import { dangerText, warnText } from '../../../utils/theme';
 import { Codegen } from '../../codegen';
+import { writeTinaLockFile } from '../../codegen/writeTinaLockFile';
 import { ConfigManager } from '../../config-manager';
 import { createAndInitializeDatabase, createDBServer } from '../../database';
 import { BaseCommand } from '../baseCommands';
@@ -116,28 +117,7 @@ export class DevCommand extends BaseCommand {
         });
         const apiURL = await codegen.execute();
 
-        if (!configManager.isUsingLegacyFolder) {
-          const schemaObject = await fs.readJSON(
-            configManager.generatedSchemaJSONPath
-          );
-          const lookupObject = await fs.readJSON(
-            configManager.generatedLookupJSONPath
-          );
-          const graphqlSchemaObject = await fs.readJSON(
-            configManager.generatedGraphQLJSONPath
-          );
-
-          const tinaLockFilename = 'tina-lock.json';
-          const tinaLockContent = JSON.stringify({
-            schema: schemaObject,
-            lookup: lookupObject,
-            graphql: graphqlSchemaObject,
-          });
-          fs.writeFileSync(
-            path.join(configManager.tinaFolderPath, tinaLockFilename),
-            tinaLockContent
-          );
-        }
+        await writeTinaLockFile(configManager);
 
         await this.indexContentWithSpinner({
           database,
