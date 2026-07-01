@@ -9,7 +9,7 @@ import { expect, test } from '@playwright/test';
 test.describe('Authors Listing Page', () => {
   test('should load the authors page', async ({ page }) => {
     await page.goto('/authors');
-    await expect(page.locator('h1')).toContainText(/Authors/i);
+    await expect(page.locator('h1').first()).toContainText(/Authors/i);
   });
 
   test('should display at least one author', async ({ page }) => {

@@ -1,13 +1,12 @@
 {
     "name": "@tinacms/scripts",
     "type": "module",
-    "version": "1.6.1",
+    "version": "1.6.2",
     "main": "dist/index.js",
     "files": [
         "dist",
         "bin/*",
-        "__mocks__/styleMock.js",
-        ".env"
+        "__mocks__/styleMock.js"
     ],
     "license": "Apache-2.0",
     "bin": {

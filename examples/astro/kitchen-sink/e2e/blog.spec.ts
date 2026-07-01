@@ -9,7 +9,7 @@ import { expect, test } from '@playwright/test';
 test.describe('Blog Listing Page', () => {
   test('should load the blog page', async ({ page }) => {
     await page.goto('/blog');
-    await expect(page.locator('h1')).toContainText(/Blog/i);
+    await expect(page.locator('h1').first()).toContainText(/Blog/i);
   });
 
   test('should display blog cards', async ({ page }) => {

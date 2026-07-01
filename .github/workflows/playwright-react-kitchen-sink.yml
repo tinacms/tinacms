@@ -8,6 +8,9 @@ on:
       - 'examples/react/kitchen-sink/**'
       - '.github/workflows/playwright-react-kitchen-sink.yml'
 
+permissions:
+  contents: read
+
 jobs:
   e2e:
     name: react-kitchen-sink-e2e

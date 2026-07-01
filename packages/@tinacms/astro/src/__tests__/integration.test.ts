@@ -1,4 +1,10 @@
-import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -12,7 +18,10 @@ type ConfigSetupArg = Parameters<NonNullable<Hooks['astro:config:setup']>>[0];
 type ConfigDoneArg = Parameters<NonNullable<Hooks['astro:config:done']>>[0];
 type BuildDoneArg = Parameters<NonNullable<Hooks['astro:build:done']>>[0];
 
-function runConfigSetup(options?: Parameters<typeof tina>[0]) {
+function runConfigSetup(
+  options?: Parameters<typeof tina>[0],
+  extra?: { command?: 'dev' | 'build' | 'preview' }
+) {
   const addMiddleware = vi.fn();
   const updateConfig = vi.fn();
   const logger = { warn: vi.fn(), info: vi.fn() };
@@ -21,7 +30,12 @@ function runConfigSetup(options?: Parameters<typeof tina>[0]) {
     integration.hooks['astro:config:setup'] as NonNullable<
       Hooks['astro:config:setup']
     >
-  )({ addMiddleware, updateConfig, logger } as unknown as ConfigSetupArg);
+  )({
+    addMiddleware,
+    updateConfig,
+    logger,
+    command: extra?.command ?? 'dev',
+  } as unknown as ConfigSetupArg);
 
   const plugins: VitePlugin[] =
     updateConfig.mock.calls[0]?.[0]?.vite?.plugins ?? [];
@@ -80,7 +94,38 @@ function makeRes() {
   };
 }
 
-describe('tina() integration — astro:config:setup', () => {
+// A minimal dev server exposing the Vite environment hot channels and a file
+// watcher, so we can drive the content-invalidation plugin and capture both the
+// HMR signals it sends and the watcher handlers it registers.
+function makeDevServer(opts: { environments?: boolean; root?: string } = {}) {
+  const ssrSend = vi.fn();
+  const clientSend = vi.fn();
+  const handlers: Record<string, (file: string) => void> = {};
+  const watcher = {
+    on(event: string, cb: (file: string) => void) {
+      handlers[event] = cb;
+      return watcher;
+    },
+  };
+  const server: Record<string, unknown> = { watcher };
+  if (opts.root !== undefined) {
+    server.config = { root: opts.root };
+  }
+  if (opts.environments !== false) {
+    server.environments = {
+      ssr: { hot: { send: ssrSend } },
+      client: { hot: { send: clientSend } },
+    };
+  }
+  return { server, ssrSend, clientSend, handlers };
+}
+
+const invalidationPlugin = (plugins: VitePlugin[]) =>
+  plugins.find(
+    (p) => p.name === '@tinacms/astro:dev-content-invalidation'
+  ) as VitePlugin;
+
+describe('tina() integration - astro:config:setup', () => {
   it('wires the middleware without writing to the source tree', () => {
     const { addMiddleware, plugins } = runConfigSetup();
 
@@ -95,7 +140,7 @@ describe('tina() integration — astro:config:setup', () => {
   });
 });
 
-describe('tina() integration — bridge dev plugin', () => {
+describe('tina() integration - bridge dev plugin', () => {
   it('serves the bridge bundle at /admin/bridge.js', () => {
     const { plugins } = runConfigSetup();
     const plugin = plugins.find((p) => p.name === '@tinacms/astro:bridge-dev')!;
@@ -124,7 +169,7 @@ describe('tina() integration — bridge dev plugin', () => {
   });
 });
 
-describe('tina() integration — cloudflare import.meta.url plugin', () => {
+describe('tina() integration - cloudflare import.meta.url plugin', () => {
   const EXPECTED = JSON.stringify('file:///worker.mjs');
 
   it('injects a valid import.meta.url define for the workerd server envs under the cloudflare adapter', () => {
@@ -200,7 +245,221 @@ describe('tina() integration — cloudflare import.meta.url plugin', () => {
   });
 });
 
-describe('tina() integration — astro:build:done', () => {
+describe('tina() integration - dev content invalidation plugin', () => {
+  it('is a dev-only plugin', () => {
+    const { plugins } = runConfigSetup();
+    const plugin = invalidationPlugin(plugins);
+    expect(plugin).toBeDefined();
+    expect(plugin.apply).toBe('serve');
+  });
+
+  it('clears the route cache and reloads when a content file is added', () => {
+    vi.useFakeTimers();
+    try {
+      const { plugins } = runConfigSetup();
+      const { server, ssrSend, clientSend, handlers } = makeDevServer();
+      (invalidationPlugin(plugins).configureServer as any)(server);
+
+      handlers.add('/project/src/content/blog/new-post.mdx');
+      // Debounced, so nothing fires synchronously.
+      expect(ssrSend).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(50);
+      expect(ssrSend).toHaveBeenCalledWith('astro:content-changed', {});
+      expect(clientSend).toHaveBeenCalledWith({
+        type: 'full-reload',
+        path: '*',
+      });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('also reacts to content files being removed', () => {
+    vi.useFakeTimers();
+    try {
+      const { plugins } = runConfigSetup();
+      const { server, ssrSend, handlers } = makeDevServer();
+      (invalidationPlugin(plugins).configureServer as any)(server);
+
+      handlers.unlink('/project/content/posts/gone.md');
+      vi.advanceTimersByTime(50);
+      expect(ssrSend).toHaveBeenCalledOnce();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('falls back to a heuristic without a schema: markdown anywhere, structured data only inside a content dir', () => {
+    vi.useFakeTimers();
+    try {
+      const { plugins } = runConfigSetup();
+      // No `root`, so no schema is read and detection uses the heuristic.
+      const { server, ssrSend, handlers } = makeDevServer();
+      (invalidationPlugin(plugins).configureServer as any)(server);
+
+      // Reacts to: markdown anywhere, and json/yaml inside a content dir.
+      for (const file of [
+        '/project/src/pages/inline.mdx',
+        '/project/content/tags/tag.json',
+        '/project/content/global/site.yaml',
+      ]) {
+        handlers.add(file);
+        vi.advanceTimersByTime(50);
+        expect(ssrSend).toHaveBeenCalled();
+        ssrSend.mockClear();
+      }
+
+      // Ignores: config json outside a content dir, source code, and anything
+      // inside ignored directories.
+      for (const file of [
+        '/project/package.json',
+        '/project/tsconfig.json',
+        '/project/src/lib/data.ts',
+        '/project/node_modules/pkg/content/x.md',
+        '/project/dist/content/x.md',
+      ]) {
+        handlers.add(file);
+        vi.advanceTimersByTime(50);
+        expect(ssrSend).not.toHaveBeenCalled();
+      }
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('watches collection roots from the schema, so content outside a content dir still reloads', () => {
+    const root = mkdtempSync(join(tmpdir(), 'tina-astro-'));
+    mkdirSync(join(root, 'tina', '__generated__'), { recursive: true });
+    writeFileSync(
+      join(root, 'tina', '__generated__', '_schema.json'),
+      JSON.stringify({
+        collections: [
+          // A JSON collection that does NOT live under a `content` dir: the
+          // exact case the heuristic would miss.
+          { name: 'settings', path: 'data/settings', format: 'json' },
+          { name: 'post', path: 'src/posts', format: 'mdx' },
+        ],
+      })
+    );
+
+    vi.useFakeTimers();
+    try {
+      const { plugins } = runConfigSetup();
+      const { server, ssrSend, handlers } = makeDevServer({ root });
+      (invalidationPlugin(plugins).configureServer as any)(server);
+
+      // Reacts to content under any configured collection root.
+      for (const file of [
+        join(root, 'data/settings/site.json'),
+        join(root, 'src/posts/hello.mdx'),
+      ]) {
+        handlers.add(file);
+        vi.advanceTimersByTime(50);
+        expect(ssrSend).toHaveBeenCalled();
+        ssrSend.mockClear();
+      }
+
+      // Ignores files outside every root, and non-content files inside one.
+      for (const file of [
+        join(root, 'package.json'),
+        join(root, 'data/settings/README.txt'),
+      ]) {
+        handlers.add(file);
+        vi.advanceTimersByTime(50);
+        expect(ssrSend).not.toHaveBeenCalled();
+      }
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('coalesces a burst of changes into a single reload', () => {
+    vi.useFakeTimers();
+    try {
+      const { plugins } = runConfigSetup();
+      const { server, ssrSend, clientSend, handlers } = makeDevServer();
+      (invalidationPlugin(plugins).configureServer as any)(server);
+
+      handlers.add('/project/content/a.md');
+      handlers.add('/project/content/b.md');
+      handlers.unlink('/project/content/c.md');
+      vi.advanceTimersByTime(50);
+
+      expect(ssrSend).toHaveBeenCalledOnce();
+      expect(clientSend).toHaveBeenCalledOnce();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('does not arm on Astro 5, whose runtime has no astro:content-changed listener', () => {
+    // The integration reads the installed Astro major from `astro`'s
+    // package.json via JSON.parse; force it to 5.x for this call only. Astro 5
+    // ships Vite 6, so the environment API is present either way; the version
+    // gate, not an API sniff, is what keeps the plugin from arming here.
+    const parse = vi
+      .spyOn(JSON, 'parse')
+      .mockReturnValue({ version: '5.18.1' });
+    try {
+      const { plugins } = runConfigSetup();
+      const { server, ssrSend, clientSend, handlers } = makeDevServer();
+      (invalidationPlugin(plugins).configureServer as any)(server);
+
+      // Gate trips before any watcher is wired or HMR signal is sent.
+      expect(Object.keys(handlers)).toHaveLength(0);
+      expect(ssrSend).not.toHaveBeenCalled();
+      expect(clientSend).not.toHaveBeenCalled();
+    } finally {
+      parse.mockRestore();
+    }
+  });
+
+  it('warns in dev that live refresh needs Astro 6+ when on Astro 5', () => {
+    const parse = vi
+      .spyOn(JSON, 'parse')
+      .mockReturnValue({ version: '5.18.1' });
+    try {
+      const { logger } = runConfigSetup();
+      expect(logger.warn).toHaveBeenCalledWith(
+        expect.stringContaining('Astro 6 or newer')
+      );
+    } finally {
+      parse.mockRestore();
+    }
+  });
+
+  it('does not warn on Astro 6, where live refresh works', () => {
+    // The installed Astro is 6.x, so the version gate passes and nothing warns.
+    const { logger } = runConfigSetup();
+    expect(logger.warn).not.toHaveBeenCalled();
+  });
+
+  it('does not warn outside dev (e.g. build) even on Astro 5', () => {
+    const parse = vi
+      .spyOn(JSON, 'parse')
+      .mockReturnValue({ version: '5.18.1' });
+    try {
+      const { logger } = runConfigSetup(undefined, { command: 'build' });
+      expect(logger.warn).not.toHaveBeenCalled();
+    } finally {
+      parse.mockRestore();
+    }
+  });
+
+  it('no-ops without throwing when the environment API is unavailable', () => {
+    const { plugins } = runConfigSetup();
+    const { server, handlers } = makeDevServer({ environments: false });
+    expect(() =>
+      (invalidationPlugin(plugins).configureServer as any)(server)
+    ).not.toThrow();
+    // Defensive secondary guard: past the version check but with the hot
+    // channels absent, register no handlers rather than guess at the channel.
+    expect(Object.keys(handlers)).toHaveLength(0);
+  });
+});
+
+describe('tina() integration - astro:build:done', () => {
   it('emits bridge.js into the client output dir', () => {
     const clientDir = mkdtempSync(join(tmpdir(), 'tina-client-'));
     const { integration } = runConfigSetup();

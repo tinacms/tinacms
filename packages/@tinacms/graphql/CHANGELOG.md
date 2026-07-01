@@ -1,5 +1,17 @@
 # tina-graphql
 
+## 2.4.6
+
+### Patch Changes
+
+- [#7088](https://github.com/tinacms/tinacms/pull/7088) [`d44558e`](https://github.com/tinacms/tinacms/commit/d44558e9b4502d4f4fc2c970d22985339fe2b6ce) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Fix media upload/delete paths to prevent access to storage keys outside mediaRoot.
+
+- [#7107](https://github.com/tinacms/tinacms/pull/7107) [`4801b21`](https://github.com/tinacms/tinacms/commit/4801b21f31455d3ce6cb33e6233148caba9921c6) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Standardize date handling on date-fns and remove the moment stack. `@tinacms/graphql` moves to date-fns v4 (collapsing the previous v2/v4 split), and `tinacms` drops `moment`, `moment-timezone`, and `react-datetime`. The date-field display label now formats with date-fns via a non-breaking moment→date-fns token converter, so existing `dateFormat`/`timeFormat` schemas (moment token syntax) keep working unchanged. Also removes the orphaned vendored react-datetime views. Net effect: the admin bundle no longer ships moment (~18.6 KB gzip smaller first load).
+
+- Updated dependencies [[`e74a7d6`](https://github.com/tinacms/tinacms/commit/e74a7d62ee1dce7386b5aaf5ebaf569d3adcd247), [`5ba482b`](https://github.com/tinacms/tinacms/commit/5ba482b9c10d76ea7f7bea2a442a8999824736a8), [`d44558e`](https://github.com/tinacms/tinacms/commit/d44558e9b4502d4f4fc2c970d22985339fe2b6ce)]:
+  - @tinacms/schema-tools@2.8.2
+  - @tinacms/mdx@2.1.8
+
 ## 2.4.5
 
 ### Patch Changes

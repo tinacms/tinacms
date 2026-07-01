@@ -1,5 +1,16 @@
 # @tinacms/astro
 
+## 0.5.1
+
+### Patch Changes
+
+- [#7069](https://github.com/tinacms/tinacms/pull/7069) [`2676b78`](https://github.com/tinacms/tinacms/commit/2676b7825873959f8feb4fa7e3eee1de9450b06d) Thanks [@kulesy](https://github.com/kulesy)! - Re-run `getStaticPaths` in dev when Tina writes or deletes a content file, so newly created entries no longer 404 until the dev server is restarted by hand. Applies to Astro 6+, whose dev runtime handles the `astro:content-changed` signal; Astro 5 is left untouched.
+
+- [#7088](https://github.com/tinacms/tinacms/pull/7088) [`d44558e`](https://github.com/tinacms/tinacms/commit/d44558e9b4502d4f4fc2c970d22985339fe2b6ce) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Fix media upload/delete paths to prevent access to storage keys outside mediaRoot.
+
+- Updated dependencies []:
+  - @tinacms/bridge@0.3.0
+
 ## 0.5.0
 
 ### Minor Changes
