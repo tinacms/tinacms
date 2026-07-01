@@ -13,6 +13,7 @@ import {
 import { TokenObject } from '../auth/authenticate';
 
 import {
+  ASYNC_POLLER_ERROR,
   AuthProvider,
   Schema,
   TinaSchema,
@@ -501,9 +502,7 @@ mutation addPendingDocumentMutation(
               if (result.status === 'unknown') {
                 unknownCount++;
                 if (unknownCount > 5) {
-                  throw new Error(
-                    'AsyncPoller: status unknown for too long, please check indexing progress the TinaCloud dashboard'
-                  );
+                  throw new Error(ASYNC_POLLER_ERROR.STATUS_UNKNOWN);
                 }
               }
               return Promise.resolve({
@@ -521,7 +520,7 @@ mutation addPendingDocumentMutation(
       );
       return [prom, cancel];
     } catch (error) {
-      if (error.message === 'AsyncPoller: reached timeout') {
+      if (error.message === ASYNC_POLLER_ERROR.TIMEOUT) {
         console.warn(error);
         return [Promise.resolve({ status: 'timeout' }), () => {}];
       }
