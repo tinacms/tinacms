@@ -166,8 +166,7 @@ type SuccessRecord = { ok: true } | { ok: false; message: string };
  * appear in legitimate filenames or dotfile paths.
  *
  * @security DUPLICATED from `@tinacms/cli/src/utils/path.ts`.
- * Keep in sync with the canonical copy and the Express-server copy in
- * `cli/src/server/models/media.ts`.
+ * Keep in sync with the canonical copy.
  */
 const ENCODED_TRAVERSAL_RE = /%2e%2e|%2f|%5c/i;
 
