@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.6.2
+
+### Patch Changes
+
+- [#7095](https://github.com/tinacms/tinacms/pull/7095) [`39c06f7`](https://github.com/tinacms/tinacms/commit/39c06f7c21cac7dfd94ff6acfcdeec7117989773) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Harden npm publish pipeline and package manifests
+
 ## 1.6.1
 
 ### Patch Changes

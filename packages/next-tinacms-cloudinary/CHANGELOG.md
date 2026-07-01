@@ -1,5 +1,14 @@
 # next-tinacms-cloudinary
 
+## 26.0.4
+
+### Patch Changes
+
+- [#7088](https://github.com/tinacms/tinacms/pull/7088) [`d44558e`](https://github.com/tinacms/tinacms/commit/d44558e9b4502d4f4fc2c970d22985339fe2b6ce) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Fix media upload/delete paths to prevent access to storage keys outside mediaRoot.
+
+- Updated dependencies [[`c1994b3`](https://github.com/tinacms/tinacms/commit/c1994b36907710aeb36fd114fa6d0a8a0e1210d0), [`caadf1f`](https://github.com/tinacms/tinacms/commit/caadf1f68ec602277bcd4225a69c13fdc5402f7b), [`5ba482b`](https://github.com/tinacms/tinacms/commit/5ba482b9c10d76ea7f7bea2a442a8999824736a8), [`8a86ffa`](https://github.com/tinacms/tinacms/commit/8a86ffa045af8ff6dfa0ebc2775cf3b7b810d238), [`19fcbdd`](https://github.com/tinacms/tinacms/commit/19fcbdd90a33a66c437b0f91e325a8609022e0cc), [`871ce31`](https://github.com/tinacms/tinacms/commit/871ce31531d3d7dc379ec7d58cf427984dd6620a), [`d44558e`](https://github.com/tinacms/tinacms/commit/d44558e9b4502d4f4fc2c970d22985339fe2b6ce), [`4801b21`](https://github.com/tinacms/tinacms/commit/4801b21f31455d3ce6cb33e6233148caba9921c6)]:
+  - tinacms@3.9.4
+
 ## 26.0.3
 
 ### Patch Changes
