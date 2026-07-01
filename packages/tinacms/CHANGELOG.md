@@ -1,5 +1,31 @@
 # tinacms
 
+## 3.9.4
+
+### Patch Changes
+
+- [#6939](https://github.com/tinacms/tinacms/pull/6939) [`c1994b3`](https://github.com/tinacms/tinacms/commit/c1994b36907710aeb36fd114fa6d0a8a0e1210d0) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - feat(tinacms): add a back-to-collection breadcrumb on the admin editor/create pages and in the visual editor sidebar, switch the breadcrumb separator from a chevron to a slash, show only the filename (not the full folder path) in the root breadcrumb across both editors, and truncate long crumbs so the trail no longer overflows
+
+- [#7062](https://github.com/tinacms/tinacms/pull/7062) [`caadf1f`](https://github.com/tinacms/tinacms/commit/caadf1f68ec602277bcd4225a69c13fdc5402f7b) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Improve global collection UX: global collections now appear once in the sidebar "Site" section (globe icon) instead of being duplicated under Collections, open directly in the form instead of a popup modal, and single-document global collections skip the document list and go straight to the form. Global collections with zero or multiple documents fall through to the normal list view.
+
+- [#7058](https://github.com/tinacms/tinacms/pull/7058) [`5ba482b`](https://github.com/tinacms/tinacms/commit/5ba482b9c10d76ea7f7bea2a442a8999824736a8) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Fix Local Mode banner for absolute contentApiUrlOverride
+
+- [#7103](https://github.com/tinacms/tinacms/pull/7103) [`8a86ffa`](https://github.com/tinacms/tinacms/commit/8a86ffa045af8ff6dfa0ebc2775cf3b7b810d238) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Move `moment-timezone` to devDependencies so its timezone database no longer ships in the admin bundle. It was loaded via a non-tree-shakeable side-effect import, but production code never used the `moment.tz` API (only a unit test did). Removes ~39 KB gzip (~732 KB uncompressed) from the first admin load. No behavior change.
+
+- [#7105](https://github.com/tinacms/tinacms/pull/7105) [`19fcbdd`](https://github.com/tinacms/tinacms/commit/19fcbdd90a33a66c437b0f91e325a8609022e0cc) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Remove the dead `mdx-field-plugin/plate/plugins/ui/icons.tsx` module (398 lines of unused inline-SVG icons). Its single consumed export (`EllipsisIcon`) now resolves from the shared `plate-ui/icons` module. No behavior change.
+
+- [#7063](https://github.com/tinacms/tinacms/pull/7063) [`871ce31`](https://github.com/tinacms/tinacms/commit/871ce31531d3d7dc379ec7d58cf427984dd6620a) Thanks [@18-th](https://github.com/18-th)! - Remove unused `add` dependency
+
+- [#7088](https://github.com/tinacms/tinacms/pull/7088) [`d44558e`](https://github.com/tinacms/tinacms/commit/d44558e9b4502d4f4fc2c970d22985339fe2b6ce) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Fix media upload/delete paths to prevent access to storage keys outside mediaRoot.
+
+- [#7107](https://github.com/tinacms/tinacms/pull/7107) [`4801b21`](https://github.com/tinacms/tinacms/commit/4801b21f31455d3ce6cb33e6233148caba9921c6) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Standardize date handling on date-fns and remove the moment stack. `@tinacms/graphql` moves to date-fns v4 (collapsing the previous v2/v4 split), and `tinacms` drops `moment`, `moment-timezone`, and `react-datetime`. The date-field display label now formats with date-fns via a non-breaking moment→date-fns token converter, so existing `dateFormat`/`timeFormat` schemas (moment token syntax) keep working unchanged. Also removes the orphaned vendored react-datetime views. Net effect: the admin bundle no longer ships moment (~18.6 KB gzip smaller first load).
+
+- Updated dependencies [[`e74a7d6`](https://github.com/tinacms/tinacms/commit/e74a7d62ee1dce7386b5aaf5ebaf569d3adcd247), [`5ba482b`](https://github.com/tinacms/tinacms/commit/5ba482b9c10d76ea7f7bea2a442a8999824736a8), [`d44558e`](https://github.com/tinacms/tinacms/commit/d44558e9b4502d4f4fc2c970d22985339fe2b6ce)]:
+  - @tinacms/schema-tools@2.8.2
+  - @tinacms/search@1.2.20
+  - @tinacms/mdx@2.1.8
+  - @tinacms/bridge@0.3.0
+
 ## 3.9.3
 
 ### Patch Changes
