@@ -1,32 +1,9 @@
 import * as React from 'react';
 
-// Persisted preference for whether editorial-workflow saves open a draft PR.
-// Global (not per-project): one editor, one preference.
+// Persisted preference key for whether editorial-workflow saves open a draft PR.
+// Global (not per-project): one editor, one preference. Persistence itself is
+// handled by the shared `useLocalStorage` hook at the call site.
 export const IS_DRAFT_STORAGE_KEY = 'tina.editorialWorkflow.isDraft';
-
-/**
- * Reads the editor's last "draft vs ready for review" choice.
- * Defaults to draft (true) when nothing is stored, matching the server default.
- * Guards against environments where localStorage is unavailable.
- */
-export const getPersistedIsDraft = (): boolean => {
-  try {
-    const stored = window.localStorage.getItem(IS_DRAFT_STORAGE_KEY);
-    if (stored === null) return true;
-    return stored === 'true';
-  } catch {
-    return true;
-  }
-};
-
-/** Persists the editor's choice; silently ignores storage failures. */
-export const persistIsDraft = (isDraft: boolean): void => {
-  try {
-    window.localStorage.setItem(IS_DRAFT_STORAGE_KEY, String(isDraft));
-  } catch {
-    // Private browsing / SSR — non-fatal, just skip persistence.
-  }
-};
 
 const Segment = ({
   active,

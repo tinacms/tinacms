@@ -15,10 +15,10 @@ import { Form } from '@toolkit/forms';
 import { EditorialWorkflowProgressModal } from './editorial-workflow-progress-modal';
 import { checkBaseBranchExists } from './editorial-workflow-utils';
 import { useEditorialWorkflow } from './use-editorial-workflow';
+import { useLocalStorage } from '@toolkit/hooks/use-local-storage';
 import {
+  IS_DRAFT_STORAGE_KEY,
   PullRequestStatusField,
-  getPersistedIsDraft,
-  persistIsDraft,
 } from './pull-request-status-field';
 
 // Format the default branch name by removing content/ prefix and file extension
@@ -200,7 +200,10 @@ export const CreateBranchPromptModal = ({
   // workflow reuses this modal but does not thread isDraft, so it stays hidden there.
   showPullRequestStatus?: boolean;
 }) => {
-  const [isDraft, setIsDraft] = React.useState(getPersistedIsDraft);
+  const [isDraft, setIsDraft] = useLocalStorage(IS_DRAFT_STORAGE_KEY, true) as [
+    boolean,
+    (value: boolean) => void,
+  ];
   return (
     <Modal className='flex'>
       <PopupModal className='w-auto'>
@@ -247,13 +250,7 @@ export const CreateBranchPromptModal = ({
               }}
             />
             {showPullRequestStatus && (
-              <PullRequestStatusField
-                isDraft={isDraft}
-                onChange={(value) => {
-                  setIsDraft(value);
-                  persistIsDraft(value);
-                }}
-              />
+              <PullRequestStatusField isDraft={isDraft} onChange={setIsDraft} />
             )}
           </div>
         </ModalBody>

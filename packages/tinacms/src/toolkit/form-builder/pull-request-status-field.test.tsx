@@ -1,31 +1,9 @@
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import * as React from 'react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
-import {
-  IS_DRAFT_STORAGE_KEY,
-  PullRequestStatusField,
-  getPersistedIsDraft,
-  persistIsDraft,
-} from './pull-request-status-field';
-
-describe('isDraft persistence', () => {
-  beforeEach(() => window.localStorage.clear());
-
-  it('defaults to draft (true) when nothing is stored', () => {
-    expect(getPersistedIsDraft()).toBe(true);
-  });
-
-  it('round-trips the stored preference', () => {
-    persistIsDraft(false);
-    expect(window.localStorage.getItem(IS_DRAFT_STORAGE_KEY)).toBe('false');
-    expect(getPersistedIsDraft()).toBe(false);
-
-    persistIsDraft(true);
-    expect(getPersistedIsDraft()).toBe(true);
-  });
-});
+import { PullRequestStatusField } from './pull-request-status-field';
 
 describe('PullRequestStatusField', () => {
   it('marks the active segment based on the isDraft prop', () => {
