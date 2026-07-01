@@ -42,6 +42,7 @@ export const askCommonSetUp = async () => {
         { title: 'Yarn', value: 'yarn' },
         { title: 'NPM', value: 'npm' },
         { title: 'Bun', value: 'bun' },
+        { title: 'Deno', value: 'deno' },
       ],
     },
   ]);
@@ -53,7 +54,7 @@ export const askCommonSetUp = async () => {
   }
   return answers as {
     framework: Framework;
-    packageManager: 'pnpm' | 'yarn' | 'npm' | 'bun';
+    packageManager: 'pnpm' | 'yarn' | 'npm' | 'bun' | 'deno';
   };
 };
 export const askForestryMigrate = async ({
