@@ -241,7 +241,7 @@ catalog:
     stopword: ^3.1.4
     stringify-entities: 4.0.3
     tailwindcss-animate: ^1.0.7
-    tar: 7.4.0
+    tar: 7.5.16
     ts-jest: ^29.2.5
     ts-node: ^10.9.2
     tsc-alias: ^1.8.10
