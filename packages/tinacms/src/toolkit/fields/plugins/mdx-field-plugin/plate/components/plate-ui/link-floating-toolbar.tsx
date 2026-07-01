@@ -2,10 +2,13 @@
 
 import * as React from 'react';
 
+import { PortalBody } from '@udecode/cn';
 import {
   type UseVirtualFloatingOptions,
   flip,
+  limitShift,
   offset,
+  shift,
 } from '@udecode/plate-floating';
 import { type TLinkElement, getLinkAttributes } from '@udecode/plate-link';
 import {
@@ -31,7 +34,7 @@ import { Separator } from './separator';
 import { buttonVariants } from './button';
 
 const popoverVariants = cva(
-  'z-50 w-auto rounded-md border bg-popover p-1 text-popover-foreground shadow-md outline-hidden'
+  'z-[999999] w-auto rounded-md border bg-popover p-1 text-popover-foreground shadow-md outline-hidden'
 );
 
 const inputVariants = cva(
@@ -74,12 +77,14 @@ export function LinkFloatingToolbar({
           fallbackPlacements: ['bottom-end', 'top-start', 'top-end'],
           padding: 12,
         }),
+        shift({ padding: 8, limiter: limitShift() }),
       ],
       placement:
         activeSuggestionId || activeCommentId ? 'top-start' : 'bottom-start',
     };
   }, [activeCommentId, activeSuggestionId]);
 
+  //when adding a new link
   const insertState = useFloatingLinkInsertState({
     ...state,
     floatingOptions: {
@@ -94,6 +99,7 @@ export function LinkFloatingToolbar({
     textInputProps,
   } = useFloatingLinkInsert(insertState);
 
+  //when editing an existing link
   const editState = useFloatingLinkEditState({
     ...state,
     floatingOptions: {
@@ -113,6 +119,7 @@ export function LinkFloatingToolbar({
 
   if (hidden) return null;
 
+  // container of popup for links, including the input fields and buttons
   const input = (
     <div
       className='z-[999999] flex w-[330px] flex-col relative'
@@ -221,14 +228,14 @@ export function LinkFloatingToolbar({
       </button>
     </div>
   );
-
+  
   return (
-    <>
+    <PortalBody>
       <div
         ref={insertRef}
         className={popoverVariants()}
         {...insertProps}
-        style={insertProps.style as React.CSSProperties}
+        style={{ ...(insertProps.style as React.CSSProperties), zIndex: 99999 }}
       >
         {input}
       </div>
@@ -237,11 +244,11 @@ export function LinkFloatingToolbar({
         ref={editRef}
         className={popoverVariants()}
         {...editProps}
-        style={editProps.style as React.CSSProperties}
+        style={{ ...(editProps.style as React.CSSProperties), zIndex: 99999 }}
       >
         {editContent}
       </div>
-    </>
+    </PortalBody>
   );
 }
 
