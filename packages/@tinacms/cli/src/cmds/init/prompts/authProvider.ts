@@ -14,7 +14,8 @@ const supportedAuthProviders: {
   },
   'tina-cloud': {
     configAuthProviderClass: '',
-    backendAuthProvider: 'TinaCloudBackendAuthProvider()',
+    backendAuthProvider:
+      'TinaCloudBackendAuthProvider(process.env.NEXT_PUBLIC_TINA_CLIENT_ID)',
     name: 'tina-cloud',
     backendAuthProviderImports: [
       {
