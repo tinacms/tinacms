@@ -502,9 +502,7 @@ mutation addPendingDocumentMutation(
               if (result.status === 'unknown') {
                 unknownCount++;
                 if (unknownCount > 5) {
-                  throw new Error(
-                    'AsyncPoller: status unknown for too long, please check indexing progress the TinaCloud dashboard'
-                  );
+                  throw new Error(ASYNC_POLLER_ERROR.STATUS_UNKNOWN);
                 }
               }
               return Promise.resolve({
