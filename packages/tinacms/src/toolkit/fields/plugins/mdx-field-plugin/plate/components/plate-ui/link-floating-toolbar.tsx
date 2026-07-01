@@ -235,7 +235,7 @@ export function LinkFloatingToolbar({
         ref={insertRef}
         className={popoverVariants()}
         {...insertProps}
-        style={{ ...(insertProps.style as React.CSSProperties), zIndex: 99999 }}
+        style={{ ...(insertProps.style as React.CSSProperties) }}
       >
         {input}
       </div>
@@ -244,7 +244,7 @@ export function LinkFloatingToolbar({
         ref={editRef}
         className={popoverVariants()}
         {...editProps}
-        style={{ ...(editProps.style as React.CSSProperties), zIndex: 99999 }}
+        style={{ ...(editProps.style as React.CSSProperties) }}
       >
         {editContent}
       </div>
