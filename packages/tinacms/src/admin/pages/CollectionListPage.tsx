@@ -452,7 +452,6 @@ const CollectionListPage = () => {
                                 'Document was not deleted, ask a developer for help or check the console for an error message'
                               );
                               console.error(error);
-                              throw error;
                             }
                           }}
                           close={() => setDeleteModalOpen(false)}
