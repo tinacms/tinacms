@@ -18,8 +18,9 @@ import { NextApiHandler } from 'next'
 import { isAuthorized } from '@tinacms/auth'
 const apiHandler: NextApiHandler = async (req, res) => {
 
-  // This will check if the user is logged in. It will return undefined if the user token is not valid
-  const user = await isAuthorized(req)
+  // This will check if the user is logged in. It will return undefined if the user token is not valid.
+  // Pass your site's own clientID so the token is validated against your app.
+  const user = await isAuthorized(req, process.env.NEXT_PUBLIC_TINA_CLIENT_ID)
   if (user && user.verified) {
     console.log('this user is logged in')
     // now you could (for example) upload images
@@ -59,10 +60,8 @@ Now in our media manager, or someone in the frontend code that is wrapped with `
 const cms = useCMS()
 const tinaCloudClient: Client = cms.api.tina
 const uploadImage = async () => {
-  const req = await tinaCloudClient.fetchWithToken(`/api/upload?clientID=${tinaCloudClient.clientId}`)
+  const req = await tinaCloudClient.fetchWithToken(`/api/upload`)
   console.log({ test: await test.json() })
 }
 ```
 The `fetchWithToken` function is just the normal [fetch function](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch) but adds the `authorization` header with the correct token.
-
-You also have to add two query Params to the request; `org` which is the current organization and clientID. Both of these can be found in the `cms.api.tina`.

@@ -37,8 +37,10 @@ export const isAuthorized = async (
 ): Promise<TinaCloudUser | undefined> => {
   const token = (await headers()).get('authorization');
   // Validate against the site's configured app id, never a request value.
-  const clientID = expectedClientID ?? process.env.NEXT_PUBLIC_TINA_CLIENT_ID;
-  if (typeof clientID !== 'string' || clientID.trim().length === 0) {
+  const clientID = (
+    expectedClientID ?? process.env.NEXT_PUBLIC_TINA_CLIENT_ID
+  )?.trim();
+  if (typeof clientID !== 'string' || clientID.length === 0) {
     console.error(
       "isAuthorized could not resolve this site's clientID. Pass it explicitly or set the NEXT_PUBLIC_TINA_CLIENT_ID env var. Refusing to authorize."
     );
