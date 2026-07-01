@@ -762,6 +762,8 @@ mutation addPendingDocumentMutation(
     branchName: string;
     baseBranch: string;
     prTitle?: string;
+    // When false, opens a ready-for-review PR. Omitted keeps the server's draft-first default.
+    isDraft?: boolean;
     graphQLContentOp?: {
       query: string;
       variables: Record<string, unknown>;
@@ -777,6 +779,7 @@ mutation addPendingDocumentMutation(
           branchName: options.branchName,
           baseBranch: options.baseBranch,
           prTitle: options.prTitle,
+          isDraft: options.isDraft,
           graphQLContentOp: options.graphQLContentOp,
         },
         'Failed to start editorial workflow'

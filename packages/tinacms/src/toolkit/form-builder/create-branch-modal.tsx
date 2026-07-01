@@ -15,6 +15,11 @@ import { Form } from '@toolkit/forms';
 import { EditorialWorkflowProgressModal } from './editorial-workflow-progress-modal';
 import { checkBaseBranchExists } from './editorial-workflow-utils';
 import { useEditorialWorkflow } from './use-editorial-workflow';
+import {
+  PullRequestStatusField,
+  getPersistedIsDraft,
+  persistIsDraft,
+} from './pull-request-status-field';
 
 // Format the default branch name by removing content/ prefix and file extension
 const formatDefaultBranchName = (
@@ -91,7 +96,7 @@ export const CreateBranchModal = ({
     };
   }, []);
 
-  const executeEditorialWorkflow = async () => {
+  const executeEditorialWorkflow = async (isDraft: boolean) => {
     abortBranchGuard();
     const abortController = new AbortController();
     branchGuardAbortRef.current = abortController;
@@ -128,6 +133,7 @@ export const CreateBranchModal = ({
       crudType,
       tinaForm,
       signal: abortController.signal,
+      isDraft,
     });
     if (branchGuardAbortRef.current === abortController) {
       branchGuardAbortRef.current = null;
@@ -168,6 +174,7 @@ export const CreateBranchModal = ({
         close();
         safeSubmit();
       }}
+      showPullRequestStatus={true}
     />
   );
 };
@@ -180,15 +187,20 @@ export const CreateBranchPromptModal = ({
   onBranchNameChange,
   onCreateBranch,
   onSaveToProtectedBranch,
+  showPullRequestStatus = false,
 }: {
   branchName: string;
   close: () => void;
   disabled?: boolean;
   errorMessage?: string;
   onBranchNameChange: (value: string) => void;
-  onCreateBranch: () => void;
+  onCreateBranch: (isDraft: boolean) => void;
   onSaveToProtectedBranch: () => void;
+  // Content editorial workflow opts in to the draft/ready control. The media
+  // workflow reuses this modal but does not thread isDraft, so it stays hidden there.
+  showPullRequestStatus?: boolean;
 }) => {
+  const [isDraft, setIsDraft] = React.useState(getPersistedIsDraft);
   return (
     <Modal className='flex'>
       <PopupModal className='w-auto'>
@@ -234,6 +246,15 @@ export const CreateBranchPromptModal = ({
                 onBranchNameChange(e.target.value);
               }}
             />
+            {showPullRequestStatus && (
+              <PullRequestStatusField
+                isDraft={isDraft}
+                onChange={(value) => {
+                  setIsDraft(value);
+                  persistIsDraft(value);
+                }}
+              />
+            )}
           </div>
         </ModalBody>
         <ModalActions align='end'>
@@ -249,7 +270,7 @@ export const CreateBranchPromptModal = ({
             align='start'
             className='w-full sm:w-auto'
             disabled={disabled}
-            onMainAction={onCreateBranch}
+            onMainAction={() => onCreateBranch(isDraft)}
             items={[
               {
                 label: 'Save to Protected Branch',

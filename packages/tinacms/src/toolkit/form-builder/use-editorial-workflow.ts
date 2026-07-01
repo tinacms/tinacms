@@ -69,6 +69,8 @@ export interface ExecuteWorkflowOptions {
   crudType: string;
   tinaForm?: Form;
   signal?: AbortSignal;
+  // When false, opens a ready-for-review PR. Omitted keeps the server's draft-first default.
+  isDraft?: boolean;
 }
 
 export interface UseEditorialWorkflowResult {
@@ -153,6 +155,7 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
     crudType,
     tinaForm,
     signal,
+    isDraft,
   }: ExecuteWorkflowOptions): Promise<boolean> => {
     try {
       if (signal?.aborted) return false;
@@ -202,6 +205,7 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
         branchName,
         baseBranch,
         prTitle: getEditorialWorkflowPrTitle(branchName),
+        isDraft,
         graphQLContentOp: {
           query: graphql,
           variables: {
