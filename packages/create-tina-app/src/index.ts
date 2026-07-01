@@ -11,7 +11,12 @@ import {
 } from './util/fileUtil';
 import { install } from './util/install';
 import { initializeGit, makeFirstCommit } from './util/git';
-import { TEMPLATES, Template, downloadTemplate } from './templates';
+import {
+  DEFAULT_TEMPLATE_VALUE,
+  TEMPLATES,
+  Template,
+  downloadTemplate,
+} from './templates';
 import { preRunChecks } from './util/preRunChecks';
 import { checkPackageExists } from './util/checkPkgManagers';
 import { TextStyles, TextStylesBold, box } from './util/textstyles';
@@ -300,30 +305,44 @@ export async function run() {
   }
 
   if (!template) {
-    const res = await prompts({
-      name: 'template',
-      type: 'select',
-      message: 'What starter code would you like to use?',
-      choices: TEMPLATES.map(formatTemplateChoice),
-    });
-    if (!Object.hasOwn(res, 'template')) {
-      postHogCaptureError(
-        posthogClient,
-        userId,
-        sessionId,
-        new Error('User cancelled template selection'),
-        {
-          errorCode: ERROR_CODES.ERR_CANCEL_TEMPLATE_PROMPT,
-          errorCategory: 'user-cancellation',
-          step: TRACKING_STEPS.TEMPLATE_SELECT,
-          fatal: true,
-          additionalProperties: telemetryData,
-        }
+    const foundDefaultIndex = TEMPLATES.findIndex(
+      (t) => t.value === DEFAULT_TEMPLATE_VALUE
+    );
+    const defaultTemplate =
+      foundDefaultIndex >= 0 ? TEMPLATES[foundDefaultIndex] : undefined;
+    const defaultTemplateIndex = foundDefaultIndex >= 0 ? foundDefaultIndex : 0;
+
+    if (!process.stdin.isTTY && defaultTemplate) {
+      template = defaultTemplate;
+    } else {
+      const res = await prompts({
+        name: 'template',
+        type: 'select',
+        message: 'What starter code would you like to use?',
+        choices: TEMPLATES.map(formatTemplateChoice),
+        initial: defaultTemplateIndex,
+      });
+      if (!Object.hasOwn(res, 'template')) {
+        postHogCaptureError(
+          posthogClient,
+          userId,
+          sessionId,
+          new Error('User cancelled template selection'),
+          {
+            errorCode: ERROR_CODES.ERR_CANCEL_TEMPLATE_PROMPT,
+            errorCategory: 'user-cancellation',
+            step: TRACKING_STEPS.TEMPLATE_SELECT,
+            fatal: true,
+            additionalProperties: telemetryData,
+          }
+        );
+        if (posthogClient) await posthogClient.shutdown();
+        exit(1);
+      }
+      template = TEMPLATES.find(
+        (_template) => _template.value === res.template
       );
-      if (posthogClient) await posthogClient.shutdown();
-      exit(1);
     }
-    template = TEMPLATES.find((_template) => _template.value === res.template);
   }
   telemetryData['template'] = template.value;
 
