@@ -134,15 +134,19 @@ export function useFieldErrors(address: FieldAddress): string[] {
 export function useFieldActivation(handler: () => void): void {
   const address = use(FieldAddressContext);
   const formId = use(FormIdContext);
-  const isActive = useFormStore(
-    (state) =>
-      address != null &&
-      state.active?.formId === formId &&
-      state.active.address === address
-  );
+  // Subscribe to the activation entry itself, not a derived boolean: setActive
+  // writes a fresh object every call, so re-activating an already-active field
+  // re-fires the handler (a boolean would latch and swallow the repeat click).
+  const active = useFormStore((state) => state.active);
   const handlerRef = useRef(handler);
   handlerRef.current = handler;
   useEffect(() => {
-    if (isActive) handlerRef.current();
-  }, [isActive]);
+    if (
+      address != null &&
+      active?.formId === formId &&
+      active.address === address
+    ) {
+      handlerRef.current();
+    }
+  }, [active, formId, address]);
 }

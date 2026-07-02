@@ -48,4 +48,28 @@ describe('active-field rail', () => {
     await userEvent.click(screen.getByText('activate'));
     expect(input).toHaveFocus();
   });
+
+  it('re-fires focus when the already-active field is activated again', async () => {
+    render(
+      <TinaProvider plugins={[stringFieldPlugin]}>
+        <FormProvider
+          collection={collection}
+          path='content/posts/active.mdx'
+          document={{ title: 'Hi' }}
+        >
+          <Field address='title' />
+          <ActivateProbe />
+        </FormProvider>
+      </TinaProvider>
+    );
+    const input = await screen.findByLabelText('title');
+    await userEvent.click(screen.getByText('activate'));
+    expect(input).toHaveFocus();
+
+    // Blur (e.g. the user clicked elsewhere), then activate the same field again.
+    (input as HTMLInputElement).blur();
+    expect(input).not.toHaveFocus();
+    await userEvent.click(screen.getByText('activate'));
+    expect(input).toHaveFocus();
+  });
 });
