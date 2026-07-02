@@ -21,9 +21,10 @@ export interface PreviewConnectionOptions {
 // markSaved/setActive, so a reference compare posts exactly on value changes
 // (registration included, which also covers a ready arriving before the form
 // exists). Values messages are idempotent full-state, so there is no send
-// queue — every ready is answered with the current values, which also covers
-// an iframe reload. Must sit under FormProvider (useFormId's invariant says so
-// otherwise).
+// queue — every ready is answered with the current values (covers an iframe
+// reload), and connecting posts the current scope outright (covers switching
+// to an already-edited form, whose re-registration is a store no-op). Must sit
+// under FormProvider (useFormId's invariant says so otherwise).
 export function usePreviewConnection(
   iframeRef: RefObject<HTMLIFrameElement | null>,
   options?: PreviewConnectionOptions
@@ -38,7 +39,11 @@ export function usePreviewConnection(
       target()?.postMessage(valuesMessage(toDocument(values)), targetOrigin);
 
     const onMessage = (event: MessageEvent) => {
-      if (event.origin !== targetOrigin || event.source !== target()) return;
+      // The null check matters: with no iframe mounted, target() === null would
+      // otherwise equal a stray same-origin message's null source.
+      const source = target();
+      if (!source || event.origin !== targetOrigin || event.source !== source)
+        return;
       if (isReadyMessage(event.data)) {
         const scope = useFormStore.getState().forms[formId];
         if (scope) postValues(scope.values);
@@ -54,6 +59,9 @@ export function usePreviewConnection(
         postValues(values);
       }
     });
+
+    const scope = useFormStore.getState().forms[formId];
+    if (scope) postValues(scope.values);
 
     return () => {
       window.removeEventListener('message', onMessage);

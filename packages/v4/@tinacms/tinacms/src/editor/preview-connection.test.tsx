@@ -150,14 +150,14 @@ describe('usePreviewConnection', () => {
     expect(useFormStore.getState().active).toBeNull();
   });
 
-  it('answers a ready that arrives before any form is registered with silence', () => {
+  it('a ready before any form registers is silent until registration answers it', async () => {
     const iframe = fakeIframe();
-    // No FormProvider content yet: drive the hook against an empty store.
+    // No <Field> content: drive the hook against a store emptied after mount.
     function Bare() {
       const ref = useRef<HTMLIFrameElement | null>(null);
       ref.current = iframe.ref.current;
       usePreviewConnection(ref);
-      return null;
+      return <div>bare</div>;
     }
     render(
       <TinaProvider plugins={[stringFieldPlugin]}>
@@ -166,12 +166,64 @@ describe('usePreviewConnection', () => {
         </FormProvider>
       </TinaProvider>
     );
+    // TinaProvider mounts children only after plugins resolve — wait for it.
+    await screen.findByText('bare');
     act(() => {
       useFormStore.setState({ forms: {}, active: null });
     });
     iframe.postMessage.mockClear();
     messageFromPreview(readyMessage(), iframe.ref.current?.contentWindow);
     expect(iframe.postMessage).not.toHaveBeenCalled();
+
+    // Recovery: registration itself fires the subscription post — the early
+    // ready needed no answer because this covers it.
+    act(() => {
+      useFormStore
+        .getState()
+        .registerForm(formId, { [toFieldAddress('title')]: 'Late doc' });
+    });
+    expect(iframe.postMessage).toHaveBeenCalledWith(
+      valuesMessage({ title: 'Late doc' }),
+      window.origin
+    );
+  });
+
+  it('streams an already-edited form on switch — no ready, no edit needed', async () => {
+    const otherPath = 'content/posts/other.mdx';
+    const otherFormId = toFormId(otherPath);
+    act(() => {
+      useFormStore
+        .getState()
+        .registerForm(otherFormId, { [toFieldAddress('title')]: 'Other' });
+      useFormStore
+        .getState()
+        .setFieldValue(otherFormId, toFieldAddress('title'), 'Other edited');
+    });
+    const iframe = fakeIframe();
+    const tree = (documentPath: string) => (
+      <TinaProvider plugins={[stringFieldPlugin]}>
+        <FormProvider
+          collection={collection}
+          path={documentPath}
+          document={{ title: 'Hello' }}
+        >
+          <Field address='title' />
+          <Connection iframeRef={iframe.ref} />
+        </FormProvider>
+      </TinaProvider>
+    );
+    const { rerender } = render(tree(path));
+    await screen.findByLabelText('title');
+    iframe.postMessage.mockClear();
+
+    // The iframe persists across the switch (no new ready) and the edited
+    // scope's re-registration is a store no-op — the connect-time post is the
+    // only thing that can bring the preview over.
+    rerender(tree(otherPath));
+    expect(iframe.postMessage).toHaveBeenCalledWith(
+      valuesMessage({ title: 'Other edited' }),
+      window.origin
+    );
   });
 
   it('goes silent after unmount', async () => {

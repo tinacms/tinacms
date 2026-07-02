@@ -109,6 +109,31 @@ describe('connectToEditor', () => {
     unmarked.remove();
   });
 
+  it('honors a custom allowedOrigin — the cross-origin opt-in', () => {
+    const editor = fakeEditorWindow();
+    const onValues = vi.fn();
+    const editorOrigin = 'https://editor.example';
+    connection = connectToEditor({
+      previewWindow: window,
+      editorWindow: editor,
+      allowedOrigin: editorOrigin,
+      onValues,
+    });
+    expect(editor.postMessage).toHaveBeenCalledWith(
+      readyMessage(),
+      editorOrigin
+    );
+    // The preview's own origin is no longer the allowed one.
+    window.dispatchEvent(
+      messageEvent(valuesMessage({ title: 'own' }), window.origin, editor)
+    );
+    expect(onValues).not.toHaveBeenCalled();
+    window.dispatchEvent(
+      messageEvent(valuesMessage({ title: 'cross' }), editorOrigin, editor)
+    );
+    expect(onValues).toHaveBeenCalledWith({ title: 'cross' });
+  });
+
   it('disconnect removes both listeners', () => {
     const editor = fakeEditorWindow();
     const onValues = vi.fn();

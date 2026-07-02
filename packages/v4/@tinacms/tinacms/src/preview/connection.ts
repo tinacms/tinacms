@@ -37,9 +37,10 @@ export const connectToEditor = ({
     if (isValuesMessage(event.data)) onValues(event.data.values);
   };
   const onClick = (event: MouseEvent) => {
-    const marked = (event.target as Element | null)?.closest(
-      `[${TINA_FIELD_ATTR}]`
-    );
+    // A click target isn't always an Element (a synthetic dispatch can target
+    // the document itself), and only Elements have closest.
+    if (!(event.target instanceof Element)) return;
+    const marked = event.target.closest(`[${TINA_FIELD_ATTR}]`);
     const address = marked?.getAttribute(TINA_FIELD_ATTR);
     if (address) {
       editorWindow.postMessage(activateMessage(address), allowedOrigin);
