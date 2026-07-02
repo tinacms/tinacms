@@ -149,16 +149,21 @@ export function useTina<T extends object>(props: {
 
 export function useEditState(): { edit: boolean } {
   const [edit, setEdit] = React.useState(false);
+  const trustedAdminOrigins = useTrustedAdminOrigins();
   React.useEffect(() => {
-    if (typeof window !== 'undefined') {
-      parent.postMessage({ type: 'isEditMode' }, window.location.origin);
-      window.addEventListener('message', (event) => {
-        if (event.data?.type === 'tina:editMode') {
-          setEdit(true);
-        }
-      });
-    }
-  }, []);
+    if (typeof window === 'undefined') return;
+    parent.postMessage({ type: 'isEditMode' }, window.location.origin);
+    const handleMessage = (event: MessageEvent) => {
+      if (!isFromAdmin(event, trustedAdminOrigins)) return;
+      if (event.data?.type === 'tina:editMode') {
+        setEdit(true);
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, [trustedAdminOrigins]);
   return { edit } as any;
 }
 
