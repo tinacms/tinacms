@@ -6,13 +6,23 @@ import {
   useRef,
   useState,
 } from 'react';
-import { FormProvider as RhfFormProvider, useForm } from 'react-hook-form';
+import {
+  FormProvider as RhfFormProvider,
+  useForm,
+  useFormState,
+} from 'react-hook-form';
 import { toFieldAddress } from '../core/field/address';
 import { createFieldRegistry } from '../core/field/registry';
 import { ingestDocument } from '../core/form/ingest';
 import { type PluginManifest, resolveClientSegments } from '../core/plugin';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
-import { toFormId, toFormValues, useFormStore } from '../form/form-store';
+import {
+  type FieldErrors,
+  toDocument,
+  toFormId,
+  toFormValues,
+  useFormStore,
+} from '../form/form-store';
 import { createTinaStore } from '../store/create-store';
 import {
   FormScopeContext,
@@ -20,6 +30,7 @@ import {
   type TinaRuntime,
   TinaRuntimeContext,
 } from './context';
+import { type FieldErrorEntry, fieldErrorMessages } from './field-errors';
 import { buildFormResolver } from './resolver';
 
 export interface TinaProviderProps {
@@ -84,41 +95,58 @@ export function FormProvider({
   const { registry } = runtime;
 
   const formId = toFormId(path);
-  const defaultValues = useMemo(
+  const ingested = useMemo(
     () => ingestDocument(document, collection.fields, registry),
     [document, collection, registry]
   );
+  // Kept edits win over the incoming document: the store retains an unsaved
+  // form across teardown (ADR-012), so hosting that formId again re-adopts its
+  // values into the fresh RHF instance instead of re-seeding from the document.
+  // Read once per hosted form ([formId], not reactive): while THIS instance
+  // hosts the form, the store mirrors RHF — adopting the mirror back mid-flight
+  // would be a cycle, and a document swap under kept edits keeps the edits
+  // (matching the store's edited no-op; the future draft slice arbitrates
+  // reload-vs-keep, form-store.ts registerForm).
+  const keptSeed = useMemo(() => {
+    const kept = useFormStore.getState().forms[formId];
+    return kept ? toDocument(kept.values) : null;
+  }, [formId]);
+  const seedValues = keptSeed ?? ingested;
   const resolver = useMemo(
     () => buildFormResolver(collection, registry),
     [collection, registry]
   );
   const methods = useForm<TinaDocument>({
-    defaultValues,
+    defaultValues: seedValues,
     resolver,
     mode: 'onChange',
   });
 
-  // Re-seed the form only when the document's content actually changes (compared by
+  // Re-seed the form only when the seed's content actually changes (compared by
   // a JSON signature). RHF's useForm reads defaultValues only at mount, so this
   // reset reloads the form when you switch documents — while a same-content
-  // re-render won't wipe in-progress edits.
-  //
-  // Known seam: resetting while the form-store scope is *edited* diverges the two
-  // (the store keeps edits per ADR-012, RHF adopts the new document). Unreachable
-  // while a provider hosts one document; it's the trigger for the increment that
-  // retires RHF value ownership (form-store.ts header).
+  // re-render won't wipe in-progress edits. The old divergence seam (reset
+  // adopting a new document while the store keeps edits) is closed: a kept
+  // form's seed is the store's own values, so both sides agree.
   const seededSignature = useRef<string | null>(null);
   useEffect(() => {
-    const signature = JSON.stringify(defaultValues);
+    const signature = JSON.stringify(seedValues);
     if (seededSignature.current === null) {
       seededSignature.current = signature;
       return;
     }
     if (seededSignature.current !== signature) {
       seededSignature.current = signature;
-      methods.reset(defaultValues);
+      methods.reset(seedValues);
     }
-  }, [defaultValues, methods]);
+  }, [seedValues, methods]);
+
+  // Re-validate on re-adopt: RHF derives no errors from defaultValues, so a
+  // form re-mounted onto invalid kept edits would look error-free until the
+  // next keystroke. One trigger() re-derives; the mirror below follows.
+  useEffect(() => {
+    if (keptSeed) void methods.trigger();
+  }, [keptSeed, methods]);
 
   // One-way RHF → form-store sync: RHF stays the value/render authority, the
   // form-store is the sole pristine/dirty/clean authority (ADR-010). This watch
@@ -126,7 +154,7 @@ export function FormProvider({
   // miss reset/setValue and be bypassable via a raw useController.
   useEffect(() => {
     const { registerForm, setFieldValue } = useFormStore.getState();
-    registerForm(formId, toFormValues(defaultValues));
+    registerForm(formId, toFormValues(seedValues));
     const subscription = methods.watch((values, { name }) => {
       // `name` is undefined on reset — re-adopting the baseline is registerForm's job.
       if (name === undefined) return;
@@ -134,7 +162,21 @@ export function FormProvider({
     });
     // No removeForm on unmount (ADR-012): navigating away keeps unsaved edits.
     return () => subscription.unsubscribe();
-  }, [formId, defaultValues, methods]);
+  }, [formId, seedValues, methods]);
+
+  // The error mirror's chokepoint, one-way like the value sync: RHF derives,
+  // the store carries the copy that outlives this mount (useFormErrors).
+  const { errors } = useFormState({ control: methods.control });
+  useEffect(() => {
+    const mirrored: FieldErrors = {};
+    for (const [name, entry] of Object.entries(
+      errors as Record<string, FieldErrorEntry | undefined>
+    )) {
+      const messages = fieldErrorMessages(entry);
+      if (messages.length > 0) mirrored[toFieldAddress(name)] = messages;
+    }
+    useFormStore.getState().setFieldErrors(formId, mirrored);
+  }, [errors, formId]);
 
   const formScope = useMemo(
     () => ({ formId, collection, onSave: onSave ?? null }),
