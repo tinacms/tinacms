@@ -24,7 +24,9 @@ bundle when the plugin's `client()` import runs.
 The shipped `string` field (`plugins/fields/string/`) is the worked example
 below — substitute your own `type` for `string` throughout. For that field's
 exact config options and validation semantics, see
-[`string-field.md`](./string-field.md).
+[`string-field.md`](./string-field.md). The shipped `boolean` field
+([`boolean-field.md`](./boolean-field.md)) is a second example — a two-state
+checkbox where `required` is a no-op.
 
 ### 1. Manifest (`.plugin.ts`)
 
