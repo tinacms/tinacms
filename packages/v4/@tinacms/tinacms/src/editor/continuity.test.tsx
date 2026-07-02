@@ -9,7 +9,12 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { toFieldAddress } from '../core/field/address';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
-import { toFormId, useFormStore, useFormValues } from '../form/form-store';
+import {
+  toFormId,
+  useFormErrors,
+  useFormStore,
+  useFormValues,
+} from '../form/form-store';
 import { t } from '../index';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import {
@@ -135,6 +140,69 @@ describe('form continuity across mounts', () => {
     expect(screen.getByTestId('status')).toHaveTextContent('dirty');
   });
 
+  it('a pristine kept scope never shadows changed document content', async () => {
+    const { unmount } = render(host(pathA, { title: 'Old content' }));
+    const input = await screen.findByLabelText('title');
+    expect(input).toHaveValue('Old content');
+    unmount();
+
+    // Never edited: the kept scope is pristine, so the re-mount must re-adopt
+    // the incoming document (registerForm's "pristine is never stale"), not
+    // re-serve the old mirror.
+    render(host(pathA, { title: 'New content' }));
+    const revisited = await screen.findByLabelText('title');
+    await waitFor(() => expect(revisited).toHaveValue('New content'));
+    expect(screen.getByTestId('status')).toHaveTextContent('pristine');
+  });
+
+  it('a document swap under kept edits keeps the edits', async () => {
+    const { unmount } = render(host(pathA, { title: 'Doc A' }));
+    await userEvent.type(await screen.findByLabelText('title'), ' edited');
+    unmount();
+
+    // Re-mounted onto kept edits, then the host swaps the document prop under
+    // the same path: edits win (the store's edited no-op, mirrored by the seed).
+    const { rerender } = render(host(pathA, { title: 'Doc A' }));
+    const revisited = await screen.findByLabelText('title');
+    await waitFor(() => expect(revisited).toHaveValue('Doc A edited'));
+    rerender(host(pathA, { title: 'Reloaded from disk' }));
+    expect(screen.getByLabelText('title')).toHaveValue('Doc A edited');
+    expect(screen.getByTestId('status')).toHaveTextContent('dirty');
+  });
+
+  it('re-adoption never clobbers kept errors, not even pre-derivation', async () => {
+    const formIdA = toFormId(pathA);
+    const { unmount } = render(host(pathA, { title: 'Doc A' }));
+    const inputA = await screen.findByLabelText('title');
+    await userEvent.clear(inputA);
+    await userEvent.type(inputA, 'x');
+    await waitFor(() =>
+      expect(useFormStore.getState().forms[formIdA]?.errors?.[title]).toEqual([
+        'Title must be at least 3 characters',
+      ])
+    );
+    unmount();
+
+    // Record every distinct error state A's scope passes through during the
+    // re-mount: the fresh RHF instance's pre-trigger empty derivation must not
+    // wipe the kept errors even transiently (a badge blip — or a permanent
+    // loss if the form unmounts inside that window).
+    const seen: unknown[] = [];
+    const unsubscribe = useFormStore.subscribe((state, previous) => {
+      const errors = state.forms[formIdA]?.errors;
+      if (errors !== previous.forms[formIdA]?.errors) seen.push(errors);
+    });
+    render(host(pathA, { title: 'Doc A' }));
+    await screen.findByText('Title must be at least 3 characters');
+    unsubscribe();
+    expect(
+      seen.every((errors) => errors != null && Object.keys(errors).length > 0)
+    ).toBe(true);
+    expect(useFormStore.getState().forms[formIdA]?.errors?.[title]).toEqual([
+      'Title must be at least 3 characters',
+    ]);
+  });
+
   it('mirrored errors survive the unmount and report from anywhere', async () => {
     const formIdA = toFormId(pathA);
     const { rerender } = render(host(pathA, { title: 'Doc A' }));
@@ -189,5 +257,38 @@ describe('useFormValues', () => {
       useFormStore.getState().setFieldValue(formId, title, 'Edited');
     });
     expect(result.current).toEqual({ title: 'Edited' });
+  });
+});
+
+describe('useFormErrors', () => {
+  it('reports {} for unregistered and pristine forms with a stable identity', () => {
+    const formId = toFormId(pathA);
+    const { result, rerender } = renderHook(() => useFormErrors(formId));
+    expect(result.current).toEqual({});
+    const unregistered = result.current;
+
+    act(() => {
+      useFormStore.getState().registerForm(formId, { [title]: 'Hello' });
+    });
+    rerender();
+    expect(result.current).toBe(unregistered);
+  });
+
+  it('reports the mirrored map for an edited form and follows clears', () => {
+    const formId = toFormId(pathA);
+    const { result } = renderHook(() => useFormErrors(formId));
+    act(() => {
+      useFormStore.getState().registerForm(formId, { [title]: 'Hello' });
+      useFormStore.getState().setFieldValue(formId, title, 'x');
+      useFormStore
+        .getState()
+        .setFieldErrors(formId, { [title]: ['Too short'] });
+    });
+    expect(result.current).toEqual({ [title]: ['Too short'] });
+
+    act(() => {
+      useFormStore.getState().setFieldErrors(formId, {});
+    });
+    expect(result.current).toEqual({});
   });
 });

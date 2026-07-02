@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type RefObject, useRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -218,11 +218,14 @@ describe('usePreviewConnection', () => {
 
     // The iframe persists across the switch (no new ready) and the edited
     // scope's re-registration is a store no-op — the connect-time post is the
-    // only thing that can bring the preview over.
+    // only thing that can bring the preview over. waitFor also flushes the
+    // provider's async re-adopt validation (trigger), keeping act quiet.
     rerender(tree(otherPath));
-    expect(iframe.postMessage).toHaveBeenCalledWith(
-      valuesMessage({ title: 'Other edited' }),
-      window.origin
+    await waitFor(() =>
+      expect(iframe.postMessage).toHaveBeenCalledWith(
+        valuesMessage({ title: 'Other edited' }),
+        window.origin
+      )
     );
   });
 
