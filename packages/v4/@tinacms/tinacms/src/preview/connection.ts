@@ -1,3 +1,4 @@
+import { invariant } from '../core/invariant';
 import type { TinaDocument } from '../core/schema/types';
 import {
   TINA_FIELD_ATTR,
@@ -32,6 +33,13 @@ export const connectToEditor = ({
   allowedOrigin,
   onValues,
 }: ConnectToEditorOptions): PreviewConnection => {
+  // Enforced at construction, not by documentation: '*' would post ready and
+  // activate messages to any embedder and defeat the incoming origin check.
+  invariant(
+    allowedOrigin !== '*',
+    'preview-allowed-origin-wildcard',
+    "allowedOrigin must name the editor's origin — never '*'."
+  );
   const onMessage = (event: MessageEvent) => {
     if (event.origin !== allowedOrigin || event.source !== editorWindow) return;
     if (isValuesMessage(event.data)) onValues(event.data.values);

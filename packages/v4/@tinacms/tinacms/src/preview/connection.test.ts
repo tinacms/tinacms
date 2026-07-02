@@ -109,6 +109,17 @@ describe('connectToEditor', () => {
     unmarked.remove();
   });
 
+  it("rejects '*' as allowedOrigin at construction", () => {
+    expect(() =>
+      connectToEditor({
+        previewWindow: window,
+        editorWindow: fakeEditorWindow(),
+        allowedOrigin: '*',
+        onValues: vi.fn(),
+      })
+    ).toThrow('preview-allowed-origin-wildcard');
+  });
+
   it('honors a custom allowedOrigin — the cross-origin opt-in', () => {
     const editor = fakeEditorWindow();
     const onValues = vi.fn();

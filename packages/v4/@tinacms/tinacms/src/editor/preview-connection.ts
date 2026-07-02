@@ -1,5 +1,6 @@
 import { type RefObject, useEffect } from 'react';
 import { toFieldAddress } from '../core/field/address';
+import { invariant } from '../core/invariant';
 import { type FormValues, toDocument, useFormStore } from '../form/form-store';
 import {
   isActivateMessage,
@@ -32,6 +33,13 @@ export function usePreviewConnection(
   const formId = useFormId();
   const { setActive } = useActiveField();
   const targetOrigin = options?.targetOrigin ?? window.origin;
+  // Enforced at construction, not by documentation: '*' would stream the
+  // document's values to whatever window embedded the editor.
+  invariant(
+    targetOrigin !== '*',
+    'preview-target-origin-wildcard',
+    "targetOrigin must name the preview's origin — never '*'."
+  );
 
   useEffect(() => {
     const target = () => iframeRef.current?.contentWindow ?? null;
