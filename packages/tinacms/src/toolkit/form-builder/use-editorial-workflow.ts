@@ -78,8 +78,10 @@ export interface UseEditorialWorkflowResult {
   errorMessage: string;
   currentStep: number;
   elapsedTime: number;
-  /** Returns true on success, false on failure (error captured in errorMessage) */
-  executeWorkflow: (opts: ExecuteWorkflowOptions) => Promise<boolean>;
+  /** Resolves with the outcome; on failure `error` holds the message. */
+  executeWorkflow: (
+    opts: ExecuteWorkflowOptions
+  ) => Promise<{ success: boolean; error?: string }>;
   /** Reset error/executing state so the form can be retried */
   reset: () => void;
 }
@@ -156,9 +158,9 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
     tinaForm,
     signal,
     isDraft,
-  }: ExecuteWorkflowOptions): Promise<boolean> => {
+  }: ExecuteWorkflowOptions): Promise<{ success: boolean; error?: string }> => {
     try {
-      if (signal?.aborted) return false;
+      if (signal?.aborted) return { success: false };
 
       const targetBranchExists = await checkTargetBranchExists(
         tinaApi,
@@ -167,13 +169,13 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
         signal
       );
 
-      if (signal?.aborted) return false;
+      if (signal?.aborted) return { success: false };
 
       if (targetBranchExists) {
         setErrorMessage(TARGET_BRANCH_EXISTS_ERROR);
         setIsExecuting(false);
         setCurrentStep(0);
-        return false;
+        return { success: false, error: TARGET_BRANCH_EXISTS_ERROR };
       }
 
       setIsExecuting(true);
@@ -261,7 +263,7 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
         }`;
       }
 
-      return true;
+      return { success: true };
     } catch (e: unknown) {
       console.error(e);
       const errMessage = getEditorialWorkflowErrorMessage(e);
@@ -270,7 +272,7 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
       setIsExecuting(false);
       setCurrentStep(0);
 
-      return false;
+      return { success: false, error: errMessage };
     }
   };
 
