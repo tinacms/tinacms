@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 2.8.3
+
+### Patch Changes
+
+- [#7123](https://github.com/tinacms/tinacms/pull/7123) [`5148d67`](https://github.com/tinacms/tinacms/commit/5148d679049bc53e34b287a586bc721db7cb7710) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - refactor: replace hardcoded error-message string checks with shared error-identifier constants in `@tinacms/schema-tools`, so producers and consumers reference one source of truth instead of fragile `error.message.includes('...')` matching (#6777)
+
 ## 2.8.2
 
 ### Patch Changes

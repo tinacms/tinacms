@@ -1,5 +1,12 @@
 # tinacms-clerk
 
+## 24.0.0
+
+### Patch Changes
+
+- Updated dependencies [[`c809733`](https://github.com/tinacms/tinacms/commit/c809733ce8037d81937e81f0c8781a6cf222099b), [`8497110`](https://github.com/tinacms/tinacms/commit/8497110ada7554f97807ce7a09a3624b5efc5713), [`22d0c0d`](https://github.com/tinacms/tinacms/commit/22d0c0d095b79e116677a798d07b35591ccb816e), [`5148d67`](https://github.com/tinacms/tinacms/commit/5148d679049bc53e34b287a586bc721db7cb7710), [`b53a51c`](https://github.com/tinacms/tinacms/commit/b53a51c92ee8ddecbb654f5b57c7d10673a06626)]:
+  - tinacms@3.10.0
+
 ## 23.0.4
 
 ### Patch Changes
