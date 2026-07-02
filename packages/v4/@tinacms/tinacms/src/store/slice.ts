@@ -1,3 +1,4 @@
+import { invariant } from '../core/invariant';
 import {
   type ClientSlice,
   type PluginManifest,
@@ -24,7 +25,17 @@ export interface SliceMount {
 // mounts under the plugin name. Swapping providers (tinaCloudAuth → auth0Auth) leaves
 // `get().auth` consumers unchanged.
 export const sliceMountFor = (manifest: PluginManifest): SliceMount => {
-  const capability = (manifest.provides ?? []).find(isSingletonSliceCapability);
+  const singletons = (manifest.provides ?? []).filter(
+    isSingletonSliceCapability
+  );
+  invariant(
+    singletons.length <= 1,
+    'plugin-multiple-singleton-slices',
+    `Plugin "${manifest.name}" provides ${singletons.length} singleton ` +
+      `capabilities (${singletons.join(', ')}), but a client segment has one ` +
+      'slice, so it can mount at only one namespace.'
+  );
+  const capability = singletons[0];
   return capability
     ? { namespace: capability, capability }
     : { namespace: manifest.name };

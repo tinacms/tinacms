@@ -3,7 +3,8 @@
 // sites. tiny-invariant strips messages in production; here production throws the stable
 // grep-able `code` instead, so a stripped error still points at its guard, while
 // development gets `code: message` in full.
-const isProduction = process.env.NODE_ENV === 'production';
+const isProduction =
+  typeof process !== 'undefined' && process.env.NODE_ENV === 'production';
 
 export function invariant(
   condition: unknown,

@@ -125,6 +125,17 @@ describe('composePluginSlices conflicts', () => {
     expect(winner(composePluginSlices([override, base]))).toBe('s3');
   });
 
+  it('rejects a plugin providing two singleton capabilities', () => {
+    expect(() =>
+      composePluginSlices([
+        resolved(
+          { name: 'tina:everything', provides: ['auth', 'media'] },
+          () => ({})
+        ),
+      ])
+    ).toThrow(/only one namespace/);
+  });
+
   it('throws when two plugins both declare an override for the same capability', () => {
     const overrideFor = (name: string, from: string) =>
       resolved(
