@@ -1,6 +1,12 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  render,
+  renderHook,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { type RefObject, useRef } from 'react';
+import { type ReactNode, type RefObject, useRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { toFieldAddress } from '../core/field/address';
 import type { CollectionSchema } from '../core/schema/types';
@@ -12,6 +18,7 @@ import {
   readyMessage,
   valuesMessage,
 } from '../preview/protocol';
+import { FormScopeContext } from './context';
 import { Field, FormProvider, TinaProvider } from './index';
 import { usePreviewConnection } from './preview-connection';
 
@@ -227,6 +234,23 @@ describe('usePreviewConnection', () => {
         window.origin
       )
     );
+  });
+
+  it("rejects '*' as targetOrigin at construction", () => {
+    const iframe = fakeIframe();
+    // A bare FormScopeContext is enough: the invariant fires in the hook body,
+    // before any effect needs the runtime.
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <FormScopeContext value={{ formId, collection, onSave: null }}>
+        {children}
+      </FormScopeContext>
+    );
+    expect(() =>
+      renderHook(
+        () => usePreviewConnection(iframe.ref, { targetOrigin: '*' }),
+        { wrapper }
+      )
+    ).toThrow('preview-target-origin-wildcard');
   });
 
   it('goes silent after unmount', async () => {

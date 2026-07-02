@@ -8,6 +8,7 @@ import {
 } from 'react';
 import {
   FormProvider as RhfFormProvider,
+  type UseFormReturn,
   useForm,
   useFormState,
 } from 'react-hook-form';
@@ -18,6 +19,7 @@ import { type PluginManifest, resolveClientSegments } from '../core/plugin';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import {
   type FieldErrors,
+  type FormId,
   toDocument,
   toFormId,
   toFormValues,
@@ -148,27 +150,6 @@ export function FormProvider({
     }
   }, [formId, seedValues, methods]);
 
-  // Re-validate on re-adopt: RHF derives no errors from defaultValues, so a
-  // form re-mounted onto invalid kept edits would look error-free until the
-  // next keystroke. One trigger() re-derives; the mirror below follows. Until
-  // it resolves, the fresh RHF instance's empty error state is pre-derivation
-  // noise — the mirror must not let it clobber the kept errors. Armed once per
-  // hosted form (re-arming on later renders would swallow a legitimate
-  // errors-cleared write after the flag is spent).
-  const reAdoptValidationPending = useRef(false);
-  const armedFormId = useRef<string | null>(null);
-  if (armedFormId.current !== formId) {
-    armedFormId.current = formId;
-    reAdoptValidationPending.current = keptSeed !== null;
-  }
-  useEffect(() => {
-    if (keptSeed) {
-      void methods.trigger().finally(() => {
-        reAdoptValidationPending.current = false;
-      });
-    }
-  }, [keptSeed, methods]);
-
   // One-way RHF → form-store sync: RHF stays the value/render authority, the
   // form-store is the sole pristine/dirty/clean authority (ADR-010). This watch
   // subscription is the single chokepoint — wrapping field.onChange instead would
@@ -185,38 +166,7 @@ export function FormProvider({
     return () => subscription.unsubscribe();
   }, [formId, seedValues, methods]);
 
-  // The error mirror's chokepoint, one-way like the value sync: RHF derives,
-  // the store carries the copy that outlives this mount (useFormErrors).
-  const { errors } = useFormState({ control: methods.control });
-  const mirroredFormId = useRef<string | null>(null);
-  useEffect(() => {
-    // Ownership guard: the run where formId changed (an unkeyed switch) still
-    // holds the OUTGOING form's derivation — writing it would bleed one form's
-    // errors into the other's scope. Skip it; the reset above re-derives and
-    // its notification re-runs the mirror under the right owner. (Also skips
-    // the mount run, whose fresh-instance {} has nothing to say.)
-    if (mirroredFormId.current !== formId) {
-      mirroredFormId.current = formId;
-      return;
-    }
-    const mirrored: FieldErrors = {};
-    for (const [name, entry] of Object.entries(
-      errors as Record<string, FieldErrorEntry | undefined>
-    )) {
-      const messages = fieldErrorMessages(entry);
-      if (messages.length > 0) mirrored[toFieldAddress(name)] = messages;
-    }
-    const empty = Object.keys(mirrored).length === 0;
-    // Pre-derivation empty state on a re-adopted form: the kept errors are the
-    // truth until trigger() re-derives — skip the clobbering write. A non-empty
-    // derivation IS the re-derivation, so it flows (and clears the pending flag
-    // in case it beat trigger's resolution).
-    if (reAdoptValidationPending.current) {
-      if (empty) return;
-      reAdoptValidationPending.current = false;
-    }
-    useFormStore.getState().setFieldErrors(formId, mirrored);
-  }, [errors, formId]);
+  useErrorMirror(formId, methods, keptSeed);
 
   const formScope = useMemo(
     () => ({ formId, collection, onSave: onSave ?? null }),
@@ -232,4 +182,64 @@ export function FormProvider({
       </RhfFormProvider>
     </FormScopeContext>
   );
+}
+
+// Keeps the store's error mirror faithful to RHF's derivations — one-way, like
+// the value sync, with the store carrying the copy that outlives the mount
+// (useFormErrors). One unit owns the whole coupled lifecycle:
+//
+// - Re-validate on re-adopt: RHF derives no errors from defaultValues, so a
+//   form re-mounted onto invalid kept edits (`keptSeed`) would look error-free
+//   until the next keystroke — one trigger() re-derives.
+// - Until that resolves, the fresh RHF instance's empty error state is
+//   pre-derivation noise: the pending flag (armed once per hosted form —
+//   re-arming on later renders would swallow a legitimate errors-cleared write
+//   after the flag is spent) keeps it from clobbering the kept errors. A
+//   non-empty derivation IS the re-derivation, so it flows and spends the flag
+//   in case it beat trigger's resolution.
+// - Ownership guard: the run where formId changed (an unkeyed switch) still
+//   holds the OUTGOING form's derivation — writing it would bleed one form's
+//   errors into the other's scope. Skip it; the provider's reset re-derives
+//   and its notification re-runs the mirror under the right owner. (Also skips
+//   the mount run, whose fresh-instance {} has nothing to say.)
+function useErrorMirror(
+  formId: FormId,
+  methods: UseFormReturn<TinaDocument>,
+  keptSeed: TinaDocument | null
+): void {
+  const reAdoptValidationPending = useRef(false);
+  const armedFormId = useRef<FormId | null>(null);
+  if (armedFormId.current !== formId) {
+    armedFormId.current = formId;
+    reAdoptValidationPending.current = keptSeed !== null;
+  }
+  useEffect(() => {
+    if (keptSeed) {
+      void methods.trigger().finally(() => {
+        reAdoptValidationPending.current = false;
+      });
+    }
+  }, [keptSeed, methods]);
+
+  const { errors } = useFormState({ control: methods.control });
+  const mirroredFormId = useRef<FormId | null>(null);
+  useEffect(() => {
+    if (mirroredFormId.current !== formId) {
+      mirroredFormId.current = formId;
+      return;
+    }
+    const mirrored: FieldErrors = {};
+    for (const [name, entry] of Object.entries(
+      errors as Record<string, FieldErrorEntry | undefined>
+    )) {
+      const messages = fieldErrorMessages(entry);
+      if (messages.length > 0) mirrored[toFieldAddress(name)] = messages;
+    }
+    const empty = Object.keys(mirrored).length === 0;
+    if (reAdoptValidationPending.current) {
+      if (empty) return;
+      reAdoptValidationPending.current = false;
+    }
+    useFormStore.getState().setFieldErrors(formId, mirrored);
+  }, [errors, formId]);
 }
