@@ -4,9 +4,10 @@ import { useStore } from 'zustand';
 import type { FieldAddress } from '../core/field/address';
 import type { FieldRegistry } from '../core/field/registry';
 import { digestDocument } from '../core/form/ingest';
+import { invariant } from '../core/invariant';
 import type { TinaStoreState } from '../core/plugin';
 import type { FieldSchema, TinaDocument } from '../core/schema/types';
-import { type FormId, useFormStore } from '../form/form-store';
+import { type FormId, toFormValues, useFormStore } from '../form/form-store';
 import {
   CollectionContext,
   FieldAddressContext,
@@ -20,9 +21,11 @@ import { type FieldErrorEntry, fieldErrorMessages } from './field-errors';
 
 export function useFieldRegistry(): FieldRegistry {
   const registry = use(RegistryContext);
-  if (!registry) {
-    throw new Error('useFieldRegistry must be used within a TinaProvider');
-  }
+  invariant(
+    registry,
+    'field-registry-outside-provider',
+    'useFieldRegistry must be used within a TinaProvider'
+  );
   return registry;
 }
 
@@ -30,17 +33,21 @@ export function useTinaStore<Selected>(
   selector: (state: TinaStoreState) => Selected
 ): Selected {
   const store = use(TinaStoreContext);
-  if (!store) {
-    throw new Error('useTinaStore must be used within a TinaProvider');
-  }
+  invariant(
+    store,
+    'tina-store-outside-provider',
+    'useTinaStore must be used within a TinaProvider'
+  );
   return useStore(store, selector);
 }
 
 export function useFormId(): FormId {
   const formId = use(FormIdContext);
-  if (formId == null) {
-    throw new Error('useFormId must be used within a FormProvider');
-  }
+  invariant(
+    formId != null,
+    'form-id-outside-provider',
+    'useFormId must be used within a FormProvider'
+  );
   return formId;
 }
 
@@ -67,28 +74,34 @@ export function useActiveField(): ActiveField {
 
 // Reconstruct the document from the form's values and hand it to the host's save
 // handler (the ADR-018/019 seam); only a resolved save freezes the clean baseline —
-// a rejected save leaves the form dirty.
+// a rejected save leaves the form dirty. The baseline is the pre-save snapshot, not
+// the store's latest values, so edits typed while the save is in flight stay dirty.
 export function useFormSave(): () => Promise<void> {
   const registry = useFieldRegistry();
   const collection = use(CollectionContext);
   const formId = useFormId();
   const onSave = use(SaveHandlerContext);
   const { getValues } = useFormContext<TinaDocument>();
-  if (!collection) {
-    throw new Error('useFormSave must be used within a FormProvider');
-  }
-  return async () => {
-    const digested = digestDocument(getValues(), collection.fields, registry);
+  invariant(
+    collection,
+    'form-save-outside-provider',
+    'useFormSave must be used within a FormProvider'
+  );
+  return useCallback(async () => {
+    const values = getValues();
+    const digested = digestDocument(values, collection.fields, registry);
     await onSave?.(digested);
-    useFormStore.getState().markSaved(formId);
-  };
+    useFormStore.getState().markSaved(formId, toFormValues(values));
+  }, [registry, collection, formId, onSave, getValues]);
 }
 
 export function useFieldAddress(): FieldAddress {
   const address = use(FieldAddressContext);
-  if (address == null) {
-    throw new Error('useFieldAddress must be used within a <Field>');
-  }
+  invariant(
+    address != null,
+    'field-address-outside-field',
+    'useFieldAddress must be used within a <Field>'
+  );
   return address;
 }
 

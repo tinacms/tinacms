@@ -11,10 +11,9 @@ import { toFieldAddress } from '../core/field/address';
 import {
   type FieldRegistry,
   createFieldRegistry,
-  resolveClientSegments,
 } from '../core/field/registry';
 import { ingestDocument } from '../core/form/ingest';
-import type { PluginManifest } from '../core/plugin';
+import { type PluginManifest, resolveClientSegments } from '../core/plugin';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import { toFormId, toFormValues, useFormStore } from '../form/form-store';
 import { createTinaStore } from '../store/create-store';

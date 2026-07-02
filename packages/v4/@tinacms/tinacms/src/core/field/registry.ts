@@ -1,9 +1,12 @@
-import { invariant } from '../invariant';
 import {
   type RegistryConflict,
   composeOverridableRegistry,
 } from '../overridable-registry';
-import type { PluginManifest, ResolvedSegment } from '../plugin';
+import {
+  type PluginManifest,
+  type ResolvedSegment,
+  resolveClientSegments,
+} from '../plugin';
 import type { FieldDescriptor } from './contract';
 
 export type FieldRegistry = Map<string, FieldDescriptor>;
@@ -43,26 +46,6 @@ export const createFieldRegistry = (
     ),
     fieldConflictError
   );
-
-// Load every plugin's client segment once. The one boot-time resolution pass — its
-// result feeds both createFieldRegistry and createTinaStore so the two compose from
-// the same segments and can't diverge.
-export const resolveClientSegments = async (
-  plugins: PluginManifest[]
-): Promise<ResolvedSegment[]> => {
-  const resolved: ResolvedSegment[] = [];
-  for (const manifest of plugins) {
-    if (!manifest.client) continue;
-    const clientModule = await manifest.client();
-    invariant(
-      clientModule?.default,
-      'plugin-client-no-default',
-      `Plugin "${manifest.name}" has a client segment with no default export.`
-    );
-    resolved.push({ manifest, segment: clientModule.default });
-  }
-  return resolved;
-};
 
 export const resolveFieldPlugins = async (
   plugins: PluginManifest[]

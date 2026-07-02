@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { toFieldAddress } from '../core/field/address';
 import {
   type FormId,
@@ -13,10 +13,6 @@ const postA = toFormId('posts/a.mdx');
 const postB = toFormId('posts/b.mdx');
 const store = useFormStore;
 const statusOf = (formId: FormId) => formStatus(store.getState().forms[formId]);
-
-beforeEach(() => {
-  store.setState({ forms: {} });
-});
 
 describe('form-store registration', () => {
   it('a freshly registered form is pristine', () => {

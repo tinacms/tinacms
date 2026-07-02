@@ -46,5 +46,9 @@ export const isReadyMessage = (data: unknown): data is ReadyMessage =>
 export const isDocumentMessage = (data: unknown): data is DocumentMessage =>
   hasMessageType(data, DOCUMENT_MESSAGE_TYPE);
 
+// Also validates the payload: toFieldAddress throws on an empty address, so a
+// malformed message must not pass the guard.
 export const isActivateMessage = (data: unknown): data is ActivateMessage =>
-  hasMessageType(data, ACTIVATE_MESSAGE_TYPE);
+  hasMessageType(data, ACTIVATE_MESSAGE_TYPE) &&
+  typeof (data as { address?: unknown }).address === 'string' &&
+  (data as { address: string }).address.length > 0;
