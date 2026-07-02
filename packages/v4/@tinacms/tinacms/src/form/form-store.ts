@@ -67,8 +67,9 @@ export type FieldErrors = Partial<Record<FieldAddress, string[]>>;
 // carries no baseline (its values *are* the baseline), and a baseline exists only once
 // the form has been edited or saved. Dirty vs clean is then derived from
 // values-vs-baseline within the edited state — there is no "pristine with a divergent
-// baseline" to mishandle.
-type FormScope =
+// baseline" to mishandle. (Named OpenForm, not FormScope — that name belongs to the
+// editor's form context value in editor/context.ts; one name per concept.)
+type OpenForm =
   | { readonly status: 'pristine'; readonly values: FormValues }
   | {
       readonly status: 'edited';
@@ -79,8 +80,8 @@ type FormScope =
 
 export interface FormStore {
   // Keyed by FormId (one open document per form, ADR-010); a missing key is a form
-  // that isn't open, so a lookup returns `FormScope | undefined`.
-  forms: Partial<Record<FormId, FormScope>>;
+  // that isn't open, so a lookup returns `OpenForm | undefined`.
+  forms: Partial<Record<FormId, OpenForm>>;
   // The single active field across all open forms (ADR-009 visual editing): a
   // preview click activates exactly one field; the owning field reacts (focus)
   // via useFieldActivation. Form-scoped rather than per-scope because activation
@@ -126,7 +127,7 @@ const valuesEqual = (current: FormValues, baseline: FormValues): boolean => {
   return [...keys].every((key) => Object.is(current[key], baseline[key]));
 };
 
-export const formStatus = (scope: FormScope | undefined): FormStatus => {
+export const formStatus = (scope: OpenForm | undefined): FormStatus => {
   if (!scope || scope.status === 'pristine') return 'pristine';
   return valuesEqual(scope.values, scope.baseline) ? 'clean' : 'dirty';
 };
@@ -135,7 +136,7 @@ export const formStatus = (scope: FormScope | undefined): FormStatus => {
 // `valuesEqual`: `Object.is` is correct while field values are primitives; an
 // in-place-mutated object/list value would misread here too once composite fields land.
 export const fieldDirty = (
-  scope: FormScope | undefined,
+  scope: OpenForm | undefined,
   address: FieldAddress
 ): boolean =>
   scope?.status === 'edited'
