@@ -1,5 +1,26 @@
 # tinacms
 
+## 3.10.0
+
+### Minor Changes
+
+- [#7136](https://github.com/tinacms/tinacms/pull/7136) [`c809733`](https://github.com/tinacms/tinacms/commit/c809733ce8037d81937e81f0c8781a6cf222099b) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - editorial workflow - add toggle to switch PRs created between draft and ready to review mode
+
+### Patch Changes
+
+- [#7138](https://github.com/tinacms/tinacms/pull/7138) [`8497110`](https://github.com/tinacms/tinacms/commit/8497110ada7554f97807ce7a09a3624b5efc5713) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Editorial workflow: replace the draft / ready-for-review toggle in the "Save changes to new branch" modal with a save-options dropdown (Save draft, Save (ready for review), Save and publish). The split button's main action reflects the editor's last choice (default Save draft, remembered via localStorage), and Save and publish is disabled with a tooltip on protected branches.
+
+- [#7131](https://github.com/tinacms/tinacms/pull/7131) [`22d0c0d`](https://github.com/tinacms/tinacms/commit/22d0c0d095b79e116677a798d07b35591ccb816e) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - move floatingtoolbar for links to a react portal
+
+- [#7123](https://github.com/tinacms/tinacms/pull/7123) [`5148d67`](https://github.com/tinacms/tinacms/commit/5148d679049bc53e34b287a586bc721db7cb7710) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - refactor: replace hardcoded error-message string checks with shared error-identifier constants in `@tinacms/schema-tools`, so producers and consumers reference one source of truth instead of fragile `error.message.includes('...')` matching (#6777)
+
+- [#7128](https://github.com/tinacms/tinacms/pull/7128) [`b53a51c`](https://github.com/tinacms/tinacms/commit/b53a51c92ee8ddecbb654f5b57c7d10673a06626) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Harden message handling in the `useEditState` hook so it validates the sender of incoming `message` events, matching the `isFromAdmin(event, trustedAdminOrigins)` check already used by `useTina`. The hook now also removes its `message` listener on unmount. Legitimate admin→preview behavior is unchanged.
+
+- Updated dependencies [[`5148d67`](https://github.com/tinacms/tinacms/commit/5148d679049bc53e34b287a586bc721db7cb7710)]:
+  - @tinacms/schema-tools@2.8.3
+  - @tinacms/mdx@2.1.9
+  - @tinacms/search@1.2.21
+
 ## 3.9.4
 
 ### Patch Changes
