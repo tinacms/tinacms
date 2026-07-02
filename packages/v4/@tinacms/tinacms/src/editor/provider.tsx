@@ -134,7 +134,10 @@ export function FormProvider({
   // draft slice's reload-vs-keep arbitration (form-store.ts registerForm TODO).
   const seededSignature = useRef<string | null>(null);
   useEffect(() => {
-    const signature = JSON.stringify(seedValues);
+    // The signature carries the formId: an unkeyed switch between
+    // identical-content documents must still reset, or the old form's RHF
+    // edits would render — and save — under the new form's path.
+    const signature = JSON.stringify([formId, seedValues]);
     if (seededSignature.current === null) {
       seededSignature.current = signature;
       return;
@@ -143,7 +146,7 @@ export function FormProvider({
       seededSignature.current = signature;
       methods.reset(seedValues);
     }
-  }, [seedValues, methods]);
+  }, [formId, seedValues, methods]);
 
   // Re-validate on re-adopt: RHF derives no errors from defaultValues, so a
   // form re-mounted onto invalid kept edits would look error-free until the
@@ -185,7 +188,17 @@ export function FormProvider({
   // The error mirror's chokepoint, one-way like the value sync: RHF derives,
   // the store carries the copy that outlives this mount (useFormErrors).
   const { errors } = useFormState({ control: methods.control });
+  const mirroredFormId = useRef<string | null>(null);
   useEffect(() => {
+    // Ownership guard: the run where formId changed (an unkeyed switch) still
+    // holds the OUTGOING form's derivation — writing it would bleed one form's
+    // errors into the other's scope. Skip it; the reset above re-derives and
+    // its notification re-runs the mirror under the right owner. (Also skips
+    // the mount run, whose fresh-instance {} has nothing to say.)
+    if (mirroredFormId.current !== formId) {
+      mirroredFormId.current = formId;
+      return;
+    }
     const mirrored: FieldErrors = {};
     for (const [name, entry] of Object.entries(
       errors as Record<string, FieldErrorEntry | undefined>
