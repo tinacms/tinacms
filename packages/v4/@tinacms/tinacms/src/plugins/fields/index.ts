@@ -1,9 +1,11 @@
+import booleanFieldPlugin from './boolean/boolean-field.plugin';
+import { boolean } from './boolean/boolean-field.schema';
 import stringFieldPlugin from './string/string-field.plugin';
 import { string } from './string/string-field.schema';
 
 // The built-in field plugins TinaCMS ships. The "is this a core plugin" check
 // reads this list, not the plugin name.
-export const corePlugins = [stringFieldPlugin];
+export const corePlugins = [stringFieldPlugin, booleanFieldPlugin];
 
 // Schema-authoring helpers, one per built-in field. Kept explicit (rather than
 // derived in a loop) so `t.string` stays statically typed; co-located with
@@ -11,6 +13,7 @@ export const corePlugins = [stringFieldPlugin];
 // TODO: once defineConfig (ADR-024) lands, generate `t` from the configured plugin
 // set so user-registered field plugins join it (typed). This stays the built-in
 // default until then.
-export const t = { string };
+export const t = { string, boolean };
 
+export type { BooleanFieldSchema } from './boolean/boolean-field.schema';
 export type { StringFieldSchema } from './string/string-field.schema';
