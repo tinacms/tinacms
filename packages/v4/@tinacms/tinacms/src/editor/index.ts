@@ -27,6 +27,10 @@ export {
   type TinaProviderProps,
 } from './provider';
 export {
+  type PreviewConnectionOptions,
+  usePreviewConnection,
+} from './preview-connection';
+export {
   type ActiveField,
   useActiveField,
   useFieldActivation,
