@@ -15,18 +15,33 @@ import type { FormId } from '../form/form-store';
 // leaves the form dirty (useFormSave only marks saved after it resolves).
 export type SaveHandler = (document: TinaDocument) => void | Promise<void>;
 
-// RegistryContext deliberately stays React context rather than moving into the boot
-// store: the registry is an immutable Map of React components — configuration
-// resolved once, not state (devtools can't serialize it either). CollectionContext,
-// FormIdContext and SaveHandlerContext are form-scoped; FieldAddressContext and
-// FieldSchemaContext are intentionally plain context — per ADR-009 a field receives
-// its address (extended with its resolved schema node), passed down by <Field>.
-export const RegistryContext = createContext<FieldRegistry | null>(null);
-export const TinaStoreContext = createContext<StoreApi<TinaStoreState> | null>(
-  null
-);
-export const CollectionContext = createContext<CollectionSchema | null>(null);
-export const FormIdContext = createContext<FormId | null>(null);
-export const SaveHandlerContext = createContext<SaveHandler | null>(null);
+// One context per tree scope — app, form, field — rather than one per value: each
+// maps to exactly one provider and one lifetime. None carry hot-path mutable state
+// (values live in RHF, status/active in the form store), so the usual
+// split-contexts-to-limit-re-renders concern doesn't apply.
+
+// App scope (TinaProvider): the boot-composed runtime, one resolveClientSegments
+// pass feeding both halves. The registry deliberately stays out of the store — an
+// immutable Map of React components is config, not state (and devtools couldn't
+// serialize it).
+export interface TinaRuntime {
+  registry: FieldRegistry;
+  store: StoreApi<TinaStoreState>;
+}
+export const TinaRuntimeContext = createContext<TinaRuntime | null>(null);
+
+// Form scope (FormProvider): the open document's identity, schema and save seam —
+// changes only on document switch. `collection` (and save) likely become store /
+// capability reads once the data layer (ADR-019) lands, shrinking this to the id.
+export interface FormScope {
+  formId: FormId;
+  collection: CollectionSchema;
+  onSave: SaveHandler | null;
+}
+export const FormScopeContext = createContext<FormScope | null>(null);
+
+// Field scope: per ADR-009 a field receives its address, passed down by <Field>;
+// extended so <Field> also passes the resolved schema node — the field's config
+// for rendering (declarative validation stays on the validation path).
 export const FieldAddressContext = createContext<FieldAddress | null>(null);
 export const FieldSchemaContext = createContext<FieldSchema | null>(null);

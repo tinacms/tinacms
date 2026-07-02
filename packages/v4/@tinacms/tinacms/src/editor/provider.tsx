@@ -8,22 +8,17 @@ import {
 } from 'react';
 import { FormProvider as RhfFormProvider, useForm } from 'react-hook-form';
 import { toFieldAddress } from '../core/field/address';
-import {
-  type FieldRegistry,
-  createFieldRegistry,
-} from '../core/field/registry';
+import { createFieldRegistry } from '../core/field/registry';
 import { ingestDocument } from '../core/form/ingest';
 import { type PluginManifest, resolveClientSegments } from '../core/plugin';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import { toFormId, toFormValues, useFormStore } from '../form/form-store';
 import { createTinaStore } from '../store/create-store';
 import {
-  CollectionContext,
-  FormIdContext,
-  RegistryContext,
+  FormScopeContext,
   type SaveHandler,
-  SaveHandlerContext,
-  TinaStoreContext,
+  type TinaRuntime,
+  TinaRuntimeContext,
 } from './context';
 import { buildFormResolver } from './resolver';
 
@@ -32,16 +27,9 @@ export interface TinaProviderProps {
   children: ReactNode;
 }
 
-// The boot-composed runtime: one resolveClientSegments pass feeds both the field
-// registry and the client store (ADR-003), held as a single state object so the two
-// always appear together (no tearing). The registry deliberately does NOT live in
-// the store — it's an immutable Map of React components, config rather than state.
-interface TinaRuntime {
-  registry: FieldRegistry;
-  store: ReturnType<typeof createTinaStore>;
-}
-
 export function TinaProvider({ plugins, children }: TinaProviderProps) {
+  // One resolveClientSegments pass feeds both runtime halves (ADR-003), held as a
+  // single state object so registry and store always appear together (no tearing).
   const [runtime, setRuntime] = useState<TinaRuntime | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const pluginsKey = plugins.map((plugin) => plugin.name).join('|');
@@ -69,11 +57,7 @@ export function TinaProvider({ plugins, children }: TinaProviderProps) {
 
   if (error) throw error;
   if (!runtime) return null;
-  return (
-    <RegistryContext value={runtime.registry}>
-      <TinaStoreContext value={runtime.store}>{children}</TinaStoreContext>
-    </RegistryContext>
-  );
+  return <TinaRuntimeContext value={runtime}>{children}</TinaRuntimeContext>;
 }
 
 export interface FormProviderProps {
@@ -93,10 +77,11 @@ export function FormProvider({
   onSave,
   children,
 }: FormProviderProps) {
-  const registry = use(RegistryContext);
-  if (!registry) {
+  const runtime = use(TinaRuntimeContext);
+  if (!runtime) {
     throw new Error('FormProvider must be used within a TinaProvider');
   }
+  const { registry } = runtime;
 
   const formId = toFormId(path);
   const defaultValues = useMemo(
@@ -151,17 +136,18 @@ export function FormProvider({
     return () => subscription.unsubscribe();
   }, [formId, defaultValues, methods]);
 
+  const formScope = useMemo(
+    () => ({ formId, collection, onSave: onSave ?? null }),
+    [formId, collection, onSave]
+  );
+
   return (
-    <CollectionContext value={collection}>
-      <FormIdContext value={formId}>
-        <SaveHandlerContext value={onSave ?? null}>
-          <RhfFormProvider {...methods}>
-            {/* Fragment pins children to a ReactElement — RHF's FormProvider children
-                type predates the bigint that React 19's ReactNode includes. */}
-            <>{children}</>
-          </RhfFormProvider>
-        </SaveHandlerContext>
-      </FormIdContext>
-    </CollectionContext>
+    <FormScopeContext value={formScope}>
+      <RhfFormProvider {...methods}>
+        {/* Fragment pins children to a ReactElement — RHF's FormProvider children
+            type predates the bigint that React 19's ReactNode includes. */}
+        <>{children}</>
+      </RhfFormProvider>
+    </FormScopeContext>
   );
 }

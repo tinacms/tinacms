@@ -9,46 +9,44 @@ import type { TinaStoreState } from '../core/plugin';
 import type { FieldSchema, TinaDocument } from '../core/schema/types';
 import { type FormId, toFormValues, useFormStore } from '../form/form-store';
 import {
-  CollectionContext,
   FieldAddressContext,
   FieldSchemaContext,
-  FormIdContext,
-  RegistryContext,
-  SaveHandlerContext,
-  TinaStoreContext,
+  type FormScope,
+  FormScopeContext,
+  TinaRuntimeContext,
 } from './context';
 import { type FieldErrorEntry, fieldErrorMessages } from './field-errors';
 
 export function useFieldRegistry(): FieldRegistry {
-  const registry = use(RegistryContext);
+  const runtime = use(TinaRuntimeContext);
   invariant(
-    registry,
+    runtime,
     'field-registry-outside-provider',
     'useFieldRegistry must be used within a TinaProvider'
   );
-  return registry;
+  return runtime.registry;
 }
 
 export function useTinaStore<Selected>(
   selector: (state: TinaStoreState) => Selected
 ): Selected {
-  const store = use(TinaStoreContext);
+  const runtime = use(TinaRuntimeContext);
   invariant(
-    store,
+    runtime,
     'tina-store-outside-provider',
     'useTinaStore must be used within a TinaProvider'
   );
-  return useStore(store, selector);
+  return useStore(runtime.store, selector);
+}
+
+function useFormScope(hookCode: string, hookName: string): FormScope {
+  const scope = use(FormScopeContext);
+  invariant(scope, hookCode, `${hookName} must be used within a FormProvider`);
+  return scope;
 }
 
 export function useFormId(): FormId {
-  const formId = use(FormIdContext);
-  invariant(
-    formId != null,
-    'form-id-outside-provider',
-    'useFormId must be used within a FormProvider'
-  );
-  return formId;
+  return useFormScope('form-id-outside-provider', 'useFormId').formId;
 }
 
 export interface ActiveField {
@@ -78,21 +76,15 @@ export function useActiveField(): ActiveField {
 // the store's latest values, so edits typed while the save is in flight stay dirty.
 export function useFormSave(): () => Promise<void> {
   const registry = useFieldRegistry();
-  const collection = use(CollectionContext);
-  const formId = useFormId();
-  const onSave = use(SaveHandlerContext);
+  const scope = useFormScope('form-save-outside-provider', 'useFormSave');
   const { getValues } = useFormContext<TinaDocument>();
-  invariant(
-    collection,
-    'form-save-outside-provider',
-    'useFormSave must be used within a FormProvider'
-  );
   return useCallback(async () => {
+    const { formId, collection, onSave } = scope;
     const values = getValues();
     const digested = digestDocument(values, collection.fields, registry);
     await onSave?.(digested);
     useFormStore.getState().markSaved(formId, toFormValues(values));
-  }, [registry, collection, formId, onSave, getValues]);
+  }, [registry, scope, getValues]);
 }
 
 export function useFieldAddress(): FieldAddress {
@@ -133,7 +125,7 @@ export function useFieldErrors(address: FieldAddress): string[] {
 
 export function useFieldActivation(handler: () => void): void {
   const address = use(FieldAddressContext);
-  const formId = use(FormIdContext);
+  const formId = use(FormScopeContext)?.formId ?? null;
   // Subscribe to the activation entry itself, not a derived boolean: setActive
   // writes a fresh object every call, so re-activating an already-active field
   // re-fires the handler (a boolean would latch and swallow the repeat click).
