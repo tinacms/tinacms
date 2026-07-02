@@ -25,6 +25,10 @@
       "types": "./src/editor/index.ts",
       "default": "./src/editor/index.ts"
     },
+    "./preview": {
+      "types": "./src/preview/index.ts",
+      "default": "./src/preview/index.ts"
+    },
     "./client": {
       "types": "./src/client/index.ts",
       "default": "./src/client/index.ts"
