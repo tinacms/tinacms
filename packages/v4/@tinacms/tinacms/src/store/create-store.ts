@@ -1,8 +1,9 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import type { ResolvedSegment } from '../core/field/registry';
+import { invariant } from '../core/invariant';
+import type { ResolvedSegment } from '../core/plugin';
 import { composePluginSlices } from './compose-slices';
-import type { SliceSet, SliceState, TinaStoreState } from './slice';
+import type { SliceSet, TinaStoreState } from './slice';
 
 // The store's built-in namespaces. Intentionally empty stubs for now — this increment
 // delivers the registration mechanism + middleware stack, not the ui/branch/documents
@@ -53,7 +54,7 @@ const createNamespacedSet =
   (partial, replace = false, action) =>
     setStore(
       (store) => {
-        const currentSliceState = (store[namespace] ?? {}) as SliceState;
+        const currentSliceState = store[namespace] ?? {};
         const nextSliceState =
           typeof partial === 'function' ? partial(currentSliceState) : partial;
         return {
@@ -69,36 +70,39 @@ const createNamespacedSet =
 const isCoreNamespace = (namespace: string): namespace is CoreNamespace =>
   (CORE_NAMESPACES as readonly string[]).includes(namespace);
 
+// The store's fixed identities: one store per app boot (ADR-003), so a single persist
+// storage key and devtools title are intentional, not a collision risk.
+const PERSIST_STORAGE_KEY = 'tina-store';
+const DEVTOOLS_STORE_NAME = 'TinaStore';
+
 // Compose the client store once at boot from the resolved plugin segments: core slices
 // plus each plugin slice mounted at its namespace, wrapped in the fixed middleware stack
-// (devtools → persist). The plugin list is static, so there is no runtime extend. There
-// is one store per app boot (ADR-003), so the fixed `'tina-store'` persist key and
-// `'TinaStore'` devtools name are intentional, not a collision risk.
+// (devtools → persist). The plugin list is static, so there is no runtime extend.
 export const createTinaStore = (resolved: ResolvedSegment[]) => {
   const pluginSlices = composePluginSlices(resolved);
   return create<TinaStoreState>()(
     devtools(
       persist(
-        (set, get, api) => {
+        (set, get) => {
           const state: TinaStoreState = createCoreSlices();
           for (const [namespace, slice] of pluginSlices) {
-            if (isCoreNamespace(namespace)) {
-              throw new Error(
-                `A plugin slice mounts at "${namespace}", which is a reserved core ` +
-                  `store namespace (${CORE_NAMESPACES.join('/')}). Rename the plugin ` +
-                  'or the capability it provides.'
-              );
-            }
+            invariant(
+              !isCoreNamespace(namespace),
+              'store-namespace-reserved',
+              `A plugin slice mounts at "${namespace}", which is a reserved core ` +
+                `store namespace (${CORE_NAMESPACES.join('/')}). Rename the plugin ` +
+                'or the capability it provides.'
+            );
             // `set as RootSet` bridges Zustand's broad middleware set type to the merge-only
             // root set createNamespacedSet drives; the slice itself gets the clean SliceSet.
             const scopedSet = createNamespacedSet(namespace, set as RootSet);
-            state[namespace] = slice(scopedSet, get, api);
+            state[namespace] = slice(scopedSet, get);
           }
           return state;
         },
-        { name: 'tina-store', partialize: pickPersistableNamespaces }
+        { name: PERSIST_STORAGE_KEY, partialize: pickPersistableNamespaces }
       ),
-      { name: 'TinaStore' }
+      { name: DEVTOOLS_STORE_NAME }
     )
   );
 };

@@ -1,12 +1,11 @@
 import {
-  type Capability,
   type ClientSlice,
   type PluginManifest,
-  SINGLETON_SLICE_CAPABILITIES,
   type SingletonSliceCapability,
   type SliceSet,
   type SliceState,
   type TinaStoreState,
+  isSingletonSliceCapability,
 } from '../core/plugin';
 
 // The slice/store types and the singleton-capability list live in core/plugin.ts (the plugin
@@ -20,11 +19,6 @@ export interface SliceMount {
   // slice mounts under the plugin name (a feature plugin like editorial-workflow).
   capability?: SingletonSliceCapability;
 }
-
-const isSingletonSliceCapability = (
-  capability: Capability
-): capability is SingletonSliceCapability =>
-  (SINGLETON_SLICE_CAPABILITIES as readonly Capability[]).includes(capability);
 
 // A plugin providing a singleton capability mounts its slice at that key; anything else
 // mounts under the plugin name. Swapping providers (tinaCloudAuth → auth0Auth) leaves

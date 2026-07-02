@@ -20,36 +20,36 @@ beforeEach(() => {
 
 describe('form-store registration', () => {
   it('a freshly registered form is pristine', () => {
-    store.getState().registerForm(postA, { title: 'Hello' });
+    store.getState().registerForm(postA, { [title]: 'Hello' });
     expect(statusOf(postA)).toBe('pristine');
   });
 
   it('re-registering a pristine form adopts the new content', () => {
-    store.getState().registerForm(postA, { title: 'Old' });
-    store.getState().registerForm(postA, { title: 'New' });
-    expect(store.getState().forms[postA].values.title).toBe('New');
+    store.getState().registerForm(postA, { [title]: 'Old' });
+    store.getState().registerForm(postA, { [title]: 'New' });
+    expect(store.getState().forms[postA].values[title]).toBe('New');
     expect(statusOf(postA)).toBe('pristine');
   });
 
   it('re-registering an edited form keeps in-progress edits', () => {
-    store.getState().registerForm(postA, { title: 'Hello' });
+    store.getState().registerForm(postA, { [title]: 'Hello' });
     store.getState().setFieldValue(postA, title, 'Edited');
     // A remount re-registers with the original values — the live edit must survive.
-    store.getState().registerForm(postA, { title: 'Hello' });
-    expect(store.getState().forms[postA].values.title).toBe('Edited');
+    store.getState().registerForm(postA, { [title]: 'Hello' });
+    expect(store.getState().forms[postA].values[title]).toBe('Edited');
     expect(statusOf(postA)).toBe('dirty');
   });
 });
 
 describe('form-store dirty tracking', () => {
   it('an edit moves a form from pristine to dirty', () => {
-    store.getState().registerForm(postA, { title: 'Hello' });
+    store.getState().registerForm(postA, { [title]: 'Hello' });
     store.getState().setFieldValue(postA, title, 'Goodbye');
     expect(statusOf(postA)).toBe('dirty');
   });
 
   it('editing back to the baseline value is clean, not pristine', () => {
-    store.getState().registerForm(postA, { title: 'Hello' });
+    store.getState().registerForm(postA, { [title]: 'Hello' });
     store.getState().setFieldValue(postA, title, 'Goodbye');
     store.getState().setFieldValue(postA, title, 'Hello');
     expect(statusOf(postA)).toBe('clean');
@@ -67,7 +67,7 @@ describe('form-store dirty tracking', () => {
 
 describe('form-store save reset', () => {
   it('markSaved rebases the baseline and returns the form to clean', () => {
-    store.getState().registerForm(postA, { title: 'Hello' });
+    store.getState().registerForm(postA, { [title]: 'Hello' });
     store.getState().setFieldValue(postA, title, 'Saved value');
     expect(statusOf(postA)).toBe('dirty');
 
@@ -82,21 +82,21 @@ describe('form-store save reset', () => {
 
 describe('form-store multiple forms', () => {
   it('tracks open forms independently without overwriting each other', () => {
-    store.getState().registerForm(postA, { title: 'A' });
-    store.getState().registerForm(postB, { title: 'B' });
+    store.getState().registerForm(postA, { [title]: 'A' });
+    store.getState().registerForm(postB, { [title]: 'B' });
 
     store.getState().setFieldValue(postA, title, 'A edited');
 
     expect(statusOf(postA)).toBe('dirty');
     expect(statusOf(postB)).toBe('pristine');
-    expect(store.getState().forms[postB].values.title).toBe('B');
+    expect(store.getState().forms[postB].values[title]).toBe('B');
   });
 });
 
 describe('form-store per-field dirty', () => {
   it('reports dirty per field and stays clean for siblings and missing forms', () => {
     const slug = toFieldAddress('slug');
-    store.getState().registerForm(postA, { title: 'Hi', slug: 'hi' });
+    store.getState().registerForm(postA, { [title]: 'Hi', [slug]: 'hi' });
     const scope = () => store.getState().forms[postA];
     expect(fieldDirty(scope(), title)).toBe(false);
 
@@ -109,7 +109,7 @@ describe('form-store per-field dirty', () => {
 
 describe('form-store teardown', () => {
   it('removeForm drops the scope', () => {
-    store.getState().registerForm(postA, { title: 'Hello' });
+    store.getState().registerForm(postA, { [title]: 'Hello' });
     store.getState().removeForm(postA);
     expect(store.getState().forms[postA]).toBeUndefined();
     expect(statusOf(postA)).toBe('pristine');
@@ -139,7 +139,7 @@ describe('form-store guards on unopened forms', () => {
 
 describe('form-store reference stability', () => {
   it('re-setting a field to its current value leaves the scope untouched', () => {
-    store.getState().registerForm(postA, { title: 'Hello' });
+    store.getState().registerForm(postA, { [title]: 'Hello' });
     const before = store.getState().forms[postA];
     store.getState().setFieldValue(postA, title, 'Hello');
     // No churn: same scope object, still pristine.
@@ -148,7 +148,7 @@ describe('form-store reference stability', () => {
   });
 
   it('markSaved on a never-edited form leaves it clean', () => {
-    store.getState().registerForm(postA, { title: 'Hello' });
+    store.getState().registerForm(postA, { [title]: 'Hello' });
     store.getState().markSaved(postA);
     expect(statusOf(postA)).toBe('clean');
   });

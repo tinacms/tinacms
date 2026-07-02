@@ -26,21 +26,22 @@ export const composeOverridableRegistry = <TValue>(
   // at one key collide. Tracked as two sets rather than one so a second base is still a
   // `duplicate-base` even when an override already sits at the key — an override must not
   // mask a genuine base-vs-base collision between two other plugins.
-  const overridden = new Set<string>();
-  const based = new Set<string>();
+  const overriddenKeys = new Set<string>();
+  const baseKeys = new Set<string>();
 
   for (const { key, value, isOverride } of entries) {
     if (isOverride) {
-      if (overridden.has(key)) throw conflictError('duplicate-override', key);
+      if (overriddenKeys.has(key))
+        throw conflictError('duplicate-override', key);
       // An override claims its key outright, whether or not a base has resolved yet.
       registry.set(key, value);
-      overridden.add(key);
+      overriddenKeys.add(key);
       continue;
     }
-    if (based.has(key)) throw conflictError('duplicate-base', key);
-    based.add(key);
+    if (baseKeys.has(key)) throw conflictError('duplicate-base', key);
+    baseKeys.add(key);
     // A base fills its key only when no override has already claimed it; else it yields.
-    if (!overridden.has(key)) registry.set(key, value);
+    if (!overriddenKeys.has(key)) registry.set(key, value);
   }
   return registry;
 };

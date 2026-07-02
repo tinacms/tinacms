@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import type { Brand } from '../core/brand';
 import type { FieldAddress } from '../core/field/address';
+import { invariant } from '../core/invariant';
 
 // The Form state store (ADR-010, issue #6909). One trustworthy source of truth for
 // whether an open document's form is pristine, dirty, or clean — read by save
@@ -24,13 +25,16 @@ import type { FieldAddress } from '../core/field/address';
 export type FormId = Brand<string, 'FormId'>;
 
 export const toFormId = (path: string): FormId => {
-  if (path.length === 0) {
-    throw new Error('A form id must be a non-empty path.');
-  }
+  invariant(
+    path.length > 0,
+    'form-id-empty',
+    'A form id must be a non-empty path.'
+  );
   return path as FormId;
 };
 
-export type FormValues = Record<string, unknown>;
+// Keyed by branded FieldAddress so a raw string can't seed or index a form's values.
+export type FormValues = Record<FieldAddress, unknown>;
 
 export type FormStatus = 'pristine' | 'dirty' | 'clean';
 
@@ -73,7 +77,8 @@ export interface FormStore {
 // value, alongside its parse/serialize) rather than a central deep-compare bolted on
 // here — the store then asks the field "did this change?" instead of guessing.
 const valuesEqual = (current: FormValues, baseline: FormValues): boolean => {
-  const keys = Object.keys(current);
+  // Object.keys erases the brand; these keys came in as FieldAddress.
+  const keys = Object.keys(current) as FieldAddress[];
   if (keys.length !== Object.keys(baseline).length) return false;
   return keys.every((key) => Object.is(current[key], baseline[key]));
 };
@@ -100,14 +105,17 @@ export const fieldDirty = (
 // there, only labelled actions in development. No `persist`: form values are volatile,
 // reloaded from the document on boot, never rehydrated from storage.
 //
-// `ACTION.*` are the devtools action labels, named once so the call sites can't drift.
-const ACTION = {
+// The devtools display names: the store's title and its per-action labels in the Redux
+// DevTools timeline, named once so the call sites can't drift.
+const DEVTOOLS_STORE_NAME = 'TinaFormStore';
+const DEVTOOLS_ACTION = {
   register: 'form/register',
   setFieldValue: 'form/setFieldValue',
   markSaved: 'form/markSaved',
   removeForm: 'form/removeForm',
 } as const;
-type FormActionLabel = (typeof ACTION)[keyof typeof ACTION];
+type DevtoolsActionLabel =
+  (typeof DEVTOOLS_ACTION)[keyof typeof DEVTOOLS_ACTION];
 
 export const useFormStore = create<FormStore>()(
   devtools(
@@ -117,7 +125,7 @@ export const useFormStore = create<FormStore>()(
       // replaces the whole store — so the call sites read as intent, not a raw flag.
       const apply = (
         patch: (state: FormStore) => FormStore | Partial<FormStore>,
-        action: FormActionLabel
+        action: DevtoolsActionLabel
       ) => set(patch, false, action);
 
       return {
@@ -125,6 +133,9 @@ export const useFormStore = create<FormStore>()(
 
         registerForm: (formId, values) =>
           apply((state) => {
+            // TODO(v4): `edited` covers clean (saved) forms too, so a clean form won't
+            // re-adopt externally-changed content on reload; the future auto-save/draft
+            // slice will arbitrate reload-vs-keep against dirty state.
             if (state.forms[formId]?.status === 'edited') return state;
             return {
               forms: {
@@ -132,7 +143,7 @@ export const useFormStore = create<FormStore>()(
                 [formId]: { status: 'pristine', values: { ...values } },
               },
             };
-          }, ACTION.register),
+          }, DEVTOOLS_ACTION.register),
 
         setFieldValue: (formId, address, value) =>
           apply((state) => {
@@ -156,7 +167,7 @@ export const useFormStore = create<FormStore>()(
                 },
               },
             };
-          }, ACTION.setFieldValue),
+          }, DEVTOOLS_ACTION.setFieldValue),
 
         markSaved: (formId) =>
           apply((state) => {
@@ -172,17 +183,17 @@ export const useFormStore = create<FormStore>()(
                 },
               },
             };
-          }, ACTION.markSaved),
+          }, DEVTOOLS_ACTION.markSaved),
 
         removeForm: (formId) =>
           apply((state) => {
             if (!state.forms[formId]) return state;
             const { [formId]: _removed, ...rest } = state.forms;
             return { forms: rest };
-          }, ACTION.removeForm),
+          }, DEVTOOLS_ACTION.removeForm),
       };
     },
-    { name: 'TinaFormStore' }
+    { name: DEVTOOLS_STORE_NAME }
   )
 );
 

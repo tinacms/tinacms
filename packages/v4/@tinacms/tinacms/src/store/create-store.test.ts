@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import type { ResolvedSegment } from '../core/field/registry';
 import {
   type Capability,
   type CapabilityOverride,
   type ClientSlice,
+  type ResolvedSegment,
   definePlugin,
 } from '../core/plugin';
 import { composePluginSlices } from './compose-slices';
@@ -90,8 +90,7 @@ describe('composePluginSlices conflicts', () => {
     expect(
       registry.get('media')?.(
         () => {},
-        () => ({}),
-        {} as never
+        () => ({})
       )
     ).toEqual({
       from: 's3',
@@ -117,8 +116,7 @@ describe('composePluginSlices conflicts', () => {
       (
         registry.get('media')?.(
           () => {},
-          () => ({}),
-          {} as never
+          () => ({})
         ) as any
       )?.from;
 

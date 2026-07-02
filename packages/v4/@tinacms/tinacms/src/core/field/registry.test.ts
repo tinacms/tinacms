@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { type CapabilityOverride, definePlugin } from '../plugin';
+import {
+  type CapabilityOverride,
+  type ResolvedSegment,
+  definePlugin,
+} from '../plugin';
 import type { FieldDescriptor } from './contract';
-import { type ResolvedSegment, createFieldRegistry } from './registry';
+import { createFieldRegistry } from './registry';
 
 const Noop = () => null;
 

@@ -24,7 +24,9 @@ describe('form-store hooks re-render on status changes', () => {
     const { result } = renderHook(() => useFormStatus(postA));
     expect(result.current).toBe('pristine');
 
-    act(() => useFormStore.getState().registerForm(postA, { title: 'Hello' }));
+    act(() =>
+      useFormStore.getState().registerForm(postA, { [title]: 'Hello' })
+    );
     expect(result.current).toBe('pristine');
 
     act(() => useFormStore.getState().setFieldValue(postA, title, 'Edited'));
@@ -35,7 +37,9 @@ describe('form-store hooks re-render on status changes', () => {
   });
 
   it('useIsFormDirty and useIsFieldDirty subscribe to their form', () => {
-    act(() => useFormStore.getState().registerForm(postA, { title: 'Hello' }));
+    act(() =>
+      useFormStore.getState().registerForm(postA, { [title]: 'Hello' })
+    );
     const formDirty = renderHook(() => useIsFormDirty(postA));
     const fieldIsDirty = renderHook(() => useIsFieldDirty(postA, title));
     expect(formDirty.result.current).toBe(false);
