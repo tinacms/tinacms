@@ -1,6 +1,12 @@
 import * as React from 'react';
 import { BiError } from 'react-icons/bi';
-import { GitBranchIcon, TriangleAlert } from 'lucide-react';
+import {
+  Eye,
+  FileText,
+  GitBranchIcon,
+  Globe,
+  TriangleAlert,
+} from 'lucide-react';
 import { Button, DropdownButton } from '@toolkit/styles';
 import { useCMS } from '../react-core';
 import {
@@ -17,9 +23,10 @@ import { checkBaseBranchExists } from './editorial-workflow-utils';
 import { useEditorialWorkflow } from './use-editorial-workflow';
 import { useLocalStorage } from '@toolkit/hooks/use-local-storage';
 import {
-  IS_DRAFT_STORAGE_KEY,
-  PullRequestStatusField,
-} from './pull-request-status-field';
+  SAVE_CHOICE_KEY,
+  type SaveChoice,
+  resolveSaveOptions,
+} from './save-options';
 
 // Format the default branch name by removing content/ prefix and file extension
 const formatDefaultBranchName = (
@@ -174,7 +181,8 @@ export const CreateBranchModal = ({
         close();
         safeSubmit();
       }}
-      showPullRequestStatus={true}
+      showSaveOptions={true}
+      disablePublish={!!tinaApi.usingProtectedBranch()}
     />
   );
 };
@@ -187,7 +195,8 @@ export const CreateBranchPromptModal = ({
   onBranchNameChange,
   onCreateBranch,
   onSaveToProtectedBranch,
-  showPullRequestStatus = false,
+  showSaveOptions = false,
+  disablePublish = false,
 }: {
   branchName: string;
   close: () => void;
@@ -196,14 +205,53 @@ export const CreateBranchPromptModal = ({
   onBranchNameChange: (value: string) => void;
   onCreateBranch: (isDraft: boolean) => void;
   onSaveToProtectedBranch: () => void;
-  // Content editorial workflow opts in to the draft/ready control. The media
-  // workflow reuses this modal but does not thread isDraft, so it stays hidden there.
-  showPullRequestStatus?: boolean;
+  // Content editorial workflow opts in to the draft / ready / publish save
+  // options. The media workflow reuses this modal but keeps its legacy button.
+  showSaveOptions?: boolean;
+  // Disable "Save and publish" (direct commit) on protected branches, w/ tooltip.
+  disablePublish?: boolean;
 }) => {
-  const [isDraft, setIsDraft] = useLocalStorage(IS_DRAFT_STORAGE_KEY, true) as [
-    boolean,
-    (value: boolean) => void,
-  ];
+  // Remember the editor's last save choice; the main button reflects it
+  // (default "Save draft"), the caret menu offers the others.
+  const [lastChoice, setLastChoice] = useLocalStorage(
+    SAVE_CHOICE_KEY,
+    'draft'
+  ) as [SaveChoice, (choice: SaveChoice) => void];
+  const { main, menu } = resolveSaveOptions(lastChoice, disablePublish);
+
+  const choices: Record<
+    SaveChoice,
+    {
+      label: string;
+      Icon: React.ComponentType<any>;
+      run: () => void;
+      disabled?: boolean;
+      tooltip?: string;
+    }
+  > = {
+    draft: {
+      label: 'Save draft',
+      Icon: FileText,
+      run: () => onCreateBranch(true),
+    },
+    review: {
+      label: 'Save (ready for review)',
+      Icon: Eye,
+      run: () => onCreateBranch(false),
+    },
+    publish: {
+      label: 'Save and publish',
+      Icon: Globe,
+      run: onSaveToProtectedBranch,
+      disabled: disablePublish,
+      tooltip: disablePublish
+        ? 'This branch is protected. Save a draft or send it for review instead.'
+        : undefined,
+    },
+  };
+  const mainChoice = choices[main] ?? choices.draft;
+  const MainIcon = mainChoice.Icon;
+
   return (
     <Modal className='flex'>
       <PopupModal className='w-auto'>
@@ -249,9 +297,6 @@ export const CreateBranchPromptModal = ({
                 onBranchNameChange(e.target.value);
               }}
             />
-            {showPullRequestStatus && (
-              <PullRequestStatusField isDraft={isDraft} onChange={setIsDraft} />
-            )}
           </div>
         </ModalBody>
         <ModalActions align='end'>
@@ -262,23 +307,53 @@ export const CreateBranchPromptModal = ({
           >
             Cancel
           </Button>
-          <DropdownButton
-            variant='primary'
-            align='start'
-            className='w-full sm:w-auto'
-            disabled={disabled}
-            onMainAction={() => onCreateBranch(isDraft)}
-            items={[
-              {
-                label: 'Save to Protected Branch',
-                onClick: onSaveToProtectedBranch,
-                icon: <TriangleAlert className='w-4 h-4' />,
-              },
-            ]}
-          >
-            <GitBranchIcon className='w-4 h-4 mr-1' style={{ fill: 'none' }} />
-            Save to a new branch
-          </DropdownButton>
+          {showSaveOptions ? (
+            <DropdownButton
+              variant='primary'
+              align='start'
+              className='w-full sm:w-auto'
+              disabled={disabled}
+              onMainAction={mainChoice.run}
+              items={menu.map((choice) => {
+                const option = choices[choice];
+                const OptionIcon = option.Icon;
+                return {
+                  label: option.label,
+                  icon: <OptionIcon className='w-4 h-4' />,
+                  disabled: option.disabled,
+                  tooltip: option.tooltip,
+                  onClick: () => {
+                    setLastChoice(choice);
+                    option.run();
+                  },
+                };
+              })}
+            >
+              <MainIcon className='w-4 h-4 mr-1' style={{ fill: 'none' }} />
+              {mainChoice.label}
+            </DropdownButton>
+          ) : (
+            <DropdownButton
+              variant='primary'
+              align='start'
+              className='w-full sm:w-auto'
+              disabled={disabled}
+              onMainAction={() => onCreateBranch(false)}
+              items={[
+                {
+                  label: 'Save to Protected Branch',
+                  onClick: onSaveToProtectedBranch,
+                  icon: <TriangleAlert className='w-4 h-4' />,
+                },
+              ]}
+            >
+              <GitBranchIcon
+                className='w-4 h-4 mr-1'
+                style={{ fill: 'none' }}
+              />
+              Save to a new branch
+            </DropdownButton>
+          )}
         </ModalActions>
       </PopupModal>
     </Modal>
