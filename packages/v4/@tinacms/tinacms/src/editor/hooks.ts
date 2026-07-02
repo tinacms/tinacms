@@ -1,13 +1,88 @@
-import { use, useEffect, useRef } from 'react';
-import { useController, useFormState } from 'react-hook-form';
+import { use, useCallback, useEffect, useRef } from 'react';
+import { useController, useFormContext, useFormState } from 'react-hook-form';
+import { useStore } from 'zustand';
 import type { FieldAddress } from '../core/field/address';
-import type { FieldSchema } from '../core/schema/types';
+import type { FieldRegistry } from '../core/field/registry';
+import { digestDocument } from '../core/form/ingest';
+import type { TinaStoreState } from '../core/plugin';
+import type { FieldSchema, TinaDocument } from '../core/schema/types';
+import { type FormId, useFormStore } from '../form/form-store';
 import {
-  ActiveFieldContext,
+  CollectionContext,
   FieldAddressContext,
   FieldSchemaContext,
+  FormIdContext,
+  RegistryContext,
+  SaveHandlerContext,
+  TinaStoreContext,
 } from './context';
 import { type FieldErrorEntry, fieldErrorMessages } from './field-errors';
+
+export function useFieldRegistry(): FieldRegistry {
+  const registry = use(RegistryContext);
+  if (!registry) {
+    throw new Error('useFieldRegistry must be used within a TinaProvider');
+  }
+  return registry;
+}
+
+export function useTinaStore<Selected>(
+  selector: (state: TinaStoreState) => Selected
+): Selected {
+  const store = use(TinaStoreContext);
+  if (!store) {
+    throw new Error('useTinaStore must be used within a TinaProvider');
+  }
+  return useStore(store, selector);
+}
+
+export function useFormId(): FormId {
+  const formId = use(FormIdContext);
+  if (formId == null) {
+    throw new Error('useFormId must be used within a FormProvider');
+  }
+  return formId;
+}
+
+export interface ActiveField {
+  active: FieldAddress | null;
+  setActive: (address: FieldAddress | null) => void;
+}
+
+// The current form's view of the store's single active field (ADR-009 visual
+// editing): `active` is the address a preview click activated (null when the active
+// field belongs to another form), `setActive` activates/clears it.
+export function useActiveField(): ActiveField {
+  const formId = useFormId();
+  const active = useFormStore((state) =>
+    state.active?.formId === formId ? state.active.address : null
+  );
+  const setActive = useCallback(
+    (address: FieldAddress | null) =>
+      useFormStore.getState().setActive(formId, address),
+    [formId]
+  );
+  return { active, setActive };
+}
+
+// Reconstruct the document from the form's values and hand it to the host's save
+// handler (the ADR-018/019 seam); only a resolved save freezes the clean baseline —
+// a rejected save leaves the form dirty.
+export function useFormSave(): () => Promise<void> {
+  const registry = useFieldRegistry();
+  const collection = use(CollectionContext);
+  const formId = useFormId();
+  const onSave = use(SaveHandlerContext);
+  const { getValues } = useFormContext<TinaDocument>();
+  if (!collection) {
+    throw new Error('useFormSave must be used within a FormProvider');
+  }
+  return async () => {
+    const digested = digestDocument(getValues(), collection.fields, registry);
+    await onSave?.(digested);
+    useFormStore.getState().markSaved(formId);
+  };
+}
 
 export function useFieldAddress(): FieldAddress {
   const address = use(FieldAddressContext);
@@ -45,11 +120,16 @@ export function useFieldErrors(address: FieldAddress): string[] {
 
 export function useFieldActivation(handler: () => void): void {
   const address = use(FieldAddressContext);
-  const activeField = use(ActiveFieldContext);
-  const active = activeField?.active ?? null;
+  const formId = use(FormIdContext);
+  const isActive = useFormStore(
+    (state) =>
+      address != null &&
+      state.active?.formId === formId &&
+      state.active.address === address
+  );
   const handlerRef = useRef(handler);
   handlerRef.current = handler;
   useEffect(() => {
-    if (address != null && active === address) handlerRef.current();
-  }, [active, address]);
+    if (isActive) handlerRef.current();
+  }, [isActive]);
 }

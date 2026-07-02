@@ -7,18 +7,24 @@ import {
   useState,
 } from 'react';
 import { FormProvider as RhfFormProvider, useForm } from 'react-hook-form';
-import type { FieldAddress } from '../core/field/address';
+import { toFieldAddress } from '../core/field/address';
 import {
   type FieldRegistry,
-  resolveFieldPlugins,
+  createFieldRegistry,
+  resolveClientSegments,
 } from '../core/field/registry';
 import { ingestDocument } from '../core/form/ingest';
 import type { PluginManifest } from '../core/plugin';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
+import { toFormId, toFormValues, useFormStore } from '../form/form-store';
+import { createTinaStore } from '../store/create-store';
 import {
-  ActiveFieldContext,
   CollectionContext,
+  FormIdContext,
   RegistryContext,
+  type SaveHandler,
+  SaveHandlerContext,
+  TinaStoreContext,
 } from './context';
 import { buildFormResolver } from './resolver';
 
@@ -27,21 +33,30 @@ export interface TinaProviderProps {
   children: ReactNode;
 }
 
+// The boot-composed runtime: one resolveClientSegments pass feeds both the field
+// registry and the client store (ADR-003), held as a single state object so the two
+// always appear together (no tearing). The registry deliberately does NOT live in
+// the store — it's an immutable Map of React components, config rather than state.
+interface TinaRuntime {
+  registry: FieldRegistry;
+  store: ReturnType<typeof createTinaStore>;
+}
+
 export function TinaProvider({ plugins, children }: TinaProviderProps) {
-  // TODO(zustand): the resolved registry + this loading/error state belong in the
-  // global Tina store (ADR-003), composed once at boot — not per-provider state.
-  const [registry, setRegistry] = useState<FieldRegistry | null>(null);
+  const [runtime, setRuntime] = useState<TinaRuntime | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const pluginsKey = plugins.map((plugin) => plugin.name).join('|');
 
-  // TODO(zustand): resolve plugins once at boot into the global store (ADR-003)
-  // rather than in this effect — the provider would then just read a ready
-  // registry, with no loading state or in-effect async here.
   useEffect(() => {
     let mounted = true;
-    resolveFieldPlugins(plugins)
+    resolveClientSegments(plugins)
       .then((resolved) => {
-        if (mounted) setRegistry(resolved);
+        if (mounted) {
+          setRuntime({
+            registry: createFieldRegistry(resolved),
+            store: createTinaStore(resolved),
+          });
+        }
       })
       .catch((cause) => {
         if (mounted) {
@@ -54,19 +69,29 @@ export function TinaProvider({ plugins, children }: TinaProviderProps) {
   }, [pluginsKey]);
 
   if (error) throw error;
-  if (!registry) return null;
-  return <RegistryContext value={registry}>{children}</RegistryContext>;
+  if (!runtime) return null;
+  return (
+    <RegistryContext value={runtime.registry}>
+      <TinaStoreContext value={runtime.store}>{children}</TinaStoreContext>
+    </RegistryContext>
+  );
 }
 
 export interface FormProviderProps {
   collection: CollectionSchema;
+  // The open document's path — a form is opened per document (ADR-010), so this is
+  // the form's identity in the form-state store.
+  path: string;
   document?: TinaDocument;
+  onSave?: SaveHandler;
   children: ReactNode;
 }
 
 export function FormProvider({
   collection,
+  path,
   document,
+  onSave,
   children,
 }: FormProviderProps) {
   const registry = use(RegistryContext);
@@ -74,6 +99,7 @@ export function FormProvider({
     throw new Error('FormProvider must be used within a TinaProvider');
   }
 
+  const formId = toFormId(path);
   const defaultValues = useMemo(
     () => ingestDocument(document, collection.fields, registry),
     [document, collection, registry]
@@ -92,6 +118,11 @@ export function FormProvider({
   // a JSON signature). RHF's useForm reads defaultValues only at mount, so this
   // reset reloads the form when you switch documents — while a same-content
   // re-render won't wipe in-progress edits.
+  //
+  // Known seam: resetting while the form-store scope is *edited* diverges the two
+  // (the store keeps edits per ADR-012, RHF adopts the new document). Unreachable
+  // while a provider hosts one document; it's the trigger for the increment that
+  // retires RHF value ownership (form-store.ts header).
   const seededSignature = useRef<string | null>(null);
   useEffect(() => {
     const signature = JSON.stringify(defaultValues);
@@ -105,19 +136,33 @@ export function FormProvider({
     }
   }, [defaultValues, methods]);
 
-  // TODO(zustand): active-field / UI state should live in the global Tina store.
-  const [active, setActive] = useState<FieldAddress | null>(null);
-  const activeField = useMemo(() => ({ active, setActive }), [active]);
+  // One-way RHF → form-store sync: RHF stays the value/render authority, the
+  // form-store is the sole pristine/dirty/clean authority (ADR-010). This watch
+  // subscription is the single chokepoint — wrapping field.onChange instead would
+  // miss reset/setValue and be bypassable via a raw useController.
+  useEffect(() => {
+    const { registerForm, setFieldValue } = useFormStore.getState();
+    registerForm(formId, toFormValues(defaultValues));
+    const subscription = methods.watch((values, { name }) => {
+      // `name` is undefined on reset — re-adopting the baseline is registerForm's job.
+      if (name === undefined) return;
+      setFieldValue(formId, toFieldAddress(name), values[name]);
+    });
+    // No removeForm on unmount (ADR-012): navigating away keeps unsaved edits.
+    return () => subscription.unsubscribe();
+  }, [formId, defaultValues, methods]);
 
   return (
     <CollectionContext value={collection}>
-      <ActiveFieldContext value={activeField}>
-        <RhfFormProvider {...methods}>
-          {/* Fragment pins children to a ReactElement — RHF's FormProvider children
-              type predates the bigint that React 19's ReactNode includes. */}
-          <>{children}</>
-        </RhfFormProvider>
-      </ActiveFieldContext>
+      <FormIdContext value={formId}>
+        <SaveHandlerContext value={onSave ?? null}>
+          <RhfFormProvider {...methods}>
+            {/* Fragment pins children to a ReactElement — RHF's FormProvider children
+                type predates the bigint that React 19's ReactNode includes. */}
+            <>{children}</>
+          </RhfFormProvider>
+        </SaveHandlerContext>
+      </FormIdContext>
     </CollectionContext>
   );
 }

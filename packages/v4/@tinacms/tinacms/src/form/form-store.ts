@@ -1,8 +1,9 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import type { Brand } from '../core/brand';
-import type { FieldAddress } from '../core/field/address';
+import { type FieldAddress, toFieldAddress } from '../core/field/address';
 import { invariant } from '../core/invariant';
+import type { TinaDocument } from '../core/schema/types';
 
 // The Form state store (ADR-010, issue #6909). One trustworthy source of truth for
 // whether an open document's form is pristine, dirty, or clean — read by save
@@ -37,6 +38,17 @@ export const toFormId = (path: string): FormId => {
 // Keyed by branded FieldAddress so a raw string can't seed or index a form's values.
 export type FormValues = Record<FieldAddress, unknown>;
 
+// Brand a flat document's keys as field addresses — the constructor for FormValues.
+// Flat addresses only, the same assumption as the editor's field hooks; nested
+// fields need a path walk here too when composite fields land.
+export const toFormValues = (document: TinaDocument): FormValues => {
+  const values: FormValues = {};
+  for (const [name, value] of Object.entries(document)) {
+    values[toFieldAddress(name)] = value;
+  }
+  return values;
+};
+
 export type FormStatus = 'pristine' | 'dirty' | 'clean';
 
 // One open document's form, modelled so illegal states can't be built: a pristine form
@@ -56,6 +68,11 @@ export interface FormStore {
   // Keyed by FormId (one open document per form, ADR-010); a missing key is a form
   // that isn't open, so a lookup returns `FormScope | undefined`.
   forms: Partial<Record<FormId, FormScope>>;
+  // The single active field across all open forms (ADR-009 visual editing): a
+  // preview click activates exactly one field; the owning field reacts (focus)
+  // via useFieldActivation. Form-scoped rather than per-scope because activation
+  // is orthogonal to dirty state.
+  active: { formId: FormId; address: FieldAddress } | null;
   // Flatten on load: seed a form's values. Re-registering an *edited* form is a no-op so
   // navigating away and back keeps unsaved edits (ADR-012 teardown); re-registering a
   // pristine form re-adopts the incoming content, so reloading the same id with changed
@@ -66,6 +83,7 @@ export interface FormStore {
     address: FieldAddress,
     value: unknown
   ) => void;
+  setActive: (formId: FormId, address: FieldAddress | null) => void;
   // Save success: freeze the baseline at the current values -> status goes `clean`.
   markSaved: (formId: FormId) => void;
   // Explicit close: drop the scope (GC).
@@ -117,6 +135,7 @@ const DEVTOOLS_STORE_NAME = 'TinaFormStore';
 const DEVTOOLS_ACTION = {
   register: 'form/register',
   setFieldValue: 'form/setFieldValue',
+  setActive: 'form/setActive',
   markSaved: 'form/markSaved',
   removeForm: 'form/removeForm',
 } as const;
@@ -136,6 +155,7 @@ export const useFormStore = create<FormStore>()(
 
       return {
         forms: {},
+        active: null,
 
         registerForm: (formId, values) =>
           apply((state) => {
@@ -175,6 +195,12 @@ export const useFormStore = create<FormStore>()(
             };
           }, DEVTOOLS_ACTION.setFieldValue),
 
+        setActive: (formId, address) =>
+          apply(
+            () => ({ active: address == null ? null : { formId, address } }),
+            DEVTOOLS_ACTION.setActive
+          ),
+
         markSaved: (formId) =>
           apply((state) => {
             const scope = state.forms[formId];
@@ -195,7 +221,10 @@ export const useFormStore = create<FormStore>()(
           apply((state) => {
             if (!state.forms[formId]) return state;
             const { [formId]: _removed, ...rest } = state.forms;
-            return { forms: rest };
+            return {
+              forms: rest,
+              active: state.active?.formId === formId ? null : state.active,
+            };
           }, DEVTOOLS_ACTION.removeForm),
       };
     },

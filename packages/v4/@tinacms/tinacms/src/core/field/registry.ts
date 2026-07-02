@@ -44,9 +44,12 @@ export const createFieldRegistry = (
     fieldConflictError
   );
 
-export const resolveFieldPlugins = async (
+// Load every plugin's client segment once. The one boot-time resolution pass — its
+// result feeds both createFieldRegistry and createTinaStore so the two compose from
+// the same segments and can't diverge.
+export const resolveClientSegments = async (
   plugins: PluginManifest[]
-): Promise<FieldRegistry> => {
+): Promise<ResolvedSegment[]> => {
   const resolved: ResolvedSegment[] = [];
   for (const manifest of plugins) {
     if (!manifest.client) continue;
@@ -58,5 +61,10 @@ export const resolveFieldPlugins = async (
     );
     resolved.push({ manifest, segment: clientModule.default });
   }
-  return createFieldRegistry(resolved);
+  return resolved;
 };
+
+export const resolveFieldPlugins = async (
+  plugins: PluginManifest[]
+): Promise<FieldRegistry> =>
+  createFieldRegistry(await resolveClientSegments(plugins));
