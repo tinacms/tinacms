@@ -115,6 +115,59 @@ describe('form-store save reset', () => {
   });
 });
 
+describe('form-store error mirror', () => {
+  const scope = () => store.getState().forms[postA];
+
+  it('stores mirrored errors on an edited scope and clears them on a clean write', () => {
+    store.getState().registerForm(postA, { [title]: 'Hello' });
+    store.getState().setFieldValue(postA, title, 'x');
+    store.getState().setFieldErrors(postA, { [title]: ['Too short'] });
+    expect(scope().errors[title]).toEqual(['Too short']);
+
+    store.getState().setFieldErrors(postA, {});
+    expect(scope().errors).toEqual({});
+  });
+
+  it('no-ops on a pristine scope — never validated, nothing to mirror', () => {
+    store.getState().registerForm(postA, { [title]: 'Hello' });
+    store.getState().setFieldErrors(postA, { [title]: ['Too short'] });
+    expect(scope().status).toBe('pristine');
+    expect(statusOf(postA)).toBe('pristine');
+  });
+
+  it('an equal map write and an error write both preserve identities they must not churn', () => {
+    store.getState().registerForm(postA, { [title]: 'Hello' });
+    store.getState().setFieldValue(postA, title, 'x');
+    store.getState().setFieldErrors(postA, { [title]: ['Too short'] });
+    const before = scope();
+
+    // Same content, fresh arrays — RHF rebuilds these per keystroke.
+    store.getState().setFieldErrors(postA, { [title]: ['Too short'] });
+    expect(scope()).toBe(before);
+
+    // A differing write replaces errors but must keep the values reference:
+    // error mirroring must not read as a value change to the preview wire.
+    store.getState().setFieldErrors(postA, {});
+    expect(scope().values).toBe(before.values);
+  });
+
+  it('value writes preserve mirrored errors until RHF re-derives', () => {
+    store.getState().registerForm(postA, { [title]: 'Hello' });
+    store.getState().setFieldValue(postA, title, 'x');
+    store.getState().setFieldErrors(postA, { [title]: ['Too short'] });
+    store.getState().setFieldValue(postA, title, 'xy');
+    expect(scope().errors[title]).toEqual(['Too short']);
+  });
+
+  it('markSaved carries errors through', () => {
+    store.getState().registerForm(postA, { [title]: 'Hello' });
+    store.getState().setFieldValue(postA, title, 'x');
+    store.getState().setFieldErrors(postA, { [title]: ['Too short'] });
+    store.getState().markSaved(postA);
+    expect(scope().errors[title]).toEqual(['Too short']);
+  });
+});
+
 describe('form-store multiple forms', () => {
   it('tracks open forms independently without overwriting each other', () => {
     store.getState().registerForm(postA, { [title]: 'A' });

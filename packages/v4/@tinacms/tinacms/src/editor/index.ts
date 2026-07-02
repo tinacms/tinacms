@@ -9,14 +9,19 @@
 // form-state store's single source of truth.
 
 export { type FieldAddress, toFieldAddress } from '../core/field/address';
-// Read-only source of truth for form clean/dirty/pristine state. The store handle
-// and its mutators stay package-internal (the editor drives writes) so plugin client
-// segments cannot poke form state directly (ADR-010 §6).
+// Read-only form-store surface: clean/dirty/pristine state plus the values/errors
+// mirror of any open form (useFormValues/useFormErrors — collection-level
+// indicators, mounted or not). The store handle and its mutators stay
+// package-internal (the editor drives writes) so plugin client segments cannot
+// poke form state directly (ADR-010 §6).
 export {
+  type FieldErrors,
   type FormId,
   type FormStatus,
   toFormId,
+  useFormErrors,
   useFormStatus,
+  useFormValues,
   useIsFieldDirty,
   useIsFormDirty,
 } from '../form/form-store';
