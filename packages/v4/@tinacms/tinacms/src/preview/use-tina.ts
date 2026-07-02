@@ -21,6 +21,11 @@ export interface UseTinaResult<T extends TinaDocument> {
 // inert — no listeners, no ready beacon, props flow through untouched. Inside
 // the editor iframe it announces readiness, adopts every streamed document, and
 // sends clicks on tinaField-marked elements up as activate messages.
+//
+// One document per connection: tina:values carries no document identity (the
+// protocol header pins that), so every useTina on the page adopts the same
+// hosted form. A multi-document page needs the envelope discriminator that
+// lands with multi-form editing — out of scope here.
 export function useTina<T extends TinaDocument = TinaDocument>({
   data,
   allowedOrigin,
