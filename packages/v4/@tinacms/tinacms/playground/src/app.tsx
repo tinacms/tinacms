@@ -14,12 +14,11 @@ import {
   useFormStatus,
   useIsFieldDirty,
   useIsFormDirty,
+  usePreviewConnection,
 } from '@tinacms/tinacms/react';
-import { useState } from 'react';
-import { ActiveFieldListener } from './active-field-listener';
+import { useRef, useState } from 'react';
 import { DOCUMENT_PATH, postCollection, sampleDocument } from './content';
 import { PluginsPanel } from './plugins-panel';
-import { PreviewBridge } from './preview-bridge';
 
 const STATUS_COLORS: Record<FormStatus, string> = {
   pristine: '#6b7280',
@@ -57,6 +56,21 @@ function FieldRow({ node }: { node: FieldSchema }) {
   );
 }
 
+// Hosts the preview iframe and wires it to the editor: usePreviewConnection
+// streams the form's values over and sets preview clicks active.
+function PreviewPane() {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  usePreviewConnection(iframeRef);
+  return (
+    <iframe
+      ref={iframeRef}
+      src='/preview.html'
+      title='Preview'
+      style={{ width: '100%', height: '100%', border: 'none' }}
+    />
+  );
+}
+
 function SaveButton() {
   const dirty = useIsFormDirty(useFormId());
   const save = useFormSave();
@@ -77,7 +91,6 @@ export function App() {
         document={sampleDocument}
         onSave={setSavedDocument}
       >
-        <ActiveFieldListener />
         <div style={{ display: 'flex', height: '100vh' }}>
           <aside
             style={{
@@ -106,7 +119,7 @@ export function App() {
             <PluginsPanel savedDocument={savedDocument} />
           </aside>
           <main style={{ flex: 1 }}>
-            <PreviewBridge />
+            <PreviewPane />
           </main>
         </div>
       </FormProvider>
