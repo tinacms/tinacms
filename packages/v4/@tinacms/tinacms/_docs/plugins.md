@@ -41,4 +41,5 @@ a *keyed* capability: many field plugins coexist, one per schema `type`
 - [Field plugins](./field-plugins.md) — how to build one
   - [The `string` field](./string-field.md) — the shipped text input
   - [The `boolean` field](./boolean-field.md) — the shipped checkbox
+  - [The `number` field](./number-field.md) — the shipped numeric input
 - [Architecture](./architecture.md) — how a plugin reaches the screen
