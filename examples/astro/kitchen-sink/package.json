@@ -21,7 +21,7 @@
     "@astrojs/react": "^5.0.5",
     "@tailwindcss/typography": "catalog:",
     "@tinacms/datalayer": "workspace:*",
-    "astro": "^6.3.7",
+    "astro": "^6.4.6",
     "clsx": "^2.1.1",
     "graphql": "^15.10.1",
     "react": "^18.3.1",
