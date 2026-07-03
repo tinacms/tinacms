@@ -35,6 +35,8 @@ export const sliceMountFor = (manifest: PluginManifest): SliceMount => {
       `capabilities (${singletons.join(', ')}), but a client segment has one ` +
       'slice, so it can mount at only one namespace.'
   );
+  // The invariant above caps singletons at one, so [0] is that single capability or
+  // undefined — undefined ⇒ a feature plugin, mounted under its own name.
   const capability = singletons[0];
   return capability
     ? { namespace: capability, capability }

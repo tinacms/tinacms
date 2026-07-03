@@ -7,7 +7,9 @@ import type { SliceSet, TinaStoreState } from './slice';
 
 // The store's built-in namespaces. Intentionally empty stubs for now — this increment
 // delivers the registration mechanism + middleware stack, not the ui/branch/documents
-// shapes (those land with their own slices later).
+// shapes (those land as core slices later, composed directly at boot: createUiSlice /
+// createBranchSlice / createDocumentsSlice per store-architecture.md). They are core, not
+// plugins — `isCoreNamespace` reserves these keys and a plugin mounting here is rejected.
 const CORE_NAMESPACES = ['ui', 'branch', 'documents'] as const;
 type CoreNamespace = (typeof CORE_NAMESPACES)[number];
 
@@ -19,6 +21,10 @@ type CoreNamespace = (typeof CORE_NAMESPACES)[number];
 // NB: persist's default shallow merge replaces a whole namespace on rehydrate — fine while
 // these are plain data, but once a core slice carries action functions it needs a custom
 // `merge` so rehydration doesn't clobber the freshly-composed slice.
+//
+// NB: persistence.md keeps the branch *list* and dirty state volatile — only the selection
+// should survive. Whole-namespace persistence is fine while `branch` is an empty stub, but
+// needs a per-key partialize when the real branch slice lands.
 const PERSISTED_NAMESPACES: readonly CoreNamespace[] = ['ui', 'branch'];
 
 export const pickPersistableNamespaces = (
@@ -55,6 +61,8 @@ const createNamespacedSet =
     setStore(
       (store) => {
         const currentSliceState = store[namespace] ?? {};
+        // SliceSet mirrors Zustand's two set() forms — set(partial) and
+        // set(current => partial); the function form reads the current slice state.
         const nextSliceState =
           typeof partial === 'function' ? partial(currentSliceState) : partial;
         return {

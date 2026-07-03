@@ -3,6 +3,10 @@ import type { FieldDescriptor } from './field/contract';
 
 export type Capability = 'field' | 'content' | 'auth' | 'media' | 'search';
 
+// The one keyed capability (many field types, one registry). Named so runtime checks
+// reference the constant, not a repeated literal.
+export const FIELD_CAPABILITY = 'field' as const satisfies Capability;
+
 // Capabilities whose provider owns a single client store namespace — its slice mounts at the
 // capability key (store-architecture.md), not the plugin name. The one place this
 // categorisation lives, so the store composer reads it here instead of re-listing. `content`
@@ -31,7 +35,7 @@ export const isSingletonSliceCapability = (
 // override names the field type; singletons have exactly one slot, so the union forbids
 // a dead `key` on them.
 export type CapabilityOverride =
-  | { capability: 'field'; key: string }
+  | { capability: typeof FIELD_CAPABILITY; key: string }
   | { capability: SingletonSliceCapability };
 
 // The whole boot-composed client store: a flat bag of namespaces, each holding one

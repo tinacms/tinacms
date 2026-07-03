@@ -15,7 +15,13 @@ export interface RegistryEntry<TValue> {
   isOverride: boolean;
 }
 
-export type RegistryConflict = 'duplicate-base' | 'duplicate-override';
+export const REGISTRY_CONFLICTS = {
+  duplicateBase: 'duplicate-base',
+  duplicateOverride: 'duplicate-override',
+} as const;
+
+export type RegistryConflict =
+  (typeof REGISTRY_CONFLICTS)[keyof typeof REGISTRY_CONFLICTS];
 
 export const composeOverridableRegistry = <TValue>(
   entries: Iterable<RegistryEntry<TValue>>,
@@ -32,13 +38,14 @@ export const composeOverridableRegistry = <TValue>(
   for (const { key, value, isOverride } of entries) {
     if (isOverride) {
       if (overriddenKeys.has(key))
-        throw conflictError('duplicate-override', key);
+        throw conflictError(REGISTRY_CONFLICTS.duplicateOverride, key);
       // An override claims its key outright, whether or not a base has resolved yet.
       registry.set(key, value);
       overriddenKeys.add(key);
       continue;
     }
-    if (baseKeys.has(key)) throw conflictError('duplicate-base', key);
+    if (baseKeys.has(key))
+      throw conflictError(REGISTRY_CONFLICTS.duplicateBase, key);
     baseKeys.add(key);
     // A base fills its key only when no override has already claimed it; else it yields.
     if (!overriddenKeys.has(key)) registry.set(key, value);

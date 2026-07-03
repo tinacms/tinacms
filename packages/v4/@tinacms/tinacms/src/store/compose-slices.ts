@@ -1,4 +1,5 @@
 import {
+  REGISTRY_CONFLICTS,
   type RegistryConflict,
   composeOverridableRegistry,
 } from '../core/overridable-registry';
@@ -20,7 +21,7 @@ const sliceConflictError = (
   conflict: RegistryConflict,
   namespace: string
 ): Error => {
-  if (conflict === 'duplicate-override') {
+  if (conflict === REGISTRY_CONFLICTS.duplicateOverride) {
     return new Error(
       `Two plugins both declare an \`overrides\` for the "${namespace}" capability. ` +
         'Only one may replace the built-in.'

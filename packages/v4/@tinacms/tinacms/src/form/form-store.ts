@@ -11,8 +11,9 @@ import { invariant } from '../core/invariant';
 //
 // Shape: a flat `address -> value` map per open document (keyed by `formId`); once
 // edited, the values are diffed against the baseline they were loaded/last-saved from.
-// Pristine is "never edited since load". Multiple forms coexist (a reference field
-// hosts a second document's form) without overwriting each other's state.
+// Pristine is "never edited since load". Multiple forms coexist without overwriting
+// each other's state — each is keyed by its own formId (e.g. once a reference field can
+// host a second document's form inline; that field type isn't built yet).
 //
 // Scope (ponytail): this is the standalone source-of-truth store. Field values still
 // render through react-hook-form today; wiring the editor to read/write here (and
