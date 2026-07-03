@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 
-// Shared vectors for the duplicated safeUploadName copies: guard against drift
-// and against the sanitisation being dropped (which would reopen CWE-22).
+// Shared vectors for the duplicated safeUploadName copies: guard against the
+// copies drifting apart and against a directory component slipping through.
 import { safeUploadName as dos } from '../packages/next-tinacms-dos/src/upload-filename';
 import { safeUploadName as cloudinary } from '../packages/next-tinacms-cloudinary/src/upload-filename';
 
