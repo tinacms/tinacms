@@ -4,6 +4,7 @@ import busboy from 'busboy';
 import fs from 'fs-extra';
 import type { Connect } from 'vite';
 import { PathTraversalError } from '../../../../utils/path';
+import { isDisallowedUploadType } from '../../../../utils/upload-type';
 
 export const createMediaRouter = (config: PathConfig) => {
   const mediaFolder = path.join(
@@ -82,6 +83,14 @@ export const createMediaRouter = (config: PathConfig) => {
             error: `Path traversal detected: ${fullPath}`,
           })
         );
+        return;
+      }
+      // Reject file types that are not allowed for media uploads.
+      if (isDisallowedUploadType(fullPath)) {
+        responded = true;
+        file.resume(); // drain the stream to avoid hanging
+        res.statusCode = 415;
+        res.end(JSON.stringify({ error: 'Unsupported file type' }));
         return;
       }
       // make sure the directory exists before writing the file. This is needed for creating new folders

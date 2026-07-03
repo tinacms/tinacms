@@ -340,5 +340,42 @@ describe('createMediaRouter', () => {
       expect(JSON.parse(body)).toHaveProperty('error');
       expect(JSON.parse(body).error).toContain('Path traversal detected');
     });
+
+    it.each(['evil.html', 'evil.svg', 'nested/evil.js'])(
+      'returns 415 and writes nothing for disallowed type %s',
+      async (name) => {
+        const router = createMediaRouter(config);
+        const req = makeMultipartReq(`/media/upload/${name}`, 'payload');
+        let statusCode: number = 0;
+        let body: string = '';
+        const res = {
+          set statusCode(code: number) {
+            statusCode = code;
+          },
+          end(data: string) {
+            body = data;
+          },
+        } as any;
+
+        await new Promise<void>((resolve) => {
+          const origEnd = res.end;
+          res.end = (data: string) => {
+            origEnd(data);
+            setTimeout(resolve, 50);
+          };
+          router.handlePost(req, res);
+        });
+
+        expect(statusCode).toBe(415);
+        expect(JSON.parse(body)).toHaveProperty('error');
+        const written = path.join(
+          tmpDir,
+          'public',
+          'uploads',
+          name.split('/').pop() as string
+        );
+        expect(await fs.pathExists(written)).toBe(false);
+      }
+    );
   });
 });
