@@ -27,12 +27,17 @@ export function NumberField() {
       <input
         ref={inputRef}
         type='number'
-        step={field.step}
+        // Default to 'any' so decimals aren't flagged as a stepMismatch.
+        step={field.step ?? 'any'}
         aria-label={address}
         value={value ?? ''}
+        // Browser `badInput` (e.g. "5e") reports '' here, so it collapses to empty;
+        // surfacing it needs the value model / save flow, deferred for now.
         onChange={(event) =>
           setValue(event.target.value === '' ? undefined : event.target.value)
         }
+        // Stop a scroll over a focused input from silently changing the value.
+        onWheel={(event) => event.currentTarget.blur()}
       />
       {errors.map((error) => (
         <span key={error} role='alert'>

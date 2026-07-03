@@ -30,16 +30,29 @@ Config (`NumberFieldSchema`, extends `BaseFieldSchema`):
 | `max` | `number` | maximum **value** |
 | `step` | `number` | the input's `step` (render hint; no validation role) |
 
+## Descriptor
+
+The client segment (`number-field.client.tsx`) claims the `number` key:
+
+```tsx
+defineClientPlugin({
+  field: {
+    type: 'number',            // NUMBER_FIELD_TYPE
+    Component: NumberField,
+    // no defaultValue — an absent field stays absent
+    metadata: { layout: 'inline' },
+    schema: numberSchema,
+    parse: (stored) => (stored == null ? undefined : String(stored)),  // load: number → string
+    serialize: (value) => Number(value),                               // save: string → number
+  },
+});
+```
+
 ## Editor value vs stored value
 
 The DOM gives `<input type="number">` a **string**, but the document stores a
-**number**. The descriptor bridges them, so partial entries (`-`, `1.`) survive
-typing and the document always gets a clean number back:
-
-```ts
-parse: (stored) => (stored == null ? undefined : String(stored)),  // load: number → string
-serialize: (value) => Number(value),                                // save: string → number
-```
+**number**. `parse`/`serialize` (above) bridge them, so partial entries
+(`-`, `1.`) survive typing and the document always gets a clean number back.
 
 Empty is `undefined`, converted in **one place** — the component's `onChange`
 (`'' → undefined`). There is no `defaultValue`, and `digestDocument` drops

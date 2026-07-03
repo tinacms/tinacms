@@ -16,19 +16,23 @@ export const number = (
 
 const labelOf = (node: NumberFieldSchema): string => node.label ?? node.name;
 
-// Coerce the editor string before validating. Guard empty explicitly: `0` is valid
-// and a falsy test would smuggle empty in as zero (`Number('') === 0`).
-const toNumber = (value: unknown): unknown =>
-  value === '' || value == null ? undefined : Number(value);
+// Coerce the editor string before validating. Guard empty (incl. whitespace-only)
+// explicitly: `0` is valid and a falsy test would smuggle empty in as zero.
+const toNumber = (value: unknown): unknown => {
+  const trimmed = typeof value === 'string' ? value.trim() : value;
+  return trimmed === '' || trimmed == null ? undefined : Number(trimmed);
+};
 
 // `min`/`max` are value bounds (not string length); a non-numeric string becomes
-// `NaN`, which `z.number()` rejects.
+// `NaN` and `.finite()` also rejects `Infinity` (which JSON would write as `null`).
 export const numberSchema = (node: FieldSchema): ZodType => {
   const field = node as NumberFieldSchema;
-  let schema = z.number({
-    required_error: `${labelOf(field)} is required`,
-    invalid_type_error: `${labelOf(field)} must be a number`,
-  });
+  let schema = z
+    .number({
+      required_error: `${labelOf(field)} is required`,
+      invalid_type_error: `${labelOf(field)} must be a number`,
+    })
+    .finite(`${labelOf(field)} must be a finite number`);
   if (field.min != null) {
     schema = schema.min(
       field.min,

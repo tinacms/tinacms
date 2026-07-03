@@ -34,7 +34,7 @@ const collection: CollectionSchema = {
   ],
 };
 
-const [ratingNode, countNode] = collection.fields;
+const [ratingNode, countNode, weightNode] = collection.fields;
 
 const resolveRegistry = (): Promise<FieldRegistry> =>
   resolveFieldPlugins([numberFieldPlugin]);
@@ -127,6 +127,29 @@ describe('NumberField validation', () => {
     expect(validateField(countNode, descriptor, 'abc')).toEqual([
       'Count must be a number',
     ]);
+  });
+
+  it('rejects a non-finite value (Infinity)', async () => {
+    const registry = await resolveRegistry();
+    const descriptor = registry.get('number');
+    expect(validateField(countNode, descriptor, '1e999')).toEqual([
+      'Count must be a finite number',
+    ]);
+  });
+
+  it('treats a whitespace-only value as empty', async () => {
+    const registry = await resolveRegistry();
+    const descriptor = registry.get('number');
+    expect(validateField(countNode, descriptor, '   ')).toEqual([
+      'Count is required',
+    ]);
+  });
+
+  it('passes an optional field left empty', async () => {
+    const registry = await resolveRegistry();
+    const descriptor = registry.get('number');
+    expect(validateField(weightNode, descriptor, '')).toEqual([]);
+    expect(validateField(weightNode, descriptor, undefined)).toEqual([]);
   });
 
   it('appends a descriptor-level custom validate error', () => {
