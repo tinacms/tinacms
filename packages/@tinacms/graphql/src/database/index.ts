@@ -1355,6 +1355,93 @@ export class Database {
     }
   };
 
+  /**
+   * Deletes every index entry for the given paths by matching on the path rather
+   * than the stored value. Unlike delete()/deleteContentByPaths(), which target
+   * `<currentValue>\x1D<path>`, this also clears stale value-keyed sort entries
+   * left by an earlier value change that never removed the old key, so a removed
+   * document leaves no dangling entry that would fail a field-sorted collection query.
+   */
+  public deleteIndexEntriesForPaths = async (documentPaths: string[]) => {
+    await this.initLevel();
+    if (!documentPaths.length) {
+      return;
+    }
+    const tinaSchema = await this.getSchema(this.contentLevel);
+    const { pathsByCollection, collections } = await partitionPathsByCollection(
+      tinaSchema,
+      documentPaths
+    );
+    const indexDefinitions = await this.getIndexDefinitions(this.contentLevel);
+    const rootSublevel = this.contentLevel.sublevel(
+      CONTENT_ROOT_PREFIX,
+      SUBLEVEL_OPTIONS
+    );
+    const ops: DelOp[] = [];
+
+    for (const collectionName of Object.keys(pathsByCollection)) {
+      const collection = collections[collectionName];
+      const paths = pathsByCollection[collectionName].map(normalizePath);
+      const pathSet = new Set(paths);
+      const collectionIndexDefinitions =
+        indexDefinitions?.[collectionName] ?? {};
+
+      // Each document is indexed under the collection index and its folder
+      // index, so sweep both for every affected folder.
+      const folderKeys = new Set<string>();
+      const folderTreeBuilder = new FolderTreeBuilder();
+      for (const p of paths) {
+        folderKeys.add(folderTreeBuilder.update(p, collection?.path || ''));
+      }
+      const collectionSublevelNames = [
+        collectionName,
+        ...[...folderKeys].map((folderKey) => `${collectionName}_${folderKey}`),
+      ];
+
+      for (const sublevelName of collectionSublevelNames) {
+        const collectionSublevel = this.contentLevel.sublevel(
+          sublevelName,
+          SUBLEVEL_OPTIONS
+        );
+        for (const sortKey of Object.keys(collectionIndexDefinitions)) {
+          // Reference entries are keyed under the referenced collection and
+          // cleaned via delete(); leave them alone.
+          if (sortKey === REFS_COLLECTIONS_SORT_KEY) {
+            continue;
+          }
+          const indexSublevel = collectionSublevel.sublevel(
+            sortKey,
+            SUBLEVEL_OPTIONS
+          );
+          if (sortKey === DEFAULT_COLLECTION_SORT_KEY) {
+            for (const p of paths) {
+              ops.push({ type: 'del', key: p, sublevel: indexSublevel });
+            }
+          } else {
+            // Value-keyed (`<value>\x1D<path>`): the path is a suffix and can't
+            // be seeked, so scan and match the trailing path segment.
+            for await (const [key] of indexSublevel.iterator()) {
+              const keyPath = key.slice(
+                key.lastIndexOf(INDEX_KEY_FIELD_SEPARATOR) + 1
+              );
+              if (pathSet.has(keyPath)) {
+                ops.push({ type: 'del', key, sublevel: indexSublevel });
+              }
+            }
+          }
+        }
+      }
+
+      for (const p of paths) {
+        ops.push({ type: 'del', key: p, sublevel: rootSublevel });
+      }
+    }
+
+    for (let i = 0; i < ops.length; i += this.levelBatchSize) {
+      await this.contentLevel.batch(ops.slice(i, i + this.levelBatchSize));
+    }
+  };
+
   public indexContentByPaths = async (documentPaths: string[]) => {
     await this.initLevel();
     const operations: BatchOp[] = [];
