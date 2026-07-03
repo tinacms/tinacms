@@ -19,6 +19,7 @@ import fs from 'fs';
 import { NextApiRequest, NextApiResponse } from 'next';
 import multer from 'multer';
 import { resolveKey, resolveDirectory, MediaKeyError } from './media-key';
+import { isDisallowedUploadType } from './upload-type';
 import { promisify } from 'util';
 
 export interface DOSConfig {
@@ -115,6 +116,10 @@ async function uploadMedia(
   const fileType = req.file?.mimetype;
   const blob = fs.readFileSync(filePath);
   const filename = path.basename(filePath);
+
+  if (isDisallowedUploadType(filename)) {
+    return res.status(415).json({ message: 'Unsupported file type' });
+  }
 
   let objectKey: string;
   try {
