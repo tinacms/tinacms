@@ -57,7 +57,7 @@
     "@radix-ui/react-popover": "catalog:",
     "@radix-ui/react-select": "catalog:",
     "@radix-ui/react-separator": "catalog:",
-    "@radix-ui/react-slot": "^1.1.2",
+    "@radix-ui/react-slot": "catalog:",
     "@radix-ui/react-toolbar": "catalog:",
     "@radix-ui/react-tooltip": "catalog:",
     "@react-hook/window-size": "catalog:",
