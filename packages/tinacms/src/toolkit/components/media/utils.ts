@@ -41,8 +41,6 @@ const DISALLOWED_UPLOAD_EXTENSIONS = new Set([
   'xhtml',
   'xht',
   'shtml',
-  'svg',
-  'svgz',
   'xml',
   'xsl',
   'xslt',

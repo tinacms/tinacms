@@ -341,7 +341,7 @@ describe('createMediaRouter', () => {
       expect(JSON.parse(body).error).toContain('Path traversal detected');
     });
 
-    it.each(['evil.html', 'evil.svg', 'nested/evil.js'])(
+    it.each(['evil.html', 'evil.xml', 'nested/evil.js'])(
       'returns 415 and writes nothing for disallowed type %s',
       async (name) => {
         const router = createMediaRouter(config);

@@ -7,4 +7,4 @@
 "next-tinacms-azure": patch
 ---
 
-Validate media upload file types on the server and reject active document types (e.g. `.html`, `.svg`, `.js`) instead of relying on the client-side accept filter alone.
+Validate media upload file types on the server and reject active document types (e.g. `.html`, `.js`, `.xml`) instead of relying on the client-side accept filter alone.

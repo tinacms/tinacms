@@ -20,14 +20,21 @@ describe('getFinalExtension', () => {
 });
 
 describe('isDisallowedUploadType', () => {
-  it('allows common media types', () => {
-    for (const name of ['photo.png', 'clip.mp4', 'doc.pdf', 'model.riv']) {
+  it('allows common media types, including SVG', () => {
+    for (const name of [
+      'photo.png',
+      'clip.mp4',
+      'doc.pdf',
+      'model.riv',
+      'logo.svg',
+      'logo.svgz',
+    ]) {
       expect(isDisallowedUploadType(name)).toBe(false);
     }
   });
 
   it('rejects active document types regardless of case', () => {
-    for (const name of ['a.html', 'a.HTM', 'a.svg', 'a.svgz', 'a.js', 'a.xml']) {
+    for (const name of ['a.html', 'a.HTM', 'a.js', 'a.mjs', 'a.xml', 'a.xhtml']) {
       expect(isDisallowedUploadType(name)).toBe(true);
     }
   });
