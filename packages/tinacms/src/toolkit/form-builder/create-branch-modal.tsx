@@ -27,6 +27,8 @@ import {
   type SaveChoice,
   resolveSaveOptions,
 } from './save-options';
+import { EditorialWorkflowSaveEvent } from '../../lib/posthog/posthog';
+import { captureEvent } from '../../lib/posthog/posthogProvider';
 
 // Format the default branch name by removing content/ prefix and file extension
 const formatDefaultBranchName = (
@@ -65,7 +67,7 @@ export const CreateBranchModal = ({
   tinaForm,
   onBaseBranchDeleted,
 }: {
-  safeSubmit: () => Promise<void>;
+  safeSubmit: (editorialWorkflowChoice?: SaveChoice) => Promise<void>;
   close: () => void;
   path: string;
   values: Record<string, unknown>;
@@ -132,7 +134,7 @@ export const CreateBranchModal = ({
 
     setIsBranchGuardChecking(false);
 
-    const success = await executeWorkflow({
+    const { success, error } = await executeWorkflow({
       branchName: targetBranch,
       baseBranch,
       path,
@@ -145,6 +147,16 @@ export const CreateBranchModal = ({
     if (branchGuardAbortRef.current === abortController) {
       branchGuardAbortRef.current = null;
     }
+
+    // Cancelled mid-run (modal closed, branch renamed, another save started, or
+    // unmounted) — treat as a no-op and record nothing.
+    if (abortController.signal.aborted) return;
+
+    captureEvent(EditorialWorkflowSaveEvent, {
+      choice: isDraft ? 'draft' : 'review',
+      success,
+      error,
+    });
 
     if (success) {
       close();
@@ -179,7 +191,7 @@ export const CreateBranchModal = ({
       onSaveToProtectedBranch={() => {
         abortBranchGuard();
         close();
-        safeSubmit();
+        safeSubmit('publish');
       }}
       showSaveOptions={true}
       disablePublish={!!tinaApi.usingProtectedBranch()}
