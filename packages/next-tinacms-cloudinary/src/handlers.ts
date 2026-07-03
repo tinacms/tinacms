@@ -9,6 +9,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import multer from 'multer';
 import { promisify } from 'util';
 import { resolveKey, resolveDirectory, MediaKeyError } from './media-key';
+import { isDisallowedUploadType } from './upload-type';
 
 export interface CloudinaryConfig {
   cloud_name: string;
@@ -79,6 +80,10 @@ async function uploadMedia(req: NextApiRequest, res: NextApiResponse) {
   const { directory } = req.body;
   // @ts-ignore - multer augments the request with `file`
   const filename: string = req.file.originalname;
+
+  if (isDisallowedUploadType(filename)) {
+    return res.status(415).json({ message: 'Unsupported file type' });
+  }
 
   let folder: string;
   try {
