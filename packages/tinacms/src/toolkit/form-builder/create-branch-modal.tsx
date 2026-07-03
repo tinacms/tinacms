@@ -148,6 +148,10 @@ export const CreateBranchModal = ({
       branchGuardAbortRef.current = null;
     }
 
+    // Cancelled mid-run (modal closed, branch renamed, another save started, or
+    // unmounted) — treat as a no-op and record nothing.
+    if (abortController.signal.aborted) return;
+
     captureEvent(EditorialWorkflowSaveEvent, {
       choice: isDraft ? 'draft' : 'review',
       success,
