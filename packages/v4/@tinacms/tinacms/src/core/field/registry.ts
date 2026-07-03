@@ -1,8 +1,10 @@
 import {
+  REGISTRY_CONFLICTS,
   type RegistryConflict,
   composeOverridableRegistry,
 } from '../overridable-registry';
 import {
+  FIELD_CAPABILITY,
   type PluginManifest,
   type ResolvedSegment,
   resolveClientSegments,
@@ -13,11 +15,12 @@ export type FieldRegistry = Map<string, FieldDescriptor>;
 
 const overridesFieldKey = (manifest: PluginManifest, key: string): boolean =>
   (manifest.overrides ?? []).some(
-    (override) => override.capability === 'field' && override.key === key
+    (override) =>
+      override.capability === FIELD_CAPABILITY && override.key === key
   );
 
 const fieldConflictError = (conflict: RegistryConflict, key: string): Error => {
-  if (conflict === 'duplicate-override') {
+  if (conflict === REGISTRY_CONFLICTS.duplicateOverride) {
     return new Error(
       `Two plugins both declare an \`overrides\` for the \`field\` type "${key}". ` +
         'Only one may replace the built-in.'
