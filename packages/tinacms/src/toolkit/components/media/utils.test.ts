@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { sanitizeFilename } from './utils';
+import { isDisallowedUploadType, sanitizeFilename } from './utils';
 
 describe('sanitizeFilename', () => {
   it('returns simple ASCII names unchanged', () => {
@@ -72,5 +72,24 @@ describe('sanitizeFilename', () => {
     const result = sanitizeFilename(`${'a'.repeat(500)}.jpg`);
     expect(result.endsWith('.jpg')).toBe(true);
     expect(result.length).toBeLessThanOrEqual(204);
+  });
+});
+
+describe('isDisallowedUploadType', () => {
+  it('allows common media types', () => {
+    for (const name of ['photo.png', 'clip.mp4', 'doc.pdf', 'model.riv']) {
+      expect(isDisallowedUploadType(name)).toBe(false);
+    }
+  });
+
+  it('rejects active document types regardless of case', () => {
+    for (const name of ['a.html', 'a.HTM', 'a.svg', 'a.svgz', 'a.js', 'a.xml']) {
+      expect(isDisallowedUploadType(name)).toBe(true);
+    }
+  });
+
+  it('checks the final extension only', () => {
+    expect(isDisallowedUploadType('a.html.png')).toBe(false);
+    expect(isDisallowedUploadType('a.png.html')).toBe(true);
   });
 });

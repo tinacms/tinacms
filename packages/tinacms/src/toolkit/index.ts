@@ -70,5 +70,6 @@ export { CursorPaginator } from './components/media/pagination';
 export {
   DEFAULT_MEDIA_UPLOAD_TYPES,
   sanitizeFilename,
+  isDisallowedUploadType,
 } from './components/media';
 export { MediaWorkflowOverlay } from './components/media/media-workflow-overlay';
