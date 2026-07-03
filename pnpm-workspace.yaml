@@ -19,6 +19,33 @@ overrides:
     "@clerk/clerk-js>react": 19.2.3
     "@clerk/clerk-js>react-dom": 19.2.3
     "@clerk/backend>react": 19.2.3
+    # Security floors for transitive deps stuck behind parents' exact/stale
+    # pins (pnpm audit). Same-major only; drop when parents catch up.
+    # markdown-it is deliberately cross-major: graphiql pins 12.x, which has
+    # no patched release.
+    "brace-expansion@2": "^2.0.3"
+    "uvu>diff": "^5.2.2"
+    "tsup>esbuild": "^0.28.1"
+    "fast-xml-parser@5": "^5.9.3"
+    "immutable@3": "^3.8.3"
+    "immutable@5": "^5.1.5"
+    "js-yaml@3": "^3.15.0"
+    "js-yaml@4": "^4.1.2"
+    "lodash@4": "^4.18.1"
+    "lodash-es@4": "^4.18.1"
+    markdown-it: "^14.3.0"
+    "minimatch@9": "^9.0.9"
+    "path-to-regexp@0.1": "^0.1.13"
+    "picomatch@2": "^2.3.2"
+    "postcss@8": "^8.5.10"
+    "qs@6": "^6.15.3"
+    "rollup@4": "^4.62.2"
+    "uuid@11": "^11.1.1"
+    "yaml@2": "^2.8.3"
+    # vitest 3 accepts vite 5-8; keep it on vite 7 so astro's vite plugins
+    # (which require vite 7) load inside the test server.
+    "vitest@3>vite": "^7.3.3"
+    "vite-node@3>vite": "^7.3.3"
 allowBuilds:
     "@biomejs/biome": true
     "@parcel/watcher": true
@@ -137,7 +164,7 @@ catalog:
     "@udecode/plate-trailing-block": ^48.0.0
     "@udecode/slate": ^48.0.1
     "@vercel/stega": ^0.0.5
-    "@vitejs/plugin-react": 3.1.0
+    "@vitejs/plugin-react": ^4.7.0
     abstract-level: ^1.0.4
     acorn: 8.8.2
     altair-express-middleware: ^7.3.6
@@ -153,7 +180,7 @@ catalog:
     class-variance-authority: ^0.7.1
     cli-spinner: ^0.2.10
     clipanion: ^3.2.1
-    cloudinary: ^1.41.3
+    cloudinary: ^2.7.0
     clsx: ^2.1.1
     cmdk: ^1.0.4
     color-string: ^1.9.1
@@ -162,7 +189,7 @@ catalog:
     cross-spawn: ^7.0.6
     crypto-js: ^4.2.0
     dotenv: ^16.4.7
-    esbuild: ^0.24.2
+    esbuild: ^0.28.1
     estree-util-is-identifier-name: 2.1.0
     fast-glob: ^3.3.3
     final-form: 4.20.10
@@ -204,7 +231,7 @@ catalog:
     micromark-util-symbol: 1.0.1
     micromark-util-types: 1.1.0
     micromatch: 4.0.8
-    minimatch: ^5.1.6
+    minimatch: ^5.1.9
     monaco-editor: 0.31.0
     mongodb-level: ^0.0.4
     multer: 1.4.5-lts.1
@@ -229,8 +256,7 @@ catalog:
     react-dnd-html5-backend: ^16.0.1
     react-dropzone: 14.2.3
     react-final-form: ^6.5.9
-    react-router-dom: ^6.30.3
-    react-use: ^17.6.0
+    react-router-dom: ^6.30.4
     readable-stream: ^4.7.0
     remark: 14.0.2
     remark-gfm: ^2.0.0
@@ -241,7 +267,7 @@ catalog:
     stopword: ^3.1.4
     stringify-entities: 4.0.3
     tailwindcss-animate: ^1.0.7
-    tar: 7.4.0
+    tar: ^7.5.16
     ts-jest: ^29.2.5
     ts-node: ^10.9.2
     tsc-alias: ^1.8.10

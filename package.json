@@ -38,14 +38,14 @@
 		"@changesets/cli": "catalog:",
 		"@types/jest": "^29.5.14",
 		"@types/node": "^22.19.17",
+		"@types/picomatch": "catalog:",
 		"@types/react": "18.3.27",
 		"@types/react-dom": "18.3.7",
-		"vitest": "^2.1.9",
-		"@types/picomatch": "catalog:",
 		"picomatch": "catalog:",
 		"turbo": "catalog:",
 		"typescript": "^5.7.3",
-		"vite": "^4.5.14"
+		"vite": "^5.4.21",
+		"vitest": "^2.1.9"
 	},
 	"packageManager": "pnpm@11.7.0",
 	"dependencies": {

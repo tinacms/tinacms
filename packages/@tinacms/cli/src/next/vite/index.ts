@@ -183,11 +183,12 @@ export const createConfig = async ({
        *  - `process.env.__NEXT_CROSS_ORIGIN`
        *  - `process.env.__NEXT_I18N_SUPPORT`
        *
-       * Also, interestingly some of the advice for handling this doesn't work, references to replacing
-       * `process.env` with `{}` are problematic, because browsers don't understand the `{}.` syntax,
-       * but node does. This was a surprise, but using `new Object()` seems to do the trick.
+       * esbuild >=0.25 requires define values to be entity names or JS literals
+       * (the old `new Object(...)` workaround is rejected). A plain JSON object
+       * literal is safe: esbuild hoists it into a variable before substituting,
+       * so the historical `{}.` browser-syntax problem can't occur.
        */
-      'process.env': `new Object(${JSON.stringify(publicEnv)})`,
+      'process.env': JSON.stringify(publicEnv),
       // Used by picomatch https://github.com/micromatch/picomatch/blob/master/lib/utils.js#L4
       'process.platform': `"${process.platform}"`,
       __API_URL__: `"${apiURL}"`,
@@ -251,7 +252,6 @@ export const createConfig = async ({
           // Supresses the warning [NOTE] babel The code generator has deoptimised the styling of
           compact: true,
         },
-        fastRefresh: false,
       }),
       splitVendorChunkPlugin(),
       tinaTailwind(configManager.spaRootPath, configManager.prebuildFilePath),

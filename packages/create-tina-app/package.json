@@ -49,9 +49,9 @@
         "cross-spawn": "catalog:",
         "fs-extra": "catalog:",
         "ora": "catalog:",
-        "posthog-node": "^5.17.2",
+        "posthog-node": "^5.39.2",
         "prompts": "catalog:",
-        "systeminformation": "^5.27.13",
+        "systeminformation": "^5.31.11",
         "tar": "catalog:"
     }
 }
