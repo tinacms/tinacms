@@ -22,9 +22,11 @@ import { BranchDeletedModal } from './branch-deleted-modal';
 import {
   SavedContentEvent,
   SaveContentErrorEvent,
+  EditorialWorkflowSaveEvent,
   FormResetEvent,
 } from '../../lib/posthog/posthog';
 import { captureEvent } from '../../lib/posthog/posthogProvider';
+import type { SaveChoice } from './save-options';
 
 export interface FormBuilderProps {
   form: { tinaForm: Form; activeFieldName?: string };
@@ -184,7 +186,19 @@ export const FormBuilder: FC<FormBuilderProps> = ({
           !hasValidationErrors &&
           !(invalid && !dirtySinceLastSubmit);
 
-        const safeSubmit = async () => {
+        const safeSubmit = async (editorialWorkflowChoice?: SaveChoice) => {
+          // When invoked as the "Save and publish" choice from the editorial
+          // workflow modal, also record the choice + outcome in one event.
+          const captureWorkflowChoice = (success: boolean, error?: string) => {
+            if (editorialWorkflowChoice) {
+              captureEvent(EditorialWorkflowSaveEvent, {
+                choice: editorialWorkflowChoice,
+                success,
+                error,
+              });
+            }
+          };
+
           if (canSubmit) {
             const alertsBefore = new Set(cms.alerts.all.map((a) => a.id));
             console.debug(
@@ -214,6 +228,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                     cms.alerts.dismiss(alert);
                   }
                 }
+                captureWorkflowChoice(false, errorMsg);
                 setDeletedBranchModalOpen(true);
                 return;
               }
@@ -222,10 +237,12 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                 documentPath: tinaForm.path,
                 error: errorMsg,
               });
+              captureWorkflowChoice(false, errorMsg);
             } else {
               captureEvent(SavedContentEvent, {
                 documentPath: tinaForm.path,
               });
+              captureWorkflowChoice(true);
             }
           } else {
             console.debug(
