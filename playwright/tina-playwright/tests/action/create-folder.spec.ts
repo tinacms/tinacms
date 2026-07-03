@@ -23,7 +23,9 @@ test.describe("Create Folder", () => {
     );
     await expect(validationError).toBeVisible();
 
-    // Invalid name keeps Create disabled, so no createFolder request is sent
-    await expect(page.locator('button:has-text("Create")')).toBeDisabled();
+    // This Button disables via pointer-events-none styling, not a native disabled attr.
+    await expect(page.locator('button:has-text("Create")')).toHaveClass(
+      /pointer-events-none/
+    );
   });
 });
