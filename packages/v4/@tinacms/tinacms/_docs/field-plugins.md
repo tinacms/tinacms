@@ -26,7 +26,10 @@ below — substitute your own `type` for `string` throughout. For that field's
 exact config options and validation semantics, see
 [`string-field.md`](./string-field.md). The shipped `boolean` field
 ([`boolean-field.md`](./boolean-field.md)) is a second example — a two-state
-checkbox where `required` is a no-op.
+checkbox where `required` is a no-op. The shipped `number` field
+([`number-field.md`](./number-field.md)) is a third — a string editor value ↔
+numeric stored value via `parse`/`serialize`, reading its own config
+(`step`) through `useFieldSchema`.
 
 ### 1. Manifest (`.plugin.ts`)
 
@@ -89,10 +92,11 @@ export const string = (config: Omit<StringFieldSchema, 'type'>): StringFieldSche
 
 ### 4. The component (`.ui.tsx`)
 
-The component receives **only its address** via context and pulls value/errors
-through address-keyed hooks (`editor/hooks.ts`). No `value`/`onChange` props:
-that keeps each field an O(1) react-hook-form subscription instead of
-re-rendering the whole form on a keystroke.
+The component receives **its address and its resolved schema node** via context
+(both provided by `<Field>`) and pulls value/errors through address-keyed hooks
+(`editor/hooks.ts`). No `value`/`onChange` props: that keeps each field an O(1)
+react-hook-form subscription instead of re-rendering the whole form on a
+keystroke.
 
 ```tsx
 import { useRef } from 'react';
@@ -123,6 +127,7 @@ Hooks:
 | Hook | Does |
 |---|---|
 | `useFieldAddress()` | this field's address |
+| `useFieldSchema<T>()` | this field's resolved schema node (render hints, e.g. `step`) |
 | `useFieldValue<T>(address)` | `[value, setValue]` via the RHF controller |
 | `useFieldErrors(address)` | validation messages at the address |
 | `useFieldActivation(handler)` | run `handler` when this becomes the active field (visual editing) |

@@ -3,6 +3,7 @@ import { toFieldAddress } from '../core/field/address';
 import {
   CollectionContext,
   FieldAddressContext,
+  FieldSchemaContext,
   RegistryContext,
 } from './context';
 
@@ -32,7 +33,9 @@ export function Field({ address }: FieldProps) {
   const Component = descriptor.Component;
   return (
     <FieldAddressContext value={toFieldAddress(address)}>
-      <Component />
+      <FieldSchemaContext value={node}>
+        <Component />
+      </FieldSchemaContext>
     </FieldAddressContext>
   );
 }
