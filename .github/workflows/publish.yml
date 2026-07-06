@@ -289,6 +289,79 @@ jobs:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token  }}
           NPM_CONFIG_PROVENANCE: true
 
+      # changesets/action pushes "Version Packages" with plain git, which GitHub can't
+      # sign, so main's required-signatures rule blocks the release PR. Recreate that
+      # commit through the API, which GitHub signs, leaving the tree byte-identical.
+      - name: Sign the release pull request commit
+        if: steps.changesets.outputs.hasChangesets == 'true' && steps.changesets.outputs.published != 'true'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          github-token: ${{ steps.generate-token.outputs.token }}
+          script: |
+            const branchName = `changeset-release/${context.ref.replace('refs/heads/', '')}`;
+            const { owner, repo } = context.repo;
+
+            const { data: ref } = await github.rest.git.getRef({ owner, repo, ref: `heads/${branchName}` });
+            const headSha = ref.object.sha;
+
+            const { data: head } = await github.rest.repos.getCommit({ owner, repo, ref: headSha });
+            if (head.commit.verification?.verified) {
+              core.info('Release commit is already signed; nothing to do.');
+              return;
+            }
+            if (head.parents.length !== 1) {
+              throw new Error(`Expected 1 parent on the release commit, found ${head.parents.length}.`);
+            }
+            if ((head.files ?? []).length >= 300) {
+              throw new Error('Release commit changed >=300 files; file list may be truncated, refusing to re-sign.');
+            }
+            const baseSha = head.parents[0].sha;
+
+            // Look up each changed blob's sha from the commit tree so we can copy the
+            // exact bytes (getBlob handles files the 1MB contents endpoint rejects).
+            const { data: tree } = await github.rest.git.getTree({
+              owner, repo, tree_sha: head.commit.tree.sha, recursive: 'true',
+            });
+            if (tree.truncated) {
+              throw new Error('Release tree was truncated; cannot re-sign reliably.');
+            }
+            const shaByPath = new Map(tree.tree.filter((e) => e.type === 'blob').map((e) => [e.path, e.sha]));
+
+            const additions = [];
+            const deletions = [];
+            for (const file of head.files ?? []) {
+              if (file.status === 'removed') {
+                deletions.push({ path: file.filename });
+                continue;
+              }
+              if (file.status === 'renamed' && file.previous_filename) {
+                deletions.push({ path: file.previous_filename });
+              }
+              const { data: blob } = await github.rest.git.getBlob({
+                owner, repo, file_sha: shaByPath.get(file.filename),
+              });
+              additions.push({ path: file.filename, contents: blob.content.replace(/\n/g, '') });
+            }
+
+            // Reset the branch to its base, then lay down a single GitHub-signed commit.
+            await github.rest.git.updateRef({ owner, repo, ref: `heads/${branchName}`, sha: baseSha, force: true });
+
+            const [headline, ...body] = head.commit.message.split('\n');
+            const { createCommitOnBranch } = await github.graphql(
+              `mutation ($input: CreateCommitOnBranchInput!) {
+                createCommitOnBranch(input: $input) { commit { oid } }
+              }`,
+              {
+                input: {
+                  branch: { repositoryNameWithOwner: `${owner}/${repo}`, branchName },
+                  message: { headline, body: body.join('\n').trim() || null },
+                  expectedHeadOid: baseSha,
+                  fileChanges: { additions, deletions },
+                },
+              },
+            );
+            core.info(`Re-signed release commit: ${createCommitOnBranch.commit.oid}`);
+
       - name: Release to @dev channel
         if: steps.changesets.outputs.hasChangesets == 'true'
         run: |
