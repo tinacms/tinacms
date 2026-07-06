@@ -213,6 +213,7 @@ catalog:
     parse-entities: 4.0.1
     picomatch: ^4.0.2
     picomatch-browser: 2.2.6
+    postcss: ^8.5.16
     postcss-import: ^14.1.0
     postcss-nesting: ^10.2.0
     prettier: ^2.8.8
