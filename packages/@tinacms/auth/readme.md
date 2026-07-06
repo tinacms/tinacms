@@ -61,7 +61,7 @@ const cms = useCMS()
 const tinaCloudClient: Client = cms.api.tina
 const uploadImage = async () => {
   const req = await tinaCloudClient.fetchWithToken(`/api/upload`)
-  console.log({ test: await test.json() })
+  console.log({ result: await req.json() })
 }
 ```
 The `fetchWithToken` function is just the normal [fetch function](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch) but adds the `authorization` header with the correct token.
