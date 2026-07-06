@@ -161,7 +161,7 @@ catalog:
     cross-spawn: ^7.0.6
     crypto-js: ^4.2.0
     dotenv: ^16.4.7
-    esbuild: ^0.24.2
+    esbuild: ^0.28.1
     estree-util-is-identifier-name: 2.1.0
     fast-glob: ^3.3.3
     final-form: 4.20.10
