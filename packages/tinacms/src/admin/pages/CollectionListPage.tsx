@@ -6,7 +6,12 @@ import {
   Transition,
 } from '@headlessui/react';
 import type { Collection, TinaField } from '@tinacms/schema-tools';
-import { ERR_ALREADY_EXISTS, ERR_HAS_REFERENCES } from '@tinacms/schema-tools';
+import {
+  ERR_ALREADY_EXISTS,
+  ERR_HAS_REFERENCES,
+  RELATIVE_PATH_ALLOWED_CHARS_MESSAGE,
+  isValidRelativePath,
+} from '@tinacms/schema-tools';
 import {
   BaseTextField,
   Button,
@@ -1469,6 +1474,9 @@ const FolderModal = ({
   validationRegex,
 }: FolderModalProps) => {
   const [isFolderNameValid, setIsFolderNameValid] = useState(false);
+  const [validationMessage, setValidationMessage] = useState<string | null>(
+    null
+  );
   const [isInteracted, setIsInteracted] = useState(false);
 
   useEffect(() => {
@@ -1476,20 +1484,39 @@ const FolderModal = ({
   }, [folderName]);
 
   const validateFolderName = (name: string) => {
-    if (!validationRegex || !name.trim()) {
-      setIsFolderNameValid(!!name.trim());
-      return !!name.trim();
-    }
-
-    try {
-      const regex = new RegExp(validationRegex);
-      const valid = regex.test(name);
-      setIsFolderNameValid(valid);
-      return valid;
-    } catch (error) {
+    if (!name.trim()) {
       setIsFolderNameValid(false);
+      setValidationMessage(null);
       return false;
     }
+
+    // Baseline mirrors the backend allowlist; a project-level folderNameRegex
+    // layers on top, so the UI can only ever be stricter than the resolver.
+    if (!isValidRelativePath(name)) {
+      setIsFolderNameValid(false);
+      setValidationMessage(RELATIVE_PATH_ALLOWED_CHARS_MESSAGE);
+      return false;
+    }
+
+    if (validationRegex) {
+      let passesCustomRegex = false;
+      try {
+        passesCustomRegex = new RegExp(validationRegex).test(name);
+      } catch (error) {
+        passesCustomRegex = false;
+      }
+      if (!passesCustomRegex) {
+        setIsFolderNameValid(false);
+        setValidationMessage(
+          'Folder name is not valid, please enter a valid folder name.'
+        );
+        return false;
+      }
+    }
+
+    setIsFolderNameValid(true);
+    setValidationMessage(null);
+    return true;
   };
 
   return (
@@ -1502,7 +1529,7 @@ const FolderModal = ({
               placeholder='Enter the name of the new folder'
               value={folderName}
               className={`mb-4 ${
-                !isFolderNameValid && isInteracted ? 'border-red-500' : ''
+                isInteracted && validationMessage ? 'border-red-500' : ''
               }`}
               onChange={(event) => {
                 setFolderName(event.target.value);
@@ -1510,10 +1537,8 @@ const FolderModal = ({
                 validateFolderName(event.target.value);
               }}
             />
-            {!isFolderNameValid && isInteracted && (
-              <p className='text-red-500 text-sm pl-1'>
-                Folder name is not valid – please enter a valid folder name.
-              </p>
+            {isInteracted && validationMessage && (
+              <p className='text-red-500 text-sm pl-1'>{validationMessage}</p>
             )}
           </>
         </ModalBody>
