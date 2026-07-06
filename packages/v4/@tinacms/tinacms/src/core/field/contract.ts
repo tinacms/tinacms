@@ -18,9 +18,9 @@ export interface FieldDescriptor<TValue = unknown, TStored = unknown> {
   metadata?: FieldMetadata;
   schema?: (node: FieldSchema) => ZodType;
   validate?: (value: TValue) => string | null;
-  // parse/serialize are the per-field ingest/digest transforms. Declared but not
-  // wired to any built-in field yet (string is identity) — image/datetime/reference
-  // will use them (e.g. path <-> media object, ISO string <-> Date).
+  // parse/serialize are the per-field ingest/digest transforms. string/boolean are
+  // identity; the number field uses them for string <-> number. image/datetime/reference
+  // will use them too (e.g. path <-> media object, ISO string <-> Date).
   parse?: (stored: TStored) => TValue;
   serialize?: (value: TValue) => TStored;
 }

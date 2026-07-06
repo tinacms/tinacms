@@ -33,8 +33,8 @@ RHF's own `FormProvider`.
 
 `<Field address="title" />` (`editor/field.tsx`) finds the schema node by `name`,
 reads its `type`, pulls the `descriptor` from the registry, and renders
-`descriptor.Component` inside a `FieldAddressContext` carrying the address. The
-component takes no props.
+`descriptor.Component` inside a `FieldAddressContext` carrying the address and a
+`FieldSchemaContext` carrying the resolved node. The component takes no props.
 
 ## 4. Read & write through hooks
 
@@ -43,6 +43,7 @@ The component pulls everything from address-keyed hooks (`editor/hooks.ts`):
 | Hook | Backed by |
 |---|---|
 | `useFieldAddress()` | `FieldAddressContext` |
+| `useFieldSchema()` | `FieldSchemaContext` (the field's resolved node) |
 | `useFieldValue(address)` | RHF `useController` → `[value, setValue]` |
 | `useFieldErrors(address)` | RHF `useFormState`, keyed by field name |
 | `useFieldActivation(handler)` | fires when the active field equals this address |

@@ -3,8 +3,9 @@ import type { FieldSchema, TinaDocument } from '../schema/types';
 
 // Flatten on load (ADR-010): turn a stored document into the form's initial values.
 // Per field, run the field plugin's parse() (stored → editor value), or fall back to
-// its defaultValue when the key is absent. Every field is identity today (string);
-// image/datetime/reference will plug real transforms in here.
+// its defaultValue when the key is absent. string/boolean are identity; the number
+// field parses stored numbers to editor strings; image/datetime/reference will plug
+// real transforms in here.
 // Plan: the document source becomes the content capability (ADR-019) once the data
 // layer lands — today it's passed in directly.
 export const ingestDocument = (
