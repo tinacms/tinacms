@@ -11,6 +11,7 @@ import LoadingPage from '../components/LoadingPage';
 import { handleNavigate } from '../pages/CollectionListPage';
 import type { CollectionResponse, DocumentForm } from '../types';
 import { FullscreenError } from './FullscreenError';
+import { shouldAutoOpenCollectionDocument } from './GetCollection.utils';
 
 const isValidSortKey = (sortKey: string, collection: Collection<true>) => {
   if (collection.fields) {
@@ -300,12 +301,12 @@ const GetCollection = ({
 
     const collectionResponse = collection as CollectionResponse;
     if (
-      !allowCreate &&
-      !allowDelete &&
-      // Check there is only one document
-      collectionResponse.documents?.edges?.length === 1 &&
-      // Check to make sure the file is not a folder
-      collectionResponse.documents?.edges[0]?.node?.__typename !== 'Folder'
+      shouldAutoOpenCollectionDocument({
+        allowCreate,
+        allowDelete,
+        collection: collectionResponse,
+        folder,
+      })
     ) {
       const doc = collectionResponse.documents.edges[0].node;
       handleNavigate(
