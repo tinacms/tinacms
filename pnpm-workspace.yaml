@@ -75,7 +75,7 @@ catalog:
     "@svgr/webpack": ^8.1.0
     "@tailwindcss/aspect-ratio": ^0.4.2
     "@tailwindcss/container-queries": ^0.1.1
-    "@tailwindcss/typography": ^0.5.16
+    "@tailwindcss/typography": ^0.5.20
     "@testing-library/dom": ^10.4.0
     "@testing-library/jest-dom": ^6.7.0
     "@testing-library/react": ^16.2.0
