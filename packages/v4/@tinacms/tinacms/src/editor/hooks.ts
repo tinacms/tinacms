@@ -1,7 +1,12 @@
 import { use, useEffect, useRef } from 'react';
 import { useController, useFormState } from 'react-hook-form';
 import type { FieldAddress } from '../core/field/address';
-import { ActiveFieldContext, FieldAddressContext } from './context';
+import type { FieldSchema } from '../core/schema/types';
+import {
+  ActiveFieldContext,
+  FieldAddressContext,
+  FieldSchemaContext,
+} from './context';
 import { type FieldErrorEntry, fieldErrorMessages } from './field-errors';
 
 export function useFieldAddress(): FieldAddress {
@@ -10,6 +15,16 @@ export function useFieldAddress(): FieldAddress {
     throw new Error('useFieldAddress must be used within a <Field>');
   }
   return address;
+}
+
+// The field's own resolved schema node, for reading its config. `T` is
+// caller-asserted.
+export function useFieldSchema<T extends FieldSchema = FieldSchema>(): T {
+  const node = use(FieldSchemaContext);
+  if (node == null) {
+    throw new Error('useFieldSchema must be used within a <Field>');
+  }
+  return node as T;
 }
 
 export function useFieldValue<T = unknown>(

@@ -50,7 +50,7 @@ export const BranchDeletedModal = ({
   } = useEditorialWorkflow();
 
   const handleCreate = async () => {
-    const success = await executeWorkflow({
+    const { success } = await executeWorkflow({
       branchName: `tina/${newBranchName}`,
       baseBranch,
       path,

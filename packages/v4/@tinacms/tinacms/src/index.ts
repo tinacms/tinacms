@@ -16,4 +16,8 @@ export type {
   TinaDocument,
 } from './core/schema/types';
 export { corePlugins, t } from './plugins/fields';
-export type { StringFieldSchema } from './plugins/fields';
+export type {
+  BooleanFieldSchema,
+  NumberFieldSchema,
+  StringFieldSchema,
+} from './plugins/fields';

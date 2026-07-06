@@ -133,6 +133,26 @@ pnpm watch
 > This will only work for packages loaded by webpack. That means that environments which don't use
 > webpack (i.e. SSR builds) will not use this alias
 
+## Error handling
+
+When code needs to react to _which_ error occurred, do not match the raw
+message string (for example `error.message.includes('already exists')`). Message
+prose is not a contract, so rewording it silently breaks every consumer.
+
+- **In-repo errors:** import the identifier from `@tinacms/schema-tools`
+  (`src/errors.ts`) and build the thrown message from it. Producers and consumers
+  reference the same constant, so they cannot drift.
+- **Structured codes beat fragments:** where an error carries a discriminant
+  field, switch on the code rather than the text. See `EDITORIAL_WORKFLOW_ERROR`
+  in `packages/tinacms/src/toolkit/form-builder/editorial-workflow-constants.ts`.
+- **External-service strings** (TinaCloud, esbuild, Cloudinary) still get a named
+  constant, marked as an un-enforceable contract since this repo does not own the
+  producer.
+- **Security-tied messages** (for example `ERR_PATH_TRAVERSAL`) must keep their
+  user-visible bytes stable. Update the asserting tests if you ever change one.
+
+See [#6777](https://github.com/tinacms/tinacms/issues/6777) for background.
+
 ## Windows
 
 ### Symlinks

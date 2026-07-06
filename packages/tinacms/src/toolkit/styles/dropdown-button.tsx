@@ -9,6 +9,13 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '../components/ui/dropdown-menu';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipPortal,
+  TooltipProvider,
+  TooltipTrigger,
+} from '../fields/plugins/mdx-field-plugin/plate/components/plate-ui/tooltip';
 
 export interface DropdownButtonItem {
   label: string;
@@ -16,7 +23,40 @@ export interface DropdownButtonItem {
   variant?: 'default' | 'destructive';
   icon?: React.ReactNode;
   disabled?: boolean;
+  /** Optional hover tooltip. Shown even when the item is disabled. */
+  tooltip?: string;
 }
+
+/**
+ * Renders a menu item, wrapping it in a tooltip when `item.tooltip` is set.
+ * The wrapping element receives hover events even when the item itself is
+ * disabled, so the tooltip still shows (explaining why the action is blocked).
+ */
+const MenuItem = ({ item }: { item: DropdownButtonItem }) => {
+  const menuItem = (
+    <DropdownMenuItem
+      onClick={item.onClick}
+      disabled={item.disabled}
+      variant={item.variant}
+    >
+      {item.icon && item.icon}
+      {item.label}
+    </DropdownMenuItem>
+  );
+
+  if (!item.tooltip) return menuItem;
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div>{menuItem}</div>
+      </TooltipTrigger>
+      <TooltipPortal>
+        <TooltipContent side='left'>{item.tooltip}</TooltipContent>
+      </TooltipPortal>
+    </Tooltip>
+  );
+};
 
 export interface DropdownButtonProps extends Omit<ButtonProps, 'onClick'> {
   /**
@@ -130,17 +170,11 @@ export const DropdownButton = React.forwardRef<
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end' side='bottom' className='z-[100000]'>
-            {items.map((item, index) => (
-              <DropdownMenuItem
-                key={index}
-                onClick={item.onClick}
-                disabled={item.disabled}
-                variant={item.variant}
-              >
-                {item.icon && item.icon}
-                {item.label}
-              </DropdownMenuItem>
-            ))}
+            <TooltipProvider>
+              {items.map((item, index) => (
+                <MenuItem key={index} item={item} />
+              ))}
+            </TooltipProvider>
           </DropdownMenuContent>
         </DropdownMenu>
       );
@@ -183,24 +217,19 @@ export const DropdownButton = React.forwardRef<
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end' side='bottom'>
-            {items.map((item, index) => (
-              <React.Fragment key={index}>
-                <DropdownMenuItem
-                  onClick={item.onClick}
-                  disabled={item.disabled}
-                  variant={item.variant}
-                >
-                  {item.icon && item.icon}
-                  {item.label}
-                </DropdownMenuItem>
-                {/* Add separator before destructive items */}
-                {item.variant === 'destructive' &&
-                  index < items.length - 1 &&
-                  items[index + 1]?.variant !== 'destructive' && (
-                    <DropdownMenuSeparator />
-                  )}
-              </React.Fragment>
-            ))}
+            <TooltipProvider>
+              {items.map((item, index) => (
+                <React.Fragment key={index}>
+                  <MenuItem item={item} />
+                  {/* Add separator before destructive items */}
+                  {item.variant === 'destructive' &&
+                    index < items.length - 1 &&
+                    items[index + 1]?.variant !== 'destructive' && (
+                      <DropdownMenuSeparator />
+                    )}
+                </React.Fragment>
+              ))}
+            </TooltipProvider>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
