@@ -32,7 +32,7 @@ const isUserAuthorized = async (args: {
 };
 
 export const isAuthorized = async (
-  req: NextRequest,
+  _req: NextRequest,
   expectedClientID?: string
 ): Promise<TinaCloudUser | undefined> => {
   const token = (await headers()).get('authorization');
