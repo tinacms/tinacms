@@ -127,8 +127,8 @@ catalogs:
       specifier: ^0.1.1
       version: 0.1.1
     '@tailwindcss/typography':
-      specifier: ^0.5.16
-      version: 0.5.19
+      specifier: ^0.5.20
+      version: 0.5.20
     '@testing-library/dom':
       specifier: ^10.4.0
       version: 10.4.1
@@ -709,7 +709,7 @@ importers:
         version: 5.0.5(@types/node@25.1.0)(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(jiti@2.6.1)(lightningcss@1.32.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.2)
       '@tailwindcss/typography':
         specifier: 'catalog:'
-        version: 0.5.19(tailwindcss@4.2.1)
+        version: 0.5.20(tailwindcss@4.2.1)
       '@tinacms/datalayer':
         specifier: workspace:*
         version: link:../../../packages/@tinacms/datalayer
@@ -791,7 +791,7 @@ importers:
         version: 10.1.1(astro@6.3.7(@azure/storage-blob@12.29.1)(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.53.4)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.2))
       '@tailwindcss/typography':
         specifier: 'catalog:'
-        version: 0.5.19(tailwindcss@4.2.1)
+        version: 0.5.20(tailwindcss@4.2.1)
       '@tailwindcss/vite':
         specifier: ^4.2.1
         version: 4.2.4(vite@7.3.3(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.2))
@@ -870,7 +870,7 @@ importers:
     dependencies:
       '@tailwindcss/typography':
         specifier: 'catalog:'
-        version: 0.5.19(tailwindcss@4.2.1)
+        version: 0.5.20(tailwindcss@4.2.1)
       '@tinacms/datalayer':
         specifier: workspace:*
         version: link:../../../packages/@tinacms/datalayer
@@ -934,7 +934,7 @@ importers:
     dependencies:
       '@tailwindcss/typography':
         specifier: 'catalog:'
-        version: 0.5.19(tailwindcss@4.1.18)
+        version: 0.5.20(tailwindcss@4.1.18)
       '@tinacms/datalayer':
         specifier: workspace:*
         version: link:../../../packages/@tinacms/datalayer
@@ -1013,7 +1013,7 @@ importers:
         version: 22.0.1
       '@tailwindcss/typography':
         specifier: 'catalog:'
-        version: 0.5.19(tailwindcss@3.4.19(yaml@2.8.2))
+        version: 0.5.20(tailwindcss@3.4.19(yaml@2.8.2))
       '@tinacms/datalayer':
         specifier: workspace:*
         version: link:../../../packages/@tinacms/datalayer
@@ -1101,7 +1101,7 @@ importers:
     dependencies:
       '@tailwindcss/typography':
         specifier: 'catalog:'
-        version: 0.5.19(tailwindcss@4.2.1)
+        version: 0.5.20(tailwindcss@4.2.1)
       '@tinacms/datalayer':
         specifier: workspace:*
         version: link:../../../packages/@tinacms/datalayer
@@ -1350,7 +1350,7 @@ importers:
         version: 0.1.1(tailwindcss@3.4.19(yaml@2.8.2))
       '@tailwindcss/typography':
         specifier: 'catalog:'
-        version: 0.5.19(tailwindcss@3.4.19(yaml@2.8.2))
+        version: 0.5.20(tailwindcss@3.4.19(yaml@2.8.2))
       '@tinacms/app':
         specifier: workspace:*
         version: link:../app
@@ -7712,10 +7712,10 @@ packages:
   '@tailwindcss/postcss@4.2.1':
     resolution: {integrity: sha512-OEwGIBnXnj7zJeonOh6ZG9woofIjGrd2BORfvE5p9USYKDCZoQmfqLcfNiRWoJlRWLdNPn2IgVZuWAOM4iTYMw==}
 
-  '@tailwindcss/typography@0.5.19':
-    resolution: {integrity: sha512-w31dd8HOx3k9vPtcQh5QHP9GwKcgbMp87j58qi6xgiBnFFtKEAgCWnDw4qUT8aHwkCp8bKvb/KGKWWHedP0AAg==}
+  '@tailwindcss/typography@0.5.20':
+    resolution: {integrity: sha512-hwbzQuNUfcPvbegQFatVPl/MY/tcM9KLl963hQ5laJKPh81TEZ1+dNG9PirGvcaDBkp+BCshExAyKVPW91dozw==}
     peerDependencies:
-      tailwindcss: '>=3.0.0 || insiders || >=4.0.0-alpha.20 || >=4.0.0-beta.1'
+      tailwindcss: '>=3.0.0 || >=4.0.0 || insiders'
 
   '@tailwindcss/vite@4.2.4':
     resolution: {integrity: sha512-pCvohwOCspk3ZFn6eJzrrX3g4n2JY73H6MmYC87XfGPyTty4YsCjYTMArRZm/zOI8dIt3+EcrLHAFPe5A4bgtw==}
@@ -22215,17 +22215,17 @@ snapshots:
       postcss: 8.5.6
       tailwindcss: 4.2.1
 
-  '@tailwindcss/typography@0.5.19(tailwindcss@3.4.19(yaml@2.8.2))':
+  '@tailwindcss/typography@0.5.20(tailwindcss@3.4.19(yaml@2.8.2))':
     dependencies:
       postcss-selector-parser: 6.0.10
       tailwindcss: 3.4.19(yaml@2.8.2)
 
-  '@tailwindcss/typography@0.5.19(tailwindcss@4.1.18)':
+  '@tailwindcss/typography@0.5.20(tailwindcss@4.1.18)':
     dependencies:
       postcss-selector-parser: 6.0.10
       tailwindcss: 4.1.18
 
-  '@tailwindcss/typography@0.5.19(tailwindcss@4.2.1)':
+  '@tailwindcss/typography@0.5.20(tailwindcss@4.2.1)':
     dependencies:
       postcss-selector-parser: 6.0.10
       tailwindcss: 4.2.1
