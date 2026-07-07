@@ -5,9 +5,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to file a bug report! The fields below are the same checklist
-        we use in our Discord `#ask-for-help` post guidelines. Filling them in gives both our team
-        and our AI triage tooling enough to act on inside one session.
+        Thanks for taking the time to file a bug report! Filling in the fields below
+        gives our team enough to act on it quickly.
 
         Full guide: https://tina.io/docs/contributing/bug-reports
 
@@ -70,15 +69,6 @@ body:
       label: A way for us to reproduce
       description: A link to a minimal reproduction repo is the gold standard. `npx create-tina-app@latest` is a good starting point if you need one.
       placeholder: https://github.com/your-username/tina-bug-repro
-    validations:
-      required: false
-
-  - type: textarea
-    id: schema-sections
-    attributes:
-      label: Relevant sections of your schema file
-      description: You don't need to paste the whole thing — just the parts related to the issue.
-      render: typescript
     validations:
       required: false
 
