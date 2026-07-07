@@ -285,6 +285,9 @@ jobs:
           publish: pnpm run publish
           createGithubReleases: true
           setupGitUser: false
+          # github-api mode makes GitHub create and sign the Version Packages
+          # commit server-side, satisfying main's required-signatures rule
+          commitMode: github-api
         env:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token  }}
           NPM_CONFIG_PROVENANCE: true

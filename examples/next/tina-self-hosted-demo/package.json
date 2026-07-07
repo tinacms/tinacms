@@ -40,7 +40,7 @@
     "autoprefixer": "catalog:",
     "cross-env": "^7.0.3",
     "eslint": "^8.57.1",
-    "postcss": "^8.5.2",
+    "postcss": "catalog:",
     "postcss-import": "catalog:",
     "postcss-nesting": "catalog:",
     "tailwindcss": "^3.4.17",
