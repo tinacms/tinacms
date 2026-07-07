@@ -1,0 +1,58 @@
+name: Strip empty issue sections
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  strip:
+    runs-on: ubuntu-latest
+    steps:
+      # Issue forms render an omitted optional field as a "_No response_" section.
+      # Remove those whole sections so the filed issue only shows fields the reporter filled in.
+      - name: Remove "_No response_" sections from the issue body
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.issue.body || '';
+            if (!body.includes('_No response_')) return;
+
+            // Split the body into blocks at each "### " heading, ignoring headings
+            // inside fenced code blocks (a rendered error message can contain one).
+            const lines = body.split('\n');
+            const blocks = [];
+            let current = { heading: null, lines: [] };
+            let inFence = false;
+            for (const line of lines) {
+              const isFence = /^\s*(```|~~~)/.test(line);
+              if (!inFence && !isFence && line.startsWith('### ')) {
+                blocks.push(current);
+                current = { heading: line, lines: [] };
+              } else {
+                current.lines.push(line);
+                if (isFence) inFence = !inFence;
+              }
+            }
+            blocks.push(current);
+
+            const isEmpty = (b) => b.lines.join('\n').trim() === '_No response_';
+            const kept = blocks.filter((b) => b.heading === null || !isEmpty(b));
+            if (kept.length === blocks.length) return;
+
+            const rebuilt = kept
+              .map((b) => (b.heading ? `${b.heading}\n${b.lines.join('\n')}` : b.lines.join('\n')))
+              .join('\n')
+              .replace(/\n{3,}/g, '\n\n')
+              .trim();
+
+            if (rebuilt === body.trim()) return;
+
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              body: rebuilt,
+            });
