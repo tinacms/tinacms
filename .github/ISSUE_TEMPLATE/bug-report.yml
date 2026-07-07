@@ -11,6 +11,16 @@ body:
         Full guide: https://tina.io/docs/contributing/bug-reports
 
   - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: A clear description of what is going wrong. Keep the literal error text for the field below.
+      placeholder: |
+        e.g. Selecting an image from the Media Library and clicking Insert blanks the entire admin instead of inserting the image.
+    validations:
+      required: true
+
+  - type: textarea
     id: exact-error
     attributes:
       label: The exact error message
