@@ -251,7 +251,10 @@ describe('authorization is scoped to the site clientID', () => {
       if (APP_TOKEN[app] && auth === APP_TOKEN[app]) {
         return { ok: true, json: async () => APP_USER[app] } as any;
       }
-      return { ok: false, json: async () => ({ message: 'unauthorized' }) } as any;
+      return {
+        ok: false,
+        json: async () => ({ message: 'unauthorized' }),
+      } as any;
     });
   });
 
@@ -265,12 +268,12 @@ describe('authorization is scoped to the site clientID', () => {
     ({
       query: { clientID },
       headers: { authorization: token },
-    } as unknown as NextApiRequest);
+    }) as unknown as NextApiRequest;
 
   it("a token for this site's app is authorized", async () => {
-    expect(
-      await authorized(makeReq('this-site-app', 'token-this-site'))
-    ).toBe(true);
+    expect(await authorized(makeReq('this-site-app', 'token-this-site'))).toBe(
+      true
+    );
   });
 
   it("a token for another app cannot reach this site's app", async () => {
