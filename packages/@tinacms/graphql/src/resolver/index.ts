@@ -38,6 +38,11 @@ import {
   resolveMediaRelativeToCloud,
 } from './media-utils';
 
+const isEmptyOptionalImageValue = (
+  value: unknown,
+  field: Pick<TinaField<true>, 'type' | 'required' | 'list'>
+) => field.type === 'image' && !field.required && !field.list && !value;
+
 interface ResolverConfig {
   config?: GraphQLConfig;
   database: Database;
@@ -90,6 +95,9 @@ export const resolveFieldData = async (
       };
       break;
     case 'image':
+      if (isEmptyOptionalImageValue(value, field)) {
+        break;
+      }
       accumulator[field.name] = resolveMediaRelativeToCloud(
         value as string,
         config,
@@ -1553,6 +1561,9 @@ export class Resolver {
       const field = template.fields.find((field) => field.name === fieldName);
       if (!field) {
         throw new Error(`Expected to find field by name ${fieldName}`);
+      }
+      if (isEmptyOptionalImageValue(fieldValue, field)) {
+        continue;
       }
       switch (field.type) {
         case 'displayOnly':

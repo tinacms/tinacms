@@ -1,16 +1,16 @@
+import path from 'path';
+import { describe, expect, it, vi } from 'vitest';
+import { generatePasswordHash } from '../auth/utils';
+import { parseMDX, serializeMDX } from '../mdx';
 import {
   createResolver,
   resolveFieldData,
   updateObjectWithJsonPath,
 } from './index';
-import { describe, expect, it, vi } from 'vitest';
-import path from 'path';
-import { parseMDX, serializeMDX } from '../mdx';
 import {
   resolveMediaCloudToRelative,
   resolveMediaRelativeToCloud,
 } from './media-utils';
-import { generatePasswordHash } from '../auth/utils';
 
 vi.mock('../mdx', () => ({
   parseMDX: vi.fn(),
@@ -463,6 +463,27 @@ describe('index', () => {
 
       await resolveFieldData(field, { author: null }, accumulator, tinaSchema);
 
+      expect(accumulator).toEqual({});
+    });
+
+    it('omits optional image fields when value is empty', async () => {
+      vi.mocked(resolveMediaRelativeToCloud).mockClear();
+      const field = {
+        name: 'coverImage',
+        type: 'image',
+        namespace: ['post', 'coverImage'],
+        required: false,
+      } as any;
+      const accumulator: Record<string, unknown> = {};
+
+      await resolveFieldData(
+        field,
+        { coverImage: '' },
+        accumulator,
+        tinaSchema
+      );
+
+      expect(resolveMediaRelativeToCloud).not.toHaveBeenCalled();
       expect(accumulator).toEqual({});
     });
 
@@ -947,6 +968,19 @@ describe('index', () => {
         {}
       );
       expect(result).toEqual({ hero: 'images/hero.png' });
+    });
+
+    it('omits optional image fields when the submitted value is empty', async () => {
+      vi.mocked(resolveMediaCloudToRelative).mockClear();
+      const { build } = setup();
+      const template = {
+        fields: [{ name: 'coverImage', type: 'image', required: false }],
+      } as any;
+
+      const result = await build({ coverImage: '' }, template);
+
+      expect(resolveMediaCloudToRelative).not.toHaveBeenCalled();
+      expect(result).toEqual({});
     });
 
     it('serializes rich-text via serializeMDX before storage', async () => {
