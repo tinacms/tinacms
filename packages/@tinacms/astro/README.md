@@ -14,7 +14,7 @@ pnpm add @tinacms/astro tinacms
 pnpm add -D @tinacms/cli
 ```
 
-Requires Astro 5 or 6 and an SSR adapter (`@astrojs/node`, `vercel`, `netlify`, or `cloudflare`) — the island-refresh endpoint (`/tina-island/[name]`) is on-demand. `output: 'server'` is the simplest choice; `output: 'static'` also works as long as editable regions are wrapped in [`<TinaIsland>`](#static-site-editing) and the adapter can serve that one on-demand route.
+Requires Astro 5, 6, or 7 and an SSR adapter (`@astrojs/node`, `vercel`, `netlify`, or `cloudflare`) — the island-refresh endpoint (`/tina-island/[name]`) is on-demand. `output: 'server'` is the simplest choice; `output: 'static'` also works as long as editable regions are wrapped in [`<TinaIsland>`](#static-site-editing) and the adapter can serve that one on-demand route.
 
 ## Usage
 
