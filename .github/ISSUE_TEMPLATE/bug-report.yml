@@ -21,6 +21,23 @@ body:
       required: true
 
   - type: textarea
+    id: environment
+    attributes:
+      label: Your environment
+      description: |
+        Version of `tinacms` and `@tinacms/cli`, framework, and **anything non-default** —
+        custom MediaStore, custom auth, custom adapters, self-hosted setup. The non-default
+        detail is often what points us straight at the root cause.
+      placeholder: |
+        - TinaCMS v3.7.2
+        - @tinacms/cli v1.10.x
+        - Next.js (App Router)
+        - Self-hosted TinaCMS with custom GitHubMediaStore
+        - Netlify deployment with serverless functions
+    validations:
+      required: true
+
+  - type: textarea
     id: exact-error
     attributes:
       label: The exact error message
@@ -44,23 +61,6 @@ body:
         5. Click "Insert"
     validations:
       required: false
-
-  - type: textarea
-    id: environment
-    attributes:
-      label: Your environment
-      description: |
-        Version of `tinacms` and `@tinacms/cli`, framework, and **anything non-default** —
-        custom MediaStore, custom auth, custom adapters, self-hosted setup. The non-default
-        detail is often what points us straight at the root cause.
-      placeholder: |
-        - TinaCMS v3.7.2
-        - @tinacms/cli v1.10.x
-        - Next.js (App Router)
-        - Self-hosted TinaCMS with custom GitHubMediaStore
-        - Netlify deployment with serverless functions
-    validations:
-      required: true
 
   - type: input
     id: reproduction-repo
