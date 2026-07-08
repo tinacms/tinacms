@@ -65,7 +65,7 @@ export const remarkToSlate = (
             };
           }),
           props: {
-            align: content.align?.filter((item) => !!item),
+            align: content.align?.some((item) => !!item) ? content.align : [],
           },
         };
       }
