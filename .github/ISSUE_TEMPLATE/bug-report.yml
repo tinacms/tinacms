@@ -29,7 +29,7 @@ body:
         e.g. React error #31: Objects are not valid as a React child (found: object with keys {id, src, filename, directory, type, thumbnails}).
       render: shell
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: steps-to-reproduce
@@ -43,18 +43,7 @@ body:
         4. Select any image
         5. Click "Insert"
     validations:
-      required: true
-
-  - type: textarea
-    id: expected-vs-actual
-    attributes:
-      label: What you expected vs. what actually happened
-      description: One sentence each is enough.
-      placeholder: |
-        Expected: The selected image is inserted and the src string is saved.
-        Actual: TinaCMS admin goes blank / white screen.
-    validations:
-      required: true
+      required: false
 
   - type: textarea
     id: environment
