@@ -52,7 +52,8 @@
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
     "react-hook-form": "^7.80.0",
-    "zod": "catalog:"
+    "zod": "catalog:",
+    "zustand": "^5.0.14"
   },
   "peerDependencies": {
     "react": "^19.2.0",
