@@ -5,6 +5,7 @@ const baseOpts = {
   entryPoint: '/project/tina/database.ts',
   outfile:
     '/project/tina/__generated__/.cache/12345/database/database.build.mjs',
+  absWorkingDir: '/project',
   external: ['better-sqlite3'],
   loader: { '.ts': 'ts' as Loader },
 };
@@ -54,6 +55,11 @@ describe('buildDatabaseEsbuildConfig — output path contract', () => {
   it('forwards the caller-provided outfile unchanged', () => {
     const config = buildDatabaseEsbuildConfig(baseOpts);
     expect(config.outfile).toBe(baseOpts.outfile);
+  });
+
+  it('pins esbuild package resolution to the caller-provided project root', () => {
+    const config = buildDatabaseEsbuildConfig(baseOpts);
+    expect(config.absWorkingDir).toBe(baseOpts.absWorkingDir);
   });
 
   it('outfile is whatever was passed in — no remapping', () => {
