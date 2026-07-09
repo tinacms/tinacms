@@ -54,6 +54,19 @@ describe('composePluginSlices namespacing', () => {
     expect([...registry.keys()]).toEqual(['editorial-workflow']);
   });
 
+  it('rejects a plugin named after a capability it does not provide', () => {
+    // Peers read capability state at `get().media` — a feature plugin must not squat
+    // that namespace by name alone.
+    expect(() =>
+      composePluginSlices([resolved({ name: 'media' }, () => ({}))])
+    ).toThrow(/does not provide it/);
+    // A genuine provider may carry the bare capability name.
+    const registry = composePluginSlices([
+      resolved({ name: 'media', provides: ['media'] }, () => ({})),
+    ]);
+    expect([...registry.keys()]).toEqual(['media']);
+  });
+
   it('skips segments with no slice (field plugins contribute none)', () => {
     const registry = composePluginSlices([
       resolved({ name: 'tina:field:string', provides: ['field'] }),

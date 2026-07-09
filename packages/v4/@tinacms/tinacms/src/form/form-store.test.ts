@@ -55,6 +55,17 @@ describe('form-store dirty tracking', () => {
     expect(statusOf(postA)).toBe('clean');
   });
 
+  it('clearing a never-baselined field back to undefined is clean, not dirty', () => {
+    const subtitle = toFieldAddress('subtitle');
+    store.getState().registerForm(postA, { [title]: 'Hello' });
+    store.getState().setFieldValue(postA, subtitle, 'x');
+    expect(statusOf(postA)).toBe('dirty');
+    // RHF emits undefined on clear; absent and undefined are one state (JSON can't
+    // represent "present but undefined"), so this must read clean.
+    store.getState().setFieldValue(postA, subtitle, undefined);
+    expect(statusOf(postA)).toBe('clean');
+  });
+
   // Composite field values (object/list/rich-text) aren't supported yet; when they land,
   // `valuesEqual`/`fieldDirty` must delegate equality to the field descriptor (each field
   // type owns its comparison) so an edit-then-revert of an object field reads clean rather

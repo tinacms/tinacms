@@ -38,9 +38,18 @@ export const sliceMountFor = (manifest: PluginManifest): SliceMount => {
   // The invariant above caps singletons at one, so [0] is that single capability or
   // undefined — undefined ⇒ a feature plugin, mounted under its own name.
   const capability = singletons[0];
-  return capability
-    ? { namespace: capability, capability }
-    : { namespace: manifest.name };
+  if (capability) return { namespace: capability, capability };
+  // A feature plugin must not squat a capability namespace by name alone: peers read
+  // capability state at these keys (`get().media`), so only a genuine provider may
+  // mount there — the same reservation createTinaStore applies to core namespaces.
+  invariant(
+    !isSingletonSliceCapability(manifest.name),
+    'plugin-name-squats-capability',
+    `Plugin "${manifest.name}" is named after the "${manifest.name}" capability ` +
+      'but does not provide it, so its slice would mount at that reserved ' +
+      `namespace. Rename the plugin or declare \`provides: ["${manifest.name}"]\`.`
+  );
+  return { namespace: manifest.name };
 };
 
 // A later plugin may replace a singleton's slice only by declaring an explicit override

@@ -78,10 +78,15 @@ export interface FormStore {
 // value, alongside its parse/serialize) rather than a central deep-compare bolted on
 // here — the store then asks the field "did this change?" instead of guessing.
 const valuesEqual = (current: FormValues, baseline: FormValues): boolean => {
+  // Compared over the union of both key sets so a key holding undefined equals its
+  // absence — JSON can't represent "present but undefined", and controlled inputs
+  // clear to undefined, so the two are one state.
   // Object.keys erases the brand; these keys came in as FieldAddress.
-  const keys = Object.keys(current) as FieldAddress[];
-  if (keys.length !== Object.keys(baseline).length) return false;
-  return keys.every((key) => Object.is(current[key], baseline[key]));
+  const keys = new Set([
+    ...Object.keys(current),
+    ...Object.keys(baseline),
+  ]) as Set<FieldAddress>;
+  return [...keys].every((key) => Object.is(current[key], baseline[key]));
 };
 
 export const formStatus = (scope: FormScope | undefined): FormStatus => {
