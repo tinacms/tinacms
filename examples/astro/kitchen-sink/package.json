@@ -17,11 +17,12 @@
     "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
-    "@astrojs/mdx": "^5.0.6",
-    "@astrojs/react": "^5.0.5",
+    "@astrojs/mdx": "^7.0.2",
+    "@astrojs/react": "^6.0.1",
     "@tailwindcss/typography": "catalog:",
+    "@tailwindcss/vite": "^4.2.1",
     "@tinacms/datalayer": "workspace:*",
-    "astro": "^6.3.7",
+    "astro": "^7.0.6",
     "clsx": "^2.1.1",
     "graphql": "^15.10.1",
     "react": "^18.3.1",
@@ -32,7 +33,6 @@
   },
   "devDependencies": {
     "@biomejs/biome": "catalog:",
-    "@tailwindcss/postcss": "^4.2.1",
     "@tinacms/app": "workspace:*",
     "@tinacms/cli": "workspace:*",
     "@tinacms/scripts": "workspace:*",
@@ -40,10 +40,9 @@
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "@playwright/test": "catalog:",
-    "autoprefixer": "catalog:",
     "cross-env": "^7.0.3",
-    "postcss": "catalog:",
     "tailwindcss": "^4.0.0",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vite": "^8.0.0"
   }
 }
