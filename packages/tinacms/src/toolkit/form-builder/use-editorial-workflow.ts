@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { ERR_BRANCH_CONFLICT, ERR_BRANCH_EXISTS } from '@tinacms/schema-tools';
 import { useBranchData } from '@toolkit/plugin-branch-switcher';
 import { useCMS } from '../react-core';
 import {
@@ -68,6 +69,8 @@ export interface ExecuteWorkflowOptions {
   crudType: string;
   tinaForm?: Form;
   signal?: AbortSignal;
+  // When false, opens a ready-for-review PR. Omitted keeps the server's draft-first default.
+  isDraft?: boolean;
 }
 
 export interface UseEditorialWorkflowResult {
@@ -75,8 +78,10 @@ export interface UseEditorialWorkflowResult {
   errorMessage: string;
   currentStep: number;
   elapsedTime: number;
-  /** Returns true on success, false on failure (error captured in errorMessage) */
-  executeWorkflow: (opts: ExecuteWorkflowOptions) => Promise<boolean>;
+  /** Resolves with the outcome; on failure `error` holds the message. */
+  executeWorkflow: (
+    opts: ExecuteWorkflowOptions
+  ) => Promise<{ success: boolean; error?: string }>;
   /** Reset error/executing state so the form can be retried */
   reset: () => void;
 }
@@ -104,9 +109,9 @@ export const getEditorialWorkflowErrorMessage = (e: unknown): string => {
         break;
     }
   } else if (err.message) {
-    if (err.message.toLowerCase().includes('already exists')) {
+    if (err.message.toLowerCase().includes(ERR_BRANCH_EXISTS)) {
       errMessage = 'A branch with this name already exists';
-    } else if (err.message.toLowerCase().includes('conflict')) {
+    } else if (err.message.toLowerCase().includes(ERR_BRANCH_CONFLICT)) {
       errMessage = err.message;
     }
   }
@@ -152,9 +157,10 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
     crudType,
     tinaForm,
     signal,
-  }: ExecuteWorkflowOptions): Promise<boolean> => {
+    isDraft,
+  }: ExecuteWorkflowOptions): Promise<{ success: boolean; error?: string }> => {
     try {
-      if (signal?.aborted) return false;
+      if (signal?.aborted) return { success: false };
 
       const targetBranchExists = await checkTargetBranchExists(
         tinaApi,
@@ -163,13 +169,13 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
         signal
       );
 
-      if (signal?.aborted) return false;
+      if (signal?.aborted) return { success: false };
 
       if (targetBranchExists) {
         setErrorMessage(TARGET_BRANCH_EXISTS_ERROR);
         setIsExecuting(false);
         setCurrentStep(0);
-        return false;
+        return { success: false, error: TARGET_BRANCH_EXISTS_ERROR };
       }
 
       setIsExecuting(true);
@@ -201,6 +207,7 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
         branchName,
         baseBranch,
         prTitle: getEditorialWorkflowPrTitle(branchName),
+        isDraft,
         graphQLContentOp: {
           query: graphql,
           variables: {
@@ -256,7 +263,7 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
         }`;
       }
 
-      return true;
+      return { success: true };
     } catch (e: unknown) {
       console.error(e);
       const errMessage = getEditorialWorkflowErrorMessage(e);
@@ -265,7 +272,7 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
       setIsExecuting(false);
       setCurrentStep(0);
 
-      return false;
+      return { success: false, error: errMessage };
     }
   };
 

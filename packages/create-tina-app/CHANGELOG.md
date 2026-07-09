@@ -1,5 +1,17 @@
 # create-tina-app
 
+## 2.1.10
+
+### Patch Changes
+
+- [#7122](https://github.com/tinacms/tinacms/pull/7122) [`90833f1`](https://github.com/tinacms/tinacms/commit/90833f10d700aaa6940a8104c48d47e9b4aabe0a) Thanks [@kulesy](https://github.com/kulesy)! - feat(create-tina-app): stream live install activity on the spinner
+
+## 2.1.9
+
+### Patch Changes
+
+- [#7088](https://github.com/tinacms/tinacms/pull/7088) [`d44558e`](https://github.com/tinacms/tinacms/commit/d44558e9b4502d4f4fc2c970d22985339fe2b6ce) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Fix media upload/delete paths to prevent access to storage keys outside mediaRoot.
+
 ## 2.1.8
 
 ### Patch Changes

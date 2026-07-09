@@ -1,5 +1,46 @@
 # tinacms-cli
 
+## 2.5.4
+
+### Patch Changes
+
+- [#7168](https://github.com/tinacms/tinacms/pull/7168) [`0a927a4`](https://github.com/tinacms/tinacms/commit/0a927a4f8d228dd05ee7ca4be32899bc190e73af) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Security fix: TinaCloud authorization is now scoped to the site's own configured clientID instead of a value read from the request. `isAuthorized` takes an optional `expectedClientID` (falling back to `NEXT_PUBLIC_TINA_CLIENT_ID`) and refuses when neither resolves. `TinaCloudBackendAuthProvider`, the `next-tinacms-azure` adapter, and the `tinacms init` template all pass the site clientID through.
+
+  **Action required (self-hosted).** Authorization now fails closed when the site's clientID cannot be resolved at runtime. Ensure `NEXT_PUBLIC_TINA_CLIENT_ID` is present in the server runtime (not only inlined at build time), or pass the clientID explicitly to `TinaCloudBackendAuthProvider(...)` and to media-store `authorized` callbacks, e.g. `isAuthorized(req, process.env.NEXT_PUBLIC_TINA_CLIENT_ID)`. If it cannot be resolved, backend and media authorization will return 401.
+
+## 2.5.3
+
+### Patch Changes
+
+- [#7157](https://github.com/tinacms/tinacms/pull/7157) [`aef9de0`](https://github.com/tinacms/tinacms/commit/aef9de0dabff72e0815ea6dfc03ce720dd8c4a7b) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Bump `@tailwindcss/typography` to 0.5.20
+
+- Updated dependencies [[`c809733`](https://github.com/tinacms/tinacms/commit/c809733ce8037d81937e81f0c8781a6cf222099b), [`3a1b39a`](https://github.com/tinacms/tinacms/commit/3a1b39ad9a2bbeb82a539fbca6985d5b714238dd), [`de4a807`](https://github.com/tinacms/tinacms/commit/de4a80771e83afa8502f834227351cff54c5f236), [`8497110`](https://github.com/tinacms/tinacms/commit/8497110ada7554f97807ce7a09a3624b5efc5713), [`22d0c0d`](https://github.com/tinacms/tinacms/commit/22d0c0d095b79e116677a798d07b35591ccb816e), [`5148d67`](https://github.com/tinacms/tinacms/commit/5148d679049bc53e34b287a586bc721db7cb7710), [`ff10e65`](https://github.com/tinacms/tinacms/commit/ff10e657e48f1acc67cafd3e1a99bef23c8ac419), [`b53a51c`](https://github.com/tinacms/tinacms/commit/b53a51c92ee8ddecbb654f5b57c7d10673a06626)]:
+  - tinacms@3.10.0
+  - @tinacms/schema-tools@2.8.3
+  - @tinacms/graphql@2.4.7
+  - @tinacms/app@2.5.8
+  - @tinacms/search@1.2.21
+
+## 2.5.2
+
+### Patch Changes
+
+- [#7111](https://github.com/tinacms/tinacms/pull/7111) [`211997c`](https://github.com/tinacms/tinacms/commit/211997cdb53cbd43638bdee999faa65375cfc260) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Reject cross-origin state-changing requests on the dev server. Previously the `cors` middleware only suppressed response headers, so an attacker-controlled page could still drive a cross-origin multipart upload to completion (writing files into the media root). State-changing routes (`/media/upload`, `/media` DELETE, `searchIndex` POST/DELETE, and `/graphql` POST) now reject disallowed origins server-side with a 403.
+
+- [#7113](https://github.com/tinacms/tinacms/pull/7113) [`4ce8757`](https://github.com/tinacms/tinacms/commit/4ce87576055729fe66bf0e0da465ccec7950fc16) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Remove the unused legacy Express dev server (`src/server`). It was superseded by the Vite-based dev server years ago and is no longer reachable from the CLI. Its compiled output was still being published and deep-importable as `@tinacms/cli/dist/server`, exposing an un-gated media upload handler; deleting it removes that dead code path. The active `tinacms dev` server is unaffected.
+
+- [#7088](https://github.com/tinacms/tinacms/pull/7088) [`d44558e`](https://github.com/tinacms/tinacms/commit/d44558e9b4502d4f4fc2c970d22985339fe2b6ce) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Fix media upload/delete paths to prevent access to storage keys outside mediaRoot.
+
+- [#7095](https://github.com/tinacms/tinacms/pull/7095) [`39c06f7`](https://github.com/tinacms/tinacms/commit/39c06f7c21cac7dfd94ff6acfcdeec7117989773) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Harden npm publish pipeline and package manifests
+
+- Updated dependencies [[`c1994b3`](https://github.com/tinacms/tinacms/commit/c1994b36907710aeb36fd114fa6d0a8a0e1210d0), [`e74a7d6`](https://github.com/tinacms/tinacms/commit/e74a7d62ee1dce7386b5aaf5ebaf569d3adcd247), [`caadf1f`](https://github.com/tinacms/tinacms/commit/caadf1f68ec602277bcd4225a69c13fdc5402f7b), [`5ba482b`](https://github.com/tinacms/tinacms/commit/5ba482b9c10d76ea7f7bea2a442a8999824736a8), [`8a86ffa`](https://github.com/tinacms/tinacms/commit/8a86ffa045af8ff6dfa0ebc2775cf3b7b810d238), [`19fcbdd`](https://github.com/tinacms/tinacms/commit/19fcbdd90a33a66c437b0f91e325a8609022e0cc), [`871ce31`](https://github.com/tinacms/tinacms/commit/871ce31531d3d7dc379ec7d58cf427984dd6620a), [`d44558e`](https://github.com/tinacms/tinacms/commit/d44558e9b4502d4f4fc2c970d22985339fe2b6ce), [`39c06f7`](https://github.com/tinacms/tinacms/commit/39c06f7c21cac7dfd94ff6acfcdeec7117989773), [`4801b21`](https://github.com/tinacms/tinacms/commit/4801b21f31455d3ce6cb33e6233148caba9921c6)]:
+  - tinacms@3.9.4
+  - @tinacms/schema-tools@2.8.2
+  - @tinacms/app@2.5.7
+  - @tinacms/graphql@2.4.6
+  - @tinacms/search@1.2.20
+  - @tinacms/metrics@2.1.1
+
 ## 2.5.1
 
 ### Patch Changes

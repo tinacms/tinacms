@@ -6,6 +6,11 @@ import {
 } from '@tinacms/schema-tools';
 import type { Template } from '@tinacms/schema-tools';
 import {
+  ERR_ALREADY_EXISTS,
+  RELATIVE_PATH_ALLOWED_CHARS_MESSAGE,
+  RELATIVE_PATH_REGEX,
+} from '@tinacms/schema-tools';
+import {
   BillingWarning,
   Form,
   FormBuilder,
@@ -228,9 +233,8 @@ export const RenderForm = ({
         return true;
       }
 
-      const isValid = /^[\.\-_\/a-zA-Z0-9]*$/.test(value);
-      if (value && !isValid) {
-        return 'Must contain only a-z, A-Z, 0-9, -, _, ., or /.';
+      if (!RELATIVE_PATH_REGEX.test(value)) {
+        return RELATIVE_PATH_ALLOWED_CHARS_MESSAGE;
       }
       // check if the filename is allowed by the collection.
       if (schemaCollection.match?.exclude || schemaCollection.match?.include) {
@@ -315,11 +319,7 @@ export const RenderForm = ({
           }, 10);
         } catch (error) {
           const defaultErrorText = 'There was a problem saving your document.';
-          // TODO(#6777): These error strings are hardcoded because `tinacms` and
-          // `@tinacms/graphql` are separate workspaces. A shared constants/enum
-          // should be introduced via an existing common package to avoid fragile
-          // string matching. See: https://github.com/tinacms/tinacms/issues/6777
-          if (error.message && error.message.includes('already exists')) {
+          if (error.message && error.message.includes(ERR_ALREADY_EXISTS)) {
             cms.alerts.error(
               `${defaultErrorText} The filename "${form.values.filename}.${collection.format || 'md'}" is already used for another document, please modify it.`
             );

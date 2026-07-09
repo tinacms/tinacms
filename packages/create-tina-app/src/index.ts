@@ -37,6 +37,8 @@ import { osInfo as getOsSystemInfo } from 'systeminformation';
 
 const DISCORD_SUPPORT_URL = 'https://discord.com/invite/zumN63Ybpf';
 const FAQ_URL = 'https://tina.io/docs/faq';
+// Truncate the install activity line so the spinner stays on a single row.
+const MAX_ACTIVITY_LINE = 56;
 
 let posthogClient: PostHog | null = null;
 async function initializePostHog(
@@ -442,8 +444,15 @@ export async function run() {
 
   spinner.start('Installing packages.');
   try {
-    await install(pkgManager as PackageManager, opts.verbose);
-    spinner.succeed();
+    // Reflect the package manager's latest line on the spinner as live activity.
+    await install(pkgManager as PackageManager, opts.verbose, (line) => {
+      const text =
+        line.length > MAX_ACTIVITY_LINE
+          ? `${line.slice(0, MAX_ACTIVITY_LINE - 1)}…`
+          : line;
+      spinner.text = `Installing packages, ${text}`;
+    });
+    spinner.succeed('Installing packages.');
   } catch (err) {
     const error = err instanceof Error ? err : new Error(String(err));
     const reason = error.message || String(err);

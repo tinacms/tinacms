@@ -1,5 +1,23 @@
 # @tinacms/schema-tools
 
+## 2.8.3
+
+### Patch Changes
+
+- [#7123](https://github.com/tinacms/tinacms/pull/7123) [`5148d67`](https://github.com/tinacms/tinacms/commit/5148d679049bc53e34b287a586bc721db7cb7710) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - refactor: replace hardcoded error-message string checks with shared error-identifier constants in `@tinacms/schema-tools`, so producers and consumers reference one source of truth instead of fragile `error.message.includes('...')` matching (#6777)
+
+- [#7143](https://github.com/tinacms/tinacms/pull/7143) [`ff10e65`](https://github.com/tinacms/tinacms/commit/ff10e657e48f1acc67cafd3e1a99bef23c8ac419) Thanks [@kulesy](https://github.com/kulesy)! - Unify folder-name validation with the document-filename and backend `relativePath` allowlist. The Create Folder modal now rejects names with disallowed characters (e.g. spaces) inline instead of letting the request fail on the backend, and a project-level `folderNameRegex` is layered on top of that baseline. The allowlist lives in a single shared constant in `@tinacms/schema-tools`.
+
+## 2.8.2
+
+### Patch Changes
+
+- [#6856](https://github.com/tinacms/tinacms/pull/6856) [`e74a7d6`](https://github.com/tinacms/tinacms/commit/e74a7d62ee1dce7386b5aaf5ebaf569d3adcd247) Thanks [@lphuc2250gma](https://github.com/lphuc2250gma)! - fix: duplicated words in parseURL error message and rich-text type docs
+
+- [#7058](https://github.com/tinacms/tinacms/pull/7058) [`5ba482b`](https://github.com/tinacms/tinacms/commit/5ba482b9c10d76ea7f7bea2a442a8999824736a8) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Fix Local Mode banner for absolute contentApiUrlOverride
+
+- [#7088](https://github.com/tinacms/tinacms/pull/7088) [`d44558e`](https://github.com/tinacms/tinacms/commit/d44558e9b4502d4f4fc2c970d22985339fe2b6ce) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Fix media upload/delete paths to prevent access to storage keys outside mediaRoot.
+
 ## 2.8.1
 
 ### Patch Changes

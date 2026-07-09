@@ -29,5 +29,6 @@ export {
   useFieldActivation,
   useFieldAddress,
   useFieldErrors,
+  useFieldSchema,
   useFieldValue,
 } from './hooks';

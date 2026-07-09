@@ -7,6 +7,12 @@ import {
 } from '@headlessui/react';
 import type { Collection, TinaField } from '@tinacms/schema-tools';
 import {
+  ERR_ALREADY_EXISTS,
+  ERR_HAS_REFERENCES,
+  RELATIVE_PATH_ALLOWED_CHARS_MESSAGE,
+  isValidRelativePath,
+} from '@tinacms/schema-tools';
+import {
   BaseTextField,
   Button,
   CreateBranchModal,
@@ -441,7 +447,7 @@ const CollectionListPage = () => {
                               );
                               reFetchCollection();
                             } catch (error) {
-                              if (error.message.indexOf('has references')) {
+                              if (error.message.includes(ERR_HAS_REFERENCES)) {
                                 cms.alerts.error(
                                   error.message.split('\n\t').filter(Boolean)[1]
                                 );
@@ -451,7 +457,6 @@ const CollectionListPage = () => {
                                 'Document was not deleted, ask a developer for help or check the console for an error message'
                               );
                               console.error(error);
-                              throw error;
                             }
                           }}
                           close={() => setDeleteModalOpen(false)}
@@ -506,20 +511,16 @@ const CollectionListPage = () => {
                             );
                             reFetchCollection();
                           } catch (error) {
-                            // TODO(#6777): These error strings are hardcoded because `tinacms` and
-                            // `@tinacms/graphql` are separate workspaces. A shared constants/enum
-                            // should be introduced via an existing common package to avoid fragile
-                            // string matching. See: https://github.com/tinacms/tinacms/issues/6777
                             if (
                               error.message &&
-                              error.message.includes('already exists')
+                              error.message.includes(ERR_ALREADY_EXISTS)
                             ) {
                               cms.alerts.error(
                                 `Document was not renamed. The filename "${vars.newRelativePath}" is already used by another document, please choose a different name.`
                               );
                             } else if (
                               error.message &&
-                              error.message.includes('has references')
+                              error.message.includes(ERR_HAS_REFERENCES)
                             ) {
                               cms.alerts.error(
                                 error.message.split('\n\t').filter(Boolean)[1]
@@ -571,13 +572,9 @@ const CollectionListPage = () => {
                             );
                             cms.alerts.info('Folder was successfully created');
                           } catch (error) {
-                            // TODO(#6777): These error strings are hardcoded because `tinacms` and
-                            // `@tinacms/graphql` are separate workspaces. A shared constants/enum
-                            // should be introduced via an existing common package to avoid fragile
-                            // string matching. See: https://github.com/tinacms/tinacms/issues/6777
                             if (
                               error.message &&
-                              error.message.includes('already exists')
+                              error.message.includes(ERR_ALREADY_EXISTS)
                             ) {
                               cms.alerts.error(
                                 `Folder was not created, folder with name "${vars.folderName}" already exists ${folder.name ? `in ${folder.name}` : ''}`
@@ -1477,6 +1474,9 @@ const FolderModal = ({
   validationRegex,
 }: FolderModalProps) => {
   const [isFolderNameValid, setIsFolderNameValid] = useState(false);
+  const [validationMessage, setValidationMessage] = useState<string | null>(
+    null
+  );
   const [isInteracted, setIsInteracted] = useState(false);
 
   useEffect(() => {
@@ -1484,20 +1484,39 @@ const FolderModal = ({
   }, [folderName]);
 
   const validateFolderName = (name: string) => {
-    if (!validationRegex || !name.trim()) {
-      setIsFolderNameValid(!!name.trim());
-      return !!name.trim();
-    }
-
-    try {
-      const regex = new RegExp(validationRegex);
-      const valid = regex.test(name);
-      setIsFolderNameValid(valid);
-      return valid;
-    } catch (error) {
+    if (!name.trim()) {
       setIsFolderNameValid(false);
+      setValidationMessage(null);
       return false;
     }
+
+    // Baseline mirrors the backend allowlist; a project-level folderNameRegex
+    // layers on top, so the UI can only ever be stricter than the resolver.
+    if (!isValidRelativePath(name)) {
+      setIsFolderNameValid(false);
+      setValidationMessage(RELATIVE_PATH_ALLOWED_CHARS_MESSAGE);
+      return false;
+    }
+
+    if (validationRegex) {
+      let passesCustomRegex = false;
+      try {
+        passesCustomRegex = new RegExp(validationRegex).test(name);
+      } catch (error) {
+        passesCustomRegex = false;
+      }
+      if (!passesCustomRegex) {
+        setIsFolderNameValid(false);
+        setValidationMessage(
+          'Folder name is not valid, please enter a valid folder name.'
+        );
+        return false;
+      }
+    }
+
+    setIsFolderNameValid(true);
+    setValidationMessage(null);
+    return true;
   };
 
   return (
@@ -1510,7 +1529,7 @@ const FolderModal = ({
               placeholder='Enter the name of the new folder'
               value={folderName}
               className={`mb-4 ${
-                !isFolderNameValid && isInteracted ? 'border-red-500' : ''
+                isInteracted && validationMessage ? 'border-red-500' : ''
               }`}
               onChange={(event) => {
                 setFolderName(event.target.value);
@@ -1518,10 +1537,8 @@ const FolderModal = ({
                 validateFolderName(event.target.value);
               }}
             />
-            {!isFolderNameValid && isInteracted && (
-              <p className='text-red-500 text-sm pl-1'>
-                Folder name is not valid – please enter a valid folder name.
-              </p>
+            {isInteracted && validationMessage && (
+              <p className='text-red-500 text-sm pl-1'>{validationMessage}</p>
             )}
           </>
         </ModalBody>

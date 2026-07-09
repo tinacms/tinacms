@@ -1,5 +1,22 @@
 # @tinacms/astro
 
+## 0.6.0
+
+### Minor Changes
+
+- [#7163](https://github.com/tinacms/tinacms/pull/7163) [`c2c03c6`](https://github.com/tinacms/tinacms/commit/c2c03c677f67b6fd3a2155d5227b9bf785b43288) Thanks [@kulesy](https://github.com/kulesy)! - Add official support for Astro 7. The `astro` peer dependency is now `^5.0.0 || ^6.0.0 || ^7.0.0`, so Astro 5 and 6 consumers continue to work without changes. The package's own test suite and the `examples/astro/visual-editing` reference app (which consumes `@tinacms/astro`) have been bumped to Astro 7 to exercise the new version in CI. The `examples/astro/kitchen-sink` app stays on Astro 6 for now, since moving it to Astro 7 (Vite 8) needs a separate Tailwind PostCSS-to-Vite-plugin migration and it uses its own integration rather than `@tinacms/astro`.
+
+## 0.5.1
+
+### Patch Changes
+
+- [#7069](https://github.com/tinacms/tinacms/pull/7069) [`2676b78`](https://github.com/tinacms/tinacms/commit/2676b7825873959f8feb4fa7e3eee1de9450b06d) Thanks [@kulesy](https://github.com/kulesy)! - Re-run `getStaticPaths` in dev when Tina writes or deletes a content file, so newly created entries no longer 404 until the dev server is restarted by hand. Applies to Astro 6+, whose dev runtime handles the `astro:content-changed` signal; Astro 5 is left untouched.
+
+- [#7088](https://github.com/tinacms/tinacms/pull/7088) [`d44558e`](https://github.com/tinacms/tinacms/commit/d44558e9b4502d4f4fc2c970d22985339fe2b6ce) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Fix media upload/delete paths to prevent access to storage keys outside mediaRoot.
+
+- Updated dependencies []:
+  - @tinacms/bridge@0.3.0
+
 ## 0.5.0
 
 ### Minor Changes

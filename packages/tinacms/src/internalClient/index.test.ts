@@ -604,6 +604,28 @@ describe('Tina Client', () => {
       });
     });
 
+    it('includes isDraft in the request body', async () => {
+      fetchWithToken.mockResolvedValueOnce(
+        makeResponse({
+          status: 200,
+          body: { branchName: 'feature/test' },
+        })
+      );
+
+      await client.executeEditorialWorkflow({
+        branchName: 'feature/test',
+        baseBranch: 'main',
+        isDraft: false,
+      });
+
+      const requestBody = JSON.parse(fetchWithToken.mock.calls[0][1].body);
+      expect(requestBody).toMatchObject({
+        branchName: 'feature/test',
+        baseBranch: 'main',
+        isDraft: false,
+      });
+    });
+
     it('polls until the workflow completes', async () => {
       const onStatusUpdate = vi.fn();
 
