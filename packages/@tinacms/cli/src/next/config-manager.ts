@@ -390,7 +390,6 @@ export class ConfigManager {
     // `build.externalDependencies` in tina/config.ts. See external-resolver.ts
     // for the merge rules and rationale.
     const external = resolveDatabaseExternals(this.config);
-    const esbuildRootPath = path.resolve(this.rootPath);
     // Construct the esbuild options via a pure helper so the externalize /
     // output-path contract is locked down by unit tests in
     // build-database-esbuild-config.test.ts (see #6785).
@@ -399,7 +398,6 @@ export class ConfigManager {
         buildDatabaseEsbuildConfig({
           entryPoint: this.selfHostedDatabaseFilePath,
           outfile,
-          absWorkingDir: esbuildRootPath,
           external,
           loader: loaders,
         })
@@ -408,7 +406,10 @@ export class ConfigManager {
       // database.ts imports @tinacms/datalayer, so the same parent-directory
       // package-manager artifacts that break config resolution surface here as
       // `Could not resolve "@tinacms/datalayer"`. Add the same guidance.
-      throw formatConfigBuildError({ error: e, rootPath: esbuildRootPath });
+      throw formatConfigBuildError({
+        error: e,
+        rootPath: path.resolve(this.rootPath),
+      });
     }
     const result = await import(pathToFileURL(outfile).href);
     // Remove the build subdir + reap the timestamp parent if it's now empty
@@ -438,7 +439,8 @@ export class ConfigManager {
     const esmRequireBanner = {
       js: `import { createRequire } from 'module';const require = createRequire(import.meta.url);`,
     };
-    const esbuildRootPath = path.resolve(this.rootPath);
+    // Absolute project root, shown in the resolve-failure guidance message only.
+    const resolvedRootPath = path.resolve(this.rootPath);
 
     fs.outputFileSync(tempTSConfigFile, '{}');
     let result2: esbuild.BuildResult<{ metafile: true }>;
@@ -455,10 +457,9 @@ export class ConfigManager {
         outfile: preBuildConfigPath,
         loader: loaders,
         metafile: true,
-        absWorkingDir: esbuildRootPath,
       });
     } catch (e) {
-      throw formatConfigBuildError({ error: e, rootPath: esbuildRootPath });
+      throw formatConfigBuildError({ error: e, rootPath: resolvedRootPath });
     }
     const flattenedList = [];
 
@@ -480,7 +481,6 @@ export class ConfigManager {
         outfile,
         loader: loaders,
         banner: esmRequireBanner,
-        absWorkingDir: esbuildRootPath,
       });
       await esbuild.build({
         entryPoints: [outfile],
@@ -491,10 +491,9 @@ export class ConfigManager {
         format: 'esm',
         outfile: outfile2,
         loader: loaders,
-        absWorkingDir: path.dirname(outfile),
       });
     } catch (e) {
-      throw formatConfigBuildError({ error: e, rootPath: esbuildRootPath });
+      throw formatConfigBuildError({ error: e, rootPath: resolvedRootPath });
     }
     let result: { default: any };
     try {

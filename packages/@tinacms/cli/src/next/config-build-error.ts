@@ -1,8 +1,16 @@
+type EsbuildMessageLike = {
+  text?: string;
+  location?: {
+    file?: string;
+    line?: number;
+    column?: number;
+    lineText?: string;
+  } | null;
+};
+
 type EsbuildErrorLike = {
   message?: string;
-  errors?: Array<{
-    text?: string;
-  }>;
+  errors?: EsbuildMessageLike[];
 };
 
 const isObject = (value: unknown): value is Record<string, unknown> =>
@@ -47,8 +55,20 @@ const getUnresolvedTinaPackage = (error: unknown): string | null => {
   return targets.find(isTinaPackage) ?? null;
 };
 
-export const isTinacmsResolveError = (error: unknown): boolean =>
-  getUnresolvedTinaPackage(error) !== null;
+// esbuild attaches the failing import's location — file, line, column, and the
+// offending source line — to the structured error entry. Grab it from the entry
+// that reports the TinaCMS resolution failure so the rewritten message can keep
+// the precise "which import, which file" detail alongside the guidance.
+const getResolveLocation = (error: unknown): EsbuildMessageLike['location'] => {
+  if (!isObject(error)) {
+    return null;
+  }
+  const esbuildError = error as EsbuildErrorLike;
+  const entry = (esbuildError.errors ?? []).find((item) =>
+    collectResolveTargets(item.text).some(isTinaPackage)
+  );
+  return entry?.location ?? null;
+};
 
 export const formatConfigBuildError = ({
   error,
@@ -62,14 +82,31 @@ export const formatConfigBuildError = ({
     return error;
   }
 
-  return new Error(
-    [
-      `Unable to resolve the "${unresolvedPackage}" package while building your Tina config.`,
+  const lines = [
+    `Unable to resolve the "${unresolvedPackage}" package while building your Tina config.`,
+    '',
+    `Tina looked from: ${rootPath}`,
+  ];
+
+  const location = getResolveLocation(error);
+  if (location?.file) {
+    const position = [location.line, location.column]
+      .filter((value): value is number => typeof value === 'number')
+      .join(':');
+    lines.push(
       '',
-      `Tina looked from: ${rootPath}`,
-      '',
-      'Make sure the TinaCMS packages are installed in this project and that you are running the CLI from the project root.',
-      'If they are installed, check parent directories for package-manager files that can interfere with module resolution, such as package.json, node_modules, yarn.lock, or .pnp.cjs.',
-    ].join('\n')
+      `Failing import: ${location.file}${position ? `:${position}` : ''}`
+    );
+    if (location.lineText) {
+      lines.push(`  ${location.lineText.trim()}`);
+    }
+  }
+
+  lines.push(
+    '',
+    'Make sure the TinaCMS packages are installed in this project and that you are running the CLI from the project root.',
+    'If they are installed, check parent directories for package-manager files that can interfere with module resolution, such as package.json, node_modules, yarn.lock, or .pnp.cjs.'
   );
+
+  return new Error(lines.join('\n'));
 };

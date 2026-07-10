@@ -30,8 +30,6 @@ export const buildDatabaseEsbuildConfig = (opts: {
   entryPoint: string;
   /** Where esbuild writes the bundled `.mjs`. Must be inside the project tree. */
   outfile: string;
-  /** Project root used for esbuild package resolution. */
-  absWorkingDir: string;
   /** Externalized package names (must include `better-sqlite3` baseline). */
   external: string[];
   /** Loader map shared with the rest of the CLI (asset extensions, .ts/.tsx, etc.). */
@@ -42,7 +40,6 @@ export const buildDatabaseEsbuildConfig = (opts: {
   platform: 'node',
   format: 'esm',
   outfile: opts.outfile,
-  absWorkingDir: opts.absWorkingDir,
   loader: opts.loader,
   external: opts.external,
   // Provide a require() polyfill for ESM bundles containing CommonJS packages.
