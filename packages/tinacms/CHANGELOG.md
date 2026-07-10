@@ -1,5 +1,13 @@
 # tinacms
 
+## 3.10.1
+
+### Patch Changes
+
+- Updated dependencies [[`4b4e139`](https://github.com/tinacms/tinacms/commit/4b4e1395c8c2a1a4a9d95daad397dbcfff64e47d)]:
+  - @tinacms/mdx@2.1.10
+  - @tinacms/search@1.2.22
+
 ## 3.10.0
 
 ### Minor Changes
