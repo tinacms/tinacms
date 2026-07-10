@@ -1,31 +1,30 @@
 import type { Form } from '@toolkit/forms';
+import { Button } from '@toolkit/styles';
+import { cn } from '@utils/cn';
+import { FORM_ERROR } from 'final-form';
+import { FileStack } from 'lucide-react';
 import * as React from 'react';
 import { type FC, useEffect } from 'react';
-import { FORM_ERROR } from 'final-form';
 import { Form as FinalForm } from 'react-final-form';
-import { Button } from '@toolkit/styles';
+import { FaCircle } from 'react-icons/fa';
+import {
+  EditorialWorkflowSaveEvent,
+  FormResetEvent,
+  SaveContentErrorEvent,
+  SavedContentEvent,
+} from '../../lib/posthog/posthog';
+import { captureEvent } from '../../lib/posthog/posthogProvider';
 import {
   DragDropContext,
   type DropResult,
 } from '../fields/plugins/dnd-kit-wrapper';
-import { FaCircle } from 'react-icons/fa';
-import { cn } from '@utils/cn';
-import { FileStack } from 'lucide-react';
 import { useCMS } from '../react-core';
+import { BranchDeletedModal } from './branch-deleted-modal';
+import { CreateBranchModal } from './create-branch-modal';
 import { FieldsBuilder } from './fields-builder';
 import { FormActionMenu } from './form-actions';
 import { FormPortalProvider } from './form-portal';
-import { LoadingDots } from './loading-dots';
 import { ResetForm } from './reset-form';
-import { CreateBranchModal } from './create-branch-modal';
-import { BranchDeletedModal } from './branch-deleted-modal';
-import {
-  SavedContentEvent,
-  SaveContentErrorEvent,
-  EditorialWorkflowSaveEvent,
-  FormResetEvent,
-} from '../../lib/posthog/posthog';
-import { captureEvent } from '../../lib/posthog/posthogProvider';
 import type { SaveChoice } from './save-options';
 
 export interface FormBuilderProps {
@@ -353,11 +352,10 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                       <Button
                         onClick={safeHandleSubmit}
                         disabled={!canSubmit || isGuardChecking}
-                        busy={submitting || isGuardChecking}
+                        busy={submitting}
                         variant='primary'
                       >
-                        {submitting && <LoadingDots />}
-                        {!submitting && tinaForm.buttons.save}
+                        {tinaForm.buttons.save}
                       </Button>
                       {tinaForm.actions.length > 0 && (
                         <FormActionMenu
