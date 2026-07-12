@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 import os from 'os';
-import { pathToFileURL } from 'url';
+import { pathToFileURL } from 'node:url';
 import * as esbuild from 'esbuild';
 import type { Loader } from 'esbuild';
 import { Config } from '@tinacms/schema-tools';
@@ -430,6 +430,11 @@ export class ConfigManager {
       js: `import { createRequire } from 'module';const require = createRequire(import.meta.url);`,
     };
 
+    // Externalize react/react-dom from the config build so they're resolved from
+    // the project's node_modules at runtime. This resolves CJS interop issues with
+    // the createRequire polyfill.
+    const configExternalPackages = ['react', 'react-dom', 'react-dom/client'];
+
     fs.outputFileSync(tempTSConfigFile, '{}');
     const result2 = await esbuild.build({
       entryPoints: [configFilePath],
@@ -463,6 +468,7 @@ export class ConfigManager {
       outfile,
       loader: loaders,
       banner: esmRequireBanner,
+      external: configExternalPackages,
     });
     await esbuild.build({
       entryPoints: [outfile],
@@ -473,6 +479,7 @@ export class ConfigManager {
       format: 'esm',
       outfile: outfile2,
       loader: loaders,
+      external: configExternalPackages,
     });
     let result: { default: any };
     try {

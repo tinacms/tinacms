@@ -398,6 +398,7 @@ const addDependencies = async (
     npm: `npm install ${deps.join(' ')}`,
     yarn: `yarn add ${deps.join(' ')}`,
     bun: `bun add ${deps.join(' ')}`,
+    deno: `deno install ${deps.join(' ')}`,
   };
 
   if (packageManagers[packageManager] && deps.length > 0) {
@@ -415,6 +416,7 @@ const addDependencies = async (
       npm: `npm install -D ${devDeps.join(' ')}`,
       yarn: `yarn add -D ${devDeps.join(' ')}`,
       bun: `bun add -D ${devDeps.join(' ')}`,
+      deno: `deno add -D ${devDeps.join(' ')}`,
     };
     if (packageManagers[packageManager]) {
       logger.info(
@@ -643,6 +645,7 @@ const other = ({ packageManager }: { packageManager: string }) => {
     npm: `npx`, // npx is the way to run executables that aren't in your "scripts"
     yarn: `yarn`,
     bun: `bun run`,
+    deno: `deno run`,
   };
   return `${packageManagers[packageManager]} tinacms dev -c "<your dev command>"`;
 };
@@ -653,6 +656,7 @@ const runDevScript = ({ packageManager }: { packageManager: string }) => {
     npm: `npm run`,
     yarn: `yarn`,
     bun: `bun run`,
+    deno: `deno run`,
   };
   return `${packageManagers[packageManager]} dev`;
 };
