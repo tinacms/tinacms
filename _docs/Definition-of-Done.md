@@ -11,7 +11,7 @@ An issue can be considered "done" when the following criteria are met:
 7. TinaCloud has been updated if affected
 8. The starter templates have been updated if they are affected:
    1. [tina-self-hosted-demo](https://github.com/tinacms/tina-self-hosted-demo)
-   2. [tina-barebones-starter](https://github.com/tinacms/tina-barebones-starter)
+   2. [tina-react-starter](https://github.com/tinacms/tina-react-starter)
    3. [tina-nextjs-starter](https://github.com/tinacms/tina-nextjs-starter)
 9. All user and developer documentation has been updated, including:
    1. [README.md](/README.md)
