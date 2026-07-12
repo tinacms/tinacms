@@ -171,7 +171,7 @@ export const TEMPLATES: Template[] = [
   {
     title: 'React Starter',
     description:
-      'Stripped down to essentials, this starter is the canvas for pure, unadulterated code creativity. Built with Next.js.',
+      'Stripped down to essentials, this starter is the canvas for pure, unadulterated code creativity. Built with Vite and React.',
     value: 'basic',
     isInternal: false,
     features: [
