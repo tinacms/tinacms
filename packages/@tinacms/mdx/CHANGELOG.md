@@ -1,5 +1,11 @@
 # @tinacms/mdx
 
+## 2.1.10
+
+### Patch Changes
+
+- [#7173](https://github.com/tinacms/tinacms/pull/7173) [`4b4e139`](https://github.com/tinacms/tinacms/commit/4b4e1395c8c2a1a4a9d95daad397dbcfff64e47d) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Preserve markdown table alignment positions when only later columns are explicitly aligned.
+
 ## 2.1.9
 
 ### Patch Changes

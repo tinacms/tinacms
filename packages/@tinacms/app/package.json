@@ -1,6 +1,6 @@
 {
 	"name": "@tinacms/app",
-	"version": "2.5.8",
+	"version": "2.5.9",
 	"main": "src/main.tsx",
 	"files": [
 		"src",
