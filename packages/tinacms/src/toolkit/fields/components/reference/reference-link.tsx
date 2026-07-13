@@ -1,6 +1,6 @@
 import type { TinaCMS } from '@toolkit/tina-cms';
+import { Edit } from 'lucide-react';
 import * as React from 'react';
-import { BiEdit } from 'react-icons/bi';
 import {
   Document,
   ReferenceLinkProps,
@@ -87,7 +87,7 @@ const ReferenceLink: React.FC<ReferenceLinkProps> = ({ cms, input }) => {
             }}
             className='text-gray-700 hover:text-blue-500 flex items-center uppercase text-sm mt-2 mb-2 leading-none'
           >
-            <BiEdit className='h-5 w-auto opacity-80 mr-2' />
+            <Edit className='h-5 w-auto opacity-80 mr-2' />
             Edit
           </button>
         ) : (
@@ -99,7 +99,7 @@ const ReferenceLink: React.FC<ReferenceLinkProps> = ({ cms, input }) => {
             }/~/${filenameWithoutExt}`}
             className='text-gray-700 hover:text-blue-500 inline-flex items-center uppercase text-sm mt-2 mb-2 leading-none'
           >
-            <BiEdit className='h-5 w-auto opacity-80 mr-2' />
+            <Edit className='h-5 w-auto opacity-80 mr-2' />
             Edit in CMS
           </a>
         );

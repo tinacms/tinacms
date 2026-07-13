@@ -1187,9 +1187,6 @@ importers:
       '@headlessui/react':
         specifier: 2.1.8
         version: 2.1.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@heroicons/react':
-        specifier: ^1.0.6
-        version: 1.0.6(react@18.3.1)
       '@monaco-editor/react':
         specifier: 'catalog:'
         version: 4.7.0-rc.0(monaco-editor@0.31.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1205,6 +1202,9 @@ importers:
       graphql:
         specifier: 15.8.0
         version: 15.8.0
+      lucide-react:
+        specifier: 'catalog:'
+        version: 0.424.0(react@18.3.1)
       monaco-editor:
         specifier: 'catalog:'
         version: 0.31.0
@@ -2219,9 +2219,6 @@ importers:
       '@headlessui/react':
         specifier: 2.1.8
         version: 2.1.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@heroicons/react':
-        specifier: ^1.0.6
-        version: 1.0.6(react@18.3.1)
       '@monaco-editor/react':
         specifier: 'catalog:'
         version: 4.7.0-rc.0(monaco-editor@0.31.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2417,9 +2414,6 @@ importers:
       react-final-form:
         specifier: 'catalog:'
         version: 6.5.9(final-form@4.20.10)(react@18.3.1)
-      react-icons:
-        specifier: ^5.4.0
-        version: 5.5.0(react@18.3.1)
       react-router-dom:
         specifier: 'catalog:'
         version: 6.30.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -5279,11 +5273,6 @@ packages:
     peerDependencies:
       react: ^18
       react-dom: ^18
-
-  '@heroicons/react@1.0.6':
-    resolution: {integrity: sha512-JJCXydOFWMDpCP4q13iEplA503MQO3xLoZiKum+955ZCtHINWnx26CUxVxxFQu/uLb4LW3ge15ZpzIkXKkJ8oQ==}
-    peerDependencies:
-      react: '>= 16'
 
   '@hookform/resolvers@5.4.0':
     resolution: {integrity: sha512-EIsqr/t/qbinPIhGjMdtvutIN1Kk4uwbROE9/UQ93CAVGR7GkA7Y92+fX80OzXi/OB67jVFYwKGO1WzkxmkFZw==}
@@ -14226,11 +14215,6 @@ packages:
     peerDependencies:
       react: '*'
 
-  react-icons@5.5.0:
-    resolution: {integrity: sha512-MEFcXdkP3dLo8uumGI5xN3lDFNsRtrjbOEKDLD7yv76v4wpnEq2Lt2qeHaQOr34I/wPN3s3+N08WkQ+CW37Xiw==}
-    peerDependencies:
-      react: '*'
-
   react-icons@5.6.0:
     resolution: {integrity: sha512-RH93p5ki6LfOiIt0UtDyNg/cee+HLVR6cHHtW3wALfo+eOHTp8RnU2kRkI6E+H19zMIs03DyxUG/GfZMOGvmiA==}
     peerDependencies:
@@ -19851,10 +19835,6 @@ snapshots:
       '@tanstack/react-virtual': 3.13.13(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-
-  '@heroicons/react@1.0.6(react@18.3.1)':
-    dependencies:
-      react: 18.3.1
 
   '@hookform/resolvers@5.4.0(react-hook-form@7.80.0(react@19.2.7))':
     dependencies:
@@ -31245,10 +31225,6 @@ snapshots:
       react: 19.2.7
 
   react-icons@4.12.0(react@18.3.1):
-    dependencies:
-      react: 18.3.1
-
-  react-icons@5.5.0(react@18.3.1):
     dependencies:
       react: 18.3.1
 

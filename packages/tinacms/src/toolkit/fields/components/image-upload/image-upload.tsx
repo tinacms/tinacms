@@ -2,18 +2,18 @@
 
 */
 
-import * as React from 'react';
-import * as dropzone from 'react-dropzone';
-import { IconButton } from '@toolkit/styles';
-import { TrashIcon } from '@toolkit/icons';
-import { LoadingDots } from '@toolkit/form-builder';
-import { useCMS } from '@toolkit/react-tinacms/use-cms';
 import {
   DEFAULT_MEDIA_UPLOAD_TYPES,
   dropzoneAcceptFromString,
   isImage,
 } from '@toolkit/components/media/utils';
-import { BiFileBlank } from 'react-icons/bi';
+import { LoadingDots } from '@toolkit/form-builder';
+import { TrashIcon } from '@toolkit/icons';
+import { useCMS } from '@toolkit/react-tinacms/use-cms';
+import { IconButton } from '@toolkit/styles';
+import { File } from 'lucide-react';
+import * as React from 'react';
+import * as dropzone from 'react-dropzone';
 
 const { useDropzone } = dropzone;
 
@@ -43,7 +43,7 @@ export const StyledFile = ({ src }) => {
   return (
     <div className='max-w-full w-full flex-1 flex justify-start items-center gap-3'>
       <div className='w-12 h-12 bg-white shadow border border-gray-100 rounded flex justify-center flex-none'>
-        <BiFileBlank className='w-3/5 h-full fill-gray-300' />
+        <File className='w-3/5 h-full text-gray-300' />
       </div>
       <span className='text-base text-left flex-1 text-gray-500 w-full break-words truncate'>
         {src}

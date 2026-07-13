@@ -6,7 +6,7 @@ import {
   ComboboxOptions,
   Transition,
 } from '@headlessui/react';
-import { ChevronDownIcon } from '@heroicons/react/solid';
+import { ChevronDown } from 'lucide-react';
 import React, { Fragment } from 'react';
 import { classNames } from './helpers';
 
@@ -59,10 +59,7 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({
             onClick={(ev) => ev.stopPropagation()}
           />
           <ComboboxButton className='absolute inset-y-0 right-0 flex items-center pr-2'>
-            <ChevronDownIcon
-              className='h-5 w-5 text-gray-400'
-              aria-hidden='true'
-            />
+            <ChevronDown className='h-5 w-5 text-gray-400' aria-hidden='true' />
           </ComboboxButton>
         </div>
       </div>

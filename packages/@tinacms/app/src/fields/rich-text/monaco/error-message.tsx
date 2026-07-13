@@ -4,7 +4,7 @@ import {
   PopoverPanel,
   Transition,
 } from '@headlessui/react';
-import { XCircleIcon } from '@heroicons/react/solid';
+import { CircleX } from 'lucide-react';
 /**
 
 
@@ -81,7 +81,7 @@ export function ErrorMessage({ error }: { error: InvalidMarkdownElement }) {
             }`}
           >
             <span className='sr-only'>Errors</span>
-            <XCircleIcon className='h-5 w-5 text-red-400' aria-hidden='true' />
+            <CircleX className='h-5 w-5 text-red-400' aria-hidden='true' />
           </PopoverButton>
           <Transition
             enter='transition ease-out duration-200'
@@ -96,7 +96,7 @@ export function ErrorMessage({ error }: { error: InvalidMarkdownElement }) {
                 <div className='rounded bg-red-50 p-4 overflow-scroll'>
                   <div className='flex'>
                     <div className='flex-shrink-0'>
-                      <XCircleIcon
+                      <CircleX
                         className='h-5 w-5 text-red-400'
                         aria-hidden='true'
                       />

@@ -18,9 +18,8 @@ import { FormBuilder, FormStatus } from '@toolkit/form-builder';
 import type { Form } from '@toolkit/forms';
 import type { FormMetaPlugin } from '@toolkit/plugin-form-meta';
 import { useCMS } from '@toolkit/react-core';
-import { History } from 'lucide-react';
+import { ArrowLeft, History } from 'lucide-react';
 import * as React from 'react';
-import { BiArrowBack } from 'react-icons/bi';
 import {
   Tooltip,
   TooltipContent,
@@ -346,7 +345,7 @@ const CollectionBreadcrumbItem = ({
           aria-label={`Back to ${label}`}
           className='flex items-center gap-1.5 min-w-0'
         >
-          <BiArrowBack className='w-4 h-4 shrink-0 opacity-80' />
+          <ArrowLeft className='w-4 h-4 shrink-0 opacity-80' />
           <span className='truncate min-w-0'>{label}</span>
         </button>
       </BreadcrumbLink>

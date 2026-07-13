@@ -3,18 +3,19 @@ import { BaseTextField, Input } from '@toolkit/fields';
 import { LoadingDots } from '@toolkit/form-builder';
 import { useCMS } from '@toolkit/react-core';
 import { Button } from '@toolkit/styles';
-import * as React from 'react';
-import { AiFillWarning } from 'react-icons/ai';
 import {
-  BiError,
-  BiGitBranch,
-  BiPlus,
-  BiRefresh,
-  BiSearch,
-} from 'react-icons/bi';
-import { FaSpinner } from 'react-icons/fa';
-import { GrCircleQuestion } from 'react-icons/gr';
-import { MdArrowForward, MdOutlineClear } from 'react-icons/md';
+  ArrowRight,
+  CircleAlert,
+  CircleHelp,
+  GitBranch,
+  Loader2,
+  Plus,
+  RefreshCw,
+  Search,
+  TriangleAlert,
+  X,
+} from 'lucide-react';
+import * as React from 'react';
 import { useBranchData } from './branch-data';
 import { Branch, BranchSwitcherProps } from './types';
 
@@ -134,7 +135,7 @@ export const BranchSwitcherLegacy = ({
         {isLocalMode ? (
           <div className='px-6 py-8 w-full h-full flex flex-col items-center justify-center'>
             <p className='text-base mb-4 text-center'>
-              <AiFillWarning className='w-7 h-auto inline-block mr-0.5 opacity-70 text-yellow-600' />
+              <TriangleAlert className='w-7 h-auto inline-block mr-0.5 opacity-70 text-yellow-600' />
             </p>
             <p className='text-base mb-6 text-center'>
               Tina's branch switcher isn't available in local mode.{' '}
@@ -153,7 +154,7 @@ export const BranchSwitcherLegacy = ({
                 as='a'
               >
                 Read Our Docs{' '}
-                <MdArrowForward className='w-5 h-auto ml-1.5 opacity-80' />
+                <ArrowRight className='w-5 h-auto ml-1.5 opacity-80' />
               </Button>
             </p>
           </div>
@@ -180,7 +181,7 @@ export const BranchSwitcherLegacy = ({
                   An error occurred while retrieving the branch list.
                 </p>
                 <Button className='mb-4' onClick={refreshBranchList}>
-                  Try again <BiRefresh className='w-6 h-full ml-1 opacity-70' />
+                  Try again <RefreshCw className='w-6 h-full ml-1 opacity-70' />
                 </Button>
               </div>
             )}
@@ -245,7 +246,7 @@ const BranchSelector = ({
           onChange={(e) => setFilter(e.target.value)}
         />
         {filter === '' ? (
-          <BiSearch className='absolute right-3 top-1/2 -translate-y-1/2 w-5 h-auto text-blue-500 opacity-70 group-hover:opacity-100 transition-all ease-out duration-150' />
+          <Search className='absolute right-3 top-1/2 -translate-y-1/2 w-5 h-auto text-blue-500 opacity-70 group-hover:opacity-100 transition-all ease-out duration-150' />
         ) : (
           <button
             onClick={() => {
@@ -253,7 +254,7 @@ const BranchSelector = ({
             }}
             className='outline-none focus:outline-none bg-transparent border-0 p-0 m-0 absolute right-2.5 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100 transition-all ease-out duration-150'
           >
-            <MdOutlineClear className='w-5 h-auto text-gray-600' />
+            <X className='w-5 h-auto text-gray-600' />
           </button>
         )}
       </div>
@@ -285,31 +286,31 @@ const BranchSelector = ({
                 }}
               >
                 {isCurrentBranch && (
-                  <BiGitBranch className='w-5 h-auto text-blue-500/70' />
+                  <GitBranch className='w-5 h-auto text-blue-500/70' />
                 )}
                 {branch.name}
                 {indexingStatus === 'unknown' && (
                   <span className='flex-1 w-full flex justify-end items-center gap-2 text-blue-500'>
                     <span className='opacity-50 italic'>{`Unknown`}</span>
-                    <GrCircleQuestion className='w-5 h-auto opacity-70' />
+                    <CircleHelp className='w-5 h-auto opacity-70' />
                   </span>
                 )}
                 {indexingStatus === 'inprogress' && (
                   <span className='flex-1 w-full flex justify-end items-center gap-2 text-blue-500'>
                     <span className='opacity-50 italic'>{`Indexing`}</span>
-                    <FaSpinner className='w-5 h-auto opacity-70 animate-spin' />
+                    <Loader2 className='w-5 h-auto opacity-70 animate-spin' />
                   </span>
                 )}
                 {indexingStatus === 'failed' && (
                   <span className='flex-1 w-full flex justify-end items-center gap-2 text-red-500'>
                     <span className='opacity-50 italic'>{`Indexing failed`}</span>
-                    <BiError className='w-5 h-auto opacity-70' />
+                    <CircleAlert className='w-5 h-auto opacity-70' />
                   </span>
                 )}
                 {indexingStatus === 'timeout' && (
                   <span className='flex-1 w-full flex justify-end items-center gap-2 text-red-500'>
                     <span className='opacity-50 italic'>{`Indexing timed out`}</span>
-                    <BiError className='w-5 h-auto opacity-70' />
+                    <CircleAlert className='w-5 h-auto opacity-70' />
                   </span>
                 )}
                 {isCurrentBranch && (
@@ -352,7 +353,7 @@ export const CreateBranch: React.FC<{
           disabled={newBranchName === ''}
           onClick={() => onCreateBranch(newBranchName)}
         >
-          <BiPlus className='w-5 h-auto opacity-70' /> Create Branch
+          <Plus className='w-5 h-auto opacity-70' /> Create Branch
         </Button>
       </div>
     </div>

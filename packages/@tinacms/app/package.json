@@ -29,12 +29,12 @@
 	"dependencies": {
 		"@graphiql/toolkit": "catalog:",
 		"@headlessui/react": "2.1.8",
-		"@heroicons/react": "^1.0.6",
 		"@monaco-editor/react": "catalog:",
 		"@tinacms/mdx": "workspace:*",
 		"final-form": "catalog:",
 		"graphiql": "catalog:",
 		"graphql": "15.8.0",
+		"lucide-react": "catalog:",
 		"monaco-editor": "catalog:",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",

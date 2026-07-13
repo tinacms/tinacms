@@ -1,24 +1,24 @@
-import * as React from 'react';
+import type {
+  FieldFocusEvent,
+  FieldHoverEvent,
+} from '@toolkit/fields/field-events';
 import type { Field, Form } from '@toolkit/forms';
-import { Droppable, Draggable, SortableProvider } from '../dnd-kit-wrapper';
+import { useEvent } from '@toolkit/react-core';
+import { useCMS } from '@toolkit/react-core/use-cms';
+import { Pencil } from 'lucide-react';
+import * as React from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Draggable, Droppable, SortableProvider } from '../dnd-kit-wrapper';
 import {
+  DragHandle,
   GroupLabel,
+  ItemClickTarget,
   ItemDeleteButton,
   ItemHeader,
-  DragHandle,
-  ItemClickTarget,
 } from '../group-list-field-plugin';
-import { useCMS } from '@toolkit/react-core/use-cms';
-import { useEvent } from '@toolkit/react-core';
-import type {
-  FieldHoverEvent,
-  FieldFocusEvent,
-} from '@toolkit/fields/field-events';
+import { EmptyList, ListFieldMeta, ListPanel } from '../list-field-meta';
 import { BlockSelector } from './block-selector';
 import { BlockSelectorBig } from './block-selector-big';
-import { BiPencil } from 'react-icons/bi';
-import { EmptyList, ListFieldMeta, ListPanel } from '../list-field-meta';
-import { useCallback, useEffect, useRef, useState } from 'react';
 
 export interface BlocksFieldDefinititon extends Field {
   component: 'blocks';
@@ -262,7 +262,7 @@ const BlockListItem = ({
                   NEW
                 </span>
               )}
-              <BiPencil className='h-5 w-auto fill-current text-gray-200 group-hover:text-inherit transition-colors duration-150 ease-out' />
+              <Pencil className='h-5 w-auto fill-current text-gray-200 group-hover:text-inherit transition-colors duration-150 ease-out' />
             </ItemClickTarget>
             {(!fixedLength || (fixedLength && !isMin)) && (
               <ItemDeleteButton disabled={isMin} onClick={removeItem} />

@@ -1,8 +1,8 @@
 import { Media } from '@toolkit/core';
-import React from 'react';
-import { BiFile, BiFolder, BiMovie } from 'react-icons/bi';
-import { isImage, isVideo } from './utils';
 import { cn } from '@utils/cn';
+import { Clapperboard, File, Folder } from 'lucide-react';
+import React from 'react';
+import { isImage, isVideo } from './utils';
 
 interface MediaItemProps {
   item: Media & { new?: boolean };
@@ -25,11 +25,11 @@ export const smallCheckerboardStyle = {
 };
 
 export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
-  let FileIcon = BiFile;
+  let FileIcon = File;
   if (item.type === 'dir') {
-    FileIcon = BiFolder;
+    FileIcon = Folder;
   } else if (isVideo(item.src)) {
-    FileIcon = BiMovie;
+    FileIcon = Clapperboard;
   }
   const thumbnail = (item.thumbnails || {})['75x75'];
   return (
@@ -62,7 +62,7 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
           />
         ) : (
           <FileIcon
-            className={`w-1/2 h-full ${item.type === 'dir' ? 'fill-tina-orange' : 'fill-gray-300'}`}
+            className={`w-1/2 h-full ${item.type === 'dir' ? 'text-tina-orange' : 'text-gray-300'}`}
           />
         )}
       </div>
@@ -76,11 +76,11 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
 }
 
 export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
-  let FileIcon = BiFile;
+  let FileIcon = File;
   if (item.type === 'dir') {
-    FileIcon = BiFolder;
+    FileIcon = Folder;
   } else if (isVideo(item.src)) {
-    FileIcon = BiMovie;
+    FileIcon = Clapperboard;
   }
   const thumbnail = (item.thumbnails || {})['400x400'];
   const itemIsImage = isImage(thumbnail);
@@ -120,7 +120,7 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
           ) : (
             <div className='w-full h-full flex flex-col items-center justify-center'>
               <FileIcon
-                className={`w-[40%] h-auto ${item.type === 'dir' ? 'fill-tina-orange' : 'fill-gray-300'}`}
+                className={`w-[40%] h-auto ${item.type === 'dir' ? 'text-tina-orange' : 'text-gray-300'}`}
                 size={40}
               />
             </div>

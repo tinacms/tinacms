@@ -8,13 +8,16 @@ import type { CloudConfigPlugin } from '@toolkit/react-cloud-config';
 import { useCMS, useSubscribable } from '@toolkit/react-core';
 import { type ScreenPlugin, ScreenPluginModal } from '@toolkit/react-screens';
 import { Button } from '@toolkit/styles';
+import {
+  Files,
+  Globe,
+  type LucideIcon,
+  Menu,
+  PanelLeft,
+  Users,
+} from 'lucide-react';
 import * as React from 'react';
 import { useState } from 'react';
-import { BiMenu } from 'react-icons/bi';
-import { ImFilesEmpty, ImUsers } from 'react-icons/im';
-import type { IconType } from 'react-icons/lib';
-import { MdOutlineLanguage } from 'react-icons/md';
-import { PiSidebarSimpleLight } from 'react-icons/pi';
 import type { SidebarState, SidebarStateOptions } from '../sidebar';
 import { BillingWarning, LocalWarning } from './local-warning';
 import { Nav } from './nav';
@@ -311,7 +314,7 @@ const Sidebar = ({
                       setMenuIsOpen(false);
                     }}
                     collection={collection}
-                    Icon={ImUsers}
+                    Icon={Users}
                   />
                 )}
               ></Nav>
@@ -389,7 +392,7 @@ const SidebarHeader = ({ isLocalMode }) => {
               title='Open navigation menu'
               aria-label='Open navigation menu'
             >
-              <BiMenu className='h-8 w-auto text-gray-600' />
+              <Menu className='h-8 w-auto text-gray-600' />
             </button>
             <TinaIcon className='self-center h-10 min-w-10 w-auto text-orange-500 mr-2' />
             <BranchButton className='overflow-hidden mr-2' />
@@ -406,7 +409,7 @@ const SidebarHeader = ({ isLocalMode }) => {
               title='Hide editing panel'
               aria-label='Hide editing panel'
             >
-              <PiSidebarSimpleLight className='h-6 w-auto text-gray-600' />
+              <PanelLeft className='h-6 w-auto text-gray-600' />
             </button>
           </div>
         </div>
@@ -455,18 +458,18 @@ const SidebarGlobalLink = ({
       href={href}
       className='text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100'
     >
-      <MdOutlineLanguage className='mr-2 h-6 opacity-80 w-auto' />{' '}
+      <Globe className='mr-2 h-6 opacity-80 w-auto' />{' '}
       {collection.label ? collection.label : collection.name}
     </a>
   );
 };
 
 const SidebarCollectionLink = ({
-  Icon = ImFilesEmpty,
+  Icon = Files,
   collection,
   onClick,
 }: {
-  Icon?: IconType;
+  Icon?: LucideIcon;
   collection: {
     label: string;
     name: string;
@@ -506,7 +509,7 @@ const EditButton = ({}) => {
       title='Show editing panel'
       aria-label='Show editing panel'
     >
-      <PiSidebarSimpleLight className='h-6 w-auto' />
+      <PanelLeft className='h-6 w-auto' />
     </Button>
   );
 };

@@ -5,7 +5,7 @@ import {
   MenuItems,
   Transition,
 } from '@headlessui/react';
-import { ChevronDownIcon } from '@heroicons/react/solid';
+import { ChevronDown } from 'lucide-react';
 import React from 'react';
 import { classNames } from './helpers';
 
@@ -25,7 +25,7 @@ export function Dropdown({
       <div>
         <MenuButton className='inline-flex justify-center w-full rounded border border-gray-300 shadow-sm px-2 py-1 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-blue-500'>
           {label}
-          <ChevronDownIcon className='-mr-1 ml-2 h-4 w-4' aria-hidden='true' />
+          <ChevronDown className='-mr-1 ml-2 h-4 w-4' aria-hidden='true' />
         </MenuButton>
       </div>
 

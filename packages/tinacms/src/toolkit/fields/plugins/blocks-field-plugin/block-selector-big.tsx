@@ -7,11 +7,10 @@ import {
 } from '@headlessui/react';
 import { useFormPortal } from '@toolkit/form-builder';
 import { AddIcon } from '@toolkit/icons';
-import { IconButton } from '@toolkit/styles';
 import { useCMS } from '@toolkit/react-core';
+import { IconButton } from '@toolkit/styles';
+import { ChevronDown, Search, X } from 'lucide-react';
 import * as React from 'react';
-import { BiSearch } from 'react-icons/bi';
-import { MdKeyboardArrowDown, MdOutlineClear } from 'react-icons/md';
 import type { BlockTemplate } from '.';
 import { PanelHeader } from '../group-field-plugin';
 
@@ -159,7 +158,7 @@ export const BlockSelectorBig = ({
                             placeholder='Search'
                           />
                           {filter === '' ? (
-                            <BiSearch className='absolute right-3 top-1/2 -translate-y-1/2 w-5 h-auto text-blue-500 opacity-70 group-hover:opacity-100 transition-all ease-out duration-150' />
+                            <Search className='absolute right-3 top-1/2 -translate-y-1/2 w-5 h-auto text-blue-500 opacity-70 group-hover:opacity-100 transition-all ease-out duration-150' />
                           ) : (
                             <button
                               onClick={() => {
@@ -167,7 +166,7 @@ export const BlockSelectorBig = ({
                               }}
                               className='outline-none focus:outline-none bg-transparent border-0 p-0 m-0 absolute right-2.5 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100 transition-all ease-out duration-150'
                             >
-                              <MdOutlineClear className='w-5 h-auto text-gray-600' />
+                              <X className='w-5 h-auto text-gray-600' />
                             </button>
                           )}
                         </div>
@@ -262,7 +261,7 @@ const BlockGroup = ({ category, templates, close, isLast = false }) => {
               {category}
             </span>
             {templates.length > 0 && (
-              <MdKeyboardArrowDown
+              <ChevronDown
                 className={`absolute top-1/2 right-0 w-6 h-auto -translate-y-1/2 text-gray-300 origin-center group-hover:text-blue-500 transition-all duration-150 ease-out ${
                   open ? `` : `-rotate-90 opacity-70 group-hover:opacity-100`
                 }`}
