@@ -89,6 +89,10 @@ const scalarDefinitions = [
     description: 'References another document, used as a foreign key',
   }),
   astBuilder.ScalarTypeDefinition({ name: 'JSON' }),
+  astBuilder.ScalarTypeDefinition({
+    name: 'RichText',
+    description: 'A rich-text document, renderable by TinaMarkdown',
+  }),
   astBuilder.ObjectTypeDefinition({
     name: 'SystemInfo',
     fields: [

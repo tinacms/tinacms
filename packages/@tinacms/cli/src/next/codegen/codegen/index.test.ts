@@ -6,10 +6,11 @@ import { generateTypes } from './index';
 const schema = buildSchema(`
   scalar JSON
   scalar Reference
+  scalar RichText
 
   type Post {
     title: String!
-    _body: JSON
+    _body: RichText
     _values: JSON!
   }
 
@@ -32,16 +33,22 @@ describe('generateTypes', () => {
     );
   });
 
-  it('types the JSON scalar as `any`', () => {
-    // Rich-text bodies ride on JSON and get passed straight to <TinaMarkdown/>,
-    // which takes TinaMarkdownContent. `unknown` — graphql-codegen's default for
-    // unmapped scalars — does not assign to that, so every consumer would break.
-    expect(types).toContain('JSON: { input: any; output: any; }');
-    expect(types).not.toMatch(/JSON: \{ input: unknown/);
+  it('types rich-text as TinaMarkdownContent, not an opaque blob', () => {
+    expect(types).toContain(
+      'RichText: { input: TinaMarkdownContent; output: TinaMarkdownContent; }'
+    );
+    expect(types).toContain(
+      "import type { TinaMarkdownContent } from 'tinacms/dist/rich-text';"
+    );
   });
 
-  it('types the Reference scalar as `any`', () => {
-    expect(types).toContain('Reference: { input: any; output: any; }');
+  it('types the JSON scalar as `unknown` — it carries arbitrary values', () => {
+    expect(types).toContain('JSON: { input: unknown; output: unknown; }');
+    expect(types).not.toMatch(/JSON: \{ input: any/);
+  });
+
+  it('types the Reference scalar as `unknown`', () => {
+    expect(types).toContain('Reference: { input: unknown; output: unknown; }');
   });
 
   it('exports the helper types the generated module has always exported', () => {

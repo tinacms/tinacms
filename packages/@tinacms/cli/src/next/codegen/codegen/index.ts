@@ -14,6 +14,10 @@ import { plugin as typescriptPlugin } from '@graphql-codegen/typescript';
 // Docs: https://www.graphql-code-generator.com/docs/plugins/typescript-generic-sdk
 import { plugin as typescriptSdkPlugin } from './sdkPlugin';
 
+/** The RichText scalar maps to this, so the generated module has to import it. */
+const importRichTextType = (types: string) =>
+  `import type { TinaMarkdownContent } from 'tinacms/dist/rich-text';\n${types}`;
+
 /** codegen declares `Exact` but keeps it local; `types.ts` has always exported it. */
 const reexportExact = (types: string) => `${types}\nexport type { Exact };\n`;
 
@@ -36,9 +40,12 @@ export const generateTypes = async (
     schema: parse(printSchema(schema)),
     documents: [...docs, ...fragDocs],
     config: {
-      // The JSON scalar still carries rich-text bodies, which callers pass
-      // straight to <TinaMarkdown/>; codegen's `unknown` default won't assign.
-      defaultScalarType: 'any',
+      scalars: {
+        RichText: 'TinaMarkdownContent',
+      },
+      // What's left on JSON — _values, templates, fields — really is arbitrary,
+      // so it should not pretend to be `any`.
+      defaultScalarType: 'unknown',
     },
     plugins: [
       { typescript: {} },
@@ -61,7 +68,7 @@ export const generateTypes = async (
       AddGeneratedClient: AddGeneratedClient(apiURL),
     },
   });
-  return reexportExact(res);
+  return reexportExact(importRichTextType(res));
 };
 
 const loadGraphQLDocuments = async (globPath: string) => {
