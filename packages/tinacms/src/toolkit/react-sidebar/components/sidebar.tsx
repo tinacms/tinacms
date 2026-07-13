@@ -1,4 +1,4 @@
-import { Transition, TransitionChild } from '@headlessui/react';
+import { Transition, TransitionChild } from '@toolkit/components/transition';
 import { TinaIcon } from '@toolkit/icons';
 import {
   BranchButton,

@@ -28,8 +28,8 @@
 	},
 	"dependencies": {
 		"@graphiql/toolkit": "catalog:",
-		"@headlessui/react": "2.1.8",
 		"@monaco-editor/react": "catalog:",
+		"@radix-ui/react-popover": "^1.1.18",
 		"@tinacms/mdx": "workspace:*",
 		"final-form": "catalog:",
 		"graphiql": "catalog:",

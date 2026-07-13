@@ -1,10 +1,4 @@
-import {
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-  Transition,
-} from '@headlessui/react';
+import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import type { Collection, TinaField } from '@tinacms/schema-tools';
 import {
   ERR_ALREADY_EXISTS,
@@ -90,64 +84,50 @@ const TemplateMenu = ({
   folder: CollectionFolder;
 }) => {
   return (
-    <Menu as='div' className='relative inline-block text-left w-full md:w-auto'>
-      {() => (
-        <div>
-          <div>
-            <MenuButton className='w-full md:w-auto icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded justify-center transition-all duration-150 ease-out  shadow text-white bg-tina-orange-dark hover:bg-tina-orange focus:ring-tina-orange-dark text-sm h-10 px-6'>
-              Create New <Plus className='w-5 h-full ml-1 opacity-70' />
-            </MenuButton>
-          </div>
-
-          <Transition
-            enter='transition ease-out duration-100'
-            enterFrom='transform opacity-0 scale-95'
-            enterTo='transform opacity-100 scale-100'
-            leave='transition ease-in duration-75'
-            leaveFrom='transform opacity-100 scale-100'
-            leaveTo='transform opacity-0 scale-95'
-          >
-            <MenuItems className='origin-top-right absolute right-0 mt-2 z-menu w-56 rounded shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none'>
-              <div className='py-1'>
-                {templates.map((template) => (
-                  <MenuItem key={`${template.label}-${template.name}`}>
-                    {({ focus }) => (
-                      <Link
-                        to={`/${
-                          folder.fullyQualifiedName
-                            ? [
-                                'collections',
-                                'new',
-                                collectionName,
-                                template.name,
-                                '~',
-                                folder.name,
-                              ].join('/')
-                            : [
-                                'collections',
-                                'new',
-                                collectionName,
-                                template.name,
-                              ].join('/')
-                        }`}
-                        // to={`${template.name}/new`}
-                        className={`w-full text-md px-4 py-2 tracking-wide flex items-center transition ease-out duration-100 ${
-                          focus
-                            ? 'text-blue-600 opacity-100 bg-gray-50'
-                            : 'opacity-80 text-gray-600'
-                        }`}
-                      >
-                        {template.label}
-                      </Link>
-                    )}
-                  </MenuItem>
-                ))}
-              </div>
-            </MenuItems>
-          </Transition>
-        </div>
-      )}
-    </Menu>
+    <DropdownMenuPrimitive.Root>
+      <DropdownMenuPrimitive.Trigger className='w-full md:w-auto icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded justify-center transition-all duration-150 ease-out  shadow text-white bg-tina-orange-dark hover:bg-tina-orange focus:ring-tina-orange-dark text-sm h-10 px-6'>
+        Create New <Plus className='w-5 h-full ml-1 opacity-70' />
+      </DropdownMenuPrimitive.Trigger>
+      <DropdownMenuPrimitive.Portal>
+        <DropdownMenuPrimitive.Content
+          align='end'
+          sideOffset={8}
+          className='z-menu w-56 py-1 rounded shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none'
+        >
+          {templates.map((template) => (
+            // asChild keeps the router <Link>; Radix's data-highlighted replaces
+            // Headless UI's `focus` render prop.
+            <DropdownMenuPrimitive.Item
+              key={`${template.label}-${template.name}`}
+              asChild
+            >
+              <Link
+                to={`/${
+                  folder.fullyQualifiedName
+                    ? [
+                        'collections',
+                        'new',
+                        collectionName,
+                        template.name,
+                        '~',
+                        folder.name,
+                      ].join('/')
+                    : [
+                        'collections',
+                        'new',
+                        collectionName,
+                        template.name,
+                      ].join('/')
+                }`}
+                className='w-full text-md px-4 py-2 tracking-wide flex items-center transition ease-out duration-100 cursor-pointer opacity-80 text-gray-600 data-[highlighted]:text-blue-600 data-[highlighted]:opacity-100 data-[highlighted]:bg-gray-50'
+              >
+                {template.label}
+              </Link>
+            </DropdownMenuPrimitive.Item>
+          ))}
+        </DropdownMenuPrimitive.Content>
+      </DropdownMenuPrimitive.Portal>
+    </DropdownMenuPrimitive.Root>
   );
 };
 

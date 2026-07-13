@@ -1,10 +1,4 @@
-import {
-  Disclosure,
-  DisclosureButton,
-  DisclosurePanel,
-  Transition,
-  TransitionChild,
-} from '@headlessui/react';
+import { Transition, TransitionChild } from '@toolkit/components/transition';
 import { useFormPortal } from '@toolkit/form-builder';
 import { AddIcon } from '@toolkit/icons';
 import { useCMS } from '@toolkit/react-core';
@@ -236,65 +230,62 @@ export const BlockSelectorBig = ({
 };
 
 const BlockGroup = ({ category, templates, close, isLast = false }) => {
-  return (
-    <Disclosure
-      defaultOpen={true}
-      as='div'
-      className={`left-0 right-0 relative`}
-    >
-      {({ open }) => (
-        <>
-          <DisclosureButton
-            className={`relative block group text-left w-full text-base font-bold tracking-wide py-2 truncate ${
-              templates.length === 0 ? `pointer-events-none` : ``
-            } ${
-              !isLast &&
-              (!open || templates.length === 0) &&
-              `border-b border-gray-100`
-            }`}
-          >
-            <span
-              className={`text-gray-500 group-hover:text-gray-800 transition-all ease-out duration-150 ${
-                templates.length === 0 ? `opacity-50` : ``
-              }`}
-            >
-              {category}
-            </span>
-            {templates.length > 0 && (
-              <ChevronDown
-                className={`absolute top-1/2 right-0 w-6 h-auto -translate-y-1/2 text-gray-300 origin-center group-hover:text-blue-500 transition-all duration-150 ease-out ${
-                  open ? `` : `-rotate-90 opacity-70 group-hover:opacity-100`
-                }`}
-              />
-            )}
-          </DisclosureButton>
+  // Was a Headless UI <Disclosure defaultOpen>; it's a plain collapsible.
+  const [open, setOpen] = React.useState(true);
 
-          <Transition
-            enter='transition duration-100 ease-out'
-            enterFrom='transform scale-95 opacity-0'
-            enterTo='transform scale-100 opacity-100'
-            leave='transition duration-75 ease-out'
-            leaveFrom='transform scale-100 opacity-100'
-            leaveTo='transform scale-95 opacity-0'
-          >
-            <DisclosurePanel>
-              {templates.length > 0 && (
-                <CardColumns>
-                  {templates.map(([name, template], index) => (
-                    <BlockCard
-                      key={index}
-                      close={close}
-                      name={name}
-                      template={template}
-                    />
-                  ))}
-                </CardColumns>
-              )}
-            </DisclosurePanel>
-          </Transition>
-        </>
-      )}
-    </Disclosure>
+  return (
+    <div className='left-0 right-0 relative'>
+      <button
+        type='button'
+        aria-expanded={open}
+        onClick={() => setOpen((wasOpen) => !wasOpen)}
+        className={`relative block group text-left w-full text-base font-bold tracking-wide py-2 truncate ${
+          templates.length === 0 ? `pointer-events-none` : ``
+        } ${
+          !isLast &&
+          (!open || templates.length === 0) &&
+          `border-b border-gray-100`
+        }`}
+      >
+        <span
+          className={`text-gray-500 group-hover:text-gray-800 transition-all ease-out duration-150 ${
+            templates.length === 0 ? `opacity-50` : ``
+          }`}
+        >
+          {category}
+        </span>
+        {templates.length > 0 && (
+          <ChevronDown
+            className={`absolute top-1/2 right-0 w-6 h-auto -translate-y-1/2 text-gray-300 origin-center group-hover:text-blue-500 transition-all duration-150 ease-out ${
+              open ? `` : `-rotate-90 opacity-70 group-hover:opacity-100`
+            }`}
+          />
+        )}
+      </button>
+
+      <Transition
+        show={open}
+        enter='transition duration-100 ease-out'
+        enterFrom='transform scale-95 opacity-0'
+        enterTo='transform scale-100 opacity-100'
+        leave='transition duration-75 ease-out'
+        leaveFrom='transform scale-100 opacity-100'
+        leaveTo='transform scale-95 opacity-0'
+      >
+        {templates.length > 0 && (
+          <CardColumns>
+            {templates.map(([name, template], index) => (
+              <BlockCard
+                key={index}
+                close={close}
+                name={name}
+                template={template}
+              />
+            ))}
+          </CardColumns>
+        )}
+      </Transition>
+    </div>
   );
 };
 

@@ -48,7 +48,6 @@
     "@floating-ui/dom": "catalog:",
     "@floating-ui/react-dom": "catalog:",
     "@graphql-inspector/core": "^6.2.1",
-    "@headlessui/react": "2.1.8",
     "@monaco-editor/react": "catalog:",
     "@radix-ui/react-dialog": "catalog:",
     "@radix-ui/react-dropdown-menu": "catalog:",

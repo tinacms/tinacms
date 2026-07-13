@@ -1,4 +1,4 @@
-import { Transition } from '@headlessui/react';
+import { Transition } from '@toolkit/components/transition';
 import {
   Breadcrumb,
   BreadcrumbEllipsis,
