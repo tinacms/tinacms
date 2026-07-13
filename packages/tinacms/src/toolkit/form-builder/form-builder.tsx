@@ -1,31 +1,30 @@
 import type { Form } from '@toolkit/forms';
+import { Button } from '@toolkit/styles';
+import { cn } from '@utils/cn';
+import { FORM_ERROR } from 'final-form';
+import { Circle, FileStack } from 'lucide-react';
 import * as React from 'react';
 import { type FC, useEffect } from 'react';
-import { FORM_ERROR } from 'final-form';
 import { Form as FinalForm } from 'react-final-form';
-import { Button } from '@toolkit/styles';
+import {
+  EditorialWorkflowSaveEvent,
+  FormResetEvent,
+  SaveContentErrorEvent,
+  SavedContentEvent,
+} from '../../lib/posthog/posthog';
+import { captureEvent } from '../../lib/posthog/posthogProvider';
 import {
   DragDropContext,
   type DropResult,
 } from '../fields/plugins/dnd-kit-wrapper';
-import { FaCircle } from 'react-icons/fa';
-import { cn } from '@utils/cn';
-import { FileStack } from 'lucide-react';
 import { useCMS } from '../react-core';
+import { BranchDeletedModal } from './branch-deleted-modal';
+import { CreateBranchModal } from './create-branch-modal';
 import { FieldsBuilder } from './fields-builder';
 import { FormActionMenu } from './form-actions';
 import { FormPortalProvider } from './form-portal';
 import { LoadingDots } from './loading-dots';
 import { ResetForm } from './reset-form';
-import { CreateBranchModal } from './create-branch-modal';
-import { BranchDeletedModal } from './branch-deleted-modal';
-import {
-  SavedContentEvent,
-  SaveContentErrorEvent,
-  EditorialWorkflowSaveEvent,
-  FormResetEvent,
-} from '../../lib/posthog/posthog';
-import { captureEvent } from '../../lib/posthog/posthogProvider';
 import type { SaveChoice } from './save-options';
 
 export interface FormBuilderProps {
@@ -379,7 +378,8 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 
 export const FormStatus = ({ pristine }: { pristine: boolean }) => {
   const pristineClass = pristine ? 'text-green-500' : 'text-red-500';
-  return <FaCircle className={cn('h-3', pristineClass)} />;
+  // fill-current keeps this a solid status dot; lucide icons are stroke-only by default.
+  return <Circle className={cn('h-3 fill-current', pristineClass)} />;
 };
 
 const RelatedFilesBanner = () => {

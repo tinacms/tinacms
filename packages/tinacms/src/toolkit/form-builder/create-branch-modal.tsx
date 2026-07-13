@@ -1,13 +1,18 @@
-import * as React from 'react';
-import { BiError } from 'react-icons/bi';
+import { FieldLabel } from '@toolkit/fields';
+import { Form } from '@toolkit/forms';
+import { useLocalStorage } from '@toolkit/hooks/use-local-storage';
+import { Button, DropdownButton } from '@toolkit/styles';
 import {
+  CircleAlert,
   Eye,
   FileText,
   GitBranchIcon,
   Globe,
   TriangleAlert,
 } from 'lucide-react';
-import { Button, DropdownButton } from '@toolkit/styles';
+import * as React from 'react';
+import { EditorialWorkflowSaveEvent } from '../../lib/posthog/posthog';
+import { captureEvent } from '../../lib/posthog/posthogProvider';
 import { useCMS } from '../react-core';
 import {
   Modal,
@@ -16,19 +21,14 @@ import {
   ModalHeader,
   PopupModal,
 } from '../react-modals';
-import { FieldLabel } from '@toolkit/fields';
-import { Form } from '@toolkit/forms';
 import { EditorialWorkflowProgressModal } from './editorial-workflow-progress-modal';
 import { checkBaseBranchExists } from './editorial-workflow-utils';
-import { useEditorialWorkflow } from './use-editorial-workflow';
-import { useLocalStorage } from '@toolkit/hooks/use-local-storage';
 import {
   SAVE_CHOICE_KEY,
   type SaveChoice,
   resolveSaveOptions,
 } from './save-options';
-import { EditorialWorkflowSaveEvent } from '../../lib/posthog/posthog';
-import { captureEvent } from '../../lib/posthog/posthogProvider';
+import { useEditorialWorkflow } from './use-editorial-workflow';
 
 // Format the default branch name by removing content/ prefix and file extension
 const formatDefaultBranchName = (
@@ -276,7 +276,7 @@ export const CreateBranchPromptModal = ({
           <div className='max-w-sm'>
             {errorMessage && (
               <div className='flex items-center gap-1 text-red-700 py-2 px-3 mb-4 bg-red-50 border border-red-200 rounded'>
-                <BiError className='w-5 h-auto text-red-400 flex-shrink-0' />
+                <CircleAlert className='w-5 h-auto text-red-400 flex-shrink-0' />
                 <span className='text-sm'>
                   <b>Error:</b> {errorMessage}
                 </span>

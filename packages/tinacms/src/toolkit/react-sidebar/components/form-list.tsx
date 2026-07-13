@@ -1,8 +1,7 @@
 import { useCMS } from '@toolkit/react-tinacms';
 import type { TinaState } from '@toolkit/tina-state';
+import { ChevronRight, FileStack, Folder, FolderOpen, X } from 'lucide-react';
 import * as React from 'react';
-import { BiChevronRight, BiFolder, BiFolderOpen, BiX } from 'react-icons/bi';
-import { FileStack } from 'lucide-react';
 
 type FormListItem = TinaState['formLists'][number]['items'][number];
 
@@ -362,7 +361,7 @@ const TreeNodeComponent = ({
       >
         {/* Expand/collapse arrow for folders */}
         {node.children.length > 0 && (
-          <BiChevronRight
+          <ChevronRight
             className={`w-4 h-4 flex-none text-gray-500 transition-transform duration-150 -ml-1 ${
               isExpanded ? 'rotate-90' : ''
             }`}
@@ -371,9 +370,9 @@ const TreeNodeComponent = ({
 
         {/* Folder icon */}
         {isExpanded ? (
-          <BiFolderOpen className='w-4 h-4 text-orange-500 flex-none' />
+          <FolderOpen className='w-4 h-4 text-orange-500 flex-none' />
         ) : (
-          <BiFolder className='w-4 h-4 text-orange-500 flex-none' />
+          <Folder className='w-4 h-4 text-orange-500 flex-none' />
         )}
 
         {/* Node name */}
@@ -494,7 +493,7 @@ export const FormLists = (props: { lastActiveFormId: string | null }) => {
               className='ml-auto p-1 text-gray-500 hover:text-orange-500 hover:bg-gray-100 rounded transition-all ease-out duration-150'
               title='Close'
             >
-              <BiX className='w-6 h-6' />
+              <X className='w-6 h-6' />
             </button>
           )}
         </div>

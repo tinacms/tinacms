@@ -1,13 +1,11 @@
 import {
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-  Transition,
-} from '@headlessui/react';
-import { ChevronDownIcon } from '@heroicons/react/solid';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@toolkit/components/ui/dropdown-menu';
+import { ChevronDown } from 'lucide-react';
 import React from 'react';
-import { classNames } from './helpers';
 
 export function Dropdown({
   label,
@@ -21,42 +19,31 @@ export function Dropdown({
   }[];
 }) {
   return (
-    <Menu as='div' className='relative inline-block text-left z-20'>
-      <div>
-        <MenuButton className='inline-flex justify-center w-full rounded border border-gray-300 shadow-sm px-2 py-1 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-blue-500'>
-          {label}
-          <ChevronDownIcon className='-mr-1 ml-2 h-4 w-4' aria-hidden='true' />
-        </MenuButton>
-      </div>
-
-      <Transition
-        enter='transition ease-out duration-100'
-        enterFrom='transform opacity-0 scale-95'
-        enterTo='transform opacity-100 scale-100'
-        leave='transition ease-in duration-75'
-        leaveFrom='transform opacity-100 scale-100'
-        leaveTo='transform opacity-0 scale-95'
+    <DropdownMenu>
+      <DropdownMenuTrigger className='inline-flex justify-center w-full rounded border border-gray-300 shadow-sm px-2 py-1 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-blue-500'>
+        {label}
+        <ChevronDown className='-mr-1 ml-2 h-4 w-4' aria-hidden='true' />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        align='end'
+        sideOffset={8}
+        className='w-32 max-h-[200px] overflow-y-auto py-1 rounded shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none'
       >
-        <MenuItems className='origin-top-right absolute right-0 mt-2 w-32 max-h-[200px] overflow-y-auto rounded shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none'>
-          <div className='py-1'>
-            {items.map((item) => (
-              <MenuItem key={item.key}>
-                {({ focus }) => (
-                  <button
-                    onClick={item.onClick}
-                    className={classNames(
-                      focus ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                      'block px-4 py-2 text-xs w-full text-right'
-                    )}
-                  >
-                    {item.render}
-                  </button>
-                )}
-              </MenuItem>
-            ))}
-          </div>
-        </MenuItems>
-      </Transition>
-    </Menu>
+        {items.map((item) => (
+          // asChild keeps the real <button>, so item.onClick still gets a MouseEvent.
+          // Radix marks the hovered/keyboard-focused item with data-highlighted,
+          // which replaces Headless UI's `focus` render prop.
+          <DropdownMenuItem key={item.key} asChild>
+            <button
+              type='button'
+              onClick={item.onClick}
+              className='block px-4 py-2 text-xs w-full text-right cursor-pointer text-gray-700 data-[highlighted]:bg-gray-100 data-[highlighted]:text-gray-900'
+            >
+              {item.render}
+            </button>
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

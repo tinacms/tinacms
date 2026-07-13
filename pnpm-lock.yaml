@@ -75,9 +75,9 @@ catalogs:
     '@iarna/toml':
       specifier: ^2.2.5
       version: 2.2.5
-    '@monaco-editor/react':
-      specifier: 4.7.0-rc.0
-      version: 4.7.0-rc.0
+    '@monaco-editor/loader':
+      specifier: ^1.7.0
+      version: 1.7.0
     '@octokit/rest':
       specifier: ^22.0.1
       version: 22.0.1
@@ -1184,17 +1184,17 @@ importers:
       '@graphiql/toolkit':
         specifier: 'catalog:'
         version: 0.8.4(@types/node@25.1.0)(graphql@15.8.0)
-      '@headlessui/react':
-        specifier: 2.1.8
-        version: 2.1.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@heroicons/react':
         specifier: ^1.0.6
         version: 1.0.6(react@18.3.1)
-      '@monaco-editor/react':
+      '@monaco-editor/loader':
         specifier: 'catalog:'
-        version: 4.7.0-rc.0(monaco-editor@0.31.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 1.7.0
+      '@radix-ui/react-popover':
+        specifier: ^1.1.18
+        version: 1.1.18(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tinacms/mdx':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../mdx
       final-form:
         specifier: 'catalog:'
@@ -1205,9 +1205,9 @@ importers:
       graphql:
         specifier: 15.8.0
         version: 15.8.0
-      monaco-editor:
+      lucide-react:
         specifier: 'catalog:'
-        version: 0.31.0
+        version: 0.424.0(react@18.3.1)
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -1218,11 +1218,8 @@ importers:
         specifier: 'catalog:'
         version: 6.30.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       tinacms:
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../tinacms
-      typescript:
-        specifier: ^5.7.3
-        version: 5.9.3
       zod:
         specifier: 'catalog:'
         version: 3.25.76
@@ -1236,6 +1233,12 @@ importers:
       happy-dom:
         specifier: 'catalog:'
         version: 15.10.2
+      monaco-editor:
+        specifier: 'catalog:'
+        version: 0.31.0
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
       vite:
         specifier: ^5.4.14
         version: 5.4.21(@types/node@25.1.0)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)
@@ -1246,7 +1249,7 @@ importers:
   packages/@tinacms/astro:
     dependencies:
       '@tinacms/bridge':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../bridge
     devDependencies:
       '@tinacms/scripts':
@@ -1352,19 +1355,19 @@ importers:
         specifier: 'catalog:'
         version: 0.5.20(tailwindcss@3.4.19(yaml@2.8.2))
       '@tinacms/app':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../app
       '@tinacms/graphql':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../graphql
       '@tinacms/metrics':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../metrics
       '@tinacms/schema-tools':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../schema-tools
       '@tinacms/search':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../search
       '@vitejs/plugin-react':
         specifier: 'catalog:'
@@ -1454,7 +1457,7 @@ importers:
         specifier: ^3.4.17
         version: 3.4.19(yaml@2.8.2)
       tinacms:
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../tinacms
       typanion:
         specifier: 'catalog:'
@@ -1533,7 +1536,7 @@ importers:
   packages/@tinacms/datalayer:
     dependencies:
       '@tinacms/graphql':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../graphql
     devDependencies:
       '@tinacms/scripts':
@@ -1570,10 +1573,10 @@ importers:
         specifier: 'catalog:'
         version: 2.2.5
       '@tinacms/mdx':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../mdx
       '@tinacms/schema-tools':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../schema-tools
       abstract-level:
         specifier: 'catalog:'
@@ -1688,7 +1691,7 @@ importers:
   packages/@tinacms/mdx:
     dependencies:
       '@tinacms/schema-tools':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../schema-tools
       acorn:
         specifier: 'catalog:'
@@ -1919,10 +1922,10 @@ importers:
   packages/@tinacms/search:
     dependencies:
       '@tinacms/graphql':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../graphql
       '@tinacms/schema-tools':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../schema-tools
       memory-level:
         specifier: 'catalog:'
@@ -1965,7 +1968,7 @@ importers:
         specifier: 'catalog:'
         version: 0.0.5
       tinacms:
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../tinacms
     devDependencies:
       '@tinacms/scripts':
@@ -2045,7 +2048,7 @@ importers:
         specifier: 'catalog:'
         version: 12.29.1
       '@tinacms/auth':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../@tinacms/auth
       sharp:
         specifier: 'catalog:'
@@ -2216,15 +2219,6 @@ importers:
       '@graphql-inspector/core':
         specifier: ^6.2.1
         version: 6.4.1(graphql@15.8.0)
-      '@headlessui/react':
-        specifier: 2.1.8
-        version: 2.1.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@heroicons/react':
-        specifier: ^1.0.6
-        version: 1.0.6(react@18.3.1)
-      '@monaco-editor/react':
-        specifier: 'catalog:'
-        version: 4.7.0-rc.0(monaco-editor@0.31.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-dialog':
         specifier: 'catalog:'
         version: 1.1.18(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2256,16 +2250,16 @@ importers:
         specifier: ^8.21.3
         version: 8.21.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tinacms/bridge':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../@tinacms/bridge
       '@tinacms/mdx':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../@tinacms/mdx
       '@tinacms/schema-tools':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../@tinacms/schema-tools
       '@tinacms/search':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../@tinacms/search
       '@udecode/cmdk':
         specifier: 'catalog:'
@@ -2387,9 +2381,6 @@ importers:
       mermaid:
         specifier: ^11.12.2
         version: 11.12.2
-      monaco-editor:
-        specifier: 'catalog:'
-        version: 0.31.0
       posthog-js:
         specifier: ^1.347.1
         version: 1.347.1
@@ -2417,9 +2408,6 @@ importers:
       react-final-form:
         specifier: 'catalog:'
         version: 6.5.9(final-form@4.20.10)(react@18.3.1)
-      react-icons:
-        specifier: ^5.4.0
-        version: 5.5.0(react@18.3.1)
       react-router-dom:
         specifier: 'catalog:'
         version: 6.30.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2521,7 +2509,7 @@ importers:
   packages/tinacms-authjs:
     dependencies:
       '@tinacms/schema-tools':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../@tinacms/schema-tools
       react-dom:
         specifier: ^17.0.2 || ^18 || ^19
@@ -5826,13 +5814,6 @@ packages:
 
   '@monaco-editor/loader@1.7.0':
     resolution: {integrity: sha512-gIwR1HrJrrx+vfyOhYmCZ0/JcWqG5kbfG7+d3f/C1LXk2EvzAbHSg3MQ5lO2sMlo9izoAZ04shohfKLVT6crVA==}
-
-  '@monaco-editor/react@4.7.0-rc.0':
-    resolution: {integrity: sha512-YfjXkDK0bcwS0zo8PXptvQdCQfOPPtzGsAzmIv7PnoUGFdIohsR+NVDyjbajMddF+3cWUm/3q9NzP/DUke9a+w==}
-    peerDependencies:
-      monaco-editor: '>= 0.25.0 < 1'
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   '@mongodb-js/saslprep@1.4.0':
     resolution: {integrity: sha512-ZHzx7Z3rdlWL1mECydvpryWN/ETXJiCxdgQKTAH+djzIPe77HdnSizKBDi1TVDXZjXyOj2IqEG/vPw71ULF06w==}
@@ -14226,11 +14207,6 @@ packages:
     peerDependencies:
       react: '*'
 
-  react-icons@5.5.0:
-    resolution: {integrity: sha512-MEFcXdkP3dLo8uumGI5xN3lDFNsRtrjbOEKDLD7yv76v4wpnEq2Lt2qeHaQOr34I/wPN3s3+N08WkQ+CW37Xiw==}
-    peerDependencies:
-      react: '*'
-
   react-icons@5.6.0:
     resolution: {integrity: sha512-RH93p5ki6LfOiIt0UtDyNg/cee+HLVR6cHHtW3wALfo+eOHTp8RnU2kRkI6E+H19zMIs03DyxUG/GfZMOGvmiA==}
     peerDependencies:
@@ -20620,13 +20596,6 @@ snapshots:
     dependencies:
       state-local: 1.0.7
 
-  '@monaco-editor/react@4.7.0-rc.0(monaco-editor@0.31.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
-    dependencies:
-      '@monaco-editor/loader': 1.7.0
-      monaco-editor: 0.31.0
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-
   '@mongodb-js/saslprep@1.4.0':
     dependencies:
       sparse-bitfield: 3.0.3
@@ -23650,7 +23619,7 @@ snapshots:
 
   '@udecode/react-utils@47.3.1(@types/react@18.3.27)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@radix-ui/react-slot': 1.2.4(@types/react@18.3.27)(react@18.3.1)
+      '@radix-ui/react-slot': 1.3.0(@types/react@18.3.27)(react@18.3.1)
       '@udecode/utils': 47.2.7
       clsx: 2.1.1
       react: 18.3.1
@@ -31245,10 +31214,6 @@ snapshots:
       react: 19.2.7
 
   react-icons@4.12.0(react@18.3.1):
-    dependencies:
-      react: 18.3.1
-
-  react-icons@5.5.0(react@18.3.1):
     dependencies:
       react: 18.3.1
 

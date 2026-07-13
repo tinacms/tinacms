@@ -1,14 +1,11 @@
 import {
-  Combobox,
-  ComboboxButton,
-  ComboboxInput,
-  ComboboxOption,
-  ComboboxOptions,
-  Transition,
-} from '@headlessui/react';
-import { ChevronDownIcon } from '@heroicons/react/solid';
-import React, { Fragment } from 'react';
-import { classNames } from './helpers';
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
+  PopoverTrigger,
+} from '@toolkit/components/ui/popover';
+import { ChevronDown } from 'lucide-react';
+import React from 'react';
 
 interface AutocompleteItem {
   key: string;
@@ -23,13 +20,27 @@ interface AutocompleteProps {
   items: AutocompleteItem[];
 }
 
+/**
+ * Was a Headless UI <Combobox>. Rebuilt on the Radix popover we already ship:
+ * the input doubles as the filter and the popover anchor, and the chevron is
+ * the explicit trigger.
+ */
 export const Autocomplete: React.FC<AutocompleteProps> = ({
   value,
   onChange,
   defaultQuery,
   items,
 }) => {
+  const [open, setOpen] = React.useState(false);
   const [query, setQuery] = React.useState(defaultQuery ?? '');
+
+  const displayValue = value?.label ?? 'Plain Text';
+
+  // When the selection changes elsewhere, mirror it back into the input.
+  React.useEffect(() => {
+    setQuery('');
+  }, [value?.key]);
+
   const filteredItems = React.useMemo(() => {
     try {
       const reFilter = new RegExp(query, 'i');
@@ -41,56 +52,60 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({
     }
   }, [items, query]);
 
+  const select = (item: AutocompleteItem) => {
+    onChange(item);
+    setQuery('');
+    setOpen(false);
+  };
+
   return (
-    <Combobox
-      value={value}
-      onChange={onChange}
-      as='div'
-      className='relative inline-block text-left z-20'
+    <Popover
+      open={open}
+      onOpenChange={(next) => {
+        setOpen(next);
+        if (!next) {
+          setQuery('');
+        }
+      }}
     >
       <div className='mt-1'>
         <div className='relative w-full cursor-default overflow-hidden rounded-lg bg-white text-left shadow-md sm:text-sm'>
-          <ComboboxInput
-            className='w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-300'
-            displayValue={(item: AutocompleteItem) =>
-              item?.label ?? 'Plain Text'
-            }
-            onChange={(event) => setQuery(event.target.value)}
-            onClick={(ev) => ev.stopPropagation()}
-          />
-          <ComboboxButton className='absolute inset-y-0 right-0 flex items-center pr-2'>
-            <ChevronDownIcon
-              className='h-5 w-5 text-gray-400'
-              aria-hidden='true'
+          <PopoverAnchor asChild>
+            <input
+              className='w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-300'
+              value={open ? query : displayValue}
+              placeholder={displayValue}
+              onFocus={() => setOpen(true)}
+              onChange={(event) => {
+                setQuery(event.target.value);
+                setOpen(true);
+              }}
+              onClick={(ev) => ev.stopPropagation()}
             />
-          </ComboboxButton>
+          </PopoverAnchor>
+          <PopoverTrigger className='absolute inset-y-0 right-0 flex items-center pr-2'>
+            <ChevronDown className='h-5 w-5 text-gray-400' aria-hidden='true' />
+          </PopoverTrigger>
         </div>
       </div>
-      <Transition
-        enter='transition ease-out duration-100'
-        enterFrom='transform opacity-0 scale-95'
-        enterTo='transform opacity-100 scale-100'
-        leave='transition ease-in duration-75'
-        leaveFrom='transform opacity-100 scale-100'
-        leaveTo='transform opacity-0 scale-95'
+      <PopoverContent
+        align='end'
+        sideOffset={4}
+        // Keep the caret in the input so typing keeps filtering.
+        onOpenAutoFocus={(event) => event.preventDefault()}
+        className='w-[--radix-popover-trigger-width] min-w-[12rem] max-h-[300px] overflow-y-auto p-0 rounded shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none'
       >
-        <ComboboxOptions className='origin-top-right absolute right-0 mt-1 w-full max-h-[300px] overflow-y-auto rounded shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none'>
-          {filteredItems.map((item) => (
-            <ComboboxOption key={item.key} value={item}>
-              {({ focus }) => (
-                <button
-                  className={classNames(
-                    focus ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                    'block px-4 py-2 text-xs w-full text-right'
-                  )}
-                >
-                  {item.render(item)}
-                </button>
-              )}
-            </ComboboxOption>
-          ))}
-        </ComboboxOptions>
-      </Transition>
-    </Combobox>
+        {filteredItems.map((item) => (
+          <button
+            key={item.key}
+            type='button'
+            onClick={() => select(item)}
+            className='block px-4 py-2 text-xs w-full text-right text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none'
+          >
+            {item.render(item)}
+          </button>
+        ))}
+      </PopoverContent>
+    </Popover>
   );
 };

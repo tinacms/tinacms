@@ -1,12 +1,3 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import { ArrowDown, ArrowUp, ArrowUpDown, ChevronDown } from 'lucide-react';
-import { BiFile, BiMovie } from 'react-icons/bi';
 import {
   flexRender,
   getCoreRowModel,
@@ -16,20 +7,37 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import type {
-  ColumnFiltersState,
   ColumnDef,
+  ColumnFiltersState,
   ExpandedState,
   FilterFn,
   Row,
   SortingState,
 } from '@tanstack/react-table';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../../ui/select';
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  ChevronDown,
+  Clapperboard,
+  File,
+} from 'lucide-react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import {
+  MediaUsageDashboardDocumentLinkClickedEvent,
+  MediaUsageDashboardRowExpandedEvent,
+  MediaUsageDashboardTypeFilterEvent,
+  MediaUsageDashboardTypeFilterPayload,
+  MediaUsageDashboardUsageFilterChangedEvent,
+  MediaUsageDashboardUsageFilterChangedPayload,
+} from '../../../../lib/posthog/posthog';
+import { captureEvent } from '../../../../lib/posthog/posthogProvider';
 import {
   Tooltip,
   TooltipContent,
@@ -37,6 +45,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '../../../fields/plugins/mdx-field-plugin/plate/components/plate-ui/tooltip';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../ui/select';
 import {
   Table,
   TableBody,
@@ -47,15 +62,6 @@ import {
 } from '../../ui/table';
 import type { DocumentReference, MediaUsage } from './media-usage-scanner';
 import { MEDIA_USAGE_THUMBNAIL_KEY } from './media-usage-thumbnails';
-import {
-  MediaUsageDashboardDocumentLinkClickedEvent,
-  MediaUsageDashboardRowExpandedEvent,
-  MediaUsageDashboardTypeFilterEvent,
-  MediaUsageDashboardTypeFilterPayload,
-  MediaUsageDashboardUsageFilterChangedEvent,
-  MediaUsageDashboardUsageFilterChangedPayload,
-} from '../../../../lib/posthog/posthog';
-import { captureEvent } from '../../../../lib/posthog/posthogProvider';
 
 const INFINITE_SCROLL_PAGE_SIZE = 10;
 
@@ -167,10 +173,10 @@ const getMediaColumns = (
                   onPreview?.(row.original);
                 }}
               >
-                <BiMovie className='text-3xl' />
+                <Clapperboard className='text-3xl' />
               </button>
             ) : (
-              <BiFile className='text-3xl' />
+              <File className='text-3xl' />
             )}
           </div>
         </div>
@@ -620,7 +626,7 @@ const ExpandedRowContent = ({
                 </td>
                 <td className='py-1.5 text-gray-700'>
                   <span className='flex items-center gap-1.5'>
-                    <BiFile className='text-gray-400 flex-shrink-0' />
+                    <File className='text-gray-400 flex-shrink-0' />
                     {doc.editUrl ? (
                       <a
                         href={doc.editUrl}
