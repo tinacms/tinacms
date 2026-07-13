@@ -1,6 +1,6 @@
 ---
-"@tinacms/graphql": minor
-"@tinacms/cli": minor
+"@tinacms/graphql": major
+"@tinacms/cli": major
 ---
 
 Give rich-text its own GraphQL scalar, so `_body` is actually typed.
