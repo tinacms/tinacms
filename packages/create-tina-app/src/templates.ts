@@ -169,9 +169,9 @@ export const TEMPLATES: Template[] = [
     devUrl: 'http://localhost:3000',
   },
   {
-    title: 'Bare bones starter',
+    title: 'React Starter',
     description:
-      'Stripped down to essentials, this starter is the canvas for pure, unadulterated code creativity. Built with Next.js.',
+      'Stripped down to essentials, this starter is the canvas for pure, unadulterated code creativity. Built with Vite and React.',
     value: 'basic',
     isInternal: false,
     features: [
@@ -188,7 +188,7 @@ export const TEMPLATES: Template[] = [
         description: '✅',
       },
     ],
-    gitURL: 'https://github.com/tinacms/tina-barebones-starter',
+    gitURL: 'https://github.com/tinacms/tina-react-starter',
     branch: 'main',
     devUrl: 'http://localhost:3000',
   },

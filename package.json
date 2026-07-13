@@ -9,6 +9,7 @@
 	],
 	"engines": {
 		"node": "22.x || 24.x",
+		"npm": "11.x",
 		"pnpm": ">=11"
 	},
 	"scripts": {
