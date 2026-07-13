@@ -42,13 +42,12 @@ describe('generateTypes', () => {
     );
   });
 
-  it('types the JSON scalar as `unknown` — it carries arbitrary values', () => {
-    expect(types).toContain('JSON: { input: unknown; output: unknown; }');
-    expect(types).not.toMatch(/JSON: \{ input: any/);
+  it('leaves the JSON scalar as `any` — `_values` consumers still index it freely', () => {
+    expect(types).toContain('JSON: { input: any; output: any; }');
   });
 
-  it('types the Reference scalar as `unknown`', () => {
-    expect(types).toContain('Reference: { input: unknown; output: unknown; }');
+  it('leaves the Reference scalar as `any`', () => {
+    expect(types).toContain('Reference: { input: any; output: any; }');
   });
 
   it('exports the helper types the generated module has always exported', () => {

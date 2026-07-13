@@ -5,21 +5,18 @@
 
 Give rich-text its own GraphQL scalar, so `_body` is actually typed.
 
-**This is a breaking change for TypeScript consumers.** It is the good kind: it surfaces bugs that `any` was hiding.
-
 Rich-text fields were typed with the generic `JSON` scalar — the same one carrying `_values`, `templates` and `fields`. One scalar means one TypeScript mapping, and the only one that suited both an editable document AST and an arbitrary blob was `any`. So `data.post._body` came out untyped, even though TinaCMS already ships the exact type it should be: `TinaMarkdownContent`, which is what `<TinaMarkdown/>` demands.
 
 Rich-text fields now use a dedicated `RichText` scalar:
 
 ```
-RichText  -> TinaMarkdownContent   (real type)
-JSON      -> unknown               (arbitrary, and now says so)
-Reference -> unknown
+RichText -> TinaMarkdownContent   (real type)
+JSON     -> any                   (unchanged — `_values` still indexes freely)
 ```
 
 Query documents are unchanged, and no resolver is needed — `buildASTSchema` gives custom scalars passthrough behaviour, so the server indexes and resolves rich text exactly as before. `schema.gql` gains `scalar RichText`.
 
-**Migrating:** `_body` is now `Maybe<TinaMarkdownContent>`, so passing it straight to `<TinaMarkdown content={...} />` will fail to compile where the field is optional. Guard it:
+**Breaking for TypeScript consumers, in the useful direction.** `_body` is now `Maybe<TinaMarkdownContent>` rather than `any`, so passing it straight to `<TinaMarkdown/>` fails to compile wherever the field is optional:
 
 ```diff
 - <TinaMarkdown content={data.post._body} />

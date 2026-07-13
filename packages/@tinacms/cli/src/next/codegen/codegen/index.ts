@@ -43,9 +43,10 @@ export const generateTypes = async (
       scalars: {
         RichText: 'TinaMarkdownContent',
       },
-      // What's left on JSON — _values, templates, fields — really is arbitrary,
-      // so it should not pretend to be `any`.
-      defaultScalarType: 'unknown',
+      // `_values` is a first-class way to read a document (the query selects it
+      // instead of the typed fields), so JSON stays `any` until it has a better
+      // answer than "cast it yourself".
+      defaultScalarType: 'any',
     },
     plugins: [
       { typescript: {} },
