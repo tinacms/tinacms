@@ -1,5 +1,4 @@
-import React from 'react';
-import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react';
+import loader from '@monaco-editor/loader';
 /**
  * MDX is built directly to the app because of how we load dependencies.
  * Since we drop the package.json in to the end users folder, we can't
@@ -8,14 +7,15 @@ import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react';
  */
 import { parseMDX, serializeMDX } from '@tinacms/mdx';
 import type * as monaco from 'monaco-editor';
+import React from 'react';
 import { RichTextType } from 'tinacms';
+import { RichTextEditorSwitchedEvent, captureEvent } from 'tinacms';
 import {
   ErrorMessage,
   InvalidMarkdownElement,
   buildError,
 } from './error-message';
 import { useDebounce } from './use-debounce';
-import { RichTextEditorSwitchedEvent, captureEvent } from 'tinacms';
 
 export const uuid = () => {
   // @ts-ignore
@@ -28,6 +28,70 @@ export const uuid = () => {
 };
 
 type Monaco = typeof monaco;
+
+/**
+ * The editor itself is fetched from a CDN at runtime by @monaco-editor/loader;
+ * the `monaco-editor` package is a devDependency used only for its types.
+ */
+const useMonaco = (): Monaco | null => {
+  const [instance, setInstance] = React.useState<Monaco | null>(null);
+  React.useEffect(() => {
+    let cancelled = false;
+    loader.init().then((m) => {
+      if (!cancelled) {
+        setInstance(m as Monaco);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  return instance;
+};
+
+const MonacoEditor = (props: {
+  monaco: Monaco;
+  path: string;
+  value: string;
+  language: string;
+  options: monaco.editor.IStandaloneEditorConstructionOptions;
+  onMount: (
+    editor: monaco.editor.IStandaloneCodeEditor,
+    monaco: Monaco
+  ) => void;
+  onChange: (value: string) => void;
+}) => {
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  // Read through a ref so re-creating the editor isn't tied to callback identity.
+  const onChangeRef = React.useRef(props.onChange);
+  onChangeRef.current = props.onChange;
+
+  React.useEffect(() => {
+    const { monaco, path, value, language, options, onMount } = props;
+    if (!containerRef.current) {
+      return;
+    }
+    const uri = monaco.Uri.parse(`inmemory://tina/${path}`);
+    const model =
+      monaco.editor.getModel(uri) ||
+      monaco.editor.createModel(value, language, uri);
+    const editor = monaco.editor.create(containerRef.current, {
+      model,
+      ...options,
+    });
+    const subscription = editor.onDidChangeModelContent(() => {
+      onChangeRef.current(editor.getValue());
+    });
+    onMount(editor, monaco);
+    return () => {
+      subscription.dispose();
+      model.dispose();
+      editor.dispose();
+    };
+  }, [props.monaco]);
+
+  return <div ref={containerRef} style={{ height: '100%', width: '100%' }} />;
+};
 
 /**
  * Since monaco lazy-loads we may have a delay from when the block is inserted
@@ -166,52 +230,52 @@ export const RawEditor = (props: RichTextType) => {
         <ErrorMessage error={error} />
       </div>
       <div style={{ height: `${height}px` }}>
-        <MonacoEditor
-          beforeMount={() => {}}
-          height='100%'
-          width='100%'
-          path={id}
-          onMount={handleEditorDidMount}
-          // Setting a custom theme is kind of buggy because it doesn't get defined until monaco has mounted.
-          // So we end up with the default (light) theme in some scenarios. Seems like a race condition.
-          // theme="vs-dark"
-          options={{
-            scrollBeyondLastLine: false,
-            tabSize: 2,
-            disableLayerHinting: true,
-            accessibilitySupport: 'off',
-            codeLens: false,
-            wordWrap: 'on',
-            minimap: {
-              enabled: false,
-            },
-            fontSize: 14,
-            lineHeight: 2,
-            formatOnPaste: true,
-            lineNumbers: 'on',
-            lineNumbersMinChars: 2,
-            formatOnType: true,
-            fixedOverflowWidgets: true,
-            // Takes too much horizontal space for iframe
-            folding: false,
-            renderLineHighlight: 'none',
-            scrollbar: {
-              verticalScrollbarSize: 4,
-              horizontalScrollbarSize: 4,
-              // https://github.com/microsoft/monaco-editor/issues/2007#issuecomment-644425664
-              alwaysConsumeMouseWheel: false,
-            },
-          }}
-          language={'markdown'}
-          value={value}
-          onChange={(value) => {
-            try {
-              setValue(value);
-            } catch (e) {
-              console.log('error', e);
-            }
-          }}
-        />
+        {monaco ? (
+          <MonacoEditor
+            monaco={monaco}
+            path={id}
+            onMount={handleEditorDidMount}
+            // Setting a custom theme is kind of buggy because it doesn't get defined until monaco has mounted.
+            // So we end up with the default (light) theme in some scenarios. Seems like a race condition.
+            // theme="vs-dark"
+            options={{
+              scrollBeyondLastLine: false,
+              tabSize: 2,
+              disableLayerHinting: true,
+              accessibilitySupport: 'off',
+              codeLens: false,
+              wordWrap: 'on',
+              minimap: {
+                enabled: false,
+              },
+              fontSize: 14,
+              lineHeight: 2,
+              formatOnPaste: true,
+              lineNumbers: 'on',
+              lineNumbersMinChars: 2,
+              formatOnType: true,
+              fixedOverflowWidgets: true,
+              // Takes too much horizontal space for iframe
+              folding: false,
+              renderLineHighlight: 'none',
+              scrollbar: {
+                verticalScrollbarSize: 4,
+                horizontalScrollbarSize: 4,
+                // https://github.com/microsoft/monaco-editor/issues/2007#issuecomment-644425664
+                alwaysConsumeMouseWheel: false,
+              },
+            }}
+            language={'markdown'}
+            value={value}
+            onChange={(value) => {
+              try {
+                setValue(value);
+              } catch (e) {
+                console.log('error', e);
+              }
+            }}
+          />
+        ) : null}
       </div>
     </div>
   );
