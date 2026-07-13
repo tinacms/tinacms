@@ -23,7 +23,7 @@
     "build": "tinacms-scripts build"
   },
   "peerDependencies": {
-    "tinacms": "workspace:*"
+    "tinacms": "workspace:^"
   },
   "devDependencies": {
     "@tinacms/scripts": "workspace:*",
