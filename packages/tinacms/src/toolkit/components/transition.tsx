@@ -8,7 +8,7 @@ import React from 'react';
  * stack (~50 MB installed) to do it.
  *
  * Same prop API as Headless UI: `show`, `appear`, `as`, and the
- * enter/enterFrom/enterTo/leave/leaveFrom/leaveTo class strings.
+ * enter/enterFrom/enterTo/entered/leave/leaveFrom/leaveTo class strings.
  */
 
 type Stage = 'start' | 'end';
@@ -18,6 +18,8 @@ export interface TransitionClasses {
   enter?: string;
   enterFrom?: string;
   enterTo?: string;
+  /** Held once the enter transition has landed, for as long as the element is shown. */
+  entered?: string;
   leave?: string;
   leaveFrom?: string;
   leaveTo?: string;
@@ -43,7 +45,9 @@ const classesFor = (
       : stage === 'start'
         ? c.leaveFrom
         : c.leaveTo;
-  return [base, phase].filter(Boolean).join(' ');
+  const settled =
+    direction === 'enter' && stage === 'end' ? c.entered : undefined;
+  return [base, phase, settled].filter(Boolean).join(' ');
 };
 
 /**
@@ -81,6 +85,7 @@ export const Transition = ({
   enter,
   enterFrom,
   enterTo,
+  entered,
   leave,
   leaveFrom,
   leaveTo,
@@ -156,6 +161,7 @@ export const Transition = ({
     enter,
     enterFrom,
     enterTo,
+    entered,
     leave,
     leaveFrom,
     leaveTo,
@@ -184,6 +190,7 @@ export const TransitionChild = ({
   enter,
   enterFrom,
   enterTo,
+  entered,
   leave,
   leaveFrom,
   leaveTo,
@@ -198,6 +205,7 @@ export const TransitionChild = ({
         enter,
         enterFrom,
         enterTo,
+        entered,
         leave,
         leaveFrom,
         leaveTo,
