@@ -1,5 +1,14 @@
 # next-tinacms-cloudinary
 
+## 27.0.1
+
+### Patch Changes
+
+- [#7146](https://github.com/tinacms/tinacms/pull/7146) [`54e066f`](https://github.com/tinacms/tinacms/commit/54e066fce4863504cf7f7fd744df7b0a5190cdb1) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Sanitize the uploaded filename before writing it to the temp directory, and fix an inert multer `destination` misconfiguration.
+
+- Updated dependencies []:
+  - tinacms@3.10.1
+
 ## 27.0.0
 
 ### Patch Changes
