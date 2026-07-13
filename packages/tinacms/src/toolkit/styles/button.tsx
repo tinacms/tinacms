@@ -1,5 +1,6 @@
-import * as React from 'react';
 import { cn } from '@utils/cn';
+import * as React from 'react';
+import { LoadingDots } from './loading-dots';
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -75,7 +76,7 @@ export const Button = ({
       )}
       {...props}
     >
-      {children}
+      {busy ? <LoadingDots color='currentColor' /> : children}
     </Tag>
   );
 };
