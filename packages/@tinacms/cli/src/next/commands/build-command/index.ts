@@ -1,6 +1,10 @@
 import crypto from 'crypto';
 import path from 'path';
-import { ChangeType, diff } from '@graphql-inspector/core';
+import {
+  ChangeType,
+  type TypeOfChangeType,
+  diff,
+} from '@graphql-inspector/core';
 import { type Database, FilesystemBridge, buildSchema } from '@tinacms/graphql';
 import { parseURL } from '@tinacms/schema-tools';
 import {
@@ -15,10 +19,19 @@ import {
   buildClientSchema,
   getIntrospectionQuery,
 } from 'graphql';
+import type { PostHog } from 'posthog-node';
 import Progress from 'progress';
 import type { ViteDevServer } from 'vite';
 import { logger, summary } from '../../../logger';
 import { getFaqLink } from '../../../utils';
+import {
+  BuildFinishedEvent,
+  BuildInvokeEvent,
+  BuildInvokeEventPayload,
+  generateSessionId,
+  initializePostHog,
+  postHogCapture,
+} from '../../../utils/posthog';
 import { timeout } from '../../../utils/sleep';
 import { spin } from '../../../utils/spinner';
 import { dangerText, linkText, warnText } from '../../../utils/theme';
@@ -30,15 +43,6 @@ import { BaseCommand } from '../baseCommands';
 import { createDevServer } from '../dev-command/server';
 import { buildProductionSpa } from './server';
 import { waitForDB } from './waitForDB';
-import type { PostHog } from 'posthog-node';
-import {
-  BuildFinishedEvent,
-  BuildInvokeEvent,
-  BuildInvokeEventPayload,
-  generateSessionId,
-  initializePostHog,
-  postHogCapture,
-} from '../../../utils/posthog';
 
 export class BuildCommand extends BaseCommand {
   static paths = [['build']];
@@ -734,7 +738,7 @@ export class BuildCommand extends BaseCommand {
           prog: '❌',
         });
 
-        const type: ChangeType = diffResult[0].type;
+        const type: TypeOfChangeType = diffResult[0].type;
         const reason = diffResult[0].message;
         const errorLevel = diffResult[0].criticality.level;
         const faqLink = getFaqLink(type);

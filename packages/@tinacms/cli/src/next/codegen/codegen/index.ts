@@ -14,6 +14,9 @@ import { plugin as typescriptPlugin } from '@graphql-codegen/typescript';
 // Docs: https://www.graphql-code-generator.com/docs/plugins/typescript-generic-sdk
 import { plugin as typescriptSdkPlugin } from './sdkPlugin';
 
+/** codegen declares `Exact` but keeps it local; `types.ts` has always exported it. */
+const reexportExact = (types: string) => `${types}\nexport type { Exact };\n`;
+
 export const generateTypes = async (
   schema: GraphQLSchema,
   queryPathGlob = process.cwd(),
@@ -32,7 +35,11 @@ export const generateTypes = async (
     filename: process.cwd(),
     schema: parse(printSchema(schema)),
     documents: [...docs, ...fragDocs],
-    config: {},
+    config: {
+      // The JSON scalar still carries rich-text bodies, which callers pass
+      // straight to <TinaMarkdown/>; codegen's `unknown` default won't assign.
+      defaultScalarType: 'any',
+    },
     plugins: [
       { typescript: {} },
       { typescriptOperations: {} },
@@ -54,7 +61,7 @@ export const generateTypes = async (
       AddGeneratedClient: AddGeneratedClient(apiURL),
     },
   });
-  return res;
+  return reexportExact(res);
 };
 
 const loadGraphQLDocuments = async (globPath: string) => {
