@@ -1,19 +1,19 @@
-import fs from 'fs-extra';
+import { createRequire } from 'module';
 import path from 'path';
-import os from 'os';
 import { pathToFileURL } from 'url';
-import * as esbuild from 'esbuild';
-import type { Loader } from 'esbuild';
 import { Config } from '@tinacms/schema-tools';
 import * as dotenv from 'dotenv';
+import * as esbuild from 'esbuild';
+import type { Loader } from 'esbuild';
+import fs from 'fs-extra';
 import normalizePath from 'normalize-path';
-import { createRequire } from 'module';
 import { logger } from '../logger';
 import { warnText } from '../utils/theme';
-import { resolveContentRootPath } from './resolve-content-root';
-import { resolveDatabaseExternals } from './external-resolver';
-import { prepareCacheLocation, reapBuildSubdir } from './cache-manager';
 import { buildDatabaseEsbuildConfig } from './build-database-esbuild-config';
+import { prepareCacheLocation, reapBuildSubdir } from './cache-manager';
+import { formatConfigBuildError } from './config-build-error';
+import { resolveDatabaseExternals } from './external-resolver';
+import { resolveContentRootPath } from './resolve-content-root';
 
 export const TINA_FOLDER = 'tina';
 export const LEGACY_TINA_FOLDER = '.tina';
@@ -393,14 +393,24 @@ export class ConfigManager {
     // Construct the esbuild options via a pure helper so the externalize /
     // output-path contract is locked down by unit tests in
     // build-database-esbuild-config.test.ts (see #6785).
-    await esbuild.build(
-      buildDatabaseEsbuildConfig({
-        entryPoint: this.selfHostedDatabaseFilePath,
-        outfile,
-        external,
-        loader: loaders,
-      })
-    );
+    try {
+      await esbuild.build(
+        buildDatabaseEsbuildConfig({
+          entryPoint: this.selfHostedDatabaseFilePath,
+          outfile,
+          external,
+          loader: loaders,
+        })
+      );
+    } catch (e) {
+      // database.ts imports @tinacms/datalayer, so the same parent-directory
+      // package-manager artifacts that break config resolution surface here as
+      // `Could not resolve "@tinacms/datalayer"`. Add the same guidance.
+      throw formatConfigBuildError({
+        error: e,
+        rootPath: path.resolve(this.rootPath),
+      });
+    }
     const result = await import(pathToFileURL(outfile).href);
     // Remove the build subdir + reap the timestamp parent if it's now empty
     // (the sibling loadConfigFile may have finished). See cache-manager.ts.
@@ -429,21 +439,28 @@ export class ConfigManager {
     const esmRequireBanner = {
       js: `import { createRequire } from 'module';const require = createRequire(import.meta.url);`,
     };
+    // Absolute project root, shown in the resolve-failure guidance message only.
+    const resolvedRootPath = path.resolve(this.rootPath);
 
     fs.outputFileSync(tempTSConfigFile, '{}');
-    const result2 = await esbuild.build({
-      entryPoints: [configFilePath],
-      bundle: true,
-      target: ['esnext'],
-      platform: 'browser',
-      format: 'esm',
-      logLevel: 'silent',
-      packages: 'external',
-      ignoreAnnotations: true,
-      outfile: preBuildConfigPath,
-      loader: loaders,
-      metafile: true,
-    });
+    let result2: esbuild.BuildResult<{ metafile: true }>;
+    try {
+      result2 = await esbuild.build({
+        entryPoints: [configFilePath],
+        bundle: true,
+        target: ['esnext'],
+        platform: 'browser',
+        format: 'esm',
+        logLevel: 'silent',
+        packages: 'external',
+        ignoreAnnotations: true,
+        outfile: preBuildConfigPath,
+        loader: loaders,
+        metafile: true,
+      });
+    } catch (e) {
+      throw formatConfigBuildError({ error: e, rootPath: resolvedRootPath });
+    }
     const flattenedList = [];
 
     Object.keys(result2.metafile.inputs).forEach((key) => {
@@ -453,27 +470,31 @@ export class ConfigManager {
       flattenedList.push(key);
     });
 
-    await esbuild.build({
-      entryPoints: [configFilePath],
-      bundle: true,
-      target: ['esnext'],
-      logLevel: 'silent',
-      platform: 'node',
-      format: 'esm',
-      outfile,
-      loader: loaders,
-      banner: esmRequireBanner,
-    });
-    await esbuild.build({
-      entryPoints: [outfile],
-      bundle: true,
-      logLevel: 'silent',
-      platform: 'node',
-      target: ['esnext'],
-      format: 'esm',
-      outfile: outfile2,
-      loader: loaders,
-    });
+    try {
+      await esbuild.build({
+        entryPoints: [configFilePath],
+        bundle: true,
+        target: ['esnext'],
+        logLevel: 'silent',
+        platform: 'node',
+        format: 'esm',
+        outfile,
+        loader: loaders,
+        banner: esmRequireBanner,
+      });
+      await esbuild.build({
+        entryPoints: [outfile],
+        bundle: true,
+        logLevel: 'silent',
+        platform: 'node',
+        target: ['esnext'],
+        format: 'esm',
+        outfile: outfile2,
+        loader: loaders,
+      });
+    } catch (e) {
+      throw formatConfigBuildError({ error: e, rootPath: resolvedRootPath });
+    }
     let result: { default: any };
     try {
       result = await import(pathToFileURL(outfile2).href);
