@@ -33,7 +33,7 @@
 	"peerDependencies": {
 		"@clerk/backend": "0.x",
 		"@clerk/clerk-js": "4.x",
-		"tinacms": "workspace:*"
+		"tinacms": "workspace:^"
 	},
 	"publishConfig": {
 		"registry": "https://registry.npmjs.org"
