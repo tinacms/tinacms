@@ -11,7 +11,7 @@ import React from 'react';
  * enter/enterFrom/enterTo/entered/leave/leaveFrom/leaveTo class strings.
  */
 
-type Stage = 'start' | 'end';
+type Stage = 'start' | 'end' | 'settled';
 type Direction = 'enter' | 'leave';
 
 export interface TransitionClasses {
@@ -36,6 +36,13 @@ const classesFor = (
   { direction, stage }: TransitionState,
   c: TransitionClasses
 ) => {
+  // Once the enter transition has landed we drop enter/enterFrom/enterTo and keep
+  // only `entered`, matching Headless UI. Leaving them applied keeps a `transform`
+  // on the node (e.g. `translate-x-0`), which makes it a containing block and
+  // collapses absolutely-positioned children to zero size.
+  if (direction === 'enter' && stage === 'settled') {
+    return [c.entered].filter(Boolean).join(' ');
+  }
   const base = direction === 'enter' ? c.enter : c.leave;
   const phase =
     direction === 'enter'
@@ -45,17 +52,17 @@ const classesFor = (
       : stage === 'start'
         ? c.leaveFrom
         : c.leaveTo;
-  const settled =
-    direction === 'enter' && stage === 'end' ? c.entered : undefined;
-  return [base, phase, settled].filter(Boolean).join(' ');
+  return [base, phase].filter(Boolean).join(' ');
 };
 
 /**
  * Resolves once every CSS transition/animation on `el` **and its descendants**
- * has settled. This is what lets a parent <Transition> with no classes of its
- * own stay mounted until its <TransitionChild> has finished leaving.
+ * has finished. Used for both directions: it lets a parent <Transition> with no
+ * classes of its own stay mounted until its <TransitionChild> has finished
+ * leaving, and it lets us detect when an enter transition has landed so we can
+ * drop the transition classes.
  */
-const waitForExit = (el: HTMLElement | null): Promise<void> => {
+const waitForAnimations = (el: HTMLElement | null): Promise<void> => {
   if (!el?.getAnimations) {
     return Promise.resolve();
   }
@@ -63,9 +70,8 @@ const waitForExit = (el: HTMLElement | null): Promise<void> => {
   if (animations.length === 0) {
     return Promise.resolve();
   }
-  return Promise.allSettled(animations.map((a) => a.finished)).then(() => {
-    // ponytail: settled, not resolved — a cancelled transition still means "done leaving"
-  });
+  // allSettled, not all: a cancelled transition still counts as "done".
+  return Promise.allSettled(animations.map((a) => a.finished)).then(() => {});
 };
 
 export interface TransitionProps
@@ -132,6 +138,31 @@ export const Transition = ({
     return () => cancelAnimationFrame(raf);
   }, [state.stage, state.direction]);
 
+  // Once the enter transition has finished, advance to `settled` so classesFor
+  // drops enter/enterFrom/enterTo (and any lingering transform). Wait for the
+  // animation to actually run first so we don't cut the entrance short.
+  React.useEffect(() => {
+    if (!mounted || state.direction !== 'enter' || state.stage !== 'end') {
+      return;
+    }
+    let cancelled = false;
+    const raf = requestAnimationFrame(() => {
+      waitForAnimations(ref.current).then(() => {
+        if (!cancelled) {
+          setState((prev) =>
+            prev.direction === 'enter' && prev.stage === 'end'
+              ? { ...prev, stage: 'settled' }
+              : prev
+          );
+        }
+      });
+    });
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(raf);
+    };
+  }, [mounted, state.direction, state.stage]);
+
   // Only once the leave classes are actually painted do the transitions exist,
   // so this must run *after* commit — asking any earlier finds nothing running
   // and unmounts instantly, skipping the animation entirely.
@@ -141,7 +172,7 @@ export const Transition = ({
     }
     let cancelled = false;
     const raf = requestAnimationFrame(() => {
-      waitForExit(ref.current).then(() => {
+      waitForAnimations(ref.current).then(() => {
         if (!cancelled) {
           setMounted(false);
         }
