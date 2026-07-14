@@ -84,7 +84,7 @@ const TemplateMenu = ({
   folder: CollectionFolder;
 }) => {
   return (
-    <DropdownMenuPrimitive.Root>
+    <DropdownMenuPrimitive.Root modal={false}>
       <DropdownMenuPrimitive.Trigger className='w-full md:w-auto icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded justify-center transition-all duration-150 ease-out  shadow text-white bg-tina-orange-dark hover:bg-tina-orange focus:ring-tina-orange-dark text-sm h-10 px-6'>
         Create New <Plus className='w-5 h-full ml-1 opacity-70' />
       </DropdownMenuPrimitive.Trigger>
@@ -730,7 +730,7 @@ const CollectionListPage = () => {
                                               : 0
                                           }
                                         >
-                                          <Folder className='mr-2' />
+                                          <Folder className='mr-2 w-4 h-4' />
                                           Add Folder
                                         </Link>
                                       </TooltipTrigger>
@@ -786,7 +786,7 @@ const CollectionListPage = () => {
                                     }`}
                                     className='inline-flex items-center font-medium focus:ring-2 focus:outline-none focus:ring-tina-orange-dark focus:shadow-outline text-center rounded justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-white bg-tina-orange-dark hover:bg-tina-orange w-full md:w-auto text-sm h-10 px-6'
                                   >
-                                    <File className='mr-2' />
+                                    <File className='mr-2 w-4 h-4' />
                                     Add File
                                   </Link>
                                 </>

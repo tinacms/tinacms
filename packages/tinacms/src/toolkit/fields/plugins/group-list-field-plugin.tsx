@@ -230,7 +230,7 @@ const Item = ({
               }}
             >
               <GroupLabel>{title}</GroupLabel>
-              <Pencil className='h-5 w-auto fill-current text-gray-200 group-hover:text-inherit transition-colors duration-150 ease-out' />
+              <Pencil className='h-5 w-auto text-gray-200 group-hover:text-inherit transition-colors duration-150 ease-out' />
             </ItemClickTarget>
             {(!fixedLength || (fixedLength && !isMin)) && (
               <ItemDeleteButton disabled={isMin} onClick={removeItem} />

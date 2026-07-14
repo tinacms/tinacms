@@ -163,7 +163,7 @@ export const Nav = ({
                       href='https://tina.io/docs/r/content-modelling-collections'
                       target='_blank'
                     >
-                      <Info />
+                      <Info className='w-4 h-4' />
                     </a>
                   </span>
                 )}

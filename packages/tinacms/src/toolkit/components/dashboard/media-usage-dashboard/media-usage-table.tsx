@@ -173,10 +173,10 @@ const getMediaColumns = (
                   onPreview?.(row.original);
                 }}
               >
-                <Clapperboard className='text-3xl' />
+                <Clapperboard className='w-8 h-8' />
               </button>
             ) : (
-              <File className='text-3xl' />
+              <File className='w-8 h-8' />
             )}
           </div>
         </div>
@@ -626,7 +626,7 @@ const ExpandedRowContent = ({
                 </td>
                 <td className='py-1.5 text-gray-700'>
                   <span className='flex items-center gap-1.5'>
-                    <File className='text-gray-400 flex-shrink-0' />
+                    <File className='w-4 h-4 text-gray-400 flex-shrink-0' />
                     {doc.editUrl ? (
                       <a
                         href={doc.editUrl}
