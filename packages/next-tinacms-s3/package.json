@@ -35,7 +35,7 @@
     "typescript": "^5.7.3"
   },
   "peerDependencies": {
-    "tinacms": "workspace:*"
+    "tinacms": "workspace:^"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"

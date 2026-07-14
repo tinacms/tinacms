@@ -1194,7 +1194,7 @@ importers:
         specifier: 'catalog:'
         version: 4.7.0-rc.0(monaco-editor@0.31.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tinacms/mdx':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../mdx
       final-form:
         specifier: 'catalog:'
@@ -1218,7 +1218,7 @@ importers:
         specifier: 'catalog:'
         version: 6.30.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       tinacms:
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../tinacms
       typescript:
         specifier: ^5.7.3
@@ -1246,7 +1246,7 @@ importers:
   packages/@tinacms/astro:
     dependencies:
       '@tinacms/bridge':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../bridge
     devDependencies:
       '@tinacms/scripts':
@@ -1352,19 +1352,19 @@ importers:
         specifier: 'catalog:'
         version: 0.5.20(tailwindcss@3.4.19(yaml@2.8.2))
       '@tinacms/app':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../app
       '@tinacms/graphql':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../graphql
       '@tinacms/metrics':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../metrics
       '@tinacms/schema-tools':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../schema-tools
       '@tinacms/search':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../search
       '@vitejs/plugin-react':
         specifier: 'catalog:'
@@ -1454,7 +1454,7 @@ importers:
         specifier: ^3.4.17
         version: 3.4.19(yaml@2.8.2)
       tinacms:
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../tinacms
       typanion:
         specifier: 'catalog:'
@@ -1533,7 +1533,7 @@ importers:
   packages/@tinacms/datalayer:
     dependencies:
       '@tinacms/graphql':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../graphql
     devDependencies:
       '@tinacms/scripts':
@@ -1570,10 +1570,10 @@ importers:
         specifier: 'catalog:'
         version: 2.2.5
       '@tinacms/mdx':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../mdx
       '@tinacms/schema-tools':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../schema-tools
       abstract-level:
         specifier: 'catalog:'
@@ -1688,7 +1688,7 @@ importers:
   packages/@tinacms/mdx:
     dependencies:
       '@tinacms/schema-tools':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../schema-tools
       acorn:
         specifier: 'catalog:'
@@ -1919,10 +1919,10 @@ importers:
   packages/@tinacms/search:
     dependencies:
       '@tinacms/graphql':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../graphql
       '@tinacms/schema-tools':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../schema-tools
       memory-level:
         specifier: 'catalog:'
@@ -1965,7 +1965,7 @@ importers:
         specifier: 'catalog:'
         version: 0.0.5
       tinacms:
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../tinacms
     devDependencies:
       '@tinacms/scripts':
@@ -2045,7 +2045,7 @@ importers:
         specifier: 'catalog:'
         version: 12.29.1
       '@tinacms/auth':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../@tinacms/auth
       sharp:
         specifier: 'catalog:'
@@ -2256,16 +2256,16 @@ importers:
         specifier: ^8.21.3
         version: 8.21.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tinacms/bridge':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../@tinacms/bridge
       '@tinacms/mdx':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../@tinacms/mdx
       '@tinacms/schema-tools':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../@tinacms/schema-tools
       '@tinacms/search':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../@tinacms/search
       '@udecode/cmdk':
         specifier: 'catalog:'
@@ -2521,7 +2521,7 @@ importers:
   packages/tinacms-authjs:
     dependencies:
       '@tinacms/schema-tools':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../@tinacms/schema-tools
       react-dom:
         specifier: ^17.0.2 || ^18 || ^19
