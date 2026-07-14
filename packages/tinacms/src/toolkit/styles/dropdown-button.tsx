@@ -1,13 +1,12 @@
-import * as React from 'react';
-import { ChevronDownIcon } from 'lucide-react';
 import { cn } from '@utils/cn';
-import { Button, ButtonProps } from './button';
+import { ChevronDownIcon } from 'lucide-react';
+import * as React from 'react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
   DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from '../components/ui/dropdown-menu';
 import {
   Tooltip,
@@ -16,6 +15,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '../fields/plugins/mdx-field-plugin/plate/components/plate-ui/tooltip';
+import { Button, ButtonProps } from './button';
 
 export interface DropdownButtonItem {
   label: string;
@@ -200,8 +200,7 @@ export const DropdownButton = React.forwardRef<
             <Button
               variant={variant}
               size={size}
-              busy={busy}
-              disabled={disabled}
+              disabled={disabled || busy}
               rounded='right'
               className='px-4 border-l'
               style={{ borderColor: '#00000030' }}

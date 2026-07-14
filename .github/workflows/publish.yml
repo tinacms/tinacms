@@ -51,7 +51,7 @@ jobs:
           registry-url: "https://registry.npmjs.org"
 
       - name: Upgrade npm for OIDC support
-        run: npm install -g npm@latest
+        run: npm install -g npm@$(node -p "require('./package.json').engines.npm")
 
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
         name: Install pnpm
@@ -240,7 +240,7 @@ jobs:
           registry-url: "https://registry.npmjs.org"
 
       - name: Upgrade npm for OIDC support
-        run: npm install -g npm@latest
+        run: npm install -g npm@$(node -p "require('./package.json').engines.npm")
 
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
         name: Install pnpm
@@ -295,7 +295,12 @@ jobs:
       - name: Release to @dev channel
         if: steps.changesets.outputs.hasChangesets == 'true'
         run: |
-          git checkout ${{ github.sha }}
+          # Hard reset (not checkout) so the snapshot runs against the pristine
+          # release commit. changesets/action's github-api commit mode leaves the
+          # version bumps uncommitted in the working tree; a plain checkout keeps
+          # them, so `version:snapshot` finds no changesets and publishes the real
+          # release version to the beta tag, which then blocks the latest publish.
+          git reset --hard ${{ github.sha }}
           pnpm version:snapshot $(echo ${{ github.sha }} | cut -c1-7)
           pnpm run publish:beta
           echo "A release PR has been created: <https://github.com/tinacms/tinacms/pull/${{ steps.changesets.outputs.pullRequestNumber }}>" >> $GITHUB_STEP_SUMMARY

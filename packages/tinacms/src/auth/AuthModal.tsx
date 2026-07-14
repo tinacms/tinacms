@@ -1,11 +1,11 @@
 import {
+  Button,
   Modal,
-  ModalPopup,
-  ModalHeader,
-  ModalBody,
   ModalActions,
+  ModalBody,
+  ModalHeader,
+  ModalPopup,
 } from '@tinacms/toolkit';
-import { LoadingDots, Button } from '@tinacms/toolkit';
 import React, { useCallback, useEffect, useState } from 'react';
 
 interface ModalBuilderProps {
@@ -81,8 +81,7 @@ export const AsyncButton = ({ name, primary, action }: ButtonProps) => {
       busy={submitting}
       disabled={submitting}
     >
-      {submitting && <LoadingDots />}
-      {!submitting && name}
+      {name}
     </Button>
   );
 };
