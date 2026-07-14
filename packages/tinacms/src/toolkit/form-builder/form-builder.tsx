@@ -23,7 +23,6 @@ import { CreateBranchModal } from './create-branch-modal';
 import { FieldsBuilder } from './fields-builder';
 import { FormActionMenu } from './form-actions';
 import { FormPortalProvider } from './form-portal';
-import { LoadingDots } from './loading-dots';
 import { ResetForm } from './reset-form';
 import type { SaveChoice } from './save-options';
 
@@ -352,11 +351,10 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                       <Button
                         onClick={safeHandleSubmit}
                         disabled={!canSubmit || isGuardChecking}
-                        busy={submitting || isGuardChecking}
+                        busy={submitting}
                         variant='primary'
                       >
-                        {submitting && <LoadingDots />}
-                        {!submitting && tinaForm.buttons.save}
+                        {tinaForm.buttons.save}
                       </Button>
                       {tinaForm.actions.length > 0 && (
                         <FormActionMenu
