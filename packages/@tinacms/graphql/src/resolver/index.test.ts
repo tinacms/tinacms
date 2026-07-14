@@ -983,6 +983,23 @@ describe('index', () => {
       expect(result).toEqual({});
     });
 
+    it('clears an existing optional image when the submitted value is empty', async () => {
+      vi.mocked(resolveMediaCloudToRelative).mockClear();
+      const { build } = setup();
+      const template = {
+        fields: [{ name: 'coverImage', type: 'image', required: false }],
+      } as any;
+
+      const result = await build(
+        { coverImage: '' },
+        template,
+        { coverImage: 'images/old.png' }
+      );
+
+      expect(resolveMediaCloudToRelative).not.toHaveBeenCalled();
+      expect(result).toEqual({ coverImage: '' });
+    });
+
     it('serializes rich-text via serializeMDX before storage', async () => {
       vi.mocked(serializeMDX).mockReturnValue('# Hello');
       const { build } = setup();

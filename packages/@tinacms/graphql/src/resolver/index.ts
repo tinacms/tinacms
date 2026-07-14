@@ -1563,6 +1563,12 @@ export class Resolver {
         throw new Error(`Expected to find field by name ${fieldName}`);
       }
       if (isEmptyOptionalImageValue(fieldValue, field)) {
+        if (
+          existingData &&
+          Object.prototype.hasOwnProperty.call(existingData, fieldName)
+        ) {
+          accum[fieldName] = '';
+        }
         continue;
       }
       switch (field.type) {
