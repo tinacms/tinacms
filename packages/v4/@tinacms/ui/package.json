@@ -29,10 +29,10 @@
     }
   },
   "dependencies": {
+    "@base-ui/react": "^1.6.0",
     "class-variance-authority": "catalog:",
     "clsx": "^2.1.1",
     "lucide-react": "catalog:",
-    "radix-ui": "^1.6.1",
     "tailwind-merge": "^3.4.1"
   },
   "peerDependencies": {
