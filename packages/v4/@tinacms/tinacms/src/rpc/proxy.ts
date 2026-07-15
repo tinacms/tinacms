@@ -1,14 +1,8 @@
 // Client half of Capability RPC (ADR-007): a typed Proxy that turns
-// `server.media.upload(input)` into one POST to the mounted handler. Types come from
-// each server segment's exported shape via `import type` — erased at compile time, so
-// no server code (or secrets) can reach the browser bundle. Browser-safe: this module
-// must not import from ../server or ../rpc/handler.
+// `server.media.upload(input)` into one POST. Types cross via `import type` (erased at
+// compile time — no server code or secrets reach the browser). Browser-safe: must not
+// import from ../server or ./handler.
 
-import { RPC_ERROR_CODES } from './codes';
-
-// Maps a record of server segments to their client call signatures: each op keeps its
-// input/output types but loses everything else (there is nothing else — ops are
-// `(input) => Promise<result>` by contract).
 export type RpcProxy<TSegments> = {
   [Namespace in keyof TSegments]: {
     [Op in keyof TSegments[Namespace]]: TSegments[Namespace][Op] extends (
@@ -39,9 +33,8 @@ export interface RpcClientConfig {
   fetch?: typeof fetch;
 }
 
-// Two proxy levels mirror the two call levels (`server.media.upload`). No caching:
-// every access exists to make a network call, and op reads allocate a closure per
-// read regardless, so nothing can rely on property identity anyway.
+// Two proxy levels mirror the two call levels. No caching: every access exists to make
+// a network call, and nothing can rely on property identity anyway.
 export const createRpcClient = <TSegments>(
   config: RpcClientConfig
 ): RpcProxy<TSegments> =>
@@ -55,10 +48,9 @@ export const createRpcClient = <TSegments>(
     }
   ) as RpcProxy<TSegments>;
 
-// A Proxy get trap sees every property read, not just op calls: symbols (console and
-// runtime inspection probes) and `then` (the thenable check `await` performs on any
-// object). Those must read as absent — answering them would hang `await client.media`
-// and fire bogus POSTs to /then.
+// Get traps see every property read, not just op calls: symbols (inspection probes)
+// and `then` (await's thenable check) must read as absent, or `await client.media`
+// hangs and inspection fires bogus POSTs.
 const isReservedProxyKey = (key: string | symbol): key is symbol | 'then' =>
   typeof key === 'symbol' || key === 'then';
 
@@ -104,7 +96,7 @@ const unwrapRpcResponse = async (
     ?.error;
   throw new RpcError(
     response.status,
-    error?.code ?? RPC_ERROR_CODES.transportFailed,
+    error?.code ?? 'rpc-failed',
     error?.message ?? `RPC ${namespace}/${opName} failed (${response.status}).`
   );
 };

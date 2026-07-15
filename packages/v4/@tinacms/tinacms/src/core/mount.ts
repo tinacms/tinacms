@@ -1,18 +1,15 @@
 import { invariant } from './invariant';
 import { type PluginManifest, isSingletonSliceCapability } from './plugin';
 
-// Where a plugin's contribution mounts, on either side of the boundary: the client store
-// slice (store/compose-slices.ts) and the server ops namespace (rpc/handler.ts) resolve
-// through this one rule so `get().media.*` and `server.media.*` always agree.
+// Where a plugin mounts, on either side of the boundary: the client store slice and the
+// server ops namespace resolve through this one rule so `get().media.*` and
+// `server.media.*` always agree. isOverride = an explicit `overrides` declaration, the
+// only sanctioned way to replace another provider (ADR-006).
 export interface CapabilityMount {
   namespace: string;
-  // True when the plugin declares an explicit `overrides` for the capability it mounts
-  // at — the only sanctioned way to replace another provider (ADR-006).
   isOverride: boolean;
 }
 
-// Whether the manifest declares an explicit override for `capability` — shared with the
-// graph validation pass (core/resolve.ts), which checks it per provided capability.
 export const declaresCapabilityOverride = (
   manifest: PluginManifest,
   capability: string
@@ -37,8 +34,6 @@ export const capabilityMountFor = (
       `capabilities (${singletons.join(', ')}), but a plugin mounts at only ` +
       'one namespace. Split it into one plugin per capability.'
   );
-  // The invariant above caps singletons at one, so [0] is that single capability or
-  // undefined — undefined ⇒ a feature plugin, mounted under its own name.
   const capability = singletons[0];
   if (capability) {
     return {
@@ -46,9 +41,8 @@ export const capabilityMountFor = (
       isOverride: declaresCapabilityOverride(manifest, capability),
     };
   }
-  // A feature plugin must not squat a capability namespace by name alone: peers read
-  // capability state and call capability ops at these keys, so only a genuine provider
-  // may mount there — the same reservation createTinaStore applies to core namespaces.
+  // A feature plugin must not squat a capability namespace by name alone — peers read
+  // capability state and call capability ops at these keys.
   invariant(
     !isSingletonSliceCapability(manifest.name),
     'plugin-name-squats-capability',

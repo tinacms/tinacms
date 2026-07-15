@@ -80,20 +80,19 @@ export function TinaProvider({ plugins, children }: TinaProviderProps) {
     });
     return () => {
       mounted = false;
-      // Teardown rides the boot promise (the init sequence isn't cancellable, so
+      // Teardown awaits the boot (the init sequence isn't cancellable, so
       // unmounting mid-boot still destroys whatever finished initializing) and
       // becomes the next lifecycle turn. A failed boot has nothing to destroy —
       // initializePlugins tore its partial sequence down and setError surfaced
       // the cause. A destroy failure is logged, not rethrown: unmount has no
       // error boundary to feed.
-      lifecycleTurn = boot
-        .then(
-          (destroyPlugins) => destroyPlugins(),
-          () => undefined
-        )
-        .catch((cause) => {
-          console.error('[tinacms] plugin teardown failed:', cause);
-        });
+      const destroyBootedPlugins = async () => {
+        const destroyPlugins = await boot.catch(() => null);
+        await destroyPlugins?.();
+      };
+      lifecycleTurn = destroyBootedPlugins().catch((cause) => {
+        console.error('[tinacms] plugin teardown failed:', cause);
+      });
     };
   }, [pluginsKey]);
 

@@ -31,17 +31,11 @@ export const resolveServerSegments = async (
   return resolved;
 };
 
-// ADR-006: dependency resolution over capabilities, not plugin names. Only the
-// config-listed plugins participate — a plugin cannot inject itself into the graph.
-// Validates everything a broken config can get wrong (duplicate names,
-// singleton-capability conflicts, missing providers) before any segment is imported,
-// so a bad config never half-boots.
-//
-// `field` is the keyed capability (ADR-009): many providers are legal, and per-type
-// conflicts are the field registry's job (createFieldRegistry). Both segment composers
-// are order-independent registries — ADR-006's topological order exists solely for the
-// onInit lifecycle, and its one config-shaped failure (a dependency cycle) is caught
-// here with the rest.
+// ADR-006: only config-listed plugins participate — a plugin cannot inject itself.
+// Everything a broken config can get wrong (duplicate names, singleton conflicts,
+// missing providers, dependency cycles) fails here, before any segment import, so a
+// bad config never half-boots. `field` is keyed (ADR-009): many providers are legal,
+// per-type conflicts are the field registry's job.
 export const validateCapabilityGraph = (plugins: PluginManifest[]): void => {
   const names = new Set<string>();
   for (const plugin of plugins) {
@@ -85,12 +79,9 @@ export const validateCapabilityGraph = (plugins: PluginManifest[]): void => {
   orderPluginsByDependencies(plugins);
 };
 
-// ADR-006 initialization order: every provider of a capability initializes before the
-// plugins depending on it. Repeated ready-scan (Kahn's algorithm) so config order breaks
-// ties and runs are deterministic; a plugin satisfying its own dependency is not an
-// edge. A cycle cannot be ordered — hard error naming the members, same philosophy as
-// capability conflicts: nothing is silently picked.
-// ponytail: O(n²) ready-scan — plugin lists are tens, not thousands.
+// ADR-006 init order: providers before dependents; config order breaks ties; a plugin
+// satisfying its own dependency is not an edge; a cycle is a hard error naming its
+// members. ponytail: O(n²) ready-scan — plugin lists are tens, not thousands.
 const orderPluginsByDependencies = (
   plugins: PluginManifest[]
 ): PluginManifest[] => {
@@ -134,18 +125,15 @@ const orderPluginsByDependencies = (
   return ordered;
 };
 
-// The onInit lifecycle (ADR-006): run once per runtime boot, in dependency order, each
-// hook awaited before the next. Returns the matching teardown — onDestroy in reverse
-// order, only for plugins whose init actually ran. A mid-sequence failure tears those
-// down first (a poller registered by an earlier onInit must not outlive a failed boot),
-// then rethrows the original cause.
+// The onInit lifecycle (ADR-006): once per boot, in dependency order, each hook awaited.
+// Returns the teardown — onDestroy in reverse, only for inits that ran; a mid-sequence
+// failure tears those down first, then rethrows.
 export const initializePlugins = async (
   plugins: PluginManifest[]
 ): Promise<() => Promise<void>> => {
   const initialized: PluginManifest[] = [];
-  // Idempotent (drains the list, so a second call is a no-op) and abort-proof:
-  // one throwing onDestroy must not skip the remaining teardowns — every hook
-  // runs, then the first failure rethrows so callers can still surface it.
+  // Idempotent (drains the list) and abort-proof: every hook runs even if one throws,
+  // then the first failure rethrows.
   const destroyInitialized = async () => {
     const failures: unknown[] = [];
     for (const plugin of initialized.splice(0).reverse()) {

@@ -1,11 +1,7 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { invariant } from '../core/invariant';
-import type {
-  ResolvedSegment,
-  SliceSet,
-  TinaStoreState,
-} from '../core/plugin';
+import type { ResolvedSegment, SliceSet, TinaStoreState } from '../core/plugin';
 import { composePluginSlices } from './compose-slices';
 
 // The store's built-in namespaces. Intentionally empty stubs for now — this increment

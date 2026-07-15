@@ -19,17 +19,10 @@ export const defineServerPlugin = <TOps extends ServerSegment>(
   ops: TOps
 ): TOps => ops;
 
-// ADR-023 §1: the single primitive every verifier needs — `getSession(request) →
-// { identity, roles } | null`. Roles ride in the session; core reads them per request
-// and stores nothing (ADR-008).
-export interface SessionIdentity {
-  id: string;
-  name?: string;
-  email?: string;
-}
-
+// ADR-023 §1: the single primitive every verifier needs. Roles ride in the session;
+// core reads them per request and stores nothing (ADR-008).
 export interface Session {
-  identity: SessionIdentity;
+  identity: { id: string; name?: string; email?: string };
   roles: string[];
 }
 
@@ -56,13 +49,11 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, string[]> = Object.assign(
   }
 );
 
-// Op-level authorization marks (ADR-008 §1/§2). A bare handler is protected by default;
-// `publicOp` is the only unauthenticated opt-out (`grep publicOp` enumerates the public
-// surface); `protectedOp` additionally names the required permission. Both wrap rather
-// than mutate, so one handler reused under two wrappers can't cross-tag. The permission
-// stays `string` until codegen aggregates declared permissions into a typed union
-// (ADR-008 §3). `Symbol.for`, so duplicate copies of this module (a plugin bundling its
-// own tinacms/server) still agree on the tag.
+// Op-level authorization marks (ADR-008): bare handlers are protected by default;
+// `publicOp` is the only unauthenticated opt-out (greppable); `protectedOp` names the
+// required permission (`string` until codegen builds the typed union). Wrapping, not
+// mutating, so one handler under two wrappers can't cross-tag; `Symbol.for`, so
+// duplicate module copies still agree on the tag.
 const OP_META = Symbol.for('tinacms.op-meta');
 
 interface OpMeta {
@@ -91,30 +82,25 @@ export const protectedOp = <TOp extends ServerOp>(
 export const opMeta = (handler: ServerOp): OpMeta =>
   (handler as TaggedOp)[OP_META] ?? {};
 
-// The composed server runtime: resolved segments by mount namespace (capability key or
-// plugin name — core/mount.ts), built once per handler by rpc/handler.ts. The auth
-// transport hooks are extracted at compose time (parse, don't validate): dispatch never
-// re-checks the auth segment's shape, and `null` means fail-closed — no sessions.
+// The composed server runtime (built once per handler, rpc/handler.ts): segments by
+// mount namespace, plus the auth hooks claimed at compose — `null` fails closed.
 export interface ServerRuntime {
   segmentsByNamespace: Map<string, ResolvedServerSegment>;
   authHooks: AuthTransportHooks | null;
 }
 
-// Carries the runtime across an op invocation so the module-level `use()` accessor
-// resolves against the handler that dispatched it — safe under interleaved async
-// requests, unlike a swapped module global.
+// Carries the runtime across a dispatch so the module-level `use()` resolves against
+// the handler that dispatched it — safe under interleaved requests.
 export const serverRuntimeStorage = new AsyncLocalStorage<ServerRuntime>();
 
-// Server→server in-process capability accessor (ADR-007): compose capabilities without
-// an HTTP hop — `use('content').listAll()`. Typed per-capability contracts arrive with
-// the capability-contract ADRs' implementations (019/021/022); until then callers cast.
+// Server→server in-process capability accessor (ADR-007) — `use('content').listAll()`.
+// Typed per-capability contracts arrive with ADR-019/021/022; until then callers cast.
 export const use = (capability: string): ServerSegment => {
   const runtime = serverRuntimeStorage.getStore();
   invariant(
     runtime,
     'use-outside-op',
-    "`use(capability)` reads the dispatching handler's runtime, so it only works " +
-      'inside a server operation invoked through the RPC handler.'
+    '`use(capability)` only works inside code dispatched by the RPC handler.'
   );
   const mounted = runtime.segmentsByNamespace.get(capability);
   invariant(
