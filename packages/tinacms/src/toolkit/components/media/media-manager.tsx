@@ -632,13 +632,7 @@ const UploadButton = ({ onClick, uploading }: any) => {
       busy={uploading}
       onClick={onClick}
     >
-      {uploading ? (
-        <LoadingDots />
-      ) : (
-        <>
-          Upload <BiCloudUpload className='w-6 h-full ml-2 opacity-70' />
-        </>
-      )}
+      Upload <BiCloudUpload className='w-6 h-full ml-2 opacity-70' />
     </Button>
   );
 };

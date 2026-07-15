@@ -297,3 +297,12 @@ export const E_DEFAULT = new MediaListError({
   message: 'Something went wrong accessing your media from TinaCloud.',
   docsLink: 'https://tina.io/docs/r/repo-based-media',
 });
+
+export const E_SELF_HOSTED_MEDIA = new MediaListError({
+  title: "Repo-based media isn't available when self-hosting",
+  message:
+    "Self-hosted TinaCMS can't serve media from your repo through TinaCloud. " +
+    'Configure an external media store (e.g. S3, Cloudinary, DigitalOcean Spaces, or Azure) ' +
+    'with media.loadCustomStore, or add media to your repo manually.',
+  docsLink: 'https://tina.io/docs/r/backend-media-handler/',
+});
