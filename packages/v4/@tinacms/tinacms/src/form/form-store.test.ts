@@ -85,6 +85,22 @@ describe('form-store save reset', () => {
     store.getState().setFieldValue(postA, title, 'Hello');
     expect(statusOf(postA)).toBe('dirty');
   });
+
+  it('markSaved with a pre-save snapshot keeps in-flight edits dirty', () => {
+    store.getState().registerForm(postA, { [title]: 'Hello' });
+    store.getState().setFieldValue(postA, title, 'Saved value');
+    const snapshot = { ...store.getState().forms[postA].values };
+
+    // Edit typed while the save was in flight: baseline is the snapshot, not
+    // the current values, so the newer edit still diffs dirty.
+    store.getState().setFieldValue(postA, title, 'Newer edit');
+    store.getState().markSaved(postA, snapshot);
+    expect(statusOf(postA)).toBe('dirty');
+
+    // Reverting to what was actually saved is clean against the new baseline.
+    store.getState().setFieldValue(postA, title, 'Saved value');
+    expect(statusOf(postA)).toBe('clean');
+  });
 });
 
 describe('form-store multiple forms', () => {
