@@ -11,7 +11,10 @@ import {
   composeOverridableRegistry,
 } from '../core/overridable-registry';
 import { AUTH_CAPABILITY, type PluginManifest } from '../core/plugin';
-import { resolveCapabilityGraph, resolveServerSegments } from '../core/resolve';
+import {
+  resolveServerSegments,
+  validateCapabilityGraph,
+} from '../core/resolve';
 import {
   type AuthTransportHooks,
   DEFAULT_ROLE_PERMISSIONS,
@@ -61,7 +64,8 @@ export const createRpcHandler = ({ plugins }: RpcHandlerConfig): RpcHandler => {
 export const composeServerRuntime = async (
   plugins: PluginManifest[]
 ): Promise<ServerRuntime> => {
-  const resolved = await resolveServerSegments(resolveCapabilityGraph(plugins));
+  validateCapabilityGraph(plugins);
+  const resolved = await resolveServerSegments(plugins);
   const segmentsByNamespace = composeOverridableRegistry(
     resolved.map((segment) => {
       const mount = capabilityMountFor(segment.manifest);

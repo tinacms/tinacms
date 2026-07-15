@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { type Capability, definePlugin } from './plugin';
-import { resolveCapabilityGraph } from './resolve';
+import { validateCapabilityGraph } from './resolve';
 
 const plugin = (
   name: string,
@@ -11,40 +11,23 @@ const plugin = (
   } = {}
 ) => definePlugin({ name, ...spec });
 
-const orderOf = (plugins: ReturnType<typeof plugin>[]) =>
-  resolveCapabilityGraph(plugins).map((manifest) => manifest.name);
-
-describe('resolveCapabilityGraph', () => {
-  it('orders providers before their dependents', () => {
-    const search = plugin('local-search', {
-      provides: ['search'],
-      dependsOn: ['content', 'auth'],
-    });
-    const auth = plugin('local-auth', { provides: ['auth'] });
-    const content = plugin('local-content', {
-      provides: ['content'],
-      dependsOn: ['auth'],
-    });
-    const ordered = orderOf([search, content, auth]);
-    expect(ordered.indexOf('local-auth')).toBeLessThan(
-      ordered.indexOf('local-content')
-    );
-    expect(ordered.indexOf('local-content')).toBeLessThan(
-      ordered.indexOf('local-search')
-    );
-  });
-
-  it('keeps input order among independent plugins', () => {
-    expect(orderOf([plugin('a'), plugin('b'), plugin('c')])).toEqual([
-      'a',
-      'b',
-      'c',
-    ]);
+describe('validateCapabilityGraph', () => {
+  it('accepts a config whose dependencies are all provided', () => {
+    expect(() =>
+      validateCapabilityGraph([
+        plugin('local-auth', { provides: ['auth'] }),
+        plugin('local-content', { provides: ['content'], dependsOn: ['auth'] }),
+        plugin('local-search', {
+          provides: ['search'],
+          dependsOn: ['content', 'auth'],
+        }),
+      ])
+    ).not.toThrow();
   });
 
   it('allows many field providers — field is the keyed capability', () => {
     expect(() =>
-      resolveCapabilityGraph([
+      validateCapabilityGraph([
         plugin('tina:field:string', { provides: ['field'] }),
         plugin('tina:field:boolean', { provides: ['field'] }),
       ])
@@ -53,7 +36,7 @@ describe('resolveCapabilityGraph', () => {
 
   it('rejects two providers of a singleton capability', () => {
     expect(() =>
-      resolveCapabilityGraph([
+      validateCapabilityGraph([
         plugin('s3-media', { provides: ['media'] }),
         plugin('cloudinary-media', { provides: ['media'] }),
       ])
@@ -66,13 +49,13 @@ describe('resolveCapabilityGraph', () => {
       provides: ['media'],
       overrides: [{ capability: 'media' }],
     });
-    expect(() => resolveCapabilityGraph([base, override])).not.toThrow();
-    expect(() => resolveCapabilityGraph([override, base])).not.toThrow();
+    expect(() => validateCapabilityGraph([base, override])).not.toThrow();
+    expect(() => validateCapabilityGraph([override, base])).not.toThrow();
   });
 
   it('rejects two overrides of one capability', () => {
     expect(() =>
-      resolveCapabilityGraph([
+      validateCapabilityGraph([
         plugin('a', {
           provides: ['media'],
           overrides: [{ capability: 'media' }],
@@ -87,28 +70,28 @@ describe('resolveCapabilityGraph', () => {
 
   it('rejects a dependency no plugin provides', () => {
     expect(() =>
-      resolveCapabilityGraph([plugin('needs-auth', { dependsOn: ['auth'] })])
+      validateCapabilityGraph([plugin('needs-auth', { dependsOn: ['auth'] })])
     ).toThrow(/capability-no-provider/);
   });
 
   it('rejects duplicate plugin names', () => {
     expect(() =>
-      resolveCapabilityGraph([plugin('twin'), plugin('twin')])
+      validateCapabilityGraph([plugin('twin'), plugin('twin')])
     ).toThrow(/plugin-duplicate-name/);
   });
 
-  it('rejects capability cycles and names the participants', () => {
+  it('accepts mutual dependencies — ordering is not computed until onInit lands', () => {
     expect(() =>
-      resolveCapabilityGraph([
+      validateCapabilityGraph([
         plugin('a', { provides: ['media'], dependsOn: ['search'] }),
         plugin('b', { provides: ['search'], dependsOn: ['media'] }),
       ])
-    ).toThrow(/capability-cycle/);
+    ).not.toThrow();
   });
 
-  it('ignores a self-satisfied dependency', () => {
+  it('accepts a self-satisfied dependency', () => {
     expect(() =>
-      resolveCapabilityGraph([
+      validateCapabilityGraph([
         plugin('solo', { provides: ['auth'], dependsOn: ['auth'] }),
       ])
     ).not.toThrow();
