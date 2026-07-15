@@ -12,6 +12,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "tinacms-scripts build",
+    "dev": "vite playground",
     "types": "tsc",
     "test": "vitest run --passWithNoTests"
   },
@@ -72,6 +73,7 @@
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "typescript": "^5.7.3",
+    "vite": "^5.4.0",
     "vitest": "^2.1.9"
   }
 }
