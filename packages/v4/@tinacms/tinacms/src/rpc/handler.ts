@@ -3,6 +3,7 @@
 // — binary is the media capability's own contract (ADR-022), and a rich-JSON codec is a
 // still-open ADR-007 sub-decision.
 
+import { invariant } from '../core/invariant';
 import { capabilityMountFor, overridesCapabilityMount } from '../core/mount';
 import {
   REGISTRY_CONFLICTS,
@@ -79,18 +80,25 @@ export const composeServerRuntime = async (
 
 // The one place the auth segment's shape is checked (parse, don't validate). A missing
 // or non-callable getSession yields null — the transport then never has a session, so
-// every non-public op fails closed rather than half-trusting a malformed provider.
+// every non-public op fails closed. A present-but-non-callable rolePermissions is a
+// malformed provider and fails compose outright: silently falling back to the built-in
+// bundles would swap in different grants (admin's wildcard) than the provider intended.
 const extractAuthTransportHooks = (
   segmentsByNamespace: Map<string, ResolvedServerSegment>
 ): AuthTransportHooks | null => {
   const authOps = segmentsByNamespace.get(AUTH_CAPABILITY)?.ops;
   if (!authOps || typeof authOps.getSession !== 'function') return null;
+  invariant(
+    authOps.rolePermissions === undefined ||
+      typeof authOps.rolePermissions === 'function',
+    'auth-role-permissions-not-callable',
+    'The auth provider declares `rolePermissions` but it is not a function.'
+  );
   return {
     getSession: authOps.getSession as AuthTransportHooks['getSession'],
-    rolePermissions:
-      typeof authOps.rolePermissions === 'function'
-        ? (authOps.rolePermissions as AuthTransportHooks['rolePermissions'])
-        : undefined,
+    rolePermissions: authOps.rolePermissions as
+      | AuthTransportHooks['rolePermissions']
+      | undefined,
   };
 };
 

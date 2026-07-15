@@ -147,6 +147,33 @@ describe('createRpcHandler', () => {
     expect((await authless(post('/media/health'))).status).toBe(200);
   });
 
+  it('fails compose when rolePermissions is not callable', async () => {
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+    const malformed = createRpcHandler({
+      plugins: [
+        definePlugin({
+          name: 'malformed-auth',
+          provides: ['auth'],
+          server: async () => ({
+            default: defineServerPlugin({
+              getSession: async () => sessionsByToken['admin-token'],
+              rolePermissions: { editor: ['media:delete'] } as never,
+            }),
+          }),
+        }),
+        mediaPlugin,
+      ],
+    });
+    const response = await malformed(
+      post('/media/list', { token: 'admin-token', body: { dir: 'x' } })
+    );
+    expect(response.status).toBe(500);
+    expect((await response.json()).error.code).toBe('runtime-compose-failed');
+    consoleError.mockRestore();
+  });
+
   it('resolves use(capability) inside the auth transport hooks', async () => {
     const composingAuth = definePlugin({
       name: 'composing-auth',
