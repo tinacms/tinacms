@@ -75,6 +75,21 @@ export interface ClientSegment {
   slice?: ClientSlice;
 }
 
+// One server-segment operation (ADR-007): a flat `(input) => Promise<result>` record is
+// the whole contract — the same shape `import type` carries to the client for the typed
+// RPC proxy. `never` keeps every concrete op assignable (parameter contravariance)
+// without reaching for `any`; the transport casts at the single dispatch site.
+export type ServerOp = (input: never) => Promise<unknown>;
+
+export type ServerSegment = Record<string, ServerOp>;
+
+// A manifest paired with its loaded server segment — what the RPC handler composes
+// (rpc/handler.ts), symmetric with ResolvedSegment on the client side.
+export interface ResolvedServerSegment {
+  manifest: PluginManifest;
+  ops: ServerSegment;
+}
+
 // A manifest paired with its loaded client segment — the boot-resolved unit both
 // registries (field types, store slices) compose from.
 export interface ResolvedSegment {
@@ -104,13 +119,13 @@ export const resolveClientSegments = async (
 
 export interface PluginManifest {
   name: string;
-  // Honored today: `name`, `client`, `provides` (slice mount key), and `overrides`.
-  // The rest are the declared plugin contract (ADR-002/006/007/008), not yet wired —
-  // noops for now.
+  // Honored today: `name`, `client`, `server`, `provides` (mount key), `dependsOn`
+  // (graph order, core/resolve.ts), `overrides`, and `requires` (RPC transport gate).
+  // `permissions` declarations await codegen's typed Permission union (ADR-008 §3).
   provides?: Capability[];
   dependsOn?: Capability[];
   client?: () => Promise<{ default: ClientSegment }>;
-  server?: () => Promise<unknown>;
+  server?: () => Promise<{ default: ServerSegment }>;
   permissions?: { name: string; description?: string }[];
   requires?: { permission: string };
   overrides?: CapabilityOverride[];
