@@ -98,12 +98,44 @@ function BreadcrumbEllipsis({
   );
 }
 
+// A crumb that navigates somewhere when clicked.
+function BreadcrumbItemLink({
+  breadcrumb,
+  onClick,
+}: { breadcrumb: string; onClick: () => void }) {
+  return (
+    <BreadcrumbItem className='shrink min-w-0'>
+      <BreadcrumbLink
+        asChild
+        className='block min-w-0 truncate text-gray-700 hover:text-orange-500'
+      >
+        <button type='button' onClick={onClick}>
+          {breadcrumb}
+        </button>
+      </BreadcrumbLink>
+    </BreadcrumbItem>
+  );
+}
+
+// The trailing crumb. Represents where you already are, so it isn't clickable.
+function FinalBreadcrumbItem({ breadcrumb }: { breadcrumb: string }) {
+  return (
+    <BreadcrumbItem className='shrink min-w-0'>
+      <BreadcrumbPage className='block min-w-0 truncate text-gray-700 font-medium cursor-default'>
+        {breadcrumb}
+      </BreadcrumbPage>
+    </BreadcrumbItem>
+  );
+}
+
 export {
   Breadcrumb,
   BreadcrumbList,
   BreadcrumbItem,
+  BreadcrumbItemLink,
   BreadcrumbLink,
   BreadcrumbPage,
   BreadcrumbSeparator,
   BreadcrumbEllipsis,
+  FinalBreadcrumbItem,
 };

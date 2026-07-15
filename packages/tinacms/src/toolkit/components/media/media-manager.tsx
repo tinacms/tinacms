@@ -435,9 +435,8 @@ export function MediaPicker({
 
       <MediaPickerWrap>
         <SyncStatusContainer>
-          <div className='flex flex-wrap items-center bg-gray-50 border-b border-gray-150 gap-4 py-3 px-5 shadow-sm flex-shrink-0'>
-            <div className='flex flex-1 items-center gap-4'>
-              <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
+          <div className='flex flex-col gap-2 bg-gray-50 p-5 flex-col gap-2 border-b border-gray-150'>
+            <div className='flex flex-row justify-between gap-4'>
               <Breadcrumb
                 directory={directory}
                 setDirectory={(dir: string) => {
@@ -448,38 +447,50 @@ export function MediaPicker({
                   setActiveItem(false);
                 }}
               />
+              {cms.media.store.isStatic ? null : (
+                <div className='flex items-center gap-4'>
+                  <Button
+                    busy={false}
+                    variant='white'
+                    onClick={() => {
+                      setRefreshing(true);
+                      resetOffset();
+                      resetList();
+                      setActiveItem(false);
+                    }}
+                    className='whitespace-nowrap'
+                  >
+                    Refresh
+                    <IoMdRefresh className='w-6 h-full ml-2 opacity-70 text-blue-500' />
+                  </Button>
+                  <Button
+                    busy={false}
+                    variant='white'
+                    onClick={() => {
+                      setNewFolderModalOpen(true);
+                    }}
+                    className='whitespace-nowrap'
+                  >
+                    New Folder
+                    <BiFolder className='w-6 h-full ml-2 opacity-70 text-tina-orange' />
+                  </Button>
+                  <UploadButton onClick={onClick} uploading={uploading} />
+                </div>
+              )}
             </div>
-
-            {cms.media.store.isStatic ? null : (
-              <div className='flex flex-wrap items-center gap-4'>
-                <Button
-                  busy={false}
-                  variant='white'
-                  onClick={() => {
-                    setRefreshing(true);
-                    resetOffset();
-                    resetList();
-                    setActiveItem(false);
-                  }}
-                  className='whitespace-nowrap'
-                >
-                  Refresh
-                  <IoMdRefresh className='w-6 h-full ml-2 opacity-70 text-blue-500' />
-                </Button>
-                <Button
-                  busy={false}
-                  variant='white'
-                  onClick={() => {
-                    setNewFolderModalOpen(true);
-                  }}
-                  className='whitespace-nowrap'
-                >
-                  New Folder
-                  <BiFolder className='w-6 h-full ml-2 opacity-70 text-tina-orange' />
-                </Button>
-                <UploadButton onClick={onClick} uploading={uploading} />
+            <div className='flex justify-between items-center gap-4'>
+              {/* placeholder for search */}
+              <div>
+                <input
+                  type='text'
+                  placeholder='Search this library...'
+                  className='px-3 py-2 rounded border border-gray-200 text-gray-500 text-sm w-80'
+                ></input>
               </div>
-            )}
+              <div className='flex items-center gap-4'>
+                <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
+              </div>
+            </div>
           </div>
 
           <div className='flex h-full overflow-hidden bg-white'>
@@ -762,10 +773,10 @@ const DocsLink = ({ title, message, docsLink, ...props }) => {
 
 const ViewModeToggle = ({ viewMode, setViewMode }) => {
   const toggleClasses = {
-    base: 'relative whitespace-nowrap flex items-center justify-center flex-1 block font-medium text-base py-1 transition-all ease-out duration-150 border',
+    base: 'relative border-gray-50 whitespace-nowrap flex items-center justify-center flex-1 block font-medium text-base py-1 transition-all ease-out duration-150 border',
     active:
-      'bg-white text-blue-500 shadow-inner border-gray-50 border-t-gray-100',
-    inactive: 'bg-gray-50 text-gray-400 shadow border-gray-100 border-t-white',
+      'bg-white text-tina-orange',
+    inactive: 'bg-gray-50 text-gray-400 ',
   };
 
   return (
@@ -773,7 +784,7 @@ const ViewModeToggle = ({ viewMode, setViewMode }) => {
       className={`grow-0 flex justify-between rounded border border-gray-100`}
     >
       <button
-        className={`${toggleClasses.base} px-2.5 rounded-l ${
+        className={`${toggleClasses.base} px-2.5 rounded ${
           viewMode === 'grid' ? toggleClasses.active : toggleClasses.inactive
         }`}
         onClick={() => {
@@ -783,7 +794,7 @@ const ViewModeToggle = ({ viewMode, setViewMode }) => {
         <BiGridAlt className='w-6 h-full opacity-70' />
       </button>
       <button
-        className={`${toggleClasses.base} px-2 rounded-r ${
+        className={`${toggleClasses.base} px-2 rounded ${
           viewMode === 'list' ? toggleClasses.active : toggleClasses.inactive
         }`}
         onClick={() => {

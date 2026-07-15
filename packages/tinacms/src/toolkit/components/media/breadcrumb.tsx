@@ -1,80 +1,145 @@
-import React, { Fragment } from 'react';
-import { LeftArrowIcon } from '@toolkit/icons';
-import { IconButton } from '@toolkit/styles';
-import { cn } from '@utils/cn';
+import {
+  BreadcrumbEllipsis,
+  BreadcrumbItem,
+  BreadcrumbItemLink,
+  BreadcrumbList,
+  Breadcrumb as BreadcrumbNav,
+  BreadcrumbSeparator,
+  FinalBreadcrumbItem,
+} from '@toolkit/components/ui/breadcrumb';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@toolkit/components/ui/dropdown-menu';
+import { Folder } from 'lucide-react';
+import React from 'react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '../../../admin/components/ui/tooltip';
 
-// Fixed issue where dirname was being used in the frontend
-function dirname(path): string | undefined {
-  const pattern = new RegExp('(?<prevDir>.*)/');
-  return path.match(pattern)?.groups?.prevDir;
-}
-
-interface BreadcrumbProps {
+interface BreadcrumbProps extends React.HTMLAttributes<HTMLElement> {
   directory?: string;
   setDirectory: (_directory: string) => void;
 }
 
-const BreadcrumbButton = ({ className = '', ...props }) => (
-  <button
-    className={cn(
-      'capitalize transition-colors duration-150 border-0 bg-transparent hover:text-blue-500',
-      className
-    )}
-    {...props}
-  />
-);
+const ROOT_LABEL = 'Media';
 
-const BreadcrumbItem = ({ className = '', ...props }) => (
-  <span className={cn('capitalize', className)} {...props} />
-);
-
-export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
+// Split a directory into the crumbs leading to it, root first. Each crumb
+// carries the directory it navigates to, so callers never re-derive the path.
+function toCrumbs(directory: string) {
   // Normalize: ensure non-root directories always have a leading slash so that
-  // split('/') produces '' as the first element, which renders as 'Media'.
-  const normalizedDir =
-    directory && !directory.startsWith('/') ? '/' + directory : directory;
-  const directoryParts = normalizedDir.split('/');
+  // split('/') produces '' as the first element, which renders as the root.
+  const normalized =
+    directory && !directory.startsWith('/') ? `/${directory}` : directory;
 
-  let prevDir: string = dirname(normalizedDir) || '';
-  if (prevDir === '.') {
-    prevDir = '';
-  }
+  return normalized.split('/').map((part, index, parts) => ({
+    label: part === '' ? ROOT_LABEL : part,
+    directory: parts.slice(0, index + 1).join('/'),
+  }));
+}
+
+export function Breadcrumb({
+  directory = '',
+  setDirectory,
+  ...props
+}: BreadcrumbProps) {
+  const crumbs = toCrumbs(directory);
+
+  const firstCrumb = crumbs[0];
+  const secondLastCrumb = crumbs.length > 2 ? crumbs[crumbs.length - 2] : null;
+  const lastCrumb = crumbs.length > 1 ? crumbs[crumbs.length - 1] : null;
+  const dropdownCrumbs = crumbs.length > 3 ? crumbs.slice(1, -2) : [];
 
   return (
-    <div className='w-full flex items-center text-[16px] text-gray-300'>
-      {directoryParts.length > 1 && (
-        <IconButton
-          variant='ghost'
-          className='mr-2'
-          onClick={() => setDirectory(prevDir)}
-        >
-          <LeftArrowIcon
-            className={`w-7 h-auto fill-gray-300 hover:fill-gray-900 transition duration-150 ease-out`}
-          />
-        </IconButton>
-      )}
-      {directoryParts.map((part, index) => {
-        return directoryParts.length === index + 1 ? (
-          <BreadcrumbItem
-            key={index}
-            className='pl-1.5 font-bold text-gray-500'
-          >
-            {part === '' ? 'Media' : part}
-          </BreadcrumbItem>
-        ) : (
-          <Fragment key={index}>
-            <BreadcrumbButton
-              onClick={() =>
-                setDirectory(directoryParts.slice(0, index + 1).join('/'))
-              }
-              className='pl-1.5 text-gray-300'
-            >
-              {part === '' ? 'Media' : part}
-            </BreadcrumbButton>
-            <span className='pl-1.5 text-gray-300'>/</span>
-          </Fragment>
-        );
-      })}
+    <div className='flex min-w-0 items-center gap-1.5' {...props}>
+      {/* Anchors the path. shrink-0 keeps it visible when the crumbs truncate. */}
+      <Folder
+        aria-hidden='true'
+        className='size-4 shrink-0 fill-current text-tina-orange'
+      />
+
+      <BreadcrumbNav className='min-w-0'>
+        <BreadcrumbList className='flex-nowrap text-nowrap overflow-hidden'>
+          {/* First crumb: the media root */}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className='flex min-w-0 shrink'>
+                  {lastCrumb ? (
+                    <BreadcrumbItemLink
+                      breadcrumb={firstCrumb.label}
+                      onClick={() => setDirectory(firstCrumb.directory)}
+                    />
+                  ) : (
+                    <FinalBreadcrumbItem breadcrumb={firstCrumb.label} />
+                  )}
+                </span>
+              </TooltipTrigger>
+              {directory && (
+                <TooltipContent
+                  side='bottom'
+                  align='start'
+                  className='shadow-md max-w-xs break-all'
+                >
+                  {directory}
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
+
+          {/* Dropdown for middle crumbs */}
+          {dropdownCrumbs.length > 0 && (
+            <>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <DropdownMenu>
+                  <DropdownMenuTrigger className='flex items-center gap-1'>
+                    <BreadcrumbEllipsis className='size-4' />
+                    <span className='sr-only'>Toggle menu</span>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align='start'>
+                    {dropdownCrumbs.map((crumb) => (
+                      <DropdownMenuItem
+                        key={crumb.directory}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setDirectory(crumb.directory);
+                        }}
+                      >
+                        {crumb.label}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </BreadcrumbItem>
+            </>
+          )}
+
+          {/* Second last crumb */}
+          {secondLastCrumb && (
+            <>
+              <BreadcrumbSeparator />
+              <BreadcrumbItemLink
+                breadcrumb={secondLastCrumb.label}
+                onClick={() => setDirectory(secondLastCrumb.directory)}
+              />
+            </>
+          )}
+
+          {/* Last crumb: the directory currently open */}
+          {lastCrumb && (
+            <>
+              <BreadcrumbSeparator />
+              <FinalBreadcrumbItem breadcrumb={lastCrumb.label} />
+            </>
+          )}
+        </BreadcrumbList>
+      </BreadcrumbNav>
     </div>
   );
 }

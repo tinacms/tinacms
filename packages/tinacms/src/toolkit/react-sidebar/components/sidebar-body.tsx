@@ -3,10 +3,11 @@ import {
   Breadcrumb,
   BreadcrumbEllipsis,
   BreadcrumbItem,
+  BreadcrumbItemLink,
   BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
   BreadcrumbSeparator,
+  FinalBreadcrumbItem,
 } from '@toolkit/components/ui/breadcrumb';
 import {
   DropdownMenu,
@@ -311,24 +312,6 @@ export const FileHistoryProvider = ({
   );
 };
 
-const BreadcrumbItemLink = ({
-  breadcrumb,
-  onClick,
-}: { breadcrumb: string; onClick: () => void }) => {
-  return (
-    <BreadcrumbItem className='shrink min-w-0'>
-      <BreadcrumbLink
-        asChild
-        className='block min-w-0 truncate text-gray-700 hover:text-orange-500'
-      >
-        <button type='button' onClick={onClick}>
-          {breadcrumb}
-        </button>
-      </BreadcrumbLink>
-    </BreadcrumbItem>
-  );
-};
-
 // Leading crumb that navigates back to the collection's document list.
 const CollectionBreadcrumbItem = ({
   label,
@@ -350,16 +333,6 @@ const CollectionBreadcrumbItem = ({
           <span className='truncate min-w-0'>{label}</span>
         </button>
       </BreadcrumbLink>
-    </BreadcrumbItem>
-  );
-};
-
-const FinalBreadcrumbItem = ({ breadcrumb }: { breadcrumb: string }) => {
-  return (
-    <BreadcrumbItem className='shrink min-w-0'>
-      <BreadcrumbPage className='block min-w-0 truncate text-gray-700 font-medium cursor-default'>
-        {breadcrumb}
-      </BreadcrumbPage>
     </BreadcrumbItem>
   );
 };
