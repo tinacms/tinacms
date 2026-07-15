@@ -1,0 +1,15 @@
+{
+  "extends": "../../../../../base.tsconfig.json",
+  "compilerOptions": {
+    "emitDeclarationOnly": false,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "types": ["vite/client"],
+    "baseUrl": ".",
+    "paths": {
+      "@tinacms/tinacms/react": ["../src/editor/index.ts"],
+      "@tinacms/tinacms": ["../src/index.ts"]
+    }
+  },
+  "include": ["src", "vite.config.ts"]
+}
