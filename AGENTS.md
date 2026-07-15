@@ -47,6 +47,8 @@ tests/                 # Build verification tests
 
 - `pnpm-workspace.yaml` defines workspace packages and a `catalog:` section for shared dependency versions
 - Example apps use `workspace:*` to reference local TinaCMS packages
+- Published packages must use `workspace:^` for internal refs in `dependencies`/`peerDependencies` (`devDependencies` are exempt). pnpm publishes it as a caret range so npm can dedupe; `workspace:*` publishes an exact pin that nests duplicate dependency trees (#7207). Enforced by `tests/workspace-protocol.test.ts`.
+- Because published dependents float across caret ranges, internal APIs consumed by sibling published packages are compatibility contracts within a major: an already-published `@tinacms/cli`/`@tinacms/app` may run against a newer `tinacms`. Breaking such an API requires a major bump.
 - `turbo.json` defines build/test/types task dependencies
 
 ## Coding Standards
