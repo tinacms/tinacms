@@ -45,6 +45,13 @@ export interface AuthTransportHooks {
 
 export const AUTH_TRANSPORT_HOOKS = ['getSession', 'rolePermissions'] as const;
 
+export type AuthTransportHookName = (typeof AUTH_TRANSPORT_HOOKS)[number];
+
+export const isAuthTransportHook = (
+  opName: string
+): opName is AuthTransportHookName =>
+  (AUTH_TRANSPORT_HOOKS as readonly string[]).includes(opName);
+
 // ADR-008 §4/§5: Tina ships editor/admin so TinaCloud works with zero config; new
 // permissions are granted to nobody by default except admin's wildcard. Null-prototype,
 // so a role named after an Object.prototype member ("constructor", "__proto__")

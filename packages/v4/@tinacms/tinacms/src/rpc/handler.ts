@@ -13,12 +13,13 @@ import {
 import { AUTH_CAPABILITY, type PluginManifest } from '../core/plugin';
 import { resolveCapabilityGraph, resolveServerSegments } from '../core/resolve';
 import {
-  AUTH_TRANSPORT_HOOKS,
   type AuthTransportHooks,
   DEFAULT_ROLE_PERMISSIONS,
   type ResolvedServerSegment,
+  type ServerOp,
   type ServerRuntime,
   type Session,
+  isAuthTransportHook,
   opMeta,
   serverRuntimeStorage,
 } from '../server';
@@ -148,16 +149,8 @@ const authorizeAndInvokeOp = async (
   opName: string
 ): Promise<Response> => {
   const mounted = runtime.segmentsByNamespace.get(namespace);
-  // The auth transport hooks are the handler's own seam, not RPC surface — routing
-  // them would hand the raw JSON body to code expecting a Request.
-  const isTransportHook =
-    namespace === AUTH_CAPABILITY &&
-    (AUTH_TRANSPORT_HOOKS as readonly string[]).includes(opName);
-  const op =
-    mounted && !isTransportHook && Object.hasOwn(mounted.ops, opName)
-      ? mounted.ops[opName]
-      : undefined;
-  if (!mounted || typeof op !== 'function') {
+  const op = mounted ? routedOp(mounted, namespace, opName) : undefined;
+  if (!mounted || !op) {
     return errorResponse(
       404,
       RPC_ERROR_CODES.notFound,
@@ -211,9 +204,31 @@ const authorizeAndInvokeOp = async (
     }
   }
 
-  const result = await (op as (input: unknown) => Promise<unknown>)(input);
+  const result = await invokeOp(op, input);
   return Response.json(result ?? null);
 };
+
+// Resolves the op a route names, or undefined when the route must 404, guard by guard:
+// the auth transport hooks are the handler's own seam, not RPC surface (routing them
+// would hand a JSON body to code expecting a Request); the own-property and function
+// checks keep prototype members (`toString`) and non-op values unroutable.
+const routedOp = (
+  mounted: ResolvedServerSegment,
+  namespace: string,
+  opName: string
+): ServerOp | undefined => {
+  if (namespace === AUTH_CAPABILITY && isAuthTransportHook(opName)) {
+    return undefined;
+  }
+  if (!Object.hasOwn(mounted.ops, opName)) return undefined;
+  const op = mounted.ops[opName];
+  return typeof op === 'function' ? op : undefined;
+};
+
+// The single point where ServerOp's authoring-side `never` input is erased for
+// invocation — core/plugin.ts explains the contravariance trade that requires it.
+const invokeOp = (op: ServerOp, input: unknown): Promise<unknown> =>
+  (op as (input: unknown) => Promise<unknown>)(input);
 
 const hasPermission = async (
   authHooks: AuthTransportHooks | null,

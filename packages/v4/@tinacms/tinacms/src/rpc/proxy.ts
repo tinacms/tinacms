@@ -39,61 +39,78 @@ export interface RpcClientConfig {
   fetch?: typeof fetch;
 }
 
+// Two proxy levels mirror the two call levels (`server.media.upload`); namespace
+// proxies are cached so repeated reads don't re-allocate.
 export const createRpcClient = <TSegments>(
   config: RpcClientConfig
 ): RpcProxy<TSegments> => {
-  const fetchImpl = config.fetch ?? fetch;
-  const call = async (namespace: string, op: string, input: unknown) => {
-    const token = await config.getToken?.();
-    const response = await fetchImpl(`${config.url}/${namespace}/${op}`, {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        ...(token ? { authorization: `Bearer ${token}` } : {}),
-      },
-      body: input === undefined ? undefined : JSON.stringify(input),
-    });
-    const payload = await response.json().catch(() => null);
-    if (!response.ok) {
-      const error = (payload as { error?: { code?: string; message?: string } })
-        ?.error;
-      throw new RpcError(
-        response.status,
-        error?.code ?? RPC_ERROR_CODES.transportFailed,
-        error?.message ?? `RPC ${namespace}/${op} failed (${response.status}).`
-      );
-    }
-    return payload;
-  };
-
-  // Two proxy levels mirror the two call levels (`server.media.upload`). Property reads
-  // are cached per namespace so repeated access doesn't re-allocate.
-  const namespaces = new Map<string, unknown>();
+  const namespaceProxies = new Map<string, unknown>();
   return new Proxy(
     {},
     {
-      get(_target, namespace: string | symbol) {
-        // Symbol reads (inspection) and `then` (await/thenable assimilation) are not
-        // ops — answering them would hang `await client.search` and fire bogus POSTs.
-        if (typeof namespace === 'symbol' || namespace === 'then') {
-          return undefined;
-        }
-        let ops = namespaces.get(namespace);
+      get(_target, namespace) {
+        if (isReservedProxyKey(namespace)) return undefined;
+        let ops = namespaceProxies.get(namespace);
         if (!ops) {
-          ops = new Proxy(
-            {},
-            {
-              get: (_ops, op: string | symbol) =>
-                typeof op === 'symbol' || op === 'then'
-                  ? undefined
-                  : (input: unknown): Promise<unknown> =>
-                      call(namespace, op, input),
-            }
-          );
-          namespaces.set(namespace, ops);
+          ops = createNamespaceProxy(config, namespace);
+          namespaceProxies.set(namespace, ops);
         }
         return ops;
       },
     }
   ) as RpcProxy<TSegments>;
+};
+
+// A Proxy get trap sees every property read, not just op calls: symbols (console and
+// runtime inspection probes) and `then` (the thenable check `await` performs on any
+// object). Those must read as absent — answering them would hang `await client.media`
+// and fire bogus POSTs to /then.
+const isReservedProxyKey = (key: string | symbol): key is symbol | 'then' =>
+  typeof key === 'symbol' || key === 'then';
+
+const createNamespaceProxy = (config: RpcClientConfig, namespace: string) =>
+  new Proxy(
+    {},
+    {
+      get: (_ops, opName) =>
+        isReservedProxyKey(opName)
+          ? undefined
+          : (input: unknown): Promise<unknown> =>
+              postOp(config, namespace, opName, input),
+    }
+  );
+
+const postOp = async (
+  config: RpcClientConfig,
+  namespace: string,
+  opName: string,
+  input: unknown
+): Promise<unknown> => {
+  const fetchImpl = config.fetch ?? fetch;
+  const token = await config.getToken?.();
+  const response = await fetchImpl(`${config.url}/${namespace}/${opName}`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      ...(token ? { authorization: `Bearer ${token}` } : {}),
+    },
+    body: input === undefined ? undefined : JSON.stringify(input),
+  });
+  return unwrapRpcResponse(response, namespace, opName);
+};
+
+const unwrapRpcResponse = async (
+  response: Response,
+  namespace: string,
+  opName: string
+): Promise<unknown> => {
+  const payload = await response.json().catch(() => null);
+  if (response.ok) return payload;
+  const error = (payload as { error?: { code?: string; message?: string } })
+    ?.error;
+  throw new RpcError(
+    response.status,
+    error?.code ?? RPC_ERROR_CODES.transportFailed,
+    error?.message ?? `RPC ${namespace}/${opName} failed (${response.status}).`
+  );
 };
