@@ -4,6 +4,8 @@
 // no server code (or secrets) can reach the browser bundle. Browser-safe: this module
 // must not import from ../server or ../rpc/handler.
 
+import { RPC_ERROR_CODES } from './codes';
+
 // Maps a record of server segments to their client call signatures: each op keeps its
 // input/output types but loses everything else (there is nothing else — ops are
 // `(input) => Promise<result>` by contract).
@@ -57,7 +59,7 @@ export const createRpcClient = <TSegments>(
         ?.error;
       throw new RpcError(
         response.status,
-        error?.code ?? 'rpc-failed',
+        error?.code ?? RPC_ERROR_CODES.transportFailed,
         error?.message ?? `RPC ${namespace}/${op} failed (${response.status}).`
       );
     }

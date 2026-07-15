@@ -8,6 +8,10 @@ export type Capability = 'field' | 'content' | 'auth' | 'media' | 'search';
 // reference the constant, not a repeated literal.
 export const FIELD_CAPABILITY = 'field' as const satisfies Capability;
 
+// The capability whose provider additionally carries the RPC transport hooks
+// (server/index.ts AuthTransportHooks) — same naming rule as FIELD_CAPABILITY.
+export const AUTH_CAPABILITY = 'auth' as const satisfies Capability;
+
 // Capabilities whose provider owns a single client store namespace — its slice mounts at the
 // capability key (store-architecture.md), not the plugin name. The one place this
 // categorisation lives, so the store composer reads it here instead of re-listing. `content`

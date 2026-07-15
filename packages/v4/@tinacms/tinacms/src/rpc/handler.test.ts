@@ -147,6 +147,31 @@ describe('createRpcHandler', () => {
     expect((await authless(post('/media/health'))).status).toBe(200);
   });
 
+  it('resolves use(capability) inside the auth transport hooks', async () => {
+    const composingAuth = definePlugin({
+      name: 'composing-auth',
+      provides: ['auth'],
+      server: async () => ({
+        default: defineServerPlugin({
+          getSession: async (request: Request) => {
+            // A capability-composing provider may consult peers mid-verification.
+            await (use('media').health as () => Promise<unknown>)();
+            return request.headers.get('authorization')
+              ? { identity: { id: 'ada' }, roles: ['admin'] }
+              : null;
+          },
+        }),
+      }),
+    });
+    const composed = createRpcHandler({
+      plugins: [composingAuth, mediaPlugin],
+    });
+    const response = await composed(
+      post('/media/list', { token: 'admin-token', body: { dir: 'x' } })
+    );
+    expect(response.status).toBe(200);
+  });
+
   it('resolves use(capability) inside a dispatched op', async () => {
     const response = await handler(
       post('/media/viaAuth', { token: 'editor-token' })

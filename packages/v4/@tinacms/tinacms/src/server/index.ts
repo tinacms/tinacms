@@ -93,9 +93,12 @@ export const opMeta = (handler: ServerOp): OpMeta =>
   (handler as TaggedOp)[OP_META] ?? {};
 
 // The composed server runtime: resolved segments by mount namespace (capability key or
-// plugin name — core/mount.ts), built once per handler by rpc/handler.ts.
+// plugin name — core/mount.ts), built once per handler by rpc/handler.ts. The auth
+// transport hooks are extracted at compose time (parse, don't validate): dispatch never
+// re-checks the auth segment's shape, and `null` means fail-closed — no sessions.
 export interface ServerRuntime {
   segmentsByNamespace: Map<string, ResolvedServerSegment>;
+  authHooks: AuthTransportHooks | null;
 }
 
 // Carries the runtime across an op invocation so the module-level `use()` accessor

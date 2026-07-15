@@ -9,17 +9,19 @@ import {
   type RegistryConflict,
   composeOverridableRegistry,
 } from '../core/overridable-registry';
-import type { PluginManifest, ServerSegment } from '../core/plugin';
+import { AUTH_CAPABILITY, type PluginManifest } from '../core/plugin';
 import { resolveCapabilityGraph, resolveServerSegments } from '../core/resolve';
 import {
   AUTH_TRANSPORT_HOOKS,
   type AuthTransportHooks,
   DEFAULT_ROLE_PERMISSIONS,
+  type ResolvedServerSegment,
   type ServerRuntime,
   type Session,
   opMeta,
   serverRuntimeStorage,
 } from '../server';
+import { RPC_ERROR_CODES } from './codes';
 
 export type RpcHandler = (request: Request) => Promise<Response>;
 
@@ -46,7 +48,7 @@ export const createRpcHandler = ({ plugins }: RpcHandlerConfig): RpcHandler => {
       console.error('[tinacms] RPC server runtime failed to compose:', cause);
       return errorResponse(
         500,
-        'runtime-compose-failed',
+        RPC_ERROR_CODES.composeFailed,
         'Server runtime failed to compose.'
       );
     }
@@ -58,18 +60,37 @@ export const composeServerRuntime = async (
   plugins: PluginManifest[]
 ): Promise<ServerRuntime> => {
   const resolved = await resolveServerSegments(resolveCapabilityGraph(plugins));
+  const segmentsByNamespace = composeOverridableRegistry(
+    resolved.map((segment) => {
+      const mount = capabilityMountFor(segment.manifest);
+      return {
+        key: mount.namespace,
+        value: segment,
+        isOverride: overridesCapabilityMount(segment.manifest, mount),
+      };
+    }),
+    serverConflictError
+  );
   return {
-    segmentsByNamespace: composeOverridableRegistry(
-      resolved.map((segment) => {
-        const mount = capabilityMountFor(segment.manifest);
-        return {
-          key: mount.namespace,
-          value: segment,
-          isOverride: overridesCapabilityMount(segment.manifest, mount),
-        };
-      }),
-      serverConflictError
-    ),
+    segmentsByNamespace,
+    authHooks: extractAuthTransportHooks(segmentsByNamespace),
+  };
+};
+
+// The one place the auth segment's shape is checked (parse, don't validate). A missing
+// or non-callable getSession yields null — the transport then never has a session, so
+// every non-public op fails closed rather than half-trusting a malformed provider.
+const extractAuthTransportHooks = (
+  segmentsByNamespace: Map<string, ResolvedServerSegment>
+): AuthTransportHooks | null => {
+  const authOps = segmentsByNamespace.get(AUTH_CAPABILITY)?.ops;
+  if (!authOps || typeof authOps.getSession !== 'function') return null;
+  return {
+    getSession: authOps.getSession as AuthTransportHooks['getSession'],
+    rolePermissions:
+      typeof authOps.rolePermissions === 'function'
+        ? (authOps.rolePermissions as AuthTransportHooks['rolePermissions'])
+        : undefined,
   };
 };
 
@@ -78,7 +99,11 @@ const dispatch = async (
   request: Request
 ): Promise<Response> => {
   if (request.method !== 'POST') {
-    return errorResponse(405, 'method-not-allowed', 'RPC operations are POST.');
+    return errorResponse(
+      405,
+      RPC_ERROR_CODES.methodNotAllowed,
+      'RPC operations are POST.'
+    );
   }
   // Adapters mount the handler at an arbitrary base path, so the route is the last two
   // segments: `…/<namespace>/<op>`.
@@ -86,86 +111,104 @@ const dispatch = async (
   const namespace = segments.at(-2);
   const opName = segments.at(-1);
   if (!namespace || !opName) {
-    return errorResponse(404, 'not-found', 'Expected …/<capability>/<op>.');
+    return errorResponse(
+      404,
+      RPC_ERROR_CODES.notFound,
+      'Expected …/<capability>/<op>.'
+    );
   }
 
   // One catch over routing, auth, and the op: everything past here runs plugin code
   // (getSession, rolePermissions, the op itself), and any throw stays server-side —
   // failures often carry internals (paths, provider responses) that don't belong in
-  // an HTTP body.
+  // an HTTP body. The runtime context spans the same region, so `use(capability)`
+  // resolves from the auth transport hooks too, not just from ops.
   try {
-    const mounted = runtime.segmentsByNamespace.get(namespace);
-    // The auth transport hooks are the handler's own seam, not RPC surface — routing
-    // them would hand the raw JSON body to code expecting a Request.
-    const isTransportHook =
-      namespace === 'auth' &&
-      (AUTH_TRANSPORT_HOOKS as readonly string[]).includes(opName);
-    const op =
-      mounted && !isTransportHook && Object.hasOwn(mounted.ops, opName)
-        ? mounted.ops[opName]
-        : undefined;
-    if (!mounted || typeof op !== 'function') {
-      return errorResponse(
-        404,
-        'not-found',
-        `No operation "${namespace}/${opName}".`
-      );
-    }
-
-    // Secure by default (ADR-008 §1): authenticate before dispatching anything except an
-    // explicit publicOp — which opts out entirely, including the plugin-level `requires`
-    // gate, since an unauthenticated caller has no permissions to check. With no auth
-    // provider installed (or an auth segment missing a callable getSession) there is no
-    // session, so every non-public op fails closed.
-    const meta = opMeta(op);
-    if (!meta.public) {
-      const authHooks = runtime.segmentsByNamespace.get('auth')?.ops as
-        | (ServerSegment & AuthTransportHooks)
-        | undefined;
-      const session =
-        typeof authHooks?.getSession === 'function'
-          ? await authHooks.getSession(request)
-          : null;
-      if (!session) {
-        return errorResponse(401, 'unauthenticated', 'No CMS session.');
-      }
-      for (const permission of [
-        mounted.manifest.requires?.permission,
-        meta.permission,
-      ]) {
-        if (!permission) continue;
-        if (!(await hasPermission(authHooks, session, permission))) {
-          return errorResponse(
-            403,
-            'forbidden',
-            `Requires the "${permission}" permission.`
-          );
-        }
-      }
-    }
-
-    let input: unknown;
-    const body = await request.text();
-    if (body) {
-      try {
-        input = JSON.parse(body);
-      } catch {
-        return errorResponse(400, 'invalid-json', 'Body must be JSON.');
-      }
-    }
-
-    const result = await serverRuntimeStorage.run(runtime, () =>
-      (op as (input: unknown) => Promise<unknown>)(input)
+    return await serverRuntimeStorage.run(runtime, () =>
+      authorizeAndInvokeOp(runtime, request, namespace, opName)
     );
-    return Response.json(result ?? null);
   } catch (cause) {
     console.error(`[tinacms] RPC op "${namespace}/${opName}" failed:`, cause);
-    return errorResponse(500, 'op-failed', 'Operation failed.');
+    return errorResponse(500, RPC_ERROR_CODES.opFailed, 'Operation failed.');
   }
 };
 
+const authorizeAndInvokeOp = async (
+  runtime: ServerRuntime,
+  request: Request,
+  namespace: string,
+  opName: string
+): Promise<Response> => {
+  const mounted = runtime.segmentsByNamespace.get(namespace);
+  // The auth transport hooks are the handler's own seam, not RPC surface — routing
+  // them would hand the raw JSON body to code expecting a Request.
+  const isTransportHook =
+    namespace === AUTH_CAPABILITY &&
+    (AUTH_TRANSPORT_HOOKS as readonly string[]).includes(opName);
+  const op =
+    mounted && !isTransportHook && Object.hasOwn(mounted.ops, opName)
+      ? mounted.ops[opName]
+      : undefined;
+  if (!mounted || typeof op !== 'function') {
+    return errorResponse(
+      404,
+      RPC_ERROR_CODES.notFound,
+      `No operation "${namespace}/${opName}".`
+    );
+  }
+
+  // Secure by default (ADR-008 §1): authenticate before invoking anything except an
+  // explicit publicOp — which opts out entirely, including the plugin-level `requires`
+  // gate, since an unauthenticated caller has no permissions to check. With no auth
+  // hooks (no provider, or a malformed one) there is no session, so every non-public
+  // op fails closed.
+  const meta = opMeta(op);
+  if (!meta.public) {
+    const session = runtime.authHooks
+      ? await runtime.authHooks.getSession(request)
+      : null;
+    if (!session) {
+      return errorResponse(
+        401,
+        RPC_ERROR_CODES.unauthenticated,
+        'No CMS session.'
+      );
+    }
+    for (const permission of [
+      mounted.manifest.requires?.permission,
+      meta.permission,
+    ]) {
+      if (!permission) continue;
+      if (!(await hasPermission(runtime.authHooks, session, permission))) {
+        return errorResponse(
+          403,
+          RPC_ERROR_CODES.forbidden,
+          `Requires the "${permission}" permission.`
+        );
+      }
+    }
+  }
+
+  let input: unknown;
+  const body = await request.text();
+  if (body) {
+    try {
+      input = JSON.parse(body);
+    } catch {
+      return errorResponse(
+        400,
+        RPC_ERROR_CODES.invalidJson,
+        'Body must be JSON.'
+      );
+    }
+  }
+
+  const result = await (op as (input: unknown) => Promise<unknown>)(input);
+  return Response.json(result ?? null);
+};
+
 const hasPermission = async (
-  authHooks: AuthTransportHooks | undefined,
+  authHooks: AuthTransportHooks | null,
   session: Session,
   permission: string
 ): Promise<boolean> => {
