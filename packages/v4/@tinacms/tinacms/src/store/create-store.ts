@@ -2,8 +2,8 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { invariant } from '../core/invariant';
 import type { ResolvedSegment } from '../core/plugin';
+import type { SliceSet, TinaStoreState } from '../core/plugin';
 import { composePluginSlices } from './compose-slices';
-import type { SliceSet, TinaStoreState } from './slice';
 
 // The store's built-in namespaces. Intentionally empty stubs for now — this increment
 // delivers the registration mechanism + middleware stack, not the ui/branch/documents

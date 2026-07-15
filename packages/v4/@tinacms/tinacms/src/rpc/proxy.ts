@@ -39,27 +39,21 @@ export interface RpcClientConfig {
   fetch?: typeof fetch;
 }
 
-// Two proxy levels mirror the two call levels (`server.media.upload`); namespace
-// proxies are cached so repeated reads don't re-allocate.
+// Two proxy levels mirror the two call levels (`server.media.upload`). No caching:
+// every access exists to make a network call, and op reads allocate a closure per
+// read regardless, so nothing can rely on property identity anyway.
 export const createRpcClient = <TSegments>(
   config: RpcClientConfig
-): RpcProxy<TSegments> => {
-  const namespaceProxies = new Map<string, unknown>();
-  return new Proxy(
+): RpcProxy<TSegments> =>
+  new Proxy(
     {},
     {
-      get(_target, namespace) {
-        if (isReservedProxyKey(namespace)) return undefined;
-        let ops = namespaceProxies.get(namespace);
-        if (!ops) {
-          ops = createNamespaceProxy(config, namespace);
-          namespaceProxies.set(namespace, ops);
-        }
-        return ops;
-      },
+      get: (_target, namespace) =>
+        isReservedProxyKey(namespace)
+          ? undefined
+          : createNamespaceProxy(config, namespace),
     }
   ) as RpcProxy<TSegments>;
-};
 
 // A Proxy get trap sees every property read, not just op calls: symbols (console and
 // runtime inspection probes) and `then` (the thenable check `await` performs on any

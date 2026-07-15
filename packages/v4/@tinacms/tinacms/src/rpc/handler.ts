@@ -4,7 +4,7 @@
 // still-open ADR-007 sub-decision.
 
 import { invariant } from '../core/invariant';
-import { capabilityMountFor, overridesCapabilityMount } from '../core/mount';
+import { capabilityMountFor } from '../core/mount';
 import {
   REGISTRY_CONFLICTS,
   type RegistryConflict,
@@ -23,7 +23,6 @@ import {
   type ServerOp,
   type ServerRuntime,
   type Session,
-  isAuthTransportHook,
   opMeta,
   serverRuntimeStorage,
 } from '../server';
@@ -62,51 +61,59 @@ export const createRpcHandler = ({ plugins }: RpcHandlerConfig): RpcHandler => {
   };
 };
 
-export const composeServerRuntime = async (
+const composeServerRuntime = async (
   plugins: PluginManifest[]
 ): Promise<ServerRuntime> => {
   validateCapabilityGraph(plugins);
   const resolved = await resolveServerSegments(plugins);
-  // Server runtime lives for the process — onInit runs once here; the returned
-  // teardown is dropped because there is no compose-side unload to hang it on. A
-  // failed init already tore down what ran, and the handler retries next request.
-  await initializePlugins(plugins);
   const segmentsByNamespace = composeOverridableRegistry(
     resolved.map((segment) => {
       const mount = capabilityMountFor(segment.manifest);
       return {
         key: mount.namespace,
         value: segment,
-        isOverride: overridesCapabilityMount(segment.manifest, mount),
+        isOverride: mount.isOverride,
       };
     }),
     serverConflictError
   );
-  return {
-    segmentsByNamespace,
-    authHooks: extractAuthTransportHooks(segmentsByNamespace),
-  };
+  const authHooks = claimAuthTransportHooks(segmentsByNamespace);
+  // Init runs LAST, once every deterministic compose failure has passed: a
+  // namespace conflict or malformed auth provider must not leave initialized
+  // plugins behind for the handler's compose-retry to re-init on every request.
+  // The returned teardown is dropped — the server runtime lives for the process
+  // and there is no compose-side unload to hang it on; a failed init tears its
+  // own partial sequence down before rethrowing.
+  await initializePlugins(plugins);
+  return { segmentsByNamespace, authHooks };
 };
 
-// The one place the auth segment's shape is checked (parse, don't validate). A missing
-// or non-callable getSession yields null — the transport then never has a session, so
+// The one place the auth segment's shape is checked (parse, don't validate) — and the
+// claim REMOVES the hooks from the routable ops, so dispatch 404s their names through
+// the ordinary own-property lookup with no reserved-name blocklist. A missing or
+// non-callable getSession yields null — the transport then never has a session, so
 // every non-public op fails closed. A present-but-non-callable rolePermissions is a
 // malformed provider and fails compose outright: silently falling back to the built-in
 // bundles would swap in different grants (admin's wildcard) than the provider intended.
-const extractAuthTransportHooks = (
+const claimAuthTransportHooks = (
   segmentsByNamespace: Map<string, ResolvedServerSegment>
 ): AuthTransportHooks | null => {
-  const authOps = segmentsByNamespace.get(AUTH_CAPABILITY)?.ops;
-  if (!authOps || typeof authOps.getSession !== 'function') return null;
+  const authSegment = segmentsByNamespace.get(AUTH_CAPABILITY);
+  if (!authSegment) return null;
+  const { getSession, rolePermissions, ...routableOps } = authSegment.ops;
+  segmentsByNamespace.set(AUTH_CAPABILITY, {
+    ...authSegment,
+    ops: routableOps,
+  });
+  if (typeof getSession !== 'function') return null;
   invariant(
-    authOps.rolePermissions === undefined ||
-      typeof authOps.rolePermissions === 'function',
+    rolePermissions === undefined || typeof rolePermissions === 'function',
     'auth-role-permissions-not-callable',
     'The auth provider declares `rolePermissions` but it is not a function.'
   );
   return {
-    getSession: authOps.getSession as AuthTransportHooks['getSession'],
-    rolePermissions: authOps.rolePermissions as
+    getSession: getSession as AuthTransportHooks['getSession'],
+    rolePermissions: rolePermissions as
       | AuthTransportHooks['rolePermissions']
       | undefined,
   };
@@ -158,7 +165,7 @@ const authorizeAndInvokeOp = async (
   opName: string
 ): Promise<Response> => {
   const mounted = runtime.segmentsByNamespace.get(namespace);
-  const op = mounted ? routedOp(mounted, namespace, opName) : undefined;
+  const op = mounted ? routedOp(mounted, opName) : undefined;
   if (!mounted || !op) {
     return errorResponse(
       404,
@@ -217,18 +224,14 @@ const authorizeAndInvokeOp = async (
   return Response.json(result ?? null);
 };
 
-// Resolves the op a route names, or undefined when the route must 404, guard by guard:
-// the auth transport hooks are the handler's own seam, not RPC surface (routing them
-// would hand a JSON body to code expecting a Request); the own-property and function
-// checks keep prototype members (`toString`) and non-op values unroutable.
+// Resolves the op a route names, or undefined when the route must 404. The own-property
+// and function checks keep prototype members (`toString`) and non-op values unroutable;
+// the auth transport hooks need no rule here — compose already claimed them off the
+// routable ops (claimAuthTransportHooks).
 const routedOp = (
   mounted: ResolvedServerSegment,
-  namespace: string,
   opName: string
 ): ServerOp | undefined => {
-  if (namespace === AUTH_CAPABILITY && isAuthTransportHook(opName)) {
-    return undefined;
-  }
   if (!Object.hasOwn(mounted.ops, opName)) return undefined;
   const op = mounted.ops[opName];
   return typeof op === 'function' ? op : undefined;

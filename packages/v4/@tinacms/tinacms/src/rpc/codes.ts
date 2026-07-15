@@ -14,6 +14,3 @@ export const RPC_ERROR_CODES = {
   // Proxy-side fallback when a failure response carries no parseable envelope.
   transportFailed: 'rpc-failed',
 } as const;
-
-export type RpcErrorCode =
-  (typeof RPC_ERROR_CODES)[keyof typeof RPC_ERROR_CODES];

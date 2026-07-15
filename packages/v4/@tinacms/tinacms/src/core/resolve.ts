@@ -1,4 +1,5 @@
 import { invariant } from './invariant';
+import { declaresCapabilityOverride } from './mount';
 import {
   REGISTRY_CONFLICTS,
   type RegistryConflict,
@@ -63,9 +64,7 @@ export const validateCapabilityGraph = (plugins: PluginManifest[]): void => {
         .map((capability) => ({
           key: capability,
           value: plugin,
-          isOverride: (plugin.overrides ?? []).some(
-            (override) => override.capability === capability
-          ),
+          isOverride: declaresCapabilityOverride(plugin, capability),
         }))
     ),
     capabilityConflictError
@@ -92,7 +91,7 @@ export const validateCapabilityGraph = (plugins: PluginManifest[]): void => {
 // edge. A cycle cannot be ordered — hard error naming the members, same philosophy as
 // capability conflicts: nothing is silently picked.
 // ponytail: O(n²) ready-scan — plugin lists are tens, not thousands.
-export const orderPluginsByDependencies = (
+const orderPluginsByDependencies = (
   plugins: PluginManifest[]
 ): PluginManifest[] => {
   const providersOf = new Map<Capability, PluginManifest[]>();
@@ -144,10 +143,19 @@ export const initializePlugins = async (
   plugins: PluginManifest[]
 ): Promise<() => Promise<void>> => {
   const initialized: PluginManifest[] = [];
+  // Idempotent (drains the list, so a second call is a no-op) and abort-proof:
+  // one throwing onDestroy must not skip the remaining teardowns — every hook
+  // runs, then the first failure rethrows so callers can still surface it.
   const destroyInitialized = async () => {
-    for (const plugin of [...initialized].reverse()) {
-      await plugin.onDestroy?.();
+    const failures: unknown[] = [];
+    for (const plugin of initialized.splice(0).reverse()) {
+      try {
+        await plugin.onDestroy?.();
+      } catch (cause) {
+        failures.push(cause);
+      }
     }
+    if (failures.length > 0) throw failures[0];
   };
   for (const plugin of orderPluginsByDependencies(plugins)) {
     try {

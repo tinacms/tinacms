@@ -40,6 +40,13 @@ export interface TinaProviderProps {
   children: ReactNode;
 }
 
+// Serializes the plugin lifecycle across provider instances — including
+// StrictMode's mount→unmount→remount and a pluginsKey change: the next boot's
+// onInit waits for the previous instance's teardown, so an outgoing onDestroy
+// can never land after a successor's onInit. Module-level on purpose: manifests
+// are module singletons, so their lifecycle is global state.
+let lifecycleTurn: Promise<unknown> = Promise.resolve();
+
 export function TinaProvider({ plugins, children }: TinaProviderProps) {
   // One resolveClientSegments pass feeds both runtime halves (ADR-003), held as a
   // single state object so registry and store always appear together (no tearing).
@@ -51,18 +58,19 @@ export function TinaProvider({ plugins, children }: TinaProviderProps) {
     let mounted = true;
     // The graph pass (ADR-006) validates the manifests before any segment is
     // imported — a conflicting or unsatisfiable config fails here, not mid-boot.
-    // onInit runs after the segments load and before the runtime is exposed, so
-    // no consumer sees a half-initialized plugin set.
-    const boot = Promise.resolve().then(async () => {
+    // Composition runs BEFORE init (a per-type field conflict only surfaces in
+    // createFieldRegistry, and it must not leave initialized plugins behind);
+    // onInit runs last, before the runtime is exposed, so no consumer sees a
+    // half-initialized plugin set.
+    const boot = lifecycleTurn.then(async () => {
       validateCapabilityGraph(plugins);
       const resolved = await resolveClientSegments(plugins);
+      const runtime: TinaRuntime = {
+        registry: createFieldRegistry(resolved),
+        store: createTinaStore(resolved),
+      };
       const destroyPlugins = await initializePlugins(plugins);
-      if (mounted) {
-        setRuntime({
-          registry: createFieldRegistry(resolved),
-          store: createTinaStore(resolved),
-        });
-      }
+      if (mounted) setRuntime(runtime);
       return destroyPlugins;
     });
     boot.catch((cause) => {
@@ -72,10 +80,20 @@ export function TinaProvider({ plugins, children }: TinaProviderProps) {
     });
     return () => {
       mounted = false;
-      // Teardown rides the boot promise: the init sequence isn't cancellable, so
-      // unmounting mid-boot still destroys whatever finished initializing. A failed
-      // boot already tore itself down (initializePlugins), hence the swallowed catch.
-      void boot.then((destroyPlugins) => destroyPlugins()).catch(() => {});
+      // Teardown rides the boot promise (the init sequence isn't cancellable, so
+      // unmounting mid-boot still destroys whatever finished initializing) and
+      // becomes the next lifecycle turn. A failed boot has nothing to destroy —
+      // initializePlugins tore its partial sequence down and setError surfaced
+      // the cause. A destroy failure is logged, not rethrown: unmount has no
+      // error boundary to feed.
+      lifecycleTurn = boot
+        .then(
+          (destroyPlugins) => destroyPlugins(),
+          () => undefined
+        )
+        .catch((cause) => {
+          console.error('[tinacms] plugin teardown failed:', cause);
+        });
     };
   }, [pluginsKey]);
 

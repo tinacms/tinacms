@@ -1,10 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { type Capability, definePlugin } from './plugin';
-import {
-  initializePlugins,
-  orderPluginsByDependencies,
-  validateCapabilityGraph,
-} from './resolve';
+import { initializePlugins, validateCapabilityGraph } from './resolve';
 
 const plugin = (
   name: string,
@@ -102,33 +98,6 @@ describe('validateCapabilityGraph', () => {
   });
 });
 
-describe('orderPluginsByDependencies', () => {
-  it('orders every provider before its dependents', () => {
-    const ordered = orderPluginsByDependencies([
-      plugin('search', { provides: ['search'], dependsOn: ['content'] }),
-      plugin('content', { provides: ['content'], dependsOn: ['auth'] }),
-      plugin('auth', { provides: ['auth'] }),
-    ]);
-    expect(ordered.map((p) => p.name)).toEqual(['auth', 'content', 'search']);
-  });
-
-  it('keeps config order among independent plugins', () => {
-    const ordered = orderPluginsByDependencies([
-      plugin('b'),
-      plugin('a'),
-      plugin('c'),
-    ]);
-    expect(ordered.map((p) => p.name)).toEqual(['b', 'a', 'c']);
-  });
-
-  it('a self-satisfied dependency is not a cycle', () => {
-    const ordered = orderPluginsByDependencies([
-      plugin('solo', { provides: ['auth'], dependsOn: ['auth'] }),
-    ]);
-    expect(ordered.map((p) => p.name)).toEqual(['solo']);
-  });
-});
-
 describe('initializePlugins', () => {
   const lifecyclePlugin = (
     name: string,
@@ -165,9 +134,43 @@ describe('initializePlugins', () => {
     ]);
   });
 
+  it('keeps config order among independent plugins', async () => {
+    const calls: string[] = [];
+    await initializePlugins([
+      lifecyclePlugin('b', calls),
+      lifecyclePlugin('a', calls),
+      lifecyclePlugin('c', calls),
+    ]);
+    expect(calls).toEqual(['init:b', 'init:a', 'init:c']);
+  });
+
   it('tolerates plugins with no lifecycle hooks', async () => {
     const destroy = await initializePlugins([plugin('bare')]);
     await expect(destroy()).resolves.toBeUndefined();
+  });
+
+  it('a throwing onDestroy does not skip remaining teardowns, then rethrows', async () => {
+    const calls: string[] = [];
+    const destroy = await initializePlugins([
+      lifecyclePlugin('auth', calls, { provides: ['auth'] }),
+      definePlugin({
+        name: 'volatile',
+        dependsOn: ['auth'],
+        onDestroy: () => {
+          throw new Error('teardown failure');
+        },
+      }),
+    ]);
+    await expect(destroy()).rejects.toThrow('teardown failure');
+    expect(calls).toContain('destroy:auth');
+  });
+
+  it('teardown is idempotent — a second call destroys nothing', async () => {
+    const calls: string[] = [];
+    const destroy = await initializePlugins([lifecyclePlugin('auth', calls)]);
+    await destroy();
+    await destroy();
+    expect(calls.filter((call) => call === 'destroy:auth')).toHaveLength(1);
   });
 
   it('a failed onInit destroys the already-initialized plugins, then rethrows', async () => {

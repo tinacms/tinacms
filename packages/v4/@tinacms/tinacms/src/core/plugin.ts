@@ -46,7 +46,7 @@ export type CapabilityOverride =
 // The whole boot-composed client store: a flat bag of namespaces, each holding one
 // slice's state, open-shaped because plugins register arbitrary namespaces at boot.
 // Core and plugin slices both mount here; a slice reads peers from it. Single
-// definition — store/slice.ts re-exports it.
+// definition — the store modules import it from here.
 export type TinaStoreState = Record<string, SliceState>;
 
 // One slice's own state: the object a slice returns and mounts at its namespace — its

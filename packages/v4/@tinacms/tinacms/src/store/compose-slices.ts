@@ -1,14 +1,14 @@
-import { capabilityMountFor, overridesCapabilityMount } from '../core/mount';
+import { capabilityMountFor } from '../core/mount';
 import {
   REGISTRY_CONFLICTS,
   type RegistryConflict,
   composeOverridableRegistry,
 } from '../core/overridable-registry';
 import {
+  type ClientSlice,
   type ResolvedSegment,
   isSingletonSliceCapability,
 } from '../core/plugin';
-import type { ClientSlice } from './slice';
 
 // Namespace → the slice creator mounted there. Composed once at boot from the resolved
 // client segments — the same input the field registry consumes (createFieldRegistry), through
@@ -49,11 +49,7 @@ export const composePluginSlices = (
       if (!slice) return [];
       const mount = capabilityMountFor(manifest);
       return [
-        {
-          key: mount.namespace,
-          value: slice,
-          isOverride: overridesCapabilityMount(manifest, mount),
-        },
+        { key: mount.namespace, value: slice, isOverride: mount.isOverride },
       ];
     }),
     sliceConflictError

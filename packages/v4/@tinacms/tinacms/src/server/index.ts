@@ -34,23 +34,15 @@ export interface Session {
 }
 
 // The transport hooks the RPC handler needs from whatever provides `auth`. They live on
-// the auth plugin's server segment under these reserved names, which the handler invokes
-// directly (getSession receives the raw Request) and never routes as RPC ops.
+// the auth plugin's server segment under these names; compose claims them off the
+// routable ops (rpc/handler.ts), so the handler invokes them directly (getSession
+// receives the raw Request) and dispatch can never route them as RPC ops.
 export interface AuthTransportHooks {
   getSession: (request: Request) => Promise<Session | null>;
   // Role → permission bundles are the auth provider's domain (ADR-008 §3). Absent, the
   // built-in editor/admin defaults apply.
   rolePermissions?: (role: string) => Promise<string[]>;
 }
-
-export const AUTH_TRANSPORT_HOOKS = ['getSession', 'rolePermissions'] as const;
-
-export type AuthTransportHookName = (typeof AUTH_TRANSPORT_HOOKS)[number];
-
-export const isAuthTransportHook = (
-  opName: string
-): opName is AuthTransportHookName =>
-  (AUTH_TRANSPORT_HOOKS as readonly string[]).includes(opName);
 
 // ADR-008 §4/§5: Tina ships editor/admin so TinaCloud works with zero config; new
 // permissions are granted to nobody by default except admin's wildcard. Null-prototype,
@@ -73,7 +65,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, string[]> = Object.assign(
 // own tinacms/server) still agree on the tag.
 const OP_META = Symbol.for('tinacms.op-meta');
 
-export interface OpMeta {
+interface OpMeta {
   public?: true;
   permission?: string;
 }

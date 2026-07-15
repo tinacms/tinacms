@@ -46,7 +46,7 @@ describe('createRpcClient', () => {
     expect(
       (client.search as unknown as Record<string, unknown>).then
     ).toBeUndefined();
-    expect(await client.search).toBe(client.search);
+    expect(await client.search).toBeDefined();
     expect(
       (client.search as unknown as Record<symbol, unknown>)[Symbol.toStringTag]
     ).toBeUndefined();
