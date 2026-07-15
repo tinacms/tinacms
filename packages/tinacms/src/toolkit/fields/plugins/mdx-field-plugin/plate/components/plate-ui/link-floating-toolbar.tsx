@@ -235,7 +235,9 @@ export function LinkFloatingToolbar({
         ref={insertRef}
         className={popoverVariants()}
         {...insertProps}
-        style={{ ...(insertProps.style as React.CSSProperties) }}
+        // Override plate-floating's inline z-index (which beats the z-[999999]
+        // class) so the portaled popover sits above the form field wrappers.
+        style={{ ...(insertProps.style as React.CSSProperties), zIndex: 999999 }}
       >
         {input}
       </div>
@@ -244,7 +246,7 @@ export function LinkFloatingToolbar({
         ref={editRef}
         className={popoverVariants()}
         {...editProps}
-        style={{ ...(editProps.style as React.CSSProperties) }}
+        style={{ ...(editProps.style as React.CSSProperties), zIndex: 999999 }}
       >
         {editContent}
       </div>
