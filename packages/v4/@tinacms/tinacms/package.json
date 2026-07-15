@@ -41,19 +41,19 @@
       "types": "./src/server/index.ts",
       "default": "./src/server/index.ts"
     },
-    "./next": {
+    "./adapters/next": {
       "types": "./src/adapters/next/index.ts",
       "default": "./src/adapters/next/index.ts"
     },
-    "./express": {
+    "./adapters/express": {
       "types": "./src/adapters/express/index.ts",
       "default": "./src/adapters/express/index.ts"
     },
-    "./astro": {
+    "./adapters/astro": {
       "types": "./src/adapters/astro/index.ts",
       "default": "./src/adapters/astro/index.ts"
     },
-    "./hono": {
+    "./adapters/hono": {
       "types": "./src/adapters/hono/index.ts",
       "default": "./src/adapters/hono/index.ts"
     }
