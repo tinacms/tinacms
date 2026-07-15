@@ -588,6 +588,23 @@ mutation addPendingDocumentMutation(
     return branches.some((b) => b.name === branchName);
   }
 
+  async branchesExist(
+    branchNames: string[],
+    args?: { signal?: AbortSignal }
+  ): Promise<Record<string, boolean>> {
+    if (this.isLocalMode) {
+      return Object.fromEntries(branchNames.map((name) => [name, true]));
+    }
+    const branches = await this.listBranches({
+      includeIndexStatus: false,
+      signal: args?.signal,
+    });
+    const existing = new Set(branches.map((b) => b.name));
+    return Object.fromEntries(
+      branchNames.map((name) => [name, existing.has(name)])
+    );
+  }
+
   async createBranch({ baseBranch, branchName }: BranchData) {
     const url = `${this.contentApiBase}/github/${this.clientId}/create_branch`;
 
