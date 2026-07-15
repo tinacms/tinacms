@@ -262,6 +262,7 @@ const Sidebar = ({
         </SidebarWrapper>
         <Transition show={menuIsOpen} as='div'>
           <TransitionChild
+            className='fixed left-0 top-0 z-overlay h-full'
             enter='transform transition-all ease-out duration-300'
             enterFrom='opacity-0 -translate-x-full'
             enterTo='opacity-100 translate-x-0'
@@ -269,58 +270,55 @@ const Sidebar = ({
             leaveFrom='opacity-100 translate-x-0'
             leaveTo='opacity-0 -translate-x-full'
           >
-            <div className='fixed left-0 top-0 z-overlay h-full transform'>
-              <Nav
-                isLocalMode={cms.api?.tina?.isLocalMode}
-                menuIsOpen
-                toggleMenu={toggleMenu}
-                showCollections={isTinaAdminEnabled}
-                collectionsInfo={collectionsInfo}
-                screens={activeScreens}
-                cloudConfigs={allConfigs}
-                contentCreators={contentCreators}
-                sidebarWidth={sidebarWidth}
-                RenderNavSite={({ view }) => (
-                  <SidebarSiteLink
-                    view={view}
-                    onClick={() => {
-                      setActiveView(view);
-                      setMenuIsOpen(false);
-                    }}
-                  />
-                )}
-                RenderNavCloud={({ config }) => (
-                  <NavCloudLink config={config} />
-                )}
-                RenderNavGlobal={({ collection }) => (
-                  <SidebarGlobalLink
-                    collection={collection}
-                    onClick={() => {
-                      setMenuIsOpen(false);
-                    }}
-                  />
-                )}
-                RenderNavCollection={({ collection }) => (
-                  <SidebarCollectionLink
-                    onClick={() => {
-                      setMenuIsOpen(false);
-                    }}
-                    collection={collection}
-                  />
-                )}
-                AuthRenderNavCollection={({ collection }) => (
-                  <SidebarCollectionLink
-                    onClick={() => {
-                      setMenuIsOpen(false);
-                    }}
-                    collection={collection}
-                    Icon={Users}
-                  />
-                )}
-              ></Nav>
-            </div>
+            <Nav
+              isLocalMode={cms.api?.tina?.isLocalMode}
+              menuIsOpen
+              toggleMenu={toggleMenu}
+              showCollections={isTinaAdminEnabled}
+              collectionsInfo={collectionsInfo}
+              screens={activeScreens}
+              cloudConfigs={allConfigs}
+              contentCreators={contentCreators}
+              sidebarWidth={sidebarWidth}
+              RenderNavSite={({ view }) => (
+                <SidebarSiteLink
+                  view={view}
+                  onClick={() => {
+                    setActiveView(view);
+                    setMenuIsOpen(false);
+                  }}
+                />
+              )}
+              RenderNavCloud={({ config }) => <NavCloudLink config={config} />}
+              RenderNavGlobal={({ collection }) => (
+                <SidebarGlobalLink
+                  collection={collection}
+                  onClick={() => {
+                    setMenuIsOpen(false);
+                  }}
+                />
+              )}
+              RenderNavCollection={({ collection }) => (
+                <SidebarCollectionLink
+                  onClick={() => {
+                    setMenuIsOpen(false);
+                  }}
+                  collection={collection}
+                />
+              )}
+              AuthRenderNavCollection={({ collection }) => (
+                <SidebarCollectionLink
+                  onClick={() => {
+                    setMenuIsOpen(false);
+                  }}
+                  collection={collection}
+                  Icon={Users}
+                />
+              )}
+            ></Nav>
           </TransitionChild>
           <TransitionChild
+            className='fixed inset-0 z-menu'
             enter='ease-out duration-300'
             enterFrom='opacity-0'
             enterTo='opacity-80'
@@ -333,7 +331,7 @@ const Sidebar = ({
               onClick={() => {
                 setMenuIsOpen(false);
               }}
-              className='fixed z-menu inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black'
+              className='w-full h-full bg-gradient-to-br from-gray-800 via-gray-900 to-black'
             />
           </TransitionChild>
         </Transition>
