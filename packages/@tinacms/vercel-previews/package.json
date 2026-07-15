@@ -39,7 +39,7 @@
 	},
 	"dependencies": {
 		"@vercel/stega": "catalog:",
-		"tinacms": "workspace:*"
+		"tinacms": "workspace:^"
 	},
 	"peerDependencies": {
 		"react": ">=16.14"
