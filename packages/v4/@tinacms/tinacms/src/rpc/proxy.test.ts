@@ -40,6 +40,18 @@ describe('createRpcClient', () => {
     });
   });
 
+  it('is not thenable and yields nothing for symbol keys', async () => {
+    // `await` probes `then` at both levels; a caller there would POST and hang.
+    expect((client as unknown as Record<string, unknown>).then).toBeUndefined();
+    expect(
+      (client.search as unknown as Record<string, unknown>).then
+    ).toBeUndefined();
+    expect(await client.search).toBe(client.search);
+    expect(
+      (client.search as unknown as Record<symbol, unknown>)[Symbol.toStringTag]
+    ).toBeUndefined();
+  });
+
   it('attaches the bearer token from getToken', async () => {
     let seenAuthorization: string | null = null;
     const spying = createRpcClient<{ search: typeof searchOps }>({

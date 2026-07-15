@@ -40,25 +40,31 @@ export interface AuthTransportHooks {
   getSession: (request: Request) => Promise<Session | null>;
   // Role → permission bundles are the auth provider's domain (ADR-008 §3). Absent, the
   // built-in editor/admin defaults apply.
-  rolePermissions?: (role: string) => string[] | Promise<string[]>;
+  rolePermissions?: (role: string) => Promise<string[]>;
 }
 
 export const AUTH_TRANSPORT_HOOKS = ['getSession', 'rolePermissions'] as const;
 
 // ADR-008 §4/§5: Tina ships editor/admin so TinaCloud works with zero config; new
-// permissions are granted to nobody by default except admin's wildcard.
-export const DEFAULT_ROLE_PERMISSIONS: Record<string, string[]> = {
-  admin: ['*'],
-  editor: [],
-};
+// permissions are granted to nobody by default except admin's wildcard. Null-prototype,
+// so a role named after an Object.prototype member ("constructor", "__proto__")
+// resolves to nothing rather than an inherited function.
+export const DEFAULT_ROLE_PERMISSIONS: Record<string, string[]> = Object.assign(
+  Object.create(null),
+  {
+    admin: ['*'],
+    editor: [],
+  }
+);
 
 // Op-level authorization marks (ADR-008 §1/§2). A bare handler is protected by default;
 // `publicOp` is the only unauthenticated opt-out (`grep publicOp` enumerates the public
 // surface); `protectedOp` additionally names the required permission. Both wrap rather
 // than mutate, so one handler reused under two wrappers can't cross-tag. The permission
 // stays `string` until codegen aggregates declared permissions into a typed union
-// (ADR-008 §3).
-const OP_META = Symbol('tina.op-meta');
+// (ADR-008 §3). `Symbol.for`, so duplicate copies of this module (a plugin bundling its
+// own tinacms/server) still agree on the tag.
+const OP_META = Symbol.for('tinacms.op-meta');
 
 export interface OpMeta {
   public?: true;

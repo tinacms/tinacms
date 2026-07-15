@@ -12,9 +12,10 @@ import { createRpcHandler } from './handler';
 const sessionsByToken: Record<string, Session> = {
   'admin-token': { identity: { id: 'ada' }, roles: ['admin'] },
   'editor-token': { identity: { id: 'eli' }, roles: ['editor'] },
+  'proto-token': { identity: { id: 'mal' }, roles: ['constructor'] },
 };
 
-const authPlugin = (rolePermissions?: (role: string) => string[]) =>
+const authPlugin = (rolePermissions?: (role: string) => Promise<string[]>) =>
   definePlugin({
     name: 'test-auth',
     provides: ['auth'],
@@ -116,7 +117,7 @@ describe('createRpcHandler', () => {
   it("honors the provider's rolePermissions over the defaults", async () => {
     const permissive = createRpcHandler({
       plugins: [
-        authPlugin((role) => (role === 'editor' ? ['media:delete'] : [])),
+        authPlugin(async (role) => (role === 'editor' ? ['media:delete'] : [])),
         mediaPlugin,
       ],
     });
@@ -180,6 +181,87 @@ describe('createRpcHandler', () => {
       post('/media/list', { token: 'admin-token', raw: 'not json' })
     );
     expect(response.status).toBe(400);
+  });
+
+  it('denies a role named after an Object.prototype member', async () => {
+    const response = await handler(
+      post('/media/remove', { token: 'proto-token', body: { path: 'a.png' } })
+    );
+    expect(response.status).toBe(403);
+  });
+
+  it('fails closed when the auth segment has no callable getSession', async () => {
+    const hookless = createRpcHandler({
+      plugins: [
+        definePlugin({
+          name: 'hookless-auth',
+          provides: ['auth'],
+          server: async () => ({
+            default: defineServerPlugin({ whoami: async () => 'x' }),
+          }),
+        }),
+        mediaPlugin,
+      ],
+    });
+    const response = await hookless(
+      post('/media/list', { token: 'admin-token', body: { dir: 'x' } })
+    );
+    expect(response.status).toBe(401);
+  });
+
+  it('500s a throwing getSession without leaking its error', async () => {
+    const throwing = createRpcHandler({
+      plugins: [
+        definePlugin({
+          name: 'throwing-auth',
+          provides: ['auth'],
+          server: async () => ({
+            default: defineServerPlugin({
+              getSession: async () => {
+                throw new Error('secret provider detail');
+              },
+            }),
+          }),
+        }),
+        mediaPlugin,
+      ],
+    });
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+    const response = await throwing(
+      post('/media/list', { token: 'admin-token', body: { dir: 'x' } })
+    );
+    expect(response.status).toBe(500);
+    expect(JSON.stringify(await response.json())).not.toContain(
+      'secret provider detail'
+    );
+    expect(consoleError).toHaveBeenCalled();
+    consoleError.mockRestore();
+  });
+
+  it('retries composition after a failed compose instead of caching it', async () => {
+    let attempts = 0;
+    const flaky = definePlugin({
+      name: 'flaky',
+      server: async () => {
+        attempts += 1;
+        if (attempts === 1) throw new Error('transient import failure');
+        return {
+          default: defineServerPlugin({ ping: publicOp(async () => 'pong') }),
+        };
+      },
+    });
+    const flakyHandler = createRpcHandler({ plugins: [flaky] });
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+    const first = await flakyHandler(post('/flaky/ping'));
+    expect(first.status).toBe(500);
+    expect(JSON.stringify(await first.json())).not.toContain('transient');
+    const second = await flakyHandler(post('/flaky/ping'));
+    expect(second.status).toBe(200);
+    consoleError.mockRestore();
   });
 
   it('500s a throwing op without leaking its error', async () => {

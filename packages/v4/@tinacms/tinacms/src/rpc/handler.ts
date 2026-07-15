@@ -33,8 +33,24 @@ export interface RpcHandlerConfig {
 export const createRpcHandler = ({ plugins }: RpcHandlerConfig): RpcHandler => {
   let runtimePromise: Promise<ServerRuntime> | null = null;
   return async (request) => {
-    runtimePromise ??= composeServerRuntime(plugins);
-    return dispatch(await runtimePromise, request);
+    // A rejected compose must not stay cached — drop it so the next request retries
+    // (a transient segment-import failure would otherwise poison the handler forever).
+    runtimePromise ??= composeServerRuntime(plugins).catch((cause) => {
+      runtimePromise = null;
+      throw cause;
+    });
+    let runtime: ServerRuntime;
+    try {
+      runtime = await runtimePromise;
+    } catch (cause) {
+      console.error('[tinacms] RPC server runtime failed to compose:', cause);
+      return errorResponse(
+        500,
+        'runtime-compose-failed',
+        'Server runtime failed to compose.'
+      );
+    }
+    return dispatch(runtime, request);
   };
 };
 
@@ -73,70 +89,76 @@ const dispatch = async (
     return errorResponse(404, 'not-found', 'Expected …/<capability>/<op>.');
   }
 
-  const mounted = runtime.segmentsByNamespace.get(namespace);
-  // The auth transport hooks are the handler's own seam, not RPC surface — routing
-  // them would hand the raw JSON body to code expecting a Request.
-  const isTransportHook =
-    namespace === 'auth' &&
-    (AUTH_TRANSPORT_HOOKS as readonly string[]).includes(opName);
-  const op =
-    mounted && !isTransportHook && Object.hasOwn(mounted.ops, opName)
-      ? mounted.ops[opName]
-      : undefined;
-  if (!mounted || typeof op !== 'function') {
-    return errorResponse(
-      404,
-      'not-found',
-      `No operation "${namespace}/${opName}".`
-    );
-  }
-
-  // Secure by default (ADR-008 §1): authenticate before dispatching anything except an
-  // explicit publicOp — which opts out entirely, including the plugin-level `requires`
-  // gate, since an unauthenticated caller has no permissions to check. With no auth
-  // provider installed there is no session, so every non-public op fails closed.
-  const meta = opMeta(op);
-  if (!meta.public) {
-    const authHooks = runtime.segmentsByNamespace.get('auth')?.ops as
-      | (ServerSegment & AuthTransportHooks)
-      | undefined;
-    const session = authHooks ? await authHooks.getSession(request) : null;
-    if (!session) {
-      return errorResponse(401, 'unauthenticated', 'No CMS session.');
+  // One catch over routing, auth, and the op: everything past here runs plugin code
+  // (getSession, rolePermissions, the op itself), and any throw stays server-side —
+  // failures often carry internals (paths, provider responses) that don't belong in
+  // an HTTP body.
+  try {
+    const mounted = runtime.segmentsByNamespace.get(namespace);
+    // The auth transport hooks are the handler's own seam, not RPC surface — routing
+    // them would hand the raw JSON body to code expecting a Request.
+    const isTransportHook =
+      namespace === 'auth' &&
+      (AUTH_TRANSPORT_HOOKS as readonly string[]).includes(opName);
+    const op =
+      mounted && !isTransportHook && Object.hasOwn(mounted.ops, opName)
+        ? mounted.ops[opName]
+        : undefined;
+    if (!mounted || typeof op !== 'function') {
+      return errorResponse(
+        404,
+        'not-found',
+        `No operation "${namespace}/${opName}".`
+      );
     }
-    for (const permission of [
-      mounted.manifest.requires?.permission,
-      meta.permission,
-    ]) {
-      if (!permission) continue;
-      if (!(await hasPermission(authHooks, session, permission))) {
-        return errorResponse(
-          403,
-          'forbidden',
-          `Requires the "${permission}" permission.`
-        );
+
+    // Secure by default (ADR-008 §1): authenticate before dispatching anything except an
+    // explicit publicOp — which opts out entirely, including the plugin-level `requires`
+    // gate, since an unauthenticated caller has no permissions to check. With no auth
+    // provider installed (or an auth segment missing a callable getSession) there is no
+    // session, so every non-public op fails closed.
+    const meta = opMeta(op);
+    if (!meta.public) {
+      const authHooks = runtime.segmentsByNamespace.get('auth')?.ops as
+        | (ServerSegment & AuthTransportHooks)
+        | undefined;
+      const session =
+        typeof authHooks?.getSession === 'function'
+          ? await authHooks.getSession(request)
+          : null;
+      if (!session) {
+        return errorResponse(401, 'unauthenticated', 'No CMS session.');
+      }
+      for (const permission of [
+        mounted.manifest.requires?.permission,
+        meta.permission,
+      ]) {
+        if (!permission) continue;
+        if (!(await hasPermission(authHooks, session, permission))) {
+          return errorResponse(
+            403,
+            'forbidden',
+            `Requires the "${permission}" permission.`
+          );
+        }
       }
     }
-  }
 
-  let input: unknown;
-  const body = await request.text();
-  if (body) {
-    try {
-      input = JSON.parse(body);
-    } catch {
-      return errorResponse(400, 'invalid-json', 'Body must be JSON.');
+    let input: unknown;
+    const body = await request.text();
+    if (body) {
+      try {
+        input = JSON.parse(body);
+      } catch {
+        return errorResponse(400, 'invalid-json', 'Body must be JSON.');
+      }
     }
-  }
 
-  try {
     const result = await serverRuntimeStorage.run(runtime, () =>
       (op as (input: unknown) => Promise<unknown>)(input)
     );
     return Response.json(result ?? null);
   } catch (cause) {
-    // The thrown error stays server-side: op failures often carry internals
-    // (paths, provider responses) that don't belong in an HTTP body.
     console.error(`[tinacms] RPC op "${namespace}/${opName}" failed:`, cause);
     return errorResponse(500, 'op-failed', 'Operation failed.');
   }

@@ -70,16 +70,22 @@ export const createRpcClient = <TSegments>(
   return new Proxy(
     {},
     {
-      get(_target, namespace: string) {
+      get(_target, namespace: string | symbol) {
+        // Symbol reads (inspection) and `then` (await/thenable assimilation) are not
+        // ops — answering them would hang `await client.search` and fire bogus POSTs.
+        if (typeof namespace === 'symbol' || namespace === 'then') {
+          return undefined;
+        }
         let ops = namespaces.get(namespace);
         if (!ops) {
           ops = new Proxy(
             {},
             {
-              get:
-                (_ops, op: string) =>
-                (input: unknown): Promise<unknown> =>
-                  call(namespace, op, input),
+              get: (_ops, op: string | symbol) =>
+                typeof op === 'symbol' || op === 'then'
+                  ? undefined
+                  : (input: unknown): Promise<unknown> =>
+                      call(namespace, op, input),
             }
           );
           namespaces.set(namespace, ops);
