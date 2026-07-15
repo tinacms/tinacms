@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import type { TinaDocument } from '../core/schema/types';
-import { connectToEditor } from './connection';
+import type { TinaDocument } from '../../core/schema/types';
+import { connectToEditor } from '../../preview/connection';
 
 export interface UseTinaOptions<T extends TinaDocument> {
   // The document as the site rendered it (SSR/static build) — the whole story

@@ -1,4 +1,4 @@
-import { tinaField, useTina } from '@tinacms/tinacms/preview';
+import { tinaField, useTina } from '@tinacms/tinacms/adapters/react';
 import { sampleDocument } from '../content';
 
 // The site side of visual editing, as a real site would write it: useTina

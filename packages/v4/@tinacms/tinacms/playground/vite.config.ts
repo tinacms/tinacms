@@ -16,6 +16,12 @@ export default defineConfig({
         ),
       },
       {
+        find: '@tinacms/tinacms/adapters/react',
+        replacement: fileURLToPath(
+          new URL('../src/adapters/react/index.ts', import.meta.url)
+        ),
+      },
+      {
         find: '@tinacms/tinacms/preview',
         replacement: fileURLToPath(
           new URL('../src/preview/index.ts', import.meta.url)

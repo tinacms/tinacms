@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { readyMessage, valuesMessage } from './protocol';
+import { readyMessage, valuesMessage } from '../../preview/protocol';
 import { useTina } from './use-tina';
 
 // Embedded-path scaffolding: happy-dom's window.parent === window (the

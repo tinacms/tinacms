@@ -29,6 +29,10 @@
       "types": "./src/preview/index.ts",
       "default": "./src/preview/index.ts"
     },
+    "./adapters/react": {
+      "types": "./src/adapters/react/index.ts",
+      "default": "./src/adapters/react/index.ts"
+    },
     "./client": {
       "types": "./src/client/index.ts",
       "default": "./src/client/index.ts"
