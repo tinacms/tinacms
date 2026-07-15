@@ -4,7 +4,9 @@ import {
   type FormId,
   fieldDirty,
   formStatus,
+  toDocument,
   toFormId,
+  toFormValues,
   useFormStore,
 } from './form-store';
 
@@ -34,6 +36,16 @@ describe('form-store registration', () => {
     store.getState().registerForm(postA, { [title]: 'Hello' });
     expect(store.getState().forms[postA].values[title]).toBe('Edited');
     expect(statusOf(postA)).toBe('dirty');
+  });
+});
+
+describe('form-store document round trip', () => {
+  it('toDocument inverts toFormValues key for key, on a copy', () => {
+    const document = { title: 'Hello', featured: true };
+    const values = toFormValues(document);
+    const roundTripped = toDocument(values);
+    expect(roundTripped).toEqual(document);
+    expect(roundTripped).not.toBe(values);
   });
 });
 

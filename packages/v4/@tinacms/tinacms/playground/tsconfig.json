@@ -8,6 +8,7 @@
     "baseUrl": ".",
     "paths": {
       "@tinacms/tinacms/react": ["../src/editor/index.ts"],
+      "@tinacms/tinacms/preview": ["../src/preview/index.ts"],
       "@tinacms/tinacms": ["../src/index.ts"]
     }
   },

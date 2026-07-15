@@ -49,6 +49,10 @@ export const toFormValues = (document: TinaDocument): FormValues => {
   return values;
 };
 
+// Inverse of toFormValues — flat addresses are field names today, so the document is
+// a key-for-key copy; a path walk lands here alongside toFormValues when nesting does.
+export const toDocument = (values: FormValues): TinaDocument => ({ ...values });
+
 export type FormStatus = 'pristine' | 'dirty' | 'clean';
 
 // One open document's form, modelled so illegal states can't be built: a pristine form
