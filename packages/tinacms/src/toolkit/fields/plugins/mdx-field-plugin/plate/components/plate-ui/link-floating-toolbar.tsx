@@ -237,7 +237,10 @@ export function LinkFloatingToolbar({
         {...insertProps}
         // Override plate-floating's inline z-index (which beats the z-[999999]
         // class) so the portaled popover sits above the form field wrappers.
-        style={{ ...(insertProps.style as React.CSSProperties), zIndex: 999999 }}
+        style={{
+          ...(insertProps.style as React.CSSProperties),
+          zIndex: 999999,
+        }}
       >
         {input}
       </div>
