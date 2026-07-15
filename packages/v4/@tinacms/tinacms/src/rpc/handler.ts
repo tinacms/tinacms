@@ -12,6 +12,7 @@ import {
 } from '../core/overridable-registry';
 import { AUTH_CAPABILITY, type PluginManifest } from '../core/plugin';
 import {
+  initializePlugins,
   resolveServerSegments,
   validateCapabilityGraph,
 } from '../core/resolve';
@@ -66,6 +67,10 @@ export const composeServerRuntime = async (
 ): Promise<ServerRuntime> => {
   validateCapabilityGraph(plugins);
   const resolved = await resolveServerSegments(plugins);
+  // Server runtime lives for the process — onInit runs once here; the returned
+  // teardown is dropped because there is no compose-side unload to hang it on. A
+  // failed init already tore down what ran, and the handler retries next request.
+  await initializePlugins(plugins);
   const segmentsByNamespace = composeOverridableRegistry(
     resolved.map((segment) => {
       const mount = capabilityMountFor(segment.manifest);

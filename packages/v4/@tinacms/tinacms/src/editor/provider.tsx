@@ -11,6 +11,7 @@ import { toFieldAddress } from '../core/field/address';
 import { createFieldRegistry } from '../core/field/registry';
 import { ingestDocument } from '../core/form/ingest';
 import { type PluginManifest, resolveClientSegments } from '../core/plugin';
+import { initializePlugins, validateCapabilityGraph } from '../core/resolve';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import {
   type FieldErrors,
@@ -48,22 +49,33 @@ export function TinaProvider({ plugins, children }: TinaProviderProps) {
 
   useEffect(() => {
     let mounted = true;
-    resolveClientSegments(plugins)
-      .then((resolved) => {
-        if (mounted) {
-          setRuntime({
-            registry: createFieldRegistry(resolved),
-            store: createTinaStore(resolved),
-          });
-        }
-      })
-      .catch((cause) => {
-        if (mounted) {
-          setError(cause instanceof Error ? cause : new Error(String(cause)));
-        }
-      });
+    // The graph pass (ADR-006) validates the manifests before any segment is
+    // imported — a conflicting or unsatisfiable config fails here, not mid-boot.
+    // onInit runs after the segments load and before the runtime is exposed, so
+    // no consumer sees a half-initialized plugin set.
+    const boot = Promise.resolve().then(async () => {
+      validateCapabilityGraph(plugins);
+      const resolved = await resolveClientSegments(plugins);
+      const destroyPlugins = await initializePlugins(plugins);
+      if (mounted) {
+        setRuntime({
+          registry: createFieldRegistry(resolved),
+          store: createTinaStore(resolved),
+        });
+      }
+      return destroyPlugins;
+    });
+    boot.catch((cause) => {
+      if (mounted) {
+        setError(cause instanceof Error ? cause : new Error(String(cause)));
+      }
+    });
     return () => {
       mounted = false;
+      // Teardown rides the boot promise: the init sequence isn't cancellable, so
+      // unmounting mid-boot still destroys whatever finished initializing. A failed
+      // boot already tore itself down (initializePlugins), hence the swallowed catch.
+      void boot.then((destroyPlugins) => destroyPlugins()).catch(() => {});
     };
   }, [pluginsKey]);
 

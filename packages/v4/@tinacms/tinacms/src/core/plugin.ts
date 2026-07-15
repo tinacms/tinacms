@@ -133,6 +133,12 @@ export interface PluginManifest {
   permissions?: { name: string; description?: string }[];
   requires?: { permission: string };
   overrides?: CapabilityOverride[];
+  // Plugin-lifecycle (ADR-006), run once per runtime boot in dependency order
+  // (core/resolve.ts initializePlugins) — not per UI instance. No context argument
+  // yet: the intentionally-narrow PluginInitContext (resolved config, nothing else)
+  // lands with defineConfig (ADR-024) and is additive for implementers.
+  onInit?: () => void | Promise<void>;
+  onDestroy?: () => void | Promise<void>;
 }
 
 export const definePlugin = (manifest: PluginManifest): PluginManifest =>

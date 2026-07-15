@@ -5,6 +5,7 @@ import {
   composeOverridableRegistry,
 } from './overridable-registry';
 import {
+  type Capability,
   FIELD_CAPABILITY,
   type PluginManifest,
   type ResolvedServerSegment,
@@ -36,9 +37,10 @@ export const resolveServerSegments = async (
 // so a bad config never half-boots.
 //
 // `field` is the keyed capability (ADR-009): many providers are legal, and per-type
-// conflicts are the field registry's job (createFieldRegistry). ADR-006's topological
-// init order is deliberately NOT computed here — nothing consumes ordering until the
-// deferred onInit lifecycle lands; both composers are order-independent registries.
+// conflicts are the field registry's job (createFieldRegistry). Both segment composers
+// are order-independent registries — ADR-006's topological order exists solely for the
+// onInit lifecycle, and its one config-shaped failure (a dependency cycle) is caught
+// here with the rest.
 export const validateCapabilityGraph = (plugins: PluginManifest[]): void => {
   const names = new Set<string>();
   for (const plugin of plugins) {
@@ -80,6 +82,83 @@ export const validateCapabilityGraph = (plugins: PluginManifest[]): void => {
       );
     }
   }
+
+  orderPluginsByDependencies(plugins);
+};
+
+// ADR-006 initialization order: every provider of a capability initializes before the
+// plugins depending on it. Repeated ready-scan (Kahn's algorithm) so config order breaks
+// ties and runs are deterministic; a plugin satisfying its own dependency is not an
+// edge. A cycle cannot be ordered — hard error naming the members, same philosophy as
+// capability conflicts: nothing is silently picked.
+// ponytail: O(n²) ready-scan — plugin lists are tens, not thousands.
+export const orderPluginsByDependencies = (
+  plugins: PluginManifest[]
+): PluginManifest[] => {
+  const providersOf = new Map<Capability, PluginManifest[]>();
+  for (const plugin of plugins) {
+    for (const capability of plugin.provides ?? []) {
+      providersOf.set(capability, [
+        ...(providersOf.get(capability) ?? []),
+        plugin,
+      ]);
+    }
+  }
+
+  const ordered: PluginManifest[] = [];
+  const emitted = new Set<PluginManifest>();
+  while (ordered.length < plugins.length) {
+    const ready = plugins.filter(
+      (plugin) =>
+        !emitted.has(plugin) &&
+        (plugin.dependsOn ?? []).every((capability) =>
+          (providersOf.get(capability) ?? []).every(
+            (provider) => provider === plugin || emitted.has(provider)
+          )
+        )
+    );
+    invariant(
+      ready.length > 0,
+      'capability-cycle',
+      'Capability dependencies form a cycle among: ' +
+        plugins
+          .filter((plugin) => !emitted.has(plugin))
+          .map((plugin) => `"${plugin.name}"`)
+          .join(', ') +
+        '. Initialization order requires an acyclic graph — break the cycle.'
+    );
+    for (const plugin of ready) {
+      emitted.add(plugin);
+      ordered.push(plugin);
+    }
+  }
+  return ordered;
+};
+
+// The onInit lifecycle (ADR-006): run once per runtime boot, in dependency order, each
+// hook awaited before the next. Returns the matching teardown — onDestroy in reverse
+// order, only for plugins whose init actually ran. A mid-sequence failure tears those
+// down first (a poller registered by an earlier onInit must not outlive a failed boot),
+// then rethrows the original cause.
+export const initializePlugins = async (
+  plugins: PluginManifest[]
+): Promise<() => Promise<void>> => {
+  const initialized: PluginManifest[] = [];
+  const destroyInitialized = async () => {
+    for (const plugin of [...initialized].reverse()) {
+      await plugin.onDestroy?.();
+    }
+  };
+  for (const plugin of orderPluginsByDependencies(plugins)) {
+    try {
+      await plugin.onInit?.();
+      initialized.push(plugin);
+    } catch (cause) {
+      await destroyInitialized().catch(() => {});
+      throw cause;
+    }
+  }
+  return destroyInitialized;
 };
 
 const capabilityConflictError = (
