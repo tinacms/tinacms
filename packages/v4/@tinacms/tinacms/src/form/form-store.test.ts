@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { toFieldAddress } from '../core/field/address';
 import {
   type FormId,
@@ -13,10 +13,6 @@ const postA = toFormId('posts/a.mdx');
 const postB = toFormId('posts/b.mdx');
 const store = useFormStore;
 const statusOf = (formId: FormId) => formStatus(store.getState().forms[formId]);
-
-beforeEach(() => {
-  store.setState({ forms: {} });
-});
 
 describe('form-store registration', () => {
   it('a freshly registered form is pristine', () => {
@@ -88,6 +84,22 @@ describe('form-store save reset', () => {
     // Baseline moved to the saved value: returning to the original is now dirty.
     store.getState().setFieldValue(postA, title, 'Hello');
     expect(statusOf(postA)).toBe('dirty');
+  });
+
+  it('markSaved with a pre-save snapshot keeps in-flight edits dirty', () => {
+    store.getState().registerForm(postA, { [title]: 'Hello' });
+    store.getState().setFieldValue(postA, title, 'Saved value');
+    const snapshot = { ...store.getState().forms[postA].values };
+
+    // Edit typed while the save was in flight: baseline is the snapshot, not
+    // the current values, so the newer edit still diffs dirty.
+    store.getState().setFieldValue(postA, title, 'Newer edit');
+    store.getState().markSaved(postA, snapshot);
+    expect(statusOf(postA)).toBe('dirty');
+
+    // Reverting to what was actually saved is clean against the new baseline.
+    store.getState().setFieldValue(postA, title, 'Saved value');
+    expect(statusOf(postA)).toBe('clean');
   });
 });
 
