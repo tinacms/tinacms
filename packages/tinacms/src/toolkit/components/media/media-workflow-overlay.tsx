@@ -1,5 +1,12 @@
-import * as React from 'react';
-import { BiError } from 'react-icons/bi';
+import { CreateBranchPromptModal } from '@toolkit/form-builder/create-branch-modal';
+import { EditorialWorkflowProgressModal } from '@toolkit/form-builder/editorial-workflow-progress-modal';
+import {
+  type MediaWorkflowConfirmBranchEvent,
+  TARGET_BRANCH_EXISTS_ERROR,
+  checkBaseBranchExists,
+  checkTargetBranchExists,
+} from '@toolkit/form-builder/editorial-workflow-utils';
+import { getEditorialWorkflowErrorMessage } from '@toolkit/form-builder/use-editorial-workflow';
 import { useBranchData } from '@toolkit/plugin-branch-switcher';
 import { useCMS } from '@toolkit/react-core';
 import {
@@ -8,15 +15,8 @@ import {
   ModalHeader,
   PopupModal,
 } from '@toolkit/react-modals';
-import { CreateBranchPromptModal } from '@toolkit/form-builder/create-branch-modal';
-import {
-  checkBaseBranchExists,
-  checkTargetBranchExists,
-  type MediaWorkflowConfirmBranchEvent,
-  TARGET_BRANCH_EXISTS_ERROR,
-} from '@toolkit/form-builder/editorial-workflow-utils';
-import { EditorialWorkflowProgressModal } from '@toolkit/form-builder/editorial-workflow-progress-modal';
-import { getEditorialWorkflowErrorMessage } from '@toolkit/form-builder/use-editorial-workflow';
+import * as React from 'react';
+import { BiError } from 'react-icons/bi';
 
 type WorkflowState =
   | { phase: 'idle' }
@@ -199,7 +199,8 @@ export const MediaWorkflowOverlay = () => {
           state.onCancel();
           setState({ phase: 'idle' });
         }}
-        disabled={state.branchName === '' || state.isChecking}
+        disabled={state.branchName === ''}
+        busy={state.isChecking}
         errorMessage={state.errorMessage}
         onBranchNameChange={(branchName) => {
           abortPreflight();

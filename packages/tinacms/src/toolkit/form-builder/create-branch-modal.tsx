@@ -1,5 +1,7 @@
-import * as React from 'react';
-import { BiError } from 'react-icons/bi';
+import { FieldLabel } from '@toolkit/fields';
+import { Form } from '@toolkit/forms';
+import { useLocalStorage } from '@toolkit/hooks/use-local-storage';
+import { Button, DropdownButton } from '@toolkit/styles';
 import {
   Eye,
   FileText,
@@ -7,7 +9,10 @@ import {
   Globe,
   TriangleAlert,
 } from 'lucide-react';
-import { Button, DropdownButton } from '@toolkit/styles';
+import * as React from 'react';
+import { BiError } from 'react-icons/bi';
+import { EditorialWorkflowSaveEvent } from '../../lib/posthog/posthog';
+import { captureEvent } from '../../lib/posthog/posthogProvider';
 import { useCMS } from '../react-core';
 import {
   Modal,
@@ -16,19 +21,15 @@ import {
   ModalHeader,
   PopupModal,
 } from '../react-modals';
-import { FieldLabel } from '@toolkit/fields';
-import { Form } from '@toolkit/forms';
 import { EditorialWorkflowProgressModal } from './editorial-workflow-progress-modal';
 import { checkBaseBranchExists } from './editorial-workflow-utils';
-import { useEditorialWorkflow } from './use-editorial-workflow';
-import { useLocalStorage } from '@toolkit/hooks/use-local-storage';
+import { LoadingDots } from './loading-dots';
 import {
   SAVE_CHOICE_KEY,
   type SaveChoice,
   resolveSaveOptions,
 } from './save-options';
-import { EditorialWorkflowSaveEvent } from '../../lib/posthog/posthog';
-import { captureEvent } from '../../lib/posthog/posthogProvider';
+import { useEditorialWorkflow } from './use-editorial-workflow';
 
 // Format the default branch name by removing content/ prefix and file extension
 const formatDefaultBranchName = (
@@ -80,8 +81,7 @@ export const CreateBranchModal = ({
   const [newBranchName, setNewBranchName] = React.useState(
     formatDefaultBranchName(path, crudType)
   );
-  const [isBranchGuardChecking, setIsBranchGuardChecking] =
-    React.useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
   const branchGuardAbortRef = React.useRef<AbortController | null>(null);
 
   const {
@@ -96,7 +96,7 @@ export const CreateBranchModal = ({
   const abortBranchGuard = React.useCallback(() => {
     branchGuardAbortRef.current?.abort();
     branchGuardAbortRef.current = null;
-    setIsBranchGuardChecking(false);
+    setIsSubmitting(false);
   }, []);
 
   React.useEffect(() => {
@@ -109,7 +109,9 @@ export const CreateBranchModal = ({
     abortBranchGuard();
     const abortController = new AbortController();
     branchGuardAbortRef.current = abortController;
-    setIsBranchGuardChecking(true);
+    // Keep the submit button spinning through the whole async guard + workflow
+    // start, so the click gives immediate feedback instead of a dead beat.
+    setIsSubmitting(true);
 
     const baseBranch = decodeURIComponent(tinaApi.branch);
     const targetBranch = `tina/${newBranchName}`;
@@ -132,8 +134,6 @@ export const CreateBranchModal = ({
       return;
     }
 
-    setIsBranchGuardChecking(false);
-
     const { success, error } = await executeWorkflow({
       branchName: targetBranch,
       baseBranch,
@@ -147,6 +147,10 @@ export const CreateBranchModal = ({
     if (branchGuardAbortRef.current === abortController) {
       branchGuardAbortRef.current = null;
     }
+
+    // On success the progress modal has already taken over; on failure this
+    // drops the spinner so the prompt shows the error.
+    setIsSubmitting(false);
 
     // Cancelled mid-run (modal closed, branch renamed, another save started, or
     // unmounted) — treat as a no-op and record nothing.
@@ -181,7 +185,8 @@ export const CreateBranchModal = ({
         close();
       }}
       errorMessage={errorMessage}
-      disabled={newBranchName === '' || isBranchGuardChecking}
+      disabled={newBranchName === ''}
+      busy={isSubmitting}
       onBranchNameChange={(value) => {
         abortBranchGuard();
         reset();
@@ -203,6 +208,7 @@ export const CreateBranchPromptModal = ({
   branchName,
   close,
   disabled,
+  busy,
   errorMessage,
   onBranchNameChange,
   onCreateBranch,
@@ -213,6 +219,7 @@ export const CreateBranchPromptModal = ({
   branchName: string;
   close: () => void;
   disabled?: boolean;
+  busy?: boolean;
   errorMessage?: string;
   onBranchNameChange: (value: string) => void;
   onCreateBranch: (isDraft: boolean) => void;
@@ -325,6 +332,7 @@ export const CreateBranchPromptModal = ({
               align='start'
               className='w-full sm:w-auto'
               disabled={disabled}
+              busy={busy}
               onMainAction={mainChoice.run}
               items={menu.map((choice) => {
                 const option = choices[choice];
@@ -341,8 +349,14 @@ export const CreateBranchPromptModal = ({
                 };
               })}
             >
-              <MainIcon className='w-4 h-4 mr-1' style={{ fill: 'none' }} />
-              {mainChoice.label}
+              {busy ? (
+                <LoadingDots />
+              ) : (
+                <>
+                  <MainIcon className='w-4 h-4 mr-1' style={{ fill: 'none' }} />
+                  {mainChoice.label}
+                </>
+              )}
             </DropdownButton>
           ) : (
             <DropdownButton
@@ -350,6 +364,7 @@ export const CreateBranchPromptModal = ({
               align='start'
               className='w-full sm:w-auto'
               disabled={disabled}
+              busy={busy}
               onMainAction={() => onCreateBranch(false)}
               items={[
                 {
@@ -359,11 +374,17 @@ export const CreateBranchPromptModal = ({
                 },
               ]}
             >
-              <GitBranchIcon
-                className='w-4 h-4 mr-1'
-                style={{ fill: 'none' }}
-              />
-              Save to a new branch
+              {busy ? (
+                <LoadingDots />
+              ) : (
+                <>
+                  <GitBranchIcon
+                    className='w-4 h-4 mr-1'
+                    style={{ fill: 'none' }}
+                  />
+                  Save to a new branch
+                </>
+              )}
             </DropdownButton>
           )}
         </ModalActions>
