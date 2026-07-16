@@ -9,7 +9,7 @@
     "url": "https://github.com/tinacms/tinacms.git",
     "directory": "packages/v4/@tinacms/ui"
   },
-  "sideEffects": false,
+  "sideEffects": ["**/*.css"],
   "scripts": {
     "types": "tsc"
   },
@@ -31,7 +31,7 @@
   "dependencies": {
     "@base-ui/react": "^1.6.0",
     "class-variance-authority": "catalog:",
-    "clsx": "^2.1.1",
+    "clsx": "catalog:",
     "lucide-react": "catalog:",
     "tailwind-merge": "^3.4.1"
   },

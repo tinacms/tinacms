@@ -2662,7 +2662,7 @@ importers:
         specifier: 'catalog:'
         version: 0.7.1
       clsx:
-        specifier: ^2.1.1
+        specifier: 'catalog:'
         version: 2.1.1
       lucide-react:
         specifier: 'catalog:'
@@ -24674,7 +24674,7 @@ snapshots:
 
   babel-plugin-macros@3.1.0:
     dependencies:
-      '@babel/runtime': 7.28.6
+      '@babel/runtime': 7.29.7
       cosmiconfig: 7.1.0
       resolve: 1.22.11
 
