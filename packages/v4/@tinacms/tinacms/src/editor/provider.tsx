@@ -14,6 +14,7 @@ import { type PluginManifest, resolveClientSegments } from '../core/plugin';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import {
   type FieldErrors,
+  isEdited,
   toDocument,
   toFormId,
   toFormValues,
@@ -107,7 +108,7 @@ export function FormProvider({
   // slice arbitrates reload-vs-keep, form-store.ts registerForm).
   const keptSeed = useMemo(() => {
     const kept = useFormStore.getState().forms[formId];
-    return kept?.status === 'edited' ? toDocument(kept.values) : null;
+    return isEdited(kept) ? toDocument(kept.values) : null;
   }, [formId]);
   const seedValues = keptSeed ?? ingested;
   const resolver = useMemo(

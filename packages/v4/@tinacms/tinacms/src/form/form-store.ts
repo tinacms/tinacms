@@ -78,6 +78,13 @@ type OpenForm =
       readonly errors: FieldErrors;
     };
 
+// The one place the discriminant string is compared — every consumer asks the
+// question, none repeat the literal.
+export const isEdited = (
+  scope: OpenForm | undefined
+): scope is Extract<OpenForm, { status: 'edited' }> =>
+  scope?.status === 'edited';
+
 export interface FormStore {
   // Keyed by FormId (one open document per form, ADR-010); a missing key is a form
   // that isn't open, so a lookup returns `OpenForm | undefined`.
@@ -128,7 +135,7 @@ const valuesEqual = (current: FormValues, baseline: FormValues): boolean => {
 };
 
 export const formStatus = (scope: OpenForm | undefined): FormStatus => {
-  if (!scope || scope.status === 'pristine') return 'pristine';
+  if (!isEdited(scope)) return 'pristine';
   return valuesEqual(scope.values, scope.baseline) ? 'clean' : 'dirty';
 };
 
@@ -139,26 +146,16 @@ export const fieldDirty = (
   scope: OpenForm | undefined,
   address: FieldAddress
 ): boolean =>
-  scope?.status === 'edited'
+  isEdited(scope)
     ? !Object.is(scope.values[address], scope.baseline[address])
     : false;
 
 // Message arrays are rebuilt by RHF on every derivation; compare content so an
-// unchanged mirror write doesn't churn subscriber identity.
-const errorsEqual = (current: FieldErrors, next: FieldErrors): boolean => {
-  const keys = Object.keys(current) as FieldAddress[];
-  if (keys.length !== Object.keys(next).length) return false;
-  return keys.every((key) => {
-    const a = current[key];
-    const b = next[key];
-    return (
-      a !== undefined &&
-      b !== undefined &&
-      a.length === b.length &&
-      a.every((message, index) => message === b[index])
-    );
-  });
-};
+// unchanged mirror write doesn't churn subscriber identity. JSON is fine here:
+// the maps are string[] leaves, and a key-order false negative just means one
+// harmless extra write.
+const errorsEqual = (current: FieldErrors, next: FieldErrors): boolean =>
+  JSON.stringify(current) === JSON.stringify(next);
 
 // Middleware composes at create() time (Zustand's contract): here just `devtools`, which
 // streams clean/dirty/pristine transitions to the Redux DevTools extension. It's a no-op
@@ -200,7 +197,7 @@ export const useFormStore = create<FormStore>()(
             // TODO(v4): `edited` covers clean (saved) forms too, so a clean form won't
             // re-adopt externally-changed content on reload; the future auto-save/draft
             // slice will arbitrate reload-vs-keep against dirty state.
-            if (state.forms[formId]?.status === 'edited') return state;
+            if (isEdited(state.forms[formId])) return state;
             return {
               forms: {
                 ...state.forms,
@@ -219,18 +216,16 @@ export const useFormStore = create<FormStore>()(
             // reads equal and would be dropped — composite fields need field-owned equality.
             if (Object.is(scope.values[address], value)) return state;
             // The first edit freezes the pristine values as the baseline to diff against.
-            const baseline =
-              scope.status === 'pristine' ? scope.values : scope.baseline;
             return {
               forms: {
                 ...state.forms,
                 [formId]: {
                   status: 'edited',
                   values: { ...scope.values, [address]: value },
-                  baseline,
+                  baseline: isEdited(scope) ? scope.baseline : scope.values,
                   // Value writes never touch errors — RHF re-derives and the
                   // mirror (setFieldErrors) follows.
-                  errors: scope.status === 'pristine' ? {} : scope.errors,
+                  errors: isEdited(scope) ? scope.errors : {},
                 },
               },
             };
@@ -241,7 +236,7 @@ export const useFormStore = create<FormStore>()(
             const scope = state.forms[formId];
             // Pristine means never validated — there is nothing to mirror onto
             // (and RHF's onChange mode derives no errors before the first edit).
-            if (scope?.status !== 'edited') return state;
+            if (!isEdited(scope)) return state;
             if (errorsEqual(scope.errors, errors)) return state;
             // values/baseline references are preserved: an error write must not
             // read as a value change to values subscribers (preview wire, dirty).
@@ -272,7 +267,7 @@ export const useFormStore = create<FormStore>()(
                   baseline: savedValues ?? scope.values,
                   // A save changes no values, so it changes no errors; the
                   // mirror overwrites on RHF's next derivation anyway.
-                  errors: scope.status === 'edited' ? scope.errors : {},
+                  errors: isEdited(scope) ? scope.errors : {},
                 },
               },
             };
@@ -320,5 +315,5 @@ const NO_FIELD_ERRORS: FieldErrors = {};
 export const useFormErrors = (formId: FormId): FieldErrors =>
   useFormStore((state) => {
     const scope = state.forms[formId];
-    return scope?.status === 'edited' ? scope.errors : NO_FIELD_ERRORS;
+    return isEdited(scope) ? scope.errors : NO_FIELD_ERRORS;
   });
