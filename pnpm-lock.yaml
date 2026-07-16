@@ -75,9 +75,9 @@ catalogs:
     '@iarna/toml':
       specifier: ^2.2.5
       version: 2.2.5
-    '@monaco-editor/react':
-      specifier: 4.7.0-rc.0
-      version: 4.7.0-rc.0
+    '@monaco-editor/loader':
+      specifier: ^1.7.0
+      version: 1.7.0
     '@octokit/rest':
       specifier: ^22.0.1
       version: 22.0.1
@@ -1190,9 +1190,9 @@ importers:
       '@heroicons/react':
         specifier: ^1.0.6
         version: 1.0.6(react@18.3.1)
-      '@monaco-editor/react':
+      '@monaco-editor/loader':
         specifier: 'catalog:'
-        version: 4.7.0-rc.0(monaco-editor@0.31.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 1.7.0
       '@tinacms/mdx':
         specifier: workspace:^
         version: link:../mdx
@@ -1205,9 +1205,6 @@ importers:
       graphql:
         specifier: 15.8.0
         version: 15.8.0
-      monaco-editor:
-        specifier: 'catalog:'
-        version: 0.31.0
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -1236,6 +1233,9 @@ importers:
       happy-dom:
         specifier: 'catalog:'
         version: 15.10.2
+      monaco-editor:
+        specifier: 'catalog:'
+        version: 0.31.0
       vite:
         specifier: ^5.4.14
         version: 5.4.21(@types/node@25.1.0)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)
@@ -2222,9 +2222,6 @@ importers:
       '@heroicons/react':
         specifier: ^1.0.6
         version: 1.0.6(react@18.3.1)
-      '@monaco-editor/react':
-        specifier: 'catalog:'
-        version: 4.7.0-rc.0(monaco-editor@0.31.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-dialog':
         specifier: 'catalog:'
         version: 1.1.18(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2387,9 +2384,6 @@ importers:
       mermaid:
         specifier: ^11.12.2
         version: 11.12.2
-      monaco-editor:
-        specifier: 'catalog:'
-        version: 0.31.0
       posthog-js:
         specifier: ^1.347.1
         version: 1.347.1
@@ -5829,13 +5823,6 @@ packages:
 
   '@monaco-editor/loader@1.7.0':
     resolution: {integrity: sha512-gIwR1HrJrrx+vfyOhYmCZ0/JcWqG5kbfG7+d3f/C1LXk2EvzAbHSg3MQ5lO2sMlo9izoAZ04shohfKLVT6crVA==}
-
-  '@monaco-editor/react@4.7.0-rc.0':
-    resolution: {integrity: sha512-YfjXkDK0bcwS0zo8PXptvQdCQfOPPtzGsAzmIv7PnoUGFdIohsR+NVDyjbajMddF+3cWUm/3q9NzP/DUke9a+w==}
-    peerDependencies:
-      monaco-editor: '>= 0.25.0 < 1'
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   '@mongodb-js/saslprep@1.4.0':
     resolution: {integrity: sha512-ZHzx7Z3rdlWL1mECydvpryWN/ETXJiCxdgQKTAH+djzIPe77HdnSizKBDi1TVDXZjXyOj2IqEG/vPw71ULF06w==}
@@ -20623,13 +20610,6 @@ snapshots:
     dependencies:
       state-local: 1.0.7
 
-  '@monaco-editor/react@4.7.0-rc.0(monaco-editor@0.31.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
-    dependencies:
-      '@monaco-editor/loader': 1.7.0
-      monaco-editor: 0.31.0
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-
   '@mongodb-js/saslprep@1.4.0':
     dependencies:
       sparse-bitfield: 3.0.3
@@ -33623,7 +33603,7 @@ snapshots:
   vite@5.4.21(@types/node@22.19.17)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0):
     dependencies:
       esbuild: 0.21.5
-      postcss: 8.5.6
+      postcss: 8.5.16
       rollup: 4.53.4
     optionalDependencies:
       '@types/node': 22.19.17
@@ -33635,7 +33615,7 @@ snapshots:
   vite@5.4.21(@types/node@22.19.3)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0):
     dependencies:
       esbuild: 0.21.5
-      postcss: 8.5.6
+      postcss: 8.5.16
       rollup: 4.53.4
     optionalDependencies:
       '@types/node': 22.19.3
@@ -33647,7 +33627,7 @@ snapshots:
   vite@5.4.21(@types/node@25.1.0)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0):
     dependencies:
       esbuild: 0.21.5
-      postcss: 8.5.6
+      postcss: 8.5.16
       rollup: 4.53.4
     optionalDependencies:
       '@types/node': 25.1.0
