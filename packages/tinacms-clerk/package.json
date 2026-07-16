@@ -1,7 +1,7 @@
 {
 	"name": "tinacms-clerk",
 	"type": "module",
-	"version": "24.0.1",
+	"version": "24.0.2",
 	"main": "dist/index.js",
 	"module": "./dist/index.js",
 	"files": [
@@ -33,7 +33,7 @@
 	"peerDependencies": {
 		"@clerk/backend": "0.x",
 		"@clerk/clerk-js": "4.x",
-		"tinacms": "workspace:*"
+		"tinacms": "workspace:^"
 	},
 	"publishConfig": {
 		"registry": "https://registry.npmjs.org"

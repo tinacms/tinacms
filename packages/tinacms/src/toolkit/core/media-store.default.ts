@@ -15,6 +15,7 @@ import type { TinaCMS } from '@toolkit/tina-cms';
 import type { Client } from '../../internalClient';
 import {
   E_BAD_ROUTE,
+  E_SELF_HOSTED_MEDIA,
   E_UNAUTHORIZED,
   Media,
   MediaList,
@@ -120,7 +121,26 @@ export class TinaMediaStore implements MediaStore {
     }
   }
 
+  /**
+   * Repo-backed media (`media.tina`) is served by TinaCloud's assets API. A
+   * self-hosted site (a custom content API, and not local dev) has no such
+   * endpoint, so these operations can never succeed there. Detecting the case
+   * lets us fail with a clear, actionable message instead of a misleading
+   * TinaCloud/provider error (e.g. a bogus 404 "Bad Route").
+   */
+  private isUnsupportedSelfHostedRepoMedia(): boolean {
+    const api = this.api ?? this.cms?.api?.tina;
+    return Boolean(api && !api.isLocalMode && api.isCustomContentApi);
+  }
+
   setup() {
+    // Static repo media is generated at build time and served without the
+    // assets API, so it keeps working self-hosted (read-only) — only live
+    // repo-media operations hit the unsupported path.
+    if (!this.isStatic && this.isUnsupportedSelfHostedRepoMedia()) {
+      throw E_SELF_HOSTED_MEDIA;
+    }
+
     if (!this.api) {
       this.api = this.cms?.api?.tina;
 
@@ -721,6 +741,12 @@ export class TinaMediaStore implements MediaStore {
   async persist(media: MediaUploadOptions[]): Promise<Media[]> {
     this.setup();
 
+    // Also covers static repo media, which browses read-only self-hosted but
+    // still can't accept uploads without an external store.
+    if (this.isUnsupportedSelfHostedRepoMedia()) {
+      throw E_SELF_HOSTED_MEDIA;
+    }
+
     if (this.isLocal) {
       return this.persist_local(media);
     } else {
@@ -844,6 +870,10 @@ export class TinaMediaStore implements MediaStore {
   };
 
   async delete(media: Media) {
+    if (this.isUnsupportedSelfHostedRepoMedia()) {
+      throw E_SELF_HOSTED_MEDIA;
+    }
+
     const path = this.joinMediaPath(media.directory, media.filename);
     if (!this.isLocal) {
       if (await this.isAuthenticated()) {

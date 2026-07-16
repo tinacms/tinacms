@@ -12,6 +12,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "tinacms-scripts build",
+    "dev": "vite playground",
     "types": "tsc",
     "test": "vitest run --passWithNoTests"
   },
@@ -23,6 +24,14 @@
     "./react": {
       "types": "./src/editor/index.ts",
       "default": "./src/editor/index.ts"
+    },
+    "./preview": {
+      "types": "./src/preview/index.ts",
+      "default": "./src/preview/index.ts"
+    },
+    "./adapters/react": {
+      "types": "./src/adapters/react/index.ts",
+      "default": "./src/adapters/react/index.ts"
     },
     "./client": {
       "types": "./src/client/index.ts",
@@ -72,6 +81,7 @@
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "typescript": "^5.7.3",
+    "vite": "^5.4.0",
     "vitest": "^2.1.9"
   }
 }
