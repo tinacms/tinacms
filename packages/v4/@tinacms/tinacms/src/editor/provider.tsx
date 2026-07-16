@@ -6,12 +6,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import {
-  FormProvider as RhfFormProvider,
-  type UseFormReturn,
-  useForm,
-  useFormState,
-} from 'react-hook-form';
+import { FormProvider as RhfFormProvider, useForm } from 'react-hook-form';
 import { toFieldAddress } from '../core/field/address';
 import { createFieldRegistry } from '../core/field/registry';
 import { ingestDocument } from '../core/form/ingest';
@@ -19,7 +14,6 @@ import { type PluginManifest, resolveClientSegments } from '../core/plugin';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import {
   type FieldErrors,
-  type FormId,
   toDocument,
   toFormId,
   toFormValues,
@@ -126,47 +120,83 @@ export function FormProvider({
     mode: 'onChange',
   });
 
-  // Re-seed the form only when the seed's content actually changes (compared by
-  // a JSON signature). RHF's useForm reads defaultValues only at mount, so this
-  // reset reloads the form when you switch documents — while a same-content
-  // re-render won't wipe in-progress edits. The divergence seam is closed across
-  // remounts (a kept form's seed is the store's own values, so both sides
-  // agree); the one remaining case — a document swap on a form edited while
-  // mounted — still resets RHF while the store keeps its edits, awaiting the
-  // draft slice's reload-vs-keep arbitration (form-store.ts registerForm TODO).
+  // Adopt the seed. RHF's useForm reads defaultValues only at mount, so a
+  // seed change resets the form — compared by a JSON signature that carries
+  // the formId (an unkeyed switch between identical-content documents must
+  // still reset, or the old form's RHF edits would render — and save — under
+  // the new form's path), while a same-content re-render won't wipe
+  // in-progress edits. The mount run only registers: defaultValues already
+  // seeded RHF. The one remaining divergence seam — a document swap on a form
+  // edited while mounted — still resets RHF while the store keeps its edits,
+  // awaiting the draft slice's reload-vs-keep arbitration (form-store.ts
+  // registerForm TODO).
   const seededSignature = useRef<string | null>(null);
   useEffect(() => {
-    // The signature carries the formId: an unkeyed switch between
-    // identical-content documents must still reset, or the old form's RHF
-    // edits would render — and save — under the new form's path.
     const signature = JSON.stringify([formId, seedValues]);
-    if (seededSignature.current === null) {
-      seededSignature.current = signature;
-      return;
-    }
-    if (seededSignature.current !== signature) {
-      seededSignature.current = signature;
+    if (
+      seededSignature.current !== null &&
+      seededSignature.current !== signature
+    ) {
       methods.reset(seedValues);
     }
-  }, [formId, seedValues, methods]);
-
-  // One-way RHF → form-store sync: RHF stays the value/render authority, the
-  // form-store is the sole pristine/dirty/clean authority (ADR-010). This watch
-  // subscription is the single chokepoint — wrapping field.onChange instead would
-  // miss reset/setValue and be bypassable via a raw useController.
-  useEffect(() => {
-    const { registerForm, setFieldValue } = useFormStore.getState();
-    registerForm(formId, toFormValues(seedValues));
-    const subscription = methods.watch((values, { name }) => {
-      // `name` is undefined on reset — re-adopting the baseline is registerForm's job.
-      if (name === undefined) return;
-      setFieldValue(formId, toFieldAddress(name), values[name]);
-    });
+    seededSignature.current = signature;
     // No removeForm on unmount (ADR-012): navigating away keeps unsaved edits.
-    return () => subscription.unsubscribe();
+    useFormStore.getState().registerForm(formId, toFormValues(seedValues));
   }, [formId, seedValues, methods]);
 
-  useErrorMirror(formId, methods, keptSeed);
+  // One-way RHF → form-store sync, values and errors on one subscription: RHF
+  // stays the value/render authority, the form-store is the sole
+  // pristine/dirty/clean authority (ADR-010). methods.subscribe is the single
+  // chokepoint — wrapping field.onChange instead would miss reset/setValue and
+  // be bypassable via a raw useController. The subscription's lifetime IS the
+  // hosted form's ([formId]; keptSeed is memoized per formId), so a derivation
+  // can never land under another form's id — no ownership guard needed.
+  useEffect(() => {
+    // Re-validate on re-adopt: RHF derives no errors from defaultValues, so a
+    // form re-mounted onto invalid kept edits would look error-free until the
+    // next keystroke — one trigger() re-derives. Until it resolves, the fresh
+    // instance's empty derivations are pre-derivation noise that must not
+    // clobber the kept errors; a non-empty derivation IS the re-derivation, so
+    // it flows and spends the flag. A VALID re-derivation emits nothing
+    // non-empty, so a still-armed flag is spent here — writing the empty map
+    // in case the kept errors went stale (rules loosened between hosts).
+    let reAdoptValidationPending = keptSeed !== null;
+    if (keptSeed) {
+      methods.trigger().then(
+        (isValid) => {
+          if (!reAdoptValidationPending) return;
+          reAdoptValidationPending = false;
+          if (isValid) useFormStore.getState().setFieldErrors(formId, {});
+        },
+        () => {
+          reAdoptValidationPending = false;
+        }
+      );
+    }
+    const unsubscribe = methods.subscribe({
+      formState: { values: true, errors: true },
+      callback: ({ values, errors, name }) => {
+        const store = useFormStore.getState();
+        // `name` is undefined on reset — re-adopting the baseline is registerForm's job.
+        if (name !== undefined) {
+          store.setFieldValue(formId, toFieldAddress(name), values[name]);
+        }
+        const mirrored: FieldErrors = {};
+        for (const [field, entry] of Object.entries(
+          (errors ?? {}) as Record<string, FieldErrorEntry | undefined>
+        )) {
+          const messages = fieldErrorMessages(entry);
+          if (messages.length > 0) mirrored[toFieldAddress(field)] = messages;
+        }
+        if (reAdoptValidationPending) {
+          if (Object.keys(mirrored).length === 0) return;
+          reAdoptValidationPending = false;
+        }
+        store.setFieldErrors(formId, mirrored);
+      },
+    });
+    return () => unsubscribe();
+  }, [formId, keptSeed, methods]);
 
   const formScope = useMemo(
     () => ({ formId, collection, onSave: onSave ?? null }),
@@ -182,64 +212,4 @@ export function FormProvider({
       </RhfFormProvider>
     </FormScopeContext>
   );
-}
-
-// Keeps the store's error mirror faithful to RHF's derivations — one-way, like
-// the value sync, with the store carrying the copy that outlives the mount
-// (useFormErrors). One unit owns the whole coupled lifecycle:
-//
-// - Re-validate on re-adopt: RHF derives no errors from defaultValues, so a
-//   form re-mounted onto invalid kept edits (`keptSeed`) would look error-free
-//   until the next keystroke — one trigger() re-derives.
-// - Until that resolves, the fresh RHF instance's empty error state is
-//   pre-derivation noise: the pending flag (armed once per hosted form —
-//   re-arming on later renders would swallow a legitimate errors-cleared write
-//   after the flag is spent) keeps it from clobbering the kept errors. A
-//   non-empty derivation IS the re-derivation, so it flows and spends the flag
-//   in case it beat trigger's resolution.
-// - Ownership guard: the run where formId changed (an unkeyed switch) still
-//   holds the OUTGOING form's derivation — writing it would bleed one form's
-//   errors into the other's scope. Skip it; the provider's reset re-derives
-//   and its notification re-runs the mirror under the right owner. (Also skips
-//   the mount run, whose fresh-instance {} has nothing to say.)
-function useErrorMirror(
-  formId: FormId,
-  methods: UseFormReturn<TinaDocument>,
-  keptSeed: TinaDocument | null
-): void {
-  const reAdoptValidationPending = useRef(false);
-  const armedFormId = useRef<FormId | null>(null);
-  if (armedFormId.current !== formId) {
-    armedFormId.current = formId;
-    reAdoptValidationPending.current = keptSeed !== null;
-  }
-  useEffect(() => {
-    if (keptSeed) {
-      void methods.trigger().finally(() => {
-        reAdoptValidationPending.current = false;
-      });
-    }
-  }, [keptSeed, methods]);
-
-  const { errors } = useFormState({ control: methods.control });
-  const mirroredFormId = useRef<FormId | null>(null);
-  useEffect(() => {
-    if (mirroredFormId.current !== formId) {
-      mirroredFormId.current = formId;
-      return;
-    }
-    const mirrored: FieldErrors = {};
-    for (const [name, entry] of Object.entries(
-      errors as Record<string, FieldErrorEntry | undefined>
-    )) {
-      const messages = fieldErrorMessages(entry);
-      if (messages.length > 0) mirrored[toFieldAddress(name)] = messages;
-    }
-    const empty = Object.keys(mirrored).length === 0;
-    if (reAdoptValidationPending.current) {
-      if (empty) return;
-      reAdoptValidationPending.current = false;
-    }
-    useFormStore.getState().setFieldErrors(formId, mirrored);
-  }, [errors, formId]);
 }
