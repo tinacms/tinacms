@@ -1,5 +1,8 @@
-import { Command, Option } from 'clipanion';
+import { createRequire } from 'module';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import chalk from 'chalk';
+import { Command, Option } from 'clipanion';
 
 import type { ChildProcess } from 'child_process';
 import type { DocumentNode } from 'graphql';
@@ -7,13 +10,14 @@ import type { DocumentNode } from 'graphql';
 import type { Database } from '@tinacms/graphql';
 import type { TinaSchema } from '@tinacms/schema-tools';
 
-import { startSubprocess2 } from '../../utils/start-subprocess';
-import { logger } from '../../logger';
-import { spin } from '../../utils/spinner';
-import { warnText } from '../../utils/theme';
 import { getChangedFiles, getSha, shaExists } from '@tinacms/graphql';
 import fs from 'fs-extra';
+import { logger } from '../../logger';
+import { spin } from '../../utils/spinner';
+import { startSubprocess2 } from '../../utils/start-subprocess';
+import { warnText } from '../../utils/theme';
 import { ConfigManager } from '../config-manager';
+import { collectVersionCoherenceWarnings } from '../version-coherence';
 
 /**
  * Base Command for Dev and build
@@ -80,6 +84,28 @@ export abstract class BaseCommand extends Command {
       logger.error(`Uncaught exception ${error.name}`);
       console.error(error);
     });
+  }
+
+  warnOnVersionSkew(rootPath: string) {
+    const moduleDir = path.dirname(fileURLToPath(import.meta.url));
+    const require = createRequire(import.meta.url);
+    const warnings = collectVersionCoherenceWarnings({
+      rootPath,
+      cliModuleDir: moduleDir,
+      resolveEntry: (packageName, fromDir) =>
+        require.resolve(packageName, { paths: [fromDir] }),
+    });
+    if (warnings.length > 0) {
+      logger.warn(warnText('WARN: TinaCMS package version mismatch detected:'));
+      warnings.forEach((warning) => {
+        logger.warn(warnText(`  - ${warning}`));
+      });
+      logger.warn(
+        warnText(
+          'A held-back package (stale lockfile entry, partial upgrade, pnpm minimumReleaseAge) can leave the admin UI on an older tinacms where newer documented features are silently missing. Upgrade the packages above to matching releases and reinstall.'
+        )
+      );
+    }
   }
 
   logDeprecationWarnings() {
