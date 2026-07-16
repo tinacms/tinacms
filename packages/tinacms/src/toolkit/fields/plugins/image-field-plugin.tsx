@@ -18,7 +18,12 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
     const ref = React.useRef(null);
     const cms = useCMS();
     const { value } = props.input;
-    const src = value;
+    const [selected, setSelected] = useState<
+      { value: string; src: string } | undefined
+    >();
+    // A just-picked image displays its hosted src: the persisted value may be
+    // a repo-relative path that isn't servable until the branch merges.
+    const src = selected && selected.value === value ? selected.src : value;
     const [isImgUploading, setIsImgUploading] = useState(false);
     let onClear: any;
     if (props.field.clearable) {
@@ -39,6 +44,9 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
             ? cms.media.store.parse(item)
             : item.src || item;
 
+        if (typeof parsedValue === 'string' && typeof item?.src === 'string') {
+          setSelected({ value: parsedValue, src: item.src });
+        }
         props.input.onChange(parsedValue);
       }
     }

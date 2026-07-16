@@ -1429,3 +1429,101 @@ describe('TinaMediaStore — self-hosted repo media', () => {
     vi.unstubAllGlobals();
   });
 });
+
+describe('TinaMediaStore — parse()', () => {
+  // Git-backed media persists the repo-relative path, reconstructed from the
+  // Media object, never the hosted src: on a non-media branch the src is
+  // staging-scoped and would 404 once committed (tinacms/tinacloud#3858).
+  const gitMediaConfig = {
+    mediaRoot: 'images/uploads',
+    publicFolder: 'public',
+  };
+
+  const stagedMedia: Media = {
+    type: 'file',
+    id: 'Untitled-design-(1).png',
+    filename: 'Untitled-design-(1).png',
+    directory: '',
+    src: 'https://assets.tina.io/test-client/__staging/tina/staging/__file/Untitled-design-(1).png',
+    thumbnails: {},
+  };
+
+  it('persists the repo-relative path for git-backed media, never the staged src', () => {
+    const { store, api } = buildStore({ branch: 'tina/staging' });
+    api.schema.schema.config.media.tina = gitMediaConfig;
+
+    expect(store.parse(stagedMedia)).toBe(
+      '/images/uploads/Untitled-design-(1).png'
+    );
+  });
+
+  it('includes the media directory in the persisted path', () => {
+    const { store, api } = buildStore();
+    api.schema.schema.config.media.tina = gitMediaConfig;
+
+    expect(
+      store.parse({
+        ...stagedMedia,
+        filename: 'a.png',
+        directory: 'blog',
+        src: 'https://assets.tina.io/test-client/blog/a.png',
+      })
+    ).toBe('/images/uploads/blog/a.png');
+  });
+
+  it('normalizes mediaRoot slashes in the persisted path', () => {
+    const { store, api } = buildStore();
+    api.schema.schema.config.media.tina = {
+      ...gitMediaConfig,
+      mediaRoot: '/images/uploads/',
+    };
+
+    expect(store.parse({ ...stagedMedia, filename: 'a.png' })).toBe(
+      '/images/uploads/a.png'
+    );
+  });
+
+  it('persists from the site root when mediaRoot is empty', () => {
+    const { store, api } = buildStore();
+    api.schema.schema.config.media.tina = {
+      ...gitMediaConfig,
+      mediaRoot: '',
+    };
+
+    expect(store.parse({ ...stagedMedia, filename: 'a.png' })).toBe('/a.png');
+  });
+
+  it('keeps the hosted src for non-git media configs', () => {
+    // No mediaRoot/publicFolder: hosted media persists the absolute URL.
+    const { store } = buildStore();
+
+    expect(store.parse(stagedMedia)).toBe(stagedMedia.src);
+  });
+
+  it('falls back to src when the media object has no filename', () => {
+    const { store, api } = buildStore();
+    api.schema.schema.config.media.tina = gitMediaConfig;
+
+    expect(store.parse({ src: 'https://example.com/y.png' } as Media)).toBe(
+      'https://example.com/y.png'
+    );
+  });
+
+  it("agrees with persist_local's persisted path for the same file", async () => {
+    const { store, api } = buildStore({ isLocalMode: true });
+    api.schema.schema.config.media.tina = gitMediaConfig;
+    store.fetchFunction = vi
+      .fn()
+      .mockResolvedValue(makeJsonResponse(200, { success: true }));
+
+    const [localMedia] = await store.persist([
+      {
+        directory: 'blog',
+        file: new File(['x'], 'a.png', { type: 'image/png' }),
+      },
+    ]);
+
+    expect(localMedia.src).toBe('/images/uploads/blog/a.png');
+    expect(store.parse(localMedia)).toBe(localMedia.src);
+  });
+});

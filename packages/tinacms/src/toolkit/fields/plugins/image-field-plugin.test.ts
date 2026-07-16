@@ -184,3 +184,39 @@ describe('MDX image toolbar button onSelect', () => {
     expect(result.src).toBe('https://example.com/images/hero.jpg');
   });
 });
+
+describe('image field display src', () => {
+  // Mirrors image-field-plugin.tsx: a just-picked image previews its hosted
+  // src, since the persisted value may not be servable until the branch merges.
+  function displaySrc(
+    selected: { value: string; src: string } | undefined,
+    value: string
+  ): string {
+    return selected && selected.value === value ? selected.src : value;
+  }
+
+  const selection = {
+    value: '/images/uploads/hero.jpg',
+    src: 'https://assets.tina.io/client/__staging/tina/x/__file/hero.jpg',
+  };
+
+  it('shows the hosted src while the form holds the persisted relative path', () => {
+    expect(displaySrc(selection, '/images/uploads/hero.jpg')).toBe(
+      selection.src
+    );
+  });
+
+  it('falls back to the form value when it no longer matches the selection', () => {
+    // Clear, undo, or an external value change must drop the stale preview.
+    expect(displaySrc(selection, '')).toBe('');
+    expect(displaySrc(selection, '/images/uploads/other.jpg')).toBe(
+      '/images/uploads/other.jpg'
+    );
+  });
+
+  it('uses the form value directly when nothing was picked this session', () => {
+    expect(displaySrc(undefined, 'https://assets.tina.io/client/a.png')).toBe(
+      'https://assets.tina.io/client/a.png'
+    );
+  });
+});
