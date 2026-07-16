@@ -128,6 +128,26 @@ export const findPackageJsonAbove = (
   }
 };
 
+/** Mimics node's node_modules lookup: nearest node_modules first, then parents. */
+const findInNodeModulesAbove = (
+  packageName: string,
+  fromDir: string
+): ResolvedPackage | undefined => {
+  let dir = fromDir;
+  while (true) {
+    const candidate = path.join(dir, 'node_modules', ...packageName.split('/'));
+    const packageJson = readPackageJson(candidate);
+    if (packageJson?.name === packageName && packageJson.version) {
+      return { version: packageJson.version, dir: candidate };
+    }
+    const parent = path.dirname(dir);
+    if (parent === dir) {
+      return undefined;
+    }
+    dir = parent;
+  }
+};
+
 export const resolvePackage = (
   packageName: string,
   fromDir: string,
@@ -140,7 +160,10 @@ export const resolvePackage = (
       return { version: found.packageJson.version, dir: found.dir };
     }
   } catch (_) {
-    // Package not installed in the project - nothing to compare.
+    // require.resolve throws ERR_PACKAGE_PATH_NOT_EXPORTED for installed
+    // packages whose exports map lacks a `require` condition (e.g.
+    // @tinacms/graphql), so fall back to walking node_modules directly.
+    return findInNodeModulesAbove(packageName, fromDir);
   }
   return undefined;
 };

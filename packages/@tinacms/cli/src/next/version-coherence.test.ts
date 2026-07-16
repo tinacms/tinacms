@@ -1,3 +1,5 @@
+import { execFileSync } from 'child_process';
+import { createRequire } from 'module';
 import os from 'os';
 import path from 'path';
 import fs from 'fs-extra';
@@ -212,5 +214,60 @@ describe('resolution against a real directory layout', () => {
       'tinacms@3.9.3 is installed, but @tinacms/cli@2.5.5 expects tinacms@^3.10.1'
     );
     expect(warnings[1]).toContain('multiple copies of tinacms');
+  });
+});
+
+describe('resolution through the real require.resolve', () => {
+  let root: string;
+
+  // As warnOnVersionSkew wires it in baseCommands. Jest patches this
+  // resolver in-process (its throw carries no `code`), so the faithful
+  // ERR_PACKAGE_PATH_NOT_EXPORTED guard below runs in a node subprocess.
+  const realResolveEntry: ResolveEntry = (packageName, fromDir) =>
+    createRequire(path.join(fromDir, 'noop.js')).resolve(packageName, {
+      paths: [fromDir],
+    });
+
+  beforeAll(() => {
+    root = fs.mkdtempSync(path.join(os.tmpdir(), 'version-coherence-real-'));
+    // Mirrors the published @tinacms/graphql: an exports map with only
+    // `types` and `import` conditions, no `require` or `default`.
+    const dir = path.join(root, 'node_modules', '@tinacms', 'graphql');
+    fs.outputFileSync(path.join(dir, 'dist', 'index.js'), '');
+    fs.outputJsonSync(path.join(dir, 'package.json'), {
+      name: '@tinacms/graphql',
+      version: '2.4.8',
+      exports: {
+        '.': { types: './dist/index.d.ts', import: './dist/index.js' },
+      },
+    });
+  });
+
+  afterAll(() => {
+    fs.removeSync(root);
+  });
+
+  it('real node CJS resolution rejects the exports map of this fixture', () => {
+    const script = `try { require.resolve('@tinacms/graphql', { paths: [${JSON.stringify(
+      root
+    )}] }); console.log('resolved'); } catch (e) { console.log(e.code); }`;
+    const out = execFileSync(process.execPath, ['-e', script], {
+      encoding: 'utf-8',
+    });
+    expect(out.trim()).toBe('ERR_PACKAGE_PATH_NOT_EXPORTED');
+  });
+
+  it('falls back to a node_modules walk when the resolver throws', () => {
+    expect(() => realResolveEntry('@tinacms/graphql', root)).toThrow();
+    expect(resolvePackage('@tinacms/graphql', root, realResolveEntry)).toEqual({
+      version: '2.4.8',
+      dir: path.join(root, 'node_modules', '@tinacms', 'graphql'),
+    });
+  });
+
+  it('still reports genuinely missing packages as undefined', () => {
+    expect(
+      resolvePackage('@tinacms/not-installed', root, realResolveEntry)
+    ).toBeUndefined();
   });
 });
