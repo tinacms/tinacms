@@ -37,11 +37,16 @@ const useMonaco = (): Monaco | null => {
   const [instance, setInstance] = React.useState<Monaco | null>(null);
   React.useEffect(() => {
     let cancelled = false;
-    loader.init().then((m) => {
-      if (!cancelled) {
-        setInstance(m as Monaco);
-      }
-    });
+    loader
+      .init()
+      .then((m) => {
+        if (!cancelled) {
+          setInstance(m as Monaco);
+        }
+      })
+      .catch((error) => {
+        console.error('Monaco initialization: error:', error);
+      });
     return () => {
       cancelled = true;
     };
@@ -77,6 +82,7 @@ const MonacoEditor = (props: {
       monaco.editor.createModel(value, language, uri);
     const editor = monaco.editor.create(containerRef.current, {
       model,
+      automaticLayout: true,
       ...options,
     });
     const subscription = editor.onDidChangeModelContent(() => {
