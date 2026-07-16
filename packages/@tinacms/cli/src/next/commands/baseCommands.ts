@@ -87,24 +87,30 @@ export abstract class BaseCommand extends Command {
   }
 
   warnOnVersionSkew(rootPath: string) {
-    const moduleDir = path.dirname(fileURLToPath(import.meta.url));
-    const require = createRequire(import.meta.url);
-    const warnings = collectVersionCoherenceWarnings({
-      rootPath,
-      cliModuleDir: moduleDir,
-      resolveEntry: (packageName, fromDir) =>
-        require.resolve(packageName, { paths: [fromDir] }),
-    });
-    if (warnings.length > 0) {
-      logger.warn(warnText('WARN: TinaCMS package version mismatch detected:'));
-      warnings.forEach((warning) => {
-        logger.warn(warnText(`  - ${warning}`));
+    try {
+      const moduleDir = path.dirname(fileURLToPath(import.meta.url));
+      const require = createRequire(import.meta.url);
+      const warnings = collectVersionCoherenceWarnings({
+        rootPath,
+        cliModuleDir: moduleDir,
+        resolveEntry: (packageName, fromDir) =>
+          require.resolve(packageName, { paths: [fromDir] }),
       });
-      logger.warn(
-        warnText(
-          'A held-back package (stale lockfile entry, partial upgrade, pnpm minimumReleaseAge) can leave the admin UI on an older tinacms where newer documented features are silently missing. Upgrade the packages above to matching releases and reinstall.'
-        )
-      );
+      if (warnings.length > 0) {
+        logger.warn(
+          warnText('WARN: TinaCMS package version mismatch detected:')
+        );
+        warnings.forEach((warning) => {
+          logger.warn(warnText(`  - ${warning}`));
+        });
+        logger.warn(
+          warnText(
+            'A held-back package (stale lockfile entry, partial upgrade, pnpm minimumReleaseAge) can leave the admin UI on an older tinacms where newer documented features are silently missing. Upgrade the packages above to matching releases and reinstall.'
+          )
+        );
+      }
+    } catch (_) {
+      // Best-effort check - never block dev/build on it.
     }
   }
 

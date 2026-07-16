@@ -29,6 +29,11 @@ describe('satisfiesDeclaredRange', () => {
     expect(satisfiesDeclaredRange('0.3.0', '^0.2.3')).toBe(false);
   });
 
+  it('treats caret ranges on 0.0.x versions as exact', () => {
+    expect(satisfiesDeclaredRange('0.0.3', '^0.0.3')).toBe(true);
+    expect(satisfiesDeclaredRange('0.0.4', '^0.0.3')).toBe(false);
+  });
+
   it('returns undefined for specs and versions it cannot interpret', () => {
     expect(satisfiesDeclaredRange('3.10.1', 'workspace:^')).toBeUndefined();
     expect(satisfiesDeclaredRange('3.10.1', 'workspace:*')).toBeUndefined();

@@ -76,8 +76,17 @@ export const satisfiesDeclaredRange = (
   if (!isCaret) {
     return compareVersions(resolved, base) === 0;
   }
-  if (resolved[0] !== base[0] || (base[0] === 0 && resolved[1] !== base[1])) {
+  // Caret pins everything left of the first non-zero element.
+  if (resolved[0] !== base[0]) {
     return false;
+  }
+  if (base[0] === 0) {
+    if (resolved[1] !== base[1]) {
+      return false;
+    }
+    if (base[1] === 0 && resolved[2] !== base[2]) {
+      return false;
+    }
   }
   return compareVersions(resolved, base) >= 0;
 };
@@ -141,7 +150,7 @@ export const getVersionCoherenceWarnings = (
 ): string[] => {
   const warnings: string[] = [];
   for (const name of CORE_PACKAGES) {
-    const spec = input.cliDependencies?.[name];
+    const spec = input.cliDependencies[name];
     const resolved = input.resolvedFromProject[name];
     if (!spec || !resolved) {
       continue;
