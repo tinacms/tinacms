@@ -22,10 +22,6 @@
     "./lib/*": {
       "types": "./src/lib/*.ts",
       "default": "./src/lib/*.ts"
-    },
-    "./hooks/*": {
-      "types": "./src/hooks/*.ts",
-      "default": "./src/hooks/*.ts"
     }
   },
   "dependencies": {
