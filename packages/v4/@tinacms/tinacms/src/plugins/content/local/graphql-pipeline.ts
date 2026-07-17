@@ -53,17 +53,17 @@ export const createGraphQLPipeline = async (
     bridge: new FilesystemBridge(options.rootDir),
     level:
       options.level ??
-      (new SqliteLevel({
+      new SqliteLevel<string, Record<string, unknown>>({
         filename: ':memory:',
         valueEncoding: 'json',
-      }) as unknown as Level),
+      }),
     tinaDirectory: 'tina',
   });
   const schema = { collections: options.collections.map(toV3Collection) };
   const { graphQLSchema, tinaSchema, lookup } = await buildDotTinaFiles({
     // buildDotTinaFiles only reads config.schema; the full v3 Config surface
     // (branch, clientId, media…) has no local equivalent.
-    config: { schema } as Parameters<typeof buildDotTinaFiles>[0]['config'],
+    config: { schema },
     buildSDK: false,
   });
   await database.indexContent({ graphQLSchema, tinaSchema, lookup });
