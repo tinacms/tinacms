@@ -64,8 +64,11 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
+    "abstract-level": "catalog:",
     "gray-matter": "catalog:",
+    "@tinacms/graphql": "workspace:*",
     "@tinacms/ui": "workspace:*",
+    "sqlite-level": "catalog:",
     "react-hook-form": "^7.80.0",
     "zod": "catalog:",
     "zustand": "^5.0.14"

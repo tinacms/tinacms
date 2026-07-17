@@ -16,7 +16,9 @@ import { postCollectionMeta } from './src/collection-meta';
 const localDataLayerPlugin = (): Plugin => {
   const dataLayer = createLocalDataLayer({
     rootDir: fileURLToPath(new URL('.', import.meta.url)),
-    collections: [{ ...postCollectionMeta, fields: [] }],
+    collections: [
+      { ...postCollectionMeta, fields: [...postCollectionMeta.fields] },
+    ],
   });
   const handle: Connect.NextHandleFunction = (req, res) => {
     // CSRF guard: browsers send Origin on cross-site POSTs — reject anything

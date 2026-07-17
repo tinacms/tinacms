@@ -12,12 +12,22 @@ import type {
 } from '../../../core/content/contract';
 import type { CollectionSchema } from '../../../core/schema/types';
 import { type FormatAdapter, formatAdapterFor } from './format-adapters';
+import {
+  type GraphQLPipeline,
+  createGraphQLPipeline,
+} from './graphql-pipeline';
 
 export interface LocalDataLayerOptions {
   // The project root document paths are relative to; collection `path`s resolve
   // against it.
   rootDir: string;
   collections: CollectionSchema[];
+}
+
+// ContentProvider plus the v3 GraphQL read surface (graphql-pipeline.ts) —
+// serving the website render path the same queries v3 served.
+export interface LocalDataLayer extends ContentProvider {
+  graphql(query: string, variables?: Record<string, unknown>): Promise<unknown>;
 }
 
 interface ResolvedCollection {
@@ -49,9 +59,19 @@ const resolveCollections = ({
 
 export const createLocalDataLayer = (
   options: LocalDataLayerOptions
-): ContentProvider => {
+): LocalDataLayer => {
   const rootDir = path.resolve(options.rootDir);
   const collections = resolveCollections(options);
+
+  // The v3 pipeline indexes every file at first use, so it boots lazily — a
+  // session that never queries GraphQL never pays for it. Files stay the source
+  // of truth: saves land on disk first, then refresh the index.
+  let pipeline: Promise<GraphQLPipeline> | undefined;
+  const graphQLPipeline = () =>
+    (pipeline ??= createGraphQLPipeline({
+      rootDir,
+      collections: options.collections,
+    }));
 
   const collectionFor = (name: string): ResolvedCollection => {
     const collection = collections.get(name);
@@ -139,8 +159,16 @@ export const createLocalDataLayer = (
       // The parent folder may have been deleted out-of-band — same promise.
       await fs.mkdir(path.dirname(absolute), { recursive: true });
       await fs.writeFile(absolute, raw);
+      // Keep the GraphQL index in step with the save — only once it exists;
+      // a not-yet-booted pipeline indexes everything fresh on first query.
+      // ponytail: no fs watcher, out-of-band edits go stale until the next
+      // save; add chokidar when that bites.
+      if (pipeline) await (await pipeline).reindexPaths([documentPath]);
       return { path: documentPath, document: collection.adapter.parse(raw) };
     },
+
+    graphql: async (query, variables) =>
+      (await graphQLPipeline()).execute(query, variables),
   };
 };
 
@@ -156,14 +184,22 @@ const contentRequestSchema = z.discriminatedUnion('op', [
     path: z.string(),
     value: z.record(z.string(), z.unknown()),
   }),
+  // The v3 read surface: a raw GraphQL request, answered by graphql-pipeline.ts.
+  z.object({
+    op: z.literal('graphql'),
+    query: z.string(),
+    variables: z.record(z.string(), z.unknown()).optional(),
+  }),
 ]);
 
 export type ContentRequest = z.infer<typeof contentRequestSchema>;
 
+// Returns DocumentEntry shapes for the provider ops, or the GraphQL
+// { data, errors } envelope for `graphql` — the host JSONs it either way.
 export const handleContentRequest = async (
-  provider: ContentProvider,
+  provider: LocalDataLayer,
   request: unknown
-): Promise<DocumentEntry[] | DocumentEntry | null> => {
+): Promise<unknown> => {
   const parsed = contentRequestSchema.parse(request);
   switch (parsed.op) {
     case 'list':
@@ -172,5 +208,7 @@ export const handleContentRequest = async (
       return provider.get(parsed.collection, parsed.path);
     case 'update':
       return provider.update(parsed.collection, parsed.path, parsed.value);
+    case 'graphql':
+      return provider.graphql(parsed.query, parsed.variables);
   }
 };
