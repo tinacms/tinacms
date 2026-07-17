@@ -1,3 +1,5 @@
+import { Checkbox } from '@tinacms/ui/components/checkbox';
+import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
 import { useRef } from 'react';
 import {
   useFieldActivation,
@@ -10,27 +12,18 @@ export function BooleanField() {
   const address = useFieldAddress();
   const [value, setValue] = useFieldValue<boolean>(address);
   const errors = useFieldErrors(address);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLButtonElement>(null);
 
   useFieldActivation(() => inputRef.current?.focus());
 
-  // TODO(shadcn): swap this raw checkbox/markup for shared, themed primitives from
-  // src/ui/ (shadcn — Checkbox/Label/form-field wrapper, added via the shadcn CLI) so
-  // every field looks consistent and is re-themeable without per-field redesign.
   return (
-    <div>
-      <input
+    <FieldWrapper errors={errors}>
+      <Checkbox
         ref={inputRef}
-        type='checkbox'
         aria-label={address}
         checked={value ?? false}
-        onChange={(event) => setValue(event.target.checked)}
+        onCheckedChange={(checked) => setValue(checked === true)}
       />
-      {errors.map((error) => (
-        <span key={error} role='alert'>
-          {error}
-        </span>
-      ))}
-    </div>
+    </FieldWrapper>
   );
 }

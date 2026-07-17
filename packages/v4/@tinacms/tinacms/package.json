@@ -60,6 +60,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
+    "@tinacms/ui": "workspace:*",
     "react-hook-form": "^7.80.0",
     "zod": "catalog:",
     "zustand": "^5.0.14"
@@ -69,17 +70,19 @@
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
-    "@tinacms/scripts": "workspace:*",
+    "@tailwindcss/vite": "^4.2.4",
     "@testing-library/dom": "catalog:",
     "@testing-library/jest-dom": "catalog:",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "catalog:",
+    "@tinacms/scripts": "workspace:*",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^4.7.0",
     "happy-dom": "catalog:",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
+    "tailwindcss": "^4.3.2",
     "typescript": "^5.7.3",
     "vite": "^5.4.0",
     "vitest": "^2.1.9"
