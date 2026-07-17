@@ -68,6 +68,18 @@ describe('list', () => {
     expect(warn).toHaveBeenCalledOnce();
     warn.mockRestore();
   });
+
+  it('skips (and warns on) an unreadable entry, e.g. a directory named *.mdx', async () => {
+    await fs.mkdir(path.join(rootDir, 'content/posts/folder.mdx'));
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const entries = await dataLayer.list('post');
+    expect(entries.map((entry) => entry.path)).toEqual([
+      'content/posts/hello.mdx',
+      'content/posts/nested/deep.mdx',
+    ]);
+    expect(warn).toHaveBeenCalledOnce();
+    warn.mockRestore();
+  });
 });
 
 describe('get', () => {

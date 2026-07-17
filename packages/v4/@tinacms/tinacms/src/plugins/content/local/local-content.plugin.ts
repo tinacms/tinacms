@@ -25,7 +25,7 @@ export interface ContentSlice {
     collection: string,
     path: string,
     value: TinaDocument
-  ): Promise<void>;
+  ): Promise<DocumentEntry>;
 }
 
 const postContentRequest = async (
@@ -74,12 +74,17 @@ const createContentSlice =
           path,
           value,
         })) as DocumentEntry;
-        // Keep the list cache honest so collection views reflect the save.
-        set(({ documents }) => ({
-          documents: (documents as DocumentEntry[]).map((entry) =>
-            entry.path === path ? saved : entry
-          ),
-        }));
+        // Keep the list cache honest so collection views reflect the save —
+        // replace the cached entry, or append when the path is not cached yet.
+        set(({ documents }) => {
+          const entries = documents as DocumentEntry[];
+          return {
+            documents: entries.some((entry) => entry.path === path)
+              ? entries.map((entry) => (entry.path === path ? saved : entry))
+              : [...entries, saved],
+          };
+        });
+        return saved;
       },
     };
     return { ...slice };

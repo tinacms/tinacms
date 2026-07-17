@@ -107,16 +107,17 @@ export const createLocalDataLayer = (
       for (const name of names.sort()) {
         if (!name.endsWith(collection.adapter.extension)) continue;
         const absolute = path.join(collection.folder, name);
-        const raw = await fs.readFile(absolute, 'utf8');
         try {
+          const raw = await fs.readFile(absolute, 'utf8');
           entries.push({
             // Paths are the document id: root-relative posix (ADR-017).
             path: path.relative(rootDir, absolute).split(path.sep).join('/'),
             document: collection.adapter.parse(raw),
           });
         } catch (cause) {
-          // One malformed file must not take down the whole collection.
-          console.warn(`Skipping unparsable document "${absolute}":`, cause);
+          // One malformed or unreadable file must not take down the whole
+          // collection.
+          console.warn(`Skipping unreadable document "${absolute}":`, cause);
         }
       }
       return entries;

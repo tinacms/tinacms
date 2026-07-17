@@ -62,7 +62,7 @@ describe('content slice', () => {
     const harness = await createSliceHarness(persisted);
     // Seed the cache as if a list had run.
     harness.slice().documents.push(...ENTRIES);
-    await harness
+    const saved = await harness
       .slice()
       .saveDocument('post', 'content/posts/hello.mdx', { title: 'Renamed' });
     expect(harness.requests).toEqual([
@@ -73,7 +73,22 @@ describe('content slice', () => {
         value: { title: 'Renamed' },
       },
     ]);
+    expect(saved).toEqual(persisted);
     expect(harness.slice().documents).toEqual([persisted, ENTRIES[1]]);
+  });
+
+  it('saveDocument appends the persisted entry when the path is not cached', async () => {
+    const persisted: DocumentEntry = {
+      path: 'content/posts/new.mdx',
+      document: { title: 'New' },
+    };
+    const harness = await createSliceHarness(persisted);
+    harness.slice().documents.push(...ENTRIES);
+    const saved = await harness
+      .slice()
+      .saveDocument('post', 'content/posts/new.mdx', { title: 'New' });
+    expect(saved).toEqual(persisted);
+    expect(harness.slice().documents).toEqual([...ENTRIES, persisted]);
   });
 
   it('surfaces a failed request as a rejection (form stays dirty)', async () => {

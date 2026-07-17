@@ -22,7 +22,7 @@ import {
   usePreviewConnection,
   useTinaStore,
 } from '@tinacms/tinacms/react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { postCollection } from './content';
 import { PluginsPanel } from './plugins-panel';
 
@@ -171,22 +171,32 @@ function Workspace() {
   const { documents } = content;
   const active =
     documents.find(({ path }) => path === activePath) ?? documents[0];
-  if (!active) return <p style={{ padding: '1rem' }}>Loading content…</p>;
+  // Pin the hosted entry per form instance: live cache updates (e.g. the
+  // persisted entry a save feeds back) keep the tab badges fresh but must not
+  // re-seed the mounted form — that would reset RHF and wipe keystrokes typed
+  // while the save was in flight.
+  const hosted = useMemo(() => active, [active?.path]);
+  if (!hosted) return <p style={{ padding: '1rem' }}>Loading content…</p>;
 
-  const saveActiveDocument = async (document: TinaDocument) => {
-    await content.saveDocument(postCollection.name, active.path, document);
-    setSavedDocument(document);
+  const saveHostedDocument = async (document: TinaDocument) => {
+    const saved = await content.saveDocument(
+      postCollection.name,
+      hosted.path,
+      document
+    );
+    // Show what was persisted (unknown fields merged), not the raw form value.
+    setSavedDocument(saved.document);
   };
 
   return (
     // Keyed remount per document: a switch tears the form down (the store
     // keeps its edits, ADR-012) and hosts the other one.
     <FormProvider
-      key={active.path}
+      key={hosted.path}
       collection={postCollection}
-      path={active.path}
-      document={active.document}
-      onSave={saveActiveDocument}
+      path={hosted.path}
+      document={hosted.document}
+      onSave={saveHostedDocument}
     >
       <div style={{ display: 'flex', height: '100vh' }}>
         <aside
@@ -200,7 +210,7 @@ function Workspace() {
         >
           <DocumentTabs
             documents={documents}
-            activePath={active.path}
+            activePath={hosted.path}
             onSelect={setActivePath}
           />
           <header
@@ -211,7 +221,7 @@ function Workspace() {
               marginBottom: '1rem',
             }}
           >
-            <strong>{active.path}</strong>
+            <strong>{hosted.path}</strong>
             <StatusBadge />
           </header>
           {postCollection.fields.map((node) => (
