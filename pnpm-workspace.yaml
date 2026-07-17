@@ -55,7 +55,7 @@ catalog:
     "@graphql-tools/load": ^7.8.14
     "@graphql-tools/utils": ^10.8.1
     "@iarna/toml": ^2.2.5
-    "@monaco-editor/react": 4.7.0-rc.0
+    "@monaco-editor/loader": ^1.7.0
     "@octokit/rest": ^22.0.1
     "@playwright/test": ^1.61.1
     "@puppeteer/replay": ^1.3.2
