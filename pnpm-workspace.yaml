@@ -206,7 +206,7 @@ catalog:
     minimatch: ^5.1.6
     monaco-editor: 0.31.0
     mongodb-level: ^0.0.4
-    multer: 1.4.5-lts.1
+    multer: 2.2.0
     next-themes: ^0.3.0
     normalize-path: ^3.0.0
     ora: ^8.2.0
