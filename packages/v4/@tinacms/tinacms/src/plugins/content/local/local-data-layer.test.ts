@@ -1,7 +1,7 @@
 import { promises as fs } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ContentProvider } from '../../../core/content/contract';
 import { createLocalDataLayer, handleContentRequest } from './local-data-layer';
 
@@ -32,6 +32,8 @@ beforeEach(async () => {
     rootDir,
     collections: [
       { name: 'post', path: 'content/posts', format: 'mdx', fields: [] },
+      // Folder intentionally never created.
+      { name: 'page', path: 'content/pages', format: 'mdx', fields: [] },
     ],
   });
 });
@@ -47,6 +49,25 @@ describe('list', () => {
     ]);
     expect(entries[0].document.title).toBe('Hello World');
   });
+
+  it('returns [] when the collection folder does not exist yet', async () => {
+    expect(await dataLayer.list('page')).toEqual([]);
+  });
+
+  it('skips (and warns on) an unparsable file instead of rejecting', async () => {
+    await fs.writeFile(
+      path.join(rootDir, 'content/posts/broken.mdx'),
+      '---\ntitle: [unclosed\n---\n'
+    );
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const entries = await dataLayer.list('post');
+    expect(entries.map((entry) => entry.path)).toEqual([
+      'content/posts/hello.mdx',
+      'content/posts/nested/deep.mdx',
+    ]);
+    expect(warn).toHaveBeenCalledOnce();
+    warn.mockRestore();
+  });
 });
 
 describe('get', () => {
@@ -61,8 +82,8 @@ describe('get', () => {
 });
 
 describe('update', () => {
-  it('writes the save and preserves unknown fields and the body', async () => {
-    await dataLayer.update('post', 'content/posts/hello.mdx', {
+  it('writes the save, preserves unknown fields and the body, and returns the persisted entry', async () => {
+    const saved = await dataLayer.update('post', 'content/posts/hello.mdx', {
       title: 'Renamed',
       featured: true,
     });
@@ -72,18 +93,33 @@ describe('update', () => {
     );
     expect(raw).toContain('category: not-in-schema');
     expect(raw).toContain('Body prose.');
-    const entry = await dataLayer.get('post', 'content/posts/hello.mdx');
-    expect(entry?.document).toEqual({
-      title: 'Renamed',
-      featured: true,
-      category: 'not-in-schema',
+    expect(saved).toEqual({
+      path: 'content/posts/hello.mdx',
+      document: {
+        title: 'Renamed',
+        featured: true,
+        category: 'not-in-schema',
+      },
     });
+    const entry = await dataLayer.get('post', 'content/posts/hello.mdx');
+    expect(entry?.document).toEqual(saved.document);
   });
 
   it('writes fresh when the file is missing (never lose the edit)', async () => {
     await dataLayer.update('post', 'content/posts/new.mdx', { title: 'New' });
     const entry = await dataLayer.get('post', 'content/posts/new.mdx');
     expect(entry?.document).toEqual({ title: 'New' });
+  });
+
+  it('recreates a parent folder deleted out-of-band (never lose the edit)', async () => {
+    await fs.rm(path.join(rootDir, 'content/posts/nested'), {
+      recursive: true,
+    });
+    await dataLayer.update('post', 'content/posts/nested/deep.mdx', {
+      title: 'Restored',
+    });
+    const entry = await dataLayer.get('post', 'content/posts/nested/deep.mdx');
+    expect(entry?.document).toEqual({ title: 'Restored' });
   });
 });
 
@@ -121,7 +157,10 @@ describe('handleContentRequest', () => {
       path: 'content/posts/hello.mdx',
       value: { title: 'Via wire' },
     });
-    expect(updated).toBeNull();
+    expect(updated).toMatchObject({
+      path: 'content/posts/hello.mdx',
+      document: { title: 'Via wire' },
+    });
     const fetched = await handleContentRequest(dataLayer, {
       op: 'get',
       collection: 'post',

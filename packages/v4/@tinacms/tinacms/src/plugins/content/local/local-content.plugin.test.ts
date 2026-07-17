@@ -52,8 +52,14 @@ describe('content slice', () => {
     expect(harness.slice().documents).toEqual(ENTRIES);
   });
 
-  it('saveDocument posts an update op and refreshes the cache entry', async () => {
-    const harness = await createSliceHarness(null);
+  it('saveDocument posts an update op and caches the persisted entry', async () => {
+    // The server merges unknown fields into the persisted document — the cache
+    // must hold what came back, not the raw form value.
+    const persisted: DocumentEntry = {
+      path: 'content/posts/hello.mdx',
+      document: { title: 'Renamed', category: 'not-in-schema' },
+    };
+    const harness = await createSliceHarness(persisted);
     // Seed the cache as if a list had run.
     harness.slice().documents.push(...ENTRIES);
     await harness
@@ -67,10 +73,7 @@ describe('content slice', () => {
         value: { title: 'Renamed' },
       },
     ]);
-    expect(harness.slice().documents).toEqual([
-      { path: 'content/posts/hello.mdx', document: { title: 'Renamed' } },
-      ENTRIES[1],
-    ]);
+    expect(harness.slice().documents).toEqual([persisted, ENTRIES[1]]);
   });
 
   it('surfaces a failed request as a rejection (form stays dirty)', async () => {

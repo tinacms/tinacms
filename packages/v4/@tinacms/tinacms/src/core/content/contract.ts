@@ -21,6 +21,11 @@ export interface ContentProvider {
   list(collection: string): Promise<DocumentEntry[]>;
   // The save: writes the JSON content value. Also writes when the file is missing —
   // a document deleted out-of-band must not swallow the editor's pending save
-  // (never lose the edit, ADR-018).
-  update(collection: string, path: string, value: TinaDocument): Promise<void>;
+  // (never lose the edit, ADR-018). Returns what was persisted, which may carry
+  // more than `value` (unknown fields merged from the stored document).
+  update(
+    collection: string,
+    path: string,
+    value: TinaDocument
+  ): Promise<DocumentEntry>;
 }

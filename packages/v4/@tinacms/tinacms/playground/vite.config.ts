@@ -2,6 +2,7 @@ import { fileURLToPath } from 'node:url';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { type Connect, type Plugin, defineConfig } from 'vite';
+import { DEFAULT_CONTENT_URL } from '../src/plugins/content/local/local-content.plugin';
 import {
   createLocalDataLayer,
   handleContentRequest,
@@ -18,7 +19,16 @@ const localDataLayerPlugin = (): Plugin => {
     collections: [{ ...postCollectionMeta, fields: [] }],
   });
   const handle: Connect.NextHandleFunction = (req, res) => {
+    // CSRF guard: browsers send Origin on cross-site POSTs — reject anything
+    // that isn't the dev server itself (no Origin = curl and friends, allowed).
+    const { origin, host } = req.headers;
+    if (origin && origin !== `http://${host}`) {
+      res.statusCode = 403;
+      res.end('Cross-origin request rejected');
+      return;
+    }
     let body = '';
+    req.setEncoding('utf8');
     req.on('data', (chunk) => {
       body += chunk;
     });
@@ -36,7 +46,7 @@ const localDataLayerPlugin = (): Plugin => {
   return {
     name: 'tina-local-data-layer',
     configureServer(server) {
-      server.middlewares.use('/api/tina/content', handle);
+      server.middlewares.use(DEFAULT_CONTENT_URL, handle);
     },
   };
 };

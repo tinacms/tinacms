@@ -66,16 +66,18 @@ const createContentSlice =
         })) as DocumentEntry | null;
       },
       async saveDocument(collection, path, value) {
-        await postContentRequest(url, {
+        // update returns the persisted entry, which may carry more than the
+        // form value (unknown fields merged from the stored document).
+        const saved = (await postContentRequest(url, {
           op: 'update',
           collection,
           path,
           value,
-        });
+        })) as DocumentEntry;
         // Keep the list cache honest so collection views reflect the save.
         set(({ documents }) => ({
           documents: (documents as DocumentEntry[]).map((entry) =>
-            entry.path === path ? { path, document: value } : entry
+            entry.path === path ? saved : entry
           ),
         }));
       },

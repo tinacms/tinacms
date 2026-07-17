@@ -93,17 +93,31 @@ export const createLocalDataLayer = (
 
     async list(collectionName) {
       const collection = collectionFor(collectionName);
-      const names = await fs.readdir(collection.folder, { recursive: true });
+      let names: string[];
+      try {
+        names = (await fs.readdir(collection.folder, { recursive: true })).map(
+          String
+        );
+      } catch (cause) {
+        // A not-yet-created collection folder is an empty collection.
+        if ((cause as NodeJS.ErrnoException).code === 'ENOENT') return [];
+        throw cause;
+      }
       const entries: DocumentEntry[] = [];
-      for (const name of names.map(String).sort()) {
+      for (const name of names.sort()) {
         if (!name.endsWith(collection.adapter.extension)) continue;
         const absolute = path.join(collection.folder, name);
-        entries.push({
-          path: path.relative(rootDir, absolute),
-          document: collection.adapter.parse(
-            await fs.readFile(absolute, 'utf8')
-          ),
-        });
+        const raw = await fs.readFile(absolute, 'utf8');
+        try {
+          entries.push({
+            // Paths are the document id: root-relative posix (ADR-017).
+            path: path.relative(rootDir, absolute).split(path.sep).join('/'),
+            document: collection.adapter.parse(raw),
+          });
+        } catch (cause) {
+          // One malformed file must not take down the whole collection.
+          console.warn(`Skipping unparsable document "${absolute}":`, cause);
+        }
       }
       return entries;
     },
@@ -114,13 +128,17 @@ export const createLocalDataLayer = (
       // Merge over the file's current contents so unknown fields and the body
       // survive (format-adapters.ts); a missing file is written fresh — never
       // lose the edit (ADR-018).
-      const previousRaw = await fs
-        .readFile(absolute, 'utf8')
-        .catch(() => undefined);
-      await fs.writeFile(
-        absolute,
-        collection.adapter.serialize(value, previousRaw)
-      );
+      let previousRaw: string | undefined;
+      try {
+        previousRaw = await fs.readFile(absolute, 'utf8');
+      } catch (cause) {
+        if ((cause as NodeJS.ErrnoException).code !== 'ENOENT') throw cause;
+      }
+      const raw = collection.adapter.serialize(value, previousRaw);
+      // The parent folder may have been deleted out-of-band — same promise.
+      await fs.mkdir(path.dirname(absolute), { recursive: true });
+      await fs.writeFile(absolute, raw);
+      return { path: documentPath, document: collection.adapter.parse(raw) };
     },
   };
 };
@@ -152,7 +170,6 @@ export const handleContentRequest = async (
     case 'get':
       return provider.get(parsed.collection, parsed.path);
     case 'update':
-      await provider.update(parsed.collection, parsed.path, parsed.value);
-      return null;
+      return provider.update(parsed.collection, parsed.path, parsed.value);
   }
 };
