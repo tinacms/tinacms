@@ -24,7 +24,7 @@ const localDataLayerPlugin = (): Plugin => {
     // CSRF guard: browsers send Origin on cross-site POSTs — reject anything
     // that isn't the dev server itself (no Origin = curl and friends, allowed).
     const { origin, host } = req.headers;
-    if (origin && origin !== `http://${host}`) {
+    if (origin && origin !== `http://${host}` && origin !== `https://${host}`) {
       res.statusCode = 403;
       res.end('Cross-origin request rejected');
       return;

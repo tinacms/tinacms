@@ -2,8 +2,16 @@ import { promises as fs } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { ContentProvider } from '../../../core/content/contract';
-import { createLocalDataLayer, handleContentRequest } from './local-data-layer';
+import { createGraphQLPipeline } from './graphql-pipeline';
+import {
+  type LocalDataLayer,
+  createLocalDataLayer,
+  handleContentRequest,
+} from './local-data-layer';
+
+// The real pipeline boots the whole v3 stack; these tests only care about the
+// memoization around it.
+vi.mock('./graphql-pipeline', () => ({ createGraphQLPipeline: vi.fn() }));
 
 const HELLO_RAW = `---
 title: Hello World
@@ -15,7 +23,7 @@ Body prose.
 `;
 
 let rootDir: string;
-let dataLayer: ContentProvider;
+let dataLayer: LocalDataLayer;
 
 beforeEach(async () => {
   rootDir = await fs.mkdtemp(path.join(tmpdir(), 'tina-local-'));
@@ -153,6 +161,37 @@ describe('trust boundary', () => {
 
   it('rejects an unknown collection', async () => {
     await expect(dataLayer.list('nope')).rejects.toThrow(/Unknown collection/);
+  });
+});
+
+describe('graphql pipeline', () => {
+  it('retries the boot after a failure instead of caching the rejection', async () => {
+    vi.mocked(createGraphQLPipeline)
+      .mockRejectedValueOnce(new Error('boot failed'))
+      .mockResolvedValueOnce({
+        execute: async () => 'ok',
+        reindexPaths: async () => {},
+      });
+    await expect(dataLayer.graphql('{}')).rejects.toThrow('boot failed');
+    await expect(dataLayer.graphql('{}')).resolves.toBe('ok');
+    expect(createGraphQLPipeline).toHaveBeenCalledTimes(2);
+  });
+
+  it('a reindex failure warns but does not fail the written save', async () => {
+    vi.mocked(createGraphQLPipeline).mockResolvedValueOnce({
+      execute: async () => 'ok',
+      reindexPaths: async () => {
+        throw new Error('index broke');
+      },
+    });
+    await dataLayer.graphql('{}');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const saved = await dataLayer.update('post', 'content/posts/hello.mdx', {
+      title: 'Still saved',
+    });
+    expect(saved.document.title).toBe('Still saved');
+    expect(warn).toHaveBeenCalledOnce();
+    warn.mockRestore();
   });
 });
 

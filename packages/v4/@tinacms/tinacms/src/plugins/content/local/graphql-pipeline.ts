@@ -67,9 +67,18 @@ export const createGraphQLPipeline = async (
     buildSDK: false,
   });
   await database.indexContent({ graphQLSchema, tinaSchema, lookup });
+  // Reindexes run one at a time — concurrent saves must not interleave
+  // read-modify-write on the shared index. A failed run doesn't block the next.
+  let indexing: Promise<unknown> = Promise.resolve();
   return {
     execute: (query, variables = {}) =>
       resolve({ database, query, variables, verbose: false }),
-    reindexPaths: (paths) => database.indexContentByPaths(paths),
+    reindexPaths: async (paths) => {
+      const run = indexing
+        .catch(() => {})
+        .then(() => database.indexContentByPaths(paths));
+      indexing = run;
+      await run;
+    },
   };
 };

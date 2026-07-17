@@ -71,6 +71,10 @@ export const createLocalDataLayer = (
     (pipeline ??= createGraphQLPipeline({
       rootDir,
       collections: options.collections,
+    }).catch((cause) => {
+      // A failed boot must not be memoized forever — the next call retries.
+      pipeline = undefined;
+      throw cause;
     }));
 
   const collectionFor = (name: string): ResolvedCollection => {
@@ -163,7 +167,15 @@ export const createLocalDataLayer = (
       // a not-yet-booted pipeline indexes everything fresh on first query.
       // ponytail: no fs watcher, out-of-band edits go stale until the next
       // save; add chokidar when that bites.
-      if (pipeline) await (await pipeline).reindexPaths([documentPath]);
+      if (pipeline) {
+        try {
+          await (await pipeline).reindexPaths([documentPath]);
+        } catch (cause) {
+          // The file is already written — a reindex failure must not fail the
+          // save; the index self-heals on the next successful reindex/boot.
+          console.warn(`Reindex failed for "${documentPath}":`, cause);
+        }
+      }
       return { path: documentPath, document: collection.adapter.parse(raw) };
     },
 
