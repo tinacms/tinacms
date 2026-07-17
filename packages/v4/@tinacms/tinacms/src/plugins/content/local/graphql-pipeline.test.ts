@@ -33,6 +33,7 @@ beforeEach(async () => {
         fields: [
           { name: 'title', type: 'string', required: true },
           { name: 'featured', type: 'boolean' },
+          { name: 'body', type: 'rich-text', isBody: true },
         ],
       },
     ],
@@ -79,6 +80,24 @@ describe('graphql (the v3 pipeline)', () => {
       'query { post(relativePath: "hello.mdx") { title } }'
     )) as GraphQLResult;
     expect(result.data?.post.title).toBe('Renamed');
+  });
+
+  it('serves the markdown body as the v3 mdx AST, surviving a frontmatter save', async () => {
+    const query = 'query { post(relativePath: "hello.mdx") { body } }';
+    const before = (await dataLayer.graphql(query)) as GraphQLResult;
+    expect(before.errors).toBeUndefined();
+    expect(before.data?.post.body).toMatchObject({
+      type: 'root',
+      children: [
+        { type: 'p', children: [{ type: 'text', text: 'Body prose.' }] },
+      ],
+    });
+    await dataLayer.update('post', 'content/posts/hello.mdx', {
+      title: 'Renamed',
+      featured: true,
+    });
+    const after = (await dataLayer.graphql(query)) as GraphQLResult;
+    expect(after.data?.post.body).toEqual(before.data?.post.body);
   });
 
   it('dispatches over the wire protocol', async () => {

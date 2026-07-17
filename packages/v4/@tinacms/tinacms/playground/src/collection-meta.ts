@@ -10,5 +10,7 @@ export const postCollectionMeta = {
   fields: [
     { name: 'title', type: 'string', required: true },
     { name: 'featured', type: 'boolean' },
+    // v3 content model: the markdown body, served by GraphQL as the mdx AST.
+    { name: 'body', type: 'rich-text', isBody: true },
   ],
 } as const;

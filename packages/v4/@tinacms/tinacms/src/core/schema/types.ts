@@ -6,6 +6,9 @@ export interface BaseFieldSchema {
 
 export interface FieldSchema extends BaseFieldSchema {
   type: string;
+  // Marks the field that owns the markdown body (v3 content model). The local
+  // GraphQL pipeline serves it as the v3 mdx AST; the form doesn't edit it yet.
+  isBody?: boolean;
 }
 
 export interface CollectionSchema {
