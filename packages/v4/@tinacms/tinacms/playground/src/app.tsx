@@ -1,7 +1,10 @@
 import {
+  type ContentSlice,
+  type DocumentEntry,
   type FieldSchema,
   type TinaDocument,
   corePlugins,
+  localContentPlugin,
 } from '@tinacms/tinacms';
 import {
   Field,
@@ -17,10 +20,19 @@ import {
   useIsFieldDirty,
   useIsFormDirty,
   usePreviewConnection,
+  useTinaStore,
 } from '@tinacms/tinacms/react';
-import { useRef, useState } from 'react';
-import { documents, postCollection } from './content';
+import { useEffect, useRef, useState } from 'react';
+import { postCollection } from './content';
 import { PluginsPanel } from './plugins-panel';
+
+const plugins = [...corePlugins, localContentPlugin()];
+
+// The `content` namespace is typed as an open SliceState until codegen produces
+// typed capability reads; the one cast lives here.
+function useContentSlice(): ContentSlice {
+  return useTinaStore((state) => state.content) as unknown as ContentSlice;
+}
 
 const STATUS_COLORS: Record<FormStatus, string> = {
   pristine: '#6b7280',
@@ -62,9 +74,11 @@ function FieldRow({ node }: { node: FieldSchema }) {
 // mirror — a dirty dot and an error dot stay live for BOTH documents no matter
 // which form is hosted (useIsFormDirty/useFormErrors read any open form).
 function DocumentTabs({
+  documents,
   activePath,
   onSelect,
 }: {
+  documents: DocumentEntry[];
   activePath: string;
   onSelect: (path: string) => void;
 }) {
@@ -140,55 +154,84 @@ function SaveButton() {
   );
 }
 
-export function App() {
+// Loads the collection through the content capability and hosts one document's
+// form at a time. Saves flow back through the same slice — the local data layer
+// writes the real file (ADR-018).
+function Workspace() {
+  const content = useContentSlice();
   const [savedDocument, setSavedDocument] = useState<TinaDocument | null>(null);
-  const [activePath, setActivePath] = useState(documents[0].path);
+  const [activePath, setActivePath] = useState<string | null>(null);
+  // Action refs are stable across slice updates; depending on the function (not
+  // the slice object) keeps this a boot-time load, not a loop.
+  const { loadDocuments } = content;
+  useEffect(() => {
+    void loadDocuments(postCollection.name);
+  }, [loadDocuments]);
+
+  const { documents } = content;
   const active =
     documents.find(({ path }) => path === activePath) ?? documents[0];
+  if (!active) return <p style={{ padding: '1rem' }}>Loading content…</p>;
+
+  const saveActiveDocument = async (document: TinaDocument) => {
+    await content.saveDocument(postCollection.name, active.path, document);
+    setSavedDocument(document);
+  };
+
   return (
-    <TinaProvider plugins={corePlugins}>
-      {/* Keyed remount per document: a switch tears the form down (the store
-          keeps its edits, ADR-012) and hosts the other one. */}
-      <FormProvider
-        key={active.path}
-        collection={postCollection}
-        path={active.path}
-        document={active.document}
-        onSave={setSavedDocument}
-      >
-        <div style={{ display: 'flex', height: '100vh' }}>
-          <aside
+    // Keyed remount per document: a switch tears the form down (the store
+    // keeps its edits, ADR-012) and hosts the other one.
+    <FormProvider
+      key={active.path}
+      collection={postCollection}
+      path={active.path}
+      document={active.document}
+      onSave={saveActiveDocument}
+    >
+      <div style={{ display: 'flex', height: '100vh' }}>
+        <aside
+          style={{
+            width: '22rem',
+            flexShrink: 0,
+            borderRight: '1px solid #e5e7eb',
+            padding: '1rem',
+            overflowY: 'auto',
+          }}
+        >
+          <DocumentTabs
+            documents={documents}
+            activePath={active.path}
+            onSelect={setActivePath}
+          />
+          <header
             style={{
-              width: '22rem',
-              flexShrink: 0,
-              borderRight: '1px solid #e5e7eb',
-              padding: '1rem',
-              overflowY: 'auto',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '1rem',
             }}
           >
-            <DocumentTabs activePath={activePath} onSelect={setActivePath} />
-            <header
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: '1rem',
-              }}
-            >
-              <strong>{active.path}</strong>
-              <StatusBadge />
-            </header>
-            {postCollection.fields.map((node) => (
-              <FieldRow key={node.name} node={node} />
-            ))}
-            <SaveButton />
-            <PluginsPanel savedDocument={savedDocument} />
-          </aside>
-          <main style={{ flex: 1 }}>
-            <PreviewPane />
-          </main>
-        </div>
-      </FormProvider>
+            <strong>{active.path}</strong>
+            <StatusBadge />
+          </header>
+          {postCollection.fields.map((node) => (
+            <FieldRow key={node.name} node={node} />
+          ))}
+          <SaveButton />
+          <PluginsPanel savedDocument={savedDocument} />
+        </aside>
+        <main style={{ flex: 1 }}>
+          <PreviewPane />
+        </main>
+      </div>
+    </FormProvider>
+  );
+}
+
+export function App() {
+  return (
+    <TinaProvider plugins={plugins}>
+      <Workspace />
     </TinaProvider>
   );
 }

@@ -1,12 +1,11 @@
 import { type CollectionSchema, type TinaDocument, t } from '@tinacms/tinacms';
+import { postCollectionMeta } from './collection-meta';
 
-// The hardcoded documents this playground edits — two of them, so form
-// continuity (kept edits across a switch) and the collection-level dirty/error
-// dots have something to switch between. The data layer (ADR-019) replaces
-// this with real content once it lands.
+// Real documents live in playground/content/posts/ and arrive through the
+// content slice (localContentPlugin → vite.config.ts middleware).
 
 export const postCollection: CollectionSchema = {
-  name: 'post',
+  ...postCollectionMeta,
   label: 'Posts',
   fields: [
     t.string({ name: 'title', label: 'Title', required: true, min: 3 }),
@@ -14,21 +13,8 @@ export const postCollection: CollectionSchema = {
   ],
 };
 
-export interface PlaygroundDocument {
-  path: string;
-  document: TinaDocument;
-}
-
-export const documents: PlaygroundDocument[] = [
-  {
-    path: 'content/posts/hello-world.mdx',
-    document: { title: 'Hello World', featured: false },
-  },
-  {
-    path: 'content/posts/second-post.mdx',
-    document: { title: 'Second Post', featured: true },
-  },
-];
-
-// The standalone preview's static seed (/preview.html opened directly).
-export const sampleDocument: TinaDocument = documents[0].document;
+// Static seed for /preview.html opened standalone (outside the editor iframe).
+export const sampleDocument: TinaDocument = {
+  title: 'Hello World',
+  featured: false,
+};

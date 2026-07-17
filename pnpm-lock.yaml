@@ -2603,6 +2603,9 @@ importers:
       '@tinacms/ui':
         specifier: workspace:*
         version: link:../ui
+      gray-matter:
+        specifier: 'catalog:'
+        version: 4.0.3
       react-hook-form:
         specifier: ^7.80.0
         version: 7.80.0(react@19.2.7)

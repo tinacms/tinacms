@@ -5,6 +5,10 @@
 // helpers, and the public contract types. Each field type contributes its own
 // `t.<type>` builder from its plugin; this entry is the composition root.
 
+export type {
+  ContentProvider,
+  DocumentEntry,
+} from './core/content/contract';
 export {
   type Capability,
   definePlugin,
@@ -15,6 +19,10 @@ export type {
   FieldSchema,
   TinaDocument,
 } from './core/schema/types';
+export {
+  type ContentSlice,
+  localContentPlugin,
+} from './plugins/content/local/local-content.plugin';
 export { corePlugins, t } from './plugins/fields';
 export type {
   BooleanFieldSchema,

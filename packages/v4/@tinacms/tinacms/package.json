@@ -41,6 +41,10 @@
       "types": "./src/server/index.ts",
       "default": "./src/server/index.ts"
     },
+    "./local-data-layer": {
+      "types": "./src/plugins/content/local/local-data-layer.ts",
+      "default": "./src/plugins/content/local/local-data-layer.ts"
+    },
     "./adapters/next": {
       "types": "./src/adapters/next/index.ts",
       "default": "./src/adapters/next/index.ts"
@@ -60,6 +64,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
+    "gray-matter": "catalog:",
     "@tinacms/ui": "workspace:*",
     "react-hook-form": "^7.80.0",
     "zod": "catalog:",
