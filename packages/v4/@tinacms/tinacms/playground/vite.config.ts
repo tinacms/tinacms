@@ -58,6 +58,14 @@ const localDataLayerPlugin = (): Plugin => {
 // Array form: the more specific subpath must come first.
 export default defineConfig({
   plugins: [react(), tailwindcss(), localDataLayerPlugin()],
+  server: {
+    watch: {
+      // Content documents are data, not app source — a save must reach the
+      // editor through the content slice, not as an HMR full page reload
+      // (tailwind's content scan otherwise promotes the .mdx write to one).
+      ignored: [fileURLToPath(new URL('./content/**', import.meta.url))],
+    },
+  },
   resolve: {
     alias: [
       {
