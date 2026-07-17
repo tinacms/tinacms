@@ -143,7 +143,7 @@ catalog:
     async-lock: ^1.4.1
     auto-bind: ^4.0.0
     autoprefixer: ^10.4.20
-    axios: 1.7.5
+    axios: 1.16.0
     body-parser: ^1.20.3
     busboy: ^1.6.0
     c8: ^7.14.0
