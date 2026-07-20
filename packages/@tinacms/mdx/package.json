@@ -1,6 +1,6 @@
 {
 	"name": "@tinacms/mdx",
-	"version": "2.1.10",
+	"version": "2.1.11",
 	"type": "module",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -36,7 +36,7 @@
 		"test-watch": "vitest"
 	},
 	"dependencies": {
-		"@tinacms/schema-tools": "workspace:*",
+		"@tinacms/schema-tools": "workspace:^",
 		"acorn": "catalog:",
 		"ccount": "catalog:",
 		"estree-util-is-identifier-name": "catalog:",

@@ -1,7 +1,7 @@
 {
   "name": "next-tinacms-s3",
   "type": "module",
-  "version": "24.0.1",
+  "version": "24.0.2",
   "main": "dist/index.js",
   "module": "./dist/index.js",
   "files": [
@@ -35,7 +35,7 @@
     "typescript": "^5.7.3"
   },
   "peerDependencies": {
-    "tinacms": "workspace:*"
+    "tinacms": "workspace:^"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
