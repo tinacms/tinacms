@@ -1,7 +1,7 @@
 {
   "name": "next-tinacms-cloudinary",
   "type": "module",
-  "version": "27.0.1",
+  "version": "27.0.2",
   "main": "dist/index.js",
   "module": "./dist/index.js",
   "files": [

@@ -1,4 +1,4 @@
-// Server-only — `tinacms/next`.
+// Server-only — `tinacms/adapters/next`.
 // Mounts the runtime-composed RPC handler as Next.js route handlers.
 //
 // Intended exports:
