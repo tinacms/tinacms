@@ -55,8 +55,9 @@ export const tinaLocalDataLayerVitePlugin = (
       res.end(JSON.stringify(result));
     } catch (cause) {
       // A malformed body or a mid-stream abort lands here — 400 rather than a
-      // crashed dev server. Skip the write if the socket is already gone.
-      if (res.writableEnded) return;
+      // crashed dev server. Skip the write if the socket is already gone (an
+      // abort destroys it, so `destroyed` is the live check, not `writableEnded`).
+      if (res.destroyed) return;
       res.statusCode = 400;
       res.end(cause instanceof Error ? cause.message : String(cause));
     }
