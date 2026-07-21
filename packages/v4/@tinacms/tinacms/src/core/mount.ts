@@ -32,9 +32,7 @@ export const declaresCapabilityOverride = (
 export const capabilityMountFor = (
   manifest: PluginManifest
 ): CapabilityMount => {
-  const singletons = manifest.provides.filter(
-    isSingletonSliceCapability
-  );
+  const singletons = manifest.provides.filter(isSingletonSliceCapability);
   invariant(
     singletons.length <= 1,
     'plugin-multiple-singleton-slices',

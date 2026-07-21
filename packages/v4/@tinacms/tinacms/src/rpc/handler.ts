@@ -119,8 +119,11 @@ const dispatch = async (
   // can't reach a state-changing op — even when getSession reads a cookie. Compare
   // the MIME essence, not a substring: a safelisted type carrying the string as a
   // parameter (text/plain; charset=application/json) sends no preflight.
-  const contentType = request.headers.get('content-type') ?? '';
-  const mimeEssence = contentType.split(';')[0].trim().toLowerCase();
+  const mimeEssence = request.headers
+    .get('content-type')
+    ?.replace(/;.*/, '')
+    .trim()
+    .toLowerCase();
   if (mimeEssence !== 'application/json') {
     return errorResponse(
       415,
@@ -181,7 +184,12 @@ const authorizeAndInvokeOp = async (
       meta.permission,
     ]) {
       if (!permission) continue;
-      if (!(await hasPermission(runtime.authHooks, session, permission))) {
+      const allowed = await hasPermission(
+        runtime.authHooks,
+        session,
+        permission
+      );
+      if (!allowed) {
         return errorResponse(
           403,
           'forbidden',
