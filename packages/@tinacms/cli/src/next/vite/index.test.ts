@@ -12,9 +12,6 @@ jest.mock('@vitejs/plugin-react', () => ({
 jest.mock('./tailwind', () => ({
   tinaTailwind: () => ({ name: 'mock-tailwind' }),
 }));
-jest.mock('vite', () => ({
-  splitVendorChunkPlugin: () => ({ name: 'mock-split-vendor' }),
-}));
 
 import type { Database } from '@tinacms/graphql';
 import type { ConfigManager } from '../config-manager';
@@ -87,7 +84,7 @@ describe('createConfig', () => {
     });
     const raw = config.define!['process.env'];
 
-    expect(raw).toBe(`new Object(${JSON.stringify(FAKE_PUBLIC_ENV)})`);
+    expect(raw).toBe(JSON.stringify(FAKE_PUBLIC_ENV));
   });
 
   it('does not embed any values outside the filterPublicEnv result', async () => {
@@ -100,8 +97,7 @@ describe('createConfig', () => {
       noWatch: true,
     });
     const raw = config.define!['process.env'];
-    const jsonStr = raw.replace(/^new Object\(/, '').replace(/\)$/, '');
-    const env = JSON.parse(jsonStr);
+    const env = JSON.parse(raw);
 
     expect(Object.keys(env)).toEqual(['TINA_PUBLIC_ONLY']);
   });
