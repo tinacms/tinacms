@@ -519,7 +519,12 @@ export async function run() {
   ${padCommand(`${pkgManager} install`)}# install dependencies`
       : ''
   }
-  ${padCommand(
+  ${
+    template.hasCleanup
+      ? `${padCommand(`${pkgManager} run cleanup`)}# start fresh
+  `
+      : ''
+  }${padCommand(
     `${pkgManager} run dev`
   )}# start the dev server ${TextStyles.link(template.devUrl)}
   ${padCommand(`${pkgManager} run build`)}# build the app for production

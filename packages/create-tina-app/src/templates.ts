@@ -15,6 +15,8 @@ export type BaseExample = {
   features?: Feature[];
   value: string;
   devUrl: string;
+  /** Starter ships a `cleanup` script to strip boilerplate content. */
+  hasCleanup?: boolean;
 };
 
 export type InternalTemplate = BaseExample & {
@@ -75,6 +77,7 @@ export const TEMPLATES: Template[] = [
     gitURL: 'https://github.com/tinacms/tina-docs',
     branch: 'main',
     devUrl: 'http://localhost:3000',
+    hasCleanup: true,
   },
   {
     title: 'Astro Starter',
