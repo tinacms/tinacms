@@ -48,7 +48,7 @@ export interface TinaProviderProps {
 // onInit waits for the previous instance's teardown, so an outgoing onDestroy
 // can never land after a successor's onInit. Module-level on purpose: manifests
 // are module singletons, so their lifecycle is global state.
-let lifecycleTurn: Promise<unknown> = Promise.resolve();
+let lifecycleTurn: Promise<void> = Promise.resolve();
 
 export function TinaProvider({ plugins = [], children }: TinaProviderProps) {
   // One resolveClientSegments pass feeds both runtime halves (ADR-003), held as a
@@ -81,10 +81,19 @@ export function TinaProvider({ plugins = [], children }: TinaProviderProps) {
       if (mounted) setRuntime(runtime);
       return destroyPlugins;
     });
+    // Advance the shared turn at mount, not just at teardown: a second provider
+    // mounting in the same commit then chains its onInit after this boot instead
+    // of racing it on the module-singleton manifests. Teardown replaces the turn
+    // again with the destroy.
+    lifecycleTurn = boot.then(
+      () => undefined,
+      () => undefined
+    );
     boot.catch((cause) => {
-      if (mounted) {
-        setError(cause instanceof Error ? cause : new Error(String(cause)));
-      }
+      if (!mounted) return;
+      const bootError =
+        cause instanceof Error ? cause : new Error(String(cause));
+      setError(bootError);
     });
     return () => {
       mounted = false;
