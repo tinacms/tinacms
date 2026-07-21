@@ -13,46 +13,53 @@ import {
   createLocalDataLayer,
 } from './local-data-layer';
 
+// Same origin as the dev server, or no Origin at all (curl and friends).
+const isSameOrigin = (origin: string | undefined, host?: string): boolean =>
+  !origin || origin === `http://${host}` || origin === `https://${host}`;
+
+// Collect the request body as a UTF-8 string; a client abort mid-stream rejects
+// rather than hanging or crashing the dev server.
+const readRequestBody = (req: Connect.IncomingMessage): Promise<string> =>
+  new Promise((resolve, reject) => {
+    let body = '';
+    req.setEncoding('utf8');
+    req.on('data', (chunk) => {
+      body += chunk;
+    });
+    req.on('end', () => resolve(body));
+    req.on('error', reject);
+  });
+
 export const tinaLocalDataLayerVitePlugin = (
   options: LocalDataLayerOptions & { url?: string }
 ): Plugin => {
   const dataLayer = createLocalDataLayer(options);
-  const serveContentRequest: Connect.NextHandleFunction = (req, res) => {
-    // CSRF guard: browsers send Origin on cross-site POSTs — reject anything
-    // that isn't the dev server itself (no Origin = curl and friends, allowed).
+  const serveContentRequest: Connect.NextHandleFunction = async (req, res) => {
     const { origin, host } = req.headers;
-    if (origin && origin !== `http://${host}` && origin !== `https://${host}`) {
+    // CSRF guard: reject a cross-site POST, and require a JSON content-type — a
+    // cross-origin fetch with it always preflights, closing the remaining gap.
+    if (!isSameOrigin(origin, host)) {
       res.statusCode = 403;
       res.end('Cross-origin request rejected');
       return;
     }
-    // Only JSON bodies: a cross-origin fetch with this content-type always
-    // preflights, closing the remaining CSRF gap.
     if (req.headers['content-type']?.includes('application/json') !== true) {
       res.statusCode = 415;
       res.end('Expected application/json');
       return;
     }
-    let body = '';
-    req.setEncoding('utf8');
-    // A client abort mid-body must not crash the dev server.
-    req.on('error', () => res.destroy());
-    req.on('data', (chunk) => {
-      body += chunk;
-    });
-    req.on('end', async () => {
-      try {
-        const result = await dispatchContentRequest(
-          dataLayer,
-          JSON.parse(body)
-        );
-        res.setHeader('content-type', 'application/json');
-        res.end(JSON.stringify(result));
-      } catch (cause) {
-        res.statusCode = 400;
-        res.end(cause instanceof Error ? cause.message : String(cause));
-      }
-    });
+    try {
+      const body = await readRequestBody(req);
+      const result = await dispatchContentRequest(dataLayer, JSON.parse(body));
+      res.setHeader('content-type', 'application/json');
+      res.end(JSON.stringify(result));
+    } catch (cause) {
+      // A malformed body or a mid-stream abort lands here — 400 rather than a
+      // crashed dev server. Skip the write if the socket is already gone.
+      if (res.writableEnded) return;
+      res.statusCode = 400;
+      res.end(cause instanceof Error ? cause.message : String(cause));
+    }
   };
   return {
     name: 'tina-local-data-layer',
