@@ -1,7 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { definePlugin } from '../core/plugin';
-import { corePlugins } from '../index';
 import { useFieldRegistry, useTinaStore } from './hooks';
 import { TinaProvider } from './provider';
 
@@ -21,9 +20,9 @@ function BootProbe() {
 }
 
 describe('TinaProvider boot', () => {
-  it('provides the resolved field registry and the composed boot store', async () => {
+  it('mounts corePlugins by default: resolved field registry, composed boot store', async () => {
     render(
-      <TinaProvider plugins={corePlugins}>
+      <TinaProvider>
         <BootProbe />
       </TinaProvider>
     );
@@ -40,7 +39,7 @@ describe('TinaProvider boot', () => {
     const onDestroy = vi.fn();
     const lifecycle = definePlugin({ name: 'lifecycle', onInit, onDestroy });
     const { unmount } = render(
-      <TinaProvider plugins={[...corePlugins, lifecycle]}>
+      <TinaProvider plugins={[lifecycle]}>
         <BootProbe />
       </TinaProvider>
     );

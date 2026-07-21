@@ -1,9 +1,7 @@
 import {
-  type ContentSlice,
   type DocumentEntry,
   type FieldSchema,
   type TinaDocument,
-  corePlugins,
   localContentPlugin,
 } from '@tinacms/tinacms';
 import {
@@ -13,6 +11,8 @@ import {
   TinaProvider,
   toFieldAddress,
   toFormId,
+  useCollectionDocuments,
+  useContentSlice,
   useFormErrors,
   useFormId,
   useFormSave,
@@ -20,19 +20,10 @@ import {
   useIsFieldDirty,
   useIsFormDirty,
   usePreviewConnection,
-  useTinaStore,
 } from '@tinacms/tinacms/react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { postCollection } from './content';
 import { PluginsPanel } from './plugins-panel';
-
-const plugins = [...corePlugins, localContentPlugin()];
-
-// The `content` namespace is typed as an open SliceState until codegen produces
-// typed capability reads; the one cast lives here.
-function useContentSlice(): ContentSlice {
-  return useTinaStore((state) => state.content) as unknown as ContentSlice;
-}
 
 const STATUS_COLORS: Record<FormStatus, string> = {
   pristine: '#6b7280',
@@ -161,14 +152,7 @@ function Workspace() {
   const content = useContentSlice();
   const [savedDocument, setSavedDocument] = useState<TinaDocument | null>(null);
   const [activePath, setActivePath] = useState<string | null>(null);
-  // Action refs are stable across slice updates; depending on the function (not
-  // the slice object) keeps this a boot-time load, not a loop.
-  const { loadDocuments } = content;
-  useEffect(() => {
-    void loadDocuments(postCollection.name);
-  }, [loadDocuments]);
-
-  const { documents } = content;
+  const documents = useCollectionDocuments(postCollection.name);
   const active =
     documents.find(({ path }) => path === activePath) ?? documents[0];
   // Pin the hosted entry per form instance: live cache updates (e.g. the
@@ -240,7 +224,7 @@ function Workspace() {
 
 export function App() {
   return (
-    <TinaProvider plugins={plugins}>
+    <TinaProvider plugins={[localContentPlugin()]}>
       <Workspace />
     </TinaProvider>
   );

@@ -21,6 +21,7 @@ import {
   toFormValues,
   useFormStore,
 } from '../form/form-store';
+import { corePlugins } from '../plugins/fields';
 import { createTinaStore } from '../store/create-store';
 import {
   FormScopeContext,
@@ -36,7 +37,9 @@ import {
 import { buildFormResolver } from './resolver';
 
 export interface TinaProviderProps {
-  plugins: PluginManifest[];
+  // Additional plugins on top of the built-in corePlugins; a passed plugin with
+  // a built-in's name replaces it (user override wins).
+  plugins?: PluginManifest[];
   children: ReactNode;
 }
 
@@ -47,12 +50,17 @@ export interface TinaProviderProps {
 // are module singletons, so their lifecycle is global state.
 let lifecycleTurn: Promise<unknown> = Promise.resolve();
 
-export function TinaProvider({ plugins, children }: TinaProviderProps) {
+export function TinaProvider({ plugins = [], children }: TinaProviderProps) {
   // One resolveClientSegments pass feeds both runtime halves (ADR-003), held as a
   // single state object so registry and store always appear together (no tearing).
   const [runtime, setRuntime] = useState<TinaRuntime | null>(null);
   const [error, setError] = useState<Error | null>(null);
-  const pluginsKey = plugins.map((plugin) => plugin.name).join('|');
+  const passedNames = new Set(plugins.map((plugin) => plugin.name));
+  const composedPlugins = [
+    ...corePlugins.filter((plugin) => !passedNames.has(plugin.name)),
+    ...plugins,
+  ];
+  const pluginsKey = composedPlugins.map((plugin) => plugin.name).join('|');
 
   useEffect(() => {
     let mounted = true;
@@ -63,13 +71,13 @@ export function TinaProvider({ plugins, children }: TinaProviderProps) {
     // onInit runs last, before the runtime is exposed, so no consumer sees a
     // half-initialized plugin set.
     const boot = lifecycleTurn.then(async () => {
-      validateCapabilityGraph(plugins);
-      const resolved = await resolveClientSegments(plugins);
+      validateCapabilityGraph(composedPlugins);
+      const resolved = await resolveClientSegments(composedPlugins);
       const runtime: TinaRuntime = {
         registry: createFieldRegistry(resolved),
         store: createTinaStore(resolved),
       };
-      const destroyPlugins = await initializePlugins(plugins);
+      const destroyPlugins = await initializePlugins(composedPlugins);
       if (mounted) setRuntime(runtime);
       return destroyPlugins;
     });

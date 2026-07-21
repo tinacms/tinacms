@@ -29,3 +29,22 @@ export interface ContentProvider {
     value: TinaDocument
   ): Promise<DocumentEntry>;
 }
+
+// What `get().content` holds: the ContentProvider ops (above) plus the
+// list cache collection views render from, keyed by collection name.
+// saveDocument's rejection propagates so useFormSave leaves the form dirty
+// (context.ts SaveHandler contract).
+export interface ContentSlice {
+  documents: Record<string, DocumentEntry[]>;
+  loadDocuments(collection: string): Promise<DocumentEntry[]>;
+  getDocument(collection: string, path: string): Promise<DocumentEntry | null>;
+  saveDocument(
+    collection: string,
+    path: string,
+    value: TinaDocument
+  ): Promise<DocumentEntry>;
+}
+
+// Where the content capability's wire endpoint mounts by default — shared by
+// the client slice and whatever dev server hosts the data layer.
+export const DEFAULT_CONTENT_URL = '/api/tina/content';

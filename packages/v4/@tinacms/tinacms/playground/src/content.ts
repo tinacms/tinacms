@@ -2,7 +2,7 @@ import { type CollectionSchema, type TinaDocument, t } from '@tinacms/tinacms';
 import { postCollectionMeta } from './collection-meta';
 
 // Real documents live in playground/content/posts/ and arrive through the
-// content slice (localContentPlugin → vite.config.ts middleware).
+// content slice (localContentPlugin → tinaLocalDataLayerVitePlugin's endpoint).
 
 export const postCollection: CollectionSchema = {
   ...postCollectionMeta,

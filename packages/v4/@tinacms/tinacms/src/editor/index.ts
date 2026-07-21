@@ -40,6 +40,8 @@ export {
 export {
   type ActiveField,
   useActiveField,
+  useCollectionDocuments,
+  useContentSlice,
   useFieldActivation,
   useFieldAddress,
   useFieldErrors,

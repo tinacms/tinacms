@@ -2,11 +2,8 @@ import { promises as fs } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import {
-  type LocalDataLayer,
-  createLocalDataLayer,
-  handleContentRequest,
-} from './local-data-layer';
+import { dispatchContentRequest } from './content-request';
+import { type LocalDataLayer, createLocalDataLayer } from './local-data-layer';
 
 const HELLO_RAW = `---
 title: Hello World
@@ -42,17 +39,12 @@ beforeEach(async () => {
 
 afterEach(() => fs.rm(rootDir, { recursive: true, force: true }));
 
-type GraphQLResult = {
-  data?: Record<string, any>;
-  errors?: { message: string }[];
-};
-
 describe('graphql (the v3 pipeline)', () => {
   it('answers a v3 single-document query', async () => {
-    const result = (await dataLayer.graphql(
+    const result = await dataLayer.graphql(
       'query($relativePath: String!) { post(relativePath: $relativePath) { title featured } }',
       { relativePath: 'hello.mdx' }
-    )) as GraphQLResult;
+    );
     expect(result.errors).toBeUndefined();
     expect(result.data?.post).toMatchObject({
       title: 'Hello World',
@@ -61,13 +53,13 @@ describe('graphql (the v3 pipeline)', () => {
   });
 
   it('answers a v3 connection (list) query', async () => {
-    const result = (await dataLayer.graphql(
+    const result = await dataLayer.graphql(
       'query { postConnection { edges { node { title } } } }'
-    )) as GraphQLResult;
+    );
     expect(result.errors).toBeUndefined();
-    expect(
-      result.data?.postConnection.edges.map((edge: any) => edge.node.title)
-    ).toEqual(['Hello World']);
+    expect(result.data?.postConnection).toMatchObject({
+      edges: [{ node: { title: 'Hello World' } }],
+    });
   });
 
   it('sees a save made after the pipeline booted (reindex-on-save)', async () => {
@@ -76,35 +68,40 @@ describe('graphql (the v3 pipeline)', () => {
       title: 'Renamed',
       featured: true,
     });
-    const result = (await dataLayer.graphql(
+    const result = await dataLayer.graphql(
       'query { post(relativePath: "hello.mdx") { title } }'
-    )) as GraphQLResult;
-    expect(result.data?.post.title).toBe('Renamed');
+    );
+    expect(result.data?.post).toMatchObject({ title: 'Renamed' });
   });
 
   it('serves the markdown body as the v3 mdx AST, surviving a frontmatter save', async () => {
     const query = 'query { post(relativePath: "hello.mdx") { body } }';
-    const before = (await dataLayer.graphql(query)) as GraphQLResult;
+    const before = await dataLayer.graphql(query);
     expect(before.errors).toBeUndefined();
-    expect(before.data?.post.body).toMatchObject({
-      type: 'root',
-      children: [
-        { type: 'p', children: [{ type: 'text', text: 'Body prose.' }] },
-      ],
+    expect(before.data?.post).toMatchObject({
+      body: {
+        type: 'root',
+        children: [
+          { type: 'p', children: [{ type: 'text', text: 'Body prose.' }] },
+        ],
+      },
     });
     await dataLayer.update('post', 'content/posts/hello.mdx', {
       title: 'Renamed',
       featured: true,
     });
-    const after = (await dataLayer.graphql(query)) as GraphQLResult;
-    expect(after.data?.post.body).toEqual(before.data?.post.body);
+    // The query selects only the body, so the whole envelope must round-trip.
+    const after = await dataLayer.graphql(query);
+    expect(after.data).toEqual(before.data);
   });
 
   it('dispatches over the wire protocol', async () => {
-    const result = (await handleContentRequest(dataLayer, {
+    const result = await dispatchContentRequest(dataLayer, {
       op: 'graphql',
       query: 'query { post(relativePath: "hello.mdx") { title } }',
-    })) as GraphQLResult;
-    expect(result.data?.post.title).toBe('Hello World');
+    });
+    expect(result).toMatchObject({
+      data: { post: { title: 'Hello World' } },
+    });
   });
 });

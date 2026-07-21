@@ -1,7 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { DocumentEntry } from '../../../core/content/contract';
+import type {
+  ContentSlice,
+  DocumentEntry,
+} from '../../../core/content/contract';
 import type { SliceSet, SliceState } from '../../../core/plugin';
-import { type ContentSlice, localContentPlugin } from './local-content.plugin';
+import { localContentPlugin } from './local-content.plugin';
 
 const ENTRIES: DocumentEntry[] = [
   { path: 'content/posts/hello.mdx', document: { title: 'Hello' } },
@@ -49,7 +52,7 @@ describe('content slice', () => {
     const loaded = await harness.slice().loadDocuments('post');
     expect(harness.requests).toEqual([{ op: 'list', collection: 'post' }]);
     expect(loaded).toEqual(ENTRIES);
-    expect(harness.slice().documents).toEqual(ENTRIES);
+    expect(harness.slice().documents).toEqual({ post: ENTRIES });
   });
 
   it('saveDocument posts an update op and caches the persisted entry', async () => {
@@ -61,7 +64,7 @@ describe('content slice', () => {
     };
     const harness = await createSliceHarness(persisted);
     // Seed the cache as if a list had run.
-    harness.slice().documents.push(...ENTRIES);
+    harness.slice().documents.post = [...ENTRIES];
     const saved = await harness
       .slice()
       .saveDocument('post', 'content/posts/hello.mdx', { title: 'Renamed' });
@@ -74,7 +77,9 @@ describe('content slice', () => {
       },
     ]);
     expect(saved).toEqual(persisted);
-    expect(harness.slice().documents).toEqual([persisted, ENTRIES[1]]);
+    expect(harness.slice().documents).toEqual({
+      post: [persisted, ENTRIES[1]],
+    });
   });
 
   it('saveDocument appends the persisted entry when the path is not cached', async () => {
@@ -83,12 +88,14 @@ describe('content slice', () => {
       document: { title: 'New' },
     };
     const harness = await createSliceHarness(persisted);
-    harness.slice().documents.push(...ENTRIES);
+    harness.slice().documents.post = [...ENTRIES];
     const saved = await harness
       .slice()
       .saveDocument('post', 'content/posts/new.mdx', { title: 'New' });
     expect(saved).toEqual(persisted);
-    expect(harness.slice().documents).toEqual([...ENTRIES, persisted]);
+    expect(harness.slice().documents).toEqual({
+      post: [...ENTRIES, persisted],
+    });
   });
 
   it('surfaces a failed request as a rejection (form stays dirty)', async () => {

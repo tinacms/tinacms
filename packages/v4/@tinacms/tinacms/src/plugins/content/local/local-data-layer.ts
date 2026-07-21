@@ -5,57 +5,74 @@
 
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
-import { z } from 'zod';
 import type {
   ContentProvider,
   DocumentEntry,
 } from '../../../core/content/contract';
+import { invariant } from '../../../core/invariant';
 import type { CollectionSchema } from '../../../core/schema/types';
-import { type FormatAdapter, formatAdapterFor } from './format-adapters';
+import {
+  type CollectionFormat,
+  type FormatAdapter,
+  formatAdapterFor,
+} from './format-adapters';
 import {
   type GraphQLPipeline,
+  type GraphQLResult,
+  type GraphQLVariables,
   createGraphQLPipeline,
 } from './graphql-pipeline';
+
+// The wire dispatch a host (express, a Next route) pairs with createLocalDataLayer.
+export {
+  type ContentRequest,
+  dispatchContentRequest,
+} from './content-request';
 
 export interface LocalDataLayerOptions {
   // The project root document paths are relative to; collection `path`s resolve
   // against it.
   rootDir: string;
   collections: CollectionSchema[];
+  // Per-format adapter overrides, merged over the built-ins (format-adapters.ts).
+  formatAdapters?: Partial<Record<CollectionFormat, FormatAdapter>>;
 }
 
 // ContentProvider plus the v3 GraphQL read surface (graphql-pipeline.ts) —
 // serving the website render path the same queries v3 served.
 export interface LocalDataLayer extends ContentProvider {
-  graphql(query: string, variables?: Record<string, unknown>): Promise<unknown>;
+  graphql(query: string, variables?: GraphQLVariables): Promise<GraphQLResult>;
 }
 
 interface ResolvedCollection {
   schema: CollectionSchema;
   adapter: FormatAdapter;
-  // Absolute folder holding the collection's files.
-  folder: string;
+  absoluteFolder: string;
 }
 
 const resolveCollections = ({
   rootDir,
   collections,
+  formatAdapters,
 }: LocalDataLayerOptions): Map<string, ResolvedCollection> => {
   const resolved = new Map<string, ResolvedCollection>();
   for (const schema of collections) {
-    if (!schema.path) {
-      throw new Error(
-        `Collection "${schema.name}" has no \`path\` — the local data layer needs one to locate its files.`
-      );
-    }
+    invariant(
+      schema.path,
+      'content-collection-no-path',
+      `Collection "${schema.name}" has no \`path\` — the local data layer needs one to locate its files.`
+    );
     resolved.set(schema.name, {
       schema,
-      adapter: formatAdapterFor(schema.format ?? 'md'),
-      folder: path.resolve(rootDir, schema.path),
+      adapter: formatAdapterFor(schema.format ?? 'md', formatAdapters),
+      absoluteFolder: path.resolve(rootDir, schema.path),
     });
   }
   return resolved;
 };
+
+const isMissingFileError = (cause: unknown): boolean =>
+  cause instanceof Error && (cause as NodeJS.ErrnoException).code === 'ENOENT';
 
 export const createLocalDataLayer = (
   options: LocalDataLayerOptions
@@ -67,19 +84,27 @@ export const createLocalDataLayer = (
   // session that never queries GraphQL never pays for it. Files stay the source
   // of truth: saves land on disk first, then refresh the index.
   let pipeline: Promise<GraphQLPipeline> | undefined;
-  const graphQLPipeline = () =>
-    (pipeline ??= createGraphQLPipeline({
-      rootDir,
-      collections: options.collections,
-    }).catch((cause) => {
-      // A failed boot must not be memoized forever — the next call retries.
-      pipeline = undefined;
-      throw cause;
-    }));
+  const graphQLPipeline = () => {
+    if (!pipeline) {
+      pipeline = createGraphQLPipeline({
+        rootDir,
+        collections: options.collections,
+      }).catch((cause) => {
+        // A failed boot must not be memoized forever — the next call retries.
+        pipeline = undefined;
+        throw cause;
+      });
+    }
+    return pipeline;
+  };
 
   const collectionFor = (name: string): ResolvedCollection => {
     const collection = collections.get(name);
-    if (!collection) throw new Error(`Unknown collection "${name}".`);
+    invariant(
+      collection,
+      'content-unknown-collection',
+      `Unknown collection "${name}".`
+    );
     return collection;
   };
 
@@ -90,16 +115,24 @@ export const createLocalDataLayer = (
     documentPath: string
   ): string => {
     const absolute = path.resolve(rootDir, documentPath);
-    if (
-      !absolute.startsWith(collection.folder + path.sep) ||
-      !absolute.endsWith(collection.adapter.extension)
-    ) {
+    if (!absolute.startsWith(collection.absoluteFolder + path.sep)) {
       throw new Error(
         `Path "${documentPath}" is outside collection "${collection.schema.name}".`
       );
     }
+    if (!absolute.endsWith(collection.adapter.extension)) {
+      throw new Error(
+        `Path "${documentPath}" is not a ${collection.adapter.extension} file in collection "${collection.schema.name}".`
+      );
+    }
     return absolute;
   };
+
+  // The document id is the root-relative posix path (ADR-017) — derived from the
+  // resolved absolute so a non-canonical client path (…/nested/../x.mdx) can't
+  // leak into the index or the echoed entry.
+  const documentIdFor = (absolute: string): string =>
+    path.relative(rootDir, absolute).split(path.sep).join('/');
 
   return {
     async get(collectionName, documentPath) {
@@ -109,33 +142,35 @@ export const createLocalDataLayer = (
       try {
         raw = await fs.readFile(absolute, 'utf8');
       } catch (cause) {
-        if ((cause as NodeJS.ErrnoException).code === 'ENOENT') return null;
+        if (isMissingFileError(cause)) return null;
         throw cause;
       }
-      return { path: documentPath, document: collection.adapter.parse(raw) };
+      return {
+        path: documentIdFor(absolute),
+        document: collection.adapter.parse(raw),
+      };
     },
 
     async list(collectionName) {
       const collection = collectionFor(collectionName);
       let names: string[];
       try {
-        names = (await fs.readdir(collection.folder, { recursive: true })).map(
-          String
-        );
+        names = await fs.readdir(collection.absoluteFolder, {
+          recursive: true,
+        });
       } catch (cause) {
         // A not-yet-created collection folder is an empty collection.
-        if ((cause as NodeJS.ErrnoException).code === 'ENOENT') return [];
+        if (isMissingFileError(cause)) return [];
         throw cause;
       }
       const entries: DocumentEntry[] = [];
       for (const name of names.sort()) {
         if (!name.endsWith(collection.adapter.extension)) continue;
-        const absolute = path.join(collection.folder, name);
+        const absolute = path.join(collection.absoluteFolder, name);
         try {
           const raw = await fs.readFile(absolute, 'utf8');
           entries.push({
-            // Paths are the document id: root-relative posix (ADR-017).
-            path: path.relative(rootDir, absolute).split(path.sep).join('/'),
+            path: documentIdFor(absolute),
             document: collection.adapter.parse(raw),
           });
         } catch (cause) {
@@ -150,6 +185,7 @@ export const createLocalDataLayer = (
     async update(collectionName, documentPath, value) {
       const collection = collectionFor(collectionName);
       const absolute = resolveDocumentPath(collection, documentPath);
+      const canonicalPath = documentIdFor(absolute);
       // Merge over the file's current contents so unknown fields and the body
       // survive (format-adapters.ts); a missing file is written fresh — never
       // lose the edit (ADR-018).
@@ -157,70 +193,43 @@ export const createLocalDataLayer = (
       try {
         previousRaw = await fs.readFile(absolute, 'utf8');
       } catch (cause) {
-        if ((cause as NodeJS.ErrnoException).code !== 'ENOENT') throw cause;
+        if (!isMissingFileError(cause)) throw cause;
       }
-      const raw = collection.adapter.serialize(value, previousRaw);
+      // An isBody field is the markdown body, not frontmatter — a client
+      // echoing it back must not land the rich-text AST in the YAML merge
+      // (previousRaw still owns the real body).
+      const bodyFields = new Set(
+        collection.schema.fields
+          .filter((field) => field.isBody)
+          .map((field) => field.name)
+      );
+      const frontmatter = Object.fromEntries(
+        Object.entries(value).filter(([key]) => !bodyFields.has(key))
+      );
+      const raw = collection.adapter.serialize(frontmatter, previousRaw);
       // The parent folder may have been deleted out-of-band — same promise.
       await fs.mkdir(path.dirname(absolute), { recursive: true });
       await fs.writeFile(absolute, raw);
       // Keep the GraphQL index in step with the save — only once it exists;
       // a not-yet-booted pipeline indexes everything fresh on first query.
-      // ponytail: no fs watcher, out-of-band edits go stale until the next
-      // save; add chokidar when that bites.
+      // Deliberately no fs watcher: out-of-band edits go stale until the
+      // next save; add chokidar when that bites.
       if (pipeline) {
+        const readyPipeline = await pipeline;
         try {
-          await (await pipeline).reindexPaths([documentPath]);
+          await readyPipeline.reindexPaths([canonicalPath]);
         } catch (cause) {
           // The file is already written — a reindex failure must not fail the
           // save; the index self-heals on the next successful reindex/boot.
-          console.warn(`Reindex failed for "${documentPath}":`, cause);
+          console.warn(`Reindex failed for "${canonicalPath}":`, cause);
         }
       }
-      return { path: documentPath, document: collection.adapter.parse(raw) };
+      return { path: canonicalPath, document: collection.adapter.parse(raw) };
     },
 
-    graphql: async (query, variables) =>
-      (await graphQLPipeline()).execute(query, variables),
+    graphql: async (query, variables) => {
+      const readyPipeline = await graphQLPipeline();
+      return readyPipeline.execute(query, variables);
+    },
   };
-};
-
-// The wire protocol: one JSON request per operation, validated at the trust
-// boundary. Transport-agnostic — the host (Vite middleware, express, a Next
-// route) parses the HTTP body and JSONs the result back.
-const contentRequestSchema = z.discriminatedUnion('op', [
-  z.object({ op: z.literal('list'), collection: z.string() }),
-  z.object({ op: z.literal('get'), collection: z.string(), path: z.string() }),
-  z.object({
-    op: z.literal('update'),
-    collection: z.string(),
-    path: z.string(),
-    value: z.record(z.string(), z.unknown()),
-  }),
-  // The v3 read surface: a raw GraphQL request, answered by graphql-pipeline.ts.
-  z.object({
-    op: z.literal('graphql'),
-    query: z.string(),
-    variables: z.record(z.string(), z.unknown()).optional(),
-  }),
-]);
-
-export type ContentRequest = z.infer<typeof contentRequestSchema>;
-
-// Returns DocumentEntry shapes for the provider ops, or the GraphQL
-// { data, errors } envelope for `graphql` — the host JSONs it either way.
-export const handleContentRequest = async (
-  provider: LocalDataLayer,
-  request: unknown
-): Promise<unknown> => {
-  const parsed = contentRequestSchema.parse(request);
-  switch (parsed.op) {
-    case 'list':
-      return provider.list(parsed.collection);
-    case 'get':
-      return provider.get(parsed.collection, parsed.path);
-    case 'update':
-      return provider.update(parsed.collection, parsed.path, parsed.value);
-    case 'graphql':
-      return provider.graphql(parsed.query, parsed.variables);
-  }
 };

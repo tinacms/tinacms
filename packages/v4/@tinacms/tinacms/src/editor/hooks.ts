@@ -1,6 +1,7 @@
 import { use, useCallback, useEffect, useRef } from 'react';
 import { useController, useFormContext, useFormState } from 'react-hook-form';
 import { useStore } from 'zustand';
+import type { ContentSlice, DocumentEntry } from '../core/content/contract';
 import type { FieldAddress } from '../core/field/address';
 import type { FieldRegistry } from '../core/field/registry';
 import { digestDocument } from '../core/form/ingest';
@@ -37,6 +38,38 @@ export function useTinaStore<Selected>(
     'useTinaStore must be used within a TinaProvider'
   );
   return useStore(runtime.store, selector);
+}
+
+// The `content` namespace is typed as an open SliceState until codegen produces
+// typed capability reads; the one cast lives here.
+export function useContentSlice(): ContentSlice {
+  const slice = useTinaStore((state) => state.content);
+  invariant(
+    slice,
+    'content-capability-missing',
+    'No content capability is mounted — pass a content plugin (e.g. localContentPlugin()) to <TinaProvider plugins>'
+  );
+  return slice as unknown as ContentSlice;
+}
+
+// Stable fallback so the selector below never returns a fresh [] per render.
+const EMPTY_DOCUMENTS: DocumentEntry[] = [];
+
+// Loads the collection through the content capability on mount (and when the
+// collection changes) and returns the slice's list cache for that collection.
+// The effect depends on the loadDocuments function (stable action ref), not the
+// slice object, so the load runs once per collection — not per slice update.
+export function useCollectionDocuments(collection: string): DocumentEntry[] {
+  const { documents, loadDocuments } = useContentSlice();
+  useEffect(() => {
+    loadDocuments(collection).catch((cause) =>
+      console.error(
+        `[tinacms] Failed to load collection "${collection}":`,
+        cause
+      )
+    );
+  }, [loadDocuments, collection]);
+  return documents[collection] ?? EMPTY_DOCUMENTS;
 }
 
 function useFormScope(hookCode: string, hookName: string): FormScope {

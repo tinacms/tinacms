@@ -7,6 +7,7 @@
 
 export type {
   ContentProvider,
+  ContentSlice,
   DocumentEntry,
 } from './core/content/contract';
 export {
@@ -19,10 +20,7 @@ export type {
   FieldSchema,
   TinaDocument,
 } from './core/schema/types';
-export {
-  type ContentSlice,
-  localContentPlugin,
-} from './plugins/content/local/local-content.plugin';
+export { localContentPlugin } from './plugins/content/local/local-content.plugin';
 export { corePlugins, t } from './plugins/fields';
 export type {
   BooleanFieldSchema,

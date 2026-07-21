@@ -2,12 +2,9 @@ import { promises as fs } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { dispatchContentRequest } from './content-request';
 import { createGraphQLPipeline } from './graphql-pipeline';
-import {
-  type LocalDataLayer,
-  createLocalDataLayer,
-  handleContentRequest,
-} from './local-data-layer';
+import { type LocalDataLayer, createLocalDataLayer } from './local-data-layer';
 
 // The real pipeline boots the whole v3 stack; these tests only care about the
 // memoization around it.
@@ -39,7 +36,12 @@ beforeEach(async () => {
   dataLayer = createLocalDataLayer({
     rootDir,
     collections: [
-      { name: 'post', path: 'content/posts', format: 'mdx', fields: [] },
+      {
+        name: 'post',
+        path: 'content/posts',
+        format: 'mdx',
+        fields: [{ name: 'body', type: 'rich-text', isBody: true }],
+      },
       // Folder intentionally never created.
       { name: 'page', path: 'content/pages', format: 'mdx', fields: [] },
     ],
@@ -125,6 +127,19 @@ describe('update', () => {
     expect(entry?.document).toEqual(saved.document);
   });
 
+  it('keeps an isBody field out of the frontmatter (the raw body owns it)', async () => {
+    await dataLayer.update('post', 'content/posts/hello.mdx', {
+      title: 'Renamed',
+      body: { type: 'root', children: [] },
+    });
+    const raw = await fs.readFile(
+      path.join(rootDir, 'content/posts/hello.mdx'),
+      'utf8'
+    );
+    expect(raw).not.toContain('body:');
+    expect(raw).toContain('Body prose.');
+  });
+
   it('writes fresh when the file is missing (never lose the edit)', async () => {
     await dataLayer.update('post', 'content/posts/new.mdx', { title: 'New' });
     const entry = await dataLayer.get('post', 'content/posts/new.mdx');
@@ -156,7 +171,16 @@ describe('trust boundary', () => {
   it('rejects paths with the wrong extension', async () => {
     await expect(
       dataLayer.get('post', 'content/posts/ignored.txt')
-    ).rejects.toThrow(/outside collection/);
+    ).rejects.toThrow(/not a \.mdx file/);
+  });
+
+  it('canonicalizes a non-canonical path in the returned entry', async () => {
+    const saved = await dataLayer.update(
+      'post',
+      'content/posts/nested/../hello.mdx',
+      { title: 'Canonical' }
+    );
+    expect(saved.path).toBe('content/posts/hello.mdx');
   });
 
   it('rejects an unknown collection', async () => {
@@ -169,17 +193,17 @@ describe('graphql pipeline', () => {
     vi.mocked(createGraphQLPipeline)
       .mockRejectedValueOnce(new Error('boot failed'))
       .mockResolvedValueOnce({
-        execute: async () => 'ok',
+        execute: async () => ({ data: {} }),
         reindexPaths: async () => {},
       });
     await expect(dataLayer.graphql('{}')).rejects.toThrow('boot failed');
-    await expect(dataLayer.graphql('{}')).resolves.toBe('ok');
+    await expect(dataLayer.graphql('{}')).resolves.toEqual({ data: {} });
     expect(createGraphQLPipeline).toHaveBeenCalledTimes(2);
   });
 
   it('a reindex failure warns but does not fail the written save', async () => {
     vi.mocked(createGraphQLPipeline).mockResolvedValueOnce({
-      execute: async () => 'ok',
+      execute: async () => ({ data: {} }),
       reindexPaths: async () => {
         throw new Error('index broke');
       },
@@ -195,14 +219,14 @@ describe('graphql pipeline', () => {
   });
 });
 
-describe('handleContentRequest', () => {
+describe('dispatchContentRequest', () => {
   it('dispatches ops', async () => {
-    const listed = await handleContentRequest(dataLayer, {
+    const listed = await dispatchContentRequest(dataLayer, {
       op: 'list',
       collection: 'post',
     });
     expect(Array.isArray(listed)).toBe(true);
-    const updated = await handleContentRequest(dataLayer, {
+    const updated = await dispatchContentRequest(dataLayer, {
       op: 'update',
       collection: 'post',
       path: 'content/posts/hello.mdx',
@@ -212,7 +236,7 @@ describe('handleContentRequest', () => {
       path: 'content/posts/hello.mdx',
       document: { title: 'Via wire' },
     });
-    const fetched = await handleContentRequest(dataLayer, {
+    const fetched = await dispatchContentRequest(dataLayer, {
       op: 'get',
       collection: 'post',
       path: 'content/posts/hello.mdx',
@@ -222,10 +246,10 @@ describe('handleContentRequest', () => {
 
   it('rejects a malformed request at the boundary', async () => {
     await expect(
-      handleContentRequest(dataLayer, { op: 'drop-tables' })
+      dispatchContentRequest(dataLayer, { op: 'drop-tables' })
     ).rejects.toThrow();
     await expect(
-      handleContentRequest(dataLayer, { op: 'get', collection: 'post' })
+      dispatchContentRequest(dataLayer, { op: 'get', collection: 'post' })
     ).rejects.toThrow();
   });
 });

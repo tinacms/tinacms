@@ -43,10 +43,15 @@ declare module '@tinacms/graphql' {
     lookup: object;
   }>;
 
+  export interface GraphQLResult {
+    data?: Record<string, unknown> | null;
+    errors?: Array<{ message: string }>;
+  }
+
   export function resolve(args: {
     database: Database;
     query: string;
     variables: object;
     verbose?: boolean;
-  }): Promise<unknown>;
+  }): Promise<GraphQLResult>;
 }

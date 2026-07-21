@@ -5,6 +5,7 @@
 
 import {
   FilesystemBridge,
+  type GraphQLResult,
   type Level,
   buildDotTinaFiles,
   createDatabaseInternal,
@@ -12,6 +13,9 @@ import {
 } from '@tinacms/graphql';
 import { SqliteLevel } from 'sqlite-level';
 import type { CollectionSchema, FieldSchema } from '../../../core/schema/types';
+
+export type { GraphQLResult } from '@tinacms/graphql';
+export type GraphQLVariables = Record<string, unknown>;
 
 export interface GraphQLPipelineOptions {
   rootDir: string;
@@ -23,7 +27,7 @@ export interface GraphQLPipelineOptions {
 
 export interface GraphQLPipeline {
   // Runs one v3 GraphQL request; returns the standard { data, errors } envelope.
-  execute(query: string, variables?: Record<string, unknown>): Promise<unknown>;
+  execute(query: string, variables?: GraphQLVariables): Promise<GraphQLResult>;
   // Re-index saved documents (root-relative posix paths) so the next execute
   // sees them.
   reindexPaths(paths: string[]): Promise<void>;
@@ -47,6 +51,8 @@ const toV3Collection = (collection: CollectionSchema) => ({
   fields: collection.fields.map(toV3Field),
 });
 
+type IndexedDocument = Record<string, unknown>;
+
 export const createGraphQLPipeline = async (
   options: GraphQLPipelineOptions
 ): Promise<GraphQLPipeline> => {
@@ -54,7 +60,7 @@ export const createGraphQLPipeline = async (
     bridge: new FilesystemBridge(options.rootDir),
     level:
       options.level ??
-      new SqliteLevel<string, Record<string, unknown>>({
+      new SqliteLevel<string, IndexedDocument>({
         filename: ':memory:',
         valueEncoding: 'json',
       }),
@@ -70,7 +76,7 @@ export const createGraphQLPipeline = async (
   await database.indexContent({ graphQLSchema, tinaSchema, lookup });
   // Reindexes run one at a time — concurrent saves must not interleave
   // read-modify-write on the shared index. A failed run doesn't block the next.
-  let indexing: Promise<unknown> = Promise.resolve();
+  let indexing: Promise<void> = Promise.resolve();
   return {
     execute: (query, variables = {}) =>
       resolve({ database, query, variables, verbose: false }),

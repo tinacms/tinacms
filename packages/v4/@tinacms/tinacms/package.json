@@ -45,6 +45,10 @@
       "types": "./src/plugins/content/local/local-data-layer.ts",
       "default": "./src/plugins/content/local/local-data-layer.ts"
     },
+    "./local-data-layer/vite": {
+      "types": "./src/plugins/content/local/local-data-layer.vite.ts",
+      "default": "./src/plugins/content/local/local-data-layer.vite.ts"
+    },
     "./adapters/next": {
       "types": "./src/adapters/next/index.ts",
       "default": "./src/adapters/next/index.ts"
@@ -64,12 +68,12 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
-    "abstract-level": "catalog:",
-    "gray-matter": "catalog:",
     "@tinacms/graphql": "workspace:*",
     "@tinacms/ui": "workspace:*",
-    "sqlite-level": "catalog:",
+    "abstract-level": "catalog:",
+    "gray-matter": "catalog:",
     "react-hook-form": "^7.80.0",
+    "sqlite-level": "catalog:",
     "zod": "catalog:",
     "zustand": "^5.0.14"
   },
