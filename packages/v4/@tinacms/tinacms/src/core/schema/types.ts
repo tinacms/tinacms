@@ -15,7 +15,7 @@ export interface CollectionSchema {
   name: string;
   label?: string;
   path?: string;
-  format?: 'md' | 'mdx' | 'json' | 'yaml';
+  format: 'md' | 'mdx' | 'json' | 'yaml';
   fields: FieldSchema[];
 }
 

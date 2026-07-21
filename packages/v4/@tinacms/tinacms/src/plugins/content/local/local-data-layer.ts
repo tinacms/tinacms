@@ -64,7 +64,7 @@ const resolveCollections = ({
     );
     resolved.set(schema.name, {
       schema,
-      adapter: formatAdapterFor(schema.format ?? 'md', formatAdapters),
+      adapter: formatAdapterFor(schema.format, formatAdapters),
       absoluteFolder: path.resolve(rootDir, schema.path),
     });
   }

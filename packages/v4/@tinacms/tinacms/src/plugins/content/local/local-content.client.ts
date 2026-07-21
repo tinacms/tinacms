@@ -34,6 +34,14 @@ const upsertByPath = (
     ? entries.map((cached) => (cached.path === entry.path ? entry : cached))
     : [...entries, entry];
 
+// The store composes many slices, so the setter hands back the generic SliceState
+// (Record<string, unknown>). This is the one place that reads our own `documents`
+// field back out as its concrete type — the single boundary cast.
+const documentsOf = (state: {
+  documents?: unknown;
+}): ContentSlice['documents'] =>
+  (state.documents as ContentSlice['documents']) ?? {};
+
 export const createContentSlice =
   (url: string): ClientSlice =>
   (set) => {
@@ -44,9 +52,9 @@ export const createContentSlice =
           op: 'list',
           collection,
         });
-        set(({ documents }) => ({
+        set((state) => ({
           documents: {
-            ...(documents as ContentSlice['documents']),
+            ...documentsOf(state),
             [collection]: response,
           },
         }));
@@ -70,8 +78,8 @@ export const createContentSlice =
         });
         // Keep the list cache honest so collection views reflect the save —
         // replace the cached entry, or append when the path is not cached yet.
-        set(({ documents }) => {
-          const cache = documents as ContentSlice['documents'];
+        set((state) => {
+          const cache = documentsOf(state);
           return {
             documents: {
               ...cache,

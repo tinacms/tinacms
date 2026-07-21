@@ -91,9 +91,11 @@ export function TinaProvider({ plugins = [], children }: TinaProviderProps) {
     );
     boot.catch((cause) => {
       if (!mounted) return;
-      const bootError =
-        cause instanceof Error ? cause : new Error(String(cause));
-      setError(bootError);
+      if (cause instanceof Error) {
+        setError(cause);
+      } else {
+        setError(new Error(String(cause)));
+      }
     });
     return () => {
       mounted = false;
