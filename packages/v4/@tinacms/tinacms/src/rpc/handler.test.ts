@@ -238,6 +238,26 @@ describe('createRpcHandler', () => {
     expect(response.status).toBe(415);
   });
 
+  it('415s a safelisted content-type that only names json in a parameter', async () => {
+    const response = await handler(
+      new Request('http://tina.local/api/tina/media/health', {
+        method: 'POST',
+        headers: { 'content-type': 'text/plain; charset=application/json' },
+      })
+    );
+    expect(response.status).toBe(415);
+  });
+
+  it('accepts application/json with a charset parameter', async () => {
+    const response = await handler(
+      new Request('http://tina.local/api/tina/media/health', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json; charset=utf-8' },
+      })
+    );
+    expect(response.status).toBe(200);
+  });
+
   it('400s a non-JSON body', async () => {
     const response = await handler(
       post('/media/list', { token: 'admin-token', raw: 'not json' })

@@ -116,9 +116,12 @@ const dispatch = async (
   }
   // CSRF guard (ADR-008): a cross-origin fetch carrying application/json always
   // triggers a CORS preflight the server never answers, so a forged cross-site POST
-  // can't reach a state-changing op — even when getSession reads a cookie.
+  // can't reach a state-changing op — even when getSession reads a cookie. Compare
+  // the MIME essence, not a substring: a safelisted type carrying the string as a
+  // parameter (text/plain; charset=application/json) sends no preflight.
   const contentType = request.headers.get('content-type') ?? '';
-  if (!contentType.toLowerCase().includes('application/json')) {
+  const mimeEssence = contentType.split(';')[0].trim().toLowerCase();
+  if (mimeEssence !== 'application/json') {
     return errorResponse(
       415,
       'unsupported-media-type',
