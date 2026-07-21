@@ -29,10 +29,13 @@ const postContentRequest = async <Result>(
 const upsertByPath = (
   entries: DocumentEntry[],
   entry: DocumentEntry
-): DocumentEntry[] =>
-  entries.some((cached) => cached.path === entry.path)
-    ? entries.map((cached) => (cached.path === entry.path ? entry : cached))
-    : [...entries, entry];
+): DocumentEntry[] => {
+  const index = entries.findIndex((cached) => cached.path === entry.path);
+  if (index === -1) return [...entries, entry];
+  const next = [...entries];
+  next[index] = entry;
+  return next;
+};
 
 // The store composes many slices, so the setter hands back the generic SliceState
 // (Record<string, unknown>). This is the one place that reads our own `documents`
