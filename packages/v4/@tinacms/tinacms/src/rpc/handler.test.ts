@@ -73,7 +73,10 @@ const post = (
 ) =>
   new Request(`http://tina.local/api/tina${path}`, {
     method: 'POST',
-    headers: opts.token ? { authorization: `Bearer ${opts.token}` } : {},
+    headers: {
+      'content-type': 'application/json',
+      ...(opts.token ? { authorization: `Bearer ${opts.token}` } : {}),
+    },
     body:
       opts.raw ??
       (opts.body === undefined ? undefined : JSON.stringify(opts.body)),
@@ -226,6 +229,13 @@ describe('createRpcHandler', () => {
       new Request('http://tina.local/api/tina/media/health')
     );
     expect(response.status).toBe(405);
+  });
+
+  it('415s a POST without a JSON content-type', async () => {
+    const response = await handler(
+      new Request('http://tina.local/api/tina/media/health', { method: 'POST' })
+    );
+    expect(response.status).toBe(415);
   });
 
   it('400s a non-JSON body', async () => {

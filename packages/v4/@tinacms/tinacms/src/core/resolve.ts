@@ -51,18 +51,17 @@ export const validateCapabilityGraph = (plugins: PluginManifest[]): void => {
   // Singleton capabilities resolve through the same order-independent override rule as
   // field types and store slices: two bases or two overrides at one capability throw;
   // an explicit `overrides` is the only sanctioned way to replace a provider.
-  composeOverridableRegistry(
-    plugins.flatMap((plugin) =>
-      (plugin.provides ?? [])
-        .filter((capability) => capability !== FIELD_CAPABILITY)
-        .map((capability) => ({
-          key: capability,
-          value: plugin,
-          isOverride: declaresCapabilityOverride(plugin, capability),
-        }))
-    ),
-    capabilityConflictError
-  );
+  const capabilityEntries = plugins.flatMap((plugin) => {
+    const singletonCapabilities = (plugin.provides ?? []).filter(
+      (capability) => capability !== FIELD_CAPABILITY
+    );
+    return singletonCapabilities.map((capability) => ({
+      key: capability,
+      value: plugin,
+      isOverride: declaresCapabilityOverride(plugin, capability),
+    }));
+  });
+  composeOverridableRegistry(capabilityEntries, capabilityConflictError);
 
   const provided = new Set(plugins.flatMap((plugin) => plugin.provides ?? []));
   for (const plugin of plugins) {
@@ -97,16 +96,18 @@ const orderPluginsByDependencies = (
 
   const ordered: PluginManifest[] = [];
   const emitted = new Set<PluginManifest>();
+  const dependenciesSatisfied = (plugin: PluginManifest): boolean => {
+    if (emitted.has(plugin)) return false;
+    const dependencies = plugin.dependsOn ?? [];
+    return dependencies.every((capability) => {
+      const providers = providersOf.get(capability) ?? [];
+      return providers.every(
+        (provider) => provider === plugin || emitted.has(provider)
+      );
+    });
+  };
   while (ordered.length < plugins.length) {
-    const ready = plugins.filter(
-      (plugin) =>
-        !emitted.has(plugin) &&
-        (plugin.dependsOn ?? []).every((capability) =>
-          (providersOf.get(capability) ?? []).every(
-            (provider) => provider === plugin || emitted.has(provider)
-          )
-        )
-    );
+    const ready = plugins.filter(dependenciesSatisfied);
     invariant(
       ready.length > 0,
       'capability-cycle',

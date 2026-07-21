@@ -114,6 +114,17 @@ const dispatch = async (
   if (request.method !== 'POST') {
     return errorResponse(405, 'method-not-allowed', 'RPC operations are POST.');
   }
+  // CSRF guard (ADR-008): a cross-origin fetch carrying application/json always
+  // triggers a CORS preflight the server never answers, so a forged cross-site POST
+  // can't reach a state-changing op — even when getSession reads a cookie.
+  const contentType = request.headers.get('content-type') ?? '';
+  if (!contentType.toLowerCase().includes('application/json')) {
+    return errorResponse(
+      415,
+      'unsupported-media-type',
+      'RPC requests must be application/json.'
+    );
+  }
   // Adapters mount at an arbitrary base path — the route is the last two segments.
   const segments = new URL(request.url).pathname.split('/').filter(Boolean);
   const namespace = segments.at(-2);

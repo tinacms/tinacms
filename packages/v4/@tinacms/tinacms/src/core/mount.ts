@@ -1,5 +1,9 @@
 import { invariant } from './invariant';
-import { type PluginManifest, isSingletonSliceCapability } from './plugin';
+import {
+  type Capability,
+  type PluginManifest,
+  isSingletonSliceCapability,
+} from './plugin';
 
 // Where a plugin mounts, on either side of the boundary: the client store slice and the
 // server ops namespace resolve through this one rule so `get().media.*` and
@@ -12,11 +16,15 @@ export interface CapabilityMount {
 
 export const declaresCapabilityOverride = (
   manifest: PluginManifest,
-  capability: string
-): boolean =>
-  (manifest.overrides ?? []).some(
-    (override) => override.capability === capability
-  );
+  capability: Capability
+): boolean => {
+  for (const override of manifest.overrides ?? []) {
+    if (override.capability === capability) {
+      return true;
+    }
+  }
+  return false;
+};
 
 // A plugin providing a singleton capability mounts at that key; anything else mounts
 // under the plugin name. Swapping providers (tinaCloudAuth → auth0Auth) leaves
