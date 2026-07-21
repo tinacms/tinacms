@@ -52,7 +52,7 @@ export const validateCapabilityGraph = (plugins: PluginManifest[]): void => {
   // field types and store slices: two bases or two overrides at one capability throw;
   // an explicit `overrides` is the only sanctioned way to replace a provider.
   const capabilityEntries = plugins.flatMap((plugin) => {
-    const singletonCapabilities = (plugin.provides ?? []).filter(
+    const singletonCapabilities = plugin.provides.filter(
       (capability) => capability !== FIELD_CAPABILITY
     );
     return singletonCapabilities.map((capability) => ({
@@ -63,9 +63,9 @@ export const validateCapabilityGraph = (plugins: PluginManifest[]): void => {
   });
   composeOverridableRegistry(capabilityEntries, capabilityConflictError);
 
-  const provided = new Set(plugins.flatMap((plugin) => plugin.provides ?? []));
+  const provided = new Set(plugins.flatMap((plugin) => plugin.provides));
   for (const plugin of plugins) {
-    for (const capability of plugin.dependsOn ?? []) {
+    for (const capability of plugin.dependsOn) {
       invariant(
         provided.has(capability),
         'capability-no-provider',
@@ -86,7 +86,7 @@ const orderPluginsByDependencies = (
 ): PluginManifest[] => {
   const providersOf = new Map<Capability, PluginManifest[]>();
   for (const plugin of plugins) {
-    for (const capability of plugin.provides ?? []) {
+    for (const capability of plugin.provides) {
       providersOf.set(capability, [
         ...(providersOf.get(capability) ?? []),
         plugin,
@@ -98,7 +98,7 @@ const orderPluginsByDependencies = (
   const emitted = new Set<PluginManifest>();
   const dependenciesSatisfied = (plugin: PluginManifest): boolean => {
     if (emitted.has(plugin)) return false;
-    const dependencies = plugin.dependsOn ?? [];
+    const dependencies = plugin.dependsOn;
     return dependencies.every((capability) => {
       const providers = providersOf.get(capability) ?? [];
       return providers.every(
@@ -144,7 +144,12 @@ export const initializePlugins = async (
         failures.push(cause);
       }
     }
-    if (failures.length > 0) throw failures[0];
+    // Surface every teardown failure, not just the first — a later onDestroy
+    // throwing must not hide an earlier one.
+    if (failures.length === 1) throw failures[0];
+    if (failures.length > 1) {
+      throw new AggregateError(failures, 'Plugin teardown failed.');
+    }
   };
   for (const plugin of orderPluginsByDependencies(plugins)) {
     try {

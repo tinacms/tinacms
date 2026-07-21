@@ -121,7 +121,10 @@ export const resolveClientSegments = async (
   return resolved;
 };
 
-export interface PluginManifest {
+// The authoring shape passed to definePlugin: the list fields are optional so a
+// plugin only spells out what it uses. definePlugin normalizes them, so every
+// consumer works with PluginManifest below and never guards with `?? []`.
+export interface PluginManifestInput {
   name: string;
   // Honored today: `name`, `client`, `server`, `provides` (mount key), `dependsOn`
   // (graph order, core/resolve.ts), `overrides`, and `requires` (RPC transport gate).
@@ -141,5 +144,19 @@ export interface PluginManifest {
   onDestroy?: () => void | Promise<void>;
 }
 
-export const definePlugin = (manifest: PluginManifest): PluginManifest =>
-  manifest;
+// The normalized manifest every consumer reads: definePlugin has filled the list
+// fields, so `provides`/`dependsOn`/`overrides` are always arrays (no `?? []`).
+export interface PluginManifest extends PluginManifestInput {
+  provides: Capability[];
+  dependsOn: Capability[];
+  overrides: CapabilityOverride[];
+}
+
+export const definePlugin = (
+  manifest: PluginManifestInput
+): PluginManifest => ({
+  ...manifest,
+  provides: manifest.provides ?? [],
+  dependsOn: manifest.dependsOn ?? [],
+  overrides: manifest.overrides ?? [],
+});

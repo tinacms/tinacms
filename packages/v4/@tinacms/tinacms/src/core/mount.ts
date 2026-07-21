@@ -18,7 +18,7 @@ export const declaresCapabilityOverride = (
   manifest: PluginManifest,
   capability: Capability
 ): boolean => {
-  for (const override of manifest.overrides ?? []) {
+  for (const override of manifest.overrides) {
     if (override.capability === capability) {
       return true;
     }
@@ -32,7 +32,7 @@ export const declaresCapabilityOverride = (
 export const capabilityMountFor = (
   manifest: PluginManifest
 ): CapabilityMount => {
-  const singletons = (manifest.provides ?? []).filter(
+  const singletons = manifest.provides.filter(
     isSingletonSliceCapability
   );
   invariant(
