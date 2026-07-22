@@ -55,22 +55,19 @@ const classesFor = (
   return [base, phase].filter(Boolean).join(' ');
 };
 
-/**
- * Resolves once every CSS transition/animation on `el` **and its descendants**
- * has finished. Used for both directions: it lets a parent <Transition> with no
- * classes of its own stay mounted until its <TransitionChild> has finished
- * leaving, and it lets us detect when an enter transition has landed so we can
- * drop the transition classes.
- */
 const waitForAnimations = (el: HTMLElement | null): Promise<void> => {
   if (!el?.getAnimations) {
     return Promise.resolve();
   }
-  const animations = el.getAnimations({ subtree: true });
+  const animations = el
+    .getAnimations({ subtree: true })
+    .filter(
+      (a) =>
+        a.effect?.getComputedTiming().iterations !== Number.POSITIVE_INFINITY
+    );
   if (animations.length === 0) {
     return Promise.resolve();
   }
-  // allSettled, not all: a cancelled transition still counts as "done".
   return Promise.allSettled(animations.map((a) => a.finished)).then(() => {});
 };
 
