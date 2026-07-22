@@ -72,7 +72,7 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
   identityApiUrl: string;
   frontendUrl: string;
   token: string; // used with memory storage
-  setToken: (_token: TokenObject) => void;
+  setToken: (_token: TokenObject | null) => void;
   getToken: () => Promise<TokenObject>;
 
   constructor({
@@ -176,6 +176,9 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
     refresh_token?: string;
   }): Promise<TokenObject> {
     const { access_token, id_token, refresh_token } = tokens;
+    if (!access_token) {
+      throw new Error('Unable to refresh auth tokens: missing access_token');
+    }
     const { client_id, exp } = this.parseJwt(access_token);
 
     // if the token is going to expire within the next two minutes, refresh it now
@@ -198,7 +201,7 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
         const val = await res.json();
         if (res.status !== 200) {
           throw new Error(
-            `Unable to refresh auth tokens. Status: ${res.status} - Body: ${val}`
+            `Unable to refresh auth tokens. Status: ${res.status} - Body: ${JSON.stringify(val)}`
           );
         }
         const newToken = {
@@ -207,14 +210,14 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
           refresh_token: refresh_token,
         };
         this.setToken(newToken);
-        return Promise.resolve(newToken);
+        return newToken;
       } catch (e) {
         console.error(e);
-        throw new Error('Unable to refresh auth tokens');
+        throw new Error('Unable to refresh auth tokens', { cause: e });
       }
     }
 
-    return Promise.resolve({ access_token, id_token, refresh_token });
+    return { access_token, id_token, refresh_token };
   }
   parseJwt(token) {
     const base64Url = token.split('.')[1];
