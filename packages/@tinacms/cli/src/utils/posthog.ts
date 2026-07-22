@@ -68,6 +68,9 @@ export function postHogCapture(
       properties: {
         ...properties,
         system: 'tinacms/cli',
+        // Bill as anonymous events: distinctId is a throwaway per-run UUID, so
+        // person profiles would be single-use junk at ~4x the event price.
+        $process_person_profile: false,
       },
     });
   } catch (error) {

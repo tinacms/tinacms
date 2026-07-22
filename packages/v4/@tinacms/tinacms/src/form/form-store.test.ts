@@ -1,10 +1,12 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { toFieldAddress } from '../core/field/address';
 import {
   type FormId,
   fieldDirty,
   formStatus,
+  toDocument,
   toFormId,
+  toFormValues,
   useFormStore,
 } from './form-store';
 
@@ -13,10 +15,6 @@ const postA = toFormId('posts/a.mdx');
 const postB = toFormId('posts/b.mdx');
 const store = useFormStore;
 const statusOf = (formId: FormId) => formStatus(store.getState().forms[formId]);
-
-beforeEach(() => {
-  store.setState({ forms: {} });
-});
 
 describe('form-store registration', () => {
   it('a freshly registered form is pristine', () => {
@@ -38,6 +36,16 @@ describe('form-store registration', () => {
     store.getState().registerForm(postA, { [title]: 'Hello' });
     expect(store.getState().forms[postA].values[title]).toBe('Edited');
     expect(statusOf(postA)).toBe('dirty');
+  });
+});
+
+describe('form-store document round trip', () => {
+  it('toDocument inverts toFormValues key for key, on a copy', () => {
+    const document = { title: 'Hello', featured: true };
+    const values = toFormValues(document);
+    const roundTripped = toDocument(values);
+    expect(roundTripped).toEqual(document);
+    expect(roundTripped).not.toBe(values);
   });
 });
 
@@ -88,6 +96,75 @@ describe('form-store save reset', () => {
     // Baseline moved to the saved value: returning to the original is now dirty.
     store.getState().setFieldValue(postA, title, 'Hello');
     expect(statusOf(postA)).toBe('dirty');
+  });
+
+  it('markSaved with a pre-save snapshot keeps in-flight edits dirty', () => {
+    store.getState().registerForm(postA, { [title]: 'Hello' });
+    store.getState().setFieldValue(postA, title, 'Saved value');
+    const snapshot = { ...store.getState().forms[postA].values };
+
+    // Edit typed while the save was in flight: baseline is the snapshot, not
+    // the current values, so the newer edit still diffs dirty.
+    store.getState().setFieldValue(postA, title, 'Newer edit');
+    store.getState().markSaved(postA, snapshot);
+    expect(statusOf(postA)).toBe('dirty');
+
+    // Reverting to what was actually saved is clean against the new baseline.
+    store.getState().setFieldValue(postA, title, 'Saved value');
+    expect(statusOf(postA)).toBe('clean');
+  });
+});
+
+describe('form-store error mirror', () => {
+  const scope = () => store.getState().forms[postA];
+
+  it('stores mirrored errors on an edited scope and clears them on a clean write', () => {
+    store.getState().registerForm(postA, { [title]: 'Hello' });
+    store.getState().setFieldValue(postA, title, 'x');
+    store.getState().setFieldErrors(postA, { [title]: ['Too short'] });
+    expect(scope().errors[title]).toEqual(['Too short']);
+
+    store.getState().setFieldErrors(postA, {});
+    expect(scope().errors).toEqual({});
+  });
+
+  it('no-ops on a pristine scope — never validated, nothing to mirror', () => {
+    store.getState().registerForm(postA, { [title]: 'Hello' });
+    store.getState().setFieldErrors(postA, { [title]: ['Too short'] });
+    expect(scope().status).toBe('pristine');
+    expect(statusOf(postA)).toBe('pristine');
+  });
+
+  it('an equal map write and an error write both preserve identities they must not churn', () => {
+    store.getState().registerForm(postA, { [title]: 'Hello' });
+    store.getState().setFieldValue(postA, title, 'x');
+    store.getState().setFieldErrors(postA, { [title]: ['Too short'] });
+    const before = scope();
+
+    // Same content, fresh arrays — RHF rebuilds these per keystroke.
+    store.getState().setFieldErrors(postA, { [title]: ['Too short'] });
+    expect(scope()).toBe(before);
+
+    // A differing write replaces errors but must keep the values reference:
+    // error mirroring must not read as a value change to the preview wire.
+    store.getState().setFieldErrors(postA, {});
+    expect(scope().values).toBe(before.values);
+  });
+
+  it('value writes preserve mirrored errors until RHF re-derives', () => {
+    store.getState().registerForm(postA, { [title]: 'Hello' });
+    store.getState().setFieldValue(postA, title, 'x');
+    store.getState().setFieldErrors(postA, { [title]: ['Too short'] });
+    store.getState().setFieldValue(postA, title, 'xy');
+    expect(scope().errors[title]).toEqual(['Too short']);
+  });
+
+  it('markSaved carries errors through', () => {
+    store.getState().registerForm(postA, { [title]: 'Hello' });
+    store.getState().setFieldValue(postA, title, 'x');
+    store.getState().setFieldErrors(postA, { [title]: ['Too short'] });
+    store.getState().markSaved(postA);
+    expect(scope().errors[title]).toEqual(['Too short']);
   });
 });
 

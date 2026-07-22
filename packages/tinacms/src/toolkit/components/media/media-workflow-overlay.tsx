@@ -1,12 +1,5 @@
-import { CreateBranchPromptModal } from '@toolkit/form-builder/create-branch-modal';
-import { EditorialWorkflowProgressModal } from '@toolkit/form-builder/editorial-workflow-progress-modal';
-import {
-  type MediaWorkflowConfirmBranchEvent,
-  TARGET_BRANCH_EXISTS_ERROR,
-  checkBaseBranchExists,
-  checkTargetBranchExists,
-} from '@toolkit/form-builder/editorial-workflow-utils';
-import { getEditorialWorkflowErrorMessage } from '@toolkit/form-builder/use-editorial-workflow';
+import { CircleAlert } from 'lucide-react';
+import * as React from 'react';
 import { useBranchData } from '@toolkit/plugin-branch-switcher';
 import { useCMS } from '@toolkit/react-core';
 import {
@@ -15,8 +8,14 @@ import {
   ModalHeader,
   PopupModal,
 } from '@toolkit/react-modals';
-import { CircleAlert } from 'lucide-react';
-import * as React from 'react';
+import { CreateBranchPromptModal } from '@toolkit/form-builder/create-branch-modal';
+import {
+  checkBranchGuard,
+  type MediaWorkflowConfirmBranchEvent,
+  TARGET_BRANCH_EXISTS_ERROR,
+} from '@toolkit/form-builder/editorial-workflow-utils';
+import { EditorialWorkflowProgressModal } from '@toolkit/form-builder/editorial-workflow-progress-modal';
+import { getEditorialWorkflowErrorMessage } from '@toolkit/form-builder/use-editorial-workflow';
 
 type WorkflowState =
   | { phase: 'idle' }
@@ -127,9 +126,10 @@ export const MediaWorkflowOverlay = () => {
       errorMessage: '',
     });
 
-    const baseBranchExists = await checkBaseBranchExists(
+    const { baseBranchExists, targetBranchExists } = await checkBranchGuard(
       cms.api.tina,
       confirmState.baseBranch,
+      targetBranch,
       'media workflow',
       abortController.signal
     );
@@ -148,15 +148,6 @@ export const MediaWorkflowOverlay = () => {
       });
       return;
     }
-
-    const targetBranchExists = await checkTargetBranchExists(
-      cms.api.tina,
-      targetBranch,
-      'media workflow',
-      abortController.signal
-    );
-
-    if (abortController.signal.aborted) return;
 
     if (targetBranchExists) {
       if (preflightAbortRef.current === abortController) {

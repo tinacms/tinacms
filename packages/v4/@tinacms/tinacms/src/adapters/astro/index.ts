@@ -1,4 +1,4 @@
-// Server-only — `tinacms/astro`.
+// Server-only — `tinacms/adapters/astro`.
 // Mounts the runtime-composed RPC handler as Astro endpoint handlers.
 //
 // Intended exports:

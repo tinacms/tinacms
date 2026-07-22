@@ -66,6 +66,7 @@ export class DevCommand extends BaseCommand {
     });
     logger.info('🦙 TinaCMS Dev Server is initializing...');
     this.logDeprecationWarnings();
+    this.warnOnVersionSkew(configManager.rootPath);
 
     // Initialize the host TCP server
     createDBServer(Number(this.datalayerPort));
