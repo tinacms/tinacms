@@ -23,8 +23,9 @@ export abstract class AbstractAuthProvider implements AuthProvider {
   async fetchWithToken(input: Input, init: Init): FetchReturn {
     const headers = init?.headers || {};
     const token = await this.getToken();
-    if (token?.id_token) {
-      headers['Authorization'] = 'Bearer ' + token?.id_token;
+    const accessToken = token?.id_token ?? token?.access_token;
+    if (accessToken) {
+      headers['Authorization'] = 'Bearer ' + accessToken;
     }
     return await fetch(input, {
       ...(init || {}),
@@ -94,7 +95,9 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
     switch (tokenStorage) {
       case 'LOCAL_STORAGE':
         this.getToken = async function () {
-          const tokens = localStorage.getItem(AUTH_TOKEN_KEY) || null;
+          const tokens = JSON.parse(
+            localStorage.getItem(AUTH_TOKEN_KEY) || null
+          );
           if (tokens) {
             return await this.getRefreshedToken(tokens);
           } else {
@@ -112,7 +115,8 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
       case 'MEMORY':
         this.getToken = async () => {
           if (this.token) {
-            return await this.getRefreshedToken(this.token);
+            const tokens = JSON.parse(this.token);
+            return await this.getRefreshedToken(tokens);
           } else {
             return {
               access_token: null,
@@ -166,41 +170,48 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
     this.setToken(null);
   }
 
-  async getRefreshedToken(tokens: string): Promise<TokenObject> {
-    const { access_token, id_token, refresh_token } = JSON.parse(tokens);
-    const { exp, iss, client_id } = this.parseJwt(access_token);
+  async getRefreshedToken(tokens: {
+    access_token?: string;
+    id_token?: string;
+    refresh_token?: string;
+  }): Promise<TokenObject> {
+    const { access_token, id_token, refresh_token } = tokens;
+    const { client_id, exp } = this.parseJwt(access_token);
 
     // if the token is going to expire within the next two minutes, refresh it now
     if (Date.now() / 1000 >= exp - 120) {
-      const refreshResponse = await fetch(iss, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-amz-json-1.1',
-          'x-amz-target': 'AWSCognitoIdentityProviderService.InitiateAuth',
-        },
-        body: JSON.stringify({
-          ClientId: client_id,
-          AuthFlow: 'REFRESH_TOKEN_AUTH',
-          AuthParameters: {
-            REFRESH_TOKEN: refresh_token,
-            DEVICE_KEY: null,
-          },
-        }),
-      });
+      const url = `${this.identityApiUrl}/oauth/token`;
 
-      if (refreshResponse.status !== 200) {
+      const params = new URLSearchParams();
+      params.set('grant_type', 'refresh_token');
+      params.set('refresh_token', refresh_token);
+      params.set('client_id', client_id);
+
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: params.toString(),
+        });
+        const val = await res.json();
+        if (res.status !== 200) {
+          throw new Error(
+            `Unable to refresh auth tokens. Status: ${res.status} - Body: ${val}`
+          );
+        }
+        const newToken = {
+          access_token: val.access_token,
+          id_token: val.id_token,
+          refresh_token: refresh_token,
+        };
+        this.setToken(newToken);
+        return Promise.resolve(newToken);
+      } catch (e) {
+        console.error(e);
         throw new Error('Unable to refresh auth tokens');
       }
-
-      const responseJson = await refreshResponse.json();
-      const newToken = {
-        access_token: responseJson.AuthenticationResult.AccessToken,
-        id_token: responseJson.AuthenticationResult.IdToken,
-        refresh_token,
-      };
-      this.setToken(newToken);
-
-      return Promise.resolve(newToken);
     }
 
     return Promise.resolve({ access_token, id_token, refresh_token });
