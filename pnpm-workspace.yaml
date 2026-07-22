@@ -236,7 +236,7 @@ catalog:
     remark-gfm: ^2.0.0
     remark-mdx: 2.3.0
     search-index: 4.0.0
-    sharp: ^0.33.5
+    sharp: ^0.35.0
     sqlite-level: ^2.1.0
     stopword: ^3.1.4
     stringify-entities: 4.0.3
