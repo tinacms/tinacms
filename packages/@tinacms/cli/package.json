@@ -89,7 +89,7 @@
         "esbuild": "catalog:",
         "fs-extra": "catalog:",
         "graphql": "15.8.0",
-        "js-yaml": "^4.1.0",
+        "js-yaml": "^3.15.0",
         "many-level": "catalog:",
         "memory-level": "catalog:",
         "minimatch": "catalog:",
