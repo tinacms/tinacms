@@ -16,7 +16,7 @@ jest.mock('./tailwind', () => ({
 import type { Database } from '@tinacms/graphql';
 import type { ConfigManager } from '../config-manager';
 import * as filterPublicEnvModule from './filterPublicEnv';
-import { createConfig } from './index';
+import { createConfig, getBasePath } from './index';
 
 /** Minimal stub satisfying the properties createConfig reads. */
 function stubConfigManager(): ConfigManager {
@@ -61,6 +61,50 @@ const FAKE_PUBLIC_ENV = {
   NODE_ENV: 'test',
   HEAD: 'main',
 };
+
+describe('getBasePath', () => {
+  const stubWithBasePath = (basePath: string | undefined) => {
+    const cm = stubConfigManager();
+    cm.config.build.basePath = basePath;
+    return cm;
+  };
+
+  it('returns /admin/ when basePath is empty', () => {
+    expect(getBasePath(stubConfigManager())).toBe('/admin/');
+  });
+
+  it('returns /admin/ when basePath is omitted from the config', () => {
+    expect(getBasePath(stubWithBasePath(undefined))).toBe('/admin/');
+  });
+
+  it('prefixes a configured basePath', () => {
+    expect(getBasePath(stubWithBasePath('blog'))).toBe('/blog/admin/');
+  });
+
+  it('supports nested basePaths', () => {
+    expect(getBasePath(stubWithBasePath('foo/bar'))).toBe('/foo/bar/admin/');
+  });
+
+  it('always starts and ends with a slash', () => {
+    for (const basePath of ['', 'blog', 'foo/bar']) {
+      const base = getBasePath(stubWithBasePath(basePath));
+      expect(base.startsWith('/')).toBe(true);
+      expect(base.endsWith('/')).toBe(true);
+    }
+  });
+
+  it('matches the base createConfig sets', async () => {
+    const cm = stubWithBasePath('blog');
+    const config = await createConfig({
+      configManager: cm,
+      database: {} as Database,
+      apiURL: 'http://localhost:4001/graphql',
+      noWatch: true,
+    });
+
+    expect(config.base).toBe(getBasePath(cm));
+  });
+});
 
 describe('createConfig', () => {
   let spy: jest.SpyInstance;
