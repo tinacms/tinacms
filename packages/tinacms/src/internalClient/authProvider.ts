@@ -210,7 +210,7 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
           refresh_token: val.refresh_token ?? refresh_token,
         };
         this.setToken(newToken);
-        return newToken;
+        return Promise.resolve(newToken);
       } catch (e) {
         console.error(e);
         throw new Error('Unable to refresh auth tokens', { cause: e });
