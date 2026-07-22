@@ -144,7 +144,7 @@ catalog:
     auto-bind: ^4.0.0
     autoprefixer: ^10.4.20
     axios: 1.7.5
-    body-parser: ^1.20.3
+    body-parser: ^1.20.6
     busboy: ^1.6.0
     c8: ^7.14.0
     ccount: 2.0.1
