@@ -292,8 +292,9 @@ mutation addPendingDocumentMutation(
     const headers = {
       'Content-Type': 'application/json',
     };
-    if (token?.id_token) {
-      headers['Authorization'] = 'Bearer ' + token?.id_token;
+    const accessToken = token?.id_token ?? token?.access_token;
+    if (accessToken) {
+      headers['Authorization'] = 'Bearer ' + accessToken;
     }
     const res = await fetch(this.contentApiUrl, {
       method: 'POST',
