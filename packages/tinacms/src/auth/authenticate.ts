@@ -8,7 +8,7 @@ const TINA_LOGIN_EVENT = 'tinaCloudLogin';
 export const AUTH_TOKEN_KEY = 'tinacms-auth';
 
 export type TokenObject = {
-  id_token: string;
+  id_token?: string;
   access_token?: string;
   refresh_token?: string;
 };

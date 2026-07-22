@@ -584,7 +584,7 @@ export type Template<WithNamespace extends boolean = false> = {
 } & MaybeNamespace<WithNamespace>;
 
 type TokenObject = {
-  id_token: string;
+  id_token?: string;
   access_token?: string;
   refresh_token?: string;
 };
