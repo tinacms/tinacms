@@ -1,5 +1,11 @@
-import { CircleAlert } from 'lucide-react';
-import * as React from 'react';
+import { CreateBranchPromptModal } from '@toolkit/form-builder/create-branch-modal';
+import { EditorialWorkflowProgressModal } from '@toolkit/form-builder/editorial-workflow-progress-modal';
+import {
+  type MediaWorkflowConfirmBranchEvent,
+  TARGET_BRANCH_EXISTS_ERROR,
+  checkBranchGuard,
+} from '@toolkit/form-builder/editorial-workflow-utils';
+import { getEditorialWorkflowErrorMessage } from '@toolkit/form-builder/use-editorial-workflow';
 import { useBranchData } from '@toolkit/plugin-branch-switcher';
 import { useCMS } from '@toolkit/react-core';
 import {
@@ -8,14 +14,8 @@ import {
   ModalHeader,
   PopupModal,
 } from '@toolkit/react-modals';
-import { CreateBranchPromptModal } from '@toolkit/form-builder/create-branch-modal';
-import {
-  checkBranchGuard,
-  type MediaWorkflowConfirmBranchEvent,
-  TARGET_BRANCH_EXISTS_ERROR,
-} from '@toolkit/form-builder/editorial-workflow-utils';
-import { EditorialWorkflowProgressModal } from '@toolkit/form-builder/editorial-workflow-progress-modal';
-import { getEditorialWorkflowErrorMessage } from '@toolkit/form-builder/use-editorial-workflow';
+import { CircleAlert } from 'lucide-react';
+import * as React from 'react';
 
 type WorkflowState =
   | { phase: 'idle' }

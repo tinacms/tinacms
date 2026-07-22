@@ -1,4 +1,7 @@
-import * as React from 'react';
+import { FieldLabel } from '@toolkit/fields';
+import { Form } from '@toolkit/forms';
+import { useLocalStorage } from '@toolkit/hooks/use-local-storage';
+import { Button, DropdownButton } from '@toolkit/styles';
 import {
   CircleAlert,
   Eye,
@@ -7,7 +10,9 @@ import {
   Globe,
   TriangleAlert,
 } from 'lucide-react';
-import { Button, DropdownButton } from '@toolkit/styles';
+import * as React from 'react';
+import { EditorialWorkflowSaveEvent } from '../../lib/posthog/posthog';
+import { captureEvent } from '../../lib/posthog/posthogProvider';
 import { useCMS } from '../react-core';
 import {
   Modal,
@@ -16,19 +21,14 @@ import {
   ModalHeader,
   PopupModal,
 } from '../react-modals';
-import { FieldLabel } from '@toolkit/fields';
-import { Form } from '@toolkit/forms';
 import { EditorialWorkflowProgressModal } from './editorial-workflow-progress-modal';
 import { checkBranchGuard } from './editorial-workflow-utils';
-import { useEditorialWorkflow } from './use-editorial-workflow';
-import { useLocalStorage } from '@toolkit/hooks/use-local-storage';
 import {
   SAVE_CHOICE_KEY,
   type SaveChoice,
   resolveSaveOptions,
 } from './save-options';
-import { EditorialWorkflowSaveEvent } from '../../lib/posthog/posthog';
-import { captureEvent } from '../../lib/posthog/posthogProvider';
+import { useEditorialWorkflow } from './use-editorial-workflow';
 
 // Format the default branch name by removing content/ prefix and file extension
 const formatDefaultBranchName = (
