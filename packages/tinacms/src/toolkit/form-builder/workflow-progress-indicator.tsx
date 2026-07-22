@@ -1,5 +1,5 @@
+import { Loader2 } from 'lucide-react';
 import * as React from 'react';
-import { AiOutlineLoading } from 'react-icons/ai';
 import { WORKFLOW_STEPS, formatTime } from './use-editorial-workflow';
 
 interface WorkflowProgressIndicatorProps {
@@ -68,7 +68,7 @@ export const WorkflowProgressIndicator = ({
                     />
                   </svg>
                 ) : isActive ? (
-                  <AiOutlineLoading className='animate-spin text-lg' />
+                  <Loader2 className='animate-spin text-lg' />
                 ) : (
                   stepNumber
                 )}

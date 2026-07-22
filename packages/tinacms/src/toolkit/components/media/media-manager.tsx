@@ -9,22 +9,22 @@ import { CloseIcon, TrashIcon } from '@toolkit/icons';
 import { FullscreenModal, Modal, ModalBody } from '@toolkit/react-modals';
 import { useCMS } from '@toolkit/react-tinacms';
 import { Button, IconButton } from '@toolkit/styles';
+import {
+  ArrowDownToLine,
+  CircleAlert,
+  CloudUpload,
+  ExternalLink,
+  File,
+  Folder,
+  LayoutGrid,
+  List,
+  RefreshCw,
+  X,
+} from 'lucide-react';
 import React, { useEffect, useState, forwardRef, useRef } from 'react';
 import { createContext, useContext } from 'react';
 import * as dropzone from 'react-dropzone';
 import type { FileError } from 'react-dropzone';
-import {
-  BiArrowToBottom,
-  BiCloudUpload,
-  BiError,
-  BiFolder,
-  BiGridAlt,
-  BiLinkExternal,
-  BiListUl,
-  BiX,
-} from 'react-icons/bi';
-import { BiFile } from 'react-icons/bi';
-import { IoMdRefresh } from 'react-icons/io';
 import {
   MediaManagerContentDeletedEvent,
   MediaManagerContentUploadedEvent,
@@ -464,7 +464,7 @@ export function MediaPicker({
                   className='whitespace-nowrap'
                 >
                   Refresh
-                  <IoMdRefresh className='w-6 h-full ml-2 opacity-70 text-blue-500' />
+                  <RefreshCw className='w-6 h-full ml-2 opacity-70 text-blue-500' />
                 </Button>
                 <Button
                   busy={false}
@@ -475,7 +475,7 @@ export function MediaPicker({
                   className='whitespace-nowrap'
                 >
                   New Folder
-                  <BiFolder className='w-6 h-full ml-2 opacity-70 text-tina-orange' />
+                  <Folder className='w-6 h-full ml-2 opacity-70 text-tina-orange' />
                 </Button>
                 <UploadButton onClick={onClick} uploading={uploading} />
               </div>
@@ -571,7 +571,7 @@ const ActiveItemPreview = ({
               className='group grow-0 shrink-0'
               onClick={close}
             >
-              <BiX
+              <X
                 className={`w-7 h-auto text-gray-500 opacity-50 group-hover:opacity-100 transition duration-150 ease-out`}
               />
             </IconButton>
@@ -587,7 +587,7 @@ const ActiveItemPreview = ({
             </div>
           ) : (
             <span className='p-3 border border-gray-100 rounded overflow-hidden bg-gray-50 shadow'>
-              <BiFile className='w-14 h-auto fill-gray-300' />
+              <File className='w-14 h-auto text-gray-300' />
             </span>
           )}
           <div className='grow h-full w-full shrink flex flex-col gap-3 items-start justify-start'>
@@ -601,7 +601,7 @@ const ActiveItemPreview = ({
                   variant='primary'
                   onClick={() => selectMediaItem(activeItem)}
                 >
-                  <BiArrowToBottom className='mr-1 -ml-0.5 w-6 h-auto opacity-70' />
+                  <ArrowDownToLine className='mr-1 -ml-0.5 w-6 h-auto opacity-70' />
                   Insert
                 </Button>
               )}
@@ -632,7 +632,7 @@ const UploadButton = ({ onClick, uploading }: any) => {
       busy={uploading}
       onClick={onClick}
     >
-      Upload <BiCloudUpload className='w-6 h-full ml-2 opacity-70' />
+      Upload <CloudUpload className='w-6 h-full ml-2 opacity-70' />
     </Button>
   );
 };
@@ -700,7 +700,7 @@ const SyncStatusContainer = ({ children }) => {
     <div className='h-full flex items-center justify-center p-6 bg-gradient-to-t from-gray-200 to-transparent'>
       <div className='rounded-lg border shadow-sm px-4 lg:px-6 py-3 lg:py-4 bg-gradient-to-r from-yellow-50 to-yellow-100 border-yellow-200 mx-auto mb-12'>
         <div className='flex items-start sm:items-center gap-2'>
-          <BiError
+          <CircleAlert
             className={`w-7 h-auto flex-shrink-0 text-yellow-400 -mt-px`}
           />
           <div
@@ -713,7 +713,7 @@ const SyncStatusContainer = ({ children }) => {
               href={`${cms.api.tina.appDashboardLink}/media`}
             >
               Sync Your Media In TinaCloud.
-              <BiLinkExternal className={`w-5 h-auto flex-shrink-0`} />
+              <ExternalLink className={`w-5 h-auto flex-shrink-0`} />
             </a>
           </div>
         </div>
@@ -780,7 +780,7 @@ const ViewModeToggle = ({ viewMode, setViewMode }) => {
           setViewMode('grid');
         }}
       >
-        <BiGridAlt className='w-6 h-full opacity-70' />
+        <LayoutGrid className='w-6 h-full opacity-70' />
       </button>
       <button
         className={`${toggleClasses.base} px-2 rounded-r ${
@@ -790,7 +790,7 @@ const ViewModeToggle = ({ viewMode, setViewMode }) => {
           setViewMode('list');
         }}
       >
-        <BiListUl className='w-8 h-full opacity-70' />
+        <List className='w-8 h-full opacity-70' />
       </button>
     </div>
   );

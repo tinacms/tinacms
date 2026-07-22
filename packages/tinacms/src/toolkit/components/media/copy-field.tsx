@@ -1,5 +1,5 @@
+import { Copy } from 'lucide-react';
 import React from 'react';
-import { BiCopyAlt } from 'react-icons/bi';
 
 interface CopyFieldProps {
   label?: string;
@@ -36,7 +36,7 @@ export const CopyField = ({ label, description, value }: CopyFieldProps) => {
           copied ? `pointer-events-none` : ``
         }`}
       >
-        <BiCopyAlt className='relative text-blue-500 shrink-0 w-5 h-auto mr-1.5 -ml-0.5 z-20' />{' '}
+        <Copy className='relative text-blue-500 shrink-0 w-5 h-auto mr-1.5 -ml-0.5 z-20' />{' '}
         {value}{' '}
         {copied && (
           <span

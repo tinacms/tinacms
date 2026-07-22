@@ -1,7 +1,5 @@
+import { Files, Globe, type LucideIcon, Users } from 'lucide-react';
 import React from 'react';
-import { ImFilesEmpty, ImUsers } from 'react-icons/im';
-import type { IconType } from 'react-icons/lib';
-import { MdOutlineLanguage } from 'react-icons/md';
 import { NavLink, useLocation } from 'react-router-dom';
 
 import { Nav, NavCloudLink, NavProvider } from '@tinacms/toolkit';
@@ -52,7 +50,7 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
         <SidebarLink
           label={view.name}
           to={`/screens/${slugify(view.name)}`}
-          Icon={view.Icon ? view.Icon : ImFilesEmpty}
+          Icon={view.Icon ? view.Icon : Files}
         />
       )}
       RenderNavCloud={({ config }) => <NavCloudLink config={config} />}
@@ -60,21 +58,21 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
         <SidebarLink
           label={collection.label ? collection.label : collection.name}
           to={`/collections/${collection.name}/~`}
-          Icon={MdOutlineLanguage}
+          Icon={Globe}
         />
       )}
       RenderNavCollection={({ collection }) => (
         <SidebarLink
           label={collection.label ? collection.label : collection.name}
           to={`/collections/${collection.name}/~`}
-          Icon={ImFilesEmpty}
+          Icon={Files}
         />
       )}
       AuthRenderNavCollection={({ collection }) => (
         <SidebarLink
           label={collection.label ? collection.label : collection.name}
           to={`/collections/${collection.name}/~`}
-          Icon={ImUsers}
+          Icon={Users}
         />
       )}
     />
@@ -84,7 +82,7 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
 const SidebarLink = (props: {
   to: string;
   label: string;
-  Icon: IconType;
+  Icon: LucideIcon;
   onClick?: any;
 }): JSX.Element => {
   const { to, label, Icon } = props;

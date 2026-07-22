@@ -1,12 +1,10 @@
 import {
   Popover,
-  PopoverButton,
-  PopoverPanel,
-  Transition,
-} from '@headlessui/react';
-import { XCircleIcon } from '@heroicons/react/solid';
+  PopoverContent,
+  PopoverTrigger,
+} from '@toolkit/components/ui/popover';
+import { CircleX } from 'lucide-react';
 import React from 'react';
-import { Fragment } from 'react';
 export type EmptyTextElement = { type: 'text'; text: '' };
 export type PositionItem = {
   line?: number | null;
@@ -66,47 +64,33 @@ export function ErrorMessage({ error }: { error: InvalidMarkdownElement }) {
   const message = buildErrorMessage(error);
 
   return (
-    <Popover className='relative'>
-      {() => (
-        <>
-          <PopoverButton
-            className={`p-2 shaodw-lg border ${
-              error ? '' : ' opacity-0 hidden '
-            }`}
-          >
-            <span className='sr-only'>Errors</span>
-            <XCircleIcon className='h-5 w-5 text-red-400' aria-hidden='true' />
-          </PopoverButton>
-          <Transition
-            enter='transition ease-out duration-200'
-            enterFrom='opacity-0 translate-y-1'
-            enterTo='opacity-100 translate-y-0'
-            leave='transition ease-in duration-150'
-            leaveFrom='opacity-100 translate-y-0'
-            leaveTo='opacity-0 translate-y-1'
-          >
-            <PopoverPanel className='absolute top-8 w-[300px] -right-3 z-10 mt-3 px-4 sm:px-0'>
-              <div className='overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5'>
-                <div className='rounded bg-red-50 p-4 overflow-scroll'>
-                  <div className='flex'>
-                    <div className='flex-shrink-0'>
-                      <XCircleIcon
-                        className='h-5 w-5 text-red-400'
-                        aria-hidden='true'
-                      />
-                    </div>
-                    <div className='ml-3'>
-                      <h3 className='text-sm font-medium text-red-800 whitespace-pre-wrap'>
-                        {message}
-                      </h3>
-                    </div>
-                  </div>
-                </div>
+    <Popover>
+      <PopoverTrigger
+        className={`p-2 shaodw-lg border ${error ? '' : ' opacity-0 hidden '}`}
+      >
+        <span className='sr-only'>Errors</span>
+        <CircleX className='h-5 w-5 text-red-400' aria-hidden='true' />
+      </PopoverTrigger>
+      <PopoverContent
+        align='end'
+        sideOffset={12}
+        className='w-[300px] p-0 border-0 bg-transparent shadow-none'
+      >
+        <div className='overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5'>
+          <div className='rounded bg-red-50 p-4 overflow-scroll'>
+            <div className='flex'>
+              <div className='flex-shrink-0'>
+                <CircleX className='h-5 w-5 text-red-400' aria-hidden='true' />
               </div>
-            </PopoverPanel>
-          </Transition>
-        </>
-      )}
+              <div className='ml-3'>
+                <h3 className='text-sm font-medium text-red-800 whitespace-pre-wrap'>
+                  {message}
+                </h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </PopoverContent>
     </Popover>
   );
 }

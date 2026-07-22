@@ -1,5 +1,5 @@
+import { Check } from 'lucide-react';
 import * as React from 'react';
-import { BiCheck } from 'react-icons/bi';
 
 type Option = {
   value: string;
@@ -87,7 +87,7 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
                 : 'border-gray-200 bg-white shadow-inner group-hover:bg-gray-100'
             }`}
           >
-            <BiCheck
+            <Check
               className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[17px] h-[17px] transition ease-out duration-150 ${
                 checked
                   ? 'opacity-100 text-white group-hover:opacity-80'

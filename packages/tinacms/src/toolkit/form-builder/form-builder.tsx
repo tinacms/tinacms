@@ -2,11 +2,10 @@ import type { Form } from '@toolkit/forms';
 import { Button } from '@toolkit/styles';
 import { cn } from '@utils/cn';
 import { FORM_ERROR } from 'final-form';
-import { FileStack } from 'lucide-react';
+import { Circle, FileStack } from 'lucide-react';
 import * as React from 'react';
 import { type FC, useEffect } from 'react';
 import { Form as FinalForm } from 'react-final-form';
-import { FaCircle } from 'react-icons/fa';
 import {
   EditorialWorkflowSaveEvent,
   FormResetEvent,
@@ -377,7 +376,8 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 
 export const FormStatus = ({ pristine }: { pristine: boolean }) => {
   const pristineClass = pristine ? 'text-green-500' : 'text-red-500';
-  return <FaCircle className={cn('h-3', pristineClass)} />;
+  // fill-current keeps this a solid status dot; lucide icons are stroke-only by default.
+  return <Circle className={cn('h-3 fill-current', pristineClass)} />;
 };
 
 const RelatedFilesBanner = () => {

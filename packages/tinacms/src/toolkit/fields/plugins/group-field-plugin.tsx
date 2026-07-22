@@ -1,3 +1,4 @@
+import { Transition } from '@toolkit/components/transition';
 import {
   FieldsBuilder,
   FormWrapper,
@@ -5,11 +6,9 @@ import {
 } from '@toolkit/form-builder';
 import { Field, Form } from '@toolkit/forms';
 import { useCMS } from '@toolkit/react-core/use-cms';
+import { Pencil, X } from 'lucide-react';
 import * as React from 'react';
-import { BiPencil } from 'react-icons/bi';
-import { IoMdClose } from 'react-icons/io';
 import { wrapFieldWithNoHeader } from './wrap-field-with-meta';
-import { Transition } from '@headlessui/react';
 
 export interface GroupFieldDefinititon extends Field {
   component: 'group';
@@ -122,7 +121,7 @@ const Header = ({ onClick, children }) => {
         <span className='text-left text-base font-medium overflow-hidden text-ellipsis whitespace-nowrap flex-1'>
           {children}
         </span>{' '}
-        <BiPencil className='h-6 w-auto transition-opacity duration-150 ease-out opacity-80 group-hover:opacity-90' />
+        <Pencil className='h-6 w-auto transition-opacity duration-150 ease-out opacity-80 group-hover:opacity-90' />
       </button>
     </div>
   );
@@ -138,7 +137,7 @@ export const PanelHeader = ({ onClick, children }) => {
     >
       <div className='flex items-center justify-between gap-3 text-xs tracking-wide font-medium text-gray-700 group-hover:text-blue-400 uppercase max-w-form mx-auto'>
         {children}
-        <IoMdClose className='h-auto w-5 inline-block opacity-70 -mt-0.5 -mx-0.5' />
+        <X className='h-auto w-5 inline-block opacity-70 -mt-0.5 -mx-0.5' />
       </div>
     </button>
   );

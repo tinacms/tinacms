@@ -1,22 +1,21 @@
-import React from 'react';
 import {
   Popover,
-  PopoverButton,
-  PopoverPanel,
-  Transition,
-} from '@headlessui/react';
-import { ELEMENT_MDX_INLINE } from '.';
-import { NestedForm } from '../../nested-form';
-import { classNames } from '../ui/helpers';
-import { EllipsisIcon } from '../../components/plate-ui/icons';
-import { useEmbedHandles, useHotkey } from '../../hooks/embed-hooks';
-import { useTemplates } from '../../editor-context';
+  PopoverContent,
+  PopoverTrigger,
+} from '@toolkit/components/ui/popover';
+import { ElementApi } from '@udecode/plate';
 import {
   ParagraphPlugin,
   PlateEditor,
   useSelected,
 } from '@udecode/plate/react';
-import { ElementApi } from '@udecode/plate';
+import React from 'react';
+import { ELEMENT_MDX_INLINE } from '.';
+import { EllipsisIcon } from '../../components/plate-ui/icons';
+import { useTemplates } from '../../editor-context';
+import { useEmbedHandles, useHotkey } from '../../hooks/embed-hooks';
+import { NestedForm } from '../../nested-form';
+import { classNames } from '../ui/helpers';
 
 const Wrapper = ({ inline, children }) => {
   const Component = inline ? 'span' : 'div';
@@ -204,48 +203,38 @@ const EmbedNestedForm = ({
 
 const DotMenu = ({ onOpen, onRemove }) => {
   return (
-    <Popover as='span' className='-ml-px relative block'>
-      <PopoverButton
-        as='span'
-        className='cursor-pointer h-full relative inline-flex items-center px-1 py-0.5 rounded-r border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
-      >
+    <Popover>
+      <PopoverTrigger className='cursor-pointer h-full relative inline-flex items-center px-1 py-0.5 rounded-r border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'>
         <EllipsisIcon title='Open options' />
-      </PopoverButton>
-      <Transition
-        enter='transition ease-out duration-100'
-        enterFrom='transform opacity-0 scale-95'
-        enterTo='transform opacity-100 scale-100'
-        leave='transition ease-in duration-75'
-        leaveFrom='transform opacity-100 scale-100'
-        leaveTo='transform opacity-0 scale-95'
+      </PopoverTrigger>
+      <PopoverContent
+        align='end'
+        sideOffset={8}
+        className='z-30 w-auto p-0 rounded shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none border-0'
       >
-        <PopoverPanel className='z-30 fixed origin-top-right right-0'>
-          <div className='mt-2 -mr-1 rounded shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none'>
-            <div className='py-1'>
-              <span
-                onClick={onOpen}
-                className={classNames(
-                  'cursor-pointer text-left w-full block px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900'
-                )}
-              >
-                Edit
-              </span>
-              <button
-                type='button'
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  onRemove();
-                }}
-                className={classNames(
-                  'cursor-pointer text-left w-full block px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900'
-                )}
-              >
-                Remove
-              </button>
-            </div>
-          </div>
-        </PopoverPanel>
-      </Transition>
+        <div className='py-1'>
+          <span
+            onClick={onOpen}
+            className={classNames(
+              'cursor-pointer text-left w-full block px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900'
+            )}
+          >
+            Edit
+          </span>
+          <button
+            type='button'
+            onMouseDown={(e) => {
+              e.preventDefault();
+              onRemove();
+            }}
+            className={classNames(
+              'cursor-pointer text-left w-full block px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900'
+            )}
+          >
+            Remove
+          </button>
+        </div>
+      </PopoverContent>
     </Popover>
   );
 };

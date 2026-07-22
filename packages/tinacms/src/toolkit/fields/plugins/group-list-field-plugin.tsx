@@ -1,12 +1,12 @@
-import React from 'react';
 import type { Field, Form } from '@toolkit/forms';
-import { IconButton } from '@toolkit/styles';
-import { Droppable, Draggable, SortableProvider } from './dnd-kit-wrapper';
 import { AddIcon, DragIcon, ReorderIcon, TrashIcon } from '@toolkit/icons';
-import { useEvent } from '@toolkit/react-core/use-cms-event';
-import type { FieldHoverEvent, FieldFocusEvent } from '../field-events';
 import { useCMS } from '@toolkit/react-core/use-cms';
-import { BiPencil } from 'react-icons/bi';
+import { useEvent } from '@toolkit/react-core/use-cms-event';
+import { IconButton } from '@toolkit/styles';
+import { Pencil } from 'lucide-react';
+import React from 'react';
+import type { FieldFocusEvent, FieldHoverEvent } from '../field-events';
+import { Draggable, Droppable, SortableProvider } from './dnd-kit-wrapper';
 import { EmptyList, ListFieldMeta, ListPanel } from './list-field-meta';
 
 interface GroupFieldDefinititon extends Field {
@@ -230,7 +230,7 @@ const Item = ({
               }}
             >
               <GroupLabel>{title}</GroupLabel>
-              <BiPencil className='h-5 w-auto fill-current text-gray-200 group-hover:text-inherit transition-colors duration-150 ease-out' />
+              <Pencil className='h-5 w-auto text-gray-200 group-hover:text-inherit transition-colors duration-150 ease-out' />
             </ItemClickTarget>
             {(!fixedLength || (fixedLength && !isMin)) && (
               <ItemDeleteButton disabled={isMin} onClick={removeItem} />
