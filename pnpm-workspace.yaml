@@ -136,7 +136,7 @@ catalog:
     "@udecode/plate-trailing-block": ^48.0.0
     "@udecode/slate": ^48.0.1
     "@vercel/stega": ^0.0.5
-    "@vitejs/plugin-react": 3.1.0
+    "@vitejs/plugin-react": ^4.7.0
     abstract-level: ^1.0.4
     acorn: 8.8.2
     altair-express-middleware: ^7.3.6
@@ -161,7 +161,7 @@ catalog:
     cross-spawn: ^7.0.6
     crypto-js: ^4.2.0
     dotenv: ^16.4.7
-    esbuild: ^0.24.2
+    esbuild: ^0.25.0
     estree-util-is-identifier-name: 2.1.0
     fast-glob: ^3.3.3
     final-form: 4.20.10

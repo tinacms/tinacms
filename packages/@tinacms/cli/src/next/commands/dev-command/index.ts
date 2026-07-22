@@ -13,6 +13,7 @@ import { dangerText, warnText } from '../../../utils/theme';
 import { Codegen } from '../../codegen';
 import { ConfigManager } from '../../config-manager';
 import { createAndInitializeDatabase, createDBServer } from '../../database';
+import { getBasePath } from '../../vite';
 import { BaseCommand } from '../baseCommands';
 import { devHTML } from './html';
 import { createDevServer } from './server';
@@ -180,7 +181,10 @@ export class DevCommand extends BaseCommand {
       firstTime: true,
     });
 
-    await fs.outputFile(configManager.outputHTMLFilePath, devHTML(this.port));
+    await fs.outputFile(
+      configManager.outputHTMLFilePath,
+      devHTML(this.port, getBasePath(configManager))
+    );
     // Add the gitignore so the index.html and assets are committed to git
     await fs.outputFile(
       configManager.outputGitignorePath,
