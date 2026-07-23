@@ -36,8 +36,25 @@ export interface IslandConfig {
 
 export type IslandRegistry = Record<string, IslandConfig>;
 
+export interface IslandRouteOptions {
+  /**
+   * Options forwarded to `AstroContainer.create`. Pass `renderers` here so
+   * islands that use a UI framework (React, Vue, Svelte, ...) can be rendered —
+   * the container is created empty and, unlike the page pipeline, does not
+   * inherit renderers from the Astro config.
+   *
+   * @example
+   * import reactRenderer from '@astrojs/react/server.js';
+   * experimental_createIslandRoute(islands, {
+   *   containerOptions: { renderers: [{ name: '@astrojs/react', ssr: reactRenderer }] },
+   * });
+   */
+  containerOptions?: Parameters<typeof AstroContainer.create>[0];
+}
+
 export function experimental_createIslandRoute(
-  islands: IslandRegistry
+  islands: IslandRegistry,
+  options?: IslandRouteOptions
 ): APIRoute {
   return async ({ params, request, url }) => {
     const rejection = rejectIfUnsafe(request);
@@ -55,7 +72,7 @@ export function experimental_createIslandRoute(
       const html = await requestStore.run(request, () =>
         formsStore.run(forms, async () => {
           const data = await island.fetch(request, url.searchParams);
-          const container = await AstroContainer.create();
+          const container = await AstroContainer.create(options?.containerOptions);
           return container.renderToString(island.component, {
             props: island.propsFromData(data, url.searchParams),
           });
