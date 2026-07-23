@@ -27,11 +27,33 @@ export type ExternalTemplate = BaseExample & {
 };
 export type Template = InternalTemplate | ExternalTemplate;
 
+export const DEFAULT_TEMPLATE_VALUE = 'tina-astro-starter';
+
 export const TEMPLATES: Template[] = [
   {
-    title: '⭐ NextJS starter',
+    title: '⭐ Astro Starter',
     description:
-      'Kickstart your project with Next.js – our top recommendation for a seamless, performant, and versatile web experience.',
+      'Get started with Astro - a modern static site generator designed for fast, lightweight, and flexible web projects.',
+    value: 'tina-astro-starter',
+    isInternal: false,
+    features: [
+      {
+        name: 'Visual Editing',
+        description: '✅',
+      },
+      {
+        name: 'SSG',
+        description: '✅',
+      },
+    ],
+    gitURL: 'https://github.com/tinacms/tina-astro-starter',
+    branch: 'main',
+    devUrl: 'http://localhost:4321',
+  },
+  {
+    title: 'NextJS starter',
+    description:
+      'Kickstart your project with Next.js – a seamless, performant, and versatile web experience.',
     value: 'tina-nextjs-starter',
     isInternal: false,
     features: [
@@ -53,7 +75,7 @@ export const TEMPLATES: Template[] = [
     devUrl: 'http://localhost:3000',
   },
   {
-    title: '⭐️ TinaDocs',
+    title: 'TinaDocs',
     description:
       'Get your documentation site up and running with TinaCMS and Next.js in minutes.',
     value: 'tina-docs',
@@ -75,26 +97,6 @@ export const TEMPLATES: Template[] = [
     gitURL: 'https://github.com/tinacms/tina-docs',
     branch: 'main',
     devUrl: 'http://localhost:3000',
-  },
-  {
-    title: 'Astro Starter',
-    description:
-      'Get started with Astro - a modern static site generator designed for fast, lightweight, and flexible web projects.',
-    value: 'tina-astro-starter',
-    isInternal: false,
-    features: [
-      {
-        name: 'Visual Editing',
-        description: '✅',
-      },
-      {
-        name: 'SSG',
-        description: '✅',
-      },
-    ],
-    gitURL: 'https://github.com/tinacms/tina-astro-starter',
-    branch: 'main',
-    devUrl: 'http://localhost:4321',
   },
   {
     title: 'Hugo Starter',
