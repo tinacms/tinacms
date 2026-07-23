@@ -2,16 +2,11 @@
 
 */
 
+import { TokenObject } from '@tinacms/schema-tools';
 import popupWindow from './popupWindow';
 
 const TINA_LOGIN_EVENT = 'tinaCloudLogin';
 export const AUTH_TOKEN_KEY = 'tinacms-auth';
-
-export type TokenObject = {
-  id_token: string;
-  access_token?: string;
-  refresh_token?: string;
-};
 
 // Custom error for when user cancels authentication by closing the popup
 export class AuthenticationCancelledError extends Error {
