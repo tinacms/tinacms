@@ -56,11 +56,11 @@
     },
     "dependencies": {
         "@graphql-codegen/core": "catalog:",
-        "@graphql-codegen/plugin-helpers": "^7.0.1",
+        "@graphql-codegen/plugin-helpers": "^5.1.0",
         "@graphql-codegen/typescript": "catalog:",
         "@graphql-codegen/typescript-operations": "catalog:",
         "@graphql-codegen/visitor-plugin-common": "catalog:",
-        "@graphql-inspector/core": "^4.2.2",
+        "@graphql-inspector/core": "^6.2.1",
         "@graphql-tools/graphql-file-loader": "catalog:",
         "@graphql-tools/load": "catalog:",
         "@rollup/pluginutils": "catalog:",

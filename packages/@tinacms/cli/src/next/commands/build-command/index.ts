@@ -1,6 +1,10 @@
 import crypto from 'crypto';
 import path from 'path';
-import { ChangeType, diff } from '@graphql-inspector/core';
+import {
+  ChangeType,
+  type TypeOfChangeType,
+  diff,
+} from '@graphql-inspector/core';
 import { type Database, FilesystemBridge, buildSchema } from '@tinacms/graphql';
 import { parseURL } from '@tinacms/schema-tools';
 import {
@@ -735,7 +739,7 @@ export class BuildCommand extends BaseCommand {
           prog: '❌',
         });
 
-        const type: ChangeType = diffResult[0].type;
+        const type: TypeOfChangeType = diffResult[0].type;
         const reason = diffResult[0].message;
         const errorLevel = diffResult[0].criticality.level;
         const faqLink = getFaqLink(type);
