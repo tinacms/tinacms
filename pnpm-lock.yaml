@@ -2696,6 +2696,43 @@ importers:
         specifier: 'catalog:'
         version: 1.61.1
 
+  playwright/prebuilt-admin:
+    dependencies:
+      next:
+        specifier: 14.2.35
+        version: 14.2.35(@babel/core@7.29.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.61.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.97.3)
+      next-auth:
+        specifier: ^4.24.11
+        version: 4.24.13(next@14.2.35(@opentelemetry/api@1.9.0)(@playwright/test@1.61.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.97.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+      react-is:
+        specifier: ^18.3.1
+        version: 18.3.1
+      tinacms:
+        specifier: workspace:*
+        version: link:../../packages/tinacms
+      tinacms-authjs:
+        specifier: workspace:*
+        version: link:../../packages/tinacms-authjs
+    devDependencies:
+      '@playwright/test':
+        specifier: 'catalog:'
+        version: 1.61.1
+      '@tinacms/cli':
+        specifier: workspace:*
+        version: link:../../packages/@tinacms/cli
+      '@types/node':
+        specifier: ^22.13.1
+        version: 22.19.17
+      '@types/react':
+        specifier: ^18.3.18
+        version: 18.3.27
+
   playwright/tina-playwright:
     dependencies:
       axios:
@@ -30141,6 +30178,21 @@ snapshots:
       cookie: 0.7.2
       jose: 4.15.9
       next: 14.2.35(@babel/core@7.29.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.61.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.97.3)
+      oauth: 0.9.15
+      openid-client: 5.7.1
+      preact: 10.28.3
+      preact-render-to-string: 5.2.6(preact@10.28.3)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      uuid: 8.3.2
+
+  next-auth@4.24.13(next@14.2.35(@opentelemetry/api@1.9.0)(@playwright/test@1.61.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.97.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      '@babel/runtime': 7.28.6
+      '@panva/hkdf': 1.2.1
+      cookie: 0.7.2
+      jose: 4.15.9
+      next: 14.2.35(@opentelemetry/api@1.9.0)(@playwright/test@1.61.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.97.3)
       oauth: 0.9.15
       openid-client: 5.7.1
       preact: 10.28.3

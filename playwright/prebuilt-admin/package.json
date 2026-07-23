@@ -1,0 +1,25 @@
+{
+  "name": "playwright-prebuilt-admin",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "build:admin": "tinacms build --local --skip-cloud-checks --noTelemetry",
+    "serve:prod": "tinacms build --local --skip-cloud-checks --noTelemetry -c \"node serve-admin.mjs\"",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "next": "14.2.35",
+    "next-auth": "^4.24.11",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-is": "^18.3.1",
+    "tinacms": "workspace:*",
+    "tinacms-authjs": "workspace:*"
+  },
+  "devDependencies": {
+    "@playwright/test": "catalog:",
+    "@tinacms/cli": "workspace:*",
+    "@types/node": "^22.13.1",
+    "@types/react": "^18.3.18"
+  }
+}
