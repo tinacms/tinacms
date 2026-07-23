@@ -33,6 +33,7 @@ import { spin } from '../../../utils/spinner';
 import { dangerText, linkText, warnText } from '../../../utils/theme';
 import { logText } from '../../../utils/theme';
 import { Codegen } from '../../codegen';
+import { writeTinaLockFile } from '../../codegen/writeTinaLockFile';
 import { ConfigManager } from '../../config-manager';
 import { createAndInitializeDatabase, createDBServer } from '../../database';
 import { BaseCommand } from '../baseCommands';
@@ -224,6 +225,7 @@ export class BuildCommand extends BaseCommand {
       noClientBuildCache: this.noClientBuildCache,
     });
     const apiURL = await codegen.execute();
+    await writeTinaLockFile(configManager);
 
     // Always index the content when we're sourcing it locally (and not skipping indexing)
     if (
