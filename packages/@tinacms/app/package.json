@@ -40,7 +40,6 @@
 		"react-dom": "^18.3.1",
 		"react-router-dom": "catalog:",
 		"tinacms": "workspace:^",
-		"typescript": "^5.7.3",
 		"zod": "catalog:"
 	},
 	"repository": {
