@@ -12,8 +12,9 @@ on:
     # PRs) is seeded only from HEAD, so it cannot reproduce published-registry
     # history regressions; the scheduled run installs the fixture from the real
     # npm registry instead. See scripts/size-baseline.mjs for the full rationale.
-    # NOTE: a schedule trigger is workflow-level, so the other jobs above also
-    # run on this weekly cron.
+    # NOTE: a schedule trigger is workflow-level; unrelated jobs (build,
+    # adapter-changes) carry `if: github.event_name != 'schedule'` so the cron
+    # only exercises the size canary.
     - cron: "0 6 * * 1"
 
 permissions:
@@ -21,6 +22,7 @@ permissions:
 
 jobs:
   build:
+    if: github.event_name != 'schedule'
     strategy:
       matrix:
         os:
@@ -97,6 +99,7 @@ jobs:
   # run always exercises the matrix.
   adapter-changes:
     name: Detect adapter-relevant changes
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     outputs:
       should_run: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.adapter == 'true' }}
