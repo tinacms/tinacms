@@ -1,5 +1,31 @@
 # tinacms-cli
 
+## 2.6.0
+
+### Minor Changes
+
+- [#7283](https://github.com/tinacms/tinacms/pull/7283) [`1c89c44`](https://github.com/tinacms/tinacms/commit/1c89c44f377a56e9637d719d781ba2281ff56e37) Thanks [@kulesy](https://github.com/kulesy)! - `tinacms dev` and `tinacms build` now warn at startup when the `tinacms`, `@tinacms/graphql`, or `@tinacms/schema-tools` versions resolved from the project don't satisfy the ranges the CLI was published with, or when two different copies of `tinacms` are installed. A held-back package (stale lockfile entry, partial upgrade, pnpm `minimumReleaseAge`) previously failed silently: the admin built fine but served an older `tinacms` where newer documented features were missing.
+
+### Patch Changes
+
+- [#7297](https://github.com/tinacms/tinacms/pull/7297) [`f74e2d9`](https://github.com/tinacms/tinacms/commit/f74e2d90974e59973bbbfcf4cf118adc4726a17e) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Bump `vite` off the EOL 4.x line (`^4.5.9`, resolving to the last-ever `4.5.14`) to `^6.4.3`, and `@vitejs/plugin-react` 3 → 4, closing several path-traversal / file-disclosure advisories that were never backported to vite 4.x.
+
+  **Dev server:** Vite 6 serves its dev endpoints (`@vite/client`, `@react-refresh`, and the SPA entry) under the configured `base` — Vite 4 served them at the server root. The injected dev HTML now prefixes those URLs with the admin base path, so `tinacms dev` loads the editor again instead of failing with "Failed loading TinaCMS assets".
+
+  **esbuild:** the `esbuild` catalog pin moves `^0.24.2` → `^0.25.0` to match the version vite 6 bundles, so `@tinacms/cli` installs a single esbuild native binary instead of two.
+
+  **Other fallout from the majors:** `@vitejs/plugin-react` 4 removed the `fastRefresh` option, so Fast Refresh is now always on in `tinacms dev` (it had been explicitly disabled) — if editor HMR misbehaves, that's the knob that changed. `splitVendorChunkPlugin` (deprecated since Vite 5.2.7, still exported in 6.4.3) is deliberately dropped from the build config as a simplification — the admin build now emits a single bundle with no separate vendor chunk, unless a `manualChunks` split is reinstated. The `process.env` define switches from a `new Object(...)` wrapper to a plain JSON literal, since esbuild ≥0.25 (bundled by vite 6) rejects the old form. The Node.js floor for the `tinacms` binary rises from 14.18 to 18, matching vite 6's engine requirement.
+
+- [#7285](https://github.com/tinacms/tinacms/pull/7285) [`c87b028`](https://github.com/tinacms/tinacms/commit/c87b0282b98f7a8e3ebafd7594914856c8692758) Thanks [@kulesy](https://github.com/kulesy)! - Capture CLI telemetry as anonymous events so builds no longer create a single-use person profile per run
+
+- Updated dependencies [[`bd4df92`](https://github.com/tinacms/tinacms/commit/bd4df92a7e00bd74ee13eaf9f9b584fbb1a864ab), [`5f14d96`](https://github.com/tinacms/tinacms/commit/5f14d96fdba3d7a143827fc1cac9c7964c3f9b01)]:
+  - @tinacms/app@2.5.11
+  - tinacms@3.11.1
+  - @tinacms/graphql@2.4.9
+  - @tinacms/metrics@2.1.1
+  - @tinacms/schema-tools@2.8.3
+  - @tinacms/search@1.2.23
+
 ## 2.5.6
 
 ### Patch Changes
