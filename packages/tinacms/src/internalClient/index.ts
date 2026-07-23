@@ -10,13 +10,13 @@ import {
   parse,
   print,
 } from 'graphql';
-import { TokenObject } from '../auth/authenticate';
 
 import {
   ASYNC_POLLER_ERROR,
   AuthProvider,
   Schema,
   TinaSchema,
+  TokenObject,
   addNamespaceToSchema,
 } from '@tinacms/schema-tools';
 import {
