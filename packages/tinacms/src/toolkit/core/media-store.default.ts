@@ -247,6 +247,22 @@ export class TinaMediaStore implements MediaStore {
     return dir && dir !== '/' ? `${dir}/${filename ?? ''}` : (filename ?? '');
   }
 
+  /** Git-backed media config (`media.tina` with `mediaRoot` + `publicFolder`). */
+  private hasGitMediaConfig(): boolean {
+    const tina = this.cms.api.tina.schema?.schema?.config?.media?.tina || {};
+    return 'mediaRoot' in tina && 'publicFolder' in tina;
+  }
+
+  /** Canonical repo-relative path for a media item: `/{mediaRoot}/{dir}/{file}`. */
+  private canonicalMediaPath(media: Media): string {
+    const mediaRoot = this.trimEdges(
+      this.cms.api.tina.schema?.schema?.config?.media?.tina?.mediaRoot ?? '',
+      '/'
+    );
+    const path = this.joinMediaPath(media.directory, media.filename);
+    return `/${[mediaRoot, path].filter(Boolean).join('/')}`;
+  }
+
   private branchQueryParam(): string {
     const encodedBranch = this.encodedBranchParam();
     return encodedBranch ? `?branch=${encodedBranch}` : '';
@@ -650,13 +666,7 @@ export class TinaMediaStore implements MediaStore {
 
   private async persist_local(media: MediaUploadOptions[]): Promise<Media[]> {
     const newFiles: Media[] = [];
-    const hasTinaMedia =
-      Object.keys(
-        this.cms.api.tina.schema.schema?.config?.media?.tina || {}
-      ).includes('mediaRoot') &&
-      Object.keys(
-        this.cms.api.tina.schema.schema?.config?.media?.tina || {}
-      ).includes('publicFolder');
+    const hasTinaMedia = this.hasGitMediaConfig();
 
     // Folder always has leading and trailing slashes
     let folder: string = hasTinaMedia
@@ -865,7 +875,12 @@ export class TinaMediaStore implements MediaStore {
     };
   }
 
-  parse = (img) => {
+  parse = (img: Media) => {
+    // Git-backed media persists the repo-relative path: the hosted src is
+    // staging-scoped on non-media branches (tinacms/tinacloud#3858).
+    if (img?.filename && this.hasGitMediaConfig()) {
+      return this.canonicalMediaPath(img);
+    }
     return img.src;
   };
 
