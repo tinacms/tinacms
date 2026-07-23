@@ -13,7 +13,7 @@
 
 import { readFile, stat } from 'node:fs/promises';
 import { createServer } from 'node:http';
-import { extname, join, normalize } from 'node:path';
+import { extname, join, normalize, sep } from 'node:path';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -84,7 +84,7 @@ const server = createServer(async (req, res) => {
       const rel = url.slice(`${BASE_PREFIX}/`.length);
       // Prevent path traversal outside the admin root.
       const abs = normalize(join(ADMIN_ROOT, rel));
-      if (!abs.startsWith(ADMIN_ROOT)) {
+      if (!(abs === ADMIN_ROOT || abs.startsWith(ADMIN_ROOT + sep))) {
         res.writeHead(403);
         res.end('Forbidden');
         return;

@@ -43,8 +43,10 @@ test.describe('built bundle contains the hostile ingredients', () => {
 
   test('tinacms-authjs / next-auth is bundled', () => {
     const js = readBuiltJs();
-    expect(js.includes('next-auth') || js.includes('CLIENT_FETCH_ERROR')).toBe(
-      true
-    );
+    // Two next-auth-specific string literals (minification-proof): the client
+    // logger's error constant and the default API basePath. Both must be
+    // present — a loose substring like 'next-auth' could match incidentally.
+    expect(js).toContain('CLIENT_FETCH_ERROR');
+    expect(js).toContain('/api/auth');
   });
 });
