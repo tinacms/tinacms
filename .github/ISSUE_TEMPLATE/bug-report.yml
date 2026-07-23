@@ -5,45 +5,18 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to file a bug report! The fields below are the same checklist
-        we use in our Discord `#ask-for-help` post guidelines. Filling them in gives both our team
-        and our AI triage tooling enough to act on inside one session.
+        Thanks for taking the time to file a bug report! Filling in the fields below
+        gives our team enough to act on it quickly.
 
         Full guide: https://tina.io/docs/contributing/bug-reports
 
   - type: textarea
-    id: exact-error
+    id: description
     attributes:
-      label: The exact error message
-      description: Copy-paste it, don't paraphrase. The literal string is what we grep on.
+      label: Describe the bug
+      description: A clear description of what is going wrong. Keep the literal error text for the field below.
       placeholder: |
-        e.g. React error #31: Objects are not valid as a React child (found: object with keys {id, src, filename, directory, type, thumbnails}).
-      render: shell
-    validations:
-      required: true
-
-  - type: textarea
-    id: steps-to-reproduce
-    attributes:
-      label: Steps to reproduce
-      description: What you clicked, in order. A numbered list is enough — no video needed.
-      placeholder: |
-        1. Open TinaCMS admin
-        2. Navigate to any page with an image field
-        3. Click the image field → "Media Library" tab
-        4. Select any image
-        5. Click "Insert"
-    validations:
-      required: true
-
-  - type: textarea
-    id: expected-vs-actual
-    attributes:
-      label: What you expected vs. what actually happened
-      description: One sentence each is enough.
-      placeholder: |
-        Expected: The selected image is inserted and the src string is saved.
-        Actual: TinaCMS admin goes blank / white screen.
+        e.g. Selecting an image from the Media Library and clicking Insert blanks the entire admin instead of inserting the image.
     validations:
       required: true
 
@@ -64,21 +37,37 @@ body:
     validations:
       required: true
 
+  - type: textarea
+    id: exact-error
+    attributes:
+      label: The exact error message
+      description: Copy-paste it, don't paraphrase. The literal string is what we grep on.
+      placeholder: |
+        e.g. React error #31: Objects are not valid as a React child (found: object with keys {id, src, filename, directory, type, thumbnails}).
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to reproduce
+      description: What you clicked, in order. A numbered list is enough — no video needed.
+      placeholder: |
+        1. Open TinaCMS admin
+        2. Navigate to any page with an image field
+        3. Click the image field → "Media Library" tab
+        4. Select any image
+        5. Click "Insert"
+    validations:
+      required: false
+
   - type: input
     id: reproduction-repo
     attributes:
       label: A way for us to reproduce
       description: A link to a minimal reproduction repo is the gold standard. `npx create-tina-app@latest` is a good starting point if you need one.
       placeholder: https://github.com/your-username/tina-bug-repro
-    validations:
-      required: false
-
-  - type: textarea
-    id: schema-sections
-    attributes:
-      label: Relevant sections of your schema file
-      description: You don't need to paste the whole thing — just the parts related to the issue.
-      render: typescript
     validations:
       required: false
 
