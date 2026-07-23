@@ -55,7 +55,7 @@ tests/                 # Build verification tests
 
 - **Linting/Formatting:** Biome (`biome.json` at root). Example apps extend with `"extends": ["../../../biome.json"]`
 - **TypeScript:** Base config at `base.tsconfig.json`. Examples extend it. Strict mode enabled.
-- **Package manager:** pnpm only. Never use npm or yarn.
+- **Package manager:** pnpm only. Never use npm or yarn. One deliberate exception: the size-baseline harness (`scripts/size-baseline.mjs` + `tests/size-fixture/`) shells out to real `npm`, because npm's nested-duplicate hoisting is exactly the regression it measures — pnpm's content-addressed store would hide it.
 - **`CLAUDE.md` files** are git symlinks to the sibling `AGENTS.md`. On Windows without Developer Mode, if `git status` shows `TT` typechanges on them, run `git config --local core.symlinks false` — git then materialises them as regular pointer files. Linux/macOS clones get real symlinks automatically.
 
 ## Kitchen-Sink Examples
