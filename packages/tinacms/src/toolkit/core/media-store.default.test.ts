@@ -257,6 +257,44 @@ describe('TinaMediaStore — endpoint version (v1 vs v2)', () => {
   });
 });
 
+describe('TinaMediaStore — search query param', () => {
+  it('appends the url-encoded search term', async () => {
+    const { store, fetchWithToken } = buildStore({ branch: 'main' });
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+    );
+
+    await store.list({ directory: '', thumbnailSizes: [], search: 'a b/c' });
+
+    const calledUrl = fetchWithToken.mock.calls[0][0];
+    expect(calledUrl).toContain('&search=a%20b%2Fc');
+  });
+
+  it('omits the search param when unset', async () => {
+    const { store, fetchWithToken } = buildStore({ branch: 'main' });
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+    );
+
+    await store.list({ directory: '', thumbnailSizes: [] });
+
+    const calledUrl = fetchWithToken.mock.calls[0][0];
+    expect(calledUrl).not.toContain('search=');
+  });
+
+  it('omits the search param when empty', async () => {
+    const { store, fetchWithToken } = buildStore({ branch: 'main' });
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+    );
+
+    await store.list({ directory: '', thumbnailSizes: [], search: '' });
+
+    const calledUrl = fetchWithToken.mock.calls[0][0];
+    expect(calledUrl).not.toContain('search=');
+  });
+});
+
 describe('TinaMediaStore — branch query param', () => {
   describe('list()', () => {
     it('appends single-encoded branch for a simple branch', async () => {

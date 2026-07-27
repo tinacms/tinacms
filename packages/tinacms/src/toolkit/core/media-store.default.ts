@@ -807,7 +807,7 @@ export class TinaMediaStore implements MediaStore {
           options.limit || 20
         }${options.offset ? `&cursor=${options.offset}` : ''}${
           encodedBranch ? `&branch=${encodedBranch}` : ''
-        }`
+        }${options.search ? `&search=${encodeURIComponent(options.search)}` : ''}`
       );
 
       if (res.status == 401) {

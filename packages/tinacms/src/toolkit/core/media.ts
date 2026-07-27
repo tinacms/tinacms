@@ -126,6 +126,7 @@ export interface MediaListOptions {
   offset?: MediaListOffset;
   thumbnailSizes?: { w: number; h: number }[];
   filesOnly?: boolean;
+  search?: string;
 }
 
 /**

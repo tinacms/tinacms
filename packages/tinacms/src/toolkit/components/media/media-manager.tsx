@@ -21,6 +21,7 @@ import {
   BiGridAlt,
   BiLinkExternal,
   BiListUl,
+  BiSearch,
   BiX,
 } from 'react-icons/bi';
 import { BiFile } from 'react-icons/bi';
@@ -153,6 +154,11 @@ export function MediaPicker({
   const closePreview = () => setActiveItem(false);
   const [refreshing, setRefreshing] = useState(false);
   const [loadFolders, setLoadFolders] = useState(true);
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [mediaFilter, setMediaFilter] = useState<'all' | 'folders' | 'files'>(
+    'all'
+  );
 
   /**
    * current offset is last element in offsetHistory[]
@@ -175,11 +181,12 @@ export function MediaPicker({
           { w: 1000, h: 1000 },
         ],
         filesOnly: !loadFolders,
+        search: debouncedSearch || undefined,
       });
-      setList({
-        items: [...list.items, ..._list.items],
+      setList((prev) => ({
+        items: offset ? [...prev.items, ..._list.items] : _list.items,
         nextOffset: _list.nextOffset,
-      });
+      }));
       setListState('loaded');
     } catch (e) {
       console.error(e);
@@ -191,6 +198,17 @@ export function MediaPicker({
       setListState('error');
     }
   }
+
+  useEffect(() => {
+    const next = search.trim();
+    const timer = setTimeout(() => {
+      if (next === debouncedSearch) return;
+      setDebouncedSearch(next);
+      resetOffset();
+      setLoadFolders(true);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search, debouncedSearch]);
 
   useEffect(() => {
     if (!refreshing) return;
@@ -213,7 +231,7 @@ export function MediaPicker({
         resetList();
       }
     );
-  }, [offset, directory, cms.media.isConfigured]);
+  }, [offset, directory, debouncedSearch, cms.media.isConfigured]);
 
   const onClickMediaItem = (item: Media) => {
     if (!item) {
@@ -383,6 +401,14 @@ export function MediaPicker({
     };
   }, [list.nextOffset, loaderRef.current]);
 
+  const isSearching = !!debouncedSearch;
+  const canSearch = !cms.media.store.isStatic && !cms.api?.tina?.isLocalMode;
+  const visibleItems = list.items.filter((item) => {
+    if (mediaFilter === 'folders') return item.type === 'dir';
+    if (mediaFilter === 'files') return item.type === 'file';
+    return true;
+  });
+
   if ((listState === 'loading' && !list?.items?.length) || uploading) {
     return <LoadingMediaList />;
   }
@@ -482,28 +508,52 @@ export function MediaPicker({
             )}
           </div>
 
+          <div className='flex flex-wrap items-center gap-4 bg-gray-50 border-b border-gray-150 py-3 px-5 shadow-sm flex-shrink-0'>
+            {canSearch && (
+              <SearchInput
+                value={search}
+                setValue={setSearch}
+                clear={() => setSearch('')}
+              />
+            )}
+            <div className='ml-auto'>
+              <MediaFilterToggle
+                value={mediaFilter}
+                setValue={setMediaFilter}
+              />
+            </div>
+          </div>
+
           <div className='flex h-full overflow-hidden bg-white'>
             <div className='flex w-full flex-col h-full @container'>
               <ul
                 {...rootProps}
                 className={`h-full grow overflow-y-auto transition duration-150 ease-out bg-gradient-to-b from-gray-50/50 to-gray-50 ${
-                  list.items.length === 0 ||
+                  visibleItems.length === 0 ||
                   (viewMode === 'list' &&
                     'w-full flex flex-1 flex-col justify-start -mb-px')
                 } ${
-                  list.items.length > 0 &&
+                  visibleItems.length > 0 &&
                   viewMode === 'grid' &&
                   'w-full p-4 gap-4 grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 @2xl:grid-cols-4 @4xl:grid-cols-6 @6xl:grid-cols-9 auto-rows-auto content-start justify-start'
                 } ${isDragActive ? `border-2 border-blue-500 rounded-lg` : ``}`}
               >
                 <input {...getInputProps()} />
 
-                {listState === 'loaded' && list.items.length === 0 && (
-                  <EmptyMediaList />
+                {listState === 'loaded' && visibleItems.length === 0 && (
+                  <EmptyMediaList
+                    message={
+                      mediaFilter === 'folders' && isSearching
+                        ? "Folders aren't part of search results"
+                        : isSearching
+                          ? `No media matches “${debouncedSearch}”`
+                          : undefined
+                    }
+                  />
                 )}
 
                 {viewMode === 'list' &&
-                  list.items.map((item: Media) => (
+                  visibleItems.map((item: Media) => (
                     <ListMediaItem
                       key={item.id}
                       item={item}
@@ -513,7 +563,7 @@ export function MediaPicker({
                   ))}
 
                 {viewMode === 'grid' &&
-                  list.items.map((item: Media) => (
+                  visibleItems.map((item: Media) => (
                     <GridMediaItem
                       key={item.id}
                       item={item}
@@ -522,7 +572,9 @@ export function MediaPicker({
                     />
                   ))}
 
-                {!!list.nextOffset && <LoadingMediaList ref={loaderRef} />}
+                {!!list.nextOffset && mediaFilter !== 'folders' && (
+                  <LoadingMediaList ref={loaderRef} />
+                )}
               </ul>
             </div>
 
@@ -734,11 +786,12 @@ const useSyncStatus = () => {
   return context;
 };
 
-const EmptyMediaList = () => {
+const EmptyMediaList = ({ message }: { message?: string }) => {
   const { syncStatus } = useSyncStatus();
   return (
     <div className={`p-12 text-xl opacity-50 text-center`}>
-      {syncStatus == 'synced' ? 'Drag and drop assets here' : 'Loading...'}
+      {message ??
+        (syncStatus == 'synced' ? 'Drag and drop assets here' : 'Loading...')}
     </div>
   );
 };
@@ -756,6 +809,79 @@ const DocsLink = ({ title, message, docsLink, ...props }) => {
       >
         Learn More
       </a>
+    </div>
+  );
+};
+
+const SearchInput = ({
+  value,
+  setValue,
+  clear,
+}: {
+  value: string;
+  setValue: (value: string) => void;
+  clear: () => void;
+}) => {
+  return (
+    <div className='relative flex flex-1 items-center min-w-[200px] max-w-md'>
+      <BiSearch className='absolute left-3 w-5 h-5 text-gray-400 pointer-events-none' />
+      <input
+        type='text'
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        placeholder='Search this library...'
+        className='w-full rounded border border-gray-150 bg-white py-2 pl-10 pr-9 text-base text-gray-700 shadow-inner placeholder:text-gray-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400'
+      />
+      {value && (
+        <button
+          type='button'
+          onClick={clear}
+          aria-label='Clear search'
+          className='absolute right-2 flex items-center justify-center text-gray-400 hover:text-gray-600'
+        >
+          <BiX className='w-5 h-5' />
+        </button>
+      )}
+    </div>
+  );
+};
+
+const MediaFilterToggle = ({
+  value,
+  setValue,
+}: {
+  value: 'all' | 'folders' | 'files';
+  setValue: (value: 'all' | 'folders' | 'files') => void;
+}) => {
+  const base =
+    'relative whitespace-nowrap flex items-center justify-center gap-1.5 font-medium text-base px-3 py-1 transition-all ease-out duration-150 border';
+  const active =
+    'bg-white text-blue-500 shadow-inner border-gray-50 border-t-gray-100';
+  const inactive =
+    'bg-gray-50 text-gray-400 shadow border-gray-100 border-t-white';
+  const options: { key: 'all' | 'folders' | 'files'; label: string }[] = [
+    { key: 'all', label: 'All' },
+    { key: 'folders', label: 'Folders' },
+    { key: 'files', label: 'Files' },
+  ];
+  return (
+    <div className='grow-0 flex justify-between rounded border border-gray-100'>
+      {options.map((option, index) => (
+        <button
+          key={option.key}
+          type='button'
+          onClick={() => setValue(option.key)}
+          className={`${base} ${index === 0 ? 'rounded-l' : ''} ${
+            index === options.length - 1 ? 'rounded-r' : ''
+          } ${value === option.key ? active : inactive}`}
+        >
+          {option.key === 'folders' && (
+            <BiFolder className='w-5 h-5 opacity-70' />
+          )}
+          {option.key === 'files' && <BiFile className='w-5 h-5 opacity-70' />}
+          {option.label}
+        </button>
+      ))}
     </div>
   );
 };
