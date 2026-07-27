@@ -1,11 +1,46 @@
+import { TokenObject } from '@tinacms/schema-tools';
+import popupWindow from './popupWindow';
+
 export const AUTH_TOKEN_KEY = 'tinacms-auth';
 export const PKCE_STORAGE_KEY = 'tinacms-pkce';
+
+const TINA_LOGIN_EVENT = 'tinaCloudLogin';
 
 export class AuthenticationCancelledError extends Error {
   constructor(message = 'Authentication cancelled') {
     super(message);
     this.name = 'AuthenticationCancelledError';
   }
+}
+
+let workosEnabledPromise: Promise<boolean> | null = null;
+
+export async function getWorkosEnabled(
+  identityApiUrl: string
+): Promise<boolean> {
+  if (!workosEnabledPromise) {
+    workosEnabledPromise = (async () => {
+      const res = await fetch(`${identityApiUrl}/v2/auth/config`);
+      if (!res.ok) {
+        throw new Error(
+          `Failed to fetch auth config: ${res.status} ${res.statusText}`
+        );
+      }
+
+      const data: { workosEnabled?: boolean } = await res.json();
+      if (typeof data.workosEnabled !== 'boolean') {
+        throw new Error('Invalid auth config response');
+      }
+
+      return data.workosEnabled;
+    })();
+  }
+
+  return workosEnabledPromise;
+}
+
+export function resetWorkosEnabledCache(): void {
+  workosEnabledPromise = null;
 }
 
 function randomString(length: number = 40): string {
@@ -24,10 +59,7 @@ function base64UrlEncode(arrayBuffer: ArrayBuffer): string {
   for (const byte of bytes) {
     binary += String.fromCharCode(byte);
   }
-  return btoa(binary)
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=/g, '');
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 }
 
 async function generateCodeChallenge(verifier: string): Promise<string> {
@@ -37,10 +69,70 @@ async function generateCodeChallenge(verifier: string): Promise<string> {
   return base64UrlEncode(digest);
 }
 
-export const authenticate = async (
+export function authenticatePopup(
+  clientId: string,
+  frontendUrl: string
+): Promise<TokenObject> {
+  return new Promise((resolve, reject) => {
+    const origin = `${window.location.protocol}//${window.location.host}`;
+    const expectedOrigin = new URL(frontendUrl).origin;
+
+    const authTab = popupWindow(
+      `${frontendUrl}/signin?clientId=${clientId}&origin=${origin}`,
+      '_blank',
+      window,
+      1000,
+      700
+    );
+
+    if (!authTab) {
+      reject(
+        new Error(
+          'Popup was blocked by browser. Please allow popups for this site.'
+        )
+      );
+      return;
+    }
+
+    const cleanup = () => {
+      clearInterval(pollInterval);
+      window.removeEventListener('message', messageHandler);
+    };
+
+    const messageHandler = (e: MessageEvent) => {
+      if (e.origin !== expectedOrigin || e.source !== authTab) {
+        return;
+      }
+
+      if (e.data.source === TINA_LOGIN_EVENT) {
+        cleanup();
+
+        if (authTab) {
+          authTab.close();
+        }
+        resolve({
+          id_token: e.data.id_token,
+          access_token: e.data.access_token,
+          refresh_token: e.data.refresh_token,
+        });
+      }
+    };
+
+    const pollInterval = setInterval(() => {
+      if (authTab.closed) {
+        cleanup();
+        reject(new AuthenticationCancelledError('Popup was closed'));
+      }
+    }, 500);
+
+    window.addEventListener('message', messageHandler);
+  });
+}
+
+export async function authenticatePKCE(
   clientId: string,
   identityApiUrl: string
-): Promise<void> => {
+): Promise<void> {
   const codeVerifier = randomString(128);
   const codeChallenge = await generateCodeChallenge(codeVerifier);
   const state = randomString();
@@ -67,4 +159,17 @@ export const authenticate = async (
   });
 
   window.location.href = `${identityApiUrl}/v2/auth/tinacms?${params.toString()}`;
-};
+}
+
+export async function authenticate(
+  clientId: string,
+  identityApiUrl: string,
+  frontendUrl: string
+): Promise<TokenObject | void> {
+  const workosEnabled = await getWorkosEnabled(identityApiUrl);
+  if (workosEnabled) {
+    await authenticatePKCE(clientId, identityApiUrl);
+  } else {
+    return authenticatePopup(clientId, frontendUrl);
+  }
+}

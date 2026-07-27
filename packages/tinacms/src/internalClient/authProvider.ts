@@ -79,14 +79,17 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
     clientId,
     identityApiUrl,
     tokenStorage = 'MEMORY',
+    frontendUrl,
     ...options
   }: {
     clientId: string;
     identityApiUrl: string;
     tokenStorage?: 'MEMORY' | 'LOCAL_STORAGE' | 'CUSTOM';
     getTokenFn?: () => Promise<TokenObject>;
+    frontendUrl: string;
   }) {
     super();
+    this.frontendUrl = frontendUrl;
     this.clientId = clientId;
     this.identityApiUrl = identityApiUrl;
     switch (tokenStorage) {
@@ -136,7 +139,15 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
     }
   }
   async authenticate() {
-    await authenticate(this.clientId, this.identityApiUrl);
+    const result = await authenticate(
+      this.clientId,
+      this.identityApiUrl,
+      this.frontendUrl
+    );
+    if (result) {
+      this.setToken(result);
+      return result;
+    }
   }
   async getUser() {
     if (!this.clientId) {
