@@ -1,13 +1,16 @@
 import { useEffect } from 'react';
 import { AUTH_TOKEN_KEY, PKCE_STORAGE_KEY } from './authenticate';
 
-export const useTinaAuthRedirect = () => {
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
-    const state = urlParams.get('state');
-    const error = urlParams.get('error');
+export interface AuthRedirectParams {
+  code: string | null;
+  state: string | null;
+  error: string | null;
+}
 
+export const useTinaAuthRedirect = (params: AuthRedirectParams) => {
+  const { code, state, error } = params;
+
+  useEffect(() => {
     if (error) {
       console.error('Auth error:', error);
       window.history.replaceState({}, '', window.location.pathname);
@@ -37,7 +40,7 @@ export const useTinaAuthRedirect = () => {
     const { code_verifier, client_id, identity_api_url } = pkceData;
     const redirectUri = window.location.origin + window.location.pathname;
 
-    const params = new URLSearchParams({
+    const tokenParams = new URLSearchParams({
       grant_type: 'authorization_code',
       code,
       redirect_uri: redirectUri,
@@ -50,7 +53,7 @@ export const useTinaAuthRedirect = () => {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: params.toString(),
+      body: tokenParams.toString(),
     })
       .then((res) => res.json())
       .then((data) => {
@@ -75,5 +78,5 @@ export const useTinaAuthRedirect = () => {
         localStorage.removeItem(PKCE_STORAGE_KEY);
         window.history.replaceState({}, '', window.location.pathname);
       });
-  }, []);
+  }, [code, state, error]);
 };
