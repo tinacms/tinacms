@@ -173,7 +173,10 @@ export function MediaPicker({
   const offset = offsetHistory[offsetHistory.length - 1];
   const resetOffset = () => setOffsetHistory([]);
 
+  const listRequestRef = useRef(0);
+
   async function loadMedia(loadFolders = true) {
+    const requestId = ++listRequestRef.current;
     setListState('loading');
     try {
       const _list = await cms.media.list({
@@ -188,12 +191,14 @@ export function MediaPicker({
         filesOnly: !loadFolders,
         search: debouncedSearch || undefined,
       });
+      if (requestId !== listRequestRef.current) return;
       setList((prev) => ({
         items: offset ? [...prev.items, ..._list.items] : _list.items,
         nextOffset: _list.nextOffset,
       }));
       setListState('loaded');
     } catch (e) {
+      if (requestId !== listRequestRef.current) return;
       console.error(e);
       if (e.ERR_TYPE === 'MediaListError') {
         setListError(e);
@@ -415,8 +420,23 @@ export function MediaPicker({
   });
   const folders = visibleItems.filter((item) => item.type === 'dir');
   const files = visibleItems.filter((item) => item.type === 'file');
+  const showLoader = !!list.nextOffset && mediaFilter !== 'folders';
 
-  if ((listState === 'loading' && !list?.items?.length) || uploading) {
+  const emptyMessage = () => {
+    if (isSearching) {
+      return mediaFilter === 'folders'
+        ? "Folders aren't part of search results"
+        : `No media matches “${debouncedSearch}”`;
+    }
+    if (mediaFilter === 'folders') return 'No folders here';
+    if (mediaFilter === 'files') return 'No files here';
+    return undefined;
+  };
+
+  if (
+    (listState === 'loading' && !list?.items?.length && !isSearching) ||
+    uploading
+  ) {
     return <LoadingMediaList />;
   }
 
@@ -541,17 +561,9 @@ export function MediaPicker({
               >
                 <input {...getInputProps()} />
 
-                {listState === 'loaded' && visibleItems.length === 0 && (
-                  <EmptyMediaList
-                    message={
-                      mediaFilter === 'folders' && isSearching
-                        ? "Folders aren't part of search results"
-                        : isSearching
-                          ? `No media matches “${debouncedSearch}”`
-                          : undefined
-                    }
-                  />
-                )}
+                {listState === 'loaded' &&
+                  visibleItems.length === 0 &&
+                  !showLoader && <EmptyMediaList message={emptyMessage()} />}
 
                 {viewMode === 'list' ? (
                   <ul className='w-full flex flex-col -mb-px'>
@@ -602,9 +614,7 @@ export function MediaPicker({
                   </>
                 )}
 
-                {!!list.nextOffset && mediaFilter !== 'folders' && (
-                  <LoadingMediaList ref={loaderRef} />
-                )}
+                {showLoader && <LoadingMediaList ref={loaderRef} />}
               </div>
             </div>
 
@@ -859,6 +869,7 @@ const SearchInput = ({
         type='text'
         value={value}
         onChange={(e) => setValue(e.target.value)}
+        aria-label='Search media library'
         placeholder='Search this library...'
         className='w-full rounded-lg border border-gray-200 bg-white py-2 pl-10 pr-9 text-base text-gray-700 shadow-sm placeholder:text-gray-400 focus:border-tina-orange focus:outline-none focus:ring-1 focus:ring-tina-orange'
       />
@@ -899,6 +910,7 @@ const MediaFilterToggle = ({
           key={option.key}
           type='button'
           onClick={() => setValue(option.key)}
+          aria-pressed={value === option.key}
           className={`${base} ${index > 0 ? 'border-l border-gray-200' : ''} ${
             value === option.key ? active : inactive
           }`}
@@ -923,6 +935,8 @@ const ViewModeToggle = ({ viewMode, setViewMode }) => {
   return (
     <div className='grow-0 flex rounded-lg border border-gray-200 overflow-hidden'>
       <button
+        aria-label='Grid view'
+        aria-pressed={viewMode === 'grid'}
         className={`${base} ${viewMode === 'grid' ? active : inactive}`}
         onClick={() => {
           setViewMode('grid');
@@ -931,6 +945,8 @@ const ViewModeToggle = ({ viewMode, setViewMode }) => {
         <BiGridAlt className='w-5 h-5' />
       </button>
       <button
+        aria-label='List view'
+        aria-pressed={viewMode === 'list'}
         className={`${base} border-l border-gray-200 ${
           viewMode === 'list' ? active : inactive
         }`}

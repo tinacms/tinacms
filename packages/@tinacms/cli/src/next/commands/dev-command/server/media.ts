@@ -327,11 +327,13 @@ export class MediaModel {
 
       const search = args.search?.trim().toLowerCase();
       if (search) {
-        return this.searchMedia({
+        return await this.searchMedia({
           mediaBase,
           validatedPath,
           searchPath,
           search,
+          cursor: args.cursor,
+          limit: args.limit,
         });
       }
 
@@ -412,29 +414,50 @@ export class MediaModel {
     validatedPath,
     searchPath,
     search,
+    cursor,
+    limit,
   }: {
     mediaBase: string;
     validatedPath: string;
     searchPath: string;
     search: string;
+    cursor?: string;
+    limit?: string;
   }): Promise<ListMediaRes> {
     const resolvedBase = path.resolve(mediaBase);
     const files: File[] = [];
+    const visitedDirs = new Set<string>([resolveRealPath(validatedPath)]);
 
     const walk = async (dir: string, relPrefix: string) => {
       const entries = await fs.readdir(dir);
-      for (const entry of entries) {
-        const absPath = join(dir, entry);
-        // @security Skip entries whose real path escapes the media root
-        // (symlink/junction), matching resolveWithinBase for the recursive walk.
-        try {
-          assertSymlinkWithinBase(absPath, resolvedBase, absPath);
-        } catch {
-          continue;
-        }
+      const stats = await Promise.all(
+        entries.map(async (entry) => {
+          const absPath = join(dir, entry);
+          // @security Skip entries whose real path escapes the media root
+          // (symlink/junction), matching resolveWithinBase for the recursive walk.
+          try {
+            assertSymlinkWithinBase(absPath, resolvedBase, absPath);
+          } catch {
+            return null;
+          }
+          try {
+            return { entry, absPath, stat: await fs.stat(absPath) };
+          } catch {
+            return null;
+          }
+        })
+      );
+
+      for (const entryStat of stats) {
+        if (!entryStat) continue;
+        const { entry, absPath, stat } = entryStat;
         const relPath = relPrefix ? `${relPrefix}/${entry}` : entry;
-        const stat = await fs.stat(absPath);
         if (stat.isDirectory()) {
+          // @security Symlinked directories inside the media root pass the
+          // containment check, so track real paths to break traversal cycles.
+          const realDir = resolveRealPath(absPath);
+          if (visitedDirs.has(realDir)) continue;
+          visitedDirs.add(realDir);
           await walk(absPath, relPath);
           continue;
         }
@@ -448,8 +471,17 @@ export class MediaModel {
     };
 
     await walk(validatedPath, '');
+    files.sort((a, b) => a.filename.localeCompare(b.filename));
 
-    return { files, directories: [] };
+    const offset = Number(cursor) || 0;
+    const pageSize = Number(limit) || 20;
+
+    return {
+      files: files.slice(offset, offset + pageSize),
+      directories: [],
+      cursor:
+        files.length > offset + pageSize ? String(offset + pageSize) : null,
+    };
   }
 
   async deleteMedia(args: MediaArgs): Promise<SuccessRecord> {

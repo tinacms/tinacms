@@ -76,8 +76,10 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
 }
 
 const typeBadge = (filename: string): string | null => {
-  const ext = filename.split('.').pop()?.toLowerCase();
-  if (!ext || ext === filename.toLowerCase()) return null;
+  const name = filename.split('/').pop() ?? filename;
+  if (name.startsWith('.')) return null;
+  const ext = name.split('.').pop()?.toLowerCase();
+  if (!ext || ext === name.toLowerCase() || ext.length > 5) return null;
   return ext === 'jpg' ? 'JPEG' : ext.toUpperCase();
 };
 

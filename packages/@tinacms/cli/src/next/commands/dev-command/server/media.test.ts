@@ -70,7 +70,7 @@ describe('MediaModel (Vite dev server)', () => {
       await fs.writeFile(path.join(base, 'nested', 'deep', 'LLAMA.jpg'), 'x');
     };
 
-    it('matches filenames recursively and suppresses directories', async () => {
+    it('matches file paths recursively and suppresses directories', async () => {
       await seed();
       const model = new MediaModel(config);
       const result = await model.listMedia({ searchPath: '', search: 'llama' });
@@ -81,6 +81,69 @@ describe('MediaModel (Vite dev server)', () => {
         'nested/llama-baby.png',
       ]);
       expect(result.directories).toEqual([]);
+    });
+
+    it('matches a directory name against the files beneath it', async () => {
+      await seed();
+      const model = new MediaModel(config);
+      const result = await model.listMedia({ searchPath: '', search: 'deep' });
+      const names = result.files.map((f) => f.filename);
+      expect(names).toEqual(['nested/deep/LLAMA.jpg']);
+    });
+
+    it('paginates results with limit and cursor', async () => {
+      const base = path.join(tmpDir, 'public', 'uploads');
+      for (let i = 0; i < 25; i++) {
+        await fs.writeFile(
+          path.join(base, `match-${String(i).padStart(2, '0')}.png`),
+          'x'
+        );
+      }
+      const model = new MediaModel(config);
+
+      const page1 = await model.listMedia({
+        searchPath: '',
+        search: 'match',
+        limit: '10',
+      });
+      expect(page1.files).toHaveLength(10);
+      expect(page1.files[0].filename).toBe('match-00.png');
+      expect(page1.cursor).toBe('10');
+
+      const page3 = await model.listMedia({
+        searchPath: '',
+        search: 'match',
+        limit: '10',
+        cursor: page1.cursor as string,
+      });
+      expect(page3.files[0].filename).toBe('match-10.png');
+
+      const last = await model.listMedia({
+        searchPath: '',
+        search: 'match',
+        limit: '10',
+        cursor: '20',
+      });
+      expect(last.files).toHaveLength(5);
+      expect(last.cursor).toBeNull();
+    });
+
+    it('returns a structured result instead of throwing on a broken symlink', async () => {
+      await seed();
+      const base = path.join(tmpDir, 'public', 'uploads');
+      await fs.symlink(path.join(tmpDir, 'gone'), path.join(base, 'dangling'));
+      const model = new MediaModel(config);
+      const result = await model.listMedia({ searchPath: '', search: 'llama' });
+      expect(result.files).toHaveLength(3);
+    });
+
+    it('terminates on a symlink cycle inside the media root', async () => {
+      await seed();
+      const base = path.join(tmpDir, 'public', 'uploads');
+      await fs.symlink(base, path.join(base, 'loop'), 'dir');
+      const model = new MediaModel(config);
+      const result = await model.listMedia({ searchPath: '', search: 'llama' });
+      expect(result.files).toHaveLength(3);
     });
 
     it('is case-insensitive', async () => {
