@@ -803,7 +803,7 @@ export class TinaMediaStore implements MediaStore {
     if (!this.isLocal) {
       const encodedBranch = this.encodedBranchParam();
       res = await this.api.authProvider.fetchWithToken(
-        `${this.listUrl || this.url}/list/${options.directory || ''}?limit=${
+        `${this.listUrl}/list/${options.directory || ''}?limit=${
           options.limit || 20
         }${options.offset ? `&cursor=${options.offset}` : ''}${
           encodedBranch ? `&branch=${encodedBranch}` : ''
