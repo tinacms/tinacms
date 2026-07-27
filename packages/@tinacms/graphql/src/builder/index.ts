@@ -1298,7 +1298,7 @@ export class Builder {
         return astBuilder.InputValueDefinition({
           name: field.name,
           list: field.list,
-          type: astBuilder.TYPES.JSON,
+          type: astBuilder.TYPES.RichText,
         });
       case 'reference':
         return astBuilder.InputValueDefinition({
@@ -1591,7 +1591,7 @@ Visit https://tina.io/docs/r/content-fields/#list-fields/ for more information
           name: field.name,
           list: field.list,
           required: field.required,
-          type: astBuilder.TYPES.JSON,
+          type: astBuilder.TYPES.RichText,
         });
       case 'reference':
         const name = NAMER.documentTypeName(field.namespace);

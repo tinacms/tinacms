@@ -1,17 +1,17 @@
 'use client';
 
-import React from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { sanitizeImageSrc } from '@/lib/utils';
-import { useTina, tinaField } from 'tinacms/dist/react';
-import { TinaMarkdown } from 'tinacms/dist/rich-text';
-import { Section } from '@/components/layout/section';
 import { Container } from '@/components/layout/container';
+import { Section } from '@/components/layout/section';
 import { customComponents } from '@/components/markdown-components';
 import { GradientTitle } from '@/components/ui/gradient-title';
 import { NoData } from '@/components/ui/no-data';
+import { sanitizeImageSrc } from '@/lib/utils';
 import type { PostQuery, PostQueryVariables } from '@/tina/__generated__/types';
+import Image from 'next/image';
+import Link from 'next/link';
+import React from 'react';
+import { tinaField, useTina } from 'tinacms/dist/react';
+import { TinaMarkdown } from 'tinacms/dist/rich-text';
 
 interface PostClientPageProps {
   data: PostQuery;
@@ -107,7 +107,9 @@ export default function PostClientPage(props: PostClientPageProps) {
           className='prose dark:prose-dark w-full max-w-none'
           data-tina-field={tinaField(post, '_body')}
         >
-          <TinaMarkdown components={customComponents} content={post._body} />
+          {post._body && (
+            <TinaMarkdown components={customComponents} content={post._body} />
+          )}
         </div>
       </Container>
     </Section>
