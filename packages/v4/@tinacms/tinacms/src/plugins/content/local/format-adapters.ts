@@ -13,10 +13,17 @@ export type CollectionFormat = NonNullable<CollectionSchema['format']>;
 // markdown body survive every save verbatim (CONTEXT.md Unknown field). That
 // round-trip guarantee is what makes pointing v4 at an existing v3 content folder
 // safe — same gray-matter format v3 writes, nothing gets dropped.
+// `bodyField` is the collection's `isBody` field name, when it has one: the body
+// crosses as that field's value instead of being preserved untouched. Formats with
+// no body concept (json) ignore it.
 export interface FormatAdapter {
   extension: string;
-  parse(raw: string): TinaDocument;
-  serialize(document: TinaDocument, previousRaw?: string): string;
+  parse(raw: string, bodyField?: string): TinaDocument;
+  serialize(
+    document: TinaDocument,
+    previousRaw?: string,
+    bodyField?: string
+  ): string;
 }
 
 const adapters: Partial<Record<CollectionFormat, FormatAdapter>> = {

@@ -121,29 +121,40 @@ describe('update', () => {
         title: 'Renamed',
         featured: true,
         category: 'not-in-schema',
+        body: '\nBody prose.\n',
       },
     });
     const entry = await dataLayer.get('post', 'content/posts/hello.mdx');
     expect(entry?.document).toEqual(saved.document);
   });
 
-  it('keeps an isBody field out of the frontmatter (the raw body owns it)', async () => {
+  it('routes the isBody field to the markdown body, not the frontmatter', async () => {
     await dataLayer.update('post', 'content/posts/hello.mdx', {
       title: 'Renamed',
-      body: { type: 'root', children: [] },
+      body: '\nRewritten prose.\n',
     });
     const raw = await fs.readFile(
       path.join(rootDir, 'content/posts/hello.mdx'),
       'utf8'
     );
     expect(raw).not.toContain('body:');
-    expect(raw).toContain('Body prose.');
+    expect(raw).toContain('Rewritten prose.');
+    const entry = await dataLayer.get('post', 'content/posts/hello.mdx');
+    expect(entry?.document.body).toBe('\nRewritten prose.\n');
+  });
+
+  it('leaves the body alone when the save omits the isBody field', async () => {
+    await dataLayer.update('post', 'content/posts/hello.mdx', {
+      title: 'Renamed',
+    });
+    const entry = await dataLayer.get('post', 'content/posts/hello.mdx');
+    expect(entry?.document.body).toBe('\nBody prose.\n');
   });
 
   it('writes fresh when the file is missing (never lose the edit)', async () => {
     await dataLayer.update('post', 'content/posts/new.mdx', { title: 'New' });
     const entry = await dataLayer.get('post', 'content/posts/new.mdx');
-    expect(entry?.document).toEqual({ title: 'New' });
+    expect(entry?.document).toEqual({ title: 'New', body: '\n' });
   });
 
   it('recreates a parent folder deleted out-of-band (never lose the edit)', async () => {
@@ -154,7 +165,7 @@ describe('update', () => {
       title: 'Restored',
     });
     const entry = await dataLayer.get('post', 'content/posts/nested/deep.mdx');
-    expect(entry?.document).toEqual({ title: 'Restored' });
+    expect(entry?.document).toEqual({ title: 'Restored', body: '\n' });
   });
 });
 

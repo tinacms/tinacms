@@ -29,7 +29,9 @@ exact config options and validation semantics, see
 checkbox where `required` is a no-op. The shipped `number` field
 ([`number-field.md`](./number-field.md)) is a third — a string editor value ↔
 numeric stored value via `parse`/`serialize`, reading its own config
-(`step`) through `useFieldSchema`.
+(`step`) through `useFieldSchema`. The shipped `rich-text` field
+([`rich-text-field.md`](./rich-text-field.md)) is a fourth — a `block`-layout
+field that can own the file's markdown body via `isBody`.
 
 ### 1. Manifest (`.plugin.ts`)
 

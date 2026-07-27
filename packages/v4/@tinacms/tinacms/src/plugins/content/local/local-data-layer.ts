@@ -48,6 +48,9 @@ interface ResolvedCollection {
   schema: CollectionSchema;
   adapter: FormatAdapter;
   absoluteFolder: string;
+  // The `isBody` field name, if the collection declares one — the field that owns
+  // the markdown body (format-adapters.ts). One body per file, so one field.
+  bodyField?: string;
 }
 
 const resolveCollections = ({
@@ -62,10 +65,17 @@ const resolveCollections = ({
       'content-collection-no-path',
       `Collection "${schema.name}" has no \`path\` — the local data layer needs one to locate its files.`
     );
+    const bodyFields = schema.fields.filter((field) => field.isBody);
+    invariant(
+      bodyFields.length <= 1,
+      'content-multiple-body-fields',
+      `Collection "${schema.name}" marks ${bodyFields.length} fields \`isBody\` — a file has one body, so mark one field.`
+    );
     resolved.set(schema.name, {
       schema,
       adapter: formatAdapterFor(schema.format, formatAdapters),
       absoluteFolder: path.resolve(rootDir, schema.path),
+      bodyField: bodyFields[0]?.name,
     });
   }
   return resolved;
@@ -147,7 +157,7 @@ export const createLocalDataLayer = (
       }
       return {
         path: documentIdFor(absolute),
-        document: collection.adapter.parse(raw),
+        document: collection.adapter.parse(raw, collection.bodyField),
       };
     },
 
@@ -171,7 +181,7 @@ export const createLocalDataLayer = (
           const raw = await fs.readFile(absolute, 'utf8');
           entries.push({
             path: documentIdFor(absolute),
-            document: collection.adapter.parse(raw),
+            document: collection.adapter.parse(raw, collection.bodyField),
           });
         } catch (cause) {
           // One malformed or unreadable file must not take down the whole
@@ -195,18 +205,13 @@ export const createLocalDataLayer = (
       } catch (cause) {
         if (!isMissingFileError(cause)) throw cause;
       }
-      // An isBody field is the markdown body, not frontmatter — a client
-      // echoing it back must not land the rich-text AST in the YAML merge
-      // (previousRaw still owns the real body).
-      const bodyFields = new Set(
-        collection.schema.fields
-          .filter((field) => field.isBody)
-          .map((field) => field.name)
+      // The adapter routes an isBody field to the markdown body rather than the
+      // YAML merge; omitting it from the save leaves the existing body alone.
+      const raw = collection.adapter.serialize(
+        value,
+        previousRaw,
+        collection.bodyField
       );
-      const frontmatter = Object.fromEntries(
-        Object.entries(value).filter(([key]) => !bodyFields.has(key))
-      );
-      const raw = collection.adapter.serialize(frontmatter, previousRaw);
       // The parent folder may have been deleted out-of-band — same promise.
       await fs.mkdir(path.dirname(absolute), { recursive: true });
       await fs.writeFile(absolute, raw);
@@ -224,7 +229,10 @@ export const createLocalDataLayer = (
           console.warn(`Reindex failed for "${canonicalPath}":`, cause);
         }
       }
-      return { path: canonicalPath, document: collection.adapter.parse(raw) };
+      return {
+        path: canonicalPath,
+        document: collection.adapter.parse(raw, collection.bodyField),
+      };
     },
 
     graphql: async (query, variables) => {

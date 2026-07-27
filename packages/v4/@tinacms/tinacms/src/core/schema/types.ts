@@ -6,8 +6,10 @@ export interface BaseFieldSchema {
 
 export interface FieldSchema extends BaseFieldSchema {
   type: string;
-  // Marks the field that owns the markdown body (v3 content model). The local
-  // GraphQL pipeline serves it as the v3 mdx AST; the form doesn't edit it yet.
+  // Marks the field that owns the markdown body (v3 content model). The form
+  // edits it as raw markdown (the format adapters hand it over as a string); the
+  // local GraphQL pipeline serves the same body to the render path as the v3 mdx
+  // AST. Two shapes, two consumers, one file.
   isBody?: boolean;
 }
 

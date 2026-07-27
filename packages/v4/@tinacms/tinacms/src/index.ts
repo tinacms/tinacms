@@ -25,5 +25,6 @@ export { corePlugins, t } from './plugins/fields';
 export type {
   BooleanFieldSchema,
   NumberFieldSchema,
+  RichTextFieldSchema,
   StringFieldSchema,
 } from './plugins/fields';

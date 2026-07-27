@@ -10,6 +10,7 @@ export const postCollection: CollectionSchema = {
   fields: [
     t.string({ name: 'title', label: 'Title', required: true, min: 3 }),
     t.boolean({ name: 'featured', label: 'Featured' }),
+    t.richText({ name: 'body', label: 'Body', isBody: true }),
   ],
 };
 
@@ -17,4 +18,5 @@ export const postCollection: CollectionSchema = {
 export const sampleDocument: TinaDocument = {
   title: 'Hello World',
   featured: false,
+  body: '\nBody prose, edited as markdown.\n',
 };

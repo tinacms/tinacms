@@ -38,6 +38,38 @@ describe('markdown adapter', () => {
     const saved = adapter.serialize({ title: 'New' });
     expect(adapter.parse(saved)).toEqual({ title: 'New' });
   });
+
+  it('parses the body under the collection body field', () => {
+    expect(adapter.parse(MDX_RAW, 'body')).toEqual({
+      title: 'Hello World',
+      featured: false,
+      category: 'not-in-schema',
+      body: '\nBody prose the schema does not know about.\n',
+    });
+  });
+
+  it('writes an edited body back as markdown, not frontmatter', () => {
+    const saved = adapter.serialize(
+      { title: 'Hello World', body: '\nRewritten prose.\n' },
+      MDX_RAW,
+      'body'
+    );
+    expect(saved).not.toContain('body:');
+    expect(adapter.parse(saved, 'body')).toMatchObject({
+      title: 'Hello World',
+      body: '\nRewritten prose.\n',
+    });
+  });
+
+  it('rewrites the file byte-identically when nothing changed', () => {
+    const document = adapter.parse(MDX_RAW, 'body');
+    expect(adapter.serialize(document, MDX_RAW, 'body')).toBe(MDX_RAW);
+  });
+
+  it('leaves the body alone when the save omits the body field', () => {
+    const saved = adapter.serialize({ title: 'Renamed' }, MDX_RAW, 'body');
+    expect(saved).toContain('Body prose the schema does not know about.');
+  });
 });
 
 describe('json adapter', () => {
