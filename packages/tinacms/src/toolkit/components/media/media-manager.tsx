@@ -402,7 +402,7 @@ export function MediaPicker({
   }, [list.nextOffset, loaderRef.current]);
 
   const isSearching = !!debouncedSearch;
-  const canSearch = !cms.media.store.isStatic && !cms.api?.tina?.isLocalMode;
+  const canSearch = !cms.media.store.isStatic;
   const visibleItems = list.items.filter((item) => {
     if (mediaFilter === 'folders') return item.type === 'dir';
     if (mediaFilter === 'files') return item.type === 'file';

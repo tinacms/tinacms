@@ -821,7 +821,9 @@ export class TinaMediaStore implements MediaStore {
       res = await this.fetchFunction(
         `${this.url}/list/${options.directory || ''}?limit=${
           options.limit || 20
-        }${options.offset ? `&cursor=${options.offset}` : ''}`
+        }${options.offset ? `&cursor=${options.offset}` : ''}${
+          options.search ? `&search=${encodeURIComponent(options.search)}` : ''
+        }`
       );
 
       if (res.status == 404) {

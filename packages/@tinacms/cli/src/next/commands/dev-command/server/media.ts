@@ -24,10 +24,12 @@ export const createMediaRouter = (config: PathConfig) => {
       );
       const limit = requestURL.searchParams.get('limit');
       const cursor = requestURL.searchParams.get('cursor');
+      const search = requestURL.searchParams.get('search');
       const media = await mediaModel.listMedia({
         searchPath: folder,
         cursor,
         limit,
+        search,
       });
       res.end(JSON.stringify(media));
     } catch (error) {
@@ -122,6 +124,7 @@ interface MediaArgs {
   searchPath: string;
   cursor?: string;
   limit?: string;
+  search?: string;
 }
 
 interface File {
@@ -321,6 +324,17 @@ export class MediaModel {
           directories: [],
         };
       }
+
+      const search = args.search?.trim().toLowerCase();
+      if (search) {
+        return this.searchMedia({
+          mediaBase,
+          validatedPath,
+          searchPath,
+          search,
+        });
+      }
+
       const filesStr = await fs.readdir(validatedPath);
       const filesProm: Promise<FileRes>[] = filesStr.map(async (file) => {
         const filePath = join(validatedPath, file);
@@ -393,6 +407,51 @@ export class MediaModel {
       };
     }
   }
+  private async searchMedia({
+    mediaBase,
+    validatedPath,
+    searchPath,
+    search,
+  }: {
+    mediaBase: string;
+    validatedPath: string;
+    searchPath: string;
+    search: string;
+  }): Promise<ListMediaRes> {
+    const resolvedBase = path.resolve(mediaBase);
+    const files: File[] = [];
+
+    const walk = async (dir: string, relPrefix: string) => {
+      const entries = await fs.readdir(dir);
+      for (const entry of entries) {
+        const absPath = join(dir, entry);
+        // @security Skip entries whose real path escapes the media root
+        // (symlink/junction), matching resolveWithinBase for the recursive walk.
+        try {
+          assertSymlinkWithinBase(absPath, resolvedBase, absPath);
+        } catch {
+          continue;
+        }
+        const relPath = relPrefix ? `${relPrefix}/${entry}` : entry;
+        const stat = await fs.stat(absPath);
+        if (stat.isDirectory()) {
+          await walk(absPath, relPath);
+          continue;
+        }
+        if (!relPath.toLowerCase().includes(search)) continue;
+
+        let src = `/${relPath}`;
+        if (searchPath) src = `/${searchPath}${src}`;
+        if (this.mediaRoot) src = `/${this.mediaRoot}${src}`;
+        files.push({ src, filename: relPath, size: stat.size });
+      }
+    };
+
+    await walk(validatedPath, '');
+
+    return { files, directories: [] };
+  }
+
   async deleteMedia(args: MediaArgs): Promise<SuccessRecord> {
     try {
       const mediaBase = join(this.rootPath, this.publicFolder, this.mediaRoot);

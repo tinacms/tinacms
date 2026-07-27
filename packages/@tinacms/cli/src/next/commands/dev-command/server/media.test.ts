@@ -60,6 +60,63 @@ describe('MediaModel (Vite dev server)', () => {
     });
   });
 
+  describe('listMedia search', () => {
+    const seed = async () => {
+      const base = path.join(tmpDir, 'public', 'uploads');
+      await fs.mkdirp(path.join(base, 'nested', 'deep'));
+      await fs.writeFile(path.join(base, 'llama.png'), 'x');
+      await fs.writeFile(path.join(base, 'cat.png'), 'x');
+      await fs.writeFile(path.join(base, 'nested', 'llama-baby.png'), 'x');
+      await fs.writeFile(path.join(base, 'nested', 'deep', 'LLAMA.jpg'), 'x');
+    };
+
+    it('matches filenames recursively and suppresses directories', async () => {
+      await seed();
+      const model = new MediaModel(config);
+      const result = await model.listMedia({ searchPath: '', search: 'llama' });
+      const names = result.files.map((f) => f.filename).sort();
+      expect(names).toEqual([
+        'llama.png',
+        'nested/deep/LLAMA.jpg',
+        'nested/llama-baby.png',
+      ]);
+      expect(result.directories).toEqual([]);
+    });
+
+    it('is case-insensitive', async () => {
+      await seed();
+      const model = new MediaModel(config);
+      const result = await model.listMedia({ searchPath: '', search: 'LLAMA' });
+      expect(result.files).toHaveLength(3);
+    });
+
+    it('scopes to the requested directory with dir-relative filenames', async () => {
+      await seed();
+      const model = new MediaModel(config);
+      const result = await model.listMedia({
+        searchPath: 'nested',
+        search: 'llama',
+      });
+      const names = result.files.map((f) => f.filename).sort();
+      expect(names).toEqual(['deep/LLAMA.jpg', 'llama-baby.png']);
+    });
+
+    it('prefixes src with the media root', async () => {
+      await seed();
+      const model = new MediaModel(config);
+      const result = await model.listMedia({ searchPath: '', search: 'cat' });
+      expect(result.files[0].src).toBe('/uploads/cat.png');
+    });
+
+    it('returns empty when nothing matches', async () => {
+      await seed();
+      const model = new MediaModel(config);
+      const result = await model.listMedia({ searchPath: '', search: 'zzz' });
+      expect(result.files).toEqual([]);
+      expect(result.directories).toEqual([]);
+    });
+  });
+
   describe('symlink traversal', () => {
     let outsideDir: string;
 
@@ -90,6 +147,15 @@ describe('MediaModel (Vite dev server)', () => {
       await expect(
         model.deleteMedia({ searchPath: 'escape/secret.txt' })
       ).rejects.toThrow(PathTraversalError);
+    });
+
+    it('search does not follow a symlink escaping the media root', async () => {
+      const model = new MediaModel(config);
+      const result = await model.listMedia({
+        searchPath: '',
+        search: 'secret',
+      });
+      expect(result.files).toEqual([]);
     });
   });
 
