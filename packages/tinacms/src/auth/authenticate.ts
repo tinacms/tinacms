@@ -1,5 +1,6 @@
 import { TokenObject } from '@tinacms/schema-tools';
 import popupWindow from './popupWindow';
+import { randomString, generateCodeChallenge } from './pkce';
 
 export const AUTH_TOKEN_KEY = 'tinacms-auth';
 export const PKCE_STORAGE_KEY = 'tinacms-pkce';
@@ -41,32 +42,6 @@ export async function getWorkosEnabled(
 
 export function resetWorkosEnabledCache(): void {
   workosEnabledPromise = null;
-}
-
-function randomString(length: number = 40): string {
-  const possible =
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let result = '';
-  for (let i = 0; i < length; i++) {
-    result += possible.charAt(Math.floor(Math.random() * possible.length));
-  }
-  return result;
-}
-
-function base64UrlEncode(arrayBuffer: ArrayBuffer): string {
-  const bytes = new Uint8Array(arrayBuffer);
-  let binary = '';
-  for (const byte of bytes) {
-    binary += String.fromCharCode(byte);
-  }
-  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
-}
-
-async function generateCodeChallenge(verifier: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(verifier);
-  const digest = await crypto.subtle.digest('SHA-256', data);
-  return base64UrlEncode(digest);
 }
 
 export function authenticatePopup(
