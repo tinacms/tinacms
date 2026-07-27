@@ -155,6 +155,108 @@ const buildStore = ({
   };
 };
 
+describe('TinaMediaStore — endpoint version (v1 vs v2)', () => {
+  it('lists media from the v2 endpoint', async () => {
+    const { store, fetchWithToken } = buildStore({ branch: 'main' });
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+    );
+
+    await store.list({ directory: '', thumbnailSizes: [] });
+
+    const calledUrl = fetchWithToken.mock.calls[0][0];
+    expect(calledUrl).toContain('/v2/test-client/list');
+    expect(calledUrl).not.toContain('/v1/');
+  });
+
+  it('lists a subdirectory from the v2 endpoint', async () => {
+    const { store, fetchWithToken } = buildStore({ branch: 'main' });
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+    );
+
+    await store.list({ directory: 'uploads', thumbnailSizes: [] });
+
+    const calledUrl = fetchWithToken.mock.calls[0][0];
+    expect(calledUrl).toContain('/v2/test-client/list/uploads');
+    expect(calledUrl).not.toContain('/v1/');
+  });
+
+  describe('mutating operations stay on v1', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+      vi.unstubAllGlobals();
+    });
+
+    it('deletes via the v1 endpoint', async () => {
+      const { store, fetchWithToken } = buildStore({ branch: 'main' });
+      fetchWithToken.mockResolvedValueOnce(
+        makeJsonResponse(200, { requestId: 'req-1' })
+      );
+
+      const deletePromise = store.delete({
+        directory: 'images',
+        filename: 'a.png',
+      } as Media);
+      await vi.advanceTimersByTimeAsync(1100);
+      await deletePromise;
+
+      const calledUrl = fetchWithToken.mock.calls[0][0];
+      expect(calledUrl).toContain('/v1/test-client/');
+      expect(calledUrl).not.toContain('/v2/');
+    });
+
+    it('requests the upload URL via v1 but resolves uploaded entries via v2', async () => {
+      const { store, fetchWithToken } = buildStore({ branch: 'feat%2Fx' });
+      fetchWithToken.mockResolvedValueOnce(
+        makeJsonResponse(200, {
+          signedUrl: 'https://s3.example/signed',
+          requestId: 'req-1',
+        })
+      );
+      fetchWithToken.mockResolvedValueOnce(
+        makeJsonResponse(200, {
+          files: [
+            {
+              filename: 'llama.png',
+              src: 'https://assets.tina.io/test-client/__file/uploads/llama.png',
+            },
+          ],
+          directories: [],
+          cursor: 0,
+        })
+      );
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        text: vi.fn().mockResolvedValue(''),
+        json: vi.fn().mockResolvedValue({}),
+      });
+      vi.stubGlobal('fetch', fetchMock);
+
+      const uploads: MediaUploadOptions[] = [
+        {
+          directory: 'uploads',
+          file: new File(['x'], 'llama.png', { type: 'image/png' }),
+        },
+      ];
+
+      const persistPromise = store.persist(uploads);
+      await vi.advanceTimersByTimeAsync(1100);
+      await persistPromise;
+
+      const uploadUrl = fetchWithToken.mock.calls[0][0];
+      const listUrl = fetchWithToken.mock.calls[1][0];
+      expect(uploadUrl).toContain('/v1/test-client/upload_url/');
+      expect(listUrl).toContain('/v2/test-client/list');
+    });
+  });
+});
+
 describe('TinaMediaStore — branch query param', () => {
   describe('list()', () => {
     it('appends single-encoded branch for a simple branch', async () => {
