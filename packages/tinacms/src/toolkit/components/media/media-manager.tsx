@@ -33,7 +33,12 @@ import {
 import { captureEvent } from '../../../lib/posthog/posthogProvider';
 import { Breadcrumb } from './breadcrumb';
 import { CopyField } from './copy-field';
-import { GridMediaItem, ListMediaItem, checkerboardStyle } from './media-item';
+import {
+  GridFolderItem,
+  GridMediaItem,
+  ListMediaItem,
+  checkerboardStyle,
+} from './media-item';
 import { DeleteModal, NewFolderModal } from './modal';
 import {
   DEFAULT_MEDIA_UPLOAD_TYPES,
@@ -408,6 +413,8 @@ export function MediaPicker({
     if (mediaFilter === 'files') return item.type === 'file';
     return true;
   });
+  const folders = visibleItems.filter((item) => item.type === 'dir');
+  const files = visibleItems.filter((item) => item.type === 'file');
 
   if ((listState === 'loading' && !list?.items?.length) || uploading) {
     return <LoadingMediaList />;
@@ -526,17 +533,11 @@ export function MediaPicker({
 
           <div className='flex h-full overflow-hidden bg-white'>
             <div className='flex w-full flex-col h-full @container'>
-              <ul
+              <div
                 {...rootProps}
-                className={`h-full grow overflow-y-auto transition duration-150 ease-out bg-gradient-to-b from-gray-50/50 to-gray-50 ${
-                  visibleItems.length === 0 ||
-                  (viewMode === 'list' &&
-                    'w-full flex flex-1 flex-col justify-start -mb-px')
-                } ${
-                  visibleItems.length > 0 &&
-                  viewMode === 'grid' &&
-                  'w-full p-4 gap-4 grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 @2xl:grid-cols-4 @4xl:grid-cols-6 @6xl:grid-cols-9 auto-rows-auto content-start justify-start'
-                } ${isDragActive ? `border-2 border-blue-500 rounded-lg` : ``}`}
+                className={`h-full grow overflow-y-auto p-4 transition duration-150 ease-out bg-gradient-to-b from-gray-50/50 to-gray-50 ${
+                  isDragActive ? `border-2 border-tina-orange rounded-lg` : ``
+                }`}
               >
                 <input {...getInputProps()} />
 
@@ -552,30 +553,59 @@ export function MediaPicker({
                   />
                 )}
 
-                {viewMode === 'list' &&
-                  visibleItems.map((item: Media) => (
-                    <ListMediaItem
-                      key={item.id}
-                      item={item}
-                      onClick={onClickMediaItem}
-                      active={activeItem && activeItem.id === item.id}
-                    />
-                  ))}
-
-                {viewMode === 'grid' &&
-                  visibleItems.map((item: Media) => (
-                    <GridMediaItem
-                      key={item.id}
-                      item={item}
-                      onClick={onClickMediaItem}
-                      active={activeItem && activeItem.id === item.id}
-                    />
-                  ))}
+                {viewMode === 'list' ? (
+                  <ul className='w-full flex flex-col -mb-px'>
+                    {visibleItems.map((item: Media) => (
+                      <ListMediaItem
+                        key={item.id}
+                        item={item}
+                        onClick={onClickMediaItem}
+                        active={activeItem && activeItem.id === item.id}
+                      />
+                    ))}
+                  </ul>
+                ) : (
+                  <>
+                    {folders.length > 0 && (
+                      <section className='mb-6'>
+                        <h3 className='text-xs font-semibold tracking-wider text-gray-400 mb-3'>
+                          FOLDERS
+                        </h3>
+                        <ul className='grid grid-cols-2 gap-4 @md:grid-cols-3 @2xl:grid-cols-4 @4xl:grid-cols-5'>
+                          {folders.map((item: Media) => (
+                            <GridFolderItem
+                              key={item.id}
+                              item={item}
+                              onClick={onClickMediaItem}
+                            />
+                          ))}
+                        </ul>
+                      </section>
+                    )}
+                    {files.length > 0 && (
+                      <section>
+                        <h3 className='text-xs font-semibold tracking-wider text-gray-400 mb-3'>
+                          FILES
+                        </h3>
+                        <ul className='grid grid-cols-2 gap-4 @sm:grid-cols-3 @lg:grid-cols-4 @2xl:grid-cols-6 @4xl:grid-cols-8'>
+                          {files.map((item: Media) => (
+                            <GridMediaItem
+                              key={item.id}
+                              item={item}
+                              onClick={onClickMediaItem}
+                              active={activeItem && activeItem.id === item.id}
+                            />
+                          ))}
+                        </ul>
+                      </section>
+                    )}
+                  </>
+                )}
 
                 {!!list.nextOffset && mediaFilter !== 'folders' && (
                   <LoadingMediaList ref={loaderRef} />
                 )}
-              </ul>
+              </div>
             </div>
 
             <ActiveItemPreview
@@ -830,7 +860,7 @@ const SearchInput = ({
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder='Search this library...'
-        className='w-full rounded border border-gray-150 bg-white py-2 pl-10 pr-9 text-base text-gray-700 shadow-inner placeholder:text-gray-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400'
+        className='w-full rounded-lg border border-gray-200 bg-white py-2 pl-10 pr-9 text-base text-gray-700 shadow-sm placeholder:text-gray-400 focus:border-tina-orange focus:outline-none focus:ring-1 focus:ring-tina-orange'
       />
       {value && (
         <button
@@ -854,31 +884,29 @@ const MediaFilterToggle = ({
   setValue: (value: 'all' | 'folders' | 'files') => void;
 }) => {
   const base =
-    'relative whitespace-nowrap flex items-center justify-center gap-1.5 font-medium text-base px-3 py-1 transition-all ease-out duration-150 border';
-  const active =
-    'bg-white text-blue-500 shadow-inner border-gray-50 border-t-gray-100';
-  const inactive =
-    'bg-gray-50 text-gray-400 shadow border-gray-100 border-t-white';
+    'relative whitespace-nowrap flex items-center justify-center gap-1.5 text-sm px-3 py-1.5 transition-colors ease-out duration-150';
+  const active = 'bg-white text-tina-orange font-medium';
+  const inactive = 'bg-gray-50 text-gray-500 hover:text-gray-700';
   const options: { key: 'all' | 'folders' | 'files'; label: string }[] = [
     { key: 'all', label: 'All' },
     { key: 'folders', label: 'Folders' },
     { key: 'files', label: 'Files' },
   ];
   return (
-    <div className='grow-0 flex justify-between rounded border border-gray-100'>
+    <div className='grow-0 flex rounded-lg border border-gray-200 overflow-hidden'>
       {options.map((option, index) => (
         <button
           key={option.key}
           type='button'
           onClick={() => setValue(option.key)}
-          className={`${base} ${index === 0 ? 'rounded-l' : ''} ${
-            index === options.length - 1 ? 'rounded-r' : ''
-          } ${value === option.key ? active : inactive}`}
+          className={`${base} ${index > 0 ? 'border-l border-gray-200' : ''} ${
+            value === option.key ? active : inactive
+          }`}
         >
           {option.key === 'folders' && (
-            <BiFolder className='w-5 h-5 opacity-70' />
+            <BiFolder className='w-4 h-4 opacity-80' />
           )}
-          {option.key === 'files' && <BiFile className='w-5 h-5 opacity-70' />}
+          {option.key === 'files' && <BiFile className='w-4 h-4 opacity-80' />}
           {option.label}
         </button>
       ))}
@@ -887,36 +915,30 @@ const MediaFilterToggle = ({
 };
 
 const ViewModeToggle = ({ viewMode, setViewMode }) => {
-  const toggleClasses = {
-    base: 'relative whitespace-nowrap flex items-center justify-center flex-1 block font-medium text-base py-1 transition-all ease-out duration-150 border',
-    active:
-      'bg-white text-blue-500 shadow-inner border-gray-50 border-t-gray-100',
-    inactive: 'bg-gray-50 text-gray-400 shadow border-gray-100 border-t-white',
-  };
+  const base =
+    'relative whitespace-nowrap flex items-center justify-center px-2.5 py-1.5 transition-colors ease-out duration-150';
+  const active = 'bg-white text-tina-orange';
+  const inactive = 'bg-gray-50 text-gray-400 hover:text-gray-600';
 
   return (
-    <div
-      className={`grow-0 flex justify-between rounded border border-gray-100`}
-    >
+    <div className='grow-0 flex rounded-lg border border-gray-200 overflow-hidden'>
       <button
-        className={`${toggleClasses.base} px-2.5 rounded-l ${
-          viewMode === 'grid' ? toggleClasses.active : toggleClasses.inactive
-        }`}
+        className={`${base} ${viewMode === 'grid' ? active : inactive}`}
         onClick={() => {
           setViewMode('grid');
         }}
       >
-        <BiGridAlt className='w-6 h-full opacity-70' />
+        <BiGridAlt className='w-5 h-5' />
       </button>
       <button
-        className={`${toggleClasses.base} px-2 rounded-r ${
-          viewMode === 'list' ? toggleClasses.active : toggleClasses.inactive
+        className={`${base} border-l border-gray-200 ${
+          viewMode === 'list' ? active : inactive
         }`}
         onClick={() => {
           setViewMode('list');
         }}
       >
-        <BiListUl className='w-8 h-full opacity-70' />
+        <BiListUl className='w-6 h-5' />
       </button>
     </div>
   );
