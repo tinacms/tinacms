@@ -928,7 +928,7 @@ const MediaFilterToggle = ({
 
 const ViewModeToggle = ({ viewMode, setViewMode }) => {
   const base =
-    'relative whitespace-nowrap flex items-center justify-center px-2.5 py-1.5 transition-colors ease-out duration-150';
+    'relative flex items-center justify-center w-9 py-1.5 transition-colors ease-out duration-150';
   const active = 'bg-white text-tina-orange';
   const inactive = 'bg-gray-50 text-gray-400 hover:text-gray-600';
 
@@ -954,7 +954,7 @@ const ViewModeToggle = ({ viewMode, setViewMode }) => {
           setViewMode('list');
         }}
       >
-        <BiListUl className='w-6 h-5' />
+        <BiListUl className='w-5 h-5' />
       </button>
     </div>
   );
