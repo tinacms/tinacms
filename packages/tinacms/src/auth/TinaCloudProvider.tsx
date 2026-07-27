@@ -25,6 +25,7 @@ import {
 } from '../internalClient';
 import { CreateClientProps, createClient } from '../utils';
 import { useTinaAuthRedirect } from './useTinaAuthRedirect';
+import { AuthenticationCancelledError } from './authenticate';
 import { captureEvent } from '../lib/posthog/posthogProvider';
 import { BranchSwitchedEvent } from '../lib/posthog/posthog';
 
@@ -147,8 +148,20 @@ const AuthWallInner = ({
   ) => {
     try {
       setAuthenticated(false);
-      await client.authProvider.authenticate(loginScreenProps || authProps);
+      const token = await client.authProvider.authenticate(
+        loginScreenProps || authProps
+      );
+      if (typeof client?.onLogin === 'function') {
+        await client?.onLogin({ token });
+      }
+      return onAuthenticated();
     } catch (e: any) {
+      if (
+        e instanceof AuthenticationCancelledError ||
+        e?.name === 'AuthenticationCancelledError'
+      ) {
+        return;
+      }
       console.error(e);
       setActiveModal('error');
       setErrorMessage({

@@ -158,6 +158,7 @@ export class Client {
         identityApiUrl: this.identityApiUrl,
         getTokenFn: options.getTokenFn,
         tokenStorage: tokenStorage,
+        frontendUrl: this.frontendUrl,
       });
   }
 
