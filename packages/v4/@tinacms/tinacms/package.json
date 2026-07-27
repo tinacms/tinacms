@@ -12,6 +12,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "tinacms-scripts build",
+    "dev": "vite playground",
     "types": "tsc",
     "test": "vitest run --passWithNoTests"
   },
@@ -24,6 +25,14 @@
       "types": "./src/editor/index.ts",
       "default": "./src/editor/index.ts"
     },
+    "./preview": {
+      "types": "./src/preview/index.ts",
+      "default": "./src/preview/index.ts"
+    },
+    "./adapters/react": {
+      "types": "./src/adapters/react/index.ts",
+      "default": "./src/adapters/react/index.ts"
+    },
     "./client": {
       "types": "./src/client/index.ts",
       "default": "./src/client/index.ts"
@@ -32,25 +41,26 @@
       "types": "./src/server/index.ts",
       "default": "./src/server/index.ts"
     },
-    "./next": {
+    "./adapters/next": {
       "types": "./src/adapters/next/index.ts",
       "default": "./src/adapters/next/index.ts"
     },
-    "./express": {
+    "./adapters/express": {
       "types": "./src/adapters/express/index.ts",
       "default": "./src/adapters/express/index.ts"
     },
-    "./astro": {
+    "./adapters/astro": {
       "types": "./src/adapters/astro/index.ts",
       "default": "./src/adapters/astro/index.ts"
     },
-    "./hono": {
+    "./adapters/hono": {
       "types": "./src/adapters/hono/index.ts",
       "default": "./src/adapters/hono/index.ts"
     }
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
+    "@tinacms/ui": "workspace:*",
     "react-hook-form": "^7.80.0",
     "zod": "catalog:",
     "zustand": "^5.0.14"
@@ -60,18 +70,21 @@
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
-    "@tinacms/scripts": "workspace:*",
+    "@tailwindcss/vite": "^4.2.4",
     "@testing-library/dom": "catalog:",
     "@testing-library/jest-dom": "catalog:",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "catalog:",
+    "@tinacms/scripts": "workspace:*",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^4.7.0",
     "happy-dom": "catalog:",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
+    "tailwindcss": "^4.3.2",
     "typescript": "^5.7.3",
+    "vite": "^5.4.0",
     "vitest": "^2.1.9"
   }
 }

@@ -1,5 +1,25 @@
 # tinacms-cli
 
+## 2.5.6
+
+### Patch Changes
+
+- [#7176](https://github.com/tinacms/tinacms/pull/7176) [`5daa624`](https://github.com/tinacms/tinacms/commit/5daa62453428320d3fe33e8f549aa814a42237f1) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Improve the error message when the CLI cannot resolve `tinacms` or a `@tinacms/*` package while building your Tina config or database. It now names the package that failed, reports the directory Tina searched from, and points at parent-directory package-manager files (`package.json`, `node_modules`, `yarn.lock`, `.pnp.cjs`) that can hijack module resolution. esbuild package resolution is also anchored at the project root.
+
+- [#7213](https://github.com/tinacms/tinacms/pull/7213) [`056ffc2`](https://github.com/tinacms/tinacms/commit/056ffc22dc87b0040281054f4140c6260c22ea1f) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Publish internal package references as ranges instead of exact versions.
+
+  Internal dependencies were declared as `workspace:*`, which pnpm expands to an **exact version** when publishing (`"tinacms": "3.10.0"`), not a range. An exact pin cannot deduplicate against the version a consumer has already installed, so npm nests a second — and third — complete copy of `tinacms` and its dependency tree. In a stock Astro + TinaCMS blog this produced three copies of `tinacms`, three of `mermaid` (186 MB), five of `date-fns` (151 MB), and four of `typescript` (88 MB): about **320 MB of duplication**.
+
+  The same expansion applied to `peerDependencies`, so packages such as `next-tinacms-cloudinary` and `tinacms-authjs` published `"tinacms": "3.10.0"` as a _peer_ — requiring consumers to have that exact version or hit an `ERESOLVE` conflict, and forcing a republish of every dependent on each `tinacms` release.
+
+  Switching these to `workspace:^` publishes them as caret ranges (`^3.10.0`), which deduplicate normally and let `onlyUpdatePeerDependentsWhenOutOfRange` do its job.
+
+- Updated dependencies [[`711ba30`](https://github.com/tinacms/tinacms/commit/711ba30f6e8955bbcea134fd22a5b498b7734325), [`908fe7d`](https://github.com/tinacms/tinacms/commit/908fe7ddc1c01a2c091f1e4f3c1b00f3696577b4), [`566af78`](https://github.com/tinacms/tinacms/commit/566af78ded66891edeb6fdf928b6543d45ac76fd), [`b8df6ee`](https://github.com/tinacms/tinacms/commit/b8df6eeee85b603406d204042a5ef95d49e8a9cf), [`59efccc`](https://github.com/tinacms/tinacms/commit/59efcccd3f1713870e40ebd9db25659cd6357237), [`056ffc2`](https://github.com/tinacms/tinacms/commit/056ffc22dc87b0040281054f4140c6260c22ea1f)]:
+  - tinacms@3.11.0
+  - @tinacms/app@2.5.10
+  - @tinacms/graphql@2.4.9
+  - @tinacms/search@1.2.23
+
 ## 2.5.5
 
 ### Patch Changes

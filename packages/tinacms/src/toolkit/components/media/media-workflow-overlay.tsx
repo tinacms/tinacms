@@ -10,8 +10,7 @@ import {
 } from '@toolkit/react-modals';
 import { CreateBranchPromptModal } from '@toolkit/form-builder/create-branch-modal';
 import {
-  checkBaseBranchExists,
-  checkTargetBranchExists,
+  checkBranchGuard,
   type MediaWorkflowConfirmBranchEvent,
   TARGET_BRANCH_EXISTS_ERROR,
 } from '@toolkit/form-builder/editorial-workflow-utils';
@@ -127,9 +126,10 @@ export const MediaWorkflowOverlay = () => {
       errorMessage: '',
     });
 
-    const baseBranchExists = await checkBaseBranchExists(
+    const { baseBranchExists, targetBranchExists } = await checkBranchGuard(
       cms.api.tina,
       confirmState.baseBranch,
+      targetBranch,
       'media workflow',
       abortController.signal
     );
@@ -148,15 +148,6 @@ export const MediaWorkflowOverlay = () => {
       });
       return;
     }
-
-    const targetBranchExists = await checkTargetBranchExists(
-      cms.api.tina,
-      targetBranch,
-      'media workflow',
-      abortController.signal
-    );
-
-    if (abortController.signal.aborted) return;
 
     if (targetBranchExists) {
       if (preflightAbortRef.current === abortController) {

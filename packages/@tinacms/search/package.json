@@ -1,7 +1,7 @@
 {
     "name": "@tinacms/search",
     "type": "module",
-    "version": "1.2.22",
+    "version": "1.2.23",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "files": [
@@ -36,8 +36,8 @@
         "test-watch": "NODE_OPTIONS='--experimental-vm-modules' jest --watch"
     },
     "dependencies": {
-        "@tinacms/graphql": "workspace:*",
-        "@tinacms/schema-tools": "workspace:*",
+        "@tinacms/graphql": "workspace:^",
+        "@tinacms/schema-tools": "workspace:^",
         "memory-level": "catalog:",
         "search-index": "catalog:",
         "sqlite-level": "catalog:",

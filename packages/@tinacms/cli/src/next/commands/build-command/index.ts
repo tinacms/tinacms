@@ -119,6 +119,7 @@ export class BuildCommand extends BaseCommand {
       tinaGraphQLVersion: this.tinaGraphQLVersion,
       legacyNoSDK: this.noSDK,
     });
+    this.warnOnVersionSkew(configManager.rootPath);
 
     if (this.previewName && !this.previewBaseBranch) {
       logger.error(

@@ -42,7 +42,11 @@ const resolveRegistry = (): Promise<FieldRegistry> =>
 const renderField = (address: string, document?: TinaDocument) =>
   render(
     <TinaProvider plugins={[numberFieldPlugin]}>
-      <FormProvider collection={collection} document={document}>
+      <FormProvider
+        collection={collection}
+        path='content/posts/featured.mdx'
+        document={document}
+      >
         <Field address={address} />
       </FormProvider>
     </TinaProvider>

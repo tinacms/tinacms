@@ -1,4 +1,4 @@
-// Server-only — `tinacms/hono`.
+// Server-only — `tinacms/adapters/hono`.
 // Mounts the runtime-composed RPC handler as a Hono route.
 //
 // Intended exports:

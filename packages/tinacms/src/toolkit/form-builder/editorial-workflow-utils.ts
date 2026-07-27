@@ -47,19 +47,6 @@ const checkBranchExists = async (
   }
 };
 
-export const checkBaseBranchExists = async (
-  tinaApi: {
-    branchExists: (
-      branchName: string,
-      args?: { signal?: AbortSignal }
-    ) => Promise<boolean>;
-  },
-  baseBranch: string,
-  debugLabel: string,
-  signal?: AbortSignal
-): Promise<boolean> =>
-  checkBranchExists(tinaApi, baseBranch, debugLabel, 'base', true, signal);
-
 export const checkTargetBranchExists = async (
   tinaApi: {
     branchExists: (
@@ -72,3 +59,51 @@ export const checkTargetBranchExists = async (
   signal?: AbortSignal
 ): Promise<boolean> =>
   checkBranchExists(tinaApi, targetBranch, debugLabel, 'target', false, signal);
+
+export interface BranchGuardResult {
+  baseBranchExists: boolean;
+  targetBranchExists: boolean;
+}
+
+export const checkBranchGuard = async (
+  tinaApi: {
+    branchesExist: (
+      branchNames: string[],
+      args?: { signal?: AbortSignal }
+    ) => Promise<Record<string, boolean>>;
+  },
+  baseBranch: string,
+  targetBranch: string,
+  debugLabel: string,
+  signal?: AbortSignal
+): Promise<BranchGuardResult> => {
+  try {
+    console.debug(
+      `[tina:branch-guard] ${debugLabel}: checking base + target branches:`,
+      baseBranch,
+      targetBranch
+    );
+    const existence = await tinaApi.branchesExist([baseBranch, targetBranch], {
+      signal,
+    });
+    const result = {
+      baseBranchExists: existence[baseBranch] ?? true,
+      targetBranchExists: existence[targetBranch] ?? false,
+    };
+    console.debug(
+      `[tina:branch-guard] ${debugLabel}: base exists?`,
+      result.baseBranchExists,
+      'target exists?',
+      result.targetBranchExists
+    );
+    return result;
+  } catch (err) {
+    if (!signal?.aborted) {
+      console.error(
+        `[tina:branch-guard] ${debugLabel}: branchesExist threw, failing open:`,
+        err
+      );
+    }
+    return { baseBranchExists: true, targetBranchExists: false };
+  }
+};

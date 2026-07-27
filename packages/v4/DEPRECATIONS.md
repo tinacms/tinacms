@@ -32,7 +32,7 @@ Status values:
 | `@tinacms/core` *(workspace dir present, no published package)* | remove | None. | Internal core lives in `@tinacms/tinacms/src/core/`. |
 | `@tinacms/ui` *(workspace dir present, no published package)* | remove | None. | Admin UI lives in `@tinacms/app`. |
 | `react-tinacms-editor` *(not in monorepo HEAD)* | remove | None. | Use the v4 rich-text field in `@tinacms/tinacms`. |
-| `tina-cloud-next` *(not in monorepo HEAD)* | remove | None. | TinaCloud integration is provided by `@tinacms/tinacms/next`. |
+| `tina-cloud-next` *(not in monorepo HEAD)* | remove | None. | TinaCloud integration is provided by `@tinacms/tinacms/adapters/next`. |
 | `tina-graphql` *(not in monorepo HEAD)* | remove | `@tinacms/graphql` | Replace import. |
 | `tina-graphql-gateway` *(not in monorepo HEAD)* | remove | None. | Use `@tinacms/graphql` directly or the TinaCloud API. |
 | `tina-graphql-gateway-cli` *(not in monorepo HEAD)* | remove | None. | Use the `tinacms` CLI in `@tinacms/tinacms`. |

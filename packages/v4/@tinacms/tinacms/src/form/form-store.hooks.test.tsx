@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { toFieldAddress } from '../core/field/address';
 import {
   toFormId,
@@ -14,10 +14,6 @@ import {
 // subscribes and re-renders a consumer when the form's status changes.
 const title = toFieldAddress('title');
 const postA = toFormId('posts/a.mdx');
-
-beforeEach(() => {
-  useFormStore.setState({ forms: {} });
-});
 
 describe('form-store hooks re-render on status changes', () => {
   it('useFormStatus tracks pristine -> dirty -> clean', () => {

@@ -19,7 +19,7 @@ import {
 import { FieldLabel } from '@toolkit/fields';
 import { Form } from '@toolkit/forms';
 import { EditorialWorkflowProgressModal } from './editorial-workflow-progress-modal';
-import { checkBaseBranchExists } from './editorial-workflow-utils';
+import { checkBranchGuard } from './editorial-workflow-utils';
 import { useEditorialWorkflow } from './use-editorial-workflow';
 import { useLocalStorage } from '@toolkit/hooks/use-local-storage';
 import {
@@ -114,9 +114,10 @@ export const CreateBranchModal = ({
     const baseBranch = decodeURIComponent(tinaApi.branch);
     const targetBranch = `tina/${newBranchName}`;
 
-    const baseBranchExists = await checkBaseBranchExists(
+    const { baseBranchExists, targetBranchExists } = await checkBranchGuard(
       tinaApi,
       baseBranch,
+      targetBranch,
       'executeEditorialWorkflow',
       abortController.signal
     );
@@ -142,6 +143,7 @@ export const CreateBranchModal = ({
       crudType,
       tinaForm,
       signal: abortController.signal,
+      targetBranchExists,
       isDraft,
     });
     if (branchGuardAbortRef.current === abortController) {

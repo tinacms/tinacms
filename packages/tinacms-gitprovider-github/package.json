@@ -1,7 +1,7 @@
 {
 	"name": "tinacms-gitprovider-github",
 	"type": "module",
-	"version": "4.1.15",
+	"version": "4.1.16",
 	"main": "dist/index.js",
 	"module": "./dist/index.js",
 	"files": [
@@ -32,7 +32,7 @@
 		"@types/node": "^22.13.1"
 	},
 	"peerDependencies": {
-		"@tinacms/datalayer": "workspace:*"
+		"@tinacms/datalayer": "workspace:^"
 	},
 	"publishConfig": {
 		"registry": "https://registry.npmjs.org"

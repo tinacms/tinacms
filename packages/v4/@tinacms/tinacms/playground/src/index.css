@@ -1,0 +1,6 @@
+@import "@tinacms/ui/globals.css";
+
+/* Tailwind only auto-scans the vite root (playground/); the classes actually
+   rendered live in the package's field components and the ui package. */
+@source "../../src";
+@source "../../../ui/src";

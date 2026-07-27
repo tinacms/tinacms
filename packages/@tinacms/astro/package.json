@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/astro",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "type": "module",
   "main": "src/TinaMarkdown.astro",
   "types": "dist/index.d.ts",
@@ -128,7 +128,7 @@
     "sync-fixtures": "node ./scripts/sync-fixtures.mjs"
   },
   "dependencies": {
-    "@tinacms/bridge": "workspace:*"
+    "@tinacms/bridge": "workspace:^"
   },
   "peerDependencies": {
     "astro": "^5.0.0 || ^6.0.0 || ^7.0.0"
