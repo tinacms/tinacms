@@ -79,17 +79,14 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
     clientId,
     identityApiUrl,
     tokenStorage = 'MEMORY',
-    frontendUrl,
     ...options
   }: {
     clientId: string;
     identityApiUrl: string;
     tokenStorage?: 'MEMORY' | 'LOCAL_STORAGE' | 'CUSTOM';
     getTokenFn?: () => Promise<TokenObject>;
-    frontendUrl: string;
   }) {
     super();
-    this.frontendUrl = frontendUrl;
     this.clientId = clientId;
     this.identityApiUrl = identityApiUrl;
     switch (tokenStorage) {
@@ -139,9 +136,7 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
     }
   }
   async authenticate() {
-    const token = await authenticate(this.clientId, this.frontendUrl);
-    this.setToken(token);
-    return token;
+    await authenticate(this.clientId, this.identityApiUrl);
   }
   async getUser() {
     if (!this.clientId) {
@@ -245,7 +240,7 @@ export class LocalAuthProvider extends AbstractAuthProvider {
     return localStorage.getItem(LOCAL_CLIENT_KEY) === 'true';
   }
   async getToken() {
-    return Promise.resolve({ id_token: '' });
+    return Promise.resolve({ access_token: 'LOCAL', refresh_token: 'LOCAL' });
   }
   async logout() {
     localStorage.removeItem(LOCAL_CLIENT_KEY);

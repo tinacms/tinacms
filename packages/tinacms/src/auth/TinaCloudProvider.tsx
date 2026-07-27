@@ -14,7 +14,6 @@ import {
 } from '@tinacms/toolkit';
 import React, { useEffect, useState } from 'react';
 import { ModalBuilder } from './AuthModal';
-import { AuthenticationCancelledError } from './authenticate';
 import loginLlama from './tina-login.png';
 
 import { TinaAdminApi } from '../admin/api';
@@ -148,23 +147,8 @@ const AuthWallInner = ({
   ) => {
     try {
       setAuthenticated(false);
-      const token = await client.authProvider.authenticate(
-        loginScreenProps || authProps
-      );
-      if (typeof client?.onLogin === 'function') {
-        await client?.onLogin({ token });
-      }
-      return onAuthenticated();
+      await client.authProvider.authenticate(loginScreenProps || authProps);
     } catch (e: any) {
-      // If user just closed the popup, silently reset - don't show error
-      // Check both instanceof and error name (in case of module boundary issues)
-      if (
-        e instanceof AuthenticationCancelledError ||
-        e?.name === 'AuthenticationCancelledError'
-      ) {
-        return;
-      }
-
       console.error(e);
       setActiveModal('error');
       setErrorMessage({
