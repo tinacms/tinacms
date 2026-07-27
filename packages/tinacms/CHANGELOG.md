@@ -1,5 +1,36 @@
 # tinacms
 
+## 3.11.0
+
+### Minor Changes
+
+- [#7235](https://github.com/tinacms/tinacms/pull/7235) [`908fe7d`](https://github.com/tinacms/tinacms/commit/908fe7ddc1c01a2c091f1e4f3c1b00f3696577b4) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Editorial-workflow saves (Save draft / Save to a new branch, and the media create-branch flow) now run a single branch-list lookup instead of two sequential ones, roughly halving the delay before the progress modal appears.
+
+### Patch Changes
+
+- [#7194](https://github.com/tinacms/tinacms/pull/7194) [`711ba30`](https://github.com/tinacms/tinacms/commit/711ba30f6e8955bbcea134fd22a5b498b7734325) Thanks [@kulesy](https://github.com/kulesy)! - `Button` now renders the shared loading-dots indicator automatically when `busy`, so every busy button gets a consistent spinner instead of each call site wiring its own (and some, like the account password form, were missing it entirely). The dots inherit the button text color so they stay visible across variants.
+
+- [#7161](https://github.com/tinacms/tinacms/pull/7161) [`566af78`](https://github.com/tinacms/tinacms/commit/566af78ded66891edeb6fdf928b6543d45ac76fd) Thanks [@ahfoysal](https://github.com/ahfoysal)! - Keep folder collection views open when they only contain one document.
+
+- [#7251](https://github.com/tinacms/tinacms/pull/7251) [`b8df6ee`](https://github.com/tinacms/tinacms/commit/b8df6eeee85b603406d204042a5ef95d49e8a9cf) Thanks [@kulesy](https://github.com/kulesy)! - Fix the rich-text link popover not appearing when adding or editing a link.
+
+  Since the popover was moved into a portal on `document.body`, `plate-floating`'s inline `z-index: 50` overrode its `z-[999999]` class, so it rendered behind the form field wrappers (which use z-index up to 1000) and was invisible. It now sits above them, so clicking the link button shows the URL input as expected.
+
+- [#7204](https://github.com/tinacms/tinacms/pull/7204) [`59efccc`](https://github.com/tinacms/tinacms/commit/59efcccd3f1713870e40ebd9db25659cd6357237) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Show a clear error when repo-based media is used with a self-hosted site, instead of a misleading "Bad Route" message.
+
+- [#7213](https://github.com/tinacms/tinacms/pull/7213) [`056ffc2`](https://github.com/tinacms/tinacms/commit/056ffc22dc87b0040281054f4140c6260c22ea1f) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Publish internal package references as ranges instead of exact versions.
+
+  Internal dependencies were declared as `workspace:*`, which pnpm expands to an **exact version** when publishing (`"tinacms": "3.10.0"`), not a range. An exact pin cannot deduplicate against the version a consumer has already installed, so npm nests a second — and third — complete copy of `tinacms` and its dependency tree. In a stock Astro + TinaCMS blog this produced three copies of `tinacms`, three of `mermaid` (186 MB), five of `date-fns` (151 MB), and four of `typescript` (88 MB): about **320 MB of duplication**.
+
+  The same expansion applied to `peerDependencies`, so packages such as `next-tinacms-cloudinary` and `tinacms-authjs` published `"tinacms": "3.10.0"` as a _peer_ — requiring consumers to have that exact version or hit an `ERESOLVE` conflict, and forcing a republish of every dependent on each `tinacms` release.
+
+  Switching these to `workspace:^` publishes them as caret ranges (`^3.10.0`), which deduplicate normally and let `onlyUpdatePeerDependentsWhenOutOfRange` do its job.
+
+- Updated dependencies [[`cdbf469`](https://github.com/tinacms/tinacms/commit/cdbf469d96d8a3bcf5d3096d53907a06eaaed7f2), [`056ffc2`](https://github.com/tinacms/tinacms/commit/056ffc22dc87b0040281054f4140c6260c22ea1f)]:
+  - @tinacms/bridge@0.3.1
+  - @tinacms/mdx@2.1.11
+  - @tinacms/search@1.2.23
+
 ## 3.10.1
 
 ### Patch Changes

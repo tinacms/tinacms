@@ -29,7 +29,11 @@ const resolveRegistry = (): Promise<FieldRegistry> =>
 const renderTitle = (document?: TinaDocument) =>
   render(
     <TinaProvider plugins={[stringFieldPlugin]}>
-      <FormProvider collection={collection} document={document}>
+      <FormProvider
+        collection={collection}
+        path='content/posts/test.mdx'
+        document={document}
+      >
         <Field address='title' />
       </FormProvider>
     </TinaProvider>

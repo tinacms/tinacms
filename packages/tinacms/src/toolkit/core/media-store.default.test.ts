@@ -4,6 +4,16 @@ import { EventBus } from './event';
 import type { Media, MediaUploadOptions } from './media';
 import { TinaMediaStore } from './media-store.default';
 
+/** Runs `fn`, returning the value it throws/rejects with (or fails the test). */
+const captureRejection = async (fn: () => Promise<unknown>): Promise<any> => {
+  try {
+    await fn();
+  } catch (err) {
+    return err;
+  }
+  throw new Error('Expected the operation to reject, but it resolved');
+};
+
 type FetchWithTokenMock = ReturnType<typeof vi.fn>;
 type TinaApiMock = {
   branch?: string;
@@ -11,6 +21,7 @@ type TinaApiMock = {
   contentApiUrl: string;
   assetsApiUrl: string;
   isLocalMode: boolean;
+  isCustomContentApi: boolean;
   authProvider: {
     fetchWithToken: FetchWithTokenMock;
     isAuthenticated: ReturnType<typeof vi.fn>;
@@ -48,6 +59,8 @@ const stubS3PutOk = () =>
 const buildStore = ({
   branch = 'main',
   isLocalMode = false,
+  isCustomContentApi = false,
+  contentApiUrl = 'https://content.tinajs.io/1.1/content/test-client/github/main',
   authenticated = true,
   usingProtectedBranch = false,
   createBranch,
@@ -59,6 +72,8 @@ const buildStore = ({
 }: {
   branch?: string | undefined;
   isLocalMode?: boolean;
+  isCustomContentApi?: boolean;
+  contentApiUrl?: string;
   authenticated?: boolean;
   usingProtectedBranch?: boolean;
   createBranch?: ReturnType<typeof vi.fn>;
@@ -77,10 +92,10 @@ const buildStore = ({
   const api: TinaApiMock = {
     branch,
     clientId: 'test-client',
-    contentApiUrl:
-      'https://content.tinajs.io/1.1/content/test-client/github/main',
+    contentApiUrl,
     assetsApiUrl: 'https://assets.tinajs.io',
     isLocalMode,
+    isCustomContentApi,
     authProvider,
     options: {},
     getRequestStatus: vi.fn().mockResolvedValue({ error: false }),
@@ -139,6 +154,108 @@ const buildStore = ({
       api.waitForEditorialWorkflowStatus as ReturnType<typeof vi.fn>,
   };
 };
+
+describe('TinaMediaStore — endpoint version (v1 vs v2)', () => {
+  it('lists media from the v2 endpoint', async () => {
+    const { store, fetchWithToken } = buildStore({ branch: 'main' });
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+    );
+
+    await store.list({ directory: '', thumbnailSizes: [] });
+
+    const calledUrl = fetchWithToken.mock.calls[0][0];
+    expect(calledUrl).toContain('/v2/test-client/list');
+    expect(calledUrl).not.toContain('/v1/');
+  });
+
+  it('lists a subdirectory from the v2 endpoint', async () => {
+    const { store, fetchWithToken } = buildStore({ branch: 'main' });
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+    );
+
+    await store.list({ directory: 'uploads', thumbnailSizes: [] });
+
+    const calledUrl = fetchWithToken.mock.calls[0][0];
+    expect(calledUrl).toContain('/v2/test-client/list/uploads');
+    expect(calledUrl).not.toContain('/v1/');
+  });
+
+  describe('mutating operations stay on v1', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+      vi.unstubAllGlobals();
+    });
+
+    it('deletes via the v1 endpoint', async () => {
+      const { store, fetchWithToken } = buildStore({ branch: 'main' });
+      fetchWithToken.mockResolvedValueOnce(
+        makeJsonResponse(200, { requestId: 'req-1' })
+      );
+
+      const deletePromise = store.delete({
+        directory: 'images',
+        filename: 'a.png',
+      } as Media);
+      await vi.advanceTimersByTimeAsync(1100);
+      await deletePromise;
+
+      const calledUrl = fetchWithToken.mock.calls[0][0];
+      expect(calledUrl).toContain('/v1/test-client/');
+      expect(calledUrl).not.toContain('/v2/');
+    });
+
+    it('requests the upload URL via v1 but resolves uploaded entries via v2', async () => {
+      const { store, fetchWithToken } = buildStore({ branch: 'feat%2Fx' });
+      fetchWithToken.mockResolvedValueOnce(
+        makeJsonResponse(200, {
+          signedUrl: 'https://s3.example/signed',
+          requestId: 'req-1',
+        })
+      );
+      fetchWithToken.mockResolvedValueOnce(
+        makeJsonResponse(200, {
+          files: [
+            {
+              filename: 'llama.png',
+              src: 'https://assets.tina.io/test-client/__file/uploads/llama.png',
+            },
+          ],
+          directories: [],
+          cursor: 0,
+        })
+      );
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        text: vi.fn().mockResolvedValue(''),
+        json: vi.fn().mockResolvedValue({}),
+      });
+      vi.stubGlobal('fetch', fetchMock);
+
+      const uploads: MediaUploadOptions[] = [
+        {
+          directory: 'uploads',
+          file: new File(['x'], 'llama.png', { type: 'image/png' }),
+        },
+      ];
+
+      const persistPromise = store.persist(uploads);
+      await vi.advanceTimersByTimeAsync(1100);
+      await persistPromise;
+
+      const uploadUrl = fetchWithToken.mock.calls[0][0];
+      const listUrl = fetchWithToken.mock.calls[1][0];
+      expect(uploadUrl).toContain('/v1/test-client/upload_url/');
+      expect(listUrl).toContain('/v2/test-client/list');
+    });
+  });
+});
 
 describe('TinaMediaStore — branch query param', () => {
   describe('list()', () => {
@@ -1294,5 +1411,123 @@ describe('TinaMediaStore — protected-branch interception', () => {
 
     expect(startMediaEditorialWorkflow).toHaveBeenCalledTimes(2);
     expect(onWorkflowComplete).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('TinaMediaStore — self-hosted repo media', () => {
+  // Repo-backed media (`media.tina`) is served by TinaCloud's assets API.
+  // A self-hosted site (a custom content API and not local mode) has no such
+  // endpoint, so every operation should fail fast with a clear, actionable
+  // message instead of a misleading TinaCloud/provider error.
+  const expectSelfHostedError = (err: any) => {
+    expect(err?.ERR_TYPE).toBe('MediaListError');
+    expect(err?.title).toMatch(/self-host/i);
+    // Must not surface the old misleading "route is missing or misconfigured"
+    // message that blamed a provider the user never configured.
+    expect(err?.message ?? '').not.toMatch(
+      /route is missing or misconfigured/i
+    );
+    // Point the user at configuring an external media store.
+    expect(err?.message ?? '').toMatch(/media store|provider/i);
+    expect(typeof err?.docsLink).toBe('string');
+  };
+
+  it('list() fails fast when the content API is a relative self-hosted route', async () => {
+    const { store, fetchWithToken } = buildStore({
+      isCustomContentApi: true,
+      contentApiUrl: '/api/tina/gql',
+    });
+
+    const err = await captureRejection(() =>
+      store.list({ directory: '', thumbnailSizes: [] })
+    );
+
+    expectSelfHostedError(err);
+    expect(fetchWithToken).not.toHaveBeenCalled();
+  });
+
+  it('list() replaces the misleading provider error for an absolute self-hosted origin', async () => {
+    // Reproduces the reported case: an absolute override resolves to a live
+    // fetch that 404s and previously surfaced "Bad Route — the Cloudinary API
+    // route is missing or misconfigured."
+    const { store, fetchWithToken } = buildStore({
+      isCustomContentApi: true,
+      contentApiUrl: 'https://my-self-hosted-site.com/api/tina/gql',
+    });
+    fetchWithToken.mockResolvedValue(makeJsonResponse(404, {}));
+
+    const err = await captureRejection(() =>
+      store.list({ directory: '', thumbnailSizes: [] })
+    );
+
+    expectSelfHostedError(err);
+    expect(fetchWithToken).not.toHaveBeenCalled();
+  });
+
+  it('persist() fails fast without attempting an upload', async () => {
+    const { store, fetchWithToken } = buildStore({
+      isCustomContentApi: true,
+      contentApiUrl: 'https://my-self-hosted-site.com/api/tina/gql',
+    });
+
+    const err = await captureRejection(() =>
+      store.persist([
+        {
+          directory: 'images',
+          file: new File(['x'], 'a.png', { type: 'image/png' }),
+        } as MediaUploadOptions,
+      ])
+    );
+
+    expectSelfHostedError(err);
+    expect(fetchWithToken).not.toHaveBeenCalled();
+  });
+
+  it('delete() fails fast without attempting a request', async () => {
+    const { store, fetchWithToken } = buildStore({
+      isCustomContentApi: true,
+      contentApiUrl: 'https://my-self-hosted-site.com/api/tina/gql',
+    });
+
+    const err = await captureRejection(() =>
+      store.delete({ directory: 'images', filename: 'a.png' } as Media)
+    );
+
+    expectSelfHostedError(err);
+    expect(fetchWithToken).not.toHaveBeenCalled();
+  });
+
+  it('does not fire for TinaCloud (custom content API not set)', async () => {
+    const { store, fetchWithToken } = buildStore({ isCustomContentApi: false });
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+    );
+
+    await expect(
+      store.list({ directory: '', thumbnailSizes: [] })
+    ).resolves.toBeDefined();
+    expect(fetchWithToken).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not fire in local mode even with a custom content API', async () => {
+    const { store } = buildStore({
+      isLocalMode: true,
+      isCustomContentApi: true,
+      contentApiUrl: 'http://localhost:4001/graphql',
+    });
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockResolvedValue(
+          makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+        )
+    );
+
+    await expect(
+      store.list({ directory: '', thumbnailSizes: [] })
+    ).resolves.toBeDefined();
+
+    vi.unstubAllGlobals();
   });
 });

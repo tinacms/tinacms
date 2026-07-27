@@ -29,7 +29,11 @@ const resolveRegistry = (): Promise<FieldRegistry> =>
 const renderFeatured = (document?: TinaDocument) =>
   render(
     <TinaProvider plugins={[booleanFieldPlugin]}>
-      <FormProvider collection={collection} document={document}>
+      <FormProvider
+        collection={collection}
+        path='content/posts/featured.mdx'
+        document={document}
+      >
         <Field address='featured' />
       </FormProvider>
     </TinaProvider>

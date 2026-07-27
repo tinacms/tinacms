@@ -15,10 +15,19 @@ import {
   buildClientSchema,
   getIntrospectionQuery,
 } from 'graphql';
+import type { PostHog } from 'posthog-node';
 import Progress from 'progress';
 import type { ViteDevServer } from 'vite';
 import { logger, summary } from '../../../logger';
 import { getFaqLink } from '../../../utils';
+import {
+  BuildFinishedEvent,
+  BuildInvokeEvent,
+  BuildInvokeEventPayload,
+  generateSessionId,
+  initializePostHog,
+  postHogCapture,
+} from '../../../utils/posthog';
 import { timeout } from '../../../utils/sleep';
 import { spin } from '../../../utils/spinner';
 import { dangerText, linkText, warnText } from '../../../utils/theme';
@@ -30,15 +39,6 @@ import { BaseCommand } from '../baseCommands';
 import { createDevServer } from '../dev-command/server';
 import { buildProductionSpa } from './server';
 import { waitForDB } from './waitForDB';
-import type { PostHog } from 'posthog-node';
-import {
-  BuildFinishedEvent,
-  BuildInvokeEvent,
-  BuildInvokeEventPayload,
-  generateSessionId,
-  initializePostHog,
-  postHogCapture,
-} from '../../../utils/posthog';
 
 export class BuildCommand extends BaseCommand {
   static paths = [['build']];
@@ -115,6 +115,7 @@ export class BuildCommand extends BaseCommand {
       tinaGraphQLVersion: this.tinaGraphQLVersion,
       legacyNoSDK: this.noSDK,
     });
+    this.warnOnVersionSkew(configManager.rootPath);
 
     if (this.previewName && !this.previewBaseBranch) {
       logger.error(

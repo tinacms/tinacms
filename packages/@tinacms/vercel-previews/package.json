@@ -1,7 +1,7 @@
 {
 	"name": "@tinacms/vercel-previews",
 	"type": "module",
-	"version": "0.2.18",
+	"version": "0.2.19",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"keywords": [
@@ -39,7 +39,7 @@
 	},
 	"dependencies": {
 		"@vercel/stega": "catalog:",
-		"tinacms": "workspace:*"
+		"tinacms": "workspace:^"
 	},
 	"peerDependencies": {
 		"react": ">=16.14"

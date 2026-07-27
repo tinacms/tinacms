@@ -1,7 +1,7 @@
 {
   "name": "next-tinacms-azure",
   "type": "module",
-  "version": "15.0.2",
+  "version": "15.0.3",
   "description": "",
   "main": "dist/index.js",
   "module": "./dist/index.js",
@@ -47,8 +47,8 @@
     "typescript": "^5.7.3"
   },
   "peerDependencies": {
-    "tinacms": "workspace:*",
-    "@tinacms/auth": "workspace:*"
+    "tinacms": "workspace:^",
+    "@tinacms/auth": "workspace:^"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
