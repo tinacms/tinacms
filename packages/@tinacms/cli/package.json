@@ -25,6 +25,8 @@
         "react-dom": ">=18.3.1 <20.0.0"
     },
     "devDependencies": {
+        "@babel/core": "^7.28.5",
+        "@babel/preset-env": "^7.28.5",
         "@tinacms/scripts": "workspace:*",
         "@types/clear": "catalog:",
         "@types/cli-spinner": "catalog:",
@@ -40,6 +42,7 @@
         "@types/node": "^22.13.1",
         "@types/progress": "catalog:",
         "@types/prompts": "catalog:",
+        "babel-jest": "^29.7.0",
         "jest": "catalog:",
         "mongodb-level": "catalog:",
         "sqlite-level": "catalog:",
