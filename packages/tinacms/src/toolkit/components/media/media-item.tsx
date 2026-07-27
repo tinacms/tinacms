@@ -126,7 +126,10 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
             NEW
           </span>
         )}
-        <div className='relative w-full aspect-square overflow-hidden bg-gray-50'>
+        <div
+          className='relative w-full overflow-hidden bg-gray-50'
+          style={{ aspectRatio: '1 / 1' }}
+        >
           {itemIsImage ? (
             <img
               className='block w-full h-full object-center object-cover'
