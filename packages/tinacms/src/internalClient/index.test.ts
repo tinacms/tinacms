@@ -84,7 +84,7 @@ describe('Tina Client', () => {
       expect(client.authProvider).toBeInstanceOf(LocalAuthProvider);
     });
 
-    it('sends no Authorization header because LocalAuthProvider returns an empty id_token', async () => {
+    it('sends Authorization header with LOCAL token from LocalAuthProvider', async () => {
       const fetchMock = stubFetchOnce(
         makeResponse({ status: 200, body: { data: {} } })
       );
@@ -92,7 +92,7 @@ describe('Tina Client', () => {
       await client.request('{ x }', { variables: {} });
 
       const [, init] = fetchMock.mock.calls[0];
-      expect(init.headers).not.toHaveProperty('Authorization');
+      expect(init.headers).toHaveProperty('Authorization', 'Bearer LOCAL');
     });
   });
 

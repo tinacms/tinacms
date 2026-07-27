@@ -57,7 +57,8 @@ const Playground = () => {
   const ref = React.useRef();
 
   const getToken = () => {
-    return JSON.parse(localStorage.getItem('tinacms-auth') || '{}')?.id_token;
+    const auth = JSON.parse(localStorage.getItem('tinacms-auth') || '{}');
+    return auth?.access_token || auth?.id_token;
   };
 
   if (!autoQueries) {

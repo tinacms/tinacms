@@ -1,187 +1,83 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  authenticate,
-  AUTH_TOKEN_KEY,
-  AuthenticationCancelledError,
-} from './authenticate';
+import { authenticate, AUTH_TOKEN_KEY, PKCE_STORAGE_KEY } from './authenticate';
 
-vi.mock('./popupWindow', () => ({
-  default: vi.fn(),
-}));
+const CLIENT_ID = 'test-client-id';
+const IDENTITY_API_URL = 'https://api.example';
 
-import popupWindow from './popupWindow';
-
-const FRONTEND_URL = 'https://frontend.example';
-const EXPECTED_ORIGIN = 'https://frontend.example';
-const UNTRUSTED_ORIGIN = 'https://untrusted.example';
-
-const TINA_LOGIN_EVENT = 'tinaCloudLogin';
-
-const validData = {
-  source: TINA_LOGIN_EVENT,
-  id_token: 'id-token',
-  access_token: 'access-token',
-  refresh_token: 'refresh-token',
-};
-
-// A stand-in for the Window object returned by window.open.
-const makeAuthTab = () => ({
-  close: vi.fn(),
-  closed: false,
-});
-
-// Captured `message` listeners registered against the real window. We spy on
-// addEventListener/removeEventListener so the real window object is preserved.
-let messageListeners: Array<(e: MessageEvent) => void>;
-let authTab: ReturnType<typeof makeAuthTab>;
-
-const dispatch = (e: Partial<MessageEvent>) => {
-  for (const listener of [...messageListeners]) {
-    listener(e as MessageEvent);
-  }
-};
+let originalHref: string;
 
 beforeEach(() => {
-  vi.useFakeTimers();
-  messageListeners = [];
-  authTab = makeAuthTab();
-
-  vi.mocked(popupWindow).mockReturnValue(authTab as unknown as Window);
-
-  vi.spyOn(window, 'addEventListener').mockImplementation(
-    (type: string, cb: EventListenerOrEventListenerObject) => {
-      if (type === 'message') {
-        messageListeners.push(cb as (e: MessageEvent) => void);
-      }
-    }
-  );
-  vi.spyOn(window, 'removeEventListener').mockImplementation(
-    (type: string, cb: EventListenerOrEventListenerObject) => {
-      if (type === 'message') {
-        messageListeners = messageListeners.filter((l) => l !== cb);
-      }
-    }
-  );
+  originalHref = window.location.href;
+  Object.defineProperty(window, 'location', {
+    value: new URL('https://mysite.com/admin'),
+    writable: true,
+  });
+  localStorage.clear();
 });
 
 afterEach(() => {
-  vi.useRealTimers();
-  vi.restoreAllMocks();
+  Object.defineProperty(window, 'location', {
+    value: new URL(originalHref),
+    writable: true,
+  });
+  localStorage.clear();
 });
 
-// Drive the popup-closed poll so a pending authenticate() promise settles
-// deterministically, and assert it rejects with the cancellation error.
-const settleViaPopupClose = async (result: Promise<unknown>) => {
-  const expectation = expect(result).rejects.toThrowError(
-    new AuthenticationCancelledError('Popup was closed')
-  );
-  authTab.closed = true;
-  await vi.advanceTimersByTimeAsync(600);
-  await expectation;
-};
+describe('authenticate', () => {
+  it('stores PKCE data in localStorage', async () => {
+    const promise = authenticate(CLIENT_ID, IDENTITY_API_URL);
 
-describe('authenticate origin/source validation', () => {
-  it('ignores a message from an untrusted origin', async () => {
-    const result = authenticate('client-id', FRONTEND_URL);
-
-    dispatch({
-      origin: UNTRUSTED_ORIGIN,
-      source: authTab as unknown as Window,
-      data: validData,
+    // The function redirects, so it never resolves. We catch the navigation.
+    await vi.waitFor(() => {
+      const stored = JSON.parse(localStorage.getItem(PKCE_STORAGE_KEY));
+      expect(stored).toBeTruthy();
+      expect(stored.client_id).toBe(CLIENT_ID);
+      expect(stored.identity_api_url).toBe(IDENTITY_API_URL);
+      expect(stored.code_verifier).toHaveLength(128);
+      expect(stored.state).toBeTruthy();
     });
-
-    // The handler should not have resolved; the listener stays registered.
-    expect(messageListeners.length).toBe(1);
-    expect(authTab.close).not.toHaveBeenCalled();
-
-    await settleViaPopupClose(result);
   });
 
-  it('ignores a message from the expected origin but a different source', async () => {
-    const result = authenticate('client-id', FRONTEND_URL);
+  it('generates a valid code_challenge from code_verifier', async () => {
+    await authenticate(CLIENT_ID, IDENTITY_API_URL);
 
-    const otherWindow = makeAuthTab();
-    dispatch({
-      origin: EXPECTED_ORIGIN,
-      source: otherWindow as unknown as Window,
-      data: validData,
-    });
-
-    expect(messageListeners.length).toBe(1);
-    expect(authTab.close).not.toHaveBeenCalled();
-
-    await settleViaPopupClose(result);
+    const stored = JSON.parse(localStorage.getItem(PKCE_STORAGE_KEY));
+    expect(stored.code_verifier).toMatch(/^[A-Za-z0-9]{128}$/);
+    expect(stored.state).toMatch(/^[A-Za-z0-9]{40}$/);
   });
 
-  it('accepts a message from the expected origin and the exact opened popup source', async () => {
-    const result = authenticate('client-id', FRONTEND_URL);
+  it('redirects to the authorize endpoint', async () => {
+    await authenticate(CLIENT_ID, IDENTITY_API_URL);
 
-    dispatch({
-      origin: EXPECTED_ORIGIN,
-      source: authTab as unknown as Window,
-      data: validData,
-    });
-
-    await expect(result).resolves.toEqual({
-      id_token: 'id-token',
-      access_token: 'access-token',
-      refresh_token: 'refresh-token',
-    });
-    expect(authTab.close).toHaveBeenCalled();
-    // Listener cleaned up after a successful login.
-    expect(messageListeners.length).toBe(0);
+    const redirectUrl = new URL(window.location.href);
+    expect(redirectUrl.origin + redirectUrl.pathname).toBe(
+      `${IDENTITY_API_URL}/v2/auth/tinacms`
+    );
+    expect(redirectUrl.searchParams.get('response_type')).toBe('code');
+    expect(redirectUrl.searchParams.get('client_id')).toBe(CLIENT_ID);
+    expect(redirectUrl.searchParams.get('redirect_uri')).toBe(
+      'https://mysite.com/admin'
+    );
+    expect(redirectUrl.searchParams.get('code_challenge_method')).toBe('S256');
+    expect(redirectUrl.searchParams.get('code_challenge')).toBeTruthy();
+    expect(redirectUrl.searchParams.get('state')).toBeTruthy();
   });
 
-  it('derives expectedOrigin from new URL(frontendUrl).origin, including the port', async () => {
-    const result = authenticate('client-id', 'https://frontend.example:8443');
-
-    // Same host but the default port (no :8443) is a different origin.
-    dispatch({
-      origin: 'https://frontend.example',
-      source: authTab as unknown as Window,
-      data: validData,
-    });
-    expect(authTab.close).not.toHaveBeenCalled();
-
-    // Exact origin including the port is accepted.
-    dispatch({
-      origin: 'https://frontend.example:8443',
-      source: authTab as unknown as Window,
-      data: validData,
+  it('uses the correct redirect_uri based on current page', async () => {
+    Object.defineProperty(window, 'location', {
+      value: new URL('https://mysite.com:3000/editor'),
+      writable: true,
     });
 
-    await expect(result).resolves.toEqual({
-      id_token: 'id-token',
-      access_token: 'access-token',
-      refresh_token: 'refresh-token',
-    });
-    expect(authTab.close).toHaveBeenCalled();
+    await authenticate(CLIENT_ID, IDENTITY_API_URL);
+
+    const redirectUrl = new URL(window.location.href);
+    expect(redirectUrl.searchParams.get('redirect_uri')).toBe(
+      'https://mysite.com:3000/editor'
+    );
   });
 
-  it('does not read event.data before origin/source validation', async () => {
-    const result = authenticate('client-id', FRONTEND_URL);
-
-    let dataAccessed = false;
-    const trap = {
-      get source() {
-        dataAccessed = true;
-        return TINA_LOGIN_EVENT;
-      },
-    };
-
-    // Untrusted origin: the handler must bail out before touching e.data.
-    dispatch({
-      origin: UNTRUSTED_ORIGIN,
-      source: authTab as unknown as Window,
-      data: trap,
-    });
-
-    expect(dataAccessed).toBe(false);
-
-    await settleViaPopupClose(result);
+  it('exports the auth token key', () => {
+    expect(AUTH_TOKEN_KEY).toBe('tinacms-auth');
   });
-});
-
-it('exports the auth token key', () => {
-  expect(AUTH_TOKEN_KEY).toBe('tinacms-auth');
 });
