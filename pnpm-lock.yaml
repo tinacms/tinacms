@@ -1217,9 +1217,6 @@ importers:
       tinacms:
         specifier: workspace:^
         version: link:../../tinacms
-      typescript:
-        specifier: ^5.7.3
-        version: 5.9.3
       zod:
         specifier: 'catalog:'
         version: 3.25.76
@@ -1236,6 +1233,9 @@ importers:
       monaco-editor:
         specifier: 'catalog:'
         version: 0.31.0
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
       vite:
         specifier: ^5.4.14
         version: 5.4.21(@types/node@25.1.0)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)
