@@ -175,6 +175,8 @@ export class TinaMediaStore implements MediaStore {
 
   accept = DEFAULT_MEDIA_UPLOAD_TYPES;
 
+  searchable = true;
+
   // allow up to 100MB uploads
   maxSize = 100 * 1024 * 1024;
 

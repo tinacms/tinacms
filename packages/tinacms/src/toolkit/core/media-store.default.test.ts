@@ -155,6 +155,13 @@ const buildStore = ({
   };
 };
 
+describe('TinaMediaStore — capabilities', () => {
+  it('advertises searchable so the media manager shows the search box', () => {
+    const { store } = buildStore();
+    expect(store.searchable).toBe(true);
+  });
+});
+
 describe('TinaMediaStore — endpoint version (v1 vs v2)', () => {
   it('lists media from the v2 endpoint', async () => {
     const { store, fetchWithToken } = buildStore({ branch: 'main' });

@@ -108,6 +108,15 @@ export interface MediaStore {
   isStatic?: boolean;
 
   /**
+   * Indicates that `list` honours the `search` option, so the media manager
+   * may show a search box. Stores that ignore `search` should leave this
+   * unset to avoid a search box that returns unfiltered results.
+   *
+   * @default false
+   */
+  searchable?: boolean;
+
+  /**
    * Converts a Media object to the value stored in a form field.
    *
    * Typically returns `media.src`. If not implemented, the image field
