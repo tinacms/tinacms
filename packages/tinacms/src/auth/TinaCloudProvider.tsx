@@ -24,7 +24,10 @@ import {
   TinaIOConfig,
 } from '../internalClient';
 import { CreateClientProps, createClient } from '../utils';
-import { useTinaAuthRedirect } from './useTinaAuthRedirect';
+import {
+  useTinaAuthRedirect,
+  type AuthRedirectParams,
+} from './useTinaAuthRedirect';
 import { AuthenticationCancelledError } from './authenticate';
 import { captureEvent } from '../lib/posthog/posthogProvider';
 import { BranchSwitchedEvent } from '../lib/posthog/posthog';
@@ -54,7 +57,8 @@ const AuthWallInner = ({
   children,
   cms,
   getModalActions,
-}: TinaCloudAuthWallProps) => {
+  isAuthRedirect,
+}: TinaCloudAuthWallProps & { isAuthRedirect?: boolean }) => {
   const client: Client = cms.api.tina;
   // Whether we are using TinaCloud for auth
   const isTinaCloud =
@@ -81,6 +85,14 @@ const AuthWallInner = ({
 
   React.useEffect(() => {
     let mounted = true;
+
+    if (isAuthRedirect) {
+      setActiveModal('authenticate');
+      return () => {
+        mounted = false;
+      };
+    }
+
     client.authProvider
       .isAuthenticated()
       .then((isAuthenticated) => {
@@ -210,6 +222,7 @@ const AuthWallInner = ({
             )
           }
           close={close}
+          busy={isAuthRedirect}
           actions={[
             ...otherModalActions,
             {
@@ -226,6 +239,7 @@ const AuthWallInner = ({
             title={modalTitle}
             message={''}
             close={close}
+            busy={isAuthRedirect}
             actions={[
               ...otherModalActions,
               {
@@ -342,7 +356,19 @@ export const TinaCloudProvider = (
     'tinacms-current-branch',
     baseBranch
   );
-  useTinaAuthRedirect();
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const authRedirectParams: AuthRedirectParams = {
+    code: urlParams.get('code'),
+    state: urlParams.get('state'),
+    error: urlParams.get('error'),
+  };
+
+  const isAuthRedirect = !!(
+    authRedirectParams.code && authRedirectParams.state
+  );
+  useTinaAuthRedirect(authRedirectParams);
+
   const cms = React.useMemo(
     () =>
       props.cms ||
@@ -534,7 +560,7 @@ export const TinaCloudProvider = (
       >
         <TinaProvider cms={cms}>
           <MediaWorkflowOverlay />
-          <AuthWallInner {...props} cms={cms} />
+          <AuthWallInner {...props} cms={cms} isAuthRedirect={isAuthRedirect} />
         </TinaProvider>
       </BranchDataProvider>
     </SessionProvider>
