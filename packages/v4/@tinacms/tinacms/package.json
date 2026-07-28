@@ -10,12 +10,16 @@
     "directory": "packages/v4/@tinacms/tinacms"
   },
   "sideEffects": false,
+  "bin": {
+    "tinacms": "./bin/tinacms.mjs"
+  },
   "scripts": {
     "build": "tinacms-scripts build",
     "dev": "vite playground",
-    "types": "tsc",
+    "types": "tsc && tsc -p tsconfig.test.json",
     "test": "vitest run --passWithNoTests",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "codegen": "node ./bin/tinacms.mjs codegen --root playground"
   },
   "exports": {
     ".": {

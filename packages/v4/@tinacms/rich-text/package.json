@@ -3,7 +3,7 @@
   "version": "4.0.0-alpha.0",
   "private": true,
   "license": "Apache-2.0",
-  "description": "TinaCMS v4 — the Plate rich-text editor, behind a value contract so the storage format and the editor can each be replaced without the other.",
+  "description": "TinaCMS v4 \u2014 the Plate rich-text editor, behind a value contract so the storage format and the editor can each be replaced without the other.",
   "type": "module",
   "repository": {
     "url": "https://github.com/tinacms/tinacms.git",
@@ -12,7 +12,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "tinacms-scripts build",
-    "types": "tsc",
+    "types": "tsc && tsc -p tsconfig.test.json",
     "test": "vitest run --passWithNoTests"
   },
   "exports": {

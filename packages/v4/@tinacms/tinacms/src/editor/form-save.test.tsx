@@ -19,6 +19,7 @@ import {
 
 const collection: CollectionSchema = {
   name: 'post',
+  format: 'mdx',
   fields: [t.string({ name: 'title', label: 'Title' })],
 };
 
@@ -114,6 +115,7 @@ function StructureField() {
 
 const structureCollection: CollectionSchema = {
   name: 'post',
+  format: 'mdx',
   fields: [{ name: 'body', type: 'structure' }],
 };
 

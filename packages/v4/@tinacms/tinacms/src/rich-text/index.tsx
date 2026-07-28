@@ -90,7 +90,11 @@ export type Components<ComponentAndProps extends object> = {
 
 export type TinaMarkdownContent = {
   type: string;
-  children: TinaMarkdownContent[];
+  // Optional because leaves genuinely have none: a text node is
+  // `{ type: 'text', text: '…' }`, which is what the parser emits and what the
+  // renderer branches on. Requiring it described a tree that never exists —
+  // every caller had to cast around it, which is exactly what hid the mismatch.
+  children?: TinaMarkdownContent[];
 };
 
 export const TinaMarkdown = <

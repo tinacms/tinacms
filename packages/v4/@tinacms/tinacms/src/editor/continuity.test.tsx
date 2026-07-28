@@ -10,12 +10,23 @@ import { describe, expect, it, vi } from 'vitest';
 import { toFieldAddress } from '../core/field/address';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import {
+  type FormId,
+  type FormStore,
+  isEdited,
   toFormId,
   useFormErrors,
   useFormStore,
   useFormValues,
 } from '../form/form-store';
 import { t } from '../index';
+
+// A pristine form has never been validated, so the store models it as carrying no
+// errors at all rather than an empty map (form-store.ts). Narrowing here keeps
+// that shape honest instead of reaching through the union at every assertion.
+const errorsOf = (forms: FormStore['forms'], formId: FormId) => {
+  const scope = forms[formId];
+  return isEdited(scope) ? scope.errors : undefined;
+};
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import {
   Field,
@@ -32,6 +43,7 @@ import {
 // second, distinguishable one (bleed detection needs two distinct messages).
 const collection: CollectionSchema = {
   name: 'post',
+  format: 'mdx',
   fields: [
     t.string({
       name: 'title',
@@ -186,9 +198,9 @@ describe('form continuity across mounts', () => {
     await userEvent.clear(inputA);
     await userEvent.type(inputA, 'x');
     await waitFor(() =>
-      expect(useFormStore.getState().forms[formIdA]?.errors?.[title]).toEqual([
-        'Title must be at least 3 characters',
-      ])
+      expect(errorsOf(useFormStore.getState().forms, formIdA)?.[title]).toEqual(
+        ['Title must be at least 3 characters']
+      )
     );
     unmount();
 
@@ -198,8 +210,8 @@ describe('form continuity across mounts', () => {
     // loss if the form unmounts inside that window).
     const seen: unknown[] = [];
     const unsubscribe = useFormStore.subscribe((state, previous) => {
-      const errors = state.forms[formIdA]?.errors;
-      if (errors !== previous.forms[formIdA]?.errors) seen.push(errors);
+      const errors = errorsOf(state.forms, formIdA);
+      if (errors !== errorsOf(previous.forms, formIdA)) seen.push(errors);
     });
     render(host(pathA, { title: 'Doc A' }));
     await screen.findByText('Title must be at least 3 characters');
@@ -207,7 +219,7 @@ describe('form continuity across mounts', () => {
     expect(
       seen.every((errors) => errors != null && Object.keys(errors).length > 0)
     ).toBe(true);
-    expect(useFormStore.getState().forms[formIdA]?.errors?.[title]).toEqual([
+    expect(errorsOf(useFormStore.getState().forms, formIdA)?.[title]).toEqual([
       'Title must be at least 3 characters',
     ]);
   });
@@ -219,24 +231,24 @@ describe('form continuity across mounts', () => {
     await userEvent.clear(inputA);
     await userEvent.type(inputA, 'x');
     await waitFor(() =>
-      expect(useFormStore.getState().forms[formIdA]?.errors?.[title]).toEqual([
-        'Title must be at least 3 characters',
-      ])
+      expect(errorsOf(useFormStore.getState().forms, formIdA)?.[title]).toEqual(
+        ['Title must be at least 3 characters']
+      )
     );
 
     // Fixing the value clears the mirror through the same chokepoint.
     await userEvent.type(inputA, 'yz');
     await waitFor(() =>
       expect(
-        useFormStore.getState().forms[formIdA]?.errors?.[title]
+        errorsOf(useFormStore.getState().forms, formIdA)?.[title]
       ).toBeUndefined()
     );
     await userEvent.clear(inputA);
     await userEvent.type(inputA, 'x');
     await waitFor(() =>
-      expect(useFormStore.getState().forms[formIdA]?.errors?.[title]).toEqual([
-        'Title must be at least 3 characters',
-      ])
+      expect(errorsOf(useFormStore.getState().forms, formIdA)?.[title]).toEqual(
+        ['Title must be at least 3 characters']
+      )
     );
 
     // A is torn down; its mirrored errors are still readable while B is hosted
@@ -245,7 +257,7 @@ describe('form continuity across mounts', () => {
     await waitFor(() =>
       expect(screen.getByLabelText('title')).toHaveValue('Doc B')
     );
-    expect(useFormStore.getState().forms[formIdA]?.errors?.[title]).toEqual([
+    expect(errorsOf(useFormStore.getState().forms, formIdA)?.[title]).toEqual([
       'Title must be at least 3 characters',
     ]);
   });
@@ -306,14 +318,14 @@ describe('unkeyed document switches (same FormProvider instance)', () => {
     await userEvent.type(inputA, ' with far too long a title');
     await waitFor(() =>
       expect(
-        useFormStore.getState().forms[toFormId(pathA)]?.errors?.[title]
+        errorsOf(useFormStore.getState().forms, toFormId(pathA))?.[title]
       ).toContain('Title must be at most 20 characters')
     );
 
     const seen: unknown[] = [];
     const unsubscribe = useFormStore.subscribe((state, previous) => {
-      const errors = state.forms[formIdB]?.errors;
-      if (errors !== previous.forms[formIdB]?.errors) seen.push(errors);
+      const errors = errorsOf(state.forms, formIdB);
+      if (errors !== errorsOf(previous.forms, formIdB)) seen.push(errors);
     });
     rerender(unkeyedHost(pathB, { title: 'Doc B' }));
     await waitFor(() =>
@@ -331,12 +343,12 @@ describe('unkeyed document switches (same FormProvider instance)', () => {
           !JSON.stringify(errors).includes('at most')
       )
     ).toBe(true);
-    expect(useFormStore.getState().forms[formIdB]?.errors?.[title]).toEqual([
+    expect(errorsOf(useFormStore.getState().forms, formIdB)?.[title]).toEqual([
       'Title must be at least 3 characters',
     ]);
     // A's own error is still where it belongs.
     expect(
-      useFormStore.getState().forms[toFormId(pathA)]?.errors?.[title]
+      errorsOf(useFormStore.getState().forms, toFormId(pathA))?.[title]
     ).toContain('Title must be at most 20 characters');
 
     // And the mirror is alive under the new owner: a fresh edit in B mirrors
@@ -345,9 +357,9 @@ describe('unkeyed document switches (same FormProvider instance)', () => {
     await userEvent.clear(inputB);
     await userEvent.type(inputB, 'now far too long for the max rule');
     await waitFor(() =>
-      expect(useFormStore.getState().forms[formIdB]?.errors?.[title]).toContain(
-        'Title must be at most 20 characters'
-      )
+      expect(
+        errorsOf(useFormStore.getState().forms, formIdB)?.[title]
+      ).toContain('Title must be at most 20 characters')
     );
   });
 });

@@ -18,6 +18,7 @@ import numberFieldPlugin from './number-field.plugin';
 const collection: CollectionSchema = {
   name: 'post',
   label: 'Posts',
+  format: 'mdx',
   fields: [
     t.number({
       name: 'rating',

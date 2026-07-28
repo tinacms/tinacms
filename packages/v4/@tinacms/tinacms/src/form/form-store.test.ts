@@ -4,6 +4,7 @@ import {
   type FormId,
   fieldDirty,
   formStatus,
+  isEdited,
   toDocument,
   toFormId,
   toFormValues,
@@ -155,16 +156,24 @@ describe('form-store structural value equality', () => {
 });
 
 describe('form-store error mirror', () => {
+  // `errors` exists only on an edited scope — a pristine form has never been
+  // validated, so the store gives it no error map at all rather than an empty
+  // one. Narrowing here asserts against the real shape.
   const scope = () => store.getState().forms[postA];
+  const errorsOf = () => {
+    const current = scope();
+    if (!isEdited(current)) throw new Error('expected an edited scope');
+    return current.errors;
+  };
 
   it('stores mirrored errors on an edited scope and clears them on a clean write', () => {
     store.getState().registerForm(postA, { [title]: 'Hello' });
     store.getState().setFieldValue(postA, title, 'x');
     store.getState().setFieldErrors(postA, { [title]: ['Too short'] });
-    expect(scope().errors[title]).toEqual(['Too short']);
+    expect(errorsOf()[title]).toEqual(['Too short']);
 
     store.getState().setFieldErrors(postA, {});
-    expect(scope().errors).toEqual({});
+    expect(errorsOf()).toEqual({});
   });
 
   it('no-ops on a pristine scope — never validated, nothing to mirror', () => {
@@ -195,7 +204,7 @@ describe('form-store error mirror', () => {
     store.getState().setFieldValue(postA, title, 'x');
     store.getState().setFieldErrors(postA, { [title]: ['Too short'] });
     store.getState().setFieldValue(postA, title, 'xy');
-    expect(scope().errors[title]).toEqual(['Too short']);
+    expect(errorsOf()[title]).toEqual(['Too short']);
   });
 
   it('markSaved carries errors through', () => {
@@ -203,7 +212,7 @@ describe('form-store error mirror', () => {
     store.getState().setFieldValue(postA, title, 'x');
     store.getState().setFieldErrors(postA, { [title]: ['Too short'] });
     store.getState().markSaved(postA);
-    expect(scope().errors[title]).toEqual(['Too short']);
+    expect(errorsOf()[title]).toEqual(['Too short']);
   });
 });
 
@@ -230,7 +239,9 @@ describe('form-store per-field dirty', () => {
     store.getState().setFieldValue(postA, title, 'Changed');
     expect(fieldDirty(scope(), title)).toBe(true);
     expect(fieldDirty(scope(), slug)).toBe(false);
-    expect(fieldDirty(store.getState().forms.missing, title)).toBe(false);
+    expect(fieldDirty(store.getState().forms[toFormId('missing')], title)).toBe(
+      false
+    );
   });
 });
 

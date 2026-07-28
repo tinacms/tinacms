@@ -18,6 +18,7 @@ import booleanFieldPlugin from './boolean-field.plugin';
 const collection: CollectionSchema = {
   name: 'post',
   label: 'Posts',
+  format: 'mdx',
   fields: [t.boolean({ name: 'featured', label: 'Featured', required: true })],
 };
 

@@ -1,0 +1,21 @@
+{
+  // The main tsconfig excludes tests because it emits declarations and tests are
+  // not part of the public surface. That left them unchecked by anything: vitest
+  // strips types without reading them, so a test could reference a type that no
+  // longer exists and both `pnpm types` and `pnpm test` would pass. That happened
+  // — a rename left `RichTextAst` behind in two test files and nothing noticed.
+  //
+  // This config checks them and emits nothing. `pnpm types` runs both.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "emitDeclarationOnly": false,
+    // Nothing is emitted, so rootDir has no job here — and keeping src's would
+    // reject the playground, e2e and config files this exists to check.
+    "rootDir": "."
+  },
+  // `**/dist` not just `dist`: the playground builds into its own, and allowJs
+  // means tsc would otherwise typecheck the minified bundles in it.
+  "exclude": ["node_modules", "**/dist"],
+  "include": ["src"]
+}

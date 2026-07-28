@@ -18,6 +18,7 @@ import stringFieldPlugin from './string-field.plugin';
 const collection: CollectionSchema = {
   name: 'post',
   label: 'Posts',
+  format: 'mdx',
   fields: [t.string({ name: 'title', label: 'Title', required: true, min: 3 })],
 };
 

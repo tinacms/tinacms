@@ -14,6 +14,7 @@ import {
 
 const collection: CollectionSchema = {
   name: 'post',
+  format: 'mdx',
   fields: [t.string({ name: 'title', label: 'Title' })],
 };
 

@@ -24,6 +24,7 @@ import { usePreviewConnection } from './preview-connection';
 
 const collection: CollectionSchema = {
   name: 'post',
+  format: 'mdx',
   fields: [t.string({ name: 'title', label: 'Title' })],
 };
 const path = 'content/posts/preview.mdx';
@@ -241,7 +242,7 @@ describe('usePreviewConnection', () => {
     // A bare FormScopeContext is enough: the invariant fires in the hook body,
     // before any effect needs the runtime.
     const wrapper = ({ children }: { children: ReactNode }) => (
-      <FormScopeContext value={{ formId, collection, onSave: null }}>
+      <FormScopeContext value={{ formId, path, collection, onSave: null }}>
         {children}
       </FormScopeContext>
     );
