@@ -1,6 +1,5 @@
 import {
   TinaMarkdown,
-  type TinaMarkdownContent,
   tinaField,
   useTina,
 } from '@tinacms/tinacms/adapters/react';
@@ -38,7 +37,7 @@ export function PostPreview() {
       {/* The body arrives as the mdx AST the editor is editing, so keystrokes
           in the rich-text field show up here without a round-trip to disk. */}
       <div {...tinaField('body')}>
-        <TinaMarkdown content={post.body as TinaMarkdownContent} />
+        <TinaMarkdown content={post.body} />
       </div>
     </article>
   );

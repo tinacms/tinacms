@@ -14,10 +14,10 @@ export const postCollection: CollectionSchema = {
   ],
 };
 
-// Static seed for /preview.html opened standalone (outside the editor iframe).
-// `body` is the mdx AST, not markdown — the preview renders the same shape the
-// editor edits, so a real site would get this from its GraphQL query.
-export const sampleDocument: TinaDocument = {
+// Static seed for /preview.html opened standalone. `satisfies`, not an
+// annotation: useTina is generic, so keeping the literal shape lets the preview
+// read `body` as the mdx AST instead of casting it back out of `unknown`.
+export const sampleDocument = {
   title: 'Hello World',
   featured: false,
   body: {
@@ -29,4 +29,4 @@ export const sampleDocument: TinaDocument = {
       },
     ],
   },
-};
+} satisfies TinaDocument;

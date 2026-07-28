@@ -117,15 +117,11 @@ export interface FormStore {
   removeForm: (formId: FormId) => void;
 }
 
-// Reference equality first — correct and cheap for the primitive fields, which are
-// still most of them. It is not sufficient on its own: the store is fed from RHF's
-// formState subscription, which hands over a *clone* of each value, while
-// `markSaved` baselines the values RHF itself holds. For a primitive the two
-// compare equal anyway; for the rich-text field's AST they never do, so a saved
-// document stayed dirty forever. Form values are JSON documents, so falling back to
-// structural comparison is the honest test of "did this change".
-//
-// A false negative here only costs an extra dirty read, never a lost edit.
+// RHF's subscription hands over a *clone* of each value while `markSaved`
+// baselines the originals, so reference equality alone leaves any structural
+// value (the rich-text AST) dirty forever. Values are JSON documents, so
+// structural comparison is the honest fallback; a false negative costs an extra
+// dirty read, never a lost edit.
 // TODO: the field descriptor should own this (each type comparing its own value
 // alongside its parse/serialize) rather than the store guessing — that needs the
 // field registry in the store, which it deliberately does not have today.
