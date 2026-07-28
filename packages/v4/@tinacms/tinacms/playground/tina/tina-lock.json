@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "schema": {
+    "collections": [
+      {
+        "name": "post",
+        "label": "Posts",
+        "path": "content/posts",
+        "format": "mdx",
+        "fields": [
+          {
+            "name": "title",
+            "label": "Title",
+            "required": true,
+            "min": 3,
+            "type": "string"
+          },
+          {
+            "name": "featured",
+            "label": "Featured",
+            "type": "boolean"
+          },
+          {
+            "name": "body",
+            "label": "Body",
+            "isBody": true,
+            "type": "rich-text"
+          }
+        ]
+      }
+    ]
+  },
+  "primitives": {
+    "boolean": 1,
+    "rich-text": 1,
+    "string": 1
+  }
+}
