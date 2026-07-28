@@ -76,6 +76,16 @@ describe('markdown adapter', () => {
     expect(saved).toContain('Body prose the schema does not know about.');
   });
 
+  // "Is the save editing the body?" is a question about the save. Asking it of
+  // the save merged over the file's frontmatter answers yes whenever the file
+  // carries a stale key of that name, and the real body is replaced by it.
+  it('ignores a stale frontmatter key sharing the body field name', () => {
+    const withStaleKey = `---\ntitle: Hello\nbody: stale frontmatter value\n---\n\nThe real body.\n`;
+    const saved = adapter.serialize({ title: 'Renamed' }, withStaleKey, 'body');
+    // The body is the file's body, not the stale key promoted into its place.
+    expect(adapter.parse(saved, 'body').body).toBe('The real body.\n');
+  });
+
   // Coercing instead of rejecting would write "[object Object]" as the whole
   // file — the body arrives straight off the wire, so its shape isn't a given.
   it('rejects a non-string body rather than coercing it', () => {
