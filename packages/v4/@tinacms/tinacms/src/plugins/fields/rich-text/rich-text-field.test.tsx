@@ -9,8 +9,8 @@ import { validateField } from '../../../core/validation';
 import { t } from '../../../index';
 import { formatAdapterFor } from '../../content/local/format-adapters';
 import { INVALID_MARKDOWN_TYPE } from './error-message';
-import richTextFieldPlugin from './rich-text-field.plugin';
 import type { RichTextValue } from './rich-text-codec';
+import richTextFieldPlugin from './rich-text-field.plugin';
 
 const collection: CollectionSchema = {
   name: 'post',

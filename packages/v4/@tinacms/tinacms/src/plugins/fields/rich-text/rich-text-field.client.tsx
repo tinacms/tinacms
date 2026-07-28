@@ -15,9 +15,14 @@ export default defineClientPlugin({
     // The document stores whatever the codec writes (markdown by default); the
     // editor works on the document model. The codec is the only thing that knows
     // the format, so changing it changes what lands in the file and nothing else.
-    parse: (stored, node) =>
-      codecFor(node).parse(typeof stored === 'string' ? stored : '', node),
-    serialize: (value, node) =>
-      codecFor(node).serialize(value as RichTextValue, node),
+    // It is resolved from the document, not just the field, so one collection can
+    // hold .md and .mdx documents and each is read with its own parser.
+    parse: (stored, node, context) =>
+      codecFor(node, context).parse(
+        typeof stored === 'string' ? stored : '',
+        node
+      ),
+    serialize: (value, node, context) =>
+      codecFor(node, context).serialize(value as RichTextValue, node),
   },
 });

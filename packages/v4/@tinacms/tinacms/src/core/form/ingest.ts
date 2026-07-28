@@ -1,5 +1,11 @@
+import type { FieldTransformContext } from '../field/contract';
 import type { FieldRegistry } from '../field/registry';
 import type { FieldSchema, TinaDocument } from '../schema/types';
+
+// Ingest and digest are the only callers of a field's parse/serialize, so the
+// document context threads through here. Defaulted, so a caller with no document
+// in hand (tests, and every field whose transform is value-only) is unaffected.
+const NO_DOCUMENT: FieldTransformContext = {};
 
 // Flatten on load (ADR-010): turn a stored document into the form's initial values.
 // Per field, run the field plugin's parse() (stored → editor value), or fall back to
@@ -11,7 +17,8 @@ import type { FieldSchema, TinaDocument } from '../schema/types';
 export const ingestDocument = (
   storedDocument: TinaDocument | undefined,
   fields: FieldSchema[],
-  registry: FieldRegistry
+  registry: FieldRegistry,
+  context: FieldTransformContext = NO_DOCUMENT
 ): TinaDocument => {
   const values: TinaDocument = {};
   for (const node of fields) {
@@ -19,7 +26,7 @@ export const ingestDocument = (
     const stored = storedDocument?.[node.name];
     if (stored !== undefined) {
       values[node.name] = descriptor?.parse
-        ? descriptor.parse(stored, node)
+        ? descriptor.parse(stored, node, context)
         : stored;
     } else if (descriptor?.defaultValue !== undefined) {
       values[node.name] = descriptor.defaultValue;
@@ -36,7 +43,8 @@ export const ingestDocument = (
 export const digestDocument = (
   values: TinaDocument | undefined,
   fields: FieldSchema[],
-  registry: FieldRegistry
+  registry: FieldRegistry,
+  context: FieldTransformContext = NO_DOCUMENT
 ): TinaDocument => {
   const reconstructedDocument: TinaDocument = {};
   for (const node of fields) {
@@ -44,7 +52,7 @@ export const digestDocument = (
     if (value === undefined) continue;
     const descriptor = registry.get(node.type);
     reconstructedDocument[node.name] = descriptor?.serialize
-      ? descriptor.serialize(value, node)
+      ? descriptor.serialize(value, node, context)
       : value;
   }
   return reconstructedDocument;

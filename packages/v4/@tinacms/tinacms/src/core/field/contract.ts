@@ -11,6 +11,16 @@ export interface FieldMetadata {
   layout?: FieldLayout;
 }
 
+// What a field's transform knows about the document it belongs to, beyond its own
+// schema node. `documentPath` is the file the value came from and returns to — its
+// extension names the storage format, which is what lets a collection hold mixed
+// formats (rich-text picks its codec from it, mdx-codec.ts). Absent when a
+// transform runs outside a document (a unit test, a future preview).
+// Media-relative paths will read this too when the media capability lands.
+export interface FieldTransformContext {
+  documentPath?: string;
+}
+
 export interface FieldDescriptor<TValue = unknown, TStored = unknown> {
   type: string;
   Component: ComponentType;
@@ -22,7 +32,17 @@ export interface FieldDescriptor<TValue = unknown, TStored = unknown> {
   // identity; the number field uses them for string <-> number. image/datetime/reference
   // will use them too (e.g. path <-> media object, ISO string <-> Date).
   // `node` is the field's own schema — rich-text reads its templates off it to parse
-  // markdown into the mdx AST. Fields whose transform is value-only ignore it.
-  parse?: (stored: TStored, node: FieldSchema) => TValue;
-  serialize?: (value: TValue, node: FieldSchema) => TStored;
+  // markdown into the mdx AST. `context` is the surrounding document (above), which
+  // rich-text reads to pick a codec per file rather than per collection. Fields whose
+  // transform is value-only ignore both.
+  parse?: (
+    stored: TStored,
+    node: FieldSchema,
+    context: FieldTransformContext
+  ) => TValue;
+  serialize?: (
+    value: TValue,
+    node: FieldSchema,
+    context: FieldTransformContext
+  ) => TStored;
 }

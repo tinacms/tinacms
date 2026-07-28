@@ -112,9 +112,13 @@ export function useFormSave(): () => Promise<void> {
   const scope = useFormScope('form-save-outside-provider', 'useFormSave');
   const { getValues } = useFormContext<TinaDocument>();
   return useCallback(async () => {
-    const { formId, collection, onSave } = scope;
+    const { formId, path, collection, onSave } = scope;
     const values = getValues();
-    const digested = digestDocument(values, collection.fields, registry);
+    // Same context ingest parsed with, so the value round-trips through one codec
+    // rather than being read as .md and written back as .mdx.
+    const digested = digestDocument(values, collection.fields, registry, {
+      documentPath: path,
+    });
     await onSave?.(digested);
     useFormStore.getState().markSaved(formId, toFormValues(values));
   }, [registry, scope, getValues]);

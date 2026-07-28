@@ -144,9 +144,14 @@ export function FormProvider({
   const { registry } = runtime;
 
   const formId = toFormId(path);
+  // The document's own path travels with its values: a field transform that
+  // depends on the storage format (rich-text picking a codec) reads it from here,
+  // so a mixed-format collection resolves per document rather than per collection.
+  const transformContext = useMemo(() => ({ documentPath: path }), [path]);
   const ingested = useMemo(
-    () => ingestDocument(document, collection.fields, registry),
-    [document, collection, registry]
+    () =>
+      ingestDocument(document, collection.fields, registry, transformContext),
+    [document, collection, registry, transformContext]
   );
   // Kept EDITS win over the incoming document: the store retains an unsaved
   // form across teardown (ADR-012), so hosting that formId again re-adopts its
@@ -248,8 +253,8 @@ export function FormProvider({
   }, [formId, methods]);
 
   const formScope = useMemo(
-    () => ({ formId, collection, onSave: onSave ?? null }),
-    [formId, collection, onSave]
+    () => ({ formId, path, collection, onSave: onSave ?? null }),
+    [formId, path, collection, onSave]
   );
 
   return (

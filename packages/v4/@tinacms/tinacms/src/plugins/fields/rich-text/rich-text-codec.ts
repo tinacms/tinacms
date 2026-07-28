@@ -24,11 +24,19 @@ export interface RichTextValue {
   children: RichTextNode[];
 }
 
-export const EMPTY_RICH_TEXT: RichTextValue = { type: 'root', children: [] };
+// Frozen because it is shared, not copied: ingestDocument hands a descriptor's
+// defaultValue straight into form values by reference, so every empty rich-text
+// field in every open document points at this one object. Nothing mutates it
+// today — Plate seeds from it and builds its own tree — but the form store
+// compares values structurally and would not notice if something did, so a
+// mutation would surface as one document's edits appearing in another. Freezing
+// turns that into an immediate error instead.
+export const EMPTY_RICH_TEXT: RichTextValue = Object.freeze({
+  type: 'root',
+  children: Object.freeze([]) as RichTextNode[],
+});
 
 export interface RichTextCodec {
-  // Identifies the codec in errors and tests; not a registry key.
-  name: string;
   // `node` is the field's own schema. The default codec reads `templates` off it
   // to resolve embeds; a codec that needs no config can ignore it.
   parse(source: string, node: FieldSchema): RichTextValue;

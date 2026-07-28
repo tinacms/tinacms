@@ -35,6 +35,10 @@ export const TinaRuntimeContext = createContext<TinaRuntime | null>(null);
 // capability reads once the data layer (ADR-019) lands, shrinking this to the id.
 export interface FormScope {
   formId: FormId;
+  // The open document's path, alongside the derived formId: the save needs the
+  // raw path to rebuild the transform context ingest used (FieldTransformContext),
+  // and a FormId is not reversible.
+  path: string;
   collection: CollectionSchema;
   onSave: SaveHandler | null;
 }

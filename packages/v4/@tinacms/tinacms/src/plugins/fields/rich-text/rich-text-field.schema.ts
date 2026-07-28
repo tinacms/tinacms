@@ -30,16 +30,18 @@ export interface RichTextFieldSchema extends BaseFieldSchema {
   templates?: MdxTemplate[];
   overrides?: ToolbarOverrides;
   toolbarOverride?: ToolbarOverrideType[];
-  // Overrides how this field's body is read from and written to the file. The
-  // default is markdown/MDX (mdx-codec.ts); supply one to store the body in some
-  // other format without the editor changing.
+  // Overrides how this field's body is read from and written to the file. Left
+  // unset, the codec follows the document's extension — MDX for .mdx, markdown
+  // for .md, MDX for anything holding a markdown string (mdx-codec.ts) — which is
+  // what lets one collection hold mixed formats. Supply one to pin this field to a
+  // format regardless of the file, or to store the body in some format of your own.
   codec?: RichTextCodec;
-  // No `parser` option: v3's two alternatives both lose content here. `slatejson`
-  // makes serializeMDX return the AST, which this field would write as an empty
-  // body; `markdown` routes to a stringifier with no invalid_markdown branch, so
-  // an unparseable body saves as blank. Leaving it unset takes the path that
-  // round-trips markdown AND returns the original source for a body it couldn't
-  // parse. Re-add the option behind tests if a real collection needs it.
+  // No `parser` option, though the codecs use v3's parsers underneath: routing it
+  // through here would reach serializeMDX's `markdown` branch, which returns before
+  // its invalid_markdown check and so saves an unparseable body as blank (and
+  // `slatejson`, which returns the AST this field would write as an empty body).
+  // markdownCodec takes that branch deliberately and guards it first. Re-add the
+  // option only behind the same guard.
 }
 
 export const richText = (
