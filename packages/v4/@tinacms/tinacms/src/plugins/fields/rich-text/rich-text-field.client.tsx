@@ -1,12 +1,11 @@
 import { defineClientPlugin } from '../../../client';
 import { codecFor } from './mdx-codec';
 import { EMPTY_RICH_TEXT, type RichTextValue } from './rich-text-codec';
-import { RICH_TEXT_FIELD_TYPE, richTextSchema } from './rich-text-field.schema';
+import { richTextSchema } from './rich-text-field.schema';
 import { RichTextField } from './rich-text-field.ui';
 
 export default defineClientPlugin({
   field: {
-    type: RICH_TEXT_FIELD_TYPE,
     Component: RichTextField,
     defaultValue: EMPTY_RICH_TEXT,
     // A body is its own section, not something to sit beside a text input.

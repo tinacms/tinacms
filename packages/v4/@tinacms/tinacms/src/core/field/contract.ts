@@ -21,8 +21,9 @@ export interface FieldTransformContext {
   documentPath?: string;
 }
 
+// The rendering half of a field plugin. Its type key lives on the manifest
+// (FieldProvision), not here — the compile step needs the key without importing this.
 export interface FieldDescriptor<TValue = unknown, TStored = unknown> {
-  type: string;
   Component: ComponentType;
   defaultValue?: TValue;
   metadata?: FieldMetadata;

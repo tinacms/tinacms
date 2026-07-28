@@ -87,10 +87,10 @@ describe('useFormSave', () => {
 const structureFieldPlugin = definePlugin({
   name: 'test:field:structure',
   provides: ['field'],
+  field: { type: 'structure', contractVersion: 1 },
   client: async () => ({
     default: {
       field: {
-        type: 'structure',
         Component: StructureField,
         // Mirrors rich-text: stored is a string, the editor value is a structure,
         // and every edit mints a fresh object.

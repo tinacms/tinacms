@@ -1,3 +1,4 @@
+import { invariant } from '../invariant';
 import {
   REGISTRY_CONFLICTS,
   type RegistryConflict,
@@ -32,21 +33,35 @@ const fieldConflictError = (conflict: RegistryConflict, key: string): Error => {
   );
 };
 
+// A field plugin declares in two places — the type key on the manifest, the descriptor
+// on its client segment — so either half alone is an authoring mistake that would
+// otherwise fail as a missing field type at render, far from its cause.
+const fieldEntryOf = ({ manifest, segment }: ResolvedSegment) => {
+  if (!(manifest.field || segment.field)) return [];
+  invariant(
+    manifest.field,
+    'field-plugin-no-provision',
+    `Plugin "${manifest.name}" has a field descriptor but declares no \`field: { type, contractVersion }\` on its manifest.`
+  );
+  invariant(
+    segment.field,
+    'field-plugin-no-descriptor',
+    `Plugin "${manifest.name}" declares the field type "${manifest.field.type}" but its client segment exports no field descriptor.`
+  );
+  return [
+    {
+      key: manifest.field.type,
+      value: segment.field,
+      isOverride: overridesFieldKey(manifest, manifest.field.type),
+    },
+  ];
+};
+
 export const createFieldRegistry = (
   resolved: ResolvedSegment[]
 ): FieldRegistry =>
   composeOverridableRegistry(
-    resolved.flatMap(({ manifest, segment }) =>
-      segment.field
-        ? [
-            {
-              key: segment.field.type,
-              value: segment.field,
-              isOverride: overridesFieldKey(manifest, segment.field.type),
-            },
-          ]
-        : []
-    ),
+    resolved.flatMap(fieldEntryOf),
     fieldConflictError
   );
 

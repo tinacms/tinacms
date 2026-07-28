@@ -36,6 +36,17 @@ export const isSingletonSliceCapability = (
 ): value is SingletonSliceCapability =>
   (SINGLETON_SLICE_CAPABILITIES as readonly string[]).includes(value);
 
+// A `field` provider's static half: the schema `type` it renders, plus the contract
+// version of that type's shape. Both sit on the MANIFEST rather than the descriptor
+// because the schema compile runs in Node — reading the type key off the client
+// segment would drag React (and, for rich-text, Plate) into the build (ADR-016 §2).
+export interface FieldProvision {
+  type: string;
+  // Bumped only by a breaking change to this field type's schema shape. A committed
+  // lock pinning an older major is a hard stop, not a silent break (ADR-016 §3).
+  contractVersion: number;
+}
+
 // A plugin's declaration that its segment replaces a built-in. `field` is keyed, so its
 // override names the field type; singletons have exactly one slot, so the union forbids
 // a dead `key` on them.
@@ -131,6 +142,9 @@ export interface PluginManifestInput {
   // `permissions` declarations await codegen's typed Permission union (ADR-008 §3).
   provides?: Capability[];
   dependsOn?: Capability[];
+  // Required of a `field` provider, and only of one — it names the keyed slot this
+  // plugin fills. The client segment supplies the matching descriptor.
+  field?: FieldProvision;
   client?: () => Promise<{ default: ClientSegment }>;
   server?: () => Promise<{ default: ServerSegment }>;
   permissions?: { name: string; description?: string }[];
