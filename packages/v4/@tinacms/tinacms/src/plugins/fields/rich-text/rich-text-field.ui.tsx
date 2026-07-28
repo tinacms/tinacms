@@ -76,7 +76,12 @@ export function RichTextField() {
           identity (toFormId(path)), and the provider resets react-hook-form in
           place without remounting — without this key the editor would keep the
           previous document's body and save it into the new file. */}
-      <div ref={containerRef}>
+      {/* min-w-0: FieldWrapper lays its children out in a grid, so this is a grid
+          item and defaults to `min-width: auto` — it would refuse to shrink below
+          the editor's intrinsic width and spill out of the sidebar (an indented
+          list is enough to trigger it). Zeroing it lets the track win, and the
+          editor's own overflow handling takes it from there. */}
+      <div ref={containerRef} className='min-w-0'>
         <EditorContext.Provider
           key={formId}
           value={{
