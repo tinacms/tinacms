@@ -253,6 +253,8 @@ export function MediaPicker({
           ? item.filename
           : join(item.directory, item.filename)
       );
+      setSearch('');
+      setDebouncedSearch('');
       setLoadFolders(true);
       resetOffset();
       resetList();
