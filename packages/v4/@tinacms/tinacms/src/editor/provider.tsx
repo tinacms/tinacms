@@ -44,6 +44,10 @@ export interface TinaProviderProps {
   children: ReactNode;
 }
 
+// What the async boot produces. The runtime the tree sees is this plus the schema,
+// which needs no booting.
+type BootedRuntime = Omit<TinaRuntime, 'schema'>;
+
 // Serializes the plugin lifecycle across provider instances — including
 // StrictMode's mount→unmount→remount and a pluginsKey change: the next boot's
 // onInit waits for the previous instance's teardown, so an outgoing onDestroy
@@ -54,7 +58,10 @@ let lifecycleTurn: Promise<void> = Promise.resolve();
 export function TinaProvider({ config, children }: TinaProviderProps) {
   // One resolveClientSegments pass feeds both runtime halves (ADR-003), held as a
   // single state object so registry and store always appear together (no tearing).
-  const [runtime, setRuntime] = useState<TinaRuntime | null>(null);
+  // The schema is NOT part of it: the boot is keyed on the plugin set, so folding
+  // build-time config into the async result would pin a stale schema whenever it
+  // changed without the plugin names changing.
+  const [booted, setBooted] = useState<BootedRuntime | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const composedPlugins = config.plugins;
   const pluginsKey = composedPlugins.map((plugin) => plugin.name).join('|');
@@ -70,12 +77,12 @@ export function TinaProvider({ config, children }: TinaProviderProps) {
     const boot = lifecycleTurn.then(async () => {
       validateCapabilityGraph(composedPlugins);
       const resolved = await resolveClientSegments(composedPlugins);
-      const runtime: TinaRuntime = {
+      const runtime: BootedRuntime = {
         registry: createFieldRegistry(resolved),
         store: createTinaStore(resolved),
       };
       const destroyPlugins = await initializePlugins(composedPlugins);
-      if (mounted) setRuntime(runtime);
+      if (mounted) setBooted(runtime);
       return destroyPlugins;
     });
     // Advance the shared turn at mount, not just at teardown: a second provider
@@ -111,6 +118,11 @@ export function TinaProvider({ config, children }: TinaProviderProps) {
       });
     };
   }, [pluginsKey]);
+
+  const runtime = useMemo(
+    () => (booted ? { ...booted, schema: config.schema } : null),
+    [booted, config.schema]
+  );
 
   if (error) throw error;
   if (!runtime) return null;

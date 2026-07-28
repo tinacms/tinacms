@@ -30,6 +30,10 @@
       "types": "./src/editor/index.ts",
       "default": "./src/editor/index.ts"
     },
+    "./admin": {
+      "types": "./src/admin/index.ts",
+      "default": "./src/admin/index.ts"
+    },
     "./preview": {
       "types": "./src/preview/index.ts",
       "default": "./src/preview/index.ts"

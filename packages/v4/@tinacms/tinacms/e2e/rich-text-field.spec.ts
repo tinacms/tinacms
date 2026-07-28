@@ -10,8 +10,27 @@ import { setColumnWidth, toolbar } from './form-column';
 const body = (page: import('@playwright/test').Page) =>
   page.getByRole('textbox', { name: 'body' });
 
+// The admin shell badges the OPEN document in its form header; the document list
+// badges every other one. Scoped to the header so the two never cross.
+// Exact, because the document list badges an edited document "Unsaved" — which
+// contains "Save", so a substring match resolves to the list entry as well.
+const saveButton = (page: import('@playwright/test').Page) =>
+  page.getByRole('button', { name: 'Save', exact: true });
+
 const status = (page: import('@playwright/test').Page) =>
-  page.locator('aside').getByText(/^(pristine|dirty|clean)$/);
+  page.locator('aside header').getByText(/^(No changes|Unsaved|Saved)$/);
+
+// The admin opens on the collection list, so a document has to be navigated to.
+// Deep-linking is the shortest way in and exercises the route at the same time.
+const openDocument = async (
+  page: import('@playwright/test').Page,
+  name: string
+) => {
+  await page.goto(
+    `/#/collections/post/${encodeURIComponent(`content/posts/${name}`)}`
+  );
+  await expect(body(page)).toBeVisible();
+};
 
 // These tests really save, so they really write to the playground's content.
 // Snapshot it and put it back, or a test run leaves the repo dirty.
@@ -35,8 +54,7 @@ test.afterAll(async () => {
 });
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/');
-  await expect(body(page)).toBeVisible();
+  await openDocument(page, 'hello-world.mdx');
 });
 
 test.describe('rich-text layout', () => {
@@ -48,7 +66,7 @@ test.describe('rich-text layout', () => {
   test('the editor stays inside the sidebar, even with nested lists', async ({
     page,
   }) => {
-    await page.getByRole('button', { name: 'second-post.mdx' }).click();
+    await openDocument(page, 'second-post.mdx');
     await expect(body(page)).toContainText('bullet point');
 
     const overflow = await page.locator('aside').evaluate((aside) => ({
@@ -106,6 +124,13 @@ test.describe('rich-text save lifecycle', () => {
   // the same file. The layout test opens a different document and stays parallel.
   test.describe.configure({ mode: 'serial' });
 
+  // This also guards the admin shell's pinned document entry. A save feeds the
+  // persisted document back into the content slice's list cache; read unpinned, that
+  // re-ingests and resets RHF, and the form never reaches clean. It reproduces only
+  // for a field whose stored form differs from its editor value — rich-text parses
+  // markdown to an AST Plate then normalizes — so a plain-field unit test cannot see
+  // it, and this is the guard.
+  //
   // The store compares values by reference but is fed RHF's clone, so a
   // structured value could never diff equal and a saved document stayed dirty
   // forever. Plate also re-emits a normalized AST (node ids, a trailing block)
@@ -114,17 +139,17 @@ test.describe('rich-text save lifecycle', () => {
   test('goes pristine -> dirty on a real edit -> clean once saved', async ({
     page,
   }) => {
-    await expect(status(page)).toHaveText('pristine');
+    await expect(status(page)).toHaveText('No changes');
 
     // Focusing and moving the caret is not an edit.
     await body(page).click();
-    await expect(status(page)).toHaveText('pristine');
+    await expect(status(page)).toHaveText('No changes');
 
     await body(page).pressSequentially('Edited. ');
-    await expect(status(page)).toHaveText('dirty');
+    await expect(status(page)).toHaveText('Unsaved');
 
-    await page.getByRole('button', { name: 'Save' }).click();
-    await expect(status(page)).toHaveText('clean');
+    await saveButton(page).click();
+    await expect(status(page)).toHaveText('Saved');
   });
 
   // Typing and then deleting what was typed leaves the file it would write unchanged,
@@ -150,12 +175,12 @@ test.describe('rich-text save lifecycle', () => {
   test('a second edit after saving can also reach clean', async ({ page }) => {
     await body(page).click();
     await body(page).pressSequentially('One. ');
-    await page.getByRole('button', { name: 'Save' }).click();
-    await expect(status(page)).toHaveText('clean');
+    await saveButton(page).click();
+    await expect(status(page)).toHaveText('Saved');
 
     await body(page).pressSequentially('Two. ');
-    await expect(status(page)).toHaveText('dirty');
-    await page.getByRole('button', { name: 'Save' }).click();
-    await expect(status(page)).toHaveText('clean');
+    await expect(status(page)).toHaveText('Unsaved');
+    await saveButton(page).click();
+    await expect(status(page)).toHaveText('Saved');
   });
 });

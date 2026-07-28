@@ -1,5 +1,6 @@
 import { createContext } from 'react';
 import type { StoreApi } from 'zustand';
+import type { TinaSchema } from '../config';
 import type { FieldAddress } from '../core/field/address';
 import type { FieldRegistry } from '../core/field/registry';
 import type { TinaStoreState } from '../core/plugin';
@@ -27,6 +28,9 @@ export type SaveHandler = (document: TinaDocument) => void | Promise<void>;
 export interface TinaRuntime {
   registry: FieldRegistry;
   store: StoreApi<TinaStoreState>;
+  // The content model the admin navigates. Config, not state — it is build-time
+  // (ADR-016), so it sits beside the registry rather than in the store.
+  schema: TinaSchema;
 }
 export const TinaRuntimeContext = createContext<TinaRuntime | null>(null);
 

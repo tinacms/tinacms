@@ -16,6 +16,10 @@ export const playgroundAliases = [
     replacement: source('../src/editor/index.ts'),
   },
   {
+    find: '@tinacms/tinacms/admin',
+    replacement: source('../src/admin/index.ts'),
+  },
+  {
     find: '@tinacms/tinacms/adapters/react',
     replacement: source('../src/adapters/react/index.ts'),
   },
