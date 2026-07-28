@@ -14,7 +14,8 @@
     "build": "tinacms-scripts build",
     "dev": "vite playground",
     "types": "tsc",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "test:e2e": "playwright test"
   },
   "exports": {
     ".": {
@@ -130,6 +131,7 @@
     "@testing-library/jest-dom": "catalog:",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "catalog:",
+    "@playwright/test": "catalog:",
     "@tinacms/scripts": "workspace:*",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",

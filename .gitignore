@@ -56,3 +56,7 @@ dist/**
 # Fallow (keep snapshots/ versioned so progress is visible in history)
 .fallow/cache.bin
 .fallow/churn.bin
+
+# Playwright run artefacts (v4 package e2e)
+test-results/
+playwright-report/
