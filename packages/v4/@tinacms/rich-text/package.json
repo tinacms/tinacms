@@ -3,7 +3,7 @@
   "version": "4.0.0-alpha.0",
   "private": true,
   "license": "Apache-2.0",
-  "description": "TinaCMS v4 \u2014 the Plate rich-text editor, behind a value contract so the storage format and the editor can each be replaced without the other.",
+  "description": "The Plate rich-text editor for TinaCMS v4. A value contract keeps the editor separate from the storage format. You can replace one of them, and the other stays the same.",
   "type": "module",
   "repository": {
     "url": "https://github.com/tinacms/tinacms.git",
