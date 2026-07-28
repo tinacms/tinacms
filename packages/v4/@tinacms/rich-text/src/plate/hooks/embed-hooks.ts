@@ -1,8 +1,7 @@
 import { useSelected } from '@udecode/plate/react';
 import { isHotkey } from 'is-hotkey';
 import React from 'react';
-import { toFieldAddress } from '../../../../../core/field/address';
-import { useActiveField } from '../../../../../editor';
+import { useEditorContext } from '../editor-context';
 
 const handleCloseBase = (editor, element) => {
   const path = editor.findPath(element);
@@ -52,7 +51,7 @@ export const useHotkey = (key, callback) => {
 };
 
 export const useEmbedHandles = (editor, element, baseFieldName: string) => {
-  const { setActive } = useActiveField();
+  const { onActivateField } = useEditorContext();
   const [isExpanded, setIsExpanded] = React.useState(false);
 
   const handleClose = () => {
@@ -61,9 +60,9 @@ export const useEmbedHandles = (editor, element, baseFieldName: string) => {
   };
   const path = editor.findPath(element);
   const fieldName = `${baseFieldName}.children.${path.join('.children.')}.props`;
-  // v3 dispatched a CMS event plus a form action to focus an embed's props; v4's
-  // store has a single active field, so activating that address covers both.
-  const handleSelect = () => setActive(toFieldAddress(fieldName));
+  // The host decides what selecting an embed does — this package only says which
+  // address was selected, so it never has to import the host's form store.
+  const handleSelect = () => onActivateField(fieldName);
 
   const handleRemove = () => {
     handleRemoveBase(editor, element);

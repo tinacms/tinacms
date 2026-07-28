@@ -1,11 +1,11 @@
 import { Plate } from '@udecode/plate/react';
 import React from 'react';
-import type { RichTextValue } from '../rich-text-codec';
-import type { RichTextFieldSchema } from '../rich-text-field.schema';
+import type { RichTextValue } from '../value';
 import { Editor, EditorContainer } from './components/editor';
 import FixedToolbarButtons from './components/fixed-toolbar-buttons';
 import { FixedToolbar } from './components/plate-ui/fixed-toolbar';
 import { TooltipProvider } from './components/plate-ui/tooltip';
+import type { RichEditorField } from './editor-field';
 import { useCreateEditor } from './hooks/use-create-editor';
 import { helpers, normalizeLinksInCodeBlocks } from './plugins/core/common';
 import { createEditorPlugins } from './plugins/editor-plugins';
@@ -20,7 +20,7 @@ export interface RichEditorProps {
     value: RichTextValue;
     onChange: (value: RichTextValue) => void;
   };
-  field: RichTextFieldSchema;
+  field: RichEditorField;
   // Goes on the contenteditable itself — a label on the wrapper is invisible to
   // assistive tech, and every other v4 field labels its control.
   ariaLabel?: string;

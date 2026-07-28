@@ -1,6 +1,10 @@
+import { EMPTY_RICH_TEXT, type RichTextValue } from '@tinacms/rich-text';
+import { EditorContext, RichEditor } from '@tinacms/rich-text/editor';
 import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
 import { useCallback, useRef } from 'react';
+import { toFieldAddress } from '../../../core/field/address';
 import {
+  useActiveField,
   useFieldActivation,
   useFieldAddress,
   useFieldErrors,
@@ -9,9 +13,6 @@ import {
   useFormId,
 } from '../../../editor';
 import { codecFor } from './mdx-codec';
-import { RichEditor } from './plate';
-import { EditorContext } from './plate/editor-context';
-import { EMPTY_RICH_TEXT, type RichTextValue } from './rich-text-codec';
 import type { RichTextFieldSchema } from './rich-text-field.schema';
 
 // Raw-mode is not ported: v4 has no raw markdown editor to switch to, so the
@@ -28,6 +29,15 @@ export function RichTextField() {
   const [value, setValue] = useFieldValue<RichTextValue>(address);
   const errors = useFieldErrors(address);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // The editor tells us which embed the author selected; translating that into
+  // the store's single active field is the host's business, so it lives here
+  // rather than inside the editor package.
+  const { setActive } = useActiveField();
+  const activateEmbed = useCallback(
+    (embedAddress: string) => setActive(toFieldAddress(embedAddress)),
+    [setActive]
+  );
 
   // Plate fires onChange for selection changes too, not just edits, and its
   // normalization (NodeIdPlugin stamps an `id` on every node, TrailingBlockPlugin
@@ -86,6 +96,10 @@ export function RichTextField() {
             templates: field.templates ?? [],
             rawMode: RAW_MODE_UNAVAILABLE,
             setRawMode: setRawModeUnavailable,
+            // The editor reports which embed was selected; deciding what that
+            // means is the host's job, which is why the editor package no longer
+            // imports the form store. See activateEmbed above.
+            onActivateField: activateEmbed,
           }}
         >
           <RichEditor

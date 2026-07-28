@@ -2595,7 +2595,7 @@ importers:
         specifier: ^22.13.1
         version: 22.19.3
 
-  packages/v4/@tinacms/tinacms:
+  packages/v4/@tinacms/rich-text:
     dependencies:
       '@ariakit/react':
         specifier: 'catalog:'
@@ -2630,9 +2630,6 @@ importers:
       '@radix-ui/react-tooltip':
         specifier: 'catalog:'
         version: 1.2.11(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tinacms/graphql':
-        specifier: workspace:*
-        version: link:../../../@tinacms/graphql
       '@tinacms/mdx':
         specifier: workspace:*
         version: link:../../../@tinacms/mdx
@@ -2711,9 +2708,6 @@ importers:
       '@udecode/plate-trailing-block':
         specifier: 'catalog:'
         version: 48.0.0(@udecode/plate@48.0.5(@types/react@19.2.17)(immer@10.2.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(scheduler@0.27.0)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.6.0(react@19.2.7)))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      abstract-level:
-        specifier: 'catalog:'
-        version: 1.0.4
       class-variance-authority:
         specifier: 'catalog:'
         version: 0.7.1
@@ -2723,9 +2717,6 @@ importers:
       color-string:
         specifier: 'catalog:'
         version: 1.9.1
-      gray-matter:
-        specifier: 'catalog:'
-        version: 4.0.3
       is-hotkey:
         specifier: 'catalog:'
         version: 0.2.0
@@ -2738,6 +2729,58 @@ importers:
       mermaid:
         specifier: ^11.12.2
         version: 11.12.2
+      prism-react-renderer:
+        specifier: 'catalog:'
+        version: 2.4.1(react@19.2.7)
+    devDependencies:
+      '@tinacms/scripts':
+        specifier: workspace:*
+        version: link:../../../@tinacms/scripts
+      '@types/react':
+        specifier: ^19.2.17
+        version: 19.2.17
+      '@types/react-dom':
+        specifier: ^19.2.3
+        version: 19.2.3(@types/react@19.2.17)
+      react:
+        specifier: ^19.2.7
+        version: 19.2.7
+      react-dom:
+        specifier: ^19.2.7
+        version: 19.2.7(react@19.2.7)
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.9
+        version: 2.1.9(@types/node@25.1.0)(happy-dom@15.10.2)(jsdom@15.2.1(bufferutil@4.1.0))(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)
+
+  packages/v4/@tinacms/tinacms:
+    dependencies:
+      '@hookform/resolvers':
+        specifier: ^5.4.0
+        version: 5.4.0(react-hook-form@7.80.0(react@19.2.7))
+      '@tinacms/graphql':
+        specifier: workspace:*
+        version: link:../../../@tinacms/graphql
+      '@tinacms/mdx':
+        specifier: workspace:*
+        version: link:../../../@tinacms/mdx
+      '@tinacms/rich-text':
+        specifier: workspace:*
+        version: link:../rich-text
+      '@tinacms/schema-tools':
+        specifier: workspace:*
+        version: link:../../../@tinacms/schema-tools
+      '@tinacms/ui':
+        specifier: workspace:*
+        version: link:../ui
+      abstract-level:
+        specifier: 'catalog:'
+        version: 1.0.4
+      gray-matter:
+        specifier: 'catalog:'
+        version: 4.0.3
       prism-react-renderer:
         specifier: 'catalog:'
         version: 2.4.1(react@19.2.7)

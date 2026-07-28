@@ -1,11 +1,11 @@
 import { parseMDX, serializeMDX } from '@tinacms/mdx';
+import { INVALID_MARKDOWN_TYPE } from '@tinacms/rich-text';
 import type { FieldTransformContext } from '../../../core/field/contract';
 import {
   type CollectionFormat,
   type FieldSchema,
   formatForPath,
 } from '../../../core/schema/types';
-import { INVALID_MARKDOWN_TYPE } from './error-message';
 import type { RichTextCodec, RichTextValue } from './rich-text-codec';
 import type { RichTextFieldSchema } from './rich-text-field.schema';
 

@@ -1,11 +1,11 @@
-import { type ZodType, z } from 'zod';
-import type { BaseFieldSchema, FieldSchema } from '../../../core/schema/types';
-import { INVALID_MARKDOWN_TYPE } from './error-message';
+import { INVALID_MARKDOWN_TYPE } from '@tinacms/rich-text';
 import type {
   ToolbarOverrideType,
   ToolbarOverrides,
-} from './plate/toolbar/toolbar-overrides';
-import type { MdxTemplate } from './plate/types';
+} from '@tinacms/rich-text/editor';
+import type { MdxTemplate } from '@tinacms/rich-text/editor';
+import { type ZodType, z } from 'zod';
+import type { BaseFieldSchema, FieldSchema } from '../../../core/schema/types';
 
 export const RICH_TEXT_FIELD_TYPE = 'rich-text';
 

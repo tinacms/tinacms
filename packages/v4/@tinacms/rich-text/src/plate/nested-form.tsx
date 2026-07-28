@@ -1,4 +1,4 @@
-import type { FieldSchema } from '../../../../core/schema/types';
+import type { TemplateField } from './types';
 
 // ponytail: stub — editing an embed's props needs a nested form panel, and that
 // panel is the object field (plugins/fields/object/, not built yet). Embeds
@@ -11,7 +11,7 @@ export const NestedForm = (_props: {
   onClose: () => void;
   id: string;
   label: string;
-  fields: FieldSchema[];
+  fields: TemplateField[];
   initialValues: object;
   onChange: (values: object) => void;
 }) => null;

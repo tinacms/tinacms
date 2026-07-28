@@ -1,3 +1,4 @@
+import { INVALID_MARKDOWN_TYPE } from '@tinacms/rich-text';
 import { describe, expect, it } from 'vitest';
 import {
   type FieldRegistry,
@@ -8,7 +9,6 @@ import type { CollectionSchema } from '../../../core/schema/types';
 import { validateField } from '../../../core/validation';
 import { t } from '../../../index';
 import { formatAdapterFor } from '../../content/local/format-adapters';
-import { INVALID_MARKDOWN_TYPE } from './error-message';
 import type { RichTextValue } from './rich-text-codec';
 import richTextFieldPlugin from './rich-text-field.plugin';
 
