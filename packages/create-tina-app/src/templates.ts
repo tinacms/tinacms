@@ -27,8 +27,6 @@ export type ExternalTemplate = BaseExample & {
 };
 export type Template = InternalTemplate | ExternalTemplate;
 
-export const DEFAULT_TEMPLATE_VALUE = 'tina-astro-starter';
-
 export const TEMPLATES: Template[] = [
   {
     title: '⭐ Astro Starter',
@@ -199,6 +197,16 @@ export const TEMPLATES: Template[] = [
     devUrl: 'http://localhost:3000',
   },
 ];
+
+const defaultTemplate = TEMPLATES.find(
+  (template) => template.value === 'tina-astro-starter'
+);
+if (!defaultTemplate) {
+  throw new Error(
+    'DEFAULT_TEMPLATE: no template in TEMPLATES has the value "tina-astro-starter"'
+  );
+}
+export const DEFAULT_TEMPLATE = defaultTemplate;
 
 export async function downloadTemplate(
   template: Template,

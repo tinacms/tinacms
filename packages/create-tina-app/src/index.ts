@@ -12,7 +12,7 @@ import {
 import { install } from './util/install';
 import { initializeGit, makeFirstCommit } from './util/git';
 import {
-  DEFAULT_TEMPLATE_VALUE,
+  DEFAULT_TEMPLATE,
   TEMPLATES,
   Template,
   downloadTemplate,
@@ -307,22 +307,15 @@ export async function run() {
   }
 
   if (!template) {
-    const foundDefaultIndex = TEMPLATES.findIndex(
-      (t) => t.value === DEFAULT_TEMPLATE_VALUE
-    );
-    const defaultTemplate =
-      foundDefaultIndex >= 0 ? TEMPLATES[foundDefaultIndex] : undefined;
-    const defaultTemplateIndex = foundDefaultIndex >= 0 ? foundDefaultIndex : 0;
-
-    if (!process.stdin.isTTY && defaultTemplate) {
-      template = defaultTemplate;
+    if (!process.stdin.isTTY) {
+      template = DEFAULT_TEMPLATE;
     } else {
       const res = await prompts({
         name: 'template',
         type: 'select',
         message: 'What starter code would you like to use?',
         choices: TEMPLATES.map(formatTemplateChoice),
-        initial: defaultTemplateIndex,
+        initial: TEMPLATES.indexOf(DEFAULT_TEMPLATE),
       });
       if (!Object.hasOwn(res, 'template')) {
         postHogCaptureError(
