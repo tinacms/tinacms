@@ -1,19 +1,16 @@
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import {
   type FieldRegistry,
   resolveFieldPlugins,
 } from '../../../core/field/registry';
 import { digestDocument, ingestDocument } from '../../../core/form/ingest';
-import type {
-  CollectionSchema,
-  TinaDocument,
-} from '../../../core/schema/types';
+import type { CollectionSchema } from '../../../core/schema/types';
 import { validateField } from '../../../core/validation';
-import { Field, FormProvider, TinaProvider } from '../../../editor';
 import { t } from '../../../index';
+import { formatAdapterFor } from '../../content/local/format-adapters';
+import { INVALID_MARKDOWN_TYPE } from './error-message';
 import richTextFieldPlugin from './rich-text-field.plugin';
+import type { RichTextAst } from './rich-text-field.schema';
 
 const collection: CollectionSchema = {
   name: 'post',
@@ -29,46 +26,141 @@ const bodyNode = collection.fields[0];
 const resolveRegistry = (): Promise<FieldRegistry> =>
   resolveFieldPlugins([richTextFieldPlugin]);
 
-const renderBody = (document?: TinaDocument) =>
-  render(
-    <TinaProvider plugins={[richTextFieldPlugin]}>
-      <FormProvider
-        collection={collection}
-        path='content/posts/test.mdx'
-        document={document}
-      >
-        <Field address='body' />
-      </FormProvider>
-    </TinaProvider>
-  );
+const ast = (markdown: string, registry: FieldRegistry): RichTextAst =>
+  ingestDocument({ body: markdown }, collection.fields, registry)
+    .body as RichTextAst;
 
-describe('RichTextField rendering', () => {
-  it('renders the stored markdown source verbatim', async () => {
-    renderBody({ body: '# Heading\n\nSome *prose*.\n' });
-    const textarea = (await screen.findByLabelText(
-      'body'
-    )) as HTMLTextAreaElement;
-    expect(textarea.value).toBe('# Heading\n\nSome *prose*.\n');
+describe('RichTextField ingest and digest', () => {
+  it('parses stored markdown into the mdx AST', async () => {
+    const registry = await resolveRegistry();
+    expect(ast('# Heading\n\nSome prose.\n', registry)).toEqual({
+      type: 'root',
+      children: [
+        { type: 'h1', children: [{ type: 'text', text: 'Heading' }] },
+        { type: 'p', children: [{ type: 'text', text: 'Some prose.' }] },
+      ],
+    });
   });
 
-  it('falls back to the descriptor default (empty) when absent', async () => {
-    renderBody();
-    const textarea = (await screen.findByLabelText(
-      'body'
-    )) as HTMLTextAreaElement;
-    expect(textarea.value).toBe('');
+  it('serializes the AST back to markdown', async () => {
+    const registry = await resolveRegistry();
+    const values = { body: ast('# Heading\n\nSome prose.\n', registry) };
+    expect(digestDocument(values, collection.fields, registry)).toEqual({
+      body: '# Heading\n\nSome prose.\n',
+    });
+  });
+
+  it('seeds an empty root when the field is absent', async () => {
+    const registry = await resolveRegistry();
+    expect(ingestDocument({}, collection.fields, registry)).toEqual({
+      body: { type: 'root', children: [] },
+    });
   });
 });
 
-describe('RichTextField value updates', () => {
-  it('writes edits back through the form store', async () => {
-    renderBody({ body: 'Start.' });
-    const textarea = (await screen.findByLabelText(
-      'body'
-    )) as HTMLTextAreaElement;
+// The AST has no concept of leading whitespace, so serializing drops the blank
+// line separating frontmatter from prose. The markdown adapter writes it back —
+// without that, opening and saving any v3 document would restyle it.
+describe('RichTextField round-trip through the format adapter', () => {
+  const adapter = formatAdapterFor('mdx');
+  const RAW = '---\ntitle: Hello World\n---\n\nBody prose.\n';
 
-    await userEvent.type(textarea, ' More.');
-    expect(textarea.value).toBe('Start. More.');
+  it('rewrites an untouched document byte-identically', async () => {
+    const registry = await resolveRegistry();
+    const stored = adapter.parse(RAW, 'body');
+    const values = ingestDocument(stored, collection.fields, registry);
+    const digested = digestDocument(values, collection.fields, registry);
+    expect(adapter.serialize({ ...stored, ...digested }, RAW, 'body')).toBe(
+      RAW
+    );
+  });
+
+  it('keeps the separator when the body is edited', async () => {
+    const registry = await resolveRegistry();
+    const values = { body: ast('Rewritten prose.\n', registry) };
+    const digested = digestDocument(values, collection.fields, registry);
+    expect(
+      adapter.serialize({ title: 'Hello World', ...digested }, RAW, 'body')
+    ).toBe('---\ntitle: Hello World\n---\n\nRewritten prose.\n');
+  });
+});
+
+// `parse`/`serialize` take the field node for exactly one reason: the parser
+// reads `templates` off it. Without them an embed degrades to a raw html node,
+// so this is the test that fails if the node argument is ever dropped again.
+describe('RichTextField templates through the node argument', () => {
+  const withTemplates: CollectionSchema = {
+    name: 'post',
+    format: 'mdx',
+    fields: [
+      t.richText({
+        name: 'body',
+        isBody: true,
+        templates: [
+          {
+            name: 'Callout',
+            label: 'Callout',
+            key: 'callout',
+            fields: [{ name: 'text', type: 'string' }],
+          },
+        ],
+      }),
+    ],
+  };
+  const SOURCE = 'Before.\n\n<Callout text="hi" />\n\nAfter.\n';
+
+  it('parses a configured embed into an element carrying its props', async () => {
+    const registry = await resolveRegistry();
+    const parsed = ingestDocument(
+      { body: SOURCE },
+      withTemplates.fields,
+      registry
+    ).body as RichTextAst;
+    expect(parsed.children[1]).toMatchObject({
+      type: 'mdxJsxFlowElement',
+      name: 'Callout',
+      props: { text: 'hi' },
+    });
+  });
+
+  it('round-trips the embed back to its original source', async () => {
+    const registry = await resolveRegistry();
+    const values = ingestDocument(
+      { body: SOURCE },
+      withTemplates.fields,
+      registry
+    );
+    expect(digestDocument(values, withTemplates.fields, registry)).toEqual({
+      body: SOURCE,
+    });
+  });
+
+  it('degrades the embed to raw html when templates are absent', async () => {
+    const registry = await resolveRegistry();
+    const parsed = ingestDocument({ body: SOURCE }, collection.fields, registry)
+      .body as RichTextAst;
+    expect(parsed.children[1]).toMatchObject({ type: 'html' });
+  });
+});
+
+// Saving is what makes an unparseable body dangerous — validation reports it but
+// does not block the write, so the serializer has to hand the source back intact.
+describe('RichTextField unparseable markdown', () => {
+  const BROKEN = '<Unclosed\n';
+
+  it('keeps the original source through a full save round-trip', async () => {
+    const registry = await resolveRegistry();
+    const values = ingestDocument(
+      { body: BROKEN },
+      collection.fields,
+      registry
+    );
+    expect((values.body as RichTextAst).children[0]).toMatchObject({
+      type: INVALID_MARKDOWN_TYPE,
+    });
+    expect(digestDocument(values, collection.fields, registry)).toEqual({
+      body: BROKEN,
+    });
   });
 });
 
@@ -76,14 +168,33 @@ describe('RichTextField validation', () => {
   it('rejects an empty required body', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('rich-text');
-    expect(validateField(bodyNode, descriptor, '')).not.toEqual([]);
-    expect(validateField(bodyNode, descriptor, undefined)).not.toEqual([]);
+    expect(
+      validateField(bodyNode, descriptor, { type: 'root', children: [] })
+    ).not.toEqual([]);
   });
 
-  it('accepts any non-empty markdown', async () => {
+  it('accepts a body with content', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('rich-text');
-    expect(validateField(bodyNode, descriptor, '# Hi')).toEqual([]);
+    expect(validateField(bodyNode, descriptor, ast('# Hi', registry))).toEqual(
+      []
+    );
+  });
+
+  it('rejects markdown the parser could not read', async () => {
+    const registry = await resolveRegistry();
+    const descriptor = registry.get('rich-text');
+    const unparsed: RichTextAst = {
+      type: 'root',
+      children: [{ type: INVALID_MARKDOWN_TYPE }],
+    };
+    expect(validateField(bodyNode, descriptor, unparsed)).not.toEqual([]);
+  });
+
+  it('rejects a value that is not rich text at all', async () => {
+    const registry = await resolveRegistry();
+    const descriptor = registry.get('rich-text');
+    expect(validateField(bodyNode, descriptor, 'plain string')).not.toEqual([]);
   });
 
   it('accepts an absent value when the field is optional', async () => {
@@ -91,22 +202,14 @@ describe('RichTextField validation', () => {
     const descriptor = registry.get('rich-text');
     const optional = t.richText({ name: 'body' });
     expect(validateField(optional, descriptor, undefined)).toEqual([]);
-    expect(validateField(optional, descriptor, '')).toEqual([]);
   });
-});
 
-describe('RichTextField ingest and digest', () => {
-  // The stored value and the editor value are the same markdown string, so the
-  // round-trip has to be byte-exact — the format adapter writes whatever comes
-  // back out straight into the file.
-  it('round-trips markdown untouched, leading newline and all', async () => {
+  it('reports an absent required body as required, not as malformed', async () => {
     const registry = await resolveRegistry();
-    const body = '\nBody prose.\n';
-    const ingested = ingestDocument({ body }, collection.fields, registry);
-    expect(ingested).toEqual({ body });
-    expect(digestDocument(ingested, collection.fields, registry)).toEqual({
-      body,
-    });
+    const descriptor = registry.get('rich-text');
+    expect(validateField(bodyNode, descriptor, undefined)).toEqual([
+      'Body is required',
+    ]);
   });
 });
 
@@ -115,6 +218,6 @@ describe('RichTextField metadata wrapping', () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('rich-text');
     expect(descriptor?.metadata).toEqual({ layout: 'block' });
-    expect(descriptor?.defaultValue).toBe('');
+    expect(descriptor?.defaultValue).toEqual({ type: 'root', children: [] });
   });
 });

@@ -1,13 +1,16 @@
 # The `rich-text` field
 
-A shipped field plugin: a `block`-layout markdown editor whose **stored value and
-editor value are both the raw markdown source**. With `isBody: true` it owns the
-file's markdown body instead of a frontmatter key. Source:
-`plugins/fields/rich-text/`.
+The `rich-text` field is one of the field plugins that v4 supplies. It is the
+Plate editor from v3, and an author sees the formatted text during the edit. The
+document stores markdown, and the editor holds the MDX abstract syntax tree
+(AST). `@tinacms/mdx` converts between the two formats. It is the same parser as
+v3, thus v3 content opens without a change. With `isBody: true`, the field
+controls the markdown body of the file, and not a frontmatter key. The source
+code is in `plugins/fields/rich-text/`.
 
 ## Authoring
 
-`t.richText({...})` stamps `type: 'rich-text'` (`RICH_TEXT_FIELD_TYPE`) onto the
+`t.richText({...})` adds `type: 'rich-text'` (`RICH_TEXT_FIELD_TYPE`) to the
 config:
 
 ```ts
@@ -23,114 +26,173 @@ const collection = {
 };
 ```
 
-Config (`RichTextFieldSchema`, extends `BaseFieldSchema`):
+The config (`RichTextFieldSchema`, which extends `BaseFieldSchema`):
 
 | Key | Type | Effect |
 |---|---|---|
-| `name` | `string` (required) | field key in the document; also the fallback label |
-| `label` | `string` | display label; used in validation messages |
-| `required` | `boolean` | empty value fails validation |
-| `isBody` | `boolean` | this field is the file's markdown body, not frontmatter |
+| `name` | `string` (necessary) | The field key in the document. It is also the alternative label. |
+| `label` | `string` | The label on the screen. The validation messages use it. |
+| `required` | `boolean` | An empty body does not pass validation. |
+| `isBody` | `boolean` | This field is the markdown body of the file, and not a frontmatter key. |
+| `templates` | `MdxTemplate[]` | The MDX components that an author can embed in the text. |
+| `overrides` | `ToolbarOverrides` | The toolbar buttons and the heading levels that the editor shows. |
+| `toolbarOverride` | `ToolbarOverrideType[]` | The older list form of `overrides.toolbar`. |
 
-## `isBody` — where the value comes from
+There is no `parser` option. Both of v3's values lose content through this
+field. `slatejson` makes `serializeMDX` return the AST, and this field writes
+that as an empty body. `markdown` uses a stringifier that has no
+`invalid_markdown` branch, so a body that did not parse saves as blank. The
+unset value — the only value — takes the path that both round-trips markdown
+and returns the original source for a body it could not parse. Add the option
+again, behind tests, if a real collection needs it.
 
-At most one field per collection may set `isBody`; the local data layer asserts
-that (`content-multiple-body-fields`) because a file has one body.
+## The value: markdown in the file, AST in the editor
 
-The format adapters (`plugins/content/local/format-adapters.ts`) do the routing.
-`markdownAdapter` hands the body over as that field's value on read and writes it
-straight back on save, so `md` and `mdx` behave identically. `json` has no body
-concept and ignores the field name.
-
-The body crosses **verbatim** — gray-matter's leading newline included — so a
-save that doesn't edit it rewrites the file byte-identically. A save that omits
-the field entirely (a partial update) leaves the existing body alone.
-
-Without `isBody` the field is an ordinary frontmatter key that happens to hold
-markdown.
-
-## Two shapes, two consumers
-
-The form edits the body as a markdown **string**. The local GraphQL pipeline
-(`graphql-pipeline.ts`) serves the same body to the website render path as the v3
-**mdx AST**, exactly as v3 did. Both read one file; neither converts for the
-other.
-
-## Descriptor
-
-The client segment (`rich-text-field.client.tsx`) claims the `rich-text` key:
+The `parse` and `serialize` functions of the client segment do the conversion:
 
 ```tsx
-defineClientPlugin({
-  field: {
-    type: 'rich-text',           // RICH_TEXT_FIELD_TYPE
-    Component: RichTextField,
-    defaultValue: '',
-    metadata: { layout: 'block' },
-    schema: richTextSchema,
-    // no parse/serialize — editor value and stored value are the same string
-  },
-});
+parse: (stored, node) => parseMDX(stored, node, passthroughMedia),
+serialize: (value, node) => serializeMDX(value, node, passthroughMedia),
 ```
 
-`layout: 'block'` tells a composite parent to render the field as its own
-section rather than in line with single-line inputs.
+`descriptor.parse` and `descriptor.serialize` receive the `node` of the field
+as well as the value. The parser needs the `templates` property from the schema:
+without it, `<Callout />` in a body degrades to a raw `html` node instead of the
+element with its props. That is the whole reason for the second argument, and
+`rich-text-field.test.tsx` guards it. A field with a conversion that uses the
+value only, for example `number`, ignores the argument.
+
+### The separator line
+
+gray-matter adds the body to the closing `---\n` line directly. Thus the empty
+line between the frontmatter and the prose is a `\n` character at the start of
+the body string. The AST has no concept of leading space characters, thus
+`serializeMDX` removes that character. Without a correction, the CMS would
+change the format of each v3 document at the first save.
+
+`markdown.adapter.ts` writes the character again at serialization. Thus a save
+with no changes writes the same bytes to the file.
+`rich-text-field.test.tsx` tests this behavior.
+
+## `isBody` and the source of the value
+
+One field in a collection can set `isBody`, and no more than one. The local data
+layer makes this check (`content-multiple-body-fields`), because a file has one
+body.
+
+`markdownAdapter` gives the body to that field as its value at read, and it
+writes the body again at save. Thus `md` files and `mdx` files operate in the
+same way. A `json` file has no body, thus the adapter ignores the field name. If
+a save does not include the field, the body does not change.
+
+The form edits the body as the MDX AST. The local GraphQL pipeline
+(`graphql-pipeline.ts`) gives the same body to the website in the v3 MDX AST
+format. Thus one file has one shape and two consumers.
+
+## Render the value
+
+`<TinaMarkdown>` (`src/rich-text/`) renders the AST to React.
+`@tinacms/tinacms/adapters/react` exports it. It comes from v3 without a change,
+thus the `components` map of a site continues to operate:
+
+```tsx
+import { TinaMarkdown } from '@tinacms/tinacms/adapters/react';
+
+<TinaMarkdown content={post.body} components={{ MyEmbed: ({ ... }) => ... }} />
+```
 
 ## Validation
 
-`richTextSchema(node)` is the string field's rules minus `min`/`max`/`pattern` —
-those count characters, which says nothing useful about prose:
-
 | Config | Rule | Message |
 |---|---|---|
-| `required` | empty (`''`/absent) fails | `<label> is required` |
-| — | optional empty passes as `.optional()` | — |
+| — | The value must be an AST with the shape `{ type: 'root', children }` | `<label> must be rich text` |
+| — | The first child must not be `invalid_markdown` | `Unable to parse rich-text` |
+| `required` | The value must have children | `<label> is required` |
 
-Structural rules (required blocks, allowed embed templates) need the AST and
-arrive with the WYSIWYG editor. Runs through the shared path (`validateField`);
-see [`field-plugins.md`](./field-plugins.md#validation--two-layers).
+If `@tinacms/mdx` cannot parse the markdown, it does not throw an error. It
+gives one `invalid_markdown` node, so the editor can still show the source text.
 
-## Component
+This validation reports; it does not protect. A save does not run the resolver —
+`useFormSave` digests the values and calls `onSave` directly — so the value
+reaches the disk whether or not it passes. What keeps that safe is the
+serializer: for an `invalid_markdown` node it writes the original source back,
+not a blank body. `rich-text-field.test.tsx` covers that round trip.
 
-`RichTextField` (`rich-text-field.ui.tsx`) takes **no props** — it reads
-value/errors through address-keyed hooks:
+## Embeds
 
-```tsx
-export function RichTextField() {
-  const address = useFieldAddress();
-  const [value, setValue] = useFieldValue<string>(address);
-  const errors = useFieldErrors(address);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+An MDX component that an author can insert is a `templates` entry. The parser
+needs that list to build the element: with the template, `<Callout text="hi" />`
+becomes an `mdxJsxFlowElement` that carries `props`; without it, the same source
+becomes a raw `html` node. The list reaches the parser through the `node`
+argument of `parse`, and it reaches the embed components through
+`EditorContext`, which `rich-text-field.ui.tsx` provides.
 
-  useFieldActivation(() => textareaRef.current?.focus());
+Editing the props of an embed needs the object field, which does not exist yet
+(see the next section). The embeds parse, render, and serialize now, so a
+document loses nothing when a user opens it.
 
-  return (
-    <FieldWrapper errors={errors}>
-      <Textarea ref={textareaRef} aria-label={address} value={value ?? ''}
-        onChange={(e) => setValue(e.target.value)} />
-    </FieldWrapper>
-  );
-}
-```
+## The parts that the port does not include
 
-A WYSIWYG editor replaces this component and adds a `parse`/`serialize` pair
-(markdown ↔ AST) beside it. Nothing outside `plugins/fields/rich-text/` moves —
-the format adapters keep handing over a string either way.
+The editor is the editor of v3, file for file (86 files in `plate/`). Three
+parts are stubs, because v4 does not have the necessary capabilities now:
 
-## Where it's wired
+| Stub | It waits for | Effect now |
+|---|---|---|
+| `nested-form.tsx` | The object field (`plugins/fields/object/`) | The CMS parses, renders, and serializes the embeds. Their side panel is not available, thus a document loses no data when a user opens it. |
+| `image-toolbar-button.tsx` | The media capability (`plugins/media/`) | The CMS renders and serializes the image nodes that exist. A user cannot insert a new image. |
+| The field definitions of `create-img-plugin` | The image field | An author edits the URL of an embed as a plain string. |
+| Raw mode | A raw markdown editor | v4 has no editor to switch to, so the toolbar button and the button on the parse-error card are hidden instead of dead. `EditorContext` keeps the `setRawMode` shape for when one exists. |
 
-- Manifest: `rich-text-field.plugin.ts` — `tina:field:rich-text`, exported as
-  `richTextFieldPlugin`.
-- Registration: `plugins/fields/index.ts` adds it to `corePlugins` and exposes
-  `t.richText`.
-- Body routing: `markdown.adapter.ts` + `local-data-layer.ts` (`bodyField`).
+v3 selected a widget for each field with `component`. v4 finds the widget from
+`type` in the field registry (ADR-009). For this reason, those field definitions
+have a different shape.
+
+The toolbar components use Radix, ariakit, and headlessui, and they do not use
+base-ui from v4. A change of approximately 53 `plate-ui` components to base-ui
+is a separate task. The team keeps it separate from the changes to the form
+layer.
+
+## Bundle
+
+The editor is approximately 3.6 MB after minification. The dynamic `client()`
+import of the plugin keeps the editor out of the main bundle. In the playground
+build, the editor is a separate chunk, and the entry chunk is 314 kB. The split
+of `.plugin.ts` and `.client.tsx` exists for this condition. `mermaid` is a
+large part of the weight of the editor. The team can remove `mermaid`, or load
+it only when a user needs it.
+
+## The connections
+
+- The manifest is `rich-text-field.plugin.ts`. Its name is
+  `tina:field:rich-text`, and it exports `richTextFieldPlugin`.
+- The registration is in `plugins/fields/index.ts`. That file adds the plugin to
+  `corePlugins`, and it supplies `t.richText`.
+- The body routing is in `markdown.adapter.ts` and `local-data-layer.ts`
+  (`bodyField`).
+- The renderer is in `src/rich-text/`. `adapters/react` exports it.
+
+## A note about `@types/react`
+
+The root of the repository supplies `@types/react` version 18, because v3 is a
+React 18 package. Some dependencies, for example Plate and Radix, have types for
+React 19. A compilation with those dependencies finds two React type identities.
+Then each `forwardRef` component fails the `ElementType` check, and the
+compilation gives approximately 94 errors. To prevent this, `tsconfig.json`
+points `react` and `react-dom` to the types in this package.
 
 ## Tests
 
-`rich-text-field.test.tsx` covers verbatim rendering of stored markdown, the
-empty default, edits through the form store, `required` on empty, optional empty,
-a byte-exact ingest/digest round-trip, and the registered descriptor metadata.
-`format-adapters.test.ts` and `local-data-layer.test.ts` cover the body routing:
-parse under the body field, edited body written as markdown not frontmatter, the
-byte-identical no-op rewrite, and an omitted body field leaving the file's body
-untouched.
+`rich-text-field.test.tsx` does these tests:
+
+- It converts markdown to the AST with ingest, then converts the AST to markdown
+  with digest.
+- It makes sure that a save with no changes writes the same bytes through the
+  format adapter.
+- It makes sure that the separator line is correct after an edit to the body.
+- It makes sure that an empty body gets the default value.
+- It applies the `required` rule to an empty body.
+- It rejects an `invalid_markdown` node.
+- It rejects a value that is not an AST.
+- It examines the metadata of the descriptor in the registry.
+
+`format-adapters.test.ts` and `local-data-layer.test.ts` test the body routing.

@@ -1,4 +1,9 @@
-import { tinaField, useTina } from '@tinacms/tinacms/adapters/react';
+import {
+  TinaMarkdown,
+  type TinaMarkdownContent,
+  tinaField,
+  useTina,
+} from '@tinacms/tinacms/adapters/react';
 import { sampleDocument } from '../content';
 
 // The site side of visual editing, as a real site would write it: useTina
@@ -30,6 +35,11 @@ export function PostPreview() {
           ? 'This preview renders the document streamed from the editor. Click the title or the badge to focus its field in the sidebar.'
           : 'Standalone preview — rendering the static document.'}
       </p>
+      {/* The body arrives as the mdx AST the editor is editing, so keystrokes
+          in the rich-text field show up here without a round-trip to disk. */}
+      <div {...tinaField('body')}>
+        <TinaMarkdown content={post.body as TinaMarkdownContent} />
+      </div>
     </article>
   );
 }

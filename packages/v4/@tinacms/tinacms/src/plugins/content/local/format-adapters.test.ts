@@ -44,20 +44,20 @@ describe('markdown adapter', () => {
       title: 'Hello World',
       featured: false,
       category: 'not-in-schema',
-      body: '\nBody prose the schema does not know about.\n',
+      body: 'Body prose the schema does not know about.\n',
     });
   });
 
   it('writes an edited body back as markdown, not frontmatter', () => {
     const saved = adapter.serialize(
-      { title: 'Hello World', body: '\nRewritten prose.\n' },
+      { title: 'Hello World', body: 'Rewritten prose.\n' },
       MDX_RAW,
       'body'
     );
     expect(saved).not.toContain('body:');
     expect(adapter.parse(saved, 'body')).toMatchObject({
       title: 'Hello World',
-      body: '\nRewritten prose.\n',
+      body: 'Rewritten prose.\n',
     });
   });
 
@@ -69,6 +69,16 @@ describe('markdown adapter', () => {
   it('leaves the body alone when the save omits the body field', () => {
     const saved = adapter.serialize({ title: 'Renamed' }, MDX_RAW, 'body');
     expect(saved).toContain('Body prose the schema does not know about.');
+  });
+
+  // Coercing instead of rejecting would write "[object Object]" as the whole
+  // file — the body arrives straight off the wire, so its shape isn't a given.
+  it('rejects a non-string body rather than coercing it', () => {
+    for (const body of [{ type: 'root', children: [] }, 42, null]) {
+      expect(() =>
+        adapter.serialize({ title: 'Renamed', body }, MDX_RAW, 'body')
+      ).toThrow(/Expected a string for body field/);
+    }
   });
 });
 

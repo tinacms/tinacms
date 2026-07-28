@@ -18,7 +18,9 @@ export const ingestDocument = (
     const descriptor = registry.get(node.type);
     const stored = storedDocument?.[node.name];
     if (stored !== undefined) {
-      values[node.name] = descriptor?.parse ? descriptor.parse(stored) : stored;
+      values[node.name] = descriptor?.parse
+        ? descriptor.parse(stored, node)
+        : stored;
     } else if (descriptor?.defaultValue !== undefined) {
       values[node.name] = descriptor.defaultValue;
     }
@@ -42,7 +44,7 @@ export const digestDocument = (
     if (value === undefined) continue;
     const descriptor = registry.get(node.type);
     reconstructedDocument[node.name] = descriptor?.serialize
-      ? descriptor.serialize(value)
+      ? descriptor.serialize(value, node)
       : value;
   }
   return reconstructedDocument;

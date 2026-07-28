@@ -1,0 +1,60 @@
+// The node @tinacms/mdx emits instead of throwing when it can't parse a body, so
+// the editor can still show the source. Named here — the plate-free layer both
+// the schema and the Plate plugin already depend on — because a typo would
+// silently disarm the guard that stops a save overwriting good markdown with it.
+export const INVALID_MARKDOWN_TYPE = 'invalid_markdown';
+
+export type EmptyTextElement = { type: 'text'; text: '' };
+export type PositionItem = {
+  line?: number | null;
+  column?: number | null;
+  offset?: number | null;
+  _index?: number | null;
+  _bufferIndex?: number | null;
+};
+export type Position = {
+  start: PositionItem;
+  end: PositionItem;
+};
+export type InvalidMarkdownElement = {
+  type: typeof INVALID_MARKDOWN_TYPE;
+  value: string;
+  message: string;
+  position?: Position;
+  children: [EmptyTextElement];
+};
+
+type ErrorType = {
+  message: string;
+  position?: {
+    startColumn: number;
+    endColumn: number;
+    startLineNumber: number;
+    endLineNumber: number;
+  };
+};
+const buildError = (element: InvalidMarkdownElement): ErrorType => {
+  return {
+    message: element.message,
+    position: element.position && {
+      endColumn: element.position.end.column,
+      startColumn: element.position.start.column,
+      startLineNumber: element.position.start.line,
+      endLineNumber: element.position.end.line,
+    },
+  };
+};
+export const buildErrorMessage = (element: InvalidMarkdownElement): string => {
+  if (!element) {
+    return '';
+  }
+  const errorMessage = buildError(element);
+  const message = errorMessage
+    ? `${errorMessage.message}${
+        errorMessage.position
+          ? ` at line: ${errorMessage.position.startLineNumber}, column: ${errorMessage.position.startColumn}`
+          : ''
+      }`
+    : null;
+  return message;
+};

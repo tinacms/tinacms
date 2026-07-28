@@ -7,7 +7,15 @@
     "paths": {
       "@tinacms/graphql": [
         "./src/plugins/content/local/tinacms-graphql.d.ts"
-      ]
+      ],
+      // The repo root still resolves @types/react 18 (v3 is a React 18 package).
+      // Without these, a compilation that pulls in React 19-typed deps (Plate,
+      // Radix) sees two React type identities and every forwardRef component
+      // fails ElementType. Pin this package to its own React 19 types.
+      "react": ["./node_modules/@types/react"],
+      "react/*": ["./node_modules/@types/react/*"],
+      "react-dom": ["./node_modules/@types/react-dom"],
+      "react-dom/*": ["./node_modules/@types/react-dom/*"]
     }
   },
   "exclude": ["node_modules", "dist", "src/**/*.test.ts", "src/**/*.test.tsx", "src/**/*.spec.ts", "src/**/*.spec.tsx"],

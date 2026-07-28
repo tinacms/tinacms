@@ -21,6 +21,8 @@ export interface FieldDescriptor<TValue = unknown, TStored = unknown> {
   // parse/serialize are the per-field ingest/digest transforms. string/boolean are
   // identity; the number field uses them for string <-> number. image/datetime/reference
   // will use them too (e.g. path <-> media object, ISO string <-> Date).
-  parse?: (stored: TStored) => TValue;
-  serialize?: (value: TValue) => TStored;
+  // `node` is the field's own schema — rich-text reads its templates off it to parse
+  // markdown into the mdx AST. Fields whose transform is value-only ignore it.
+  parse?: (stored: TStored, node: FieldSchema) => TValue;
+  serialize?: (value: TValue, node: FieldSchema) => TStored;
 }

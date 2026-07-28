@@ -15,8 +15,18 @@ export const postCollection: CollectionSchema = {
 };
 
 // Static seed for /preview.html opened standalone (outside the editor iframe).
+// `body` is the mdx AST, not markdown — the preview renders the same shape the
+// editor edits, so a real site would get this from its GraphQL query.
 export const sampleDocument: TinaDocument = {
   title: 'Hello World',
   featured: false,
-  body: '\nBody prose, edited as markdown.\n',
+  body: {
+    type: 'root',
+    children: [
+      {
+        type: 'p',
+        children: [{ type: 'text', text: 'Body prose, edited as markdown.' }],
+      },
+    ],
+  },
 };

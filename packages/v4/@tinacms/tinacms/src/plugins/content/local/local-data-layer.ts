@@ -65,6 +65,13 @@ const resolveCollections = ({
       'content-collection-no-path',
       `Collection "${schema.name}" has no \`path\` — the local data layer needs one to locate its files.`
     );
+    // A file has one body, so two `isBody` fields is a schema mistake with no
+    // sensible resolution — picking one silently would route the other into the
+    // frontmatter. Failing at construction (like the missing-path check above)
+    // surfaces it on boot rather than on someone's first save.
+    // TODO: this is schema validation living in the fs provider because the fs
+    // provider is currently the first thing that reads a collection. Move it to
+    // defineConfig (ADR-024) once that lands, so every provider inherits it.
     const bodyFields = schema.fields.filter((field) => field.isBody);
     invariant(
       bodyFields.length <= 1,
