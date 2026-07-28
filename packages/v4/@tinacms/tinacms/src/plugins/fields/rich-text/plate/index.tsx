@@ -1,9 +1,7 @@
 import { Plate } from '@udecode/plate/react';
 import React from 'react';
-import type {
-  RichTextAst,
-  RichTextFieldSchema,
-} from '../rich-text-field.schema';
+import type { RichTextValue } from '../rich-text-codec';
+import type { RichTextFieldSchema } from '../rich-text-field.schema';
 import { Editor, EditorContainer } from './components/editor';
 import FixedToolbarButtons from './components/fixed-toolbar-buttons';
 import { FixedToolbar } from './components/plate-ui/fixed-toolbar';
@@ -19,8 +17,8 @@ import { ToolbarProvider } from './toolbar/toolbar-provider';
 // between Plate and v4's form store.
 export interface RichEditorProps {
   input: {
-    value: RichTextAst;
-    onChange: (value: RichTextAst) => void;
+    value: RichTextValue;
+    onChange: (value: RichTextValue) => void;
   };
   field: RichTextFieldSchema;
   // Goes on the contenteditable itself — a label on the wrapper is invisible to

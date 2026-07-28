@@ -9,19 +9,15 @@ import type { MdxTemplate } from './plate/types';
 
 export const RICH_TEXT_FIELD_TYPE = 'rich-text';
 
-// Plate owns the full shape of each node type. `type` is the only field this
-// package reads, so it's the only one named.
-export interface RichTextNode {
-  type: string;
-  [key: string]: unknown;
-}
+// The document model and the format contract live in rich-text-codec.ts; this is
+// a type-only re-export so a schema author imports from one place.
+import type { RichTextCodec, RichTextValue } from './rich-text-codec';
 
-// The editor value: the mdx AST @tinacms/mdx parses markdown into and serializes
-// back out — the same shape v3 stored, so v3 content round-trips unchanged.
-export interface RichTextAst {
-  type: 'root';
-  children: RichTextNode[];
-}
+export type {
+  RichTextCodec,
+  RichTextNode,
+  RichTextValue,
+} from './rich-text-codec';
 
 export interface RichTextFieldSchema extends BaseFieldSchema {
   type: typeof RICH_TEXT_FIELD_TYPE;
@@ -34,6 +30,10 @@ export interface RichTextFieldSchema extends BaseFieldSchema {
   templates?: MdxTemplate[];
   overrides?: ToolbarOverrides;
   toolbarOverride?: ToolbarOverrideType[];
+  // Overrides how this field's body is read from and written to the file. The
+  // default is markdown/MDX (mdx-codec.ts); supply one to store the body in some
+  // other format without the editor changing.
+  codec?: RichTextCodec;
   // No `parser` option: v3's two alternatives both lose content here. `slatejson`
   // makes serializeMDX return the AST, which this field would write as an empty
   // body; `markdown` routes to a stringifier with no invalid_markdown branch, so
@@ -48,8 +48,8 @@ export const richText = (
 
 const labelOf = (node: RichTextFieldSchema): string => node.label ?? node.name;
 
-const isRichTextAst = (value: unknown): value is RichTextAst => {
-  const candidate = value as RichTextAst | null;
+const isRichTextValue = (value: unknown): value is RichTextValue => {
+  const candidate = value as RichTextValue | null;
   return (
     typeof candidate === 'object' &&
     candidate !== null &&
@@ -63,7 +63,7 @@ const isRichTextAst = (value: unknown): value is RichTextAst => {
 // (useFormSave digests and calls onSave directly), so the value still reaches
 // disk. What keeps that safe is the serializer, which writes the original source
 // back for this node rather than a blank body.
-const isUnparsedMarkdown = (value: RichTextAst): boolean =>
+const isUnparsedMarkdown = (value: RichTextValue): boolean =>
   value.children[0]?.type === INVALID_MARKDOWN_TYPE;
 
 // An empty body parses to a root with no children, so `required` counts children
@@ -73,7 +73,10 @@ const isUnparsedMarkdown = (value: RichTextAst): boolean =>
 export const richTextSchema = (node: FieldSchema): ZodType => {
   const field = node as RichTextFieldSchema;
   const ast = z
-    .custom<RichTextAst>(isRichTextAst, `${labelOf(field)} must be rich text`)
+    .custom<RichTextValue>(
+      isRichTextValue,
+      `${labelOf(field)} must be rich text`
+    )
     .refine((value) => !isUnparsedMarkdown(value), 'Unable to parse rich-text');
   if (field.required) {
     return z.preprocess(

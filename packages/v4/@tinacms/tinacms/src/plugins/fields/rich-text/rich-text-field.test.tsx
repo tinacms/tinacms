@@ -10,7 +10,7 @@ import { t } from '../../../index';
 import { formatAdapterFor } from '../../content/local/format-adapters';
 import { INVALID_MARKDOWN_TYPE } from './error-message';
 import richTextFieldPlugin from './rich-text-field.plugin';
-import type { RichTextAst } from './rich-text-field.schema';
+import type { RichTextValue } from './rich-text-codec';
 
 const collection: CollectionSchema = {
   name: 'post',
@@ -26,9 +26,9 @@ const bodyNode = collection.fields[0];
 const resolveRegistry = (): Promise<FieldRegistry> =>
   resolveFieldPlugins([richTextFieldPlugin]);
 
-const ast = (markdown: string, registry: FieldRegistry): RichTextAst =>
+const ast = (markdown: string, registry: FieldRegistry): RichTextValue =>
   ingestDocument({ body: markdown }, collection.fields, registry)
-    .body as RichTextAst;
+    .body as RichTextValue;
 
 describe('RichTextField ingest and digest', () => {
   it('parses stored markdown into the mdx AST', async () => {
@@ -115,7 +115,7 @@ describe('RichTextField templates through the node argument', () => {
       { body: SOURCE },
       withTemplates.fields,
       registry
-    ).body as RichTextAst;
+    ).body as RichTextValue;
     expect(parsed.children[1]).toMatchObject({
       type: 'mdxJsxFlowElement',
       name: 'Callout',
@@ -138,7 +138,7 @@ describe('RichTextField templates through the node argument', () => {
   it('degrades the embed to raw html when templates are absent', async () => {
     const registry = await resolveRegistry();
     const parsed = ingestDocument({ body: SOURCE }, collection.fields, registry)
-      .body as RichTextAst;
+      .body as RichTextValue;
     expect(parsed.children[1]).toMatchObject({ type: 'html' });
   });
 });
@@ -155,7 +155,7 @@ describe('RichTextField unparseable markdown', () => {
       collection.fields,
       registry
     );
-    expect((values.body as RichTextAst).children[0]).toMatchObject({
+    expect((values.body as RichTextValue).children[0]).toMatchObject({
       type: INVALID_MARKDOWN_TYPE,
     });
     expect(digestDocument(values, collection.fields, registry)).toEqual({
@@ -184,7 +184,7 @@ describe('RichTextField validation', () => {
   it('rejects markdown the parser could not read', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('rich-text');
-    const unparsed: RichTextAst = {
+    const unparsed: RichTextValue = {
       type: 'root',
       children: [{ type: INVALID_MARKDOWN_TYPE }],
     };

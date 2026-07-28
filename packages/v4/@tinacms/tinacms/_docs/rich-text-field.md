@@ -46,21 +46,56 @@ unset value — the only value — takes the path that both round-trips markdown
 and returns the original source for a body it could not parse. Add the option
 again, behind tests, if a real collection needs it.
 
-## The value: markdown in the file, AST in the editor
+## The codec: what the file holds, and what the editor edits
 
-The `parse` and `serialize` functions of the client segment do the conversion:
+The editor and the storage format are separate. A **codec** owns the format
+entirely — how a body is read from the file and how it is written back — and the
+editor knows nothing about markdown. Replace the codec and you replace the
+format; nothing else in the field changes.
 
-```tsx
-parse: (stored, node) => parseMDX(stored, node, passthroughMedia),
-serialize: (value, node) => serializeMDX(value, node, passthroughMedia),
+The contract is `rich-text-codec.ts`, which has no dependencies at all so that
+implementing a codec does not drag the default one's parser in behind it:
+
+```ts
+export interface RichTextCodec {
+  name: string;
+  parse(source: string, node: FieldSchema): RichTextValue;
+  serialize(value: RichTextValue, node: FieldSchema): string;
+}
 ```
 
-`descriptor.parse` and `descriptor.serialize` receive the `node` of the field
-as well as the value. The parser needs the `templates` property from the schema:
-without it, `<Callout />` in a body degrades to a raw `html` node instead of the
-element with its props. That is the whole reason for the second argument, and
-`rich-text-field.test.tsx` guards it. A field with a conversion that uses the
-value only, for example `number`, ignores the argument.
+`RichTextValue` is the one thing both sides must agree on: it is the **editor's**
+document model, not any one format's AST. `serialize` always returns a string,
+because that string is what lands in the file.
+
+`node` is the field's own schema. The default codec reads `templates` off it to
+resolve embeds — without them `<Callout />` degrades to a raw `html` node instead
+of an element with props, which is the whole reason `descriptor.parse` and
+`descriptor.serialize` take a second argument at all. A field whose conversion
+uses only the value, like `number`, ignores it.
+
+### Choosing a codec
+
+The default is `mdxCodec` (`mdx-codec.ts`), markdown/MDX through `@tinacms/mdx` —
+the same parser v3 used, so a v3 content folder opens unchanged. A field can
+override it:
+
+```ts
+t.richText({ name: 'body', isBody: true, codec: myCodec })
+```
+
+`codecFor(node)` resolves it, and lives beside the default rather than beside the
+contract, so the contract stays implementation-free and the universal entry
+(`src/index.ts` reaches the schema) never pulls a parser into the main bundle.
+A project-wide default belongs on `defineConfig` (ADR-024) when that lands.
+
+One honest limit: because `codecFor` holds the default, overriding a field's codec
+does not currently drop `@tinacms/mdx` from the bundle. That is a bundling
+concern, not a correctness one, and the editor chunk dwarfs it either way.
+
+`rich-text-codec.test.ts` drives the whole field with a codec that stores
+upper-cased plain text — deliberately nothing like markdown, so it fails if any
+markdown assumption leaks out of the codec.
 
 ### The separator line
 

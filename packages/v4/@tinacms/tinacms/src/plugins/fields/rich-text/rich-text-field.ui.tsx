@@ -8,15 +8,11 @@ import {
   useFieldValue,
   useFormId,
 } from '../../../editor';
+import { codecFor } from './mdx-codec';
 import { RichEditor } from './plate';
 import { EditorContext } from './plate/editor-context';
-import { astToMarkdown } from './rich-text-field.markdown';
-import type {
-  RichTextAst,
-  RichTextFieldSchema,
-} from './rich-text-field.schema';
-
-const EMPTY_AST: RichTextAst = { type: 'root', children: [] };
+import { EMPTY_RICH_TEXT, type RichTextValue } from './rich-text-codec';
+import type { RichTextFieldSchema } from './rich-text-field.schema';
 
 // Raw-mode is not ported: v4 has no raw markdown editor to switch to, so the
 // affordances that would call this are hidden (fixed-toolbar-buttons.tsx, and
@@ -29,35 +25,36 @@ export function RichTextField() {
   const address = useFieldAddress();
   const formId = useFormId();
   const field = useFieldSchema<RichTextFieldSchema>();
-  const [value, setValue] = useFieldValue<RichTextAst>(address);
+  const [value, setValue] = useFieldValue<RichTextValue>(address);
   const errors = useFieldErrors(address);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Plate fires onChange for selection changes too, not just edits, and its
   // normalization (NodeIdPlugin stamps an `id` on every node, TrailingBlockPlugin
-  // appends an empty paragraph) means the mounted AST never structurally matches
-  // the one parsed off disk. Comparing ASTs would therefore report an edit on a
-  // mere click; the form store compares by reference (form-store.ts
+  // appends an empty paragraph) means the mounted document never structurally
+  // matches the one read off disk. Comparing documents would therefore report an
+  // edit on a mere click; the form store compares by reference (form-store.ts
   // `valuesEqual`), so that edit would stick and the document could never return
-  // to clean after a save. Compare what the user actually means by unsaved
-  // changes: would the file be different?
-  // Seeded from the value on disk, and re-seeded when a different document opens
+  // to clean after a save. Ask the codec instead — would the file be different?
+  //
+  // Seeded from what is on disk, and re-seeded when a different document opens
   // (this component stays mounted across that switch — only the editor below it
   // is keyed).
-  const lastMarkdown = useRef('');
+  const codec = codecFor(field);
+  const lastSerialized = useRef('');
   const seededFor = useRef<string | null>(null);
   if (seededFor.current !== formId) {
     seededFor.current = formId;
-    lastMarkdown.current = astToMarkdown(value ?? EMPTY_AST, field);
+    lastSerialized.current = codec.serialize(value ?? EMPTY_RICH_TEXT, field);
   }
   const setBody = useCallback(
-    (next: RichTextAst) => {
-      const markdown = astToMarkdown(next, field);
-      if (markdown === lastMarkdown.current) return;
-      lastMarkdown.current = markdown;
+    (next: RichTextValue) => {
+      const serialized = codec.serialize(next, field);
+      if (serialized === lastSerialized.current) return;
+      lastSerialized.current = serialized;
       setValue(next);
     },
-    [setValue, field]
+    [setValue, field, codec]
   );
 
   const editable = () =>
@@ -92,7 +89,7 @@ export function RichTextField() {
           }}
         >
           <RichEditor
-            input={{ value: value ?? EMPTY_AST, onChange: setBody }}
+            input={{ value: value ?? EMPTY_RICH_TEXT, onChange: setBody }}
             field={field}
             ariaLabel={address}
           />
