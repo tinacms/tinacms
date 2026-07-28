@@ -1,7 +1,7 @@
 import { promises as fs } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { dispatchContentRequest } from './content-request';
 import { type LocalDataLayer, createLocalDataLayer } from './local-data-layer';
 
@@ -103,5 +103,54 @@ describe('graphql (the v3 pipeline)', () => {
     expect(result).toMatchObject({
       data: { post: { title: 'Hello World' } },
     });
+  });
+});
+
+// v3 indexes one extension per collection, so a mixed collection is fully
+// editable but only partly queryable. Pinned here so the gap is a stated
+// limitation rather than something discovered from an empty query result.
+describe('a mixed-format collection through the v3 pipeline', () => {
+  let mixed: LocalDataLayer;
+  let warn: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(async () => {
+    await fs.writeFile(
+      path.join(rootDir, 'content/posts/settings.json'),
+      '{ "title": "From JSON" }\n'
+    );
+    warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    mixed = createLocalDataLayer({
+      rootDir,
+      collections: [
+        {
+          name: 'post',
+          path: 'content/posts',
+          format: ['mdx', 'json'],
+          fields: [{ name: 'title', type: 'string', required: true }],
+        },
+      ],
+    });
+  });
+
+  afterEach(() => warn.mockRestore());
+
+  it('indexes the primary format and warns about the rest', async () => {
+    const result = await mixed.graphql(
+      'query { postConnection { edges { node { title } } } }'
+    );
+    expect(result.errors).toBeUndefined();
+    expect(result.data?.postConnection).toMatchObject({
+      edges: [{ node: { title: 'Hello World' } }],
+    });
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('GraphQL indexes "mdx" only')
+    );
+  });
+
+  it('still reads and writes the unindexed format through the fs provider', async () => {
+    const saved = await mixed.update('post', 'content/posts/settings.json', {
+      title: 'Edited anyway',
+    });
+    expect(saved.document.title).toBe('Edited anyway');
   });
 });

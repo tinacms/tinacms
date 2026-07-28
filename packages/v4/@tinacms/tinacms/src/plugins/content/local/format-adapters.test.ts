@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { formatAdapterFor } from './format-adapters';
+import {
+  adapterForPath,
+  collectionFormats,
+  formatAdapterFor,
+  formatAdaptersFor,
+} from './format-adapters';
 
 const MDX_RAW = `---
 title: Hello World
@@ -95,4 +100,46 @@ describe('json adapter', () => {
 
 it('throws on an unsupported format', () => {
   expect(() => formatAdapterFor('yaml')).toThrow(/No format adapter/);
+});
+
+describe('multi-format collections', () => {
+  it('reads a single format and a list of one as the same collection', () => {
+    expect(collectionFormats('mdx')).toEqual(['mdx']);
+    expect(collectionFormats(['mdx'])).toEqual(['mdx']);
+    expect(collectionFormats(['mdx', 'json'])).toEqual(['mdx', 'json']);
+  });
+
+  it('resolves one adapter per declared format, in schema order', () => {
+    expect(
+      formatAdaptersFor(['mdx', 'json']).map((adapter) => adapter.extension)
+    ).toEqual(['.mdx', '.json']);
+  });
+
+  it('picks the adapter by the file extension, not the collection', () => {
+    const adapters = formatAdaptersFor(['mdx', 'json']);
+    expect(adapterForPath(adapters, 'content/posts/a.mdx')?.extension).toBe(
+      '.mdx'
+    );
+    expect(adapterForPath(adapters, 'content/posts/b.json')?.extension).toBe(
+      '.json'
+    );
+    expect(adapterForPath(adapters, 'content/posts/c.txt')).toBeUndefined();
+  });
+
+  // '.mdx'.endsWith('.md') is false, so the two never shadow each other.
+  it('keeps md and mdx distinct', () => {
+    const adapters = formatAdaptersFor(['md', 'mdx']);
+    expect(adapterForPath(adapters, 'a.md')?.extension).toBe('.md');
+    expect(adapterForPath(adapters, 'a.mdx')?.extension).toBe('.mdx');
+  });
+
+  it('rejects formats that collide on one extension', () => {
+    expect(() => formatAdaptersFor(['mdx', 'mdx'])).toThrow(
+      /duplicate extensions/
+    );
+  });
+
+  it('rejects a collection with no format at all', () => {
+    expect(() => formatAdaptersFor([])).toThrow(/at least one `format`/);
+  });
 });

@@ -16,6 +16,7 @@ export {
   type PluginManifest,
 } from './core/plugin';
 export type {
+  CollectionFormat,
   CollectionSchema,
   FieldSchema,
   TinaDocument,

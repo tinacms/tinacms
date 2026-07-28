@@ -14,7 +14,8 @@ import type { CollectionSchema } from '../../../core/schema/types';
 import {
   type CollectionFormat,
   type FormatAdapter,
-  formatAdapterFor,
+  adapterForPath,
+  formatAdaptersFor,
 } from './format-adapters';
 import {
   type GraphQLPipeline,
@@ -46,10 +47,15 @@ export interface LocalDataLayer extends ContentProvider {
 
 interface ResolvedCollection {
   schema: CollectionSchema;
-  adapter: FormatAdapter;
+  // One per declared format, in schema order (format-adapters.ts). A file's own
+  // extension picks which one reads and writes it, so a collection can hold .mdx
+  // and .json documents side by side.
+  adapters: FormatAdapter[];
   absoluteFolder: string;
   // The `isBody` field name, if the collection declares one — the field that owns
   // the markdown body (format-adapters.ts). One body per file, so one field.
+  // A format with no body concept (json) ignores it and stores the field inline,
+  // which is the honest reading: that document has no body to route it to.
   bodyField?: string;
 }
 
@@ -80,7 +86,7 @@ const resolveCollections = ({
     );
     resolved.set(schema.name, {
       schema,
-      adapter: formatAdapterFor(schema.format, formatAdapters),
+      adapters: formatAdaptersFor(schema.format, formatAdapters),
       absoluteFolder: path.resolve(rootDir, schema.path),
       bodyField: bodyFields[0]?.name,
     });
@@ -126,23 +132,29 @@ export const createLocalDataLayer = (
   };
 
   // Document paths come from the client — resolve and pin them inside the
-  // collection's folder before any fs call (trust boundary).
+  // collection's folder before any fs call (trust boundary). The extension check
+  // and the adapter lookup are one question ("does this collection read this
+  // file, and with what?"), so they are answered together.
   const resolveDocumentPath = (
     collection: ResolvedCollection,
     documentPath: string
-  ): string => {
+  ): { absolute: string; adapter: FormatAdapter } => {
     const absolute = path.resolve(rootDir, documentPath);
     if (!absolute.startsWith(collection.absoluteFolder + path.sep)) {
       throw new Error(
         `Path "${documentPath}" is outside collection "${collection.schema.name}".`
       );
     }
-    if (!absolute.endsWith(collection.adapter.extension)) {
+    const adapter = adapterForPath(collection.adapters, absolute);
+    if (!adapter) {
+      const extensions = collection.adapters
+        .map((each) => each.extension)
+        .join(' or ');
       throw new Error(
-        `Path "${documentPath}" is not a ${collection.adapter.extension} file in collection "${collection.schema.name}".`
+        `Path "${documentPath}" is not a ${extensions} file in collection "${collection.schema.name}".`
       );
     }
-    return absolute;
+    return { absolute, adapter };
   };
 
   // The document id is the root-relative posix path (ADR-017) — derived from the
@@ -154,7 +166,10 @@ export const createLocalDataLayer = (
   return {
     async get(collectionName, documentPath) {
       const collection = collectionFor(collectionName);
-      const absolute = resolveDocumentPath(collection, documentPath);
+      const { absolute, adapter } = resolveDocumentPath(
+        collection,
+        documentPath
+      );
       let raw: string;
       try {
         raw = await fs.readFile(absolute, 'utf8');
@@ -164,7 +179,7 @@ export const createLocalDataLayer = (
       }
       return {
         path: documentIdFor(absolute),
-        document: collection.adapter.parse(raw, collection.bodyField),
+        document: adapter.parse(raw, collection.bodyField),
       };
     },
 
@@ -182,13 +197,16 @@ export const createLocalDataLayer = (
       }
       const entries: DocumentEntry[] = [];
       for (const name of names.sort()) {
-        if (!name.endsWith(collection.adapter.extension)) continue;
+        // No adapter owns this extension, so the collection doesn't claim the
+        // file — the mixed-format equivalent of the old single-extension skip.
+        const adapter = adapterForPath(collection.adapters, name);
+        if (!adapter) continue;
         const absolute = path.join(collection.absoluteFolder, name);
         try {
           const raw = await fs.readFile(absolute, 'utf8');
           entries.push({
             path: documentIdFor(absolute),
-            document: collection.adapter.parse(raw, collection.bodyField),
+            document: adapter.parse(raw, collection.bodyField),
           });
         } catch (cause) {
           // One malformed or unreadable file must not take down the whole
@@ -201,7 +219,10 @@ export const createLocalDataLayer = (
 
     async update(collectionName, documentPath, value) {
       const collection = collectionFor(collectionName);
-      const absolute = resolveDocumentPath(collection, documentPath);
+      const { absolute, adapter } = resolveDocumentPath(
+        collection,
+        documentPath
+      );
       const canonicalPath = documentIdFor(absolute);
       // Merge over the file's current contents so unknown fields and the body
       // survive (format-adapters.ts); a missing file is written fresh — never
@@ -214,11 +235,7 @@ export const createLocalDataLayer = (
       }
       // The adapter routes an isBody field to the markdown body rather than the
       // YAML merge; omitting it from the save leaves the existing body alone.
-      const raw = collection.adapter.serialize(
-        value,
-        previousRaw,
-        collection.bodyField
-      );
+      const raw = adapter.serialize(value, previousRaw, collection.bodyField);
       // The parent folder may have been deleted out-of-band — same promise.
       await fs.mkdir(path.dirname(absolute), { recursive: true });
       await fs.writeFile(absolute, raw);
@@ -238,7 +255,7 @@ export const createLocalDataLayer = (
       }
       return {
         path: canonicalPath,
-        document: collection.adapter.parse(raw, collection.bodyField),
+        document: adapter.parse(raw, collection.bodyField),
       };
     },
 

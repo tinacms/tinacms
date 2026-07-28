@@ -230,6 +230,105 @@ describe('graphql pipeline', () => {
   });
 });
 
+// One collection, two formats: each document's own extension picks its adapter.
+describe('mixed-format collection', () => {
+  let mixed: LocalDataLayer;
+
+  beforeEach(async () => {
+    await fs.writeFile(
+      path.join(rootDir, 'content/posts/settings.json'),
+      '{\n  "title": "From JSON",\n  "extra": "kept"\n}\n'
+    );
+    mixed = createLocalDataLayer({
+      rootDir,
+      collections: [
+        {
+          name: 'post',
+          path: 'content/posts',
+          format: ['mdx', 'json'],
+          fields: [{ name: 'body', type: 'rich-text', isBody: true }],
+        },
+      ],
+    });
+  });
+
+  it('lists documents of every declared format', async () => {
+    const entries = await mixed.list('post');
+    expect(entries.map((entry) => entry.path)).toEqual([
+      'content/posts/hello.mdx',
+      'content/posts/nested/deep.mdx',
+      'content/posts/settings.json',
+    ]);
+  });
+
+  it('parses each document with the adapter its extension names', async () => {
+    const markdown = await mixed.get('post', 'content/posts/hello.mdx');
+    expect(markdown?.document).toMatchObject({
+      title: 'Hello World',
+      body: 'Body prose.\n',
+    });
+    const json = await mixed.get('post', 'content/posts/settings.json');
+    expect(json?.document).toEqual({ title: 'From JSON', extra: 'kept' });
+  });
+
+  it('writes each document back in its own format', async () => {
+    await mixed.update('post', 'content/posts/settings.json', {
+      title: 'Renamed',
+    });
+    const raw = await fs.readFile(
+      path.join(rootDir, 'content/posts/settings.json'),
+      'utf8'
+    );
+    expect(JSON.parse(raw)).toEqual({ title: 'Renamed', extra: 'kept' });
+    // The sibling .mdx still round-trips through gray-matter, untouched.
+    await mixed.update('post', 'content/posts/hello.mdx', {
+      body: 'Rewritten prose.\n',
+    });
+    const mdxRaw = await fs.readFile(
+      path.join(rootDir, 'content/posts/hello.mdx'),
+      'utf8'
+    );
+    expect(mdxRaw).toContain('title: Hello World');
+    expect(mdxRaw).not.toContain('body:');
+  });
+
+  // json has no body concept, so the isBody field is stored inline — the honest
+  // reading for a document with no body to route it to.
+  it('stores the body field inline for a format without a body', async () => {
+    const saved = await mixed.update('post', 'content/posts/settings.json', {
+      body: 'Not a markdown body.',
+    });
+    expect(saved.document.body).toBe('Not a markdown body.');
+    const raw = await fs.readFile(
+      path.join(rootDir, 'content/posts/settings.json'),
+      'utf8'
+    );
+    expect(JSON.parse(raw).body).toBe('Not a markdown body.');
+  });
+
+  it('still rejects an extension no declared format claims', async () => {
+    await expect(
+      mixed.get('post', 'content/posts/ignored.txt')
+    ).rejects.toThrow(/not a \.mdx or \.json file/);
+  });
+
+  it('rejects formats colliding on one extension at construction', () => {
+    expect(() =>
+      createLocalDataLayer({
+        rootDir,
+        collections: [
+          {
+            name: 'post',
+            path: 'content/posts',
+            format: ['mdx', 'mdx'],
+            fields: [],
+          },
+        ],
+      })
+    ).toThrow(/duplicate extensions/);
+  });
+});
+
 describe('dispatchContentRequest', () => {
   it('dispatches ops', async () => {
     const listed = await dispatchContentRequest(dataLayer, {

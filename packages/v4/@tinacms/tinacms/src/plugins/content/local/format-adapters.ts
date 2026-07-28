@@ -1,11 +1,13 @@
-import type {
+import {
+  type CollectionFormat,
   CollectionSchema,
+  FORMAT_EXTENSIONS,
   TinaDocument,
 } from '../../../core/schema/types';
 import { jsonAdapter } from './json.adapter';
 import { markdownAdapter } from './markdown.adapter';
 
-export type CollectionFormat = NonNullable<CollectionSchema['format']>;
+export type { CollectionFormat };
 
 // Format adapters (ADR-017 §5): the only serialization layer — document JSON ↔ file.
 // `serialize` takes the file's previous raw contents and merges the saved value OVER
@@ -26,9 +28,11 @@ export interface FormatAdapter {
   ): string;
 }
 
+// Extensions come from FORMAT_EXTENSIONS (core/schema/types.ts) so this and the
+// rich-text codecs cannot drift apart on what a format is called on disk.
 const adapters: Partial<Record<CollectionFormat, FormatAdapter>> = {
-  md: markdownAdapter('.md'),
-  mdx: markdownAdapter('.mdx'),
+  md: markdownAdapter(FORMAT_EXTENSIONS.md),
+  mdx: markdownAdapter(FORMAT_EXTENSIONS.mdx),
   json: jsonAdapter,
 };
 
@@ -45,3 +49,40 @@ export const formatAdapterFor = (
   }
   return adapter;
 };
+
+// A collection's formats, always as a list — `format: 'mdx'` and
+// `format: ['mdx']` describe the same collection. Order is the schema's:
+// formats[0] is the primary (types.ts).
+export const collectionFormats = (
+  format: CollectionSchema['format']
+): CollectionFormat[] => (Array.isArray(format) ? format : [format]);
+
+// The adapters a collection reads and writes with, in schema order. Two formats
+// resolving to the same extension has no sensible answer — whichever won the
+// lookup would parse the other's files — so it fails here, at construction,
+// rather than on someone's first save.
+export const formatAdaptersFor = (
+  format: CollectionSchema['format'],
+  overrides?: Partial<Record<CollectionFormat, FormatAdapter>>
+): FormatAdapter[] => {
+  const formats = collectionFormats(format);
+  if (formats.length === 0) {
+    throw new Error('A collection needs at least one `format`.');
+  }
+  const resolved = formats.map((each) => formatAdapterFor(each, overrides));
+  const extensions = new Set(resolved.map((adapter) => adapter.extension));
+  if (extensions.size !== resolved.length) {
+    throw new Error(
+      `Formats ${formats.join(', ')} resolve to duplicate extensions — a collection's formats must map to distinct file extensions.`
+    );
+  }
+  return resolved;
+};
+
+// Which adapter owns this file. The document's extension decides, not the
+// collection — that is what lets one collection hold mixed formats.
+export const adapterForPath = (
+  adapters: FormatAdapter[],
+  filePath: string
+): FormatAdapter | undefined =>
+  adapters.find((adapter) => filePath.endsWith(adapter.extension));

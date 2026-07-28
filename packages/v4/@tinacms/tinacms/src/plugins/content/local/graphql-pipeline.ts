@@ -13,6 +13,7 @@ import {
 } from '@tinacms/graphql';
 import { SqliteLevel } from 'sqlite-level';
 import type { CollectionSchema, FieldSchema } from '../../../core/schema/types';
+import { collectionFormats } from './format-adapters';
 
 export type { GraphQLResult } from '@tinacms/graphql';
 export type GraphQLVariables = Record<string, unknown>;
@@ -43,19 +44,35 @@ const toV3Field = (field: FieldSchema) => ({
   isBody: field.isBody,
 });
 
+// v3 pins one format per collection: it globs for `${path}/**.${format}` and
+// filters candidate files on extension equality, so only the primary format
+// reaches the index. A mixed collection is therefore fully editable (the fs
+// provider dispatches per file) but only partly queryable — hence the warning
+// below rather than a silent half-index. Goes away when v4 owns its own index.
 const toV3Collection = (collection: CollectionSchema) => ({
   name: collection.name,
   label: collection.label,
   path: collection.path,
-  format: collection.format,
+  format: collectionFormats(collection.format)[0],
   fields: collection.fields.map(toV3Field),
 });
+
+const warnUnindexedFormats = (collections: CollectionSchema[]) => {
+  for (const collection of collections) {
+    const [primary, ...rest] = collectionFormats(collection.format);
+    if (rest.length === 0) continue;
+    console.warn(
+      `Collection "${collection.name}" declares formats ${[primary, ...rest].join(', ')}, but GraphQL indexes "${primary}" only — ${rest.join(', ')} documents are editable but will not appear in query results.`
+    );
+  }
+};
 
 type IndexedDocument = Record<string, unknown>;
 
 export const createGraphQLPipeline = async (
   options: GraphQLPipelineOptions
 ): Promise<GraphQLPipeline> => {
+  warnUnindexedFormats(options.collections);
   const database = createDatabaseInternal({
     bridge: new FilesystemBridge(options.rootDir),
     level:
