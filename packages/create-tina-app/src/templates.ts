@@ -33,13 +33,17 @@ export const TEMPLATES: Template[] = [
   {
     title: '⭐ Astro Starter',
     description:
-      'Get started with Astro - a modern static site generator designed for fast, lightweight, and flexible web projects.',
+      'Kickstart your project with Astro, our top recommendation for a fast, lightweight, and flexible web experience.',
     value: 'tina-astro-starter',
     isInternal: false,
     features: [
       {
         name: 'Visual Editing',
         description: '✅',
+      },
+      {
+        name: 'ISR',
+        description: '❌',
       },
       {
         name: 'SSG',
@@ -51,9 +55,9 @@ export const TEMPLATES: Template[] = [
     devUrl: 'http://localhost:4321',
   },
   {
-    title: 'NextJS starter',
+    title: 'Next.js Starter',
     description:
-      'Kickstart your project with Next.js – a seamless, performant, and versatile web experience.',
+      'Kickstart your project with Next.js, a seamless, performant, and versatile web experience.',
     value: 'tina-nextjs-starter',
     isInternal: false,
     features: [
