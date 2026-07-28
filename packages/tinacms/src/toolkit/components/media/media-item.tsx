@@ -67,6 +67,7 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
         )}
       </div>
       <span
+        title={item.filename}
         className={'text-base flex-grow w-full break-words truncate px-3 py-2'}
       >
         {item.filename}
@@ -96,7 +97,10 @@ export function GridFolderItem({
         <div className='flex items-center justify-center h-24'>
           <BiFolder className='w-11 h-11 fill-tina-orange' />
         </div>
-        <div className='w-full px-3 py-2 border-t border-gray-100 bg-white/60 text-sm font-medium text-gray-700 truncate'>
+        <div
+          title={item.filename}
+          className='w-full px-3 py-2 border-t border-gray-100 bg-white/60 text-sm font-medium text-gray-700 truncate'
+        >
           {item.filename}
         </div>
       </button>
@@ -164,7 +168,10 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
             </span>
           )}
         </div>
-        <div className='w-full px-2.5 py-2 text-sm text-gray-700 truncate'>
+        <div
+          title={item.filename}
+          className='w-full px-2.5 py-2 text-sm text-gray-700 truncate'
+        >
           {item.filename}
         </div>
       </button>

@@ -384,12 +384,15 @@ export class MediaModel {
         }
         return 0;
       });
-      const limitItems = sortedItems.slice(offset, offset + limit);
-      const files = limitItems.filter((x) => x.isFile);
-      const directories = limitItems.filter((x) => !x.isFile).map((x) => x.src);
+      const allDirectories = sortedItems
+        .filter((x) => !x.isFile)
+        .map((x) => x.src);
+      const allFiles = sortedItems.filter((x) => x.isFile);
 
+      const directories = offset === 0 ? allDirectories : [];
+      const files = allFiles.slice(offset, offset + limit);
       const cursor =
-        rawItems.length > offset + limit ? String(offset + limit) : null;
+        allFiles.length > offset + limit ? String(offset + limit) : null;
 
       return {
         files,
@@ -429,7 +432,12 @@ export class MediaModel {
     const visitedDirs = new Set<string>([resolveRealPath(validatedPath)]);
 
     const walk = async (dir: string, relPrefix: string) => {
-      const entries = await fs.readdir(dir);
+      let entries: string[];
+      try {
+        entries = await fs.readdir(dir);
+      } catch {
+        return;
+      }
       const stats = await Promise.all(
         entries.map(async (entry) => {
           const absPath = join(dir, entry);

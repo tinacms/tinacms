@@ -58,6 +58,33 @@ describe('MediaModel (Vite dev server)', () => {
         model.listMedia({ searchPath: '%2e%2e/%2e%2e/%2e%2e/etc' })
       ).rejects.toThrow(PathTraversalError);
     });
+
+    it('returns all directories on the first page and paginates files', async () => {
+      const base = path.join(tmpDir, 'public', 'uploads');
+      for (let i = 0; i < 5; i++) {
+        await fs.mkdirp(path.join(base, `dir-${i}`));
+      }
+      for (let i = 0; i < 10; i++) {
+        await fs.writeFile(
+          path.join(base, `file-${String(i).padStart(2, '0')}.png`),
+          'x'
+        );
+      }
+      const model = new MediaModel(config);
+
+      const page1 = await model.listMedia({ searchPath: '', limit: '4' });
+      expect(page1.directories).toHaveLength(5);
+      expect(page1.files).toHaveLength(4);
+      expect(page1.cursor).toBe('4');
+
+      const page2 = await model.listMedia({
+        searchPath: '',
+        limit: '4',
+        cursor: '4',
+      });
+      expect(page2.directories).toEqual([]);
+      expect(page2.files).toHaveLength(4);
+    });
   });
 
   describe('listMedia search', () => {
@@ -144,6 +171,28 @@ describe('MediaModel (Vite dev server)', () => {
       const model = new MediaModel(config);
       const result = await model.listMedia({ searchPath: '', search: 'llama' });
       expect(result.files).toHaveLength(3);
+    });
+
+    it('keeps matches from readable folders when a nested folder cannot be read', async () => {
+      await seed();
+      const realReaddir = fs.readdir;
+      const spy = jest
+        .spyOn(fs, 'readdir')
+        .mockImplementation((dirPath: any, ...rest: any[]) =>
+          typeof dirPath === 'string' && dirPath.endsWith('nested')
+            ? Promise.reject(new Error('EACCES: permission denied'))
+            : (realReaddir as any).call(fs, dirPath, ...rest)
+        );
+      try {
+        const result = await new MediaModel(config).listMedia({
+          searchPath: '',
+          search: 'llama',
+        });
+        expect(result.files.map((f) => f.filename)).toEqual(['llama.png']);
+        expect(result.error).toBeUndefined();
+      } finally {
+        spy.mockRestore();
+      }
     });
 
     it('is case-insensitive', async () => {
