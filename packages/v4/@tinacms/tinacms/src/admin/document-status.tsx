@@ -1,3 +1,4 @@
+import { Badge } from '@tinacms/ui/components/badge';
 import { useFormId } from '../editor/hooks';
 import {
   type FormId,
@@ -5,11 +6,15 @@ import {
   useFormStatus,
 } from '../form/form-store';
 
-const STATUS_STYLES: Record<FormStatus, string> = {
-  pristine: 'bg-neutral-100 text-neutral-600',
-  dirty: 'bg-amber-100 text-amber-800',
-  clean: 'bg-emerald-100 text-emerald-800',
-};
+// Mapped onto the variants the design system has, rather than inventing tokens for
+// them: there is no success/warning pair in globals.css, and a badge is the wrong
+// place to introduce one. The ordering still reads correctly — the state that wants
+// action is the loudest, and both settled states recede.
+const STATUS_VARIANTS = {
+  pristine: 'secondary',
+  dirty: 'default',
+  clean: 'outline',
+} as const satisfies Record<FormStatus, string>;
 
 const STATUS_LABELS: Record<FormStatus, string> = {
   pristine: 'No changes',
@@ -22,13 +27,7 @@ const STATUS_LABELS: Record<FormStatus, string> = {
 // pristine/dirty/clean authority (ADR-010) rather than RHF.
 export function FormStatusBadge({ formId }: { formId: FormId }) {
   const status = useFormStatus(formId);
-  return (
-    <span
-      className={`rounded-full px-2 py-0.5 text-xs whitespace-nowrap ${STATUS_STYLES[status]}`}
-    >
-      {STATUS_LABELS[status]}
-    </span>
-  );
+  return <Badge variant={STATUS_VARIANTS[status]}>{STATUS_LABELS[status]}</Badge>;
 }
 
 export function DocumentStatus() {
