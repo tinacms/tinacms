@@ -50,8 +50,12 @@ export interface CollectionSchema {
    * a `.json` document in the same list and the same form, each read by the
    * adapter its extension names.
    *
-   * The first entry is the primary format: what a new document gets, and (until
-   * v4 owns its index) the only one the v3 GraphQL pipeline reads.
+   * The first entry is the primary format. Today that means exactly one thing:
+   * until v4 owns its index, it is the only format the v3 GraphQL pipeline reads
+   * (graphql-pipeline.ts warns about the rest). It is *not* yet what a new
+   * document gets — the data layer writes whatever path it is handed, so the
+   * extension is the caller's choice. It becomes the default when something
+   * above the data layer starts naming new files.
    */
   format: CollectionFormat | CollectionFormat[];
   fields: FieldSchema[];

@@ -86,6 +86,16 @@ describe('markdown adapter', () => {
     expect(adapter.parse(saved, 'body').body).toBe('The real body.\n');
   });
 
+  // Shadowed on read, so it never reaches the editor — but it stays in the file,
+  // where git diffs, other tooling and v3 all still see it. Removing it on any
+  // save heals the file instead of waiting for someone to edit that body.
+  it('drops a stale body key even when the save never mentions the body', () => {
+    const withStaleKey = `---\ntitle: Hello\nbody: stale frontmatter value\n---\n\nThe real body.\n`;
+    const saved = adapter.serialize({ title: 'Renamed' }, withStaleKey, 'body');
+    expect(saved).not.toContain('stale frontmatter value');
+    expect(saved).toBe('---\ntitle: Renamed\n---\n\nThe real body.\n');
+  });
+
   // Coercing instead of rejecting would write "[object Object]" as the whole
   // file — the body arrives straight off the wire, so its shape isn't a given.
   it('rejects a non-string body rather than coercing it', () => {
