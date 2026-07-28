@@ -5,6 +5,16 @@
 // helpers, and the public contract types. Each field type contributes its own
 // `t.<type>` builder from its plugin; this entry is the composition root.
 
+// The schema compile is pure and node-safe (it reads manifests, never segments), so
+// it sits in the universal entry beside the config it compiles. loadTinaConfig does
+// not: it needs vite to resolve the user's TypeScript, so it stays build-side only.
+export {
+  type LockCheck,
+  LOCK_VERSION,
+  checkLock,
+  compileSchema,
+  type TinaLock,
+} from './codegen/compile-schema';
 export {
   defineConfig,
   type ResolvedConfig,
