@@ -27,7 +27,9 @@ const STATUS_LABELS: Record<FormStatus, string> = {
 // pristine/dirty/clean authority (ADR-010) rather than RHF.
 export function FormStatusBadge({ formId }: { formId: FormId }) {
   const status = useFormStatus(formId);
-  return <Badge variant={STATUS_VARIANTS[status]}>{STATUS_LABELS[status]}</Badge>;
+  return (
+    <Badge variant={STATUS_VARIANTS[status]}>{STATUS_LABELS[status]}</Badge>
+  );
 }
 
 export function DocumentStatus() {

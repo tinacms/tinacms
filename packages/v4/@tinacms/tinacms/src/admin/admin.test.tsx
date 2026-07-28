@@ -123,9 +123,11 @@ beforeEach(() => {
 describe('TinaAdmin', () => {
   it('lists every collection the schema declares, and nothing else', async () => {
     renderAdmin();
-    const nav = await screen.findByRole('navigation', { name: 'Collections' });
+    // A SidebarMenu is a <ul>, so the menu is a labelled list rather than a nav
+    // landmark — the sidebar as a whole is the landmark.
+    const menu = await screen.findByRole('list', { name: 'Collections' });
     expect(
-      within(nav)
+      within(menu)
         .getAllByRole('button')
         .map((button) => button.textContent)
     ).toEqual(['Posts', 'Pages']);
@@ -187,9 +189,7 @@ describe('TinaAdmin', () => {
 
   it('shows no preview until a document is open', async () => {
     renderAdmin(<PreviewProbe />);
-    expect(
-      await screen.findByText(/Select a document to edit/)
-    ).toBeInTheDocument();
+    await screen.findByRole('list', { name: 'Collections' });
     expect(screen.queryByText(/^previewing /)).not.toBeInTheDocument();
   });
 
