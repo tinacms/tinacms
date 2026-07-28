@@ -429,6 +429,7 @@ export class MediaModel {
   }): Promise<ListMediaRes> {
     const resolvedBase = path.resolve(mediaBase);
     const files: File[] = [];
+    const directories: string[] = [];
     const visitedDirs = new Set<string>([resolveRealPath(validatedPath)]);
 
     const walk = async (dir: string, relPrefix: string) => {
@@ -466,6 +467,9 @@ export class MediaModel {
           const realDir = resolveRealPath(absPath);
           if (visitedDirs.has(realDir)) continue;
           visitedDirs.add(realDir);
+          if (relPath.toLowerCase().includes(search)) {
+            directories.push(`/${relPath}`);
+          }
           await walk(absPath, relPath);
           continue;
         }
@@ -480,13 +484,14 @@ export class MediaModel {
 
     await walk(validatedPath, '');
     files.sort((a, b) => a.filename.localeCompare(b.filename));
+    directories.sort();
 
     const offset = Number(cursor) || 0;
     const pageSize = Number(limit) || 20;
 
     return {
       files: files.slice(offset, offset + pageSize),
-      directories: [],
+      directories: offset === 0 ? directories : [],
       cursor:
         files.length > offset + pageSize ? String(offset + pageSize) : null,
     };

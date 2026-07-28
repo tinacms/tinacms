@@ -118,6 +118,41 @@ describe('MediaModel (Vite dev server)', () => {
       expect(names).toEqual(['nested/deep/LLAMA.jpg']);
     });
 
+    it('returns matching directories as results, not only files', async () => {
+      await seed();
+      const model = new MediaModel(config);
+      const result = await model.listMedia({ searchPath: '', search: 'deep' });
+      expect(result.directories).toEqual(['/nested/deep']);
+    });
+
+    it('returns matching directories only on the first page', async () => {
+      const base = path.join(tmpDir, 'public', 'uploads');
+      await fs.mkdirp(path.join(base, 'match-dir'));
+      for (let i = 0; i < 15; i++) {
+        await fs.writeFile(
+          path.join(base, `match-${String(i).padStart(2, '0')}.png`),
+          'x'
+        );
+      }
+      const model = new MediaModel(config);
+
+      const page1 = await model.listMedia({
+        searchPath: '',
+        search: 'match',
+        limit: '10',
+      });
+      expect(page1.directories).toEqual(['/match-dir']);
+      expect(page1.files).toHaveLength(10);
+
+      const page2 = await model.listMedia({
+        searchPath: '',
+        search: 'match',
+        limit: '10',
+        cursor: '10',
+      });
+      expect(page2.directories).toEqual([]);
+    });
+
     it('paginates results with limit and cursor', async () => {
       const base = path.join(tmpDir, 'public', 'uploads');
       for (let i = 0; i < 25; i++) {

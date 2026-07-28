@@ -425,7 +425,7 @@ export function MediaPicker({
   const emptyMessage = () => {
     if (isSearching) {
       return mediaFilter === 'folders'
-        ? "Folders aren't part of search results"
+        ? 'No folders match'
         : `No media matches “${debouncedSearch}”`;
     }
     if (mediaFilter === 'folders') return 'No folders here';
