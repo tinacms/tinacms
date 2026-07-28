@@ -117,11 +117,25 @@ export interface FormStore {
   removeForm: (formId: FormId) => void;
 }
 
-// ponytail: shallow key/value equality is correct while field values are primitives
-// (the only field type today is `string`). When object/list/rich-text values land,
-// equality should be owned by the field descriptor (each field type compares its own
-// value, alongside its parse/serialize) rather than a central deep-compare bolted on
-// here — the store then asks the field "did this change?" instead of guessing.
+// Reference equality first — correct and cheap for the primitive fields, which are
+// still most of them. It is not sufficient on its own: the store is fed from RHF's
+// formState subscription, which hands over a *clone* of each value, while
+// `markSaved` baselines the values RHF itself holds. For a primitive the two
+// compare equal anyway; for the rich-text field's AST they never do, so a saved
+// document stayed dirty forever. Form values are JSON documents, so falling back to
+// structural comparison is the honest test of "did this change".
+//
+// A false negative here only costs an extra dirty read, never a lost edit.
+// TODO: the field descriptor should own this (each type comparing its own value
+// alongside its parse/serialize) rather than the store guessing — that needs the
+// field registry in the store, which it deliberately does not have today.
+const sameValue = (a: unknown, b: unknown): boolean => {
+  if (Object.is(a, b)) return true;
+  if (typeof a !== 'object' || typeof b !== 'object') return false;
+  if (a === null || b === null) return false;
+  return JSON.stringify(a) === JSON.stringify(b);
+};
+
 const valuesEqual = (current: FormValues, baseline: FormValues): boolean => {
   // Compared over the union of both key sets so a key holding undefined equals its
   // absence — JSON can't represent "present but undefined", and controlled inputs
@@ -131,7 +145,7 @@ const valuesEqual = (current: FormValues, baseline: FormValues): boolean => {
     ...Object.keys(current),
     ...Object.keys(baseline),
   ]) as Set<FieldAddress>;
-  return [...keys].every((key) => Object.is(current[key], baseline[key]));
+  return [...keys].every((key) => sameValue(current[key], baseline[key]));
 };
 
 export const formStatus = (scope: OpenForm | undefined): FormStatus => {
@@ -139,15 +153,14 @@ export const formStatus = (scope: OpenForm | undefined): FormStatus => {
   return valuesEqual(scope.values, scope.baseline) ? 'clean' : 'dirty';
 };
 
-// Per-field dirty behind the exported `useIsFieldDirty`. Same primitive assumption as
-// `valuesEqual`: `Object.is` is correct while field values are primitives; an
-// in-place-mutated object/list value would misread here too once composite fields land.
+// Per-field dirty behind the exported `useIsFieldDirty`; same equality as
+// `valuesEqual`, for the same reason.
 export const fieldDirty = (
   scope: OpenForm | undefined,
   address: FieldAddress
 ): boolean =>
   isEdited(scope)
-    ? !Object.is(scope.values[address], scope.baseline[address])
+    ? !sameValue(scope.values[address], scope.baseline[address])
     : false;
 
 // Message arrays are rebuilt by RHF on every derivation; compare content so an
@@ -211,10 +224,10 @@ export const useFormStore = create<FormStore>()(
             const scope = state.forms[formId];
             if (!scope) return state;
             // Re-setting a field to the value it already holds is a no-op — controlled
-            // inputs re-fire onChange with the same value; don't churn state. Primitive
-            // assumption (see valuesEqual): an in-place-mutated object/list re-passed here
-            // reads equal and would be dropped — composite fields need field-owned equality.
-            if (Object.is(scope.values[address], value)) return state;
+            // inputs re-fire onChange with the same value; don't churn state. An
+            // object value mutated in place would read equal here and be dropped;
+            // fields hand over fresh values rather than mutating (see sameValue).
+            if (sameValue(scope.values[address], value)) return state;
             // The first edit freezes the pristine values as the baseline to diff against.
             return {
               forms: {

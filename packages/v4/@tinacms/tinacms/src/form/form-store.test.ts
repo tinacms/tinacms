@@ -115,6 +115,45 @@ describe('form-store save reset', () => {
   });
 });
 
+// The store is fed from RHF's formState subscription, which hands over a clone of
+// each value, while markSaved baselines the values RHF itself holds. Primitives
+// compare equal across that split; a structure never does by reference, so a saved
+// rich-text document stayed dirty forever until equality became structural.
+describe('form-store structural value equality', () => {
+  const body = toFieldAddress('body');
+  const ast = () => ({
+    type: 'root',
+    children: [{ type: 'p', children: [{ type: 'text', text: 'Prose.' }] }],
+  });
+
+  it('treats an equal-but-cloned structure as unchanged', () => {
+    store.getState().registerForm(postA, { [body]: ast() });
+    store.getState().setFieldValue(postA, body, ast());
+    expect(statusOf(postA)).toBe('pristine');
+  });
+
+  it('returns to clean when markSaved baselines a clone of the saved value', () => {
+    store.getState().registerForm(postA, { [body]: ast() });
+    const edited = ast();
+    edited.children[0].children[0].text = 'Edited.';
+    store.getState().setFieldValue(postA, body, edited);
+    expect(statusOf(postA)).toBe('dirty');
+
+    // A different object holding the same content, as markSaved receives.
+    const savedClone = JSON.parse(JSON.stringify(edited));
+    store.getState().markSaved(postA, { [body]: savedClone });
+    expect(statusOf(postA)).toBe('clean');
+  });
+
+  it('still reports a genuine structural change as dirty', () => {
+    store.getState().registerForm(postA, { [body]: ast() });
+    const edited = ast();
+    edited.children[0].children[0].text = 'Different.';
+    store.getState().setFieldValue(postA, body, edited);
+    expect(statusOf(postA)).toBe('dirty');
+  });
+});
+
 describe('form-store error mirror', () => {
   const scope = () => store.getState().forms[postA];
 

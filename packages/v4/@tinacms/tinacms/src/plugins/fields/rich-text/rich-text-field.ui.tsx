@@ -1,5 +1,5 @@
 import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
-import { useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import {
   useFieldActivation,
   useFieldAddress,
@@ -10,6 +10,7 @@ import {
 } from '../../../editor';
 import { RichEditor } from './plate';
 import { EditorContext } from './plate/editor-context';
+import { astToMarkdown } from './rich-text-field.markdown';
 import type {
   RichTextAst,
   RichTextFieldSchema,
@@ -31,6 +32,33 @@ export function RichTextField() {
   const [value, setValue] = useFieldValue<RichTextAst>(address);
   const errors = useFieldErrors(address);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Plate fires onChange for selection changes too, not just edits, and its
+  // normalization (NodeIdPlugin stamps an `id` on every node, TrailingBlockPlugin
+  // appends an empty paragraph) means the mounted AST never structurally matches
+  // the one parsed off disk. Comparing ASTs would therefore report an edit on a
+  // mere click; the form store compares by reference (form-store.ts
+  // `valuesEqual`), so that edit would stick and the document could never return
+  // to clean after a save. Compare what the user actually means by unsaved
+  // changes: would the file be different?
+  // Seeded from the value on disk, and re-seeded when a different document opens
+  // (this component stays mounted across that switch — only the editor below it
+  // is keyed).
+  const lastMarkdown = useRef('');
+  const seededFor = useRef<string | null>(null);
+  if (seededFor.current !== formId) {
+    seededFor.current = formId;
+    lastMarkdown.current = astToMarkdown(value ?? EMPTY_AST, field);
+  }
+  const setBody = useCallback(
+    (next: RichTextAst) => {
+      const markdown = astToMarkdown(next, field);
+      if (markdown === lastMarkdown.current) return;
+      lastMarkdown.current = markdown;
+      setValue(next);
+    },
+    [setValue, field]
+  );
 
   const editable = () =>
     containerRef.current?.querySelector<HTMLElement>('[role="textbox"]');
@@ -59,7 +87,7 @@ export function RichTextField() {
           }}
         >
           <RichEditor
-            input={{ value: value ?? EMPTY_AST, onChange: setValue }}
+            input={{ value: value ?? EMPTY_AST, onChange: setBody }}
             field={field}
             ariaLabel={address}
           />
