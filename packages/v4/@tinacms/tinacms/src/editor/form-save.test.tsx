@@ -17,6 +17,10 @@ import {
   useFormStatus,
 } from './index';
 
+// These render a runtime directly rather than a configured app, so they hand
+// TinaProvider the resolved shape instead of going through defineConfig.
+const NO_COLLECTIONS = { collections: [] };
+
 const collection: CollectionSchema = {
   name: 'post',
   format: 'mdx',
@@ -38,7 +42,9 @@ function SaveProbe() {
 
 const renderWithSave = (onSave: SaveHandler) =>
   render(
-    <TinaProvider plugins={[stringFieldPlugin]}>
+    <TinaProvider
+      config={{ plugins: [stringFieldPlugin], schema: NO_COLLECTIONS }}
+    >
       <FormProvider
         collection={collection}
         path='content/posts/save.mdx'
@@ -123,7 +129,9 @@ describe('useFormSave with a structured field value', () => {
   it('reaches clean after a save, despite RHF cloning the value', async () => {
     const onSave = vi.fn();
     render(
-      <TinaProvider plugins={[structureFieldPlugin]}>
+      <TinaProvider
+        config={{ plugins: [structureFieldPlugin], schema: NO_COLLECTIONS }}
+      >
         <FormProvider
           collection={structureCollection}
           path='content/posts/structure.mdx'

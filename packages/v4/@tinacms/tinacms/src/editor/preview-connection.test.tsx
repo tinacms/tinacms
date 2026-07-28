@@ -22,6 +22,10 @@ import { FormScopeContext } from './context';
 import { Field, FormProvider, TinaProvider } from './index';
 import { usePreviewConnection } from './preview-connection';
 
+// These render a runtime directly rather than a configured app, so they hand
+// TinaProvider the resolved shape instead of going through defineConfig.
+const NO_COLLECTIONS = { collections: [] };
+
 const collection: CollectionSchema = {
   name: 'post',
   format: 'mdx',
@@ -69,7 +73,9 @@ const messageFromPreview = (
 
 const renderConnected = (iframeRef: RefObject<HTMLIFrameElement | null>) =>
   render(
-    <TinaProvider plugins={[stringFieldPlugin]}>
+    <TinaProvider
+      config={{ plugins: [stringFieldPlugin], schema: NO_COLLECTIONS }}
+    >
       <FormProvider
         collection={collection}
         path={path}
@@ -168,7 +174,9 @@ describe('usePreviewConnection', () => {
       return <div>bare</div>;
     }
     render(
-      <TinaProvider plugins={[stringFieldPlugin]}>
+      <TinaProvider
+        config={{ plugins: [stringFieldPlugin], schema: NO_COLLECTIONS }}
+      >
         <FormProvider collection={collection} path={path}>
           <Bare />
         </FormProvider>
@@ -209,7 +217,9 @@ describe('usePreviewConnection', () => {
     });
     const iframe = fakeIframe();
     const tree = (documentPath: string) => (
-      <TinaProvider plugins={[stringFieldPlugin]}>
+      <TinaProvider
+        config={{ plugins: [stringFieldPlugin], schema: NO_COLLECTIONS }}
+      >
         <FormProvider
           collection={collection}
           path={documentPath}

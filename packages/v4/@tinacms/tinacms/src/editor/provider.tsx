@@ -7,10 +7,11 @@ import {
   useState,
 } from 'react';
 import { FormProvider as RhfFormProvider, useForm } from 'react-hook-form';
+import type { ResolvedConfig } from '../config';
 import { toFieldAddress } from '../core/field/address';
 import { createFieldRegistry } from '../core/field/registry';
 import { ingestDocument } from '../core/form/ingest';
-import { type PluginManifest, resolveClientSegments } from '../core/plugin';
+import { resolveClientSegments } from '../core/plugin';
 import { initializePlugins, validateCapabilityGraph } from '../core/resolve';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import {
@@ -21,7 +22,6 @@ import {
   toFormValues,
   useFormStore,
 } from '../form/form-store';
-import { corePlugins } from '../plugins/fields';
 import { createTinaStore } from '../store/create-store';
 import {
   FormScopeContext,
@@ -37,9 +37,10 @@ import {
 import { buildFormResolver } from './resolver';
 
 export interface TinaProviderProps {
-  // Additional plugins on top of the built-in corePlugins; a passed plugin with
-  // a built-in's name replaces it (user override wins).
-  plugins?: PluginManifest[];
+  // The output of defineConfig — its plugin list is already composed (built-ins
+  // folded in) and graph-validated, so boot here is import-and-mount. A test that
+  // is not a configured app can hand over the literal instead.
+  config: ResolvedConfig;
   children: ReactNode;
 }
 
@@ -50,16 +51,12 @@ export interface TinaProviderProps {
 // are module singletons, so their lifecycle is global state.
 let lifecycleTurn: Promise<void> = Promise.resolve();
 
-export function TinaProvider({ plugins = [], children }: TinaProviderProps) {
+export function TinaProvider({ config, children }: TinaProviderProps) {
   // One resolveClientSegments pass feeds both runtime halves (ADR-003), held as a
   // single state object so registry and store always appear together (no tearing).
   const [runtime, setRuntime] = useState<TinaRuntime | null>(null);
   const [error, setError] = useState<Error | null>(null);
-  const passedNames = new Set(plugins.map((plugin) => plugin.name));
-  const composedPlugins = [
-    ...corePlugins.filter((plugin) => !passedNames.has(plugin.name)),
-    ...plugins,
-  ];
+  const composedPlugins = config.plugins;
   const pluginsKey = composedPlugins.map((plugin) => plugin.name).join('|');
 
   useEffect(() => {

@@ -15,6 +15,10 @@ import { Field, FormProvider, TinaProvider } from '../../../editor';
 import { t } from '../../../index';
 import numberFieldPlugin from './number-field.plugin';
 
+// These render a runtime directly rather than a configured app, so they hand
+// TinaProvider the resolved shape instead of going through defineConfig.
+const NO_COLLECTIONS = { collections: [] };
+
 const collection: CollectionSchema = {
   name: 'post',
   label: 'Posts',
@@ -42,7 +46,9 @@ const resolveRegistry = (): Promise<FieldRegistry> =>
 
 const renderField = (address: string, document?: TinaDocument) =>
   render(
-    <TinaProvider plugins={[numberFieldPlugin]}>
+    <TinaProvider
+      config={{ plugins: [numberFieldPlugin], schema: NO_COLLECTIONS }}
+    >
       <FormProvider
         collection={collection}
         path='content/posts/featured.mdx'

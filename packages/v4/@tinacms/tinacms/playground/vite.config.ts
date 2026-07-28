@@ -2,39 +2,25 @@ import { fileURLToPath } from 'node:url';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
+import { loadTinaConfig } from '../src/codegen/load-config';
 import { tinaLocalDataLayerVitePlugin } from '../src/plugins/content/local/local-data-layer.vite';
-import { postCollectionMeta } from './src/collection-meta';
+import { playgroundAliases } from './aliases';
 
-// Aliases point the public import strings at the package source, so the playground
-// exercises the same specifiers a real app will use (not relative paths into src/).
-// Array form: the more specific subpath must come first.
+// The data layer indexes the collections the forms render, so both read the one
+// declaration — this loads it in node, app.tsx imports it in the browser.
+const tina = await loadTinaConfig(
+  fileURLToPath(new URL('./tina/config.ts', import.meta.url)),
+  { alias: playgroundAliases }
+);
+
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
     tinaLocalDataLayerVitePlugin({
       rootDir: fileURLToPath(new URL('.', import.meta.url)),
-      collections: [postCollectionMeta],
+      collections: tina.schema.collections,
     }),
   ],
-  resolve: {
-    alias: [
-      {
-        find: '@tinacms/tinacms/react',
-        replacement: fileURLToPath(
-          new URL('../src/editor/index.ts', import.meta.url)
-        ),
-      },
-      {
-        find: '@tinacms/tinacms/adapters/react',
-        replacement: fileURLToPath(
-          new URL('../src/adapters/react/index.ts', import.meta.url)
-        ),
-      },
-      {
-        find: '@tinacms/tinacms',
-        replacement: fileURLToPath(new URL('../src/index.ts', import.meta.url)),
-      },
-    ],
-  },
+  resolve: { alias: playgroundAliases },
 });

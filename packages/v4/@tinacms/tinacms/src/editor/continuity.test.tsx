@@ -38,6 +38,10 @@ import {
   useFormStatus,
 } from './index';
 
+// These render a runtime directly rather than a configured app, so they hand
+// TinaProvider the resolved shape instead of going through defineConfig.
+const NO_COLLECTIONS = { collections: [] };
+
 // Same shape as the playground's post collection: min 3 gives the tests a real
 // validation failure to keep alive across a document switch, and max 20 a
 // second, distinguishable one (bleed detection needs two distinct messages).
@@ -75,7 +79,9 @@ function SaveProbe() {
 // The playground's switcher shape: keyed FormProvider, so a path change is a
 // full teardown + host of the other document (the store keeps the edits).
 const host = (path: string, document: TinaDocument, onSave?: SaveHandler) => (
-  <TinaProvider plugins={[stringFieldPlugin]}>
+  <TinaProvider
+    config={{ plugins: [stringFieldPlugin], schema: NO_COLLECTIONS }}
+  >
     <FormProvider
       key={path}
       collection={collection}
@@ -270,7 +276,9 @@ const unkeyedHost = (
   document: TinaDocument,
   onSave?: SaveHandler
 ) => (
-  <TinaProvider plugins={[stringFieldPlugin]}>
+  <TinaProvider
+    config={{ plugins: [stringFieldPlugin], schema: NO_COLLECTIONS }}
+  >
     <FormProvider
       collection={collection}
       path={path}

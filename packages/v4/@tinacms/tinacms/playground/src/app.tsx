@@ -1,8 +1,7 @@
-import {
-  type DocumentEntry,
-  type FieldSchema,
-  type TinaDocument,
-  localContentPlugin,
+import type {
+  DocumentEntry,
+  FieldSchema,
+  TinaDocument,
 } from '@tinacms/tinacms';
 import {
   Field,
@@ -22,7 +21,7 @@ import {
   usePreviewConnection,
 } from '@tinacms/tinacms/react';
 import { useMemo, useRef, useState } from 'react';
-import { postCollection } from './content';
+import config, { postCollection } from '../tina/config';
 import { PluginsPanel } from './plugins-panel';
 
 const STATUS_COLORS: Record<FormStatus, string> = {
@@ -224,7 +223,7 @@ function Workspace() {
 
 export function App() {
   return (
-    <TinaProvider plugins={[localContentPlugin()]}>
+    <TinaProvider config={config}>
       <Workspace />
     </TinaProvider>
   );

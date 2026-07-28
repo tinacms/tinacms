@@ -15,6 +15,10 @@ import { Field, FormProvider, TinaProvider } from '../../../editor';
 import { t } from '../../../index';
 import stringFieldPlugin from './string-field.plugin';
 
+// These render a runtime directly rather than a configured app, so they hand
+// TinaProvider the resolved shape instead of going through defineConfig.
+const NO_COLLECTIONS = { collections: [] };
+
 const collection: CollectionSchema = {
   name: 'post',
   label: 'Posts',
@@ -29,7 +33,9 @@ const resolveRegistry = (): Promise<FieldRegistry> =>
 
 const renderTitle = (document?: TinaDocument) =>
   render(
-    <TinaProvider plugins={[stringFieldPlugin]}>
+    <TinaProvider
+      config={{ plugins: [stringFieldPlugin], schema: NO_COLLECTIONS }}
+    >
       <FormProvider
         collection={collection}
         path='content/posts/test.mdx'

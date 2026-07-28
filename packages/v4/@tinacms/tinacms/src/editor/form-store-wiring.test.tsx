@@ -12,6 +12,10 @@ import {
   useFormStatus,
 } from './index';
 
+// These render a runtime directly rather than a configured app, so they hand
+// TinaProvider the resolved shape instead of going through defineConfig.
+const NO_COLLECTIONS = { collections: [] };
+
 const collection: CollectionSchema = {
   name: 'post',
   format: 'mdx',
@@ -25,7 +29,9 @@ function StatusProbe() {
 describe('FormProvider form-store wiring', () => {
   it('tracks pristine on mount, dirty on edit, clean when the original value is retyped', async () => {
     render(
-      <TinaProvider plugins={[stringFieldPlugin]}>
+      <TinaProvider
+        config={{ plugins: [stringFieldPlugin], schema: NO_COLLECTIONS }}
+      >
         <FormProvider
           collection={collection}
           path='content/posts/wiring.mdx'

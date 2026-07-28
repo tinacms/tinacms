@@ -5,6 +5,12 @@
 // helpers, and the public contract types. Each field type contributes its own
 // `t.<type>` builder from its plugin; this entry is the composition root.
 
+export {
+  defineConfig,
+  type ResolvedConfig,
+  type TinaConfig,
+  type TinaSchema,
+} from './config';
 export type {
   ContentProvider,
   ContentSlice,

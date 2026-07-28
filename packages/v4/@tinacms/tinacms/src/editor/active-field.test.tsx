@@ -12,6 +12,10 @@ import {
   useActiveField,
 } from './index';
 
+// These render a runtime directly rather than a configured app, so they hand
+// TinaProvider the resolved shape instead of going through defineConfig.
+const NO_COLLECTIONS = { collections: [] };
+
 const collection: CollectionSchema = {
   name: 'post',
   format: 'mdx',
@@ -32,7 +36,9 @@ function ActivateProbe() {
 describe('active-field rail', () => {
   it('focuses the field input when its address is activated', async () => {
     render(
-      <TinaProvider plugins={[stringFieldPlugin]}>
+      <TinaProvider
+        config={{ plugins: [stringFieldPlugin], schema: NO_COLLECTIONS }}
+      >
         <FormProvider
           collection={collection}
           path='content/posts/active.mdx'
@@ -52,7 +58,9 @@ describe('active-field rail', () => {
 
   it('re-fires focus when the already-active field is activated again', async () => {
     render(
-      <TinaProvider plugins={[stringFieldPlugin]}>
+      <TinaProvider
+        config={{ plugins: [stringFieldPlugin], schema: NO_COLLECTIONS }}
+      >
         <FormProvider
           collection={collection}
           path='content/posts/active.mdx'
