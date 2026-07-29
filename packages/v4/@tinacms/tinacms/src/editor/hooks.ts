@@ -1,4 +1,4 @@
-import { use, useCallback, useEffect, useRef } from 'react';
+import { use, useCallback, useEffect, useEffectEvent, useMemo } from 'react';
 import { useController, useFormContext, useFormState } from 'react-hook-form';
 import { useStore } from 'zustand';
 import type { ContentSlice } from '../core/content/contract';
@@ -64,16 +64,25 @@ export function useFormId(): FormId {
 
 // The path of the open document. A field whose behaviour depends on the storage format
 // builds its FieldTransformContext from this, so it resolves the same codec that the
-// ingest and the save resolve.
+// ingest and the save resolve. Reading it any other way lets the three disagree.
 export function useDocumentPath(): string {
   return useFormScope('document-path-outside-provider', 'useDocumentPath').path;
 }
 
 // The identity of the values the form was seeded from. A field whose editor owns its own
-// state keys on this, so that a reseed mounts it again on the new values.
+// state keys on this, so that a reseed of RHF mounts it again on the new values. Every
+// other field reads its value through useFieldValue and needs nothing here.
 export function useFormSeedKey(): string {
   return useFormScope('form-seed-key-outside-provider', 'useFormSeedKey')
     .seedKey;
+}
+
+// Throw the edits of this form away and put it back on its baseline: the content it
+// loaded, or the content it last saved. It cannot be undone, so the caller confirms
+// first. No control in the admin calls this yet.
+export function useDiscardEdits(): () => void {
+  return useFormScope('discard-edits-outside-provider', 'useDiscardEdits')
+    .discardEdits;
 }
 
 export interface ActiveField {
@@ -90,12 +99,16 @@ export function useActiveField(): ActiveField {
   const active = useFormStore((state) =>
     state.active?.formId === formId ? state.active.address : null
   );
+  // Memoised by hand. Only the playground and the test config run the React Compiler,
+  // and this package ships its source — so a consumer's bundler sees these hooks
+  // uncompiled, and a fresh identity here re-runs their `[setActive]` effects on every
+  // render.
   const setActive = useCallback(
     (address: FieldAddress | null) =>
       useFormStore.getState().setActive(formId, address),
     [formId]
   );
-  return { active, setActive };
+  return useMemo(() => ({ active, setActive }), [active, setActive]);
 }
 
 // Build the document again from the values of the form, and give it to the save handler
@@ -107,6 +120,8 @@ export function useFormSave(): () => Promise<void> {
   const registry = useFieldRegistry();
   const scope = useFormScope('form-save-outside-provider', 'useFormSave');
   const { getValues } = useFormContext<TinaDocument>();
+  // Memoised for the same reason as useActiveField above: consumers hold this in
+  // `[save]` dependencies, and this package ships uncompiled source.
   return useCallback(async () => {
     const { formId, path, collection, onSave } = scope;
     const values = getValues();
@@ -117,7 +132,7 @@ export function useFormSave(): () => Promise<void> {
     });
     await onSave?.(digested);
     useFormStore.getState().markSaved(formId, toFormValues(values));
-  }, [registry, scope, getValues]);
+  }, [scope, getValues, registry]);
 }
 
 export function useFieldAddress(): FieldAddress {
@@ -162,15 +177,18 @@ export function useFieldActivation(handler: () => void): void {
   // object at each call, so a second activation of the same field calls the handler
   // again. A boolean would hold its value, and the second click would do nothing.
   const active = useFormStore((state) => state.active);
-  const handlerRef = useRef(handler);
-  handlerRef.current = handler;
+  // The activation entry is the reactive half, and the handler is not. Every call site
+  // passes a new closure on each render, so a handler in the dependencies would fire on
+  // each render instead of on an activation. An Effect Event reads the latest closure
+  // without joining them.
+  const onActivate = useEffectEvent(handler);
   useEffect(() => {
     if (
       address != null &&
       active?.formId === formId &&
       active.address === address
     ) {
-      handlerRef.current();
+      onActivate();
     }
   }, [active, formId, address]);
 }

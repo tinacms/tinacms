@@ -6,6 +6,12 @@
 // main pane, not the sidebar. Scoping the form to the sidebar put the preview outside
 // it, which is a runtime throw with no type to catch it. Anything else the shell grows
 // that reads the open document (a toolbar, a document-actions menu) lands the same way.
+//
+// With nothing open, or with the entry still loading, it renders `children` bare. That
+// swap changes the element type at this position, so React unmounts and rebuilds what
+// sits below — the two document panes, including the preview iframe. It is confined to
+// those panes on purpose: the sidebar and its document list sit above this scope and
+// keep their open state, their fetch, and their scroll position across a switch.
 
 import { type ReactNode, useEffect, useRef } from 'react';
 import type { DocumentEntry } from '../core/content/contract';
@@ -52,18 +58,34 @@ export function DocumentScope({
   path,
   children,
 }: DocumentScopeProps) {
-  const content = useContentSlice();
-  // From the same list the sidebar renders, not a second fetch: two reads of one
-  // document can disagree, and the form would seed from the loser.
-  const cached = useCollectionDocuments(collection.name).find(
-    (candidate) => candidate.path === path
-  );
-  // Pinned for the life of this scope. A save feeds the persisted entry back into
-  // that cache, which has to keep the list badges fresh WITHOUT re-seeding the
-  // mounted form: a fresh `document` prop re-ingests and resets RHF, dropping both
-  // the saved-clean baseline and any keystroke typed while the save was in flight.
-  // Switching documents remounts on the `key` below, so the pin never goes stale.
-  const entry = useMemo(() => cached, [cached?.path]);
+  // This reads the list that the sidebar renders, and shares its request — it does not
+  // fetch again. Two reads of one document can disagree, and the form would then seed
+  // from the older one.
+  const { documents } = useCollectionDocuments(collection?.name);
+  const cached = documents.find((candidate) => candidate.path === path);
+  const entry = usePinnedDocument(path, cached);
+
+  // The save handler is stable, so FormProvider's formScope memo holds. Rebuilt each
+  // render it changed on every content-slice update, which defeated the memo and the
+  // "changes only on a document switch" contract in editor/context.ts.
+  const { save: saveDocument } = useSaveDocument();
+  // The open document travels as one value, because only a collection and a path
+  // together name one. Either alone is not half a document, it is no document.
+  const openDocument = (): { collection: string; path: string } | null =>
+    collection && path ? { collection: collection.name, path } : null;
+  const saveRef = useRef({ target: openDocument(), saveDocument });
+  // Written after the commit, and not during the render. `save` is permanently stable
+  // and reads this when the author invokes it, which is always after a commit — so a
+  // render React starts and then throws away must not leave this pointing at that
+  // render's document.
+  useEffect(() => {
+    saveRef.current = { target: openDocument(), saveDocument };
+  });
+  const save = useRef(async (value: TinaDocument) => {
+    const { target, saveDocument: latestSave } = saveRef.current;
+    if (!target) return;
+    await latestSave({ ...target, value });
+  }).current;
 
   // Nothing open: no form scope to provide, so the panes render without one and read
   // that absence through FormScopeContext.
@@ -72,26 +94,19 @@ export function DocumentScope({
   // Wait for the document. Mounting the provider without one seeds the form empty, and
   // Plate reads its value at mount only — so the editor stayed blank once the entry
   // arrived. The panes below therefore mount once, with a value.
-  //
-  // This is the swap the shell used to do around the whole layout. Here it is confined
-  // to the two panes that hold the document, which are created with it in any case; the
-  // sidebar sits above this and keeps its state.
   if (!entry) return children;
 
   return (
-    // Keyed on the path, and it has to be. FormProvider does re-seed when its formId
-    // changes, but the reset lands in an effect — after the children have rendered — so
-    // Plate, which reads its value at mount only, keeps the previous document's prose.
-    // A fresh RHF instance means the fields mount with the right values to begin with.
-    //
-    // The cost is that these children remount per document, so the preview iframe
-    // reloads on a switch. That is why this scope wraps the two panes and not the whole
-    // shell: the sidebar and its document list sit above it and survive.
+    // No key, and that is the point. The provider hosts a switch of document in place:
+    // it resets RHF to the next document's seed and advances the seed key, which is
+    // what a field hosting its own editor remounts on. The continuity tests pin that
+    // down under "unkeyed document switches". A key here remounted everything below on
+    // every switch — including the preview iframe, whose same-origin reload runs on the
+    // admin's own main thread and froze the whole shell while the preview re-booted.
     <FormProvider
-      key={path}
       collection={collection}
       path={path}
-      document={entry?.document}
+      document={entry.document}
       onSave={save}
     >
       {children}
