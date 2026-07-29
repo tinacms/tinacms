@@ -1,6 +1,7 @@
-// The wire protocol: one JSON request per operation, validated at the trust
-// boundary. Transport-agnostic — the host (Vite middleware, express, a Next
-// route) parses the HTTP body and JSONs the result back.
+// The wire protocol. Each operation is one JSON request, and this file validates it at
+// the trust boundary. It knows no transport. The host parses the HTTP body, and writes
+// the result back as JSON. That host is a Vite middleware, an express server, or a
+// Next.js route.
 
 import { z } from 'zod';
 import type { DocumentEntry } from '../../../core/content/contract';
@@ -16,7 +17,7 @@ const contentRequestSchema = z.discriminatedUnion('op', [
     path: z.string(),
     value: z.record(z.string(), z.unknown()),
   }),
-  // The v3 read surface: a raw GraphQL request, answered by graphql-pipeline.ts.
+  // The v3 read interface. It is a GraphQL request, and graphql-pipeline.ts answers it.
   z.object({
     op: z.literal('graphql'),
     query: z.string(),
@@ -26,8 +27,8 @@ const contentRequestSchema = z.discriminatedUnion('op', [
 
 export type ContentRequest = z.infer<typeof contentRequestSchema>;
 
-// Returns DocumentEntry shapes for the provider ops, or the GraphQL
-// { data, errors } envelope for `graphql` — the host JSONs it either way.
+// This returns a DocumentEntry for a provider operation, and the GraphQL
+// { data, errors } object for `graphql`. The host writes either one as JSON.
 export const dispatchContentRequest = async (
   provider: LocalDataLayer,
   request: unknown

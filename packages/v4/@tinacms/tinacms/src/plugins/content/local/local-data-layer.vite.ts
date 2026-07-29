@@ -1,8 +1,8 @@
-// Vite host for the Local Data Layer (ADR-018): mounts the content endpoint
-// the localContentPlugin slice talks to, and keeps the content folders out of
-// the dev watcher — a save must reach the editor through the content slice,
-// not as an HMR full page reload (tailwind's content scan otherwise promotes
-// the file write to one).
+// The Vite host for the local data layer (ADR-018). It mounts the content endpoint that
+// the localContentPlugin slice calls. It also keeps the content folders out of the dev
+// watcher. A save must reach the editor through the content slice, and not as a full page
+// reload from HMR. Without that, the content scan of Tailwind turns the file write into a
+// reload.
 
 import path from 'node:path';
 import type { Connect, Plugin } from 'vite';
@@ -13,12 +13,12 @@ import {
   createLocalDataLayer,
 } from './local-data-layer';
 
-// Same origin as the dev server, or no Origin at all (curl and friends).
+// The same origin as the dev server, or no Origin header, which is what curl sends.
 const isSameOrigin = (origin: string | undefined, host?: string): boolean =>
   !origin || origin === `http://${host}` || origin === `https://${host}`;
 
-// Collect the request body as a UTF-8 string; a client abort mid-stream rejects
-// rather than hanging or crashing the dev server.
+// Collect the request body as a UTF-8 string. A client that aborts the stream makes this
+// reject. It does not hang, and it does not stop the dev server.
 const readRequestBody = (req: Connect.IncomingMessage): Promise<string> =>
   new Promise((resolve, reject) => {
     let body = '';
@@ -36,8 +36,9 @@ export const tinaLocalDataLayerVitePlugin = (
   const dataLayer = createLocalDataLayer(options);
   const serveContentRequest: Connect.NextHandleFunction = async (req, res) => {
     const { origin, host } = req.headers;
-    // CSRF guard: reject a cross-site POST, and require a JSON content-type — a
-    // cross-origin fetch with it always preflights, closing the remaining gap.
+    // The CSRF guard. It rejects a cross-site POST, and it requires a JSON content
+    // type. A cross-origin fetch with that type always sends a preflight, which
+    // closes the gap.
     if (!isSameOrigin(origin, host)) {
       res.statusCode = 403;
       res.end('Cross-origin request rejected');
@@ -54,9 +55,10 @@ export const tinaLocalDataLayerVitePlugin = (
       res.setHeader('content-type', 'application/json');
       res.end(JSON.stringify(result));
     } catch (cause) {
-      // A malformed body or a mid-stream abort lands here — 400 rather than a
-      // crashed dev server. Skip the write if the socket is already gone (an
-      // abort destroys it, so `destroyed` is the live check, not `writableEnded`).
+      // A damaged body, and an abort during the stream, both arrive here. The reply
+      // is a 400, and the dev server keeps running. Do not write when the socket has
+      // gone. An abort destroys the socket, so `destroyed` is the correct check, and
+      // `writableEnded` is not.
       if (res.destroyed) return;
       res.statusCode = 400;
       res.end(cause instanceof Error ? cause.message : String(cause));
@@ -67,16 +69,14 @@ export const tinaLocalDataLayerVitePlugin = (
     config: () => ({
       server: {
         watch: {
-          // Globs must be posix even on Windows (picomatch).
-          ignored: options.collections.flatMap(({ path: folder }) =>
-            folder
-              ? [
-                  path
-                    .resolve(options.rootDir, folder, '**')
-                    .split(path.sep)
-                    .join('/'),
-                ]
-              : []
+          // A glob must use posix separators, and Windows is no exception. This is
+          // a picomatch rule. Every collection has a folder: createLocalDataLayer
+          // above throws for one that declares no `path`.
+          ignored: options.collections.map(({ path: folder }) =>
+            path
+              .resolve(options.rootDir, folder, '**')
+              .split(path.sep)
+              .join('/')
           ),
         },
       },

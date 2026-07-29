@@ -11,7 +11,7 @@ const ENTRIES: DocumentEntry[] = [
   { path: 'content/posts/second.mdx', document: { title: 'Second' } },
 ];
 
-// Minimal slice harness: the namespace-scoped `set` the store hands a slice.
+// A small harness for a slice. It is the scoped `set` that the store gives to a slice.
 const createSliceHarness = async (responseBody: unknown, ok = true) => {
   const requests: unknown[] = [];
   vi.stubGlobal(
@@ -46,28 +46,38 @@ const createSliceHarness = async (responseBody: unknown, ok = true) => {
 
 afterEach(() => vi.unstubAllGlobals());
 
+// The slice is a transport. It maps the ContentProvider operations onto the wire
+// protocol and returns what came back. The caching that used to live here belongs to the
+// query client now, and editor/content-queries.test.tsx covers it.
 describe('content slice', () => {
-  it('loadDocuments posts a list op and caches the result', async () => {
+  it('posts a list op and returns the entries', async () => {
     const harness = await createSliceHarness(ENTRIES);
-    const loaded = await harness.slice().loadDocuments('post');
+    const listed = await harness.slice().list('post');
     expect(harness.requests).toEqual([{ op: 'list', collection: 'post' }]);
-    expect(loaded).toEqual(ENTRIES);
-    expect(harness.slice().documents).toEqual({ post: ENTRIES });
+    expect(listed).toEqual(ENTRIES);
   });
 
-  it('saveDocument posts an update op and caches the persisted entry', async () => {
-    // The server merges unknown fields into the persisted document — the cache
-    // must hold what came back, not the raw form value.
+  it('posts a get op for one document', async () => {
+    const harness = await createSliceHarness(ENTRIES[0]);
+    const entry = await harness.slice().get('post', 'content/posts/hello.mdx');
+    expect(harness.requests).toEqual([
+      { op: 'get', collection: 'post', path: 'content/posts/hello.mdx' },
+    ]);
+    expect(entry).toEqual(ENTRIES[0]);
+  });
+
+  it('posts an update op and returns the persisted entry', async () => {
+    // The server merges the unknown fields into the stored document, so the result
+    // holds more than the value that was sent. The caller gets that result, and not
+    // the raw form value.
     const persisted: DocumentEntry = {
       path: 'content/posts/hello.mdx',
       document: { title: 'Renamed', category: 'not-in-schema' },
     };
     const harness = await createSliceHarness(persisted);
-    // Seed the cache as if a list had run.
-    harness.slice().documents.post = [...ENTRIES];
     const saved = await harness
       .slice()
-      .saveDocument('post', 'content/posts/hello.mdx', { title: 'Renamed' });
+      .update('post', 'content/posts/hello.mdx', { title: 'Renamed' });
     expect(harness.requests).toEqual([
       {
         op: 'update',
@@ -77,31 +87,18 @@ describe('content slice', () => {
       },
     ]);
     expect(saved).toEqual(persisted);
-    expect(harness.slice().documents).toEqual({
-      post: [persisted, ENTRIES[1]],
-    });
-  });
-
-  it('saveDocument appends the persisted entry when the path is not cached', async () => {
-    const persisted: DocumentEntry = {
-      path: 'content/posts/new.mdx',
-      document: { title: 'New' },
-    };
-    const harness = await createSliceHarness(persisted);
-    harness.slice().documents.post = [...ENTRIES];
-    const saved = await harness
-      .slice()
-      .saveDocument('post', 'content/posts/new.mdx', { title: 'New' });
-    expect(saved).toEqual(persisted);
-    expect(harness.slice().documents).toEqual({
-      post: [...ENTRIES, persisted],
-    });
   });
 
   it('surfaces a failed request as a rejection (form stays dirty)', async () => {
     const harness = await createSliceHarness(null, false);
     await expect(
-      harness.slice().saveDocument('post', 'content/posts/hello.mdx', {})
+      harness.slice().update('post', 'content/posts/hello.mdx', {})
     ).rejects.toThrow(/update failed \(500\): boom/);
+  });
+
+  it('writes no store state, because it holds no cache', async () => {
+    const harness = await createSliceHarness(ENTRIES);
+    await harness.slice().list('post');
+    expect(Object.keys(harness.slice())).toEqual(['list', 'get', 'update']);
   });
 });

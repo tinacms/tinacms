@@ -1,6 +1,9 @@
-// Client segment of the localContentPlugin: the ContentSlice (contract.ts)
-// speaking the content-request.ts wire protocol over plain fetch — content goes
-// Client → Data Layer directly, not through Capability RPC (ADR-018 §1).
+// The client segment of the localContentPlugin. It is the ContentSlice from contract.ts,
+// and it speaks the wire protocol of content-request.ts over fetch. The content goes from
+// the client to the data layer directly, and not through the capability RPC (ADR-018 §1).
+//
+// It is a transport, and holds no cache. The admin's query client caches these reads.
+// Refer to ContentSlice.
 
 import type {
   ContentSlice,
@@ -26,72 +29,27 @@ const postContentRequest = async <Result>(
   return response.json();
 };
 
-const upsertByPath = (
-  entries: DocumentEntry[],
-  entry: DocumentEntry
-): DocumentEntry[] => {
-  const index = entries.findIndex((cached) => cached.path === entry.path);
-  if (index === -1) return [...entries, entry];
-  const next = [...entries];
-  next[index] = entry;
-  return next;
-};
-
-// The store composes many slices, so the setter hands back the generic SliceState
-// (Record<string, unknown>). This is the one place that reads our own `documents`
-// field back out as its concrete type — the single boundary cast.
-const documentsOf = (state: {
-  documents?: unknown;
-}): ContentSlice['documents'] =>
-  (state.documents as ContentSlice['documents']) ?? {};
-
-export const createContentSlice =
-  (url: string): ClientSlice =>
-  (set) => {
-    const slice: ContentSlice = {
-      documents: {},
-      async loadDocuments(collection) {
-        const response = await postContentRequest<DocumentEntry[]>(url, {
-          op: 'list',
-          collection,
-        });
-        set((state) => ({
-          documents: {
-            ...documentsOf(state),
-            [collection]: response,
-          },
-        }));
-        return response;
-      },
-      async getDocument(collection, path) {
-        return postContentRequest<DocumentEntry | null>(url, {
-          op: 'get',
-          collection,
-          path,
-        });
-      },
-      async saveDocument(collection, path, value) {
-        // update returns the persisted entry, which may carry more than the
-        // form value (unknown fields merged from the stored document).
-        const saved = await postContentRequest<DocumentEntry>(url, {
-          op: 'update',
-          collection,
-          path,
-          value,
-        });
-        // Keep the list cache honest so collection views reflect the save —
-        // replace the cached entry, or append when the path is not cached yet.
-        set((state) => {
-          const cache = documentsOf(state);
-          return {
-            documents: {
-              ...cache,
-              [collection]: upsertByPath(cache[collection] ?? [], saved),
-            },
-          };
-        });
-        return saved;
-      },
-    };
-    return { ...slice };
+export const createContentSlice = (url: string): ClientSlice => {
+  const slice: ContentSlice = {
+    list: (collection) =>
+      postContentRequest<DocumentEntry[]>(url, { op: 'list', collection }),
+    get: (collection, path) =>
+      postContentRequest<DocumentEntry | null>(url, {
+        op: 'get',
+        collection,
+        path,
+      }),
+    // The update returns the stored entry, which can hold more than the value that was
+    // sent. The unknown fields of the stored document merge into it.
+    update: (collection, path, value) =>
+      postContentRequest<DocumentEntry>(url, {
+        op: 'update',
+        collection,
+        path,
+        value,
+      }),
   };
+  // The slice takes no `set`. It writes no state, so it ignores both arguments and
+  // returns the same operations at each boot.
+  return () => ({ ...slice });
+};

@@ -1,10 +1,10 @@
-// Local typings for @tinacms/graphql, mapped in via tsconfig `paths`. The
-// published d.ts is a passthrough into v3 source (tinacms-scripts emits
-// `export * from "../src/index"`), which drags the whole v3 graphql+mdx source
-// — and its ~150 pre-existing type errors — into this package's tsc. Typing
-// just the members graphql-pipeline.ts consumes keeps the boundary typed
-// without checking v3 source. Runtime behaviour is covered by
-// graphql-pipeline.test.ts against the real package.
+// The local types for @tinacms/graphql. The tsconfig `paths` field maps them in. The
+// published d.ts file points into the v3 source, because tinacms-scripts emits
+// `export * from "../src/index"`. That pulls the whole v3 graphql and mdx source into
+// the tsc run of this package, with about 150 type errors that were already there. These
+// types cover the members that graphql-pipeline.ts uses, so the boundary has types and
+// tsc does not check the v3 source. graphql-pipeline.test.ts covers the runtime behaviour
+// against the real package.
 declare module '@tinacms/graphql' {
   import type { AbstractLevel } from 'abstract-level';
 
