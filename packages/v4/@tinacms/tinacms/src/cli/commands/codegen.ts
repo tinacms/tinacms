@@ -56,8 +56,10 @@ const firstExisting = async (candidates: string[]): Promise<string | null> => {
       // a real fault the developer needs to see.
       await access(candidate, constants.R_OK);
       return candidate;
-    } catch {
+    } catch (cause) {
       // Try the next candidate. A missing file here is the question, and not a fault.
+      // An unreadable one is, so it surfaces rather than reading as "no config".
+      if ((cause as NodeJS.ErrnoException).code !== 'ENOENT') throw cause;
     }
   }
   return null;

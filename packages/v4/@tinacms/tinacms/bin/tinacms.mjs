@@ -4,9 +4,10 @@
 // follow the relative imports of this package, which have no extension. The `exports`
 // field still points at the raw source, because ADR-001 has not decided the dist build.
 //
-// This costs nothing. The CLI needs a Vite server in any case, because that is how it
-// reads the tina/config.ts of a user. This file starts one server, and lends it to the
-// code below.
+// This server loads the CLI, and only the CLI. It is rooted at this package, so it must
+// not also read the user's tina/config.ts: that config resolves its relative imports and
+// tsconfig paths against the project, which `--root` can put anywhere. The CLI therefore
+// opens its own server for the config, rooted at the directory the config sits in.
 
 import { fileURLToPath } from 'node:url';
 import { createServer } from 'vite';
@@ -25,7 +26,7 @@ try {
   const { runCli } = await server.ssrLoadModule(
     fileURLToPath(new URL('../src/cli/index.ts', import.meta.url))
   );
-  process.exitCode = await runCli(process.argv.slice(2), { loader: server });
+  process.exitCode = await runCli(process.argv.slice(2));
 } finally {
   await server.close();
 }
