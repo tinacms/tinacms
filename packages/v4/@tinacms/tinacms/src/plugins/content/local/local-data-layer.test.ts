@@ -6,8 +6,8 @@ import { dispatchContentRequest } from './content-request';
 import { createGraphQLPipeline } from './graphql-pipeline';
 import { type LocalDataLayer, createLocalDataLayer } from './local-data-layer';
 
-// The real pipeline boots the whole v3 stack; these tests only care about the
-// memoization around it.
+// The real pipeline boots the whole v3 stack. These tests cover the memoization around
+// it.
 vi.mock('./graphql-pipeline', () => ({ createGraphQLPipeline: vi.fn() }));
 
 const HELLO_RAW = `---
@@ -42,7 +42,7 @@ beforeEach(async () => {
         format: 'mdx',
         fields: [{ name: 'body', type: 'rich-text', isBody: true }],
       },
-      // Folder intentionally never created.
+      // This folder is never created.
       { name: 'page', path: 'content/pages', format: 'mdx', fields: [] },
     ],
   });
@@ -230,7 +230,7 @@ describe('graphql pipeline', () => {
   });
 });
 
-// One collection, two formats: each document's own extension picks its adapter.
+// One collection with two formats. The extension of each document selects its adapter.
 describe('mixed-format collection', () => {
   let mixed: LocalDataLayer;
 
@@ -280,7 +280,7 @@ describe('mixed-format collection', () => {
       'utf8'
     );
     expect(JSON.parse(raw)).toEqual({ title: 'Renamed', extra: 'kept' });
-    // The sibling .mdx still round-trips through gray-matter, untouched.
+    // The .mdx file beside it still passes through gray-matter with no change.
     await mixed.update('post', 'content/posts/hello.mdx', {
       body: 'Rewritten prose.\n',
     });
@@ -292,8 +292,8 @@ describe('mixed-format collection', () => {
     expect(mdxRaw).not.toContain('body:');
   });
 
-  // json has no body concept, so the isBody field is stored inline — the honest
-  // reading for a document with no body to route it to.
+  // JSON has no body, so the isBody field is stored with the other values. That is
+  // correct for a document with no body.
   it('stores the body field inline for a format without a body', async () => {
     const saved = await mixed.update('post', 'content/posts/settings.json', {
       body: 'Not a markdown body.',
