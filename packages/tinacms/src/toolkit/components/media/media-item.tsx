@@ -67,6 +67,7 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
         )}
       </div>
       <span
+        title={item.filename}
         className={'text-base flex-grow w-full break-words truncate px-3 py-2'}
       >
         {item.filename}
@@ -75,41 +76,66 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
   );
 }
 
+const typeBadge = (filename: string): string | null => {
+  const name = filename.split('/').pop() ?? filename;
+  if (name.startsWith('.')) return null;
+  const ext = name.split('.').pop()?.toLowerCase();
+  if (!ext || ext === name.toLowerCase() || ext.length > 5) return null;
+  return ext === 'jpg' ? 'JPEG' : ext.toUpperCase();
+};
+
+export function GridFolderItem({
+  item,
+  onClick,
+}: Omit<MediaItemProps, 'active'>) {
+  return (
+    <li className='block shrink-0 w-full'>
+      <button
+        onClick={() => onClick(item)}
+        className='group flex flex-col w-full text-left rounded-xl overflow-hidden border border-gray-150 bg-gradient-to-b from-orange-50/60 to-white shadow-sm hover:shadow-md hover:border-tina-orange/40 transition outline-none focus-visible:ring-2 focus-visible:ring-tina-orange/40'
+      >
+        <div className='flex items-center justify-center h-24'>
+          <BiFolder className='w-11 h-11 fill-tina-orange' />
+        </div>
+        <div
+          title={item.filename}
+          className='w-full px-3 py-2 border-t border-gray-100 bg-white/60 text-sm font-medium text-gray-700 truncate'
+        >
+          {item.filename}
+        </div>
+      </button>
+    </li>
+  );
+}
+
 export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
-  let FileIcon = BiFile;
-  if (item.type === 'dir') {
-    FileIcon = BiFolder;
-  } else if (isVideo(item.src)) {
-    FileIcon = BiMovie;
-  }
   const thumbnail = (item.thumbnails || {})['400x400'];
   const itemIsImage = isImage(thumbnail);
+  const itemIsVideo = isVideo(item.src);
+  const badge = typeBadge(item.filename);
   return (
-    <li className='block flex justify-center shrink-0 w-full transition duration-150 ease-out'>
+    <li className='block shrink-0 w-full'>
       <button
         className={cn(
-          'relative flex flex-col gap-1 items-center w-full outline-none rounded-lg overflow-hidden border-2 transition',
+          'group relative flex flex-col w-full text-left outline-none rounded-xl overflow-hidden border bg-white shadow-sm transition',
           {
-            'border-black/10 hover:border-tina-orange/50 shadow-sm hover:shadow-md bg-white':
+            'border-gray-150 hover:border-tina-orange/40 hover:shadow-md':
               !active,
-            'border-tina-orange bg-tina-orange/10 shadow-md': active,
-            'cursor-pointer': item.type === 'dir',
+            'border-2 border-tina-orange ring-2 ring-tina-orange/20 shadow-md':
+              active,
           }
         )}
-        onClick={() => {
-          if (!active) {
-            onClick(item);
-          } else {
-            onClick(false);
-          }
-        }}
+        onClick={() => onClick(active ? false : item)}
       >
         {item.new && (
-          <span className='absolute top-1 right-1 rounded shadow bg-green-100 border border-green-200 text-[10px] tracking-wide font-bold text-green-600 px-1.5 py-0.5 z-10'>
+          <span className='absolute top-2 right-2 z-10 rounded bg-green-100 border border-green-200 text-[10px] tracking-wide font-bold text-green-600 px-1.5 py-0.5'>
             NEW
           </span>
         )}
-        <div className='w-full overflow-hidden aspect-[1/1]'>
+        <div
+          className='relative w-full overflow-hidden bg-gray-50'
+          style={{ aspectRatio: '1 / 1' }}
+        >
           {itemIsImage ? (
             <img
               className='block w-full h-full object-center object-cover'
@@ -117,16 +143,35 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
               src={thumbnail}
               alt={item.filename}
             />
+          ) : itemIsVideo ? (
+            <div className='w-full h-full bg-gradient-to-br from-gray-700 to-gray-900' />
           ) : (
-            <div className='w-full h-full flex flex-col items-center justify-center'>
-              <FileIcon
-                className={`w-[40%] h-auto ${item.type === 'dir' ? 'fill-tina-orange' : 'fill-gray-300'}`}
-                size={40}
-              />
+            <div className='w-full h-full flex items-center justify-center'>
+              <BiFile className='w-2/5 h-auto fill-gray-300' />
             </div>
           )}
+          {itemIsVideo && (
+            <span className='absolute inset-0 flex items-center justify-center'>
+              <span className='w-10 h-10 rounded-full bg-white/90 shadow flex items-center justify-center'>
+                <svg
+                  className='w-4 h-4 ml-0.5 fill-gray-700'
+                  viewBox='0 0 24 24'
+                >
+                  <path d='M8 5v14l11-7z' />
+                </svg>
+              </span>
+            </span>
+          )}
+          {badge && (
+            <span className='absolute bottom-2 left-2 rounded bg-black/65 text-white text-[10px] font-semibold tracking-wide px-1.5 py-0.5'>
+              {badge}
+            </span>
+          )}
         </div>
-        <div className='mt-auto w-full px-2 py-1 text-sm truncate'>
+        <div
+          title={item.filename}
+          className='w-full px-2.5 py-2 text-sm text-gray-700 truncate'
+        >
           {item.filename}
         </div>
       </button>

@@ -106,6 +106,7 @@ export class TinaMediaStore implements MediaStore {
   private cms: TinaCMS;
   private isLocal: boolean;
   private url: string;
+  private listUrl: string;
   private staticMedia: StaticMedia;
   isStatic?: boolean;
 
@@ -161,6 +162,7 @@ export class TinaMediaStore implements MediaStore {
               'assets'
             )}/v1/${this.api.clientId}`;
           }
+          this.listUrl = this.url.replace('/v1/', '/v2/');
         }
       }
     }
@@ -172,6 +174,8 @@ export class TinaMediaStore implements MediaStore {
   }
 
   accept = DEFAULT_MEDIA_UPLOAD_TYPES;
+
+  searchable = true;
 
   // allow up to 100MB uploads
   maxSize = 100 * 1024 * 1024;
@@ -801,11 +805,11 @@ export class TinaMediaStore implements MediaStore {
     if (!this.isLocal) {
       const encodedBranch = this.encodedBranchParam();
       res = await this.api.authProvider.fetchWithToken(
-        `${this.url}/list/${options.directory || ''}?limit=${
+        `${this.listUrl}/list/${options.directory || ''}?limit=${
           options.limit || 20
         }${options.offset ? `&cursor=${options.offset}` : ''}${
           encodedBranch ? `&branch=${encodedBranch}` : ''
-        }`
+        }${options.search ? `&search=${encodeURIComponent(options.search)}` : ''}`
       );
 
       if (res.status == 401) {
@@ -819,7 +823,9 @@ export class TinaMediaStore implements MediaStore {
       res = await this.fetchFunction(
         `${this.url}/list/${options.directory || ''}?limit=${
           options.limit || 20
-        }${options.offset ? `&cursor=${options.offset}` : ''}`
+        }${options.offset ? `&cursor=${options.offset}` : ''}${
+          options.search ? `&search=${encodeURIComponent(options.search)}` : ''
+        }`
       );
 
       if (res.status == 404) {
