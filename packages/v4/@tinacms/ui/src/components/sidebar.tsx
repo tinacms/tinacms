@@ -32,6 +32,14 @@ const SIDEBAR_WIDTH_MOBILE = '18rem';
 const SIDEBAR_WIDTH_ICON = '3rem';
 const SIDEBAR_KEYBOARD_SHORTCUT = 'b';
 
+const isEditable = (target: EventTarget | null) => {
+  const element = target as HTMLElement | null;
+  if (!element || typeof element.closest !== 'function') return false;
+  return Boolean(
+    element.closest('input, textarea, select, [contenteditable="true"]')
+  );
+};
+
 type SidebarContextProps = {
   state: 'expanded' | 'collapsed';
   open: boolean;
@@ -99,28 +107,25 @@ function SidebarProvider({
   // Cmd/Ctrl+B is Bold in every text editor, and this listener is on `window` with a
   // preventDefault, so hosting a rich-text field inside a sidebar layout silently killed
   // it. A shortcut for chrome should not outrank the field the chrome exists to edit.
-  React.useEffect(() => {
-    const isEditable = (target: EventTarget | null) => {
-      const element = target as HTMLElement | null;
-      if (!element || typeof element.closest !== 'function') return false;
-      return Boolean(
-        element.closest('input, textarea, select, [contenteditable="true"]')
-      );
-    };
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (
-        event.key === SIDEBAR_KEYBOARD_SHORTCUT &&
-        (event.metaKey || event.ctrlKey) &&
-        !isEditable(event.target)
-      ) {
-        event.preventDefault();
-        toggleSidebar();
-      }
-    };
+  //
+  // The listener is also bound once rather than on every `toggleSidebar`, which the
+  // registry rebuilds whenever `open` or `isMobile` changes — so opening and closing
+  // the sidebar used to detach and re-attach a window listener each time.
+  const handleKeyDown = React.useEffectEvent((event: KeyboardEvent) => {
+    if (
+      event.key === SIDEBAR_KEYBOARD_SHORTCUT &&
+      (event.metaKey || event.ctrlKey) &&
+      !isEditable(event.target)
+    ) {
+      event.preventDefault();
+      toggleSidebar();
+    }
+  });
 
+  React.useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [toggleSidebar]);
+  }, []);
 
   // We add a state so that we can do data-state="expanded" or "collapsed".
   // This makes it easier to style the sidebar with Tailwind classes.
@@ -193,13 +198,17 @@ function Sidebar({
   }
 
   if (isMobile) {
+    // `props` go to SheetContent, and not to Sheet. Sheet is Dialog.Root, which renders
+    // no element — so the aria-label and role a caller puts on <Sidebar> would land
+    // nowhere on mobile.
     return (
-      <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
+      <Sheet open={openMobile} onOpenChange={setOpenMobile}>
         <SheetContent
           dir={dir}
           data-sidebar='sidebar'
           data-slot='sidebar'
           data-mobile='true'
+          {...props}
           className='w-(--sidebar-width) bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden'
           style={
             {
