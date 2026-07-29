@@ -1,9 +1,10 @@
-// `tinacms codegen` — read the project's config, compile its schema, and write
-// tina-lock.json (ADR-016). The lock is committed, so the write is deliberately
-// conservative: an unchanged lock is left alone rather than rewritten, and a
-// contract-version mismatch stops rather than resolving itself.
+// The `tinacms codegen` command. It reads the config of the project, compiles its
+// schema, and writes tina-lock.json (ADR-016). The lock is committed, so the write is
+// careful. An unchanged lock stays as it is, and a contract version that does not match
+// stops the command.
 
-import { readFile, writeFile } from 'node:fs/promises';
+import { constants } from 'node:fs';
+import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import {
   type LoadTinaConfigOptions,
@@ -19,13 +20,14 @@ import { invariant } from '../../core/invariant';
 export const TINA_DIRECTORY = 'tina';
 export const LOCK_FILENAME = 'tina-lock.json';
 
-// In config-file order. `.tsx` earns its place: a collection holding a custom field
-// component is JSX, which is why the v3 examples name their config config.tsx.
+// In the order of the config files. The list holds `.tsx`, because a collection with a
+// custom field component holds JSX. The v3 examples name their config config.tsx for
+// that reason.
 const CONFIG_FILENAMES = ['config.ts', 'config.tsx', 'config.js', 'config.mjs'];
 
 export interface CodegenOptions {
   rootDir: string;
-  // Explicit path to the config, for a project that keeps it somewhere else.
+  // An explicit path to the config, for a project that keeps it in another place.
   configPath?: string;
   load?: LoadTinaConfigOptions;
 }
@@ -33,8 +35,8 @@ export interface CodegenOptions {
 export type CodegenOutcome =
   | 'created'
   | 'updated'
-  // Byte-identical to what is already committed, so nothing was written — the lock
-  // must not show up in `git status` on every build.
+  // The output holds the same bytes as the committed file, so this command wrote
+  // nothing. The lock must not appear in `git status` after each build.
   | 'unchanged';
 
 export interface CodegenResult {
@@ -42,17 +44,20 @@ export interface CodegenResult {
   lockPath: string;
   outcome: CodegenOutcome;
   lock: TinaLock;
-  // Set when an existing lock lagged the schema; the lock has been regenerated.
+  // Set when the committed lock was older than the schema. The command wrote it again.
   warning?: string;
 }
 
 const firstExisting = async (candidates: string[]): Promise<string | null> => {
   for (const candidate of candidates) {
     try {
-      await readFile(candidate);
+      // access, not readFile: slurping the file reported an unreadable or
+      // directory-shaped config as a missing one, and anything that is not ENOENT is
+      // a real fault the developer needs to see.
+      await access(candidate, constants.R_OK);
       return candidate;
     } catch {
-      // Next candidate — a missing file here is the question being asked, not a fault.
+      // Try the next candidate. A missing file here is the question, and not a fault.
     }
   }
   return null;
@@ -74,16 +79,26 @@ export const findConfigPath = async (rootDir: string): Promise<string> => {
 
 const readExistingLock = async (lockPath: string): Promise<TinaLock | null> => {
   try {
-    return JSON.parse(await readFile(lockPath, 'utf8')) as TinaLock;
+    const parsed: unknown = JSON.parse(await readFile(lockPath, 'utf8'));
+    // A lock that parses to `[]`, `3`, or `{}` after a bad merge is as untrustworthy
+    // as one that does not parse at all; the cast alone let it reach checkLock and
+    // throw a TypeError on `lock.primitives[type]`.
+    const lock = parsed as TinaLock | null;
+    if (!lock || typeof lock !== 'object' || Array.isArray(lock)) return null;
+    if (typeof lock.primitives !== 'object' || lock.primitives === null) {
+      return null;
+    }
+    return lock;
   } catch {
-    // Absent (first run) or unparseable (hand-edited, bad merge) are the same
-    // situation: there is nothing trustworthy to compare against, so recompile.
+    // A lock that is absent, on the first run, and a lock that does not parse, after
+    // a hand edit or a bad merge, are one situation. There is nothing to compare
+    // against, so compile again.
     return null;
   }
 };
 
-// Pretty-printed with a trailing newline because it is a committed file that people
-// read in diffs, not a build output.
+// The file is formatted, and it ends with a newline, because it is a committed file that
+// people read in a diff. It is not a build output.
 const serializeLock = (lock: TinaLock): string =>
   `${JSON.stringify(lock, null, 2)}\n`;
 
@@ -99,6 +114,7 @@ export const runCodegen = async (
   const existing = await readExistingLock(lockPath);
 
   if (!existing) {
+    await mkdir(path.dirname(lockPath), { recursive: true });
     await writeFile(lockPath, serializeLock(lock));
     return { configPath, lockPath, outcome: 'created', lock };
   }
@@ -107,9 +123,13 @@ export const runCodegen = async (
   if (check.status === 'current') {
     return { configPath, lockPath, outcome: 'unchanged', lock };
   }
-  // The one failure this command has: a field type changed shape under a committed
-  // lock. Rewriting it here is exactly the silent break ADR-016 exists to prevent.
-  invariant(check.status === 'stale', 'lock-incompatible', check.message);
+  // This is the one failure of the command. A field type changed its shape under a
+  // committed lock. A write here would be the silent break that ADR-016 prevents.
+  invariant(
+    check.status === 'stale',
+    check.status === 'unreadable' ? 'lock-unreadable' : 'lock-incompatible',
+    check.message
+  );
   await writeFile(lockPath, serializeLock(lock));
   return {
     configPath,
