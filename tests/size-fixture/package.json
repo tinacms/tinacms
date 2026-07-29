@@ -9,5 +9,9 @@
   },
   "devDependencies": {
     "@tinacms/cli": "latest"
+  },
+  "_overrides_comment": "The committed lockfile is a manifest like any other to dependency-review, so a vulnerable transitive here fails the PR even though nothing in this fixture is ever executed — it is installed and measured with du. brace-expansion is patched only in 5.0.8 (GHSA-mh99-v99m-4gvg covers <= 5.0.7), which is a major jump from the ^2.0.1 its parent asks for. Safe here, but it does mean the measured tree carries one dependency a real user's install would not; it is a few KB against a ~1 GB closure. Drop the override once the upstream range moves.",
+  "overrides": {
+    "brace-expansion": "^5.0.8"
   }
 }
