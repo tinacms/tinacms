@@ -125,6 +125,16 @@ describe('MediaModel (Vite dev server)', () => {
       expect(result.directories).toEqual(['/nested/deep']);
     });
 
+    it('a parent-folder match does not include its descendants', async () => {
+      await seed();
+      const model = new MediaModel(config);
+      const result = await model.listMedia({
+        searchPath: '',
+        search: 'nested',
+      });
+      expect(result.directories).toEqual(['/nested']);
+    });
+
     it('returns matching directories only on the first page', async () => {
       const base = path.join(tmpDir, 'public', 'uploads');
       await fs.mkdirp(path.join(base, 'match-dir'));

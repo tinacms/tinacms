@@ -467,7 +467,7 @@ export class MediaModel {
           const realDir = resolveRealPath(absPath);
           if (visitedDirs.has(realDir)) continue;
           visitedDirs.add(realDir);
-          if (relPath.toLowerCase().includes(search)) {
+          if (entry.toLowerCase().includes(search)) {
             directories.push(`/${relPath}`);
           }
           await walk(absPath, relPath);
