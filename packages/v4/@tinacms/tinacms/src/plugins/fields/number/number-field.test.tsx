@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
+import { asResolvedConfig } from '../../../config';
 import {
   type FieldRegistry,
   resolveFieldPlugins,
@@ -15,8 +16,8 @@ import { Field, FormProvider, TinaProvider } from '../../../editor';
 import { t } from '../../../index';
 import numberFieldPlugin from './number-field.plugin';
 
-// These render a runtime directly rather than a configured app, so they hand
-// TinaProvider the resolved shape instead of going through defineConfig.
+// These tests render a runtime directly, and not a configured app. They therefore pass
+// TinaProvider the resolved shape, and do not call defineConfig.
 const NO_COLLECTIONS = { collections: [] };
 
 const collection: CollectionSchema = {
@@ -32,9 +33,10 @@ const collection: CollectionSchema = {
       max: 5,
       step: 0.5,
     }),
-    // Required but unbounded — proves `0` is a present value, not empty.
+    // Required, with no bounds. This proves that `0` is a present value, and not
+    // empty.
     t.number({ name: 'count', label: 'Count', required: true }),
-    // Optional — for negatives, decimals, and empty handling.
+    // Optional, for the negative values, the decimals, and the empty case.
     t.number({ name: 'weight', label: 'Weight' }),
   ],
 };
@@ -47,7 +49,10 @@ const resolveRegistry = (): Promise<FieldRegistry> =>
 const renderField = (address: string, document?: TinaDocument) =>
   render(
     <TinaProvider
-      config={{ plugins: [numberFieldPlugin], schema: NO_COLLECTIONS }}
+      config={asResolvedConfig({
+        plugins: [numberFieldPlugin],
+        schema: NO_COLLECTIONS,
+      })}
     >
       <FormProvider
         collection={collection}

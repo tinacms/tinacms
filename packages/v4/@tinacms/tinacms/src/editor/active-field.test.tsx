@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
+import { asResolvedConfig } from '../config';
 import type { CollectionSchema } from '../core/schema/types';
 import { t } from '../index';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
@@ -12,8 +13,8 @@ import {
   useActiveField,
 } from './index';
 
-// These render a runtime directly rather than a configured app, so they hand
-// TinaProvider the resolved shape instead of going through defineConfig.
+// These tests render a runtime directly, and not a configured app. They therefore pass
+// TinaProvider the resolved shape, and do not call defineConfig.
 const NO_COLLECTIONS = { collections: [] };
 
 const collection: CollectionSchema = {
@@ -22,8 +23,8 @@ const collection: CollectionSchema = {
   fields: [t.string({ name: 'title', label: 'Title' })],
 };
 
-// Drives the activation rail the way the preview's click listener does — through
-// useActiveField — without needing postMessage.
+// This drives the activation path in the same way as the click listener of the preview.
+// It calls useActiveField, and it needs no postMessage.
 function ActivateProbe() {
   const { setActive } = useActiveField();
   return (
@@ -37,7 +38,10 @@ describe('active-field rail', () => {
   it('focuses the field input when its address is activated', async () => {
     render(
       <TinaProvider
-        config={{ plugins: [stringFieldPlugin], schema: NO_COLLECTIONS }}
+        config={asResolvedConfig({
+          plugins: [stringFieldPlugin],
+          schema: NO_COLLECTIONS,
+        })}
       >
         <FormProvider
           collection={collection}
@@ -59,7 +63,10 @@ describe('active-field rail', () => {
   it('re-fires focus when the already-active field is activated again', async () => {
     render(
       <TinaProvider
-        config={{ plugins: [stringFieldPlugin], schema: NO_COLLECTIONS }}
+        config={asResolvedConfig({
+          plugins: [stringFieldPlugin],
+          schema: NO_COLLECTIONS,
+        })}
       >
         <FormProvider
           collection={collection}
@@ -75,7 +82,8 @@ describe('active-field rail', () => {
     await userEvent.click(screen.getByText('activate'));
     expect(input).toHaveFocus();
 
-    // Blur (e.g. the user clicked elsewhere), then activate the same field again.
+    // Blur the field, as a click elsewhere does, and then activate the same field
+    // again.
     (input as HTMLInputElement).blur();
     expect(input).not.toHaveFocus();
     await userEvent.click(screen.getByText('activate'));

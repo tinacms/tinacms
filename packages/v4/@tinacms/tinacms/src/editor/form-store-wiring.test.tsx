@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
+import { asResolvedConfig } from '../config';
 import type { CollectionSchema } from '../core/schema/types';
 import { t } from '../index';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
@@ -12,8 +13,8 @@ import {
   useFormStatus,
 } from './index';
 
-// These render a runtime directly rather than a configured app, so they hand
-// TinaProvider the resolved shape instead of going through defineConfig.
+// These tests render a runtime directly, and not a configured app. They therefore pass
+// TinaProvider the resolved shape, and do not call defineConfig.
 const NO_COLLECTIONS = { collections: [] };
 
 const collection: CollectionSchema = {
@@ -30,7 +31,10 @@ describe('FormProvider form-store wiring', () => {
   it('tracks pristine on mount, dirty on edit, clean when the original value is retyped', async () => {
     render(
       <TinaProvider
-        config={{ plugins: [stringFieldPlugin], schema: NO_COLLECTIONS }}
+        config={asResolvedConfig({
+          plugins: [stringFieldPlugin],
+          schema: NO_COLLECTIONS,
+        })}
       >
         <FormProvider
           collection={collection}
@@ -48,7 +52,8 @@ describe('FormProvider form-store wiring', () => {
     await userEvent.type(input, '!');
     expect(screen.getByTestId('status')).toHaveTextContent('dirty');
 
-    // Back to the registered baseline — proves status is a diff, not a touched flag.
+    // Back to the registered baseline. This proves that the status is a comparison,
+    // and not a flag.
     await userEvent.type(input, '{backspace}');
     expect(screen.getByTestId('status')).toHaveTextContent('clean');
   });

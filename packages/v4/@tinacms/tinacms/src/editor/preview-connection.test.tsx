@@ -8,6 +8,7 @@ import {
 import userEvent from '@testing-library/user-event';
 import { type ReactNode, type RefObject, useRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
+import { asResolvedConfig } from '../config';
 import { toFieldAddress } from '../core/field/address';
 import type { CollectionSchema } from '../core/schema/types';
 import { toFormId, useFormStore } from '../form/form-store';
@@ -22,8 +23,8 @@ import { FormScopeContext } from './context';
 import { Field, FormProvider, TinaProvider } from './index';
 import { usePreviewConnection } from './preview-connection';
 
-// These render a runtime directly rather than a configured app, so they hand
-// TinaProvider the resolved shape instead of going through defineConfig.
+// These tests render a runtime directly, and not a configured app. They therefore pass
+// TinaProvider the resolved shape, and do not call defineConfig.
 const NO_COLLECTIONS = { collections: [] };
 
 const collection: CollectionSchema = {
@@ -34,7 +35,7 @@ const collection: CollectionSchema = {
 const path = 'content/posts/preview.mdx';
 const formId = toFormId(path);
 
-// Stands in for the iframe: usePreviewConnection only touches contentWindow.
+// This stands in for the iframe. usePreviewConnection reads contentWindow only.
 const fakeIframe = () => {
   const contentWindow = { postMessage: vi.fn() };
   return {
@@ -54,8 +55,8 @@ function Connection({
   return null;
 }
 
-// happy-dom's MessageEvent constructor doesn't reliably carry origin/source, so
-// force them on (same helper shape as connection.test.ts).
+// The MessageEvent constructor of happy-dom does not always carry the origin and the
+// source, so this sets them. connection.test.ts uses the same helper.
 const messageFromPreview = (
   data: unknown,
   source: unknown,
@@ -74,7 +75,10 @@ const messageFromPreview = (
 const renderConnected = (iframeRef: RefObject<HTMLIFrameElement | null>) =>
   render(
     <TinaProvider
-      config={{ plugins: [stringFieldPlugin], schema: NO_COLLECTIONS }}
+      config={asResolvedConfig({
+        plugins: [stringFieldPlugin],
+        schema: NO_COLLECTIONS,
+      })}
     >
       <FormProvider
         collection={collection}
@@ -166,7 +170,8 @@ describe('usePreviewConnection', () => {
 
   it('a ready before any form registers is silent until registration answers it', async () => {
     const iframe = fakeIframe();
-    // No <Field> content: drive the hook against a store emptied after mount.
+    // There is no <Field> here. This drives the hook against a store that is empty
+    // after the mount.
     function Bare() {
       const ref = useRef<HTMLIFrameElement | null>(null);
       ref.current = iframe.ref.current;
@@ -175,14 +180,17 @@ describe('usePreviewConnection', () => {
     }
     render(
       <TinaProvider
-        config={{ plugins: [stringFieldPlugin], schema: NO_COLLECTIONS }}
+        config={asResolvedConfig({
+          plugins: [stringFieldPlugin],
+          schema: NO_COLLECTIONS,
+        })}
       >
         <FormProvider collection={collection} path={path}>
           <Bare />
         </FormProvider>
       </TinaProvider>
     );
-    // TinaProvider mounts children only after plugins resolve — wait for it.
+    // TinaProvider mounts its children after the plugins resolve, so wait for that.
     await screen.findByText('bare');
     act(() => {
       useFormStore.setState({ forms: {}, active: null });
@@ -191,8 +199,8 @@ describe('usePreviewConnection', () => {
     messageFromPreview(readyMessage(), iframe.ref.current?.contentWindow);
     expect(iframe.postMessage).not.toHaveBeenCalled();
 
-    // Recovery: registration itself fires the subscription post — the early
-    // ready needed no answer because this covers it.
+    // The recovery. The registration fires the post from the subscription, so the
+    // early ready message needs no answer.
     act(() => {
       useFormStore
         .getState()
@@ -218,7 +226,10 @@ describe('usePreviewConnection', () => {
     const iframe = fakeIframe();
     const tree = (documentPath: string) => (
       <TinaProvider
-        config={{ plugins: [stringFieldPlugin], schema: NO_COLLECTIONS }}
+        config={asResolvedConfig({
+          plugins: [stringFieldPlugin],
+          schema: NO_COLLECTIONS,
+        })}
       >
         <FormProvider
           collection={collection}
@@ -234,10 +245,11 @@ describe('usePreviewConnection', () => {
     await screen.findByLabelText('title');
     iframe.postMessage.mockClear();
 
-    // The iframe persists across the switch (no new ready) and the edited
-    // scope's re-registration is a store no-op — the connect-time post is the
-    // only thing that can bring the preview over. waitFor also flushes the
-    // provider's async re-adopt validation (trigger), keeping act quiet.
+    // The iframe stays across the change, so there is no new ready message. The
+    // store also does nothing when an edited scope registers again. The post at
+    // connect time is therefore the only way to move the preview. The waitFor call
+    // also flushes the validation that the provider runs when it adopts the kept
+    // edits, which keeps act quiet.
     rerender(tree(otherPath));
     await waitFor(() =>
       expect(iframe.postMessage).toHaveBeenCalledWith(
@@ -249,8 +261,8 @@ describe('usePreviewConnection', () => {
 
   it("rejects '*' as targetOrigin at construction", () => {
     const iframe = fakeIframe();
-    // A bare FormScopeContext is enough: the invariant fires in the hook body,
-    // before any effect needs the runtime.
+    // A FormScopeContext alone is enough. The invariant throws in the body of the
+    // hook, before an effect needs the runtime.
     const wrapper = ({ children }: { children: ReactNode }) => (
       <FormScopeContext value={{ formId, path, collection, onSave: null }}>
         {children}

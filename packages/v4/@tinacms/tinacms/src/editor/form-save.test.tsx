@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import { asResolvedConfig } from '../config';
 import { definePlugin } from '../core/plugin';
 import type { CollectionSchema } from '../core/schema/types';
 import { t } from '../index';
@@ -17,8 +18,8 @@ import {
   useFormStatus,
 } from './index';
 
-// These render a runtime directly rather than a configured app, so they hand
-// TinaProvider the resolved shape instead of going through defineConfig.
+// These tests render a runtime directly, and not a configured app. They therefore pass
+// TinaProvider the resolved shape, and do not call defineConfig.
 const NO_COLLECTIONS = { collections: [] };
 
 const collection: CollectionSchema = {
@@ -43,7 +44,10 @@ function SaveProbe() {
 const renderWithSave = (onSave: SaveHandler) =>
   render(
     <TinaProvider
-      config={{ plugins: [stringFieldPlugin], schema: NO_COLLECTIONS }}
+      config={asResolvedConfig({
+        plugins: [stringFieldPlugin],
+        schema: NO_COLLECTIONS,
+      })}
     >
       <FormProvider
         collection={collection}
@@ -82,14 +86,14 @@ describe('useFormSave', () => {
   });
 });
 
-// A field whose value is a structure rather than a primitive, with a plain input
-// so the edit is simulatable — rich-text is the real instance of this, but Plate
-// needs a browser to accept keystrokes and the fault has nothing to do with Plate.
+// A field whose value is a structure, and not a primitive. It uses a plain input, so a
+// test can simulate the edit. The rich-text field is the real case, but Plate needs a
+// browser to accept a keystroke, and the fault has nothing to do with Plate.
 //
-// The regression: the store is fed from RHF's formState subscription, which hands
-// over a *clone* of each value, while markSaved baselines the values RHF itself
-// holds. Two primitives compare equal across that split under `Object.is`; two
-// structures never do, so the form stayed dirty through every save.
+// The regression: the store reads the formState subscription of RHF, which sends a clone
+// of each value, but markSaved keeps the values that RHF holds as the baseline. Two
+// primitives compare equal across that split under `Object.is`. Two structures never do,
+// so the form stayed dirty through every save.
 const structureFieldPlugin = definePlugin({
   name: 'test:field:structure',
   provides: ['field'],
@@ -98,8 +102,8 @@ const structureFieldPlugin = definePlugin({
     default: {
       field: {
         Component: StructureField,
-        // Mirrors rich-text: stored is a string, the editor value is a structure,
-        // and every edit mints a fresh object.
+        // This matches the rich-text field. The stored value is a string, the editor
+        // value is a structure, and each edit makes a new object.
         parse: (stored: unknown) => ({ text: String(stored ?? '') }),
         serialize: (value: unknown) => (value as { text: string }).text,
       },
@@ -130,7 +134,10 @@ describe('useFormSave with a structured field value', () => {
     const onSave = vi.fn();
     render(
       <TinaProvider
-        config={{ plugins: [structureFieldPlugin], schema: NO_COLLECTIONS }}
+        config={asResolvedConfig({
+          plugins: [structureFieldPlugin],
+          schema: NO_COLLECTIONS,
+        })}
       >
         <FormProvider
           collection={structureCollection}

@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
+import { asResolvedConfig } from '../../../config';
 import {
   type FieldRegistry,
   resolveFieldPlugins,
@@ -15,8 +16,8 @@ import { Field, FormProvider, TinaProvider } from '../../../editor';
 import { t } from '../../../index';
 import booleanFieldPlugin from './boolean-field.plugin';
 
-// These render a runtime directly rather than a configured app, so they hand
-// TinaProvider the resolved shape instead of going through defineConfig.
+// These tests render a runtime directly, and not a configured app. They therefore pass
+// TinaProvider the resolved shape, and do not call defineConfig.
 const NO_COLLECTIONS = { collections: [] };
 
 const collection: CollectionSchema = {
@@ -34,7 +35,10 @@ const resolveRegistry = (): Promise<FieldRegistry> =>
 const renderFeatured = (document?: TinaDocument) =>
   render(
     <TinaProvider
-      config={{ plugins: [booleanFieldPlugin], schema: NO_COLLECTIONS }}
+      config={asResolvedConfig({
+        plugins: [booleanFieldPlugin],
+        schema: NO_COLLECTIONS,
+      })}
     >
       <FormProvider
         collection={collection}
@@ -88,8 +92,8 @@ describe('BooleanField value updates', () => {
 });
 
 describe('BooleanField validation', () => {
-  // `required` is a no-op for boolean by design: a checkbox has no empty state
-  // and `false` is a first-class value, so neither true nor false is rejected.
+  // The `required` flag does nothing for a boolean, by design. A checkbox has no empty
+  // state, and `false` is a real value, so neither true nor false is rejected.
   it('accepts both true and false even when the field is required', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('boolean');

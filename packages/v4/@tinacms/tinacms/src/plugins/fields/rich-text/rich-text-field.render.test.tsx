@@ -1,12 +1,13 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { asResolvedConfig } from '../../../config';
 import type { CollectionSchema } from '../../../core/schema/types';
 import { Field, FormProvider, TinaProvider } from '../../../editor';
 import { t } from '../../../index';
 import richTextFieldPlugin from './rich-text-field.plugin';
 
-// These render a runtime directly rather than a configured app, so they hand
-// TinaProvider the resolved shape instead of going through defineConfig.
+// These tests render a runtime directly, and not a configured app. They therefore pass
+// TinaProvider the resolved shape, and do not call defineConfig.
 const NO_COLLECTIONS = { collections: [] };
 
 const collection: CollectionSchema = {
@@ -40,7 +41,10 @@ const withCallout: CollectionSchema = {
 const renderBody = (markdown: string) =>
   render(
     <TinaProvider
-      config={{ plugins: [richTextFieldPlugin], schema: NO_COLLECTIONS }}
+      config={asResolvedConfig({
+        plugins: [richTextFieldPlugin],
+        schema: NO_COLLECTIONS,
+      })}
     >
       <FormProvider
         collection={collection}
@@ -61,14 +65,17 @@ describe('RichTextField rendering', () => {
     expect(editable).toHaveTextContent('Some prose.');
   });
 
-  // The embed nodes read their templates from EditorContext, which the field
-  // component must provide. Unprovided, `useTemplates()` returns the context
-  // default of `[]` and every embed renders as nothing — silently, since the
-  // toolbar reads a different context and still looks correct.
+  // The embed nodes read their templates from EditorContext, and the field component
+  // must provide it. Without it, `useTemplates()` returns the context default of `[]`,
+  // and every embed renders nothing. There is no message, because the toolbar reads
+  // another context and still looks correct.
   it('renders a configured embed, proving EditorContext is provided', async () => {
     render(
       <TinaProvider
-        config={{ plugins: [richTextFieldPlugin], schema: NO_COLLECTIONS }}
+        config={asResolvedConfig({
+          plugins: [richTextFieldPlugin],
+          schema: NO_COLLECTIONS,
+        })}
       >
         <FormProvider
           collection={withCallout}

@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import type { ResolvedConfig } from '../config';
+import { type ResolvedConfig, asResolvedConfig } from '../config';
 import { definePlugin } from '../core/plugin';
+import type { FieldSchema } from '../core/schema/types';
 import { LOCK_VERSION, checkLock, compileSchema } from './compile-schema';
 
-// Built by hand rather than through defineConfig: the compile reads manifests only,
-// and pinning the field set here keeps these assertions independent of which
-// built-ins ship.
+// This config is built by hand, and not by defineConfig. The compile reads the manifests
+// only. A fixed field set here also keeps these tests independent of the built-ins that
+// ship.
 const fieldPlugin = (type: string, contractVersion: number) =>
   definePlugin({
     name: `test:field:${type}`,
@@ -16,14 +17,15 @@ const fieldPlugin = (type: string, contractVersion: number) =>
 const configWith = (
   fields: { name: string; type: string }[],
   plugins = [fieldPlugin('string', 1), fieldPlugin('rich-text', 1)]
-): ResolvedConfig => ({
-  plugins,
-  schema: {
-    collections: [
-      { name: 'post', path: 'content/posts', format: 'md', fields },
-    ],
-  },
-});
+): ResolvedConfig =>
+  asResolvedConfig({
+    plugins,
+    schema: {
+      collections: [
+        { name: 'post', path: 'content/posts', format: 'md', fields },
+      ],
+    },
+  });
 
 describe('compileSchema', () => {
   it('pins each field type the schema uses to its plugin contract version', () => {
@@ -40,12 +42,17 @@ describe('compileSchema', () => {
     });
   });
 
-  // The definitions resolve at build from the installed plugins, so the lock holds
-  // a version number and nothing that could go stale on a non-breaking change.
+  // The definitions resolve at build time from the installed plugins. The lock
+  // therefore holds a version number, and nothing that a change without a break could
+  // make stale.
+  // The previous version of this asserted `not.toContain('Component')` against
+  // manifests that carry no client segment, so it could not fail. What the ADR
+  // actually promises is that the lock holds a version number and nothing that the
+  // installed plugin resolves at build.
   it('references primitives by key and version without inlining them', () => {
     const lock = compileSchema(configWith([{ name: 'title', type: 'string' }]));
-    expect(JSON.stringify(lock)).not.toContain('Component');
     expect(lock.primitives).toEqual({ string: 1 });
+    expect(typeof lock.primitives.string).toBe('number');
   });
 
   it('omits installed field types the schema does not use', () => {
@@ -53,7 +60,7 @@ describe('compileSchema', () => {
     expect(lock.primitives).not.toHaveProperty('rich-text');
   });
 
-  // Committed, so iteration order must not produce a diff on its own.
+  // The file is committed, so the iteration order alone must not change it.
   it('orders primitives stably', () => {
     const lock = compileSchema(
       configWith([
@@ -80,7 +87,8 @@ describe('checkLock', () => {
     });
   });
 
-  // A schema edit is the everyday case: regenerate, never block.
+  // An edit to the schema is the common case. Write the lock again, and do not stop
+  // the build.
   it('reports a lock that lags the schema as stale', () => {
     const lock = compileSchema(config);
     const check = checkLock(
@@ -93,8 +101,8 @@ describe('checkLock', () => {
     expect(check.status).toBe('stale');
   });
 
-  // The case ADR-016 exists for: the primitive changed shape under a committed
-  // lock, so resolving it silently is what must not happen.
+  // This is the case that ADR-016 covers. The primitive changed its shape under a
+  // committed lock, and a silent repair must not happen.
   it('stops on a pinned contract version the installed plugin no longer matches', () => {
     const lock = compileSchema(config);
     const check = checkLock(
@@ -107,7 +115,99 @@ describe('checkLock', () => {
     expect(check.status).toBe('incompatible');
     expect(check).toHaveProperty(
       'message',
-      expect.stringContaining('tina migrate')
+      expect.stringContaining('tinacms migrate')
     );
+  });
+});
+
+// A rich-text field carries templates whose fields have their own types. They render
+// like any other field, so they need the same build gate and the same contract pin —
+// reading only the top level let them through both.
+const withTemplate = (nestedType: string): ResolvedConfig =>
+  asResolvedConfig({
+    plugins: [fieldPlugin('rich-text', 1), fieldPlugin('string', 3)],
+    schema: {
+      collections: [
+        {
+          name: 'post',
+          path: 'content/posts',
+          format: 'md',
+          // `templates` belongs to RichTextFieldSchema, not the base FieldSchema a
+          // collection declares, which is exactly why the compile step has to reach
+          // for it structurally.
+          fields: [
+            {
+              name: 'body',
+              type: 'rich-text',
+              templates: [
+                { name: 'cta', fields: [{ name: 'label', type: nestedType }] },
+              ],
+            } as FieldSchema,
+          ],
+        },
+      ],
+    },
+  });
+
+describe('compileSchema with nested template fields', () => {
+  it('pins a type that only a template uses', () => {
+    expect(compileSchema(withTemplate('string')).primitives).toEqual({
+      'rich-text': 1,
+      string: 3,
+    });
+  });
+
+  it('rejects a template field type no plugin provides', () => {
+    expect(() => compileSchema(withTemplate('image'))).toThrow(
+      /uses the field type "image"/
+    );
+  });
+});
+
+describe('compileSchema provider conflicts', () => {
+  // The field registry refuses to boot this config; last-wins here would still write
+  // a lock, pinning whichever plugin happened to be last.
+  it('rejects two plugins providing the same field type', () => {
+    expect(() =>
+      compileSchema(
+        configWith(
+          [{ name: 'title', type: 'string' }],
+          [fieldPlugin('string', 1), fieldPlugin('string', 2)]
+        )
+      )
+    ).toThrow(/Two plugins provide/);
+  });
+});
+
+describe('checkLock across lock formats', () => {
+  const config = configWith([{ name: 'title', type: 'string' }]);
+
+  // A lock from a newer tinacms differs only by stringify, so it read as stale and was
+  // rewritten in the older format — a silent downgrade of a committed file.
+  it('refuses a lock written in a newer format instead of downgrading it', () => {
+    const lock = { ...compileSchema(config), version: LOCK_VERSION + 1 };
+    const check = checkLock(lock, config);
+    expect(check.status).toBe('unreadable');
+    expect(check).toHaveProperty('message', expect.stringContaining('Upgrade'));
+  });
+
+  // `primitives` is parsed JSON, so an inherited key would otherwise resolve against
+  // Object.prototype and compare as a pinned version nobody wrote.
+  it('does not read prototype keys as pinned versions', () => {
+    const lock = compileSchema(
+      configWith(
+        [{ name: 'title', type: 'constructor' }],
+        [fieldPlugin('constructor', 1)]
+      )
+    );
+    expect(
+      checkLock(
+        lock,
+        configWith(
+          [{ name: 'title', type: 'constructor' }],
+          [fieldPlugin('constructor', 1)]
+        )
+      )
+    ).toEqual({ status: 'current' });
   });
 });

@@ -7,6 +7,7 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import { asResolvedConfig } from '../config';
 import { toFieldAddress } from '../core/field/address';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import {
@@ -20,9 +21,9 @@ import {
 } from '../form/form-store';
 import { t } from '../index';
 
-// A pristine form has never been validated, so the store models it as carrying no
-// errors at all rather than an empty map (form-store.ts). Narrowing here keeps
-// that shape honest instead of reaching through the union at every assertion.
+// A pristine form has never been validated, so the store gives it no error map at all,
+// and not an empty one. Refer to form-store.ts. This narrowing keeps that shape, so no
+// assertion reaches through the union.
 const errorsOf = (forms: FormStore['forms'], formId: FormId) => {
   const scope = forms[formId];
   return isEdited(scope) ? scope.errors : undefined;
@@ -38,13 +39,13 @@ import {
   useFormStatus,
 } from './index';
 
-// These render a runtime directly rather than a configured app, so they hand
-// TinaProvider the resolved shape instead of going through defineConfig.
+// These tests render a runtime directly, and not a configured app. They therefore pass
+// TinaProvider the resolved shape, and do not call defineConfig.
 const NO_COLLECTIONS = { collections: [] };
 
-// Same shape as the playground's post collection: min 3 gives the tests a real
-// validation failure to keep alive across a document switch, and max 20 a
-// second, distinguishable one (bleed detection needs two distinct messages).
+// The same shape as the post collection of the playground. The min of 3 gives these
+// tests one validation failure to keep across a change of document. The max of 20 gives
+// a second failure. A test for a leak between forms needs two different messages.
 const collection: CollectionSchema = {
   name: 'post',
   format: 'mdx',
@@ -76,11 +77,14 @@ function SaveProbe() {
   );
 }
 
-// The playground's switcher shape: keyed FormProvider, so a path change is a
-// full teardown + host of the other document (the store keeps the edits).
+// The switcher of the playground. Its FormProvider has a key, so a change of path tears
+// the form down and hosts the other document. The store keeps the edits.
 const host = (path: string, document: TinaDocument, onSave?: SaveHandler) => (
   <TinaProvider
-    config={{ plugins: [stringFieldPlugin], schema: NO_COLLECTIONS }}
+    config={asResolvedConfig({
+      plugins: [stringFieldPlugin],
+      schema: NO_COLLECTIONS,
+    })}
   >
     <FormProvider
       key={path}
@@ -155,14 +159,14 @@ describe('form continuity across mounts', () => {
     await userEvent.type(inputB, ' two');
     await userEvent.click(screen.getByText('save'));
     await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
-    // B's document only — A's scope is untouched by the save.
+    // The document of B only. The save does not change the scope of A.
     expect(onSave).toHaveBeenCalledWith({ title: 'Doc B two' });
 
     rerender(host(pathA, { title: 'Doc A' }, onSave));
     const backOnA = await screen.findByLabelText('title');
     await waitFor(() => expect(backOnA).toHaveValue('x'));
-    // trigger-on-re-adopt: RHF derives no errors from defaultValues, so this
-    // message is only here because the provider re-validated the kept edits.
+    // RHF derives no error from defaultValues, so this message is here only because
+    // the provider validated the kept edits again.
     await screen.findByText('Title must be at least 3 characters');
     expect(screen.getByTestId('status')).toHaveTextContent('dirty');
   });
@@ -173,9 +177,9 @@ describe('form continuity across mounts', () => {
     expect(input).toHaveValue('Old content');
     unmount();
 
-    // Never edited: the kept scope is pristine, so the re-mount must re-adopt
-    // the incoming document (registerForm's "pristine is never stale"), not
-    // re-serve the old mirror.
+    // No one edited this form, so the kept scope is pristine. The remount must adopt
+    // the incoming document, because a pristine form is never stale. It must not
+    // serve the old mirror.
     render(host(pathA, { title: 'New content' }));
     const revisited = await screen.findByLabelText('title');
     await waitFor(() => expect(revisited).toHaveValue('New content'));
@@ -187,8 +191,9 @@ describe('form continuity across mounts', () => {
     await userEvent.type(await screen.findByLabelText('title'), ' edited');
     unmount();
 
-    // Re-mounted onto kept edits, then the host swaps the document prop under
-    // the same path: edits win (the store's edited no-op, mirrored by the seed).
+    // This remounts onto the kept edits, and the host then changes the document prop
+    // under the same path. The edits win, because the store does nothing for an
+    // edited form, and the seed follows.
     const { rerender } = render(host(pathA, { title: 'Doc A' }));
     const revisited = await screen.findByLabelText('title');
     await waitFor(() => expect(revisited).toHaveValue('Doc A edited'));
@@ -210,10 +215,11 @@ describe('form continuity across mounts', () => {
     );
     unmount();
 
-    // Record every distinct error state A's scope passes through during the
-    // re-mount: the fresh RHF instance's pre-trigger empty derivation must not
-    // wipe the kept errors even transiently (a badge blip — or a permanent
-    // loss if the form unmounts inside that window).
+    // Record every error state that the scope of A passes through during the
+    // remount. The new RHF instance derives an empty map before its first trigger,
+    // and that must not clear the kept errors, not even for one render. Such a gap
+    // makes the badge flicker, and it loses the errors when the form unmounts inside
+    // it.
     const seen: unknown[] = [];
     const unsubscribe = useFormStore.subscribe((state, previous) => {
       const errors = errorsOf(state.forms, formIdA);
@@ -242,7 +248,7 @@ describe('form continuity across mounts', () => {
       )
     );
 
-    // Fixing the value clears the mirror through the same chokepoint.
+    // A correct value clears the mirror through the same path.
     await userEvent.type(inputA, 'yz');
     await waitFor(() =>
       expect(
@@ -257,8 +263,8 @@ describe('form continuity across mounts', () => {
       )
     );
 
-    // A is torn down; its mirrored errors are still readable while B is hosted
-    // — the collection-level badge case.
+    // A is torn down, and its mirrored errors are still readable while B is hosted.
+    // This is the case that the collection badge needs.
     rerender(host(pathB, { title: 'Doc B' }));
     await waitFor(() =>
       expect(screen.getByLabelText('title')).toHaveValue('Doc B')
@@ -269,15 +275,18 @@ describe('form continuity across mounts', () => {
   });
 });
 
-// No key: the same FormProvider instance re-hosts the other path — the harder
-// switch, where nothing remounts and every seam must hold by itself.
+// There is no key here, so one FormProvider instance hosts the other path. This is the
+// harder change. Nothing remounts, and each part must hold by itself.
 const unkeyedHost = (
   path: string,
   document: TinaDocument,
   onSave?: SaveHandler
 ) => (
   <TinaProvider
-    config={{ plugins: [stringFieldPlugin], schema: NO_COLLECTIONS }}
+    config={asResolvedConfig({
+      plugins: [stringFieldPlugin],
+      schema: NO_COLLECTIONS,
+    })}
   >
     <FormProvider
       collection={collection}
@@ -299,7 +308,7 @@ describe('unkeyed document switches (same FormProvider instance)', () => {
     const input = await screen.findByLabelText('title');
     await userEvent.type(input, ' edited');
 
-    // Same content, different path: only the formId distinguishes the two.
+    // The same content, and a different path. Only the form id separates the two.
     rerender(unkeyedHost(pathB, { title: 'Same' }, onSave));
     await waitFor(() =>
       expect(screen.getByLabelText('title')).toHaveValue('Same')
@@ -320,7 +329,7 @@ describe('unkeyed document switches (same FormProvider instance)', () => {
       [title]: ['Title must be at least 3 characters'],
     });
 
-    // A carries a DIFFERENT error (max, not min), so a bleed is distinguishable.
+    // A carries a different error, max and not min, so a leak between the two shows.
     const { rerender } = render(unkeyedHost(pathA, { title: 'Doc A' }));
     const inputA = await screen.findByLabelText('title');
     await userEvent.type(inputA, ' with far too long a title');
@@ -342,7 +351,7 @@ describe('unkeyed document switches (same FormProvider instance)', () => {
     await screen.findByText('Title must be at least 3 characters');
     unsubscribe();
 
-    // B's scope never held A's error and was never wiped in transit.
+    // The scope of B never held the error of A, and nothing cleared it.
     expect(
       seen.every(
         (errors) =>
@@ -354,13 +363,13 @@ describe('unkeyed document switches (same FormProvider instance)', () => {
     expect(errorsOf(useFormStore.getState().forms, formIdB)?.[title]).toEqual([
       'Title must be at least 3 characters',
     ]);
-    // A's own error is still where it belongs.
+    // The error of A is still on A.
     expect(
       errorsOf(useFormStore.getState().forms, toFormId(pathA))?.[title]
     ).toContain('Title must be at most 20 characters');
 
-    // And the mirror is alive under the new owner: a fresh edit in B mirrors
-    // (the ownership guard skips one run, never the stream).
+    // The mirror works under the new owner. A new edit in B reaches the mirror. The
+    // ownership guard skips one run, and never the stream.
     const inputB = screen.getByLabelText('title');
     await userEvent.clear(inputB);
     await userEvent.type(inputB, 'now far too long for the max rule');

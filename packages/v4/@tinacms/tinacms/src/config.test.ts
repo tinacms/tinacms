@@ -34,15 +34,15 @@ describe('defineConfig', () => {
     ).toEqual([customString]);
   });
 
-  // Which Data Layer you are on has no sane default, so it is the one required entry.
+  // The data layer has no default, so it is the one required entry.
   it('rejects a config with no content provider', () => {
     expect(() => defineConfig({ schema })).toThrow(
       /provides the "content" capability/
     );
   });
 
-  // The graph pass runs here rather than at boot, so a broken config fails when
-  // tina/config.ts is imported.
+  // The graph pass runs here, and not at boot, so a broken config fails at the import
+  // of tina/config.ts.
   it('rejects a capability conflict at config time', () => {
     const second = definePlugin({
       name: 'other:content',
@@ -63,5 +63,18 @@ describe('defineConfig', () => {
     expect(() =>
       defineConfig({ plugins: [contentPlugin, needsMedia], schema })
     ).toThrow(/depends on the "media" capability/);
+  });
+});
+
+describe('defineConfig schema validation', () => {
+  // The schema reached the compile step unchecked, so a malformed one imported cleanly
+  // and died later as a TypeError far from the config that caused it.
+  it.each([
+    ['a schema with no collections', {} as never],
+    ['collections that are not an array', { collections: {} } as never],
+  ])('rejects %s', (_label, badSchema) => {
+    expect(() =>
+      defineConfig({ plugins: [contentPlugin], schema: badSchema })
+    ).toThrow(/collections` must be an array/);
   });
 });

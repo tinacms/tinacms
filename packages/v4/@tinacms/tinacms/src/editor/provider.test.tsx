@@ -1,12 +1,13 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { asResolvedConfig } from '../config';
 import { defineConfig } from '../config';
 import { definePlugin } from '../core/plugin';
 import { useFieldRegistry, useTinaStore } from './hooks';
 import { TinaProvider } from './provider';
 
-// These render a runtime directly rather than a configured app, so they hand
-// TinaProvider the resolved shape instead of going through defineConfig.
+// These tests render a runtime directly, and not a configured app. They therefore pass
+// TinaProvider the resolved shape, and do not call defineConfig.
 const NO_COLLECTIONS = { collections: [] };
 
 function BootProbe() {
@@ -25,9 +26,9 @@ function BootProbe() {
 }
 
 describe('TinaProvider boot', () => {
-  // Through defineConfig, so this covers the whole path a real app takes: the
-  // built-ins it folds in have to reach the registry and the store, not just the
-  // plugin list.
+  // This goes through defineConfig, so it covers the whole path of a real app. The
+  // built-ins that defineConfig adds must reach the registry and the store, and not
+  // the plugin list alone.
   it('mounts the built-in fields a bare config installs: resolved registry, composed boot store', async () => {
     const config = defineConfig({
       plugins: [definePlugin({ name: 'test:content', provides: ['content'] })],
@@ -51,7 +52,12 @@ describe('TinaProvider boot', () => {
     const onDestroy = vi.fn();
     const lifecycle = definePlugin({ name: 'lifecycle', onInit, onDestroy });
     const { unmount } = render(
-      <TinaProvider config={{ plugins: [lifecycle], schema: NO_COLLECTIONS }}>
+      <TinaProvider
+        config={asResolvedConfig({
+          plugins: [lifecycle],
+          schema: NO_COLLECTIONS,
+        })}
+      >
         <BootProbe />
       </TinaProvider>
     );

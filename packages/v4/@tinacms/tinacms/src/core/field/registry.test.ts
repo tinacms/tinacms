@@ -3,20 +3,21 @@ import {
   type CapabilityOverride,
   type ResolvedSegment,
   definePlugin,
+  resolveClientSegments,
 } from '../plugin';
 import type { FieldDescriptor } from './contract';
 import { createFieldRegistry } from './registry';
 
 const Noop = () => null;
 
-// A minimal field descriptor tagged via defaultValue so a test can tell which one won.
+// A small field descriptor, tagged with defaultValue, so a test can see which one won.
 const fieldOf = (tag: string): FieldDescriptor => ({
   Component: Noop,
   defaultValue: tag,
 });
 
-// `type` on the manifest, descriptor on the segment — the shape a real field plugin
-// splits across its .plugin.ts and .client.tsx.
+// The `type` sits on the manifest, and the descriptor sits on the segment. A real field
+// plugin splits them across its .plugin.ts and .client.tsx files.
 const resolved = (
   spec: { name: string; type?: string; overrides?: CapabilityOverride[] },
   field?: FieldDescriptor
@@ -49,8 +50,8 @@ describe('createFieldRegistry', () => {
     expect(registry.size).toBe(0);
   });
 
-  // Either half alone is an authoring slip; caught at boot rather than as an
-  // unresolvable field type at render.
+  // One half alone is an error by the author. The boot catches it, so it does not
+  // appear as an unknown field type at the render.
   it('throws when a manifest declares a field type with no descriptor', () => {
     expect(() =>
       createFieldRegistry([resolved({ name: 'custom:string', type: 'string' })])
@@ -104,5 +105,22 @@ describe('createFieldRegistry', () => {
     expect(() =>
       createFieldRegistry([overrideFor('a', 'a'), overrideFor('b', 'b')])
     ).toThrow(/both declare an/);
+  });
+});
+
+describe('resolveClientSegments', () => {
+  // The registry's paired check below can never see this plugin: resolveClientSegments
+  // skips a manifest with no client, so the type would compile into the lock and then
+  // resolve to nothing at render.
+  it('throws when a field provider has no client segment at all', async () => {
+    await expect(
+      resolveClientSegments([
+        definePlugin({
+          name: 'custom:image',
+          provides: ['field'],
+          field: { type: 'image', contractVersion: 1 },
+        }),
+      ])
+    ).rejects.toThrow(/no client segment to render it/);
   });
 });

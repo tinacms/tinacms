@@ -120,6 +120,14 @@ export const resolveClientSegments = async (
 ): Promise<ResolvedSegment[]> => {
   const resolved: ResolvedSegment[] = [];
   for (const manifest of plugins) {
+    // A field provider with no client segment never reaches the registry's paired
+    // check below, so it would compile into the lock and then resolve to nothing at
+    // render. Caught here, where the segment list is built.
+    invariant(
+      !(manifest.field && !manifest.client),
+      'field-plugin-no-client',
+      `Plugin "${manifest.name}" declares the field type "${manifest.field?.type}" but has no client segment to render it.`
+    );
     if (!manifest.client) continue;
     const clientModule = await manifest.client();
     invariant(
