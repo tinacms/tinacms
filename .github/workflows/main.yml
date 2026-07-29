@@ -7,6 +7,16 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, labeled]
   workflow_dispatch:
+    inputs:
+      update_size_baseline:
+        description: >-
+          Regenerate tests/size-baselines.json instead of checking against it,
+          and upload the result as an artifact to commit. Baselines MUST come
+          from here: the numbers are platform-specific (du block accounting,
+          platform-optional binaries), so one generated on a dev machine can
+          never match ubuntu-latest — a macOS baseline read 83 MB light.
+        type: boolean
+        default: false
   schedule:
     # Weekly real-registry canary for the size-baseline job. verdaccio (used on
     # PRs) is seeded only from HEAD, so it cannot reproduce published-registry
@@ -290,4 +300,23 @@ jobs:
         run: pnpm build
 
       - name: Size check
+        if: inputs.update_size_baseline != true
         run: pnpm size:check ${{ github.event_name == 'schedule' && '--registry-mode=real' || '' }}
+
+      # Re-baselining path. Runs the identical measurement, writes the JSON, and
+      # hands it back as an artifact rather than pushing — CI keeps read-only
+      # contents permission, and a human still reviews the numbers before they
+      # become the thing every future PR is gated on.
+      - name: Regenerate size baseline
+        if: inputs.update_size_baseline == true
+        run: pnpm size:update
+
+      - name: Upload regenerated baseline
+        if: inputs.update_size_baseline == true
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        with:
+          name: size-baselines
+          path: |
+            tests/size-baselines.json
+            tests/size-fixture/package-lock.json
+          if-no-files-found: error
