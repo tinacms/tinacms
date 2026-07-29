@@ -759,6 +759,51 @@ export function compareScalar(label, baseline, current, tolerance) {
   return { status: 'ok', detail: line };
 }
 
+// Mirror the console report into the GitHub Actions job summary, so the numbers
+// are visible on the PR without opening the raw log. Runs on green builds too —
+// the drift this job exists to catch (1412→1037 MB) stayed invisible precisely
+// because nobody was looking at a number that hadn't tripped a threshold yet.
+// No-op outside Actions.
+export function writeStepSummary(results, groups, { failed, warned, seconds }) {
+  const target = process.env.GITHUB_STEP_SUMMARY;
+  if (!target) return;
+
+  const icon = { fail: '🔴', warn: '🟡', ok: '🟢' };
+  const verdict = failed > 0 ? '🔴' : warned > 0 ? '🟡' : '🟢';
+  const md = [
+    `## ${verdict} Size baseline — ${failed} failing, ${warned} warning`,
+    '',
+    `registry-mode \`${REGISTRY_MODE}\` · ${seconds}s`,
+    '',
+    '| | Group | Detail |',
+    '| :-: | --- | --- |',
+  ];
+
+  for (const group of groups) {
+    const rows = results.filter((r) => r.group === group);
+    // Same readability trade-off as the console: 23 green package rows would
+    // bury the four that matter, so collapse them into a count.
+    const shown =
+      group === 'packages' ? rows.filter((r) => r.status !== 'ok') : rows;
+    for (const r of shown) {
+      md.push(`| ${icon[r.status]} | ${group} | ${r.detail} |`);
+    }
+    if (group === 'packages') {
+      const okCount = rows.length - shown.length;
+      md.push(`| 🟢 | packages | ${okCount} package(s) within tolerance |`);
+    }
+  }
+
+  if (REGISTRY_MODE === 'real' && failed > 0) {
+    md.push(
+      '',
+      '> Real-registry numbers can differ from the verdaccio baseline (published history); treat this as a canary to investigate.'
+    );
+  }
+
+  fs.appendFileSync(target, `${md.join('\n')}\n`);
+}
+
 export function compare(baseline, current) {
   const results = [];
 
@@ -896,6 +941,12 @@ async function main() {
   console.log(
     `\n[size-baseline] ${failed} failing, ${warned} warning — ${((Date.now() - started) / 1000).toFixed(1)}s (registry-mode=${REGISTRY_MODE})`
   );
+
+  writeStepSummary(results, groups, {
+    failed,
+    warned,
+    seconds: ((Date.now() - started) / 1000).toFixed(1),
+  });
 
   if (REGISTRY_MODE === 'real' && failed > 0) {
     console.log(

@@ -14,6 +14,7 @@ import {
   lockKeyPackageNames,
   stripWorkspaceEntries,
   unpackedSizeOfTarball,
+  writeStepSummary,
 } from '../scripts/size-baseline.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -521,5 +522,102 @@ describe('stripWorkspaceEntries', () => {
       )
     );
     expect(stripWorkspaceEntries(committed)).toEqual(committed);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// writeStepSummary — the numbers have to reach the PR, not just the raw log
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('writeStepSummary', () => {
+  const GROUPS = ['install closure', 'watchlist', 'admin output', 'packages'];
+  const results = [
+    { group: 'install closure', status: 'ok', detail: 'du -sk: 933.24 MB' },
+    { group: 'watchlist', status: 'warn', detail: 'typescript: 2 copies' },
+    { group: 'admin output', status: 'fail', detail: 'public/admin: +12 MB' },
+    { group: 'packages', status: 'ok', detail: 'tinacms: 3.80 MB' },
+    { group: 'packages', status: 'ok', detail: '@tinacms/cli: 1.20 MB' },
+    { group: 'packages', status: 'fail', detail: '@tinacms/mdx: +900 KB' },
+  ];
+
+  function render(counts) {
+    const file = path.join(
+      fs.mkdtempSync(path.join(os.tmpdir(), 'size-summary-')),
+      'summary.md'
+    );
+    const prev = process.env.GITHUB_STEP_SUMMARY;
+    process.env.GITHUB_STEP_SUMMARY = file;
+    try {
+      writeStepSummary(results, GROUPS, {
+        failed: 0,
+        warned: 0,
+        seconds: '12.3',
+        ...counts,
+      });
+    } finally {
+      if (prev === undefined) delete process.env.GITHUB_STEP_SUMMARY;
+      else process.env.GITHUB_STEP_SUMMARY = prev;
+    }
+    return fs.readFileSync(file, 'utf-8');
+  }
+
+  it('is a no-op outside GitHub Actions', () => {
+    const prev = process.env.GITHUB_STEP_SUMMARY;
+    delete process.env.GITHUB_STEP_SUMMARY;
+    try {
+      expect(() =>
+        writeStepSummary(results, GROUPS, {
+          failed: 0,
+          warned: 0,
+          seconds: '1.0',
+        })
+      ).not.toThrow();
+    } finally {
+      if (prev !== undefined) process.env.GITHUB_STEP_SUMMARY = prev;
+    }
+  });
+
+  it('leads with a red verdict when anything failed', () => {
+    expect(render({ failed: 2, warned: 1 })).toContain(
+      '## 🔴 Size baseline — 2 failing, 1 warning'
+    );
+  });
+
+  it('leads with amber on warnings alone and green on a clean run', () => {
+    expect(render({ warned: 1 })).toContain('## 🟡 Size baseline');
+    expect(render({})).toContain('## 🟢 Size baseline');
+  });
+
+  it('renders every non-packages row, including green ones', () => {
+    const md = render({ failed: 2, warned: 1 });
+    expect(md).toContain('| 🟢 | install closure | du -sk: 933.24 MB |');
+    expect(md).toContain('| 🟡 | watchlist | typescript: 2 copies |');
+    expect(md).toContain('| 🔴 | admin output | public/admin: +12 MB |');
+  });
+
+  it('collapses green package rows to a count but keeps the failures', () => {
+    const md = render({ failed: 2, warned: 1 });
+    expect(md).toContain('| 🔴 | packages | @tinacms/mdx: +900 KB |');
+    expect(md).toContain('| 🟢 | packages | 2 package(s) within tolerance |');
+    expect(md).not.toContain('tinacms: 3.80 MB');
+  });
+
+  it('appends rather than truncating — Actions shares the file across steps', () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'size-summary-'));
+    const file = path.join(dir, 'summary.md');
+    fs.writeFileSync(file, 'earlier step output\n');
+    const prev = process.env.GITHUB_STEP_SUMMARY;
+    process.env.GITHUB_STEP_SUMMARY = file;
+    try {
+      writeStepSummary(results, GROUPS, {
+        failed: 0,
+        warned: 0,
+        seconds: '1.0',
+      });
+    } finally {
+      if (prev === undefined) delete process.env.GITHUB_STEP_SUMMARY;
+      else process.env.GITHUB_STEP_SUMMARY = prev;
+    }
+    expect(fs.readFileSync(file, 'utf-8')).toMatch(/^earlier step output\n/);
   });
 });
