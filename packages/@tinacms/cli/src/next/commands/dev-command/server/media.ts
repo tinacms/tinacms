@@ -24,10 +24,12 @@ export const createMediaRouter = (config: PathConfig) => {
       );
       const limit = requestURL.searchParams.get('limit');
       const cursor = requestURL.searchParams.get('cursor');
+      const search = requestURL.searchParams.get('search');
       const media = await mediaModel.listMedia({
         searchPath: folder,
         cursor,
         limit,
+        search,
       });
       res.end(JSON.stringify(media));
     } catch (error) {
@@ -122,6 +124,7 @@ interface MediaArgs {
   searchPath: string;
   cursor?: string;
   limit?: string;
+  search?: string;
 }
 
 interface File {
@@ -321,6 +324,19 @@ export class MediaModel {
           directories: [],
         };
       }
+
+      const search = args.search?.trim().toLowerCase();
+      if (search) {
+        return await this.searchMedia({
+          mediaBase,
+          validatedPath,
+          searchPath,
+          search,
+          cursor: args.cursor,
+          limit: args.limit,
+        });
+      }
+
       const filesStr = await fs.readdir(validatedPath);
       const filesProm: Promise<FileRes>[] = filesStr.map(async (file) => {
         const filePath = join(validatedPath, file);
@@ -368,12 +384,15 @@ export class MediaModel {
         }
         return 0;
       });
-      const limitItems = sortedItems.slice(offset, offset + limit);
-      const files = limitItems.filter((x) => x.isFile);
-      const directories = limitItems.filter((x) => !x.isFile).map((x) => x.src);
+      const allDirectories = sortedItems
+        .filter((x) => !x.isFile)
+        .map((x) => x.src);
+      const allFiles = sortedItems.filter((x) => x.isFile);
 
+      const directories = offset === 0 ? allDirectories : [];
+      const files = allFiles.slice(offset, offset + limit);
       const cursor =
-        rawItems.length > offset + limit ? String(offset + limit) : null;
+        allFiles.length > offset + limit ? String(offset + limit) : null;
 
       return {
         files,
@@ -393,6 +412,91 @@ export class MediaModel {
       };
     }
   }
+  private async searchMedia({
+    mediaBase,
+    validatedPath,
+    searchPath,
+    search,
+    cursor,
+    limit,
+  }: {
+    mediaBase: string;
+    validatedPath: string;
+    searchPath: string;
+    search: string;
+    cursor?: string;
+    limit?: string;
+  }): Promise<ListMediaRes> {
+    const resolvedBase = path.resolve(mediaBase);
+    const files: File[] = [];
+    const directories: string[] = [];
+    const visitedDirs = new Set<string>([resolveRealPath(validatedPath)]);
+
+    const walk = async (dir: string, relPrefix: string) => {
+      let entries: string[];
+      try {
+        entries = await fs.readdir(dir);
+      } catch {
+        return;
+      }
+      const stats = await Promise.all(
+        entries.map(async (entry) => {
+          const absPath = join(dir, entry);
+          // @security Skip entries whose real path escapes the media root
+          // (symlink/junction), matching resolveWithinBase for the recursive walk.
+          try {
+            assertSymlinkWithinBase(absPath, resolvedBase, absPath);
+          } catch {
+            return null;
+          }
+          try {
+            return { entry, absPath, stat: await fs.stat(absPath) };
+          } catch {
+            return null;
+          }
+        })
+      );
+
+      for (const entryStat of stats) {
+        if (!entryStat) continue;
+        const { entry, absPath, stat } = entryStat;
+        const relPath = relPrefix ? `${relPrefix}/${entry}` : entry;
+        if (stat.isDirectory()) {
+          // @security Symlinked directories inside the media root pass the
+          // containment check, so track real paths to break traversal cycles.
+          const realDir = resolveRealPath(absPath);
+          if (visitedDirs.has(realDir)) continue;
+          visitedDirs.add(realDir);
+          if (entry.toLowerCase().includes(search)) {
+            directories.push(`/${relPath}`);
+          }
+          await walk(absPath, relPath);
+          continue;
+        }
+        if (!relPath.toLowerCase().includes(search)) continue;
+
+        let src = `/${relPath}`;
+        if (searchPath) src = `/${searchPath}${src}`;
+        if (this.mediaRoot) src = `/${this.mediaRoot}${src}`;
+        files.push({ src, filename: relPath, size: stat.size });
+      }
+    };
+
+    await walk(validatedPath, '');
+    files.sort((a, b) => a.filename.localeCompare(b.filename));
+    directories.sort();
+
+    const offset = Number(cursor) || 0;
+    const pageSize = Number(limit) || 20;
+
+    return {
+      files: files.slice(offset, offset + pageSize),
+      directories: offset === 0 ? directories : [],
+      cursor:
+        files.length > offset + pageSize ? String(offset + pageSize) : null,
+    };
+  }
+
   async deleteMedia(args: MediaArgs): Promise<SuccessRecord> {
     try {
       const mediaBase = join(this.rootPath, this.publicFolder, this.mediaRoot);
