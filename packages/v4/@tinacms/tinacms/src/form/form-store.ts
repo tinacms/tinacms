@@ -3,6 +3,11 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import type { Brand } from '../core/brand';
 import { type FieldAddress, toFieldAddress } from '../core/field/address';
+import {
+  type FieldEquality,
+  STRUCTURAL_EQUALITY,
+  sameValue,
+} from '../core/form/compare';
 import { invariant } from '../core/invariant';
 import type { TinaDocument } from '../core/schema/types';
 
@@ -64,13 +69,21 @@ export type FieldErrors = Partial<Record<FieldAddress, string[]>>;
 // pristine form with a different baseline impossible to build.
 // The name is OpenForm, not FormScope. FormScope is the form context of the editor in
 // editor/context.ts.
+// The `equal` of a form arrives with it, from the host that registered it, because the
+// answer belongs to the fields and the store holds no field registry. Refer to
+// core/form/compare.ts.
 type OpenForm =
-  | { readonly status: 'pristine'; readonly values: FormValues }
+  | {
+      readonly status: 'pristine';
+      readonly values: FormValues;
+      readonly equal: FieldEquality;
+    }
   | {
       readonly status: 'edited';
       readonly values: FormValues;
       readonly baseline: FormValues;
       readonly errors: FieldErrors;
+      readonly equal: FieldEquality;
     };
 
 // The only place that compares the discriminant. Every consumer calls this instead.
@@ -90,7 +103,13 @@ export interface FormStore {
   // Seed a form with the values it loaded. A second call on an edited form does
   // nothing, so a return to the form keeps the unsaved edits (ADR-012). A second call
   // on a pristine form adopts the new content, so a reload is never stale.
-  registerForm: (formId: FormId, values: FormValues) => void;
+  // The `equal` is the equality of this form's fields, from fieldEqualityFor. Without
+  // it, every field of the form compares as structure.
+  registerForm: (
+    formId: FormId,
+    values: FormValues,
+    equal?: FieldEquality
+  ) => void;
   setFieldValue: (
     formId: FormId,
     address: FieldAddress,
@@ -105,25 +124,20 @@ export interface FormStore {
   // clean. The caller passes the snapshot it saved, so an edit made during the save
   // stays dirty. Without a snapshot, the current values become the baseline.
   markSaved: (formId: FormId, savedValues?: FormValues) => void;
+  // Throw the edits away and put the form back on its baseline: the content it loaded,
+  // or the content it last saved. The form becomes pristine, and its mirrored errors go
+  // with the edits that raised them, because this is the form a fresh load would give.
+  // The host resets RHF alongside it. Refer to discardEdits in editor/provider.tsx.
+  discardEdits: (formId: FormId) => void;
   // Close the form and drop its state.
   removeForm: (formId: FormId) => void;
 }
 
-// The RHF subscription sends a clone of each value, but markSaved keeps the original
-// as the baseline. A reference test therefore holds a structural value, such as the
-// rich-text tree, dirty for ever. The values are JSON documents, so this compares
-// their structure. A wrong result costs one more dirty read. It never loses an edit.
-// TODO: each field descriptor must compare its own values, next to its parse and
-// serialize functions. That needs the field registry in the store, which the store
-// does not have today.
-const sameValue = (a: unknown, b: unknown): boolean => {
-  if (Object.is(a, b)) return true;
-  if (typeof a !== 'object' || typeof b !== 'object') return false;
-  if (a === null || b === null) return false;
-  return JSON.stringify(a) === JSON.stringify(b);
-};
-
-const valuesEqual = (current: FormValues, baseline: FormValues): boolean => {
+const valuesEqual = (
+  current: FormValues,
+  baseline: FormValues,
+  equal: FieldEquality
+): boolean => {
   // Compare the union of both key sets, so an undefined value equals an absent key.
   // JSON cannot hold "present but undefined", and a controlled input clears to
   // undefined. The two are one state.
@@ -132,12 +146,14 @@ const valuesEqual = (current: FormValues, baseline: FormValues): boolean => {
     ...Object.keys(current),
     ...Object.keys(baseline),
   ]) as Set<FieldAddress>;
-  return [...keys].every((key) => sameValue(current[key], baseline[key]));
+  return [...keys].every((key) => equal(key, current[key], baseline[key]));
 };
 
 export const formStatus = (scope: OpenForm | undefined): FormStatus => {
   if (!isEdited(scope)) return 'pristine';
-  return valuesEqual(scope.values, scope.baseline) ? 'clean' : 'dirty';
+  return valuesEqual(scope.values, scope.baseline, scope.equal)
+    ? 'clean'
+    : 'dirty';
 };
 
 // The dirty test for one field, behind the exported useIsFieldDirty. It compares
@@ -147,7 +163,7 @@ export const fieldDirty = (
   address: FieldAddress
 ): boolean =>
   isEdited(scope)
-    ? !sameValue(scope.values[address], scope.baseline[address])
+    ? !scope.equal(address, scope.values[address], scope.baseline[address])
     : false;
 
 // RHF builds new message arrays each time it derives the errors. This compares their
@@ -170,6 +186,7 @@ const DEVTOOLS_ACTION = {
   setFieldErrors: 'form/setFieldErrors',
   setActive: 'form/setActive',
   markSaved: 'form/markSaved',
+  discardEdits: 'form/discardEdits',
   removeForm: 'form/removeForm',
 } as const;
 type DevtoolsActionLabel =
@@ -190,7 +207,7 @@ export const useFormStore = create<FormStore>()(
         forms: {},
         active: null,
 
-        registerForm: (formId, values) =>
+        registerForm: (formId, values, equal = STRUCTURAL_EQUALITY) =>
           apply((state) => {
             // TODO(v4): the edited state also covers a clean form, so a clean form
             // does not adopt new content on a reload. The draft slice will choose
@@ -199,7 +216,7 @@ export const useFormStore = create<FormStore>()(
             return {
               forms: {
                 ...state.forms,
-                [formId]: { status: 'pristine', values: { ...values } },
+                [formId]: { status: 'pristine', values: { ...values }, equal },
               },
             };
           }, DEVTOOLS_ACTION.register),
@@ -208,16 +225,22 @@ export const useFormStore = create<FormStore>()(
           apply((state) => {
             const scope = state.forms[formId];
             if (!scope) return state;
-            // A write of the current value does nothing, because a controlled input
-            // fires onChange again with the same value. A field must send a new
-            // value, and must not change a value in place. This test drops a value
-            // that was changed in place.
-            if (sameValue(scope.values[address], value)) return state;
+            // A write that the document would not see does nothing, because a
+            // controlled input fires onChange again with the same value, and Plate
+            // rewrites its tree on a click alone. A field must send a new value, and
+            // must not change a value in place. This test drops a value that was
+            // changed in place.
+            if (scope.equal(address, scope.values[address], value))
+              return state;
             // The first edit keeps the pristine values as the baseline.
             return {
               forms: {
                 ...state.forms,
                 [formId]: {
+                  // Spread, so a rebuild carries the `equal` of the form rather
+                  // than relisting it. A rebuild that forgot it would silently
+                  // compare every field of the form as structure.
+                  ...scope,
                   status: 'edited',
                   values: { ...scope.values, [address]: value },
                   baseline: isEdited(scope) ? scope.baseline : scope.values,
@@ -260,8 +283,8 @@ export const useFormStore = create<FormStore>()(
               forms: {
                 ...state.forms,
                 [formId]: {
+                  ...scope,
                   status: 'edited',
-                  values: scope.values,
                   baseline: savedValues ?? scope.values,
                   // A save changes no values, so it changes no errors.
                   errors: isEdited(scope) ? scope.errors : {},
@@ -269,6 +292,24 @@ export const useFormStore = create<FormStore>()(
               },
             };
           }, DEVTOOLS_ACTION.markSaved),
+
+        discardEdits: (formId) =>
+          apply((state) => {
+            const scope = state.forms[formId];
+            // A form with no edits has nothing to discard. That covers a pristine
+            // form, and a form that is not open at all.
+            if (!isEdited(scope)) return state;
+            return {
+              forms: {
+                ...state.forms,
+                [formId]: {
+                  status: 'pristine',
+                  values: scope.baseline,
+                  equal: scope.equal,
+                },
+              },
+            };
+          }, DEVTOOLS_ACTION.discardEdits),
 
         removeForm: (formId) =>
           apply((state) => {
@@ -285,6 +326,13 @@ export const useFormStore = create<FormStore>()(
   )
 );
 
+// A read of the store that does not subscribe, for the places that need the current
+// state and not a render on every change. Callers use this rather than
+// useFormStore.getState() when the read happens during a render: the hook is a value
+// there and not a call, which breaks the rules of React and makes the React Compiler
+// skip the whole component. At module scope it is a plain read.
+export const readFormStore = (): FormStore => useFormStore.getState();
+
 export const useFormStatus = (formId: FormId): FormStatus =>
   useFormStore((state) => formStatus(state.forms[formId]));
 
@@ -299,7 +347,8 @@ export const useIsFieldDirty = (
 // The live values of any open form, mounted or not. The chrome, the collection views,
 // and the panels read the mirror. They do not touch the RHF instance of the form. The
 // selector returns a stable reference to the values. The memo then gives the caller a
-// stable document for each real change.
+// stable document for each real change. This package ships its source, so a consumer
+// that holds the document in a dependency list sees this hook as written.
 export const useFormValues = (formId: FormId): TinaDocument | undefined => {
   const values = useFormStore((state) => state.forms[formId]?.values);
   return useMemo(() => (values ? toDocument(values) : undefined), [values]);

@@ -22,7 +22,8 @@ export interface FieldMetadata {
 // What the transform of a field knows about its document, beyond its own schema node.
 // The `documentPath` is the file that the value came from, and that it returns to. The
 // extension of that file names the storage format, which lets a collection hold more
-// than one format. The rich-text field selects its codec from it. Refer to mdx-codec.ts.
+// than one format. The rich-text field selects its codec from it. Refer to
+// rich-text-codecs.ts.
 // The path is absent when a transform runs outside a document, such as in a unit test.
 // The media paths will also read this when the media capability arrives.
 export interface FieldTransformContext {
@@ -56,4 +57,14 @@ export interface FieldDescriptor<TValue = unknown, TStored = unknown> {
     node: FieldSchema,
     context: FieldTransformContext
   ) => TStored;
+  // Whether two editor values would write the same thing to the document. The form store
+  // asks this to tell a real edit from a value that only looks new. A field whose value
+  // is the value the document holds needs no answer here, because the store compares
+  // those as structure. Refer to core/form/compare.ts for the case that does.
+  isEqual?: (
+    a: TValue,
+    b: TValue,
+    node: FieldSchema,
+    context: FieldTransformContext
+  ) => boolean;
 }

@@ -9,9 +9,10 @@ import {
   useIsFormDirty,
 } from './form-store';
 
-// The exported hooks are the store's public surface (re-exported from editor/index.ts).
-// The getState() tests prove the reducer logic; these prove the Zustand selector actually
-// subscribes and re-renders a consumer when the form's status changes.
+// The exported hooks are the public surface of the store, and editor/index.ts re-exports
+// them. The getState() tests cover the reducer logic. These tests prove that the Zustand
+// selector subscribes, and that a consumer renders again when the status of the form
+// changes.
 const title = toFieldAddress('title');
 const postA = toFormId('posts/a.mdx');
 
