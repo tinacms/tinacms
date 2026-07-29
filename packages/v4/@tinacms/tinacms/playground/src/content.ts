@@ -1,8 +1,8 @@
 import type { TinaDocument } from '@tinacms/tinacms';
 
-// Static seed for /preview.html opened standalone. `satisfies`, not an
-// annotation: useTina is generic, so keeping the literal shape lets the preview
-// read `body` as the mdx AST instead of casting it back out of `unknown`.
+// The static seed for /preview.html, when a browser opens that page by itself. This uses
+// `satisfies`, and not a type annotation. useTina is generic, so the literal shape lets
+// the preview read `body` as the MDX tree, and not cast it out of `unknown`.
 export const sampleDocument = {
   title: 'Hello World',
   featured: false,

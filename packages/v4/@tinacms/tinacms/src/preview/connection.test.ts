@@ -2,8 +2,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { type PreviewConnection, connectToEditor } from './connection';
 import { activateMessage, readyMessage, valuesMessage } from './protocol';
 
-// happy-dom's MessageEvent constructor doesn't reliably carry origin/source, so
-// force them on — every test needs both for the guards under test.
+// The MessageEvent constructor of happy-dom does not always carry the origin and the
+// source, so this sets them. Every test needs both for the guards under test.
 const messageEvent = (data: unknown, origin: string, source: unknown) => {
   const event = new MessageEvent('message', { data });
   Object.defineProperty(event, 'origin', { value: origin });
@@ -84,7 +84,8 @@ describe('connectToEditor', () => {
     const child = document.createElement('span');
     marked.appendChild(child);
     document.body.appendChild(marked);
-    // Clicks bubble up from descendants of the marked element too (closest).
+    // A click also bubbles up from a child of the marked element, which closest()
+    // finds.
     child.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(editor.postMessage).toHaveBeenCalledWith(
       activateMessage('title'),
@@ -134,7 +135,7 @@ describe('connectToEditor', () => {
       readyMessage(),
       editorOrigin
     );
-    // The preview's own origin is no longer the allowed one.
+    // The origin of the preview is no longer the allowed origin.
     window.dispatchEvent(
       messageEvent(valuesMessage({ title: 'own' }), window.origin, editor)
     );

@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useRef, useSyncExternalStore } from 'react';
 import type { TinaDocument } from '../../core/schema/types';
-import { connectToEditor } from '../../preview/connection';
+import { type PreviewStore, createPreviewStore } from '../../preview/store';
 
 export interface UseTinaOptions<T extends TinaDocument> {
   // The document as the site rendered it, in the SSR or the static build. This is the
@@ -17,11 +17,11 @@ export interface UseTinaResult<T extends TinaDocument> {
   isEditing: boolean;
 }
 
-// The site-side hook for visual editing (the v4 part of #6944). On a page by itself, it
-// does nothing. It adds no listener, it sends no ready message, and the props pass
-// through. Inside the editor iframe, it announces that it is ready, adopts every
-// document that arrives, and sends a click on a tinaField element up as an activate
-// message.
+// The site-side hook for visual editing (the v4 part of #6944), and the React binding of
+// ../../preview/store. The store holds what is true of every framework — that a page
+// outside the editor connects to nothing, that the editor's document supersedes the one
+// the site rendered — and this file holds the one thing that is React's: reading a
+// subscribe/getSnapshot pair, which useSyncExternalStore takes as it stands.
 //
 // There is one document for each connection. The tina:values message carries no document
 // identity, as the protocol header states, so every useTina on the page adopts the same
@@ -31,20 +31,31 @@ export function useTina<T extends TinaDocument = TinaDocument>({
   data,
   allowedOrigin,
 }: UseTinaOptions<T>): UseTinaResult<T> {
-  const [streamed, setStreamed] = useState<T | null>(null);
+  const store = usePreviewStore(allowedOrigin);
+  const streamed = useSyncExternalStore(
+    store.subscribe,
+    store.getSnapshot,
+    store.getServerSnapshot
+  );
 
-  useEffect(() => {
-    if (window.parent === window) return;
-    const connection = connectToEditor({
-      previewWindow: window,
-      editorWindow: window.parent,
-      allowedOrigin: allowedOrigin ?? window.origin,
-      // The wire carries the document in the shape that the caller asserted for
-      // `data`. This is a cast at a serialization boundary.
-      onValues: (values) => setStreamed(values as T),
-    });
-    return () => connection.disconnect();
-  }, [allowedOrigin]);
+  // The wire carries the document in the shape that the caller asserted for `data`. This
+  // is a cast at a serialization boundary.
+  return { data: (streamed as T | null) ?? data, isEditing: streamed !== null };
+}
 
-  return { data: streamed ?? data, isEditing: streamed !== null };
+// One store for the life of the hook, rebuilt only when the origin it connects to
+// changes. Not useMemo: React may discard a memo, and discarding this one would drop the
+// document the editor has already streamed.
+function usePreviewStore(allowedOrigin: string | undefined): PreviewStore {
+  const heldStore = useRef<{
+    allowedOrigin?: string;
+    store: PreviewStore;
+  }>(null);
+  if (!heldStore.current || heldStore.current.allowedOrigin !== allowedOrigin) {
+    heldStore.current = {
+      allowedOrigin,
+      store: createPreviewStore({ allowedOrigin }),
+    };
+  }
+  return heldStore.current.store;
 }

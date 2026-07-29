@@ -3,9 +3,9 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { readyMessage, valuesMessage } from '../../preview/protocol';
 import { useTina } from './use-tina';
 
-// Embedded-path scaffolding: happy-dom's window.parent === window (the
-// standalone default), so embedding is simulated by swapping window.parent for
-// a fake editor window and restoring it after each test.
+// The scaffolding for the embedded path. In happy-dom, window.parent equals window,
+// which is the standalone default. These tests therefore replace window.parent with a
+// false editor window, and put the original back after each test.
 const realParent = window.parent;
 afterEach(() => {
   Object.defineProperty(window, 'parent', {
@@ -46,7 +46,8 @@ describe('useTina standalone', () => {
     });
     rerender({ data: { title: 'Regenerated' } });
     expect(result.current.data).toEqual({ title: 'Regenerated' });
-    // Inert outside the editor: no message listener, no ready beacon.
+    // Outside the editor it does nothing. It adds no message listener, and it sends
+    // no ready message.
     expect(listenerSpy).not.toHaveBeenCalledWith('message', expect.anything());
     listenerSpy.mockRestore();
   });

@@ -34,8 +34,10 @@ import {
   FormProvider,
   type SaveHandler,
   TinaProvider,
+  useDiscardEdits,
   useFormId,
   useFormSave,
+  useFormSeedKey,
   useFormStatus,
 } from './index';
 
@@ -77,8 +79,25 @@ function SaveProbe() {
   );
 }
 
-// The switcher of the playground. Its FormProvider has a key, so a change of path tears
-// the form down and hosts the other document. The store keeps the edits.
+function DiscardProbe() {
+  const discard = useDiscardEdits();
+  return (
+    <button type='button' onClick={discard}>
+      discard
+    </button>
+  );
+}
+
+// The seed key is what a field hosting its own editor keys on, so a test that reads it
+// is testing that such a field would mount again. No string field needs it.
+function SeedKeyProbe() {
+  return <span data-testid='seed'>{useFormSeedKey()}</span>;
+}
+
+// A host that keys its FormProvider, so a change of path tears the form down and hosts
+// the other document. The store keeps the edits. The admin shell no longer keys its
+// provider — it switches in place, which the unkeyed describe below covers — but a host
+// that remounts is still supported, and ADR-012 must hold for it.
 const host = (path: string, document: TinaDocument, onSave?: SaveHandler) => (
   <TinaProvider
     config={asResolvedConfig({
@@ -96,6 +115,8 @@ const host = (path: string, document: TinaDocument, onSave?: SaveHandler) => (
       <Field address='title' />
       <StatusProbe />
       <SaveProbe />
+      <DiscardProbe />
+      <SeedKeyProbe />
     </FormProvider>
   </TinaProvider>
 );
@@ -396,6 +417,93 @@ describe('useFormValues', () => {
       useFormStore.getState().setFieldValue(formId, title, 'Edited');
     });
     expect(result.current).toEqual({ title: 'Edited' });
+  });
+});
+
+// Discarding an edit has to move three things at once: the store, RHF, and any editor
+// that owns its state. The last of those cannot be reset in place, so it keys on the seed
+// and mounts again. A string field needs none of that, so these tests read the seed key
+// directly — the rich-text e2e is what proves an editor follows it.
+describe('discarding edits', () => {
+  it('puts RHF and the store back on the loaded content, under a new seed', async () => {
+    render(host(pathA, { title: 'Hello' }));
+    const input = await screen.findByLabelText('title');
+    await userEvent.type(input, '!');
+    expect(screen.getByTestId('status')).toHaveTextContent('dirty');
+    const seed = screen.getByTestId('seed').textContent;
+
+    await userEvent.click(screen.getByText('discard'));
+
+    await waitFor(() => expect(input).toHaveValue('Hello'));
+    // Pristine, and not clean: a discarded form is the form a fresh load would give.
+    expect(screen.getByTestId('status')).toHaveTextContent('pristine');
+    expect(screen.getByTestId('seed').textContent).not.toBe(seed);
+  });
+
+  it('returns a saved form to what was saved, and not to what was loaded', async () => {
+    render(host(pathA, { title: 'Hello' }, () => {}));
+    const input = await screen.findByLabelText('title');
+    await userEvent.type(input, ' one');
+    await userEvent.click(screen.getByText('save'));
+    await waitFor(() =>
+      expect(screen.getByTestId('status')).toHaveTextContent('clean')
+    );
+
+    await userEvent.type(input, ' two');
+    await userEvent.click(screen.getByText('discard'));
+    await waitFor(() => expect(input).toHaveValue('Hello one'));
+    expect(screen.getByTestId('status')).toHaveTextContent('pristine');
+  });
+
+  it('takes the validation errors of the discarded edits with them', async () => {
+    render(host(pathA, { title: 'Hello' }));
+    const input = await screen.findByLabelText('title');
+    await userEvent.clear(input);
+    await userEvent.type(input, 'x');
+    await screen.findByText('Title must be at least 3 characters');
+
+    await userEvent.click(screen.getByText('discard'));
+    await waitFor(() => expect(input).toHaveValue('Hello'));
+    expect(
+      screen.queryByText('Title must be at least 3 characters')
+    ).toBeNull();
+    expect(errorsOf(useFormStore.getState().forms, toFormId(pathA))).toBe(
+      undefined
+    );
+  });
+
+  it('does nothing to a form with no edits, and reseeds no editor', async () => {
+    render(host(pathA, { title: 'Hello' }));
+    const input = await screen.findByLabelText('title');
+    const seed = screen.getByTestId('seed').textContent;
+
+    await userEvent.click(screen.getByText('discard'));
+
+    expect(input).toHaveValue('Hello');
+    expect(screen.getByTestId('status')).toHaveTextContent('pristine');
+    expect(screen.getByTestId('seed').textContent).toBe(seed);
+  });
+
+  it('keeps the discarded form out of the way of another open form', async () => {
+    const { rerender } = render(host(pathA, { title: 'Doc A' }));
+    await userEvent.type(await screen.findByLabelText('title'), ' edited');
+
+    rerender(host(pathB, { title: 'Doc B' }));
+    await waitFor(() =>
+      expect(screen.getByLabelText('title')).toHaveValue('Doc B')
+    );
+    await userEvent.type(screen.getByLabelText('title'), ' edited');
+    await userEvent.click(screen.getByText('discard'));
+    await waitFor(() =>
+      expect(screen.getByLabelText('title')).toHaveValue('Doc B')
+    );
+
+    // A's edits are its own. Discarding B did not touch them.
+    rerender(host(pathA, { title: 'Doc A' }));
+    await waitFor(() =>
+      expect(screen.getByLabelText('title')).toHaveValue('Doc A edited')
+    );
+    expect(screen.getByTestId('status')).toHaveTextContent('dirty');
   });
 });
 

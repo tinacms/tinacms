@@ -7,7 +7,7 @@ import {
   isReadyMessage,
   valuesMessage,
 } from '../preview/protocol';
-import { useActiveField, useFormId } from './hooks';
+import { useFormId } from './hooks';
 
 export interface PreviewConnectionOptions {
   // The origin of the preview iframe. It defaults to the origin of the editor. A
@@ -31,7 +31,6 @@ export function usePreviewConnection(
   options?: PreviewConnectionOptions
 ): void {
   const formId = useFormId();
-  const { setActive } = useActiveField();
   const targetOrigin = options?.targetOrigin ?? window.origin;
   // This check runs at construction. A '*' origin would stream the values of the
   // document to any window that embeds the editor.
@@ -56,7 +55,12 @@ export function usePreviewConnection(
         const scope = useFormStore.getState().forms[formId];
         if (scope) postValues(scope.values);
       } else if (isActivateMessage(event.data)) {
-        setActive(toFieldAddress(event.data.address));
+        // The store directly, and not useActiveField. This hook writes the active
+        // field and never reads it, so subscribing would re-render the pane that
+        // holds the iframe on every activation for a value it does not use.
+        useFormStore
+          .getState()
+          .setActive(formId, toFieldAddress(event.data.address));
       }
     };
     window.addEventListener('message', onMessage);
@@ -75,5 +79,5 @@ export function usePreviewConnection(
       window.removeEventListener('message', onMessage);
       unsubscribe();
     };
-  }, [iframeRef, formId, setActive, targetOrigin]);
+  }, [iframeRef, formId, targetOrigin]);
 }

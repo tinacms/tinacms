@@ -264,7 +264,16 @@ describe('usePreviewConnection', () => {
     // A FormScopeContext alone is enough. The invariant throws in the body of the
     // hook, before an effect needs the runtime.
     const wrapper = ({ children }: { children: ReactNode }) => (
-      <FormScopeContext value={{ formId, path, collection, onSave: null }}>
+      <FormScopeContext
+        value={{
+          formId,
+          path,
+          collection,
+          onSave: null,
+          seedKey: path,
+          discardEdits: () => {},
+        }}
+      >
         {children}
       </FormScopeContext>
     );
