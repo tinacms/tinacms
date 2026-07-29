@@ -10,22 +10,22 @@ import {
 import { useActiveField, useFormId } from './hooks';
 
 export interface PreviewConnectionOptions {
-  // The preview iframe's origin. Defaults to the editor's own origin;
-  // cross-origin embedding is an explicit opt-in, never '*'.
+  // The origin of the preview iframe. It defaults to the origin of the editor. A
+  // cross-origin embed is an explicit choice, and is never '*'.
   targetOrigin?: string;
 }
 
-// The editor half of visual editing (the v4 slice of #6944): stream the hosted
-// form's values into the preview iframe and set preview clicks active. The
-// form-store — not RHF — is the wire source: the scope's `values` object is
-// replaced immutably on every registerForm/setFieldValue and preserved by
-// markSaved/setActive, so a reference compare posts exactly on value changes
-// (registration included, which also covers a ready arriving before the form
-// exists). Values messages are idempotent full-state, so there is no send
-// queue — every ready is answered with the current values (covers an iframe
-// reload), and connecting posts the current scope outright (covers switching
-// to an already-edited form, whose re-registration is a store no-op). Must sit
-// under FormProvider (useFormId's invariant says so otherwise).
+// The editor half of visual editing (the v4 part of #6944). It streams the values of
+// the hosted form into the preview iframe, and it activates the field that a preview
+// click names. The form store is the source for the wire, and RHF is not. The store
+// replaces the `values` object at each registerForm and setFieldValue, and keeps it at
+// each markSaved and setActive. A reference compare therefore posts on a value change
+// alone. That includes the registration, which also covers a ready message that arrives
+// before the form exists. A values message carries the whole state, so a second message
+// does no harm and there is no send queue. Every ready message gets the current values,
+// which covers a reload of the iframe. A new connection posts the current scope, which
+// covers a move to a form that was already edited. This hook must sit under a
+// FormProvider, and the invariant in useFormId reports it otherwise.
 export function usePreviewConnection(
   iframeRef: RefObject<HTMLIFrameElement | null>,
   options?: PreviewConnectionOptions
@@ -33,8 +33,8 @@ export function usePreviewConnection(
   const formId = useFormId();
   const { setActive } = useActiveField();
   const targetOrigin = options?.targetOrigin ?? window.origin;
-  // Enforced at construction, not by documentation: '*' would stream the
-  // document's values to whatever window embedded the editor.
+  // This check runs at construction. A '*' origin would stream the values of the
+  // document to any window that embeds the editor.
   invariant(
     targetOrigin !== '*',
     'preview-target-origin-wildcard',
@@ -47,8 +47,8 @@ export function usePreviewConnection(
       target()?.postMessage(valuesMessage(toDocument(values)), targetOrigin);
 
     const onMessage = (event: MessageEvent) => {
-      // The null check matters: with no iframe mounted, target() === null would
-      // otherwise equal a stray same-origin message's null source.
+      // The null check is necessary. With no iframe mounted, target() returns null,
+      // which would equal the null source of a stray message from the same origin.
       const source = target();
       if (!source || event.origin !== targetOrigin || event.source !== source)
         return;

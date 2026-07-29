@@ -18,9 +18,9 @@ export const buildFormResolver =
         errors[node.name] = toFieldErrorEntry(fieldErrors);
       }
     }
-    // RHF's resolver contract: return { values, errors }. On failure, errors holds
-    // the field errors and values is {}; on success, errors is {} and values passes
-    // through — hence the two shapes.
+    // The resolver contract of RHF returns { values, errors }. After a failure,
+    // errors holds the field errors and values is empty. After a success, errors is
+    // empty and the values pass through.
     return Object.keys(errors).length > 0
       ? { values: {}, errors }
       : { values, errors: {} };

@@ -1,28 +1,29 @@
 import type { TinaDocument } from '../schema/types';
 
-// A document paired with its identity — the path IS the id (ADR-017); paths are
-// project-root-relative ('content/posts/hello.mdx').
+// A document with its identity. The path is the id (ADR-017). A path is relative to the
+// project root, for example 'content/posts/hello.mdx'.
 export interface DocumentEntry {
   path: string;
   document: TinaDocument;
 }
 
-// The abstract level of the `content` capability (ADR-019): the operation set every
-// Data Layer implements — Local (fs, this package), TinaCloud, self-hosted, or a
-// v3-compat provider translating these ops onto the v3 GraphQL client. The client
-// side talks only to this interface, so swapping providers never touches the editor.
+// The abstract level of the `content` capability (ADR-019). Every data layer implements
+// this set of operations. The layers are the local one in this package, TinaCloud, the
+// self-hosted one, and a v3 provider that maps these operations onto the v3 GraphQL
+// client. The client talks to this interface only, so a change of provider does not
+// touch the editor.
 //
-// Deliberately the slice-sized subset: get/list/update (the save, ADR-018). Absent
-// until a consumer exists: create/delete/rename, cursor pagination, filter/sort on
-// indexed fields, system metadata, and the GraphQL wire format + generated typed
-// client (lands with codegen, ADR-019 §2).
+// The set holds get, list, and update, which is the save (ADR-018). These operations
+// wait for a consumer: create, delete, rename, cursor pagination, filter and sort on
+// indexed fields, and the system metadata. The GraphQL wire format and the generated
+// typed client also wait. They arrive with codegen (ADR-019 §2).
 export interface ContentProvider {
   get(collection: string, path: string): Promise<DocumentEntry | null>;
   list(collection: string): Promise<DocumentEntry[]>;
-  // The save: writes the JSON content value. Also writes when the file is missing —
-  // a document deleted out-of-band must not swallow the editor's pending save
-  // (never lose the edit, ADR-018). Returns what was persisted, which may carry
-  // more than `value` (unknown fields merged from the stored document).
+  // The save. It writes the JSON content value. It also writes when the file is
+  // absent, because a document that another program deleted must not lose the save of
+  // the editor (ADR-018). It returns the stored result, which can hold more than
+  // `value`. The unknown fields of the stored document merge into it.
   update(
     collection: string,
     path: string,
@@ -30,21 +31,20 @@ export interface ContentProvider {
   ): Promise<DocumentEntry>;
 }
 
-// What `get().content` holds: the ContentProvider ops (above) plus the
-// list cache collection views render from, keyed by collection name.
-// saveDocument's rejection propagates so useFormSave leaves the form dirty
-// (context.ts SaveHandler contract).
-export interface ContentSlice {
-  documents: Record<string, DocumentEntry[]>;
-  loadDocuments(collection: string): Promise<DocumentEntry[]>;
-  getDocument(collection: string, path: string): Promise<DocumentEntry | null>;
-  saveDocument(
-    collection: string,
-    path: string,
-    value: TinaDocument
-  ): Promise<DocumentEntry>;
-}
+// The contents of `get().content`. It is the ContentProvider above, and nothing more.
+//
+// It holds no cache. A data layer is a transport, and the caching policy — deduplicating
+// concurrent reads, deciding when a read went stale, retrying a failed one — belongs to
+// the one consumer that renders it. That consumer is the admin, and it uses React Query
+// (content-queries.ts). An earlier version of this interface carried a
+// `documents: Record<collection, DocumentEntry[]>` cache with its own load and save
+// operations, which meant every data layer author re-implemented a fraction of a query
+// client, each one differently.
+//
+// A rejection from `update` passes to the caller, so useFormSave leaves the form dirty.
+// Refer to SaveHandler in context.ts.
+export type ContentSlice = ContentProvider;
 
-// Where the content capability's wire endpoint mounts by default — shared by
-// the client slice and whatever dev server hosts the data layer.
+// The default mount path of the wire endpoint for the content capability. The client
+// slice and the dev server that hosts the data layer both use it.
 export const DEFAULT_CONTENT_URL = '/api/tina/content';

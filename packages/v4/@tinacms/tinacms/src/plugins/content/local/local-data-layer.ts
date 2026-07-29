@@ -1,7 +1,8 @@
-// Node-only — the Local Data Layer (ADR-018 §3): an fs-backed ContentProvider.
-// A save writes the file and leaves it uncommitted; Tina runs no git locally.
-// Hosted by whatever dev server is around (the playground mounts it as a Vite
-// middleware; the CLI will mount the same handler).
+// The local data layer (ADR-018 §3). It runs in Node only, and it is a
+// ContentProvider that reads and writes files. A save writes the file and does not
+// commit it, because Tina runs no git commands locally. The dev server that is
+// available hosts it. The playground mounts it as a Vite middleware, and the CLI
+// mounts the same handler.
 
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
@@ -24,38 +25,39 @@ import {
   createGraphQLPipeline,
 } from './graphql-pipeline';
 
-// The wire dispatch a host (express, a Next route) pairs with createLocalDataLayer.
+// The wire dispatch that a host pairs with createLocalDataLayer. A host is an express
+// server, or a Next.js route.
 export {
   type ContentRequest,
   dispatchContentRequest,
 } from './content-request';
 
 export interface LocalDataLayerOptions {
-  // The project root document paths are relative to; collection `path`s resolve
-  // against it.
+  // The project root. The document paths and the collection paths are relative to it.
   rootDir: string;
   collections: CollectionSchema[];
-  // Per-format adapter overrides, merged over the built-ins (format-adapters.ts).
+  // The adapter overrides for each format. They merge over the built-in adapters in
+  // format-adapters.ts.
   formatAdapters?: Partial<Record<CollectionFormat, FormatAdapter>>;
 }
 
-// ContentProvider plus the v3 GraphQL read surface (graphql-pipeline.ts) —
-// serving the website render path the same queries v3 served.
+// A ContentProvider with the v3 GraphQL read interface from graphql-pipeline.ts. It
+// serves the website the same queries that v3 served.
 export interface LocalDataLayer extends ContentProvider {
   graphql(query: string, variables?: GraphQLVariables): Promise<GraphQLResult>;
 }
 
 interface ResolvedCollection {
   schema: CollectionSchema;
-  // One per declared format, in schema order (format-adapters.ts). A file's own
-  // extension picks which one reads and writes it, so a collection can hold .mdx
-  // and .json documents side by side.
+  // One adapter for each declared format, in schema order. Refer to
+  // format-adapters.ts. The extension of a file selects the adapter that reads and
+  // writes it, so a collection can hold .mdx and .json documents together.
   adapters: FormatAdapter[];
   absoluteFolder: string;
-  // The `isBody` field name, if the collection declares one — the field that owns
-  // the markdown body (format-adapters.ts). One body per file, so one field.
-  // A format with no body concept (json) ignores it and stores the field inline,
-  // which is the honest reading: that document has no body to route it to.
+  // The name of the `isBody` field, if the collection declares one. That field holds
+  // the markdown body. Refer to format-adapters.ts. A file has one body, so a
+  // collection has one such field. A format with no body, such as JSON, ignores this
+  // name and stores the field with the other values.
   bodyField?: string;
 }
 
@@ -71,13 +73,14 @@ const resolveCollections = ({
       'content-collection-no-path',
       `Collection "${schema.name}" has no \`path\` — the local data layer needs one to locate its files.`
     );
-    // A file has one body, so two `isBody` fields is a schema mistake with no
-    // sensible resolution — picking one silently would route the other into the
-    // frontmatter. Failing at construction (like the missing-path check above)
-    // surfaces it on boot rather than on someone's first save.
-    // TODO: this is schema validation living in the fs provider because the fs
-    // provider is currently the first thing that reads a collection. Move it to
-    // defineConfig (ADR-024) once that lands, so every provider inherits it.
+    // A file has one body, so two `isBody` fields are a schema error. There is no
+    // correct way to resolve them. A silent choice of one field would write the
+    // other one into the frontmatter. This check runs at construction, like the
+    // check for a missing path above, so the error appears at boot and not at the
+    // first save.
+    // TODO: this schema validation sits in the file provider, because that provider
+    // is the first code that reads a collection. Move it to defineConfig (ADR-024),
+    // so that every provider gets it.
     const bodyFields = schema.fields.filter((field) => field.isBody);
     invariant(
       bodyFields.length <= 1,
@@ -103,9 +106,9 @@ export const createLocalDataLayer = (
   const rootDir = path.resolve(options.rootDir);
   const collections = resolveCollections(options);
 
-  // The v3 pipeline indexes every file at first use, so it boots lazily — a
-  // session that never queries GraphQL never pays for it. Files stay the source
-  // of truth: saves land on disk first, then refresh the index.
+  // The v3 pipeline indexes every file at its first use, so it boots late. A session
+  // that runs no GraphQL query does not pay that cost. The files stay the source of
+  // truth. A save writes to disk first, and then refreshes the index.
   let pipeline: Promise<GraphQLPipeline> | undefined;
   const graphQLPipeline = () => {
     if (!pipeline) {
@@ -113,7 +116,7 @@ export const createLocalDataLayer = (
         rootDir,
         collections: options.collections,
       }).catch((cause) => {
-        // A failed boot must not be memoized forever — the next call retries.
+        // Do not keep a failed boot. The next call tries again.
         pipeline = undefined;
         throw cause;
       });
@@ -131,10 +134,10 @@ export const createLocalDataLayer = (
     return collection;
   };
 
-  // Document paths come from the client — resolve and pin them inside the
-  // collection's folder before any fs call (trust boundary). The extension check
-  // and the adapter lookup are one question ("does this collection read this
-  // file, and with what?"), so they are answered together.
+  // The document paths come from the client, so this is a trust boundary. Resolve
+  // each path, and keep it inside the folder of the collection, before any file call.
+  // The extension check and the adapter lookup answer one question, so they run
+  // together.
   const resolveDocumentPath = (
     collection: ResolvedCollection,
     documentPath: string
@@ -157,9 +160,9 @@ export const createLocalDataLayer = (
     return { absolute, adapter };
   };
 
-  // The document id is the root-relative posix path (ADR-017) — derived from the
-  // resolved absolute so a non-canonical client path (…/nested/../x.mdx) can't
-  // leak into the index or the echoed entry.
+  // The document id is the posix path from the root (ADR-017). It comes from the
+  // resolved absolute path, so a client path such as …/nested/../x.mdx cannot reach
+  // the index or the returned entry.
   const documentIdFor = (absolute: string): string =>
     path.relative(rootDir, absolute).split(path.sep).join('/');
 
@@ -191,14 +194,13 @@ export const createLocalDataLayer = (
           recursive: true,
         });
       } catch (cause) {
-        // A not-yet-created collection folder is an empty collection.
+        // A collection folder that does not exist yet is an empty collection.
         if (isMissingFileError(cause)) return [];
         throw cause;
       }
       const entries: DocumentEntry[] = [];
       for (const name of names.sort()) {
-        // No adapter owns this extension, so the collection doesn't claim the
-        // file — the mixed-format equivalent of the old single-extension skip.
+        // No adapter owns this extension, so the collection does not claim the file.
         const adapter = adapterForPath(collection.adapters, name);
         if (!adapter) continue;
         const absolute = path.join(collection.absoluteFolder, name);
@@ -209,8 +211,7 @@ export const createLocalDataLayer = (
             document: adapter.parse(raw, collection.bodyField),
           });
         } catch (cause) {
-          // One malformed or unreadable file must not take down the whole
-          // collection.
+          // One damaged or unreadable file must not stop the whole collection.
           console.warn(`Skipping unreadable document "${absolute}":`, cause);
         }
       }
@@ -224,32 +225,32 @@ export const createLocalDataLayer = (
         documentPath
       );
       const canonicalPath = documentIdFor(absolute);
-      // Merge over the file's current contents so unknown fields and the body
-      // survive (format-adapters.ts); a missing file is written fresh — never
-      // lose the edit (ADR-018).
+      // Merge over the current contents of the file, so the unknown fields and the
+      // body stay. Refer to format-adapters.ts. If the file does not exist, write a
+      // new one. Never lose the edit (ADR-018).
       let previousRaw: string | undefined;
       try {
         previousRaw = await fs.readFile(absolute, 'utf8');
       } catch (cause) {
         if (!isMissingFileError(cause)) throw cause;
       }
-      // The adapter routes an isBody field to the markdown body rather than the
-      // YAML merge; omitting it from the save leaves the existing body alone.
+      // The adapter writes an isBody field to the markdown body, and not to the
+      // YAML. A save that omits that field leaves the body as it is.
       const raw = adapter.serialize(value, previousRaw, collection.bodyField);
-      // The parent folder may have been deleted out-of-band — same promise.
+      // Another program can delete the parent folder, so make it again.
       await fs.mkdir(path.dirname(absolute), { recursive: true });
       await fs.writeFile(absolute, raw);
-      // Keep the GraphQL index in step with the save — only once it exists;
-      // a not-yet-booted pipeline indexes everything fresh on first query.
-      // Deliberately no fs watcher: out-of-band edits go stale until the
-      // next save; add chokidar when that bites.
+      // Keep the GraphQL index in step with the save, but only after the index
+      // exists. A pipeline that has not booted indexes every file at its first
+      // query. There is no file watcher. An edit from another program stays stale
+      // until the next save.
       if (pipeline) {
         const readyPipeline = await pipeline;
         try {
           await readyPipeline.reindexPaths([canonicalPath]);
         } catch (cause) {
-          // The file is already written — a reindex failure must not fail the
-          // save; the index self-heals on the next successful reindex/boot.
+          // The file is written, so a failed reindex must not fail the save. The
+          // next reindex or boot repairs the index.
           console.warn(`Reindex failed for "${canonicalPath}":`, cause);
         }
       }

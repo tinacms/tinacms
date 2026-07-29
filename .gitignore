@@ -17,6 +17,9 @@ packages/cli/forestry/.env
 **/.cache/
 **/package-lock.json
 tsconfig.tsbuildinfo
+# Vite writes these while bundling a config and normally removes them; a killed
+# dev server or CLI run leaves them behind.
+*.timestamp-*.mjs
 
 .npmrc
 

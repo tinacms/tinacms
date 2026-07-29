@@ -1,4 +1,4 @@
-// Owns the open document's form scope, and sits ABOVE the whole layout rather than
+// This owns the form scope of the open document. It sits above the whole layout, and not
 // around the field list.
 //
 // The preview is the reason. It streams the open form's values across the iframe
@@ -10,7 +10,10 @@
 import { type ReactNode, useEffect, useRef } from 'react';
 import type { DocumentEntry } from '../core/content/contract';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
-import { useCollectionDocuments, useContentSlice } from '../editor/hooks';
+import {
+  useCollectionDocuments,
+  useSaveDocument,
+} from '../editor/content-queries';
 import { FormProvider } from '../editor/provider';
 
 export interface DocumentScopeProps {
@@ -62,21 +65,28 @@ export function DocumentScope({
   // Switching documents remounts on the `key` below, so the pin never goes stale.
   const entry = useMemo(() => cached, [cached?.path]);
 
-  // The persisted entry is dropped on purpose — saveDocument feeds it back into the
-  // slice's list cache, so it arrives here through the same read as everything else
-  // rather than as a second seed racing it.
-  const save = async (value: TinaDocument) => {
-    await content.saveDocument(collection.name, path, value);
-  };
+  // Nothing open: no form scope to provide, so the panes render without one and read
+  // that absence through FormScopeContext.
+  if (!(collection && path)) return children;
 
-  // Still loading, or a path that is not in the collection: the layout renders either
-  // way, minus the parts that need a form.
+  // Wait for the document. Mounting the provider without one seeds the form empty, and
+  // Plate reads its value at mount only — so the editor stayed blank once the entry
+  // arrived. The panes below therefore mount once, with a value.
+  //
+  // This is the swap the shell used to do around the whole layout. Here it is confined
+  // to the two panes that hold the document, which are created with it in any case; the
+  // sidebar sits above this and keeps its state.
   if (!entry) return children;
 
   return (
-    // Keyed on the path: switching documents tears the scope down and hosts the other
-    // one. The store keeps the outgoing form's unsaved edits (ADR-012), so switching
-    // away and back returns to them rather than to the file.
+    // Keyed on the path, and it has to be. FormProvider does re-seed when its formId
+    // changes, but the reset lands in an effect — after the children have rendered — so
+    // Plate, which reads its value at mount only, keeps the previous document's prose.
+    // A fresh RHF instance means the fields mount with the right values to begin with.
+    //
+    // The cost is that these children remount per document, so the preview iframe
+    // reloads on a switch. That is why this scope wraps the two panes and not the whole
+    // shell: the sidebar and its document list sit above it and survive.
     <FormProvider
       key={path}
       collection={collection}

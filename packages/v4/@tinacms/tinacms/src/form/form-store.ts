@@ -6,27 +6,22 @@ import { type FieldAddress, toFieldAddress } from '../core/field/address';
 import { invariant } from '../core/invariant';
 import type { TinaDocument } from '../core/schema/types';
 
-// The Form state store (ADR-010, issue #6909). One trustworthy source of truth for
-// whether an open document's form is pristine, dirty, or clean — read by save
-// controls, navigation warnings and editor-state indicators instead of each view
-// inferring it from its own local copy.
+// The form state store (ADR-010, issue #6909). It holds the status of each open
+// document: pristine, dirty, or clean. Save controls, navigation warnings, and the
+// editor indicators all read the status from here.
 //
-// Shape: a flat `address -> value` map per open document (keyed by `formId`); once
-// edited, the values are diffed against the baseline they were loaded/last-saved from.
-// Pristine is "never edited since load". Multiple forms coexist without overwriting
-// each other's state — each is keyed by its own formId (e.g. once a reference field can
-// host a second document's form inline; that field type isn't built yet).
+// Each open form keeps a flat map of values, keyed by its form id. After the first
+// edit, the store compares those values with a baseline. The baseline is the content
+// the form loaded, or the content it last saved. Open forms do not overwrite each
+// other, because each one has its own form id.
 //
-// Scope (ponytail): RHF owns and renders field values and derives errors inside an
-// open form; this store carries the one-way mirror of both (the provider is the sole
-// writer) plus the status/active state it owns outright. The mirror is what outlives
-// the form's mount — navigation back re-adopts kept edits — and what everything
-// non-RHF subscribes to: collection-level dirty/error indicators, the preview
-// adapter's wire, any future framework adapter. Structure index (ADR-010) arrives
-// with composite fields.
+// RHF owns the values and the errors inside a mounted form. This store keeps a
+// one-way mirror of both, and the provider is the only writer. The mirror outlives
+// the mount, so a return to the form keeps the unsaved edits. Everything outside RHF
+// reads the mirror. The structure index (ADR-010) arrives with the composite fields.
 
-// A form is opened per document (ADR-010), so its id is that document's path. Branded
-// like FieldAddress so it can't be confused with a field address or a bare string.
+// There is one form per document (ADR-010), so the form id is the document path. The
+// brand keeps it distinct from a field address and from a plain string.
 export type FormId = Brand<string, 'FormId'>;
 
 export const toFormId = (path: string): FormId => {
@@ -38,12 +33,12 @@ export const toFormId = (path: string): FormId => {
   return path as FormId;
 };
 
-// Keyed by branded FieldAddress so a raw string can't seed or index a form's values.
+// The brand stops a plain string from seeding or indexing the values of a form.
 export type FormValues = Record<FieldAddress, unknown>;
 
-// Brand a flat document's keys as field addresses — the constructor for FormValues.
-// Flat addresses only, the same assumption as the editor's field hooks; nested
-// fields need a path walk here too when composite fields land.
+// The constructor for FormValues. It brands the keys of a flat document as field
+// addresses. It handles flat addresses only, which is what the editor field hooks
+// assume. Composite fields will need a path walk here.
 export const toFormValues = (document: TinaDocument): FormValues => {
   const values: FormValues = {};
   for (const [name, value] of Object.entries(document)) {
@@ -52,23 +47,23 @@ export const toFormValues = (document: TinaDocument): FormValues => {
   return values;
 };
 
-// Inverse of toFormValues — flat addresses are field names today, so the document is
-// a key-for-key copy; a path walk lands here alongside toFormValues when nesting does.
+// The inverse of toFormValues. A flat address is a field name today, so the document
+// is a key-for-key copy.
 export const toDocument = (values: FormValues): TinaDocument => ({ ...values });
 
 export type FormStatus = 'pristine' | 'dirty' | 'clean';
 
-// Sparse per-address validation messages, mirrored one-way from RHF (the owner that
-// derives them). Lives only on the edited scope: a pristine form has never been
-// validated — RHF's onChange mode shows no errors at mount, and the model matches.
+// The validation messages for each address, mirrored from RHF. RHF derives them, and
+// they exist only on an edited form. RHF validates on change, so a pristine form has
+// no errors yet.
 export type FieldErrors = Partial<Record<FieldAddress, string[]>>;
 
-// One open document's form, modelled so illegal states can't be built: a pristine form
-// carries no baseline (its values *are* the baseline), and a baseline exists only once
-// the form has been edited or saved. Dirty vs clean is then derived from
-// values-vs-baseline within the edited state — there is no "pristine with a divergent
-// baseline" to mishandle. (Named OpenForm, not FormScope — that name belongs to the
-// editor's form context value in editor/context.ts; one name per concept.)
+// One open document's form. A pristine form has no baseline, because its values are
+// the baseline. A baseline appears when the form is edited or saved. The store then
+// compares the values with the baseline to tell dirty from clean. This shape makes a
+// pristine form with a different baseline impossible to build.
+// The name is OpenForm, not FormScope. FormScope is the form context of the editor in
+// editor/context.ts.
 type OpenForm =
   | { readonly status: 'pristine'; readonly values: FormValues }
   | {
@@ -78,53 +73,49 @@ type OpenForm =
       readonly errors: FieldErrors;
     };
 
-// The one place the discriminant string is compared — every consumer asks the
-// question, none repeat the literal.
+// The only place that compares the discriminant. Every consumer calls this instead.
 export const isEdited = (
   scope: OpenForm | undefined
 ): scope is Extract<OpenForm, { status: 'edited' }> =>
   scope?.status === 'edited';
 
 export interface FormStore {
-  // Keyed by FormId (one open document per form, ADR-010); a missing key is a form
-  // that isn't open, so a lookup returns `OpenForm | undefined`.
+  // Keyed by form id, so a missing key is a form that is not open.
   forms: Partial<Record<FormId, OpenForm>>;
-  // The single active field across all open forms (ADR-009 visual editing): a
-  // preview click activates exactly one field; the owning field reacts (focus)
-  // via useFieldActivation. Form-scoped rather than per-scope because activation
-  // is orthogonal to dirty state.
+  // The one active field across all open forms (ADR-009, visual editing). A click in
+  // the preview activates a single field, and that field then focuses itself with
+  // useFieldActivation. It sits on the store, not on the form, because activation
+  // does not depend on the dirty state.
   active: { formId: FormId; address: FieldAddress } | null;
-  // Flatten on load: seed a form's values. Re-registering an *edited* form is a no-op so
-  // navigating away and back keeps unsaved edits (ADR-012 teardown); re-registering a
-  // pristine form re-adopts the incoming content, so reloading the same id with changed
-  // content is never stale.
+  // Seed a form with the values it loaded. A second call on an edited form does
+  // nothing, so a return to the form keeps the unsaved edits (ADR-012). A second call
+  // on a pristine form adopts the new content, so a reload is never stale.
   registerForm: (formId: FormId, values: FormValues) => void;
   setFieldValue: (
     formId: FormId,
     address: FieldAddress,
     value: unknown
   ) => void;
-  // The error mirror's single write path: whole-map replace, called by the provider
-  // whenever RHF re-derives. No-op for a pristine scope (never validated) and for an
-  // equal map (RHF churns error-object identity per keystroke).
+  // The only write path for the error mirror. It replaces the whole map. The provider
+  // calls it each time RHF derives the errors again. It does nothing for a pristine
+  // form, and nothing for an equal map.
   setFieldErrors: (formId: FormId, errors: FieldErrors) => void;
   setActive: (formId: FormId, address: FieldAddress | null) => void;
-  // Save success: freeze the baseline at what was actually saved -> status goes
-  // `clean`. The caller passes its pre-save snapshot so edits made while the save
-  // was in flight still diff dirty; omitted, the current values are the baseline.
+  // After a save, move the baseline to the values that were saved. The status becomes
+  // clean. The caller passes the snapshot it saved, so an edit made during the save
+  // stays dirty. Without a snapshot, the current values become the baseline.
   markSaved: (formId: FormId, savedValues?: FormValues) => void;
-  // Explicit close: drop the scope (GC).
+  // Close the form and drop its state.
   removeForm: (formId: FormId) => void;
 }
 
-// RHF's subscription hands over a *clone* of each value while `markSaved`
-// baselines the originals, so reference equality alone leaves any structural
-// value (the rich-text AST) dirty forever. Values are JSON documents, so
-// structural comparison is the honest fallback; a false negative costs an extra
-// dirty read, never a lost edit.
-// TODO: the field descriptor should own this (each type comparing its own value
-// alongside its parse/serialize) rather than the store guessing — that needs the
-// field registry in the store, which it deliberately does not have today.
+// The RHF subscription sends a clone of each value, but markSaved keeps the original
+// as the baseline. A reference test therefore holds a structural value, such as the
+// rich-text tree, dirty for ever. The values are JSON documents, so this compares
+// their structure. A wrong result costs one more dirty read. It never loses an edit.
+// TODO: each field descriptor must compare its own values, next to its parse and
+// serialize functions. That needs the field registry in the store, which the store
+// does not have today.
 const sameValue = (a: unknown, b: unknown): boolean => {
   if (Object.is(a, b)) return true;
   if (typeof a !== 'object' || typeof b !== 'object') return false;
@@ -133,10 +124,10 @@ const sameValue = (a: unknown, b: unknown): boolean => {
 };
 
 const valuesEqual = (current: FormValues, baseline: FormValues): boolean => {
-  // Compared over the union of both key sets so a key holding undefined equals its
-  // absence — JSON can't represent "present but undefined", and controlled inputs
-  // clear to undefined, so the two are one state.
-  // Object.keys erases the brand; these keys came in as FieldAddress.
+  // Compare the union of both key sets, so an undefined value equals an absent key.
+  // JSON cannot hold "present but undefined", and a controlled input clears to
+  // undefined. The two are one state.
+  // Object.keys drops the brand. These keys arrived as field addresses.
   const keys = new Set([
     ...Object.keys(current),
     ...Object.keys(baseline),
@@ -149,8 +140,8 @@ export const formStatus = (scope: OpenForm | undefined): FormStatus => {
   return valuesEqual(scope.values, scope.baseline) ? 'clean' : 'dirty';
 };
 
-// Per-field dirty behind the exported `useIsFieldDirty`; same equality as
-// `valuesEqual`, for the same reason.
+// The dirty test for one field, behind the exported useIsFieldDirty. It compares
+// values like valuesEqual, and for the same reason.
 export const fieldDirty = (
   scope: OpenForm | undefined,
   address: FieldAddress
@@ -159,21 +150,19 @@ export const fieldDirty = (
     ? !sameValue(scope.values[address], scope.baseline[address])
     : false;
 
-// Message arrays are rebuilt by RHF on every derivation; compare content so an
-// unchanged mirror write doesn't churn subscriber identity. JSON is fine here:
-// the maps are string[] leaves, and a key-order false negative just means one
-// harmless extra write.
+// RHF builds new message arrays each time it derives the errors. This compares their
+// content, so an unchanged write does not disturb the subscribers. The maps hold
+// arrays of strings, so JSON is safe here. A different key order costs one more write.
 const errorsEqual = (current: FieldErrors, next: FieldErrors): boolean =>
   JSON.stringify(current) === JSON.stringify(next);
 
-// Middleware composes at create() time (Zustand's contract): here just `devtools`, which
-// streams clean/dirty/pristine transitions to the Redux DevTools extension. It's a no-op
-// when the extension is absent — production and tests — so it adds no runtime behaviour
-// there, only labelled actions in development. No `persist`: form values are volatile,
-// reloaded from the document on boot, never rehydrated from storage.
+// Zustand composes its middleware at create() time. This store uses devtools only,
+// which sends the status changes to the Redux DevTools extension. Without the
+// extension, in production and in the tests, devtools does nothing. The store does
+// not use persist, because it loads the values from the document at each boot.
 //
-// The devtools display names: the store's title and its per-action labels in the Redux
-// DevTools timeline, named once so the call sites can't drift.
+// The names below are the title of the store and its action labels in the DevTools
+// timeline. They are declared once, so the call sites cannot drift.
 const DEVTOOLS_STORE_NAME = 'TinaFormStore';
 const DEVTOOLS_ACTION = {
   register: 'form/register',
@@ -189,9 +178,9 @@ type DevtoolsActionLabel =
 export const useFormStore = create<FormStore>()(
   devtools(
     (set) => {
-      // Apply a labelled state patch. Wraps Zustand's set(partial, replace, action) with
-      // `replace` pinned to false — every form action merges its patch into state, never
-      // replaces the whole store — so the call sites read as intent, not a raw flag.
+      // Apply a labelled patch to the state. It calls the Zustand set(partial,
+      // replace, action) with replace set to false. Every action merges its patch
+      // into the state, and no action replaces the whole store.
       const apply = (
         patch: (state: FormStore) => FormStore | Partial<FormStore>,
         action: DevtoolsActionLabel
@@ -203,9 +192,9 @@ export const useFormStore = create<FormStore>()(
 
         registerForm: (formId, values) =>
           apply((state) => {
-            // TODO(v4): `edited` covers clean (saved) forms too, so a clean form won't
-            // re-adopt externally-changed content on reload; the future auto-save/draft
-            // slice will arbitrate reload-vs-keep against dirty state.
+            // TODO(v4): the edited state also covers a clean form, so a clean form
+            // does not adopt new content on a reload. The draft slice will choose
+            // between the new content and the kept edits.
             if (isEdited(state.forms[formId])) return state;
             return {
               forms: {
@@ -219,12 +208,12 @@ export const useFormStore = create<FormStore>()(
           apply((state) => {
             const scope = state.forms[formId];
             if (!scope) return state;
-            // Re-setting a field to the value it already holds is a no-op — controlled
-            // inputs re-fire onChange with the same value; don't churn state. An
-            // object value mutated in place would read equal here and be dropped;
-            // fields hand over fresh values rather than mutating (see sameValue).
+            // A write of the current value does nothing, because a controlled input
+            // fires onChange again with the same value. A field must send a new
+            // value, and must not change a value in place. This test drops a value
+            // that was changed in place.
             if (sameValue(scope.values[address], value)) return state;
-            // The first edit freezes the pristine values as the baseline to diff against.
+            // The first edit keeps the pristine values as the baseline.
             return {
               forms: {
                 ...state.forms,
@@ -232,8 +221,8 @@ export const useFormStore = create<FormStore>()(
                   status: 'edited',
                   values: { ...scope.values, [address]: value },
                   baseline: isEdited(scope) ? scope.baseline : scope.values,
-                  // Value writes never touch errors — RHF re-derives and the
-                  // mirror (setFieldErrors) follows.
+                  // A value write leaves the errors alone. RHF derives them
+                  // again, and setFieldErrors then updates the mirror.
                   errors: isEdited(scope) ? scope.errors : {},
                 },
               },
@@ -243,12 +232,12 @@ export const useFormStore = create<FormStore>()(
         setFieldErrors: (formId, errors) =>
           apply((state) => {
             const scope = state.forms[formId];
-            // Pristine means never validated — there is nothing to mirror onto
-            // (and RHF's onChange mode derives no errors before the first edit).
+            // A pristine form has no errors to mirror. RHF validates on change, so
+            // it derives no errors before the first edit.
             if (!isEdited(scope)) return state;
             if (errorsEqual(scope.errors, errors)) return state;
-            // values/baseline references are preserved: an error write must not
-            // read as a value change to values subscribers (preview wire, dirty).
+            // Keep the values and the baseline references. An error write must not
+            // look like a value change to the preview wire or to the dirty test.
             return {
               forms: {
                 ...state.forms,
@@ -274,8 +263,7 @@ export const useFormStore = create<FormStore>()(
                   status: 'edited',
                   values: scope.values,
                   baseline: savedValues ?? scope.values,
-                  // A save changes no values, so it changes no errors; the
-                  // mirror overwrites on RHF's next derivation anyway.
+                  // A save changes no values, so it changes no errors.
                   errors: isEdited(scope) ? scope.errors : {},
                 },
               },
@@ -308,10 +296,10 @@ export const useIsFieldDirty = (
   address: FieldAddress
 ): boolean => useFormStore((state) => fieldDirty(state.forms[formId], address));
 
-// Any open form's live values, mounted or not — chrome, collection views and
-// panels read the mirror without touching the hosting form's RHF instance.
-// The selector returns the stable values reference; the document copy is
-// memoized on it so callers get a stable identity per actual change.
+// The live values of any open form, mounted or not. The chrome, the collection views,
+// and the panels read the mirror. They do not touch the RHF instance of the form. The
+// selector returns a stable reference to the values. The memo then gives the caller a
+// stable document for each real change.
 export const useFormValues = (formId: FormId): TinaDocument | undefined => {
   const values = useFormStore((state) => state.forms[formId]?.values);
   return useMemo(() => (values ? toDocument(values) : undefined), [values]);
@@ -319,8 +307,8 @@ export const useFormValues = (formId: FormId): TinaDocument | undefined => {
 
 const NO_FIELD_ERRORS: FieldErrors = {};
 
-// Any open form's mirrored errors ({} for pristine/unregistered) — what lets a
-// collection view badge "this document has errors" while another form is open.
+// The mirrored errors of any open form. A pristine form and an unopened form both
+// give an empty map. A collection view uses this to mark a document that has errors.
 export const useFormErrors = (formId: FormId): FieldErrors =>
   useFormStore((state) => {
     const scope = state.forms[formId];

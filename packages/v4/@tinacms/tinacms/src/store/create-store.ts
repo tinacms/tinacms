@@ -4,26 +4,30 @@ import { invariant } from '../core/invariant';
 import type { ResolvedSegment, SliceSet, TinaStoreState } from '../core/plugin';
 import { composePluginSlices } from './compose-slices';
 
-// The store's built-in namespaces. Intentionally empty stubs for now — this increment
-// delivers the registration mechanism + middleware stack, not the ui/branch/documents
-// shapes (those land as core slices later, composed directly at boot: createUiSlice /
-// createBranchSlice / createDocumentsSlice per store-architecture.md). They are core, not
-// plugins — `isCoreNamespace` reserves these keys and a plugin mounting here is rejected.
+// The built-in namespaces of the store. They are empty for now. This increment delivers
+// the registration mechanism and the middleware stack. It does not deliver the shapes of
+// ui, branch, and documents. Those arrive later as core slices, composed at boot by
+// createUiSlice, createBranchSlice, and createDocumentsSlice. Refer to
+// store-architecture.md. These namespaces are core, and not plugins. isCoreNamespace
+// reserves these keys, and the store rejects a plugin that mounts on one of them.
 const CORE_NAMESPACES = ['ui', 'branch', 'documents'] as const;
 type CoreNamespace = (typeof CORE_NAMESPACES)[number];
 
-// Which core namespaces survive a reload (theme, sidebar, branch selection) — a typed subset
-// of CORE_NAMESPACES, so the two can't drift. Everything else (document selection, and every
-// plugin namespace: form values, media listings) is volatile and recomputed on boot. This is
-// the one place persistence is decided (store-architecture.md, persistence.md).
+// The core namespaces that survive a reload. They hold the theme, the sidebar, and the
+// branch selection. The type is a subset of CORE_NAMESPACES, so the two cannot drift.
+// All other state is volatile, and the store computes it again at each boot. That state
+// includes the document selection and every plugin namespace, such as the form values
+// and the media lists. This is the one place that decides what persists. Refer to
+// store-architecture.md and persistence.md.
 //
-// NB: persist's default shallow merge replaces a whole namespace on rehydrate — fine while
-// these are plain data, but once a core slice carries action functions it needs a custom
-// `merge` so rehydration doesn't clobber the freshly-composed slice.
+// Note: the persist middleware does a shallow merge, which replaces a whole namespace
+// at rehydration. That is correct while these namespaces hold plain data. A core slice
+// that carries action functions needs a custom `merge`, so that rehydration keeps the
+// composed slice.
 //
-// NB: persistence.md keeps the branch *list* and dirty state volatile — only the selection
-// should survive. Whole-namespace persistence is fine while `branch` is an empty stub, but
-// needs a per-key partialize when the real branch slice lands.
+// Note: persistence.md keeps the branch list and the dirty state volatile. Only the
+// selection survives. Persistence of the whole namespace is correct while `branch` is
+// empty. The real branch slice needs a partialize function for each key.
 const PERSISTED_NAMESPACES: readonly CoreNamespace[] = ['ui', 'branch'];
 
 export const pickPersistableNamespaces = (
@@ -39,29 +43,30 @@ export const pickPersistableNamespaces = (
 const createCoreSlices = (): TinaStoreState =>
   Object.fromEntries(CORE_NAMESPACES.map((namespace) => [namespace, {}]));
 
-// The whole-store `set` the middleware stack hands the initializer. We only ever drive it
-// with a merge (replace=false) so a one-namespace patch can't clobber peer namespaces.
+// The whole-store `set` that the middleware stack gives to the initializer. This code
+// always calls it with replace set to false, so a patch to one namespace cannot remove
+// its peers.
 type RootSet = (
   updater: (store: TinaStoreState) => Partial<TinaStoreState>,
   replace: false,
   action?: string
 ) => void;
 
-// Build the `set` a slice gets, scoped to its `namespace`. The slice reads and updates only
-// its own state; that result is then written back under the namespace key and merged into
-// the whole store, so peer namespaces are untouched.
+// Build the `set` for one slice, scoped to the namespace of that slice. The slice reads
+// and updates its own state only. This function then writes the result under the
+// namespace key, and merges it into the whole store. The peer namespaces do not change.
 //
-// `replace` is the slice-level flag (swap the slice's own state instead of merging into
-// it). It is deliberately NOT forwarded to the root set — the root set always merges this
-// single-namespace patch, or it would drop every peer.
+// The `replace` flag belongs to the slice. It replaces the state of the slice instead of
+// a merge into it. This function does not pass the flag to the root set. The root set
+// always merges the patch for one namespace, or it would drop every peer.
 const createNamespacedSet =
   (namespace: string, setStore: RootSet): SliceSet =>
   (partial, replace = false, action) =>
     setStore(
       (store) => {
         const currentSliceState = store[namespace] ?? {};
-        // SliceSet mirrors Zustand's two set() forms — set(partial) and
-        // set(current => partial); the function form reads the current slice state.
+        // SliceSet has the two forms of the Zustand set(): set(partial) and
+        // set(current => partial). The second form reads the current slice state.
         const nextSliceState =
           typeof partial === 'function' ? partial(currentSliceState) : partial;
         return {
@@ -77,14 +82,15 @@ const createNamespacedSet =
 const isCoreNamespace = (namespace: string): namespace is CoreNamespace =>
   (CORE_NAMESPACES as readonly string[]).includes(namespace);
 
-// The store's fixed identities: one store per app boot (ADR-003), so a single persist
-// storage key and devtools title are intentional, not a collision risk.
+// The fixed names of the store. There is one store for each app boot (ADR-003), so one
+// storage key and one devtools title are correct. They cannot collide.
 const PERSIST_STORAGE_KEY = 'tina-store';
 const DEVTOOLS_STORE_NAME = 'TinaStore';
 
-// Compose the client store once at boot from the resolved plugin segments: core slices
-// plus each plugin slice mounted at its namespace, wrapped in the fixed middleware stack
-// (devtools → persist). The plugin list is static, so there is no runtime extend.
+// Compose the client store once at boot from the resolved plugin segments. It holds the
+// core slices, and each plugin slice at its own namespace. The fixed middleware stack
+// wraps them: devtools, and then persist. The plugin list is static, so the store has no
+// extend function at runtime.
 export const createTinaStore = (resolved: ResolvedSegment[]) => {
   const pluginSlices = composePluginSlices(resolved);
   return create<TinaStoreState>()(
@@ -100,8 +106,8 @@ export const createTinaStore = (resolved: ResolvedSegment[]) => {
                 `store namespace (${CORE_NAMESPACES.join('/')}). Rename the plugin ` +
                 'or the capability it provides.'
             );
-            // `set as RootSet` bridges Zustand's broad middleware set type to the merge-only
-            // root set createNamespacedSet drives; the slice itself gets the clean SliceSet.
+            // The `set as RootSet` cast narrows the wide middleware type of Zustand to
+            // the merge-only root set. The slice itself receives the SliceSet type.
             const scopedSet = createNamespacedSet(namespace, set as RootSet);
             state[namespace] = slice(scopedSet, get);
           }

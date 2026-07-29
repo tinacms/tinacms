@@ -1,25 +1,27 @@
 import type { StoreApi } from 'zustand';
 import type { FieldDescriptor } from './field/contract';
 import { invariant } from './invariant';
+import type { AdminPage } from './page/contract';
 
 export type Capability = 'field' | 'content' | 'auth' | 'media' | 'search';
 
-// The one keyed capability (many field types, one registry). Named so runtime checks
-// reference the constant, not a repeated literal.
+// The one keyed capability. There are many field types, but one registry. Runtime
+// checks read this constant instead of a repeated literal.
 export const FIELD_CAPABILITY = 'field' as const satisfies Capability;
 
-// The capability whose provider additionally carries the RPC transport hooks
-// (server/index.ts AuthTransportHooks) — same naming rule as FIELD_CAPABILITY.
+// The provider of this capability also carries the RPC transport hooks. Refer to
+// AuthTransportHooks in server/index.ts. The naming rule is the same as
+// FIELD_CAPABILITY.
 export const AUTH_CAPABILITY = 'auth' as const satisfies Capability;
 
-// Capabilities whose provider owns a single client store namespace — its slice mounts at the
-// capability key (store-architecture.md), not the plugin name. The one place this
-// categorisation lives, so the store composer reads it here instead of re-listing. `content`
-// is included though it has no client slice yet; `field` is absent (keyed, and Form state is
-// core, ADR-010).
+// The provider of each of these capabilities owns one client store namespace. Its slice
+// mounts at the capability key, and not at the plugin name. Refer to
+// store-architecture.md. The store composer reads this list instead of repeating it.
+// The list holds `content`, which has no client slice yet. It does not hold `field`,
+// because `field` is keyed and the form state is core (ADR-010).
 //
-// TODO(v4): fold into a richer per-capability descriptor (kind: 'singleton-slice' | 'keyed' |
-// 'backend') and derive this list from that once more capabilities land.
+// TODO(v4): give each capability a descriptor with a kind of 'singleton-slice',
+// 'keyed', or 'backend'. Then derive this list from those descriptors.
 export const SINGLETON_SLICE_CAPABILITIES = [
   'auth',
   'content',
@@ -30,56 +32,61 @@ export const SINGLETON_SLICE_CAPABILITIES = [
 export type SingletonSliceCapability =
   (typeof SINGLETON_SLICE_CAPABILITIES)[number];
 
-// The one guard over that list; takes a raw string so namespace checks use it too.
+// The one guard over that list. It takes a plain string, so the namespace checks can
+// also use it.
 export const isSingletonSliceCapability = (
   value: string
 ): value is SingletonSliceCapability =>
   (SINGLETON_SLICE_CAPABILITIES as readonly string[]).includes(value);
 
-// A `field` provider's static half: the schema `type` it renders, plus the contract
-// version of that type's shape. Both sit on the MANIFEST rather than the descriptor
-// because the schema compile runs in Node — reading the type key off the client
-// segment would drag React (and, for rich-text, Plate) into the build (ADR-016 §2).
+// The static half of a `field` provider. It holds the schema type the provider renders,
+// and the contract version of the shape of that type. Both sit on the manifest, and not
+// on the descriptor, because the schema compile runs in Node. A read of the type key
+// from the client segment would pull React into the build. For rich text it would also
+// pull in Plate (ADR-016 §2).
 export interface FieldProvision {
   type: string;
-  // Bumped only by a breaking change to this field type's schema shape. A committed
-  // lock pinning an older major is a hard stop, not a silent break (ADR-016 §3).
+  // Only a breaking change to the schema shape of this field type increases this
+  // number. A committed lock that holds an older major version stops the build. It
+  // does not break quietly (ADR-016 §3).
   contractVersion: number;
 }
 
-// A plugin's declaration that its segment replaces a built-in. `field` is keyed, so its
-// override names the field type; singletons have exactly one slot, so the union forbids
-// a dead `key` on them.
+// A declaration that the segment of a plugin replaces a built-in segment. The `field`
+// capability is keyed, so its override names the field type. A singleton capability has
+// one slot, so the union gives it no key.
 export type CapabilityOverride =
   | { capability: typeof FIELD_CAPABILITY; key: string }
   | { capability: SingletonSliceCapability };
 
-// The whole boot-composed client store: a flat bag of namespaces, each holding one
-// slice's state, open-shaped because plugins register arbitrary namespaces at boot.
-// Core and plugin slices both mount here; a slice reads peers from it. Single
-// definition — the store modules import it from here.
+// The full client store, composed at boot. It is a flat set of namespaces, and each
+// namespace holds the state of one slice. The shape is open, because a plugin can
+// register any namespace at boot. Core slices and plugin slices both mount here, and a
+// slice reads its peers from here. The store modules import this one definition.
 export type TinaStoreState = Record<string, SliceState>;
 
-// One slice's own state: the object a slice returns and mounts at its namespace — its
-// data fields plus its action functions, e.g. `{ items: [], add: (item) => … }`. Keys
-// and value shapes are the slice author's to define, hence `Record<string, unknown>`.
+// The state of one slice. The slice returns this object, and the runtime mounts it at
+// the namespace of the slice. It holds the data fields of the slice and its action
+// functions, for example `{ items: [], add: (item) => … }`. The author of the slice
+// defines the keys and the value shapes.
 export type SliceState = Record<string, unknown>;
 
-// The `set` a slice is handed, scoped to its own namespace. It takes either the next
-// partial state or an updater computing it from the slice's current state (Zustand's two
-// `set` forms), plus an optional devtools action label. Writes land under the slice's
-// namespace only — never the whole store.
+// The `set` function of a slice, scoped to the namespace of that slice. It takes the
+// next partial state, or a function that computes the next state from the current
+// state. These are the two forms of `set` in Zustand. It also takes a devtools action
+// label. A write lands in the namespace of the slice only, and never in the whole store.
 export type SliceSet = (
   partial: Partial<SliceState> | ((current: SliceState) => Partial<SliceState>),
   replace?: boolean,
   action?: string
 ) => void;
 
-// A client segment's store slice (store-architecture.md): given its namespace-scoped `set`
-// and the whole-store `get`, it returns the state + actions the runtime mounts at the
-// plugin's namespace. `get` reads peers by namespace (`get().auth.user`). It's deliberately
-// middleware-agnostic — slices never see the host's devtools/persist. Field plugins
-// contribute none: Form state is core (ADR-010).
+// The store slice of a client segment. Refer to store-architecture.md. It receives the
+// scoped `set` and the whole-store `get`, and it returns the state and the actions. The
+// runtime mounts them at the namespace of the plugin. The `get` function reads the peers
+// by namespace, for example `get().auth.user`. A slice never sees the devtools
+// middleware or the persist middleware of the host. A field plugin supplies no slice,
+// because the form state is core (ADR-010).
 export type ClientSlice = (
   set: SliceSet,
   get: StoreApi<TinaStoreState>['getState']
@@ -88,33 +95,39 @@ export type ClientSlice = (
 export interface ClientSegment {
   field?: FieldDescriptor;
   slice?: ClientSlice;
+  // Screens this plugin adds to the admin, beside the collection views the schema
+  // generates. They compose into the page registry at boot. Refer to core/page/registry.
+  // A plugin declares no capability for these: a page is a contribution, and not a slot
+  // that one provider fills.
+  pages?: AdminPage[];
 }
 
-// One server-segment operation (ADR-007): a flat `(input) => Promise<result>` record is
-// the whole contract — the same shape `import type` carries to the client for the typed
-// RPC proxy. `never` keeps every concrete op assignable (parameter contravariance)
-// without reaching for `any`; the transport casts at the single dispatch site.
+// One operation in a server segment (ADR-007). The whole contract is a flat record of
+// `(input) => Promise<result>` functions. An `import type` carries the same shape to the
+// client for the typed RPC proxy. The `never` input keeps every concrete operation
+// assignable, and it avoids `any`. The transport casts the input at its one dispatch
+// site.
 export type ServerOp = (input: never) => Promise<unknown>;
 
 export type ServerSegment = Record<string, ServerOp>;
 
-// A manifest paired with its loaded server segment — what the RPC handler composes
-// (rpc/handler.ts), symmetric with ResolvedSegment on the client side.
+// A manifest with its loaded server segment. The RPC handler composes these in
+// rpc/handler.ts. ResolvedSegment is the equivalent shape on the client.
 export interface ResolvedServerSegment {
   manifest: PluginManifest;
   ops: ServerSegment;
 }
 
-// A manifest paired with its loaded client segment — the boot-resolved unit both
-// registries (field types, store slices) compose from.
+// A manifest with its loaded client segment. Both registries compose from these units:
+// the field type registry and the store slice registry.
 export interface ResolvedSegment {
   manifest: PluginManifest;
   segment: ClientSegment;
 }
 
-// Load every plugin's client segment once. The one boot-time resolution pass — its
-// result feeds both createFieldRegistry and createTinaStore so the two compose from
-// the same segments and can't diverge.
+// Load the client segment of each plugin once. This is the one resolution pass at boot.
+// Its result feeds createFieldRegistry and createTinaStore, so the two compose from the
+// same segments and cannot diverge.
 export const resolveClientSegments = async (
   plugins: PluginManifest[]
 ): Promise<ResolvedSegment[]> => {
@@ -140,34 +153,37 @@ export const resolveClientSegments = async (
   return resolved;
 };
 
-// The authoring shape passed to definePlugin: the list fields are optional so a
-// plugin only spells out what it uses. definePlugin normalizes them, so every
-// consumer works with PluginManifest below and never guards with `?? []`.
+// The shape an author passes to definePlugin. The list fields are optional, so a plugin
+// declares only what it uses. definePlugin fills them in, so every consumer reads the
+// PluginManifest below and needs no `?? []` guard.
 export interface PluginManifestInput {
   name: string;
-  // Honored today: `name`, `client`, `server`, `provides` (mount key), `dependsOn`
-  // (graph order, core/resolve.ts), `overrides`, and `requires` (RPC transport gate).
-  // `permissions` declarations await codegen's typed Permission union (ADR-008 §3).
+  // The runtime reads `name`, `client`, `server`, `provides` for the mount key,
+  // `dependsOn` for the graph order in core/resolve.ts, `overrides`, and `requires` for
+  // the RPC transport gate. It does not read `permissions` yet. That field waits for
+  // the typed Permission union from codegen (ADR-008 §3).
   provides?: Capability[];
   dependsOn?: Capability[];
-  // Required of a `field` provider, and only of one — it names the keyed slot this
-  // plugin fills. The client segment supplies the matching descriptor.
+  // A `field` provider must set this field, and no other plugin may set it. It names
+  // the keyed slot that the plugin fills. The client segment supplies the descriptor
+  // for that slot.
   field?: FieldProvision;
   client?: () => Promise<{ default: ClientSegment }>;
   server?: () => Promise<{ default: ServerSegment }>;
   permissions?: { name: string; description?: string }[];
   requires?: { permission: string };
   overrides?: CapabilityOverride[];
-  // Plugin-lifecycle (ADR-006), run once per runtime boot in dependency order
-  // (core/resolve.ts initializePlugins) — not per UI instance. No context argument
-  // yet: the intentionally-narrow PluginInitContext (resolved config, nothing else)
-  // lands with defineConfig (ADR-024) and is additive for implementers.
+  // The plugin lifecycle (ADR-006). The runtime runs these once at each boot, in
+  // dependency order. Refer to initializePlugins in core/resolve.ts. It does not run
+  // them for each UI instance. They take no context argument yet. PluginInitContext
+  // carries the resolved config and nothing else. It arrives with defineConfig
+  // (ADR-024), and it adds to this shape without a breaking change.
   onInit?: () => void | Promise<void>;
   onDestroy?: () => void | Promise<void>;
 }
 
-// The normalized manifest every consumer reads: definePlugin has filled the list
-// fields, so `provides`/`dependsOn`/`overrides` are always arrays (no `?? []`).
+// The normalized manifest that every consumer reads. definePlugin has filled the list
+// fields, so `provides`, `dependsOn`, and `overrides` are always arrays.
 export interface PluginManifest extends PluginManifestInput {
   provides: Capability[];
   dependsOn: Capability[];

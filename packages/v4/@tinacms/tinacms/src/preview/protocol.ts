@@ -1,11 +1,13 @@
 import type { TinaDocument } from '../core/schema/types';
 
-// The visual-editing wire protocol (the v4 slice of #6944): three messages across
-// the editor/preview window boundary. `tina:activate` is doc-pinned — a click
-// carries the field address and nothing else (ADR-009 §4). `tina:ready` (preview →
-// editor handshake) and `tina:values` (editor → preview full-state stream) are this
-// package's own contract; both halves ship in lockstep from here, so there is no
-// version or formId envelope — growth is a new message type.
+// The wire protocol for visual editing (the v4 part of #6944). It carries three
+// messages across the boundary between the editor window and the preview window. The
+// `tina:activate` message holds the field address and nothing else (ADR-009 §4). The
+// `tina:ready` message is the handshake from the preview to the editor. The
+// `tina:values` message streams the whole state from the editor to the preview. This
+// package owns both of those messages, and it ships both halves together. There is
+// therefore no version field and no form id field. A new need becomes a new message
+// type.
 
 export const READY_MESSAGE_TYPE = 'tina:ready';
 export const VALUES_MESSAGE_TYPE = 'tina:values';
@@ -50,15 +52,16 @@ export const isValuesMessage = (data: unknown): data is ValuesMessage =>
   typeof (data as { values?: unknown }).values === 'object' &&
   (data as { values?: unknown }).values !== null;
 
-// Also validates the payload: toFieldAddress throws on an empty address, so a
-// malformed message must not pass the guard.
+// This also validates the payload. toFieldAddress throws on an empty address, so a
+// damaged message must not pass this guard.
 export const isActivateMessage = (data: unknown): data is ActivateMessage =>
   hasMessageType(data, ACTIVATE_MESSAGE_TYPE) &&
   typeof (data as { address?: unknown }).address === 'string' &&
   (data as { address: string }).address.length > 0;
 
-// The marker half of the protocol: how a site tags a rendered element with the
-// field address a click should activate. Spreadable — <h1 {...tinaField('title')}>.
+// The marker half of the protocol. A site uses it to tag a rendered element with the
+// field address that a click activates. Spread it onto the element, for example
+// <h1 {...tinaField('title')}>.
 export const TINA_FIELD_ATTR = 'data-tina-field';
 
 export const tinaField = (address: string): { 'data-tina-field': string } => ({

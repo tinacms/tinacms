@@ -1,7 +1,7 @@
 import { use, useCallback, useEffect, useRef } from 'react';
 import { useController, useFormContext, useFormState } from 'react-hook-form';
 import { useStore } from 'zustand';
-import type { ContentSlice, DocumentEntry } from '../core/content/contract';
+import type { ContentSlice } from '../core/content/contract';
 import type { FieldAddress } from '../core/field/address';
 import type { FieldRegistry } from '../core/field/registry';
 import { digestDocument } from '../core/form/ingest';
@@ -40,8 +40,8 @@ export function useTinaStore<Selected>(
   return useStore(runtime.store, selector);
 }
 
-// The `content` namespace is typed as an open SliceState until codegen produces
-// typed capability reads; the one cast lives here.
+// The `content` namespace has the open SliceState type, until codegen produces the
+// typed capability reads. The one cast is here.
 export function useContentSlice(): ContentSlice {
   const slice = useTinaStore((state) => state.content);
   invariant(
@@ -50,30 +50,6 @@ export function useContentSlice(): ContentSlice {
     'No content capability is mounted — pass a content plugin (e.g. localContentPlugin()) to <TinaProvider plugins>'
   );
   return slice as unknown as ContentSlice;
-}
-
-// Stable fallback so the selector below never returns a fresh [] per render.
-const EMPTY_DOCUMENTS: DocumentEntry[] = [];
-
-// Loads the collection through the content capability on mount (and when the
-// collection changes) and returns the slice's list cache for that collection.
-// The effect depends on the loadDocuments function (stable action ref), not the
-// slice object, so the load runs once per collection — not per slice update.
-export function useCollectionDocuments(
-  collection: string | undefined
-): DocumentEntry[] {
-  const { documents, loadDocuments } = useContentSlice();
-  useEffect(() => {
-    // No collection is a real state (nothing is open), not a load of one named ''.
-    if (!collection) return;
-    loadDocuments(collection).catch((cause) =>
-      console.error(
-        `[tinacms] Failed to load collection "${collection}":`,
-        cause
-      )
-    );
-  }, [loadDocuments, collection]);
-  return (collection ? documents[collection] : undefined) ?? EMPTY_DOCUMENTS;
 }
 
 function useFormScope(hookCode: string, hookName: string): FormScope {
@@ -91,9 +67,10 @@ export interface ActiveField {
   setActive: (address: FieldAddress | null) => void;
 }
 
-// The current form's view of the store's single active field (ADR-009 visual
-// editing): `active` is the address a preview click activated (null when the active
-// field belongs to another form), `setActive` activates/clears it.
+// The view of this form on the one active field in the store (ADR-009, visual editing).
+// The `active` value is the address that a click in the preview activated. It is null
+// when the active field belongs to another form. The `setActive` function sets that
+// address, or clears it.
 export function useActiveField(): ActiveField {
   const formId = useFormId();
   const active = useFormStore((state) =>
@@ -107,10 +84,11 @@ export function useActiveField(): ActiveField {
   return { active, setActive };
 }
 
-// Reconstruct the document from the form's values and hand it to the host's save
-// handler (the ADR-018/019 seam); only a resolved save freezes the clean baseline —
-// a rejected save leaves the form dirty. The baseline is the pre-save snapshot, not
-// the store's latest values, so edits typed while the save is in flight stay dirty.
+// Build the document again from the values of the form, and give it to the save handler
+// of the host (ADR-018 and ADR-019). Only a save that resolves moves the baseline and
+// makes the form clean. A save that rejects leaves the form dirty. The baseline is the
+// snapshot from before the save, and not the latest values in the store. An edit made
+// during the save therefore stays dirty.
 export function useFormSave(): () => Promise<void> {
   const registry = useFieldRegistry();
   const scope = useFormScope('form-save-outside-provider', 'useFormSave');
@@ -118,8 +96,8 @@ export function useFormSave(): () => Promise<void> {
   return useCallback(async () => {
     const { formId, path, collection, onSave } = scope;
     const values = getValues();
-    // Same context ingest parsed with, so the value round-trips through one codec
-    // rather than being read as .md and written back as .mdx.
+    // The same context that the ingest parsed with, so one codec reads and writes
+    // the value. Without it, a value read as .md could be written as .mdx.
     const digested = digestDocument(values, collection.fields, registry, {
       documentPath: path,
     });
@@ -138,8 +116,7 @@ export function useFieldAddress(): FieldAddress {
   return address;
 }
 
-// The field's own resolved schema node, for reading its config. `T` is
-// caller-asserted.
+// The resolved schema node of the field, which holds its config. The caller asserts `T`.
 export function useFieldSchema<T extends FieldSchema = FieldSchema>(): T {
   const node = use(FieldSchemaContext);
   if (node == null) {
@@ -157,9 +134,9 @@ export function useFieldValue<T = unknown>(
 
 export function useFieldErrors(address: FieldAddress): string[] {
   const { errors } = useFormState({ name: address });
-  // RHF's `errors` is a complex mapped type; cast it once to index by field name.
-  // Assumes flat addresses (no nested fields yet) — nested paths would need a path
-  // walk here instead of a direct key access.
+  // The `errors` value of RHF has a complex mapped type. Cast it once, and index it by
+  // field name. This assumes flat addresses, because there are no nested fields yet. A
+  // nested path would need a path walk here.
   const fieldErrors = errors as Record<string, FieldErrorEntry | undefined>;
   return fieldErrorMessages(fieldErrors[address]);
 }
@@ -167,9 +144,9 @@ export function useFieldErrors(address: FieldAddress): string[] {
 export function useFieldActivation(handler: () => void): void {
   const address = use(FieldAddressContext);
   const formId = use(FormScopeContext)?.formId ?? null;
-  // Subscribe to the activation entry itself, not a derived boolean: setActive
-  // writes a fresh object every call, so re-activating an already-active field
-  // re-fires the handler (a boolean would latch and swallow the repeat click).
+  // Subscribe to the activation entry, and not to a boolean. setActive writes a new
+  // object at each call, so a second activation of the same field calls the handler
+  // again. A boolean would hold its value, and the second click would do nothing.
   const active = useFormStore((state) => state.active);
   const handlerRef = useRef(handler);
   handlerRef.current = handler;

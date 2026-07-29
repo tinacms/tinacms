@@ -2,18 +2,20 @@ import type { FieldTransformContext } from '../field/contract';
 import type { FieldRegistry } from '../field/registry';
 import type { FieldSchema, TinaDocument } from '../schema/types';
 
-// Ingest and digest are the only callers of a field's parse/serialize, so the
-// document context threads through here. Defaulted, so a caller with no document
-// in hand (tests, and every field whose transform is value-only) is unaffected.
+// The ingest and the digest are the only callers of the parse and serialize functions of
+// a field, so the document context passes through here. It has a default, so a caller
+// with no document is not affected. Those callers are the tests, and every field with a
+// value-only transform.
 const NO_DOCUMENT: FieldTransformContext = {};
 
-// Flatten on load (ADR-010): turn a stored document into the form's initial values.
-// Per field, run the field plugin's parse() (stored → editor value), or fall back to
-// its defaultValue when the key is absent. string/boolean are identity; the number
-// field parses stored numbers to editor strings; image/datetime/reference will plug
-// real transforms in here.
-// Plan: the document source becomes the content capability (ADR-019) once the data
-// layer lands — today it's passed in directly.
+// Flatten a document at the load (ADR-010). This turns a stored document into the
+// initial values of the form. For each field, it runs the parse() of the field plugin,
+// which converts the stored value into the editor value. When the key is absent, it uses
+// the defaultValue of the field. The string and boolean fields return the value as it
+// is. The number field converts a stored number into an editor string. The image,
+// datetime, and reference fields will add their own transforms.
+// Plan: the content capability supplies the document when the data layer arrives
+// (ADR-019). Today the caller passes it.
 export const ingestDocument = (
   storedDocument: TinaDocument | undefined,
   fields: FieldSchema[],
@@ -35,11 +37,11 @@ export const ingestDocument = (
   return values;
 };
 
-// Reconstruct on save (ADR-010): turn the form's values back into document shape,
-// running each field's serialize() (the reverse of parse). Undefined values are
-// dropped (absent); null is preserved.
-// Plan: the result is handed to the content capability (ADR-018 save flow) to write
-// to git/disk + TinaCloud, after the document lifecycle hooks (ADR-014) run.
+// Build the document again at the save (ADR-010). This turns the values of the form back
+// into the shape of a document. It runs the serialize() of each field, which is the
+// reverse of parse(). It drops an undefined value, and it keeps a null value.
+// Plan: the result goes to the content capability, which writes it to git, to disk, and
+// to TinaCloud (ADR-018). The document lifecycle hooks run first (ADR-014).
 export const digestDocument = (
   values: TinaDocument | undefined,
   fields: FieldSchema[],

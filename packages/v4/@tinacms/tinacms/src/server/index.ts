@@ -1,6 +1,5 @@
-// Server-only entry — `tinacms/server`.
-// Imported by plugin server segments and by per-framework adapters.
-// Never reaches the browser bundle.
+// The server entry, `tinacms/server`. The server segments of the plugins import it, and
+// so do the framework adapters. It never reaches the browser bundle.
 
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { invariant } from '../core/invariant';
@@ -12,35 +11,38 @@ import type {
 
 export type { ResolvedServerSegment, ServerOp, ServerSegment };
 
-// Identity helper, mirroring definePlugin/defineClientPlugin: `TOps` is preserved so the
-// segment's exported type is what `import type` carries to the client for the RPC proxy
-// (ADR-007) — a widened Record would erase every op signature.
+// An identity function, like definePlugin and defineClientPlugin. It keeps `TOps`, so
+// the exported type of the segment is the type that `import type` carries to the client
+// for the RPC proxy (ADR-007). A wider Record type would erase the signature of every
+// operation.
 export const defineServerPlugin = <TOps extends ServerSegment>(
   ops: TOps
 ): TOps => ops;
 
-// ADR-023 §1: the single primitive every verifier needs. Roles ride in the session;
-// core reads them per request and stores nothing (ADR-008).
+// The one primitive that every verifier needs (ADR-023 §1). The session carries the
+// roles. The core reads them at each request, and stores nothing (ADR-008).
 export interface Session {
   identity: { id: string; name?: string; email?: string };
   roles: string[];
 }
 
-// The transport hooks the RPC handler needs from whatever provides `auth`. They live on
-// the auth plugin's server segment under these names; compose claims them off the
-// routable ops (rpc/handler.ts), so the handler invokes them directly (getSession
-// receives the raw Request) and dispatch can never route them as RPC ops.
+// The transport hooks that the RPC handler needs from the provider of `auth`. They sit
+// on the server segment of the auth plugin, under these names. The composition removes
+// them from the routable ops in rpc/handler.ts. The handler then calls them directly,
+// and getSession receives the Request. The dispatch can never route them as RPC
+// operations.
 export interface AuthTransportHooks {
   getSession: (request: Request) => Promise<Session | null>;
-  // Role → permission bundles are the auth provider's domain (ADR-008 §3). Absent, the
-  // built-in editor/admin defaults apply.
+  // The auth provider owns the map from a role to its permissions (ADR-008 §3).
+  // Without this hook, the built-in defaults for editor and admin apply.
   rolePermissions?: (role: string) => Promise<string[]>;
 }
 
-// ADR-008 §4/§5: Tina ships editor/admin so TinaCloud works with zero config; new
-// permissions are granted to nobody by default except admin's wildcard. Null-prototype,
-// so a role named after an Object.prototype member ("constructor", "__proto__")
-// resolves to nothing rather than an inherited function.
+// Tina supplies the editor role and the admin role, so that TinaCloud works with no
+// config (ADR-008 §4 and §5). A new permission goes to no role by default, except
+// through the wildcard of the admin role. The object has a null prototype, so a role
+// with the name of an Object.prototype member resolves to nothing. Two such names are
+// "constructor" and "__proto__".
 export const DEFAULT_ROLE_PERMISSIONS: Record<string, string[]> = Object.assign(
   Object.create(null),
   {
@@ -49,11 +51,12 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, string[]> = Object.assign(
   }
 );
 
-// Op-level authorization marks (ADR-008): bare handlers are protected by default;
-// `publicOp` is the only unauthenticated opt-out (greppable); `protectedOp` names the
-// required permission (`string` until codegen builds the typed union). Wrapping, not
-// mutating, so one handler under two wrappers can't cross-tag; `Symbol.for`, so
-// duplicate module copies still agree on the tag.
+// The authorization marks for an operation (ADR-008). A plain handler is protected by
+// default. `publicOp` is the one way to remove that protection, and a search finds it.
+// `protectedOp` names the permission that the operation needs. That name is a string
+// until codegen builds the typed union. These functions wrap the handler, and do not
+// change it, so two wrappers on one handler cannot share a tag. The key uses
+// `Symbol.for`, so two copies of this module agree on the tag.
 const OP_META = Symbol.for('tinacms.op-meta');
 
 interface OpMeta {
@@ -82,8 +85,9 @@ export const protectedOp = <TOp extends ServerOp>(
 export const opMeta = (handler: ServerOp): OpMeta =>
   (handler as TaggedOp)[OP_META] ?? {};
 
-// The composed server runtime (built once per handler, rpc/handler.ts): segments by
-// mount namespace, plus the auth hooks claimed at compose — `null` fails closed.
+// The composed server runtime. rpc/handler.ts builds it once for each handler. It holds
+// the segments by mount namespace, and the auth hooks from the composition. A null value
+// there fails closed.
 export interface ServerRuntime {
   segmentsByNamespace: Map<string, ResolvedServerSegment>;
   authHooks: AuthTransportHooks | null;
@@ -92,12 +96,14 @@ export interface ServerRuntime {
   destroy: () => Promise<void>;
 }
 
-// Carries the runtime across a dispatch so the module-level `use()` resolves against
-// the handler that dispatched it — safe under interleaved requests.
+// This carries the runtime through a dispatch, so that the module-level `use()`
+// resolves against the handler that dispatched it. It stays correct when requests
+// overlap.
 export const serverRuntimeStorage = new AsyncLocalStorage<ServerRuntime>();
 
-// Server→server in-process capability accessor (ADR-007) — `use('content').listAll()`.
-// Typed per-capability contracts arrive with ADR-019/021/022; until then callers cast.
+// The in-process accessor for a capability on the server (ADR-007). One example is
+// `use('content').listAll()`. The typed contract for each capability arrives with
+// ADR-019, ADR-021, and ADR-022. Until then, a caller casts the result.
 export const use = (capability: string): ServerSegment => {
   const runtime = serverRuntimeStorage.getStore();
   invariant(

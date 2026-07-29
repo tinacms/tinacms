@@ -90,10 +90,10 @@ export type Components<ComponentAndProps extends object> = {
 
 export type TinaMarkdownContent = {
   type: string;
-  // Optional because leaves genuinely have none: a text node is
-  // `{ type: 'text', text: '…' }`, which is what the parser emits and what the
-  // renderer branches on. Requiring it described a tree that never exists —
-  // every caller had to cast around it, which is exactly what hid the mismatch.
+  // Optional, because a leaf node has no children. A text node is
+  // `{ type: 'text', text: '…' }`. The parser emits that shape, and the renderer
+  // branches on it. A required field here would describe a tree that never exists,
+  // and every caller would cast around it.
   children?: TinaMarkdownContent[];
 };
 

@@ -1,13 +1,14 @@
-// Universal entry — imported by client, server, and per-framework adapter code.
-// Must NOT import from ./react, ./client, ./server, or ./adapters.
+// The universal entry. The client code, the server code, and the framework adapters all
+// import it. It must not import from ./react, ./client, ./server, or ./adapters.
 //
-// Config + schema authoring surface (ADR-024): definePlugin, the `t` schema
-// helpers, and the public contract types. Each field type contributes its own
-// `t.<type>` builder from its plugin; this entry is the composition root.
+// It holds the surface for the config and the schema (ADR-024): definePlugin, the `t`
+// schema helpers, and the public contract types. Each field type supplies its own
+// `t.<type>` builder from its plugin. This entry is the composition root.
 
-// The schema compile is pure and node-safe (it reads manifests, never segments), so
-// it sits in the universal entry beside the config it compiles. loadTinaConfig does
-// not: it needs vite to resolve the user's TypeScript, so it stays build-side only.
+// The schema compile is pure, and it runs in Node, because it reads the manifests and
+// never the segments. It therefore sits in the universal entry, next to the config that
+// it compiles. loadTinaConfig does not sit here. It needs Vite to resolve the TypeScript
+// of the user, so it stays on the build side.
 export {
   type LockCheck,
   LOCK_VERSION,

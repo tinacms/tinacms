@@ -7,14 +7,14 @@ import { constants } from 'node:fs';
 import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import {
-  type LoadTinaConfigOptions,
-  loadTinaConfig,
-} from '../../codegen/load-config';
-import {
   type TinaLock,
   checkLock,
   compileSchema,
 } from '../../codegen/compile-schema';
+import {
+  type LoadTinaConfigOptions,
+  loadTinaConfig,
+} from '../../codegen/load-config';
 import { invariant } from '../../core/invariant';
 
 export const TINA_DIRECTORY = 'tina';

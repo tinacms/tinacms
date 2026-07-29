@@ -33,9 +33,10 @@ const fieldConflictError = (conflict: RegistryConflict, key: string): Error => {
   );
 };
 
-// A field plugin declares in two places — the type key on the manifest, the descriptor
-// on its client segment — so either half alone is an authoring mistake that would
-// otherwise fail as a missing field type at render, far from its cause.
+// A field plugin declares itself in two places. The type key sits on the manifest, and
+// the descriptor sits on the client segment. One half alone is an error by the author.
+// Without this check, it would fail as a missing field type at the render, far from its
+// cause.
 const fieldEntryOf = ({ manifest, segment }: ResolvedSegment) => {
   if (!(manifest.field || segment.field)) return [];
   invariant(

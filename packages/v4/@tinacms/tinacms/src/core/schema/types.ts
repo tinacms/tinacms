@@ -35,9 +35,9 @@ export interface TemplateSchema {
 export interface FieldSchema extends BaseFieldSchema {
   type: string;
   /**
-   * Marks the field that owns the file's markdown body. Markdown on disk, mdx
-   * AST in memory — the format adapter reads and writes the string, the
-   * rich-text field edits the AST.
+   * Marks the field that holds the markdown body of the file. The body is markdown
+   * on disk, and an MDX tree in memory. The format adapter reads and writes the
+   * string, and the rich-text field edits the tree.
    */
   isBody?: boolean;
   templates?: TemplateSchema[];
@@ -48,10 +48,10 @@ export const COLLECTION_FORMATS = ['md', 'mdx', 'json', 'yaml'] as const;
 export type CollectionFormat = (typeof COLLECTION_FORMATS)[number];
 
 /**
- * The file extension each format is stored as. Declared once because two
- * consumers must agree on it: the format adapters (which adapter owns a file)
- * and the rich-text codecs (which parser reads its body). Total over the union,
- * so a new format doesn't compile until it names its extension.
+ * The file extension of each format. It is declared once, because two consumers must
+ * agree on it. The format adapters use it to find the adapter for a file. The
+ * rich-text codecs use it to find the parser for a body. The record covers the whole
+ * union, so a new format does not compile until it names its extension.
  */
 export const FORMAT_EXTENSIONS: Record<CollectionFormat, string> = {
   md: '.md',
@@ -61,9 +61,9 @@ export const FORMAT_EXTENSIONS: Record<CollectionFormat, string> = {
 };
 
 /**
- * Which format a document is stored in, read from its own name — the file
- * decides, not the collection. This is what lets one collection hold mixed
- * formats.
+ * The format of a document, read from the name of that document. The file decides its
+ * format, and the collection does not. One collection can therefore hold more than one
+ * format.
  */
 export const formatForPath = (
   documentPath: string
@@ -77,23 +77,23 @@ export interface CollectionSchema {
   label?: string;
   path?: string;
   /**
-   * One format, or several for a collection holding mixed files — an `.mdx` and
-   * a `.json` document in the same list and the same form, each read by the
-   * adapter its extension names.
+   * One format, or several formats for a collection with mixed files. An `.mdx`
+   * document and a `.json` document can share a list and a form. The extension of
+   * each file names the adapter that reads it.
    *
-   * The first entry is the primary format. Today that means exactly one thing:
-   * until v4 owns its index, it is the only format the v3 GraphQL pipeline reads
-   * (graphql-pipeline.ts warns about the rest). It is *not* yet what a new
-   * document gets — the data layer writes whatever path it is handed, so the
-   * extension is the caller's choice. It becomes the default when something
-   * above the data layer starts naming new files.
+   * The first entry is the primary format. Today that has one meaning only. The v3
+   * GraphQL pipeline reads the primary format and no other, until v4 owns its index.
+   * graphql-pipeline.ts warns about the other formats. The primary format is not yet
+   * the format of a new document. The data layer writes the path that it receives, so
+   * the caller chooses the extension. The primary format becomes the default when code
+   * above the data layer starts to name new files.
    */
   format: CollectionFormat | CollectionFormat[];
   fields: FieldSchema[];
 }
 
 /**
- * An open bag of field values keyed by field name. Value types are contributed
- * by plugins and unknowable statically, so `unknown` is the honest type.
+ * An open set of field values, keyed by field name. The plugins supply the value
+ * types, and no static type can describe them. The type is therefore `unknown`.
  */
 export type TinaDocument = Record<string, unknown>;

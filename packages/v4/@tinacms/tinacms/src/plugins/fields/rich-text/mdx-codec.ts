@@ -9,32 +9,32 @@ import {
 import type { RichTextCodec, RichTextValue } from './rich-text-codec';
 import type { RichTextFieldSchema } from './rich-text-field.schema';
 
-// The default codec: markdown/MDX through @tinacms/mdx, the same parser v3 used,
-// so a v3 content folder opens unchanged. This is the only thing in the field
-// that knows the storage format — replacing it replaces the format.
+// The default codec. It reads and writes markdown and MDX through @tinacms/mdx. This
+// is the parser that v3 used, so a v3 content folder opens without a change. The codec
+// is the only part of the field that knows the storage format. A new codec gives the
+// field a new format.
 
-// @tinacms/mdx resolves media paths through this callback. v4 has no media
-// capability yet (plugins/media/ is empty), so paths pass through untouched —
-// swap in the media store's resolver when it lands.
+// @tinacms/mdx resolves the media paths through this callback. v4 has no media
+// capability yet, because plugins/media/ is empty. The paths therefore pass through
+// with no change. Use the resolver of the media store when that store exists.
 const passthroughMedia = (url: string): string => url;
 
-// The registry hands every field its node as the base FieldSchema, and
-// @tinacms/mdx wants v3's field type. Both are structurally satisfied by
-// RichTextFieldSchema (templates, under the same name), so this is the one place
-// the two nominal types are reconciled — not at each call site.
+// The registry gives each field its node as the base FieldSchema, but @tinacms/mdx
+// needs the v3 field type. RichTextFieldSchema satisfies the structure of both,
+// because it holds the templates under the same name. This is the one place that
+// reconciles the two types. The call sites do not repeat it.
 type MdxField = Parameters<typeof parseMDX>[1];
 
 const asMdxField = (node: FieldSchema): MdxField =>
   node as RichTextFieldSchema as unknown as MdxField;
 
-// Both codecs serialize the same way and differ only in how they shape the field
-// they hand @tinacms/mdx, so the body lives here once.
+// The two codecs serialize in the same way. They differ only in the shape of the field
+// they give to @tinacms/mdx, so the body of the function is here once.
 //
-// The invalid_markdown guard is ours rather than the parser's. @tinacms/mdx does
-// the same thing internally, but only on its MDX branch — its markdown branch
-// returns before that check, so a body it could not parse would save as blank.
-// Doing it here covers both branches and stops the guarantee depending on which
-// path inside the parser a value happens to take.
+// The guard for invalid markdown belongs to this file, and not to the parser.
+// @tinacms/mdx makes the same check, but only on its MDX branch. Its markdown branch
+// returns before that check, so a body that it could not parse would save as an empty
+// string. This guard covers both branches.
 const serializeWith =
   (toMdxField: (node: FieldSchema) => MdxField): RichTextCodec['serialize'] =>
   (value, node) => {
@@ -47,7 +47,7 @@ const serializeWith =
       toMdxField(node),
       passthroughMedia
     );
-    // serializeMDX returns undefined for an empty value; a file holds a string.
+    // serializeMDX returns undefined for an empty value, but a file holds a string.
     return typeof serialized === 'string' ? serialized : '';
   };
 
@@ -57,11 +57,11 @@ export const mdxCodec: RichTextCodec = {
   serialize: serializeWith(asMdxField),
 };
 
-// The .md codec: @tinacms/mdx's stricter `markdown` parser, which reads no JSX.
-// A .md file and a .mdx file are different formats, so parsing both as MDX is
-// wrong in both directions — `{`/`<` in ordinary .md prose reads as an expression
-// or a tag, and an embed serialized into a .md file writes JSX that no markdown
-// consumer can read back.
+// The codec for .md files. It uses the stricter `markdown` parser of @tinacms/mdx,
+// which reads no JSX. A .md file and a .mdx file are different formats, so a parse of
+// both as MDX is wrong in two ways. In .md prose, the MDX parser reads `{` as an
+// expression and `<` as a tag. In a .md file, an embed writes JSX that no markdown
+// reader can parse again.
 const markdownField = (node: FieldSchema): MdxField =>
   ({ ...asMdxField(node), parser: { type: 'markdown' } }) as MdxField;
 
@@ -71,30 +71,30 @@ export const markdownCodec: RichTextCodec = {
   serialize: serializeWith(markdownField),
 };
 
-// Keyed by format rather than by extension: the extension is FORMAT_EXTENSIONS'
-// business (core/schema/types.ts), and keying off the union means a new format
-// is a compiler-visible gap here rather than a lookup that silently misses.
-// Partial because a format need not have a codec — see the fallback below.
+// This map is keyed by format, and not by extension. FORMAT_EXTENSIONS in
+// core/schema/types.ts owns the extensions. A key from the format union also makes a
+// new format visible to the compiler here. The map is partial, because a format needs
+// no codec. Refer to the fallback below.
 const codecsByFormat: Partial<Record<CollectionFormat, RichTextCodec>> = {
   mdx: mdxCodec,
   md: markdownCodec,
 };
 
-// Which codec a field uses: its own if it declares one, otherwise the one its
-// document's format names.
+// The codec that a field uses. A field that declares a codec uses that codec. Every
+// other field uses the codec for the format of its document.
 //
-// The fallback covers formats with no markdown file of their own (.json, .yaml,
-// and any path with no recognised extension). MDX is the right default there
-// because it is what v3 does: v3 picks a parser from the field's `parser` option
-// — not from the extension — and unset means the MDX path whatever the file is
-// (@tinacms/graphql resolver/index.ts hands the field straight to parseMDX).
-// Choosing per extension is v4 being stricter than v3 where it can be sure; the
-// fallback is where it cannot, so it keeps v3's answer.
+// The fallback covers the formats with no markdown file of their own. These are .json,
+// .yaml, and any path with an extension that this code does not know. MDX is the
+// correct default there, because v3 behaves in the same way. v3 selects a parser from
+// the `parser` option of the field, and not from the extension. Without that option,
+// v3 uses the MDX parser for every file. Refer to resolver/index.ts in
+// @tinacms/graphql, which calls parseMDX directly. v4 selects by extension where the
+// extension is clear, and keeps the answer of v3 where it is not.
 //
-// Lives here rather than beside the contract so the contract stays free of any
-// implementation, and here rather than on the schema so the universal entry
-// (src/index.ts reaches the schema) never pulls a parser into the main bundle.
-// A project-wide default belongs on defineConfig (ADR-024) when that lands.
+// This function sits here, and not next to the contract, so that the contract holds no
+// implementation. It also sits here, and not on the schema, so that the universal entry
+// in src/index.ts never pulls a parser into the main bundle. A default for the whole
+// project belongs on defineConfig (ADR-024).
 export const codecFor = (
   node: FieldSchema,
   context: FieldTransformContext = {}

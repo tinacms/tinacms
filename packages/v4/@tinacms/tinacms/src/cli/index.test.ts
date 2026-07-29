@@ -59,7 +59,10 @@ describe('runCli', () => {
     const { out, context } = capture();
     // The lookup for the config file reads the directory, and does not trust the
     // loader. The file must therefore exist.
-    await writeFile(path.join(rootDir, 'tina', 'config.ts'), 'export default {}');
+    await writeFile(
+      path.join(rootDir, 'tina', 'config.ts'),
+      'export default {}'
+    );
 
     expect(await runCli(['codegen'], context)).toBe(0);
     expect(out.join('\n')).toMatch(/Wrote .*tina-lock\.json/);
@@ -73,10 +76,15 @@ describe('runCli', () => {
     const { out, context } = capture();
     const nested = path.join(rootDir, 'site');
     await mkdir(path.join(nested, 'tina'), { recursive: true });
-    await writeFile(path.join(nested, 'tina', 'config.ts'), 'export default {}');
+    await writeFile(
+      path.join(nested, 'tina', 'config.ts'),
+      'export default {}'
+    );
 
     expect(await runCli(['codegen', '--root', 'site'], context)).toBe(0);
-    expect(out.join('\n')).toContain(path.join(nested, 'tina', 'tina-lock.json'));
+    expect(out.join('\n')).toContain(
+      path.join(nested, 'tina', 'tina-lock.json')
+    );
   });
 
   // Every throw on this path carries an explanation, so the developer reads that and
