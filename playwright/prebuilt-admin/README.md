@@ -64,12 +64,13 @@ either way.
 ## Specs
 
 - `boot.spec` — collection list renders; single React reconciler; zero console errors on boot
-- `custom-field.spec` — custom field renders and a save round-trips to disk
-- `tailwind.spec` — `bg-blue-500` computes to Tina's `rgb(0, 132, 255)`; `aspect-w-9` compiled
+- `custom-field.spec` — custom field renders and a save round-trips to disk (its own document, `roundtrip.mdx`, isolated from the read-only specs)
+- `tailwind.spec` — `bg-blue-500` computes to Tina's `rgb(0, 132, 255)`; `aspect-w-9` compiled; also re-asserts the single-React/zero-console-error health check, since this is where `next/image` actually renders
 - `basepath.spec` — admin boots at `/my-site/admin/` **and** the bare `/my-site/admin`
 - `media.spec` — media manager lists via the custom store
 - `auth.spec` — the custom AuthJS login screen appears
-- `setup.spec` — meta-assertion: the CJS module + custom store are present in the built chunks
+- `screen.spec` — navigates through the admin nav (not a deep link) to the `cmsCallback` screen plugin, guarding a second react-router-dom instance
+- `setup.spec` — meta-assertion: the CJS module, custom store and screen plugin are present in the built chunks
 
 ## Running locally
 

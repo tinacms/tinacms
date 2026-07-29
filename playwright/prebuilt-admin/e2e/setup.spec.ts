@@ -49,4 +49,16 @@ test.describe('built bundle contains the hostile ingredients', () => {
     expect(js).toContain('CLIENT_FETCH_ERROR');
     expect(js).toContain('/api/auth');
   });
+
+  // Without this, screen.spec's nav-click + zero-console-errors assertion
+  // would be meaningless: it would pass vacuously if the `cmsCallback` plugin
+  // registration were ever dropped from the bundle (e.g. tree-shaken), since
+  // there'd simply be no "Fixture Screen" link to find. This proves the
+  // screen actually reached the built chunk, so a real react-router-dom
+  // duplication is what the runtime spec is left to catch.
+  test('screen plugin (react-router-dom singleton guard) is bundled', () => {
+    const js = readBuiltJs();
+    expect(js).toContain('fixture-screen');
+    expect(js).toContain('Fixture Screen');
+  });
 });
