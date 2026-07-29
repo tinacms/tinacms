@@ -17,6 +17,7 @@ export {
   type TinaLock,
 } from './codegen/compile-schema';
 export {
+  defineCollection,
   defineConfig,
   type ResolvedConfig,
   type TinaConfig,
@@ -27,6 +28,7 @@ export type {
   ContentSlice,
   DocumentEntry,
 } from './core/content/contract';
+export type { AdminScreen, AdminScreenProps } from './core/screen/contract';
 export {
   type Capability,
   definePlugin,
@@ -42,6 +44,7 @@ export { localContentPlugin } from './plugins/content/local/local-content.plugin
 export { corePlugins, t } from './plugins/fields';
 export type {
   BooleanFieldSchema,
+  DatetimeFieldSchema,
   NumberFieldSchema,
   RichTextFieldSchema,
   StringFieldSchema,
