@@ -29,14 +29,22 @@ export interface RichEditorProps {
 export const RichEditor = ({ input, field, ariaLabel }: RichEditorProps) => {
   // Seeded once: Plate owns the value after mount. Remounting on a document
   // switch is the field component's job (it keys this on the form id).
-  const initialValue = React.useMemo(() => {
+  // A lazy useState initialiser, and not a useMemo with an empty dependency list:
+  // the seed reads `input.value`, so an empty list claims a narrower dependency
+  // than the body has. That is the one memo the React Compiler cannot preserve, and
+  // it skips the whole component over it. useState says "once at mount" outright.
+  const [initialValue] = React.useState(() => {
     if (input.value?.children?.length) {
-      return input.value.children.map(helpers.normalize);
+      return helpers.withRootNodeIds(
+        input.value.children.map(helpers.normalize)
+      );
     }
     return [{ type: 'p', children: [{ type: 'text', text: '' }] }];
-  }, []);
+  });
   // Filter out FloatingToolbarPlugin if showFloatingToolbar is false
   const showFloatingToolbar = field?.overrides?.showFloatingToolbar !== false;
+  // Held: this package is not built with the React Compiler, and usePlateEditor reads
+  // the list at mount only, so rebuilding it on every keystroke buys nothing.
   const builtPlugins = React.useMemo(
     () =>
       createEditorPlugins({
@@ -77,9 +85,7 @@ export const RichEditor = ({ input, field, ariaLabel }: RichEditorProps) => {
           <TooltipProvider>
             <ToolbarProvider
               templates={field.templates ?? []}
-              overrides={
-                field?.toolbarOverride ? field.toolbarOverride : field.overrides
-              }
+              overrides={field?.overrides}
             >
               <FixedToolbar>
                 <FixedToolbarButtons />

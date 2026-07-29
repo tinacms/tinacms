@@ -36,7 +36,11 @@ The config (`RichTextFieldSchema`, which extends `BaseFieldSchema`):
 | `isBody` | `boolean` | This field is the markdown body of the file, and not a frontmatter key. |
 | `templates` | `MdxTemplate[]` | The MDX components that an author can embed in the text. |
 | `overrides` | `ToolbarOverrides` | The toolbar buttons and the heading levels that the editor shows. |
-| `toolbarOverride` | `ToolbarOverrideType[]` | The older list form of `overrides.toolbar`. |
+
+v3 also took a bare list of buttons under `toolbarOverride`. v4 drops it:
+`overrides.toolbar` takes the same list, and it is the only shape the editor
+reads. A v3 schema with `toolbarOverride: ['bold', 'italic']` becomes
+`overrides: { toolbar: ['bold', 'italic'] }`.
 
 There is no `parser` option. Both of v3's values lose content through this
 field. `slatejson` makes `serializeMDX` return the AST, and this field writes

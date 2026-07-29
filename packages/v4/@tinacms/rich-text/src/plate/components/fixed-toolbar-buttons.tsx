@@ -12,10 +12,11 @@ import { helpers, unsupportedItemsInTable } from '../plugins/core/common';
 import {
   CONTAINER_MD_BREAKPOINT,
   EMBED_ICON_WIDTH,
-  FLOAT_BUTTON_WIDTH,
   HEADING_ICON_ONLY,
   HEADING_ICON_WITH_TEXT,
   HEADING_LABEL,
+  HIGHLIGHT_ICON_WIDTH,
+  OVERFLOW_MENU_WIDTH,
   STANDARD_ICON_WIDTH,
   type ToolbarOverrideType,
 } from '../toolbar/toolbar-overrides';
@@ -100,7 +101,7 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
   },
   highlight: {
     label: 'Highlight',
-    width: () => STANDARD_ICON_WIDTH,
+    width: () => HIGHLIGHT_ICON_WIDTH,
     Component: <HighlightToolbarButton />,
   },
   italic: {
@@ -146,23 +147,15 @@ export default function FixedToolbarButtons() {
   const { overrides, templates } = useToolbarContext();
   const showEmbedButton = templates.length > 0;
 
-  let items = [];
-
-  if (Array.isArray(overrides)) {
-    items =
-      overrides === undefined
-        ? Object.values(toolbarItems)
-        : overrides
-            .map((item) => toolbarItems[item])
-            .filter((item) => item !== undefined);
-  } else {
-    items =
-      overrides?.toolbar === undefined
-        ? Object.values(toolbarItems)
-        : overrides.toolbar
-            .map((item) => toolbarItems[item])
-            .filter((item) => item !== undefined);
-  }
+  // The buttons the schema asks for, in the order it asks for them. Without a
+  // `toolbar` list, the toolbar holds every button. An empty list holds none, and
+  // the filter drops a name that no button answers to.
+  let items: ToolbarItem[] =
+    overrides?.toolbar === undefined
+      ? Object.values(toolbarItems)
+      : overrides.toolbar
+          .map((item) => toolbarItems[item])
+          .filter((item) => item !== undefined);
 
   if (!showEmbedButton) {
     items = items.filter((item) => item.label !== toolbarItems.embed.label);
@@ -178,35 +171,45 @@ export default function FixedToolbarButtons() {
   const userInCodeBlock = helpers.isNodeActive(editorState, CodeBlockPlugin);
 
   useResize(toolbarRef, (entry) => {
-    const width = entry.target.getBoundingClientRect().width - 8;
+    const width = entry.target.getBoundingClientRect().width;
     const headingButton = items.find((item) => item.label === HEADING_LABEL);
+    // This element carries `@container/toolbar`, so its own width is what the
+    // `@md/toolbar` query on the heading label resolves against.
     const headingWidth = headingButton
-      ? //some discrepancy here between the md breakpoint here and in practice, but it works
-        headingButton.width(width > CONTAINER_MD_BREAKPOINT - 9)
+      ? headingButton.width(width >= CONTAINER_MD_BREAKPOINT)
       : 0;
 
     // Calculate the available width excluding the heading button
     const availableWidth = width - headingWidth;
 
     // Count numbers of buttons can fit into the available width
-    const { itemFitCount } = items.reduce(
-      (acc, item) => {
-        if (
-          item.label !== HEADING_LABEL &&
-          acc.totalItemsWidth + item.width() <= availableWidth
-        ) {
-          return {
-            //add 4px to account for additional padding on toolbar buttons
-            totalItemsWidth: acc.totalItemsWidth + item.width() + 4,
-            itemFitCount: acc.itemFitCount + 1,
-          };
-        }
-        return acc;
-      },
-      { totalItemsWidth: 0, itemFitCount: 1 }
-    ); // Initial values fit count set as 1 becasue heading is always exist
+    const countItemsFitting = (budget: number) => {
+      // The heading is measured above, so it starts the count already spent —
+      // but only when it is actually in the list.
+      let count = headingButton ? 1 : 0;
+      let used = 0;
+      for (const item of items) {
+        if (item.label === HEADING_LABEL) continue;
+        // The row renders a contiguous prefix of `items`, so the first item that
+        // does not fit ends the count. A narrower item further down the list
+        // cannot take its place, and counting one that way overfills the row.
+        if (used + item.width() > budget) break;
+        used += item.width();
+        count += 1;
+      }
+      return count;
+    };
 
-    setItemsShown(itemFitCount);
+    // Reserve room for the overflow menu itself, but only once we know it will
+    // be rendered — otherwise a toolbar that fits exactly loses a button to a
+    // menu that never appears.
+    const fitCount = countItemsFitting(availableWidth);
+
+    setItemsShown(
+      fitCount >= items.length
+        ? items.length
+        : countItemsFitting(availableWidth - OVERFLOW_MENU_WIDTH)
+    );
   });
 
   const getOpacity = (item: ToolbarItem) => {
@@ -228,23 +231,24 @@ export default function FixedToolbarButtons() {
         }}
       >
         <>
-          {items
-            .slice(0, items.length > itemsShown ? itemsShown - 1 : itemsShown)
-            .map((item) => (
-              <div
-                className={cn(
-                  'transition duration-500 ease-in-out',
-                  getOpacity(item)
-                )}
-                key={item.label}
-              >
-                {item.Component}
-              </div>
-            ))}
+          {items.slice(0, itemsShown).map((item) => (
+            <div
+              className={cn(
+                'transition duration-500 ease-in-out',
+                getOpacity(item)
+              )}
+              key={item.label}
+            >
+              {item.Component}
+            </div>
+          ))}
+          {/* The menu follows the last button rather than sitting against the far
+              edge. Pushed right, the leftover width opens as a gap mid-row, which
+              reads as a button that failed to render. */}
           {items.length > itemsShown && (
-            <div className='w-fit ml-auto'>
+            <div className='w-fit'>
               <OverflowMenu>
-                {items.slice(itemsShown - 1).flatMap((c) => (
+                {items.slice(itemsShown).flatMap((c) => (
                   <div
                     className={cn(
                       'transition duration-500 ease-in-out',

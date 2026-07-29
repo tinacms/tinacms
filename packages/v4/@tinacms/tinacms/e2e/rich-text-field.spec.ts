@@ -2,6 +2,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
+import { setColumnWidth, toolbar } from './form-column';
 
 // Two rich-text guarantees that only a real browser can check. Both of these
 // shipped broken and were caught by hand; this is what stops that recurring.
@@ -63,6 +64,41 @@ test.describe('rich-text layout', () => {
     });
     expect(fits).toBe(true);
   });
+
+  // The toolbar decides how many tools to show from a table of pixel widths, one entry
+  // per control. Nothing derives that table from the buttons, so it drifts the moment a
+  // button changes. When it does, the row runs past its container and `overflow-hidden`
+  // takes the last control off screen — silently, because a clipped button still reports
+  // as rendered and still answers a click that lands where it used to be. This asserts
+  // the property the table exists to hold, at the widths the column can take.
+  test('the toolbar fits its column at every width the column can take', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1800, height: 900 });
+    await openDocument(page, 'second-post.mdx');
+
+    for (const columnWidth of [352, 420, 480, 560, 700, 900, 1200]) {
+      await setColumnWidth(page, columnWidth);
+
+      const row = await toolbar(page).evaluate((container) => {
+        const controls = Array.from(
+          (container.firstElementChild as HTMLElement).children
+        );
+        return {
+          container: container.getBoundingClientRect().width,
+          controls: controls.reduce(
+            (total, control) => total + control.getBoundingClientRect().width,
+            0
+          ),
+        };
+      });
+
+      expect(
+        row.controls,
+        `toolbar controls overflow a ${columnWidth}px column`
+      ).toBeLessThanOrEqual(row.container);
+    }
+  });
 });
 
 test.describe('rich-text save lifecycle', () => {
@@ -89,6 +125,26 @@ test.describe('rich-text save lifecycle', () => {
 
     await page.getByRole('button', { name: 'Save' }).click();
     await expect(status(page)).toHaveText('clean');
+  });
+
+  // Typing and then deleting what was typed leaves the file it would write unchanged,
+  // so the document is not edited any more. The tree Plate holds is not the tree the
+  // document was parsed from — Plate adds node ids and a trailing block — so a compare
+  // of the two trees answers "edited" for a document that has returned to its contents
+  // on disk, and the badge then never leaves "Unsaved".
+  test('typing and then deleting it returns the document to clean', async ({
+    page,
+  }) => {
+    await expect(status(page)).toHaveText('No changes');
+
+    await body(page).click();
+    await body(page).pressSequentially('Edited.');
+    await expect(status(page)).toHaveText('Unsaved');
+
+    // "Saved", and not "No changes": the form has been edited, and its values match the
+    // file again. Only a form that was never edited is pristine.
+    for (const _ of 'Edited.') await page.keyboard.press('Backspace');
+    await expect(status(page)).toHaveText('Saved');
   });
 
   test('a second edit after saving can also reach clean', async ({ page }) => {

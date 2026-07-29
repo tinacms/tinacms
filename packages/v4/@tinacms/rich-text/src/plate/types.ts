@@ -6,6 +6,11 @@ export interface TemplateField {
   name: string;
   label?: string;
   type?: string;
+  // The field whose value labels the embed in the editor, as `Template: value`. Refer
+  // to getLabel in create-mdx-plugins/component.tsx, which reads this. Templates are
+  // author-written config, so the key reaches here even though v4's own FieldSchema
+  // does not model it yet.
+  isTitle?: boolean;
 }
 
 export type MdxTemplate = {

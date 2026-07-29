@@ -32,6 +32,19 @@ const isListActive = (editor, type) => {
   return !!res && res.list[0].type === type;
 };
 
+// NodeIdPlugin normalizes the initial value by walking every node, one editor
+// operation each, so the walk grows with the document — it was most of the editor's
+// build time on a long body. The plugin skips the whole walk when the first and the
+// last root nodes already carry an id: partial ids are a state Plate supports, and
+// its insert overrides id new nodes as they arrive. Seeding the root ids here turns
+// the walk into that skip. Plain object copies, because at this point the value is
+// data, and not yet an editor.
+let seededNodeIds = 0;
+const withRootNodeIds = (nodes: any[]) =>
+  nodes.map((node) =>
+    node.id ? node : { ...node, id: `seed-${++seededNodeIds}` }
+  );
+
 const normalize = (node: any) => {
   if (
     [ELEMENT_MDX_BLOCK, ELEMENT_MDX_INLINE, ELEMENT_IMG].includes(node.type)
@@ -39,7 +52,6 @@ const normalize = (node: any) => {
     return {
       ...node,
       children: [{ type: 'text', text: '' }],
-      id: Date.now(),
     };
   }
   if (node.children) {
@@ -47,14 +59,12 @@ const normalize = (node: any) => {
       return {
         ...node,
         children: node.children.map(normalize),
-        id: Date.now(),
       };
     }
     // Always supply an empty text leaf
     return {
       ...node,
       children: [{ text: '' }],
-      id: Date.now(),
     };
   }
   return node;
@@ -85,8 +95,7 @@ const isCurrentBlockEmpty = (editor) => {
   const blockAbove = editor.api.block();
   const isEmpty =
     !NodeApi.string(node) &&
-    // @ts-ignore bad type from slate
-    !node.children?.some((n) => Editor.isInline(editor, n)) &&
+    !node.children?.some((child) => editor.api.isInline(child)) &&
     // Only do this if we're at the start of a block
     editor.api.isStart(cursor, blockAbove[1]);
 
@@ -137,4 +146,5 @@ export const helpers = {
   currentNodeSupportsMDX,
   normalize,
   normalizeLinksInCodeBlocks,
+  withRootNodeIds,
 };

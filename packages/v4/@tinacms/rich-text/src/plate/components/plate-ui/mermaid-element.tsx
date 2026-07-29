@@ -5,15 +5,14 @@ export const MermaidElementWithRef = ({ config }) => {
   const mermaidRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (mermaidRef.current) {
-      const renderMermaid = async () => {
-        await mermaid.run({
-          nodes: [mermaidRef.current.querySelector('.mermaid')],
-        });
-      };
+    const node = mermaidRef.current?.querySelector<HTMLElement>('.mermaid');
+    if (!node) return;
 
-      renderMermaid();
-    }
+    // mermaid.run rejects for a diagram it cannot parse, and the author types one
+    // character at a time, so most intermediate states do not parse. Reporting that is
+    // the code block's job — code-block-element.tsx validates and shows the message.
+    // Here the rejection only has to stop being an unhandled one.
+    mermaid.run({ nodes: [node] }).catch(() => {});
   }, [config]);
 
   return (

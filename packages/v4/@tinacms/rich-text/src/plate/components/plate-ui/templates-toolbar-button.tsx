@@ -24,18 +24,16 @@ interface EmbedButtonProps {
   templates: MdxTemplate[];
 }
 
+// Below this many, the list is short enough to scan and the input is just noise.
+const TEMPLATE_COUNT_NEEDING_FILTER = 10;
+
 const EmbedButton: React.FC<EmbedButtonProps> = ({ editor, templates }) => {
   const { open, onOpenChange } = useOpenState();
-  const [filteredTemplates, setFilteredTemplates] = useState(templates);
+  const [filterText, setFilterText] = useState('');
 
-  const filterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const filterText = e.target.value.toLowerCase();
-    setFilteredTemplates(
-      templates.filter((template) =>
-        template.name.toLowerCase().includes(filterText)
-      )
-    );
-  };
+  const filteredTemplates = templates.filter((template) =>
+    template.name.toLowerCase().includes(filterText.toLowerCase())
+  );
 
   return (
     <DropdownMenu modal={false} open={open} onOpenChange={onOpenChange}>
@@ -48,12 +46,13 @@ const EmbedButton: React.FC<EmbedButtonProps> = ({ editor, templates }) => {
         align='start'
         className='max-h-72 overflow-y-auto border-border rounded-none rounded-bl rounded-br'
       >
-        {templates.length > 10 && (
+        {templates.length > TEMPLATE_COUNT_NEEDING_FILTER && (
           <input
             type='text'
             placeholder='Filter templates...'
             className='w-full p-2 border border-gray-300 rounded'
-            onChange={filterChange}
+            value={filterText}
+            onChange={(event) => setFilterText(event.target.value)}
           />
         )}
         {filteredTemplates.map((template) => (
@@ -64,7 +63,6 @@ const EmbedButton: React.FC<EmbedButtonProps> = ({ editor, templates }) => {
               onOpenChange(false);
               insertMDX(editor, template);
             }}
-            className={''}
           >
             {template.label || template.name}
           </DropdownMenuItem>

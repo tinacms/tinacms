@@ -35,19 +35,23 @@ const handleRemoveBase = (editor, element) => {
 export const useHotkey = (key, callback) => {
   const selected = useSelected();
 
-  React.useEffect(() => {
-    const handleEnter = (e) => {
-      if (selected) {
-        if (isHotkey(key, e)) {
-          e.preventDefault();
-          callback();
-        }
-      }
-    };
-    document.addEventListener('keydown', handleEnter);
+  /**
+   * Bound once, for the life of the node. `selected`, `key`, and the callback are all
+   * read when the key is pressed, so the listener never churns on a selection change
+   * and never fires a callback from an earlier render — the callbacks here close over
+   * the editor and the element, and only `selected` used to re-create them.
+   */
+  const onKeyDown = React.useEffectEvent((e) => {
+    if (!selected || !isHotkey(key, e)) return;
+    e.preventDefault();
+    callback();
+  });
 
-    return () => document.removeEventListener('keydown', handleEnter);
-  }, [selected]);
+  React.useEffect(() => {
+    document.addEventListener('keydown', onKeyDown);
+
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, []);
 };
 
 export const useEmbedHandles = (editor, element, baseFieldName: string) => {

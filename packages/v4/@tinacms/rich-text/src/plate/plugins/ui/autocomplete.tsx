@@ -6,7 +6,7 @@ import {
   ComboboxOptions,
   Transition,
 } from '@headlessui/react';
-import { ChevronDownIcon } from '@heroicons/react/solid';
+import { ChevronDownIcon } from 'lucide-react';
 import React, { Fragment } from 'react';
 import { classNames } from './helpers';
 
@@ -25,6 +25,20 @@ interface AutocompleteProps {
   items: AutocompleteItem[];
 }
 
+const filterItems = (
+  items: AutocompleteItem[],
+  query: string
+): AutocompleteItem[] => {
+  try {
+    const reFilter = new RegExp(query, 'i');
+    const matched = items.filter((item) => reFilter.test(item.label));
+    if (matched.length === 0) return items;
+    return matched;
+  } catch {
+    return items;
+  }
+};
+
 export const Autocomplete: React.FC<AutocompleteProps> = ({
   value,
   onChange,
@@ -32,16 +46,7 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({
   items,
 }) => {
   const [query, setQuery] = React.useState(defaultQuery ?? '');
-  const filteredItems = React.useMemo(() => {
-    try {
-      const reFilter = new RegExp(query, 'i');
-      const _items = items.filter((item) => reFilter.test(item.label));
-      if (_items.length === 0) return items;
-      return _items;
-    } catch (err) {
-      return items;
-    }
-  }, [items, query]);
+  const filteredItems = filterItems(items, query);
 
   return (
     <Combobox

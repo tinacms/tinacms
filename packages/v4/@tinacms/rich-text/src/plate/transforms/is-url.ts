@@ -10,20 +10,20 @@ const nonLocalhostDomainRE = /^[^\s.]+\.\S{2,}$/;
 const localUrlRE = /^\/\S+/; // Regular expression for local URLs
 
 /** Loosely validate a URL `string`. */
-export const isUrl = (string: any) => {
-  if (typeof string !== 'string') {
+export const isUrl = (value: unknown) => {
+  if (typeof value !== 'string') {
     return false;
   }
 
   // Check if the string is a bare hash link
-  if (string.startsWith('#')) {
+  if (value.startsWith('#')) {
     return true;
   }
 
-  const generalMatch = string.match(protocolAndDomainRE);
-  const emailLinkMatch = string.match(emailLintRE);
-  const telLinkMatch = string.match(telLintRE); // Check for tel: link match
-  const localUrlMatch = string.match(localUrlRE); // Check for local URL match
+  const generalMatch = value.match(protocolAndDomainRE);
+  const emailLinkMatch = value.match(emailLintRE);
+  const telLinkMatch = value.match(telLintRE); // Check for tel: link match
+  const localUrlMatch = value.match(localUrlRE); // Check for local URL match
 
   // Check if any of the specific link types or the general pattern match
   if (emailLinkMatch || telLinkMatch || localUrlMatch) {
@@ -41,7 +41,7 @@ export const isUrl = (string: any) => {
 
     // Fallback to URL constructor for stricter validation of complex URLs
     try {
-      new URL(string);
+      new URL(value);
     } catch {
       return false;
     }

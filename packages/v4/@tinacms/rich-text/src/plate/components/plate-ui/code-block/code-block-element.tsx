@@ -60,7 +60,7 @@ export const CodeBlockElement = withRef<typeof PlateElement>(
         } catch (err) {
           if (!isCancelled) {
             setCodeBlockError(
-              String(err.message) ||
+              (err instanceof Error && err.message) ||
                 'An error occurred while parsing the diagram.'
             );
           }

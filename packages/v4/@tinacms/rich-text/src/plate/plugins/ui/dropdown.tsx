@@ -5,7 +5,7 @@ import {
   MenuItems,
   Transition,
 } from '@headlessui/react';
-import { ChevronDownIcon } from '@heroicons/react/solid';
+import { ChevronDownIcon } from 'lucide-react';
 import React from 'react';
 import { classNames } from './helpers';
 
