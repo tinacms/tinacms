@@ -28,9 +28,15 @@
  *      after `tinacms build`. (Kept as an object so #7245/#7246 can later split it
  *      into shell-dist + project-chunk budgets without a shape change.)
  *
- * Tolerance (metrics 1, 3, 4): fail when current exceeds baseline by more than
- * 5% OR 5 MB, whichever is larger. A decrease of more than 10% warns, prompting
- * a re-baseline so wins get locked in. The watchlist has zero tolerance.
+ * Tolerance (metrics 1, 3, 4): per-metric bands — see TOLERANCES below for the
+ * numbers and the reasoning. A decrease of more than 10% warns, prompting a
+ * re-baseline so wins get locked in. The watchlist has zero tolerance.
+ *
+ * Determinism: the fixture installs against a CHECKED-IN package-lock.json so
+ * install-closure size and watchlist copy-counts cannot drift from upstream
+ * point releases that have nothing to do with the PR's diff. See the lockfile
+ * section further down for why the workspace's own packages are deliberately
+ * absent from that lockfile (and why `npm ci` therefore cannot be used).
  *
  * Usage:
  *   node scripts/size-baseline.mjs                       # check against baseline (verdaccio)
@@ -84,8 +90,45 @@ const WATCHLIST = [
   'lodash',
 ];
 
-const TOLERANCE_PCT = 0.05;
-const TOLERANCE_ABS_BYTES = 5 * 1024 * 1024; // 5 MB
+/**
+ * Per-metric tolerance bands. A metric fails when it exceeds
+ * `baseline + max(baseline * pct, abs)`.
+ *
+ * One global band cannot work here: the tracked metrics span five orders of
+ * magnitude (a 16 KB tarball up to a ~1 GB install closure). Any absolute floor
+ * big enough for the closure makes every package budget unfireable — a 5 MB
+ * floor lets @tinacms/metrics (16.5 KB) grow 300× and stay green — and any
+ * percentage tight enough for the closure makes small tarballs fail on a README
+ * edit. So each band is sized against what its metric is actually for:
+ *
+ *  - installClosure (~966 MB): `du -sk` over ~100k files, deterministic now the
+ *    fixture installs from a committed lockfile, so the band only has to absorb
+ *    npm hoisting noise. 1% ≈ 9.7 MB — fires on a mid-size dependency entering
+ *    the closure (typescript 23 MB, monaco 73 MB, a nested `tinacms` copy
+ *    100 MB+), which is the regression class this job exists for. The 5 MB
+ *    floor only binds once the closure drops under 500 MB (i.e. after the
+ *    epic's runtime split), where 1% would get twitchy.
+ *  - adminOutput (~9.1 MB): vite output, byte-identical for identical inputs.
+ *    5% ≈ 468 KB today; the 250 KB floor takes over as the prebuilt shell
+ *    shrinks the bundle. #7245 (lazy mermaid) and #7246 (posthog chunk) both
+ *    move this metric by more than either number — that is the point of it.
+ *  - package (16 KB … 4 MB): 5% covers the big ones (tinacms 132 KB,
+ *    @tinacms/mdx 200 KB); the 25 KB floor covers the small ones. 25 KB is
+ *    sized to "a dependency got bundled in", not "a file was edited" — tight
+ *    enough that a small package can no longer grow unnoticed, loose enough
+ *    that ordinary source edits don't demand a re-baseline every PR.
+ *
+ * @type {Record<'installClosure'|'adminOutput'|'package', {pct:number, abs:number}>}
+ */
+export const TOLERANCES = {
+  installClosure: { pct: 0.01, abs: 5 * 1024 * 1024 },
+  adminOutput: { pct: 0.05, abs: 250 * 1024 },
+  package: { pct: 0.05, abs: 25 * 1024 },
+};
+
+// Decreases are judged on a single, deliberately looser rule: a warn exists
+// only to prompt `pnpm size:update` so a win gets locked in, and a warn channel
+// that fires on every dead-code removal is a warn channel nobody reads.
 const WARN_DECREASE_PCT = 0.1;
 
 const VERDACCIO_VERSION = '6';
@@ -100,11 +143,8 @@ const registryModeArg = args.find((a) => a.startsWith('--registry-mode='));
 const REGISTRY_MODE = registryModeArg
   ? registryModeArg.split('=')[1]
   : 'verdaccio';
-if (REGISTRY_MODE !== 'verdaccio' && REGISTRY_MODE !== 'real') {
-  fail(
-    `--registry-mode must be "verdaccio" or "real" (got "${REGISTRY_MODE}")`
-  );
-}
+// Validated in main() rather than here so importing this module (tests) can
+// never call process.exit.
 
 // ── small utils ──────────────────────────────────────────────────────────────
 function log(msg) {
@@ -150,7 +190,7 @@ function discoverPackages() {
 }
 
 // ── tarball unpacked-size (sum of regular-file entry sizes, like npm) ─────────
-function unpackedSizeOfTarball(tgzPath) {
+export function unpackedSizeOfTarball(tgzPath) {
   const buf = gunzipSync(fs.readFileSync(tgzPath));
   let off = 0;
   let total = 0;
@@ -572,14 +612,18 @@ function writeBaseline(metrics) {
 
 // ── tolerance engine ──────────────────────────────────────────────────────────
 /**
+ * @param {string} label
+ * @param {number|null|undefined} baseline
+ * @param {number} current
+ * @param {{pct:number, abs:number}} tolerance
  * @returns {{status:'ok'|'fail'|'warn', detail:string}}
  */
-function compareScalar(label, baseline, current) {
+export function compareScalar(label, baseline, current, tolerance) {
   if (baseline == null) {
     return { status: 'warn', detail: `${label}: no baseline (new metric)` };
   }
   const threshold =
-    baseline + Math.max(baseline * TOLERANCE_PCT, TOLERANCE_ABS_BYTES);
+    baseline + Math.max(baseline * tolerance.pct, tolerance.abs);
   const deltaBytes = current - baseline;
   const deltaPct = baseline === 0 ? 0 : (deltaBytes / baseline) * 100;
   const sign = deltaBytes >= 0 ? '+' : '';
@@ -599,7 +643,7 @@ function compareScalar(label, baseline, current) {
   return { status: 'ok', detail: line };
 }
 
-function compare(baseline, current) {
+export function compare(baseline, current) {
   const results = [];
 
   results.push({
@@ -607,7 +651,8 @@ function compare(baseline, current) {
     ...compareScalar(
       'du -sk node_modules',
       baseline.installClosureBytes,
-      current.installClosureBytes
+      current.installClosureBytes,
+      TOLERANCES.installClosure
     ),
   });
 
@@ -658,7 +703,8 @@ function compare(baseline, current) {
     ...compareScalar(
       'public/admin total',
       baseline.adminOutput?.totalBytes,
-      current.adminOutput.totalBytes
+      current.adminOutput.totalBytes,
+      TOLERANCES.adminOutput
     ),
   });
 
@@ -678,7 +724,10 @@ function compare(baseline, current) {
       });
       continue;
     }
-    results.push({ group: 'packages', ...compareScalar(name, base, cur) });
+    results.push({
+      group: 'packages',
+      ...compareScalar(name, base, cur, TOLERANCES.package),
+    });
   }
 
   return results;
@@ -687,6 +736,11 @@ function compare(baseline, current) {
 // ── main ──────────────────────────────────────────────────────────────────────
 async function main() {
   const started = Date.now();
+  if (REGISTRY_MODE !== 'verdaccio' && REGISTRY_MODE !== 'real') {
+    fail(
+      `--registry-mode must be "verdaccio" or "real" (got "${REGISTRY_MODE}")`
+    );
+  }
   log(`mode=${UPDATE ? 'update' : 'check'} registry-mode=${REGISTRY_MODE}`);
   const current = await measure();
 
@@ -736,7 +790,15 @@ async function main() {
   if (failed > 0) process.exit(1);
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+// Only run when invoked as the entry script — the pure pieces (compareScalar,
+// compare, unpackedSizeOfTarball) are imported by tests/size-baseline.test.ts.
+const invokedDirectly =
+  process.argv[1] &&
+  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+
+if (invokedDirectly) {
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}
