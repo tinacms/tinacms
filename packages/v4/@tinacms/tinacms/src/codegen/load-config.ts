@@ -1,38 +1,60 @@
-// Node-only. Reads a project's `tina/config.ts` and hands back what defineConfig
-// returned — the entry point for everything that needs the config outside the
-// browser: the schema compile, the Local Data Layer, and (once it lands) the CLI.
+// This runs in Node only. It reads the `tina/config.ts` of a project, and returns the
+// output of defineConfig. Every consumer outside the browser enters here: the schema
+// compile, the local data layer, and the CLI.
 //
-// It runs the file through a throwaway Vite server rather than importing it. The
-// config is TypeScript, and node can strip that on its own now, but it also imports
-// `@tinacms/tinacms`, whose `exports` still point at raw `.ts` using extensionless
-// relative specifiers (`./core/plugin`) that node's resolver will not follow. Vite's
-// resolver will, and `tinacms dev` hosts a Vite server regardless, so this is the
-// mechanism that survives rather than a stopgap.
+// It runs the file through a temporary Vite server, and does not import it. The config
+// is TypeScript, and node can now strip the types by itself. But the config also imports
+// `@tinacms/tinacms`, whose `exports` still point at raw `.ts` files. Those exports use
+// relative specifiers with no extension, such as `./core/plugin`, and the node resolver
+// does not follow them. The Vite resolver does follow them. `tinacms dev` also hosts a
+// Vite server, so this mechanism stays.
 
+import path from 'node:path';
 import { createServer } from 'vite';
 import type { ResolvedConfig } from '../config';
 import { invariant } from '../core/invariant';
 
+// The one function that this module needs from a Vite server. A caller can therefore
+// pass the server that it already has, and this module does not depend on the full
+// ViteDevServer type.
+export interface ModuleLoader {
+  ssrLoadModule(url: string): Promise<Record<string, unknown>>;
+}
+
 export interface LoadTinaConfigOptions {
-  // Resolution overrides for the loading server. A real project needs none — it
-  // resolves `@tinacms/tinacms` from node_modules — but a workspace that aliases
-  // the package at its source has to pass the same aliases its app uses.
+  // The resolution overrides for the loading server. Few callers need them. A project
+  // resolves `@tinacms/tinacms` from node_modules, and a copy in a workspace resolves
+  // through its own `exports`.
   alias?: { find: string; replacement: string }[];
+  // Use the server of the caller, instead of a new one. The CLI passes the server that
+  // loaded it. A second server costs about one second at each run, and gives nothing.
+  loader?: ModuleLoader;
 }
 
 export const loadTinaConfig = async (
   configPath: string,
   options: LoadTinaConfigOptions = {}
 ): Promise<ResolvedConfig> => {
-  const server = await createServer({
-    // Ignore any vite.config in scope: this server exists to resolve one module,
-    // and inheriting a project's plugins would run its whole dev pipeline (and, in
-    // a workspace, recurse straight back into the config that called us).
-    configFile: false,
-    logLevel: 'warn',
-    server: { middlewareMode: true, hmr: false, watch: null },
-    resolve: { alias: options.alias ?? [] },
-  });
+  const server =
+    options.loader ??
+    (await createServer({
+      // Ignore any vite.config in scope. This server resolves one module. The plugins
+      // of a project would run its whole dev pipeline. In a workspace, they would
+      // also return to the config that called this function.
+      configFile: false,
+      // Without this the server roots at process.cwd(), so a config loaded from
+      // anywhere else resolves its relative imports and tsconfig paths against the
+      // caller's directory rather than the project's.
+      root: path.dirname(configPath),
+      logLevel: 'warn',
+      // The `ws: false` option is necessary. In middleware mode, Vite has no HTTP
+      // server for the HMR socket. The `hmr: false` option alone does not stop that
+      // socket. Vite then binds its default port, 24678, on every interface. A load
+      // of one config file would claim a fixed global port, and two loads at the same
+      // time would race. Only `ws: false` stops createWebSocketServer.
+      server: { middlewareMode: true, hmr: false, ws: false, watch: null },
+      resolve: { alias: options.alias ?? [] },
+    }));
   try {
     const loaded = await server.ssrLoadModule(configPath);
     const config = loaded.default as ResolvedConfig | undefined;
@@ -43,6 +65,8 @@ export const loadTinaConfig = async (
     );
     return config;
   } finally {
-    await server.close();
+    // Close only the server that this function opened. A server from the caller stays
+    // open.
+    if (!options.loader) await (server as { close(): Promise<void> }).close();
   }
 };
