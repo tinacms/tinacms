@@ -59,9 +59,13 @@ const EMPTY_DOCUMENTS: DocumentEntry[] = [];
 // collection changes) and returns the slice's list cache for that collection.
 // The effect depends on the loadDocuments function (stable action ref), not the
 // slice object, so the load runs once per collection — not per slice update.
-export function useCollectionDocuments(collection: string): DocumentEntry[] {
+export function useCollectionDocuments(
+  collection: string | undefined
+): DocumentEntry[] {
   const { documents, loadDocuments } = useContentSlice();
   useEffect(() => {
+    // No collection is a real state (nothing is open), not a load of one named ''.
+    if (!collection) return;
     loadDocuments(collection).catch((cause) =>
       console.error(
         `[tinacms] Failed to load collection "${collection}":`,
@@ -69,7 +73,7 @@ export function useCollectionDocuments(collection: string): DocumentEntry[] {
       )
     );
   }, [loadDocuments, collection]);
-  return documents[collection] ?? EMPTY_DOCUMENTS;
+  return (collection ? documents[collection] : undefined) ?? EMPTY_DOCUMENTS;
 }
 
 function useFormScope(hookCode: string, hookName: string): FormScope {

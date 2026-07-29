@@ -8,14 +8,16 @@ export default defineClientPlugin({
   field: {
     Component: RichTextField,
     defaultValue: EMPTY_RICH_TEXT,
-    // A body is its own section, not something to sit beside a text input.
-    metadata: { layout: 'block' },
+    // A body is its own section. It does not sit beside a text input.
+    // A contenteditable is not a labelable element, so a host's `for` cannot reach
+    // it; the editor carries its own accessible name.
+    metadata: { layout: 'block', labelable: false },
     schema: richTextSchema,
-    // The document stores whatever the codec writes (markdown by default); the
-    // editor works on the document model. The codec is the only thing that knows
-    // the format, so changing it changes what lands in the file and nothing else.
-    // It is resolved from the document, not just the field, so one collection can
-    // hold .md and .mdx documents and each is read with its own parser.
+    // The document holds what the codec writes, which is markdown by default. The
+    // editor works on the document model. The codec is the only part that knows the
+    // format, so a new codec changes the contents of the file and nothing else. The
+    // codec resolves from the document, and not from the field alone, so one
+    // collection can hold .md and .mdx documents, each read with its own parser.
     parse: (stored, node, context) =>
       codecFor(node, context).parse(
         typeof stored === 'string' ? stored : '',

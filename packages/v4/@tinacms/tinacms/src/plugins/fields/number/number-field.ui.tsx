@@ -11,32 +11,37 @@ import type { NumberFieldSchema } from './number-field.schema';
 export function NumberField() {
   const address = useFieldAddress();
   const field = useFieldSchema<NumberFieldSchema>();
-  // The stored value is a number, but the editor value is the raw input string
-  // (`undefined` when empty) so partial entries like `-` or `1.` survive typing.
+  // The stored value is a number, but the editor value is the string from the input.
+  // It is undefined when the input is empty. A partial entry such as `-` or `1.`
+  // therefore survives while the author types.
   const [value, setValue] = useFieldValue<string | undefined>(address);
   const errors = useFieldErrors(address);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useFieldActivation(() => inputRef.current?.focus());
 
-  // TODO(shadcn): swap this raw input/markup for shared, themed primitives from
-  // src/ui/ (shadcn — Input/Label/form-field wrapper, added via the shadcn CLI) so
-  // every field looks consistent and is re-themeable without per-field redesign.
+  // TODO(shadcn): replace this input and its markup with the shared components in
+  // src/ui/. Those are the shadcn Input, Label, and form field wrapper, added with the
+  // shadcn CLI. Every field then looks the same, and a new theme needs no change to a
+  // field.
   return (
     <div>
       <input
         ref={inputRef}
         type='number'
-        // Default to 'any' so decimals aren't flagged as a stepMismatch.
+        // The default is 'any', so the browser does not report a decimal as a
+        // stepMismatch.
         step={field.step ?? 'any'}
+        id={address}
         aria-label={address}
         value={value ?? ''}
-        // Browser `badInput` (e.g. "5e") reports '' here, so it collapses to empty;
-        // surfacing it needs the value model / save flow, deferred for now.
+        // The browser reports an empty string here for bad input, such as "5e", so
+        // the value becomes empty. A report of that state needs the value model and
+        // the save flow, which come later.
         onChange={(event) =>
           setValue(event.target.value === '' ? undefined : event.target.value)
         }
-        // Stop a scroll over a focused input from silently changing the value.
+        // Stop a scroll over a focused input from changing the value.
         onWheel={(event) => event.currentTarget.blur()}
       />
       {errors.map((error) => (

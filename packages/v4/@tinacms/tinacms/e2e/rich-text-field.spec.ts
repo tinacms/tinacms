@@ -4,24 +4,24 @@ import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
 import { setColumnWidth, toolbar } from './form-column';
 
-// Two rich-text guarantees that only a real browser can check. Both of these
-// shipped broken and were caught by hand; this is what stops that recurring.
+// Two guarantees of the rich-text field that only a real browser can check. Both of them
+// shipped broken, and a person found them by hand. These tests stop that.
 
 const body = (page: import('@playwright/test').Page) =>
   page.getByRole('textbox', { name: 'body' });
 
-// The admin shell badges the OPEN document in its form header; the document list
-// badges every other one. Scoped to the header so the two never cross.
-// Exact, because the document list badges an edited document "Unsaved" — which
-// contains "Save", so a substring match resolves to the list entry as well.
+// The admin shell marks the open document in the header of its form, and it marks every
+// other document in the document list. This locator reads the header only, so the two
+// never cross. The match is exact, because the document list marks an edited document
+// "Unsaved". That word holds "Save", so a substring match would also find the list entry.
 const saveButton = (page: import('@playwright/test').Page) =>
   page.getByRole('button', { name: 'Save', exact: true });
 
 const status = (page: import('@playwright/test').Page) =>
   page.locator('aside header').getByText(/^(No changes|Unsaved|Saved)$/);
 
-// The admin opens on the collection list, so a document has to be navigated to.
-// Deep-linking is the shortest way in and exercises the route at the same time.
+// The admin opens on the collection list, so a test must navigate to a document. A deep
+// link is the shortest way in, and it also exercises the route.
 const openDocument = async (
   page: import('@playwright/test').Page,
   name: string
@@ -32,8 +32,8 @@ const openDocument = async (
   await expect(body(page)).toBeVisible();
 };
 
-// These tests really save, so they really write to the playground's content.
-// Snapshot it and put it back, or a test run leaves the repo dirty.
+// These tests save, so they write to the content of the playground. Copy that content
+// first, and write it back after, or a test run leaves the repository dirty.
 const CONTENT_DIR = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
   '../playground/content/posts'
@@ -58,11 +58,10 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe('rich-text layout', () => {
-  // FieldWrapper is a grid, so the editor's wrapper is a grid item and defaults
-  // to `min-width: auto` — without min-w-0 it refuses to shrink below Plate's
-  // intrinsic width and spills out of the sidebar. A single paragraph fits
-  // either way; an indented list is what exposes it, so this opens the document
-  // that has one.
+  // FieldWrapper is a grid, so the wrapper of the editor is a grid item and defaults
+  // to `min-width: auto`. Without min-w-0, it refuses to become narrower than Plate,
+  // and it spills out of the sidebar. One paragraph fits in both cases. An indented
+  // list shows the fault, so this test opens the document that has one.
   test('the editor stays inside the sidebar, even with nested lists', async ({
     page,
   }) => {
@@ -75,7 +74,7 @@ test.describe('rich-text layout', () => {
     }));
     expect(overflow.scroll).toBeLessThanOrEqual(overflow.client);
 
-    // And the editor itself fits the track rather than defining it.
+    // The editor fits the grid track, and does not set its width.
     const fits = await body(page).evaluate((editor) => {
       const track = editor.closest('aside') as HTMLElement;
       return editor.clientWidth <= track.clientWidth;
@@ -120,28 +119,29 @@ test.describe('rich-text layout', () => {
 });
 
 test.describe('rich-text save lifecycle', () => {
-  // Both of these really write hello-world.mdx; in parallel they would race on
-  // the same file. The layout test opens a different document and stays parallel.
+  // Both of these tests write hello-world.mdx. In parallel, they would race on that
+  // one file. The layout test opens another document, so it stays parallel.
   test.describe.configure({ mode: 'serial' });
 
-  // This also guards the admin shell's pinned document entry. A save feeds the
-  // persisted document back into the content slice's list cache; read unpinned, that
-  // re-ingests and resets RHF, and the form never reaches clean. It reproduces only
-  // for a field whose stored form differs from its editor value — rich-text parses
-  // markdown to an AST Plate then normalizes — so a plain-field unit test cannot see
-  // it, and this is the guard.
+  // This test also guards the pinned document entry of the admin shell. A save writes
+  // the stored document back into the list cache of the content slice. Without the
+  // pin, that read ingests the document again and resets RHF, and the form never
+  // becomes clean. It happens only for a field whose stored form differs from its
+  // editor value. The rich-text field parses markdown into a tree, and Plate then
+  // normalizes that tree. A unit test on a plain field cannot see it, so this test is
+  // the guard.
   //
-  // The store compares values by reference but is fed RHF's clone, so a
-  // structured value could never diff equal and a saved document stayed dirty
-  // forever. Plate also re-emits a normalized AST (node ids, a trailing block)
-  // that never matches what was parsed off disk, which made a bare click look
-  // like an edit. Typing here is real, so both are exercised end to end.
+  // The store compares values by reference, but it receives the clone from RHF. A
+  // structured value could therefore never compare equal, and a saved document stayed
+  // dirty for ever. Plate also emits a normalized tree, with node ids and a trailing
+  // block, which never matches the tree parsed from the disk. A click alone then
+  // looked like an edit. This test types real text, so it covers both faults.
   test('goes pristine -> dirty on a real edit -> clean once saved', async ({
     page,
   }) => {
     await expect(status(page)).toHaveText('No changes');
 
-    // Focusing and moving the caret is not an edit.
+    // A focus, and a move of the caret, are not an edit.
     await body(page).click();
     await expect(status(page)).toHaveText('No changes');
 

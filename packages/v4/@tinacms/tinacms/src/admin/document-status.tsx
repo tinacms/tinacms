@@ -6,10 +6,10 @@ import {
   useFormStatus,
 } from '../form/form-store';
 
-// Mapped onto the variants the design system has, rather than inventing tokens for
-// them: there is no success/warning pair in globals.css, and a badge is the wrong
-// place to introduce one. The ordering still reads correctly — the state that wants
-// action is the loudest, and both settled states recede.
+// These map onto the variants that the design system has. globals.css holds no success
+// colour and no warning colour, and a badge is the wrong place to add them. The order
+// still reads correctly. The state that needs action is the loudest, and the two settled
+// states are quiet.
 const STATUS_VARIANTS = {
   pristine: 'secondary',
   dirty: 'default',
@@ -22,9 +22,9 @@ const STATUS_LABELS: Record<FormStatus, string> = {
   clean: 'Saved',
 };
 
-// Reads any form's status, mounted or not — the document list badges closed
-// documents with it, which is the whole point of the store being the single
-// pristine/dirty/clean authority (ADR-010) rather than RHF.
+// This reads the status of any form, mounted or not. The document list marks a closed
+// document with it. This is why the store owns the pristine, dirty, and clean status
+// (ADR-010), and RHF does not.
 export function FormStatusBadge({ formId }: { formId: FormId }) {
   const status = useFormStatus(formId);
   return (

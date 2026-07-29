@@ -58,9 +58,9 @@ describe('RichTextField ingest and digest', () => {
   });
 });
 
-// The AST has no concept of leading whitespace, so serializing drops the blank
-// line separating frontmatter from prose. The markdown adapter writes it back —
-// without that, opening and saving any v3 document would restyle it.
+// The tree holds no leading whitespace, so the serializer drops the blank line between
+// the frontmatter and the prose. The markdown adapter writes it back. Without that, an
+// open and a save of any v3 document would restyle it.
 describe('RichTextField round-trip through the format adapter', () => {
   const adapter = formatAdapterFor('mdx');
   const RAW = '---\ntitle: Hello World\n---\n\nBody prose.\n';
@@ -85,9 +85,9 @@ describe('RichTextField round-trip through the format adapter', () => {
   });
 });
 
-// `parse`/`serialize` take the field node for exactly one reason: the parser
-// reads `templates` off it. Without them an embed degrades to a raw html node,
-// so this is the test that fails if the node argument is ever dropped again.
+// The parse and serialize functions take the field node for one reason: the parser reads
+// `templates` from it. Without the node, an embed becomes a raw html node. This test
+// fails if anyone drops that argument again.
 describe('RichTextField templates through the node argument', () => {
   const withTemplates: CollectionSchema = {
     name: 'post',
@@ -143,8 +143,8 @@ describe('RichTextField templates through the node argument', () => {
   });
 });
 
-// Saving is what makes an unparseable body dangerous — validation reports it but
-// does not block the write, so the serializer has to hand the source back intact.
+// A save is what makes an unparsed body dangerous. The validation reports it, and does
+// not block the write, so the serializer must return the source unchanged.
 describe('RichTextField unparseable markdown', () => {
   const BROKEN = '<Unclosed\n';
 
@@ -217,7 +217,9 @@ describe('RichTextField metadata wrapping', () => {
   it('registers the rich-text descriptor as a block field', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('rich-text');
-    expect(descriptor?.metadata).toEqual({ layout: 'block' });
+    // labelable: false — a contenteditable is not a labelable element, so a host
+    // must not point a <label for> at it.
+    expect(descriptor?.metadata).toEqual({ layout: 'block', labelable: false });
     expect(descriptor?.defaultValue).toEqual({ type: 'root', children: [] });
   });
 });

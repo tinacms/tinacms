@@ -52,3 +52,16 @@ describe('admin routing', () => {
     });
   });
 });
+
+describe('parseAdminRoute on input a user can type', () => {
+  // decodeURIComponent throws a URIError on these, and parseAdminRoute runs during
+  // render — so an unguarded throw white-screened the admin.
+  it.each([
+    '#/collections/100%',
+    '#/collections/post/%E0%A4%A',
+    '#/collections/%',
+  ])('falls back rather than throwing on %j', (hash) => {
+    expect(() => parseAdminRoute(hash)).not.toThrow();
+    expect(parseAdminRoute(hash)).toEqual(COLLECTIONS_ROUTE);
+  });
+});

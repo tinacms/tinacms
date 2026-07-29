@@ -94,11 +94,24 @@ function SidebarProvider({
   }, [isMobile, setOpen, setOpenMobile]);
 
   // Adds a keyboard shortcut to toggle the sidebar.
+  //
+  // Local change to the registry component: the shortcut yields to an editable target.
+  // Cmd/Ctrl+B is Bold in every text editor, and this listener is on `window` with a
+  // preventDefault, so hosting a rich-text field inside a sidebar layout silently killed
+  // it. A shortcut for chrome should not outrank the field the chrome exists to edit.
   React.useEffect(() => {
+    const isEditable = (target: EventTarget | null) => {
+      const element = target as HTMLElement | null;
+      if (!element || typeof element.closest !== 'function') return false;
+      return Boolean(
+        element.closest('input, textarea, select, [contenteditable="true"]')
+      );
+    };
     const handleKeyDown = (event: KeyboardEvent) => {
       if (
         event.key === SIDEBAR_KEYBOARD_SHORTCUT &&
-        (event.metaKey || event.ctrlKey)
+        (event.metaKey || event.ctrlKey) &&
+        !isEditable(event.target)
       ) {
         event.preventDefault();
         toggleSidebar();

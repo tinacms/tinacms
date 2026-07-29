@@ -3,8 +3,9 @@ import type { TinaSchema } from '../config';
 import { invariant } from '../core/invariant';
 import { TinaRuntimeContext } from '../editor/context';
 
-// The content model the admin navigates, as defineConfig declared it. Build-time
-// config rather than state (ADR-016), so it is read from the runtime, not the store.
+// The content model that the admin navigates, as defineConfig declared it. It is config
+// from the build, and not state (ADR-016), so this reads it from the runtime and not
+// from the store.
 export function useTinaSchema(): TinaSchema {
   const runtime = use(TinaRuntimeContext);
   invariant(

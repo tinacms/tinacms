@@ -7,16 +7,42 @@
 // it, which is a runtime throw with no type to catch it. Anything else the shell grows
 // that reads the open document (a toolbar, a document-actions menu) lands the same way.
 
-import { type ReactNode, useMemo } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
+import type { DocumentEntry } from '../core/content/contract';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import { useCollectionDocuments, useContentSlice } from '../editor/hooks';
 import { FormProvider } from '../editor/provider';
 
 export interface DocumentScopeProps {
-  collection: CollectionSchema;
-  path: string;
+  // Both absent when no document is open. The component still renders, so the panes
+  // below keep their place in the tree.
+  collection?: CollectionSchema;
+  path?: string;
   children: ReactNode;
 }
+
+/**
+ * The document the form seeds from, pinned for as long as `path` is open.
+ *
+ * A save writes the stored entry back into the list cache. The cache has to keep the
+ * list badges current, and must not seed the mounted form again — a new `document` prop
+ * ingests again and resets RHF, dropping the clean baseline the save just set and any
+ * key typed while it was in flight.
+ *
+ * A ref, not useMemo. useMemo is a cache React is allowed to discard, and a discarded
+ * one returns the post-save entry: the exact re-seed this exists to prevent, arriving
+ * unpredictably rather than never.
+ */
+const usePinnedDocument = (
+  path: string | undefined,
+  cached: DocumentEntry | undefined
+): DocumentEntry | undefined => {
+  const pinned = useRef<{ path: string; entry: DocumentEntry } | null>(null);
+  if (pinned.current?.path !== path) {
+    pinned.current = path && cached ? { path, entry: cached } : null;
+  }
+  return pinned.current?.entry;
+};
 
 export function DocumentScope({
   collection,
@@ -55,7 +81,7 @@ export function DocumentScope({
       key={path}
       collection={collection}
       path={path}
-      document={entry.document}
+      document={entry?.document}
       onSave={save}
     >
       {children}

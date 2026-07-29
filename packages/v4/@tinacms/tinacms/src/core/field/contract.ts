@@ -9,6 +9,13 @@ export type FieldLayout = 'inline' | 'block';
 
 export interface FieldMetadata {
   layout?: FieldLayout;
+  /**
+   * Whether a host's `<label for>` can target this field's control. Defaults to true.
+   * Set it false for a control HTML cannot label — a contenteditable is not a labelable
+   * element, so `for` would point at nothing and the association would be worse than
+   * none. Such a field names itself instead.
+   */
+  labelable?: boolean;
 }
 
 // What a field's transform knows about the document it belongs to, beyond its own

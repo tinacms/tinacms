@@ -1,17 +1,18 @@
 import { useCallback, useSyncExternalStore } from 'react';
 import { type AdminRoute, formatAdminRoute, parseAdminRoute } from './routing';
 
-// `location.hash` is external mutable state that React does not own — the back
-// button and a pasted link both change it behind the component tree. useSyncExternalStore
-// is the primitive for exactly that; a useState mirror would miss both.
+// The `location.hash` value is external state that React does not own. The back button
+// changes it, and so does a pasted link, both outside the component tree.
+// useSyncExternalStore is the primitive for that state. A copy in useState would miss
+// both changes.
 const subscribe = (onChange: () => void) => {
   window.addEventListener('hashchange', onChange);
   return () => window.removeEventListener('hashchange', onChange);
 };
 
 const readHash = () => window.location.hash;
-// The server has no location, and the admin is client-rendered — the collection
-// list is what it would show before hydration anyway.
+// The server has no location, and the client renders the admin. The collection list is
+// what the admin shows before hydration.
 const readHashOnServer = () => '';
 
 export interface AdminNavigation {
@@ -22,8 +23,9 @@ export interface AdminNavigation {
 export const useAdminRoute = (): AdminNavigation => {
   const hash = useSyncExternalStore(subscribe, readHash, readHashOnServer);
   const navigate = useCallback((route: AdminRoute) => {
-    // Assigning the hash rather than pushState: it produces the history entry the
-    // back button expects and fires hashchange, so there is one path in and out.
+    // This assigns the hash, and does not call pushState. The assignment makes the
+    // history entry that the back button needs, and it fires hashchange. There is then
+    // one path in and one path out.
     window.location.hash = formatAdminRoute(route);
   }, []);
   return { route: parseAdminRoute(hash), navigate };
