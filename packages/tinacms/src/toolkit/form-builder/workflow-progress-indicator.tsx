@@ -68,7 +68,7 @@ export const WorkflowProgressIndicator = ({
                     />
                   </svg>
                 ) : isActive ? (
-                  <Loader2 className='animate-spin text-lg' />
+                  <Loader2 className='animate-spin w-5 h-5' />
                 ) : (
                   stepNumber
                 )}
