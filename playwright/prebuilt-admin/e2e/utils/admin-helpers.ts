@@ -73,3 +73,51 @@ export async function clickSave(page: Page): Promise<void> {
   await page.getByRole('button', { name: 'Save', exact: true }).click();
   await saved;
 }
+
+/**
+ * Start collecting console errors and page errors. Call before `page.goto`
+ * so nothing during boot is missed, then hand the returned array to
+ * `assertHealthyRender`.
+ */
+export function trackConsoleErrors(page: Page): string[] {
+  const consoleErrors: string[] = [];
+  page.on('console', (msg) => {
+    if (msg.type() === 'error') consoleErrors.push(msg.text());
+  });
+  page.on('pageerror', (err) => {
+    consoleErrors.push(`pageerror: ${err.message}`);
+  });
+  return consoleErrors;
+}
+
+/**
+ * The "killer trap" health check (single React reconciler + zero console
+ * errors), factored out so every spec that renders the hostile bundle —
+ * not just boot.spec's collection list — can assert it. `FixtureField`
+ * (which imports `next/image`) only mounts on the edit form, so the
+ * custom-field and tailwind specs must call this too: the collection list
+ * alone never exercises next/image's render, only its module import.
+ *
+ * Requires `DEVTOOLS_HOOK_STUB` to have been injected via `addInitScript`
+ * before `page.goto`, and `consoleErrors` to come from `trackConsoleErrors`.
+ */
+export async function assertHealthyRender(
+  page: Page,
+  consoleErrors: string[]
+): Promise<void> {
+  // Exactly one react-dom registered with the DevTools hook. A second React
+  // dragged in through a CJS dep (e.g. next/image) would push this to 2.
+  const renderers = await page.evaluate(
+    () =>
+      (
+        window as unknown as {
+          __REACT_DEVTOOLS_GLOBAL_HOOK__: { renderers: Map<number, unknown> };
+        }
+      ).__REACT_DEVTOOLS_GLOBAL_HOOK__.renderers.size
+  );
+  expect(renderers).toBe(1);
+
+  expect(consoleErrors, `console errors:\n${consoleErrors.join('\n')}`).toEqual(
+    []
+  );
+}
