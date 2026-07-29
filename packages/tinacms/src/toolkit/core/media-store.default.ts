@@ -175,6 +175,8 @@ export class TinaMediaStore implements MediaStore {
 
   accept = DEFAULT_MEDIA_UPLOAD_TYPES;
 
+  searchable = true;
+
   // allow up to 100MB uploads
   maxSize = 100 * 1024 * 1024;
 
@@ -807,7 +809,7 @@ export class TinaMediaStore implements MediaStore {
           options.limit || 20
         }${options.offset ? `&cursor=${options.offset}` : ''}${
           encodedBranch ? `&branch=${encodedBranch}` : ''
-        }`
+        }${options.search ? `&search=${encodeURIComponent(options.search)}` : ''}`
       );
 
       if (res.status == 401) {
@@ -821,7 +823,9 @@ export class TinaMediaStore implements MediaStore {
       res = await this.fetchFunction(
         `${this.url}/list/${options.directory || ''}?limit=${
           options.limit || 20
-        }${options.offset ? `&cursor=${options.offset}` : ''}`
+        }${options.offset ? `&cursor=${options.offset}` : ''}${
+          options.search ? `&search=${encodeURIComponent(options.search)}` : ''
+        }`
       );
 
       if (res.status == 404) {
