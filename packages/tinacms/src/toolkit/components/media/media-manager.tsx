@@ -358,16 +358,23 @@ export function MediaPicker({
             fileCount: mediaItems.length,
           });
           setActiveItem(mediaItems[0]);
-          setList((mediaList) => {
-            return {
-              items: [
-                // all the newly added items are new
-                ...mediaItems.map((x) => ({ ...x, new: true })),
-                ...mediaList.items,
-              ],
-              nextOffset: mediaList.nextOffset,
-            };
-          });
+          if (debouncedSearch) {
+            setSearch('');
+            setDebouncedSearch('');
+            resetOffset();
+            setLoadFolders(true);
+          } else {
+            setList((mediaList) => {
+              return {
+                items: [
+                  // all the newly added items are new
+                  ...mediaItems.map((x) => ({ ...x, new: true })),
+                  ...mediaList.items,
+                ],
+                nextOffset: mediaList.nextOffset,
+              };
+            });
+          }
         }
       } catch {
         // TODO: Events get dispatched already. Does anything else need to happen?
