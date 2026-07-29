@@ -1,10 +1,10 @@
-// Point the public import strings at the package source, so the playground exercises
-// the same specifiers a real app will use (not relative paths into src/). The more
-// specific subpath must come first.
+// Point the public import strings at the source of the package, so the playground uses
+// the same specifiers that a real app uses. It does not use a relative path into src/.
+// The longer subpath must come first.
 //
-// Its own module because two servers need it: the dev server, and the throwaway one
-// loadTinaConfig spins up to read tina/config.ts. A real app needs neither — it
-// resolves @tinacms/tinacms from node_modules.
+// This is its own module, because two servers need it. Those are the dev server, and the
+// temporary server that loadTinaConfig starts to read tina/config.ts. A real app needs
+// neither, because it resolves @tinacms/tinacms from node_modules.
 
 import { fileURLToPath } from 'node:url';
 

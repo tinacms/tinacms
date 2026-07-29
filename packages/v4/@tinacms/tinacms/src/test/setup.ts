@@ -3,7 +3,8 @@ import { configure } from '@testing-library/dom';
 import { beforeEach } from 'vitest';
 import { useFormStore } from '../form/form-store';
 
-// findBy*/waitFor default to 1s — too tight for TinaProvider's async boot
+// findBy* and waitFor default to one second, which is too short for the async boot of
+// TinaProvider.
 // (plugin graph + lazy segment imports) on loaded CI runners.
 configure({ asyncUtilTimeout: 5000 });
 
