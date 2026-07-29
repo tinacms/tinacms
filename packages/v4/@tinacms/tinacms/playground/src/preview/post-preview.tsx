@@ -5,10 +5,10 @@ import {
 } from '@tinacms/tinacms/adapters/react';
 import { sampleDocument } from '../content';
 
-// The site side of visual editing, as a real site would write it: useTina
-// seeds from the statically-rendered document (the whole story when
-// /preview.html is opened directly) and adopts the editor's streamed values
-// when embedded; tinaField marks the clickable elements.
+// The site side of visual editing, written as a real site would write it. useTina seeds
+// from the document that the site rendered, which is the whole document when a browser
+// opens /preview.html directly. Inside the editor, useTina adopts the values that arrive.
+// tinaField marks the elements that an author can click.
 export function PostPreview() {
   const { data: post, isEditing } = useTina({ data: sampleDocument });
 
