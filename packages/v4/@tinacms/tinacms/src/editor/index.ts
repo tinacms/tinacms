@@ -38,11 +38,26 @@ export {
   type PreviewConnectionOptions,
   usePreviewConnection,
 } from './preview-connection';
+// The cache over the content capability. A plugin's client segment reads content
+// through these, and not through the slice: the slice is a transport, and these hold
+// the deduplication, the staleness policy, and the save's write-back.
+export {
+  type CollectionDocuments,
+  CONTENT_STALE_TIME,
+  contentKeys,
+  type DocumentRead,
+  type DocumentSave,
+  type SaveDocumentInput,
+  useCollectionDocuments,
+  useDocument,
+  useInvalidateContent,
+  useSaveDocument,
+} from './content-queries';
 export {
   type ActiveField,
   useActiveField,
-  useCollectionDocuments,
   useContentSlice,
+  useDiscardEdits,
   useDocumentPath,
   useFieldActivation,
   useFieldAddress,
