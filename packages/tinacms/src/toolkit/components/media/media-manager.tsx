@@ -359,6 +359,9 @@ export function MediaPicker({
             fileCount: mediaItems.length,
           });
           setActiveItem(mediaItems[0]);
+          if (mediaFilter === 'folders') {
+            setMediaFilter('all');
+          }
           if (debouncedSearch) {
             setSearch('');
             setDebouncedSearch('');
