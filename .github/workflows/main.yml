@@ -231,6 +231,9 @@ jobs:
               - 'scripts/size-baseline.mjs'
               - 'tests/size-fixture/**'
               - 'tests/size-baselines.json'
+              # Metric 4 is the kitchen-sink's built admin bundle, so its Tina
+              # config and collections move the number too.
+              - 'examples/next/kitchen-sink/**'
 
   # Fails a PR that regresses install size, per-package tarball size, admin
   # bundle size, or introduces a duplicate copy of a watchlist package.
