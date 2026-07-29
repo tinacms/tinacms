@@ -509,6 +509,7 @@ export function MediaPicker({
             setDebouncedSearch('');
             resetOffset();
             resetList();
+            setActiveItem(false);
           }}
           close={() => setNewFolderModalOpen(false)}
         />
