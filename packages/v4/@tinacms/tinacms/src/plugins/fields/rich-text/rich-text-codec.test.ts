@@ -7,17 +7,19 @@ import {
 import { digestDocument, ingestDocument } from '../../../core/form/ingest';
 import type { CollectionSchema } from '../../../core/schema/types';
 import { t } from '../../../index';
-import { codecFor, markdownCodec, mdxCodec } from './mdx-codec';
+import { markdownCodec } from './markdown.codec';
+import { mdxCodec } from './mdx.codec';
 import type { RichTextCodec } from './rich-text-codec';
+import { codecFor } from './rich-text-codecs';
 import richTextFieldPlugin from './rich-text-field.plugin';
 
 const resolveRegistry = (): Promise<FieldRegistry> =>
   resolveFieldPlugins([richTextFieldPlugin]);
 
-// The whole point of the codec seam: the format is replaceable without the
-// editor, the schema, or the save flow knowing. This one stores the body as
-// upper-cased plain text — deliberately nothing like markdown, so a test passing
-// with it proves no markdown assumption leaked out of the codec.
+// This is the point of the codec boundary: a new format needs no change in the editor,
+// the schema, or the save flow. This codec stores the body as plain text in capitals.
+// That is nothing like markdown, so a test that passes with it proves that no assumption
+// about markdown left the codec.
 const shoutCodec: RichTextCodec = {
   parse: (source) => ({
     type: 'root',
@@ -43,8 +45,8 @@ describe('codec selection', () => {
   });
 });
 
-// One collection can hold .md and .mdx documents, so the parser follows the file
-// rather than the collection — the plate stack's half of multi-format collections.
+// One collection can hold .md and .mdx documents, so the parser follows the file and not
+// the collection. This is the Plate half of a collection with more than one format.
 describe('codec selection follows the document', () => {
   const body = t.richText({ name: 'body' });
 
@@ -57,9 +59,9 @@ describe('codec selection follows the document', () => {
     );
   });
 
-  // .json/.yaml hold rich text as a markdown string (as v3 does) with no format
-  // of their own to name, so they take the branch that round-trips an unparseable
-  // body instead of blanking it.
+  // A .json file and a .yaml file hold rich text as a markdown string, as v3 does, and
+  // they name no format of their own. They therefore take the branch that returns an
+  // unparsed body, and does not blank it.
   it('falls back to MDX for a format with no markdown file of its own', () => {
     expect(codecFor(body, { documentPath: 'content/posts/a.json' })).toBe(
       mdxCodec
@@ -79,8 +81,8 @@ describe('codec selection follows the document', () => {
 
 describe('the two parsers genuinely differ', () => {
   const body = t.richText({ name: 'body' });
-  // Braces are an MDX expression and ordinary characters in markdown. A price in
-  // .md prose is the everyday case: MDX rejects the whole body over it.
+  // A brace is an MDX expression, and an ordinary character in markdown. A price in
+  // .md prose is the common case, and MDX rejects the whole body over it.
   const PROSE_WITH_BRACES = 'Costs {100} dollars\n';
 
   it('reads braces in .md prose as text where MDX fails the whole body', () => {
@@ -105,10 +107,11 @@ describe('the two parsers genuinely differ', () => {
     ).toBe(source);
   });
 
-  // The reason the schema refuses a per-field `parser: 'markdown'`: serializeMDX's
-  // markdown branch returns before its invalid_markdown check, so an unparsed body
-  // would save as blank. The codec guards it instead — without this, opening a
-  // body the parser choked on and hitting save destroys the file.
+  // This is why the schema refuses a `parser: 'markdown'` option on a field. The
+  // markdown branch of serializeMDX returns before its check for invalid markdown, so
+  // a body that it could not parse would save as an empty string. The codec guards it
+  // instead. Without that guard, an author who opens a body that the parser rejected,
+  // and then saves, destroys the file.
   it('writes an unparsed body back as its original source, never blank', () => {
     const source = 'Body the parser could not read\n';
     const unparsed = {
@@ -177,8 +180,8 @@ describe('a field carries its content through its codec', () => {
       collection.fields,
       registry
     );
-    // The markdown parser would have produced a text node of "hello there" too,
-    // so assert the structure this codec makes rather than the text alone.
+    // The markdown parser would also produce a text node of "hello there", so this
+    // asserts the structure that this codec makes, and not the text alone.
     expect(values.body).toEqual({
       type: 'root',
       children: [

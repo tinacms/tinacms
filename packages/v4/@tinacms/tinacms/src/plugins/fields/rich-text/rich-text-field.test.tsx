@@ -164,6 +164,60 @@ describe('RichTextField unparseable markdown', () => {
   });
 });
 
+// The form store asks the descriptor whether two values are the same edit. It cannot
+// compare the trees itself: Plate normalizes the tree it is given, so the tree in the
+// editor never matches the tree parsed from the file. Without this answer, a body that
+// its author typed and then deleted again would stay "Unsaved" for ever.
+describe('RichTextField equality', () => {
+  // What Plate hands back: NodeIdPlugin puts an id on every node, and TrailingBlockPlugin
+  // appends an empty paragraph.
+  const normalized = (value: RichTextValue): RichTextValue => {
+    const withIds = (node: Record<string, unknown>, index: number) => ({
+      ...node,
+      id: `node-${index}`,
+      ...(Array.isArray(node.children)
+        ? { children: node.children.map(withIds) }
+        : {}),
+    });
+    return {
+      ...value,
+      children: [
+        ...value.children.map((child, index) =>
+          withIds(child as Record<string, unknown>, index)
+        ),
+        { type: 'p', children: [{ type: 'text', text: '' }] },
+      ],
+    } as RichTextValue;
+  };
+
+  const isEqual = async () => {
+    const registry = await resolveRegistry();
+    const descriptor = registry.get('rich-text');
+    if (!descriptor?.isEqual) throw new Error('no equality on the descriptor');
+    return (a: unknown, b: unknown) => descriptor.isEqual?.(a, b, bodyNode, {});
+  };
+
+  it('reads a normalized tree as the tree it was parsed from', async () => {
+    const registry = await resolveRegistry();
+    const parsed = ast('Some prose.\n', registry);
+    expect((await isEqual())(parsed, normalized(parsed))).toBe(true);
+  });
+
+  it('still reads a real edit as a change', async () => {
+    const registry = await resolveRegistry();
+    const parsed = ast('Some prose.\n', registry);
+    expect((await isEqual())(parsed, ast('Edited prose.\n', registry))).toBe(
+      false
+    );
+  });
+
+  it('reads an absent body and an empty one as two states', async () => {
+    const registry = await resolveRegistry();
+    expect((await isEqual())(undefined, ast('', registry))).toBe(false);
+    expect((await isEqual())(undefined, undefined)).toBe(true);
+  });
+});
+
 describe('RichTextField validation', () => {
   it('rejects an empty required body', async () => {
     const registry = await resolveRegistry();

@@ -9,15 +9,16 @@ import { markdownAdapter } from './markdown.adapter';
 
 export type { CollectionFormat };
 
-// Format adapters (ADR-017 §5): the only serialization layer — document JSON ↔ file.
-// `serialize` takes the file's previous raw contents and merges the saved value OVER
-// what's already there, so frontmatter keys the schema doesn't know about and the
-// markdown body survive every save verbatim (CONTEXT.md Unknown field). That
-// round-trip guarantee is what makes pointing v4 at an existing v3 content folder
-// safe — same gray-matter format v3 writes, nothing gets dropped.
-// `bodyField` is the collection's `isBody` field name, when it has one: the body
-// crosses as that field's value instead of being preserved untouched. Formats with
-// no body concept (json) ignore it.
+// The format adapters (ADR-017 §5). They are the only serialization layer, and they
+// convert between the document JSON and the file. The `serialize` function takes the
+// previous contents of the file, and merges the saved value over them. A frontmatter key
+// that the schema does not know, and the markdown body, therefore survive every save
+// without a change. Refer to the unknown field in CONTEXT.md. That guarantee makes it
+// safe to point v4 at a v3 content folder. It writes the same gray-matter format that v3
+// writes, and it drops nothing.
+// The `bodyField` is the name of the `isBody` field of the collection, when it has one.
+// The body then crosses as the value of that field, and does not stay untouched. A
+// format with no body, such as JSON, ignores it.
 export interface FormatAdapter {
   extension: string;
   parse(raw: string, bodyField?: string): TinaDocument;
@@ -28,8 +29,8 @@ export interface FormatAdapter {
   ): string;
 }
 
-// Extensions come from FORMAT_EXTENSIONS (core/schema/types.ts) so this and the
-// rich-text codecs cannot drift apart on what a format is called on disk.
+// The extensions come from FORMAT_EXTENSIONS in core/schema/types.ts, so this file and
+// the rich-text codecs cannot disagree about the name of a format on disk.
 const adapters: Partial<Record<CollectionFormat, FormatAdapter>> = {
   md: markdownAdapter(FORMAT_EXTENSIONS.md),
   mdx: markdownAdapter(FORMAT_EXTENSIONS.mdx),
@@ -50,17 +51,17 @@ export const formatAdapterFor = (
   return adapter;
 };
 
-// A collection's formats, always as a list — `format: 'mdx'` and
-// `format: ['mdx']` describe the same collection. Order is the schema's:
-// formats[0] is the primary (types.ts).
+// The formats of a collection, always as a list. `format: 'mdx'` and `format: ['mdx']`
+// describe the same collection. The order comes from the schema, and the first entry is
+// the primary format. Refer to types.ts.
 export const collectionFormats = (
   format: CollectionSchema['format']
 ): CollectionFormat[] => (Array.isArray(format) ? format : [format]);
 
-// The adapters a collection reads and writes with, in schema order. Two formats
-// resolving to the same extension has no sensible answer — whichever won the
-// lookup would parse the other's files — so it fails here, at construction,
-// rather than on someone's first save.
+// The adapters that a collection reads and writes with, in schema order. Two formats
+// with the same extension have no correct answer, because the adapter that won the
+// lookup would parse the files of the other one. This therefore fails at construction,
+// and not at the first save.
 export const formatAdaptersFor = (
   format: CollectionSchema['format'],
   overrides?: Partial<Record<CollectionFormat, FormatAdapter>>
@@ -79,8 +80,8 @@ export const formatAdaptersFor = (
   return resolved;
 };
 
-// Which adapter owns this file. The document's extension decides, not the
-// collection — that is what lets one collection hold mixed formats.
+// The adapter that owns a file. The extension of the document decides, and the
+// collection does not. This lets one collection hold more than one format.
 export const adapterForPath = (
   adapters: FormatAdapter[],
   filePath: string

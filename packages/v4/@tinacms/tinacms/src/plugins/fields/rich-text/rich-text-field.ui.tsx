@@ -5,100 +5,113 @@ import { useCallback, useRef } from 'react';
 import { toFieldAddress } from '../../../core/field/address';
 import {
   useActiveField,
+  useDocumentPath,
   useFieldActivation,
   useFieldAddress,
   useFieldErrors,
   useFieldSchema,
   useFieldValue,
-  useFormId,
+  useFormSeedKey,
 } from '../../../editor';
-import { codecFor } from './mdx-codec';
+import { writesSameSource } from './rich-text-codecs';
 import type { RichTextFieldSchema } from './rich-text-field.schema';
 
-// Raw-mode is not ported: v4 has no raw markdown editor to switch to, so the
-// affordances that would call this are hidden (fixed-toolbar-buttons.tsx, and
-// the invalid-markdown card). Wiring it needs a raw editor, not just this
-// setter, which is why the context still carries the shape.
+// The raw mode is not ported. v4 has no raw markdown editor to change to, so the
+// controls that would call this are hidden. Those controls are in
+// fixed-toolbar-buttons.tsx, and in the card for invalid markdown. This mode needs a raw
+// editor, and not this setter alone, so the context still carries the shape.
 const RAW_MODE_UNAVAILABLE = false;
 const setRawModeUnavailable = () => {};
 
 export function RichTextField() {
   const address = useFieldAddress();
-  const formId = useFormId();
+  const seedKey = useFormSeedKey();
   const field = useFieldSchema<RichTextFieldSchema>();
   const [value, setValue] = useFieldValue<RichTextValue>(address);
   const errors = useFieldErrors(address);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // The editor tells us which embed the author selected; translating that into
-  // the store's single active field is the host's business, so it lives here
-  // rather than inside the editor package.
+  // The editor reports the embed that the author selected. The host turns that into
+  // the one active field of the store, so this code sits here and not in the editor
+  // package.
   const { setActive } = useActiveField();
   const activateEmbed = useCallback(
     (embedAddress: string) => setActive(toFieldAddress(embedAddress)),
     [setActive]
   );
 
-  // Plate fires onChange for selection changes too, not just edits, and its
-  // normalization (NodeIdPlugin stamps an `id` on every node, TrailingBlockPlugin
-  // appends an empty paragraph) means the mounted document never structurally
-  // matches the one read off disk. Comparing documents would therefore report an
-  // edit on a mere click; the form store compares by reference (form-store.ts
-  // `valuesEqual`), so that edit would stick and the document could never return
-  // to clean after a save. Ask the codec instead — would the file be different?
+  // Plate fires onChange for a change of selection, and not for an edit alone. Its
+  // normalization also changes the document: NodeIdPlugin adds an `id` to every node,
+  // and TrailingBlockPlugin adds an empty paragraph. The mounted document therefore
+  // never matches the structure of the document on disk. A compare of the two
+  // documents would report an edit after a click. Ask the codec instead: would the file
+  // be different? The store asks the same question of the same codec, through
+  // `isEqual` on the descriptor, so this keeps a write out of RHF and the store keeps
+  // it out of the dirty state.
   //
-  // Seeded from what is on disk, and re-seeded when a different document opens
-  // (this component stays mounted across that switch — only the editor below it
-  // is keyed).
-  const codec = codecFor(field);
-  const lastSerialized = useRef('');
+  // The value comes from the disk, and it is seeded again when another document opens.
+  // This component stays mounted across that change, and only the editor below it has
+  // a key.
+  // The same context the ingest and the save build, so all three resolve one codec.
+  // Without the path, a .md body would be compared as MDX here and written as markdown
+  // by useFormSave.
+  const documentPath = useDocumentPath();
+
+  // The value the editor last reported, which is what the next change is compared
+  // against. A tree, and not its source: writesSameSource caches the source of a tree
+  // against the tree itself, so the comparison costs one serialize per change rather
+  // than two, and a body the parser cannot write again reads as a change instead of
+  // taking the field down.
+  const lastValue = useRef<RichTextValue>(EMPTY_RICH_TEXT);
   const seededFor = useRef<string | null>(null);
-  if (seededFor.current !== formId) {
-    seededFor.current = formId;
-    lastSerialized.current = codec.serialize(value ?? EMPTY_RICH_TEXT, field);
+  if (seededFor.current !== seedKey) {
+    seededFor.current = seedKey;
+    lastValue.current = value ?? EMPTY_RICH_TEXT;
   }
   const setBody = useCallback(
     (next: RichTextValue) => {
-      const serialized = codec.serialize(next, field);
-      if (serialized === lastSerialized.current) return;
-      lastSerialized.current = serialized;
+      if (writesSameSource(next, lastValue.current, field, { documentPath })) {
+        return;
+      }
+      lastValue.current = next;
       setValue(next);
     },
-    [setValue, field, codec]
+    [setValue, field, documentPath]
   );
 
   const editable = () =>
     containerRef.current?.querySelector<HTMLElement>('[role="textbox"]');
 
-  // Plate doesn't expose its contenteditable as a ref, so activation queries for
-  // it. Slate mounts a tick after us, hence the deferral.
+  // Plate gives no ref for its contenteditable element, so the activation searches
+  // for it. Slate mounts one tick after this component, so the search waits.
   useFieldActivation(() => {
     setTimeout(() => editable()?.focus(), 0);
   });
 
   return (
     <FieldWrapper errors={errors}>
-      {/* Plate owns its own state once mounted and only reads `value` as a seed,
-          so switching documents has to remount it. formId is the document's
-          identity (toFormId(path)), and the provider resets react-hook-form in
-          place without remounting — without this key the editor would keep the
-          previous document's body and save it into the new file. */}
-      {/* min-w-0: FieldWrapper lays its children out in a grid, so this is a grid
-          item and defaults to `min-width: auto` — it would refuse to shrink below
-          the editor's intrinsic width and spill out of the sidebar (an indented
-          list is enough to trigger it). Zeroing it lets the track win, and the
-          editor's own overflow handling takes it from there. */}
+      {/* Plate owns its state once it mounts, and it reads `value` as a seed only.
+          A new seed must therefore remount it. The provider resets react-hook-form
+          in place, and does not remount it, so the seed key changes for every one of
+          those resets: another document, a discarded edit, or content that changed
+          under the form. Without this key, the editor would keep the body it mounted
+          with, and save that back. */}
+      {/* The min-w-0 class is necessary. FieldWrapper lays its children out in a
+          grid, so this element is a grid item and defaults to `min-width: auto`. It
+          would then refuse to become narrower than the editor, and would spill out
+          of the sidebar. An indented list is enough to cause that. A width of zero
+          lets the grid track decide, and the editor then handles its own overflow. */}
       <div ref={containerRef} className='min-w-0'>
         <EditorContext.Provider
-          key={formId}
+          key={seedKey}
           value={{
             fieldName: address,
             templates: field.templates ?? [],
             rawMode: RAW_MODE_UNAVAILABLE,
             setRawMode: setRawModeUnavailable,
-            // The editor reports which embed was selected; deciding what that
-            // means is the host's job, which is why the editor package no longer
-            // imports the form store. See activateEmbed above.
+            // The editor reports the embed that was selected. The host decides what
+            // that means, which is why the editor package no longer imports the form
+            // store. Refer to activateEmbed above.
             onActivateField: activateEmbed,
           }}
         >

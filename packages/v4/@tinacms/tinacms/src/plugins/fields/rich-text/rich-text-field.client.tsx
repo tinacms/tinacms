@@ -1,6 +1,6 @@
 import { defineClientPlugin } from '../../../client';
-import { codecFor } from './mdx-codec';
 import { EMPTY_RICH_TEXT, type RichTextValue } from './rich-text-codec';
+import { codecFor, writesSameSource } from './rich-text-codecs';
 import { richTextSchema } from './rich-text-field.schema';
 import { RichTextField } from './rich-text-field.ui';
 
@@ -23,7 +23,17 @@ export default defineClientPlugin({
         typeof stored === 'string' ? stored : '',
         node
       ),
+    // An absent body is resolved here, and not in each codec. digestDocument drops only
+    // `undefined`, and richTextSchema models an absent body as null, so a codec written
+    // to the declared contract — `serialize(value: RichTextValue)` — would receive a
+    // null it never agreed to.
     serialize: (value, node, context) =>
-      codecFor(node, context).serialize(value as RichTextValue, node),
+      codecFor(node, context).serialize(
+        value == null ? EMPTY_RICH_TEXT : (value as RichTextValue),
+        node
+      ),
+    // Two trees are the same edit when they write the same source. The editor value is
+    // richer than the document, so the store cannot answer this by structure alone.
+    isEqual: writesSameSource,
   },
 });

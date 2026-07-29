@@ -25,39 +25,53 @@ import {
   createGraphQLPipeline,
 } from './graphql-pipeline';
 
-// The wire dispatch that a host pairs with createLocalDataLayer. A host is an express
-// server, or a Next.js route.
+/**
+ * The wire dispatch that a host pairs with createLocalDataLayer. A host is an express
+ * server, or a Next.js route.
+ */
 export {
   type ContentRequest,
   dispatchContentRequest,
 } from './content-request';
 
 export interface LocalDataLayerOptions {
-  // The project root. The document paths and the collection paths are relative to it.
+  /**
+   * The project root. The document paths and the collection paths are relative to it.
+   */
   rootDir: string;
   collections: CollectionSchema[];
-  // The adapter overrides for each format. They merge over the built-in adapters in
-  // format-adapters.ts.
+  /**
+   * The adapter overrides for each format. They merge over the built-in adapters in
+   * format-adapters.ts.
+   */
   formatAdapters?: Partial<Record<CollectionFormat, FormatAdapter>>;
 }
 
-// A ContentProvider with the v3 GraphQL read interface from graphql-pipeline.ts. It
-// serves the website the same queries that v3 served.
+/**
+ * A ContentProvider with the v3 GraphQL read interface from graphql-pipeline.ts. It
+ * serves the website the same queries that v3 served.
+ */
 export interface LocalDataLayer extends ContentProvider {
   graphql(query: string, variables?: GraphQLVariables): Promise<GraphQLResult>;
 }
 
 interface ResolvedCollection {
   schema: CollectionSchema;
-  // One adapter for each declared format, in schema order. Refer to
-  // format-adapters.ts. The extension of a file selects the adapter that reads and
-  // writes it, so a collection can hold .mdx and .json documents together.
+  /**
+   * One adapter for each declared format, in schema order. Refer to format-adapters.ts.
+   * The extension of a file selects the adapter that reads and writes it, so a
+   * collection can hold .mdx and .json documents together.
+   */
   adapters: FormatAdapter[];
   absoluteFolder: string;
-  // The name of the `isBody` field, if the collection declares one. That field holds
-  // the markdown body. Refer to format-adapters.ts. A file has one body, so a
-  // collection has one such field. A format with no body, such as JSON, ignores this
-  // name and stores the field with the other values.
+  /**
+   * The name of the `isBody` field, if the collection declares one. That field holds the
+   * markdown body. Refer to format-adapters.ts. A file has one body, so a collection has
+   * one such field.
+   *
+   * A format with no body, such as JSON, ignores this name and stores the field with the
+   * other values.
+   */
   bodyField?: string;
 }
 
@@ -106,9 +120,13 @@ export const createLocalDataLayer = (
   const rootDir = path.resolve(options.rootDir);
   const collections = resolveCollections(options);
 
-  // The v3 pipeline indexes every file at its first use, so it boots late. A session
-  // that runs no GraphQL query does not pay that cost. The files stay the source of
-  // truth. A save writes to disk first, and then refreshes the index.
+  /**
+   * The v3 pipeline indexes every file at its first use, so it boots late. A session
+   * that runs no GraphQL query does not pay that cost.
+   *
+   * The files stay the source of truth. A save writes to disk first, and then refreshes
+   * the index.
+   */
   let pipeline: Promise<GraphQLPipeline> | undefined;
   const graphQLPipeline = () => {
     if (!pipeline) {
@@ -134,10 +152,13 @@ export const createLocalDataLayer = (
     return collection;
   };
 
-  // The document paths come from the client, so this is a trust boundary. Resolve
-  // each path, and keep it inside the folder of the collection, before any file call.
-  // The extension check and the adapter lookup answer one question, so they run
-  // together.
+  /**
+   * The document paths come from the client, so this is a trust boundary. Resolve each
+   * path, and keep it inside the folder of the collection, before any file call.
+   *
+   * The extension check and the adapter lookup answer one question, so they run
+   * together.
+   */
   const resolveDocumentPath = (
     collection: ResolvedCollection,
     documentPath: string
@@ -160,9 +181,11 @@ export const createLocalDataLayer = (
     return { absolute, adapter };
   };
 
-  // The document id is the posix path from the root (ADR-017). It comes from the
-  // resolved absolute path, so a client path such as …/nested/../x.mdx cannot reach
-  // the index or the returned entry.
+  /**
+   * The document id is the posix path from the root (ADR-017). It comes from the
+   * resolved absolute path, so a client path such as …/nested/../x.mdx cannot reach the
+   * index or the returned entry.
+   */
   const documentIdFor = (absolute: string): string =>
     path.relative(rootDir, absolute).split(path.sep).join('/');
 
@@ -245,8 +268,11 @@ export const createLocalDataLayer = (
       // query. There is no file watcher. An edit from another program stays stale
       // until the next save.
       if (pipeline) {
-        const readyPipeline = await pipeline;
         try {
+          // The await on the pipeline belongs inside the try. A pipeline whose boot
+          // rejects would otherwise throw here, after the file is on disk, and report
+          // a save that succeeded as failed.
+          const readyPipeline = await pipeline;
           await readyPipeline.reindexPaths([canonicalPath]);
         } catch (cause) {
           // The file is written, so a failed reindex must not fail the save. The

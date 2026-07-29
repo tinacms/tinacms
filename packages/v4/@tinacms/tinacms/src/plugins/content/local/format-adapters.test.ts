@@ -76,19 +76,19 @@ describe('markdown adapter', () => {
     expect(saved).toContain('Body prose the schema does not know about.');
   });
 
-  // "Is the save editing the body?" is a question about the save. Asking it of
-  // the save merged over the file's frontmatter answers yes whenever the file
-  // carries a stale key of that name, and the real body is replaced by it.
+  // "Does the save edit the body?" is a question about the save. A test on the save
+  // merged over the frontmatter of the file answers yes whenever the file holds an old
+  // key of that name, and that key then replaces the real body.
   it('ignores a stale frontmatter key sharing the body field name', () => {
     const withStaleKey = `---\ntitle: Hello\nbody: stale frontmatter value\n---\n\nThe real body.\n`;
     const saved = adapter.serialize({ title: 'Renamed' }, withStaleKey, 'body');
-    // The body is the file's body, not the stale key promoted into its place.
+    // The body is the body of the file, and not the old key in its place.
     expect(adapter.parse(saved, 'body').body).toBe('The real body.\n');
   });
 
-  // Shadowed on read, so it never reaches the editor — but it stays in the file,
-  // where git diffs, other tooling and v3 all still see it. Removing it on any
-  // save heals the file instead of waiting for someone to edit that body.
+  // The read hides this key, so it never reaches the editor. It stays in the file,
+  // where git, other tools, and v3 all see it. A removal at any save repairs the file,
+  // and does not wait for an edit to that body.
   it('drops a stale body key even when the save never mentions the body', () => {
     const withStaleKey = `---\ntitle: Hello\nbody: stale frontmatter value\n---\n\nThe real body.\n`;
     const saved = adapter.serialize({ title: 'Renamed' }, withStaleKey, 'body');
@@ -96,8 +96,8 @@ describe('markdown adapter', () => {
     expect(saved).toBe('---\ntitle: Renamed\n---\n\nThe real body.\n');
   });
 
-  // Coercing instead of rejecting would write "[object Object]" as the whole
-  // file — the body arrives straight off the wire, so its shape isn't a given.
+  // A coercion here, instead of a rejection, would write "[object Object]" as the
+  // whole file. The body arrives from the wire, so its shape is not certain.
   it('rejects a non-string body rather than coercing it', () => {
     for (const body of [{ type: 'root', children: [] }, 42, null]) {
       expect(() =>
