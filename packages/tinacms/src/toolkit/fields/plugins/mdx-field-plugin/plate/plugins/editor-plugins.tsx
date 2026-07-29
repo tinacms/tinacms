@@ -89,10 +89,7 @@ const resetBlockTypesCodeBlockRule = {
 };
 
 // View Plugins: Basic nodes and marks
-// The inferred plugin type names @udecode/plate-core's internals. v4 now depends
-// on Plate too, so the store holds a second (React 19) instance and the emit can
-// no longer name one portably — annotate rather than infer.
-export const viewPlugins: any[] = [
+export const viewPlugins = [
   BasicMarksPlugin,
   UnderlinePlugin,
   HighlightPlugin,
@@ -153,7 +150,7 @@ export interface CreateEditorPluginsOptions {
 // participate in markdown autoformat shortcuts.
 export const createEditorPlugins = ({
   headingLevels,
-}: CreateEditorPluginsOptions = {}): any[] => [
+}: CreateEditorPluginsOptions = {}) => [
   createMdxBlockPlugin,
   createMdxInlinePlugin,
   createImgPlugin,

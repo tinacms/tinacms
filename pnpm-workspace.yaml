@@ -54,6 +54,8 @@ catalog:
     "@graphql-tools/graphql-file-loader": ^7.5.17
     "@graphql-tools/load": ^7.8.14
     "@graphql-tools/utils": ^10.8.1
+    "@headlessui/react": 2.1.8
+    "@heroicons/react": ^1.0.6
     "@iarna/toml": ^2.2.5
     "@monaco-editor/loader": ^1.7.0
     "@octokit/rest": ^22.0.1
@@ -195,6 +197,7 @@ catalog:
     mdast-util-mdx-jsx: 2.1.2
     mdast-util-to-markdown: 1.5.0
     memory-level: ^1.0.0
+    mermaid: ^11.12.2
     micromark-extension-gfm: 2.0.3
     micromark-factory-mdx-expression: 1.0.7
     micromark-factory-space: 1.0.0

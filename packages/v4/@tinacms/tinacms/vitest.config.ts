@@ -3,7 +3,10 @@ import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  plugins: [react()],
+  // The suite runs the compiled output, not the source. The compiler's memoisation
+  // is only sound while the components stay pure, so a component that mutates in
+  // render should fail here rather than go stale in someone's editor.
+  plugins: [react({ babel: { plugins: ['babel-plugin-react-compiler'] } })],
   test: {
     globals: true,
     environment: 'happy-dom',

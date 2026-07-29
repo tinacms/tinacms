@@ -27,8 +27,7 @@
   },
   "dependencies": {
     "@ariakit/react": "catalog:",
-    "@headlessui/react": "2.1.8",
-    "@heroicons/react": "^1.0.6",
+    "@headlessui/react": "catalog:",
     "@radix-ui/react-dialog": "catalog:",
     "@radix-ui/react-dropdown-menu": "catalog:",
     "@radix-ui/react-popover": "catalog:",
@@ -68,8 +67,7 @@
     "is-hotkey": "catalog:",
     "lowlight": "catalog:",
     "lucide-react": "catalog:",
-    "mermaid": "^11.12.2",
-    "prism-react-renderer": "catalog:"
+    "mermaid": "catalog:"
   },
   "peerDependencies": {
     "react": "^19.2.0",
