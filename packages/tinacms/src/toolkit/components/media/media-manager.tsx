@@ -216,6 +216,7 @@ export function MediaPicker({
       setDebouncedSearch(next);
       resetOffset();
       setLoadFolders(true);
+      setActiveItem(false);
     }, 300);
     return () => clearTimeout(timer);
   }, [search, debouncedSearch]);
