@@ -517,7 +517,7 @@ describe('stripWorkspaceEntries', () => {
   it('leaves the committed fixture lockfile unchanged (it is already stripped)', () => {
     const committed = JSON.parse(
       fs.readFileSync(
-        path.join(__dirname, 'size-fixture', 'package-lock.json'),
+        path.join(__dirname, 'size-fixture', 'package-lock.fixture.json'),
         'utf-8'
       )
     );

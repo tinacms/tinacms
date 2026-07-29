@@ -32,11 +32,12 @@
  * numbers and the reasoning. A decrease of more than 10% warns, prompting a
  * re-baseline so wins get locked in. The watchlist has zero tolerance.
  *
- * Determinism: the fixture installs against a CHECKED-IN package-lock.json so
+ * Determinism: the fixture installs against a CHECKED-IN set of pins, held in
+ * package-lock.fixture.json and staged as package-lock.json for the install, so
  * install-closure size and watchlist copy-counts cannot drift from upstream
  * point releases that have nothing to do with the PR's diff. See the lockfile
- * section further down for why the workspace's own packages are deliberately
- * absent from that lockfile (and why `npm ci` therefore cannot be used).
+ * section further down for why the file is split in two, why the workspace's
+ * own packages are deliberately absent, and why `npm ci` cannot be used.
  *
  * Usage:
  *   node scripts/size-baseline.mjs                       # check against baseline (verdaccio)
@@ -76,7 +77,20 @@ import { gunzipSync } from 'node:zlib';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const FIXTURE_DIR = path.join(ROOT, 'tests', 'size-fixture');
+// Two paths on purpose. npm only reads/writes `package-lock.json`, so that one
+// is transient: staged before the install, deleted after. The pins live in
+// `package-lock.fixture.json`, which is the checked-in file.
+//
+// Why not just commit package-lock.json: the fixture installs `tinacms`, so its
+// lockfile mirrors the product's entire dependency closure. dependency-review
+// diffs manifests between base and head, so committing one under a name it
+// recognises makes all ~1400 entries read as newly-introduced dependencies —
+// and every advisory anywhere in that closure fails the PR, none of which the
+// diff introduced. Three fired in a single sitting (brace-expansion, astro,
+// react-router, the last with no patched 6.x at all) before this split. The
+// pins still do their job; they are simply not a manifest any scanner claims.
 const FIXTURE_LOCK_PATH = path.join(FIXTURE_DIR, 'package-lock.json');
+const COMMITTED_LOCK_PATH = path.join(FIXTURE_DIR, 'package-lock.fixture.json');
 const BASELINE_PATH = path.join(ROOT, 'tests', 'size-baselines.json');
 const ADMIN_DIR = path.join(
   ROOT,
@@ -475,11 +489,12 @@ export function stripWorkspaceEntries(lock) {
 
 /** Committed lockfile contents, or null when it has never been seeded. */
 function readCommittedLock() {
-  return fs.existsSync(FIXTURE_LOCK_PATH)
-    ? fs.readFileSync(FIXTURE_LOCK_PATH, 'utf8')
+  return fs.existsSync(COMMITTED_LOCK_PATH)
+    ? fs.readFileSync(COMMITTED_LOCK_PATH, 'utf8')
     : null;
 }
 
+/** Stage pins where npm will actually look for them. */
 function writeFixtureLock(lock) {
   fs.writeFileSync(FIXTURE_LOCK_PATH, `${JSON.stringify(lock, null, 2)}\n`);
 }
@@ -487,8 +502,11 @@ function writeFixtureLock(lock) {
 /** Regenerate the committed lockfile from whatever npm just resolved. */
 function updateCommittedLock() {
   const generated = JSON.parse(fs.readFileSync(FIXTURE_LOCK_PATH, 'utf8'));
-  writeFixtureLock(stripWorkspaceEntries(generated));
-  log(`wrote ${path.relative(ROOT, FIXTURE_LOCK_PATH)}`);
+  fs.writeFileSync(
+    COMMITTED_LOCK_PATH,
+    `${JSON.stringify(stripWorkspaceEntries(generated), null, 2)}\n`
+  );
+  log(`wrote ${path.relative(ROOT, COMMITTED_LOCK_PATH)}`);
 }
 
 // ── fixture install + measurement ─────────────────────────────────────────────
@@ -654,7 +672,7 @@ async function measure() {
   const committedLock = readCommittedLock();
   if (committedLock == null && !UPDATE) {
     fail(
-      `${path.relative(ROOT, FIXTURE_LOCK_PATH)} not found — run \`pnpm size:update\` to seed it`
+      `${path.relative(ROOT, COMMITTED_LOCK_PATH)} not found — run \`pnpm size:update\` to seed it`
     );
   }
   const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'size-baseline-'));
@@ -700,12 +718,10 @@ async function measure() {
     stopVerdaccio(verdaccio);
     // SIZE_KEEP_INSTALL leaves the fixture node_modules in place for debugging.
     if (!process.env.SIZE_KEEP_INSTALL) cleanFixture();
-    // npm rewrote package-lock.json in place (re-adding the workspace entries
-    // we stripped); restore the committed bytes so a check run leaves the
-    // working tree clean.
-    if (!UPDATE && committedLock != null) {
-      fs.writeFileSync(FIXTURE_LOCK_PATH, committedLock);
-    }
+    // package-lock.json is staging, never a tracked file — drop it so no run
+    // leaves a manifest behind for a scanner to find, and so a check run leaves
+    // the working tree clean instead of dirty with npm's in-place rewrite.
+    fs.rmSync(FIXTURE_LOCK_PATH, { force: true });
     fs.rmSync(workDir, { recursive: true, force: true });
   }
 }
