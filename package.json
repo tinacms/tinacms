@@ -4,6 +4,7 @@
 	"version": "0.0.0",
 	"workspaces": [
 		"packages/@tinacms/*",
+		"packages/v4/@tinacms/*",
 		"examples/*/*",
 		"packages/[^@]*"
 	],

@@ -45,6 +45,11 @@ function discoverPackages(): PkgRef[] {
   return [
     ...collectPackagesFromDir(path.join(ROOT, 'packages/@tinacms')),
     ...collectPackagesFromDir(path.join(ROOT, 'packages'), true),
+    // `packages/v4` holds no package.json of its own, so the scan of `packages` above
+    // walks straight past it. Every v4 package is private today, so this adds no
+    // violation — it means the check is already in place on the day one is published,
+    // rather than being noticed after the fact.
+    ...collectPackagesFromDir(path.join(ROOT, 'packages/v4/@tinacms')),
   ]
 }
 

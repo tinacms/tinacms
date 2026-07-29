@@ -6,6 +6,13 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'happy-dom',
+    poolOptions: {
+      forks: {
+        // node >=23 otherwise injects a broken globalThis.localStorage that shadows
+        // happy-dom's, leaving window.localStorage undefined.
+        execArgv: ['--no-experimental-webstorage'],
+      },
+    },
   },
   resolve: {
     alias: {
