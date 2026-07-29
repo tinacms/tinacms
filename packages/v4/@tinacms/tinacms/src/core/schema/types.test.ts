@@ -1,15 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { FORMAT_EXTENSIONS, formatForPath } from './types';
 
-// One mapping, two consumers that must agree: the format adapters decide which
-// adapter owns a file, the rich-text codecs decide which parser reads its body.
-// They read the same constant, so drift is impossible by construction — what is
-// worth pinning is the matching itself.
+// There is one map, and two consumers that must agree. The format adapters choose the
+// adapter for a file, and the rich-text codecs choose the parser for a body. Both read
+// the same constant, so they cannot drift. These tests pin the matching itself.
 describe('formatForPath', () => {
   it('tells .md and .mdx apart', () => {
-    // '.md' is a prefix of '.mdx' everywhere but the dot, so a looser match
-    // (includes, or stripping at the first dot) reads every .mdx file as
-    // markdown and silently drops embeds on save.
+    // The string '.md' is a prefix of '.mdx'. A looser match, with includes or with
+    // a cut at the first dot, therefore reads every .mdx file as markdown, and drops
+    // the embeds at the save.
     expect(formatForPath('content/posts/hello.mdx')).toBe('mdx');
     expect(formatForPath('content/posts/hello.md')).toBe('md');
   });
@@ -24,8 +23,8 @@ describe('formatForPath', () => {
   });
 
   it('names an extension for every format in the union', () => {
-    // Record<CollectionFormat, string> makes this a compile error rather than a
-    // runtime gap; asserted anyway so the intent survives a type loosening.
+    // The Record<CollectionFormat, string> type makes this a compile error, and not a
+    // fault at runtime. The test asserts it too, so the intent survives a wider type.
     expect(
       Object.values(FORMAT_EXTENSIONS).every((ext) => ext.startsWith('.'))
     ).toBe(true);

@@ -4,6 +4,34 @@ export interface BaseFieldSchema {
   required?: boolean;
 }
 
+/**
+ * A field declared inside a template. Its `type` is optional, because a template is
+ * author-written config and the editor carries a template's fields through to the
+ * nested-form panel without reading them.
+ */
+export interface TemplateFieldSchema extends BaseFieldSchema {
+  type?: string;
+  templates?: TemplateSchema[];
+}
+
+/**
+ * One shape that a field's value can take, for a field that offers several. A rich-text
+ * embed is the only case today.
+ *
+ * It is declared here, and not on the rich-text field alone, because three consumers
+ * read it off a plain schema node: the compile step gates and pins the field types
+ * nested inside it, the v3 GraphQL pipeline hands it to the v3 schema builder, and the
+ * editor renders the embed. The editor's own MdxTemplate is the narrower of the two, and
+ * satisfies this structurally.
+ */
+export interface TemplateSchema {
+  name: string;
+  label?: string;
+  key?: string;
+  inline?: boolean;
+  fields?: TemplateFieldSchema[];
+}
+
 export interface FieldSchema extends BaseFieldSchema {
   type: string;
   /**
@@ -12,9 +40,12 @@ export interface FieldSchema extends BaseFieldSchema {
    * rich-text field edits the AST.
    */
   isBody?: boolean;
+  templates?: TemplateSchema[];
 }
 
-export type CollectionFormat = 'md' | 'mdx' | 'json' | 'yaml';
+export const COLLECTION_FORMATS = ['md', 'mdx', 'json', 'yaml'] as const;
+
+export type CollectionFormat = (typeof COLLECTION_FORMATS)[number];
 
 /**
  * The file extension each format is stored as. Declared once because two
@@ -37,7 +68,7 @@ export const FORMAT_EXTENSIONS: Record<CollectionFormat, string> = {
 export const formatForPath = (
   documentPath: string
 ): CollectionFormat | undefined =>
-  (Object.keys(FORMAT_EXTENSIONS) as CollectionFormat[]).find((format) =>
+  COLLECTION_FORMATS.find((format) =>
     documentPath.endsWith(FORMAT_EXTENSIONS[format])
   );
 

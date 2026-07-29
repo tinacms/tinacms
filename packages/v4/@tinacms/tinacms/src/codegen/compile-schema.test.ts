@@ -123,31 +123,26 @@ describe('checkLock', () => {
 // A rich-text field carries templates whose fields have their own types. They render
 // like any other field, so they need the same build gate and the same contract pin —
 // reading only the top level let them through both.
-const withTemplate = (nestedType: string): ResolvedConfig =>
+const withFields = (fields: FieldSchema[]): ResolvedConfig =>
   asResolvedConfig({
     plugins: [fieldPlugin('rich-text', 1), fieldPlugin('string', 3)],
     schema: {
       collections: [
-        {
-          name: 'post',
-          path: 'content/posts',
-          format: 'md',
-          // `templates` belongs to RichTextFieldSchema, not the base FieldSchema a
-          // collection declares, which is exactly why the compile step has to reach
-          // for it structurally.
-          fields: [
-            {
-              name: 'body',
-              type: 'rich-text',
-              templates: [
-                { name: 'cta', fields: [{ name: 'label', type: nestedType }] },
-              ],
-            } as FieldSchema,
-          ],
-        },
+        { name: 'post', path: 'content/posts', format: 'md', fields },
       ],
     },
   });
+
+const withTemplate = (nestedType: string): ResolvedConfig =>
+  withFields([
+    {
+      name: 'body',
+      type: 'rich-text',
+      templates: [
+        { name: 'cta', fields: [{ name: 'label', type: nestedType }] },
+      ],
+    },
+  ]);
 
 describe('compileSchema with nested template fields', () => {
   it('pins a type that only a template uses', () => {
@@ -161,6 +156,38 @@ describe('compileSchema with nested template fields', () => {
     expect(() => compileSchema(withTemplate('image'))).toThrow(
       /uses the field type "image"/
     );
+  });
+
+  // A template can nest a field that carries templates of its own, and those fields
+  // render too. Stopping at the first level let them past the gate.
+  it('rejects a field type nested inside a template of a template', () => {
+    expect(() =>
+      compileSchema(
+        withFields([
+          {
+            name: 'body',
+            type: 'rich-text',
+            templates: [
+              {
+                name: 'cta',
+                fields: [
+                  {
+                    name: 'blurb',
+                    type: 'rich-text',
+                    templates: [
+                      {
+                        name: 'note',
+                        fields: [{ name: 'icon', type: 'image' }],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ])
+      )
+    ).toThrow(/uses the field type "image"/);
   });
 });
 
@@ -189,6 +216,13 @@ describe('checkLock across lock formats', () => {
     const check = checkLock(lock, config);
     expect(check.status).toBe('unreadable');
     expect(check).toHaveProperty('message', expect.stringContaining('Upgrade'));
+  });
+
+  // The opposite case: this package can write the newer format, so the lock is merely
+  // out of date. Telling the author to upgrade tinacms would leave them stuck.
+  it('reports a lock written in an older format as stale', () => {
+    const lock = { ...compileSchema(config), version: LOCK_VERSION - 1 };
+    expect(checkLock(lock, config).status).toBe('stale');
   });
 
   // `primitives` is parsed JSON, so an inherited key would otherwise resolve against
