@@ -4,7 +4,7 @@
   "private": true,
   "description": "Install-only fixture for scripts/size-baseline.mjs. NOT a workspace member (tests/ is outside the pnpm-workspace globs). Mirrors the measured scenario: a minimal Astro site depending on astro + tinacms + @tinacms/cli, installed with npm against a throwaway verdaccio registry.",
   "dependencies": {
-    "astro": "7.0.6",
+    "astro": "7.1.1",
     "tinacms": "latest"
   },
   "devDependencies": {
