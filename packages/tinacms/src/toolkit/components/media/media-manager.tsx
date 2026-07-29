@@ -175,6 +175,16 @@ export function MediaPicker({
   const offset = offsetHistory[offsetHistory.length - 1];
   const resetOffset = () => setOffsetHistory([]);
 
+  const navigateToDirectory = (dir: string) => {
+    setDirectory(dir);
+    setSearch('');
+    setDebouncedSearch('');
+    setLoadFolders(true);
+    resetOffset();
+    resetList();
+    setActiveItem(false);
+  };
+
   const listRequestRef = useRef(0);
   const newMediaSrcsRef = useRef<Set<string>>(new Set());
 
@@ -261,17 +271,11 @@ export function MediaPicker({
       setActiveItem(false);
     } else if (item.type === 'dir') {
       // Only join when there is a directory to join to
-      setDirectory(
+      navigateToDirectory(
         item.directory === '.' || item.directory === ''
           ? item.filename
           : join(item.directory, item.filename)
       );
-      setSearch('');
-      setDebouncedSearch('');
-      setLoadFolders(true);
-      resetOffset();
-      resetList();
-      setActiveItem(false);
     } else {
       setActiveItem(item);
     }
@@ -498,18 +502,7 @@ export function MediaPicker({
       {newFolderModalOpen && (
         <NewFolderModal
           onSubmit={(name) => {
-            setDirectory((oldDir) => {
-              if (oldDir) {
-                return join(oldDir, name);
-              } else {
-                return name;
-              }
-            });
-            setSearch('');
-            setDebouncedSearch('');
-            resetOffset();
-            resetList();
-            setActiveItem(false);
+            navigateToDirectory(directory ? join(directory, name) : name);
           }}
           close={() => setNewFolderModalOpen(false)}
         />
@@ -523,11 +516,7 @@ export function MediaPicker({
               <Breadcrumb
                 directory={directory}
                 setDirectory={(dir: string) => {
-                  setDirectory(dir);
-                  setLoadFolders(true);
-                  resetOffset();
-                  resetList();
-                  setActiveItem(false);
+                  navigateToDirectory(dir);
                 }}
               />
             </div>
