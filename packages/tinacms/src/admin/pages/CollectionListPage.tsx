@@ -27,13 +27,13 @@ import { cn } from '@utils/cn';
 import {
   ArrowLeft,
   Copy,
-  Edit,
   File,
   Folder,
   House,
   Plus,
   Search,
   SquarePen,
+  TextCursorInput,
   Trash2,
   X,
 } from 'lucide-react';
@@ -1061,7 +1061,7 @@ const CollectionListPage = () => {
                                                       name: 'edit',
                                                       label: 'Edit in Admin',
                                                       Icon: (
-                                                        <Edit size='1.3rem' />
+                                                        <SquarePen size='1.3rem' />
                                                       ),
                                                       onMouseDown: () => {
                                                         const pathToDoc =
@@ -1117,7 +1117,7 @@ const CollectionListPage = () => {
                                                       name: 'rename',
                                                       label: 'Rename',
                                                       Icon: (
-                                                        <SquarePen size='1.3rem' />
+                                                        <TextCursorInput size='1.3rem' />
                                                       ),
                                                       onMouseDown: () => {
                                                         setVars((old) => ({
