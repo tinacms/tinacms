@@ -148,11 +148,13 @@ export function MediaPicker({
     items: [],
     nextOffset: undefined,
   });
-  const resetList = () =>
+  const resetList = () => {
+    newMediaSrcsRef.current = new Set();
     setList({
       items: [],
       nextOffset: undefined,
     });
+  };
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [activeItem, setActiveItem] = useState<Media | false>(false);
@@ -174,6 +176,7 @@ export function MediaPicker({
   const resetOffset = () => setOffsetHistory([]);
 
   const listRequestRef = useRef(0);
+  const newMediaSrcsRef = useRef<Set<string>>(new Set());
 
   async function loadMedia(loadFolders = true) {
     const requestId = ++listRequestRef.current;
@@ -192,10 +195,19 @@ export function MediaPicker({
         search: debouncedSearch || undefined,
       });
       if (requestId !== listRequestRef.current) return;
-      setList((prev) => ({
-        items: offset ? [...prev.items, ..._list.items] : _list.items,
-        nextOffset: _list.nextOffset,
-      }));
+      setList((prev) => {
+        const items = offset ? [...prev.items, ..._list.items] : _list.items;
+        const newSrcs = newMediaSrcsRef.current;
+        return {
+          items:
+            newSrcs.size === 0
+              ? items
+              : items.map((item) =>
+                  newSrcs.has(item.src) ? { ...item, new: true } : item
+                ),
+          nextOffset: _list.nextOffset,
+        };
+      });
       setListState('loaded');
     } catch (e) {
       if (requestId !== listRequestRef.current) return;
@@ -359,6 +371,7 @@ export function MediaPicker({
             fileCount: mediaItems.length,
           });
           setActiveItem(mediaItems[0]);
+          newMediaSrcsRef.current = new Set(mediaItems.map((x) => x.src));
           if (mediaFilter === 'folders') {
             setMediaFilter('all');
           }
