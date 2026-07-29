@@ -505,6 +505,8 @@ export function MediaPicker({
                 return name;
               }
             });
+            setSearch('');
+            setDebouncedSearch('');
             resetOffset();
             resetList();
           }}
