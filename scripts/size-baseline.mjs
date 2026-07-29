@@ -69,6 +69,7 @@ import { gunzipSync } from 'node:zlib';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const FIXTURE_DIR = path.join(ROOT, 'tests', 'size-fixture');
+const FIXTURE_LOCK_PATH = path.join(FIXTURE_DIR, 'package-lock.json');
 const BASELINE_PATH = path.join(ROOT, 'tests', 'size-baselines.json');
 const ADMIN_DIR = path.join(
   ROOT,
@@ -78,6 +79,27 @@ const ADMIN_DIR = path.join(
   'public',
   'admin'
 );
+
+// Name patterns for packages published from THIS workspace. Two consumers:
+// verdaccio serves them locally with no npmjs proxy (so the fixture resolves
+// the current workspace, not whatever is on npm), and the committed fixture
+// lockfile deliberately omits them (see stripWorkspaceEntries).
+const LOCAL_PKG_GLOBS = [
+  '@tinacms/*',
+  'tinacms',
+  'tinacms-*',
+  'create-tina-app',
+  'next-tinacms-*',
+];
+
+/** @param {string} name */
+export function isWorkspacePackageName(name) {
+  return LOCAL_PKG_GLOBS.some((glob) =>
+    new RegExp(
+      `^${glob.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*')}$`
+    ).test(name)
+  );
+}
 
 // Packages whose duplicate physical copies are the documented failure mode.
 const WATCHLIST = [
@@ -270,7 +292,16 @@ function writeVerdaccioConfig(dir) {
   const cfgPath = path.join(dir, 'verdaccio.yaml');
   // Local packages get NO `proxy` — verdaccio serves only what we publish, so
   // the fixture resolves the CURRENT workspace and not whatever is on npm.
-  // Everything else (astro, react, …) proxies npmjs.
+  // Everything else (astro, react, …) proxies npmjs. `cache: false` on the
+  // uplink stays: run-to-run determinism now comes from the committed fixture
+  // lockfile (versions are pinned, so a cache would only save bandwidth), and
+  // the cache would live in a per-run tmpdir anyway.
+  const localPkgBlock = LOCAL_PKG_GLOBS.map(
+    (glob) => `  '${glob}':
+    access: $all
+    publish: $anonymous
+    unpublish: $anonymous`
+  ).join('\n');
   const cfg = `storage: ${path.join(dir, 'storage')}
 auth:
   htpasswd:
@@ -282,26 +313,7 @@ uplinks:
     cache: false
     timeout: 60s
 packages:
-  '@tinacms/*':
-    access: $all
-    publish: $anonymous
-    unpublish: $anonymous
-  'tinacms':
-    access: $all
-    publish: $anonymous
-    unpublish: $anonymous
-  'tinacms-*':
-    access: $all
-    publish: $anonymous
-    unpublish: $anonymous
-  'create-tina-app':
-    access: $all
-    publish: $anonymous
-    unpublish: $anonymous
-  'next-tinacms-*':
-    access: $all
-    publish: $anonymous
-    unpublish: $anonymous
+${localPkgBlock}
   '**':
     access: $all
     publish: $anonymous
@@ -391,11 +403,94 @@ function publishAll(packed, workDir) {
   }
 }
 
-// ── fixture install + measurement ─────────────────────────────────────────────
-function cleanFixture() {
-  for (const f of ['node_modules', 'package-lock.json']) {
-    fs.rmSync(path.join(FIXTURE_DIR, f), { recursive: true, force: true });
+// ── fixture lockfile ──────────────────────────────────────────────────────────
+//
+// tests/size-fixture/package-lock.json is CHECKED IN. Without it, every run
+// re-resolved the whole third-party tree against live npm, so the install
+// closure and — worse — the zero-tolerance watchlist counts could move because
+// of an upstream point release with nothing to do with the PR's diff.
+//
+// Two deliberate shapes:
+//
+//  1. `npm ci` is NOT used, and the workspace's own packages are NOT in the
+//     lockfile. Their tarballs are rebuilt from HEAD on every run, so their
+//     integrity hash changes with every commit that touches packages/** — which
+//     is exactly when this job runs. Pinning them (and `npm ci`, which verifies
+//     integrity for every entry) would therefore fail on essentially every PR.
+//     They are stripped from the lockfile and re-resolved each run, which is
+//     the point: they are the code under test. Everything they pull in stays
+//     pinned, so the closure only moves when the diff moves it.
+//  2. `resolved` URLs are normalised to the public registry. npm's default
+//     `replace-registry-host=npmjs` then rewrites them to whichever registry
+//     the run uses, so one lockfile serves both verdaccio and real mode and the
+//     committed diff never churns on the verdaccio port.
+
+/** @param {string} key an npm lockfile `packages` key, e.g. `node_modules/a/node_modules/b` */
+export function lockKeyPackageNames(key) {
+  const names = [];
+  const parts = key.split('/');
+  for (let i = 0; i < parts.length; i++) {
+    if (parts[i] !== 'node_modules') continue;
+    const next = parts[i + 1];
+    if (!next) continue;
+    names.push(next.startsWith('@') ? `${next}/${parts[i + 2] ?? ''}` : next);
   }
+  return names;
+}
+
+/**
+ * Drop every entry that is — or lives underneath — a workspace package, and
+ * normalise registry hosts. Returns a new lockfile object.
+ */
+export function stripWorkspaceEntries(lock) {
+  if (lock.lockfileVersion < 3) {
+    fail(
+      `fixture lockfileVersion ${lock.lockfileVersion} is unsupported — regenerate with npm 11 (\`pnpm size:update\`)`
+    );
+  }
+  const packages = {};
+  for (const [key, entry] of Object.entries(lock.packages ?? {})) {
+    if (lockKeyPackageNames(key).some(isWorkspacePackageName)) continue;
+    if (typeof entry.resolved === 'string') {
+      packages[key] = {
+        ...entry,
+        resolved: entry.resolved.replace(
+          /^https?:\/\/[^/]+\//,
+          REAL_REGISTRY_URL
+        ),
+      };
+    } else {
+      packages[key] = entry;
+    }
+  }
+  return { ...lock, packages };
+}
+
+/** Committed lockfile contents, or null when it has never been seeded. */
+function readCommittedLock() {
+  return fs.existsSync(FIXTURE_LOCK_PATH)
+    ? fs.readFileSync(FIXTURE_LOCK_PATH, 'utf8')
+    : null;
+}
+
+function writeFixtureLock(lock) {
+  fs.writeFileSync(FIXTURE_LOCK_PATH, `${JSON.stringify(lock, null, 2)}\n`);
+}
+
+/** Regenerate the committed lockfile from whatever npm just resolved. */
+function updateCommittedLock() {
+  const generated = JSON.parse(fs.readFileSync(FIXTURE_LOCK_PATH, 'utf8'));
+  writeFixtureLock(stripWorkspaceEntries(generated));
+  log(`wrote ${path.relative(ROOT, FIXTURE_LOCK_PATH)}`);
+}
+
+// ── fixture install + measurement ─────────────────────────────────────────────
+/** Removes the installed tree. The committed lockfile is NOT deleted. */
+function cleanFixture() {
+  fs.rmSync(path.join(FIXTURE_DIR, 'node_modules'), {
+    recursive: true,
+    force: true,
+  });
 }
 
 function installFixture() {
@@ -549,6 +644,12 @@ function buildAdminOutput() {
 // ── measurement orchestration ─────────────────────────────────────────────────
 async function measure() {
   assertBuilt();
+  const committedLock = readCommittedLock();
+  if (committedLock == null && !UPDATE) {
+    fail(
+      `${path.relative(ROOT, FIXTURE_LOCK_PATH)} not found — run \`pnpm size:update\` to seed it`
+    );
+  }
   const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'size-baseline-'));
   const tarballDir = path.join(workDir, 'tarballs');
   fs.mkdirSync(tarballDir, { recursive: true });
@@ -564,7 +665,16 @@ async function measure() {
     }
 
     cleanFixture();
+    // Install against the committed pins minus the workspace packages. Note
+    // `size:update` keeps the existing pins rather than re-resolving the world:
+    // it re-baselines the numbers for the current tree, and only what the diff
+    // actually moved gets a new pin. Delete the lockfile by hand for a
+    // deliberate upgrade-everything re-pin.
+    if (committedLock != null) {
+      writeFixtureLock(stripWorkspaceEntries(JSON.parse(committedLock)));
+    }
     installFixture();
+    if (UPDATE) updateCommittedLock();
     const installClosureBytes = measureInstallClosureBytes();
     const watchlist = measureWatchlistCopies();
 
@@ -583,6 +693,12 @@ async function measure() {
     stopVerdaccio(verdaccio);
     // SIZE_KEEP_INSTALL leaves the fixture node_modules in place for debugging.
     if (!process.env.SIZE_KEEP_INSTALL) cleanFixture();
+    // npm rewrote package-lock.json in place (re-adding the workspace entries
+    // we stripped); restore the committed bytes so a check run leaves the
+    // working tree clean.
+    if (!UPDATE && committedLock != null) {
+      fs.writeFileSync(FIXTURE_LOCK_PATH, committedLock);
+    }
     fs.rmSync(workDir, { recursive: true, force: true });
   }
 }

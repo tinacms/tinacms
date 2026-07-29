@@ -1,2 +1,9 @@
 node_modules/
-package-lock.json
+
+# The repo root ignores `**/package-lock.json` and `.npmrc` (pnpm-only policy).
+# This fixture is the documented npm carve-out — see the "Package manager" note
+# in the root AGENTS.md — so both files are tracked here on purpose. The
+# lockfile pins the third-party closure so install size and the zero-tolerance
+# watchlist counts can't drift from upstream point releases.
+!package-lock.json
+!.npmrc
