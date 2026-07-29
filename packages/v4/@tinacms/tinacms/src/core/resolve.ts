@@ -159,7 +159,15 @@ export const initializePlugins = async (
       await plugin.onInit?.();
       initialized.push(plugin);
     } catch (cause) {
-      await destroyInitialized().catch(() => {});
+      // The rollback failure must not replace the failure that caused it, but it must
+      // not vanish either: a half-torn-down plugin can leave a handle open, and the
+      // thrown `cause` says nothing about that.
+      await destroyInitialized().catch((rollbackFailure) => {
+        console.error(
+          '[tinacms] Plugin teardown failed while rolling back a failed init:',
+          rollbackFailure
+        );
+      });
       throw cause;
     }
   }

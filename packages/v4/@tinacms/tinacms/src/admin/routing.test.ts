@@ -11,6 +11,8 @@ describe('admin routing', () => {
     { view: 'collections' },
     { view: 'collection', collection: 'post' },
     { view: 'document', collection: 'post', path: 'content/posts/hello.mdx' },
+    { view: 'screen', screen: 'media', segments: [] },
+    { view: 'screen', screen: 'media', segments: ['photos', '2026'] },
   ];
 
   it.each(routes)('round-trips $view', (route) => {
@@ -50,6 +52,46 @@ describe('admin routing', () => {
       view: 'collection',
       collection: 'post',
     });
+  });
+});
+
+describe('admin routing for plugin screens', () => {
+  it('mounts a screen under its own prefix', () => {
+    expect(
+      formatAdminRoute({ view: 'screen', screen: 'media', segments: [] })
+    ).toBe('#/screens/media');
+  });
+
+  // The two prefixes are separate namespaces. A project with a collection called `page`
+  // is the case that named this prefix `screens` rather than `pages`.
+  it('does not confuse a screen with a collection of the same name', () => {
+    expect(parseAdminRoute('#/screens/page')).toEqual({
+      view: 'screen',
+      screen: 'page',
+      segments: [],
+    });
+    expect(parseAdminRoute('#/collections/page')).toEqual({
+      view: 'collection',
+      collection: 'page',
+    });
+  });
+
+  // Each segment is encoded on its own, so a segment holding a slash stays one segment.
+  it('keeps a screen segment whole when it holds a slash', () => {
+    const route: AdminRoute = {
+      view: 'screen',
+      screen: 'media',
+      segments: ['uploads/2026', 'a b & c'],
+    };
+    expect(formatAdminRoute(route)).toBe(
+      '#/screens/media/uploads%2F2026/a%20b%20%26%20c'
+    );
+    expect(parseAdminRoute(formatAdminRoute(route))).toEqual(route);
+  });
+
+  // A screen prefix with no name is not a screen. It falls back like any stale hash.
+  it.each(['#/screens', '#/screens/'])('falls back for %j', (hash) => {
+    expect(parseAdminRoute(hash)).toEqual(COLLECTIONS_ROUTE);
   });
 });
 

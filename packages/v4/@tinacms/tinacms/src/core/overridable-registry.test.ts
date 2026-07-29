@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { composeOverridableRegistry } from './overridable-registry';
 
-// A conflict factory that encodes kind:key so a test can assert which conflict fired.
+// A conflict factory that writes the kind and the key, so a test can assert which
+// conflict happened.
 const conflict = (kind: string, key: string) => new Error(`${kind}:${key}`);
 
 const base = (key: string, value: string) => ({
@@ -49,8 +50,8 @@ describe('composeOverridableRegistry', () => {
   });
 
   it('an override does not mask a base-vs-base collision', () => {
-    // Two different plugins both provide a base at "a" and a third overrides it: the
-    // override winning its key must not hide that the two bases genuinely collide.
+    // Two plugins both provide a base at "a", and a third one overrides it. The
+    // override wins its key, and it must not hide the collision between the two bases.
     expect(() =>
       composeOverridableRegistry(
         [base('a', '1'), override('a', 'over'), base('a', '2')],

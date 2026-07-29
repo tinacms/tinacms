@@ -2,8 +2,9 @@
 // a host mounts inside a TinaProvider. Everything it renders comes from the compiled
 // schema, so a host writes no code for a collection.
 
+export type { AdminScreen, AdminScreenProps } from '../core/screen/contract';
 export { TinaAdmin, type TinaAdminProps } from './admin';
-export { useTinaSchema } from './hooks';
+export { useAdminScreens, useTinaSchema } from './hooks';
 export {
   type AdminRoute,
   COLLECTIONS_ROUTE,

@@ -1,4 +1,4 @@
-import { useCallback, useSyncExternalStore } from 'react';
+import { useMemo, useSyncExternalStore } from 'react';
 import { type AdminRoute, formatAdminRoute, parseAdminRoute } from './routing';
 
 // The `location.hash` value is external state that React does not own. The back button
@@ -15,6 +15,13 @@ const readHash = () => window.location.hash;
 // what the admin shows before hydration.
 const readHashOnServer = () => '';
 
+// This assigns the hash, and does not call pushState. The assignment makes the history
+// entry that the back button needs, and it fires hashchange. There is then one path in
+// and one path out.
+const navigate = (route: AdminRoute) => {
+  window.location.hash = formatAdminRoute(route);
+};
+
 export interface AdminNavigation {
   route: AdminRoute;
   navigate: (route: AdminRoute) => void;
@@ -22,11 +29,9 @@ export interface AdminNavigation {
 
 export const useAdminRoute = (): AdminNavigation => {
   const hash = useSyncExternalStore(subscribe, readHash, readHashOnServer);
-  const navigate = useCallback((route: AdminRoute) => {
-    // This assigns the hash, and does not call pushState. The assignment makes the
-    // history entry that the back button needs, and it fires hashchange. There is then
-    // one path in and one path out.
-    window.location.hash = formatAdminRoute(route);
-  }, []);
-  return { route: parseAdminRoute(hash), navigate };
+  // Held against the hash, and not rebuilt each render. This is a public hook, and
+  // parseAdminRoute returns a fresh object with a fresh `segments` array — so a
+  // consumer with `[route]` or `[segments]` in its dependencies would loop.
+  const route = useMemo(() => parseAdminRoute(hash), [hash]);
+  return { route, navigate };
 };

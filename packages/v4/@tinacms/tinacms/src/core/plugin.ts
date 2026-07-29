@@ -1,7 +1,7 @@
 import type { StoreApi } from 'zustand';
 import type { FieldDescriptor } from './field/contract';
 import { invariant } from './invariant';
-import type { AdminPage } from './page/contract';
+import type { AdminScreen } from './screen/contract';
 
 export type Capability = 'field' | 'content' | 'auth' | 'media' | 'search';
 
@@ -96,10 +96,10 @@ export interface ClientSegment {
   field?: FieldDescriptor;
   slice?: ClientSlice;
   // Screens this plugin adds to the admin, beside the collection views the schema
-  // generates. They compose into the page registry at boot. Refer to core/page/registry.
-  // A plugin declares no capability for these: a page is a contribution, and not a slot
-  // that one provider fills.
-  pages?: AdminPage[];
+  // generates. They compose into the screen registry at boot. Refer to
+  // core/screen/registry. A plugin declares no capability for these: a screen is a
+  // contribution, and not a slot that one provider fills.
+  screens?: AdminScreen[];
 }
 
 // One operation in a server segment (ADR-007). The whole contract is a flat record of
