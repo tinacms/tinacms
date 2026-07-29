@@ -27,6 +27,7 @@ Commands:
 Options:
   --root <dir>      Project root (default: the working directory)
   --config <path>   Path to the config, when it is not under tina/
+  --check           Write nothing; exit 1 when the committed lock is stale
   -h, --help        Show this message
 `;
 
@@ -38,8 +39,8 @@ const describe = (result: CodegenResult): string => {
 };
 
 const codegenCommand = async (
-  values: { root?: string; config?: string },
-  context: Required<Pick<CliContext, 'cwd' | 'log'>> & CliContext
+  values: { root?: string; config?: string; check?: boolean },
+  context: Required<Pick<CliContext, 'cwd' | 'log' | 'logError'>> & CliContext
 ): Promise<number> => {
   const result = await runCodegen({
     rootDir: values.root ? resolveFrom(context.cwd, values.root) : context.cwd,
@@ -47,7 +48,22 @@ const codegenCommand = async (
       ? resolveFrom(context.cwd, values.config)
       : undefined,
     load: { loader: context.loader },
+    write: !values.check,
   });
+  // Under --check the lock on disk is the answer, and the command reports it instead
+  // of repairing it. The pipeline of the project never runs this bin (refer to the CLI
+  // rule in packages/v4/README.md), so this is how CI catches a config that changed
+  // without its lock.
+  if (values.check) {
+    if (result.outcome === 'unchanged') {
+      context.log(`${result.lockPath} is up to date`);
+      return 0;
+    }
+    context.logError(
+      `${result.lockPath} is out of date. Run \`tinacms codegen\` and commit the result.`
+    );
+    return 1;
+  }
   // A stale lock is written again, and does not fail the build, so this states the
   // reason. A change to the lock with no explanation in a commit hides the drift.
   if (result.warning) context.log(result.warning);
@@ -84,6 +100,7 @@ export const runCli = async (
       options: {
         root: { type: 'string' },
         config: { type: 'string' },
+        check: { type: 'boolean' },
         help: { type: 'boolean', short: 'h' },
       },
       allowPositionals: true,
@@ -98,7 +115,7 @@ export const runCli = async (
       log(USAGE);
       return 0;
     }
-    return await codegenCommand(values, { ...context, cwd, log });
+    return await codegenCommand(values, { ...context, cwd, log, logError });
   } catch (cause) {
     // A failure of the config or of the lock is a message for the developer, and not
     // a stack trace. Every throw on this path carries an explanation.

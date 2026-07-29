@@ -30,6 +30,11 @@ export interface CodegenOptions {
   // An explicit path to the config, for a project that keeps it in another place.
   configPath?: string;
   load?: LoadTinaConfigOptions;
+  // Write the lock when it differs. It defaults to true. `tinacms codegen --check`
+  // passes false: in CI a lock that differs from the committed one is the failure to
+  // report, and not a file to repair. The outcome is the same either way, so the
+  // caller reads `outcome` to learn what a write would have done.
+  write?: boolean;
 }
 
 export type CodegenOutcome =
@@ -111,13 +116,16 @@ export const runCodegen = async (
     options.configPath ?? (await findConfigPath(options.rootDir));
   const lockPath = path.join(options.rootDir, TINA_DIRECTORY, LOCK_FILENAME);
 
+  const write = options.write ?? true;
   const config = await loadTinaConfig(configPath, options.load);
   const lock = compileSchema(config);
   const existing = await readExistingLock(lockPath);
 
   if (!existing) {
-    await mkdir(path.dirname(lockPath), { recursive: true });
-    await writeFile(lockPath, serializeLock(lock));
+    if (write) {
+      await mkdir(path.dirname(lockPath), { recursive: true });
+      await writeFile(lockPath, serializeLock(lock));
+    }
     return { configPath, lockPath, outcome: 'created', lock };
   }
 
@@ -132,7 +140,7 @@ export const runCodegen = async (
     check.status === 'unreadable' ? 'lock-unreadable' : 'lock-incompatible',
     check.message
   );
-  await writeFile(lockPath, serializeLock(lock));
+  if (write) await writeFile(lockPath, serializeLock(lock));
   return {
     configPath,
     lockPath,

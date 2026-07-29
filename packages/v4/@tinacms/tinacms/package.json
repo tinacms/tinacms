@@ -76,24 +76,33 @@
     }
   },
   "dependencies": {
-    "@hookform/resolvers": "^5.4.0",
     "@tinacms/graphql": "workspace:*",
     "@tinacms/mdx": "workspace:*",
     "@tinacms/rich-text": "workspace:*",
-    "@tinacms/schema-tools": "workspace:*",
     "@tinacms/ui": "workspace:*",
     "abstract-level": "catalog:",
     "gray-matter": "catalog:",
     "prism-react-renderer": "catalog:",
     "react-hook-form": "^7.80.0",
     "sqlite-level": "catalog:",
-    "vite": "^5.4.0",
     "zod": "catalog:",
     "zustand": "^5.0.14"
   },
   "peerDependencies": {
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "vite": "^5.4.0 || ^6.0.0 || ^7.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    },
+    "vite": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.2.4",
@@ -111,6 +120,7 @@
     "react-dom": "^19.2.7",
     "tailwindcss": "^4.3.2",
     "typescript": "^5.7.3",
+    "vite": "^5.4.0",
     "vitest": "^2.1.9"
   }
 }

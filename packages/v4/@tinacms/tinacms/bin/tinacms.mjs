@@ -10,7 +10,19 @@
 // opens its own server for the config, rooted at the directory the config sits in.
 
 import { fileURLToPath } from 'node:url';
-import { createServer } from 'vite';
+
+// Vite is an optional peer, because the browser runtime of this package does not need a
+// build tool and should not install one. The bin does need it, for the reason above, so
+// this reports the missing peer as the instruction it is. The `catch` goes when ADR-001
+// lands the dist build: from then the bin loads compiled JavaScript, and only the config
+// read needs a loader.
+const { createServer } = await import('vite').catch(() => {
+  console.error(
+    'tinacms: this command needs Vite to read tina/config.ts.\n' +
+      'Install it in your project:  npm i -D vite'
+  );
+  process.exit(1);
+});
 
 const server = await createServer({
   configFile: false,

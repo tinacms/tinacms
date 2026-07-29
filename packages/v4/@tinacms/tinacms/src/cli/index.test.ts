@@ -116,6 +116,54 @@ describe('runCli', () => {
   });
 });
 
+// The pipeline of a project never runs this bin, so a config that changed without its
+// lock reaches CI unnoticed. --check is the guard, and it must never repair the file it
+// is checking: a CI run that rewrites the lock reports success and commits nothing.
+describe('runCli codegen --check', () => {
+  const writeConfig = () =>
+    writeFile(path.join(rootDir, 'tina', 'config.ts'), 'export default {}');
+  const lockPath = () => path.join(rootDir, 'tina', 'tina-lock.json');
+
+  it('exits 0 when the committed lock matches the schema', async () => {
+    const { context } = capture();
+    await writeConfig();
+    await runCli(['codegen'], context);
+
+    const { out, context: checkContext } = capture();
+    expect(await runCli(['codegen', '--check'], checkContext)).toBe(0);
+    expect(out.join('\n')).toMatch(/is up to date/);
+  });
+
+  it('exits 1 and writes nothing when no lock is committed', async () => {
+    const { err, context } = capture();
+    await writeConfig();
+
+    expect(await runCli(['codegen', '--check'], context)).toBe(1);
+    expect(err.join('\n')).toMatch(/is out of date/);
+    await expect(readFile(lockPath(), 'utf8')).rejects.toThrow();
+  });
+
+  it('exits 1 and leaves a stale lock untouched', async () => {
+    const { context } = capture();
+    await writeConfig();
+    // A lock that parses and carries a different schema digest is the drift this
+    // command exists to catch.
+    await runCli(['codegen'], context);
+    const committed = JSON.parse(await readFile(lockPath(), 'utf8'));
+    committed.schema.collections[0].fields.push({
+      name: 'subtitle',
+      type: 'string',
+    });
+    const stale = `${JSON.stringify(committed, null, 2)}\n`;
+    await writeFile(lockPath(), stale);
+
+    const { err, context: checkContext } = capture();
+    expect(await runCli(['codegen', '--check'], checkContext)).toBe(1);
+    expect(err.join('\n')).toMatch(/is out of date/);
+    expect(await readFile(lockPath(), 'utf8')).toBe(stale);
+  });
+});
+
 describe('runCli argument handling', () => {
   // parseArgs sat outside the try/catch, so a bad flag escaped as a stack trace —
   // against this file's own "a message, not a crash" contract.

@@ -44,7 +44,7 @@ the publish rule for a package when a pull request changes that package.
 
 | Package | Path | Role | Build | Releases to |
 |---|---|---|---|---|
-| `@tinacms/tinacms` | `packages/v4/@tinacms/tinacms` | The v4 runtime. It supplies the universal entry and the subpath entries (`/react`, `/client`, `/server`, `/next`, `/express`, `/astro`, `/hono`). It also contains the CLI. The `tinacms` bin supplies the `init`, `dev`, `build`, and `codegen` commands. | Not decided. The alpha scaffold uses `src/*` directly through `exports`. ADR-001 specifies that the production build compiles to `dist/`. | npm `@tinacms/tinacms` |
+| `@tinacms/tinacms` | `packages/v4/@tinacms/tinacms` | The v4 runtime. It supplies the universal entry and the subpath entries (`/react`, `/client`, `/server`, `/next`, `/express`, `/astro`, `/hono`). It also contains the CLI. The `tinacms` bin supplies the `init` and `codegen` commands. It does not supply `dev` or `build`; refer to [The CLI stays out of the pipeline](#the-cli-stays-out-of-the-pipeline). | Not decided. The alpha scaffold uses `src/*` directly through `exports`. ADR-001 specifies that the production build compiles to `dist/`. | npm `@tinacms/tinacms` |
 | `@tinacms/app` | `packages/@tinacms/app` | The admin app bundle. `@tinacms/tinacms` uses it at build time and at development time. | `tinacms-scripts build` | npm `@tinacms/app` |
 | `@tinacms/auth` | `packages/@tinacms/auth` | Shared auth primitives. The core packages and TinaCloud use them. | `tinacms-scripts build` | npm `@tinacms/auth` |
 | `@tinacms/graphql` | `packages/@tinacms/graphql` | The GraphQL runtime. TinaCloud also uses it. | `tinacms-scripts build` | npm `@tinacms/graphql` |
@@ -64,6 +64,46 @@ list prevents a reviewer from moving them into this repository.
 | `mongodb-level` | https://github.com/tinacms/mongodb-level |
 | `sqlite-level` | https://github.com/tinacms/sqlite-level |
 | `upstash-redis-level` | https://github.com/tinacms/upstash-redis-level |
+
+## The CLI stays out of the pipeline
+
+v3 owns the pipeline of the project. `tinacms dev -c "next dev"` makes Tina the
+parent process of the framework, and `tinacms build && next build` makes Tina a
+build step. Thus a fault in Tina, or a build tool in Tina that does not agree
+with the one in the project, stops a build that has nothing to do with content.
+It is also the reason that `tinacms` and `@tinacms/cli` move together: two
+packages in one pipeline must agree at each release.
+
+v4 inverts that. The project owns its pipeline, and it calls Tina.
+
+**The rule: the `tinacms` bin only writes files into the repository that a person
+then commits. It does not wrap a process, it does not open a port, and it does
+not produce a build artifact.**
+
+The rule gives the commands that the bin can supply:
+
+| Command | What it writes | Allowed |
+|---|---|---|
+| `tinacms init` | `tina/config.ts`, the plugin registration, the admin route | Yes |
+| `tinacms codegen` | `tina/tina-lock.json` | Yes |
+| `tinacms codegen --check` | nothing; it exits 1 when the committed lock is stale | Yes |
+| `tinacms dev` | — | No. Run the dev server of the framework. The Vite plugin and the adapter do the rest. |
+| `tinacms build` | — | No. The lock is committed, so there is nothing to build. |
+
+Each capability therefore mounts into the server that the project already runs:
+
+- The local data layer is a Vite plugin that the project adds to its own config,
+  or an adapter route. `dispatchContentRequest` belongs to no transport, so a
+  host for another bundler is a small file.
+- The RPC handler is `(Request) => Promise<Response>`. The framework adapters
+  mount it as a route of the project.
+- The admin UI is a React component that the project renders on its own route.
+  It is not a bundle that a build step copies into `public/`.
+
+`tina-lock.json` is a committed file and not a build output (ADR-016). Thus CI
+and the deploy of a project never run the `tinacms` bin. `tinacms codegen
+--check` is available as a guard against drift, and it stays a check that a
+project opts into.
 
 ## Publish rules
 
