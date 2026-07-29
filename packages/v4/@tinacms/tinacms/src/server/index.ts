@@ -87,6 +87,9 @@ export const opMeta = (handler: ServerOp): OpMeta =>
 export interface ServerRuntime {
   segmentsByNamespace: Map<string, ResolvedServerSegment>;
   authHooks: AuthTransportHooks | null;
+  // The teardown from initializePlugins. It runs every onDestroy that its matching
+  // onInit paired with, and a second call destroys nothing.
+  destroy: () => Promise<void>;
 }
 
 // Carries the runtime across a dispatch so the module-level `use()` resolves against

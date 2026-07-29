@@ -44,7 +44,8 @@ const mediaPlugin = definePlugin({
         { permission: 'media:delete' },
         async (input: { path: string }) => ({ removed: input.path })
       ),
-      // Exercises the server→server in-process accessor from inside a dispatch.
+      // This covers the in-process accessor between two server segments, inside a
+      // dispatch.
       viaAuth: async () => (use('auth').whoami as () => Promise<unknown>)(),
       explode: async () => {
         throw new Error('secret internals');
@@ -81,6 +82,22 @@ const post = (
       opts.raw ??
       (opts.body === undefined ? undefined : JSON.stringify(opts.body)),
   });
+
+// Sec-Fetch-Site is a forbidden header name, so happy-dom refuses to put it on a real
+// Request — which is the property the guard rests on: a page cannot forge it either.
+// The handler reads only these four members, so a double states the header instead.
+const postStatingFetchSite = (path: string, site: string): Request =>
+  ({
+    method: 'POST',
+    url: `http://tina.local/api/tina${path}`,
+    headers: {
+      get: (name: string) =>
+        ({ 'content-type': 'application/json', 'sec-fetch-site': site })[
+          name.toLowerCase()
+        ] ?? null,
+    },
+    text: async () => '',
+  }) as unknown as Request;
 
 describe('createRpcHandler', () => {
   it('serves a publicOp with no session', async () => {
@@ -184,7 +201,8 @@ describe('createRpcHandler', () => {
       server: async () => ({
         default: defineServerPlugin({
           getSession: async (request: Request) => {
-            // A capability-composing provider may consult peers mid-verification.
+            // A provider that composes a capability can read its peers during a
+            // verification.
             await (use('media').health as () => Promise<unknown>)();
             return request.headers.get('authorization')
               ? { identity: { id: 'ada' }, roles: ['admin'] }
@@ -358,5 +376,178 @@ describe('createRpcHandler', () => {
     expect(JSON.stringify(payload)).not.toContain('secret internals');
     expect(consoleError).toHaveBeenCalled();
     consoleError.mockRestore();
+  });
+
+  it('403s a cross-site POST', async () => {
+    const response = await handler(
+      postStatingFetchSite('/media/health', 'cross-site')
+    );
+    expect(response.status).toBe(403);
+  });
+
+  it('serves a same-origin POST that states its relationship', async () => {
+    const response = await handler(
+      postStatingFetchSite('/media/health', 'same-origin')
+    );
+    expect(response.status).toBe(200);
+  });
+});
+
+// The guards that need no runtime run before the runtime composes, so a request that
+// never reaches an operation cannot make every plugin import and initialize.
+describe('createRpcHandler composition', () => {
+  const countingPlugin = (onInit: () => void) =>
+    definePlugin({
+      name: 'counting',
+      provides: ['search'],
+      onInit,
+      server: async () => ({
+        default: defineServerPlugin({ ping: publicOp(async () => 'pong') }),
+      }),
+    });
+
+  it('does not compose the runtime for a request the guards refuse', async () => {
+    const onInit = vi.fn();
+    const handler = createRpcHandler({ plugins: [countingPlugin(onInit)] });
+    await handler(new Request('http://tina.local/api/tina/search/ping'));
+    await handler(
+      new Request('http://tina.local/api/tina/search/ping', { method: 'POST' })
+    );
+    expect(onInit).not.toHaveBeenCalled();
+    await handler(post('/search/ping'));
+    expect(onInit).toHaveBeenCalledTimes(1);
+  });
+
+  it('runs every onDestroy when a handler is destroyed', async () => {
+    const onDestroy = vi.fn();
+    const handler = createRpcHandler({
+      plugins: [
+        definePlugin({
+          name: 'counting',
+          provides: ['search'],
+          onDestroy,
+          server: async () => ({
+            default: defineServerPlugin({ ping: publicOp(async () => 'pong') }),
+          }),
+        }),
+      ],
+    });
+    await handler(post('/search/ping'));
+    await handler.destroy();
+    expect(onDestroy).toHaveBeenCalledTimes(1);
+  });
+
+  it('holds a request that arrives mid-teardown until onDestroy finishes', async () => {
+    const lifecycle: string[] = [];
+    let onDestroyStarted: () => void = () => {};
+    let releaseOnDestroy: () => void = () => {};
+    const started = new Promise<void>((resolve) => {
+      onDestroyStarted = resolve;
+    });
+    const released = new Promise<void>((resolve) => {
+      releaseOnDestroy = resolve;
+    });
+    const handler = createRpcHandler({
+      plugins: [
+        definePlugin({
+          name: 'counting',
+          provides: ['search'],
+          onInit: () => {
+            lifecycle.push('init');
+          },
+          onDestroy: async () => {
+            lifecycle.push('destroy-start');
+            onDestroyStarted();
+            await released;
+            lifecycle.push('destroy-end');
+          },
+          server: async () => ({
+            default: defineServerPlugin({ ping: publicOp(async () => 'pong') }),
+          }),
+        }),
+      ],
+    });
+    await handler(post('/search/ping'));
+    const teardown = handler.destroy();
+    await started;
+    // The destroy has cleared the cache, so this request composes again. It must not
+    // run onInit while the onDestroy above is still running.
+    const duringTeardown = handler(post('/search/ping'));
+    // Long enough for an unserialised composition to reach its onInit.
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    releaseOnDestroy();
+    await teardown;
+    expect((await duringTeardown).status).toBe(200);
+    expect(lifecycle).toEqual(['init', 'destroy-start', 'destroy-end', 'init']);
+  });
+
+  it('logs a failing onDestroy instead of swallowing it', async () => {
+    const cause = new Error('a handle stayed open');
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+    const handler = createRpcHandler({
+      plugins: [
+        definePlugin({
+          name: 'counting',
+          provides: ['search'],
+          onDestroy: () => {
+            throw cause;
+          },
+          server: async () => ({
+            default: defineServerPlugin({ ping: publicOp(async () => 'pong') }),
+          }),
+        }),
+      ],
+    });
+    await handler(post('/search/ping'));
+    await expect(handler.destroy()).resolves.toBeUndefined();
+    expect(consoleError).toHaveBeenCalledWith(
+      '[tinacms] RPC plugin teardown failed:',
+      cause
+    );
+    consoleError.mockRestore();
+  });
+
+  it('destroys nothing when no request ever composed the runtime', async () => {
+    const onDestroy = vi.fn();
+    const handler = createRpcHandler({
+      plugins: [
+        definePlugin({
+          name: 'counting',
+          provides: ['search'],
+          onDestroy,
+          server: async () => ({
+            default: defineServerPlugin({ ping: publicOp(async () => 'pong') }),
+          }),
+        }),
+      ],
+    });
+    await handler.destroy();
+    expect(onDestroy).not.toHaveBeenCalled();
+  });
+});
+
+// Without a mountPath the route is the last two segments, so any prefix reaches the
+// operation. With one, the path has to be the mount and exactly those two.
+describe('createRpcHandler mountPath', () => {
+  const plugins = [mediaPlugin, authPlugin()];
+
+  it('routes a prefixed path when no mountPath is set', async () => {
+    const handler = createRpcHandler({ plugins });
+    const response = await handler(post('/junk/media/health'));
+    expect(response.status).toBe(200);
+  });
+
+  it('404s that same prefixed path when a mountPath is set', async () => {
+    const handler = createRpcHandler({ plugins, mountPath: '/api/tina' });
+    const response = await handler(post('/junk/media/health'));
+    expect(response.status).toBe(404);
+  });
+
+  it('serves the exact mounted path', async () => {
+    const handler = createRpcHandler({ plugins, mountPath: '/api/tina' });
+    const response = await handler(post('/media/health'));
+    expect(response.status).toBe(200);
   });
 });

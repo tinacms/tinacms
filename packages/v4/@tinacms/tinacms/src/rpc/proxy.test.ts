@@ -4,8 +4,9 @@ import { defineServerPlugin, publicOp } from '../server';
 import { createRpcHandler } from './handler';
 import { RpcError, createRpcClient } from './proxy';
 
-// The exact pattern a real plugin uses: the ops record's type crosses to the client
-// via `import type`-style inference — here directly, same TS project.
+// The pattern that a real plugin uses. The type of the ops record crosses to the client,
+// as an `import type` does. Here it crosses directly, because both sides are one TS
+// project.
 const searchOps = defineServerPlugin({
   query: publicOp(async (input: { q: string }) => ({ hits: [input.q] })),
   reindex: async () => ({ started: true }),
@@ -21,7 +22,8 @@ const handler = createRpcHandler({ plugins: [searchPlugin] });
 
 const client = createRpcClient<{ search: typeof searchOps }>({
   url: 'http://tina.local/api/tina',
-  // The handler is Web-standard, so it doubles as the fetch implementation.
+  // The handler takes a Request and returns a Response, so it also serves as the fetch
+  // implementation.
   fetch: (input, init) => handler(new Request(input, init)),
 });
 
@@ -32,7 +34,7 @@ describe('createRpcClient', () => {
   });
 
   it('throws RpcError carrying the transport code and status', async () => {
-    const rejection = client.search.reindex(undefined as never);
+    const rejection = client.search.reindex(undefined);
     await expect(rejection).rejects.toBeInstanceOf(RpcError);
     await expect(rejection).rejects.toMatchObject({
       status: 401,
@@ -41,12 +43,13 @@ describe('createRpcClient', () => {
   });
 
   it('is not thenable and yields nothing for symbol keys', async () => {
-    // `await` probes `then` at both levels; a caller there would POST and hang.
+    // The `await` keyword reads `then` at both levels. A POST there would hang the
+    // caller.
     expect((client as unknown as Record<string, unknown>).then).toBeUndefined();
     expect(
       (client.search as unknown as Record<string, unknown>).then
     ).toBeUndefined();
-    expect(await client.search).toBeDefined();
+    expect(client.search).toBeDefined();
     expect(
       (client.search as unknown as Record<symbol, unknown>)[Symbol.toStringTag]
     ).toBeUndefined();
