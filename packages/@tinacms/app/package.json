@@ -30,7 +30,7 @@
 	"dependencies": {
 		"@graphiql/toolkit": "catalog:",
 		"@monaco-editor/loader": "catalog:",
-		"@radix-ui/react-popover": "^1.1.18",
+		"@radix-ui/react-popover": "catalog:",
 		"@tinacms/mdx": "workspace:^",
 		"final-form": "catalog:",
 		"graphiql": "catalog:",
