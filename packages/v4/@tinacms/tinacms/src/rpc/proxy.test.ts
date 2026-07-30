@@ -29,7 +29,7 @@ describe('createRpcClient', () => {
   });
 
   it('throws RpcError carrying the transport code and status', async () => {
-    const rejection = client.search.reindex(undefined);
+    const rejection = client.search.reindex();
     await expect(rejection).rejects.toBeInstanceOf(RpcError);
     await expect(rejection).rejects.toMatchObject({
       status: 401,

@@ -1,3 +1,4 @@
+import { fieldConflictError, overridesFieldKey } from './field/registry';
 import { invariant } from './invariant';
 import { declaresCapabilityOverride } from './mount';
 import {
@@ -7,9 +8,9 @@ import {
 } from './overridable-registry';
 import {
   type Capability,
-  FIELD_CAPABILITY,
   type PluginManifest,
   type ResolvedServerSegment,
+  isSingletonSliceCapability,
 } from './plugin';
 
 export const resolveServerSegments = async (
@@ -29,9 +30,6 @@ export const resolveServerSegments = async (
   return resolved;
 };
 
-// Every config error fails here, before any segment import, so a bad config
-// never boots part-way (ADR-006). `field` is keyed, so many providers are
-// correct; the field registry finds per-type conflicts.
 export const validateCapabilityGraph = (plugins: PluginManifest[]): void => {
   const names = new Set<string>();
   for (const plugin of plugins) {
@@ -44,11 +42,43 @@ export const validateCapabilityGraph = (plugins: PluginManifest[]): void => {
     names.add(plugin.name);
   }
 
-  // Singleton capabilities resolve through the same order-independent override
-  // rule as field types and store slices.
+  for (const plugin of plugins) {
+    for (const override of plugin.overrides) {
+      invariant(
+        plugin.provides.includes(override.capability),
+        'override-without-provides',
+        `Plugin "${plugin.name}" declares \`overrides\` for "${override.capability}" ` +
+          `but does not declare \`provides: ["${override.capability}"]\`, so it ` +
+          'would never replace the built-in.'
+      );
+    }
+  }
+
+  composeOverridableRegistry(
+    plugins.flatMap((plugin) =>
+      plugin.field
+        ? [
+            {
+              key: plugin.field.type,
+              value: plugin,
+              isOverride: overridesFieldKey(plugin, plugin.field.type),
+            },
+          ]
+        : []
+    ),
+    fieldConflictError
+  );
+
   const capabilityEntries = plugins.flatMap((plugin) => {
     const singletonCapabilities = plugin.provides.filter(
-      (capability) => capability !== FIELD_CAPABILITY
+      isSingletonSliceCapability
+    );
+    invariant(
+      singletonCapabilities.length <= 1,
+      'plugin-multiple-singleton-slices',
+      `Plugin "${plugin.name}" provides ${singletonCapabilities.length} ` +
+        `singleton capabilities (${singletonCapabilities.join(', ')}), but a ` +
+        'plugin mounts at only one namespace. Split it into one plugin per capability.'
     );
     return singletonCapabilities.map((capability) => ({
       key: capability,
@@ -73,8 +103,6 @@ export const validateCapabilityGraph = (plugins: PluginManifest[]): void => {
   orderPluginsByDependencies(plugins);
 };
 
-// Init order (ADR-006): providers before dependents, config order breaks ties,
-// a cycle is an error. The ready scan is O(n²), enough for tens of plugins.
 const orderPluginsByDependencies = (
   plugins: PluginManifest[]
 ): PluginManifest[] => {
@@ -120,13 +148,10 @@ const orderPluginsByDependencies = (
   return ordered;
 };
 
-// Runs each onInit once per boot in dependency order and returns the teardown,
-// which runs onDestroy in reverse for the plugins that ran their init (ADR-006).
 export const initializePlugins = async (
   plugins: PluginManifest[]
 ): Promise<() => Promise<void>> => {
   const initialized: PluginManifest[] = [];
-  // Drains the list, so a second call destroys nothing.
   const destroyInitialized = async () => {
     const failures: unknown[] = [];
     for (const plugin of initialized.splice(0).reverse()) {
@@ -146,8 +171,6 @@ export const initializePlugins = async (
       await plugin.onInit?.();
       initialized.push(plugin);
     } catch (cause) {
-      // The rollback failure must not replace the failure that caused it, but
-      // must not vanish either.
       await destroyInitialized().catch((rollbackFailure) => {
         console.error(
           '[tinacms] Plugin teardown failed while rolling back a failed init:',

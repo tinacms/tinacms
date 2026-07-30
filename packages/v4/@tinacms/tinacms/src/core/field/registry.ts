@@ -14,13 +14,19 @@ import type { FieldDescriptor } from './contract';
 
 export type FieldRegistry = Map<string, FieldDescriptor>;
 
-const overridesFieldKey = (manifest: PluginManifest, key: string): boolean =>
+export const overridesFieldKey = (
+  manifest: PluginManifest,
+  key: string
+): boolean =>
   manifest.overrides.some(
     (override) =>
       override.capability === FIELD_CAPABILITY && override.key === key
   );
 
-const fieldConflictError = (conflict: RegistryConflict, key: string): Error => {
+export const fieldConflictError = (
+  conflict: RegistryConflict,
+  key: string
+): Error => {
   if (conflict === REGISTRY_CONFLICTS.duplicateOverride) {
     return new Error(
       `Two plugins both declare an \`overrides\` for the \`field\` type "${key}". ` +
@@ -33,10 +39,6 @@ const fieldConflictError = (conflict: RegistryConflict, key: string): Error => {
   );
 };
 
-// A field plugin declares itself in two places. The type key sits on the manifest, and
-// the descriptor sits on the client segment. One half alone is an error by the author.
-// Without this check, it would fail as a missing field type at the render, far from its
-// cause.
 const fieldEntryOf = ({ manifest, segment }: ResolvedSegment) => {
   if (!(manifest.field || segment.field)) return [];
   invariant(

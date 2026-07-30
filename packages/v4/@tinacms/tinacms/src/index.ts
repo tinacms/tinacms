@@ -9,6 +9,7 @@ export {
   defineCollection,
   defineConfig,
   type ResolvedConfig,
+  type TinaBuildConfig,
   type TinaConfig,
   type TinaSchema,
 } from './config';

@@ -5,8 +5,6 @@ import {
   isSingletonSliceCapability,
 } from './plugin';
 
-// Where a plugin mounts, on both sides of the boundary: one rule so
-// `get().media.*` and `server.media.*` always agree.
 export interface CapabilityMount {
   namespace: string;
   isOverride: boolean;
@@ -15,17 +13,9 @@ export interface CapabilityMount {
 export const declaresCapabilityOverride = (
   manifest: PluginManifest,
   capability: Capability
-): boolean => {
-  for (const override of manifest.overrides) {
-    if (override.capability === capability) {
-      return true;
-    }
-  }
-  return false;
-};
+): boolean =>
+  manifest.overrides.some((override) => override.capability === capability);
 
-// Singleton providers mount at the capability key, everything else under its
-// own name, so a change of provider changes no reader.
 export const capabilityMountFor = (
   manifest: PluginManifest
 ): CapabilityMount => {
@@ -44,7 +34,6 @@ export const capabilityMountFor = (
       isOverride: declaresCapabilityOverride(manifest, capability),
     };
   }
-  // A feature plugin must not squat a capability namespace by name alone.
   invariant(
     !isSingletonSliceCapability(manifest.name),
     'plugin-name-squats-capability',

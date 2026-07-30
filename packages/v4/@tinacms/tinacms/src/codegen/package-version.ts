@@ -1,9 +1,7 @@
-
-import { createRequire } from 'node:module';
-
-const packageJson: { version: string } = createRequire(import.meta.url)(
-  '../../package.json'
-);
+// A JSON import, not createRequire: the main entry reaches this file through
+// compile-schema, and a browser imports that entry for defineConfig, so nothing
+// here may touch a node builtin.
+import packageJson from '../../package.json';
 
 export interface PackageVersion {
   fullVersion: string;

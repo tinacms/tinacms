@@ -14,14 +14,30 @@ export const defineCollection = (
   collection: CollectionSchema
 ): CollectionSchema => collection;
 
+export interface TinaBuildConfig {
+  publicFolder?: string;
+  outputFolder?: string;
+}
+
+export const DEFAULT_BUILD: Required<TinaBuildConfig> = {
+  publicFolder: 'public',
+  outputFolder: 'admin',
+};
+
+export const resolveBuild = (
+  build?: TinaBuildConfig
+): Required<TinaBuildConfig> => ({ ...DEFAULT_BUILD, ...build });
+
 export interface TinaConfig {
   plugins?: PluginManifest[];
   schema: TinaSchema;
+  build?: TinaBuildConfig;
 }
 
 export interface ComposedConfig {
   plugins: PluginManifest[];
   schema: TinaSchema;
+  build?: Required<TinaBuildConfig>;
 }
 
 export type ResolvedConfig = Brand<ComposedConfig, 'ResolvedConfig'>;
@@ -53,5 +69,9 @@ export const defineConfig = (config: TinaConfig): ResolvedConfig => {
       'provider to `plugins` — `localContentPlugin()` for local development.'
   );
   validateCapabilityGraph(plugins);
-  return asResolvedConfig({ plugins, schema: config.schema });
+  return asResolvedConfig({
+    plugins,
+    schema: config.schema,
+    build: resolveBuild(config.build),
+  });
 };

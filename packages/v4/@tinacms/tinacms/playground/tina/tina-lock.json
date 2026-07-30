@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 5,
   "schema": {
     "collections": [
       {
@@ -28,7 +28,13 @@
           }
         ]
       }
-    ]
+    ],
+    "version": {
+      "fullVersion": "4.0.0-alpha.0",
+      "major": "4",
+      "minor": "0",
+      "patch": "0-alpha"
+    }
   },
   "primitives": {
     "boolean": 1,
