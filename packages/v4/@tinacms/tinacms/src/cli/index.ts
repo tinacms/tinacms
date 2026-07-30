@@ -1,14 +1,10 @@
-// Command dispatch of the `tinacms` bin. The CLI lives in the runtime package
-// (ADR-001); four flags do not need an argument-parsing dependency.
-
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 import type { ModuleLoader } from '../codegen/load-config';
 import { type CodegenResult, runCodegen } from './commands/codegen';
+import { INIT_NEXT_STEPS, runInit } from './commands/init';
 
 export interface CliContext {
-  // The Vite server the bin used to load this module, so the config read does
-  // not start a second one.
   loader?: ModuleLoader;
   cwd?: string;
   log?: (message: string) => void;
@@ -18,17 +14,18 @@ export interface CliContext {
 const USAGE = `tinacms <command> [options]
 
 Commands:
+  init        Write the starter tina/config.ts and a first document
   codegen     Compile the schema in tina/config.ts to tina/tina-lock.json
 
 Options:
   --root <dir>      Project root (default: the working directory)
-  --config <path>   Path to the config, when it is not under tina/
-  --check           Write nothing; exit 1 when the committed lock is stale
+  --config <path>   Path to the config, when it is not under tina/ (codegen)
+  --check           Write nothing; exit 1 when the committed lock is stale (codegen)
   -h, --help        Show this message
 `;
 
 const describe = (result: CodegenResult): string => {
-  const target = `${result.lockPath}`;
+  const target = result.lockPath;
   if (result.outcome === 'created') return `Wrote ${target}`;
   if (result.outcome === 'updated') return `Updated ${target}`;
   return `${target} is up to date`;
@@ -46,8 +43,6 @@ const codegenCommand = async (
     load: { loader: context.loader },
     write: !values.check,
   });
-  // Under --check the lock on disk is the answer: this is how CI catches a
-  // config that changed without its lock.
   if (values.check) {
     if (result.outcome === 'unchanged') {
       context.log(`${result.lockPath} is up to date`);
@@ -58,13 +53,33 @@ const codegenCommand = async (
     );
     return 1;
   }
-  // A stale lock is rewritten without failing the build, so state the reason.
   if (result.warning) context.log(result.warning);
   context.log(describe(result));
+  for (const file of result.admin) {
+    if (file.outcome === 'created') context.log(`Wrote ${file.path}`);
+  }
   return 0;
 };
 
-// path.resolve, not a `/` test: `C:\site` is absolute on Windows.
+const initCommand = async (
+  values: { root?: string },
+  context: Required<Pick<CliContext, 'cwd' | 'log'>>
+): Promise<number> => {
+  const rootDir = values.root
+    ? resolveFrom(context.cwd, values.root)
+    : context.cwd;
+  const result = await runInit({ rootDir });
+  for (const file of result.files) {
+    context.log(
+      file.outcome === 'created'
+        ? `Wrote ${file.path}`
+        : `Kept ${file.path} (it already exists)`
+    );
+  }
+  context.log(INIT_NEXT_STEPS);
+  return 0;
+};
+
 const resolveFrom = (cwd: string, target: string): string =>
   path.resolve(cwd, target);
 
@@ -84,7 +99,6 @@ export const runCli = async (
   }
 
   try {
-    // Inside the try: an unknown flag makes parseArgs throw.
     const { values } = parseArgs({
       args: rest,
       options: {
@@ -93,11 +107,8 @@ export const runCli = async (
         check: { type: 'boolean' },
         help: { type: 'boolean', short: 'h' },
       },
-      allowPositionals: true,
     });
-    // Command before --help, so a typo does not exit 0 just because the user
-    // also asked for usage.
-    if (command !== 'codegen') {
+    if (command !== 'codegen' && command !== 'init') {
       logError(`Unknown command "${command}".\n\n${USAGE}`);
       return 1;
     }
@@ -105,9 +116,11 @@ export const runCli = async (
       log(USAGE);
       return 0;
     }
+    if (command === 'init') {
+      return await initCommand(values, { cwd, log });
+    }
     return await codegenCommand(values, { ...context, cwd, log, logError });
   } catch (cause) {
-    // A message for the developer, not a stack trace.
     logError(cause instanceof Error ? cause.message : String(cause));
     return 1;
   }

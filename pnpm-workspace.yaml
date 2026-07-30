@@ -2,6 +2,7 @@ packages:
     - packages/*
     - packages/@tinacms/*
     - packages/v4/@tinacms/*
+    - packages/v4/examples/*
     - examples/*/*
     - e2e/*
     - playwright/*
