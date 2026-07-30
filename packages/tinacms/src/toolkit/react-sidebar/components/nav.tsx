@@ -12,6 +12,7 @@ import { VscNewFile } from 'react-icons/vsc';
 import { VersionInfo } from './VersionInfo';
 import { NavContext } from './nav-context';
 import { SyncStatusButton, SyncStatusModal } from './sync-status';
+import { AnnouncementsBanner } from '../../../admin/components/AnnouncementsBanner';
 
 interface NavCollection {
   label?: string;
@@ -155,6 +156,9 @@ export const Nav = ({
         </div>
         {children}
         <div className='flex flex-col px-6 flex-1 overflow-auto'>
+          <div className='-mx-6'>
+            <AnnouncementsBanner />
+          </div>
           {showCollections && (
             <>
               <h4 className='flex space-x-1 justify-items-start uppercase font-sans font-bold text-sm mb-3 mt-8 text-gray-700'>

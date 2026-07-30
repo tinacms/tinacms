@@ -32,6 +32,7 @@ import ScreenPage from './pages/ScreenPage';
 
 import { Client, TinaCloudAuthProvider } from '../internalClient';
 import { TinaAdminApi } from './api';
+import { AnnouncementsBanner } from './components/AnnouncementsBanner';
 import {
   initializePostHog,
   TinaCMSStartedEvent,
@@ -195,7 +196,15 @@ const PreviewInner = ({ preview, config }) => {
     }, 100);
   }, [ref.current]);
   const Preview = preview;
-  return <Preview url={url} iframeRef={ref} {...config} />;
+  return (
+    <div className='flex flex-col h-screen'>
+      <style>{`#tina-iframe { height: 100% !important; }`}</style>
+      <AnnouncementsBanner />
+      <div className='flex-1 min-h-0'>
+        <Preview url={url} iframeRef={ref} {...config} />
+      </div>
+    </div>
+  );
 };
 
 const CheckSchema = ({
