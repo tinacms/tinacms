@@ -24,7 +24,6 @@ interface EmbedButtonProps {
   templates: MdxTemplate[];
 }
 
-// Below this many, the list is short enough to scan and the input is just noise.
 const TEMPLATE_COUNT_NEEDING_FILTER = 10;
 
 const EmbedButton: React.FC<EmbedButtonProps> = ({ editor, templates }) => {

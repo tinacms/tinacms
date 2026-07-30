@@ -322,7 +322,6 @@ export const Icons = {
   arrowDown: ChevronDown,
   bg: PaintBucket,
   blockquote: Quote,
-  // bold: Bold,
   overflow: Overflow,
   borderAll,
   borderBottom,
@@ -335,7 +334,6 @@ export const Icons = {
   chevronsUpDown: ChevronsUpDown,
   clear: X,
   close: X,
-  // code: Code2,
   paint: PaintBucket,
   codeblock: FileCode,
   color: Baseline,
@@ -355,16 +353,12 @@ export const Icons = {
   h4: Heading4,
   h5: Heading5,
   h6: Heading6,
-  // image: Image,
   indent: Indent,
-  // italic: Italic,
   kbd: Keyboard,
   lineHeight: WrapText,
-  // link: Link2,
   minus: Minus,
   mermaid: MermaidIcon,
   more: MoreHorizontal,
-  // ol: ListOrdered,
   outdent: Outdent,
   paragraph: Pilcrow,
   refresh: RotateCcw,
@@ -378,7 +372,6 @@ export const Icons = {
   table: Table,
   text: Text,
   trash: Trash,
-  // ul: List,
   underline: Underline,
   unlink: Link2Off,
   viewing: Eye,
@@ -399,7 +392,6 @@ export const Icons = {
   bold: BoldIcon,
   italic: ItalicIcon,
   raw: RawMarkdown,
-  // www
   gitHub: (props: LucideProps) => (
     <svg viewBox='0 0 438.549 438.549' {...props}>
       <path

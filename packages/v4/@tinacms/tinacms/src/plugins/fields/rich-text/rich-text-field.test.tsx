@@ -58,9 +58,6 @@ describe('RichTextField ingest and digest', () => {
   });
 });
 
-// The tree holds no leading whitespace, so the serializer drops the blank line between
-// the frontmatter and the prose. The markdown adapter writes it back. Without that, an
-// open and a save of any v3 document would restyle it.
 describe('RichTextField round-trip through the format adapter', () => {
   const adapter = formatAdapterFor('mdx');
   const RAW = '---\ntitle: Hello World\n---\n\nBody prose.\n';
@@ -85,9 +82,6 @@ describe('RichTextField round-trip through the format adapter', () => {
   });
 });
 
-// The parse and serialize functions take the field node for one reason: the parser reads
-// `templates` from it. Without the node, an embed becomes a raw html node. This test
-// fails if anyone drops that argument again.
 describe('RichTextField templates through the node argument', () => {
   const withTemplates: CollectionSchema = {
     name: 'post',
@@ -143,8 +137,6 @@ describe('RichTextField templates through the node argument', () => {
   });
 });
 
-// A save is what makes an unparsed body dangerous. The validation reports it, and does
-// not block the write, so the serializer must return the source unchanged.
 describe('RichTextField unparseable markdown', () => {
   const BROKEN = '<Unclosed\n';
 
@@ -164,13 +156,7 @@ describe('RichTextField unparseable markdown', () => {
   });
 });
 
-// The form store asks the descriptor whether two values are the same edit. It cannot
-// compare the trees itself: Plate normalizes the tree it is given, so the tree in the
-// editor never matches the tree parsed from the file. Without this answer, a body that
-// its author typed and then deleted again would stay "Unsaved" for ever.
 describe('RichTextField equality', () => {
-  // What Plate hands back: NodeIdPlugin puts an id on every node, and TrailingBlockPlugin
-  // appends an empty paragraph.
   const normalized = (value: RichTextValue): RichTextValue => {
     const withIds = (node: Record<string, unknown>, index: number) => ({
       ...node,
@@ -271,8 +257,6 @@ describe('RichTextField metadata wrapping', () => {
   it('registers the rich-text descriptor as a block field', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('rich-text');
-    // labelable: false — a contenteditable is not a labelable element, so a host
-    // must not point a <label for> at it.
     expect(descriptor?.metadata).toEqual({ layout: 'block', labelable: false });
     expect(descriptor?.defaultValue).toEqual({ type: 'root', children: [] });
   });

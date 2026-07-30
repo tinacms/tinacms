@@ -11,7 +11,6 @@ const ENTRIES: DocumentEntry[] = [
   { path: 'content/posts/second.mdx', document: { title: 'Second' } },
 ];
 
-// A small harness for a slice. It is the scoped `set` that the store gives to a slice.
 const createSliceHarness = async (responseBody: unknown, ok = true) => {
   const requests: unknown[] = [];
   vi.stubGlobal(
@@ -46,9 +45,6 @@ const createSliceHarness = async (responseBody: unknown, ok = true) => {
 
 afterEach(() => vi.unstubAllGlobals());
 
-// The slice is a transport. It maps the ContentProvider operations onto the wire
-// protocol and returns what came back. The caching that used to live here belongs to the
-// query client now, and editor/content-queries.test.tsx covers it.
 describe('content slice', () => {
   it('posts a list op and returns the entries', async () => {
     const harness = await createSliceHarness(ENTRIES);
@@ -67,9 +63,6 @@ describe('content slice', () => {
   });
 
   it('posts an update op and returns the persisted entry', async () => {
-    // The server merges the unknown fields into the stored document, so the result
-    // holds more than the value that was sent. The caller gets that result, and not
-    // the raw form value.
     const persisted: DocumentEntry = {
       path: 'content/posts/hello.mdx',
       document: { title: 'Renamed', category: 'not-in-schema' },

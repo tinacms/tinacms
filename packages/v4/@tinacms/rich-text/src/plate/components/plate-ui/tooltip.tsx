@@ -20,8 +20,6 @@ export const TooltipContent = withCn(
   'z-[9999] overflow-hidden rounded border bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md'
 );
 
-// React 19 narrowed ElementRef's constraint: keyof HTMLElementTagNameMap admits
-// tags JSX doesn't (and ElementRef is the old name for ComponentRef).
 export function withTooltip<T extends React.ElementType>(Component: T) {
   return React.forwardRef<
     React.ComponentRef<T>,

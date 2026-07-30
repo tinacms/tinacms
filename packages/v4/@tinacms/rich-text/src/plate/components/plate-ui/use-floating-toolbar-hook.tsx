@@ -18,8 +18,6 @@ export const useCustomFloatingToolbar = ({
   showWhenReadOnly,
   waitForCollapsedSelection,
 }: ReturnType<typeof useFloatingToolbarState>) => {
-  // On refocus, the editor keeps the previous selection,
-  // so we need to wait it's collapsed at the new position before displaying the floating toolbar.
   React.useEffect(() => {
     if (!(editorId === focusedEditorId)) {
       setWaitForCollapsedSelection(true);
@@ -46,7 +44,6 @@ export const useCustomFloatingToolbar = ({
       document.removeEventListener('mousedown', mousedown);
     };
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   React.useEffect(() => {

@@ -3,9 +3,6 @@ import { ParagraphPlugin } from '@udecode/plate/react';
 import type { ComponentType, SVGProps } from 'react';
 import { Icons } from './icons';
 
-// Permissive enough to accept both Lucide icons and the project's
-// custom SVG components, both of which only need `className` from
-// the caller.
 export type HeadingItemIcon = ComponentType<SVGProps<SVGSVGElement>>;
 
 export interface HeadingMenuItem {
@@ -15,8 +12,6 @@ export interface HeadingMenuItem {
   value: string;
 }
 
-// Builder that preserves the `Record<HeadingLevel, T>` shape without
-// `as` — each key is spelled out so TS verifies exhaustiveness.
 const buildByLevel = <T>(
   make: (level: HeadingLevel) => T
 ): Record<HeadingLevel, T> => ({
@@ -46,8 +41,5 @@ export const paragraphItem: HeadingMenuItem = {
   value: ParagraphPlugin.key,
 };
 
-/** Looks up the menu item for any block value. Returns `undefined`
- * for non-heading values so callers can fall back as they see fit
- * (e.g. to `paragraphItem` for the dropdown trigger label). */
 export const getHeadingItem = (value: string): HeadingMenuItem | undefined =>
   isHeadingLevel(value) ? headingItemsByLevel[value] : undefined;

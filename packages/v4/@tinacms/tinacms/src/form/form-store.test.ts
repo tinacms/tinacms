@@ -34,7 +34,6 @@ describe('form-store registration', () => {
   it('re-registering an edited form keeps in-progress edits', () => {
     store.getState().registerForm(postA, { [title]: 'Hello' });
     store.getState().setFieldValue(postA, title, 'Edited');
-    // A remount registers the original values again. The live edit must survive that.
     store.getState().registerForm(postA, { [title]: 'Hello' });
     expect(store.getState().forms[postA].values[title]).toBe('Edited');
     expect(statusOf(postA)).toBe('dirty');
@@ -70,16 +69,10 @@ describe('form-store dirty tracking', () => {
     store.getState().registerForm(postA, { [title]: 'Hello' });
     store.getState().setFieldValue(postA, subtitle, 'x');
     expect(statusOf(postA)).toBe('dirty');
-    // RHF emits undefined when a field clears. An absent key and an undefined value
-    // are one state, because JSON cannot hold "present but undefined". This must
-    // therefore read clean.
     store.getState().setFieldValue(postA, subtitle, undefined);
     expect(statusOf(postA)).toBe('clean');
   });
 
-  // A composite value arrives as a fresh object on every edit, so a reference test
-  // holds it dirty for ever. The default equality compares structure, which is what
-  // makes the revert below read clean. Refer to sameValue in core/form/compare.ts.
   it('an object value that is edited and reverted is clean, not dirty', () => {
     const hero = toFieldAddress('hero');
     store.getState().registerForm(postA, { [hero]: { heading: 'Hello' } });
@@ -87,7 +80,6 @@ describe('form-store dirty tracking', () => {
     expect(statusOf(postA)).toBe('dirty');
     expect(fieldDirty(store.getState().forms[postA], hero)).toBe(true);
 
-    // A new object, equal to the baseline in structure alone.
     store.getState().setFieldValue(postA, hero, { heading: 'Hello' });
     expect(statusOf(postA)).toBe('clean');
     expect(fieldDirty(store.getState().forms[postA], hero)).toBe(false);
@@ -114,7 +106,6 @@ describe('form-store save reset', () => {
     store.getState().markSaved(postA);
     expect(statusOf(postA)).toBe('clean');
 
-    // The baseline is the saved value, so a return to the original value is dirty.
     store.getState().setFieldValue(postA, title, 'Hello');
     expect(statusOf(postA)).toBe('dirty');
   });
@@ -124,22 +115,15 @@ describe('form-store save reset', () => {
     store.getState().setFieldValue(postA, title, 'Saved value');
     const snapshot = { ...store.getState().forms[postA].values };
 
-    // An edit typed during the save. The baseline is the snapshot, and not the
-    // current values, so the newer edit still reads dirty.
     store.getState().setFieldValue(postA, title, 'Newer edit');
     store.getState().markSaved(postA, snapshot);
     expect(statusOf(postA)).toBe('dirty');
 
-    // Reverting to what was actually saved is clean against the new baseline.
     store.getState().setFieldValue(postA, title, 'Saved value');
     expect(statusOf(postA)).toBe('clean');
   });
 });
 
-// The store reads the formState subscription of RHF, which sends a clone of each value,
-// but markSaved keeps the values that RHF holds as the baseline. Two primitives compare
-// equal across that split. Two structures never do by reference, so a saved rich-text
-// document stayed dirty for ever until the comparison became structural.
 describe('form-store structural value equality', () => {
   const body = toFieldAddress('body');
   const ast = () => ({
@@ -160,7 +144,6 @@ describe('form-store structural value equality', () => {
     store.getState().setFieldValue(postA, body, edited);
     expect(statusOf(postA)).toBe('dirty');
 
-    // A different object holding the same content, as markSaved receives.
     const savedClone = JSON.parse(JSON.stringify(edited));
     store.getState().markSaved(postA, { [body]: savedClone });
     expect(statusOf(postA)).toBe('clean');
@@ -175,11 +158,6 @@ describe('form-store structural value equality', () => {
   });
 });
 
-// A field whose editor value is richer than its stored form answers for itself, through
-// isEqual on its descriptor (core/form/compare.ts). The rich-text field is the one that
-// does today: Plate adds an id to every node, so the tree in the editor never matches the
-// tree parsed from the file, and structure alone would hold such a document dirty for
-// ever. The equality here stands in for that, so this test needs no editor.
 describe('form-store field-supplied equality', () => {
   const body = toFieldAddress('body');
   type Body = { source: string; editorOnly: number };
@@ -208,8 +186,6 @@ describe('form-store field-supplied equality', () => {
     expect(statusOf(postA)).toBe('dirty');
     expect(fieldDirty(store.getState().forms[postA], body)).toBe(true);
 
-    // What the editor gives back is never the tree it was given, so this undo carries
-    // its own noise. Only the field can tell that the document is back where it was.
     store.getState().setFieldValue(postA, body, withSource('Prose.', 2));
     expect(statusOf(postA)).toBe('clean');
     expect(fieldDirty(store.getState().forms[postA], body)).toBe(false);
@@ -236,9 +212,6 @@ describe('form-store field-supplied equality', () => {
 });
 
 describe('form-store error mirror', () => {
-  // The `errors` map exists only on an edited scope. A pristine form has never been
-  // validated, so the store gives it no error map at all, and not an empty one. This
-  // narrowing asserts against the real shape.
   const scope = () => store.getState().forms[postA];
   const errorsOf = () => {
     const current = scope();
@@ -269,13 +242,9 @@ describe('form-store error mirror', () => {
     store.getState().setFieldErrors(postA, { [title]: ['Too short'] });
     const before = scope();
 
-    // The same content in new arrays. RHF builds these again at each keystroke.
     store.getState().setFieldErrors(postA, { [title]: ['Too short'] });
     expect(scope()).toBe(before);
 
-    // A write that differs replaces the errors, and it must keep the values
-    // reference. An error write must not look like a value change to the preview
-    // wire.
     store.getState().setFieldErrors(postA, {});
     expect(scope().values).toBe(before.values);
   });
@@ -334,8 +303,6 @@ describe('form-store discarded edits', () => {
 
     store.getState().discardEdits(postA);
     expect(store.getState().forms[postA].values[title]).toBe('Hello');
-    // Pristine, and not clean. A discarded form is the form a fresh load would give,
-    // so a remount adopts new content rather than keeping this one.
     expect(statusOf(postA)).toBe('pristine');
   });
 
@@ -424,7 +391,6 @@ describe('form-store reference stability', () => {
     store.getState().registerForm(postA, { [title]: 'Hello' });
     const before = store.getState().forms[postA];
     store.getState().setFieldValue(postA, title, 'Hello');
-    // Nothing changed. The scope is the same object, and it is still pristine.
     expect(store.getState().forms[postA]).toBe(before);
     expect(statusOf(postA)).toBe('pristine');
   });

@@ -13,8 +13,6 @@ const ENTRIES: DocumentEntry[] = [
   { path: 'content/posts/second.mdx', document: { title: 'Second' } },
 ];
 
-// The runtime these hooks read: a store with a content namespace, and nothing else they
-// touch. The registry and the schema are not on this path.
 const renderWithContent = (provider: ContentProvider) => {
   const store = createStore<TinaStoreState>()(() => ({
     content: provider as unknown as Record<string, unknown>,
@@ -55,7 +53,6 @@ describe('useCollectionDocuments', () => {
     expect(provider.list).toHaveBeenCalledWith('post');
   });
 
-  // No collection is a real state — nothing is open — and not a read of one named ''.
   it('reads nothing and reports no load without a collection', async () => {
     const provider = stubProvider();
     const { wrapper } = renderWithContent(provider);
@@ -68,8 +65,6 @@ describe('useCollectionDocuments', () => {
     expect(provider.list).not.toHaveBeenCalled();
   });
 
-  // The list renders straight from this, so a new array each render would re-render
-  // every consumer of it.
   it('returns the same empty list identity across renders', () => {
     const { wrapper } = renderWithContent(stubProvider());
     const { result, rerender } = renderHook(
@@ -100,8 +95,6 @@ describe('useCollectionDocuments', () => {
 });
 
 describe('useSaveDocument', () => {
-  // The stored entry can hold more than the value that was sent, and the cached list
-  // has to show what was stored rather than what the form had.
   it('replaces the cached entry with what the data layer stored', async () => {
     const persisted: DocumentEntry = {
       path: 'content/posts/hello.mdx',
@@ -127,8 +120,6 @@ describe('useSaveDocument', () => {
     await waitFor(() =>
       expect(result.current.list.documents).toEqual([persisted, ENTRIES[1]])
     );
-    // Written into the cache, not refetched: the stored entry is already the
-    // authoritative result of the write.
     expect(provider.list).toHaveBeenCalledTimes(1);
   });
 
@@ -159,8 +150,6 @@ describe('useSaveDocument', () => {
     );
   });
 
-  // useFormSave marks the form clean only after the save resolves, so the rejection has
-  // to reach it.
   it('rejects when the write does', async () => {
     const provider = stubProvider({
       update: vi.fn(async () => {

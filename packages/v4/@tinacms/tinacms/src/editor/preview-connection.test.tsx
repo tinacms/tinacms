@@ -23,8 +23,6 @@ import { FormScopeContext } from './context';
 import { Field, FormProvider, TinaProvider } from './index';
 import { usePreviewConnection } from './preview-connection';
 
-// These tests render a runtime directly, and not a configured app. They therefore pass
-// TinaProvider the resolved shape, and do not call defineConfig.
 const NO_COLLECTIONS = { collections: [] };
 
 const collection: CollectionSchema = {
@@ -35,7 +33,6 @@ const collection: CollectionSchema = {
 const path = 'content/posts/preview.mdx';
 const formId = toFormId(path);
 
-// This stands in for the iframe. usePreviewConnection reads contentWindow only.
 const fakeIframe = () => {
   const contentWindow = { postMessage: vi.fn() };
   return {
@@ -55,8 +52,6 @@ function Connection({
   return null;
 }
 
-// The MessageEvent constructor of happy-dom does not always carry the origin and the
-// source, so this sets them. connection.test.ts uses the same helper.
 const messageFromPreview = (
   data: unknown,
   source: unknown,
@@ -170,8 +165,6 @@ describe('usePreviewConnection', () => {
 
   it('a ready before any form registers is silent until registration answers it', async () => {
     const iframe = fakeIframe();
-    // There is no <Field> here. This drives the hook against a store that is empty
-    // after the mount.
     function Bare() {
       const ref = useRef<HTMLIFrameElement | null>(null);
       ref.current = iframe.ref.current;
@@ -190,7 +183,6 @@ describe('usePreviewConnection', () => {
         </FormProvider>
       </TinaProvider>
     );
-    // TinaProvider mounts its children after the plugins resolve, so wait for that.
     await screen.findByText('bare');
     act(() => {
       useFormStore.setState({ forms: {}, active: null });
@@ -199,8 +191,6 @@ describe('usePreviewConnection', () => {
     messageFromPreview(readyMessage(), iframe.ref.current?.contentWindow);
     expect(iframe.postMessage).not.toHaveBeenCalled();
 
-    // The recovery. The registration fires the post from the subscription, so the
-    // early ready message needs no answer.
     act(() => {
       useFormStore
         .getState()
@@ -245,11 +235,6 @@ describe('usePreviewConnection', () => {
     await screen.findByLabelText('title');
     iframe.postMessage.mockClear();
 
-    // The iframe stays across the change, so there is no new ready message. The
-    // store also does nothing when an edited scope registers again. The post at
-    // connect time is therefore the only way to move the preview. The waitFor call
-    // also flushes the validation that the provider runs when it adopts the kept
-    // edits, which keeps act quiet.
     rerender(tree(otherPath));
     await waitFor(() =>
       expect(iframe.postMessage).toHaveBeenCalledWith(
@@ -261,8 +246,6 @@ describe('usePreviewConnection', () => {
 
   it("rejects '*' as targetOrigin at construction", () => {
     const iframe = fakeIframe();
-    // A FormScopeContext alone is enough. The invariant throws in the body of the
-    // hook, before an effect needs the runtime.
     const wrapper = ({ children }: { children: ReactNode }) => (
       <FormScopeContext
         value={{

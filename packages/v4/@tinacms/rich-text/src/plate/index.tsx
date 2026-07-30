@@ -12,27 +12,16 @@ import { createEditorPlugins } from './plugins/editor-plugins';
 import { Components } from './plugins/ui/components';
 import { ToolbarProvider } from './toolbar/toolbar-provider';
 
-// The v4 field component (rich-text-field.ui.tsx) reads value/schema through
-// address-keyed hooks and hands them here as `input`/`field` — the one seam
-// between Plate and v4's form store.
 export interface RichEditorProps {
   input: {
     value: RichTextValue;
     onChange: (value: RichTextValue) => void;
   };
   field: RichEditorField;
-  // Goes on the contenteditable itself — a label on the wrapper is invisible to
-  // assistive tech, and every other v4 field labels its control.
   ariaLabel?: string;
 }
 
 export const RichEditor = ({ input, field, ariaLabel }: RichEditorProps) => {
-  // Seeded once: Plate owns the value after mount. Remounting on a document
-  // switch is the field component's job (it keys this on the form id).
-  // A lazy useState initialiser, and not a useMemo with an empty dependency list:
-  // the seed reads `input.value`, so an empty list claims a narrower dependency
-  // than the body has. That is the one memo the React Compiler cannot preserve, and
-  // it skips the whole component over it. useState says "once at mount" outright.
   const [initialValue] = React.useState(() => {
     if (input.value?.children?.length) {
       return helpers.withRootNodeIds(
@@ -41,10 +30,7 @@ export const RichEditor = ({ input, field, ariaLabel }: RichEditorProps) => {
     }
     return [{ type: 'p', children: [{ type: 'text', text: '' }] }];
   });
-  // Filter out FloatingToolbarPlugin if showFloatingToolbar is false
   const showFloatingToolbar = field?.overrides?.showFloatingToolbar !== false;
-  // Held: this package is not built with the React Compiler, and usePlateEditor reads
-  // the list at mount only, so rebuilding it on every keystroke buys nothing.
   const builtPlugins = React.useMemo(
     () =>
       createEditorPlugins({
@@ -62,15 +48,11 @@ export const RichEditor = ({ input, field, ariaLabel }: RichEditorProps) => {
     components: Components(),
   });
 
-  // Focus-on-activation lives in the v4 field component (useFieldActivation),
-  // which is why v3's experimental_focusIntent effect is gone from here.
   return (
     <div>
       <Plate
         editor={editor}
         onChange={(value) => {
-          // Normalize links in code blocks before saving (we dont want type: 'a' inside code blocks, this will break the mdx parser)
-          // Ideal Solution: let code block provider to have a option for exclude certain plugins
           const normalized = (value.value as any[]).map(
             normalizeLinksInCodeBlocks
           );

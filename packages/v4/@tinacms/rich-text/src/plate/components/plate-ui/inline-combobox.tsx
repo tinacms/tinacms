@@ -96,10 +96,6 @@ const InlineCombobox = ({
     [setValueProp, hasValueProp]
   );
 
-  /**
-   * Track the point just before the input element so we know where to
-   * insertText if the combobox closes due to a selection change.
-   */
   const insertPoint = React.useRef<Point | null>(null);
 
   useEffect(() => {
@@ -161,15 +157,10 @@ const InlineCombobox = ({
 
   const items = store.useState('items');
 
-  /**
-   * If there is no active ID and the list of items changes, select the first
-   * item.
-   */
   useEffect(() => {
     if (!store.getState().activeId) {
       store.setActiveId(store.first());
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items, store]);
 
   return (
@@ -205,13 +196,6 @@ const InlineComboboxInput = forwardRef<
 
   const ref = useComposedRef(propRef, contextRef);
 
-  /**
-   * To create an auto-resizing input, we render a visually hidden span
-   * containing the input value and position the input element on top of it.
-   * This works well for all cases except when input exceeds the width of the
-   * container.
-   */
-
   return (
     <>
       {showTrigger && trigger}
@@ -246,7 +230,6 @@ const InlineComboboxContent: typeof ComboboxPopover = ({
   className,
   ...props
 }) => {
-  // Portal prevents CSS from leaking into popover
   return (
     <Portal>
       <ComboboxPopover
@@ -292,7 +275,6 @@ const InlineComboboxItem = ({
 
   const store = useComboboxContext();
 
-  // Optimization: Do not subscribe to value if filter is false
   // biome-ignore lint/correctness/useHookAtTopLevel: not ready to fix these yet
   const search = filter && store.useState('value');
 

@@ -85,9 +85,6 @@ export const ImageForm = (props) => {
     <NestedForm
       id='image-form'
       label='Image'
-      // v3 selected a UI widget per field with `component`; v4 resolves the
-      // component from `type` through the field registry (ADR-009). `image` has
-      // no v4 field plugin yet, so the URL is a plain string for now.
       fields={[
         { label: 'URL', name: 'url', type: 'string' },
         { label: 'Caption', name: 'caption', type: 'string' },

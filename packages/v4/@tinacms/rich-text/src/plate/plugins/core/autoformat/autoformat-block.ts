@@ -10,7 +10,6 @@ import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 import { HEADING_KEYS } from '@udecode/plate-heading';
 import { HorizontalRulePlugin } from '@udecode/plate-horizontal-rule/react';
 import { ParagraphPlugin } from '@udecode/plate/react';
-// import { insertEmptyCodeBlock } from '../../../transforms/insert-empty-block';
 import { preFormat } from './autoformat-utils';
 
 const headingAutoformatByLevel: Record<HeadingLevel, AutoformatRule> = {
@@ -58,16 +57,10 @@ const nonHeadingAutoformatBlocks: AutoformatRule[] = [
 export const getAutoformatBlocks = (
   headingLevels: readonly HeadingLevel[] = ALL_HEADING_LEVELS
 ): AutoformatRule[] => [
-  // Normalize so a pure-JS schema passing e.g. `['h7']` doesn't push an
-  // `undefined` rule into the autoformat config. The toolbar context
-  // applies the same filter, keeping both surfaces consistent.
   ...normalizeHeadingLevels(headingLevels).map(
     (level) => headingAutoformatByLevel[level]
   ),
   ...nonHeadingAutoformatBlocks,
 ];
 
-// Default rule set with all heading levels — consumed by the static
-// `autoformatRules` aggregate. The field-aware editor opts into a
-// filtered set via `getAutoformatBlocks(headingLevels)`.
 export const autoformatBlocks: AutoformatRule[] = getAutoformatBlocks();

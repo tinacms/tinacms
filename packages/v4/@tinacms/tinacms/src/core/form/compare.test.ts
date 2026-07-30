@@ -13,8 +13,6 @@ const fields: FieldSchema[] = [
   { name: 'body', type: 'rich-text' },
 ];
 
-// A field whose editor value is richer than its stored form. `source` is what the
-// document holds, and `editorOnly` is what the editor added to it.
 const sourceOnly: FieldDescriptor = {
   Component: () => null,
   isEqual: (a, b) =>
@@ -45,7 +43,6 @@ describe('fieldEqualityFor', () => {
     );
     expect(equal(title, 'Hello', 'Hello')).toBe(true);
     expect(equal(title, 'Hello', 'Goodbye')).toBe(false);
-    // The declared answer belongs to its own address, and to no other.
     expect(equal(title, { source: 'x', editorOnly: 1 }, { source: 'x' })).toBe(
       false
     );

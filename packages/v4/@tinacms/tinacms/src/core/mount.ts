@@ -5,10 +5,8 @@ import {
   isSingletonSliceCapability,
 } from './plugin';
 
-// Where a plugin mounts, on both sides of the boundary. The client store slice and the
-// server ops namespace resolve through this one rule, so that `get().media.*` and
-// `server.media.*` always agree. The isOverride flag records an `overrides` declaration,
-// which is the only way to replace another provider (ADR-006).
+// Where a plugin mounts, on both sides of the boundary: one rule so
+// `get().media.*` and `server.media.*` always agree.
 export interface CapabilityMount {
   namespace: string;
   isOverride: boolean;
@@ -26,9 +24,8 @@ export const declaresCapabilityOverride = (
   return false;
 };
 
-// A plugin that provides a singleton capability mounts at that key. Every other plugin
-// mounts under its own name. A change of provider, from tinaCloudAuth to auth0Auth,
-// therefore changes no reader of `get().auth` and no caller of `server.auth.*`.
+// Singleton providers mount at the capability key, everything else under its
+// own name, so a change of provider changes no reader.
 export const capabilityMountFor = (
   manifest: PluginManifest
 ): CapabilityMount => {
@@ -47,8 +44,7 @@ export const capabilityMountFor = (
       isOverride: declaresCapabilityOverride(manifest, capability),
     };
   }
-  // A feature plugin must not take a capability namespace by its name alone. The peers
-  // read the capability state, and call the capability ops, at these keys.
+  // A feature plugin must not squat a capability namespace by name alone.
   invariant(
     !isSingletonSliceCapability(manifest.name),
     'plugin-name-squats-capability',

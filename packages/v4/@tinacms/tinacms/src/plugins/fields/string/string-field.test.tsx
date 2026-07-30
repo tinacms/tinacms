@@ -16,8 +16,6 @@ import { Field, FormProvider, TinaProvider } from '../../../editor';
 import { t } from '../../../index';
 import stringFieldPlugin from './string-field.plugin';
 
-// These tests render a runtime directly, and not a configured app. They therefore pass
-// TinaProvider the resolved shape, and do not call defineConfig.
 const NO_COLLECTIONS = { collections: [] };
 
 const collection: CollectionSchema = {

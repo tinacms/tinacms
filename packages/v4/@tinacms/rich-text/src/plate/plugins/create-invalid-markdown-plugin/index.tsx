@@ -32,10 +32,6 @@ function InvalidMarkdownElement({
   );
 }
 
-// v3 offered a "switch to raw-mode" button here. v4 has no raw editor to switch
-// to, so it would have done nothing — the recovery instruction points at the
-// file instead. Saving is safe meanwhile: the serializer writes this node's
-// original source back rather than a blank body.
 function ErrorMessage({ error }) {
   const message = buildErrorMessage(error);
   return (

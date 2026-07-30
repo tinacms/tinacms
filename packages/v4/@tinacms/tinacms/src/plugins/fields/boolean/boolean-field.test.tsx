@@ -16,8 +16,6 @@ import { Field, FormProvider, TinaProvider } from '../../../editor';
 import { t } from '../../../index';
 import booleanFieldPlugin from './boolean-field.plugin';
 
-// These tests render a runtime directly, and not a configured app. They therefore pass
-// TinaProvider the resolved shape, and do not call defineConfig.
 const NO_COLLECTIONS = { collections: [] };
 
 const collection: CollectionSchema = {
@@ -92,8 +90,6 @@ describe('BooleanField value updates', () => {
 });
 
 describe('BooleanField validation', () => {
-  // The `required` flag does nothing for a boolean, by design. A checkbox has no empty
-  // state, and `false` is a real value, so neither true nor false is rejected.
   it('accepts both true and false even when the field is required', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('boolean');

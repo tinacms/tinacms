@@ -147,9 +147,7 @@ export default function FixedToolbarButtons() {
   const { overrides, templates } = useToolbarContext();
   const showEmbedButton = templates.length > 0;
 
-  // The buttons the schema asks for, in the order it asks for them. Without a
-  // `toolbar` list, the toolbar holds every button. An empty list holds none, and
-  // the filter drops a name that no button answers to.
+  // Without a `toolbar` list, every button; an empty list, none.
   let items: ToolbarItem[] =
     overrides?.toolbar === undefined
       ? Object.values(toolbarItems)
@@ -161,8 +159,7 @@ export default function FixedToolbarButtons() {
     items = items.filter((item) => item.label !== toolbarItems.embed.label);
   }
 
-  // v4 has no raw markdown editor to switch to, so the button would toggle
-  // nothing. Drop it until raw-mode is ported rather than ship a dead control.
+  // v4 has no raw markdown editor yet, so the button would toggle nothing.
   items = items.filter((item) => item.label !== toolbarItems.raw.label);
 
   const editorState = useEditorState();
@@ -173,26 +170,20 @@ export default function FixedToolbarButtons() {
   useResize(toolbarRef, (entry) => {
     const width = entry.target.getBoundingClientRect().width;
     const headingButton = items.find((item) => item.label === HEADING_LABEL);
-    // This element carries `@container/toolbar`, so its own width is what the
-    // `@md/toolbar` query on the heading label resolves against.
     const headingWidth = headingButton
       ? headingButton.width(width >= CONTAINER_MD_BREAKPOINT)
       : 0;
 
-    // Calculate the available width excluding the heading button
     const availableWidth = width - headingWidth;
 
-    // Count numbers of buttons can fit into the available width
     const countItemsFitting = (budget: number) => {
-      // The heading is measured above, so it starts the count already spent —
-      // but only when it is actually in the list.
+      // The heading is measured above, so it starts the count already spent.
       let count = headingButton ? 1 : 0;
       let used = 0;
       for (const item of items) {
         if (item.label === HEADING_LABEL) continue;
-        // The row renders a contiguous prefix of `items`, so the first item that
-        // does not fit ends the count. A narrower item further down the list
-        // cannot take its place, and counting one that way overfills the row.
+        // The row renders a contiguous prefix, so the first item that does not
+        // fit ends the count.
         if (used + item.width() > budget) break;
         used += item.width();
         count += 1;
@@ -200,9 +191,8 @@ export default function FixedToolbarButtons() {
       return count;
     };
 
-    // Reserve room for the overflow menu itself, but only once we know it will
-    // be rendered — otherwise a toolbar that fits exactly loses a button to a
-    // menu that never appears.
+    // Reserve room for the overflow menu only once we know it will render, or a
+    // toolbar that fits exactly loses a button to a menu that never appears.
     const fitCount = countItemsFitting(availableWidth);
 
     setItemsShown(

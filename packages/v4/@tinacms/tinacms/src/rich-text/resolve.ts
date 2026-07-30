@@ -1,10 +1,3 @@
-// The walk over a rich-text tree, with no framework in it.
-//
-// v3 kept this switch inside a React component, so Astro had to rewrite the whole thing
-// in `.astro` files to render the same content. Here the switch answers a question every
-// binding asks — what does this node render as, and did the site supply a component for
-// it — and a binding is left with the part that is genuinely its own: turning an
-// instruction into an element.
 
 import { sanitizeUrl } from '@tinacms/mdx/sanitize-url';
 import type {
@@ -20,8 +13,6 @@ import type {
   TinaMarkdownContent,
 } from './types';
 
-// Presence, not lookup. Matches the truthiness check the v3 renderer made, so a site that
-// passes `{ p: undefined }` still gets the default markup.
 const supplied = (components: SuppliedComponents, key: string): boolean =>
   Boolean(components[key]);
 
@@ -38,8 +29,6 @@ const PASSTHROUGH_TAGS = new Set([
   'li',
 ]);
 
-// The markup a mark falls back to when the site supplied no component for it. `text` is
-// absent on purpose: a text component wraps the string and has no markup to stand in for.
 const MARK_FALLBACK_TAG: Record<Exclude<RichTextMarkKey, 'text'>, string> = {
   bold: 'strong',
   italic: 'em',
@@ -58,10 +47,6 @@ export function resolveRichTextNode(
   const content: RichTextChildren = { kind: 'content', content: children };
   const noChildren: RichTextChildren = { kind: 'none' };
 
-  // The one decision this file makes, in the one place it is made: call the component the
-  // site supplied under `key`, or build `fallback` instead. The v3 renderer dropped the
-  // node's own props on the fallback path, and a site that never supplied a component has
-  // never seen them on the element, so the fallback carries only what it names.
   const componentOr = (
     key: string,
     fallback: { tag: string; props?: RichTextProps },
@@ -85,9 +70,6 @@ export function resolveRichTextNode(
       return componentOr('lic', { tag: 'div' }, content);
 
     case 'blockquote':
-      // Support both blockquote and block_quote (deprecated) for backwards compatibility.
-      // Naming the deprecated key second means it also carries the case where the site
-      // supplied neither, which falls back to the element.
       return componentOr(
         supplied(components, 'blockquote') ? 'blockquote' : 'block_quote',
         { tag: 'blockquote' },
@@ -182,8 +164,6 @@ export function resolveRichTextNode(
       return resolveGfmTable(fields);
 
     case 'maybe_mdx':
-      // We don't want to render this as it's only displayed while editing an mdx node and
-      // should be transformed before form submission
       return { kind: 'nothing' };
 
     case 'html':
@@ -196,9 +176,6 @@ export function resolveRichTextNode(
           children: noChildren,
         };
       }
-      // Escaped, not injected: v3 returned the string from the component and React
-      // rendered it as text. A site that wants the markup live supplies an `html`
-      // component and takes that decision itself.
       return { kind: 'text', text: fields.value ?? '' };
 
     case 'invalid_markdown':
@@ -233,14 +210,12 @@ function resolveLeaf(
     );
   };
 
-  // Pushed outermost first, in the order v3 nested them.
   if (fields.bold) mark('bold');
   if (fields.italic) mark('italic');
   if (fields.underline) mark('underline');
   if (fields.strikethrough) mark('strikethrough');
   if (fields.code) mark('code');
   if (fields.highlight) mark('highlight', { color: fields.highlightColor });
-  // A text component only ever wraps the string itself, so it is always innermost.
   if (supplied(components, 'text')) {
     marks.push({ kind: 'component', key: 'text', props: {} });
   }
@@ -249,7 +224,6 @@ function resolveLeaf(
 }
 
 function readCodeBlockValue(fields: RichTextNodeFields): string {
-  // Extract code string from children if present, else fallback to value
   if (Array.isArray(fields.children)) {
     return fields.children
       .map((line) =>
@@ -268,10 +242,6 @@ type MdxTableRow = { tableCells?: { value: TinaMarkdownContent }[] };
 
 const TABLE_ALIGNMENTS = new Set<string>(['left', 'right', 'center']);
 
-// The alignment of each column, by position. This is author content, and a pipe table
-// writes a null for a column it did not align, so anything that is not one of the three
-// keywords becomes "no alignment" rather than being dropped — dropping it would shift
-// the alignment of every column after it.
 const columnAlignments = (
   align: unknown
 ): (RichTextTableAlign | undefined)[] =>
@@ -303,8 +273,6 @@ function resolveGfmTable(fields: RichTextNodeFields): RichTextInstruction {
     kind: 'table',
     source: 'gfm',
     align: columnAlignments(fields.props?.align),
-    // A pipe table carries its header in the markup, not in a flag, and v3 rendered every
-    // row into the body. Keep that until the parser says which row is the header.
     header: null,
     rows: (fields.children ?? []).map((row) =>
       (row.children ?? []).map((cell) => ({ content: cell.children }))

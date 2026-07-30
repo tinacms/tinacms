@@ -2,9 +2,6 @@ import { describe, expect, it, vi } from 'vitest';
 import { readyMessage, valuesMessage } from './protocol';
 import { createPreviewStore } from './store';
 
-// No framework here. The store takes its windows as arguments, so these drive the
-// boundary directly instead of standing a component up around it.
-
 const fakeEditor = () =>
   ({ postMessage: vi.fn() }) as unknown as Window & { postMessage: any };
 
@@ -18,7 +15,6 @@ const streamValues = (editor: Window, values: Record<string, unknown>) => {
 describe('a preview outside the editor', () => {
   it('connects to nothing', () => {
     const listenerSpy = vi.spyOn(window, 'addEventListener');
-    // A page opened on its own is its own parent.
     const store = createPreviewStore({
       previewWindow: window,
       editorWindow: window,
@@ -73,8 +69,6 @@ describe('a preview embedded in the editor', () => {
     const { editor, store } = embedded();
     store.subscribe(vi.fn());
     streamValues(editor, { title: 'Edited live' });
-    // Referential stability is the contract a store consumer reads to decide whether
-    // anything happened.
     expect(store.getSnapshot()).toBe(store.getSnapshot());
   });
 

@@ -19,7 +19,6 @@ describe('admin routing', () => {
     expect(parseAdminRoute(formatAdminRoute(route))).toEqual(route);
   });
 
-  // The document id is a path, so its slashes must not read as route separators.
   it('carries a document path as one encoded segment', () => {
     expect(
       formatAdminRoute({
@@ -39,7 +38,6 @@ describe('admin routing', () => {
     expect(parseAdminRoute(formatAdminRoute(route))).toEqual(route);
   });
 
-  // A stale or hand-typed hash is a navigation mistake, not a fault.
   it.each(['', '#', '#/', '#/nonsense', '#/collections', '#/collections/'])(
     'falls back to the collection list for %j',
     (hash) => {
@@ -62,8 +60,6 @@ describe('admin routing for plugin screens', () => {
     ).toBe('#/screens/media');
   });
 
-  // The two prefixes are separate namespaces. A project with a collection called `page`
-  // is the case that named this prefix `screens` rather than `pages`.
   it('does not confuse a screen with a collection of the same name', () => {
     expect(parseAdminRoute('#/screens/page')).toEqual({
       view: 'screen',
@@ -76,7 +72,6 @@ describe('admin routing for plugin screens', () => {
     });
   });
 
-  // Each segment is encoded on its own, so a segment holding a slash stays one segment.
   it('keeps a screen segment whole when it holds a slash', () => {
     const route: AdminRoute = {
       view: 'screen',
@@ -89,15 +84,12 @@ describe('admin routing for plugin screens', () => {
     expect(parseAdminRoute(formatAdminRoute(route))).toEqual(route);
   });
 
-  // A screen prefix with no name is not a screen. It falls back like any stale hash.
   it.each(['#/screens', '#/screens/'])('falls back for %j', (hash) => {
     expect(parseAdminRoute(hash)).toEqual(COLLECTIONS_ROUTE);
   });
 });
 
 describe('parseAdminRoute on input a user can type', () => {
-  // decodeURIComponent throws a URIError on these, and parseAdminRoute runs during
-  // render — so an unguarded throw white-screened the admin.
   it.each([
     '#/collections/100%',
     '#/collections/post/%E0%A4%A',

@@ -84,7 +84,6 @@ export function LinkFloatingToolbar({
     };
   }, [activeCommentId, activeSuggestionId]);
 
-  //when adding a new link
   const insertState = useFloatingLinkInsertState({
     ...state,
     floatingOptions: {
@@ -99,7 +98,6 @@ export function LinkFloatingToolbar({
     textInputProps,
   } = useFloatingLinkInsert(insertState);
 
-  //when editing an existing link
   const editState = useFloatingLinkEditState({
     ...state,
     floatingOptions: {
@@ -119,7 +117,6 @@ export function LinkFloatingToolbar({
 
   if (hidden) return null;
 
-  // container of popup for links, including the input fields and buttons
   const input = (
     <div
       className='z-[999999] flex w-[330px] flex-col relative'
@@ -235,8 +232,6 @@ export function LinkFloatingToolbar({
         ref={insertRef}
         className={popoverVariants()}
         {...insertProps}
-        // Override plate-floating's inline z-index (which beats the z-[999999]
-        // class) so the portaled popover sits above the form field wrappers.
         style={{
           ...(insertProps.style as React.CSSProperties),
           zIndex: 999999,
@@ -272,7 +267,6 @@ function LinkOpenButton() {
       const [element] = entry;
       return getLinkAttributes(editor, element);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [editor, selection]
   );
 

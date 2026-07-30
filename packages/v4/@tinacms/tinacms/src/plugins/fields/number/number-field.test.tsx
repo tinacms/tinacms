@@ -16,8 +16,6 @@ import { Field, FormProvider, TinaProvider } from '../../../editor';
 import { t } from '../../../index';
 import numberFieldPlugin from './number-field.plugin';
 
-// These tests render a runtime directly, and not a configured app. They therefore pass
-// TinaProvider the resolved shape, and do not call defineConfig.
 const NO_COLLECTIONS = { collections: [] };
 
 const collection: CollectionSchema = {
@@ -33,10 +31,7 @@ const collection: CollectionSchema = {
       max: 5,
       step: 0.5,
     }),
-    // Required, with no bounds. This proves that `0` is a present value, and not
-    // empty.
     t.number({ name: 'count', label: 'Count', required: true }),
-    // Optional, for the negative values, the decimals, and the empty case.
     t.number({ name: 'weight', label: 'Weight' }),
   ],
 };
@@ -183,9 +178,7 @@ describe('NumberField ingest and digest', () => {
     const registry = await resolveRegistry();
     const stored = { rating: 3, count: 0, weight: -1.5 };
     const ingested = ingestDocument(stored, collection.fields, registry);
-    // parse: stored number -> editor string
     expect(ingested).toEqual({ rating: '3', count: '0', weight: '-1.5' });
-    // serialize: editor string -> stored number (zero and decimal preserved)
     expect(digestDocument(ingested, collection.fields, registry)).toEqual(
       stored
     );

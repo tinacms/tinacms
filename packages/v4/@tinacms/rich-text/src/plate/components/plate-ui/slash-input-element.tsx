@@ -60,8 +60,6 @@ const headingRulesByLevel: Record<HeadingLevel, SlashCommandRule> = {
   },
 };
 
-// The slash menu historically only exposed h1-h3; preserve that default so
-// existing editors don't suddenly grow new entries.
 const DEFAULT_SLASH_HEADING_LEVELS: readonly HeadingLevel[] = [
   'h1',
   'h2',

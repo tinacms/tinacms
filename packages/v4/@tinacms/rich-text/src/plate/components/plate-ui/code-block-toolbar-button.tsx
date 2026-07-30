@@ -4,7 +4,6 @@ import { withRef } from '@udecode/cn';
 import { useEditorState } from '@udecode/plate/react';
 
 import { insertEmptyCodeBlock } from '@udecode/plate-code-block';
-// import { insertEmptyCodeBlock } from '../../transforms/insert-empty-block';
 import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 import { helpers } from '../../plugins/core/common';
 import { Icons } from './icons';

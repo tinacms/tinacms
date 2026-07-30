@@ -12,8 +12,6 @@ import {
   type ResolvedServerSegment,
 } from './plugin';
 
-// Load the server segment of each plugin once. This is the server equivalent of
-// resolveClientSegments. The RPC handler calls it after the graph is valid.
 export const resolveServerSegments = async (
   plugins: PluginManifest[]
 ): Promise<ResolvedServerSegment[]> => {
@@ -31,11 +29,9 @@ export const resolveServerSegments = async (
   return resolved;
 };
 
-// Only the plugins in the config take part (ADR-006). A plugin cannot add itself. Every
-// error in a config fails here, before any segment import, so a bad config never boots
-// part-way. Those errors are duplicate names, singleton conflicts, missing providers,
-// and dependency cycles. The `field` capability is keyed (ADR-009), so many providers
-// are correct. The field registry finds a conflict on one field type.
+// Every config error fails here, before any segment import, so a bad config
+// never boots part-way (ADR-006). `field` is keyed, so many providers are
+// correct; the field registry finds per-type conflicts.
 export const validateCapabilityGraph = (plugins: PluginManifest[]): void => {
   const names = new Set<string>();
   for (const plugin of plugins) {
@@ -48,10 +44,8 @@ export const validateCapabilityGraph = (plugins: PluginManifest[]): void => {
     names.add(plugin.name);
   }
 
-  // A singleton capability resolves through the same override rule as a field type and
-  // a store slice. That rule does not depend on the order. Two bases at one capability
-  // throw, and so do two overrides. An `overrides` declaration is the only way to
-  // replace a provider.
+  // Singleton capabilities resolve through the same order-independent override
+  // rule as field types and store slices.
   const capabilityEntries = plugins.flatMap((plugin) => {
     const singletonCapabilities = plugin.provides.filter(
       (capability) => capability !== FIELD_CAPABILITY
@@ -79,10 +73,8 @@ export const validateCapabilityGraph = (plugins: PluginManifest[]): void => {
   orderPluginsByDependencies(plugins);
 };
 
-// The init order (ADR-006). A provider runs before the plugins that depend on it. The
-// config order decides between plugins that are otherwise equal. A plugin that satisfies
-// its own dependency makes no edge. A cycle is an error, and the message names its
-// members. The scan for ready plugins is O(n²), which is enough for tens of plugins.
+// Init order (ADR-006): providers before dependents, config order breaks ties,
+// a cycle is an error. The ready scan is O(n²), enough for tens of plugins.
 const orderPluginsByDependencies = (
   plugins: PluginManifest[]
 ): PluginManifest[] => {
@@ -128,16 +120,13 @@ const orderPluginsByDependencies = (
   return ordered;
 };
 
-// The onInit lifecycle (ADR-006). Each hook runs once at each boot, in dependency order,
-// and this function waits for it. It returns the teardown. The teardown runs onDestroy in
-// the reverse order, and only for the plugins that ran their init. A failure part-way
-// through tears those plugins down, and then throws the cause again.
+// Runs each onInit once per boot in dependency order and returns the teardown,
+// which runs onDestroy in reverse for the plugins that ran their init (ADR-006).
 export const initializePlugins = async (
   plugins: PluginManifest[]
 ): Promise<() => Promise<void>> => {
   const initialized: PluginManifest[] = [];
-  // This drains the list, so a second call destroys nothing. Every hook runs, even when
-  // one throws. The first failure then throws again.
+  // Drains the list, so a second call destroys nothing.
   const destroyInitialized = async () => {
     const failures: unknown[] = [];
     for (const plugin of initialized.splice(0).reverse()) {
@@ -147,8 +136,6 @@ export const initializePlugins = async (
         failures.push(cause);
       }
     }
-    // Report every teardown failure, and not the first one alone. A later onDestroy
-    // must not hide an earlier failure.
     if (failures.length === 1) throw failures[0];
     if (failures.length > 1) {
       throw new AggregateError(failures, 'Plugin teardown failed.');
@@ -159,9 +146,8 @@ export const initializePlugins = async (
       await plugin.onInit?.();
       initialized.push(plugin);
     } catch (cause) {
-      // The rollback failure must not replace the failure that caused it, but it must
-      // not vanish either: a half-torn-down plugin can leave a handle open, and the
-      // thrown `cause` says nothing about that.
+      // The rollback failure must not replace the failure that caused it, but
+      // must not vanish either.
       await destroyInitialized().catch((rollbackFailure) => {
         console.error(
           '[tinacms] Plugin teardown failed while rolling back a failed init:',

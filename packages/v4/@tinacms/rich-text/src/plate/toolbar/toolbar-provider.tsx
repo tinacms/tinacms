@@ -13,12 +13,6 @@ interface ToolbarContextProps {
   templates: MdxTemplate[];
   overrides: ToolbarOverrides | undefined;
   headingLevels: readonly HeadingLevel[];
-  /**
-   * True when the schema explicitly sets `overrides.headingLevels`
-   * (including an explicit empty array, which means "no headings").
-   * Lets consumers (e.g. the slash menu) distinguish "user opted in"
-   * from "use the legacy default" without re-deriving the check.
-   */
   headingLevelsConfigured: boolean;
 }
 

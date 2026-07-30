@@ -34,15 +34,12 @@ describe('defineConfig', () => {
     ).toEqual([customString]);
   });
 
-  // The data layer has no default, so it is the one required entry.
   it('rejects a config with no content provider', () => {
     expect(() => defineConfig({ schema })).toThrow(
       /provides the "content" capability/
     );
   });
 
-  // The graph pass runs here, and not at boot, so a broken config fails at the import
-  // of tina/config.ts.
   it('rejects a capability conflict at config time', () => {
     const second = definePlugin({
       name: 'other:content',
@@ -67,8 +64,6 @@ describe('defineConfig', () => {
 });
 
 describe('defineConfig schema validation', () => {
-  // The schema reached the compile step unchecked, so a malformed one imported cleanly
-  // and died later as a TypeError far from the config that caused it.
   it.each([
     ['a schema with no collections', {} as never],
     ['collections that are not an array', { collections: {} } as never],

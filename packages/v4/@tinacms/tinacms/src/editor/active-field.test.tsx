@@ -15,8 +15,6 @@ import {
   useActiveField,
 } from './index';
 
-// These tests render a runtime directly, and not a configured app. They therefore pass
-// TinaProvider the resolved shape, and do not call defineConfig.
 const NO_COLLECTIONS = { collections: [] };
 
 const collection: CollectionSchema = {
@@ -28,8 +26,6 @@ const collection: CollectionSchema = {
   ],
 };
 
-// This drives the activation path in the same way as the click listener of the preview.
-// It calls useActiveField, and it needs no postMessage.
 function ActivateProbe() {
   const { setActive } = useActiveField();
   return (
@@ -39,15 +35,11 @@ function ActivateProbe() {
   );
 }
 
-// The view of this form on the active field, as a field plugin would read it.
 function ActiveReadout() {
   const { active } = useActiveField();
   return <span data-testid='active'>{active ?? 'none'}</span>;
 }
 
-// Records every new activation entry, by identity. The echo test needs the count of
-// entries, which no rendered value can show: a second entry for the same address
-// renders the same text.
 function ActivationLog({ entries }: { entries: string[] }) {
   const active = useFormStore((state) => state.active);
   const last = useRef<unknown>(null);
@@ -106,8 +98,6 @@ describe('active-field rail', () => {
     await userEvent.click(screen.getByText('activate'));
     expect(input).toHaveFocus();
 
-    // Blur the field, as a click elsewhere does, and then activate the same field
-    // again.
     (input as HTMLInputElement).blur();
     expect(input).not.toHaveFocus();
     await userEvent.click(screen.getByText('activate'));

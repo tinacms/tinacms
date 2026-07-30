@@ -41,7 +41,6 @@ export const insertImg = (editor: PlateEditor, media: Media) => {
     });
   }
 
-  // Normalizing the editor after insertion
   editor.tf.normalize({ force: true });
 };
 

@@ -19,9 +19,6 @@ const useImageToolbarButtonState = () => {
 };
 
 // ponytail: inert until the media capability exists — picking an image needs a
-// media library to pick from (plugins/media/ is a .gitkeep). Existing image
-// nodes still render and serialize; only insertion is unavailable, so the button
-// reports itself disabled rather than opening nothing.
 const useImageToolbarButton = (state) => {
   useEditorState();
 

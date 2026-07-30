@@ -42,8 +42,6 @@ import { SlashPlugin } from '@udecode/plate-slash-command/react';
 import { TablePlugin } from '@udecode/plate-table/react';
 import { TrailingBlockPlugin } from '@udecode/plate-trailing-block';
 import { ParagraphPlugin } from '@udecode/plate/react';
-// @ts-ignore
-// NOTE: Linter complains about ESM import here, as per conversation with Jeff it will be fine at build time—ignore this linting error for now.
 import { all, createLowlight } from 'lowlight';
 import React from 'react';
 import { LinkFloatingToolbar } from '../components/plate-ui/link-floating-toolbar';
@@ -65,7 +63,6 @@ import {
 } from './create-mdx-plugins';
 import { FloatingToolbarPlugin } from './ui/floating-toolbar-plugin';
 
-// Define block types that support MDX embedding
 export const HANDLES_MDX = [
   HEADING_KEYS.h1,
   HEADING_KEYS.h2,
@@ -76,7 +73,6 @@ export const HANDLES_MDX = [
   ParagraphPlugin.key,
 ];
 
-// Common rule for resetting block types
 const resetBlockTypesCommonRule = {
   defaultType: ParagraphPlugin.key,
   types: [...HEADING_LEVELS, BlockquotePlugin.key],
@@ -88,10 +84,6 @@ const resetBlockTypesCodeBlockRule = {
   onReset: unwrapCodeBlock,
 };
 
-// View Plugins: Basic nodes and marks
-// The inferred plugin type names @udecode/plate-core's internals, which resolve
-// through a React 18 copy at the repo root and so aren't portable in a .d.ts.
-// Plate's own plugin types aren't exported in a usable shape here.
 export const viewPlugins: any[] = [
   BasicMarksPlugin,
   UnderlinePlugin,
@@ -143,14 +135,9 @@ const ClearHighlightOnEnterPlugin = createSlatePlugin({
 }));
 
 export interface CreateEditorPluginsOptions {
-  /** Heading levels exposed via markdown autoformat shortcuts (`# `, `## `, …).
-   * Omit to allow all levels 1-6. */
   headingLevels?: readonly HeadingLevel[];
 }
 
-// Functional and formatting plugins for the rich-text editor. Built lazily
-// per-field so the schema can scope behaviors like which heading levels
-// participate in markdown autoformat shortcuts.
 export const createEditorPlugins = ({
   headingLevels,
 }: CreateEditorPluginsOptions = {}): any[] => [
@@ -165,7 +152,6 @@ export const createEditorPlugins = ({
   ClearHighlightOnEnterPlugin,
   LinkPlugin.configure({
     options: {
-      // Custom validation function to allow relative links, e.g., /about
       isUrl: (url) => isUrl(url),
     },
     render: { afterEditable: () => <LinkFloatingToolbar /> },
@@ -178,8 +164,6 @@ export const createEditorPlugins = ({
   NodeIdPlugin,
   TablePlugin,
   SlashPlugin,
-  // Keeps a blank paragraph at the end of the editor so users can keep
-  // typing after a heading, quote, or other terminal block.
   TrailingBlockPlugin,
   createBreakPlugin,
   FloatingToolbarPlugin,
@@ -199,7 +183,6 @@ export const createEditorPlugins = ({
       ].map(
         (rule): AutoformatRule => ({
           ...rule,
-          // Suppress autoformat inside code blocks so e.g. `# ` stays literal.
           query: (editor) =>
             !editor.api.some({
               match: { type: editor.getType(CodeBlockPlugin) },
@@ -209,7 +192,6 @@ export const createEditorPlugins = ({
     },
   }),
 
-  // Lets users "break out" of a block (e.g. a heading) with Enter.
   ExitBreakPlugin.configure({
     options: {
       rules: [
@@ -222,8 +204,6 @@ export const createEditorPlugins = ({
       ],
     },
   }),
-  // Lets users turn a heading back into a paragraph by pressing Enter on
-  // an empty heading or Backspace at the start of one.
   ResetNodePlugin.configure({
     options: {
       rules: [
@@ -248,11 +228,6 @@ export const createEditorPlugins = ({
           hotkey: 'Backspace',
           predicate: isSelectionAtCodeBlockStart,
         },
-        // Plate's ListPlugin usually resets lists to paragraphs on Backspace
-        // at the start of a list item, but when the list is the editor's
-        // first node the default doesn't fully unwrap and we end up with an
-        // invalid structure (e.g. <li> inside <p>). `onReset: unwrapList`
-        // forces a clean reset in that case.
         {
           types: [BulletedListPlugin.key, NumberedListPlugin.key],
           defaultType: ParagraphPlugin.key,

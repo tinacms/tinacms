@@ -47,8 +47,6 @@ describe('admin screen registry', () => {
     ).toBe(0);
   });
 
-  // Both would mount at the same hash, and there is no `overrides` for a screen to say
-  // which one wins.
   it('rejects two plugins claiming one screen name', () => {
     expect(() =>
       createScreenRegistry([
@@ -58,8 +56,6 @@ describe('admin screen registry', () => {
     ).toThrow(/both contribute an admin screen named "media"/);
   });
 
-  // A name holding a slash parses as a screen name plus a segment, so the screen would
-  // never match its own route. Caught at boot, and not as a dead navigation entry.
   it('rejects a screen name that holds a slash', () => {
     expect(() =>
       createScreenRegistry([
@@ -86,8 +82,6 @@ describe('screen navigation order', () => {
     ).toEqual(['First', 'Second', 'Third']);
   });
 
-  // The whole point of an explicit order: which plugin was installed first must not
-  // decide what the editor sees (ADR-006).
   it('gives the same order whichever way the plugin list is written', () => {
     const media = segmentOf('media-plugin', [
       screen('media', { label: 'Media' }),
@@ -107,7 +101,6 @@ describe('screen navigation order', () => {
     ).toEqual(['Apple', 'Zebra']);
   });
 
-  // Zero is the default, so a negative order sits a screen above the undeclared ones.
   it('lets a negative order sit above the default', () => {
     expect(
       labelsOf([

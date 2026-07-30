@@ -13,8 +13,6 @@ import {
   useFormStatus,
 } from './index';
 
-// These tests render a runtime directly, and not a configured app. They therefore pass
-// TinaProvider the resolved shape, and do not call defineConfig.
 const NO_COLLECTIONS = { collections: [] };
 
 const collection: CollectionSchema = {
@@ -52,8 +50,6 @@ describe('FormProvider form-store wiring', () => {
     await userEvent.type(input, '!');
     expect(screen.getByTestId('status')).toHaveTextContent('dirty');
 
-    // Back to the registered baseline. This proves that the status is a comparison,
-    // and not a flag.
     await userEvent.type(input, '{backspace}');
     expect(screen.getByTestId('status')).toHaveTextContent('clean');
   });

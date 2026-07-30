@@ -1,7 +1,3 @@
-// The node @tinacms/mdx emits instead of throwing when it can't parse a body, so
-// the editor can still show the source. Named here — the plate-free layer both
-// the schema and the Plate plugin already depend on — because a typo would
-// silently disarm the guard that stops a save overwriting good markdown with it.
 export const INVALID_MARKDOWN_TYPE = 'invalid_markdown';
 
 export type EmptyTextElement = { type: 'text'; text: '' };

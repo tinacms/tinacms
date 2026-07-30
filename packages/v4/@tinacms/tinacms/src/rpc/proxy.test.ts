@@ -4,9 +4,6 @@ import { defineServerPlugin, publicOp } from '../server';
 import { createRpcHandler } from './handler';
 import { RpcError, createRpcClient } from './proxy';
 
-// The pattern that a real plugin uses. The type of the ops record crosses to the client,
-// as an `import type` does. Here it crosses directly, because both sides are one TS
-// project.
 const searchOps = defineServerPlugin({
   query: publicOp(async (input: { q: string }) => ({ hits: [input.q] })),
   reindex: async () => ({ started: true }),
@@ -22,8 +19,6 @@ const handler = createRpcHandler({ plugins: [searchPlugin] });
 
 const client = createRpcClient<{ search: typeof searchOps }>({
   url: 'http://tina.local/api/tina',
-  // The handler takes a Request and returns a Response, so it also serves as the fetch
-  // implementation.
   fetch: (input, init) => handler(new Request(input, init)),
 });
 
@@ -43,8 +38,6 @@ describe('createRpcClient', () => {
   });
 
   it('is not thenable and yields nothing for symbol keys', async () => {
-    // The `await` keyword reads `then` at both levels. A POST there would hang the
-    // caller.
     expect((client as unknown as Record<string, unknown>).then).toBeUndefined();
     expect(
       (client.search as unknown as Record<string, unknown>).then

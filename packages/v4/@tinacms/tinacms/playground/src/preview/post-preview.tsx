@@ -5,10 +5,6 @@ import {
 } from '@tinacms/tinacms/adapters/react';
 import { sampleDocument } from '../content';
 
-// The site side of visual editing, written as a real site would write it. useTina seeds
-// from the document that the site rendered, which is the whole document when a browser
-// opens /preview.html directly. Inside the editor, useTina adopts the values that arrive.
-// tinaField marks the elements that an author can click.
 export function PostPreview() {
   const { data: post, isEditing } = useTina({ data: sampleDocument });
 
@@ -34,8 +30,6 @@ export function PostPreview() {
           ? 'This preview renders the document streamed from the editor. Click the title or the badge to focus its field in the sidebar.'
           : 'Standalone preview — rendering the static document.'}
       </p>
-      {/* The body arrives as the mdx AST the editor is editing, so keystrokes
-          in the rich-text field show up here without a round-trip to disk. */}
       <div {...tinaField('body')}>
         <TinaMarkdown content={post.body} />
       </div>

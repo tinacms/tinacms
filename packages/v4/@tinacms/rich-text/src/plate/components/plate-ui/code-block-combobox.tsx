@@ -19,9 +19,7 @@ import {
 } from './command';
 import { Popover, PopoverContent, PopoverTrigger } from './popover';
 
-// Languages available in lowlight (base + important additional languages)
 const languages: { label: string; value: string }[] = [
-  // Base languages
   { label: 'Plain Text', value: 'plaintext' },
   { label: 'Arduino', value: 'arduino' },
   { label: 'Bash', value: 'bash' },
@@ -61,7 +59,6 @@ const languages: { label: string; value: string }[] = [
   { label: 'XML', value: 'xml' },
   { label: 'YAML', value: 'yaml' },
 
-  // Additional important languages
   { label: 'ASCIIDoc', value: 'asciidoc' },
   { label: 'Clojure', value: 'clojure' },
   { label: 'CMake', value: 'cmake' },

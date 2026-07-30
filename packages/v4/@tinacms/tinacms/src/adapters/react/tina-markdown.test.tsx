@@ -3,10 +3,6 @@ import { describe, expect, it } from 'vitest';
 import type { TinaMarkdownContent } from '../../rich-text';
 import { StaticTinaMarkdown, TinaMarkdown } from './tina-markdown';
 
-// The binding is thin, so these tests are about the markup it lands on: the fallbacks a
-// site gets without supplying anything, and the seams where a supplied component takes
-// over. They double as the parity check between the memoised and the static renderer.
-
 const html = (
   content: TinaMarkdownContent | TinaMarkdownContent[],
   components?: any
@@ -165,8 +161,6 @@ describe('supplied components', () => {
 });
 
 describe('tables', () => {
-  // A cell holds a list of blocks, and the renderer swaps `p` for the cell element, so
-  // the paragraph wrapper is what becomes the th or td.
   const cell = (value: string) => ({
     value: [{ type: 'p', children: [text(value)] }] as any,
   });

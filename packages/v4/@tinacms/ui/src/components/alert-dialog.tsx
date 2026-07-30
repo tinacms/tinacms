@@ -3,10 +3,6 @@ import type * as React from 'react';
 
 import { cn } from '@tinacms/ui/lib/utils';
 
-// The dialog for an action that cannot be undone. It differs from Sheet in what it
-// refuses to do: it has no close button, and a click outside it or the Escape key does
-// not dismiss it. The choice has to be made.
-
 function AlertDialog({ ...props }: AlertDialogPrimitive.Root.Props) {
   return <AlertDialogPrimitive.Root data-slot='alert-dialog' {...props} />;
 }

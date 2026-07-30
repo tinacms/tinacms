@@ -1,8 +1,6 @@
-// The v3 content pipeline, hosted by the local data layer. It runs in Node only. It is
-// the same Database and resolve stack from @tinacms/graphql that the v3 CLI ran. It
-// indexes the local files into an abstract-level store, through the sqlite-level adapter
-// that this project maintains. Every v3 GraphQL query therefore still works against the
-// content that v4 manages.
+// The v3 content pipeline, hosted by the local data layer (Node only): the same
+// Database and resolve stack from @tinacms/graphql, so every v3 GraphQL query
+// still works against the content v4 manages.
 
 import {
   FilesystemBridge,
@@ -22,36 +20,20 @@ export type GraphQLVariables = Record<string, unknown>;
 export interface GraphQLPipelineOptions {
   rootDir: string;
   collections: CollectionSchema[];
-  /**
-   * Any abstract-level store. It defaults to an in-memory sqlite-level store. Pass a
-   * store backed by a file to keep the index across restarts.
-   */
+  // Defaults to in-memory sqlite-level; pass a file-backed store to keep the
+  // index across restarts.
   level?: Level;
 }
 
 export interface GraphQLPipeline {
-  /**
-   * Run one v3 GraphQL request. It returns the standard `{ data, errors }` object.
-   */
   execute(query: string, variables?: GraphQLVariables): Promise<GraphQLResult>;
-  /**
-   * Index the saved documents again, so that the next execute sees them. The paths are
-   * posix paths from the project root.
-   */
+  // Paths are posix paths from the project root.
   reindexPaths(paths: string[]): Promise<void>;
 }
 
-/**
- * One v4 field, in the shape that the v3 schema builder reads.
- *
- * The schema validation of v3 rejects an unknown key, so only the properties that both
- * models share cross over. A property that belongs to v4 alone stays out. The validation
- * rules and the UI config are two examples.
- *
- * `templates` crosses over too. v3 models it under the same name. Without it, a body
- * that holds an embed indexes as MDX that the v3 parser cannot read, while the editor
- * renders that same body correctly.
- */
+// v3 schema validation rejects unknown keys, so only shared properties cross
+// over. `templates` must cross: without it a body holding an embed indexes as
+// MDX the v3 parser cannot read.
 const toV3Field = (field: FieldSchema) => ({
   type: field.type,
   name: field.name,
@@ -61,16 +43,9 @@ const toV3Field = (field: FieldSchema) => ({
   ...(field.templates ? { templates: field.templates } : {}),
 });
 
-/**
- * One v4 collection, in the shape that the v3 schema builder reads.
- *
- * v3 holds one format for each collection. It globs for `${path}/**.${format}`, and it
- * then compares the extension of each candidate file. Only the primary format therefore
- * reaches the index. A collection with mixed formats is fully editable, because the file
- * provider dispatches for each file, but it is only partly queryable.
- * warnUnindexedFormats reports that, instead of a half-index with no message. This ends
- * when v4 owns its index.
- */
+// v3 holds one format per collection, so only the primary format reaches the
+// index: a mixed collection is fully editable but only partly queryable, and
+// warnUnindexedFormats says so. Ends when v4 owns its index.
 const toV3Collection = (collection: CollectionSchema) => ({
   name: collection.name,
   label: collection.label,
@@ -107,19 +82,13 @@ export const createGraphQLPipeline = async (
   });
   const schema = { collections: options.collections.map(toV3Collection) };
   const { graphQLSchema, tinaSchema, lookup } = await buildDotTinaFiles({
-    /**
-     * buildDotTinaFiles reads config.schema only. The full v3 Config, with the branch,
-     * the client id, and the media, has no local equivalent.
-     */
+    // buildDotTinaFiles reads config.schema only.
     config: { schema },
     buildSDK: false,
   });
   await database.indexContent({ graphQLSchema, tinaSchema, lookup });
-  /**
-   * The queue of index runs. A reindex runs alone. Two saves at the same time must not
-   * interleave a read, a change, and a write on the shared index. A failed run does not
-   * block the next one.
-   */
+  // Serialises index runs: two saves must not interleave on the shared index.
+  // A failed run does not block the next one.
   let indexing: Promise<void> = Promise.resolve();
   return {
     execute: (query, variables = {}) =>

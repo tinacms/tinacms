@@ -1,7 +1,5 @@
 import type { Page } from '@playwright/test';
 
-// The shell renders two asides: the navigation of the Sidebar, and the form column
-// inside the main region. The form column is the second.
 export const formColumn = (page: Page) => page.locator('aside').last();
 
 export const resizeHandle = (page: Page) =>
@@ -10,14 +8,9 @@ export const resizeHandle = (page: Page) =>
 export const columnWidth = (page: Page) =>
   formColumn(page).evaluate((column) => column.getBoundingClientRect().width);
 
-// The element that carries `@container/toolbar`, which is what the toolbar measures
-// itself against.
 export const toolbar = (page: Page) =>
   page.locator('div.w-full.overflow-hidden.\\@container\\/toolbar');
 
-// Drags the handle rather than setting a width, because React owns the inline style on
-// the column and would overwrite an assignment on its next render. This also keeps the
-// pointer path — capture, move, release — under test.
 export const setColumnWidth = async (page: Page, target: number) => {
   const from = await columnWidth(page);
   const handle = resizeHandle(page);

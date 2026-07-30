@@ -2,11 +2,6 @@ import { describe, expect, it } from 'vitest';
 import { type RichTextHost, renderRichText, styleToCss } from './render';
 import type { TinaMarkdownContent } from './types';
 
-// A second host, written here rather than shipped, to hold the interface honest. It
-// renders to an HTML string with no framework anywhere, and the markup it lands on is the
-// markup adapters/react lands on — the assertions below are the same literals that file
-// asserts. If a fallback ever drifts into one binding, this fails.
-
 const VOID_TAGS = new Set(['img', 'hr', 'br']);
 
 const escape = (value: string) =>

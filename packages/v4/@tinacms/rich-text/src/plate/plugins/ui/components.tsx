@@ -49,21 +49,9 @@ import { TableElement } from '../../components/plate-ui/table/table-element';
 import { TableRowElement } from '../../components/plate-ui/table/table-row-element';
 import { classNames } from './helpers';
 
-/**
- * For blocks elements (p, blockquote, ul, ...etc), it
- * can be jarring to see the cursor jump inconsistently
- * based on .prose styles. These classes aim to normalize
- * blocks behavior so they take up the same space
- */
 const blockClasses = 'mt-0.5';
-/** prose sets a bold font, making bold marks impossible to see */
 const headerClasses = 'font-normal';
 
-/**
- * Returns black or white depending on the luminance of the given background
- * color, ensuring the text on top meets WCAG contrast requirements.
- * Accepts any CSS color format (hex, rgb, hsl, named colors).
- */
 function getContrastColor(color: string): string {
   const parsed = colorString.get.rgb(color);
   if (!parsed) return '#000000';
@@ -166,7 +154,6 @@ const Heading4 = ({
   </h4>
 );
 
-/** Tailwind prose doesn't style h5 and h6 elements */
 const headerFontStyle: React.CSSProperties = {
   fontFamily: "'Inter', sans-serif",
   fontWeight: '400',

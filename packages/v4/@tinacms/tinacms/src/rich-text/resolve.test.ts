@@ -2,10 +2,6 @@ import { describe, expect, it } from 'vitest';
 import { resolveRichTextNode } from './resolve';
 import type { SuppliedComponents, TinaMarkdownContent } from './types';
 
-// The point of these tests is that they import no framework and render nothing. The walk
-// that v3 could only exercise through React is now a function from a node and a set of
-// supplied components to an instruction, so the branches are checkable directly.
-
 const node = (value: Record<string, unknown>) => value as TinaMarkdownContent;
 const none: SuppliedComponents = {};
 const supplying = (...keys: string[]): SuppliedComponents =>
@@ -311,8 +307,6 @@ describe('tables', () => {
     expect(instruction.rows).toEqual([[{ content: [] }]]);
   });
 
-  // Alignment is author content, and a pipe table writes a null for a column it did not
-  // align. Dropping those entries would shift every column after them.
   it('keeps a column position when its alignment is not one of the three keywords', () => {
     const instruction = resolveRichTextNode(
       node({

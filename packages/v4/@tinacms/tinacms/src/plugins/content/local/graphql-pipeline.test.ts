@@ -90,8 +90,6 @@ describe('graphql (the v3 pipeline)', () => {
       title: 'Renamed',
       featured: true,
     });
-    // The query selects the body only, so the whole object must survive the round
-    // trip.
     const after = await dataLayer.graphql(query);
     expect(after.data).toEqual(before.data);
   });
@@ -107,9 +105,6 @@ describe('graphql (the v3 pipeline)', () => {
   });
 });
 
-// v3 indexes one extension for each collection, so a collection with mixed formats is
-// fully editable and only partly queryable. This test states that limit, so no one has
-// to find it in an empty query result.
 describe('a mixed-format collection through the v3 pipeline', () => {
   let mixed: LocalDataLayer;
   let warn: ReturnType<typeof vi.spyOn>;

@@ -18,23 +18,6 @@ export const HANDLES_MDX = [
   ParagraphPlugin.key,
 ];
 
-const resetBlockTypesCommonRule = {
-  types: [
-    BlockquotePlugin.key,
-    HEADING_KEYS.h1,
-    HEADING_KEYS.h2,
-    HEADING_KEYS.h3,
-    HEADING_KEYS.h4,
-    HEADING_KEYS.h5,
-    HEADING_KEYS.h6,
-    // NOTE: code blocks behave strangely when used here
-  ],
-  defaultType: ParagraphPlugin.key,
-};
-
-// The inferred plugin type names @udecode/plate-core's internals, which resolve
-// through a React 18 copy at the repo root and so aren't portable in a .d.ts.
-// Plate's own plugin types aren't exported in a usable shape here.
 export const plugins: any[] = [
   TrailingBlockPlugin,
   AutoformatPlugin.configure({
@@ -45,13 +28,9 @@ export const plugins: any[] = [
   ExitBreakPlugin.configure({
     options: {
       rules: [
-        // Break out of a block entirely, eg. get out of a blockquote
-        // TOOD: maybe this should be shift+enter, but that's a soft break
-        // for other things like list items (see below)
         {
           hotkey: 'mod+enter',
         },
-        // Same as above but drops you at the top of a block
         {
           hotkey: 'mod+shift+enter',
           before: true,
@@ -67,22 +46,7 @@ export const plugins: any[] = [
       ],
     },
   }),
-  //See the usage code example from https://platejs.org/docs/reset-node
   ResetNodePlugin.configure({
-    // options: {
-    //   rules: [
-    //     {
-    //       ...resetBlockTypesCommonRule,
-    //       hotkey: 'Enter',
-    //       predicate: editor.api.isEmpty(editor.selection, { block: true }),
-    //     },
-    //     {
-    //       ...resetBlockTypesCommonRule,
-    //       hotkey: 'Backspace',
-    //       predicate: isSelectionAtBlockStart,
-    //     },
-    //   ],
-    // },
   }),
   SoftBreakPlugin.configure({
     options: {

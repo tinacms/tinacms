@@ -10,14 +10,11 @@ import { createFieldRegistry } from './registry';
 
 const Noop = () => null;
 
-// A small field descriptor, tagged with defaultValue, so a test can see which one won.
 const fieldOf = (tag: string): FieldDescriptor => ({
   Component: Noop,
   defaultValue: tag,
 });
 
-// The `type` sits on the manifest, and the descriptor sits on the segment. A real field
-// plugin splits them across its .plugin.ts and .client.tsx files.
 const resolved = (
   spec: { name: string; type?: string; overrides?: CapabilityOverride[] },
   field?: FieldDescriptor
@@ -50,8 +47,6 @@ describe('createFieldRegistry', () => {
     expect(registry.size).toBe(0);
   });
 
-  // One half alone is an error by the author. The boot catches it, so it does not
-  // appear as an unknown field type at the render.
   it('throws when a manifest declares a field type with no descriptor', () => {
     expect(() =>
       createFieldRegistry([resolved({ name: 'custom:string', type: 'string' })])
@@ -87,7 +82,6 @@ describe('createFieldRegistry', () => {
       fieldOf('custom')
     );
 
-    // base-first and override-first both resolve to the override.
     expect(winnerTag(createFieldRegistry([base, override]))).toBe('custom');
     expect(winnerTag(createFieldRegistry([override, base]))).toBe('custom');
   });
@@ -109,9 +103,6 @@ describe('createFieldRegistry', () => {
 });
 
 describe('resolveClientSegments', () => {
-  // The registry's paired check below can never see this plugin: resolveClientSegments
-  // skips a manifest with no client, so the type would compile into the lock and then
-  // resolve to nothing at render.
   it('throws when a field provider has no client segment at all', async () => {
     await expect(
       resolveClientSegments([

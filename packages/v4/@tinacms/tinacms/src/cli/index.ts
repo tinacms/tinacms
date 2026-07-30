@@ -1,9 +1,5 @@
-// The command dispatch of the `tinacms` bin. v4 puts the CLI in the runtime package
-// (ADR-001), so this file sits beside the code that it drives. There is no separate
-// @tinacms/cli package.
-//
-// parseArgs from node:util reads the arguments. The command surface is four flags wide,
-// which does not need a dependency.
+// Command dispatch of the `tinacms` bin. The CLI lives in the runtime package
+// (ADR-001); four flags do not need an argument-parsing dependency.
 
 import path from 'node:path';
 import { parseArgs } from 'node:util';
@@ -11,8 +7,8 @@ import type { ModuleLoader } from '../codegen/load-config';
 import { type CodegenResult, runCodegen } from './commands/codegen';
 
 export interface CliContext {
-  // The Vite server that the bin used to load this module. The bin passes it down, so
-  // the config read uses it and does not start a second one.
+  // The Vite server the bin used to load this module, so the config read does
+  // not start a second one.
   loader?: ModuleLoader;
   cwd?: string;
   log?: (message: string) => void;
@@ -50,10 +46,8 @@ const codegenCommand = async (
     load: { loader: context.loader },
     write: !values.check,
   });
-  // Under --check the lock on disk is the answer, and the command reports it instead
-  // of repairing it. The pipeline of the project never runs this bin (refer to the CLI
-  // rule in packages/v4/README.md), so this is how CI catches a config that changed
-  // without its lock.
+  // Under --check the lock on disk is the answer: this is how CI catches a
+  // config that changed without its lock.
   if (values.check) {
     if (result.outcome === 'unchanged') {
       context.log(`${result.lockPath} is up to date`);
@@ -64,15 +58,13 @@ const codegenCommand = async (
     );
     return 1;
   }
-  // A stale lock is written again, and does not fail the build, so this states the
-  // reason. A change to the lock with no explanation in a commit hides the drift.
+  // A stale lock is rewritten without failing the build, so state the reason.
   if (result.warning) context.log(result.warning);
   context.log(describe(result));
   return 0;
 };
 
-// path.resolve, not a `/` test: `C:\\site` is absolute and `startsWith('/')` says it
-// is not, so it was concatenated onto cwd and reported as a missing config.
+// path.resolve, not a `/` test: `C:\site` is absolute on Windows.
 const resolveFrom = (cwd: string, target: string): string =>
   path.resolve(cwd, target);
 
@@ -92,9 +84,7 @@ export const runCli = async (
   }
 
   try {
-    // Inside the try. An unknown flag, or `--root` with no value, makes parseArgs
-    // throw, and outside this block that reached the caller as a stack trace — which
-    // is what the comment below promises it never does.
+    // Inside the try: an unknown flag makes parseArgs throw.
     const { values } = parseArgs({
       args: rest,
       options: {
@@ -105,8 +95,8 @@ export const runCli = async (
       },
       allowPositionals: true,
     });
-    // The command is checked before --help, so a typo does not exit 0 just because
-    // the user also asked for usage.
+    // Command before --help, so a typo does not exit 0 just because the user
+    // also asked for usage.
     if (command !== 'codegen') {
       logError(`Unknown command "${command}".\n\n${USAGE}`);
       return 1;
@@ -117,8 +107,7 @@ export const runCli = async (
     }
     return await codegenCommand(values, { ...context, cwd, log, logError });
   } catch (cause) {
-    // A failure of the config or of the lock is a message for the developer, and not
-    // a stack trace. Every throw on this path carries an explanation.
+    // A message for the developer, not a stack trace.
     logError(cause instanceof Error ? cause.message : String(cause));
     return 1;
   }

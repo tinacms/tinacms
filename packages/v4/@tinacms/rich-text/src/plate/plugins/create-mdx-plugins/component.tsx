@@ -88,7 +88,6 @@ export const InlineEmbed = ({
       {children}
       <Wrapper inline={true}>
         <span
-          // give just enough margin so that the cursor is visible when adjacent to this node.
           style={{ margin: '0 0.5px' }}
           className='relative inline-flex shadow-sm rounded leading-none'
         >
@@ -97,7 +96,6 @@ export const InlineEmbed = ({
           )}
           <span
             style={{ fontWeight: 'inherit', maxWidth: '275px' }}
-            // Tailwind reset puts styles on buttons
             className='truncate cursor-pointer relative inline-flex items-center justify-start px-2 py-0.5 rounded-l border border-gray-200 bg-white  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
             onMouseDown={handleSelect}
           >

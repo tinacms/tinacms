@@ -6,8 +6,6 @@ import { Field, FormProvider, TinaProvider } from '../../../editor';
 import { t } from '../../../index';
 import richTextFieldPlugin from './rich-text-field.plugin';
 
-// These tests render a runtime directly, and not a configured app. They therefore pass
-// TinaProvider the resolved shape, and do not call defineConfig.
 const NO_COLLECTIONS = { collections: [] };
 
 const collection: CollectionSchema = {
@@ -65,10 +63,6 @@ describe('RichTextField rendering', () => {
     expect(editable).toHaveTextContent('Some prose.');
   });
 
-  // The embed nodes read their templates from EditorContext, and the field component
-  // must provide it. Without it, `useTemplates()` returns the context default of `[]`,
-  // and every embed renders nothing. There is no message, because the toolbar reads
-  // another context and still looks correct.
   it('renders a configured embed, proving EditorContext is provided', async () => {
     render(
       <TinaProvider

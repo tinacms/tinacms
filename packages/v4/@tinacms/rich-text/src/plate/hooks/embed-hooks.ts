@@ -7,17 +7,7 @@ const handleCloseBase = (editor, element) => {
   const path = editor.findPath(element);
   const editorEl = editor.toDOMNode(editor, editor);
   if (editorEl) {
-    /**
-     * FIXME: there must be a better way to do this. When jumping
-     * back from a nested form, the entire editor doesn't receive
-     * focus, so enable that, but what we also want is to ensure
-     * that this node is selected - so do that, too. But there
-     * seems to be a race condition where the `editorEl.focus` doesn't
-     * happen in time for the Transform to take effect, hence the
-     * setTimeout. I _think_ it just needs to queue and the actual
-     * ms timeout is irrelevant, but might be worth checking on
-     * devices with lower CPUs
-     */
+    // FIXME: jumping back from a nested form needs both editor focus and node
     editorEl.focus();
     setTimeout(() => {
       editor.tf.select(path);
@@ -35,12 +25,6 @@ const handleRemoveBase = (editor, element) => {
 export const useHotkey = (key, callback) => {
   const selected = useSelected();
 
-  /**
-   * Bound once, for the life of the node. `selected`, `key`, and the callback are all
-   * read when the key is pressed, so the listener never churns on a selection change
-   * and never fires a callback from an earlier render — the callbacks here close over
-   * the editor and the element, and only `selected` used to re-create them.
-   */
   const onKeyDown = React.useEffectEvent((e) => {
     if (!selected || !isHotkey(key, e)) return;
     e.preventDefault();
@@ -64,8 +48,6 @@ export const useEmbedHandles = (editor, element, baseFieldName: string) => {
   };
   const path = editor.findPath(element);
   const fieldName = `${baseFieldName}.children.${path.join('.children.')}.props`;
-  // The host decides what selecting an embed does — this package only says which
-  // address was selected, so it never has to import the host's form store.
   const handleSelect = () => onActivateField(fieldName);
 
   const handleRemove = () => {

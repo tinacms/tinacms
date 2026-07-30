@@ -14,9 +14,6 @@ export const datetime = (
 const labelOf = (field: DatetimeFieldSchema): string =>
   field.label ?? field.name;
 
-// The value is an ISO-shaped string, and the field does no zone math anywhere. A YAML
-// frontmatter date arrives as a Date, because js-yaml parses an unquoted date, so the
-// preprocess folds that case back to the string form before the checks.
 export const datetimeSchema = (node: FieldSchema): ZodType => {
   const field = node as DatetimeFieldSchema;
   const schema = z
