@@ -377,7 +377,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 export const FormStatus = ({ pristine }: { pristine: boolean }) => {
   const pristineClass = pristine ? 'text-green-500' : 'text-red-500';
   // fill-current keeps this a solid status dot; lucide icons are stroke-only by default.
-  return <Circle className={cn('h-3 fill-current', pristineClass)} />;
+  return <Circle className={cn('w-3 h-3 fill-current', pristineClass)} />;
 };
 
 const RelatedFilesBanner = () => {
