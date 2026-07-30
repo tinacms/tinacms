@@ -6,7 +6,7 @@ import type { FieldAddress } from '../core/field/address';
 import type { FieldRegistry } from '../core/field/registry';
 import { digestDocument } from '../core/form/ingest';
 import { invariant } from '../core/invariant';
-import type { TinaStoreState } from '../core/plugin';
+import type { SliceState, TinaStoreState } from '../core/plugin';
 import type { FieldSchema, TinaDocument } from '../core/schema/types';
 import { type FormId, toFormValues, useFormStore } from '../form/form-store';
 import {
@@ -40,16 +40,21 @@ export function useTinaStore<Selected>(
   return useStore(runtime.store, selector);
 }
 
-// The `content` namespace has the open SliceState type, until codegen produces the
-// typed capability reads. The one cast is here.
+const isContentSlice = (
+  slice: SliceState
+): slice is SliceState & ContentSlice =>
+  typeof slice.get === 'function' &&
+  typeof slice.list === 'function' &&
+  typeof slice.update === 'function';
+
 export function useContentSlice(): ContentSlice {
   const slice = useTinaStore((state) => state.content);
   invariant(
-    slice,
+    slice && isContentSlice(slice),
     'content-capability-missing',
-    'No content capability is mounted — pass a content plugin (e.g. localContentPlugin()) to <TinaProvider plugins>'
+    'No content capability with get, list and update is mounted — pass a content plugin (e.g. localContentPlugin()) to <TinaProvider plugins>'
   );
-  return slice as unknown as ContentSlice;
+  return slice;
 }
 
 function useFormScope(hookCode: string, hookName: string): FormScope {
@@ -62,24 +67,15 @@ export function useFormId(): FormId {
   return useFormScope('form-id-outside-provider', 'useFormId').formId;
 }
 
-// The path of the open document. A field whose behaviour depends on the storage format
-// builds its FieldTransformContext from this, so it resolves the same codec that the
-// ingest and the save resolve. Reading it any other way lets the three disagree.
 export function useDocumentPath(): string {
   return useFormScope('document-path-outside-provider', 'useDocumentPath').path;
 }
 
-// The identity of the values the form was seeded from. A field whose editor owns its own
-// state keys on this, so that a reseed of RHF mounts it again on the new values. Every
-// other field reads its value through useFieldValue and needs nothing here.
 export function useFormSeedKey(): string {
   return useFormScope('form-seed-key-outside-provider', 'useFormSeedKey')
     .seedKey;
 }
 
-// Throw the edits of this form away and put it back on its baseline: the content it
-// loaded, or the content it last saved. It cannot be undone, so the caller confirms
-// first. No control in the admin calls this yet.
 export function useDiscardEdits(): () => void {
   return useFormScope('discard-edits-outside-provider', 'useDiscardEdits')
     .discardEdits;
@@ -90,19 +86,11 @@ export interface ActiveField {
   setActive: (address: FieldAddress | null) => void;
 }
 
-// The view of this form on the one active field in the store (ADR-009, visual editing).
-// The `active` value is the address that a click in the preview activated. It is null
-// when the active field belongs to another form. The `setActive` function sets that
-// address, or clears it.
 export function useActiveField(): ActiveField {
   const formId = useFormId();
   const active = useFormStore((state) =>
     state.active?.formId === formId ? state.active.address : null
   );
-  // Memoised by hand. Only the playground and the test config run the React Compiler,
-  // and this package ships its source — so a consumer's bundler sees these hooks
-  // uncompiled, and a fresh identity here re-runs their `[setActive]` effects on every
-  // render.
   const setActive = useCallback(
     (address: FieldAddress | null) =>
       useFormStore.getState().setActive(formId, address),
@@ -111,22 +99,13 @@ export function useActiveField(): ActiveField {
   return useMemo(() => ({ active, setActive }), [active, setActive]);
 }
 
-// Build the document again from the values of the form, and give it to the save handler
-// of the host (ADR-018 and ADR-019). Only a save that resolves moves the baseline and
-// makes the form clean. A save that rejects leaves the form dirty. The baseline is the
-// snapshot from before the save, and not the latest values in the store. An edit made
-// during the save therefore stays dirty.
 export function useFormSave(): () => Promise<void> {
   const registry = useFieldRegistry();
   const scope = useFormScope('form-save-outside-provider', 'useFormSave');
   const { getValues } = useFormContext<TinaDocument>();
-  // Memoised for the same reason as useActiveField above: consumers hold this in
-  // `[save]` dependencies, and this package ships uncompiled source.
   return useCallback(async () => {
     const { formId, path, collection, onSave } = scope;
     const values = getValues();
-    // The same context that the ingest parsed with, so one codec reads and writes
-    // the value. Without it, a value read as .md could be written as .mdx.
     const digested = digestDocument(values, collection.fields, registry, {
       documentPath: path,
     });
@@ -145,7 +124,6 @@ export function useFieldAddress(): FieldAddress {
   return address;
 }
 
-// The resolved schema node of the field, which holds its config. The caller asserts `T`.
 export function useFieldSchema<T extends FieldSchema = FieldSchema>(): T {
   const node = use(FieldSchemaContext);
   if (node == null) {
@@ -163,9 +141,6 @@ export function useFieldValue<T = unknown>(
 
 export function useFieldErrors(address: FieldAddress): string[] {
   const { errors } = useFormState({ name: address });
-  // The `errors` value of RHF has a complex mapped type. Cast it once, and index it by
-  // field name. This assumes flat addresses, because there are no nested fields yet. A
-  // nested path would need a path walk here.
   const fieldErrors = errors as Record<string, FieldErrorEntry | undefined>;
   return fieldErrorMessages(fieldErrors[address]);
 }
@@ -173,14 +148,7 @@ export function useFieldErrors(address: FieldAddress): string[] {
 export function useFieldActivation(handler: () => void): void {
   const address = use(FieldAddressContext);
   const formId = use(FormScopeContext)?.formId ?? null;
-  // Subscribe to the activation entry, and not to a boolean. setActive writes a new
-  // object at each call, so a second activation of the same field calls the handler
-  // again. A boolean would hold its value, and the second click would do nothing.
   const active = useFormStore((state) => state.active);
-  // The activation entry is the reactive half, and the handler is not. Every call site
-  // passes a new closure on each render, so a handler in the dependencies would fire on
-  // each render instead of on an activation. An Effect Event reads the latest closure
-  // without joining them.
   const onActivate = useEffectEvent(handler);
   useEffect(() => {
     if (

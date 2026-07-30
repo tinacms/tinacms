@@ -9,6 +9,8 @@ hooks → validation → digest.
 
 ## 1. Resolve the plugins into a registry
 
+`<TinaAdmin config>` (`admin/admin.tsx`) mounts `<TinaProvider>` itself, so an
+app renders one component and does not compose the provider by hand.
 `<TinaProvider plugins={[...]}>` (`editor/provider.tsx`) calls
 `resolveFieldPlugins` (`core/field/registry.ts`). `resolveFieldPlugins` awaits
 the `client()` import of each manifest. Then it builds the `FieldRegistry`, a

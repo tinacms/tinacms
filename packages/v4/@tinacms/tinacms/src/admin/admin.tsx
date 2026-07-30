@@ -1,6 +1,4 @@
-// The admin shell. The compiled schema drives all of it: no code here names a
-// collection or a field type (ADR-016 §1).
-
+import type { QueryClient } from '@tanstack/react-query';
 import {
   Sidebar,
   SidebarContent,
@@ -21,12 +19,17 @@ import {
   startTransition,
   use,
   useEffect,
+  useRef,
   useState,
 } from 'react';
+import { HashRouter } from 'react-router-dom';
+import type { ResolvedConfig } from '../config';
 import type { CollectionSchema } from '../core/schema/types';
 import type { AdminScreen } from '../core/screen/contract';
 import { useCollectionDocuments } from '../editor/content-queries';
 import { FormScopeContext } from '../editor/context';
+import { usePreviewConnection } from '../editor/preview-connection';
+import { TinaProvider } from '../editor/provider';
 import { toFormId } from '../form/form-store';
 import { DocumentForm } from './document-form';
 import { DocumentScope } from './document-scope';
@@ -36,7 +39,6 @@ import { type AdminRoute, COLLECTIONS_ROUTE } from './routing';
 import { useAdminRoute } from './use-admin-route';
 import { useFormColumnWidth } from './use-form-column-width';
 
-// Wider than the 16rem default: the entries are file paths.
 const SHELL_WIDTH = { '--sidebar-width': '18rem' } as CSSProperties;
 
 const documentName = (path: string) => path.split('/').at(-1) ?? path;
@@ -72,7 +74,6 @@ function CollectionMenu({
   );
 }
 
-// Separate component: a hook higher in the tree would load every collection.
 function DocumentMenu({
   collection,
   activePath,
@@ -86,7 +87,6 @@ function DocumentMenu({
     collection.name
   );
   const label = collection.label ?? collection.name;
-  // A failed read and an empty collection are different answers.
   if (error) {
     return (
       <p className='px-2 py-1.5 text-sm text-destructive'>
@@ -112,6 +112,7 @@ function DocumentMenu({
         <SidebarMenuItem key={path}>
           <SidebarMenuButton
             isActive={path === activePath}
+            aria-label={documentName(path)}
             onClick={() =>
               navigate({ view: 'document', collection: collection.name, path })
             }
@@ -168,7 +169,6 @@ function ScreenOutlet({
       </div>
       <div className='min-h-0 flex-1 overflow-y-auto'>
         {screen ? (
-          // Keyed so moving between screens remounts.
           <screen.component key={screen.name} segments={segments} />
         ) : (
           <Placeholder>No screen named “{name}”.</Placeholder>
@@ -178,13 +178,24 @@ function ScreenOutlet({
   );
 }
 
-// Tests the form scope, not the route: on a deep link the two differ for one
-// frame, and a preview mounted in that gap would read a form that does not
-// exist yet.
+function PreviewFrame({ src }: { src: string }) {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  usePreviewConnection(iframeRef);
+  return (
+    <iframe
+      ref={iframeRef}
+      src={src}
+      title='Preview'
+      className='size-full border-none'
+    />
+  );
+}
+
 function PreviewSlot({ preview }: { preview?: ReactNode }) {
   if (!use(FormScopeContext)) {
     return <Placeholder>Select a document to edit.</Placeholder>;
   }
+  if (typeof preview === 'string') return <PreviewFrame src={preview} />;
   return <>{preview ?? <Placeholder>No preview configured.</Placeholder>}</>;
 }
 
@@ -204,10 +215,6 @@ function FormColumn({ openPath }: { openPath?: string }) {
   const scope = use(FormScopeContext);
   const seedKey = scope?.seedKey;
 
-  // The field mount is deferred behind a transition: building the rich-text
-  // editor is the most expensive render in the admin, and long prose froze the
-  // shell for most of a second in the urgent pass. The urgent pass commits the
-  // skeleton, which also unmounts the outgoing editor at once.
   const [mountedSeedKey, setMountedSeedKey] = useState<string | undefined>(
     undefined
   );
@@ -219,7 +226,8 @@ function FormColumn({ openPath }: { openPath?: string }) {
   return (
     <>
       <aside
-        className='flex min-w-0 shrink-0 flex-col overflow-y-auto border-r border-sidebar-border p-4'
+        aria-label='Document form'
+        className='flex min-w-0 shrink-0 flex-col overflow-y-auto border-r border-border p-4'
         style={{ width }}
       >
         <div className='mb-2 flex items-center gap-1'>
@@ -231,23 +239,17 @@ function FormColumn({ openPath }: { openPath?: string }) {
           ) : null}
         </div>
         {mountedSeedKey === seedKey ? (
-          /* Keyed on the seed key: Plate reads its value at mount only. The key
-             stays here — on FormProvider it remounted the preview iframe on
-             every switch. */
           <DocumentForm key={seedKey} />
         ) : (
           <FormColumnSkeleton />
         )}
       </aside>
 
-      {/* Grab area wider than the line it draws: a 1px target is a miss. */}
       <div
         className='-ml-1 z-10 w-2 shrink-0 cursor-col-resize touch-none select-none focus-visible:outline-none'
         {...handleProps}
       />
 
-      {/* Holds the resize cursor over the panes and stops the drag selecting
-          their text. */}
       {isResizing ? (
         <div className='fixed inset-0 z-50 cursor-col-resize' />
       ) : null}
@@ -256,12 +258,24 @@ function FormColumn({ openPath }: { openPath?: string }) {
 }
 
 export interface TinaAdminProps {
-  // The site preview. A prop, not a UI slot: the slot names are a first-party
-  // set the core has not defined yet (ADR-013).
+  config: ResolvedConfig;
   preview?: ReactNode;
+  queryClient?: QueryClient;
 }
 
-export function TinaAdmin({ preview }: TinaAdminProps) {
+export function TinaAdmin({ config, preview, queryClient }: TinaAdminProps) {
+  return (
+    <TinaProvider config={config} queryClient={queryClient}>
+      <HashRouter
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
+        <AdminShell preview={preview} />
+      </HashRouter>
+    </TinaProvider>
+  );
+}
+
+function AdminShell({ preview }: { preview?: ReactNode }) {
   const schema = useTinaSchema();
   const screens = useAdminScreens();
   const { route, navigate } = useAdminRoute();
@@ -275,7 +289,6 @@ export function TinaAdmin({ preview }: TinaAdminProps) {
   );
   const openPath = route.view === 'document' ? route.path : undefined;
   const activeScreen = route.view === 'screen' ? route : undefined;
-  // A route naming a collection outside the schema is stale, not broken.
   const isStaleCollectionRoute =
     activeCollectionName !== undefined && collection === undefined;
 
@@ -336,9 +349,6 @@ export function TinaAdmin({ preview }: TinaAdminProps) {
         </SidebarContent>
       </Sidebar>
 
-      {/* A screen replaces the editor panes. That unmounts the form scope, but
-          unsaved edits survive it: the store keeps a form after its scope goes
-          (ADR-012). */}
       {activeScreen ? (
         <ScreenOutlet
           name={activeScreen.screen}
@@ -348,9 +358,6 @@ export function TinaAdmin({ preview }: TinaAdminProps) {
           segments={activeScreen.segments}
         />
       ) : (
-        /* The scope wraps only the panes that read the open form: wrapping the
-           whole layout reset the sidebar and re-fetched the document list on
-           every open and close. */
         <DocumentScope collection={collection} path={openPath}>
           <SidebarInset className='flex-row'>
             <FormColumn openPath={openPath} />
