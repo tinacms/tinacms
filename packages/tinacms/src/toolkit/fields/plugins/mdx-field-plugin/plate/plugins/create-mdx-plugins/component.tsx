@@ -204,13 +204,13 @@ const EmbedNestedForm = ({
 const DotMenu = ({ onOpen, onRemove }) => {
   return (
     <Popover>
-      <PopoverTrigger className='cursor-pointer h-full relative inline-flex items-center px-1 py-0.5 rounded-r border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'>
+      <PopoverTrigger className='-ml-px cursor-pointer h-full relative inline-flex items-center px-1 py-0.5 rounded-r border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'>
         <EllipsisIcon title='Open options' />
       </PopoverTrigger>
       <PopoverContent
         align='end'
         sideOffset={8}
-        className='z-30 w-auto p-0 rounded shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none border-0'
+        className='w-auto p-0 rounded shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none border-0'
       >
         <div className='py-1'>
           <span
