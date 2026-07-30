@@ -31,8 +31,6 @@ export function codeLineToString(content: PlateCodeBlockElement): string {
     .join('\n');
 }
 
-//the default code block element from @udecode/plate-code-block
-//custom styling to match TinaCMS branding + remove copy button
 export const CodeBlockElement = withRef<typeof PlateElement>(
   ({ children, className, ...props }, ref) => {
     const { editor, element } = props;
@@ -41,7 +39,6 @@ export const CodeBlockElement = withRef<typeof PlateElement>(
     const [codeBlockError, setCodeBlockError] = useState<string | null>(null);
 
     useEffect(() => {
-      // Look to find mermaid errors as well as format ( formatCodeBlock(editor, { element })})
       if ((element.lang as string) !== 'mermaid') {
         return;
       }
@@ -59,10 +56,11 @@ export const CodeBlockElement = withRef<typeof PlateElement>(
           }
         } catch (err) {
           if (!isCancelled) {
-            setCodeBlockError(
-              (err instanceof Error && err.message) ||
-                'An error occurred while parsing the diagram.'
-            );
+            if (err instanceof Error && err.message) {
+              setCodeBlockError(err.message);
+            } else {
+              setCodeBlockError('An error occurred while parsing the diagram.');
+            }
           }
         }
       };
@@ -164,7 +162,7 @@ export const CodeBlockElement = withRef<typeof PlateElement>(
             )}
             <CodeBlockCombobox
               onLanguageChange={(lang) => {
-                setCodeBlockError(null); // Clear errors on language change
+                setCodeBlockError(null);
                 editor.tf.setNodes<TCodeBlockElement>(
                   { lang },
                   { at: element }

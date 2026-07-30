@@ -348,13 +348,6 @@ function ColorDropdownMenu({ children, tooltip }: ColorDropdownMenuProps) {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align='start'>
-        {/* <DropdownMenuGroup label="Colors">
-          <ColorDropdownMenuItems
-            className="px-2"
-            colors={DEFAULT_COLORS}
-            updateColor={onUpdateColor}
-          />
-        </DropdownMenuGroup> */}
         <DropdownMenuGroup>
           <DropdownMenuItem className='p-2' onClick={onClearColor}>
             <EraserIcon />

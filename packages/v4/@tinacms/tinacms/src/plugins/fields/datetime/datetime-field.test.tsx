@@ -15,8 +15,6 @@ import { Field, FormProvider, TinaProvider } from '../../../editor';
 import { t } from '../../../index';
 import datetimeFieldPlugin from './datetime-field.plugin';
 
-// These tests render a runtime directly, and not a configured app. They therefore pass
-// TinaProvider the resolved shape, and do not call defineConfig.
 const NO_COLLECTIONS = { collections: [] };
 
 const collection: CollectionSchema = {
@@ -114,9 +112,9 @@ describe('DatetimeField validation', () => {
   it('rejects a string that is not a date', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('datetime');
-    expect(
-      validateField(publishedNode, descriptor, 'not-a-date')
-    ).not.toEqual([]);
+    expect(validateField(publishedNode, descriptor, 'not-a-date')).not.toEqual(
+      []
+    );
   });
 
   it('accepts an absent value as optional', async () => {

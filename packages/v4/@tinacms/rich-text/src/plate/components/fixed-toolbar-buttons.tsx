@@ -44,7 +44,7 @@ import { ToolbarGroup } from './plate-ui/toolbar';
 
 type ToolbarItem = {
   label: string;
-  width: (paragraphIconExists?: boolean) => number; // Use function to calculate width
+  width: (paragraphIconExists?: boolean) => number;
   Component: React.ReactNode;
 };
 
@@ -147,7 +147,6 @@ export default function FixedToolbarButtons() {
   const { overrides, templates } = useToolbarContext();
   const showEmbedButton = templates.length > 0;
 
-  // Without a `toolbar` list, every button; an empty list, none.
   let items: ToolbarItem[] =
     overrides?.toolbar === undefined
       ? Object.values(toolbarItems)
@@ -159,7 +158,6 @@ export default function FixedToolbarButtons() {
     items = items.filter((item) => item.label !== toolbarItems.embed.label);
   }
 
-  // v4 has no raw markdown editor yet, so the button would toggle nothing.
   items = items.filter((item) => item.label !== toolbarItems.raw.label);
 
   const editorState = useEditorState();
@@ -177,13 +175,10 @@ export default function FixedToolbarButtons() {
     const availableWidth = width - headingWidth;
 
     const countItemsFitting = (budget: number) => {
-      // The heading is measured above, so it starts the count already spent.
       let count = headingButton ? 1 : 0;
       let used = 0;
       for (const item of items) {
         if (item.label === HEADING_LABEL) continue;
-        // The row renders a contiguous prefix, so the first item that does not
-        // fit ends the count.
         if (used + item.width() > budget) break;
         used += item.width();
         count += 1;
@@ -191,8 +186,6 @@ export default function FixedToolbarButtons() {
       return count;
     };
 
-    // Reserve room for the overflow menu only once we know it will render, or a
-    // toolbar that fits exactly loses a button to a menu that never appears.
     const fitCount = countItemsFitting(availableWidth);
 
     setItemsShown(
@@ -232,9 +225,6 @@ export default function FixedToolbarButtons() {
               {item.Component}
             </div>
           ))}
-          {/* The menu follows the last button rather than sitting against the far
-              edge. Pushed right, the leftover width opens as a gap mid-row, which
-              reads as a button that failed to render. */}
           {items.length > itemsShown && (
             <div className='w-fit'>
               <OverflowMenu>

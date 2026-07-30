@@ -16,8 +16,6 @@ import {
 import { writesSameSource } from './rich-text-codecs';
 import type { RichTextFieldSchema } from './rich-text-field.schema';
 
-// Raw mode is not ported: v4 has no raw markdown editor yet, so the controls
-// are hidden but the context still carries the shape.
 const RAW_MODE_UNAVAILABLE = false;
 const setRawModeUnavailable = () => {};
 
@@ -35,14 +33,8 @@ export function RichTextField() {
     [setActive]
   );
 
-  // Same context the ingest and the save build, so all three resolve one codec:
-  // without the path, a .md body would be compared as MDX here and written as
-  // markdown by useFormSave.
   const documentPath = useDocumentPath();
 
-  // Plate fires onChange on selection changes and its normalization rewrites the
-  // tree, so compare written source against the last reported value instead of
-  // trees — a click must not read as an edit.
   const lastValue = useRef<RichTextValue>(EMPTY_RICH_TEXT);
   const seededFor = useRef<string | null>(null);
   if (seededFor.current !== seedKey) {
@@ -63,17 +55,12 @@ export function RichTextField() {
   const editable = () =>
     containerRef.current?.querySelector<HTMLElement>('[role="textbox"]');
 
-  // Plate gives no ref for its contenteditable, and Slate mounts one tick after
-  // this component, so the search waits.
   useFieldActivation(() => {
     setTimeout(() => editable()?.focus(), 0);
   });
 
   return (
     <FieldWrapper errors={errors}>
-      {/* Plate reads `value` as a seed only, so a new seed must remount it via
-          the key. min-w-0: as a grid item this defaults to min-width:auto and
-          would spill out of the sidebar instead of shrinking. */}
       <div ref={containerRef} className='min-w-0'>
         <EditorContext.Provider
           key={seedKey}

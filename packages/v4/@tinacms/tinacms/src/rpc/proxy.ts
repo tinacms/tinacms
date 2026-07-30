@@ -1,11 +1,6 @@
-// Client half of the capability RPC (ADR-007): a typed Proxy that turns
-// `server.media.upload(input)` into one POST. Runs in the browser; must not
-// import from ../server or ./handler.
 
 export type RpcProxy<TSegments> = {
   [Namespace in keyof TSegments]: {
-    // Variadic inference so a zero-arg op stays callable with zero args —
-    // `(input: infer I)` would infer `unknown` and demand a dummy argument.
     [Op in keyof TSegments[Namespace]]: TSegments[Namespace][Op] extends (
       ...args: infer TArgs
     ) => Promise<infer TResult>
@@ -27,7 +22,6 @@ export class RpcError extends Error {
 
 export interface RpcClientConfig {
   url: string;
-  // Bearer token (ADR-023 §4). Without it, only a publicOp answers.
   getToken?: () => string | null | Promise<string | null>;
   fetch?: typeof fetch;
 }
@@ -45,16 +39,15 @@ export const createRpcClient = <TSegments>(
     }
   ) as RpcProxy<TSegments>;
 
-// Protocol keys must read as absent: `then` or `await client.media` hangs,
-// and string coercion (`${client.media}`, JSON.stringify) reads toString/
-// valueOf/toJSON — returning an op function there fires bogus POSTs.
 const RESERVED_PROXY_KEYS: ReadonlySet<string> = new Set([
   'then',
   'toString',
   'valueOf',
   'toJSON',
 ]);
-const isReservedProxyKey = (key: string | symbol): boolean =>
+const isReservedProxyKey = (
+  key: string | symbol
+): key is symbol | 'then' | 'toString' | 'valueOf' | 'toJSON' =>
   typeof key === 'symbol' || RESERVED_PROXY_KEYS.has(key);
 
 const createNamespaceProxy = (config: RpcClientConfig, namespace: string) =>
@@ -93,8 +86,6 @@ const unwrapRpcResponse = async (
   namespace: string,
   opName: string
 ): Promise<unknown> => {
-  // A 2xx that is not JSON is not a result: an SSO interstitial comes back 200,
-  // and parsing it as "null" would resolve the call as an empty success.
   const isJson = response.headers
     .get('content-type')
     ?.toLowerCase()
