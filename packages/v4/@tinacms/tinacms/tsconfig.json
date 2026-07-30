@@ -6,7 +6,7 @@
     "jsx": "react-jsx",
     "paths": {
       "@tinacms/graphql": [
-        "./src/plugins/content/local/tinacms-graphql.d.ts"
+        "./src/plugins/content/local/graphql/tinacms-graphql.d.ts"
       ],
       // The repo root still resolves @types/react 18 (v3 is a React 18 package).
       // Without these, a compilation that pulls in React 19-typed deps (Plate,

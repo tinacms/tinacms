@@ -8,7 +8,7 @@ import { digestDocument, ingestDocument } from '../../../core/form/ingest';
 import type { CollectionSchema } from '../../../core/schema/types';
 import { validateField } from '../../../core/validation';
 import { t } from '../../../index';
-import { formatAdapterFor } from '../../content/local/format-adapters';
+import { formatAdapterFor } from '../../content/local/adapters/format-adapters';
 import type { RichTextValue } from './rich-text-codec';
 import richTextFieldPlugin from './rich-text-field.plugin';
 

@@ -51,12 +51,12 @@
       "default": "./src/server/index.ts"
     },
     "./local-data-layer": {
-      "types": "./src/plugins/content/local/local-data-layer.ts",
-      "default": "./src/plugins/content/local/local-data-layer.ts"
+      "types": "./src/plugins/content/local/server/local-data-layer.ts",
+      "default": "./src/plugins/content/local/server/local-data-layer.ts"
     },
     "./local-data-layer/vite": {
-      "types": "./src/plugins/content/local/local-data-layer.vite.ts",
-      "default": "./src/plugins/content/local/local-data-layer.vite.ts"
+      "types": "./src/plugins/content/local/server/local-data-layer.vite.ts",
+      "default": "./src/plugins/content/local/server/local-data-layer.vite.ts"
     },
     "./adapters/next": {
       "types": "./src/adapters/next/index.ts",
@@ -81,10 +81,9 @@
     "@tinacms/mdx": "workspace:*",
     "@tinacms/rich-text": "workspace:*",
     "@tinacms/ui": "workspace:*",
-    "react-router-dom": "catalog:",
-    "abstract-level": "catalog:",
     "gray-matter": "catalog:",
     "react-hook-form": "^7.80.0",
+    "react-router-dom": "catalog:",
     "sqlite-level": "catalog:",
     "zod": "catalog:",
     "zustand": "^5.0.14"
@@ -116,6 +115,7 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "catalog:",
+    "abstract-level": "catalog:",
     "babel-plugin-react-compiler": "^1.0.0",
     "happy-dom": "catalog:",
     "react": "^19.2.7",

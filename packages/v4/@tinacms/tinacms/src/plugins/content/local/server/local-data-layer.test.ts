@@ -3,12 +3,10 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { dispatchContentRequest } from './content-request';
-import { createGraphQLPipeline } from './graphql-pipeline';
+import { createGraphQLPipeline } from '../graphql/graphql-pipeline';
 import { type LocalDataLayer, createLocalDataLayer } from './local-data-layer';
 
-// The real pipeline boots the whole v3 stack. These tests cover the memoization around
-// it.
-vi.mock('./graphql-pipeline', () => ({ createGraphQLPipeline: vi.fn() }));
+vi.mock('../graphql/graphql-pipeline', () => ({ createGraphQLPipeline: vi.fn() }));
 
 const HELLO_RAW = `---
 title: Hello World
@@ -42,7 +40,6 @@ beforeEach(async () => {
         format: 'mdx',
         fields: [{ name: 'body', type: 'rich-text', isBody: true }],
       },
-      // This folder is never created.
       { name: 'page', path: 'content/pages', format: 'mdx', fields: [] },
     ],
   });
@@ -157,6 +154,56 @@ describe('update', () => {
     expect(entry?.document).toEqual({ title: 'New', body: '' });
   });
 
+  it('serialises two concurrent saves of one document instead of dropping the first', async () => {
+    await Promise.all([
+      dataLayer.update('post', 'content/posts/hello.mdx', { title: 'A' }),
+      dataLayer.update('post', 'content/posts/hello.mdx', { featured: true }),
+    ]);
+    const entry = await dataLayer.get('post', 'content/posts/hello.mdx');
+    expect(entry?.document).toMatchObject({ title: 'A', featured: true });
+  });
+
+  it('keeps saves of different documents parallel', async () => {
+    await Promise.all([
+      dataLayer.update('post', 'content/posts/hello.mdx', { title: 'A' }),
+      dataLayer.update('post', 'content/posts/nested/deep.mdx', { title: 'B' }),
+    ]);
+    expect(
+      (await dataLayer.get('post', 'content/posts/hello.mdx'))?.document.title
+    ).toBe('A');
+    expect(
+      (await dataLayer.get('post', 'content/posts/nested/deep.mdx'))?.document
+        .title
+    ).toBe('B');
+  });
+
+  it('refuses to write over a file whose contents cannot be parsed, and names the document', async () => {
+    const corrupt = '---\ntitle: [unclosed\nother: "x\n---\nbody\n';
+    const file = path.join(rootDir, 'content/posts/broken.mdx');
+    await fs.writeFile(file, corrupt);
+    await expect(
+      dataLayer.update('post', 'content/posts/broken.mdx', { title: 'Fixed' })
+    ).rejects.toThrow(
+      /Cannot save "content\/posts\/broken\.mdx": the contents of the file on disk could not be parsed/
+    );
+    expect(await fs.readFile(file, 'utf8')).toBe(corrupt);
+    await fs.writeFile(file, '---\ntitle: Repaired\n---\n');
+    const saved = await dataLayer.update('post', 'content/posts/broken.mdx', {
+      title: 'Fixed',
+    });
+    expect(saved.document.title).toBe('Fixed');
+  });
+
+  it('names the document when the value itself cannot be written', async () => {
+    await expect(
+      dataLayer.update('post', 'content/posts/hello.mdx', {
+        body: { type: 'root', children: [] },
+      })
+    ).rejects.toThrow(
+      /^Cannot save "content\/posts\/hello\.mdx": Expected a string for body field/
+    );
+  });
+
   it('recreates a parent folder deleted out-of-band (never lose the edit)', async () => {
     await fs.rm(path.join(rootDir, 'content/posts/nested'), {
       recursive: true,
@@ -177,6 +224,68 @@ describe('trust boundary', () => {
     await expect(
       dataLayer.update('post', 'content/posts/../../escape.mdx', {})
     ).rejects.toThrow(/outside collection/);
+  });
+
+  it('rejects a path that a link points out of the collection folder', async () => {
+    const outside = await fs.mkdtemp(path.join(tmpdir(), 'tina-outside-'));
+    await fs.writeFile(
+      path.join(outside, 'outside.mdx'),
+      '---\ntitle: Outside\n---\n'
+    );
+    await fs.symlink(
+      outside,
+      path.join(rootDir, 'content/posts/linked'),
+      'dir'
+    );
+    await expect(
+      dataLayer.get('post', 'content/posts/linked/outside.mdx')
+    ).rejects.toThrow(/outside collection/);
+    await expect(
+      dataLayer.update('post', 'content/posts/linked/new.mdx', {
+        title: 'Nope',
+      })
+    ).rejects.toThrow(/outside collection/);
+    await fs.rm(outside, { recursive: true, force: true });
+  });
+
+  it('reads a document through a link that stays inside the collection folder', async () => {
+    await fs.symlink(
+      path.join(rootDir, 'content/posts/nested'),
+      path.join(rootDir, 'content/posts/linked-nested'),
+      'dir'
+    );
+    const entry = await dataLayer.get(
+      'post',
+      'content/posts/linked-nested/deep.mdx'
+    );
+    expect(entry?.document.title).toBe('Deep');
+  });
+
+  it('skips a listed entry that a link points out of the collection folder', async () => {
+    const outside = await fs.mkdtemp(path.join(tmpdir(), 'tina-outside-'));
+    await fs.writeFile(
+      path.join(outside, 'outside.mdx'),
+      '---\ntitle: Outside\n---\n'
+    );
+    await fs.symlink(
+      path.join(outside, 'outside.mdx'),
+      path.join(rootDir, 'content/posts/zz-linked.mdx')
+    );
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const entries = await dataLayer.list('post');
+    expect(entries.map((entry) => entry.path)).toEqual([
+      'content/posts/hello.mdx',
+      'content/posts/nested/deep.mdx',
+    ]);
+    expect(warn).toHaveBeenCalledOnce();
+    warn.mockRestore();
+    await fs.rm(outside, { recursive: true, force: true });
+  });
+
+  it('rejects a path that holds a null byte', async () => {
+    await expect(
+      dataLayer.get('post', 'content/posts/hello.mdx\0.png')
+    ).rejects.toThrow(/null byte/);
   });
 
   it('rejects paths with the wrong extension', async () => {
@@ -206,6 +315,7 @@ describe('graphql pipeline', () => {
       .mockResolvedValueOnce({
         execute: async () => ({ data: {} }),
         reindexPaths: async () => {},
+        close: async () => {},
       });
     await expect(dataLayer.graphql('{}')).rejects.toThrow('boot failed');
     await expect(dataLayer.graphql('{}')).resolves.toEqual({ data: {} });
@@ -218,6 +328,7 @@ describe('graphql pipeline', () => {
       reindexPaths: async () => {
         throw new Error('index broke');
       },
+      close: async () => {},
     });
     await dataLayer.graphql('{}');
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -230,7 +341,6 @@ describe('graphql pipeline', () => {
   });
 });
 
-// One collection with two formats. The extension of each document selects its adapter.
 describe('mixed-format collection', () => {
   let mixed: LocalDataLayer;
 
@@ -280,7 +390,6 @@ describe('mixed-format collection', () => {
       'utf8'
     );
     expect(JSON.parse(raw)).toEqual({ title: 'Renamed', extra: 'kept' });
-    // The .mdx file beside it still passes through gray-matter with no change.
     await mixed.update('post', 'content/posts/hello.mdx', {
       body: 'Rewritten prose.\n',
     });
@@ -292,8 +401,6 @@ describe('mixed-format collection', () => {
     expect(mdxRaw).not.toContain('body:');
   });
 
-  // JSON has no body, so the isBody field is stored with the other values. That is
-  // correct for a document with no body.
   it('stores the body field inline for a format without a body', async () => {
     const saved = await mixed.update('post', 'content/posts/settings.json', {
       body: 'Not a markdown body.',
@@ -361,5 +468,56 @@ describe('dispatchContentRequest', () => {
     await expect(
       dispatchContentRequest(dataLayer, { op: 'get', collection: 'post' })
     ).rejects.toThrow();
+  });
+
+  it('refuses a graphql document that is not a query', async () => {
+    const file = path.join(rootDir, 'content/posts/hello.mdx');
+    const before = await fs.readFile(file, 'utf8');
+    for (const query of [
+      'mutation Write { saveSomething(name: "x") { __typename } }',
+      'query Read { post { title } } mutation Write { saveSomething { __typename } }',
+      'subscription Watch { changed { __typename } }',
+      'fragment PostFields on Post { title }',
+      '',
+      '   ',
+      'query Read { post { title }',
+    ]) {
+      await expect(
+        dispatchContentRequest(dataLayer, { op: 'graphql', query })
+      ).rejects.toThrow(/queries only/);
+    }
+    expect(await fs.readFile(file, 'utf8')).toBe(before);
+  });
+
+  it('serves a query that holds a comment, a fragment and a braced string', async () => {
+    vi.mocked(createGraphQLPipeline).mockResolvedValueOnce({
+      execute: async () => ({ data: { post: { title: 'Hello World' } } }),
+      reindexPaths: async () => {},
+      close: async () => {},
+    });
+    const result = await dispatchContentRequest(dataLayer, {
+      op: 'graphql',
+      query: `# a comment that holds a brace {
+        query Post($path: String!) {
+          post(relativePath: $path, note: "a { brace } in a string") {
+            ...PostFields
+          }
+        }
+        fragment PostFields on Post { title }`,
+    });
+    expect(result).toMatchObject({ data: { post: { title: 'Hello World' } } });
+  });
+
+  it('serves the query shorthand, which opens with a brace', async () => {
+    vi.mocked(createGraphQLPipeline).mockResolvedValueOnce({
+      execute: async () => ({ data: { post: { title: 'Hello World' } } }),
+      reindexPaths: async () => {},
+      close: async () => {},
+    });
+    const result = await dispatchContentRequest(dataLayer, {
+      op: 'graphql',
+      query: '{ post(relativePath: "hello.mdx") { title } }',
+    });
+    expect(result).toMatchObject({ data: { post: { title: 'Hello World' } } });
   });
 });

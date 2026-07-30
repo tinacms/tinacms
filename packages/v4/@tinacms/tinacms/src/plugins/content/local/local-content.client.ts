@@ -4,7 +4,7 @@ import type {
   DocumentEntry,
 } from '../../../core/content/contract';
 import type { ClientSlice } from '../../../core/plugin';
-import type { ContentRequest } from './content-request';
+import type { ContentRequest } from './server/content-request';
 
 const postContentRequest = async <Result>(
   url: string,

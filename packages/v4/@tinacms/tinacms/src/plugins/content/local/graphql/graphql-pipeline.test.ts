@@ -2,8 +2,8 @@ import { promises as fs } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { dispatchContentRequest } from './content-request';
-import { type LocalDataLayer, createLocalDataLayer } from './local-data-layer';
+import { dispatchContentRequest } from '../server/content-request';
+import { type LocalDataLayer, createLocalDataLayer } from '../server/local-data-layer';
 
 const HELLO_RAW = `---
 title: Hello World

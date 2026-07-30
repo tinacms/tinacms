@@ -8,6 +8,7 @@ import {
 
 const MDX_RAW = `---
 title: Hello World
+date: 2024-01-01
 featured: false
 category: not-in-schema
 ---
@@ -15,12 +16,15 @@ category: not-in-schema
 Body prose the schema does not know about.
 `;
 
+const overTheWire = (document: object) => JSON.parse(JSON.stringify(document));
+
 describe('markdown adapter', () => {
   const adapter = formatAdapterFor('mdx');
 
   it('parses frontmatter as the document', () => {
     expect(adapter.parse(MDX_RAW)).toEqual({
       title: 'Hello World',
+      date: new Date('2024-01-01T00:00:00.000Z'),
       featured: false,
       category: 'not-in-schema',
     });
@@ -33,6 +37,7 @@ describe('markdown adapter', () => {
     );
     expect(adapter.parse(saved)).toEqual({
       title: 'Renamed',
+      date: new Date('2024-01-01T00:00:00.000Z'),
       featured: true,
       category: 'not-in-schema',
     });
@@ -47,6 +52,7 @@ describe('markdown adapter', () => {
   it('parses the body under the collection body field', () => {
     expect(adapter.parse(MDX_RAW, 'body')).toEqual({
       title: 'Hello World',
+      date: new Date('2024-01-01T00:00:00.000Z'),
       featured: false,
       category: 'not-in-schema',
       body: 'Body prose the schema does not know about.\n',
@@ -71,24 +77,44 @@ describe('markdown adapter', () => {
     expect(adapter.serialize(document, MDX_RAW, 'body')).toBe(MDX_RAW);
   });
 
+  it('rewrites the file byte-identically when the client echoes the document back over the wire', () => {
+    const document = overTheWire(adapter.parse(MDX_RAW, 'body'));
+    expect(adapter.serialize(document, MDX_RAW, 'body')).toBe(MDX_RAW);
+  });
+
+  it('keeps an untouched timestamp a timestamp when another field changes', () => {
+    const document = overTheWire(adapter.parse(MDX_RAW, 'body'));
+    const saved = adapter.serialize(
+      { ...document, title: 'Renamed' },
+      MDX_RAW,
+      'body'
+    );
+    expect(saved).toContain('date: 2024-01-01T00:00:00.000Z');
+    expect(saved).not.toContain("date: '");
+    expect(adapter.parse(saved).date).toEqual(
+      new Date('2024-01-01T00:00:00.000Z')
+    );
+  });
+
+  it('writes an edited date as the save sends it', () => {
+    const saved = adapter.serialize(
+      { title: 'Hello World', date: '2025-06-15' },
+      MDX_RAW
+    );
+    expect(adapter.parse(saved).date).toBe('2025-06-15');
+  });
+
   it('leaves the body alone when the save omits the body field', () => {
     const saved = adapter.serialize({ title: 'Renamed' }, MDX_RAW, 'body');
     expect(saved).toContain('Body prose the schema does not know about.');
   });
 
-  // "Does the save edit the body?" is a question about the save. A test on the save
-  // merged over the frontmatter of the file answers yes whenever the file holds an old
-  // key of that name, and that key then replaces the real body.
   it('ignores a stale frontmatter key sharing the body field name', () => {
     const withStaleKey = `---\ntitle: Hello\nbody: stale frontmatter value\n---\n\nThe real body.\n`;
     const saved = adapter.serialize({ title: 'Renamed' }, withStaleKey, 'body');
-    // The body is the body of the file, and not the old key in its place.
     expect(adapter.parse(saved, 'body').body).toBe('The real body.\n');
   });
 
-  // The read hides this key, so it never reaches the editor. It stays in the file,
-  // where git, other tools, and v3 all see it. A removal at any save repairs the file,
-  // and does not wait for an edit to that body.
   it('drops a stale body key even when the save never mentions the body', () => {
     const withStaleKey = `---\ntitle: Hello\nbody: stale frontmatter value\n---\n\nThe real body.\n`;
     const saved = adapter.serialize({ title: 'Renamed' }, withStaleKey, 'body');
@@ -96,8 +122,6 @@ describe('markdown adapter', () => {
     expect(saved).toBe('---\ntitle: Renamed\n---\n\nThe real body.\n');
   });
 
-  // A coercion here, instead of a rejection, would write "[object Object]" as the
-  // whole file. The body arrives from the wire, so its shape is not certain.
   it('rejects a non-string body rather than coercing it', () => {
     for (const body of [{ type: 'root', children: [] }, 42, null]) {
       expect(() =>
@@ -146,7 +170,19 @@ describe('multi-format collections', () => {
     expect(adapterForPath(adapters, 'content/posts/c.txt')).toBeUndefined();
   });
 
-  // '.mdx'.endsWith('.md') is false, so the two never shadow each other.
+  it('picks the adapter whatever the case of the extension', () => {
+    const adapters = formatAdaptersFor(['mdx', 'json']);
+    expect(adapterForPath(adapters, 'content/posts/Hello.MDX')?.extension).toBe(
+      '.mdx'
+    );
+    expect(adapterForPath(adapters, 'content/posts/A.Json')?.extension).toBe(
+      '.json'
+    );
+    expect(
+      adapterForPath(formatAdaptersFor(['md', 'mdx']), 'a.MD')?.extension
+    ).toBe('.md');
+  });
+
   it('keeps md and mdx distinct', () => {
     const adapters = formatAdaptersFor(['md', 'mdx']);
     expect(adapterForPath(adapters, 'a.md')?.extension).toBe('.md');
