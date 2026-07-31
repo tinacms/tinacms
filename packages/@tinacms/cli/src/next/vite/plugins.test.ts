@@ -19,6 +19,10 @@ const mockHandleDelete = jest.fn(async (_req: any, res: any) => {
   res.end(JSON.stringify({ ok: true }));
 });
 const mockHandleList = jest.fn();
+const mockHandleRename = jest.fn(async (_req: any, res: any) => {
+  res.statusCode = 200;
+  res.end(JSON.stringify({ success: true }));
+});
 const mockSearchPut = jest.fn(async (_req: any, res: any) => {
   res.statusCode = 200;
   res.end('{}');
@@ -29,6 +33,7 @@ jest.mock('../commands/dev-command/server/media', () => ({
     handlePost: mockHandlePost,
     handleDelete: mockHandleDelete,
     handleList: mockHandleList,
+    handleRename: mockHandleRename,
   }),
   parseMediaFolder: (s: string) => s,
 }));
@@ -143,6 +148,21 @@ describe('devServerEndPointsPlugin cross-origin gate', () => {
       expect(mockHandleDelete).not.toHaveBeenCalled();
     });
 
+    it('rejects cross-origin POST /media/rename before reaching the handler', async () => {
+      const mw = getRequestMiddleware();
+      const { res, next } = await invoke(mw, {
+        url: '/media/rename',
+        method: 'POST',
+        headers: { origin: 'http://evil.test:8000' },
+        body: { from: 'a.txt', to: 'b.txt' },
+      });
+
+      expect(res.statusCode).toBe(403);
+      expect(res.body).toContain('Origin not allowed');
+      expect(mockHandleRename).not.toHaveBeenCalled();
+      expect(next).not.toHaveBeenCalled();
+    });
+
     it('rejects cross-origin POST /searchIndex before reaching the handler', async () => {
       const mw = getRequestMiddleware();
       const { res } = await invoke(mw, {
@@ -180,6 +200,21 @@ describe('devServerEndPointsPlugin cross-origin gate', () => {
 
       expect(res.statusCode).not.toBe(403);
       expect(mockHandlePost).toHaveBeenCalledTimes(1);
+    });
+
+    it('routes a localhost POST /media/rename to the rename handler', async () => {
+      const mw = getRequestMiddleware();
+      const { res } = await invoke(mw, {
+        url: '/media/rename',
+        method: 'POST',
+        headers: { origin: 'http://localhost:3000' },
+        body: { from: 'a.txt', to: 'b.txt' },
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(mockHandleRename).toHaveBeenCalled();
+      expect(mockHandlePost).not.toHaveBeenCalled();
+      expect(mockHandleDelete).not.toHaveBeenCalled();
     });
 
     it('allows a localhost Origin', async () => {

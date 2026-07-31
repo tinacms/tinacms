@@ -72,6 +72,7 @@ export const devServerEndPointsPlugin = ({
   const isStateChangingRequest = (req: { url?: string; method?: string }) => {
     const url = req.url || '';
     if (url.startsWith('/media/upload')) return true;
+    if (url.startsWith('/media/rename')) return true;
     if (url.startsWith('/media') && req.method === 'DELETE') return true;
     if (url.startsWith('/graphql') && req.method === 'POST') return true;
     if (
@@ -117,6 +118,10 @@ export const devServerEndPointsPlugin = ({
 
         if (req.url.startsWith('/media/upload')) {
           await mediaRouter.handlePost(req, res);
+          return;
+        }
+        if (req.url.startsWith('/media/rename')) {
+          await mediaRouter.handleRename(req, res);
           return;
         }
         if (req.url.startsWith('/media')) {

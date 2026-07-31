@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import type { ServerResponse } from 'http';
 import path, { join } from 'path';
 import busboy from 'busboy';
@@ -59,6 +60,48 @@ export const createMediaRouter = (config: PathConfig) => {
     }
   };
 
+  const handleRename = async (req: Connect.IncomingMessage, res) => {
+    // Body is populated by the bodyParser.json middleware registered ahead of
+    // this router, the same way the /graphql route consumes it.
+    const body = (req as unknown as { body?: unknown }).body;
+    const { from, to, ...rest } =
+      (body as { from?: unknown; to?: unknown }) || {};
+    void rest; // `branch` is accepted for parity with the cloud contract
+
+    if (typeof from !== 'string' || typeof to !== 'string' || !from || !to) {
+      res.statusCode = 400;
+      res.end(
+        JSON.stringify({
+          code: 'INVALID_FILENAME',
+          message: 'Both "from" and "to" are required.',
+        })
+      );
+      return;
+    }
+
+    try {
+      const result = await mediaModel.renameMedia({ from, to });
+      // `in` rather than `result.ok`: this repo compiles with `strict: false`,
+      // where boolean-literal discriminants do not narrow.
+      if ('code' in result) {
+        res.statusCode = RENAME_ERROR_STATUS[result.code];
+        res.end(JSON.stringify({ code: result.code, message: result.message }));
+        return;
+      }
+      res.statusCode = 200;
+      res.end(JSON.stringify({ success: true, from, to }));
+    } catch (error) {
+      if (error instanceof PathTraversalError) {
+        res.statusCode = 403;
+        res.end(
+          JSON.stringify({ code: 'INVALID_PATH', message: error.message })
+        );
+        return;
+      }
+      throw error;
+    }
+  };
+
   const handlePost = async function (
     req: Connect.IncomingMessage,
     res: ServerResponse
@@ -107,7 +150,7 @@ export const createMediaRouter = (config: PathConfig) => {
     req.pipe(bb);
   };
 
-  return { handleList, handleDelete, handlePost };
+  return { handleList, handleDelete, handlePost, handleRename };
 };
 
 export const parseMediaFolder = (str: string) => {
@@ -153,6 +196,28 @@ export interface PathConfig {
 }
 
 type SuccessRecord = { ok: true } | { ok: false; message: string };
+
+export type RenameFailureCode =
+  | 'NOT_FOUND'
+  | 'NAME_COLLISION'
+  | 'UNSUPPORTED'
+  | 'BACKEND_FAILURE';
+
+type RenameRecord =
+  | { ok: true }
+  | { ok: false; code: RenameFailureCode; message: string };
+
+const RENAME_ERROR_STATUS: Record<RenameFailureCode, number> = {
+  NOT_FOUND: 404,
+  NAME_COLLISION: 409,
+  UNSUPPORTED: 400,
+  BACKEND_FAILURE: 500,
+};
+
+/** fs-extra's move rejects an existing destination with a bare message. */
+const isDestinationExistsError = (error: unknown) =>
+  (error as { code?: string })?.code === 'EEXIST' ||
+  /dest already exists/i.test((error as Error)?.message || '');
 
 /**
  * Detects URL-encoded path-traversal sequences that should have been
@@ -495,6 +560,91 @@ export class MediaModel {
       cursor:
         files.length > offset + pageSize ? String(offset + pageSize) : null,
     };
+  }
+
+  /**
+   * @security Both paths go through `resolveStrictlyWithinBase`, which rejects
+   * traversal, symlink escapes and the media root itself.
+   */
+  async renameMedia(args: { from: string; to: string }): Promise<RenameRecord> {
+    const mediaBase = join(this.rootPath, this.publicFolder, this.mediaRoot);
+    const source = resolveStrictlyWithinBase(args.from, mediaBase);
+    const destination = resolveStrictlyWithinBase(args.to, mediaBase);
+
+    try {
+      const stats = await fs.stat(source);
+      if (stats.isDirectory()) {
+        return {
+          ok: false,
+          code: 'UNSUPPORTED',
+          message: 'Renaming folders is not supported.',
+        };
+      }
+    } catch {
+      return {
+        ok: false,
+        code: 'NOT_FOUND',
+        message: `"${args.from}" does not exist.`,
+      };
+    }
+
+    // On case-insensitive filesystems the destination of a case-only rename
+    // reports as existing because it *is* the source.
+    const isCaseOnlyRename =
+      source !== destination &&
+      source.toLowerCase() === destination.toLowerCase();
+
+    if (!isCaseOnlyRename && (await fs.pathExists(destination))) {
+      return {
+        ok: false,
+        code: 'NAME_COLLISION',
+        message: `"${args.to}" already exists.`,
+      };
+    }
+
+    try {
+      await fs.ensureDir(path.dirname(destination));
+      if (isCaseOnlyRename) {
+        await this.renameViaStaging(source, destination);
+      } else {
+        await fs.move(source, destination, { overwrite: false });
+      }
+      return { ok: true };
+    } catch (error) {
+      // pathExists above is advisory only; the move stays overwrite-free so a
+      // racing writer still surfaces as a collision rather than data loss.
+      if (isDestinationExistsError(error)) {
+        return {
+          ok: false,
+          code: 'NAME_COLLISION',
+          message: `"${args.to}" already exists.`,
+        };
+      }
+      console.error(error);
+      return {
+        ok: false,
+        code: 'BACKEND_FAILURE',
+        message: 'Failed to rename the file.',
+      };
+    }
+  }
+
+  /**
+   * A case-insensitive filesystem can treat `a.jpg` -> `A.jpg` as a no-op, so
+   * hop through a unique sibling name. On failure the source is put back.
+   */
+  private async renameViaStaging(source: string, destination: string) {
+    const staging = join(
+      path.dirname(source),
+      `.tina-rename-${randomUUID()}`
+    );
+    await fs.move(source, staging, { overwrite: false });
+    try {
+      await fs.move(staging, destination, { overwrite: false });
+    } catch (error) {
+      await fs.move(staging, source, { overwrite: false }).catch(() => {});
+      throw error;
+    }
   }
 
   async deleteMedia(args: MediaArgs): Promise<SuccessRecord> {

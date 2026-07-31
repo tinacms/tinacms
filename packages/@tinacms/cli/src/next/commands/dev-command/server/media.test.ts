@@ -340,6 +340,212 @@ describe('MediaModel (Vite dev server)', () => {
       ).rejects.toThrow(PathTraversalError);
     });
   });
+
+  describe('renameMedia', () => {
+    let mediaDir: string;
+
+    beforeEach(() => {
+      mediaDir = path.join(tmpDir, 'public', 'uploads');
+    });
+
+    it('renames a file within the media root', async () => {
+      await fs.writeFile(path.join(mediaDir, 'old.txt'), 'content');
+      const model = new MediaModel(config);
+
+      const result = await model.renameMedia({
+        from: 'old.txt',
+        to: 'new.txt',
+      });
+
+      expect(result).toEqual({ ok: true });
+      expect(await fs.pathExists(path.join(mediaDir, 'old.txt'))).toBe(false);
+      expect(await fs.readFile(path.join(mediaDir, 'new.txt'), 'utf8')).toBe(
+        'content'
+      );
+    });
+
+    it('renames a file inside a subdirectory', async () => {
+      await fs.mkdirp(path.join(mediaDir, 'products'));
+      await fs.writeFile(path.join(mediaDir, 'products', 'old.txt'), 'x');
+      const model = new MediaModel(config);
+
+      const result = await model.renameMedia({
+        from: 'products/old.txt',
+        to: 'products/new.txt',
+      });
+
+      expect(result).toEqual({ ok: true });
+      expect(
+        await fs.pathExists(path.join(mediaDir, 'products', 'new.txt'))
+      ).toBe(true);
+    });
+
+    it('returns NOT_FOUND when the source is missing', async () => {
+      const model = new MediaModel(config);
+      const result = await model.renameMedia({
+        from: 'ghost.txt',
+        to: 'new.txt',
+      });
+      expect(result).toMatchObject({ ok: false, code: 'NOT_FOUND' });
+    });
+
+    it('returns NAME_COLLISION when the destination exists', async () => {
+      await fs.writeFile(path.join(mediaDir, 'old.txt'), 'a');
+      await fs.writeFile(path.join(mediaDir, 'taken.txt'), 'b');
+      const model = new MediaModel(config);
+
+      const result = await model.renameMedia({
+        from: 'old.txt',
+        to: 'taken.txt',
+      });
+
+      expect(result).toMatchObject({ ok: false, code: 'NAME_COLLISION' });
+      // the source must survive a rejected rename
+      expect(await fs.readFile(path.join(mediaDir, 'old.txt'), 'utf8')).toBe(
+        'a'
+      );
+      expect(await fs.readFile(path.join(mediaDir, 'taken.txt'), 'utf8')).toBe(
+        'b'
+      );
+    });
+
+    it('returns UNSUPPORTED when the source is a directory', async () => {
+      await fs.mkdirp(path.join(mediaDir, 'a-folder'));
+      const model = new MediaModel(config);
+
+      const result = await model.renameMedia({
+        from: 'a-folder',
+        to: 'renamed-folder',
+      });
+
+      expect(result).toMatchObject({ ok: false, code: 'UNSUPPORTED' });
+      expect(await fs.pathExists(path.join(mediaDir, 'a-folder'))).toBe(true);
+    });
+
+    it('performs a case-only rename and leaves no staging file behind', async () => {
+      await fs.writeFile(path.join(mediaDir, 'photo.jpg'), 'bytes');
+      const model = new MediaModel(config);
+
+      const result = await model.renameMedia({
+        from: 'photo.jpg',
+        to: 'Photo.jpg',
+      });
+
+      expect(result).toEqual({ ok: true });
+      const entries = await fs.readdir(mediaDir);
+      expect(entries).toEqual(['Photo.jpg']);
+      expect(await fs.readFile(path.join(mediaDir, 'Photo.jpg'), 'utf8')).toBe(
+        'bytes'
+      );
+    });
+
+    it('restores the source when the second staged move fails', async () => {
+      await fs.writeFile(path.join(mediaDir, 'photo.jpg'), 'bytes');
+      const model = new MediaModel(config);
+      const realMove = fs.move;
+      const move = jest.spyOn(fs, 'move');
+      // staging move succeeds, the move onto the new casing fails, and the
+      // restore falls through to the real implementation
+      move
+        .mockImplementationOnce(realMove)
+        .mockImplementationOnce(async () => {
+          throw new Error('boom');
+        });
+
+      const result = await model.renameMedia({
+        from: 'photo.jpg',
+        to: 'Photo.jpg',
+      });
+
+      expect(result).toMatchObject({ ok: false, code: 'BACKEND_FAILURE' });
+      const entries = await fs.readdir(mediaDir);
+      expect(entries).toEqual(['photo.jpg']);
+      move.mockRestore();
+    });
+
+    it('maps a racing destination write to NAME_COLLISION', async () => {
+      await fs.writeFile(path.join(mediaDir, 'old.txt'), 'a');
+      const model = new MediaModel(config);
+      const move = jest.spyOn(fs, 'move').mockImplementationOnce(async () => {
+        // what fs-extra raises when overwrite is false and dest appeared
+        throw new Error('dest already exists.');
+      });
+
+      const result = await model.renameMedia({
+        from: 'old.txt',
+        to: 'new.txt',
+      });
+
+      expect(result).toMatchObject({ ok: false, code: 'NAME_COLLISION' });
+      move.mockRestore();
+    });
+
+    it('throws PathTraversalError for traversal in "from"', async () => {
+      const model = new MediaModel(config);
+      await expect(
+        model.renameMedia({ from: '../../etc/passwd', to: 'safe.txt' })
+      ).rejects.toThrow(PathTraversalError);
+    });
+
+    it('throws PathTraversalError for traversal in "to"', async () => {
+      await fs.writeFile(path.join(mediaDir, 'old.txt'), 'a');
+      const model = new MediaModel(config);
+      await expect(
+        model.renameMedia({ from: 'old.txt', to: '../../escaped.txt' })
+      ).rejects.toThrow(PathTraversalError);
+    });
+
+    it('throws PathTraversalError for still-encoded traversal', async () => {
+      const model = new MediaModel(config);
+      await expect(
+        model.renameMedia({ from: '..%2f..%2fpasswd', to: 'safe.txt' })
+      ).rejects.toThrow(PathTraversalError);
+    });
+
+    it('rejects the media root itself as a destination', async () => {
+      await fs.writeFile(path.join(mediaDir, 'old.txt'), 'a');
+      const model = new MediaModel(config);
+      await expect(
+        model.renameMedia({ from: 'old.txt', to: '' })
+      ).rejects.toThrow(PathTraversalError);
+    });
+  });
+
+  describe('renameMedia symlink traversal', () => {
+    let outsideDir: string;
+
+    beforeEach(async () => {
+      outsideDir = path.join(
+        process.env.TMPDIR || '/tmp',
+        `tina-outside-rename-${Date.now()}`
+      );
+      await fs.mkdirp(outsideDir);
+      await fs.writeFile(path.join(outsideDir, 'secret.txt'), 'sensitive');
+      await fs.symlink(
+        outsideDir,
+        path.join(tmpDir, 'public', 'uploads', 'escape')
+      );
+    });
+
+    afterEach(async () => {
+      await fs.remove(outsideDir);
+    });
+
+    it('rejects a source that escapes via symlink', async () => {
+      const model = new MediaModel(config);
+      await expect(
+        model.renameMedia({ from: 'escape/secret.txt', to: 'stolen.txt' })
+      ).rejects.toThrow(PathTraversalError);
+    });
+
+    it('rejects a destination that escapes via symlink', async () => {
+      await fs.writeFile(path.join(tmpDir, 'public', 'uploads', 'a.txt'), 'a');
+      const model = new MediaModel(config);
+      await expect(
+        model.renameMedia({ from: 'a.txt', to: 'escape/planted.txt' })
+      ).rejects.toThrow(PathTraversalError);
+    });
+  });
 });
 
 describe('createMediaRouter', () => {
@@ -364,11 +570,137 @@ describe('createMediaRouter', () => {
     await fs.remove(tmpDir);
   });
 
-  it('returns handleList, handleDelete, handlePost functions', () => {
+  it('returns handleList, handleDelete, handlePost, handleRename functions', () => {
     const router = createMediaRouter(config);
     expect(typeof router.handleList).toBe('function');
     expect(typeof router.handleDelete).toBe('function');
     expect(typeof router.handlePost).toBe('function');
+    expect(typeof router.handleRename).toBe('function');
+  });
+
+  describe('handleRename', () => {
+    const callRename = async (router: any, body: unknown) => {
+      let statusCode = 0;
+      let responseBody = '';
+      const res = {
+        set statusCode(code: number) {
+          statusCode = code;
+        },
+        end(data: string) {
+          responseBody = data;
+        },
+      };
+      await router.handleRename({ url: '/media/rename', body } as any, res);
+      return { statusCode, body: JSON.parse(responseBody || '{}') };
+    };
+
+    it('returns 200 and moves the file', async () => {
+      const mediaDir = path.join(tmpDir, 'public', 'uploads');
+      await fs.writeFile(path.join(mediaDir, 'old.txt'), 'data');
+      const router = createMediaRouter(config);
+
+      const res = await callRename(router, {
+        from: 'old.txt',
+        to: 'new.txt',
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body).toEqual({
+        success: true,
+        from: 'old.txt',
+        to: 'new.txt',
+      });
+      expect(await fs.pathExists(path.join(mediaDir, 'new.txt'))).toBe(true);
+    });
+
+    it('ignores an extra branch field for parity with the cloud contract', async () => {
+      const mediaDir = path.join(tmpDir, 'public', 'uploads');
+      await fs.writeFile(path.join(mediaDir, 'old.txt'), 'data');
+      const router = createMediaRouter(config);
+
+      const res = await callRename(router, {
+        from: 'old.txt',
+        to: 'new.txt',
+        branch: 'main',
+      });
+
+      expect(res.statusCode).toBe(200);
+    });
+
+    it('returns 400 INVALID_FILENAME when from/to are missing', async () => {
+      const router = createMediaRouter(config);
+      const res = await callRename(router, { from: 'old.txt' });
+      expect(res.statusCode).toBe(400);
+      expect(res.body.code).toBe('INVALID_FILENAME');
+    });
+
+    it('returns 400 INVALID_FILENAME when the body is absent', async () => {
+      const router = createMediaRouter(config);
+      const res = await callRename(router, undefined);
+      expect(res.statusCode).toBe(400);
+      expect(res.body.code).toBe('INVALID_FILENAME');
+    });
+
+    it('returns 404 NOT_FOUND for a missing source', async () => {
+      const router = createMediaRouter(config);
+      const res = await callRename(router, {
+        from: 'ghost.txt',
+        to: 'new.txt',
+      });
+      expect(res.statusCode).toBe(404);
+      expect(res.body.code).toBe('NOT_FOUND');
+    });
+
+    it('returns 409 NAME_COLLISION when the destination is taken', async () => {
+      const mediaDir = path.join(tmpDir, 'public', 'uploads');
+      await fs.writeFile(path.join(mediaDir, 'old.txt'), 'a');
+      await fs.writeFile(path.join(mediaDir, 'taken.txt'), 'b');
+      const router = createMediaRouter(config);
+
+      const res = await callRename(router, {
+        from: 'old.txt',
+        to: 'taken.txt',
+      });
+
+      expect(res.statusCode).toBe(409);
+      expect(res.body.code).toBe('NAME_COLLISION');
+      expect(res.body.message).toContain('taken.txt');
+    });
+
+    it('returns 400 UNSUPPORTED when the source is a folder', async () => {
+      await fs.mkdirp(path.join(tmpDir, 'public', 'uploads', 'a-folder'));
+      const router = createMediaRouter(config);
+
+      const res = await callRename(router, {
+        from: 'a-folder',
+        to: 'b-folder',
+      });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.code).toBe('UNSUPPORTED');
+    });
+
+    it('returns 403 INVALID_PATH for traversal', async () => {
+      const router = createMediaRouter(config);
+      const res = await callRename(router, {
+        from: '../../etc/passwd',
+        to: 'safe.txt',
+      });
+      expect(res.statusCode).toBe(403);
+      expect(res.body.code).toBe('INVALID_PATH');
+      expect(res.body.message).toContain('Path traversal detected');
+    });
+
+    it('returns 403 INVALID_PATH when the destination escapes the media root', async () => {
+      await fs.writeFile(path.join(tmpDir, 'public', 'uploads', 'a.txt'), 'a');
+      const router = createMediaRouter(config);
+      const res = await callRename(router, {
+        from: 'a.txt',
+        to: '../../evil.txt',
+      });
+      expect(res.statusCode).toBe(403);
+      expect(res.body.code).toBe('INVALID_PATH');
+    });
   });
 
   describe('handleList', () => {
