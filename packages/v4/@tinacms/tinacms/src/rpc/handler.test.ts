@@ -364,6 +364,41 @@ describe('createRpcHandler', () => {
     consoleError.mockRestore();
   });
 
+  it('a stale compose failure does not clear a newer runtime', async () => {
+    let attempts = 0;
+    let rejectFirst: (cause: Error) => void = () => {};
+    const flaky = definePlugin({
+      name: 'flaky',
+      server: async () => {
+        attempts += 1;
+        if (attempts === 1) {
+          return new Promise<never>((_, reject) => {
+            rejectFirst = reject;
+          });
+        }
+        return {
+          default: defineServerPlugin({ ping: publicOp(async () => 'pong') }),
+        };
+      },
+    });
+    const flakyHandler = createRpcHandler({ plugins: [flaky] });
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+    const first = flakyHandler(post('/flaky/ping'));
+    const destroyed = flakyHandler.destroy();
+    const second = flakyHandler(post('/flaky/ping'));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    rejectFirst(new Error('deferred import failure'));
+    expect((await first).status).toBe(500);
+    await destroyed;
+    expect((await second).status).toBe(200);
+    const third = await flakyHandler(post('/flaky/ping'));
+    expect(third.status).toBe(200);
+    expect(attempts).toBe(2);
+    consoleError.mockRestore();
+  });
+
   it('500s a throwing op without leaking its error', async () => {
     const consoleError = vi
       .spyOn(console, 'error')

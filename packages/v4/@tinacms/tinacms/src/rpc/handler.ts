@@ -62,10 +62,11 @@ export const createRpcHandler = ({
       () => undefined,
       () => undefined
     );
-    return composing.catch((cause) => {
-      runtimePromise = null;
+    const composed: Promise<ServerRuntime> = composing.catch((cause) => {
+      if (runtimePromise === composed) runtimePromise = null;
       throw cause;
     });
+    return composed;
   };
 
   const handler = async (request: Request): Promise<Response> => {
