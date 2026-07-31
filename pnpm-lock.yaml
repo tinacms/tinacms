@@ -2787,6 +2787,9 @@ importers:
       react-hook-form:
         specifier: ^7.80.0
         version: 7.80.0(react@19.2.7)
+      react-router-dom:
+        specifier: 'catalog:'
+        version: 6.30.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       sqlite-level:
         specifier: 'catalog:'
         version: 2.1.0

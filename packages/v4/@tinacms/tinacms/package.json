@@ -81,6 +81,7 @@
     "@tinacms/mdx": "workspace:*",
     "@tinacms/rich-text": "workspace:*",
     "@tinacms/ui": "workspace:*",
+    "react-router-dom": "catalog:",
     "abstract-level": "catalog:",
     "gray-matter": "catalog:",
     "react-hook-form": "^7.80.0",
