@@ -20,6 +20,7 @@ import {
   List,
   RefreshCw,
   Search,
+  TextCursorInput,
   X,
 } from 'lucide-react';
 import React, { useEffect, useState, forwardRef, useRef } from 'react';
@@ -39,7 +40,7 @@ import {
   ListMediaItem,
   checkerboardStyle,
 } from './media-item';
-import { DeleteModal, NewFolderModal } from './modal';
+import { DeleteModal, NewFolderModal, RenameModal } from './modal';
 import {
   DEFAULT_MEDIA_UPLOAD_TYPES,
   absoluteImgURL,
@@ -71,6 +72,16 @@ const join = function (...parts) {
   });
 
   return parts.join(slash);
+};
+
+/**
+ * Media-root-relative `directory/filename`, the path shape the store's rename
+ * and delete calls expect — no origin, public folder or media root prefix.
+ */
+const mediaItemPath = (item: Media, filename: string) => {
+  const directory = item.directory === '.' ? '' : item.directory || '';
+  const trimmed = directory.replace(/^\/+|\/+$/g, '');
+  return trimmed ? `${trimmed}/${filename}` : filename;
 };
 
 export interface MediaRequest {
@@ -138,6 +149,7 @@ export function MediaPicker({
   });
 
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
+  const [renameModalOpen, setRenameModalOpen] = React.useState(false);
   const [newFolderModalOpen, setNewFolderModalOpen] = React.useState(false);
   const [listError, setListError] = useState<MediaListError>(defaultListError);
   const [directory, setDirectory] = useState<string | undefined>(
@@ -257,8 +269,17 @@ export function MediaPicker({
     if (loadFolders) setLoadFolders(false);
 
     return cms.events.subscribe(
-      ['media:delete:success', 'media:pageSize'],
-      () => {
+      ['media:delete:success', 'media:rename:success', 'media:pageSize'],
+      (event) => {
+        if (event.type === 'media:rename:success') {
+          // Every mounted picker sees this, so only the ones actually
+          // previewing the renamed file swap their selection.
+          setActiveItem((current) =>
+            current && mediaItemPath(current, current.filename) === event.from
+              ? event.media
+              : current
+          );
+        }
         setRefreshing(true);
         resetOffset();
         resetList();
@@ -289,6 +310,21 @@ export function MediaPicker({
       captureEvent(MediaManagerContentDeletedEvent, { fileType: ext });
     };
   }
+
+  // Only stores that implement rename can offer the action; a store without it
+  // would fail on click. Static stores are read-only, and folders never become
+  // the active item, so neither needs a separate check here.
+  const canRename =
+    allowDelete &&
+    !cms.media.store.isStatic &&
+    typeof cms.media.store.rename === 'function';
+
+  const renameMediaItem = async (item: Media, newFilename: string) => {
+    await cms.media.rename(
+      mediaItemPath(item, item.filename),
+      mediaItemPath(item, newFilename)
+    );
+  };
 
   let selectMediaItem: (_item: Media) => void;
 
@@ -499,6 +535,15 @@ export function MediaPicker({
           close={() => setDeleteModalOpen(false)}
         />
       )}
+      {renameModalOpen && activeItem && (
+        <RenameModal
+          filename={activeItem.filename}
+          renameFunc={async (newFilename) => {
+            await renameMediaItem(activeItem, newFilename);
+          }}
+          close={() => setRenameModalOpen(false)}
+        />
+      )}
       {newFolderModalOpen && (
         <NewFolderModal
           onSubmit={(name) => {
@@ -644,6 +689,10 @@ export function MediaPicker({
               deleteMediaItem={() => {
                 setDeleteModalOpen(true);
               }}
+              allowRename={canRename}
+              renameMediaItem={() => {
+                setRenameModalOpen(true);
+              }}
             />
           </div>
         </SyncStatusContainer>
@@ -658,6 +707,8 @@ const ActiveItemPreview = ({
   selectMediaItem,
   deleteMediaItem,
   allowDelete,
+  renameMediaItem,
+  allowRename,
 }) => {
   const thumbnail = activeItem
     ? (activeItem.thumbnails || {})['1000x1000']
@@ -713,6 +764,12 @@ const ActiveItemPreview = ({
                 >
                   <ArrowDownToLine className='mr-1 -ml-0.5 w-6 h-auto opacity-70' />
                   Insert
+                </Button>
+              )}
+              {allowRename && (
+                <Button size='medium' onClick={renameMediaItem}>
+                  <TextCursorInput className='mr-1 -ml-0.5 w-6 h-auto opacity-70' />
+                  Rename
                 </Button>
               )}
               {allowDelete && (

@@ -57,6 +57,21 @@ const MAX_BASENAME_LENGTH = 200;
  * Example: `image-a\u0308.jpg` becomes `image-ä.jpg`,
  * so URLs use `%C3%A4` instead of the decomposed `%CC%88` sequence.
  */
+/**
+ * Splits a filename into its base and extension using the same final-dot rule
+ * as {@link sanitizeFilename}, so both agree on what the extension is.
+ */
+export const splitFilename = (
+  filename: string
+): { base: string; ext: string } => {
+  const lastDot = filename.lastIndexOf('.');
+  const hasExt = lastDot > 0 && lastDot < filename.length - 1;
+  return {
+    base: hasExt ? filename.slice(0, lastDot) : filename,
+    ext: hasExt ? filename.slice(lastDot) : '',
+  };
+};
+
 export const sanitizeFilename = (filename: string): string => {
   if (!filename) return 'file';
 
