@@ -634,10 +634,7 @@ export class MediaModel {
    * hop through a unique sibling name. On failure the source is put back.
    */
   private async renameViaStaging(source: string, destination: string) {
-    const staging = join(
-      path.dirname(source),
-      `.tina-rename-${randomUUID()}`
-    );
+    const staging = join(path.dirname(source), `.tina-rename-${randomUUID()}`);
     await fs.move(source, staging, { overwrite: false });
     try {
       await fs.move(staging, destination, { overwrite: false });

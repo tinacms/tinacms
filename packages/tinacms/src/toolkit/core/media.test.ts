@@ -40,10 +40,7 @@ describe('MediaManager.rename', () => {
     const rename = vi.fn().mockResolvedValue(renamed);
     const { manager } = buildManager(buildStore({ rename }));
 
-    const result = await manager.rename(
-      'products/old.jpg',
-      'products/new.jpg'
-    );
+    const result = await manager.rename('products/old.jpg', 'products/new.jpg');
 
     expect(rename).toHaveBeenCalledWith('products/old.jpg', 'products/new.jpg');
     expect(result).toBe(renamed);

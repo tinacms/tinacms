@@ -800,7 +800,8 @@ export class TinaMediaStore implements MediaStore {
     // No structured body: a CLI predating the /media/rename route lets the
     // request fall through to the dev server's own handling.
     return new MediaRenameError({
-      code: status === 404 || status === 200 ? 'UNSUPPORTED' : 'BACKEND_FAILURE',
+      code:
+        status === 404 || status === 200 ? 'UNSUPPORTED' : 'BACKEND_FAILURE',
       message:
         status === 404 || status === 200
           ? 'This version of the TinaCMS CLI does not support renaming media. Update @tinacms/cli to rename files.'

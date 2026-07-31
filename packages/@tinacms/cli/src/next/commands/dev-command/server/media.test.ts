@@ -446,11 +446,9 @@ describe('MediaModel (Vite dev server)', () => {
       const move = jest.spyOn(fs, 'move');
       // staging move succeeds, the move onto the new casing fails, and the
       // restore falls through to the real implementation
-      move
-        .mockImplementationOnce(realMove)
-        .mockImplementationOnce(async () => {
-          throw new Error('boom');
-        });
+      move.mockImplementationOnce(realMove).mockImplementationOnce(async () => {
+        throw new Error('boom');
+      });
 
       const result = await model.renameMedia({
         from: 'photo.jpg',
