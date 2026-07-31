@@ -6,7 +6,7 @@
 // Refer to ContentSlice.
 
 import type {
-  ContentSlice,
+  ContentProvider,
   DocumentEntry,
 } from '../../../core/content/contract';
 import type { ClientSlice } from '../../../core/plugin';
@@ -30,7 +30,7 @@ const postContentRequest = async <Result>(
 };
 
 export const createContentSlice = (url: string): ClientSlice => {
-  const slice: ContentSlice = {
+  const slice: ContentProvider = {
     list: (collection) =>
       postContentRequest<DocumentEntry[]>(url, { op: 'list', collection }),
     get: (collection, path) =>
