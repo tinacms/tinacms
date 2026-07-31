@@ -86,19 +86,28 @@ const unwrapRpcResponse = async (
   namespace: string,
   opName: string
 ): Promise<unknown> => {
-  const isJson = response.headers
+  const mimeEssence = response.headers
     .get('content-type')
-    ?.toLowerCase()
-    .includes('application/json');
-  if (response.ok && !isJson) {
-    throw new RpcError(
-      response.status,
-      'rpc-not-json',
-      `RPC ${namespace}/${opName} returned ${response.status} but not JSON.`
-    );
+    ?.replace(/;.*/, '')
+    .trim()
+    .toLowerCase();
+  if (response.ok) {
+    if (mimeEssence !== 'application/json') {
+      throw new RpcError(
+        response.status,
+        'rpc-not-json',
+        `RPC ${namespace}/${opName} returned ${response.status} but not JSON.`
+      );
+    }
+    return response.json().catch(() => {
+      throw new RpcError(
+        response.status,
+        'rpc-not-json',
+        `RPC ${namespace}/${opName} returned ${response.status} with a body that is not JSON.`
+      );
+    });
   }
   const payload = await response.json().catch(() => null);
-  if (response.ok) return payload;
   const error = (payload as { error?: { code?: string; message?: string } })
     ?.error;
   throw new RpcError(

@@ -37,6 +37,20 @@ describe('createRpcClient', () => {
     });
   });
 
+  it('throws rpc-not-json for an ok response whose body is not JSON', async () => {
+    const broken = createRpcClient<{ search: typeof searchOps }>({
+      url: 'http://tina.local/api/tina',
+      fetch: async () =>
+        new Response('<!doctype html>', {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        }),
+    });
+    const rejection = broken.search.query({ q: 'x' });
+    await expect(rejection).rejects.toBeInstanceOf(RpcError);
+    await expect(rejection).rejects.toMatchObject({ code: 'rpc-not-json' });
+  });
+
   it('is not thenable and yields nothing for symbol keys', async () => {
     expect((client as unknown as Record<string, unknown>).then).toBeUndefined();
     expect(
