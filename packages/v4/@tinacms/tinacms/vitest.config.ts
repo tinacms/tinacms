@@ -8,8 +8,9 @@ export default defineConfig({
     globals: true,
     environment: 'happy-dom',
     // Must exceed setup.ts's 5s asyncUtilTimeout, or a failing findBy* dies as
-    // a generic vitest timeout with no testing-library DOM dump.
-    testTimeout: 10_000,
+    // a generic vitest timeout with no testing-library DOM dump. 30s, not 10 —
+    // the Plate suites sit at the 10s edge on 2-core CI runners.
+    testTimeout: 30_000,
     poolOptions: {
       forks: {
         // node ≥23 otherwise injects a broken globalThis.localStorage that shadows happy-dom's
