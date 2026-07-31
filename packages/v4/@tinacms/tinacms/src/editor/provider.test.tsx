@@ -1,5 +1,6 @@
-import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+import { definePlugin } from '../core/plugin';
 import { corePlugins } from '../index';
 import { useFieldRegistry, useTinaStore } from './hooks';
 import { TinaProvider } from './provider';
@@ -32,5 +33,21 @@ describe('TinaProvider boot', () => {
     expect(screen.getByTestId('namespaces')).toHaveTextContent(
       'branch,documents,ui'
     );
+  });
+
+  it('runs plugin onInit before exposing the runtime, onDestroy on unmount', async () => {
+    const onInit = vi.fn();
+    const onDestroy = vi.fn();
+    const lifecycle = definePlugin({ name: 'lifecycle', onInit, onDestroy });
+    const { unmount } = render(
+      <TinaProvider plugins={[...corePlugins, lifecycle]}>
+        <BootProbe />
+      </TinaProvider>
+    );
+    await screen.findByTestId('field-types');
+    expect(onInit).toHaveBeenCalledTimes(1);
+    expect(onDestroy).not.toHaveBeenCalled();
+    unmount();
+    await waitFor(() => expect(onDestroy).toHaveBeenCalledTimes(1));
   });
 });
