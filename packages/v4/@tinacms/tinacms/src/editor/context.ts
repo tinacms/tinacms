@@ -52,6 +52,9 @@ export interface FormScope {
   path: string;
   collection: CollectionSchema;
   onSave: SaveHandler | null;
+  // The identity of the values the form was seeded from. A reseed changes it, so an
+  // editor that owns its own state can mount again on the new values.
+  seedKey: string;
 }
 export const FormScopeContext = createContext<FormScope | null>(null);
 

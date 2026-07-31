@@ -43,6 +43,7 @@ export {
   useActiveField,
   useCollectionDocuments,
   useContentSlice,
+  useDocumentPath,
   useFieldActivation,
   useFieldAddress,
   useFieldErrors,
@@ -51,5 +52,6 @@ export {
   useFieldValue,
   useFormId,
   useFormSave,
+  useFormSeedKey,
   useTinaStore,
 } from './hooks';

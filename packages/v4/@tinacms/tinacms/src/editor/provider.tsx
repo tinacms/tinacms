@@ -262,7 +262,7 @@ export function FormProvider({
   }, [formId, methods]);
 
   const formScope = useMemo(
-    () => ({ formId, path, collection, onSave: onSave ?? null }),
+    () => ({ formId, path, collection, onSave: onSave ?? null, seedKey: formId }),
     [formId, path, collection, onSave]
   );
 

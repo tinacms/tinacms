@@ -62,6 +62,20 @@ export function useFormId(): FormId {
   return useFormScope('form-id-outside-provider', 'useFormId').formId;
 }
 
+// The path of the open document. A field whose behaviour depends on the storage format
+// builds its FieldTransformContext from this, so it resolves the same codec that the
+// ingest and the save resolve.
+export function useDocumentPath(): string {
+  return useFormScope('document-path-outside-provider', 'useDocumentPath').path;
+}
+
+// The identity of the values the form was seeded from. A field whose editor owns its own
+// state keys on this, so that a reseed mounts it again on the new values.
+export function useFormSeedKey(): string {
+  return useFormScope('form-seed-key-outside-provider', 'useFormSeedKey')
+    .seedKey;
+}
+
 export interface ActiveField {
   active: FieldAddress | null;
   setActive: (address: FieldAddress | null) => void;
