@@ -2793,6 +2793,9 @@ importers:
       sqlite-level:
         specifier: 'catalog:'
         version: 2.1.0
+      vite:
+        specifier: ^5.4.0
+        version: 5.4.21(@types/node@25.1.0)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)
       zod:
         specifier: 'catalog:'
         version: 3.25.76
@@ -2845,9 +2848,6 @@ importers:
       typescript:
         specifier: ^5.7.3
         version: 5.9.3
-      vite:
-        specifier: ^5.4.0
-        version: 5.4.21(@types/node@25.1.0)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)
       vitest:
         specifier: ^2.1.9
         version: 2.1.9(@types/node@25.1.0)(happy-dom@15.10.2)(jsdom@15.2.1(bufferutil@4.1.0))(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)
