@@ -2760,9 +2760,6 @@ importers:
 
   packages/v4/@tinacms/tinacms:
     dependencies:
-      '@hookform/resolvers':
-        specifier: ^5.4.0
-        version: 5.5.7(@sinclair/typebox@0.34.41)(ajv@8.17.1)(react-hook-form@7.80.0(react@19.2.7))(typanion@3.13.0)(yup@1.7.1)(zod@3.25.76)
       '@tinacms/graphql':
         specifier: workspace:*
         version: link:../../../@tinacms/graphql
@@ -2772,9 +2769,6 @@ importers:
       '@tinacms/rich-text':
         specifier: workspace:*
         version: link:../rich-text
-      '@tinacms/schema-tools':
-        specifier: workspace:*
-        version: link:../../../@tinacms/schema-tools
       '@tinacms/ui':
         specifier: workspace:*
         version: link:../ui
@@ -2793,9 +2787,6 @@ importers:
       sqlite-level:
         specifier: 'catalog:'
         version: 2.1.0
-      vite:
-        specifier: ^5.4.0
-        version: 5.4.21(@types/node@25.1.0)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)
       zod:
         specifier: 'catalog:'
         version: 3.25.76
@@ -2848,6 +2839,9 @@ importers:
       typescript:
         specifier: ^5.7.3
         version: 5.9.3
+      vite:
+        specifier: ^5.4.0
+        version: 5.4.21(@types/node@25.1.0)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)
       vitest:
         specifier: ^2.1.9
         version: 2.1.9(@types/node@25.1.0)(happy-dom@15.10.2)(jsdom@15.2.1(bufferutil@4.1.0))(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)
