@@ -1,11 +1,11 @@
-import { MdImage } from 'react-icons/md';
-import { createScreen } from '@toolkit/react-screens';
 import { MediaUsageDashboard } from '@toolkit/components/dashboard/media-usage-dashboard';
+import { createScreen } from '@toolkit/react-screens';
+import { Image } from 'lucide-react';
 
 export const MediaUsageDashboardScreenPlugin = createScreen({
   name: 'Media Usage',
   Component: MediaUsageDashboard,
-  Icon: MdImage,
+  Icon: Image,
   layout: 'popup',
   navCategory: 'Dashboard',
 });
