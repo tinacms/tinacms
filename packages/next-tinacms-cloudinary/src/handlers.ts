@@ -10,6 +10,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import multer from 'multer';
 import { promisify } from 'util';
 import { resolveKey, resolveDirectory, MediaKeyError } from './media-key';
+import { escapeSearchValue } from './search-expression';
 import { safeUploadName } from './upload-filename';
 
 export interface CloudinaryConfig {
@@ -135,10 +136,10 @@ async function listMedia(
       try {
         // Validation only: reject upward traversal in the listing directory for
         // consistency with the other adapters. The normalised result is
-        // intentionally discarded; the raw directory is still interpolated into
-        // the search expression below, so this does NOT bound the listing the
-        // way resolveDirectory bounds the S3/DOS prefix. Search-expression
-        // escaping (SEC-5) is a separate follow-up.
+        // intentionally discarded; Cloudinary derives public_id from folder +
+        // use_filename, so applying the resolved prefix here would change the
+        // naming model. Bounding the listing to a mediaRoot is tracked
+        // separately.
         resolveDirectory(mediaListOptions.directory);
       } catch (e) {
         if (e instanceof MediaKeyError) {
@@ -151,7 +152,7 @@ async function listMedia(
 
     const query = useRootDirectory
       ? 'folder=""'
-      : `folder="${mediaListOptions.directory}"`;
+      : `folder="${escapeSearchValue(mediaListOptions.directory)}"`;
 
     const response = await cloudinary.search
       .expression(query)
