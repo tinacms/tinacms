@@ -461,6 +461,36 @@ describe('MediaModel (Vite dev server)', () => {
       move.mockRestore();
     });
 
+    it('names the staging file when the source cannot be restored', async () => {
+      await fs.writeFile(path.join(mediaDir, 'photo.jpg'), 'bytes');
+      const model = new MediaModel(config);
+      const realMove = fs.move;
+      const move = jest.spyOn(fs, 'move');
+      // stage succeeds, the move onto the new casing fails, and so does the
+      // attempt to put the file back
+      move
+        .mockImplementationOnce(realMove)
+        .mockImplementationOnce(async () => {
+          throw new Error('boom');
+        })
+        .mockImplementationOnce(async () => {
+          throw new Error('restore failed');
+        });
+
+      const result = await model.renameMedia({
+        from: 'photo.jpg',
+        to: 'Photo.jpg',
+      });
+
+      const entries = await fs.readdir(mediaDir);
+      expect(entries).toHaveLength(1);
+      expect(entries[0]).toMatch(/^\.tina-rename-/);
+      // the surviving file is named in the message so it can be recovered
+      expect(result).toMatchObject({ ok: false, code: 'BACKEND_FAILURE' });
+      expect((result as { message: string }).message).toContain(entries[0]);
+      move.mockRestore();
+    });
+
     it('maps a racing destination write to NAME_COLLISION', async () => {
       await fs.writeFile(path.join(mediaDir, 'old.txt'), 'a');
       const model = new MediaModel(config);
@@ -500,13 +530,16 @@ describe('MediaModel (Vite dev server)', () => {
       ).rejects.toThrow(PathTraversalError);
     });
 
-    it('rejects the media root itself as a destination', async () => {
-      await fs.writeFile(path.join(mediaDir, 'old.txt'), 'a');
-      const model = new MediaModel(config);
-      await expect(
-        model.renameMedia({ from: 'old.txt', to: '' })
-      ).rejects.toThrow(PathTraversalError);
-    });
+    it.each(['', '.', './'])(
+      'rejects the media root itself as a destination (%j)',
+      async (to) => {
+        await fs.writeFile(path.join(mediaDir, 'old.txt'), 'a');
+        const model = new MediaModel(config);
+        await expect(
+          model.renameMedia({ from: 'old.txt', to })
+        ).rejects.toThrow(PathTraversalError);
+      }
+    );
   });
 
   describe('renameMedia symlink traversal', () => {
@@ -611,7 +644,9 @@ describe('createMediaRouter', () => {
       expect(await fs.pathExists(path.join(mediaDir, 'new.txt'))).toBe(true);
     });
 
-    it('ignores an extra branch field for parity with the cloud contract', async () => {
+    // Guards the contract, not the handler: unknown keys must not start
+    // 400ing if body validation is ever tightened.
+    it('accepts and ignores unknown fields in the body', async () => {
       const mediaDir = path.join(tmpDir, 'public', 'uploads');
       await fs.writeFile(path.join(mediaDir, 'old.txt'), 'data');
       const router = createMediaRouter(config);

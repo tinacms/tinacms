@@ -64,9 +64,7 @@ export const createMediaRouter = (config: PathConfig) => {
     // Body is populated by the bodyParser.json middleware registered ahead of
     // this router, the same way the /graphql route consumes it.
     const body = (req as unknown as { body?: unknown }).body;
-    const { from, to, ...rest } =
-      (body as { from?: unknown; to?: unknown }) || {};
-    void rest; // `branch` is accepted for parity with the cloud contract
+    const { from, to } = (body as { from?: unknown; to?: unknown }) || {};
 
     if (typeof from !== 'string' || typeof to !== 'string' || !from || !to) {
       res.statusCode = 400;
@@ -213,6 +211,17 @@ const RENAME_ERROR_STATUS: Record<RenameFailureCode, number> = {
   UNSUPPORTED: 400,
   BACKEND_FAILURE: 500,
 };
+
+/**
+ * Raised when a staged rename cannot put the file back where it started, so
+ * the file is left under the staging name. Carries that name so the response
+ * can tell the editor where to find it.
+ */
+class StagedRenameError extends Error {
+  constructor(public readonly stagingName: string) {
+    super(`Left the file as "${stagingName}" in the same folder.`);
+  }
+}
 
 /** fs-extra's move rejects an existing destination with a bare message. */
 const isDestinationExistsError = (error: unknown) =>
@@ -624,22 +633,33 @@ export class MediaModel {
       return {
         ok: false,
         code: 'BACKEND_FAILURE',
-        message: 'Failed to rename the file.',
+        message:
+          error instanceof StagedRenameError
+            ? `Failed to rename the file. ${error.message}`
+            : 'Failed to rename the file.',
       };
     }
   }
 
   /**
    * A case-insensitive filesystem can treat `a.jpg` -> `A.jpg` as a no-op, so
-   * hop through a unique sibling name. On failure the source is put back.
+   * hop through a unique sibling name. On failure the source is put back; if
+   * even that fails the file survives under the staging name, which
+   * StagedRenameError reports rather than leaving it to be found by accident.
    */
   private async renameViaStaging(source: string, destination: string) {
-    const staging = join(path.dirname(source), `.tina-rename-${randomUUID()}`);
+    const stagingName = `.tina-rename-${randomUUID()}`;
+    const staging = join(path.dirname(source), stagingName);
     await fs.move(source, staging, { overwrite: false });
     try {
       await fs.move(staging, destination, { overwrite: false });
     } catch (error) {
-      await fs.move(staging, source, { overwrite: false }).catch(() => {});
+      try {
+        await fs.move(staging, source, { overwrite: false });
+      } catch (restoreError) {
+        console.error(restoreError);
+        throw new StagedRenameError(stagingName);
+      }
       throw error;
     }
   }
