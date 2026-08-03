@@ -78,11 +78,16 @@ const join = function (...parts) {
  * Media-root-relative `directory/filename`, the path shape the store's rename
  * and delete calls expect — no origin, public folder or media root prefix.
  */
-const mediaItemPath = (item: Media, filename: string) => {
+const mediaItemPath = (item: Media) => {
   const directory = item.directory === '.' ? '' : item.directory || '';
   const trimmed = directory.replace(/^\/+|\/+$/g, '');
-  return trimmed ? `${trimmed}/${filename}` : filename;
+  return trimmed ? `${trimmed}/${item.filename}` : item.filename;
 };
+
+const basename = (path: string) => path.slice(path.lastIndexOf('/') + 1);
+
+const siblingPath = (path: string, name: string) =>
+  `${path.slice(0, path.lastIndexOf('/') + 1)}${name}`;
 
 export interface MediaRequest {
   directory?: string;
@@ -275,7 +280,7 @@ export function MediaPicker({
           // Every mounted picker sees this, so only the ones actually
           // previewing the renamed file swap their selection.
           setActiveItem((current) =>
-            current && mediaItemPath(current, current.filename) === event.from
+            current && mediaItemPath(current) === event.from
               ? event.media
               : current
           );
@@ -320,10 +325,8 @@ export function MediaPicker({
     typeof cms.media.store.rename === 'function';
 
   const renameMediaItem = async (item: Media, newFilename: string) => {
-    await cms.media.rename(
-      mediaItemPath(item, item.filename),
-      mediaItemPath(item, newFilename)
-    );
+    const from = mediaItemPath(item);
+    await cms.media.rename(from, siblingPath(from, newFilename));
   };
 
   let selectMediaItem: (_item: Media) => void;
@@ -537,7 +540,7 @@ export function MediaPicker({
       )}
       {renameModalOpen && activeItem && (
         <RenameModal
-          filename={activeItem.filename}
+          filename={basename(activeItem.filename)}
           renameFunc={async (newFilename) => {
             await renameMediaItem(activeItem, newFilename);
           }}

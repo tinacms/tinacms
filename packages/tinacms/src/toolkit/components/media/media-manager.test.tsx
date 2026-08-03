@@ -142,6 +142,38 @@ describe('MediaPicker rename action', () => {
     );
   });
 
+  // A search hit reports its folder inside `filename` and leaves `directory`
+  // empty, unlike a file reached by browsing into that folder.
+  it('keeps a searched file in its folder when renamed', async () => {
+    const rename = vi.fn().mockResolvedValue(file('new.jpg', 'nested'));
+    const { cms } = buildCms({ rename }, [file('nested/old.jpg')]);
+    renderPicker(cms);
+
+    await openPreview('nested/old.jpg');
+    await submitRename('new');
+
+    await waitFor(() =>
+      expect(rename).toHaveBeenCalledWith('nested/old.jpg', 'nested/new.jpg')
+    );
+  });
+
+  it('offers only the base name of a searched file for editing', async () => {
+    const rename = vi.fn();
+    const { cms } = buildCms({ rename }, [file('nested/old.jpg')]);
+    renderPicker(cms);
+
+    await openPreview('nested/old.jpg');
+    fireEvent.click(await screen.findByText('Rename'));
+
+    const input = screen.getByPlaceholderText('File name') as HTMLInputElement;
+    expect(input.value).toBe('old');
+
+    // Submitting an untouched name is not a rename, so the folder cannot be
+    // dropped just by opening the modal and confirming.
+    fireEvent.click(modal().getByText('Rename').closest('button'));
+    expect(rename).not.toHaveBeenCalled();
+  });
+
   it('reloads the list and re-points the preview at the renamed file', async () => {
     const renamed = file('new.jpg');
     let current = [file('old.jpg')];
