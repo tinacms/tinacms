@@ -23,6 +23,12 @@
             "name": "stars",
             "label": "Stars",
             "type": "rating"
+          },
+          {
+            "name": "body",
+            "label": "Body",
+            "isBody": true,
+            "type": "rich-text"
           }
         ]
       }
@@ -37,6 +43,7 @@
   "primitives": {
     "boolean": 1,
     "rating": 1,
+    "rich-text": 1,
     "string": 1
   }
 }
