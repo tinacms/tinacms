@@ -110,13 +110,6 @@ export class TinaCMS extends CMS {
         level: 'error',
         message: 'Failed to delete file.',
       }),
-      'media:rename:failure': (event: CMSEvent & { error?: Error }) => ({
-        error: event.error,
-        level: 'error',
-        message: `Failed to rename file.${
-          event.error?.message ? ` ${event.error.message}` : ''
-        }`,
-      }),
       ...alerts,
     });
 
