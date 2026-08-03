@@ -113,6 +113,10 @@
 	},
 	"overrides": [
 		{
+			"include": ["**/tsconfig.*.json"],
+			"json": { "parser": { "allowComments": true } }
+		},
+		{
 			"include": [
 				"examples/astro/visual-editing/**/*.css"
 			],

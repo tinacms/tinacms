@@ -20,6 +20,7 @@ export function StringField() {
     <FieldWrapper errors={errors}>
       <Input
         ref={inputRef}
+        id={address}
         aria-label={address}
         value={value ?? ''}
         onChange={(event) => setValue(event.target.value)}

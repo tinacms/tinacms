@@ -8,6 +8,7 @@ import {
 import userEvent from '@testing-library/user-event';
 import { type ReactNode, type RefObject, useRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
+import { asResolvedConfig } from '../config';
 import { toFieldAddress } from '../core/field/address';
 import type { CollectionSchema } from '../core/schema/types';
 import { toFormId, useFormStore } from '../form/form-store';
@@ -22,14 +23,16 @@ import { FormScopeContext } from './context';
 import { Field, FormProvider, TinaProvider } from './index';
 import { usePreviewConnection } from './preview-connection';
 
+const NO_COLLECTIONS = { collections: [] };
+
 const collection: CollectionSchema = {
   name: 'post',
+  format: 'mdx',
   fields: [t.string({ name: 'title', label: 'Title' })],
 };
 const path = 'content/posts/preview.mdx';
 const formId = toFormId(path);
 
-// Stands in for the iframe: usePreviewConnection only touches contentWindow.
 const fakeIframe = () => {
   const contentWindow = { postMessage: vi.fn() };
   return {
@@ -49,8 +52,6 @@ function Connection({
   return null;
 }
 
-// happy-dom's MessageEvent constructor doesn't reliably carry origin/source, so
-// force them on (same helper shape as connection.test.ts).
 const messageFromPreview = (
   data: unknown,
   source: unknown,
@@ -68,7 +69,12 @@ const messageFromPreview = (
 
 const renderConnected = (iframeRef: RefObject<HTMLIFrameElement | null>) =>
   render(
-    <TinaProvider plugins={[stringFieldPlugin]}>
+    <TinaProvider
+      config={asResolvedConfig({
+        plugins: [stringFieldPlugin],
+        schema: NO_COLLECTIONS,
+      })}
+    >
       <FormProvider
         collection={collection}
         path={path}
@@ -159,7 +165,6 @@ describe('usePreviewConnection', () => {
 
   it('a ready before any form registers is silent until registration answers it', async () => {
     const iframe = fakeIframe();
-    // No <Field> content: drive the hook against a store emptied after mount.
     function Bare() {
       const ref = useRef<HTMLIFrameElement | null>(null);
       ref.current = iframe.ref.current;
@@ -167,13 +172,17 @@ describe('usePreviewConnection', () => {
       return <div>bare</div>;
     }
     render(
-      <TinaProvider plugins={[stringFieldPlugin]}>
+      <TinaProvider
+        config={asResolvedConfig({
+          plugins: [stringFieldPlugin],
+          schema: NO_COLLECTIONS,
+        })}
+      >
         <FormProvider collection={collection} path={path}>
           <Bare />
         </FormProvider>
       </TinaProvider>
     );
-    // TinaProvider mounts children only after plugins resolve — wait for it.
     await screen.findByText('bare');
     act(() => {
       useFormStore.setState({ forms: {}, active: null });
@@ -182,8 +191,6 @@ describe('usePreviewConnection', () => {
     messageFromPreview(readyMessage(), iframe.ref.current?.contentWindow);
     expect(iframe.postMessage).not.toHaveBeenCalled();
 
-    // Recovery: registration itself fires the subscription post — the early
-    // ready needed no answer because this covers it.
     act(() => {
       useFormStore
         .getState()
@@ -208,7 +215,12 @@ describe('usePreviewConnection', () => {
     });
     const iframe = fakeIframe();
     const tree = (documentPath: string) => (
-      <TinaProvider plugins={[stringFieldPlugin]}>
+      <TinaProvider
+        config={asResolvedConfig({
+          plugins: [stringFieldPlugin],
+          schema: NO_COLLECTIONS,
+        })}
+      >
         <FormProvider
           collection={collection}
           path={documentPath}
@@ -223,10 +235,6 @@ describe('usePreviewConnection', () => {
     await screen.findByLabelText('title');
     iframe.postMessage.mockClear();
 
-    // The iframe persists across the switch (no new ready) and the edited
-    // scope's re-registration is a store no-op — the connect-time post is the
-    // only thing that can bring the preview over. waitFor also flushes the
-    // provider's async re-adopt validation (trigger), keeping act quiet.
     rerender(tree(otherPath));
     await waitFor(() =>
       expect(iframe.postMessage).toHaveBeenCalledWith(
@@ -238,10 +246,17 @@ describe('usePreviewConnection', () => {
 
   it("rejects '*' as targetOrigin at construction", () => {
     const iframe = fakeIframe();
-    // A bare FormScopeContext is enough: the invariant fires in the hook body,
-    // before any effect needs the runtime.
     const wrapper = ({ children }: { children: ReactNode }) => (
-      <FormScopeContext value={{ formId, collection, onSave: null }}>
+      <FormScopeContext
+        value={{
+          formId,
+          path,
+          collection,
+          onSave: null,
+          seedKey: path,
+          discardEdits: () => {},
+        }}
+      >
         {children}
       </FormScopeContext>
     );

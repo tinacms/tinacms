@@ -4,9 +4,6 @@ import { defineServerPlugin, publicOp } from '../server';
 import { createRpcHandler } from './handler';
 import { RpcError, createRpcClient } from './proxy';
 
-// The pattern that a real plugin uses. The type of the ops record crosses to the client,
-// as an `import type` does. Here it crosses directly, because both sides are one TS
-// project.
 const searchOps = defineServerPlugin({
   query: publicOp(async (input: { q: string }) => ({ hits: [input.q] })),
   reindex: async () => ({ started: true }),
@@ -22,8 +19,6 @@ const handler = createRpcHandler({ plugins: [searchPlugin] });
 
 const client = createRpcClient<{ search: typeof searchOps }>({
   url: 'http://tina.local/api/tina',
-  // The handler takes a Request and returns a Response, so it also serves as the fetch
-  // implementation.
   fetch: (input, init) => handler(new Request(input, init)),
 });
 
@@ -34,7 +29,7 @@ describe('createRpcClient', () => {
   });
 
   it('throws RpcError carrying the transport code and status', async () => {
-    const rejection = client.search.reindex(undefined);
+    const rejection = client.search.reindex();
     await expect(rejection).rejects.toBeInstanceOf(RpcError);
     await expect(rejection).rejects.toMatchObject({
       status: 401,
@@ -42,9 +37,21 @@ describe('createRpcClient', () => {
     });
   });
 
+  it('throws rpc-not-json for an ok response whose body is not JSON', async () => {
+    const broken = createRpcClient<{ search: typeof searchOps }>({
+      url: 'http://tina.local/api/tina',
+      fetch: async () =>
+        new Response('<!doctype html>', {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        }),
+    });
+    const rejection = broken.search.query({ q: 'x' });
+    await expect(rejection).rejects.toBeInstanceOf(RpcError);
+    await expect(rejection).rejects.toMatchObject({ code: 'rpc-not-json' });
+  });
+
   it('is not thenable and yields nothing for symbol keys', async () => {
-    // The `await` keyword reads `then` at both levels. A POST there would hang the
-    // caller.
     expect((client as unknown as Record<string, unknown>).then).toBeUndefined();
     expect(
       (client.search as unknown as Record<string, unknown>).then
