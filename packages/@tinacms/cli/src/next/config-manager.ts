@@ -45,6 +45,7 @@ export class ConfigManager {
   generatedClientTSFilePath: string;
   generatedClientJSFilePath: string;
   generatedClientDFilePath: string;
+  generatedClientBundleFilePath: string;
   generatedDatabaseClientJSFilePath: string;
   generatedDatabaseClientTSFilePath: string;
   generatedDatabaseClientDFilePath: string;
@@ -200,6 +201,10 @@ export class ConfigManager {
     this.generatedClientDFilePath = path.join(
       this.generatedFolderPath,
       'client.d.ts'
+    );
+    this.generatedClientBundleFilePath = path.join(
+      this.generatedFolderPath,
+      'client.bundle.js'
     );
 
     this.generatedDatabaseClientDFilePath = path.join(

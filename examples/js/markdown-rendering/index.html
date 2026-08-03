@@ -18,7 +18,9 @@
     </div>
 
     <script type="module">
-        // Pull in the bundled client
+        // Pull in the browser-ready client bundle.
+        // Emitted by `tinacms dev` / `tinacms build` into `tina/__generated__`
+        // (see `build.clientBundle` in `tina/config.js`)
         import {client} from "./tina/__generated__/client.bundle.js";
         // Register the `tina-markdown` component.
         import "./node_modules/tinacms/dist/web-components/tina-markdown.js";

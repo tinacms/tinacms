@@ -9,6 +9,7 @@ export default defineConfig({
   build: {
     outputFolder: 'admin',
     publicFolder: './',
+    clientBundle: true,
   },
   media: {
     tina: {

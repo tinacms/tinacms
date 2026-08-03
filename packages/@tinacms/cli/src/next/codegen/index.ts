@@ -3,7 +3,7 @@ import path from 'path';
 import { buildASTSchema, printSchema } from 'graphql';
 import type { GraphQLSchema, DocumentNode } from 'graphql';
 import { generateTypes } from './codegen';
-import { transform } from 'esbuild';
+import { build as esbuildBuild, transform } from 'esbuild';
 import { ConfigManager } from '../config-manager';
 import type { TinaSchema } from '@tinacms/schema-tools';
 import { mapUserFields } from '@tinacms/graphql';
@@ -84,6 +84,7 @@ export class Codegen {
     await unlinkIfExists(this.configManager.generatedTypesJSFilePath);
     await unlinkIfExists(this.configManager.generatedTypesTSFilePath);
     await unlinkIfExists(this.configManager.generatedClientTSFilePath);
+    await unlinkIfExists(this.configManager.generatedClientBundleFilePath);
     await unlinkIfExists(this.configManager.generatedQueriesFilePath);
     await unlinkIfExists(this.configManager.generatedFragmentsFilePath);
   }
@@ -213,7 +214,26 @@ export class Codegen {
         );
       }
     }
+    // Emit a browser-ready bundle of the generated client for bundler-free
+    // (vanilla JS) sites. Opt-in via `build.clientBundle` in the Tina config.
+    if (this.configManager.config?.build?.clientBundle) {
+      await this.bundleClient();
+    }
     return apiURL;
+  }
+
+  private async bundleClient() {
+    const entryPoint = this.configManager.isUsingTs()
+      ? this.configManager.generatedClientTSFilePath
+      : this.configManager.generatedClientJSFilePath;
+    await esbuildBuild({
+      entryPoints: [entryPoint],
+      bundle: true,
+      format: 'esm',
+      platform: 'browser',
+      external: ['node:*'],
+      outfile: this.configManager.generatedClientBundleFilePath,
+    });
   }
   private _createApiUrl() {
     const branch = this.configManager.config?.branch;
