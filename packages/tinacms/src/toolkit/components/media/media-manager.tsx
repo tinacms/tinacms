@@ -314,7 +314,7 @@ export function MediaPicker({
   // Only stores that implement rename can offer the action; a store without it
   // would fail on click. Static stores are read-only, and folders never become
   // the active item, so neither needs a separate check here.
-  const canRename =
+  const allowRename =
     allowDelete &&
     !cms.media.store.isStatic &&
     typeof cms.media.store.rename === 'function';
@@ -689,7 +689,7 @@ export function MediaPicker({
               deleteMediaItem={() => {
                 setDeleteModalOpen(true);
               }}
-              allowRename={canRename}
+              allowRename={allowRename}
               renameMediaItem={() => {
                 setRenameModalOpen(true);
               }}
