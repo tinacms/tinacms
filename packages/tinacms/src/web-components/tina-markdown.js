@@ -1,42 +1,42 @@
 const TAGS = {
-  h1: "h1",
-  h2: "h2",
-  h3: "h3",
-  h4: "h4",
-  h5: "h5",
-  h6: "h6",
-  p: "p",
-  ol: "ol",
-  ul: "ul",
-  li: "li",
+  h1: 'h1',
+  h2: 'h2',
+  h3: 'h3',
+  h4: 'h4',
+  h5: 'h5',
+  h6: 'h6',
+  p: 'p',
+  ol: 'ol',
+  ul: 'ul',
+  li: 'li',
   // lic: "div", // TODO: is this needed? seems to render fine without.
   //             // possible used to handle nested rich-text?
-  blockquote: "blockquote",
-  img: "img",
-  a: "a",
-  code_block: "code",
-  hr: "hr",
-  break: "br",
-  table: "table", // TODO: does not support alignment.
-  tr: "tr",
-  td: "td",
-  invalid_markdown: "pre",
-  html: "html",
-  html_inline: "html",
+  blockquote: 'blockquote',
+  img: 'img',
+  a: 'a',
+  code_block: 'code',
+  hr: 'hr',
+  break: 'br',
+  table: 'table', // TODO: does not support alignment.
+  tr: 'tr',
+  td: 'td',
+  invalid_markdown: 'pre',
+  html: 'html',
+  html_inline: 'html',
 };
 const MARKS = [
-  ["bold", "strong"],
-  ["italic", "em"],
-  ["underline", "u"],
-  ["strikethrough", "s"],
-  ["code", "code"],
-  ["highlight", "mark"],
+  ['bold', 'strong'],
+  ['italic', 'em'],
+  ['underline', 'u'],
+  ['strikethrough', 's'],
+  ['code', 'code'],
+  ['highlight', 'mark'],
 ];
 
 function renderRichText(root) {
-  const container = document.createElement("div");
+  const container = document.createElement('div');
 
-  for (const block of (root.children ?? [])) {
+  for (const block of root.children ?? []) {
     container.appendChild(renderNode(block));
   }
 
@@ -44,52 +44,51 @@ function renderRichText(root) {
 }
 
 function renderNode(node) {
-  if (node.type === "text") return renderText(node);
+  if (node.type === 'text') return renderText(node);
 
   const tag = TAGS[node.type];
   const el = document.createElement(tag);
 
-  if (node.type === "html" || node.type === "html_inline") {
-    const htmlContainer = document.createElement("div");
+  if (node.type === 'html' || node.type === 'html_inline') {
+    const htmlContainer = document.createElement('div');
     htmlContainer.innerHTML = node.value;
     return htmlContainer;
   }
-  if (node.url && node.type === "a") el.href = node.url;
-  if (node.url && node.type === "img") el.src = node.url;
+  if (node.url && node.type === 'a') el.href = node.url;
+  if (node.url && node.type === 'img') el.src = node.url;
 
-  console.log(node)
-  if (node.type === "code_block") {
-    const pre = document.createElement("pre");
+  if (node.type === 'code_block') {
+    const pre = document.createElement('pre');
 
-    let codeString = "";
+    let codeString = '';
     if (Array.isArray(node.children)) {
       codeString = node.children
         .map((line) =>
           Array.isArray(line.children)
-            ? line.children.map((t) => t.text).join("")
-            : ""
+            ? line.children.map((t) => t.text).join('')
+            : ''
         )
-        .join("\n");
-    } else if (typeof node.value === "string") {
-      codeString = child.value;
+        .join('\n');
+    } else if (typeof node.value === 'string') {
+      codeString = node.value;
     }
     el.innerText = codeString;
-    if (node.lang) el.setAttribute("lang", node.lang);
+    if (node.lang) el.setAttribute('lang', node.lang);
 
     pre.appendChild(el);
     return pre;
   }
 
-  if (node.type === "table") {
-    const table_body = document.createElement("tbody");
-    for (const child of (node.children ?? [])) {
+  if (node.type === 'table') {
+    const table_body = document.createElement('tbody');
+    for (const child of node.children ?? []) {
       table_body.appendChild(renderNode(child));
     }
     el.appendChild(table_body);
     return el;
   }
 
-  for (const child of (node.children ?? [])) {
+  for (const child of node.children ?? []) {
     el.appendChild(renderNode(child));
   }
 
@@ -113,16 +112,16 @@ class TinaMarkdown extends HTMLElement {
     super();
 
     this.attachShadow({
-      mode: "open"
+      mode: 'open',
     });
   }
 
   connectedCallback() {
-    const contentStr = this.getAttribute("content");
+    const contentStr = this.getAttribute('content');
     const content = JSON.parse(contentStr);
 
     this.shadowRoot.appendChild(renderRichText(content));
   }
 }
 
-customElements.define("tina-markdown", TinaMarkdown);
+customElements.define('tina-markdown', TinaMarkdown);
