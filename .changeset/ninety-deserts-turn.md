@@ -1,8 +1,7 @@
 ---
-"tinacms": patch
-"@tinacms/cli": patch
-"@tinacms/schema-tools": patch
-"@examples/js": patch
+"tinacms": minor
+"@tinacms/cli": minor
+"@tinacms/schema-tools": minor
 ---
 
 feat: add tina-markdown web component
