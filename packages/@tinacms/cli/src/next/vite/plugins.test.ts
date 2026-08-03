@@ -293,3 +293,58 @@ describe('devServerEndPointsPlugin cross-origin gate', () => {
     });
   });
 });
+
+describe('devServerEndPointsPlugin media route matching', () => {
+  it('routes DELETE of a "rename"-prefixed file to the delete handler', async () => {
+    const mw = getRequestMiddleware();
+    const { res } = await invoke(mw, {
+      url: '/media/renamed-hero.jpg',
+      method: 'DELETE',
+      headers: { origin: 'http://localhost:3000' },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(mockHandleDelete).toHaveBeenCalledTimes(1);
+    expect(mockHandleRename).not.toHaveBeenCalled();
+  });
+
+  it('routes DELETE of a file named exactly "rename" to the delete handler', async () => {
+    const mw = getRequestMiddleware();
+    const { res } = await invoke(mw, {
+      url: '/media/rename',
+      method: 'DELETE',
+      headers: { origin: 'http://localhost:3000' },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(mockHandleDelete).toHaveBeenCalledTimes(1);
+    expect(mockHandleRename).not.toHaveBeenCalled();
+  });
+
+  it('still gates a cross-origin DELETE of a "rename"-prefixed file', async () => {
+    const mw = getRequestMiddleware();
+    const { res, next } = await invoke(mw, {
+      url: '/media/renamed-hero.jpg',
+      method: 'DELETE',
+      headers: { origin: 'http://evil.test:8000' },
+    });
+
+    expect(res.statusCode).toBe(403);
+    expect(mockHandleDelete).not.toHaveBeenCalled();
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  it('matches the rename route with a query string attached', async () => {
+    const mw = getRequestMiddleware();
+    const { res } = await invoke(mw, {
+      url: '/media/rename?branch=main',
+      method: 'POST',
+      headers: { origin: 'http://localhost:3000' },
+      body: { from: 'a.txt', to: 'b.txt' },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(mockHandleRename).toHaveBeenCalledTimes(1);
+    expect(mockHandleDelete).not.toHaveBeenCalled();
+  });
+});
