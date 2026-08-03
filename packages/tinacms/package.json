@@ -14,7 +14,8 @@
     "./dist/tina-field": "./dist/tina-field.js",
     "./dist/rich-text": "./dist/rich-text/index.js",
     "./dist/rich-text/static": "./dist/rich-text/static.js",
-    "./dist/rich-text/prism": "./dist/rich-text/prism.js"
+    "./dist/rich-text/prism": "./dist/rich-text/prism.js",
+    "./dist/web-components/tina-markdown": "./src/web-components/tina-markdown.js"
   },
   "files": [
     "dist"

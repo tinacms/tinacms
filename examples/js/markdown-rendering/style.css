@@ -1,0 +1,55 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+:root {
+    --text: #1a1a1a;
+    --off-white: #f7f7f7;
+    --light-gray: #e8e8e8;
+    --dark-gray: #c0c0c0;
+}
+
+table {
+    border-collapse: separate;
+    border: 2px solid var(--dark-gray);
+    text-align: left;
+}
+
+thead {
+    background-color: var(--off-white);
+
+    th {
+        border: 1px solid var(--dark-gray);
+    }
+}
+
+th,
+td {
+    padding: 0.1rem 0.5rem;
+}
+
+tbody>tr:nth-of-type(even) {
+    background-color: var(--light-gray);
+}
+
+blockquote {
+    background-color: var(--light-gray);
+    border-left: 5px solid var(--dark-gray);
+    margin: 1.5em 10px;
+    padding: 0.5em 10px;
+}
+
+pre:has(>code) {
+    padding: 0.5em 1rem;
+    border: 1px solid var(--text);
+
+    >code {
+        font-family: 'monospace';
+    }
+}
+
+img {
+    width: 100%;
+}

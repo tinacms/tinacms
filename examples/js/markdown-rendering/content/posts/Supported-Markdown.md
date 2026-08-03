@@ -1,0 +1,58 @@
+---
+title: Supported Markdown
+---
+
+# Heading 1
+
+## Heading 2
+
+### Heading 3
+
+#### Heading 4
+
+##### Heading 5
+
+###### Heading 6
+
+This is a paragraph!
+
+1. ordered list item 1
+2. ordered list item 2
+
+* unordered list item 1
+* unordered list item 2
+
+> This is a block quote!
+
+![](/example-image.jpg)
+
+[This is a block link](https://tina.io)
+
+This is an [inline link](https://tina.io) !!
+
+```javascript
+function helloWorld(name) {
+  console.log("hello", name)
+}
+```
+
+***
+
+this is
+
+a manual
+
+line break
+
+| You   | Me       | Us                    |
+| ----- | -------- | --------------------- |
+| Okay  | Handsome | A match               |
+| Funny | Dumb     | Yet another match \<3 |
+
+<div id="raw-html-test">
+  <center>
+    <p>This is raw html</p>
+  </center>
+</div>
+
+this is `inline` code block
