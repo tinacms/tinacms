@@ -275,7 +275,7 @@ const RENAME_VECTORS: { label: string; from: string; to: string }[] = [
   {
     label: "media root as destination",
     from: "rename-security-probe.txt",
-    to: "",
+    to: ".",
   },
 ];
 
@@ -284,8 +284,7 @@ for (const vector of RENAME_VECTORS) {
     const resp = await renameMedia(apiContext, vector.from, vector.to);
     const responseText = await resp.text();
 
-    // An empty destination is refused as a bad request before path resolution.
-    expect(vector.to === "" ? [400] : [403]).toContain(resp.status());
+    expect(resp.status()).toBe(403);
 
     const residual = responseText
       .replace(vector.from, "")
