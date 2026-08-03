@@ -1,6 +1,4 @@
 import { Input } from '@toolkit/fields';
-// Direct path rather than the '@tinacms/toolkit' barrel: the barrel re-exports
-// this module, so going through it resolves to undefined at runtime.
 import { LoadingDots } from '@toolkit/form-builder';
 import {
   Modal,
@@ -11,7 +9,7 @@ import {
 } from '@toolkit/react-modals';
 import { Button } from '@toolkit/styles';
 import React from 'react';
-import { sanitizeFilename, splitFilename } from './utils';
+import { previewRename, splitFilename } from './utils';
 
 interface DeleteModalProps {
   close(): void;
@@ -52,31 +50,17 @@ export const RenameModal = ({
   renameFunc,
   filename,
 }: RenameModalProps) => {
-  const { base, ext } = splitFilename(filename);
-  const [nextBase, setNextBase] = React.useState(base);
+  const [nextBase, setNextBase] = React.useState(
+    () => splitFilename(filename).base
+  );
   const [processing, setProcessing] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
-  const trimmedBase = nextBase.trim();
-  // Sanitize the base on its own and re-attach the original extension, so a
-  // base containing slashes or dots can never rewrite or drop it.
-  const sanitizedBase = sanitizeFilename(trimmedBase);
-  const sanitized = `${sanitizedBase}${ext}`;
-  const isEmpty = trimmedBase.length === 0;
-  // Nothing usable survived, so sanitizeFilename fell back to its placeholder
-  // instead of producing something derived from the input.
-  const isStripped =
-    !isEmpty && sanitizedBase === 'file' && trimmedBase !== 'file';
-  const isUnchanged = sanitized === filename;
-  const canSubmit = !processing && !isEmpty && !isStripped && !isUnchanged;
-  const showPreview = !isEmpty && !isStripped && sanitizedBase !== trimmedBase;
-
-  let hint: string | null = null;
-  if (isEmpty) {
-    hint = 'Enter a file name.';
-  } else if (isStripped) {
-    hint = "That name isn't valid. Try using letters, numbers or hyphens.";
-  }
+  const { sanitized, extension, valid, preview, hint } = previewRename(
+    nextBase,
+    filename
+  );
+  const canSubmit = !processing && valid;
 
   return (
     <Modal>
@@ -98,13 +82,15 @@ export const RenameModal = ({
                 setError(null);
               }}
             />
-            {ext && (
-              <span className='text-base text-gray-500 shrink-0'>{ext}</span>
+            {extension && (
+              <span className='text-base text-gray-500 shrink-0'>
+                {extension}
+              </span>
             )}
           </div>
-          {showPreview && (
+          {preview && (
             <p className='text-sm text-gray-500 mt-2'>
-              Will be saved as <strong>{sanitized}</strong>
+              Will be saved as <strong>{preview}</strong>
             </p>
           )}
           {hint && <p className='text-sm text-gray-500 mt-2'>{hint}</p>}
