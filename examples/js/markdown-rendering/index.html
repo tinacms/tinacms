@@ -20,8 +20,8 @@
     <script type="module">
         // Pull in the bundled client
         import {client} from "./tina/__generated__/client.bundle.js";
-        // Register `tina-markdown` component
-        import "./tina-markdown.bundle.js";
+        // Register the `tina-markdown` component.
+        import "./node_modules/tinacms/dist/web-components/tina-markdown.js";
 
         // Fetch the posts
         const postsResponse = await client.queries.postConnection();

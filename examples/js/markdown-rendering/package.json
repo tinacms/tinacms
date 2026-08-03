@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "build:client": "esbuild tina/__generated__/client.js --bundle --format=esm --platform=browser --external:node:* --outfile=tina/__generated__/client.bundle.js",
-    "build:tina-markdown": "esbuild tinacms/dist/web-components/tina-markdown --bundle --format=iife --outfile=tina-markdown.bundle.js",
     "dev": "tinacms dev -c \"python3 -m http.server\"",
     "build": "tinacms build"
   },
