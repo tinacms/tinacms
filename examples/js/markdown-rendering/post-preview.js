@@ -1,5 +1,5 @@
-const postPreviewTemplate = document.createElement("template");
-postPreviewTemplate.id = "post-preview";
+const postPreviewTemplate = document.createElement('template');
+postPreviewTemplate.id = 'post-preview';
 postPreviewTemplate.innerHTML = `
 	<style>
 		.post-card {
@@ -27,10 +27,10 @@ postPreviewTemplate.innerHTML = `
 class PostPreviewComponent extends HTMLElement {
   constructor() {
     super();
-    const shadowRoot = this.attachShadow({ mode: "closed" });
+    const shadowRoot = this.attachShadow({ mode: 'closed' });
 
     shadowRoot.appendChild(postPreviewTemplate.content.cloneNode(true));
   }
 }
 
-customElements.define("post-preview", PostPreviewComponent);
+customElements.define('post-preview', PostPreviewComponent);
