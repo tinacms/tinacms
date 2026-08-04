@@ -47,6 +47,7 @@ const nonHeadingAutoformatBlocks: AutoformatRule[] = [
     // reads `***`, before the author types the closing delimiter of `***bold
     // italic***`, and the mark rule would never run.
     match: ['---', '___', '—-'],
+    preFormat,
     format: (editor) => {
       editor.tf.setNodes({ type: HorizontalRulePlugin.key });
       editor.tf.insertNodes({

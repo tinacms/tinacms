@@ -27,6 +27,25 @@ const type = (editor: ReturnType<typeof makeEditor>, text: string) => {
   }
 };
 
+const listWithAnEmptySecondItem: Value = [
+  {
+    type: 'ul',
+    children: [
+      { type: 'li', children: [{ type: 'lic', children: [{ text: 'item' }] }] },
+      { type: 'li', children: [{ type: 'lic', children: [{ text: '' }] }] },
+    ],
+  },
+];
+
+const makeListEditor = () => {
+  const editor = createPlateEditor({
+    plugins: createEditorPlugins(),
+    value: listWithAnEmptySecondItem,
+  });
+  editor.tf.select({ path: [0, 1, 0, 0], offset: 0 });
+  return editor;
+};
+
 const topType = (editor: ReturnType<typeof makeEditor>) =>
   editor.children[0].type;
 
@@ -195,5 +214,21 @@ describe('horizontal rule autoformat', () => {
     type(editor, '---');
 
     expect(editor.children[1].type).toBe('p');
+  });
+
+  /**
+   * A rule inside a list item is a shape that `@tinacms/mdx` cannot write and
+   * cannot read back. The rule ends the list, as the code block shortcut and
+   * the "Turn into" menu already do.
+   */
+  it.each(['---', '___'])('ends the list for %j in a list item', (shortcut) => {
+    const editor = makeListEditor();
+
+    type(editor, shortcut);
+
+    expect(editor.children.map((block) => block.type)).toContain(
+      HorizontalRulePlugin.key
+    );
+    expect(JSON.stringify(editor.children)).toContain('item');
   });
 });
