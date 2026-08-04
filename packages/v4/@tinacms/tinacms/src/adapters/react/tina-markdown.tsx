@@ -30,7 +30,7 @@ const reactHost: RichTextHost<React.ReactNode> = {
       ? React.createElement(tag, props)
       : React.createElement(tag, props, children),
   component: (component, props, children) => {
-    const Component = component as React.ComponentType<any>;
+    const Component = component as React.ComponentType<Record<string, unknown>>;
     return children === null ? (
       <Component {...props} />
     ) : (
@@ -54,7 +54,7 @@ const staticReactHost: RichTextHost<React.ReactNode> = {
 };
 
 export const TinaMarkdown = <
-  CustomComponents extends { [key: string]: object } = any,
+  CustomComponents extends { [key: string]: object },
 >({
   content,
   components = {},
@@ -63,7 +63,7 @@ export const TinaMarkdown = <
 );
 
 export const StaticTinaMarkdown = <
-  CustomComponents extends { [key: string]: object } = any,
+  CustomComponents extends { [key: string]: object },
 >({
   content,
   components = {},

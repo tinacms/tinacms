@@ -254,7 +254,8 @@ const columnAlignments = (
 
 function resolveMdxTable(fields: RichTextNodeFields): RichTextInstruction {
   const firstRowHeader = Boolean(fields.props?.firstRowHeader);
-  const tableRows: MdxTableRow[] = fields.props?.tableRows ?? [];
+  const rawRows = fields.props?.tableRows;
+  const tableRows: MdxTableRow[] = Array.isArray(rawRows) ? rawRows : [];
   const cellsOf = (row: MdxTableRow | undefined): RichTextTableCell[] =>
     (row?.tableCells ?? []).map((cell) => ({ content: cell.value }));
 
