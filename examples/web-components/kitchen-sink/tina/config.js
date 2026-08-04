@@ -23,6 +23,9 @@ export default defineConfig({
         name: 'post',
         label: 'Posts',
         path: 'content/posts',
+        ui: {
+          router: () => '/',
+        },
         fields: [
           {
             type: 'string',

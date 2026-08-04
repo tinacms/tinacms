@@ -1,5 +1,5 @@
 {
-  "name": "@examples/js",
+  "name": "@examples/web-components-kitchen-sink",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -7,9 +7,10 @@
     "build": "tinacms build"
   },
   "dependencies": {
-    "tinacms": "workspace:*"
+    "@tinacms/web-components": "workspace:^"
   },
   "devDependencies": {
-    "@tinacms/cli": "workspace:*"
+    "@tinacms/cli": "workspace:*",
+    "tinacms": "workspace:*"
   }
 }
