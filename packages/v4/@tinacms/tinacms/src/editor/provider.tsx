@@ -169,6 +169,9 @@ export function FormProvider({
     () => fieldEqualityFor(collection.fields, registry, transformContext),
     [collection, registry, transformContext]
   );
+  // What a fresh form instance adopts from the store. It samples the store one time,
+  // because RHF replaces its full error state each time the `errors` option changes
+  // identity — a rebuild on each document would overwrite the live errors of the user.
   const kept = useMemo(() => {
     const scope = readFormStore().forms[formId];
     if (!keepsValues(scope, toFormValues(ingested)))
@@ -179,7 +182,14 @@ export function FormProvider({
     }
     return { seed: toDocument(scope.values), errors };
   }, [formId]);
-  const seedValues = kept.seed ?? ingested;
+  // Whether the scope still keeps its values against the document of this render. A
+  // clean scope stops keeping them when another writer changes the file, so the test
+  // must follow the document, not only the form id.
+  const keepsIncoming = useMemo(
+    () => keepsValues(readFormStore().forms[formId], toFormValues(ingested)),
+    [formId, ingested]
+  );
+  const seedValues = keepsIncoming ? (kept.seed ?? ingested) : ingested;
   const resolver = buildFormResolver(collection, registry);
   const methods = useForm<TinaDocument>({
     defaultValues: seedValues,
@@ -208,7 +218,7 @@ export function FormProvider({
     }
     if (seededSignature.current !== signature) {
       seededSignature.current = signature;
-      methods.reset(seedValues, { keepErrors: kept.seed !== null });
+      methods.reset(seedValues, { keepErrors: seedValues === kept.seed });
       advanceSeedKey(formId);
     }
   }, [formId, seedValues, kept, methods, equal, advanceSeedKey]);
