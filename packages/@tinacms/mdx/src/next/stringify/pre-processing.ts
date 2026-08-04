@@ -202,6 +202,9 @@ const listItemElement = (
     // spread is always false since we don't support block elements in list items
     // good explanation of the difference: https://stackoverflow.com/questions/43503528/extra-lines-appearing-between-list-items-in-github-markdown
     spread: false,
+    ...(typeof content.checked === 'boolean'
+      ? { checked: content.checked }
+      : {}),
     children: content.children.map((child) => {
       if (child.type === 'lic') {
         return {

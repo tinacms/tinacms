@@ -98,6 +98,8 @@ export type ListItemChildrenElement =
  */
 export type ListItemElement = {
   type: 'li';
+  /** Set only on GFM task list items. `false` is an unticked checkbox. */
+  checked?: boolean;
   children: ListItemChildrenElement[];
 };
 /**
