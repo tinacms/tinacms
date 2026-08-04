@@ -179,8 +179,9 @@ limits of the current codec, not of the embed handling above.
 
 ## The parts that the port does not include
 
-The editor is the editor of v3, file for file (86 files in `plate/`). Four
-parts are stubs, because v4 does not have the necessary capabilities now:
+The editor is the editor of v3 (84 files in `plate/`). The port drops two
+files that nothing imports. Four parts are stubs, because v4 does not have
+the necessary capabilities now:
 
 | Stub | It waits for | Effect now |
 |---|---|---|
