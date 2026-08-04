@@ -157,7 +157,7 @@ describe('a host that is not a framework', () => {
     );
   });
 
-  it('renders a pipe table with the border fallback', () => {
+  it('treats the only row of a pipe table as its header', () => {
     expect(
       toHtml([
         {
@@ -176,8 +176,35 @@ describe('a host that is not a framework', () => {
         } as any,
       ])
     ).toBe(
-      '<table style="border: 1px solid #EDECF3;"><tbody><tr>' +
-        '<td style="border: 1px solid #EDECF3; padding: 0.25rem;">A</td>' +
+      '<table style="border: 1px solid #EDECF3;"><thead><tr>' +
+        '<th style="border: 1px solid #EDECF3; padding: 0.25rem;">A</th>' +
+        '</tr></thead><tbody></tbody></table>'
+    );
+  });
+
+  it('renders a pipe table with a header row, alignment, and the border fallback', () => {
+    const cell = (value: string) => ({
+      type: 'td',
+      children: [{ type: 'p', children: [text(value)] }],
+    });
+    expect(
+      toHtml([
+        {
+          type: 'table',
+          props: { align: ['left', 'right'] },
+          children: [
+            { type: 'tr', children: [cell('A'), cell('B')] },
+            { type: 'tr', children: [cell('1'), cell('2')] },
+          ],
+        } as any,
+      ])
+    ).toBe(
+      '<table style="border: 1px solid #EDECF3;"><thead><tr>' +
+        '<th align="left" style="text-align: left; border: 1px solid #EDECF3; padding: 0.25rem;">A</th>' +
+        '<th align="right" style="text-align: right; border: 1px solid #EDECF3; padding: 0.25rem;">B</th>' +
+        '</tr></thead><tbody><tr>' +
+        '<td align="left" style="text-align: left; border: 1px solid #EDECF3; padding: 0.25rem;">1</td>' +
+        '<td align="right" style="text-align: right; border: 1px solid #EDECF3; padding: 0.25rem;">2</td>' +
         '</tr></tbody></table>'
     );
   });

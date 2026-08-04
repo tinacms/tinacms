@@ -220,26 +220,21 @@ describe('tables', () => {
     ).toBe('<div>1 row</div>');
   });
 
-  it('renders a pipe table with the border fallback', () => {
-    expect(
-      html([
-        {
-          type: 'table',
-          children: [
-            {
-              type: 'tr',
-              children: [
-                {
-                  type: 'td',
-                  children: [{ type: 'p', children: [text('A')] }],
-                },
-              ],
-            },
-          ],
-        } as any,
-      ])
-    ).toContain(
-      '<td style="border: 1px solid #EDECF3; padding: 0.25rem;">A</td>'
+  it('renders a pipe table with a header row and the border fallback', () => {
+    const row = (value: string) => ({
+      type: 'tr',
+      children: [
+        { type: 'td', children: [{ type: 'p', children: [text(value)] }] },
+      ],
+    });
+    const rendered = html([
+      { type: 'table', children: [row('A'), row('1')] } as any,
+    ]);
+    expect(rendered).toContain(
+      '<th style="border: 1px solid #EDECF3; padding: 0.25rem;">A</th>'
+    );
+    expect(rendered).toContain(
+      '<td style="border: 1px solid #EDECF3; padding: 0.25rem;">1</td>'
     );
   });
 });
