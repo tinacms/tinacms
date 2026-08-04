@@ -22,6 +22,7 @@ import {
   type FieldErrors,
   type FormId,
   isEdited,
+  keepsValues,
   readFormStore,
   toDocument,
   toFormId,
@@ -170,7 +171,8 @@ export function FormProvider({
   );
   const kept = useMemo(() => {
     const scope = readFormStore().forms[formId];
-    if (!isEdited(scope)) return { seed: null, errors: {} };
+    if (!keepsValues(scope, toFormValues(ingested)))
+      return { seed: null, errors: {} };
     const errors: Record<string, FieldErrorEntry> = {};
     for (const [address, messages] of Object.entries(scope.errors)) {
       if (messages?.length) errors[address] = toFieldErrorEntry(messages);
