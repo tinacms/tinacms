@@ -13,7 +13,7 @@ postPreviewTemplate.innerHTML = `
 		}
 	</style>
 
-	<li class="post-card">
+	<div class="post-card">
 			<h1>
 				<slot name="title"></slot>
 			</h1>
@@ -21,7 +21,7 @@ postPreviewTemplate.innerHTML = `
 				<slot name="content"></slot>
 			</p>
 		</div>
-	</li>
+	</div>
 `;
 
 class PostPreviewComponent extends HTMLElement {
