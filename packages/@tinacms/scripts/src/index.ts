@@ -355,6 +355,8 @@ export class BuildTina {
       return;
     }
 
+    // @tinacms/web-components is designed to be imported in plain JS sites.
+    // It needs to be bundled for browsers.
     if (['@tinacms/web-components'].includes(packageJSON.name)) {
       await esbuild({
         entryPoints: [path.join(process.cwd(), entry)],

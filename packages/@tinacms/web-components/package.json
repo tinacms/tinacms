@@ -7,9 +7,6 @@
     "src",
     "dist"
   ],
-  "exports": {
-    ".": "./dist/index.browser.js"
-  },
   "license": "Apache-2.0",
   "buildConfig": {
     "entryPoints": [

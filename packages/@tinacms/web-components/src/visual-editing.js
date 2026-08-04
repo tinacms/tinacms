@@ -1,28 +1,5 @@
-// Vanilla-JS visual editing for a client-rendered site.
-//
-// The admin UI runs the preview site in an iframe and talks to it over
-// `postMessage`. This module reimplements the exact protocol the React
-// `useTina` hook uses (packages/tinacms/src/react.tsx), so the admin sees
-// identical traffic:
-//
-//   1. `{type: 'open', id, query, variables, data}`  — announce the query
-//   2. `{type: 'quick-edit', value}`                 — report that the DOM
-//      has `[data-tina-field]` markers
-//   3. `{type: 'quickEditEnabled', value}`           — admin toggles visual
-//      editing; we enable the click-to-focus handler
-//   4. `{type: 'updateData', id, data}`              — content edited in the
-//      admin; we re-render the page
-//   5. `{type: 'field:selected', fieldName}`         — user clicked a
-//      `[data-tina-field]` element; admin opens that form field
-//   6. `{type: 'close', id}`                         — page is going away
-//
-// Unlike React, we build the DOM by hand, and web components (like the
-// `tina-markdown` rich-text renderer) render into shadow DOM. `closest()`
-// cannot cross a shadow boundary, so the click handler walks
-// `event.composedPath()` instead — the composed path includes every shadow
-// host, which is where we attach the `data-tina-field` marker.
-
 import { tinaField } from '@tinacms/bridge';
+export { tinaField };
 
 import {
   QUICK_EDIT_BODY_CLASS,
@@ -31,17 +8,22 @@ import {
 
 import { addMetadata, hashFromQuery } from '@tinacms/bridge/metadata';
 
-export { tinaField };
+/**
+ * @typedef {'open' | 'quick-edit' | 'quickEditEnabled' | 'field:selected' | 'close'} type
+ */
+
+/**
+ * @typedef {Object} CreateTinaOptions
+ * @property {() => Promise<{data: object, query: string, variables: object}>} query
+ *   A generated-client query (e.g. `() => client.queries.postConnection()`).
+ * @property {(data: object) => void} render
+ *   Rebuilds the page DOM from metadata-stamped data. Called with the
+ *   initial fetch result and again with every admin `updateData` payload.
+ */
 
 /**
  * Create a visual-editing session for one page.
- *
- * @param {object} options
- * @param {() => Promise<{data: object, query: string, variables: object}>} options.query
- *   A generated-client query (e.g. `() => client.queries.postConnection()`).
- * @param {(data: object) => void} options.render
- *   Rebuilds the page DOM from metadata-stamped data. Called with the
- *   initial fetch result and again with every admin `updateData` payload.
+ * @param {CreateTinaOptions} options
  */
 export function createTina({ query, render }) {
   let id = null;
@@ -55,7 +37,7 @@ export function createTina({ query, render }) {
 
     // Stamp every object in the result with `_content_source` so `tinaField()`
     // can derive `data-tina-field` values from it. The stamp mutates the data
-    // shape, so only the render path sees it — the `open` message carries the
+    // shape, so only the render path sees it - the `open` message carries the
     // raw result instead.
     render(addMetadata(id, structuredClone(result.data), []));
 
