@@ -89,6 +89,7 @@ const Harness = ({
     rawMode: false,
     setRawMode: () => {},
     onActivateField,
+    embedEditAvailable: false,
   };
 
   return (
