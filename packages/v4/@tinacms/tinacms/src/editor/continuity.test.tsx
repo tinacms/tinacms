@@ -207,6 +207,28 @@ describe('form continuity across mounts', () => {
     expect(screen.getByTestId('status')).toHaveTextContent('pristine');
   });
 
+  it('a clean re-mount takes content that changes after the re-mount', async () => {
+    const { unmount } = render(host(pathA, { title: 'Hello' }, () => {}));
+    await userEvent.type(await screen.findByLabelText('title'), '!');
+    await userEvent.click(screen.getByText('save'));
+    await waitFor(() =>
+      expect(screen.getByTestId('status')).toHaveTextContent('clean')
+    );
+    unmount();
+
+    const { rerender } = render(host(pathA, { title: 'Hello!' }, () => {}));
+    await waitFor(() =>
+      expect(screen.getByLabelText('title')).toHaveValue('Hello!')
+    );
+    expect(screen.getByTestId('status')).toHaveTextContent('clean');
+
+    rerender(host(pathA, { title: 'Changed on disk' }, () => {}));
+    await waitFor(() =>
+      expect(screen.getByLabelText('title')).toHaveValue('Changed on disk')
+    );
+    expect(screen.getByTestId('status')).toHaveTextContent('pristine');
+  });
+
   it('a document swap under kept edits keeps the edits', async () => {
     const { unmount } = render(host(pathA, { title: 'Doc A' }));
     await userEvent.type(await screen.findByLabelText('title'), ' edited');
