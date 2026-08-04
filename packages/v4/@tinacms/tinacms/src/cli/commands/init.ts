@@ -25,6 +25,7 @@ export const postCollection = {
   format: 'mdx',
   fields: [
     t.string({ name: 'title', label: 'Title', required: true }),
+    t.richText({ name: 'body', label: 'Body', isBody: true }),
   ],
 } satisfies CollectionSchema;
 

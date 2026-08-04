@@ -1,5 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+// Warm the Plate editor chain at module scope. Boot dynamically imports the
+// rich-text client, and paying its transform cost inside a test's async
+// timeout flakes on contended CI runners.
+import '../plugins/fields/rich-text/rich-text-field.client';
 import { asResolvedConfig } from '../config';
 import { defineConfig } from '../config';
 import { definePlugin } from '../core/plugin';
@@ -35,7 +39,7 @@ describe('TinaProvider boot', () => {
       </TinaProvider>
     );
     expect(await screen.findByTestId('field-types')).toHaveTextContent(
-      'boolean,datetime,number,string'
+      'boolean,datetime,number,rich-text,string'
     );
     expect(screen.getByTestId('namespaces')).toHaveTextContent(
       'branch,documents,ui'

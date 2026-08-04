@@ -10,6 +10,7 @@
     "types": "tsc"
   },
   "dependencies": {
+    "@tinacms/rich-text": "workspace:*",
     "@tinacms/tinacms": "workspace:*",
     "@tinacms/ui": "workspace:*",
     "react": "^19.2.7",
