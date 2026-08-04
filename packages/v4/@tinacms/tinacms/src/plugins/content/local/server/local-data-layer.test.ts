@@ -250,6 +250,19 @@ describe('trust boundary', () => {
     await fs.rm(outside, { recursive: true, force: true });
   });
 
+  it('rejects a path that a link with no target points out of the collection folder', async () => {
+    const outside = await fs.mkdtemp(path.join(tmpdir(), 'tina-outside-'));
+    const target = path.join(outside, 'absent.mdx');
+    await fs.symlink(target, path.join(rootDir, 'content/posts/dangling.mdx'));
+    await expect(
+      dataLayer.update('post', 'content/posts/dangling.mdx', {
+        title: 'Nope',
+      })
+    ).rejects.toThrow(/outside collection/);
+    await expect(fs.access(target)).rejects.toThrow();
+    await fs.rm(outside, { recursive: true, force: true });
+  });
+
   it('reads a document through a link that stays inside the collection folder', async () => {
     await fs.symlink(
       path.join(rootDir, 'content/posts/nested'),
