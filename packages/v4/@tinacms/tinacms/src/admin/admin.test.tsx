@@ -30,7 +30,8 @@ const store: Record<string, DocumentEntry[]> = {
 };
 
 const provider: ContentProvider = {
-  list: async (collection) => store[collection] ?? [],
+  list: async (collection) =>
+    (store[collection] ?? []).map(({ path }) => ({ path })),
   get: async (collection, path) =>
     (store[collection] ?? []).find((entry) => entry.path === path) ?? null,
   update: async (collection, path, value) => {
@@ -44,6 +45,7 @@ const provider: ContentProvider = {
 };
 
 const listCalls: string[] = [];
+const getCalls: string[] = [];
 
 const contentPlugin = definePlugin({
   name: 'test:content',
@@ -55,7 +57,10 @@ const contentPlugin = definePlugin({
           listCalls.push(collection);
           return provider.list(collection);
         },
-        get: provider.get,
+        get: (collection: string, path: string) => {
+          getCalls.push(path);
+          return provider.get(collection, path);
+        },
         update: provider.update,
       }),
     },
@@ -148,6 +153,7 @@ const FIXTURES: Record<string, DocumentEntry[]> = {
 beforeEach(() => {
   saved.length = 0;
   listCalls.length = 0;
+  getCalls.length = 0;
   window.location.hash = '';
   useFormStore.setState({ forms: {} });
   for (const [collection, entries] of Object.entries(FIXTURES)) {
@@ -311,6 +317,32 @@ describe('TinaAdmin unsaved changes', () => {
 });
 
 describe('TinaAdmin content reads', () => {
+  it('names the documents of a collection without reading any of them', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    const menu = await screen.findByRole('list', { name: 'Posts documents' });
+
+    expect(
+      within(menu)
+        .getAllByRole('button')
+        .map((button) => button.getAttribute('aria-label'))
+    ).toEqual(['hello.mdx', 'second.mdx']);
+    expect(getCalls).toEqual([]);
+  });
+
+  it('reads only the document it opens', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    await screen.findByLabelText('title');
+
+    expect(getCalls).toEqual(['content/posts/hello.mdx']);
+  });
+
   it('reads a collection once when two components ask for it', async () => {
     const user = userEvent.setup();
     renderAdmin();
