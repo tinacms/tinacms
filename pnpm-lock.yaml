@@ -2724,6 +2724,18 @@ importers:
         specifier: 'catalog:'
         version: 11.12.2
     devDependencies:
+      '@testing-library/dom':
+        specifier: 'catalog:'
+        version: 10.4.1
+      '@testing-library/jest-dom':
+        specifier: 'catalog:'
+        version: 6.9.1
+      '@testing-library/react':
+        specifier: 'catalog:'
+        version: 16.3.1(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@testing-library/user-event':
+        specifier: 'catalog:'
+        version: 14.6.1(@testing-library/dom@10.4.1)
       '@tinacms/scripts':
         specifier: workspace:*
         version: link:../../../@tinacms/scripts
@@ -2733,6 +2745,9 @@ importers:
       '@types/react-dom':
         specifier: ^19.2.3
         version: 19.2.3(@types/react@19.2.17)
+      happy-dom:
+        specifier: 'catalog:'
+        version: 15.10.2
       react:
         specifier: ^19.2.7
         version: 19.2.7
