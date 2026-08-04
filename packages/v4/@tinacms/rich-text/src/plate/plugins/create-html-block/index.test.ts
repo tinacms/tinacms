@@ -17,9 +17,7 @@ const blockquoteDocument: Value = [
   { type: 'blockquote', children: [{ text: 'quoted' }] },
 ];
 
-const paragraphDocument: Value = [
-  { type: 'p', children: [{ text: 'plain' }] },
-];
+const paragraphDocument: Value = [{ type: 'p', children: [{ text: 'plain' }] }];
 
 const pressKey = (
   editor: ReturnType<typeof makeEditor>,

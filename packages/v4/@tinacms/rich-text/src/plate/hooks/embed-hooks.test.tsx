@@ -123,7 +123,9 @@ describe('useEmbedHandles', () => {
 
     act(() => handles?.handleSelect());
 
-    expect(onActivateField).toHaveBeenCalledWith('body.children.1.children.0.props');
+    expect(onActivateField).toHaveBeenCalledWith(
+      'body.children.1.children.0.props'
+    );
   });
 
   it('removes the embed node at its own path', () => {

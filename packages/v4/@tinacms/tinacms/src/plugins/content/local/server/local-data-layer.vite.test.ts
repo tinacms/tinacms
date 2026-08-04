@@ -335,7 +335,10 @@ const configOf = (fields: { name: string; type: string }[]): ResolvedConfig =>
 // config object, so the file only has to exist.
 const bootServer = async (config: ResolvedConfig) => {
   await fs.mkdir(path.join(rootDir, 'tina'), { recursive: true });
-  await fs.writeFile(path.join(rootDir, 'tina', 'config.ts'), 'export default {}');
+  await fs.writeFile(
+    path.join(rootDir, 'tina', 'config.ts'),
+    'export default {}'
+  );
   const plugin = tinaLocalDataLayerVitePlugin({ rootDir, config });
   const server = serverDouble();
   (plugin.configureServer as (s: unknown) => void)(server);
@@ -353,8 +356,7 @@ const adminRequest = async (
   return { res, next };
 };
 
-const adminHtmlPath = () =>
-  path.join(rootDir, 'public', 'admin', 'index.html');
+const adminHtmlPath = () => path.join(rootDir, 'public', 'admin', 'index.html');
 
 describe('tinaLocalDataLayerVitePlugin dev codegen', () => {
   it('writes the admin shell and names each file it wrote', async () => {
@@ -428,7 +430,10 @@ describe('tinaLocalDataLayerVitePlugin admin route', () => {
     const { server } = await bootServer(
       configOf([{ name: 'title', type: 'string' }])
     );
-    const { res, next } = await adminRequest(server, '/admin/?collection=posts');
+    const { res, next } = await adminRequest(
+      server,
+      '/admin/?collection=posts'
+    );
     expect(next).not.toHaveBeenCalled();
     expect(res.body).toContain(TRANSFORM_MARK);
   });
