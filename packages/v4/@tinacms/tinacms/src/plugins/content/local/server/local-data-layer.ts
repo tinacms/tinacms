@@ -72,8 +72,10 @@ const resolveCollections = ({
   return resolved;
 };
 
-const isMissingFileError = (cause: unknown): boolean =>
-  cause instanceof Error && 'code' in cause && cause.code === 'ENOENT';
+const isMissingFileError = (cause: unknown): boolean => {
+  if (!(cause instanceof Error)) return false;
+  return 'code' in cause && cause.code === 'ENOENT';
+};
 
 const isUnparsable = (
   adapter: FormatAdapter,
@@ -267,7 +269,12 @@ export const createLocalDataLayer = (
         try {
           raw = adapter.serialize(value, previousRaw, collection.bodyField);
         } catch (cause) {
-          const reason = cause instanceof Error ? cause.message : String(cause);
+          let reason: string;
+          if (cause instanceof Error) {
+            reason = cause.message;
+          } else {
+            reason = String(cause);
+          }
           throw new Error(
             isUnparsable(adapter, previousRaw, collection.bodyField)
               ? `Cannot save "${canonicalPath}": the contents of the file on disk could not be parsed (${reason}). Repair the file, then save again.`
