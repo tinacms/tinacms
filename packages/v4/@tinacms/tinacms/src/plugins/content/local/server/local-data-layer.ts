@@ -55,6 +55,7 @@ const resolveCollections = ({
       `Collection "${schema.name}" has no \`path\` — the local data layer needs one to locate its files.`
     );
     // TODO: move this schema validation to defineConfig (ADR-024) so every
+    // content plugin gets it, not the local data layer alone.
     const bodyFields = schema.fields.filter((field) => field.isBody);
     invariant(
       bodyFields.length <= 1,
@@ -218,15 +219,31 @@ export const createLocalDataLayer = (
         const adapter = adapterForPath(collection.adapters, name);
         if (!adapter) continue;
         const absolute = path.join(collection.absoluteFolder, name);
+        let raw: string;
         try {
           await resolveDocumentPath(collection, absolute);
-          const raw = await fs.readFile(absolute, 'utf8');
+          raw = await fs.readFile(absolute, 'utf8');
+        } catch (cause) {
+          console.warn(`Skipping unreadable document "${absolute}":`, cause);
+          continue;
+        }
+        try {
           entries.push({
             path: documentIdFor(absolute),
             document: adapter.parse(raw, collection.bodyField),
           });
         } catch (cause) {
-          console.warn(`Skipping unreadable document "${absolute}":`, cause);
+          let reason: string;
+          if (cause instanceof Error) {
+            reason = cause.message;
+          } else {
+            reason = String(cause);
+          }
+          entries.push({
+            path: documentIdFor(absolute),
+            document: {},
+            error: reason,
+          });
         }
       }
       return entries;

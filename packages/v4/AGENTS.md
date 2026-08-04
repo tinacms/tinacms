@@ -106,6 +106,7 @@ Comment policy (a prior cleanup pass established this):
   // TODO(ADR-008 §3): type `permissions` against codegen's Permission union once it lands.
 
   // TODO: move this schema validation to defineConfig (ADR-024) so every
+  // content plugin gets it, not the local data layer alone.
   ```
 
 ## Error handling

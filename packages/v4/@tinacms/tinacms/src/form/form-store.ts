@@ -135,6 +135,8 @@ export const useFormStore = create<FormStore>()(
         registerForm: (formId, values, equal = STRUCTURAL_EQUALITY) =>
           apply((state) => {
             // TODO(v4): the edited state also covers a clean form, so a clean form
+            // does not re-adopt content that changed outside the editor. A future
+            // auto-save slice arbitrates reload against dirty state.
             if (isEdited(state.forms[formId])) return state;
             return {
               forms: {

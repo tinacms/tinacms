@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { asResolvedConfig } from '../../../config';
 import {
@@ -10,12 +10,15 @@ import type {
   CollectionSchema,
   TinaDocument,
 } from '../../../core/schema/types';
+import { toFieldAddress } from '../../../core/field/address';
 import { validateField } from '../../../core/validation';
 import { Field, FormProvider, TinaProvider } from '../../../editor';
+import { toFormId, useFormStore } from '../../../form/form-store';
 import { t } from '../../../index';
 import datetimeFieldPlugin from './datetime-field.plugin';
 
 const NO_COLLECTIONS = { collections: [] };
+const DOCUMENT_PATH = 'content/posts/published.mdx';
 
 const collection: CollectionSchema = {
   name: 'post',
@@ -45,7 +48,7 @@ const renderPublished = (document?: TinaDocument) =>
     >
       <FormProvider
         collection={collection}
-        path='content/posts/published.mdx'
+        path={DOCUMENT_PATH}
         document={document}
       >
         <Field address='published' />
@@ -88,6 +91,22 @@ describe('DatetimeField value updates', () => {
 
     fireEvent.change(input, { target: { value: '2025-12-24T18:00' } });
     expect(input.value).toBe('2025-12-24T18:00');
+  });
+
+  it('writes a stored `Z` value back without its zone', async () => {
+    renderPublished({ published: '2024-05-01T09:30:00.000Z' });
+    const input = (await screen.findByLabelText(
+      'published'
+    )) as HTMLInputElement;
+
+    fireEvent.change(input, { target: { value: '2024-05-01T11:45' } });
+
+    await waitFor(() => {
+      const form = useFormStore.getState().forms[toFormId(DOCUMENT_PATH)];
+      expect(form?.values[toFieldAddress('published')]).toBe(
+        '2024-05-01T11:45'
+      );
+    });
   });
 });
 

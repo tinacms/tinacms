@@ -58,6 +58,10 @@ Next steps:
   1. Mount Tina in vite.config.ts:
 
        import { tinaLocalDataLayerVitePlugin } from '@tinacms/tinacms/local-data-layer/vite';
+
+     The alpha releases raw .ts through \`exports\`, and node cannot follow its
+     extensionless relative imports. Until the dist build lands, import this
+     through a relative path to the package source. See the barebones example.
        // ...
        plugins: [
          tinaLocalDataLayerVitePlugin({ rootDir, config: tina }),

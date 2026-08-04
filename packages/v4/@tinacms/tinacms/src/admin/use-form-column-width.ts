@@ -29,8 +29,11 @@ const writeStoredWidth = (width: number) => {
   } catch {}
 };
 
+const maxWidthForViewport = (): number =>
+  Math.max(MIN_WIDTH, window.innerWidth - MIN_PREVIEW_WIDTH);
+
 const clampWidth = (width: number) =>
-  Math.max(MIN_WIDTH, Math.min(width, window.innerWidth - MIN_PREVIEW_WIDTH));
+  Math.min(Math.max(MIN_WIDTH, width), maxWidthForViewport());
 
 export interface FormColumnWidth {
   width: number;
@@ -40,6 +43,7 @@ export interface FormColumnWidth {
 
 export const useFormColumnWidth = (): FormColumnWidth => {
   const [width, setWidth] = useState(DEFAULT_WIDTH);
+  const [maxWidth, setMaxWidth] = useState(MIN_WIDTH);
   const [isResizing, setIsResizing] = useState(false);
   const dragStart = useRef<{ x: number; width: number } | null>(null);
 
@@ -49,7 +53,11 @@ export const useFormColumnWidth = (): FormColumnWidth => {
   }, []);
 
   useEffect(() => {
-    const onWindowResize = () => setWidth(clampWidth);
+    const onWindowResize = () => {
+      setWidth(clampWidth);
+      setMaxWidth(maxWidthForViewport());
+    };
+    setMaxWidth(maxWidthForViewport());
     window.addEventListener('resize', onWindowResize);
     return () => window.removeEventListener('resize', onWindowResize);
   }, []);
@@ -104,6 +112,7 @@ export const useFormColumnWidth = (): FormColumnWidth => {
       'aria-label': 'Resize the form column',
       'aria-valuenow': width,
       'aria-valuemin': MIN_WIDTH,
+      'aria-valuemax': maxWidth,
       tabIndex: 0,
       onPointerDown,
       onPointerMove,

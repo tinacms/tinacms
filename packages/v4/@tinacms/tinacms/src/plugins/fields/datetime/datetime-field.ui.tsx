@@ -8,7 +8,8 @@ import {
   useFieldValue,
 } from '../../../editor';
 
-// ponytail: no zone math — a stored `Z` time shows as wall clock. Convert to the
+// No zone math: a stored `Z` time shows as wall clock, and saves back without the
+// zone. The input needs `YYYY-MM-DDTHH:mm`, so a date-only value gets a midnight time.
 const toInputValue = (stored: string | undefined): string => {
   if (!stored) return '';
   return stored.includes('T') ? stored.slice(0, 16) : `${stored}T00:00`;

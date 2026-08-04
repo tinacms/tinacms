@@ -108,17 +108,24 @@ function DocumentMenu({
   }
   return (
     <SidebarMenu aria-label={`${label} documents`}>
-      {documents.map(({ path }) => (
+      {documents.map(({ path, error }) => (
         <SidebarMenuItem key={path}>
           <SidebarMenuButton
             isActive={path === activePath}
             aria-label={documentName(path)}
+            title={error}
             onClick={() =>
               navigate({ view: 'document', collection: collection.name, path })
             }
           >
             <span className='flex-1 truncate'>{documentName(path)}</span>
-            <FormStatusBadge formId={toFormId(path)} />
+            {error ? (
+              <span role='alert' className='text-destructive text-xs'>
+                Cannot read
+              </span>
+            ) : (
+              <FormStatusBadge formId={toFormId(path)} />
+            )}
           </SidebarMenuButton>
         </SidebarMenuItem>
       ))}
@@ -292,7 +299,7 @@ function AdminShell({ preview }: { preview?: ReactNode }) {
   const isStaleCollectionRoute =
     activeCollectionName !== undefined && collection === undefined;
 
-  const layout = (
+  return (
     <SidebarProvider style={SHELL_WIDTH}>
       <Sidebar aria-label='Content' role='navigation'>
         <SidebarHeader>
@@ -370,6 +377,4 @@ function AdminShell({ preview }: { preview?: ReactNode }) {
       )}
     </SidebarProvider>
   );
-
-  return layout;
 }

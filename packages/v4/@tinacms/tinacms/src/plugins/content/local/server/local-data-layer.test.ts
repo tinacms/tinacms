@@ -63,19 +63,33 @@ describe('list', () => {
     expect(await dataLayer.list('page')).toEqual([]);
   });
 
-  it('skips (and warns on) an unparsable file instead of rejecting', async () => {
+  it('lists an unparsable file as an entry carrying its error', async () => {
     await fs.writeFile(
       path.join(rootDir, 'content/posts/broken.mdx'),
       '---\ntitle: [unclosed\n---\n'
     );
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const entries = await dataLayer.list('post');
     expect(entries.map((entry) => entry.path)).toEqual([
+      'content/posts/broken.mdx',
       'content/posts/hello.mdx',
       'content/posts/nested/deep.mdx',
     ]);
-    expect(warn).toHaveBeenCalledOnce();
-    warn.mockRestore();
+    const broken = entries[0];
+    expect(broken.error).toBeTruthy();
+    expect(broken.document).toEqual({});
+    expect(entries[1].error).toBeUndefined();
+  });
+
+  it('refuses to save over a document it listed as unparsable', async () => {
+    await fs.writeFile(
+      path.join(rootDir, 'content/posts/broken.mdx'),
+      '---\ntitle: [unclosed\n---\n'
+    );
+    const [broken] = await dataLayer.list('post');
+    expect(broken.error).toBeTruthy();
+    await expect(
+      dataLayer.update('post', broken.path, broken.document)
+    ).rejects.toThrow(/could not be parsed/);
   });
 
   it('skips (and warns on) an unreadable entry, e.g. a directory named *.mdx', async () => {

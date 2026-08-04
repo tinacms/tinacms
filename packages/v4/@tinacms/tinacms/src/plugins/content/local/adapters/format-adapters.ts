@@ -1,8 +1,8 @@
 import {
   type CollectionFormat,
-  CollectionSchema,
+  type CollectionSchema,
   FORMAT_EXTENSIONS,
-  TinaDocument,
+  type TinaDocument,
 } from '../../../../core/schema/types';
 import { jsonAdapter } from './json.adapter';
 import { markdownAdapter } from './markdown.adapter';

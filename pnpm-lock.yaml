@@ -624,9 +624,6 @@ catalogs:
     typedoc-plugin-markdown:
       specifier: ^3.17.1
       version: 3.17.1
-    unified:
-      specifier: ^10.1.2
-      version: 10.1.2
     unist-util-source:
       specifier: 4.0.2
       version: 4.0.2
@@ -1774,9 +1771,6 @@ importers:
       typedoc:
         specifier: 'catalog:'
         version: 0.26.11(typescript@5.9.3)
-      unified:
-        specifier: 'catalog:'
-        version: 10.1.2
       unist-util-source:
         specifier: 'catalog:'
         version: 4.0.2
