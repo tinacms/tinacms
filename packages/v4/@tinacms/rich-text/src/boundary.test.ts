@@ -19,6 +19,14 @@ const importsOf = (file: string): string[] => {
   return [...contents.matchAll(IMPORT)].map((match) => match[1]);
 };
 
+// The editor keeps a value contract with the storage format. It can use the
+// shared schema and UI packages. It must not import the host runtime, or a
+// package that reads or writes a storage format.
+const ALLOWED_TINACMS_PACKAGES = ['@tinacms/schema-tools', '@tinacms/ui'];
+
+const packageOf = (specifier: string): string =>
+  specifier.split('/').slice(0, 2).join('/');
+
 describe('package boundary', () => {
   const files = sourceFiles(SRC);
 
@@ -48,13 +56,19 @@ describe('package boundary', () => {
     expect(totalImports.length).toBeGreaterThan(200);
   });
 
-  it('never imports the host package', () => {
-    const offenders = files.filter((file) =>
-      importsOf(file).some((specifier) =>
-        specifier.startsWith('@tinacms/tinacms')
-      )
+  it('imports only the allowed TinaCMS packages', () => {
+    const tinacmsImports = files.flatMap((file) =>
+      importsOf(file)
+        .filter((specifier) => specifier.startsWith('@tinacms/'))
+        .map((specifier) => ({ file: path.relative(SRC, file), specifier }))
     );
-    expect(offenders.map((file) => path.relative(SRC, file))).toEqual([]);
+    expect(tinacmsImports.length).toBeGreaterThan(0);
+
+    const offenders = tinacmsImports.filter(
+      ({ specifier }) =>
+        !ALLOWED_TINACMS_PACKAGES.includes(packageOf(specifier))
+    );
+    expect(offenders).toEqual([]);
   });
 
   it('never reaches outside its own src directory', () => {
