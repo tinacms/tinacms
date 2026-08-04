@@ -9,8 +9,8 @@ import type { CollectionSchema } from '../../../core/schema/types';
 import { t } from '../../../index';
 import { markdownCodec } from './markdown.codec';
 import { mdxCodec } from './mdx.codec';
-import type { RichTextCodec } from './rich-text-codec';
-import { codecFor } from './rich-text-codecs';
+import type { RichTextCodec, RichTextValue } from './rich-text-codec';
+import { codecFor, writesSameSource } from './rich-text-codecs';
 import richTextFieldPlugin from './rich-text-field.plugin';
 
 const resolveRegistry = (): Promise<FieldRegistry> =>
@@ -110,6 +110,59 @@ describe('the two parsers genuinely differ', () => {
       ],
     };
     expect(markdownCodec.serialize(unparsed, body)).toBe(source);
+  });
+});
+
+/**
+ * The editor keeps a code block out of a list item. This holds the other end of
+ * that contract: if the codec ever accepts the shape, the editor guard has
+ * become dead code and someone must say so on purpose.
+ */
+describe('a block inside a list item', () => {
+  const body = t.richText({ name: 'body' });
+
+  const codeBlockInListItem: RichTextValue = {
+    type: 'root',
+    children: [
+      {
+        type: 'ul',
+        children: [
+          {
+            type: 'li',
+            children: [
+              { type: 'lic', children: [{ type: 'text', text: 'item' }] },
+              {
+                type: 'code_block',
+                children: [
+                  {
+                    type: 'code_line',
+                    children: [{ type: 'text', text: 'x' }],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  };
+
+  it.each([
+    ['mdx', mdxCodec],
+    ['md', markdownCodec],
+  ])('is a shape the %s codec refuses to write', (_format, codec) => {
+    expect(() => codec.serialize(codeBlockInListItem, body)).toThrow();
+  });
+
+  it('reads as a change rather than throwing out of the equality check', () => {
+    expect(
+      writesSameSource(
+        codeBlockInListItem,
+        { type: 'root', children: [] },
+        body,
+        {}
+      )
+    ).toBe(false);
   });
 });
 

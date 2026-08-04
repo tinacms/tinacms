@@ -11,3 +11,10 @@ export interface RichTextCodec {
   parse(source: string, node: FieldSchema): RichTextValue;
   serialize(value: RichTextValue, node: FieldSchema): string;
 }
+
+export class RichTextSerializeError extends Error {
+  constructor(cause: unknown) {
+    super('The codec cannot write this rich-text value.', { cause });
+    this.name = 'RichTextSerializeError';
+  }
+}
