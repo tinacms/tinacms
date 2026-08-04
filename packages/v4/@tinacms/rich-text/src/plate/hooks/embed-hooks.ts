@@ -7,9 +7,15 @@ const handleCloseBase = (editor, element) => {
   const path = editor.findPath(element);
   const editorEl = editor.toDOMNode(editor, editor);
   if (editorEl) {
-    // FIXME: jumping back from a nested form needs both editor focus and node
+    // Returning from a nested form needs focus and the selection. The
+    // selection has to follow focus on a later tick, or it does not take.
     editorEl.focus();
-    setTimeout(() => {
+    return setTimeout(() => {
+      // The embed can leave the document inside the window of the timer. The
+      // path then points at no node, and `select` throws.
+      if (!editor.api.hasPath(path)) {
+        return;
+      }
       editor.tf.select(path);
     }, 1);
   }
@@ -41,10 +47,20 @@ export const useHotkey = (key, callback) => {
 export const useEmbedHandles = (editor, element, baseFieldName: string) => {
   const { onActivateField } = useEditorContext();
   const [isExpanded, setIsExpanded] = React.useState(false);
+  const deferredSelect = React.useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  // The embed can unmount inside the window of the timer. A deferred select
+  // must not move the caret of an editor that the user no longer sees.
+  React.useEffect(
+    () => () => {
+      clearTimeout(deferredSelect.current);
+    },
+    []
+  );
 
   const handleClose = () => {
     setIsExpanded(false);
-    handleCloseBase(editor, element);
+    deferredSelect.current = handleCloseBase(editor, element);
   };
   const path = editor.findPath(element);
   const fieldName = `${baseFieldName}.children.${path.join('.children.')}.props`;
