@@ -40,7 +40,6 @@ The client segment (`boolean-field.client.tsx`) takes the `boolean` key:
 ```tsx
 defineClientPlugin({
   field: {
-    type: 'boolean',          // BOOLEAN_FIELD_TYPE
     Component: BooleanField,
     defaultValue: false,      // seeds a new/absent field on ingest
     metadata: { layout: 'inline' },
@@ -48,6 +47,11 @@ defineClientPlugin({
   },
 });
 ```
+
+The descriptor does not carry `type`. `boolean-field.plugin.ts` claims the
+`boolean` key with `field: { type: BOOLEAN_FIELD_TYPE, contractVersion: 1 }`
+on the manifest (see
+[`field-plugins.md`](./field-plugins.md#2-the-client-segment-and-the-descriptor-clienttsx)).
 
 The descriptor has no `validate`, `parse`, or `serialize` function. TinaCMS
 stores the value without a change, as a JSON boolean or a YAML boolean.

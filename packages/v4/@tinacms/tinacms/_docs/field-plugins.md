@@ -13,7 +13,7 @@ that the plugin controls, in the format `<type>-field.*`:
 
 | File | Role |
 |---|---|
-| `<type>-field.plugin.ts` | The manifest: `definePlugin({ name, provides:['field'], client })` |
+| `<type>-field.plugin.ts` | The manifest: `definePlugin({ name, provides:['field'], field: { type, contractVersion }, client })` |
 | `<type>-field.schema.ts` | The `t.<type>()` helper function for authors, and its Zod validator |
 | `<type>-field.client.tsx` | The client segment: `defineClientPlugin({ field: descriptor })` |
 | `<type>-field.ui.tsx` | The React component that the editor renders |
@@ -25,7 +25,12 @@ The `string` field (`plugins/fields/string/`) is the example in the sections
 below. Use your own `type` in place of `string`. For the config options and the
 validation rules of that field, refer to [`string-field.md`](./string-field.md).
 
-v4 supplies three more examples:
+For a complete, working field plugin in one file — manifest, descriptor, and
+component together — copy `packages/v4/examples/barebones/tina/rating-field.tsx`.
+It defines a five-star rating field end to end, including the `field: { type,
+contractVersion }` manifest property that the sections below walk through.
+
+v4 supplies four more examples:
 
 - The `boolean` field ([`boolean-field.md`](./boolean-field.md)) is a checkbox
   with two states. For that field, `required` has no effect.
@@ -33,6 +38,9 @@ v4 supplies three more examples:
   value in the editor and a numeric value in the document. `parse` and
   `serialize` do the conversion. The field reads its own config option, `step`,
   with `useFieldSchema`.
+- The `datetime` field ([`datetime-field.md`](./datetime-field.md)) holds a
+  string on both sides. It defines `parse`, but no `serialize` and no
+  `defaultValue`.
 - The `rich-text` field ([`rich-text-field.md`](./rich-text-field.md)) uses the
   `block` layout. With `isBody`, it controls the markdown body of the file.
 
@@ -40,10 +48,12 @@ v4 supplies three more examples:
 
 ```ts
 import { definePlugin } from '../../../core/plugin';
+import { STRING_FIELD_TYPE } from './string-field.schema';
 
 export default definePlugin({
   name: 'tina:field:string',
   provides: ['field'],
+  field: { type: STRING_FIELD_TYPE, contractVersion: 1 },
   client: () => import('./string-field.client'),
 });
 ```
@@ -52,19 +62,25 @@ export default definePlugin({
 `tina:<capability>:<key>`. In this example the name is `tina:field:string`. The
 capability is `field`, and the key is `string`.
 
+`field` is necessary for a field plugin. It has two properties: `type`, the
+schema type this plugin owns and the registry key, and `contractVersion`, a
+number the codegen lock file records for that type
+(`codegen/compile-schema.ts`). Without `field`, the registry throws
+`field-plugin-no-provision` (`core/field/registry.ts`) as soon as the client
+segment resolves a descriptor.
+
 ### 2. The client segment and the descriptor (`.client.tsx`)
 
 The `field` property of the segment is a `FieldDescriptor`
-(`core/field/contract.ts`). This descriptor takes the `type` key:
+(`core/field/contract.ts`):
 
 ```tsx
 import { defineClientPlugin } from '../../../client';
-import { STRING_FIELD_TYPE, stringSchema } from './string-field.schema';
+import { stringSchema } from './string-field.schema';
 import { StringField } from './string-field.ui';
 
 export default defineClientPlugin({
   field: {
-    type: STRING_FIELD_TYPE,        // ← the registry key
     Component: StringField,
     defaultValue: '',
     metadata: { layout: 'inline' }, // 'inline' | 'block' layout hint
@@ -73,23 +89,34 @@ export default defineClientPlugin({
 });
 ```
 
+The descriptor does not carry `type`. The registry key comes from the
+manifest's `field.type` (step 1) — the resolver assigns this descriptor to
+that key (`core/field/registry.ts`).
+
 The properties of the descriptor:
 
-- `type` (necessary) — The schema `type` that this plugin renders. It is the
-  registry key.
 - `Component` (necessary) — It has no props. It gets all its data from the
   hooks below.
-- `defaultValue` — The initial value for a new document.
+- `defaultValue` — The initial value for a new or absent field, applied on
+  ingest.
 - `metadata.layout` — The layout hint: `inline` or `block`.
+- `metadata.labelable` — Set it to `false` to hide the outer field label. The
+  `rich-text` field sets it to `false` because it renders its own label area.
 - `schema(node)` — It returns a Zod schema for the validation in layer 1.
 - `validate(value)` — A custom check for layer 2. It returns `string` or `null`.
 - `parse` and `serialize` — Optional conversions between the stored value and
   the editor value. Do not add them if the two values are the same. Each one
-  also receives the field's own schema node as a second argument:
-  `parse(stored, node)` and `serialize(value, node)`. Use it when the conversion
-  depends on the field's config — the `rich-text` field reads `templates` off
-  the node to parse markdown. Ignore it when the conversion is value-only, as
-  `number` does.
+  also receives the field's own schema node and a `FieldTransformContext`
+  (`core/field/contract.ts`) as a second and third argument:
+  `parse(stored, node, context)` and `serialize(value, node, context)`. Use
+  them when the conversion depends on the field's config — the `rich-text`
+  field reads `templates` off the node to parse markdown. Ignore them when the
+  conversion is value-only, as `number` does.
+- `isEqual` — An optional custom equality check,
+  `isEqual(a, b, node, context) => boolean`. The form calls it instead of
+  structural equality when it decides whether a field's value changed
+  (`core/form/compare.ts`). The `rich-text` field uses it to treat two AST
+  values as equal when they serialize to the same markdown source.
 
 ### 3. The schema helper function and the validator (`.schema.ts`)
 
@@ -165,6 +192,7 @@ override:
 definePlugin({
   name: 'my:field:string',
   provides: ['field'],
+  field: { type: 'string', contractVersion: 1 },
   client: () => import('./my-string.client'),
   overrides: [{ capability: 'field', key: 'string' }],
 });
@@ -175,9 +203,9 @@ definePlugin({
 This example makes a color field:
 
 1. Make the folder `plugins/fields/color/` with the four files above.
-2. In `.client.tsx`, set `type` to `'color'`. Use an `<input type="color">`
-   component. Set `defaultValue` to `'#000000'`. Add an optional `validate`
-   function for the hexadecimal value.
+2. In `.plugin.ts`, set `field.type` to `'color'`. In `.client.tsx`, use an
+   `<input type="color">` component. Set `defaultValue` to `'#000000'`. Add an
+   optional `validate` function for the hexadecimal value.
 3. In `.schema.ts`, write the `color()` helper function. It adds
    `type: 'color'`.
 4. Add the plugin to `corePlugins`, and add `color` to `t`. Both are in
