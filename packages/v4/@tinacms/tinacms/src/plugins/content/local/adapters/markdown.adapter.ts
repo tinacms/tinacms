@@ -6,6 +6,18 @@ const dropLayoutBlankLine = (body: string): string =>
 
 const NO_MATTER_CACHE = {};
 
+const CRLF = '\r\n';
+
+/**
+ * gray-matter and the markdown parser both carry a carriage return through to
+ * the field value. The adapter reads a document in line feeds and writes it
+ * back in the line ending the document came with.
+ */
+const toLineFeeds = (text: string): string => text.replace(/\r\n/g, '\n');
+
+const toDocumentEol = (text: string, crlf: boolean): string =>
+  crlf ? text.replace(/\n/g, CRLF) : text;
+
 const isSameValue = (next: unknown, previous: unknown): boolean =>
   JSON.stringify(next) === JSON.stringify(previous);
 
@@ -25,13 +37,14 @@ const mergeFrontmatter = (
 export const markdownAdapter = (extension: string): FormatAdapter => ({
   extension,
   parse: (raw, bodyField) => {
-    const { data, content } = matter(raw, NO_MATTER_CACHE);
+    const { data, content } = matter(toLineFeeds(raw), NO_MATTER_CACHE);
     return bodyField
       ? { ...data, [bodyField]: dropLayoutBlankLine(content) }
       : data;
   },
   serialize: (document, previousRaw, bodyField) => {
-    const previous = matter(previousRaw ?? '', NO_MATTER_CACHE);
+    const crlf = previousRaw?.includes(CRLF) ?? false;
+    const previous = matter(toLineFeeds(previousRaw ?? ''), NO_MATTER_CACHE);
     const frontmatter = mergeFrontmatter(document, previous.data);
     if (bodyField != null) {
       delete frontmatter[bodyField];
@@ -44,7 +57,7 @@ export const markdownAdapter = (extension: string): FormatAdapter => ({
     ) {
       return previousRaw;
     }
-    return matter.stringify(content, frontmatter);
+    return toDocumentEol(matter.stringify(content, frontmatter), crlf);
   },
 });
 
