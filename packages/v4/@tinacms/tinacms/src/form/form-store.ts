@@ -96,6 +96,19 @@ export const formStatus = (scope: OpenForm | undefined): FormStatus => {
     : 'dirty';
 };
 
+// The edited state also covers a clean form, so a clean form must not keep values that
+// hide a changed document. A dirty form keeps its edits across mounts. A clean form
+// keeps its values only while the document matches the baseline of the last save. A
+// different document shows that another writer changed the file after the save.
+export const keepsValues = (
+  scope: OpenForm | undefined,
+  incoming: FormValues
+): scope is Extract<OpenForm, { status: 'edited' }> => {
+  if (!isEdited(scope)) return false;
+  if (formStatus(scope) === 'dirty') return true;
+  return valuesEqual(scope.baseline, incoming, scope.equal);
+};
+
 export const fieldDirty = (
   scope: OpenForm | undefined,
   address: FieldAddress
@@ -134,8 +147,7 @@ export const useFormStore = create<FormStore>()(
 
         registerForm: (formId, values, equal = STRUCTURAL_EQUALITY) =>
           apply((state) => {
-            // TODO(v4): the edited state also covers a clean form, so a clean form
-            if (isEdited(state.forms[formId])) return state;
+            if (keepsValues(state.forms[formId], values)) return state;
             return {
               forms: {
                 ...state.forms,

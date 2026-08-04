@@ -121,7 +121,11 @@ describe('form continuity across mounts', () => {
   });
 
   it('a saved form re-mounts clean on its saved values', async () => {
-    const { unmount } = render(host(pathA, { title: 'Hello' }, () => {}));
+    let stored: TinaDocument = { title: 'Hello' };
+    const onSave: SaveHandler = (document) => {
+      stored = document;
+    };
+    const { unmount } = render(host(pathA, stored, onSave));
     const input = await screen.findByLabelText('title');
     await userEvent.type(input, '!');
     await userEvent.click(screen.getByText('save'));
@@ -130,7 +134,7 @@ describe('form continuity across mounts', () => {
     );
     unmount();
 
-    render(host(pathA, { title: 'Hello' }, () => {}));
+    render(host(pathA, stored, onSave));
     const revisited = await screen.findByLabelText('title');
     expect(revisited).toHaveValue('Hello!');
     expect(screen.getByTestId('status')).toHaveTextContent('clean');
@@ -182,6 +186,22 @@ describe('form continuity across mounts', () => {
     unmount();
 
     render(host(pathA, { title: 'New content' }));
+    const revisited = await screen.findByLabelText('title');
+    await waitFor(() => expect(revisited).toHaveValue('New content'));
+    expect(screen.getByTestId('status')).toHaveTextContent('pristine');
+  });
+
+  it('a clean kept scope never shadows changed document content', async () => {
+    const { unmount } = render(host(pathA, { title: 'Old content' }, () => {}));
+    const input = await screen.findByLabelText('title');
+    await userEvent.type(input, '!');
+    await userEvent.click(screen.getByText('save'));
+    await waitFor(() =>
+      expect(screen.getByTestId('status')).toHaveTextContent('clean')
+    );
+    unmount();
+
+    render(host(pathA, { title: 'New content' }, () => {}));
     const revisited = await screen.findByLabelText('title');
     await waitFor(() => expect(revisited).toHaveValue('New content'));
     expect(screen.getByTestId('status')).toHaveTextContent('pristine');
