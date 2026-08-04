@@ -26,7 +26,7 @@ import { HashRouter } from 'react-router-dom';
 import type { ResolvedConfig } from '../config';
 import type { CollectionSchema } from '../core/schema/types';
 import type { AdminScreen } from '../core/screen/contract';
-import { useCollectionDocuments } from '../editor/content-queries';
+import { useCollectionDocuments, useDocument } from '../editor/content-queries';
 import { FormScopeContext } from '../editor/context';
 import { usePreviewConnection } from '../editor/preview-connection';
 import { TinaProvider } from '../editor/provider';
@@ -297,6 +297,20 @@ function AdminShell({ preview }: { preview?: ReactNode }) {
   const isStaleCollectionRoute =
     activeCollectionName !== undefined && collection === undefined;
 
+  // `get` already answers whether the open path exists — `list` only names a
+  // collection's documents and would need a second, redundant query.
+  const {
+    entry: openEntry,
+    isLoading: isLoadingOpenDocument,
+    error: openDocumentError,
+  } = useDocument(collection?.name, openPath);
+  const isStaleDocumentRoute =
+    collection !== undefined &&
+    openPath !== undefined &&
+    !isLoadingOpenDocument &&
+    openDocumentError === null &&
+    openEntry === null;
+
   const layout = (
     <SidebarProvider style={SHELL_WIDTH}>
       <Sidebar aria-label='Content' role='navigation'>
@@ -362,6 +376,15 @@ function AdminShell({ preview }: { preview?: ReactNode }) {
           )}
           segments={activeScreen.segments}
         />
+      ) : isStaleDocumentRoute ? (
+        <SidebarInset>
+          <div className='flex items-center gap-1 p-4 pb-2'>
+            <SidebarTrigger />
+          </div>
+          <div className='min-h-0 flex-1 overflow-y-auto'>
+            <Placeholder>No document named “{openPath}”.</Placeholder>
+          </div>
+        </SidebarInset>
       ) : (
         <DocumentScope collection={collection} path={openPath}>
           <SidebarInset className='flex-row'>

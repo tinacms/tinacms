@@ -217,6 +217,19 @@ describe('TinaAdmin', () => {
     expect(await screen.findByText(/No collection named/)).toBeInTheDocument();
   });
 
+  it('reports a document a deep link names that does not exist', async () => {
+    window.location.hash = '#/collections/post/content%2Fposts%2Fghost.mdx';
+    renderAdmin();
+    expect(await screen.findByText(/No document named/)).toBeInTheDocument();
+  });
+
+  it('does not report a document a deep link names that does exist', async () => {
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    renderAdmin();
+    expect(await screen.findByLabelText('Title')).toHaveValue('Hello');
+    expect(screen.queryByText(/No document named/)).not.toBeInTheDocument();
+  });
+
   it('renders the preview inside the open document form scope', async () => {
     window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
     renderAdmin(<PreviewProbe />);
@@ -365,6 +378,23 @@ describe('TinaAdmin content reads', () => {
     await screen.findByRole('button', { name: /hello\.mdx/ });
 
     expect(listCalls).toEqual(['post', 'page']);
+  });
+
+  it('does not report a document missing while it is still loading', async () => {
+    let resolveGet: (entry: DocumentEntry | null) => void = () => {};
+    const pending = new Promise<DocumentEntry | null>((resolve) => {
+      resolveGet = resolve;
+    });
+    const reading = vi.spyOn(provider, 'get').mockReturnValueOnce(pending);
+    window.location.hash = '#/collections/post/content%2Fposts%2Fghost.mdx';
+    renderAdmin();
+
+    await screen.findByRole('list', { name: 'Posts documents' });
+    expect(screen.queryByText(/No document named/)).not.toBeInTheDocument();
+
+    resolveGet(null);
+    expect(await screen.findByText(/No document named/)).toBeInTheDocument();
+    reading.mockRestore();
   });
 
   it('reports a collection that failed to load', async () => {
