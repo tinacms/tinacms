@@ -52,18 +52,11 @@ const renderInvalidMarkdown = () => {
 };
 
 /**
- * `createInvalidMarkdownPlugin` declares `isElement`, `isVoid` and `isInline`
- * under `options`. Plate reads node behaviour from `node`, so it registers no
- * element for this key and never mounts `InvalidMarkdownElement`. The block
- * renders as an empty div: the author sees an empty editor where their
- * content was, and no message that says why.
- *
- * Every case below is marked `fails` and asserts the behaviour the plugin
- * intends. Moving the three flags under `node` turns them all red at once,
- * which is the signal to change each `it.fails` back to `it`.
+ * The editor shows this block when the parser cannot read the markdown.
+ * The original source stays in the file until it parses.
  */
 describe('invalid markdown element', () => {
-  it.fails('shows the parser message and the line it failed on', () => {
+  it('shows the parser message and the line it failed on', () => {
     renderInvalidMarkdown();
 
     expect(
@@ -71,7 +64,7 @@ describe('invalid markdown element', () => {
     ).toBeInTheDocument();
   });
 
-  it.fails('names the failure in a heading', () => {
+  it('names the failure in a heading', () => {
     renderInvalidMarkdown();
 
     expect(
@@ -79,13 +72,13 @@ describe('invalid markdown element', () => {
     ).toBeInTheDocument();
   });
 
-  it.fails('tells the author their markdown is kept as it is', () => {
+  it('tells the author their markdown is kept as it is', () => {
     renderInvalidMarkdown();
 
     expect(screen.getByText(/kept as-is until it parses/)).toBeInTheDocument();
   });
 
-  it.fails('treats the error box as a void the author cannot type into', () => {
+  it('treats the error box as a void the author cannot type into', () => {
     const editor = renderInvalidMarkdown();
 
     expect(editor.api.isVoid(editor.children[0])).toBe(true);
@@ -95,7 +88,7 @@ describe('invalid markdown element', () => {
    * A second, separate defect: `AGENTS.md` requires `role='alert'` on an error
    * message. This one survives the fix above, so it needs its own change.
    */
-  it.fails('carries the alert role', () => {
+  it('carries the alert role', () => {
     renderInvalidMarkdown();
 
     expect(screen.getByRole('alert')).toBeInTheDocument();
