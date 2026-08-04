@@ -16,9 +16,7 @@
   },
   "scripts": {
     "types": "tsc",
-    "build": "tinacms-scripts build",
-    "test": "vitest run",
-    "test-watch": "vitest"
+    "build": "tinacms-scripts build"
   },
   "dependencies": {
     "@tinacms/bridge": "workspace:^"
