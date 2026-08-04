@@ -7,6 +7,13 @@ export interface EditorContextValue {
   rawMode: boolean;
   setRawMode: (mode: boolean) => void;
   onActivateField: (address: string) => void;
+  /**
+   * The object field that would show embed props (ADR pending) does not
+   * exist yet, so the Edit control has nothing to open. Optional so an
+   * existing `Provider` value stays valid without this field; consumers
+   * treat a missing value as unavailable. Flip it once that field lands.
+   */
+  embedEditAvailable?: boolean;
 }
 
 export const EditorContext = React.createContext<EditorContextValue>({
@@ -15,6 +22,7 @@ export const EditorContext = React.createContext<EditorContextValue>({
   setRawMode: () => {},
   templates: [],
   onActivateField: () => {},
+  embedEditAvailable: false,
 });
 
 export const useEditorContext = () => {

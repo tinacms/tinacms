@@ -40,7 +40,7 @@ const getEditable = (): HTMLElement => {
  */
 const getMenuPanel = (): HTMLElement => {
   const trigger = getTrigger();
-  const item = screen.getByText('Edit');
+  const item = screen.getByText('Remove');
   let panel = item;
   for (
     let node = item.parentElement;
@@ -114,33 +114,30 @@ describe('embed dot menu', () => {
 
       await user.click(getTrigger());
 
-      expect(screen.getByText('Edit')).toBeVisible();
+      expect(screen.queryByText('Edit')).not.toBeInTheDocument();
       expect(screen.getByText('Remove')).toBeVisible();
       expect(getTrigger()).toHaveAttribute('aria-expanded', 'true');
 
       await user.keyboard('{Escape}');
 
       await waitFor(() =>
-        expect(screen.queryByText('Edit')).not.toBeInTheDocument()
+        expect(screen.queryByText('Remove')).not.toBeInTheDocument()
       );
-      expect(screen.queryByText('Remove')).not.toBeInTheDocument();
+      expect(screen.queryByText('Edit')).not.toBeInTheDocument();
       expect(getTrigger()).toHaveAttribute('aria-expanded', 'false');
     });
 
-    it('activates the embed field when Edit is chosen', async () => {
+    it('hides the Edit control while field editing is unavailable', async () => {
       const { onActivateField } = renderEmbedEditor({
         value: inlineValue,
         templates: [ctaTemplate],
       });
 
       await user.click(getTrigger());
+
+      expect(screen.queryByText('Edit')).not.toBeInTheDocument();
+      expect(screen.getByText('Remove')).toBeVisible();
       expect(onActivateField).not.toHaveBeenCalled();
-
-      await user.click(screen.getByText('Edit'));
-
-      expect(onActivateField).toHaveBeenCalledWith(
-        'body.children.0.children.1.props'
-      );
     });
 
     it('deletes the embed node when Remove is chosen', async () => {
@@ -188,7 +185,7 @@ describe('embed dot menu', () => {
 
       await user.click(getTrigger());
 
-      expect(screen.getByText('Edit')).toBeVisible();
+      expect(screen.getByText('Remove')).toBeVisible();
       expect(JSON.stringify(editor.selection)).toBe(before);
 
       // A popover that focuses its own panel on open pulls the caret out of the
@@ -210,7 +207,7 @@ describe('embed dot menu', () => {
       expect(trigger.closest('[contenteditable="false"]')).not.toBeNull();
     });
 
-    it('opens the menu and activates the embed field when Edit is chosen', async () => {
+    it('hides the Edit control while field editing is unavailable', async () => {
       const { onActivateField } = renderEmbedEditor({
         value: blockValue,
         templates: [bannerTemplate],
@@ -219,9 +216,10 @@ describe('embed dot menu', () => {
       expect(screen.queryByText('Edit')).not.toBeInTheDocument();
 
       await user.click(getTrigger());
-      await user.click(screen.getByText('Edit'));
 
-      expect(onActivateField).toHaveBeenCalledWith('body.children.1.props');
+      expect(screen.queryByText('Edit')).not.toBeInTheDocument();
+      expect(screen.getByText('Remove')).toBeVisible();
+      expect(onActivateField).not.toHaveBeenCalled();
     });
 
     it('deletes the embed node when Remove is chosen', async () => {

@@ -47,7 +47,7 @@ export const InlineEmbed = ({
   editor,
 }: InlineEmbedProps) => {
   const selected = useSelected();
-  const { templates, fieldName } = useTemplates();
+  const { templates, fieldName, embedEditAvailable } = useTemplates();
   const { handleClose, handleRemove, handleSelect, isExpanded } =
     useEmbedHandles(editor, element, fieldName);
   useHotkey('enter', () => {
@@ -101,7 +101,11 @@ export const InlineEmbed = ({
           >
             {label}
           </span>
-          <DotMenu onOpen={handleSelect} onRemove={handleRemove} />
+          <DotMenu
+            onOpen={handleSelect}
+            onRemove={handleRemove}
+            showEdit={embedEditAvailable ?? false}
+          />
         </span>
         {isExpanded ? <EmbedNestedForm {...formProps} /> : null}
       </Wrapper>
@@ -117,7 +121,7 @@ export const BlockEmbed = ({
   onChange,
 }) => {
   const selected = useSelected();
-  const { templates, fieldName } = useTemplates();
+  const { templates, fieldName, embedEditAvailable } = useTemplates();
   const { handleClose, handleRemove, handleSelect, isExpanded } =
     useEmbedHandles(editor, element, fieldName);
 
@@ -158,7 +162,11 @@ export const BlockEmbed = ({
           >
             {label}
           </span>
-          <DotMenu onOpen={handleSelect} onRemove={handleRemove} />
+          <DotMenu
+            onOpen={handleSelect}
+            onRemove={handleRemove}
+            showEdit={embedEditAvailable ?? false}
+          />
         </span>
         {isExpanded ? <EmbedNestedForm {...formProps} /> : null}
       </Wrapper>
@@ -200,7 +208,15 @@ const EmbedNestedForm = ({
   );
 };
 
-const DotMenu = ({ onOpen, onRemove }) => {
+const DotMenu = ({
+  onOpen,
+  onRemove,
+  showEdit,
+}: {
+  onOpen: () => void;
+  onRemove: () => void;
+  showEdit: boolean;
+}) => {
   return (
     <Popover as='span' className='-ml-px relative block'>
       <PopoverButton
@@ -220,14 +236,16 @@ const DotMenu = ({ onOpen, onRemove }) => {
         <PopoverPanel className='z-30 fixed origin-top-right right-0'>
           <div className='mt-2 -mr-1 rounded shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none'>
             <div className='py-1'>
-              <span
-                onClick={onOpen}
-                className={classNames(
-                  'cursor-pointer text-left w-full block px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900'
-                )}
-              >
-                Edit
-              </span>
+              {showEdit ? (
+                <span
+                  onClick={onOpen}
+                  className={classNames(
+                    'cursor-pointer text-left w-full block px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900'
+                  )}
+                >
+                  Edit
+                </span>
+              ) : null}
               <button
                 type='button'
                 onMouseDown={(e) => {
