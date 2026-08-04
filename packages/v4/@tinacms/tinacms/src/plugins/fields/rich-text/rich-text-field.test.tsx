@@ -217,6 +217,59 @@ describe('RichTextField validation', () => {
     ).not.toEqual([]);
   });
 
+  it('rejects the lone empty paragraph the editor mounts with', async () => {
+    const registry = await resolveRegistry();
+    const descriptor = registry.get('rich-text');
+    const trailingBlock: RichTextValue = {
+      type: 'root',
+      children: [{ type: 'p', children: [{ type: 'text', text: '' }] }],
+    };
+    expect(validateField(bodyNode, descriptor, trailingBlock)).toEqual([
+      'Body is required',
+    ]);
+  });
+
+  it('rejects a body of blank paragraphs', async () => {
+    const registry = await resolveRegistry();
+    const descriptor = registry.get('rich-text');
+    const blank: RichTextValue = {
+      type: 'root',
+      children: [
+        { type: 'p', children: [{ text: '' }] },
+        { type: 'p', children: [] },
+      ],
+    };
+    expect(validateField(bodyNode, descriptor, blank)).toEqual([
+      'Body is required',
+    ]);
+  });
+
+  it('accepts a paragraph the editor put one character in', async () => {
+    const registry = await resolveRegistry();
+    const descriptor = registry.get('rich-text');
+    const typed: RichTextValue = {
+      type: 'root',
+      children: [
+        { type: 'p', children: [{ type: 'text', text: '' }] },
+        { type: 'p', children: [{ type: 'text', text: 'a' }] },
+      ],
+    };
+    expect(validateField(bodyNode, descriptor, typed)).toEqual([]);
+  });
+
+  it('accepts a body whose only content is an embed', async () => {
+    const registry = await resolveRegistry();
+    const descriptor = registry.get('rich-text');
+    const embed: RichTextValue = {
+      type: 'root',
+      children: [
+        { type: 'p', children: [{ type: 'text', text: '' }] },
+        { type: 'img', url: '/a.png', children: [{ type: 'text', text: '' }] },
+      ],
+    };
+    expect(validateField(bodyNode, descriptor, embed)).toEqual([]);
+  });
+
   it('accepts a body with content', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('rich-text');
