@@ -11,10 +11,10 @@ import {
 import { PlateElement } from '@udecode/plate/react';
 import { BracesIcon } from 'lucide-react';
 
-import {
+import type {
   CodeLineElement,
   CodeBlockElement as PlateCodeBlockElement,
-} from '@tinacms/mdx';
+} from '../../../types';
 import { Button } from '../button';
 import { CodeBlockCombobox } from '../code-block-combobox';
 import { MermaidElementWithRef } from '../mermaid-element';
