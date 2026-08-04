@@ -933,16 +933,6 @@ importers:
         specifier: ^5.7.3
         version: 5.9.3
 
-  examples/js/markdown-rendering:
-    dependencies:
-      tinacms:
-        specifier: workspace:*
-        version: link:../../../packages/tinacms
-    devDependencies:
-      '@tinacms/cli':
-        specifier: workspace:*
-        version: link:../../../packages/@tinacms/cli
-
   examples/next/kitchen-sink:
     dependencies:
       '@tailwindcss/typography':
@@ -1191,6 +1181,16 @@ importers:
       vite:
         specifier: ^6.0.0
         version: 6.4.1(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.2)
+
+  examples/web-components/markdown-rendering:
+    dependencies:
+      tinacms:
+        specifier: workspace:*
+        version: link:../../../packages/tinacms
+    devDependencies:
+      '@tinacms/cli':
+        specifier: workspace:*
+        version: link:../../../packages/@tinacms/cli
 
   packages/@tinacms/app:
     dependencies:
