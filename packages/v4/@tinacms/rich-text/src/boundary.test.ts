@@ -26,6 +26,28 @@ describe('package boundary', () => {
     expect(files.length).toBeGreaterThan(50);
   });
 
+  it('extracts every specifier from a fixture with all import forms', () => {
+    const fixture = `
+      import Default from '@tinacms/tinacms';
+      import { Named } from '@tinacms/tinacms/react';
+      export { Reexported } from '../../outside';
+      const dynamic = await import('./local');
+    `;
+    expect([...fixture.matchAll(IMPORT)].map((match) => match[1])).toEqual([
+      '@tinacms/tinacms',
+      '@tinacms/tinacms/react',
+      '../../outside',
+      './local',
+    ]);
+  });
+
+  it('finds real import specifiers across the source tree', () => {
+    // Guards the two checks below: if IMPORT stops matching, offenders
+    // silently filters to [] and both checks pass without having run.
+    const totalImports = files.flatMap(importsOf);
+    expect(totalImports.length).toBeGreaterThan(200);
+  });
+
   it('never imports the host package', () => {
     const offenders = files.filter((file) =>
       importsOf(file).some((specifier) =>
