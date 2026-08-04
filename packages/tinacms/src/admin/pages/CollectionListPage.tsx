@@ -937,7 +937,7 @@ const CollectionListPage = () => {
                                                   </a>
                                                 </td>
                                                 <td
-                                                  className='px-3 py-3'
+                                                  className='pl-5 pr-3 py-3 break-all'
                                                   colSpan={4}
                                                 >
                                                   <span className='leading-5 block text-sm font-medium text-gray-400 truncate'>
@@ -976,7 +976,7 @@ const CollectionListPage = () => {
                                               key={`document-${document.node._sys.relativePath}`}
                                             >
                                               <td
-                                                className='pl-5 pr-3 py-3'
+                                                className='pl-5 pr-3 py-3 break-all'
                                                 colSpan={hasTitle ? 1 : 2}
                                               >
                                                 <a
@@ -1027,7 +1027,7 @@ const CollectionListPage = () => {
                                                 </a>
                                               </td>
                                               {hasTitle && (
-                                                <td className='px-3 py-3'>
+                                                <td className='px-3 py-3 break-all'>
                                                   <span className='leading-5 block text-sm font-medium text-gray-900 truncate'>
                                                     {!folderView &&
                                                       subfolders && (
