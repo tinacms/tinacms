@@ -76,6 +76,7 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
           showArrow
           pressed={openState.open}
           tooltip='Turn into'
+          aria-label={`Turn into ${selectedItemLabel}`}
         >
           <span className=''>{selectedItemLabel}</span>
         </ToolbarButton>
