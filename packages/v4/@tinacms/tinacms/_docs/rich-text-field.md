@@ -172,10 +172,13 @@ Editing the props of an embed needs the object field, which does not exist yet
 (see the next section). The embeds parse, render, and serialize now, so an
 embed's props survive an open-and-save.
 
-The markdown codec itself does not yet preserve every detail through an
-open-and-save with no edits. It rewrites GFM task-list checkboxes — `- [ ] a`
-becomes `* a` — and it normalizes CRLF line endings to LF. Both are known
-limits of the current codec, not of the embed handling above.
+The markdown codec keeps the content of a document through an open-and-save
+with no edits. It keeps the checked state of a GFM task list, and it keeps the
+line endings of the file. It writes a list marker as `*`, so a document that
+uses `-` changes on the first save.
+
+The editor draws a task-list item as an ordinary bullet. The checked state
+stays in the file, but a user cannot see it or change it in the editor.
 
 ## The parts that the port does not include
 
