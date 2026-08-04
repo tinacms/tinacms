@@ -7,7 +7,6 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { DocumentForm } from '../admin/document-form';
 import { asResolvedConfig } from '../config';
 import { toFieldAddress } from '../core/field/address';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
@@ -21,6 +20,7 @@ import {
   useFormValues,
 } from '../form/form-store';
 import { t } from '../index';
+import { LabelledFields } from '../test/labelled-fields';
 
 const errorsOf = (forms: FormStore['forms'], formId: FormId) => {
   const scope = forms[formId];
@@ -98,7 +98,7 @@ const host = (path: string, document: TinaDocument, onSave?: SaveHandler) => (
       document={document}
       onSave={onSave}
     >
-      <DocumentForm />
+      <LabelledFields />
       <StatusProbe />
       <SaveProbe />
       <DiscardProbe />
@@ -115,8 +115,7 @@ describe('form continuity across mounts', () => {
     unmount();
 
     render(host(pathA, { title: 'Hello' }));
-    // The label of a dirty field also carries its unsaved marker.
-    const revisited = await screen.findByLabelText(/^Title/);
+    const revisited = await screen.findByLabelText('Title');
     expect(revisited).toHaveValue('Hello!');
     expect(screen.getByTestId('status')).toHaveTextContent('dirty');
   });
@@ -152,7 +151,7 @@ describe('form continuity across mounts', () => {
     expect(screen.getByTestId('status')).toHaveTextContent('pristine');
 
     rerender(host(pathA, { title: 'Doc A' }));
-    const backOnA = await screen.findByLabelText(/^Title/);
+    const backOnA = await screen.findByLabelText('Title');
     await waitFor(() => expect(backOnA).toHaveValue('Doc A edited'));
     expect(screen.getByTestId('status')).toHaveTextContent('dirty');
   });
@@ -174,7 +173,7 @@ describe('form continuity across mounts', () => {
     expect(onSave).toHaveBeenCalledWith({ title: 'Doc B two' });
 
     rerender(host(pathA, { title: 'Doc A' }, onSave));
-    const backOnA = await screen.findByLabelText(/^Title/);
+    const backOnA = await screen.findByLabelText('Title');
     await waitFor(() => expect(backOnA).toHaveValue('x'));
     await screen.findByText('Title must be at least 3 characters');
     expect(screen.getByTestId('status')).toHaveTextContent('dirty');
@@ -236,10 +235,10 @@ describe('form continuity across mounts', () => {
     unmount();
 
     const { rerender } = render(host(pathA, { title: 'Doc A' }));
-    const revisited = await screen.findByLabelText(/^Title/);
+    const revisited = await screen.findByLabelText('Title');
     await waitFor(() => expect(revisited).toHaveValue('Doc A edited'));
     rerender(host(pathA, { title: 'Reloaded from disk' }));
-    expect(screen.getByLabelText(/^Title/)).toHaveValue('Doc A edited');
+    expect(screen.getByLabelText('Title')).toHaveValue('Doc A edited');
     expect(screen.getByTestId('status')).toHaveTextContent('dirty');
   });
 
@@ -325,7 +324,7 @@ const unkeyedHost = (
       document={document}
       onSave={onSave}
     >
-      <DocumentForm />
+      <LabelledFields />
       <StatusProbe />
       <SaveProbe />
     </FormProvider>
@@ -374,7 +373,7 @@ describe('unkeyed document switches (same FormProvider instance)', () => {
     });
     rerender(unkeyedHost(pathB, { title: 'Doc B' }));
     await waitFor(() =>
-      expect(screen.getByLabelText(/^Title/)).toHaveValue('xy')
+      expect(screen.getByLabelText('Title')).toHaveValue('xy')
     );
     await screen.findByText('Title must be at least 3 characters');
     unsubscribe();
@@ -394,7 +393,7 @@ describe('unkeyed document switches (same FormProvider instance)', () => {
       errorsOf(useFormStore.getState().forms, toFormId(pathA))?.[title]
     ).toContain('Title must be at most 20 characters');
 
-    const inputB = screen.getByLabelText(/^Title/);
+    const inputB = screen.getByLabelText('Title');
     await userEvent.clear(inputB);
     await userEvent.type(inputB, 'now far too long for the max rule');
     await waitFor(() =>
@@ -498,7 +497,7 @@ describe('discarding edits', () => {
 
     rerender(host(pathA, { title: 'Doc A' }));
     await waitFor(() =>
-      expect(screen.getByLabelText(/^Title/)).toHaveValue('Doc A edited')
+      expect(screen.getByLabelText('Title')).toHaveValue('Doc A edited')
     );
     expect(screen.getByTestId('status')).toHaveTextContent('dirty');
   });

@@ -2,12 +2,12 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useRef } from 'react';
 import { describe, expect, it } from 'vitest';
-import { DocumentForm } from '../admin/document-form';
 import { asResolvedConfig } from '../config';
 import type { CollectionSchema } from '../core/schema/types';
 import { useFormStore } from '../form/form-store';
 import { t } from '../index';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
+import { LabelledFields } from '../test/labelled-fields';
 import {
   FormProvider,
   TinaProvider,
@@ -64,7 +64,7 @@ describe('active-field rail', () => {
           path='content/posts/active.mdx'
           document={{ title: 'Hi' }}
         >
-          <DocumentForm />
+          <LabelledFields />
           <ActivateProbe />
         </FormProvider>
       </TinaProvider>
@@ -89,7 +89,7 @@ describe('active-field rail', () => {
           path='content/posts/active.mdx'
           document={{ title: 'Hi' }}
         >
-          <DocumentForm />
+          <LabelledFields />
           <ActivateProbe />
         </FormProvider>
       </TinaProvider>
@@ -117,7 +117,7 @@ describe('active-field rail', () => {
           path='content/posts/active.mdx'
           document={{ title: 'Hi', summary: 'There' }}
         >
-          <DocumentForm />
+          <LabelledFields />
           <ActiveReadout />
         </FormProvider>
       </TinaProvider>
@@ -145,7 +145,7 @@ describe('active-field rail', () => {
           path='content/posts/active.mdx'
           document={{ title: 'Hi' }}
         >
-          <DocumentForm />
+          <LabelledFields />
           <ActivateProbe />
           <ActivationLog entries={entries} />
         </FormProvider>

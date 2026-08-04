@@ -4,11 +4,11 @@ import { describe, expect, it } from 'vitest';
 // rich-text client, and paying its transform cost inside a test's async
 // timeout flakes on contended CI runners.
 import './rich-text-field.client';
-import { DocumentForm } from '../../../admin/document-form';
 import { asResolvedConfig } from '../../../config';
 import type { CollectionSchema } from '../../../core/schema/types';
 import { FormProvider, TinaProvider } from '../../../editor';
 import { t } from '../../../index';
+import { LabelledFields } from '../../../test/labelled-fields';
 import richTextFieldPlugin from './rich-text-field.plugin';
 
 const NO_COLLECTIONS = { collections: [] };
@@ -54,7 +54,7 @@ const renderBody = (markdown: string) =>
         path='content/posts/test.mdx'
         document={{ body: markdown }}
       >
-        <DocumentForm />
+        <LabelledFields />
       </FormProvider>
     </TinaProvider>
   );
@@ -81,7 +81,7 @@ describe('RichTextField rendering', () => {
           path='content/posts/embed.mdx'
           document={{ body: 'Before.\n\n<Callout text="hi" />\n\nAfter.\n' }}
         >
-          <DocumentForm />
+          <LabelledFields />
         </FormProvider>
       </TinaProvider>
     );

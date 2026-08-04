@@ -1,7 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
-import { DocumentForm } from '../../../admin/document-form';
 import { asResolvedConfig } from '../../../config';
 import {
   type FieldRegistry,
@@ -15,6 +14,7 @@ import type {
 import { validateField } from '../../../core/validation';
 import { FormProvider, TinaProvider } from '../../../editor';
 import { t } from '../../../index';
+import { LabelledFields } from '../../../test/labelled-fields';
 import numberFieldPlugin from './number-field.plugin';
 
 const NO_COLLECTIONS = { collections: [] };
@@ -55,7 +55,7 @@ const renderField = (document?: TinaDocument) =>
         path='content/posts/featured.mdx'
         document={document}
       >
-        <DocumentForm />
+        <LabelledFields />
       </FormProvider>
     </TinaProvider>
   );

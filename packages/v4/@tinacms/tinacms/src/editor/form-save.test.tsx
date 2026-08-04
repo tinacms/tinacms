@@ -1,12 +1,12 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { DocumentForm } from '../admin/document-form';
 import { asResolvedConfig } from '../config';
 import { definePlugin } from '../core/plugin';
 import type { CollectionSchema } from '../core/schema/types';
 import { t } from '../index';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
+import { LabelledFields } from '../test/labelled-fields';
 import {
   FormProvider,
   type SaveHandler,
@@ -53,7 +53,7 @@ const renderWithSave = (onSave: SaveHandler) =>
         document={{ title: 'Hi' }}
         onSave={onSave}
       >
-        <DocumentForm />
+        <LabelledFields />
         <SaveProbe />
       </FormProvider>
     </TinaProvider>
@@ -133,7 +133,7 @@ describe('useFormSave with a structured field value', () => {
           document={{ body: 'Original.' }}
           onSave={onSave}
         >
-          <DocumentForm />
+          <LabelledFields />
           <SaveProbe />
         </FormProvider>
       </TinaProvider>

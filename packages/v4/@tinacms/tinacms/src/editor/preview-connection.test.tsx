@@ -8,7 +8,6 @@ import {
 import userEvent from '@testing-library/user-event';
 import { type ReactNode, type RefObject, useRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { DocumentForm } from '../admin/document-form';
 import { asResolvedConfig } from '../config';
 import { toFieldAddress } from '../core/field/address';
 import type { CollectionSchema } from '../core/schema/types';
@@ -20,6 +19,7 @@ import {
   readyMessage,
   valuesMessage,
 } from '../preview/protocol';
+import { LabelledFields } from '../test/labelled-fields';
 import { FormScopeContext } from './context';
 import { FormProvider, TinaProvider } from './index';
 import { usePreviewConnection } from './preview-connection';
@@ -81,7 +81,7 @@ const renderConnected = (iframeRef: RefObject<HTMLIFrameElement | null>) =>
         path={path}
         document={{ title: 'Hello' }}
       >
-        <DocumentForm />
+        <LabelledFields />
         <Connection iframeRef={iframeRef} />
       </FormProvider>
     </TinaProvider>
@@ -227,7 +227,7 @@ describe('usePreviewConnection', () => {
           path={documentPath}
           document={{ title: 'Hello' }}
         >
-          <DocumentForm />
+          <LabelledFields />
           <Connection iframeRef={iframe.ref} />
         </FormProvider>
       </TinaProvider>
