@@ -2,8 +2,12 @@ import { EventEmitter } from 'node:events';
 import { promises as fs } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { type ResolvedConfig, asResolvedConfig } from '../../../../config';
+import { DEFAULT_CONTENT_URL } from '../../../../core/content/contract';
+import { definePlugin } from '../../../../core/plugin';
 import type { CollectionSchema } from '../../../../core/schema/types';
+import { createGraphQLPipeline } from '../graphql/graphql-pipeline';
 import { tinaLocalDataLayerVitePlugin } from './local-data-layer.vite';
 
 vi.mock('../graphql/graphql-pipeline', () => ({
@@ -27,6 +31,11 @@ beforeEach(async () => {
     path.join(rootDir, 'content/posts/hello.mdx'),
     '---\ntitle: Hello\n---\n'
   );
+});
+
+afterEach(async () => {
+  vi.restoreAllMocks();
+  await fs.rm(rootDir, { recursive: true, force: true });
 });
 
 const requestDouble = (
@@ -264,6 +273,240 @@ describe('tinaLocalDataLayerVitePlugin middleware', () => {
 
   it('mounts at the configured url', () => {
     expect(middlewareOf('/__tina/content').route).toBe('/__tina/content');
+  });
+
+  // A socket failure rejects with whatever the stream emits, which need not be
+  // an Error.
+  it('answers a failure that is not an Error', async () => {
+    const { handler } = middlewareOf();
+    const res = responseDouble();
+    const req = requestDouble(JSON_HEADERS);
+    const pending = handler(req, res);
+    queueMicrotask(() => req.emit('error', 'the socket reset'));
+    await pending;
+    expect(res.statusCode).toBe(400);
+    expect(res.body).toBe('the socket reset');
+  });
+});
+
+const TRANSFORM_MARK = '<!-- transformed by vite -->';
+
+type Mounted = { route?: string; handler: Function };
+
+const serverDouble = () => {
+  const mounted: Mounted[] = [];
+  const logs: string[] = [];
+  return {
+    mounted,
+    logs,
+    middlewares: {
+      use: (first: unknown, second?: unknown) => {
+        if (typeof first === 'function') {
+          mounted.push({ handler: first as Function });
+          return;
+        }
+        mounted.push({ route: first as string, handler: second as Function });
+      },
+    },
+    config: { logger: { info: (message: string) => logs.push(message) } },
+    transformIndexHtml: async (_url: string, html: string) =>
+      `${html}${TRANSFORM_MARK}`,
+  };
+};
+
+const configOf = (fields: { name: string; type: string }[]): ResolvedConfig =>
+  asResolvedConfig({
+    plugins: [
+      definePlugin({ name: 'test:content', provides: ['content'] }),
+      definePlugin({
+        name: 'test:field:string',
+        provides: ['field'],
+        field: { type: 'string', contractVersion: 1 },
+      }),
+    ],
+    schema: {
+      collections: [
+        { name: 'posts', path: 'content/posts', format: 'mdx', fields },
+      ],
+    },
+  });
+
+// Codegen looks for tina/config.ts on disk. The loader still hands over the
+// config object, so the file only has to exist.
+const bootServer = async (config: ResolvedConfig) => {
+  await fs.mkdir(path.join(rootDir, 'tina'), { recursive: true });
+  await fs.writeFile(path.join(rootDir, 'tina', 'config.ts'), 'export default {}');
+  const plugin = tinaLocalDataLayerVitePlugin({ rootDir, config });
+  const server = serverDouble();
+  (plugin.configureServer as (s: unknown) => void)(server);
+  await vi.waitFor(() => expect(server.logs.length).toBeGreaterThan(0));
+  return { plugin, server };
+};
+
+const adminRequest = async (
+  server: ReturnType<typeof serverDouble>,
+  url: string
+) => {
+  const res = responseDouble();
+  const next = vi.fn();
+  await server.mounted[0].handler({ url, headers: {} }, res, next);
+  return { res, next };
+};
+
+const adminHtmlPath = () =>
+  path.join(rootDir, 'public', 'admin', 'index.html');
+
+describe('tinaLocalDataLayerVitePlugin dev codegen', () => {
+  it('writes the admin shell and names each file it wrote', async () => {
+    const { server } = await bootServer(
+      configOf([{ name: 'title', type: 'string' }])
+    );
+    expect(server.logs.join('\n')).toContain('tina: wrote');
+    await expect(fs.readFile(adminHtmlPath(), 'utf8')).resolves.toContain(
+      '<div id="root">'
+    );
+  });
+
+  // A schema that names a field type without a plugin must not stop the dev
+  // server. The plugin reports the failure and serves content.
+  it('reports a codegen failure and keeps the server running', async () => {
+    const { server } = await bootServer(
+      configOf([{ name: 'cover', type: 'image' }])
+    );
+    expect(server.logs.join('\n')).toContain('tina: codegen failed');
+    expect(server.logs.join('\n')).toContain('image');
+    expect(server.mounted.length).toBeGreaterThan(0);
+  });
+
+  it('names the files it changed when the schema moves on', async () => {
+    await bootServer(configOf([{ name: 'title', type: 'string' }]));
+    const { server } = await bootServer(
+      configOf([
+        { name: 'title', type: 'string' },
+        { name: 'summary', type: 'string' },
+      ])
+    );
+    expect(server.logs.join('\n')).toContain('tina: updated');
+  });
+
+  it('runs no codegen when the caller hands over collections alone', () => {
+    const plugin = tinaLocalDataLayerVitePlugin({
+      rootDir,
+      collections: [POSTS],
+    });
+    const server = serverDouble();
+    (plugin.configureServer as (s: unknown) => void)(server);
+    expect(server.logs).toEqual([]);
+    expect(server.mounted).toHaveLength(1);
+    expect(server.mounted[0].route).toBe(DEFAULT_CONTENT_URL);
+  });
+});
+
+describe('tinaLocalDataLayerVitePlugin admin route', () => {
+  it('serves the admin shell through the html transform of vite', async () => {
+    const { server } = await bootServer(
+      configOf([{ name: 'title', type: 'string' }])
+    );
+    const { res, next } = await adminRequest(server, '/admin/');
+    expect(res.headers['content-type']).toBe('text/html');
+    expect(res.body).toContain(TRANSFORM_MARK);
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  it('serves the shell on each form of the admin route', async () => {
+    const { server } = await bootServer(
+      configOf([{ name: 'title', type: 'string' }])
+    );
+    for (const url of ['/admin', '/admin/', '/admin/index.html']) {
+      const { res, next } = await adminRequest(server, url);
+      expect(next).not.toHaveBeenCalled();
+      expect(res.body).toContain(TRANSFORM_MARK);
+    }
+  });
+
+  it('serves the shell for an admin route that carries a query', async () => {
+    const { server } = await bootServer(
+      configOf([{ name: 'title', type: 'string' }])
+    );
+    const { res, next } = await adminRequest(server, '/admin/?collection=posts');
+    expect(next).not.toHaveBeenCalled();
+    expect(res.body).toContain(TRANSFORM_MARK);
+  });
+
+  it('passes a route that is not the admin route to the next handler', async () => {
+    const { server } = await bootServer(
+      configOf([{ name: 'title', type: 'string' }])
+    );
+    const { res, next } = await adminRequest(server, '/posts/hello');
+    expect(next).toHaveBeenCalledWith();
+    expect(res.body).toBe('');
+  });
+
+  it('passes a route that only starts with the admin route to the next handler', async () => {
+    const { server } = await bootServer(
+      configOf([{ name: 'title', type: 'string' }])
+    );
+    const { next } = await adminRequest(server, '/administrator');
+    expect(next).toHaveBeenCalledWith();
+  });
+
+  it('hands the failure to the next handler when the shell is missing', async () => {
+    const { server } = await bootServer(
+      configOf([{ name: 'title', type: 'string' }])
+    );
+    await fs.rm(adminHtmlPath());
+    const { next } = await adminRequest(server, '/admin/');
+    expect(next).toHaveBeenCalledTimes(1);
+    expect(next.mock.calls[0][0]).toBeInstanceOf(Error);
+  });
+
+  it('serves a request that states no url', async () => {
+    const { server } = await bootServer(
+      configOf([{ name: 'title', type: 'string' }])
+    );
+    const res = responseDouble();
+    const next = vi.fn();
+    await server.mounted[0].handler({ headers: {} }, res, next);
+    expect(next).toHaveBeenCalledWith();
+  });
+});
+
+describe('tinaLocalDataLayerVitePlugin shutdown', () => {
+  it('closes the data layer when the bundle closes', async () => {
+    const close = vi.fn().mockResolvedValue(undefined);
+    vi.mocked(createGraphQLPipeline).mockResolvedValue({
+      execute: vi.fn().mockResolvedValue({ data: {} }),
+      close,
+    } as unknown as Awaited<ReturnType<typeof createGraphQLPipeline>>);
+
+    const plugin = tinaLocalDataLayerVitePlugin({
+      rootDir,
+      collections: [POSTS],
+    });
+    const server = serverDouble();
+    (plugin.configureServer as (s: unknown) => void)(server);
+
+    const res = responseDouble();
+    await server.mounted[0].handler(
+      requestDouble(
+        JSON_HEADERS,
+        JSON.stringify({ op: 'graphql', query: '{ __typename }' })
+      ),
+      res
+    );
+
+    await (plugin.closeBundle as () => Promise<void>)();
+    expect(close).toHaveBeenCalledTimes(1);
+  });
+
+  it('closes a data layer that never booted a pipeline', async () => {
+    const plugin = tinaLocalDataLayerVitePlugin({
+      rootDir,
+      collections: [POSTS],
+    });
+    await expect(
+      (plugin.closeBundle as () => Promise<void>)()
+    ).resolves.toBeUndefined();
   });
 });
 
