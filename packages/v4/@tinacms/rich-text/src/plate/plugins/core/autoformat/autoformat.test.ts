@@ -30,6 +30,10 @@ const type = (editor: ReturnType<typeof makeEditor>, text: string) => {
 const topType = (editor: ReturnType<typeof makeEditor>) =>
   editor.children[0].type;
 
+const listItem = (editor: ReturnType<typeof makeEditor>) =>
+  (editor.children[0] as { children: { type: string; checked?: boolean }[] })
+    .children[0];
+
 describe('getAutoformatBlocks', () => {
   it('offers a rule for every heading level by default', () => {
     const matches = getAutoformatBlocks().map((rule) => rule.match);
@@ -104,6 +108,26 @@ describe('list autoformat', () => {
     type(editor, shortcut);
 
     expect(JSON.stringify(editor.children)).toContain('"ol"');
+  });
+
+  it('gives a bulleted list item no checked key', () => {
+    const editor = makeEditor();
+
+    type(editor, '- ');
+
+    expect(listItem(editor)).not.toHaveProperty('checked');
+  });
+
+  it.each([
+    ['[] ', false],
+    ['[x] ', true],
+  ])('turns %j into a task item that is checked=%s', (shortcut, checked) => {
+    const editor = makeEditor();
+
+    type(editor, shortcut);
+
+    expect(topType(editor)).toBe('ul');
+    expect(listItem(editor)).toMatchObject({ type: 'li', checked });
   });
 });
 
