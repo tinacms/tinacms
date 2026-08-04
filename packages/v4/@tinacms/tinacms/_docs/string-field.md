@@ -1,13 +1,14 @@
 # The `string` field
 
-The field plugin v4 ships, and the worked example behind
-[`field-plugins.md`](./field-plugins.md). Single-line text, backed by a Zod
-validator. Source: `plugins/fields/string/`.
+The `string` field is one of the field plugins that v4 supplies. It is also the
+example in [`field-plugins.md`](./field-plugins.md). It shows a single line of
+text, and a Zod validator checks the value. The source code is in
+`plugins/fields/string/`.
 
 ## Authoring
 
-`t.string({...})` is the typed builder you call in a collection. It stamps
-`type: 'string'` onto the config (`STRING_FIELD_TYPE`):
+`t.string({...})` is the typed function that you call in a collection. It adds
+`type: 'string'` (`STRING_FIELD_TYPE`) to the config:
 
 ```ts
 import { t } from '@tinacms/tinacms';
@@ -20,20 +21,20 @@ const collection = {
 };
 ```
 
-Config (`StringFieldSchema`, extends `BaseFieldSchema`):
+The config (`StringFieldSchema`, which extends `BaseFieldSchema`):
 
 | Key | Type | Effect |
 |---|---|---|
-| `name` | `string` (required) | field key in the document; also the fallback label |
-| `label` | `string` | display label; used in validation messages |
-| `required` | `boolean` | empty value fails validation (see below) |
-| `min` | `number` | minimum length |
-| `max` | `number` | maximum length |
-| `pattern` | `string` | `RegExp` source the value must match |
+| `name` | `string` (necessary) | The field key in the document. It is also the alternative label. |
+| `label` | `string` | The label on the screen. The validation messages use it. |
+| `required` | `boolean` | An empty value does not pass validation. Refer to the rules below. |
+| `min` | `number` | The minimum length |
+| `max` | `number` | The maximum length |
+| `pattern` | `string` | The `RegExp` source that the value must obey |
 
-## Descriptor
+## The descriptor
 
-The client segment (`string-field.client.tsx`) claims the `string` key:
+The client segment (`string-field.client.tsx`) takes the `string` key:
 
 ```tsx
 defineClientPlugin({
@@ -47,41 +48,44 @@ defineClientPlugin({
 });
 ```
 
-It defines no `validate`, `parse`, or `serialize`: the value is stored as-is and
-all rules live in `schema`.
+The descriptor has no `validate`, `parse`, or `serialize` function. TinaCMS
+stores the value without a change, and `schema` holds all the rules.
 
 ## Validation
 
-`stringSchema(node)` (`string-field.schema.ts`) compiles the config into a Zod
-schema. Messages use `label ?? name`:
+`stringSchema(node)` (`string-field.schema.ts`) converts the config into a Zod
+schema. The messages use `label`. If the config has no `label`, the messages use
+`name`.
 
 | Config | Rule | Message |
 |---|---|---|
 | `min` | `.min(min)` | `<label> must be at least <min> characters` |
 | `max` | `.max(max)` | `<label> must be at most <max> characters` |
 | `pattern` | `.regex(...)` | `<label> is invalid` |
-| `required` | `.min(1)` *(only if no positive `min` already)* | `<label> is required` |
+| `required` | `.min(1)`, but only if `min` is not more than zero | `<label> is required` |
 
-Edge cases worth knowing:
+These conditions are important:
 
-- **`required` + `min`** — when `min > 0` is set, `required` adds no separate
-  rule; the `min` message covers the empty case. A required field with no `min`
-  gets `.min(1, "<label> is required")`.
-- **Optional fields** — `''` and `null` are preprocessed to `undefined` and pass
-  as `.optional()`; an empty optional string is valid.
-- **Invalid `pattern`** — a `pattern` that isn't a valid `RegExp` is skipped, so
-  no pattern constraint is applied.
-- **Per-field scope** — `stringSchema` validates against this field's node alone.
+- **`required` with `min`** — If `min` is more than zero, `required` adds no
+  rule. The `min` message tells the user about the empty value. If a necessary
+  field has no `min`, the schema adds `.min(1, "<label> is required")`.
+- **Optional fields** — The schema changes `''` and `null` to `undefined`. These
+  values pass validation as `.optional()`. Thus an empty optional string is
+  correct.
+- **An incorrect `pattern`** — If the `pattern` is not a correct `RegExp`, the
+  schema ignores it. Then the value has no pattern constraint.
+- **The scope of the schema** — `stringSchema` uses the node of this field only.
 
-This runs through the shared two-layer path (`validateField` →
-`descriptor.schema` then `descriptor.validate`); see
-[`field-plugins.md`](./field-plugins.md#validation--two-layers).
+These rules run on the shared two-layer path. `validateField` calls
+`descriptor.schema`, then it calls `descriptor.validate`. Refer to
+[`field-plugins.md`](./field-plugins.md#validation-in-two-layers).
 
-## Component
+## The component
 
-`StringField` (`string-field.ui.tsx`) takes **no props** — it reads its address
-from context and pulls value/errors through address-keyed hooks, so a keystroke
-re-renders only this field:
+`StringField` (`string-field.ui.tsx`) has no props. It reads its address from
+the context. It gets the value and the errors from hooks that use the address.
+Thus a keystroke renders this field again, but does not render the other fields
+again.
 
 ```tsx
 export function StringField() {
@@ -102,16 +106,22 @@ export function StringField() {
 }
 ```
 
-## Where it's wired
+## The connections
 
-- Manifest: `string-field.plugin.ts` — `definePlugin({ name: 'tina:field:string',
-  provides: ['field'], client: () => import('./string-field.client') })`,
-  exported as `stringFieldPlugin`.
-- Registration: `plugins/fields/index.ts` adds it to `corePlugins` and exposes
-  `t.string`.
+- The manifest is `string-field.plugin.ts`. It calls `definePlugin({ name:
+  'tina:field:string', provides: ['field'], client: () =>
+  import('./string-field.client') })`, and it exports `stringFieldPlugin`.
+- The registration is in `plugins/fields/index.ts`. That file adds the plugin to
+  `corePlugins`, and it supplies `t.string`.
 
 ## Tests
 
-`string-field.test.tsx` covers rendering the ingested value, default-value
-fallback, keystroke writes, the shared min-length message, ingest/digest
-round-trips (including null-vs-absent), and the registered descriptor metadata.
+`string-field.test.tsx` does these tests:
+
+- It renders the value from the document.
+- It uses the default value when the document has no value.
+- It writes a keystroke to the value.
+- It shows the shared message for the minimum length.
+- It converts a value with ingest, then converts it again with digest. This
+  test includes a `null` value and an absent value.
+- It examines the metadata of the descriptor in the registry.

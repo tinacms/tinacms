@@ -6,8 +6,6 @@ export interface FieldErrorEntry {
 
 export const toFieldErrorEntry = (messages: string[]): FieldErrorEntry => ({
   type: 'validation',
-  // RHF's FieldError has a single `message` — use the first (primary) error; the
-  // full list is carried in `types` and surfaced together by useFieldErrors.
   message: messages[0],
   types: Object.fromEntries(
     messages.map((message, index) => [String(index), message])
