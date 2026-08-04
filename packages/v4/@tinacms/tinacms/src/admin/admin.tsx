@@ -34,6 +34,7 @@ import { toFormId } from '../form/form-store';
 import { DocumentForm } from './document-form';
 import { DocumentScope } from './document-scope';
 import { FormStatusBadge } from './document-status';
+import { AdminErrorBoundary } from './error-boundary';
 import { useAdminScreens, useTinaSchema } from './hooks';
 import { type AdminRoute, COLLECTIONS_ROUTE } from './routing';
 import { useAdminRoute } from './use-admin-route';
@@ -266,13 +267,15 @@ export interface TinaAdminProps {
 
 export function TinaAdmin({ config, preview, queryClient }: TinaAdminProps) {
   return (
-    <TinaProvider config={config} queryClient={queryClient}>
-      <HashRouter
-        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
-      >
-        <AdminShell preview={preview} />
-      </HashRouter>
-    </TinaProvider>
+    <AdminErrorBoundary>
+      <TinaProvider config={config} queryClient={queryClient}>
+        <HashRouter
+          future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+        >
+          <AdminShell preview={preview} />
+        </HashRouter>
+      </TinaProvider>
+    </AdminErrorBoundary>
   );
 }
 
