@@ -168,31 +168,42 @@ describe('useEmbedHandles', () => {
   });
 
   /**
-   * `handleCloseBase` defers `editor.tf.select(path)` by 1ms and registers no
-   * cleanup. The path it captured goes stale when the node leaves the
-   * document inside that window, and the deferred select then reads a path
-   * that resolves to nothing.
-   *
-   * Marked `fails`: it asserts the behaviour the hook should have. It turns
-   * red when the hook gains a cleanup, which is the signal to change `it.fails`
-   * back to `it`.
+   * The deferred select holds the path of the embed. The embed can leave the
+   * document inside the 1ms window. The path then points at no node, and the
+   * select throws.
    */
-  it.fails(
-    'does not throw when the embed leaves the document before the deferred select runs',
-    () => {
-      vi.useFakeTimers();
-      const { editor } = renderProbe(topLevelProbe);
+  it('does not throw when the embed leaves the document before the deferred select runs', () => {
+    vi.useFakeTimers();
+    const { editor } = renderProbe(topLevelProbe);
 
-      act(() => handles?.handleClose());
-      act(() => {
-        editor.tf.removeNodes({ at: [1] });
-      });
+    act(() => handles?.handleClose());
+    act(() => {
+      editor.tf.removeNodes({ at: [1] });
+    });
 
-      expect(() => {
-        vi.advanceTimersByTime(5);
-      }).not.toThrow();
-    }
-  );
+    expect(() => {
+      vi.advanceTimersByTime(5);
+    }).not.toThrow();
+  });
+
+  /**
+   * A node that leaves the document does not unmount the embed here: Plate
+   * re-renders on a microtask, and a synchronous `act` does not flush it. This
+   * case pins the other half — the cleanup of the hook stops the timer, so the
+   * caret of an editor that the user no longer sees stays where it is.
+   */
+  it('does not select after the embed unmounts', () => {
+    vi.useFakeTimers();
+    const { editor, view } = renderProbe(topLevelProbe);
+
+    act(() => handles?.handleClose());
+    view.unmount();
+    act(() => {
+      vi.advanceTimersByTime(5);
+    });
+
+    expect(editor.selection).toBeNull();
+  });
 });
 
 /**
