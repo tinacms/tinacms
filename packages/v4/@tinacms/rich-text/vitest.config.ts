@@ -11,15 +11,16 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       include: ['src/**/*.{ts,tsx}'],
-      // `plate/components/plate-ui` is the shadcn and Plate registry output.
-      // A person regenerates it, and does not write a test for it, so it does
-      // not belong in a measurement of the code this package owns.
+      // plate-ui is regenerated registry output, not code this package owns.
       exclude: [
         'src/**/*.test.{ts,tsx}',
         'src/test/**',
         'src/plate/components/plate-ui/**',
         'src/**/types.ts',
       ],
+      // Low because no test mounts `RichEditor`. The toolbar tree loads with
+      // it, so one mount moves this a long way.
+      thresholds: { statements: 48, branches: 78, functions: 53, lines: 48 },
     },
   },
 });
