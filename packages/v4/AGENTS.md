@@ -160,6 +160,12 @@ Comment policy (a prior cleanup pass established this):
   `<label>` element. It replaces the label that an author wrote with the name of
   the field, so a field labelled "SEO description" announces as `seoDesc`.
 
+- **An icon button takes `aria-label`.** The rule above is about field widgets,
+  which get their name from the row. A toolbar button has no `<label>` element
+  and shows only an icon, so `aria-label` is the correct tool. If the button
+  also shows text, the `aria-label` must hold that text (WCAG 2.5.3). Make each
+  icon in the button decorative with `aria-hidden='true'`.
+
 - **A widget that `htmlFor` cannot reach takes `aria-labelledby`.** A descriptor
   with `metadata.labelable: false` has no input for the label to point at. The
   row gives its label an id, and the widget reads that id. The rich-text field

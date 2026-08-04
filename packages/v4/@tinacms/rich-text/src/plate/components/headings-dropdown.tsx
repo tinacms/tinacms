@@ -71,6 +71,7 @@ export function HeadingsMenu(props: DropdownMenuProps) {
             isDropdown
             pressed={openState.open}
             tooltip='Headings'
+            aria-label={`Heading level: ${selectedItemLabel}`}
           >
             <SelectedItemIcon className='size-5' />
             <span className='@md/toolbar:flex hidden'>{selectedItemLabel}</span>

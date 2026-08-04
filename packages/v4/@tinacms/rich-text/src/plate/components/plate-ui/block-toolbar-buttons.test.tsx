@@ -109,7 +109,7 @@ describe('a block button with the caret in a list item', () => {
     const user = userEvent.setup();
     const editor = renderWithCaretInListItem(<CodeBlockToolbarButton />);
 
-    await user.click(screen.getByRole('radio'));
+    await user.click(screen.getByRole('radio', { name: 'Code Block' }));
 
     expect(JSON.stringify(editor.children)).toContain('"code_block"');
     expect(JSON.stringify(editor.children)).toContain('second');
@@ -122,7 +122,7 @@ describe('a block button with the caret in a list item', () => {
     const user = userEvent.setup();
     const editor = renderWithCaretInListItem(<HorizontalRuleToolbarButton />);
 
-    await user.click(screen.getByRole('radio'));
+    await user.click(screen.getByRole('radio', { name: 'Horizontal Rule' }));
 
     expect(JSON.stringify(editor.children)).toContain('"hr"');
     expect(JSON.stringify(editor.children)).toContain('second');

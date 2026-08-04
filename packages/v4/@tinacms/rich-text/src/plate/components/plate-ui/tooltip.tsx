@@ -24,6 +24,7 @@ export function withTooltip<T extends React.ElementType>(Component: T) {
   return React.forwardRef<
     React.ComponentRef<T>,
     {
+      'aria-label'?: string;
       tooltip?: React.ReactNode;
       tooltipContentProps?: Omit<
         React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>,
@@ -35,7 +36,13 @@ export function withTooltip<T extends React.ElementType>(Component: T) {
       >;
     } & React.ComponentPropsWithoutRef<T>
   >(function ExtendComponent(
-    { tooltip, tooltipContentProps, tooltipProps, ...props },
+    {
+      'aria-label': ariaLabel,
+      tooltip,
+      tooltipContentProps,
+      tooltipProps,
+      ...props
+    },
     ref
   ) {
     const [mounted, setMounted] = React.useState(false);
@@ -44,7 +51,18 @@ export function withTooltip<T extends React.ElementType>(Component: T) {
       setMounted(true);
     }, []);
 
-    const component = <Component ref={ref} {...(props as any)} />;
+    /**
+     * Radix gives the tooltip text to `aria-describedby`. A description is
+     * never a name, and the children of a tooltipped icon button are icons.
+     * The tooltip text becomes the name of the control. A caller that shows
+     * text gives its own `aria-label` that holds that text (WCAG 2.5.3).
+     */
+    const name =
+      ariaLabel ?? (typeof tooltip === 'string' ? tooltip : undefined);
+
+    const component = (
+      <Component ref={ref} aria-label={name} {...(props as any)} />
+    );
 
     if (tooltip && mounted) {
       return (
