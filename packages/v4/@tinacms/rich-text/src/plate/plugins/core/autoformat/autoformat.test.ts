@@ -137,27 +137,28 @@ describe('horizontal rule autoformat', () => {
     expect(topType(editor)).toBe('p');
   });
 
-  /**
-   * The underscore variant of the rule carries a trailing space that the
-   * hyphen variants do not. Three underscores alone therefore match nothing.
-   * CommonMark treats `___` as a thematic break, so this is a defect, not a
-   * choice: the same document is a rule when written with hyphens and a
-   * paragraph when written with underscores.
-   */
-  it('does not turn three underscores into a horizontal rule', () => {
+  it('turns three underscores into a horizontal rule', () => {
     const editor = makeEditor();
 
     type(editor, '___');
 
-    expect(topType(editor)).toBe('p');
+    expect(topType(editor)).toBe(HorizontalRulePlugin.key);
   });
 
-  it('turns three underscores and a space into a horizontal rule', () => {
+  /**
+   * `***` is a thematic break in CommonMark, and it is not a rule here. The
+   * block rule would fire while the line reads `***`, which is what an author
+   * types on the way to `***bold italic***`.
+   */
+  it('leaves three asterisks alone so the bold italic mark can run', () => {
     const editor = makeEditor();
 
-    type(editor, '___ ');
+    type(editor, '***bold italic***');
 
-    expect(topType(editor)).toBe(HorizontalRulePlugin.key);
+    expect(topType(editor)).toBe('p');
+    expect(editor.children[0]).toMatchObject({
+      children: [{ text: 'bold italic', bold: true, italic: true }],
+    });
   });
 
   /**
