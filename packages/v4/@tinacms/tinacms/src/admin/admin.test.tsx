@@ -125,6 +125,12 @@ function PreviewProbe() {
   return <p>previewing {useFormId()}</p>;
 }
 
+const reloadIsBlocked = (): boolean => {
+  const unload = new Event('beforeunload', { cancelable: true });
+  window.dispatchEvent(unload);
+  return unload.defaultPrevented;
+};
+
 const FIXTURES: Record<string, DocumentEntry[]> = {
   post: [
     {
@@ -234,6 +240,73 @@ describe('TinaAdmin', () => {
       name: /hello\.mdx/,
     });
     expect(helloEntry).toHaveTextContent('Unsaved');
+  });
+});
+
+describe('TinaAdmin unsaved changes', () => {
+  it('blocks a reload while edits are unsaved, and lets it through once they are saved', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    await screen.findByLabelText('title');
+    expect(reloadIsBlocked()).toBe(false);
+
+    await user.type(screen.getByLabelText('title'), '!');
+    expect(reloadIsBlocked()).toBe(true);
+
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(saved).toHaveLength(1));
+    await waitFor(() => expect(reloadIsBlocked()).toBe(false));
+  });
+
+  it('blocks a reload for a document that another one is open over', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    await user.type(await screen.findByLabelText('title'), '!');
+
+    await user.click(
+      await screen.findByRole('button', { name: /second\.mdx/ })
+    );
+    await waitFor(() =>
+      expect(screen.getByLabelText('title')).toHaveValue('Second')
+    );
+    expect(reloadIsBlocked()).toBe(true);
+  });
+
+  it('stops blocking the reload when the admin unmounts', async () => {
+    const user = userEvent.setup();
+    const { unmount } = renderAdmin();
+
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    await user.type(await screen.findByLabelText('title'), '!');
+    expect(reloadIsBlocked()).toBe(true);
+
+    unmount();
+    expect(reloadIsBlocked()).toBe(false);
+  });
+
+  it('discards unsaved edits back to the loaded document', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    await user.type(await screen.findByLabelText('title'), '!');
+    expect(screen.getByRole('status')).toHaveTextContent('Unsaved');
+
+    await user.click(screen.getByRole('button', { name: 'Discard' }));
+
+    await waitFor(() =>
+      expect(screen.getByLabelText('title')).toHaveValue('Hello')
+    );
+    expect(screen.getByRole('status')).toHaveTextContent('No changes');
+    expect(reloadIsBlocked()).toBe(false);
   });
 });
 
