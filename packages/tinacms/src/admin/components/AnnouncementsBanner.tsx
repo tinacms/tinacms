@@ -21,6 +21,12 @@ const addDismissed = (headline: string) => {
   }
 };
 
+const severityToCalloutStyle: Record<string, 'info' | 'warning' | 'error'> = {
+  info: 'info',
+  warning: 'warning',
+  critical: 'error',
+};
+
 export const AnnouncementsBanner = () => {
   const cms = useCMS();
   const [announcements, setAnnouncements] = React.useState<
@@ -53,7 +59,7 @@ export const AnnouncementsBanner = () => {
       {visible.map((a) => (
         <Callout
           key={a.id}
-          calloutStyle={a.severity}
+          calloutStyle={severityToCalloutStyle[a.severity] || 'info'}
           className='flex items-start gap-2'
         >
           <div className='flex-1 min-w-0'>
