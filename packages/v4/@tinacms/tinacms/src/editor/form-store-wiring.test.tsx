@@ -1,17 +1,12 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
+import { DocumentForm } from '../admin/document-form';
 import { asResolvedConfig } from '../config';
 import type { CollectionSchema } from '../core/schema/types';
 import { t } from '../index';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
-import {
-  Field,
-  FormProvider,
-  TinaProvider,
-  useFormId,
-  useFormStatus,
-} from './index';
+import { FormProvider, TinaProvider, useFormId, useFormStatus } from './index';
 
 const NO_COLLECTIONS = { collections: [] };
 
@@ -39,12 +34,12 @@ describe('FormProvider form-store wiring', () => {
           path='content/posts/wiring.mdx'
           document={{ title: 'Hi' }}
         >
-          <Field address='title' />
+          <DocumentForm />
           <StatusProbe />
         </FormProvider>
       </TinaProvider>
     );
-    const input = await screen.findByLabelText('title');
+    const input = await screen.findByLabelText('Title');
     expect(screen.getByTestId('status')).toHaveTextContent('pristine');
 
     await userEvent.type(input, '!');

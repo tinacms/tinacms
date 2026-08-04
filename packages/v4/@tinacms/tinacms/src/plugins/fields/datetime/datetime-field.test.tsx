@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { DocumentForm } from '../../../admin/document-form';
 import { asResolvedConfig } from '../../../config';
 import {
   type FieldRegistry,
@@ -12,7 +13,6 @@ import type {
 } from '../../../core/schema/types';
 import { validateField } from '../../../core/validation';
 import {
-  Field,
   FormProvider,
   TinaProvider,
   toFieldAddress,
@@ -54,7 +54,7 @@ const renderPublished = (document?: TinaDocument) =>
         path='content/posts/published.mdx'
         document={document}
       >
-        <Field address='published' />
+        <DocumentForm />
         <StoredValue />
       </FormProvider>
     </TinaProvider>
@@ -87,7 +87,7 @@ describe('DatetimeField rendering', () => {
   it('renders a stored instant as the local wall clock of the editor', async () => {
     renderPublished({ published: '2024-05-01T09:30:00.000Z' });
     const input = (await screen.findByLabelText(
-      'published'
+      'Published'
     )) as HTMLInputElement;
     expect(input.value).toBe(localWallClock('2024-05-01T09:30:00.000Z'));
   });
@@ -95,7 +95,7 @@ describe('DatetimeField rendering', () => {
   it('renders a stored value with no zone as the wall clock it spells', async () => {
     renderPublished({ published: '2024-05-01T09:30' });
     const input = (await screen.findByLabelText(
-      'published'
+      'Published'
     )) as HTMLInputElement;
     expect(input.value).toBe('2024-05-01T09:30');
   });
@@ -103,7 +103,7 @@ describe('DatetimeField rendering', () => {
   it('renders a stored date with no time as midnight', async () => {
     renderPublished({ published: '2024-05-01' });
     const input = (await screen.findByLabelText(
-      'published'
+      'Published'
     )) as HTMLInputElement;
     expect(input.value).toBe('2024-05-01T00:00');
   });
@@ -111,7 +111,7 @@ describe('DatetimeField rendering', () => {
   it('renders empty when the value is absent', async () => {
     renderPublished();
     const input = (await screen.findByLabelText(
-      'published'
+      'Published'
     )) as HTMLInputElement;
     expect(input.value).toBe('');
   });
@@ -121,7 +121,7 @@ describe('DatetimeField value updates', () => {
   it('writes the picked datetime back through the form store', async () => {
     renderPublished({ published: '2024-05-01T09:30' });
     const input = (await screen.findByLabelText(
-      'published'
+      'Published'
     )) as HTMLInputElement;
 
     fireEvent.change(input, { target: { value: '2025-12-24T18:00' } });
@@ -132,7 +132,7 @@ describe('DatetimeField value updates', () => {
     const stored = '2024-05-01T09:30:00.000Z';
     renderPublished({ published: stored });
     const input = (await screen.findByLabelText(
-      'published'
+      'Published'
     )) as HTMLInputElement;
     const displayed = input.value;
 
@@ -149,7 +149,7 @@ describe('DatetimeField value updates', () => {
   it('keeps the value zone-qualified when an editor touches it', async () => {
     renderPublished({ published: '2024-05-01T09:30:00.000Z' });
     const input = (await screen.findByLabelText(
-      'published'
+      'Published'
     )) as HTMLInputElement;
 
     fireEvent.change(input, { target: { value: '2024-06-15T12:00' } });
@@ -160,7 +160,7 @@ describe('DatetimeField value updates', () => {
   it('leaves a stored value with no zone without one', async () => {
     renderPublished({ published: '2024-05-01T09:30' });
     const input = (await screen.findByLabelText(
-      'published'
+      'Published'
     )) as HTMLInputElement;
 
     fireEvent.change(input, { target: { value: '2025-12-24T18:00' } });

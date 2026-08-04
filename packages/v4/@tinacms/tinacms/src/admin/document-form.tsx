@@ -21,7 +21,11 @@ function FieldRow({ node }: { node: FieldSchema }) {
     useFieldRegistry().get(node.type)?.metadata?.labelable !== false;
   return (
     <div className='mb-4 min-w-0'>
-      <Label className='mb-1' htmlFor={labelable ? name : undefined}>
+      <Label
+        className='mb-1'
+        id={`${name}-label`}
+        htmlFor={labelable ? name : undefined}
+      >
         {node.label ?? name}
         {dirty ? (
           <>

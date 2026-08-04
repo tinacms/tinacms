@@ -105,7 +105,7 @@ export function NumberField() {
 
   return (
     <div>
-      <input ref={inputRef} type='number' step={field.step} aria-label={address}
+      <input ref={inputRef} type='number' step={field.step} id={address}
         value={value ?? ''}
         onChange={(e) => setValue(e.target.value === '' ? undefined : e.target.value)} />
       {errors.map((e) => <span key={e} role='alert'>{e}</span>)}

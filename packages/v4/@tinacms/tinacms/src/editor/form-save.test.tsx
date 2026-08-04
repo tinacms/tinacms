@@ -1,13 +1,13 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import { DocumentForm } from '../admin/document-form';
 import { asResolvedConfig } from '../config';
 import { definePlugin } from '../core/plugin';
 import type { CollectionSchema } from '../core/schema/types';
 import { t } from '../index';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import {
-  Field,
   FormProvider,
   type SaveHandler,
   TinaProvider,
@@ -53,7 +53,7 @@ const renderWithSave = (onSave: SaveHandler) =>
         document={{ title: 'Hi' }}
         onSave={onSave}
       >
-        <Field address='title' />
+        <DocumentForm />
         <SaveProbe />
       </FormProvider>
     </TinaProvider>
@@ -63,7 +63,7 @@ describe('useFormSave', () => {
   it('delivers the digested document to onSave and marks the form clean', async () => {
     const onSave = vi.fn();
     renderWithSave(onSave);
-    const input = await screen.findByLabelText('title');
+    const input = await screen.findByLabelText('Title');
     await userEvent.type(input, '!');
     expect(screen.getByTestId('status')).toHaveTextContent('dirty');
 
@@ -75,7 +75,7 @@ describe('useFormSave', () => {
   it('leaves the form dirty when onSave rejects', async () => {
     const onSave = vi.fn().mockRejectedValue(new Error('save failed'));
     renderWithSave(onSave);
-    const input = await screen.findByLabelText('title');
+    const input = await screen.findByLabelText('Title');
     await userEvent.type(input, '!');
 
     await userEvent.click(screen.getByText('save'));
@@ -104,7 +104,7 @@ function StructureField() {
   const [value, setValue] = useFieldValue<{ text: string }>(address);
   return (
     <input
-      aria-label={address}
+      id={address}
       value={value?.text ?? ''}
       onChange={(event) => setValue({ text: event.target.value })}
     />
@@ -133,7 +133,7 @@ describe('useFormSave with a structured field value', () => {
           document={{ body: 'Original.' }}
           onSave={onSave}
         >
-          <Field address='body' />
+          <DocumentForm />
           <SaveProbe />
         </FormProvider>
       </TinaProvider>
