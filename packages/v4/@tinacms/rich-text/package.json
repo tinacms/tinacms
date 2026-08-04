@@ -13,7 +13,8 @@
   "scripts": {
     "build": "tinacms-scripts build",
     "types": "tsc && tsc -p tsconfig.test.json",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "coverage": "vitest run --coverage"
   },
   "exports": {
     ".": {
@@ -80,6 +81,7 @@
     "@tinacms/scripts": "workspace:*",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
+    "@vitest/coverage-v8": "catalog:",
     "happy-dom": "catalog:",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
