@@ -1,8 +1,8 @@
 import { createGraphiQLFetcher } from '@graphiql/toolkit';
-import { FolderIcon } from '@heroicons/react/outline';
 import { queries } from 'CLIENT_IMPORT';
 import { GraphiQL } from 'graphiql';
 import { parse, print } from 'graphql';
+import { Folder } from 'lucide-react';
 import React from 'react';
 import { useCMS } from 'tinacms';
 
@@ -144,7 +144,7 @@ const Playground = () => {
         plugins={[
           {
             title: 'Queries',
-            icon: () => <FolderIcon />,
+            icon: () => <Folder />,
             content: (values) => <Plugin />,
           },
         ]}

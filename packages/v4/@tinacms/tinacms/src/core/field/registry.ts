@@ -14,7 +14,7 @@ import type { FieldDescriptor } from './contract';
 export type FieldRegistry = Map<string, FieldDescriptor>;
 
 const overridesFieldKey = (manifest: PluginManifest, key: string): boolean =>
-  (manifest.overrides ?? []).some(
+  manifest.overrides.some(
     (override) =>
       override.capability === FIELD_CAPABILITY && override.key === key
   );

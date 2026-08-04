@@ -5,10 +5,8 @@ import { FormModal } from '@toolkit/react-forms';
 import type { ScreenPlugin } from '@toolkit/react-screens';
 import { TinaCMS } from '@toolkit/tina-cms';
 import { cn } from '@utils/cn';
+import { FilePlus, Info, LogOut, Menu, X } from 'lucide-react';
 import * as React from 'react';
-import { BiExit, BiMenu, BiX } from 'react-icons/bi';
-import { FiInfo } from 'react-icons/fi';
-import { VscNewFile } from 'react-icons/vsc';
 import { VersionInfo } from './VersionInfo';
 import { NavContext } from './nav-context';
 import { SyncStatusButton, SyncStatusModal } from './sync-status';
@@ -127,7 +125,7 @@ export const Nav = ({
               toggleMenu();
             }}
           >
-            <BiMenu className='h-8 w-auto text-gray-600' />
+            <Menu className='h-8 w-auto text-gray-600' />
           </button>
         </div>
       )}
@@ -151,7 +149,7 @@ export const Nav = ({
               toggleMenu();
             }}
           >
-            <BiX className='h-8 w-auto text-gray-600' />
+            <X className='h-8 w-auto text-gray-600' />
           </button>
         </div>
         {children}
@@ -169,7 +167,7 @@ export const Nav = ({
                       href='https://tina.io/docs/r/content-modelling-collections'
                       target='_blank'
                     >
-                      <FiInfo />
+                      <Info className='w-4 h-4' />
                     </a>
                   </span>
                 )}
@@ -319,7 +317,7 @@ const CreateContentNavItem = ({ plugin }) => {
           setOpen(true);
         }}
       >
-        <VscNewFile className='mr-3 h-6 opacity-80 w-auto' /> {plugin.name}
+        <FilePlus className='mr-3 h-6 opacity-80 w-auto' /> {plugin.name}
       </button>
       {open && <FormModal plugin={plugin} close={() => setOpen(false)} />}
     </li>
@@ -349,7 +347,7 @@ const Logout = ({
 
   return (
     <button onClick={handleLogout} {...buttonProps}>
-      <BiExit className='w-6 h-auto mr-2' /> Log Out
+      <LogOut className='w-6 h-auto mr-2' /> Log Out
     </button>
   );
 };
