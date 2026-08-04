@@ -35,7 +35,6 @@
     "@radix-ui/react-slot": "catalog:",
     "@radix-ui/react-toolbar": "catalog:",
     "@radix-ui/react-tooltip": "catalog:",
-    "@tinacms/mdx": "workspace:*",
     "@tinacms/schema-tools": "workspace:*",
     "@tinacms/ui": "workspace:*",
     "@udecode/cn": "catalog:",
