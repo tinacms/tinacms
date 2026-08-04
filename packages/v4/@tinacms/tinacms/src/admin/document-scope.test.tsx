@@ -7,7 +7,7 @@ import { asResolvedConfig } from '../config';
 import type { ContentProvider, DocumentEntry } from '../core/content/contract';
 import { definePlugin } from '../core/plugin';
 import type { CollectionSchema } from '../core/schema/types';
-import { contentKeys, useCollectionDocuments } from '../editor/content-queries';
+import { contentKeys, useDocument } from '../editor/content-queries';
 import { FormScopeContext } from '../editor/context';
 import { Field, TinaProvider } from '../editor/index';
 import { toFormId, useFormStatus } from '../form/form-store';
@@ -24,45 +24,47 @@ const collection: CollectionSchema = {
   fields: [{ name: 'title', label: 'Title', type: 'string' }],
 };
 
-const ON_LOAD: DocumentEntry[] = [{ path, document: { title: 'Hello' } }];
-const ON_DISK: DocumentEntry[] = [
-  { path, document: { title: 'Changed on disk' } },
-];
+const ON_LOAD: DocumentEntry = { path, document: { title: 'Hello' } };
+const ON_DISK: DocumentEntry = { path, document: { title: 'Changed on disk' } };
 
-const provider: ContentProvider = {
-  list: async () => ON_LOAD,
-  get: async () => ON_LOAD[0],
+const providerReading = (read: ContentProvider['get']): ContentProvider => ({
+  list: async () => [{ path }],
+  get: read,
   update: async (_collection, target, value) => ({
     path: target,
     document: { ...value },
   }),
+});
+
+const configReading = (read: ContentProvider['get']) => {
+  const provider = providerReading(read);
+  return asResolvedConfig({
+    plugins: [
+      definePlugin({
+        name: 'test:content',
+        provides: ['content'],
+        client: async () => ({
+          default: {
+            slice: () => ({
+              list: provider.list,
+              get: provider.get,
+              update: provider.update,
+            }),
+          },
+        }),
+      }),
+      stringFieldPlugin,
+    ],
+    schema: { collections: [collection] },
+  });
 };
 
-const contentPlugin = definePlugin({
-  name: 'test:content',
-  provides: ['content'],
-  client: async () => ({
-    default: {
-      slice: () => ({
-        list: provider.list,
-        get: provider.get,
-        update: provider.update,
-      }),
-    },
-  }),
-});
-
-const config = asResolvedConfig({
-  plugins: [contentPlugin, stringFieldPlugin],
-  schema: { collections: [collection] },
-});
+const config = configReading(async () => ON_LOAD);
 
 function CachedTitle() {
-  const { documents } = useCollectionDocuments(collection.name);
+  const { entry } = useDocument(collection.name, path);
   return (
-    <span data-testid='cached'>
-      {String(documents[0]?.document.title ?? '')}
-    </span>
+    <span data-testid='cached'>{String(entry?.document.title ?? '')}</span>
   );
 }
 
@@ -74,8 +76,11 @@ function FieldSlot() {
   return use(FormScopeContext) ? <Field address='title' /> : null;
 }
 
-const host = (queryClient: QueryClient) => (
-  <TinaProvider config={config} queryClient={queryClient}>
+const host = (
+  queryClient: QueryClient,
+  hostConfig: ReturnType<typeof configReading> = config
+) => (
+  <TinaProvider config={hostConfig} queryClient={queryClient}>
     <DocumentScope collection={collection} path={path}>
       <FieldSlot />
     </DocumentScope>
@@ -89,8 +94,8 @@ const makeQueryClient = () =>
 
 const writeDiskChange = (queryClient: QueryClient) =>
   act(() => {
-    queryClient.setQueryData<DocumentEntry[]>(
-      contentKeys.list(collection.name),
+    queryClient.setQueryData<DocumentEntry>(
+      contentKeys.document(collection.name, path),
       ON_DISK
     );
   });
@@ -123,5 +128,39 @@ describe('DocumentScope on a document that changed after it opened', () => {
 
     expect(screen.getByLabelText('title')).toHaveValue('Hello!');
     expect(screen.getByTestId('status')).toHaveTextContent('dirty');
+  });
+});
+
+describe('DocumentScope on a document the data layer cannot give', () => {
+  it('opens no form for a path that does not exist', async () => {
+    const queryClient = makeQueryClient();
+    render(
+      host(
+        queryClient,
+        configReading(async () => null)
+      )
+    );
+
+    await waitFor(() =>
+      expect(screen.getByTestId('cached')).toBeEmptyDOMElement()
+    );
+    expect(screen.queryByLabelText('title')).not.toBeInTheDocument();
+  });
+
+  it('opens no form when the read fails', async () => {
+    const queryClient = makeQueryClient();
+    render(
+      host(
+        queryClient,
+        configReading(async () => {
+          throw new Error('cannot parse the file');
+        })
+      )
+    );
+
+    await waitFor(() =>
+      expect(screen.getByTestId('cached')).toBeEmptyDOMElement()
+    );
+    expect(screen.queryByLabelText('title')).not.toBeInTheDocument();
   });
 });

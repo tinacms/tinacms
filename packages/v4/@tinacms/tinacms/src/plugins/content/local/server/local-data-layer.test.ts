@@ -52,18 +52,23 @@ afterEach(() => fs.rm(rootDir, { recursive: true, force: true }));
 describe('list', () => {
   it('returns matching files (recursively) with root-relative paths', async () => {
     const entries = await dataLayer.list('post');
-    expect(entries.map((entry) => entry.path)).toEqual([
-      'content/posts/hello.mdx',
-      'content/posts/nested/deep.mdx',
+    expect(entries).toEqual([
+      { path: 'content/posts/hello.mdx' },
+      { path: 'content/posts/nested/deep.mdx' },
     ]);
-    expect(entries[0].document.title).toBe('Hello World');
+  });
+
+  it('keeps the content of the documents out of the payload', async () => {
+    const payload = JSON.stringify(await dataLayer.list('post'));
+    expect(payload).not.toContain('Body prose');
+    expect(payload).not.toContain('Hello World');
   });
 
   it('returns [] when the collection folder does not exist yet', async () => {
     expect(await dataLayer.list('page')).toEqual([]);
   });
 
-  it('lists an unparsable file as an entry carrying its error', async () => {
+  it('lists a file it cannot parse, which `get` then reports', async () => {
     await fs.writeFile(
       path.join(rootDir, 'content/posts/broken.mdx'),
       '---\ntitle: [unclosed\n---\n'
@@ -74,25 +79,12 @@ describe('list', () => {
       'content/posts/hello.mdx',
       'content/posts/nested/deep.mdx',
     ]);
-    const broken = entries[0];
-    expect(broken.error).toBeTruthy();
-    expect(broken.document).toEqual({});
-    expect(entries[1].error).toBeUndefined();
-  });
-
-  it('refuses to save over a document it listed as unparsable', async () => {
-    await fs.writeFile(
-      path.join(rootDir, 'content/posts/broken.mdx'),
-      '---\ntitle: [unclosed\n---\n'
-    );
-    const [broken] = await dataLayer.list('post');
-    expect(broken.error).toBeTruthy();
     await expect(
-      dataLayer.update('post', broken.path, broken.document)
-    ).rejects.toThrow(/could not be parsed/);
+      dataLayer.get('post', 'content/posts/broken.mdx')
+    ).rejects.toThrow();
   });
 
-  it('skips (and warns on) an unreadable entry, e.g. a directory named *.mdx', async () => {
+  it('excludes a directory named *.mdx without a warning', async () => {
     await fs.mkdir(path.join(rootDir, 'content/posts/folder.mdx'));
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const entries = await dataLayer.list('post');
@@ -100,7 +92,7 @@ describe('list', () => {
       'content/posts/hello.mdx',
       'content/posts/nested/deep.mdx',
     ]);
-    expect(warn).toHaveBeenCalledOnce();
+    expect(warn).not.toHaveBeenCalled();
     warn.mockRestore();
   });
 });

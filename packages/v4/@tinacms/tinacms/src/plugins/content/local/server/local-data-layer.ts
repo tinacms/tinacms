@@ -1,8 +1,9 @@
+import type { Dirent } from 'node:fs';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import type {
   ContentProvider,
-  DocumentEntry,
+  DocumentSummary,
 } from '../../../../core/content/contract';
 import { invariant } from '../../../../core/invariant';
 import type { CollectionSchema } from '../../../../core/schema/types';
@@ -229,10 +230,11 @@ export const createLocalDataLayer = (
 
     async list(collectionName) {
       const collection = collectionFor(collectionName);
-      let names: string[];
+      let dirents: Dirent[];
       try {
-        names = await fs.readdir(collection.absoluteFolder, {
+        dirents = await fs.readdir(collection.absoluteFolder, {
           recursive: true,
+          withFileTypes: true,
         });
       } catch (cause) {
         if (isMissingFileError(cause)) return [];
@@ -241,39 +243,25 @@ export const createLocalDataLayer = (
           { cause }
         );
       }
-      const entries: DocumentEntry[] = [];
-      for (const name of names.sort()) {
-        const adapter = adapterForPath(collection.adapters, name);
-        if (!adapter) continue;
-        const absolute = path.join(collection.absoluteFolder, name);
-        let raw: string;
+      const files = dirents
+        .filter((dirent) => !dirent.isDirectory())
+        .map((dirent) => path.join(dirent.parentPath, dirent.name))
+        .sort();
+      const summaries: DocumentSummary[] = [];
+      for (const absolute of files) {
+        if (!adapterForPath(collection.adapters, absolute)) continue;
         try {
           await resolveDocumentPath(collection, absolute);
-          raw = await fs.readFile(absolute, 'utf8');
         } catch (cause) {
-          console.warn(`Skipping unreadable document "${absolute}":`, cause);
+          console.warn(
+            `Skipping document "${absolute}": it does not resolve inside collection "${collection.schema.name}".`,
+            cause
+          );
           continue;
         }
-        try {
-          entries.push({
-            path: documentIdFor(absolute),
-            document: adapter.parse(raw, collection.bodyField),
-          });
-        } catch (cause) {
-          let reason: string;
-          if (cause instanceof Error) {
-            reason = cause.message;
-          } else {
-            reason = String(cause);
-          }
-          entries.push({
-            path: documentIdFor(absolute),
-            document: {},
-            error: reason,
-          });
-        }
+        summaries.push({ path: documentIdFor(absolute) });
       }
-      return entries;
+      return summaries;
     },
 
     async update(collectionName, documentPath, value) {
