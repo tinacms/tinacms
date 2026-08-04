@@ -269,23 +269,15 @@ describe('useFormColumnWidth handle', () => {
   });
 });
 
-/**
- * Two defects of the persist effect. Each test states the behaviour that the
- * hook must have. `it.fails` records that the hook does not have it yet, and
- * turns red when a fix lands, so the fix must flip these to `it`.
- */
 describe('useFormColumnWidth stored width survival', () => {
-  it.fails(
-    'keeps a stored width that the window is momentarily too narrow to show',
-    () => {
-      setViewportWidth(700);
-      localStorage.setItem(STORAGE_KEY, '600');
-      renderHook(() => useFormColumnWidth());
-      expect(storedWidth()).toBe('600');
-    }
-  );
+  it('keeps a stored width that the window is momentarily too narrow to show', () => {
+    setViewportWidth(700);
+    localStorage.setItem(STORAGE_KEY, '600');
+    renderHook(() => useFormColumnWidth());
+    expect(storedWidth()).toBe('600');
+  });
 
-  it.fails('never writes the default width over a stored width', () => {
+  it('never writes the default width over a stored width', () => {
     localStorage.setItem(STORAGE_KEY, '600');
     const writes: string[] = [];
     const write = window.localStorage.setItem.bind(window.localStorage);

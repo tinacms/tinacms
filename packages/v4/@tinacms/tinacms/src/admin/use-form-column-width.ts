@@ -29,8 +29,8 @@ const writeStoredWidth = (width: number) => {
   } catch {}
 };
 
-const clampWidth = (width: number) =>
-  Math.max(MIN_WIDTH, Math.min(width, window.innerWidth - MIN_PREVIEW_WIDTH));
+const clampWidth = (width: number, viewportWidth: number) =>
+  Math.max(MIN_WIDTH, Math.min(width, viewportWidth - MIN_PREVIEW_WIDTH));
 
 export interface FormColumnWidth {
   width: number;
@@ -39,25 +39,29 @@ export interface FormColumnWidth {
 }
 
 export const useFormColumnWidth = (): FormColumnWidth => {
-  const [width, setWidth] = useState(DEFAULT_WIDTH);
+  // Storage holds the width the editor chose, and never the clamped width. A
+  // narrow window clamps the column for display only. If the clamp went to
+  // storage, a narrow window would destroy the choice, and a wide window
+  // could not give it back.
+  const [chosenWidth, setChosenWidth] = useState(
+    () => readStoredWidth() ?? DEFAULT_WIDTH
+  );
+  const [viewportWidth, setViewportWidth] = useState(() => window.innerWidth);
   const [isResizing, setIsResizing] = useState(false);
   const dragStart = useRef<{ x: number; width: number } | null>(null);
 
-  useEffect(() => {
-    const stored = readStoredWidth();
-    if (stored !== null) setWidth(clampWidth(stored));
-  }, []);
+  const width = clampWidth(chosenWidth, viewportWidth);
 
   useEffect(() => {
-    const onWindowResize = () => setWidth(clampWidth);
+    const onWindowResize = () => setViewportWidth(window.innerWidth);
     window.addEventListener('resize', onWindowResize);
     return () => window.removeEventListener('resize', onWindowResize);
   }, []);
 
   useEffect(() => {
     if (isResizing) return;
-    writeStoredWidth(width);
-  }, [isResizing, width]);
+    writeStoredWidth(chosenWidth);
+  }, [isResizing, chosenWidth]);
 
   const onPointerDown = useCallback(
     (event: PointerEvent<HTMLDivElement>) => {
@@ -69,11 +73,16 @@ export const useFormColumnWidth = (): FormColumnWidth => {
     [width]
   );
 
-  const onPointerMove = useCallback((event: PointerEvent<HTMLDivElement>) => {
-    const start = dragStart.current;
-    if (!start) return;
-    setWidth(clampWidth(start.width + (event.clientX - start.x)));
-  }, []);
+  const onPointerMove = useCallback(
+    (event: PointerEvent<HTMLDivElement>) => {
+      const start = dragStart.current;
+      if (!start) return;
+      setChosenWidth(
+        clampWidth(start.width + (event.clientX - start.x), viewportWidth)
+      );
+    },
+    [viewportWidth]
+  );
 
   const endDrag = useCallback((event: PointerEvent<HTMLDivElement>) => {
     if (!dragStart.current) return;
@@ -82,18 +91,21 @@ export const useFormColumnWidth = (): FormColumnWidth => {
     setIsResizing(false);
   }, []);
 
-  const onKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>) => {
-    const step =
-      event.key === 'ArrowLeft'
-        ? -KEYBOARD_STEP
-        : event.key === 'ArrowRight'
-          ? KEYBOARD_STEP
-          : 0;
-    if (step === 0 && event.key !== 'Home') return;
-    event.preventDefault();
-    if (event.key === 'Home') setWidth(clampWidth(DEFAULT_WIDTH));
-    else setWidth((current) => clampWidth(current + step));
-  }, []);
+  const onKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLDivElement>) => {
+      const step =
+        event.key === 'ArrowLeft'
+          ? -KEYBOARD_STEP
+          : event.key === 'ArrowRight'
+            ? KEYBOARD_STEP
+            : 0;
+      if (step === 0 && event.key !== 'Home') return;
+      event.preventDefault();
+      if (event.key === 'Home') setChosenWidth(DEFAULT_WIDTH);
+      else setChosenWidth(clampWidth(width + step, viewportWidth));
+    },
+    [width, viewportWidth]
+  );
 
   return {
     width,
