@@ -132,7 +132,11 @@ describe('normalizeLinksInCodeBlocks', () => {
       type: 'code_line',
       children: [
         { text: 'see ' },
-        { type: 'a', url: 'https://x.test', children: [{ text: 'https://x.test' }] },
+        {
+          type: 'a',
+          url: 'https://x.test',
+          children: [{ text: 'https://x.test' }],
+        },
       ],
     };
 

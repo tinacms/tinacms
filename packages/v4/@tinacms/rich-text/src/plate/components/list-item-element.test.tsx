@@ -67,7 +67,9 @@ describe('a task list item', () => {
   it('draws an unchecked box for a checked:false item', () => {
     renderList(list(item('buy milk', false)));
 
-    expect(screen.getByRole('checkbox', { name: 'buy milk' })).not.toBeChecked();
+    expect(
+      screen.getByRole('checkbox', { name: 'buy milk' })
+    ).not.toBeChecked();
   });
 
   it('draws a checked box for a checked:true item', () => {

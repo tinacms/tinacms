@@ -108,7 +108,10 @@ describe('useFormColumnWidth keyboard resize', () => {
   });
 
   it('keeps the preview minimum width when ArrowRight goes past it', () => {
-    localStorage.setItem(STORAGE_KEY, String(WIDE_VIEWPORT - MIN_PREVIEW_WIDTH));
+    localStorage.setItem(
+      STORAGE_KEY,
+      String(WIDE_VIEWPORT - MIN_PREVIEW_WIDTH)
+    );
     const { handle, width } = renderHandle();
     fireEvent.keyDown(handle, { key: 'ArrowRight' });
     expect(width()).toBe(WIDE_VIEWPORT - MIN_PREVIEW_WIDTH);

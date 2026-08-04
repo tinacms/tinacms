@@ -58,7 +58,14 @@ describe('getAutoformatBlocks', () => {
     const matches = getAutoformatBlocks().map((rule) => rule.match);
 
     expect(matches).toEqual(
-      expect.arrayContaining(['# ', '## ', '### ', '#### ', '##### ', '###### '])
+      expect.arrayContaining([
+        '# ',
+        '## ',
+        '### ',
+        '#### ',
+        '##### ',
+        '###### ',
+      ])
     );
   });
 

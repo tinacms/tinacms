@@ -56,8 +56,8 @@ describe('buildErrorMessage', () => {
    * asks for a message while it still holds nothing.
    */
   it('returns an empty string for a missing element', () => {
-    expect(buildErrorMessage(undefined as unknown as InvalidMarkdownElement)).toBe(
-      ''
-    );
+    expect(
+      buildErrorMessage(undefined as unknown as InvalidMarkdownElement)
+    ).toBe('');
   });
 });
