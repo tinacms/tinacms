@@ -26,7 +26,7 @@ export interface RichTextHost<Rendered> {
   ): Rendered;
   text(value: string): Rendered;
   list(items: Rendered[]): Rendered;
-  memo?(render: () => Rendered, cacheKey: unknown): Rendered;
+  memo?(render: () => Rendered, deps: readonly unknown[]): Rendered;
 }
 
 type RenderContext<Rendered> = {

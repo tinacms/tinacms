@@ -1,4 +1,5 @@
 import { render } from '@testing-library/react';
+import type { JSX } from 'react';
 import { describe, expect, it } from 'vitest';
 import type { TinaMarkdownContent } from '../../rich-text';
 import { StaticTinaMarkdown, TinaMarkdown } from './tina-markdown';
@@ -267,5 +268,51 @@ describe('the static renderer', () => {
       bold: (props: any) => <b>{props.children}</b>,
     };
     expect(staticHtml(fixture, components)).toBe(html(fixture, components));
+  });
+});
+
+describe('the memo', () => {
+  const paragraph = (className: string) => ({
+    p: (props: { children: JSX.Element }) => (
+      <p className={className}>{props.children}</p>
+    ),
+  });
+
+  it('re-renders when only the components change', () => {
+    const content: TinaMarkdownContent[] = [
+      { type: 'p', children: [text('hi')] },
+    ];
+    const first = paragraph('first');
+    const second = paragraph('second');
+
+    const { container, rerender } = render(
+      <TinaMarkdown content={content} components={first} />
+    );
+    expect(container.innerHTML).toBe('<p class="first">hi</p>');
+
+    rerender(<TinaMarkdown content={content} components={second} />);
+    expect(container.innerHTML).toBe(staticHtml(content, second));
+  });
+
+  // A new `content` array with the same node in it. TinaMarkdown must render
+  // again — with the same array, the React compiler holds the last output and
+  // the test measures nothing.
+  it('keeps the last render when the node and the components hold', () => {
+    const node: TinaMarkdownContent = { type: 'p', children: [text('hi')] };
+    let renders = 0;
+    const components = {
+      p: (props: { children: JSX.Element }) => {
+        renders += 1;
+        return <p>{props.children}</p>;
+      },
+    };
+
+    const { rerender } = render(
+      <TinaMarkdown content={[node]} components={components} />
+    );
+    expect(renders).toBe(1);
+
+    rerender(<TinaMarkdown content={[node]} components={components} />);
+    expect(renders).toBe(1);
   });
 });
