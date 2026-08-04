@@ -49,7 +49,13 @@ export const markdownAdapter = (extension: string): FormatAdapter => ({
     if (bodyField != null) {
       delete frontmatter[bodyField];
     }
-    const content = bodyToWrite(document, previous.content, bodyField);
+    const hasFrontmatter = Object.keys(frontmatter).length > 0;
+    const content = bodyToWrite(
+      document,
+      previous.content,
+      hasFrontmatter,
+      bodyField
+    );
     if (
       previousRaw !== undefined &&
       content === previous.content &&
@@ -64,6 +70,7 @@ export const markdownAdapter = (extension: string): FormatAdapter => ({
 const bodyToWrite = (
   document: Record<string, unknown>,
   previousContent: string,
+  hasFrontmatter: boolean,
   bodyField?: string
 ): string => {
   if (bodyField == null || !(bodyField in document)) return previousContent;
@@ -73,5 +80,5 @@ const bodyToWrite = (
       `Expected a string for body field "${bodyField}", received ${typeof body}.`
     );
   }
-  return `\n${body}`;
+  return hasFrontmatter ? `\n${body}` : body;
 };
