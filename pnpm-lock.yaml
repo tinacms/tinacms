@@ -309,9 +309,6 @@ catalogs:
     altair-express-middleware:
       specifier: ^7.3.6
       version: 7.3.6
-    async-lock:
-      specifier: ^1.4.1
-      version: 1.4.1
     auto-bind:
       specifier: ^4.0.0
       version: 4.0.0
@@ -1388,9 +1385,6 @@ importers:
       altair-express-middleware:
         specifier: 'catalog:'
         version: 7.3.6
-      async-lock:
-        specifier: 'catalog:'
-        version: 1.4.1
       auto-bind:
         specifier: 'catalog:'
         version: 4.0.0
@@ -2374,9 +2368,6 @@ importers:
       '@udecode/plate-trailing-block':
         specifier: 'catalog:'
         version: 48.0.0(@udecode/plate@48.0.5(@types/react@18.3.27)(immer@10.2.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.27.0)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.6.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      async-lock:
-        specifier: 'catalog:'
-        version: 1.4.1
       class-variance-authority:
         specifier: 'catalog:'
         version: 0.7.1

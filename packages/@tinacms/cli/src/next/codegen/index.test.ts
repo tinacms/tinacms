@@ -15,12 +15,11 @@ jest.mock('./codegen', () => ({
 }));
 jest.mock('esbuild', () => ({
   transform: jest.fn().mockResolvedValue({ code: '' }),
-  build: jest.fn().mockResolvedValue(undefined),
 }));
 
 import path from 'path';
-import * as stripModule from './stripSearchTokenFromConfig';
 import { Codegen } from './index';
+import * as stripModule from './stripSearchTokenFromConfig';
 
 describe('Codegen.genClient', () => {
   function makeInstance(isTs: boolean): Codegen {
@@ -142,25 +141,6 @@ describe('Codegen.execute integration', () => {
     return instance;
   }
 
-  function stubFullCodegen() {
-    const codegen = stubCodegen();
-    const cm = codegen.configManager as any;
-    cm.shouldSkipSDK = () => false;
-    cm.isUsingTs = () => false;
-    cm.hasSelfHostedConfig = () => false;
-    cm.generatedGraphQLGQLPath = '/fake/tina/__generated__/schema.gql';
-    cm.generatedTypesTSFilePath = '/fake/tina/__generated__/types.ts';
-    cm.generatedTypesJSFilePath = '/fake/tina/__generated__/types.js';
-    cm.generatedTypesDFilePath = '/fake/tina/__generated__/types.d.ts';
-    cm.generatedClientTSFilePath = '/fake/tina/__generated__/client.ts';
-    cm.generatedClientJSFilePath = '/fake/tina/__generated__/client.js';
-    cm.generatedClientDFilePath = '/fake/tina/__generated__/client.d.ts';
-    cm.generatedClientBundleFilePath =
-      '/fake/tina/__generated__/client.bundle.js';
-    cm.generatedCachePath = '/fake/cache';
-    return codegen;
-  }
-
   it('calls stripSearchTokenFromConfig during execute', async () => {
     const codegen = stubCodegen();
     await codegen.execute();
@@ -275,61 +255,6 @@ describe('Codegen.execute integration', () => {
     } finally {
       genTypesSpy.mockRestore();
       (fs.existsSync as jest.Mock).mockReturnValue(false);
-    }
-  });
-
-  it('emits client.bundle.js when build.clientBundle is enabled', async () => {
-    const esbuild = jest.requireMock('esbuild');
-    (esbuild.build as jest.Mock).mockClear();
-
-    const genTypesSpy = jest
-      .spyOn(Codegen.prototype, 'genTypes')
-      .mockResolvedValue({
-        codeString: '/*ts source*/',
-        schemaString: '/*gql schema*/',
-      });
-
-    try {
-      const codegen = stubFullCodegen();
-      (codegen.configManager as any).config = {
-        ...(codegen.configManager as any).config,
-        build: { clientBundle: true },
-      };
-
-      await codegen.execute();
-
-      expect(esbuild.build).toHaveBeenCalledWith({
-        entryPoints: ['/fake/tina/__generated__/client.js'],
-        bundle: true,
-        format: 'esm',
-        platform: 'browser',
-        external: ['node:*'],
-        outfile: '/fake/tina/__generated__/client.bundle.js',
-      });
-    } finally {
-      genTypesSpy.mockRestore();
-    }
-  });
-
-  it('does not bundle the client unless build.clientBundle is enabled', async () => {
-    const esbuild = jest.requireMock('esbuild');
-    (esbuild.build as jest.Mock).mockClear();
-
-    const genTypesSpy = jest
-      .spyOn(Codegen.prototype, 'genTypes')
-      .mockResolvedValue({
-        codeString: '/*ts source*/',
-        schemaString: '/*gql schema*/',
-      });
-
-    try {
-      const codegen = stubFullCodegen();
-
-      await codegen.execute();
-
-      expect(esbuild.build).not.toHaveBeenCalled();
-    } finally {
-      genTypesSpy.mockRestore();
     }
   });
 

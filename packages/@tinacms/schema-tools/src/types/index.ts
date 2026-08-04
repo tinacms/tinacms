@@ -810,20 +810,6 @@ export interface Config<
      * }
      */
     externalDependencies?: string[];
-    /**
-     * Emit a browser-ready bundle of the generated client (`client.bundle.js`)
-     * into the `tina/__generated__` folder.
-     *
-     * Frameworks with a bundler (Next, Astro, React) already bundle the client
-     * themselves. Set this for bundler-free, vanilla-JS sites that load the
-     * generated client directly in the browser.
-     *
-     * @example
-     * build: {
-     *   clientBundle: true,
-     * }
-     */
-    clientBundle?: boolean;
   };
   /**
    * Configuration for the local development server (`tinacms dev`).

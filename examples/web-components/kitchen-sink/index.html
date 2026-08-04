@@ -6,6 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" type="text/css" href="/style.css">
     <script src="post-preview.js"></script>
+    <!--
+        The generated client imports `tinacms/dist/client`, a bare specifier
+        the browser can't resolve. Map it to the installed package's entry file.
+    -->
+    <script type="importmap">
+        {
+            "imports": {
+                "tinacms/dist/client": "./node_modules/tinacms/dist/client.js"
+            }
+        }
+    </script>
 </head>
 
 <body>
@@ -18,10 +29,10 @@
     </div>
 
     <script type="module">
-        // Pull in the browser-ready client bundle.
+        // Pull in the generated client. `tinacms/dist/client` is resolved
+        // via the import map in <head>.
         // Emitted by `tinacms dev` / `tinacms build` into `tina/__generated__`
-        // (see `build.clientBundle` in `tina/config.js`)
-        import {client} from "./tina/__generated__/client.bundle.js";
+        import {client} from "./tina/__generated__/client.js";
 
         // Register the `tina-markdown` component.
         import "./node_modules/@tinacms/web-components/dist/tina-markdown.js";
