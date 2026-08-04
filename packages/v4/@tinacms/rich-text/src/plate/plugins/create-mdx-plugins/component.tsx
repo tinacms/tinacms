@@ -91,9 +91,9 @@ export const InlineEmbed = ({
           style={{ margin: '0 0.5px' }}
           className='relative inline-flex shadow-sm rounded leading-none'
         >
-          {selected && (
+          {selected ? (
             <span className='absolute inset-0 ring-2 ring-blue-100 ring-inset rounded z-10 pointer-events-none' />
-          )}
+          ) : null}
           <span
             style={{ fontWeight: 'inherit', maxWidth: '275px' }}
             className='truncate cursor-pointer relative inline-flex items-center justify-start px-2 py-0.5 rounded-l border border-gray-200 bg-white  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
@@ -103,7 +103,7 @@ export const InlineEmbed = ({
           </span>
           <DotMenu onOpen={handleSelect} onRemove={handleRemove} />
         </span>
-        {isExpanded && <EmbedNestedForm {...formProps} />}
+        {isExpanded ? <EmbedNestedForm {...formProps} /> : null}
       </Wrapper>
     </span>
   );
@@ -149,9 +149,9 @@ export const BlockEmbed = ({
       {children}
       <Wrapper inline={false}>
         <span className='relative w-full inline-flex shadow-sm rounded'>
-          {selected && (
+          {selected ? (
             <span className='absolute inset-0 ring-2 ring-blue-100 ring-inset rounded z-10 pointer-events-none' />
-          )}
+          ) : null}
           <span
             onMouseDown={handleSelect}
             className='truncate cursor-pointer w-full relative inline-flex items-center justify-start px-4 py-2 rounded-l border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
@@ -160,7 +160,7 @@ export const BlockEmbed = ({
           </span>
           <DotMenu onOpen={handleSelect} onRemove={handleRemove} />
         </span>
-        {isExpanded && <EmbedNestedForm {...formProps} />}
+        {isExpanded ? <EmbedNestedForm {...formProps} /> : null}
       </Wrapper>
     </div>
   );
