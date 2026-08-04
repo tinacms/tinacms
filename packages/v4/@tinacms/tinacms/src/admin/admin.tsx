@@ -38,6 +38,7 @@ import { useAdminScreens, useTinaSchema } from './hooks';
 import { type AdminRoute, COLLECTIONS_ROUTE } from './routing';
 import { useAdminRoute } from './use-admin-route';
 import { useFormColumnWidth } from './use-form-column-width';
+import { useUnsavedChangesGuard } from './use-unsaved-changes-guard';
 
 const SHELL_WIDTH = { '--sidebar-width': '18rem' } as CSSProperties;
 
@@ -276,6 +277,7 @@ export function TinaAdmin({ config, preview, queryClient }: TinaAdminProps) {
 }
 
 function AdminShell({ preview }: { preview?: ReactNode }) {
+  useUnsavedChangesGuard();
   const schema = useTinaSchema();
   const screens = useAdminScreens();
   const { route, navigate } = useAdminRoute();
