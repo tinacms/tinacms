@@ -7,7 +7,7 @@ import { digestDocument } from '../core/form/ingest';
 import { invariant } from '../core/invariant';
 import type { TinaStoreState } from '../core/plugin';
 import type { FieldSchema, TinaDocument } from '../core/schema/types';
-import { type FormId, toFormValues, useFormStore } from '../form/form-store';
+import { type FormId, useFormStore } from '../form/form-store';
 import {
   FieldAddressContext,
   FieldSchemaContext,
@@ -72,8 +72,9 @@ export function useActiveField(): ActiveField {
 
 // Reconstruct the document from the form's values and hand it to the host's save
 // handler (the ADR-018/019 seam); only a resolved save freezes the clean baseline —
-// a rejected save leaves the form dirty. The baseline is the pre-save snapshot, not
-// the store's latest values, so edits typed while the save is in flight stay dirty.
+// a rejected save leaves the form dirty. The store's own values serve as the
+// new baseline so the form becomes clean after a successful save, preventing
+// the false-dirty state when RHF's value set differs from the store's.
 export function useFormSave(): () => Promise<void> {
   const registry = useFieldRegistry();
   const scope = useFormScope('form-save-outside-provider', 'useFormSave');
@@ -83,7 +84,7 @@ export function useFormSave(): () => Promise<void> {
     const values = getValues();
     const digested = digestDocument(values, collection.fields, registry);
     await onSave?.(digested);
-    useFormStore.getState().markSaved(formId, toFormValues(values));
+    useFormStore.getState().markSaved(formId);
   }, [registry, scope, getValues]);
 }
 
