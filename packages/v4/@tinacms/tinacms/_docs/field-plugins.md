@@ -153,7 +153,7 @@ export function StringField() {
 
   return (
     <div>
-      <input ref={inputRef} aria-label={address} value={value ?? ''}
+      <input ref={inputRef} id={address} value={value ?? ''}
         onChange={(e) => setValue(e.target.value)} />
       {errors.map((e) => <span key={e} role='alert'>{e}</span>)}
     </div>

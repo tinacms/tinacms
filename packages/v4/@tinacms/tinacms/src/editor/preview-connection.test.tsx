@@ -8,6 +8,7 @@ import {
 import userEvent from '@testing-library/user-event';
 import { type ReactNode, type RefObject, useRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
+import { DocumentForm } from '../admin/document-form';
 import { asResolvedConfig } from '../config';
 import { toFieldAddress } from '../core/field/address';
 import type { CollectionSchema } from '../core/schema/types';
@@ -20,7 +21,7 @@ import {
   valuesMessage,
 } from '../preview/protocol';
 import { FormScopeContext } from './context';
-import { Field, FormProvider, TinaProvider } from './index';
+import { FormProvider, TinaProvider } from './index';
 import { usePreviewConnection } from './preview-connection';
 
 const NO_COLLECTIONS = { collections: [] };
@@ -80,7 +81,7 @@ const renderConnected = (iframeRef: RefObject<HTMLIFrameElement | null>) =>
         path={path}
         document={{ title: 'Hello' }}
       >
-        <Field address='title' />
+        <DocumentForm />
         <Connection iframeRef={iframeRef} />
       </FormProvider>
     </TinaProvider>
@@ -90,7 +91,7 @@ describe('usePreviewConnection', () => {
   it('answers the ready handshake with the registered document', async () => {
     const iframe = fakeIframe();
     renderConnected(iframe.ref);
-    await screen.findByLabelText('title');
+    await screen.findByLabelText('Title');
     iframe.postMessage.mockClear();
 
     messageFromPreview(readyMessage(), iframe.ref.current?.contentWindow);
@@ -103,7 +104,7 @@ describe('usePreviewConnection', () => {
   it('reposts on every edit — the store chokepoint carries changes to the wire', async () => {
     const iframe = fakeIframe();
     renderConnected(iframe.ref);
-    const input = await screen.findByLabelText('title');
+    const input = await screen.findByLabelText('Title');
     iframe.postMessage.mockClear();
 
     await userEvent.type(input, '!');
@@ -116,7 +117,7 @@ describe('usePreviewConnection', () => {
   it('does not repost on markSaved — the values reference is preserved', async () => {
     const iframe = fakeIframe();
     renderConnected(iframe.ref);
-    const input = await screen.findByLabelText('title');
+    const input = await screen.findByLabelText('Title');
     await userEvent.type(input, '!');
     iframe.postMessage.mockClear();
 
@@ -129,7 +130,7 @@ describe('usePreviewConnection', () => {
   it('sets a preview activate message active and focuses the field', async () => {
     const iframe = fakeIframe();
     renderConnected(iframe.ref);
-    const input = await screen.findByLabelText('title');
+    const input = await screen.findByLabelText('Title');
     expect(input).not.toHaveFocus();
 
     messageFromPreview(
@@ -146,7 +147,7 @@ describe('usePreviewConnection', () => {
   it('ignores the wrong origin, the wrong source, and malformed data', async () => {
     const iframe = fakeIframe();
     renderConnected(iframe.ref);
-    await screen.findByLabelText('title');
+    await screen.findByLabelText('Title');
     iframe.postMessage.mockClear();
 
     messageFromPreview(
@@ -226,13 +227,13 @@ describe('usePreviewConnection', () => {
           path={documentPath}
           document={{ title: 'Hello' }}
         >
-          <Field address='title' />
+          <DocumentForm />
           <Connection iframeRef={iframe.ref} />
         </FormProvider>
       </TinaProvider>
     );
     const { rerender } = render(tree(path));
-    await screen.findByLabelText('title');
+    await screen.findByLabelText('Title');
     iframe.postMessage.mockClear();
 
     rerender(tree(otherPath));
@@ -271,7 +272,7 @@ describe('usePreviewConnection', () => {
   it('goes silent after unmount', async () => {
     const iframe = fakeIframe();
     const { unmount } = renderConnected(iframe.ref);
-    await screen.findByLabelText('title');
+    await screen.findByLabelText('Title');
     unmount();
     iframe.postMessage.mockClear();
 

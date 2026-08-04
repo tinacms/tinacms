@@ -117,7 +117,7 @@ export function BooleanField() {
 
   return (
     <div>
-      <input ref={inputRef} type='checkbox' aria-label={address}
+      <input ref={inputRef} type='checkbox' id={address}
         checked={value ?? false}
         onChange={(e) => setValue(e.target.checked)} />
       {errors.map((e) => <span key={e} role='alert'>{e}</span>)}

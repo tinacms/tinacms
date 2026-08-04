@@ -150,3 +150,26 @@ Comment policy (a prior cleanup pass established this):
   // ✅ Good
   {items.length > 0 ? <List items={items} /> : null}
   ```
+
+## Accessibility
+
+- **The row of a field gives the field its name.** `admin/document-form.tsx`
+  renders the label and points it at the control with `htmlFor`. A field widget
+  renders `id={address}`, and no label of its own.
+
+- **Never put `aria-label` on a field widget.** `aria-label` outranks a
+  `<label>` element. It replaces the label that an author wrote with the name of
+  the field, so a field labelled "SEO description" announces as `seoDesc`.
+
+- **A widget that `htmlFor` cannot reach takes `aria-labelledby`.** A descriptor
+  with `metadata.labelable: false` has no input for the label to point at. The
+  row gives its label an id, and the widget reads that id. The rich-text field
+  is the example.
+
+- **Assert the accessible name, not the label text.** Use
+  `getByRole(role, { name })`. Use `toHaveAccessibleName` for a control that
+  maps to no role, such as `datetime-local`. A `getByLabelText` query passes on
+  an `aria-label` that a screen reader announces wrongly, so it cannot see this
+  class of defect.
+
+- **An error message carries `role='alert'`.**

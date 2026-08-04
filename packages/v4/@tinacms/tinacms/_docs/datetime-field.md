@@ -133,7 +133,6 @@ export function DatetimeField() {
         ref={inputRef}
         type='datetime-local'
         id={address}
-        aria-label={address}
         value={toInputValue(value)}
         onChange={(event) => setValue(fromInputValue(event.target.value, value))}
       />

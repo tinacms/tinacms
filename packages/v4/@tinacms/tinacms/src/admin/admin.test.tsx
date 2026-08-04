@@ -179,7 +179,7 @@ describe('TinaAdmin', () => {
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
 
-    const input = await screen.findByLabelText('title');
+    const input = await screen.findByLabelText('Title');
     expect(input).toHaveValue('Hello');
 
     await user.type(input, '!');
@@ -199,7 +199,7 @@ describe('TinaAdmin', () => {
   it('opens the document a deep link names', async () => {
     window.location.hash = '#/collections/post/content%2Fposts%2Fsecond.mdx';
     renderAdmin();
-    expect(await screen.findByLabelText('title')).toHaveValue('Second');
+    expect(await screen.findByLabelText('Title')).toHaveValue('Second');
   });
 
   it('navigating writes a shareable hash', async () => {
@@ -235,12 +235,12 @@ describe('TinaAdmin', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
-    await user.type(await screen.findByLabelText('title'), '!');
+    await user.type(await screen.findByLabelText('Title'), '!');
 
     await user.click(
       await screen.findByRole('button', { name: /second\.mdx/ })
     );
-    expect(await screen.findByLabelText('title')).toHaveValue('Second');
+    expect(await screen.findByLabelText('Title')).toHaveValue('Second');
 
     const helloEntry = await screen.findByRole('button', {
       name: /hello\.mdx/,
@@ -256,10 +256,10 @@ describe('TinaAdmin unsaved changes', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
-    await screen.findByLabelText('title');
+    await screen.findByLabelText('Title');
     expect(reloadIsBlocked()).toBe(false);
 
-    await user.type(screen.getByLabelText('title'), '!');
+    await user.type(screen.getByLabelText('Title'), '!');
     expect(reloadIsBlocked()).toBe(true);
 
     await user.click(screen.getByRole('button', { name: 'Save' }));
@@ -273,13 +273,13 @@ describe('TinaAdmin unsaved changes', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
-    await user.type(await screen.findByLabelText('title'), '!');
+    await user.type(await screen.findByLabelText('Title'), '!');
 
     await user.click(
       await screen.findByRole('button', { name: /second\.mdx/ })
     );
     await waitFor(() =>
-      expect(screen.getByLabelText('title')).toHaveValue('Second')
+      expect(screen.getByLabelText('Title')).toHaveValue('Second')
     );
     expect(reloadIsBlocked()).toBe(true);
   });
@@ -290,7 +290,7 @@ describe('TinaAdmin unsaved changes', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
-    await user.type(await screen.findByLabelText('title'), '!');
+    await user.type(await screen.findByLabelText('Title'), '!');
     expect(reloadIsBlocked()).toBe(true);
 
     unmount();
@@ -303,13 +303,13 @@ describe('TinaAdmin unsaved changes', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
-    await user.type(await screen.findByLabelText('title'), '!');
+    await user.type(await screen.findByLabelText('Title'), '!');
     expect(screen.getByRole('status')).toHaveTextContent('Unsaved');
 
     await user.click(screen.getByRole('button', { name: 'Discard' }));
 
     await waitFor(() =>
-      expect(screen.getByLabelText('title')).toHaveValue('Hello')
+      expect(screen.getByLabelText('Title')).toHaveValue('Hello')
     );
     expect(screen.getByRole('status')).toHaveTextContent('No changes');
     expect(reloadIsBlocked()).toBe(false);
@@ -338,7 +338,7 @@ describe('TinaAdmin content reads', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
-    await screen.findByLabelText('title');
+    await screen.findByLabelText('Title');
 
     expect(getCalls).toEqual(['content/posts/hello.mdx']);
   });
@@ -387,7 +387,7 @@ describe('TinaAdmin content reads', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
-    await user.type(await screen.findByLabelText('title'), '!');
+    await user.type(await screen.findByLabelText('Title'), '!');
     await user.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => expect(saved).toHaveLength(1));
@@ -468,7 +468,7 @@ describe('TinaAdmin screens', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
-    await user.type(await screen.findByLabelText('title'), '!');
+    await user.type(await screen.findByLabelText('Title'), '!');
 
     await user.click(await screen.findByRole('button', { name: 'Media' }));
     await screen.findByText(/media library at/);
@@ -476,7 +476,8 @@ describe('TinaAdmin screens', () => {
     await user.click(await screen.findByRole('button', { name: 'Posts' }));
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
 
-    expect(await screen.findByLabelText('title')).toHaveValue('Hello!');
+    // The label of a dirty field also carries its unsaved marker.
+    expect(await screen.findByLabelText(/^Title/)).toHaveValue('Hello!');
   });
 });
 
@@ -489,7 +490,7 @@ describe('TinaAdmin form continuity', () => {
     const before = await screen.findByRole('list', { name: 'Posts documents' });
 
     await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
-    await screen.findByLabelText('title');
+    await screen.findByLabelText('Title');
 
     expect(screen.getByRole('list', { name: 'Posts documents' })).toBe(before);
   });
