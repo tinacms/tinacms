@@ -1,0 +1,39 @@
+{
+  "name": "@tinacms/web-components",
+  "version": "0.1.0",
+  "type": "module",
+  "files": [
+    "package.json",
+    "src",
+    "dist"
+  ],
+  "exports": {
+    ".": "./dist/index.browser.js"
+  },
+  "license": "Apache-2.0",
+  "buildConfig": {
+    "entryPoints": [
+        "./src/tina-markdown.js",
+        "./src/visual-editing.js"
+    ]
+  },
+  "scripts": {
+    "types": "tsc",
+    "build": "tinacms-scripts build",
+    "test": "vitest run",
+    "test-watch": "vitest"
+  },
+  "dependencies": {
+    "@tinacms/bridge": "workspace:^"
+  },
+  "devDependencies": {
+    "@tinacms/scripts": "workspace:*"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/@tinacms/web-components"
+  }
+}

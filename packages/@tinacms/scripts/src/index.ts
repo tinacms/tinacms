@@ -355,6 +355,18 @@ export class BuildTina {
       return;
     }
 
+    if (['@tinacms/web-components'].includes(packageJSON.name)) {
+      await esbuild({
+        entryPoints: [path.join(process.cwd(), entry)],
+        bundle: true,
+        platform: 'browser',
+        target: 'esnext',
+        format: 'esm',
+        outfile: path.join(process.cwd(), 'dist', `${outInfo.outfile}.js`),
+      });
+      return true;
+    }
+
     // Rollup requires globals for UMD externals — using 'NOOP' as a dummy to silence warnings.
     // This has no effect unless UMD is run in a browser.
     external.forEach((ext) => (globals[ext] = 'NOOP'));

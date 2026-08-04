@@ -1182,15 +1182,18 @@ importers:
         specifier: ^6.0.0
         version: 6.4.1(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.2)
 
-  examples/web-components/markdown-rendering:
+  examples/web-components/kitchen-sink:
     dependencies:
-      tinacms:
-        specifier: workspace:*
-        version: link:../../../packages/tinacms
+      '@tinacms/web-components':
+        specifier: workspace:^
+        version: link:../../../packages/@tinacms/web-components
     devDependencies:
       '@tinacms/cli':
         specifier: workspace:*
         version: link:../../../packages/@tinacms/cli
+      tinacms:
+        specifier: workspace:*
+        version: link:../../../packages/tinacms
 
   packages/@tinacms/app:
     dependencies:
@@ -1381,7 +1384,7 @@ importers:
         version: link:../search
       '@vitejs/plugin-react':
         specifier: 'catalog:'
-        version: 4.7.0(vite@6.4.3(@types/node@22.19.3)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.2))
+        version: 4.7.0(vite@6.4.3(@types/node@22.19.3)(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.2))
       altair-express-middleware:
         specifier: 'catalog:'
         version: 7.3.6
@@ -1477,7 +1480,7 @@ importers:
         version: 5.9.3
       vite:
         specifier: ^6.4.3
-        version: 6.4.3(@types/node@22.19.3)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.2)
+        version: 6.4.3(@types/node@22.19.3)(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.2)
       yup:
         specifier: ^1.6.1
         version: 1.7.1
@@ -2002,6 +2005,16 @@ importers:
       typescript:
         specifier: ^5.7.3
         version: 5.9.3
+
+  packages/@tinacms/web-components:
+    dependencies:
+      '@tinacms/bridge':
+        specifier: workspace:^
+        version: link:../bridge
+    devDependencies:
+      '@tinacms/scripts':
+        specifier: workspace:*
+        version: link:../scripts
 
   packages/@tinacms/webpack-helpers:
     dependencies:
@@ -23926,7 +23939,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vitejs/plugin-react@4.7.0(vite@6.4.3(@types/node@22.19.3)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.2))':
+  '@vitejs/plugin-react@4.7.0(vite@6.4.3(@types/node@22.19.3)(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.2))':
     dependencies:
       '@babel/core': 7.28.5
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.28.5)
@@ -23934,7 +23947,7 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.27
       '@types/babel__core': 7.20.5
       react-refresh: 0.17.0
-      vite: 6.4.3(@types/node@22.19.3)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.2)
+      vite: 6.4.3(@types/node@22.19.3)(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -33703,7 +33716,7 @@ snapshots:
       terser: 5.46.0
       yaml: 2.8.2
 
-  vite@6.4.3(@types/node@22.19.3)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.2):
+  vite@6.4.3(@types/node@22.19.3)(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.2):
     dependencies:
       esbuild: 0.25.12
       fdir: 6.5.0(picomatch@4.0.4)
@@ -33714,7 +33727,7 @@ snapshots:
     optionalDependencies:
       '@types/node': 22.19.3
       fsevents: 2.3.3
-      jiti: 2.6.1
+      jiti: 1.21.7
       lightningcss: 1.32.0
       sass: 1.97.3
       terser: 5.46.0
