@@ -37,7 +37,6 @@ The client segment (`number-field.client.tsx`) takes the `number` key:
 ```tsx
 defineClientPlugin({
   field: {
-    type: 'number',            // NUMBER_FIELD_TYPE
     Component: NumberField,
     // no defaultValue — an absent field stays absent
     metadata: { layout: 'inline' },
@@ -47,6 +46,11 @@ defineClientPlugin({
   },
 });
 ```
+
+The descriptor does not carry `type`. `number-field.plugin.ts` claims the
+`number` key with `field: { type: NUMBER_FIELD_TYPE, contractVersion: 1 }`
+on the manifest (see
+[`field-plugins.md`](./field-plugins.md#2-the-client-segment-and-the-descriptor-clienttsx)).
 
 ## The editor value and the stored value
 
