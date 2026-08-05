@@ -207,7 +207,7 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
         const newToken = {
           access_token: val.access_token,
           id_token: val.id_token,
-          refresh_token: refresh_token,
+          refresh_token: val.refresh_token ?? refresh_token,
         };
         this.setToken(newToken);
         return newToken;
