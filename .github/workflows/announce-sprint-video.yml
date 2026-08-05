@@ -140,6 +140,7 @@ jobs:
               out.write(f'announce={"true" if announce else "false"}\n')
               out.write(f'first_run={"true" if last is None else "false"}\n')
               out.write(f'number={number}\n')
+              out.write(f'previous={last if last is not None else ""}\n')
               out.write(f'video_id={video_id}\n')
               out.write(f'title={title}\n')
           EOF
@@ -147,6 +148,7 @@ jobs:
       # Recorded BEFORE posting, so a failure here means a missed announcement rather
       # than the same video being re-announced every day.
       - name: Record the sprint as announced
+        id: record
         if: steps.resolve.outputs.announce == 'true'
         run: |
           echo "${{ steps.resolve.outputs.number }}" > "$STATE_FILE"
@@ -179,9 +181,25 @@ jobs:
               urllib.request.Request(
                   os.environ['WEBHOOK_URL'],
                   data=json.dumps(payload).encode(),
-                  headers={'Content-Type': 'application/json'},
+                  headers={
+                      'Content-Type': 'application/json',
+                      # Discord sits behind Cloudflare, which 403s urllib's default
+                      # User-Agent with error code 1010. Any explicit UA passes.
+                      'User-Agent': 'TinaCMS-SprintAnnouncer (+https://github.com/tinacms/tinacms, 1.0)',
+                  },
               ),
               timeout=30,
           )
           print(f'announced Sprint {os.environ["NUMBER"]}')
           EOF
+
+      # Without this a failed post would leave the sprint marked as announced and it
+      # would never be retried - state is written first to prevent duplicates.
+      - name: Roll back state if the announcement failed
+        if: failure() && steps.record.outcome == 'success' && steps.resolve.outputs.previous != ''
+        run: |
+          echo "${{ steps.resolve.outputs.previous }}" > "$STATE_FILE"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -am "chore: roll back to sprint ${{ steps.resolve.outputs.previous }} (announcement failed) [skip ci]"
+          git push origin HEAD:"$STATE_BRANCH"
