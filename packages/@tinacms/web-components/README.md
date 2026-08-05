@@ -12,8 +12,8 @@ plain JS sites.
 ## Install
 
 ```bash
-pnpm add @tinacms/web-components tinacms
-pnpm add -D @tinacms/cli
+pnpm add @tinacms/web-components
+pnpm add -D @tinacms/cli tinacms
 ```
 
 
