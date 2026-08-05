@@ -1708,9 +1708,15 @@ importers:
       ccount:
         specifier: 'catalog:'
         version: 2.0.1
+      emoji-regex:
+        specifier: 9.2.2
+        version: 9.2.2
       estree-util-is-identifier-name:
         specifier: 'catalog:'
         version: 2.1.0
+      esutils:
+        specifier: ^2.0.3
+        version: 2.0.3
       mdast-util-compact:
         specifier: 'catalog:'
         version: 4.1.1
@@ -1753,9 +1759,6 @@ importers:
       parse-entities:
         specifier: 'catalog:'
         version: 4.0.1
-      prettier:
-        specifier: 'catalog:'
-        version: 2.8.8
       remark:
         specifier: 'catalog:'
         version: 14.0.2
@@ -1793,6 +1796,9 @@ importers:
       '@types/estree':
         specifier: 1.0.0
         version: 1.0.0
+      '@types/esutils':
+        specifier: ^2.0.2
+        version: 2.0.2
       '@types/mdast':
         specifier: 'catalog:'
         version: 3.0.15
@@ -1814,6 +1820,9 @@ importers:
       jest-file-snapshot:
         specifier: ^0.5.0
         version: 0.5.0
+      prettier:
+        specifier: 'catalog:'
+        version: 2.8.8
       ts-node:
         specifier: 'catalog:'
         version: 10.9.2(@types/node@22.19.3)(typescript@5.9.3)
@@ -8176,6 +8185,9 @@ packages:
 
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
+
+  '@types/esutils@2.0.2':
+    resolution: {integrity: sha512-HPQcBvKaxSKbCt+KKOfPhEFsrXoXDuTuMSEnpB/DVcHXzO6Yt2SAj2OnxqQT/LYO8sCPpk22AJQ2k+nTMMSvNw==}
 
   '@types/express-serve-static-core@4.19.7':
     resolution: {integrity: sha512-FvPtiIf1LfhzsaIXhv/PHan/2FeQBbtBDtfX2QfvPxdUelMDEckK08SM6nqo1MIZY3RUlfA+HV8+hFUSio78qg==}
@@ -23154,6 +23166,8 @@ snapshots:
   '@types/estree@1.0.0': {}
 
   '@types/estree@1.0.8': {}
+
+  '@types/esutils@2.0.2': {}
 
   '@types/express-serve-static-core@4.19.7':
     dependencies:
