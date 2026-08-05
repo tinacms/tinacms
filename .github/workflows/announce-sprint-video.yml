@@ -1,0 +1,187 @@
+name: Announce new sprint video on Discord
+
+on:
+  schedule:
+    - cron: '0 22 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: announce-sprint-video
+  cancel-in-progress: false
+
+env:
+  STATE_BRANCH: ci-sprint-announcer-state
+  STATE_FILE: last-announced-sprint.txt
+
+jobs:
+  announce:
+    if: github.repository == 'tinacms/tinacms'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      # State lives on its own branch because main is protected and GITHUB_TOKEN
+      # cannot write repo variables (403) - see PR for the verification.
+      - name: Check out the state branch
+        uses: actions/checkout@v4
+        with:
+          ref: ci-sprint-announcer-state
+
+      - name: Resolve the newest sprint recording
+        id: resolve
+        env:
+          WEBHOOK_URL: ${{ secrets.DISCORD_VIDEOS_WEBHOOK }}
+        run: |
+          python3 - <<'EOF'
+          import json
+          import os
+          import re
+          import sys
+          import urllib.request
+
+          PLAYLIST = 'PLPar4H9PHKVqKlX1mqe07JZyl1L0zjqpZ'
+          URL = f'https://www.youtube.com/playlist?list={PLAYLIST}'
+          HEADERS = {
+              'User-Agent': ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
+                             'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36'),
+              'Accept-Language': 'en-US,en',
+          }
+
+          raw = urllib.request.urlopen(
+              urllib.request.Request(URL, headers=HEADERS), timeout=60
+          ).read().decode('utf-8', 'ignore')
+
+          def extract_json(text, marker):
+              i = text.find(marker)
+              if i < 0:
+                  return None
+              i = text.index('{', i)
+              depth, j, instr, esc = 0, i, False, False
+              while j < len(text):
+                  c = text[j]
+                  if instr:
+                      if esc:
+                          esc = False
+                      elif c == '\\':
+                          esc = True
+                      elif c == '"':
+                          instr = False
+                  else:
+                      if c == '"':
+                          instr = True
+                      elif c == '{':
+                          depth += 1
+                      elif c == '}':
+                          depth -= 1
+                          if depth == 0:
+                              return text[i:j + 1]
+                  j += 1
+              return None
+
+          blob = extract_json(raw, 'ytInitialData')
+          if not blob:
+              sys.exit('FAILED: no ytInitialData in the playlist page - YouTube may be '
+                       'serving this runner a consent/bot page instead of the playlist.')
+
+          items = []
+
+          def walk(node):
+              if isinstance(node, dict):
+                  lv = node.get('lockupViewModel')
+                  if lv:
+                      vid = lv.get('contentId')
+                      title = (((lv.get('metadata') or {}).get('lockupMetadataViewModel') or {})
+                               .get('title', {}).get('content', ''))
+                      if vid and title:
+                          items.append((vid, title))
+                  for v in node.values():
+                      walk(v)
+              elif isinstance(node, list):
+                  for v in node:
+                      walk(v)
+
+          walk(json.loads(blob))
+
+          # Titles read "Sprint 117 Review + Retro and Sprint 118 Forecast", so anchor on
+          # "Review" to avoid picking up the forecast number.
+          sprints = [(int(m.group(1)), vid, title) for vid, title in items
+                     if (m := re.search(r'Sprint\s+(\d+)\s+Review', title))]
+
+          # Fail loudly rather than sit silent for months if YouTube changes its markup.
+          if not sprints:
+              sys.exit(f'FAILED: parsed {len(items)} playlist entries but none matched '
+                       '"Sprint N Review" - the page structure has probably changed.')
+
+          number, video_id, title = max(sprints, key=lambda s: s[0])
+
+          state_file = os.environ['STATE_FILE']
+          last = None
+          if os.path.exists(state_file):
+              text = open(state_file).read().strip()
+              last = int(text) if text else None
+          print(f'latest in playlist: Sprint {number} ({video_id}); last announced: {last}')
+
+          announce = last is None or number > last
+
+          # A typo'd title (e.g. "Sprint 1180") would otherwise become the permanent
+          # maximum and silently suppress every future announcement.
+          if last is not None and number > last + 50:
+              sys.exit(f'FAILED: Sprint {number} is implausibly far ahead of {last} - '
+                       'likely a typo in a playlist title. Not announcing.')
+
+          # Check the webhook before any state is written, so a missing secret retries
+          # tomorrow instead of recording a sprint that was never announced.
+          if announce and last is not None and not os.environ.get('WEBHOOK_URL', '').strip():
+              sys.exit('FAILED: DISCORD_VIDEOS_WEBHOOK is not set on this repository.')
+
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+              out.write(f'announce={"true" if announce else "false"}\n')
+              out.write(f'first_run={"true" if last is None else "false"}\n')
+              out.write(f'number={number}\n')
+              out.write(f'video_id={video_id}\n')
+              out.write(f'title={title}\n')
+          EOF
+
+      # Recorded BEFORE posting, so a failure here means a missed announcement rather
+      # than the same video being re-announced every day.
+      - name: Record the sprint as announced
+        if: steps.resolve.outputs.announce == 'true'
+        run: |
+          echo "${{ steps.resolve.outputs.number }}" > "$STATE_FILE"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$STATE_FILE"
+          git commit -m "chore: sprint ${{ steps.resolve.outputs.number }} announced [skip ci]"
+          git push origin HEAD:"$STATE_BRANCH"
+
+      - name: Announce on Discord
+        if: steps.resolve.outputs.announce == 'true' && steps.resolve.outputs.first_run == 'false'
+        env:
+          WEBHOOK_URL: ${{ secrets.DISCORD_VIDEOS_WEBHOOK }}
+          NUMBER: ${{ steps.resolve.outputs.number }}
+          VIDEO_ID: ${{ steps.resolve.outputs.video_id }}
+          TITLE: ${{ steps.resolve.outputs.title }}
+        run: |
+          python3 - <<'EOF'
+          import json
+          import os
+          import urllib.request
+
+          payload = {
+              'content': (f'\U0001F3A5 **Sprint {os.environ["NUMBER"]} review is up**\n'
+                          f'{os.environ["TITLE"]}\n'
+                          f'https://www.youtube.com/watch?v={os.environ["VIDEO_ID"]}'),
+              'allowed_mentions': {'parse': []},
+          }
+          urllib.request.urlopen(
+              urllib.request.Request(
+                  os.environ['WEBHOOK_URL'],
+                  data=json.dumps(payload).encode(),
+                  headers={'Content-Type': 'application/json'},
+              ),
+              timeout=30,
+          )
+          print(f'announced Sprint {os.environ["NUMBER"]}')
+          EOF
