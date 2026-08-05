@@ -29,8 +29,7 @@
     </div>
 
     <script type="module">
-        // Pull in the generated client. `tinacms/dist/client` is resolved
-        // via the import map in <head>.
+        // Pull in the generated client.
         // Emitted by `tinacms dev` / `tinacms build` into `tina/__generated__`
         import {client} from "./tina/__generated__/client.js";
 
@@ -38,6 +37,10 @@
         import "./node_modules/@tinacms/web-components/dist/tina-markdown.js";
 
         // Imports required for visual editing.
+        //   - `createTina` fetches a provided connection and renders the content
+        //     when changes are detected.
+        //   - `tinaField` generates unique IDs used by Tina internally for
+        //     click-to-edit functionality.
         import {createTina, tinaField} from "./node_modules/@tinacms/web-components/dist/visual-editing.js";
 
         const postsContainer = document.getElementById("posts");
@@ -126,7 +129,7 @@
                 // Append the `li` to the `ul`.
                 postsContainer.appendChild(li);
             }
-        }
+        };
 
         // Fetch the posts and enable visual editing.
         //
