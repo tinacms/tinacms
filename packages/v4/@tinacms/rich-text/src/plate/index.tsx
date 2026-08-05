@@ -18,10 +18,14 @@ export interface RichEditorProps {
     onChange: (value: RichTextValue) => void;
   };
   field: RichEditorField;
-  ariaLabel?: string;
+  ariaLabelledBy?: string;
 }
 
-export const RichEditor = ({ input, field, ariaLabel }: RichEditorProps) => {
+export const RichEditor = ({
+  input,
+  field,
+  ariaLabelledBy,
+}: RichEditorProps) => {
   const [initialValue] = React.useState(() => {
     if (input.value?.children?.length) {
       return helpers.withRootNodeIds(
@@ -72,7 +76,7 @@ export const RichEditor = ({ input, field, ariaLabel }: RichEditorProps) => {
               <FixedToolbar>
                 <FixedToolbarButtons />
               </FixedToolbar>
-              <Editor aria-label={ariaLabel} />
+              <Editor aria-labelledby={ariaLabelledBy} />
             </ToolbarProvider>
           </TooltipProvider>
         </EditorContainer>

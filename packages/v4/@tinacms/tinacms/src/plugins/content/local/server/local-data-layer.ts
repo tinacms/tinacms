@@ -1,8 +1,9 @@
+import type { Dirent } from 'node:fs';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import type {
   ContentProvider,
-  DocumentEntry,
+  DocumentSummary,
 } from '../../../../core/content/contract';
 import { invariant } from '../../../../core/invariant';
 import type { CollectionSchema } from '../../../../core/schema/types';
@@ -88,13 +89,40 @@ const isUnparsable = (
   }
 };
 
-const realPathOf = async (candidate: string): Promise<string> => {
+const MAX_LINK_DEPTH = 40;
+
+const linkTargetOf = async (candidate: string): Promise<string | undefined> => {
+  try {
+    const stats = await fs.lstat(candidate);
+    if (!stats.isSymbolicLink()) return undefined;
+    return await fs.readlink(candidate);
+  } catch {
+    return undefined;
+  }
+};
+
+// `realpath` fails for a link that has no target, and the fallback below then
+// resolves a path to itself. A link must resolve to its target, or the caller
+// cannot see where a write lands.
+const realPathOf = async (candidate: string, depth = 0): Promise<string> => {
   try {
     return await fs.realpath(candidate);
   } catch {
+    const target = await linkTargetOf(candidate);
+    if (target !== undefined) {
+      invariant(
+        depth < MAX_LINK_DEPTH,
+        'content-path-link-depth',
+        'A document path follows too many links.'
+      );
+      return realPathOf(
+        path.resolve(path.dirname(candidate), target),
+        depth + 1
+      );
+    }
     const parent = path.dirname(candidate);
     if (parent === candidate) return candidate;
-    return path.join(await realPathOf(parent), path.basename(candidate));
+    return path.join(await realPathOf(parent, depth), path.basename(candidate));
   }
 };
 
@@ -201,10 +229,11 @@ export const createLocalDataLayer = (
 
     async list(collectionName) {
       const collection = collectionFor(collectionName);
-      let names: string[];
+      let dirents: Dirent[];
       try {
-        names = await fs.readdir(collection.absoluteFolder, {
+        dirents = await fs.readdir(collection.absoluteFolder, {
           recursive: true,
+          withFileTypes: true,
         });
       } catch (cause) {
         if (isMissingFileError(cause)) return [];
@@ -213,23 +242,25 @@ export const createLocalDataLayer = (
           { cause }
         );
       }
-      const entries: DocumentEntry[] = [];
-      for (const name of names.sort()) {
-        const adapter = adapterForPath(collection.adapters, name);
-        if (!adapter) continue;
-        const absolute = path.join(collection.absoluteFolder, name);
+      const files = dirents
+        .filter((dirent) => !dirent.isDirectory())
+        .map((dirent) => path.join(dirent.parentPath, dirent.name))
+        .sort();
+      const summaries: DocumentSummary[] = [];
+      for (const absolute of files) {
+        if (!adapterForPath(collection.adapters, absolute)) continue;
         try {
           await resolveDocumentPath(collection, absolute);
-          const raw = await fs.readFile(absolute, 'utf8');
-          entries.push({
-            path: documentIdFor(absolute),
-            document: adapter.parse(raw, collection.bodyField),
-          });
         } catch (cause) {
-          console.warn(`Skipping unreadable document "${absolute}":`, cause);
+          console.warn(
+            `Skipping document "${absolute}": it does not resolve inside collection "${collection.schema.name}".`,
+            cause
+          );
+          continue;
         }
+        summaries.push({ path: documentIdFor(absolute) });
       }
-      return entries;
+      return summaries;
     },
 
     async update(collectionName, documentPath, value) {

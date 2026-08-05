@@ -24,8 +24,8 @@ throws an error. To prevent the error, one plugin must declare `overrides`.
 
 - `ingestDocument(document, fields, registry)` (`core/form/ingest.ts`) makes the
   `defaultValues` object for react-hook-form. For each field, it calls the
-  `parse(stored)` function of the descriptor. If the document does not contain
-  that key, it uses `defaultValue`.
+  `parse(stored, node, context)` function of the descriptor. If the document
+  does not contain that key, it uses `defaultValue`.
 - `buildFormResolver(collection, registry)` (`editor/resolver.ts`) is the
   resolver for react-hook-form.
 - `useForm({ defaultValues, resolver, mode: 'onChange' })` holds the values. If
@@ -71,9 +71,9 @@ messages to the component.
 
 `digestDocument(values, fields, registry)` (`core/form/ingest.ts`) does the
 opposite operation to `ingestDocument`. For each field, it calls the
-`serialize(value)` function of the descriptor. If the descriptor has no
-`serialize` function, the value does not change. The function removes the
-`undefined` values, but keeps the `null` values.
+`serialize(value, node, context)` function of the descriptor. If the
+descriptor has no `serialize` function, the value does not change. The
+function removes the `undefined` values, but keeps the `null` values.
 
 ## Form status
 

@@ -6,8 +6,9 @@ import { describe, expect, it } from 'vitest';
 import './rich-text-field.client';
 import { asResolvedConfig } from '../../../config';
 import type { CollectionSchema } from '../../../core/schema/types';
-import { Field, FormProvider, TinaProvider } from '../../../editor';
+import { FormProvider, TinaProvider } from '../../../editor';
 import { t } from '../../../index';
+import { LabelledFields } from '../../../test/labelled-fields';
 import richTextFieldPlugin from './rich-text-field.plugin';
 
 const NO_COLLECTIONS = { collections: [] };
@@ -53,7 +54,7 @@ const renderBody = (markdown: string) =>
         path='content/posts/test.mdx'
         document={{ body: markdown }}
       >
-        <Field address='body' />
+        <LabelledFields />
       </FormProvider>
     </TinaProvider>
   );
@@ -61,7 +62,7 @@ const renderBody = (markdown: string) =>
 describe('RichTextField rendering', () => {
   it('mounts the editor and shows the stored prose', async () => {
     renderBody('# Heading\n\nSome prose.\n');
-    const editable = await screen.findByLabelText('body');
+    const editable = await screen.findByLabelText('Body');
     expect(editable).toHaveAttribute('role', 'textbox');
     expect(editable).toHaveTextContent('Heading');
     expect(editable).toHaveTextContent('Some prose.');
@@ -80,11 +81,11 @@ describe('RichTextField rendering', () => {
           path='content/posts/embed.mdx'
           document={{ body: 'Before.\n\n<Callout text="hi" />\n\nAfter.\n' }}
         >
-          <Field address='body' />
+          <LabelledFields />
         </FormProvider>
       </TinaProvider>
     );
-    const editable = await screen.findByLabelText('body');
+    const editable = await screen.findByLabelText('Body');
     expect(editable).toHaveTextContent('Callout');
   });
 });

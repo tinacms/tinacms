@@ -1,10 +1,10 @@
-import { CodeLineElement } from '@tinacms/mdx';
 import { withRef } from '@udecode/cn';
 import { TElement } from '@udecode/plate';
 import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 import { useEditorState } from '@udecode/plate/react';
 import React from 'react';
 import { helpers } from '../../plugins/core/common';
+import type { CodeLineElement } from '../../types';
 import { Icons } from './icons';
 import { ToolbarButton } from './toolbar';
 

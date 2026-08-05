@@ -4,6 +4,7 @@ import { withRef } from '@udecode/cn';
 import { useEditorState } from '@udecode/plate/react';
 
 import { HorizontalRulePlugin } from '@udecode/plate-horizontal-rule/react';
+import { unwrapList } from '@udecode/plate-list';
 import { ParagraphPlugin } from '@udecode/plate/react';
 import { helpers } from '../../plugins/core/common';
 import { Icons } from './icons';
@@ -24,6 +25,7 @@ const useHorizontalRuleToolbarButton = (state) => {
   const editor = useEditorState();
 
   const onClick = () => {
+    unwrapList(editor);
     editor.tf.insertNodes({
       type: ParagraphPlugin.key,
       children: [{ text: '' }],

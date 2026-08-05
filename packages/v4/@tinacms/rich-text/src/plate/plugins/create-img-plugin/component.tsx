@@ -68,14 +68,14 @@ export const ImgEmbed = ({
           </div>
         </button>
       )}
-      {isExpanded && (
+      {isExpanded ? (
         <ImageForm
           onChange={onChange}
           initialValues={element}
           onClose={handleClose}
           element={element}
         />
-      )}
+      ) : null}
     </span>
   );
 };

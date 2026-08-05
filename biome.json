@@ -124,6 +124,17 @@
 			"formatter": { "enabled": false }
 		},
 		{
+			"include": ["packages/v4/@tinacms/tinacms/src/**"],
+			"ignore": ["**/*.test.ts", "**/*.test.tsx"],
+			"linter": {
+				"rules": {
+					"suspicious": {
+						"noExplicitAny": "error"
+					}
+				}
+			}
+		},
+		{
 			"include": [
 				"*.ts",
 				"*.tsx",

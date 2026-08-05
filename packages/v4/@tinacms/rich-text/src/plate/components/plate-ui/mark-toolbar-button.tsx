@@ -156,7 +156,6 @@ const HighlightColorToolbarButton = () => {
         >
           <div className='flex items-center gap-1.5'>
             <Icons.highlight />
-            <span className='sr-only'>Highlight color</span>
           </div>
         </ToolbarButton>
       </DropdownMenuTrigger>

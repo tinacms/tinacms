@@ -75,7 +75,7 @@ export function RichTextField() {
           <RichEditor
             input={{ value: value ?? EMPTY_RICH_TEXT, onChange: setBody }}
             field={field}
-            ariaLabel={address}
+            ariaLabelledBy={`${address}-label`}
           />
         </EditorContext.Provider>
       </div>

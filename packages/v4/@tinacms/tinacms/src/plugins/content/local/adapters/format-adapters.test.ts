@@ -131,6 +131,48 @@ describe('markdown adapter', () => {
   });
 });
 
+describe('markdown adapter — documents with and without frontmatter', () => {
+  const adapter = formatAdapterFor('md');
+
+  const NO_FRONTMATTER_RAW = 'Body prose with no frontmatter block.\n';
+  const FRONTMATTER_RAW =
+    '---\ntitle: Hello\n---\n\nBody prose with frontmatter.\n';
+
+  it('rewrites a frontmatter-less document byte-identically when nothing changed', () => {
+    const document = adapter.parse(NO_FRONTMATTER_RAW, 'body');
+    expect(adapter.serialize(document, NO_FRONTMATTER_RAW, 'body')).toBe(
+      NO_FRONTMATTER_RAW
+    );
+  });
+
+  it('rewrites a document with frontmatter byte-identically when nothing changed', () => {
+    const document = adapter.parse(FRONTMATTER_RAW, 'body');
+    expect(adapter.serialize(document, FRONTMATTER_RAW, 'body')).toBe(
+      FRONTMATTER_RAW
+    );
+  });
+
+  it('writes an edited body in a frontmatter-less document with no leading blank line', () => {
+    const document = adapter.parse(NO_FRONTMATTER_RAW, 'body');
+    const saved = adapter.serialize(
+      { ...document, body: 'Rewritten prose.\n' },
+      NO_FRONTMATTER_RAW,
+      'body'
+    );
+    expect(saved).toBe('Rewritten prose.\n');
+  });
+
+  it('writes an edited body in a document with frontmatter, keeping the blank line', () => {
+    const document = adapter.parse(FRONTMATTER_RAW, 'body');
+    const saved = adapter.serialize(
+      { ...document, body: 'Rewritten prose.\n' },
+      FRONTMATTER_RAW,
+      'body'
+    );
+    expect(saved).toBe('---\ntitle: Hello\n---\n\nRewritten prose.\n');
+  });
+});
+
 describe('json adapter', () => {
   const adapter = formatAdapterFor('json');
 

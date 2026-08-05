@@ -254,7 +254,8 @@ const columnAlignments = (
 
 function resolveMdxTable(fields: RichTextNodeFields): RichTextInstruction {
   const firstRowHeader = Boolean(fields.props?.firstRowHeader);
-  const tableRows: MdxTableRow[] = fields.props?.tableRows ?? [];
+  const rawRows = fields.props?.tableRows;
+  const tableRows: MdxTableRow[] = Array.isArray(rawRows) ? rawRows : [];
   const cellsOf = (row: MdxTableRow | undefined): RichTextTableCell[] =>
     (row?.tableCells ?? []).map((cell) => ({ content: cell.value }));
 
@@ -268,13 +269,15 @@ function resolveMdxTable(fields: RichTextNodeFields): RichTextInstruction {
 }
 
 function resolveGfmTable(fields: RichTextNodeFields): RichTextInstruction {
+  const tableRows = fields.children ?? [];
+  const cellsOf = (row: TinaMarkdownContent | undefined): RichTextTableCell[] =>
+    (row?.children ?? []).map((cell) => ({ content: cell.children }));
+
   return {
     kind: 'table',
     source: 'gfm',
     align: columnAlignments(fields.props?.align),
-    header: null,
-    rows: (fields.children ?? []).map((row) =>
-      (row.children ?? []).map((cell) => ({ content: cell.children }))
-    ),
+    header: tableRows.length > 0 ? cellsOf(tableRows.at(0)) : null,
+    rows: tableRows.slice(1).map(cellsOf),
   };
 }

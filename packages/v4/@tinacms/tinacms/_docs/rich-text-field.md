@@ -57,12 +57,14 @@ entirely — how a body is read from the file and how it is written back — and
 editor knows nothing about markdown. Replace the codec and you replace the
 format; nothing else in the field changes.
 
-The contract is `rich-text-codec.ts`, which has no dependencies at all so that
-implementing a codec does not drag the default one's parser in behind it:
+The contract is `rich-text-codec.ts`. It imports `FieldSchema` from the core
+schema types, and it re-exports three symbols from `@tinacms/rich-text` —
+`EMPTY_RICH_TEXT`, `RichTextNode`, and `RichTextValue` — but it depends on no
+markdown parser. Implementing a codec does not drag the default one's parser
+in behind it:
 
 ```ts
 export interface RichTextCodec {
-  name: string;
   parse(source: string, node: FieldSchema): RichTextValue;
   serialize(value: RichTextValue, node: FieldSchema): string;
 }
@@ -80,7 +82,7 @@ uses only the value, like `number`, ignores it.
 
 ### Choosing a codec
 
-The default is `mdxCodec` (`mdx-codec.ts`), markdown/MDX through `@tinacms/mdx` —
+The default is `mdxCodec` (`mdx.codec.ts`), markdown/MDX through `@tinacms/mdx` —
 the same parser v3 used, so a v3 content folder opens unchanged. A field can
 override it:
 
@@ -167,13 +169,22 @@ argument of `parse`, and it reaches the embed components through
 `EditorContext`, which `rich-text-field.ui.tsx` provides.
 
 Editing the props of an embed needs the object field, which does not exist yet
-(see the next section). The embeds parse, render, and serialize now, so a
-document loses nothing when a user opens it.
+(see the next section). The embeds parse, render, and serialize now, so an
+embed's props survive an open-and-save.
+
+The markdown codec keeps the content of a document through an open-and-save
+with no edits. It keeps the checked state of a GFM task list, and it keeps the
+line endings of the file. It writes a list marker as `*`, so a document that
+uses `-` changes on the first save.
+
+The editor draws a task-list item as an ordinary bullet. The checked state
+stays in the file, but a user cannot see it or change it in the editor.
 
 ## The parts that the port does not include
 
-The editor is the editor of v3, file for file (86 files in `plate/`). Three
-parts are stubs, because v4 does not have the necessary capabilities now:
+The editor is the editor of v3 (84 files in `plate/`). The port drops two
+files that nothing imports. Four parts are stubs, because v4 does not have
+the necessary capabilities now:
 
 | Stub | It waits for | Effect now |
 |---|---|---|

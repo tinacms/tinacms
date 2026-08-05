@@ -11,7 +11,7 @@ export type RichTextNodeFields = TinaMarkdownContent & {
   caption?: string;
   lang?: string;
   name?: string;
-  props?: Record<string, any>;
+  props?: Record<string, unknown>;
   bold?: boolean;
   italic?: boolean;
   underline?: boolean;

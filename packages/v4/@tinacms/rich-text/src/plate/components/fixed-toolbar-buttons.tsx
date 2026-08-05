@@ -225,7 +225,7 @@ export default function FixedToolbarButtons() {
               {item.Component}
             </div>
           ))}
-          {items.length > itemsShown && (
+          {items.length > itemsShown ? (
             <div className='w-fit'>
               <OverflowMenu>
                 {items.slice(itemsShown).flatMap((c) => (
@@ -241,7 +241,7 @@ export default function FixedToolbarButtons() {
                 ))}
               </OverflowMenu>
             </div>
-          )}
+          ) : null}
         </>
       </div>
     </div>
