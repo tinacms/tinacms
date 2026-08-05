@@ -141,6 +141,29 @@ const text = (content: { text: string }) => {
   };
 };
 
+/**
+ * When SoftBreakPlugin inserts Shift+Enter it places a literal `\n` inside
+ * the text node's `.text` string rather than a separate `{ type: 'break' }`
+ * node. Split those text strings here so mdast-util-to-markdown can emit
+ * proper Markdown hard breaks (`\` at end of line).
+ */
+const textWithBreaks = (rawText: string): Md.PhrasingContent[] => {
+  const parts = rawText.split('\n');
+  if (parts.length === 1) {
+    return [{ type: 'text', value: rawText }];
+  }
+  const result: Md.PhrasingContent[] = [];
+  parts.forEach((part, i) => {
+    if (part) {
+      result.push({ type: 'text', value: part });
+    }
+    if (i < parts.length - 1) {
+      result.push({ type: 'break' });
+    }
+  });
+  return result;
+};
+
 const markAttributes = (content: Plate.TextElement) => {
   if (!content.highlightColor) {
     return [];
@@ -161,8 +184,19 @@ const markAttributes = (content: Plate.TextElement) => {
 export const eat = (
   c: InlineElementWithCallback[],
   field: RichTextType,
-  imageCallback: (url: string) => string
+  imageCallback: (url: string) => string,
+  _hasHtmlInline?: boolean
 ): Md.PhrasingContent[] => {
+  // When html_inline nodes are present among the siblings at this paragraph
+  // level, embedded \n in text nodes is raw content (e.g. code inside HTML
+  // tags) and must not be expanded into hard breaks. We compute this once from
+  // the full sibling list and propagate it through slice-recursive calls so
+  // the flag isn't lost as we consume items one by one.
+  const hasHtmlInline =
+    _hasHtmlInline ?? c.some((item) => item.type === 'html_inline');
+  const inlineText = (rawText: string): Md.PhrasingContent[] =>
+    hasHtmlInline ? [text({ text: rawText })] : textWithBreaks(rawText);
+
   const content = replaceLinksWithTextNodes(c);
   const first = content[0];
   if (!first) {
@@ -184,13 +218,13 @@ export const eat = (
             imageCallback
           ) as Md.StaticPhrasingContent[],
         },
-        ...eat(content.slice(1), field, imageCallback),
+        ...eat(content.slice(1), field, imageCallback, hasHtmlInline),
       ];
     }
     // non-text nodes can't be merged. Eg. img, break. So process them and move on to the rest
     return [
       inlineElementExceptLink(first, field, imageCallback),
-      ...eat(content.slice(1), field, imageCallback),
+      ...eat(content.slice(1), field, imageCallback, hasHtmlInline),
     ];
   }
   const marks = getMarks(first);
@@ -202,15 +236,15 @@ export const eat = (
       };
       return [
         first.linkifyTextNode(text({ text: f.text })),
-        ...eat(content.slice(1), field, imageCallback),
+        ...eat(content.slice(1), field, imageCallback, hasHtmlInline),
       ];
     } else {
       const f = first as Plate.TextElement & {
         linkifyTextNode?: (arg: Md.Text) => Md.Link;
       };
       return [
-        text({ text: f.text }),
-        ...eat(content.slice(1), field, imageCallback),
+        ...inlineText(f.text),
+        ...eat(content.slice(1), field, imageCallback, hasHtmlInline),
       ];
     }
   }
@@ -272,8 +306,8 @@ export const eat = (
       linkifyTextNode?: (arg: Md.Text) => Md.Link;
     };
     return [
-      text({ text: f.text }),
-      ...eat(content.slice(1), field, imageCallback),
+      ...inlineText(f.text),
+      ...eat(content.slice(1), field, imageCallback, hasHtmlInline),
     ];
   }
   if (markToProcess === 'highlight') {
@@ -289,7 +323,7 @@ export const eat = (
         attributes: markAttributes(f),
         children: [child],
       } as unknown as Md.PhrasingContent,
-      ...eat(content.slice(1), field, imageCallback),
+      ...eat(content.slice(1), field, imageCallback, hasHtmlInline),
     ];
   }
   if (markToProcess === 'inlineCode') {
@@ -306,7 +340,12 @@ export const eat = (
     return [
       // @ts-ignore
       first.linkifyTextNode?.(node) ?? node,
-      ...eat(content.slice(nonMatchingSiblingIndex + 1), field, imageCallback),
+      ...eat(
+        content.slice(nonMatchingSiblingIndex + 1),
+        field,
+        imageCallback,
+        hasHtmlInline
+      ),
     ];
   }
 
@@ -323,7 +362,12 @@ export const eat = (
         imageCallback
       ),
     },
-    ...eat(content.slice(nonMatchingSiblingIndex + 1), field, imageCallback),
+    ...eat(
+      content.slice(nonMatchingSiblingIndex + 1),
+      field,
+      imageCallback,
+      hasHtmlInline
+    ),
   ];
 };
 
