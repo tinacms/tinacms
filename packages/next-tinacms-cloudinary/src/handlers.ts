@@ -120,8 +120,15 @@ async function listMedia(
   opts?: CloudinaryOptions
 ) {
   try {
+    // A repeated query param (?directory=a&directory=b) arrives as an array,
+    // so narrow it before it reaches the string-typed escaper below.
+    const rawDirectory = req.query.directory;
+    const directory = Array.isArray(rawDirectory)
+      ? rawDirectory[0]
+      : rawDirectory;
+
     const mediaListOptions: MediaListOptions = {
-      directory: (req.query.directory as string) || '""',
+      directory: directory || '""',
       limit: parseInt(req.query.limit as string, 10) || 500,
       offset: req.query.offset as string,
       filesOnly: req.query.filesOnly === 'true' || false,
@@ -134,12 +141,9 @@ async function listMedia(
 
     if (!useRootDirectory) {
       try {
-        // Validation only: reject upward traversal in the listing directory for
-        // consistency with the other adapters. The normalised result is
-        // intentionally discarded; Cloudinary derives public_id from folder +
-        // use_filename, so applying the resolved prefix here would change the
-        // naming model. Bounding the listing to a mediaRoot is tracked
-        // separately.
+        // Validation only: rejects traversal but does NOT bound the listing
+        // the way resolveDirectory bounds the S3/DOS prefix. The normalised
+        // result is discarded; its trailing slash matches no folder= term.
         resolveDirectory(mediaListOptions.directory);
       } catch (e) {
         if (e instanceof MediaKeyError) {
