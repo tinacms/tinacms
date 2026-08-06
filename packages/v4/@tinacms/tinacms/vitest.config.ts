@@ -8,6 +8,8 @@ export default defineConfig({
     globals: true,
     environment: 'happy-dom',
     testTimeout: 30_000,
+    // beforeAll warms plugin client segments, so a cold Vite transform lands here.
+    hookTimeout: 30_000,
     poolOptions: {
       forks: {
         execArgv: ['--no-experimental-webstorage'],

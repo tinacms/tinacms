@@ -1,10 +1,14 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
 import { defineConfig } from '../config';
 import { definePlugin } from '../core/plugin';
+import { corePlugins } from '../plugins/fields';
+import { warmPluginClients } from '../test/warm-plugins';
 import { useFieldRegistry, useTinaStore } from './hooks';
 import { TinaProvider } from './provider';
+
+beforeAll(() => warmPluginClients(corePlugins));
 
 const NO_COLLECTIONS = { collections: [] };
 

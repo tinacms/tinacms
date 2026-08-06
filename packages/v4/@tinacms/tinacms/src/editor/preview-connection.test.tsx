@@ -7,7 +7,7 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type ReactNode, type RefObject, useRef } from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
 import { toFieldAddress } from '../core/field/address';
 import type { CollectionSchema } from '../core/schema/types';
@@ -19,9 +19,12 @@ import {
   readyMessage,
   valuesMessage,
 } from '../preview/protocol';
+import { warmPluginClients } from '../test/warm-plugins';
 import { FormScopeContext } from './context';
 import { Field, FormProvider, TinaProvider } from './index';
 import { usePreviewConnection } from './preview-connection';
+
+beforeAll(() => warmPluginClients([stringFieldPlugin]));
 
 const NO_COLLECTIONS = { collections: [] };
 

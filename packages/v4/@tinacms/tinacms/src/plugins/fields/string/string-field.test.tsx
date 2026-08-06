@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { asResolvedConfig } from '../../../config';
 import {
   type FieldRegistry,
@@ -14,9 +14,12 @@ import type {
 import { validateField } from '../../../core/validation';
 import { Field, FormProvider, TinaProvider } from '../../../editor';
 import { t } from '../../../index';
+import { warmPluginClients } from '../../../test/warm-plugins';
 import stringFieldPlugin from './string-field.plugin';
 
 const NO_COLLECTIONS = { collections: [] };
+
+beforeAll(() => warmPluginClients([stringFieldPlugin]));
 
 const collection: CollectionSchema = {
   name: 'post',

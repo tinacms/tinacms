@@ -6,7 +6,7 @@ import {
   waitFor,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
 import { toFieldAddress } from '../core/field/address';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
@@ -26,6 +26,7 @@ const errorsOf = (forms: FormStore['forms'], formId: FormId) => {
   return isEdited(scope) ? scope.errors : undefined;
 };
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
+import { warmPluginClients } from '../test/warm-plugins';
 import {
   Field,
   FormProvider,
@@ -37,6 +38,8 @@ import {
   useFormSeedKey,
   useFormStatus,
 } from './index';
+
+beforeAll(() => warmPluginClients([stringFieldPlugin]));
 
 const NO_COLLECTIONS = { collections: [] };
 
