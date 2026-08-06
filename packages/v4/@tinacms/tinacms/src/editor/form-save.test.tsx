@@ -1,12 +1,11 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
 import { definePlugin } from '../core/plugin';
 import type { CollectionSchema } from '../core/schema/types';
 import { t } from '../index';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
-import { warmPluginClients } from '../test/warm-plugins';
 import {
   Field,
   FormProvider,
@@ -18,8 +17,6 @@ import {
   useFormSave,
   useFormStatus,
 } from './index';
-
-beforeAll(() => warmPluginClients([stringFieldPlugin]));
 
 const NO_COLLECTIONS = { collections: [] };
 

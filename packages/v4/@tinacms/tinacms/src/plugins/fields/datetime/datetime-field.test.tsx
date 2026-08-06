@@ -1,7 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { asResolvedConfig } from '../../../config';
-import { toFieldAddress } from '../../../core/field/address';
 import {
   type FieldRegistry,
   resolveFieldPlugins,
@@ -11,16 +10,14 @@ import type {
   CollectionSchema,
   TinaDocument,
 } from '../../../core/schema/types';
+import { toFieldAddress } from '../../../core/field/address';
 import { validateField } from '../../../core/validation';
 import { Field, FormProvider, TinaProvider } from '../../../editor';
 import { toFormId, useFormStore } from '../../../form/form-store';
 import { t } from '../../../index';
-import { warmPluginClients } from '../../../test/warm-plugins';
 import datetimeFieldPlugin from './datetime-field.plugin';
 
 const NO_COLLECTIONS = { collections: [] };
-
-beforeAll(() => warmPluginClients([datetimeFieldPlugin]));
 const DOCUMENT_PATH = 'content/posts/published.mdx';
 
 const collection: CollectionSchema = {
