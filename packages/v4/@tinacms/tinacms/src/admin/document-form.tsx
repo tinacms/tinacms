@@ -48,11 +48,11 @@ function SaveButton() {
           setFailure(null);
           save().catch((cause) => {
             console.error('[tinacms] Save failed:', cause);
-            setFailure(
-              cause instanceof Error && cause.message
-                ? cause.message
-                : 'Save failed.'
-            );
+            if (cause instanceof Error && cause.message) {
+              setFailure(cause.message);
+            } else {
+              setFailure('Save failed.');
+            }
           });
         }}
       >

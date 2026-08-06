@@ -95,9 +95,11 @@ export const tinaLocalDataLayerVitePlugin = (
         if (file.outcome === 'updated') log(`tina: updated ${file.path}`);
       }
     } catch (cause) {
-      log(
-        `tina: codegen failed — ${cause instanceof Error ? cause.message : cause}`
-      );
+      if (cause instanceof Error) {
+        log(`tina: codegen failed — ${cause.message}`);
+      } else {
+        log(`tina: codegen failed — ${String(cause)}`);
+      }
     }
   };
   const serveContentRequest: Connect.NextHandleFunction = async (req, res) => {
@@ -133,7 +135,11 @@ export const tinaLocalDataLayerVitePlugin = (
         return;
       }
       res.statusCode = 400;
-      res.end(cause instanceof Error ? cause.message : String(cause));
+      if (cause instanceof Error) {
+        res.end(cause.message);
+      } else {
+        res.end(String(cause));
+      }
     }
   };
   return {
