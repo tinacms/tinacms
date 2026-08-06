@@ -179,6 +179,9 @@ export const remarkToSlate = (
 
     return {
       type: 'li',
+      ...(typeof content.checked === 'boolean'
+        ? { checked: content.checked }
+        : {}),
       // @ts-ignore
       children: content.children.map((child) => {
         switch (child.type) {
