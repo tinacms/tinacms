@@ -15,6 +15,7 @@ concurrency:
 env:
   STATE_BRANCH: ci-sprint-announcer-state
   STATE_FILE: last-announced-sprint.txt
+  DISCORD_CHANNEL_ID: '1534382872251732080'  # #videos
 
 jobs:
   announce:
@@ -32,7 +33,7 @@ jobs:
       - name: Resolve the newest sprint recording
         id: resolve
         env:
-          WEBHOOK_URL: ${{ secrets.DISCORD_VIDEOS_WEBHOOK }}
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
         run: |
           python3 - <<'EOF'
           import json
@@ -133,8 +134,8 @@ jobs:
 
           # Check the webhook before any state is written, so a missing secret retries
           # tomorrow instead of recording a sprint that was never announced.
-          if announce and last is not None and not os.environ.get('WEBHOOK_URL', '').strip():
-              sys.exit('FAILED: DISCORD_VIDEOS_WEBHOOK is not set on this repository.')
+          if announce and last is not None and not os.environ.get('DISCORD_BOT_TOKEN', '').strip():
+              sys.exit('FAILED: DISCORD_BOT_TOKEN is not set on this repository.')
 
           with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
               out.write(f'announce={"true" if announce else "false"}\n')
@@ -161,7 +162,7 @@ jobs:
       - name: Announce on Discord
         if: steps.resolve.outputs.announce == 'true' && steps.resolve.outputs.first_run == 'false'
         env:
-          WEBHOOK_URL: ${{ secrets.DISCORD_VIDEOS_WEBHOOK }}
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
           NUMBER: ${{ steps.resolve.outputs.number }}
           VIDEO_ID: ${{ steps.resolve.outputs.video_id }}
           TITLE: ${{ steps.resolve.outputs.title }}
@@ -177,15 +178,17 @@ jobs:
                           f'https://www.youtube.com/watch?v={os.environ["VIDEO_ID"]}'),
               'allowed_mentions': {'parse': []},
           }
+          channel = os.environ['DISCORD_CHANNEL_ID']
           urllib.request.urlopen(
               urllib.request.Request(
-                  os.environ['WEBHOOK_URL'],
+                  f'https://discord.com/api/v10/channels/{channel}/messages',
                   data=json.dumps(payload).encode(),
                   headers={
                       'Content-Type': 'application/json',
                       # Discord sits behind Cloudflare, which 403s urllib's default
                       # User-Agent with error code 1010. Any explicit UA passes.
                       'User-Agent': 'TinaCMS-SprintAnnouncer (+https://github.com/tinacms/tinacms, 1.0)',
+                      'Authorization': f'Bot {os.environ["DISCORD_BOT_TOKEN"]}',
                   },
               ),
               timeout=30,
