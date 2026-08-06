@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
+import { asResolvedConfig } from '../../../config';
 import {
   type FieldRegistry,
   resolveFieldPlugins,
@@ -15,9 +16,12 @@ import { Field, FormProvider, TinaProvider } from '../../../editor';
 import { t } from '../../../index';
 import booleanFieldPlugin from './boolean-field.plugin';
 
+const NO_COLLECTIONS = { collections: [] };
+
 const collection: CollectionSchema = {
   name: 'post',
   label: 'Posts',
+  format: 'mdx',
   fields: [t.boolean({ name: 'featured', label: 'Featured', required: true })],
 };
 
@@ -28,7 +32,12 @@ const resolveRegistry = (): Promise<FieldRegistry> =>
 
 const renderFeatured = (document?: TinaDocument) =>
   render(
-    <TinaProvider plugins={[booleanFieldPlugin]}>
+    <TinaProvider
+      config={asResolvedConfig({
+        plugins: [booleanFieldPlugin],
+        schema: NO_COLLECTIONS,
+      })}
+    >
       <FormProvider
         collection={collection}
         path='content/posts/featured.mdx'
@@ -81,8 +90,6 @@ describe('BooleanField value updates', () => {
 });
 
 describe('BooleanField validation', () => {
-  // `required` is a no-op for boolean by design: a checkbox has no empty state
-  // and `false` is a first-class value, so neither true nor false is rejected.
   it('accepts both true and false even when the field is required', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('boolean');

@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
+import { asResolvedConfig } from '../../../config';
 import {
   type FieldRegistry,
   resolveFieldPlugins,
@@ -15,9 +16,12 @@ import { Field, FormProvider, TinaProvider } from '../../../editor';
 import { t } from '../../../index';
 import stringFieldPlugin from './string-field.plugin';
 
+const NO_COLLECTIONS = { collections: [] };
+
 const collection: CollectionSchema = {
   name: 'post',
   label: 'Posts',
+  format: 'mdx',
   fields: [t.string({ name: 'title', label: 'Title', required: true, min: 3 })],
 };
 
@@ -28,7 +32,12 @@ const resolveRegistry = (): Promise<FieldRegistry> =>
 
 const renderTitle = (document?: TinaDocument) =>
   render(
-    <TinaProvider plugins={[stringFieldPlugin]}>
+    <TinaProvider
+      config={asResolvedConfig({
+        plugins: [stringFieldPlugin],
+        schema: NO_COLLECTIONS,
+      })}
+    >
       <FormProvider
         collection={collection}
         path='content/posts/test.mdx'

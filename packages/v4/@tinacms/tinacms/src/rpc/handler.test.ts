@@ -9,11 +9,14 @@ import {
 } from '../server';
 import { createRpcHandler } from './handler';
 
-const sessionsByToken: Record<string, Session> = {
-  'admin-token': { identity: { id: 'ada' }, roles: ['admin'] },
-  'editor-token': { identity: { id: 'eli' }, roles: ['editor'] },
-  'proto-token': { identity: { id: 'mal' }, roles: ['constructor'] },
-};
+const sessionsByToken: Record<string, Session> = Object.assign(
+  Object.create(null),
+  {
+    'admin-token': { identity: { id: 'ada' }, roles: ['admin'] },
+    'editor-token': { identity: { id: 'eli' }, roles: ['editor'] },
+    'proto-token': { identity: { id: 'mal' }, roles: ['constructor'] },
+  }
+);
 
 const authPlugin = (rolePermissions?: (role: string) => Promise<string[]>) =>
   definePlugin({
@@ -44,8 +47,6 @@ const mediaPlugin = definePlugin({
         { permission: 'media:delete' },
         async (input: { path: string }) => ({ removed: input.path })
       ),
-      // This covers the in-process accessor between two server segments, inside a
-      // dispatch.
       viaAuth: async () => (use('auth').whoami as () => Promise<unknown>)(),
       explode: async () => {
         throw new Error('secret internals');
@@ -83,9 +84,6 @@ const post = (
       (opts.body === undefined ? undefined : JSON.stringify(opts.body)),
   });
 
-// Sec-Fetch-Site is a forbidden header name, so happy-dom refuses to put it on a real
-// Request — which is the property the guard rests on: a page cannot forge it either.
-// The handler reads only these four members, so a double states the header instead.
 const postStatingFetchSite = (path: string, site: string): Request =>
   ({
     method: 'POST',
@@ -201,8 +199,6 @@ describe('createRpcHandler', () => {
       server: async () => ({
         default: defineServerPlugin({
           getSession: async (request: Request) => {
-            // A provider that composes a capability can read its peers during a
-            // verification.
             await (use('media').health as () => Promise<unknown>)();
             return request.headers.get('authorization')
               ? { identity: { id: 'ada' }, roles: ['admin'] }
@@ -428,8 +424,6 @@ describe('createRpcHandler', () => {
   });
 });
 
-// The guards that need no runtime run before the runtime composes, so a request that
-// never reaches an operation cannot make every plugin import and initialize.
 describe('createRpcHandler composition', () => {
   const countingPlugin = (onInit: () => void) =>
     definePlugin({
@@ -505,10 +499,7 @@ describe('createRpcHandler composition', () => {
     await handler(post('/search/ping'));
     const teardown = handler.destroy();
     await started;
-    // The destroy has cleared the cache, so this request composes again. It must not
-    // run onInit while the onDestroy above is still running.
     const duringTeardown = handler(post('/search/ping'));
-    // Long enough for an unserialised composition to reach its onInit.
     await new Promise((resolve) => setTimeout(resolve, 20));
     releaseOnDestroy();
     await teardown;
@@ -563,8 +554,6 @@ describe('createRpcHandler composition', () => {
   });
 });
 
-// Without a mountPath the route is the last two segments, so any prefix reaches the
-// operation. With one, the path has to be the mount and exactly those two.
 describe('createRpcHandler mountPath', () => {
   const plugins = [mediaPlugin, authPlugin()];
 

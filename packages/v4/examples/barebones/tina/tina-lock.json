@@ -1,0 +1,42 @@
+{
+  "version": 5,
+  "schema": {
+    "collections": [
+      {
+        "name": "post",
+        "label": "Posts",
+        "path": "content/posts",
+        "format": "mdx",
+        "fields": [
+          {
+            "name": "title",
+            "label": "Title",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "featured",
+            "label": "Featured",
+            "type": "boolean"
+          },
+          {
+            "name": "stars",
+            "label": "Stars",
+            "type": "rating"
+          }
+        ]
+      }
+    ],
+    "version": {
+      "fullVersion": "4.0.0-alpha.0",
+      "major": "4",
+      "minor": "0",
+      "patch": "0-alpha"
+    }
+  },
+  "primitives": {
+    "boolean": 1,
+    "rating": 1,
+    "string": 1
+  }
+}
