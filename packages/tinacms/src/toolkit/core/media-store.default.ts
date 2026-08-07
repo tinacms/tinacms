@@ -861,14 +861,18 @@ export class TinaMediaStore implements MediaStore {
     if (decision.kind === 'workflow') {
       return this.renameCloudViaWorkflow(from, to, decision.context);
     }
-    return this.renameCloudDirect(from, to, { waitForStatus: true });
+    return this.renameCloudDirect(from, to);
   }
 
-  private async renameCloudDirect(
+  /**
+   * Issues the rename itself. `branch` comes from the workflow override when
+   * one is active, so this targets the workflow branch without the caller
+   * having to say so.
+   */
+  private async postCloudRename(
     from: string,
-    to: string,
-    { waitForStatus }: { waitForStatus: boolean }
-  ): Promise<Media> {
+    to: string
+  ): Promise<{ path?: string; src?: string; requestId?: string }> {
     const res = await this.api.authProvider.fetchWithToken(
       `${this.url}/rename`,
       {
@@ -883,11 +887,16 @@ export class TinaMediaStore implements MediaStore {
     if (res.status !== 200 || body?.success !== true) {
       throw this.toCloudRenameError(res.status, body);
     }
+    return body;
+  }
 
-    if (waitForStatus && body.requestId) {
+  private async renameCloudDirect(from: string, to: string): Promise<Media> {
+    const result = await this.postCloudRename(from, to);
+
+    if (result.requestId) {
       try {
         await this.waitForRequestStatus(
-          body.requestId,
+          result.requestId,
           'Time out waiting for rename to complete'
         );
       } catch (error) {
@@ -905,7 +914,7 @@ export class TinaMediaStore implements MediaStore {
     }
 
     // `path` is the server-sanitised target and may differ from what we sent.
-    return this.resolveRenamedMedia(body.path || to, body.src);
+    return this.resolveRenamedMedia(result.path || to, result.src);
   }
 
   /**
@@ -920,12 +929,16 @@ export class TinaMediaStore implements MediaStore {
     branchContext: MediaBranchContext
   ): Promise<Media> {
     try {
-      // workflowBranchOverride now routes this at the workflow branch.
-      await this.renameCloudDirect(from, to, { waitForStatus: false });
+      // The rename's own requestId is deliberately not awaited: the workflow
+      // status is what waits for the branch, the index and the pull request.
+      const result = await this.postCloudRename(from, to);
 
       let renamed: Media | undefined;
       await this.finalizeMediaWorkflow(branchContext, async () => {
-        renamed = await this.resolveRenamedMedia(to);
+        renamed = await this.resolveRenamedMedia(
+          result.path || to,
+          result.src
+        );
       });
 
       // finalizeMediaWorkflow reports failures through `media:workflow:error`

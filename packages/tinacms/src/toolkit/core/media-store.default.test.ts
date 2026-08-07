@@ -2437,6 +2437,30 @@ describe('TinaMediaStore — cloud rename (protected media workflow)', () => {
     expect(media.src).toContain(`__staging/${WORKFLOW_BRANCH}/__file/`);
   });
 
+  it('resolves the canonical entry once, after the workflow completes', async () => {
+    const { store, fetchWithToken } = buildWorkflowStore();
+
+    await runRename(store);
+
+    const listCalls = fetchWithToken.mock.calls.filter(([url]) =>
+      String(url).includes('/list/')
+    );
+    expect(listCalls).toHaveLength(1);
+  });
+
+  it('falls back to the rename response when the post-workflow listing misses', async () => {
+    const { store } = buildWorkflowStore({
+      listResponses: [
+        makeJsonResponse(200, { cursor: null, directories: [], files: [] }),
+      ],
+    });
+
+    const media = await runRename(store);
+
+    expect(media.filename).toBe('new.png');
+    expect(media.src).toContain(`__staging/${WORKFLOW_BRANCH}/__file/`);
+  });
+
   it('rejects rather than reporting success when the workflow fails', async () => {
     // finalizeMediaWorkflow reports the failure through an event instead of
     // throwing, so the rename must detect the missing result itself.
