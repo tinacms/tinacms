@@ -1,5 +1,14 @@
 # next-tinacms-cloudinary
 
+## 27.0.3
+
+### Patch Changes
+
+- [#7394](https://github.com/tinacms/tinacms/pull/7394) [`e66f1a4`](https://github.com/tinacms/tinacms/commit/e66f1a496b68078328c5a9e75ca41093426c8f77) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Escape the listing directory before interpolating it into the Cloudinary search expression, so folder names are always matched literally.
+
+- Updated dependencies [[`cf75e5b`](https://github.com/tinacms/tinacms/commit/cf75e5b8dd3209203df9fe1ffbc12a9d965277f9), [`cf75e5b`](https://github.com/tinacms/tinacms/commit/cf75e5b8dd3209203df9fe1ffbc12a9d965277f9), [`bd4df92`](https://github.com/tinacms/tinacms/commit/bd4df92a7e00bd74ee13eaf9f9b584fbb1a864ab), [`5f14d96`](https://github.com/tinacms/tinacms/commit/5f14d96fdba3d7a143827fc1cac9c7964c3f9b01), [`b6199da`](https://github.com/tinacms/tinacms/commit/b6199da1eeea7de01d5216c9b50c9e158440f891), [`ece366b`](https://github.com/tinacms/tinacms/commit/ece366bd5aa86e048d22f829319e41fe3d1267ba), [`4a19d66`](https://github.com/tinacms/tinacms/commit/4a19d669b069c0af959c6461cd60b5910aea6512), [`5112e60`](https://github.com/tinacms/tinacms/commit/5112e60bd0c98f6de36f63dbf068d252993e586f)]:
+  - tinacms@3.12.0
+
 ## 27.0.2
 
 ### Patch Changes
