@@ -21,6 +21,7 @@ import {
   MediaList,
   MediaListOptions,
   MediaRenameError,
+  MediaRenameErrorCode,
   MediaStore,
   MediaUploadOptions,
 } from './media';
@@ -71,6 +72,35 @@ const MEDIA_WORKFLOW_STATUS_TO_STEP: Partial<
 };
 
 const s3ErrorRegex = /<Error>.*<Code>(.+)<\/Code>.*<Message>(.+)<\/Message>.*/;
+
+const CANONICAL_THUMBNAIL_SIZES = [
+  { w: 75, h: 75 },
+  { w: 400, h: 400 },
+  { w: 1000, h: 1000 },
+];
+
+const RENAME_ERROR_CODES: MediaRenameErrorCode[] = [
+  'NOT_FOUND',
+  'NAME_COLLISION',
+  'INVALID_FILENAME',
+  'INVALID_PATH',
+  'UNAUTHORIZED',
+  'UNSUPPORTED',
+  'BACKEND_FAILURE',
+];
+
+/**
+ * Signals that the editor dismissed the branch prompt, so nothing was renamed.
+ * Rejecting is how a `rename` that must resolve to a `Media` reports "no work
+ * happened"; the rename modal recognises it and closes without an error.
+ */
+export class MediaRenameCancelled extends Error {
+  public ERR_TYPE = 'MediaRenameCancelled';
+
+  constructor() {
+    super('Media rename cancelled.');
+  }
+}
 
 export class DummyMediaStore implements MediaStore {
   accept = '*';
@@ -132,12 +162,11 @@ export class TinaMediaStore implements MediaStore {
   private mediaWorkflowInProgress = false;
 
   /**
-   * Renaming is only implemented against the local dev server. This is an
-   * instance property rather than a prototype method on purpose: the media
+   * An instance property rather than a prototype method on purpose: the media
    * manager decides whether to offer the action by checking whether the store
-   * defines `rename`, so a cloud-backed instance must not carry one — a
+   * defines `rename`, so an instance that cannot rename must not carry one — a
    * prototype method would advertise support everywhere and surface an action
-   * that always fails.
+   * that always fails. Static and self-hosted repo media get no `rename`.
    */
   rename?: (from: string, to: string) => Promise<Media>;
 
@@ -147,8 +176,10 @@ export class TinaMediaStore implements MediaStore {
       this.isStatic = true;
       this.staticMedia = staticMedia;
     }
-    if (!this.isStatic && cms?.api?.tina?.isLocalMode) {
-      this.rename = (from, to) => this.rename_local(from, to);
+    if (!this.isStatic && !this.isUnsupportedSelfHostedRepoMedia()) {
+      this.rename = cms?.api?.tina?.isLocalMode
+        ? (from, to) => this.rename_local(from, to)
+        : (from, to) => this.rename_cloud(from, to);
     }
   }
 
@@ -799,11 +830,247 @@ export class TinaMediaStore implements MediaStore {
       throw this.toRenameError(res.status, body);
     }
 
-    const lastSlash = to.lastIndexOf('/');
-    return this.buildLocalMedia(
-      lastSlash === -1 ? '' : to.slice(0, lastSlash),
-      lastSlash === -1 ? to : to.slice(lastSlash + 1)
+    const { directory, filename } = this.splitMediaPath(to);
+    return this.buildLocalMedia(directory, filename);
+  }
+
+  /**
+   * `from`/`to` are media-root-relative `directory/filename` paths. `to` has
+   * already been sanitised by the rename UI (`previewRename`), and is passed
+   * through untouched so the workflow record and the renamed file agree — the
+   * editorial-workflow route does not sanitise its target.
+   */
+  private async rename_cloud(from: string, to: string): Promise<Media> {
+    this.setup();
+
+    if (!(await this.isAuthenticated())) {
+      throw new MediaRenameError({
+        code: 'UNAUTHORIZED',
+        message: "You don't have permission to rename this file.",
+      });
+    }
+
+    // Best effort: without it we take the direct path and the assets API
+    // stays the final gate on a protected media branch.
+    await this.api.ensureProjectMeta();
+
+    const decision = await this.prepareRenameBranch(from, to);
+    if (decision.kind === 'cancelled') {
+      throw new MediaRenameCancelled();
+    }
+    if (decision.kind === 'workflow') {
+      return this.renameCloudViaWorkflow(from, to, decision.context);
+    }
+    return this.renameCloudDirect(from, to, { waitForStatus: true });
+  }
+
+  private async renameCloudDirect(
+    from: string,
+    to: string,
+    { waitForStatus }: { waitForStatus: boolean }
+  ): Promise<Media> {
+    const res = await this.api.authProvider.fetchWithToken(
+      `${this.url}/rename`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ from, to, branch: this.rawBranchForBody() }),
+      }
     );
+
+    const body = await res.json().catch(() => null);
+
+    if (res.status !== 200 || body?.success !== true) {
+      throw this.toCloudRenameError(res.status, body);
+    }
+
+    if (waitForStatus && body.requestId) {
+      try {
+        await this.waitForRequestStatus(
+          body.requestId,
+          'Time out waiting for rename to complete'
+        );
+      } catch (error) {
+        // The asset is already renamed in the media index at this point, so
+        // report the unconfirmed commit without claiming the rename failed.
+        const detail =
+          error instanceof Error && error.message
+            ? `${error.message}. `
+            : 'Failed to confirm the rename. ';
+        throw new MediaRenameError({
+          code: 'BACKEND_FAILURE',
+          message: `${detail}The file may still have been renamed — refresh the media library to check.`,
+        });
+      }
+    }
+
+    // `path` is the server-sanitised target and may differ from what we sent.
+    return this.resolveRenamedMedia(body.path || to, body.src);
+  }
+
+  /**
+   * A protected media branch cannot be renamed directly, so the rename is
+   * staged on a workflow branch. Completion is the *workflow* status, not the
+   * rename request status: only the former waits for the branch, the index and
+   * the pull request.
+   */
+  private async renameCloudViaWorkflow(
+    from: string,
+    to: string,
+    branchContext: MediaBranchContext
+  ): Promise<Media> {
+    try {
+      // workflowBranchOverride now routes this at the workflow branch.
+      await this.renameCloudDirect(from, to, { waitForStatus: false });
+
+      let renamed: Media | undefined;
+      await this.finalizeMediaWorkflow(branchContext, async () => {
+        renamed = await this.resolveRenamedMedia(to);
+      });
+
+      // finalizeMediaWorkflow reports failures through `media:workflow:error`
+      // rather than throwing, and skips the post-catalogue step when it fails.
+      // An unresolved entry is therefore the only signal we have that the
+      // workflow did not complete, and we must not report success without it.
+      if (!renamed) {
+        throw new MediaRenameError({
+          code: 'BACKEND_FAILURE',
+          message:
+            'The rename was staged but the branch workflow did not complete. ' +
+            'Check the branch in TinaCloud before trying again.',
+        });
+      }
+      return renamed;
+    } catch (err) {
+      this.resetWorkflowState();
+      this.cms.events.dispatch({ type: 'media:workflow:finish' });
+      throw err;
+    }
+  }
+
+  private async prepareRenameBranch(
+    from: string,
+    to: string
+  ): Promise<MediaBranchDecision> {
+    if (!this.api.usingProtectedMediaBranch()) return { kind: 'direct' };
+
+    const baseBranch = decodeURIComponent(this.api.branch || '');
+    const { directory, filename } = this.splitMediaPath(from);
+    const branchName = `media-rename-${this.branchSlugForMediaPath(
+      directory,
+      filename
+    )}`;
+
+    return this.requestMediaBranchChoice(branchName, baseBranch, {
+      opType: 'rename',
+      // The source verbatim: it exists under its stored name, which
+      // re-sanitising could move off for legacy or externally added files.
+      repoPath: from,
+      targetRepoPath: to,
+      // A direct write to a protected media branch is always rejected.
+      allowSaveToProtectedBranch: false,
+    });
+  }
+
+  /**
+   * The branch name for a JSON body. `encodedBranchParam` is for query strings;
+   * bodies take the raw name, and never the literal string `"undefined"`.
+   */
+  private rawBranchForBody(): string {
+    if (this.workflowBranchOverride) return this.workflowBranchOverride;
+    if (!this.api.branch) return '';
+    const decoded = decodeURIComponent(this.api.branch);
+    return !decoded || decoded === 'undefined' ? '' : decoded;
+  }
+
+  private splitMediaPath(path: string): {
+    directory: string;
+    filename: string;
+  } {
+    const lastSlash = path.lastIndexOf('/');
+    return lastSlash === -1
+      ? { directory: '', filename: path }
+      : {
+          directory: path.slice(0, lastSlash),
+          filename: path.slice(lastSlash + 1),
+        };
+  }
+
+  /**
+   * Resolves the renamed asset to a listing entry, which is the source of
+   * truth for the `src` URL (staging path and per-stage CDN host) and carries
+   * the thumbnails the media manager renders. Falls back to the fields the
+   * rename response returned when the entry isn't on the first page, since the
+   * caller hands this straight to the media manager's preview.
+   */
+  private async resolveRenamedMedia(
+    targetPath: string,
+    srcFromResponse?: string
+  ): Promise<Media> {
+    const { directory, filename } = this.splitMediaPath(targetPath);
+
+    try {
+      const listed = await this.list({
+        directory,
+        limit: 100,
+        thumbnailSizes: CANONICAL_THUMBNAIL_SIZES,
+      });
+      const entry = listed.items.find(
+        (item) => item.type === 'file' && item.filename === filename
+      );
+      if (entry) return entry;
+    } catch (error) {
+      console.error('Failed to fetch the canonical media entry:', error);
+    }
+
+    const src = srcFromResponse || '';
+    return {
+      type: 'file',
+      id: filename,
+      filename,
+      directory,
+      src,
+      thumbnails: CANONICAL_THUMBNAIL_SIZES.reduce(
+        (acc, size) => {
+          acc[`${size.w}x${size.h}`] = this.genThumbnail(src, size);
+          return acc;
+        },
+        {} as Record<string, string>
+      ),
+    };
+  }
+
+  private toCloudRenameError(status: number, body: any): MediaRenameError {
+    const message =
+      typeof body?.message === 'string' && body.message
+        ? body.message
+        : 'Failed to rename the file.';
+
+    if (
+      typeof body?.code === 'string' &&
+      (RENAME_ERROR_CODES as string[]).includes(body.code)
+    ) {
+      return new MediaRenameError({
+        code: body.code as MediaRenameErrorCode,
+        message,
+      });
+    }
+
+    // No usable code: fall back on the status. Unlike the local dev server, a
+    // 404 here means the asset is missing, not that the route is unavailable.
+    let code: MediaRenameErrorCode;
+    if (status === 401) {
+      code = 'UNAUTHORIZED';
+    } else if (status === 403) {
+      code = 'INVALID_PATH';
+    } else if (status === 404) {
+      code = 'NOT_FOUND';
+    } else if (status === 409) {
+      code = 'NAME_COLLISION';
+    } else {
+      code = 'BACKEND_FAILURE';
+    }
+    return new MediaRenameError({ code, message });
   }
 
   private toRenameError(status: number, body: any): MediaRenameError {
