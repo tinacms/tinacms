@@ -88,6 +88,17 @@ describe('useTinaAuthRedirect', () => {
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
+  it('does nothing when disabled even with code and state', () => {
+    renderHook(() =>
+      useTinaAuthRedirect({ code: CODE, state: STATE, error: null }, false)
+    );
+
+    expect(consoleErrorSpy).not.toHaveBeenCalled();
+    expect(replaceStateSpy).not.toHaveBeenCalled();
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(localStorage.getItem(PKCE_STORAGE_KEY)).toBeNull();
+  });
+
   it('bails when no PKCE data is stored', () => {
     renderHook(() =>
       useTinaAuthRedirect({ code: CODE, state: STATE, error: null })
