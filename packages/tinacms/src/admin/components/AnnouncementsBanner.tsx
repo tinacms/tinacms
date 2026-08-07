@@ -4,7 +4,7 @@ import React from 'react';
 import pkg from '../../../package.json';
 import type { Announcement } from '../../internalClient';
 
-const DISMISSED_KEY = 'tinacms-announcements-dismissed';
+export const DISMISSED_KEY = 'tinacms-announcements-dismissed';
 
 const getDismissed = (): string[] => {
   try {

@@ -289,6 +289,34 @@ describe('Tina Client', () => {
         'https://content.tinajs.io/announcement?version=1.2.3'
       );
     });
+
+    it('returns null when the response is not ok', async () => {
+      client = buildClient();
+      stubFetchOnce(
+        makeResponse({
+          status: 500,
+          body: { error: 'boom' },
+        })
+      );
+
+      const result = await client.getAnnouncements('1.2.3');
+
+      expect(result).toBeNull();
+    });
+
+    it('returns null when the fetch rejects', async () => {
+      client = buildClient();
+      const fetchMock = vi.fn().mockRejectedValueOnce(new Error('network'));
+      vi.stubGlobal('fetch', fetchMock);
+      const consoleError = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+
+      const result = await client.getAnnouncements('1.2.3');
+
+      expect(result).toBeNull();
+      consoleError.mockRestore();
+    });
   });
 
   describe('branch management', () => {
