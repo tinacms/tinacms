@@ -1,0 +1,6 @@
+@import "@tinacms/ui/globals.css";
+
+/* Tailwind skips node_modules, and the alpha releases the editor as source (ADR-001),
+   so name the package sources here. These lines go when the dist build lands. */
+@source "../node_modules/@tinacms/tinacms/src";
+@source "../node_modules/@tinacms/ui/src";

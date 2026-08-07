@@ -1,0 +1,37 @@
+{
+  "version": 5,
+  "schema": {
+    "collections": [
+      {
+        "name": "post",
+        "label": "Posts",
+        "path": "content/posts",
+        "format": "mdx",
+        "fields": [
+          {
+            "name": "title",
+            "label": "Title",
+            "required": true,
+            "min": 3,
+            "type": "string"
+          },
+          {
+            "name": "featured",
+            "label": "Featured",
+            "type": "boolean"
+          }
+        ]
+      }
+    ],
+    "version": {
+      "fullVersion": "4.0.0-alpha.0",
+      "major": "4",
+      "minor": "0",
+      "patch": "0-alpha"
+    }
+  },
+  "primitives": {
+    "boolean": 1,
+    "string": 1
+  }
+}

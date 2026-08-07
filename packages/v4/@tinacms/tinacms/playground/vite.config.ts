@@ -1,31 +1,38 @@
 import { fileURLToPath } from 'node:url';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
+import { type Plugin, defineConfig } from 'vite';
+import { loadTinaConfig } from '../src/codegen/load-config';
+import { tinaLocalDataLayerVitePlugin } from '../src/plugins/content/local/server/local-data-layer.vite';
+import { playgroundAliases } from './aliases';
 
-// Aliases point the public import strings at the package source, so the playground
-// exercises the same specifiers a real app will use (not relative paths into src/).
-// Array form: the more specific subpath must come first.
-export default defineConfig({
-  plugins: [react(), tailwindcss()],
-  resolve: {
-    alias: [
-      {
-        find: '@tinacms/tinacms/react',
-        replacement: fileURLToPath(
-          new URL('../src/editor/index.ts', import.meta.url)
-        ),
-      },
-      {
-        find: '@tinacms/tinacms/adapters/react',
-        replacement: fileURLToPath(
-          new URL('../src/adapters/react/index.ts', import.meta.url)
-        ),
-      },
-      {
-        find: '@tinacms/tinacms',
-        replacement: fileURLToPath(new URL('../src/index.ts', import.meta.url)),
-      },
-    ],
+const tinaConfigPath = fileURLToPath(
+  new URL('./tina/config.ts', import.meta.url)
+);
+
+const tina = await loadTinaConfig(tinaConfigPath, {
+  alias: playgroundAliases,
+});
+
+const restartOnTinaConfigChange = (): Plugin => ({
+  name: 'tina-playground-restart-on-config-change',
+  configureServer(server) {
+    server.watcher.add(tinaConfigPath);
+    server.watcher.on('change', (file) => {
+      if (file === tinaConfigPath) void server.restart();
+    });
   },
+});
+
+export default defineConfig({
+  plugins: [
+    react({ babel: { plugins: ['babel-plugin-react-compiler'] } }),
+    tailwindcss(),
+    tinaLocalDataLayerVitePlugin({
+      rootDir: fileURLToPath(new URL('.', import.meta.url)),
+      collections: tina.schema.collections,
+    }),
+    restartOnTinaConfigChange(),
+  ],
+  resolve: { alias: playgroundAliases },
 });

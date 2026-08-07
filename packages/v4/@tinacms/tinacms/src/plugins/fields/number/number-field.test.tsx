@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
+import { asResolvedConfig } from '../../../config';
 import {
   type FieldRegistry,
   resolveFieldPlugins,
@@ -15,9 +16,12 @@ import { Field, FormProvider, TinaProvider } from '../../../editor';
 import { t } from '../../../index';
 import numberFieldPlugin from './number-field.plugin';
 
+const NO_COLLECTIONS = { collections: [] };
+
 const collection: CollectionSchema = {
   name: 'post',
   label: 'Posts',
+  format: 'mdx',
   fields: [
     t.number({
       name: 'rating',
@@ -27,9 +31,7 @@ const collection: CollectionSchema = {
       max: 5,
       step: 0.5,
     }),
-    // Required but unbounded — proves `0` is a present value, not empty.
     t.number({ name: 'count', label: 'Count', required: true }),
-    // Optional — for negatives, decimals, and empty handling.
     t.number({ name: 'weight', label: 'Weight' }),
   ],
 };
@@ -41,7 +43,12 @@ const resolveRegistry = (): Promise<FieldRegistry> =>
 
 const renderField = (address: string, document?: TinaDocument) =>
   render(
-    <TinaProvider plugins={[numberFieldPlugin]}>
+    <TinaProvider
+      config={asResolvedConfig({
+        plugins: [numberFieldPlugin],
+        schema: NO_COLLECTIONS,
+      })}
+    >
       <FormProvider
         collection={collection}
         path='content/posts/featured.mdx'
@@ -171,9 +178,7 @@ describe('NumberField ingest and digest', () => {
     const registry = await resolveRegistry();
     const stored = { rating: 3, count: 0, weight: -1.5 };
     const ingested = ingestDocument(stored, collection.fields, registry);
-    // parse: stored number -> editor string
     expect(ingested).toEqual({ rating: '3', count: '0', weight: '-1.5' });
-    // serialize: editor string -> stored number (zero and decimal preserved)
     expect(digestDocument(ingested, collection.fields, registry)).toEqual(
       stored
     );
