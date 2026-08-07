@@ -493,6 +493,12 @@ mutation addPendingDocumentMutation(
   }
 
   async getAnnouncements(version: string): Promise<Announcement[] | null> {
+    if (
+      this.isCustomContentApi ||
+      this.schema?.config?.config?.contentApiUrlOverride
+    ) {
+      return null;
+    }
     const url = `${this.contentApiBase}/announcement?version=${version}`;
     try {
       const res = await fetch(url);

@@ -1,9 +1,9 @@
-import { Client, LocalClient, LocalAuthProvider } from './index';
 import {
   EDITORIAL_WORKFLOW_ERROR,
   EDITORIAL_WORKFLOW_STATUS,
   EditorialWorkflowErrorDetails,
 } from '../toolkit/form-builder/editorial-workflow-constants';
+import { Client, LocalAuthProvider, LocalClient } from './index';
 
 const makeResponse = ({
   status,
@@ -212,6 +212,82 @@ describe('Tina Client', () => {
       });
 
       expect(client.contentApiUrl).toBe('https://schema-override.example.com');
+    });
+  });
+
+  describe('getAnnouncements', () => {
+    let client: Client;
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+      vi.restoreAllMocks();
+    });
+
+    it('returns null without fetching for a custom content API client', async () => {
+      client = buildClient({
+        customContentApiUrl: 'https://self-hosted.example.com/graphql',
+      });
+      const fetchMock = vi.fn();
+      vi.stubGlobal('fetch', fetchMock);
+
+      const result = await client.getAnnouncements('1.2.3');
+
+      expect(result).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('returns null without fetching when contentApiUrlOverride is set in the schema', async () => {
+      client = buildClient({
+        schema: {
+          collections: [],
+          config: {
+            contentApiUrlOverride: '/api/tina/gql',
+          },
+        } as any,
+      });
+      const fetchMock = vi.fn();
+      vi.stubGlobal('fetch', fetchMock);
+
+      const result = await client.getAnnouncements('1.2.3');
+
+      expect(result).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('returns null without fetching for a LocalClient', async () => {
+      client = new LocalClient();
+      const fetchMock = vi.fn();
+      vi.stubGlobal('fetch', fetchMock);
+
+      const result = await client.getAnnouncements('1.2.3');
+
+      expect(result).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('fetches from the content API base and returns the announcements for a TinaCloud client', async () => {
+      client = buildClient();
+      const announcements = [
+        {
+          id: 'a-1',
+          headline: 'Hello',
+          body: 'World',
+          severity: 'info',
+        },
+      ];
+      stubFetchOnce(
+        makeResponse({
+          status: 200,
+          body: { announcements },
+        })
+      );
+
+      const result = await client.getAnnouncements('1.2.3');
+
+      expect(result).toEqual(announcements);
+      expect(global.fetch).toHaveBeenCalledWith(
+        'https://content.tinajs.io/announcement?version=1.2.3'
+      );
     });
   });
 
