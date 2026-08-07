@@ -1921,7 +1921,11 @@ describe('TinaMediaStore — cloud rename (direct)', () => {
 
     // The rename UI already sanitises; a second pass here could disagree with
     // the value recorded on the workflow.
-    await renameSettled(store, 'uploads/old.png', 'uploads/Already Sanitised.png');
+    await renameSettled(
+      store,
+      'uploads/old.png',
+      'uploads/Already Sanitised.png'
+    );
 
     expect(JSON.parse(renameCall(fetchWithToken)[1].body).to).toBe(
       'uploads/Already Sanitised.png'
@@ -2159,7 +2163,9 @@ describe('TinaMediaStore — cloud rename routing', () => {
     vi.restoreAllMocks();
   });
 
-  const buildRoutingStore = (options: Parameters<typeof buildStore>[0] = {}) => {
+  const buildRoutingStore = (
+    options: Parameters<typeof buildStore>[0] = {}
+  ) => {
     const built = buildStore(options);
     built.fetchWithToken.mockImplementation((url: string) =>
       Promise.resolve(
@@ -2399,17 +2405,16 @@ describe('TinaMediaStore — cloud rename (protected media workflow)', () => {
 
     await runRename(store);
 
-    expect(
-      startMediaEditorialWorkflow.mock.calls[0][0].branchName
-    ).not.toBe('tina/media-rename-uploads-a-png');
+    expect(startMediaEditorialWorkflow.mock.calls[0][0].branchName).not.toBe(
+      'tina/media-rename-uploads-a-png'
+    );
     expect(renameRequest(fetchWithToken).branch).toBe(
       'tina/media-rename-uploads-a-png'
     );
   });
 
   it('polls the workflow request, not the rename request', async () => {
-    const { store, api, waitForEditorialWorkflowStatus } =
-      buildWorkflowStore();
+    const { store, api, waitForEditorialWorkflowStatus } = buildWorkflowStore();
 
     await runRename(store);
 
