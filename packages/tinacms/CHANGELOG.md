@@ -1,5 +1,69 @@
 # tinacms
 
+## 3.12.0
+
+### Minor Changes
+
+- [#7391](https://github.com/tinacms/tinacms/pull/7391) [`ece366b`](https://github.com/tinacms/tinacms/commit/ece366bd5aa86e048d22f829319e41fe3d1267ba) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Add a Rename action to the Media Manager, backed by the local dev server.
+
+  Selecting a file in the media preview now offers Rename alongside Insert and Delete. The modal edits the basename, keeps the extension, previews the sanitised result using the same rules uploads apply, and reports collisions and missing files specifically instead of a generic failure. Every open media picker refreshes afterwards, and pickers previewing the renamed file follow it to its new path.
+
+  Renaming does **not** update content that already references the old path — the modal says so explicitly.
+
+  The action only appears when the media store implements `rename`. `TinaMediaStore` implements it for local development via a new `POST /media/rename` route on the CLI dev server; TinaCloud, static and self-hosted repo-media stores do not advertise it, so the action stays hidden there rather than failing on click. Third-party stores (S3, Cloudinary, DigitalOcean Spaces, Azure) can opt in by implementing `MediaStore.rename`.
+
+  `MediaManager.rename()` dispatches `media:rename:start`, `media:rename:success` and `media:rename:failure`.
+
+- [#7323](https://github.com/tinacms/tinacms/pull/7323) [`4a19d66`](https://github.com/tinacms/tinacms/commit/4a19d669b069c0af959c6461cd60b5910aea6512) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Add media-manager search and a folder/file filter, and refresh the grid.
+
+  Search filters the library by file path (debounced, recursive across folders); the `All | Folders | Files` toggle narrows the view. Folders and files render in labelled sections, files show a type badge (JPEG/PNG/MP4…), and videos show a play overlay.
+
+  Search works against both TinaCloud media and local dev media. The local dev-server media endpoint (`@tinacms/cli`) now honours a `search` query param, matching paths recursively within the requested folder (case-insensitive) and staying within the media root. Matching is on the folder-relative path, so a folder name matches the files beneath it, and matching folders surface as their own folder results (local dev media; TinaCloud parity to follow). Results are paginated with the same `limit`/`cursor` contract as an unfiltered listing.
+
+  The search box is opt-in per media store via a new `searchable` flag on the `MediaStore` interface. The default (TinaCloud/local) store sets it; a custom or self-hosted store shows the box only once it sets `searchable` and reads `options.search` in its `list()`, so stores that don't support search don't get a box that returns unfiltered results.
+
+  Also fixes the breadcrumb rendering a duplicate root crumb — and Back not returning to the root — for folder names that carry a trailing slash.
+
+### Patch Changes
+
+- [#7216](https://github.com/tinacms/tinacms/pull/7216) [`cf75e5b`](https://github.com/tinacms/tinacms/commit/cf75e5b8dd3209203df9fe1ffbc12a9d965277f9) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Collapse three icon libraries into `lucide-react` (~85 MB).
+
+  `tinacms` declared `react-icons` (84 MB), `lucide-react` (32 MB) and `@heroicons/react` as production dependencies, so every user installed all three. Icon usage is entirely internal admin chrome — there is no icon-picker, no `icon` schema field type, and no dynamic whole-set import — so `react-icons` and `@heroicons/react` have been removed in favour of `lucide-react`, which was already the de-facto house set.
+
+  Not a breaking change for user content, schemas, or plugins: `ScreenPlugin.Icon` is typed `any`, and `CloudConfigOptions` is not publicly exported. The internal `IconType` prop type is now lucide's `LucideIcon`.
+
+  Six icons have no exact lucide counterpart and were substituted: `BsCheckCircleFill`/`BsExclamationOctagonFill` → `CircleCheck`/`OctagonAlert` (lucide is outline-only), `MdSyncProblem` → `RefreshCwOff`, `TbLogs` → `ScrollText`, `BiRename` → `SquarePen`, `MdOutlineDataSaverOff` → `Info`.
+
+- [#7216](https://github.com/tinacms/tinacms/pull/7216) [`cf75e5b`](https://github.com/tinacms/tinacms/commit/cf75e5b8dd3209203df9fe1ffbc12a9d965277f9) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Drop `@headlessui/react` (~50 MB).
+
+  Headless UI v2 pulls in the entire React Aria stack (`react-aria` 34.8 MB, `react-stately` 9.4 MB, `@internationalized/*`) — about 50 MB installed — to provide components Radix already covers. `tinacms` was shipping three headless component libraries at once (`@radix-ui/*` in 22 files, `@headlessui/react` in 11, `@ariakit/react` in 1).
+
+  The 11 Headless UI files now use Radix (`Popover`, `DropdownMenu`) and local state, consolidating on the library that was already the majority. No new dependencies were added.
+
+  `Transition`/`TransitionChild` are replaced by a small local equivalent with the same prop API (`show`, `appear`, `enter*`/`leave*`). It uses `element.getAnimations({ subtree: true })` so a parent transition with no classes of its own still waits for its children to finish leaving before unmounting.
+
+- [#7214](https://github.com/tinacms/tinacms/pull/7214) [`bd4df92`](https://github.com/tinacms/tinacms/commit/bd4df92a7e00bd74ee13eaf9f9b584fbb1a864ab) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Stop shipping the `monaco-editor` package (~73 MB).
+
+  Every import of `monaco-editor` in shipped source was **types-only**. The editor itself has always been fetched from a CDN at runtime by `@monaco-editor/loader`, so the 73 MB installed on every user's disk was never executed — and was a different version (0.31.0) from the one that actually runs (0.55.1, the loader's default).
+
+  `monaco-editor` is a _required_ peer dependency of `@monaco-editor/react`, and npm 7+ auto-installs required peers, so removing it from our `dependencies` was not enough on its own. `@tinacms/app` now uses `@monaco-editor/loader` directly — the same loader `@monaco-editor/react` wraps, so the CDN and editor version are unchanged — and `monaco-editor` is kept as a devDependency for its types.
+
+  The copy of the raw editor in `packages/tinacms` was dead code: nothing imported it, it was not exported, and its `parseMDX`/`stringifyMDX` were stubs returning empty values. The live raw editor lives in `@tinacms/app` and is injected into `tinacms` as the `rawEditor` prop. It has been deleted, letting `tinacms` drop both monaco packages entirely.
+
+  No behaviour change: raw MDX mode still loads the same editor from the same CDN.
+
+- [#7233](https://github.com/tinacms/tinacms/pull/7233) [`5f14d96`](https://github.com/tinacms/tinacms/commit/5f14d96fdba3d7a143827fc1cac9c7964c3f9b01) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Add a dedicated `@tinacms/mdx/sanitize-url` subpath export containing just the URL-scheme sanitizer, and point `tinacms`'s rich-text renderer (`TinaMarkdown` / `StaticTinaMarkdown`) at it instead of the root `@tinacms/mdx` entry. Previously, importing `sanitizeUrl` pulled in `@tinacms/mdx`'s full remark/mdast/micromark markdown-parsing bundle (~2MB) into every site's client bundle, even though rich-text rendering only needs the ~15-line sanitizer. The root `@tinacms/mdx` export of `sanitizeUrl` is unchanged and still works.
+
+- [#7322](https://github.com/tinacms/tinacms/pull/7322) [`b6199da`](https://github.com/tinacms/tinacms/commit/b6199da1eeea7de01d5216c9b50c9e158440f891) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - The media manager now lists assets from the v2 assets-api endpoint. Uploads and deletes are unchanged and stay on v1. Listing behaviour is identical — this is a transport-only move that sets up media search.
+
+- [#7231](https://github.com/tinacms/tinacms/pull/7231) [`5112e60`](https://github.com/tinacms/tinacms/commit/5112e60bd0c98f6de36f63dbf068d252993e586f) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Remove dead code left over from the `monaco-editor` removal in the mdx field plugin.
+
+- Updated dependencies [[`5f14d96`](https://github.com/tinacms/tinacms/commit/5f14d96fdba3d7a143827fc1cac9c7964c3f9b01)]:
+  - @tinacms/mdx@2.2.0
+  - @tinacms/bridge@0.3.1
+  - @tinacms/schema-tools@2.8.3
+  - @tinacms/search@1.2.23
+
 ## 3.11.0
 
 ### Minor Changes

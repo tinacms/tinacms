@@ -1,5 +1,16 @@
 # @tinacms/mdx
 
+## 2.2.0
+
+### Minor Changes
+
+- [#7233](https://github.com/tinacms/tinacms/pull/7233) [`5f14d96`](https://github.com/tinacms/tinacms/commit/5f14d96fdba3d7a143827fc1cac9c7964c3f9b01) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Add a dedicated `@tinacms/mdx/sanitize-url` subpath export containing just the URL-scheme sanitizer, and point `tinacms`'s rich-text renderer (`TinaMarkdown` / `StaticTinaMarkdown`) at it instead of the root `@tinacms/mdx` entry. Previously, importing `sanitizeUrl` pulled in `@tinacms/mdx`'s full remark/mdast/micromark markdown-parsing bundle (~2MB) into every site's client bundle, even though rich-text rendering only needs the ~15-line sanitizer. The root `@tinacms/mdx` export of `sanitizeUrl` is unchanged and still works.
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/schema-tools@2.8.3
+
 ## 2.1.11
 
 ### Patch Changes
