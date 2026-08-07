@@ -2464,20 +2464,86 @@ describe('TinaMediaStore — cloud rename (protected media workflow)', () => {
   it('rejects rather than reporting success when the workflow fails', async () => {
     // finalizeMediaWorkflow reports the failure through an event instead of
     // throwing, so the rename must detect the missing result itself.
-    const { store, events } = buildWorkflowStore({
+    const { store, events, api } = buildWorkflowStore({
       waitForEditorialWorkflowStatus: vi
         .fn()
         .mockRejectedValue(new Error('indexing failed')),
     });
-    const workflowError = vi.fn();
-    events.subscribe('media:workflow:error', workflowError);
+    const renameSuccess = vi.fn();
+    events.subscribe('media:rename:success', renameSuccess);
 
     const error = await runRename(store).catch((e) => e);
 
     expect(error).toBeInstanceOf(MediaRenameError);
     expect(error.code).toBe('BACKEND_FAILURE');
     expect(error.message).toContain('did not complete');
-    expect(workflowError).toHaveBeenCalled();
+    // The store rejects, so MediaManager never dispatches success. (The store
+    // is driven directly here, so assert on the event the manager would relay.)
+    expect(renameSuccess).not.toHaveBeenCalled();
+    // No retry or request-status polling after the workflow gave up.
+    expect(api.getRequestStatus).not.toHaveBeenCalled();
+    expect(api.startMediaEditorialWorkflow).toHaveBeenCalledTimes(1);
+
+    // Workflow state was released: a second attempt starts a new workflow
+    // instead of hitting "A media workflow is already in progress."
+    const second = await runRename(store).catch((e) => e);
+    expect(second.message).toContain('did not complete');
+    expect(api.startMediaEditorialWorkflow).toHaveBeenCalledTimes(2);
+  });
+
+  it('leaves the workflow error as the last event so the overlay keeps showing it', async () => {
+    // <MediaWorkflowOverlay /> maps `media:workflow:error` to its error modal
+    // and `media:workflow:finish` back to idle, so a trailing finish would
+    // dismiss the real workflow message and leave only the generic one.
+    const { store, events } = buildWorkflowStore({
+      waitForEditorialWorkflowStatus: vi
+        .fn()
+        .mockRejectedValue(new Error('indexing failed')),
+    });
+    const seen: string[] = [];
+    let workflowErrorMessage: string | undefined;
+    events.subscribe<{ type: string; message: string }>(
+      'media:workflow:error',
+      (event) => {
+        workflowErrorMessage = event.message;
+      }
+    );
+    events.subscribe('*', (event) => {
+      if (event.type.startsWith('media:workflow:')) seen.push(event.type);
+    });
+
+    await runRename(store).catch(() => {});
+
+    expect(seen.at(-1)).toBe('media:workflow:error');
+    expect(seen.filter((type) => type === 'media:workflow:finish')).toEqual([]);
+    // The overlay renders this message, so it must be the backend's own.
+    expect(workflowErrorMessage).toBe('indexing failed');
+  });
+
+  it('dismisses the progress overlay when the rename itself fails', async () => {
+    // No workflow error was dispatched in this case, so nothing else would
+    // take the overlay out of its executing state.
+    const { store, events, fetchWithToken } = buildWorkflowStore();
+    fetchWithToken.mockImplementation((url: string) =>
+      Promise.resolve(
+        String(url).includes('/rename')
+          ? makeJsonResponse(409, {
+              code: 'NAME_COLLISION',
+              message: 'That name is taken.',
+            })
+          : makeJsonResponse(200, { cursor: null, directories: [], files: [] })
+      )
+    );
+    const seen: string[] = [];
+    events.subscribe('*', (event) => {
+      if (event.type.startsWith('media:workflow:')) seen.push(event.type);
+    });
+
+    const error = await runRename(store).catch((e) => e);
+
+    expect(error.code).toBe('NAME_COLLISION');
+    expect(error.message).toBe('That name is taken.');
+    expect(seen.at(-1)).toBe('media:workflow:finish');
   });
 
   it('performs no rename when the editor cancels the branch prompt', async () => {
