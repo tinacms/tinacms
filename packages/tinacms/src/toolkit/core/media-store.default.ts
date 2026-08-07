@@ -928,37 +928,41 @@ export class TinaMediaStore implements MediaStore {
     to: string,
     branchContext: MediaBranchContext
   ): Promise<Media> {
+    let renamed: Media | undefined;
+
     try {
       // The rename's own requestId is deliberately not awaited: the workflow
       // status is what waits for the branch, the index and the pull request.
       const result = await this.postCloudRename(from, to);
 
-      let renamed: Media | undefined;
       await this.finalizeMediaWorkflow(branchContext, async () => {
-        renamed = await this.resolveRenamedMedia(
-          result.path || to,
-          result.src
-        );
+        renamed = await this.resolveRenamedMedia(result.path || to, result.src);
       });
-
-      // finalizeMediaWorkflow reports failures through `media:workflow:error`
-      // rather than throwing, and skips the post-catalogue step when it fails.
-      // An unresolved entry is therefore the only signal we have that the
-      // workflow did not complete, and we must not report success without it.
-      if (!renamed) {
-        throw new MediaRenameError({
-          code: 'BACKEND_FAILURE',
-          message:
-            'The rename was staged but the branch workflow did not complete. ' +
-            'Check the branch in TinaCloud before trying again.',
-        });
-      }
-      return renamed;
     } catch (err) {
+      // Reached when the rename itself fails, which leaves the progress modal
+      // up with no error of its own to show — so dismiss it here.
       this.resetWorkflowState();
       this.cms.events.dispatch({ type: 'media:workflow:finish' });
       throw err;
     }
+
+    // finalizeMediaWorkflow reports failures through `media:workflow:error`
+    // rather than throwing, and skips the post-catalogue step when it fails.
+    // An unresolved entry is therefore the only signal we have that the
+    // workflow did not complete, and we must not report success without it.
+    //
+    // This check sits outside the block above on purpose: dispatching
+    // `media:workflow:finish` here would return the overlay to idle and hide
+    // the workflow error it is already showing.
+    if (!renamed) {
+      throw new MediaRenameError({
+        code: 'BACKEND_FAILURE',
+        message:
+          'The rename was staged but the branch workflow did not complete. ' +
+          'Check the branch in TinaCloud before trying again.',
+      });
+    }
+    return renamed;
   }
 
   private async prepareRenameBranch(
