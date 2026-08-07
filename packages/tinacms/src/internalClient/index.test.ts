@@ -888,4 +888,288 @@ describe('Tina Client', () => {
       await rejection;
     });
   });
+
+  describe('startMediaEditorialWorkflow', () => {
+    let client: Client;
+    let fetchWithToken: ReturnType<typeof vi.fn>;
+
+    beforeEach(() => {
+      client = buildClient({ clientId: 'client-id' });
+      fetchWithToken = vi.fn();
+      client.authProvider = { fetchWithToken } as any;
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('posts a rename with the source as repoPath and the target as targetRepoPath', async () => {
+      fetchWithToken.mockResolvedValueOnce(
+        makeResponse({
+          status: 202,
+          body: {
+            branchName: 'tina/media-rename-uploads-a-png',
+            requestId: 'workflow-1',
+            status: 'queued',
+          },
+        })
+      );
+
+      await client.startMediaEditorialWorkflow({
+        branchName: 'tina/media-rename-Uploads A.PNG',
+        baseBranch: 'main',
+        operation: 'rename',
+        repoPath: 'uploads/A.PNG',
+        targetRepoPath: 'uploads/b.png',
+      });
+
+      const [url, init] = fetchWithToken.mock.calls[0];
+      expect(url).toBe(
+        'https://content.tinajs.io/editorial-workflow/client-id/media'
+      );
+      expect(init.method).toBe('POST');
+      expect(JSON.parse(init.body)).toEqual({
+        branchName: 'tina/media-rename-Uploads A.PNG',
+        baseBranch: 'main',
+        operation: 'rename',
+        repoPath: 'uploads/A.PNG',
+        targetRepoPath: 'uploads/b.png',
+      });
+    });
+
+    it('returns the server-formatted branchName and requestId unchanged', async () => {
+      fetchWithToken.mockResolvedValueOnce(
+        makeResponse({
+          status: 202,
+          body: {
+            branchName: 'tina/media-rename-uploads-a-png',
+            requestId: 'workflow-1',
+            status: 'queued',
+          },
+        })
+      );
+
+      const result = await client.startMediaEditorialWorkflow({
+        branchName: 'tina/media-rename-Uploads A.PNG',
+        baseBranch: 'main',
+        operation: 'rename',
+        repoPath: 'uploads/A.PNG',
+        targetRepoPath: 'uploads/b.png',
+      });
+
+      expect(result).toEqual({
+        branchName: 'tina/media-rename-uploads-a-png',
+        requestId: 'workflow-1',
+        status: 'queued',
+      });
+    });
+
+    it('still posts an upload without a targetRepoPath', async () => {
+      fetchWithToken.mockResolvedValueOnce(
+        makeResponse({
+          status: 202,
+          body: { branchName: 'tina/media-upload-x', requestId: 'workflow-2' },
+        })
+      );
+
+      await client.startMediaEditorialWorkflow({
+        branchName: 'tina/media-upload-x',
+        baseBranch: 'main',
+        operation: 'upload',
+        repoPath: 'uploads/x.png',
+      });
+
+      const body = JSON.parse(fetchWithToken.mock.calls[0][1].body);
+      expect(body).toEqual({
+        branchName: 'tina/media-upload-x',
+        baseBranch: 'main',
+        operation: 'upload',
+        repoPath: 'uploads/x.png',
+      });
+      expect('targetRepoPath' in body).toBe(false);
+    });
+  });
+
+  describe('project metadata', () => {
+    let client: Client;
+    let fetchWithToken: ReturnType<typeof vi.fn>;
+
+    const projectResponse = (body: Record<string, unknown>) =>
+      makeResponse({ status: 200, body });
+
+    beforeEach(() => {
+      client = buildClient();
+      fetchWithToken = vi.fn();
+      client.authProvider = { fetchWithToken } as any;
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('getProject caches mediaBranch on the client', async () => {
+      fetchWithToken.mockResolvedValueOnce(
+        projectResponse({ mediaBranch: 'main', protectedBranches: ['main'] })
+      );
+
+      expect(client.mediaBranch).toBeUndefined();
+      await client.getProject();
+      expect(client.mediaBranch).toBe('main');
+    });
+
+    it('ensureProjectMeta skips the request once mediaBranch is known', async () => {
+      fetchWithToken.mockResolvedValueOnce(
+        projectResponse({ mediaBranch: 'main' })
+      );
+
+      await client.ensureProjectMeta();
+      await client.ensureProjectMeta();
+      await client.ensureProjectMeta();
+
+      expect(fetchWithToken).toHaveBeenCalledTimes(1);
+    });
+
+    it('ensureProjectMeta dedupes concurrent callers into one request', async () => {
+      let resolveFetch = (_value: unknown) => {};
+      fetchWithToken.mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveFetch = resolve;
+        })
+      );
+
+      const inFlight = Promise.all([
+        client.ensureProjectMeta(),
+        client.ensureProjectMeta(),
+        client.ensureProjectMeta(),
+      ]);
+      resolveFetch(projectResponse({ mediaBranch: 'main' }));
+      await inFlight;
+
+      expect(fetchWithToken).toHaveBeenCalledTimes(1);
+      expect(client.mediaBranch).toBe('main');
+    });
+
+    it('ensureProjectMeta resolves and stays retryable when the request fails', async () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      fetchWithToken.mockRejectedValueOnce(new Error('network down'));
+
+      await expect(client.ensureProjectMeta()).resolves.toBeUndefined();
+      expect(client.mediaBranch).toBeUndefined();
+      expect(errorSpy).toHaveBeenCalled();
+
+      fetchWithToken.mockResolvedValueOnce(
+        projectResponse({ mediaBranch: 'main' })
+      );
+      await client.ensureProjectMeta();
+      expect(client.mediaBranch).toBe('main');
+    });
+
+    it('ensureProjectMeta is a no-op in local mode', async () => {
+      const localClient = new LocalClient();
+      const localFetch = vi.fn();
+      localClient.authProvider = { fetchWithToken: localFetch } as any;
+
+      await localClient.ensureProjectMeta();
+
+      expect(localFetch).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('usingProtectedMediaBranch', () => {
+    const buildFor = ({
+      branch,
+      mediaBranch,
+      protectedBranches,
+      usingEditorialWorkflow,
+    }: {
+      branch: string;
+      mediaBranch?: string;
+      protectedBranches: string[];
+      usingEditorialWorkflow: boolean;
+    }) => {
+      const client = buildClient({ branch });
+      client.mediaBranch = mediaBranch;
+      client.protectedBranches = protectedBranches;
+      client.usingEditorialWorkflow = usingEditorialWorkflow;
+      return client;
+    };
+
+    it.each([
+      {
+        name: 'protected media branch with editorial workflow',
+        branch: 'main',
+        mediaBranch: 'main',
+        protectedBranches: ['main'],
+        usingEditorialWorkflow: true,
+        expected: true,
+      },
+      {
+        name: 'protected media branch without editorial workflow',
+        branch: 'main',
+        mediaBranch: 'main',
+        protectedBranches: ['main'],
+        usingEditorialWorkflow: false,
+        expected: false,
+      },
+      {
+        name: 'unprotected media branch',
+        branch: 'main',
+        mediaBranch: 'main',
+        protectedBranches: [],
+        usingEditorialWorkflow: true,
+        expected: false,
+      },
+      {
+        name: 'protected feature branch',
+        branch: 'develop',
+        mediaBranch: 'main',
+        protectedBranches: ['main', 'develop'],
+        usingEditorialWorkflow: true,
+        expected: false,
+      },
+      {
+        name: 'unprotected feature branch',
+        branch: 'feat/x',
+        mediaBranch: 'main',
+        protectedBranches: ['main'],
+        usingEditorialWorkflow: true,
+        expected: false,
+      },
+      {
+        name: 'media branch unknown',
+        branch: 'main',
+        mediaBranch: undefined,
+        protectedBranches: ['main'],
+        usingEditorialWorkflow: true,
+        expected: false,
+      },
+    ])('$name → $expected', ({ expected, ...config }) => {
+      expect(buildFor(config).usingProtectedMediaBranch()).toBe(expected);
+    });
+
+    it('compares the decoded branch name', () => {
+      const client = buildFor({
+        branch: 'feat/media',
+        mediaBranch: 'feat/media',
+        protectedBranches: ['feat/media'],
+        usingEditorialWorkflow: true,
+      });
+
+      // setBranch stores the branch URL-encoded.
+      expect(client.branch).toBe('feat%2Fmedia');
+      expect(client.usingProtectedMediaBranch()).toBe(true);
+    });
+
+    it('does not change usingProtectedBranch for a protected feature branch', () => {
+      const client = buildFor({
+        branch: 'develop',
+        mediaBranch: 'main',
+        protectedBranches: ['develop'],
+        usingEditorialWorkflow: true,
+      });
+
+      expect(client.usingProtectedBranch()).toBe(true);
+      expect(client.usingProtectedMediaBranch()).toBe(false);
+    });
+  });
 });

@@ -116,6 +116,8 @@ export class Client {
   events = new EventBus(); // automatically hooked into global event bus when attached via cms.
   protectedBranches: string[] = [];
   usingEditorialWorkflow: boolean = false;
+  mediaBranch?: string;
+  private projectMetaPromise?: Promise<void>;
 
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
     this.tinaGraphQLVersion = options.tinaGraphQLVersion;
@@ -367,7 +369,32 @@ mutation addPendingDocumentMutation(
       }
     );
     const val = await res.json();
-    return val as TinaCloudProject;
+    const project = val as TinaCloudProject;
+    this.mediaBranch = project?.mediaBranch;
+    return project;
+  }
+
+  /**
+   * Makes sure project-derived metadata (currently `mediaBranch`) has been
+   * loaded, without issuing a request when something else in the session has
+   * already fetched the project.
+   *
+   * A failure is deliberately non-fatal: callers fall back to the branch state
+   * they already have and the API stays the final gate. The in-flight promise
+   * is cleared on failure so a later call can retry.
+   */
+  async ensureProjectMeta(): Promise<void> {
+    if (this.isLocalMode) return;
+    if (this.mediaBranch !== undefined) return;
+    if (!this.projectMetaPromise) {
+      this.projectMetaPromise = this.getProject()
+        .then(() => undefined)
+        .catch((error) => {
+          console.error('Failed to load TinaCloud project metadata.', error);
+          this.projectMetaPromise = undefined;
+        });
+    }
+    return this.projectMetaPromise;
   }
 
   async getRequestStatus(requestId: string): Promise<{
@@ -573,6 +600,25 @@ mutation addPendingDocumentMutation(
     return (
       this.usingEditorialWorkflow &&
       this.protectedBranches?.includes(decodeURIComponent(this.branch))
+    );
+  }
+
+  /**
+   * Whether the current branch is the *media* branch and protected — the only
+   * case where the assets API refuses a direct rename and requires the media
+   * editorial workflow.
+   *
+   * Distinct from {@link usingProtectedBranch} on purpose: a protected
+   * *feature* branch renames through the ordinary staging flow, so routing it
+   * into a workflow would create a branch nothing needs.
+   */
+  usingProtectedMediaBranch() {
+    const current = decodeURIComponent(this.branch || '');
+    return Boolean(
+      this.usingEditorialWorkflow &&
+        this.mediaBranch &&
+        current === this.mediaBranch &&
+        this.protectedBranches?.includes(current)
     );
   }
 
@@ -828,12 +874,23 @@ mutation addPendingDocumentMutation(
     }
   }
 
+  /**
+   * The server normalises `branchName` (lowercases it, replaces unsafe
+   * characters), so callers must use the `branchName` in the response for any
+   * follow-up call rather than the one they sent.
+   *
+   * `repoPath` is the asset the workflow concerns — for a rename, the source.
+   * `targetRepoPath` is the rename target and is required by the server for
+   * that operation; it must already be sanitised, since the route does not
+   * sanitise it.
+   */
   async startMediaEditorialWorkflow(options: {
     branchName: string;
     baseBranch: string;
     prTitle?: string;
-    operation: 'upload' | 'delete';
+    operation: 'upload' | 'delete' | 'rename';
     repoPath: string;
+    targetRepoPath?: string;
   }): Promise<{ branchName: string; requestId: string; status?: string }> {
     const url = `${this.contentApiBase}/editorial-workflow/${this.clientId}/media`;
     return await this.postEditorialWorkflow(
