@@ -58,7 +58,7 @@ const Playground = () => {
 
   const getToken = () => {
     const auth = JSON.parse(localStorage.getItem('tinacms-auth') || '{}');
-    return auth?.access_token || auth?.id_token;
+    return auth?.access_token ?? auth?.id_token;
   };
 
   if (!autoQueries) {

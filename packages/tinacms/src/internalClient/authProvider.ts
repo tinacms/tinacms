@@ -23,7 +23,7 @@ export abstract class AbstractAuthProvider implements AuthProvider {
   async fetchWithToken(input: Input, init: Init): FetchReturn {
     const headers = init?.headers || {};
     const token = await this.getToken();
-    const accessToken = token?.id_token ?? token?.access_token;
+    const accessToken = token?.access_token ?? token?.id_token;
     if (accessToken) {
       headers['Authorization'] = 'Bearer ' + accessToken;
     }
