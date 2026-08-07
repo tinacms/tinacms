@@ -36,6 +36,22 @@ type MediaBranchDecision =
   | { kind: 'cancelled' }
   | { kind: 'direct' };
 
+type MediaOpType = 'upload' | 'delete' | 'rename';
+
+interface MediaWorkflowRequest {
+  opType: MediaOpType;
+  /** The asset the workflow concerns; for a rename, the source. */
+  repoPath: string;
+  /** Rename only: the already-sanitised target. */
+  targetRepoPath?: string;
+  /**
+   * Whether the branch prompt may offer the direct "Save to Protected Branch"
+   * action. False only for a rename on a protected media branch, where the
+   * assets API rejects a direct write outright.
+   */
+  allowSaveToProtectedBranch: boolean;
+}
+
 const MEDIA_WORKFLOW_STEP = {
   BRANCH: 1,
   CONTENT: 2,
@@ -273,8 +289,7 @@ export class TinaMediaStore implements MediaStore {
   private requestMediaBranchChoice(
     branchName: string,
     baseBranch: string,
-    opType: 'upload' | 'delete',
-    repoPath: string
+    request: MediaWorkflowRequest
   ): Promise<MediaBranchDecision> {
     // The decision is driven entirely by the branch prompt rendered by
     // <MediaWorkflowOverlay />. We can't infer its presence from
@@ -296,12 +311,12 @@ export class TinaMediaStore implements MediaStore {
         type: 'media:workflow:confirm-branch',
         branchName,
         baseBranch,
+        allowSaveToProtectedBranch: request.allowSaveToProtectedBranch,
         onConfirm: async (selectedBranchName) => {
           const context = await this.prepareMediaBranch(
             selectedBranchName,
             baseBranch,
-            opType,
-            repoPath
+            request
           );
           resolve({
             kind: 'workflow',
@@ -317,8 +332,7 @@ export class TinaMediaStore implements MediaStore {
   private async prepareMediaBranch(
     branchName: string,
     baseBranch: string,
-    opType: 'upload' | 'delete',
-    repoPath: string
+    request: MediaWorkflowRequest
   ): Promise<MediaBranchContext> {
     if (this.mediaWorkflowInProgress) {
       throw new Error('A media workflow is already in progress.');
@@ -336,8 +350,11 @@ export class TinaMediaStore implements MediaStore {
         branchName,
         baseBranch,
         prTitle: getEditorialWorkflowPrTitle(branchName),
-        operation: opType,
-        repoPath,
+        operation: request.opType,
+        repoPath: request.repoPath,
+        ...(request.targetRepoPath
+          ? { targetRepoPath: request.targetRepoPath }
+          : {}),
       });
       const branchContext = {
         branchName: workflow.branchName || branchName,
@@ -448,12 +465,11 @@ export class TinaMediaStore implements MediaStore {
     const repoFilename =
       opType === 'upload' && filename ? sanitizeFilename(filename) : filename;
     const repoPath = this.joinMediaPath(directory, repoFilename);
-    return this.requestMediaBranchChoice(
-      branchName,
-      baseBranch,
+    return this.requestMediaBranchChoice(branchName, baseBranch, {
       opType,
-      repoPath
-    );
+      repoPath,
+      allowSaveToProtectedBranch: true,
+    });
   }
 
   private async waitForRequestStatus(
