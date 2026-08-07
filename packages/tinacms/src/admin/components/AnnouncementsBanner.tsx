@@ -1,8 +1,8 @@
 import { useCMS } from '@tinacms/toolkit';
-import React from 'react';
 import { Callout } from '@toolkit/react-sidebar/components/callout';
-import type { Announcement } from '../../internalClient';
+import React from 'react';
 import pkg from '../../../package.json';
+import type { Announcement } from '../../internalClient';
 
 const DISMISSED_KEY = 'tinacms-announcements-dismissed';
 
@@ -27,7 +27,21 @@ const severityToCalloutStyle: Record<string, 'info' | 'warning' | 'error'> = {
   critical: 'error',
 };
 
-export const AnnouncementsBanner = () => {
+type AnnouncementsContextValue = {
+  announcements: Announcement[] | null;
+  dismissed: string[];
+  dismiss: (id: string) => void;
+};
+
+const AnnouncementsContext = React.createContext<
+  AnnouncementsContextValue | undefined
+>(undefined);
+
+export const AnnouncementsProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const cms = useCMS();
   const [announcements, setAnnouncements] = React.useState<
     Announcement[] | null
@@ -45,6 +59,51 @@ export const AnnouncementsBanner = () => {
     };
     fetchAnnouncements();
   }, [cms.api.tina]);
+
+  const dismiss = (id: string) => {
+    addDismissed(id);
+    setDismissed(getDismissed());
+  };
+
+  return (
+    <AnnouncementsContext.Provider
+      value={{ announcements, dismissed, dismiss }}
+    >
+      {children}
+    </AnnouncementsContext.Provider>
+  );
+};
+
+export const AnnouncementsBanner = () => {
+  const ctx = React.useContext(AnnouncementsContext);
+  const [localAnnouncements, setLocalAnnouncements] = React.useState<
+    Announcement[] | null
+  >(null);
+  const [localDismissed, setLocalDismissed] =
+    React.useState<string[]>(getDismissed);
+  const cms = useCMS();
+
+  const announcements = ctx?.announcements ?? localAnnouncements;
+  const dismissed = ctx?.dismissed ?? localDismissed;
+  const dismiss =
+    ctx?.dismiss ??
+    ((id: string) => {
+      addDismissed(id);
+      setLocalDismissed(getDismissed());
+    });
+
+  React.useEffect(() => {
+    if (ctx) return;
+    const fetchAnnouncements = async () => {
+      try {
+        const result = await cms.api.tina.getAnnouncements(pkg.version);
+        setLocalAnnouncements(result);
+      } catch (err) {
+        console.error('failed to fetch announcements', err);
+      }
+    };
+    fetchAnnouncements();
+  }, [ctx, cms.api.tina]);
 
   if (!announcements || announcements.length === 0) return null;
 
@@ -67,10 +126,7 @@ export const AnnouncementsBanner = () => {
               <span className='font-bold'>{a.headline}</span>
               {a.severity !== 'critical' ? (
                 <button
-                  onClick={() => {
-                    addDismissed(a.id);
-                    setDismissed(getDismissed());
-                  }}
+                  onClick={() => dismiss(a.id)}
                   className='flex-shrink-0 text-gray-400 hover:text-gray-600 text-lg leading-none'
                   aria-label='Dismiss'
                 >

@@ -1,3 +1,4 @@
+import { ERR_NOT_INDEXED } from '@tinacms/schema-tools';
 import {
   Button,
   Modal,
@@ -9,7 +10,6 @@ import {
   TinaCMS,
   useCMS,
 } from '@tinacms/toolkit';
-import { ERR_NOT_INDEXED } from '@tinacms/schema-tools';
 import React, { useState, useEffect } from 'react';
 import {
   Route,
@@ -19,9 +19,9 @@ import {
   useParams,
 } from 'react-router-dom';
 
+import Sidebar from './components/AdminNav';
 import GetCMS from './components/GetCMS';
 import Layout from './components/Layout';
-import Sidebar from './components/AdminNav';
 
 import CollectionCreatePage from './pages/CollectionCreatePage';
 import CollectionDuplicatePage from './pages/CollectionDuplicatePage';
@@ -30,15 +30,18 @@ import CollectionUpdatePage from './pages/CollectionUpdatePage';
 import DashboardPage from './pages/DashboardPage';
 import ScreenPage from './pages/ScreenPage';
 
-import { Client, TinaCloudAuthProvider } from '../internalClient';
-import { TinaAdminApi } from './api';
-import { AnnouncementsBanner } from './components/AnnouncementsBanner';
-import {
-  initializePostHog,
-  TinaCMSStartedEvent,
-  TelemetryMode,
-} from '../lib/posthog';
 import pkg from '../../package.json';
+import { Client, TinaCloudAuthProvider } from '../internalClient';
+import {
+  TelemetryMode,
+  TinaCMSStartedEvent,
+  initializePostHog,
+} from '../lib/posthog';
+import { TinaAdminApi } from './api';
+import {
+  AnnouncementsBanner,
+  AnnouncementsProvider,
+} from './components/AnnouncementsBanner';
 
 type AuthType = 'tinacloud' | 'self-hosted' | 'local' | 'other';
 
@@ -315,7 +318,7 @@ export const TinaAdmin = ({
             });
           const hasRouter = Boolean(collectionWithRouter);
           return (
-            <>
+            <AnnouncementsProvider>
               <PostHogTracker cms={cms} />
               <CheckSchema schemaJson={schemaJson}>
                 <Router>
@@ -425,7 +428,7 @@ export const TinaAdmin = ({
                   </Routes>
                 </Router>
               </CheckSchema>
-            </>
+            </AnnouncementsProvider>
           );
         } else {
           return (
