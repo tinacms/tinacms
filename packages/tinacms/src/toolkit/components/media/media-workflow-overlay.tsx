@@ -25,6 +25,7 @@ type WorkflowState =
       baseBranch: string;
       errorMessage?: string;
       isChecking?: boolean;
+      allowSaveToProtectedBranch: boolean;
       onConfirm: (branchName: string) => Promise<void>;
       onCancel: () => void;
       onSaveToProtectedBranch: () => void;
@@ -53,6 +54,8 @@ export const MediaWorkflowOverlay = () => {
           phase: 'confirming',
           branchName: event.branchName,
           baseBranch: event.baseBranch,
+          allowSaveToProtectedBranch:
+            event.allowSaveToProtectedBranch !== false,
           onConfirm: event.onConfirm,
           onCancel: event.onCancel,
           onSaveToProtectedBranch: event.onSaveToProtectedBranch,
@@ -206,6 +209,7 @@ export const MediaWorkflowOverlay = () => {
           );
         }}
         onCreateBranch={handleCreateBranch}
+        allowSaveToProtectedBranch={state.allowSaveToProtectedBranch}
         onSaveToProtectedBranch={() => {
           abortPreflight();
           state.onSaveToProtectedBranch();
