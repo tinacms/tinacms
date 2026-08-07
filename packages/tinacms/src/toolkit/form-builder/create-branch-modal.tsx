@@ -211,6 +211,7 @@ export const CreateBranchPromptModal = ({
   onSaveToProtectedBranch,
   showSaveOptions = false,
   disablePublish = false,
+  allowSaveToProtectedBranch = true,
 }: {
   branchName: string;
   close: () => void;
@@ -224,6 +225,10 @@ export const CreateBranchPromptModal = ({
   showSaveOptions?: boolean;
   // Disable "Save and publish" (direct commit) on protected branches, w/ tooltip.
   disablePublish?: boolean;
+  // Media workflow only: drop "Save to Protected Branch" entirely when the
+  // direct write it performs cannot succeed. Offering a control that always
+  // errors is worse than not offering it.
+  allowSaveToProtectedBranch?: boolean;
 }) => {
   // Remember the editor's last save choice; the main button reflects it
   // (default "Save draft"), the caret menu offers the others.
@@ -346,7 +351,7 @@ export const CreateBranchPromptModal = ({
               <MainIcon className='w-4 h-4 mr-1' style={{ fill: 'none' }} />
               {mainChoice.label}
             </DropdownButton>
-          ) : (
+          ) : allowSaveToProtectedBranch ? (
             <DropdownButton
               variant='primary'
               align='start'
@@ -367,6 +372,20 @@ export const CreateBranchPromptModal = ({
               />
               Save to a new branch
             </DropdownButton>
+          ) : (
+            // A dropdown whose only item is gone would open an empty menu.
+            <Button
+              variant='primary'
+              className='w-full sm:w-auto'
+              disabled={disabled}
+              onClick={() => onCreateBranch(false)}
+            >
+              <GitBranchIcon
+                className='w-4 h-4 mr-1'
+                style={{ fill: 'none' }}
+              />
+              Save to a new branch
+            </Button>
           )}
         </ModalActions>
       </PopupModal>
