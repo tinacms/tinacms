@@ -21,16 +21,17 @@ import {
   Client,
   LocalSearchClient,
   TinaCMSSearchClient,
+  TinaCloudAuthProvider,
   TinaIOConfig,
 } from '../internalClient';
-import { CreateClientProps, createClient } from '../utils';
-import {
-  useTinaAuthRedirect,
-  type AuthRedirectParams,
-} from './useTinaAuthRedirect';
-import { AuthenticationCancelledError } from './authenticate';
-import { captureEvent } from '../lib/posthog/posthogProvider';
 import { BranchSwitchedEvent } from '../lib/posthog/posthog';
+import { captureEvent } from '../lib/posthog/posthogProvider';
+import { CreateClientProps, createClient } from '../utils';
+import { AuthenticationCancelledError } from './authenticate';
+import {
+  type AuthRedirectParams,
+  useTinaAuthRedirect,
+} from './useTinaAuthRedirect';
 
 type ModalNames = null | 'authenticate' | 'error';
 
@@ -357,18 +358,6 @@ export const TinaCloudProvider = (
     baseBranch
   );
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const authRedirectParams: AuthRedirectParams = {
-    code: urlParams.get('code'),
-    state: urlParams.get('state'),
-    error: urlParams.get('error'),
-  };
-
-  const isAuthRedirect = !!(
-    authRedirectParams.code && authRedirectParams.state
-  );
-  useTinaAuthRedirect(authRedirectParams);
-
   const cms = React.useMemo(
     () =>
       props.cms ||
@@ -465,6 +454,17 @@ export const TinaCloudProvider = (
   const isTinaCloud =
     !client.isLocalMode &&
     !client.schema?.config?.config?.contentApiUrlOverride;
+  const isTinaCloudAuth = client.authProvider instanceof TinaCloudAuthProvider;
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const authRedirectParams: AuthRedirectParams = {
+    code: urlParams.get('code'),
+    state: urlParams.get('state'),
+    error: urlParams.get('error'),
+  };
+  const isAuthRedirect =
+    isTinaCloudAuth && !!(authRedirectParams.code && authRedirectParams.state);
+  useTinaAuthRedirect(authRedirectParams, isTinaCloudAuth);
   const SessionProvider = client.authProvider.getSessionProvider();
 
   const handleListBranches = async (): Promise<Branch[]> => {

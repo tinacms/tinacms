@@ -7,10 +7,17 @@ export interface AuthRedirectParams {
   error: string | null;
 }
 
-export const useTinaAuthRedirect = (params: AuthRedirectParams) => {
+export const useTinaAuthRedirect = (
+  params: AuthRedirectParams,
+  enabled = true
+) => {
   const { code, state, error } = params;
 
   useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
     if (error) {
       console.error('Auth error:', error);
       window.history.replaceState({}, '', window.location.pathname);
@@ -78,5 +85,5 @@ export const useTinaAuthRedirect = (params: AuthRedirectParams) => {
         localStorage.removeItem(PKCE_STORAGE_KEY);
         window.history.replaceState({}, '', window.location.pathname);
       });
-  }, [code, state, error]);
+  }, [code, state, error, enabled]);
 };
