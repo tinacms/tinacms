@@ -20,7 +20,7 @@ function FieldWrapper({
 }: FieldWrapperProps) {
   return (
     <div data-slot='field-wrapper' className={cn('grid gap-1.5', className)}>
-      {label && <Label htmlFor={htmlFor}>{label}</Label>}
+      {label ? <Label htmlFor={htmlFor}>{label}</Label> : null}
       {children}
       {errors.map((error) => (
         <span key={error} role='alert' className='text-sm text-destructive'>

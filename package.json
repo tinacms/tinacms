@@ -30,7 +30,7 @@
 		"publish:beta": "pnpm publish -r --tag beta --no-git-checks --access public",
 		"publish:dev": "pnpm publish -r --tag dev --no-git-checks --access public",
 		"push-tags": "pnpm exec changeset tag && git pull && git push --follow-tags",
-		"lint": "biome lint ./packages ./examples",
+		"lint": "biome lint ./packages ./examples && node ./scripts/check-conventions.mjs",
 		"format": "biome format --write ./packages/ ./examples/"
 	},
 	"devDependencies": {
