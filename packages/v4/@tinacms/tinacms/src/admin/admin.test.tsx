@@ -411,6 +411,18 @@ describe('TinaAdmin content reads', () => {
     failing.mockRestore();
   });
 
+  it('reports a document it cannot read', async () => {
+    const failing = vi
+      .spyOn(provider, 'get')
+      .mockRejectedValueOnce(new Error('could not be parsed'));
+    window.location.hash = '#/collections/post/content%2Fposts%2Fhello.mdx';
+    renderAdmin();
+
+    const message = await screen.findByText(/Cannot read/);
+    expect(message).toHaveTextContent('could not be parsed');
+    failing.mockRestore();
+  });
+
   it('shows a save in the document list without re-reading the collection', async () => {
     const user = userEvent.setup();
     renderAdmin();

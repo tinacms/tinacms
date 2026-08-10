@@ -9,9 +9,6 @@ export interface DocumentSummary {
 
 export interface DocumentEntry extends DocumentSummary {
   document: TinaDocument;
-  // Set when the file exists but does not parse. `document` is then empty, so a
-  // consumer must not write it back — `update` rejects the save anyway.
-  error?: string;
 }
 
 export interface ContentProvider {

@@ -110,24 +110,17 @@ function DocumentMenu({
   }
   return (
     <SidebarMenu aria-label={`${label} documents`}>
-      {documents.map(({ path, error }) => (
+      {documents.map(({ path }) => (
         <SidebarMenuItem key={path}>
           <SidebarMenuButton
             isActive={path === activePath}
             aria-label={documentName(path)}
-            title={error}
             onClick={() =>
               navigate({ view: 'document', collection: collection.name, path })
             }
           >
             <span className='flex-1 truncate'>{documentName(path)}</span>
-            {error ? (
-              <span role='alert' className='text-destructive text-xs'>
-                Cannot read
-              </span>
-            ) : (
-              <FormStatusBadge formId={toFormId(path)} />
-            )}
+            <FormStatusBadge formId={toFormId(path)} />
           </SidebarMenuButton>
         </SidebarMenuItem>
       ))}
@@ -390,6 +383,19 @@ function AdminShell({ preview }: { preview?: ReactNode }) {
           </div>
           <div className='min-h-0 flex-1 overflow-y-auto'>
             <Placeholder>No document named “{openPath}”.</Placeholder>
+          </div>
+        </SidebarInset>
+      ) : openPath !== undefined && openDocumentError !== null ? (
+        <SidebarInset>
+          <div className='flex items-center gap-1 p-4 pb-2'>
+            <SidebarTrigger />
+          </div>
+          <div className='min-h-0 flex-1 overflow-y-auto'>
+            <Placeholder>
+              <span role='alert'>
+                Cannot read “{openPath}”. {openDocumentError.message}
+              </span>
+            </Placeholder>
           </div>
         </SidebarInset>
       ) : (
