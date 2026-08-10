@@ -84,6 +84,17 @@ describe('list', () => {
     ).rejects.toThrow();
   });
 
+  it('refuses to save over a document it cannot parse', async () => {
+    await fs.writeFile(
+      path.join(rootDir, 'content/posts/broken.mdx'),
+      '---\ntitle: [unclosed\n---\n'
+    );
+    const [broken] = await dataLayer.list('post');
+    await expect(
+      dataLayer.update('post', broken.path, { title: 'Replacement' })
+    ).rejects.toThrow(/could not be parsed/);
+  });
+
   it('excludes a directory named *.mdx without a warning', async () => {
     await fs.mkdir(path.join(rootDir, 'content/posts/folder.mdx'));
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
