@@ -36,5 +36,6 @@ export type {
   BooleanFieldSchema,
   DatetimeFieldSchema,
   NumberFieldSchema,
+  RichTextFieldSchema,
   StringFieldSchema,
 } from './plugins/fields';
