@@ -47,8 +47,8 @@ interface MediaWorkflowRequest {
   targetRepoPath?: string;
   /**
    * Whether the branch prompt may offer the direct "Save to Protected Branch"
-   * action. False only for a rename on a protected media branch, where the
-   * assets API rejects a direct write outright.
+   * action. False for a rename on any protected branch, which must go through
+   * the workflow; uploads and deletes still offer it.
    */
   allowSaveToProtectedBranch: boolean;
 }
@@ -850,10 +850,6 @@ export class TinaMediaStore implements MediaStore {
       });
     }
 
-    // Best effort: without it we take the direct path and the assets API
-    // stays the final gate on a protected media branch.
-    await this.api.ensureProjectMeta();
-
     const decision = await this.prepareRenameBranch(from, to);
     if (decision.kind === 'cancelled') {
       throw new MediaRenameCancelled();
@@ -969,7 +965,7 @@ export class TinaMediaStore implements MediaStore {
     from: string,
     to: string
   ): Promise<MediaBranchDecision> {
-    if (!this.api.usingProtectedMediaBranch()) return { kind: 'direct' };
+    if (!this.api.usingProtectedBranch()) return { kind: 'direct' };
 
     const baseBranch = decodeURIComponent(this.api.branch || '');
     const { directory, filename } = this.splitMediaPath(from);
@@ -984,7 +980,8 @@ export class TinaMediaStore implements MediaStore {
       // re-sanitising could move off for legacy or externally added files.
       repoPath: from,
       targetRepoPath: to,
-      // A direct write to a protected media branch is always rejected.
+      // Renames on a protected branch always go through the workflow, so the
+      // direct action is not offered — unlike upload and delete, which keep it.
       allowSaveToProtectedBranch: false,
     });
   }

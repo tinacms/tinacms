@@ -25,8 +25,6 @@ type TinaApiMock = {
   isCustomContentApi: boolean;
   mediaBranch?: string;
   getProject: ReturnType<typeof vi.fn>;
-  ensureProjectMeta: ReturnType<typeof vi.fn>;
-  usingProtectedMediaBranch: ReturnType<typeof vi.fn>;
   authProvider: {
     fetchWithToken: FetchWithTokenMock;
     isAuthenticated: ReturnType<typeof vi.fn>;
@@ -68,7 +66,6 @@ const buildStore = ({
   contentApiUrl = 'https://content.tinajs.io/1.1/content/test-client/github/main',
   authenticated = true,
   usingProtectedBranch = false,
-  usingProtectedMediaBranch = false,
   mediaBranch,
   createBranch,
   createPullRequest,
@@ -83,7 +80,6 @@ const buildStore = ({
   contentApiUrl?: string;
   authenticated?: boolean;
   usingProtectedBranch?: boolean;
-  usingProtectedMediaBranch?: boolean;
   mediaBranch?: string;
   createBranch?: ReturnType<typeof vi.fn>;
   createPullRequest?: ReturnType<typeof vi.fn>;
@@ -111,11 +107,7 @@ const buildStore = ({
     schema: { schema: { config: { media: { tina: {} } } } },
     mediaBranch,
     getProject: vi.fn().mockResolvedValue({ mediaBranch }),
-    ensureProjectMeta: vi.fn().mockResolvedValue(undefined),
     usingProtectedBranch: vi.fn().mockReturnValue(usingProtectedBranch),
-    usingProtectedMediaBranch: vi
-      .fn()
-      .mockReturnValue(usingProtectedMediaBranch),
     createBranch:
       createBranch ??
       vi.fn().mockImplementation(async ({ branchName }) => {
@@ -2202,13 +2194,13 @@ describe('TinaMediaStore — cloud rename routing', () => {
     const { store, startMediaEditorialWorkflow, api } = buildRoutingStore({
       branch: 'feat/x',
       mediaBranch: 'main',
-      usingProtectedMediaBranch: false,
+      usingProtectedBranch: false,
     });
 
     await runRename(store);
 
     expect(startMediaEditorialWorkflow).not.toHaveBeenCalled();
-    expect(api.usingProtectedMediaBranch).toHaveBeenCalled();
+    expect(api.usingProtectedBranch).toHaveBeenCalled();
   });
 
   it('renames directly on an unprotected media branch', async () => {
@@ -2216,7 +2208,7 @@ describe('TinaMediaStore — cloud rename routing', () => {
       buildRoutingStore({
         branch: 'main',
         mediaBranch: 'main',
-        usingProtectedMediaBranch: false,
+        usingProtectedBranch: false,
       });
 
     await runRename(store);
@@ -2230,22 +2222,33 @@ describe('TinaMediaStore — cloud rename routing', () => {
     expect(renameBody.branch).toBe('main');
   });
 
-  it('renames directly on a protected feature branch, without a new workflow', async () => {
-    // The regression the rename-specific predicate exists to prevent: a
-    // protected feature branch stages like any other branch.
-    const { store, startMediaEditorialWorkflow, events } = buildRoutingStore({
-      branch: 'develop',
-      mediaBranch: 'main',
-      usingProtectedBranch: true,
-      usingProtectedMediaBranch: false,
-    });
+  it('routes a protected feature branch through the editorial workflow', async () => {
+    const { store, startMediaEditorialWorkflow, events, fetchWithToken } =
+      buildRoutingStore({
+        branch: 'release',
+        mediaBranch: 'main',
+        usingProtectedBranch: true,
+      });
     const prompted = vi.fn();
     events.subscribe('media:workflow:confirm-branch', prompted);
 
     await runRename(store);
 
-    expect(startMediaEditorialWorkflow).not.toHaveBeenCalled();
-    expect(prompted).not.toHaveBeenCalled();
+    expect(prompted).toHaveBeenCalledTimes(1);
+    expect(startMediaEditorialWorkflow).toHaveBeenCalledTimes(1);
+    // The workflow branches off the branch the editor is on, not the media branch.
+    expect(startMediaEditorialWorkflow.mock.calls[0][0]).toMatchObject({
+      baseBranch: 'release',
+      operation: 'rename',
+    });
+    // Nothing is written before the workflow exists.
+    const renameCallIndex = fetchWithToken.mock.calls.findIndex(([url]) =>
+      String(url).includes('/rename')
+    );
+    expect(renameCallIndex).toBeGreaterThan(-1);
+    expect(
+      startMediaEditorialWorkflow.mock.invocationCallOrder[0]
+    ).toBeLessThan(fetchWithToken.mock.invocationCallOrder[renameCallIndex]);
   });
 
   it('routes a protected media branch through the editorial workflow', async () => {
@@ -2253,22 +2256,25 @@ describe('TinaMediaStore — cloud rename routing', () => {
       branch: 'main',
       mediaBranch: 'main',
       usingProtectedBranch: true,
-      usingProtectedMediaBranch: true,
     });
 
     await runRename(store);
 
     expect(startMediaEditorialWorkflow).toHaveBeenCalledTimes(1);
+    expect(startMediaEditorialWorkflow.mock.calls[0][0]).toMatchObject({
+      baseBranch: 'main',
+      operation: 'rename',
+    });
   });
 
   it('renames directly when editorial workflow is unavailable, letting the API decide', async () => {
-    // usingProtectedMediaBranch() is false without the feature, so the call
-    // goes through and the assets API returns its own UNSUPPORTED message.
+    // usingProtectedBranch() is false without the feature, so the call goes
+    // through and the assets API returns its own UNSUPPORTED message.
     const { store, startMediaEditorialWorkflow, fetchWithToken } =
       buildRoutingStore({
         branch: 'main',
         mediaBranch: 'main',
-        usingProtectedMediaBranch: false,
+        usingProtectedBranch: false,
       });
     fetchWithToken.mockImplementation((url: string) =>
       Promise.resolve(
@@ -2289,17 +2295,16 @@ describe('TinaMediaStore — cloud rename routing', () => {
     expect(error.message).toContain('requires the editorial workflow');
   });
 
-  it('does not fetch project metadata again once it is cached', async () => {
+  it('does not fetch project metadata to decide the route', async () => {
     const { store, api } = buildRoutingStore({ mediaBranch: 'main' });
 
     await runRename(store);
 
-    expect(api.ensureProjectMeta).toHaveBeenCalled();
     expect(api.getProject).not.toHaveBeenCalled();
   });
 });
 
-describe('TinaMediaStore — cloud rename (protected media workflow)', () => {
+describe('TinaMediaStore — cloud rename (protected-branch workflow)', () => {
   const WORKFLOW_BRANCH = 'tina/media-rename-uploads-old-png';
 
   beforeEach(() => {
@@ -2321,7 +2326,6 @@ describe('TinaMediaStore — cloud rename (protected media workflow)', () => {
       branch: 'main',
       mediaBranch: 'main',
       usingProtectedBranch: true,
-      usingProtectedMediaBranch: true,
       ...options,
     });
     const listQueue = listResponses ? [...listResponses] : undefined;

@@ -990,7 +990,7 @@ describe('Tina Client', () => {
     });
   });
 
-  describe('project metadata', () => {
+  describe('getProject', () => {
     let client: Client;
     let fetchWithToken: ReturnType<typeof vi.fn>;
 
@@ -1007,88 +1007,30 @@ describe('Tina Client', () => {
       vi.restoreAllMocks();
     });
 
-    it('getProject caches mediaBranch on the client', async () => {
+    it('returns the project payload, including mediaBranch', async () => {
       fetchWithToken.mockResolvedValueOnce(
         projectResponse({ mediaBranch: 'main', protectedBranches: ['main'] })
       );
 
-      expect(client.mediaBranch).toBeUndefined();
-      await client.getProject();
-      expect(client.mediaBranch).toBe('main');
-    });
-
-    it('ensureProjectMeta skips the request once mediaBranch is known', async () => {
-      fetchWithToken.mockResolvedValueOnce(
-        projectResponse({ mediaBranch: 'main' })
-      );
-
-      await client.ensureProjectMeta();
-      await client.ensureProjectMeta();
-      await client.ensureProjectMeta();
+      const project = await client.getProject();
 
       expect(fetchWithToken).toHaveBeenCalledTimes(1);
-    });
-
-    it('ensureProjectMeta dedupes concurrent callers into one request', async () => {
-      let resolveFetch = (_value: unknown) => {};
-      fetchWithToken.mockReturnValueOnce(
-        new Promise((resolve) => {
-          resolveFetch = resolve;
-        })
-      );
-
-      const inFlight = Promise.all([
-        client.ensureProjectMeta(),
-        client.ensureProjectMeta(),
-        client.ensureProjectMeta(),
-      ]);
-      resolveFetch(projectResponse({ mediaBranch: 'main' }));
-      await inFlight;
-
-      expect(fetchWithToken).toHaveBeenCalledTimes(1);
-      expect(client.mediaBranch).toBe('main');
-    });
-
-    it('ensureProjectMeta resolves and stays retryable when the request fails', async () => {
-      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      fetchWithToken.mockRejectedValueOnce(new Error('network down'));
-
-      await expect(client.ensureProjectMeta()).resolves.toBeUndefined();
-      expect(client.mediaBranch).toBeUndefined();
-      expect(errorSpy).toHaveBeenCalled();
-
-      fetchWithToken.mockResolvedValueOnce(
-        projectResponse({ mediaBranch: 'main' })
-      );
-      await client.ensureProjectMeta();
-      expect(client.mediaBranch).toBe('main');
-    });
-
-    it('ensureProjectMeta is a no-op in local mode', async () => {
-      const localClient = new LocalClient();
-      const localFetch = vi.fn();
-      localClient.authProvider = { fetchWithToken: localFetch } as any;
-
-      await localClient.ensureProjectMeta();
-
-      expect(localFetch).not.toHaveBeenCalled();
+      expect(project.mediaBranch).toBe('main');
+      expect(project.protectedBranches).toEqual(['main']);
     });
   });
 
-  describe('usingProtectedMediaBranch', () => {
+  describe('usingProtectedBranch', () => {
     const buildFor = ({
       branch,
-      mediaBranch,
       protectedBranches,
       usingEditorialWorkflow,
     }: {
       branch: string;
-      mediaBranch?: string;
       protectedBranches: string[];
       usingEditorialWorkflow: boolean;
     }) => {
       const client = buildClient({ branch });
-      client.mediaBranch = mediaBranch;
       client.protectedBranches = protectedBranches;
       client.usingEditorialWorkflow = usingEditorialWorkflow;
       return client;
@@ -1098,15 +1040,20 @@ describe('Tina Client', () => {
       {
         name: 'protected media branch with editorial workflow',
         branch: 'main',
-        mediaBranch: 'main',
         protectedBranches: ['main'],
         usingEditorialWorkflow: true,
         expected: true,
       },
       {
-        name: 'protected media branch without editorial workflow',
+        name: 'protected feature branch with editorial workflow',
+        branch: 'release',
+        protectedBranches: ['main', 'release'],
+        usingEditorialWorkflow: true,
+        expected: true,
+      },
+      {
+        name: 'protected branch without editorial workflow',
         branch: 'main',
-        mediaBranch: 'main',
         protectedBranches: ['main'],
         usingEditorialWorkflow: false,
         expected: false,
@@ -1114,62 +1061,38 @@ describe('Tina Client', () => {
       {
         name: 'unprotected media branch',
         branch: 'main',
-        mediaBranch: 'main',
         protectedBranches: [],
-        usingEditorialWorkflow: true,
-        expected: false,
-      },
-      {
-        name: 'protected feature branch',
-        branch: 'develop',
-        mediaBranch: 'main',
-        protectedBranches: ['main', 'develop'],
         usingEditorialWorkflow: true,
         expected: false,
       },
       {
         name: 'unprotected feature branch',
         branch: 'feat/x',
-        mediaBranch: 'main',
         protectedBranches: ['main'],
         usingEditorialWorkflow: true,
         expected: false,
       },
       {
-        name: 'media branch unknown',
-        branch: 'main',
-        mediaBranch: undefined,
+        name: 'workflow branch',
+        branch: 'tina/media-rename-x',
         protectedBranches: ['main'],
         usingEditorialWorkflow: true,
         expected: false,
       },
     ])('$name → $expected', ({ expected, ...config }) => {
-      expect(buildFor(config).usingProtectedMediaBranch()).toBe(expected);
+      expect(buildFor(config).usingProtectedBranch()).toBe(expected);
     });
 
     it('compares the decoded branch name', () => {
       const client = buildFor({
         branch: 'feat/media',
-        mediaBranch: 'feat/media',
         protectedBranches: ['feat/media'],
         usingEditorialWorkflow: true,
       });
 
       // setBranch stores the branch URL-encoded.
       expect(client.branch).toBe('feat%2Fmedia');
-      expect(client.usingProtectedMediaBranch()).toBe(true);
-    });
-
-    it('does not change usingProtectedBranch for a protected feature branch', () => {
-      const client = buildFor({
-        branch: 'develop',
-        mediaBranch: 'main',
-        protectedBranches: ['develop'],
-        usingEditorialWorkflow: true,
-      });
-
       expect(client.usingProtectedBranch()).toBe(true);
-      expect(client.usingProtectedMediaBranch()).toBe(false);
     });
   });
 });
