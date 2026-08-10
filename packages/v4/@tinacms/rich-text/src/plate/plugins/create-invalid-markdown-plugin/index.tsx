@@ -9,12 +9,13 @@ export const ELEMENT_INVALID_MARKDOWN = INVALID_MARKDOWN_TYPE;
 
 export const createInvalidMarkdownPlugin = createPlatePlugin({
   key: ELEMENT_INVALID_MARKDOWN,
-  options: {
+  // Plate reads the behaviour of a node from `node`. Under `options` it takes
+  // the shape without complaint, registers no element, and the component below
+  // never mounts.
+  node: {
     isElement: true,
     isVoid: true,
     isInline: false,
-  },
-  node: {
     component: InvalidMarkdownElement,
   },
 });
@@ -35,7 +36,11 @@ function InvalidMarkdownElement({
 function ErrorMessage({ error }) {
   const message = buildErrorMessage(error);
   return (
-    <div contentEditable={false} className='bg-red-50 sm:rounded-lg'>
+    <div
+      role='alert'
+      contentEditable={false}
+      className='bg-red-50 sm:rounded-lg'
+    >
       <div className='px-4 py-5 sm:p-6'>
         <h3 className='text-lg leading-6 font-medium text-red-800'>
           ❌ Error parsing markdown

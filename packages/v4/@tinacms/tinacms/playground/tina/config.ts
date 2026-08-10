@@ -1,9 +1,9 @@
 import {
   type CollectionSchema,
   defineConfig,
+  definePlugin,
   localContentPlugin,
   t,
-  definePlugin,
 } from '@tinacms/tinacms';
 
 export const postCollection = {

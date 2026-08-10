@@ -15,13 +15,7 @@ export type Components<ComponentAndProps extends object> = RichTextComponents<
 
 type RichTextProps<CustomComponents extends { [key: string]: object }> = {
   content: TinaMarkdownContent | TinaMarkdownContent[];
-  components?:
-    | Components<{}>
-    | Components<{
-        [BK in keyof CustomComponents]: (
-          props: CustomComponents[BK]
-        ) => React.JSX.Element;
-      }>;
+  components?: Components<{}> | Components<CustomComponents>;
 };
 
 const reactHost: RichTextHost<React.ReactNode> = {
@@ -30,7 +24,7 @@ const reactHost: RichTextHost<React.ReactNode> = {
       ? React.createElement(tag, props)
       : React.createElement(tag, props, children),
   component: (component, props, children) => {
-    const Component = component as React.ComponentType<any>;
+    const Component = component as React.ComponentType<Record<string, unknown>>;
     return children === null ? (
       <Component {...props} />
     ) : (
@@ -45,7 +39,7 @@ const reactHost: RichTextHost<React.ReactNode> = {
       ))}
     </>
   ),
-  memo: (render, cacheKey) => <MemoNode render={render} cacheKey={cacheKey} />,
+  memo: (render, deps) => <MemoNode render={render} deps={deps} />,
 };
 
 const staticReactHost: RichTextHost<React.ReactNode> = {
@@ -53,32 +47,38 @@ const staticReactHost: RichTextHost<React.ReactNode> = {
   memo: undefined,
 };
 
+// A stable identity. An inline `{}` default makes a new object on each render,
+// and the memo in MemoNode then misses for every node.
+const NO_COMPONENTS: Components<{}> = {};
+
 export const TinaMarkdown = <
-  CustomComponents extends { [key: string]: object } = any,
+  CustomComponents extends { [key: string]: object },
 >({
   content,
-  components = {},
+  components = NO_COMPONENTS,
 }: RichTextProps<CustomComponents>) => (
   <>{renderRichText(content, components, reactHost)}</>
 );
 
 export const StaticTinaMarkdown = <
-  CustomComponents extends { [key: string]: object } = any,
+  CustomComponents extends { [key: string]: object },
 >({
   content,
-  components = {},
+  components = NO_COMPONENTS,
 }: RichTextProps<CustomComponents>) => (
   <>{renderRichText(content, components, staticReactHost)}</>
 );
 
-// FIXME: needs more testing with custom components. The memo stays by hand:
+// React compares the deps by reference. Do not compare them by value: a
+// structural key drops the component functions, and two different maps then
+// make the same key and the same stale output.
 const MemoNode = ({
   render,
-  cacheKey,
+  deps,
 }: {
   render: () => React.ReactNode;
-  cacheKey: unknown;
+  deps: readonly unknown[];
 }) => {
-  const node = React.useMemo(render, [JSON.stringify(cacheKey)]);
+  const node = React.useMemo(render, deps);
   return <>{node}</>;
 };

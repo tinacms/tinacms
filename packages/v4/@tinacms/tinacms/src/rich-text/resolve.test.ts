@@ -294,17 +294,29 @@ describe('tables', () => {
     expect(instruction.rows).toEqual([[]]);
   });
 
-  it('normalises a pipe table into the same shape', () => {
+  it('normalises a pipe table into the same shape, treating its first row as the header', () => {
     const instruction = resolveRichTextNode(
       node({
         type: 'table',
-        children: [{ type: 'tr', children: [{ type: 'td', children: [] }] }],
+        children: [
+          { type: 'tr', children: [{ type: 'td', children: [] }] },
+          { type: 'tr', children: [{ type: 'td', children: [] }] },
+        ],
       }),
       none
     ) as any;
     expect(instruction.source).toBe('gfm');
-    expect(instruction.header).toBeNull();
+    expect(instruction.header).toEqual([{ content: [] }]);
     expect(instruction.rows).toEqual([[{ content: [] }]]);
+  });
+
+  it('treats an empty pipe table as having no header', () => {
+    const instruction = resolveRichTextNode(
+      node({ type: 'table', children: [] }),
+      none
+    ) as any;
+    expect(instruction.header).toBeNull();
+    expect(instruction.rows).toEqual([]);
   });
 
   it('keeps a column position when its alignment is not one of the three keywords', () => {

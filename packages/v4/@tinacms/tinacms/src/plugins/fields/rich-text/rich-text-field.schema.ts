@@ -6,7 +6,11 @@ import type { BaseFieldSchema, FieldSchema } from '../../../core/schema/types';
 
 export const RICH_TEXT_FIELD_TYPE = 'rich-text';
 
-import type { RichTextCodec, RichTextValue } from './rich-text-codec';
+import type {
+  RichTextCodec,
+  RichTextNode,
+  RichTextValue,
+} from './rich-text-codec';
 
 export type {
   RichTextCodec,
@@ -45,6 +49,27 @@ export const isRichTextValue = (value: unknown): value is RichTextValue => {
 const isUnparsedMarkdown = (value: RichTextValue): boolean =>
   value.children[0]?.type === INVALID_MARKDOWN_TYPE;
 
+const isBlankText = (node: unknown): boolean => {
+  if (typeof node !== 'object' || node === null) return false;
+  const candidate = node as { type?: unknown; text?: unknown };
+  const isText = candidate.type === undefined || candidate.type === 'text';
+  return isText && candidate.text === '';
+};
+
+const isBlankParagraph = (node: RichTextNode): boolean => {
+  if (node.type !== 'p') return false;
+  if (!Array.isArray(node.children)) return true;
+  return (node.children as unknown[]).every(isBlankText);
+};
+
+/**
+ * Plate's trailing-block plugin puts one empty paragraph in every body. A
+ * length test on `children` therefore passes for a body the writer never
+ * typed in.
+ */
+const hasContent = (value: RichTextValue): boolean =>
+  value.children.some((node) => !isBlankParagraph(node));
+
 export const richTextSchema = (node: FieldSchema): ZodType => {
   const ast = z
     .custom<RichTextValue>(
@@ -55,10 +80,7 @@ export const richTextSchema = (node: FieldSchema): ZodType => {
   if (node.required) {
     return z.preprocess(
       (value) => value ?? { type: 'root', children: [] },
-      ast.refine(
-        (value) => value.children.length > 0,
-        `${labelOf(node)} is required`
-      )
+      ast.refine(hasContent, `${labelOf(node)} is required`)
     );
   }
   return z.preprocess(

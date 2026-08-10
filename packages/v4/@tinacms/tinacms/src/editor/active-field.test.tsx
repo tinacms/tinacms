@@ -7,8 +7,8 @@ import type { CollectionSchema } from '../core/schema/types';
 import { useFormStore } from '../form/form-store';
 import { t } from '../index';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
+import { LabelledFields } from '../test/labelled-fields';
 import {
-  Field,
   FormProvider,
   TinaProvider,
   toFieldAddress,
@@ -64,12 +64,12 @@ describe('active-field rail', () => {
           path='content/posts/active.mdx'
           document={{ title: 'Hi' }}
         >
-          <Field address='title' />
+          <LabelledFields />
           <ActivateProbe />
         </FormProvider>
       </TinaProvider>
     );
-    const input = await screen.findByLabelText('title');
+    const input = await screen.findByLabelText('Title');
     expect(input).not.toHaveFocus();
 
     await userEvent.click(screen.getByText('activate'));
@@ -89,12 +89,12 @@ describe('active-field rail', () => {
           path='content/posts/active.mdx'
           document={{ title: 'Hi' }}
         >
-          <Field address='title' />
+          <LabelledFields />
           <ActivateProbe />
         </FormProvider>
       </TinaProvider>
     );
-    const input = await screen.findByLabelText('title');
+    const input = await screen.findByLabelText('Title');
     await userEvent.click(screen.getByText('activate'));
     expect(input).toHaveFocus();
 
@@ -117,18 +117,17 @@ describe('active-field rail', () => {
           path='content/posts/active.mdx'
           document={{ title: 'Hi', summary: 'There' }}
         >
-          <Field address='title' />
-          <Field address='summary' />
+          <LabelledFields />
           <ActiveReadout />
         </FormProvider>
       </TinaProvider>
     );
     expect(await screen.findByTestId('active')).toHaveTextContent('none');
 
-    await userEvent.click(screen.getByLabelText('title'));
+    await userEvent.click(screen.getByLabelText('Title'));
     expect(screen.getByTestId('active')).toHaveTextContent('title');
 
-    await userEvent.click(screen.getByLabelText('summary'));
+    await userEvent.click(screen.getByLabelText('Summary'));
     expect(screen.getByTestId('active')).toHaveTextContent('summary');
   });
 
@@ -146,14 +145,14 @@ describe('active-field rail', () => {
           path='content/posts/active.mdx'
           document={{ title: 'Hi' }}
         >
-          <Field address='title' />
+          <LabelledFields />
           <ActivateProbe />
           <ActivationLog entries={entries} />
         </FormProvider>
       </TinaProvider>
     );
     await userEvent.click(await screen.findByText('activate'));
-    expect(screen.getByLabelText('title')).toHaveFocus();
+    expect(screen.getByLabelText('Title')).toHaveFocus();
     expect(entries).toEqual(['title']);
   });
 });

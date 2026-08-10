@@ -6,7 +6,11 @@ import {
 } from '../../../core/schema/types';
 import { markdownCodec } from './markdown.codec';
 import { mdxCodec } from './mdx.codec';
-import type { RichTextCodec, RichTextValue } from './rich-text-codec';
+import {
+  type RichTextCodec,
+  RichTextSerializeError,
+  type RichTextValue,
+} from './rich-text-codec';
 import {
   isRichTextFieldSchema,
   isRichTextValue,
@@ -43,7 +47,12 @@ const sourceOf = (
   if (cached && cached.codec === codec && cached.node === node) {
     return cached.source;
   }
-  const source = codec.serialize(value, node);
+  let source: string;
+  try {
+    source = codec.serialize(value, node);
+  } catch (cause) {
+    throw new RichTextSerializeError(cause);
+  }
   sourceOfValue.set(value, { codec, node, source });
   return source;
 };
@@ -59,7 +68,8 @@ export const writesSameSource = (
   const codec = codecFor(node, context);
   try {
     return sourceOf(a, codec, node) === sourceOf(b, codec, node);
-  } catch {
-    return false;
+  } catch (cause) {
+    if (cause instanceof RichTextSerializeError) return false;
+    throw cause;
   }
 };

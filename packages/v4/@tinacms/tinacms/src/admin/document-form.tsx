@@ -5,7 +5,12 @@ import { toFieldAddress } from '../core/field/address';
 import type { FieldSchema } from '../core/schema/types';
 import { FormScopeContext } from '../editor/context';
 import { Field } from '../editor/field';
-import { useFieldRegistry, useFormId, useFormSave } from '../editor/hooks';
+import {
+  useDiscardEdits,
+  useFieldRegistry,
+  useFormId,
+  useFormSave,
+} from '../editor/hooks';
 import { useIsFieldDirty, useIsFormDirty } from '../form/form-store';
 import { DocumentStatus } from './document-status';
 
@@ -16,7 +21,11 @@ function FieldRow({ node }: { node: FieldSchema }) {
     useFieldRegistry().get(node.type)?.metadata?.labelable !== false;
   return (
     <div className='mb-4 min-w-0'>
-      <Label className='mb-1' htmlFor={labelable ? name : undefined}>
+      <Label
+        className='mb-1'
+        id={`${name}-label`}
+        htmlFor={labelable ? name : undefined}
+      >
         {node.label ?? name}
         {dirty ? (
           <>
@@ -67,6 +76,25 @@ function SaveButton() {
   );
 }
 
+function DiscardButton() {
+  const dirty = useIsFormDirty(useFormId());
+  const discard = useDiscardEdits();
+  return (
+    <Button
+      type='button'
+      variant='outline'
+      className='aria-disabled:pointer-events-none aria-disabled:opacity-50'
+      aria-disabled={!dirty}
+      onClick={() => {
+        if (!dirty) return;
+        discard();
+      }}
+    >
+      Discard
+    </Button>
+  );
+}
+
 export function DocumentForm() {
   const scope = use(FormScopeContext);
   if (!scope) return null;
@@ -82,7 +110,10 @@ export function DocumentForm() {
       {scope.collection.fields.map((node) => (
         <FieldRow key={node.name} node={node} />
       ))}
-      <SaveButton />
+      <div className='flex items-start gap-2'>
+        <SaveButton />
+        <DiscardButton />
+      </div>
     </>
   );
 }
