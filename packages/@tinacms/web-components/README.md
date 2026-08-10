@@ -6,7 +6,7 @@ This package is used to add visual editing support and markdown rendering to
 plain JS sites.
 
 > [!IMPORTANT]
-> MDX and custom markdown components are not supported.
+> MDX is not supported.
 
 
 ## Install
@@ -97,6 +97,34 @@ It receives the stringified AST provided by the `rich-text` field via the
   </script>
 </body>
 ```
+
+### Raw HTML
+
+Raw HTML in a `rich-text` field arrives as `html` / `html_inline` nodes. Those
+render, with `DOMPurify` removing anything executable first, so `<div>` and
+`<center>` survive while `<script>` and `onerror` do not.
+
+### Custom components
+
+`TinaMarkdown.components` maps a node type to a function returning a DOM node,
+the same escape hatch as the `components` prop on the React and Astro
+renderers. Register before the element connects.
+
+```js
+import {TinaMarkdown} from "./node_modules/@tinacms/web-components/dist/tina-markdown.js";
+
+TinaMarkdown.components = {
+    h1: (node) => {
+        const heading = document.createElement("h1");
+        heading.className = "fancy";
+        heading.textContent = node.children[0].text;
+        return heading;
+    },
+};
+```
+
+A renderer registered for `html` or `html_inline` replaces sanitisation
+entirely, so anything it injects runs. Only do that for content you control.
 
 
 ## Visual Editing

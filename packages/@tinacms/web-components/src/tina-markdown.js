@@ -1,3 +1,5 @@
+import DOMPurify from 'dompurify';
+
 const TAGS = {
   h1: 'h1',
   h2: 'h2',
@@ -43,16 +45,18 @@ function renderRichText(root) {
 }
 
 function renderNode(node) {
+  const override = TinaMarkdown.components[node.type];
+  if (override) return override(node);
+
   if (node.type === 'text') return renderText(node);
+
+  if (node.type === 'html' || node.type === 'html_inline') {
+    return DOMPurify.sanitize(node.value, { RETURN_DOM_FRAGMENT: true });
+  }
 
   const tag = TAGS[node.type];
   const el = document.createElement(tag);
 
-  if (node.type === 'html' || node.type === 'html_inline') {
-    const htmlContainer = document.createElement('div');
-    htmlContainer.innerHTML = node.value;
-    return htmlContainer;
-  }
   if (node.url && node.type === 'a') el.href = node.url;
   if (node.url && node.type === 'img') el.src = node.url;
 
@@ -106,7 +110,14 @@ function renderText(node) {
   return el;
 }
 
-class TinaMarkdown extends HTMLElement {
+export class TinaMarkdown extends HTMLElement {
+  /**
+   * Per-node-type renderers, keyed by `node.type`, each returning a DOM node.
+   * Mirrors the `components` prop on the React and Astro renderers, which is
+   * how a consumer opts into rendering raw HTML unsanitised.
+   */
+  static components = {};
+
   constructor() {
     super();
 

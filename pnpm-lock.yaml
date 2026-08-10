@@ -369,6 +369,9 @@ catalogs:
     crypto-js:
       specifier: ^4.2.0
       version: 4.2.0
+    dompurify:
+      specifier: ^3.3.1
+      version: 3.3.1
     dotenv:
       specifier: ^16.4.7
       version: 16.6.1
@@ -2005,6 +2008,9 @@ importers:
       '@tinacms/bridge':
         specifier: workspace:^
         version: link:../bridge
+      dompurify:
+        specifier: 'catalog:'
+        version: 3.3.1
     devDependencies:
       '@tinacms/scripts':
         specifier: workspace:*
@@ -9910,6 +9916,7 @@ packages:
 
   crypto-js@4.2.0:
     resolution: {integrity: sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==}
+    deprecated: Active development of CryptoJS has been discontinued. This library is no longer maintained.
 
   css-in-js-utils@3.1.0:
     resolution: {integrity: sha512-fJAcud6B3rRu+KHYk+Bwf+WFL2MDCJJ1XG9x137tJQ0xYxor7XziQtuGFbWNdqrvF4Tk26O3H73nfVqXt/fW1A==}
