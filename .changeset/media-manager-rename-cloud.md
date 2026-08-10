@@ -8,9 +8,9 @@ Rename previously appeared only in local development. `TinaMediaStore` now imple
 
 How a rename is applied depends on the branch:
 
-- On an ordinary branch — including a protected feature branch — the rename is written directly and staged like any other media change.
+- On an unprotected branch, the rename is written directly and staged like any other media change.
 - On the media branch, when it is unprotected, the rename is written directly to the production media.
-- On the media branch, when it is protected and editorial workflow is enabled, the rename goes through the editorial workflow: you are prompted for a branch, and the rename lands there with a pull request. "Save to Protected Branch" is not offered for these renames, because a direct write to a protected media branch is always rejected. Uploads and deletes still offer it.
+- On a protected branch, when editorial workflow is enabled, the rename goes through the editorial workflow: you are prompted for a branch, and the rename lands there with a pull request targeting the branch you were on. This applies to the protected media branch and to any other protected branch. "Save to Protected Branch" is not offered for these renames, because a rename on a protected branch always goes through the workflow. Uploads and deletes are unchanged and still offer it.
 
 Renaming still does **not** update content that already references the old path — the modal continues to say so.
 
