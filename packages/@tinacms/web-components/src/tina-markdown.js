@@ -9,8 +9,7 @@ const TAGS = {
   ol: 'ol',
   ul: 'ul',
   li: 'li',
-  // lic: "div", // TODO: is this needed? seems to render fine without.
-  //             // possible used to handle nested rich-text?
+  lic: 'div',
   blockquote: 'blockquote',
   img: 'img',
   a: 'a',
