@@ -14,6 +14,14 @@ export const datetime = (
 const labelOf = (field: DatetimeFieldSchema): string =>
   field.label ?? field.name;
 
+/**
+ * The forms the field reads and writes: a date, or a date and time with an
+ * optional zone. `Date.parse` takes more shapes than this, and the input cannot
+ * show them.
+ */
+const ISO_8601 =
+  /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})?)?$/;
+
 export const datetimeSchema = (node: FieldSchema): ZodType => {
   const field = node as DatetimeFieldSchema;
   const schema = z
@@ -22,7 +30,7 @@ export const datetimeSchema = (node: FieldSchema): ZodType => {
       invalid_type_error: `${labelOf(field)} must be a date string`,
     })
     .refine(
-      (value) => !Number.isNaN(Date.parse(value)),
+      (value) => ISO_8601.test(value) && !Number.isNaN(Date.parse(value)),
       `${labelOf(field)} must be a valid date`
     );
   const toDateString = (value: unknown): unknown => {

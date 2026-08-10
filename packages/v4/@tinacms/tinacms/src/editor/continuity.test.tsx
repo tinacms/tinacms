@@ -20,6 +20,7 @@ import {
   useFormValues,
 } from '../form/form-store';
 import { t } from '../index';
+import { LabelledFields } from '../test/labelled-fields';
 
 const errorsOf = (forms: FormStore['forms'], formId: FormId) => {
   const scope = forms[formId];
@@ -27,7 +28,6 @@ const errorsOf = (forms: FormStore['forms'], formId: FormId) => {
 };
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import {
-  Field,
   FormProvider,
   type SaveHandler,
   TinaProvider,
@@ -98,7 +98,7 @@ const host = (path: string, document: TinaDocument, onSave?: SaveHandler) => (
       document={document}
       onSave={onSave}
     >
-      <Field address='title' />
+      <LabelledFields />
       <StatusProbe />
       <SaveProbe />
       <DiscardProbe />
@@ -110,19 +110,23 @@ const host = (path: string, document: TinaDocument, onSave?: SaveHandler) => (
 describe('form continuity across mounts', () => {
   it('re-adopts kept edits into a fresh RHF instance, still dirty', async () => {
     const { unmount } = render(host(pathA, { title: 'Hello' }));
-    const input = await screen.findByLabelText('title');
+    const input = await screen.findByLabelText('Title');
     await userEvent.type(input, '!');
     unmount();
 
     render(host(pathA, { title: 'Hello' }));
-    const revisited = await screen.findByLabelText('title');
+    const revisited = await screen.findByLabelText('Title');
     expect(revisited).toHaveValue('Hello!');
     expect(screen.getByTestId('status')).toHaveTextContent('dirty');
   });
 
   it('a saved form re-mounts clean on its saved values', async () => {
-    const { unmount } = render(host(pathA, { title: 'Hello' }, () => {}));
-    const input = await screen.findByLabelText('title');
+    let stored: TinaDocument = { title: 'Hello' };
+    const onSave: SaveHandler = (document) => {
+      stored = document;
+    };
+    const { unmount } = render(host(pathA, stored, onSave));
+    const input = await screen.findByLabelText('Title');
     await userEvent.type(input, '!');
     await userEvent.click(screen.getByText('save'));
     await waitFor(() =>
@@ -130,24 +134,24 @@ describe('form continuity across mounts', () => {
     );
     unmount();
 
-    render(host(pathA, { title: 'Hello' }, () => {}));
-    const revisited = await screen.findByLabelText('title');
+    render(host(pathA, stored, onSave));
+    const revisited = await screen.findByLabelText('Title');
     expect(revisited).toHaveValue('Hello!');
     expect(screen.getByTestId('status')).toHaveTextContent('clean');
   });
 
   it('switching A → B → A keeps A’s edits while B stays pristine', async () => {
     const { rerender } = render(host(pathA, { title: 'Doc A' }));
-    const inputA = await screen.findByLabelText('title');
+    const inputA = await screen.findByLabelText('Title');
     await userEvent.type(inputA, ' edited');
 
     rerender(host(pathB, { title: 'Doc B' }));
-    const inputB = await screen.findByLabelText('title');
+    const inputB = await screen.findByLabelText('Title');
     await waitFor(() => expect(inputB).toHaveValue('Doc B'));
     expect(screen.getByTestId('status')).toHaveTextContent('pristine');
 
     rerender(host(pathA, { title: 'Doc A' }));
-    const backOnA = await screen.findByLabelText('title');
+    const backOnA = await screen.findByLabelText('Title');
     await waitFor(() => expect(backOnA).toHaveValue('Doc A edited'));
     expect(screen.getByTestId('status')).toHaveTextContent('dirty');
   });
@@ -155,13 +159,13 @@ describe('form continuity across mounts', () => {
   it('saving B is never blocked by A’s invalid kept edits — and A re-derives its error', async () => {
     const onSave = vi.fn();
     const { rerender } = render(host(pathA, { title: 'Doc A' }, onSave));
-    const inputA = await screen.findByLabelText('title');
+    const inputA = await screen.findByLabelText('Title');
     await userEvent.clear(inputA);
     await userEvent.type(inputA, 'x');
     await screen.findByText('Title must be at least 3 characters');
 
     rerender(host(pathB, { title: 'Doc B' }, onSave));
-    const inputB = await screen.findByLabelText('title');
+    const inputB = await screen.findByLabelText('Title');
     await waitFor(() => expect(inputB).toHaveValue('Doc B'));
     await userEvent.type(inputB, ' two');
     await userEvent.click(screen.getByText('save'));
@@ -169,7 +173,7 @@ describe('form continuity across mounts', () => {
     expect(onSave).toHaveBeenCalledWith({ title: 'Doc B two' });
 
     rerender(host(pathA, { title: 'Doc A' }, onSave));
-    const backOnA = await screen.findByLabelText('title');
+    const backOnA = await screen.findByLabelText('Title');
     await waitFor(() => expect(backOnA).toHaveValue('x'));
     await screen.findByText('Title must be at least 3 characters');
     expect(screen.getByTestId('status')).toHaveTextContent('dirty');
@@ -177,33 +181,71 @@ describe('form continuity across mounts', () => {
 
   it('a pristine kept scope never shadows changed document content', async () => {
     const { unmount } = render(host(pathA, { title: 'Old content' }));
-    const input = await screen.findByLabelText('title');
+    const input = await screen.findByLabelText('Title');
     expect(input).toHaveValue('Old content');
     unmount();
 
     render(host(pathA, { title: 'New content' }));
-    const revisited = await screen.findByLabelText('title');
+    const revisited = await screen.findByLabelText('Title');
     await waitFor(() => expect(revisited).toHaveValue('New content'));
+    expect(screen.getByTestId('status')).toHaveTextContent('pristine');
+  });
+
+  it('a clean kept scope never shadows changed document content', async () => {
+    const { unmount } = render(host(pathA, { title: 'Old content' }, () => {}));
+    const input = await screen.findByLabelText('Title');
+    await userEvent.type(input, '!');
+    await userEvent.click(screen.getByText('save'));
+    await waitFor(() =>
+      expect(screen.getByTestId('status')).toHaveTextContent('clean')
+    );
+    unmount();
+
+    render(host(pathA, { title: 'New content' }, () => {}));
+    const revisited = await screen.findByLabelText('Title');
+    await waitFor(() => expect(revisited).toHaveValue('New content'));
+    expect(screen.getByTestId('status')).toHaveTextContent('pristine');
+  });
+
+  it('a clean re-mount takes content that changes after the re-mount', async () => {
+    const { unmount } = render(host(pathA, { title: 'Hello' }, () => {}));
+    await userEvent.type(await screen.findByLabelText('Title'), '!');
+    await userEvent.click(screen.getByText('save'));
+    await waitFor(() =>
+      expect(screen.getByTestId('status')).toHaveTextContent('clean')
+    );
+    unmount();
+
+    const { rerender } = render(host(pathA, { title: 'Hello!' }, () => {}));
+    await waitFor(() =>
+      expect(screen.getByLabelText('Title')).toHaveValue('Hello!')
+    );
+    expect(screen.getByTestId('status')).toHaveTextContent('clean');
+
+    rerender(host(pathA, { title: 'Changed on disk' }, () => {}));
+    await waitFor(() =>
+      expect(screen.getByLabelText('Title')).toHaveValue('Changed on disk')
+    );
     expect(screen.getByTestId('status')).toHaveTextContent('pristine');
   });
 
   it('a document swap under kept edits keeps the edits', async () => {
     const { unmount } = render(host(pathA, { title: 'Doc A' }));
-    await userEvent.type(await screen.findByLabelText('title'), ' edited');
+    await userEvent.type(await screen.findByLabelText('Title'), ' edited');
     unmount();
 
     const { rerender } = render(host(pathA, { title: 'Doc A' }));
-    const revisited = await screen.findByLabelText('title');
+    const revisited = await screen.findByLabelText('Title');
     await waitFor(() => expect(revisited).toHaveValue('Doc A edited'));
     rerender(host(pathA, { title: 'Reloaded from disk' }));
-    expect(screen.getByLabelText('title')).toHaveValue('Doc A edited');
+    expect(screen.getByLabelText('Title')).toHaveValue('Doc A edited');
     expect(screen.getByTestId('status')).toHaveTextContent('dirty');
   });
 
   it('re-adoption never clobbers kept errors, not even pre-derivation', async () => {
     const formIdA = toFormId(pathA);
     const { unmount } = render(host(pathA, { title: 'Doc A' }));
-    const inputA = await screen.findByLabelText('title');
+    const inputA = await screen.findByLabelText('Title');
     await userEvent.clear(inputA);
     await userEvent.type(inputA, 'x');
     await waitFor(() =>
@@ -232,7 +274,7 @@ describe('form continuity across mounts', () => {
   it('mirrored errors survive the unmount and report from anywhere', async () => {
     const formIdA = toFormId(pathA);
     const { rerender } = render(host(pathA, { title: 'Doc A' }));
-    const inputA = await screen.findByLabelText('title');
+    const inputA = await screen.findByLabelText('Title');
     await userEvent.clear(inputA);
     await userEvent.type(inputA, 'x');
     await waitFor(() =>
@@ -257,7 +299,7 @@ describe('form continuity across mounts', () => {
 
     rerender(host(pathB, { title: 'Doc B' }));
     await waitFor(() =>
-      expect(screen.getByLabelText('title')).toHaveValue('Doc B')
+      expect(screen.getByLabelText('Title')).toHaveValue('Doc B')
     );
     expect(errorsOf(useFormStore.getState().forms, formIdA)?.[title]).toEqual([
       'Title must be at least 3 characters',
@@ -282,7 +324,7 @@ const unkeyedHost = (
       document={document}
       onSave={onSave}
     >
-      <Field address='title' />
+      <LabelledFields />
       <StatusProbe />
       <SaveProbe />
     </FormProvider>
@@ -293,12 +335,12 @@ describe('unkeyed document switches (same FormProvider instance)', () => {
   it('identical-content documents still reset — edits never save under the other path', async () => {
     const onSave = vi.fn();
     const { rerender } = render(unkeyedHost(pathA, { title: 'Same' }, onSave));
-    const input = await screen.findByLabelText('title');
+    const input = await screen.findByLabelText('Title');
     await userEvent.type(input, ' edited');
 
     rerender(unkeyedHost(pathB, { title: 'Same' }, onSave));
     await waitFor(() =>
-      expect(screen.getByLabelText('title')).toHaveValue('Same')
+      expect(screen.getByLabelText('Title')).toHaveValue('Same')
     );
     expect(screen.getByTestId('status')).toHaveTextContent('pristine');
 
@@ -316,7 +358,7 @@ describe('unkeyed document switches (same FormProvider instance)', () => {
     });
 
     const { rerender } = render(unkeyedHost(pathA, { title: 'Doc A' }));
-    const inputA = await screen.findByLabelText('title');
+    const inputA = await screen.findByLabelText('Title');
     await userEvent.type(inputA, ' with far too long a title');
     await waitFor(() =>
       expect(
@@ -331,7 +373,7 @@ describe('unkeyed document switches (same FormProvider instance)', () => {
     });
     rerender(unkeyedHost(pathB, { title: 'Doc B' }));
     await waitFor(() =>
-      expect(screen.getByLabelText('title')).toHaveValue('xy')
+      expect(screen.getByLabelText('Title')).toHaveValue('xy')
     );
     await screen.findByText('Title must be at least 3 characters');
     unsubscribe();
@@ -351,7 +393,7 @@ describe('unkeyed document switches (same FormProvider instance)', () => {
       errorsOf(useFormStore.getState().forms, toFormId(pathA))?.[title]
     ).toContain('Title must be at most 20 characters');
 
-    const inputB = screen.getByLabelText('title');
+    const inputB = screen.getByLabelText('Title');
     await userEvent.clear(inputB);
     await userEvent.type(inputB, 'now far too long for the max rule');
     await waitFor(() =>
@@ -383,7 +425,7 @@ describe('useFormValues', () => {
 describe('discarding edits', () => {
   it('puts RHF and the store back on the loaded content, under a new seed', async () => {
     render(host(pathA, { title: 'Hello' }));
-    const input = await screen.findByLabelText('title');
+    const input = await screen.findByLabelText('Title');
     await userEvent.type(input, '!');
     expect(screen.getByTestId('status')).toHaveTextContent('dirty');
     const seed = screen.getByTestId('seed').textContent;
@@ -397,7 +439,7 @@ describe('discarding edits', () => {
 
   it('returns a saved form to what was saved, and not to what was loaded', async () => {
     render(host(pathA, { title: 'Hello' }, () => {}));
-    const input = await screen.findByLabelText('title');
+    const input = await screen.findByLabelText('Title');
     await userEvent.type(input, ' one');
     await userEvent.click(screen.getByText('save'));
     await waitFor(() =>
@@ -412,7 +454,7 @@ describe('discarding edits', () => {
 
   it('takes the validation errors of the discarded edits with them', async () => {
     render(host(pathA, { title: 'Hello' }));
-    const input = await screen.findByLabelText('title');
+    const input = await screen.findByLabelText('Title');
     await userEvent.clear(input);
     await userEvent.type(input, 'x');
     await screen.findByText('Title must be at least 3 characters');
@@ -429,7 +471,7 @@ describe('discarding edits', () => {
 
   it('does nothing to a form with no edits, and reseeds no editor', async () => {
     render(host(pathA, { title: 'Hello' }));
-    const input = await screen.findByLabelText('title');
+    const input = await screen.findByLabelText('Title');
     const seed = screen.getByTestId('seed').textContent;
 
     await userEvent.click(screen.getByText('discard'));
@@ -441,21 +483,21 @@ describe('discarding edits', () => {
 
   it('keeps the discarded form out of the way of another open form', async () => {
     const { rerender } = render(host(pathA, { title: 'Doc A' }));
-    await userEvent.type(await screen.findByLabelText('title'), ' edited');
+    await userEvent.type(await screen.findByLabelText('Title'), ' edited');
 
     rerender(host(pathB, { title: 'Doc B' }));
     await waitFor(() =>
-      expect(screen.getByLabelText('title')).toHaveValue('Doc B')
+      expect(screen.getByLabelText('Title')).toHaveValue('Doc B')
     );
-    await userEvent.type(screen.getByLabelText('title'), ' edited');
+    await userEvent.type(screen.getByLabelText('Title'), ' edited');
     await userEvent.click(screen.getByText('discard'));
     await waitFor(() =>
-      expect(screen.getByLabelText('title')).toHaveValue('Doc B')
+      expect(screen.getByLabelText('Title')).toHaveValue('Doc B')
     );
 
     rerender(host(pathA, { title: 'Doc A' }));
     await waitFor(() =>
-      expect(screen.getByLabelText('title')).toHaveValue('Doc A edited')
+      expect(screen.getByLabelText('Title')).toHaveValue('Doc A edited')
     );
     expect(screen.getByTestId('status')).toHaveTextContent('dirty');
   });
