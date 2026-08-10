@@ -13,7 +13,23 @@ await resolveClientSegments(corePlugins);
 // Backstop. No test that renders <TinaProvider> should need the headroom.
 configure({ asyncUtilTimeout: 5000 });
 
+// react-aria restores HTMLElement.prototype.focus by assignment on `beforeunload`.
+// A render turns that property into a getter-only accessor, so the restore throws.
+const keepFocusAssignable = () => {
+  const descriptor = Object.getOwnPropertyDescriptor(
+    HTMLElement.prototype,
+    'focus'
+  );
+  if (!descriptor || 'value' in descriptor) return;
+  Object.defineProperty(HTMLElement.prototype, 'focus', {
+    value: HTMLElement.prototype.focus,
+    writable: true,
+    configurable: true,
+  });
+};
+
 beforeEach(() => {
+  keepFocusAssignable();
   useFormStore.setState({ forms: {}, active: null });
   localStorage.clear();
 });
