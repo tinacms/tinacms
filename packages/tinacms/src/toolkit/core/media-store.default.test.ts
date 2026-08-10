@@ -2070,7 +2070,7 @@ describe('TinaMediaStore — cloud rename (direct)', () => {
 
   it.each([
     [401, 'UNAUTHORIZED'],
-    [403, 'INVALID_PATH'],
+    [403, 'UNAUTHORIZED'],
     [409, 'NAME_COLLISION'],
     [502, 'BACKEND_FAILURE'],
   ])('falls back to a status-derived code for %i', async (status, code) => {
@@ -2081,6 +2081,32 @@ describe('TinaMediaStore — cloud rename (direct)', () => {
     const error = await renameRejection(store);
 
     expect(error.code).toBe(code);
+  });
+
+  it('reads a bodyless 403 as a permission problem, not a bad filename', async () => {
+    // A token without write scope, or an edge/WAF rejection, arrives as a bare
+    // 403. Blaming the filename sends the editor renaming in circles.
+    const { store } = buildCloudStore({
+      renameResponse: makeJsonResponse(403, {}),
+    });
+
+    const error = await renameRejection(store);
+
+    expect(error.code).toBe('UNAUTHORIZED');
+  });
+
+  it('still honours an explicit INVALID_PATH code on a 403', async () => {
+    const { store } = buildCloudStore({
+      renameResponse: makeJsonResponse(403, {
+        code: 'INVALID_PATH',
+        message: 'Path outside the media root.',
+      }),
+    });
+
+    const error = await renameRejection(store);
+
+    expect(error.code).toBe('INVALID_PATH');
+    expect(error.message).toBe('Path outside the media root.');
   });
 
   it('maps an unknown backend code to BACKEND_FAILURE while keeping the message', async () => {
