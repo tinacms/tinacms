@@ -1073,10 +1073,8 @@ export class TinaMediaStore implements MediaStore {
     // No usable code: fall back on the status. Unlike the local dev server, a
     // 404 here means the asset is missing, not that the route is unavailable.
     let code: MediaRenameErrorCode;
-    if (status === 401) {
+    if (status === 401 || status === 403) {
       code = 'UNAUTHORIZED';
-    } else if (status === 403) {
-      code = 'INVALID_PATH';
     } else if (status === 404) {
       code = 'NOT_FOUND';
     } else if (status === 409) {
