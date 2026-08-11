@@ -1,7 +1,7 @@
-import { getMarks } from '../../stringify';
+import type { RichTextField, RichTextType } from '@tinacms/schema-tools';
 import type * as Md from 'mdast';
 import type * as Plate from '../../parse/plate';
-import type { RichTextField, RichTextType } from '@tinacms/schema-tools';
+import { getMarks } from '../../stringify';
 import { stringifyPropsInline } from './acorn';
 
 const matches = (a: string[], b: string[]) => {
@@ -278,7 +278,9 @@ export const eat = (
   }
   if (markToProcess === 'highlight') {
     if (nonMatchingSiblingIndex) {
-      throw new Error('Marks inside highlight are not supported');
+      throw new Error(
+        "Highlighted text can't have other formatting on it. Remove the formatting from the highlighted text."
+      );
     }
     const f = first as Plate.TextElement;
     const innerText = text({ text: f.text });
@@ -300,7 +302,9 @@ export const eat = (
       linkifyTextNode?: (arg: Md.Text) => Md.Link;
     };
     if (nonMatchingSiblingIndex) {
-      throw new Error(`Marks inside inline code are not supported`);
+      throw new Error(
+        "Inline code can't have other formatting on it. Remove the formatting from the code text."
+      );
     }
     const node = {
       type: markToProcess,
