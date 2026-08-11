@@ -98,68 +98,68 @@ describe.each(fields)('bold with edge whitespace (%s parser)', (_, field) => {
   });
 });
 
-describe.each(fields)('other marks with edge whitespace (%s parser)', (
-  _,
-  field
-) => {
-  it('keeps whitespace outside the emphasis markers', () => {
-    expect(
-      serialize(
-        [
-          { type: 'text', text: 'Some ' },
-          { type: 'text', text: 'word ', italic: true },
-          { type: 'text', text: 'more' },
-        ],
-        field
-      )
-    ).toBe('Some *word* more\n');
-  });
+describe.each(fields)(
+  'other marks with edge whitespace (%s parser)',
+  (_, field) => {
+    it('keeps whitespace outside the emphasis markers', () => {
+      expect(
+        serialize(
+          [
+            { type: 'text', text: 'Some ' },
+            { type: 'text', text: 'word ', italic: true },
+            { type: 'text', text: 'more' },
+          ],
+          field
+        )
+      ).toBe('Some *word* more\n');
+    });
 
-  it('keeps whitespace outside the strikethrough markers', () => {
-    expect(
-      serialize(
-        [
-          { type: 'text', text: 'Some ' },
-          { type: 'text', text: 'word ', strikethrough: true },
-          { type: 'text', text: 'more' },
-        ],
-        field
-      )
-    ).toBe('Some ~~word~~ more\n');
-  });
+    it('keeps whitespace outside the strikethrough markers', () => {
+      expect(
+        serialize(
+          [
+            { type: 'text', text: 'Some ' },
+            { type: 'text', text: 'word ', strikethrough: true },
+            { type: 'text', text: 'more' },
+          ],
+          field
+        )
+      ).toBe('Some ~~word~~ more\n');
+    });
 
-  it('keeps whitespace outside combined bold and emphasis markers', () => {
-    expect(
-      serialize(
-        [
-          { type: 'text', text: 'Some ' },
-          { type: 'text', text: 'word ', bold: true, italic: true },
-          { type: 'text', text: 'more' },
-        ],
-        field
-      )
-    ).toBe('Some ***word*** more\n');
-  });
+    it('keeps whitespace outside combined bold and emphasis markers', () => {
+      expect(
+        serialize(
+          [
+            { type: 'text', text: 'Some ' },
+            { type: 'text', text: 'word ', bold: true, italic: true },
+            { type: 'text', text: 'more' },
+          ],
+          field
+        )
+      ).toBe('Some ***word*** more\n');
+    });
 
-  it('keeps whitespace outside a mark nested in a link', () => {
-    expect(
-      serialize(
-        [
-          {
-            type: 'a',
-            url: 'https://example.com',
-            children: [
-              { type: 'text', text: 'word ', bold: true },
-              { type: 'text', text: 'tail' },
-            ],
-          },
-          { type: 'text', text: 'after' },
-        ],
-        field
-      )
-    ).toBe('[**word** tail](https://example.com)after\n');
-  });
-});
+    it('keeps whitespace outside a mark nested in a link', () => {
+      expect(
+        serialize(
+          [
+            {
+              type: 'a',
+              url: 'https://example.com',
+              children: [
+                { type: 'text', text: 'word ', bold: true },
+                { type: 'text', text: 'tail' },
+              ],
+            },
+            { type: 'text', text: 'after' },
+          ],
+          field
+        )
+      ).toBe('[**word** tail](https://example.com)after\n');
+    });
+  }
+);
 
 describe.each(fields)('degenerate marked nodes (%s parser)', (_, field) => {
   it('drops the markers from a whitespace-only mark', () => {
