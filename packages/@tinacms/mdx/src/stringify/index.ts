@@ -12,6 +12,7 @@ import { directiveToMarkdown } from '../extensions/tina-shortcodes/to-markdown';
 import { stringifyMDX as stringifyMDXNext } from '../next';
 import type * as Plate from '../parse/plate';
 import { stringifyProps } from './acorn';
+import { normalizeMarkWhitespace } from './mark-whitespace';
 import { eat } from './marks';
 import { stringifyShortcode } from './stringifyShortcode';
 
@@ -54,7 +55,9 @@ export const serializeMDX = (
       return value.children[0].value;
     }
   }
-  const tree = rootElement(value, field, imageCallback);
+  const tree = normalizeMarkWhitespace(
+    rootElement(value, field, imageCallback)
+  );
   const res = toTinaMarkdown(tree, field);
   const templatesWithMatchers = field.templates?.filter(
     (template) => template.match
