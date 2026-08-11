@@ -133,7 +133,9 @@ const inlineElementExceptLink = (
       if (!content.type && typeof content.text === 'string') {
         return text(content);
       }
-      throw new Error(`InlineElement: ${content.type} is not supported`);
+      throw new Error(
+        `This content can't be saved as markdown ("${content.type}"). Remove it from the field to continue.`
+      );
   }
 };
 

@@ -37,6 +37,16 @@ describe.each(fields)(
       );
     });
 
+    it('explains what to remove when a block cannot be written', () => {
+      const value = {
+        type: 'root' as const,
+        children: [{ type: 'not_a_real_block', children: [] }],
+      } as unknown as Plate.RootElement;
+      expect(() => serializeMDX(value, field, passthrough)).toThrow(
+        /This block can't be saved as markdown \("not_a_real_block"\)/
+      );
+    });
+
     it('avoids the word "marks", which no content editor uses', () => {
       const value = paragraph([
         { type: 'text', text: 'npm ', code: true },

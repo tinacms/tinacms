@@ -347,7 +347,9 @@ export const blockElement = (
         }),
       };
     default:
-      throw new Error(`BlockElement: ${content.type} is not yet supported`);
+      throw new Error(
+        `This block can't be saved as markdown ("${content.type}"). Remove it from the field to continue.`
+      );
   }
 };
 const listItemElement = (
@@ -406,7 +408,7 @@ const blockContentElement = (
       };
     default:
       throw new Error(
-        `BlockContentElement: ${content.type} is not yet supported`
+        `This block can't be saved as markdown ("${content.type}"). Remove it from the field to continue.`
       );
   }
 };

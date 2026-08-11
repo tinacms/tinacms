@@ -245,7 +245,9 @@ export function stringifyProps(
         }
         break;
       default:
-        throw new Error(`Stringify props: ${field.type} not yet supported`);
+        throw new Error(
+          `A "${field.type}" field can't be saved as markdown yet. Remove this block, or ask a developer to change the field.`
+        );
     }
   });
   if (template.match) {
