@@ -3,8 +3,21 @@ import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { RawEditorErrorBoundary } from './error-boundary';
 
-const Boom = () => {
-  throw new Error('Failed to fetch dynamically imported module');
+const Throws = ({ message }: { message: string }) => {
+  throw new Error(message);
+};
+
+const FAILED_IMPORT = 'Failed to fetch dynamically imported module';
+const FAILED_SERIALIZE = 'Marks inside inline code are not supported';
+
+const renderWithThrow = (message: string, onDismiss = () => {}) => {
+  const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+  render(
+    <RawEditorErrorBoundary onDismiss={onDismiss}>
+      <Throws message={message} />
+    </RawEditorErrorBoundary>
+  );
+  consoleError.mockRestore();
 };
 
 describe('RawEditorErrorBoundary', () => {
@@ -18,30 +31,28 @@ describe('RawEditorErrorBoundary', () => {
   });
 
   it('keeps a failed lazy import inside the field', () => {
-    const consoleError = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
-    render(
-      <RawEditorErrorBoundary onDismiss={() => {}}>
-        <Boom />
-      </RawEditorErrorBoundary>
-    );
-    expect(screen.getByText(/couldn't be loaded/)).toBeTruthy();
-    consoleError.mockRestore();
+    renderWithThrow(FAILED_IMPORT);
+    expect(
+      screen.getByText(/Couldn't open this field in raw markdown/)
+    ).toBeTruthy();
+  });
+
+  it('keeps a failure to serialize the field inside the field', () => {
+    renderWithThrow(FAILED_SERIALIZE);
+    expect(
+      screen.getByText(/Couldn't open this field in raw markdown/)
+    ).toBeTruthy();
+  });
+
+  it('shows the underlying message so the editor knows what to undo', () => {
+    renderWithThrow(FAILED_SERIALIZE);
+    expect(screen.getByText(FAILED_SERIALIZE)).toBeTruthy();
   });
 
   it('offers a way back to the rich-text editor', () => {
-    const consoleError = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
     const onDismiss = vi.fn();
-    render(
-      <RawEditorErrorBoundary onDismiss={onDismiss}>
-        <Boom />
-      </RawEditorErrorBoundary>
-    );
+    renderWithThrow(FAILED_IMPORT, onDismiss);
     fireEvent.click(screen.getByRole('button'));
     expect(onDismiss).toHaveBeenCalledOnce();
-    consoleError.mockRestore();
   });
 });
