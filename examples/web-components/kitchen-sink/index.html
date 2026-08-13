@@ -34,7 +34,28 @@
         import {client} from "./tina/__generated__/client.js";
 
         // Register the `tina-markdown` component.
-        import "./node_modules/@tinacms/web-components/dist/tina-markdown.js";
+        import {TinaMarkdown} from "./node_modules/@tinacms/web-components/dist/tina-markdown.js";
+
+        // Register custom component for rich-text consumption.
+        TinaMarkdown.components["PostPreview"] = (node) => {
+            const el = document.createElement("post-preview");
+
+            const title = document.createElement("span");
+            title.slot = "title";
+            title.textContent = node.props.title ?? "";
+
+            const tinaMarkdown = document.createElement("tina-markdown");
+            const markdownAst = JSON.stringify(node.props.children ?? {});
+            tinaMarkdown.setAttribute("content", markdownAst);
+
+            const content = document.createElement("span");
+            content.slot = "content";
+            content.appendChild(tinaMarkdown);
+
+            el.append(title, content);
+
+            return el;
+        };
 
         // Imports required for visual editing.
         //   - `createTina` fetches a provided connection and renders the content

@@ -1,5 +1,12 @@
 import DOMPurify from 'dompurify';
 
+/**
+ * @typedef {Object} Node
+ * @property {string} type
+ * @property {string} name
+ * @property {Node[]} children
+ */
+
 const TAGS = {
   h1: 'h1',
   h2: 'h2',
@@ -24,6 +31,8 @@ const TAGS = {
   invalid_markdown: 'pre',
   html: 'html',
   html_inline: 'html',
+  mdxJsxTextElement: 'div',
+  mdxJsxFlowElement: 'div',
 };
 const MARKS = [
   ['bold', 'strong'],
@@ -34,6 +43,10 @@ const MARKS = [
   ['highlight', 'mark'],
 ];
 
+/**
+ * @param {Node} root
+ * @returns {HTMLElement}
+ */
 function renderRichText(root) {
   const container = document.createElement('div');
 
@@ -44,10 +57,11 @@ function renderRichText(root) {
   return container;
 }
 
+/**
+ * @param {Node} node
+ * @returns {HTMLElement}
+ */
 function renderNode(node) {
-  const override = TinaMarkdown.components[node.type];
-  if (override) return override(node);
-
   if (node.type === 'text') return renderText(node);
 
   if (node.type === 'html' || node.type === 'html_inline') {
@@ -55,10 +69,17 @@ function renderNode(node) {
   }
 
   const tag = TAGS[node.type];
+  /** @type {HTMLElement} */
   const el = document.createElement(tag);
 
   if (node.url && node.type === 'a') el.href = node.url;
   if (node.url && node.type === 'img') el.src = node.url;
+
+  if (node.type === 'mdxJsxTextElement' || node.type === 'mdxJsxFlowElement') {
+    const override = TinaMarkdown.components[node.name];
+    if (override) return override(node);
+    return el;
+  }
 
   if (node.type === 'code_block') {
     const pre = document.createElement('pre');
@@ -98,6 +119,10 @@ function renderNode(node) {
   return el;
 }
 
+/**
+ * @param {Node} node
+ * @returns {Text}
+ */
 function renderText(node) {
   let el = document.createTextNode(node.text);
   for (const [prop, tag] of MARKS) {
@@ -112,9 +137,24 @@ function renderText(node) {
 
 export class TinaMarkdown extends HTMLElement {
   /**
-   * Per-node-type renderers, keyed by `node.type`, each returning a DOM node.
-   * Mirrors the `components` prop on the React and Astro renderers, which is
-   * how a consumer opts into rendering raw HTML unsanitised.
+   * @type {Object.<string, function(Node): HTMLElement>}
+   * Register custom components.
+   *
+   * @example
+   * import {TinaMarkdown} from "./node_modules/@tinacms/web-components/dist/tina-markdown.js";
+   *
+   * TinaMarkdown.components = {
+   *     "PostPreview": (node) => {
+   * 		const el = document.createElement("post-preview");
+   *
+   * 		const title = document.createElement("span");
+   * 		title.slot = "title";
+   * 		title.textContent = node.props.title ?? "";
+   * 		el.append(title);
+   *
+   * 		return el;
+   *     },
+   * };
    */
   static components = {};
 
@@ -127,10 +167,12 @@ export class TinaMarkdown extends HTMLElement {
   }
 
   connectedCallback() {
-    const contentStr = this.getAttribute('content');
-    const content = JSON.parse(contentStr);
+    /** @type {string} */
+    const content = this.getAttribute('content');
+    /** @type {Node} */
+    const ast = JSON.parse(content);
 
-    this.shadowRoot.appendChild(renderRichText(content));
+    this.shadowRoot.appendChild(renderRichText(ast));
   }
 }
 

@@ -5,9 +5,6 @@ All things web components with Tina.
 This package is used to add visual editing support and markdown rendering to
 plain JS sites.
 
-> [!IMPORTANT]
-> MDX is not supported.
-
 
 ## Install
 
@@ -100,31 +97,39 @@ It receives the stringified AST provided by the `rich-text` field via the
 
 ### Raw HTML
 
-Raw HTML in a `rich-text` field arrives as `html` / `html_inline` nodes. Those
-render, with `DOMPurify` removing anything executable first, so `<div>` and
-`<center>` survive while `<script>` and `onerror` do not.
+Raw HTML in a `rich-text` field is first sanitized via [the DOMPurify
+package](https://github.com/cure53/dompurify) before being rendered. To see
+what gets stripped, please refer to [the DOMPurify
+documentation](https://github.com/cure53/dompurify#some-purification-samples-please).
 
 ### Custom components
 
-`TinaMarkdown.components` maps a node type to a function returning a DOM node,
-the same escape hatch as the `components` prop on the React and Astro
-renderers. Register before the element connects.
+Custom components can be registered via the `TinaMarkdown.components` object.
+This allows you to render custom html or web-components via MDX.
+
+Custom components **must** be registered before the `tina-markdown` component
+connects, e.g. before render.
+
+For more information on how to register custom components in your schema, refer
+to the [Field with custom component
+documentation](https://tina.io/docs/reference/types/rich-text#field-with-custom-component-mdx).
 
 ```js
 import {TinaMarkdown} from "./node_modules/@tinacms/web-components/dist/tina-markdown.js";
 
 TinaMarkdown.components = {
-    h1: (node) => {
-        const heading = document.createElement("h1");
-        heading.className = "fancy";
-        heading.textContent = node.children[0].text;
-        return heading;
+    "PostPreview": (node) => {
+		const el = document.createElement("post-preview");
+
+		const title = document.createElement("span");
+		title.slot = "title";
+		title.textContent = node.props.title ?? "";
+		el.append(title);
+
+		return el;
     },
 };
 ```
-
-A renderer registered for `html` or `html_inline` replaces sanitisation
-entirely, so anything it injects runs. Only do that for content you control.
 
 
 ## Visual Editing
