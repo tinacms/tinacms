@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
+import { asResolvedConfig } from '../../../config';
 import {
   type FieldRegistry,
   resolveFieldPlugins,
@@ -11,13 +12,17 @@ import type {
   TinaDocument,
 } from '../../../core/schema/types';
 import { validateField } from '../../../core/validation';
-import { Field, FormProvider, TinaProvider } from '../../../editor';
+import { FormProvider, TinaProvider } from '../../../editor';
 import { t } from '../../../index';
+import { LabelledFields } from '../../../test/labelled-fields';
 import booleanFieldPlugin from './boolean-field.plugin';
+
+const NO_COLLECTIONS = { collections: [] };
 
 const collection: CollectionSchema = {
   name: 'post',
   label: 'Posts',
+  format: 'mdx',
   fields: [t.boolean({ name: 'featured', label: 'Featured', required: true })],
 };
 
@@ -28,9 +33,18 @@ const resolveRegistry = (): Promise<FieldRegistry> =>
 
 const renderFeatured = (document?: TinaDocument) =>
   render(
-    <TinaProvider plugins={[booleanFieldPlugin]}>
-      <FormProvider collection={collection} document={document}>
-        <Field address='featured' />
+    <TinaProvider
+      config={asResolvedConfig({
+        plugins: [booleanFieldPlugin],
+        schema: NO_COLLECTIONS,
+      })}
+    >
+      <FormProvider
+        collection={collection}
+        path='content/posts/featured.mdx'
+        document={document}
+      >
+        <LabelledFields />
       </FormProvider>
     </TinaProvider>
   );
@@ -38,25 +52,19 @@ const renderFeatured = (document?: TinaDocument) =>
 describe('BooleanField rendering', () => {
   it('renders a stored true value as a checked box', async () => {
     renderFeatured({ featured: true });
-    const input = (await screen.findByLabelText(
-      'featured'
-    )) as HTMLInputElement;
+    const input = await screen.findByRole('checkbox', { name: 'Featured' });
     expect(input).toBeChecked();
   });
 
   it('renders a stored false value as an unchecked box', async () => {
     renderFeatured({ featured: false });
-    const input = (await screen.findByLabelText(
-      'featured'
-    )) as HTMLInputElement;
+    const input = await screen.findByRole('checkbox', { name: 'Featured' });
     expect(input).not.toBeChecked();
   });
 
   it('falls back to the descriptor default (false) when absent', async () => {
     renderFeatured();
-    const input = (await screen.findByLabelText(
-      'featured'
-    )) as HTMLInputElement;
+    const input = await screen.findByRole('checkbox', { name: 'Featured' });
     expect(input).not.toBeChecked();
   });
 });
@@ -64,9 +72,7 @@ describe('BooleanField rendering', () => {
 describe('BooleanField value updates', () => {
   it('toggles the value back through the form store', async () => {
     renderFeatured({ featured: false });
-    const input = (await screen.findByLabelText(
-      'featured'
-    )) as HTMLInputElement;
+    const input = await screen.findByRole('checkbox', { name: 'Featured' });
 
     await userEvent.click(input);
     expect(input).toBeChecked();
@@ -77,8 +83,6 @@ describe('BooleanField value updates', () => {
 });
 
 describe('BooleanField validation', () => {
-  // `required` is a no-op for boolean by design: a checkbox has no empty state
-  // and `false` is a first-class value, so neither true nor false is rejected.
   it('accepts both true and false even when the field is required', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('boolean');

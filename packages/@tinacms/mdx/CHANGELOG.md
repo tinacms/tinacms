@@ -1,5 +1,30 @@
 # @tinacms/mdx
 
+## 2.1.11
+
+### Patch Changes
+
+- [#7213](https://github.com/tinacms/tinacms/pull/7213) [`056ffc2`](https://github.com/tinacms/tinacms/commit/056ffc22dc87b0040281054f4140c6260c22ea1f) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Publish internal package references as ranges instead of exact versions.
+
+  Internal dependencies were declared as `workspace:*`, which pnpm expands to an **exact version** when publishing (`"tinacms": "3.10.0"`), not a range. An exact pin cannot deduplicate against the version a consumer has already installed, so npm nests a second — and third — complete copy of `tinacms` and its dependency tree. In a stock Astro + TinaCMS blog this produced three copies of `tinacms`, three of `mermaid` (186 MB), five of `date-fns` (151 MB), and four of `typescript` (88 MB): about **320 MB of duplication**.
+
+  The same expansion applied to `peerDependencies`, so packages such as `next-tinacms-cloudinary` and `tinacms-authjs` published `"tinacms": "3.10.0"` as a _peer_ — requiring consumers to have that exact version or hit an `ERESOLVE` conflict, and forcing a republish of every dependent on each `tinacms` release.
+
+  Switching these to `workspace:^` publishes them as caret ranges (`^3.10.0`), which deduplicate normally and let `onlyUpdatePeerDependentsWhenOutOfRange` do its job.
+
+## 2.1.10
+
+### Patch Changes
+
+- [#7173](https://github.com/tinacms/tinacms/pull/7173) [`4b4e139`](https://github.com/tinacms/tinacms/commit/4b4e1395c8c2a1a4a9d95daad397dbcfff64e47d) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Preserve markdown table alignment positions when only later columns are explicitly aligned.
+
+## 2.1.9
+
+### Patch Changes
+
+- Updated dependencies [[`5148d67`](https://github.com/tinacms/tinacms/commit/5148d679049bc53e34b287a586bc721db7cb7710), [`ff10e65`](https://github.com/tinacms/tinacms/commit/ff10e657e48f1acc67cafd3e1a99bef23c8ac419)]:
+  - @tinacms/schema-tools@2.8.3
+
 ## 2.1.8
 
 ### Patch Changes

@@ -1,5 +1,39 @@
 # tina-graphql
 
+## 2.4.9
+
+### Patch Changes
+
+- [#7213](https://github.com/tinacms/tinacms/pull/7213) [`056ffc2`](https://github.com/tinacms/tinacms/commit/056ffc22dc87b0040281054f4140c6260c22ea1f) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Publish internal package references as ranges instead of exact versions.
+
+  Internal dependencies were declared as `workspace:*`, which pnpm expands to an **exact version** when publishing (`"tinacms": "3.10.0"`), not a range. An exact pin cannot deduplicate against the version a consumer has already installed, so npm nests a second — and third — complete copy of `tinacms` and its dependency tree. In a stock Astro + TinaCMS blog this produced three copies of `tinacms`, three of `mermaid` (186 MB), five of `date-fns` (151 MB), and four of `typescript` (88 MB): about **320 MB of duplication**.
+
+  The same expansion applied to `peerDependencies`, so packages such as `next-tinacms-cloudinary` and `tinacms-authjs` published `"tinacms": "3.10.0"` as a _peer_ — requiring consumers to have that exact version or hit an `ERESOLVE` conflict, and forcing a republish of every dependent on each `tinacms` release.
+
+  Switching these to `workspace:^` publishes them as caret ranges (`^3.10.0`), which deduplicate normally and let `onlyUpdatePeerDependentsWhenOutOfRange` do its job.
+
+- Updated dependencies [[`056ffc2`](https://github.com/tinacms/tinacms/commit/056ffc22dc87b0040281054f4140c6260c22ea1f)]:
+  - @tinacms/mdx@2.1.11
+
+## 2.4.8
+
+### Patch Changes
+
+- Updated dependencies [[`4b4e139`](https://github.com/tinacms/tinacms/commit/4b4e1395c8c2a1a4a9d95daad397dbcfff64e47d)]:
+  - @tinacms/mdx@2.1.10
+
+## 2.4.7
+
+### Patch Changes
+
+- [#7123](https://github.com/tinacms/tinacms/pull/7123) [`5148d67`](https://github.com/tinacms/tinacms/commit/5148d679049bc53e34b287a586bc721db7cb7710) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - refactor: replace hardcoded error-message string checks with shared error-identifier constants in `@tinacms/schema-tools`, so producers and consumers reference one source of truth instead of fragile `error.message.includes('...')` matching (#6777)
+
+- [#7143](https://github.com/tinacms/tinacms/pull/7143) [`ff10e65`](https://github.com/tinacms/tinacms/commit/ff10e657e48f1acc67cafd3e1a99bef23c8ac419) Thanks [@kulesy](https://github.com/kulesy)! - Unify folder-name validation with the document-filename and backend `relativePath` allowlist. The Create Folder modal now rejects names with disallowed characters (e.g. spaces) inline instead of letting the request fail on the backend, and a project-level `folderNameRegex` is layered on top of that baseline. The allowlist lives in a single shared constant in `@tinacms/schema-tools`.
+
+- Updated dependencies [[`5148d67`](https://github.com/tinacms/tinacms/commit/5148d679049bc53e34b287a586bc721db7cb7710), [`ff10e65`](https://github.com/tinacms/tinacms/commit/ff10e657e48f1acc67cafd3e1a99bef23c8ac419)]:
+  - @tinacms/schema-tools@2.8.3
+  - @tinacms/mdx@2.1.9
+
 ## 2.4.6
 
 ### Patch Changes

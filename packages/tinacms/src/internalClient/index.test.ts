@@ -402,6 +402,36 @@ describe('Tina Client', () => {
       expect(result).toBe(true);
       expect(localFetchWithToken).not.toHaveBeenCalled();
     });
+
+    it('branchesExist resolves several branches from a single list_branches fetch', async () => {
+      fetchWithToken.mockResolvedValueOnce(
+        makeResponse({
+          status: 200,
+          body: [
+            { name: 'main', protected: true },
+            { name: 'tina/existing', protected: false },
+          ] as unknown as Record<string, unknown>,
+        })
+      );
+
+      const result = await client.branchesExist(['main', 'tina/new-branch']);
+
+      expect(result).toEqual({ main: true, 'tina/new-branch': false });
+      expect(fetchWithToken).toHaveBeenCalledTimes(1);
+    });
+
+    it('branchesExist returns all-true in local mode without calling listBranches', async () => {
+      const localClient = new LocalClient();
+      const localFetchWithToken = vi.fn();
+      localClient.authProvider = {
+        fetchWithToken: localFetchWithToken,
+      } as any;
+
+      const result = await localClient.branchesExist(['main', 'tina/x']);
+
+      expect(result).toEqual({ main: true, 'tina/x': true });
+      expect(localFetchWithToken).not.toHaveBeenCalled();
+    });
   });
 
   describe('request() — error handling', () => {

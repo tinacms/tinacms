@@ -71,6 +71,7 @@ export interface ExecuteWorkflowOptions {
   signal?: AbortSignal;
   // When false, opens a ready-for-review PR. Omitted keeps the server's draft-first default.
   isDraft?: boolean;
+  targetBranchExists?: boolean;
 }
 
 export interface UseEditorialWorkflowResult {
@@ -158,16 +159,19 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
     tinaForm,
     signal,
     isDraft,
+    targetBranchExists: precomputedTargetBranchExists,
   }: ExecuteWorkflowOptions): Promise<{ success: boolean; error?: string }> => {
     try {
       if (signal?.aborted) return { success: false };
 
-      const targetBranchExists = await checkTargetBranchExists(
-        tinaApi,
-        branchName,
-        'executeEditorialWorkflow',
-        signal
-      );
+      const targetBranchExists =
+        precomputedTargetBranchExists ??
+        (await checkTargetBranchExists(
+          tinaApi,
+          branchName,
+          'executeEditorialWorkflow',
+          signal
+        ));
 
       if (signal?.aborted) return { success: false };
 

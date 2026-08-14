@@ -1,5 +1,56 @@
 # tinacms-cli
 
+## 2.5.6
+
+### Patch Changes
+
+- [#7176](https://github.com/tinacms/tinacms/pull/7176) [`5daa624`](https://github.com/tinacms/tinacms/commit/5daa62453428320d3fe33e8f549aa814a42237f1) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Improve the error message when the CLI cannot resolve `tinacms` or a `@tinacms/*` package while building your Tina config or database. It now names the package that failed, reports the directory Tina searched from, and points at parent-directory package-manager files (`package.json`, `node_modules`, `yarn.lock`, `.pnp.cjs`) that can hijack module resolution. esbuild package resolution is also anchored at the project root.
+
+- [#7213](https://github.com/tinacms/tinacms/pull/7213) [`056ffc2`](https://github.com/tinacms/tinacms/commit/056ffc22dc87b0040281054f4140c6260c22ea1f) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Publish internal package references as ranges instead of exact versions.
+
+  Internal dependencies were declared as `workspace:*`, which pnpm expands to an **exact version** when publishing (`"tinacms": "3.10.0"`), not a range. An exact pin cannot deduplicate against the version a consumer has already installed, so npm nests a second — and third — complete copy of `tinacms` and its dependency tree. In a stock Astro + TinaCMS blog this produced three copies of `tinacms`, three of `mermaid` (186 MB), five of `date-fns` (151 MB), and four of `typescript` (88 MB): about **320 MB of duplication**.
+
+  The same expansion applied to `peerDependencies`, so packages such as `next-tinacms-cloudinary` and `tinacms-authjs` published `"tinacms": "3.10.0"` as a _peer_ — requiring consumers to have that exact version or hit an `ERESOLVE` conflict, and forcing a republish of every dependent on each `tinacms` release.
+
+  Switching these to `workspace:^` publishes them as caret ranges (`^3.10.0`), which deduplicate normally and let `onlyUpdatePeerDependentsWhenOutOfRange` do its job.
+
+- Updated dependencies [[`711ba30`](https://github.com/tinacms/tinacms/commit/711ba30f6e8955bbcea134fd22a5b498b7734325), [`908fe7d`](https://github.com/tinacms/tinacms/commit/908fe7ddc1c01a2c091f1e4f3c1b00f3696577b4), [`566af78`](https://github.com/tinacms/tinacms/commit/566af78ded66891edeb6fdf928b6543d45ac76fd), [`b8df6ee`](https://github.com/tinacms/tinacms/commit/b8df6eeee85b603406d204042a5ef95d49e8a9cf), [`59efccc`](https://github.com/tinacms/tinacms/commit/59efcccd3f1713870e40ebd9db25659cd6357237), [`056ffc2`](https://github.com/tinacms/tinacms/commit/056ffc22dc87b0040281054f4140c6260c22ea1f)]:
+  - tinacms@3.11.0
+  - @tinacms/app@2.5.10
+  - @tinacms/graphql@2.4.9
+  - @tinacms/search@1.2.23
+
+## 2.5.5
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/app@2.5.9
+  - @tinacms/graphql@2.4.8
+  - tinacms@3.10.1
+  - @tinacms/search@1.2.22
+
+## 2.5.4
+
+### Patch Changes
+
+- [#7168](https://github.com/tinacms/tinacms/pull/7168) [`0a927a4`](https://github.com/tinacms/tinacms/commit/0a927a4f8d228dd05ee7ca4be32899bc190e73af) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Security fix: TinaCloud authorization is now scoped to the site's own configured clientID instead of a value read from the request. `isAuthorized` takes an optional `expectedClientID` (falling back to `NEXT_PUBLIC_TINA_CLIENT_ID`) and refuses when neither resolves. `TinaCloudBackendAuthProvider`, the `next-tinacms-azure` adapter, and the `tinacms init` template all pass the site clientID through.
+
+  **Action required (self-hosted).** Authorization now fails closed when the site's clientID cannot be resolved at runtime. Ensure `NEXT_PUBLIC_TINA_CLIENT_ID` is present in the server runtime (not only inlined at build time), or pass the clientID explicitly to `TinaCloudBackendAuthProvider(...)` and to media-store `authorized` callbacks, e.g. `isAuthorized(req, process.env.NEXT_PUBLIC_TINA_CLIENT_ID)`. If it cannot be resolved, backend and media authorization will return 401.
+
+## 2.5.3
+
+### Patch Changes
+
+- [#7157](https://github.com/tinacms/tinacms/pull/7157) [`aef9de0`](https://github.com/tinacms/tinacms/commit/aef9de0dabff72e0815ea6dfc03ce720dd8c4a7b) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Bump `@tailwindcss/typography` to 0.5.20
+
+- Updated dependencies [[`c809733`](https://github.com/tinacms/tinacms/commit/c809733ce8037d81937e81f0c8781a6cf222099b), [`3a1b39a`](https://github.com/tinacms/tinacms/commit/3a1b39ad9a2bbeb82a539fbca6985d5b714238dd), [`de4a807`](https://github.com/tinacms/tinacms/commit/de4a80771e83afa8502f834227351cff54c5f236), [`8497110`](https://github.com/tinacms/tinacms/commit/8497110ada7554f97807ce7a09a3624b5efc5713), [`22d0c0d`](https://github.com/tinacms/tinacms/commit/22d0c0d095b79e116677a798d07b35591ccb816e), [`5148d67`](https://github.com/tinacms/tinacms/commit/5148d679049bc53e34b287a586bc721db7cb7710), [`ff10e65`](https://github.com/tinacms/tinacms/commit/ff10e657e48f1acc67cafd3e1a99bef23c8ac419), [`b53a51c`](https://github.com/tinacms/tinacms/commit/b53a51c92ee8ddecbb654f5b57c7d10673a06626)]:
+  - tinacms@3.10.0
+  - @tinacms/schema-tools@2.8.3
+  - @tinacms/graphql@2.4.7
+  - @tinacms/app@2.5.8
+  - @tinacms/search@1.2.21
+
 ## 2.5.2
 
 ### Patch Changes

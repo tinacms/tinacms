@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import TinaCMS, { TinaAdmin, useCMS, MdxFieldPluginExtendible } from 'tinacms';
 import { Preview } from './preview';
 import Playground from './Playground';
+import { RawEditorErrorBoundary } from './fields/rich-text/error-boundary';
 
 // TODO: Resolve this to local file in tsconfig.json
 // @ts-expect-error
@@ -21,9 +22,11 @@ const Editor = (props) => {
       setRawMode={setRawMode}
       {...props}
       rawEditor={
-        <Suspense fallback={<div>Loading raw editor...</div>}>
-          <RawEditor {...props} setRawMode={setRawMode} rawMode={rawMode} />
-        </Suspense>
+        <RawEditorErrorBoundary onDismiss={() => setRawMode(false)}>
+          <Suspense fallback={<div>Loading raw editor...</div>}>
+            <RawEditor {...props} setRawMode={setRawMode} rawMode={rawMode} />
+          </Suspense>
+        </RawEditorErrorBoundary>
       }
     />
   );

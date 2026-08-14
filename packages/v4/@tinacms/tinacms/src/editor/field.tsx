@@ -1,10 +1,11 @@
 import { use } from 'react';
 import { toFieldAddress } from '../core/field/address';
+import { useFormStore } from '../form/form-store';
 import {
-  CollectionContext,
   FieldAddressContext,
   FieldSchemaContext,
-  RegistryContext,
+  FormScopeContext,
+  TinaRuntimeContext,
 } from './context';
 
 export interface FieldProps {
@@ -12,13 +13,15 @@ export interface FieldProps {
 }
 
 export function Field({ address }: FieldProps) {
-  const registry = use(RegistryContext);
-  const collection = use(CollectionContext);
-  if (!registry || !collection) {
+  const runtime = use(TinaRuntimeContext);
+  const scope = use(FormScopeContext);
+  if (!runtime || !scope) {
     throw new Error(
       '<Field> must be used within a TinaProvider and FormProvider'
     );
   }
+  const { registry } = runtime;
+  const { collection } = scope;
 
   const node = collection.fields.find((field) => field.name === address);
   if (!node) {
@@ -30,11 +33,23 @@ export function Field({ address }: FieldProps) {
     throw new Error(`No field plugin registered for type "${node.type}"`);
   }
 
+  const fieldAddress = toFieldAddress(address);
+
+  const markActive = () => {
+    const { active, setActive } = useFormStore.getState();
+    if (active?.formId === scope.formId && active.address === fieldAddress) {
+      return;
+    }
+    setActive(scope.formId, fieldAddress);
+  };
+
   const Component = descriptor.Component;
   return (
-    <FieldAddressContext value={toFieldAddress(address)}>
+    <FieldAddressContext value={fieldAddress}>
       <FieldSchemaContext value={node}>
-        <Component />
+        <div style={{ display: 'contents' }} onFocus={markActive}>
+          <Component />
+        </div>
       </FieldSchemaContext>
     </FieldAddressContext>
   );

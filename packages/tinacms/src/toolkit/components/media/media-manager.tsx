@@ -9,22 +9,24 @@ import { CloseIcon, TrashIcon } from '@toolkit/icons';
 import { FullscreenModal, Modal, ModalBody } from '@toolkit/react-modals';
 import { useCMS } from '@toolkit/react-tinacms';
 import { Button, IconButton } from '@toolkit/styles';
+import {
+  ArrowDownToLine,
+  CircleAlert,
+  CloudUpload,
+  ExternalLink,
+  File,
+  Folder,
+  LayoutGrid,
+  List,
+  RefreshCw,
+  Search,
+  TextCursorInput,
+  X,
+} from 'lucide-react';
 import React, { useEffect, useState, forwardRef, useRef } from 'react';
 import { createContext, useContext } from 'react';
 import * as dropzone from 'react-dropzone';
 import type { FileError } from 'react-dropzone';
-import {
-  BiArrowToBottom,
-  BiCloudUpload,
-  BiError,
-  BiFolder,
-  BiGridAlt,
-  BiLinkExternal,
-  BiListUl,
-  BiX,
-} from 'react-icons/bi';
-import { BiFile } from 'react-icons/bi';
-import { IoMdRefresh } from 'react-icons/io';
 import {
   MediaManagerContentDeletedEvent,
   MediaManagerContentUploadedEvent,
@@ -32,8 +34,13 @@ import {
 import { captureEvent } from '../../../lib/posthog/posthogProvider';
 import { Breadcrumb } from './breadcrumb';
 import { CopyField } from './copy-field';
-import { GridMediaItem, ListMediaItem, checkerboardStyle } from './media-item';
-import { DeleteModal, NewFolderModal } from './modal';
+import {
+  GridFolderItem,
+  GridMediaItem,
+  ListMediaItem,
+  checkerboardStyle,
+} from './media-item';
+import { DeleteModal, NewFolderModal, RenameModal } from './modal';
 import {
   DEFAULT_MEDIA_UPLOAD_TYPES,
   absoluteImgURL,
@@ -66,6 +73,21 @@ const join = function (...parts) {
 
   return parts.join(slash);
 };
+
+/**
+ * Media-root-relative `directory/filename`, the path shape the store's rename
+ * and delete calls expect — no origin, public folder or media root prefix.
+ */
+const mediaItemPath = (item: Media) => {
+  const directory = item.directory === '.' ? '' : item.directory || '';
+  const trimmed = directory.replace(/^\/+|\/+$/g, '');
+  return trimmed ? `${trimmed}/${item.filename}` : item.filename;
+};
+
+const basename = (path: string) => path.slice(path.lastIndexOf('/') + 1);
+
+const siblingPath = (path: string, name: string) =>
+  `${path.slice(0, path.lastIndexOf('/') + 1)}${name}`;
 
 export interface MediaRequest {
   directory?: string;
@@ -132,6 +154,7 @@ export function MediaPicker({
   });
 
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
+  const [renameModalOpen, setRenameModalOpen] = React.useState(false);
   const [newFolderModalOpen, setNewFolderModalOpen] = React.useState(false);
   const [listError, setListError] = useState<MediaListError>(defaultListError);
   const [directory, setDirectory] = useState<string | undefined>(
@@ -142,17 +165,24 @@ export function MediaPicker({
     items: [],
     nextOffset: undefined,
   });
-  const resetList = () =>
+  const resetList = () => {
+    newMediaSrcsRef.current = new Set();
     setList({
       items: [],
       nextOffset: undefined,
     });
+  };
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [activeItem, setActiveItem] = useState<Media | false>(false);
   const closePreview = () => setActiveItem(false);
   const [refreshing, setRefreshing] = useState(false);
   const [loadFolders, setLoadFolders] = useState(true);
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [mediaFilter, setMediaFilter] = useState<'all' | 'folders' | 'files'>(
+    'all'
+  );
 
   /**
    * current offset is last element in offsetHistory[]
@@ -162,7 +192,21 @@ export function MediaPicker({
   const offset = offsetHistory[offsetHistory.length - 1];
   const resetOffset = () => setOffsetHistory([]);
 
+  const navigateToDirectory = (dir: string) => {
+    setDirectory(dir);
+    setSearch('');
+    setDebouncedSearch('');
+    setLoadFolders(true);
+    resetOffset();
+    resetList();
+    setActiveItem(false);
+  };
+
+  const listRequestRef = useRef(0);
+  const newMediaSrcsRef = useRef<Set<string>>(new Set());
+
   async function loadMedia(loadFolders = true) {
+    const requestId = ++listRequestRef.current;
     setListState('loading');
     try {
       const _list = await cms.media.list({
@@ -175,13 +219,25 @@ export function MediaPicker({
           { w: 1000, h: 1000 },
         ],
         filesOnly: !loadFolders,
+        search: debouncedSearch || undefined,
       });
-      setList({
-        items: [...list.items, ..._list.items],
-        nextOffset: _list.nextOffset,
+      if (requestId !== listRequestRef.current) return;
+      setList((prev) => {
+        const items = offset ? [...prev.items, ..._list.items] : _list.items;
+        const newSrcs = newMediaSrcsRef.current;
+        return {
+          items:
+            newSrcs.size === 0
+              ? items
+              : items.map((item) =>
+                  newSrcs.has(item.src) ? { ...item, new: true } : item
+                ),
+          nextOffset: _list.nextOffset,
+        };
       });
       setListState('loaded');
     } catch (e) {
+      if (requestId !== listRequestRef.current) return;
       console.error(e);
       if (e.ERR_TYPE === 'MediaListError') {
         setListError(e);
@@ -191,6 +247,18 @@ export function MediaPicker({
       setListState('error');
     }
   }
+
+  useEffect(() => {
+    const next = search.trim();
+    const timer = setTimeout(() => {
+      if (next === debouncedSearch) return;
+      setDebouncedSearch(next);
+      resetOffset();
+      setLoadFolders(true);
+      setActiveItem(false);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search, debouncedSearch]);
 
   useEffect(() => {
     if (!refreshing) return;
@@ -206,29 +274,34 @@ export function MediaPicker({
     if (loadFolders) setLoadFolders(false);
 
     return cms.events.subscribe(
-      ['media:delete:success', 'media:pageSize'],
-      () => {
+      ['media:delete:success', 'media:rename:success', 'media:pageSize'],
+      (event) => {
+        if (event.type === 'media:rename:success') {
+          // Every mounted picker sees this, so only the ones actually
+          // previewing the renamed file swap their selection.
+          setActiveItem((current) =>
+            current && mediaItemPath(current) === event.from
+              ? event.media
+              : current
+          );
+        }
         setRefreshing(true);
         resetOffset();
         resetList();
       }
     );
-  }, [offset, directory, cms.media.isConfigured]);
+  }, [offset, directory, debouncedSearch, cms.media.isConfigured]);
 
   const onClickMediaItem = (item: Media) => {
     if (!item) {
       setActiveItem(false);
     } else if (item.type === 'dir') {
       // Only join when there is a directory to join to
-      setDirectory(
+      navigateToDirectory(
         item.directory === '.' || item.directory === ''
           ? item.filename
           : join(item.directory, item.filename)
       );
-      setLoadFolders(true);
-      resetOffset();
-      resetList();
-      setActiveItem(false);
     } else {
       setActiveItem(item);
     }
@@ -242,6 +315,19 @@ export function MediaPicker({
       captureEvent(MediaManagerContentDeletedEvent, { fileType: ext });
     };
   }
+
+  // Only stores that implement rename can offer the action; a store without it
+  // would fail on click. Static stores are read-only, and folders never become
+  // the active item, so neither needs a separate check here.
+  const allowRename =
+    allowDelete &&
+    !cms.media.store.isStatic &&
+    typeof cms.media.store.rename === 'function';
+
+  const renameMediaItem = async (item: Media, newFilename: string) => {
+    const from = mediaItemPath(item);
+    await cms.media.rename(from, siblingPath(from, newFilename));
+  };
 
   let selectMediaItem: (_item: Media) => void;
 
@@ -328,16 +414,27 @@ export function MediaPicker({
             fileCount: mediaItems.length,
           });
           setActiveItem(mediaItems[0]);
-          setList((mediaList) => {
-            return {
-              items: [
-                // all the newly added items are new
-                ...mediaItems.map((x) => ({ ...x, new: true })),
-                ...mediaList.items,
-              ],
-              nextOffset: mediaList.nextOffset,
-            };
-          });
+          newMediaSrcsRef.current = new Set(mediaItems.map((x) => x.src));
+          if (mediaFilter === 'folders') {
+            setMediaFilter('all');
+          }
+          if (debouncedSearch) {
+            setSearch('');
+            setDebouncedSearch('');
+            resetOffset();
+            setLoadFolders(true);
+          } else {
+            setList((mediaList) => {
+              return {
+                items: [
+                  // all the newly added items are new
+                  ...mediaItems.map((x) => ({ ...x, new: true })),
+                  ...mediaList.items,
+                ],
+                nextOffset: mediaList.nextOffset,
+              };
+            });
+          }
         }
       } catch {
         // TODO: Events get dispatched already. Does anything else need to happen?
@@ -383,7 +480,32 @@ export function MediaPicker({
     };
   }, [list.nextOffset, loaderRef.current]);
 
-  if ((listState === 'loading' && !list?.items?.length) || uploading) {
+  const isSearching = !!debouncedSearch;
+  const canSearch = !cms.media.store.isStatic && !!cms.media.store.searchable;
+  const visibleItems = list.items.filter((item) => {
+    if (mediaFilter === 'folders') return item.type === 'dir';
+    if (mediaFilter === 'files') return item.type === 'file';
+    return true;
+  });
+  const folders = visibleItems.filter((item) => item.type === 'dir');
+  const files = visibleItems.filter((item) => item.type === 'file');
+  const showLoader = !!list.nextOffset && mediaFilter !== 'folders';
+
+  const emptyMessage = () => {
+    if (isSearching) {
+      return mediaFilter === 'folders'
+        ? 'No folders match'
+        : `No media matches “${debouncedSearch}”`;
+    }
+    if (mediaFilter === 'folders') return 'No folders here';
+    if (mediaFilter === 'files') return 'No files here';
+    return undefined;
+  };
+
+  if (
+    (listState === 'loading' && !list?.items?.length && !isSearching) ||
+    uploading
+  ) {
     return <LoadingMediaList />;
   }
 
@@ -416,18 +538,19 @@ export function MediaPicker({
           close={() => setDeleteModalOpen(false)}
         />
       )}
+      {renameModalOpen && activeItem && (
+        <RenameModal
+          filename={basename(activeItem.filename)}
+          renameFunc={async (newFilename) => {
+            await renameMediaItem(activeItem, newFilename);
+          }}
+          close={() => setRenameModalOpen(false)}
+        />
+      )}
       {newFolderModalOpen && (
         <NewFolderModal
           onSubmit={(name) => {
-            setDirectory((oldDir) => {
-              if (oldDir) {
-                return join(oldDir, name);
-              } else {
-                return name;
-              }
-            });
-            resetOffset();
-            resetList();
+            navigateToDirectory(directory ? join(directory, name) : name);
           }}
           close={() => setNewFolderModalOpen(false)}
         />
@@ -441,11 +564,7 @@ export function MediaPicker({
               <Breadcrumb
                 directory={directory}
                 setDirectory={(dir: string) => {
-                  setDirectory(dir);
-                  setLoadFolders(true);
-                  resetOffset();
-                  resetList();
-                  setActiveItem(false);
+                  navigateToDirectory(dir);
                 }}
               />
             </div>
@@ -464,7 +583,7 @@ export function MediaPicker({
                   className='whitespace-nowrap'
                 >
                   Refresh
-                  <IoMdRefresh className='w-6 h-full ml-2 opacity-70 text-blue-500' />
+                  <RefreshCw className='w-6 h-full ml-2 opacity-70 text-blue-500' />
                 </Button>
                 <Button
                   busy={false}
@@ -475,55 +594,94 @@ export function MediaPicker({
                   className='whitespace-nowrap'
                 >
                   New Folder
-                  <BiFolder className='w-6 h-full ml-2 opacity-70 text-tina-orange' />
+                  <Folder className='w-6 h-full ml-2 opacity-70 text-tina-orange' />
                 </Button>
                 <UploadButton onClick={onClick} uploading={uploading} />
               </div>
             )}
           </div>
 
+          <div className='flex flex-wrap items-center gap-4 bg-gray-50 border-b border-gray-150 py-3 px-5 shadow-sm flex-shrink-0'>
+            {canSearch && (
+              <SearchInput
+                value={search}
+                setValue={setSearch}
+                clear={() => setSearch('')}
+              />
+            )}
+            <div className='ml-auto'>
+              <MediaFilterToggle
+                value={mediaFilter}
+                setValue={setMediaFilter}
+              />
+            </div>
+          </div>
+
           <div className='flex h-full overflow-hidden bg-white'>
             <div className='flex w-full flex-col h-full @container'>
-              <ul
+              <div
                 {...rootProps}
-                className={`h-full grow overflow-y-auto transition duration-150 ease-out bg-gradient-to-b from-gray-50/50 to-gray-50 ${
-                  list.items.length === 0 ||
-                  (viewMode === 'list' &&
-                    'w-full flex flex-1 flex-col justify-start -mb-px')
-                } ${
-                  list.items.length > 0 &&
-                  viewMode === 'grid' &&
-                  'w-full p-4 gap-4 grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 @2xl:grid-cols-4 @4xl:grid-cols-6 @6xl:grid-cols-9 auto-rows-auto content-start justify-start'
-                } ${isDragActive ? `border-2 border-blue-500 rounded-lg` : ``}`}
+                className={`h-full grow overflow-y-auto p-4 transition duration-150 ease-out bg-gradient-to-b from-gray-50/50 to-gray-50 ${
+                  isDragActive ? `border-2 border-tina-orange rounded-lg` : ``
+                }`}
               >
                 <input {...getInputProps()} />
 
-                {listState === 'loaded' && list.items.length === 0 && (
-                  <EmptyMediaList />
+                {listState === 'loaded' &&
+                  visibleItems.length === 0 &&
+                  !showLoader && <EmptyMediaList message={emptyMessage()} />}
+
+                {viewMode === 'list' ? (
+                  <ul className='w-full flex flex-col -mb-px'>
+                    {visibleItems.map((item: Media) => (
+                      <ListMediaItem
+                        key={item.id}
+                        item={item}
+                        onClick={onClickMediaItem}
+                        active={activeItem && activeItem.id === item.id}
+                      />
+                    ))}
+                  </ul>
+                ) : (
+                  <>
+                    {folders.length > 0 && (
+                      <section className='mb-6'>
+                        <h3 className='text-xs font-semibold tracking-wider text-gray-400 mb-3'>
+                          FOLDERS
+                        </h3>
+                        <ul className='grid grid-cols-2 gap-4 @md:grid-cols-3 @2xl:grid-cols-4 @4xl:grid-cols-5'>
+                          {folders.map((item: Media) => (
+                            <GridFolderItem
+                              key={item.id}
+                              item={item}
+                              onClick={onClickMediaItem}
+                            />
+                          ))}
+                        </ul>
+                      </section>
+                    )}
+                    {files.length > 0 && (
+                      <section>
+                        <h3 className='text-xs font-semibold tracking-wider text-gray-400 mb-3'>
+                          FILES
+                        </h3>
+                        <ul className='grid grid-cols-2 gap-4 @sm:grid-cols-3 @lg:grid-cols-4 @2xl:grid-cols-6 @4xl:grid-cols-8'>
+                          {files.map((item: Media) => (
+                            <GridMediaItem
+                              key={item.id}
+                              item={item}
+                              onClick={onClickMediaItem}
+                              active={activeItem && activeItem.id === item.id}
+                            />
+                          ))}
+                        </ul>
+                      </section>
+                    )}
+                  </>
                 )}
 
-                {viewMode === 'list' &&
-                  list.items.map((item: Media) => (
-                    <ListMediaItem
-                      key={item.id}
-                      item={item}
-                      onClick={onClickMediaItem}
-                      active={activeItem && activeItem.id === item.id}
-                    />
-                  ))}
-
-                {viewMode === 'grid' &&
-                  list.items.map((item: Media) => (
-                    <GridMediaItem
-                      key={item.id}
-                      item={item}
-                      onClick={onClickMediaItem}
-                      active={activeItem && activeItem.id === item.id}
-                    />
-                  ))}
-
-                {!!list.nextOffset && <LoadingMediaList ref={loaderRef} />}
-              </ul>
+                {showLoader && <LoadingMediaList ref={loaderRef} />}
+              </div>
             </div>
 
             <ActiveItemPreview
@@ -533,6 +691,10 @@ export function MediaPicker({
               allowDelete={cms.media.store.isStatic ? false : allowDelete}
               deleteMediaItem={() => {
                 setDeleteModalOpen(true);
+              }}
+              allowRename={allowRename}
+              renameMediaItem={() => {
+                setRenameModalOpen(true);
               }}
             />
           </div>
@@ -548,6 +710,8 @@ const ActiveItemPreview = ({
   selectMediaItem,
   deleteMediaItem,
   allowDelete,
+  renameMediaItem,
+  allowRename,
 }) => {
   const thumbnail = activeItem
     ? (activeItem.thumbnails || {})['1000x1000']
@@ -571,7 +735,7 @@ const ActiveItemPreview = ({
               className='group grow-0 shrink-0'
               onClick={close}
             >
-              <BiX
+              <X
                 className={`w-7 h-auto text-gray-500 opacity-50 group-hover:opacity-100 transition duration-150 ease-out`}
               />
             </IconButton>
@@ -587,7 +751,7 @@ const ActiveItemPreview = ({
             </div>
           ) : (
             <span className='p-3 border border-gray-100 rounded overflow-hidden bg-gray-50 shadow'>
-              <BiFile className='w-14 h-auto fill-gray-300' />
+              <File className='w-14 h-auto text-gray-300' />
             </span>
           )}
           <div className='grow h-full w-full shrink flex flex-col gap-3 items-start justify-start'>
@@ -601,8 +765,14 @@ const ActiveItemPreview = ({
                   variant='primary'
                   onClick={() => selectMediaItem(activeItem)}
                 >
-                  <BiArrowToBottom className='mr-1 -ml-0.5 w-6 h-auto opacity-70' />
+                  <ArrowDownToLine className='mr-1 -ml-0.5 w-6 h-auto opacity-70' />
                   Insert
+                </Button>
+              )}
+              {allowRename && (
+                <Button size='medium' onClick={renameMediaItem}>
+                  <TextCursorInput className='mr-1 -ml-0.5 w-6 h-auto opacity-70' />
+                  Rename
                 </Button>
               )}
               {allowDelete && (
@@ -632,13 +802,7 @@ const UploadButton = ({ onClick, uploading }: any) => {
       busy={uploading}
       onClick={onClick}
     >
-      {uploading ? (
-        <LoadingDots />
-      ) : (
-        <>
-          Upload <BiCloudUpload className='w-6 h-full ml-2 opacity-70' />
-        </>
-      )}
+      Upload <CloudUpload className='w-6 h-full ml-2 opacity-70' />
     </Button>
   );
 };
@@ -706,7 +870,7 @@ const SyncStatusContainer = ({ children }) => {
     <div className='h-full flex items-center justify-center p-6 bg-gradient-to-t from-gray-200 to-transparent'>
       <div className='rounded-lg border shadow-sm px-4 lg:px-6 py-3 lg:py-4 bg-gradient-to-r from-yellow-50 to-yellow-100 border-yellow-200 mx-auto mb-12'>
         <div className='flex items-start sm:items-center gap-2'>
-          <BiError
+          <CircleAlert
             className={`w-7 h-auto flex-shrink-0 text-yellow-400 -mt-px`}
           />
           <div
@@ -719,7 +883,7 @@ const SyncStatusContainer = ({ children }) => {
               href={`${cms.api.tina.appDashboardLink}/media`}
             >
               Sync Your Media In TinaCloud.
-              <BiLinkExternal className={`w-5 h-auto flex-shrink-0`} />
+              <ExternalLink className={`w-5 h-auto flex-shrink-0`} />
             </a>
           </div>
         </div>
@@ -740,11 +904,12 @@ const useSyncStatus = () => {
   return context;
 };
 
-const EmptyMediaList = () => {
+const EmptyMediaList = ({ message }: { message?: string }) => {
   const { syncStatus } = useSyncStatus();
   return (
     <div className={`p-12 text-xl opacity-50 text-center`}>
-      {syncStatus == 'synced' ? 'Drag and drop assets here' : 'Loading...'}
+      {message ??
+        (syncStatus == 'synced' ? 'Drag and drop assets here' : 'Loading...')}
     </div>
   );
 };
@@ -766,37 +931,108 @@ const DocsLink = ({ title, message, docsLink, ...props }) => {
   );
 };
 
+const SearchInput = ({
+  value,
+  setValue,
+  clear,
+}: {
+  value: string;
+  setValue: (value: string) => void;
+  clear: () => void;
+}) => {
+  return (
+    <div className='relative flex flex-1 items-center min-w-[200px] max-w-md'>
+      <Search className='absolute left-3 w-5 h-5 text-gray-400 pointer-events-none' />
+      <input
+        type='text'
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        aria-label='Search media library'
+        placeholder='Search this library...'
+        className='w-full rounded-lg border border-gray-200 bg-white py-2 pl-10 pr-9 text-base text-gray-700 shadow-sm placeholder:text-gray-400 focus:border-tina-orange focus:outline-none focus:ring-1 focus:ring-tina-orange'
+      />
+      {value && (
+        <button
+          type='button'
+          onClick={clear}
+          aria-label='Clear search'
+          className='absolute right-2 flex items-center justify-center text-gray-400 hover:text-gray-600'
+        >
+          <X className='w-5 h-5' />
+        </button>
+      )}
+    </div>
+  );
+};
+
+const MediaFilterToggle = ({
+  value,
+  setValue,
+}: {
+  value: 'all' | 'folders' | 'files';
+  setValue: (value: 'all' | 'folders' | 'files') => void;
+}) => {
+  const base =
+    'relative whitespace-nowrap flex items-center justify-center gap-1.5 text-sm px-3 py-1.5 transition-colors ease-out duration-150';
+  const active = 'bg-white text-tina-orange font-medium';
+  const inactive = 'bg-gray-50 text-gray-500 hover:text-gray-700';
+  const options: { key: 'all' | 'folders' | 'files'; label: string }[] = [
+    { key: 'all', label: 'All' },
+    { key: 'folders', label: 'Folders' },
+    { key: 'files', label: 'Files' },
+  ];
+  return (
+    <div className='grow-0 flex rounded-lg border border-gray-200 overflow-hidden'>
+      {options.map((option, index) => (
+        <button
+          key={option.key}
+          type='button'
+          onClick={() => setValue(option.key)}
+          aria-pressed={value === option.key}
+          className={`${base} ${index > 0 ? 'border-l border-gray-200' : ''} ${
+            value === option.key ? active : inactive
+          }`}
+        >
+          {option.key === 'folders' && (
+            <Folder className='w-4 h-4 opacity-80' />
+          )}
+          {option.key === 'files' && <File className='w-4 h-4 opacity-80' />}
+          {option.label}
+        </button>
+      ))}
+    </div>
+  );
+};
+
 const ViewModeToggle = ({ viewMode, setViewMode }) => {
-  const toggleClasses = {
-    base: 'relative whitespace-nowrap flex items-center justify-center flex-1 block font-medium text-base py-1 transition-all ease-out duration-150 border',
-    active:
-      'bg-white text-blue-500 shadow-inner border-gray-50 border-t-gray-100',
-    inactive: 'bg-gray-50 text-gray-400 shadow border-gray-100 border-t-white',
-  };
+  const base =
+    'relative flex items-center justify-center w-9 py-1.5 transition-colors ease-out duration-150';
+  const active = 'bg-white text-tina-orange';
+  const inactive = 'bg-gray-50 text-gray-400 hover:text-gray-600';
 
   return (
-    <div
-      className={`grow-0 flex justify-between rounded border border-gray-100`}
-    >
+    <div className='grow-0 flex rounded-lg border border-gray-200 overflow-hidden'>
       <button
-        className={`${toggleClasses.base} px-2.5 rounded-l ${
-          viewMode === 'grid' ? toggleClasses.active : toggleClasses.inactive
-        }`}
+        aria-label='Grid view'
+        aria-pressed={viewMode === 'grid'}
+        className={`${base} ${viewMode === 'grid' ? active : inactive}`}
         onClick={() => {
           setViewMode('grid');
         }}
       >
-        <BiGridAlt className='w-6 h-full opacity-70' />
+        <LayoutGrid className='w-5 h-5' />
       </button>
       <button
-        className={`${toggleClasses.base} px-2 rounded-r ${
-          viewMode === 'list' ? toggleClasses.active : toggleClasses.inactive
+        aria-label='List view'
+        aria-pressed={viewMode === 'list'}
+        className={`${base} border-l border-gray-200 ${
+          viewMode === 'list' ? active : inactive
         }`}
         onClick={() => {
           setViewMode('list');
         }}
       >
-        <BiListUl className='w-8 h-full opacity-70' />
+        <List className='w-5 h-5' />
       </button>
     </div>
   );

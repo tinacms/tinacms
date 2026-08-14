@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import type { ServerResponse } from 'http';
 import path, { join } from 'path';
 import busboy from 'busboy';
@@ -24,10 +25,12 @@ export const createMediaRouter = (config: PathConfig) => {
       );
       const limit = requestURL.searchParams.get('limit');
       const cursor = requestURL.searchParams.get('cursor');
+      const search = requestURL.searchParams.get('search');
       const media = await mediaModel.listMedia({
         searchPath: folder,
         cursor,
         limit,
+        search,
       });
       res.end(JSON.stringify(media));
     } catch (error) {
@@ -51,6 +54,46 @@ export const createMediaRouter = (config: PathConfig) => {
       if (error instanceof PathTraversalError) {
         res.statusCode = 403;
         res.end(JSON.stringify({ error: error.message }));
+        return;
+      }
+      throw error;
+    }
+  };
+
+  const handleRename = async (req: Connect.IncomingMessage, res) => {
+    // Body is populated by the bodyParser.json middleware registered ahead of
+    // this router, the same way the /graphql route consumes it.
+    const body = (req as unknown as { body?: unknown }).body;
+    const { from, to } = (body as { from?: unknown; to?: unknown }) || {};
+
+    if (typeof from !== 'string' || typeof to !== 'string' || !from || !to) {
+      res.statusCode = 400;
+      res.end(
+        JSON.stringify({
+          code: 'INVALID_FILENAME',
+          message: 'Both "from" and "to" are required.',
+        })
+      );
+      return;
+    }
+
+    try {
+      const result = await mediaModel.renameMedia({ from, to });
+      // `in` rather than `result.ok`: this repo compiles with `strict: false`,
+      // where boolean-literal discriminants do not narrow.
+      if ('code' in result) {
+        res.statusCode = RENAME_ERROR_STATUS[result.code];
+        res.end(JSON.stringify({ code: result.code, message: result.message }));
+        return;
+      }
+      res.statusCode = 200;
+      res.end(JSON.stringify({ success: true, from, to }));
+    } catch (error) {
+      if (error instanceof PathTraversalError) {
+        res.statusCode = 403;
+        res.end(
+          JSON.stringify({ code: 'INVALID_PATH', message: error.message })
+        );
         return;
       }
       throw error;
@@ -105,7 +148,7 @@ export const createMediaRouter = (config: PathConfig) => {
     req.pipe(bb);
   };
 
-  return { handleList, handleDelete, handlePost };
+  return { handleList, handleDelete, handlePost, handleRename };
 };
 
 export const parseMediaFolder = (str: string) => {
@@ -122,6 +165,7 @@ interface MediaArgs {
   searchPath: string;
   cursor?: string;
   limit?: string;
+  search?: string;
 }
 
 interface File {
@@ -150,6 +194,39 @@ export interface PathConfig {
 }
 
 type SuccessRecord = { ok: true } | { ok: false; message: string };
+
+export type RenameFailureCode =
+  | 'NOT_FOUND'
+  | 'NAME_COLLISION'
+  | 'UNSUPPORTED'
+  | 'BACKEND_FAILURE';
+
+type RenameRecord =
+  | { ok: true }
+  | { ok: false; code: RenameFailureCode; message: string };
+
+const RENAME_ERROR_STATUS: Record<RenameFailureCode, number> = {
+  NOT_FOUND: 404,
+  NAME_COLLISION: 409,
+  UNSUPPORTED: 400,
+  BACKEND_FAILURE: 500,
+};
+
+/**
+ * Raised when a staged rename cannot put the file back where it started, so
+ * the file is left under the staging name. Carries that name so the response
+ * can tell the editor where to find it.
+ */
+class StagedRenameError extends Error {
+  constructor(public readonly stagingName: string) {
+    super(`Left the file as "${stagingName}" in the same folder.`);
+  }
+}
+
+/** fs-extra's move rejects an existing destination with a bare message. */
+const isDestinationExistsError = (error: unknown) =>
+  (error as { code?: string })?.code === 'EEXIST' ||
+  /dest already exists/i.test((error as Error)?.message || '');
 
 /**
  * Detects URL-encoded path-traversal sequences that should have been
@@ -321,6 +398,19 @@ export class MediaModel {
           directories: [],
         };
       }
+
+      const search = args.search?.trim().toLowerCase();
+      if (search) {
+        return await this.searchMedia({
+          mediaBase,
+          validatedPath,
+          searchPath,
+          search,
+          cursor: args.cursor,
+          limit: args.limit,
+        });
+      }
+
       const filesStr = await fs.readdir(validatedPath);
       const filesProm: Promise<FileRes>[] = filesStr.map(async (file) => {
         const filePath = join(validatedPath, file);
@@ -368,12 +458,15 @@ export class MediaModel {
         }
         return 0;
       });
-      const limitItems = sortedItems.slice(offset, offset + limit);
-      const files = limitItems.filter((x) => x.isFile);
-      const directories = limitItems.filter((x) => !x.isFile).map((x) => x.src);
+      const allDirectories = sortedItems
+        .filter((x) => !x.isFile)
+        .map((x) => x.src);
+      const allFiles = sortedItems.filter((x) => x.isFile);
 
+      const directories = offset === 0 ? allDirectories : [];
+      const files = allFiles.slice(offset, offset + limit);
       const cursor =
-        rawItems.length > offset + limit ? String(offset + limit) : null;
+        allFiles.length > offset + limit ? String(offset + limit) : null;
 
       return {
         files,
@@ -393,6 +486,184 @@ export class MediaModel {
       };
     }
   }
+  private async searchMedia({
+    mediaBase,
+    validatedPath,
+    searchPath,
+    search,
+    cursor,
+    limit,
+  }: {
+    mediaBase: string;
+    validatedPath: string;
+    searchPath: string;
+    search: string;
+    cursor?: string;
+    limit?: string;
+  }): Promise<ListMediaRes> {
+    const resolvedBase = path.resolve(mediaBase);
+    const files: File[] = [];
+    const directories: string[] = [];
+    const visitedDirs = new Set<string>([resolveRealPath(validatedPath)]);
+
+    const walk = async (dir: string, relPrefix: string) => {
+      let entries: string[];
+      try {
+        entries = await fs.readdir(dir);
+      } catch {
+        return;
+      }
+      const stats = await Promise.all(
+        entries.map(async (entry) => {
+          const absPath = join(dir, entry);
+          // @security Skip entries whose real path escapes the media root
+          // (symlink/junction), matching resolveWithinBase for the recursive walk.
+          try {
+            assertSymlinkWithinBase(absPath, resolvedBase, absPath);
+          } catch {
+            return null;
+          }
+          try {
+            return { entry, absPath, stat: await fs.stat(absPath) };
+          } catch {
+            return null;
+          }
+        })
+      );
+
+      for (const entryStat of stats) {
+        if (!entryStat) continue;
+        const { entry, absPath, stat } = entryStat;
+        const relPath = relPrefix ? `${relPrefix}/${entry}` : entry;
+        if (stat.isDirectory()) {
+          // @security Symlinked directories inside the media root pass the
+          // containment check, so track real paths to break traversal cycles.
+          const realDir = resolveRealPath(absPath);
+          if (visitedDirs.has(realDir)) continue;
+          visitedDirs.add(realDir);
+          if (entry.toLowerCase().includes(search)) {
+            directories.push(`/${relPath}`);
+          }
+          await walk(absPath, relPath);
+          continue;
+        }
+        if (!relPath.toLowerCase().includes(search)) continue;
+
+        let src = `/${relPath}`;
+        if (searchPath) src = `/${searchPath}${src}`;
+        if (this.mediaRoot) src = `/${this.mediaRoot}${src}`;
+        files.push({ src, filename: relPath, size: stat.size });
+      }
+    };
+
+    await walk(validatedPath, '');
+    files.sort((a, b) => a.filename.localeCompare(b.filename));
+    directories.sort();
+
+    const offset = Number(cursor) || 0;
+    const pageSize = Number(limit) || 20;
+
+    return {
+      files: files.slice(offset, offset + pageSize),
+      directories: offset === 0 ? directories : [],
+      cursor:
+        files.length > offset + pageSize ? String(offset + pageSize) : null,
+    };
+  }
+
+  /**
+   * @security Both paths go through `resolveStrictlyWithinBase`, which rejects
+   * traversal, symlink escapes and the media root itself.
+   */
+  async renameMedia(args: { from: string; to: string }): Promise<RenameRecord> {
+    const mediaBase = join(this.rootPath, this.publicFolder, this.mediaRoot);
+    const source = resolveStrictlyWithinBase(args.from, mediaBase);
+    const destination = resolveStrictlyWithinBase(args.to, mediaBase);
+
+    try {
+      const stats = await fs.stat(source);
+      if (stats.isDirectory()) {
+        return {
+          ok: false,
+          code: 'UNSUPPORTED',
+          message: 'Renaming folders is not supported.',
+        };
+      }
+    } catch {
+      return {
+        ok: false,
+        code: 'NOT_FOUND',
+        message: `"${args.from}" does not exist.`,
+      };
+    }
+
+    // On case-insensitive filesystems the destination of a case-only rename
+    // reports as existing because it *is* the source.
+    const isCaseOnlyRename =
+      source !== destination &&
+      source.toLowerCase() === destination.toLowerCase();
+
+    if (!isCaseOnlyRename && (await fs.pathExists(destination))) {
+      return {
+        ok: false,
+        code: 'NAME_COLLISION',
+        message: `"${args.to}" already exists.`,
+      };
+    }
+
+    try {
+      await fs.ensureDir(path.dirname(destination));
+      if (isCaseOnlyRename) {
+        await this.renameViaStaging(source, destination);
+      } else {
+        await fs.move(source, destination, { overwrite: false });
+      }
+      return { ok: true };
+    } catch (error) {
+      // pathExists above is advisory only; the move stays overwrite-free so a
+      // racing writer still surfaces as a collision rather than data loss.
+      if (isDestinationExistsError(error)) {
+        return {
+          ok: false,
+          code: 'NAME_COLLISION',
+          message: `"${args.to}" already exists.`,
+        };
+      }
+      console.error(error);
+      return {
+        ok: false,
+        code: 'BACKEND_FAILURE',
+        message:
+          error instanceof StagedRenameError
+            ? `Failed to rename the file. ${error.message}`
+            : 'Failed to rename the file.',
+      };
+    }
+  }
+
+  /**
+   * A case-insensitive filesystem can treat `a.jpg` -> `A.jpg` as a no-op, so
+   * hop through a unique sibling name. On failure the source is put back; if
+   * even that fails the file survives under the staging name, which
+   * StagedRenameError reports rather than leaving it to be found by accident.
+   */
+  private async renameViaStaging(source: string, destination: string) {
+    const stagingName = `.tina-rename-${randomUUID()}`;
+    const staging = join(path.dirname(source), stagingName);
+    await fs.move(source, staging, { overwrite: false });
+    try {
+      await fs.move(staging, destination, { overwrite: false });
+    } catch (error) {
+      try {
+        await fs.move(staging, source, { overwrite: false });
+      } catch (restoreError) {
+        console.error(restoreError);
+        throw new StagedRenameError(stagingName);
+      }
+      throw error;
+    }
+  }
+
   async deleteMedia(args: MediaArgs): Promise<SuccessRecord> {
     try {
       const mediaBase = join(this.rootPath, this.publicFolder, this.mediaRoot);

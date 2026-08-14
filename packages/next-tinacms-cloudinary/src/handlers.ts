@@ -5,10 +5,13 @@
 import { v2 as cloudinary } from 'cloudinary';
 import type { Media, MediaListOptions } from 'tinacms';
 import path from 'path';
+import os from 'os';
 import { NextApiRequest, NextApiResponse } from 'next';
 import multer from 'multer';
 import { promisify } from 'util';
 import { resolveKey, resolveDirectory, MediaKeyError } from './media-key';
+import { escapeSearchValue } from './search-expression';
+import { safeUploadName } from './upload-filename';
 
 export interface CloudinaryConfig {
   cloud_name: string;
@@ -57,12 +60,11 @@ async function uploadMedia(req: NextApiRequest, res: NextApiResponse) {
   const upload = promisify(
     multer({
       storage: multer.diskStorage({
-        // @ts-ignore
-        directory: (req, file, cb) => {
-          cb(null, '/tmp');
+        destination: (req, file, cb) => {
+          cb(null, os.tmpdir());
         },
         filename: (req, file, cb) => {
-          cb(null, file.originalname);
+          cb(null, safeUploadName(file.originalname));
         },
       }),
     }).single('file')
@@ -118,8 +120,15 @@ async function listMedia(
   opts?: CloudinaryOptions
 ) {
   try {
+    // A repeated query param (?directory=a&directory=b) arrives as an array,
+    // so narrow it before it reaches the string-typed escaper below.
+    const rawDirectory = req.query.directory;
+    const directory = Array.isArray(rawDirectory)
+      ? rawDirectory[0]
+      : rawDirectory;
+
     const mediaListOptions: MediaListOptions = {
-      directory: (req.query.directory as string) || '""',
+      directory: directory || '""',
       limit: parseInt(req.query.limit as string, 10) || 500,
       offset: req.query.offset as string,
       filesOnly: req.query.filesOnly === 'true' || false,
@@ -132,12 +141,9 @@ async function listMedia(
 
     if (!useRootDirectory) {
       try {
-        // Validation only: reject upward traversal in the listing directory for
-        // consistency with the other adapters. The normalised result is
-        // intentionally discarded; the raw directory is still interpolated into
-        // the search expression below, so this does NOT bound the listing the
-        // way resolveDirectory bounds the S3/DOS prefix. Search-expression
-        // escaping (SEC-5) is a separate follow-up.
+        // Validation only: rejects traversal but does NOT bound the listing
+        // the way resolveDirectory bounds the S3/DOS prefix. The normalised
+        // result is discarded; its trailing slash matches no folder= term.
         resolveDirectory(mediaListOptions.directory);
       } catch (e) {
         if (e instanceof MediaKeyError) {
@@ -150,7 +156,7 @@ async function listMedia(
 
     const query = useRootDirectory
       ? 'folder=""'
-      : `folder="${mediaListOptions.directory}"`;
+      : `folder="${escapeSearchValue(mediaListOptions.directory)}"`;
 
     const response = await cloudinary.search
       .expression(query)

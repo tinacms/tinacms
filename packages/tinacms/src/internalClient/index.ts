@@ -292,8 +292,9 @@ mutation addPendingDocumentMutation(
     const headers = {
       'Content-Type': 'application/json',
     };
-    if (token?.id_token) {
-      headers['Authorization'] = 'Bearer ' + token?.id_token;
+    const accessToken = token?.id_token ?? token?.access_token;
+    if (accessToken) {
+      headers['Authorization'] = 'Bearer ' + accessToken;
     }
     const res = await fetch(this.contentApiUrl, {
       method: 'POST',
@@ -586,6 +587,23 @@ mutation addPendingDocumentMutation(
       signal: args?.signal,
     });
     return branches.some((b) => b.name === branchName);
+  }
+
+  async branchesExist(
+    branchNames: string[],
+    args?: { signal?: AbortSignal }
+  ): Promise<Record<string, boolean>> {
+    if (this.isLocalMode) {
+      return Object.fromEntries(branchNames.map((name) => [name, true]));
+    }
+    const branches = await this.listBranches({
+      includeIndexStatus: false,
+      signal: args?.signal,
+    });
+    const existing = new Set(branches.map((b) => b.name));
+    return Object.fromEntries(
+      branchNames.map((name) => [name, existing.has(name)])
+    );
   }
 
   async createBranch({ baseBranch, branchName }: BranchData) {
