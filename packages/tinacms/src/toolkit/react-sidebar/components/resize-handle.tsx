@@ -6,9 +6,8 @@ export const ResizeHandle = () => {
     React.useContext(SidebarContext);
 
   const startResizing = (e: React.PointerEvent<HTMLDivElement>) => {
-    // Capture the pointer so move/up keep targeting the handle even over the
-    // iframe. Losing capture for any reason — release, cancel, or focus loss —
-    // ends the resize via onLostPointerCapture, so the state can't get stuck.
+    if (e.button !== 0) return;
+    // Capture so move/up keep targeting the handle once the cursor is over the iframe.
     e.currentTarget.setPointerCapture(e.pointerId);
     setResizingSidebar(true);
   };
@@ -27,10 +26,16 @@ export const ResizeHandle = () => {
     };
 
     window.addEventListener('pointermove', handlePointerMove);
+    // Backstop for the cases onLostPointerCapture misses, e.g. the handle
+    // unmounting mid-drag, which would strand the overlay over the whole app.
+    window.addEventListener('pointerup', stopResizing);
+    window.addEventListener('pointercancel', stopResizing);
     document.body.classList.add('select-none');
 
     return () => {
       window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', stopResizing);
+      window.removeEventListener('pointercancel', stopResizing);
       document.body.classList.remove('select-none');
     };
   }, [resizingSidebar, setSidebarWidth]);
@@ -43,6 +48,7 @@ export const ResizeHandle = () => {
     <div
       onPointerDown={startResizing}
       onLostPointerCapture={stopResizing}
+      data-testid='resize-handle'
       className={`z-100 absolute top-1/2 right-px w-2 h-32 bg-white rounded-r border border-gray-150 shadow-sm hover:shadow-md origin-left transition-all duration-150 ease-out transform translate-x-full -translate-y-1/2 group hover:bg-gray-50 ${
         displayState !== 'closed' ? `opacity-100` : `opacity-0`
       } ${resizingSidebar ? `scale-110` : `scale-90 hover:scale-100`}`}

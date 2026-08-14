@@ -5,9 +5,8 @@ interface ResizeOverlayProps {
 }
 
 /**
- * An invisible overlay that captures mouse events during sidebar resize.
- * This prevents the "laggy" feeling when dragging across the iframe,
- * without using pointer-events-none which causes focus issues.
+ * Pointer capture on the handle is what keeps the drag alive over the iframe.
+ * This only wins hit-testing, so the resize cursor holds across the whole window.
  */
 export const ResizeOverlay: React.FC<ResizeOverlayProps> = ({ isResizing }) => {
   if (!isResizing) return null;
