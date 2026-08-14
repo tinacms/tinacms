@@ -269,6 +269,11 @@ describe('tina-markdown', () => {
  * `packages/@tinacms/astro`. The three suites share case names so the
  * renderers can be compared side by side; where an expectation here differs
  * from the other two, the renderers disagree.
+ *
+ * One deliberate divergence: the web component has no `components.html`
+ * opt-in. Raw HTML is always sanitised, so where the other two renderers have
+ * a positive "opt in" case this suite asserts the sanitisation cannot be
+ * bypassed, and that the `components` map is keyed by MDX component name only.
  */
 describe('tina-markdown raw HTML nodes', () => {
   afterEach(() => {
@@ -350,11 +355,10 @@ describe('tina-markdown raw HTML nodes', () => {
     expect(root.querySelector('p')?.textContent).toBe('before');
   });
 
-  it('renders raw HTML when the consumer opts in via components.html', () => {
+  it('does not let components.html bypass sanitisation', () => {
     TinaMarkdown.components = {
       html: (node: { value: string }) => {
         const el = document.createElement('div');
-        el.id = 'opt-in';
         el.innerHTML = node.value;
         return el;
       },
@@ -365,12 +369,12 @@ describe('tina-markdown raw HTML nodes', () => {
       children: [{ type: 'html', value: '<b onclick="x">raw</b>' }],
     });
 
-    expect(root.querySelector('#opt-in > b')?.getAttribute('onclick')).toBe(
-      'x'
-    );
+    const b = root.querySelector('b');
+    expect(b?.textContent).toBe('raw');
+    expect(b?.getAttribute('onclick')).toBeNull();
   });
 
-  it('routes any node type through the components map', () => {
+  it('does not route node types through the components map', () => {
     TinaMarkdown.components = {
       h1: (node: { children: { text: string }[] }) => {
         const el = document.createElement('h1');
@@ -385,6 +389,33 @@ describe('tina-markdown raw HTML nodes', () => {
       children: [{ type: 'h1', children: [{ type: 'text', text: 'Title' }] }],
     });
 
-    expect(root.querySelector('h1.fancy')?.textContent).toBe('Title');
+    const h1 = root.querySelector('h1');
+    expect(h1?.textContent).toBe('Title');
+    expect(h1?.className).toBe('');
+  });
+
+  it('routes mdx custom elements through components by name', () => {
+    TinaMarkdown.components = {
+      PostPreview: (node: { props: { title: string } }) => {
+        const el = document.createElement('div');
+        el.className = 'preview';
+        el.textContent = node.props.title;
+        return el;
+      },
+    };
+
+    const root = render({
+      type: 'root',
+      children: [
+        {
+          type: 'mdxJsxFlowElement',
+          name: 'PostPreview',
+          props: { title: 'Hello' },
+        },
+      ],
+    });
+
+    const preview = root.querySelector('.preview');
+    expect(preview?.textContent).toBe('Hello');
   });
 });
