@@ -7,7 +7,7 @@
  * fully static and can be rendered on the server.
  */
 
-import { sanitizeUrl } from '@tinacms/mdx';
+import { sanitizeUrl } from '@tinacms/mdx/sanitize-url';
 import React from 'react';
 
 type BaseComponents = {

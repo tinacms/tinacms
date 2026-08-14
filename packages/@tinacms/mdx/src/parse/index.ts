@@ -152,6 +152,12 @@ const sanitizeSlateTree = <T>(node: T): T => {
   return next as unknown as T;
 };
 
+/**
+ * A CRLF pair survives micromark into the value of a text node. Normalize the
+ * source so no carriage return reaches the editor.
+ */
+const toLineFeeds = (value: string): string => value.replace(/\r\n/g, '\n');
+
 export const parseMDX = (
   value: string,
   field: RichTextType,
@@ -164,14 +170,15 @@ export const parseMDX = (
   try {
     switch (field.parser?.type) {
       case 'markdown':
-        return parseMDXNext(value, field, imageCallback);
+        return parseMDXNext(toLineFeeds(value), field, imageCallback);
       case 'slatejson':
         // Assuming `value` is a JSON object
         return sanitizeSlateTree(
           value as unknown as Plate.RootElement
         ) as Plate.RootElement;
     }
-    let preprocessedString = value;
+    const source = toLineFeeds(value);
+    let preprocessedString = source;
     const templatesWithMatchers = field.templates?.filter(
       (template) => template.match
     );
@@ -187,7 +194,7 @@ export const parseMDX = (
     });
     tree = mdxToAst(preprocessedString);
     if (tree) {
-      return remarkToSlate(tree, field, imageCallback, value);
+      return remarkToSlate(tree, field, imageCallback, source);
     } else {
       return { type: 'root', children: [] };
     }

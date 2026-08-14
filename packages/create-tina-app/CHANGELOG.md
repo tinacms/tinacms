@@ -1,5 +1,17 @@
 # create-tina-app
 
+## 2.1.11
+
+### Patch Changes
+
+- [#7186](https://github.com/tinacms/tinacms/pull/7186) [`77c9555`](https://github.com/tinacms/tinacms/commit/77c95553dfd7e1812f8303b8a30c9d264591d74f) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Rename the "Bare bones starter" template to "React Starter" and point it at the renamed `tina-react-starter` repository. The `--template basic` flag value is unchanged.
+
+## 2.1.10
+
+### Patch Changes
+
+- [#7122](https://github.com/tinacms/tinacms/pull/7122) [`90833f1`](https://github.com/tinacms/tinacms/commit/90833f10d700aaa6940a8104c48d47e9b4aabe0a) Thanks [@kulesy](https://github.com/kulesy)! - feat(create-tina-app): stream live install activity on the spinner
+
 ## 2.1.9
 
 ### Patch Changes

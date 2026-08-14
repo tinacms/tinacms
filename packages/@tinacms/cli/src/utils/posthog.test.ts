@@ -130,6 +130,16 @@ describe('postHogCapture', () => {
     });
   });
 
+  it('marks events as anonymous so no person profile is created', () => {
+    const capture = jest.fn();
+    const client = { capture } as unknown as PostHog;
+
+    postHogCapture(client, 'd', 'e', {});
+
+    const arg = capture.mock.calls[0][0];
+    expect(arg.properties.$process_person_profile).toBe(false);
+  });
+
   it('swallows errors thrown by client.capture so telemetry never breaks the CLI', () => {
     const capture = jest.fn().mockImplementation(() => {
       throw new Error('boom');

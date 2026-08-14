@@ -1,6 +1,6 @@
 {
 	"name": "@tinacms/mdx",
-	"version": "2.1.8",
+	"version": "2.1.11",
 	"type": "module",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -14,6 +14,10 @@
 			"types": "./dist/index.d.ts",
 			"browser": "./dist/index.browser.js",
 			"default": "./dist/index.js"
+		},
+		"./sanitize-url": {
+			"types": "./dist/sanitize-url.d.ts",
+			"default": "./dist/sanitize-url.js"
 		}
 	},
 	"license": "Apache-2.0",
@@ -23,7 +27,8 @@
 				"name": "src/index.ts",
 				"target": "node",
 				"bundleDeps": true
-			}
+			},
+			"src/sanitize-url.ts"
 		]
 	},
 	"scripts": {
@@ -36,7 +41,7 @@
 		"test-watch": "vitest"
 	},
 	"dependencies": {
-		"@tinacms/schema-tools": "workspace:*",
+		"@tinacms/schema-tools": "workspace:^",
 		"acorn": "catalog:",
 		"ccount": "catalog:",
 		"estree-util-is-identifier-name": "catalog:",

@@ -47,10 +47,14 @@ tests/                 # Build verification tests
 
 - `pnpm-workspace.yaml` defines workspace packages and a `catalog:` section for shared dependency versions
 - Example apps use `workspace:*` to reference local TinaCMS packages
+- Published packages must use `workspace:^` for internal refs in `dependencies`/`peerDependencies` (`devDependencies` are exempt). pnpm publishes it as a caret range so npm can dedupe; `workspace:*` publishes an exact pin that nests duplicate dependency trees (#7207). Enforced by `tests/workspace-protocol.test.ts`.
+- Because published dependents float across caret ranges, internal APIs consumed by sibling published packages are compatibility contracts within a major: an already-published `@tinacms/cli`/`@tinacms/app` may run against a newer `tinacms`. Breaking such an API requires a major bump.
 - `turbo.json` defines build/test/types task dependencies
 
 ## Coding Standards
 
+- **Comments are a last resort.** Write code that explains itself; comment only what the code cannot say (a non-obvious invariant, a documented workaround). No narrated comments, no restating what the next line does, no essay-length headers riding on a few lines of code.
+- **Error narrowing is an `if`, not an expression.** Use `if (err instanceof Error) { … } else { … }` — never `(err instanceof Error && err.message) || fallback` or a ternary that smuggles narrowing into an expression.
 - **Linting/Formatting:** Biome (`biome.json` at root). Example apps extend with `"extends": ["../../../biome.json"]`
 - **TypeScript:** Base config at `base.tsconfig.json`. Examples extend it. Strict mode enabled.
 - **Package manager:** pnpm only. Never use npm or yarn.

@@ -1,7 +1,18 @@
-import * as React from 'react';
-import { BiError } from 'react-icons/bi';
-import { GitBranchIcon, TriangleAlert } from 'lucide-react';
+import { FieldLabel } from '@toolkit/fields';
+import { Form } from '@toolkit/forms';
+import { useLocalStorage } from '@toolkit/hooks/use-local-storage';
 import { Button, DropdownButton } from '@toolkit/styles';
+import {
+  CircleAlert,
+  Eye,
+  FileText,
+  GitBranchIcon,
+  Globe,
+  TriangleAlert,
+} from 'lucide-react';
+import * as React from 'react';
+import { EditorialWorkflowSaveEvent } from '../../lib/posthog/posthog';
+import { captureEvent } from '../../lib/posthog/posthogProvider';
 import { useCMS } from '../react-core';
 import {
   Modal,
@@ -10,10 +21,13 @@ import {
   ModalHeader,
   PopupModal,
 } from '../react-modals';
-import { FieldLabel } from '@toolkit/fields';
-import { Form } from '@toolkit/forms';
 import { EditorialWorkflowProgressModal } from './editorial-workflow-progress-modal';
-import { checkBaseBranchExists } from './editorial-workflow-utils';
+import { checkBranchGuard } from './editorial-workflow-utils';
+import {
+  SAVE_CHOICE_KEY,
+  type SaveChoice,
+  resolveSaveOptions,
+} from './save-options';
 import { useEditorialWorkflow } from './use-editorial-workflow';
 
 // Format the default branch name by removing content/ prefix and file extension
@@ -53,7 +67,7 @@ export const CreateBranchModal = ({
   tinaForm,
   onBaseBranchDeleted,
 }: {
-  safeSubmit: () => Promise<void>;
+  safeSubmit: (editorialWorkflowChoice?: SaveChoice) => Promise<void>;
   close: () => void;
   path: string;
   values: Record<string, unknown>;
@@ -91,7 +105,7 @@ export const CreateBranchModal = ({
     };
   }, []);
 
-  const executeEditorialWorkflow = async () => {
+  const executeEditorialWorkflow = async (isDraft: boolean) => {
     abortBranchGuard();
     const abortController = new AbortController();
     branchGuardAbortRef.current = abortController;
@@ -100,9 +114,10 @@ export const CreateBranchModal = ({
     const baseBranch = decodeURIComponent(tinaApi.branch);
     const targetBranch = `tina/${newBranchName}`;
 
-    const baseBranchExists = await checkBaseBranchExists(
+    const { baseBranchExists, targetBranchExists } = await checkBranchGuard(
       tinaApi,
       baseBranch,
+      targetBranch,
       'executeEditorialWorkflow',
       abortController.signal
     );
@@ -120,7 +135,7 @@ export const CreateBranchModal = ({
 
     setIsBranchGuardChecking(false);
 
-    const success = await executeWorkflow({
+    const { success, error } = await executeWorkflow({
       branchName: targetBranch,
       baseBranch,
       path,
@@ -128,10 +143,22 @@ export const CreateBranchModal = ({
       crudType,
       tinaForm,
       signal: abortController.signal,
+      targetBranchExists,
+      isDraft,
     });
     if (branchGuardAbortRef.current === abortController) {
       branchGuardAbortRef.current = null;
     }
+
+    // Cancelled mid-run (modal closed, branch renamed, another save started, or
+    // unmounted) — treat as a no-op and record nothing.
+    if (abortController.signal.aborted) return;
+
+    captureEvent(EditorialWorkflowSaveEvent, {
+      choice: isDraft ? 'draft' : 'review',
+      success,
+      error,
+    });
 
     if (success) {
       close();
@@ -166,8 +193,10 @@ export const CreateBranchModal = ({
       onSaveToProtectedBranch={() => {
         abortBranchGuard();
         close();
-        safeSubmit();
+        safeSubmit('publish');
       }}
+      showSaveOptions={true}
+      disablePublish={!!tinaApi.usingProtectedBranch()}
     />
   );
 };
@@ -180,15 +209,63 @@ export const CreateBranchPromptModal = ({
   onBranchNameChange,
   onCreateBranch,
   onSaveToProtectedBranch,
+  showSaveOptions = false,
+  disablePublish = false,
 }: {
   branchName: string;
   close: () => void;
   disabled?: boolean;
   errorMessage?: string;
   onBranchNameChange: (value: string) => void;
-  onCreateBranch: () => void;
+  onCreateBranch: (isDraft: boolean) => void;
   onSaveToProtectedBranch: () => void;
+  // Content editorial workflow opts in to the draft / ready / publish save
+  // options. The media workflow reuses this modal but keeps its legacy button.
+  showSaveOptions?: boolean;
+  // Disable "Save and publish" (direct commit) on protected branches, w/ tooltip.
+  disablePublish?: boolean;
 }) => {
+  // Remember the editor's last save choice; the main button reflects it
+  // (default "Save draft"), the caret menu offers the others.
+  const [lastChoice, setLastChoice] = useLocalStorage(
+    SAVE_CHOICE_KEY,
+    'draft'
+  ) as [SaveChoice, (choice: SaveChoice) => void];
+  const { main, menu } = resolveSaveOptions(lastChoice, disablePublish);
+
+  const choices: Record<
+    SaveChoice,
+    {
+      label: string;
+      Icon: React.ComponentType<any>;
+      run: () => void;
+      disabled?: boolean;
+      tooltip?: string;
+    }
+  > = {
+    draft: {
+      label: 'Save draft',
+      Icon: FileText,
+      run: () => onCreateBranch(true),
+    },
+    review: {
+      label: 'Save (ready for review)',
+      Icon: Eye,
+      run: () => onCreateBranch(false),
+    },
+    publish: {
+      label: 'Save and publish',
+      Icon: Globe,
+      run: onSaveToProtectedBranch,
+      disabled: disablePublish,
+      tooltip: disablePublish
+        ? 'This branch is protected. Save a draft or send it for review instead.'
+        : undefined,
+    },
+  };
+  const mainChoice = choices[main] ?? choices.draft;
+  const MainIcon = mainChoice.Icon;
+
   return (
     <Modal className='flex'>
       <PopupModal className='w-auto'>
@@ -201,7 +278,7 @@ export const CreateBranchPromptModal = ({
           <div className='max-w-sm'>
             {errorMessage && (
               <div className='flex items-center gap-1 text-red-700 py-2 px-3 mb-4 bg-red-50 border border-red-200 rounded'>
-                <BiError className='w-5 h-auto text-red-400 flex-shrink-0' />
+                <CircleAlert className='w-5 h-auto text-red-400 flex-shrink-0' />
                 <span className='text-sm'>
                   <b>Error:</b> {errorMessage}
                 </span>
@@ -244,23 +321,53 @@ export const CreateBranchPromptModal = ({
           >
             Cancel
           </Button>
-          <DropdownButton
-            variant='primary'
-            align='start'
-            className='w-full sm:w-auto'
-            disabled={disabled}
-            onMainAction={onCreateBranch}
-            items={[
-              {
-                label: 'Save to Protected Branch',
-                onClick: onSaveToProtectedBranch,
-                icon: <TriangleAlert className='w-4 h-4' />,
-              },
-            ]}
-          >
-            <GitBranchIcon className='w-4 h-4 mr-1' style={{ fill: 'none' }} />
-            Save to a new branch
-          </DropdownButton>
+          {showSaveOptions ? (
+            <DropdownButton
+              variant='primary'
+              align='start'
+              className='w-full sm:w-auto'
+              disabled={disabled}
+              onMainAction={mainChoice.run}
+              items={menu.map((choice) => {
+                const option = choices[choice];
+                const OptionIcon = option.Icon;
+                return {
+                  label: option.label,
+                  icon: <OptionIcon className='w-4 h-4' />,
+                  disabled: option.disabled,
+                  tooltip: option.tooltip,
+                  onClick: () => {
+                    setLastChoice(choice);
+                    option.run();
+                  },
+                };
+              })}
+            >
+              <MainIcon className='w-4 h-4 mr-1' style={{ fill: 'none' }} />
+              {mainChoice.label}
+            </DropdownButton>
+          ) : (
+            <DropdownButton
+              variant='primary'
+              align='start'
+              className='w-full sm:w-auto'
+              disabled={disabled}
+              onMainAction={() => onCreateBranch(false)}
+              items={[
+                {
+                  label: 'Save to Protected Branch',
+                  onClick: onSaveToProtectedBranch,
+                  icon: <TriangleAlert className='w-4 h-4' />,
+                },
+              ]}
+            >
+              <GitBranchIcon
+                className='w-4 h-4 mr-1'
+                style={{ fill: 'none' }}
+              />
+              Save to a new branch
+            </DropdownButton>
+          )}
         </ModalActions>
       </PopupModal>
     </Modal>

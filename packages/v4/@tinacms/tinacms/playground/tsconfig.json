@@ -1,0 +1,18 @@
+{
+  "extends": "../../../../../base.tsconfig.json",
+  "compilerOptions": {
+    "emitDeclarationOnly": false,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "types": ["vite/client"],
+    "baseUrl": ".",
+    "paths": {
+      "@tinacms/tinacms/react": ["../src/editor/index.ts"],
+      "@tinacms/tinacms/admin": ["../src/admin/index.ts"],
+      "@tinacms/tinacms/adapters/react": ["../src/adapters/react/index.ts"],
+      "@tinacms/tinacms": ["../src/index.ts"],
+      "@tinacms/graphql": ["../src/plugins/content/local/graphql/tinacms-graphql.d.ts"]
+    }
+  },
+  "include": ["src", "vite.config.ts"]
+}

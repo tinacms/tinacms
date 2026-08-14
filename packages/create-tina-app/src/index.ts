@@ -11,7 +11,12 @@ import {
 } from './util/fileUtil';
 import { install } from './util/install';
 import { initializeGit, makeFirstCommit } from './util/git';
-import { TEMPLATES, Template, downloadTemplate } from './templates';
+import {
+  DEFAULT_TEMPLATE,
+  TEMPLATES,
+  Template,
+  downloadTemplate,
+} from './templates';
 import { preRunChecks } from './util/preRunChecks';
 import { checkPackageExists } from './util/checkPkgManagers';
 import { TextStyles, TextStylesBold, box } from './util/textstyles';
@@ -37,6 +42,8 @@ import { osInfo as getOsSystemInfo } from 'systeminformation';
 
 const DISCORD_SUPPORT_URL = 'https://discord.com/invite/zumN63Ybpf';
 const FAQ_URL = 'https://tina.io/docs/faq';
+// Truncate the install activity line so the spinner stays on a single row.
+const MAX_ACTIVITY_LINE = 56;
 
 let posthogClient: PostHog | null = null;
 async function initializePostHog(
@@ -300,30 +307,37 @@ export async function run() {
   }
 
   if (!template) {
-    const res = await prompts({
-      name: 'template',
-      type: 'select',
-      message: 'What starter code would you like to use?',
-      choices: TEMPLATES.map(formatTemplateChoice),
-    });
-    if (!Object.hasOwn(res, 'template')) {
-      postHogCaptureError(
-        posthogClient,
-        userId,
-        sessionId,
-        new Error('User cancelled template selection'),
-        {
-          errorCode: ERROR_CODES.ERR_CANCEL_TEMPLATE_PROMPT,
-          errorCategory: 'user-cancellation',
-          step: TRACKING_STEPS.TEMPLATE_SELECT,
-          fatal: true,
-          additionalProperties: telemetryData,
-        }
+    if (!process.stdin.isTTY) {
+      template = DEFAULT_TEMPLATE;
+    } else {
+      const res = await prompts({
+        name: 'template',
+        type: 'select',
+        message: 'What starter code would you like to use?',
+        choices: TEMPLATES.map(formatTemplateChoice),
+        initial: TEMPLATES.indexOf(DEFAULT_TEMPLATE),
+      });
+      if (!Object.hasOwn(res, 'template')) {
+        postHogCaptureError(
+          posthogClient,
+          userId,
+          sessionId,
+          new Error('User cancelled template selection'),
+          {
+            errorCode: ERROR_CODES.ERR_CANCEL_TEMPLATE_PROMPT,
+            errorCategory: 'user-cancellation',
+            step: TRACKING_STEPS.TEMPLATE_SELECT,
+            fatal: true,
+            additionalProperties: telemetryData,
+          }
+        );
+        if (posthogClient) await posthogClient.shutdown();
+        exit(1);
+      }
+      template = TEMPLATES.find(
+        (_template) => _template.value === res.template
       );
-      if (posthogClient) await posthogClient.shutdown();
-      exit(1);
     }
-    template = TEMPLATES.find((_template) => _template.value === res.template);
   }
   telemetryData['template'] = template.value;
 
@@ -442,8 +456,15 @@ export async function run() {
 
   spinner.start('Installing packages.');
   try {
-    await install(pkgManager as PackageManager, opts.verbose);
-    spinner.succeed();
+    // Reflect the package manager's latest line on the spinner as live activity.
+    await install(pkgManager as PackageManager, opts.verbose, (line) => {
+      const text =
+        line.length > MAX_ACTIVITY_LINE
+          ? `${line.slice(0, MAX_ACTIVITY_LINE - 1)}…`
+          : line;
+      spinner.text = `Installing packages, ${text}`;
+    });
+    spinner.succeed('Installing packages.');
   } catch (err) {
     const error = err instanceof Error ? err : new Error(String(err));
     const reason = error.message || String(err);

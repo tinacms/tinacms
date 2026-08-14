@@ -64,7 +64,7 @@ const BlogPage = (props) => {
             {' '}
             Check out this guide
           </a>{' '}
-          to see how add TinaCMS to an existing Next.js site.
+          to see how to add TinaCMS to an existing Next.js site.
         </div>
       </div>
     </>

@@ -34,7 +34,12 @@ import {
   updateDocument,
   deleteDocument,
 } from "../../utils/graphql";
-import { uploadMedia, deleteMedia, encodeMediaPath } from "../../utils/media";
+import {
+  uploadMedia,
+  deleteMedia,
+  encodeMediaPath,
+  renameMedia,
+} from "../../utils/media";
 
 // ---------------------------------------------------------------------------
 // Traversal vectors — plausible attack payloads that must be rejected.
@@ -248,4 +253,44 @@ for (const route of MEDIA_ROUTES) {
       assertNoLeak(responseText, vector);
     });
   }
+}
+
+// ---------------------------------------------------------------------------
+// Media rename — paths travel in a JSON body rather than the URL, so the
+// encoding vectors above don't apply; both ends still have to be validated.
+// ---------------------------------------------------------------------------
+
+const RENAME_VECTORS: { label: string; from: string; to: string }[] = [
+  { label: "traversal in from", from: "../../etc/passwd", to: "stolen.txt" },
+  {
+    label: "traversal in to",
+    from: "rename-security-probe.txt",
+    to: "../../etc/passwd",
+  },
+  {
+    label: "still-encoded traversal",
+    from: "..%2f..%2fetc%2fpasswd",
+    to: "stolen.txt",
+  },
+  {
+    label: "media root as destination",
+    from: "rename-security-probe.txt",
+    to: ".",
+  },
+];
+
+for (const vector of RENAME_VECTORS) {
+  test(`media rename rejects ${vector.label}`, async ({ apiContext }) => {
+    const resp = await renameMedia(apiContext, vector.from, vector.to);
+    const responseText = await resp.text();
+
+    expect(resp.status()).toBe(403);
+
+    const residual = responseText
+      .replace(vector.from, "")
+      .replace(vector.to, "");
+    expect(residual).not.toMatch(FILESYSTEM_LEAK);
+    assertNoEscapeWrite();
+    expect(fs.existsSync(path.join(PROJECT_ROOT, "etc", "passwd"))).toBe(false);
+  });
 }

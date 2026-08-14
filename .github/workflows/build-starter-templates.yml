@@ -85,7 +85,7 @@ jobs:
             echo "NEXT_PUBLIC_TINA_CLIENT_ID=${{ secrets.TINASAURUS_CLIENT_ID }}" >> $GITHUB_ENV
             echo "TINA_TOKEN=${{ secrets.TINASAURUS_TOKEN }}" >> $GITHUB_ENV
           elif [[ "${{ matrix.template }}" == "basic" ]]; then
-            echo "NEXT_PUBLIC_TINA_CLIENT_ID=${{ secrets.BASIC_CLIENT_ID }}" >> $GITHUB_ENV
+            echo "TINA_PUBLIC_CLIENT_ID=${{ secrets.BASIC_CLIENT_ID }}" >> $GITHUB_ENV
             echo "TINA_TOKEN=${{ secrets.BASIC_TOKEN }}" >> $GITHUB_ENV
           fi
 

@@ -292,8 +292,9 @@ mutation addPendingDocumentMutation(
     const headers = {
       'Content-Type': 'application/json',
     };
-    if (token?.id_token) {
-      headers['Authorization'] = 'Bearer ' + token?.id_token;
+    const accessToken = token?.id_token ?? token?.access_token;
+    if (accessToken) {
+      headers['Authorization'] = 'Bearer ' + accessToken;
     }
     const res = await fetch(this.contentApiUrl, {
       method: 'POST',
@@ -588,6 +589,23 @@ mutation addPendingDocumentMutation(
     return branches.some((b) => b.name === branchName);
   }
 
+  async branchesExist(
+    branchNames: string[],
+    args?: { signal?: AbortSignal }
+  ): Promise<Record<string, boolean>> {
+    if (this.isLocalMode) {
+      return Object.fromEntries(branchNames.map((name) => [name, true]));
+    }
+    const branches = await this.listBranches({
+      includeIndexStatus: false,
+      signal: args?.signal,
+    });
+    const existing = new Set(branches.map((b) => b.name));
+    return Object.fromEntries(
+      branchNames.map((name) => [name, existing.has(name)])
+    );
+  }
+
   async createBranch({ baseBranch, branchName }: BranchData) {
     const url = `${this.contentApiBase}/github/${this.clientId}/create_branch`;
 
@@ -762,6 +780,8 @@ mutation addPendingDocumentMutation(
     branchName: string;
     baseBranch: string;
     prTitle?: string;
+    // When false, opens a ready-for-review PR. Omitted keeps the server's draft-first default.
+    isDraft?: boolean;
     graphQLContentOp?: {
       query: string;
       variables: Record<string, unknown>;
@@ -777,6 +797,7 @@ mutation addPendingDocumentMutation(
           branchName: options.branchName,
           baseBranch: options.baseBranch,
           prTitle: options.prTitle,
+          isDraft: options.isDraft,
           graphQLContentOp: options.graphQLContentOp,
         },
         'Failed to start editorial workflow'

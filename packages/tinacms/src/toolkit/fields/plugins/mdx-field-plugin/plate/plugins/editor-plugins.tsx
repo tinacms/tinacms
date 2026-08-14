@@ -89,7 +89,7 @@ const resetBlockTypesCodeBlockRule = {
 };
 
 // View Plugins: Basic nodes and marks
-export const viewPlugins = [
+export const viewPlugins: any[] = [
   BasicMarksPlugin,
   UnderlinePlugin,
   HighlightPlugin,
@@ -150,7 +150,7 @@ export interface CreateEditorPluginsOptions {
 // participate in markdown autoformat shortcuts.
 export const createEditorPlugins = ({
   headingLevels,
-}: CreateEditorPluginsOptions = {}) => [
+}: CreateEditorPluginsOptions = {}): any[] => [
   createMdxBlockPlugin,
   createMdxInlinePlugin,
   createImgPlugin,

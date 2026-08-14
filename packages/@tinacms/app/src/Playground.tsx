@@ -1,8 +1,8 @@
 import { createGraphiQLFetcher } from '@graphiql/toolkit';
-import { FolderIcon } from '@heroicons/react/outline';
 import { queries } from 'CLIENT_IMPORT';
 import { GraphiQL } from 'graphiql';
 import { parse, print } from 'graphql';
+import { Folder } from 'lucide-react';
 import React from 'react';
 import { useCMS } from 'tinacms';
 
@@ -56,8 +56,9 @@ const Playground = () => {
 
   const ref = React.useRef();
 
-  const getToken = () => {
-    return JSON.parse(localStorage.getItem('tinacms-auth') || '{}')?.id_token;
+  const getToken = async () => {
+    const token = await cms.api.tina.authProvider.getToken();
+    return token?.id_token ?? token?.access_token;
   };
 
   if (!autoQueries) {
@@ -133,7 +134,7 @@ const Playground = () => {
         fetcher={async (params, options) => {
           const fetcher = createGraphiQLFetcher({
             url: cms.api.tina.contentApiUrl || __API_URL__,
-            headers: { Authorization: `Bearer ${getToken()}` },
+            headers: { Authorization: `Bearer ${await getToken()}` },
           });
           return fetcher(params, options);
         }}
@@ -144,7 +145,7 @@ const Playground = () => {
         plugins={[
           {
             title: 'Queries',
-            icon: () => <FolderIcon />,
+            icon: () => <Folder />,
             content: (values) => <Plugin />,
           },
         ]}

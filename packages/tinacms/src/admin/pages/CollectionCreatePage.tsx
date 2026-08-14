@@ -5,7 +5,11 @@ import {
   resolveForm,
 } from '@tinacms/schema-tools';
 import type { Template } from '@tinacms/schema-tools';
-import { ERR_ALREADY_EXISTS } from '@tinacms/schema-tools';
+import {
+  ERR_ALREADY_EXISTS,
+  RELATIVE_PATH_ALLOWED_CHARS_MESSAGE,
+  RELATIVE_PATH_REGEX,
+} from '@tinacms/schema-tools';
 import {
   BillingWarning,
   Form,
@@ -16,8 +20,8 @@ import {
 } from '@tinacms/toolkit';
 import type { TinaCMS } from '@tinacms/toolkit';
 import { FormBreadcrumbs } from '@toolkit/react-sidebar/components/sidebar-body';
+import { Lock, Unlock } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
-import { FaLock, FaUnlock } from 'react-icons/fa';
 import { useNavigate, useParams } from 'react-router-dom';
 import { TinaAdminApi } from '../api';
 import { ErrorDialog } from '../components/ErrorDialog';
@@ -117,14 +121,14 @@ const FilenameInput = (props) => {
         {...props}
         disabled={props.readonly || !filenameTouched}
       />
-      <FaLock
+      <Lock
         className={`text-gray-400 absolute top-1/2 left-2 -translate-y-1/2 pointer-events-none h-5 w-auto transition-opacity duration-150 ease-out ${
           !filenameTouched && !props.readonly
             ? 'opacity-20 group-hover:opacity-0 group-active:opacity-0'
             : 'opacity-0'
         }`}
       />
-      <FaUnlock
+      <Unlock
         className={`text-blue-500 absolute top-1/2 left-2 -translate-y-1/2 pointer-events-none h-5 w-auto transition-opacity duration-150 ease-out ${
           !filenameTouched && !props.readonly
             ? 'opacity-0 group-hover:opacity-80 group-active:opacity-80'
@@ -229,9 +233,8 @@ export const RenderForm = ({
         return true;
       }
 
-      const isValid = /^[\.\-_\/a-zA-Z0-9]*$/.test(value);
-      if (value && !isValid) {
-        return 'Must contain only a-z, A-Z, 0-9, -, _, ., or /.';
+      if (!RELATIVE_PATH_REGEX.test(value)) {
+        return RELATIVE_PATH_ALLOWED_CHARS_MESSAGE;
       }
       // check if the filename is allowed by the collection.
       if (schemaCollection.match?.exclude || schemaCollection.match?.include) {

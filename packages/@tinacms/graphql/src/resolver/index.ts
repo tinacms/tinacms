@@ -18,7 +18,7 @@ import type {
   TinaField,
   TinaSchema,
 } from '@tinacms/schema-tools';
-import { ERR_ALREADY_EXISTS } from '@tinacms/schema-tools';
+import { ERR_ALREADY_EXISTS, RELATIVE_PATH_REGEX } from '@tinacms/schema-tools';
 
 import type { GraphQLConfig } from '../types';
 
@@ -698,7 +698,7 @@ export class Resolver {
         'Invalid path: relativePath cannot have leading or trailing whitespace'
       );
     }
-    if (!/^[a-zA-Z0-9\-_./]+$/.test(relativePath)) {
+    if (!RELATIVE_PATH_REGEX.test(relativePath)) {
       throw new Error('Invalid path: relativePath contains invalid characters');
     }
   }

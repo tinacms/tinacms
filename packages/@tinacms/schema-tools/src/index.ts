@@ -4,5 +4,6 @@ export * from './validate';
 export * from './util/namer';
 export * from './util/parseURL';
 export * from './util/normalizePath';
+export * from './util/relativePath';
 export * from './util/headingLevels';
 export * from './errors';
