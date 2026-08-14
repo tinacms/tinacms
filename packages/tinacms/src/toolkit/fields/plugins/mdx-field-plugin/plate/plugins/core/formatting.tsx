@@ -32,7 +32,7 @@ const resetBlockTypesCommonRule = {
   defaultType: ParagraphPlugin.key,
 };
 
-export const plugins = [
+export const plugins: any[] = [
   TrailingBlockPlugin,
   AutoformatPlugin.configure({
     options: {
