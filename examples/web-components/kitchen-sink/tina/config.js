@@ -25,6 +25,7 @@ export default defineConfig({
         ui: {
           router: () => '/',
         },
+        format: 'mdx',
         fields: [
           {
             type: 'string',
@@ -38,6 +39,16 @@ export default defineConfig({
             name: 'body',
             label: 'Body',
             isBody: true,
+            templates: [
+              {
+                name: 'PostPreview',
+                label: 'Post Preview',
+                fields: [
+                  { type: 'string', name: 'title' },
+                  { type: 'rich-text', name: 'children' },
+                ],
+              },
+            ],
           },
         ],
       },

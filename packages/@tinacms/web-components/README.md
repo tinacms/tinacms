@@ -5,9 +5,6 @@ All things web components with Tina.
 This package is used to add visual editing support and markdown rendering to
 plain JS sites.
 
-> [!IMPORTANT]
-> MDX and custom markdown components are not supported.
-
 
 ## Install
 
@@ -96,6 +93,42 @@ It receives the stringified AST provided by the `rich-text` field via the
     }
   </script>
 </body>
+```
+
+### Raw HTML
+
+Raw HTML in a `rich-text` field is first sanitized via [the DOMPurify
+package](https://github.com/cure53/dompurify) before being rendered. To see
+what gets stripped, please refer to [the DOMPurify
+documentation](https://github.com/cure53/dompurify#some-purification-samples-please).
+
+### Custom components
+
+Custom components can be registered via the `TinaMarkdown.components` object.
+This allows you to render custom html or web-components via MDX.
+
+Custom components **must** be registered before the `tina-markdown` component
+connects, e.g. before render.
+
+For more information on how to register custom components in your schema, refer
+to the [Field with custom component
+documentation](https://tina.io/docs/reference/types/rich-text#field-with-custom-component-mdx).
+
+```js
+import {TinaMarkdown} from "./node_modules/@tinacms/web-components/dist/tina-markdown.js";
+
+TinaMarkdown.components = {
+    "PostPreview": (node) => {
+		const el = document.createElement("post-preview");
+
+		const title = document.createElement("span");
+		title.slot = "title";
+		title.textContent = node.props.title ?? "";
+		el.append(title);
+
+		return el;
+    },
+};
 ```
 
 

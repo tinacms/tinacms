@@ -21,7 +21,8 @@
     "test-watch": "vitest"
   },
   "dependencies": {
-    "@tinacms/bridge": "workspace:^"
+    "@tinacms/bridge": "workspace:^",
+    "dompurify": "catalog:"
   },
   "devDependencies": {
     "@tinacms/scripts": "workspace:*",
