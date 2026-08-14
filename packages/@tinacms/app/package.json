@@ -15,6 +15,7 @@
 		"test-watch": "vitest"
 	},
 	"devDependencies": {
+		"@testing-library/react": "catalog:",
 		"@types/react": "^18.3.18",
 		"@types/react-dom": "catalog:",
 		"happy-dom": "catalog:",
