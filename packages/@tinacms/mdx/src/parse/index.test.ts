@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
 import type { RichTextField } from '@tinacms/schema-tools';
+import { describe, expect, it } from 'vitest';
 import { parseMDX } from './index';
 
 // parseMDX and serializeMDX require an image URL callback to transform image src values.

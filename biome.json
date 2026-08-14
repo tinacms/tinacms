@@ -113,11 +113,26 @@
 	},
 	"overrides": [
 		{
+			"include": ["**/tsconfig.*.json"],
+			"json": { "parser": { "allowComments": true } }
+		},
+		{
 			"include": [
 				"examples/astro/visual-editing/**/*.css"
 			],
 			"linter": { "enabled": false },
 			"formatter": { "enabled": false }
+		},
+		{
+			"include": ["packages/v4/@tinacms/tinacms/src/**"],
+			"ignore": ["**/*.test.ts", "**/*.test.tsx"],
+			"linter": {
+				"rules": {
+					"suspicious": {
+						"noExplicitAny": "error"
+					}
+				}
+			}
 		},
 		{
 			"include": [
