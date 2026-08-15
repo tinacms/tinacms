@@ -20,6 +20,7 @@ overrides:
     "@clerk/clerk-js>react": 19.2.3
     "@clerk/clerk-js>react-dom": 19.2.3
     "@clerk/backend>react": 19.2.3
+    markdown-it: ^14.3.0
 allowBuilds:
     "@biomejs/biome": true
     "@parcel/watcher": true
@@ -47,7 +48,7 @@ catalog:
     "@dnd-kit/utilities": ^3.2.2
     "@floating-ui/dom": ^1.6.13
     "@floating-ui/react-dom": ^2.1.2
-    "@graphiql/toolkit": 0.8.4
+    "@graphiql/toolkit": ^0.11.3
     "@graphql-codegen/core": ^6.2.0
     "@graphql-codegen/typescript": ^6.1.0
     "@graphql-codegen/typescript-operations": ^6.1.0
@@ -172,7 +173,7 @@ catalog:
     final-form-set-field-data: ^1.0.2
     fs-extra: ^11.3.0
     glob-parent: ^6.0.2
-    graphiql: 3.0.0-alpha.1
+    graphiql: ^4.1.2
     graphql-tag: ^2.12.6
     gray-matter: ^4.0.3
     happy-dom: 15.10.2
