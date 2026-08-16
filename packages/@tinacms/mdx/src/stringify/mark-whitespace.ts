@@ -5,9 +5,10 @@ type Parent = { type?: string; children: Md.PhrasingContent[] };
 const MARKS = new Set(['strong', 'emphasis', 'delete']);
 
 /**
- * `toTinaMarkdown` drops the escape for spaces in phrasing content, so anything
- * left at a block boundary reaches the file verbatim — four of them would open
- * an indented code block.
+ * Whitespace this pass moves to a block edge was never at the edge in the
+ * editor: at the start of a paragraph it reloads as indentation nobody typed,
+ * and in a table cell it widens the column on every save. It is cleared there.
+ * Whitespace already at the edge is the author's, and is left alone.
  */
 const BLOCK_BOUNDARIES = new Set(['paragraph', 'heading', 'tableCell']);
 
@@ -56,6 +57,13 @@ const mergeText = (children: Md.PhrasingContent[]): Md.PhrasingContent[] =>
 
 const hoistFromMarks = (node: Parent) => {
   const hoisted: Md.PhrasingContent[] = [];
+  const fromHoist = new Set<Md.Text>();
+  const hoist = (value: string) => {
+    const text: Md.Text = { type: 'text', value };
+    fromHoist.add(text);
+    hoisted.push(text);
+  };
+
   for (const child of node.children) {
     if (!MARKS.has(child.type)) {
       hoisted.push(child);
@@ -64,29 +72,28 @@ const hoistFromMarks = (node: Parent) => {
     const lead = takeEdge(child, 'lead');
     const trail = takeEdge(child, 'trail');
     if (isEmpty(child)) {
-      hoisted.push({ type: 'text', value: lead + trail });
+      hoist(lead + trail);
       continue;
     }
     if (lead) {
-      hoisted.push({ type: 'text', value: lead });
+      hoist(lead);
     }
     hoisted.push(child);
     if (trail) {
-      hoisted.push({ type: 'text', value: trail });
+      hoist(trail);
     }
   }
 
-  node.children = mergeText(hoisted);
   if (node.type && BLOCK_BOUNDARIES.has(node.type)) {
-    const first = node.children.at(0);
-    const last = node.children.at(-1);
-    if (first) {
-      takeEdge(first, 'lead');
-    }
-    if (last) {
-      takeEdge(last, 'trail');
+    for (const edge of [hoisted.at(0), hoisted.at(-1)]) {
+      if (edge?.type === 'text' && fromHoist.has(edge)) {
+        edge.value = '';
+      }
     }
   }
+  // Runs after the edge clearing: merging discards the node identity `fromHoist`
+  // is keyed on, so an earlier merge makes every edge look like the author's.
+  node.children = mergeText(hoisted);
 };
 
 /**
