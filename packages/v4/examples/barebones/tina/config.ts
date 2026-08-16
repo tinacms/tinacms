@@ -21,6 +21,7 @@ export const postCollection = {
     t.boolean({ name: 'featured', label: 'Featured' }),
     // The custom field of this project. tina/rating-field.tsx is the whole plugin.
     rating({ name: 'stars', label: 'Stars' }),
+    t.richText({ name: 'body', label: 'Body', isBody: true }),
   ],
 } satisfies CollectionSchema;
 

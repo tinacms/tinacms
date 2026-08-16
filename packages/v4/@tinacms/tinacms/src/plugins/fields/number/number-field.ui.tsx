@@ -25,7 +25,6 @@ export function NumberField() {
         type='number'
         step={field.step ?? 'any'}
         id={address}
-        aria-label={address}
         value={value ?? ''}
         onChange={(event) =>
           setValue(event.target.value === '' ? undefined : event.target.value)

@@ -1,7 +1,8 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { asResolvedConfig } from '../../../config';
+import { toFieldAddress } from '../../../core/field/address';
 import {
   type FieldRegistry,
   resolveFieldPlugins,
@@ -12,11 +13,19 @@ import type {
   TinaDocument,
 } from '../../../core/schema/types';
 import { validateField } from '../../../core/validation';
-import { Field, FormProvider, TinaProvider } from '../../../editor';
+import { FormProvider, TinaProvider } from '../../../editor';
+import { toFormId, useFormStore } from '../../../form/form-store';
 import { t } from '../../../index';
+import { LabelledFields } from '../../../test/labelled-fields';
 import numberFieldPlugin from './number-field.plugin';
 
 const NO_COLLECTIONS = { collections: [] };
+const DOCUMENT_PATH = 'content/posts/featured.mdx';
+
+const valueOf = (name: string) =>
+  useFormStore.getState().forms[toFormId(DOCUMENT_PATH)]?.values[
+    toFieldAddress(name)
+  ];
 
 const collection: CollectionSchema = {
   name: 'post',
@@ -41,7 +50,7 @@ const [ratingNode, countNode, weightNode] = collection.fields;
 const resolveRegistry = (): Promise<FieldRegistry> =>
   resolveFieldPlugins([numberFieldPlugin]);
 
-const renderField = (address: string, document?: TinaDocument) =>
+const renderField = (document?: TinaDocument) =>
   render(
     <TinaProvider
       config={asResolvedConfig({
@@ -51,62 +60,97 @@ const renderField = (address: string, document?: TinaDocument) =>
     >
       <FormProvider
         collection={collection}
-        path='content/posts/featured.mdx'
+        path={DOCUMENT_PATH}
         document={document}
       >
-        <Field address={address} />
+        <LabelledFields />
       </FormProvider>
     </TinaProvider>
   );
 
 describe('NumberField rendering', () => {
   it('renders a stored number as its string value', async () => {
-    renderField('weight', { weight: 3 });
-    const input = (await screen.findByLabelText('weight')) as HTMLInputElement;
+    renderField({ weight: 3 });
+    const input = (await screen.findByLabelText('Weight')) as HTMLInputElement;
     expect(input.value).toBe('3');
   });
 
   it('renders empty when the field is absent (no default value)', async () => {
-    renderField('weight');
-    const input = (await screen.findByLabelText('weight')) as HTMLInputElement;
+    renderField();
+    const input = (await screen.findByLabelText('Weight')) as HTMLInputElement;
     expect(input.value).toBe('');
   });
 
   it('renders a stored zero rather than blanking it', async () => {
-    renderField('count', { count: 0 });
-    const input = (await screen.findByLabelText('count')) as HTMLInputElement;
+    renderField({ count: 0 });
+    const input = (await screen.findByLabelText('Count')) as HTMLInputElement;
     expect(input.value).toBe('0');
   });
 
   it('applies the schema step to the input', async () => {
-    renderField('rating', { rating: 3 });
-    const input = (await screen.findByLabelText('rating')) as HTMLInputElement;
+    renderField({ rating: 3 });
+    const input = (await screen.findByLabelText('Rating')) as HTMLInputElement;
     expect(input.step).toBe('0.5');
+  });
+
+  it('accepts any step when the schema sets none', async () => {
+    renderField({ weight: 3 });
+    const input = (await screen.findByLabelText('Weight')) as HTMLInputElement;
+    expect(input.step).toBe('any');
   });
 });
 
 describe('NumberField value updates', () => {
   it('writes a decimal keystroke sequence back through the store', async () => {
-    renderField('weight');
-    const input = (await screen.findByLabelText('weight')) as HTMLInputElement;
+    renderField();
+    const input = (await screen.findByLabelText('Weight')) as HTMLInputElement;
     await userEvent.type(input, '1.5');
     expect(input.value).toBe('1.5');
   });
 
   it('accepts a negative value', async () => {
-    renderField('weight');
-    const input = (await screen.findByLabelText('weight')) as HTMLInputElement;
+    renderField();
+    const input = (await screen.findByLabelText('Weight')) as HTMLInputElement;
     await userEvent.type(input, '-5');
     expect(input.value).toBe('-5');
   });
 
   it('surfaces the shared min message while editing', async () => {
-    renderField('rating');
-    const input = await screen.findByLabelText('rating');
+    renderField();
+    const input = await screen.findByLabelText('Rating');
     await userEvent.type(input, '0');
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Rating must be at least 1'
     );
+  });
+
+  // An empty input must clear the field. An empty string would serialize
+  // through `Number('')` and write a 0 that the editor never typed.
+  it('empties the field rather than storing an empty string', async () => {
+    renderField({ weight: 3 });
+    const input = await screen.findByLabelText('Weight');
+    await userEvent.clear(input);
+    expect(valueOf('weight')).toBeUndefined();
+  });
+
+  it('keeps a typed value in the store', async () => {
+    renderField();
+    const input = await screen.findByLabelText('Weight');
+    await userEvent.type(input, '42');
+    expect(valueOf('weight')).toBe('42');
+  });
+});
+
+describe('NumberField wheel guard', () => {
+  // A wheel over a focused number input steps its value in a browser. The
+  // field drops focus so a scroll past the form cannot edit the document.
+  it('drops focus when the wheel scrolls over the input', async () => {
+    renderField({ weight: 3 });
+    const input = await screen.findByLabelText('Weight');
+    input.focus();
+    expect(input).toHaveFocus();
+    fireEvent.wheel(input);
+    expect(input).not.toHaveFocus();
   });
 });
 
