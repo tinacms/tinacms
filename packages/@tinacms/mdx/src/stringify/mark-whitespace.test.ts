@@ -6,7 +6,7 @@ import { serializeMDX } from './index';
 
 const passthrough = (value: string) => value;
 
-const NBSP = ' ';
+const NBSP = '\u00a0';
 
 const fields: [string, RichTextField][] = [
   ['mdx', { name: 'body', type: 'rich-text' }],
@@ -259,6 +259,26 @@ describe.each(fields)('block boundaries (%s parser)', (_, field) => {
     ).toBe('## &#x20;Title\n');
   });
 
+  it('writes author indentation so it comes back as a paragraph', () => {
+    const markdown = serialize([{ type: 'text', text: '    word' }], field);
+    expect(markdown).toBe('&#x20;   word\n');
+    expect(
+      (parseMDX(markdown, field, passthrough) as Plate.RootElement).children
+    ).toEqual([{ type: 'p', children: [{ type: 'text', text: '    word' }] }]);
+  });
+
+  it('leaves author indentation next to whitespace the hoist moved', () => {
+    expect(
+      serialize(
+        [
+          { type: 'text', text: '   ' },
+          { type: 'text', text: ' bold', bold: true },
+        ],
+        field
+      )
+    ).toBe('&#x20;   **bold**\n');
+  });
+
   it('keeps a whitespace-only spacer paragraph', () => {
     const markdown = serializeRoot(
       {
@@ -274,6 +294,54 @@ describe.each(fields)('block boundaries (%s parser)', (_, field) => {
     expect(
       (parseMDX(markdown, field, passthrough) as Plate.RootElement).children
     ).toHaveLength(3);
+  });
+});
+
+describe.each(fields)('table cells (%s parser)', (_, field) => {
+  const cell = (children: Plate.InlineElement[]) => ({
+    type: 'td',
+    children: [{ type: 'p', children }],
+  });
+
+  /**
+   * GFM strips whatever sits against the cell delimiters, so author whitespace
+   * at a cell edge cannot survive a reload no matter what is written. Pinning
+   * that here so nobody extends the author carve-out to cells expecting it to.
+   */
+  it('discards author whitespace at a cell edge on reload', () => {
+    const markdown = serializeRoot(
+      {
+        type: 'root',
+        children: [
+          {
+            type: 'table',
+            children: [
+              {
+                type: 'tr',
+                children: [cell([{ type: 'text', text: 'head' }])],
+              },
+              {
+                type: 'tr',
+                children: [
+                  cell([
+                    { type: 'text', text: 'word ', bold: true },
+                    { type: 'text', text: '  ' },
+                  ]),
+                ],
+              },
+            ],
+          },
+        ],
+      } as unknown as Plate.RootElement,
+      field
+    );
+    const [table] = (
+      parseMDX(markdown, field, passthrough) as Plate.RootElement
+    ).children as any[];
+    const [, row] = table.children;
+    expect(row.children[0].children[0].children).toEqual([
+      { type: 'text', text: 'word', bold: true },
+    ]);
   });
 });
 

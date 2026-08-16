@@ -5,10 +5,10 @@ type Parent = { type?: string; children: Md.PhrasingContent[] };
 const MARKS = new Set(['strong', 'emphasis', 'delete']);
 
 /**
- * `toTinaMarkdown` drops the escape for spaces in phrasing content, so whitespace
- * this pass moves to a block boundary reaches the file verbatim — four of them
- * would open an indented code block. Whitespace already at the edge is the
- * author's, and is left alone.
+ * Whitespace this pass moves to a block edge was never at the edge in the
+ * editor: at the start of a paragraph it reloads as indentation nobody typed,
+ * and in a table cell it widens the column on every save. It is cleared there.
+ * Whitespace already at the edge is the author's, and is left alone.
  */
 const BLOCK_BOUNDARIES = new Set(['paragraph', 'heading', 'tableCell']);
 
@@ -57,9 +57,9 @@ const mergeText = (children: Md.PhrasingContent[]): Md.PhrasingContent[] =>
 
 const hoistFromMarks = (node: Parent) => {
   const hoisted: Md.PhrasingContent[] = [];
-  const fromHoist = new Set<Md.PhrasingContent>();
+  const fromHoist = new Set<Md.Text>();
   const hoist = (value: string) => {
-    const text: Md.PhrasingContent = { type: 'text', value };
+    const text: Md.Text = { type: 'text', value };
     fromHoist.add(text);
     hoisted.push(text);
   };
@@ -86,11 +86,13 @@ const hoistFromMarks = (node: Parent) => {
 
   if (node.type && BLOCK_BOUNDARIES.has(node.type)) {
     for (const edge of [hoisted.at(0), hoisted.at(-1)]) {
-      if (edge && fromHoist.has(edge)) {
-        (edge as Md.Text).value = '';
+      if (edge?.type === 'text' && fromHoist.has(edge)) {
+        edge.value = '';
       }
     }
   }
+  // Runs after the edge clearing: merging discards the node identity `fromHoist`
+  // is keyed on, so an earlier merge makes every edge look like the author's.
   node.children = mergeText(hoisted);
 };
 
