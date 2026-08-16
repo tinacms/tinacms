@@ -10,6 +10,7 @@ import {
   AnnouncementsBanner,
   AnnouncementsProvider,
   DISMISSED_KEY,
+  resetDismissedStore,
 } from './AnnouncementsBanner';
 
 const localStorageMock = (() => {
@@ -58,6 +59,7 @@ const renderBanner = (getAnnouncements: ReturnType<typeof vi.fn>) => {
 describe('AnnouncementsBanner', () => {
   beforeEach(() => {
     localStorageMock.clear();
+    resetDismissedStore();
     vi.clearAllMocks();
   });
 
@@ -207,6 +209,7 @@ describe('AnnouncementsBanner', () => {
 describe('AnnouncementsProvider', () => {
   beforeEach(() => {
     localStorageMock.clear();
+    resetDismissedStore();
     vi.clearAllMocks();
   });
 
@@ -255,5 +258,38 @@ describe('AnnouncementsProvider', () => {
       DISMISSED_KEY,
       JSON.stringify(['a-1'])
     );
+  });
+
+  it('syncs dismissal across independent banner trees via module store', async () => {
+    const getAnnouncements = vi.fn().mockResolvedValue([announcement()]);
+    const cms = createCMS(getAnnouncements);
+
+    // Two separate TinaCMSProvider trees — no shared context.
+    // The module-level store should still keep them in sync.
+    const { unmount: unmountA } = render(
+      <TinaCMSProvider cms={cms}>
+        <AnnouncementsBanner />
+      </TinaCMSProvider>
+    );
+    await screen.findByText('New version available');
+
+    const { unmount: unmountB } = render(
+      <TinaCMSProvider cms={cms}>
+        <AnnouncementsBanner />
+      </TinaCMSProvider>
+    );
+    await waitFor(() => {
+      expect(screen.getAllByLabelText('Dismiss')).toHaveLength(2);
+    });
+    const buttons = screen.getAllByLabelText('Dismiss');
+
+    await userEvent.click(buttons[0]);
+
+    await waitFor(() => {
+      expect(screen.queryByText('New version available')).toBeNull();
+    });
+
+    unmountA();
+    unmountB();
   });
 });

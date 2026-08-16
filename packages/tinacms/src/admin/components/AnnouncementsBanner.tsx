@@ -6,31 +6,82 @@ import type { Announcement } from '../../internalClient';
 
 export const DISMISSED_KEY = 'tinacms-announcements-dismissed';
 
-const getDismissed = (): string[] => {
+type Listener = () => void;
+let listeners: Set<Listener> = new Set();
+
+function readDismissedFromStorage(): string[] {
   try {
     return JSON.parse(localStorage.getItem(DISMISSED_KEY) || '[]');
   } catch {
     return [];
   }
-};
+}
 
-const addDismissed = (headline: string) => {
-  const current = getDismissed();
-  if (!current.includes(headline)) {
-    localStorage.setItem(DISMISSED_KEY, JSON.stringify([...current, headline]));
-  }
-};
+function notify() {
+  for (const fn of listeners) fn();
+}
 
-const severityToCalloutStyle: Record<string, 'info' | 'warning' | 'error'> = {
-  info: 'info',
-  warning: 'warning',
-  critical: 'error',
-};
+function dismissAnnouncement(id: string) {
+  const current = readDismissedFromStorage();
+  if (current.includes(id)) return;
+  current.push(id);
+  localStorage.setItem(DISMISSED_KEY, JSON.stringify(current));
+  notify();
+}
+
+function subscribe(fn: Listener): () => void {
+  listeners.add(fn);
+  return () => {
+    listeners.delete(fn);
+  };
+}
+
+function getDismissed(): string[] {
+  return readDismissedFromStorage();
+}
+
+export function resetDismissedStore() {
+  listeners = new Set();
+}
+
+export function useAnnouncements() {
+  const ctx = React.useContext(AnnouncementsContext);
+  const cms = useCMS();
+  const [, forceRender] = React.useState(0);
+
+  React.useEffect(() => {
+    return subscribe(() => forceRender((n) => n + 1));
+  }, []);
+
+  const [localAnnouncements, setLocalAnnouncements] = React.useState<
+    Announcement[] | null
+  >(null);
+
+  React.useEffect(() => {
+    if (ctx) return;
+    const fetchAnnouncements = async () => {
+      try {
+        const result = await cms.api.tina.getAnnouncements(pkg.version);
+        setLocalAnnouncements(result);
+      } catch (err) {
+        console.error('failed to fetch announcements', err);
+      }
+    };
+    fetchAnnouncements();
+  }, [ctx, cms.api.tina]);
+
+  const announcements = ctx?.announcements ?? localAnnouncements;
+  const dismissed = getDismissed();
+
+  const dismiss = React.useCallback((id: string) => {
+    dismissAnnouncement(id);
+  }, []);
+
+  return { announcements, dismissed, dismiss };
+}
 
 type AnnouncementsContextValue = {
   announcements: Announcement[] | null;
-  dismissed: string[];
-  dismiss: (id: string) => void;
 };
 
 const AnnouncementsContext = React.createContext<
@@ -46,7 +97,6 @@ export const AnnouncementsProvider = ({
   const [announcements, setAnnouncements] = React.useState<
     Announcement[] | null
   >(null);
-  const [dismissed, setDismissed] = React.useState<string[]>(getDismissed);
 
   React.useEffect(() => {
     const fetchAnnouncements = async () => {
@@ -60,50 +110,21 @@ export const AnnouncementsProvider = ({
     fetchAnnouncements();
   }, [cms.api.tina]);
 
-  const dismiss = (id: string) => {
-    addDismissed(id);
-    setDismissed(getDismissed());
-  };
-
   return (
-    <AnnouncementsContext.Provider
-      value={{ announcements, dismissed, dismiss }}
-    >
+    <AnnouncementsContext.Provider value={{ announcements }}>
       {children}
     </AnnouncementsContext.Provider>
   );
 };
 
+const severityToCalloutStyle: Record<string, 'info' | 'warning' | 'error'> = {
+  info: 'info',
+  warning: 'warning',
+  critical: 'error',
+};
+
 export const AnnouncementsBanner = () => {
-  const ctx = React.useContext(AnnouncementsContext);
-  const [localAnnouncements, setLocalAnnouncements] = React.useState<
-    Announcement[] | null
-  >(null);
-  const [localDismissed, setLocalDismissed] =
-    React.useState<string[]>(getDismissed);
-  const cms = useCMS();
-
-  const announcements = ctx?.announcements ?? localAnnouncements;
-  const dismissed = ctx?.dismissed ?? localDismissed;
-  const dismiss =
-    ctx?.dismiss ??
-    ((id: string) => {
-      addDismissed(id);
-      setLocalDismissed(getDismissed());
-    });
-
-  React.useEffect(() => {
-    if (ctx) return;
-    const fetchAnnouncements = async () => {
-      try {
-        const result = await cms.api.tina.getAnnouncements(pkg.version);
-        setLocalAnnouncements(result);
-      } catch (err) {
-        console.error('failed to fetch announcements', err);
-      }
-    };
-    fetchAnnouncements();
-  }, [ctx, cms.api.tina]);
+  const { announcements, dismissed, dismiss } = useAnnouncements();
 
   if (!announcements || announcements.length === 0) return null;
 
