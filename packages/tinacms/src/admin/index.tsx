@@ -201,7 +201,6 @@ const PreviewInner = ({ preview, config }) => {
   const Preview = preview;
   return (
     <div className='flex flex-col h-screen'>
-      <style>{`#tina-iframe { height: 100% !important; }`}</style>
       <AnnouncementsBanner />
       <div className='flex-1 min-h-0'>
         <Preview url={url} iframeRef={ref} {...config} />
