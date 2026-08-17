@@ -17,7 +17,7 @@ export async function successMessage(ctx: any, next: () => void, options) {
 
   logger.info(`${chalk.bold('Read the docs')}`);
   logger.info(
-    `  Check out 'https://tina.io/docs/introduction/tina-init/#adding-tina' for help getting started with Tina \n`
+    `  Check out 'https://tina.io/docs/r/tina-init#adding-tina' for help getting started with Tina \n`
   );
 
   logger.info(`Enjoy Tina! 🦙`);

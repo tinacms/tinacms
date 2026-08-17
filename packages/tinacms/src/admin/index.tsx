@@ -1,3 +1,4 @@
+import { ERR_NOT_INDEXED } from '@tinacms/schema-tools';
 import {
   Button,
   Modal,
@@ -18,9 +19,9 @@ import {
   useParams,
 } from 'react-router-dom';
 
+import Sidebar from './components/AdminNav';
 import GetCMS from './components/GetCMS';
 import Layout from './components/Layout';
-import Sidebar from './components/AdminNav';
 
 import CollectionCreatePage from './pages/CollectionCreatePage';
 import CollectionDuplicatePage from './pages/CollectionDuplicatePage';
@@ -29,16 +30,40 @@ import CollectionUpdatePage from './pages/CollectionUpdatePage';
 import DashboardPage from './pages/DashboardPage';
 import ScreenPage from './pages/ScreenPage';
 
+import pkg from '../../package.json';
 import { Client, TinaCloudAuthProvider } from '../internalClient';
+import {
+  TelemetryMode,
+  TinaCMSStartedEvent,
+  initializePostHog,
+} from '../lib/posthog';
 import { TinaAdminApi } from './api';
 import {
-  initializePostHog,
-  TinaCMSStartedEvent,
-  TelemetryMode,
-} from '../lib/posthog';
-import pkg from '../../package.json';
+  AnnouncementsBanner,
+  AnnouncementsProvider,
+} from './components/AnnouncementsBanner';
 
 type AuthType = 'tinacloud' | 'self-hosted' | 'local' | 'other';
+
+const TROUBLESHOOTING_URL = 'https://tina.io/docs/tinacloud/troubleshooting';
+
+const ErrorModalContent = (props: { title: string; message: string }) => {
+  const { title, message } = props;
+  return (
+    <>
+      <div>{title}</div>
+      <p>{message}</p>
+      <a href={TROUBLESHOOTING_URL} target='_blank' rel='noopener noreferrer'>
+        Learn more
+      </a>
+    </>
+  );
+};
+
+const showErrorModal = (title: string, message: string, cms: TinaCMS) => {
+  if (cms.alerts.all.some((a) => a.level === 'error')) return;
+  cms.alerts.error(() => <ErrorModalContent title={title} message={message} />);
+};
 
 const getBackendType = (client: Client | undefined): AuthType => {
   if (!client) return 'other';
@@ -174,7 +199,14 @@ const PreviewInner = ({ preview, config }) => {
     }, 100);
   }, [ref.current]);
   const Preview = preview;
-  return <Preview url={url} iframeRef={ref} {...config} />;
+  return (
+    <div className='flex flex-col h-screen'>
+      <AnnouncementsBanner />
+      <div className='flex-1 min-h-0'>
+        <Preview url={url} iframeRef={ref} {...config} />
+      </div>
+    </div>
+  );
 };
 
 const CheckSchema = ({
@@ -198,23 +230,24 @@ const CheckSchema = ({
         })
         .then((isSchemaMatchedToCloud) => {
           if (isSchemaMatchedToCloud === false) {
-            cms.alerts.error(
-              `GraphQL Schema Mismatch - Editing may not work. 
-              
-              If you just switched branches, try going back to the previous branch.
-              
-              If you just pushed changes to the branch, try pulling the latest changes.
-              
-              For more information, please see https://tina.io/docs/tinacloud/troubleshooting`
+            showErrorModal(
+              'GraphQL Schema Mismatch',
+              'Editing may not work. If you just switched branches, try going back to the previous branch. If you just pushed changes, try pulling the latest.',
+              cms
             );
           }
         })
         .catch((error) => {
-          // TODO: HACK- Check on an error id, rather than message string
-          if (error.message.includes('has not been indexed by TinaCloud')) {
+          // Matches a TinaCloud server contract (string owned upstream); see #6777.
+          if (error.message.includes(ERR_NOT_INDEXED)) {
             setSchemaMissingError(true);
           } else {
-            cms.alerts.error(`Unexpected error checking schema: ${error}`);
+            console.error('Unexpected error checking schema:', error);
+            showErrorModal(
+              'Unexpected Error',
+              'An unexpected error occurred while validating your Tina schema. If after refreshing the issue persists, reach out to us on Discord.',
+              cms
+            );
             throw error;
           }
         });
@@ -284,7 +317,7 @@ export const TinaAdmin = ({
             });
           const hasRouter = Boolean(collectionWithRouter);
           return (
-            <>
+            <AnnouncementsProvider>
               <PostHogTracker cms={cms} />
               <CheckSchema schemaJson={schemaJson}>
                 <Router>
@@ -394,7 +427,7 @@ export const TinaAdmin = ({
                   </Routes>
                 </Router>
               </CheckSchema>
-            </>
+            </AnnouncementsProvider>
           );
         } else {
           return (

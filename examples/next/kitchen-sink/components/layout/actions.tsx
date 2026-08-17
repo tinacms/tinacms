@@ -24,7 +24,9 @@ export const Actions = ({
   actions,
 }: ActionsProps) => {
   return (
-    <div className={cn('flex flex-wrap items-center gap-y-4 gap-x-6', className)}>
+    <div
+      className={cn('flex flex-wrap items-center gap-y-4 gap-x-6', className)}
+    >
       {actions?.map((action, index) => {
         if (!action) return null;
         const isButton = action.type === 'button';
@@ -50,7 +52,7 @@ export const Actions = ({
           >
             {action.label}
             {action.icon && (
-              <BiRightArrowAlt className="ml-1 -mr-1 w-6 h-6 opacity-80" />
+              <BiRightArrowAlt className='ml-1 -mr-1 w-6 h-6 opacity-80' />
             )}
           </Link>
         );

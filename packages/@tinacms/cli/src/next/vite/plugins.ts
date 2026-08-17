@@ -16,7 +16,7 @@ import {
 } from '../commands/dev-command/server/media';
 import { createSearchIndexRouter } from '../commands/dev-command/server/searchIndex';
 import type { ConfigManager } from '../config-manager';
-import { buildCorsOriginCheck } from './cors';
+import { buildCorsOriginCheck, isOriginAllowed } from './cors';
 
 export const transformTsxPlugin = ({
   configManager: _configManager,
@@ -47,6 +47,9 @@ export const transformTsxPlugin = ({
   return plug;
 };
 
+const isMediaRenameRequest = (req: { url?: string; method?: string }) =>
+  req.method === 'POST' && (req.url || '').split('?')[0] === '/media/rename';
+
 export const devServerEndPointsPlugin = ({
   configManager,
   apiURL,
@@ -60,9 +63,28 @@ export const devServerEndPointsPlugin = ({
   searchIndex: any;
   databaseLock: (fn: () => Promise<void>) => Promise<void>;
 }) => {
-  const corsOriginCheck = buildCorsOriginCheck(
-    configManager.config?.server?.allowedOrigins
-  );
+  const allowedOrigins = configManager.config?.server?.allowedOrigins;
+  const corsOriginCheck = buildCorsOriginCheck(allowedOrigins);
+
+  /**
+   * @security `cors` only sets response headers; it does NOT reject requests.
+   * Multipart uploads are "simple" requests that skip the CORS preflight, so
+   * an attacker page can still drive these routes to completion. They must
+   * reject disallowed origins explicitly to prevent cross-origin CSRF writes.
+   */
+  const isStateChangingRequest = (req: { url?: string; method?: string }) => {
+    const url = req.url || '';
+    if (url.startsWith('/media/upload')) return true;
+    if (isMediaRenameRequest(req)) return true;
+    if (url.startsWith('/media') && req.method === 'DELETE') return true;
+    if (url.startsWith('/graphql') && req.method === 'POST') return true;
+    if (
+      (url.startsWith('/searchIndex') || url.startsWith('/v2/searchIndex')) &&
+      (req.method === 'POST' || req.method === 'DELETE')
+    )
+      return true;
+    return false;
+  };
 
   const plug: Plugin = {
     name: 'graphql-endpoints',
@@ -87,8 +109,22 @@ export const devServerEndPointsPlugin = ({
           searchIndex,
         });
 
+        // @security Reject disallowed cross-origin writes (see isStateChangingRequest).
+        if (
+          isStateChangingRequest(req) &&
+          !isOriginAllowed(req.headers.origin, allowedOrigins)
+        ) {
+          res.statusCode = 403;
+          res.end(JSON.stringify({ error: 'Origin not allowed' }));
+          return;
+        }
+
         if (req.url.startsWith('/media/upload')) {
           await mediaRouter.handlePost(req, res);
+          return;
+        }
+        if (isMediaRenameRequest(req)) {
+          await mediaRouter.handleRename(req, res);
           return;
         }
         if (req.url.startsWith('/media')) {

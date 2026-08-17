@@ -333,7 +333,17 @@ export type PasswordField = (
     type: 'password';
   };
 
-type ToolbarOverrideType =
+export type DisplayOnlyField = BaseField & {
+  type: 'displayOnly';
+  list?: never;
+  required?: never;
+  indexed?: never;
+  ui?: {
+    component?: FC<any> | null;
+  };
+};
+
+export type ToolbarOverrideType =
   | 'heading'
   | 'link'
   | 'image'
@@ -344,10 +354,27 @@ type ToolbarOverrideType =
   | 'codeBlock'
   | 'bold'
   | 'italic'
+  | 'strikethrough'
+  | 'highlight'
   | 'raw'
   | 'embed'
   | 'mermaid'
-  | 'table';
+  | 'table'
+  | 'hr';
+/**
+ * Heading node type as used by the rich-text editor. Mirrors
+ * `@udecode/plate-heading`'s `HEADING_KEYS` so consumers can pass these
+ * values straight through without translation.
+ */
+export type HeadingLevel = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+export const ALL_HEADING_LEVELS: readonly HeadingLevel[] = [
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+];
 type RichTextAst = { type: 'root'; children: Record<string, unknown>[] };
 export type RichTextField<WithNamespace extends boolean = false> = (
   | FieldGeneric<RichTextAst, undefined>
@@ -369,6 +396,16 @@ export type RichTextField<WithNamespace extends boolean = false> = (
       toolbar?: ToolbarOverrideType[];
       /**Default set to true */
       showFloatingToolbar?: boolean;
+      /**
+       * Restricts which heading levels are offered in the editor UI
+       * (headings dropdown, "Turn into" menu, slash menu, and markdown
+       * autoformat shortcuts like `## `). When omitted, all levels are
+       * available. UI-only — existing content with disallowed levels is
+       * rendered as-is.
+       *
+       * @example headingLevels: ['h1', 'h2', 'h3']
+       */
+      headingLevels?: HeadingLevel[];
     };
     /**
      * By default, Tina parses markdown with MDX, this is a more strict parser
@@ -436,7 +473,7 @@ type ObjectListUiProps = {
    * ```
    *
    * Note: when supplying a value for a `rich-text` field, you must supply
-   * the the value as an object.
+   * the value as an object.
    * ```ts
    * {
    *   title: "My Headline",
@@ -501,6 +538,7 @@ type Field<WithNamespace extends boolean = false> = (
   | RichTextField<WithNamespace>
   | ObjectField<WithNamespace>
   | PasswordField
+  | DisplayOnlyField
 ) &
   MaybeNamespace<WithNamespace>;
 
@@ -546,7 +584,7 @@ export type Template<WithNamespace extends boolean = false> = {
 } & MaybeNamespace<WithNamespace>;
 
 type TokenObject = {
-  id_token: string;
+  id_token?: string;
   access_token?: string;
   refresh_token?: string;
 };
@@ -616,6 +654,14 @@ export interface Config<
   Store = undefined,
   SearchClient = undefined,
 > {
+  /**
+   * Points the admin UI at a custom/self-hosted content API instead of TinaCloud.
+   *
+   * Can be a relative URL, such as `/api/tina/gql`, or an absolute URL, such as
+   * `https://example.com/api/content`. When set, the admin UI will not show the
+   * Local Mode banner; Local Mode is only detected when this option is unset and
+   * the content API resolves to `localhost`.
+   */
   contentApiUrlOverride?: string;
   authProvider?: AuthProvider;
   admin?: {
@@ -747,6 +793,23 @@ export interface Config<
      * If your site will be served at a sub-path like `my-domain.com/my-site`, provide `"my-site"`
      */
     basePath?: string;
+    /**
+     * Additional npm packages to externalize when bundling `tina/database.ts`.
+     *
+     * Tina automatically externalizes a known-good baseline (currently `better-sqlite3`).
+     * Use this list for native modules or packages outside that baseline that cannot be
+     * bundled by esbuild — for example, custom database adapters that ship native bindings.
+     *
+     * Externalized packages must be installed in your project's `node_modules` so Node can
+     * resolve them at runtime.
+     *
+     * @example
+     * build: {
+     *   // ...other build options
+     *   externalDependencies: ['my-custom-native-adapter'],
+     * }
+     */
+    externalDependencies?: string[];
   };
   /**
    * Configuration for the local development server (`tinacms dev`).
@@ -865,7 +928,7 @@ export interface Config<
      * @example
      *s
      * historyUrl: ({ relativePath, branch }) => ({
-     *   url: `https://github.com/tinacms/tinacms/commits/${branch}/examples/next-2024/${relativePath}`
+     *   url: `https://github.com/tinacms/tinacms/commits/${branch}/examples/next/kitchen-sink/${relativePath}`
      * })
      *      */
     historyUrl?: (context: { relativePath: string; branch: string }) => {

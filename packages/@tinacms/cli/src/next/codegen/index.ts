@@ -24,10 +24,14 @@ export class Codegen {
   localUrl: string;
   // production url
   productionUrl: string;
+  // URL for the local GraphQL server used during --content=local builds
+  localBuildUrl?: string;
   graphqlSchemaDoc: DocumentNode;
   tinaSchema: TinaSchema;
   lookup: any;
   noClientBuildCache: boolean;
+  // When true, queries run locally but the generated client points to TinaCloud
+  localContentBuild: boolean;
 
   constructor({
     configManager,
@@ -35,6 +39,7 @@ export class Codegen {
     queryDoc,
     fragDoc,
     isLocal,
+    localContentBuild,
     graphqlSchemaDoc,
     tinaSchema,
     lookup,
@@ -45,12 +50,14 @@ export class Codegen {
     queryDoc: string;
     fragDoc: string;
     isLocal: boolean;
+    localContentBuild?: boolean;
     graphqlSchemaDoc: DocumentNode;
     tinaSchema: TinaSchema;
     lookup: any;
     noClientBuildCache: boolean;
   }) {
     this.isLocal = isLocal;
+    this.localContentBuild = localContentBuild || false;
     this.graphqlSchemaDoc = graphqlSchemaDoc;
     this.configManager = configManager;
     this.port = port;
@@ -69,14 +76,6 @@ export class Codegen {
     );
     await fs.ensureFile(filePath);
     await fs.outputFile(filePath, data);
-    if (this.configManager.hasSeparateContentRoot()) {
-      const filePath = path.join(
-        this.configManager.generatedFolderPathContentRepo,
-        fileName
-      );
-      await fs.ensureFile(filePath);
-      await fs.outputFile(filePath, data);
-    }
   }
 
   async removeGeneratedFilesIfExists() {
@@ -112,10 +111,12 @@ export class Codegen {
     // update _lookup.json
     await this.writeConfigFile('_lookup.json', JSON.stringify(this.lookup));
 
-    const { apiURL, localUrl, tinaCloudUrl } = this._createApiUrl();
+    const { apiURL, localUrl, tinaCloudUrl, localBuildUrl } =
+      this._createApiUrl();
     this.apiURL = apiURL;
     this.localUrl = localUrl;
     this.productionUrl = tinaCloudUrl;
+    this.localBuildUrl = localBuildUrl;
 
     if (this.configManager.shouldSkipSDK()) {
       await this.removeGeneratedFilesIfExists();
@@ -146,6 +147,15 @@ export class Codegen {
         this.configManager.generatedTypesTSFilePath,
         codeString
       );
+      // Co-resident types.js so the generated `import { queries } from "./types.js"`
+      // works under Node native ESM at runtime. Modern TS module resolution
+      // (bundler / node16 / nodenext) rewrites the .js import to types.ts at
+      // compile time, so type checking still sees the .ts source.
+      const jsTypes = await transform(codeString, { loader: 'ts' });
+      await fs.outputFile(
+        this.configManager.generatedTypesJSFilePath,
+        jsTypes.code
+      );
       await fs.outputFile(
         this.configManager.generatedClientTSFilePath,
         clientString
@@ -158,7 +168,6 @@ export class Codegen {
       }
       await unlinkIfExists(this.configManager.generatedClientJSFilePath);
       await unlinkIfExists(this.configManager.generatedTypesDFilePath);
-      await unlinkIfExists(this.configManager.generatedTypesJSFilePath);
     } else {
       // Write out the generated types.
       // write types.js and types.d.ts
@@ -239,9 +248,15 @@ export class Codegen {
     const tinaCloudUrl =
       overrideUrl ||
       `${baseUrl}/${version}/content/${clientId}/github/${branch}`;
-    const apiURL = this.isLocal ? localUrl : tinaCloudUrl;
+    const apiURL =
+      this.isLocal && !this.localContentBuild ? localUrl : tinaCloudUrl;
+    // Stays on localhost: this is consumed in-process by `tinacms build`, and
+    // `server.url` is dev-only.
+    const localBuildUrl = this.port
+      ? `http://localhost:${this.port}/graphql`
+      : undefined;
 
-    return { apiURL, localUrl, tinaCloudUrl };
+    return { apiURL, localUrl, tinaCloudUrl, localBuildUrl };
   }
 
   getApiURL() {
@@ -279,7 +294,7 @@ export class Codegen {
 import { resolve } from "@tinacms/datalayer";
 import type { TinaClient } from "tinacms/dist/client";
 
-import { queries } from "./types";
+import { queries } from "./types.js";
 import database from "../database";
 
 export async function databaseRequest({ query, variables, user }) {
@@ -347,14 +362,14 @@ export default databaseClient;
     const apiURL = this.getApiURL();
 
     const clientString = `import { createClient } from "tinacms/dist/client";
-import { queries } from "./types";
+import { queries } from "./types.js";
 export const client = createClient({ ${
       this.noClientBuildCache === false
         ? `cacheDir: '${normalizePath(
             this.configManager.generatedCachePath
           )}', `
         : ''
-    }url: '${apiURL}', token: '${token}', queries, ${
+    }url: ${this.localContentBuild ? `process.env.TINA_LOCAL_URL || '${apiURL}'` : `'${apiURL}'`}, token: '${token}', queries, ${
       errorPolicy ? `errorPolicy: '${errorPolicy}'` : ''
     } });
 export default client;

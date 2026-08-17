@@ -1,0 +1,130 @@
+{
+  "name": "@tinacms/tinacms",
+  "version": "4.0.0-alpha.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "The core package of TinaCMS v4. Plugins supply its functions, and it keeps the content in git. It is a rewrite of TinaCMS in one package. For the architecture, refer to the specification in tinacmsv4.",
+  "type": "module",
+  "repository": {
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/v4/@tinacms/tinacms"
+  },
+  "sideEffects": false,
+  "bin": {
+    "tinacms": "./bin/tinacms.mjs"
+  },
+  "scripts": {
+    "build": "tinacms-scripts build",
+    "dev": "vite playground",
+    "types": "tsc && tsc -p tsconfig.test.json",
+    "test": "vitest run --passWithNoTests",
+    "test:e2e": "playwright test",
+    "codegen": "node ./bin/tinacms.mjs codegen --root playground",
+    "coverage": "vitest run --coverage"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./react": {
+      "types": "./src/editor/index.ts",
+      "default": "./src/editor/index.ts"
+    },
+    "./admin": {
+      "types": "./src/admin/index.ts",
+      "default": "./src/admin/index.ts"
+    },
+    "./preview": {
+      "types": "./src/preview/index.ts",
+      "default": "./src/preview/index.ts"
+    },
+    "./adapters/react": {
+      "types": "./src/adapters/react/index.ts",
+      "default": "./src/adapters/react/index.ts"
+    },
+    "./client": {
+      "types": "./src/client/index.ts",
+      "default": "./src/client/index.ts"
+    },
+    "./server": {
+      "types": "./src/server/index.ts",
+      "default": "./src/server/index.ts"
+    },
+    "./local-data-layer": {
+      "types": "./src/plugins/content/local/server/local-data-layer.ts",
+      "default": "./src/plugins/content/local/server/local-data-layer.ts"
+    },
+    "./local-data-layer/vite": {
+      "types": "./src/plugins/content/local/server/local-data-layer.vite.ts",
+      "default": "./src/plugins/content/local/server/local-data-layer.vite.ts"
+    },
+    "./adapters/next": {
+      "types": "./src/adapters/next/index.ts",
+      "default": "./src/adapters/next/index.ts"
+    },
+    "./adapters/express": {
+      "types": "./src/adapters/express/index.ts",
+      "default": "./src/adapters/express/index.ts"
+    },
+    "./adapters/astro": {
+      "types": "./src/adapters/astro/index.ts",
+      "default": "./src/adapters/astro/index.ts"
+    },
+    "./adapters/hono": {
+      "types": "./src/adapters/hono/index.ts",
+      "default": "./src/adapters/hono/index.ts"
+    }
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.101.4",
+    "@tinacms/graphql": "workspace:*",
+    "@tinacms/mdx": "workspace:*",
+    "@tinacms/rich-text": "workspace:*",
+    "@tinacms/ui": "workspace:*",
+    "gray-matter": "catalog:",
+    "react-hook-form": "^7.80.0",
+    "react-router-dom": "catalog:",
+    "sqlite-level": "catalog:",
+    "zod": "catalog:",
+    "zustand": "^5.0.14"
+  },
+  "peerDependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "vite": "^5.4.0 || ^6.0.0 || ^7.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    },
+    "vite": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@playwright/test": "catalog:",
+    "@tailwindcss/vite": "^4.2.4",
+    "@testing-library/dom": "catalog:",
+    "@testing-library/jest-dom": "catalog:",
+    "@testing-library/react": "catalog:",
+    "@testing-library/user-event": "catalog:",
+    "@tinacms/scripts": "workspace:*",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "abstract-level": "catalog:",
+    "babel-plugin-react-compiler": "^1.0.0",
+    "happy-dom": "catalog:",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "tailwindcss": "^4.3.2",
+    "typescript": "^5.7.3",
+    "vite": "^5.4.0",
+    "vitest": "^2.1.9"
+  }
+}

@@ -1,8 +1,10 @@
-import { fromMarkdown } from './markdown';
-import { compact } from 'mdast-util-compact';
-import { postProcessor } from './post-processing';
-import type { Root } from 'mdast';
 import type { RichTextField } from '@tinacms/schema-tools';
+import type { Root } from 'mdast';
+import { compact } from 'mdast-util-compact';
+// This is the newer parser implementation, introduced in commit 651b6b53b ("Add next module for mdx behavior").
+// The public-facing parseMDX in src/parse/index.ts delegates here for markdown content.
+import { fromMarkdown } from './markdown';
+import { postProcessor } from './post-processing';
 
 export const parseMDX = (
   value: string,

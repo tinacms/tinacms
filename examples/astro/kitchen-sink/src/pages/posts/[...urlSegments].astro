@@ -14,7 +14,7 @@ export async function getStaticPaths() {
         {
           params: { urlSegments: edge.node._sys.breadcrumbs.join('/') },
           props: {
-            relativePath: `${edge.node._sys.breadcrumbs.join('/')}.mdx`,
+            relativePath: `${edge.node._sys.breadcrumbs.join('/')}.md`,
           },
         },
       ];

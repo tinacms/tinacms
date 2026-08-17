@@ -16,6 +16,7 @@ const TypeName = [
   'object',
   'reference',
   'rich-text',
+  'displayOnly',
 ] as const;
 
 const formattedTypes = `  - ${TypeName.join('\n  - ')}`;
@@ -94,6 +95,40 @@ const DateTimeField = TinaScalerBase.extend({
   }),
   dateFormat: z.string().optional(),
   timeFormat: z.string().optional(),
+});
+
+// ==========
+// Display-only fields
+// ==========
+const DisplayOnlyField = TinaField.omit({ required: true }).extend({
+  type: z.literal('displayOnly', {
+    invalid_type_error: typeTypeError,
+    required_error: typeRequiredError,
+  }),
+  list: z
+    .literal(undefined, {
+      errorMap: () => ({
+        message:
+          'Property `list` is not allowed on fields of `type: displayOnly`.',
+      }),
+    })
+    .optional(),
+  required: z
+    .literal(undefined, {
+      errorMap: () => ({
+        message:
+          'Property `required` is not allowed on fields of `type: displayOnly`.',
+      }),
+    })
+    .optional(),
+  indexed: z
+    .literal(undefined, {
+      errorMap: () => ({
+        message:
+          'Property `indexed` is not allowed on fields of `type: displayOnly`.',
+      }),
+    })
+    .optional(),
 });
 
 // ==========
@@ -199,6 +234,7 @@ export const TinaFieldZod: z.ZodType<TinaFieldType> = z.lazy(() => {
         ObjectField,
         RichTextField,
         PasswordField,
+        DisplayOnlyField,
       ],
       {
         errorMap: (issue, ctx) => {

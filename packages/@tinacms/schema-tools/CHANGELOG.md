@@ -1,5 +1,90 @@
 # @tinacms/schema-tools
 
+## 2.8.3
+
+### Patch Changes
+
+- [#7123](https://github.com/tinacms/tinacms/pull/7123) [`5148d67`](https://github.com/tinacms/tinacms/commit/5148d679049bc53e34b287a586bc721db7cb7710) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - refactor: replace hardcoded error-message string checks with shared error-identifier constants in `@tinacms/schema-tools`, so producers and consumers reference one source of truth instead of fragile `error.message.includes('...')` matching (#6777)
+
+- [#7143](https://github.com/tinacms/tinacms/pull/7143) [`ff10e65`](https://github.com/tinacms/tinacms/commit/ff10e657e48f1acc67cafd3e1a99bef23c8ac419) Thanks [@kulesy](https://github.com/kulesy)! - Unify folder-name validation with the document-filename and backend `relativePath` allowlist. The Create Folder modal now rejects names with disallowed characters (e.g. spaces) inline instead of letting the request fail on the backend, and a project-level `folderNameRegex` is layered on top of that baseline. The allowlist lives in a single shared constant in `@tinacms/schema-tools`.
+
+## 2.8.2
+
+### Patch Changes
+
+- [#6856](https://github.com/tinacms/tinacms/pull/6856) [`e74a7d6`](https://github.com/tinacms/tinacms/commit/e74a7d62ee1dce7386b5aaf5ebaf569d3adcd247) Thanks [@lphuc2250gma](https://github.com/lphuc2250gma)! - fix: duplicated words in parseURL error message and rich-text type docs
+
+- [#7058](https://github.com/tinacms/tinacms/pull/7058) [`5ba482b`](https://github.com/tinacms/tinacms/commit/5ba482b9c10d76ea7f7bea2a442a8999824736a8) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Fix Local Mode banner for absolute contentApiUrlOverride
+
+- [#7088](https://github.com/tinacms/tinacms/pull/7088) [`d44558e`](https://github.com/tinacms/tinacms/commit/d44558e9b4502d4f4fc2c970d22985339fe2b6ce) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Fix media upload/delete paths to prevent access to storage keys outside mediaRoot.
+
+## 2.8.1
+
+### Patch Changes
+
+- [#6974](https://github.com/tinacms/tinacms/pull/6974) [`c7b366c`](https://github.com/tinacms/tinacms/commit/c7b366c5de66b1a3f086c1f11954225e55430324) Thanks [@JackDevAU](https://github.com/JackDevAU)! - feat: add toolbar override settings "headingLevels" for h1,h2,etc
+  fix: fixes some incorrect react hook calls
+
+## 2.8.0
+
+### Minor Changes
+
+- [#6790](https://github.com/tinacms/tinacms/pull/6790) [`542c781`](https://github.com/tinacms/tinacms/commit/542c781b4f7a6ff5b5481bd88329f60c9bf3b57d) Thanks [@Ben0189](https://github.com/Ben0189)! - Fix native SQLite (and other native CJS adapters) crashing the ESM database build, plus surrounding cleanup work.
+
+  **The bug.** Since Tina v3's December 2025 ESM migration, bundling `tina/database.ts` with esbuild — and writing the output to `os.tmpdir()` — left users wedged between two failure modes: bundling native modules like `better-sqlite3` crashed with `__filename is not defined`, and externalizing them couldn't resolve `node_modules` from `/tmp/`. See #6675.
+
+  **What changed:**
+
+  - `loadDatabaseFile` and `loadConfigFile` now write esbuild output to `<project>/tina/__generated__/.cache/<timestamp>/` instead of `os.tmpdir()`, so Node's resolver can walk up to the project's `node_modules` at runtime.
+  - `better-sqlite3` is externalized so Node loads it as CJS where `__filename` exists.
+  - The build cache is swept on startup (clears residue from crashed prior runs), and each per-build subdir + its now-empty timestamp parent are removed after the dynamic-import resolves.
+  - Read-only project mounts (Docker `:ro` volumes, AWS Lambda's `/var/task`, sandboxed CI runners) now fail with an actionable error explaining the cause and resolution, instead of a cryptic mid-build `EACCES`.
+  - New `defineConfig` field: `build.externalDependencies?: string[]`. Users with custom native adapters outside the baseline can extend the externalize list from their config:
+
+    ```ts
+    // tina/config.ts
+    export default defineConfig({
+      build: {
+        publicFolder: "public",
+        outputFolder: "admin",
+        externalDependencies: ["my-custom-native-adapter"],
+      },
+      // ...
+    });
+    ```
+
+    Externalized packages must be installed in the project's `node_modules` so Node can resolve them at runtime.
+
+  - `tina init` now adds `tina/__generated__` to `.gitignore` for new projects (and existing projects without it).
+
+## 2.7.4
+
+### Patch Changes
+
+- [#6757](https://github.com/tinacms/tinacms/pull/6757) [`38cbec7`](https://github.com/tinacms/tinacms/commit/38cbec7b1b204f395f4e6e97c4bab6edc7296439) Thanks [@OfekDanny](https://github.com/OfekDanny)! - Fix folder creation failing when a collection has `match.exclude` configured.
+
+  `TinaSchema.getCollectionByFullPath` was applying the `match.exclude` glob check to `.gitkeep.*` folder placeholder files, causing the collection lookup to return no results. This made `database.put()` throw during `resolveCreateFolder`, blocking folder creation entirely in any collection with `match.exclude` set.
+
+  The fix skips the `match.include`/`match.exclude` check for `.gitkeep.*` placeholders in both `TinaSchema` and `Database.put`, mirroring the existing extension-check special-case that already handled these files.
+
+## 2.7.3
+
+### Patch Changes
+
+- [#6721](https://github.com/tinacms/tinacms/pull/6721) [`a85b1c0`](https://github.com/tinacms/tinacms/commit/a85b1c0ff44d8c214be47f89531beaf0e9dc234c) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Add runtime Zod validation for the `localContentPath` Tina config field (rejects non-string and empty-string values) in the CLI's content-root resolver. Extract content-root resolution out of `processConfig` into a standalone, unit-testable `resolveContentRootPath` function that preserves existing behaviour (falls back to `rootPath` with a warning when the configured directory is missing). `localContentPath` is deliberately excluded from `tinaConfigZod` so it does not leak into the hashed `_schema.json` and break the server-schema match check for projects that set it. Closes [tinacms/tinacloud#3294](https://github.com/tinacms/tinacloud/issues/3294).
+
+## 2.7.2
+
+### Patch Changes
+
+- [#6548](https://github.com/tinacms/tinacms/pull/6548) [`cd262b3`](https://github.com/tinacms/tinacms/commit/cd262b311c218ea4e5b5bb8abbbe54fcff3b8054) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Add 'displayOnly' field type for display-only form fields
+
+## 2.7.1
+
+### Patch Changes
+
+- [#6633](https://github.com/tinacms/tinacms/pull/6633) [`4315d73`](https://github.com/tinacms/tinacms/commit/4315d731e729857713d5f3fc6cdef2b30abd9384) Thanks [@JackDevAU](https://github.com/JackDevAU)! - refactor: make @tinacms/schema-tools the single source of truth
+
 ## 2.7.0
 
 ### Minor Changes

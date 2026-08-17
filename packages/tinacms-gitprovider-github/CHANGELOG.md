@@ -1,5 +1,120 @@
 # tinacms-gitprovider-github
 
+## 4.1.16
+
+### Patch Changes
+
+- [#7213](https://github.com/tinacms/tinacms/pull/7213) [`056ffc2`](https://github.com/tinacms/tinacms/commit/056ffc22dc87b0040281054f4140c6260c22ea1f) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Publish internal package references as ranges instead of exact versions.
+
+  Internal dependencies were declared as `workspace:*`, which pnpm expands to an **exact version** when publishing (`"tinacms": "3.10.0"`), not a range. An exact pin cannot deduplicate against the version a consumer has already installed, so npm nests a second — and third — complete copy of `tinacms` and its dependency tree. In a stock Astro + TinaCMS blog this produced three copies of `tinacms`, three of `mermaid` (186 MB), five of `date-fns` (151 MB), and four of `typescript` (88 MB): about **320 MB of duplication**.
+
+  The same expansion applied to `peerDependencies`, so packages such as `next-tinacms-cloudinary` and `tinacms-authjs` published `"tinacms": "3.10.0"` as a _peer_ — requiring consumers to have that exact version or hit an `ERESOLVE` conflict, and forcing a republish of every dependent on each `tinacms` release.
+
+  Switching these to `workspace:^` publishes them as caret ranges (`^3.10.0`), which deduplicate normally and let `onlyUpdatePeerDependentsWhenOutOfRange` do its job.
+
+- Updated dependencies [[`056ffc2`](https://github.com/tinacms/tinacms/commit/056ffc22dc87b0040281054f4140c6260c22ea1f)]:
+  - @tinacms/datalayer@2.0.29
+
+## 4.1.15
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/datalayer@2.0.28
+
+## 4.1.14
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/datalayer@2.0.27
+
+## 4.1.13
+
+### Patch Changes
+
+- [#7088](https://github.com/tinacms/tinacms/pull/7088) [`d44558e`](https://github.com/tinacms/tinacms/commit/d44558e9b4502d4f4fc2c970d22985339fe2b6ce) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Fix media upload/delete paths to prevent access to storage keys outside mediaRoot.
+
+- Updated dependencies [[`d44558e`](https://github.com/tinacms/tinacms/commit/d44558e9b4502d4f4fc2c970d22985339fe2b6ce)]:
+  - @tinacms/datalayer@2.0.26
+
+## 4.1.12
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/datalayer@2.0.25
+
+## 4.1.11
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/datalayer@2.0.24
+
+## 4.1.10
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/datalayer@2.0.23
+
+## 4.1.9
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/datalayer@2.0.22
+
+## 4.1.8
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/datalayer@2.0.21
+
+## 4.1.7
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/datalayer@2.0.20
+
+## 4.1.6
+
+### Patch Changes
+
+- Updated dependencies [[`556a162`](https://github.com/tinacms/tinacms/commit/556a16255df4b48df69c14133ee6530b68dd9131)]:
+  - @tinacms/datalayer@2.0.19
+
+## 4.1.5
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/datalayer@2.0.18
+
+## 4.1.4
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/datalayer@2.0.17
+
+## 4.1.3
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/datalayer@2.0.16
+
+## 4.1.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/datalayer@2.0.15
+
 ## 4.1.1
 
 ### Patch Changes

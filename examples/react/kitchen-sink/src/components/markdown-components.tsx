@@ -32,7 +32,13 @@ export const customComponents: Components<{
     lang?: string;
     children?: React.ReactNode;
   }) => (
-    <Suspense fallback={<pre><code>{props.value}</code></pre>}>
+    <Suspense
+      fallback={
+        <pre>
+          <code>{props.value}</code>
+        </pre>
+      }
+    >
       <Prism {...(props as object)} />
     </Suspense>
   ),

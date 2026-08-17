@@ -1,13 +1,37 @@
 packages:
     - packages/*
     - packages/@tinacms/*
-    - examples/*
-    - examples/next/*
-    - examples/react/*
-    - examples/astro/*
+    - packages/v4/@tinacms/*
+    - packages/v4/examples/*
+    - examples/*/*
     - e2e/*
-    - experimental-examples/*
     - playwright/*
+# Supply-chain cooldown: don't install registry releases newer than 1 day,
+# giving time to react to a compromised/yanked package. Our own packages are
+# excluded so freshly published @tinacms releases aren't blocked.
+minimumReleaseAge: 1440
+minimumReleaseAgeExclude:
+    - "@tinacms/*"
+    - tinacms
+    - tinacms-*
+    - create-tina-app
+    - next-tinacms-*
+overrides:
+    "@clerk/clerk-js>react": 19.2.3
+    "@clerk/clerk-js>react-dom": 19.2.3
+    "@clerk/backend>react": 19.2.3
+allowBuilds:
+    "@biomejs/biome": true
+    "@parcel/watcher": true
+    better-sqlite3: true
+    browser-tabs-lock: true
+    bufferutil: true
+    core-js: true
+    esbuild: true
+    hugo-extended: true
+    protobufjs: true
+    sharp: true
+    unrs-resolver: true
 catalog:
     "@ariakit/react": ^0.4.15
     "@aws-sdk/client-s3": ^3.744.0
@@ -24,28 +48,28 @@ catalog:
     "@floating-ui/dom": ^1.6.13
     "@floating-ui/react-dom": ^2.1.2
     "@graphiql/toolkit": 0.8.4
-    "@graphql-codegen/core": ^2.6.8
-    "@graphql-codegen/typescript": ^4.1.3
-    "@graphql-codegen/typescript-operations": ^4.4.1
-    "@graphql-codegen/visitor-plugin-common": ^4.1.2
+    "@graphql-codegen/core": ^6.2.0
+    "@graphql-codegen/typescript": ^6.1.0
+    "@graphql-codegen/typescript-operations": ^6.1.0
+    "@graphql-codegen/visitor-plugin-common": ^7.2.0
     "@graphql-tools/graphql-file-loader": ^7.5.17
     "@graphql-tools/load": ^7.8.14
     "@graphql-tools/utils": ^10.8.1
+    "@headlessui/react": 2.1.8
     "@iarna/toml": ^2.2.5
-    "@monaco-editor/react": 4.7.0-rc.0
+    "@monaco-editor/loader": ^1.7.0
     "@octokit/rest": ^22.0.1
-    "@playwright/test": ^1.50.1
+    "@playwright/test": ^1.61.1
     "@puppeteer/replay": ^1.3.2
-    "@radix-ui/react-checkbox": ^1.1.4
-    "@radix-ui/react-dialog": ^1.1.6
-    "@radix-ui/react-dropdown-menu": ^2.1.6
+    "@radix-ui/react-dialog": ^1.1.18
+    "@radix-ui/react-dropdown-menu": ^2.1.19
     "@radix-ui/react-icons": ^1.3.2
-    "@radix-ui/react-popover": ^1.1.15
-    "@radix-ui/react-separator": ^1.1.2
-    "@radix-ui/react-select": ^2.2.6
-    "@radix-ui/react-slot": ^1.1.2
-    "@radix-ui/react-toolbar": ^1.1.2
-    "@radix-ui/react-tooltip": ^1.2.8
+    "@radix-ui/react-popover": ^1.1.18
+    "@radix-ui/react-separator": ^1.1.11
+    "@radix-ui/react-select": ^2.3.2
+    "@radix-ui/react-slot": ^1.3.0
+    "@radix-ui/react-toolbar": ^1.1.14
+    "@radix-ui/react-tooltip": ^1.2.11
     "@react-hook/window-size": ^3.1.1
     "@rollup/pluginutils": ^5.1.4
     "@sucrase/jest-plugin": ^3.0.0
@@ -53,7 +77,7 @@ catalog:
     "@svgr/webpack": ^8.1.0
     "@tailwindcss/aspect-ratio": ^0.4.2
     "@tailwindcss/container-queries": ^0.1.1
-    "@tailwindcss/typography": ^0.5.16
+    "@tailwindcss/typography": ^0.5.20
     "@testing-library/dom": ^10.4.0
     "@testing-library/jest-dom": ^6.7.0
     "@testing-library/react": ^16.2.0
@@ -81,6 +105,7 @@ catalog:
     "@types/prop-types": ^15.7.14
     "@types/react-beautiful-dnd": ^13.1.8
     "@types/react-dom": ^18.3.5
+    "@vitest/coverage-v8": ^2.1.9
     "@types/search-index": ^3.2.4
     "@types/styled-components": ^5.1.34
     "@types/tar": 6.1.13
@@ -114,10 +139,9 @@ catalog:
     "@udecode/plate-trailing-block": ^48.0.0
     "@udecode/slate": ^48.0.1
     "@vercel/stega": ^0.0.5
-    "@vitejs/plugin-react": 3.1.0
+    "@vitejs/plugin-react": ^4.7.0
     abstract-level: ^1.0.4
     acorn: 8.8.2
-    add: ^2.0.6
     altair-express-middleware: ^7.3.6
     async-lock: ^1.4.1
     auto-bind: ^4.0.0
@@ -140,7 +164,7 @@ catalog:
     cross-spawn: ^7.0.6
     crypto-js: ^4.2.0
     dotenv: ^16.4.7
-    esbuild: ^0.24.2
+    esbuild: ^0.25.0
     estree-util-is-identifier-name: 2.1.0
     fast-glob: ^3.3.3
     final-form: 4.20.10
@@ -174,6 +198,7 @@ catalog:
     mdast-util-mdx-jsx: 2.1.2
     mdast-util-to-markdown: 1.5.0
     memory-level: ^1.0.0
+    mermaid: ^11.12.2
     micromark-extension-gfm: 2.0.3
     micromark-factory-mdx-expression: 1.0.7
     micromark-factory-space: 1.0.0
@@ -183,19 +208,19 @@ catalog:
     micromark-util-types: 1.1.0
     micromatch: 4.0.8
     minimatch: ^5.1.6
-    moment: 2.29.4
     monaco-editor: 0.31.0
-    multer: 1.4.5-lts.1
+    mongodb-level: ^0.0.4
+    multer: 2.2.0
     next-themes: ^0.3.0
     normalize-path: ^3.0.0
     ora: ^8.2.0
     parse-entities: 4.0.1
     picomatch: ^4.0.2
     picomatch-browser: 2.2.6
+    postcss: ^8.5.16
     postcss-import: ^14.1.0
     postcss-nesting: ^10.2.0
     prettier: ^2.8.8
-    pretty-quick: ^3.3.1
     prism-react-renderer: ^2.4.1
     progress: ^2.0.3
     prompts: ^2.4.2
@@ -204,21 +229,19 @@ catalog:
     query-string: ^9.0.0
     react-beautiful-dnd: ^13.1.1
     react-colorful: ^5.6.1
-    react-datetime: ^3.3.1
     react-dnd: ^16.0.1
     react-dnd-html5-backend: ^16.0.1
     react-dropzone: 14.2.3
     react-final-form: ^6.5.9
-    react-router-dom: 6.3.0
+    react-router-dom: ^6.30.3
     react-use: ^17.6.0
     readable-stream: ^4.7.0
     remark: 14.0.2
     remark-gfm: ^2.0.0
     remark-mdx: 2.3.0
-    remove: ^0.1.5
     search-index: 4.0.0
     sharp: ^0.33.5
-    sqlite-level: ^1.2.1
+    sqlite-level: ^2.1.0
     stopword: ^3.1.4
     stringify-entities: 4.0.3
     tailwindcss-animate: ^1.0.7
@@ -228,7 +251,7 @@ catalog:
     tsc-alias: ^1.8.10
     tslib: ^2.8.1
     tsup: ^8.3.6
-    turbo: ^2.5.3
+    turbo: ^2.9.18
     typanion: 3.13.0
     typedoc: ^0.26.11
     typedoc-plugin-markdown: ^3.17.1

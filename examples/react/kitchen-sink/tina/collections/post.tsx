@@ -5,7 +5,7 @@ const Post: Collection = {
   label: 'Posts',
   name: 'post',
   path: 'content/posts',
-  format: 'mdx',
+  format: 'md',
   ui: {
     router: ({
       document,
@@ -79,6 +79,7 @@ const Post: Collection = {
       type: 'rich-text',
       label: 'Body',
       name: '_body',
+      parser: { type: 'mdx' },
       templates: [
         {
           name: 'BlockQuote',

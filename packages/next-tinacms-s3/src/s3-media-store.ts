@@ -9,7 +9,7 @@ import type {
   MediaStore,
   MediaUploadOptions,
 } from 'tinacms';
-import { DEFAULT_MEDIA_UPLOAD_TYPES } from 'tinacms';
+import { DEFAULT_MEDIA_UPLOAD_TYPES, sanitizeFilename } from 'tinacms';
 const s3ErrorRegex = /<Error>.*<Code>(.+)<\/Code>.*<Message>(.+)<\/Message>.*/;
 
 import { E_UNAUTHORIZED, E_BAD_ROUTE, interpretErrorMessage } from './errors';
@@ -39,10 +39,11 @@ export class S3MediaStore implements MediaStore {
       if (directory?.endsWith('/')) {
         directory = directory.substr(0, directory.length - 1);
       }
+      // Normalize/sanitize once so the upload key, the saved object, and the
+      // value persisted into content all agree.
+      const safeName = sanitizeFilename(item.file.name);
       const path = `${
-        directory && directory !== '/'
-          ? `${directory}/${item.file.name}`
-          : item.file.name
+        directory && directory !== '/' ? `${directory}/${safeName}` : safeName
       }`;
 
       const res = await this.fetchWithBasePath(
@@ -95,8 +96,8 @@ export class S3MediaStore implements MediaStore {
 
       newFiles.push({
         directory: item.directory,
-        filename: item.file.name,
-        id: item.file.name,
+        filename: safeName,
+        id: safeName,
         type: 'file',
         thumbnails: {
           '75x75': src,

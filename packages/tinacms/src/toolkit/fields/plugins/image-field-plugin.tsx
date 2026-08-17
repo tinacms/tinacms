@@ -33,12 +33,11 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
 
     async function onChange(media?: Media | Media[]) {
       if (media) {
+        const item = Array.isArray(media) ? media[0] : media;
         const parsedValue =
-          // @ts-ignore
           typeof cms?.media?.store?.parse === 'function'
-            ? // @ts-ignore
-              cms.media.store.parse(media)
-            : media;
+            ? cms.media.store.parse(item)
+            : item.src || item;
 
         props.input.onChange(parsedValue);
       }

@@ -25,15 +25,18 @@ export default defineConfig({
   },
   projects: [
     {
-      name: 'chromium',
+      name: 'frontend',
       use: { ...devices['Desktop Chrome'] },
+      testIgnore: /admin\//,
+    },
+    {
+      name: 'admin',
+      use: { ...devices['Desktop Chrome'] },
+      testMatch: /admin\/.*\.spec\.ts$/,
     },
   ],
   webServer: {
-    command:
-      process.platform === 'win32'
-        ? 'set MONOREPO_DEV=true && pnpm tinacms dev -c "vite"'
-        : 'pnpm dev',
+    command: 'pnpm dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120000,

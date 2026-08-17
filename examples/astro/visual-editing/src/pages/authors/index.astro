@@ -1,0 +1,37 @@
+---
+import client from '../../../tina/__generated__/client';
+import Base from '../../layouts/Base.astro';
+import { sanitizeImageSrc } from '@tinacms/astro/sanitize';
+import { cardLinkClasses, cn } from '../../lib/utils';
+
+const connection = await client.queries.authorConnection().catch(() => null);
+const authors = (connection?.data?.authorConnection?.edges ?? []).flatMap(
+  (edge) => (edge?.node ? [edge.node] : [])
+);
+---
+<Base title="Authors | TinaCMS Astro Visual Editing">
+  <section class="max-w-5xl mx-auto px-6 sm:px-8 py-24">
+    <h1 class="text-4xl font-extrabold tracking-tight mb-12 text-center title-font">Authors</h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      {authors.map((author) => {
+        const avatarSrc = author.avatar ? sanitizeImageSrc(author.avatar) : '';
+        return (
+          <a href={`/authors/${author._sys.filename}`} class={cn(cardLinkClasses, 'px-6 sm:px-8 py-8')}>
+            <div class="flex items-center gap-4 mb-4">
+              {avatarSrc && <img src={avatarSrc} alt={author.name ?? ''} width="56" height="56" class="rounded-full" />}
+              <h2 class="text-2xl font-semibold">{author.name}</h2>
+            </div>
+            {author.description && <p class="text-gray-600 dark:text-gray-400">{author.description}</p>}
+            {author.hobbies && author.hobbies.length > 0 && (
+              <div class="mt-4 flex flex-wrap gap-2">
+                {author.hobbies.map((hobby) => hobby && (
+                  <span class="text-sm px-2 py-1 bg-theme-50 text-theme-700 rounded-full">{hobby}</span>
+                ))}
+              </div>
+            )}
+          </a>
+        );
+      })}
+    </div>
+  </section>
+</Base>

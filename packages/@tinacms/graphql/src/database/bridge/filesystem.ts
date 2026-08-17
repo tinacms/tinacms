@@ -78,10 +78,24 @@ function assertWithinBase(filepath: string, baseDir: string): string {
   return resolved;
 }
 
+const GENERATED_PATH_PREFIXES = ['tina/__generated__/', '.tina/__generated__/'];
+
+function isGeneratedPath(filepath: string): boolean {
+  const normalized = filepath.replace(/\\/g, '/');
+  return GENERATED_PATH_PREFIXES.some((prefix) =>
+    normalized.startsWith(prefix)
+  );
+}
+
 /**
  * This is the bridge from whatever datasource we need for I/O.
  * The basic example here is for the filesystem, one is needed
  * for GitHub has well.
+ *
+ * When `outputPath` differs from `rootPath` (multi-repo: generator +
+ * sibling content repo), paths under `tina/__generated__/` still resolve
+ * against `rootPath` — schema/graphql/lookup artifacts live only in the
+ * generator. Everything else (content files) resolves against `outputPath`.
  *
  * @security All public methods validate their `filepath` / `pattern`
  * argument via `assertWithinBase` before performing any I/O. If you add a
@@ -94,6 +108,37 @@ export class FilesystemBridge implements Bridge {
   constructor(rootPath: string, outputPath?: string) {
     this.rootPath = path.resolve(rootPath);
     this.outputPath = outputPath ? path.resolve(outputPath) : this.rootPath;
+  }
+
+  // Picks the base directory for a given path. The `assertWithinBase` check
+  // in delete/get/put still runs against the chosen base, so a path like
+  // `tina/__generated__/../../escape.txt` is still rejected — just rejected
+  // against `rootPath` rather than `outputPath`.
+  private baseFor(filepath: string): string {
+    return isGeneratedPath(filepath) ? this.rootPath : this.outputPath;
+  }
+
+  // Defense-in-depth for generated-path routing: assertWithinBase already
+  // rejects paths that escape rootPath, but a path like
+  // `tina/__generated__/../../.env` would resolve to `<rootPath>/.env` —
+  // technically inside rootPath but outside the generated subtree the
+  // routing is supposed to grant access to. Verify the resolved path stays
+  // inside the matching generated subdirectory.
+  private assertGeneratedSubtree(filepath: string, resolved: string) {
+    if (!isGeneratedPath(filepath)) return;
+    const normalized = filepath.replace(/\\/g, '/');
+    const subdir = normalized.startsWith('.tina/__generated__/')
+      ? '.tina/__generated__'
+      : 'tina/__generated__';
+    const generatedRoot = path.resolve(path.join(this.rootPath, subdir));
+    if (
+      resolved !== generatedRoot &&
+      !resolved.startsWith(generatedRoot + path.sep)
+    ) {
+      throw new Error(
+        `Path traversal detected: "${filepath}" routed via generated prefix but resolved outside ${generatedRoot}`
+      );
+    }
   }
 
   public async glob(pattern: string, extension: string) {
@@ -112,18 +157,21 @@ export class FilesystemBridge implements Bridge {
   }
 
   public async delete(filepath: string) {
-    const resolved = assertWithinBase(filepath, this.outputPath);
+    const resolved = assertWithinBase(filepath, this.baseFor(filepath));
+    this.assertGeneratedSubtree(filepath, resolved);
     await fs.remove(resolved);
   }
 
   public async get(filepath: string) {
-    const resolved = assertWithinBase(filepath, this.outputPath);
+    const resolved = assertWithinBase(filepath, this.baseFor(filepath));
+    this.assertGeneratedSubtree(filepath, resolved);
     return (await fs.readFile(resolved)).toString();
   }
 
   public async put(filepath: string, data: string, basePathOverride?: string) {
-    const basePath = basePathOverride || this.outputPath;
+    const basePath = basePathOverride || this.baseFor(filepath);
     const resolved = assertWithinBase(filepath, basePath);
+    this.assertGeneratedSubtree(filepath, resolved);
     await fs.outputFile(resolved, data);
   }
 }

@@ -1,5 +1,6 @@
 import path from 'path';
 import { Database, FilesystemBridge, buildSchema } from '@tinacms/graphql';
+import { Telemetry } from '@tinacms/metrics';
 import { LocalSearchIndexClient, SearchIndexer } from '@tinacms/search';
 import AsyncLock from 'async-lock';
 import chokidar from 'chokidar';
@@ -12,6 +13,7 @@ import { dangerText, warnText } from '../../../utils/theme';
 import { Codegen } from '../../codegen';
 import { ConfigManager } from '../../config-manager';
 import { createAndInitializeDatabase, createDBServer } from '../../database';
+import { getBasePath } from '../../vite';
 import { BaseCommand } from '../baseCommands';
 import { devHTML } from './html';
 import { createDevServer } from './server';
@@ -44,7 +46,7 @@ export class DevCommand extends BaseCommand {
   });
 
   async catch(error: any): Promise<void> {
-    logger.error('Error occured during tinacms dev');
+    logger.error('Error occurred during tinacms dev');
     console.error(error);
     process.exit(1);
   }
@@ -65,6 +67,7 @@ export class DevCommand extends BaseCommand {
     });
     logger.info('🦙 TinaCMS Dev Server is initializing...');
     this.logDeprecationWarnings();
+    this.warnOnVersionSkew(configManager.rootPath);
 
     // Initialize the host TCP server
     createDBServer(Number(this.datalayerPort));
@@ -78,6 +81,19 @@ export class DevCommand extends BaseCommand {
       try {
         await configManager.processConfig();
         if (firstTime) {
+          // Track localContentPath usage so we can measure adoption of the
+          // multi-repo separation. Fire once per `tinacms dev` invocation, not
+          // per reload.
+          const telemetry = new Telemetry({ disabled: this.noTelemetry });
+          await telemetry.submitRecord({
+            event: {
+              name: 'tinacms:cli:dev:invoke',
+              hasLocalContentPath: Boolean(
+                configManager.config.localContentPath
+              ),
+            },
+          });
+
           database = await createAndInitializeDatabase(
             configManager,
             Number(this.datalayerPort)
@@ -123,16 +139,6 @@ export class DevCommand extends BaseCommand {
             path.join(configManager.tinaFolderPath, tinaLockFilename),
             tinaLockContent
           );
-
-          if (configManager.hasSeparateContentRoot()) {
-            const rootPath = await configManager.getTinaFolderPath(
-              configManager.contentRootPath,
-              { isContentRoot: true }
-            );
-            const filePath = path.join(rootPath, tinaLockFilename);
-            await fs.ensureFile(filePath);
-            await fs.outputFile(filePath, tinaLockContent);
-          }
         }
 
         await this.indexContentWithSpinner({
@@ -179,7 +185,7 @@ export class DevCommand extends BaseCommand {
       configManager.config?.server?.url || `http://localhost:${this.port}`;
     await fs.outputFile(
       configManager.outputHTMLFilePath,
-      devHTML(devServerUrl)
+      devHTML(devServerUrl, getBasePath(configManager))
     );
     // Add the gitignore so the index.html and assets are committed to git
     await fs.outputFile(

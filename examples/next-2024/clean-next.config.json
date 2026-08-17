@@ -1,7 +1,0 @@
-{
-  "packageManager": "pnpm",
-  "packages": [
-    "biomejs",
-    "shadcnui"
-  ]
-}

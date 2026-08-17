@@ -1,12 +1,3 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import { ArrowDown, ArrowUp, ArrowUpDown, ChevronDown } from 'lucide-react';
-import { BiFile, BiMovie } from 'react-icons/bi';
 import {
   flexRender,
   getCoreRowModel,
@@ -16,20 +7,37 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import type {
-  ColumnFiltersState,
   ColumnDef,
+  ColumnFiltersState,
   ExpandedState,
   FilterFn,
   Row,
   SortingState,
 } from '@tanstack/react-table';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../../ui/select';
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  ChevronDown,
+  Clapperboard,
+  File,
+} from 'lucide-react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import {
+  MediaUsageDashboardDocumentLinkClickedEvent,
+  MediaUsageDashboardRowExpandedEvent,
+  MediaUsageDashboardTypeFilterEvent,
+  MediaUsageDashboardTypeFilterPayload,
+  MediaUsageDashboardUsageFilterChangedEvent,
+  MediaUsageDashboardUsageFilterChangedPayload,
+} from '../../../../lib/posthog/posthog';
+import { captureEvent } from '../../../../lib/posthog/posthogProvider';
 import {
   Tooltip,
   TooltipContent,
@@ -37,6 +45,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '../../../fields/plugins/mdx-field-plugin/plate/components/plate-ui/tooltip';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../ui/select';
 import {
   Table,
   TableBody,
@@ -158,10 +173,10 @@ const getMediaColumns = (
                   onPreview?.(row.original);
                 }}
               >
-                <BiMovie className='text-3xl' />
+                <Clapperboard className='w-8 h-8' />
               </button>
             ) : (
-              <BiFile className='text-3xl' />
+              <File className='w-8 h-8' />
             )}
           </div>
         </div>
@@ -437,11 +452,13 @@ export const MediaUsageTable = ({
                 <React.Fragment key={row.id}>
                   <TableRow
                     style={{ contentVisibility: 'auto' }}
-                    onClick={
-                      getUsageCount(row.original) > 0
-                        ? row.getToggleExpandedHandler()
-                        : undefined
-                    }
+                    onClick={() => {
+                      getUsageCount(row.original) > 0;
+                      {
+                        row.toggleExpanded();
+                        captureEvent(MediaUsageDashboardRowExpandedEvent);
+                      }
+                    }}
                     className={
                       getUsageCount(row.original) > 0
                         ? row.getIsExpanded()
@@ -519,7 +536,12 @@ const MediaFilters = ({
     </span>
     <Select
       value={typeFilter}
-      onValueChange={(value) => setTypeFilter(value as MediaFilterType)}
+      onValueChange={(value) => {
+        setTypeFilter(value as MediaFilterType);
+        captureEvent(MediaUsageDashboardTypeFilterEvent, {
+          type: value as MediaFilterType,
+        } as MediaUsageDashboardTypeFilterPayload);
+      }}
     >
       <SelectTrigger
         aria-label='Filter by media type'
@@ -536,7 +558,12 @@ const MediaFilters = ({
     </Select>
     <Select
       value={usageFilter}
-      onValueChange={(value) => setUsageFilter(value as UsageFilterType)}
+      onValueChange={(value) => {
+        setUsageFilter(value as UsageFilterType);
+        captureEvent(MediaUsageDashboardUsageFilterChangedEvent, {
+          usage: value as UsageFilterType,
+        } as MediaUsageDashboardUsageFilterChangedPayload);
+      }}
     >
       <SelectTrigger
         aria-label='Filter by usage status'
@@ -588,7 +615,10 @@ const ExpandedRowContent = ({
                 <td className='py-1.5 pr-6 text-gray-500'>
                   <a
                     href={`#/collections/${doc.collectionName}/~`}
-                    onClick={() => onClose?.()}
+                    onClick={() => {
+                      onClose?.();
+                      captureEvent(MediaUsageDashboardDocumentLinkClickedEvent);
+                    }}
                     className='underline hover:text-tina-orange-dark transition-colors'
                   >
                     {doc.collectionLabel}
@@ -596,11 +626,16 @@ const ExpandedRowContent = ({
                 </td>
                 <td className='py-1.5 text-gray-700'>
                   <span className='flex items-center gap-1.5'>
-                    <BiFile className='text-gray-400 flex-shrink-0' />
+                    <File className='w-4 h-4 text-gray-400 flex-shrink-0' />
                     {doc.editUrl ? (
                       <a
                         href={doc.editUrl}
-                        onClick={() => onClose?.()}
+                        onClick={() => {
+                          onClose?.();
+                          captureEvent(
+                            MediaUsageDashboardDocumentLinkClickedEvent
+                          );
+                        }}
                         className='underline hover:text-tina-orange-dark transition-colors break-all'
                       >
                         {breadcrumb}

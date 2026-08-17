@@ -11,11 +11,12 @@ type ApiFixtures = {
  */
 export const test = base.extend<ApiFixtures>({
   apiContext: async ({ playwright }, use) => {
+    // No extraHTTPHeaders: Playwright derives Content-Type automatically from
+    // the request body (application/json for `data`, multipart/form-data with
+    // boundary for `multipart`). A hard-coded default would break media
+    // uploads by clobbering the multipart boundary.
     const context = await playwright.request.newContext({
       baseURL: process.env.GRAPHQL_URL ?? "http://localhost:4001",
-      extraHTTPHeaders: {
-        "Content-Type": "application/json",
-      },
     });
 
     await use(context);

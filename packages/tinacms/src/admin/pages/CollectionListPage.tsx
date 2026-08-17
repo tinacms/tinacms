@@ -1,11 +1,11 @@
-import {
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-  Transition,
-} from '@headlessui/react';
+import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import type { Collection, TinaField } from '@tinacms/schema-tools';
+import {
+  ERR_ALREADY_EXISTS,
+  ERR_HAS_REFERENCES,
+  RELATIVE_PATH_ALLOWED_CHARS_MESSAGE,
+  isValidRelativePath,
+} from '@tinacms/schema-tools';
 import {
   BaseTextField,
   Button,
@@ -22,32 +22,40 @@ import {
   Select,
   type TinaCMS,
 } from '@tinacms/toolkit';
+import { Callout } from '@toolkit/react-sidebar/components/callout';
+import { cn } from '@utils/cn';
+import {
+  ArrowLeft,
+  Copy,
+  File,
+  Folder,
+  House,
+  Plus,
+  Search,
+  SquarePen,
+  TextCursorInput,
+  Trash2,
+  X,
+} from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import {
-  BiArrowBack,
-  BiCopy,
-  BiEdit,
-  BiFile,
-  BiFolder,
-  BiPlus,
-  BiRename,
-  BiSearch,
-  BiTrash,
-  BiX,
-} from 'react-icons/bi';
-import { FaFile, FaFolder } from 'react-icons/fa';
-import { RiHome2Line } from 'react-icons/ri';
-import {
   Link,
+  Navigate,
   type NavigateFunction,
   useLocation,
   useNavigate,
   useParams,
 } from 'react-router-dom';
-import { cn } from '@utils/cn';
+import {
+  CollectionListPageItemClickedEvent,
+  CollectionListPageSearchEvent,
+  CollectionListPageSortEvent,
+} from '../../lib/posthog/posthog';
+import { captureEvent } from '../../lib/posthog/posthogProvider';
 import type { TinaAdminApi } from '../api';
 import GetCMS from '../components/GetCMS';
 import GetCollection from '../components/GetCollection';
+import LoadingPage from '../components/LoadingPage';
 import { PageBody, PageHeader, PageWrapper } from '../components/Page';
 import {
   Tooltip,
@@ -62,13 +70,6 @@ import type {
   TemplateResponse,
 } from '../types';
 import { type CollectionFolder, useCollectionFolder } from './utils';
-import { Callout } from '@toolkit/react-sidebar/components/callout';
-import {
-  CollectionListPageItemClickedEvent,
-  CollectionListPageSearchEvent,
-  CollectionListPageSortEvent,
-} from '../../lib/posthog/posthog';
-import { captureEvent } from '../../lib/posthog/posthogProvider';
 
 const LOCAL_STORAGE_KEY = 'tinacms.admin.collection.list.page';
 const isSSR = typeof window === 'undefined';
@@ -83,64 +84,50 @@ const TemplateMenu = ({
   folder: CollectionFolder;
 }) => {
   return (
-    <Menu as='div' className='relative inline-block text-left w-full md:w-auto'>
-      {() => (
-        <div>
-          <div>
-            <MenuButton className='w-full md:w-auto icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded justify-center transition-all duration-150 ease-out  shadow text-white bg-tina-orange-dark hover:bg-tina-orange focus:ring-tina-orange-dark text-sm h-10 px-6'>
-              Create New <BiPlus className='w-5 h-full ml-1 opacity-70' />
-            </MenuButton>
-          </div>
-
-          <Transition
-            enter='transition ease-out duration-100'
-            enterFrom='transform opacity-0 scale-95'
-            enterTo='transform opacity-100 scale-100'
-            leave='transition ease-in duration-75'
-            leaveFrom='transform opacity-100 scale-100'
-            leaveTo='transform opacity-0 scale-95'
-          >
-            <MenuItems className='origin-top-right absolute right-0 mt-2 z-menu w-56 rounded shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none'>
-              <div className='py-1'>
-                {templates.map((template) => (
-                  <MenuItem key={`${template.label}-${template.name}`}>
-                    {({ focus }) => (
-                      <Link
-                        to={`/${
-                          folder.fullyQualifiedName
-                            ? [
-                                'collections',
-                                'new',
-                                collectionName,
-                                template.name,
-                                '~',
-                                folder.name,
-                              ].join('/')
-                            : [
-                                'collections',
-                                'new',
-                                collectionName,
-                                template.name,
-                              ].join('/')
-                        }`}
-                        // to={`${template.name}/new`}
-                        className={`w-full text-md px-4 py-2 tracking-wide flex items-center transition ease-out duration-100 ${
-                          focus
-                            ? 'text-blue-600 opacity-100 bg-gray-50'
-                            : 'opacity-80 text-gray-600'
-                        }`}
-                      >
-                        {template.label}
-                      </Link>
-                    )}
-                  </MenuItem>
-                ))}
-              </div>
-            </MenuItems>
-          </Transition>
-        </div>
-      )}
-    </Menu>
+    <DropdownMenuPrimitive.Root modal={false}>
+      <DropdownMenuPrimitive.Trigger className='w-full md:w-auto icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded justify-center transition-all duration-150 ease-out  shadow text-white bg-tina-orange-dark hover:bg-tina-orange focus:ring-tina-orange-dark text-sm h-10 px-6'>
+        Create New <Plus className='w-5 h-full ml-1 opacity-70' />
+      </DropdownMenuPrimitive.Trigger>
+      <DropdownMenuPrimitive.Portal>
+        <DropdownMenuPrimitive.Content
+          align='end'
+          sideOffset={8}
+          className='z-menu w-56 py-1 rounded shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none'
+        >
+          {templates.map((template) => (
+            // asChild keeps the router <Link>; Radix's data-highlighted replaces
+            // Headless UI's `focus` render prop.
+            <DropdownMenuPrimitive.Item
+              key={`${template.label}-${template.name}`}
+              asChild
+            >
+              <Link
+                to={`/${
+                  folder.fullyQualifiedName
+                    ? [
+                        'collections',
+                        'new',
+                        collectionName,
+                        template.name,
+                        '~',
+                        folder.name,
+                      ].join('/')
+                    : [
+                        'collections',
+                        'new',
+                        collectionName,
+                        template.name,
+                      ].join('/')
+                }`}
+                className='w-full text-md px-4 py-2 tracking-wide flex items-center transition ease-out duration-100 cursor-pointer opacity-80 text-gray-600 data-[highlighted]:text-blue-600 data-[highlighted]:opacity-100 data-[highlighted]:bg-gray-50'
+              >
+                {template.label}
+              </Link>
+            </DropdownMenuPrimitive.Item>
+          ))}
+        </DropdownMenuPrimitive.Content>
+      </DropdownMenuPrimitive.Portal>
+    </DropdownMenuPrimitive.Root>
   );
 };
 
@@ -330,13 +317,42 @@ const CollectionListPage = () => {
             >
               {(
                 collection: CollectionResponse,
-                _loading,
+                loading,
                 reFetchCollection,
                 collectionExtra: Collection<true>
               ) => {
                 const documents = collection.documents.edges;
                 const admin: TinaAdminApi = cms.api.admin;
                 const pageInfo = collection.documents.pageInfo;
+
+                // Global collections are single-document; skip the list and
+                // jump straight to the document's edit form. Only redirect when
+                // there's exactly one document — with zero or many, fall through
+                // to the list so the user can create or fix the extras.
+                if (
+                  collectionExtra?.ui?.global &&
+                  !folder.fullyQualifiedName.startsWith('~/')
+                ) {
+                  // The fetched documents lag a render behind when switching
+                  // collections; show loading until they match to avoid
+                  // flashing the list before the redirect.
+                  if (loading || collection.name !== collectionName) {
+                    return <LoadingPage />;
+                  }
+                  if (documents?.length === 1) {
+                    const globalDoc = documents[0]?.node;
+                    if (globalDoc?._sys?.breadcrumbs) {
+                      return (
+                        <Navigate
+                          replace
+                          to={`/collections/edit/${
+                            collection.name
+                          }/${globalDoc._sys.breadcrumbs.join('/')}`}
+                        />
+                      );
+                    }
+                  }
+                }
 
                 // get unique fields from all templates
                 const fields = (
@@ -359,16 +375,23 @@ const CollectionListPage = () => {
                   collection.name
                 );
                 const parse = collectionDefinition?.ui?.filename?.parse;
+                const isGlobalCollection = !!collectionExtra?.ui?.global;
+                // Global collections are single-document: allow creating only
+                // while there's no document yet, and never allow folders.
                 const allowCreate =
-                  collectionDefinition?.ui?.allowedActions?.create ?? true;
+                  (collectionDefinition?.ui?.allowedActions?.create ?? true) &&
+                  (!isGlobalCollection || documents.length === 0);
                 const allowDelete =
                   collectionDefinition?.ui?.allowedActions?.delete ?? true;
                 const allowCreateFolder =
-                  collectionDefinition?.ui?.allowedActions?.createFolder ??
-                  true;
+                  !isGlobalCollection &&
+                  (collectionDefinition?.ui?.allowedActions?.createFolder ??
+                    true);
                 const allowCreateNestedFolder =
-                  collectionDefinition?.ui?.allowedActions
-                    ?.createNestedFolder ?? true;
+                  !isGlobalCollection &&
+                  (collectionDefinition?.ui?.allowedActions
+                    ?.createNestedFolder ??
+                    true);
 
                 const folderView = folder.fullyQualifiedName !== '';
 
@@ -403,7 +426,7 @@ const CollectionListPage = () => {
                               );
                               reFetchCollection();
                             } catch (error) {
-                              if (error.message.indexOf('has references')) {
+                              if (error.message.includes(ERR_HAS_REFERENCES)) {
                                 cms.alerts.error(
                                   error.message.split('\n\t').filter(Boolean)[1]
                                 );
@@ -413,7 +436,6 @@ const CollectionListPage = () => {
                                 'Document was not deleted, ask a developer for help or check the console for an error message'
                               );
                               console.error(error);
-                              throw error;
                             }
                           }}
                           close={() => setDeleteModalOpen(false)}
@@ -455,9 +477,9 @@ const CollectionListPage = () => {
                           });
                         }}
                         renameFunc={async () => {
-                          // add the file extension
-                          const newRelativePath = `${vars.newRelativePath}.${collection.format}`;
                           try {
+                            // add the file extension
+                            const newRelativePath = `${vars.newRelativePath}.${collection.format}`;
                             await admin.renameDocument({
                               collection: vars.collection,
                               relativePath: vars.relativePath,
@@ -468,16 +490,25 @@ const CollectionListPage = () => {
                             );
                             reFetchCollection();
                           } catch (error) {
-                            if (error.message.indexOf('has references')) {
+                            if (
+                              error.message &&
+                              error.message.includes(ERR_ALREADY_EXISTS)
+                            ) {
+                              cms.alerts.error(
+                                `Document was not renamed. The filename "${vars.newRelativePath}" is already used by another document, please choose a different name.`
+                              );
+                            } else if (
+                              error.message &&
+                              error.message.includes(ERR_HAS_REFERENCES)
+                            ) {
                               cms.alerts.error(
                                 error.message.split('\n\t').filter(Boolean)[1]
                               );
-                              return;
+                            } else {
+                              cms.alerts.error(
+                                'There was an error renaming the document. Please try again. If the problem continues, please contact the developer.'
+                              );
                             }
-                            cms.alerts.warn(
-                              'Document was not renamed, ask a developer for help or check the console for an error message'
-                            );
-                            console.error(error);
                             throw error;
                           }
                         }}
@@ -499,38 +530,39 @@ const CollectionListPage = () => {
                         }
                         createFunc={async () => {
                           try {
-                            admin
-                              .createFolder(
-                                vars.collection,
-                                folder.name
-                                  ? [folder.name, vars.folderName].join('/')
-                                  : vars.folderName
-                              )
-                              .then(() => {
-                                reFetchCollection();
-                                navigate(
-                                  `/${[
-                                    'collections',
-                                    collectionName,
-                                    '~',
-                                    ...(folder.name
-                                      ? [folder.name, vars.folderName]
-                                      : [vars.folderName]),
-                                  ].join('/')}`,
-                                  { replace: true }
-                                );
-                                cms.alerts.info(
-                                  'Folder was successfully created'
-                                );
-                              })
-                              .catch((error) => {
-                                throw error;
-                              });
-                          } catch (error) {
-                            cms.alerts.warn(
-                              'Folder was not created, ask a developer for help or check the console for an error message'
+                            await admin.createFolder(
+                              vars.collection,
+                              folder.name
+                                ? [folder.name, vars.folderName].join('/')
+                                : vars.folderName
                             );
-                            console.error(error);
+
+                            reFetchCollection();
+                            navigate(
+                              `/${[
+                                'collections',
+                                collectionName,
+                                '~',
+                                ...(folder.name
+                                  ? [folder.name, vars.folderName]
+                                  : [vars.folderName]),
+                              ].join('/')}`,
+                              { replace: true }
+                            );
+                            cms.alerts.info('Folder was successfully created');
+                          } catch (error) {
+                            if (
+                              error.message &&
+                              error.message.includes(ERR_ALREADY_EXISTS)
+                            ) {
+                              cms.alerts.error(
+                                `Folder was not created, folder with name "${vars.folderName}" already exists ${folder.name ? `in ${folder.name}` : ''}`
+                              );
+                            } else {
+                              cms.alerts.error(
+                                'There was an error creating the folder. Please try again. If the problem continues, please contact the developer'
+                              );
+                            }
                             throw error;
                           }
                         }}
@@ -627,7 +659,7 @@ const CollectionListPage = () => {
                                 <SearchInput
                                   cms={cms}
                                   collectionName={collectionName}
-                                  loading={_loading}
+                                  loading={loading}
                                   search={search}
                                   setSearch={setSearch}
                                   searchInput={searchInput}
@@ -698,7 +730,7 @@ const CollectionListPage = () => {
                                               : 0
                                           }
                                         >
-                                          <FaFolder className='mr-2' />
+                                          <Folder className='mr-2 w-4 h-4' />
                                           Add Folder
                                         </Link>
                                       </TooltipTrigger>
@@ -754,7 +786,7 @@ const CollectionListPage = () => {
                                     }`}
                                     className='inline-flex items-center font-medium focus:ring-2 focus:outline-none focus:ring-tina-orange-dark focus:shadow-outline text-center rounded justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-white bg-tina-orange-dark hover:bg-tina-orange w-full md:w-auto text-sm h-10 px-6'
                                   >
-                                    <FaFile className='mr-2' />
+                                    <File className='mr-2 w-4 h-4' />
                                     Add File
                                   </Link>
                                 </>
@@ -894,7 +926,7 @@ const CollectionListPage = () => {
                                                       );
                                                     }}
                                                   >
-                                                    <BiFolder className='inline-block h-6 w-auto flex-shrink-0 opacity-70' />
+                                                    <Folder className='inline-block h-6 w-auto flex-shrink-0 opacity-70' />
                                                     <span className='truncate block'>
                                                       <span className='leading-5 block truncate'>
                                                         <span>
@@ -970,7 +1002,7 @@ const CollectionListPage = () => {
                                                     );
                                                   }}
                                                 >
-                                                  <BiFile className='inline-block h-6 w-auto flex-shrink-0 opacity-70' />
+                                                  <File className='inline-block h-6 w-auto flex-shrink-0 opacity-70' />
                                                   <span className='truncate block'>
                                                     <span className='leading-5 block truncate mb-1'>
                                                       {!folderView &&
@@ -1029,7 +1061,7 @@ const CollectionListPage = () => {
                                                       name: 'edit',
                                                       label: 'Edit in Admin',
                                                       Icon: (
-                                                        <BiEdit size='1.3rem' />
+                                                        <SquarePen size='1.3rem' />
                                                       ),
                                                       onMouseDown: () => {
                                                         const pathToDoc =
@@ -1057,7 +1089,7 @@ const CollectionListPage = () => {
                                                       name: 'duplicate',
                                                       label: 'Duplicate',
                                                       Icon: (
-                                                        <BiCopy size='1.3rem' />
+                                                        <Copy size='1.3rem' />
                                                       ),
                                                       onMouseDown: () => {
                                                         const pathToDoc =
@@ -1085,7 +1117,7 @@ const CollectionListPage = () => {
                                                       name: 'rename',
                                                       label: 'Rename',
                                                       Icon: (
-                                                        <BiRename size='1.3rem' />
+                                                        <TextCursorInput size='1.3rem' />
                                                       ),
                                                       onMouseDown: () => {
                                                         setVars((old) => ({
@@ -1113,7 +1145,7 @@ const CollectionListPage = () => {
                                                       name: 'delete',
                                                       label: 'Delete',
                                                       Icon: (
-                                                        <BiTrash
+                                                        <Trash2
                                                           size='1.3rem'
                                                           className='text-red-500'
                                                         />
@@ -1218,7 +1250,7 @@ const SearchInput = ({
     if (e.key === 'Enter') {
       e.preventDefault();
       if (searchInput.trim()) {
-        setSearch(searchInput);
+        setSearch(searchInput.trim());
         setSearchLoaded(false);
       }
     }
@@ -1227,9 +1259,9 @@ const SearchInput = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchInput.trim()) {
-      setSearch(searchInput);
+      setSearch(searchInput.trim());
       captureEvent(CollectionListPageSearchEvent, {
-        searchQuery: searchInput,
+        searchQuery: searchInput.trim(),
       });
       setSearchLoaded(false);
     }
@@ -1243,7 +1275,7 @@ const SearchInput = ({
       <div className='h-4'></div>
       <div className='flex items-center w-full md:w-auto gap-3'>
         <div className='flex-1 min-w-[200px] relative'>
-          <BiSearch className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none z-10' />
+          <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none z-10' />
           <input
             ref={inputRef}
             type='text'
@@ -1264,7 +1296,7 @@ const SearchInput = ({
               }}
               className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors z-10'
             >
-              <BiX className='w-5 h-5' />
+              <X className='w-5 h-5' />
             </button>
           )}
         </div>
@@ -1299,7 +1331,7 @@ const Breadcrumb = ({ folder, navigate, collectionName }) => {
         }}
         className='px-3 py-2 bg-white hover:bg-gray-50/50 transition ease-out duration-100 border-r border-gray-100 text-blue-500 hover:text-blue-600'
       >
-        <BiArrowBack className='w-6 h-full opacity-70' />
+        <ArrowLeft className='w-6 h-full opacity-70' />
       </button>
       <span className='px-3 py-2 text-gray-600 flex flex-wrap items-center justify-start gap-1'>
         <button
@@ -1310,7 +1342,7 @@ const Breadcrumb = ({ folder, navigate, collectionName }) => {
           }}
           className='shrink-0 bg-transparent p-0 border-0 text-blue-400 hover:text-blue-500 transition-all ease-out duration-100 opacity-70 hover:opacity-100'
         >
-          <RiHome2Line className='w-5 h-auto' />
+          <House className='w-5 h-auto' />
         </button>
         {folderArray.map((node, index) => {
           return (
@@ -1421,6 +1453,9 @@ const FolderModal = ({
   validationRegex,
 }: FolderModalProps) => {
   const [isFolderNameValid, setIsFolderNameValid] = useState(false);
+  const [validationMessage, setValidationMessage] = useState<string | null>(
+    null
+  );
   const [isInteracted, setIsInteracted] = useState(false);
 
   useEffect(() => {
@@ -1428,20 +1463,39 @@ const FolderModal = ({
   }, [folderName]);
 
   const validateFolderName = (name: string) => {
-    if (!validationRegex || !name.trim()) {
-      setIsFolderNameValid(!!name.trim());
-      return !!name.trim();
-    }
-
-    try {
-      const regex = new RegExp(validationRegex);
-      const valid = regex.test(name);
-      setIsFolderNameValid(valid);
-      return valid;
-    } catch (error) {
+    if (!name.trim()) {
       setIsFolderNameValid(false);
+      setValidationMessage(null);
       return false;
     }
+
+    // Baseline mirrors the backend allowlist; a project-level folderNameRegex
+    // layers on top, so the UI can only ever be stricter than the resolver.
+    if (!isValidRelativePath(name)) {
+      setIsFolderNameValid(false);
+      setValidationMessage(RELATIVE_PATH_ALLOWED_CHARS_MESSAGE);
+      return false;
+    }
+
+    if (validationRegex) {
+      let passesCustomRegex = false;
+      try {
+        passesCustomRegex = new RegExp(validationRegex).test(name);
+      } catch (error) {
+        passesCustomRegex = false;
+      }
+      if (!passesCustomRegex) {
+        setIsFolderNameValid(false);
+        setValidationMessage(
+          'Folder name is not valid, please enter a valid folder name.'
+        );
+        return false;
+      }
+    }
+
+    setIsFolderNameValid(true);
+    setValidationMessage(null);
+    return true;
   };
 
   return (
@@ -1454,7 +1508,7 @@ const FolderModal = ({
               placeholder='Enter the name of the new folder'
               value={folderName}
               className={`mb-4 ${
-                !isFolderNameValid && isInteracted ? 'border-red-500' : ''
+                isInteracted && validationMessage ? 'border-red-500' : ''
               }`}
               onChange={(event) => {
                 setFolderName(event.target.value);
@@ -1462,10 +1516,8 @@ const FolderModal = ({
                 validateFolderName(event.target.value);
               }}
             />
-            {!isFolderNameValid && isInteracted && (
-              <p className='text-red-500 text-sm pl-1'>
-                Folder name is not valid – please enter a valid folder name.
-              </p>
+            {isInteracted && validationMessage && (
+              <p className='text-red-500 text-sm pl-1'>{validationMessage}</p>
             )}
           </>
         </ModalBody>
@@ -1478,8 +1530,12 @@ const FolderModal = ({
             variant='primary'
             disabled={!isFolderNameValid}
             onClick={async () => {
-              await createFunc();
-              close();
+              try {
+                await createFunc();
+                close();
+              } catch (error) {
+                // error is already handled by createFunc
+              }
             }}
           >
             Create
@@ -1536,8 +1592,12 @@ const RenameModal = ({
             style={{ flexGrow: 3 }}
             variant='primary'
             onClick={async () => {
-              await renameFunc();
-              close();
+              try {
+                await renameFunc();
+                close();
+              } catch (error) {
+                // error is already handled by renameFunc
+              }
             }}
             disabled={!newRelativePath || newRelativePath === filename}
           >

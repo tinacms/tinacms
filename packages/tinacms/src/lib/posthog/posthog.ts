@@ -34,6 +34,16 @@ export type SaveContentErrorPayload = {
   error?: string;
 };
 
+// When a user saves from the editorial-workflow modal: which option they
+// chose (draft / ready for review / publish) and whether the save succeeded.
+export const EditorialWorkflowSaveEvent: string = 'editorial-workflow-save';
+export type EditorialWorkflowSavePayload = {
+  choice: 'draft' | 'review' | 'publish';
+  success: boolean;
+  // Failure reason when success is false.
+  error?: string;
+};
+
 // When a user resets a form in the TinaCMS Editor
 export const FormResetEvent: string = 'form-reset';
 
@@ -109,3 +119,36 @@ export const SlashCommandUsedEvent: string = 'slash-command-used';
 export type SlashCommandUsedPayload = {
   command: string;
 };
+
+export const MediaUsageDashboardOpenedEvent: string = 'media-dashboard-opened';
+export type MediaUsageDashboardOpenedPayload = Record<string, never>;
+
+export const MediaUsageDashboardRefreshedEvent: string =
+  'media-dashboard-refreshed';
+export type MediaUsageDashboardRefreshedPayload = {
+  errorOccured?: boolean;
+};
+
+export const MediaUsageDashboardTypeFilterEvent: string =
+  'media-dashboard-type-filter-changed';
+export type MediaUsageDashboardTypeFilterPayload = {
+  type: 'all' | 'image' | 'video' | 'other';
+};
+
+export const MediaUsageDashboardUsageFilterChangedEvent: string =
+  'media-dashboard-usage-filter-changed';
+export type MediaUsageDashboardUsageFilterChangedPayload = {
+  usage: 'all' | 'used' | 'unused';
+};
+
+export const MediaUsageDashboardRowExpandedEvent: string =
+  'media-dashboard-row-expanded';
+export type MediaUsageDashboardRowExpandedEvent = Record<string, never>;
+
+export const MediaUsageDashboardPreviewOpenedEvent: string =
+  'media-dashboard-preview-opened';
+export type MediaUsageDashboardPreviewOpenedPayload = Record<string, never>;
+
+export const MediaUsageDashboardDocumentLinkClickedEvent: string =
+  'media-dashboard-document-link-clicked';
+export type MediaUsageDashboardDocumentLinkClickedEvent = Record<string, never>;

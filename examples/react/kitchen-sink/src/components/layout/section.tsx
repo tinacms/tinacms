@@ -27,7 +27,7 @@ export const Section = ({
       className={cn(
         'flex-1 relative transition duration-150 ease-out body-font overflow-hidden',
         colorCss,
-        className,
+        className
       )}
     >
       {children}

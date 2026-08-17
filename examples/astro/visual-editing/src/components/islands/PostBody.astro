@@ -1,0 +1,42 @@
+---
+import TinaMarkdown from '@tinacms/astro/TinaMarkdown.astro';
+import { sanitizeImageSrc } from '@tinacms/astro/sanitize';
+import { tinaField } from '@tinacms/astro/tina-field';
+import type { PostQuery } from '../../../tina/__generated__/types';
+import { formatDate } from '../../lib/utils';
+import { customComponents } from '../markdown';
+
+interface Props {
+  data: NonNullable<PostQuery['post']>;
+}
+
+const { data } = Astro.props;
+const formattedDate = data.date ? formatDate(data.date) : '';
+const heroSrc = data.heroImg ? sanitizeImageSrc(data.heroImg) : '';
+const author = data.author;
+const avatarSrc = author?.avatar ? sanitizeImageSrc(author.avatar) : '';
+---
+{data.title && (
+  <h1 data-tina-field={tinaField(data, 'title')} class="text-4xl lg:text-5xl font-extrabold tracking-tight mb-6 text-gray-900 dark:text-gray-50">
+    {data.title}
+  </h1>
+)}
+<div class="flex items-center gap-3 mb-8">
+  {avatarSrc && <img src={avatarSrc} alt={author?.name ?? ''} width="40" height="40" class="rounded-full object-cover" />}
+  {author?.name && <span class="font-medium text-gray-700 dark:text-gray-200">{author.name}</span>}
+  {formattedDate && <span class="text-gray-300">·</span>}
+  {formattedDate && <span data-tina-field={tinaField(data, 'date')} class="text-gray-500">{formattedDate}</span>}
+</div>
+{heroSrc && (
+  <img data-tina-field={tinaField(data, 'heroImg')} src={heroSrc} alt={data.title} class="w-full rounded-lg shadow-md mb-8" />
+)}
+{data.excerpt && (
+  <div data-tina-field={tinaField(data, 'excerpt')} class="prose prose-lg mb-8 italic opacity-80 dark:prose-invert">
+    <TinaMarkdown content={data.excerpt} components={customComponents} />
+  </div>
+)}
+{data._body && (
+  <div data-tina-field={tinaField(data, '_body')} class="prose prose-lg dark:prose-invert">
+    <TinaMarkdown content={data._body} components={customComponents} />
+  </div>
+)}

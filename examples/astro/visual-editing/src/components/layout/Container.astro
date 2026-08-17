@@ -1,0 +1,28 @@
+---
+import { cn } from '../../lib/utils';
+
+interface Props {
+  size?: 'custom' | 'small' | 'medium' | 'large' | 'default';
+  width?: 'small' | 'medium' | 'large' | 'custom';
+  class?: string;
+}
+
+const { size = 'medium', width = 'large', class: className = '' } = Astro.props;
+
+const verticalPadding = {
+  custom: '',
+  small: 'py-8',
+  medium: 'py-12',
+  large: 'py-24',
+  default: 'py-12',
+};
+const widthClass = {
+  small: 'max-w-4xl',
+  medium: 'max-w-5xl',
+  large: 'max-w-7xl',
+  custom: '',
+};
+---
+<div class={cn(widthClass[width], 'mx-auto px-6 sm:px-8', verticalPadding[size], className)}>
+  <slot />
+</div>

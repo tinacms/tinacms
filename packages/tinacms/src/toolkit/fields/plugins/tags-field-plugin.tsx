@@ -1,7 +1,7 @@
 import { AddIcon } from '@toolkit/icons';
 import { IconButton } from '@toolkit/styles';
+import { X } from 'lucide-react';
 import * as React from 'react';
-import { BiX } from 'react-icons/bi';
 import { BaseTextField, InputProps } from '../components';
 import { parse } from './text-format';
 import { wrapFieldsWithMeta } from './wrap-field-with-meta';
@@ -92,7 +92,7 @@ const Tag = ({ tinaForm, field, index, children, ...styleProps }) => {
         className='group text-center flex-shrink-0 border-0 bg-transparent pl-1 pr-2 py-1 text-gray-300 hover:text-blue-500 flex items-center justify-center cursor-pointer'
         onClick={removeItem}
       >
-        <BiX className='w-4 h-auto transition ease-out duration-100 group-hover:scale-110 origin-center' />
+        <X className='w-4 h-auto transition ease-out duration-100 group-hover:scale-110 origin-center' />
       </button>
     </span>
   );

@@ -39,9 +39,7 @@ export const Testimonial = ({ data }: TestimonialProps) => {
             <span
               className={cn(
                 'block mx-auto h-0.5 w-1/6',
-                isPrimary
-                  ? 'bg-white/30'
-                  : 'bg-gray-200 dark:bg-gray-700'
+                isPrimary ? 'bg-white/30' : 'bg-gray-200 dark:bg-gray-700'
               )}
             />
           </div>

@@ -1,9 +1,8 @@
 import React, { useCallback } from 'react';
 import { type InputProps } from '../components';
 import { wrapFieldsWithMeta } from './wrap-field-with-meta';
-// we might be able to go back to react-datetime when https://github.com/arqex/react-datetime/pull/813 is merged
-import type { DatetimepickerProps } from 'react-datetime';
 import {
+  type DateFieldProps,
   format,
   parse,
   DEFAULT_DATE_DISPLAY_FORMAT,
@@ -14,8 +13,11 @@ import {
 import { DateTimePicker } from '../../components/ui/date-time-picker';
 import { DayPickerLocale } from 'react-day-picker';
 
-export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
-  ({ input, field: { dateFormat, timeFormat, onChange, ...rest } }) => {
+export const DateField = wrapFieldsWithMeta<InputProps, DateFieldProps>(
+  ({
+    input,
+    field: { dateFormat, timeFormat, onChange, required, ...rest },
+  }) => {
     const granularity = timeFormat ? 'minute' : 'day';
 
     const inputRef = React.useRef(null);
@@ -44,7 +46,11 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
       return dateFormat;
     }, [dateFormat]);
 
-    const date = input.value ? new Date(input.value) : new Date();
+    const date = input.value
+      ? new Date(input.value)
+      : required === false
+        ? undefined
+        : new Date();
     return (
       <React.Fragment>
         <DateTimePicker
@@ -52,7 +58,13 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
           ref={inputRef}
           granularity={granularity}
           onChange={(value) =>
-            input.onChange(value ? value.toISOString() : value)
+            input.onChange(
+              value
+                ? value.toISOString()
+                : required !== false
+                  ? new Date().toISOString()
+                  : value
+            )
           }
           timeFormat={getTimeFormat()}
           hourCycle={12}

@@ -19,7 +19,7 @@ export class CodemodCommand extends Command {
 
   async catch(error: any): Promise<void> {
     console.log(error);
-    // logger.error('Error occured during tinacms codemod')
+    // logger.error('Error occurred during tinacms codemod')
     // process.exit(1)
   }
 

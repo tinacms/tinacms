@@ -1,0 +1,16 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "invalid_markdown",
+      "value": "<Cta>{name}</Cta>\n",
+      "message": "Unexpected expression name.",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ]
+    }
+  ]
+}

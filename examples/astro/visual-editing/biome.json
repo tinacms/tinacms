@@ -1,0 +1,16 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "extends": ["../../../biome.json"],
+  "files": {
+    "ignore": [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/.astro/**",
+      "**/public/admin/**",
+      "**/__generated__/**",
+      "**/test-results/**",
+      "**/.turbo/**",
+      "**/src/styles/global.css"
+    ]
+  }
+}

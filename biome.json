@@ -1,13 +1,21 @@
 {
 	"$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
 	"vcs": {
-		"enabled": false,
+		"enabled": true,
 		"clientKind": "git",
 		"useIgnoreFile": true
 	},
 	"files": {
 		"ignoreUnknown": true,
-		"ignore": [],
+		"ignore": [
+			"**/__generated__/**",
+			"**/dist/**",
+			"**/.astro/**",
+			"**/.next/**",
+			"**/node_modules/**",
+			"**/public/admin/**",
+			"**/static/admin/**"
+		],
 		"maxSize": 3145728
 	},
 	"formatter": {
@@ -43,7 +51,6 @@
 			"**/*.tfstate",
 			"**/.next/**",
 			"**/dist/**",
-			"examples/hugo-quickstart",
 			"**/out.md",
 			"**/_response.md"
 		]
@@ -105,6 +112,28 @@
 		}
 	},
 	"overrides": [
+		{
+			"include": ["**/tsconfig.*.json"],
+			"json": { "parser": { "allowComments": true } }
+		},
+		{
+			"include": [
+				"examples/astro/visual-editing/**/*.css"
+			],
+			"linter": { "enabled": false },
+			"formatter": { "enabled": false }
+		},
+		{
+			"include": ["packages/v4/@tinacms/tinacms/src/**"],
+			"ignore": ["**/*.test.ts", "**/*.test.tsx"],
+			"linter": {
+				"rules": {
+					"suspicious": {
+						"noExplicitAny": "error"
+					}
+				}
+			}
+		},
 		{
 			"include": [
 				"*.ts",

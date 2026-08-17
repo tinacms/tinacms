@@ -12,7 +12,7 @@ export async function getStaticPaths() {
       return [
         {
           params: { filename: edge.node._sys.filename },
-          props: { relativePath: `${edge.node._sys.filename}.mdx` },
+          props: { relativePath: `${edge.node._sys.filename}.md` },
         },
       ];
     }

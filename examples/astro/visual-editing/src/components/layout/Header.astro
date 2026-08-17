@@ -1,0 +1,65 @@
+---
+import { tinaField } from '@tinacms/astro/tina-field';
+import type { GlobalQuery } from '../../../tina/__generated__/types';
+import { sanitizeHref } from '@tinacms/astro/sanitize';
+import Container from './Container.astro';
+
+interface Props {
+  data: NonNullable<GlobalQuery['global']>['header'] | null;
+  pathname?: string;
+}
+
+const { data, pathname = '/' } = Astro.props;
+const nav = (data?.nav ?? []).filter((item) => item !== null);
+---
+<header class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-30">
+  <Container size="custom" class="py-4 flex items-center justify-between">
+    <a href="/" class="font-extrabold text-xl text-theme-600 dark:text-theme-400" data-tina-field={data ? tinaField(data, 'name') : undefined}>
+      {data?.name || 'Tina'}
+    </a>
+    <nav class="hidden md:flex gap-6" data-tina-field={data ? tinaField(data, 'nav') : undefined}>
+      {nav.map((item) => {
+        const href = sanitizeHref(item.href, '/');
+        const isActive = href === pathname;
+        return (
+          <a
+            href={href}
+            class={`text-sm font-medium ${isActive ? 'text-theme-600 dark:text-theme-300' : 'text-gray-700 dark:text-gray-300 hover:text-theme-500'}`}
+          >
+            {item.label}
+          </a>
+        );
+      })}
+    </nav>
+    <button
+      type="button"
+      class="md:hidden text-gray-700 dark:text-gray-200 p-2"
+      aria-label="Open menu"
+      data-tina-mobile-toggle
+    >
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+  </Container>
+  <div class="md:hidden hidden border-t border-gray-200 dark:border-gray-800" data-tina-mobile-drawer>
+    <nav class="flex flex-col p-4 gap-3">
+      {nav.map((item) => (
+        <a href={sanitizeHref(item.href, '/')} class="text-gray-700 dark:text-gray-300 hover:text-theme-500">
+          {item.label}
+        </a>
+      ))}
+    </nav>
+  </div>
+</header>
+
+<script>
+  // Mobile drawer toggle: vanilla JS replacement for the React drawer in
+  // the kitchen-sink. Event delegation so islands swapped by edit-mode
+  // refreshes still work without re-running the script.
+  document.addEventListener('click', (event) => {
+    const button = (event.target as HTMLElement | null)?.closest('[data-tina-mobile-toggle]');
+    if (!button) return;
+    const header = button.closest('header');
+    const drawer = header?.querySelector<HTMLElement>('[data-tina-mobile-drawer]');
+    drawer?.classList.toggle('hidden');
+  });
+</script>

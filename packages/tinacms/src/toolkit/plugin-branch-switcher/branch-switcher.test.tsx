@@ -87,4 +87,15 @@ describe('formatBranchName', () => {
     const result = formatBranchName('mYbRaNcH');
     expect(result).toEqual('mybranch');
   });
+
+  it.each([
+    ['Hello World', 'hello-world'],
+    ['foo@@@bar', 'foo-bar'],
+    ['---foo---', '---foo---'],
+    ['feature/my_branch-123', 'feature/my_branch-123'],
+    [' spaces around ', '-spaces-around-'],
+    ['symbols!*&name', 'symbols-name'],
+  ])('formats %s as %s', (input, expected) => {
+    expect(formatBranchName(input)).toEqual(expected);
+  });
 });

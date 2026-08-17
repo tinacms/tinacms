@@ -1,29 +1,30 @@
 import type { Form } from '@toolkit/forms';
+import { Button } from '@toolkit/styles';
+import { cn } from '@utils/cn';
+import { FORM_ERROR } from 'final-form';
+import { Circle, FileStack } from 'lucide-react';
 import * as React from 'react';
 import { type FC, useEffect } from 'react';
-import { FORM_ERROR } from 'final-form';
 import { Form as FinalForm } from 'react-final-form';
-import { Button } from '@toolkit/styles';
+import {
+  EditorialWorkflowSaveEvent,
+  FormResetEvent,
+  SaveContentErrorEvent,
+  SavedContentEvent,
+} from '../../lib/posthog/posthog';
+import { captureEvent } from '../../lib/posthog/posthogProvider';
 import {
   DragDropContext,
   type DropResult,
 } from '../fields/plugins/dnd-kit-wrapper';
-import { FaCircle } from 'react-icons/fa';
-import { cn } from '@utils/cn';
-import { FileStack } from 'lucide-react';
 import { useCMS } from '../react-core';
+import { BranchDeletedModal } from './branch-deleted-modal';
+import { CreateBranchModal } from './create-branch-modal';
 import { FieldsBuilder } from './fields-builder';
 import { FormActionMenu } from './form-actions';
 import { FormPortalProvider } from './form-portal';
-import { LoadingDots } from './loading-dots';
 import { ResetForm } from './reset-form';
-import { CreateBranchModal } from './create-branch-modal';
-import {
-  SavedContentEvent,
-  SaveContentErrorEvent,
-  FormResetEvent,
-} from '../../lib/posthog/posthog';
-import { captureEvent } from '../../lib/posthog/posthogProvider';
+import type { SaveChoice } from './save-options';
 
 export interface FormBuilderProps {
   form: { tinaForm: Form; activeFieldName?: string };
@@ -98,6 +99,9 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   const hideFooter = !!rest.hideFooter;
   const [createBranchModalOpen, setCreateBranchModalOpen] =
     React.useState(false);
+  const [deletedBranchModalOpen, setDeletedBranchModalOpen] =
+    React.useState(false);
+  const [isGuardChecking, setIsGuardChecking] = React.useState(false);
 
   const tinaForm = form.tinaForm;
   const finalForm = form.tinaForm.finalForm;
@@ -180,29 +184,110 @@ export const FormBuilder: FC<FormBuilderProps> = ({
           !hasValidationErrors &&
           !(invalid && !dirtySinceLastSubmit);
 
-        const safeSubmit = async () => {
+        const safeSubmit = async (editorialWorkflowChoice?: SaveChoice) => {
+          // When invoked as the "Save and publish" choice from the editorial
+          // workflow modal, also record the choice + outcome in one event.
+          const captureWorkflowChoice = (success: boolean, error?: string) => {
+            if (editorialWorkflowChoice) {
+              captureEvent(EditorialWorkflowSaveEvent, {
+                choice: editorialWorkflowChoice,
+                success,
+                error,
+              });
+            }
+          };
+
           if (canSubmit) {
+            const alertsBefore = new Set(cms.alerts.all.map((a) => a.id));
+            console.debug(
+              '[tina:branch-guard] safeSubmit: calling handleSubmit'
+            );
+
             const result = await handleSubmit();
             if (result && result[FORM_ERROR]) {
               const error = result[FORM_ERROR];
+              const errorMsg =
+                error instanceof Error ? error.message : String(error);
+
+              console.debug(
+                '[tina:branch-guard] safeSubmit: FORM_ERROR detected:',
+                errorMsg
+              );
+
+              // If the save failed because the branch no longer exists,
+              // intercept the generic error alert and replace it with the
+              // branch-deleted modal.
+              if (/branch.*not found/i.test(errorMsg)) {
+                console.debug(
+                  '[tina:branch-guard] safeSubmit: branch-not-found — dismissing alert and opening modal'
+                );
+                for (const alert of cms.alerts.all) {
+                  if (!alertsBefore.has(alert.id) && alert.level === 'error') {
+                    cms.alerts.dismiss(alert);
+                  }
+                }
+                captureWorkflowChoice(false, errorMsg);
+                setDeletedBranchModalOpen(true);
+                return;
+              }
+
               captureEvent(SaveContentErrorEvent, {
                 documentPath: tinaForm.path,
-                error: error instanceof Error ? error.message : String(error),
+                error: errorMsg,
               });
+              captureWorkflowChoice(false, errorMsg);
             } else {
               captureEvent(SavedContentEvent, {
                 documentPath: tinaForm.path,
               });
+              captureWorkflowChoice(true);
             }
+          } else {
+            console.debug(
+              '[tina:branch-guard] safeSubmit: skipped — canSubmit is false'
+            );
           }
         };
 
         const safeHandleSubmit = async () => {
+          setIsGuardChecking(true);
+
+          const currentBranch = decodeURIComponent(cms.api.tina.getBranch());
+
+          let exists = true;
+          try {
+            console.debug(
+              '[tina:branch-guard] safeHandleSubmit: checking branch:',
+              currentBranch
+            );
+            exists = await cms.api.tina.branchExists(currentBranch);
+          } catch (err) {
+            console.error(
+              '[tina:branch-guard] safeHandleSubmit: branchExists threw, failing open:',
+              err
+            );
+          }
+
+          console.debug(
+            '[tina:branch-guard] safeHandleSubmit: branchExists returned:',
+            exists
+          );
+          if (!exists) {
+            console.debug(
+              '[tina:branch-guard] safeHandleSubmit: branch missing — opening modal'
+            );
+            setIsGuardChecking(false);
+            setDeletedBranchModalOpen(true);
+            return;
+          }
+
           if (usingProtectedBranch) {
             setCreateBranchModalOpen(true);
           } else {
-            safeSubmit();
+            await safeSubmit();
           }
+
+          setIsGuardChecking(false);
         };
 
         return (
@@ -215,6 +300,20 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                 values={tinaForm.values}
                 tinaForm={tinaForm}
                 close={() => setCreateBranchModalOpen(false)}
+                onBaseBranchDeleted={() => {
+                  setCreateBranchModalOpen(false);
+                  setDeletedBranchModalOpen(true);
+                }}
+              />
+            )}
+            {deletedBranchModalOpen && (
+              <BranchDeletedModal
+                branchName={decodeURIComponent(cms.api.tina.getBranch())}
+                close={() => setDeletedBranchModalOpen(false)}
+                path={tinaForm.path}
+                values={tinaForm.values}
+                crudType={tinaForm.crudType}
+                tinaForm={tinaForm}
               />
             )}
             <DragDropContext onDragEnd={moveArrayItem}>
@@ -251,12 +350,11 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                       )}
                       <Button
                         onClick={safeHandleSubmit}
-                        disabled={!canSubmit}
+                        disabled={!canSubmit || isGuardChecking}
                         busy={submitting}
                         variant='primary'
                       >
-                        {submitting && <LoadingDots />}
-                        {!submitting && tinaForm.buttons.save}
+                        {tinaForm.buttons.save}
                       </Button>
                       {tinaForm.actions.length > 0 && (
                         <FormActionMenu
@@ -278,7 +376,8 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 
 export const FormStatus = ({ pristine }: { pristine: boolean }) => {
   const pristineClass = pristine ? 'text-green-500' : 'text-red-500';
-  return <FaCircle className={cn('h-3', pristineClass)} />;
+  // fill-current keeps this a solid status dot; lucide icons are stroke-only by default.
+  return <Circle className={cn('w-3 h-3 fill-current', pristineClass)} />;
 };
 
 const RelatedFilesBanner = () => {

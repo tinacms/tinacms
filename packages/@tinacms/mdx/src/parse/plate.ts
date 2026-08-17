@@ -28,6 +28,7 @@ export type CodeLineElement = {
 export type CodeBlockElement = {
   type: 'code_block';
   lang?: string;
+  meta?: string;
   value?: string; // this is needed for mdast, it is not used by Plate as the 'value' (platev48) now stores this in the children as CodeLineElements
   children: CodeLineElement[];
 };
@@ -97,6 +98,8 @@ export type ListItemChildrenElement =
  */
 export type ListItemElement = {
   type: 'li';
+  /** Set only on GFM task list items. `false` is an unticked checkbox. */
+  checked?: boolean;
   children: ListItemChildrenElement[];
 };
 /**

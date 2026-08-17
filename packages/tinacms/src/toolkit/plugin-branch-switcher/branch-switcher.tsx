@@ -1,26 +1,5 @@
+import { ASYNC_POLLER_ERROR } from '@tinacms/schema-tools';
 import { BaseTextField, FieldLabel, Select } from '@toolkit/fields';
-import { LoadingDots, PrefixedTextField } from '@toolkit/form-builder';
-import { useCMS } from '@toolkit/react-core';
-import { Button } from '@toolkit/styles';
-import { formatDistanceToNow } from 'date-fns';
-import * as React from 'react';
-import { AiFillWarning } from 'react-icons/ai';
-import {
-  BiError,
-  BiGitBranch,
-  BiLinkExternal,
-  BiLockAlt,
-  BiPencil,
-  BiRefresh,
-  BiSearch,
-} from 'react-icons/bi';
-import { FaSpinner } from 'react-icons/fa';
-import { GrCircleQuestion } from 'react-icons/gr';
-import { MdArrowForward, MdOutlineClear } from 'react-icons/md';
-import { useBranchData } from './branch-data';
-import { BranchSwitcherLegacy } from './branch-switcher-legacy';
-import { Branch, BranchSwitcherProps } from './types';
-import { Badge } from '@toolkit/react-sidebar/components/badge';
 import {
   Tooltip,
   TooltipContent,
@@ -28,6 +7,29 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@toolkit/fields/plugins/mdx-field-plugin/plate/components/plate-ui/tooltip';
+import { LoadingDots, PrefixedTextField } from '@toolkit/form-builder';
+import { useCMS } from '@toolkit/react-core';
+import { Badge } from '@toolkit/react-sidebar/components/badge';
+import { Button } from '@toolkit/styles';
+import { formatDistanceToNow } from 'date-fns';
+import {
+  ArrowRight,
+  CircleAlert,
+  CircleHelp,
+  ExternalLink,
+  GitBranch,
+  Loader2,
+  Lock,
+  Pencil,
+  RefreshCw,
+  Search,
+  TriangleAlert,
+  X,
+} from 'lucide-react';
+import * as React from 'react';
+import { useBranchData } from './branch-data';
+import { BranchSwitcherLegacy } from './branch-switcher-legacy';
+import { Branch, BranchSwitcherProps } from './types';
 
 import BranchSelectorTable from './branch-selector-table';
 
@@ -36,11 +38,8 @@ type ListState = 'loading' | 'ready' | 'error';
 export const tableHeadingStyle =
   'px-3 py-3 text-left text-xs font-bold text-gray-700 tracking-wider sticky top-0 bg-gray-100 z-20 border-b-2 border-gray-200 ';
 
-export function formatBranchName(str: string): string {
-  const pattern = /[^/\w-]+/g; // regular expression pattern to match invalid special characters
-  const formattedStr = str.replace(pattern, '-'); // remove special characters
-  return formattedStr.toLowerCase();
-}
+import { formatBranchName } from './format-branch-name';
+export { formatBranchName };
 
 export const BranchSwitcher = (props: BranchSwitcherProps) => {
   const cms = useCMS();
@@ -149,7 +148,7 @@ export const EditoralBranchSwitcher = ({
               });
             })
             .catch((e) => {
-              if (e.message === 'AsyncPoller: cancelled') return;
+              if (e.message === ASYNC_POLLER_ERROR.CANCELLED) return;
               console.error(e);
             });
         });
@@ -167,7 +166,7 @@ export const EditoralBranchSwitcher = ({
         {isLocalMode ? (
           <div className='px-6 py-8 w-full h-full flex flex-col items-center justify-center'>
             <p className='text-base mb-4 text-center'>
-              <AiFillWarning className='w-7 h-auto inline-block mr-0.5 opacity-70 text-yellow-600' />
+              <TriangleAlert className='w-7 h-auto inline-block mr-0.5 opacity-70 text-yellow-600' />
             </p>
             <p className='text-base mb-6 text-center'>
               Tina's branch switcher isn't available in local mode.{' '}
@@ -186,7 +185,7 @@ export const EditoralBranchSwitcher = ({
                 as='a'
               >
                 Read Our Docs{' '}
-                <MdArrowForward className='w-5 h-auto ml-1.5 opacity-80' />
+                <ArrowRight className='w-5 h-auto ml-1.5 opacity-80' />
               </Button>
             </p>
           </div>
@@ -220,7 +219,7 @@ export const EditoralBranchSwitcher = ({
                   An error occurred while retrieving the branch list.
                 </p>
                 <Button className='mb-4' onClick={refreshBranchList}>
-                  Try again <BiRefresh className='w-6 h-full ml-1 opacity-70' />
+                  Try again <RefreshCw className='w-6 h-full ml-1 opacity-70' />
                 </Button>
               </div>
             )}
@@ -340,7 +339,7 @@ const BranchCreator = ({ setViewState, handleCreateBranch, currentBranch }) => {
             handleCreateBranch('tina/' + branchName);
           }}
         >
-          Create Branch <BiGitBranch className='w-5 h-full ml-1 opacity-70' />
+          Create Branch <GitBranch className='w-5 h-full ml-1 opacity-70' />
         </Button>
       </div>
     </form>
@@ -426,9 +425,9 @@ export const BranchItem = ({
         <div className='flex flex-col'>
           <div className='flex items-center gap-1 min-w-0'>
             {branch.protected ? (
-              <BiLockAlt className='w-4 h-auto opacity-70 text-blue-500 flex-shrink-0' />
+              <Lock className='w-4 h-auto opacity-70 text-blue-500 flex-shrink-0' />
             ) : (
-              <BiGitBranch className='w-4 h-auto opacity-70 text-gray-600 flex-shrink-0' />
+              <GitBranch className='w-4 h-auto opacity-70 text-gray-600 flex-shrink-0' />
             )}
             <Tooltip delayDuration={300}>
               <TooltipTrigger asChild>
@@ -448,7 +447,7 @@ export const BranchItem = ({
                 className='w-fit flex-shrink-0'
                 displayIcon={false}
               >
-                <BiPencil className='w-3 h-auto inline-block mr-1' />
+                <Pencil className='w-3 h-auto inline-block mr-1' />
                 Currently editing
               </Badge>
             </div>
@@ -469,7 +468,7 @@ export const BranchItem = ({
                 Please wait...
               </span>
             </div>
-            <FaSpinner className='w-3 h-auto animate-spin text-blue-500' />
+            <Loader2 className='w-3 h-auto animate-spin text-blue-500' />
           </div>
         ) : (
           <span className='text-sm leading-tight whitespace-nowrap'>
@@ -490,7 +489,7 @@ export const BranchItem = ({
             className='cursor-pointer h-9 px-2 flex items-center gap-1'
             title='Open Git Pull Request'
           >
-            <BiLinkExternal className='h-3.5 w-auto text-gray-700 flex-shrink-0' />
+            <ExternalLink className='h-3.5 w-auto text-gray-700 flex-shrink-0' />
             <span className='text-sm truncate max-w-[120px]'>
               PR: {extractPullRequestId(branch.githubPullRequestUrl)}
             </span>
@@ -505,7 +504,7 @@ export const BranchItem = ({
             className='cursor-pointer h-9 px-2 flex items-center gap-1'
             title='Create Pull Request'
           >
-            <BiGitBranch className='h-3.5 w-auto text-gray-700 flex-shrink-0' />
+            <GitBranch className='h-3.5 w-auto text-gray-700 flex-shrink-0' />
             <span className='text-sm whitespace-nowrap'>Create PR</span>
           </Button>
         ) : null}
@@ -531,7 +530,7 @@ const IndexStatus = ({ indexingStatus }: { indexingStatus: Status }) => {
       classes: 'text-blue-500 border-blue-500',
       content: () => (
         <>
-          <GrCircleQuestion className='w-3 h-auto' />
+          <CircleHelp className='w-3 h-auto' />
           <span className=''>{`Unknown`}</span>
         </>
       ),
@@ -540,7 +539,7 @@ const IndexStatus = ({ indexingStatus }: { indexingStatus: Status }) => {
       classes: 'text-blue-500 border-blue-500',
       content: () => (
         <>
-          <FaSpinner className='w-3 h-auto animate-spin' />
+          <Loader2 className='w-3 h-auto animate-spin' />
           <span className=''>{`Indexing`}</span>
         </>
       ),
@@ -549,7 +548,7 @@ const IndexStatus = ({ indexingStatus }: { indexingStatus: Status }) => {
       classes: 'text-red-500 border-red-500',
       content: () => (
         <>
-          <BiError className='w-3 h-auto' />
+          <CircleAlert className='w-3 h-auto' />
           <span className=''>{`Indexing failed`}</span>
         </>
       ),
@@ -558,7 +557,7 @@ const IndexStatus = ({ indexingStatus }: { indexingStatus: Status }) => {
       classes: 'text-red-500 border-red-500',
       content: () => (
         <>
-          <BiError className='w-3 h-auto' />
+          <CircleAlert className='w-3 h-auto' />
           <span className=''>{`Indexing timed out`}</span>
         </>
       ),

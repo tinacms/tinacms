@@ -11,6 +11,7 @@ export interface CreateOptions {
   noTelemetry: boolean;
   projectName: string;
   verbose: boolean;
+  theme?: string;
 }
 
 export function extractOptions(args: string[]): CreateOptions {
@@ -34,6 +35,10 @@ export function extractOptions(args: string[]): CreateOptions {
     )
     .option('-v, --verbose', 'Enable verbose output.')
     .option('--noTelemetry', 'Disable anonymous telemetry that is collected.')
+    .option(
+      '--theme <theme>',
+      'Choose a theme for the tina-docs template (skips interactive prompt).'
+    )
     .arguments('[project-directory]')
     .usage(`${TextStyles.success('<project-directory>')} [options]`)
     .action((name) => {

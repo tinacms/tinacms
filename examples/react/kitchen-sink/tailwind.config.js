@@ -3,10 +3,7 @@ import defaultTheme from 'tailwindcss/defaultTheme';
 import typography from '@tailwindcss/typography';
 
 export default {
-  content: [
-    './src/**/*.{js,ts,jsx,tsx}',
-    './index.html',
-  ],
+  content: ['./src/**/*.{js,ts,jsx,tsx}', './index.html'],
   darkMode: 'class',
   theme: {
     colors: {

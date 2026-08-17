@@ -6,8 +6,13 @@ export const MermaidElementWithRef = ({ config }) => {
 
   useEffect(() => {
     if (mermaidRef.current) {
-      mermaid.initialize({ startOnLoad: true });
-      mermaid.init();
+      const renderMermaid = async () => {
+        await mermaid.run({
+          nodes: [mermaidRef.current.querySelector('.mermaid')],
+        });
+      };
+
+      renderMermaid();
     }
   }, [config]);
 

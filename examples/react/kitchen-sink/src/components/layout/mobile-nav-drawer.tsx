@@ -92,7 +92,8 @@ export const MobileNavDrawer = ({
             if (!item) return null;
             const active = isActive(item.href ?? '/');
             const href = sanitizeHref(item.href, '/');
-            const isStaticOrExternal = href.includes('.') || href.startsWith('http');
+            const isStaticOrExternal =
+              href.includes('.') || href.startsWith('http');
             const className = cn(
               'block px-4 py-3 rounded-md text-base font-medium transition-colors',
               active

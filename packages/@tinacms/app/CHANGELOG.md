@@ -1,5 +1,181 @@
 # @tinacms/app
 
+## 2.5.10
+
+### Patch Changes
+
+- [#7213](https://github.com/tinacms/tinacms/pull/7213) [`056ffc2`](https://github.com/tinacms/tinacms/commit/056ffc22dc87b0040281054f4140c6260c22ea1f) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Publish internal package references as ranges instead of exact versions.
+
+  Internal dependencies were declared as `workspace:*`, which pnpm expands to an **exact version** when publishing (`"tinacms": "3.10.0"`), not a range. An exact pin cannot deduplicate against the version a consumer has already installed, so npm nests a second — and third — complete copy of `tinacms` and its dependency tree. In a stock Astro + TinaCMS blog this produced three copies of `tinacms`, three of `mermaid` (186 MB), five of `date-fns` (151 MB), and four of `typescript` (88 MB): about **320 MB of duplication**.
+
+  The same expansion applied to `peerDependencies`, so packages such as `next-tinacms-cloudinary` and `tinacms-authjs` published `"tinacms": "3.10.0"` as a _peer_ — requiring consumers to have that exact version or hit an `ERESOLVE` conflict, and forcing a republish of every dependent on each `tinacms` release.
+
+  Switching these to `workspace:^` publishes them as caret ranges (`^3.10.0`), which deduplicate normally and let `onlyUpdatePeerDependentsWhenOutOfRange` do its job.
+
+- Updated dependencies [[`711ba30`](https://github.com/tinacms/tinacms/commit/711ba30f6e8955bbcea134fd22a5b498b7734325), [`908fe7d`](https://github.com/tinacms/tinacms/commit/908fe7ddc1c01a2c091f1e4f3c1b00f3696577b4), [`566af78`](https://github.com/tinacms/tinacms/commit/566af78ded66891edeb6fdf928b6543d45ac76fd), [`b8df6ee`](https://github.com/tinacms/tinacms/commit/b8df6eeee85b603406d204042a5ef95d49e8a9cf), [`59efccc`](https://github.com/tinacms/tinacms/commit/59efcccd3f1713870e40ebd9db25659cd6357237), [`056ffc2`](https://github.com/tinacms/tinacms/commit/056ffc22dc87b0040281054f4140c6260c22ea1f)]:
+  - tinacms@3.11.0
+  - @tinacms/mdx@2.1.11
+
+## 2.5.9
+
+### Patch Changes
+
+- Updated dependencies [[`4b4e139`](https://github.com/tinacms/tinacms/commit/4b4e1395c8c2a1a4a9d95daad397dbcfff64e47d)]:
+  - @tinacms/mdx@2.1.10
+  - tinacms@3.10.1
+
+## 2.5.8
+
+### Patch Changes
+
+- Updated dependencies [[`c809733`](https://github.com/tinacms/tinacms/commit/c809733ce8037d81937e81f0c8781a6cf222099b), [`3a1b39a`](https://github.com/tinacms/tinacms/commit/3a1b39ad9a2bbeb82a539fbca6985d5b714238dd), [`de4a807`](https://github.com/tinacms/tinacms/commit/de4a80771e83afa8502f834227351cff54c5f236), [`8497110`](https://github.com/tinacms/tinacms/commit/8497110ada7554f97807ce7a09a3624b5efc5713), [`22d0c0d`](https://github.com/tinacms/tinacms/commit/22d0c0d095b79e116677a798d07b35591ccb816e), [`5148d67`](https://github.com/tinacms/tinacms/commit/5148d679049bc53e34b287a586bc721db7cb7710), [`ff10e65`](https://github.com/tinacms/tinacms/commit/ff10e657e48f1acc67cafd3e1a99bef23c8ac419), [`b53a51c`](https://github.com/tinacms/tinacms/commit/b53a51c92ee8ddecbb654f5b57c7d10673a06626)]:
+  - tinacms@3.10.0
+  - @tinacms/mdx@2.1.9
+
+## 2.5.7
+
+### Patch Changes
+
+- [#7062](https://github.com/tinacms/tinacms/pull/7062) [`caadf1f`](https://github.com/tinacms/tinacms/commit/caadf1f68ec602277bcd4225a69c13fdc5402f7b) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Improve global collection UX: global collections now appear once in the sidebar "Site" section (globe icon) instead of being duplicated under Collections, open directly in the form instead of a popup modal, and single-document global collections skip the document list and go straight to the form. Global collections with zero or multiple documents fall through to the normal list view.
+
+- [#7088](https://github.com/tinacms/tinacms/pull/7088) [`d44558e`](https://github.com/tinacms/tinacms/commit/d44558e9b4502d4f4fc2c970d22985339fe2b6ce) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Fix media upload/delete paths to prevent access to storage keys outside mediaRoot.
+
+- [#7095](https://github.com/tinacms/tinacms/pull/7095) [`39c06f7`](https://github.com/tinacms/tinacms/commit/39c06f7c21cac7dfd94ff6acfcdeec7117989773) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Harden npm publish pipeline and package manifests
+
+- Updated dependencies [[`c1994b3`](https://github.com/tinacms/tinacms/commit/c1994b36907710aeb36fd114fa6d0a8a0e1210d0), [`caadf1f`](https://github.com/tinacms/tinacms/commit/caadf1f68ec602277bcd4225a69c13fdc5402f7b), [`5ba482b`](https://github.com/tinacms/tinacms/commit/5ba482b9c10d76ea7f7bea2a442a8999824736a8), [`8a86ffa`](https://github.com/tinacms/tinacms/commit/8a86ffa045af8ff6dfa0ebc2775cf3b7b810d238), [`19fcbdd`](https://github.com/tinacms/tinacms/commit/19fcbdd90a33a66c437b0f91e325a8609022e0cc), [`871ce31`](https://github.com/tinacms/tinacms/commit/871ce31531d3d7dc379ec7d58cf427984dd6620a), [`d44558e`](https://github.com/tinacms/tinacms/commit/d44558e9b4502d4f4fc2c970d22985339fe2b6ce), [`4801b21`](https://github.com/tinacms/tinacms/commit/4801b21f31455d3ce6cb33e6233148caba9921c6)]:
+  - tinacms@3.9.4
+  - @tinacms/mdx@2.1.8
+
+## 2.5.6
+
+### Patch Changes
+
+- [#7056](https://github.com/tinacms/tinacms/pull/7056) [`c491fc5`](https://github.com/tinacms/tinacms/commit/c491fc55e612725f5d775eeb1fdf3f8ba82314fa) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Harden cross-window message handling and rich-text URL sanitization.
+
+  Adds stricter origin/source checks for trusted message flows, use explicit target origins for preview iframe message, and applies URL sanitization to slatejson rich-text parsing and default rich-text link/image rendering.
+
+- Updated dependencies [[`42760d8`](https://github.com/tinacms/tinacms/commit/42760d8f5afd201107e27e274308af37f96ba8d0), [`c491fc5`](https://github.com/tinacms/tinacms/commit/c491fc55e612725f5d775eeb1fdf3f8ba82314fa)]:
+  - tinacms@3.9.3
+  - @tinacms/mdx@2.1.7
+
+## 2.5.5
+
+### Patch Changes
+
+- [#6681](https://github.com/tinacms/tinacms/pull/6681) [`95b7523`](https://github.com/tinacms/tinacms/commit/95b75237cb91ec3dc5dac9ce52359f9786072502) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Fix click-to-edit for fields in connection query results (e.g. ruleConnection)
+
+- Updated dependencies []:
+  - tinacms@3.9.2
+
+## 2.5.4
+
+### Patch Changes
+
+- Updated dependencies [[`7b539b8`](https://github.com/tinacms/tinacms/commit/7b539b8e7d7d9f4451b5fd36a04d26b734f7d78e)]:
+  - tinacms@3.9.1
+
+## 2.5.3
+
+### Patch Changes
+
+- Updated dependencies [[`a8dd9af`](https://github.com/tinacms/tinacms/commit/a8dd9af056b17a8faeaa621bbf7722a62b396cf8), [`916bd43`](https://github.com/tinacms/tinacms/commit/916bd43de1b563854fac65a74ecf04f946ebda56), [`b9d561f`](https://github.com/tinacms/tinacms/commit/b9d561fcea56185f0f146d2bdb1b510caab180d3)]:
+  - tinacms@3.9.0
+
+## 2.5.2
+
+### Patch Changes
+
+- Updated dependencies [[`c7b366c`](https://github.com/tinacms/tinacms/commit/c7b366c5de66b1a3f086c1f11954225e55430324)]:
+  - tinacms@3.8.4
+  - @tinacms/mdx@2.1.6
+
+## 2.5.1
+
+### Patch Changes
+
+- [#6947](https://github.com/tinacms/tinacms/pull/6947) [`7be8175`](https://github.com/tinacms/tinacms/commit/7be81751a6b93f785d347e759e91f024bb12c452) Thanks [@MirkaJuliet34](https://github.com/MirkaJuliet34)! - Aligned rich text editor typography class names with the actual font used and updated related references.
+
+- Updated dependencies [[`7be8175`](https://github.com/tinacms/tinacms/commit/7be81751a6b93f785d347e759e91f024bb12c452)]:
+  - tinacms@3.8.3
+
+## 2.5.0
+
+### Minor Changes
+
+- [#6843](https://github.com/tinacms/tinacms/pull/6843) [`0509095`](https://github.com/tinacms/tinacms/commit/0509095601fedc87f05a622e219e6414ef51a6b6) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Support TinaCMS visual editing on statically-built Astro pages.
+
+  Wrap editable regions in `<TinaIsland>` and visual editing now works under `output: 'static'` (and mixed static/SSR), provided the adapter can serve the one on-demand route `/tina-island/[name]`. Highlights:
+
+  - **Static page support.** `<TinaIsland>` emits a tiny in-iframe bootstrap that fetches `/admin/bridge.js`; on init the bridge "primes" any page with island markers but no server-injected form payloads by calling the island endpoints, which now return the page's form payloads alongside region HTML.
+  - **Bridge served as a static asset.** Dropped the injected `/_tina/bridge.js` route (some adapters 404'd it) in favour of serving `/admin/bridge.js` from a dev-only Vite plugin and emitting the bundle into the build client output — no source-tree writes. The `@tinacms/astro/bridge-route` subpath export is removed.
+  - **Re-prime on soft navigation.** `refreshForms` now re-primes when it sees island markers without server-injected payloads, so Astro `ClientRouter` swaps work without a hard reload.
+  - **Primary-form selection.** Mark the page's main form via `requestWithMetadata(..., { priority: 'primary' })` (SSR) or the `primary` prop on `<TinaIsland>` (static); the admin reducer routes around its default selection so multi-form pages no longer land on "Referenced Files".
+  - **Prerender-safe middleware.** `tina()` now short-circuits on `context.isPrerendered`, fixing the `Astro.request.headers` warnings that fired on every prerendered route during `astro build`.
+  - **New `tinaAdminDevRedirect` Vite plugin** at `@tinacms/astro/vite` — redirects `/admin` and `/admin/` to `/admin/index.html` during `astro dev` so a bare `/admin` request lands on the SPA.
+
+### Patch Changes
+
+- [#6938](https://github.com/tinacms/tinacms/pull/6938) [`4757225`](https://github.com/tinacms/tinacms/commit/475722599ff350b45bfdb4f7a6af2e37d33c81c3) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - chore(deps): upgrade react-router-dom from 6.3.0 to ^6.30.3 to resolve GHSA-9jcx-v3wj-wh4m (unexpected external redirect via untrusted paths)
+
+- Updated dependencies [[`33feeac`](https://github.com/tinacms/tinacms/commit/33feeacf6585be2736a0a14c5a800c1b6db34e44), [`8ac0776`](https://github.com/tinacms/tinacms/commit/8ac0776dea0c0650a5e5098c143b24c17fc25b8e), [`df50cbf`](https://github.com/tinacms/tinacms/commit/df50cbf35536bf2028a742832aebd57701dc3bb6), [`b9eaf61`](https://github.com/tinacms/tinacms/commit/b9eaf61c28c25814ae65b5fbe72d5b33df0b3596), [`cf73a11`](https://github.com/tinacms/tinacms/commit/cf73a115c3a58fac26e2518734dd3cb49133260d), [`4757225`](https://github.com/tinacms/tinacms/commit/475722599ff350b45bfdb4f7a6af2e37d33c81c3)]:
+  - tinacms@3.8.2
+  - @tinacms/mdx@2.1.5
+
+## 2.4.8
+
+### Patch Changes
+
+- Updated dependencies []:
+  - tinacms@3.8.1
+
+## 2.4.7
+
+### Patch Changes
+
+- Updated dependencies [[`723632b`](https://github.com/tinacms/tinacms/commit/723632b050b1e9502c46215fd6e8e548cc108ac0), [`95758a0`](https://github.com/tinacms/tinacms/commit/95758a0ad31ec96aa652f247211a769e82a37cbb), [`9e7eba9`](https://github.com/tinacms/tinacms/commit/9e7eba9f290c935cd56569421de88b5adfac65d8)]:
+  - tinacms@3.8.0
+
+## 2.4.6
+
+### Patch Changes
+
+- Updated dependencies [[`3e4dcc7`](https://github.com/tinacms/tinacms/commit/3e4dcc76d5fb89ec900b778cb7e82f3aa3ed6501), [`3da4588`](https://github.com/tinacms/tinacms/commit/3da45887c23da552a4bd994154eeaaf8990065f7), [`b37187d`](https://github.com/tinacms/tinacms/commit/b37187d46b6e1a274db7ab79372f02aaa2ef992d), [`84ec7ad`](https://github.com/tinacms/tinacms/commit/84ec7adea7a1d8015cf1430fe804886493c5ae21), [`28b869a`](https://github.com/tinacms/tinacms/commit/28b869a0d2c9b2a608e1076b6dea24bd3e01ac31)]:
+  - tinacms@3.7.6
+  - @tinacms/mdx@2.1.4
+
+## 2.4.5
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/mdx@2.1.3
+  - tinacms@3.7.5
+
+## 2.4.4
+
+### Patch Changes
+
+- [#6687](https://github.com/tinacms/tinacms/pull/6687) [`a526f9f`](https://github.com/tinacms/tinacms/commit/a526f9f4c37a0aaefb572c9dcc562d89aa9e5c7e) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: simplify errors shown to users
+
+- Updated dependencies [[`4672251`](https://github.com/tinacms/tinacms/commit/4672251c813e51f4471f025943008d2dea700aca), [`ca725ac`](https://github.com/tinacms/tinacms/commit/ca725acb42be499c146d76b12982e05a8127f81e), [`a526f9f`](https://github.com/tinacms/tinacms/commit/a526f9f4c37a0aaefb572c9dcc562d89aa9e5c7e), [`b260b5e`](https://github.com/tinacms/tinacms/commit/b260b5ed4beb5d678b9605357b99a8667fddc8de), [`b56dad4`](https://github.com/tinacms/tinacms/commit/b56dad42d2216ac9c8f90f19b78a4951ca97a61f)]:
+  - tinacms@3.7.4
+
+## 2.4.3
+
+### Patch Changes
+
+- Updated dependencies [[`cd262b3`](https://github.com/tinacms/tinacms/commit/cd262b311c218ea4e5b5bb8abbbe54fcff3b8054), [`55dae8e`](https://github.com/tinacms/tinacms/commit/55dae8eef898f49f827c00bc72297863d0d69be1), [`217bfb4`](https://github.com/tinacms/tinacms/commit/217bfb4ff2c1a61fa7b6df3ea460b192b5179bb7), [`5feb18d`](https://github.com/tinacms/tinacms/commit/5feb18d0d3032bbcd6a5aad678208c0dde19bf81), [`32e145d`](https://github.com/tinacms/tinacms/commit/32e145d4859cbc710a222f2a01c55ca7b29a080b), [`d998884`](https://github.com/tinacms/tinacms/commit/d9988849ad67fb5e9d7e233c1ccca0cb0c031c3e), [`c75d871`](https://github.com/tinacms/tinacms/commit/c75d87121224f91dc4e5e2aa8af60b0881b87a5b)]:
+  - tinacms@3.7.3
+  - @tinacms/mdx@2.1.2
+
+## 2.4.2
+
+### Patch Changes
+
+- Updated dependencies [[`3569c95`](https://github.com/tinacms/tinacms/commit/3569c95c124138013b36cd30bfef4d0b02f5c57b), [`4315d73`](https://github.com/tinacms/tinacms/commit/4315d731e729857713d5f3fc6cdef2b30abd9384), [`ff1cd6f`](https://github.com/tinacms/tinacms/commit/ff1cd6fb50edc24b34f81166d7dedbfec6d22b32), [`d1ad86e`](https://github.com/tinacms/tinacms/commit/d1ad86e204e19bf5bb4811658d40d172635da3af), [`e146e92`](https://github.com/tinacms/tinacms/commit/e146e922b40cb5376c7a3adf81b44ad4cf8f1867), [`246ee27`](https://github.com/tinacms/tinacms/commit/246ee27a8e0b74baf241c6a70a1699013fc59299)]:
+  - tinacms@3.7.2
+  - @tinacms/mdx@2.1.1
+
 ## 2.4.1
 
 ### Patch Changes

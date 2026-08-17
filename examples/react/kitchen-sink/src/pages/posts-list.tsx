@@ -23,7 +23,10 @@ export default function PostsList() {
   const result = useTinaQuery(queryFn);
 
   if (result.loading) return <Loading />;
-  if (result.error || !result.data) return <div className='py-12 text-center text-gray-500'>No posts found</div>;
+  if (result.error || !result.data)
+    return (
+      <div className='py-12 text-center text-gray-500'>No posts found</div>
+    );
 
   const posts = (result.data?.postConnection?.edges ?? []).flatMap(
     (edge: any) => (edge?.node ? [edge.node] : [])
@@ -47,7 +50,10 @@ export default function PostsList() {
               key={post._sys.filename}
               to={postUrl}
               data-testid={`post-card-${post._sys.filename}`}
-              className={cn(cardLinkClasses, 'px-6 sm:px-8 md:px-10 py-10 mb-8 last:mb-0')}
+              className={cn(
+                cardLinkClasses,
+                'px-6 sm:px-8 md:px-10 py-10 mb-8 last:mb-0'
+              )}
             >
               <h3 className='bg-gradient-to-r bg-clip-text text-transparent from-theme-400 to-theme-600 dark:from-theme-300 dark:to-theme-500 text-3xl lg:text-4xl font-semibold title-font mb-5 transition-all duration-150 ease-out'>
                 {post.title}{' '}

@@ -1,4 +1,4 @@
-import { createServer } from 'net';
+import { createServer, type Server } from 'net';
 import {
   Bridge,
   Database,
@@ -16,7 +16,7 @@ import {
   TINA_FOLDER,
 } from './config-manager';
 
-export const createDBServer = (port: number) => {
+export const createDBServer = (port: number): Server => {
   const levelHost = new ManyLevelHost(
     // @ts-ignore
     new MemoryLevel<string, Record<string, any>>({
@@ -38,6 +38,7 @@ export const createDBServer = (port: number) => {
     }
   });
   dbServer.listen(port, 'localhost');
+  return dbServer;
 };
 
 export async function createAndInitializeDatabase(

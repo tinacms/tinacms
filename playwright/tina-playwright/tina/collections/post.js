@@ -1,15 +1,22 @@
 /**
- * @type {import('tinacms').Collection}
+ * @type {import("tinacms").Collection}
  */
 export default {
   label: "Blog Posts",
   name: "post",
   path: "content/post",
+  indexes: [
+    {
+      name: "title",
+      fields: [{ name: "title" }],
+    },
+  ],
   fields: [
     {
       type: "string",
       label: "Title",
       name: "title",
+      searchable: true,
     },
     {
       type: "string",

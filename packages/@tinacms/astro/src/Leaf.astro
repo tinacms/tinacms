@@ -1,0 +1,42 @@
+---
+/**
+ * Recursive text-formatting renderer. Each formatting flag (bold, italic,
+ * underline, strikethrough, code, highlight) wraps the node in its tag and
+ * recurses via `Astro.self` with that flag cleared, so combinations stack
+ * naturally (`<strong><em><code>...</code></em></strong>`).
+ */
+import type { TextElement } from './types';
+
+interface Props {
+  node: TextElement;
+}
+
+const { node } = Astro.props;
+---
+{node.bold ? (
+  <strong>
+    <Astro.self node={{ ...node, bold: false }} />
+  </strong>
+) : node.italic ? (
+  <em>
+    <Astro.self node={{ ...node, italic: false }} />
+  </em>
+) : node.underline ? (
+  <u>
+    <Astro.self node={{ ...node, underline: false }} />
+  </u>
+) : node.strikethrough ? (
+  <s>
+    <Astro.self node={{ ...node, strikethrough: false }} />
+  </s>
+) : node.code ? (
+  <code>
+    <Astro.self node={{ ...node, code: false }} />
+  </code>
+) : node.highlight ? (
+  <mark style={node.highlightColor ? `background-color:${node.highlightColor}` : undefined}>
+    <Astro.self node={{ ...node, highlight: false, highlightColor: undefined }} />
+  </mark>
+) : (
+  <Fragment>{node.text}</Fragment>
+)}

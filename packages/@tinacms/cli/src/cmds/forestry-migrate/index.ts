@@ -18,6 +18,7 @@ import {
   makeTemplateFile,
   makeFieldsWithInternalCode,
 } from './util/codeTransformer';
+import { stringifyLabel, stringifyLabelWithField } from './util/naming';
 
 const BODY_FIELD = {
   // This is the body field
@@ -28,13 +29,7 @@ const BODY_FIELD = {
   isBody: true,
 };
 
-export const stringifyLabel = (label: string) => {
-  return label.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
-};
-export const stringifyLabelWithField = (label: string) => {
-  const labelString = stringifyLabel(label);
-  return `${labelString}Fields`;
-};
+export { stringifyLabel, stringifyLabelWithField };
 const transformForestryMatchToTinaMatch = (match: string) => {
   const newMatch = match
     // remove white space
@@ -49,7 +44,7 @@ const transformForestryMatchToTinaMatch = (match: string) => {
   if (match !== newMatch) {
     logger.info(
       `Info: Match ${match} was transformed to ${newMatch}. See ${linkText(
-        'https://tina.io/docs/forestry/common-errors/#info-match-match-was-transformed-to-newmatch'
+        'https://tina.io/docs/r/forestry-common-errors#info-match-match-was-transformed-to-newmatch'
       )}`
     );
   }
@@ -262,7 +257,7 @@ const generateCollectionFromForestrySection = (args: {
           `No templates found for section ${
             section.label
           }. Please see ${linkText(
-            'https://tina.io/docs/forestry/content-modelling/'
+            'https://tina.io/docs/r/forestry-content-modelling'
           )} for more information`
         )
       );

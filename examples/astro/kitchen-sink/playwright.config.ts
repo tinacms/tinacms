@@ -36,10 +36,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command:
-      process.platform === 'win32'
-        ? 'set MONOREPO_DEV=true && pnpm tinacms dev -c "astro dev"'
-        : 'pnpm dev',
+    command: 'pnpm dev',
     url: 'http://localhost:4321',
     reuseExistingServer: !process.env.CI,
     timeout: 120000,

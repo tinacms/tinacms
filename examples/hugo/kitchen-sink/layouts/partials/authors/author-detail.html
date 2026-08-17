@@ -1,0 +1,27 @@
+{{/* Author detail — matches Astro AuthorDetail component styling */}}
+<div class="max-w-4xl mx-auto px-6 sm:px-8 py-24">
+  <div class="flex flex-col items-center text-center mb-16">
+    {{ with .Params.avatar }}
+      {{ if or (hasPrefix . "/") (hasPrefix . "./") (hasPrefix . "../") (hasPrefix . "http://") (hasPrefix . "https://") }}
+        <img src="{{ . }}" alt="{{ $.Params.name }}" width="128" height="128" class="rounded-full mb-6 object-cover shadow-sm" />
+      {{ end }}
+    {{ end }}
+
+    {{ partial "ui/gradient-title.html" (dict "text" .Params.name "size" "5xl" "class" "mb-4") }}
+
+    {{ with .Params.description }}
+      <p class="text-lg text-gray-600 dark:text-gray-400 max-w-2xl">{{ . }}</p>
+    {{ end }}
+  </div>
+
+  {{ with .Params.hobbies }}
+    <div class="mt-8 p-6 bg-gray-50 dark:bg-gray-900 rounded-lg">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-50 mb-4">Hobbies</h3>
+      <div class="flex flex-wrap gap-2">
+        {{ range . }}
+          {{ partial "ui/badge.html" (dict "text" .) }}
+        {{ end }}
+      </div>
+    </div>
+  {{ end }}
+</div>

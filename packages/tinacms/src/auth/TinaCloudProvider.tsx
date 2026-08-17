@@ -5,6 +5,7 @@ import {
   BranchSwitcherPlugin,
   DummyMediaStore,
   MediaStore,
+  MediaWorkflowOverlay,
   StaticMedia,
   TinaCMS,
   TinaMediaStore,
@@ -63,7 +64,7 @@ const AuthWallInner = ({
   const loginScreen = client.authProvider.getLoginScreen();
   if (loginStrategy === 'LoginScreen' && !loginScreen) {
     throw new Error(
-      'LoginScreen is set as the login strategy but no login screen component was provided'
+      'LoginScreen is set as the login strategy but no login screen component was provided.'
     );
   }
 
@@ -99,7 +100,7 @@ const AuthWallInner = ({
               } else {
                 setErrorMessage({
                   title: 'Access Denied:',
-                  message: 'Not Authorized To Edit',
+                  message: 'Not authorized to edit.',
                 });
                 setActiveModal('error');
               }
@@ -173,7 +174,7 @@ const AuthWallInner = ({
     }
   };
 
-  let modalTitle = 'Let’s get you editing with TinaCMS...';
+  let modalTitle = 'Let’s get you editing with TinaCMS!';
   if (
     activeModal === 'authenticate' &&
     loginStrategy === 'Redirect' &&
@@ -184,12 +185,12 @@ const AuthWallInner = ({
     activeModal === 'authenticate' &&
     loginStrategy === 'UsernamePassword'
   ) {
-    modalTitle = 'Let’s get you editing with TinaCMS...';
+    modalTitle = 'Let’s get you editing with TinaCMS!';
   } else if (activeModal === 'error') {
     if (loginStrategy === 'Redirect' && !isTinaCloud) {
       modalTitle = 'Enter into edit mode';
     } else if (loginStrategy === 'UsernamePassword') {
-      modalTitle = 'Let’s get you editing with TinaCMS...';
+      modalTitle = 'Let’s get you editing with TinaCMS!';
     }
   }
 
@@ -205,7 +206,7 @@ const AuthWallInner = ({
                 alt='Tina the Llama playing a large orange key like a guitar.'
                 width={816}
                 height={816}
-                style={{ maxWidth: '100%', margin: '0 auto', display: 'block' }}
+                style={{ width: '16rem', margin: '0 auto', display: 'block' }}
               />
             ) : (
               'When you save, changes will be saved to the local filesystem.'
@@ -500,7 +501,7 @@ export const TinaCloudProvider = (
 
   React.useEffect(() => {
     const setupEditorialWorkflow = () => {
-      client.getProject().then((project) => {
+      client.getProject().then(async (project) => {
         if (project?.features?.includes('editorial-workflow')) {
           cms.flags.set('branch-switcher', true);
           client.usingEditorialWorkflow = true;
@@ -535,6 +536,7 @@ export const TinaCloudProvider = (
         }}
       >
         <TinaProvider cms={cms}>
+          <MediaWorkflowOverlay />
           <AuthWallInner {...props} cms={cms} />
         </TinaProvider>
       </BranchDataProvider>

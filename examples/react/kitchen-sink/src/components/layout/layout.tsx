@@ -25,7 +25,8 @@ const defaultGlobalData = {
 };
 
 export default function Layout({ children }: PropsWithChildren) {
-  const [globalData, setGlobalData] = useState<Record<string, unknown>>(defaultGlobalData);
+  const [globalData, setGlobalData] =
+    useState<Record<string, unknown>>(defaultGlobalData);
 
   useEffect(() => {
     client.queries

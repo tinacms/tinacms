@@ -13,7 +13,7 @@ export async function getStaticPaths() {
       return [
         {
           params: { urlSegments: breadcrumbs.join('/') },
-          props: { relativePath: `${breadcrumbs.join('/')}.mdx` },
+          props: { relativePath: `${breadcrumbs.join('/')}.md` },
         },
       ];
     }

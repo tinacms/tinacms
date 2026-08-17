@@ -1,7 +1,7 @@
 {
 	"name": "@tinacms/datalayer",
 	"type": "module",
-	"version": "2.0.14",
+	"version": "2.0.29",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"files": [
@@ -24,7 +24,7 @@
 		"test": "jest --passWithNoTests"
 	},
 	"dependencies": {
-		"@tinacms/graphql": "workspace:*"
+		"@tinacms/graphql": "workspace:^"
 	},
 	"publishConfig": {
 		"registry": "https://registry.npmjs.org"
@@ -42,9 +42,6 @@
 		"@types/node": "^22.13.1",
 		"@types/normalize-path": "catalog:",
 		"jest": "catalog:",
-		"jest-diff": "catalog:",
-		"jest-file-snapshot": "^0.5.0",
-		"jest-matcher-utils": "catalog:",
 		"typescript": "^5.7.3"
 	}
 }

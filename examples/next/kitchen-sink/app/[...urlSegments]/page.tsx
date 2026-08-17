@@ -16,7 +16,7 @@ export default async function Page({
   let data;
   try {
     data = await client.queries.page({
-      relativePath: `${filepath}.mdx`,
+      relativePath: `${filepath}.md`,
     });
   } catch {
     notFound();

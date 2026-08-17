@@ -1,0 +1,8 @@
+{{/*
+  Features block — title, description, items grid with icons.
+  Context: block data from page frontmatter.
+*/}}
+{{ $color := .color | default "default" }}
+
+{{ $sectionContent := partial "blocks/features-content.html" . }}
+{{ partial "section.html" (dict "color" $color "content" $sectionContent) }}

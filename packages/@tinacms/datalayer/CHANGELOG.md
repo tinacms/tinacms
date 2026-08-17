@@ -1,5 +1,122 @@
 # tina-graphql
 
+## 2.0.29
+
+### Patch Changes
+
+- [#7213](https://github.com/tinacms/tinacms/pull/7213) [`056ffc2`](https://github.com/tinacms/tinacms/commit/056ffc22dc87b0040281054f4140c6260c22ea1f) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Publish internal package references as ranges instead of exact versions.
+
+  Internal dependencies were declared as `workspace:*`, which pnpm expands to an **exact version** when publishing (`"tinacms": "3.10.0"`), not a range. An exact pin cannot deduplicate against the version a consumer has already installed, so npm nests a second — and third — complete copy of `tinacms` and its dependency tree. In a stock Astro + TinaCMS blog this produced three copies of `tinacms`, three of `mermaid` (186 MB), five of `date-fns` (151 MB), and four of `typescript` (88 MB): about **320 MB of duplication**.
+
+  The same expansion applied to `peerDependencies`, so packages such as `next-tinacms-cloudinary` and `tinacms-authjs` published `"tinacms": "3.10.0"` as a _peer_ — requiring consumers to have that exact version or hit an `ERESOLVE` conflict, and forcing a republish of every dependent on each `tinacms` release.
+
+  Switching these to `workspace:^` publishes them as caret ranges (`^3.10.0`), which deduplicate normally and let `onlyUpdatePeerDependentsWhenOutOfRange` do its job.
+
+- Updated dependencies [[`056ffc2`](https://github.com/tinacms/tinacms/commit/056ffc22dc87b0040281054f4140c6260c22ea1f)]:
+  - @tinacms/graphql@2.4.9
+
+## 2.0.28
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/graphql@2.4.8
+
+## 2.0.27
+
+### Patch Changes
+
+- Updated dependencies [[`5148d67`](https://github.com/tinacms/tinacms/commit/5148d679049bc53e34b287a586bc721db7cb7710), [`ff10e65`](https://github.com/tinacms/tinacms/commit/ff10e657e48f1acc67cafd3e1a99bef23c8ac419)]:
+  - @tinacms/graphql@2.4.7
+
+## 2.0.26
+
+### Patch Changes
+
+- [#7088](https://github.com/tinacms/tinacms/pull/7088) [`d44558e`](https://github.com/tinacms/tinacms/commit/d44558e9b4502d4f4fc2c970d22985339fe2b6ce) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Fix media upload/delete paths to prevent access to storage keys outside mediaRoot.
+
+- Updated dependencies [[`d44558e`](https://github.com/tinacms/tinacms/commit/d44558e9b4502d4f4fc2c970d22985339fe2b6ce), [`4801b21`](https://github.com/tinacms/tinacms/commit/4801b21f31455d3ce6cb33e6233148caba9921c6)]:
+  - @tinacms/graphql@2.4.6
+
+## 2.0.25
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/graphql@2.4.5
+
+## 2.0.24
+
+### Patch Changes
+
+- Updated dependencies [[`c931f18`](https://github.com/tinacms/tinacms/commit/c931f18a19c292cd89530e41b71da8fcd90c8415)]:
+  - @tinacms/graphql@2.4.4
+
+## 2.0.23
+
+### Patch Changes
+
+- Updated dependencies [[`5c216dd`](https://github.com/tinacms/tinacms/commit/5c216dd117ec5dd206c4efc68027f83cb6d2a932), [`f7a2e5a`](https://github.com/tinacms/tinacms/commit/f7a2e5a4b90c8bb5890d62953907cb939b341918)]:
+  - @tinacms/graphql@2.4.3
+
+## 2.0.22
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/graphql@2.4.2
+
+## 2.0.21
+
+### Patch Changes
+
+- Updated dependencies [[`890108d`](https://github.com/tinacms/tinacms/commit/890108dd6c1a88a1c5531cf397514c34712d13bd)]:
+  - @tinacms/graphql@2.4.1
+
+## 2.0.20
+
+### Patch Changes
+
+- Updated dependencies [[`eafb1ff`](https://github.com/tinacms/tinacms/commit/eafb1ffbd78267838f6939b3e993efc37c05cb2e), [`4d0c37a`](https://github.com/tinacms/tinacms/commit/4d0c37a8a50b211b7c5070c370faa369ee5d260d), [`9e7eba9`](https://github.com/tinacms/tinacms/commit/9e7eba9f290c935cd56569421de88b5adfac65d8)]:
+  - @tinacms/graphql@2.4.0
+
+## 2.0.19
+
+### Patch Changes
+
+- [#6751](https://github.com/tinacms/tinacms/pull/6751) [`556a162`](https://github.com/tinacms/tinacms/commit/556a16255df4b48df69c14133ee6530b68dd9131) Thanks [@JackDevAU](https://github.com/JackDevAU)! - chore(tinacms-pkgs): remove unused devDeps across @tinacms/\* packages
+
+- Updated dependencies [[`38cbec7`](https://github.com/tinacms/tinacms/commit/38cbec7b1b204f395f4e6e97c4bab6edc7296439), [`3da4588`](https://github.com/tinacms/tinacms/commit/3da45887c23da552a4bd994154eeaaf8990065f7), [`75f69a6`](https://github.com/tinacms/tinacms/commit/75f69a6476ff98614ae8cb910bcedb5fe52331e2)]:
+  - @tinacms/graphql@2.3.1
+
+## 2.0.18
+
+### Patch Changes
+
+- Updated dependencies [[`01e6e4b`](https://github.com/tinacms/tinacms/commit/01e6e4b08e52d777c0c07d4448930cfa5599a6bc)]:
+  - @tinacms/graphql@2.3.0
+
+## 2.0.17
+
+### Patch Changes
+
+- Updated dependencies [[`8194482`](https://github.com/tinacms/tinacms/commit/81944822373ad2d548871b880d586492efe71f3f), [`b260b5e`](https://github.com/tinacms/tinacms/commit/b260b5ed4beb5d678b9605357b99a8667fddc8de)]:
+  - @tinacms/graphql@2.2.5
+
+## 2.0.16
+
+### Patch Changes
+
+- Updated dependencies [[`cd262b3`](https://github.com/tinacms/tinacms/commit/cd262b311c218ea4e5b5bb8abbbe54fcff3b8054), [`4a8627b`](https://github.com/tinacms/tinacms/commit/4a8627b66fccf3396e790ae88fe7bb79408b4808), [`c75d871`](https://github.com/tinacms/tinacms/commit/c75d87121224f91dc4e5e2aa8af60b0881b87a5b)]:
+  - @tinacms/graphql@2.2.4
+
+## 2.0.15
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/graphql@2.2.3
+
 ## 2.0.14
 
 ### Patch Changes

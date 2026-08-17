@@ -30,24 +30,24 @@ it('creates pending document with article template and validates bridge writes',
   const { query, bridge } = await setupMutation(__dirname, config);
 
   const result = await query({ query: createArticleMutation, variables: {} });
-  expect(format(result)).toMatchFileSnapshot(
+  await expect(format(result)).toMatchFileSnapshot(
     'addPendingDocument-article-response.json'
   );
 
   const newDocWrite = bridge.getWrite('pages/new-article.md');
   expect(newDocWrite).toBeDefined();
-  expect(newDocWrite).toMatchFileSnapshot('new-article-content.md');
+  await expect(newDocWrite).toMatchFileSnapshot('new-article-content.md');
 });
 
 it('creates pending document with product template and validates bridge writes', async () => {
   const { query, bridge } = await setupMutation(__dirname, config);
 
   const result = await query({ query: createProductMutation, variables: {} });
-  expect(format(result)).toMatchFileSnapshot(
+  await expect(format(result)).toMatchFileSnapshot(
     'addPendingDocument-product-response.json'
   );
 
   const newDocWrite = bridge.getWrite('pages/new-product.md');
   expect(newDocWrite).toBeDefined();
-  expect(newDocWrite).toMatchFileSnapshot('new-product-content.md');
+  await expect(newDocWrite).toMatchFileSnapshot('new-product-content.md');
 });

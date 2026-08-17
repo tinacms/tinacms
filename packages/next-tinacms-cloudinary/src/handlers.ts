@@ -5,9 +5,13 @@
 import { v2 as cloudinary } from 'cloudinary';
 import type { Media, MediaListOptions } from 'tinacms';
 import path from 'path';
+import os from 'os';
 import { NextApiRequest, NextApiResponse } from 'next';
 import multer from 'multer';
 import { promisify } from 'util';
+import { resolveKey, resolveDirectory, MediaKeyError } from './media-key';
+import { escapeSearchValue } from './search-expression';
+import { safeUploadName } from './upload-filename';
 
 export interface CloudinaryConfig {
   cloud_name: string;
@@ -56,12 +60,11 @@ async function uploadMedia(req: NextApiRequest, res: NextApiResponse) {
   const upload = promisify(
     multer({
       storage: multer.diskStorage({
-        // @ts-ignore
-        directory: (req, file, cb) => {
-          cb(null, '/tmp');
+        destination: (req, file, cb) => {
+          cb(null, os.tmpdir());
         },
         filename: (req, file, cb) => {
-          cb(null, file.originalname);
+          cb(null, safeUploadName(file.originalname));
         },
       }),
     }).single('file')
@@ -70,12 +73,36 @@ async function uploadMedia(req: NextApiRequest, res: NextApiResponse) {
   // @ts-ignore
   await upload(req, res);
 
+  // @ts-ignore - multer augments the request with `file`
+  if (!req.file) {
+    return res.status(400).json({ message: 'file is required' });
+  }
+
   const { directory } = req.body;
+  // @ts-ignore - multer augments the request with `file`
+  const filename: string = req.file.originalname;
+
+  let folder: string;
+  try {
+    // Cloudinary has no mediaRoot concept yet; an empty folder (root upload)
+    // is allowed, but traversal / absolute folders are rejected.
+    const rawFolder = (directory || '').replace(/^\/+/, '');
+    folder = rawFolder ? resolveKey('', rawFolder, { decode: false }) : '';
+    // Validate the filename with the same rules. Cloudinary still derives the
+    // public_id from folder + use_filename; we only reject illegal names here
+    // and leave the naming model unchanged.
+    resolveKey('', filename, { decode: false });
+  } catch (e) {
+    if (e instanceof MediaKeyError) {
+      return res.status(400).json({ message: e.message });
+    }
+    throw e;
+  }
 
   try {
     //@ts-ignore
     const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: directory.replace(/^\//, ''),
+      folder,
       use_filename: true,
       overwrite: false,
       resource_type: 'auto',
@@ -93,8 +120,15 @@ async function listMedia(
   opts?: CloudinaryOptions
 ) {
   try {
+    // A repeated query param (?directory=a&directory=b) arrives as an array,
+    // so narrow it before it reaches the string-typed escaper below.
+    const rawDirectory = req.query.directory;
+    const directory = Array.isArray(rawDirectory)
+      ? rawDirectory[0]
+      : rawDirectory;
+
     const mediaListOptions: MediaListOptions = {
-      directory: (req.query.directory as string) || '""',
+      directory: directory || '""',
       limit: parseInt(req.query.limit as string, 10) || 500,
       offset: req.query.offset as string,
       filesOnly: req.query.filesOnly === 'true' || false,
@@ -105,9 +139,24 @@ async function listMedia(
       mediaListOptions.directory === '/' ||
       mediaListOptions.directory === '""';
 
+    if (!useRootDirectory) {
+      try {
+        // Validation only: rejects traversal but does NOT bound the listing
+        // the way resolveDirectory bounds the S3/DOS prefix. The normalised
+        // result is discarded; its trailing slash matches no folder= term.
+        resolveDirectory(mediaListOptions.directory);
+      } catch (e) {
+        if (e instanceof MediaKeyError) {
+          res.status(400).json({ message: e.message });
+          return;
+        }
+        throw e;
+      }
+    }
+
     const query = useRootDirectory
       ? 'folder=""'
-      : `folder="${mediaListOptions.directory}"`;
+      : `folder="${escapeSearchValue(mediaListOptions.directory)}"`;
 
     const response = await cloudinary.search
       .expression(query)
@@ -192,9 +241,21 @@ const findErrorMessage = (e: any) => {
 
 async function deleteAsset(req: NextApiRequest, res: NextApiResponse) {
   const { media } = req.query;
-  const [, public_id] = media as string[];
+  const [, rawPublicId] = media as string[];
 
-  cloudinary.uploader.destroy(public_id as string, {}, (err) => {
+  let public_id: string;
+  try {
+    // The framework already decodes the route param once; decoding again here
+    // would mangle keys containing a literal "%" (e.g. "100%off.png").
+    public_id = resolveKey('', rawPublicId, { decode: false });
+  } catch (e) {
+    if (e instanceof MediaKeyError) {
+      return res.status(400).json({ message: e.message });
+    }
+    throw e;
+  }
+
+  cloudinary.uploader.destroy(public_id, {}, (err: any) => {
     if (err) res.status(500);
     res.json({
       err,

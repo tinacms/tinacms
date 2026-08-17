@@ -46,16 +46,33 @@ export const CodeBlockElement = withRef<typeof PlateElement>(
         return;
       }
 
-      if (mermaid.parse(codeLineToString(element as PlateCodeBlockElement))) {
-        setCodeBlockError(null); // Clear errors on success
-      }
-    }, [element.children]);
+      let isCancelled = false;
 
-    mermaid.parseError = (err: any) => {
-      setCodeBlockError(
-        String(err.message) || 'An error occurred while parsing the diagram.'
-      );
-    };
+      const validateMermaid = async () => {
+        try {
+          await mermaid.parse(
+            codeLineToString(element as PlateCodeBlockElement)
+          );
+
+          if (!isCancelled) {
+            setCodeBlockError(null);
+          }
+        } catch (err) {
+          if (!isCancelled) {
+            setCodeBlockError(
+              String(err.message) ||
+                'An error occurred while parsing the diagram.'
+            );
+          }
+        }
+      };
+
+      validateMermaid();
+
+      return () => {
+        isCancelled = true;
+      };
+    }, [element.children, element.lang]);
 
     return (
       <PlateElement

@@ -3,7 +3,7 @@
 */
 
 import path from 'path';
-import isValid from 'date-fns/isValid/index.js';
+import { isValid } from 'date-fns';
 import { JSONPath } from 'jsonpath-plus';
 import { NAMER } from '../ast-builder';
 import { Database } from '../database';
@@ -18,6 +18,7 @@ import type {
   TinaField,
   TinaSchema,
 } from '@tinacms/schema-tools';
+import { ERR_ALREADY_EXISTS, RELATIVE_PATH_REGEX } from '@tinacms/schema-tools';
 
 import type { GraphQLConfig } from '../types';
 
@@ -48,7 +49,7 @@ export const createResolver = (args: ResolverConfig) => {
   return new Resolver(args);
 };
 
-const resolveFieldData = async (
+export const resolveFieldData = async (
   { namespace, ...field }: TinaField<true>,
   rawData: unknown,
   accumulator: { [key: string]: unknown },
@@ -62,6 +63,8 @@ const resolveFieldData = async (
   assertShape<{ [key: string]: unknown }>(rawData, (yup) => yup.object());
   const value = rawData[field.name];
   switch (field.type) {
+    case 'displayOnly':
+      break;
     case 'datetime':
       // See you in March ;)
       if (value instanceof Date) {
@@ -571,7 +574,9 @@ export class Resolver {
 
     const alreadyExists = await this.database.documentExists(realPath);
     if (alreadyExists) {
-      throw new Error(`Unable to add document, ${realPath} already exists`);
+      throw new Error(
+        `Unable to add document, ${realPath} ${ERR_ALREADY_EXISTS}`
+      );
     }
 
     const templateInfo = this.tinaSchema.getTemplatesForCollectable(collection);
@@ -677,6 +682,27 @@ export class Resolver {
     return input.replace(/\\/g, '/');
   }
 
+  /**
+   * Validates that relativePath is non-empty and contains only allowed
+   * characters: a-z, A-Z, 0-9, hyphens, underscores, periods, and
+   * forward slashes.
+   */
+  private static validateRelativePath(relativePath: string): void {
+    if (!relativePath.trim()) {
+      throw new Error(
+        'Invalid path: relativePath cannot be empty or whitespace'
+      );
+    }
+    if (relativePath !== relativePath.trim()) {
+      throw new Error(
+        'Invalid path: relativePath cannot have leading or trailing whitespace'
+      );
+    }
+    if (!RELATIVE_PATH_REGEX.test(relativePath)) {
+      throw new Error('Invalid path: relativePath contains invalid characters');
+    }
+  }
+
   private validatePath = (
     fullPath: string,
     collection: Collection<true>,
@@ -697,6 +723,8 @@ export class Resolver {
 
     // Validate file extension matches collection format
     if (relativePath) {
+      Resolver.validateRelativePath(relativePath);
+
       const collectionFormat = collection.format || 'md';
       const fileExtension = path.extname(relativePath).toLowerCase().slice(1);
 
@@ -728,6 +756,7 @@ export class Resolver {
       validateExtension?: boolean;
     }
   ): { collection: Collection<true>; realPath: string } => {
+    Resolver.validateRelativePath(relativePath);
     const collection = this.getCollectionWithName(collectionName);
     const sanitizedRelativePath = Resolver.sanitizePath(relativePath);
     const pathSegments = [collection.path, sanitizedRelativePath];
@@ -778,6 +807,7 @@ export class Resolver {
     relativePath: string;
   }) => {
     const collection = this.getCollectionWithName(collectionName);
+    Resolver.validateRelativePath(relativePath);
     const realPath = path.join(
       collection.path,
       relativePath,
@@ -786,7 +816,9 @@ export class Resolver {
     this.validatePath(realPath, collection);
     const alreadyExists = await this.database.documentExists(realPath);
     if (alreadyExists) {
-      throw new Error(`Unable to add folder, ${realPath} already exists`);
+      throw new Error(
+        `Unable to add folder, ${realPath} ${ERR_ALREADY_EXISTS}`
+      );
     }
     await this.database.put(
       realPath,
@@ -811,7 +843,9 @@ export class Resolver {
     );
     const alreadyExists = await this.database.documentExists(realPath);
     if (alreadyExists) {
-      throw new Error(`Unable to add document, ${realPath} already exists`);
+      throw new Error(
+        `Unable to add document, ${realPath} ${ERR_ALREADY_EXISTS}`
+      );
     }
 
     const params = await this.buildObjectMutations(body, collection);
@@ -851,6 +885,15 @@ export class Resolver {
       // don't update if the paths are the same
       if (newRealPath === realPath) {
         return doc;
+      }
+
+      // prevent silent overwrite of an existing document
+      const newPathAlreadyExists =
+        await this.database.documentExists(newRealPath);
+      if (newPathAlreadyExists) {
+        throw new Error(
+          `Unable to rename document, ${newRealPath} ${ERR_ALREADY_EXISTS}`
+        );
       }
 
       // update the document
@@ -1512,6 +1555,8 @@ export class Resolver {
         throw new Error(`Expected to find field by name ${fieldName}`);
       }
       switch (field.type) {
+        case 'displayOnly':
+          break;
         case 'datetime':
           // @ts-ignore FIXME: Argument of type 'string | { [key: string]: unknown; } | (string | { [key: string]: unknown; })[]' is not assignable to parameter of type 'string'
           accum[fieldName] = resolveDateInput(fieldValue, field);

@@ -1,0 +1,22 @@
+---
+import TinaMarkdown from './TinaMarkdown.astro';
+import { sanitizeHref } from './sanitize';
+import type { CustomComponentsMap, LinkElement } from './types';
+
+interface Props {
+  node: LinkElement;
+  components: CustomComponentsMap;
+}
+
+const { node, components } = Astro.props;
+const Override = components.a;
+---
+{Override ? (
+  <Override url={node.url}>
+    <TinaMarkdown content={node.children} components={components} />
+  </Override>
+) : (
+  <a href={sanitizeHref(node.url)}>
+    <TinaMarkdown content={node.children} components={components} />
+  </a>
+)}

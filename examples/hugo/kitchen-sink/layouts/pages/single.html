@@ -1,0 +1,5 @@
+{{ define "main" }}
+  {{ range .Params.blocks }}
+    {{ partial (printf "blocks/%s.html" ._template) . }}
+  {{ end }}
+{{ end }}

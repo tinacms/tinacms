@@ -242,4 +242,15 @@ describe('validateTinaCloudSchemaConfig', () => {
       expect(() => validateTinaCloudSchemaConfig(config)).not.toThrow();
     });
   });
+
+  describe('localContentPath (hash invariant)', () => {
+    it('strips localContentPath from parsed output', () => {
+      const result = validateTinaCloudSchemaConfig({
+        localContentPath: '../content-repo',
+        media: { tina: { publicFolder: 'public', mediaRoot: 'uploads' } },
+      });
+      expect(result).not.toHaveProperty('localContentPath');
+      expect(result.media).toBeDefined();
+    });
+  });
 });

@@ -486,19 +486,14 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
             }),
           };
         } else {
-          const childrenIndex = namePath.findIndex(
-            (value) => value === 'children'
-          );
-          // Find the props for the next item, ignoring parent 'props'
-          const propsIndex =
-            namePath
-              .slice(childrenIndex)
-              .findIndex((value) => value === 'props') + childrenIndex;
+          const childrenIndex = namePath.indexOf('children', namePathIndex + 1);
+          const propsIndex = namePath.indexOf('props', childrenIndex + 1);
           const itemName = namePath.slice(childrenIndex, propsIndex).join('.');
           const item = getIn(value, itemName);
+          if (!item) return formOrObjectField;
           const props = item.props;
           const templateString = item.name;
-          const currentPathIndex = namePathIndex + Math.max(propsIndex, 3);
+          const currentPathIndex = propsIndex;
           const isLastItem = currentPathIndex + 1 === namePath.length;
           const template = field.templates.find(
             (t) => t.name === templateString
@@ -508,29 +503,27 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
             .join('.');
           if (item?.type === 'img') {
             const imageName = namePath.slice(0, currentPathIndex + 2).join('.');
+            const imageBaseName = templateName.replace(/\.props$/, '');
             return {
-              ...formOrObjectField,
-              // name: [formOrObjectField.name, 'img'].join('.'),
+              label: 'Image',
               name: [imageName].join('.'),
               fields: [
                 {
                   type: 'image',
-                  // label: 'URL',
-                  name: [templateName, 'url'].join('.'),
+                  label: 'URL',
+                  name: [imageBaseName, 'url'].join('.'),
                   component: 'image',
                 },
                 {
                   type: 'string',
                   label: 'Alt',
-                  name: [templateName.replace(/\.props$/, ''), 'alt'].join('.'),
+                  name: [imageBaseName, 'alt'].join('.'),
                   component: 'text',
                 },
                 {
                   type: 'string',
                   label: 'Caption',
-                  name: [templateName.replace(/\.props$/, ''), 'caption'].join(
-                    '.'
-                  ),
+                  name: [imageBaseName, 'caption'].join('.'),
                   component: 'text',
                 },
               ],
@@ -541,8 +534,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
               formOrObjectField: template,
               values: props,
               namePath,
-              namePathIndex:
-                namePathIndex + Math.max(4, childrenIndex + propsIndex),
+              namePathIndex: propsIndex + 1,
             });
           }
           if (!template) {

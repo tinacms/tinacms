@@ -38,5 +38,5 @@ it('filters movies by date using after, before, and between operations', async (
     variables: {},
   });
 
-  expect(format(result)).toMatchFileSnapshot('node.json');
+  await expect(format(result)).toMatchFileSnapshot('node.json');
 });

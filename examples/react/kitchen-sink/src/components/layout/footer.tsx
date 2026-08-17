@@ -44,29 +44,27 @@ export const Footer = () => {
             />
           </Link>
           <div className='flex gap-4'>
-            {footer?.social?.map(
-              (social: any, index: number) => {
-                const SocialIcon =
-                  socialIconMap[social.icon?.toLowerCase() ?? ''];
-                if (!SocialIcon || !social.url) return null;
-                return (
-                  <a
-                    key={index}
-                    className='inline-block opacity-80 hover:opacity-100 transition ease-out duration-150'
-                    href={sanitizeHref(social.url)}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                  >
-                    <SocialIcon
-                      className={cn(
-                        socialIconClasses,
-                        'text-theme-500 dark:text-theme-400 hover:text-theme-300'
-                      )}
-                    />
-                  </a>
-                );
-              }
-            )}
+            {footer?.social?.map((social: any, index: number) => {
+              const SocialIcon =
+                socialIconMap[social.icon?.toLowerCase() ?? ''];
+              if (!SocialIcon || !social.url) return null;
+              return (
+                <a
+                  key={index}
+                  className='inline-block opacity-80 hover:opacity-100 transition ease-out duration-150'
+                  href={sanitizeHref(social.url)}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                >
+                  <SocialIcon
+                    className={cn(
+                      socialIconClasses,
+                      'text-theme-500 dark:text-theme-400 hover:text-theme-300'
+                    )}
+                  />
+                </a>
+              );
+            })}
           </div>
         </div>
         <div className='absolute h-1 bg-gradient-to-r from-transparent via-black dark:via-white to-transparent top-0 left-4 right-4 opacity-5' />

@@ -21,7 +21,7 @@ export async function generateStaticParams() {
 
 export default async function BlogFile({ params }: Props) {
   const { filename } = await params;
-  const relativePath = `${filename}.mdx`;
+  const relativePath = `${filename}.md`;
 
   let tinaProps: Awaited<ReturnType<typeof client.queries.blog>>;
   try {

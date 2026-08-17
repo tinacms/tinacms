@@ -1,0 +1,35 @@
+---
+import type { GlobalQuery } from '../../../tina/__generated__/types';
+import { sanitizeHref } from '@tinacms/astro/sanitize';
+import Container from './Container.astro';
+
+interface Props {
+  data: NonNullable<GlobalQuery['global']>['footer'] | null;
+}
+
+const { data } = Astro.props;
+const social = (data?.social ?? []).filter((item) => item !== null);
+
+const iconLabel: Record<string, string> = {
+  github: 'GitHub',
+  twitter: 'Twitter',
+  facebook: 'Facebook',
+  instagram: 'Instagram',
+};
+---
+<footer class="bg-gradient-to-br text-gray-800 from-white to-gray-50 dark:from-gray-900 dark:to-gray-1000 mt-12">
+  <Container size="small" class="flex justify-between items-center gap-6 flex-wrap">
+    <a href="/" class="font-bold tracking-tight text-gray-400 dark:text-gray-300">TinaCMS</a>
+    <div class="flex gap-4">
+      {social.map((item) => {
+        const url = sanitizeHref(item.url, '#');
+        if (!item.icon) return null;
+        return (
+          <a href={url} target="_blank" rel="noopener noreferrer" class="text-theme-500 hover:text-theme-300 text-sm font-medium">
+            {iconLabel[item.icon.toLowerCase()] ?? item.icon}
+          </a>
+        );
+      })}
+    </div>
+  </Container>
+</footer>

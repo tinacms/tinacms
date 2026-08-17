@@ -4,10 +4,14 @@
 	"version": "0.0.0",
 	"workspaces": [
 		"packages/@tinacms/*",
-		"examples/*",
-		"experimental-examples/*",
+		"examples/*/*",
 		"packages/[^@]*"
 	],
+	"engines": {
+		"node": "22.x || 24.x",
+		"npm": "11.x",
+		"pnpm": ">=11"
+	},
 	"scripts": {
 		"dev": "pnpm watch",
 		"watch": "pnpm run build && pnpm --filter=\"./packages/@tinacms/scripts\" run watch",
@@ -16,11 +20,8 @@
 		"update-tina-lock": "pnpm -r --filter='{./**}' --workspace-concurrency=1 run --if-present update-tina-lock",
 		"test": "turbo run test --filter=\"./packages/**\"",
 		"lint:packages": "pnpm --filter './packages/**' --no-bail exec pnpm dlx publint --strict",
-		"test:packages": "vitest run tests/build-verification.test.ts --reporter=verbose && pnpm run lint:packages",
+		"test:packages": "vitest run --reporter=verbose && pnpm run lint:packages",
 		"types": "turbo run types --filter=\"./packages/**\"",
-		"build:e2e": "pnpm run build && pnpm --filter=kitchen-sink-starter run build",
-		"start:e2e": "pnpm --filter=kitchen-sink-starter run start ",
-		"start:e2e:dev": "pnpm --filter=kitchen-sink-starter run dev",
 		"test:dev": "cd playwright/tina-playwright && npx playwright test --ui",
 		"test:e2e": "cd playwright/tina-playwright && npx playwright test",
 		"version": "pnpm exec changeset version",
@@ -29,33 +30,28 @@
 		"publish:beta": "pnpm publish -r --tag beta --no-git-checks --access public",
 		"publish:dev": "pnpm publish -r --tag dev --no-git-checks --access public",
 		"push-tags": "pnpm exec changeset tag && git pull && git push --follow-tags",
-		"lint": "biome lint ./packages",
-		"format": "biome format --write ./packages/"
+		"lint": "biome lint ./packages ./examples",
+		"format": "biome format --write ./packages/ ./examples/",
+		"coverage": "turbo run coverage --filter=\"./packages/v4/**\""
 	},
 	"devDependencies": {
 		"@biomejs/biome": "catalog:",
 		"@changesets/changelog-github": "catalog:",
 		"@changesets/cli": "catalog:",
 		"@types/jest": "^29.5.14",
-		"@types/node": "^22.13.1",
-		"vitest": "^2.1.8",
+		"@types/node": "^22.19.17",
+		"@types/react": "18.3.27",
+		"@types/react-dom": "18.3.7",
+		"vitest": "^2.1.9",
 		"@types/picomatch": "catalog:",
 		"picomatch": "catalog:",
-		"pretty-quick": "catalog:",
 		"turbo": "catalog:",
 		"typescript": "^5.7.3",
-		"vite": "^4.5.9"
+		"vite": "^4.5.14"
 	},
-	"packageManager": "pnpm@9.15.5",
+	"packageManager": "pnpm@11.7.0",
 	"dependencies": {
 		"highlight.js": "catalog:",
 		"react-colorful": "catalog:"
-	},
-	"pnpm": {
-		"overrides": {
-			"@clerk/clerk-js>react": "19.2.3",
-			"@clerk/clerk-js>react-dom": "19.2.3",
-			"@clerk/backend>react": "19.2.3"
-		}
 	}
 }

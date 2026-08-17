@@ -30,7 +30,12 @@ const useImageToolbarButton = (state) => {
       allowDelete: true,
       directory: '',
       onSelect: (media) => {
-        insertImg(editor, media);
+        // Ensure media.src is a string, falling back to parse if available
+        const src =
+          typeof cms?.media?.store?.parse === 'function'
+            ? cms.media.store.parse(media)
+            : media.src;
+        insertImg(editor, { ...media, src: src || media.src });
       },
     });
   };

@@ -2,6 +2,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import { logger } from '../../logger';
 import { GeneratedFile, InitEnvironment } from './index';
+import { parseAstroMajor } from './astro-config-detect';
 import { ContentFrontmatterFormat } from '@tinacms/schema-tools';
 
 const checkGitignoreForItem = async ({
@@ -139,6 +140,8 @@ const detectEnvironment = async ({
   const hasSampleContent = await fs.pathExists(sampleContentPath);
   const hasPackageJSON = await fs.pathExists('package.json');
   let hasTinaDeps = false;
+  let hasReactDep = false;
+  let astroMajor: number | undefined;
 
   if (hasPackageJSON) {
     try {
@@ -153,6 +156,14 @@ const detectEnvironment = async ({
       if (deps.includes('@tinacms/cli') && deps.includes('tinacms')) {
         hasTinaDeps = true;
       }
+      // Both must be present: installing only one leaves the admin SPA with a
+      // missing or mismatched React and a blank screen.
+      if (deps.includes('react') && deps.includes('react-dom')) {
+        hasReactDep = true;
+      }
+      astroMajor = parseAstroMajor(
+        packageJSON?.dependencies?.astro || packageJSON?.devDependencies?.astro
+      );
     } catch (e) {
       logger.error(
         'Error reading package.json assuming that no Tina dependencies are installed'
@@ -169,6 +180,15 @@ const detectEnvironment = async ({
     (await checkGitignoreForItem({ baseDir, line: '.env.tina' }));
   const hasGitIgnoreEnv =
     hasGitIgnore && (await checkGitignoreForItem({ baseDir, line: '.env' }));
+  // Tina writes generated artifacts (including the build cache used by the CLI
+  // to bundle tina/database.ts and tina/config.ts) under tina/__generated__/.
+  // Anything under that path is build output and should not be committed.
+  const hasGitIgnoreTinaGenerated =
+    hasGitIgnore &&
+    (await checkGitignoreForItem({
+      baseDir,
+      line: 'tina/__generated__',
+    }));
   let frontMatterFormat: ContentFrontmatterFormat;
   if (hasForestryConfig) {
     const hugoConfigPath = path.join(rootPath, 'config.toml');
@@ -194,6 +214,7 @@ const detectEnvironment = async ({
     gitIgnoreNodeModulesExists: hasGitIgnoreNodeModules,
     gitIgnoreEnvExists: hasGitIgnoreEnv,
     gitIgnoreTinaEnvExists: hasEnvTina,
+    gitIgnoreTinaGeneratedExists: hasGitIgnoreTinaGenerated,
     packageJSONExists: hasPackageJSON,
     sampleContentExists: hasSampleContent,
     sampleContentPath,
@@ -201,6 +222,8 @@ const detectEnvironment = async ({
     usingSrc,
     tinaConfigExists,
     hasTinaDeps,
+    hasReactDep,
+    astroMajor,
   };
   if (debug) {
     console.log('Environment:');

@@ -3,7 +3,7 @@ import PageRenderer from '../components/tina/PageRenderer';
 import Layout from '../layouts/Layout.astro';
 
 const client = (await import('../../tina/__generated__/client')).default;
-const result = await client.queries.page({ relativePath: 'home.mdx' });
+const result = await client.queries.page({ relativePath: 'home.md' });
 ---
 
 <Layout title="TinaCMS Astro Kitchen Sink">

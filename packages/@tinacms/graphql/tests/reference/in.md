@@ -1,3 +1,0 @@
----
-author: authors/author.md
----

@@ -210,6 +210,7 @@ export const blockElement = (
       return {
         type: 'code',
         lang: content.lang,
+        meta: content.meta,
         value: codeLinesToString(content),
       };
     case 'mdxJsxFlowElement':
@@ -346,7 +347,9 @@ export const blockElement = (
         }),
       };
     default:
-      throw new Error(`BlockElement: ${content.type} is not yet supported`);
+      throw new Error(
+        `This block can't be saved as markdown ("${content.type}"). Remove it from the field to continue.`
+      );
   }
 };
 const listItemElement = (
@@ -359,6 +362,9 @@ const listItemElement = (
     // spread is always false since we don't support block elements in list items
     // good explanation of the difference: https://stackoverflow.com/questions/43503528/extra-lines-appearing-between-list-items-in-github-markdown
     spread: false,
+    ...(typeof content.checked === 'boolean'
+      ? { checked: content.checked }
+      : {}),
     children: content.children.map((child) => {
       if (child.type === 'lic') {
         return {
@@ -402,7 +408,7 @@ const blockContentElement = (
       };
     default:
       throw new Error(
-        `BlockContentElement: ${content.type} is not yet supported`
+        `This block can't be saved as markdown ("${content.type}"). Remove it from the field to continue.`
       );
   }
 };

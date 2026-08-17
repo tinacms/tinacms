@@ -1,0 +1,8 @@
+{{/*
+  CTA block — title, description, centered action buttons.
+  Context: block data from page frontmatter.
+*/}}
+{{ $color := .color | default "default" }}
+
+{{ $sectionContent := partial "blocks/cta-content.html" . }}
+{{ partial "section.html" (dict "color" $color "content" $sectionContent) }}

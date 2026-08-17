@@ -1,0 +1,40 @@
+---
+import client from '../../../tina/__generated__/client';
+import Base from '../../layouts/Base.astro';
+import { sanitizeImageSrc } from '@tinacms/astro/sanitize';
+import { cardLinkClasses, cn, formatDate } from '../../lib/utils';
+
+const allPosts = await client.queries
+  .postConnection({ first: 1000 })
+  .catch(() => null);
+const posts = (allPosts?.data?.postConnection?.edges ?? []).flatMap((edge) =>
+  edge?.node ? [edge.node] : []
+);
+---
+<Base title="Posts | TinaCMS Astro Visual Editing">
+  <section class="flex-1 relative">
+    <div class="max-w-3xl mx-auto px-6 sm:px-8 py-24">
+      <h2 class="text-4xl font-extrabold tracking-tight mb-12 text-center title-font text-gray-800 dark:text-gray-50">Posts</h2>
+      {posts.length === 0 ? (
+        <p class="text-center text-gray-500 dark:text-gray-400 py-12">No posts found.</p>
+      ) : (
+        posts.map((post) => {
+          const formattedDate = post.date ? formatDate(post.date) : '';
+          const postUrl = `/posts/${post._sys.breadcrumbs?.join('/') || post._sys.filename}`;
+          const avatarSrc = post.author?.avatar ? sanitizeImageSrc(post.author.avatar) : '';
+          return (
+            <a href={postUrl} class={cn(cardLinkClasses, 'px-6 sm:px-8 md:px-10 py-10 mb-8 last:mb-0')}>
+              <h3 class="text-3xl lg:text-4xl font-semibold text-theme-600 dark:text-theme-400 mb-5">{post.title}</h3>
+              <div class="flex items-center">
+                {avatarSrc && <img src={avatarSrc} alt={post.author?.name || ''} width="40" height="40" class="object-cover rounded-full shadow-sm mr-2" />}
+                {post.author?.name && <p class="text-base font-medium text-gray-600 dark:text-gray-200">{post.author.name}</p>}
+                {formattedDate && <span class="font-bold text-gray-200 dark:text-gray-500 mx-2">—</span>}
+                {formattedDate && <p class="text-base text-gray-400 dark:text-gray-300">{formattedDate}</p>}
+              </div>
+            </a>
+          );
+        })
+      )}
+    </div>
+  </section>
+</Base>

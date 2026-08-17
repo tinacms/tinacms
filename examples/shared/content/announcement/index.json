@@ -1,0 +1,6 @@
+{
+  "enabled": true,
+  "message": "This is a site-wide announcement bar — editable as a Global collection.",
+  "linkLabel": "Learn more",
+  "linkHref": "/blog"
+}

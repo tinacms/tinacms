@@ -17,6 +17,13 @@ import type { MediaUsage } from './media-usage-scanner';
 import { useMediaUsageScanner } from './useMediaUsageScanner';
 import { MediaLightbox } from './media-lightbox';
 import { MediaUsageTable } from './media-usage-table';
+import { useEffect } from 'react';
+import { captureEvent } from '../../../../lib/posthog/posthogProvider';
+import {
+  MediaUsageDashboardOpenedEvent,
+  MediaUsageDashboardRefreshedEvent,
+  MediaUsageDashboardRefreshedPayload,
+} from '../../../../lib/posthog/posthog';
 
 /**
  * Media Usage Dashboard component that displays media files and their usage across the CMS
@@ -24,6 +31,11 @@ import { MediaUsageTable } from './media-usage-table';
 export const MediaUsageDashboard = ({
   close: onClose,
 }: ScreenComponentProps) => {
+  useEffect(() => {
+    console.log('MediaUsageDashboard');
+    captureEvent(MediaUsageDashboardOpenedEvent);
+  }, []);
+
   const { mediaItems, isLoading, errorOccurred, progress, refresh } =
     useMediaUsageScanner();
   const [lightboxImage, setLightboxImage] = useState<MediaUsage | null>(null);
@@ -63,7 +75,13 @@ export const MediaUsageDashboard = ({
         controls={
           <Button
             variant='outline'
-            onClick={refresh}
+            onClick={async () => {
+              await refresh();
+              const payload = {
+                errorOccured: errorOccurred,
+              } as MediaUsageDashboardRefreshedPayload;
+              captureEvent(MediaUsageDashboardRefreshedEvent, payload);
+            }}
             disabled={isLoading}
             className='flex items-center gap-2 shadow-sm font-medium transition-colors'
           >
