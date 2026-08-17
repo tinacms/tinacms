@@ -143,7 +143,6 @@ catalog:
     abstract-level: ^1.0.4
     acorn: 8.8.2
     altair-express-middleware: ^7.3.6
-    async-lock: ^1.4.1
     auto-bind: ^4.0.0
     autoprefixer: ^10.4.20
     axios: 1.7.5
@@ -163,8 +162,9 @@ catalog:
     cors: ^2.8.5
     cross-spawn: ^7.0.6
     crypto-js: ^4.2.0
+    dompurify: ^3.3.1
     dotenv: ^16.4.7
-    esbuild: ^0.25.0
+    esbuild: ^0.28.1
     estree-util-is-identifier-name: 2.1.0
     fast-glob: ^3.3.3
     final-form: 4.20.10
@@ -245,7 +245,7 @@ catalog:
     stopword: ^3.1.4
     stringify-entities: 4.0.3
     tailwindcss-animate: ^1.0.7
-    tar: 7.4.0
+    tar: 7.5.21
     ts-jest: ^29.2.5
     ts-node: ^10.9.2
     tsc-alias: ^1.8.10
