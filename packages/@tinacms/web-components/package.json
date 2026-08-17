@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/web-components",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "files": [
     "package.json",
@@ -10,8 +10,8 @@
   "license": "Apache-2.0",
   "buildConfig": {
     "entryPoints": [
-        "./src/tina-markdown.js",
-        "./src/visual-editing.js"
+      "./src/tina-markdown.js",
+      "./src/visual-editing.js"
     ]
   },
   "scripts": {
