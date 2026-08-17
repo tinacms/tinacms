@@ -1,7 +1,9 @@
 import type { Config } from '@tinacms/schema-tools';
-import AsyncLock from 'async-lock';
 import type { GraphQLError } from 'graphql';
 import type { Cache } from '../cache/index';
+import { AsyncLock } from './asyncLock';
+
+export { AsyncLock } from './asyncLock';
 
 export const TINA_HOST = 'content.tinajs.io';
 export interface TinaClientArgs<GenQueries = Record<string, unknown>> {
