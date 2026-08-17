@@ -1,3 +1,4 @@
+import { ERR_NOT_INDEXED } from '@tinacms/schema-tools';
 import {
   Button,
   Modal,
@@ -9,7 +10,6 @@ import {
   TinaCMS,
   useCMS,
 } from '@tinacms/toolkit';
-import { ERR_NOT_INDEXED } from '@tinacms/schema-tools';
 import React, { useState, useEffect } from 'react';
 import {
   Route,
@@ -19,9 +19,9 @@ import {
   useParams,
 } from 'react-router-dom';
 
+import Sidebar from './components/AdminNav';
 import GetCMS from './components/GetCMS';
 import Layout from './components/Layout';
-import Sidebar from './components/AdminNav';
 
 import CollectionCreatePage from './pages/CollectionCreatePage';
 import CollectionDuplicatePage from './pages/CollectionDuplicatePage';
@@ -30,14 +30,18 @@ import CollectionUpdatePage from './pages/CollectionUpdatePage';
 import DashboardPage from './pages/DashboardPage';
 import ScreenPage from './pages/ScreenPage';
 
+import pkg from '../../package.json';
 import { Client, TinaCloudAuthProvider } from '../internalClient';
+import {
+  TelemetryMode,
+  TinaCMSStartedEvent,
+  initializePostHog,
+} from '../lib/posthog';
 import { TinaAdminApi } from './api';
 import {
-  initializePostHog,
-  TinaCMSStartedEvent,
-  TelemetryMode,
-} from '../lib/posthog';
-import pkg from '../../package.json';
+  AnnouncementsBanner,
+  AnnouncementsProvider,
+} from './components/AnnouncementsBanner';
 
 type AuthType = 'tinacloud' | 'self-hosted' | 'local' | 'other';
 
@@ -195,7 +199,14 @@ const PreviewInner = ({ preview, config }) => {
     }, 100);
   }, [ref.current]);
   const Preview = preview;
-  return <Preview url={url} iframeRef={ref} {...config} />;
+  return (
+    <div className='flex flex-col h-screen'>
+      <AnnouncementsBanner />
+      <div className='flex-1 min-h-0'>
+        <Preview url={url} iframeRef={ref} {...config} />
+      </div>
+    </div>
+  );
 };
 
 const CheckSchema = ({
@@ -306,7 +317,7 @@ export const TinaAdmin = ({
             });
           const hasRouter = Boolean(collectionWithRouter);
           return (
-            <>
+            <AnnouncementsProvider>
               <PostHogTracker cms={cms} />
               <CheckSchema schemaJson={schemaJson}>
                 <Router>
@@ -416,7 +427,7 @@ export const TinaAdmin = ({
                   </Routes>
                 </Router>
               </CheckSchema>
-            </>
+            </AnnouncementsProvider>
           );
         } else {
           return (
