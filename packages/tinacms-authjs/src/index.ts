@@ -6,9 +6,10 @@ import { TINA_CREDENTIALS_PROVIDER_NAME } from './tinacms';
 
 // next-auth v4 is CommonJS: webpack unwraps its `__esModule` default but Node's
 // ESM loader and esbuild do not, breaking every non-Next.js backend. See #7434.
-const NextAuth = (NextAuthImport as any).default ?? NextAuthImport;
-const CredentialsProvider =
-  (CredentialsImport as any).default ?? CredentialsImport;
+const interopDefault = <T>(mod: T & { default?: T }): T => mod.default ?? mod;
+
+const NextAuth = interopDefault(NextAuthImport);
+const CredentialsProvider = interopDefault(CredentialsImport);
 
 const authenticate = async (
   databaseClient: any,
