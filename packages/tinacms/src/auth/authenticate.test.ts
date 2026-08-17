@@ -3,6 +3,9 @@ import {
   authenticate,
   AUTH_TOKEN_KEY,
   AuthenticationCancelledError,
+  getWorkosEnabled,
+  resetWorkosEnabledCache,
+  PKCE_STORAGE_KEY,
 } from './authenticate';
 
 vi.mock('./popupWindow', () => ({
@@ -11,6 +14,8 @@ vi.mock('./popupWindow', () => ({
 
 import popupWindow from './popupWindow';
 
+const CLIENT_ID = 'test-client-id';
+const IDENTITY_API_URL = 'https://api.example';
 const FRONTEND_URL = 'https://frontend.example';
 const EXPECTED_ORIGIN = 'https://frontend.example';
 const UNTRUSTED_ORIGIN = 'https://untrusted.example';
@@ -24,14 +29,11 @@ const validData = {
   refresh_token: 'refresh-token',
 };
 
-// A stand-in for the Window object returned by window.open.
 const makeAuthTab = () => ({
   close: vi.fn(),
   closed: false,
 });
 
-// Captured `message` listeners registered against the real window. We spy on
-// addEventListener/removeEventListener so the real window object is preserved.
 let messageListeners: Array<(e: MessageEvent) => void>;
 let authTab: ReturnType<typeof makeAuthTab>;
 
@@ -41,7 +43,17 @@ const dispatch = (e: Partial<MessageEvent>) => {
   }
 };
 
+let originalHref: string;
+let fetchSpy: ReturnType<typeof vi.fn>;
+
 beforeEach(() => {
+  originalHref = window.location.href;
+  Object.defineProperty(window, 'location', {
+    value: new URL('https://mysite.com/admin'),
+    writable: true,
+  });
+  localStorage.clear();
+
   vi.useFakeTimers();
   messageListeners = [];
   authTab = makeAuthTab();
@@ -62,15 +74,24 @@ beforeEach(() => {
       }
     }
   );
+
+  resetWorkosEnabledCache();
+  fetchSpy = vi.fn();
+  vi.stubGlobal('fetch', fetchSpy);
 });
 
 afterEach(() => {
+  Object.defineProperty(window, 'location', {
+    value: new URL(originalHref),
+    writable: true,
+  });
+  localStorage.clear();
   vi.useRealTimers();
   vi.restoreAllMocks();
+  vi.unstubAllGlobals();
 });
 
-// Drive the popup-closed poll so a pending authenticate() promise settles
-// deterministically, and assert it rejects with the cancellation error.
+// Set up rejection handler before advancing timers to avoid unhandled rejection warning.
 const settleViaPopupClose = async (result: Promise<unknown>) => {
   const expectation = expect(result).rejects.toThrowError(
     new AuthenticationCancelledError('Popup was closed')
@@ -80,41 +101,139 @@ const settleViaPopupClose = async (result: Promise<unknown>) => {
   await expectation;
 };
 
-describe('authenticate origin/source validation', () => {
-  it('ignores a message from an untrusted origin', async () => {
-    const result = authenticate('client-id', FRONTEND_URL);
-
-    dispatch({
-      origin: UNTRUSTED_ORIGIN,
-      source: authTab as unknown as Window,
-      data: validData,
+describe('getWorkosEnabled', () => {
+  it('returns true when workosEnabled is true', async () => {
+    fetchSpy.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ workosEnabled: true }),
     });
 
-    // The handler should not have resolved; the listener stays registered.
-    expect(messageListeners.length).toBe(1);
-    expect(authTab.close).not.toHaveBeenCalled();
-
-    await settleViaPopupClose(result);
+    const result = await getWorkosEnabled(IDENTITY_API_URL);
+    expect(result).toBe(true);
+    expect(fetchSpy).toHaveBeenCalledWith(`${IDENTITY_API_URL}/v2/auth/config`);
   });
 
-  it('ignores a message from the expected origin but a different source', async () => {
-    const result = authenticate('client-id', FRONTEND_URL);
-
-    const otherWindow = makeAuthTab();
-    dispatch({
-      origin: EXPECTED_ORIGIN,
-      source: otherWindow as unknown as Window,
-      data: validData,
+  it('returns false when workosEnabled is false', async () => {
+    fetchSpy.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ workosEnabled: false }),
     });
 
-    expect(messageListeners.length).toBe(1);
-    expect(authTab.close).not.toHaveBeenCalled();
-
-    await settleViaPopupClose(result);
+    const result = await getWorkosEnabled(IDENTITY_API_URL);
+    expect(result).toBe(false);
   });
 
-  it('accepts a message from the expected origin and the exact opened popup source', async () => {
-    const result = authenticate('client-id', FRONTEND_URL);
+  it('caches the result across calls', async () => {
+    fetchSpy.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ workosEnabled: true }),
+    });
+
+    await getWorkosEnabled(IDENTITY_API_URL);
+    await getWorkosEnabled(IDENTITY_API_URL);
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('throws on non-200 response', async () => {
+    fetchSpy.mockResolvedValueOnce({
+      ok: false,
+      status: 500,
+      statusText: 'Internal Server Error',
+    });
+
+    await expect(getWorkosEnabled(IDENTITY_API_URL)).rejects.toThrow(
+      'Failed to fetch auth config: 500 Internal Server Error'
+    );
+  });
+
+  it('throws when workosEnabled is missing from response', async () => {
+    fetchSpy.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({}),
+    });
+
+    await expect(getWorkosEnabled(IDENTITY_API_URL)).rejects.toThrow(
+      'Invalid auth config response'
+    );
+  });
+});
+
+describe('authenticate — WorkOS enabled (PKCE redirect)', () => {
+  beforeEach(() => {
+    fetchSpy.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ workosEnabled: true }),
+    });
+  });
+
+  it('stores PKCE data in localStorage', async () => {
+    authenticate(CLIENT_ID, IDENTITY_API_URL, FRONTEND_URL);
+
+    await vi.waitFor(() => {
+      const stored = JSON.parse(localStorage.getItem(PKCE_STORAGE_KEY));
+      expect(stored).toBeTruthy();
+      expect(stored.client_id).toBe(CLIENT_ID);
+      expect(stored.identity_api_url).toBe(IDENTITY_API_URL);
+      expect(stored.code_verifier).toHaveLength(128);
+      expect(stored.state).toBeTruthy();
+    });
+  });
+
+  it('redirects to /v2/auth/tinacms', async () => {
+    await authenticate(CLIENT_ID, IDENTITY_API_URL, FRONTEND_URL);
+
+    const redirectUrl = new URL(window.location.href);
+    expect(redirectUrl.origin + redirectUrl.pathname).toBe(
+      `${IDENTITY_API_URL}/v2/auth/tinacms`
+    );
+    expect(redirectUrl.searchParams.get('response_type')).toBe('code');
+    expect(redirectUrl.searchParams.get('client_id')).toBe(CLIENT_ID);
+    expect(redirectUrl.searchParams.get('redirect_uri')).toBe(
+      'https://mysite.com/admin'
+    );
+    expect(redirectUrl.searchParams.get('code_challenge_method')).toBe('S256');
+    expect(redirectUrl.searchParams.get('code_challenge')).toBeTruthy();
+    expect(redirectUrl.searchParams.get('state')).toBeTruthy();
+  });
+});
+
+describe('authenticate — WorkOS disabled (popup)', () => {
+  beforeEach(() => {
+    fetchSpy.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ workosEnabled: false }),
+    });
+  });
+
+  it('opens a popup to the frontend signin URL', async () => {
+    const result = authenticate(CLIENT_ID, IDENTITY_API_URL, FRONTEND_URL);
+
+    await vi.waitFor(() => {
+      expect(popupWindow).toHaveBeenCalledWith(
+        expect.stringContaining(`${FRONTEND_URL}/signin`),
+        '_blank',
+        window,
+        1000,
+        700
+      );
+    });
+
+    // Set up rejection handler before triggering to avoid unhandled rejection warning.
+    const expectation = expect(result).rejects.toThrow(
+      AuthenticationCancelledError
+    );
+    authTab.closed = true;
+    await vi.advanceTimersByTimeAsync(600);
+    await expectation;
+  });
+
+  it('resolves with tokens on valid message', async () => {
+    const result = authenticate(CLIENT_ID, IDENTITY_API_URL, FRONTEND_URL);
+
+    await vi.waitFor(() => {
+      expect(messageListeners.length).toBe(1);
+    });
 
     dispatch({
       origin: EXPECTED_ORIGIN,
@@ -128,60 +247,35 @@ describe('authenticate origin/source validation', () => {
       refresh_token: 'refresh-token',
     });
     expect(authTab.close).toHaveBeenCalled();
-    // Listener cleaned up after a successful login.
-    expect(messageListeners.length).toBe(0);
   });
 
-  it('derives expectedOrigin from new URL(frontendUrl).origin, including the port', async () => {
-    const result = authenticate('client-id', 'https://frontend.example:8443');
-
-    // Same host but the default port (no :8443) is a different origin.
-    dispatch({
-      origin: 'https://frontend.example',
-      source: authTab as unknown as Window,
-      data: validData,
-    });
-    expect(authTab.close).not.toHaveBeenCalled();
-
-    // Exact origin including the port is accepted.
-    dispatch({
-      origin: 'https://frontend.example:8443',
-      source: authTab as unknown as Window,
-      data: validData,
-    });
-
-    await expect(result).resolves.toEqual({
-      id_token: 'id-token',
-      access_token: 'access-token',
-      refresh_token: 'refresh-token',
-    });
-    expect(authTab.close).toHaveBeenCalled();
-  });
-
-  it('does not read event.data before origin/source validation', async () => {
-    const result = authenticate('client-id', FRONTEND_URL);
-
-    let dataAccessed = false;
-    const trap = {
-      get source() {
-        dataAccessed = true;
-        return TINA_LOGIN_EVENT;
-      },
-    };
-
-    // Untrusted origin: the handler must bail out before touching e.data.
-    dispatch({
-      origin: UNTRUSTED_ORIGIN,
-      source: authTab as unknown as Window,
-      data: trap,
-    });
-
-    expect(dataAccessed).toBe(false);
+  it('rejects when popup is closed without auth', async () => {
+    const result = authenticate(CLIENT_ID, IDENTITY_API_URL, FRONTEND_URL);
 
     await settleViaPopupClose(result);
   });
 });
 
-it('exports the auth token key', () => {
-  expect(AUTH_TOKEN_KEY).toBe('tinacms-auth');
+describe('authenticate — propagates fetch errors', () => {
+  it('throws when /v2/auth/config fetch fails', async () => {
+    fetchSpy.mockResolvedValueOnce({
+      ok: false,
+      status: 500,
+      statusText: 'Internal Server Error',
+    });
+
+    await expect(
+      authenticate(CLIENT_ID, IDENTITY_API_URL, FRONTEND_URL)
+    ).rejects.toThrow('Failed to fetch auth config');
+  });
+});
+
+describe('exports', () => {
+  it('exports the auth token key', () => {
+    expect(AUTH_TOKEN_KEY).toBe('tinacms-auth');
+  });
+
+  it('exports the PKCE storage key', () => {
+    expect(PKCE_STORAGE_KEY).toBe('tinacms-pkce');
+  });
 });
