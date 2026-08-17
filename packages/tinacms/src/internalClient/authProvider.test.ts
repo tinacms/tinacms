@@ -43,7 +43,7 @@ describe('TinaCloudAuthProvider getRefreshedToken', () => {
   };
 
   const storedToken = (provider: TinaCloudAuthProvider): TokenObject =>
-    JSON.parse(provider.token);
+    provider.token;
 
   it('keeps the existing refresh token when the response does not include a new one', async () => {
     const provider = buildProvider();
