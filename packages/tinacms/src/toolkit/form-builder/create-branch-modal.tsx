@@ -1,7 +1,9 @@
+import { FieldLabel } from '@toolkit/fields';
+import { Form } from '@toolkit/forms';
+import { Button, DropdownButton } from '@toolkit/styles';
+import { GitBranchIcon, TriangleAlert } from 'lucide-react';
 import * as React from 'react';
 import { BiError } from 'react-icons/bi';
-import { GitBranchIcon, TriangleAlert } from 'lucide-react';
-import { Button, DropdownButton } from '@toolkit/styles';
 import { useCMS } from '../react-core';
 import {
   Modal,
@@ -10,43 +12,9 @@ import {
   ModalHeader,
   PopupModal,
 } from '../react-modals';
-import { FieldLabel } from '@toolkit/fields';
-import { Form } from '@toolkit/forms';
+import { formatDefaultBranchName, normalizeBranchName } from './branch-name';
 import { useEditorialWorkflow } from './use-editorial-workflow';
 import { WorkflowProgressIndicator } from './workflow-progress-indicator';
-
-// Format the default branch name by removing content/ prefix and file extension
-const formatDefaultBranchName = (
-  filePath: string,
-  crudType: string
-): string => {
-  let result = filePath;
-
-  const contentPrefix = 'content/';
-  // Remove "content/" prefix if present
-  if (result.startsWith(contentPrefix)) {
-    result = result.substring(contentPrefix.length);
-  }
-
-  // Remove file extension
-  const lastDot = result.lastIndexOf('.');
-  const lastSlash = Math.max(result.lastIndexOf('/'), result.lastIndexOf('\\'));
-  if (lastDot > lastSlash && lastDot > 0) {
-    result = result.slice(0, lastDot);
-  }
-
-  result = normalizeBranchSlashes(result);
-
-  // Add deletion indicator for delete operations
-  if (crudType === 'delete') {
-    result = `❌-${result}`;
-  }
-
-  return result;
-};
-
-const normalizeBranchSlashes = (name: string): string =>
-  name.split('/').filter(Boolean).join('/');
 
 export const CreateBranchModal = ({
   close,
@@ -72,6 +40,7 @@ export const CreateBranchModal = ({
   );
   const [isBranchGuardChecking, setIsBranchGuardChecking] =
     React.useState(false);
+  const normalizedBranchName = normalizeBranchName(newBranchName);
 
   const {
     isExecuting,
@@ -116,7 +85,7 @@ export const CreateBranchModal = ({
     setIsBranchGuardChecking(false);
 
     const success = await executeWorkflow({
-      branchName: `tina/${normalizeBranchSlashes(newBranchName)}`,
+      branchName: `tina/${normalizedBranchName}`,
       baseBranch,
       path,
       values,
@@ -205,7 +174,7 @@ export const CreateBranchModal = ({
               variant='primary'
               align='start'
               className='w-full sm:w-auto'
-              disabled={newBranchName === '' || isBranchGuardChecking}
+              disabled={normalizedBranchName === '' || isBranchGuardChecking}
               onMainAction={executeEditorialWorkflow}
               items={[
                 {
