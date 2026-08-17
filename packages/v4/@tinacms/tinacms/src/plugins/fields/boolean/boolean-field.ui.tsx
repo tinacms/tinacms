@@ -20,7 +20,7 @@ export function BooleanField() {
     <FieldWrapper errors={errors}>
       <Checkbox
         ref={inputRef}
-        aria-label={address}
+        id={address}
         checked={value ?? false}
         onCheckedChange={(checked) => setValue(checked === true)}
       />

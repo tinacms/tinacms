@@ -1,4 +1,3 @@
-import type { Effects, State, Code } from 'micromark-util-types';
 import { factorySpace } from 'micromark-factory-space';
 import { factoryWhitespace } from 'micromark-factory-whitespace';
 import {
@@ -10,6 +9,7 @@ import {
 } from 'micromark-util-character';
 import { codes } from 'micromark-util-symbol/codes';
 import { types } from 'micromark-util-symbol/types';
+import type { Code, Effects, State } from 'micromark-util-types';
 
 export function factoryAttributes(
   effects: Effects,

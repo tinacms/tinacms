@@ -1,17 +1,35 @@
 import '@testing-library/jest-dom';
 import { configure } from '@testing-library/dom';
 import { beforeEach } from 'vitest';
+import { resolveClientSegments } from '../core/plugin';
 import { useFormStore } from '../form/form-store';
+import { corePlugins } from '../plugins/fields';
 
-// findBy*/waitFor default to 1s — too tight for TinaProvider's async boot
-// (plugin graph + lazy segment imports) on loaded CI runners.
+// TinaProvider renders null until its boot resolves each plugin's client() thunk —
+// a dynamic import Vite transforms on demand. Load the core segments up front so
+// that cost never lands in a test's findBy* budget, where a loaded runner blows it.
+await resolveClientSegments(corePlugins);
+
+// Backstop. No test that renders <TinaProvider> should need the headroom.
 configure({ asyncUtilTimeout: 5000 });
 
-// The form-store is a module-level singleton, so its state bleeds across tests.
-// Reset it here for every test file rather than mandating a beforeEach per file.
-// localStorage too: every createTinaStore persists/rehydrates the shared
-// 'tina-store' key, so durable namespaces would otherwise leak between tests.
+// react-aria restores HTMLElement.prototype.focus by assignment on `beforeunload`.
+// A render turns that property into a getter-only accessor, so the restore throws.
+const keepFocusAssignable = () => {
+  const descriptor = Object.getOwnPropertyDescriptor(
+    HTMLElement.prototype,
+    'focus'
+  );
+  if (!descriptor || 'value' in descriptor) return;
+  Object.defineProperty(HTMLElement.prototype, 'focus', {
+    value: HTMLElement.prototype.focus,
+    writable: true,
+    configurable: true,
+  });
+};
+
 beforeEach(() => {
+  keepFocusAssignable();
   useFormStore.setState({ forms: {}, active: null });
   localStorage.clear();
 });
