@@ -13,7 +13,7 @@ import { dangerText, warnText } from '../../../utils/theme';
 import { Codegen } from '../../codegen';
 import { ConfigManager } from '../../config-manager';
 import { createAndInitializeDatabase, createDBServer } from '../../database';
-import { getBasePath, getDevServerUrl } from '../../vite';
+import { getAdminApiURL, getBasePath, getDevServerUrl } from '../../vite';
 import { BaseCommand } from '../baseCommands';
 import { devHTML } from './html';
 import { createDevServer } from './server';
@@ -182,10 +182,7 @@ export class DevCommand extends BaseCommand {
     });
 
     const devServerUrl = getDevServerUrl(configManager, this.port);
-    // The admin runs in the browser, so it needs the browser-facing URL rather
-    // than the localhost one codegen bakes into the generated client.
-    const adminApiURL =
-      configManager.config?.contentApiUrlOverride || `${devServerUrl}/graphql`;
+    const adminApiURL = getAdminApiURL(configManager, this.port);
     await fs.outputFile(
       configManager.outputHTMLFilePath,
       devHTML(devServerUrl, getBasePath(configManager))

@@ -17,6 +17,7 @@ import {
 import { createSearchIndexRouter } from '../commands/dev-command/server/searchIndex';
 import type { ConfigManager } from '../config-manager';
 import { buildCorsOriginCheck, isOriginAllowed } from './cors';
+import { getAllowedOrigins } from './devServerUrl';
 
 export const transformTsxPlugin = ({
   configManager: _configManager,
@@ -63,7 +64,7 @@ export const devServerEndPointsPlugin = ({
   searchIndex: any;
   databaseLock: (fn: () => Promise<void>) => Promise<void>;
 }) => {
-  const allowedOrigins = configManager.config?.server?.allowedOrigins;
+  const allowedOrigins = getAllowedOrigins(configManager);
   const corsOriginCheck = buildCorsOriginCheck(allowedOrigins);
 
   /**
