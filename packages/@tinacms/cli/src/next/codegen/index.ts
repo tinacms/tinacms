@@ -1,13 +1,13 @@
-import fs from 'fs-extra';
 import path from 'path';
-import { buildASTSchema, printSchema } from 'graphql';
-import type { GraphQLSchema, DocumentNode } from 'graphql';
-import { generateTypes } from './codegen';
-import { transform } from 'esbuild';
-import { ConfigManager } from '../config-manager';
-import type { TinaSchema } from '@tinacms/schema-tools';
 import { mapUserFields } from '@tinacms/graphql';
+import type { TinaSchema } from '@tinacms/schema-tools';
+import { transform } from 'esbuild';
+import fs from 'fs-extra';
+import { buildASTSchema, printSchema } from 'graphql';
+import type { DocumentNode, GraphQLSchema } from 'graphql';
 import normalizePath from 'normalize-path';
+import { ConfigManager } from '../config-manager';
+import { generateTypes } from './codegen';
 import { stripSearchTokenFromConfig } from './stripSearchTokenFromConfig';
 export const TINA_HOST = 'content.tinajs.io';
 
@@ -215,6 +215,7 @@ export class Codegen {
     }
     return apiURL;
   }
+
   private _createApiUrl() {
     const branch = this.configManager.config?.branch;
     const clientId = this.configManager.config?.clientId;
