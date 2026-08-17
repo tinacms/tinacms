@@ -180,7 +180,7 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
     if (!access_token) {
       throw new Error('Unable to refresh auth tokens: missing access_token');
     }
-    const { client_id, exp } = this.parseJwt(access_token);
+    const { exp } = this.parseJwt(access_token);
 
     // if the token is going to expire within the next two minutes, refresh it now
     if (Date.now() / 1000 >= exp - 120) {
@@ -189,7 +189,7 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
       const params = new URLSearchParams();
       params.set('grant_type', 'refresh_token');
       params.set('refresh_token', refresh_token);
-      params.set('client_id', client_id);
+      params.set('client_id', this.clientId);
 
       try {
         const res = await fetch(url, {

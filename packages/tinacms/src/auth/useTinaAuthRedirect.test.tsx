@@ -141,6 +141,7 @@ describe('useTinaAuthRedirect', () => {
   it('exchanges the code and stores the tokens on success', async () => {
     seedPkceStorage();
     fetchSpy.mockResolvedValueOnce({
+      ok: true,
       json: () =>
         Promise.resolve({ access_token: 'access-token', refresh_token: '' }),
     });
@@ -191,6 +192,35 @@ describe('useTinaAuthRedirect', () => {
   it('bails and clears storage when the token endpoint returns an error', async () => {
     seedPkceStorage();
     fetchSpy.mockResolvedValueOnce({
+      ok: false,
+      status: 400,
+      json: () => Promise.resolve({ message: 'invalid_grant' }),
+    });
+
+    renderHook(() =>
+      useTinaAuthRedirect({ code: CODE, state: STATE, error: null })
+    );
+
+    await vi.waitFor(() => {
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Token exchange failed:',
+        expect.any(Error)
+      );
+    });
+
+    expect(localStorage.getItem(PKCE_STORAGE_KEY)).toBeNull();
+    expect(replaceStateSpy).toHaveBeenCalledWith(
+      {},
+      '',
+      window.location.pathname
+    );
+    expect(localStorage.getItem(AUTH_TOKEN_KEY)).toBeNull();
+  });
+
+  it('bails and clears storage when the response is ok but body contains an error', async () => {
+    seedPkceStorage();
+    fetchSpy.mockResolvedValueOnce({
+      ok: true,
       json: () => Promise.resolve({ error: 'invalid_grant' }),
     });
 

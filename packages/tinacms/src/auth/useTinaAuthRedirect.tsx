@@ -62,12 +62,19 @@ export const useTinaAuthRedirect = (
       },
       body: tokenParams.toString(),
     })
-      .then((res) => res.json())
-      .then((data) => {
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(
+            data.message || data.error || `Token exchange failed: ${res.status}`
+          );
+        }
         if (data.error) {
           throw new Error(data.error);
         }
-
+        return data;
+      })
+      .then((data) => {
         localStorage.setItem(
           AUTH_TOKEN_KEY,
           JSON.stringify({
