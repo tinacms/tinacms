@@ -78,7 +78,6 @@
         "@tinacms/search": "workspace:^",
         "@vitejs/plugin-react": "catalog:",
         "altair-express-middleware": "catalog:",
-        "async-lock": "catalog:",
         "auto-bind": "catalog:",
         "body-parser": "catalog:",
         "busboy": "catalog:",

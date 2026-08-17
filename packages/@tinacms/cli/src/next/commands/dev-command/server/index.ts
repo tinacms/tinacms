@@ -1,7 +1,6 @@
-import AsyncLock from 'async-lock';
+import type { Database } from '@tinacms/graphql';
 import { createServer as createViteServer } from 'vite';
 import type { Plugin } from 'vite';
-import type { Database } from '@tinacms/graphql';
 import { ConfigManager } from '../../../config-manager';
 import { createConfig } from '../../../vite';
 import {
