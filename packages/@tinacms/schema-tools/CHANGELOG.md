@@ -1,5 +1,18 @@
 # @tinacms/schema-tools
 
+## 2.9.0
+
+### Minor Changes
+
+- [#7392](https://github.com/tinacms/tinacms/pull/7392) [`4b7d9b9`](https://github.com/tinacms/tinacms/commit/4b7d9b9f116f7f649aae1a573c838a663f97d99d) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: add tina-markdown web component
+  feat: add visual-editing library for web components
+
+### Patch Changes
+
+- [#7304](https://github.com/tinacms/tinacms/pull/7304) [`d7a1641`](https://github.com/tinacms/tinacms/commit/d7a16416b1b4bc1ba0e2aabdddcf39ed1e4135d7) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - refactor: facilitate token refresh through tinacloud
+
+- [#7327](https://github.com/tinacms/tinacms/pull/7327) [`5050709`](https://github.com/tinacms/tinacms/commit/5050709dcbbc99530d6b284021c259d098d6455d) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: when WorkOS is enabled, use a redirect-based workflow for authentication
+
 ## 2.8.3
 
 ### Patch Changes

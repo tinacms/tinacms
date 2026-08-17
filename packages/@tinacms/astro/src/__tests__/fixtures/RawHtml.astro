@@ -1,0 +1,9 @@
+---
+interface Props {
+  value: string;
+}
+
+const { value } = Astro.props;
+---
+
+<div data-raw-html set:html={value} />

@@ -14,7 +14,6 @@ import {
 } from '@tinacms/toolkit';
 import React, { useEffect, useState } from 'react';
 import { ModalBuilder } from './AuthModal';
-import { AuthenticationCancelledError } from './authenticate';
 import loginLlama from './tina-login.png';
 
 import { TinaAdminApi } from '../admin/api';
@@ -22,12 +21,17 @@ import {
   Client,
   LocalSearchClient,
   TinaCMSSearchClient,
+  TinaCloudAuthProvider,
   TinaIOConfig,
 } from '../internalClient';
-import { CreateClientProps, createClient } from '../utils';
-import { useTinaAuthRedirect } from './useTinaAuthRedirect';
-import { captureEvent } from '../lib/posthog/posthogProvider';
 import { BranchSwitchedEvent } from '../lib/posthog/posthog';
+import { captureEvent } from '../lib/posthog/posthogProvider';
+import { CreateClientProps, createClient } from '../utils';
+import { AuthenticationCancelledError } from './authenticate';
+import {
+  type AuthRedirectParams,
+  useTinaAuthRedirect,
+} from './useTinaAuthRedirect';
 
 type ModalNames = null | 'authenticate' | 'error';
 
@@ -54,7 +58,8 @@ const AuthWallInner = ({
   children,
   cms,
   getModalActions,
-}: TinaCloudAuthWallProps) => {
+  isAuthRedirect,
+}: TinaCloudAuthWallProps & { isAuthRedirect?: boolean }) => {
   const client: Client = cms.api.tina;
   // Whether we are using TinaCloud for auth
   const isTinaCloud =
@@ -81,6 +86,14 @@ const AuthWallInner = ({
 
   React.useEffect(() => {
     let mounted = true;
+
+    if (isAuthRedirect) {
+      setActiveModal('authenticate');
+      return () => {
+        mounted = false;
+      };
+    }
+
     client.authProvider
       .isAuthenticated()
       .then((isAuthenticated) => {
@@ -156,15 +169,12 @@ const AuthWallInner = ({
       }
       return onAuthenticated();
     } catch (e: any) {
-      // If user just closed the popup, silently reset - don't show error
-      // Check both instanceof and error name (in case of module boundary issues)
       if (
         e instanceof AuthenticationCancelledError ||
         e?.name === 'AuthenticationCancelledError'
       ) {
         return;
       }
-
       console.error(e);
       setActiveModal('error');
       setErrorMessage({
@@ -213,6 +223,7 @@ const AuthWallInner = ({
             )
           }
           close={close}
+          busy={isAuthRedirect}
           actions={[
             ...otherModalActions,
             {
@@ -229,6 +240,7 @@ const AuthWallInner = ({
             title={modalTitle}
             message={''}
             close={close}
+            busy={isAuthRedirect}
             actions={[
               ...otherModalActions,
               {
@@ -345,7 +357,7 @@ export const TinaCloudProvider = (
     'tinacms-current-branch',
     baseBranch
   );
-  useTinaAuthRedirect();
+
   const cms = React.useMemo(
     () =>
       props.cms ||
@@ -442,6 +454,17 @@ export const TinaCloudProvider = (
   const isTinaCloud =
     !client.isLocalMode &&
     !client.schema?.config?.config?.contentApiUrlOverride;
+  const isTinaCloudAuth = client.authProvider instanceof TinaCloudAuthProvider;
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const authRedirectParams: AuthRedirectParams = {
+    code: urlParams.get('code'),
+    state: urlParams.get('state'),
+    error: urlParams.get('error'),
+  };
+  const isAuthRedirect =
+    isTinaCloudAuth && !!(authRedirectParams.code && authRedirectParams.state);
+  useTinaAuthRedirect(authRedirectParams, isTinaCloudAuth);
   const SessionProvider = client.authProvider.getSessionProvider();
 
   const handleListBranches = async (): Promise<Branch[]> => {
@@ -537,7 +560,7 @@ export const TinaCloudProvider = (
       >
         <TinaProvider cms={cms}>
           <MediaWorkflowOverlay />
-          <AuthWallInner {...props} cms={cms} />
+          <AuthWallInner {...props} cms={cms} isAuthRedirect={isAuthRedirect} />
         </TinaProvider>
       </BranchDataProvider>
     </SessionProvider>

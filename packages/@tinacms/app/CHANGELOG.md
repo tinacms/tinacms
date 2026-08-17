@@ -1,5 +1,53 @@
 # @tinacms/app
 
+## 2.5.11
+
+### Patch Changes
+
+- [#7429](https://github.com/tinacms/tinacms/pull/7429) [`7df6e04`](https://github.com/tinacms/tinacms/commit/7df6e04e4b5574bf7c0ddf8aa1240716fa03d20f) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Switching a rich-text field to raw markdown no longer blanks the whole admin.
+
+  Two things could take the editing session down. The raw editor arrives as a lazy chunk, so a failed fetch after a deploy or on a flaky connection tore the page down. It also serializes the field while rendering, so content it cannot represent threw with the chunk already loaded. Applying inline code and then bolding a word inside it was enough. Either way you got a blank page: no message, no way back, and unsaved work in the other fields gone with it.
+
+  The failure now stays inside the field it came from. You get the thrown message, which for the formatting case names what to undo, and a button back to the rich-text editor.
+
+- [#7218](https://github.com/tinacms/tinacms/pull/7218) [`4499dcb`](https://github.com/tinacms/tinacms/commit/4499dcb69f3bb614dda24aab9c475c5adf76b403) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Remove `typescript` from `@tinacms/app`'s production dependencies.
+
+  It was declared in both `dependencies` and `devDependencies`, but nothing in `src/` imports it — the package ships raw source and is compiled by `@tinacms/cli`. Every TinaCMS user was installing a second copy of the TypeScript compiler (~23 MB) for nothing. It remains a devDependency for type-checking.
+
+- [#7388](https://github.com/tinacms/tinacms/pull/7388) [`17931b7`](https://github.com/tinacms/tinacms/commit/17931b72762afb575505c383ee6355476207a44e) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: add announcements banner
+
+- [#7216](https://github.com/tinacms/tinacms/pull/7216) [`cf75e5b`](https://github.com/tinacms/tinacms/commit/cf75e5b8dd3209203df9fe1ffbc12a9d965277f9) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Collapse three icon libraries into `lucide-react` (~85 MB).
+
+  `tinacms` declared `react-icons` (84 MB), `lucide-react` (32 MB) and `@heroicons/react` as production dependencies, so every user installed all three. Icon usage is entirely internal admin chrome — there is no icon-picker, no `icon` schema field type, and no dynamic whole-set import — so `react-icons` and `@heroicons/react` have been removed in favour of `lucide-react`, which was already the de-facto house set.
+
+  Not a breaking change for user content, schemas, or plugins: `ScreenPlugin.Icon` is typed `any`, and `CloudConfigOptions` is not publicly exported. The internal `IconType` prop type is now lucide's `LucideIcon`.
+
+  Six icons have no exact lucide counterpart and were substituted: `BsCheckCircleFill`/`BsExclamationOctagonFill` → `CircleCheck`/`OctagonAlert` (lucide is outline-only), `MdSyncProblem` → `RefreshCwOff`, `TbLogs` → `ScrollText`, `BiRename` → `SquarePen`, `MdOutlineDataSaverOff` → `Info`.
+
+- [#7327](https://github.com/tinacms/tinacms/pull/7327) [`5050709`](https://github.com/tinacms/tinacms/commit/5050709dcbbc99530d6b284021c259d098d6455d) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: when WorkOS is enabled, use a redirect-based workflow for authentication
+
+- [#7216](https://github.com/tinacms/tinacms/pull/7216) [`cf75e5b`](https://github.com/tinacms/tinacms/commit/cf75e5b8dd3209203df9fe1ffbc12a9d965277f9) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Drop `@headlessui/react` (~50 MB).
+
+  Headless UI v2 pulls in the entire React Aria stack (`react-aria` 34.8 MB, `react-stately` 9.4 MB, `@internationalized/*`) — about 50 MB installed — to provide components Radix already covers. `tinacms` was shipping three headless component libraries at once (`@radix-ui/*` in 22 files, `@headlessui/react` in 11, `@ariakit/react` in 1).
+
+  The 11 Headless UI files now use Radix (`Popover`, `DropdownMenu`) and local state, consolidating on the library that was already the majority. No new dependencies were added.
+
+  `Transition`/`TransitionChild` are replaced by a small local equivalent with the same prop API (`show`, `appear`, `enter*`/`leave*`). It uses `element.getAnimations({ subtree: true })` so a parent transition with no classes of its own still waits for its children to finish leaving before unmounting.
+
+- [#7214](https://github.com/tinacms/tinacms/pull/7214) [`bd4df92`](https://github.com/tinacms/tinacms/commit/bd4df92a7e00bd74ee13eaf9f9b584fbb1a864ab) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Stop shipping the `monaco-editor` package (~73 MB).
+
+  Every import of `monaco-editor` in shipped source was **types-only**. The editor itself has always been fetched from a CDN at runtime by `@monaco-editor/loader`, so the 73 MB installed on every user's disk was never executed — and was a different version (0.31.0) from the one that actually runs (0.55.1, the loader's default).
+
+  `monaco-editor` is a _required_ peer dependency of `@monaco-editor/react`, and npm 7+ auto-installs required peers, so removing it from our `dependencies` was not enough on its own. `@tinacms/app` now uses `@monaco-editor/loader` directly — the same loader `@monaco-editor/react` wraps, so the CDN and editor version are unchanged — and `monaco-editor` is kept as a devDependency for its types.
+
+  The copy of the raw editor in `packages/tinacms` was dead code: nothing imported it, it was not exported, and its `parseMDX`/`stringifyMDX` were stubs returning empty values. The live raw editor lives in `@tinacms/app` and is injected into `tinacms` as the `rawEditor` prop. It has been deleted, letting `tinacms` drop both monaco packages entirely.
+
+  No behaviour change: raw MDX mode still loads the same editor from the same CDN.
+
+- Updated dependencies [[`d7a1641`](https://github.com/tinacms/tinacms/commit/d7a16416b1b4bc1ba0e2aabdddcf39ed1e4135d7), [`f014558`](https://github.com/tinacms/tinacms/commit/f014558a7ece15964b3b2eda942c02fc609dc32f), [`17931b7`](https://github.com/tinacms/tinacms/commit/17931b72762afb575505c383ee6355476207a44e), [`cf75e5b`](https://github.com/tinacms/tinacms/commit/cf75e5b8dd3209203df9fe1ffbc12a9d965277f9), [`5050709`](https://github.com/tinacms/tinacms/commit/5050709dcbbc99530d6b284021c259d098d6455d), [`cf75e5b`](https://github.com/tinacms/tinacms/commit/cf75e5b8dd3209203df9fe1ffbc12a9d965277f9), [`bd4df92`](https://github.com/tinacms/tinacms/commit/bd4df92a7e00bd74ee13eaf9f9b584fbb1a864ab), [`566f977`](https://github.com/tinacms/tinacms/commit/566f9775bc306f1a41806a29eb22182700765974), [`064b78e`](https://github.com/tinacms/tinacms/commit/064b78e9407d5d7f91ab11dd8b99de8f8ac38ab1), [`a0e0d2e`](https://github.com/tinacms/tinacms/commit/a0e0d2e8d573abfbfb5a3d277ffe1c2b6d692e37), [`2860f56`](https://github.com/tinacms/tinacms/commit/2860f569b3f4f8f6115ee4399af855ea3baa61e1), [`5f14d96`](https://github.com/tinacms/tinacms/commit/5f14d96fdba3d7a143827fc1cac9c7964c3f9b01), [`b6199da`](https://github.com/tinacms/tinacms/commit/b6199da1eeea7de01d5216c9b50c9e158440f891), [`ece366b`](https://github.com/tinacms/tinacms/commit/ece366bd5aa86e048d22f829319e41fe3d1267ba), [`4a19d66`](https://github.com/tinacms/tinacms/commit/4a19d669b069c0af959c6461cd60b5910aea6512), [`4b7d9b9`](https://github.com/tinacms/tinacms/commit/4b7d9b9f116f7f649aae1a573c838a663f97d99d), [`5112e60`](https://github.com/tinacms/tinacms/commit/5112e60bd0c98f6de36f63dbf068d252993e586f), [`8c8e297`](https://github.com/tinacms/tinacms/commit/8c8e297efb12324f23785a5f8f7acbceeb3f0a4a)]:
+  - tinacms@3.12.0
+  - @tinacms/mdx@2.2.0
+
 ## 2.5.10
 
 ### Patch Changes
