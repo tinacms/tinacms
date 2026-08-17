@@ -1,19 +1,4 @@
-// Browser-only entry — `tinacms/react`.
-// Imported by the Admin UI host and by plugin client segments.
-// The server-side adapters (next/express/astro/hono in the adapters/ folder) must NOT be imported from here.
-//
-// Provider + the `<Field>` Component-resolution primitive (ADR-009), the
-// address-keyed Form hooks (ADR-010), and the editor half of visual editing
-// (usePreviewConnection — the site half lives on the ./preview entry). Field
-// values render through react-hook-form; clean/dirty/pristine state is the
-// form-state store's single source of truth.
-
 export { type FieldAddress, toFieldAddress } from '../core/field/address';
-// Read-only form-store surface: clean/dirty/pristine state plus the values/errors
-// mirror of any open form (useFormValues/useFormErrors — collection-level
-// indicators, mounted or not). The store handle and its mutators stay
-// package-internal (the editor drives writes) so plugin client segments cannot
-// poke form state directly (ADR-010 §6).
 export {
   type FieldErrors,
   type FormId,
@@ -38,8 +23,23 @@ export {
   usePreviewConnection,
 } from './preview-connection';
 export {
+  type CollectionDocuments,
+  CONTENT_STALE_TIME,
+  contentKeys,
+  type DocumentRead,
+  type DocumentSave,
+  type SaveDocumentInput,
+  useCollectionDocuments,
+  useDocument,
+  useInvalidateContent,
+  useSaveDocument,
+} from './content-queries';
+export {
   type ActiveField,
   useActiveField,
+  useContentSlice,
+  useDiscardEdits,
+  useDocumentPath,
   useFieldActivation,
   useFieldAddress,
   useFieldErrors,
@@ -48,5 +48,6 @@ export {
   useFieldValue,
   useFormId,
   useFormSave,
+  useFormSeedKey,
   useTinaStore,
 } from './hooks';

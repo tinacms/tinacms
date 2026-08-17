@@ -1,3 +1,4 @@
+import { invariant } from '../invariant';
 import {
   REGISTRY_CONFLICTS,
   type RegistryConflict,
@@ -13,13 +14,19 @@ import type { FieldDescriptor } from './contract';
 
 export type FieldRegistry = Map<string, FieldDescriptor>;
 
-const overridesFieldKey = (manifest: PluginManifest, key: string): boolean =>
+export const overridesFieldKey = (
+  manifest: PluginManifest,
+  key: string
+): boolean =>
   manifest.overrides.some(
     (override) =>
       override.capability === FIELD_CAPABILITY && override.key === key
   );
 
-const fieldConflictError = (conflict: RegistryConflict, key: string): Error => {
+export const fieldConflictError = (
+  conflict: RegistryConflict,
+  key: string
+): Error => {
   if (conflict === REGISTRY_CONFLICTS.duplicateOverride) {
     return new Error(
       `Two plugins both declare an \`overrides\` for the \`field\` type "${key}". ` +
@@ -32,21 +39,32 @@ const fieldConflictError = (conflict: RegistryConflict, key: string): Error => {
   );
 };
 
+const fieldEntryOf = ({ manifest, segment }: ResolvedSegment) => {
+  if (!(manifest.field || segment.field)) return [];
+  invariant(
+    manifest.field,
+    'field-plugin-no-provision',
+    `Plugin "${manifest.name}" has a field descriptor but declares no \`field: { type, contractVersion }\` on its manifest.`
+  );
+  invariant(
+    segment.field,
+    'field-plugin-no-descriptor',
+    `Plugin "${manifest.name}" declares the field type "${manifest.field.type}" but its client segment exports no field descriptor.`
+  );
+  return [
+    {
+      key: manifest.field.type,
+      value: segment.field,
+      isOverride: overridesFieldKey(manifest, manifest.field.type),
+    },
+  ];
+};
+
 export const createFieldRegistry = (
   resolved: ResolvedSegment[]
 ): FieldRegistry =>
   composeOverridableRegistry(
-    resolved.flatMap(({ manifest, segment }) =>
-      segment.field
-        ? [
-            {
-              key: segment.field.type,
-              value: segment.field,
-              isOverride: overridesFieldKey(manifest, segment.field.type),
-            },
-          ]
-        : []
-    ),
+    resolved.flatMap(fieldEntryOf),
     fieldConflictError
   );
 

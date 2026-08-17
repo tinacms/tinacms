@@ -142,11 +142,9 @@ const composeServerRuntime = async (
 };
 
 // Read the transport hooks from the auth segment, and remove them from its routable
-// ops. The dispatch then returns 404 for their names through its normal lookup. Without
-// a callable getSession, this returns null, and every non-public op fails closed. A
-// rolePermissions that is not callable fails the composition. A silent change to the
-// built-in bundles would grant the wildcard of the admin role, which the provider did
-// not intend.
+// ops. The dispatch then returns 404 for their names through its normal lookup.
+// Without a callable getSession, this returns null, so every non-public op fails
+// closed. A rolePermissions that is not callable fails the composition.
 const claimAuthTransportHooks = (
   segmentsByNamespace: Map<string, ResolvedServerSegment>
 ): AuthTransportHooks | null => {
@@ -212,11 +210,8 @@ const refusalOf = (request: Request): Response | null => {
   return null;
 };
 
-// The operation a path addresses, or null when it addresses none.
 const routeOf = (request: Request, mountPath?: string): RpcRoute | null => {
   const segments = new URL(request.url).pathname.split('/').filter(Boolean);
-  // Without a mount path the route is the last two segments, so any prefix reaches the
-  // operation. With one, the path has to be exactly the mount and those two.
   const routed = mountPath
     ? segmentsBelowMount(segments, mountPath)
     : segments.slice(-2);
@@ -235,15 +230,15 @@ const segmentsBelowMount = (
   return segments.slice(mount.length);
 };
 
+// One catch covers all the code after the routing, because that code belongs to the
+// plugins. A thrown error carries internal details, which must not reach an HTTP
+// body. The runtime context covers the same region, so use() also resolves inside
+// the auth hooks.
 const dispatch = async (
   runtime: ServerRuntime,
   request: Request,
   { namespace, opName }: RpcRoute
 ): Promise<Response> => {
-  // One catch covers all the code after the routing, because that code belongs to the
-  // plugins. A thrown error carries internal details, which must not reach an HTTP
-  // body. The runtime context covers the same region, so use() also resolves inside
-  // the auth hooks.
   try {
     return await serverRuntimeStorage.run(runtime, () =>
       authorizeAndInvokeOp(runtime, request, namespace, opName)
@@ -275,9 +270,10 @@ const authorizeAndInvokeOp = async (
   // `requires`, because a caller with no session has no permissions to check.
   const meta = opMeta(op);
   if (!meta.public) {
-    const session = runtime.authHooks
-      ? await runtime.authHooks.getSession(request)
-      : null;
+    if (!runtime.authHooks) {
+      return errorResponse(401, 'unauthenticated', 'No CMS session.');
+    }
+    const session = await runtime.authHooks.getSession(request);
     if (!session) {
       return errorResponse(401, 'unauthenticated', 'No CMS session.');
     }
@@ -333,13 +329,13 @@ const invokeOp = (op: ServerOp, input: unknown): Promise<unknown> =>
   (op as (input: unknown) => Promise<unknown>)(input);
 
 const hasPermission = async (
-  authHooks: AuthTransportHooks | null,
+  authHooks: AuthTransportHooks,
   session: Session,
   permission: string
 ): Promise<boolean> => {
   for (const role of session.roles) {
     // A provider that resolves the roles owns the whole map (ADR-008 §3 and §4).
-    const permissions = authHooks?.rolePermissions
+    const permissions = authHooks.rolePermissions
       ? await authHooks.rolePermissions(role)
       : (DEFAULT_ROLE_PERMISSIONS[role] ?? []);
     if (permissions.includes('*') || permissions.includes(permission)) {

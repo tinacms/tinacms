@@ -41,12 +41,13 @@ export interface AuthTransportHooks {
 // permissions are granted to nobody by default except admin's wildcard. Null-prototype,
 // so a role named after an Object.prototype member ("constructor", "__proto__")
 // resolves to nothing rather than an inherited function.
-export const DEFAULT_ROLE_PERMISSIONS: Record<string, string[]> = Object.assign(
-  Object.create(null),
-  {
-    admin: ['*'],
-    editor: [],
-  }
+export const DEFAULT_ROLE_PERMISSIONS: Readonly<
+  Record<string, readonly string[]>
+> = Object.freeze(
+  Object.assign(Object.create(null), {
+    admin: Object.freeze(['*']),
+    editor: Object.freeze([]),
+  })
 );
 
 // Op-level authorization marks (ADR-008): bare handlers are protected by default;
@@ -66,6 +67,11 @@ interface TaggedOp {
 }
 
 const tagOp = <TOp extends ServerOp>(handler: TOp, meta: OpMeta): TOp => {
+  invariant(
+    (handler as TaggedOp)[OP_META] === undefined,
+    'op-already-tagged',
+    'This handler already carries an authorization mark; wrap the bare handler instead.'
+  );
   const wrapped = ((input: never) => handler(input)) as TOp & TaggedOp;
   wrapped[OP_META] = meta;
   return wrapped;

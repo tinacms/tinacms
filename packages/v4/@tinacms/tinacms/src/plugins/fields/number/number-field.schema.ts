@@ -16,15 +16,11 @@ export const number = (
 
 const labelOf = (node: NumberFieldSchema): string => node.label ?? node.name;
 
-// Coerce the editor string before validating. Guard empty (incl. whitespace-only)
-// explicitly: `0` is valid and a falsy test would smuggle empty in as zero.
 const toNumber = (value: unknown): unknown => {
   const trimmed = typeof value === 'string' ? value.trim() : value;
   return trimmed === '' || trimmed == null ? undefined : Number(trimmed);
 };
 
-// `min`/`max` are value bounds (not string length); a non-numeric string becomes
-// `NaN` and `.finite()` also rejects `Infinity` (which JSON would write as `null`).
 export const numberSchema = (node: FieldSchema): ZodType => {
   const field = node as NumberFieldSchema;
   let schema = z
@@ -46,7 +42,6 @@ export const numberSchema = (node: FieldSchema): ZodType => {
     );
   }
   if (field.required) {
-    // Empty coerces to `undefined`, which fails the non-optional schema.
     return z.preprocess(toNumber, schema);
   }
   return z.preprocess(toNumber, schema.optional());

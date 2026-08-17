@@ -6,9 +6,9 @@
 export type RpcProxy<TSegments> = {
   [Namespace in keyof TSegments]: {
     [Op in keyof TSegments[Namespace]]: TSegments[Namespace][Op] extends (
-      input: infer TInput
+      ...args: infer TArgs
     ) => Promise<infer TResult>
-      ? (input: TInput) => Promise<TResult>
+      ? (...args: TArgs) => Promise<TResult>
       : never;
   };
 };
@@ -25,7 +25,6 @@ export class RpcError extends Error {
 }
 
 export interface RpcClientConfig {
-  // The base URL where the handler is mounted, for example `/api/tina`.
   url: string;
   // The session credential is a bearer token, and the transport attaches it
   // (ADR-023 §4). Without it, in local development with no auth, a request carries no
@@ -50,12 +49,20 @@ export const createRpcClient = <TSegments>(
     }
   ) as RpcProxy<TSegments>;
 
-// A get trap sees every read of a property, and not the operation calls alone. A symbol,
-// which an inspector reads, and `then`, which `await` reads, must therefore read as
-// absent. Without that, `await client.media` hangs, and an inspector sends POST requests
-// that no one wanted.
-const isReservedProxyKey = (key: string | symbol): key is symbol | 'then' =>
-  typeof key === 'symbol' || key === 'then';
+// A get trap sees every read of a property, and not the operation calls alone. Await
+// reads `then`, and console/inspector code reads `toString`, `valueOf`, and `toJSON`.
+// Each must read as absent, or `await client.media` hangs and an inspector call sends
+// an unwanted POST.
+const RESERVED_PROXY_KEYS: ReadonlySet<string> = new Set([
+  'then',
+  'toString',
+  'valueOf',
+  'toJSON',
+]);
+const isReservedProxyKey = (
+  key: string | symbol
+): key is symbol | 'then' | 'toString' | 'valueOf' | 'toJSON' =>
+  typeof key === 'symbol' || RESERVED_PROXY_KEYS.has(key);
 
 const createNamespaceProxy = (config: RpcClientConfig, namespace: string) =>
   new Proxy(
@@ -88,27 +95,36 @@ const postOp = async (
   return unwrapRpcResponse(response, namespace, opName);
 };
 
+// A 2xx that is not JSON is not a result. An SSO interstitial or a proxy's own page
+// comes back with 200, and parsing it as "null" would resolve the call as an empty
+// success — the caller then writes that absence into the UI as though it were data.
 const unwrapRpcResponse = async (
   response: Response,
   namespace: string,
   opName: string
 ): Promise<unknown> => {
-  // A 2xx that is not JSON is not a result. An SSO interstitial or a proxy's own page
-  // comes back with 200, and parsing it as "null" would resolve the call as an empty
-  // success — the caller then writes that absence into the UI as though it were data.
-  const isJson = response.headers
+  const mimeEssence = response.headers
     .get('content-type')
-    ?.toLowerCase()
-    .includes('application/json');
-  if (response.ok && !isJson) {
-    throw new RpcError(
-      response.status,
-      'rpc-not-json',
-      `RPC ${namespace}/${opName} returned ${response.status} but not JSON.`
-    );
+    ?.replace(/;.*/, '')
+    .trim()
+    .toLowerCase();
+  if (response.ok) {
+    if (mimeEssence !== 'application/json') {
+      throw new RpcError(
+        response.status,
+        'rpc-not-json',
+        `RPC ${namespace}/${opName} returned ${response.status} but not JSON.`
+      );
+    }
+    return response.json().catch(() => {
+      throw new RpcError(
+        response.status,
+        'rpc-not-json',
+        `RPC ${namespace}/${opName} returned ${response.status} with a body that is not JSON.`
+      );
+    });
   }
   const payload = await response.json().catch(() => null);
-  if (response.ok) return payload;
   const error = (payload as { error?: { code?: string; message?: string } })
     ?.error;
   throw new RpcError(

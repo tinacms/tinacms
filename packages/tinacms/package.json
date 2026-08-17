@@ -101,7 +101,7 @@
     "graphql-tag": "catalog:",
     "is-hotkey": "catalog:",
     "lucide-react": "catalog:",
-    "mermaid": "^11.12.2",
+    "mermaid": "catalog:",
     "posthog-js": "^1.347.1",
     "prism-react-renderer": "catalog:",
     "prop-types": "catalog:",
