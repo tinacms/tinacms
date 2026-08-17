@@ -7,6 +7,7 @@ import {
 } from '@tinacms/toolkit';
 import React from 'react';
 import { TinaIcon } from '@toolkit/icons';
+import { AnnouncementsBanner } from './AnnouncementsBanner';
 
 export const PageWrapper = ({
   headerClassName,
@@ -27,6 +28,7 @@ export const PageWrapper = ({
           <BranchPreviewButton />
         </div>
       </div>
+      <AnnouncementsBanner />
       {children}
     </div>
   );
