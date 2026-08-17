@@ -13,7 +13,7 @@ import { dangerText, warnText } from '../../../utils/theme';
 import { Codegen } from '../../codegen';
 import { ConfigManager } from '../../config-manager';
 import { createAndInitializeDatabase, createDBServer } from '../../database';
-import { getBasePath } from '../../vite';
+import { getBasePath, getDevServerUrl } from '../../vite';
 import { BaseCommand } from '../baseCommands';
 import { devHTML } from './html';
 import { createDevServer } from './server';
@@ -177,12 +177,15 @@ export class DevCommand extends BaseCommand {
         }
       }
     };
-    const { apiURL, graphQLSchema, tinaSchema } = await setup({
+    const { graphQLSchema, tinaSchema } = await setup({
       firstTime: true,
     });
 
-    const devServerUrl =
-      configManager.config?.server?.url || `http://localhost:${this.port}`;
+    const devServerUrl = getDevServerUrl(configManager, this.port);
+    // The admin runs in the browser, so it needs the browser-facing URL rather
+    // than the localhost one codegen bakes into the generated client.
+    const adminApiURL =
+      configManager.config?.contentApiUrlOverride || `${devServerUrl}/graphql`;
     await fs.outputFile(
       configManager.outputHTMLFilePath,
       devHTML(devServerUrl, getBasePath(configManager))
@@ -251,7 +254,7 @@ export class DevCommand extends BaseCommand {
       configManager,
       database,
       searchIndexWithFuzzy,
-      apiURL,
+      adminApiURL,
       this.noWatch,
       dbLock
     );
@@ -300,7 +303,7 @@ export class DevCommand extends BaseCommand {
           },
           {
             key: 'API url',
-            value: apiURL,
+            value: adminApiURL,
           },
           ...subItems,
         ],

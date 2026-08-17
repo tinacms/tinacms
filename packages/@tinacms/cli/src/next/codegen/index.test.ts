@@ -318,15 +318,46 @@ describe('Codegen local API URL', () => {
     });
   });
 
-  it('uses server.url for local dev when provided', () => {
+  it('stays on localhost when server.url is set', () => {
+    // server.url only moves the browser-facing URLs. The generated client is
+    // called by the user's own server runtime, which usually cannot reach the
+    // external host.
     const codegen = stubCodegen();
     codegen.configManager.config.server = {
       url: 'https://my-codespace-4001.github.dev',
     } as any;
 
     expect((codegen as any)._createApiUrl()).toMatchObject({
-      apiURL: 'https://my-codespace-4001.github.dev/graphql',
-      localUrl: 'https://my-codespace-4001.github.dev/graphql',
+      apiURL: 'http://localhost:4001/graphql',
+      localUrl: 'http://localhost:4001/graphql',
     });
+  });
+
+  it('lets contentApiUrlOverride win over server.url', () => {
+    const codegen = stubCodegen();
+    codegen.configManager.config.server = {
+      url: 'https://my-codespace-4001.github.dev',
+    } as any;
+    codegen.configManager.config.contentApiUrlOverride =
+      'https://my-proxy.test/graphql';
+
+    expect((codegen as any)._createApiUrl()).toMatchObject({
+      apiURL: 'https://my-proxy.test/graphql',
+      localUrl: 'https://my-proxy.test/graphql',
+      tinaCloudUrl: 'https://my-proxy.test/graphql',
+    });
+  });
+
+  it('keeps localBuildUrl on localhost for --content=local builds', () => {
+    const codegen = stubCodegen();
+    codegen.configManager.config.server = {
+      url: 'https://my-codespace-4001.github.dev',
+    } as any;
+    codegen.localContentBuild = true;
+
+    const result = (codegen as any)._createApiUrl();
+
+    expect(result.localBuildUrl).toBe('http://localhost:4001/graphql');
+    expect(result.apiURL).toBe(result.tinaCloudUrl);
   });
 });

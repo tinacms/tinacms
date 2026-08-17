@@ -16,7 +16,12 @@ jest.mock('./tailwind', () => ({
 import type { Database } from '@tinacms/graphql';
 import type { ConfigManager } from '../config-manager';
 import * as filterPublicEnvModule from './filterPublicEnv';
-import { createConfig, getBasePath } from './index';
+import {
+  createConfig,
+  getAllowedHosts,
+  getBasePath,
+  getDevServerUrl,
+} from './index';
 
 /** Minimal stub satisfying the properties createConfig reads. */
 function stubConfigManager(): ConfigManager {
@@ -103,6 +108,89 @@ describe('getBasePath', () => {
     });
 
     expect(config.base).toBe(getBasePath(cm));
+  });
+});
+
+describe('getDevServerUrl', () => {
+  const stubWithServerUrl = (url?: string) => {
+    const cm = stubConfigManager();
+    (cm.config as any).server = url ? { url } : undefined;
+    return cm;
+  };
+
+  it('falls back to localhost when server.url is unset', () => {
+    expect(getDevServerUrl(stubWithServerUrl(), 4001)).toBe(
+      'http://localhost:4001'
+    );
+  });
+
+  it('uses server.url when set', () => {
+    expect(
+      getDevServerUrl(stubWithServerUrl('https://mycontainer.test'), 4001)
+    ).toBe('https://mycontainer.test');
+  });
+
+  it('strips a trailing slash so concatenated paths are not doubled', () => {
+    expect(
+      getDevServerUrl(stubWithServerUrl('https://mycontainer.test/'), 4001)
+    ).toBe('https://mycontainer.test');
+  });
+
+  it('keeps a non-default port', () => {
+    expect(
+      getDevServerUrl(stubWithServerUrl('http://mycontainer.test:8080'), 4001)
+    ).toBe('http://mycontainer.test:8080');
+  });
+
+  it('ignores a path on server.url (basePath owns subpaths)', () => {
+    expect(
+      getDevServerUrl(stubWithServerUrl('https://mycontainer.test/admin'), 4001)
+    ).toBe('https://mycontainer.test');
+  });
+
+  it('throws a config error when server.url has no protocol', () => {
+    expect(() =>
+      getDevServerUrl(stubWithServerUrl('mycontainer.test'), 4001)
+    ).toThrow(/Invalid `server.url`/);
+  });
+});
+
+describe('getAllowedHosts', () => {
+  const stubWithServerUrl = (url?: string) => {
+    const cm = stubConfigManager();
+    (cm.config as any).server = url ? { url } : undefined;
+    return cm;
+  };
+
+  it('is empty when server.url is unset, matching Vite defaults', () => {
+    expect(getAllowedHosts(stubWithServerUrl())).toEqual([]);
+  });
+
+  it('allows the configured host through Vite host checking', () => {
+    expect(
+      getAllowedHosts(stubWithServerUrl('https://mycontainer.test'))
+    ).toEqual(['mycontainer.test']);
+  });
+
+  it('excludes the port, which Vite strips before matching', () => {
+    expect(
+      getAllowedHosts(stubWithServerUrl('http://mycontainer.test:8080'))
+    ).toEqual(['mycontainer.test']);
+  });
+
+  it('reaches createConfig so the dev server does not 403 the configured host', async () => {
+    const cm = stubWithServerUrl('https://my-codespace-4001.app.github.dev');
+
+    const config = await createConfig({
+      configManager: cm,
+      database: {} as Database,
+      apiURL: 'https://my-codespace-4001.app.github.dev/graphql',
+      noWatch: true,
+    });
+
+    expect(config.server!.allowedHosts).toEqual([
+      'my-codespace-4001.app.github.dev',
+    ]);
   });
 });
 

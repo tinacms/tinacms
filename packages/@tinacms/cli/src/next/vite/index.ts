@@ -109,6 +109,42 @@ export const getBasePath = (configManager: ConfigManager) => {
   )}/`;
 };
 
+const parseDevServerUrl = (configManager: ConfigManager) => {
+  const configured = configManager.config?.server?.url;
+  if (!configured) {
+    return undefined;
+  }
+  try {
+    return new URL(configured);
+  } catch {
+    throw new Error(
+      `Invalid \`server.url\` in your Tina config: "${configured}". It must be an absolute URL including the protocol, for example 'https://my-codespace-4001.app.github.dev'.`
+    );
+  }
+};
+
+/**
+ * The origin the *browser* uses to reach the dev server: `server.url` when the
+ * admin is served from a non-localhost host, otherwise localhost. Feeds the
+ * injected admin HTML, the admin's own API URL, and `allowedHosts`, so the
+ * three can't drift. Any path on `server.url` is dropped — use `build.basePath`
+ * to serve the admin under a subpath.
+ */
+export const getDevServerUrl = (
+  configManager: ConfigManager,
+  port: number | string
+) => parseDevServerUrl(configManager)?.origin ?? `http://localhost:${port}`;
+
+/**
+ * Vite host-checks every request against `allowedHosts` to block DNS rebinding,
+ * and its defaults cover only IP literals and localhost. Without the configured
+ * host in this list, `server.url` gets a 403 before it reaches the SPA.
+ */
+export const getAllowedHosts = (configManager: ConfigManager) => {
+  const hostname = parseDevServerUrl(configManager)?.hostname;
+  return hostname ? [hostname] : [];
+};
+
 export const createConfig = async ({
   configManager,
   apiURL,
@@ -207,6 +243,7 @@ export const createConfig = async ({
     },
     server: {
       host: configManager.config?.build?.host ?? false,
+      allowedHosts: getAllowedHosts(configManager),
       // Restrict Vite's built-in CORS to the same origins our custom
       // middleware allows (localhost + user-configured allowedOrigins).
       cors: {

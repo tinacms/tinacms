@@ -242,16 +242,14 @@ export class Codegen {
       );
     }
     const overrideUrl = this.configManager.config.contentApiUrlOverride;
-    const devServerUrl =
-      this.configManager.config?.server?.url || `http://localhost:${this.port}`;
-    const localUrl = overrideUrl || `${devServerUrl}/graphql`;
+    // Not `server.url`: the generated client is called by the user's own server
+    // runtime, which often cannot reach the external host. See getDevServerUrl.
+    const localUrl = overrideUrl || `http://localhost:${this.port}/graphql`;
     const tinaCloudUrl =
       overrideUrl ||
       `${baseUrl}/${version}/content/${clientId}/github/${branch}`;
     const apiURL =
       this.isLocal && !this.localContentBuild ? localUrl : tinaCloudUrl;
-    // Stays on localhost: this is consumed in-process by `tinacms build`, and
-    // `server.url` is dev-only.
     const localBuildUrl = this.port
       ? `http://localhost:${this.port}/graphql`
       : undefined;
