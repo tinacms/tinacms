@@ -1,5 +1,32 @@
 # @tinacms/mdx
 
+## 2.2.0
+
+### Minor Changes
+
+- [#7233](https://github.com/tinacms/tinacms/pull/7233) [`5f14d96`](https://github.com/tinacms/tinacms/commit/5f14d96fdba3d7a143827fc1cac9c7964c3f9b01) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Add a dedicated `@tinacms/mdx/sanitize-url` subpath export containing just the URL-scheme sanitizer, and point `tinacms`'s rich-text renderer (`TinaMarkdown` / `StaticTinaMarkdown`) at it instead of the root `@tinacms/mdx` entry. Previously, importing `sanitizeUrl` pulled in `@tinacms/mdx`'s full remark/mdast/micromark markdown-parsing bundle (~2MB) into every site's client bundle, even though rich-text rendering only needs the ~15-line sanitizer. The root `@tinacms/mdx` export of `sanitizeUrl` is unchanged and still works.
+
+### Patch Changes
+
+- [#7431](https://github.com/tinacms/tinacms/pull/7431) [`064b78e`](https://github.com/tinacms/tinacms/commit/064b78e9407d5d7f91ab11dd8b99de8f8ac38ab1) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Serializer errors that a content editor can hit now say what to change.
+
+  The raw markdown editor prints the thrown message verbatim in the field, so these are read by whoever is editing, not only by developers. "Marks inside inline code are not supported" put a Slate term in front of someone who has never met it, and messages naming internal node types did the same.
+
+  Reworded: the two mark-combination errors, the block and inline node errors, and the one raised for a field type that cannot be written. Each now names what to remove. Schema and template errors are unchanged, since a developer hits those on first run and needs the exact term.
+
+- [#7403](https://github.com/tinacms/tinacms/pull/7403) [`a0e0d2e`](https://github.com/tinacms/tinacms/commit/a0e0d2e8d573abfbfb5a3d277ffe1c2b6d692e37) Thanks [@wicksipedia](https://github.com/wicksipedia)! - `parseMDX` now normalizes CRLF to LF before parsing. A carriage return used to survive micromark into the value of a text node, so a document authored on Windows carried `\r` into the editor.
+
+  GFM task list items now keep their checked state through a round trip. `parseMDX` reads `checked` onto the `li` node, and both stringifiers write it back. A ticked checkbox previously came back unticked on save. `ListItemElement` gains an optional `checked?: boolean` — set only on task list items.
+
+- [#7427](https://github.com/tinacms/tinacms/pull/7427) [`2860f56`](https://github.com/tinacms/tinacms/commit/2860f569b3f4f8f6115ee4399af855ea3baa61e1) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Bold, italic and strikethrough now survive a leading or trailing space in the selection. Selecting `word ` and applying bold used to save `**word **`. CommonMark cannot close emphasis that sits against a space, so the published page showed literal asterisks and the formatting was lost, even though the editor still looked right. The space now sits outside the markers, giving `a **word** more`.
+
+  Indentation at the start of a line is kept as well. A bare space there is whitespace a Markdown parser may discard, and four of them open an indented code block, so an indented line used to reload without its spaces on the `mdx` parser and as a code block on the `markdown` parser. This applies to the first line of a paragraph and to a line broken with Shift+Enter. The leading space is now written as `&#x20;`, so the text comes back the way it was left.
+
+  The fix also covers marks holding only whitespace, empty marks, marks spanning several text nodes, marks inside a link, and combined bold and italic. Whitespace inside a mark, as in `**Hello *world*, again**`, still round trips unchanged.
+
+- Updated dependencies [[`d7a1641`](https://github.com/tinacms/tinacms/commit/d7a16416b1b4bc1ba0e2aabdddcf39ed1e4135d7), [`5050709`](https://github.com/tinacms/tinacms/commit/5050709dcbbc99530d6b284021c259d098d6455d), [`4b7d9b9`](https://github.com/tinacms/tinacms/commit/4b7d9b9f116f7f649aae1a573c838a663f97d99d)]:
+  - @tinacms/schema-tools@2.9.0
+
 ## 2.1.11
 
 ### Patch Changes
