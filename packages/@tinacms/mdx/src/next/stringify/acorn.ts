@@ -1,13 +1,13 @@
-// @ts-ignore TODO: Fix this
-import prettier from 'prettier/esm/standalone.mjs';
+import type { RichTextField, RichTextTemplate } from '@tinacms/schema-tools';
+import type * as Md from 'mdast';
+import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx';
 // @ts-ignore TODO: Fix this
 import parser from 'prettier/esm/parser-espree.mjs';
-import type { RichTextField, RichTextTemplate } from '@tinacms/schema-tools';
-import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx';
-import * as Plate from '../../parse/plate';
-import type * as Md from 'mdast';
-import { rootElement } from './pre-processing';
+// @ts-ignore TODO: Fix this
+import prettier from 'prettier/esm/standalone.mjs';
 import { stringifyMDX } from '.';
+import * as Plate from '../../parse/plate';
+import { rootElement } from './pre-processing';
 
 export const stringifyPropsInline = (
   element: Plate.MdxInlineElement,
@@ -245,7 +245,9 @@ export function stringifyProps(
         }
         break;
       default:
-        throw new Error(`Stringify props: ${field.type} not yet supported`);
+        throw new Error(
+          `A "${field.type}" field can't be saved as markdown yet. Remove this block, or ask a developer to change the field.`
+        );
     }
   });
   if (template.match) {

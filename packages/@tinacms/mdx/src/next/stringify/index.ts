@@ -1,7 +1,7 @@
 import { RichTextField } from '@tinacms/schema-tools';
 import type * as Plate from '../../parse/plate';
-import { toTinaMarkdown } from './to-markdown';
 import { preProcess } from './pre-processing';
+import { toTinaMarkdown } from './to-markdown';
 
 export const stringifyMDX = (
   value: Plate.RootElement,
