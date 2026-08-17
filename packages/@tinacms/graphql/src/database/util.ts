@@ -378,6 +378,10 @@ export const loadAndParseWithAliases = async (
   collection?: Collection<true>,
   templateInfo?: CollectionTemplateable
 ) => {
+  if (filepath.endsWith('.gitkeep')) {
+    return { _is_tina_folder_placeholder: true };
+  }
+
   const dataString = await bridge.get(normalizePath(filepath));
   const data = parseFile(
     dataString,

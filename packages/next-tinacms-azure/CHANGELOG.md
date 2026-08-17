@@ -1,5 +1,126 @@
 # next-tinacms-azure
 
+## 15.0.3
+
+### Patch Changes
+
+- [#7213](https://github.com/tinacms/tinacms/pull/7213) [`056ffc2`](https://github.com/tinacms/tinacms/commit/056ffc22dc87b0040281054f4140c6260c22ea1f) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Publish internal package references as ranges instead of exact versions.
+
+  Internal dependencies were declared as `workspace:*`, which pnpm expands to an **exact version** when publishing (`"tinacms": "3.10.0"`), not a range. An exact pin cannot deduplicate against the version a consumer has already installed, so npm nests a second — and third — complete copy of `tinacms` and its dependency tree. In a stock Astro + TinaCMS blog this produced three copies of `tinacms`, three of `mermaid` (186 MB), five of `date-fns` (151 MB), and four of `typescript` (88 MB): about **320 MB of duplication**.
+
+  The same expansion applied to `peerDependencies`, so packages such as `next-tinacms-cloudinary` and `tinacms-authjs` published `"tinacms": "3.10.0"` as a _peer_ — requiring consumers to have that exact version or hit an `ERESOLVE` conflict, and forcing a republish of every dependent on each `tinacms` release.
+
+  Switching these to `workspace:^` publishes them as caret ranges (`^3.10.0`), which deduplicate normally and let `onlyUpdatePeerDependentsWhenOutOfRange` do its job.
+
+- Updated dependencies [[`711ba30`](https://github.com/tinacms/tinacms/commit/711ba30f6e8955bbcea134fd22a5b498b7734325), [`908fe7d`](https://github.com/tinacms/tinacms/commit/908fe7ddc1c01a2c091f1e4f3c1b00f3696577b4), [`566af78`](https://github.com/tinacms/tinacms/commit/566af78ded66891edeb6fdf928b6543d45ac76fd), [`b8df6ee`](https://github.com/tinacms/tinacms/commit/b8df6eeee85b603406d204042a5ef95d49e8a9cf), [`59efccc`](https://github.com/tinacms/tinacms/commit/59efcccd3f1713870e40ebd9db25659cd6357237), [`056ffc2`](https://github.com/tinacms/tinacms/commit/056ffc22dc87b0040281054f4140c6260c22ea1f)]:
+  - tinacms@3.11.0
+
+## 15.0.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - tinacms@3.10.1
+
+## 15.0.1
+
+### Patch Changes
+
+- [#7168](https://github.com/tinacms/tinacms/pull/7168) [`0a927a4`](https://github.com/tinacms/tinacms/commit/0a927a4f8d228dd05ee7ca4be32899bc190e73af) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Security fix: TinaCloud authorization is now scoped to the site's own configured clientID instead of a value read from the request. `isAuthorized` takes an optional `expectedClientID` (falling back to `NEXT_PUBLIC_TINA_CLIENT_ID`) and refuses when neither resolves. `TinaCloudBackendAuthProvider`, the `next-tinacms-azure` adapter, and the `tinacms init` template all pass the site clientID through.
+
+  **Action required (self-hosted).** Authorization now fails closed when the site's clientID cannot be resolved at runtime. Ensure `NEXT_PUBLIC_TINA_CLIENT_ID` is present in the server runtime (not only inlined at build time), or pass the clientID explicitly to `TinaCloudBackendAuthProvider(...)` and to media-store `authorized` callbacks, e.g. `isAuthorized(req, process.env.NEXT_PUBLIC_TINA_CLIENT_ID)`. If it cannot be resolved, backend and media authorization will return 401.
+
+- Updated dependencies [[`0a927a4`](https://github.com/tinacms/tinacms/commit/0a927a4f8d228dd05ee7ca4be32899bc190e73af)]:
+  - @tinacms/auth@1.1.4
+
+## 15.0.0
+
+### Patch Changes
+
+- Updated dependencies [[`c809733`](https://github.com/tinacms/tinacms/commit/c809733ce8037d81937e81f0c8781a6cf222099b), [`3a1b39a`](https://github.com/tinacms/tinacms/commit/3a1b39ad9a2bbeb82a539fbca6985d5b714238dd), [`de4a807`](https://github.com/tinacms/tinacms/commit/de4a80771e83afa8502f834227351cff54c5f236), [`8497110`](https://github.com/tinacms/tinacms/commit/8497110ada7554f97807ce7a09a3624b5efc5713), [`22d0c0d`](https://github.com/tinacms/tinacms/commit/22d0c0d095b79e116677a798d07b35591ccb816e), [`5148d67`](https://github.com/tinacms/tinacms/commit/5148d679049bc53e34b287a586bc721db7cb7710), [`ff10e65`](https://github.com/tinacms/tinacms/commit/ff10e657e48f1acc67cafd3e1a99bef23c8ac419), [`b53a51c`](https://github.com/tinacms/tinacms/commit/b53a51c92ee8ddecbb654f5b57c7d10673a06626)]:
+  - tinacms@3.10.0
+
+## 14.0.4
+
+### Patch Changes
+
+- [#7088](https://github.com/tinacms/tinacms/pull/7088) [`d44558e`](https://github.com/tinacms/tinacms/commit/d44558e9b4502d4f4fc2c970d22985339fe2b6ce) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Fix media upload/delete paths to prevent access to storage keys outside mediaRoot.
+
+- Updated dependencies [[`c1994b3`](https://github.com/tinacms/tinacms/commit/c1994b36907710aeb36fd114fa6d0a8a0e1210d0), [`caadf1f`](https://github.com/tinacms/tinacms/commit/caadf1f68ec602277bcd4225a69c13fdc5402f7b), [`5ba482b`](https://github.com/tinacms/tinacms/commit/5ba482b9c10d76ea7f7bea2a442a8999824736a8), [`8a86ffa`](https://github.com/tinacms/tinacms/commit/8a86ffa045af8ff6dfa0ebc2775cf3b7b810d238), [`19fcbdd`](https://github.com/tinacms/tinacms/commit/19fcbdd90a33a66c437b0f91e325a8609022e0cc), [`871ce31`](https://github.com/tinacms/tinacms/commit/871ce31531d3d7dc379ec7d58cf427984dd6620a), [`d44558e`](https://github.com/tinacms/tinacms/commit/d44558e9b4502d4f4fc2c970d22985339fe2b6ce), [`4801b21`](https://github.com/tinacms/tinacms/commit/4801b21f31455d3ce6cb33e6233148caba9921c6)]:
+  - tinacms@3.9.4
+  - @tinacms/auth@1.1.3
+
+## 14.0.3
+
+### Patch Changes
+
+- Updated dependencies [[`42760d8`](https://github.com/tinacms/tinacms/commit/42760d8f5afd201107e27e274308af37f96ba8d0), [`c491fc5`](https://github.com/tinacms/tinacms/commit/c491fc55e612725f5d775eeb1fdf3f8ba82314fa)]:
+  - tinacms@3.9.3
+
+## 14.0.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - tinacms@3.9.2
+
+## 14.0.1
+
+### Patch Changes
+
+- Updated dependencies [[`7b539b8`](https://github.com/tinacms/tinacms/commit/7b539b8e7d7d9f4451b5fd36a04d26b734f7d78e)]:
+  - tinacms@3.9.1
+
+## 14.0.0
+
+### Patch Changes
+
+- Updated dependencies [[`a8dd9af`](https://github.com/tinacms/tinacms/commit/a8dd9af056b17a8faeaa621bbf7722a62b396cf8), [`916bd43`](https://github.com/tinacms/tinacms/commit/916bd43de1b563854fac65a74ecf04f946ebda56), [`b9d561f`](https://github.com/tinacms/tinacms/commit/b9d561fcea56185f0f146d2bdb1b510caab180d3)]:
+  - tinacms@3.9.0
+
+## 13.0.4
+
+### Patch Changes
+
+- Updated dependencies [[`c7b366c`](https://github.com/tinacms/tinacms/commit/c7b366c5de66b1a3f086c1f11954225e55430324)]:
+  - tinacms@3.8.4
+
+## 13.0.3
+
+### Patch Changes
+
+- Updated dependencies [[`7be8175`](https://github.com/tinacms/tinacms/commit/7be81751a6b93f785d347e759e91f024bb12c452)]:
+  - tinacms@3.8.3
+
+## 13.0.2
+
+### Patch Changes
+
+- Updated dependencies [[`33feeac`](https://github.com/tinacms/tinacms/commit/33feeacf6585be2736a0a14c5a800c1b6db34e44), [`8ac0776`](https://github.com/tinacms/tinacms/commit/8ac0776dea0c0650a5e5098c143b24c17fc25b8e), [`b9eaf61`](https://github.com/tinacms/tinacms/commit/b9eaf61c28c25814ae65b5fbe72d5b33df0b3596), [`cf73a11`](https://github.com/tinacms/tinacms/commit/cf73a115c3a58fac26e2518734dd3cb49133260d), [`4757225`](https://github.com/tinacms/tinacms/commit/475722599ff350b45bfdb4f7a6af2e37d33c81c3)]:
+  - tinacms@3.8.2
+
+## 13.0.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - tinacms@3.8.1
+
+## 13.0.0
+
+### Patch Changes
+
+- Updated dependencies [[`723632b`](https://github.com/tinacms/tinacms/commit/723632b050b1e9502c46215fd6e8e548cc108ac0), [`95758a0`](https://github.com/tinacms/tinacms/commit/95758a0ad31ec96aa652f247211a769e82a37cbb), [`9e7eba9`](https://github.com/tinacms/tinacms/commit/9e7eba9f290c935cd56569421de88b5adfac65d8)]:
+  - tinacms@3.8.0
+
+## 12.0.6
+
+### Patch Changes
+
+- Updated dependencies [[`3e4dcc7`](https://github.com/tinacms/tinacms/commit/3e4dcc76d5fb89ec900b778cb7e82f3aa3ed6501), [`3da4588`](https://github.com/tinacms/tinacms/commit/3da45887c23da552a4bd994154eeaaf8990065f7), [`b37187d`](https://github.com/tinacms/tinacms/commit/b37187d46b6e1a274db7ab79372f02aaa2ef992d), [`556a162`](https://github.com/tinacms/tinacms/commit/556a16255df4b48df69c14133ee6530b68dd9131), [`84ec7ad`](https://github.com/tinacms/tinacms/commit/84ec7adea7a1d8015cf1430fe804886493c5ae21), [`28b869a`](https://github.com/tinacms/tinacms/commit/28b869a0d2c9b2a608e1076b6dea24bd3e01ac31)]:
+  - tinacms@3.7.6
+  - @tinacms/auth@1.1.3
+
 ## 12.0.5
 
 ### Patch Changes

@@ -1,13 +1,12 @@
 {
     "name": "@tinacms/cli",
     "type": "module",
-    "version": "2.2.5",
+    "version": "2.5.6",
     "main": "dist/index.js",
     "typings": "dist/index.d.ts",
     "files": [
         "dist",
-        "bin/*",
-        ".env"
+        "bin/*"
     ],
     "license": "Apache-2.0",
     "bin": {
@@ -26,6 +25,8 @@
         "react-dom": ">=18.3.1 <20.0.0"
     },
     "devDependencies": {
+        "@babel/core": "^7.28.5",
+        "@babel/preset-env": "^7.28.5",
         "@tinacms/scripts": "workspace:*",
         "@types/clear": "catalog:",
         "@types/cli-spinner": "catalog:",
@@ -41,11 +42,16 @@
         "@types/node": "^22.13.1",
         "@types/progress": "catalog:",
         "@types/prompts": "catalog:",
-        "jest": "catalog:"
+        "babel-jest": "^29.7.0",
+        "jest": "catalog:",
+        "mongodb-level": "catalog:",
+        "sqlite-level": "catalog:",
+        "ts-jest": "catalog:"
     },
     "scripts": {
         "build": "tinacms-scripts build",
         "test": "jest --passWithNoTests",
+        "test:adapters": "NODE_OPTIONS='--experimental-vm-modules' jest --config jest.adapter-matrix.config.js --runTestsByPath src/next/adapter-matrix.adapter-test.ts",
         "types": "pnpm tsc",
         "test-watch": "jest  --passWithNoTests --watch",
         "tinacms": "MONOREPO_DEV=true node ./bin/tinacms",
@@ -53,11 +59,11 @@
     },
     "dependencies": {
         "@graphql-codegen/core": "catalog:",
-        "@graphql-codegen/plugin-helpers": "latest",
+        "@graphql-codegen/plugin-helpers": "^7.1.0",
         "@graphql-codegen/typescript": "catalog:",
         "@graphql-codegen/typescript-operations": "catalog:",
         "@graphql-codegen/visitor-plugin-common": "catalog:",
-        "@graphql-inspector/core": "^4.2.2",
+        "@graphql-inspector/core": "^6.2.1",
         "@graphql-tools/graphql-file-loader": "catalog:",
         "@graphql-tools/load": "catalog:",
         "@rollup/pluginutils": "catalog:",
@@ -65,11 +71,11 @@
         "@tailwindcss/aspect-ratio": "catalog:",
         "@tailwindcss/container-queries": "catalog:",
         "@tailwindcss/typography": "catalog:",
-        "@tinacms/app": "workspace:*",
-        "@tinacms/graphql": "workspace:*",
-        "@tinacms/metrics": "workspace:*",
-        "@tinacms/schema-tools": "workspace:*",
-        "@tinacms/search": "workspace:*",
+        "@tinacms/app": "workspace:^",
+        "@tinacms/graphql": "workspace:^",
+        "@tinacms/metrics": "workspace:^",
+        "@tinacms/schema-tools": "workspace:^",
+        "@tinacms/search": "workspace:^",
         "@vitejs/plugin-react": "catalog:",
         "altair-express-middleware": "catalog:",
         "async-lock": "catalog:",
@@ -91,15 +97,16 @@
         "memory-level": "catalog:",
         "minimatch": "catalog:",
         "normalize-path": "catalog:",
+        "posthog-node": "^5.17.2",
         "prettier": "catalog:",
         "progress": "catalog:",
         "prompts": "catalog:",
         "readable-stream": "catalog:",
         "tailwindcss": "^3.4.17",
-        "tinacms": "workspace:*",
+        "tinacms": "workspace:^",
         "typanion": "catalog:",
         "typescript": "^5.7.3",
-        "vite": "^4.5.9",
+        "vite": "^6.4.3",
         "yup": "^1.6.1",
         "zod": "catalog:"
     },

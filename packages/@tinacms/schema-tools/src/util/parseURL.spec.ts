@@ -38,4 +38,18 @@ describe('parseUrl', () => {
       parseURL(wrongURL);
     }).toThrow();
   });
+  it('treats a relative contentApiUrlOverride as not local', () => {
+    const { isLocalClient, host } = parseURL('/api/tina/gql');
+    expect(isLocalClient).toBe(false);
+    expect(host).toBe(null);
+  });
+  it('treats an absolute (self-hosted) contentApiUrlOverride as not local', () => {
+    const { branch, clientId, isLocalClient, host } = parseURL(
+      'https://example.com/api/content'
+    );
+    expect(isLocalClient).toBe(false);
+    expect(host).toBe('example.com');
+    expect(branch).toBe(null);
+    expect(clientId).toBe(null);
+  });
 });

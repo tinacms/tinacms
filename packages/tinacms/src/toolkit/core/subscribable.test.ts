@@ -3,7 +3,7 @@ import { describe, it, test, expect, beforeEach, vi } from 'vitest';
 
 class Example extends Subscribable {
   notify() {
-    this.notifiySubscribers();
+    this.notifySubscribers();
   }
 }
 

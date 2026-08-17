@@ -17,7 +17,11 @@ import { parseMDX as parseMDXNext } from '../next';
 import type { Pattern } from '../stringify';
 import { parseShortcode } from './parseShortcode';
 import type * as Plate from './plate';
-import { RichTextParseError, remarkToSlate } from './remarkToPlate';
+import {
+  RichTextParseError,
+  remarkToSlate,
+  sanitizeUrl,
+} from './remarkToPlate';
 /**
  * ### Convert the MDXAST into an API-friendly format
  *
@@ -98,6 +102,62 @@ export const MDX_PARSE_ERROR_MSG =
 export const MDX_PARSE_ERROR_MSG_HTML =
   'TinaCMS supports a stricter version of markdown and a subset of MDX. <a href="https://tina.io/docs/r/what-is-markdown" target="_blank" rel="noopener noreferrer">Learn More</a>';
 
+/** Returns true for Slate-like element nodes. */
+const isSlateNode = (value: unknown): value is Record<string, unknown> =>
+  !!value &&
+  typeof value === 'object' &&
+  !Array.isArray(value) &&
+  typeof (value as Record<string, unknown>).type === 'string';
+
+/** Returns true for traversable Slate-like content. */
+const isSlateContent = (value: unknown): boolean =>
+  isSlateNode(value) ||
+  (Array.isArray(value) && value.length > 0 && value.every(isSlateNode));
+
+/**
+ * Recursively sanitizes URLs on Slate link and image nodes.
+ *
+ * Also traverses Slate-shaped `props.children`; arbitrary props are left
+ * untouched.
+ */
+const sanitizeSlateTree = <T>(node: T): T => {
+  if (Array.isArray(node)) {
+    return node.map((child) => sanitizeSlateTree(child)) as unknown as T;
+  }
+  if (!node || typeof node !== 'object') {
+    return node;
+  }
+  const next: Record<string, unknown> = {
+    ...(node as Record<string, unknown>),
+  };
+  if (
+    (next.type === 'a' || next.type === 'img') &&
+    typeof next.url === 'string'
+  ) {
+    next.url = sanitizeUrl(next.url);
+  }
+  if (Array.isArray(next.children)) {
+    next.children = next.children.map((child) => sanitizeSlateTree(child));
+  }
+  if (
+    next.props &&
+    typeof next.props === 'object' &&
+    !Array.isArray(next.props)
+  ) {
+    const props = next.props as Record<string, unknown>;
+    if (isSlateContent(props.children)) {
+      next.props = { ...props, children: sanitizeSlateTree(props.children) };
+    }
+  }
+  return next as unknown as T;
+};
+
+/**
+ * A CRLF pair survives micromark into the value of a text node. Normalize the
+ * source so no carriage return reaches the editor.
+ */
+const toLineFeeds = (value: string): string => value.replace(/\r\n/g, '\n');
+
 export const parseMDX = (
   value: string,
   field: RichTextType,
@@ -110,12 +170,15 @@ export const parseMDX = (
   try {
     switch (field.parser?.type) {
       case 'markdown':
-        return parseMDXNext(value, field, imageCallback);
+        return parseMDXNext(toLineFeeds(value), field, imageCallback);
       case 'slatejson':
         // Assuming `value` is a JSON object
-        return value as unknown as Plate.RootElement;
+        return sanitizeSlateTree(
+          value as unknown as Plate.RootElement
+        ) as Plate.RootElement;
     }
-    let preprocessedString = value;
+    const source = toLineFeeds(value);
+    let preprocessedString = source;
     const templatesWithMatchers = field.templates?.filter(
       (template) => template.match
     );
@@ -131,7 +194,7 @@ export const parseMDX = (
     });
     tree = mdxToAst(preprocessedString);
     if (tree) {
-      return remarkToSlate(tree, field, imageCallback, value);
+      return remarkToSlate(tree, field, imageCallback, source);
     } else {
       return { type: 'root', children: [] };
     }

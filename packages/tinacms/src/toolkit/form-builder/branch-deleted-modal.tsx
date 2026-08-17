@@ -1,9 +1,8 @@
 import { Form } from '@toolkit/forms';
 import { Button } from '@toolkit/styles';
 import { formatBranchName, normalizeBranchName } from '@utils/branch-name';
-import { GitBranchIcon } from 'lucide-react';
+import { CircleAlert, GitBranchIcon } from 'lucide-react';
 import * as React from 'react';
-import { BiError } from 'react-icons/bi';
 import { useCMS } from '../react-core';
 import {
   Modal,
@@ -51,7 +50,7 @@ export const BranchDeletedModal = ({
   } = useEditorialWorkflow();
 
   const handleCreate = async () => {
-    const success = await executeWorkflow({
+    const { success } = await executeWorkflow({
       branchName: `tina/${normalizedBranchName}`,
       baseBranch,
       path,
@@ -100,7 +99,7 @@ export const BranchDeletedModal = ({
 
               {errorMessage && (
                 <div className='flex items-center gap-1 text-red-700 py-2 px-3 mb-4 bg-red-50 border border-red-200 rounded'>
-                  <BiError className='w-5 h-auto text-red-400 flex-shrink-0' />
+                  <CircleAlert className='w-5 h-auto text-red-400 flex-shrink-0' />
                   <span className='text-sm'>
                     <b>Error:</b> {errorMessage}
                   </span>

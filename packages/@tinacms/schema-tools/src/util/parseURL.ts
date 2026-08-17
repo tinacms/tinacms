@@ -33,16 +33,19 @@ export const parseURL = (
 
   const params = new URL(url);
 
-  // This is a self-hosted URL
   const isTinaCloud =
     params.host.includes('tinajs.dev') ||
     params.host.includes('tina.io') ||
     params.host.includes('tinajs.io');
 
+  // This is a self-hosted URL (e.g. an absolute `contentApiUrlOverride`).
+  // It points at a custom/self-hosted content API, not the local dev server,
+  // so it must not be treated as local mode. The genuine local server URL
+  // contains `localhost` and is handled by the check above.
   if (!isTinaCloud) {
     return {
       branch: null,
-      isLocalClient: true,
+      isLocalClient: false,
       clientId: null,
       host: params.host,
     };
@@ -59,7 +62,7 @@ export const parseURL = (
 
   if (!branch || !clientId) {
     throw new Error(
-      `Invalid URL format provided. Expected: https://content.tinajs.io/<Version>/content/<ClientID>/github/<Branch> but but received ${url}`
+      `Invalid URL format provided. Expected: https://content.tinajs.io/<Version>/content/<ClientID>/github/<Branch> but received ${url}`
     );
   }
 

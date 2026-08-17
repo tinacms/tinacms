@@ -1,0 +1,207 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "table",
+      "children": [
+        {
+          "type": "tr",
+          "children": [
+            {
+              "type": "td",
+              "children": [
+                {
+                  "type": "p",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": "Case"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "td",
+              "children": [
+                {
+                  "type": "p",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": "Example"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "tr",
+          "children": [
+            {
+              "type": "td",
+              "children": [
+                {
+                  "type": "p",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": "Pipe escape"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "td",
+              "children": [
+                {
+                  "type": "p",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": "a | b"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "tr",
+          "children": [
+            {
+              "type": "td",
+              "children": [
+                {
+                  "type": "p",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": "Backslash"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "td",
+              "children": [
+                {
+                  "type": "p",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": "C:\\path"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "tr",
+          "children": [
+            {
+              "type": "td",
+              "children": [
+                {
+                  "type": "p",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": "Inline code"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "td",
+              "children": [
+                {
+                  "type": "p",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": "<script>",
+                      "code": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "tr",
+          "children": [
+            {
+              "type": "td",
+              "children": [
+                {
+                  "type": "p",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": "Markdown char"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "td",
+              "children": [
+                {
+                  "type": "p",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": "*not bold*"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "tr",
+          "children": [
+            {
+              "type": "td",
+              "children": [
+                {
+                  "type": "p",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": "Empty cell"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "td",
+              "children": [
+                {
+                  "type": "p",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "props": {
+        "align": []
+      }
+    }
+  ]
+}

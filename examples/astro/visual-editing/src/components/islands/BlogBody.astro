@@ -1,0 +1,35 @@
+---
+import TinaMarkdown from '@tinacms/astro/TinaMarkdown.astro';
+import { sanitizeImageSrc } from '@tinacms/astro/sanitize';
+import { tinaField } from '@tinacms/astro/tina-field';
+import type { BlogQuery } from '../../../tina/__generated__/types';
+import { formatDate } from '../../lib/utils';
+import { customComponents } from '../markdown';
+
+interface Props {
+  data: NonNullable<BlogQuery['blog']>;
+}
+
+const { data } = Astro.props;
+const formattedPubDate = data.pubDate ? formatDate(data.pubDate) : '';
+const heroSrc = data.heroImage ? sanitizeImageSrc(data.heroImage) : '';
+---
+{heroSrc && (
+  <img data-tina-field={tinaField(data, 'heroImage')} src={heroSrc} alt={data.title} class="w-full rounded-lg shadow-md mb-8" />
+)}
+{data.title && (
+  <h1 data-tina-field={tinaField(data, 'title')} class="text-4xl lg:text-5xl font-extrabold tracking-tight mb-6">{data.title}</h1>
+)}
+{formattedPubDate && (
+  <p data-tina-field={tinaField(data, 'pubDate')} class="text-gray-500 mb-8">{formattedPubDate}</p>
+)}
+{data.excerpt && (
+  <div data-tina-field={tinaField(data, 'excerpt')} class="prose prose-lg mb-8 italic opacity-80 dark:prose-invert">
+    <TinaMarkdown content={data.excerpt} components={customComponents} />
+  </div>
+)}
+{data._body && (
+  <div data-tina-field={tinaField(data, '_body')} class="prose prose-lg dark:prose-invert">
+    <TinaMarkdown content={data._body} components={customComponents} />
+  </div>
+)}

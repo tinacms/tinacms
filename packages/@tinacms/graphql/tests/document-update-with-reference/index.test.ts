@@ -23,12 +23,12 @@ it('executes mutation with reference and validates bridge writes', async () => {
     variables,
   });
 
-  expect(format(result)).toMatchFileSnapshot('updated-movie-node.json');
+  await expect(format(result)).toMatchFileSnapshot('updated-movie-node.json');
 
   const writes = bridge.getWrites();
   expect(writes.size).toBeGreaterThan(0);
 
   const movieWrite = bridge.getWrite('movies/in.md');
   expect(movieWrite).toBeDefined();
-  expect(movieWrite).toMatchFileSnapshot('updated-movie-content.md');
+  await expect(movieWrite).toMatchFileSnapshot('updated-movie-content.md');
 });

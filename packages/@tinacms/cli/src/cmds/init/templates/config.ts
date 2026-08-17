@@ -32,6 +32,47 @@ const baseFields = `[
   },
 ]`;
 
+// The Astro demo hero is a fully editable content model: every text element
+// (eyebrow, headline, tagline) and both call-to-action buttons (label + link).
+const astroHeroFields = `[
+  {
+    type: 'string',
+    name: 'eyebrow',
+    label: 'Eyebrow',
+  },
+  {
+    type: 'string',
+    name: 'title',
+    label: 'Headline',
+    isTitle: true,
+    required: true,
+  },
+  {
+    type: 'rich-text',
+    name: 'body',
+    label: 'Tagline',
+    isBody: true,
+  },
+  {
+    type: 'object',
+    name: 'ctaPrimary',
+    label: 'Primary button',
+    fields: [
+      { type: 'string', name: 'label', label: 'Label' },
+      { type: 'string', name: 'href', label: 'Link' },
+    ],
+  },
+  {
+    type: 'object',
+    name: 'ctaSecondary',
+    label: 'Secondary button',
+    fields: [
+      { type: 'string', name: 'label', label: 'Label' },
+      { type: 'string', name: 'href', label: 'Link' },
+    ],
+  },
+]`;
+
 const generateCollectionString = (args: ConfigTemplateArgs) => {
   if (args.collections) {
     return args.collections;
@@ -65,8 +106,24 @@ const generateCollectionString = (args: ConfigTemplateArgs) => {
       },
     },
   ]`;
+  const astroExampleCollection = `[
+    ${extraTinaCollections || ''}
+    {
+      name: 'post',
+      label: 'Posts',
+      path: 'content/posts',
+      fields: ${astroHeroFields},
+      ui: {
+        // Opens the /tinacms-demo page for visual editing. Change or remove to fit your site.
+        router: () => '/tinacms-demo',
+      },
+    },
+  ]`;
   if (args.config?.framework?.name === 'next') {
     return nextExampleCollection;
+  }
+  if (args.config?.framework?.name === 'astro') {
+    return astroExampleCollection;
   }
   return baseCollections;
 };

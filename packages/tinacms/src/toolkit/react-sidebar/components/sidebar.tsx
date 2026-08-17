@@ -1,4 +1,5 @@
-import { Transition, TransitionChild } from '@headlessui/react';
+import { Transition, TransitionChild } from '@toolkit/components/transition';
+import { TinaIcon } from '@toolkit/icons';
 import {
   BranchButton,
   BranchPreviewButton,
@@ -7,23 +8,28 @@ import type { CloudConfigPlugin } from '@toolkit/react-cloud-config';
 import { useCMS, useSubscribable } from '@toolkit/react-core';
 import { type ScreenPlugin, ScreenPluginModal } from '@toolkit/react-screens';
 import { Button } from '@toolkit/styles';
+import {
+  Files,
+  Globe,
+  type LucideIcon,
+  Menu,
+  PanelLeft,
+  Users,
+} from 'lucide-react';
 import * as React from 'react';
 import { useState } from 'react';
-import { BiMenu } from 'react-icons/bi';
-import { ImFilesEmpty, ImUsers } from 'react-icons/im';
-import type { IconType } from 'react-icons/lib';
-import { PiSidebarSimpleLight } from 'react-icons/pi';
 import type { SidebarState, SidebarStateOptions } from '../sidebar';
 import { BillingWarning, LocalWarning } from './local-warning';
 import { Nav } from './nav';
 import { NavCloudLink } from './nav-components';
 import { ResizeHandle } from './resize-handle';
 import { FormsView } from './sidebar-body';
-import { TinaIcon } from '@toolkit/icons';
 
 export const SidebarContext = React.createContext<any>(null);
 export const minPreviewWidth = 440;
 export const minSidebarWidth = 360;
+/* Sliver of the window kept clear of the sidebar at its max width */
+export const sidebarEdgeGap = 8;
 
 const LOCALSTATEKEY = 'tina.sidebarState';
 const LOCALWIDTHKEY = 'tina.sidebarWidth';
@@ -258,6 +264,7 @@ const Sidebar = ({
         </SidebarWrapper>
         <Transition show={menuIsOpen} as='div'>
           <TransitionChild
+            className='fixed left-0 top-0 z-overlay h-full'
             enter='transform transition-all ease-out duration-300'
             enterFrom='opacity-0 -translate-x-full'
             enterTo='opacity-100 translate-x-0'
@@ -265,50 +272,55 @@ const Sidebar = ({
             leaveFrom='opacity-100 translate-x-0'
             leaveTo='opacity-0 -translate-x-full'
           >
-            <div className='fixed left-0 top-0 z-overlay h-full transform'>
-              <Nav
-                isLocalMode={cms.api?.tina?.isLocalMode}
-                menuIsOpen
-                toggleMenu={toggleMenu}
-                showCollections={isTinaAdminEnabled}
-                collectionsInfo={collectionsInfo}
-                screens={activeScreens}
-                cloudConfigs={allConfigs}
-                contentCreators={contentCreators}
-                sidebarWidth={sidebarWidth}
-                RenderNavSite={({ view }) => (
-                  <SidebarSiteLink
-                    view={view}
-                    onClick={() => {
-                      setActiveView(view);
-                      setMenuIsOpen(false);
-                    }}
-                  />
-                )}
-                RenderNavCloud={({ config }) => (
-                  <NavCloudLink config={config} />
-                )}
-                RenderNavCollection={({ collection }) => (
-                  <SidebarCollectionLink
-                    onClick={() => {
-                      setMenuIsOpen(false);
-                    }}
-                    collection={collection}
-                  />
-                )}
-                AuthRenderNavCollection={({ collection }) => (
-                  <SidebarCollectionLink
-                    onClick={() => {
-                      setMenuIsOpen(false);
-                    }}
-                    collection={collection}
-                    Icon={ImUsers}
-                  />
-                )}
-              ></Nav>
-            </div>
+            <Nav
+              isLocalMode={cms.api?.tina?.isLocalMode}
+              menuIsOpen
+              toggleMenu={toggleMenu}
+              showCollections={isTinaAdminEnabled}
+              collectionsInfo={collectionsInfo}
+              screens={activeScreens}
+              cloudConfigs={allConfigs}
+              contentCreators={contentCreators}
+              sidebarWidth={sidebarWidth}
+              RenderNavSite={({ view }) => (
+                <SidebarSiteLink
+                  view={view}
+                  onClick={() => {
+                    setActiveView(view);
+                    setMenuIsOpen(false);
+                  }}
+                />
+              )}
+              RenderNavCloud={({ config }) => <NavCloudLink config={config} />}
+              RenderNavGlobal={({ collection }) => (
+                <SidebarGlobalLink
+                  collection={collection}
+                  onClick={() => {
+                    setMenuIsOpen(false);
+                  }}
+                />
+              )}
+              RenderNavCollection={({ collection }) => (
+                <SidebarCollectionLink
+                  onClick={() => {
+                    setMenuIsOpen(false);
+                  }}
+                  collection={collection}
+                />
+              )}
+              AuthRenderNavCollection={({ collection }) => (
+                <SidebarCollectionLink
+                  onClick={() => {
+                    setMenuIsOpen(false);
+                  }}
+                  collection={collection}
+                  Icon={Users}
+                />
+              )}
+            ></Nav>
           </TransitionChild>
           <TransitionChild
+            className='fixed inset-0 z-menu'
             enter='ease-out duration-300'
             enterFrom='opacity-0'
             enterTo='opacity-80'
@@ -321,7 +333,7 @@ const Sidebar = ({
               onClick={() => {
                 setMenuIsOpen(false);
               }}
-              className='fixed z-menu inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black'
+              className='w-full h-full bg-gradient-to-br from-gray-800 via-gray-900 to-black'
             />
           </TransitionChild>
         </Transition>
@@ -380,7 +392,7 @@ const SidebarHeader = ({ isLocalMode }) => {
               title='Open navigation menu'
               aria-label='Open navigation menu'
             >
-              <BiMenu className='h-8 w-auto text-gray-600' />
+              <Menu className='h-8 w-auto text-gray-600' />
             </button>
             <TinaIcon className='self-center h-10 min-w-10 w-auto text-orange-500 mr-2' />
             <BranchButton className='overflow-hidden mr-2' />
@@ -397,7 +409,7 @@ const SidebarHeader = ({ isLocalMode }) => {
               title='Hide editing panel'
               aria-label='Hide editing panel'
             >
-              <PiSidebarSimpleLight className='h-6 w-auto text-gray-600' />
+              <PanelLeft className='h-6 w-auto text-gray-600' />
             </button>
           </div>
         </div>
@@ -424,12 +436,40 @@ const SidebarSiteLink = ({
   );
 };
 
-const SidebarCollectionLink = ({
-  Icon = ImFilesEmpty,
+const SidebarGlobalLink = ({
   collection,
   onClick,
 }: {
-  Icon?: IconType;
+  collection: {
+    label?: string;
+    name: string;
+  };
+  onClick: () => void;
+}) => {
+  const cms = useCMS();
+  const tinaPreview = cms.flags.get('tina-preview') || false;
+  const href = `${
+    tinaPreview ? `/${tinaPreview}/index.html#` : '/admin#'
+  }/collections/${collection.name}/~`;
+
+  return (
+    <a
+      onClick={onClick}
+      href={href}
+      className='text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100'
+    >
+      <Globe className='mr-2 h-6 opacity-80 w-auto' />{' '}
+      {collection.label ? collection.label : collection.name}
+    </a>
+  );
+};
+
+const SidebarCollectionLink = ({
+  Icon = Files,
+  collection,
+  onClick,
+}: {
+  Icon?: LucideIcon;
   collection: {
     label: string;
     name: string;
@@ -469,7 +509,7 @@ const EditButton = ({}) => {
       title='Show editing panel'
       aria-label='Show editing panel'
     >
-      <PiSidebarSimpleLight className='h-6 w-auto' />
+      <PanelLeft className='h-6 w-auto' />
     </Button>
   );
 };
@@ -499,8 +539,10 @@ const SidebarWrapper = ({ children }) => {
         style={{
           width: displayState === 'fullscreen' ? '100vw' : `${sidebarWidth}px`,
           maxWidth:
-            displayState === 'fullscreen' ? '100vw' : 'calc(100vw - 8px)',
-          minWidth: '360px',
+            displayState === 'fullscreen'
+              ? '100vw'
+              : `calc(100vw - ${sidebarEdgeGap}px)`,
+          minWidth: `${minSidebarWidth}px`,
         }}
       >
         {children}

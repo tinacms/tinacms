@@ -3,6 +3,7 @@ import { MemoryLevel } from 'memory-level';
 import {
   coerceFilterChainOperands,
   DEFAULT_COLLECTION_SORT_KEY,
+  DEFAULT_NUMERIC_PAD,
   makeFilter,
   makeFilterChain,
   makeFilterSuffixes,
@@ -122,48 +123,48 @@ describe('makeFilter', () => {
   });
 
   describe('datetime type', () => {
-    const d = (iso: string) => new Date(iso).getTime();
+    const iso = (s: string) => new Date(s).toISOString();
 
     it.each([
       [
         'eq — match',
         OP.EQ,
-        d('2023-01-15'),
+        iso('2023-01-15'),
         { ts: new Date('2023-01-15').toISOString() },
         true,
       ],
       [
         'eq — miss',
         OP.EQ,
-        d('2023-01-15'),
+        iso('2023-01-15'),
         { ts: new Date('2023-01-16').toISOString() },
         false,
       ],
       [
         'gt — match',
         OP.GT,
-        d('2023-01-15'),
+        iso('2023-01-15'),
         { ts: new Date('2023-01-16').toISOString() },
         true,
       ],
       [
         'gt — miss',
         OP.GT,
-        d('2023-01-15'),
+        iso('2023-01-15'),
         { ts: new Date('2023-01-14').toISOString() },
         false,
       ],
       [
         'lt — match',
         OP.LT,
-        d('2023-01-15'),
+        iso('2023-01-15'),
         { ts: new Date('2023-01-14').toISOString() },
         true,
       ],
       [
         'lt — miss',
         OP.LT,
-        d('2023-01-15'),
+        iso('2023-01-15'),
         { ts: new Date('2023-01-16').toISOString() },
         false,
       ],
@@ -172,6 +173,14 @@ describe('makeFilter', () => {
         filterChain: [binary('ts', 'datetime', operator, rightOperand)],
       });
       expect(fn(data)).toBe(expected);
+    });
+
+    it('eq — match when data value is a numeric timestamp', () => {
+      const ts = new Date('2023-01-15').getTime();
+      const fn = makeFilter({
+        filterChain: [binary('ts', 'datetime', OP.EQ, iso('2023-01-15'))],
+      });
+      expect(fn({ ts })).toBe(true);
     });
   });
 
@@ -209,10 +218,10 @@ describe('makeFilter', () => {
     });
 
     it('datetime list: eq matches if any list item equals the operand (ISO string coerced)', () => {
-      const epoch = new Date('2023-06-15').getTime();
+      const iso = new Date('2023-06-15').toISOString();
       const fn = makeFilter({
         filterChain: [
-          { ...binary('dates', 'datetime', OP.EQ, epoch), list: true },
+          { ...binary('dates', 'datetime', OP.EQ, iso), list: true },
         ],
       });
       expect(fn({ dates: ['2023-01-01', '2023-06-15'] })).toBe(true);
@@ -370,7 +379,7 @@ describe('makeFilterChain', () => {
         },
       ],
     }) as BinaryFilter[];
-    expect(f.pad).toEqual({ fillString: '0', maxLength: 4 });
+    expect(f.pad).toEqual(DEFAULT_NUMERIC_PAD);
   });
 
   it('builds a TernaryFilter from gt+lt pair', () => {
@@ -691,23 +700,23 @@ describe('coerceFilterChainOperands', () => {
     expect(coerceFilterChainOperands([])).toEqual([]);
   });
 
-  it('converts datetime string operand to epoch number', () => {
+  it('normalizes datetime string operand to ISO string', () => {
     const iso = '2023-06-15T00:00:00.000Z';
     const [f] = coerceFilterChainOperands([
       binary('ts', 'datetime', OP.EQ, iso),
     ]) as BinaryFilter[];
-    expect(f.rightOperand).toBe(new Date(iso).getTime());
+    expect(f.rightOperand).toBe(iso);
   });
 
-  it('converts datetime array operand elements to epoch numbers', () => {
+  it('normalizes datetime array operand elements to ISO strings', () => {
     const dates = ['2023-01-01', '2023-06-01'];
     const [f] = coerceFilterChainOperands([
       { ...binary('ts', 'datetime', OP.IN, dates) },
     ]) as BinaryFilter[];
-    expect(f.rightOperand).toEqual(dates.map((d) => new Date(d).getTime()));
+    expect(f.rightOperand).toEqual(dates.map((d) => new Date(d).toISOString()));
   });
 
-  it('converts both operands of a datetime TernaryFilter', () => {
+  it('normalizes both operands of a datetime TernaryFilter to ISO strings', () => {
     const filter = ternary(
       'ts',
       'datetime',
@@ -717,8 +726,8 @@ describe('coerceFilterChainOperands', () => {
       '2023-12-31'
     );
     const [f] = coerceFilterChainOperands([filter]) as TernaryFilter[];
-    expect(f.leftOperand).toBe(new Date('2023-01-01').getTime());
-    expect(f.rightOperand).toBe(new Date('2023-12-31').getTime());
+    expect(f.leftOperand).toBe(new Date('2023-01-01').toISOString());
+    expect(f.rightOperand).toBe(new Date('2023-12-31').toISOString());
   });
 
   it('passes through non-datetime types unchanged', () => {

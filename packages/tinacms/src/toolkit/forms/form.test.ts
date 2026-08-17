@@ -398,6 +398,275 @@ describe('Form', () => {
           });
         });
       });
+
+      describe('with nested rich-text fields (2 levels deep)', () => {
+        // The outer Grid is at children[2] and the inner Panel is at
+        // children[0].  Using different indices is critical: the buggy
+        // findIndex always resolves the *outer* "children.2" slice when
+        // processing the inner rich-text, so getIn looks for children[2]
+        // in the inner content (which only has one element) and returns
+        // undefined, crashing with "Cannot read properties of undefined
+        // (reading 'props')".
+        function makeTwoLevelForm(defaults: FormOptions<any>) {
+          const panelTemplate = {
+            inline: false,
+            name: 'Panel',
+            fields: [{ type: 'string', name: 'title', required: true }],
+          };
+          return new Form({
+            ...defaults,
+            fields: [
+              {
+                type: 'rich-text',
+                name: 'body',
+                isBody: true,
+                templates: [
+                  {
+                    inline: false,
+                    name: 'Grid',
+                    fields: [
+                      {
+                        type: 'rich-text',
+                        name: 'gridBody',
+                        templates: [panelTemplate],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+            initialValues: {
+              body: {
+                type: 'root',
+                children: [
+                  { type: 'p', children: [{ type: 'text', text: 'a' }] },
+                  { type: 'p', children: [{ type: 'text', text: 'b' }] },
+                  {
+                    type: 'mdxJsxFlowElement',
+                    name: 'Grid',
+                    children: [{ type: 'text', text: '' }],
+                    props: {
+                      gridBody: {
+                        type: 'root',
+                        children: [
+                          {
+                            type: 'mdxJsxFlowElement',
+                            name: 'Panel',
+                            children: [{ type: 'text', text: '' }],
+                            props: { title: 'Hello' },
+                          },
+                        ],
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          });
+        }
+
+        it('does not crash', () => {
+          const form = makeTwoLevelForm(DEFAULTS);
+          expect(() =>
+            form.getActiveField(
+              'body.children.2.props.gridBody.children.0.props'
+            )
+          ).not.toThrow();
+        });
+
+        it('returns the correct template name', () => {
+          const form = makeTwoLevelForm(DEFAULTS);
+          const activeField = form.getActiveField(
+            'body.children.2.props.gridBody.children.0.props'
+          );
+          expect(activeField.name).toEqual(
+            'body.children.2.props.gridBody.children.0.props'
+          );
+        });
+
+        it('returns namespaced field names on the inner template', () => {
+          const form = makeTwoLevelForm(DEFAULTS);
+          const activeField = form.getActiveField(
+            'body.children.2.props.gridBody.children.0.props'
+          );
+          expect(activeField.fields).toEqual([
+            {
+              type: 'string',
+              name: 'body.children.2.props.gridBody.children.0.props.title',
+              required: true,
+            },
+          ]);
+        });
+      });
+
+      describe('with deeply nested rich-text fields (3 levels deep)', () => {
+        function makeThreeLevelForm(defaults: FormOptions<any>) {
+          const alertTemplate = {
+            inline: false,
+            name: 'Alert',
+            fields: [{ type: 'string', name: 'message' }],
+          };
+          const panelTemplate = {
+            inline: false,
+            name: 'Panel',
+            fields: [
+              {
+                type: 'rich-text',
+                name: 'panelBody',
+                templates: [alertTemplate],
+              },
+            ],
+          };
+          return new Form({
+            ...defaults,
+            fields: [
+              {
+                type: 'rich-text',
+                name: 'body',
+                isBody: true,
+                templates: [
+                  {
+                    inline: false,
+                    name: 'Grid',
+                    fields: [
+                      {
+                        type: 'rich-text',
+                        name: 'gridBody',
+                        templates: [panelTemplate],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+            initialValues: {
+              body: {
+                type: 'root',
+                children: [
+                  { type: 'p', children: [{ type: 'text', text: 'a' }] },
+                  {
+                    type: 'mdxJsxFlowElement',
+                    name: 'Grid',
+                    children: [{ type: 'text', text: '' }],
+                    props: {
+                      gridBody: {
+                        type: 'root',
+                        children: [
+                          {
+                            type: 'p',
+                            children: [{ type: 'text', text: 'b' }],
+                          },
+                          {
+                            type: 'p',
+                            children: [{ type: 'text', text: 'c' }],
+                          },
+                          {
+                            type: 'mdxJsxFlowElement',
+                            name: 'Panel',
+                            children: [{ type: 'text', text: '' }],
+                            props: {
+                              panelBody: {
+                                type: 'root',
+                                children: [
+                                  {
+                                    type: 'mdxJsxFlowElement',
+                                    name: 'Alert',
+                                    children: [{ type: 'text', text: '' }],
+                                    props: { message: 'Warning!' },
+                                  },
+                                ],
+                              },
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          });
+        }
+
+        // Grid at children[1], Panel at children[2], Alert at children[0]
+        // — all different indices to ensure correct resolution at each level.
+        const fieldName =
+          'body.children.1.props.gridBody.children.2.props.panelBody.children.0.props';
+
+        it('does not crash', () => {
+          const form = makeThreeLevelForm(DEFAULTS);
+          expect(() => form.getActiveField(fieldName)).not.toThrow();
+        });
+
+        it('returns the correct template name', () => {
+          const form = makeThreeLevelForm(DEFAULTS);
+          const activeField = form.getActiveField(fieldName);
+          expect(activeField.name).toEqual(fieldName);
+        });
+
+        it('returns namespaced field names on the innermost template', () => {
+          const form = makeThreeLevelForm(DEFAULTS);
+          const activeField = form.getActiveField(fieldName);
+          expect(activeField.fields).toEqual([
+            { type: 'string', name: `${fieldName}.message` },
+          ]);
+        });
+      });
+
+      describe('with malformed nested rich-text content', () => {
+        it('does not crash when inner content is empty', () => {
+          const form = new Form({
+            ...DEFAULTS,
+            fields: [
+              {
+                type: 'rich-text',
+                name: 'body',
+                isBody: true,
+                templates: [
+                  {
+                    inline: false,
+                    name: 'Grid',
+                    fields: [
+                      {
+                        type: 'rich-text',
+                        name: 'gridBody',
+                        templates: [
+                          {
+                            inline: false,
+                            name: 'Panel',
+                            fields: [{ type: 'string', name: 'title' }],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+            initialValues: {
+              body: {
+                type: 'root',
+                children: [
+                  {
+                    type: 'mdxJsxFlowElement',
+                    name: 'Grid',
+                    children: [{ type: 'text', text: '' }],
+                    props: {
+                      gridBody: { type: 'root', children: [] },
+                    },
+                  },
+                ],
+              },
+            },
+          });
+
+          expect(() =>
+            form.getActiveField(
+              'body.children.0.props.gridBody.children.0.props'
+            )
+          ).not.toThrow();
+        });
+      });
     });
 
     describe('when the rich-text child is an img node', () => {

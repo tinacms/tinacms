@@ -1,0 +1,56 @@
+---
+/**
+ * Renders any node whose default form is `<Tag>{children}</Tag>` —
+ * paragraphs, headings, lists, list items, blockquote, lic. The tag itself
+ * is derived from `node.type`; if the consumer registered an override on
+ * `components[type]`, we render that instead and pass children as a slot.
+ */
+import TinaMarkdown from './TinaMarkdown.astro';
+import type { CustomComponentsMap, TinaRichTextNode } from './types';
+
+interface Props {
+  node: TinaRichTextNode & { children: TinaRichTextNode[] };
+  components: CustomComponentsMap;
+}
+
+const { node, components } = Astro.props;
+const t = node.type;
+const Override = components[t];
+
+const tagFor: Record<
+  string,
+  | 'p'
+  | 'h1'
+  | 'h2'
+  | 'h3'
+  | 'h4'
+  | 'h5'
+  | 'h6'
+  | 'ol'
+  | 'ul'
+  | 'li'
+  | 'div'
+  | 'blockquote'
+> = {
+  p: 'p',
+  h1: 'h1',
+  h2: 'h2',
+  h3: 'h3',
+  h4: 'h4',
+  h5: 'h5',
+  h6: 'h6',
+  ol: 'ol',
+  ul: 'ul',
+  li: 'li',
+  blockquote: 'blockquote',
+  lic: 'div',
+};
+const Tag = tagFor[t];
+---
+{Override ? (
+  <Override>
+    <TinaMarkdown content={node.children} components={components} />
+  </Override>
+) : (
+  <Tag><TinaMarkdown content={node.children} components={components} /></Tag>
+)}

@@ -25,7 +25,44 @@ function expandOrigins(raw: (string | RegExp)[]): (string | RegExp)[] {
 }
 
 /**
- * Build a CORS `origin` callback compatible with the `cors` npm package.
+ * Decide whether a request `Origin` is allowed to reach the dev server.
+ *
+ * No `Origin` (curl, same-origin, CLI tooling) and localhost are always
+ * allowed; extra `allowedOrigins` (with `'private'` expanded) match by exact
+ * string or RegExp.
+ */
+export function isOriginAllowed(
+  origin: string | undefined,
+  allowedOrigins: (string | RegExp)[] = []
+): boolean {
+  // Allow requests with no Origin header (curl, same-origin, etc.).
+  if (!origin) {
+    return true;
+  }
+  if (LOCALHOST_RE.test(origin)) {
+    return true;
+  }
+  for (const allowed of expandOrigins(allowedOrigins)) {
+    if (typeof allowed === 'string') {
+      if (allowed === origin) {
+        return true;
+      }
+    } else {
+      allowed.lastIndex = 0;
+      if (allowed.test(origin)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/**
+ * Build a CORS `origin` callback for the `cors` npm package.
+ *
+ * NOTE: `cors` only uses this to set the `Access-Control-Allow-Origin` header;
+ * it does NOT reject disallowed requests server-side. State-changing routes
+ * must also gate on {@link isOriginAllowed} (see plugins.ts).
  */
 export function buildCorsOriginCheck(
   allowedOrigins: (string | RegExp)[] = []
@@ -33,32 +70,7 @@ export function buildCorsOriginCheck(
   origin: string | undefined,
   callback: (err: Error | null, allow?: boolean) => void
 ) => void {
-  const extra = expandOrigins(allowedOrigins);
-
   return (origin, callback) => {
-    // Allow requests with no Origin header (curl, same-origin, etc.).
-    if (!origin) {
-      callback(null, true);
-      return;
-    }
-    if (LOCALHOST_RE.test(origin)) {
-      callback(null, true);
-      return;
-    }
-    for (const allowed of extra) {
-      if (typeof allowed === 'string') {
-        if (allowed === origin) {
-          callback(null, true);
-          return;
-        }
-      } else {
-        allowed.lastIndex = 0;
-        if (allowed.test(origin)) {
-          callback(null, true);
-          return;
-        }
-      }
-    }
-    callback(null, false);
+    callback(null, isOriginAllowed(origin, allowedOrigins));
   };
 }

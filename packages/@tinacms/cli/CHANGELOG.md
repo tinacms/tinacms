@@ -1,5 +1,267 @@
 # tinacms-cli
 
+## 2.5.6
+
+### Patch Changes
+
+- [#7176](https://github.com/tinacms/tinacms/pull/7176) [`5daa624`](https://github.com/tinacms/tinacms/commit/5daa62453428320d3fe33e8f549aa814a42237f1) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Improve the error message when the CLI cannot resolve `tinacms` or a `@tinacms/*` package while building your Tina config or database. It now names the package that failed, reports the directory Tina searched from, and points at parent-directory package-manager files (`package.json`, `node_modules`, `yarn.lock`, `.pnp.cjs`) that can hijack module resolution. esbuild package resolution is also anchored at the project root.
+
+- [#7213](https://github.com/tinacms/tinacms/pull/7213) [`056ffc2`](https://github.com/tinacms/tinacms/commit/056ffc22dc87b0040281054f4140c6260c22ea1f) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Publish internal package references as ranges instead of exact versions.
+
+  Internal dependencies were declared as `workspace:*`, which pnpm expands to an **exact version** when publishing (`"tinacms": "3.10.0"`), not a range. An exact pin cannot deduplicate against the version a consumer has already installed, so npm nests a second — and third — complete copy of `tinacms` and its dependency tree. In a stock Astro + TinaCMS blog this produced three copies of `tinacms`, three of `mermaid` (186 MB), five of `date-fns` (151 MB), and four of `typescript` (88 MB): about **320 MB of duplication**.
+
+  The same expansion applied to `peerDependencies`, so packages such as `next-tinacms-cloudinary` and `tinacms-authjs` published `"tinacms": "3.10.0"` as a _peer_ — requiring consumers to have that exact version or hit an `ERESOLVE` conflict, and forcing a republish of every dependent on each `tinacms` release.
+
+  Switching these to `workspace:^` publishes them as caret ranges (`^3.10.0`), which deduplicate normally and let `onlyUpdatePeerDependentsWhenOutOfRange` do its job.
+
+- Updated dependencies [[`711ba30`](https://github.com/tinacms/tinacms/commit/711ba30f6e8955bbcea134fd22a5b498b7734325), [`908fe7d`](https://github.com/tinacms/tinacms/commit/908fe7ddc1c01a2c091f1e4f3c1b00f3696577b4), [`566af78`](https://github.com/tinacms/tinacms/commit/566af78ded66891edeb6fdf928b6543d45ac76fd), [`b8df6ee`](https://github.com/tinacms/tinacms/commit/b8df6eeee85b603406d204042a5ef95d49e8a9cf), [`59efccc`](https://github.com/tinacms/tinacms/commit/59efcccd3f1713870e40ebd9db25659cd6357237), [`056ffc2`](https://github.com/tinacms/tinacms/commit/056ffc22dc87b0040281054f4140c6260c22ea1f)]:
+  - tinacms@3.11.0
+  - @tinacms/app@2.5.10
+  - @tinacms/graphql@2.4.9
+  - @tinacms/search@1.2.23
+
+## 2.5.5
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/app@2.5.9
+  - @tinacms/graphql@2.4.8
+  - tinacms@3.10.1
+  - @tinacms/search@1.2.22
+
+## 2.5.4
+
+### Patch Changes
+
+- [#7168](https://github.com/tinacms/tinacms/pull/7168) [`0a927a4`](https://github.com/tinacms/tinacms/commit/0a927a4f8d228dd05ee7ca4be32899bc190e73af) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Security fix: TinaCloud authorization is now scoped to the site's own configured clientID instead of a value read from the request. `isAuthorized` takes an optional `expectedClientID` (falling back to `NEXT_PUBLIC_TINA_CLIENT_ID`) and refuses when neither resolves. `TinaCloudBackendAuthProvider`, the `next-tinacms-azure` adapter, and the `tinacms init` template all pass the site clientID through.
+
+  **Action required (self-hosted).** Authorization now fails closed when the site's clientID cannot be resolved at runtime. Ensure `NEXT_PUBLIC_TINA_CLIENT_ID` is present in the server runtime (not only inlined at build time), or pass the clientID explicitly to `TinaCloudBackendAuthProvider(...)` and to media-store `authorized` callbacks, e.g. `isAuthorized(req, process.env.NEXT_PUBLIC_TINA_CLIENT_ID)`. If it cannot be resolved, backend and media authorization will return 401.
+
+## 2.5.3
+
+### Patch Changes
+
+- [#7157](https://github.com/tinacms/tinacms/pull/7157) [`aef9de0`](https://github.com/tinacms/tinacms/commit/aef9de0dabff72e0815ea6dfc03ce720dd8c4a7b) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Bump `@tailwindcss/typography` to 0.5.20
+
+- Updated dependencies [[`c809733`](https://github.com/tinacms/tinacms/commit/c809733ce8037d81937e81f0c8781a6cf222099b), [`3a1b39a`](https://github.com/tinacms/tinacms/commit/3a1b39ad9a2bbeb82a539fbca6985d5b714238dd), [`de4a807`](https://github.com/tinacms/tinacms/commit/de4a80771e83afa8502f834227351cff54c5f236), [`8497110`](https://github.com/tinacms/tinacms/commit/8497110ada7554f97807ce7a09a3624b5efc5713), [`22d0c0d`](https://github.com/tinacms/tinacms/commit/22d0c0d095b79e116677a798d07b35591ccb816e), [`5148d67`](https://github.com/tinacms/tinacms/commit/5148d679049bc53e34b287a586bc721db7cb7710), [`ff10e65`](https://github.com/tinacms/tinacms/commit/ff10e657e48f1acc67cafd3e1a99bef23c8ac419), [`b53a51c`](https://github.com/tinacms/tinacms/commit/b53a51c92ee8ddecbb654f5b57c7d10673a06626)]:
+  - tinacms@3.10.0
+  - @tinacms/schema-tools@2.8.3
+  - @tinacms/graphql@2.4.7
+  - @tinacms/app@2.5.8
+  - @tinacms/search@1.2.21
+
+## 2.5.2
+
+### Patch Changes
+
+- [#7111](https://github.com/tinacms/tinacms/pull/7111) [`211997c`](https://github.com/tinacms/tinacms/commit/211997cdb53cbd43638bdee999faa65375cfc260) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Reject cross-origin state-changing requests on the dev server. Previously the `cors` middleware only suppressed response headers, so an attacker-controlled page could still drive a cross-origin multipart upload to completion (writing files into the media root). State-changing routes (`/media/upload`, `/media` DELETE, `searchIndex` POST/DELETE, and `/graphql` POST) now reject disallowed origins server-side with a 403.
+
+- [#7113](https://github.com/tinacms/tinacms/pull/7113) [`4ce8757`](https://github.com/tinacms/tinacms/commit/4ce87576055729fe66bf0e0da465ccec7950fc16) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Remove the unused legacy Express dev server (`src/server`). It was superseded by the Vite-based dev server years ago and is no longer reachable from the CLI. Its compiled output was still being published and deep-importable as `@tinacms/cli/dist/server`, exposing an un-gated media upload handler; deleting it removes that dead code path. The active `tinacms dev` server is unaffected.
+
+- [#7088](https://github.com/tinacms/tinacms/pull/7088) [`d44558e`](https://github.com/tinacms/tinacms/commit/d44558e9b4502d4f4fc2c970d22985339fe2b6ce) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Fix media upload/delete paths to prevent access to storage keys outside mediaRoot.
+
+- [#7095](https://github.com/tinacms/tinacms/pull/7095) [`39c06f7`](https://github.com/tinacms/tinacms/commit/39c06f7c21cac7dfd94ff6acfcdeec7117989773) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Harden npm publish pipeline and package manifests
+
+- Updated dependencies [[`c1994b3`](https://github.com/tinacms/tinacms/commit/c1994b36907710aeb36fd114fa6d0a8a0e1210d0), [`e74a7d6`](https://github.com/tinacms/tinacms/commit/e74a7d62ee1dce7386b5aaf5ebaf569d3adcd247), [`caadf1f`](https://github.com/tinacms/tinacms/commit/caadf1f68ec602277bcd4225a69c13fdc5402f7b), [`5ba482b`](https://github.com/tinacms/tinacms/commit/5ba482b9c10d76ea7f7bea2a442a8999824736a8), [`8a86ffa`](https://github.com/tinacms/tinacms/commit/8a86ffa045af8ff6dfa0ebc2775cf3b7b810d238), [`19fcbdd`](https://github.com/tinacms/tinacms/commit/19fcbdd90a33a66c437b0f91e325a8609022e0cc), [`871ce31`](https://github.com/tinacms/tinacms/commit/871ce31531d3d7dc379ec7d58cf427984dd6620a), [`d44558e`](https://github.com/tinacms/tinacms/commit/d44558e9b4502d4f4fc2c970d22985339fe2b6ce), [`39c06f7`](https://github.com/tinacms/tinacms/commit/39c06f7c21cac7dfd94ff6acfcdeec7117989773), [`4801b21`](https://github.com/tinacms/tinacms/commit/4801b21f31455d3ce6cb33e6233148caba9921c6)]:
+  - tinacms@3.9.4
+  - @tinacms/schema-tools@2.8.2
+  - @tinacms/app@2.5.7
+  - @tinacms/graphql@2.4.6
+  - @tinacms/search@1.2.20
+  - @tinacms/metrics@2.1.1
+
+## 2.5.1
+
+### Patch Changes
+
+- Updated dependencies [[`42760d8`](https://github.com/tinacms/tinacms/commit/42760d8f5afd201107e27e274308af37f96ba8d0), [`c491fc5`](https://github.com/tinacms/tinacms/commit/c491fc55e612725f5d775eeb1fdf3f8ba82314fa)]:
+  - tinacms@3.9.3
+  - @tinacms/app@2.5.6
+  - @tinacms/graphql@2.4.5
+  - @tinacms/search@1.2.19
+
+## 2.5.0
+
+### Minor Changes
+
+- [#7049](https://github.com/tinacms/tinacms/pull/7049) [`29a0e2e`](https://github.com/tinacms/tinacms/commit/29a0e2e43790af89408453a3a0ba9f77c31648df) Thanks [@0xharkirat](https://github.com/0xharkirat)! - Add **Astro** as a first-class framework in `tinacms init` (now listed first). Selecting Astro:
+
+  - auto-sets the public assets folder to `public` (no prompt) and wraps the `package.json` `dev`/`build` scripts (`tinacms dev -c "astro dev"`, `tinacms build && astro build`)
+  - installs `@tinacms/astro` plus an `@astrojs/node` adapter **pinned to the project's Astro major** (node 9 for Astro 5, node 10 for Astro 6), and matched `react`/`react-dom` (`^18.3.1`) as **dev dependencies** — the site stays React-free, but the admin SPA is built with React and a bare Astro project ships none (skipped when the project already declares both)
+  - wires `astro.config` for SSR + visual editing, or — when your config is already customized — prints exactly what to add
+  - scaffolds a self-contained, **fully editable** visual-editing demo at `/tinacms-demo`: a dark hero whose eyebrow, headline, tagline, and both call-to-action buttons (label + link) are all click-to-edit, with scoped styles and a procedural SVG starfield (no CSS framework or image assets). CMS-editable button links are passed through `sanitizeHref`.
+
+  The demo is scaffolded automatically with no opt-in (mirroring the Next.js init demo), and is skipped during Forestry migrations.
+
+  `init` also makes clear it adds Tina to an **existing** site: it points to `npx create-tina-app@latest` for new projects and stops early (with that pointer) when run in a folder that has no `package.json`.
+
+### Patch Changes
+
+- Updated dependencies [[`95b7523`](https://github.com/tinacms/tinacms/commit/95b75237cb91ec3dc5dac9ce52359f9786072502), [`c931f18`](https://github.com/tinacms/tinacms/commit/c931f18a19c292cd89530e41b71da8fcd90c8415)]:
+  - @tinacms/app@2.5.5
+  - @tinacms/graphql@2.4.4
+  - @tinacms/search@1.2.18
+  - tinacms@3.9.2
+
+## 2.4.4
+
+### Patch Changes
+
+- Updated dependencies [[`7b539b8`](https://github.com/tinacms/tinacms/commit/7b539b8e7d7d9f4451b5fd36a04d26b734f7d78e)]:
+  - tinacms@3.9.1
+  - @tinacms/app@2.5.4
+
+## 2.4.3
+
+### Patch Changes
+
+- [#7006](https://github.com/tinacms/tinacms/pull/7006) [`77665ae`](https://github.com/tinacms/tinacms/commit/77665ae73dd4f9563d339535e76fa811a8abdfbb) Thanks [@18-th](https://github.com/18-th)! - Harden Forestry migration code generation against untrusted input
+
+- Updated dependencies [[`a8dd9af`](https://github.com/tinacms/tinacms/commit/a8dd9af056b17a8faeaa621bbf7722a62b396cf8), [`916bd43`](https://github.com/tinacms/tinacms/commit/916bd43de1b563854fac65a74ecf04f946ebda56), [`b9d561f`](https://github.com/tinacms/tinacms/commit/b9d561fcea56185f0f146d2bdb1b510caab180d3)]:
+  - tinacms@3.9.0
+  - @tinacms/app@2.5.3
+
+## 2.4.2
+
+### Patch Changes
+
+- [#6946](https://github.com/tinacms/tinacms/pull/6946) [`e729ed9`](https://github.com/tinacms/tinacms/commit/e729ed917bdee9fac01cd341ccdeaed7985be405) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Add regression coverage for loading self-hosted database adapters through ConfigManager.loadDatabaseFile(), including memory-level, sqlite-level, mongodb-level, and the local Tina database client path.
+
+- Updated dependencies [[`5c216dd`](https://github.com/tinacms/tinacms/commit/5c216dd117ec5dd206c4efc68027f83cb6d2a932), [`c7b366c`](https://github.com/tinacms/tinacms/commit/c7b366c5de66b1a3f086c1f11954225e55430324), [`f7a2e5a`](https://github.com/tinacms/tinacms/commit/f7a2e5a4b90c8bb5890d62953907cb939b341918)]:
+  - @tinacms/graphql@2.4.3
+  - tinacms@3.8.4
+  - @tinacms/schema-tools@2.8.1
+  - @tinacms/search@1.2.17
+  - @tinacms/app@2.5.2
+
+## 2.4.1
+
+### Patch Changes
+
+- Updated dependencies [[`7be8175`](https://github.com/tinacms/tinacms/commit/7be81751a6b93f785d347e759e91f024bb12c452)]:
+  - @tinacms/app@2.5.1
+  - tinacms@3.8.3
+
+## 2.4.0
+
+### Minor Changes
+
+- [#6790](https://github.com/tinacms/tinacms/pull/6790) [`542c781`](https://github.com/tinacms/tinacms/commit/542c781b4f7a6ff5b5481bd88329f60c9bf3b57d) Thanks [@Ben0189](https://github.com/Ben0189)! - Fix native SQLite (and other native CJS adapters) crashing the ESM database build, plus surrounding cleanup work.
+
+  **The bug.** Since Tina v3's December 2025 ESM migration, bundling `tina/database.ts` with esbuild — and writing the output to `os.tmpdir()` — left users wedged between two failure modes: bundling native modules like `better-sqlite3` crashed with `__filename is not defined`, and externalizing them couldn't resolve `node_modules` from `/tmp/`. See #6675.
+
+  **What changed:**
+
+  - `loadDatabaseFile` and `loadConfigFile` now write esbuild output to `<project>/tina/__generated__/.cache/<timestamp>/` instead of `os.tmpdir()`, so Node's resolver can walk up to the project's `node_modules` at runtime.
+  - `better-sqlite3` is externalized so Node loads it as CJS where `__filename` exists.
+  - The build cache is swept on startup (clears residue from crashed prior runs), and each per-build subdir + its now-empty timestamp parent are removed after the dynamic-import resolves.
+  - Read-only project mounts (Docker `:ro` volumes, AWS Lambda's `/var/task`, sandboxed CI runners) now fail with an actionable error explaining the cause and resolution, instead of a cryptic mid-build `EACCES`.
+  - New `defineConfig` field: `build.externalDependencies?: string[]`. Users with custom native adapters outside the baseline can extend the externalize list from their config:
+
+    ```ts
+    // tina/config.ts
+    export default defineConfig({
+      build: {
+        publicFolder: "public",
+        outputFolder: "admin",
+        externalDependencies: ["my-custom-native-adapter"],
+      },
+      // ...
+    });
+    ```
+
+    Externalized packages must be installed in the project's `node_modules` so Node can resolve them at runtime.
+
+  - `tina init` now adds `tina/__generated__` to `.gitignore` for new projects (and existing projects without it).
+
+### Patch Changes
+
+- [#6841](https://github.com/tinacms/tinacms/pull/6841) [`c8b4ecb`](https://github.com/tinacms/tinacms/commit/c8b4ecbf6c1a70ac594db4eccf25956ec2153ad9) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Track `tinacms build` invocations + outcomes in PostHog. Replaces the `metrics.tina.io` event for this command. Opt-out via `--noTelemetry` is unchanged.
+
+- [#6950](https://github.com/tinacms/tinacms/pull/6950) [`8ac0776`](https://github.com/tinacms/tinacms/commit/8ac0776dea0c0650a5e5098c143b24c17fc25b8e) Thanks [@RonGamzu](https://github.com/RonGamzu)! - Fix typos: rename misspelled `notifiySubscribers` to `notifySubscribers` and correct "Error occured" to "Error occurred" in CLI error messages
+
+- [#6864](https://github.com/tinacms/tinacms/pull/6864) [`638b47a`](https://github.com/tinacms/tinacms/commit/638b47aa7c11308bc0b93fbc40794b40a53b44e0) Thanks [@kulesy](https://github.com/kulesy)! - Extract the database-bundle esbuild options out of `loadDatabaseFile()` into a pure `buildDatabaseEsbuildConfig()` helper, and add unit tests covering the externalize / output-path contracts.
+
+  The helper guarantees:
+
+  - `external` includes `better-sqlite3` (and whatever else the caller passes)
+  - `packages: 'external'` is never set (broad-externalize would break user-side named imports of CJS UMD packages like `sqlite-level` v1 and `mongodb-level`)
+  - `outfile` is forwarded unchanged from the caller (caller is responsible for putting it inside the project tree via `prepareCacheLocation()`)
+  - The fixed esbuild options (`bundle`, `platform: 'node'`, `format: 'esm'`, `createRequire` banner, loader map) are stable
+
+  Closes the regression-test gap left by the architectural fix in #6790.
+
+- Updated dependencies [[`0509095`](https://github.com/tinacms/tinacms/commit/0509095601fedc87f05a622e219e6414ef51a6b6), [`542c781`](https://github.com/tinacms/tinacms/commit/542c781b4f7a6ff5b5481bd88329f60c9bf3b57d), [`33feeac`](https://github.com/tinacms/tinacms/commit/33feeacf6585be2736a0a14c5a800c1b6db34e44), [`8ac0776`](https://github.com/tinacms/tinacms/commit/8ac0776dea0c0650a5e5098c143b24c17fc25b8e), [`d622ac5`](https://github.com/tinacms/tinacms/commit/d622ac5c0205adfc1b5cd8fe5f42045e579029c3), [`a8c8f08`](https://github.com/tinacms/tinacms/commit/a8c8f08012d30c5ed0df67ad2b04b805a9434784), [`b9eaf61`](https://github.com/tinacms/tinacms/commit/b9eaf61c28c25814ae65b5fbe72d5b33df0b3596), [`cf73a11`](https://github.com/tinacms/tinacms/commit/cf73a115c3a58fac26e2518734dd3cb49133260d), [`4757225`](https://github.com/tinacms/tinacms/commit/475722599ff350b45bfdb4f7a6af2e37d33c81c3)]:
+  - @tinacms/app@2.5.0
+  - @tinacms/schema-tools@2.8.0
+  - tinacms@3.8.2
+  - @tinacms/search@1.2.16
+  - @tinacms/graphql@2.4.2
+
+## 2.3.1
+
+### Patch Changes
+
+- [#6850](https://github.com/tinacms/tinacms/pull/6850) [`629af08`](https://github.com/tinacms/tinacms/commit/629af08dc4b6dbe7ed652cbc5dfd55699b0fffa9) Thanks [@18-th](https://github.com/18-th)! - Fix the generated `client.ts` / `databaseClient.ts` `./types` import so it satisfies both TypeScript strict mode and Node native ESM. The generated import is now `import { queries } from "./types.js"` unconditionally, and the CLI emits a co-resident `types.js` alongside `types.ts` for TypeScript projects. Modern TS module resolution (`bundler` / `node16` / `nodenext`) rewrites the `.js` import back to `types.ts` at compile time, so type checking still sees the `.ts` source and `allowImportingTsExtensions` is not required, while Node ESM consumers resolve the on-disk `.js` file at runtime.
+
+- Updated dependencies [[`890108d`](https://github.com/tinacms/tinacms/commit/890108dd6c1a88a1c5531cf397514c34712d13bd)]:
+  - @tinacms/graphql@2.4.1
+  - @tinacms/search@1.2.15
+  - tinacms@3.8.1
+  - @tinacms/app@2.4.8
+
+## 2.3.0
+
+### Minor Changes
+
+- [#6738](https://github.com/tinacms/tinacms/pull/6738) [`4d0c37a`](https://github.com/tinacms/tinacms/commit/4d0c37a8a50b211b7c5070c370faa369ee5d260d) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Stop writing generated files (`_schema.json`, `_graphql.json`, `_lookup.json`, `tina-lock.json`) to the content repo when `localContentPath` is set. Generated files now live only in the generator repo's `tina/__generated__/`. The content repo is no longer required to contain a `tina/` folder. `FilesystemBridge.get` / `put` / `delete` now route `tina/__generated__/` and `.tina/__generated__/` paths to `rootPath` (the generator) instead of `outputPath` (the content root). Closes [tinacms/tinacloud#3295](https://github.com/tinacms/tinacloud/issues/3295).
+
+  ### ⚠️ Rollout gate
+
+  **This release must not be promoted to the `@latest` dist-tag until TinaCloud prod has deployed [tinacms/tinacloud#3403](https://github.com/tinacms/tinacloud/issues/3403).** Pre-#3403 TinaCloud reads `tina-lock.json` from the content repo on generator pushes; shipping this change before the server-side fix breaks every existing multi-repo user's indexing.
+
+  ### Migration notes for existing multi-repo projects
+
+  After upgrading (and once TinaCloud prod is on #3403):
+
+  - **Stale `tina/` folder in your content repo.** Pre-upgrade builds committed `tina/__generated__/*` and `tina/tina-lock.json` to the content repo. Nothing updates or reads those files any more. They are safe — and recommended — to delete from the content repo in a single cleanup commit.
+  - **`ConfigManager.generatedFolderPathContentRepo` is removed.** If any custom CLI code, plugins, or scripts referenced this field, they will fail at type-check or runtime. Use `generatedFolderPath` — it has always been the generator-relative path.
+  - **`ConfigManager.getTinaFolderPath` no longer accepts an `isContentRoot` option.** The content root never needs a `tina/` folder now, so the option was removed. If any custom code called `getTinaFolderPath(path, { isContentRoot: true })`, drop the second argument.
+  - **`FilesystemBridge` behavior change for `tina/__generated__/` paths.** In multi-repo setups, bridge reads/writes of paths under `tina/__generated__/` or `.tina/__generated__/` now resolve against the generator (`rootPath`) rather than the content repo (`outputPath`). If you have custom bridge subclasses or code that relied on these paths resolving to the content repo, update it.
+  - **Generated `client.ts` / `database-client.ts` now import `./types` extensionless** (was `./types.ts`) for TypeScript projects. Avoids requiring `allowImportingTsExtensions: true` in consumer tsconfigs, which broke the build under Next.js 15.5+ defaults. JS projects still import `./types.js` (Node ESM requires the extension).
+
+### Patch Changes
+
+- Updated dependencies [[`723632b`](https://github.com/tinacms/tinacms/commit/723632b050b1e9502c46215fd6e8e548cc108ac0), [`95758a0`](https://github.com/tinacms/tinacms/commit/95758a0ad31ec96aa652f247211a769e82a37cbb), [`eafb1ff`](https://github.com/tinacms/tinacms/commit/eafb1ffbd78267838f6939b3e993efc37c05cb2e), [`4d0c37a`](https://github.com/tinacms/tinacms/commit/4d0c37a8a50b211b7c5070c370faa369ee5d260d), [`9e7eba9`](https://github.com/tinacms/tinacms/commit/9e7eba9f290c935cd56569421de88b5adfac65d8)]:
+  - tinacms@3.8.0
+  - @tinacms/graphql@2.4.0
+  - @tinacms/metrics@2.1.0
+  - @tinacms/app@2.4.7
+  - @tinacms/search@1.2.14
+
+## 2.2.6
+
+### Patch Changes
+
+- [#6770](https://github.com/tinacms/tinacms/pull/6770) [`3da4588`](https://github.com/tinacms/tinacms/commit/3da45887c23da552a4bd994154eeaaf8990065f7) Thanks [@zaidkhatri-dev](https://github.com/zaidkhatri-dev)! - - Improved error handling for file and folder operations: errors are now shown as clear notifications in the UI rather than just logging to the console.
+
+  - Fixed an issue where renaming a document to an already existing filename would silently fail; this now correctly triggers an error alert in the UI.
+
+- [#6739](https://github.com/tinacms/tinacms/pull/6739) [`7f66caa`](https://github.com/tinacms/tinacms/commit/7f66caab15d6cf2ea5d68afbc00db2b700c21aab) Thanks [@galsakuri](https://github.com/galsakuri)! - Fix missing .js extension on ./types import in generated client.ts and databaseClient.ts
+
+- [#6758](https://github.com/tinacms/tinacms/pull/6758) [`63234a1`](https://github.com/tinacms/tinacms/commit/63234a1aca7d7f0a86aaa0de4565428460f466c3) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - ⚕️ adds `tinacms doctor` in CLI to check a project's direct TinaCMS package dependencies against the npm latest dist-tag
+
+- [#6776](https://github.com/tinacms/tinacms/pull/6776) [`c9e08ef`](https://github.com/tinacms/tinacms/commit/c9e08efc71bac7ba4e136a04990ced1b8be348e3) Thanks [@kulesy](https://github.com/kulesy)! - Warn when a project still uses the legacy `.tina/` config folder. `tina-lock.json` is only generated for the new `tina/` layout, and TinaCloud requires it to index the schema, so projects on the legacy layout were silently failing the Project Setup Checklist. The warning fires once per CLI run from `dev`, `build`, and any other command that loads the config.
+
+- Updated dependencies [[`3e4dcc7`](https://github.com/tinacms/tinacms/commit/3e4dcc76d5fb89ec900b778cb7e82f3aa3ed6501), [`38cbec7`](https://github.com/tinacms/tinacms/commit/38cbec7b1b204f395f4e6e97c4bab6edc7296439), [`3da4588`](https://github.com/tinacms/tinacms/commit/3da45887c23da552a4bd994154eeaaf8990065f7), [`b37187d`](https://github.com/tinacms/tinacms/commit/b37187d46b6e1a274db7ab79372f02aaa2ef992d), [`75f69a6`](https://github.com/tinacms/tinacms/commit/75f69a6476ff98614ae8cb910bcedb5fe52331e2), [`556a162`](https://github.com/tinacms/tinacms/commit/556a16255df4b48df69c14133ee6530b68dd9131), [`84ec7ad`](https://github.com/tinacms/tinacms/commit/84ec7adea7a1d8015cf1430fe804886493c5ae21), [`28b869a`](https://github.com/tinacms/tinacms/commit/28b869a0d2c9b2a608e1076b6dea24bd3e01ac31)]:
+  - tinacms@3.7.6
+  - @tinacms/graphql@2.3.1
+  - @tinacms/schema-tools@2.7.4
+  - @tinacms/search@1.2.13
+  - @tinacms/app@2.4.6
+  - @tinacms/metrics@2.0.1
+
 ## 2.2.5
 
 ### Patch Changes

@@ -4,19 +4,19 @@ import { useCMS } from '@toolkit/react-core';
 import { FormModal } from '@toolkit/react-forms';
 import type { ScreenPlugin } from '@toolkit/react-screens';
 import { TinaCMS } from '@toolkit/tina-cms';
-import * as React from 'react';
-import { BiExit, BiMenu, BiX } from 'react-icons/bi';
-import { FiInfo } from 'react-icons/fi';
-import { VscNewFile } from 'react-icons/vsc';
 import { cn } from '@utils/cn';
-import { NavContext } from './nav-context';
+import { FilePlus, Info, LogOut, Menu, X } from 'lucide-react';
+import * as React from 'react';
 import { VersionInfo } from './VersionInfo';
+import { NavContext } from './nav-context';
 import { SyncStatusButton, SyncStatusModal } from './sync-status';
+import { AnnouncementsBanner } from '../../../admin/components/AnnouncementsBanner';
 
 interface NavCollection {
   label?: string;
   name: string;
   isAuthCollection?: boolean;
+  ui?: { global?: boolean | object };
 }
 
 interface NavProps {
@@ -37,6 +37,9 @@ interface NavProps {
   sidebarWidth?: number;
   RenderNavSite: React.ComponentType<{ view: ScreenPlugin }>;
   RenderNavCloud: React.ComponentType<{ config: CloudConfigPlugin }>;
+  RenderNavGlobal: React.ComponentType<{
+    collection: { label?: string; name: string };
+  }>;
   RenderNavCollection: React.ComponentType<{
     collection: { label: string; name: string };
   }>;
@@ -60,6 +63,7 @@ export const Nav = ({
   sidebarWidth,
   RenderNavSite,
   RenderNavCloud,
+  RenderNavGlobal,
   RenderNavCollection,
   AuthRenderNavCollection,
   ...props
@@ -72,17 +76,20 @@ export const Nav = ({
 
   const menuIsOpen = menuIsOpenProp ?? navContext?.menuIsOpen ?? false;
   const toggleMenu = toggleMenuProp ?? navContext?.toggleMenu ?? (() => {});
-  const { contentCollections, authCollection } =
+  const { contentCollections, authCollection, globalCollections } =
     collectionsInfo.collections.reduce(
       (
         acc: {
           contentCollections: NavCollection[];
+          globalCollections: NavCollection[];
           authCollection?: NavCollection;
         },
         collection: NavCollection
       ) => {
         if (collection.isAuthCollection) {
           acc.authCollection = collection;
+        } else if (collection.ui?.global) {
+          acc.globalCollections.push(collection);
         } else {
           acc.contentCollections.push(collection);
         }
@@ -90,6 +97,7 @@ export const Nav = ({
       },
       {
         contentCollections: [],
+        globalCollections: [],
       }
     );
 
@@ -117,7 +125,7 @@ export const Nav = ({
               toggleMenu();
             }}
           >
-            <BiMenu className='h-8 w-auto text-gray-600' />
+            <Menu className='h-8 w-auto text-gray-600' />
           </button>
         </div>
       )}
@@ -141,11 +149,14 @@ export const Nav = ({
               toggleMenu();
             }}
           >
-            <BiX className='h-8 w-auto text-gray-600' />
+            <X className='h-8 w-auto text-gray-600' />
           </button>
         </div>
         {children}
         <div className='flex flex-col px-6 flex-1 overflow-auto'>
+          <div className='-mx-6'>
+            <AnnouncementsBanner />
+          </div>
           {showCollections && (
             <>
               <h4 className='flex space-x-1 justify-items-start uppercase font-sans font-bold text-sm mb-3 mt-8 text-gray-700'>
@@ -156,7 +167,7 @@ export const Nav = ({
                       href='https://tina.io/docs/r/content-modelling-collections'
                       target='_blank'
                     >
-                      <FiInfo />
+                      <Info className='w-4 h-4' />
                     </a>
                   </span>
                 )}
@@ -167,12 +178,22 @@ export const Nav = ({
               />
             </>
           )}
-          {(screenCategories.Site.length > 0 || contentCreators.length) > 0 && (
+          {(globalCollections.length > 0 ||
+            screenCategories.Site.length > 0 ||
+            contentCreators.length > 0) && (
             <>
               <h4 className='uppercase font-sans font-bold text-sm mb-3 mt-8 text-gray-700'>
                 Site
               </h4>
               <ul className='flex flex-col gap-4'>
+                {globalCollections.map((collection) => {
+                  return (
+                    <li key={`nav-global-${collection.name}`}>
+                      <RenderNavGlobal collection={collection} />
+                    </li>
+                  );
+                })}
+
                 {screenCategories.Site.map((view) => {
                   return (
                     <li key={`nav-site-${view.name}`}>
@@ -296,7 +317,7 @@ const CreateContentNavItem = ({ plugin }) => {
           setOpen(true);
         }}
       >
-        <VscNewFile className='mr-3 h-6 opacity-80 w-auto' /> {plugin.name}
+        <FilePlus className='mr-3 h-6 opacity-80 w-auto' /> {plugin.name}
       </button>
       {open && <FormModal plugin={plugin} close={() => setOpen(false)} />}
     </li>
@@ -326,7 +347,7 @@ const Logout = ({
 
   return (
     <button onClick={handleLogout} {...buttonProps}>
-      <BiExit className='w-6 h-auto mr-2' /> Log Out
+      <LogOut className='w-6 h-auto mr-2' /> Log Out
     </button>
   );
 };

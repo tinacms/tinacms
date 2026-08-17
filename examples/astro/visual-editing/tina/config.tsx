@@ -1,0 +1,34 @@
+import { defineConfig } from 'tinacms';
+
+import Author from './collections/author';
+import Blog from './collections/blog';
+import Global from './collections/global';
+import Page from './collections/page';
+import Post from './collections/post';
+import Tag from './collections/tag';
+
+const branch =
+  process.env.GITHUB_BRANCH ||
+  process.env.VERCEL_GIT_COMMIT_REF ||
+  process.env.HEAD ||
+  'main';
+
+export default defineConfig({
+  branch,
+  clientId: process.env.TINA_CLIENT_ID || null,
+  token: process.env.TINA_TOKEN || null,
+  localContentPath: '../../../shared',
+  build: {
+    outputFolder: 'admin',
+    publicFolder: 'public',
+  },
+  media: {
+    tina: {
+      mediaRoot: 'uploads',
+      publicFolder: 'public',
+    },
+  },
+  schema: {
+    collections: [Tag, Author, Global, Post, Blog, Page],
+  },
+});

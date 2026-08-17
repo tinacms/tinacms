@@ -32,12 +32,25 @@ export interface TinaCMSServerError extends EventsBase {
   name: 'tinacms:cli:server:error';
   errorMessage: string;
 }
+
+export interface TinaCMSDevInvoke extends EventsBase {
+  name: 'tinacms:cli:dev:invoke';
+  hasLocalContentPath: boolean;
+}
+
+export interface TinaCMSBuildInvoke extends EventsBase {
+  name: 'tinacms:cli:build:invoke';
+  hasLocalContentPath: boolean;
+}
+
 export type Events =
   | CreateTinaAppInvoke
   | TinaCMSAuditInvoke
   | TinaCMSInitInvoke
   | TinaCMSServerStartInvoke
-  | TinaCMSServerError;
+  | TinaCMSServerError
+  | TinaCMSDevInvoke
+  | TinaCMSBuildInvoke;
 
 type Merge<A, B> = {
   [K in keyof A]: K extends keyof B ? B[K] : A[K];

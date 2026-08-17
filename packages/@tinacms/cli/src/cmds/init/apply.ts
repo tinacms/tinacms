@@ -18,9 +18,18 @@ import { templates as NextTemplates } from './templates/next';
 import { ConfigTemplateArgs, generateConfig } from './templates/config';
 import { databaseTemplate } from './templates/database';
 import { nextApiRouteTemplate } from './templates/tinaNextRoute';
-import { helloWorldPost } from './templates/content';
+import { astroHelloWorldPost, helloWorldPost } from './templates/content';
 import { format } from 'prettier';
-import { extendNextScripts } from '../../utils/script-helpers';
+import {
+  extendAstroScripts,
+  extendNextScripts,
+} from '../../utils/script-helpers';
+import {
+  type AstroSetupResult,
+  logAstroConfigGuidance,
+  setupAstroVisualEditing,
+} from './astro-visual-editing';
+import { astroNodeAdapterDep } from './astro-config-detect';
 import {
   Framework,
   GeneratedFile,
@@ -42,7 +51,10 @@ async function apply({
   params: InitParams;
   config: Config;
 }) {
-  if (config.framework.name === 'other' && config.hosting === 'self-host') {
+  if (
+    (config.framework.name === 'other' || config.framework.name === 'astro') &&
+    config.hosting === 'self-host'
+  ) {
     logger.error(
       logText(
         'Self-hosted Tina requires init setup only works with next.js right now. Please check out the docs for info on how to setup Tina on another framework: https://tina.io/docs/r/self-hosting-nextjs'
@@ -95,6 +107,12 @@ async function apply({
     }
     if (!env.gitIgnoreEnvExists) {
       itemsToAdd.push('.env');
+    }
+    if (!env.gitIgnoreTinaGeneratedExists) {
+      // Tina writes generated artifacts (including the build cache used to
+      // bundle tina/database.ts and tina/config.ts) under tina/__generated__/.
+      // None of it should be committed.
+      itemsToAdd.push('tina/__generated__');
     }
     if (itemsToAdd.length > 0) {
       await updateGitIgnore({ baseDir, items: itemsToAdd });
@@ -168,6 +186,18 @@ async function apply({
     });
   }
 
+  // Wire the Astro dev/build scripts + scaffold the visual-editing demo
+  // (first-time init only)
+  let astroSetup: AstroSetupResult | null = null;
+  if (
+    config.framework.name === 'astro' &&
+    !env.tinaConfigExists &&
+    !env.forestryConfigExists
+  ) {
+    await updateAstroPackageJson({ baseDir });
+    astroSetup = setupAstroVisualEditing({ baseDir });
+  }
+
   await addDependencies(config, env, params);
 
   if (!env.tinaConfigExists) {
@@ -210,7 +240,12 @@ async function apply({
     dataLayer: usingDataLayer,
     packageManager: config.packageManager,
     framework: config.framework,
+    demoScaffolded: !!astroSetup?.demoScaffolded,
   });
+
+  if (astroSetup && !astroSetup.configHandled) {
+    logAstroConfigGuidance();
+  }
 }
 
 const forestryMigrate = async ({
@@ -272,7 +307,10 @@ const createPackageJSON = async () => {
 };
 const createGitignore = async ({ baseDir }: { baseDir: string }) => {
   logger.info(logText('No .gitignore found, creating one'));
-  fs.outputFileSync(path.join(baseDir, '.gitignore'), 'node_modules');
+  fs.outputFileSync(
+    path.join(baseDir, '.gitignore'),
+    'node_modules\ntina/__generated__\n'
+  );
 };
 
 const updateGitIgnore = async ({
@@ -313,6 +351,18 @@ const addDependencies = async (
 
   if (config.hosting === 'self-host') {
     deps.push('@tinacms/datalayer');
+  }
+
+  if (config.framework.name === 'astro') {
+    deps.push('@tinacms/astro', astroNodeAdapterDep(env.astroMajor));
+    // The Astro site is React-free, but the TinaCMS admin SPA is built with
+    // React. Astro ships none, and tinacms' loose peer range (>=16.14.0) can
+    // resolve mismatched react/react-dom majors, which blanks the admin. Add
+    // both as matched dev deps (build-time only, for the admin), like the Astro
+    // starter. Skip when the project already declares React.
+    if (!env.hasReactDep) {
+      devDeps.push('react@^18.3.1', 'react-dom@^18.3.1');
+    }
   }
 
   // Add deps from database adapter, auth provider, and git provider
@@ -508,7 +558,8 @@ const addContentFile = async ({
       },
     },
     overwrite: config.overwriteList?.includes('sample-content'),
-    content: helloWorldPost,
+    content:
+      config.framework?.name === 'astro' ? astroHelloWorldPost : helloWorldPost,
     typescript: false,
   });
 };
@@ -519,12 +570,14 @@ const logNextSteps = ({
   framework,
   packageManager,
   isBackend,
+  demoScaffolded,
 }: {
   config: Config;
   isBackend: boolean;
   dataLayer: boolean;
   packageManager: string;
   framework: Framework;
+  demoScaffolded?: boolean;
 }) => {
   if (isBackend) {
     logger.info(focusText(`\n${titleText(' TinaCMS ')} backend initialized!`));
@@ -574,6 +627,13 @@ const logNextSteps = ({
         '<YourDevURL>/admin/index.html'
       )}`
     );
+    if (framework.name === 'astro' && demoScaffolded) {
+      logger.info(
+        `Try the visual-editing demo at ${linkText(
+          '<YourDevURL>/tinacms-demo'
+        )} (open the post in the CMS to click-and-edit).`
+      );
+    }
   }
 };
 
@@ -587,21 +647,24 @@ const other = ({ packageManager }: { packageManager: string }) => {
   return `${packageManagers[packageManager]} tinacms dev -c "<your dev command>"`;
 };
 
+const runDevScript = ({ packageManager }: { packageManager: string }) => {
+  const packageManagers = {
+    pnpm: `pnpm`,
+    npm: `npm run`,
+    yarn: `yarn`,
+    bun: `bun run`,
+  };
+  return `${packageManagers[packageManager]} dev`;
+};
+
 const frameworkDevCmds: {
   [key in Framework['name']]: (args?: { packageManager: string }) => string;
 } = {
   other,
   hugo: other,
   jekyll: other,
-  next: ({ packageManager }: { packageManager: string }) => {
-    const packageManagers = {
-      pnpm: `pnpm`,
-      npm: `npm run`, // npx is the way to run executables that aren't in your "scripts"
-      yarn: `yarn`,
-      bun: `bun run`,
-    };
-    return `${packageManagers[packageManager]} dev`;
-  },
+  astro: runDevScript,
+  next: runDevScript,
 };
 
 type AddReactiveParams = {
@@ -652,6 +715,25 @@ const addReactiveFile: {
     );
     fs.writeFileSync(packageJsonPath, updatedPackageJson);
   },
+};
+
+const updateAstroPackageJson = async ({ baseDir }: { baseDir: string }) => {
+  const packageJsonPath = path.join(baseDir, 'package.json');
+  if (!fs.existsSync(packageJsonPath)) {
+    return;
+  }
+  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath).toString());
+  const scripts = packageJson.scripts || {};
+  const updatedPackageJson = JSON.stringify(
+    {
+      ...packageJson,
+      scripts: extendAstroScripts(scripts),
+    },
+    null,
+    2
+  );
+  fs.writeFileSync(packageJsonPath, updatedPackageJson);
+  logger.info('Updating package.json scripts for Astro... ✅');
 };
 
 /**

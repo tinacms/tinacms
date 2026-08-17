@@ -8,9 +8,16 @@ describe('EventBus', () => {
     const event = { type: 'example' };
 
     events.subscribe('*', listener);
-    events.dispatch(event);
+    const handled = events.dispatch(event);
 
     expect(listener).toHaveBeenCalledWith(event);
+    expect(handled).toBe(true);
+  });
+
+  it('returns false when no listener handles the dispatched event', () => {
+    const events = new EventBus();
+
+    expect(events.dispatch({ type: 'example' })).toBe(false);
   });
   test('for an array of eventscalls listeners and passes it the dispatched event', () => {
     const listener = vi.fn();
@@ -36,6 +43,38 @@ describe('EventBus', () => {
       events.dispatch(event);
 
       expect(listener).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('hasExplicitListenerFor', () => {
+    it('is true when a listener specifically targets the event', () => {
+      const events = new EventBus();
+      events.subscribe('foo:bar', vi.fn());
+
+      expect(events.hasExplicitListenerFor('foo:bar')).toBe(true);
+    });
+
+    it('ignores catch-all wildcard listeners', () => {
+      const events = new EventBus();
+      events.subscribe('*', vi.fn());
+
+      expect(events.hasExplicitListenerFor('foo:bar')).toBe(false);
+    });
+
+    it('is false when nothing targets the event', () => {
+      const events = new EventBus();
+      events.subscribe('other', vi.fn());
+
+      expect(events.hasExplicitListenerFor('foo:bar')).toBe(false);
+    });
+
+    it('is false after the targeting listener unsubscribes', () => {
+      const events = new EventBus();
+      const unsubscribe = events.subscribe('foo:bar', vi.fn());
+
+      expect(events.hasExplicitListenerFor('foo:bar')).toBe(true);
+      unsubscribe();
+      expect(events.hasExplicitListenerFor('foo:bar')).toBe(false);
     });
   });
 });

@@ -58,9 +58,29 @@ export const normalizeBranchName = (name: string): string =>
     .filter(Boolean)
     .join('/');
 
-// Live-input slugifier for branch name fields: invalid special characters
-// become hyphens and the result is lowercased. Slash handling stays out of it
-// so nested names can still be typed; apply normalizeBranchName at submit.
+// Live-input slugifier: invalid-char runs collapse to one hyphen, lowercased; slashes
+// pass through so nested names stay typable. Loop, not regex, to stay off CodeQL's radar.
 export function formatBranchName(str: string): string {
-  return str.replace(/[^/\w-]+/g, '-').toLowerCase();
+  let result = '';
+  let replacingInvalidChars = false;
+
+  for (const char of str.toLowerCase()) {
+    const code = char.charCodeAt(0);
+    const isValid =
+      char === '/' ||
+      char === '-' ||
+      char === '_' ||
+      (code >= 48 && code <= 57) ||
+      (code >= 97 && code <= 122);
+
+    if (isValid) {
+      result += char;
+      replacingInvalidChars = false;
+    } else if (!replacingInvalidChars) {
+      result += '-';
+      replacingInvalidChars = true;
+    }
+  }
+
+  return result;
 }

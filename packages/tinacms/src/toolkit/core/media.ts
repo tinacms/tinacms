@@ -92,11 +92,32 @@ export interface MediaStore {
   list(options?: MediaListOptions): Promise<MediaList>;
 
   /**
+   * Renames a media object in the store. `from` and `to` are media-root-relative
+   * `directory/filename` paths, matching what `delete` receives.
+   *
+   * Optional by design: the media manager only offers a Rename action when the
+   * store instance actually defines it, so stores opt in individually. Defining
+   * it on the prototype but leaving it unsupported at runtime would surface an
+   * action that always fails — see `TinaMediaStore`, which assigns it per
+   * instance.
+   */
+  rename?(from: string, to: string): Promise<Media>;
+
+  /**
    * Indicates that uploads and deletions are not supported
    *
    * @default false
    */
   isStatic?: boolean;
+
+  /**
+   * Indicates that `list` honours the `search` option, so the media manager
+   * may show a search box. Stores that ignore `search` should leave this
+   * unset to avoid a search box that returns unfiltered results.
+   *
+   * @default false
+   */
+  searchable?: boolean;
 
   /**
    * Converts a Media object to the value stored in a form field.
@@ -117,6 +138,7 @@ export interface MediaListOptions {
   offset?: MediaListOffset;
   thumbnailSizes?: { w: number; h: number }[];
   filesOnly?: boolean;
+  search?: string;
 }
 
 /**
@@ -219,6 +241,29 @@ export class MediaManager implements MediaStore {
     }
   }
 
+  /**
+   * `from` and `to` are media-root-relative `directory/filename` paths — the
+   * same shape `delete` sends. They must not carry an origin, a CDN host, the
+   * public folder, or the media root prefix.
+   */
+  async rename(from: string, to: string): Promise<Media> {
+    if (typeof this.store.rename !== 'function') {
+      throw new MediaRenameError({
+        code: 'UNSUPPORTED',
+        message: 'This media store does not support renaming.',
+      });
+    }
+    try {
+      this.events.dispatch({ type: 'media:rename:start', from, to });
+      const media = await this.store.rename(from, to);
+      this.events.dispatch({ type: 'media:rename:success', from, to, media });
+      return media;
+    } catch (error) {
+      this.events.dispatch({ type: 'media:rename:failure', from, to, error });
+      throw error;
+    }
+  }
+
   async list(options: MediaListOptions): Promise<MediaList> {
     try {
       this.events.dispatch({ type: 'media:list:start', ...options });
@@ -287,4 +332,32 @@ export const E_DEFAULT = new MediaListError({
   title: 'An Error Occurred',
   message: 'Something went wrong accessing your media from TinaCloud.',
   docsLink: 'https://tina.io/docs/r/repo-based-media',
+});
+
+export type MediaRenameErrorCode =
+  | 'NOT_FOUND'
+  | 'NAME_COLLISION'
+  | 'INVALID_FILENAME'
+  | 'INVALID_PATH'
+  | 'UNAUTHORIZED'
+  | 'UNSUPPORTED'
+  | 'BACKEND_FAILURE';
+
+export class MediaRenameError extends Error {
+  public ERR_TYPE = 'MediaRenameError';
+  public code: MediaRenameErrorCode;
+
+  constructor(config: { code: MediaRenameErrorCode; message: string }) {
+    super(config.message);
+    this.code = config.code;
+  }
+}
+
+export const E_SELF_HOSTED_MEDIA = new MediaListError({
+  title: "Repo-based media isn't available when self-hosting",
+  message:
+    "Self-hosted TinaCMS can't serve media from your repo through TinaCloud. " +
+    'Configure an external media store (e.g. S3, Cloudinary, DigitalOcean Spaces, or Azure) ' +
+    'with media.loadCustomStore, or add media to your repo manually.',
+  docsLink: 'https://tina.io/docs/r/backend-media-handler/',
 });

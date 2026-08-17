@@ -25,7 +25,7 @@ import type { Bridge } from './bridge';
 import {
   type BinaryFilter,
   DEFAULT_COLLECTION_SORT_KEY,
-  DEFAULT_NUMERIC_LPAD,
+  DEFAULT_NUMERIC_PAD,
   FOLDER_ROOT,
   FolderTreeBuilder,
   type IndexDefinition,
@@ -531,7 +531,13 @@ export class Database {
 
         // If a collection match is specified, make sure the file matches the glob.
         // TODO: Maybe we should service this error better in the frontend?
-        if (collection.match?.exclude || collection.match?.include) {
+        const isFolderPlaceholder = filepath.endsWith(
+          `.gitkeep.${collection.format || 'md'}`
+        );
+        if (
+          !isFolderPlaceholder &&
+          (collection.match?.exclude || collection.match?.include)
+        ) {
           const matches = this.tinaSchema.getMatches({ collection });
 
           const match = micromatch.isMatch(filepath, matches);
@@ -963,7 +969,7 @@ export class Database {
                       list: !!field.list,
                       pad:
                         field.type === 'number'
-                          ? { fillString: '0', maxLength: DEFAULT_NUMERIC_LPAD }
+                          ? DEFAULT_NUMERIC_PAD
                           : undefined,
                     },
                   ],
@@ -983,6 +989,10 @@ export class Database {
                       name: indexField.name,
                       type: field?.type,
                       list: !!field?.list,
+                      pad:
+                        field?.type === 'number'
+                          ? DEFAULT_NUMERIC_PAD
+                          : undefined,
                     };
                   }),
                 };
@@ -1713,8 +1723,9 @@ const _indexContent = async ({
         }
       }
 
+      let putOps: BatchOp[] = [];
       if (!isGitKeep(filepath, collection)) {
-        await enqueueOps([
+        putOps = [
           ...makeRefOpsForDocument(
             normalizedPath,
             collection?.name,
@@ -1740,17 +1751,21 @@ const _indexContent = async ({
             'put',
             level
           ),
-          {
-            type: 'put',
-            key: normalizedPath,
-            value: aliasedData as any,
-            sublevel: level.sublevel<string, Record<string, any>>(
-              CONTENT_ROOT_PREFIX,
-              SUBLEVEL_OPTIONS
-            ),
-          },
-        ]);
+        ];
       }
+
+      await enqueueOps([
+        ...putOps,
+        {
+          type: 'put',
+          key: normalizedPath,
+          value: aliasedData as any,
+          sublevel: level.sublevel<string, Record<string, any>>(
+            CONTENT_ROOT_PREFIX,
+            SUBLEVEL_OPTIONS
+          ),
+        },
+      ]);
     } catch (error) {
       throw new TinaFetchError(`Unable to seed ${filepath}`, {
         originalError: error,

@@ -22,6 +22,8 @@ import {
   NumberedListPlugin,
 } from '@udecode/plate-list/react';
 import { toggleList } from '@udecode/plate-list';
+import { useToolbarContext } from '../../toolbar/toolbar-provider';
+import type { HeadingLevel } from '../../toolbar/toolbar-overrides';
 
 interface SlashCommandRule {
   icon: ComponentType<SVGProps<SVGSVGElement>>;
@@ -30,28 +32,48 @@ interface SlashCommandRule {
   keywords?: string[];
 }
 
-const rules: SlashCommandRule[] = [
-  {
+const headingRulesByLevel: Record<HeadingLevel, SlashCommandRule> = {
+  h1: {
     icon: Icons.h1,
-    onSelect: (editor) => {
-      editor.tf.toggleBlock(HEADING_KEYS.h1);
-    },
+    onSelect: (editor) => editor.tf.toggleBlock(HEADING_KEYS.h1),
     value: 'Heading 1',
   },
-  {
+  h2: {
     icon: Icons.h2,
-    onSelect: (editor) => {
-      editor.tf.toggleBlock(HEADING_KEYS.h2);
-    },
+    onSelect: (editor) => editor.tf.toggleBlock(HEADING_KEYS.h2),
     value: 'Heading 2',
   },
-  {
+  h3: {
     icon: Icons.h3,
-    onSelect: (editor) => {
-      editor.tf.toggleBlock(HEADING_KEYS.h3);
-    },
+    onSelect: (editor) => editor.tf.toggleBlock(HEADING_KEYS.h3),
     value: 'Heading 3',
   },
+  h4: {
+    icon: Icons.h4,
+    onSelect: (editor) => editor.tf.toggleBlock(HEADING_KEYS.h4),
+    value: 'Heading 4',
+  },
+  h5: {
+    icon: Icons.h5,
+    onSelect: (editor) => editor.tf.toggleBlock(HEADING_KEYS.h5),
+    value: 'Heading 5',
+  },
+  h6: {
+    icon: Icons.h6,
+    onSelect: (editor) => editor.tf.toggleBlock(HEADING_KEYS.h6),
+    value: 'Heading 6',
+  },
+};
+
+// The slash menu historically only exposed h1-h3; preserve that default so
+// existing editors don't suddenly grow new entries.
+const DEFAULT_SLASH_HEADING_LEVELS: readonly HeadingLevel[] = [
+  'h1',
+  'h2',
+  'h3',
+];
+
+const listRules: SlashCommandRule[] = [
   {
     icon: Icons.ul,
     keywords: ['ul', 'unordered list'],
@@ -73,6 +95,14 @@ const rules: SlashCommandRule[] = [
 export const SlashInputElement = withRef<typeof PlateElement>(
   ({ className, ...props }, ref) => {
     const { children, editor, element } = props;
+    const { headingLevels, headingLevelsConfigured } = useToolbarContext();
+    const slashHeadingLevels = headingLevelsConfigured
+      ? headingLevels
+      : DEFAULT_SLASH_HEADING_LEVELS;
+    const rules: SlashCommandRule[] = [
+      ...slashHeadingLevels.map((level) => headingRulesByLevel[level]),
+      ...listRules,
+    ];
 
     useEffect(() => {
       captureEvent(SlashCommandOpenedEvent);

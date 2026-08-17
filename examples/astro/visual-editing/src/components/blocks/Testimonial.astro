@@ -1,0 +1,33 @@
+---
+import { tinaField } from '@tinacms/astro/tina-field';
+import type { PageBlocksTestimonial } from '../../../tina/__generated__/types';
+import { cn } from '../../lib/utils';
+import Container from '../layout/Container.astro';
+import Section from '../layout/Section.astro';
+
+interface Props {
+  data: PageBlocksTestimonial;
+}
+
+const { data } = Astro.props;
+const isPrimary = data.color === 'primary';
+---
+<Section color={data.color}>
+  <Container size="large">
+    <blockquote>
+      <div class={cn('relative z-10 max-w-3xl mx-auto text-4xl lg:text-5xl font-bold tracking-normal text-center title-font', isPrimary ? 'text-white' : 'text-gray-700 dark:text-gray-50')}>
+        <p data-tina-field={tinaField(data, 'quote')} class="relative opacity-95">
+          “{data.quote}”
+        </p>
+      </div>
+      <div class="my-8">
+        <span class={cn('block mx-auto h-0.5 w-1/6', isPrimary ? 'bg-white/30' : 'bg-gray-200 dark:bg-gray-700')} />
+      </div>
+      <footer class="text-center">
+        <p data-tina-field={tinaField(data, 'author')} class={cn('tracking-wide title-font font-bold text-lg', isPrimary ? 'text-white/80' : 'text-theme-500 dark:text-theme-300')}>
+          {data.author}
+        </p>
+      </footer>
+    </blockquote>
+  </Container>
+</Section>

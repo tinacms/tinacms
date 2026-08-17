@@ -1,3 +1,5 @@
+import { ASYNC_POLLER_ERROR } from '@tinacms/schema-tools';
+
 /**
  * The function you pass to `asyncPoll` should return a promise
  * that resolves with object that satisfies this interface.
@@ -95,13 +97,13 @@ export function asyncPoll<T>(
       .then((result) => {
         const now = new Date().getTime();
         if (stop) {
-          reject(new Error('AsyncPoller: cancelled'));
+          reject(new Error(ASYNC_POLLER_ERROR.CANCELLED));
         } else if (result.done) {
           resolve(result.data);
         } else if (now < endTime) {
           setTimeout(checkCondition, pollInterval, resolve, reject);
         } else {
-          reject(new Error('AsyncPoller: reached timeout'));
+          reject(new Error(ASYNC_POLLER_ERROR.TIMEOUT));
         }
       })
       .catch((err) => {

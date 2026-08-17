@@ -1,7 +1,7 @@
-import { getMarks } from '../../stringify';
+import type { RichTextField, RichTextType } from '@tinacms/schema-tools';
 import type * as Md from 'mdast';
 import type * as Plate from '../../parse/plate';
-import type { RichTextField, RichTextType } from '@tinacms/schema-tools';
+import { getMarks } from '../../stringify';
 import { stringifyPropsInline } from './acorn';
 
 const matches = (a: string[], b: string[]) => {
@@ -133,7 +133,9 @@ const inlineElementExceptLink = (
       if (!content.type && typeof content.text === 'string') {
         return text(content);
       }
-      throw new Error(`InlineElement: ${content.type} is not supported`);
+      throw new Error(
+        `This content can't be saved as markdown ("${content.type}"). Remove it from the field to continue.`
+      );
   }
 };
 
@@ -153,7 +155,10 @@ const markAttributes = (content: Plate.TextElement) => {
     {
       type: 'mdxJsxAttribute' as const,
       name: 'style',
-      value: `background-color: ${content.highlightColor}`,
+      value: {
+        type: 'mdxJsxAttributeValueExpression' as const,
+        value: `{ backgroundColor: "${content.highlightColor}" }`,
+      },
     },
   ];
 };
@@ -275,7 +280,9 @@ export const eat = (
   }
   if (markToProcess === 'highlight') {
     if (nonMatchingSiblingIndex) {
-      throw new Error('Marks inside highlight are not supported');
+      throw new Error(
+        "Highlighted text can't have other formatting on it. Remove the formatting from the highlighted text."
+      );
     }
     const f = first as Plate.TextElement;
     const innerText = text({ text: f.text });
@@ -297,7 +304,9 @@ export const eat = (
       linkifyTextNode?: (arg: Md.Text) => Md.Link;
     };
     if (nonMatchingSiblingIndex) {
-      throw new Error(`Marks inside inline code are not supported`);
+      throw new Error(
+        "Inline code can't have other formatting on it. Remove the formatting from the code text."
+      );
     }
     const node = {
       type: markToProcess,

@@ -5,6 +5,7 @@ import {
   BranchSwitcherPlugin,
   DummyMediaStore,
   MediaStore,
+  MediaWorkflowOverlay,
   StaticMedia,
   TinaCMS,
   TinaMediaStore,
@@ -500,7 +501,7 @@ export const TinaCloudProvider = (
 
   React.useEffect(() => {
     const setupEditorialWorkflow = () => {
-      client.getProject().then((project) => {
+      client.getProject().then(async (project) => {
         if (project?.features?.includes('editorial-workflow')) {
           cms.flags.set('branch-switcher', true);
           client.usingEditorialWorkflow = true;
@@ -535,6 +536,7 @@ export const TinaCloudProvider = (
         }}
       >
         <TinaProvider cms={cms}>
+          <MediaWorkflowOverlay />
           <AuthWallInner {...props} cms={cms} />
         </TinaProvider>
       </BranchDataProvider>

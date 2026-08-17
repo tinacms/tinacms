@@ -8,9 +8,8 @@ import {
   PopupModal,
 } from '@toolkit/react-modals';
 import { Button } from '@toolkit/styles';
+import { CircleAlert, CircleCheck, Info, TriangleAlert, X } from 'lucide-react';
 import React from 'react';
-import { BiX } from 'react-icons/bi';
-import { MdCheckCircle, MdError, MdInfo, MdWarning } from 'react-icons/md';
 
 const parseUrlsInText = (text: string): React.ReactNode => {
   const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
@@ -57,13 +56,13 @@ export function Alerts({ alerts }: AlertsProps) {
             return (
               <Alert key={alert.id} level={alert.level}>
                 {alert.level === 'info' && (
-                  <MdInfo className='w-5 h-auto text-blue-500' />
+                  <Info className='w-5 h-auto text-blue-500' />
                 )}
                 {alert.level === 'success' && (
-                  <MdCheckCircle className='w-5 h-auto text-green-500' />
+                  <CircleCheck className='w-5 h-auto text-green-500' />
                 )}
                 {alert.level === 'warn' && (
-                  <MdWarning className='w-5 h-auto text-yellow-500' />
+                  <TriangleAlert className='w-5 h-auto text-yellow-500' />
                 )}
                 <p className='m-0 flex-1 max-w-[680px] text-left break-all'>
                   {parseUrlsInText(alert.message.toString())}
@@ -101,7 +100,7 @@ export function Alerts({ alerts }: AlertsProps) {
                     alerts.dismiss(alert);
                   }}
                 >
-                  <MdError className='mr-1 w-6 h-auto fill-current inline-block text-red-600' />{' '}
+                  <CircleAlert className='mr-1 w-6 h-auto inline-block text-red-600' />{' '}
                   Error
                 </ModalHeader>
                 <ModalBody padded={true}>
@@ -170,6 +169,6 @@ const CloseAlert = ({ ...styleProps }) => (
     className='border-none bg-transparent p-0 outline-none flex items-center'
     {...styleProps}
   >
-    <BiX className='w-5 auto flex-grow-0 flex-shrink-0 text-gray-700' />
+    <X className='w-5 auto flex-grow-0 flex-shrink-0 text-gray-700' />
   </button>
 );

@@ -1,9 +1,10 @@
 import * as React from 'react';
+import { ERR_BRANCH_CONFLICT, ERR_BRANCH_EXISTS } from '@tinacms/schema-tools';
 import { useBranchData } from '@toolkit/plugin-branch-switcher';
 import { useCMS } from '../react-core';
 import {
-  EDITORIAL_WORKFLOW_STATUS,
   EDITORIAL_WORKFLOW_ERROR,
+  EDITORIAL_WORKFLOW_STATUS,
   EditorialWorkflowErrorDetails,
 } from './editorial-workflow-constants';
 import {
@@ -12,6 +13,11 @@ import {
   UPDATE_DOCUMENT_GQL,
 } from '../../admin/api';
 import { Form } from '@toolkit/forms';
+import {
+  checkTargetBranchExists,
+  getEditorialWorkflowPrTitle,
+  TARGET_BRANCH_EXISTS_ERROR,
+} from './editorial-workflow-utils';
 
 const pathRelativeToCollection = (
   collectionPath: string,
@@ -28,6 +34,19 @@ const pathRelativeToCollection = (
   throw new Error(
     `Path ${fullPath} not within collection path ${collectionPath}`
   );
+};
+
+const getEditorialWorkflowMutation = (crudType: string): string => {
+  if (crudType === 'create') {
+    return CREATE_DOCUMENT_GQL;
+  }
+  if (crudType === 'delete') {
+    return DELETE_DOCUMENT_GQL;
+  }
+  if (crudType !== 'view') {
+    return UPDATE_DOCUMENT_GQL;
+  }
+  return '';
 };
 
 export const WORKFLOW_STEPS = [
@@ -49,6 +68,10 @@ export interface ExecuteWorkflowOptions {
   values: Record<string, unknown>;
   crudType: string;
   tinaForm?: Form;
+  signal?: AbortSignal;
+  // When false, opens a ready-for-review PR. Omitted keeps the server's draft-first default.
+  isDraft?: boolean;
+  targetBranchExists?: boolean;
 }
 
 export interface UseEditorialWorkflowResult {
@@ -56,11 +79,46 @@ export interface UseEditorialWorkflowResult {
   errorMessage: string;
   currentStep: number;
   elapsedTime: number;
-  /** Returns true on success, false on failure (error captured in errorMessage) */
-  executeWorkflow: (opts: ExecuteWorkflowOptions) => Promise<boolean>;
+  /** Resolves with the outcome; on failure `error` holds the message. */
+  executeWorkflow: (
+    opts: ExecuteWorkflowOptions
+  ) => Promise<{ success: boolean; error?: string }>;
   /** Reset error/executing state so the form can be retried */
   reset: () => void;
 }
+
+export const getEditorialWorkflowErrorMessage = (e: unknown): string => {
+  let errMessage =
+    'Branch operation failed. Talking to GitHub was unsuccessful, please try again. If the problem persists please contact support at https://tina.io/support 🦙';
+
+  const err = e as EditorialWorkflowErrorDetails;
+
+  if (err.errorCode) {
+    switch (err.errorCode) {
+      case EDITORIAL_WORKFLOW_ERROR.BRANCH_EXISTS:
+        errMessage = 'A branch with this name already exists';
+        break;
+      case EDITORIAL_WORKFLOW_ERROR.BRANCH_HIERARCHY_CONFLICT:
+        errMessage =
+          err.message || 'Branch name conflicts with an existing branch';
+        break;
+      case EDITORIAL_WORKFLOW_ERROR.VALIDATION_FAILED:
+        errMessage = err.message || 'Invalid branch name';
+        break;
+      default:
+        errMessage = err.message || errMessage;
+        break;
+    }
+  } else if (err.message) {
+    if (err.message.toLowerCase().includes(ERR_BRANCH_EXISTS)) {
+      errMessage = 'A branch with this name already exists';
+    } else if (err.message.toLowerCase().includes(ERR_BRANCH_CONFLICT)) {
+      errMessage = err.message;
+    }
+  }
+
+  return errMessage;
+};
 
 export function useEditorialWorkflow(): UseEditorialWorkflowResult {
   const cms = useCMS();
@@ -99,19 +157,35 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
     values,
     crudType,
     tinaForm,
-  }: ExecuteWorkflowOptions): Promise<boolean> => {
+    signal,
+    isDraft,
+    targetBranchExists: precomputedTargetBranchExists,
+  }: ExecuteWorkflowOptions): Promise<{ success: boolean; error?: string }> => {
     try {
+      if (signal?.aborted) return { success: false };
+
+      const targetBranchExists =
+        precomputedTargetBranchExists ??
+        (await checkTargetBranchExists(
+          tinaApi,
+          branchName,
+          'executeEditorialWorkflow',
+          signal
+        ));
+
+      if (signal?.aborted) return { success: false };
+
+      if (targetBranchExists) {
+        setErrorMessage(TARGET_BRANCH_EXISTS_ERROR);
+        setIsExecuting(false);
+        setCurrentStep(0);
+        return { success: false, error: TARGET_BRANCH_EXISTS_ERROR };
+      }
+
       setIsExecuting(true);
       setCurrentStep(1);
 
-      let graphql = '';
-      if (crudType === 'create') {
-        graphql = CREATE_DOCUMENT_GQL;
-      } else if (crudType === 'delete') {
-        graphql = DELETE_DOCUMENT_GQL;
-      } else if (crudType !== 'view') {
-        graphql = UPDATE_DOCUMENT_GQL;
-      }
+      const graphql = getEditorialWorkflowMutation(crudType);
 
       const collection = tinaApi.schema.getCollectionByFullPath(path);
 
@@ -136,7 +210,8 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
       const result = await tinaApi.executeEditorialWorkflow({
         branchName,
         baseBranch,
-        prTitle: `${branchName.replace('tina/', '').replace('-', ' ')} (PR from TinaCMS)`,
+        prTitle: getEditorialWorkflowPrTitle(branchName),
+        isDraft,
         graphQLContentOp: {
           query: graphql,
           variables: {
@@ -192,43 +267,16 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
         }`;
       }
 
-      return true;
+      return { success: true };
     } catch (e: unknown) {
       console.error(e);
-      let errMessage =
-        'Branch operation failed. Talking to GitHub was unsuccessful, please try again. If the problem persists please contact support at https://tina.io/support 🦙';
-
-      const err = e as EditorialWorkflowErrorDetails;
-
-      if (err.errorCode) {
-        switch (err.errorCode) {
-          case EDITORIAL_WORKFLOW_ERROR.BRANCH_EXISTS:
-            errMessage = 'A branch with this name already exists';
-            break;
-          case EDITORIAL_WORKFLOW_ERROR.BRANCH_HIERARCHY_CONFLICT:
-            errMessage =
-              err.message || 'Branch name conflicts with an existing branch';
-            break;
-          case EDITORIAL_WORKFLOW_ERROR.VALIDATION_FAILED:
-            errMessage = err.message || 'Invalid branch name';
-            break;
-          default:
-            errMessage = err.message || errMessage;
-            break;
-        }
-      } else if (err.message) {
-        if (err.message.toLowerCase().includes('already exists')) {
-          errMessage = 'A branch with this name already exists';
-        } else if (err.message.toLowerCase().includes('conflict')) {
-          errMessage = err.message;
-        }
-      }
+      const errMessage = getEditorialWorkflowErrorMessage(e);
 
       setErrorMessage(errMessage);
       setIsExecuting(false);
       setCurrentStep(0);
 
-      return false;
+      return { success: false, error: errMessage };
     }
   };
 

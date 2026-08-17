@@ -1,5 +1,5 @@
-import type { ToolbarOverrideType } from '@tinacms/schema-tools';
-export type { ToolbarOverrideType };
+import type { HeadingLevel, ToolbarOverrideType } from '@tinacms/schema-tools';
+export type { HeadingLevel, ToolbarOverrideType };
 
 export const STANDARD_ICON_WIDTH = 32;
 export const HEADING_ICON_WITH_TEXT = 127;
@@ -13,4 +13,5 @@ export const HEADING_LABEL = 'Headings';
 export type ToolbarOverrides = {
   toolbar?: ToolbarOverrideType[];
   showFloatingToolbar?: boolean;
+  headingLevels?: HeadingLevel[];
 };

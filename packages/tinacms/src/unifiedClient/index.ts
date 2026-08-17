@@ -10,6 +10,13 @@ export interface TinaClientArgs<GenQueries = Record<string, unknown>> {
   queries: (client: TinaClient<GenQueries>) => GenQueries;
   errorPolicy?: Config['client']['errorPolicy'];
   cacheDir?: string;
+  /**
+   * Set to `false` to force-disable the filesystem-backed response cache, even
+   * when a `cacheDir` is provided. Useful as an escape hatch on runtimes where
+   * the cache shouldn't run (e.g. an edge runtime not auto-detected). Defaults
+   * to enabled when a `cacheDir` is set.
+   */
+  cache?: boolean;
 }
 export type TinaClientRequestArgs = {
   variables?: Record<string, any>;
@@ -40,6 +47,32 @@ function replaceGithubPathSplit(url: string, replacement: string) {
   }
 }
 
+/**
+ * Detects edge runtimes that expose a Node `fs` shim where the filesystem is not
+ * actually usable for the response cache. On Cloudflare Workers (workerd) the
+ * `node:fs` calls don't throw — they hang — which would never release the
+ * per-key cache lock and deadlock concurrent same-key requests. On these
+ * runtimes the client must skip the filesystem-backed cache entirely and take
+ * the lock-free request path instead. Every global is probed defensively so
+ * this never throws under a normal Node build.
+ */
+function isEdgeRuntimeWithoutFs(): boolean {
+  // Cloudflare Workers (workerd) reports this exact navigator.userAgent.
+  if (
+    typeof navigator !== 'undefined' &&
+    navigator.userAgent === 'Cloudflare-Workers'
+  ) {
+    return true;
+  }
+  // Vercel Edge runtime exposes a global `EdgeRuntime`.
+  if (
+    typeof (globalThis as { EdgeRuntime?: unknown }).EdgeRuntime !== 'undefined'
+  ) {
+    return true;
+  }
+  return false;
+}
+
 export class TinaClient<GenQueries> {
   public apiUrl: string;
   public readonlyToken?: string;
@@ -49,6 +82,7 @@ export class TinaClient<GenQueries> {
   cacheLock: AsyncLock | undefined;
   cacheDir: string;
   cache: Cache | null;
+  cacheEnabled: boolean;
 
   constructor({
     token,
@@ -56,12 +90,14 @@ export class TinaClient<GenQueries> {
     queries,
     errorPolicy,
     cacheDir,
+    cache,
   }: TinaClientArgs<GenQueries>) {
     this.apiUrl = url;
     this.readonlyToken = token?.trim();
     this.queries = queries(this);
     this.errorPolicy = errorPolicy || 'throw';
     this.cacheDir = cacheDir || '';
+    this.cacheEnabled = cache !== false;
   }
 
   async init() {
@@ -69,7 +105,12 @@ export class TinaClient<GenQueries> {
       return;
     }
     try {
-      if (this.cacheDir && typeof window === 'undefined') {
+      if (
+        this.cacheEnabled &&
+        this.cacheDir &&
+        typeof window === 'undefined' &&
+        !isEdgeRuntimeWithoutFs()
+      ) {
         const { NodeCache } = await import('../cache/node-cache.js');
         this.cache = await NodeCache(this.cacheDir);
         if (this.cache) {

@@ -1,0 +1,16 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "invalid_markdown",
+      "value": "<Greeting message={isOpen ? \"Open\" : \"Closed\"} />\n",
+      "message": "Unable to parse field value for field \"message\" (type: string). Expected type to be Literal but received ConditionalExpression. TinaCMS supports a stricter version of markdown and a subset of MDX. https://tina.io/docs/r/what-is-markdown",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ]
+    }
+  ]
+}

@@ -82,13 +82,13 @@ export const Icon = ({
   className = '',
   tinaField = '',
 }) => {
+  const theme = useTheme();
+
   if (IconOptions[data.name] === null || IconOptions[data.name] === undefined) {
     return null;
   }
 
   const { name, color, size = 'medium', style = 'regular' } = data;
-
-  const theme = useTheme();
 
   const IconSVG = IconOptions[name];
 

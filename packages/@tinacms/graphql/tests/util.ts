@@ -11,7 +11,7 @@ import { z } from 'zod';
 
 class OutputBridge extends FilesystemBridge {
   async put(_filepath: string, data: string) {
-    super.put(`out.md`, data);
+    await super.put(`out.md`, data);
   }
 }
 

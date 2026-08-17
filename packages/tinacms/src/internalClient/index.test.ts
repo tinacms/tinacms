@@ -1,9 +1,9 @@
-import { Client, LocalClient, LocalAuthProvider } from './index';
 import {
   EDITORIAL_WORKFLOW_ERROR,
   EDITORIAL_WORKFLOW_STATUS,
   EditorialWorkflowErrorDetails,
 } from '../toolkit/form-builder/editorial-workflow-constants';
+import { Client, LocalAuthProvider, LocalClient } from './index';
 
 const makeResponse = ({
   status,
@@ -215,6 +215,110 @@ describe('Tina Client', () => {
     });
   });
 
+  describe('getAnnouncements', () => {
+    let client: Client;
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+      vi.restoreAllMocks();
+    });
+
+    it('returns null without fetching for a custom content API client', async () => {
+      client = buildClient({
+        customContentApiUrl: 'https://self-hosted.example.com/graphql',
+      });
+      const fetchMock = vi.fn();
+      vi.stubGlobal('fetch', fetchMock);
+
+      const result = await client.getAnnouncements('1.2.3');
+
+      expect(result).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('returns null without fetching when contentApiUrlOverride is set in the schema', async () => {
+      client = buildClient({
+        schema: {
+          collections: [],
+          config: {
+            contentApiUrlOverride: '/api/tina/gql',
+          },
+        } as any,
+      });
+      const fetchMock = vi.fn();
+      vi.stubGlobal('fetch', fetchMock);
+
+      const result = await client.getAnnouncements('1.2.3');
+
+      expect(result).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('returns null without fetching for a LocalClient', async () => {
+      client = new LocalClient();
+      const fetchMock = vi.fn();
+      vi.stubGlobal('fetch', fetchMock);
+
+      const result = await client.getAnnouncements('1.2.3');
+
+      expect(result).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('fetches from the content API base and returns the announcements for a TinaCloud client', async () => {
+      client = buildClient();
+      const announcements = [
+        {
+          id: 'a-1',
+          headline: 'Hello',
+          body: 'World',
+          severity: 'info',
+        },
+      ];
+      stubFetchOnce(
+        makeResponse({
+          status: 200,
+          body: { announcements },
+        })
+      );
+
+      const result = await client.getAnnouncements('1.2.3');
+
+      expect(result).toEqual(announcements);
+      expect(global.fetch).toHaveBeenCalledWith(
+        'https://content.tinajs.io/announcement?version=1.2.3'
+      );
+    });
+
+    it('returns null when the response is not ok', async () => {
+      client = buildClient();
+      stubFetchOnce(
+        makeResponse({
+          status: 500,
+          body: { error: 'boom' },
+        })
+      );
+
+      const result = await client.getAnnouncements('1.2.3');
+
+      expect(result).toBeNull();
+    });
+
+    it('returns null when the fetch rejects', async () => {
+      client = buildClient();
+      const fetchMock = vi.fn().mockRejectedValueOnce(new Error('network'));
+      vi.stubGlobal('fetch', fetchMock);
+      const consoleError = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+
+      const result = await client.getAnnouncements('1.2.3');
+
+      expect(result).toBeNull();
+      consoleError.mockRestore();
+    });
+  });
+
   describe('branch management', () => {
     let client: Client;
     let fetchWithToken: ReturnType<typeof vi.fn>;
@@ -400,6 +504,36 @@ describe('Tina Client', () => {
       const result = await localClient.branchExists('any-branch');
 
       expect(result).toBe(true);
+      expect(localFetchWithToken).not.toHaveBeenCalled();
+    });
+
+    it('branchesExist resolves several branches from a single list_branches fetch', async () => {
+      fetchWithToken.mockResolvedValueOnce(
+        makeResponse({
+          status: 200,
+          body: [
+            { name: 'main', protected: true },
+            { name: 'tina/existing', protected: false },
+          ] as unknown as Record<string, unknown>,
+        })
+      );
+
+      const result = await client.branchesExist(['main', 'tina/new-branch']);
+
+      expect(result).toEqual({ main: true, 'tina/new-branch': false });
+      expect(fetchWithToken).toHaveBeenCalledTimes(1);
+    });
+
+    it('branchesExist returns all-true in local mode without calling listBranches', async () => {
+      const localClient = new LocalClient();
+      const localFetchWithToken = vi.fn();
+      localClient.authProvider = {
+        fetchWithToken: localFetchWithToken,
+      } as any;
+
+      const result = await localClient.branchesExist(['main', 'tina/x']);
+
+      expect(result).toEqual({ main: true, 'tina/x': true });
       expect(localFetchWithToken).not.toHaveBeenCalled();
     });
   });
@@ -604,6 +738,28 @@ describe('Tina Client', () => {
       });
     });
 
+    it('includes isDraft in the request body', async () => {
+      fetchWithToken.mockResolvedValueOnce(
+        makeResponse({
+          status: 200,
+          body: { branchName: 'feature/test' },
+        })
+      );
+
+      await client.executeEditorialWorkflow({
+        branchName: 'feature/test',
+        baseBranch: 'main',
+        isDraft: false,
+      });
+
+      const requestBody = JSON.parse(fetchWithToken.mock.calls[0][1].body);
+      expect(requestBody).toMatchObject({
+        branchName: 'feature/test',
+        baseBranch: 'main',
+        isDraft: false,
+      });
+    });
+
     it('polls until the workflow completes', async () => {
       const onStatusUpdate = vi.fn();
 
@@ -805,6 +961,35 @@ describe('Tina Client', () => {
 
       expect(fetchWithToken).toHaveBeenCalledTimes(4);
       expect(warnSpy).toHaveBeenCalledOnce();
+    });
+
+    it('times out after the 15-minute cap with a wait-before-retrying message', async () => {
+      // POST starts the workflow; every poll stays in-progress so we hit the cap.
+      fetchWithToken.mockResolvedValueOnce(
+        makeResponse({ status: 200, body: { requestId: 'req-123' } })
+      );
+      fetchWithToken.mockResolvedValue(
+        makeResponse({
+          status: 202,
+          body: {
+            status: EDITORIAL_WORKFLOW_STATUS.INDEXING,
+            message: 'Indexing...',
+          },
+        })
+      );
+
+      const promise = client.executeEditorialWorkflow({
+        branchName: 'feature/test',
+        baseBranch: 'main',
+      });
+      const rejection = expect(promise).rejects.toThrow(
+        /timed out after 15 minutes.*wait before retrying/i
+      );
+
+      // Drive the full 15-minute cap (180 polls x 5s).
+      await vi.advanceTimersByTimeAsync(180 * 5000);
+
+      await rejection;
     });
   });
 });

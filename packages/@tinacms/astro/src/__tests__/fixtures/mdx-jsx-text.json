@@ -1,0 +1,53 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "h1",
+      "children": [
+        {
+          "type": "text",
+          "text": "hello "
+        },
+        {
+          "type": "mdxJsxTextElement",
+          "name": "someFeature",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ],
+          "props": {
+            "_value": "abc"
+          }
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "When not separated by whitespace"
+        },
+        {
+          "type": "mdxJsxTextElement",
+          "name": "someFeature",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ],
+          "props": {
+            "_value": "123"
+          }
+        },
+        {
+          "type": "text",
+          "text": "it still works"
+        }
+      ]
+    }
+  ]
+}

@@ -41,10 +41,6 @@ export type { Config, Schema, Collection, Template, TinaField, TinaSchema };
 /**
  * @deprecated use `TinaField` instead
  */
-export type TinaFieldEnriched = TinaField;
-/**
- * @deprecated use `TinaField` instead
- */
 export type SchemaField = TinaField;
 /**
  * @deprecated use `Template` instead

@@ -31,16 +31,36 @@ export class EventBus {
     };
   }
 
-  dispatch<E extends CMSEvent = CMSEvent>(event: E) {
+  dispatch<E extends CMSEvent = CMSEvent>(event: E): boolean {
     /**
      * If the `listener` Set is modified during the dispatch then
      * it can cause an infinite loop. Snapshot it and it's fine.
      */
-    if (!this.listeners) return;
+    if (!this.listeners) return false;
 
     const listenerSnapshot = Array.from(this.listeners.values());
 
-    listenerSnapshot.forEach((listener) => listener.handleEvent(event));
+    return listenerSnapshot.reduce(
+      (handled, listener) => listener.handleEvent(event) || handled,
+      false
+    );
+  }
+
+  /**
+   * Whether any listener *explicitly* targets `eventType`. The catch-all `'*'`
+   * pattern does not count — callers use this to detect a purpose-built
+   * subscriber (e.g. a mounted UI overlay) without being misled by ambient
+   * `'*'` listeners such as the alerts bridge, which would otherwise make
+   * {@link dispatch} report every event as "handled".
+   */
+  hasExplicitListenerFor<E extends CMSEvent = CMSEvent>(
+    eventType: E['type']
+  ): boolean {
+    if (!this.listeners) return false;
+    for (const listener of this.listeners) {
+      if (listener.isExplicitListenerFor(eventType)) return true;
+    }
+    return false;
   }
 }
 
@@ -56,6 +76,16 @@ export class Listener<E extends CMSEvent = CMSEvent> {
       return true;
     }
     return false;
+  }
+
+  /**
+   * Whether this listener explicitly targets `eventType`. Unlike
+   * {@link watchesEvent}, the catch-all `'*'` pattern does NOT match, so this
+   * reflects a purpose-built subscription rather than an ambient one.
+   */
+  isExplicitListenerFor(eventType: E['type']) {
+    if (this.eventPattern === '*') return false;
+    return this.watchesEvent({ type: eventType } as E);
   }
 
   watchesEvent(currentEvent: E) {
