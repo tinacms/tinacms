@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { formatDefaultBranchName, normalizeBranchName } from './branch-name';
+import {
+  formatBranchName,
+  formatDefaultBranchName,
+  normalizeBranchName,
+} from './branch-name';
 
 describe('formatDefaultBranchName', () => {
   it('strips the content/ prefix and file extension', () => {
@@ -79,5 +83,19 @@ describe('normalizeBranchName', () => {
     expect(normalizeBranchName('articles/foo-bar_baz.v2')).toBe(
       'articles/foo-bar_baz.v2'
     );
+  });
+});
+
+describe('formatBranchName', () => {
+  it('replaces invalid special characters with -', () => {
+    expect(formatBranchName('foo bar@@--')).toBe('foo-bar---');
+  });
+
+  it('preserves valid special character(s)', () => {
+    expect(formatBranchName('my/company-branch')).toBe('my/company-branch');
+  });
+
+  it('returns as lowerCase', () => {
+    expect(formatBranchName('mYbRaNcH')).toBe('mybranch');
   });
 });

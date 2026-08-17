@@ -1,6 +1,10 @@
 import { FieldLabel } from '@toolkit/fields';
 import { Form } from '@toolkit/forms';
 import { Button, DropdownButton } from '@toolkit/styles';
+import {
+  formatDefaultBranchName,
+  normalizeBranchName,
+} from '@utils/branch-name';
 import { GitBranchIcon, TriangleAlert } from 'lucide-react';
 import * as React from 'react';
 import { BiError } from 'react-icons/bi';
@@ -12,7 +16,6 @@ import {
   ModalHeader,
   PopupModal,
 } from '../react-modals';
-import { formatDefaultBranchName, normalizeBranchName } from './branch-name';
 import { useEditorialWorkflow } from './use-editorial-workflow';
 import { WorkflowProgressIndicator } from './workflow-progress-indicator';
 

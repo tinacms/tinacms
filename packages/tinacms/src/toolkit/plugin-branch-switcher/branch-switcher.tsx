@@ -1,6 +1,14 @@
 import { BaseTextField, FieldLabel, Select } from '@toolkit/fields';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipPortal,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@toolkit/fields/plugins/mdx-field-plugin/plate/components/plate-ui/tooltip';
 import { LoadingDots, PrefixedTextField } from '@toolkit/form-builder';
 import { useCMS } from '@toolkit/react-core';
+import { Badge } from '@toolkit/react-sidebar/components/badge';
 import { Button } from '@toolkit/styles';
 import { formatDistanceToNow } from 'date-fns';
 import * as React from 'react';
@@ -20,15 +28,8 @@ import { MdArrowForward, MdOutlineClear } from 'react-icons/md';
 import { useBranchData } from './branch-data';
 import { BranchSwitcherLegacy } from './branch-switcher-legacy';
 import { Branch, BranchSwitcherProps } from './types';
-import { Badge } from '@toolkit/react-sidebar/components/badge';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipPortal,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@toolkit/fields/plugins/mdx-field-plugin/plate/components/plate-ui/tooltip';
 
+import { formatBranchName, normalizeBranchName } from '@utils/branch-name';
 import BranchSelectorTable from './branch-selector-table';
 
 type ListState = 'loading' | 'ready' | 'error';
@@ -36,11 +37,7 @@ type ListState = 'loading' | 'ready' | 'error';
 export const tableHeadingStyle =
   'px-3 py-3 text-left text-xs font-bold text-gray-700 tracking-wider sticky top-0 bg-gray-100 z-20 border-b-2 border-gray-200 ';
 
-export function formatBranchName(str: string): string {
-  const pattern = /[^/\w-]+/g; // regular expression pattern to match invalid special characters
-  const formattedStr = str.replace(pattern, '-'); // remove special characters
-  return formattedStr.toLowerCase();
-}
+export { formatBranchName } from '@utils/branch-name';
 
 export const BranchSwitcher = (props: BranchSwitcherProps) => {
   const cms = useCMS();
@@ -84,7 +81,7 @@ export const EditoralBranchSwitcher = ({
   const handleCreateBranch = React.useCallback((value) => {
     setListState('loading');
     createBranch({
-      branchName: formatBranchName(value),
+      branchName: normalizeBranchName(formatBranchName(value)),
       baseBranch: currentBranch,
     }).then(async (createdBranchName) => {
       cms.alerts.success('Branch created.');

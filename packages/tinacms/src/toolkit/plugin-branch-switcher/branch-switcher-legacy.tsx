@@ -2,6 +2,7 @@ import { BaseTextField, Input } from '@toolkit/fields';
 import { LoadingDots } from '@toolkit/form-builder';
 import { useCMS } from '@toolkit/react-core';
 import { Button } from '@toolkit/styles';
+import { formatBranchName, normalizeBranchName } from '@utils/branch-name';
 import * as React from 'react';
 import { AiFillWarning } from 'react-icons/ai';
 import {
@@ -19,11 +20,7 @@ import { Branch, BranchSwitcherProps } from './types';
 
 type ListState = 'loading' | 'ready' | 'error';
 
-export function formatBranchName(str: string): string {
-  const pattern = /[^/\w-]+/g; // regular expression pattern to match invalid special characters
-  const formattedStr = str.replace(pattern, ''); // remove special characters
-  return formattedStr.toLowerCase();
-}
+export { formatBranchName } from '@utils/branch-name';
 
 export const BranchSwitcherLegacy = ({
   listBranches,
@@ -48,7 +45,7 @@ export const BranchSwitcherLegacy = ({
   const handleCreateBranch = React.useCallback((value) => {
     setListState('loading');
     createBranch({
-      branchName: formatBranchName(value),
+      branchName: normalizeBranchName(formatBranchName(value)),
       baseBranch: currentBranch,
     }).then(async (createdBranchName) => {
       // @ts-ignore

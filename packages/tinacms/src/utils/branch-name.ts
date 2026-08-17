@@ -28,6 +28,24 @@ export const formatDefaultBranchName = (
   return result;
 };
 
+// Loop-based trims instead of anchored regexes, which CodeQL flags on this PR
+const trimRefComponent = (part: string): string => {
+  let result = part.replace(/\.{2,}/g, '.');
+  while (result.startsWith('.')) {
+    result = result.slice(1);
+  }
+  let previous = '';
+  while (previous !== result) {
+    previous = result;
+    if (result.endsWith('.lock')) {
+      result = result.slice(0, -'.lock'.length);
+    } else if (result.endsWith('.')) {
+      result = result.slice(0, -1);
+    }
+  }
+  return result;
+};
+
 // Sanitise to a valid Git ref (check-ref-format rules): forbidden characters
 // become hyphens; per path component, ".." runs collapse, leading dots and
 // trailing "."/".lock" are stripped; empty components (and their slashes) drop.
@@ -36,11 +54,13 @@ export const normalizeBranchName = (name: string): string =>
     .replace(/[\x00-\x20\x7f~^:?*\[\\]+/g, '-')
     .replace(/@\{/g, '-')
     .split('/')
-    .map((part) =>
-      part
-        .replace(/\.{2,}/g, '.')
-        .replace(/^\.+/, '')
-        .replace(/(\.lock|\.)+$/, '')
-    )
+    .map(trimRefComponent)
     .filter(Boolean)
     .join('/');
+
+// Live-input slugifier for branch name fields: invalid special characters
+// become hyphens and the result is lowercased. Slash handling stays out of it
+// so nested names can still be typed; apply normalizeBranchName at submit.
+export function formatBranchName(str: string): string {
+  return str.replace(/[^/\w-]+/g, '-').toLowerCase();
+}
