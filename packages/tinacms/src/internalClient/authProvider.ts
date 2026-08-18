@@ -72,6 +72,7 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
   identityApiUrl: string;
   frontendUrl: string;
   token: TokenObject; // used with memory storage
+  hasWarnedNoSession = false;
   setToken: (_token: TokenObject | null) => void;
   getToken: () => Promise<TokenObject>;
 
@@ -158,14 +159,19 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
 
     try {
       const token = await this.getToken();
-      if (!token?.access_token && !token?.id_token) {
-        console.warn(
-          'TinaCMS: no TinaCloud session found, opening the login screen. If login fails, check the console inside the login popup window for the underlying error.'
-        );
+      const accessToken = token?.access_token ?? token?.id_token;
+      if (!accessToken) {
+        if (!this.hasWarnedNoSession) {
+          this.hasWarnedNoSession = true;
+          console.warn(
+            'TinaCMS: no TinaCloud session found. If login fails, check the console inside the login popup window for the underlying error.'
+          );
+        }
         return null;
       }
-      const res = await this.fetchWithToken(url, {
+      const res = await fetch(url, {
         method: 'GET',
+        headers: new Headers({ Authorization: `Bearer ${accessToken}` }),
       });
       const val = await res.json();
       if (!res.status.toString().startsWith('2')) {

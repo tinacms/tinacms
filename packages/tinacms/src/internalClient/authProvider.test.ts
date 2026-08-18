@@ -109,6 +109,7 @@ describe('TinaCloudAuthProvider getUser', () => {
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     const user = await provider.getUser();
+    await provider.getUser();
 
     expect(user).toBeNull();
     expect(fetchMock).not.toHaveBeenCalled();
