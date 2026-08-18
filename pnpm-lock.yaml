@@ -1638,8 +1638,8 @@ importers:
         specifier: 'catalog:'
         version: 0.6.0
       js-yaml:
-        specifier: ^3.14.1
-        version: 3.14.2
+        specifier: ^3.15.1
+        version: 3.15.1
       jsonpath-plus:
         specifier: 'catalog:'
         version: 10.3.0
@@ -12166,8 +12166,8 @@ packages:
   js-tokens@9.0.1:
     resolution: {integrity: sha512-mxa9E9ITFOt0ban3j6L5MpjwegGz6lBQmM1IJkWeBZGcMxto50+eWdjC/52xDbS2vy0k7vIMK0Fe2wfL9OQSpQ==}
 
-  js-yaml@3.14.2:
-    resolution: {integrity: sha512-PMSmkqxr106Xa156c2M265Z+FTrPl+oxd/rgOQy2tijQeK5TxQ43psO1ZCwhVOSdnn+RzkzlRz/eY4BgJBYVpg==}
+  js-yaml@3.15.1:
+    resolution: {integrity: sha512-S99WuO3HlhO3XN41EtYUNl9zzXjoJx7QvmipxsJVxtCBT0YHEFy+iOJhjSvrmV12nYhWpZaM8lPHkJm0yUMbag==}
     hasBin: true
 
   js-yaml@4.1.1:
@@ -19778,7 +19778,7 @@ snapshots:
       globals: 13.24.0
       ignore: 4.0.6
       import-fresh: 3.3.1
-      js-yaml: 3.14.2
+      js-yaml: 3.15.1
       minimatch: 3.1.2
       strip-json-comments: 3.1.1
     transitivePeerDependencies:
@@ -20330,7 +20330,7 @@ snapshots:
       camelcase: 5.3.1
       find-up: 4.1.0
       get-package-type: 0.1.0
-      js-yaml: 3.14.2
+      js-yaml: 3.15.1
       resolve-from: 5.0.0
 
   '@istanbuljs/schema@0.1.3': {}
@@ -27181,7 +27181,7 @@ snapshots:
       import-fresh: 3.3.1
       imurmurhash: 0.1.4
       is-glob: 4.0.3
-      js-yaml: 3.14.2
+      js-yaml: 3.15.1
       json-stable-stringify-without-jsonify: 1.0.1
       levn: 0.4.1
       lodash.merge: 4.6.2
@@ -27635,7 +27635,7 @@ snapshots:
 
   front-matter@4.0.2:
     dependencies:
-      js-yaml: 3.14.2
+      js-yaml: 3.15.1
 
   fs-constants@1.0.0: {}
 
@@ -27832,7 +27832,7 @@ snapshots:
 
   gray-matter@4.0.3:
     dependencies:
-      js-yaml: 3.14.2
+      js-yaml: 3.15.1
       kind-of: 6.0.3
       section-matter: 1.0.0
       strip-bom-string: 1.0.0
@@ -29387,7 +29387,7 @@ snapshots:
 
   js-tokens@9.0.1: {}
 
-  js-yaml@3.14.2:
+  js-yaml@3.15.1:
     dependencies:
       argparse: 1.0.10
       esprima: 4.0.1
@@ -32242,7 +32242,7 @@ snapshots:
   read-yaml-file@1.1.0:
     dependencies:
       graceful-fs: 4.2.11
-      js-yaml: 3.14.2
+      js-yaml: 3.15.1
       pify: 4.0.1
       strip-bom: 3.0.0
 
