@@ -9,8 +9,6 @@ import {
 import { composePluginSlices } from './compose-slices';
 import { createTinaStore, pickPersistableNamespaces } from './create-store';
 
-// The field registry resolves these from manifests at boot; the store composes the same
-// { manifest, segment } shape, so tests build it inline.
 const resolved = (
   spec: {
     name: string;
@@ -27,8 +25,6 @@ const get = (store: ReturnType<typeof createTinaStore>) =>
   store.getState() as Record<string, any>;
 
 beforeEach(() => {
-  // Each store persists under the same key — clear so one test's durable state never
-  // rehydrates into the next.
   localStorage.clear();
 });
 
@@ -55,12 +51,9 @@ describe('composePluginSlices namespacing', () => {
   });
 
   it('rejects a plugin named after a capability it does not provide', () => {
-    // Peers read capability state at `get().media` — a feature plugin must not squat
-    // that namespace by name alone.
     expect(() =>
       composePluginSlices([resolved({ name: 'media' }, () => ({}))])
     ).toThrow(/does not provide it/);
-    // A genuine provider may carry the bare capability name.
     const registry = composePluginSlices([
       resolved({ name: 'media', provides: ['media'] }, () => ({})),
     ]);
@@ -133,7 +126,6 @@ describe('composePluginSlices conflicts', () => {
         ) as any
       )?.from;
 
-    // base-first and override-first both resolve to the override.
     expect(winner(composePluginSlices([base, override]))).toBe('s3');
     expect(winner(composePluginSlices([override, base]))).toBe('s3');
   });
@@ -197,9 +189,7 @@ describe('createTinaStore composition', () => {
     get(store).media.add('hero.png');
 
     expect(get(store).media.items).toEqual(['hero.png']);
-    // a scoped write never leaks to the top level …
     expect(get(store).items).toBeUndefined();
-    // … and a peer read resolves through the namespace.
     expect(get(store).media.uploaderId()).toBe('u1');
   });
 
@@ -207,7 +197,6 @@ describe('createTinaStore composition', () => {
     const authSlice: ClientSlice = () => ({ user: { id: 'u1' } });
     const mediaSlice: ClientSlice = (set) => ({
       items: ['a', 'b'],
-      // replace=true → replace this slice's own state, not merge.
       reset: () => set({ items: [] }, true),
     });
 
@@ -218,9 +207,7 @@ describe('createTinaStore composition', () => {
 
     get(store).media.reset();
 
-    // the slice was replaced (reset method dropped) …
     expect(get(store).media).toEqual({ items: [] });
-    // … but peers and core namespaces survive — no whole-store wipe.
     expect(get(store).auth.user.id).toBe('u1');
     expect(get(store).ui).toEqual({});
   });
@@ -261,11 +248,9 @@ describe('createTinaStore persistence round-trip', () => {
       media: { items: ['stale'] },
     } as any);
 
-    // A fresh boot reads the persisted storage written above.
     const rebooted = get(boot());
     expect(rebooted.ui).toEqual({ theme: 'dark' });
     expect(rebooted.branch).toEqual({ current: 'feat' });
-    // documents + every plugin namespace are volatile: recomputed at boot, not rehydrated.
     expect(rebooted.documents).toEqual({});
     expect(rebooted.media).toEqual({ items: [] });
   });

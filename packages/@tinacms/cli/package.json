@@ -1,7 +1,7 @@
 {
     "name": "@tinacms/cli",
     "type": "module",
-    "version": "2.5.6",
+    "version": "2.6.0",
     "main": "dist/index.js",
     "typings": "dist/index.d.ts",
     "files": [
@@ -25,6 +25,8 @@
         "react-dom": ">=18.3.1 <20.0.0"
     },
     "devDependencies": {
+        "@babel/core": "^7.28.5",
+        "@babel/preset-env": "^7.28.5",
         "@tinacms/scripts": "workspace:*",
         "@types/clear": "catalog:",
         "@types/cli-spinner": "catalog:",
@@ -40,6 +42,7 @@
         "@types/node": "^22.13.1",
         "@types/progress": "catalog:",
         "@types/prompts": "catalog:",
+        "babel-jest": "^29.7.0",
         "jest": "catalog:",
         "mongodb-level": "catalog:",
         "sqlite-level": "catalog:",
@@ -56,11 +59,11 @@
     },
     "dependencies": {
         "@graphql-codegen/core": "catalog:",
-        "@graphql-codegen/plugin-helpers": "^7.0.1",
+        "@graphql-codegen/plugin-helpers": "^7.1.0",
         "@graphql-codegen/typescript": "catalog:",
         "@graphql-codegen/typescript-operations": "catalog:",
         "@graphql-codegen/visitor-plugin-common": "catalog:",
-        "@graphql-inspector/core": "^4.2.2",
+        "@graphql-inspector/core": "^6.2.1",
         "@graphql-tools/graphql-file-loader": "catalog:",
         "@graphql-tools/load": "catalog:",
         "@rollup/pluginutils": "catalog:",
@@ -75,7 +78,6 @@
         "@tinacms/search": "workspace:^",
         "@vitejs/plugin-react": "catalog:",
         "altair-express-middleware": "catalog:",
-        "async-lock": "catalog:",
         "auto-bind": "catalog:",
         "body-parser": "catalog:",
         "busboy": "catalog:",
@@ -103,7 +105,7 @@
         "tinacms": "workspace:^",
         "typanion": "catalog:",
         "typescript": "^5.7.3",
-        "vite": "^4.5.9",
+        "vite": "^6.4.3",
         "yup": "^1.6.1",
         "zod": "catalog:"
     },

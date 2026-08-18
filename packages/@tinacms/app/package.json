@@ -1,6 +1,6 @@
 {
 	"name": "@tinacms/app",
-	"version": "2.5.10",
+	"version": "2.5.11",
 	"main": "src/main.tsx",
 	"files": [
 		"src",
@@ -15,9 +15,11 @@
 		"test-watch": "vitest"
 	},
 	"devDependencies": {
+		"@testing-library/react": "catalog:",
 		"@types/react": "^18.3.18",
 		"@types/react-dom": "catalog:",
 		"happy-dom": "catalog:",
+		"monaco-editor": "catalog:",
 		"typescript": "^5.7.3",
 		"vite": "^5.4.14",
 		"vitest": "^2.1.9"
@@ -28,19 +30,17 @@
 	},
 	"dependencies": {
 		"@graphiql/toolkit": "catalog:",
-		"@headlessui/react": "2.1.8",
-		"@heroicons/react": "^1.0.6",
-		"@monaco-editor/react": "catalog:",
+		"@monaco-editor/loader": "catalog:",
+		"@radix-ui/react-popover": "catalog:",
 		"@tinacms/mdx": "workspace:^",
 		"final-form": "catalog:",
 		"graphiql": "catalog:",
 		"graphql": "15.8.0",
-		"monaco-editor": "catalog:",
+		"lucide-react": "catalog:",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"react-router-dom": "catalog:",
 		"tinacms": "workspace:^",
-		"typescript": "^5.7.3",
 		"zod": "catalog:"
 	},
 	"repository": {

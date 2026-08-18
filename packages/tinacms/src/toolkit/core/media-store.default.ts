@@ -20,6 +20,7 @@ import {
   Media,
   MediaList,
   MediaListOptions,
+  MediaRenameError,
   MediaStore,
   MediaUploadOptions,
 } from './media';
@@ -106,6 +107,7 @@ export class TinaMediaStore implements MediaStore {
   private cms: TinaCMS;
   private isLocal: boolean;
   private url: string;
+  private listUrl: string;
   private staticMedia: StaticMedia;
   isStatic?: boolean;
 
@@ -113,11 +115,24 @@ export class TinaMediaStore implements MediaStore {
   private workflowBranchOverride: string | undefined;
   private mediaWorkflowInProgress = false;
 
+  /**
+   * Renaming is only implemented against the local dev server. This is an
+   * instance property rather than a prototype method on purpose: the media
+   * manager decides whether to offer the action by checking whether the store
+   * defines `rename`, so a cloud-backed instance must not carry one — a
+   * prototype method would advertise support everywhere and surface an action
+   * that always fails.
+   */
+  rename?: (from: string, to: string) => Promise<Media>;
+
   constructor(cms: TinaCMS, staticMedia?: StaticMedia) {
     this.cms = cms;
     if (staticMedia && Object.keys(staticMedia).length > 0) {
       this.isStatic = true;
       this.staticMedia = staticMedia;
+    }
+    if (!this.isStatic && cms?.api?.tina?.isLocalMode) {
+      this.rename = (from, to) => this.rename_local(from, to);
     }
   }
 
@@ -161,6 +176,7 @@ export class TinaMediaStore implements MediaStore {
               'assets'
             )}/v1/${this.api.clientId}`;
           }
+          this.listUrl = this.url.replace('/v1/', '/v2/');
         }
       }
     }
@@ -172,6 +188,8 @@ export class TinaMediaStore implements MediaStore {
   }
 
   accept = DEFAULT_MEDIA_UPLOAD_TYPES;
+
+  searchable = true;
 
   // allow up to 100MB uploads
   maxSize = 100 * 1024 * 1024;
@@ -664,14 +682,12 @@ export class TinaMediaStore implements MediaStore {
     return results;
   }
 
-  private async persist_local(media: MediaUploadOptions[]): Promise<Media[]> {
-    const newFiles: Media[] = [];
-    const hasTinaMedia = this.hasGitMediaConfig();
+  /** Media root as a `/uploads/`-style prefix for local `src` values. */
+  private localMediaFolder(): string {
+    const tinaMedia = this.cms.api.tina.schema.schema?.config?.media?.tina;
 
     // Folder always has leading and trailing slashes
-    let folder: string = hasTinaMedia
-      ? this.cms.api.tina.schema.schema?.config?.media?.tina.mediaRoot
-      : '/';
+    let folder: string = this.hasGitMediaConfig() ? tinaMedia.mediaRoot : '/';
 
     if (!folder.startsWith('/')) {
       // ensure folder always has a /
@@ -680,6 +696,45 @@ export class TinaMediaStore implements MediaStore {
     if (!folder.endsWith('/')) {
       folder = folder + '/';
     }
+    return folder;
+  }
+
+  /** Stripped directory does not have leading or trailing slashes */
+  private stripDirectorySlashes(directory: string): string {
+    let stripped = directory || '';
+    if (stripped.startsWith('/')) {
+      stripped = stripped.substr(1) || '';
+    }
+    if (stripped.endsWith('/')) {
+      stripped = stripped.substr(0, stripped.length - 1) || '';
+    }
+    return stripped;
+  }
+
+  /** Shared by local upload and local rename so both describe a file identically. */
+  private buildLocalMedia(directory: string, filename: string): Media {
+    const folder = this.localMediaFolder();
+    const strippedDirectory = this.stripDirectorySlashes(directory);
+    const src = strippedDirectory
+      ? `${folder}${strippedDirectory}/${filename}`
+      : `${folder}${filename}`;
+
+    return {
+      type: 'file',
+      id: filename,
+      filename,
+      directory,
+      src,
+      thumbnails: {
+        '75x75': src,
+        '400x400': src,
+        '1000x1000': src,
+      },
+    };
+  }
+
+  private async persist_local(media: MediaUploadOptions[]): Promise<Media[]> {
+    const newFiles: Media[] = [];
 
     for (const item of media) {
       const { file, directory } = item;
@@ -687,15 +742,7 @@ export class TinaMediaStore implements MediaStore {
       // upload URL, the on-disk path, and the value persisted into content,
       // so every layer agrees on the same bytes.
       const safeName = sanitizeFilename(file.name);
-      // Stripped directory does not have leading or trailing slashes
-      let strippedDirectory = directory;
-      if (strippedDirectory.startsWith('/')) {
-        strippedDirectory = strippedDirectory.substr(1) || '';
-      }
-      if (strippedDirectory.endsWith('/')) {
-        strippedDirectory =
-          strippedDirectory.substr(0, strippedDirectory.length - 1) || '';
-      }
+      const strippedDirectory = this.stripDirectorySlashes(directory);
 
       const formData = new FormData();
       // The third arg of FormData#append overrides the part filename — pass
@@ -710,11 +757,6 @@ export class TinaMediaStore implements MediaStore {
       if (uploadPath.startsWith('/')) {
         uploadPath = uploadPath.substr(1);
       }
-      const filePath = `${
-        strippedDirectory
-          ? `${folder}${strippedDirectory}/${safeName}`
-          : folder + safeName
-      }`;
       const res = await this.fetchFunction(`${this.url}/upload/${uploadPath}`, {
         method: 'POST',
         body: formData,
@@ -727,25 +769,57 @@ export class TinaMediaStore implements MediaStore {
 
       const fileRes = await res.json();
       if (fileRes?.success) {
-        const parsedRes: Media = {
-          type: 'file',
-          id: safeName,
-          filename: safeName,
-          directory,
-          src: filePath,
-          thumbnails: {
-            '75x75': filePath,
-            '400x400': filePath,
-            '1000x1000': filePath,
-          },
-        };
-
-        newFiles.push(parsedRes);
+        newFiles.push(this.buildLocalMedia(directory, safeName));
       } else {
         throw new Error('Unexpected error uploading media');
       }
     }
     return newFiles;
+  }
+
+  /**
+   * `from`/`to` are media-root-relative `directory/filename` paths, matching
+   * what the delete route receives.
+   */
+  private async rename_local(from: string, to: string): Promise<Media> {
+    this.setup();
+
+    const res = await this.fetchFunction(`${this.url}/rename`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from, to }),
+    });
+
+    const body = await res.json().catch(() => null);
+
+    if (res.status !== 200 || !body?.success) {
+      throw this.toRenameError(res.status, body);
+    }
+
+    const lastSlash = to.lastIndexOf('/');
+    return this.buildLocalMedia(
+      lastSlash === -1 ? '' : to.slice(0, lastSlash),
+      lastSlash === -1 ? to : to.slice(lastSlash + 1)
+    );
+  }
+
+  private toRenameError(status: number, body: any): MediaRenameError {
+    if (body?.code) {
+      return new MediaRenameError({
+        code: body.code,
+        message: body.message || 'Failed to rename the file.',
+      });
+    }
+    // No structured body: a CLI predating the /media/rename route lets the
+    // request fall through to the dev server's own handling.
+    return new MediaRenameError({
+      code:
+        status === 404 || status === 200 ? 'UNSUPPORTED' : 'BACKEND_FAILURE',
+      message:
+        status === 404 || status === 200
+          ? 'This version of the TinaCMS CLI does not support renaming media. Update @tinacms/cli to rename files.'
+          : 'Failed to rename the file.',
+    });
   }
 
   async persist(media: MediaUploadOptions[]): Promise<Media[]> {
@@ -811,11 +885,11 @@ export class TinaMediaStore implements MediaStore {
     if (!this.isLocal) {
       const encodedBranch = this.encodedBranchParam();
       res = await this.api.authProvider.fetchWithToken(
-        `${this.url}/list/${options.directory || ''}?limit=${
+        `${this.listUrl}/list/${options.directory || ''}?limit=${
           options.limit || 20
         }${options.offset ? `&cursor=${options.offset}` : ''}${
           encodedBranch ? `&branch=${encodedBranch}` : ''
-        }`
+        }${options.search ? `&search=${encodeURIComponent(options.search)}` : ''}`
       );
 
       if (res.status == 401) {
@@ -829,7 +903,9 @@ export class TinaMediaStore implements MediaStore {
       res = await this.fetchFunction(
         `${this.url}/list/${options.directory || ''}?limit=${
           options.limit || 20
-        }${options.offset ? `&cursor=${options.offset}` : ''}`
+        }${options.offset ? `&cursor=${options.offset}` : ''}${
+          options.search ? `&search=${encodeURIComponent(options.search)}` : ''
+        }`
       );
 
       if (res.status == 404) {

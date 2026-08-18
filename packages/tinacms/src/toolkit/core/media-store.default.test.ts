@@ -2,6 +2,7 @@ import type { MediaWorkflowConfirmBranchEvent } from '@toolkit/form-builder/edit
 import type { TinaCMS } from '@toolkit/tina-cms';
 import { EventBus } from './event';
 import type { Media, MediaUploadOptions } from './media';
+import { MediaRenameError } from './media';
 import { TinaMediaStore } from './media-store.default';
 
 /** Runs `fn`, returning the value it throws/rejects with (or fails the test). */
@@ -154,6 +155,153 @@ const buildStore = ({
       api.waitForEditorialWorkflowStatus as ReturnType<typeof vi.fn>,
   };
 };
+
+describe('TinaMediaStore — capabilities', () => {
+  it('advertises searchable so the media manager shows the search box', () => {
+    const { store } = buildStore();
+    expect(store.searchable).toBe(true);
+  });
+});
+
+describe('TinaMediaStore — endpoint version (v1 vs v2)', () => {
+  it('lists media from the v2 endpoint', async () => {
+    const { store, fetchWithToken } = buildStore({ branch: 'main' });
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+    );
+
+    await store.list({ directory: '', thumbnailSizes: [] });
+
+    const calledUrl = fetchWithToken.mock.calls[0][0];
+    expect(calledUrl).toContain('/v2/test-client/list');
+    expect(calledUrl).not.toContain('/v1/');
+  });
+
+  it('lists a subdirectory from the v2 endpoint', async () => {
+    const { store, fetchWithToken } = buildStore({ branch: 'main' });
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+    );
+
+    await store.list({ directory: 'uploads', thumbnailSizes: [] });
+
+    const calledUrl = fetchWithToken.mock.calls[0][0];
+    expect(calledUrl).toContain('/v2/test-client/list/uploads');
+    expect(calledUrl).not.toContain('/v1/');
+  });
+
+  describe('mutating operations stay on v1', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+      vi.unstubAllGlobals();
+    });
+
+    it('deletes via the v1 endpoint', async () => {
+      const { store, fetchWithToken } = buildStore({ branch: 'main' });
+      fetchWithToken.mockResolvedValueOnce(
+        makeJsonResponse(200, { requestId: 'req-1' })
+      );
+
+      const deletePromise = store.delete({
+        directory: 'images',
+        filename: 'a.png',
+      } as Media);
+      await vi.advanceTimersByTimeAsync(1100);
+      await deletePromise;
+
+      const calledUrl = fetchWithToken.mock.calls[0][0];
+      expect(calledUrl).toContain('/v1/test-client/');
+      expect(calledUrl).not.toContain('/v2/');
+    });
+
+    it('requests the upload URL via v1 but resolves uploaded entries via v2', async () => {
+      const { store, fetchWithToken } = buildStore({ branch: 'feat%2Fx' });
+      fetchWithToken.mockResolvedValueOnce(
+        makeJsonResponse(200, {
+          signedUrl: 'https://s3.example/signed',
+          requestId: 'req-1',
+        })
+      );
+      fetchWithToken.mockResolvedValueOnce(
+        makeJsonResponse(200, {
+          files: [
+            {
+              filename: 'llama.png',
+              src: 'https://assets.tina.io/test-client/__file/uploads/llama.png',
+            },
+          ],
+          directories: [],
+          cursor: 0,
+        })
+      );
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        text: vi.fn().mockResolvedValue(''),
+        json: vi.fn().mockResolvedValue({}),
+      });
+      vi.stubGlobal('fetch', fetchMock);
+
+      const uploads: MediaUploadOptions[] = [
+        {
+          directory: 'uploads',
+          file: new File(['x'], 'llama.png', { type: 'image/png' }),
+        },
+      ];
+
+      const persistPromise = store.persist(uploads);
+      await vi.advanceTimersByTimeAsync(1100);
+      await persistPromise;
+
+      const uploadUrl = fetchWithToken.mock.calls[0][0];
+      const listUrl = fetchWithToken.mock.calls[1][0];
+      expect(uploadUrl).toContain('/v1/test-client/upload_url/');
+      expect(listUrl).toContain('/v2/test-client/list');
+    });
+  });
+});
+
+describe('TinaMediaStore — search query param', () => {
+  it('appends the url-encoded search term', async () => {
+    const { store, fetchWithToken } = buildStore({ branch: 'main' });
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+    );
+
+    await store.list({ directory: '', thumbnailSizes: [], search: 'a b/c' });
+
+    const calledUrl = fetchWithToken.mock.calls[0][0];
+    expect(calledUrl).toContain('&search=a%20b%2Fc');
+  });
+
+  it('omits the search param when unset', async () => {
+    const { store, fetchWithToken } = buildStore({ branch: 'main' });
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+    );
+
+    await store.list({ directory: '', thumbnailSizes: [] });
+
+    const calledUrl = fetchWithToken.mock.calls[0][0];
+    expect(calledUrl).not.toContain('search=');
+  });
+
+  it('omits the search param when empty', async () => {
+    const { store, fetchWithToken } = buildStore({ branch: 'main' });
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+    );
+
+    await store.list({ directory: '', thumbnailSizes: [], search: '' });
+
+    const calledUrl = fetchWithToken.mock.calls[0][0];
+    expect(calledUrl).not.toContain('search=');
+  });
+});
 
 describe('TinaMediaStore — branch query param', () => {
   describe('list()', () => {
@@ -1525,5 +1673,192 @@ describe('TinaMediaStore — parse()', () => {
 
     expect(localMedia.src).toBe('/images/uploads/blog/a.png');
     expect(store.parse(localMedia)).toBe(localMedia.src);
+  });
+});
+
+describe('TinaMediaStore — rename capability', () => {
+  it('is exposed on a local instance', () => {
+    const { store } = buildStore({
+      isLocalMode: true,
+      contentApiUrl: 'http://localhost:4001/graphql',
+    });
+    expect(typeof store.rename).toBe('function');
+  });
+
+  it('is absent on a TinaCloud instance so the UI hides the action', () => {
+    const { store } = buildStore();
+    expect(store.rename).toBeUndefined();
+    // guards against re-adding it as a prototype method, which would
+    // advertise support on every instance
+    expect('rename' in Object.getPrototypeOf(store)).toBe(false);
+  });
+
+  it('is absent on a self-hosted repo-media instance', () => {
+    const { store } = buildStore({
+      isCustomContentApi: true,
+      contentApiUrl: '/api/tina/gql',
+    });
+    expect(store.rename).toBeUndefined();
+  });
+
+  it('is absent on a static instance', () => {
+    const events = new EventBus();
+    const cms = {
+      api: { tina: { isLocalMode: true } },
+      events,
+    } as unknown as TinaCMS;
+    const store = new TinaMediaStore(cms, {
+      '0': [
+        {
+          id: 'a.png',
+          filename: 'a.png',
+          src: '/uploads/a.png',
+          directory: '',
+          thumbnails: {
+            '75x75': '/uploads/a.png',
+            '400x400': '/uploads/a.png',
+            '1000x1000': '/uploads/a.png',
+          },
+          type: 'file',
+        },
+      ],
+    });
+
+    expect(store.isStatic).toBe(true);
+    expect(store.rename).toBeUndefined();
+  });
+});
+
+describe('TinaMediaStore — local rename', () => {
+  const buildLocalStore = () => {
+    const built = buildStore({
+      isLocalMode: true,
+      contentApiUrl: 'http://localhost:4001/graphql',
+    });
+    built.api.schema.schema.config.media.tina = {
+      mediaRoot: 'uploads',
+      publicFolder: 'public',
+    };
+    const fetchFunction = vi.fn();
+    built.store.fetchFunction = fetchFunction;
+    return { ...built, fetchFunction };
+  };
+
+  it('POSTs from/to as JSON to the local rename route', async () => {
+    const { store, fetchFunction } = buildLocalStore();
+    fetchFunction.mockResolvedValue(makeJsonResponse(200, { success: true }));
+
+    await store.rename('products/old.png', 'products/new.png');
+
+    expect(fetchFunction).toHaveBeenCalledTimes(1);
+    const [url, init] = fetchFunction.mock.calls[0];
+    expect(url).toBe('http://localhost:4001/media/rename');
+    expect(init.method).toBe('POST');
+    expect(init.headers).toMatchObject({ 'Content-Type': 'application/json' });
+    expect(JSON.parse(init.body)).toEqual({
+      from: 'products/old.png',
+      to: 'products/new.png',
+    });
+  });
+
+  it('resolves with a Media built from the media root', async () => {
+    const { store, fetchFunction } = buildLocalStore();
+    fetchFunction.mockResolvedValue(makeJsonResponse(200, { success: true }));
+
+    const result = await store.rename('products/old.png', 'products/new.png');
+
+    expect(result).toEqual({
+      type: 'file',
+      id: 'new.png',
+      filename: 'new.png',
+      directory: 'products',
+      src: '/uploads/products/new.png',
+      thumbnails: {
+        '75x75': '/uploads/products/new.png',
+        '400x400': '/uploads/products/new.png',
+        '1000x1000': '/uploads/products/new.png',
+      },
+    });
+  });
+
+  it('handles a file at the media root', async () => {
+    const { store, fetchFunction } = buildLocalStore();
+    fetchFunction.mockResolvedValue(makeJsonResponse(200, { success: true }));
+
+    const result = await store.rename('old.png', 'new.png');
+
+    expect(result).toMatchObject({
+      directory: '',
+      filename: 'new.png',
+      src: '/uploads/new.png',
+    });
+  });
+
+  it('surfaces the backend error code so the UI can be specific', async () => {
+    const { store, fetchFunction } = buildLocalStore();
+    fetchFunction.mockResolvedValue(
+      makeJsonResponse(409, {
+        code: 'NAME_COLLISION',
+        message: '"new.png" already exists.',
+      })
+    );
+
+    const error = await store.rename('old.png', 'new.png').catch((e) => e);
+
+    expect(error).toBeInstanceOf(MediaRenameError);
+    expect(error.code).toBe('NAME_COLLISION');
+    expect(error.message).toContain('already exists');
+  });
+
+  it('maps a NOT_FOUND response', async () => {
+    const { store, fetchFunction } = buildLocalStore();
+    fetchFunction.mockResolvedValue(
+      makeJsonResponse(404, { code: 'NOT_FOUND', message: 'gone' })
+    );
+
+    const error = await store.rename('old.png', 'new.png').catch((e) => e);
+
+    expect(error.code).toBe('NOT_FOUND');
+  });
+
+  it('reports UNSUPPORTED when a CLI without the route answers 404', async () => {
+    const { store, fetchFunction } = buildLocalStore();
+    fetchFunction.mockResolvedValue({
+      ok: false,
+      status: 404,
+      json: vi.fn().mockRejectedValue(new Error('not json')),
+    } as unknown as Response);
+
+    const error = await store.rename('old.png', 'new.png').catch((e) => e);
+
+    expect(error).toBeInstanceOf(MediaRenameError);
+    expect(error.code).toBe('UNSUPPORTED');
+    expect(error.message).toContain('@tinacms/cli');
+  });
+
+  it('reports UNSUPPORTED when a CLI without the route serves the SPA with a 200', async () => {
+    const { store, fetchFunction } = buildLocalStore();
+    fetchFunction.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockRejectedValue(new Error('not json')),
+    } as unknown as Response);
+
+    const error = await store.rename('old.png', 'new.png').catch((e) => e);
+
+    expect(error.code).toBe('UNSUPPORTED');
+  });
+
+  it('falls back to BACKEND_FAILURE for an unstructured server error', async () => {
+    const { store, fetchFunction } = buildLocalStore();
+    fetchFunction.mockResolvedValue({
+      ok: false,
+      status: 500,
+      json: vi.fn().mockRejectedValue(new Error('not json')),
+    } as unknown as Response);
+
+    const error = await store.rename('old.png', 'new.png').catch((e) => e);
+
+    expect(error.code).toBe('BACKEND_FAILURE');
   });
 });
