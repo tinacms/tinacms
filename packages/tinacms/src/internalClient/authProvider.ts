@@ -157,12 +157,22 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
     const url = `${this.identityApiUrl}/v2/apps/${this.clientId}/currentUser`;
 
     try {
+      const token = await this.getToken();
+      if (!token?.access_token && !token?.id_token) {
+        console.warn(
+          'TinaCMS: no TinaCloud session found, opening the login screen. If login fails, check the console inside the login popup window for the underlying error.'
+        );
+        return null;
+      }
       const res = await this.fetchWithToken(url, {
         method: 'GET',
       });
       const val = await res.json();
       if (!res.status.toString().startsWith('2')) {
-        console.error(val.error);
+        console.error(
+          `TinaCMS: TinaCloud session check failed (status ${res.status}).`,
+          val?.error ?? val
+        );
         return null;
       }
       return val;

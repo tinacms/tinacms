@@ -23,7 +23,7 @@ export const useGetDocument = (
     let isCancelled = false; // Add cancellation flag
 
     const fetchDocument = async () => {
-      if (api.isAuthenticated() && !isCancelled) {
+      if ((await api.isAuthenticated()) && !isCancelled) {
         try {
           const response = await api.fetchDocument(
             collectionName,

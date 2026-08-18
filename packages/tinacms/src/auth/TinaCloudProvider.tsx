@@ -523,8 +523,13 @@ export const TinaCloudProvider = (
   }, []);
 
   React.useEffect(() => {
-    const setupEditorialWorkflow = () => {
-      client.getProject().then(async (project) => {
+    const setupEditorialWorkflow = async () => {
+      try {
+        const token = await client.authProvider.getToken();
+        if (!token?.access_token && !token?.id_token) {
+          return;
+        }
+        const project = await client.getProject();
         if (project?.features?.includes('editorial-workflow')) {
           cms.flags.set('branch-switcher', true);
           client.usingEditorialWorkflow = true;
@@ -536,7 +541,9 @@ export const TinaCloudProvider = (
             setCurrentBranch(project.defaultBranch || 'main');
           }
         }
-      });
+      } catch (e) {
+        console.error('TinaCMS: unable to load project settings', e);
+      }
     };
     if (isTinaCloud) {
       setupEditorialWorkflow();
