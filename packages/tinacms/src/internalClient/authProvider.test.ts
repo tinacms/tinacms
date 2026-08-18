@@ -124,10 +124,12 @@ describe('TinaCloudAuthProvider getUser', () => {
       refresh_token: 'refresh',
     });
     const fetchMock = stubFetch({ id: 'user-1' });
+    const fetchWithToken = vi.spyOn(provider, 'fetchWithToken');
 
     const user = await provider.getUser();
 
     expect(user).toEqual({ id: 'user-1' });
+    expect(fetchWithToken).toHaveBeenCalledTimes(1);
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const [url, init] = fetchMock.mock.calls[0];
     expect(url).toBe(
@@ -159,5 +161,37 @@ describe('TinaCloudAuthProvider getUser', () => {
       expect.stringContaining('401'),
       'unauthorized'
     );
+  });
+});
+
+describe('TinaCloudAuthProvider getAccessToken', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('returns null when no token is stored', async () => {
+    expect(await buildProvider().getAccessToken()).toBeNull();
+  });
+
+  it('prefers the access token', async () => {
+    const provider = buildProvider();
+    provider.setToken({
+      access_token: freshAccessToken,
+      id_token: 'id-token',
+      refresh_token: 'refresh',
+    });
+
+    expect(await provider.getAccessToken()).toBe(freshAccessToken);
+  });
+
+  it('falls back to the id token', async () => {
+    const provider = buildProvider();
+    provider.getToken = async () => ({
+      access_token: null,
+      id_token: 'id-token',
+      refresh_token: 'refresh',
+    });
+
+    expect(await provider.getAccessToken()).toBe('id-token');
   });
 });
