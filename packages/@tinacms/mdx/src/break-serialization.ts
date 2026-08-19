@@ -34,29 +34,39 @@ const walk = (node: Parent) => {
  * A trailing backslash is a hard break in CommonMark only when another line
  * follows it in the same block. With nothing after it, `one\` reads back as a
  * literal backslash, so the break is lost and a character the author never
- * typed enters the content as data (#5426). Descends through the last child:
- * `**one\**` is dangling, `**one\** two` is not.
+ * typed enters the content as data (#5426).
+ *
+ * Walks back over breaks and the empty text nodes between them, in any order:
+ * two shift+Enters leave `[break, text(''), break, text('')]`. Descends through
+ * the last child that writes something — the spacer after it is not it — so
+ * `**one\**` and `[one\](/x)` are both dangling, `**one\** two` is not.
  */
 const trimTrailingBreaks = ({ children }: Parent) => {
-  let end = children.length;
-  while (end > 0 && writesNothing(children[end - 1])) {
-    end--;
+  let index = children.length;
+  const trailing: number[] = [];
+  while (index > 0) {
+    const child = children[index - 1];
+    if (isBreak(child)) {
+      trailing.push(index - 1);
+    } else if (!writesNothing(child)) {
+      break;
+    }
+    index--;
   }
-  let start = end;
-  while (
-    start > 0 &&
-    (children[start - 1] as Parent | undefined)?.type === 'break'
-  ) {
-    start--;
+  // Descending indices, so each splice leaves the rest addressable. Only the
+  // breaks go; a lone empty text node is a deliberate spacer.
+  for (const at of trailing) {
+    children.splice(at, 1);
   }
-  // Splice only the breaks; a lone empty text node is a deliberate spacer.
-  children.splice(start, end - start);
 
-  const last = children.at(-1);
+  const last = children[index - 1];
   if (isParent(last)) {
     trimTrailingBreaks(last);
   }
 };
+
+const isBreak = (node: unknown) =>
+  (node as { type?: string } | undefined)?.type === 'break';
 
 /** Slate keeps one of these after a trailing inline void, and it writes nothing. */
 const writesNothing = (node: unknown) =>
@@ -74,17 +84,39 @@ const DEEPEST_SETEXT = 2;
  * author's line break vanishes with no error. Split instead: same level, content
  * and break both survive, and the next save is a fixed point.
  */
-const splitOnBreaks = (heading: Md.Heading): Md.Heading[] => {
-  const segments: Md.Heading['children'][] = [[]];
-  for (const child of heading.children) {
-    if (child.type === 'break') {
-      segments.push([]);
-    } else {
-      segments[segments.length - 1]?.push(child);
-    }
-  }
+const splitOnBreaks = (heading: Md.Heading): Md.Heading[] =>
   // A segment of nothing but empty text would write a bare `###`.
-  return segments
+  splitInlines(heading.children)
     .filter((children) => children.some((child) => !writesNothing(child)))
     .map((children) => ({ ...heading, children }));
+
+/**
+ * A break in a heading is not always a direct child — the editor puts one
+ * inside the link when the cursor is in link text — so splitting only the top
+ * level left it nested, where it degrades to a space and the line break is lost
+ * with no error. Splitting the ancestor too turns `### [one⏎two](/x)` into two
+ * headings, each carrying its own copy of the link.
+ */
+const splitInlines = <T>(nodes: T[]): T[][] => {
+  const segments: T[][] = [[]];
+  const push = (node: T) => segments[segments.length - 1]?.push(node);
+
+  for (const node of nodes) {
+    if (isBreak(node)) {
+      segments.push([]);
+      continue;
+    }
+    if (!isParent(node)) {
+      push(node);
+      continue;
+    }
+    const inner = splitInlines(node.children);
+    inner.forEach((children, index) => {
+      if (index > 0) {
+        segments.push([]);
+      }
+      push({ ...node, children } as T);
+    });
+  }
+  return segments;
 };
