@@ -112,6 +112,31 @@ describe('serializeBreaks, headings', () => {
     ]);
   });
 
+  it('splits the ancestor too when the break is nested', () => {
+    const tree = root([
+      heading([
+        { type: 'link', url: '/x', children: [text('one'), brk, text('two')] },
+      ]),
+    ]);
+    expect(serializeBreaks(tree).children).toMatchObject([
+      { type: 'heading', children: [{ type: 'link', url: '/x' }] },
+      { type: 'heading', children: [{ type: 'link', url: '/x' }] },
+    ]);
+  });
+
+  it('keeps the content either side of a nested split', () => {
+    const tree = root([
+      heading([
+        text('a '),
+        { type: 'link', url: '/x', children: [text('one'), brk, text('two')] },
+        text(' b'),
+      ]),
+    ]);
+    const [first, second] = serializeBreaks(tree).children as Md.Heading[];
+    expect(first?.children).toHaveLength(2);
+    expect(second?.children).toHaveLength(2);
+  });
+
   it('splits a heading nested in a blockquote', () => {
     const tree = root([
       {
