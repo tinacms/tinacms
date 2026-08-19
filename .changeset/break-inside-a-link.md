@@ -2,8 +2,10 @@
 "@tinacms/mdx": patch
 ---
 
-Parse a hard break inside a link instead of collapsing the field.
+Parse a hard break, and strikethrough, inside a link instead of collapsing the field.
 
-`staticPhrasingContent` had no `break` case while its sibling `phrasingContent` did, so `[a\`⏎`b](/x)` threw `StaticPhrasingContent: break is not yet supported` and the whole rich-text field rendered as an `invalid_markdown` blob. That markdown is valid CommonMark and can be hand-authored, so it did not need the editor to be involved.
+Link children go through `staticPhrasingContent`, a narrower switch than the `phrasingContent` one used everywhere else. It was missing both `break` and `delete`, so `[a\`⏎`b](/x)` and `[~~a~~](/x)` each threw `StaticPhrasingContent: ... is not yet supported` and the whole rich-text field rendered as an `invalid_markdown` blob.
+
+Both are valid CommonMark and can be hand-authored, so neither needed the editor to be involved.
 
 Part of the fix for #7415.

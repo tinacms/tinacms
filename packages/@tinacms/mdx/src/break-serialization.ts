@@ -1,10 +1,6 @@
 import type * as Md from 'mdast';
 
-/**
- * Reshape the tree so every hard break left in it is one markdown can express.
- * Order matters: a heading ending in a break would otherwise split into an
- * empty second heading.
- */
+/** Reshape the tree so every hard break left in it is one markdown can express. Acts in place. */
 export const serializeBreaks = <T extends Md.Root>(tree: T): T => {
   walk(tree);
   return tree;
@@ -15,10 +11,7 @@ type Parent = { type?: string; children: unknown[] };
 const isParent = (node: unknown): node is Parent =>
   Array.isArray((node as Parent | undefined)?.children);
 
-/**
- * Blocks that hold phrasing content directly. Blockquotes and list items hold
- * paragraphs, which the walk reaches on its own.
- */
+/** Blockquotes and list items hold paragraphs, which the walk reaches anyway. */
 const PHRASING_BLOCKS = new Set(['paragraph', 'heading', 'tableCell']);
 
 const walk = (node: Parent) => {
@@ -40,12 +33,9 @@ const walk = (node: Parent) => {
 /**
  * A trailing backslash is a hard break in CommonMark only when another line
  * follows it in the same block. With nothing after it, `one\` reads back as a
- * literal backslash — the break is lost and a character the author never typed
- * enters the content as data (#5426).
- *
- * Representability here is positional, not type-based, so no list of container
- * types can express it. Only the last child can be in trailing position, so
- * descend through it — `**one\**` is dangling, `**one\** two` is not.
+ * literal backslash, so the break is lost and a character the author never
+ * typed enters the content as data (#5426). Descends through the last child:
+ * `**one\**` is dangling, `**one\** two` is not.
  */
 const trimTrailingBreaks = ({ children }: Parent) => {
   let end = children.length;
@@ -59,7 +49,7 @@ const trimTrailingBreaks = ({ children }: Parent) => {
   ) {
     start--;
   }
-  // Leave the empty text nodes alone; a lone one is a deliberate spacer.
+  // Splice only the breaks; a lone empty text node is a deliberate spacer.
   children.splice(start, end - start);
 
   const last = children.at(-1);
@@ -68,12 +58,7 @@ const trimTrailingBreaks = ({ children }: Parent) => {
   }
 };
 
-/**
- * An empty text node writes nothing, so a break in front of one is still the
- * last thing in the block. The editor always produces that pair — Slate keeps a
- * text node after a trailing inline void — so skipping them is what makes this
- * fire on real editor output rather than only on hand-built trees.
- */
+/** Slate keeps one of these after a trailing inline void, and it writes nothing. */
 const writesNothing = (node: unknown) =>
   (node as Md.Text | undefined)?.type === 'text' &&
   (node as Md.Text).value === '';
@@ -81,21 +66,13 @@ const writesNothing = (node: unknown) =>
 const isHeading = (node: unknown): node is Md.Heading =>
   isParent(node) && node.type === 'heading';
 
-/**
- * `#` and `##` have a setext form, so a break in them survives as a real break
- * in one heading. Files written by earlier versions already carry that shape,
- * and re-splitting them would restructure content that round-trips correctly
- * today, so leave those two levels alone.
- */
+/** `#`/`##` have a setext form, so a break already survives there as a real break. */
 const DEEPEST_SETEXT = 2;
 
 /**
- * `###` and deeper have no setext form. The break silently degrades to a space,
- * so the author's line break vanishes with no error.
- *
- * Split into headings of the same level instead. The content and the line break
- * both survive, the file keeps its ATX style, and the result is a fixed point
- * on the next save.
+ * `###` and deeper have no setext form, so the break degrades to a space and the
+ * author's line break vanishes with no error. Split instead: same level, content
+ * and break both survive, and the next save is a fixed point.
  */
 const splitOnBreaks = (heading: Md.Heading): Md.Heading[] => {
   const segments: Md.Heading['children'][] = [[]];
