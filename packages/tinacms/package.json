@@ -2,7 +2,7 @@
   "name": "tinacms",
   "type": "module",
   "typings": "dist/index.d.ts",
-  "version": "3.11.0",
+  "version": "3.12.0",
   "main": "dist/index.js",
   "module": "./dist/index.js",
   "exports": {
@@ -86,7 +86,6 @@
     "@udecode/plate-slash-command": "catalog:",
     "@udecode/plate-table": "catalog:",
     "@udecode/plate-trailing-block": "catalog:",
-    "async-lock": "catalog:",
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
     "cmdk": "catalog:",

@@ -1,7 +1,7 @@
 {
     "name": "@tinacms/cli",
     "type": "module",
-    "version": "2.5.6",
+    "version": "2.6.0",
     "main": "dist/index.js",
     "typings": "dist/index.d.ts",
     "files": [
@@ -78,7 +78,6 @@
         "@tinacms/search": "workspace:^",
         "@vitejs/plugin-react": "catalog:",
         "altair-express-middleware": "catalog:",
-        "async-lock": "catalog:",
         "auto-bind": "catalog:",
         "body-parser": "catalog:",
         "busboy": "catalog:",
@@ -92,7 +91,7 @@
         "esbuild": "catalog:",
         "fs-extra": "catalog:",
         "graphql": "15.8.0",
-        "js-yaml": "^4.1.0",
+        "js-yaml": "^4.3.1",
         "many-level": "catalog:",
         "memory-level": "catalog:",
         "minimatch": "catalog:",
