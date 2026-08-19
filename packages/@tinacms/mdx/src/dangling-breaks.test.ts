@@ -8,6 +8,9 @@ const paragraph = (children: unknown[]): Md.Root =>
 const text = (value: string) => ({ type: 'text', value });
 const brk = { type: 'break' };
 
+const countBreaks = (tree: Md.Root) =>
+  JSON.stringify(tree).split('"break"').length - 1;
+
 const typesIn = (tree: Md.Root) =>
   JSON.stringify(tree, (key, value) => (key === 'value' ? undefined : value));
 
@@ -40,6 +43,25 @@ describe('dropDanglingBreaks', () => {
     ];
     expect(typesIn(dropDanglingBreaks(paragraph(nested())))).toBe(
       typesIn(paragraph(nested()))
+    );
+  });
+
+  /**
+   * The shape the editor produces: Slate keeps a text node after a trailing
+   * inline void, so the break is never literally the last child.
+   */
+  it('drops a break followed only by an empty text node', () => {
+    const tree = paragraph([text('one'), brk, { type: 'text', value: '' }]);
+    expect(dropDanglingBreaks(tree).children[0]).toMatchObject({
+      children: [{ type: 'text' }, { type: 'text' }],
+    });
+    expect(countBreaks(tree)).toBe(0);
+  });
+
+  it('keeps an empty text node that is not trailing a break', () => {
+    const tree = paragraph([{ type: 'text', value: '' }]);
+    expect(typesIn(dropDanglingBreaks(tree))).toBe(
+      typesIn(paragraph([{ type: 'text', value: '' }]))
     );
   });
 

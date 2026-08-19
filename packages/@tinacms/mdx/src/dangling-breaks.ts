@@ -37,13 +37,34 @@ const walk = (node: Parent) => {
 };
 
 /**
+ * An empty text node writes nothing, so a break in front of one is still the
+ * last thing in the block. The editor always produces that pair — Slate keeps a
+ * text node after a trailing inline void — so skipping them is what makes this
+ * fire on real editor output rather than only on hand-built trees.
+ */
+const writesNothing = (node: unknown) =>
+  (node as Md.Text | undefined)?.type === 'text' &&
+  (node as Md.Text).value === '';
+
+/**
  * Only the last child can be in trailing position, so descend through it —
  * `**one\**` is dangling, `**one\** two` is not.
  */
 const trimTrailingBreaks = ({ children }: Parent) => {
-  while ((children.at(-1) as Parent | undefined)?.type === 'break') {
-    children.pop();
+  let end = children.length;
+  while (end > 0 && writesNothing(children[end - 1])) {
+    end--;
   }
+  let start = end;
+  while (
+    start > 0 &&
+    (children[start - 1] as Parent | undefined)?.type === 'break'
+  ) {
+    start--;
+  }
+  // Leave the empty text nodes alone; a lone one is a deliberate spacer.
+  children.splice(start, end - start);
+
   const last = children.at(-1);
   if (isParent(last)) {
     trimTrailingBreaks(last);
