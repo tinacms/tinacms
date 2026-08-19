@@ -29,11 +29,14 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextField) => {
   // @ts-ignore
   const handlers: Handlers = {};
   handlers['text'] = (node, parent, context, safeOptions) => {
-    // Empty spaces before/after strings
+    // Empty spaces before/after strings. The rule guarding a space at the
+    // start of a line stays: without it four of them open an indented code
+    // block, and the author's indentation comes back as `code_block`.
     context.unsafe = context.unsafe.filter((unsafeItem) => {
       if (
         unsafeItem.character === ' ' &&
-        unsafeItem.inConstruct === 'phrasing'
+        unsafeItem.inConstruct === 'phrasing' &&
+        unsafeItem.before !== '[\\r\\n]'
       ) {
         return false;
       }
