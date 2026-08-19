@@ -350,6 +350,8 @@ export const remarkToSlate = (
         );
       case 'text':
         return text(content);
+      case 'break':
+        return breakContent();
       case 'inlineCode':
       case 'emphasis':
       case 'image':

@@ -235,8 +235,8 @@ describe('a hard break in every container', () => {
       ul                 -         skipped: holds list items                                     -       -       -
       table              -         skipped: holds rows                                           -       -       -
       tr                 -         skipped: holds cells                                          -       -       -
-      a                  mid       "[one\\\\\\ntwo](/x)\\n"                                          1       0       INVALID UNSTABLE RESAVE THREW
-      a                  final     "[one two\\\\\\n](/x)\\n"                                         1       0       INVALID UNSTABLE RESAVE THREW
+      a                  mid       "[one\\\\\\ntwo](/x)\\n"                                          1       1       parses
+      a                  final     "[one two\\\\\\n](/x)\\n"                                         1       1       parses
       text               -         skipped: the injection site of every block row above          -       -       -
       html_inline        -         skipped: carries a raw value, no inline children              -       -       -
       mdxJsxTextElement  -         skipped: children live in props                               -       -       -
@@ -278,8 +278,8 @@ describe('a hard break in every container', () => {
       ul                 -         skipped: holds list items                                     -       -       -
       table              -         skipped: holds rows                                           -       -       -
       tr                 -         skipped: holds cells                                          -       -       -
-      a                  mid       "[one\\\\\\ntwo](/x)\\n"                                          1       0       INVALID
-      a                  final     "[one two\\\\\\n](/x)\\n"                                         1       0       INVALID
+      a                  mid       "[one\\\\\\ntwo](/x)\\n"                                          1       1       parses
+      a                  final     "[one two\\\\\\n](/x)\\n"                                         1       1       parses
       text               -         skipped: the injection site of every block row above          -       -       -
       html_inline        -         skipped: carries a raw value, no inline children              -       -       -
       mdxJsxTextElement  -         skipped: children live in props                               -       -       -
