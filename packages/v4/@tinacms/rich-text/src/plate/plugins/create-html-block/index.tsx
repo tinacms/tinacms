@@ -1,4 +1,9 @@
 import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
+import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
+import {
+  TableCellHeaderPlugin,
+  TableCellPlugin,
+} from '@udecode/plate-table/react';
 import { createPlatePlugin } from '@udecode/plate/react';
 import React from 'react';
 
@@ -20,23 +25,41 @@ export const createHTMLInlinePlugin = createPlatePlugin({
   },
 });
 
-export const KEY_BLOCKQUOTE_ENTER_BREAK = 'blockquote-enter-break';
+export const KEY_SOFT_BREAK = 'tina-soft-break';
 
-export const createBlockquoteEnterBreakPlugin = createPlatePlugin({
-  key: KEY_BLOCKQUOTE_ENTER_BREAK,
+// Plate's SoftBreakPlugin puts a literal "\n" in the text. Markdown re-flows
+// that into a space, and the line break is lost. A `break` element serializes
+// to a `\` hard break, which makes the round trip.
+//
+// Code blocks and table cells stay with SoftBreakPlugin. Code blocks need a
+// real newline. A GFM table cell cannot hold a hard break.
+const NO_HARD_BREAK = [
+  CodeBlockPlugin.key,
+  TableCellPlugin.key,
+  TableCellHeaderPlugin.key,
+];
+
+export const createSoftBreakPlugin = createPlatePlugin({
+  key: KEY_SOFT_BREAK,
 
   handlers: {
     onKeyDown: ({ editor, event }) => {
-      if (event.key !== 'Enter') return;
-      const blockquoteEntry = editor.api.above({
+      // mod+enter and mod+shift+enter belong to ExitBreakPlugin.
+      if (event.key !== 'Enter' || event.metaKey || event.ctrlKey) return;
+
+      const inBlockquote = editor.api.above({
         match: { type: BlockquotePlugin.key },
       });
+      if (!event.shiftKey && !inBlockquote) return;
 
-      if (!blockquoteEntry) return;
+      if (editor.api.some({ match: { type: NO_HARD_BREAK } })) return;
 
-      event.preventDefault();
+      if (editor.api.isExpanded()) editor.tf.delete();
+
       const cursorPosition = editor.selection?.focus;
       if (!cursorPosition) return;
+
+      event.preventDefault();
 
       editor.tf.insertNodes(
         [
