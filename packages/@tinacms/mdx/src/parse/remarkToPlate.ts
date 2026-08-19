@@ -356,6 +356,7 @@ export const remarkToSlate = (
       case 'emphasis':
       case 'image':
       case 'strong':
+      case 'delete':
         return phrashingMark(content);
       case 'html':
         return html_inline(content);
