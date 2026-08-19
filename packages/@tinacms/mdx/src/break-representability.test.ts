@@ -41,7 +41,9 @@ const mdxField: RichTextField = {
  * `path` indexes `children` from the root, down to the node holding the inline
  * content. The text `one two` inside it is the injection site.
  */
-type Container = { skip: string } | { md: string; path: number[] };
+type Container =
+  | { skip: string }
+  | { md: string; path: number[]; inline?: boolean };
 
 const BLOCKS: Record<Plate.BlockElement['type'], Container> = {
   p: { md: 'one two\n', path: [0] },
@@ -72,7 +74,7 @@ const INLINES: Record<
   Exclude<Plate.InlineElement['type'], 'break'>,
   Container
 > = {
-  a: { md: '[one two](/x)\n', path: [0, 0] },
+  a: { md: '[one two](/x)\n', path: [0, 0], inline: true },
   text: { skip: 'the injection site of every block row above' },
   img: { skip: 'void' },
   html_inline: { skip: 'carries a raw value, no inline children' },
@@ -100,9 +102,14 @@ const CONTAINERS: [string, Container][] = [
  * explicitly. A bare trailing break only ever came from a synthetic fixture, so
  * testing `final` alone hides every defect on the path users take.
  */
-type Position = 'mid' | 'final' | 'final-editor';
+type Position = 'mid' | 'final' | 'final-editor' | 'final-editor-twice';
 
-const POSITIONS: Position[] = ['mid', 'final', 'final-editor'];
+const POSITIONS: Position[] = [
+  'mid',
+  'final',
+  'final-editor',
+  'final-editor-twice',
+];
 
 const newBreak = (): Plate.BreakElement => ({
   type: 'break',
@@ -112,22 +119,28 @@ const newBreak = (): Plate.BreakElement => ({
 const nodeAt = (tree: Plate.RootElement, path: number[]) =>
   path.reduce<any>((node, index) => node.children[index], tree);
 
+const emptyText = (): Plate.EmptyTextElement => ({ type: 'text', text: '' });
+
 const inject = (children: Plate.InlineElement[], position: Position) => {
-  if (position === 'final' || position === 'final-editor') {
-    children.push(newBreak());
-    if (position === 'final-editor') {
-      children.push({ type: 'text', text: '' });
-    }
+  if (position === 'mid') {
+    const index = children.findIndex(
+      (child) => (child as Plate.TextElement).text === 'one two'
+    );
+    const target = children[index] as Plate.TextElement;
+    children.splice(index, 1, { ...target, text: 'one' }, newBreak(), {
+      ...target,
+      text: 'two',
+    });
     return;
   }
-  const index = children.findIndex(
-    (child) => (child as Plate.TextElement).text === 'one two'
-  );
-  const target = children[index] as Plate.TextElement;
-  children.splice(index, 1, { ...target, text: 'one' }, newBreak(), {
-    ...target,
-    text: 'two',
-  });
+  children.push(newBreak());
+  if (position === 'final') {
+    return;
+  }
+  children.push(emptyText());
+  if (position === 'final-editor-twice') {
+    children.push(newBreak(), emptyText());
+  }
 };
 
 const countBreaks = (node: unknown): number => {
@@ -143,12 +156,18 @@ const countBreaks = (node: unknown): number => {
 };
 
 const roundTrip = (
-  container: { md: string; path: number[] },
+  container: { md: string; path: number[]; inline?: boolean },
   position: Position,
   field: RichTextField
 ) => {
   const tree = parseMDX(container.md, field, passthrough);
   inject(nodeAt(tree, container.path).children, position);
+  // Slate keeps a spacer after a trailing inline void at every level, so a
+  // break ending a link leaves one inside the link AND after it. Missing the
+  // outer one is what hid the break-inside-a-link defect.
+  if (container.inline && position !== 'mid' && position !== 'final') {
+    nodeAt(tree, container.path.slice(0, -1)).children.push(emptyText());
+  }
 
   const written = serializeMDX(tree, field, passthrough) as string;
   const reread = parseMDX(written, field, passthrough);
