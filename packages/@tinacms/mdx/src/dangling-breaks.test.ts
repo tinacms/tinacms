@@ -65,6 +65,25 @@ describe('dropDanglingBreaks', () => {
     );
   });
 
+  it('drops every break of a repeated shift+Enter, not just the last', () => {
+    const tree = paragraph([
+      text('one'),
+      brk,
+      { type: 'text', value: '' },
+      brk,
+      { type: 'text', value: '' },
+    ]);
+    expect(countBreaks(dropDanglingBreaks(tree))).toBe(0);
+  });
+
+  it('descends into the last child that writes something, not the spacer', () => {
+    const tree = paragraph([
+      { type: 'link', url: '/x', children: [text('one'), brk, { type: 'text', value: '' }] },
+      { type: 'text', value: '' },
+    ]);
+    expect(countBreaks(dropDanglingBreaks(tree))).toBe(0);
+  });
+
   it('leaves a break at the start of a block alone', () => {
     const tree = paragraph([brk, text('one')]);
     expect(typesIn(dropDanglingBreaks(tree))).toBe(
