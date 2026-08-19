@@ -1,8 +1,11 @@
 import type { RichTextField } from '@tinacms/schema-tools';
+import { toMatchFile } from 'jest-file-snapshot';
 import { describe, expect, it } from 'vitest';
 import { parseMDX } from './parse';
 import type * as Plate from './parse/plate';
 import { serializeMDX } from './stringify';
+
+expect.extend({ toMatchFile });
 
 /**
  * Where a hard break survives, and where it does not.
@@ -202,89 +205,15 @@ const writtenColumn = (field: RichTextField) =>
 
 describe('a hard break in every container', () => {
   it('round-trips through the markdown parser', () => {
-    expect(`\n${matrix(markdownField)}\n`).toMatchInlineSnapshot(`
-      "
-      container          position  written                                                       blocks  breaks  ok
-      p                  mid       "one\\\\\\ntwo\\n"                                                1       1       parses
-      p                  final     "one two\\\\\\n"                                                 1       0       parses UNSTABLE
-      h1                 mid       "one\\\\\\ntwo\\n===\\n"                                           1       1       parses
-      h1                 final     "one two\\\\\\n\\n"                                               1       0       parses UNSTABLE
-      h2                 mid       "one\\\\\\ntwo\\n---\\n"                                           1       1       parses
-      h2                 final     "one two\\\\\\n\\n"                                               1       0       parses UNSTABLE
-      h3                 mid       "### one two\\n"                                               1       0       parses
-      h3                 final     "### one two \\n"                                              1       0       parses UNSTABLE
-      h4                 mid       "#### one two\\n"                                              1       0       parses
-      h4                 final     "#### one two \\n"                                             1       0       parses UNSTABLE
-      h5                 mid       "##### one two\\n"                                             1       0       parses
-      h5                 final     "##### one two \\n"                                            1       0       parses UNSTABLE
-      h6                 mid       "###### one two\\n"                                            1       0       parses
-      h6                 final     "###### one two \\n"                                           1       0       parses UNSTABLE
-      blockquote         mid       "> one\\\\\\n> two\\n"                                            1       1       parses
-      blockquote         final     "> one two\\\\\\n>\\n"                                            1       0       parses UNSTABLE
-      li                 mid       "* one\\\\\\n  two\\n"                                            1       1       parses
-      li                 final     "* one two\\\\\\n"                                               1       0       parses UNSTABLE
-      td                 mid       "| h       |\\n| ------- |\\n| one two |\\n"                     1       0       parses
-      td                 final     "| h        |\\n| -------- |\\n| one two  |\\n"                  1       0       parses UNSTABLE
-      code_block         -         skipped: wants a literal newline, not a break                 -       -       -
-      hr                 -         skipped: void                                                 -       -       -
-      html               -         skipped: carries a raw value, no inline children              -       -       -
-      img                -         skipped: void                                                 -       -       -
-      invalid_markdown   -         skipped: carries a parse error, not authored content          -       -       -
-      mdxJsxFlowElement  -         skipped: children live in props, covered by the mdx fixtures  -       -       -
-      ol                 -         skipped: holds list items                                     -       -       -
-      ul                 -         skipped: holds list items                                     -       -       -
-      table              -         skipped: holds rows                                           -       -       -
-      tr                 -         skipped: holds cells                                          -       -       -
-      a                  mid       "[one\\\\\\ntwo](/x)\\n"                                          1       0       INVALID UNSTABLE RESAVE THREW
-      a                  final     "[one two\\\\\\n](/x)\\n"                                         1       0       INVALID UNSTABLE RESAVE THREW
-      text               -         skipped: the injection site of every block row above          -       -       -
-      html_inline        -         skipped: carries a raw value, no inline children              -       -       -
-      mdxJsxTextElement  -         skipped: children live in props                               -       -       -
-      "
-    `);
+    expect(`${matrix(markdownField)}\n`).toMatchFile(
+      `${__dirname}/break-representability.markdown.txt`
+    );
   });
 
   it('round-trips through the mdx parser', () => {
-    expect(`\n${matrix(mdxField)}\n`).toMatchInlineSnapshot(`
-      "
-      container          position  written                                                       blocks  breaks  ok
-      p                  mid       "one\\\\\\ntwo\\n"                                                1       1       parses
-      p                  final     "one two\\\\\\n"                                                 1       0       parses UNSTABLE
-      h1                 mid       "one\\\\\\ntwo\\n===\\n"                                           1       1       parses
-      h1                 final     "one two\\\\\\n\\n"                                               1       0       parses UNSTABLE
-      h2                 mid       "one\\\\\\ntwo\\n---\\n"                                           1       1       parses
-      h2                 final     "one two\\\\\\n\\n"                                               1       0       parses UNSTABLE
-      h3                 mid       "### one two\\n"                                               1       0       parses
-      h3                 final     "### one two \\n"                                              1       0       parses UNSTABLE
-      h4                 mid       "#### one two\\n"                                              1       0       parses
-      h4                 final     "#### one two \\n"                                             1       0       parses UNSTABLE
-      h5                 mid       "##### one two\\n"                                             1       0       parses
-      h5                 final     "##### one two \\n"                                            1       0       parses UNSTABLE
-      h6                 mid       "###### one two\\n"                                            1       0       parses
-      h6                 final     "###### one two \\n"                                           1       0       parses UNSTABLE
-      blockquote         mid       "> one\\\\\\n> two\\n"                                            1       1       parses
-      blockquote         final     "> one two\\\\\\n>\\n"                                            1       0       parses UNSTABLE
-      li                 mid       "* one\\\\\\n  two\\n"                                            1       1       parses
-      li                 final     "* one two\\\\\\n"                                               1       0       parses UNSTABLE
-      td                 mid       "| h       |\\n| ------- |\\n| one two |\\n"                     1       0       parses
-      td                 final     "| h        |\\n| -------- |\\n| one two  |\\n"                  1       0       parses UNSTABLE
-      code_block         -         skipped: wants a literal newline, not a break                 -       -       -
-      hr                 -         skipped: void                                                 -       -       -
-      html               -         skipped: carries a raw value, no inline children              -       -       -
-      img                -         skipped: void                                                 -       -       -
-      invalid_markdown   -         skipped: carries a parse error, not authored content          -       -       -
-      mdxJsxFlowElement  -         skipped: children live in props, covered by the mdx fixtures  -       -       -
-      ol                 -         skipped: holds list items                                     -       -       -
-      ul                 -         skipped: holds list items                                     -       -       -
-      table              -         skipped: holds rows                                           -       -       -
-      tr                 -         skipped: holds cells                                          -       -       -
-      a                  mid       "[one\\\\\\ntwo](/x)\\n"                                          1       0       INVALID
-      a                  final     "[one two\\\\\\n](/x)\\n"                                         1       0       INVALID
-      text               -         skipped: the injection site of every block row above          -       -       -
-      html_inline        -         skipped: carries a raw value, no inline children              -       -       -
-      mdxJsxTextElement  -         skipped: children live in props                               -       -       -
-      "
-    `);
+    expect(`${matrix(mdxField)}\n`).toMatchFile(
+      `${__dirname}/break-representability.mdx.txt`
+    );
   });
 
   it('writes the same markdown from either parser', () => {
