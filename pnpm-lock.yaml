@@ -601,8 +601,8 @@ catalogs:
       specifier: 4.0.3
       version: 4.0.3
     tar:
-      specifier: 7.5.21
-      version: 7.5.21
+      specifier: 7.5.22
+      version: 7.5.22
     ts-jest:
       specifier: ^29.2.5
       version: 29.4.6
@@ -2069,7 +2069,7 @@ importers:
         version: 5.27.14
       tar:
         specifier: 'catalog:'
-        version: 7.5.21
+        version: 7.5.22
     devDependencies:
       '@tinacms/scripts':
         specifier: workspace:*
@@ -15151,8 +15151,8 @@ packages:
     resolution: {integrity: sha512-tOG/7GyXpFevhXVh8jOPJrmtRpOTsYqUIkVdVooZYJS/z8WhfQUX8RJILmeuJNinGAMSu1veBr4asSHFt5/hng==}
     engines: {node: '>=18'}
 
-  tar@7.5.21:
-    resolution: {integrity: sha512-XdhtCvlMywwxpCW8YEq3lOXBJpUPTR2OHHcwLPO3HwsJqOHa2Ok/oJ7ruGzp+JrKoRPVCzJwAdEjqLW/vNRPHA==}
+  tar@7.5.22:
+    resolution: {integrity: sha512-MFO/QzvtAOmJbkhOaCTvbGcFN9L9b+JunIsDwaKljSOdcLMea3NJ1k9Usz/rjdfSXTq4dfzfeS7W4p4YOAAHeA==}
     engines: {node: '>=18'}
 
   term-size@2.2.1:
@@ -33543,7 +33543,7 @@ snapshots:
       minizlib: 3.1.0
       yallist: 5.0.0
 
-  tar@7.5.21:
+  tar@7.5.22:
     dependencies:
       '@isaacs/fs-minipass': 4.0.1
       chownr: 3.0.0
