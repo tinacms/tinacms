@@ -52,7 +52,7 @@ import { autoformatMarks } from './core/autoformat/autoformat-marks';
 import {
   createBreakPlugin,
   createHTMLInlinePlugin,
-  createSoftBreakPlugin,
+  createHardBreakPlugin,
 } from './create-html-block';
 import { createHTMLBlockPlugin } from './create-html-block';
 import createImgPlugin from './create-img-plugin';
@@ -146,7 +146,7 @@ export const createEditorPlugins = ({
   createImgPlugin,
   createHTMLBlockPlugin,
   createHTMLInlinePlugin,
-  createSoftBreakPlugin,
+  createHardBreakPlugin,
   createInvalidMarkdownPlugin,
   CorrectNodeBehaviorPlugin,
   ClearHighlightOnEnterPlugin,

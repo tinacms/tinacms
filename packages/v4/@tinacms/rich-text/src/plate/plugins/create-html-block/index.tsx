@@ -25,7 +25,7 @@ export const createHTMLInlinePlugin = createPlatePlugin({
   },
 });
 
-export const KEY_SOFT_BREAK = 'tina-soft-break';
+export const KEY_HARD_BREAK = 'tina-hard-break';
 
 // Plate's SoftBreakPlugin puts a literal "\n" in the text. Markdown re-flows
 // that into a space, and the line break is lost. A `break` element serializes
@@ -39,8 +39,8 @@ const NO_HARD_BREAK = [
   TableCellHeaderPlugin.key,
 ];
 
-export const createSoftBreakPlugin = createPlatePlugin({
-  key: KEY_SOFT_BREAK,
+export const createHardBreakPlugin = createPlatePlugin({
+  key: KEY_HARD_BREAK,
 
   handlers: {
     onKeyDown: ({ editor, event }) => {

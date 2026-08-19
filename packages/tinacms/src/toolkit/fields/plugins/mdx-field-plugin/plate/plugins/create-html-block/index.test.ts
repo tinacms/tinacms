@@ -1,12 +1,15 @@
 import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
+import { SoftBreakPlugin } from '@udecode/plate-break/react';
 import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 import { TablePlugin } from '@udecode/plate-table/react';
 import { createPlateEditor } from '@udecode/plate/react';
 import { describe, expect, it } from 'vitest';
+import { createEditorPlugins } from '../editor-plugins';
 import {
   ELEMENT_BREAK,
+  KEY_HARD_BREAK,
   createBreakPlugin,
-  createSoftBreakPlugin,
+  createHardBreakPlugin,
 } from './index';
 
 const pressEnter = (
@@ -20,7 +23,7 @@ const pressEnter = (
       CodeBlockPlugin,
       TablePlugin,
       createBreakPlugin,
-      createSoftBreakPlugin,
+      createHardBreakPlugin,
     ],
     value,
   });
@@ -38,7 +41,7 @@ const pressEnter = (
       defaultPrevented = true;
     },
   };
-  createSoftBreakPlugin.handlers.onKeyDown({ editor, event } as any);
+  createHardBreakPlugin.handlers.onKeyDown({ editor, event } as any);
 
   return { defaultPrevented, value: editor.children };
 };
@@ -49,7 +52,24 @@ const hasBreak = (node: any): boolean =>
 
 const paragraph = [{ type: 'p', children: [{ text: 'one two' }] }];
 
-describe('createSoftBreakPlugin', () => {
+describe('createHardBreakPlugin', () => {
+  /**
+   * Nothing stops a double insert except order: this plugin calls
+   * preventDefault, and Plate's SoftBreakPlugin ignores an event that is
+   * already handled. Reorder the array and every shift+Enter writes both a
+   * break element and a literal newline.
+   */
+  it('is registered before Plate SoftBreakPlugin', () => {
+    const keys = createEditorPlugins().map(
+      (plugin: { key: string }) => plugin.key
+    );
+
+    expect(keys).toContain(KEY_HARD_BREAK);
+    expect(keys.indexOf(KEY_HARD_BREAK)).toBeLessThan(
+      keys.indexOf(SoftBreakPlugin.key)
+    );
+  });
+
   it('inserts a break element on shift+Enter in a paragraph', () => {
     const { defaultPrevented, value } = pressEnter(paragraph, [0, 0], {
       shiftKey: true,

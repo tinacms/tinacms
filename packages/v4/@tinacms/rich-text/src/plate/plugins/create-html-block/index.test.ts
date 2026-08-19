@@ -1,8 +1,9 @@
 import type { Value } from '@udecode/plate';
+import { SoftBreakPlugin } from '@udecode/plate-break/react';
 import { createPlateEditor } from '@udecode/plate/react';
 import type { KeyboardEvent } from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { ELEMENT_BREAK, createSoftBreakPlugin } from '.';
+import { ELEMENT_BREAK, KEY_HARD_BREAK, createHardBreakPlugin } from '.';
 import { createEditorPlugins } from '../editor-plugins';
 
 const makeEditor = (value: Value) => {
@@ -32,7 +33,7 @@ const pressKey = (
     ...modifiers,
     preventDefault: vi.fn(),
   };
-  const handler = createSoftBreakPlugin.handlers?.onKeyDown;
+  const handler = createHardBreakPlugin.handlers?.onKeyDown;
   if (typeof handler !== 'function') {
     throw new Error('the plugin registers no keydown handler');
   }
@@ -70,7 +71,24 @@ const tableDocument: Value = [
   },
 ];
 
-describe('soft break', () => {
+describe('hard break', () => {
+  /**
+   * Nothing stops a double insert except order: this plugin calls
+   * preventDefault, and Plate's SoftBreakPlugin ignores an event that is
+   * already handled. Reorder the array and every shift+Enter writes both a
+   * break element and a literal newline.
+   */
+  it('is registered before Plate SoftBreakPlugin', () => {
+    const keys = createEditorPlugins().map(
+      (plugin: { key: string }) => plugin.key
+    );
+
+    expect(keys).toContain(KEY_HARD_BREAK);
+    expect(keys.indexOf(KEY_HARD_BREAK)).toBeLessThan(
+      keys.indexOf(SoftBreakPlugin.key)
+    );
+  });
+
   /**
    * Plate's SoftBreakPlugin puts a literal "\n" in the text. Markdown re-flows
    * that into a space, and the author's line break is lost on save.

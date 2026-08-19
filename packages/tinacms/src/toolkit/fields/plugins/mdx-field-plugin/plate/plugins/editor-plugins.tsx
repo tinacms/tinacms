@@ -1,6 +1,15 @@
 'use client';
 
+import type { HeadingLevel } from '@tinacms/schema-tools';
 import { createSlatePlugin } from '@udecode/plate';
+import {
+  AutoformatRule,
+  autoformatArrow,
+  autoformatLegal,
+  autoformatMath,
+  autoformatPunctuation,
+  autoformatSmartQuotes,
+} from '@udecode/plate-autoformat';
 import { AutoformatPlugin } from '@udecode/plate-autoformat/react';
 import {
   BasicMarksPlugin,
@@ -8,13 +17,20 @@ import {
 } from '@udecode/plate-basic-marks/react';
 import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
 import { ExitBreakPlugin, SoftBreakPlugin } from '@udecode/plate-break/react';
+import {
+  isCodeBlockEmpty,
+  isSelectionAtCodeBlockStart,
+  unwrapCodeBlock,
+} from '@udecode/plate-code-block';
 import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 import { HEADING_KEYS, HEADING_LEVELS } from '@udecode/plate-heading';
 import { HeadingPlugin } from '@udecode/plate-heading/react';
 import { HighlightPlugin } from '@udecode/plate-highlight/react';
 import { HorizontalRulePlugin } from '@udecode/plate-horizontal-rule/react';
+import { ListStyleType } from '@udecode/plate-indent-list';
 import { IndentListPlugin } from '@udecode/plate-indent-list/react';
 import { LinkPlugin } from '@udecode/plate-link/react';
+import { unwrapList } from '@udecode/plate-list';
 import {
   BulletedListPlugin,
   ListPlugin,
@@ -26,9 +42,21 @@ import { SlashPlugin } from '@udecode/plate-slash-command/react';
 import { TablePlugin } from '@udecode/plate-table/react';
 import { TrailingBlockPlugin } from '@udecode/plate-trailing-block';
 import { ParagraphPlugin } from '@udecode/plate/react';
+// @ts-ignore
+// NOTE: Linter complains about ESM import here, as per conversation with Jeff it will be fine at build time—ignore this linting error for now.
+import { all, createLowlight } from 'lowlight';
 import React from 'react';
 import { LinkFloatingToolbar } from '../components/plate-ui/link-floating-toolbar';
 import { isUrl } from '../transforms/is-url';
+import { getAutoformatBlocks } from './core/autoformat/autoformat-block';
+import { autoformatLists } from './core/autoformat/autoformat-lists';
+import { autoformatMarks } from './core/autoformat/autoformat-marks';
+import {
+  createBreakPlugin,
+  createHTMLInlinePlugin,
+  createHardBreakPlugin,
+} from './create-html-block';
+import { createHTMLBlockPlugin } from './create-html-block';
 import createImgPlugin from './create-img-plugin';
 import { createInvalidMarkdownPlugin } from './create-invalid-markdown-plugin';
 import {
@@ -36,34 +64,6 @@ import {
   createMdxInlinePlugin,
 } from './create-mdx-plugins';
 import { FloatingToolbarPlugin } from './ui/floating-toolbar-plugin';
-import {
-  autoformatArrow,
-  autoformatLegal,
-  autoformatMath,
-  autoformatPunctuation,
-  AutoformatRule,
-  autoformatSmartQuotes,
-} from '@udecode/plate-autoformat';
-import {
-  isCodeBlockEmpty,
-  isSelectionAtCodeBlockStart,
-  unwrapCodeBlock,
-} from '@udecode/plate-code-block';
-import { ListStyleType } from '@udecode/plate-indent-list';
-import { unwrapList } from '@udecode/plate-list';
-// @ts-ignore
-// NOTE: Linter complains about ESM import here, as per conversation with Jeff it will be fine at build time—ignore this linting error for now.
-import { all, createLowlight } from 'lowlight';
-import { getAutoformatBlocks } from './core/autoformat/autoformat-block';
-import { autoformatLists } from './core/autoformat/autoformat-lists';
-import { autoformatMarks } from './core/autoformat/autoformat-marks';
-import type { HeadingLevel } from '@tinacms/schema-tools';
-import {
-  createBreakPlugin,
-  createHTMLInlinePlugin,
-  createSoftBreakPlugin,
-} from './create-html-block';
-import { createHTMLBlockPlugin } from './create-html-block';
 
 // Define block types that support MDX embedding
 export const HANDLES_MDX = [
@@ -156,7 +156,7 @@ export const createEditorPlugins = ({
   createImgPlugin,
   createHTMLBlockPlugin,
   createHTMLInlinePlugin,
-  createSoftBreakPlugin,
+  createHardBreakPlugin,
   createInvalidMarkdownPlugin,
   CorrectNodeBehaviorPlugin,
   ClearHighlightOnEnterPlugin,
@@ -260,7 +260,7 @@ export const createEditorPlugins = ({
       ],
     },
   }),
-  // Only reached where `createSoftBreakPlugin` bails (code blocks, table
+  // Only reached where `createHardBreakPlugin` bails (code blocks, table
   // cells) — everywhere else it has already inserted a `break` element.
   SoftBreakPlugin.configure({
     options: {
