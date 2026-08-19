@@ -117,7 +117,9 @@ const writesNothingDeep = (node: unknown): boolean => {
     return false;
   }
   if (isParent(node)) {
-    return node.children.every(writesNothingDeep);
+    // `[].every()` is vacuously true, and a childless parent is not empty — a
+    // self-closing embed reaches mdast with no children and writes `<Cta />`.
+    return node.children.length > 0 && node.children.every(writesNothingDeep);
   }
   return writesNothing(node);
 };

@@ -174,6 +174,22 @@ describe('serializeBreaks, headings', () => {
     expect(second?.children).toMatchObject([{ type: 'text' }]);
   });
 
+  /**
+   * A self-closing embed reaches mdast with no children at all. `[].every()`
+   * is vacuously true, so treating a childless parent as empty deleted it.
+   */
+  it('keeps a childless embed when splitting around it', () => {
+    const embed = { type: 'mdxJsxTextElement', name: 'Cta', children: [] };
+    const tree = root([heading([text('one'), brk, embed])]);
+    expect(serializeBreaks(tree).children).toMatchObject([
+      { type: 'heading', children: [{ type: 'text' }] },
+      {
+        type: 'heading',
+        children: [{ type: 'mdxJsxTextElement', name: 'Cta' }],
+      },
+    ]);
+  });
+
   it('splits a heading nested in a blockquote', () => {
     const tree = root([
       {
