@@ -79,7 +79,20 @@ const INLINES: Record<
   mdxJsxTextElement: { skip: 'children live in props' },
 };
 
-const CONTAINERS = { ...BLOCKS, ...INLINES };
+/**
+ * A list of pairs, not a merged object: `img` is a key of both unions, so
+ * spreading them together silently drops the block entry and the matrix loses a
+ * row without anything failing.
+ */
+const CONTAINERS: [string, Container][] = [
+  ...Object.entries(BLOCKS).map(
+    ([type, container]) => [type, container] as [string, Container]
+  ),
+  ...Object.entries(INLINES).map(
+    ([type, container]) =>
+      [`${type} (inline)`, container] as [string, Container]
+  ),
+];
 
 /**
  * `final-editor` is the shape the editor actually produces: Slate keeps a text
@@ -164,8 +177,8 @@ const roundTrip = (
 
 const COLUMNS = ['container', 'position', 'written', 'blocks', 'breaks', 'ok'];
 
-const matrix = (field: RichTextField) => {
-  const rows = Object.entries(CONTAINERS).flatMap(([name, container]) => {
+const rows = (field: RichTextField) =>
+  CONTAINERS.flatMap(([name, container]) => {
     if ('skip' in container) {
       return [[name, '-', `skipped: ${container.skip}`, '-', '-', '-']];
     }
@@ -191,10 +204,12 @@ const matrix = (field: RichTextField) => {
     });
   });
 
+const matrix = (field: RichTextField) => {
+  const body = rows(field);
   const widths = COLUMNS.map((_, column) =>
-    Math.max(...[COLUMNS, ...rows].map((row) => (row[column] ?? '').length))
+    Math.max(...[COLUMNS, ...body].map((row) => (row[column] ?? '').length))
   );
-  return [COLUMNS, ...rows]
+  return [COLUMNS, ...body]
     .map((row) =>
       row
         .map((cell, index) => cell.padEnd(widths[index] ?? 0))
@@ -204,15 +219,11 @@ const matrix = (field: RichTextField) => {
     .join('\n');
 };
 
+/** The issue claims both parsers write byte-identical markdown; this pins it. */
 const writtenColumn = (field: RichTextField) =>
-  Object.entries(CONTAINERS).flatMap(([name, container]) =>
-    'skip' in container
-      ? []
-      : POSITIONS.map(
-          (position) =>
-            `${name} ${position} ${roundTrip(container, position, field).written}`
-        )
-  );
+  rows(field)
+    .filter((row) => row[1] !== '-')
+    .map((row) => `${row[0]} ${row[1]} ${row[2]}`);
 
 describe('a hard break in every container', () => {
   it('round-trips through the markdown parser', () => {
