@@ -54,12 +54,17 @@ export const createHardBreakPlugin = createPlatePlugin({
 
       if (editor.api.some({ match: { type: NO_HARD_BREAK } })) return;
 
+      // Claim the event before mutating. Deleting first and then bailing on a
+      // missing position leaves the event unhandled, so SoftBreakPlugin adds a
+      // literal newline on top of the deletion.
+      if (!editor.selection) return;
+
+      event.preventDefault();
+
       if (editor.api.isExpanded()) editor.tf.delete();
 
       const cursorPosition = editor.selection?.focus;
       if (!cursorPosition) return;
-
-      event.preventDefault();
 
       editor.tf.insertNodes(
         [
