@@ -81,7 +81,15 @@ const INLINES: Record<
 
 const CONTAINERS = { ...BLOCKS, ...INLINES };
 
-type Position = 'mid' | 'final';
+/**
+ * `final-editor` is the shape the editor actually produces: Slate keeps a text
+ * node after a trailing inline void, and `createSoftBreakPlugin` inserts one
+ * explicitly. A bare trailing break only ever came from a synthetic fixture, so
+ * testing `final` alone hides every defect on the path users take.
+ */
+type Position = 'mid' | 'final' | 'final-editor';
+
+const POSITIONS: Position[] = ['mid', 'final', 'final-editor'];
 
 const newBreak = (): Plate.BreakElement => ({
   type: 'break',
@@ -92,8 +100,11 @@ const nodeAt = (tree: Plate.RootElement, path: number[]) =>
   path.reduce<any>((node, index) => node.children[index], tree);
 
 const inject = (children: Plate.InlineElement[], position: Position) => {
-  if (position === 'final') {
+  if (position === 'final' || position === 'final-editor') {
     children.push(newBreak());
+    if (position === 'final-editor') {
+      children.push({ type: 'text', text: '' });
+    }
     return;
   }
   const index = children.findIndex(
@@ -158,7 +169,7 @@ const matrix = (field: RichTextField) => {
     if ('skip' in container) {
       return [[name, '-', `skipped: ${container.skip}`, '-', '-', '-']];
     }
-    return (['mid', 'final'] as Position[]).map((position) => {
+    return POSITIONS.map((position) => {
       const { written, blocks, breaks, stable, resaves, parses } = roundTrip(
         container,
         position,
@@ -197,7 +208,7 @@ const writtenColumn = (field: RichTextField) =>
   Object.entries(CONTAINERS).flatMap(([name, container]) =>
     'skip' in container
       ? []
-      : (['mid', 'final'] as Position[]).map(
+      : POSITIONS.map(
           (position) =>
             `${name} ${position} ${roundTrip(container, position, field).written}`
         )
