@@ -61,11 +61,11 @@ a in h3                     mid                 "### [one two](/x)\n"           
 a in h3                     final               "### [one two ](/x)\n"                                        1       0       parses
 a in h3                     final-editor        "### [one two ](/x)\n"                                        1       0       parses
 a in h3                     final-editor-twice  "### [one two  ](/x)\n"                                       1       0       parses
-a in li                     mid                 "* [one\\\n  two](/x)\n"                                      1       0       INVALID UNSTABLE RESAVE THREW
-a in li                     final               "* [one two\\\n  ](/x)\n"                                     1       0       INVALID UNSTABLE RESAVE THREW
-a in li                     final-editor        "* [one two\\\n  ](/x)\n"                                     1       0       INVALID UNSTABLE RESAVE THREW
-a in li                     final-editor-twice  "* [one two\\\n  \\\n  ](/x)\n"                               1       0       INVALID UNSTABLE RESAVE THREW
-a in blockquote             mid                 "> [one\\\n> two](/x)\n"                                      1       0       INVALID UNSTABLE RESAVE THREW
-a in blockquote             final               "> [one two\\\n> ](/x)\n"                                     1       0       INVALID UNSTABLE RESAVE THREW
-a in blockquote             final-editor        "> [one two\\\n> ](/x)\n"                                     1       0       INVALID UNSTABLE RESAVE THREW
-a in blockquote             final-editor-twice  "> [one two\\\n> \\\n> ](/x)\n"                               1       0       INVALID UNSTABLE RESAVE THREW
+a in li                     mid                 "* [one\\\n  two](/x)\n"                                      1       1       parses
+a in li                     final               "* [one two\\\n  ](/x)\n"                                     1       1       parses
+a in li                     final-editor        "* [one two\\\n  ](/x)\n"                                     1       1       parses
+a in li                     final-editor-twice  "* [one two\\\n  \\\n  ](/x)\n"                               1       2       parses
+a in blockquote             mid                 "> [one\\\n> two](/x)\n"                                      1       1       parses
+a in blockquote             final               "> [one two\\\n> ](/x)\n"                                     1       1       parses
+a in blockquote             final-editor        "> [one two\\\n> ](/x)\n"                                     1       1       parses
+a in blockquote             final-editor-twice  "> [one two\\\n> \\\n> ](/x)\n"                               1       2       parses
