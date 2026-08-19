@@ -72,12 +72,16 @@ export const useGetCollection = (
     let cancelled = false;
 
     const fetchCollection = async () => {
-      if ((await api.isAuthenticated()) && !folder.loading && !cancelled) {
-        const { name, order } = JSON.parse(sortKey || '{}');
-        const validSortKey = isValidSortKey(name, collectionExtra)
-          ? name
-          : undefined;
-        try {
+      // the effect re-runs once the folder resolves
+      if (folder.loading) {
+        return;
+      }
+      try {
+        if ((await api.isAuthenticated()) && !cancelled) {
+          const { name, order } = JSON.parse(sortKey || '{}');
+          const validSortKey = isValidSortKey(name, collectionExtra)
+            ? name
+            : undefined;
           const collection = await api.fetchCollection(
             collectionName,
             includeDocuments,
@@ -88,15 +92,17 @@ export const useGetCollection = (
             filterArgs
           );
           setCollection(collection);
-        } catch (error) {
-          cms.alerts.error(
-            `[${error.name}] GetCollection failed: ${error.message}`
-          );
-          console.error(error);
-          setCollection(undefined);
-          setError(error);
         }
+      } catch (error) {
+        cms.alerts.error(
+          `[${error.name}] GetCollection failed: ${error.message}`
+        );
+        console.error(error);
+        setCollection(undefined);
+        setError(error);
+      }
 
+      if (!cancelled) {
         setLoading(false);
       }
     };
@@ -152,8 +158,12 @@ export const useSearchCollection = (
     let cancelled = false;
 
     const searchCollection = async () => {
-      if ((await api.isAuthenticated()) && !folder.loading && !cancelled) {
-        try {
+      // the effect re-runs once the folder resolves
+      if (folder.loading) {
+        return;
+      }
+      try {
+        if ((await api.isAuthenticated()) && !cancelled) {
           const response = (await cms.api.search.query(search, {
             limit: 15,
             cursor: after,
@@ -203,15 +213,17 @@ export const useSearchCollection = (
           };
 
           setCollection(collectionData);
-        } catch (error) {
-          cms.alerts.error(
-            `[${error.name}] GetCollection failed: ${error.message}`
-          );
-          console.error(error);
-          setCollection(undefined);
-          setError(error);
         }
+      } catch (error) {
+        cms.alerts.error(
+          `[${error.name}] GetCollection failed: ${error.message}`
+        );
+        console.error(error);
+        setCollection(undefined);
+        setError(error);
+      }
 
+      if (!cancelled) {
         setLoading(false);
       }
     };

@@ -22,8 +22,7 @@ export abstract class AbstractAuthProvider implements AuthProvider {
    */
   async fetchWithToken(input: Input, init: Init): FetchReturn {
     const headers = init?.headers || {};
-    const token = await this.getToken();
-    const accessToken = token?.access_token ?? token?.id_token;
+    const accessToken = await this.getAccessToken();
     if (accessToken) {
       headers['Authorization'] = 'Bearer ' + accessToken;
     }
@@ -31,6 +30,11 @@ export abstract class AbstractAuthProvider implements AuthProvider {
       ...(init || {}),
       headers: new Headers(headers),
     });
+  }
+
+  async getAccessToken(): Promise<string | null> {
+    const token = await this.getToken();
+    return token?.access_token ?? token?.id_token ?? null;
   }
 
   async authorize(context?: any): Promise<any> {
@@ -72,6 +76,7 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
   identityApiUrl: string;
   frontendUrl: string;
   token: TokenObject; // used with memory storage
+  hasWarnedNoSession = false;
   setToken: (_token: TokenObject | null) => void;
   getToken: () => Promise<TokenObject>;
 
@@ -157,12 +162,24 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
     const url = `${this.identityApiUrl}/v2/apps/${this.clientId}/currentUser`;
 
     try {
+      if (!(await this.getAccessToken())) {
+        if (!this.hasWarnedNoSession) {
+          this.hasWarnedNoSession = true;
+          console.warn(
+            'TinaCMS: no TinaCloud session found. If login fails, check the console inside the login popup window for the underlying error.'
+          );
+        }
+        return null;
+      }
       const res = await this.fetchWithToken(url, {
         method: 'GET',
       });
       const val = await res.json();
       if (!res.status.toString().startsWith('2')) {
-        console.error(val.error);
+        console.error(
+          `TinaCMS: TinaCloud session check failed (status ${res.status}).`,
+          val?.error ?? val
+        );
         return null;
       }
       return val;
