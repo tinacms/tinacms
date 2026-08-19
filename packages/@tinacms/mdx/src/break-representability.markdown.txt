@@ -49,10 +49,10 @@ ol                          -                   skipped: holds list items       
 ul                          -                   skipped: holds list items                                     -       -       -
 table                       -                   skipped: holds rows                                           -       -       -
 tr                          -                   skipped: holds cells                                          -       -       -
-a (inline)                  mid                 "[one\\\ntwo](/x)\n"                                          1       0       INVALID UNSTABLE RESAVE THREW
-a (inline)                  final               "[one two\\\n](/x)\n"                                         1       0       INVALID UNSTABLE RESAVE THREW
-a (inline)                  final-editor        "[one two\\\n](/x)\n"                                         1       0       INVALID UNSTABLE RESAVE THREW
-a (inline)                  final-editor-twice  "[one two\\\n\\\n](/x)\n"                                     1       0       INVALID UNSTABLE RESAVE THREW
+a (inline)                  mid                 "[one\\\ntwo](/x)\n"                                          1       1       parses
+a (inline)                  final               "[one two\\\n](/x)\n"                                         1       1       parses
+a (inline)                  final-editor        "[one two\\\n](/x)\n"                                         1       1       parses
+a (inline)                  final-editor-twice  "[one two\\\n\\\n](/x)\n"                                     1       2       parses
 text (inline)               -                   skipped: the injection site of every block row above          -       -       -
 img (inline)                -                   skipped: void                                                 -       -       -
 html_inline (inline)        -                   skipped: carries a raw value, no inline children              -       -       -
