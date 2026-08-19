@@ -17,6 +17,7 @@ minimumReleaseAgeExclude:
     - create-tina-app
     - next-tinacms-*
 overrides:
+    qs: ^6.15.2
     "@clerk/clerk-js>react": 19.2.3
     "@clerk/clerk-js>react-dom": 19.2.3
     "@clerk/backend>react": 19.2.3
