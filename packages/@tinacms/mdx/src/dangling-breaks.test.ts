@@ -78,7 +78,11 @@ describe('dropDanglingBreaks', () => {
 
   it('descends into the last child that writes something, not the spacer', () => {
     const tree = paragraph([
-      { type: 'link', url: '/x', children: [text('one'), brk, { type: 'text', value: '' }] },
+      {
+        type: 'link',
+        url: '/x',
+        children: [text('one'), brk, { type: 'text', value: '' }],
+      },
       { type: 'text', value: '' },
     ]);
     expect(countBreaks(dropDanglingBreaks(tree))).toBe(0);
