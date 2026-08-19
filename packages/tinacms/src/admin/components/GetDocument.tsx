@@ -23,8 +23,8 @@ export const useGetDocument = (
     let isCancelled = false; // Add cancellation flag
 
     const fetchDocument = async () => {
-      if (api.isAuthenticated() && !isCancelled) {
-        try {
+      try {
+        if ((await api.isAuthenticated()) && !isCancelled) {
           const response = await api.fetchDocument(
             collectionName,
             relativePath
@@ -34,21 +34,21 @@ export const useGetDocument = (
           if (!isCancelled) {
             setDocument(response.document);
           }
-        } catch (error) {
-          // Only handle error if the request hasn't been cancelled
-          if (!isCancelled) {
-            cms.alerts.error(
-              `[${error.name}] GetDocument failed: ${error.message}`
-            );
-            console.error(error);
-            setDocument(undefined);
-            setError(error);
-          }
         }
-
+      } catch (error) {
+        // Only handle error if the request hasn't been cancelled
         if (!isCancelled) {
-          setLoading(false);
+          cms.alerts.error(
+            `[${error.name}] GetDocument failed: ${error.message}`
+          );
+          console.error(error);
+          setDocument(undefined);
+          setError(error);
         }
+      }
+
+      if (!isCancelled) {
+        setLoading(false);
       }
     };
 

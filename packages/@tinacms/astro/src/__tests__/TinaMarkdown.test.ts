@@ -86,6 +86,74 @@ describe('TinaMarkdown', () => {
   });
 });
 
+/**
+ * Characterises what this renderer does with `html` / `html_inline` nodes, so
+ * the behaviour is pinned while `tinacms` and `@tinacms/web-components` are
+ * brought into line. The same cases exist in those packages' suites.
+ */
+describe('TinaMarkdown — raw HTML nodes', () => {
+  it('does not emit markup for a block html node', async () => {
+    const html = await render({
+      props: {
+        content: [
+          {
+            type: 'html',
+            value: '<div id="raw"><center><p>hi</p></center></div>',
+          },
+        ],
+      },
+    });
+
+    expect(html).not.toContain('<div id="raw">');
+    expect(html).toContain('&lt;div id=&quot;raw&quot;&gt;');
+  });
+
+  it('does not emit markup for an inline html node', async () => {
+    const html = await render({
+      props: {
+        content: [
+          {
+            type: 'p',
+            children: [
+              { type: 'text', text: 'Some ' },
+              { type: 'html_inline', value: '<b>bold</b>' },
+              { type: 'text', text: ' inline.' },
+            ],
+          },
+        ],
+      },
+    });
+
+    expect(html).not.toContain('<b>bold</b>');
+    expect(html).toContain('&lt;b&gt;bold&lt;/b&gt;');
+  });
+
+  it('does not emit an element carrying an inline event handler', async () => {
+    const html = await render({
+      props: {
+        content: [
+          { type: 'html', value: '<img src="x" onerror="globalThis.x = 1">' },
+        ],
+      },
+    });
+
+    expect(html).not.toContain('<img');
+    expect(html).not.toContain('onerror="');
+  });
+
+  it('emits raw HTML when the consumer opts in via components.html', async () => {
+    const RawHtml = await import('./fixtures/RawHtml.astro');
+    const html = await render({
+      props: {
+        content: [{ type: 'html', value: '<div id="raw">hi</div>' }],
+        components: { html: RawHtml.default },
+      },
+    });
+
+    expect(html).toContain('<div id="raw">hi</div>');
+  });
+});
+
 describe('TinaMarkdown — tables', () => {
   it('renders a native table node with rows, cells and column alignment', async () => {
     const html = await render({ props: { content: table } });

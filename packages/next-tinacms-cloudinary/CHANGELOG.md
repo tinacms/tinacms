@@ -1,5 +1,16 @@
 # next-tinacms-cloudinary
 
+## 27.0.3
+
+### Patch Changes
+
+- [#7436](https://github.com/tinacms/tinacms/pull/7436) [`4ef6b6d`](https://github.com/tinacms/tinacms/commit/4ef6b6d8f9afa7d596e2f74add3e9c5561e09563) Thanks [@kulesy](https://github.com/kulesy)! - Bump `multer` to 2.2.0. multer 1.x is end of life; 2.x changes file-handling behaviour, so review upload paths when upgrading.
+
+- [#7394](https://github.com/tinacms/tinacms/pull/7394) [`e66f1a4`](https://github.com/tinacms/tinacms/commit/e66f1a496b68078328c5a9e75ca41093426c8f77) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Escape the listing directory before interpolating it into the Cloudinary search expression, so folder names are always matched literally.
+
+- Updated dependencies [[`d7a1641`](https://github.com/tinacms/tinacms/commit/d7a16416b1b4bc1ba0e2aabdddcf39ed1e4135d7), [`f014558`](https://github.com/tinacms/tinacms/commit/f014558a7ece15964b3b2eda942c02fc609dc32f), [`17931b7`](https://github.com/tinacms/tinacms/commit/17931b72762afb575505c383ee6355476207a44e), [`cf75e5b`](https://github.com/tinacms/tinacms/commit/cf75e5b8dd3209203df9fe1ffbc12a9d965277f9), [`5050709`](https://github.com/tinacms/tinacms/commit/5050709dcbbc99530d6b284021c259d098d6455d), [`cf75e5b`](https://github.com/tinacms/tinacms/commit/cf75e5b8dd3209203df9fe1ffbc12a9d965277f9), [`bd4df92`](https://github.com/tinacms/tinacms/commit/bd4df92a7e00bd74ee13eaf9f9b584fbb1a864ab), [`566f977`](https://github.com/tinacms/tinacms/commit/566f9775bc306f1a41806a29eb22182700765974), [`5f14d96`](https://github.com/tinacms/tinacms/commit/5f14d96fdba3d7a143827fc1cac9c7964c3f9b01), [`b6199da`](https://github.com/tinacms/tinacms/commit/b6199da1eeea7de01d5216c9b50c9e158440f891), [`ece366b`](https://github.com/tinacms/tinacms/commit/ece366bd5aa86e048d22f829319e41fe3d1267ba), [`4a19d66`](https://github.com/tinacms/tinacms/commit/4a19d669b069c0af959c6461cd60b5910aea6512), [`4b7d9b9`](https://github.com/tinacms/tinacms/commit/4b7d9b9f116f7f649aae1a573c838a663f97d99d), [`5112e60`](https://github.com/tinacms/tinacms/commit/5112e60bd0c98f6de36f63dbf068d252993e586f), [`8c8e297`](https://github.com/tinacms/tinacms/commit/8c8e297efb12324f23785a5f8f7acbceeb3f0a4a)]:
+  - tinacms@3.12.0
+
 ## 27.0.2
 
 ### Patch Changes

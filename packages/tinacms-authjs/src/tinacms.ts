@@ -8,8 +8,9 @@ import {
 } from 'next-auth/react';
 import { AbstractAuthProvider } from 'tinacms';
 import type { FC } from 'react';
+import { TINA_CREDENTIALS_PROVIDER_NAME } from './constants';
 
-export const TINA_CREDENTIALS_PROVIDER_NAME = 'TinaCredentials';
+export { TINA_CREDENTIALS_PROVIDER_NAME };
 
 export class DefaultAuthJSProvider extends AbstractAuthProvider {
   readonly callbackUrl: string;
