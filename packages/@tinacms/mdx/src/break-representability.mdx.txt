@@ -57,3 +57,15 @@ text (inline)               -                   skipped: the injection site of e
 img (inline)                -                   skipped: void                                                 -       -       -
 html_inline (inline)        -                   skipped: carries a raw value, no inline children              -       -       -
 mdxJsxTextElement (inline)  -                   skipped: children live in props                               -       -       -
+a in h3                     mid                 "### [one two](/x)\n"                                         1       0       parses
+a in h3                     final               "### [one two ](/x)\n"                                        1       0       parses
+a in h3                     final-editor        "### [one two ](/x)\n"                                        1       0       parses
+a in h3                     final-editor-twice  "### [one two  ](/x)\n"                                       1       0       parses
+a in li                     mid                 "* [one\\\n  two](/x)\n"                                      1       0       INVALID
+a in li                     final               "* [one two\\\n  ](/x)\n"                                     1       0       INVALID
+a in li                     final-editor        "* [one two\\\n  ](/x)\n"                                     1       0       INVALID
+a in li                     final-editor-twice  "* [one two\\\n  \\\n  ](/x)\n"                               1       0       INVALID
+a in blockquote             mid                 "> [one\\\n> two](/x)\n"                                      1       0       INVALID
+a in blockquote             final               "> [one two\\\n> ](/x)\n"                                     1       0       INVALID
+a in blockquote             final-editor        "> [one two\\\n> ](/x)\n"                                     1       0       INVALID
+a in blockquote             final-editor-twice  "> [one two\\\n> \\\n> ](/x)\n"                               1       0       INVALID

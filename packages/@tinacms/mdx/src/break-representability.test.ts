@@ -86,6 +86,17 @@ const INLINES: Record<
  * spreading them together silently drops the block entry and the matrix loses a
  * row without anything failing.
  */
+/**
+ * Nesting combinations rather than types. The type axis alone never crosses a
+ * block container with an inline one, and that gap hid a defect where a break
+ * ending a link inside a heading wrote a spurious empty heading.
+ */
+const NESTED: [string, Container][] = [
+  ['a in h3', { md: '### [one two](/x)\n', path: [0, 0], inline: true }],
+  ['a in li', { md: '* [one two](/x)\n', path: [0, 0, 0, 0], inline: true }],
+  ['a in blockquote', { md: '> [one two](/x)\n', path: [0, 0], inline: true }],
+];
+
 const CONTAINERS: [string, Container][] = [
   ...Object.entries(BLOCKS).map(
     ([type, container]) => [type, container] as [string, Container]
@@ -94,11 +105,12 @@ const CONTAINERS: [string, Container][] = [
     ([type, container]) =>
       [`${type} (inline)`, container] as [string, Container]
   ),
+  ...NESTED,
 ];
 
 /**
  * `final-editor` is the shape the editor actually produces: Slate keeps a text
- * node after a trailing inline void, and `createSoftBreakPlugin` inserts one
+ * node after a trailing inline void, and `createHardBreakPlugin` inserts one
  * explicitly. A bare trailing break only ever came from a synthetic fixture, so
  * testing `final` alone hides every defect on the path users take.
  */
