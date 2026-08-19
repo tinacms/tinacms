@@ -211,13 +211,13 @@ describe('a hard break in every container', () => {
       h1                 final     "# one two\\n"                                                 1       0       parses
       h2                 mid       "one\\\\\\ntwo\\n---\\n"                                           1       1       parses
       h2                 final     "## one two\\n"                                                1       0       parses
-      h3                 mid       "### one two\\n"                                               1       0       parses
+      h3                 mid       "### one\\n\\n### two\\n"                                        2       0       parses
       h3                 final     "### one two\\n"                                               1       0       parses
-      h4                 mid       "#### one two\\n"                                              1       0       parses
+      h4                 mid       "#### one\\n\\n#### two\\n"                                      2       0       parses
       h4                 final     "#### one two\\n"                                              1       0       parses
-      h5                 mid       "##### one two\\n"                                             1       0       parses
+      h5                 mid       "##### one\\n\\n##### two\\n"                                    2       0       parses
       h5                 final     "##### one two\\n"                                             1       0       parses
-      h6                 mid       "###### one two\\n"                                            1       0       parses
+      h6                 mid       "###### one\\n\\n###### two\\n"                                  2       0       parses
       h6                 final     "###### one two\\n"                                            1       0       parses
       blockquote         mid       "> one\\\\\\n> two\\n"                                            1       1       parses
       blockquote         final     "> one two\\n"                                                 1       0       parses
@@ -254,13 +254,13 @@ describe('a hard break in every container', () => {
       h1                 final     "# one two\\n"                                                 1       0       parses
       h2                 mid       "one\\\\\\ntwo\\n---\\n"                                           1       1       parses
       h2                 final     "## one two\\n"                                                1       0       parses
-      h3                 mid       "### one two\\n"                                               1       0       parses
+      h3                 mid       "### one\\n\\n### two\\n"                                        2       0       parses
       h3                 final     "### one two\\n"                                               1       0       parses
-      h4                 mid       "#### one two\\n"                                              1       0       parses
+      h4                 mid       "#### one\\n\\n#### two\\n"                                      2       0       parses
       h4                 final     "#### one two\\n"                                              1       0       parses
-      h5                 mid       "##### one two\\n"                                             1       0       parses
+      h5                 mid       "##### one\\n\\n##### two\\n"                                    2       0       parses
       h5                 final     "##### one two\\n"                                             1       0       parses
-      h6                 mid       "###### one two\\n"                                            1       0       parses
+      h6                 mid       "###### one\\n\\n###### two\\n"                                  2       0       parses
       h6                 final     "###### one two\\n"                                            1       0       parses
       blockquote         mid       "> one\\\\\\n> two\\n"                                            1       1       parses
       blockquote         final     "> one two\\n"                                                 1       0       parses
