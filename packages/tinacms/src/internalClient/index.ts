@@ -10,13 +10,13 @@ import {
   parse,
   print,
 } from 'graphql';
-import { TokenObject } from '../auth/authenticate';
 
 import {
   ASYNC_POLLER_ERROR,
   AuthProvider,
   Schema,
   TinaSchema,
+  TokenObject,
   addNamespaceToSchema,
 } from '@tinacms/schema-tools';
 import {
@@ -45,6 +45,14 @@ interface TinaSearchConfig {
   stopwordLanguages?: string[];
   fuzzyEnabled?: boolean;
   fuzzyOptions?: FuzzySearchOptions;
+}
+
+export interface Announcement {
+  id: string;
+  headline: string;
+  body: string;
+  severity: 'info' | 'warning' | 'critical';
+  versionRange?: string;
 }
 
 type EditorialWorkflowStatusUpdate = {
@@ -292,8 +300,9 @@ mutation addPendingDocumentMutation(
     const headers = {
       'Content-Type': 'application/json',
     };
-    if (token?.id_token) {
-      headers['Authorization'] = 'Bearer ' + token?.id_token;
+    const accessToken = token?.id_token ?? token?.access_token;
+    if (accessToken) {
+      headers['Authorization'] = 'Bearer ' + accessToken;
     }
     const res = await fetch(this.contentApiUrl, {
       method: 'POST',
@@ -478,6 +487,25 @@ mutation addPendingDocumentMutation(
         delinquencyDate: number;
         billingState: 'current' | 'late' | 'delinquent';
       };
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  async getAnnouncements(version: string): Promise<Announcement[] | null> {
+    if (
+      this.isCustomContentApi ||
+      this.schema?.config?.config?.contentApiUrlOverride
+    ) {
+      return null;
+    }
+    const url = `${this.contentApiBase}/announcement?version=${version}`;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      const val = await res.json();
+      return val.announcements as Announcement[];
     } catch (e) {
       console.error(e);
       return null;
