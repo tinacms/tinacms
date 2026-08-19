@@ -52,6 +52,23 @@ describe('serializeBreaks, dangling breaks', () => {
     );
   });
 
+  /**
+   * The shape the editor produces: Slate keeps a text node after a trailing
+   * inline void, so the break is never literally the last child.
+   */
+  it('drops a break followed only by an empty text node', () => {
+    const tree = paragraph([text('one'), brk, { type: 'text', value: '' }]);
+    serializeBreaks(tree);
+    expect(JSON.stringify(tree).includes('"break"')).toBe(false);
+  });
+
+  it('keeps an empty text node that is not trailing a break', () => {
+    const tree = paragraph([{ type: 'text', value: '' }]);
+    expect(typesIn(serializeBreaks(tree))).toBe(
+      typesIn(paragraph([{ type: 'text', value: '' }]))
+    );
+  });
+
   it('leaves a break at the start of a block alone', () => {
     const tree = paragraph([brk, text('one')]);
     expect(typesIn(serializeBreaks(tree))).toBe(
@@ -81,6 +98,15 @@ describe('serializeBreaks, headings', () => {
 
   it('drops a heading-final break rather than splitting on it', () => {
     const tree = root([heading([text('one'), brk])]);
+    expect(serializeBreaks(tree).children).toMatchObject([
+      { type: 'heading', children: [{ type: 'text' }] },
+    ]);
+  });
+
+  it('does not emit a bare heading for the editor trailing-break shape', () => {
+    const tree = root([
+      heading([text('one'), brk, { type: 'text', value: '' }]),
+    ]);
     expect(serializeBreaks(tree).children).toMatchObject([
       { type: 'heading', children: [{ type: 'text' }] },
     ]);
