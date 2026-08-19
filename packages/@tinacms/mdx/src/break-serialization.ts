@@ -1,8 +1,18 @@
 import type * as Md from 'mdast';
 
-/** Reshape the tree so every hard break left in it is one markdown can express. Acts in place. */
+/**
+ * Reshape the tree so every hard break left in it is one markdown can express.
+ * Acts in place.
+ *
+ * Two ordered passes, not one. Splitting a heading that still holds a trailing
+ * break yields a second heading containing only what followed it — for
+ * `### [one⏎](/x)` that is an empty link, written out as `### [](/x)`. Trimming
+ * the whole tree first means the split only ever sees breaks with content on
+ * both sides.
+ */
 export const serializeBreaks = <T extends Md.Root>(tree: T): T => {
-  walk(tree);
+  trimTree(tree);
+  splitTree(tree);
   return tree;
 };
 
@@ -14,10 +24,18 @@ const isParent = (node: unknown): node is Parent =>
 /** Blockquotes and list items hold paragraphs, which the walk reaches anyway. */
 const PHRASING_BLOCKS = new Set(['paragraph', 'heading', 'tableCell']);
 
-const walk = (node: Parent) => {
+const trimTree = (node: Parent) => {
   if (PHRASING_BLOCKS.has(node.type ?? '')) {
     trimTrailingBreaks(node);
   }
+  for (const child of node.children) {
+    if (isParent(child)) {
+      trimTree(child);
+    }
+  }
+};
+
+const splitTree = (node: Parent) => {
   node.children = node.children.flatMap((child) =>
     isHeading(child) && child.depth > DEEPEST_SETEXT
       ? splitOnBreaks(child)
@@ -25,7 +43,7 @@ const walk = (node: Parent) => {
   );
   for (const child of node.children) {
     if (isParent(child)) {
-      walk(child);
+      splitTree(child);
     }
   }
 };
@@ -85,10 +103,24 @@ const DEEPEST_SETEXT = 2;
  * and break both survive, and the next save is a fixed point.
  */
 const splitOnBreaks = (heading: Md.Heading): Md.Heading[] =>
-  // A segment of nothing but empty text would write a bare `###`.
   splitInlines(heading.children)
-    .filter((children) => children.some((child) => !writesNothing(child)))
+    // Splitting inside a link leaves an empty copy of it on one side, which
+    // would write a visible `[](/x)` the author never typed. An emptied segment
+    // would write a bare `###`.
+    .map((children) => children.filter((child) => !writesNothingDeep(child)))
+    .filter((children) => children.length)
     .map((children) => ({ ...heading, children }));
+
+/** Whether a whole subtree writes nothing, not just a single empty text node. */
+const writesNothingDeep = (node: unknown): boolean => {
+  if (isBreak(node)) {
+    return false;
+  }
+  if (isParent(node)) {
+    return node.children.every(writesNothingDeep);
+  }
+  return writesNothing(node);
+};
 
 /**
  * A break in a heading is not always a direct child — the editor puts one

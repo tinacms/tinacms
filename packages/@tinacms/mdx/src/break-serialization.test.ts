@@ -137,6 +137,43 @@ describe('serializeBreaks, headings', () => {
     expect(second?.children).toHaveLength(2);
   });
 
+  /**
+   * Trim runs over the whole tree before any split. Splitting first would leave
+   * the second heading holding only what followed the break — an empty copy of
+   * the link, written out as `### [](/x)`.
+   */
+  it('does not leave an empty link behind when the break ends one', () => {
+    const tree = root([
+      heading([
+        {
+          type: 'link',
+          url: '/x',
+          children: [text('one'), brk, { type: 'text', value: '' }],
+        },
+        { type: 'text', value: '' },
+      ]),
+    ]);
+    expect(serializeBreaks(tree).children).toMatchObject([
+      { type: 'heading', children: [{ type: 'link', url: '/x' }] },
+    ]);
+  });
+
+  it('drops an emptied link but keeps what followed it', () => {
+    const tree = root([
+      heading([
+        {
+          type: 'link',
+          url: '/x',
+          children: [text('one'), brk, { type: 'text', value: '' }],
+        },
+        text(' tail'),
+      ]),
+    ]);
+    const [first, second] = serializeBreaks(tree).children as Md.Heading[];
+    expect(first?.children).toMatchObject([{ type: 'link' }]);
+    expect(second?.children).toMatchObject([{ type: 'text' }]);
+  });
+
   it('splits a heading nested in a blockquote', () => {
     const tree = root([
       {
