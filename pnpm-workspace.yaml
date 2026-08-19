@@ -17,6 +17,7 @@ minimumReleaseAgeExclude:
     - create-tina-app
     - next-tinacms-*
 overrides:
+    qs: ^6.15.2
     "@clerk/clerk-js>react": 19.2.3
     "@clerk/clerk-js>react-dom": 19.2.3
     "@clerk/backend>react": 19.2.3
@@ -143,7 +144,6 @@ catalog:
     abstract-level: ^1.0.4
     acorn: 8.8.2
     altair-express-middleware: ^7.3.6
-    async-lock: ^1.4.1
     auto-bind: ^4.0.0
     autoprefixer: ^10.4.20
     axios: 1.7.5
@@ -163,8 +163,9 @@ catalog:
     cors: ^2.8.5
     cross-spawn: ^7.0.6
     crypto-js: ^4.2.0
+    dompurify: ^3.3.1
     dotenv: ^16.4.7
-    esbuild: ^0.25.0
+    esbuild: ^0.28.1
     estree-util-is-identifier-name: 2.1.0
     fast-glob: ^3.3.3
     final-form: 4.20.10
@@ -198,7 +199,7 @@ catalog:
     mdast-util-mdx-jsx: 2.1.2
     mdast-util-to-markdown: 1.5.0
     memory-level: ^1.0.0
-    mermaid: ^11.12.2
+    mermaid: ^11.16.1
     micromark-extension-gfm: 2.0.3
     micromark-factory-mdx-expression: 1.0.7
     micromark-factory-space: 1.0.0
@@ -210,14 +211,14 @@ catalog:
     minimatch: ^5.1.6
     monaco-editor: 0.31.0
     mongodb-level: ^0.0.4
-    multer: 1.4.5-lts.1
+    multer: 2.2.0
     next-themes: ^0.3.0
     normalize-path: ^3.0.0
     ora: ^8.2.0
     parse-entities: 4.0.1
     picomatch: ^4.0.2
     picomatch-browser: 2.2.6
-    postcss: ^8.5.16
+    postcss: ^8.5.23
     postcss-import: ^14.1.0
     postcss-nesting: ^10.2.0
     prettier: ^2.8.8
@@ -245,7 +246,7 @@ catalog:
     stopword: ^3.1.4
     stringify-entities: 4.0.3
     tailwindcss-animate: ^1.0.7
-    tar: 7.4.0
+    tar: 7.5.21
     ts-jest: ^29.2.5
     ts-node: ^10.9.2
     tsc-alias: ^1.8.10

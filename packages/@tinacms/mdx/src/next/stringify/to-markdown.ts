@@ -1,10 +1,10 @@
-import { Handlers, toMarkdown } from 'mdast-util-to-markdown';
-import { text } from 'mdast-util-to-markdown/lib/handle/text';
-import { mdxJsxToMarkdown } from '../shortcodes/mdast';
-import { gfmToMarkdown } from 'mdast-util-gfm';
 import type { RichTextField } from '@tinacms/schema-tools';
 import type * as Md from 'mdast';
+import { gfmToMarkdown } from 'mdast-util-gfm';
+import { Handlers, toMarkdown } from 'mdast-util-to-markdown';
+import { text } from 'mdast-util-to-markdown/lib/handle/text';
 import { Pattern } from '../shortcodes';
+import { mdxJsxToMarkdown } from '../shortcodes/mdast';
 import { getFieldPatterns } from '../util';
 
 export const toTinaMarkdown = (tree: Md.Root, field: RichTextField) => {
@@ -28,11 +28,14 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextField) => {
   // @ts-ignore
   const handlers: Handlers = {};
   handlers['text'] = (node, parent, context, safeOptions) => {
-    // Empty spaces before/after strings
+    // Empty spaces before/after strings. The rule guarding a space at the
+    // start of a line stays: without it four of them open an indented code
+    // block, and the author's indentation comes back as `code_block`.
     context.unsafe = context.unsafe.filter((unsafeItem) => {
       if (
         unsafeItem.character === ' ' &&
-        unsafeItem.inConstruct === 'phrasing'
+        unsafeItem.inConstruct === 'phrasing' &&
+        unsafeItem.before !== '[\\r\\n]'
       ) {
         return false;
       }
