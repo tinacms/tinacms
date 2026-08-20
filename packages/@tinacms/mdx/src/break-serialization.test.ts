@@ -175,18 +175,31 @@ describe('serializeBreaks, headings', () => {
   });
 
   /**
-   * A self-closing embed reaches mdast with no children at all. `[].every()`
-   * is vacuously true, so treating a childless parent as empty deleted it.
+   * A self-closing embed reaches mdast with no children at all, and
+   * `[].every()` is vacuously true — so treating a childless parent as empty
+   * deleted it. The break in front of it is unrepresentable and goes; the
+   * embed must not.
    */
-  it('keeps a childless embed when splitting around it', () => {
+  it('keeps a childless embed rather than pruning it as empty', () => {
     const embed = { type: 'mdxJsxTextElement', name: 'Cta', children: [] };
     const tree = root([heading([text('one'), brk, embed])]);
+
+    const written = JSON.stringify(serializeBreaks(tree).children);
+
+    expect(written).toContain('"Cta"');
+    expect(written).not.toContain('"break"');
+  });
+
+  it('still prunes a segment that only holds empty text', () => {
+    const tree = root([
+      heading([
+        text('one'),
+        brk,
+        { type: 'link', url: '/x', children: [{ type: 'text', value: '' }] },
+      ]),
+    ]);
     expect(serializeBreaks(tree).children).toMatchObject([
       { type: 'heading', children: [{ type: 'text' }] },
-      {
-        type: 'heading',
-        children: [{ type: 'mdxJsxTextElement', name: 'Cta' }],
-      },
     ]);
   });
 

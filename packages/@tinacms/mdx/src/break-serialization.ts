@@ -26,6 +26,7 @@ const PHRASING_BLOCKS = new Set(['paragraph', 'heading', 'tableCell']);
 
 const trimTree = (node: Parent) => {
   if (PHRASING_BLOCKS.has(node.type ?? '')) {
+    dropBreaksBeforeLineStartSensitive(node.children);
     trimTrailingBreaks(node);
   }
   for (const child of node.children) {
@@ -90,6 +91,33 @@ const isBreak = (node: unknown) =>
 const writesNothing = (node: unknown) =>
   (node as Md.Text | undefined)?.type === 'text' &&
   (node as Md.Text).value === '';
+
+/**
+ * A break puts whatever follows it at the start of a line, and these read
+ * differently there: `toMarkdown` will not let `<` open a line, so it rewrites
+ * the break to `\` plus a space and the backslash becomes content; and an
+ * inline MDX element parses as flow at line start, so it is promoted out of
+ * the paragraph, or writes nothing when no template matches it and leaves the
+ * `\` dangling.
+ */
+const dropBreaksBeforeLineStartSensitive = (children: unknown[]) => {
+  for (let index = children.length - 1; index >= 0; index--) {
+    if (!isBreak(children[index])) {
+      continue;
+    }
+    const next = children
+      .slice(index + 1)
+      .find((sibling) => !writesNothing(sibling));
+    const type = (next as Parent | undefined)?.type;
+    if (type === 'html') {
+      // Raw HTML always writes, so keep the word separation the break gave.
+      children.splice(index, 1, { type: 'text', value: ' ' });
+    } else if (type === 'mdxJsxTextElement') {
+      // An element that writes nothing would leave trailing whitespace.
+      children.splice(index, 1);
+    }
+  }
+};
 
 const isHeading = (node: unknown): node is Md.Heading =>
   isParent(node) && node.type === 'heading';
