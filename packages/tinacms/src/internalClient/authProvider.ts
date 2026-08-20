@@ -1,9 +1,9 @@
-import { AuthProvider, LoginStrategy } from '@tinacms/schema-tools';
 import {
-  authenticate,
-  AUTH_TOKEN_KEY,
+  AuthProvider,
+  LoginStrategy,
   TokenObject,
-} from '../auth/authenticate';
+} from '@tinacms/schema-tools';
+import { authenticate, AUTH_TOKEN_KEY } from '../auth/authenticate';
 import DefaultSessionProvider from '../auth/defaultSessionProvider';
 
 type Input = Parameters<AuthProvider['fetchWithToken']>[0];
@@ -22,8 +22,7 @@ export abstract class AbstractAuthProvider implements AuthProvider {
    */
   async fetchWithToken(input: Input, init: Init): FetchReturn {
     const headers = init?.headers || {};
-    const token = await this.getToken();
-    const accessToken = token?.id_token ?? token?.access_token;
+    const accessToken = await this.getAccessToken();
     if (accessToken) {
       headers['Authorization'] = 'Bearer ' + accessToken;
     }
@@ -31,6 +30,11 @@ export abstract class AbstractAuthProvider implements AuthProvider {
       ...(init || {}),
       headers: new Headers(headers),
     });
+  }
+
+  async getAccessToken(): Promise<string | null> {
+    const token = await this.getToken();
+    return token?.access_token ?? token?.id_token ?? null;
   }
 
   async authorize(context?: any): Promise<any> {
@@ -71,7 +75,8 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
   clientId: string;
   identityApiUrl: string;
   frontendUrl: string;
-  token: string; // used with memory storage
+  token: TokenObject; // used with memory storage
+  hasWarnedNoSession = false;
   setToken: (_token: TokenObject | null) => void;
   getToken: () => Promise<TokenObject>;
 
@@ -115,8 +120,7 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
       case 'MEMORY':
         this.getToken = async () => {
           if (this.token) {
-            const tokens = JSON.parse(this.token);
-            return await this.getRefreshedToken(tokens);
+            return await this.getRefreshedToken(this.token);
           } else {
             return {
               access_token: null,
@@ -125,8 +129,8 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
             };
           }
         };
-        this.setToken = (token) => {
-          this.token = JSON.stringify(token, null, 2);
+        this.setToken = (token: TokenObject) => {
+          this.token = token;
         };
         break;
       case 'CUSTOM':
@@ -140,9 +144,15 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
     }
   }
   async authenticate() {
-    const token = await authenticate(this.clientId, this.frontendUrl);
-    this.setToken(token);
-    return token;
+    const result = await authenticate(
+      this.clientId,
+      this.identityApiUrl,
+      this.frontendUrl
+    );
+    if (result) {
+      this.setToken(result);
+      return result;
+    }
   }
   async getUser() {
     if (!this.clientId) {
@@ -152,12 +162,24 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
     const url = `${this.identityApiUrl}/v2/apps/${this.clientId}/currentUser`;
 
     try {
+      if (!(await this.getAccessToken())) {
+        if (!this.hasWarnedNoSession) {
+          this.hasWarnedNoSession = true;
+          console.warn(
+            'TinaCMS: no TinaCloud session found. If login fails, check the console inside the login popup window for the underlying error.'
+          );
+        }
+        return null;
+      }
       const res = await this.fetchWithToken(url, {
         method: 'GET',
       });
       const val = await res.json();
       if (!res.status.toString().startsWith('2')) {
-        console.error(val.error);
+        console.error(
+          `TinaCMS: TinaCloud session check failed (status ${res.status}).`,
+          val?.error ?? val
+        );
         return null;
       }
       return val;
@@ -170,16 +192,12 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
     this.setToken(null);
   }
 
-  async getRefreshedToken(tokens: {
-    access_token?: string;
-    id_token?: string;
-    refresh_token?: string;
-  }): Promise<TokenObject> {
+  async getRefreshedToken(tokens: TokenObject): Promise<TokenObject> {
     const { access_token, id_token, refresh_token } = tokens;
     if (!access_token) {
       throw new Error('Unable to refresh auth tokens: missing access_token');
     }
-    const { client_id, exp } = this.parseJwt(access_token);
+    const { exp } = this.parseJwt(access_token);
 
     // if the token is going to expire within the next two minutes, refresh it now
     if (Date.now() / 1000 >= exp - 120) {
@@ -188,7 +206,7 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
       const params = new URLSearchParams();
       params.set('grant_type', 'refresh_token');
       params.set('refresh_token', refresh_token);
-      params.set('client_id', client_id);
+      params.set('client_id', this.clientId);
 
       try {
         const res = await fetch(url, {
@@ -250,7 +268,7 @@ export class LocalAuthProvider extends AbstractAuthProvider {
     return localStorage.getItem(LOCAL_CLIENT_KEY) === 'true';
   }
   async getToken() {
-    return Promise.resolve({ id_token: '' });
+    return Promise.resolve({ access_token: 'LOCAL', refresh_token: 'LOCAL' });
   }
   async logout() {
     localStorage.removeItem(LOCAL_CLIENT_KEY);
