@@ -143,7 +143,7 @@ catalog:
     "@vercel/stega": ^0.0.5
     "@vitejs/plugin-react": ^4.7.0
     abstract-level: ^1.0.4
-    acorn: 8.8.2
+    acorn: ^8.16.0
     altair-express-middleware: ^7.3.6
     auto-bind: ^4.0.0
     autoprefixer: ^10.4.20
