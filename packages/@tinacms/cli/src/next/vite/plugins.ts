@@ -4,7 +4,6 @@ import { FilterPattern, createFilter } from '@rollup/pluginutils';
 import type { Config } from '@svgr/core';
 import { resolve as gqlResolve } from '@tinacms/graphql';
 import type { Database } from '@tinacms/graphql';
-import AsyncLock from 'async-lock';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import { transform as esbuildTransform } from 'esbuild';
