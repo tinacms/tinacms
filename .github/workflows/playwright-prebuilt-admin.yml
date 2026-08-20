@@ -8,6 +8,9 @@ on:
       - 'packages/@tinacms/cli/**'
       - 'packages/@tinacms/app/**'
       - 'packages/tinacms/**'
+      - 'packages/@tinacms/schema-tools/**'
+      - 'packages/@tinacms/mdx/**'
+      - 'packages/@tinacms/graphql/**'
       - 'playwright/prebuilt-admin/**'
       - '.github/workflows/playwright-prebuilt-admin.yml'
 

@@ -24,7 +24,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   use: {
-    baseURL: 'http://localhost:3000',
+    baseURL: 'http://localhost:3456',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
@@ -36,8 +36,10 @@ export default defineConfig({
   ],
   webServer: {
     command: 'pnpm serve:prod',
-    url: 'http://localhost:3000/my-site/admin/',
-    reuseExistingServer: !process.env.CI,
+    url: 'http://localhost:3456/my-site/admin/',
+    // Never reuse: the command rebuilds the production SPA, so a reused
+    // server would serve a stale public/admin from an earlier run.
+    reuseExistingServer: false,
     timeout: 180000,
   },
 });

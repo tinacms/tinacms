@@ -20,7 +20,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ADMIN_ROOT = join(__dirname, 'public', 'admin');
 const BASE_PREFIX = '/my-site/admin';
-const PORT = Number(process.env.PORT || 3000);
+const PORT = Number(process.env.PORT || 3456);
 
 const CONTENT_TYPES = {
   '.html': 'text/html; charset=utf-8',

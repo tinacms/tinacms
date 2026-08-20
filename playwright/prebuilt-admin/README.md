@@ -20,11 +20,11 @@ tinacms build --local --skip-cloud-checks --noTelemetry -c "node serve-admin.mjs
    `public/admin/` (minified vite build — the same output a real deploy ships)
    **and** keeps a local GraphQL + media server alive on `:4001`.
 2. The `-c` sub-command starts `serve-admin.mjs`, a tiny static server that
-   serves the built SPA under `/my-site/admin/` on `:3000`.
+   serves the built SPA under `/my-site/admin/` on `:3456`.
 
-The browser loads the production bundle from `:3000`; the admin queries the API
+The browser loads the production bundle from `:3456`; the admin queries the API
 cross-origin on `:4001` (localhost origins are CORS-allowed by the dev server).
-Playwright waits for `http://localhost:3000/my-site/admin/` before running.
+Playwright waits for `http://localhost:3456/my-site/admin/` before running.
 
 ### Why `contentApiUrlOverride` is set
 
