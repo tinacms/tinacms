@@ -2,7 +2,7 @@
 
 */
 
-import fse from 'fs-extra';
+import { readFileSync } from 'node:fs';
 import { execSync } from 'child_process';
 import { join } from 'path';
 
@@ -21,9 +21,7 @@ function _executeCommand(cmd: string) {
 const _getPack = (rootDir: string) => {
   let pack: any = {};
   try {
-    const rawJSON: string = fse
-      .readFileSync(join(rootDir, 'package.json'))
-      .toString();
+    const rawJSON = readFileSync(join(rootDir, 'package.json'), 'utf-8');
     pack = JSON.parse(rawJSON);
   } catch (_e) {}
   return pack;
