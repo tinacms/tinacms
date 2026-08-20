@@ -1,4 +1,4 @@
-// Fails a PR that changes a published package's dependencies with no changeset: it would
+// Flags a PR that changes a published package's dependencies with no changeset: it would
 // merge with no version bump and no release, so the change never reaches npm. Fails open.
 import { execSync } from 'node:child_process';
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
