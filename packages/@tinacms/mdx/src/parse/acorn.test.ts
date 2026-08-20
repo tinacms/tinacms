@@ -3,7 +3,7 @@
 
 
 */
-import { it, expect, describe } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { trimFragments } from './acorn';
 
 describe('trimFragments', () => {

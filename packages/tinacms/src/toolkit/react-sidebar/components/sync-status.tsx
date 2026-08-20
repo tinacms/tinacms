@@ -6,12 +6,15 @@ import {
 } from '@toolkit/react-modals';
 import { Button } from '@toolkit/styles';
 import { TinaCMS } from '@toolkit/tina-cms';
+import {
+  CircleCheck,
+  OctagonAlert,
+  RefreshCwOff,
+  ScrollText,
+} from 'lucide-react';
 import * as React from 'react';
 import { useState } from 'react';
-import { BsCheckCircleFill, BsExclamationOctagonFill } from 'react-icons/bs';
-import { MdSyncProblem } from 'react-icons/md';
-import { TbLogs } from 'react-icons/tb';
-import { captureEvent, EventLogPageViewedEvent } from '../../../lib/posthog';
+import { EventLogPageViewedEvent, captureEvent } from '../../../lib/posthog';
 
 type EventListState = 'loading' | 'success' | 'error' | 'unauthorized';
 
@@ -145,14 +148,14 @@ const EventsList = ({ cms }) => {
                         key={`${event.id}_error_icon`}
                         className='py-3 pl-4 pr-0 w-0'
                       >
-                        <BsExclamationOctagonFill className='text-red-500 fill-current w-5 h-auto' />
+                        <OctagonAlert className='text-red-500 w-5 h-auto' />
                       </td>
                     ) : (
                       <td
                         key={`${event.id}_ok_icon`}
                         className='py-3 pl-4 pr-0 w-0'
                       >
-                        <BsCheckCircleFill className='text-green-500 fill-current w-5 h-auto' />
+                        <CircleCheck className='text-green-500 w-5 h-auto' />
                       </td>
                     )}
                     <td
@@ -235,9 +238,9 @@ export const SyncStatusButton = ({
         {...buttonProps}
       >
         {syncStatus.state !== 'error' ? (
-          <TbLogs className='w-6 h-auto mr-2' />
+          <ScrollText className='w-6 h-auto mr-2' />
         ) : (
-          <MdSyncProblem className='w-6 h-auto mr-2 text-red-400' />
+          <RefreshCwOff className='w-6 h-auto mr-2 text-red-400' />
         )}{' '}
         Event Log
       </button>

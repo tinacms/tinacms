@@ -1,9 +1,10 @@
 import { APIRequestContext, APIResponse } from "@playwright/test";
 
-// Helpers for the three media routes served by the Vite dev server:
+// Helpers for the media routes served by the Vite dev server:
 //   POST   /media/upload/<path>   (multipart)
 //   GET    /media/list/<folder>
 //   DELETE /media/<path>
+//   POST   /media/rename          (JSON { from, to })
 //
 // Paths are URL-encoded so exotic inputs (../, null bytes) survive client-side
 // normalisation — the server decodes and validates. Pass `rawPath: true` for
@@ -45,6 +46,16 @@ export async function listMedia(
 }> {
   const resp = await apiContext.get(`/media/list/${folder}`);
   return resp.json();
+}
+
+// `from`/`to` are media-root-relative paths and travel in a JSON body, so no
+// path encoding is involved.
+export function renameMedia(
+  apiContext: APIRequestContext,
+  from: string,
+  to: string
+): Promise<APIResponse> {
+  return apiContext.post(`/media/rename`, { data: { from, to } });
 }
 
 export function deleteMedia(

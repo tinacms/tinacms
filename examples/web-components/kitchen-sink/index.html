@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="/style.css">
+    <script src="post-preview.js"></script>
+    <!--
+        The generated client imports `tinacms/dist/client`, a bare specifier
+        the browser can't resolve. Map it to the installed package's entry file.
+    -->
+    <script type="importmap">
+        {
+            "imports": {
+                "tinacms/dist/client": "./node_modules/tinacms/dist/client.js"
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <h1>My Tina site</h1>
+
+    <div id="posts-container">
+        <h2>Blog posts</h2>
+        <ul id="posts">
+        </ul>
+    </div>
+
+    <script type="module">
+        // Pull in the generated client.
+        // Emitted by `tinacms dev` / `tinacms build` into `tina/__generated__`
+        import {client} from "./tina/__generated__/client.js";
+
+        // Register the `tina-markdown` component.
+        import {TinaMarkdown} from "./node_modules/@tinacms/web-components/dist/tina-markdown.js";
+
+        // Register custom component for rich-text consumption.
+        TinaMarkdown.components["PostPreview"] = (node) => {
+            const el = document.createElement("post-preview");
+
+            const title = document.createElement("span");
+            title.slot = "title";
+            title.textContent = node.props.title ?? "";
+
+            const tinaMarkdown = document.createElement("tina-markdown");
+            const markdownAst = JSON.stringify(node.props.children ?? {});
+            tinaMarkdown.setAttribute("content", markdownAst);
+
+            const content = document.createElement("span");
+            content.slot = "content";
+            content.appendChild(tinaMarkdown);
+
+            el.append(title, content);
+
+            return el;
+        };
+
+        // Imports required for visual editing.
+        //   - `createTina` fetches a provided connection and renders the content
+        //     when changes are detected.
+        //   - `tinaField` generates unique IDs used by Tina internally for
+        //     click-to-edit functionality.
+        import {createTina, tinaField} from "./node_modules/@tinacms/web-components/dist/visual-editing.js";
+
+        const postsContainer = document.getElementById("posts");
+
+        // Build the `#posts` list from a query result. `data` is stamped with
+        // `_content_source` metadata by `createTina`, which `tinaField()`
+        // reads to produce the `data-tina-field` markers the admin uses for
+        // click-to-edit.
+        //
+        // Re-invoked on every content update.
+        function renderPosts(data) {
+            const posts = data.postConnection.edges.map((edge) => edge.node);
+
+            postsContainer.replaceChildren();
+            for (const post of posts) {
+                // Create a `post-preview` element.
+                // This is a web component (./post-preview.js) with two slots:
+                //     - title (the blog post title)
+                //     - content (the markdown content)
+                //
+                // Read more: https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_templates_and_slots
+                const postPreview = document.createElement("post-preview");
+
+                // Create a "title" slot and set its content to the post's title.
+                //
+                // The following JS is equivalent to:
+                //     <span data-tina-field="$bodyField" slot="title">$post.title</span>
+                const title = document.createElement("span");
+                title.slot = "title";
+                title.textContent = post.title;
+                // Generate a unique id and set it to the elements `data-tina-field`.
+                // This enables click-to-edit in the admin.
+                const titleField = tinaField(post, "title");
+                if (titleField) title.setAttribute("data-tina-field", titleField);
+
+                // Create a `tina-markdown` element.
+                // This is a web component with an attribute `content`.
+                // `content` is the stringified AST provided by a tina `rich-text` element.
+                //
+                // The following JS is equivalent to:
+                //     <tina-markdown data-tina-field="$bodyField" content="$markdownAst"></tina-markdown>
+                const tinaMarkdown = document.createElement("tina-markdown");
+                const markdownAst = JSON.stringify(post.body);
+                tinaMarkdown.setAttribute("content", markdownAst)
+                // Generate a unique id and set it to the elements `data-tina-field`.
+                // This enables click-to-edit in the admin.
+                const bodyField = tinaField(post, "body");
+                if (bodyField) tinaMarkdown.setAttribute("data-tina-field", bodyField);
+
+                // Web components exist in a shadowdom and do not inherit styling.
+                // To style it, you have to embed the stylings manually.
+                //
+                // Read more: https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_shadow_DOM#encapsulation_from_css
+                const styles = document.createElement("style");
+                styles.appendChild(document.createTextNode(`@import "./style.css";`));
+                tinaMarkdown.shadowRoot.appendChild(styles);
+
+                // Create a "content" slot and append the `tina-markdown` component.
+                //
+                // The following JS is equivalent to:
+                //     <span slot="content">
+                //         <tina-markdown data-tina-field="$bodyField" content="$markdownAst"></tina-markdown>
+                //     </span>
+                const content = document.createElement("span");
+                content.slot = "content";
+                content.appendChild(tinaMarkdown);
+
+                // Append the slots to the `post-preview` element.
+                postPreview.append(title, content);
+
+                // #posts is a `ul` so `post-preview` should be wrapped in an `li`.
+                //
+                // The following JS is equivalent to:
+                //     <li style="margin: 1rem 0;">
+                //         <post-preview>
+                //             <span data-tina-field="$bodyField" slot="title">$post.title</span>
+                //             <span slot="content">
+                //                 <tina-markdown data-tina-field="$bodyField" content="$markdownAst"></tina-markdown>
+                //             </span>
+                //         </post-preview>
+                //     </li>
+                const li = document.createElement("li");
+                li.setAttribute("style", "margin: 1rem 0;");
+                li.appendChild(postPreview);
+
+                // Append the `li` to the `ul`.
+                postsContainer.appendChild(li);
+            }
+        };
+
+        // Fetch the posts and enable visual editing.
+        //
+        // `createTina` fetches via `query`, renders via `renderPosts`, and
+        //  re-renders whenever content is edited in the admin.
+        createTina({
+            query: () => client.queries.postConnection(),
+            render: renderPosts,
+        }).init();
+    </script>
+</body>
+
+</html>

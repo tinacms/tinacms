@@ -12,6 +12,7 @@ import { directiveToMarkdown } from '../extensions/tina-shortcodes/to-markdown';
 import { stringifyMDX as stringifyMDXNext } from '../next';
 import type * as Plate from '../parse/plate';
 import { stringifyProps } from './acorn';
+import { normalizeMarkWhitespace } from './mark-whitespace';
 import { eat } from './marks';
 import { stringifyShortcode } from './stringifyShortcode';
 
@@ -54,7 +55,9 @@ export const serializeMDX = (
       return value.children[0].value;
     }
   }
-  const tree = rootElement(value, field, imageCallback);
+  const tree = normalizeMarkWhitespace(
+    rootElement(value, field, imageCallback)
+  );
   const res = toTinaMarkdown(tree, field);
   const templatesWithMatchers = field.templates?.filter(
     (template) => template.match
@@ -104,11 +107,14 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextType) => {
   // @ts-ignore
   const handlers: Handlers = {};
   handlers['text'] = (node, parent, context, safeOptions) => {
-    // Empty spaces before/after strings
+    // Empty spaces before/after strings. The rule guarding a space at the
+    // start of a line stays: without it four of them open an indented code
+    // block, and the author's indentation comes back as `code_block`.
     context.unsafe = context.unsafe.filter((unsafeItem) => {
       if (
         unsafeItem.character === ' ' &&
-        unsafeItem.inConstruct === 'phrasing'
+        unsafeItem.inConstruct === 'phrasing' &&
+        unsafeItem.before !== '[\\r\\n]'
       ) {
         return false;
       }
@@ -347,7 +353,9 @@ export const blockElement = (
         }),
       };
     default:
-      throw new Error(`BlockElement: ${content.type} is not yet supported`);
+      throw new Error(
+        `This block can't be saved as markdown ("${content.type}"). Remove it from the field to continue.`
+      );
   }
 };
 const listItemElement = (
@@ -360,6 +368,9 @@ const listItemElement = (
     // spread is always false since we don't support block elements in list items
     // good explanation of the difference: https://stackoverflow.com/questions/43503528/extra-lines-appearing-between-list-items-in-github-markdown
     spread: false,
+    ...(typeof content.checked === 'boolean'
+      ? { checked: content.checked }
+      : {}),
     children: content.children.map((child) => {
       if (child.type === 'lic') {
         return {
@@ -403,7 +414,7 @@ const blockContentElement = (
       };
     default:
       throw new Error(
-        `BlockContentElement: ${content.type} is not yet supported`
+        `This block can't be saved as markdown ("${content.type}"). Remove it from the field to continue.`
       );
   }
 };

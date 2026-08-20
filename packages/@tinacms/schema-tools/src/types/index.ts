@@ -583,8 +583,8 @@ export type Template<WithNamespace extends boolean = false> = {
   fields: Field<WithNamespace>[];
 } & MaybeNamespace<WithNamespace>;
 
-type TokenObject = {
-  id_token: string;
+export type TokenObject = {
+  id_token?: string;
   access_token?: string;
   refresh_token?: string;
 };
