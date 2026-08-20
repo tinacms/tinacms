@@ -162,7 +162,6 @@ catalog:
     concat-md: ^0.5.1
     cors: ^2.8.5
     cross-spawn: ^7.0.6
-    crypto-js: ^4.2.0
     dompurify: ^3.3.1
     dotenv: ^16.4.7
     esbuild: ^0.28.1

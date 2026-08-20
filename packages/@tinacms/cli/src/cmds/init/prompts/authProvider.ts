@@ -1,4 +1,4 @@
-import crypto from 'crypto-js';
+import { randomBytes } from 'node:crypto';
 import prompts from 'prompts';
 
 import type { Framework } from '../';
@@ -69,8 +69,7 @@ const authProviderUpdateConfig: {
         type: 'text',
         message: `What is the NextAuth.js Secret? (Hit enter to use a randomly generated secret)`,
         initial:
-          process.env.NEXTAUTH_SECRET ||
-          crypto.lib.WordArray.random(16).toString(),
+          process.env.NEXTAUTH_SECRET || randomBytes(16).toString('hex'),
       },
     ]);
     config.envVars.push({
