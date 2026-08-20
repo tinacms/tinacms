@@ -22,8 +22,8 @@ import type {
   TokenizeContext,
   Tokenizer,
 } from 'micromark-util-types';
-import { ok as assert } from 'uvu/assert';
 import { VFileMessage } from 'vfile-message';
+import { assert } from '../../../assert';
 import { Pattern } from './syntax';
 import { findCode } from './util';
 

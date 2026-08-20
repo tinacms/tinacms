@@ -64,11 +64,9 @@
 		"remark-gfm": "catalog:",
 		"remark-mdx": "catalog:",
 		"stringify-entities": "catalog:",
-		"typedoc": "catalog:",
 		"unist-util-source": "catalog:",
 		"unist-util-stringify-position": "catalog:",
 		"unist-util-visit": "catalog:",
-		"uvu": "catalog:",
 		"vfile-message": "catalog:"
 	},
 	"publishConfig": {
@@ -89,6 +87,7 @@
 		"concat-md": "catalog:",
 		"jest-file-snapshot": "^0.5.0",
 		"ts-node": "catalog:",
+		"typedoc": "catalog:",
 		"typedoc-plugin-markdown": "catalog:",
 		"typescript": "^5.7.3",
 		"vite": "^4.5.9",
