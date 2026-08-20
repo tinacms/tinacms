@@ -331,6 +331,12 @@ export const CreateBranch: React.FC<{
   currentBranch: string;
   newBranchName: string;
 }> = ({ currentBranch, newBranchName, onCreateBranch, setNewBranchName }) => {
+  // Guard on the value actually sent: a slashes-only name would otherwise
+  // normalise away and be submitted as an empty branch name
+  const normalizedBranchName = normalizeBranchName(
+    formatBranchName(newBranchName)
+  );
+
   return (
     <div className='border-t border-gray-150 pt-4 mt-3 flex flex-col gap-3'>
       <div className='text-sm'>
@@ -347,8 +353,8 @@ export const CreateBranch: React.FC<{
           className='flex-0 flex items-center gap-2 whitespace-nowrap'
           size='medium'
           variant='white'
-          disabled={newBranchName === ''}
-          onClick={() => onCreateBranch(newBranchName)}
+          disabled={normalizedBranchName === ''}
+          onClick={() => onCreateBranch(normalizedBranchName)}
         >
           <Plus className='w-5 h-auto opacity-70' /> Create Branch
         </Button>

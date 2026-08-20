@@ -292,8 +292,17 @@ export const sortBranchListFn = (sortValue: 'default' | 'updated' | 'name') => {
   };
 };
 
-const BranchCreator = ({ setViewState, handleCreateBranch, currentBranch }) => {
+export const BranchCreator = ({
+  setViewState,
+  handleCreateBranch,
+  currentBranch,
+}) => {
   const [branchName, setBranchName] = React.useState('');
+  // Guard on the value actually sent: a slashes-only name would otherwise
+  // normalise away and create a bare `tina` ref, blocking every `tina/*` branch
+  const normalizedBranchName = normalizeBranchName(
+    formatBranchName(branchName)
+  );
 
   return (
     <form>
@@ -334,9 +343,9 @@ const BranchCreator = ({ setViewState, handleCreateBranch, currentBranch }) => {
           variant='primary'
           type='submit'
           style={{ flexGrow: 2 }}
-          disabled={branchName === ''}
+          disabled={normalizedBranchName === ''}
           onClick={() => {
-            handleCreateBranch('tina/' + branchName);
+            handleCreateBranch('tina/' + normalizedBranchName);
           }}
         >
           Create Branch <GitBranch className='w-5 h-full ml-1 opacity-70' />
