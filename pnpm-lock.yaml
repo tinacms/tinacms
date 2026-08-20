@@ -2978,10 +2978,10 @@ importers:
     dependencies:
       next:
         specifier: 15.5.21
-        version: 15.5.21(@opentelemetry/api@1.9.0)(@playwright/test@1.61.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.97.3)
+        version: 15.5.21(@opentelemetry/api@1.9.0)(@playwright/test@1.61.1)(babel-plugin-react-compiler@1.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.97.3)
       next-auth:
         specifier: ^4.24.11
-        version: 4.24.13(next@15.5.21(@opentelemetry/api@1.9.0)(@playwright/test@1.61.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.97.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 4.24.15(next@15.5.21(@opentelemetry/api@1.9.0)(@playwright/test@1.61.1)(babel-plugin-react-compiler@1.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.97.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -16767,7 +16767,7 @@ snapshots:
     dependencies:
       '@types/hast': 3.0.4
       '@types/mdast': 4.0.4
-      js-yaml: 4.1.1
+      js-yaml: 4.3.1
       picomatch: 4.0.4
       retext-smartypants: 6.2.0
       shiki: 4.1.0
@@ -31247,20 +31247,20 @@ snapshots:
       react-dom: 18.3.1(react@19.2.3)
       uuid: 11.1.1
 
-  next-auth@4.24.13(next@15.5.21(@opentelemetry/api@1.9.0)(@playwright/test@1.61.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.97.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  next-auth@4.24.15(next@15.5.21(@opentelemetry/api@1.9.0)(@playwright/test@1.61.1)(babel-plugin-react-compiler@1.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.97.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
-      '@babel/runtime': 7.28.6
+      '@babel/runtime': 7.29.7
       '@panva/hkdf': 1.2.1
       cookie: 0.7.2
       jose: 4.15.9
-      next: 15.5.21(@opentelemetry/api@1.9.0)(@playwright/test@1.61.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.97.3)
+      next: 15.5.21(@opentelemetry/api@1.9.0)(@playwright/test@1.61.1)(babel-plugin-react-compiler@1.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.97.3)
       oauth: 0.9.15
       openid-client: 5.7.1
       preact: 10.28.3
       preact-render-to-string: 5.2.6(preact@10.28.3)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      uuid: 8.3.2
+      uuid: 11.1.1
 
   next@14.2.35(@babel/core@7.29.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.61.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.97.3):
     dependencies:
@@ -31400,7 +31400,7 @@ snapshots:
       - '@babel/core'
       - babel-plugin-macros
 
-  next@15.5.21(@opentelemetry/api@1.9.0)(@playwright/test@1.61.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.97.3):
+  next@15.5.21(@opentelemetry/api@1.9.0)(@playwright/test@1.61.1)(babel-plugin-react-compiler@1.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.97.3):
     dependencies:
       '@next/env': 15.5.21
       '@swc/helpers': 0.5.15
@@ -31420,6 +31420,7 @@ snapshots:
       '@next/swc-win32-x64-msvc': 15.5.21
       '@opentelemetry/api': 1.9.0
       '@playwright/test': 1.61.1
+      babel-plugin-react-compiler: 1.0.0
       sass: 1.97.3
       sharp: 0.34.5
     transitivePeerDependencies:
