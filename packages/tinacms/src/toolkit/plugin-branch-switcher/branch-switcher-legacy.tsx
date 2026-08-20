@@ -354,7 +354,12 @@ export const CreateBranch: React.FC<{
           size='medium'
           variant='white'
           disabled={normalizedBranchName === ''}
-          onClick={() => onCreateBranch(normalizedBranchName)}
+          onClick={() => {
+            // Button renders `disabled` as styling only, so keyboard activation
+            // still reaches this handler
+            if (!normalizedBranchName) return;
+            onCreateBranch(normalizedBranchName);
+          }}
         >
           <Plus className='w-5 h-auto opacity-70' /> Create Branch
         </Button>

@@ -305,7 +305,9 @@ export const BranchCreator = ({
   );
 
   return (
-    <form>
+    // Submit is handled by the button below; without this the implicit
+    // submission from pressing Enter in the field reloads the page
+    <form onSubmit={(e) => e.preventDefault()}>
       <div className=''>
         <p className='text-base text-gray-700 mb-4'>
           Create a new branch from <strong>{currentBranch}</strong>.
@@ -345,6 +347,9 @@ export const BranchCreator = ({
           style={{ flexGrow: 2 }}
           disabled={normalizedBranchName === ''}
           onClick={() => {
+            // Button renders `disabled` as styling only, so keyboard activation
+            // still reaches this handler
+            if (!normalizedBranchName) return;
             handleCreateBranch('tina/' + normalizedBranchName);
           }}
         >
