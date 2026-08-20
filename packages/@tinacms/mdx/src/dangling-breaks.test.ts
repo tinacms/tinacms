@@ -88,6 +88,37 @@ describe('dropDanglingBreaks', () => {
     expect(countBreaks(dropDanglingBreaks(tree))).toBe(0);
   });
 
+  it('replaces a break before raw html with a space', () => {
+    const tree = paragraph([
+      text('one'),
+      brk,
+      { type: 'html', value: '<em>x</em>' },
+    ]);
+    expect(dropDanglingBreaks(tree).children[0]).toMatchObject({
+      children: [{ type: 'text' }, { type: 'text' }, { type: 'html' }],
+    });
+    expect(countBreaks(tree)).toBe(0);
+  });
+
+  it('drops a break before an inline mdx element', () => {
+    const tree = paragraph([
+      text('one'),
+      brk,
+      { type: 'mdxJsxTextElement', name: 'DateTime', children: [] },
+    ]);
+    expect(countBreaks(dropDanglingBreaks(tree))).toBe(0);
+  });
+
+  it('leaves a break alone when the html is not what follows it', () => {
+    const tree = paragraph([
+      { type: 'html', value: '<em>x</em>' },
+      text('one'),
+      brk,
+      text('two'),
+    ]);
+    expect(countBreaks(dropDanglingBreaks(tree))).toBe(1);
+  });
+
   it('leaves a break at the start of a block alone', () => {
     const tree = paragraph([brk, text('one')]);
     expect(typesIn(dropDanglingBreaks(tree))).toBe(

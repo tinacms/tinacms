@@ -21,11 +21,45 @@ const isParent = (node: unknown): node is Parent =>
 
 const walk = (node: Parent) => {
   if (BLOCKS.has(node.type ?? '')) {
+    dropBreaksBeforeLineStartSensitive(node.children);
     trimTrailingBreaks(node);
   }
   for (const child of node.children) {
     if (isParent(child)) {
       walk(child);
+    }
+  }
+};
+
+/**
+ * A break puts whatever follows it at the start of a line, and these two read
+ * differently there:
+ *
+ * - raw HTML — `toMarkdown` will not let `<` open a line, so it rewrites the
+ *   break to `\` plus a space, which reads back as a literal backslash;
+ * - an inline MDX element — at line start it parses as flow, so the element is
+ *   promoted out of the paragraph, or writes nothing at all when no template
+ *   matches it, leaving the `\` dangling.
+ *
+ * Either way the break has no representable form in front of one, so drop it
+ * rather than write a character the author never typed.
+ */
+const dropBreaksBeforeLineStartSensitive = (children: unknown[]) => {
+  for (let index = children.length - 1; index >= 0; index--) {
+    if (!isBreak(children[index])) {
+      continue;
+    }
+    const next = children
+      .slice(index + 1)
+      .find((sibling) => !writesNothing(sibling));
+    const type = (next as Parent | undefined)?.type;
+    if (type === 'html') {
+      // Raw HTML always writes, so keep the word separation the break gave.
+      children.splice(index, 1, { type: 'text', value: ' ' });
+    } else if (type === 'mdxJsxTextElement') {
+      // An inline element with no matching template writes nothing at all, so a
+      // space here would just be trailing whitespace.
+      children.splice(index, 1);
     }
   }
 };
