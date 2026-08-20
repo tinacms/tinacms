@@ -116,6 +116,43 @@ describe('a break next to a line-start-sensitive neighbour', () => {
   });
 });
 
+/**
+ * Verbatim `editor.children` after pressing shift+Enter with the cursor just
+ * before inline html. Slate leaves a spacer between the break and the
+ * neighbour, so a hand-built `[text, break, html]` is not the shape that
+ * reaches the serializer.
+ */
+const AFTER_SHIFT_ENTER_BEFORE_HTML = [
+  {
+    type: 'p',
+    children: [
+      { text: 'one ' },
+      { type: 'break', children: [{ text: '' }] },
+      { type: 'text', text: '' },
+      { type: 'html_inline', value: '<em>x</em>', children: [{ text: '' }] },
+      { text: '' },
+    ],
+  },
+];
+
+describe('the shape the editor really produces', () => {
+  it.each([
+    ['mdx', mdxField],
+    ['markdown', markdownField],
+  ])('writes no backslash on a %s field', (_name, field) => {
+    const written = write(
+      {
+        type: 'root',
+        children: structuredClone(AFTER_SHIFT_ENTER_BEFORE_HTML),
+      } as never,
+      field
+    );
+
+    expect(written).toBe('one <em>x</em>\n');
+    expect(rewrite(written, field)).toBe(written);
+  });
+});
+
 describe('opening and re-saving a file nobody edited', () => {
   it.each([
     ['a hard break before inline html', 'one\\\n<em>x</em>\n'],
