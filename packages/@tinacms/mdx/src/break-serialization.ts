@@ -110,8 +110,16 @@ const dropBreaksBeforeLineStartSensitive = (children: unknown[]) => {
       .find((sibling) => !writesNothing(sibling));
     const type = (next as Parent | undefined)?.type;
     if (type === 'html') {
-      // Raw HTML always writes, so keep the word separation the break gave.
-      children.splice(index, 1, { type: 'text', value: ' ' });
+      // Raw HTML always writes, so keep the word separation the break gave —
+      // unless what precedes it already ends in whitespace, where a second
+      // space would only churn the author's file.
+      const before = children[index - 1] as Md.Text | undefined;
+      const spaced = before?.type === 'text' && /[ \t]$/.test(before.value);
+      children.splice(
+        index,
+        1,
+        ...(spaced ? [] : [{ type: 'text', value: ' ' }])
+      );
     } else if (type === 'mdxJsxTextElement') {
       // An element that writes nothing would leave trailing whitespace.
       children.splice(index, 1);

@@ -69,5 +69,5 @@ a in blockquote             mid                 "> [one\\\n> two](/x)\n"        
 a in blockquote             final               "> [one two](/x)\n"                                                                                                        1       0       parses
 a in blockquote             final-editor        "> [one two](/x)\n"                                                                                                        1       0       parses
 a in blockquote             final-editor-twice  "> [one two](/x)\n"                                                                                                        1       0       parses
-html after                  before-neighbour    "one two  <em>x</em>\n"                                                                                                    1       0       parses
+html after                  before-neighbour    "one two <em>x</em>\n"                                                                                                     1       0       parses
 inline template after       -                   skipped: needs a field carrying templates, which this matrix has none of — covered end to end in break-neighbours.test.ts  -       -       -
