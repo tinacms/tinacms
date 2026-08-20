@@ -43,7 +43,7 @@ const mdxField: RichTextField = {
  */
 type Container =
   | { skip: string }
-  | { md: string; path: number[]; inline?: boolean };
+  | { md: string; path: number[]; inline?: boolean; beforeNeighbour?: boolean };
 
 const BLOCKS: Record<Plate.BlockElement['type'], Container> = {
   p: { md: 'one two\n', path: [0] },
@@ -91,6 +91,26 @@ const INLINES: Record<
  * block container with an inline one, and that gap hid a defect where a break
  * ending a link inside a heading wrote a spurious empty heading.
  */
+/**
+ * The third axis: what the break sits in FRONT of. A break puts its neighbour
+ * at the start of a line, and some neighbours read differently there — which
+ * container×position alone cannot express, and which hid three corruptions.
+ */
+const NEIGHBOURS: [string, Container][] = [
+  [
+    'html after',
+    { md: 'one two <em>x</em>\n', path: [0], beforeNeighbour: true },
+  ],
+  [
+    'inline template after',
+    {
+      skip:
+        'needs a field carrying templates, which this matrix has none of — ' +
+        'covered end to end in break-neighbours.test.ts',
+    },
+  ],
+];
+
 const NESTED: [string, Container][] = [
   ['a in h3', { md: '### [one two](/x)\n', path: [0, 0], inline: true }],
   ['a in li', { md: '* [one two](/x)\n', path: [0, 0, 0, 0], inline: true }],
@@ -106,6 +126,7 @@ const CONTAINERS: [string, Container][] = [
       [`${type} (inline)`, container] as [string, Container]
   ),
   ...NESTED,
+  ...NEIGHBOURS,
 ];
 
 /**
@@ -114,7 +135,12 @@ const CONTAINERS: [string, Container][] = [
  * explicitly. A bare trailing break only ever came from a synthetic fixture, so
  * testing `final` alone hides every defect on the path users take.
  */
-type Position = 'mid' | 'final' | 'final-editor' | 'final-editor-twice';
+type Position =
+  | 'mid'
+  | 'final'
+  | 'final-editor'
+  | 'final-editor-twice'
+  | 'before-neighbour';
 
 const POSITIONS: Position[] = [
   'mid',
@@ -134,6 +160,17 @@ const nodeAt = (tree: Plate.RootElement, path: number[]) =>
 const emptyText = (): Plate.EmptyTextElement => ({ type: 'text', text: '' });
 
 const inject = (children: Plate.InlineElement[], position: Position) => {
+  if (position === 'before-neighbour') {
+    // The two parsers tokenise inline html differently — one node for mdx, an
+    // open/close pair for markdown — so anchor on the first of them.
+    const at = children.findIndex((child) =>
+      ['html_inline', 'mdxJsxTextElement'].includes(
+        (child as { type?: string }).type ?? ''
+      )
+    );
+    children.splice(at, 0, newBreak());
+    return;
+  }
   if (position === 'mid') {
     const index = children.findIndex(
       (child) => (child as Plate.TextElement).text === 'one two'
@@ -213,7 +250,10 @@ const rows = (field: RichTextField) =>
     if ('skip' in container) {
       return [[name, '-', `skipped: ${container.skip}`, '-', '-', '-']];
     }
-    return POSITIONS.map((position) => {
+    const positions = container.beforeNeighbour
+      ? (['before-neighbour'] as Position[])
+      : POSITIONS;
+    return positions.map((position) => {
       const { written, blocks, breaks, stable, resaves, parses } = roundTrip(
         container,
         position,
