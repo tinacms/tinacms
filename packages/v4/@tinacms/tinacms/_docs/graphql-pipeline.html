@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Why graphql-pipeline.ts exists</title>
+<style>
+  body { font: 16px/1.6 -apple-system, sans-serif; max-width: 760px; margin: 3rem auto; padding: 0 1rem; color: #1a1a1a; }
+  h1 { font-size: 1.6rem; } h2 { font-size: 1.2rem; margin-top: 2.2rem; }
+  code, pre { background: #f4f4f5; border-radius: 4px; font-size: .9em; }
+  code { padding: .1em .35em; } pre { padding: 1rem; overflow-x: auto; }
+  .box { border-left: 4px solid #0ea5e9; background: #f0f9ff; padding: .75rem 1rem; border-radius: 0 6px 6px 0; margin: 1.5rem 0; }
+  .flow { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; margin: 1.5rem 0; }
+  .flow span { background: #f4f4f5; border: 1px solid #ddd; border-radius: 6px; padding: .4rem .7rem; font-size: .85rem; }
+  .flow em { font-style: normal; color: #999; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+  td, th { border: 1px solid #e4e4e7; padding: .5rem .7rem; text-align: left; font-size: .9rem; }
+</style>
+</head>
+<body>
+<h1>Why <code>graphql-pipeline.ts</code> exists</h1>
+
+<div class="box">
+<strong>One sentence:</strong> it is the adapter that lets v4's local data layer answer
+GraphQL queries by driving the existing v3 engine (<code>@tinacms/graphql</code>)
+without rewriting a query engine, an indexer, or a resolver.
+</div>
+
+<h2>The problem it solves</h2>
+<p>
+The v4 admin queries content with GraphQL (<code>query()</code> in the content
+contract). Answering GraphQL over a folder of markdown/json files needs three things:
+a <strong>schema</strong> built from the collections, an <strong>index</strong> of every
+document (so list queries, filters and references don't re-read the filesystem per
+query), and a <strong>resolver</strong> that executes queries against that index.
+</p>
+<p>
+All three already exist, battle-tested, in <code>@tinacms/graphql</code> — but that
+package speaks the <em>v3</em> schema shape and expects a LevelDB-style store plus a
+"bridge" to the filesystem. v4 has its own, flatter <code>CollectionSchema</code>.
+Something has to sit between them. That something is this file, and only this file:
+the rest of v4 never touches <code>@tinacms/graphql</code>.
+</p>
+
+<div class="flow">
+  <span>v4 CollectionSchema</span> <em>→</em>
+  <span>toV3Collection / toV3Field</span> <em>→</em>
+  <span>buildDotTinaFiles</span> <em>→</em>
+  <span>indexContent → sqlite-level (:memory:)</span> <em>→</em>
+  <span>resolve(query)</span>
+</div>
+
+<h2>What each piece is for</h2>
+<table>
+  <tr><th>Piece</th><th>Why it's there</th></tr>
+  <tr><td><code>toV3Field</code> / <code>toV3Collection</code></td>
+      <td>Translate v4 schema to the v3 shape the engine expects. Kept minimal on purpose: only the fields the engine actually reads.</td></tr>
+  <tr><td><code>SqliteLevel(':memory:')</code></td>
+      <td>The engine needs a Level store for its index. In-memory sqlite = zero files on disk, fresh index per dev-server boot, injectable (<code>options.level</code>) for tests.</td></tr>
+  <tr><td><code>FilesystemBridge</code></td>
+      <td>How the engine reads the actual content files under <code>rootDir</code>.</td></tr>
+  <tr><td><code>buildDotTinaFiles(... buildSDK: false)</code></td>
+      <td>Builds the GraphQL schema + lookup tables from the collections, without generating the client SDK files v3 would write to disk.</td></tr>
+  <tr><td><code>reindexPaths</code> + the <code>indexing</code> promise chain</td>
+      <td>When a file changes (a save), only that path is re-indexed. The chain serialises re-index runs so two rapid saves can't interleave index writes; a failed run doesn't poison the next (<code>.catch(() =&gt; {})</code>).</td></tr>
+  <tr><td><code>warnUnindexedFormats</code></td>
+      <td>Honest limitation, stated up front: a collection with several formats indexes the first only; the rest stay editable but invisible to queries.</td></tr>
+</table>
+
+<h2>Why not something simpler?</h2>
+<ul>
+  <li><strong>Scan files per query?</strong> Works for 10 documents, dies on reference resolution, filtering and pagination — exactly what the v3 engine's index already does.</li>
+  <li><strong>Rewrite a small engine in v4?</strong> That's re-owning schema building, indexing and resolving — thousands of lines of proven code for zero product gain.</li>
+  <li><strong>Use v3's full stack directly?</strong> It drags in the <code>.tina</code> file generation, SDK output and server assumptions v4 doesn't want. This file cherry-picks the four functions needed and nothing else.</li>
+</ul>
+
+<p>
+So: ~95 lines of adapter buys the whole v3 query engine, contained behind a three-method
+interface (<code>execute</code>, <code>reindexPaths</code>, <code>close</code>). When
+ADR work replaces the engine, this is the only file that changes.
+</p>
+</body>
+</html>

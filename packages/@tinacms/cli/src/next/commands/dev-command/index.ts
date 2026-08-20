@@ -2,10 +2,10 @@ import path from 'path';
 import { Database, FilesystemBridge, buildSchema } from '@tinacms/graphql';
 import { Telemetry } from '@tinacms/metrics';
 import { LocalSearchIndexClient, SearchIndexer } from '@tinacms/search';
-import AsyncLock from 'async-lock';
 import chokidar from 'chokidar';
 import { Command, Option } from 'clipanion';
 import fs from 'fs-extra';
+import { AsyncLock } from 'tinacms/dist/client';
 import { logger, summary } from '../../../logger';
 import { isHostExposed } from '../../../utils/host';
 import { spin } from '../../../utils/spinner';
@@ -13,6 +13,7 @@ import { dangerText, warnText } from '../../../utils/theme';
 import { Codegen } from '../../codegen';
 import { ConfigManager } from '../../config-manager';
 import { createAndInitializeDatabase, createDBServer } from '../../database';
+import { getBasePath } from '../../vite';
 import { BaseCommand } from '../baseCommands';
 import { devHTML } from './html';
 import { createDevServer } from './server';
@@ -180,7 +181,10 @@ export class DevCommand extends BaseCommand {
       firstTime: true,
     });
 
-    await fs.outputFile(configManager.outputHTMLFilePath, devHTML(this.port));
+    await fs.outputFile(
+      configManager.outputHTMLFilePath,
+      devHTML(this.port, getBasePath(configManager))
+    );
     // Add the gitignore so the index.html and assets are committed to git
     await fs.outputFile(
       configManager.outputGitignorePath,

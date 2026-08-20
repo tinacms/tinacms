@@ -1,6 +1,5 @@
+import { ArrowRight, CircleAlert, CircleCheck, Info } from 'lucide-react';
 import React from 'react';
-import { BiInfoCircle, BiCheckCircle, BiError } from 'react-icons/bi';
-import { BsArrowRightShort } from 'react-icons/bs';
 
 const MessageIcon = ({
   type = 'success',
@@ -10,10 +9,10 @@ const MessageIcon = ({
   className?: string;
 }) => {
   const icons = {
-    success: BiCheckCircle,
-    warning: BiError,
-    error: BiError,
-    info: BiInfoCircle,
+    success: CircleCheck,
+    warning: CircleAlert,
+    error: CircleAlert,
+    info: Info,
   };
 
   const Icon = icons[type];
@@ -82,7 +81,7 @@ export const Message = ({
             target='_blank'
             className='flex-shrink-0 flex items-center gap-1 text-blue-600 underline decoration-blue-200 hover:text-blue-500 hover:decoration-blue-500 transition-all ease-out duration-150'
           >
-            {linkLabel} <BsArrowRightShort className='w-4 h-auto' />
+            {linkLabel} <ArrowRight className='w-4 h-auto' />
           </a>
         )}
       </div>

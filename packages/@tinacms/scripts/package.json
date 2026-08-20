@@ -1,7 +1,7 @@
 {
     "name": "@tinacms/scripts",
     "type": "module",
-    "version": "1.6.2",
+    "version": "1.6.3",
     "main": "dist/index.js",
     "files": [
         "dist",
@@ -26,7 +26,7 @@
         "json-diff": "catalog:",
         "tsup": "catalog:",
         "typescript": "^5.7.3",
-        "vite": "^4.5.9"
+        "vite": "^6.4.3"
     },
     "devDependencies": {
         "@types/fs-extra": "^11.0.4",
