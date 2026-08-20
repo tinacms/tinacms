@@ -53,6 +53,8 @@ tests/                 # Build verification tests
 
 ## Coding Standards
 
+- **Comments are a last resort.** Write code that explains itself; comment only what the code cannot say (a non-obvious invariant, a documented workaround). No narrated comments, no restating what the next line does, no essay-length headers riding on a few lines of code.
+- **Error narrowing is an `if`, not an expression.** Use `if (err instanceof Error) { … } else { … }` — never `(err instanceof Error && err.message) || fallback` or a ternary that smuggles narrowing into an expression.
 - **Linting/Formatting:** Biome (`biome.json` at root). Example apps extend with `"extends": ["../../../biome.json"]`
 - **TypeScript:** Base config at `base.tsconfig.json`. Examples extend it. Strict mode enabled.
 - **Package manager:** pnpm only. Never use npm or yarn. One deliberate exception: the size-baseline harness (`scripts/size-baseline.mjs` + `tests/size-fixture/`) shells out to real `npm`, because npm's nested-duplicate hoisting is exactly the regression it measures — pnpm's content-addressed store would hide it.

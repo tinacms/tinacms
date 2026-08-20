@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import { exec } from 'node:child_process';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import chalk from 'chalk';
 import chokidar from 'chokidar';
@@ -355,6 +356,20 @@ export class BuildTina {
       return;
     }
 
+    // @tinacms/web-components is designed to be imported in plain JS sites.
+    // It needs to be bundled for browsers.
+    if (['@tinacms/web-components'].includes(packageJSON.name)) {
+      await esbuild({
+        entryPoints: [path.join(process.cwd(), entry)],
+        bundle: true,
+        platform: 'browser',
+        target: 'esnext',
+        format: 'esm',
+        outfile: path.join(process.cwd(), 'dist', `${outInfo.outfile}.js`),
+      });
+      return true;
+    }
+
     // Rollup requires globals for UMD externals — using 'NOOP' as a dummy to silence warnings.
     // This has no effect unless UMD is run in a browser.
     external.forEach((ext) => (globals[ext] = 'NOOP'));
@@ -410,6 +425,20 @@ export class BuildTina {
         });
       } else if (['@tinacms/mdx'].includes(packageJSON.name)) {
         const peerDeps = packageJSON.peerDependencies;
+
+        // acorn-jsx reaches acorn with `require`, which acorn's export map
+        // answers with the CJS build, while every other importer gets the ESM
+        // build. Without this the whole parser is bundled twice.
+        const acornManifest = createRequire(
+          path.join(process.cwd(), 'package.json')
+        ).resolve('acorn/package.json');
+        const alias = {
+          acorn: path.join(
+            path.dirname(acornManifest),
+            JSON.parse(fs.readFileSync(acornManifest, 'utf8')).module
+          ),
+        };
+
         await esbuild({
           entryPoints: [path.join(process.cwd(), entry)],
           bundle: true,
@@ -418,6 +447,7 @@ export class BuildTina {
           format: 'esm',
           outfile: path.join(process.cwd(), 'dist', 'index.js'),
           external: Object.keys({ ...peerDeps }),
+          alias,
         });
 
         // The ES version is targeting the browser. This is used by the rich-text's raw mode
@@ -432,6 +462,7 @@ export class BuildTina {
           // and includes "development" export maps which actually throw errors during
           // development, which we don't want to expose our users to.
           external: Object.keys({ ...peerDeps }),
+          alias,
         });
       } else {
         await esbuild({

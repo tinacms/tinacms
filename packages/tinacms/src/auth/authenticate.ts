@@ -1,19 +1,12 @@
-/**
-
-*/
-
+import { TokenObject } from '@tinacms/schema-tools';
 import popupWindow from './popupWindow';
+import { randomString, generateCodeChallenge } from './pkce';
+
+export const AUTH_TOKEN_KEY = 'tinacms-auth';
+export const PKCE_STORAGE_KEY = 'tinacms-pkce';
 
 const TINA_LOGIN_EVENT = 'tinaCloudLogin';
-export const AUTH_TOKEN_KEY = 'tinacms-auth';
 
-export type TokenObject = {
-  id_token: string;
-  access_token?: string;
-  refresh_token?: string;
-};
-
-// Custom error for when user cancels authentication by closing the popup
 export class AuthenticationCancelledError extends Error {
   constructor(message = 'Authentication cancelled') {
     super(message);
@@ -21,19 +14,44 @@ export class AuthenticationCancelledError extends Error {
   }
 }
 
-export const authenticate = (
+let workosEnabledPromise: Promise<boolean> | null = null;
+
+export async function getWorkosEnabled(
+  identityApiUrl: string
+): Promise<boolean> {
+  if (!workosEnabledPromise) {
+    workosEnabledPromise = (async () => {
+      const res = await fetch(`${identityApiUrl}/v2/auth/config`);
+      if (!res.ok) {
+        throw new Error(
+          `Failed to fetch auth config: ${res.status} ${res.statusText}`
+        );
+      }
+
+      const data: { workosEnabled?: boolean } = await res.json();
+      if (typeof data.workosEnabled !== 'boolean') {
+        throw new Error('Invalid auth config response');
+      }
+
+      return data.workosEnabled;
+    })();
+  }
+
+  return workosEnabledPromise;
+}
+
+export function resetWorkosEnabledCache(): void {
+  workosEnabledPromise = null;
+}
+
+export function authenticatePopup(
   clientId: string,
   frontendUrl: string
-): Promise<TokenObject> => {
+): Promise<TokenObject> {
   return new Promise((resolve, reject) => {
     const origin = `${window.location.protocol}//${window.location.host}`;
-
-    // The origin we expect login results to be posted from. Only messages
-    // sent from this origin are trusted.
     const expectedOrigin = new URL(frontendUrl).origin;
 
-    // The exact Window we opened. Only messages whose source is this Window
-    // are trusted.
     const authTab = popupWindow(
       `${frontendUrl}/signin?clientId=${clientId}&origin=${origin}`,
       '_blank',
@@ -42,7 +60,6 @@ export const authenticate = (
       700
     );
 
-    // Check if popup was blocked
     if (!authTab) {
       reject(
         new Error(
@@ -57,10 +74,7 @@ export const authenticate = (
       window.removeEventListener('message', messageHandler);
     };
 
-    // Message handler for auth completion
     const messageHandler = (e: MessageEvent) => {
-      // Validate the message origin and source before reading or trusting
-      // anything in e.data.
       if (e.origin !== expectedOrigin || e.source !== authTab) {
         return;
       }
@@ -79,7 +93,6 @@ export const authenticate = (
       }
     };
 
-    // Poll to detect if popup was closed without completing auth
     const pollInterval = setInterval(() => {
       if (authTab.closed) {
         cleanup();
@@ -89,4 +102,49 @@ export const authenticate = (
 
     window.addEventListener('message', messageHandler);
   });
-};
+}
+
+export async function authenticatePKCE(
+  clientId: string,
+  identityApiUrl: string
+): Promise<void> {
+  const codeVerifier = randomString(128);
+  const codeChallenge = await generateCodeChallenge(codeVerifier);
+  const state = randomString();
+
+  localStorage.setItem(
+    PKCE_STORAGE_KEY,
+    JSON.stringify({
+      code_verifier: codeVerifier,
+      state,
+      client_id: clientId,
+      identity_api_url: identityApiUrl,
+    })
+  );
+
+  const redirectUri = window.location.origin + window.location.pathname;
+
+  const params = new URLSearchParams({
+    response_type: 'code',
+    client_id: clientId,
+    redirect_uri: redirectUri,
+    code_challenge: codeChallenge,
+    code_challenge_method: 'S256',
+    state,
+  });
+
+  window.location.href = `${identityApiUrl}/v2/auth/tinacms?${params.toString()}`;
+}
+
+export async function authenticate(
+  clientId: string,
+  identityApiUrl: string,
+  frontendUrl: string
+): Promise<TokenObject | void> {
+  const workosEnabled = await getWorkosEnabled(identityApiUrl);
+  if (workosEnabled) {
+    await authenticatePKCE(clientId, identityApiUrl);
+  } else {
+    return authenticatePopup(clientId, frontendUrl);
+  }
+}
