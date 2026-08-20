@@ -163,7 +163,7 @@ catalog:
     cors: ^2.8.5
     cross-spawn: ^7.0.6
     crypto-js: ^4.2.0
-    dompurify: ^3.3.1
+    dompurify: ^3.4.13
     dotenv: ^16.4.7
     esbuild: ^0.28.1
     estree-util-is-identifier-name: 2.1.0
