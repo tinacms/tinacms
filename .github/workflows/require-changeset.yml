@@ -1,0 +1,29 @@
+name: Require Changeset
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+
+permissions:
+  contents: read
+
+jobs:
+  require-changeset:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # Escape hatch for a change that genuinely ships nothing. Dependabot PRs are NOT
+    # exempt: they are the ones that keep merging unreleased (tinacms/tinacms#7435).
+    if: "!contains(github.event.pull_request.labels.*.name, 'skip-changeset')"
+    steps:
+      - name: Check out code
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version-file: .nvmrc
+
+      - name: Require a changeset for published packages
+        run: node .github/scripts/check-changeset.mjs origin/${{ github.base_ref }}
