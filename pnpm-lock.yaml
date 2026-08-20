@@ -310,8 +310,8 @@ catalogs:
       specifier: ^1.0.4
       version: 1.0.4
     acorn:
-      specifier: 8.8.2
-      version: 8.8.2
+      specifier: ^8.16.0
+      version: 8.16.0
     altair-express-middleware:
       specifier: ^7.3.6
       version: 7.3.6
@@ -1724,7 +1724,7 @@ importers:
         version: link:../schema-tools
       acorn:
         specifier: 'catalog:'
-        version: 8.8.2
+        version: 8.16.0
       ccount:
         specifier: 'catalog:'
         version: 2.0.1
@@ -9068,11 +9068,6 @@ packages:
 
   acorn@8.16.0:
     resolution: {integrity: sha512-UVJyE9MttOsBQIDKw1skb9nAwQuR5wuGD3+82K6JgJlm/Y+KI92oNsMNGZCYdDsVtRHSak0pcV5Dno5+4jh9sw==}
-    engines: {node: '>=0.4.0'}
-    hasBin: true
-
-  acorn@8.8.2:
-    resolution: {integrity: sha512-xjIYgE8HBrkpd/sJqOGNspf8uHG+NOHGOw6a/Urj8taM2EXfdNAH2oFcPeIFfsv3+kz/mJrS5VuMqbNLjCa2vw==}
     engines: {node: '>=0.4.0'}
     hasBin: true
 
@@ -24923,8 +24918,6 @@ snapshots:
   acorn@8.15.0: {}
 
   acorn@8.16.0: {}
-
-  acorn@8.8.2: {}
 
   adm-zip@0.5.16: {}
 
