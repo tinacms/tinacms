@@ -100,6 +100,17 @@ describe('dropDanglingBreaks', () => {
     expect(countBreaks(tree)).toBe(0);
   });
 
+  it('adds no second space when the text already ends in one', () => {
+    const tree = paragraph([
+      text('one '),
+      brk,
+      { type: 'html', value: '<em>x</em>' },
+    ]);
+    expect(dropDanglingBreaks(tree).children[0]).toMatchObject({
+      children: [{ type: 'text', value: 'one ' }, { type: 'html' }],
+    });
+  });
+
   it('drops a break before an inline mdx element', () => {
     const tree = paragraph([
       text('one'),
