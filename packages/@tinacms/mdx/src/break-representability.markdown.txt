@@ -11,19 +11,19 @@ h2                          mid                 "one\\\ntwo\n---\n"             
 h2                          final               "## one two\n"                                                                                                             1       0       parses
 h2                          final-editor        "## one two\n"                                                                                                             1       0       parses
 h2                          final-editor-twice  "## one two\n"                                                                                                             1       0       parses
-h3                          mid                 "### one two\n"                                                                                                            1       0       parses
+h3                          mid                 "### one\n\n### two\n"                                                                                                     2       0       parses
 h3                          final               "### one two\n"                                                                                                            1       0       parses
 h3                          final-editor        "### one two\n"                                                                                                            1       0       parses
 h3                          final-editor-twice  "### one two\n"                                                                                                            1       0       parses
-h4                          mid                 "#### one two\n"                                                                                                           1       0       parses
+h4                          mid                 "#### one\n\n#### two\n"                                                                                                   2       0       parses
 h4                          final               "#### one two\n"                                                                                                           1       0       parses
 h4                          final-editor        "#### one two\n"                                                                                                           1       0       parses
 h4                          final-editor-twice  "#### one two\n"                                                                                                           1       0       parses
-h5                          mid                 "##### one two\n"                                                                                                          1       0       parses
+h5                          mid                 "##### one\n\n##### two\n"                                                                                                 2       0       parses
 h5                          final               "##### one two\n"                                                                                                          1       0       parses
 h5                          final-editor        "##### one two\n"                                                                                                          1       0       parses
 h5                          final-editor-twice  "##### one two\n"                                                                                                          1       0       parses
-h6                          mid                 "###### one two\n"                                                                                                         1       0       parses
+h6                          mid                 "###### one\n\n###### two\n"                                                                                               2       0       parses
 h6                          final               "###### one two\n"                                                                                                         1       0       parses
 h6                          final-editor        "###### one two\n"                                                                                                         1       0       parses
 h6                          final-editor-twice  "###### one two\n"                                                                                                         1       0       parses
@@ -57,7 +57,7 @@ text (inline)               -                   skipped: the injection site of e
 img (inline)                -                   skipped: void                                                                                                              -       -       -
 html_inline (inline)        -                   skipped: carries a raw value, no inline children                                                                           -       -       -
 mdxJsxTextElement (inline)  -                   skipped: children live in props                                                                                            -       -       -
-a in h3                     mid                 "### [one two](/x)\n"                                                                                                      1       0       parses
+a in h3                     mid                 "### [one](/x)\n\n### [two](/x)\n"                                                                                         2       0       parses
 a in h3                     final               "### [one two](/x)\n"                                                                                                      1       0       parses
 a in h3                     final-editor        "### [one two](/x)\n"                                                                                                      1       0       parses
 a in h3                     final-editor-twice  "### [one two](/x)\n"                                                                                                      1       0       parses
