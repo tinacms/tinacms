@@ -1,71 +1,73 @@
-container                   position            written                                                       blocks  breaks  ok
-p                           mid                 "one\\\ntwo\n"                                                1       1       parses
-p                           final               "one two\\\n"                                                 1       0       parses UNSTABLE
-p                           final-editor        "one two\\\n"                                                 1       0       parses UNSTABLE
-p                           final-editor-twice  "one two\\\n\\\n"                                             1       1       parses UNSTABLE
-h1                          mid                 "one\\\ntwo\n===\n"                                           1       1       parses
-h1                          final               "one two\\\n\n"                                               1       0       parses UNSTABLE
-h1                          final-editor        "one two\\\n\n"                                               1       0       parses UNSTABLE
-h1                          final-editor-twice  "one two\\\n\\\n\n"                                           1       1       parses UNSTABLE
-h2                          mid                 "one\\\ntwo\n---\n"                                           1       1       parses
-h2                          final               "one two\\\n\n"                                               1       0       parses UNSTABLE
-h2                          final-editor        "one two\\\n\n"                                               1       0       parses UNSTABLE
-h2                          final-editor-twice  "one two\\\n\\\n\n"                                           1       1       parses UNSTABLE
-h3                          mid                 "### one two\n"                                               1       0       parses
-h3                          final               "### one two \n"                                              1       0       parses UNSTABLE
-h3                          final-editor        "### one two \n"                                              1       0       parses UNSTABLE
-h3                          final-editor-twice  "### one two  \n"                                             1       0       parses UNSTABLE
-h4                          mid                 "#### one two\n"                                              1       0       parses
-h4                          final               "#### one two \n"                                             1       0       parses UNSTABLE
-h4                          final-editor        "#### one two \n"                                             1       0       parses UNSTABLE
-h4                          final-editor-twice  "#### one two  \n"                                            1       0       parses UNSTABLE
-h5                          mid                 "##### one two\n"                                             1       0       parses
-h5                          final               "##### one two \n"                                            1       0       parses UNSTABLE
-h5                          final-editor        "##### one two \n"                                            1       0       parses UNSTABLE
-h5                          final-editor-twice  "##### one two  \n"                                           1       0       parses UNSTABLE
-h6                          mid                 "###### one two\n"                                            1       0       parses
-h6                          final               "###### one two \n"                                           1       0       parses UNSTABLE
-h6                          final-editor        "###### one two \n"                                           1       0       parses UNSTABLE
-h6                          final-editor-twice  "###### one two  \n"                                          1       0       parses UNSTABLE
-blockquote                  mid                 "> one\\\n> two\n"                                            1       1       parses
-blockquote                  final               "> one two\\\n>\n"                                            1       0       parses UNSTABLE
-blockquote                  final-editor        "> one two\\\n>\n"                                            1       0       parses UNSTABLE
-blockquote                  final-editor-twice  "> one two\\\n> \\\n>\n"                                      1       1       parses UNSTABLE
-li                          mid                 "* one\\\n  two\n"                                            1       1       parses
-li                          final               "* one two\\\n"                                               1       0       parses UNSTABLE
-li                          final-editor        "* one two\\\n"                                               1       0       parses UNSTABLE
-li                          final-editor-twice  "* one two\\\n  \\\n"                                         1       1       parses UNSTABLE
-td                          mid                 "| h       |\n| ------- |\n| one two |\n"                     1       0       parses
-td                          final               "| h        |\n| -------- |\n| one two  |\n"                  1       0       parses UNSTABLE
-td                          final-editor        "| h        |\n| -------- |\n| one two  |\n"                  1       0       parses UNSTABLE
-td                          final-editor-twice  "| h         |\n| --------- |\n| one two   |\n"               1       0       parses UNSTABLE
-code_block                  -                   skipped: wants a literal newline, not a break                 -       -       -
-hr                          -                   skipped: void                                                 -       -       -
-html                        -                   skipped: carries a raw value, no inline children              -       -       -
-img                         -                   skipped: void                                                 -       -       -
-invalid_markdown            -                   skipped: carries a parse error, not authored content          -       -       -
-mdxJsxFlowElement           -                   skipped: children live in props, covered by the mdx fixtures  -       -       -
-ol                          -                   skipped: holds list items                                     -       -       -
-ul                          -                   skipped: holds list items                                     -       -       -
-table                       -                   skipped: holds rows                                           -       -       -
-tr                          -                   skipped: holds cells                                          -       -       -
-a (inline)                  mid                 "[one\\\ntwo](/x)\n"                                          1       1       parses
-a (inline)                  final               "[one two\\\n](/x)\n"                                         1       1       parses
-a (inline)                  final-editor        "[one two\\\n](/x)\n"                                         1       1       parses
-a (inline)                  final-editor-twice  "[one two\\\n\\\n](/x)\n"                                     1       2       parses
-text (inline)               -                   skipped: the injection site of every block row above          -       -       -
-img (inline)                -                   skipped: void                                                 -       -       -
-html_inline (inline)        -                   skipped: carries a raw value, no inline children              -       -       -
-mdxJsxTextElement (inline)  -                   skipped: children live in props                               -       -       -
-a in h3                     mid                 "### [one two](/x)\n"                                         1       0       parses
-a in h3                     final               "### [one two ](/x)\n"                                        1       0       parses
-a in h3                     final-editor        "### [one two ](/x)\n"                                        1       0       parses
-a in h3                     final-editor-twice  "### [one two  ](/x)\n"                                       1       0       parses
-a in li                     mid                 "* [one\\\n  two](/x)\n"                                      1       1       parses
-a in li                     final               "* [one two\\\n  ](/x)\n"                                     1       1       parses
-a in li                     final-editor        "* [one two\\\n  ](/x)\n"                                     1       1       parses
-a in li                     final-editor-twice  "* [one two\\\n  \\\n  ](/x)\n"                               1       2       parses
-a in blockquote             mid                 "> [one\\\n> two](/x)\n"                                      1       1       parses
-a in blockquote             final               "> [one two\\\n> ](/x)\n"                                     1       1       parses
-a in blockquote             final-editor        "> [one two\\\n> ](/x)\n"                                     1       1       parses
-a in blockquote             final-editor-twice  "> [one two\\\n> \\\n> ](/x)\n"                               1       2       parses
+container                   position            written                                                                                                                    blocks  breaks  ok
+p                           mid                 "one\\\ntwo\n"                                                                                                             1       1       parses
+p                           final               "one two\\\n"                                                                                                              1       0       parses UNSTABLE
+p                           final-editor        "one two\\\n"                                                                                                              1       0       parses UNSTABLE
+p                           final-editor-twice  "one two\\\n\\\n"                                                                                                          1       1       parses UNSTABLE
+h1                          mid                 "one\\\ntwo\n===\n"                                                                                                        1       1       parses
+h1                          final               "one two\\\n\n"                                                                                                            1       0       parses UNSTABLE
+h1                          final-editor        "one two\\\n\n"                                                                                                            1       0       parses UNSTABLE
+h1                          final-editor-twice  "one two\\\n\\\n\n"                                                                                                        1       1       parses UNSTABLE
+h2                          mid                 "one\\\ntwo\n---\n"                                                                                                        1       1       parses
+h2                          final               "one two\\\n\n"                                                                                                            1       0       parses UNSTABLE
+h2                          final-editor        "one two\\\n\n"                                                                                                            1       0       parses UNSTABLE
+h2                          final-editor-twice  "one two\\\n\\\n\n"                                                                                                        1       1       parses UNSTABLE
+h3                          mid                 "### one two\n"                                                                                                            1       0       parses
+h3                          final               "### one two \n"                                                                                                           1       0       parses UNSTABLE
+h3                          final-editor        "### one two \n"                                                                                                           1       0       parses UNSTABLE
+h3                          final-editor-twice  "### one two  \n"                                                                                                          1       0       parses UNSTABLE
+h4                          mid                 "#### one two\n"                                                                                                           1       0       parses
+h4                          final               "#### one two \n"                                                                                                          1       0       parses UNSTABLE
+h4                          final-editor        "#### one two \n"                                                                                                          1       0       parses UNSTABLE
+h4                          final-editor-twice  "#### one two  \n"                                                                                                         1       0       parses UNSTABLE
+h5                          mid                 "##### one two\n"                                                                                                          1       0       parses
+h5                          final               "##### one two \n"                                                                                                         1       0       parses UNSTABLE
+h5                          final-editor        "##### one two \n"                                                                                                         1       0       parses UNSTABLE
+h5                          final-editor-twice  "##### one two  \n"                                                                                                        1       0       parses UNSTABLE
+h6                          mid                 "###### one two\n"                                                                                                         1       0       parses
+h6                          final               "###### one two \n"                                                                                                        1       0       parses UNSTABLE
+h6                          final-editor        "###### one two \n"                                                                                                        1       0       parses UNSTABLE
+h6                          final-editor-twice  "###### one two  \n"                                                                                                       1       0       parses UNSTABLE
+blockquote                  mid                 "> one\\\n> two\n"                                                                                                         1       1       parses
+blockquote                  final               "> one two\\\n>\n"                                                                                                         1       0       parses UNSTABLE
+blockquote                  final-editor        "> one two\\\n>\n"                                                                                                         1       0       parses UNSTABLE
+blockquote                  final-editor-twice  "> one two\\\n> \\\n>\n"                                                                                                   1       1       parses UNSTABLE
+li                          mid                 "* one\\\n  two\n"                                                                                                         1       1       parses
+li                          final               "* one two\\\n"                                                                                                            1       0       parses UNSTABLE
+li                          final-editor        "* one two\\\n"                                                                                                            1       0       parses UNSTABLE
+li                          final-editor-twice  "* one two\\\n  \\\n"                                                                                                      1       1       parses UNSTABLE
+td                          mid                 "| h       |\n| ------- |\n| one two |\n"                                                                                  1       0       parses
+td                          final               "| h        |\n| -------- |\n| one two  |\n"                                                                               1       0       parses UNSTABLE
+td                          final-editor        "| h        |\n| -------- |\n| one two  |\n"                                                                               1       0       parses UNSTABLE
+td                          final-editor-twice  "| h         |\n| --------- |\n| one two   |\n"                                                                            1       0       parses UNSTABLE
+code_block                  -                   skipped: wants a literal newline, not a break                                                                              -       -       -
+hr                          -                   skipped: void                                                                                                              -       -       -
+html                        -                   skipped: carries a raw value, no inline children                                                                           -       -       -
+img                         -                   skipped: void                                                                                                              -       -       -
+invalid_markdown            -                   skipped: carries a parse error, not authored content                                                                       -       -       -
+mdxJsxFlowElement           -                   skipped: children live in props, covered by the mdx fixtures                                                               -       -       -
+ol                          -                   skipped: holds list items                                                                                                  -       -       -
+ul                          -                   skipped: holds list items                                                                                                  -       -       -
+table                       -                   skipped: holds rows                                                                                                        -       -       -
+tr                          -                   skipped: holds cells                                                                                                       -       -       -
+a (inline)                  mid                 "[one\\\ntwo](/x)\n"                                                                                                       1       0       INVALID UNSTABLE RESAVE THREW
+a (inline)                  final               "[one two\\\n](/x)\n"                                                                                                      1       0       INVALID UNSTABLE RESAVE THREW
+a (inline)                  final-editor        "[one two\\\n](/x)\n"                                                                                                      1       0       INVALID UNSTABLE RESAVE THREW
+a (inline)                  final-editor-twice  "[one two\\\n\\\n](/x)\n"                                                                                                  1       0       INVALID UNSTABLE RESAVE THREW
+text (inline)               -                   skipped: the injection site of every block row above                                                                       -       -       -
+img (inline)                -                   skipped: void                                                                                                              -       -       -
+html_inline (inline)        -                   skipped: carries a raw value, no inline children                                                                           -       -       -
+mdxJsxTextElement (inline)  -                   skipped: children live in props                                                                                            -       -       -
+a in h3                     mid                 "### [one two](/x)\n"                                                                                                      1       0       parses
+a in h3                     final               "### [one two ](/x)\n"                                                                                                     1       0       parses
+a in h3                     final-editor        "### [one two ](/x)\n"                                                                                                     1       0       parses
+a in h3                     final-editor-twice  "### [one two  ](/x)\n"                                                                                                    1       0       parses
+a in li                     mid                 "* [one\\\n  two](/x)\n"                                                                                                   1       0       INVALID UNSTABLE RESAVE THREW
+a in li                     final               "* [one two\\\n  ](/x)\n"                                                                                                  1       0       INVALID UNSTABLE RESAVE THREW
+a in li                     final-editor        "* [one two\\\n  ](/x)\n"                                                                                                  1       0       INVALID UNSTABLE RESAVE THREW
+a in li                     final-editor-twice  "* [one two\\\n  \\\n  ](/x)\n"                                                                                            1       0       INVALID UNSTABLE RESAVE THREW
+a in blockquote             mid                 "> [one\\\n> two](/x)\n"                                                                                                   1       0       INVALID UNSTABLE RESAVE THREW
+a in blockquote             final               "> [one two\\\n> ](/x)\n"                                                                                                  1       0       INVALID UNSTABLE RESAVE THREW
+a in blockquote             final-editor        "> [one two\\\n> ](/x)\n"                                                                                                  1       0       INVALID UNSTABLE RESAVE THREW
+a in blockquote             final-editor-twice  "> [one two\\\n> \\\n> ](/x)\n"                                                                                            1       0       INVALID UNSTABLE RESAVE THREW
+html after                  before-neighbour    "one two \\ <em>x</em>\n"                                                                                                  1       0       parses
+inline template after       -                   skipped: needs a field carrying templates, which this matrix has none of — covered end to end in break-neighbours.test.ts  -       -       -
