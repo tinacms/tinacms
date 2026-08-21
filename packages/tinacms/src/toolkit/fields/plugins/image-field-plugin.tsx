@@ -2,7 +2,11 @@ import * as React from 'react';
 import { wrapFieldsWithMeta } from './wrap-field-with-meta';
 import { InputProps, ImageUpload } from '../components';
 import { Media } from '@toolkit/core';
-import type { MediaAccept } from '@tinacms/schema-tools';
+import {
+  type MediaAccept,
+  extensionOf,
+  resolveMediaAccept,
+} from '@tinacms/schema-tools';
 import { useCMS } from '@toolkit/react-core';
 import { parse } from './text-format';
 import { useState } from 'react';
@@ -36,6 +40,16 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
     async function onChange(media?: Media | Media[]) {
       if (media) {
         const item = Array.isArray(media) ? media[0] : media;
+
+        const allowed = resolveMediaAccept(props.field.accept);
+        const ext = extensionOf(item.filename);
+        if (allowed.length && !allowed.some((a) => a === ext)) {
+          cms.alerts.error(
+            `${item.filename} is not an accepted file type. This field accepts ${allowed.join(', ')}.`
+          );
+          return;
+        }
+
         const parsedValue =
           typeof cms?.media?.store?.parse === 'function'
             ? cms.media.store.parse(item)
