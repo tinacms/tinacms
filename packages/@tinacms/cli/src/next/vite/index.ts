@@ -6,7 +6,15 @@ import normalizePath from 'normalize-path';
 import type { BuildOptions, InlineConfig, Plugin } from 'vite';
 import type { ConfigManager } from '../config-manager';
 import { buildCorsOriginCheck } from './cors';
+import { getAllowedHosts, getAllowedOrigins } from './devServerUrl';
 import { filterPublicEnv } from './filterPublicEnv';
+
+export {
+  getAdminApiURL,
+  getAllowedHosts,
+  getAllowedOrigins,
+  getDevServerUrl,
+} from './devServerUrl';
 import { tinaTailwind } from './tailwind';
 
 /**
@@ -207,12 +215,11 @@ export const createConfig = async ({
     },
     server: {
       host: configManager.config?.build?.host ?? false,
+      allowedHosts: getAllowedHosts(configManager),
       // Restrict Vite's built-in CORS to the same origins our custom
       // middleware allows (localhost + user-configured allowedOrigins).
       cors: {
-        origin: buildCorsOriginCheck(
-          configManager.config?.server?.allowedOrigins
-        ),
+        origin: buildCorsOriginCheck(getAllowedOrigins(configManager)),
       },
       watch: noWatch
         ? {

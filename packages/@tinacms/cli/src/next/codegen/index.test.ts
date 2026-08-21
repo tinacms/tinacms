@@ -285,3 +285,79 @@ describe('Codegen.execute integration', () => {
     }
   });
 });
+
+describe('Codegen local API URL', () => {
+  function stubCodegen(): Codegen {
+    const instance = Object.create(Codegen.prototype) as Codegen;
+
+    instance.configManager = {
+      config: {
+        branch: 'main',
+        token: 'tok',
+        clientId: 'cid',
+      },
+      getTinaGraphQLVersion: () => ({
+        fullVersion: '1.0.0',
+        major: '1',
+        minor: '0',
+        patch: '0',
+      }),
+    } as any;
+    instance.isLocal = true;
+    instance.port = 4001;
+
+    return instance;
+  }
+
+  it('defaults to localhost for local dev', () => {
+    const codegen = stubCodegen();
+
+    expect((codegen as any)._createApiUrl()).toMatchObject({
+      apiURL: 'http://localhost:4001/graphql',
+      localUrl: 'http://localhost:4001/graphql',
+    });
+  });
+
+  it('stays on localhost when server.url is set', () => {
+    // server.url only moves the browser-facing URLs. The generated client is
+    // called by the user's own server runtime, which usually cannot reach the
+    // external host.
+    const codegen = stubCodegen();
+    codegen.configManager.config.server = {
+      url: 'https://my-codespace-4001.github.dev',
+    } as any;
+
+    expect((codegen as any)._createApiUrl()).toMatchObject({
+      apiURL: 'http://localhost:4001/graphql',
+      localUrl: 'http://localhost:4001/graphql',
+    });
+  });
+
+  it('lets contentApiUrlOverride win over server.url', () => {
+    const codegen = stubCodegen();
+    codegen.configManager.config.server = {
+      url: 'https://my-codespace-4001.github.dev',
+    } as any;
+    codegen.configManager.config.contentApiUrlOverride =
+      'https://my-proxy.test/graphql';
+
+    expect((codegen as any)._createApiUrl()).toMatchObject({
+      apiURL: 'https://my-proxy.test/graphql',
+      localUrl: 'https://my-proxy.test/graphql',
+      tinaCloudUrl: 'https://my-proxy.test/graphql',
+    });
+  });
+
+  it('keeps localBuildUrl on localhost for --content=local builds', () => {
+    const codegen = stubCodegen();
+    codegen.configManager.config.server = {
+      url: 'https://my-codespace-4001.github.dev',
+    } as any;
+    codegen.localContentBuild = true;
+
+    const result = (codegen as any)._createApiUrl();
+
+    expect(result.localBuildUrl).toBe('http://localhost:4001/graphql');
+    expect(result.apiURL).toBe(result.tinaCloudUrl);
+  });
+});
