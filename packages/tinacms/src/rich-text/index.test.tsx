@@ -64,6 +64,56 @@ describe('TinaMarkdown URL sanitization', () => {
   });
 });
 
+describe('TinaMarkdown tables', () => {
+  const tableContent = (align?: (string | null)[]) =>
+    ({
+      type: 'root',
+      children: [
+        {
+          type: 'table',
+          props: { align: align || [] },
+          children: [
+            {
+              type: 'tr',
+              children: [
+                {
+                  type: 'td',
+                  children: [
+                    { type: 'p', children: [{ type: 'text', text: 'A' }] },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    }) as any;
+
+  it('renders a table without inline styles', () => {
+    const { container } = render(<TinaMarkdown content={tableContent()} />);
+
+    expect(container.querySelector('table')?.getAttribute('style')).toBeNull();
+    expect(container.querySelector('td')?.getAttribute('style')).toBeNull();
+  });
+
+  it('does not leak node props onto cell elements', () => {
+    const { container } = render(<TinaMarkdown content={tableContent()} />);
+    const cell = container.querySelector('td');
+
+    expect(cell?.getAttribute('type')).toBeNull();
+    expect(cell?.getAttribute('align')).toBeNull();
+    expect(cell?.textContent).toBe('A');
+  });
+
+  it('applies text alignment when the column declares one', () => {
+    const { container } = render(
+      <TinaMarkdown content={tableContent(['right'])} />
+    );
+
+    expect(container.querySelector('td')?.style.textAlign).toBe('right');
+  });
+});
+
 /**
  * Characterises what this renderer does with `html` / `html_inline` nodes, so
  * the behaviour is pinned while `@tinacms/astro` and `@tinacms/web-components`
