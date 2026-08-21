@@ -70,6 +70,7 @@ either way.
 - `media.spec` — media manager lists via the custom store
 - `auth.spec` — the custom AuthJS login screen appears
 - `screen.spec` — navigates through the admin nav (not a deep link) to the `cmsCallback` screen plugin, guarding a second react-router-dom instance
+- `mermaid-lazy.spec` — a document with an ordinary code block (`plain-code.mdx`) loads no chunk carrying mermaid's source, while previewing a mermaid block (`diagram.mdx`) fetches one and draws an `<svg>`
 - `setup.spec` — meta-assertion: the CJS module, custom store and screen plugin are present in the built chunks
 
 ## Running locally
