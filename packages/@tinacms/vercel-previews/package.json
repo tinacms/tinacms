@@ -23,7 +23,7 @@
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/tinacms/tinacms.git",
-		"directory": "packages/tinacms"
+		"directory": "packages/@tinacms/vercel-previews"
 	},
 	"license": "Apache-2.0",
 	"scripts": {
