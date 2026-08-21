@@ -1,9 +1,9 @@
 import type { RichTextField } from '@tinacms/schema-tools';
 import { toMatchFile } from 'jest-file-snapshot';
 import { describe, expect, it } from 'vitest';
-import { parseMDX } from './parse';
-import type * as Plate from './parse/plate';
-import { serializeMDX } from './stringify';
+import { parseMDX } from '../parse';
+import type * as Plate from '../parse/plate';
+import { serializeMDX } from '../stringify';
 
 expect.extend({ toMatchFile });
 
@@ -82,19 +82,9 @@ const INLINES: Record<
 };
 
 /**
- * A list of pairs, not a merged object: `img` is a key of both unions, so
- * spreading them together silently drops the block entry and the matrix loses a
- * row without anything failing.
- */
-/**
- * Nesting combinations rather than types. The type axis alone never crosses a
- * block container with an inline one, and that gap hid a defect where a break
- * ending a link inside a heading wrote a spurious empty heading.
- */
-/**
- * The third axis: what the break sits in FRONT of. A break puts its neighbour
- * at the start of a line, and some neighbours read differently there — which
- * container×position alone cannot express, and which hid three corruptions.
+ * The third axis: what the break sits in FRONT of. A break puts its neighbour at
+ * the start of a line, and some neighbours read differently there — which
+ * container by position alone cannot express, and which hid three corruptions.
  */
 const NEIGHBOURS: [string, Container][] = [
   [
@@ -111,12 +101,21 @@ const NEIGHBOURS: [string, Container][] = [
   ],
 ];
 
+/**
+ * Nesting combinations rather than types. The type axis never crosses a block
+ * container with an inline one, and that gap hid a defect where a break ending
+ * a link inside a heading wrote a spurious empty heading.
+ */
 const NESTED: [string, Container][] = [
   ['a in h3', { md: '### [one two](/x)\n', path: [0, 0], inline: true }],
   ['a in li', { md: '* [one two](/x)\n', path: [0, 0, 0, 0], inline: true }],
   ['a in blockquote', { md: '> [one two](/x)\n', path: [0, 0], inline: true }],
 ];
 
+/**
+ * Pairs, not a merged object: `img` is a key of both unions, so spreading them
+ * together drops the block entry and the matrix loses a row silently.
+ */
 const CONTAINERS: [string, Container][] = [
   ...Object.entries(BLOCKS).map(
     ([type, container]) => [type, container] as [string, Container]
@@ -299,14 +298,12 @@ const writtenColumn = (field: RichTextField) =>
 describe('a hard break in every container', () => {
   it('round-trips through the markdown parser', () => {
     expect(`${matrix(markdownField)}\n`).toMatchFile(
-      `${__dirname}/break-representability.markdown.txt`
+      `${__dirname}/markdown.md`
     );
   });
 
   it('round-trips through the mdx parser', () => {
-    expect(`${matrix(mdxField)}\n`).toMatchFile(
-      `${__dirname}/break-representability.mdx.txt`
-    );
+    expect(`${matrix(mdxField)}\n`).toMatchFile(`${__dirname}/mdx.md`);
   });
 
   it('writes the same markdown from either parser', () => {
