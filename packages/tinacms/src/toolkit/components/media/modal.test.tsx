@@ -22,15 +22,8 @@ const renderModal = (
     renameFunc,
     close,
     input: () => screen.getByPlaceholderText('File name') as HTMLInputElement,
-    // `Button` renders `disabled` as pointer-events-none styling rather than
-    // the DOM attribute, so "is it disabled" is asserted through the class and
-    // through the handler refusing to run.
     submit: () => screen.getByText('Rename').closest('button'),
-    submitBlocked: () =>
-      screen
-        .getByText('Rename')
-        .closest('button')
-        .className.includes('pointer-events-none'),
+    submitBlocked: () => screen.getByText('Rename').closest('button').disabled,
   };
 };
 
