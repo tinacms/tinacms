@@ -8,7 +8,7 @@ import {
 } from 'mdast-util-mdx-jsx';
 import { Handlers, toMarkdown } from 'mdast-util-to-markdown';
 import { text } from 'mdast-util-to-markdown/lib/handle/text';
-import { dropDanglingBreaks } from '../dangling-breaks';
+import { serializeBreaks } from '../break-serialization';
 import { directiveToMarkdown } from '../extensions/tina-shortcodes/to-markdown';
 import { stringifyMDX as stringifyMDXNext } from '../next';
 import type * as Plate from '../parse/plate';
@@ -138,7 +138,7 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextType) => {
     }
     return text(node, parent, context, safeOptions);
   };
-  return toMarkdown(dropDanglingBreaks(tree), {
+  return toMarkdown(serializeBreaks(tree), {
     extensions: [
       directiveToMarkdown(patterns),
       mdxJsxToMarkdown(),
