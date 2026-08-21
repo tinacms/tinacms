@@ -1,4 +1,9 @@
 import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
+import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
+import {
+  TableCellHeaderPlugin,
+  TableCellPlugin,
+} from '@udecode/plate-table/react';
 import { createPlatePlugin } from '@udecode/plate/react';
 import React from 'react';
 
@@ -20,27 +25,43 @@ export const createHTMLInlinePlugin = createPlatePlugin({
   },
 });
 
-export const KEY_BLOCKQUOTE_ENTER_BREAK = 'blockquote-enter-break';
+export const KEY_SOFT_BREAK = 'tina-soft-break';
 
-// Custom Plate plugin to handle Enter key inside blockquotes.
-// Our parsing logic expects a soft break with type 'break' to be inserted for proper handling within blockquotes.
-// This plugin inserts a 'break' element and a new paragraph when Enter is pressed inside a blockquote.
-export const createBlockquoteEnterBreakPlugin = createPlatePlugin({
-  key: KEY_BLOCKQUOTE_ENTER_BREAK,
+// Plate's SoftBreakPlugin inserts a literal "\n", which markdown re-flows into a
+// space when serialized, so the line break is silently lost. Our parser and
+// serializer round-trip a `break` element (a `\` hard break) instead, so insert
+// that for shift+Enter, and for a plain Enter inside a blockquote where a new
+// paragraph would end the quote.
+//
+// Code blocks and table cells are left to SoftBreakPlugin: code blocks want a
+// real newline, and GFM table cells cannot hold a hard break at all.
+const NO_HARD_BREAK = [
+  CodeBlockPlugin.key,
+  TableCellPlugin.key,
+  TableCellHeaderPlugin.key,
+];
+
+export const createSoftBreakPlugin = createPlatePlugin({
+  key: KEY_SOFT_BREAK,
 
   handlers: {
     onKeyDown: ({ editor, event }) => {
-      if (event.key !== 'Enter') return;
-      const blockquoteEntry = editor.api.above({
+      // mod+enter / mod+shift+enter belong to ExitBreakPlugin.
+      if (event.key !== 'Enter' || event.metaKey || event.ctrlKey) return;
+
+      const inBlockquote = editor.api.above({
         match: { type: BlockquotePlugin.key },
       });
+      if (!event.shiftKey && !inBlockquote) return;
 
-      if (!blockquoteEntry) return;
+      if (editor.api.some({ match: { type: NO_HARD_BREAK } })) return;
 
-      event.preventDefault();
-      // Log the entire editor value BEFORE insertion
+      if (editor.api.isExpanded()) editor.tf.delete();
+
       const cursorPosition = editor.selection?.focus;
       if (!cursorPosition) return;
+
+      event.preventDefault();
 
       editor.tf.insertNodes(
         [

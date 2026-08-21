@@ -59,9 +59,9 @@ import { autoformatLists } from './core/autoformat/autoformat-lists';
 import { autoformatMarks } from './core/autoformat/autoformat-marks';
 import type { HeadingLevel } from '@tinacms/schema-tools';
 import {
-  createBlockquoteEnterBreakPlugin,
   createBreakPlugin,
   createHTMLInlinePlugin,
+  createSoftBreakPlugin,
 } from './create-html-block';
 import { createHTMLBlockPlugin } from './create-html-block';
 
@@ -156,7 +156,7 @@ export const createEditorPlugins = ({
   createImgPlugin,
   createHTMLBlockPlugin,
   createHTMLInlinePlugin,
-  createBlockquoteEnterBreakPlugin,
+  createSoftBreakPlugin,
   createInvalidMarkdownPlugin,
   CorrectNodeBehaviorPlugin,
   ClearHighlightOnEnterPlugin,
@@ -260,6 +260,8 @@ export const createEditorPlugins = ({
       ],
     },
   }),
+  // Only reached where `createSoftBreakPlugin` bails (code blocks, table
+  // cells) — everywhere else it has already inserted a `break` element.
   SoftBreakPlugin.configure({
     options: {
       rules: [
