@@ -1,7 +1,4 @@
-import type {
-  MediaAccept,
-  MediaExtension,
-} from '@tinacms/schema-tools';
+import type { MediaAccept, MediaExtension } from '@tinacms/schema-tools';
 import { EventBus } from './event';
 import { DummyMediaStore } from './media-store.default';
 

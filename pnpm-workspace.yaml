@@ -155,14 +155,12 @@ catalog:
     class-variance-authority: ^0.7.1
     cli-spinner: ^0.2.10
     clipanion: ^3.2.1
-    cloudinary: ^1.41.3
+    cloudinary: ^2.7.0
     clsx: ^2.1.1
     cmdk: ^1.0.4
     color-string: ^1.9.1
-    concat-md: ^0.5.1
     cors: ^2.8.5
     cross-spawn: ^7.0.6
-    crypto-js: ^4.2.0
     dompurify: ^3.3.1
     dotenv: ^16.4.7
     esbuild: ^0.28.1
@@ -254,8 +252,6 @@ catalog:
     tsup: ^8.3.6
     turbo: ^2.9.18
     typanion: 3.13.0
-    typedoc: ^0.26.11
-    typedoc-plugin-markdown: ^3.17.1
     unist-util-source: 4.0.2
     unist-util-stringify-position: 3.0.3
     unist-util-visit: 4.1.2
