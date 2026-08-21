@@ -23,6 +23,8 @@ type TinaApiMock = {
   assetsApiUrl: string;
   isLocalMode: boolean;
   isCustomContentApi: boolean;
+  mediaBranch?: string;
+  getProject: ReturnType<typeof vi.fn>;
   authProvider: {
     fetchWithToken: FetchWithTokenMock;
     isAuthenticated: ReturnType<typeof vi.fn>;
@@ -64,6 +66,7 @@ const buildStore = ({
   contentApiUrl = 'https://content.tinajs.io/1.1/content/test-client/github/main',
   authenticated = true,
   usingProtectedBranch = false,
+  mediaBranch,
   createBranch,
   createPullRequest,
   getIndexStatus,
@@ -77,6 +80,7 @@ const buildStore = ({
   contentApiUrl?: string;
   authenticated?: boolean;
   usingProtectedBranch?: boolean;
+  mediaBranch?: string;
   createBranch?: ReturnType<typeof vi.fn>;
   createPullRequest?: ReturnType<typeof vi.fn>;
   getIndexStatus?: ReturnType<typeof vi.fn>;
@@ -101,6 +105,8 @@ const buildStore = ({
     options: {},
     getRequestStatus: vi.fn().mockResolvedValue({ error: false }),
     schema: { schema: { config: { media: { tina: {} } } } },
+    mediaBranch,
+    getProject: vi.fn().mockResolvedValue({ mediaBranch }),
     usingProtectedBranch: vi.fn().mockReturnValue(usingProtectedBranch),
     createBranch:
       createBranch ??
@@ -1587,11 +1593,11 @@ describe('TinaMediaStore — rename capability', () => {
     expect(typeof store.rename).toBe('function');
   });
 
-  it('is absent on a TinaCloud instance so the UI hides the action', () => {
+  it('is exposed on a TinaCloud instance', () => {
     const { store } = buildStore();
-    expect(store.rename).toBeUndefined();
+    expect(typeof store.rename).toBe('function');
     // guards against re-adding it as a prototype method, which would
-    // advertise support on every instance
+    // advertise support on every instance — including the ones below
     expect('rename' in Object.getPrototypeOf(store)).toBe(false);
   });
 
@@ -1762,5 +1768,885 @@ describe('TinaMediaStore — local rename', () => {
     const error = await store.rename('old.png', 'new.png').catch((e) => e);
 
     expect(error.code).toBe('BACKEND_FAILURE');
+  });
+});
+
+describe('TinaMediaStore — cloud rename (direct)', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  const listBody = (files: { filename: string; src: string }[]) => ({
+    cursor: null,
+    directories: [],
+    files,
+  });
+
+  /**
+   * Drives the request-status poll's 1s sleep so the rename settles without
+   * waiting in real time.
+   */
+  const renameSettled = async (
+    store: TinaMediaStore,
+    from = 'uploads/old.png',
+    to = 'uploads/new.png'
+  ): Promise<Media> => {
+    const promise = store.rename!(from, to);
+    // Mark it handled before advancing timers, otherwise a rejection that
+    // lands during the flush is reported as an unhandled rejection.
+    promise.catch(() => {});
+    await vi.advanceTimersByTimeAsync(1100);
+    return promise;
+  };
+
+  const renameRejection = (
+    store: TinaMediaStore,
+    from = 'uploads/old.png',
+    to = 'uploads/new.png'
+  ) => renameSettled(store, from, to).catch((error) => error);
+
+  /**
+   * Cloud rename issues two calls through `fetchWithToken`: the rename itself,
+   * then the listing that resolves the canonical entry.
+   */
+  const buildCloudStore = ({
+    renameResponse,
+    listedFiles,
+    ...options
+  }: {
+    renameResponse?: Response;
+    listedFiles?: { filename: string; src: string }[];
+  } & Parameters<typeof buildStore>[0] = {}) => {
+    const built = buildStore(options);
+    built.fetchWithToken.mockImplementation((url: string) => {
+      if (String(url).includes('/rename')) {
+        return Promise.resolve(
+          renameResponse ??
+            makeJsonResponse(200, {
+              success: true,
+              from: 'uploads/old.png',
+              to: 'uploads/new.png',
+              path: 'uploads/new.png',
+              src: 'https://assets.tinajs.io/test-client/uploads/new.png',
+              requestId: 'rename-1',
+            })
+        );
+      }
+      return Promise.resolve(
+        makeJsonResponse(
+          200,
+          listBody(
+            listedFiles ?? [
+              {
+                filename: 'new.png',
+                src: 'https://assets.tinajs.io/test-client/uploads/new.png',
+              },
+            ]
+          )
+        )
+      );
+    });
+    return built;
+  };
+
+  const renameCall = (fetchWithToken: FetchWithTokenMock) =>
+    fetchWithToken.mock.calls.find(([url]) => String(url).includes('/rename'));
+
+  it('POSTs to the v1 assets rename route with the token provider', async () => {
+    const { store, fetchWithToken } = buildCloudStore();
+
+    await renameSettled(store);
+
+    const [url, init] = renameCall(fetchWithToken);
+    expect(url).toBe('https://assets.tinajs.io/v1/test-client/rename');
+    expect(init.method).toBe('POST');
+    expect(init.headers).toMatchObject({
+      'Content-Type': 'application/json',
+    });
+  });
+
+  it('sends from, to and the branch in the JSON body', async () => {
+    const { store, fetchWithToken } = buildCloudStore();
+
+    await renameSettled(store);
+
+    expect(JSON.parse(renameCall(fetchWithToken)[1].body)).toEqual({
+      from: 'uploads/old.png',
+      to: 'uploads/new.png',
+      branch: 'main',
+    });
+  });
+
+  it('sends a slash-containing branch raw, not URL-encoded', async () => {
+    const { store, fetchWithToken } = buildCloudStore({
+      branch: 'feat/my-branch',
+    });
+
+    await renameSettled(store);
+
+    expect(JSON.parse(renameCall(fetchWithToken)[1].body).branch).toBe(
+      'feat/my-branch'
+    );
+  });
+
+  it.each(['undefined', ''])(
+    'sends an empty branch when Client.branch is %o',
+    async (branch) => {
+      // Client.setBranch runs an unset branch through encodeURIComponent, so it
+      // reaches the store as the literal string "undefined".
+      const { store, fetchWithToken, api } = buildCloudStore();
+      api.branch = branch;
+
+      await renameSettled(store);
+
+      expect(JSON.parse(renameCall(fetchWithToken)[1].body).branch).toBe('');
+    }
+  );
+
+  it('does not re-sanitise the target it was given', async () => {
+    const { store, fetchWithToken } = buildCloudStore();
+
+    // The rename UI already sanitises; a second pass here could disagree with
+    // the value recorded on the workflow.
+    await renameSettled(
+      store,
+      'uploads/old.png',
+      'uploads/Already Sanitised.png'
+    );
+
+    expect(JSON.parse(renameCall(fetchWithToken)[1].body).to).toBe(
+      'uploads/Already Sanitised.png'
+    );
+  });
+
+  it('waits for the rename request status', async () => {
+    const { store, api } = buildCloudStore();
+
+    await renameSettled(store);
+
+    expect(api.getRequestStatus).toHaveBeenCalledWith('rename-1');
+  });
+
+  it('resolves the canonical listed entry, including thumbnails', async () => {
+    const { store } = buildCloudStore();
+
+    const media = await renameSettled(store);
+
+    expect(media).toMatchObject({
+      type: 'file',
+      filename: 'new.png',
+      directory: 'uploads',
+      src: 'https://assets.tinajs.io/test-client/uploads/new.png',
+    });
+    expect(media.thumbnails?.['400x400']).toContain('max-w=400');
+  });
+
+  it('resolves the entry named by the server-sanitised path', async () => {
+    const { store } = buildCloudStore({
+      renameResponse: makeJsonResponse(200, {
+        success: true,
+        path: 'uploads/my-file-1.png',
+        src: 'https://assets.tinajs.io/test-client/uploads/my-file-1.png',
+        requestId: 'rename-1',
+      }),
+      listedFiles: [
+        {
+          filename: 'my-file-1.png',
+          src: 'https://assets.tinajs.io/test-client/uploads/my-file-1.png',
+        },
+      ],
+    });
+
+    const media = await renameSettled(
+      store,
+      'uploads/old.png',
+      'uploads/my file#1.png'
+    );
+
+    expect(media.filename).toBe('my-file-1.png');
+  });
+
+  it('falls back to the response fields when the listing does not contain the file', async () => {
+    const { store } = buildCloudStore({ listedFiles: [] });
+
+    const media = await renameSettled(store);
+
+    expect(media).toMatchObject({
+      type: 'file',
+      id: 'new.png',
+      filename: 'new.png',
+      directory: 'uploads',
+      src: 'https://assets.tinajs.io/test-client/uploads/new.png',
+    });
+    expect(Object.keys(media.thumbnails ?? {})).toEqual([
+      '75x75',
+      '400x400',
+      '1000x1000',
+    ]);
+  });
+
+  it('falls back to the response fields when the listing itself fails', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { store, fetchWithToken } = buildCloudStore();
+    fetchWithToken.mockImplementation((url: string) =>
+      String(url).includes('/rename')
+        ? Promise.resolve(
+            makeJsonResponse(200, {
+              success: true,
+              path: 'uploads/new.png',
+              src: 'https://assets.tinajs.io/test-client/uploads/new.png',
+              requestId: 'rename-1',
+            })
+          )
+        : Promise.reject(new Error('listing unavailable'))
+    );
+
+    const media = await renameSettled(store);
+
+    expect(media.filename).toBe('new.png');
+    expect(media.src).toBe(
+      'https://assets.tinajs.io/test-client/uploads/new.png'
+    );
+  });
+
+  it('handles a file at the media root', async () => {
+    const { store } = buildCloudStore({
+      renameResponse: makeJsonResponse(200, {
+        success: true,
+        path: 'new.png',
+        src: 'https://assets.tinajs.io/test-client/new.png',
+        requestId: 'rename-1',
+      }),
+      listedFiles: [
+        {
+          filename: 'new.png',
+          src: 'https://assets.tinajs.io/test-client/new.png',
+        },
+      ],
+    });
+
+    const media = await renameSettled(store, 'old.png', 'new.png');
+
+    expect(media).toMatchObject({ filename: 'new.png', directory: '' });
+  });
+
+  it.each([
+    [400, 'INVALID_FILENAME', 'That filename is not allowed.'],
+    [
+      400,
+      'UNSUPPORTED',
+      "Renaming media on the protected branch 'main' requires the editorial workflow.",
+    ],
+    [403, 'INVALID_PATH', 'Path outside the media root.'],
+    [404, 'NOT_FOUND', 'No such asset.'],
+    [409, 'NAME_COLLISION', 'That name is taken.'],
+    [500, 'BACKEND_FAILURE', 'Something broke.'],
+  ])('maps %i %s and preserves the message', async (status, code, message) => {
+    const { store } = buildCloudStore({
+      renameResponse: makeJsonResponse(status, { code, message }),
+    });
+
+    const error = await renameRejection(store);
+
+    expect(error).toBeInstanceOf(MediaRenameError);
+    expect(error.code).toBe(code);
+    expect(error.message).toBe(message);
+  });
+
+  it('maps a 404 to NOT_FOUND rather than the local "old CLI" UNSUPPORTED', async () => {
+    const { store } = buildCloudStore({
+      renameResponse: makeJsonResponse(404, {}),
+    });
+
+    const error = await renameRejection(store);
+
+    expect(error.code).toBe('NOT_FOUND');
+  });
+
+  it.each([
+    [401, 'UNAUTHORIZED'],
+    [403, 'UNAUTHORIZED'],
+    [409, 'NAME_COLLISION'],
+    [502, 'BACKEND_FAILURE'],
+  ])('falls back to a status-derived code for %i', async (status, code) => {
+    const { store } = buildCloudStore({
+      renameResponse: makeJsonResponse(status, {}),
+    });
+
+    const error = await renameRejection(store);
+
+    expect(error.code).toBe(code);
+  });
+
+  it('reads a bodyless 403 as a permission problem, not a bad filename', async () => {
+    // A token without write scope, or an edge/WAF rejection, arrives as a bare
+    // 403. Blaming the filename sends the editor renaming in circles.
+    const { store } = buildCloudStore({
+      renameResponse: makeJsonResponse(403, {}),
+    });
+
+    const error = await renameRejection(store);
+
+    expect(error.code).toBe('UNAUTHORIZED');
+  });
+
+  it('still honours an explicit INVALID_PATH code on a 403', async () => {
+    const { store } = buildCloudStore({
+      renameResponse: makeJsonResponse(403, {
+        code: 'INVALID_PATH',
+        message: 'Path outside the media root.',
+      }),
+    });
+
+    const error = await renameRejection(store);
+
+    expect(error.code).toBe('INVALID_PATH');
+    expect(error.message).toBe('Path outside the media root.');
+  });
+
+  it('maps an unknown backend code to BACKEND_FAILURE while keeping the message', async () => {
+    const { store } = buildCloudStore({
+      renameResponse: makeJsonResponse(400, {
+        code: 'SOMETHING_NEW',
+        message: 'A code this client does not know.',
+      }),
+    });
+
+    const error = await renameRejection(store);
+
+    expect(error.code).toBe('BACKEND_FAILURE');
+    expect(error.message).toBe('A code this client does not know.');
+  });
+
+  it('maps a 200 without success:true to BACKEND_FAILURE', async () => {
+    const { store } = buildCloudStore({
+      renameResponse: makeJsonResponse(200, { from: 'a', to: 'b' }),
+    });
+
+    const error = await renameRejection(store);
+
+    expect(error.code).toBe('BACKEND_FAILURE');
+  });
+
+  it('maps an unparseable response body to BACKEND_FAILURE', async () => {
+    const { store } = buildCloudStore({
+      renameResponse: {
+        ok: true,
+        status: 200,
+        json: vi.fn().mockRejectedValue(new Error('not json')),
+      } as unknown as Response,
+    });
+
+    const error = await renameRejection(store);
+
+    expect(error.code).toBe('BACKEND_FAILURE');
+  });
+
+  it('reports an unconfirmed rename without claiming it failed', async () => {
+    const { store, api } = buildCloudStore();
+    api.getRequestStatus.mockResolvedValue({
+      error: true,
+      message: 'Commit failed',
+    });
+
+    const error = await renameRejection(store);
+
+    expect(error.code).toBe('BACKEND_FAILURE');
+    expect(error.message).toContain('may still have been renamed');
+  });
+
+  it('rejects with UNAUTHORIZED without calling the API when unauthenticated', async () => {
+    const { store, fetchWithToken } = buildCloudStore({ authenticated: false });
+
+    const error = await renameRejection(store);
+
+    expect(error).toBeInstanceOf(MediaRenameError);
+    expect(error.code).toBe('UNAUTHORIZED');
+    expect(fetchWithToken).not.toHaveBeenCalled();
+  });
+});
+
+describe('TinaMediaStore — cloud rename routing', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  const buildRoutingStore = (
+    options: Parameters<typeof buildStore>[0] = {}
+  ) => {
+    const built = buildStore(options);
+    built.fetchWithToken.mockImplementation((url: string) =>
+      Promise.resolve(
+        String(url).includes('/rename')
+          ? makeJsonResponse(200, {
+              success: true,
+              path: 'uploads/new.png',
+              src: 'https://assets.tinajs.io/test-client/uploads/new.png',
+              requestId: 'rename-1',
+            })
+          : makeJsonResponse(200, {
+              cursor: null,
+              directories: [],
+              files: [
+                {
+                  filename: 'new.png',
+                  src: 'https://assets.tinajs.io/test-client/uploads/new.png',
+                },
+              ],
+            })
+      )
+    );
+    return built;
+  };
+
+  const runRename = async (store: TinaMediaStore) => {
+    const promise = store.rename!('uploads/old.png', 'uploads/new.png');
+    promise.catch(() => {});
+    await vi.advanceTimersByTimeAsync(1100);
+    return promise;
+  };
+
+  it('renames directly on an unprotected feature branch', async () => {
+    const { store, startMediaEditorialWorkflow, api } = buildRoutingStore({
+      branch: 'feat/x',
+      mediaBranch: 'main',
+      usingProtectedBranch: false,
+    });
+
+    await runRename(store);
+
+    expect(startMediaEditorialWorkflow).not.toHaveBeenCalled();
+    expect(api.usingProtectedBranch).toHaveBeenCalled();
+  });
+
+  it('renames directly on an unprotected media branch', async () => {
+    const { store, startMediaEditorialWorkflow, fetchWithToken } =
+      buildRoutingStore({
+        branch: 'main',
+        mediaBranch: 'main',
+        usingProtectedBranch: false,
+      });
+
+    await runRename(store);
+
+    expect(startMediaEditorialWorkflow).not.toHaveBeenCalled();
+    const renameBody = JSON.parse(
+      fetchWithToken.mock.calls.find(([url]) =>
+        String(url).includes('/rename')
+      )[1].body
+    );
+    expect(renameBody.branch).toBe('main');
+  });
+
+  it('routes a protected feature branch through the editorial workflow', async () => {
+    const { store, startMediaEditorialWorkflow, events, fetchWithToken } =
+      buildRoutingStore({
+        branch: 'release',
+        mediaBranch: 'main',
+        usingProtectedBranch: true,
+      });
+    const prompted = vi.fn();
+    events.subscribe('media:workflow:confirm-branch', prompted);
+
+    await runRename(store);
+
+    expect(prompted).toHaveBeenCalledTimes(1);
+    expect(startMediaEditorialWorkflow).toHaveBeenCalledTimes(1);
+    // The workflow branches off the branch the editor is on, not the media branch.
+    expect(startMediaEditorialWorkflow.mock.calls[0][0]).toMatchObject({
+      baseBranch: 'release',
+      operation: 'rename',
+    });
+    // Nothing is written before the workflow exists.
+    const renameCallIndex = fetchWithToken.mock.calls.findIndex(([url]) =>
+      String(url).includes('/rename')
+    );
+    expect(renameCallIndex).toBeGreaterThan(-1);
+    expect(
+      startMediaEditorialWorkflow.mock.invocationCallOrder[0]
+    ).toBeLessThan(fetchWithToken.mock.invocationCallOrder[renameCallIndex]);
+  });
+
+  it('routes a protected media branch through the editorial workflow', async () => {
+    const { store, startMediaEditorialWorkflow } = buildRoutingStore({
+      branch: 'main',
+      mediaBranch: 'main',
+      usingProtectedBranch: true,
+    });
+
+    await runRename(store);
+
+    expect(startMediaEditorialWorkflow).toHaveBeenCalledTimes(1);
+    expect(startMediaEditorialWorkflow.mock.calls[0][0]).toMatchObject({
+      baseBranch: 'main',
+      operation: 'rename',
+    });
+  });
+
+  it('renames directly when editorial workflow is unavailable, letting the API decide', async () => {
+    // usingProtectedBranch() is false without the feature, so the call goes
+    // through and the assets API returns its own UNSUPPORTED message.
+    const { store, startMediaEditorialWorkflow, fetchWithToken } =
+      buildRoutingStore({
+        branch: 'main',
+        mediaBranch: 'main',
+        usingProtectedBranch: false,
+      });
+    fetchWithToken.mockImplementation((url: string) =>
+      Promise.resolve(
+        String(url).includes('/rename')
+          ? makeJsonResponse(400, {
+              code: 'UNSUPPORTED',
+              message:
+                "Renaming media on the protected branch 'main' requires the editorial workflow.",
+            })
+          : makeJsonResponse(200, { cursor: null, directories: [], files: [] })
+      )
+    );
+
+    const error = await runRename(store).catch((e) => e);
+
+    expect(startMediaEditorialWorkflow).not.toHaveBeenCalled();
+    expect(error.code).toBe('UNSUPPORTED');
+    expect(error.message).toContain('requires the editorial workflow');
+  });
+
+  it('does not fetch project metadata to decide the route', async () => {
+    const { store, api } = buildRoutingStore({ mediaBranch: 'main' });
+
+    await runRename(store);
+
+    expect(api.getProject).not.toHaveBeenCalled();
+  });
+});
+
+describe('TinaMediaStore — cloud rename (protected-branch workflow)', () => {
+  const WORKFLOW_BRANCH = 'tina/media-rename-uploads-old-png';
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  const buildWorkflowStore = ({
+    listResponses,
+    ...options
+  }: {
+    listResponses?: Response[];
+  } & Parameters<typeof buildStore>[0] = {}) => {
+    const built = buildStore({
+      branch: 'main',
+      mediaBranch: 'main',
+      usingProtectedBranch: true,
+      ...options,
+    });
+    const listQueue = listResponses ? [...listResponses] : undefined;
+    built.fetchWithToken.mockImplementation((url: string) => {
+      if (String(url).includes('/rename')) {
+        return Promise.resolve(
+          makeJsonResponse(200, {
+            success: true,
+            path: 'uploads/new.png',
+            src: `https://assets.tinajs.io/test-client/__staging/${WORKFLOW_BRANCH}/__file/uploads/new.png`,
+            requestId: 'rename-request-1',
+          })
+        );
+      }
+      if (listQueue?.length) return Promise.resolve(listQueue.shift());
+      return Promise.resolve(
+        makeJsonResponse(200, {
+          cursor: null,
+          directories: [],
+          files: [
+            {
+              filename: 'new.png',
+              src: `https://assets.tinajs.io/test-client/__staging/${WORKFLOW_BRANCH}/__file/uploads/new.png`,
+            },
+          ],
+        })
+      );
+    });
+    return built;
+  };
+
+  const runRename = async (store: TinaMediaStore) => {
+    const promise = store.rename!('uploads/old.png', 'uploads/new.png');
+    promise.catch(() => {});
+    await vi.advanceTimersByTimeAsync(1100);
+    return promise;
+  };
+
+  const renameRequest = (fetchWithToken: FetchWithTokenMock) =>
+    JSON.parse(
+      fetchWithToken.mock.calls.find(([url]) =>
+        String(url).includes('/rename')
+      )[1].body
+    );
+
+  it('starts a rename workflow with the source and target paths', async () => {
+    const { store, startMediaEditorialWorkflow } = buildWorkflowStore();
+
+    await runRename(store);
+
+    expect(startMediaEditorialWorkflow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        operation: 'rename',
+        repoPath: 'uploads/old.png',
+        targetRepoPath: 'uploads/new.png',
+        baseBranch: 'main',
+      })
+    );
+  });
+
+  it('bases the workflow branch name on the source path', async () => {
+    const { store, startMediaEditorialWorkflow } = buildWorkflowStore();
+
+    await runRename(store);
+
+    expect(startMediaEditorialWorkflow.mock.calls[0][0].branchName).toContain(
+      'media-rename-uploads-old-png'
+    );
+  });
+
+  it('renames against the server-formatted workflow branch, not the requested one', async () => {
+    const startMediaEditorialWorkflow = vi.fn().mockResolvedValue({
+      // The server lowercases and normalises whatever the client asked for.
+      branchName: 'tina/media-rename-uploads-a-png',
+      requestId: 'workflow-1',
+      status: 'queued',
+    });
+    const { store, fetchWithToken } = buildWorkflowStore({
+      startMediaEditorialWorkflow,
+    });
+
+    await runRename(store);
+
+    expect(startMediaEditorialWorkflow.mock.calls[0][0].branchName).not.toBe(
+      'tina/media-rename-uploads-a-png'
+    );
+    expect(renameRequest(fetchWithToken).branch).toBe(
+      'tina/media-rename-uploads-a-png'
+    );
+  });
+
+  it('polls the workflow request, not the rename request', async () => {
+    const { store, api, waitForEditorialWorkflowStatus } = buildWorkflowStore();
+
+    await runRename(store);
+
+    expect(api.getRequestStatus).not.toHaveBeenCalled();
+    expect(waitForEditorialWorkflowStatus).toHaveBeenCalledWith(
+      'media-workflow-1',
+      expect.any(Function)
+    );
+  });
+
+  it('resolves the canonical entry while the workflow branch override is active', async () => {
+    const { store, fetchWithToken } = buildWorkflowStore();
+
+    const media = await runRename(store);
+
+    const listUrl = fetchWithToken.mock.calls
+      .map(([url]) => String(url))
+      .find((url) => url.includes('/list/'));
+    expect(listUrl).toContain(`branch=${encodeURIComponent(WORKFLOW_BRANCH)}`);
+    expect(media.src).toContain(`__staging/${WORKFLOW_BRANCH}/__file/`);
+  });
+
+  it('resolves the canonical entry once, after the workflow completes', async () => {
+    const { store, fetchWithToken } = buildWorkflowStore();
+
+    await runRename(store);
+
+    const listCalls = fetchWithToken.mock.calls.filter(([url]) =>
+      String(url).includes('/list/')
+    );
+    expect(listCalls).toHaveLength(1);
+  });
+
+  it('falls back to the rename response when the post-workflow listing misses', async () => {
+    const { store } = buildWorkflowStore({
+      listResponses: [
+        makeJsonResponse(200, { cursor: null, directories: [], files: [] }),
+      ],
+    });
+
+    const media = await runRename(store);
+
+    expect(media.filename).toBe('new.png');
+    expect(media.src).toContain(`__staging/${WORKFLOW_BRANCH}/__file/`);
+  });
+
+  it('rejects rather than reporting success when the workflow fails', async () => {
+    // finalizeMediaWorkflow reports the failure through an event instead of
+    // throwing, so the rename must detect the missing result itself.
+    const { store, events, api } = buildWorkflowStore({
+      waitForEditorialWorkflowStatus: vi
+        .fn()
+        .mockRejectedValue(new Error('indexing failed')),
+    });
+    const renameSuccess = vi.fn();
+    events.subscribe('media:rename:success', renameSuccess);
+
+    const error = await runRename(store).catch((e) => e);
+
+    expect(error).toBeInstanceOf(MediaRenameError);
+    expect(error.code).toBe('BACKEND_FAILURE');
+    expect(error.message).toContain('did not complete');
+    // The store rejects, so MediaManager never dispatches success. (The store
+    // is driven directly here, so assert on the event the manager would relay.)
+    expect(renameSuccess).not.toHaveBeenCalled();
+    // No retry or request-status polling after the workflow gave up.
+    expect(api.getRequestStatus).not.toHaveBeenCalled();
+    expect(api.startMediaEditorialWorkflow).toHaveBeenCalledTimes(1);
+
+    // Workflow state was released: a second attempt starts a new workflow
+    // instead of hitting "A media workflow is already in progress."
+    const second = await runRename(store).catch((e) => e);
+    expect(second.message).toContain('did not complete');
+    expect(api.startMediaEditorialWorkflow).toHaveBeenCalledTimes(2);
+  });
+
+  it('leaves the workflow error as the last event so the overlay keeps showing it', async () => {
+    // <MediaWorkflowOverlay /> maps `media:workflow:error` to its error modal
+    // and `media:workflow:finish` back to idle, so a trailing finish would
+    // dismiss the real workflow message and leave only the generic one.
+    const { store, events } = buildWorkflowStore({
+      waitForEditorialWorkflowStatus: vi
+        .fn()
+        .mockRejectedValue(new Error('indexing failed')),
+    });
+    const seen: string[] = [];
+    let workflowErrorMessage: string | undefined;
+    events.subscribe<{ type: string; message: string }>(
+      'media:workflow:error',
+      (event) => {
+        workflowErrorMessage = event.message;
+      }
+    );
+    events.subscribe('*', (event) => {
+      if (event.type.startsWith('media:workflow:')) seen.push(event.type);
+    });
+
+    await runRename(store).catch(() => {});
+
+    expect(seen.at(-1)).toBe('media:workflow:error');
+    expect(seen.filter((type) => type === 'media:workflow:finish')).toEqual([]);
+    // The overlay renders this message, so it must be the backend's own.
+    expect(workflowErrorMessage).toBe('indexing failed');
+  });
+
+  it('dismisses the progress overlay when the rename itself fails', async () => {
+    // No workflow error was dispatched in this case, so nothing else would
+    // take the overlay out of its executing state.
+    const { store, events, fetchWithToken } = buildWorkflowStore();
+    fetchWithToken.mockImplementation((url: string) =>
+      Promise.resolve(
+        String(url).includes('/rename')
+          ? makeJsonResponse(409, {
+              code: 'NAME_COLLISION',
+              message: 'That name is taken.',
+            })
+          : makeJsonResponse(200, { cursor: null, directories: [], files: [] })
+      )
+    );
+    const seen: string[] = [];
+    events.subscribe('*', (event) => {
+      if (event.type.startsWith('media:workflow:')) seen.push(event.type);
+    });
+
+    const error = await runRename(store).catch((e) => e);
+
+    expect(error.code).toBe('NAME_COLLISION');
+    expect(error.message).toBe('That name is taken.');
+    expect(seen.at(-1)).toBe('media:workflow:finish');
+  });
+
+  it('performs no rename when the editor cancels the branch prompt', async () => {
+    const { store, fetchWithToken, startMediaEditorialWorkflow, events } =
+      buildWorkflowStore({ autoConfirmMediaBranchPrompt: false });
+    events.subscribe('media:workflow:confirm-branch', (event) => {
+      event.onCancel();
+    });
+
+    const error = await runRename(store).catch((e) => e);
+
+    expect(error.ERR_TYPE).toBe('MediaRenameCancelled');
+    expect(startMediaEditorialWorkflow).not.toHaveBeenCalled();
+    expect(fetchWithToken).not.toHaveBeenCalled();
+  });
+
+  it('asks the prompt to hide the direct escape hatch', async () => {
+    const { store, events } = buildWorkflowStore({
+      autoConfirmMediaBranchPrompt: false,
+    });
+    const prompt = vi.fn((event) => event.onCancel());
+    events.subscribe('media:workflow:confirm-branch', prompt);
+
+    await runRename(store).catch(() => {});
+
+    expect(prompt.mock.calls[0][0].allowSaveToProtectedBranch).toBe(false);
+  });
+});
+
+describe('TinaMediaStore — upload and delete prompt behaviour is unchanged', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  it('keeps the direct escape hatch available for an upload', async () => {
+    const { store, fetchWithToken, events } = buildStore({
+      usingProtectedBranch: true,
+      autoConfirmMediaBranchPrompt: false,
+    });
+    const prompt = vi.fn((event) => event.onCancel());
+    events.subscribe('media:workflow:confirm-branch', prompt);
+    fetchWithToken.mockResolvedValue(makeJsonResponse(200, {}));
+
+    await store.persist([
+      {
+        directory: 'uploads',
+        file: new File(['x'], 'a.png', { type: 'image/png' }),
+      },
+    ]);
+
+    expect(prompt.mock.calls[0][0].allowSaveToProtectedBranch).toBe(true);
+  });
+
+  it('keeps the direct escape hatch available for a delete', async () => {
+    const { store, fetchWithToken, events } = buildStore({
+      usingProtectedBranch: true,
+      autoConfirmMediaBranchPrompt: false,
+    });
+    const prompt = vi.fn((event) => event.onCancel());
+    events.subscribe('media:workflow:confirm-branch', prompt);
+    fetchWithToken.mockResolvedValue(makeJsonResponse(200, {}));
+
+    await store.delete({
+      directory: 'uploads',
+      filename: 'a.png',
+    } as Media);
+
+    expect(prompt.mock.calls[0][0].allowSaveToProtectedBranch).toBe(true);
   });
 });

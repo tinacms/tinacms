@@ -856,12 +856,23 @@ mutation addPendingDocumentMutation(
     }
   }
 
+  /**
+   * The server normalises `branchName` (lowercases it, replaces unsafe
+   * characters), so callers must use the `branchName` in the response for any
+   * follow-up call rather than the one they sent.
+   *
+   * `repoPath` is the asset the workflow concerns — for a rename, the source.
+   * `targetRepoPath` is the rename target and is required by the server for
+   * that operation; it must already be sanitised, since the route does not
+   * sanitise it.
+   */
   async startMediaEditorialWorkflow(options: {
     branchName: string;
     baseBranch: string;
     prTitle?: string;
-    operation: 'upload' | 'delete';
+    operation: 'upload' | 'delete' | 'rename';
     repoPath: string;
+    targetRepoPath?: string;
   }): Promise<{ branchName: string; requestId: string; status?: string }> {
     const url = `${this.contentApiBase}/editorial-workflow/${this.clientId}/media`;
     return await this.postEditorialWorkflow(
