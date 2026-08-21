@@ -1,5 +1,18 @@
 # tinacms-cli
 
+## 2.6.1
+
+### Patch Changes
+
+- [#7454](https://github.com/tinacms/tinacms/pull/7454) [`41263f5`](https://github.com/tinacms/tinacms/commit/41263f503e4c02f3b9272aa5dca6fc2c572a60eb) Thanks [@kulesy](https://github.com/kulesy)! - Bump `js-yaml` to 4.3.1, picking up an upstream security fix (GHSA-5p4m-2wfm-xmqj)
+
+- Updated dependencies [[`195087d`](https://github.com/tinacms/tinacms/commit/195087de7e617d9d91b06709db869787ac0c800f), [`8d94e35`](https://github.com/tinacms/tinacms/commit/8d94e354d9bb62ce52defb56c1e25ac114b0d971), [`37ca62b`](https://github.com/tinacms/tinacms/commit/37ca62b66aadb2cb80daa280a25a390c0bc2e4af), [`37ca62b`](https://github.com/tinacms/tinacms/commit/37ca62b66aadb2cb80daa280a25a390c0bc2e4af)]:
+  - @tinacms/graphql@2.4.10
+  - tinacms@3.12.1
+  - @tinacms/metrics@2.1.1
+  - @tinacms/schema-tools@2.9.0
+  - @tinacms/search@1.2.23
+
 ## 2.6.0
 
 ### Minor Changes

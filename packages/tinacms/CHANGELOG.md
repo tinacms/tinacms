@@ -1,5 +1,21 @@
 # tinacms
 
+## 3.12.1
+
+### Patch Changes
+
+- [#6763](https://github.com/tinacms/tinacms/pull/6763) [`8d94e35`](https://github.com/tinacms/tinacms/commit/8d94e354d9bb62ce52defb56c1e25ac114b0d971) Thanks [@kulesy](https://github.com/kulesy)! - Fix "Save to new branch" failing with "Branch operation failed" when the derived branch name is not a valid Git ref, e.g. when a collection's `path` has a trailing slash, producing `content/articles//foo.mdx` and the invalid ref `tina/articles//foo`. The default branch name derived from the file path, and any user-typed name, are now normalised to a valid ref: repeated and leading/trailing slashes collapse, characters Git forbids in refs (whitespace, control characters, `~ ^ : ? * [ \` and the `@{` sequence) become hyphens, `..` runs collapse, and leading dots and trailing `.` / `.lock` are stripped per path component. Saving is disabled while the name normalises to an empty string. The same normalisation now runs when creating a branch from the branch switcher and from the deleted-branch recovery modal, and the duplicated `formatBranchName` helpers are unified into a single util (the legacy branch switcher previously deleted invalid characters; it now replaces them with hyphens like the main switcher).
+
+- [#7445](https://github.com/tinacms/tinacms/pull/7445) [`37ca62b`](https://github.com/tinacms/tinacms/commit/37ca62b66aadb2cb80daa280a25a390c0bc2e4af) Thanks [@kulesy](https://github.com/kulesy)! - Skip TinaCloud identity requests when no auth token is stored. Logged-out admin loads no longer produce misleading 401/CORS console errors; a clear console message now points at the login popup console instead. Also fixes an unawaited auth guard in GetDocument, stops the document view from loading forever when that guard rejects the request, and fixes an unhandled promise rejection when the project settings request fails.
+
+- [#7445](https://github.com/tinacms/tinacms/pull/7445) [`37ca62b`](https://github.com/tinacms/tinacms/commit/37ca62b66aadb2cb80daa280a25a390c0bc2e4af) Thanks [@kulesy](https://github.com/kulesy)! - Fix the collection list and collection search hanging on the loading screen when the session check says the user is not signed in. Both now settle and render instead of spinning until the page is reloaded.
+
+- Updated dependencies [[`4f90806`](https://github.com/tinacms/tinacms/commit/4f9080666308063332e16d96d00a75ff7348c011)]:
+  - @tinacms/mdx@2.2.1
+  - @tinacms/bridge@0.3.1
+  - @tinacms/schema-tools@2.9.0
+  - @tinacms/search@1.2.23
+
 ## 3.12.0
 
 ### Minor Changes

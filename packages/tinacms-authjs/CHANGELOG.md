@@ -1,5 +1,17 @@
 # tinacms-authjs
 
+## 24.0.3
+
+### Patch Changes
+
+- [#7437](https://github.com/tinacms/tinacms/pull/7437) [`e964c0a`](https://github.com/tinacms/tinacms/commit/e964c0a8c81564e6b81cf1d58c27a8b1e02fc419) Thanks [@kulesy](https://github.com/kulesy)! - Fix the package outside webpack. Unwraps the CommonJS default export of `next-auth`, and stops the node entry importing the browser `tinacms` package for a single string constant. Netlify Functions, Vercel Functions and plain Node ESM previously failed to load with `(0 , import_credentials.default) is not a function`. Dropping that import also shrinks bundled backends: the Netlify Functions sample from the docs goes from 21.0 MB to 5.4 MB.
+
+- [#7456](https://github.com/tinacms/tinacms/pull/7456) [`195087d`](https://github.com/tinacms/tinacms/commit/195087de7e617d9d91b06709db869787ac0c800f) Thanks [@kulesy](https://github.com/kulesy)! - Bump `next-auth` to 4.24.15
+
+- Updated dependencies [[`8d94e35`](https://github.com/tinacms/tinacms/commit/8d94e354d9bb62ce52defb56c1e25ac114b0d971), [`37ca62b`](https://github.com/tinacms/tinacms/commit/37ca62b66aadb2cb80daa280a25a390c0bc2e4af), [`37ca62b`](https://github.com/tinacms/tinacms/commit/37ca62b66aadb2cb80daa280a25a390c0bc2e4af)]:
+  - tinacms@3.12.1
+  - @tinacms/schema-tools@2.9.0
+
 ## 24.0.2
 
 ### Patch Changes

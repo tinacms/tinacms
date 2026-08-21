@@ -1,5 +1,15 @@
 # tina-graphql
 
+## 2.4.10
+
+### Patch Changes
+
+- [#7456](https://github.com/tinacms/tinacms/pull/7456) [`195087d`](https://github.com/tinacms/tinacms/commit/195087de7e617d9d91b06709db869787ac0c800f) Thanks [@kulesy](https://github.com/kulesy)! - Bump `js-yaml` to 3.15.1, picking up an upstream security fix (GHSA-5p4m-2wfm-xmqj)
+
+- Updated dependencies [[`4f90806`](https://github.com/tinacms/tinacms/commit/4f9080666308063332e16d96d00a75ff7348c011)]:
+  - @tinacms/mdx@2.2.1
+  - @tinacms/schema-tools@2.9.0
+
 ## 2.4.9
 
 ### Patch Changes
