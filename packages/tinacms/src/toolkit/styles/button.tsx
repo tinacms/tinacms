@@ -75,6 +75,7 @@ export const Button = ({
         className
       )}
       {...props}
+      disabled={Tag === 'button' ? disabled || busy : undefined}
     >
       {busy ? <LoadingDots color='currentColor' /> : children}
     </Tag>
@@ -121,6 +122,7 @@ export const IconButton = ({
         className
       )}
       {...props}
+      disabled={disabled || busy}
     >
       {children}
     </button>
