@@ -5,16 +5,28 @@ import {
   MediaListOffset,
 } from '@toolkit/core';
 import {
+  MEDIA_CATEGORIES,
   type MediaAccept,
+  type MediaCategory,
   resolveMediaAccept,
 } from '@tinacms/schema-tools';
 import { LoadingDots } from '@toolkit/form-builder';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
 import { CloseIcon, TrashIcon } from '@toolkit/icons';
 import { FullscreenModal, Modal, ModalBody } from '@toolkit/react-modals';
 import { useCMS } from '@toolkit/react-tinacms';
 import { Button, IconButton } from '@toolkit/styles';
 import {
   ArrowDownToLine,
+  ChevronDown,
   CircleAlert,
   CloudUpload,
   ExternalLink,
@@ -22,6 +34,7 @@ import {
   Folder,
   LayoutGrid,
   List,
+  Lock,
   RefreshCw,
   Search,
   TextCursorInput,
@@ -189,6 +202,7 @@ export function MediaPicker({
   const [mediaFilter, setMediaFilter] = useState<'all' | 'folders' | 'files'>(
     'all'
   );
+  const [typeFilter, setTypeFilter] = useState<MediaCategory | 'all'>('all');
 
   /**
    * current offset is last element in offsetHistory[]
@@ -214,13 +228,18 @@ export function MediaPicker({
   // A store that ignores `ext` would return everything, so honour the field's
   // `accept` only when the store says it filters. The dropzone still enforces
   // it on upload either way.
-  const acceptedExtensions = React.useMemo(
-    () =>
-      cms.media.store.extensionFilterable
-        ? resolveMediaAccept(fieldAccept)
-        : [],
-    [fieldAccept, cms.media.store.extensionFilterable]
-  );
+  const acceptedExtensions = React.useMemo(() => {
+    if (!cms.media.store.extensionFilterable) return [];
+
+    const fromField = resolveMediaAccept(fieldAccept);
+    if (typeFilter === 'all') return fromField;
+
+    const fromToolbar = resolveMediaAccept(typeFilter);
+    if (!fromField.length) return fromToolbar;
+
+    // The field sets the ceiling; the toolbar can only narrow within it.
+    return fromToolbar.filter((ext) => fromField.includes(ext));
+  }, [fieldAccept, typeFilter, cms.media.store.extensionFilterable]);
 
   async function loadMedia(loadFolders = true) {
     const requestId = ++listRequestRef.current;
@@ -637,7 +656,14 @@ export function MediaPicker({
                 clear={() => setSearch('')}
               />
             )}
-            <div className='ml-auto'>
+            <div className='ml-auto flex items-center gap-3'>
+              {cms.media.store.extensionFilterable && (
+                <MediaTypeFilter
+                  value={typeFilter}
+                  setValue={setTypeFilter}
+                  lockedTo={resolveMediaAccept(fieldAccept)}
+                />
+              )}
               <MediaFilterToggle
                 value={mediaFilter}
                 setValue={setMediaFilter}
@@ -1029,6 +1055,84 @@ const MediaFilterToggle = ({
         </button>
       ))}
     </div>
+  );
+};
+
+const TYPE_FILTER_LABELS: Record<MediaCategory, string> = {
+  image: 'Images',
+  video: 'Video',
+  audio: 'Audio',
+  document: 'Documents',
+};
+
+/**
+ * Narrows the library to one media category. When the picker is opened from a
+ * field that declares `accept`, that ceiling is shown instead — offering
+ * choices the field would override reads as a broken control.
+ */
+const MediaTypeFilter = ({
+  value,
+  setValue,
+  lockedTo,
+}: {
+  value: MediaCategory | 'all';
+  setValue: (value: MediaCategory | 'all') => void;
+  lockedTo: string[];
+}) => {
+  if (lockedTo.length) {
+    const label =
+      lockedTo.length > 2
+        ? `${lockedTo.length} types only`
+        : `${lockedTo.join(', ').toUpperCase()} only`;
+
+    return (
+      <span
+        className='grow-0 flex items-center gap-1.5 whitespace-nowrap rounded-lg border border-dashed border-gray-200 bg-gray-100 px-3 py-1.5 text-sm text-gray-500'
+        title={`This field accepts ${lockedTo.join(', ')}`}
+      >
+        <Lock className='w-3.5 h-3.5 opacity-80' />
+        {label}
+      </span>
+    );
+  }
+
+  const active = value !== 'all';
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type='button'
+          className={`grow-0 flex items-center gap-2 whitespace-nowrap rounded-lg border bg-white px-3 py-1.5 text-sm transition-colors ease-out duration-150 ${
+            active
+              ? 'border-tina-orange text-tina-orange font-medium'
+              : 'border-gray-200 text-gray-700 hover:border-gray-300'
+          }`}
+        >
+          {active ? TYPE_FILTER_LABELS[value] : 'Any type'}
+          <ChevronDown
+            className={`w-4 h-4 ${active ? 'opacity-90' : 'text-gray-400'}`}
+          />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align='end' className='min-w-52'>
+        <DropdownMenuRadioGroup
+          value={value}
+          onValueChange={(next) => setValue(next as MediaCategory | 'all')}
+        >
+          <DropdownMenuRadioItem value='all'>Any type</DropdownMenuRadioItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuLabel>Category</DropdownMenuLabel>
+          {(Object.keys(MEDIA_CATEGORIES) as MediaCategory[]).map(
+            (category) => (
+              <DropdownMenuRadioItem key={category} value={category}>
+                {TYPE_FILTER_LABELS[category]}
+              </DropdownMenuRadioItem>
+            )
+          )}
+        </DropdownMenuRadioGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 
