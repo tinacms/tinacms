@@ -2,6 +2,7 @@ import * as React from 'react';
 import { wrapFieldsWithMeta } from './wrap-field-with-meta';
 import { InputProps, ImageUpload } from '../components';
 import { Media } from '@toolkit/core';
+import type { MediaAccept } from '@tinacms/schema-tools';
 import { useCMS } from '@toolkit/react-core';
 import { parse } from './text-format';
 import { useState } from 'react';
@@ -11,6 +12,7 @@ interface ImageProps {
   path: string;
   uploadDir?(formValues: any): string;
   clearable?: boolean;
+  accept?: MediaAccept | MediaAccept[];
 }
 
 export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
@@ -56,6 +58,7 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
             allowDelete: true,
             directory,
             onSelect: onChange,
+            accept: props.field.accept,
           });
         }}
         onDrop={async ([file]: File[], fileRejections) => {
