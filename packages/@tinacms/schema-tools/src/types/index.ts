@@ -311,6 +311,19 @@ export type MediaCategory = keyof typeof MEDIA_CATEGORIES;
 export type MediaAccept = MediaExtension | MediaCategory;
 
 /**
+ * Lowercased extension without the dot, from a filename, path or URL.
+ * Query strings and hashes are dropped first, so a transformed asset URL
+ * like `hero.png?fit=crop` still reads as `png`. Dotfiles and extensionless
+ * names return ''.
+ */
+export const extensionOf = (value: string): string => {
+  const path = value.split(/[?#]/)[0];
+  const dot = path.lastIndexOf('.');
+  const slash = path.lastIndexOf('/');
+  return dot > slash + 1 ? path.slice(dot + 1).toLowerCase() : '';
+};
+
+/**
  * Flattens a field's `accept` into concrete extensions, expanding any
  * category shorthand. Unknown values are dropped rather than passed through,
  * so a typo narrows to nothing visible instead of silently disabling the
