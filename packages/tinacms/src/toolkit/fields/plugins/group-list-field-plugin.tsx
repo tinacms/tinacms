@@ -102,6 +102,7 @@ const Group = ({ tinaForm, form, field, input, meta, index }: GroupProps) => {
 
   return (
     <ListFieldMeta
+      data-test={`list-${field.name}`}
       name={input.name}
       label={field.label}
       description={field.description}
@@ -112,6 +113,7 @@ const Group = ({ tinaForm, form, field, input, meta, index }: GroupProps) => {
       actions={
         (!fixedLength || (fixedLength && !isMax)) && (
           <IconButton
+            data-test={`add-item-${field.name}`}
             onClick={addItem}
             disabled={isMax}
             variant='primary'
