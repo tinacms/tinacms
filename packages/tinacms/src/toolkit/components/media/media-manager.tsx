@@ -4,10 +4,7 @@ import {
   MediaListError,
   MediaListOffset,
 } from '@toolkit/core';
-import {
-  type MediaAccept,
-  resolveMediaAccept,
-} from '@tinacms/schema-tools';
+import { type MediaAccept, resolveMediaAccept } from '@tinacms/schema-tools';
 import { LoadingDots } from '@toolkit/form-builder';
 import { CloseIcon, TrashIcon } from '@toolkit/icons';
 import { FullscreenModal, Modal, ModalBody } from '@toolkit/react-modals';
