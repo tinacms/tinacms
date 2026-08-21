@@ -642,9 +642,6 @@ catalogs:
     url-pattern:
       specifier: ^1.0.3
       version: 1.0.3
-    uvu:
-      specifier: 0.5.6
-      version: 0.5.6
     vfile-message:
       specifier: 3.1.4
       version: 3.1.4
@@ -1788,9 +1785,6 @@ importers:
       stringify-entities:
         specifier: 'catalog:'
         version: 4.0.3
-      typedoc:
-        specifier: 'catalog:'
-        version: 0.26.11(typescript@5.9.3)
       unist-util-source:
         specifier: 'catalog:'
         version: 4.0.2
@@ -1800,9 +1794,6 @@ importers:
       unist-util-visit:
         specifier: 'catalog:'
         version: 4.1.2
-      uvu:
-        specifier: 'catalog:'
-        version: 0.5.6
       vfile-message:
         specifier: 'catalog:'
         version: 3.1.4
@@ -1837,6 +1828,9 @@ importers:
       ts-node:
         specifier: 'catalog:'
         version: 10.9.2(@types/node@22.19.3)(typescript@5.9.3)
+      typedoc:
+        specifier: 'catalog:'
+        version: 0.26.11(typescript@5.9.3)
       typedoc-plugin-markdown:
         specifier: 'catalog:'
         version: 3.17.1(typedoc@0.26.11(typescript@5.9.3))
