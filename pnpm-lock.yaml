@@ -376,8 +376,8 @@ catalogs:
       specifier: ^4.2.0
       version: 4.2.0
     dompurify:
-      specifier: ^3.3.1
-      version: 3.3.1
+      specifier: ^3.4.13
+      version: 3.4.13
     dotenv:
       specifier: ^16.4.7
       version: 16.6.1
@@ -2020,7 +2020,7 @@ importers:
         version: link:../bridge
       dompurify:
         specifier: 'catalog:'
-        version: 3.3.1
+        version: 3.4.13
     devDependencies:
       '@tinacms/scripts':
         specifier: workspace:*
@@ -10411,9 +10411,6 @@ packages:
   domhandler@5.0.3:
     resolution: {integrity: sha512-cgwlv/1iFQiFnU96XXgROh8xTeetsnJiDsTc7TYCLFd9+/WNkIqPTxiM/8pSd8VIrhXGTf1Ny1q1hquVqDJB5w==}
     engines: {node: '>= 4'}
-
-  dompurify@3.3.1:
-    resolution: {integrity: sha512-qkdCKzLNtrgPFP1Vo+98FRzJnBRGe4ffyCea9IwHB1fyxPOeNTHpLKYGd4Uk9xvNoH0ZoOjwZxNptyMwqrId1Q==}
 
   dompurify@3.4.13:
     resolution: {integrity: sha512-2vmYIoqjze2d+kakP8S/nS5shfsl587kzwEjcGlTdiksUVgFHnFCsLYDVj/JNqJVOQZGSYBTmuycv0PodwmnMQ==}
@@ -26576,10 +26573,6 @@ snapshots:
     dependencies:
       domelementtype: 2.3.0
 
-  dompurify@3.3.1:
-    optionalDependencies:
-      '@types/trusted-types': 2.0.7
-
   dompurify@3.4.13:
     optionalDependencies:
       '@types/trusted-types': 2.0.7
@@ -31726,7 +31719,7 @@ snapshots:
       '@posthog/core': 1.22.0
       '@posthog/types': 1.347.1
       core-js: 3.47.0
-      dompurify: 3.3.1
+      dompurify: 3.4.13
       fflate: 0.4.8
       preact: 10.28.3
       query-selector-shadow-dom: 1.0.1
