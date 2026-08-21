@@ -83,6 +83,7 @@ const List = ({ tinaForm, form, field, input, meta, index }: ListProps) => {
 
   return (
     <ListFieldMeta
+      data-test={`list-${field.name}`}
       name={input.name}
       label={field.label}
       description={field.description}
@@ -91,6 +92,7 @@ const List = ({ tinaForm, form, field, input, meta, index }: ListProps) => {
       tinaForm={tinaForm}
       actions={
         <IconButton
+          data-test={`add-item-${field.name}`}
           onClick={addItem}
           variant='primary'
           size='small'
