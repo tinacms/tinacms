@@ -102,6 +102,7 @@ const Group = ({ tinaForm, form, field, input, meta, index }: GroupProps) => {
 
   return (
     <ListFieldMeta
+      data-test={`list-${field.name}`}
       name={input.name}
       label={field.label}
       description={field.description}
@@ -112,6 +113,7 @@ const Group = ({ tinaForm, form, field, input, meta, index }: GroupProps) => {
       actions={
         (!fixedLength || (fixedLength && !isMax)) && (
           <IconButton
+            data-test={`add-item-${field.name}`}
             onClick={addItem}
             disabled={isMax}
             variant='primary'
@@ -305,6 +307,7 @@ export const ItemDeleteButton = ({ onClick, disabled = false }) => {
   return (
     <button
       type='button'
+      data-test='delete-item'
       className={`w-8 px-1 py-2.5 flex items-center justify-center text-gray-200 hover:opacity-100 opacity-30 hover:bg-gray-50 ${
         disabled && 'pointer-events-none opacity-30 cursor-not-allowed'
       }`}
