@@ -38,6 +38,12 @@ const Page: Collection = {
         contentBlockSchema,
       ],
     },
+    {
+      name: 'image',
+      label: 'Image',
+      type: 'image',
+      accept: 'jpeg',
+    },
   ],
 };
 
