@@ -34,6 +34,7 @@ import {
   REFS_REFERENCE_FIELD,
   type TernaryFilter,
   coerceFilterChainOperands,
+  indexSublevelName,
   makeFilter,
   makeFilterSuffixes,
   makeFolderOpsForCollection,
@@ -1092,7 +1093,7 @@ export class Database {
             }`,
             SUBLEVEL_OPTIONS
           )
-          .sublevel(sort, SUBLEVEL_OPTIONS)
+          .sublevel(indexSublevelName(sort, indexDefinition), SUBLEVEL_OPTIONS)
       : rootLevel;
 
     if (!query.gt && !query.gte) {
@@ -1121,6 +1122,10 @@ export class Database {
       ? new RegExp(`^${fieldsPattern}(?<_filepath_>.+)`)
       : new RegExp(`^(?<_filepath_>.+)`);
     const itemFilter = makeFilter({ filterChain });
+    // Defense in depth against duplicate index rows for the same document
+    // (e.g. a stale row left behind by an index key encoding change, see
+    // #7053) so a document can never surface twice in a single result page.
+    const seenPaths = new Set<string>();
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -1160,6 +1165,11 @@ export class Database {
       if (!itemFilter(itemRecord)) {
         continue;
       }
+
+      if (seenPaths.has(filepath)) {
+        continue;
+      }
+      seenPaths.add(filepath);
 
       if (limit !== -1 && edges.length >= limit) {
         if (query.reverse) {
