@@ -20,7 +20,7 @@ import GetCMS from '../components/GetCMS';
 import GetCollection from '../components/GetCollection';
 import GetDocument from '../components/GetDocument';
 import { PageWrapper } from '../components/Page';
-import { useCollectionFolder } from './utils';
+import { decodeRouteParam, useCollectionFolder } from './utils';
 
 const updateDocument = async (
   cms: TinaCMS,
@@ -46,7 +46,9 @@ const CollectionUpdatePage = () => {
   const folder = useCollectionFolder();
   const { '*': filename } = rest; // TODO can just use the folder.name instead
 
-  const resolvedFile = folder.fullyQualifiedName ? folder.name : filename;
+  const resolvedFile = folder.fullyQualifiedName
+    ? folder.name
+    : decodeRouteParam(filename);
   return (
     <GetCMS>
       {(cms: TinaCMS) => (
