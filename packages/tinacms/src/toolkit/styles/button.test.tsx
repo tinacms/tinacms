@@ -56,6 +56,52 @@ describe('Button', () => {
     );
     expect(screen.getByRole('link').hasAttribute('disabled')).toBe(false);
   });
+
+  it('disables a link with aria-disabled and removes it from the tab order', () => {
+    render(
+      <Button as='a' href='https://tina.io' disabled>
+        Read our docs
+      </Button>
+    );
+    const link = screen.getByRole('link');
+    expect(link.getAttribute('aria-disabled')).toBe('true');
+    expect(link.tabIndex).toBe(-1);
+  });
+
+  it('leaves an enabled link untouched', () => {
+    render(
+      <Button as='a' href='https://tina.io'>
+        Read our docs
+      </Button>
+    );
+    const link = screen.getByRole('link');
+    expect(link.hasAttribute('aria-disabled')).toBe(false);
+    expect(link.hasAttribute('tabindex')).toBe(false);
+  });
+
+  it('forwards disabled to a component passed via as', () => {
+    const Custom = (props: React.ComponentProps<'button'>) => (
+      <button type='button' {...props} />
+    );
+    render(
+      <Button as={Custom} disabled>
+        Save draft
+      </Button>
+    );
+    expect(buttonEl().disabled).toBe(true);
+  });
+
+  it('stays disabled when both disabled and busy are set', () => {
+    const onClick = vi.fn();
+    render(
+      <Button disabled busy onClick={onClick}>
+        Save draft
+      </Button>
+    );
+    expect(buttonEl().disabled).toBe(true);
+    buttonEl().click();
+    expect(onClick).not.toHaveBeenCalled();
+  });
 });
 
 describe('IconButton', () => {

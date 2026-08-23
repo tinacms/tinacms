@@ -63,6 +63,15 @@ export const Button = ({
     medium: `text-sm h-10 px-8`,
     custom: ``,
   };
+  const inert = disabled || busy;
+  // `as` can render a tag that has no `disabled` attribute, so those fall back
+  // to the aria/tabIndex pair used for disabled link-buttons elsewhere.
+  const inertProps =
+    typeof Tag !== 'string' || Tag === 'button'
+      ? { disabled: inert }
+      : inert
+        ? { 'aria-disabled': true, tabIndex: -1 }
+        : {};
 
   return (
     <Tag
@@ -75,7 +84,7 @@ export const Button = ({
         className
       )}
       {...props}
-      disabled={Tag === 'button' ? disabled || busy : undefined}
+      {...inertProps}
     >
       {busy ? <LoadingDots color='currentColor' /> : children}
     </Tag>
