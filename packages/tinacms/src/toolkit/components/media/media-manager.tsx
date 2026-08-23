@@ -4,10 +4,6 @@ import {
   MediaListError,
   MediaListOffset,
 } from '@toolkit/core';
-import {
-  type MediaAccept,
-  resolveMediaAccept,
-} from '@tinacms/schema-tools';
 import { LoadingDots } from '@toolkit/form-builder';
 import { CloseIcon, TrashIcon } from '@toolkit/icons';
 import { FullscreenModal, Modal, ModalBody } from '@toolkit/react-modals';
@@ -98,7 +94,6 @@ export interface MediaRequest {
   onSelect?(_media: Media): void;
   close?(): void;
   allowDelete?: boolean;
-  accept?: MediaAccept | MediaAccept[];
 }
 
 export function MediaManager() {
@@ -150,7 +145,6 @@ export function MediaPicker({
   allowDelete,
   onSelect,
   close,
-  accept: fieldAccept,
   ...props
 }: MediaRequest) {
   const cms = useCMS();
@@ -211,17 +205,6 @@ export function MediaPicker({
   const listRequestRef = useRef(0);
   const newMediaSrcsRef = useRef<Set<string>>(new Set());
 
-  // A store that ignores `ext` would return everything, so honour the field's
-  // `accept` only when the store says it filters. The dropzone still enforces
-  // it on upload either way.
-  const acceptedExtensions = React.useMemo(
-    () =>
-      cms.media.store.extensionFilterable
-        ? resolveMediaAccept(fieldAccept)
-        : [],
-    [fieldAccept, cms.media.store.extensionFilterable]
-  );
-
   async function loadMedia(loadFolders = true) {
     const requestId = ++listRequestRef.current;
     setListState('loading');
@@ -237,7 +220,6 @@ export function MediaPicker({
         ],
         filesOnly: !loadFolders,
         search: debouncedSearch || undefined,
-        ext: acceptedExtensions.length ? acceptedExtensions : undefined,
       });
       if (requestId !== listRequestRef.current) return;
       setList((prev) => {
@@ -308,13 +290,7 @@ export function MediaPicker({
         resetList();
       }
     );
-  }, [
-    offset,
-    directory,
-    debouncedSearch,
-    acceptedExtensions,
-    cms.media.isConfigured,
-  ]);
+  }, [offset, directory, debouncedSearch, cms.media.isConfigured]);
 
   const onClickMediaItem = (item: Media) => {
     if (!item) {
@@ -363,15 +339,11 @@ export function MediaPicker({
   }
 
   const [uploading, setUploading] = useState(false);
-  const globalAccept = Array.isArray(
+  const accept = Array.isArray(
     cms.api.tina.schema.schema?.config?.media?.accept
   )
     ? cms.api.tina.schema.schema?.config?.media?.accept.join(',')
     : cms.api.tina.schema.schema?.config?.media?.accept;
-  const fieldExtensions = resolveMediaAccept(fieldAccept);
-  const accept = fieldExtensions.length
-    ? fieldExtensions.map((ext) => `.${ext}`).join(',')
-    : globalAccept;
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: dropzoneAcceptFromString(
       accept || cms.media.accept || DEFAULT_MEDIA_UPLOAD_TYPES
