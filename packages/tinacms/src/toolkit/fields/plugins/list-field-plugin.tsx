@@ -181,7 +181,11 @@ const Item = ({
             <FieldsBuilder padding={false} form={tinaForm} fields={fields} />
           </ItemClickTarget>
           {(!fixedLength || (fixedLength && !isMin)) && (
-            <ItemDeleteButton disabled={isMin} onClick={removeItem} />
+            <ItemDeleteButton
+              disabled={isMin}
+              onClick={removeItem}
+              fieldName={`${field.name}.${index}`}
+            />
           )}
         </ItemHeader>
       )}

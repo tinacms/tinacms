@@ -17,11 +17,10 @@ const listValues = (page): Promise<string[]> =>
     .locator('[data-test="list-hobbies"] input')
     .evaluateAll((inputs) => inputs.map((i) => (i as HTMLInputElement).value));
 
+// The delete hook is namespaced by field path, so this addresses the exact row
+// rather than relying on descendant order within the wrapper.
 const deleteItemAt = (page, index: number) =>
-  page
-    .locator('[data-test="list-hobbies"] [data-test="delete-item"]')
-    .nth(index)
-    .click();
+  page.locator(`[data-test="delete-item-hobbies.${index}"]`).click();
 
 /**
  * Add, remove and persist items on a `list: true` field.
