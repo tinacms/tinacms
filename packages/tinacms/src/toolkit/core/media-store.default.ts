@@ -191,10 +191,6 @@ export class TinaMediaStore implements MediaStore {
 
   searchable = true;
 
-  // Only the v2 list endpoint filters by extension; the local branch below
-  // and `staticMedia` both ignore it.
-  extensionFilterable = true;
-
   // allow up to 100MB uploads
   maxSize = 100 * 1024 * 1024;
 
@@ -880,13 +876,7 @@ export class TinaMediaStore implements MediaStore {
           options.limit || 20
         }${options.offset ? `&cursor=${options.offset}` : ''}${
           encodedBranch ? `&branch=${encodedBranch}` : ''
-        }${
-          options.search ? `&search=${encodeURIComponent(options.search)}` : ''
-        }${
-          options.ext?.length
-            ? `&ext=${encodeURIComponent(options.ext.join(','))}`
-            : ''
-        }`
+        }${options.search ? `&search=${encodeURIComponent(options.search)}` : ''}`
       );
 
       if (res.status == 401) {

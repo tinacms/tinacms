@@ -271,69 +271,6 @@ export type DateTimeField = (
     type: 'datetime';
   };
 
-/**
- * File extensions the media manager can filter on. Not a list of what may be
- * uploaded — that is `media.accept` — but the vocabulary a field or filter
- * uses to narrow what is shown.
- */
-export const MEDIA_EXTENSIONS = [
-  'jpg',
-  'jpeg',
-  'png',
-  'gif',
-  'webp',
-  'svg',
-  'avif',
-  'ico',
-  'mp4',
-  'webm',
-  'mov',
-  'mp3',
-  'wav',
-  'ogg',
-  'pdf',
-  'json',
-  'csv',
-  'txt',
-] as const;
-
-export type MediaExtension = (typeof MEDIA_EXTENSIONS)[number];
-
-export const MEDIA_CATEGORIES = {
-  image: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'avif', 'ico'],
-  video: ['mp4', 'webm', 'mov'],
-  audio: ['mp3', 'wav', 'ogg'],
-  document: ['pdf', 'json', 'csv', 'txt'],
-} as const satisfies Record<string, readonly MediaExtension[]>;
-
-export type MediaCategory = keyof typeof MEDIA_CATEGORIES;
-
-export type MediaAccept = MediaExtension | MediaCategory;
-
-/**
- * Flattens a field's `accept` into concrete extensions, expanding any
- * category shorthand. Unknown values are dropped rather than passed through,
- * so a typo narrows to nothing visible instead of silently disabling the
- * filter.
- */
-export const resolveMediaAccept = (
-  accept: MediaAccept | MediaAccept[] | undefined
-): MediaExtension[] => {
-  if (!accept) return [];
-  const requested = Array.isArray(accept) ? accept : [accept];
-  const resolved = new Set<MediaExtension>();
-  for (const entry of requested) {
-    if (entry in MEDIA_CATEGORIES) {
-      for (const ext of MEDIA_CATEGORIES[entry as MediaCategory]) {
-        resolved.add(ext);
-      }
-    } else if ((MEDIA_EXTENSIONS as readonly string[]).includes(entry)) {
-      resolved.add(entry as MediaExtension);
-    }
-  }
-  return [...resolved];
-};
-
 export type ImageField = (
   | FieldGeneric<string, undefined>
   | FieldGeneric<string, true>
@@ -351,19 +288,6 @@ export type ImageField = (
      * ```
      */
     uploadDir?: (formValues: Record<string, any>) => string;
-    /**
-     * Restricts this field to specific file types. Narrows what the media
-     * manager offers when browsing and what the field will accept on upload,
-     * overriding the global `media.accept`.
-     *
-     * @example
-     * ```ts
-     * accept: 'pdf'
-     * accept: ['png', 'svg']
-     * accept: 'image'
-     * ```
-     */
-    accept?: MediaAccept | MediaAccept[];
   };
 
 type ReferenceFieldOptions = {
