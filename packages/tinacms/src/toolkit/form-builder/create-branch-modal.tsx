@@ -3,6 +3,10 @@ import { Form } from '@toolkit/forms';
 import { useLocalStorage } from '@toolkit/hooks/use-local-storage';
 import { Button, DropdownButton } from '@toolkit/styles';
 import {
+  formatDefaultBranchName,
+  normalizeBranchName,
+} from '@utils/branch-name';
+import {
   CircleAlert,
   Eye,
   FileText,
@@ -30,34 +34,6 @@ import {
 } from './save-options';
 import { useEditorialWorkflow } from './use-editorial-workflow';
 
-// Format the default branch name by removing content/ prefix and file extension
-const formatDefaultBranchName = (
-  filePath: string,
-  crudType: string
-): string => {
-  let result = filePath;
-
-  const contentPrefix = 'content/';
-  // Remove "content/" prefix if present
-  if (result.startsWith(contentPrefix)) {
-    result = result.substring(contentPrefix.length);
-  }
-
-  // Remove file extension
-  const lastDot = result.lastIndexOf('.');
-  const lastSlash = Math.max(result.lastIndexOf('/'), result.lastIndexOf('\\'));
-  if (lastDot > lastSlash && lastDot > 0) {
-    result = result.slice(0, lastDot);
-  }
-
-  // Add deletion indicator for delete operations
-  if (crudType === 'delete') {
-    result = `❌-${result}`;
-  }
-
-  return result;
-};
-
 export const CreateBranchModal = ({
   close,
   safeSubmit,
@@ -82,6 +58,7 @@ export const CreateBranchModal = ({
   );
   const [isBranchGuardChecking, setIsBranchGuardChecking] =
     React.useState(false);
+  const normalizedBranchName = normalizeBranchName(newBranchName);
   const branchGuardAbortRef = React.useRef<AbortController | null>(null);
 
   const {
@@ -112,7 +89,7 @@ export const CreateBranchModal = ({
     setIsBranchGuardChecking(true);
 
     const baseBranch = decodeURIComponent(tinaApi.branch);
-    const targetBranch = `tina/${newBranchName}`;
+    const targetBranch = `tina/${normalizedBranchName}`;
 
     const { baseBranchExists, targetBranchExists } = await checkBranchGuard(
       tinaApi,
@@ -183,7 +160,7 @@ export const CreateBranchModal = ({
         close();
       }}
       errorMessage={errorMessage}
-      disabled={newBranchName === '' || isBranchGuardChecking}
+      disabled={normalizedBranchName === '' || isBranchGuardChecking}
       onBranchNameChange={(value) => {
         abortBranchGuard();
         reset();
