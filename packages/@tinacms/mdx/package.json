@@ -45,7 +45,7 @@
 		"ccount": "catalog:",
 		"emoji-regex": "9.2.2",
 		"estree-util-is-identifier-name": "catalog:",
-		"esutils": "^2.0.3",
+		"esutils": "2.0.3",
 		"mdast-util-compact": "catalog:",
 		"mdast-util-directive": "catalog:",
 		"mdast-util-from-markdown": "catalog:",

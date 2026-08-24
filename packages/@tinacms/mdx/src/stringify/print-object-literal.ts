@@ -355,7 +355,6 @@ const fits = (
   next: Command,
   restCommands: Command[],
   width: number,
-  groupModes: Map<symbol, number>,
   mustBeFlat: boolean
 ) => {
   let restIdx = restCommands.length;
@@ -446,7 +445,7 @@ const printDocToString = (doc: Doc) => {
           const flat: Command = { ind, mode: MODE_FLAT, doc: current.contents };
           if (
             !current.shouldBreak &&
-            fits(flat, cmds, PRINT_WIDTH - pos, groupModes, false)
+            fits(flat, cmds, PRINT_WIDTH - pos, false)
           ) {
             cmds.push(flat);
           } else {
@@ -477,7 +476,7 @@ const printDocToString = (doc: Doc) => {
         const whitespace = parts[1]!;
         const contentFlat: Command = { ind, mode: MODE_FLAT, doc: content };
         const contentBreak: Command = { ind, mode: MODE_BREAK, doc: content };
-        const contentFits = fits(contentFlat, [], rem, groupModes, true);
+        const contentFits = fits(contentFlat, [], rem, true);
         if (parts.length === 1) {
           cmds.push(contentFits ? contentFlat : contentBreak);
           break;
@@ -510,7 +509,6 @@ const printDocToString = (doc: Doc) => {
           { ind, mode: MODE_FLAT, doc: [content, whitespace, rest[0]!] },
           [],
           rem,
-          groupModes,
           true
         );
         if (pairFits) {
@@ -539,6 +537,9 @@ const printDocToString = (doc: Doc) => {
   return out.join('');
 };
 
+// Callers pass an object: both call sites guard on `typeof obj === 'object'`.
+// A top-level scalar would skip the declarator's own layout choice, so a long
+// bare string would not match prettier's `break-after-operator`.
 export const printObjectLiteral = (value: unknown): string => {
   const source = JSON.stringify(value);
   if (source === undefined) {
