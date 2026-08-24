@@ -224,6 +224,18 @@ export function MediaPicker({
     setActiveItem(false);
   };
 
+  // Narrowing the type is a new listing, not more of the current one: without
+  // resetting the offset the next page is appended to results the filter has
+  // already excluded.
+  const changeTypeFilter = (next: MediaCategory | 'all') => {
+    if (next === typeFilter) return;
+    setTypeFilter(next);
+    setLoadFolders(true);
+    resetOffset();
+    resetList();
+    setActiveItem(false);
+  };
+
   const listRequestRef = useRef(0);
   const newMediaSrcsRef = useRef<Set<string>>(new Set());
 
@@ -663,7 +675,7 @@ export function MediaPicker({
               {cms.media.store.extensionFilterable && (
                 <MediaTypeFilter
                   value={typeFilter}
-                  setValue={setTypeFilter}
+                  setValue={changeTypeFilter}
                   lockedTo={fieldAccept}
                   lockedExtensions={fieldExtensions}
                 />

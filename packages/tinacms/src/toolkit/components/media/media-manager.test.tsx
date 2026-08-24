@@ -341,3 +341,54 @@ describe('cms.media.open accept plumbing', () => {
     expect(await screen.findByText('PDF only')).toBeTruthy();
   });
 });
+
+// Paging is driven by an IntersectionObserver, which jsdom does not implement.
+const withInfiniteScroll = () => {
+  const observers: Array<(entries: unknown[]) => void> = [];
+  vi.stubGlobal(
+    'IntersectionObserver',
+    class {
+      constructor(cb: (entries: unknown[]) => void) {
+        observers.push(cb);
+      }
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    }
+  );
+  return () => observers.at(-1)?.([{ isIntersecting: true }]);
+};
+
+describe('MediaPicker type filter after paging', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('replaces the listing rather than appending to the previous page', async () => {
+    const scrollToBottom = withInfiniteScroll();
+    const pages: Record<string, Media[]> = {
+      'page-1': [file('photo.png')],
+      'page-2': [file('diagram.svg')],
+      video: [file('clip.mp4')],
+    };
+    const list = vi.fn(async (opts: any) => {
+      if (opts.ext?.length)
+        return { items: pages.video, nextOffset: undefined };
+      return opts.offset
+        ? { items: pages['page-2'], nextOffset: undefined }
+        : { items: pages['page-1'], nextOffset: 20 };
+    });
+    const { cms } = buildCms({ extensionFilterable: true, list });
+    renderPicker(cms);
+
+    expect(await screen.findByTitle('photo.png')).toBeTruthy();
+    scrollToBottom();
+    expect(await screen.findByTitle('diagram.svg')).toBeTruthy();
+
+    const user = userEvent.setup();
+    await user.click(await screen.findByText('Any type'));
+    await user.click(await screen.findByText('Video'));
+
+    expect(await screen.findByTitle('clip.mp4')).toBeTruthy();
+    expect(screen.queryByTitle('photo.png')).toBeNull();
+    expect(screen.queryByTitle('diagram.svg')).toBeNull();
+  });
+});
