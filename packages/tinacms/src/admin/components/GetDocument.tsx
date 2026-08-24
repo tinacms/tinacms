@@ -89,6 +89,17 @@ const GetDocument = ({
     return <LoadingPage />;
   }
 
+  // undefined when the session check skipped the fetch; consumers read
+  // `document._values` straight away, so never hand them undefined
+  if (!document) {
+    return (
+      <FullscreenError
+        title='Unable to load'
+        errorMessage='This document could not be loaded. You may need to sign in again.'
+      />
+    );
+  }
+
   return <>{children(document, loading)}</>;
 };
 

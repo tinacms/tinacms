@@ -1,8 +1,9 @@
-import { renderHook, waitFor } from '@testing-library/react';
+import { render, renderHook, screen, waitFor } from '@testing-library/react';
 import type { TinaCMS } from '@tinacms/toolkit';
+import * as React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { TinaAdminApi } from '../api';
-import { useGetDocument } from './GetDocument';
+import GetDocument, { useGetDocument } from './GetDocument';
 
 const buildCms = (isAuthenticated: boolean) =>
   ({
@@ -58,5 +59,31 @@ describe('useGetDocument', () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.error).toEqual(new Error('boom'));
+  });
+});
+
+describe('GetDocument', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('renders an error instead of handing children an undefined document', async () => {
+    const fetchDocument = vi.spyOn(TinaAdminApi.prototype, 'fetchDocument');
+
+    render(
+      <GetDocument
+        cms={buildCms(false)}
+        collectionName='post'
+        relativePath='hello.mdx'
+      >
+        {(document) => <div data-testid='child'>{document._values.title}</div>}
+      </GetDocument>
+    );
+
+    await waitFor(() =>
+      expect(screen.getByText('Unable to load')).toBeTruthy()
+    );
+    expect(fetchDocument).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('child')).toBeNull();
   });
 });

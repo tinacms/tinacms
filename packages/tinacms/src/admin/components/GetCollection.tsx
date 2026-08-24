@@ -298,7 +298,8 @@ const GetCollection = ({
         ) || {};
 
   useEffect(() => {
-    if (loading) return;
+    // no collection when the session check skipped the fetch, or when it failed
+    if (loading || !collection) return;
 
     // get the collection definition
     const collectionDefinition = cms.api.tina.schema.getCollection(
@@ -337,6 +338,17 @@ const GetCollection = ({
 
   if (loading) {
     return <LoadingPage />;
+  }
+
+  // undefined when the session check skipped the fetch; consumers read
+  // `collection.documents` straight away, so never hand them undefined
+  if (!collection) {
+    return (
+      <FullscreenError
+        title='Unable to load'
+        errorMessage='This collection could not be loaded. You may need to sign in again.'
+      />
+    );
   }
 
   return (
