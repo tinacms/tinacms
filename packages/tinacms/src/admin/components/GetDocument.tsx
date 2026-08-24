@@ -2,12 +2,13 @@
 
 */
 
-import React, { useState, useEffect } from 'react';
 import type { TinaCMS } from '@tinacms/toolkit';
+import React, { useState, useEffect } from 'react';
 import { TinaAdminApi } from '../api';
 import type { DocumentForm } from '../types';
-import LoadingPage from './LoadingPage';
 import { FullscreenError } from './FullscreenError';
+import LoadingPage from './LoadingPage';
+import { UnableToLoadModal } from './UnableToLoadModal';
 
 export const useGetDocument = (
   cms: TinaCMS,
@@ -97,10 +98,7 @@ const GetDocument = ({
   // `document._values` straight away, so never hand them undefined
   if (!document) {
     return (
-      <FullscreenError
-        title='Unable to load'
-        errorMessage='This document could not be loaded. You may need to sign in again.'
-      />
+      <UnableToLoadModal message='This document could not be loaded. You may need to sign in again.' />
     );
   }
 

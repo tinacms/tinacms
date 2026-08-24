@@ -1,5 +1,5 @@
 import { render, renderHook, screen, waitFor } from '@testing-library/react';
-import type { TinaCMS } from '@tinacms/toolkit';
+import { ModalProvider, type TinaCMS } from '@tinacms/toolkit';
 import * as React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { TinaAdminApi } from '../api';
@@ -71,13 +71,17 @@ describe('GetDocument', () => {
     const fetchDocument = vi.spyOn(TinaAdminApi.prototype, 'fetchDocument');
 
     render(
-      <GetDocument
-        cms={buildCms(false)}
-        collectionName='post'
-        relativePath='hello.mdx'
-      >
-        {(document) => <div data-testid='child'>{document._values.title}</div>}
-      </GetDocument>
+      <ModalProvider>
+        <GetDocument
+          cms={buildCms(false)}
+          collectionName='post'
+          relativePath='hello.mdx'
+        >
+          {(document) => (
+            <div data-testid='child'>{document._values.title}</div>
+          )}
+        </GetDocument>
+      </ModalProvider>
     );
 
     await waitFor(() =>

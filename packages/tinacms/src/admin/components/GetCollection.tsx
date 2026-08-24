@@ -12,6 +12,7 @@ import { handleNavigate } from '../pages/CollectionListPage';
 import type { CollectionResponse, DocumentForm } from '../types';
 import { FullscreenError } from './FullscreenError';
 import { shouldAutoOpenCollectionDocument } from './GetCollection.utils';
+import { UnableToLoadModal } from './UnableToLoadModal';
 
 const isValidSortKey = (sortKey: string, collection: Collection<true>) => {
   if (collection.fields) {
@@ -352,10 +353,7 @@ const GetCollection = ({
   // `collection.documents` straight away, so never hand them undefined
   if (!collection) {
     return (
-      <FullscreenError
-        title='Unable to load'
-        errorMessage='This collection could not be loaded. You may need to sign in again.'
-      />
+      <UnableToLoadModal message='This collection could not be loaded. You may need to sign in again.' />
     );
   }
 

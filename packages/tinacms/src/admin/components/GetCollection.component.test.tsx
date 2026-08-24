@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import type { TinaCMS } from '@tinacms/toolkit';
+import { ModalProvider, type TinaCMS } from '@tinacms/toolkit';
 import * as React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -44,13 +44,15 @@ const renderCollection = (cms: TinaCMS) => {
   const caught: Error[] = [];
   render(
     <Boundary onError={(e) => caught.push(e)}>
-      <MemoryRouter>
-        <GetCollection cms={cms} collectionName='post' folder={loadedFolder}>
-          {(collection) => (
-            <div data-testid='child'>{collection.documents.edges.length}</div>
-          )}
-        </GetCollection>
-      </MemoryRouter>
+      <ModalProvider>
+        <MemoryRouter>
+          <GetCollection cms={cms} collectionName='post' folder={loadedFolder}>
+            {(collection) => (
+              <div data-testid='child'>{collection.documents.edges.length}</div>
+            )}
+          </GetCollection>
+        </MemoryRouter>
+      </ModalProvider>
     </Boundary>
   );
   return { caught };
