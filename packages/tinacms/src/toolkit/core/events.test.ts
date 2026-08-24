@@ -1,5 +1,5 @@
-import { EventBus, Listener } from './event';
-import { describe, it, test, expect, beforeEach, vi } from 'vitest';
+import { beforeEach, describe, expect, it, test, vi } from 'vitest';
+import { type CMSEvent, EventBus, Listener } from './event';
 
 describe('EventBus', () => {
   it('calls listener and passes it the dispatched event', () => {
@@ -174,5 +174,37 @@ describe('Listener', () => {
         expect(listener.watchesEvent({ type: 'plugin:add:baz' })).toBeFalsy();
       });
     });
+  });
+});
+
+describe('TinaCMS registerApi event bridge', () => {
+  const buildCms = async () => {
+    const { TinaCMS } = await import('../tina-cms');
+    return new TinaCMS({ enabled: true, sidebar: false });
+  };
+
+  it('forwards api-bus events to the global bus', async () => {
+    const cms = await buildCms();
+    const api = { events: new EventBus() };
+    cms.registerApi('thing', api);
+
+    const seen: CMSEvent[] = [];
+    cms.events.subscribe('thing:did', (e) => seen.push(e));
+    api.events.dispatch({ type: 'thing:did' });
+
+    expect(seen).toHaveLength(1);
+  });
+
+  it('forwards global-bus events to the api bus without recursing', async () => {
+    const cms = await buildCms();
+    const api = { events: new EventBus() };
+    cms.registerApi('thing', api);
+
+    const seen: CMSEvent[] = [];
+    api.events.subscribe('cms:did', (e) => seen.push(e));
+    // would stack-overflow if the two '*' bridges bounced the event back and forth
+    cms.events.dispatch({ type: 'cms:did' });
+
+    expect(seen).toHaveLength(1);
   });
 });

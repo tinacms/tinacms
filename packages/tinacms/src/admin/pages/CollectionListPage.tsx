@@ -46,6 +46,7 @@ import {
   useNavigate,
   useParams,
 } from 'react-router-dom';
+import { isSessionExpiredError } from '../../internalClient';
 import {
   CollectionListPageItemClickedEvent,
   CollectionListPageSearchEvent,
@@ -411,6 +412,7 @@ const CollectionListPage = () => {
                               );
                               return doc?.document?._sys?.hasReferences;
                             } catch (error) {
+                              if (isSessionExpiredError(error)) throw error;
                               cms.alerts.error(
                                 'Document was not found, ask a developer for help or check the console for an error message'
                               );
@@ -426,6 +428,7 @@ const CollectionListPage = () => {
                               );
                               reFetchCollection();
                             } catch (error) {
+                              if (isSessionExpiredError(error)) throw error;
                               if (error.message.includes(ERR_HAS_REFERENCES)) {
                                 cms.alerts.error(
                                   error.message.split('\n\t').filter(Boolean)[1]
@@ -490,6 +493,7 @@ const CollectionListPage = () => {
                             );
                             reFetchCollection();
                           } catch (error) {
+                            if (isSessionExpiredError(error)) throw error;
                             if (
                               error.message &&
                               error.message.includes(ERR_ALREADY_EXISTS)
@@ -551,6 +555,7 @@ const CollectionListPage = () => {
                             );
                             cms.alerts.info('Folder was successfully created');
                           } catch (error) {
+                            if (isSessionExpiredError(error)) throw error;
                             if (
                               error.message &&
                               error.message.includes(ERR_ALREADY_EXISTS)

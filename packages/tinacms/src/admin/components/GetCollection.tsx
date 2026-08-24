@@ -6,6 +6,7 @@ import type { Collection, TinaField, TinaSchema } from '@tinacms/schema-tools';
 import type { TinaCMS } from '@tinacms/toolkit';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { isSessionExpiredError } from '../../internalClient';
 import { FilterArgs, TinaAdminApi } from '../api';
 import LoadingPage from '../components/LoadingPage';
 import { handleNavigate } from '../pages/CollectionListPage';
@@ -13,6 +14,7 @@ import type { CollectionResponse, DocumentForm } from '../types';
 import { FullscreenError } from './FullscreenError';
 import { shouldAutoOpenCollectionDocument } from './GetCollection.utils';
 import { UnableToLoadModal } from './UnableToLoadModal';
+import { notifySessionExpired } from './session-expired';
 
 const isValidSortKey = (sortKey: string, collection: Collection<true>) => {
   if (collection.fields) {
@@ -96,16 +98,21 @@ export const useGetCollection = (
         } else if (!cancelled) {
           // The session went away mid-session: drop the stale collection and
           // send the user back to the login modal via the auth wall.
-          cms.events.dispatch({ type: 'cms:session-expired' });
+          notifySessionExpired(cms);
           setCollection(undefined);
         }
       } catch (error) {
-        cms.alerts.error(
-          `[${error.name}] GetCollection failed: ${error.message}`
-        );
-        console.error(error);
-        setCollection(undefined);
-        setError(error);
+        if (isSessionExpiredError(error)) {
+          // request() already told the auth wall; no alert over the login modal
+          setCollection(undefined);
+        } else {
+          cms.alerts.error(
+            `[${error.name}] GetCollection failed: ${error.message}`
+          );
+          console.error(error);
+          setCollection(undefined);
+          setError(error);
+        }
       }
 
       if (!cancelled) {
@@ -221,16 +228,21 @@ export const useSearchCollection = (
           setCollection(collectionData);
         } else if (!cancelled) {
           // Same as above: a stale result set is worse than a login prompt.
-          cms.events.dispatch({ type: 'cms:session-expired' });
+          notifySessionExpired(cms);
           setCollection(undefined);
         }
       } catch (error) {
-        cms.alerts.error(
-          `[${error.name}] GetCollection failed: ${error.message}`
-        );
-        console.error(error);
-        setCollection(undefined);
-        setError(error);
+        if (isSessionExpiredError(error)) {
+          // request() already told the auth wall; no alert over the login modal
+          setCollection(undefined);
+        } else {
+          cms.alerts.error(
+            `[${error.name}] GetCollection failed: ${error.message}`
+          );
+          console.error(error);
+          setCollection(undefined);
+          setError(error);
+        }
       }
 
       if (!cancelled) {

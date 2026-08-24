@@ -23,6 +23,7 @@ import { FormBreadcrumbs } from '@toolkit/react-sidebar/components/sidebar-body'
 import { Lock, Unlock } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { isSessionExpiredError } from '../../internalClient';
 import { TinaAdminApi } from '../api';
 import { ErrorDialog } from '../components/ErrorDialog';
 import GetCMS from '../components/GetCMS';
@@ -318,6 +319,7 @@ export const RenderForm = ({
             );
           }, 10);
         } catch (error) {
+          if (isSessionExpiredError(error)) throw error;
           const defaultErrorText = 'There was a problem saving your document.';
           if (error.message && error.message.includes(ERR_ALREADY_EXISTS)) {
             cms.alerts.error(

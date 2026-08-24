@@ -5,11 +5,11 @@
  * @packageDocumentation
  */
 
-import { Plugin, PluginTypeManager } from './plugins';
 import { EventBus } from './event';
+import { Flags } from './flags';
 import { MediaManager, MediaStore } from './media';
 import { DummyMediaStore } from './media-store.default';
-import { Flags } from './flags';
+import { Plugin, PluginTypeManager } from './plugins';
 
 /**
  * A [[CMS]] is the core object of any content management system.
@@ -168,13 +168,29 @@ export class CMS {
       this.unsubscribeHooks[name]();
     }
     if (api.events instanceof EventBus) {
-      const unsubscribeHost = (api.events as EventBus).subscribe(
-        '*',
-        this.events.dispatch
-      );
-      const unsubscribeGuest = this.events.subscribe('*', (e) =>
-        api.events.dispatch(e)
-      );
+      // Guarded forwarders: passing `this.events.dispatch` unbound made the
+      // api-to-cms direction a silent no-op, and a bound fix would recurse
+      // forever through the two '*' bridges.
+      let forwardingToApi = false;
+      let forwardingToCms = false;
+      const unsubscribeHost = (api.events as EventBus).subscribe('*', (e) => {
+        if (forwardingToApi) return;
+        forwardingToCms = true;
+        try {
+          this.events.dispatch(e);
+        } finally {
+          forwardingToCms = false;
+        }
+      });
+      const unsubscribeGuest = this.events.subscribe('*', (e) => {
+        if (forwardingToCms) return;
+        forwardingToApi = true;
+        try {
+          api.events.dispatch(e);
+        } finally {
+          forwardingToApi = false;
+        }
+      });
       this.unsubscribeHooks[name] = () => {
         unsubscribeHost();
         unsubscribeGuest();

@@ -553,6 +553,36 @@ describe('Tina Client', () => {
       vi.restoreAllMocks();
     });
 
+    it('dispatches cms:session-expired and throws SessionExpiredError on a 401', async () => {
+      const dispatched: { type: string }[] = [];
+      client.events.subscribe('cms:session-expired', (e) => {
+        dispatched.push(e);
+      });
+      stubFetchOnce(
+        makeResponse({ status: 401, body: {}, statusText: 'Unauthorized' })
+      );
+
+      await expect(
+        client.request('{ x }', { variables: {} })
+      ).rejects.toMatchObject({ name: 'SessionExpiredError' });
+      expect(dispatched).toHaveLength(1);
+    });
+
+    it('does not dispatch cms:session-expired on other failures', async () => {
+      const dispatched: { type: string }[] = [];
+      client.events.subscribe('cms:session-expired', (e) => {
+        dispatched.push(e);
+      });
+      stubFetchOnce(
+        makeResponse({ status: 500, body: {}, statusText: 'Server Error' })
+      );
+
+      await expect(client.request('{ x }', { variables: {} })).rejects.toThrow(
+        /Unable to complete request/
+      );
+      expect(dispatched).toHaveLength(0);
+    });
+
     it('throws with clientId and branch context on a non-200 against a tina.io URL', async () => {
       stubFetchOnce(
         makeResponse({

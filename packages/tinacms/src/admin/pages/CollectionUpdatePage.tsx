@@ -14,6 +14,7 @@ import {
 } from '@toolkit/react-sidebar/components/sidebar-body';
 import React, { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { isSessionExpiredError } from '../../internalClient';
 import { TinaAdminApi } from '../api';
 import { ErrorDialog } from '../components/ErrorDialog';
 import GetCMS from '../components/GetCMS';
@@ -143,6 +144,7 @@ const RenderForm = ({
           );
           cms.alerts.success('Document updated!');
         } catch (error) {
+          if (isSessionExpiredError(error)) throw error;
           cms.alerts.error(() =>
             ErrorDialog({
               title: 'There was a problem saving your document',
