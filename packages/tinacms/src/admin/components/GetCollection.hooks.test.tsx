@@ -72,6 +72,40 @@ describe('useGetCollection', () => {
     expect(result.current.loading).toBe(true);
   });
 
+  it('drops the previous collection when the session check starts failing', async () => {
+    vi.spyOn(TinaAdminApi.prototype, 'fetchCollection').mockResolvedValue({
+      name: 'post',
+    });
+    const isAuthenticated = vi.fn().mockResolvedValue(true);
+    const cms = {
+      api: {
+        tina: {
+          schema: { getCollection: () => ({ name: 'post', fields: [] }) },
+          authProvider: { isAuthenticated },
+        },
+        search: { supportsClientSideIndexing: () => false, query: vi.fn() },
+      },
+      alerts: { error: vi.fn() },
+    } as unknown as TinaCMS;
+
+    const { result, rerender } = renderHook(
+      ({ name }) => useGetCollection(cms, name, true, loadedFolder),
+      { initialProps: { name: 'post' } }
+    );
+
+    await waitFor(() =>
+      expect(result.current.collection).toEqual({ name: 'post' })
+    );
+
+    // the session goes away, then the user switches collection
+    isAuthenticated.mockResolvedValue(false);
+    rerender({ name: 'author' });
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    // stale data here would render the previous collection under the new heading
+    expect(result.current.collection).toBeUndefined();
+  });
+
   it('surfaces a fetch failure instead of loading forever', async () => {
     vi.spyOn(TinaAdminApi.prototype, 'fetchCollection').mockRejectedValue(
       new Error('boom')

@@ -34,6 +34,10 @@ export const useGetDocument = (
           if (!isCancelled) {
             setDocument(response.document);
           }
+        } else if (!isCancelled) {
+          // Session gone: drop the previous document rather than leave the form
+          // showing content the user can no longer save.
+          setDocument(undefined);
         }
       } catch (error) {
         // Only handle error if the request hasn't been cancelled

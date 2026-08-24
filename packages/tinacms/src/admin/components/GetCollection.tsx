@@ -92,6 +92,11 @@ export const useGetCollection = (
             filterArgs
           );
           setCollection(collection);
+        } else if (!cancelled) {
+          // The session went away mid-session. Drop the previous collection or the
+          // guard below passes it through and the list shows the last collection's
+          // documents under this one's heading.
+          setCollection(undefined);
         }
       } catch (error) {
         cms.alerts.error(
@@ -213,6 +218,9 @@ export const useSearchCollection = (
           };
 
           setCollection(collectionData);
+        } else if (!cancelled) {
+          // Same as above: a stale result set is worse than the error screen.
+          setCollection(undefined);
         }
       } catch (error) {
         cms.alerts.error(
