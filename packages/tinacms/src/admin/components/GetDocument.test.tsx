@@ -16,6 +16,7 @@ const buildCms = (isAuthenticated: boolean) =>
       },
     },
     alerts: { error: vi.fn() },
+    events: { dispatch: vi.fn() },
   }) as unknown as TinaCMS;
 
 const renderGetDocument = (cms: TinaCMS) =>

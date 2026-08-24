@@ -20,6 +20,7 @@ const buildCms = (isAuthenticated: boolean) =>
       search: { supportsClientSideIndexing: () => false, query: vi.fn() },
     },
     alerts: { error: vi.fn() },
+    events: { dispatch: vi.fn() },
   }) as unknown as TinaCMS;
 
 // An effect that throws unmounts the tree in React 18, so a boundary is the only
@@ -65,12 +66,16 @@ describe('GetCollection', () => {
 
   it('renders an error instead of throwing when the session check says not signed in', async () => {
     const fetchCollection = vi.spyOn(TinaAdminApi.prototype, 'fetchCollection');
-    const { caught } = renderCollection(buildCms(false));
+    const cms = buildCms(false);
+    const { caught } = renderCollection(cms);
 
     await waitFor(() =>
       expect(screen.getByText('Unable to load')).toBeTruthy()
     );
     expect(fetchCollection).not.toHaveBeenCalled();
+    expect(cms.events.dispatch).toHaveBeenCalledWith({
+      type: 'cms:session-expired',
+    });
     expect(screen.queryByTestId('child')).toBeNull();
     expect(caught).toEqual([]);
   });

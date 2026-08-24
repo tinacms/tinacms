@@ -21,6 +21,7 @@ const buildCms = (isAuthenticated: boolean, searchResults = []) =>
       },
     },
     alerts: { error: vi.fn() },
+    events: { dispatch: vi.fn() },
   }) as unknown as TinaCMS;
 
 describe('useGetCollection', () => {
@@ -86,6 +87,7 @@ describe('useGetCollection', () => {
         search: { supportsClientSideIndexing: () => false, query: vi.fn() },
       },
       alerts: { error: vi.fn() },
+      events: { dispatch: vi.fn() },
     } as unknown as TinaCMS;
 
     const { result, rerender } = renderHook(
@@ -104,6 +106,10 @@ describe('useGetCollection', () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
     // stale data here would render the previous collection under the new heading
     expect(result.current.collection).toBeUndefined();
+    // and the auth wall is told to drop back to the login modal
+    expect(cms.events.dispatch).toHaveBeenCalledWith({
+      type: 'cms:session-expired',
+    });
   });
 
   it('surfaces a fetch failure instead of loading forever', async () => {

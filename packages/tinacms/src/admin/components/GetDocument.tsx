@@ -38,6 +38,7 @@ export const useGetDocument = (
         } else if (!isCancelled) {
           // Session gone: drop the previous document rather than leave the form
           // showing content the user can no longer save.
+          cms.events.dispatch({ type: 'cms:session-expired' });
           setDocument(undefined);
         }
       } catch (error) {
@@ -97,9 +98,7 @@ const GetDocument = ({
   // undefined when the session check skipped the fetch; consumers read
   // `document._values` straight away, so never hand them undefined
   if (!document) {
-    return (
-      <UnableToLoadModal message='This document could not be loaded. You may need to sign in again.' />
-    );
+    return <UnableToLoadModal message='This document could not be loaded.' />;
   }
 
   return <>{children(document, loading)}</>;

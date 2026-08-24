@@ -94,9 +94,9 @@ export const useGetCollection = (
           );
           setCollection(collection);
         } else if (!cancelled) {
-          // The session went away mid-session. Drop the previous collection or the
-          // guard below passes it through and the list shows the last collection's
-          // documents under this one's heading.
+          // The session went away mid-session: drop the stale collection and
+          // send the user back to the login modal via the auth wall.
+          cms.events.dispatch({ type: 'cms:session-expired' });
           setCollection(undefined);
         }
       } catch (error) {
@@ -220,7 +220,8 @@ export const useSearchCollection = (
 
           setCollection(collectionData);
         } else if (!cancelled) {
-          // Same as above: a stale result set is worse than the error screen.
+          // Same as above: a stale result set is worse than a login prompt.
+          cms.events.dispatch({ type: 'cms:session-expired' });
           setCollection(undefined);
         }
       } catch (error) {
@@ -352,9 +353,7 @@ const GetCollection = ({
   // undefined when the session check skipped the fetch; consumers read
   // `collection.documents` straight away, so never hand them undefined
   if (!collection) {
-    return (
-      <UnableToLoadModal message='This collection could not be loaded. You may need to sign in again.' />
-    );
+    return <UnableToLoadModal message='This collection could not be loaded.' />;
   }
 
   return (
