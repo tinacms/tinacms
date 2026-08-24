@@ -20,10 +20,12 @@ import {
   Media,
   MediaList,
   MediaListOptions,
+  MediaRenameCancelled,
   MediaRenameError,
   MediaRenameErrorCode,
   MediaStore,
   MediaUploadOptions,
+  isMediaRenameErrorCode,
 } from './media';
 
 interface MediaBranchContext {
@@ -38,6 +40,14 @@ type MediaBranchDecision =
   | { kind: 'direct' };
 
 type MediaOpType = 'upload' | 'delete' | 'rename';
+
+interface CloudRenameResponse {
+  /** The server-sanitised target, which may differ from the `to` we sent. */
+  path?: string;
+  src?: string;
+  /** Present when the commit is applied asynchronously. */
+  requestId?: string;
+}
 
 interface MediaWorkflowRequest {
   opType: MediaOpType;
@@ -78,29 +88,6 @@ const CANONICAL_THUMBNAIL_SIZES = [
   { w: 400, h: 400 },
   { w: 1000, h: 1000 },
 ];
-
-const RENAME_ERROR_CODES: MediaRenameErrorCode[] = [
-  'NOT_FOUND',
-  'NAME_COLLISION',
-  'INVALID_FILENAME',
-  'INVALID_PATH',
-  'UNAUTHORIZED',
-  'UNSUPPORTED',
-  'BACKEND_FAILURE',
-];
-
-/**
- * Signals that the editor dismissed the branch prompt, so nothing was renamed.
- * Rejecting is how a `rename` that must resolve to a `Media` reports "no work
- * happened"; the rename modal recognises it and closes without an error.
- */
-export class MediaRenameCancelled extends Error {
-  public ERR_TYPE = 'MediaRenameCancelled';
-
-  constructor() {
-    super('Media rename cancelled.');
-  }
-}
 
 export class DummyMediaStore implements MediaStore {
   accept = '*';
@@ -242,27 +229,30 @@ export class TinaMediaStore implements MediaStore {
   maxSize = 100 * 1024 * 1024;
 
   /**
-   * Returns the workflow branch override or current branch as a single-encoded
-   * query-param value, or an empty string when no branch is set.
+   * The workflow branch override or the current branch, decoded, or an empty
+   * string when no branch is set.
    *
-   * `this.api.branch` is already URL-encoded by `Client.setBranch()`, so we
-   * decode then re-encode here to defend against double-encoding when this
-   * value is concatenated into a URL.
-   *
-   * `Client.setBranch()` runs the constructor's `options.branch` through
-   * `encodeURIComponent` without a guard, so an unset `options.branch`
-   * lands here as the literal string `"undefined"`. We treat that and the
-   * empty case as no-branch so we don't send `?branch=undefined` to the
-   * assets-api (which would route the call to a non-existent staging path).
+   * `this.api.branch` is already URL-encoded by `Client.setBranch()`, which
+   * runs the constructor's `options.branch` through `encodeURIComponent`
+   * without a guard — so an unset `options.branch` lands here as the literal
+   * string `"undefined"`. We treat that and the empty case as no-branch so we
+   * don't address a non-existent staging path on the assets API.
    */
-  private encodedBranchParam(): string {
-    if (this.workflowBranchOverride) {
-      return encodeURIComponent(this.workflowBranchOverride);
-    }
+  private currentBranch(): string {
+    if (this.workflowBranchOverride) return this.workflowBranchOverride;
     if (!this.api.branch) return '';
     const decoded = decodeURIComponent(this.api.branch);
-    if (!decoded || decoded === 'undefined') return '';
-    return encodeURIComponent(decoded);
+    return decoded === 'undefined' ? '' : decoded;
+  }
+
+  /**
+   * The branch as a single-encoded query-param value. Decoding first (see
+   * `currentBranch`) defends against double-encoding when this is concatenated
+   * into a URL; JSON bodies take `currentBranch()` raw instead.
+   */
+  private encodedBranchParam(): string {
+    const branch = this.currentBranch();
+    return branch ? encodeURIComponent(branch) : '';
   }
 
   private shortStableHash(input: string): string {
@@ -383,9 +373,7 @@ export class TinaMediaStore implements MediaStore {
         prTitle: getEditorialWorkflowPrTitle(branchName),
         operation: request.opType,
         repoPath: request.repoPath,
-        ...(request.targetRepoPath
-          ? { targetRepoPath: request.targetRepoPath }
-          : {}),
+        targetRepoPath: request.targetRepoPath,
       });
       const branchContext = {
         branchName: workflow.branchName || branchName,
@@ -677,12 +665,6 @@ export class TinaMediaStore implements MediaStore {
   ): Promise<Media[]> {
     const byDirectory = this.groupMediaByDirectory(media);
 
-    const thumbnailSizes = [
-      { w: 75, h: 75 },
-      { w: 400, h: 400 },
-      { w: 1000, h: 1000 },
-    ];
-
     const results: Media[] = [];
     for (const [directory, items] of byDirectory) {
       let listed: MediaList;
@@ -690,7 +672,7 @@ export class TinaMediaStore implements MediaStore {
         listed = await this.list({
           directory,
           limit: Math.max(100, items.length * 4),
-          thumbnailSizes,
+          thumbnailSizes: CANONICAL_THUMBNAIL_SIZES,
         });
       } catch (err) {
         console.error('Failed to fetch canonical media entries:', err);
@@ -868,13 +850,13 @@ export class TinaMediaStore implements MediaStore {
   private async postCloudRename(
     from: string,
     to: string
-  ): Promise<{ path?: string; src?: string; requestId?: string }> {
+  ): Promise<CloudRenameResponse> {
     const res = await this.api.authProvider.fetchWithToken(
       `${this.url}/rename`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ from, to, branch: this.rawBranchForBody() }),
+        body: JSON.stringify({ from, to, branch: this.currentBranch() }),
       }
     );
 
@@ -909,12 +891,11 @@ export class TinaMediaStore implements MediaStore {
       }
     }
 
-    // `path` is the server-sanitised target and may differ from what we sent.
     return this.resolveRenamedMedia(result.path || to, result.src);
   }
 
   /**
-   * A protected media branch cannot be renamed directly, so the rename is
+   * A protected branch cannot be renamed against directly, so the rename is
    * staged on a workflow branch. Completion is the *workflow* status, not the
    * rename request status: only the former waits for the branch, the index and
    * the pull request.
@@ -986,17 +967,6 @@ export class TinaMediaStore implements MediaStore {
     });
   }
 
-  /**
-   * The branch name for a JSON body. `encodedBranchParam` is for query strings;
-   * bodies take the raw name, and never the literal string `"undefined"`.
-   */
-  private rawBranchForBody(): string {
-    if (this.workflowBranchOverride) return this.workflowBranchOverride;
-    if (!this.api.branch) return '';
-    const decoded = decodeURIComponent(this.api.branch);
-    return !decoded || decoded === 'undefined' ? '' : decoded;
-  }
-
   private splitMediaPath(path: string): {
     directory: string;
     filename: string;
@@ -1060,14 +1030,8 @@ export class TinaMediaStore implements MediaStore {
         ? body.message
         : 'Failed to rename the file.';
 
-    if (
-      typeof body?.code === 'string' &&
-      (RENAME_ERROR_CODES as string[]).includes(body.code)
-    ) {
-      return new MediaRenameError({
-        code: body.code as MediaRenameErrorCode,
-        message,
-      });
+    if (isMediaRenameErrorCode(body?.code)) {
+      return new MediaRenameError({ code: body.code, message });
     }
 
     // No usable code: fall back on the status. Unlike the local dev server, a

@@ -1,3 +1,4 @@
+import { isMediaRenameCancelled } from '@toolkit/core/media';
 import { Input } from '@toolkit/fields';
 import { LoadingDots } from '@toolkit/form-builder';
 import {
@@ -116,7 +117,7 @@ export const RenameModal = ({
                 close();
               } catch (e) {
                 // Dismissing the branch prompt isn't a failure to report.
-                if ((e as any)?.ERR_TYPE === 'MediaRenameCancelled') {
+                if (isMediaRenameCancelled(e)) {
                   close();
                   return;
                 }

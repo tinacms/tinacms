@@ -10,8 +10,8 @@ import { MediaManager as MediaManagerCore } from '@toolkit/core/media';
 import type { Media, MediaStore } from '@toolkit/core/media';
 import { TinaMediaStore } from '@toolkit/core/media-store.default';
 import { CMSContext } from '@toolkit/react-core/use-cms';
-import type { TinaCMS } from '@toolkit/tina-cms';
 import { ModalProvider } from '@toolkit/react-modals';
+import type { TinaCMS } from '@toolkit/tina-cms';
 import React from 'react';
 import { MediaPicker } from './media-manager';
 
