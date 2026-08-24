@@ -11,14 +11,14 @@ export const MermaidElementWithRef = ({ config }) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const node = mermaidRef.current?.querySelector<HTMLElement>('.mermaid');
-    if (!node) return;
-
     let isCancelled = false;
     setStatus('loading');
 
     const render = async () => {
       try {
+        const node = mermaidRef.current?.querySelector<HTMLElement>('.mermaid');
+        if (!node) throw new Error(RENDERER_FAILED);
+
         const { default: mermaid } = await import('mermaid');
         await mermaid.run({ nodes: [node] });
 
@@ -56,13 +56,13 @@ export const MermaidElementWithRef = ({ config }) => {
         >
           <pre className='mermaid not-tina-prose'>{config}</pre>
         </div>
-        {status === 'loading' ? (
+        {status === 'loading' && (
           <div className='absolute inset-0 flex items-center justify-center text-sm text-muted-foreground'>
             Loading diagram…
           </div>
-        ) : null}
+        )}
       </div>
-      {status === 'failed' ? <ErrorMessage error={error} /> : null}
+      {status === 'failed' && <ErrorMessage error={error} />}
     </div>
   );
 };
