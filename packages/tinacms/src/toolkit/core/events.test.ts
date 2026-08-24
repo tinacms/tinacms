@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, test, vi } from 'vitest';
+import { CMS } from './cms';
 import { type CMSEvent, EventBus, Listener } from './event';
 
 describe('EventBus', () => {
@@ -177,14 +178,9 @@ describe('Listener', () => {
   });
 });
 
-describe('TinaCMS registerApi event bridge', () => {
-  const buildCms = async () => {
-    const { TinaCMS } = await import('../tina-cms');
-    return new TinaCMS({ enabled: true, sidebar: false });
-  };
-
-  it('forwards api-bus events to the global bus', async () => {
-    const cms = await buildCms();
+describe('CMS registerApi event bridge', () => {
+  it('forwards api-bus events to the global bus', () => {
+    const cms = new CMS();
     const api = { events: new EventBus() };
     cms.registerApi('thing', api);
 
@@ -195,8 +191,8 @@ describe('TinaCMS registerApi event bridge', () => {
     expect(seen).toHaveLength(1);
   });
 
-  it('forwards global-bus events to the api bus without recursing', async () => {
-    const cms = await buildCms();
+  it('forwards global-bus events to the api bus without recursing', () => {
+    const cms = new CMS();
     const api = { events: new EventBus() };
     cms.registerApi('thing', api);
 
