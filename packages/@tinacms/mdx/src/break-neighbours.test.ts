@@ -103,6 +103,18 @@ describe('a break next to a line-start-sensitive neighbour', () => {
     expect(rewrite(written, field)).toBe(written);
   });
 
+  it('reaches a break nested inside a link', () => {
+    const written = write(
+      paragraph([
+        { type: 'a', url: '/x', children: [text('one'), breakNode, html] },
+      ]),
+      mdxField
+    );
+
+    expect(written).toBe('[one <em>x</em>](/x)\n');
+    expect(written).not.toContain('\\');
+  });
+
   it('still writes a real break between two pieces of text', () => {
     expect(
       write(paragraph([text('one'), breakNode, text('two')]), mdxField)
