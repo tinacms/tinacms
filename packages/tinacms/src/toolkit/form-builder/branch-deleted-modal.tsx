@@ -1,6 +1,6 @@
 import { Form } from '@toolkit/forms';
-import { formatBranchName } from '@toolkit/plugin-branch-switcher';
 import { Button } from '@toolkit/styles';
+import { formatBranchName, normalizeBranchName } from '@utils/branch-name';
 import { CircleAlert, GitBranchIcon } from 'lucide-react';
 import * as React from 'react';
 import { useCMS } from '../react-core';
@@ -33,6 +33,7 @@ export const BranchDeletedModal = ({
   const cms = useCMS();
   const tinaApi = cms.api.tina;
   const [newBranchName, setNewBranchName] = React.useState('');
+  const normalizedBranchName = normalizeBranchName(newBranchName);
 
   const baseBranch =
     tinaApi.protectedBranches[0] ||
@@ -50,7 +51,7 @@ export const BranchDeletedModal = ({
 
   const handleCreate = async () => {
     const { success } = await executeWorkflow({
-      branchName: `tina/${newBranchName}`,
+      branchName: `tina/${normalizedBranchName}`,
       baseBranch,
       path,
       values,
@@ -130,7 +131,7 @@ export const BranchDeletedModal = ({
             <Button
               variant='primary'
               className='w-full sm:w-auto'
-              disabled={!newBranchName}
+              disabled={!normalizedBranchName}
               onClick={handleCreate}
             >
               <GitBranchIcon

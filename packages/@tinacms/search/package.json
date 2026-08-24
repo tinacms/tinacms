@@ -30,7 +30,6 @@
     "scripts": {
         "types": "pnpm tsc",
         "build": "tinacms-scripts build",
-        "docs": "pnpm typedoc",
         "serve": "pnpm nodemon dist/server.js",
         "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
         "test-watch": "NODE_OPTIONS='--experimental-vm-modules' jest --watch"
