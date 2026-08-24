@@ -322,5 +322,5 @@ jobs:
           name: size-baselines
           path: |
             tests/size-baselines.json
-            tests/size-fixture/package-lock.json
+            tests/size-fixture/package-lock.fixture.json
           if-no-files-found: error
