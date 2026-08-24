@@ -20,8 +20,10 @@ const isParent = (node: unknown): node is Parent =>
   Array.isArray((node as Parent | undefined)?.children);
 
 const walk = (node: Parent) => {
+  // What sits after a break is a local question, so it holds at any inline
+  // depth. Only "trailing" needs the block gate — `**one\** two` is not dangling.
+  dropBreaksBeforeLineStartSensitive(node.children);
   if (BLOCKS.has(node.type ?? '')) {
-    dropBreaksBeforeLineStartSensitive(node.children);
     trimTrailingBreaks(node);
   }
   for (const child of node.children) {
