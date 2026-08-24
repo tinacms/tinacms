@@ -1,5 +1,29 @@
 # @tinacms/app
 
+## 2.5.12
+
+### Patch Changes
+
+- [#7469](https://github.com/tinacms/tinacms/pull/7469) [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Bump the final-form family to the TypeScript releases
+
+  `final-form` 4.20.10 → ^5.0.1, `final-form-arrays` ^3.1.0 → ^4.0.1, `react-final-form` ^6.5.9 → ^7.0.1. All three majors are the same event: a coordinated Flow → TypeScript rewrite published on 2025-06-07 and labelled as carrying no API changes. `react-final-form@7` is where React 19 was added to the peer range, which clears the last unmet peer warning on install outside the GraphiQL chain.
+
+  They must move together because each peers on the next: `react-final-form@7` requires `final-form@^5`, and `final-form-arrays@3` peers on `final-form@^4`. `final-form-set-field-data` stays put — its peer is `>=1.2.0`.
+
+- [#7433](https://github.com/tinacms/tinacms/pull/7433) [`5544a42`](https://github.com/tinacms/tinacms/commit/5544a4225fd131fdb46c0464e8f31e4c4e0fa742) Thanks [@fetzu](https://github.com/fetzu)! - Move the GraphQL playground off the 2023 `graphiql` pre-release (`3.0.0-alpha.1`) to `^4.1.2`.
+
+  The catalog pinned an exact alpha published four days before stable 3.0.0, so no downstream consumer could override it. It carried `@graphiql/react@0.18.0` → `markdown-it@12.3.2` → `linkify-it@3.0.3`, keeping GHSA-6v5v-wf23-fmfq (markdown-it) and GHSA-22p9-wv53-3rq4 / GHSA-v245-v573-v5vm (linkify-it) alive for everyone installing `@tinacms/app`.
+
+  Bumping `graphiql` alone was not enough: both `@graphiql/react` and `typedoc` declare `markdown-it: ^14.1.0`, and pnpm deduped that to `14.1.0` — below the `14.1.2` fix. A `markdown-it: ^14.3.0` override resolves both chains to patched versions (`markdown-it@14.3.0`, `linkify-it@5.0.2`).
+
+  `graphiql` 5 was evaluated and deliberately not taken: it replaces CodeMirror with a bundled Monaco (undoing the recent 73 MB `monaco-editor` removal, and requiring a `setup-workers` import that changes the Vite build contract for every consumer building `@tinacms/app` from source), and it drops the controlled `query` / `variables` props the playground's "Queries" sidebar depends on. Version 4 keeps CodeMirror and that prop contract, so the migration is the CSS import path plus one latent-bug fix.
+
+  `defaultTabs={[]}` is removed. An empty array is a valid-looking but impossible state — zero tabs — and v4 dereferences `tabs[activeTabIndex]` when recording history, so executing any query crashed the playground with "Cannot read properties of undefined (reading 'query')". v3 only survived it because a `??` short-circuit happened to skip the same lookup. Without the prop, GraphiQL creates the single default tab seeded from `query`/`variables`, which is what the playground wanted.
+
+- Updated dependencies [[`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7), [`d7cdea7`](https://github.com/tinacms/tinacms/commit/d7cdea75219702574fa78b6adcc90c368e4e71eb), [`4f90806`](https://github.com/tinacms/tinacms/commit/4f9080666308063332e16d96d00a75ff7348c011), [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe), [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe), [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7), [`8d94e35`](https://github.com/tinacms/tinacms/commit/8d94e354d9bb62ce52defb56c1e25ac114b0d971), [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7), [`4d08c25`](https://github.com/tinacms/tinacms/commit/4d08c2546f96fa7b8fbef48b19e19c45e24b44d5), [`37ca62b`](https://github.com/tinacms/tinacms/commit/37ca62b66aadb2cb80daa280a25a390c0bc2e4af), [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7), [`de5c7d7`](https://github.com/tinacms/tinacms/commit/de5c7d72b67f589f1f5c4bccc5f5677e70cd7e2d), [`37ca62b`](https://github.com/tinacms/tinacms/commit/37ca62b66aadb2cb80daa280a25a390c0bc2e4af)]:
+  - tinacms@3.12.1
+  - @tinacms/mdx@2.2.1
+
 ## 2.5.11
 
 ### Patch Changes

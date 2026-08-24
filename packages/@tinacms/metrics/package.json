@@ -1,6 +1,6 @@
 {
     "name": "@tinacms/metrics",
-    "version": "2.1.1",
+    "version": "2.1.2",
     "main": "dist/index.js",
     "type": "module",
     "typings": "dist/index.d.ts",
@@ -16,13 +16,9 @@
             }
         ]
     },
-    "peerDependencies": {
-        "fs-extra": "^9.0.1"
-    },
     "devDependencies": {
         "@tinacms/scripts": "workspace:*",
-        "@types/fs-extra": "^9.0.13",
-        "fs-extra": "catalog:",
+        "@types/node": "^22.13.1",
         "jest": "catalog:",
         "typescript": "^5.7.3"
     },

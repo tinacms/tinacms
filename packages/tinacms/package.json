@@ -2,7 +2,7 @@
   "name": "tinacms",
   "type": "module",
   "typings": "dist/index.d.ts",
-  "version": "3.12.0",
+  "version": "3.12.1",
   "main": "dist/index.js",
   "module": "./dist/index.js",
   "exports": {
@@ -90,7 +90,6 @@
     "clsx": "catalog:",
     "cmdk": "catalog:",
     "color-string": "catalog:",
-    "crypto-js": "catalog:",
     "date-fns": "4.1.0",
     "es-toolkit": "^1.42.0",
     "final-form": "catalog:",

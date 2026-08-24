@@ -1,5 +1,51 @@
 # tinacms
 
+## 3.12.1
+
+### Patch Changes
+
+- [#7469](https://github.com/tinacms/tinacms/pull/7469) [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Bump the final-form family to the TypeScript releases
+
+  `final-form` 4.20.10 → ^5.0.1, `final-form-arrays` ^3.1.0 → ^4.0.1, `react-final-form` ^6.5.9 → ^7.0.1. All three majors are the same event: a coordinated Flow → TypeScript rewrite published on 2025-06-07 and labelled as carrying no API changes. `react-final-form@7` is where React 19 was added to the peer range, which clears the last unmet peer warning on install outside the GraphiQL chain.
+
+  They must move together because each peers on the next: `react-final-form@7` requires `final-form@^5`, and `final-form-arrays@3` peers on `final-form@^4`. `final-form-set-field-data` stays put — its peer is `>=1.2.0`.
+
+- [#7472](https://github.com/tinacms/tinacms/pull/7472) [`d7cdea7`](https://github.com/tinacms/tinacms/commit/d7cdea75219702574fa78b6adcc90c368e4e71eb) Thanks [@kulesy](https://github.com/kulesy)! - Fix `Button` and `IconButton` not passing `disabled` to the DOM. Both components used the prop only to pick styling (`pointer-events-none`), which blocks the pointer but not the keyboard, so every disabled button in the CMS stayed focusable and could still be activated with Enter or Space. `busy` is now treated as disabled too, closing a double-submit path on in-flight buttons. `disabled` is omitted when `Button` renders as a tag that does not support it (`as='a'`).
+
+- [#7468](https://github.com/tinacms/tinacms/pull/7468) [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Drop the deprecated `crypto-js` dependency
+
+  `@tinacms/cli` used it in one place, to generate the default `NEXTAUTH_SECRET` offered during `tinacms init`. `crypto.lib.WordArray.random(16).toString()` is replaced with `randomBytes(16).toString('hex')` from `node:crypto`, which produces the same 32-character hex string. `tinacms` declared the dependency without ever importing it.
+
+- [#7469](https://github.com/tinacms/tinacms/pull/7469) [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Declare the field props that `react-final-form`'s index signature used to cover
+
+  `FieldRenderProps` carried `[otherProp: string]: any` in v6, so the extras `FieldsBuilder` passes to every field plugin — `tinaForm`, `index`, `children`, `experimental_focusIntent` — type-checked implicitly. v7's TypeScript rewrite dropped that index signature, so they are now declared on `FieldProps` directly. The rich-text plugin's `rawMode`, `setRawMode` and `rawEditor` are declared on its own props rather than the shared type.
+
+  No runtime change; these props were always being passed.
+
+- [#6763](https://github.com/tinacms/tinacms/pull/6763) [`8d94e35`](https://github.com/tinacms/tinacms/commit/8d94e354d9bb62ce52defb56c1e25ac114b0d971) Thanks [@kulesy](https://github.com/kulesy)! - Fix "Save to new branch" failing with "Branch operation failed" when the derived branch name is not a valid Git ref, e.g. when a collection's `path` has a trailing slash, producing `content/articles//foo.mdx` and the invalid ref `tina/articles//foo`. The default branch name derived from the file path, and any user-typed name, are now normalised to a valid ref: repeated and leading/trailing slashes collapse, characters Git forbids in refs (whitespace, control characters, `~ ^ : ? * [ \` and the `@{` sequence) become hyphens, `..` runs collapse, and leading dots and trailing `.` / `.lock` are stripped per path component. Saving is disabled while the name normalises to an empty string. The same normalisation now runs when creating a branch from the branch switcher and from the deleted-branch recovery modal, and the duplicated `formatBranchName` helpers are unified into a single util (the legacy branch switcher previously deleted invalid characters; it now replaces them with hyphens like the main switcher).
+
+- [#7469](https://github.com/tinacms/tinacms/pull/7469) [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Add `data-test` hooks to group-list and blocks field controls
+
+  Mirrors the hooks already on simple list fields, so end-to-end tests can target the add button and field wrapper of an object list or a blocks field without depending on Tailwind classes. Nested fields carry their full path, e.g. `add-item-blocks.0.actions`.
+
+- [#7483](https://github.com/tinacms/tinacms/pull/7483) [`4d08c25`](https://github.com/tinacms/tinacms/commit/4d08c2546f96fa7b8fbef48b19e19c45e24b44d5) Thanks [@kulesy](https://github.com/kulesy)! - Fix two admin regressions that appear once the TinaCloud session check starts failing. Making the collection list settle instead of spinning left the previously fetched data in place, so switching collections rendered the last collection's documents under the new collection's heading; on a fresh mount it left `collection` undefined with no error set, so `GetCollection` ran its auto-open effect against it and threw, which the top-level error boundary caught and replaced the admin with a raw TypeError card. A failed session check now sends the user straight back to the login modal with a "Your session has ended" message, and signing back in returns them to the page they were on. `GetCollection` and `GetDocument` also stop handing `undefined` to their children, showing an "Unable to load" popup for non-auth load failures, and `GetCollection`'s auto-open effect bails out early, which clears the same crash on a failed `fetchCollection`.
+
+- [#7445](https://github.com/tinacms/tinacms/pull/7445) [`37ca62b`](https://github.com/tinacms/tinacms/commit/37ca62b66aadb2cb80daa280a25a390c0bc2e4af) Thanks [@kulesy](https://github.com/kulesy)! - Skip TinaCloud identity requests when no auth token is stored. Logged-out admin loads no longer produce misleading 401/CORS console errors; a clear console message now points at the login popup console instead. Also fixes an unawaited auth guard in GetDocument, stops the document view from loading forever when that guard rejects the request, and fixes an unhandled promise rejection when the project settings request fails.
+
+- [#7469](https://github.com/tinacms/tinacms/pull/7469) [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Add `data-test` hooks to list field controls
+
+  The add and delete buttons on `list: true` fields had no stable selector, so end-to-end tests had to target Tailwind classes. Adds `data-test="list-<name>"` on the field wrapper, `data-test="add-item-<name>"` on the add button, and `data-test="delete-item-<name>.<index>"` on the delete button shared with group-list and blocks fields.
+
+  Every hook carries the full field path. The wrapper hook lands on the outer field wrapper, so a nested list's delete buttons are descendants of the outer list's wrapper; a bare id would make `[data-test="list-x"] [data-test="delete-item"]` match the wrong row once lists nest.
+
+- [#7445](https://github.com/tinacms/tinacms/pull/7445) [`37ca62b`](https://github.com/tinacms/tinacms/commit/37ca62b66aadb2cb80daa280a25a390c0bc2e4af) Thanks [@kulesy](https://github.com/kulesy)! - Fix the collection list and collection search hanging on the loading screen when the session check says the user is not signed in. Both now settle and render instead of spinning until the page is reloaded.
+
+- Updated dependencies [[`4f90806`](https://github.com/tinacms/tinacms/commit/4f9080666308063332e16d96d00a75ff7348c011), [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe), [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe), [`de5c7d7`](https://github.com/tinacms/tinacms/commit/de5c7d72b67f589f1f5c4bccc5f5677e70cd7e2d)]:
+  - @tinacms/mdx@2.2.1
+  - @tinacms/search@1.2.24
+  - @tinacms/bridge@0.3.1
+  - @tinacms/schema-tools@2.9.0
+
 ## 3.12.0
 
 ### Minor Changes

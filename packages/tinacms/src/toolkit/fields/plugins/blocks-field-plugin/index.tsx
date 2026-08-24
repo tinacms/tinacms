@@ -109,6 +109,7 @@ const Blocks = ({
 
   return (
     <ListFieldMeta
+      data-test={`list-${field.name}`}
       name={input.name}
       label={field.label}
       description={field.description}
@@ -120,9 +121,14 @@ const Blocks = ({
         (!fixedLength || (fixedLength && !isMax)) &&
         // @ts-ignore
         (!field.visualSelector ? (
-          <BlockSelector templates={field.templates} addItem={addItem} />
+          <BlockSelector
+            templates={field.templates}
+            addItem={addItem}
+            fieldName={field.name}
+          />
         ) : (
           <BlockSelectorBig
+            fieldName={field.name}
             label={field.label || field.name}
             templates={field.templates}
             addItem={addItem}
@@ -265,7 +271,11 @@ const BlockListItem = ({
               <Pencil className='h-5 w-auto text-gray-200 group-hover:text-inherit transition-colors duration-150 ease-out' />
             </ItemClickTarget>
             {(!fixedLength || (fixedLength && !isMin)) && (
-              <ItemDeleteButton disabled={isMin} onClick={removeItem} />
+              <ItemDeleteButton
+                disabled={isMin}
+                onClick={removeItem}
+                fieldName={`${field.name}.${index}`}
+              />
             )}
           </ItemHeader>
         </>
@@ -298,7 +308,10 @@ const InvalidBlockListItem = ({
           <ItemClickTarget>
             <GroupLabel error>Invalid Block</GroupLabel>
           </ItemClickTarget>
-          <ItemDeleteButton onClick={removeItem} />
+          <ItemDeleteButton
+            onClick={removeItem}
+            fieldName={`${field.name}.${index}`}
+          />
         </ItemHeader>
       )}
     </Draggable>
