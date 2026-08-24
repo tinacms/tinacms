@@ -27,7 +27,6 @@
     "scripts": {
         "types": "pnpm tsc",
         "build": "tinacms-scripts build",
-        "docs": "pnpm typedoc",
         "test": "vitest run --coverage.enabled",
         "test-watch": "vitest"
     },

@@ -31,6 +31,7 @@ import { useBranchData } from './branch-data';
 import { BranchSwitcherLegacy } from './branch-switcher-legacy';
 import { Branch, BranchSwitcherProps } from './types';
 
+import { formatBranchName, normalizeBranchName } from '@utils/branch-name';
 import BranchSelectorTable from './branch-selector-table';
 
 type ListState = 'loading' | 'ready' | 'error';
@@ -38,8 +39,7 @@ type ListState = 'loading' | 'ready' | 'error';
 export const tableHeadingStyle =
   'px-3 py-3 text-left text-xs font-bold text-gray-700 tracking-wider sticky top-0 bg-gray-100 z-20 border-b-2 border-gray-200 ';
 
-import { formatBranchName } from './format-branch-name';
-export { formatBranchName };
+export { formatBranchName } from '@utils/branch-name';
 
 export const BranchSwitcher = (props: BranchSwitcherProps) => {
   const cms = useCMS();
@@ -83,7 +83,7 @@ export const EditoralBranchSwitcher = ({
   const handleCreateBranch = React.useCallback((value) => {
     setListState('loading');
     createBranch({
-      branchName: formatBranchName(value),
+      branchName: normalizeBranchName(formatBranchName(value)),
       baseBranch: currentBranch,
     }).then(async (createdBranchName) => {
       cms.alerts.success('Branch created.');
@@ -292,11 +292,22 @@ export const sortBranchListFn = (sortValue: 'default' | 'updated' | 'name') => {
   };
 };
 
-const BranchCreator = ({ setViewState, handleCreateBranch, currentBranch }) => {
+export const BranchCreator = ({
+  setViewState,
+  handleCreateBranch,
+  currentBranch,
+}) => {
   const [branchName, setBranchName] = React.useState('');
+  // Guard on the value actually sent: a slashes-only name would otherwise
+  // normalise away and create a bare `tina` ref, blocking every `tina/*` branch
+  const normalizedBranchName = normalizeBranchName(
+    formatBranchName(branchName)
+  );
 
   return (
-    <form>
+    // Submit is handled by the button below; without this the implicit
+    // submission from pressing Enter in the field reloads the page
+    <form onSubmit={(e) => e.preventDefault()}>
       <div className=''>
         <p className='text-base text-gray-700 mb-4'>
           Create a new branch from <strong>{currentBranch}</strong>.
@@ -334,9 +345,12 @@ const BranchCreator = ({ setViewState, handleCreateBranch, currentBranch }) => {
           variant='primary'
           type='submit'
           style={{ flexGrow: 2 }}
-          disabled={branchName === ''}
+          disabled={normalizedBranchName === ''}
           onClick={() => {
-            handleCreateBranch('tina/' + branchName);
+            // Button renders `disabled` as styling only, so keyboard activation
+            // still reaches this handler
+            if (!normalizedBranchName) return;
+            handleCreateBranch('tina/' + normalizedBranchName);
           }}
         >
           Create Branch <GitBranch className='w-5 h-full ml-1 opacity-70' />
