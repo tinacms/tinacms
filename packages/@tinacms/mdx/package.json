@@ -34,7 +34,6 @@
 	"scripts": {
 		"types": "tsc",
 		"build": "tinacms-scripts build",
-		"docs": "typedoc --plugin typedoc-plugin-markdown src/parse/plate.ts --theme markdown && concat-md --decrease-title-levels --dir-name-as-title docs > spec.md",
 		"serve": "nodemon dist/server.js",
 		"test": "vitest run",
 		"coverage": "vitest run --coverage",
@@ -64,11 +63,9 @@
 		"remark-gfm": "catalog:",
 		"remark-mdx": "catalog:",
 		"stringify-entities": "catalog:",
-		"typedoc": "catalog:",
 		"unist-util-source": "catalog:",
 		"unist-util-stringify-position": "catalog:",
 		"unist-util-visit": "catalog:",
-		"uvu": "catalog:",
 		"vfile-message": "catalog:"
 	},
 	"publishConfig": {
@@ -86,10 +83,8 @@
 		"@types/prettier": "catalog:",
 		"@types/unist": "catalog:",
 		"c8": "catalog:",
-		"concat-md": "catalog:",
 		"jest-file-snapshot": "^0.5.0",
 		"ts-node": "catalog:",
-		"typedoc-plugin-markdown": "catalog:",
 		"typescript": "^5.7.3",
 		"vite": "^4.5.9",
 		"vitest": "^0.32.4"
