@@ -102,6 +102,7 @@ const Group = ({ tinaForm, form, field, input, meta, index }: GroupProps) => {
 
   return (
     <ListFieldMeta
+      data-test={`list-${field.name}`}
       name={input.name}
       label={field.label}
       description={field.description}
@@ -112,6 +113,7 @@ const Group = ({ tinaForm, form, field, input, meta, index }: GroupProps) => {
       actions={
         (!fixedLength || (fixedLength && !isMax)) && (
           <IconButton
+            data-test={`add-item-${field.name}`}
             onClick={addItem}
             disabled={isMax}
             variant='primary'
@@ -233,7 +235,11 @@ const Item = ({
               <Pencil className='h-5 w-auto text-gray-200 group-hover:text-inherit transition-colors duration-150 ease-out' />
             </ItemClickTarget>
             {(!fixedLength || (fixedLength && !isMin)) && (
-              <ItemDeleteButton disabled={isMin} onClick={removeItem} />
+              <ItemDeleteButton
+                disabled={isMin}
+                onClick={removeItem}
+                fieldName={`${field.name}.${index}`}
+              />
             )}
           </ItemHeader>
         </>
@@ -301,10 +307,18 @@ export const ItemHeader = ({
   );
 };
 
-export const ItemDeleteButton = ({ onClick, disabled = false }) => {
+export const ItemDeleteButton = ({
+  onClick,
+  disabled = false,
+  fieldName = '',
+}) => {
   return (
     <button
       type='button'
+      // Namespaced by field path like the list- and add-item- hooks: the wrapper
+      // hook lands on the outer FieldWrapper, so a nested list's delete buttons
+      // are descendants of the outer list's wrapper and a bare id would collide.
+      data-test={fieldName ? `delete-item-${fieldName}` : 'delete-item'}
       className={`w-8 px-1 py-2.5 flex items-center justify-center text-gray-200 hover:opacity-100 opacity-30 hover:bg-gray-50 ${
         disabled && 'pointer-events-none opacity-30 cursor-not-allowed'
       }`}
