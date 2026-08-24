@@ -1,5 +1,13 @@
 # @tinacms/metrics
 
+## 2.1.2
+
+### Patch Changes
+
+- [#7468](https://github.com/tinacms/tinacms/pull/7468) [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Drop the `fs-extra` peer dependency
+
+  `@tinacms/metrics` declared `fs-extra@^9.0.1` as a peer while the repo itself ran `^11.3.0`, so the range was never satisfied and every install printed an unmet-peer warning. The one call site read `package.json` with `readFileSync`, which fs-extra re-exports unchanged from `node:fs`, so the peer is replaced with the builtin and `@types/node` covers the types that previously arrived through `@types/fs-extra`.
+
 ## 2.1.1
 
 ### Patch Changes
