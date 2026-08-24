@@ -1,4 +1,10 @@
 ---
+'next-tinacms-azure': patch
+'next-tinacms-cloudinary': patch
+'next-tinacms-dos': patch
+'next-tinacms-s3': patch
 ---
 
-Remove the orphaned `react-beautiful-dnd` catalog entries and the `@types/crypto-js` devDependency from the four media packages. No published package changes, so nothing to bump.
+Drop the unused `@types/crypto-js` devDependency
+
+`crypto-js` itself was removed from `tinacms` and `@tinacms/cli`, and no source file in these packages imports it, so the type package had nothing left to type.
