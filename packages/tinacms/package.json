@@ -90,7 +90,6 @@
     "clsx": "catalog:",
     "cmdk": "catalog:",
     "color-string": "catalog:",
-    "crypto-js": "catalog:",
     "date-fns": "4.1.0",
     "es-toolkit": "^1.42.0",
     "final-form": "catalog:",
