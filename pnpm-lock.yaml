@@ -1717,7 +1717,7 @@ importers:
         specifier: 'catalog:'
         version: 2.1.0
       esutils:
-        specifier: ^2.0.3
+        specifier: 2.0.3
         version: 2.0.3
       mdast-util-compact:
         specifier: 'catalog:'
