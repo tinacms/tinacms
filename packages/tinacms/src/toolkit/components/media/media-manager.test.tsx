@@ -12,7 +12,7 @@ import type { Media, MediaStore } from '@toolkit/core/media';
 import { CMSContext } from '@toolkit/react-core/use-cms';
 import { ModalProvider } from '@toolkit/react-modals';
 import React from 'react';
-import { MediaPicker } from './media-manager';
+import { MediaManager, MediaPicker } from './media-manager';
 
 vi.mock('../../../lib/posthog/posthogProvider', () => ({
   captureEvent: vi.fn(),
@@ -281,6 +281,22 @@ describe('MediaPicker type filter', () => {
     expect(screen.queryByText('Any type')).toBeNull();
   });
 
+  it('names the category on the chip rather than counting its extensions', async () => {
+    const { cms } = buildCms({ extensionFilterable: true, list: listSpy() });
+    renderPicker(cms, { accept: 'image' });
+
+    expect(await screen.findByText('Images only')).toBeTruthy();
+  });
+
+  it('spells out the concrete types for assistive tech', async () => {
+    const { cms } = buildCms({ extensionFilterable: true, list: listSpy() });
+    renderPicker(cms, { accept: 'jpg' });
+
+    // the visible chip stays short; the full list is not left to `title`
+    expect(await screen.findByText('JPG only')).toBeTruthy();
+    expect(screen.getByText('This field accepts jpg, jpeg')).toBeTruthy();
+  });
+
   it('offers the dropdown when the field is unconstrained', async () => {
     const { cms } = buildCms({ extensionFilterable: true, list: listSpy() });
     renderPicker(cms);
@@ -307,5 +323,21 @@ describe('MediaPicker type filter', () => {
     await waitFor(() =>
       expect(extOf(list)).toEqual(['pdf', 'json', 'csv', 'txt'])
     );
+  });
+});
+
+// The field plugin reaches the picker through `cms.media.open()`, not by
+// rendering it, so the option has to survive the event round-trip.
+describe('cms.media.open accept plumbing', () => {
+  it('carries a field accept from open() through to the listing', async () => {
+    const list = vi.fn().mockResolvedValue({ items: [file('photo.jpg')] });
+    const { cms } = buildCms({ extensionFilterable: true, list });
+
+    render(withCms(cms, <MediaManager />));
+    cms.media.open({ accept: 'pdf' });
+
+    await waitFor(() => expect(list).toHaveBeenCalled());
+    expect(list.mock.calls.at(-1)?.[0]?.ext).toEqual(['pdf']);
+    expect(await screen.findByText('PDF only')).toBeTruthy();
   });
 });

@@ -83,4 +83,32 @@ describe('image field accept guard', () => {
 
     expect(onChange).toHaveBeenCalledWith('/uploads/b.pdf');
   });
+
+  // Cloudinary reports `original_filename` without the extension, so a
+  // filename-only check would refuse every file that store returns.
+  it('falls back to src when the filename carries no extension', async () => {
+    const { onSelect, onChange, error } = renderField('png');
+
+    await onSelect({
+      ...media('logo'),
+      src: 'https://res.cloudinary.com/demo/image/upload/v1/logo.png',
+    });
+
+    expect(error).not.toHaveBeenCalled();
+    expect(onChange).toHaveBeenCalledWith(
+      'https://res.cloudinary.com/demo/image/upload/v1/logo.png'
+    );
+  });
+
+  it('still refuses an extension-less filename whose src does not match', async () => {
+    const { onSelect, onChange, error } = renderField('png');
+
+    await onSelect({
+      ...media('clip'),
+      src: 'https://res.cloudinary.com/demo/video/upload/v1/clip.mp4',
+    });
+
+    expect(onChange).not.toHaveBeenCalled();
+    expect(error).toHaveBeenCalled();
+  });
 });

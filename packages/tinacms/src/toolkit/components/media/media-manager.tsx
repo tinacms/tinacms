@@ -2,6 +2,7 @@ import {
   MEDIA_CATEGORIES,
   type MediaAccept,
   type MediaCategory,
+  type MediaExtension,
   resolveMediaAccept,
 } from '@tinacms/schema-tools';
 import {
@@ -226,6 +227,11 @@ export function MediaPicker({
   const listRequestRef = useRef(0);
   const newMediaSrcsRef = useRef<Set<string>>(new Set());
 
+  const fieldExtensions = React.useMemo(
+    () => resolveMediaAccept(fieldAccept),
+    [fieldAccept]
+  );
+
   // A store that ignores `ext` would return everything, so honour the field's
   // `accept` only when the store says it filters. The dropzone still enforces
   // it on upload either way.
@@ -235,11 +241,10 @@ export function MediaPicker({
     // A field's `accept` replaces the toolbar rather than seeding it — the
     // control renders as a locked chip in that case, so `typeFilter` stays
     // 'all' and there is nothing to combine.
-    const fromField = resolveMediaAccept(fieldAccept);
-    if (fromField.length) return fromField;
+    if (fieldExtensions.length) return fieldExtensions;
 
     return typeFilter === 'all' ? [] : resolveMediaAccept(typeFilter);
-  }, [fieldAccept, typeFilter, cms.media.store.extensionFilterable]);
+  }, [fieldExtensions, typeFilter, cms.media.store.extensionFilterable]);
 
   async function loadMedia(loadFolders = true) {
     const requestId = ++listRequestRef.current;
@@ -387,7 +392,6 @@ export function MediaPicker({
   )
     ? cms.api.tina.schema.schema?.config?.media?.accept.join(',')
     : cms.api.tina.schema.schema?.config?.media?.accept;
-  const fieldExtensions = resolveMediaAccept(fieldAccept);
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept:
       dropzoneAcceptFromExtensions(fieldExtensions) ??
@@ -660,7 +664,8 @@ export function MediaPicker({
                 <MediaTypeFilter
                   value={typeFilter}
                   setValue={setTypeFilter}
-                  lockedTo={resolveMediaAccept(fieldAccept)}
+                  lockedTo={fieldAccept}
+                  lockedExtensions={fieldExtensions}
                 />
               )}
               <MediaFilterToggle
@@ -1065,32 +1070,47 @@ const TYPE_FILTER_LABELS: Record<MediaCategory, string> = {
 };
 
 /**
+ * How one `accept` entry reads in the locked chip: a category keeps its name
+ * rather than being spelled out as the extensions it covers.
+ */
+const acceptEntryLabel = (entry: MediaAccept) =>
+  entry in MEDIA_CATEGORIES
+    ? TYPE_FILTER_LABELS[entry as MediaCategory]
+    : entry.toUpperCase();
+
+/**
  * Narrows the library to one media category. When the picker is opened from a
- * field that declares `accept`, that ceiling is shown instead — offering
+ * field that declares `accept`, that constraint is shown instead — offering
  * choices the field would override reads as a broken control.
  */
 const MediaTypeFilter = ({
   value,
   setValue,
   lockedTo,
+  lockedExtensions,
 }: {
   value: MediaCategory | 'all';
   setValue: (value: MediaCategory | 'all') => void;
-  lockedTo: string[];
+  lockedTo?: MediaAccept | MediaAccept[];
+  lockedExtensions: MediaExtension[];
 }) => {
-  if (lockedTo.length) {
+  if (lockedExtensions.length) {
+    const entries = Array.isArray(lockedTo) ? lockedTo : [lockedTo];
     const label =
-      lockedTo.length > 2
-        ? `${lockedTo.length} types only`
-        : `${lockedTo.join(', ').toUpperCase()} only`;
+      entries.length > 3
+        ? `${entries.length} types only`
+        : `${entries.map(acceptEntryLabel).join(', ')} only`;
+    const description = `This field accepts ${lockedExtensions.join(', ')}`;
 
     return (
       <span
         className='grow-0 flex items-center gap-1.5 whitespace-nowrap rounded-lg border border-dashed border-gray-200 bg-gray-100 px-3 py-1.5 text-sm text-gray-500'
-        title={`This field accepts ${lockedTo.join(', ')}`}
+        title={description}
       >
-        <Lock className='w-3.5 h-3.5 opacity-80' />
+        <Lock className='w-3.5 h-3.5 opacity-80' aria-hidden='true' />
         {label}
+        {/* `title` never reaches a screen reader on a non-focusable element */}
+        <span className='sr-only'>{description}</span>
       </span>
     );
   }

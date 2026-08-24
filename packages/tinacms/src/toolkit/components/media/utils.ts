@@ -1,4 +1,5 @@
 import { MEDIA_MIME_TYPES, type MediaExtension } from '@tinacms/schema-tools';
+import type { Accept } from 'react-dropzone';
 
 const supportedFileTypes = [
   'text/*',
@@ -43,10 +44,10 @@ export const dropzoneAcceptFromString = (str: string) => {
  */
 export const dropzoneAcceptFromExtensions = (
   extensions: MediaExtension[]
-): Record<string, string[]> | undefined => {
+): Accept | undefined => {
   if (!extensions.length) return undefined;
 
-  const accept: Record<string, string[]> = {};
+  const accept: Accept = {};
   for (const ext of extensions) {
     const mimeType = MEDIA_MIME_TYPES[ext];
     accept[mimeType] ??= [];

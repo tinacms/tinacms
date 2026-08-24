@@ -41,9 +41,14 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
       if (media) {
         const item = Array.isArray(media) ? media[0] : media;
 
-        const allowed = resolveMediaAccept(props.field.accept);
-        const ext = extensionOf(item.filename);
-        if (allowed.length && !allowed.some((a) => a === ext)) {
+        const allowed: readonly string[] = resolveMediaAccept(
+          props.field.accept
+        );
+        // Some stores carry the extension only on `src` — Cloudinary's
+        // `original_filename` drops it — so an unusable filename falls back
+        // rather than refusing every file the store returns.
+        const ext = extensionOf(item.filename) || extensionOf(item.src ?? '');
+        if (allowed.length && !allowed.includes(ext)) {
           cms.alerts.error(
             `${item.filename} is not an accepted file type. This field accepts ${allowed.join(', ')}.`
           );

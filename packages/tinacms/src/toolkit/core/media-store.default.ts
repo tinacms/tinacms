@@ -845,10 +845,10 @@ export class TinaMediaStore implements MediaStore {
    */
   private filterByExtension(items: Media[], ext?: MediaExtension[]): Media[] {
     if (!ext?.length) return items;
+    const allowed: readonly string[] = ext;
     return items.filter(
       (item) =>
-        item.type === 'dir' ||
-        ext.includes(extensionOf(item.filename) as MediaExtension)
+        item.type === 'dir' || allowed.includes(extensionOf(item.filename))
     );
   }
 

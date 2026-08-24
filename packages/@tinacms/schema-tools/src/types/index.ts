@@ -314,10 +314,12 @@ export type MediaAccept = MediaExtension | MediaCategory;
  * Extensions naming the same format. Declaring one accepts the other, so
  * `accept: 'jpeg'` does not reject `photo.jpg`.
  */
-const MEDIA_EXTENSION_ALIASES = {
+const MEDIA_EXTENSION_ALIASES: Partial<
+  Record<MediaExtension, readonly MediaExtension[]>
+> = {
   jpg: ['jpeg'],
   jpeg: ['jpg'],
-} as const satisfies Partial<Record<MediaExtension, readonly MediaExtension[]>>;
+};
 
 /**
  * The MIME type each extension belongs to. Needed because react-dropzone
@@ -372,9 +374,7 @@ export const resolveMediaAccept = (
   const resolved = new Set<MediaExtension>();
   const add = (ext: MediaExtension) => {
     resolved.add(ext);
-    for (const alias of MEDIA_EXTENSION_ALIASES[
-      ext as keyof typeof MEDIA_EXTENSION_ALIASES
-    ] ?? []) {
+    for (const alias of MEDIA_EXTENSION_ALIASES[ext] ?? []) {
       resolved.add(alias);
     }
   };
