@@ -1,7 +1,7 @@
 {
     "name": "@tinacms/graphql",
     "type": "module",
-    "version": "2.4.9",
+    "version": "2.4.10",
     "main": "dist/index.js",
     "module": "./dist/index.js",
     "files": [
@@ -27,7 +27,6 @@
     "scripts": {
         "types": "pnpm tsc",
         "build": "tinacms-scripts build",
-        "docs": "pnpm typedoc",
         "test": "vitest run --coverage.enabled",
         "test-watch": "vitest"
     },
@@ -45,7 +44,7 @@
         "gray-matter": "catalog:",
         "isomorphic-git": "catalog:",
         "js-sha1": "catalog:",
-        "js-yaml": "^3.14.1",
+        "js-yaml": "^3.15.1",
         "jsonpath-plus": "catalog:",
         "many-level": "catalog:",
         "micromatch": "catalog:",

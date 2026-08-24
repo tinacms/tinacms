@@ -10,8 +10,8 @@ import {
   type MediaWorkflowConfirmBranchEvent,
   getEditorialWorkflowPrTitle,
 } from '@toolkit/form-builder/editorial-workflow-utils';
-import { formatBranchName } from '@toolkit/plugin-branch-switcher/format-branch-name';
 import type { TinaCMS } from '@toolkit/tina-cms';
+import { formatBranchName } from '@utils/branch-name';
 import type { Client } from '../../internalClient';
 import {
   E_BAD_ROUTE,

@@ -14,6 +14,7 @@ import {
   ModalHeader,
   PopupModal,
 } from '@toolkit/react-modals';
+import { normalizeBranchName } from '@utils/branch-name';
 import { CircleAlert } from 'lucide-react';
 import * as React from 'react';
 
@@ -119,7 +120,7 @@ export const MediaWorkflowOverlay = () => {
 
     const confirmState = state;
     const branchName = confirmState.branchName;
-    const targetBranch = `tina/${branchName}`;
+    const targetBranch = `tina/${normalizeBranchName(branchName)}`;
     abortPreflight();
     const abortController = new AbortController();
     preflightAbortRef.current = abortController;
@@ -193,7 +194,9 @@ export const MediaWorkflowOverlay = () => {
           state.onCancel();
           setState({ phase: 'idle' });
         }}
-        disabled={state.branchName === '' || state.isChecking}
+        disabled={
+          normalizeBranchName(state.branchName) === '' || state.isChecking
+        }
         errorMessage={state.errorMessage}
         onBranchNameChange={(branchName) => {
           abortPreflight();

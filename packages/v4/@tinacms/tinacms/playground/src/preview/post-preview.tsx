@@ -1,4 +1,8 @@
-import { tinaField, useTina } from '@tinacms/tinacms/adapters/react';
+import {
+  TinaMarkdown,
+  tinaField,
+  useTina,
+} from '@tinacms/tinacms/adapters/react';
 import { sampleDocument } from '../content';
 
 export function PostPreview() {
@@ -26,6 +30,9 @@ export function PostPreview() {
           ? 'This preview renders the document streamed from the editor. Click the title or the badge to focus its field in the sidebar.'
           : 'Standalone preview — rendering the static document.'}
       </p>
+      <div {...tinaField('body')}>
+        <TinaMarkdown content={post.body} />
+      </div>
     </article>
   );
 }

@@ -1,5 +1,86 @@
 # tinacms-cli
 
+## 2.6.1
+
+### Patch Changes
+
+- [#7454](https://github.com/tinacms/tinacms/pull/7454) [`41263f5`](https://github.com/tinacms/tinacms/commit/41263f503e4c02f3b9272aa5dca6fc2c572a60eb) Thanks [@kulesy](https://github.com/kulesy)! - Bump `js-yaml` to 4.3.1, picking up an upstream security fix (GHSA-5p4m-2wfm-xmqj)
+
+- [#7468](https://github.com/tinacms/tinacms/pull/7468) [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Drop the deprecated `crypto-js` dependency
+
+  `@tinacms/cli` used it in one place, to generate the default `NEXTAUTH_SECRET` offered during `tinacms init`. `crypto.lib.WordArray.random(16).toString()` is replaced with `randomBytes(16).toString('hex')` from `node:crypto`, which produces the same 32-character hex string. `tinacms` declared the dependency without ever importing it.
+
+- Updated dependencies [[`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7), [`195087d`](https://github.com/tinacms/tinacms/commit/195087de7e617d9d91b06709db869787ac0c800f), [`d7cdea7`](https://github.com/tinacms/tinacms/commit/d7cdea75219702574fa78b6adcc90c368e4e71eb), [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe), [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe), [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe), [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7), [`8d94e35`](https://github.com/tinacms/tinacms/commit/8d94e354d9bb62ce52defb56c1e25ac114b0d971), [`5544a42`](https://github.com/tinacms/tinacms/commit/5544a4225fd131fdb46c0464e8f31e4c4e0fa742), [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7), [`4d08c25`](https://github.com/tinacms/tinacms/commit/4d08c2546f96fa7b8fbef48b19e19c45e24b44d5), [`37ca62b`](https://github.com/tinacms/tinacms/commit/37ca62b66aadb2cb80daa280a25a390c0bc2e4af), [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7), [`37ca62b`](https://github.com/tinacms/tinacms/commit/37ca62b66aadb2cb80daa280a25a390c0bc2e4af)]:
+  - tinacms@3.12.1
+  - @tinacms/app@2.5.12
+  - @tinacms/graphql@2.4.10
+  - @tinacms/metrics@2.1.2
+  - @tinacms/search@1.2.24
+  - @tinacms/schema-tools@2.9.0
+
+## 2.6.0
+
+### Minor Changes
+
+- [#7391](https://github.com/tinacms/tinacms/pull/7391) [`ece366b`](https://github.com/tinacms/tinacms/commit/ece366bd5aa86e048d22f829319e41fe3d1267ba) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Add a Rename action to the Media Manager, backed by the local dev server.
+
+  Selecting a file in the media preview now offers Rename alongside Insert and Delete. The modal edits the basename, keeps the extension, previews the sanitised result using the same rules uploads apply, and reports collisions and missing files specifically instead of a generic failure. Every open media picker refreshes afterwards, and pickers previewing the renamed file follow it to its new path.
+
+  Renaming does **not** update content that already references the old path — the modal says so explicitly.
+
+  The action only appears when the media store implements `rename`. `TinaMediaStore` implements it for local development via a new `POST /media/rename` route on the CLI dev server; TinaCloud, static and self-hosted repo-media stores do not advertise it, so the action stays hidden there rather than failing on click. Third-party stores (S3, Cloudinary, DigitalOcean Spaces, Azure) can opt in by implementing `MediaStore.rename`.
+
+  `MediaManager.rename()` dispatches `media:rename:start`, `media:rename:success` and `media:rename:failure`.
+
+- [#7323](https://github.com/tinacms/tinacms/pull/7323) [`4a19d66`](https://github.com/tinacms/tinacms/commit/4a19d669b069c0af959c6461cd60b5910aea6512) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Add media-manager search and a folder/file filter, and refresh the grid.
+
+  Search filters the library by file path (debounced, recursive across folders); the `All | Folders | Files` toggle narrows the view. Folders and files render in labelled sections, files show a type badge (JPEG/PNG/MP4…), and videos show a play overlay.
+
+  Search works against both TinaCloud media and local dev media. The local dev-server media endpoint (`@tinacms/cli`) now honours a `search` query param, matching paths recursively within the requested folder (case-insensitive) and staying within the media root. Matching is on the folder-relative path, so a folder name matches the files beneath it, and matching folders surface as their own folder results (local dev media; TinaCloud parity to follow). Results are paginated with the same `limit`/`cursor` contract as an unfiltered listing.
+
+  The search box is opt-in per media store via a new `searchable` flag on the `MediaStore` interface. The default (TinaCloud/local) store sets it; a custom or self-hosted store shows the box only once it sets `searchable` and reads `options.search` in its `list()`, so stores that don't support search don't get a box that returns unfiltered results.
+
+  Also fixes the breadcrumb rendering a duplicate root crumb — and Back not returning to the root — for folder names that carry a trailing slash.
+
+- [#7392](https://github.com/tinacms/tinacms/pull/7392) [`4b7d9b9`](https://github.com/tinacms/tinacms/commit/4b7d9b9f116f7f649aae1a573c838a663f97d99d) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: add tina-markdown web component
+  feat: add visual-editing library for web components
+
+- [#7283](https://github.com/tinacms/tinacms/pull/7283) [`1c89c44`](https://github.com/tinacms/tinacms/commit/1c89c44f377a56e9637d719d781ba2281ff56e37) Thanks [@kulesy](https://github.com/kulesy)! - `tinacms dev` and `tinacms build` now warn at startup when the `tinacms`, `@tinacms/graphql`, or `@tinacms/schema-tools` versions resolved from the project don't satisfy the ranges the CLI was published with, or when two different copies of `tinacms` are installed. A held-back package (stale lockfile entry, partial upgrade, pnpm `minimumReleaseAge`) previously failed silently: the admin built fine but served an older `tinacms` where newer documented features were missing.
+
+### Patch Changes
+
+- [#7297](https://github.com/tinacms/tinacms/pull/7297) [`f74e2d9`](https://github.com/tinacms/tinacms/commit/f74e2d90974e59973bbbfcf4cf118adc4726a17e) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Bump `vite` off the EOL 4.x line (`^4.5.9`, resolving to the last-ever `4.5.14`) to `^6.4.3`, and `@vitejs/plugin-react` 3 → 4, closing several path-traversal / file-disclosure advisories that were never backported to vite 4.x.
+
+  **Dev server:** Vite 6 serves its dev endpoints (`@vite/client`, `@react-refresh`, and the SPA entry) under the configured `base` — Vite 4 served them at the server root. The injected dev HTML now prefixes those URLs with the admin base path, so `tinacms dev` loads the editor again instead of failing with "Failed loading TinaCMS assets".
+
+  **esbuild:** the `esbuild` catalog pin moves `^0.24.2` → `^0.25.0` to match the version vite 6 bundles, so `@tinacms/cli` installs a single esbuild native binary instead of two.
+
+  **Other fallout from the majors:** `@vitejs/plugin-react` 4 removed the `fastRefresh` option, so Fast Refresh is now always on in `tinacms dev` (it had been explicitly disabled) — if editor HMR misbehaves, that's the knob that changed. `splitVendorChunkPlugin` (deprecated since Vite 5.2.7, still exported in 6.4.3) is deliberately dropped from the build config as a simplification — the admin build now emits a single bundle with no separate vendor chunk, unless a `manualChunks` split is reinstated. The `process.env` define switches from a `new Object(...)` wrapper to a plain JSON literal, since esbuild ≥0.25 (bundled by vite 6) rejects the old form. The Node.js floor for the `tinacms` binary rises from 14.18 to 18, matching vite 6's engine requirement.
+
+- [#7285](https://github.com/tinacms/tinacms/pull/7285) [`c87b028`](https://github.com/tinacms/tinacms/commit/c87b0282b98f7a8e3ebafd7594914856c8692758) Thanks [@kulesy](https://github.com/kulesy)! - Capture CLI telemetry as anonymous events so builds no longer create a single-use person profile per run
+
+- [#7228](https://github.com/tinacms/tinacms/pull/7228) [`74ea991`](https://github.com/tinacms/tinacms/commit/74ea9912a78a284779ddd81697ab5cdeca762ff8) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Move graphql-codegen to its current majors (~33 MB).
+
+  `@graphql-codegen/plugin-helpers@7` drops lodash entirely. Before this, the CLI declared `plugin-helpers` directly at `^7.0.1` while the five codegen plugins it uses all wanted `^5` — so our pin took the hoisted slot and each plugin nested its own copy, each dragging a `lodash` pinned to `~4.17.0` that couldn't use the hoisted `4.18.1` either. Six copies of `plugin-helpers` and six of `lodash`, all but one identical. **Now one of each.**
+
+  Three things v7 needs, all handled here:
+
+  - **jest couldn't load it.** codegen v6's CJS build `require()`s `auto-bind@5`, which is ESM-only. Node 22 can do that; jest's module registry can't, and jest doesn't transform `node_modules`. Babel now down-levels that one package.
+  - **`@graphql-inspector/core` v6** makes `ChangeType` a const rather than an enum; the type is `TypeOfChangeType`.
+  - **codegen v5+ stops exporting `Exact`** from the generated `types.ts`, and defaults unmapped scalars to `unknown` instead of `any` — which would break every `<TinaMarkdown content={data.post._body} />`, since rich-text bodies ride on the `JSON` scalar. Both are pinned back.
+
+  No behaviour change: the generated `types.ts`, `frags.gql` and `queries.gql` are unchanged, and the kitchen-sink typechecks with zero new errors.
+
+- [#7076](https://github.com/tinacms/tinacms/pull/7076) [`976a93c`](https://github.com/tinacms/tinacms/commit/976a93ca16f85343566b0a3e36618e7330b8d94f) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump `esbuild` to 0.28.1, picking up upstream security fixes (GHSA-g7r4-m6w7-qqqr, GHSA-gv7w-rqvm-qjhr)
+
+- Updated dependencies [[`7df6e04`](https://github.com/tinacms/tinacms/commit/7df6e04e4b5574bf7c0ddf8aa1240716fa03d20f), [`4499dcb`](https://github.com/tinacms/tinacms/commit/4499dcb69f3bb614dda24aab9c475c5adf76b403), [`d7a1641`](https://github.com/tinacms/tinacms/commit/d7a16416b1b4bc1ba0e2aabdddcf39ed1e4135d7), [`f014558`](https://github.com/tinacms/tinacms/commit/f014558a7ece15964b3b2eda942c02fc609dc32f), [`17931b7`](https://github.com/tinacms/tinacms/commit/17931b72762afb575505c383ee6355476207a44e), [`cf75e5b`](https://github.com/tinacms/tinacms/commit/cf75e5b8dd3209203df9fe1ffbc12a9d965277f9), [`5050709`](https://github.com/tinacms/tinacms/commit/5050709dcbbc99530d6b284021c259d098d6455d), [`cf75e5b`](https://github.com/tinacms/tinacms/commit/cf75e5b8dd3209203df9fe1ffbc12a9d965277f9), [`bd4df92`](https://github.com/tinacms/tinacms/commit/bd4df92a7e00bd74ee13eaf9f9b584fbb1a864ab), [`566f977`](https://github.com/tinacms/tinacms/commit/566f9775bc306f1a41806a29eb22182700765974), [`5f14d96`](https://github.com/tinacms/tinacms/commit/5f14d96fdba3d7a143827fc1cac9c7964c3f9b01), [`b6199da`](https://github.com/tinacms/tinacms/commit/b6199da1eeea7de01d5216c9b50c9e158440f891), [`ece366b`](https://github.com/tinacms/tinacms/commit/ece366bd5aa86e048d22f829319e41fe3d1267ba), [`4a19d66`](https://github.com/tinacms/tinacms/commit/4a19d669b069c0af959c6461cd60b5910aea6512), [`4b7d9b9`](https://github.com/tinacms/tinacms/commit/4b7d9b9f116f7f649aae1a573c838a663f97d99d), [`5112e60`](https://github.com/tinacms/tinacms/commit/5112e60bd0c98f6de36f63dbf068d252993e586f), [`8c8e297`](https://github.com/tinacms/tinacms/commit/8c8e297efb12324f23785a5f8f7acbceeb3f0a4a)]:
+  - @tinacms/app@2.5.11
+  - tinacms@3.12.0
+  - @tinacms/schema-tools@2.9.0
+  - @tinacms/graphql@2.4.9
+  - @tinacms/metrics@2.1.1
+  - @tinacms/search@1.2.23
+
 ## 2.5.6
 
 ### Patch Changes

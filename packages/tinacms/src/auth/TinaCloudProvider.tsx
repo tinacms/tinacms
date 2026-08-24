@@ -14,7 +14,6 @@ import {
 } from '@tinacms/toolkit';
 import React, { useEffect, useState } from 'react';
 import { ModalBuilder } from './AuthModal';
-import { AuthenticationCancelledError } from './authenticate';
 import loginLlama from './tina-login.png';
 
 import { TinaAdminApi } from '../admin/api';
@@ -22,12 +21,17 @@ import {
   Client,
   LocalSearchClient,
   TinaCMSSearchClient,
+  TinaCloudAuthProvider,
   TinaIOConfig,
 } from '../internalClient';
-import { CreateClientProps, createClient } from '../utils';
-import { useTinaAuthRedirect } from './useTinaAuthRedirect';
-import { captureEvent } from '../lib/posthog/posthogProvider';
 import { BranchSwitchedEvent } from '../lib/posthog/posthog';
+import { captureEvent } from '../lib/posthog/posthogProvider';
+import { CreateClientProps, createClient } from '../utils';
+import { AuthenticationCancelledError } from './authenticate';
+import {
+  type AuthRedirectParams,
+  useTinaAuthRedirect,
+} from './useTinaAuthRedirect';
 
 type ModalNames = null | 'authenticate' | 'error';
 
@@ -50,11 +54,15 @@ export interface TinaCloudAuthWallProps {
     | (() => Promise<TinaCloudMediaStoreClass>);
 }
 
+const SESSION_EXPIRED_MESSAGE =
+  'Your session has ended. Please sign in again to continue editing.';
+
 const AuthWallInner = ({
   children,
   cms,
   getModalActions,
-}: TinaCloudAuthWallProps) => {
+  isAuthRedirect,
+}: TinaCloudAuthWallProps & { isAuthRedirect?: boolean }) => {
   const client: Client = cms.api.tina;
   // Whether we are using TinaCloud for auth
   const isTinaCloud =
@@ -78,9 +86,30 @@ const AuthWallInner = ({
     password: string;
   }>({ username: '', password: '' });
   const [authenticated, setAuthenticated] = useState<boolean>(false);
+  const [sessionExpired, setSessionExpired] = useState<boolean>(false);
+
+  // Data hooks dispatch this when a session check fails mid-session: drop
+  // straight back to the login modal instead of leaving the admin mounted.
+  React.useEffect(
+    () =>
+      cms.events.subscribe('cms:session-expired', () => {
+        setSessionExpired(true);
+        setShowChildren(false);
+        setActiveModal('authenticate');
+      }),
+    []
+  );
 
   React.useEffect(() => {
     let mounted = true;
+
+    if (isAuthRedirect) {
+      setActiveModal('authenticate');
+      return () => {
+        mounted = false;
+      };
+    }
+
     client.authProvider
       .isAuthenticated()
       .then((isAuthenticated) => {
@@ -131,6 +160,7 @@ const AuthWallInner = ({
 
   const onAuthenticated = async () => {
     setAuthenticated(true);
+    setSessionExpired(false);
     setActiveModal(null);
     cms.events.dispatch({ type: 'cms:login' });
   };
@@ -156,15 +186,12 @@ const AuthWallInner = ({
       }
       return onAuthenticated();
     } catch (e: any) {
-      // If user just closed the popup, silently reset - don't show error
-      // Check both instanceof and error name (in case of module boundary issues)
       if (
         e instanceof AuthenticationCancelledError ||
         e?.name === 'AuthenticationCancelledError'
       ) {
         return;
       }
-
       console.error(e);
       setActiveModal('error');
       setErrorMessage({
@@ -199,6 +226,7 @@ const AuthWallInner = ({
       {activeModal === 'authenticate' && loginStrategy === 'Redirect' && (
         <ModalBuilder
           title={modalTitle}
+          error={sessionExpired ? SESSION_EXPIRED_MESSAGE : undefined}
           message={
             isTinaCloud ? (
               <img
@@ -213,6 +241,7 @@ const AuthWallInner = ({
             )
           }
           close={close}
+          busy={isAuthRedirect}
           actions={[
             ...otherModalActions,
             {
@@ -227,8 +256,10 @@ const AuthWallInner = ({
         loginStrategy === 'UsernamePassword' && (
           <ModalBuilder
             title={modalTitle}
+            error={sessionExpired ? SESSION_EXPIRED_MESSAGE : undefined}
             message={''}
             close={close}
+            busy={isAuthRedirect}
             actions={[
               ...otherModalActions,
               {
@@ -345,7 +376,7 @@ export const TinaCloudProvider = (
     'tinacms-current-branch',
     baseBranch
   );
-  useTinaAuthRedirect();
+
   const cms = React.useMemo(
     () =>
       props.cms ||
@@ -442,6 +473,17 @@ export const TinaCloudProvider = (
   const isTinaCloud =
     !client.isLocalMode &&
     !client.schema?.config?.config?.contentApiUrlOverride;
+  const isTinaCloudAuth = client.authProvider instanceof TinaCloudAuthProvider;
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const authRedirectParams: AuthRedirectParams = {
+    code: urlParams.get('code'),
+    state: urlParams.get('state'),
+    error: urlParams.get('error'),
+  };
+  const isAuthRedirect =
+    isTinaCloudAuth && !!(authRedirectParams.code && authRedirectParams.state);
+  useTinaAuthRedirect(authRedirectParams, isTinaCloudAuth);
   const SessionProvider = client.authProvider.getSessionProvider();
 
   const handleListBranches = async (): Promise<Branch[]> => {
@@ -500,8 +542,13 @@ export const TinaCloudProvider = (
   }, []);
 
   React.useEffect(() => {
-    const setupEditorialWorkflow = () => {
-      client.getProject().then(async (project) => {
+    const setupEditorialWorkflow = async () => {
+      try {
+        const token = await client.authProvider.getToken();
+        if (!token?.access_token && !token?.id_token) {
+          return;
+        }
+        const project = await client.getProject();
         if (project?.features?.includes('editorial-workflow')) {
           cms.flags.set('branch-switcher', true);
           client.usingEditorialWorkflow = true;
@@ -513,7 +560,9 @@ export const TinaCloudProvider = (
             setCurrentBranch(project.defaultBranch || 'main');
           }
         }
-      });
+      } catch (e) {
+        console.error('TinaCMS: unable to load project settings', e);
+      }
     };
     if (isTinaCloud) {
       setupEditorialWorkflow();
@@ -537,7 +586,7 @@ export const TinaCloudProvider = (
       >
         <TinaProvider cms={cms}>
           <MediaWorkflowOverlay />
-          <AuthWallInner {...props} cms={cms} />
+          <AuthWallInner {...props} cms={cms} isAuthRedirect={isAuthRedirect} />
         </TinaProvider>
       </BranchDataProvider>
     </SessionProvider>

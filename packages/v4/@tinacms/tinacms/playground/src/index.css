@@ -6,3 +6,4 @@
    the editor renders unstyled and overflows its container. */
 @source "../../src";
 @source "../../../ui/src";
+@source "../../../rich-text/src";

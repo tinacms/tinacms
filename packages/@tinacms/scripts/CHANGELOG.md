@@ -1,5 +1,25 @@
 # Change Log
 
+## 1.6.4
+
+### Patch Changes
+
+- [#7407](https://github.com/tinacms/tinacms/pull/7407) [`4f90806`](https://github.com/tinacms/tinacms/commit/4f9080666308063332e16d96d00a75ff7348c011) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Ship one copy of the `acorn` parser in `@tinacms/mdx` instead of three, cutting `dist/index.browser.js` from 1,976,421 to 1,578,764 bytes (440,787 to 356,471 gzipped) and `dist/index.js` from 2,013,419 to 1,615,828 bytes (452,063 to 367,630 gzipped). The catalog pinned `acorn` to 8.8.2 while `micromark-extension-mdxjs` pulled 8.16.0, so two 8.x copies were bundled side by side; separately, `acorn-jsx` reaches `acorn` through `require`, which acorn's export map answers with its CJS build while every other importer gets the ESM build, bundling the parser a second time. Aligning the catalog to `^8.16.0` and aliasing `acorn` to its ESM entry in the `@tinacms/mdx` esbuild config collapses all three into one. Parser and serializer output is unchanged — `parseMDX`/`serializeMDX` round-trips over the package's 64 markdown fixtures produce byte-identical results from the old and new bundles.
+
+## 1.6.3
+
+### Patch Changes
+
+- [#7297](https://github.com/tinacms/tinacms/pull/7297) [`f74e2d9`](https://github.com/tinacms/tinacms/commit/f74e2d90974e59973bbbfcf4cf118adc4726a17e) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Bump `vite` off the EOL 4.x line (`^4.5.9`, resolving to the last-ever `4.5.14`) to `^6.4.3`, and `@vitejs/plugin-react` 3 → 4, closing several path-traversal / file-disclosure advisories that were never backported to vite 4.x.
+
+  **Dev server:** Vite 6 serves its dev endpoints (`@vite/client`, `@react-refresh`, and the SPA entry) under the configured `base` — Vite 4 served them at the server root. The injected dev HTML now prefixes those URLs with the admin base path, so `tinacms dev` loads the editor again instead of failing with "Failed loading TinaCMS assets".
+
+  **esbuild:** the `esbuild` catalog pin moves `^0.24.2` → `^0.25.0` to match the version vite 6 bundles, so `@tinacms/cli` installs a single esbuild native binary instead of two.
+
+  **Other fallout from the majors:** `@vitejs/plugin-react` 4 removed the `fastRefresh` option, so Fast Refresh is now always on in `tinacms dev` (it had been explicitly disabled) — if editor HMR misbehaves, that's the knob that changed. `splitVendorChunkPlugin` (deprecated since Vite 5.2.7, still exported in 6.4.3) is deliberately dropped from the build config as a simplification — the admin build now emits a single bundle with no separate vendor chunk, unless a `manualChunks` split is reinstated. The `process.env` define switches from a `new Object(...)` wrapper to a plain JSON literal, since esbuild ≥0.25 (bundled by vite 6) rejects the old form. The Node.js floor for the `tinacms` binary rises from 14.18 to 18, matching vite 6's engine requirement.
+
+- [#7076](https://github.com/tinacms/tinacms/pull/7076) [`976a93c`](https://github.com/tinacms/tinacms/commit/976a93ca16f85343566b0a3e36618e7330b8d94f) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump `esbuild` to 0.28.1, picking up upstream security fixes (GHSA-g7r4-m6w7-qqqr, GHSA-gv7w-rqvm-qjhr)
+
 ## 1.6.2
 
 ### Patch Changes

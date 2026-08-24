@@ -1,6 +1,6 @@
 {
 	"name": "@tinacms/app",
-	"version": "2.5.10",
+	"version": "2.5.12",
 	"main": "src/main.tsx",
 	"files": [
 		"src",
@@ -15,6 +15,7 @@
 		"test-watch": "vitest"
 	},
 	"devDependencies": {
+		"@testing-library/react": "catalog:",
 		"@types/react": "^18.3.18",
 		"@types/react-dom": "catalog:",
 		"happy-dom": "catalog:",

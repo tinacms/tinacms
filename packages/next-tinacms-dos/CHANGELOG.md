@@ -1,5 +1,25 @@
 # next-tinacms-cloudinary
 
+## 24.0.4
+
+### Patch Changes
+
+- [#7484](https://github.com/tinacms/tinacms/pull/7484) [`7dd8ed0`](https://github.com/tinacms/tinacms/commit/7dd8ed07f05796e64496cdadc21571dbc580f362) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Drop the unused `@types/crypto-js` devDependency
+
+  `crypto-js` itself was removed from `tinacms` and `@tinacms/cli`, and no source file in these packages imports it, so the type package had nothing left to type.
+
+- Updated dependencies [[`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7), [`d7cdea7`](https://github.com/tinacms/tinacms/commit/d7cdea75219702574fa78b6adcc90c368e4e71eb), [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe), [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7), [`8d94e35`](https://github.com/tinacms/tinacms/commit/8d94e354d9bb62ce52defb56c1e25ac114b0d971), [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7), [`4d08c25`](https://github.com/tinacms/tinacms/commit/4d08c2546f96fa7b8fbef48b19e19c45e24b44d5), [`37ca62b`](https://github.com/tinacms/tinacms/commit/37ca62b66aadb2cb80daa280a25a390c0bc2e4af), [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7), [`37ca62b`](https://github.com/tinacms/tinacms/commit/37ca62b66aadb2cb80daa280a25a390c0bc2e4af)]:
+  - tinacms@3.12.1
+
+## 24.0.3
+
+### Patch Changes
+
+- [#7436](https://github.com/tinacms/tinacms/pull/7436) [`4ef6b6d`](https://github.com/tinacms/tinacms/commit/4ef6b6d8f9afa7d596e2f74add3e9c5561e09563) Thanks [@kulesy](https://github.com/kulesy)! - Bump `multer` to 2.2.0. multer 1.x is end of life; 2.x changes file-handling behaviour, so review upload paths when upgrading.
+
+- Updated dependencies [[`d7a1641`](https://github.com/tinacms/tinacms/commit/d7a16416b1b4bc1ba0e2aabdddcf39ed1e4135d7), [`f014558`](https://github.com/tinacms/tinacms/commit/f014558a7ece15964b3b2eda942c02fc609dc32f), [`17931b7`](https://github.com/tinacms/tinacms/commit/17931b72762afb575505c383ee6355476207a44e), [`cf75e5b`](https://github.com/tinacms/tinacms/commit/cf75e5b8dd3209203df9fe1ffbc12a9d965277f9), [`5050709`](https://github.com/tinacms/tinacms/commit/5050709dcbbc99530d6b284021c259d098d6455d), [`cf75e5b`](https://github.com/tinacms/tinacms/commit/cf75e5b8dd3209203df9fe1ffbc12a9d965277f9), [`bd4df92`](https://github.com/tinacms/tinacms/commit/bd4df92a7e00bd74ee13eaf9f9b584fbb1a864ab), [`566f977`](https://github.com/tinacms/tinacms/commit/566f9775bc306f1a41806a29eb22182700765974), [`5f14d96`](https://github.com/tinacms/tinacms/commit/5f14d96fdba3d7a143827fc1cac9c7964c3f9b01), [`b6199da`](https://github.com/tinacms/tinacms/commit/b6199da1eeea7de01d5216c9b50c9e158440f891), [`ece366b`](https://github.com/tinacms/tinacms/commit/ece366bd5aa86e048d22f829319e41fe3d1267ba), [`4a19d66`](https://github.com/tinacms/tinacms/commit/4a19d669b069c0af959c6461cd60b5910aea6512), [`4b7d9b9`](https://github.com/tinacms/tinacms/commit/4b7d9b9f116f7f649aae1a573c838a663f97d99d), [`5112e60`](https://github.com/tinacms/tinacms/commit/5112e60bd0c98f6de36f63dbf068d252993e586f), [`8c8e297`](https://github.com/tinacms/tinacms/commit/8c8e297efb12324f23785a5f8f7acbceeb3f0a4a)]:
+  - tinacms@3.12.0
+
 ## 24.0.2
 
 ### Patch Changes

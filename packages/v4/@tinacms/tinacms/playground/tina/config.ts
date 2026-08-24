@@ -1,9 +1,9 @@
 import {
   type CollectionSchema,
   defineConfig,
+  definePlugin,
   localContentPlugin,
   t,
-  definePlugin,
 } from '@tinacms/tinacms';
 
 export const postCollection = {
@@ -14,6 +14,7 @@ export const postCollection = {
   fields: [
     t.string({ name: 'title', label: 'Title', required: true, min: 3 }),
     t.boolean({ name: 'featured', label: 'Featured' }),
+    t.richText({ name: 'body', label: 'Body', isBody: true }),
   ],
 } satisfies CollectionSchema;
 
