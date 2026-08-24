@@ -41,7 +41,7 @@ interface MediaWorkflowRequest {
   opType: 'upload' | 'delete' | 'rename';
   /** For a rename this is the source; the target is `targetRepoPath`. */
   repoPath: string;
-  /** Already sanitised — the editorial-workflow route does not sanitise it. */
+  /** The rename destination. Sanitized here before sending, and again server-side. */
   targetRepoPath?: string;
 }
 
@@ -845,12 +845,13 @@ export class TinaMediaStore implements MediaStore {
     from: string,
     to: string
   ): Promise<{ path?: string; src?: string; requestId?: string }> {
+    const branch = this.currentBranch() || undefined;
     const res = await this.api.authProvider.fetchWithToken(
       `${this.url}/rename`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ from, to, branch: this.currentBranch() }),
+        body: JSON.stringify({ from, to, branch }),
       }
     );
 

@@ -1872,7 +1872,7 @@ describe('TinaMediaStore — cloud rename (direct)', () => {
   });
 
   it.each(['undefined', ''])(
-    'sends an empty branch when Client.branch is %o',
+    'omits the branch when Client.branch is %o',
     async (branch) => {
       // Client.setBranch runs an unset branch through encodeURIComponent, so it
       // reaches the store as the literal string "undefined".
@@ -1881,7 +1881,9 @@ describe('TinaMediaStore — cloud rename (direct)', () => {
 
       await renameSettled(store);
 
-      expect(JSON.parse(renameCall(fetchWithToken)[1].body).branch).toBe('');
+      expect('branch' in JSON.parse(renameCall(fetchWithToken)[1].body)).toBe(
+        false
+      );
     }
   );
 
