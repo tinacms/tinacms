@@ -2073,9 +2073,6 @@ importers:
       '@tinacms/scripts':
         specifier: workspace:*
         version: link:../@tinacms/scripts
-      '@types/crypto-js':
-        specifier: ^3.1.47
-        version: 3.1.47
       '@types/js-cookie':
         specifier: ^2.2.7
         version: 2.2.7
@@ -2110,9 +2107,6 @@ importers:
       '@tinacms/scripts':
         specifier: workspace:*
         version: link:../@tinacms/scripts
-      '@types/crypto-js':
-        specifier: ^3.1.47
-        version: 3.1.47
       '@types/js-cookie':
         specifier: ^2.2.7
         version: 2.2.7
@@ -2147,9 +2141,6 @@ importers:
       '@tinacms/scripts':
         specifier: workspace:*
         version: link:../@tinacms/scripts
-      '@types/crypto-js':
-        specifier: ^3.1.47
-        version: 3.1.47
       '@types/js-cookie':
         specifier: ^2.2.7
         version: 2.2.7
@@ -2184,9 +2175,6 @@ importers:
       '@tinacms/scripts':
         specifier: workspace:*
         version: link:../@tinacms/scripts
-      '@types/crypto-js':
-        specifier: ^3.1.47
-        version: 3.1.47
       '@types/js-cookie':
         specifier: ^2.2.7
         version: 2.2.7
@@ -8016,9 +8004,6 @@ packages:
 
   '@types/cross-spawn@6.0.6':
     resolution: {integrity: sha512-fXRhhUkG4H3TQk5dBhQ7m/JDdSNHKwR2BBia62lhwEIq9xGiQKLxd6LymNhn47SjXhsUEPmxi+PKw2OkW4LLjA==}
-
-  '@types/crypto-js@3.1.47':
-    resolution: {integrity: sha512-eI6gvpcGHLk3dAuHYnRCAjX+41gMv1nz/VP55wAe5HtmAKDOoPSfr3f6vkMc08ov1S0NsjvUBxDtHHxqQY1LGA==}
 
   '@types/d3-array@3.2.2':
     resolution: {integrity: sha512-hOLWVbm7uRza0BYXpIIW5pxfrKe0W+D5lrFiAEYR+pb6w3N2SwSMaJbXdUfSEv+dT4MfHBLtn5js0LAWaO6otw==}
@@ -22984,8 +22969,6 @@ snapshots:
   '@types/cross-spawn@6.0.6':
     dependencies:
       '@types/node': 22.19.17
-
-  '@types/crypto-js@3.1.47': {}
 
   '@types/d3-array@3.2.2': {}
 
