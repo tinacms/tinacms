@@ -55,8 +55,7 @@ export const MediaWorkflowOverlay = () => {
           phase: 'confirming',
           branchName: event.branchName,
           baseBranch: event.baseBranch,
-          allowSaveToProtectedBranch:
-            event.allowSaveToProtectedBranch !== false,
+          allowSaveToProtectedBranch: event.allowSaveToProtectedBranch,
           onConfirm: event.onConfirm,
           onCancel: event.onCancel,
           onSaveToProtectedBranch: event.onSaveToProtectedBranch,

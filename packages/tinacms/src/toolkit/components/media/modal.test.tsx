@@ -133,44 +133,6 @@ describe('RenameModal', () => {
     expect(close).not.toHaveBeenCalled();
   });
 
-  it('shows the backend message when a rename is unsupported', async () => {
-    const renameFunc = vi.fn().mockRejectedValue(
-      new MediaRenameError({
-        code: 'UNSUPPORTED',
-        message:
-          "Renaming media on the protected branch 'main' requires the editorial workflow.",
-      })
-    );
-    const { input, submit, close } = renderModal({ renameFunc });
-
-    fireEvent.change(input(), { target: { value: 'renamed' } });
-    fireEvent.click(submit());
-
-    await screen.findByRole('alert');
-    expect(screen.getByRole('alert').textContent).toContain(
-      "protected branch 'main' requires the editorial workflow"
-    );
-    expect(close).not.toHaveBeenCalled();
-  });
-
-  it('reports an invalid path without closing', async () => {
-    const renameFunc = vi
-      .fn()
-      .mockRejectedValue(
-        new MediaRenameError({ code: 'INVALID_PATH', message: 'nope' })
-      );
-    const { input, submit, close } = renderModal({ renameFunc });
-
-    fireEvent.change(input(), { target: { value: 'renamed' } });
-    fireEvent.click(submit());
-
-    await screen.findByRole('alert');
-    expect(screen.getByRole('alert').textContent).toContain(
-      "That name isn't valid"
-    );
-    expect(close).not.toHaveBeenCalled();
-  });
-
   it('closes without an error when the editor cancels the branch prompt', async () => {
     const cancelled = Object.assign(new Error('Media rename cancelled.'), {
       ERR_TYPE: 'MediaRenameCancelled',

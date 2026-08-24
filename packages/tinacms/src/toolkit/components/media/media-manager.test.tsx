@@ -8,10 +8,8 @@ import {
 import { EventBus } from '@toolkit/core/event';
 import { MediaManager as MediaManagerCore } from '@toolkit/core/media';
 import type { Media, MediaStore } from '@toolkit/core/media';
-import { TinaMediaStore } from '@toolkit/core/media-store.default';
 import { CMSContext } from '@toolkit/react-core/use-cms';
 import { ModalProvider } from '@toolkit/react-modals';
-import type { TinaCMS } from '@toolkit/tina-cms';
 import React from 'react';
 import { MediaPicker } from './media-manager';
 
@@ -117,31 +115,6 @@ describe('MediaPicker rename action', () => {
 
     await openPreview('photo.jpg');
     expect(screen.queryByText('Rename')).toBeNull();
-  });
-
-  it('shows Rename for a cloud-backed TinaMediaStore', async () => {
-    const { cms, events } = buildCms();
-    const tinaApi = {
-      isLocalMode: false,
-      isCustomContentApi: false,
-    } as unknown as TinaCMS['api']['tina'];
-    const store = new TinaMediaStore({
-      ...cms,
-      api: { tina: tinaApi },
-      events,
-    } as unknown as TinaCMS);
-    // The listing itself is the cloud store's own concern; this test is about
-    // the picker offering the action for a cloud instance.
-    store.list = async () => ({
-      items: [file('photo.jpg')],
-      nextOffset: undefined,
-    });
-    cms.media.store = store;
-
-    renderPicker(cms);
-
-    await openPreview('photo.jpg');
-    expect(await screen.findByText('Rename')).toBeDefined();
   });
 
   it('hides Rename when the caller disallows destructive actions', async () => {

@@ -857,14 +857,8 @@ mutation addPendingDocumentMutation(
   }
 
   /**
-   * The server normalises `branchName` (lowercases it, replaces unsafe
-   * characters), so callers must use the `branchName` in the response for any
-   * follow-up call rather than the one they sent.
-   *
-   * `repoPath` is the asset the workflow concerns — for a rename, the source.
-   * `targetRepoPath` is the rename target and is required by the server for
-   * that operation; it must already be sanitised, since the route does not
-   * sanitise it.
+   * The server normalises `branchName`, so follow-up calls must use the
+   * `branchName` from the response rather than the one they sent.
    */
   async startMediaEditorialWorkflow(options: {
     branchName: string;

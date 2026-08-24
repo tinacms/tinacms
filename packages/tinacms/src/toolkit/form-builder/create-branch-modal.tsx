@@ -202,9 +202,7 @@ export const CreateBranchPromptModal = ({
   showSaveOptions?: boolean;
   // Disable "Save and publish" (direct commit) on protected branches, w/ tooltip.
   disablePublish?: boolean;
-  // Media workflow only: drop "Save to Protected Branch" entirely when the
-  // direct write it performs cannot succeed. Offering a control that always
-  // errors is worse than not offering it.
+  // Drop "Save to Protected Branch" when the direct write it performs cannot succeed.
   allowSaveToProtectedBranch?: boolean;
 }) => {
   // Remember the editor's last save choice; the main button reflects it
@@ -350,7 +348,7 @@ export const CreateBranchPromptModal = ({
               Save to a new branch
             </DropdownButton>
           ) : (
-            // A dropdown whose only item is gone would open an empty menu.
+            // A plain button: the dropdown's only item is the one being dropped.
             <Button
               variant='primary'
               className='w-full sm:w-auto'

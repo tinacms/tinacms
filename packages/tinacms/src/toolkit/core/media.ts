@@ -334,22 +334,14 @@ export const E_DEFAULT = new MediaListError({
   docsLink: 'https://tina.io/docs/r/repo-based-media',
 });
 
-export const MEDIA_RENAME_ERROR_CODES = [
-  'NOT_FOUND',
-  'NAME_COLLISION',
-  'INVALID_FILENAME',
-  'INVALID_PATH',
-  'UNAUTHORIZED',
-  'UNSUPPORTED',
-  'BACKEND_FAILURE',
-] as const;
-
-export type MediaRenameErrorCode = (typeof MEDIA_RENAME_ERROR_CODES)[number];
-
-export const isMediaRenameErrorCode = (
-  value: unknown
-): value is MediaRenameErrorCode =>
-  MEDIA_RENAME_ERROR_CODES.includes(value as MediaRenameErrorCode);
+export type MediaRenameErrorCode =
+  | 'NOT_FOUND'
+  | 'NAME_COLLISION'
+  | 'INVALID_FILENAME'
+  | 'INVALID_PATH'
+  | 'UNAUTHORIZED'
+  | 'UNSUPPORTED'
+  | 'BACKEND_FAILURE';
 
 export class MediaRenameError extends Error {
   public ERR_TYPE = 'MediaRenameError';
@@ -360,22 +352,6 @@ export class MediaRenameError extends Error {
     this.code = config.code;
   }
 }
-
-/**
- * Signals that the editor dismissed the branch prompt, so nothing was renamed.
- * Rejecting is how a `rename` that must resolve to a `Media` reports "no work
- * happened"; the rename modal recognises it and closes without an error.
- */
-export class MediaRenameCancelled extends Error {
-  public ERR_TYPE = 'MediaRenameCancelled';
-
-  constructor() {
-    super('Media rename cancelled.');
-  }
-}
-
-export const isMediaRenameCancelled = (error: unknown): boolean =>
-  (error as { ERR_TYPE?: string } | null)?.ERR_TYPE === 'MediaRenameCancelled';
 
 export const E_SELF_HOSTED_MEDIA = new MediaListError({
   title: "Repo-based media isn't available when self-hosting",
