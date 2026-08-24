@@ -63,15 +63,14 @@ export const Button = ({
     medium: `text-sm h-10 px-8`,
     custom: ``,
   };
-  const inert = disabled || busy;
-  // `as` can render a tag that has no `disabled` attribute, so those fall back
-  // to the aria/tabIndex pair used for disabled link-buttons elsewhere.
+  const isDisabled = disabled || busy;
+  // Tags reached through `as` have no `disabled` attribute, and aria/tabIndex
+  // alone are advisory: dropping `href` is what actually stops an anchor
+  // activating. The handler is cleared separately for tags nobody anticipated.
   const inertProps =
     typeof Tag !== 'string' || Tag === 'button'
-      ? { disabled: inert }
-      : inert
-        ? { 'aria-disabled': true, tabIndex: -1 }
-        : {};
+      ? { disabled: isDisabled }
+      : isDisabled && { 'aria-disabled': true, tabIndex: -1, href: undefined };
 
   return (
     <Tag
@@ -85,6 +84,7 @@ export const Button = ({
       )}
       {...props}
       {...inertProps}
+      onClick={isDisabled ? undefined : props.onClick}
     >
       {busy ? <LoadingDots color='currentColor' /> : children}
     </Tag>

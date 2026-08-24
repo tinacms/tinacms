@@ -49,34 +49,57 @@ describe('Button', () => {
   });
 
   it('omits disabled when rendered as a tag that does not support it', () => {
-    render(
+    const { container } = render(
       <Button as='a' href='https://tina.io' disabled>
         Read our docs
       </Button>
     );
-    expect(screen.getByRole('link').hasAttribute('disabled')).toBe(false);
+    expect(container.querySelector('a')?.hasAttribute('disabled')).toBe(false);
   });
 
-  it('disables a link with aria-disabled and removes it from the tab order', () => {
-    render(
-      <Button as='a' href='https://tina.io' disabled>
+  it('strips href from a disabled link so it cannot be activated', () => {
+    const onClick = vi.fn();
+    const { container } = render(
+      <Button as='a' href='https://tina.io' disabled onClick={onClick}>
         Read our docs
       </Button>
     );
-    const link = screen.getByRole('link');
+    const link = container.querySelector('a') as HTMLAnchorElement;
+    // aria-disabled and tabIndex are advisory; a missing href is what actually
+    // stops an anchor being focusable and activatable.
+    expect(link.hasAttribute('href')).toBe(false);
     expect(link.getAttribute('aria-disabled')).toBe('true');
     expect(link.tabIndex).toBe(-1);
+    link.click();
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('does not activate a busy link', () => {
+    const onClick = vi.fn();
+    const { container } = render(
+      <Button as='a' href='https://tina.io' busy onClick={onClick}>
+        Read our docs
+      </Button>
+    );
+    const link = container.querySelector('a') as HTMLAnchorElement;
+    expect(link.hasAttribute('href')).toBe(false);
+    link.click();
+    expect(onClick).not.toHaveBeenCalled();
   });
 
   it('leaves an enabled link untouched', () => {
+    const onClick = vi.fn();
     render(
-      <Button as='a' href='https://tina.io'>
+      <Button as='a' href='https://tina.io' onClick={onClick}>
         Read our docs
       </Button>
     );
     const link = screen.getByRole('link');
+    expect(link.getAttribute('href')).toBe('https://tina.io');
     expect(link.hasAttribute('aria-disabled')).toBe(false);
     expect(link.hasAttribute('tabindex')).toBe(false);
+    link.click();
+    expect(onClick).toHaveBeenCalledTimes(1);
   });
 
   it('forwards disabled to a component passed via as', () => {
