@@ -1,5 +1,37 @@
 import { describe, expect, it } from 'vitest';
-import { previewRename, sanitizeFilename, splitFilename } from './utils';
+import {
+  dropzoneAcceptFromExtensions,
+  previewRename,
+  sanitizeFilename,
+  splitFilename,
+} from './utils';
+
+describe('dropzoneAcceptFromExtensions', () => {
+  it('returns undefined for an empty list so callers fall through', () => {
+    expect(dropzoneAcceptFromExtensions([])).toBeUndefined();
+  });
+
+  it('keys by MIME type, not by bare extension', () => {
+    // A bare `.pdf` key is dropped from the native file picker, which then
+    // offers every file and only rejects the choice afterwards.
+    expect(dropzoneAcceptFromExtensions(['pdf'])).toEqual({
+      'application/pdf': ['.pdf'],
+    });
+  });
+
+  it('groups extensions that share a MIME type', () => {
+    expect(dropzoneAcceptFromExtensions(['jpg', 'jpeg'])).toEqual({
+      'image/jpeg': ['.jpg', '.jpeg'],
+    });
+  });
+
+  it('keeps distinct MIME types separate', () => {
+    expect(dropzoneAcceptFromExtensions(['png', 'svg'])).toEqual({
+      'image/png': ['.png'],
+      'image/svg+xml': ['.svg'],
+    });
+  });
+});
 
 describe('sanitizeFilename', () => {
   it('returns simple ASCII names unchanged', () => {

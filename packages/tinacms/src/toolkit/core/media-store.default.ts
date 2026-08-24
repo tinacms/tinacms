@@ -1,3 +1,4 @@
+import { type MediaExtension, extensionOf } from '@tinacms/schema-tools';
 import {
   DEFAULT_MEDIA_UPLOAD_TYPES,
   sanitizeFilename,
@@ -191,8 +192,8 @@ export class TinaMediaStore implements MediaStore {
 
   searchable = true;
 
-  // Only the v2 list endpoint filters by extension; the local branch below
-  // and `staticMedia` both ignore it.
+  // The v2 list endpoint filters server-side; local and `staticMedia` are
+  // filtered per page in `list`.
   extensionFilterable = true;
 
   // allow up to 100MB uploads
@@ -835,6 +836,22 @@ export class TinaMediaStore implements MediaStore {
       : src;
   }
 
+  /**
+   * Applies `ext` to items the local dev server and `staticMedia` returned
+   * unfiltered. Only the v2 cloud endpoint filters before paginating, so here
+   * a page can come back mostly empty with more matches further on.
+   *
+   * Directories are always kept: what they contain is unknown until opened.
+   */
+  private filterByExtension(items: Media[], ext?: MediaExtension[]): Media[] {
+    if (!ext?.length) return items;
+    return items.filter(
+      (item) =>
+        item.type === 'dir' ||
+        ext.includes(extensionOf(item.filename) as MediaExtension)
+    );
+  }
+
   async list(options?: MediaListOptions): Promise<MediaList> {
     this.setup();
 
@@ -865,11 +882,14 @@ export class TinaMediaStore implements MediaStore {
           depth++;
         }
         return {
-          items: currentFolder,
+          items: this.filterByExtension(currentFolder, options.ext),
           nextOffset: hasMore ? Number(offset) + 20 : null,
         };
       }
-      return { items: media, nextOffset: hasMore ? Number(offset) + 20 : null };
+      return {
+        items: this.filterByExtension(media, options.ext),
+        nextOffset: hasMore ? Number(offset) + 20 : null,
+      };
     }
 
     let res;
@@ -943,7 +963,8 @@ export class TinaMediaStore implements MediaStore {
     }
 
     return {
-      items,
+      // The cloud endpoint already filtered; only the local branch needs it.
+      items: this.isLocal ? this.filterByExtension(items, options.ext) : items,
       nextOffset: cursor || 0,
     };
   }

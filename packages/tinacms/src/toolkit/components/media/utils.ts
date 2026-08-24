@@ -1,3 +1,5 @@
+import { MEDIA_MIME_TYPES, type MediaExtension } from '@tinacms/schema-tools';
+
 const supportedFileTypes = [
   'text/*',
   'application/pdf',
@@ -28,6 +30,29 @@ export const dropzoneAcceptFromString = (str: string) => {
     {},
     ...(str || DEFAULT_MEDIA_UPLOAD_TYPES).split(',').map((x) => ({ [x]: [] }))
   );
+};
+
+/**
+ * react-dropzone's `accept` shape for a field's resolved extensions, keyed by
+ * MIME type with the extensions as values. Bare extension keys would be
+ * dropped from the native file picker, which then offers every file and only
+ * rejects the choice afterwards.
+ *
+ * Returns undefined for an empty list so callers fall through to the global
+ * `media.accept`.
+ */
+export const dropzoneAcceptFromExtensions = (
+  extensions: MediaExtension[]
+): Record<string, string[]> | undefined => {
+  if (!extensions.length) return undefined;
+
+  const accept: Record<string, string[]> = {};
+  for (const ext of extensions) {
+    const mimeType = MEDIA_MIME_TYPES[ext];
+    accept[mimeType] ??= [];
+    accept[mimeType].push(`.${ext}`);
+  }
+  return accept;
 };
 
 export const isImage = (filename: string): boolean => {

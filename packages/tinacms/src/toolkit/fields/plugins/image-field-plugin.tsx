@@ -1,16 +1,16 @@
-import * as React from 'react';
-import { wrapFieldsWithMeta } from './wrap-field-with-meta';
-import { InputProps, ImageUpload } from '../components';
-import { Media } from '@toolkit/core';
 import {
   type MediaAccept,
   extensionOf,
   resolveMediaAccept,
 } from '@tinacms/schema-tools';
+import { Media } from '@toolkit/core';
 import { useCMS } from '@toolkit/react-core';
-import { parse } from './text-format';
+import * as React from 'react';
 import { useState } from 'react';
 import { FileError } from 'react-dropzone';
+import { ImageUpload, InputProps } from '../components';
+import { parse } from './text-format';
+import { wrapFieldsWithMeta } from './wrap-field-with-meta';
 
 interface ImageProps {
   path: string;
@@ -66,6 +66,7 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
         value={value}
         src={src}
         loading={isImgUploading}
+        accept={props.field.accept}
         onClick={() => {
           const directory = uploadDir(props.form.getState().values);
           cms.media.open({

@@ -311,6 +311,41 @@ export type MediaCategory = keyof typeof MEDIA_CATEGORIES;
 export type MediaAccept = MediaExtension | MediaCategory;
 
 /**
+ * Extensions naming the same format. Declaring one accepts the other, so
+ * `accept: 'jpeg'` does not reject `photo.jpg`.
+ */
+const MEDIA_EXTENSION_ALIASES = {
+  jpg: ['jpeg'],
+  jpeg: ['jpg'],
+} as const satisfies Partial<Record<MediaExtension, readonly MediaExtension[]>>;
+
+/**
+ * The MIME type each extension belongs to. Needed because react-dropzone
+ * keys its `accept` by MIME type and drops bare extensions from the native
+ * file picker.
+ */
+export const MEDIA_MIME_TYPES = {
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  gif: 'image/gif',
+  webp: 'image/webp',
+  svg: 'image/svg+xml',
+  avif: 'image/avif',
+  ico: 'image/x-icon',
+  mp4: 'video/mp4',
+  webm: 'video/webm',
+  mov: 'video/quicktime',
+  mp3: 'audio/mpeg',
+  wav: 'audio/wav',
+  ogg: 'audio/ogg',
+  pdf: 'application/pdf',
+  json: 'application/json',
+  csv: 'text/csv',
+  txt: 'text/plain',
+} as const satisfies Record<MediaExtension, string>;
+
+/**
  * Lowercased extension without the dot, from a filename, path or URL.
  * Query strings and hashes are dropped first, so a transformed asset URL
  * like `hero.png?fit=crop` still reads as `png`. Dotfiles and extensionless
@@ -325,9 +360,9 @@ export const extensionOf = (value: string): string => {
 
 /**
  * Flattens a field's `accept` into concrete extensions, expanding any
- * category shorthand. Unknown values are dropped rather than passed through,
- * so a typo narrows to nothing visible instead of silently disabling the
- * filter.
+ * category shorthand and pulling in aliases. Unknown values are dropped
+ * rather than passed through, so a typo narrows to nothing visible instead
+ * of silently disabling the filter.
  */
 export const resolveMediaAccept = (
   accept: MediaAccept | MediaAccept[] | undefined
@@ -335,13 +370,21 @@ export const resolveMediaAccept = (
   if (!accept) return [];
   const requested = Array.isArray(accept) ? accept : [accept];
   const resolved = new Set<MediaExtension>();
+  const add = (ext: MediaExtension) => {
+    resolved.add(ext);
+    for (const alias of MEDIA_EXTENSION_ALIASES[
+      ext as keyof typeof MEDIA_EXTENSION_ALIASES
+    ] ?? []) {
+      resolved.add(alias);
+    }
+  };
   for (const entry of requested) {
     if (entry in MEDIA_CATEGORIES) {
       for (const ext of MEDIA_CATEGORIES[entry as MediaCategory]) {
-        resolved.add(ext);
+        add(ext);
       }
     } else if ((MEDIA_EXTENSIONS as readonly string[]).includes(entry)) {
-      resolved.add(entry as MediaExtension);
+      add(entry as MediaExtension);
     }
   }
   return [...resolved];

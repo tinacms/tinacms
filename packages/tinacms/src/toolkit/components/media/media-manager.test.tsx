@@ -5,6 +5,7 @@ import {
   waitFor,
   within,
 } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { EventBus } from '@toolkit/core/event';
 import { MediaManager as MediaManagerCore } from '@toolkit/core/media';
 import type { Media, MediaStore } from '@toolkit/core/media';
@@ -225,6 +226,86 @@ describe('MediaPicker rename action', () => {
 
     await waitFor(() =>
       expect(screen.getAllByTitle('new.jpg')).toHaveLength(2)
+    );
+  });
+});
+
+describe('MediaPicker type filter', () => {
+  const listSpy = () =>
+    vi.fn().mockResolvedValue({ items: [file('photo.jpg')] });
+
+  const extOf = (list: ReturnType<typeof listSpy>) =>
+    list.mock.calls.at(-1)?.[0]?.ext;
+
+  it('sends nothing when neither the field nor the toolbar narrows', async () => {
+    const list = listSpy();
+    const { cms } = buildCms({ extensionFilterable: true, list });
+    renderPicker(cms);
+
+    await waitFor(() => expect(list).toHaveBeenCalled());
+    expect(extOf(list)).toBeUndefined();
+  });
+
+  it("sends the field's accept, expanded from a category", async () => {
+    const list = listSpy();
+    const { cms } = buildCms({ extensionFilterable: true, list });
+    renderPicker(cms, { accept: 'audio' });
+
+    await waitFor(() => expect(list).toHaveBeenCalled());
+    expect(extOf(list)).toEqual(['mp3', 'wav', 'ogg']);
+  });
+
+  it('sends both jpeg spellings when the field names one', async () => {
+    const list = listSpy();
+    const { cms } = buildCms({ extensionFilterable: true, list });
+    renderPicker(cms, { accept: 'jpeg' });
+
+    await waitFor(() => expect(list).toHaveBeenCalled());
+    expect([...extOf(list)].sort()).toEqual(['jpeg', 'jpg']);
+  });
+
+  it('sends nothing when the store does not filter, whatever the field says', async () => {
+    const list = listSpy();
+    const { cms } = buildCms({ list });
+    renderPicker(cms, { accept: 'pdf' });
+
+    await waitFor(() => expect(list).toHaveBeenCalled());
+    expect(extOf(list)).toBeUndefined();
+  });
+
+  it('shows a locked chip instead of a dropdown for a constrained field', async () => {
+    const { cms } = buildCms({ extensionFilterable: true, list: listSpy() });
+    renderPicker(cms, { accept: 'pdf' });
+
+    expect(await screen.findByText('PDF only')).toBeTruthy();
+    expect(screen.queryByText('Any type')).toBeNull();
+  });
+
+  it('offers the dropdown when the field is unconstrained', async () => {
+    const { cms } = buildCms({ extensionFilterable: true, list: listSpy() });
+    renderPicker(cms);
+
+    expect(await screen.findByText('Any type')).toBeTruthy();
+  });
+
+  it('hides the control entirely when the store cannot filter', async () => {
+    const { cms } = buildCms({ list: listSpy() });
+    renderPicker(cms);
+
+    await waitFor(() => expect(screen.queryByText('Any type')).toBeNull());
+  });
+
+  it('re-lists with the chosen category when the toolbar narrows', async () => {
+    const list = listSpy();
+    const { cms } = buildCms({ extensionFilterable: true, list });
+    renderPicker(cms);
+
+    const user = userEvent.setup();
+    await user.click(await screen.findByText('Any type'));
+    await user.click(await screen.findByText('Documents'));
+
+    await waitFor(() =>
+      expect(extOf(list)).toEqual(['pdf', 'json', 'csv', 'txt'])
     );
   });
 });

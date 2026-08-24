@@ -1,25 +1,16 @@
 import {
-  Media,
-  MediaList,
-  MediaListError,
-  MediaListOffset,
-} from '@toolkit/core';
-import {
   MEDIA_CATEGORIES,
   type MediaAccept,
   type MediaCategory,
   resolveMediaAccept,
 } from '@tinacms/schema-tools';
-import { LoadingDots } from '@toolkit/form-builder';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
+  Media,
+  MediaList,
+  MediaListError,
+  MediaListOffset,
+} from '@toolkit/core';
+import { LoadingDots } from '@toolkit/form-builder';
 import { CloseIcon, TrashIcon } from '@toolkit/icons';
 import { FullscreenModal, Modal, ModalBody } from '@toolkit/react-modals';
 import { useCMS } from '@toolkit/react-tinacms';
@@ -49,6 +40,15 @@ import {
   MediaManagerContentUploadedEvent,
 } from '../../../lib/posthog/posthog';
 import { captureEvent } from '../../../lib/posthog/posthogProvider';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
 import { Breadcrumb } from './breadcrumb';
 import { CopyField } from './copy-field';
 import {
@@ -61,6 +61,7 @@ import { DeleteModal, NewFolderModal, RenameModal } from './modal';
 import {
   DEFAULT_MEDIA_UPLOAD_TYPES,
   absoluteImgURL,
+  dropzoneAcceptFromExtensions,
   dropzoneAcceptFromString,
   isImage,
 } from './utils';
@@ -231,14 +232,13 @@ export function MediaPicker({
   const acceptedExtensions = React.useMemo(() => {
     if (!cms.media.store.extensionFilterable) return [];
 
+    // A field's `accept` replaces the toolbar rather than seeding it — the
+    // control renders as a locked chip in that case, so `typeFilter` stays
+    // 'all' and there is nothing to combine.
     const fromField = resolveMediaAccept(fieldAccept);
-    if (typeFilter === 'all') return fromField;
+    if (fromField.length) return fromField;
 
-    const fromToolbar = resolveMediaAccept(typeFilter);
-    if (!fromField.length) return fromToolbar;
-
-    // The field sets the ceiling; the toolbar can only narrow within it.
-    return fromToolbar.filter((ext) => fromField.includes(ext));
+    return typeFilter === 'all' ? [] : resolveMediaAccept(typeFilter);
   }, [fieldAccept, typeFilter, cms.media.store.extensionFilterable]);
 
   async function loadMedia(loadFolders = true) {
@@ -388,13 +388,12 @@ export function MediaPicker({
     ? cms.api.tina.schema.schema?.config?.media?.accept.join(',')
     : cms.api.tina.schema.schema?.config?.media?.accept;
   const fieldExtensions = resolveMediaAccept(fieldAccept);
-  const accept = fieldExtensions.length
-    ? fieldExtensions.map((ext) => `.${ext}`).join(',')
-    : globalAccept;
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: dropzoneAcceptFromString(
-      accept || cms.media.accept || DEFAULT_MEDIA_UPLOAD_TYPES
-    ),
+    accept:
+      dropzoneAcceptFromExtensions(fieldExtensions) ??
+      dropzoneAcceptFromString(
+        globalAccept || cms.media.accept || DEFAULT_MEDIA_UPLOAD_TYPES
+      ),
     maxSize: cms.media.maxSize,
     multiple: true,
     onDrop: async (files, fileRejections) => {

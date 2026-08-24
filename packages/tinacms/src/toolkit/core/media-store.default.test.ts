@@ -1764,3 +1764,136 @@ describe('TinaMediaStore — local rename', () => {
     expect(error.code).toBe('BACKEND_FAILURE');
   });
 });
+
+describe('TinaMediaStore — extension filtering', () => {
+  const listBody = (filenames: string[], directories: string[] = []) => ({
+    files: filenames.map((filename) => ({
+      filename,
+      src: `/uploads/${filename}`,
+    })),
+    directories,
+    cursor: 0,
+  });
+
+  describe('cloud', () => {
+    it('sends ext as a comma-separated param', async () => {
+      const { store, fetchWithToken } = buildStore({ branch: 'main' });
+      fetchWithToken.mockResolvedValueOnce(makeJsonResponse(200, listBody([])));
+
+      await store.list({
+        directory: '',
+        thumbnailSizes: [],
+        ext: ['pdf', 'svg'],
+      });
+
+      expect(fetchWithToken.mock.calls[0][0]).toContain('&ext=pdf%2Csvg');
+    });
+
+    it('omits ext when empty', async () => {
+      const { store, fetchWithToken } = buildStore({ branch: 'main' });
+      fetchWithToken.mockResolvedValueOnce(makeJsonResponse(200, listBody([])));
+
+      await store.list({ directory: '', thumbnailSizes: [], ext: [] });
+
+      expect(fetchWithToken.mock.calls[0][0]).not.toContain('ext=');
+    });
+
+    it('trusts the server and does not re-filter the response', async () => {
+      const { store, fetchWithToken } = buildStore({ branch: 'main' });
+      fetchWithToken.mockResolvedValueOnce(
+        makeJsonResponse(200, listBody(['report.pdf', 'photo.png']))
+      );
+
+      const { items } = await store.list({
+        directory: '',
+        thumbnailSizes: [],
+        ext: ['pdf'],
+      });
+
+      expect(items.map((i) => i.filename)).toEqual(['report.pdf', 'photo.png']);
+    });
+  });
+
+  describe('local', () => {
+    const buildLocal = () => {
+      const built = buildStore({
+        isLocalMode: true,
+        contentApiUrl: 'http://localhost:4001/graphql',
+      });
+      const fetchFunction = vi.fn();
+      built.store.fetchFunction = fetchFunction;
+      return { ...built, fetchFunction };
+    };
+
+    it('filters the page it was given, since the dev server ignores ext', async () => {
+      const { store, fetchFunction } = buildLocal();
+      fetchFunction.mockResolvedValueOnce(
+        makeJsonResponse(200, listBody(['report.pdf', 'photo.png', 'a.txt']))
+      );
+
+      const { items } = await store.list({
+        directory: '',
+        thumbnailSizes: [],
+        ext: ['pdf'],
+      });
+
+      expect(items.map((i) => i.filename)).toEqual(['report.pdf']);
+    });
+
+    it('keeps directories, whose contents are unknown until opened', async () => {
+      const { store, fetchFunction } = buildLocal();
+      fetchFunction.mockResolvedValueOnce(
+        makeJsonResponse(200, listBody(['photo.png'], ['docs']))
+      );
+
+      const { items } = await store.list({
+        directory: '',
+        thumbnailSizes: [],
+        ext: ['pdf'],
+      });
+
+      expect(items.map((i) => i.filename)).toEqual(['docs']);
+    });
+
+    it('leaves the listing alone when no ext is asked for', async () => {
+      const { store, fetchFunction } = buildLocal();
+      fetchFunction.mockResolvedValueOnce(
+        makeJsonResponse(200, listBody(['report.pdf', 'photo.png']))
+      );
+
+      const { items } = await store.list({ directory: '', thumbnailSizes: [] });
+
+      expect(items).toHaveLength(2);
+    });
+
+    it('matches extensions case-insensitively', async () => {
+      const { store, fetchFunction } = buildLocal();
+      fetchFunction.mockResolvedValueOnce(
+        makeJsonResponse(200, listBody(['SCAN.PDF']))
+      );
+
+      const { items } = await store.list({
+        directory: '',
+        thumbnailSizes: [],
+        ext: ['pdf'],
+      });
+
+      expect(items.map((i) => i.filename)).toEqual(['SCAN.PDF']);
+    });
+
+    it('never matches a dotfile', async () => {
+      const { store, fetchFunction } = buildLocal();
+      fetchFunction.mockResolvedValueOnce(
+        makeJsonResponse(200, listBody(['.DS_Store']))
+      );
+
+      const { items } = await store.list({
+        directory: '',
+        thumbnailSizes: [],
+        ext: ['pdf'],
+      });
+
+      expect(items).toEqual([]);
+    });
+  });
+});
