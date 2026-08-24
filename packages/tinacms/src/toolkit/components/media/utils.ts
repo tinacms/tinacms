@@ -1,4 +1,8 @@
-import { MEDIA_MIME_TYPES, type MediaExtension } from '@tinacms/schema-tools';
+import {
+  MEDIA_MIME_TYPES,
+  type MediaExtension,
+  extensionOf,
+} from '@tinacms/schema-tools';
 import type { Accept } from 'react-dropzone';
 
 const supportedFileTypes = [
@@ -56,15 +60,38 @@ export const dropzoneAcceptFromExtensions = (
   return accept;
 };
 
-export const isImage = (filename: string): boolean => {
-  // http://stackoverflow.com/questions/10473185/regex-javascript-image-file-extension
-  // (\?.*)? is to match query strings (like from TinaCloud)
-  return /\.(gif|jpg|jpeg|tiff|png|svg|webp|avif)(\?.*)?$/i.test(filename);
-};
+/**
+ * Which extensions get a thumbnail rather than a file icon. Deliberately not
+ * `MEDIA_CATEGORIES.image`: that drives the `accept` filter and the two lists
+ * differ — `tiff` previews, `ico` does not.
+ */
+const PREVIEWABLE_IMAGE_EXTENSIONS = new Set([
+  'gif',
+  'jpg',
+  'jpeg',
+  'tiff',
+  'png',
+  'svg',
+  'webp',
+  'avif',
+]);
 
-export const isVideo = (filename: string): boolean => {
-  return /\.(mp4|webm|ogg|m4v|mov|avi|flv|mkv)(\?.*)?$/i.test(filename);
-};
+const PREVIEWABLE_VIDEO_EXTENSIONS = new Set([
+  'mp4',
+  'webm',
+  'ogg',
+  'm4v',
+  'mov',
+  'avi',
+  'flv',
+  'mkv',
+]);
+
+export const isImage = (filename: string): boolean =>
+  PREVIEWABLE_IMAGE_EXTENSIONS.has(extensionOf(filename ?? ''));
+
+export const isVideo = (filename: string): boolean =>
+  PREVIEWABLE_VIDEO_EXTENSIONS.has(extensionOf(filename ?? ''));
 
 export const absoluteImgURL = (str: string) => {
   if (str.startsWith('http')) return str;
