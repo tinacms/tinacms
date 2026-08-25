@@ -459,6 +459,7 @@ const CollectionListPage = () => {
                             );
                             reFetchCollection();
                           } catch (error) {
+                            if (isSessionExpiredError(error)) throw error;
                             cms.alerts.warn(
                               'Document was not deleted, ask a developer for help or check the console for an error message'
                             );

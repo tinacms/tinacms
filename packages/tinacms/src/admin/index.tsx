@@ -18,6 +18,7 @@ import {
   useNavigate,
   useParams,
 } from 'react-router-dom';
+import { isSessionExpiredError } from '../internalClient';
 
 import Sidebar from './components/AdminNav';
 import GetCMS from './components/GetCMS';
@@ -238,6 +239,10 @@ const CheckSchema = ({
           }
         })
         .catch((error) => {
+          if (isSessionExpiredError(error)) {
+            // request() already sent the user back to the login modal
+            return;
+          }
           // Matches a TinaCloud server contract (string owned upstream); see #6777.
           if (error.message.includes(ERR_NOT_INDEXED)) {
             setSchemaMissingError(true);
