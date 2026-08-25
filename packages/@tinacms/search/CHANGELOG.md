@@ -1,5 +1,17 @@
 # @tinacms/search
 
+## 1.2.24
+
+### Patch Changes
+
+- [#7468](https://github.com/tinacms/tinacms/pull/7468) [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Remove the dead typedoc docs tooling
+
+  Both packages declared a `docs` script running `pnpm typedoc` without ever declaring `typedoc` as a dependency, so the script could not resolve its binary under pnpm's isolated `node_modules`. Their `typedoc.json` files were also written against the pre-0.20 option schema (`inputFiles`, `mode`, `excludeNotExported`), which the catalog's typedoc 0.26 no longer accepts. Nothing in `turbo.json` or any workflow invoked them, so the scripts and configs are removed along with the generated `spec.md` in `@tinacms/mdx`.
+
+- Updated dependencies [[`195087d`](https://github.com/tinacms/tinacms/commit/195087de7e617d9d91b06709db869787ac0c800f), [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe)]:
+  - @tinacms/graphql@2.4.10
+  - @tinacms/schema-tools@2.9.0
+
 ## 1.2.23
 
 ### Patch Changes
