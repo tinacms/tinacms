@@ -29,6 +29,17 @@
             "label": "Body",
             "isBody": true,
             "type": "rich-text"
+          },
+          {
+            "name": "authors",
+            "label": "Authors",
+            "options": [
+              {
+                "value": "ivan",
+                "label": "Ivan"
+              }
+            ],
+            "type": "select"
           }
         ]
       }
@@ -44,6 +55,7 @@
     "boolean": 1,
     "rating": 1,
     "rich-text": 1,
+    "select": 1,
     "string": 1
   }
 }
