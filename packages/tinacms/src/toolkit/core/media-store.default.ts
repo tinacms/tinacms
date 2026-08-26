@@ -22,6 +22,7 @@ import {
   MediaList,
   MediaListOptions,
   MediaRenameError,
+  MediaRenameErrorCode,
   MediaStore,
   MediaUploadOptions,
 } from './media';
@@ -36,6 +37,14 @@ type MediaBranchDecision =
   | { kind: 'workflow'; context: MediaBranchContext }
   | { kind: 'cancelled' }
   | { kind: 'direct' };
+
+interface MediaWorkflowRequest {
+  opType: 'upload' | 'delete' | 'rename';
+  /** For a rename this is the source; the target is `targetRepoPath`. */
+  repoPath: string;
+  /** The rename destination. Sanitized here before sending, and again server-side. */
+  targetRepoPath?: string;
+}
 
 const MEDIA_WORKFLOW_STEP = {
   BRANCH: 1,
@@ -56,6 +65,31 @@ const MEDIA_WORKFLOW_STATUS_TO_STEP: Partial<
 };
 
 const s3ErrorRegex = /<Error>.*<Code>(.+)<\/Code>.*<Message>(.+)<\/Message>.*/;
+
+const CANONICAL_THUMBNAIL_SIZES = [
+  { w: 75, h: 75 },
+  { w: 400, h: 400 },
+  { w: 1000, h: 1000 },
+];
+
+const RENAME_ERROR_CODES: MediaRenameErrorCode[] = [
+  'NOT_FOUND',
+  'NAME_COLLISION',
+  'INVALID_FILENAME',
+  'INVALID_PATH',
+  'UNAUTHORIZED',
+  'UNSUPPORTED',
+  'BACKEND_FAILURE',
+];
+
+/** Rejecting is how a rename that must resolve to a `Media` says "nothing happened". */
+export class MediaRenameCancelled extends Error {
+  public ERR_TYPE = 'MediaRenameCancelled';
+
+  constructor() {
+    super('Media rename cancelled.');
+  }
+}
 
 export class DummyMediaStore implements MediaStore {
   accept = '*';
@@ -117,10 +151,9 @@ export class TinaMediaStore implements MediaStore {
   private mediaWorkflowInProgress = false;
 
   /**
-   * Renaming is only implemented against the local dev server. This is an
-   * instance property rather than a prototype method on purpose: the media
+   * An instance property rather than a prototype method on purpose: the media
    * manager decides whether to offer the action by checking whether the store
-   * defines `rename`, so a cloud-backed instance must not carry one — a
+   * defines `rename`, so an instance that cannot rename must not carry one — a
    * prototype method would advertise support everywhere and surface an action
    * that always fails.
    */
@@ -132,8 +165,10 @@ export class TinaMediaStore implements MediaStore {
       this.isStatic = true;
       this.staticMedia = staticMedia;
     }
-    if (!this.isStatic && cms?.api?.tina?.isLocalMode) {
-      this.rename = (from, to) => this.rename_local(from, to);
+    if (!this.isStatic && !this.isUnsupportedSelfHostedRepoMedia()) {
+      this.rename = cms?.api?.tina?.isLocalMode
+        ? (from, to) => this.rename_local(from, to)
+        : (from, to) => this.rename_cloud(from, to);
     }
   }
 
@@ -200,27 +235,20 @@ export class TinaMediaStore implements MediaStore {
   maxSize = 100 * 1024 * 1024;
 
   /**
-   * Returns the workflow branch override or current branch as a single-encoded
-   * query-param value, or an empty string when no branch is set.
-   *
-   * `this.api.branch` is already URL-encoded by `Client.setBranch()`, so we
-   * decode then re-encode here to defend against double-encoding when this
-   * value is concatenated into a URL.
-   *
-   * `Client.setBranch()` runs the constructor's `options.branch` through
-   * `encodeURIComponent` without a guard, so an unset `options.branch`
-   * lands here as the literal string `"undefined"`. We treat that and the
-   * empty case as no-branch so we don't send `?branch=undefined` to the
-   * assets-api (which would route the call to a non-existent staging path).
+   * `Client.setBranch()` encodes an unset branch to the literal `"undefined"`,
+   * which the assets API would read as a real (non-existent) staging path.
    */
-  private encodedBranchParam(): string {
-    if (this.workflowBranchOverride) {
-      return encodeURIComponent(this.workflowBranchOverride);
-    }
+  private currentBranch(): string {
+    if (this.workflowBranchOverride) return this.workflowBranchOverride;
     if (!this.api.branch) return '';
     const decoded = decodeURIComponent(this.api.branch);
-    if (!decoded || decoded === 'undefined') return '';
-    return encodeURIComponent(decoded);
+    return decoded === 'undefined' ? '' : decoded;
+  }
+
+  /** `this.api.branch` arrives encoded, so encode the decoded name once here. */
+  private encodedBranchParam(): string {
+    const branch = this.currentBranch();
+    return branch ? encodeURIComponent(branch) : '';
   }
 
   private shortStableHash(input: string): string {
@@ -278,8 +306,7 @@ export class TinaMediaStore implements MediaStore {
   private requestMediaBranchChoice(
     branchName: string,
     baseBranch: string,
-    opType: 'upload' | 'delete',
-    repoPath: string
+    request: MediaWorkflowRequest
   ): Promise<MediaBranchDecision> {
     // The decision is driven entirely by the branch prompt rendered by
     // <MediaWorkflowOverlay />. We can't infer its presence from
@@ -301,12 +328,13 @@ export class TinaMediaStore implements MediaStore {
         type: 'media:workflow:confirm-branch',
         branchName,
         baseBranch,
+        // A rename on a protected branch can only go through the workflow.
+        allowSaveToProtectedBranch: request.opType !== 'rename',
         onConfirm: async (selectedBranchName) => {
           const context = await this.prepareMediaBranch(
             selectedBranchName,
             baseBranch,
-            opType,
-            repoPath
+            request
           );
           resolve({
             kind: 'workflow',
@@ -322,8 +350,7 @@ export class TinaMediaStore implements MediaStore {
   private async prepareMediaBranch(
     branchName: string,
     baseBranch: string,
-    opType: 'upload' | 'delete',
-    repoPath: string
+    request: MediaWorkflowRequest
   ): Promise<MediaBranchContext> {
     if (this.mediaWorkflowInProgress) {
       throw new Error('A media workflow is already in progress.');
@@ -341,8 +368,9 @@ export class TinaMediaStore implements MediaStore {
         branchName,
         baseBranch,
         prTitle: getEditorialWorkflowPrTitle(branchName),
-        operation: opType,
-        repoPath,
+        operation: request.opType,
+        repoPath: request.repoPath,
+        targetRepoPath: request.targetRepoPath,
       });
       const branchContext = {
         branchName: workflow.branchName || branchName,
@@ -453,12 +481,10 @@ export class TinaMediaStore implements MediaStore {
     const repoFilename =
       opType === 'upload' && filename ? sanitizeFilename(filename) : filename;
     const repoPath = this.joinMediaPath(directory, repoFilename);
-    return this.requestMediaBranchChoice(
-      branchName,
-      baseBranch,
+    return this.requestMediaBranchChoice(branchName, baseBranch, {
       opType,
-      repoPath
-    );
+      repoPath,
+    });
   }
 
   private async waitForRequestStatus(
@@ -793,6 +819,217 @@ export class TinaMediaStore implements MediaStore {
       lastSlash === -1 ? '' : to.slice(0, lastSlash),
       lastSlash === -1 ? to : to.slice(lastSlash + 1)
     );
+  }
+
+  /**
+   * `from`/`to` are media-root-relative `directory/filename` paths. `to` is
+   * already sanitised by `previewRename` and is passed through untouched.
+   */
+  private async rename_cloud(from: string, to: string): Promise<Media> {
+    this.setup();
+
+    if (!(await this.isAuthenticated())) {
+      throw new MediaRenameError({
+        code: 'UNAUTHORIZED',
+        message: "You don't have permission to rename this file.",
+      });
+    }
+
+    const decision = await this.prepareRenameBranch(from, to);
+    if (decision.kind === 'cancelled') {
+      throw new MediaRenameCancelled();
+    }
+    if (decision.kind === 'workflow') {
+      return this.renameCloudViaWorkflow(from, to, decision.context);
+    }
+    return this.renameCloudDirect(from, to);
+  }
+
+  /** `currentBranch()` is the workflow branch while one is active. */
+  private async postCloudRename(
+    from: string,
+    to: string
+  ): Promise<{ path?: string; src?: string; requestId?: string }> {
+    const branch = this.currentBranch() || undefined;
+    const res = await this.api.authProvider.fetchWithToken(
+      `${this.url}/rename`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ from, to, branch }),
+      }
+    );
+
+    const body = await res.json().catch(() => null);
+
+    if (res.status !== 200 || body?.success !== true) {
+      throw this.toCloudRenameError(res.status, body);
+    }
+    return body;
+  }
+
+  private async renameCloudDirect(from: string, to: string): Promise<Media> {
+    const result = await this.postCloudRename(from, to);
+
+    if (result.requestId) {
+      try {
+        await this.waitForRequestStatus(
+          result.requestId,
+          'Time out waiting for rename to complete'
+        );
+      } catch (error) {
+        // The media index already shows the rename, so don't claim it failed.
+        const detail =
+          error instanceof Error && error.message
+            ? `${error.message}. `
+            : 'Failed to confirm the rename. ';
+        throw new MediaRenameError({
+          code: 'BACKEND_FAILURE',
+          message: `${detail}The file may still have been renamed — refresh the media library to check.`,
+        });
+      }
+    }
+
+    return this.resolveRenamedMedia(result.path || to, result.src);
+  }
+
+  /**
+   * Completion is the workflow status, not the rename request status: only the
+   * former waits for the branch, the media index and the pull request.
+   */
+  private async renameCloudViaWorkflow(
+    from: string,
+    to: string,
+    branchContext: MediaBranchContext
+  ): Promise<Media> {
+    let renamed: Media | undefined;
+
+    try {
+      const result = await this.postCloudRename(from, to);
+
+      await this.finalizeMediaWorkflow(branchContext, async () => {
+        renamed = await this.resolveRenamedMedia(result.path || to, result.src);
+      });
+    } catch (err) {
+      // A failed rename leaves the progress modal up with no error of its own.
+      this.resetWorkflowState();
+      this.cms.events.dispatch({ type: 'media:workflow:finish' });
+      throw err;
+    }
+
+    // finalizeMediaWorkflow dispatches failures instead of throwing, so an
+    // unresolved entry is the only signal that it did not complete. Deliberately
+    // no `media:workflow:finish` here: it would hide the error the overlay shows.
+    if (!renamed) {
+      throw new MediaRenameError({
+        code: 'BACKEND_FAILURE',
+        message:
+          'The rename was staged but the branch workflow did not complete. ' +
+          'Check the branch in TinaCloud before trying again.',
+      });
+    }
+    return renamed;
+  }
+
+  private async prepareRenameBranch(
+    from: string,
+    to: string
+  ): Promise<MediaBranchDecision> {
+    if (!this.api.usingProtectedBranch()) return { kind: 'direct' };
+
+    const baseBranch = decodeURIComponent(this.api.branch || '');
+    const { directory, filename } = this.splitMediaPath(from);
+    const branchName = `media-rename-${this.branchSlugForMediaPath(
+      directory,
+      filename
+    )}`;
+
+    // `from` verbatim: re-sanitising could miss legacy or externally added files.
+    return this.requestMediaBranchChoice(branchName, baseBranch, {
+      opType: 'rename',
+      repoPath: from,
+      targetRepoPath: to,
+    });
+  }
+
+  private splitMediaPath(path: string): {
+    directory: string;
+    filename: string;
+  } {
+    const lastSlash = path.lastIndexOf('/');
+    return lastSlash === -1
+      ? { directory: '', filename: path }
+      : {
+          directory: path.slice(0, lastSlash),
+          filename: path.slice(lastSlash + 1),
+        };
+  }
+
+  /**
+   * The listing is the source of truth for `src` (staging path, per-stage CDN
+   * host) and thumbnails; the rename response is the fallback when the entry
+   * isn't on the first page.
+   */
+  private async resolveRenamedMedia(
+    targetPath: string,
+    srcFromResponse?: string
+  ): Promise<Media> {
+    const { directory, filename } = this.splitMediaPath(targetPath);
+
+    try {
+      const listed = await this.list({
+        directory,
+        limit: 100,
+        thumbnailSizes: CANONICAL_THUMBNAIL_SIZES,
+      });
+      const entry = listed.items.find(
+        (item) => item.type === 'file' && item.filename === filename
+      );
+      if (entry) return entry;
+    } catch (error) {
+      console.error('Failed to fetch the canonical media entry:', error);
+    }
+
+    const src = srcFromResponse || '';
+    return {
+      type: 'file',
+      id: filename,
+      filename,
+      directory,
+      src,
+      thumbnails: CANONICAL_THUMBNAIL_SIZES.reduce(
+        (acc, size) => {
+          acc[`${size.w}x${size.h}`] = this.genThumbnail(src, size);
+          return acc;
+        },
+        {} as Record<string, string>
+      ),
+    };
+  }
+
+  private toCloudRenameError(status: number, body: any): MediaRenameError {
+    const message =
+      typeof body?.message === 'string' && body.message
+        ? body.message
+        : 'Failed to rename the file.';
+
+    if (RENAME_ERROR_CODES.includes(body?.code)) {
+      return new MediaRenameError({ code: body.code, message });
+    }
+
+    // Unlike the local dev server, a 404 here means the asset is missing rather
+    // than the route being unavailable.
+    let code: MediaRenameErrorCode;
+    if (status === 401 || status === 403) {
+      code = 'UNAUTHORIZED';
+    } else if (status === 404) {
+      code = 'NOT_FOUND';
+    } else if (status === 409) {
+      code = 'NAME_COLLISION';
+    } else {
+      code = 'BACKEND_FAILURE';
+    }
+    return new MediaRenameError({ code, message });
   }
 
   private toRenameError(status: number, body: any): MediaRenameError {
