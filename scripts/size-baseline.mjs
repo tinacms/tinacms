@@ -3,68 +3,40 @@
 /**
  * size-baseline.mjs — per-PR install/tarball/bundle budgets + duplicate-copy watchlist.
  *
- * Measures four metrics against a checked-in baseline (tests/size-baselines.json)
- * and fails when a change regresses them:
+ * Measures four metrics against tests/size-baselines.json and fails on regression:
  *
- *   1. installClosureBytes — `du -sk node_modules` of a minimal npm-installed
- *      Astro fixture (tests/size-fixture). npm on purpose: npm's nested-duplicate
- *      behaviour is the failure mode we are guarding; pnpm's content-addressed
- *      store hides it.
- *   2. watchlist           — physical copy-count of each watchlist package
- *      (tinacms, mermaid, date-fns, typescript, react, graphql, lodash). The
- *      ideal is one physical copy each; the gate fails UNCONDITIONALLY (no
- *      tolerance band) the moment a package's copy-count rises ABOVE its
- *      baseline — i.e. a brand-new duplicate. Packages that already ship more
- *      than one copy (see the note in compare()) are baselined at their real
- *      count and surfaced as warnings, because hard-failing on a pre-existing,
- *      out-of-scope duplicate would leave CI permanently red. Copies are
- *      counted from the installed node_modules on disk (a package dir whose
- *      package.json `name` matches); the spec's suggested `npm ls --all --json`
- *      enumerates logical dependency EDGES, which massively overcounts hoisted
- *      singletons like react.
- *   3. packages            — `unpackedSize` of every publishable workspace package
- *      (discovered the same way tests/build-verification.test.ts does).
- *   4. adminOutput.totalBytes — total bytes of examples/next/kitchen-sink/public/admin
- *      after `tinacms build`. (Kept as an object so #7245/#7246 can later split it
- *      into shell-dist + project-chunk budgets without a shape change.)
- *
- * Tolerance (metrics 1, 3, 4): per-metric bands — see TOLERANCES below for the
- * numbers and the reasoning. A decrease of more than 10% warns, prompting a
- * re-baseline so wins get locked in. The watchlist has zero tolerance.
- *
- * Determinism: the fixture installs against a CHECKED-IN set of pins, held in
- * package-lock.fixture.json and staged as package-lock.json for the install, so
- * install-closure size and watchlist copy-counts cannot drift from upstream
- * point releases that have nothing to do with the PR's diff. See the lockfile
- * section further down for why the file is split in two, why the workspace's
- * own packages are deliberately absent, and why `npm ci` cannot be used.
+ *   1. installClosureBytes    - `du -sk node_modules` of the npm-installed fixture
+ *      (tests/size-fixture). Real npm on purpose: npm's nested-duplicate hoisting
+ *      is the failure mode this job guards; pnpm's content-addressed store hides it.
+ *   2. watchlist              - physical copy-count per watchlist package; any
+ *      increase over baseline fails, with no tolerance band (see compare()).
+ *   3. packages               - unpacked size of every publishable workspace
+ *      package (discovered the same way tests/build-verification.test.ts does).
+ *   4. adminOutput.totalBytes - kitchen-sink public/admin after `tinacms build`.
+ *      (An object so #7245/#7246 can split it into shell + project budgets
+ *      without a shape change.)
  *
  * Usage:
  *   node scripts/size-baseline.mjs                       # check against baseline (verdaccio)
  *   node scripts/size-baseline.mjs --update              # regenerate the baseline JSON
  *   node scripts/size-baseline.mjs --registry-mode=real  # cron: install from real npm
  *
- * Do NOT commit a baseline produced by `--update` on a dev machine. The numbers
- * are platform-specific — `du` block accounting and platform-optional binaries
- * both differ — so a macOS baseline reads ~83 MB light against ubuntu-latest and
- * pins CI permanently red. Re-baseline by running the "Size Baseline" workflow
- * via workflow_dispatch with `update_size_baseline: true`, then commit the
- * `size-baselines` artifact it uploads.
+ * Baselines MUST be generated in CI: `du` block accounting and platform-optional
+ * binaries differ per OS, so a dev-machine baseline can never match ubuntu-latest.
+ * Dispatch the "Size Baseline" workflow with `update_size_baseline: true` and
+ * commit the `size-baselines` artifact it uploads.
  *
- * Prerequisite: `pnpm build` must have run — metrics 3 and 4 read built dist output.
+ * Prerequisite: `pnpm build` - metrics 3 and 4 read built dist output.
  *
- * ── Verdaccio limitation (documented on purpose, per #7238) ──────────────────
- * The default (verdaccio) mode packs the CURRENT workspace, publishes the
- * tarballs into a throwaway verdaccio registry, and installs the fixture against
- * it. That reproduces npm's *resolution* of the code in this PR, but it does NOT
- * reproduce registry HISTORY. The 1412→1037 MB incident was caused by a stale
- * version already published to npm (an exact-pinned `tinacms` nesting duplicate
- * copies); verdaccio, seeded only from HEAD, can never surface that class of bug.
- * The scheduled cron job runs `--registry-mode=real`, which skips verdaccio and
- * installs the fixture straight from registry.npmjs.org, so it DOES see published
- * history. Real-registry numbers legitimately differ from the verdaccio baseline
- * (npm may resolve newer transitive versions), so treat cron failures as a canary
- * to investigate, not necessarily a hard regression in the current diff.
+ * Verdaccio limitation (documented on purpose, per #7238): the default mode packs
+ * the CURRENT workspace, publishes it into a throwaway verdaccio registry and
+ * installs the fixture from there. That reproduces npm's resolution of this PR's
+ * code but NOT registry history - a stale already-published version can nest
+ * duplicate copies that verdaccio, seeded only from HEAD, can never surface. The
+ * weekly cron's --registry-mode=real installs straight from npmjs to cover that
+ * class. Its numbers legitimately drift from the verdaccio baseline, so treat
+ * cron failures as a canary to investigate, not necessarily a regression in the
+ * current diff.
  */
 
 import { execFileSync, spawn } from 'node:child_process';
@@ -77,18 +49,12 @@ import { gunzipSync } from 'node:zlib';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const FIXTURE_DIR = path.join(ROOT, 'tests', 'size-fixture');
-// Two paths on purpose. npm only reads/writes `package-lock.json`, so that one
-// is transient: staged before the install, deleted after. The pins live in
-// `package-lock.fixture.json`, which is the checked-in file.
-//
-// Why not just commit package-lock.json: the fixture installs `tinacms`, so its
-// lockfile mirrors the product's entire dependency closure. dependency-review
-// diffs manifests between base and head, so committing one under a name it
-// recognises makes all ~1400 entries read as newly-introduced dependencies —
-// and every advisory anywhere in that closure fails the PR, none of which the
-// diff introduced. Three fired in a single sitting (brace-expansion, astro,
-// react-router, the last with no patched 6.x at all) before this split. The
-// pins still do their job; they are simply not a manifest any scanner claims.
+// Two paths on purpose. npm only reads/writes `package-lock.json`, so that name
+// is transient: staged before the install, deleted after. The committed pins live
+// in `package-lock.fixture.json` - a name dependency-review does NOT recognise.
+// Committed as package-lock.json, the fixture's ~1400-entry closure reads as
+// newly-introduced dependencies and every advisory anywhere in it fails the PR
+// (see tests/size-fixture/.gitignore).
 const FIXTURE_LOCK_PATH = path.join(FIXTURE_DIR, 'package-lock.json');
 const COMMITTED_LOCK_PATH = path.join(FIXTURE_DIR, 'package-lock.fixture.json');
 const BASELINE_PATH = path.join(ROOT, 'tests', 'size-baselines.json');
@@ -137,29 +103,15 @@ const WATCHLIST = [
  * Per-metric tolerance bands. A metric fails when it exceeds
  * `baseline + max(baseline * pct, abs)`.
  *
- * One global band cannot work here: the tracked metrics span five orders of
- * magnitude (a 16 KB tarball up to a ~1 GB install closure). Any absolute floor
- * big enough for the closure makes every package budget unfireable — a 5 MB
- * floor lets @tinacms/metrics (16.5 KB) grow 300× and stay green — and any
- * percentage tight enough for the closure makes small tarballs fail on a README
- * edit. So each band is sized against what its metric is actually for:
- *
- *  - installClosure (~966 MB): `du -sk` over ~100k files, deterministic now the
- *    fixture installs from a committed lockfile, so the band only has to absorb
- *    npm hoisting noise. 1% ≈ 9.7 MB — fires on a mid-size dependency entering
- *    the closure (typescript 23 MB, monaco 73 MB, a nested `tinacms` copy
- *    100 MB+), which is the regression class this job exists for. The 5 MB
- *    floor only binds once the closure drops under 500 MB (i.e. after the
- *    epic's runtime split), where 1% would get twitchy.
- *  - adminOutput (~9.1 MB): vite output, byte-identical for identical inputs.
- *    5% ≈ 468 KB today; the 250 KB floor takes over as the prebuilt shell
- *    shrinks the bundle. #7245 (lazy mermaid) and #7246 (posthog chunk) both
- *    move this metric by more than either number — that is the point of it.
- *  - package (16 KB … 4 MB): 5% covers the big ones (tinacms 132 KB,
- *    @tinacms/mdx 200 KB); the 25 KB floor covers the small ones. 25 KB is
- *    sized to "a dependency got bundled in", not "a file was edited" — tight
- *    enough that a small package can no longer grow unnoticed, loose enough
- *    that ordinary source edits don't demand a re-baseline every PR.
+ * One global band cannot serve metrics spanning five orders of magnitude: an
+ * absolute floor big enough for the ~GB closure lets a 16 KB tarball grow
+ * hundreds-fold unnoticed, and a percentage tight enough for the closure fails
+ * small tarballs on a README edit. Each band is sized for what its metric
+ * exists to catch: the closure's 1% fires on a mid-size dependency entering
+ * the tree (typescript, monaco, a nested tinacms copy), adminOutput's on a
+ * re-bundled lazy chunk (#7245/#7246), and the package floor on a dependency
+ * getting bundled in rather than a source edit. tests/size-baseline.test.ts
+ * asserts these properties against the committed baseline.
  *
  * @type {Record<'installClosure'|'adminOutput'|'package', {pct:number, abs:number}>}
  */
@@ -169,9 +121,9 @@ export const TOLERANCES = {
   package: { pct: 0.05, abs: 25 * 1024 },
 };
 
-// Decreases are judged on a single, deliberately looser rule: a warn exists
-// only to prompt `pnpm size:update` so a win gets locked in, and a warn channel
-// that fires on every dead-code removal is a warn channel nobody reads.
+// A decrease warns only to prompt `pnpm size:update` so wins get locked in;
+// deliberately looser than the fail bands so it does not fire on every
+// dead-code removal.
 const WARN_DECREASE_PCT = 0.1;
 
 const VERDACCIO_VERSION = '6';
@@ -311,12 +263,10 @@ function packAll(tarballDir) {
 // ── verdaccio: ephemeral registry, anonymous publish, npmjs uplink ────────────
 function writeVerdaccioConfig(dir) {
   const cfgPath = path.join(dir, 'verdaccio.yaml');
-  // Local packages get NO `proxy` — verdaccio serves only what we publish, so
-  // the fixture resolves the CURRENT workspace and not whatever is on npm.
-  // Everything else (astro, react, …) proxies npmjs. `cache: false` on the
-  // uplink stays: run-to-run determinism now comes from the committed fixture
-  // lockfile (versions are pinned, so a cache would only save bandwidth), and
-  // the cache would live in a per-run tmpdir anyway.
+  // Local packages get NO `proxy` - verdaccio serves only what we publish, so
+  // the fixture resolves the CURRENT workspace, never npm's published copy.
+  // Everything else proxies npmjs uncached (the pins make a cache pure
+  // bandwidth, and it would live in a per-run tmpdir anyway).
   const localPkgBlock = LOCAL_PKG_GLOBS.map(
     (glob) => `  '${glob}':
     access: $all
@@ -426,25 +376,19 @@ function publishAll(packed, workDir) {
 
 // ── fixture lockfile ──────────────────────────────────────────────────────────
 //
-// tests/size-fixture/package-lock.json is CHECKED IN. Without it, every run
-// re-resolved the whole third-party tree against live npm, so the install
-// closure and — worse — the zero-tolerance watchlist counts could move because
-// of an upstream point release with nothing to do with the PR's diff.
+// The committed pins keep the install closure and the zero-tolerance watchlist
+// counts from moving on upstream point releases that have nothing to do with
+// the PR's diff. Two deliberate shapes:
 //
-// Two deliberate shapes:
-//
-//  1. `npm ci` is NOT used, and the workspace's own packages are NOT in the
-//     lockfile. Their tarballs are rebuilt from HEAD on every run, so their
-//     integrity hash changes with every commit that touches packages/** — which
-//     is exactly when this job runs. Pinning them (and `npm ci`, which verifies
-//     integrity for every entry) would therefore fail on essentially every PR.
-//     They are stripped from the lockfile and re-resolved each run, which is
-//     the point: they are the code under test. Everything they pull in stays
-//     pinned, so the closure only moves when the diff moves it.
-//  2. `resolved` URLs are normalised to the public registry. npm's default
-//     `replace-registry-host=npmjs` then rewrites them to whichever registry
-//     the run uses, so one lockfile serves both verdaccio and real mode and the
-//     committed diff never churns on the verdaccio port.
+//  1. `npm ci` is NOT used, and the workspace's own packages are NOT pinned.
+//     Their tarballs are rebuilt from HEAD every run, so their integrity hashes
+//     change on exactly the commits this job runs on - pinning them (or
+//     `npm ci`, which verifies every entry) would fail essentially every PR.
+//     They are stripped and re-resolved each run: they are the code under test.
+//     Everything they pull in stays pinned.
+//  2. `resolved` URLs are normalised to the public registry; the fixture
+//     .npmrc's replace-registry-host redirects them to whichever registry the
+//     run uses, so one lockfile serves both modes without churn.
 
 /** @param {string} key an npm lockfile `packages` key, e.g. `node_modules/a/node_modules/b` */
 export function lockKeyPackageNames(key) {
@@ -543,22 +487,16 @@ function measureInstallClosureBytes() {
 }
 
 function measureWatchlistCopies() {
-  // The spec's suggested mechanism is `npm ls --all --json`, but that tree
-  // enumerates logical dependency EDGES: a single hoisted copy of react is
-  // listed once under every one of its (many) dependents, so edge-counting
-  // wildly overcounts. "Physical copy" means a real directory on disk, so we
-  // walk the installed node_modules tree and count actual package directories.
-  // We stay inside node_modules subtrees (never descending into package source)
-  // so the walk is bounded and fast even on a ~1 GB install.
+  // "Physical copy" = a real directory whose package.json `name` matches - read
+  // the name, not the dir basename, so @types/react or @monaco-editor/react are
+  // never mistaken for the bare package. The spec's `npm ls --all --json`
+  // counts logical dependency EDGES instead, which lists one hoisted react once
+  // per dependent and wildly overcounts. The walk stays inside node_modules
+  // subtrees, so it is bounded even on a ~1 GB install.
   const counts = {};
   for (const name of WATCHLIST) counts[name] = 0;
   const watch = new Set(WATCHLIST);
 
-  // A physical copy is a package directory whose package.json `name` is a
-  // watchlist entry. We read the name (not the directory basename) so scoped
-  // packages that happen to end in a watchlist word — @types/react,
-  // @monaco-editor/react, @graphql-typed-document-node/graphql — are never
-  // mistaken for the bare package.
   const handlePkgDir = (dir) => {
     let stat;
     try {
@@ -609,12 +547,9 @@ function measureWatchlistCopies() {
   return counts;
 }
 
-// `tinacms build --local` spins up the datalayer GraphQL server on port 9000
-// and does not always release it promptly, so a fast re-run (e.g. size:update
-// then size:check locally) can collide with a lingering server. A fresh CI
-// runner never hits this, but freeing the port up-front makes local reruns
-// reliable. Best-effort and posix-only (the job is ubuntu-only); we only ever
-// target the datalayer's own default port.
+// `tinacms build --local` starts the datalayer GraphQL server on port 9000 and
+// does not always release it promptly, which makes fast local reruns collide.
+// Best-effort and posix-only (the CI job is ubuntu-only).
 const DATALAYER_PORT = 9000;
 function freeDatalayerPort() {
   if (process.platform === 'win32') return;
@@ -690,11 +625,9 @@ async function measure() {
     }
 
     cleanFixture();
-    // Install against the committed pins minus the workspace packages. Note
-    // `size:update` keeps the existing pins rather than re-resolving the world:
-    // it re-baselines the numbers for the current tree, and only what the diff
-    // actually moved gets a new pin. Delete the lockfile by hand for a
-    // deliberate upgrade-everything re-pin.
+    // `size:update` keeps the existing pins - only what the diff moved gets a
+    // new pin. Delete the lockfile by hand for a deliberate upgrade-everything
+    // re-pin.
     if (committedLock != null) {
       writeFixtureLock(stripWorkspaceEntries(JSON.parse(committedLock)));
     }
@@ -718,9 +651,8 @@ async function measure() {
     stopVerdaccio(verdaccio);
     // SIZE_KEEP_INSTALL leaves the fixture node_modules in place for debugging.
     if (!process.env.SIZE_KEEP_INSTALL) cleanFixture();
-    // package-lock.json is staging, never a tracked file — drop it so no run
-    // leaves a manifest behind for a scanner to find, and so a check run leaves
-    // the working tree clean instead of dirty with npm's in-place rewrite.
+    // package-lock.json is staging, never a tracked file - drop it so no run
+    // leaves a manifest behind for a scanner to find and the tree stays clean.
     fs.rmSync(FIXTURE_LOCK_PATH, { force: true });
     fs.rmSync(workDir, { recursive: true, force: true });
   }
@@ -782,11 +714,9 @@ export function compareScalar(label, baseline, current, tolerance) {
   return { status: 'ok', detail: line };
 }
 
-// Mirror the console report into the GitHub Actions job summary, so the numbers
-// are visible on the PR without opening the raw log. Runs on green builds too —
-// the drift this job exists to catch (1412→1037 MB) stayed invisible precisely
-// because nobody was looking at a number that hadn't tripped a threshold yet.
-// No-op outside Actions.
+// Mirror the console report into the Actions job summary, on green runs too - a
+// number that has not tripped a threshold yet is one nobody reads in a raw log,
+// which is how past drift went unnoticed. No-op outside Actions.
 export function writeStepSummary(results, groups, { failed, warned, seconds }) {
   const target = process.env.GITHUB_STEP_SUMMARY;
   if (!target) return;
@@ -840,18 +770,12 @@ export function compare(baseline, current) {
     ),
   });
 
-  // Watchlist — zero tolerance on ANY increase in physical copies.
-  //
-  // The ideal for every watchlist package is a single physical copy. Two of
-  // them (typescript via @tinacms/mdx, lodash via @graphql-codegen/*) already
-  // ship more than one copy in the current tree; fixing that is out of scope
-  // for this measurement job (#7238), and hard-failing on the pre-existing
-  // state would leave CI permanently red — the exact "rubber-stamp the
-  // re-baseline" failure mode the spec tells us to design against. So the gate
-  // is: fail unconditionally (no tolerance band) the moment a package's copy
-  // count rises ABOVE its baseline — a brand-new duplicate, which is the
-  // regression we care about. Pre-existing duplicates are surfaced as warnings
-  // so they stay visible and can be driven back down to 1 and re-baselined.
+  // Watchlist - zero tolerance on ANY increase in physical copies. Hard-failing
+  // on a pre-existing >1 count would leave CI permanently red - the exact
+  // rubber-stamp-the-re-baseline failure mode the spec (#7238) says to design
+  // against - so the gate fails only when a count rises ABOVE its baseline,
+  // and pre-existing duplicates surface as warnings until driven back to 1
+  // and re-baselined.
   for (const name of WATCHLIST) {
     const base = baseline.watchlist?.[name] ?? 1;
     const count = current.watchlist[name] ?? 0;
