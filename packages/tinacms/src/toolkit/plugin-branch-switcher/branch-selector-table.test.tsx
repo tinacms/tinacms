@@ -188,14 +188,11 @@ describe('BranchSelectorTable', () => {
   // ---- Row selection ------------------------------------------------------
 
   describe('row selection', () => {
-    // The Button component applies CSS classes (pointer-events-none) instead
-    // of the HTML disabled attribute, so we check className.
     const getOpenButton = (getByRole: Function) =>
       getByRole('button', {
         name: 'Open branch in editor',
       }) as HTMLButtonElement;
-    const isDisabled = (btn: HTMLButtonElement) =>
-      btn.className.includes('pointer-events-none');
+    const isDisabled = (btn: HTMLButtonElement) => btn.disabled;
 
     it('selecting a branch enables the "Open branch in editor" button', async () => {
       const { user, getByText, getByRole } = renderTable();

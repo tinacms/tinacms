@@ -1,5 +1,22 @@
 # next-tinacms-cloudinary
 
+## 27.0.4
+
+### Patch Changes
+
+- [#7468](https://github.com/tinacms/tinacms/pull/7468) [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Bump `cloudinary` to `^2.7.0`
+
+  The catalog pinned `^1.41.3`, which carried GHSA-g4mf-96x5-5m2c (argument injection via ampersand, patched in 2.7.0) and pulled in the deprecated `q` promise library. v2 drops `q`, `core-js` and `cloudinary-core`, leaving `lodash` as its only dependency.
+
+  No code changes were needed: the package already imports the v2 API, and every method it uses (`config`, `uploader.upload`, `uploader.destroy`, `search`, `api.root_folders`, `api.sub_folders`) is unchanged. Of v2.0.0's three breaking changes, `secure` defaulting to true is already set explicitly, URL analytics only affects SDK-generated URLs rather than the Search API response fields this package reads, and the dropped Node 6/8 support is long past.
+
+- [#7484](https://github.com/tinacms/tinacms/pull/7484) [`7dd8ed0`](https://github.com/tinacms/tinacms/commit/7dd8ed07f05796e64496cdadc21571dbc580f362) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Drop the unused `@types/crypto-js` devDependency
+
+  `crypto-js` itself was removed from `tinacms` and `@tinacms/cli`, and no source file in these packages imports it, so the type package had nothing left to type.
+
+- Updated dependencies [[`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7), [`d7cdea7`](https://github.com/tinacms/tinacms/commit/d7cdea75219702574fa78b6adcc90c368e4e71eb), [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe), [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7), [`8d94e35`](https://github.com/tinacms/tinacms/commit/8d94e354d9bb62ce52defb56c1e25ac114b0d971), [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7), [`4d08c25`](https://github.com/tinacms/tinacms/commit/4d08c2546f96fa7b8fbef48b19e19c45e24b44d5), [`37ca62b`](https://github.com/tinacms/tinacms/commit/37ca62b66aadb2cb80daa280a25a390c0bc2e4af), [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7), [`37ca62b`](https://github.com/tinacms/tinacms/commit/37ca62b66aadb2cb80daa280a25a390c0bc2e4af)]:
+  - tinacms@3.12.1
+
 ## 27.0.3
 
 ### Patch Changes

@@ -1,7 +1,7 @@
 {
   "name": "tinacms-authjs",
   "type": "module",
-  "version": "24.0.2",
+  "version": "24.0.3",
   "main": "dist/index.js",
   "module": "./dist/index.js",
   "files": [
@@ -47,6 +47,6 @@
   },
   "repository": {
     "url": "https://github.com/tinacms/tinacms.git",
-    "directory": "packages/next-auth"
+    "directory": "packages/tinacms-authjs"
   }
 }

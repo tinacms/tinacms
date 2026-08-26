@@ -6,7 +6,7 @@ import { Folder } from 'lucide-react';
 import React from 'react';
 import { useCMS } from 'tinacms';
 
-import 'graphiql/graphiql.min.css';
+import 'graphiql/style.css';
 
 const Playground = () => {
   const cms = useCMS();
@@ -141,7 +141,6 @@ const Playground = () => {
         query={query}
         defaultEditorToolsVisibility='variables'
         isHeadersEditorEnabled={false}
-        defaultTabs={[]}
         plugins={[
           {
             title: 'Queries',

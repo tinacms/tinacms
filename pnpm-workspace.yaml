@@ -21,6 +21,7 @@ overrides:
     "@clerk/clerk-js>react": 19.2.3
     "@clerk/clerk-js>react-dom": 19.2.3
     "@clerk/backend>react": 19.2.3
+    markdown-it: ^14.3.0
 allowBuilds:
     "@biomejs/biome": true
     "@parcel/watcher": true
@@ -48,7 +49,7 @@ catalog:
     "@dnd-kit/utilities": ^3.2.2
     "@floating-ui/dom": ^1.6.13
     "@floating-ui/react-dom": ^2.1.2
-    "@graphiql/toolkit": 0.8.4
+    "@graphiql/toolkit": ^0.11.3
     "@graphql-codegen/core": ^6.2.0
     "@graphql-codegen/typescript": ^6.1.0
     "@graphql-codegen/typescript-operations": ^6.1.0
@@ -104,7 +105,6 @@ catalog:
     "@types/progress": ^2.0.7
     "@types/prompts": ^2.4.9
     "@types/prop-types": ^15.7.14
-    "@types/react-beautiful-dnd": ^13.1.8
     "@types/react-dom": ^18.3.5
     "@vitest/coverage-v8": ^2.1.9
     "@types/search-index": ^3.2.4
@@ -142,7 +142,7 @@ catalog:
     "@vercel/stega": ^0.0.5
     "@vitejs/plugin-react": ^4.7.0
     abstract-level: ^1.0.4
-    acorn: 8.8.2
+    acorn: ^8.16.0
     altair-express-middleware: ^7.3.6
     auto-bind: ^4.0.0
     autoprefixer: ^10.4.20
@@ -155,25 +155,23 @@ catalog:
     class-variance-authority: ^0.7.1
     cli-spinner: ^0.2.10
     clipanion: ^3.2.1
-    cloudinary: ^1.41.3
+    cloudinary: ^2.7.0
     clsx: ^2.1.1
     cmdk: ^1.0.4
     color-string: ^1.9.1
-    concat-md: ^0.5.1
     cors: ^2.8.5
     cross-spawn: ^7.0.6
-    crypto-js: ^4.2.0
     dompurify: ^3.3.1
     dotenv: ^16.4.7
     esbuild: ^0.28.1
     estree-util-is-identifier-name: 2.1.0
     fast-glob: ^3.3.3
-    final-form: 4.20.10
-    final-form-arrays: ^3.1.0
+    final-form: ^5.0.1
+    final-form-arrays: ^4.0.1
     final-form-set-field-data: ^1.0.2
     fs-extra: ^11.3.0
     glob-parent: ^6.0.2
-    graphiql: 3.0.0-alpha.1
+    graphiql: ^4.1.2
     graphql-tag: ^2.12.6
     gray-matter: ^4.0.3
     happy-dom: 15.10.2
@@ -228,12 +226,11 @@ catalog:
     prop-types: 15.7.2
     puppeteer: ^23.11.1
     query-string: ^9.0.0
-    react-beautiful-dnd: ^13.1.1
     react-colorful: ^5.6.1
     react-dnd: ^16.0.1
     react-dnd-html5-backend: ^16.0.1
     react-dropzone: 14.2.3
-    react-final-form: ^6.5.9
+    react-final-form: ^7.0.1
     react-router-dom: ^6.30.3
     react-use: ^17.6.0
     readable-stream: ^4.7.0
@@ -246,7 +243,7 @@ catalog:
     stopword: ^3.1.4
     stringify-entities: 4.0.3
     tailwindcss-animate: ^1.0.7
-    tar: 7.5.21
+    tar: 7.5.22
     ts-jest: ^29.2.5
     ts-node: ^10.9.2
     tsc-alias: ^1.8.10
@@ -254,13 +251,10 @@ catalog:
     tsup: ^8.3.6
     turbo: ^2.9.18
     typanion: 3.13.0
-    typedoc: ^0.26.11
-    typedoc-plugin-markdown: ^3.17.1
     unist-util-source: 4.0.2
     unist-util-stringify-position: 3.0.3
     unist-util-visit: 4.1.2
     url-pattern: ^1.0.3
-    uvu: 0.5.6
     validate-npm-package-name: ^7.0.0
     vfile-message: 3.1.4
     webfontloader: 1.6.28
