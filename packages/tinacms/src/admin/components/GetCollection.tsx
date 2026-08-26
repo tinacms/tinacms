@@ -12,6 +12,7 @@ import { handleNavigate } from '../pages/CollectionListPage';
 import type { CollectionResponse, DocumentForm } from '../types';
 import { FullscreenError } from './FullscreenError';
 import { shouldAutoOpenCollectionDocument } from './GetCollection.utils';
+import { UnableToLoadModal } from './UnableToLoadModal';
 
 const isValidSortKey = (sortKey: string, collection: Collection<true>) => {
   if (collection.fields) {
@@ -92,6 +93,11 @@ export const useGetCollection = (
             filterArgs
           );
           setCollection(collection);
+        } else if (!cancelled) {
+          // The session went away mid-session: drop the stale collection and
+          // send the user back to the login modal via the auth wall.
+          cms.events.dispatch({ type: 'cms:session-expired' });
+          setCollection(undefined);
         }
       } catch (error) {
         cms.alerts.error(
@@ -213,6 +219,10 @@ export const useSearchCollection = (
           };
 
           setCollection(collectionData);
+        } else if (!cancelled) {
+          // Same as above: a stale result set is worse than a login prompt.
+          cms.events.dispatch({ type: 'cms:session-expired' });
+          setCollection(undefined);
         }
       } catch (error) {
         cms.alerts.error(
@@ -298,7 +308,8 @@ const GetCollection = ({
         ) || {};
 
   useEffect(() => {
-    if (loading) return;
+    // no collection when the session check skipped the fetch, or when it failed
+    if (loading || !collection) return;
 
     // get the collection definition
     const collectionDefinition = cms.api.tina.schema.getCollection(
@@ -337,6 +348,12 @@ const GetCollection = ({
 
   if (loading) {
     return <LoadingPage />;
+  }
+
+  // undefined when the session check skipped the fetch; consumers read
+  // `collection.documents` straight away, so never hand them undefined
+  if (!collection) {
+    return <UnableToLoadModal message='This collection could not be loaded.' />;
   }
 
   return (
