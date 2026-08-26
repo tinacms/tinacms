@@ -44,7 +44,7 @@ export function PostPreview() {
           : 'Standalone preview — rendering the static document.'}
       </p>
       <p>
-        Author: <span {...tinaField('author')}>{post.author}</span>
+        Status: <span {...tinaField('status')}>{post.status}</span>
       </p>
       <div {...tinaField('body')}>
         <TinaMarkdown content={post.body} />

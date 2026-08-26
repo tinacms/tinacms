@@ -31,12 +31,17 @@
             "type": "rich-text"
           },
           {
-            "name": "authors",
-            "label": "Authors",
+            "name": "status",
+            "label": "Status",
+            "required": true,
             "options": [
               {
-                "value": "ivan",
-                "label": "Ivan"
+                "value": "draft",
+                "label": "Draft"
+              },
+              {
+                "value": "published",
+                "label": "Published"
               }
             ],
             "type": "select"

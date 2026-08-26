@@ -23,12 +23,12 @@ export const postCollection = {
     rating({ name: 'stars', label: 'Stars' }),
     t.richText({ name: 'body', label: 'Body', isBody: true }),
     t.select({
-      name: 'author',
-      label: 'Author',
+      name: 'status',
+      label: 'Status',
+      required: true,
       options: [
-        { value: 'ivan', label: 'Ivan' },
-        { value: 'brook', label: 'Brook' },
-        { value: 'ian', label: 'Ian' },
+        { value: 'draft', label: 'Draft' },
+        { value: 'published', label: 'Published' },
       ],
     }),
   ],
