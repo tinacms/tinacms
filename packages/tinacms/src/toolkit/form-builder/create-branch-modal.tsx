@@ -208,10 +208,10 @@ export const CommittingAs = () => {
         {getInitials(authorName)}
       </span>
       <div className='flex-1 min-w-0'>
+        <p className='text-xs text-gray-500'>Committing as</p>
         <p className='text-sm text-gray-700 font-medium truncate'>
           {authorName}
         </p>
-        <p className='text-xs text-gray-500'>Committing as</p>
       </div>
       <a
         className='text-sm underline text-tina-orange-dark font-medium flex-shrink-0'
