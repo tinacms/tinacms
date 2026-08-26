@@ -1,5 +1,5 @@
 ---
-"tinacms": minor
+"tinacms": patch
 ---
 
 Show the configured Git author in the editorial workflow save dialog.
