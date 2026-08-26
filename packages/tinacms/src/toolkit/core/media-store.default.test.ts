@@ -1775,126 +1775,81 @@ describe('TinaMediaStore — extension filtering', () => {
     cursor: 0,
   });
 
-  describe('cloud', () => {
-    it('sends ext as a comma-separated param', async () => {
-      const { store, fetchWithToken } = buildStore({ branch: 'main' });
-      fetchWithToken.mockResolvedValueOnce(makeJsonResponse(200, listBody([])));
+  it('sends ext as a comma-separated param to the cloud endpoint', async () => {
+    const { store, fetchWithToken } = buildStore({ branch: 'main' });
+    fetchWithToken.mockResolvedValueOnce(makeJsonResponse(200, listBody([])));
 
-      await store.list({
-        directory: '',
-        thumbnailSizes: [],
-        ext: ['pdf', 'svg'],
-      });
-
-      expect(fetchWithToken.mock.calls[0][0]).toContain('&ext=pdf%2Csvg');
+    await store.list({
+      directory: '',
+      thumbnailSizes: [],
+      ext: ['pdf', 'svg'],
     });
 
-    it('omits ext when empty', async () => {
-      const { store, fetchWithToken } = buildStore({ branch: 'main' });
-      fetchWithToken.mockResolvedValueOnce(makeJsonResponse(200, listBody([])));
-
-      await store.list({ directory: '', thumbnailSizes: [], ext: [] });
-
-      expect(fetchWithToken.mock.calls[0][0]).not.toContain('ext=');
-    });
-
-    it('trusts the server and does not re-filter the response', async () => {
-      const { store, fetchWithToken } = buildStore({ branch: 'main' });
-      fetchWithToken.mockResolvedValueOnce(
-        makeJsonResponse(200, listBody(['report.pdf', 'photo.png']))
-      );
-
-      const { items } = await store.list({
-        directory: '',
-        thumbnailSizes: [],
-        ext: ['pdf'],
-      });
-
-      expect(items.map((i) => i.filename)).toEqual(['report.pdf', 'photo.png']);
-    });
+    expect(fetchWithToken.mock.calls[0][0]).toContain('&ext=pdf%2Csvg');
   });
 
-  describe('local', () => {
-    const buildLocal = () => {
-      const built = buildStore({
-        isLocalMode: true,
-        contentApiUrl: 'http://localhost:4001/graphql',
-      });
-      const fetchFunction = vi.fn();
-      built.store.fetchFunction = fetchFunction;
-      return { ...built, fetchFunction };
-    };
+  it('sends ext to the local dev server too', async () => {
+    const built = buildStore({
+      isLocalMode: true,
+      contentApiUrl: 'http://localhost:4001/graphql',
+    });
+    const fetchFunction = vi.fn();
+    built.store.fetchFunction = fetchFunction;
+    fetchFunction.mockResolvedValueOnce(makeJsonResponse(200, listBody([])));
 
-    it('filters the page it was given, since the dev server ignores ext', async () => {
-      const { store, fetchFunction } = buildLocal();
-      fetchFunction.mockResolvedValueOnce(
-        makeJsonResponse(200, listBody(['report.pdf', 'photo.png', 'a.txt']))
-      );
+    await built.store.list({ directory: '', thumbnailSizes: [], ext: ['pdf'] });
 
-      const { items } = await store.list({
-        directory: '',
-        thumbnailSizes: [],
-        ext: ['pdf'],
-      });
+    expect(fetchFunction.mock.calls[0][0]).toContain('&ext=pdf');
+  });
 
-      expect(items.map((i) => i.filename)).toEqual(['report.pdf']);
+  it('omits ext when empty', async () => {
+    const { store, fetchWithToken } = buildStore({ branch: 'main' });
+    fetchWithToken.mockResolvedValueOnce(makeJsonResponse(200, listBody([])));
+
+    await store.list({ directory: '', thumbnailSizes: [], ext: [] });
+
+    expect(fetchWithToken.mock.calls[0][0]).not.toContain('ext=');
+  });
+
+  // Both endpoints filter before paginating, so re-filtering the page here
+  // would only mask a server-side bug.
+  it('does not re-filter what the server returned', async () => {
+    const { store, fetchWithToken } = buildStore({ branch: 'main' });
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, listBody(['report.pdf', 'photo.png']))
+    );
+
+    const { items } = await store.list({
+      directory: '',
+      thumbnailSizes: [],
+      ext: ['pdf'],
     });
 
-    it('keeps directories, whose contents are unknown until opened', async () => {
-      const { store, fetchFunction } = buildLocal();
-      fetchFunction.mockResolvedValueOnce(
-        makeJsonResponse(200, listBody(['photo.png'], ['docs']))
+    expect(items.map((i) => i.filename)).toEqual(['report.pdf', 'photo.png']);
+  });
+
+  describe('extensionFilterable', () => {
+    it('is advertised for cloud and local stores', () => {
+      expect(buildStore({ branch: 'main' }).store.extensionFilterable).toBe(
+        true
       );
-
-      const { items } = await store.list({
-        directory: '',
-        thumbnailSizes: [],
-        ext: ['pdf'],
-      });
-
-      expect(items.map((i) => i.filename)).toEqual(['docs']);
+      expect(buildStore({ isLocalMode: true }).store.extensionFilterable).toBe(
+        true
+      );
     });
 
-    it('leaves the listing alone when no ext is asked for', async () => {
-      const { store, fetchFunction } = buildLocal();
-      fetchFunction.mockResolvedValueOnce(
-        makeJsonResponse(200, listBody(['report.pdf', 'photo.png']))
-      );
-
-      const { items } = await store.list({ directory: '', thumbnailSizes: [] });
-
-      expect(items).toHaveLength(2);
+    // A build-time snapshot has no filtering pass, and narrowing a single page
+    // client-side would leave a near-empty grid.
+    it('is withheld for a static store', () => {
+      const { cms } = buildStore({});
+      const store = new TinaMediaStore(cms, {
+        '0': [],
+      } as unknown as Parameters<typeof TinaMediaStore>[1]);
+      expect(store.extensionFilterable).toBe(false);
     });
+  });
+});
 
-    it('matches extensions case-insensitively', async () => {
-      const { store, fetchFunction } = buildLocal();
-      fetchFunction.mockResolvedValueOnce(
-        makeJsonResponse(200, listBody(['SCAN.PDF']))
-      );
-
-      const { items } = await store.list({
-        directory: '',
-        thumbnailSizes: [],
-        ext: ['pdf'],
-      });
-
-      expect(items.map((i) => i.filename)).toEqual(['SCAN.PDF']);
-    });
-
-    it('never matches a dotfile', async () => {
-      const { store, fetchFunction } = buildLocal();
-      fetchFunction.mockResolvedValueOnce(
-        makeJsonResponse(200, listBody(['.DS_Store']))
-      );
-
-      const { items } = await store.list({
-        directory: '',
-        thumbnailSizes: [],
-        ext: ['pdf'],
-      });
-
-      expect(items).toEqual([]);
-    });
 describe('TinaMediaStore — cloud rename (direct)', () => {
   beforeEach(() => {
     vi.useFakeTimers();

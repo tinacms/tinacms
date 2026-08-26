@@ -1,4 +1,3 @@
-import { type MediaExtension, extensionOf } from '@tinacms/schema-tools';
 import {
   DEFAULT_MEDIA_UPLOAD_TYPES,
   sanitizeFilename,
@@ -227,9 +226,16 @@ export class TinaMediaStore implements MediaStore {
 
   searchable = true;
 
-  // The v2 list endpoint filters server-side; local and `staticMedia` are
-  // filtered per page in `list`.
-  extensionFilterable = true;
+  /**
+   * The v2 cloud endpoint and the local dev server both filter by `ext` before
+   * paginating. `staticMedia` is a build-time snapshot with no such pass, and
+   * filtering a page client-side would leave a near-empty grid while matches
+   * sit further down — so a static store reports no support and the control
+   * stays hidden, the same way `searchable` is gated.
+   */
+  get extensionFilterable(): boolean {
+    return !this.isStatic;
+  }
 
   // allow up to 100MB uploads
   maxSize = 100 * 1024 * 1024;
@@ -1073,22 +1079,6 @@ export class TinaMediaStore implements MediaStore {
       : src;
   }
 
-  /**
-   * Applies `ext` to items the local dev server and `staticMedia` returned
-   * unfiltered. Only the v2 cloud endpoint filters before paginating, so here
-   * a page can come back mostly empty with more matches further on.
-   *
-   * Directories are always kept: what they contain is unknown until opened.
-   */
-  private filterByExtension(items: Media[], ext?: MediaExtension[]): Media[] {
-    if (!ext?.length) return items;
-    const allowed: readonly string[] = ext;
-    return items.filter(
-      (item) =>
-        item.type === 'dir' || allowed.includes(extensionOf(item.filename))
-    );
-  }
-
   async list(options?: MediaListOptions): Promise<MediaList> {
     this.setup();
 
@@ -1119,12 +1109,12 @@ export class TinaMediaStore implements MediaStore {
           depth++;
         }
         return {
-          items: this.filterByExtension(currentFolder, options.ext),
+          items: currentFolder,
           nextOffset: hasMore ? Number(offset) + 20 : null,
         };
       }
       return {
-        items: this.filterByExtension(media, options.ext),
+        items: media,
         nextOffset: hasMore ? Number(offset) + 20 : null,
       };
     }
@@ -1159,6 +1149,10 @@ export class TinaMediaStore implements MediaStore {
           options.limit || 20
         }${options.offset ? `&cursor=${options.offset}` : ''}${
           options.search ? `&search=${encodeURIComponent(options.search)}` : ''
+        }${
+          options.ext?.length
+            ? `&ext=${encodeURIComponent(options.ext.join(','))}`
+            : ''
         }`
       );
 
@@ -1200,8 +1194,7 @@ export class TinaMediaStore implements MediaStore {
     }
 
     return {
-      // The cloud endpoint already filtered; only the local branch needs it.
-      items: this.isLocal ? this.filterByExtension(items, options.ext) : items,
+      items,
       nextOffset: cursor || 0,
     };
   }
