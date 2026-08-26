@@ -937,18 +937,18 @@ async function main() {
   const baseline = readBaseline();
   const results = compare(baseline, current);
 
-  const groups = ['install closure', 'watchlist', 'admin output', 'packages'];
-  let failed = 0;
-  let warned = 0;
+  // Counted from results, never from the printed groups, so a metric group
+  // missing from a display list can be badly rendered but never unenforced.
+  const failed = results.filter((r) => r.status === 'fail').length;
+  const warned = results.filter((r) => r.status === 'warn').length;
+
+  const groups = [...new Set(results.map((r) => r.group))];
   for (const group of groups) {
     const rows = results.filter((r) => r.group === group);
-    if (!rows.length) continue;
     console.log(`\n── ${group} ──`);
     for (const r of rows) {
       const icon =
         r.status === 'fail' ? 'FAIL' : r.status === 'warn' ? 'WARN' : ' ok ';
-      if (r.status === 'fail') failed++;
-      if (r.status === 'warn') warned++;
       // Only print ok rows for scalar/watchlist groups to keep the log readable;
       // always print fails and warns.
       if (r.status !== 'ok' || group !== 'packages') {
