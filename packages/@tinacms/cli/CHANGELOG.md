@@ -1,5 +1,23 @@
 # tinacms-cli
 
+## 2.6.1
+
+### Patch Changes
+
+- [#7454](https://github.com/tinacms/tinacms/pull/7454) [`41263f5`](https://github.com/tinacms/tinacms/commit/41263f503e4c02f3b9272aa5dca6fc2c572a60eb) Thanks [@kulesy](https://github.com/kulesy)! - Bump `js-yaml` to 4.3.1, picking up an upstream security fix (GHSA-5p4m-2wfm-xmqj)
+
+- [#7468](https://github.com/tinacms/tinacms/pull/7468) [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Drop the deprecated `crypto-js` dependency
+
+  `@tinacms/cli` used it in one place, to generate the default `NEXTAUTH_SECRET` offered during `tinacms init`. `crypto.lib.WordArray.random(16).toString()` is replaced with `randomBytes(16).toString('hex')` from `node:crypto`, which produces the same 32-character hex string. `tinacms` declared the dependency without ever importing it.
+
+- Updated dependencies [[`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7), [`195087d`](https://github.com/tinacms/tinacms/commit/195087de7e617d9d91b06709db869787ac0c800f), [`d7cdea7`](https://github.com/tinacms/tinacms/commit/d7cdea75219702574fa78b6adcc90c368e4e71eb), [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe), [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe), [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe), [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7), [`8d94e35`](https://github.com/tinacms/tinacms/commit/8d94e354d9bb62ce52defb56c1e25ac114b0d971), [`5544a42`](https://github.com/tinacms/tinacms/commit/5544a4225fd131fdb46c0464e8f31e4c4e0fa742), [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7), [`4d08c25`](https://github.com/tinacms/tinacms/commit/4d08c2546f96fa7b8fbef48b19e19c45e24b44d5), [`37ca62b`](https://github.com/tinacms/tinacms/commit/37ca62b66aadb2cb80daa280a25a390c0bc2e4af), [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7), [`37ca62b`](https://github.com/tinacms/tinacms/commit/37ca62b66aadb2cb80daa280a25a390c0bc2e4af)]:
+  - tinacms@3.12.1
+  - @tinacms/app@2.5.12
+  - @tinacms/graphql@2.4.10
+  - @tinacms/metrics@2.1.2
+  - @tinacms/search@1.2.24
+  - @tinacms/schema-tools@2.9.0
+
 ## 2.6.0
 
 ### Minor Changes

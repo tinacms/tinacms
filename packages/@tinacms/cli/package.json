@@ -1,7 +1,7 @@
 {
     "name": "@tinacms/cli",
     "type": "module",
-    "version": "2.6.0",
+    "version": "2.6.1",
     "main": "dist/index.js",
     "typings": "dist/index.d.ts",
     "files": [
@@ -53,8 +53,7 @@
         "test:adapters": "NODE_OPTIONS='--experimental-vm-modules' jest --config jest.adapter-matrix.config.js --runTestsByPath src/next/adapter-matrix.adapter-test.ts",
         "types": "pnpm tsc",
         "test-watch": "jest  --passWithNoTests --watch",
-        "tinacms": "MONOREPO_DEV=true node ./bin/tinacms",
-        "generate:schema": "pnpm node scripts/generateSchema.js"
+        "tinacms": "MONOREPO_DEV=true node ./bin/tinacms"
     },
     "dependencies": {
         "@graphql-codegen/core": "catalog:",
