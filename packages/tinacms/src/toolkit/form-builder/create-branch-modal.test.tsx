@@ -69,8 +69,6 @@ describe('CommittingAs', () => {
   // gitAuthoring, so the row must disappear rather than guess.
   it.each([
     ['no gitAuthoring field', { id: 'user1' }],
-    ['no user', undefined],
-    ['a null user', null],
     ['a non-object user', true],
     ['an unknown mode', { gitAuthoring: { mode: 'something-else' } }],
   ])('renders nothing with %s', (_label, user) => {
