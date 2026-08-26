@@ -115,6 +115,11 @@ export const RenameModal = ({
                 await renameFunc(sanitized);
                 close();
               } catch (e) {
+                // Dismissing the branch prompt isn't a failure to report.
+                if (e?.ERR_TYPE === 'MediaRenameCancelled') {
+                  close();
+                  return;
+                }
                 setError(renameErrorMessage(e, sanitized));
                 setProcessing(false);
               }
