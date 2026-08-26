@@ -8,12 +8,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import {
-  type FieldValues,
-  FormProvider as RhfFormProvider,
-  set,
-  useForm,
-} from 'react-hook-form';
+import { FormProvider as RhfFormProvider, useForm } from 'react-hook-form';
 import type { ResolvedConfig } from '../config';
 import { toFieldAddress } from '../core/field/address';
 import { createFieldRegistry } from '../core/field/registry';
@@ -41,7 +36,7 @@ import {
   type TinaRuntime,
   TinaRuntimeContext,
 } from './context';
-import { flattenFieldErrors, toFieldErrorEntry } from './field-errors';
+import { flattenFieldErrors, nestFieldErrors } from './field-errors';
 import { buildFormResolver } from './resolver';
 
 export interface TinaProviderProps {
@@ -180,11 +175,10 @@ export function FormProvider({
     const scope = readFormStore().forms[formId];
     if (!keepsValues(scope, toFormValues(ingested)))
       return { seed: null, errors: {} };
-    const errors: FieldValues = {};
-    for (const [address, messages] of Object.entries(scope.errors)) {
-      if (messages?.length) set(errors, address, toFieldErrorEntry(messages));
-    }
-    return { seed: toDocument(scope.values), errors };
+    return {
+      seed: toDocument(scope.values),
+      errors: nestFieldErrors(scope.errors),
+    };
   }, [formId]);
   // Whether the scope still keeps its values against the document of this render. A
   // clean scope stops keeping them when another writer changes the file, so the test
@@ -244,9 +238,7 @@ export function FormProvider({
         const store = useFormStore.getState();
         if (name !== undefined) {
           // The store's live-values mirror is flat, one entry per top-level
-          // field (`toFormValues`/`toDocument`). A nested field name (an
-          // array item's own field) collapses to its top-level address here,
-          // and re-reads that field's whole current value.
+          // field. A nested field name collapses to its top-level address.
           const topLevel = name.split('.')[0];
           store.setFieldValue(
             formId,

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { asResolvedConfig } from '../../../config';
@@ -53,10 +53,21 @@ const collection: CollectionSchema = {
       max: 2,
       fields: [t.string({ name: 'value', label: 'Value' })],
     }),
+    t.array({
+      name: 'groups',
+      label: 'Groups',
+      fields: [
+        t.array({
+          name: 'members',
+          label: 'Members',
+          fields: [t.string({ name: 'name', label: 'Name', required: true })],
+        }),
+      ],
+    }),
   ],
 };
 
-const [authorsNode, tagsNode] = collection.fields;
+const [authorsNode, tagsNode, groupsNode] = collection.fields;
 
 const resolveRegistry = (): Promise<FieldRegistry> =>
   resolveFieldPlugins(PLUGINS);
@@ -204,18 +215,43 @@ describe('ArrayField validation', () => {
     const errors = descriptor?.validateChildren?.(
       [{ name: '', age: 30 }, { name: 'Brook' }],
       authorsNode,
+      'authors',
       registry
     );
     expect(errors).toEqual({ 'authors.0.name': ['Name is required'] });
   });
 
-  it('surfaces an item field error at its own address in the rendered form', async () => {
+  it('surfaces an item field error at its own address, and rolls it up onto the array itself', async () => {
     renderField({ authors: [{ name: 'Ivan' }] });
     const name = await screen.findByLabelText('Name');
     await userEvent.clear(name);
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Name is required'
+    await waitFor(() => expect(screen.getAllByRole('alert')).toHaveLength(2));
+    for (const alert of screen.getAllByRole('alert')) {
+      expect(alert).toHaveTextContent('Name is required');
+    }
+  });
+
+  it('recurses into an array nested inside an array', async () => {
+    const registry = await resolveRegistry();
+    const descriptor = registry.get('array');
+    const errors = descriptor?.validateChildren?.(
+      [{ members: [{ name: '' }] }],
+      groupsNode,
+      'groups',
+      registry
     );
+    expect(errors).toEqual({ 'groups.0.members.0.name': ['Name is required'] });
+  });
+
+  it('rolls a doubly-nested item field error up through every ancestor array', async () => {
+    renderField({ groups: [{ members: [{ name: 'Ivan' }] }] });
+    const name = await screen.findByLabelText('Name');
+    await userEvent.clear(name);
+    // The leaf field, the `members` array, and the `groups` array each show it.
+    await waitFor(() => expect(screen.getAllByRole('alert')).toHaveLength(3));
+    for (const alert of screen.getAllByRole('alert')) {
+      expect(alert).toHaveTextContent('Name is required');
+    }
   });
 });
 

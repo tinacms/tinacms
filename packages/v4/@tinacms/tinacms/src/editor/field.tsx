@@ -15,9 +15,9 @@ export interface FieldNodeProps {
   node: FieldSchema;
 }
 
-// Renders one resolved field node at an address. <Field> resolves a node from
-// `collection.fields` by name; a compound field (e.g. array) resolves its own
-// item nodes and addresses them with `<FieldNode>` directly.
+// Renders one resolved field node at an address. <Field> looks up a node in
+// `collection.fields` by name. A compound field (e.g. array) has no such
+// entry for its item nodes, so it calls this directly instead.
 export function FieldNode({ address, node }: FieldNodeProps) {
   const runtime = use(TinaRuntimeContext);
   const scope = use(FormScopeContext);

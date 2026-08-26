@@ -12,9 +12,8 @@ export interface FieldMetadata {
 
 export interface FieldTransformContext {
   documentPath?: string;
-  // Set by the form provider and the save path. A compound field (e.g. array)
-  // reads it to parse/serialize/validate its item fields through the registry,
-  // the same way the top-level form does.
+  // The form provider and the save path set this. A compound field uses it
+  // to parse, serialize, and validate its item fields.
   registry?: FieldRegistry;
 }
 
@@ -40,13 +39,13 @@ export interface FieldDescriptor<TValue = unknown, TStored = unknown> {
     node: FieldSchema,
     context: FieldTransformContext
   ) => boolean;
-  // A compound field (e.g. array) validates its item fields itself, through
-  // `validateField`, and reports them here as flat address -> messages, keyed
-  // the same way the top-level resolver keys its own errors. The resolver
-  // merges these in beside the field's own `schema`/`validate` errors.
+  // A compound field validates its own item fields and returns their
+  // messages as address -> messages. Key them off `address`, not `node.name`
+  // — a nested compound field is not addressed by its bare name.
   validateChildren?: (
     value: TValue,
     node: FieldSchema,
+    address: string,
     registry: FieldRegistry
   ) => Record<string, string[]>;
 }

@@ -121,9 +121,11 @@ The properties of the descriptor:
   structural equality when it decides whether a field's value changed
   (`core/form/compare.ts`). The `rich-text` field uses it to treat two AST
   values as equal when they serialize to the same markdown source.
-- `validateChildren(value, node, registry)` — An optional function for a
-  compound field. It returns a flat map of nested address to messages. Refer
-  to [Compound fields](#compound-fields) below.
+- `validateChildren(value, node, address, registry)` — An optional function
+  for a compound field. It returns a flat map of nested address to messages.
+  `address` is this field's own current address — not always `node.name`, since
+  a nested compound field is not addressed by its bare name. Refer to
+  [Compound fields](#compound-fields) below.
 
 ### 3. The schema helper function and the validator (`.schema.ts`)
 
@@ -175,7 +177,7 @@ Hooks:
 | `useFieldAddress()` | Gives the address of this field |
 | `useFieldSchema<T>()` | Gives the resolved schema node of this field, which holds the render hints such as `step` |
 | `useFieldValue<T>(address)` | Gives `[value, setValue]` from the react-hook-form controller |
-| `useFieldErrors(address)` | Gives the validation messages at the address |
+| `useFieldErrors(address)` | Gives every validation message at `address` or under it |
 | `useFieldActivation(handler)` | Runs `handler` when this field becomes the active field, for visual editing |
 
 ## Validation in two layers
@@ -251,15 +253,39 @@ need three extra pieces. Each one has a plain, ordinary counterpart; refer to
   A compound field's `parse`/`serialize` calls `ingestDocument`/
   `digestDocument` again, with its own item `fields` and that registry, so its
   items go through the same conversion path as the top-level form.
-- **Validation** — `validateChildren(value, node, registry)` on the descriptor
-  runs `validateField` again, once for each item field, and returns the
-  messages keyed by the item's nested address. The resolver
-  (`editor/resolver.ts`) merges these in beside the field's own `schema`/
-  `validate` messages, so `useFieldErrors(nestedAddress)` finds them the same
-  way it finds a top-level field's messages.
+- **Validation** — `validateChildren(value, node, address, registry)` on the
+  descriptor calls `validateFieldTree(subfield, subDescriptor, subValue,
+  \`${address}.${index}.${subfield.name}\`, registry)` (`core/validation.ts`),
+  once for each item field, and merges what it returns. Build the item's
+  address from the `address` parameter, not from `node.name` — a nested
+  compound field (an array inside an array) is not addressed by its bare name.
+  `validateFieldTree` runs `validateField`, then — if the item field is itself
+  compound — calls its `validateChildren` too, so the recursion is not
+  something you write by hand; it falls out of every compound field calling
+  `validateFieldTree` the same way. The top-level resolver
+  (`editor/resolver.ts`) starts this same call for each collection field, then
+  merges what it returns.
+
+  `validateFieldTree` does not additionally write a message onto a compound
+  field's own address — do not add that yourself either. react-hook-form
+  represents a registered `useFieldArray` address as a real array of its
+  items' errors, and drops anything else — including your own descriptor's
+  `type`/`message` — sitting alongside it. `useFieldErrors(address)`
+  (`editor/hooks.ts`) gets a compound field's own message from its children
+  instead, by reading: `collectFieldErrorMessages`
+  (`editor/field-errors.ts`) walks every node under `address` in whatever
+  tree react-hook-form actually kept, and collects every message it finds.
+  So `useFieldErrors('authors')` sees an item's message the same way
+  `useFieldErrors('authors.0.name')` does, at any depth, without the resolver
+  needing to place it there.
 
 This makes every ordinary field an item field for free — an `array`'s `fields`
 accepts any registered type, unmodified. The converse is not automatic: a new
 field type is not confirmed to work as an item field until you put one inside
 an `array` and render it nested. Refer to
-[Write a new field plugin, step 5](#write-a-new-field-plugin).
+[Write a new field plugin, step 5](#write-a-new-field-plugin). Two compound
+fields nest for free too, as long as each one's `validateChildren` calls
+`validateFieldTree` with its own current `address` rather than `node.name` —
+`array` inside `array` is the test in `array-field.test.tsx`, and a future
+`reference` gets the same recursion without either field knowing about the
+other.

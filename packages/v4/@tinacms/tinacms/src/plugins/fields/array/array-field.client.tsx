@@ -3,7 +3,7 @@ import type { FieldTransformContext } from '../../../core/field/contract';
 import { digestDocument, ingestDocument } from '../../../core/form/ingest';
 import { invariant } from '../../../core/invariant';
 import type { TinaDocument } from '../../../core/schema/types';
-import { validateField } from '../../../core/validation';
+import { validateFieldTree } from '../../../core/validation';
 import { type ArrayFieldSchema, arraySchema } from './array-field.schema';
 import { ArrayField } from './array-field.ui';
 
@@ -36,21 +36,23 @@ export default defineClientPlugin({
         digestDocument(item, field.fields, registry, context)
       );
     },
-    validateChildren: (value: TinaDocument[], node, registry) => {
+    validateChildren: (value: TinaDocument[], node, address, registry) => {
       const field = node as ArrayFieldSchema;
       const items = Array.isArray(value) ? value : [];
       const errors: Record<string, string[]> = {};
       items.forEach((item, index) => {
         for (const subfield of field.fields) {
           const descriptor = registry.get(subfield.type);
-          const messages = validateField(
-            subfield,
-            descriptor,
-            item?.[subfield.name]
+          Object.assign(
+            errors,
+            validateFieldTree(
+              subfield,
+              descriptor,
+              item?.[subfield.name],
+              `${address}.${index}.${subfield.name}`,
+              registry
+            )
           );
-          if (messages.length > 0) {
-            errors[`${field.name}.${index}.${subfield.name}`] = messages;
-          }
         }
       });
       return errors;

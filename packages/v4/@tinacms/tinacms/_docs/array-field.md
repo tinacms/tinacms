@@ -65,7 +65,7 @@ defineClientPlugin({
     metadata: { layout: 'block', labelable: false },
     schema: arraySchema,
     parse, serialize,       // recurse into item fields — see below
-    validateChildren,       // recurse into item fields — see below
+    validateChildren,       // recurse into item fields, at any depth — see below
   },
 });
 ```
@@ -87,13 +87,44 @@ defineClientPlugin({
 | `max` | more than `max` items | `<label> allows at most <max> items` |
 
 That schema checks the array's own shape only — it does not look inside an
-item. Each item field's own rules run through `validateChildren`, which calls
-`validateField(subfield, descriptor, item[subfield.name])` for every item
-field of every item, and returns the messages keyed by the item's nested
-address (`items.0.title`). The resolver (`editor/resolver.ts`) merges these in
-beside the array's own cardinality messages. Thus each item field reports its
-own errors through `useFieldErrors` at its own address, the same way a
-top-level field does. Refer to
+item. Each item field's own rules run through `validateChildren(value, node,
+address, registry)`, which calls `validateFieldTree(subfield, descriptor,
+item[subfield.name], \`${address}.${index}.${subfield.name}\`, registry)`
+(`core/validation.ts`) for every item field of every item, and merges what it
+returns. It builds each item's address from its own `address` parameter, not
+`node.name` — an array nested inside another array is not addressed by its
+bare name (`members`), only by where it actually sits
+(`groups.0.members`).
+
+`validateFieldTree` is what makes an array of arrays validate correctly: it
+runs `validateField` for the item field, then — because an item field can
+itself be an `array` — calls that item field's own `validateChildren` too,
+passing its own nested address down. So the recursion is not array-specific
+code reaching into another array; it is every compound field calling the same
+function, each with its own current address. A future compound field (a
+`reference` embedding some of the referenced document's fields, say) gets this
+for free the same way, and composes with `array` — a reference inside an
+array, or an array inside a reference — without either field's code knowing
+the other exists. The resolver (`editor/resolver.ts`) starts this same call
+for each top-level field, then merges everything it returns in beside the
+array's own cardinality messages. Thus each item field, at any depth, reports
+its own errors through `useFieldErrors` at its own address, the same way a
+top-level field does.
+
+An item's message also reaches the array's own address, and every array
+above it — an item collapsed inside a closed nested array still needs to be
+visible from outside. This is not something `validateChildren` writes into
+the tree: react-hook-form represents `authors` (a name `useFieldArray`
+registers) as a real array of its items' errors, and drops any `type`/
+`message` of the array's own sitting alongside that array — so the array's
+own address is never itself an entry once an item errors. `useFieldErrors`
+(`editor/hooks.ts`) gets there anyway, by reading rather than writing:
+`collectFieldErrorMessages` (`editor/field-errors.ts`) walks every node under
+an address in whatever tree react-hook-form actually kept, and collects
+every message underneath. So `useFieldErrors('authors')` sees an item's
+message the same way `useFieldErrors('authors.0.name')` does — and for
+`groups`/`members` nesting, `useFieldErrors('groups')` sees a message from
+`groups.0.members.0.name` too. Refer to
 [field-plugins.md](./field-plugins.md#compound-fields).
 
 ## Ingest and digest
@@ -166,6 +197,13 @@ rather than re-implemented.
 - It rejects too few items on a required field, and too many items past `max`.
 - It rejects an invalid item field value, with the message at the item's own
   nested address.
+- It rejects an invalid value inside an array nested inside an array, with
+  the message at the doubly-nested address, via a direct `validateChildren`
+  call.
+- It rolls an item field's error up onto the array's own address, and up
+  through every ancestor array for a doubly-nested item.
+- It goes dirty on a reorder, then back to clean once edits restore the
+  original values.
 - It round-trips items through ingest and digest, including an item field
   with its own `parse`/`serialize`.
 - It examines the metadata of the descriptor.

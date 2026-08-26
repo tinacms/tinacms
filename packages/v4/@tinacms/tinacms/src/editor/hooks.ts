@@ -21,7 +21,7 @@ import {
   FormScopeContext,
   TinaRuntimeContext,
 } from './context';
-import { type FieldErrorEntry, fieldErrorMessages } from './field-errors';
+import { collectFieldErrorMessages } from './field-errors';
 
 export function useFieldRegistry(): FieldRegistry {
   const runtime = use(TinaRuntimeContext);
@@ -147,13 +147,11 @@ export function useFieldValue<T = unknown>(
 
 export function useFieldErrors(address: FieldAddress): string[] {
   const { errors } = useFormState({ name: address });
-  // `address` is a react-hook-form path (an array item's own field nests
-  // through an index, e.g. `items.0.title`) — `get` reads the real nested
-  // tree the resolver built with `set`, the same way react-hook-form itself
-  // resolves a field name.
-  return fieldErrorMessages(
-    get(errors, address) as FieldErrorEntry | undefined
-  );
+  // `address` can nest through an index (`items.0.title`). `get` reads that
+  // path the same way react-hook-form does. `collectFieldErrorMessages` also
+  // walks down from it, so a compound field's address reports everything
+  // wrong underneath it, not only a message at that exact address.
+  return collectFieldErrorMessages(get(errors, address));
 }
 
 export function useFieldActivation(handler: () => void): void {

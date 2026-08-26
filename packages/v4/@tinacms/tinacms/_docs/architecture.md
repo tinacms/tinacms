@@ -60,7 +60,7 @@ The component gets all its data from hooks that use the address
 | `useFieldAddress()` | `FieldAddressContext` |
 | `useFieldSchema()` | `FieldSchemaContext`, which holds the resolved node of the field |
 | `useFieldValue(address)` | `useController` from react-hook-form, which gives `[value, setValue]` |
-| `useFieldErrors(address)` | `useFormState` from react-hook-form, with the field name as the key |
+| `useFieldErrors(address)` | `useFormState` from react-hook-form, then `collectFieldErrorMessages` walks everything react-hook-form kept under `address` |
 | `useFieldActivation(handler)` | Operates when the address of the active field is the same as this address |
 
 Each field has its own react-hook-form subscription. Thus a keystroke renders
@@ -69,20 +69,36 @@ that field again, but does not render the other fields again.
 ## 5. Validate
 
 At each change, react-hook-form runs the resolver. For each field, the resolver
-calls `validateField(node, descriptor, value)` (`core/validation.ts`). That
-function runs the Zod schema of the descriptor, `schema(node)`. Then it runs the
-optional `validate(value)` function of the descriptor. It joins the two sets of
-messages. The field name is the key of each message. `useFieldErrors` gives the
-messages to the component.
+calls `validateFieldTree(node, descriptor, value, address, registry)`
+(`core/validation.ts`), with `address` set to that field's own top-level name.
+That function calls `validateField(node, descriptor, value)`, which runs the
+Zod schema of the descriptor, `schema(node)`, then the optional `validate(value)`
+function. It joins the two sets of messages under `address`.
 
-A compound field also gets a call to its optional `validateChildren(value, node,
-registry)` function. That function runs `validateField` again, once for each
-item field, with the registry it receives as its third argument. It returns
-its messages keyed by the item field's own nested address, such as
-`items.0.title`. The resolver merges these messages in beside the field's own.
-Thus an item field gets its errors from `useFieldErrors` the same way a
-top-level field does — see
-[`array-field.md`](./array-field.md#validation).
+Then, if the descriptor is a compound field, `validateFieldTree` calls its
+optional `validateChildren(value, node, address, registry)` function — `address`
+lets a nested compound field key its own children off where it actually sits,
+not off `node.name` alone. `validateChildren` calls `validateFieldTree` again,
+once for each item field, at that item's own nested address, such as
+`items.0.title`. If an item field is itself compound — an array nested inside
+an array, or a future reference embedding one — that recursive call reaches
+its `validateChildren` too, at whatever depth it sits. The resolver merges
+every message this produces in beside the field's own. Thus an item field at
+any depth gets its errors from `useFieldErrors` the same way a top-level field
+does — see [`array-field.md`](./array-field.md#validation).
+
+A message also reaches every ancestor address, not only its own — an item
+collapsed inside a closed array, or scrolled out of view, still needs to be
+visible from outside it. `useFieldErrors` (`editor/hooks.ts`) does this by
+reading, not writing: `collectFieldErrorMessages` (`editor/field-errors.ts`)
+walks every node under `address` in the tree react-hook-form actually kept,
+and collects every message it finds. This is a read, not something the
+resolver bakes into the tree ahead of time, because react-hook-form does not
+let it be: a registered `useFieldArray` address always ends up holding a real
+array of its items' errors, and drops any `type`/`message` of its own sitting
+alongside that array. So the array's own address is never itself an entry
+once it has a child error — `useFieldErrors` on that address only ever sees
+something because it went looking underneath it.
 
 ## 6. Digest at save
 

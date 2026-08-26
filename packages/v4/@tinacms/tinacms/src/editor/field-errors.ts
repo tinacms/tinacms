@@ -1,3 +1,5 @@
+import { type FieldValues, set } from 'react-hook-form';
+
 export interface FieldErrorEntry {
   type: string;
   message?: string;
@@ -25,18 +27,37 @@ const ENTRY_KEYS = new Set(['type', 'message', 'types']);
 const isFieldErrorEntry = (value: unknown): value is FieldErrorEntry =>
   typeof value === 'object' && value !== null && 'type' in value;
 
-// react-hook-form's `errors` is a tree shaped like the form's values — an
-// array item's own field nests through an index, e.g. `errors.items[0].title`.
-// `set` (`editor/resolver.ts`) built that tree from an address such as
-// `items.0.title`; this walks it back into that same flat address -> messages
-// shape, for the flat `FieldErrors` the form-state store keeps.
+// Collects every message under `node`, including `node` itself. A compound
+// field's own address is never an entry once it has a child error —
+// react-hook-form coerces a `useFieldArray` address into a plain array, and
+// drops any sibling `type`/`message` there. Walking down is how a parent
+// address still shows what is wrong underneath it.
+export const collectFieldErrorMessages = (node: unknown): string[] => {
+  const messages = new Set(
+    isFieldErrorEntry(node) ? fieldErrorMessages(node) : []
+  );
+  if (node && typeof node === 'object') {
+    for (const [key, child] of Object.entries(node)) {
+      if (ENTRY_KEYS.has(key)) continue;
+      for (const message of collectFieldErrorMessages(child)) {
+        messages.add(message);
+      }
+    }
+  }
+  return [...messages];
+};
+
+// Mirrors the react-hook-form error tree into `FieldErrors`, the flat
+// address -> messages map the form-state store keeps. Every address gets an
+// entry, not only leaf entries, since `collectFieldErrorMessages` also walks
+// down from each prefix.
 export const flattenFieldErrors = (
   node: unknown,
   prefix: string,
   out: Record<string, string[]>
 ): void => {
-  if (isFieldErrorEntry(node)) {
-    const messages = fieldErrorMessages(node);
+  if (prefix) {
+    const messages = collectFieldErrorMessages(node);
     if (messages.length > 0) out[prefix] = messages;
   }
   if (node && typeof node === 'object') {
@@ -45,4 +66,22 @@ export const flattenFieldErrors = (
       flattenFieldErrors(child, prefix ? `${prefix}.${key}` : key, out);
     }
   }
+};
+
+// The inverse of `flattenFieldErrors`. `set` on a single-segment path is a
+// plain assignment, not a merge, so a shallow address written after a deeper
+// one wipes it out. Sorting shallowest first keeps a compound field's own
+// message and its children's messages both in the tree.
+export const nestFieldErrors = (
+  flat: Record<string, string[] | undefined>
+): FieldValues => {
+  const tree: FieldValues = {};
+  const addresses = Object.keys(flat).sort(
+    (a, b) => a.split('.').length - b.split('.').length
+  );
+  for (const address of addresses) {
+    const messages = flat[address];
+    if (messages?.length) set(tree, address, toFieldErrorEntry(messages));
+  }
+  return tree;
 };
