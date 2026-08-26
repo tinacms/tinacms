@@ -2,12 +2,13 @@
 
 */
 
-import React, { useState, useEffect } from 'react';
 import type { TinaCMS } from '@tinacms/toolkit';
+import React, { useState, useEffect } from 'react';
 import { TinaAdminApi } from '../api';
 import type { DocumentForm } from '../types';
-import LoadingPage from './LoadingPage';
 import { FullscreenError } from './FullscreenError';
+import LoadingPage from './LoadingPage';
+import { UnableToLoadModal } from './UnableToLoadModal';
 
 export const useGetDocument = (
   cms: TinaCMS,
@@ -34,6 +35,11 @@ export const useGetDocument = (
           if (!isCancelled) {
             setDocument(response.document);
           }
+        } else if (!isCancelled) {
+          // Session gone: drop the previous document rather than leave the form
+          // showing content the user can no longer save.
+          cms.events.dispatch({ type: 'cms:session-expired' });
+          setDocument(undefined);
         }
       } catch (error) {
         // Only handle error if the request hasn't been cancelled
@@ -87,6 +93,12 @@ const GetDocument = ({
 
   if (loading) {
     return <LoadingPage />;
+  }
+
+  // undefined when the session check skipped the fetch; consumers read
+  // `document._values` straight away, so never hand them undefined
+  if (!document) {
+    return <UnableToLoadModal message='This document could not be loaded.' />;
   }
 
   return <>{children(document, loading)}</>;
