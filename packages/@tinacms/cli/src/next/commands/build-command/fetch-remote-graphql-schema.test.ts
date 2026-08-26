@@ -1,0 +1,106 @@
+import { fetchRemoteGraphqlSchema } from './fetch-remote-graphql-schema';
+
+const stubResponse = ({
+  status = 200,
+  statusText = 'OK',
+  body,
+}: {
+  status?: number;
+  statusText?: string;
+  body: unknown;
+}) =>
+  ({
+    ok: status >= 200 && status < 300,
+    status,
+    statusText,
+    json: async () => body,
+    headers: new Headers({
+      'tinacms-grapqhl-version': '1.6.0',
+      'tinacms-graphql-project-version': '1.6.2',
+    }),
+  }) as unknown as Response;
+
+describe('fetchRemoteGraphqlSchema', () => {
+  const realFetch = globalThis.fetch;
+
+  afterEach(() => {
+    globalThis.fetch = realFetch;
+  });
+
+  it('returns the schema and version headers on a successful response', async () => {
+    const schema = { __schema: { types: [] } };
+    globalThis.fetch = jest
+      .fn()
+      .mockResolvedValue(
+        stubResponse({ body: { data: schema } })
+      ) as unknown as typeof fetch;
+
+    expect(await fetchRemoteGraphqlSchema({ url: 'https://x' })).toEqual({
+      remoteSchema: schema,
+      remoteRuntimeVersion: '1.6.0',
+      remoteProjectVersion: '1.6.2',
+    });
+  });
+
+  it('throws the server error message when the response contains GraphQL errors', async () => {
+    globalThis.fetch = jest.fn().mockResolvedValue(
+      stubResponse({
+        body: {
+          errors: [
+            {
+              message:
+                'Input Object type PageBodySponsorshipTiersFilter must define one or more fields.',
+            },
+          ],
+        },
+      })
+    ) as unknown as typeof fetch;
+
+    await expect(
+      fetchRemoteGraphqlSchema({ url: 'https://x' })
+    ).rejects.toThrow(
+      'The remote GraphQL API returned an error: Input Object type PageBodySponsorshipTiersFilter must define one or more fields.'
+    );
+  });
+
+  it('includes the status code when a non-2xx response contains GraphQL errors', async () => {
+    globalThis.fetch = jest.fn().mockResolvedValue(
+      stubResponse({
+        status: 400,
+        statusText: 'Bad Request',
+        body: { errors: [{ message: 'Something went wrong.' }] },
+      })
+    ) as unknown as typeof fetch;
+
+    await expect(
+      fetchRemoteGraphqlSchema({ url: 'https://x' })
+    ).rejects.toThrow(
+      'The remote GraphQL API returned an error (status code 400, Bad Request): Something went wrong.'
+    );
+  });
+
+  it('throws with the status code on a non-2xx response without GraphQL errors', async () => {
+    globalThis.fetch = jest.fn().mockResolvedValue(
+      stubResponse({
+        status: 502,
+        statusText: 'Bad Gateway',
+        body: { message: 'upstream unavailable' },
+      })
+    ) as unknown as typeof fetch;
+
+    await expect(
+      fetchRemoteGraphqlSchema({ url: 'https://x' })
+    ).rejects.toThrow(
+      'Failed to fetch the remote GraphQL schema. Server responded with status code 502, Bad Gateway.'
+    );
+  });
+
+  it('resolves with no schema on a successful response without data', async () => {
+    globalThis.fetch = jest
+      .fn()
+      .mockResolvedValue(stubResponse({ body: {} })) as unknown as typeof fetch;
+
+    const result = await fetchRemoteGraphqlSchema({ url: 'https://x' });
+    expect(result.remoteSchema).toBeUndefined();
+  });
+});

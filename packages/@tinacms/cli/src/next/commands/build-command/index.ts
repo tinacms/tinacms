@@ -14,11 +14,7 @@ import {
 } from '@tinacms/search';
 import { Command, Option } from 'clipanion';
 import fs from 'fs-extra';
-import {
-  buildASTSchema,
-  buildClientSchema,
-  getIntrospectionQuery,
-} from 'graphql';
+import { buildASTSchema, buildClientSchema } from 'graphql';
 import type { PostHog } from 'posthog-node';
 import Progress from 'progress';
 import type { ViteDevServer } from 'vite';
@@ -41,8 +37,11 @@ import { ConfigManager } from '../../config-manager';
 import { createAndInitializeDatabase, createDBServer } from '../../database';
 import { BaseCommand } from '../baseCommands';
 import { createDevServer } from '../dev-command/server';
+import { fetchRemoteGraphqlSchema } from './fetch-remote-graphql-schema';
 import { buildProductionSpa } from './server';
 import { waitForDB } from './waitForDB';
+
+export { fetchRemoteGraphqlSchema };
 
 export class BuildCommand extends BaseCommand {
   static paths = [['build']];
@@ -705,11 +704,22 @@ export class BuildCommand extends BaseCommand {
     const token = config.token;
 
     // Get the remote schema from the graphql endpoint
-    const { remoteSchema, remoteProjectVersion } =
-      await fetchRemoteGraphqlSchema({
+    let remoteSchema;
+    let remoteProjectVersion;
+    try {
+      ({ remoteSchema, remoteProjectVersion } = await fetchRemoteGraphqlSchema({
         url: apiURL,
         token,
+      }));
+    } catch (e) {
+      bar.tick({
+        prog: '❌',
       });
+      if (e instanceof Error && config?.branch) {
+        e.message += `\n\nAdditional info: Branch: ${config.branch}, Client ID: ${config.clientId} `;
+      }
+      throw e;
+    }
 
     if (!remoteSchema) {
       bar.tick({
@@ -906,38 +916,6 @@ async function request(args: {
     json,
   };
 }
-
-export const fetchRemoteGraphqlSchema = async ({
-  url,
-  token,
-}: {
-  url: string;
-  token?: string;
-}) => {
-  const headers = new Headers();
-  if (token) {
-    headers.append('X-API-KEY', token);
-  }
-  const body = JSON.stringify({
-    query: getIntrospectionQuery(),
-    variables: {},
-  });
-
-  headers.append('Content-Type', 'application/json');
-
-  const res = await fetch(url, {
-    method: 'POST',
-    headers,
-    body,
-  });
-
-  const data = await res.json();
-  return {
-    remoteSchema: data?.data,
-    remoteRuntimeVersion: res.headers.get('tinacms-grapqhl-version'),
-    remoteProjectVersion: res.headers.get('tinacms-graphql-project-version'),
-  };
-};
 
 export const fetchSchemaSha = async ({
   url,
