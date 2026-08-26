@@ -47,9 +47,9 @@
  * Do NOT commit a baseline produced by `--update` on a dev machine. The numbers
  * are platform-specific — `du` block accounting and platform-optional binaries
  * both differ — so a macOS baseline reads ~83 MB light against ubuntu-latest and
- * pins CI permanently red. Re-baseline by running the "Build, Test, Lint, Format
- * for Main" workflow via workflow_dispatch with `update_size_baseline: true`,
- * then commit the `size-baselines` artifact it uploads.
+ * pins CI permanently red. Re-baseline by running the "Size Baseline" workflow
+ * via workflow_dispatch with `update_size_baseline: true`, then commit the
+ * `size-baselines` artifact it uploads.
  *
  * Prerequisite: `pnpm build` must have run — metrics 3 and 4 read built dist output.
  *
