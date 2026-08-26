@@ -29,6 +29,18 @@
             "label": "Body",
             "isBody": true,
             "type": "rich-text"
+          },
+          {
+            "name": "authors",
+            "label": "Authors",
+            "fields": [
+              {
+                "name": "name",
+                "label": "Name",
+                "type": "string"
+              }
+            ],
+            "type": "array"
           }
         ]
       }
@@ -41,6 +53,7 @@
     }
   },
   "primitives": {
+    "array": 1,
     "boolean": 1,
     "rating": 1,
     "rich-text": 1,

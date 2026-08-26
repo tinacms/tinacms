@@ -37,10 +37,18 @@ components below it. React-hook-form supplies its own `FormProvider`.
 ## 3. Render a field
 
 `<Field address="title" />` (`editor/field.tsx`) finds the schema node with the
-`name` property. It reads the `type` of that node, then it gets the `descriptor`
-from the registry. Then it renders `descriptor.Component` in two contexts.
-`FieldAddressContext` contains the address. `FieldSchemaContext` contains the
-resolved node. The component has no props.
+`name` property, then it renders `<FieldNode address node>` with that node.
+`<FieldNode>` gets the `descriptor` from the registry, then it renders
+`descriptor.Component` in two contexts. `FieldAddressContext` contains the
+address. `FieldSchemaContext` contains the resolved node. The component has no
+props.
+
+A compound field, such as `array`, does not read its item nodes from the
+collection schema. It reads them from its own config (`ArrayFieldSchema.fields`),
+and it renders `<FieldNode>` directly, with a nested address such as
+`items.0.title`. Thus an item field renders through the same descriptor
+resolution as a top-level field. Refer to
+[`array-field.md`](./array-field.md#the-component).
 
 ## 4. Read the value and write the value with hooks
 
@@ -67,6 +75,15 @@ optional `validate(value)` function of the descriptor. It joins the two sets of
 messages. The field name is the key of each message. `useFieldErrors` gives the
 messages to the component.
 
+A compound field also gets a call to its optional `validateChildren(value, node,
+registry)` function. That function runs `validateField` again, once for each
+item field, with the registry it receives as its third argument. It returns
+its messages keyed by the item field's own nested address, such as
+`items.0.title`. The resolver merges these messages in beside the field's own.
+Thus an item field gets its errors from `useFieldErrors` the same way a
+top-level field does — see
+[`array-field.md`](./array-field.md#validation).
+
 ## 6. Digest at save
 
 `digestDocument(values, fields, registry)` (`core/form/ingest.ts`) does the
@@ -74,6 +91,12 @@ opposite operation to `ingestDocument`. For each field, it calls the
 `serialize(value, node, context)` function of the descriptor. If the
 descriptor has no `serialize` function, the value does not change. The
 function removes the `undefined` values, but keeps the `null` values.
+
+`context` (`FieldTransformContext`, `core/field/contract.ts`) carries the
+registry alongside `documentPath`. A compound field's `parse`/`serialize`
+reads `context.registry` to call `ingestDocument`/`digestDocument` again, once
+for each item, with its own `fields` config. Thus it reuses the same
+conversion path for its items as the top-level form uses for its fields.
 
 ## Form status
 

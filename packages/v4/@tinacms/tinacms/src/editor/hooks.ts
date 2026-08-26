@@ -1,5 +1,10 @@
 import { use, useCallback, useEffect, useEffectEvent, useMemo } from 'react';
-import { useController, useFormContext, useFormState } from 'react-hook-form';
+import {
+  get,
+  useController,
+  useFormContext,
+  useFormState,
+} from 'react-hook-form';
 import { useStore } from 'zustand';
 import type { ContentSlice } from '../core/content/contract';
 import type { FieldAddress } from '../core/field/address';
@@ -108,6 +113,7 @@ export function useFormSave(): () => Promise<void> {
     const values = getValues();
     const digested = digestDocument(values, collection.fields, registry, {
       documentPath: path,
+      registry,
     });
     await onSave?.(digested);
     useFormStore.getState().markSaved(formId, toFormValues(values));
@@ -141,8 +147,13 @@ export function useFieldValue<T = unknown>(
 
 export function useFieldErrors(address: FieldAddress): string[] {
   const { errors } = useFormState({ name: address });
-  const fieldErrors = errors as Record<string, FieldErrorEntry | undefined>;
-  return fieldErrorMessages(fieldErrors[address]);
+  // `address` is a react-hook-form path (an array item's own field nests
+  // through an index, e.g. `items.0.title`) — `get` reads the real nested
+  // tree the resolver built with `set`, the same way react-hook-form itself
+  // resolves a field name.
+  return fieldErrorMessages(
+    get(errors, address) as FieldErrorEntry | undefined
+  );
 }
 
 export function useFieldActivation(handler: () => void): void {

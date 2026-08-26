@@ -8,7 +8,12 @@ import {
   useRef,
   useState,
 } from 'react';
-import { FormProvider as RhfFormProvider, useForm } from 'react-hook-form';
+import {
+  type FieldValues,
+  FormProvider as RhfFormProvider,
+  set,
+  useForm,
+} from 'react-hook-form';
 import type { ResolvedConfig } from '../config';
 import { toFieldAddress } from '../core/field/address';
 import { createFieldRegistry } from '../core/field/registry';
@@ -36,11 +41,7 @@ import {
   type TinaRuntime,
   TinaRuntimeContext,
 } from './context';
-import {
-  type FieldErrorEntry,
-  fieldErrorMessages,
-  toFieldErrorEntry,
-} from './field-errors';
+import { flattenFieldErrors, toFieldErrorEntry } from './field-errors';
 import { buildFormResolver } from './resolver';
 
 export interface TinaProviderProps {
@@ -159,7 +160,10 @@ export function FormProvider({
   const { registry } = runtime;
 
   const formId = toFormId(path);
-  const transformContext = useMemo(() => ({ documentPath: path }), [path]);
+  const transformContext = useMemo(
+    () => ({ documentPath: path, registry }),
+    [path, registry]
+  );
   const ingested = useMemo(
     () =>
       ingestDocument(document, collection.fields, registry, transformContext),
@@ -176,9 +180,9 @@ export function FormProvider({
     const scope = readFormStore().forms[formId];
     if (!keepsValues(scope, toFormValues(ingested)))
       return { seed: null, errors: {} };
-    const errors: Record<string, FieldErrorEntry> = {};
+    const errors: FieldValues = {};
     for (const [address, messages] of Object.entries(scope.errors)) {
-      if (messages?.length) errors[address] = toFieldErrorEntry(messages);
+      if (messages?.length) set(errors, address, toFieldErrorEntry(messages));
     }
     return { seed: toDocument(scope.values), errors };
   }, [formId]);
@@ -239,14 +243,22 @@ export function FormProvider({
       callback: ({ values, errors, name }) => {
         const store = useFormStore.getState();
         if (name !== undefined) {
-          store.setFieldValue(formId, toFieldAddress(name), values[name]);
+          // The store's live-values mirror is flat, one entry per top-level
+          // field (`toFormValues`/`toDocument`). A nested field name (an
+          // array item's own field) collapses to its top-level address here,
+          // and re-reads that field's whole current value.
+          const topLevel = name.split('.')[0];
+          store.setFieldValue(
+            formId,
+            toFieldAddress(topLevel),
+            values[topLevel]
+          );
         }
+        const flat: Record<string, string[]> = {};
+        flattenFieldErrors(errors ?? {}, '', flat);
         const mirrored: FieldErrors = {};
-        for (const [field, entry] of Object.entries(
-          (errors ?? {}) as Record<string, FieldErrorEntry | undefined>
-        )) {
-          const messages = fieldErrorMessages(entry);
-          if (messages.length > 0) mirrored[toFieldAddress(field)] = messages;
+        for (const [field, messages] of Object.entries(flat)) {
+          mirrored[toFieldAddress(field)] = messages;
         }
         store.setFieldErrors(formId, mirrored);
       },

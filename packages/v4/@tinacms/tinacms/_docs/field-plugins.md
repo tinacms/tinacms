@@ -41,6 +41,10 @@ v4 supplies four more examples:
 - The `datetime` field ([`datetime-field.md`](./datetime-field.md)) holds a
   string on both sides. It defines `parse`, but no `serialize` and no
   `defaultValue`.
+- The `array` field ([`array-field.md`](./array-field.md)) repeats a fixed set
+  of item fields. Its items reuse the ordinary field contract through
+  `<FieldNode>` and `validateField` — see
+  [Compound fields](#compound-fields) below.
 - The `rich-text` field ([`rich-text-field.md`](./rich-text-field.md)) uses the
   `block` layout. With `isBody`, it controls the markdown body of the file.
 
@@ -117,6 +121,9 @@ The properties of the descriptor:
   structural equality when it decides whether a field's value changed
   (`core/form/compare.ts`). The `rich-text` field uses it to treat two AST
   values as equal when they serialize to the same markdown source.
+- `validateChildren(value, node, registry)` — An optional function for a
+  compound field. It returns a flat map of nested address to messages. Refer
+  to [Compound fields](#compound-fields) below.
 
 ### 3. The schema helper function and the validator (`.schema.ts`)
 
@@ -210,6 +217,14 @@ This example makes a color field:
    `type: 'color'`.
 4. Add the plugin to `corePlugins`, and add `color` to `t`. Both are in
    `plugins/fields/index.ts`.
+5. Confirm the new field works as an `array` item field, not only at the top
+   level of a collection. Put `color({...})` in an `array`'s own `fields`, and
+   render it nested (`items.0.swatch`). An item field renders through
+   `<FieldNode>`, not `<Field>` — refer to
+   [Compound fields](#compound-fields). A field that reads something only a
+   top-level field has (the collection, a top-level-only address assumption)
+   breaks there; a field built only from its own node, its own address, and
+   the hooks above does not.
 
 Do no more steps. You do not change the registry.
 
@@ -218,3 +233,33 @@ Do no more steps. You do not change the registry.
 `<Field>` compares `address` to the field `name` in the collection
 (`editor/field.tsx`). The two values must be the same. `useFieldErrors` uses
 that same name as the key of the errors.
+
+## Compound fields
+
+A compound field holds a value built from other fields — `array` is the
+shipped example. Its item fields are not in the collection schema, so they
+need three extra pieces. Each one has a plain, ordinary counterpart; refer to
+[`array-field.md`](./array-field.md) for the full, worked example.
+
+- **Rendering** — `<FieldNode address node>` (`editor/field.tsx`) renders one
+  resolved node at an address, the same way `<Field>` does after it resolves a
+  node by name. A compound field's component calls `<FieldNode>` directly,
+  once for each item field, with a nested address such as `items.0.title`.
+  Export it from your own component the same way `array-field.ui.tsx` does.
+- **Parse and serialize** — `context.registry` (`FieldTransformContext`,
+  `core/field/contract.ts`) carries the registry into `parse` and `serialize`.
+  A compound field's `parse`/`serialize` calls `ingestDocument`/
+  `digestDocument` again, with its own item `fields` and that registry, so its
+  items go through the same conversion path as the top-level form.
+- **Validation** — `validateChildren(value, node, registry)` on the descriptor
+  runs `validateField` again, once for each item field, and returns the
+  messages keyed by the item's nested address. The resolver
+  (`editor/resolver.ts`) merges these in beside the field's own `schema`/
+  `validate` messages, so `useFieldErrors(nestedAddress)` finds them the same
+  way it finds a top-level field's messages.
+
+This makes every ordinary field an item field for free — an `array`'s `fields`
+accepts any registered type, unmodified. The converse is not automatic: a new
+field type is not confirmed to work as an item field until you put one inside
+an `array` and render it nested. Refer to
+[Write a new field plugin, step 5](#write-a-new-field-plugin).

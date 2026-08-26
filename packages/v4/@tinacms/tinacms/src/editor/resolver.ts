@@ -1,8 +1,9 @@
-import type { Resolver } from 'react-hook-form';
+import type { FieldValues, Resolver } from 'react-hook-form';
+import { set } from 'react-hook-form';
 import type { FieldRegistry } from '../core/field/registry';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import { validateField } from '../core/validation';
-import { type FieldErrorEntry, toFieldErrorEntry } from './field-errors';
+import { toFieldErrorEntry } from './field-errors';
 
 export const buildFormResolver =
   (
@@ -10,15 +11,27 @@ export const buildFormResolver =
     registry: FieldRegistry
   ): Resolver<TinaDocument> =>
   (values) => {
-    const errors: Record<string, FieldErrorEntry> = {};
+    // A nested address (an array item's own field) is a react-hook-form path,
+    // not a flat object key — `set` builds the real nested tree react-hook-form
+    // expects from a custom resolver's `errors`, the same tree `get` (in
+    // `useFieldErrors`) reads back.
+    const errors: FieldValues = {};
+    let hasErrors = false;
     for (const node of collection.fields) {
       const descriptor = registry.get(node.type);
-      const fieldErrors = validateField(node, descriptor, values[node.name]);
+      const value = values[node.name];
+      const fieldErrors = validateField(node, descriptor, value);
       if (fieldErrors.length > 0) {
-        errors[node.name] = toFieldErrorEntry(fieldErrors);
+        hasErrors = true;
+        set(errors, node.name, toFieldErrorEntry(fieldErrors));
+      }
+      const childErrors = descriptor?.validateChildren?.(value, node, registry);
+      for (const [address, messages] of Object.entries(childErrors ?? {})) {
+        if (messages.length > 0) {
+          hasErrors = true;
+          set(errors, address, toFieldErrorEntry(messages));
+        }
       }
     }
-    return Object.keys(errors).length > 0
-      ? { values: {}, errors }
-      : { values, errors: {} };
+    return hasErrors ? { values: {}, errors } : { values, errors: {} };
   };
