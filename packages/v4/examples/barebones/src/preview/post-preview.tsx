@@ -46,6 +46,11 @@ export function PostPreview() {
       <div {...tinaField('body')}>
         <TinaMarkdown content={post.body} />
       </div>
+      {post.authors?.map((author, index) => (
+        <p key={index} {...tinaField(`authors.${index}.name`)}>
+          {author.name}
+        </p>
+      ))}
     </article>
   );
 }
