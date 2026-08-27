@@ -856,12 +856,17 @@ mutation addPendingDocumentMutation(
     }
   }
 
+  /**
+   * The server normalises `branchName`, so follow-up calls must use the
+   * `branchName` from the response rather than the one they sent.
+   */
   async startMediaEditorialWorkflow(options: {
     branchName: string;
     baseBranch: string;
     prTitle?: string;
-    operation: 'upload' | 'delete';
+    operation: 'upload' | 'delete' | 'rename';
     repoPath: string;
+    targetRepoPath?: string;
   }): Promise<{ branchName: string; requestId: string; status?: string }> {
     const url = `${this.contentApiBase}/editorial-workflow/${this.clientId}/media`;
     return await this.postEditorialWorkflow(
