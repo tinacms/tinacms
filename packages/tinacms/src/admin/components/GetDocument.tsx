@@ -48,15 +48,14 @@ export const useGetDocument = (
       } catch (error) {
         // Only handle error if the request hasn't been cancelled
         if (!isCancelled) {
-          if (isSessionExpiredError(error)) {
-            // request() already told the auth wall; no alert over the login modal
-            setDocument(undefined);
-          } else {
+          setDocument(undefined);
+          // on session expiry request() already told the auth wall; no alert
+          // over the login modal
+          if (!isSessionExpiredError(error)) {
             cms.alerts.error(
               `[${error.name}] GetDocument failed: ${error.message}`
             );
             console.error(error);
-            setDocument(undefined);
             setError(error);
           }
         }

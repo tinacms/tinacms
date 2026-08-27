@@ -104,15 +104,14 @@ export const useGetCollection = (
           setCollection(undefined);
         }
       } catch (error) {
-        if (isSessionExpiredError(error)) {
-          // request() already told the auth wall; no alert over the login modal
-          setCollection(undefined);
-        } else {
+        setCollection(undefined);
+        // on session expiry request() already told the auth wall; no alert
+        // over the login modal
+        if (!isSessionExpiredError(error)) {
           cms.alerts.error(
             `[${error.name}] GetCollection failed: ${error.message}`
           );
           console.error(error);
-          setCollection(undefined);
           setError(error);
         }
       }
@@ -206,6 +205,20 @@ export const useSearchCollection = (
             reason?: any;
           }[];
 
+          // a per-document 401 is captured by allSettled, not the catch below;
+          // bail out rather than render a partial result set as a search answer
+          if (
+            docs.some(
+              (p) => p.status === 'rejected' && isSessionExpiredError(p.reason)
+            )
+          ) {
+            setCollection(undefined);
+            if (!cancelled) {
+              setLoading(false);
+            }
+            return;
+          }
+
           const edges = docs
             .filter((p) => p.status === 'fulfilled' && !!p.value?.document)
             .map((result) => ({ node: result.value.document })) as any[];
@@ -234,15 +247,14 @@ export const useSearchCollection = (
           setCollection(undefined);
         }
       } catch (error) {
-        if (isSessionExpiredError(error)) {
-          // request() already told the auth wall; no alert over the login modal
-          setCollection(undefined);
-        } else {
+        setCollection(undefined);
+        // on session expiry request() already told the auth wall; no alert
+        // over the login modal
+        if (!isSessionExpiredError(error)) {
           cms.alerts.error(
             `[${error.name}] GetCollection failed: ${error.message}`
           );
           console.error(error);
-          setCollection(undefined);
           setError(error);
         }
       }

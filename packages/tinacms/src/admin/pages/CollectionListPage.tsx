@@ -1410,9 +1410,14 @@ const DeleteModal = ({
 }: DeleteModalProps) => {
   const [hasRefs, setHasRefs] = React.useState<true | false | undefined>();
   useEffect(() => {
-    checkRefsFunc().then((result) => {
-      setHasRefs(result);
-    });
+    checkRefsFunc()
+      .then((result) => {
+        setHasRefs(result);
+      })
+      .catch(() => {
+        // error is already handled by checkRefsFunc; on session expiry the
+        // auth wall unmounts this modal
+      });
   }, [filename, checkRefsFunc]);
   return (
     <Modal>
@@ -1431,7 +1436,12 @@ const DeleteModal = ({
             style={{ flexGrow: 3 }}
             variant='danger'
             onClick={async () => {
-              await deleteFunc();
+              try {
+                await deleteFunc();
+              } catch {
+                // error is already handled by deleteFunc; on session expiry
+                // the auth wall unmounts this modal
+              }
               close();
             }}
           >
