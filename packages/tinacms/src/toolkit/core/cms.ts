@@ -5,7 +5,7 @@
  * @packageDocumentation
  */
 
-import { EventBus } from './event';
+import { type CMSEvent, EventBus } from './event';
 import { Flags } from './flags';
 import { MediaManager, MediaStore } from './media';
 import { DummyMediaStore } from './media-store.default';
@@ -168,27 +168,31 @@ export class CMS {
       this.unsubscribeHooks[name]();
     }
     if (api.events instanceof EventBus) {
-      // Guarded forwarders: passing `this.events.dispatch` unbound made the
-      // api-to-cms direction a silent no-op, and a bound fix would recurse
-      // forever through the two '*' bridges.
-      let forwardingToApi = false;
-      let forwardingToCms = false;
+      // Guards are scoped to the event object being forwarded: passing
+      // `this.events.dispatch` unbound made the api-to-cms direction a silent
+      // no-op, a bound fix would recurse forever through the two '*' bridges,
+      // and a direction-wide boolean would drop a NEW event dispatched
+      // synchronously by a listener mid-forward.
+      let forwardingToCms: CMSEvent | null = null;
+      let forwardingToApi: CMSEvent | null = null;
       const unsubscribeHost = (api.events as EventBus).subscribe('*', (e) => {
-        if (forwardingToApi) return;
-        forwardingToCms = true;
+        if (e === forwardingToApi) return;
+        const previous = forwardingToCms;
+        forwardingToCms = e;
         try {
           this.events.dispatch(e);
         } finally {
-          forwardingToCms = false;
+          forwardingToCms = previous;
         }
       });
       const unsubscribeGuest = this.events.subscribe('*', (e) => {
-        if (forwardingToCms) return;
-        forwardingToApi = true;
+        if (e === forwardingToCms) return;
+        const previous = forwardingToApi;
+        forwardingToApi = e;
         try {
           api.events.dispatch(e);
         } finally {
-          forwardingToApi = false;
+          forwardingToApi = previous;
         }
       });
       this.unsubscribeHooks[name] = () => {

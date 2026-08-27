@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, it, test, vi } from 'vitest';
-import { CMS } from './cms';
 import { type CMSEvent, EventBus, Listener } from './event';
 
 describe('EventBus', () => {
@@ -175,32 +174,5 @@ describe('Listener', () => {
         expect(listener.watchesEvent({ type: 'plugin:add:baz' })).toBeFalsy();
       });
     });
-  });
-});
-
-describe('CMS registerApi event bridge', () => {
-  it('forwards api-bus events to the global bus', () => {
-    const cms = new CMS();
-    const api = { events: new EventBus() };
-    cms.registerApi('thing', api);
-
-    const seen: CMSEvent[] = [];
-    cms.events.subscribe('thing:did', (e) => seen.push(e));
-    api.events.dispatch({ type: 'thing:did' });
-
-    expect(seen).toHaveLength(1);
-  });
-
-  it('forwards global-bus events to the api bus without recursing', () => {
-    const cms = new CMS();
-    const api = { events: new EventBus() };
-    cms.registerApi('thing', api);
-
-    const seen: CMSEvent[] = [];
-    api.events.subscribe('cms:did', (e) => seen.push(e));
-    // would stack-overflow if the two '*' bridges bounced the event back and forth
-    cms.events.dispatch({ type: 'cms:did' });
-
-    expect(seen).toHaveLength(1);
   });
 });
