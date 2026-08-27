@@ -4,9 +4,12 @@
 
 import type { Collection, TinaField, TinaSchema } from '@tinacms/schema-tools';
 import type { TinaCMS } from '@tinacms/toolkit';
+import {
+  dispatchSessionExpired,
+  isSessionExpiredError,
+} from '@tinacms/toolkit';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { isSessionExpiredError } from '../../internalClient';
 import { FilterArgs, TinaAdminApi } from '../api';
 import LoadingPage from '../components/LoadingPage';
 import { handleNavigate } from '../pages/CollectionListPage';
@@ -14,7 +17,6 @@ import type { CollectionResponse, DocumentForm } from '../types';
 import { FullscreenError } from './FullscreenError';
 import { shouldAutoOpenCollectionDocument } from './GetCollection.utils';
 import { UnableToLoadModal } from './UnableToLoadModal';
-import { notifySessionExpired } from './session-expired';
 
 const isValidSortKey = (sortKey: string, collection: Collection<true>) => {
   if (collection.fields) {
@@ -98,7 +100,7 @@ export const useGetCollection = (
         } else if (!cancelled) {
           // The session went away mid-session: drop the stale collection and
           // send the user back to the login modal via the auth wall.
-          notifySessionExpired(cms);
+          dispatchSessionExpired(cms.events);
           setCollection(undefined);
         }
       } catch (error) {
@@ -228,7 +230,7 @@ export const useSearchCollection = (
           setCollection(collectionData);
         } else if (!cancelled) {
           // Same as above: a stale result set is worse than a login prompt.
-          notifySessionExpired(cms);
+          dispatchSessionExpired(cms.events);
           setCollection(undefined);
         }
       } catch (error) {

@@ -6,6 +6,7 @@ import {
 } from '@tinacms/schema-tools';
 import { Form, FormBuilder, FormStatus } from '@tinacms/toolkit';
 import type { TinaCMS } from '@tinacms/toolkit';
+import { isSessionExpiredError } from '@tinacms/toolkit';
 import { documentListPath } from '@toolkit/react-sidebar/components/form-breadcrumbs.utils';
 import {
   FileHistoryProvider,
@@ -14,7 +15,6 @@ import {
 } from '@toolkit/react-sidebar/components/sidebar-body';
 import React, { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { isSessionExpiredError } from '../../internalClient';
 import { TinaAdminApi } from '../api';
 import { ErrorDialog } from '../components/ErrorDialog';
 import GetCMS from '../components/GetCMS';

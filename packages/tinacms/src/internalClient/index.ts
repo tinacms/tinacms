@@ -1,7 +1,15 @@
 import { z } from 'zod';
 
 //@ts-ignore can't locate BranchChangeEvent
-import { BranchChangeEvent, BranchData, EventBus } from '@tinacms/toolkit';
+import {
+  BranchChangeEvent,
+  BranchData,
+  EventBus,
+  SessionExpiredError,
+  dispatchSessionExpired,
+} from '@tinacms/toolkit';
+
+export { SessionExpiredError, isSessionExpiredError } from '@tinacms/toolkit';
 import {
   DocumentNode,
   GraphQLSchema,
@@ -105,18 +113,6 @@ const IndexStatusResponse = z.object({
     .optional(),
   timestamp: z.number().optional(),
 });
-
-export class SessionExpiredError extends Error {
-  constructor() {
-    super('Your session has ended. Please sign in again.');
-    this.name = 'SessionExpiredError';
-  }
-}
-
-// name-based so it survives duplicate module copies in a bundle
-export const isSessionExpiredError = (error: unknown): boolean =>
-  error instanceof SessionExpiredError ||
-  (error as Error)?.name === 'SessionExpiredError';
 
 export class Client {
   authProvider: AuthProvider;
@@ -326,8 +322,7 @@ mutation addPendingDocumentMutation(
     });
 
     if (res.status === 401) {
-      // The auth wall subscribes and returns the user to the login modal.
-      this.events.dispatch({ type: 'cms:session-expired' });
+      dispatchSessionExpired(this.events);
       throw new SessionExpiredError();
     }
 

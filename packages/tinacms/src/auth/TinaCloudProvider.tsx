@@ -16,6 +16,7 @@ import React, { useEffect, useState } from 'react';
 import { ModalBuilder } from './AuthModal';
 import loginLlama from './tina-login.png';
 
+import { isErrorNamed } from '@tinacms/toolkit';
 import { TinaAdminApi } from '../admin/api';
 import {
   Client,
@@ -188,7 +189,7 @@ const AuthWallInner = ({
     } catch (e: any) {
       if (
         e instanceof AuthenticationCancelledError ||
-        e?.name === 'AuthenticationCancelledError'
+        isErrorNamed(e, 'AuthenticationCancelledError')
       ) {
         return;
       }

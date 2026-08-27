@@ -1,0 +1,23 @@
+import type { EventBus } from './event';
+
+// name-based so the check survives duplicate module copies in a bundle
+export const isErrorNamed = (error: unknown, name: string): boolean =>
+  error instanceof Error && error.name === name;
+
+export class SessionExpiredError extends Error {
+  constructor() {
+    super('Your session has ended. Please sign in again.');
+    this.name = 'SessionExpiredError';
+  }
+}
+
+export const isSessionExpiredError = (
+  error: unknown
+): error is SessionExpiredError =>
+  error instanceof SessionExpiredError ||
+  isErrorNamed(error, 'SessionExpiredError');
+
+// The auth wall subscribes and returns the user to the login modal.
+export const dispatchSessionExpired = (events: EventBus) => {
+  events.dispatch({ type: 'cms:session-expired' });
+};

@@ -22,6 +22,7 @@ import {
   Select,
   type TinaCMS,
 } from '@tinacms/toolkit';
+import { isSessionExpiredError } from '@tinacms/toolkit';
 import { Callout } from '@toolkit/react-sidebar/components/callout';
 import { cn } from '@utils/cn';
 import {
@@ -46,7 +47,6 @@ import {
   useNavigate,
   useParams,
 } from 'react-router-dom';
-import { isSessionExpiredError } from '../../internalClient';
 import {
   CollectionListPageItemClickedEvent,
   CollectionListPageSearchEvent,

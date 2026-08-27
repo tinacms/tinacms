@@ -19,11 +19,11 @@ import {
   wrapFieldsWithMeta,
 } from '@tinacms/toolkit';
 import type { TinaCMS } from '@tinacms/toolkit';
+import { isSessionExpiredError } from '@tinacms/toolkit';
 import { FormBreadcrumbs } from '@toolkit/react-sidebar/components/sidebar-body';
 import { Lock, Unlock } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { isSessionExpiredError } from '../../internalClient';
 import { TinaAdminApi } from '../api';
 import { ErrorDialog } from '../components/ErrorDialog';
 import GetCMS from '../components/GetCMS';

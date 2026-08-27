@@ -19,6 +19,10 @@ export {
   EventBus,
   DummyMediaStore,
   TinaMediaStore,
+  SessionExpiredError,
+  isSessionExpiredError,
+  isErrorNamed,
+  dispatchSessionExpired,
 } from '@toolkit/core';
 export * from '@toolkit/alerts';
 export * from '@toolkit/styles';

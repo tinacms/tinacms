@@ -3,14 +3,16 @@
 */
 
 import type { TinaCMS } from '@tinacms/toolkit';
+import {
+  dispatchSessionExpired,
+  isSessionExpiredError,
+} from '@tinacms/toolkit';
 import React, { useState, useEffect } from 'react';
-import { isSessionExpiredError } from '../../internalClient';
 import { TinaAdminApi } from '../api';
 import type { DocumentForm } from '../types';
 import { FullscreenError } from './FullscreenError';
 import LoadingPage from './LoadingPage';
 import { UnableToLoadModal } from './UnableToLoadModal';
-import { notifySessionExpired } from './session-expired';
 
 export const useGetDocument = (
   cms: TinaCMS,
@@ -40,7 +42,7 @@ export const useGetDocument = (
         } else if (!isCancelled) {
           // Session gone: drop the previous document rather than leave the form
           // showing content the user can no longer save.
-          notifySessionExpired(cms);
+          dispatchSessionExpired(cms.events);
           setDocument(undefined);
         }
       } catch (error) {

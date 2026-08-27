@@ -10,6 +10,7 @@ import {
   TinaCMS,
   useCMS,
 } from '@tinacms/toolkit';
+import { isSessionExpiredError } from '@tinacms/toolkit';
 import React, { useState, useEffect } from 'react';
 import {
   Route,
@@ -18,7 +19,6 @@ import {
   useNavigate,
   useParams,
 } from 'react-router-dom';
-import { isSessionExpiredError } from '../internalClient';
 
 import Sidebar from './components/AdminNav';
 import GetCMS from './components/GetCMS';
