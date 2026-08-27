@@ -568,6 +568,34 @@ describe('Tina Client', () => {
       expect(dispatched).toHaveLength(1);
     });
 
+    it('drains the 401 response body and logs a diagnostic for custom content APIs', async () => {
+      client = buildClient({
+        branch: 'feature',
+        clientId: 'app-42',
+        customContentApiUrl: 'http://tina.io/override',
+      });
+      client.authProvider = {
+        getToken: vi.fn().mockResolvedValue(null),
+      } as any;
+      const consoleError = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+      const response = makeResponse({
+        status: 401,
+        body: {},
+        statusText: 'Unauthorized',
+      });
+      stubFetchOnce(response);
+
+      await expect(
+        client.request('{ x }', { variables: {} })
+      ).rejects.toMatchObject({ name: 'SessionExpiredError' });
+      expect(response.json).toHaveBeenCalled();
+      expect(consoleError).toHaveBeenCalledWith(
+        expect.stringContaining('check the backend')
+      );
+    });
+
     it('does not dispatch cms:session-expired on other failures', async () => {
       const dispatched: { type: string }[] = [];
       client.events.subscribe('cms:session-expired', (e) => {

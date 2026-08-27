@@ -322,6 +322,15 @@ mutation addPendingDocumentMutation(
     });
 
     if (res.status === 401) {
+      // drain the body so pooled connections are released (undici/Node)
+      res.json().catch(() => {});
+      if (this.isCustomContentApi) {
+        // a misconfigured self-hosted backend 401s indistinguishably from a
+        // real expiry; leave developers the diagnostic the login loop hides
+        console.error(
+          `TinaCMS: the content API at ${this.contentApiUrl} returned 401. If signing in again does not resolve this, check the backend's auth configuration (clientId: ${this.options.clientId}, branch: ${this.branch}).`
+        );
+      }
       dispatchSessionExpired(this.events);
       throw new SessionExpiredError();
     }
