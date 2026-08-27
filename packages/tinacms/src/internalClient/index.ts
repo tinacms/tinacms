@@ -124,8 +124,7 @@ export class Client {
   events = new EventBus(); // automatically hooked into global event bus when attached via cms.
   protectedBranches: string[] = [];
   usingEditorialWorkflow: boolean = false;
-  // Whatever the auth provider returned from getUser(). Custom providers may
-  // return a bare boolean rather than a user object.
+  // Whatever the auth provider returned from getUser().
   user?: AuthenticatedUser | boolean;
 
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {

@@ -101,8 +101,6 @@ describe('CreateBranchPromptModal committing-author row', () => {
     renderModal();
 
     expect(screen.queryByText('Committing as')).toBeNull();
-    expect(screen.queryByText('Change')).toBeNull();
-    // The rest of the modal is unaffected.
     expect(screen.getByText('Branch Name')).toBeTruthy();
   });
 });

@@ -178,8 +178,6 @@ export const CreateBranchModal = ({
   );
 };
 
-// An email's domain says nothing about the person, so only the local part is
-// used: ada@example.com is "A", not "AE".
 const getInitials = (name: string) => {
   const atIndex = name.indexOf('@');
   const localPart = atIndex === -1 ? name : name.slice(0, atIndex);
@@ -194,7 +192,6 @@ const getInitials = (name: string) => {
 const CommittingAs = () => {
   const cms = useCMS();
   const user = cms.api?.tina?.user;
-  // Custom auth providers may return a bare boolean instead of a user.
   const author = typeof user === 'object' && user !== null ? user : undefined;
   const mode = author?.gitAuthoring?.mode;
 
