@@ -3,7 +3,8 @@ import {
   LoginStrategy,
   TokenObject,
 } from '@tinacms/schema-tools';
-import { authenticate, AUTH_TOKEN_KEY } from '../auth/authenticate';
+import { isErrorNamed } from '@tinacms/toolkit';
+import { AUTH_TOKEN_KEY, authenticate } from '../auth/authenticate';
 import DefaultSessionProvider from '../auth/defaultSessionProvider';
 
 type Input = Parameters<AuthProvider['fetchWithToken']>[0];
@@ -183,9 +184,16 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
         }
         return null;
       }
-      const res = await this.fetchWithToken(url, {
-        method: 'GET',
-      });
+      let res: Awaited<FetchReturn>;
+      try {
+        res = await this.fetchWithToken(url, { method: 'GET' });
+      } catch (networkError) {
+        // one transient identity-API failure must not read as "logged out"
+        // and eject the user; retry once, then let callers treat it as an
+        // error rather than an expired session
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        res = await this.fetchWithToken(url, { method: 'GET' });
+      }
       const val = await res.json();
       if (!res.status.toString().startsWith('2')) {
         console.error(
@@ -196,6 +204,10 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
       }
       return val;
     } catch (e) {
+      if (e instanceof TypeError || isErrorNamed(e, 'AbortError')) {
+        // fetch network failures surface as TypeError: not an auth answer
+        throw e;
+      }
       console.error(e);
       return null;
     }

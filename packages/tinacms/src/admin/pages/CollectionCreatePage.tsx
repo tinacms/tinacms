@@ -19,7 +19,10 @@ import {
   wrapFieldsWithMeta,
 } from '@tinacms/toolkit';
 import type { TinaCMS } from '@tinacms/toolkit';
-import { isSessionExpiredError } from '@tinacms/toolkit';
+import {
+  dispatchSessionExpired,
+  isSessionExpiredError,
+} from '@tinacms/toolkit';
 import { FormBreadcrumbs } from '@toolkit/react-sidebar/components/sidebar-body';
 import { Lock, Unlock } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
@@ -60,9 +63,9 @@ const createDocument = async (
   if (await api.isAuthenticated()) {
     await api.createDocument(collection, relativePath, params);
   } else {
-    const authMessage = `CreateDocument failed: User is no longer authenticated; please login and try again.`;
-    cms.alerts.error(authMessage);
-    console.error(authMessage);
+    // the session is gone: send the user to the login modal, and tell the
+    // caller so it does not report success for a save that never ran
+    dispatchSessionExpired(cms.events);
     return false;
   }
 };
@@ -302,7 +305,7 @@ export const RenderForm = ({
       onSubmit: async (values) => {
         try {
           const folderName = folder.fullyQualifiedName ? folder.name : '';
-          await createDocument(
+          const result = await createDocument(
             cms,
             collection,
             template,
@@ -310,6 +313,7 @@ export const RenderForm = ({
             folderName,
             values
           );
+          if (result === false) return;
           cms.alerts.success('Document created!');
           setTimeout(() => {
             navigate(
