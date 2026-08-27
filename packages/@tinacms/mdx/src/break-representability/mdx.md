@@ -49,10 +49,10 @@ ol                          -                   skipped: holds list items       
 ul                          -                   skipped: holds list items                                                                                                  -       -       -
 table                       -                   skipped: holds rows                                                                                                        -       -       -
 tr                          -                   skipped: holds cells                                                                                                       -       -       -
-a (inline)                  mid                 "[one\\\ntwo](/x)\n"                                                                                                       1       0       INVALID
-a (inline)                  final               "[one two\\\n](/x)\n"                                                                                                      1       0       INVALID
-a (inline)                  final-editor        "[one two\\\n](/x)\n"                                                                                                      1       0       INVALID
-a (inline)                  final-editor-twice  "[one two\\\n\\\n](/x)\n"                                                                                                  1       0       INVALID
+a (inline)                  mid                 "[one\\\ntwo](/x)\n"                                                                                                       1       1       parses
+a (inline)                  final               "[one two\\\n](/x)\n"                                                                                                      1       1       parses
+a (inline)                  final-editor        "[one two\\\n](/x)\n"                                                                                                      1       1       parses
+a (inline)                  final-editor-twice  "[one two\\\n\\\n](/x)\n"                                                                                                  1       2       parses
 text (inline)               -                   skipped: the injection site of every block row above                                                                       -       -       -
 img (inline)                -                   skipped: void                                                                                                              -       -       -
 html_inline (inline)        -                   skipped: carries a raw value, no inline children                                                                           -       -       -
@@ -61,13 +61,13 @@ a in h3                     mid                 "### [one two](/x)\n"           
 a in h3                     final               "### [one two ](/x)\n"                                                                                                     1       0       parses
 a in h3                     final-editor        "### [one two ](/x)\n"                                                                                                     1       0       parses
 a in h3                     final-editor-twice  "### [one two  ](/x)\n"                                                                                                    1       0       parses
-a in li                     mid                 "* [one\\\n  two](/x)\n"                                                                                                   1       0       INVALID
-a in li                     final               "* [one two\\\n  ](/x)\n"                                                                                                  1       0       INVALID
-a in li                     final-editor        "* [one two\\\n  ](/x)\n"                                                                                                  1       0       INVALID
-a in li                     final-editor-twice  "* [one two\\\n  \\\n  ](/x)\n"                                                                                            1       0       INVALID
-a in blockquote             mid                 "> [one\\\n> two](/x)\n"                                                                                                   1       0       INVALID
-a in blockquote             final               "> [one two\\\n> ](/x)\n"                                                                                                  1       0       INVALID
-a in blockquote             final-editor        "> [one two\\\n> ](/x)\n"                                                                                                  1       0       INVALID
-a in blockquote             final-editor-twice  "> [one two\\\n> \\\n> ](/x)\n"                                                                                            1       0       INVALID
+a in li                     mid                 "* [one\\\n  two](/x)\n"                                                                                                   1       1       parses
+a in li                     final               "* [one two\\\n  ](/x)\n"                                                                                                  1       1       parses
+a in li                     final-editor        "* [one two\\\n  ](/x)\n"                                                                                                  1       1       parses
+a in li                     final-editor-twice  "* [one two\\\n  \\\n  ](/x)\n"                                                                                            1       2       parses
+a in blockquote             mid                 "> [one\\\n> two](/x)\n"                                                                                                   1       1       parses
+a in blockquote             final               "> [one two\\\n> ](/x)\n"                                                                                                  1       1       parses
+a in blockquote             final-editor        "> [one two\\\n> ](/x)\n"                                                                                                  1       1       parses
+a in blockquote             final-editor-twice  "> [one two\\\n> \\\n> ](/x)\n"                                                                                            1       2       parses
 html after                  before-neighbour    "one two \\ <em>x</em>\n"                                                                                                  1       0       parses
 inline template after       -                   skipped: needs a field carrying templates, which this matrix has none of — covered end to end in break-neighbours.test.ts  -       -       -
