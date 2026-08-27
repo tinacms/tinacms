@@ -173,6 +173,8 @@ const AuthWallInner = ({
   const otherModalActions = getModalActions
     ? getModalActions({
         closeModal: () => {
+          // closing without signing in must not leave alerts suppressed
+          cms.alerts.resume();
           setActiveModal(null);
         },
       })
