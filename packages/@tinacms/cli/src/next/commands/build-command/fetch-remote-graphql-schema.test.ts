@@ -4,16 +4,23 @@ const stubResponse = ({
   status = 200,
   statusText = 'OK',
   body,
+  unparseable = false,
 }: {
   status?: number;
   statusText?: string;
-  body: unknown;
+  body?: unknown;
+  unparseable?: boolean;
 }) =>
   ({
     ok: status >= 200 && status < 300,
     status,
     statusText,
-    json: async () => body,
+    json: async () => {
+      if (unparseable) {
+        throw new SyntaxError('Unexpected token < in JSON at position 0');
+      }
+      return body;
+    },
     headers: new Headers({
       'tinacms-grapqhl-version': '1.6.0',
       'tinacms-graphql-project-version': '1.6.2',
@@ -102,5 +109,77 @@ describe('fetchRemoteGraphqlSchema', () => {
 
     const result = await fetchRemoteGraphqlSchema({ url: 'https://x' });
     expect(result.remoteSchema).toBeUndefined();
+  });
+
+  it('hints at a stale lock file when the root input types are empty', async () => {
+    globalThis.fetch = jest.fn().mockResolvedValue(
+      stubResponse({
+        body: {
+          errors: [
+            {
+              message:
+                'Input Object type DocumentFilter must define one or more fields.',
+            },
+            {
+              message:
+                'Input Object type DocumentMutation must define one or more fields.',
+            },
+          ],
+        },
+      })
+    ) as unknown as typeof fetch;
+
+    await expect(
+      fetchRemoteGraphqlSchema({ url: 'https://x' })
+    ).rejects.toThrow(/tina\/tina-lock\.json is out of date/);
+  });
+
+  it('does not hint at a stale lock file for a per-template validation error', async () => {
+    globalThis.fetch = jest.fn().mockResolvedValue(
+      stubResponse({
+        body: {
+          errors: [
+            {
+              message:
+                'Input Object type PageBodySponsorshipTiersFilter must define one or more fields.',
+            },
+          ],
+        },
+      })
+    ) as unknown as typeof fetch;
+
+    await expect(
+      fetchRemoteGraphqlSchema({ url: 'https://x' })
+    ).rejects.not.toThrow(/tina-lock\.json/);
+  });
+
+  it('throws with the status code when a non-2xx response body is not JSON', async () => {
+    globalThis.fetch = jest.fn().mockResolvedValue(
+      stubResponse({
+        status: 502,
+        statusText: 'Bad Gateway',
+        unparseable: true,
+      })
+    ) as unknown as typeof fetch;
+
+    await expect(
+      fetchRemoteGraphqlSchema({ url: 'https://x' })
+    ).rejects.toThrow(
+      'Failed to fetch the remote GraphQL schema. Server responded with status code 502, Bad Gateway.'
+    );
+  });
+
+  it('throws when a successful response body is not JSON', async () => {
+    globalThis.fetch = jest
+      .fn()
+      .mockResolvedValue(
+        stubResponse({ unparseable: true })
+      ) as unknown as typeof fetch;
+
+    await expect(
+      fetchRemoteGraphqlSchema({ url: 'https://x' })
+    ).rejects.toThrow(
+      'The remote GraphQL API returned a response that could not be parsed as JSON (status code 200, OK).'
+    );
   });
 });
