@@ -630,6 +630,11 @@ export interface AuthProvider {
    **/
   authenticate: (props?: Record<string, any>) => Promise<any | null>;
   fetchWithToken: (input: RequestInfo, init?: RequestInit) => Promise<Response>;
+  /**
+   * Invoked when a request that carried a token comes back 401, so the CMS
+   * can send the user back to login. Wired automatically by the Tina client.
+   */
+  sessionExpiredListener?: () => void;
   isAuthorized: (context?: any) => Promise<boolean>;
   isAuthenticated: () => Promise<boolean>;
   getLoginStrategy: () => LoginStrategy;
