@@ -38,6 +38,15 @@ export class Alerts {
     private map: EventsToAlerts = {}
   ) {
     this.events.subscribe('*', this.mapEventToAlert);
+    // Self-managed gate, paired with the session lifecycle the way
+    // CMS.ENABLED/DISABLED pairs enablement with events: no caller can set
+    // the latch without the event that also clears it.
+    this.events.subscribe('cms:session-expired', () => {
+      this.suppressed = true;
+    });
+    this.events.subscribe('cms:login', () => {
+      this.suppressed = false;
+    });
   }
   setMap(eventsToAlerts: EventsToAlerts) {
     this.map = {
@@ -52,14 +61,6 @@ export class Alerts {
    * login modal. Alerts already showing are left alone.
    */
   private suppressed = false;
-
-  suppress() {
-    this.suppressed = true;
-  }
-
-  resume() {
-    this.suppressed = false;
-  }
 
   add(
     level: AlertLevel,

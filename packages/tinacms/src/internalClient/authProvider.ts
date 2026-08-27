@@ -3,7 +3,7 @@ import {
   LoginStrategy,
   TokenObject,
 } from '@tinacms/schema-tools';
-import { isErrorNamed } from '@tinacms/toolkit';
+import { isErrorNamed } from '@toolkit/core/errors';
 import { AUTH_TOKEN_KEY, authenticate } from '../auth/authenticate';
 import DefaultSessionProvider from '../auth/defaultSessionProvider';
 
@@ -13,6 +13,13 @@ type FetchReturn = ReturnType<AuthProvider['fetchWithToken']>;
 
 export abstract class AbstractAuthProvider implements AuthProvider {
   /**
+   * Turns a tokened 401 into the auth wall re-arming. The Client assigns this
+   * automatically; AbstractAuthProvider.fetchWithToken invokes it. A provider
+   * that implements its own fetchWithToken must invoke it itself.
+   */
+  sessionExpiredListener?: () => void;
+
+  /**
    * Wraps the normal fetch function with same API but adds the authorization header token.
    *
    * @example
@@ -21,13 +28,6 @@ export abstract class AbstractAuthProvider implements AuthProvider {
    * @param input fetch function input
    * @param init fetch function init
    */
-  /**
-   * Called when a request that carried a token comes back 401. The Client
-   * wires this to the cms:session-expired dispatch so the auth wall re-arms
-   * on every transport, not only GraphQL.
-   */
-  sessionExpiredListener?: () => void;
-
   async fetchWithToken(input: Input, init: Init): FetchReturn {
     const headers = init?.headers || {};
     const accessToken = await this.getAccessToken();
@@ -191,6 +191,7 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
         // one transient identity-API failure must not read as "logged out"
         // and eject the user; retry once, then let callers treat it as an
         // error rather than an expired session
+        console.warn('TinaCMS: session check failed, retrying.', networkError);
         await new Promise((resolve) => setTimeout(resolve, 300));
         res = await this.fetchWithToken(url, { method: 'GET' });
       }

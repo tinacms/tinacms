@@ -6,10 +6,9 @@ import {
   BranchData,
   EventBus,
   SessionExpiredError,
-  dispatchSessionExpired,
 } from '@tinacms/toolkit';
+import { dispatchSessionExpired } from '@toolkit/core/session-expired';
 
-export { SessionExpiredError, isSessionExpiredError } from '@tinacms/toolkit';
 import {
   DocumentNode,
   GraphQLSchema,
@@ -167,17 +166,26 @@ export class Client {
 
     // TODO: auth provider should be dynamically passed in
     // TODO: update auth provider whenever the clientID or url change
-    this.authProvider =
+    this.authProvider = this.adoptAuthProvider(
       this.schema?.config?.config?.authProvider ||
-      new TinaCloudAuthProvider({
-        clientId: options.clientId,
-        identityApiUrl: this.identityApiUrl,
-        getTokenFn: options.getTokenFn,
-        tokenStorage: tokenStorage,
-        frontendUrl: this.frontendUrl,
-      });
-    this.authProvider.sessionExpiredListener = () =>
-      dispatchSessionExpired(this.events);
+        new TinaCloudAuthProvider({
+          clientId: options.clientId,
+          identityApiUrl: this.identityApiUrl,
+          getTokenFn: options.getTokenFn,
+          tokenStorage: tokenStorage,
+          frontendUrl: this.frontendUrl,
+        })
+    );
+  }
+
+  /**
+   * Every provider swap must come through here: the listener is what turns a
+   * REST 401 into the auth wall re-arming, and a bare field assignment would
+   * silently drop it.
+   */
+  protected adoptAuthProvider(provider: AuthProvider): AuthProvider {
+    provider.sessionExpiredListener = () => dispatchSessionExpired(this.events);
+    return provider;
   }
 
   public get isLocalMode() {
@@ -930,10 +938,9 @@ export class LocalClient extends Client {
     };
     super(clientProps);
     // use whatever auth provider is passed in, or default to local auth provider
-    this.authProvider =
-      this.schema?.config?.config?.authProvider || new LocalAuthProvider();
-    this.authProvider.sessionExpiredListener = () =>
-      dispatchSessionExpired(this.events);
+    this.authProvider = this.adoptAuthProvider(
+      this.schema?.config?.config?.authProvider || new LocalAuthProvider()
+    );
   }
   public get isLocalMode() {
     return true;

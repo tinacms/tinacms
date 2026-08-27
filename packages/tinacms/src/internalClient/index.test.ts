@@ -687,6 +687,15 @@ describe('Tina Client', () => {
   });
 
   describe('fetchWithToken session expiry', () => {
+    it('wires the sessionExpiredListener on construction for both clients', () => {
+      expect(typeof buildClient().authProvider.sessionExpiredListener).toBe(
+        'function'
+      );
+      expect(typeof new LocalClient().authProvider.sessionExpiredListener).toBe(
+        'function'
+      );
+    });
+
     afterEach(() => {
       vi.unstubAllGlobals();
       vi.restoreAllMocks();

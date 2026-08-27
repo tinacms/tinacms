@@ -135,15 +135,15 @@ describe('Alerts', () => {
 });
 
 describe('suppression window', () => {
-  it('drops alerts raised while suppressed and resumes afterwards', () => {
+  it('drops alerts between cms:session-expired and cms:login', () => {
     const events = new EventBus();
     const alerts = new Alerts(events);
 
-    alerts.suppress();
+    events.dispatch({ type: 'cms:session-expired' });
     alerts.error('painted over the login modal');
     expect(alerts.all).toHaveLength(0);
 
-    alerts.resume();
+    events.dispatch({ type: 'cms:login' });
     alerts.error('legitimate again');
     expect(alerts.all).toHaveLength(1);
   });

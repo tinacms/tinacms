@@ -6,10 +6,8 @@ import {
 } from '@tinacms/schema-tools';
 import { Form, FormBuilder, FormStatus } from '@tinacms/toolkit';
 import type { TinaCMS } from '@tinacms/toolkit';
-import {
-  dispatchSessionExpired,
-  isSessionExpiredError,
-} from '@tinacms/toolkit';
+import { isSessionExpiredError } from '@tinacms/toolkit';
+import { dispatchSessionExpired } from '@toolkit/core/session-expired';
 import { documentListPath } from '@toolkit/react-sidebar/components/form-breadcrumbs.utils';
 import {
   FileHistoryProvider,

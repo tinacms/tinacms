@@ -3,10 +3,8 @@
 */
 
 import type { TinaCMS } from '@tinacms/toolkit';
-import {
-  dispatchSessionExpired,
-  isSessionExpiredError,
-} from '@tinacms/toolkit';
+import { isSessionExpiredError } from '@tinacms/toolkit';
+import { dispatchSessionExpired } from '@toolkit/core/session-expired';
 import React, { useState, useEffect } from 'react';
 import { TinaAdminApi } from '../api';
 import type { DocumentForm } from '../types';

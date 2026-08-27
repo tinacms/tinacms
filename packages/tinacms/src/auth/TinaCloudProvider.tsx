@@ -16,7 +16,7 @@ import React, { useEffect, useState } from 'react';
 import { ModalBuilder } from './AuthModal';
 import loginLlama from './tina-login.png';
 
-import { isErrorNamed } from '@tinacms/toolkit';
+import { isErrorNamed } from '@toolkit/core/errors';
 import { TinaAdminApi } from '../admin/api';
 import {
   Client,
@@ -94,9 +94,6 @@ const AuthWallInner = ({
   React.useEffect(
     () =>
       cms.events.subscribe('cms:session-expired', () => {
-        // enforcement net for catch sites without a guard: no alert raised
-        // after this point may paint over the login modal
-        cms.alerts.suppress();
         setSessionExpired(true);
         setShowChildren(false);
         setActiveModal('authenticate');
@@ -163,7 +160,6 @@ const AuthWallInner = ({
   }, [authenticated]);
 
   const onAuthenticated = async () => {
-    cms.alerts.resume();
     setAuthenticated(true);
     setSessionExpired(false);
     setActiveModal(null);
@@ -173,8 +169,6 @@ const AuthWallInner = ({
   const otherModalActions = getModalActions
     ? getModalActions({
         closeModal: () => {
-          // closing without signing in must not leave alerts suppressed
-          cms.alerts.resume();
           setActiveModal(null);
         },
       })
