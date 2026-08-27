@@ -20,16 +20,28 @@ export abstract class AbstractAuthProvider implements AuthProvider {
    * @param input fetch function input
    * @param init fetch function init
    */
+  /**
+   * Called when a request that carried a token comes back 401. The Client
+   * wires this to the cms:session-expired dispatch so the auth wall re-arms
+   * on every transport, not only GraphQL.
+   */
+  sessionExpiredListener?: () => void;
+
   async fetchWithToken(input: Input, init: Init): FetchReturn {
     const headers = init?.headers || {};
     const accessToken = await this.getAccessToken();
     if (accessToken) {
       headers['Authorization'] = 'Bearer ' + accessToken;
     }
-    return await fetch(input, {
+    const res = await fetch(input, {
       ...(init || {}),
       headers: new Headers(headers),
     });
+    // a 401 without a token is just "not logged in", not an expired session
+    if (res.status === 401 && accessToken) {
+      this.sessionExpiredListener?.();
+    }
+    return res;
   }
 
   async getAccessToken(): Promise<string | null> {

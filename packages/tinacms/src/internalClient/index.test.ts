@@ -686,6 +686,48 @@ describe('Tina Client', () => {
     });
   });
 
+  describe('fetchWithToken session expiry', () => {
+    afterEach(() => {
+      vi.unstubAllGlobals();
+      vi.restoreAllMocks();
+    });
+
+    it('dispatches cms:session-expired when a tokened request gets a 401', async () => {
+      const client = buildClient();
+      client.authProvider.getToken = vi
+        .fn()
+        .mockResolvedValue({ access_token: 'stale' });
+      const dispatched: { type: string }[] = [];
+      client.events.subscribe('cms:session-expired', (e) => {
+        dispatched.push(e);
+      });
+      stubFetchOnce(
+        makeResponse({ status: 401, body: {}, statusText: 'Unauthorized' })
+      );
+
+      const res = await client.authProvider.fetchWithToken('/branches', {});
+
+      expect(res.status).toBe(401);
+      expect(dispatched).toHaveLength(1);
+    });
+
+    it('does not dispatch for a 401 without a token', async () => {
+      const client = buildClient();
+      client.authProvider.getToken = vi.fn().mockResolvedValue(null);
+      const dispatched: { type: string }[] = [];
+      client.events.subscribe('cms:session-expired', (e) => {
+        dispatched.push(e);
+      });
+      stubFetchOnce(
+        makeResponse({ status: 401, body: {}, statusText: 'Unauthorized' })
+      );
+
+      await client.authProvider.fetchWithToken('/branches', {});
+
+      expect(dispatched).toHaveLength(0);
+    });
+  });
+
   describe('auth token flow', () => {
     let client: Client;
     let getToken: ReturnType<typeof vi.fn>;

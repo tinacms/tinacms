@@ -176,6 +176,8 @@ export class Client {
         tokenStorage: tokenStorage,
         frontendUrl: this.frontendUrl,
       });
+    this.authProvider.sessionExpiredListener = () =>
+      dispatchSessionExpired(this.events);
   }
 
   public get isLocalMode() {
@@ -930,6 +932,8 @@ export class LocalClient extends Client {
     // use whatever auth provider is passed in, or default to local auth provider
     this.authProvider =
       this.schema?.config?.config?.authProvider || new LocalAuthProvider();
+    this.authProvider.sessionExpiredListener = () =>
+      dispatchSessionExpired(this.events);
   }
   public get isLocalMode() {
     return true;
