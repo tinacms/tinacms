@@ -37,7 +37,7 @@ import {
 } from '../toolkit/form-builder/editorial-workflow-constants';
 import { AsyncData, asyncPoll } from './asyncPoll';
 import { LocalAuthProvider, TinaCloudAuthProvider } from './authProvider';
-import { TinaCloudProject } from './types';
+import { AuthenticatedUser, TinaCloudProject } from './types';
 
 export * from './authProvider';
 
@@ -124,8 +124,9 @@ export class Client {
   events = new EventBus(); // automatically hooked into global event bus when attached via cms.
   protectedBranches: string[] = [];
   usingEditorialWorkflow: boolean = false;
-  // Whatever the auth provider returned from getUser(); shape varies by provider.
-  user?: any;
+  // Whatever the auth provider returned from getUser(). Custom providers may
+  // return a bare boolean rather than a user object.
+  user?: AuthenticatedUser | boolean;
 
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
     this.tinaGraphQLVersion = options.tinaGraphQLVersion;

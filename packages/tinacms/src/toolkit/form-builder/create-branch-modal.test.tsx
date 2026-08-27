@@ -15,41 +15,65 @@ vi.mock('../react-core', () => ({
   }),
 }));
 
-import { CommittingAs } from './create-branch-modal';
+import { ModalProvider } from '../react-modals';
+import { CreateBranchPromptModal } from './create-branch-modal';
 
-describe('CommittingAs', () => {
+const renderModal = () =>
+  render(
+    <ModalProvider>
+      <CreateBranchPromptModal
+        branchName='my-branch'
+        close={vi.fn()}
+        onBranchNameChange={vi.fn()}
+        onCreateBranch={vi.fn()}
+        onSaveToProtectedBranch={vi.fn()}
+      />
+    </ModalProvider>
+  );
+
+describe('CreateBranchPromptModal committing-author row', () => {
   beforeEach(() => {
     mockUser = undefined;
   });
 
-  it('renders the full name in user authoring mode', () => {
+  it('renders the full name and initials in user authoring mode', () => {
     mockUser = {
       gitAuthoring: { mode: 'user' },
       fullName: 'Ada Lovelace',
       email: 'ada@example.com',
     };
 
-    render(<CommittingAs />);
+    renderModal();
 
-    expect(screen.getByText('Ada Lovelace')).toBeTruthy();
     expect(screen.getByText('Committing as')).toBeTruthy();
+    expect(screen.getByText('Ada Lovelace')).toBeTruthy();
+    expect(screen.getByText('AL')).toBeTruthy();
   });
 
-  it('falls back to the email when there is no full name', () => {
+  it('falls back to the email and uses only its local part for initials', () => {
     mockUser = { gitAuthoring: { mode: 'user' }, email: 'ada@example.com' };
 
-    render(<CommittingAs />);
+    renderModal();
 
     expect(screen.getByText('ada@example.com')).toBeTruthy();
+    expect(screen.getByText('A')).toBeTruthy();
+  });
+
+  it('keeps both initials for a dotted email local part', () => {
+    mockUser = {
+      gitAuthoring: { mode: 'user' },
+      email: 'josh.berman@ssw.com.au',
+    };
+
+    renderModal();
+
+    expect(screen.getByText('JB')).toBeTruthy();
   });
 
   it('renders the bot in bot authoring mode', () => {
-    mockUser = {
-      gitAuthoring: { mode: 'bot' },
-      fullName: 'Ada Lovelace',
-    };
+    mockUser = { gitAuthoring: { mode: 'bot' }, fullName: 'Ada Lovelace' };
 
-    render(<CommittingAs />);
+    renderModal();
 
     expect(screen.getByText('TinaCloud bot')).toBeTruthy();
     expect(screen.queryByText('Ada Lovelace')).toBeNull();
@@ -58,7 +82,7 @@ describe('CommittingAs', () => {
   it('links Change to the git settings page', () => {
     mockUser = { gitAuthoring: { mode: 'bot' } };
 
-    render(<CommittingAs />);
+    renderModal();
 
     expect(screen.getByText('Change').getAttribute('href')).toBe(
       'https://app.tina.io/account/git'
@@ -71,12 +95,14 @@ describe('CommittingAs', () => {
     ['no gitAuthoring field', { id: 'user1' }],
     ['a non-object user', true],
     ['an unknown mode', { gitAuthoring: { mode: 'something-else' } }],
-  ])('renders nothing with %s', (_label, user) => {
+  ])('renders no author row with %s', (_label, user) => {
     mockUser = user;
 
-    const { container } = render(<CommittingAs />);
+    renderModal();
 
-    expect(container.innerHTML).toBe('');
     expect(screen.queryByText('Committing as')).toBeNull();
+    expect(screen.queryByText('Change')).toBeNull();
+    // The rest of the modal is unaffected.
+    expect(screen.getByText('Branch Name')).toBeTruthy();
   });
 });

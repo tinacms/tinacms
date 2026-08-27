@@ -56,3 +56,15 @@ export interface TinaMedia {
   publicFolder: string;
   mediaRoot: string;
 }
+
+/**
+ * The TinaCloud user returned by `GET /v2/apps/{clientId}/currentUser`. Only
+ * the fields the CMS reads are declared; `gitAuthoring` is absent on older
+ * TinaCloud deployments.
+ */
+export interface AuthenticatedUser {
+  fullName?: string;
+  email?: string;
+  passwordChangeRequired?: boolean;
+  gitAuthoring?: { mode: 'bot' | 'user' };
+}
