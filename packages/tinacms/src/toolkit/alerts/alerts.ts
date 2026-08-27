@@ -1,5 +1,5 @@
+import type { CMSEvent, Callback, EventBus } from '@toolkit/core';
 import React from 'react';
-import type { EventBus, Callback, CMSEvent } from '@toolkit/core';
 
 export interface EventsToAlerts {
   [key: string]: ToAlert | AlertArgs;
@@ -46,11 +46,29 @@ export class Alerts {
     };
   }
 
+  /**
+   * While suppressed (the window between a session expiring and the user
+   * signing back in), new alerts are dropped so nothing paints over the
+   * login modal. Alerts already showing are left alone.
+   */
+  private suppressed = false;
+
+  suppress() {
+    this.suppressed = true;
+  }
+
+  resume() {
+    this.suppressed = false;
+  }
+
   add(
     level: AlertLevel,
     message: string | React.FunctionComponent,
     timeout = 4000
   ): () => void {
+    if (this.suppressed) {
+      return () => {};
+    }
     const alert = {
       level,
       message,

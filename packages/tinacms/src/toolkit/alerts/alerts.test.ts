@@ -133,3 +133,18 @@ describe('Alerts', () => {
     });
   });
 });
+
+describe('suppression window', () => {
+  it('drops alerts raised while suppressed and resumes afterwards', () => {
+    const events = new EventBus();
+    const alerts = new Alerts(events);
+
+    alerts.suppress();
+    alerts.error('painted over the login modal');
+    expect(alerts.all).toHaveLength(0);
+
+    alerts.resume();
+    alerts.error('legitimate again');
+    expect(alerts.all).toHaveLength(1);
+  });
+});

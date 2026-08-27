@@ -94,6 +94,9 @@ const AuthWallInner = ({
   React.useEffect(
     () =>
       cms.events.subscribe('cms:session-expired', () => {
+        // enforcement net for catch sites without a guard: no alert raised
+        // after this point may paint over the login modal
+        cms.alerts.suppress();
         setSessionExpired(true);
         setShowChildren(false);
         setActiveModal('authenticate');
@@ -160,6 +163,7 @@ const AuthWallInner = ({
   }, [authenticated]);
 
   const onAuthenticated = async () => {
+    cms.alerts.resume();
     setAuthenticated(true);
     setSessionExpired(false);
     setActiveModal(null);
