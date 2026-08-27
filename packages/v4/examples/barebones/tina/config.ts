@@ -25,7 +25,6 @@ export const postCollection = {
     t.select({
       name: 'status',
       label: 'Status',
-      required: true,
       options: [
         { value: 'draft', label: 'Draft' },
         { value: 'published', label: 'Published' },

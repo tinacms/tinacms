@@ -100,6 +100,24 @@ describe('SelectField value updates', () => {
     await userEvent.click(await screen.findByRole('option', { name: 'Draft' }));
     expect(valueOf('status')).toBe('draft');
   });
+
+  it('offers no clear option on a required field', async () => {
+    renderField();
+    const trigger = await screen.findByLabelText('Status');
+    await userEvent.click(trigger);
+    expect(
+      screen.queryByRole('option', { name: 'None' })
+    ).not.toBeInTheDocument();
+  });
+
+  it('clears an optional field back to absent through the None option', async () => {
+    renderField({ priority: 'low' });
+    const trigger = await screen.findByLabelText('Priority');
+    await userEvent.click(trigger);
+    await userEvent.click(await screen.findByRole('option', { name: 'None' }));
+    expect(valueOf('priority')).toBeNull();
+    expect(trigger).toHaveTextContent('Select...');
+  });
 });
 
 describe('SelectField validation', () => {
@@ -125,6 +143,7 @@ describe('SelectField validation', () => {
     const descriptor = registry.get('select');
     expect(validateField(priorityNode, descriptor, '')).toEqual([]);
     expect(validateField(priorityNode, descriptor, undefined)).toEqual([]);
+    expect(validateField(priorityNode, descriptor, null)).toEqual([]);
   });
 });
 
@@ -143,6 +162,20 @@ describe('SelectField ingest and digest', () => {
     const registry = await resolveRegistry();
     expect(ingestDocument({}, collection.fields, registry)).toEqual({});
     expect(digestDocument({}, collection.fields, registry)).toEqual({});
+  });
+
+  it('digests a cleared (null) selection as absent, not literal null', async () => {
+    const registry = await resolveRegistry();
+    expect(
+      digestDocument({ priority: null }, collection.fields, registry)
+    ).toEqual({});
+  });
+
+  it('ingests a stored null as absent', async () => {
+    const registry = await resolveRegistry();
+    expect(
+      ingestDocument({ priority: null }, collection.fields, registry)
+    ).toEqual({});
   });
 });
 

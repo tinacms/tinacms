@@ -33,7 +33,6 @@
           {
             "name": "status",
             "label": "Status",
-            "required": true,
             "options": [
               {
                 "value": "draft",

@@ -7,5 +7,7 @@ export default defineClientPlugin({
     Component: SelectField,
     metadata: { layout: 'inline' },
     schema: selectSchema,
+    parse: (stored: string) => (stored == null ? undefined : stored),
+    serialize: (value: string | null) => value ?? undefined,
   },
 });
