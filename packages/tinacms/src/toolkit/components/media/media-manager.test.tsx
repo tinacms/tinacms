@@ -1,4 +1,5 @@
 import {
+  act,
   fireEvent,
   render,
   screen,
@@ -225,6 +226,67 @@ describe('MediaPicker rename action', () => {
 
     await waitFor(() =>
       expect(screen.getAllByTitle('new.jpg')).toHaveLength(2)
+    );
+  });
+});
+
+describe('MediaPicker refresh subscription', () => {
+  // The picker pages via an IntersectionObserver on its loader sentinel;
+  // capture the callbacks so a test can "scroll" on demand.
+  let observerCallbacks: IntersectionObserverCallback[];
+
+  beforeEach(() => {
+    observerCallbacks = [];
+    vi.stubGlobal(
+      'IntersectionObserver',
+      class {
+        constructor(callback: IntersectionObserverCallback) {
+          observerCallbacks.push(callback);
+        }
+        observe() {}
+        unobserve() {}
+        disconnect() {}
+      }
+    );
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  const scrollToNextPage = () =>
+    act(() => {
+      const callback = observerCallbacks[observerCallbacks.length - 1];
+      callback(
+        [{ isIntersecting: true } as IntersectionObserverEntry],
+        {} as any
+      );
+    });
+
+  it('keeps refreshing on rename events after paging past page one', async () => {
+    const list = vi
+      .fn()
+      .mockImplementation(async ({ offset }) =>
+        offset
+          ? { items: [file('page-two.jpg')], nextOffset: undefined }
+          : { items: [file('page-one.jpg')], nextOffset: 'page-2' }
+      );
+    const rename = vi.fn().mockResolvedValue(file('renamed.jpg'));
+    const { cms } = buildCms({ rename, list });
+    renderPicker(cms);
+
+    await screen.findByTitle('page-one.jpg');
+    scrollToNextPage();
+    await screen.findByTitle('page-two.jpg');
+
+    await cms.media.rename('page-one.jpg', 'renamed.jpg');
+    await waitFor(() => expect(screen.queryByTitle('page-two.jpg')).toBeNull());
+    await screen.findByTitle('page-one.jpg');
+
+    const callsBefore = list.mock.calls.length;
+    await cms.media.rename('page-one.jpg', 'renamed.jpg');
+    await waitFor(() =>
+      expect(list.mock.calls.length).toBeGreaterThan(callsBefore)
     );
   });
 });
