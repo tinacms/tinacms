@@ -133,6 +133,20 @@ describe('RenameModal', () => {
     expect(close).not.toHaveBeenCalled();
   });
 
+  it('closes without an error when the editor cancels the branch prompt', async () => {
+    const cancelled = Object.assign(new Error('Media rename cancelled.'), {
+      ERR_TYPE: 'MediaRenameCancelled',
+    });
+    const renameFunc = vi.fn().mockRejectedValue(cancelled);
+    const { input, submit, close } = renderModal({ renameFunc });
+
+    fireEvent.change(input(), { target: { value: 'renamed' } });
+    fireEvent.click(submit());
+
+    await waitFor(() => expect(close).toHaveBeenCalled());
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+
   it('disables the inputs while the rename is in flight', async () => {
     let release: () => void;
     const renameFunc = vi.fn().mockReturnValue(
