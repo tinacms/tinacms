@@ -992,4 +992,78 @@ describe('Tina Client', () => {
       await rejection;
     });
   });
+
+  describe('startMediaEditorialWorkflow', () => {
+    let client: Client;
+    let fetchWithToken: ReturnType<typeof vi.fn>;
+
+    beforeEach(() => {
+      client = buildClient({ clientId: 'client-id' });
+      fetchWithToken = vi.fn();
+      client.authProvider = { fetchWithToken } as any;
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('posts a rename with the source as repoPath and the target as targetRepoPath', async () => {
+      fetchWithToken.mockResolvedValueOnce(
+        makeResponse({
+          status: 202,
+          body: {
+            branchName: 'tina/media-rename-uploads-a-png',
+            requestId: 'workflow-1',
+            status: 'queued',
+          },
+        })
+      );
+
+      await client.startMediaEditorialWorkflow({
+        branchName: 'tina/media-rename-Uploads A.PNG',
+        baseBranch: 'main',
+        operation: 'rename',
+        repoPath: 'uploads/A.PNG',
+        targetRepoPath: 'uploads/b.png',
+      });
+
+      const [url, init] = fetchWithToken.mock.calls[0];
+      expect(url).toBe(
+        'https://content.tinajs.io/editorial-workflow/client-id/media'
+      );
+      expect(init.method).toBe('POST');
+      expect(JSON.parse(init.body)).toEqual({
+        branchName: 'tina/media-rename-Uploads A.PNG',
+        baseBranch: 'main',
+        operation: 'rename',
+        repoPath: 'uploads/A.PNG',
+        targetRepoPath: 'uploads/b.png',
+      });
+    });
+
+    it('still posts an upload without a targetRepoPath', async () => {
+      fetchWithToken.mockResolvedValueOnce(
+        makeResponse({
+          status: 202,
+          body: { branchName: 'tina/media-upload-x', requestId: 'workflow-2' },
+        })
+      );
+
+      await client.startMediaEditorialWorkflow({
+        branchName: 'tina/media-upload-x',
+        baseBranch: 'main',
+        operation: 'upload',
+        repoPath: 'uploads/x.png',
+      });
+
+      const body = JSON.parse(fetchWithToken.mock.calls[0][1].body);
+      expect(body).toEqual({
+        branchName: 'tina/media-upload-x',
+        baseBranch: 'main',
+        operation: 'upload',
+        repoPath: 'uploads/x.png',
+      });
+      expect('targetRepoPath' in body).toBe(false);
+    });
+  });
 });
