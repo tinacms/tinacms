@@ -465,7 +465,7 @@ const Node = ({ components, child }) => {
           return <span>{`No component provided for ${child.name}`}</span>;
         }
       }
-        case 'table': {
+    case 'table': {
       const rows = child.children || [];
       const [headerRow, ...bodyRows] = rows;
       const TableComponent =

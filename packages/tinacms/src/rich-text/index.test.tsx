@@ -2,6 +2,7 @@ import { render } from '@testing-library/react';
 import * as React from 'react';
 import { describe, expect, it } from 'vitest';
 import { TinaMarkdown } from './index';
+import { StaticTinaMarkdown } from './static';
 
 describe('TinaMarkdown URL sanitization', () => {
   it('drops an unsafe link URL', () => {
@@ -143,53 +144,53 @@ describe('TinaMarkdown raw HTML nodes', () => {
   });
 });
 
-describe('TinaMarkdown table rendering', () => {
-  const tableContent = {
-    type: 'root',
-    children: [
-      {
-        type: 'table',
-        props: { align: ['left', 'right'] },
-        children: [
-          {
-            type: 'tr',
-            children: [
-              {
-                type: 'th',
-                children: [
-                  { type: 'p', children: [{ type: 'text', text: 'Name' }] },
-                ],
-              },
-              {
-                type: 'th',
-                children: [
-                  { type: 'p', children: [{ type: 'text', text: 'Age' }] },
-                ],
-              },
-            ],
-          },
-          {
-            type: 'tr',
-            children: [
-              {
-                type: 'td',
-                children: [
-                  { type: 'p', children: [{ type: 'text', text: 'Alice' }] },
-                ],
-              },
-              {
-                type: 'td',
-                children: [
-                  { type: 'p', children: [{ type: 'text', text: '30' }] },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  };
+const tableContent = {
+  type: 'root',
+  children: [
+    {
+      type: 'table',
+      props: { align: ['left', 'right'] },
+      children: [
+        {
+          type: 'tr',
+          children: [
+            {
+              type: 'th',
+              children: [
+                { type: 'p', children: [{ type: 'text', text: 'Name' }] },
+              ],
+            },
+            {
+              type: 'th',
+              children: [
+                { type: 'p', children: [{ type: 'text', text: 'Age' }] },
+              ],
+            },
+          ],
+        },
+        {
+          type: 'tr',
+          children: [
+            {
+              type: 'td',
+              children: [
+                { type: 'p', children: [{ type: 'text', text: 'Alice' }] },
+              ],
+            },
+            {
+              type: 'td',
+              children: [
+                { type: 'p', children: [{ type: 'text', text: '30' }] },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
 
+describe('TinaMarkdown table rendering', () => {
   it('renders the first row as a semantic thead/th', () => {
     const { container } = render(
       <TinaMarkdown content={tableContent as any} />
@@ -230,5 +231,18 @@ describe('TinaMarkdown table rendering', () => {
     const td = container.querySelector('tbody td');
     expect(th?.getAttribute('style')).toContain('text-align: left');
     expect(td?.getAttribute('style')).toContain('text-align: left');
+  });
+});
+
+describe('StaticTinaMarkdown table rendering', () => {
+  it('matches the client renderer for markdown tables', () => {
+    const { container } = render(
+      <StaticTinaMarkdown content={tableContent as any} />
+    );
+    const ths = container.querySelectorAll('thead th');
+    expect(ths.length).toBe(2);
+    expect(ths[0].textContent).toBe('Name');
+    expect(container.querySelector('tbody')?.textContent).not.toContain('Name');
+    expect(container.querySelectorAll('tbody td').length).toBe(2);
   });
 });
