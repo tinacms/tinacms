@@ -6,13 +6,14 @@ import {
   waitFor,
   within,
 } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { EventBus } from '@toolkit/core/event';
 import { MediaManager as MediaManagerCore } from '@toolkit/core/media';
 import type { Media, MediaStore } from '@toolkit/core/media';
 import { CMSContext } from '@toolkit/react-core/use-cms';
 import { ModalProvider } from '@toolkit/react-modals';
 import React from 'react';
-import { MediaPicker } from './media-manager';
+import { MediaManager, MediaPicker } from './media-manager';
 
 vi.mock('../../../lib/posthog/posthogProvider', () => ({
   captureEvent: vi.fn(),
@@ -230,40 +231,174 @@ describe('MediaPicker rename action', () => {
   });
 });
 
-describe('MediaPicker refresh subscription', () => {
-  // The picker pages via an IntersectionObserver on its loader sentinel;
-  // capture the callbacks so a test can "scroll" on demand.
-  let observerCallbacks: IntersectionObserverCallback[];
+describe('MediaPicker type filter', () => {
+  const listSpy = () =>
+    vi.fn().mockResolvedValue({ items: [file('photo.jpg')] });
 
-  beforeEach(() => {
-    observerCallbacks = [];
-    vi.stubGlobal(
-      'IntersectionObserver',
-      class {
-        constructor(callback: IntersectionObserverCallback) {
-          observerCallbacks.push(callback);
-        }
-        observe() {}
-        unobserve() {}
-        disconnect() {}
-      }
+  const extOf = (list: ReturnType<typeof listSpy>) =>
+    list.mock.calls.at(-1)?.[0]?.ext;
+
+  it('sends nothing when neither the field nor the toolbar narrows', async () => {
+    const list = listSpy();
+    const { cms } = buildCms({ extensionFilterable: true, list });
+    renderPicker(cms);
+
+    await waitFor(() => expect(list).toHaveBeenCalled());
+    expect(extOf(list)).toBeUndefined();
+  });
+
+  it("sends the field's accept, expanded from a category", async () => {
+    const list = listSpy();
+    const { cms } = buildCms({ extensionFilterable: true, list });
+    renderPicker(cms, { accept: 'audio' });
+
+    await waitFor(() => expect(list).toHaveBeenCalled());
+    expect(extOf(list)).toEqual(['mp3', 'wav', 'ogg']);
+  });
+
+  it('sends both jpeg spellings when the field names one', async () => {
+    const list = listSpy();
+    const { cms } = buildCms({ extensionFilterable: true, list });
+    renderPicker(cms, { accept: 'jpeg' });
+
+    await waitFor(() => expect(list).toHaveBeenCalled());
+    expect([...extOf(list)].sort()).toEqual(['jpeg', 'jpg']);
+  });
+
+  it('sends nothing when the store does not filter, whatever the field says', async () => {
+    const list = listSpy();
+    const { cms } = buildCms({ list });
+    renderPicker(cms, { accept: 'pdf' });
+
+    await waitFor(() => expect(list).toHaveBeenCalled());
+    expect(extOf(list)).toBeUndefined();
+  });
+
+  it('shows a locked chip instead of a dropdown for a constrained field', async () => {
+    const { cms } = buildCms({ extensionFilterable: true, list: listSpy() });
+    renderPicker(cms, { accept: 'pdf' });
+
+    expect(await screen.findByText('PDF only')).toBeTruthy();
+    expect(screen.queryByText('Any type')).toBeNull();
+  });
+
+  it('names the category on the chip rather than counting its extensions', async () => {
+    const { cms } = buildCms({ extensionFilterable: true, list: listSpy() });
+    renderPicker(cms, { accept: 'image' });
+
+    expect(await screen.findByText('Images only')).toBeTruthy();
+  });
+
+  it('spells out the concrete types for assistive tech', async () => {
+    const { cms } = buildCms({ extensionFilterable: true, list: listSpy() });
+    renderPicker(cms, { accept: 'jpg' });
+
+    // the visible chip stays short; the full list is not left to `title`
+    expect(await screen.findByText('JPG only')).toBeTruthy();
+    expect(screen.getByText('This field accepts jpg, jpeg')).toBeTruthy();
+  });
+
+  it('offers the dropdown when the field is unconstrained', async () => {
+    const { cms } = buildCms({ extensionFilterable: true, list: listSpy() });
+    renderPicker(cms);
+
+    expect(await screen.findByText('Any type')).toBeTruthy();
+  });
+
+  it('hides the control entirely when the store cannot filter', async () => {
+    const { cms } = buildCms({ list: listSpy() });
+    renderPicker(cms);
+
+    await waitFor(() => expect(screen.queryByText('Any type')).toBeNull());
+  });
+
+  it('re-lists with the chosen category when the toolbar narrows', async () => {
+    const list = listSpy();
+    const { cms } = buildCms({ extensionFilterable: true, list });
+    renderPicker(cms);
+
+    const user = userEvent.setup();
+    await user.click(await screen.findByText('Any type'));
+    await user.click(await screen.findByText('Documents'));
+
+    await waitFor(() =>
+      expect(extOf(list)).toEqual(['pdf', 'json', 'csv', 'txt'])
     );
   });
+});
 
-  afterEach(() => {
-    vi.unstubAllGlobals();
+// The field plugin reaches the picker through `cms.media.open()`, not by
+// rendering it, so the option has to survive the event round-trip.
+describe('cms.media.open accept plumbing', () => {
+  it('carries a field accept from open() through to the listing', async () => {
+    const list = vi.fn().mockResolvedValue({ items: [file('photo.jpg')] });
+    const { cms } = buildCms({ extensionFilterable: true, list });
+
+    render(withCms(cms, <MediaManager />));
+    cms.media.open({ accept: 'pdf' });
+
+    await waitFor(() => expect(list).toHaveBeenCalled());
+    expect(list.mock.calls.at(-1)?.[0]?.ext).toEqual(['pdf']);
+    expect(await screen.findByText('PDF only')).toBeTruthy();
   });
+});
 
-  const scrollToNextPage = () =>
-    act(() => {
-      const callback = observerCallbacks[observerCallbacks.length - 1];
-      callback(
-        [{ isIntersecting: true } as IntersectionObserverEntry],
-        {} as any
-      );
+// Paging is driven by an IntersectionObserver, which jsdom does not implement.
+const withInfiniteScroll = () => {
+  const observers: Array<(entries: unknown[]) => void> = [];
+  vi.stubGlobal(
+    'IntersectionObserver',
+    class {
+      constructor(cb: (entries: unknown[]) => void) {
+        observers.push(cb);
+      }
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    }
+  );
+  return () => observers.at(-1)?.([{ isIntersecting: true }]);
+};
+
+describe('MediaPicker type filter after paging', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('replaces the listing rather than appending to the previous page', async () => {
+    const scrollToBottom = withInfiniteScroll();
+    const pages: Record<string, Media[]> = {
+      'page-1': [file('photo.png')],
+      'page-2': [file('diagram.svg')],
+      video: [file('clip.mp4')],
+    };
+    const list = vi.fn(async (opts: any) => {
+      if (opts.ext?.length)
+        return { items: pages.video, nextOffset: undefined };
+      return opts.offset
+        ? { items: pages['page-2'], nextOffset: undefined }
+        : { items: pages['page-1'], nextOffset: 20 };
     });
+    const { cms } = buildCms({ extensionFilterable: true, list });
+    renderPicker(cms);
+
+    expect(await screen.findByTitle('photo.png')).toBeTruthy();
+    scrollToBottom();
+    expect(await screen.findByTitle('diagram.svg')).toBeTruthy();
+
+    const user = userEvent.setup();
+    await user.click(await screen.findByText('Any type'));
+    await user.click(await screen.findByText('Video'));
+
+    expect(await screen.findByTitle('clip.mp4')).toBeTruthy();
+    expect(screen.queryByTitle('photo.png')).toBeNull();
+    expect(screen.queryByTitle('diagram.svg')).toBeNull();
+  });
+});
+
+describe('MediaPicker refresh subscription after paging', () => {
+  afterEach(() => vi.unstubAllGlobals());
 
   it('keeps refreshing on rename events after paging past page one', async () => {
+    const scrollToBottom = withInfiniteScroll();
     const list = vi
       .fn()
       .mockImplementation(async ({ offset }) =>
@@ -276,7 +411,7 @@ describe('MediaPicker refresh subscription', () => {
     renderPicker(cms);
 
     await screen.findByTitle('page-one.jpg');
-    scrollToNextPage();
+    act(() => scrollToBottom());
     await screen.findByTitle('page-two.jpg');
 
     await cms.media.rename('page-one.jpg', 'renamed.jpg');
