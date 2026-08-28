@@ -49,8 +49,13 @@ export const fetchRemoteGraphqlSchema = async ({
     data = undefined;
   }
 
-  if (data?.errors?.length) {
-    const messages = data.errors.map((error) => error.message);
+  // GraphQL allows data and errors together; errors are only fatal when no schema came back.
+  const hasUsableSchema = res.ok && Boolean(data?.data);
+
+  if (data?.errors?.length && !hasUsableSchema) {
+    const messages = data.errors.map((error) =>
+      typeof error?.message === 'string' ? error.message : JSON.stringify(error)
+    );
     const statusInfo = res.ok
       ? ''
       : ` (status code ${res.status}, ${res.statusText})`;

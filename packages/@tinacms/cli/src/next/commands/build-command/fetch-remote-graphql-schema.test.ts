@@ -86,6 +86,40 @@ describe('fetchRemoteGraphqlSchema', () => {
     );
   });
 
+  it('returns the schema when a successful response carries both data and errors', async () => {
+    const schema = { __schema: { types: [] } };
+    globalThis.fetch = jest.fn().mockResolvedValue(
+      stubResponse({
+        body: {
+          data: schema,
+          errors: [{ message: 'Deprecated field requested.' }],
+        },
+      })
+    ) as unknown as typeof fetch;
+
+    const result = await fetchRemoteGraphqlSchema({ url: 'https://x' });
+    expect(result.remoteSchema).toEqual(schema);
+  });
+
+  it('throws the server error when a non-2xx response carries both data and errors', async () => {
+    globalThis.fetch = jest.fn().mockResolvedValue(
+      stubResponse({
+        status: 500,
+        statusText: 'Internal Server Error',
+        body: {
+          data: { __schema: { types: [] } },
+          errors: [{ message: 'Something went wrong.' }],
+        },
+      })
+    ) as unknown as typeof fetch;
+
+    await expect(
+      fetchRemoteGraphqlSchema({ url: 'https://x' })
+    ).rejects.toThrow(
+      'The remote GraphQL API returned an error (status code 500, Internal Server Error): Something went wrong.'
+    );
+  });
+
   it('throws with the status code on a non-2xx response without GraphQL errors', async () => {
     globalThis.fetch = jest.fn().mockResolvedValue(
       stubResponse({
@@ -181,5 +215,53 @@ describe('fetchRemoteGraphqlSchema', () => {
     ).rejects.toThrow(
       'The remote GraphQL API returned a response that could not be parsed as JSON (status code 200, OK).'
     );
+  });
+
+  it('keeps the server error readable when entries are not GraphQL shaped', async () => {
+    globalThis.fetch = jest
+      .fn()
+      .mockResolvedValue(
+        stubResponse({ body: { errors: ['Rate limited'] } })
+      ) as unknown as typeof fetch;
+
+    const error = await fetchRemoteGraphqlSchema({ url: 'https://x' }).catch(
+      (e) => e
+    );
+    expect(error).not.toBeInstanceOf(TypeError);
+    expect(error.message).toContain('Rate limited');
+  });
+
+  it('falls back to the serialized entry when an error has no message', async () => {
+    globalThis.fetch = jest
+      .fn()
+      .mockResolvedValue(
+        stubResponse({ body: { errors: [{ code: 'X' }] } })
+      ) as unknown as typeof fetch;
+
+    const error = await fetchRemoteGraphqlSchema({ url: 'https://x' }).catch(
+      (e) => e
+    );
+    expect(error).not.toBeInstanceOf(TypeError);
+    expect(error.message).toContain('{"code":"X"}');
+  });
+
+  it('still fires the stale lock hint when other entries are malformed', async () => {
+    globalThis.fetch = jest.fn().mockResolvedValue(
+      stubResponse({
+        body: {
+          errors: [
+            null,
+            {
+              message:
+                'Input Object type DocumentFilter must define one or more fields.',
+            },
+          ],
+        },
+      })
+    ) as unknown as typeof fetch;
+
+    await expect(
+      fetchRemoteGraphqlSchema({ url: 'https://x' })
+    ).rejects.toThrow(/tina\/tina-lock\.json is out of date/);
   });
 });

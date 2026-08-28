@@ -38,10 +38,21 @@ import { createAndInitializeDatabase, createDBServer } from '../../database';
 import { BaseCommand } from '../baseCommands';
 import { createDevServer } from '../dev-command/server';
 import { fetchRemoteGraphqlSchema } from './fetch-remote-graphql-schema';
+import { fetchSchemaSha } from './fetch-schema-sha';
 import { buildProductionSpa } from './server';
 import { waitForDB } from './waitForDB';
 
-export { fetchRemoteGraphqlSchema };
+export { fetchRemoteGraphqlSchema, fetchSchemaSha };
+
+const additionalInfoFooter = (config: {
+  branch?: string;
+  clientId?: string;
+}) => {
+  if (!config?.branch) {
+    return '';
+  }
+  return `\n\nAdditional info: Branch: ${config.branch}, Client ID: ${config.clientId} `;
+};
 
 export class BuildCommand extends BaseCommand {
   static paths = [['build']];
@@ -715,8 +726,8 @@ export class BuildCommand extends BaseCommand {
       bar.tick({
         prog: '❌',
       });
-      if (e instanceof Error && config?.branch) {
-        e.message += `\n\nAdditional info: Branch: ${config.branch}, Client ID: ${config.clientId} `;
+      if (e instanceof Error) {
+        e.message += additionalInfoFooter(config);
       }
       throw e;
     }
@@ -726,9 +737,7 @@ export class BuildCommand extends BaseCommand {
         prog: '❌',
       });
       let errorMessage = `The remote GraphQL schema does not exist. Check indexing for this branch.`;
-      if (config?.branch) {
-        errorMessage += `\n\nAdditional info: Branch: ${config.branch}, Client ID: ${config.clientId} `;
-      }
+      errorMessage += additionalInfoFooter(config);
       throw new Error(errorMessage);
     }
 
@@ -810,19 +819,28 @@ export class BuildCommand extends BaseCommand {
     }
 
     // Get the remote schema from the graphql endpoint
-    const { tinaSchema: remoteTinaSchemaSha } = await fetchSchemaSha({
-      url: `https://${host}/db/${clientId}/${previewName || branch}/schemaSha`,
-      token,
-    });
+    let remoteTinaSchemaSha;
+    try {
+      ({ tinaSchema: remoteTinaSchemaSha } = await fetchSchemaSha({
+        url: `https://${host}/db/${clientId}/${previewName || branch}/schemaSha`,
+        token,
+      }));
+    } catch (e) {
+      bar.tick({
+        prog: '❌',
+      });
+      if (e instanceof Error) {
+        e.message += additionalInfoFooter(config);
+      }
+      throw e;
+    }
 
     if (!remoteTinaSchemaSha) {
       bar.tick({
         prog: '❌',
       });
       let errorMessage = `The remote Tina schema does not exist. Check indexing for this branch.`;
-      if (config?.branch) {
-        errorMessage += `\n\nAdditional info: Branch: ${config.branch}, Client ID: ${config.clientId} `;
-      }
+      errorMessage += additionalInfoFooter(config);
       throw new Error(errorMessage);
     }
 
@@ -916,23 +934,3 @@ async function request(args: {
     json,
   };
 }
-
-export const fetchSchemaSha = async ({
-  url,
-  token,
-}: {
-  url: string;
-  token?: string;
-}) => {
-  const headers = new Headers();
-  if (token) {
-    headers.append('X-API-KEY', token);
-  }
-
-  const res = await fetch(url, {
-    method: 'GET',
-    headers,
-    cache: 'no-cache',
-  });
-  return res.json();
-};
