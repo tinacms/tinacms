@@ -226,6 +226,17 @@ export class TinaMediaStore implements MediaStore {
 
   searchable = true;
 
+  /**
+   * The v2 cloud endpoint and the local dev server both filter by `ext` before
+   * paginating. `staticMedia` is a build-time snapshot with no such pass, and
+   * filtering a page client-side would leave a near-empty grid while matches
+   * sit further down — so a static store reports no support and the control
+   * stays hidden, the same way `searchable` is gated.
+   */
+  get extensionFilterable(): boolean {
+    return !this.isStatic;
+  }
+
   // allow up to 100MB uploads
   maxSize = 100 * 1024 * 1024;
 
@@ -1102,7 +1113,10 @@ export class TinaMediaStore implements MediaStore {
           nextOffset: hasMore ? Number(offset) + 20 : null,
         };
       }
-      return { items: media, nextOffset: hasMore ? Number(offset) + 20 : null };
+      return {
+        items: media,
+        nextOffset: hasMore ? Number(offset) + 20 : null,
+      };
     }
 
     let res;
@@ -1113,7 +1127,13 @@ export class TinaMediaStore implements MediaStore {
           options.limit || 20
         }${options.offset ? `&cursor=${options.offset}` : ''}${
           encodedBranch ? `&branch=${encodedBranch}` : ''
-        }${options.search ? `&search=${encodeURIComponent(options.search)}` : ''}`
+        }${
+          options.search ? `&search=${encodeURIComponent(options.search)}` : ''
+        }${
+          options.ext?.length
+            ? `&ext=${encodeURIComponent(options.ext.join(','))}`
+            : ''
+        }`
       );
 
       if (res.status == 401) {
@@ -1129,6 +1149,10 @@ export class TinaMediaStore implements MediaStore {
           options.limit || 20
         }${options.offset ? `&cursor=${options.offset}` : ''}${
           options.search ? `&search=${encodeURIComponent(options.search)}` : ''
+        }${
+          options.ext?.length
+            ? `&ext=${encodeURIComponent(options.ext.join(','))}`
+            : ''
         }`
       );
 
