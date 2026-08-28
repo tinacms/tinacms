@@ -155,24 +155,28 @@ describe('TinaMarkdown — raw HTML nodes', () => {
 });
 
 describe('TinaMarkdown — tables', () => {
-  it('renders a native table node with rows, cells and column alignment', async () => {
+  it('renders a native table node with a header row, cells and column alignment', async () => {
     const html = await render({ props: { content: table } });
     expect(html).toMatchSnapshot();
     expect(html).toContain('<table');
+    expect(html).toContain('<thead>');
+    expect(html).toContain('<th');
     expect(html).toContain('<tbody>');
     expect(html).toContain('<tr>');
     expect(html).toContain('<td');
-    // Per-column alignment from props.align.
+    // Per-column alignment from props.align, on both <th> and <td>.
+    expect(html).toContain('<th style="text-align:left">Name</th>');
+    expect(html).toContain('<th style="text-align:center">Role</th>');
+    expect(html).toContain('<th style="text-align:right">Score</th>');
     expect(html).toContain('text-align:left');
     expect(html).toContain('text-align:center');
     expect(html).toContain('text-align:right');
+    // Row 0 is the header and does not leak into the body.
+    expect(html).not.toMatch(/<tbody>.*Name/s);
     // Inline marks render inside cells.
     expect(html).toContain('<strong>Ada</strong>');
-    // No <thead>/<th> on the native path (matches the React renderer).
-    expect(html).not.toContain('<thead>');
-    expect(html).not.toContain('<th');
     // Cell content is not wrapped in an extra <p>.
-    expect(html).not.toMatch(/<td[^>]*><p[\s>]/);
+    expect(html).not.toMatch(/<t[hd][^>]*><p[\s>]/);
   });
 
   it('overrides the table tag via components.table', async () => {
