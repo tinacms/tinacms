@@ -136,6 +136,25 @@ describe('fetchRemoteGraphqlSchema', () => {
     );
   });
 
+  it('adds the credentials hint and server message on an unauthorized response', async () => {
+    globalThis.fetch = jest.fn().mockResolvedValue(
+      stubResponse({
+        status: 401,
+        statusText: 'Unauthorized',
+        body: { message: 'unauthorized' },
+      })
+    ) as unknown as typeof fetch;
+
+    const error = await fetchRemoteGraphqlSchema({ url: 'https://x' }).catch(
+      (e) => e
+    );
+    expect(error.message).toContain(
+      'Please check that your client ID, URL and read only token are configured properly.'
+    );
+    expect(error.message).toContain('Message from server: unauthorized');
+    expect(error.message).toContain('https://tina.io/docs/r/FAQ/');
+  });
+
   it('resolves with no schema on a successful response without data', async () => {
     globalThis.fetch = jest
       .fn()

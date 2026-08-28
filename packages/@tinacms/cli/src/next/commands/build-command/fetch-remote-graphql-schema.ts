@@ -1,5 +1,7 @@
 import { getIntrospectionQuery } from 'graphql';
 
+const FAQ_LINK = 'https://tina.io/docs/r/FAQ/';
+
 // The server builds DocumentFilter/DocumentMutation from the collection list, so
 // graphql-js only rejects them as empty when the indexed schema has no collections.
 const EMPTY_ROOT_TYPES = ['DocumentFilter', 'DocumentMutation'];
@@ -67,9 +69,14 @@ export const fetchRemoteGraphqlSchema = async ({
   }
 
   if (!res.ok) {
-    throw new Error(
-      `Failed to fetch the remote GraphQL schema. Server responded with status code ${res.status}, ${res.statusText}.`
-    );
+    let message = `Failed to fetch the remote GraphQL schema. Server responded with status code ${res.status}, ${res.statusText}.`;
+    if (res.status === 401 || res.status === 403) {
+      message += ` Please check that your client ID, URL and read only token are configured properly.`;
+    }
+    if (data?.message) {
+      message += `\n\nMessage from server: ${data.message}`;
+    }
+    throw new Error(`${message}\n\nSee ${FAQ_LINK} for more information.`);
   }
 
   if (!data) {
