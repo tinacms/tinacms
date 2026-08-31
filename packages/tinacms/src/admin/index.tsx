@@ -10,6 +10,7 @@ import {
   TinaCMS,
   useCMS,
 } from '@tinacms/toolkit';
+import { isSessionExpiredError } from '@tinacms/toolkit';
 import React, { useState, useEffect } from 'react';
 import {
   Route,
@@ -238,6 +239,10 @@ const CheckSchema = ({
           }
         })
         .catch((error) => {
+          if (isSessionExpiredError(error)) {
+            // request() already sent the user back to the login modal
+            return;
+          }
           // Matches a TinaCloud server contract (string owned upstream); see #6777.
           if (error.message.includes(ERR_NOT_INDEXED)) {
             setSchemaMissingError(true);
