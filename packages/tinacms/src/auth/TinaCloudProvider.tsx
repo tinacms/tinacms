@@ -122,6 +122,7 @@ const AuthWallInner = ({
               if (!mounted) return;
               if (isAuthorized) {
                 const user = await client.authProvider.getUser();
+                client.user = user;
                 if (user.passwordChangeRequired) {
                   window.location.hash = '#/screens/change_password';
                 }

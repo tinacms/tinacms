@@ -178,6 +178,57 @@ export const CreateBranchModal = ({
   );
 };
 
+const getInitials = (name: string) => {
+  const atIndex = name.indexOf('@');
+  const localPart = atIndex === -1 ? name : name.slice(0, atIndex);
+  return localPart
+    .split(/[\s._-]+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => [...part][0].toUpperCase())
+    .join('');
+};
+
+const CommittingAs = () => {
+  const cms = useCMS();
+  const user = cms.api?.tina?.user;
+  const author = typeof user === 'object' && user !== null ? user : undefined;
+  const mode = author?.gitAuthoring?.mode;
+
+  if (mode !== 'bot' && mode !== 'user') {
+    return null;
+  }
+
+  const authorName =
+    mode === 'bot' ? 'TinaCloud bot' : author.fullName || author.email;
+
+  if (!authorName) {
+    return null;
+  }
+
+  return (
+    <div className='flex items-center gap-3 mt-4 pt-4 border-t border-gray-100'>
+      <span className='flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-600 text-xs font-medium flex-shrink-0'>
+        {getInitials(authorName)}
+      </span>
+      <div className='flex-1 min-w-0'>
+        <p className='text-xs text-gray-500'>Committing as</p>
+        <p className='text-sm text-gray-700 font-medium truncate'>
+          {authorName}
+        </p>
+      </div>
+      <a
+        className='text-sm underline text-tina-orange-dark font-medium flex-shrink-0'
+        href={cms.api.tina.gitSettingsLink}
+        target='_blank'
+        rel='noreferrer'
+      >
+        Change
+      </a>
+    </div>
+  );
+};
+
 export const CreateBranchPromptModal = ({
   branchName,
   close,
@@ -291,6 +342,7 @@ export const CreateBranchPromptModal = ({
                 onBranchNameChange(e.target.value);
               }}
             />
+            <CommittingAs />
           </div>
         </ModalBody>
         <ModalActions align='end'>
