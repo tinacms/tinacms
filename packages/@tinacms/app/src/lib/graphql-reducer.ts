@@ -16,6 +16,7 @@ import {
   TinaField,
   TinaSchema,
   TinaState,
+  isSessionExpiredError,
   resolveField,
   useCMS,
 } from 'tinacms';
@@ -722,6 +723,8 @@ const onSubmit = async (
     });
     cms.alerts.success('Document saved!');
   } catch (e) {
+    // request() already sent the user back to the login modal; no alert over it
+    if (isSessionExpiredError(e)) throw e;
     cms.alerts.error(() =>
       ErrorDialog({
         title: 'There was a problem saving your document',

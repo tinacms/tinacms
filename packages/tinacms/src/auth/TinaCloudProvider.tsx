@@ -16,6 +16,7 @@ import React, { useEffect, useState } from 'react';
 import { ModalBuilder } from './AuthModal';
 import loginLlama from './tina-login.png';
 
+import { isErrorNamed } from '@toolkit/core/errors';
 import { TinaAdminApi } from '../admin/api';
 import {
   Client,
@@ -121,6 +122,7 @@ const AuthWallInner = ({
               if (!mounted) return;
               if (isAuthorized) {
                 const user = await client.authProvider.getUser();
+                client.user = user;
                 if (user.passwordChangeRequired) {
                   window.location.hash = '#/screens/change_password';
                 }
@@ -188,7 +190,7 @@ const AuthWallInner = ({
     } catch (e: any) {
       if (
         e instanceof AuthenticationCancelledError ||
-        e?.name === 'AuthenticationCancelledError'
+        isErrorNamed(e, 'AuthenticationCancelledError')
       ) {
         return;
       }
