@@ -4,6 +4,8 @@
 
 import type { Collection, TinaField, TinaSchema } from '@tinacms/schema-tools';
 import type { TinaCMS } from '@tinacms/toolkit';
+import { isSessionExpiredError } from '@tinacms/toolkit';
+import { dispatchSessionExpired } from '@toolkit/core/session-expired';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FilterArgs, TinaAdminApi } from '../api';
@@ -96,16 +98,20 @@ export const useGetCollection = (
         } else if (!cancelled) {
           // The session went away mid-session: drop the stale collection and
           // send the user back to the login modal via the auth wall.
-          cms.events.dispatch({ type: 'cms:session-expired' });
+          dispatchSessionExpired(cms.events);
           setCollection(undefined);
         }
       } catch (error) {
-        cms.alerts.error(
-          `[${error.name}] GetCollection failed: ${error.message}`
-        );
-        console.error(error);
         setCollection(undefined);
-        setError(error);
+        // on session expiry request() already told the auth wall; no alert
+        // over the login modal
+        if (!isSessionExpiredError(error)) {
+          cms.alerts.error(
+            `[${error.name}] GetCollection failed: ${error.message}`
+          );
+          console.error(error);
+          setError(error);
+        }
       }
 
       if (!cancelled) {
@@ -197,6 +203,20 @@ export const useSearchCollection = (
             reason?: any;
           }[];
 
+          // a per-document 401 is captured by allSettled, not the catch below;
+          // bail out rather than render a partial result set as a search answer
+          if (
+            docs.some(
+              (p) => p.status === 'rejected' && isSessionExpiredError(p.reason)
+            )
+          ) {
+            setCollection(undefined);
+            if (!cancelled) {
+              setLoading(false);
+            }
+            return;
+          }
+
           const edges = docs
             .filter((p) => p.status === 'fulfilled' && !!p.value?.document)
             .map((result) => ({ node: result.value.document })) as any[];
@@ -221,16 +241,20 @@ export const useSearchCollection = (
           setCollection(collectionData);
         } else if (!cancelled) {
           // Same as above: a stale result set is worse than a login prompt.
-          cms.events.dispatch({ type: 'cms:session-expired' });
+          dispatchSessionExpired(cms.events);
           setCollection(undefined);
         }
       } catch (error) {
-        cms.alerts.error(
-          `[${error.name}] GetCollection failed: ${error.message}`
-        );
-        console.error(error);
         setCollection(undefined);
-        setError(error);
+        // on session expiry request() already told the auth wall; no alert
+        // over the login modal
+        if (!isSessionExpiredError(error)) {
+          cms.alerts.error(
+            `[${error.name}] GetCollection failed: ${error.message}`
+          );
+          console.error(error);
+          setError(error);
+        }
       }
 
       if (!cancelled) {

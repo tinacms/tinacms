@@ -762,7 +762,19 @@ export interface AuthProvider {
    **/
   authenticate: (props?: Record<string, any>) => Promise<any | null>;
   fetchWithToken: (input: RequestInfo, init?: RequestInit) => Promise<Response>;
+  /**
+   * Turns a tokened 401 into the CMS sending the user back to login. The
+   * Tina client assigns this automatically; providers extending
+   * AbstractAuthProvider get the invocation for free, while a provider that
+   * implements its own fetchWithToken must invoke it itself.
+   */
+  sessionExpiredListener?: () => void;
   isAuthorized: (context?: any) => Promise<boolean>;
+  /**
+   * May reject when the identity backend is unreachable (a transport
+   * failure is not an auth answer); callers should catch and treat that as
+   * an error rather than as logged-out.
+   */
   isAuthenticated: () => Promise<boolean>;
   getLoginStrategy: () => LoginStrategy;
   getLoginScreen: () => FC<LoginScreenProps> | null;

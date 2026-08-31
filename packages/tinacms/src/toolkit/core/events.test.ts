@@ -1,5 +1,5 @@
-import { EventBus, Listener } from './event';
-import { describe, it, test, expect, beforeEach, vi } from 'vitest';
+import { beforeEach, describe, expect, it, test, vi } from 'vitest';
+import { type CMSEvent, EventBus, Listener } from './event';
 
 describe('EventBus', () => {
   it('calls listener and passes it the dispatched event', () => {
