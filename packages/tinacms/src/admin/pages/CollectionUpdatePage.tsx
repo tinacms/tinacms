@@ -6,6 +6,8 @@ import {
 } from '@tinacms/schema-tools';
 import { Form, FormBuilder, FormStatus } from '@tinacms/toolkit';
 import type { TinaCMS } from '@tinacms/toolkit';
+import { isSessionExpiredError } from '@tinacms/toolkit';
+import { dispatchSessionExpired } from '@toolkit/core/session-expired';
 import { documentListPath } from '@toolkit/react-sidebar/components/form-breadcrumbs.utils';
 import {
   FileHistoryProvider,
@@ -34,9 +36,9 @@ const updateDocument = async (
   if (await api.isAuthenticated()) {
     await api.updateDocument(collection, relativePath, params);
   } else {
-    const authMessage = `UpdateDocument failed: User is no longer authenticated; please login and try again.`;
-    cms.alerts.error(authMessage);
-    console.error(authMessage);
+    // the session is gone: send the user to the login modal, and tell the
+    // caller so it does not report success for a save that never ran
+    dispatchSessionExpired(cms.events);
     return false;
   }
 };
@@ -134,15 +136,17 @@ const RenderForm = ({
       initialValues: document._values,
       onSubmit: async (values) => {
         try {
-          await updateDocument(
+          const result = await updateDocument(
             cms,
             relativePath,
             collection,
             mutationInfo,
             values
           );
+          if (result === false) return;
           cms.alerts.success('Document updated!');
         } catch (error) {
+          if (isSessionExpiredError(error)) throw error;
           cms.alerts.error(() =>
             ErrorDialog({
               title: 'There was a problem saving your document',
