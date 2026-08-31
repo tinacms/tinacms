@@ -1,4 +1,5 @@
 import {
+  act,
   fireEvent,
   render,
   screen,
@@ -390,5 +391,37 @@ describe('MediaPicker type filter after paging', () => {
     expect(await screen.findByTitle('clip.mp4')).toBeTruthy();
     expect(screen.queryByTitle('photo.png')).toBeNull();
     expect(screen.queryByTitle('diagram.svg')).toBeNull();
+  });
+});
+
+describe('MediaPicker refresh subscription after paging', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('keeps refreshing on rename events after paging past page one', async () => {
+    const scrollToBottom = withInfiniteScroll();
+    const list = vi
+      .fn()
+      .mockImplementation(async ({ offset }) =>
+        offset
+          ? { items: [file('page-two.jpg')], nextOffset: undefined }
+          : { items: [file('page-one.jpg')], nextOffset: 'page-2' }
+      );
+    const rename = vi.fn().mockResolvedValue(file('renamed.jpg'));
+    const { cms } = buildCms({ rename, list });
+    renderPicker(cms);
+
+    await screen.findByTitle('page-one.jpg');
+    act(() => scrollToBottom());
+    await screen.findByTitle('page-two.jpg');
+
+    await cms.media.rename('page-one.jpg', 'renamed.jpg');
+    await waitFor(() => expect(screen.queryByTitle('page-two.jpg')).toBeNull());
+    await screen.findByTitle('page-one.jpg');
+
+    const callsBefore = list.mock.calls.length;
+    await cms.media.rename('page-one.jpg', 'renamed.jpg');
+    await waitFor(() =>
+      expect(list.mock.calls.length).toBeGreaterThan(callsBefore)
+    );
   });
 });
