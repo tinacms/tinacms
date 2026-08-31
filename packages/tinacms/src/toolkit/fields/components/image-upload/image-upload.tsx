@@ -2,8 +2,10 @@
 
 */
 
+import { type MediaAccept, resolveMediaAccept } from '@tinacms/schema-tools';
 import {
   DEFAULT_MEDIA_UPLOAD_TYPES,
+  dropzoneAcceptFromExtensions,
   dropzoneAcceptFromString,
   isImage,
 } from '@toolkit/components/media/utils';
@@ -24,6 +26,7 @@ interface ImageUploadProps {
   value?: string;
   src?: string;
   loading?: boolean;
+  accept?: MediaAccept | MediaAccept[];
 }
 
 export const StyledImage = ({ src }) => {
@@ -55,12 +58,15 @@ export const StyledFile = ({ src }) => {
 export const ImageUpload = React.forwardRef<
   HTMLButtonElement,
   ImageUploadProps
->(({ onDrop, onClear, onClick, value, src, loading }, ref) => {
+>(({ onDrop, onClear, onClick, value, src, loading, accept }, ref) => {
   const cms = useCMS();
   const { getRootProps, getInputProps } = useDropzone({
-    accept: dropzoneAcceptFromString(
-      cms.media.accept || DEFAULT_MEDIA_UPLOAD_TYPES
-    ),
+    // A field's `accept` overrides the global `media.accept`, so a file the
+    // field would refuse is rejected here rather than uploaded and then
+    // discarded by the insert guard.
+    accept:
+      dropzoneAcceptFromExtensions(resolveMediaAccept(accept)) ??
+      dropzoneAcceptFromString(cms.media.accept || DEFAULT_MEDIA_UPLOAD_TYPES),
     onDrop,
     noClick: !!onClick,
   });

@@ -1,5 +1,75 @@
 import { describe, expect, it } from 'vitest';
-import { previewRename, sanitizeFilename, splitFilename } from './utils';
+import {
+  dropzoneAcceptFromExtensions,
+  isImage,
+  isVideo,
+  previewRename,
+  sanitizeFilename,
+  splitFilename,
+} from './utils';
+
+describe('isImage / isVideo', () => {
+  it('matches by extension, case-insensitively', () => {
+    expect(isImage('photo.PNG')).toBe(true);
+    expect(isImage('scan.tiff')).toBe(true);
+    expect(isVideo('clip.MP4')).toBe(true);
+  });
+
+  it('ignores a query string, as TinaCloud appends one', () => {
+    expect(isImage('hero.png?fit=crop&max-w=400')).toBe(true);
+    expect(isVideo('clip.mov?v=2')).toBe(true);
+  });
+
+  it('only considers the final extension', () => {
+    expect(isImage('photo.png.txt')).toBe(false);
+    expect(isVideo('clip.mp4.bak')).toBe(false);
+  });
+
+  it('rejects non-media and degenerate names', () => {
+    expect(isImage('notes.pdf')).toBe(false);
+    expect(isImage('README')).toBe(false);
+    expect(isImage('.gitignore')).toBe(false);
+    expect(isImage(undefined as unknown as string)).toBe(false);
+  });
+
+  it('keeps ico out of previews and tiff in', () => {
+    expect(isImage('favicon.ico')).toBe(false);
+    expect(isImage('scan.tiff')).toBe(true);
+  });
+
+  // The previous regex only tolerated a query string, so a fragment made an
+  // image read as a plain file. Previewing it is the better answer.
+  it('tolerates a fragment as well as a query string', () => {
+    expect(isImage('hero.png#full')).toBe(true);
+  });
+});
+
+describe('dropzoneAcceptFromExtensions', () => {
+  it('returns undefined for an empty list so callers fall through', () => {
+    expect(dropzoneAcceptFromExtensions([])).toBeUndefined();
+  });
+
+  it('keys by MIME type, not by bare extension', () => {
+    // A bare `.pdf` key is dropped from the native file picker, which then
+    // offers every file and only rejects the choice afterwards.
+    expect(dropzoneAcceptFromExtensions(['pdf'])).toEqual({
+      'application/pdf': ['.pdf'],
+    });
+  });
+
+  it('groups extensions that share a MIME type', () => {
+    expect(dropzoneAcceptFromExtensions(['jpg', 'jpeg'])).toEqual({
+      'image/jpeg': ['.jpg', '.jpeg'],
+    });
+  });
+
+  it('keeps distinct MIME types separate', () => {
+    expect(dropzoneAcceptFromExtensions(['png', 'svg'])).toEqual({
+      'image/png': ['.png'],
+      'image/svg+xml': ['.svg'],
+    });
+  });
+});
 
 describe('sanitizeFilename', () => {
   it('returns simple ASCII names unchanged', () => {
