@@ -1765,6 +1765,91 @@ describe('TinaMediaStore — local rename', () => {
   });
 });
 
+describe('TinaMediaStore — extension filtering', () => {
+  const listBody = (filenames: string[], directories: string[] = []) => ({
+    files: filenames.map((filename) => ({
+      filename,
+      src: `/uploads/${filename}`,
+    })),
+    directories,
+    cursor: 0,
+  });
+
+  it('sends ext as a comma-separated param to the cloud endpoint', async () => {
+    const { store, fetchWithToken } = buildStore({ branch: 'main' });
+    fetchWithToken.mockResolvedValueOnce(makeJsonResponse(200, listBody([])));
+
+    await store.list({
+      directory: '',
+      thumbnailSizes: [],
+      ext: ['pdf', 'svg'],
+    });
+
+    expect(fetchWithToken.mock.calls[0][0]).toContain('&ext=pdf%2Csvg');
+  });
+
+  it('sends ext to the local dev server too', async () => {
+    const built = buildStore({
+      isLocalMode: true,
+      contentApiUrl: 'http://localhost:4001/graphql',
+    });
+    const fetchFunction = vi.fn();
+    built.store.fetchFunction = fetchFunction;
+    fetchFunction.mockResolvedValueOnce(makeJsonResponse(200, listBody([])));
+
+    await built.store.list({ directory: '', thumbnailSizes: [], ext: ['pdf'] });
+
+    expect(fetchFunction.mock.calls[0][0]).toContain('&ext=pdf');
+  });
+
+  it('omits ext when empty', async () => {
+    const { store, fetchWithToken } = buildStore({ branch: 'main' });
+    fetchWithToken.mockResolvedValueOnce(makeJsonResponse(200, listBody([])));
+
+    await store.list({ directory: '', thumbnailSizes: [], ext: [] });
+
+    expect(fetchWithToken.mock.calls[0][0]).not.toContain('ext=');
+  });
+
+  // Both endpoints filter before paginating, so re-filtering the page here
+  // would only mask a server-side bug.
+  it('does not re-filter what the server returned', async () => {
+    const { store, fetchWithToken } = buildStore({ branch: 'main' });
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, listBody(['report.pdf', 'photo.png']))
+    );
+
+    const { items } = await store.list({
+      directory: '',
+      thumbnailSizes: [],
+      ext: ['pdf'],
+    });
+
+    expect(items.map((i) => i.filename)).toEqual(['report.pdf', 'photo.png']);
+  });
+
+  describe('extensionFilterable', () => {
+    it('is advertised for cloud and local stores', () => {
+      expect(buildStore({ branch: 'main' }).store.extensionFilterable).toBe(
+        true
+      );
+      expect(buildStore({ isLocalMode: true }).store.extensionFilterable).toBe(
+        true
+      );
+    });
+
+    // A build-time snapshot has no filtering pass, and narrowing a single page
+    // client-side would leave a near-empty grid.
+    it('is withheld for a static store', () => {
+      const { cms } = buildStore({});
+      const store = new TinaMediaStore(cms, {
+        '0': [],
+      } as unknown as Parameters<typeof TinaMediaStore>[1]);
+      expect(store.extensionFilterable).toBe(false);
+    });
+  });
+});
+
 describe('TinaMediaStore — cloud rename (direct)', () => {
   beforeEach(() => {
     vi.useFakeTimers();
