@@ -41,6 +41,9 @@ v4 supplies four more examples:
 - The `datetime` field ([`datetime-field.md`](./datetime-field.md)) holds a
   string on both sides. It defines `parse`, but no `serialize` and no
   `defaultValue`.
+- The `select` field ([`select-field.md`](./select-field.md)) picks one value
+  from a fixed `options` list. Its Zod validator is a `z.enum` with a custom
+  `errorMap`, and it has no `defaultValue`, `parse`, or `serialize`.
 - The `rich-text` field ([`rich-text-field.md`](./rich-text-field.md)) uses the
   `block` layout. With `isBody`, it controls the markdown body of the file.
 
