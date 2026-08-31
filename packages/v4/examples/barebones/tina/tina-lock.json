@@ -29,6 +29,21 @@
             "label": "Body",
             "isBody": true,
             "type": "rich-text"
+          },
+          {
+            "name": "status",
+            "label": "Status",
+            "options": [
+              {
+                "value": "draft",
+                "label": "Draft"
+              },
+              {
+                "value": "published",
+                "label": "Published"
+              }
+            ],
+            "type": "select"
           }
         ]
       }
@@ -44,6 +59,7 @@
     "boolean": 1,
     "rating": 1,
     "rich-text": 1,
+    "select": 1,
     "string": 1
   }
 }
