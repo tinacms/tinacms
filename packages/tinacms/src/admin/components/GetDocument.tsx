@@ -3,6 +3,8 @@
 */
 
 import type { TinaCMS } from '@tinacms/toolkit';
+import { isSessionExpiredError } from '@tinacms/toolkit';
+import { dispatchSessionExpired } from '@toolkit/core/session-expired';
 import React, { useState, useEffect } from 'react';
 import { TinaAdminApi } from '../api';
 import type { DocumentForm } from '../types';
@@ -38,18 +40,22 @@ export const useGetDocument = (
         } else if (!isCancelled) {
           // Session gone: drop the previous document rather than leave the form
           // showing content the user can no longer save.
-          cms.events.dispatch({ type: 'cms:session-expired' });
+          dispatchSessionExpired(cms.events);
           setDocument(undefined);
         }
       } catch (error) {
         // Only handle error if the request hasn't been cancelled
         if (!isCancelled) {
-          cms.alerts.error(
-            `[${error.name}] GetDocument failed: ${error.message}`
-          );
-          console.error(error);
           setDocument(undefined);
-          setError(error);
+          // on session expiry request() already told the auth wall; no alert
+          // over the login modal
+          if (!isSessionExpiredError(error)) {
+            cms.alerts.error(
+              `[${error.name}] GetDocument failed: ${error.message}`
+            );
+            console.error(error);
+            setError(error);
+          }
         }
       }
 
