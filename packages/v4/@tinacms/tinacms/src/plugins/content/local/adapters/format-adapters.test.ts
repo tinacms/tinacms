@@ -129,6 +129,18 @@ describe('markdown adapter', () => {
       ).toThrow(/Expected a string for body field/);
     }
   });
+
+  it('refuses to run code in frontmatter', () => {
+    const globals = globalThis as Record<string, unknown>;
+    for (const language of ['js', 'javascript', 'coffee', 'coffeescript']) {
+      const raw = `---${language}\n{ pwned: (globalThis.PWNED = true) }\n---\n`;
+      expect(() => adapter.parse(raw)).toThrow(/not allowed for security/);
+      expect(() => adapter.serialize({ body: raw }, undefined, 'body')).toThrow(
+        /not allowed for security/
+      );
+      expect(globals.PWNED).toBeUndefined();
+    }
+  });
 });
 
 describe('markdown adapter — documents with and without frontmatter', () => {
