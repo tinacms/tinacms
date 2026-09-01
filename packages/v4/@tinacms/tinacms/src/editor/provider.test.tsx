@@ -39,7 +39,7 @@ describe('TinaProvider boot', () => {
       </TinaProvider>
     );
     expect(await screen.findByTestId('field-types')).toHaveTextContent(
-      'boolean,datetime,number,rich-text,string'
+      'boolean,datetime,number,rich-text,select,string'
     );
     expect(screen.getByTestId('namespaces')).toHaveTextContent(
       'branch,documents,ui'

@@ -1,5 +1,24 @@
 # @tinacms/mdx
 
+## 2.2.1
+
+### Patch Changes
+
+- [#7407](https://github.com/tinacms/tinacms/pull/7407) [`4f90806`](https://github.com/tinacms/tinacms/commit/4f9080666308063332e16d96d00a75ff7348c011) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Ship one copy of the `acorn` parser in `@tinacms/mdx` instead of three, cutting `dist/index.browser.js` from 1,976,421 to 1,578,764 bytes (440,787 to 356,471 gzipped) and `dist/index.js` from 2,013,419 to 1,615,828 bytes (452,063 to 367,630 gzipped). The catalog pinned `acorn` to 8.8.2 while `micromark-extension-mdxjs` pulled 8.16.0, so two 8.x copies were bundled side by side; separately, `acorn-jsx` reaches `acorn` through `require`, which acorn's export map answers with its CJS build while every other importer gets the ESM build, bundling the parser a second time. Aligning the catalog to `^8.16.0` and aliasing `acorn` to its ESM entry in the `@tinacms/mdx` esbuild config collapses all three into one. Parser and serializer output is unchanged — `parseMDX`/`serializeMDX` round-trips over the package's 64 markdown fixtures produce byte-identical results from the old and new bundles.
+
+- [#7468](https://github.com/tinacms/tinacms/pull/7468) [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Drop the unused `typedoc` dependency
+
+  `typedoc` landed in `@tinacms/mdx`'s runtime dependencies by copy-paste and has shipped to every consumer since, dragging an unmet `typescript` peer range with it. Nothing in `src/` imports it and only the `docs` script used it, so both are removed along with the now-orphaned `typedoc-plugin-markdown` and `concat-md` catalog entries.
+
+- [#7466](https://github.com/tinacms/tinacms/pull/7466) [`de5c7d7`](https://github.com/tinacms/tinacms/commit/de5c7d72b67f589f1f5c4bccc5f5677e70cd7e2d) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Stop importing the `uvu` test runner from shipped source
+
+  `@tinacms/mdx` listed `uvu` as a runtime dependency and imported it in two shortcode parsing files, in both cases only for `ok` as a one-line assertion helper. A local `assert` function replaces those six call sites, so the dependency and its catalog entry are gone. Shortcode parsing behaviour is unchanged.
+
+  This does not remove `uvu` from a consumer's `node_modules`. `micromark` and its extensions still depend on it at runtime, and `@tinacms/mdx` depends on those.
+
+- Updated dependencies []:
+  - @tinacms/schema-tools@2.9.0
+
 ## 2.2.0
 
 ### Minor Changes

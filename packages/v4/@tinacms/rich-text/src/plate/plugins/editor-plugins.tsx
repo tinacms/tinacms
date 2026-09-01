@@ -50,9 +50,9 @@ import { getAutoformatBlocks } from './core/autoformat/autoformat-block';
 import { autoformatLists } from './core/autoformat/autoformat-lists';
 import { autoformatMarks } from './core/autoformat/autoformat-marks';
 import {
-  createBlockquoteEnterBreakPlugin,
   createBreakPlugin,
   createHTMLInlinePlugin,
+  createHardBreakPlugin,
 } from './create-html-block';
 import { createHTMLBlockPlugin } from './create-html-block';
 import createImgPlugin from './create-img-plugin';
@@ -146,7 +146,7 @@ export const createEditorPlugins = ({
   createImgPlugin,
   createHTMLBlockPlugin,
   createHTMLInlinePlugin,
-  createBlockquoteEnterBreakPlugin,
+  createHardBreakPlugin,
   createInvalidMarkdownPlugin,
   CorrectNodeBehaviorPlugin,
   ClearHighlightOnEnterPlugin,

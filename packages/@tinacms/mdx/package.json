@@ -1,6 +1,6 @@
 {
 	"name": "@tinacms/mdx",
-	"version": "2.2.0",
+	"version": "2.2.1",
 	"type": "module",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -66,7 +66,6 @@
 		"unist-util-source": "catalog:",
 		"unist-util-stringify-position": "catalog:",
 		"unist-util-visit": "catalog:",
-		"uvu": "catalog:",
 		"vfile-message": "catalog:"
 	},
 	"publishConfig": {
@@ -74,7 +73,7 @@
 	},
 	"repository": {
 		"url": "https://github.com/tinacms/tinacms.git",
-		"directory": "packages/tina-graphql"
+		"directory": "packages/@tinacms/mdx"
 	},
 	"devDependencies": {
 		"@tinacms/scripts": "workspace:*",

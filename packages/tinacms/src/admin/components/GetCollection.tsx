@@ -4,6 +4,8 @@
 
 import type { Collection, TinaField, TinaSchema } from '@tinacms/schema-tools';
 import type { TinaCMS } from '@tinacms/toolkit';
+import { isSessionExpiredError } from '@tinacms/toolkit';
+import { dispatchSessionExpired } from '@toolkit/core/session-expired';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FilterArgs, TinaAdminApi } from '../api';
@@ -12,6 +14,7 @@ import { handleNavigate } from '../pages/CollectionListPage';
 import type { CollectionResponse, DocumentForm } from '../types';
 import { FullscreenError } from './FullscreenError';
 import { shouldAutoOpenCollectionDocument } from './GetCollection.utils';
+import { UnableToLoadModal } from './UnableToLoadModal';
 
 const isValidSortKey = (sortKey: string, collection: Collection<true>) => {
   if (collection.fields) {
@@ -92,14 +95,23 @@ export const useGetCollection = (
             filterArgs
           );
           setCollection(collection);
+        } else if (!cancelled) {
+          // The session went away mid-session: drop the stale collection and
+          // send the user back to the login modal via the auth wall.
+          dispatchSessionExpired(cms.events);
+          setCollection(undefined);
         }
       } catch (error) {
-        cms.alerts.error(
-          `[${error.name}] GetCollection failed: ${error.message}`
-        );
-        console.error(error);
         setCollection(undefined);
-        setError(error);
+        // on session expiry request() already told the auth wall; no alert
+        // over the login modal
+        if (!isSessionExpiredError(error)) {
+          cms.alerts.error(
+            `[${error.name}] GetCollection failed: ${error.message}`
+          );
+          console.error(error);
+          setError(error);
+        }
       }
 
       if (!cancelled) {
@@ -191,6 +203,20 @@ export const useSearchCollection = (
             reason?: any;
           }[];
 
+          // a per-document 401 is captured by allSettled, not the catch below;
+          // bail out rather than render a partial result set as a search answer
+          if (
+            docs.some(
+              (p) => p.status === 'rejected' && isSessionExpiredError(p.reason)
+            )
+          ) {
+            setCollection(undefined);
+            if (!cancelled) {
+              setLoading(false);
+            }
+            return;
+          }
+
           const edges = docs
             .filter((p) => p.status === 'fulfilled' && !!p.value?.document)
             .map((result) => ({ node: result.value.document })) as any[];
@@ -213,14 +239,22 @@ export const useSearchCollection = (
           };
 
           setCollection(collectionData);
+        } else if (!cancelled) {
+          // Same as above: a stale result set is worse than a login prompt.
+          dispatchSessionExpired(cms.events);
+          setCollection(undefined);
         }
       } catch (error) {
-        cms.alerts.error(
-          `[${error.name}] GetCollection failed: ${error.message}`
-        );
-        console.error(error);
         setCollection(undefined);
-        setError(error);
+        // on session expiry request() already told the auth wall; no alert
+        // over the login modal
+        if (!isSessionExpiredError(error)) {
+          cms.alerts.error(
+            `[${error.name}] GetCollection failed: ${error.message}`
+          );
+          console.error(error);
+          setError(error);
+        }
       }
 
       if (!cancelled) {
@@ -298,7 +332,8 @@ const GetCollection = ({
         ) || {};
 
   useEffect(() => {
-    if (loading) return;
+    // no collection when the session check skipped the fetch, or when it failed
+    if (loading || !collection) return;
 
     // get the collection definition
     const collectionDefinition = cms.api.tina.schema.getCollection(
@@ -337,6 +372,12 @@ const GetCollection = ({
 
   if (loading) {
     return <LoadingPage />;
+  }
+
+  // undefined when the session check skipped the fetch; consumers read
+  // `collection.documents` straight away, so never hand them undefined
+  if (!collection) {
+    return <UnableToLoadModal message='This collection could not be loaded.' />;
   }
 
   return (

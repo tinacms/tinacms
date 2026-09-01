@@ -1,6 +1,6 @@
 {
     "name": "@tinacms/metrics",
-    "version": "2.1.1",
+    "version": "2.1.2",
     "main": "dist/index.js",
     "type": "module",
     "typings": "dist/index.d.ts",
@@ -26,14 +26,13 @@
         "build": "tinacms-scripts build",
         "test": "jest --passWithNoTests",
         "types": "pnpm tsc",
-        "test-watch": "jest  --passWithNoTests --watch",
-        "generate:schema": "pnpm node scripts/generateSchema.js"
+        "test-watch": "jest  --passWithNoTests --watch"
     },
     "publishConfig": {
         "registry": "https://registry.npmjs.org"
     },
     "repository": {
         "url": "https://github.com/tinacms/tinacms.git",
-        "directory": "packages/@tinacms/cli"
+        "directory": "packages/@tinacms/metrics"
     }
 }

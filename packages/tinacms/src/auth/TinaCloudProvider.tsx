@@ -16,6 +16,7 @@ import React, { useEffect, useState } from 'react';
 import { ModalBuilder } from './AuthModal';
 import loginLlama from './tina-login.png';
 
+import { isErrorNamed } from '@toolkit/core/errors';
 import { TinaAdminApi } from '../admin/api';
 import {
   Client,
@@ -54,6 +55,9 @@ export interface TinaCloudAuthWallProps {
     | (() => Promise<TinaCloudMediaStoreClass>);
 }
 
+const SESSION_EXPIRED_MESSAGE =
+  'Your session has ended. Please sign in again to continue editing.';
+
 const AuthWallInner = ({
   children,
   cms,
@@ -83,6 +87,19 @@ const AuthWallInner = ({
     password: string;
   }>({ username: '', password: '' });
   const [authenticated, setAuthenticated] = useState<boolean>(false);
+  const [sessionExpired, setSessionExpired] = useState<boolean>(false);
+
+  // Data hooks dispatch this when a session check fails mid-session: drop
+  // straight back to the login modal instead of leaving the admin mounted.
+  React.useEffect(
+    () =>
+      cms.events.subscribe('cms:session-expired', () => {
+        setSessionExpired(true);
+        setShowChildren(false);
+        setActiveModal('authenticate');
+      }),
+    []
+  );
 
   React.useEffect(() => {
     let mounted = true;
@@ -105,6 +122,7 @@ const AuthWallInner = ({
               if (!mounted) return;
               if (isAuthorized) {
                 const user = await client.authProvider.getUser();
+                client.user = user;
                 if (user.passwordChangeRequired) {
                   window.location.hash = '#/screens/change_password';
                 }
@@ -144,6 +162,7 @@ const AuthWallInner = ({
 
   const onAuthenticated = async () => {
     setAuthenticated(true);
+    setSessionExpired(false);
     setActiveModal(null);
     cms.events.dispatch({ type: 'cms:login' });
   };
@@ -171,7 +190,7 @@ const AuthWallInner = ({
     } catch (e: any) {
       if (
         e instanceof AuthenticationCancelledError ||
-        e?.name === 'AuthenticationCancelledError'
+        isErrorNamed(e, 'AuthenticationCancelledError')
       ) {
         return;
       }
@@ -209,6 +228,7 @@ const AuthWallInner = ({
       {activeModal === 'authenticate' && loginStrategy === 'Redirect' && (
         <ModalBuilder
           title={modalTitle}
+          error={sessionExpired ? SESSION_EXPIRED_MESSAGE : undefined}
           message={
             isTinaCloud ? (
               <img
@@ -238,6 +258,7 @@ const AuthWallInner = ({
         loginStrategy === 'UsernamePassword' && (
           <ModalBuilder
             title={modalTitle}
+            error={sessionExpired ? SESSION_EXPIRED_MESSAGE : undefined}
             message={''}
             close={close}
             busy={isAuthRedirect}
