@@ -3,6 +3,7 @@ import type * as Md from 'mdast';
 import { gfmToMarkdown } from 'mdast-util-gfm';
 import { Handlers, toMarkdown } from 'mdast-util-to-markdown';
 import { text } from 'mdast-util-to-markdown/lib/handle/text';
+import { dropDanglingBreaks } from '../../dangling-breaks';
 import { Pattern } from '../shortcodes';
 import { mdxJsxToMarkdown } from '../shortcodes/mdast';
 import { getFieldPatterns } from '../util';
@@ -58,7 +59,7 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextField) => {
     }
     return text(node, parent, context, safeOptions);
   };
-  return toMarkdown(tree, {
+  return toMarkdown(dropDanglingBreaks(tree), {
     extensions: [mdxJsxToMarkdown({ patterns }), gfmToMarkdown()],
     listItemIndent: 'one',
     handlers,
