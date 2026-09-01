@@ -3,7 +3,8 @@ import {
   LoginStrategy,
   TokenObject,
 } from '@tinacms/schema-tools';
-import { authenticate, AUTH_TOKEN_KEY } from '../auth/authenticate';
+import { isErrorNamed } from '@toolkit/core/errors';
+import { AUTH_TOKEN_KEY, authenticate } from '../auth/authenticate';
 import DefaultSessionProvider from '../auth/defaultSessionProvider';
 
 type Input = Parameters<AuthProvider['fetchWithToken']>[0];
@@ -11,6 +12,13 @@ type Init = Parameters<AuthProvider['fetchWithToken']>[1];
 type FetchReturn = ReturnType<AuthProvider['fetchWithToken']>;
 
 export abstract class AbstractAuthProvider implements AuthProvider {
+  /**
+   * Turns a tokened 401 into the auth wall re-arming. The Client assigns this
+   * automatically; AbstractAuthProvider.fetchWithToken invokes it. A provider
+   * that implements its own fetchWithToken must invoke it itself.
+   */
+  sessionExpiredListener?: () => void;
+
   /**
    * Wraps the normal fetch function with same API but adds the authorization header token.
    *
@@ -26,10 +34,15 @@ export abstract class AbstractAuthProvider implements AuthProvider {
     if (accessToken) {
       headers['Authorization'] = 'Bearer ' + accessToken;
     }
-    return await fetch(input, {
+    const res = await fetch(input, {
       ...(init || {}),
       headers: new Headers(headers),
     });
+    // a 401 without a token is just "not logged in", not an expired session
+    if (res.status === 401 && accessToken) {
+      this.sessionExpiredListener?.();
+    }
+    return res;
   }
 
   async getAccessToken(): Promise<string | null> {
@@ -171,9 +184,17 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
         }
         return null;
       }
-      const res = await this.fetchWithToken(url, {
-        method: 'GET',
-      });
+      let res: Awaited<FetchReturn>;
+      try {
+        res = await this.fetchWithToken(url, { method: 'GET' });
+      } catch (networkError) {
+        // one transient identity-API failure must not read as "logged out"
+        // and eject the user; retry once, then let callers treat it as an
+        // error rather than an expired session
+        console.warn('TinaCMS: session check failed, retrying.', networkError);
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        res = await this.fetchWithToken(url, { method: 'GET' });
+      }
       const val = await res.json();
       if (!res.status.toString().startsWith('2')) {
         console.error(
@@ -184,6 +205,10 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
       }
       return val;
     } catch (e) {
+      if (e instanceof TypeError || isErrorNamed(e, 'AbortError')) {
+        // fetch network failures surface as TypeError: not an auth answer
+        throw e;
+      }
       console.error(e);
       return null;
     }

@@ -320,12 +320,11 @@ export function MediaPicker({
     setRefreshing(false);
   }, [refreshing]);
 
+  // Subscribed independently of the load effect below: the handler resets the
+  // offset, which re-runs that effect into its `refreshing` guard — a
+  // subscription registered there would be cleaned up and never re-created.
   useEffect(() => {
     if (!cms.media.isConfigured) return;
-    if (refreshing) return;
-
-    loadMedia(loadFolders);
-    if (loadFolders) setLoadFolders(false);
 
     return cms.events.subscribe(
       ['media:delete:success', 'media:rename:success', 'media:pageSize'],
@@ -344,6 +343,14 @@ export function MediaPicker({
         resetList();
       }
     );
+  }, [cms.media.isConfigured]);
+
+  useEffect(() => {
+    if (!cms.media.isConfigured) return;
+    if (refreshing) return;
+
+    loadMedia(loadFolders);
+    if (loadFolders) setLoadFolders(false);
   }, [
     offset,
     directory,
