@@ -5,11 +5,11 @@
  * @packageDocumentation
  */
 
-import { Plugin, PluginTypeManager } from './plugins';
-import { EventBus } from './event';
+import { type CMSEvent, EventBus } from './event';
+import { Flags } from './flags';
 import { MediaManager, MediaStore } from './media';
 import { DummyMediaStore } from './media-store.default';
-import { Flags } from './flags';
+import { Plugin, PluginTypeManager } from './plugins';
 
 /**
  * A [[CMS]] is the core object of any content management system.
@@ -168,13 +168,33 @@ export class CMS {
       this.unsubscribeHooks[name]();
     }
     if (api.events instanceof EventBus) {
-      const unsubscribeHost = (api.events as EventBus).subscribe(
-        '*',
-        this.events.dispatch
-      );
-      const unsubscribeGuest = this.events.subscribe('*', (e) =>
-        api.events.dispatch(e)
-      );
+      // Guards are scoped to the event object being forwarded: passing
+      // `this.events.dispatch` unbound made the api-to-cms direction a silent
+      // no-op, a bound fix would recurse forever through the two '*' bridges,
+      // and a direction-wide boolean would drop a NEW event dispatched
+      // synchronously by a listener mid-forward.
+      let forwardingToCms: CMSEvent | null = null;
+      let forwardingToApi: CMSEvent | null = null;
+      const unsubscribeHost = (api.events as EventBus).subscribe('*', (e) => {
+        if (e === forwardingToApi) return;
+        const previous = forwardingToCms;
+        forwardingToCms = e;
+        try {
+          this.events.dispatch(e);
+        } finally {
+          forwardingToCms = previous;
+        }
+      });
+      const unsubscribeGuest = this.events.subscribe('*', (e) => {
+        if (e === forwardingToCms) return;
+        const previous = forwardingToApi;
+        forwardingToApi = e;
+        try {
+          api.events.dispatch(e);
+        } finally {
+          forwardingToApi = previous;
+        }
+      });
       this.unsubscribeHooks[name] = () => {
         unsubscribeHost();
         unsubscribeGuest();
