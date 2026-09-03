@@ -196,6 +196,22 @@ describe('ArrayField validation', () => {
     ]);
   });
 
+  it('keeps the required floor of one item when min is 0', async () => {
+    const registry = await resolveRegistry();
+    const descriptor = registry.get('array');
+    const node = t.array({
+      name: 'authors',
+      label: 'Authors',
+      required: true,
+      min: 0,
+      fields: [t.string({ name: 'name' })],
+    });
+    expect(validateField(node, descriptor, [])).toEqual([
+      'Authors needs at least 1 item',
+    ]);
+    expect(validateField(node, descriptor, [{ name: 'Ivan' }])).toEqual([]);
+  });
+
   it('rejects more items than max', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('array');

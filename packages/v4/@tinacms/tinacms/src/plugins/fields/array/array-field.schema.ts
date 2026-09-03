@@ -33,20 +33,24 @@ const plural = (count: number): string => (count === 1 ? 'item' : 'items');
 
 export const arraySchema = (node: FieldSchema): ZodType => {
   const field = asArrayFieldSchema(node);
-  const min = field.min ?? (field.required ? 1 : undefined);
 
   let schema = z.array(z.unknown());
-  if (min !== undefined) {
+  if (field.min != null) {
     schema = schema.min(
-      min,
-      `${labelOf(field)} needs at least ${min} ${plural(min)}`
+      field.min,
+      `${labelOf(field)} needs at least ${field.min} ${plural(field.min)}`
     );
   }
-  if (field.max !== undefined) {
+  if (field.max != null) {
     schema = schema.max(
       field.max,
       `${labelOf(field)} allows at most ${field.max} ${plural(field.max)}`
     );
+  }
+  // `required` is a floor of one item. `min` only raises that floor, so
+  // `required` with `min: 0` still needs an item rather than the other way.
+  if (field.required && !(field.min && field.min > 0)) {
+    schema = schema.min(1, `${labelOf(field)} needs at least 1 item`);
   }
 
   return z.preprocess((value) => value ?? [], schema);
