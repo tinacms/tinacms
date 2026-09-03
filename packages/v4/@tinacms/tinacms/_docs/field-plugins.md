@@ -120,7 +120,10 @@ The properties of the descriptor:
   `isEqual(a, b, node, context) => boolean`. The form calls it instead of
   structural equality when it decides whether a field's value changed
   (`core/form/compare.ts`). The `rich-text` field uses it to treat two AST
-  values as equal when they serialize to the same markdown source.
+  values as equal when they serialize to the same markdown source. The form
+  applies `isEqual` to a top-level field only. A field nested in a compound
+  field falls back to structural equality, because the form compares a
+  compound field's value as one unit.
 - `validateChildren(value, node, address, registry)` — An optional function
   for a compound field. It returns a flat map of nested address to messages.
   `address` is this field's own current address — not always `node.name`, since
@@ -280,9 +283,12 @@ need three extra pieces. Each one has a plain, ordinary counterpart; refer to
   needing to place it there.
 
 This makes every ordinary field an item field for free — an `array`'s `fields`
-accepts any registered type, unmodified. The converse is not automatic: a new
-field type is not confirmed to work as an item field until you put one inside
-an `array` and render it nested. Refer to
+accepts any registered type, unmodified. One descriptor hook does not cross the
+boundary: `isEqual` runs for a top-level field only. A nested `rich-text` item
+uses structural equality for dirty tracking, not its source-level check, so
+editor-only changes to its tree read as an edit. The converse is not automatic:
+a new field type is not confirmed to work as an item field until you put one
+inside an `array` and render it nested. Refer to
 [Write a new field plugin, step 5](#write-a-new-field-plugin). Two compound
 fields nest for free too, as long as each one's `validateChildren` calls
 `validateFieldTree` with its own current `address` rather than `node.name` —
