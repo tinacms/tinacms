@@ -247,8 +247,8 @@ export function FormProvider({
         }
         const flat = flattenFieldErrors(errors ?? {});
         const mirrored: FieldErrors = {};
-        for (const [field, messages] of Object.entries(flat)) {
-          mirrored[toFieldAddress(field)] = messages;
+        for (const [address, messages] of Object.entries(flat)) {
+          mirrored[toFieldAddress(address)] = messages;
         }
         store.setFieldErrors(formId, mirrored);
       },
