@@ -1,6 +1,7 @@
 import {
   createResolver,
   resolveFieldData,
+  transformDocumentIntoPayload,
   updateObjectWithJsonPath,
 } from './index';
 import { describe, expect, it, vi } from 'vitest';
@@ -1898,6 +1899,53 @@ describe('index', () => {
       expect(resolver.resolveLegacyValues(oldDoc, collection)).toEqual({
         _publishedAt: '2024-01-01',
       });
+    });
+  });
+
+  describe('transformDocumentIntoPayload()', () => {
+    const collection = {
+      name: 'docs',
+      path: 'content/docs',
+      format: 'mdx',
+      namespace: ['docs'],
+      fields: [],
+    } as any;
+    const tinaSchema = {
+      getCollection: () => collection,
+      getTemplateForData: () => ({ namespace: ['docs'], fields: [] }),
+    } as any;
+    const rawData = { _collection: 'docs', _template: 'docs' } as any;
+    const windowsPath = 'content\\docs\\index.mdx';
+    const posixPath = 'content/docs/index.mdx';
+
+    it('normalizes a Windows-style path into the document identity and path metadata', async () => {
+      const payload = await transformDocumentIntoPayload(
+        windowsPath,
+        rawData,
+        tinaSchema
+      );
+
+      expect(payload.id).toBe(posixPath);
+      expect(payload._sys.path).toBe(posixPath);
+      expect(payload._sys.basename).toBe('index.mdx');
+      expect(payload._sys.filename).toBe('index');
+      expect(payload._sys.extension).toBe('.mdx');
+    });
+
+    it('gives Windows-style and POSIX-style paths the same document identity', async () => {
+      const fromWindows = await transformDocumentIntoPayload(
+        windowsPath,
+        rawData,
+        tinaSchema
+      );
+      const fromPosix = await transformDocumentIntoPayload(
+        posixPath,
+        rawData,
+        tinaSchema
+      );
+
+      expect(fromWindows.id).toBe(fromPosix.id);
+      expect(fromWindows._sys).toEqual(fromPosix._sys);
     });
   });
 });
