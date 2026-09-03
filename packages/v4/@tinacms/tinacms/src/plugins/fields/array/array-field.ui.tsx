@@ -53,10 +53,7 @@ export function ArrayField() {
   } = useFieldArray({ control, name: address });
 
   const addItem = () => {
-    const item = ingestDocument({}, field.fields, registry, {
-      documentPath,
-      registry,
-    });
+    const item = ingestDocument({}, field.fields, { documentPath, registry });
     append(item as TinaDocument);
   };
 

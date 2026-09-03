@@ -259,23 +259,17 @@ describe('ArrayField ingest and digest', () => {
   it('recurses into item fields, including one with its own parse/serialize', async () => {
     const registry = await resolveRegistry();
     const stored = { authors: [{ name: 'Ivan', age: 30 }] };
-    const ingested = ingestDocument(stored, collection.fields, registry, {
-      registry,
-    });
+    const ingested = ingestDocument(stored, collection.fields, { registry });
     expect(ingested).toEqual({ authors: [{ name: 'Ivan', age: '30' }] });
-    expect(
-      digestDocument(ingested, collection.fields, registry, { registry })
-    ).toEqual(stored);
+    expect(digestDocument(ingested, collection.fields, { registry })).toEqual(
+      stored
+    );
   });
 
   it('leaves an absent field absent (no default seeding)', async () => {
     const registry = await resolveRegistry();
-    expect(
-      ingestDocument({}, collection.fields, registry, { registry })
-    ).toEqual({});
-    expect(
-      digestDocument({}, collection.fields, registry, { registry })
-    ).toEqual({});
+    expect(ingestDocument({}, collection.fields, { registry })).toEqual({});
+    expect(digestDocument({}, collection.fields, { registry })).toEqual({});
   });
 });
 

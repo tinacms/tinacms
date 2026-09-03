@@ -160,13 +160,12 @@ export function FormProvider({
     [path, registry]
   );
   const ingested = useMemo(
-    () =>
-      ingestDocument(document, collection.fields, registry, transformContext),
-    [document, collection, registry, transformContext]
+    () => ingestDocument(document, collection.fields, transformContext),
+    [document, collection, transformContext]
   );
   const equal = useMemo(
-    () => fieldEqualityFor(collection.fields, registry, transformContext),
-    [collection, registry, transformContext]
+    () => fieldEqualityFor(collection.fields, transformContext),
+    [collection, transformContext]
   );
   // What a fresh form instance adopts from the store. It samples the store one time,
   // because RHF replaces its full error state each time the `errors` option changes

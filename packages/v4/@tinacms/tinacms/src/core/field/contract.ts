@@ -12,9 +12,9 @@ export interface FieldMetadata {
 
 export interface FieldTransformContext {
   documentPath?: string;
-  // The form provider and the save path set this. A compound field uses it
-  // to parse, serialize, and validate its item fields.
-  registry?: FieldRegistry;
+  // A compound field reads this to parse, serialize, and validate its item
+  // fields.
+  registry: FieldRegistry;
 }
 
 export interface FieldDescriptor<TValue = unknown, TStored = unknown> {

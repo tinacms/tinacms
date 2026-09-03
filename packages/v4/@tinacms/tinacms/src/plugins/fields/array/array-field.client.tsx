@@ -1,20 +1,9 @@
 import { defineClientPlugin } from '../../../client';
-import type { FieldTransformContext } from '../../../core/field/contract';
 import { digestDocument, ingestDocument } from '../../../core/form/ingest';
-import { invariant } from '../../../core/invariant';
 import type { TinaDocument } from '../../../core/schema/types';
 import { validateFieldTree } from '../../../core/validation';
 import { type ArrayFieldSchema, arraySchema } from './array-field.schema';
 import { ArrayField } from './array-field.ui';
-
-const requireRegistry = (context: FieldTransformContext) => {
-  invariant(
-    context.registry,
-    'array-field-no-registry',
-    'The array field requires a registry in its transform context.'
-  );
-  return context.registry;
-};
 
 export default defineClientPlugin({
   field: {
@@ -23,18 +12,14 @@ export default defineClientPlugin({
     schema: arraySchema,
     parse: (stored: unknown, node, context) => {
       const field = node as ArrayFieldSchema;
-      const registry = requireRegistry(context);
       const items = Array.isArray(stored) ? stored : [];
       return items.map((item) =>
-        ingestDocument(item as TinaDocument, field.fields, registry, context)
+        ingestDocument(item as TinaDocument, field.fields, context)
       );
     },
     serialize: (value: TinaDocument[], node, context) => {
       const field = node as ArrayFieldSchema;
-      const registry = requireRegistry(context);
-      return value.map((item) =>
-        digestDocument(item, field.fields, registry, context)
-      );
+      return value.map((item) => digestDocument(item, field.fields, context));
     },
     validateChildren: (value: TinaDocument[], node, address, registry) => {
       const field = node as ArrayFieldSchema;

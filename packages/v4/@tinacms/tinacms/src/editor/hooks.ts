@@ -111,7 +111,7 @@ export function useFormSave(): () => Promise<void> {
   return useCallback(async () => {
     const { formId, path, collection, onSave } = scope;
     const values = getValues();
-    const digested = digestDocument(values, collection.fields, registry, {
+    const digested = digestDocument(values, collection.fields, {
       documentPath: path,
       registry,
     });
