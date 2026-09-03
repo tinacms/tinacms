@@ -13,6 +13,7 @@ export const sampleDocument = {
       name: 'Author Name',
     },
   ],
+  status: 'draft',
   body: {
     type: 'root',
     children: [

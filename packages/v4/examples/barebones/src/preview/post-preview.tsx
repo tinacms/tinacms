@@ -43,6 +43,9 @@ export function PostPreview() {
           ? 'This preview renders the document streamed from the editor. Click the title or the badge to focus its field in the sidebar.'
           : 'Standalone preview — rendering the static document.'}
       </p>
+      <p>
+        Status: <span {...tinaField('status')}>{post.status}</span>
+      </p>
       <div {...tinaField('body')}>
         <TinaMarkdown content={post.body} />
       </div>

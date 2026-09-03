@@ -45,6 +45,9 @@ v4 supplies four more examples:
   of item fields. Its items reuse the ordinary field contract through
   `<FieldNode>` and `validateField` — see
   [Compound fields](#compound-fields) below.
+- The `select` field ([`select-field.md`](./select-field.md)) picks one value
+  from a fixed `options` list. Its Zod validator is a `z.enum` with a custom
+  `errorMap`, and it has no `defaultValue`, `parse`, or `serialize`.
 - The `rich-text` field ([`rich-text-field.md`](./rich-text-field.md)) uses the
   `block` layout. With `isBody`, it controls the markdown body of the file.
 

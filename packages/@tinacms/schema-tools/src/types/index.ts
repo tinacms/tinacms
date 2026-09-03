@@ -271,6 +271,125 @@ export type DateTimeField = (
     type: 'datetime';
   };
 
+/**
+ * File extensions the media manager can filter on. Not a list of what may be
+ * uploaded — that is `media.accept` — but the vocabulary a field or filter
+ * uses to narrow what is shown.
+ */
+export const MEDIA_EXTENSIONS = [
+  'jpg',
+  'jpeg',
+  'png',
+  'gif',
+  'webp',
+  'svg',
+  'avif',
+  'ico',
+  'mp4',
+  'webm',
+  'mov',
+  'mp3',
+  'wav',
+  'ogg',
+  'pdf',
+  'json',
+  'csv',
+  'txt',
+] as const;
+
+export type MediaExtension = (typeof MEDIA_EXTENSIONS)[number];
+
+export const MEDIA_CATEGORIES = {
+  image: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'avif', 'ico'],
+  video: ['mp4', 'webm', 'mov'],
+  audio: ['mp3', 'wav', 'ogg'],
+  document: ['pdf', 'json', 'csv', 'txt'],
+} as const satisfies Record<string, readonly MediaExtension[]>;
+
+export type MediaCategory = keyof typeof MEDIA_CATEGORIES;
+
+export type MediaAccept = MediaExtension | MediaCategory;
+
+/**
+ * Extensions naming the same format. Declaring one accepts the other, so
+ * `accept: 'jpeg'` does not reject `photo.jpg`.
+ */
+const MEDIA_EXTENSION_ALIASES: Partial<
+  Record<MediaExtension, readonly MediaExtension[]>
+> = {
+  jpg: ['jpeg'],
+  jpeg: ['jpg'],
+};
+
+/**
+ * The MIME type each extension belongs to. Needed because react-dropzone
+ * keys its `accept` by MIME type and drops bare extensions from the native
+ * file picker.
+ */
+export const MEDIA_MIME_TYPES = {
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  gif: 'image/gif',
+  webp: 'image/webp',
+  svg: 'image/svg+xml',
+  avif: 'image/avif',
+  ico: 'image/x-icon',
+  mp4: 'video/mp4',
+  webm: 'video/webm',
+  mov: 'video/quicktime',
+  mp3: 'audio/mpeg',
+  wav: 'audio/wav',
+  ogg: 'audio/ogg',
+  pdf: 'application/pdf',
+  json: 'application/json',
+  csv: 'text/csv',
+  txt: 'text/plain',
+} as const satisfies Record<MediaExtension, string>;
+
+/**
+ * Lowercased extension without the dot, from a filename, path or URL.
+ * Query strings and hashes are dropped first, so a transformed asset URL
+ * like `hero.png?fit=crop` still reads as `png`. Dotfiles and extensionless
+ * names return ''.
+ */
+export const extensionOf = (value: string): string => {
+  const path = value.split(/[?#]/)[0];
+  const dot = path.lastIndexOf('.');
+  const slash = path.lastIndexOf('/');
+  return dot > slash + 1 ? path.slice(dot + 1).toLowerCase() : '';
+};
+
+/**
+ * Flattens a field's `accept` into concrete extensions, expanding any
+ * category shorthand and pulling in aliases. Unknown values are dropped
+ * rather than passed through, so a typo narrows to nothing visible instead
+ * of silently disabling the filter.
+ */
+export const resolveMediaAccept = (
+  accept: MediaAccept | MediaAccept[] | undefined
+): MediaExtension[] => {
+  if (!accept) return [];
+  const requested = Array.isArray(accept) ? accept : [accept];
+  const resolved = new Set<MediaExtension>();
+  const add = (ext: MediaExtension) => {
+    resolved.add(ext);
+    for (const alias of MEDIA_EXTENSION_ALIASES[ext] ?? []) {
+      resolved.add(alias);
+    }
+  };
+  for (const entry of requested) {
+    if (entry in MEDIA_CATEGORIES) {
+      for (const ext of MEDIA_CATEGORIES[entry as MediaCategory]) {
+        add(ext);
+      }
+    } else if ((MEDIA_EXTENSIONS as readonly string[]).includes(entry)) {
+      add(entry as MediaExtension);
+    }
+  }
+  return [...resolved];
+};
+
 export type ImageField = (
   | FieldGeneric<string, undefined>
   | FieldGeneric<string, true>
@@ -288,6 +407,19 @@ export type ImageField = (
      * ```
      */
     uploadDir?: (formValues: Record<string, any>) => string;
+    /**
+     * Restricts this field to specific file types. Narrows what the media
+     * manager offers when browsing and what the field will accept on upload,
+     * overriding the global `media.accept`.
+     *
+     * @example
+     * ```ts
+     * accept: 'pdf'
+     * accept: ['png', 'svg']
+     * accept: 'image'
+     * ```
+     */
+    accept?: MediaAccept | MediaAccept[];
   };
 
 type ReferenceFieldOptions = {
@@ -630,7 +762,19 @@ export interface AuthProvider {
    **/
   authenticate: (props?: Record<string, any>) => Promise<any | null>;
   fetchWithToken: (input: RequestInfo, init?: RequestInit) => Promise<Response>;
+  /**
+   * Turns a tokened 401 into the CMS sending the user back to login. The
+   * Tina client assigns this automatically; providers extending
+   * AbstractAuthProvider get the invocation for free, while a provider that
+   * implements its own fetchWithToken must invoke it itself.
+   */
+  sessionExpiredListener?: () => void;
   isAuthorized: (context?: any) => Promise<boolean>;
+  /**
+   * May reject when the identity backend is unreachable (a transport
+   * failure is not an auth answer); callers should catch and treat that as
+   * an error rather than as logged-out.
+   */
   isAuthenticated: () => Promise<boolean>;
   getLoginStrategy: () => LoginStrategy;
   getLoginScreen: () => FC<LoginScreenProps> | null;
