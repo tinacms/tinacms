@@ -10,15 +10,15 @@ export const buildFormResolver =
     registry: FieldRegistry
   ): Resolver<TinaDocument> =>
   (values) => {
-    const flat: Record<string, string[]> = {};
+    const flatErrors: Record<string, string[]> = {};
     for (const node of collection.fields) {
       const descriptor = registry.get(node.type);
       const value = values[node.name];
       Object.assign(
-        flat,
+        flatErrors,
         validateFieldTree(node, descriptor, value, node.name, registry)
       );
     }
-    if (Object.keys(flat).length === 0) return { values, errors: {} };
-    return { values: {}, errors: nestFieldErrors(flat) };
+    if (Object.keys(flatErrors).length === 0) return { values, errors: {} };
+    return { values: {}, errors: nestFieldErrors(flatErrors) };
   };
