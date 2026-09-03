@@ -20,12 +20,6 @@
             "type": "boolean"
           },
           {
-            "name": "flat-validation-test",
-            "label": "flat validation test",
-            "min": 10,
-            "type": "number"
-          },
-          {
             "name": "stars",
             "label": "Stars",
             "type": "rating"
@@ -61,7 +55,6 @@
   "primitives": {
     "array": 1,
     "boolean": 1,
-    "number": 1,
     "rating": 1,
     "rich-text": 1,
     "string": 1

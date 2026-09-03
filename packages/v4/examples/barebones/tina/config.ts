@@ -19,11 +19,6 @@ export const postCollection = {
   fields: [
     t.string({ name: 'title', label: 'Title', required: true }),
     t.boolean({ name: 'featured', label: 'Featured' }),
-    t.number({
-      name: 'flat-validation-test',
-      label: 'flat validation test',
-      min: 10,
-    }),
     // The custom field of this project. tina/rating-field.tsx is the whole plugin.
     rating({ name: 'stars', label: 'Stars' }),
     t.richText({ name: 'body', label: 'Body', isBody: true }),
