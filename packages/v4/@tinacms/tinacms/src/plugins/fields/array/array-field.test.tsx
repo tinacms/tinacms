@@ -350,6 +350,22 @@ describe('ArrayField ingest and digest', () => {
     expect(ingestDocument({}, collection.fields, { registry })).toEqual({});
     expect(digestDocument({}, collection.fields, { registry })).toEqual({});
   });
+
+  it('reads null as an empty list', async () => {
+    const registry = await resolveRegistry();
+    expect(
+      ingestDocument({ authors: null }, collection.fields, { registry })
+    ).toEqual({ authors: [] });
+  });
+
+  it('refuses stored content that is not an array of objects', async () => {
+    const registry = await resolveRegistry();
+    for (const bad of ['oops', 42, { name: 'Ivan' }, ['Ivan'], [null]]) {
+      expect(() =>
+        ingestDocument({ authors: bad }, collection.fields, { registry })
+      ).toThrow(/expected an array of objects/);
+    }
+  });
 });
 
 describe('asArrayFieldSchema', () => {
