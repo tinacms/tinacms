@@ -13,7 +13,7 @@ import {
   useFieldRegistry,
   useFieldSchema,
 } from '../../../editor';
-import type { ArrayFieldSchema } from './array-field.schema';
+import { asArrayFieldSchema } from './array-field.schema';
 
 function ItemFieldRow({
   address,
@@ -40,7 +40,7 @@ function ItemFieldRow({
 
 export function ArrayField() {
   const address = useFieldAddress();
-  const field = useFieldSchema<ArrayFieldSchema>();
+  const field = asArrayFieldSchema(useFieldSchema());
   const errors = useFieldErrors(address);
   const registry = useFieldRegistry();
   const documentPath = useDocumentPath();

@@ -2,7 +2,7 @@ import { defineClientPlugin } from '../../../client';
 import { digestDocument, ingestDocument } from '../../../core/form/ingest';
 import type { TinaDocument } from '../../../core/schema/types';
 import { validateFieldTree } from '../../../core/validation';
-import { type ArrayFieldSchema, arraySchema } from './array-field.schema';
+import { arraySchema, asArrayFieldSchema } from './array-field.schema';
 import { ArrayField } from './array-field.ui';
 
 export default defineClientPlugin({
@@ -11,18 +11,18 @@ export default defineClientPlugin({
     metadata: { layout: 'block', labelable: false },
     schema: arraySchema,
     parse: (stored: unknown, node, context) => {
-      const field = node as ArrayFieldSchema;
+      const field = asArrayFieldSchema(node);
       const items = Array.isArray(stored) ? stored : [];
       return items.map((item) =>
         ingestDocument(item as TinaDocument, field.fields, context)
       );
     },
     serialize: (value: TinaDocument[], node, context) => {
-      const field = node as ArrayFieldSchema;
+      const field = asArrayFieldSchema(node);
       return value.map((item) => digestDocument(item, field.fields, context));
     },
     validateChildren: (value: TinaDocument[], node, address, registry) => {
-      const field = node as ArrayFieldSchema;
+      const field = asArrayFieldSchema(node);
       const items = Array.isArray(value) ? value : [];
       const errors: Record<string, string[]> = {};
       items.forEach((item, index) => {

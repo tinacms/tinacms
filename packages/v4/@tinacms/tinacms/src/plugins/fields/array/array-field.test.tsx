@@ -10,6 +10,7 @@ import {
 import { digestDocument, ingestDocument } from '../../../core/form/ingest';
 import type {
   CollectionSchema,
+  FieldSchema,
   TinaDocument,
 } from '../../../core/schema/types';
 import { validateField } from '../../../core/validation';
@@ -20,6 +21,7 @@ import { LabelledFields } from '../../../test/labelled-fields';
 import numberFieldPlugin from '../number/number-field.plugin';
 import stringFieldPlugin from '../string/string-field.plugin';
 import arrayFieldPlugin from './array-field.plugin';
+import { asArrayFieldSchema } from './array-field.schema';
 
 const NO_COLLECTIONS = { collections: [] };
 const DOCUMENT_PATH = 'content/posts/featured.mdx';
@@ -270,6 +272,22 @@ describe('ArrayField ingest and digest', () => {
     const registry = await resolveRegistry();
     expect(ingestDocument({}, collection.fields, { registry })).toEqual({});
     expect(digestDocument({}, collection.fields, { registry })).toEqual({});
+  });
+});
+
+describe('asArrayFieldSchema', () => {
+  it('throws on an array node with no fields rather than passing it through', () => {
+    const node = { name: 'authors', type: 'array' } as FieldSchema;
+    expect(() => asArrayFieldSchema(node)).toThrow(/needs a "fields" array/);
+  });
+
+  it('returns the narrowed node when fields is present', () => {
+    const node = {
+      name: 'authors',
+      type: 'array',
+      fields: [],
+    } as FieldSchema;
+    expect(asArrayFieldSchema(node).fields).toEqual([]);
   });
 });
 
