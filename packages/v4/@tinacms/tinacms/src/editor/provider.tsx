@@ -245,8 +245,7 @@ export function FormProvider({
             values[topLevel]
           );
         }
-        const flat: Record<string, string[]> = {};
-        flattenFieldErrors(errors ?? {}, '', flat);
+        const flat = flattenFieldErrors(errors ?? {});
         const mirrored: FieldErrors = {};
         for (const [field, messages] of Object.entries(flat)) {
           mirrored[toFieldAddress(field)] = messages;

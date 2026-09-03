@@ -53,9 +53,9 @@ export const collectFieldErrorMessages = (node: unknown): string[] => {
 // down from each prefix.
 export const flattenFieldErrors = (
   node: unknown,
-  prefix: string,
-  out: Record<string, string[]>
-): void => {
+  prefix = '',
+  out: Record<string, string[]> = {}
+): Record<string, string[]> => {
   if (prefix) {
     const messages = collectFieldErrorMessages(node);
     if (messages.length > 0) out[prefix] = messages;
@@ -66,6 +66,7 @@ export const flattenFieldErrors = (
       flattenFieldErrors(child, prefix ? `${prefix}.${key}` : key, out);
     }
   }
+  return out;
 };
 
 // The inverse of `flattenFieldErrors`. `set` on a single-segment path is a
