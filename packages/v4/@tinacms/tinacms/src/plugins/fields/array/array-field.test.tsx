@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../../../config';
 import { toFieldAddress } from '../../../core/field/address';
 import {
@@ -14,7 +14,13 @@ import type {
   TinaDocument,
 } from '../../../core/schema/types';
 import { validateField } from '../../../core/validation';
-import { FormProvider, TinaProvider } from '../../../editor';
+import {
+  FormProvider,
+  TinaProvider,
+  useFormId,
+  useFormSave,
+  useFormStatus,
+} from '../../../editor';
 import { formStatus, toFormId, useFormStore } from '../../../form/form-store';
 import { t } from '../../../index';
 import { LabelledFields } from '../../../test/labelled-fields';
@@ -88,6 +94,19 @@ const renderField = (document?: TinaDocument) =>
       </FormProvider>
     </TinaProvider>
   );
+
+function SaveProbe() {
+  const save = useFormSave();
+  const currentStatus = useFormStatus(useFormId());
+  return (
+    <div>
+      <button type='button' onClick={() => save().catch(() => {})}>
+        save
+      </button>
+      <span data-testid='form-status'>{currentStatus}</span>
+    </div>
+  );
+}
 
 describe('ArrayField rendering', () => {
   it("renders each item's own fields with their own labels and values", async () => {
@@ -178,6 +197,48 @@ describe('ArrayField value updates', () => {
     await userEvent.clear(name);
     await userEvent.type(name, 'Brook');
     expect(valueOf('authors')).toEqual([{ name: 'Brook' }]);
+  });
+
+  it('goes dirty again when an item field is edited after a save', async () => {
+    const onSave = vi.fn();
+    const oneArray: CollectionSchema = {
+      name: 'post',
+      format: 'mdx',
+      fields: [
+        t.array({
+          name: 'authors',
+          label: 'Authors',
+          fields: [t.string({ name: 'name', label: 'Name' })],
+        }),
+      ],
+    };
+    render(
+      <TinaProvider
+        config={asResolvedConfig({ plugins: PLUGINS, schema: NO_COLLECTIONS })}
+      >
+        <FormProvider
+          collection={oneArray}
+          path={DOCUMENT_PATH}
+          document={{ authors: [{ name: 'Ivan' }] }}
+          onSave={onSave}
+        >
+          <LabelledFields />
+          <SaveProbe />
+        </FormProvider>
+      </TinaProvider>
+    );
+
+    const name = await screen.findByLabelText('Name');
+
+    await userEvent.type(name, 'a');
+    expect(screen.getByTestId('form-status')).toHaveTextContent('dirty');
+
+    await userEvent.click(screen.getByText('save'));
+    expect(onSave).toHaveBeenCalledWith({ authors: [{ name: 'Ivana' }] });
+    expect(await screen.findByTestId('form-status')).toHaveTextContent('clean');
+
+    await userEvent.type(name, 'b');
+    expect(screen.getByTestId('form-status')).toHaveTextContent('dirty');
   });
 });
 
