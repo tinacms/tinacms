@@ -961,6 +961,22 @@ export interface Config<
    */
   server?: {
     /**
+     * URL the *browser* uses to reach the Tina dev server when using `tinacms dev`
+     * from a non-localhost environment such as GitHub Codespaces, Gitpod, Docker,
+     * or a custom local domain. Must be an absolute URL including the protocol;
+     * any path is ignored (use `build.basePath` to serve the admin under a subpath).
+     *
+     * This moves the admin's asset URLs and its GraphQL URL, and allows the host
+     * through Vite's DNS-rebinding check. The URL baked into your generated client
+     * stays on localhost so your own server-side rendering can still reach it.
+     *
+     * @example
+     * ```ts
+     * server: { url: 'https://mycontainer.test' }
+     * ```
+     */
+    url?: string;
+    /**
      * Origins allowed to make cross-origin requests to the dev server.
      * Defaults to localhost / 127.0.0.1 / [::1] only. Each entry can be a string,
      * RegExp, or `'private'` (expands to RFC 1918 private-network IPs).
