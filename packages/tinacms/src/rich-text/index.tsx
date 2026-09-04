@@ -398,18 +398,23 @@ const Node = ({ components, child }) => {
               : child.props?.tableRows) || [];
           const header = child.props?.tableRows?.at(0);
           const TableComponent =
-            components['table'] || ((props) => <table {...props} />);
+            components['table'] ||
+            (({ children }) => <table>{children}</table>);
           const TrComponent =
-            components['tr'] || ((props) => <tr {...props} />);
+            components['tr'] || (({ children }) => <tr>{children}</tr>);
           const ThComponent =
             components['th'] ||
-            ((props) => (
-              <th style={{ textAlign: props?.align || 'auto' }} {...props} />
+            (({ align, children }) => (
+              <th style={align ? { textAlign: align } : undefined}>
+                {children}
+              </th>
             ));
           const TdComponent =
             components['td'] ||
-            ((props) => (
-              <td style={{ textAlign: props?.align || 'auto' }} {...props} />
+            (({ align, children }) => (
+              <td style={align ? { textAlign: align } : undefined}>
+                {children}
+              </td>
             ));
           const align = child.props?.align || [];
           return (
@@ -468,22 +473,13 @@ const Node = ({ components, child }) => {
     case 'table':
       const rows = child.children || [];
       const TableComponent =
-        components['table'] ||
-        ((props) => (
-          <table style={{ border: '1px solid #EDECF3' }} {...props} />
-        ));
-      const TrComponent = components['tr'] || ((props) => <tr {...props} />);
+        components['table'] || (({ children }) => <table>{children}</table>);
+      const TrComponent =
+        components['tr'] || (({ children }) => <tr>{children}</tr>);
       const TdComponent =
         components['td'] ||
-        ((props) => (
-          <td
-            style={{
-              textAlign: props?.align || 'auto',
-              border: '1px solid #EDECF3',
-              padding: '0.25rem',
-            }}
-            {...props}
-          />
+        (({ align, children }) => (
+          <td style={align ? { textAlign: align } : undefined}>{children}</td>
         ));
       const align = child.props?.align || [];
       return (
