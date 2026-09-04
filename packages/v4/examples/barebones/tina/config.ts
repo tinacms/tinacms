@@ -22,6 +22,11 @@ export const postCollection = {
     // The custom field of this project. tina/rating-field.tsx is the whole plugin.
     rating({ name: 'stars', label: 'Stars' }),
     t.richText({ name: 'body', label: 'Body', isBody: true }),
+    t.array({
+      name: 'authors',
+      label: 'Authors',
+      fields: [t.string({ name: 'name', label: 'Name' })],
+    }),
     t.select({
       name: 'status',
       label: 'Status',

@@ -31,7 +31,7 @@ const resolveRegistry = (): Promise<FieldRegistry> =>
   resolveFieldPlugins([richTextFieldPlugin]);
 
 const ast = (markdown: string, registry: FieldRegistry): RichTextValue =>
-  ingestDocument({ body: markdown }, collection.fields, registry)
+  ingestDocument({ body: markdown }, collection.fields, { registry })
     .body as RichTextValue;
 
 describe('RichTextField ingest and digest', () => {
@@ -49,14 +49,14 @@ describe('RichTextField ingest and digest', () => {
   it('serializes the AST back to markdown', async () => {
     const registry = await resolveRegistry();
     const values = { body: ast('# Heading\n\nSome prose.\n', registry) };
-    expect(digestDocument(values, collection.fields, registry)).toEqual({
+    expect(digestDocument(values, collection.fields, { registry })).toEqual({
       body: '# Heading\n\nSome prose.\n',
     });
   });
 
   it('seeds an empty root when the field is absent', async () => {
     const registry = await resolveRegistry();
-    expect(ingestDocument({}, collection.fields, registry)).toEqual({
+    expect(ingestDocument({}, collection.fields, { registry })).toEqual({
       body: { type: 'root', children: [] },
     });
   });
@@ -69,8 +69,8 @@ describe('RichTextField round-trip through the format adapter', () => {
   it('rewrites an untouched document byte-identically', async () => {
     const registry = await resolveRegistry();
     const stored = adapter.parse(RAW, 'body');
-    const values = ingestDocument(stored, collection.fields, registry);
-    const digested = digestDocument(values, collection.fields, registry);
+    const values = ingestDocument(stored, collection.fields, { registry });
+    const digested = digestDocument(values, collection.fields, { registry });
     expect(adapter.serialize({ ...stored, ...digested }, RAW, 'body')).toBe(
       RAW
     );
@@ -79,7 +79,7 @@ describe('RichTextField round-trip through the format adapter', () => {
   it('keeps the separator when the body is edited', async () => {
     const registry = await resolveRegistry();
     const values = { body: ast('Rewritten prose.\n', registry) };
-    const digested = digestDocument(values, collection.fields, registry);
+    const digested = digestDocument(values, collection.fields, { registry });
     expect(
       adapter.serialize({ title: 'Hello World', ...digested }, RAW, 'body')
     ).toBe('---\ntitle: Hello World\n---\n\nRewritten prose.\n');
@@ -109,11 +109,9 @@ describe('RichTextField templates through the node argument', () => {
 
   it('parses a configured embed into an element carrying its props', async () => {
     const registry = await resolveRegistry();
-    const parsed = ingestDocument(
-      { body: SOURCE },
-      withTemplates.fields,
-      registry
-    ).body as RichTextValue;
+    const parsed = ingestDocument({ body: SOURCE }, withTemplates.fields, {
+      registry,
+    }).body as RichTextValue;
     expect(parsed.children[1]).toMatchObject({
       type: 'mdxJsxFlowElement',
       name: 'Callout',
@@ -123,20 +121,19 @@ describe('RichTextField templates through the node argument', () => {
 
   it('round-trips the embed back to its original source', async () => {
     const registry = await resolveRegistry();
-    const values = ingestDocument(
-      { body: SOURCE },
-      withTemplates.fields,
-      registry
-    );
-    expect(digestDocument(values, withTemplates.fields, registry)).toEqual({
+    const values = ingestDocument({ body: SOURCE }, withTemplates.fields, {
+      registry,
+    });
+    expect(digestDocument(values, withTemplates.fields, { registry })).toEqual({
       body: SOURCE,
     });
   });
 
   it('degrades the embed to raw html when templates are absent', async () => {
     const registry = await resolveRegistry();
-    const parsed = ingestDocument({ body: SOURCE }, collection.fields, registry)
-      .body as RichTextValue;
+    const parsed = ingestDocument({ body: SOURCE }, collection.fields, {
+      registry,
+    }).body as RichTextValue;
     expect(parsed.children[1]).toMatchObject({ type: 'html' });
   });
 });
@@ -146,15 +143,13 @@ describe('RichTextField unparseable markdown', () => {
 
   it('keeps the original source through a full save round-trip', async () => {
     const registry = await resolveRegistry();
-    const values = ingestDocument(
-      { body: BROKEN },
-      collection.fields,
-      registry
-    );
+    const values = ingestDocument({ body: BROKEN }, collection.fields, {
+      registry,
+    });
     expect((values.body as RichTextValue).children[0]).toMatchObject({
       type: INVALID_MARKDOWN_TYPE,
     });
-    expect(digestDocument(values, collection.fields, registry)).toEqual({
+    expect(digestDocument(values, collection.fields, { registry })).toEqual({
       body: BROKEN,
     });
   });
@@ -184,7 +179,8 @@ describe('RichTextField equality', () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('rich-text');
     if (!descriptor?.isEqual) throw new Error('no equality on the descriptor');
-    return (a: unknown, b: unknown) => descriptor.isEqual?.(a, b, bodyNode, {});
+    return (a: unknown, b: unknown) =>
+      descriptor.isEqual?.(a, b, bodyNode, { registry });
   };
 
   it('reads a normalized tree as the tree it was parsed from', async () => {
