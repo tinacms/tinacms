@@ -47,7 +47,8 @@
   },
   "peerDependencies": {
     "tinacms": "workspace:^",
-    "@tinacms/auth": "workspace:^"
+    "@tinacms/auth": "workspace:^",
+    "next": "^15.0.0"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
