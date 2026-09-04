@@ -1,5 +1,26 @@
 # tinacms-cli
 
+## 2.7.0
+
+### Minor Changes
+
+- [#7477](https://github.com/tinacms/tinacms/pull/7477) [`fd6aaaf`](https://github.com/tinacms/tinacms/commit/fd6aaaf5b85a907c0803bbd20dd1d4f972677589) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Make the image field's `accept` work on `list: true` fields, and filter by extension server-side everywhere. The list variant built each item input from a bare `{component: 'image'}`, so a gallery got no dropzone restriction and no insert guard. The local dev server now accepts an `ext` param on `/media/list`, filtering before it paginates, so the media manager's type filter no longer narrows a page after the fact. A `staticMedia` store reports no extension filtering and hides the control rather than showing one that would leave a near-empty grid.
+
+### Patch Changes
+
+- [#7476](https://github.com/tinacms/tinacms/pull/7476) [`f48009e`](https://github.com/tinacms/tinacms/commit/f48009ec6cabe28427a430b80299fe92ede5da0d) Thanks [@kulesy](https://github.com/kulesy)! - chore(tinacms-pkgs): point `repository.directory` at each package's own folder
+
+  Eight packages declared a `repository.directory` copied from whichever package they were forked from, so the "repository" link on their npm pages resolved to unrelated source. Also drops a dead `generate:schema` script from `@tinacms/metrics`, `@tinacms/cli` and `@tinacms/schema-tools` - it referenced a `scripts/generateSchema.js` that has never existed in the repo and nothing invoked it.
+
+- [#7491](https://github.com/tinacms/tinacms/pull/7491) [`9fa7a4f`](https://github.com/tinacms/tinacms/commit/9fa7a4f5d03e2d53ca2ab0604db5b7b9521ec4ca) Thanks [@kulesy](https://github.com/kulesy)! - Surface the real error from TinaCloud when the `tinacms build` schema checks fail. Previously both remote checks read the response body without looking at the HTTP status or an `errors` array, so any server-side error was reported as "The remote GraphQL schema does not exist. Check indexing for this branch." (or its Tina schema equivalent), pointing users at indexing when indexing was fine. Both checks now throw with the server's own error message, include the HTTP status code for non-2xx responses, report an unparseable response body instead of failing with a JSON syntax error, and keep the "does not exist" message only for a successful response that genuinely contains no schema. When the server reports that `DocumentFilter` or `DocumentMutation` has no fields, the error also points at a stale `tina/tina-lock.json`, since that means the indexed schema has no collections.
+
+- Updated dependencies [[`d340dab`](https://github.com/tinacms/tinacms/commit/d340dab38c0356a9aa86f1531e317924b25c68fa), [`57707bf`](https://github.com/tinacms/tinacms/commit/57707bff31b1f7512119fe3e58009126ab0f1172), [`f48009e`](https://github.com/tinacms/tinacms/commit/f48009ec6cabe28427a430b80299fe92ede5da0d), [`2264a16`](https://github.com/tinacms/tinacms/commit/2264a164bd09682ee8cca69e8af5ba324ce20b22), [`fd6aaaf`](https://github.com/tinacms/tinacms/commit/fd6aaaf5b85a907c0803bbd20dd1d4f972677589), [`fd6aaaf`](https://github.com/tinacms/tinacms/commit/fd6aaaf5b85a907c0803bbd20dd1d4f972677589), [`7c21906`](https://github.com/tinacms/tinacms/commit/7c2190666b8717eee88c68531c5fd9efdd6ced0e), [`9a7092d`](https://github.com/tinacms/tinacms/commit/9a7092db53193e0d9942a061b35860fbc00e83a1), [`d340dab`](https://github.com/tinacms/tinacms/commit/d340dab38c0356a9aa86f1531e317924b25c68fa), [`aa686c6`](https://github.com/tinacms/tinacms/commit/aa686c64932fca9775fb4a4c06840a2480e6f560), [`d340dab`](https://github.com/tinacms/tinacms/commit/d340dab38c0356a9aa86f1531e317924b25c68fa)]:
+  - @tinacms/schema-tools@2.10.0
+  - tinacms@3.13.0
+  - @tinacms/metrics@2.1.3
+  - @tinacms/graphql@2.4.11
+  - @tinacms/app@2.5.13
+
 ## 2.6.1
 
 ### Patch Changes

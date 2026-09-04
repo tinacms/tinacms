@@ -1,5 +1,15 @@
 # tina-graphql
 
+## 2.4.11
+
+### Patch Changes
+
+- [#7501](https://github.com/tinacms/tinacms/pull/7501) [`9a7092d`](https://github.com/tinacms/tinacms/commit/9a7092db53193e0d9942a061b35860fbc00e83a1) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Preserve underlying storage bridge error messages when document writes fail so actionable save errors are returned to the CMS.
+
+- Updated dependencies [[`d340dab`](https://github.com/tinacms/tinacms/commit/d340dab38c0356a9aa86f1531e317924b25c68fa), [`d0593a3`](https://github.com/tinacms/tinacms/commit/d0593a37a42c9f393bbafea252cf0c1fd6a2f03a), [`dbd9234`](https://github.com/tinacms/tinacms/commit/dbd9234de2c8976e986faaeefd161e3f42520200), [`f48009e`](https://github.com/tinacms/tinacms/commit/f48009ec6cabe28427a430b80299fe92ede5da0d), [`fd6aaaf`](https://github.com/tinacms/tinacms/commit/fd6aaaf5b85a907c0803bbd20dd1d4f972677589), [`fd6aaaf`](https://github.com/tinacms/tinacms/commit/fd6aaaf5b85a907c0803bbd20dd1d4f972677589), [`16b9ca1`](https://github.com/tinacms/tinacms/commit/16b9ca173a8f26e885d8a924a6ff89f0eb062f18)]:
+  - @tinacms/schema-tools@2.10.0
+  - @tinacms/mdx@2.2.2
+
 ## 2.4.10
 
 ### Patch Changes
