@@ -27,8 +27,8 @@
   "devDependencies": {
     "@tinacms/scripts": "workspace:*",
     "happy-dom": "catalog:",
-    "vite": "^5.4.14",
-    "vitest": "^2.1.9"
+    "vite": "^6.4.3",
+    "vitest": "^3.2.6"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
