@@ -379,53 +379,60 @@ const Node = ({
           return <span>{`No component provided for ${child.name}`}</span>;
         }
       }
-    case 'table':
+    case 'table': {
       const rows = child.children || [];
+      const [headerRow, ...bodyRows] = rows;
       const TableComponent =
-        components['table'] ||
-        ((
-          props //@ts-ignore Same issue with TinaMarkdown
-        ) => <table style={{ border: '1px solid #EDECF3' }} {...props} />);
+        //@ts-ignore Same issue with TinaMarkdown
+        components['table'] || ((props) => <table {...props} />);
       const TrComponent = components['tr'] || ((props) => <tr {...props} />);
+      const ThComponent =
+        components['th'] ||
+        (({ align, ...props }) => (
+          <th style={{ textAlign: align || 'auto' }} {...props} />
+        ));
       const TdComponent =
         components['td'] ||
-        ((props) => (
-          <td
-            style={{
-              textAlign: props?.align || 'auto',
-              border: '1px solid #EDECF3',
-              padding: '0.25rem',
-            }}
-            {...props}
-          />
+        (({ align, ...props }) => (
+          <td style={{ textAlign: align || 'auto' }} {...props} />
         ));
       const align = child.props?.align || [];
       return (
         //@ts-ignore Same issue with TinaMarkdown
         <TableComponent>
+          {headerRow && (
+            <thead>
+              <TrComponent>
+                {headerRow.children?.map((cell, i) => (
+                  <StaticTinaMarkdown
+                    key={i}
+                    components={{
+                      p: (props) => <ThComponent align={align[i]} {...props} />,
+                    }}
+                    content={cell.children}
+                  />
+                ))}
+              </TrComponent>
+            </thead>
+          )}
           <tbody>
-            {rows.map((row, i) => {
-              return (
-                <TrComponent key={i}>
-                  {row.children?.map((cell, i) => {
-                    return (
-                      <StaticTinaMarkdown
-                        key={i}
-                        components={{
-                          p: (props) => (
-                            <TdComponent align={align[i]} {...props} />
-                          ),
-                        }}
-                        content={cell.children}
-                      />
-                    );
-                  })}
-                </TrComponent>
-              );
-            })}
+            {bodyRows.map((row, i) => (
+              <TrComponent key={i}>
+                {row.children?.map((cell, i) => (
+                  <StaticTinaMarkdown
+                    key={i}
+                    components={{
+                      p: (props) => <TdComponent align={align[i]} {...props} />,
+                    }}
+                    content={cell.children}
+                  />
+                ))}
+              </TrComponent>
+            ))}
           </tbody>
         </TableComponent>
       );
+    }
     case 'maybe_mdx':
       /**
        * We don't want to render this as it's only displayed while editing an mdx node and should
