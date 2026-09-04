@@ -18,7 +18,11 @@ import type {
   TinaField,
   TinaSchema,
 } from '@tinacms/schema-tools';
-import { ERR_ALREADY_EXISTS, RELATIVE_PATH_REGEX } from '@tinacms/schema-tools';
+import {
+  ERR_ALREADY_EXISTS,
+  RELATIVE_PATH_REGEX,
+  normalizePath,
+} from '@tinacms/schema-tools';
 
 import type { GraphQLConfig } from '../types';
 
@@ -199,6 +203,7 @@ export const transformDocumentIntoPayload = async (
   hasReferences?: boolean
 ) => {
   const collection = tinaSchema.getCollection(rawData._collection);
+  const normalizedPath = normalizePath(fullPath);
   try {
     const template = tinaSchema.getTemplateForData({
       data: rawData,
@@ -209,10 +214,9 @@ export const transformDocumentIntoPayload = async (
       base: basename,
       ext: extension,
       name: filename,
-    } = path.parse(fullPath);
+    } = path.parse(normalizedPath);
 
-    const relativePath = fullPath
-      .replace(/\\/g, '/')
+    const relativePath = normalizedPath
       .replace(collection.path, '')
       .replace(/^\/|\/$/g, '');
 
@@ -255,7 +259,7 @@ export const transformDocumentIntoPayload = async (
       __typename: collection.fields
         ? NAMER.documentTypeName(collection.namespace)
         : NAMER.documentTypeName(template.namespace),
-      id: fullPath,
+      id: normalizedPath,
       ...data,
       _sys: {
         title: title || '',
@@ -263,7 +267,7 @@ export const transformDocumentIntoPayload = async (
         filename,
         extension,
         hasReferences,
-        path: fullPath,
+        path: normalizedPath,
         relativePath,
         breadcrumbs,
         collection,
