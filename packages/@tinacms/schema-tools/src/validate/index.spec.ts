@@ -345,6 +345,23 @@ const schemaWithEmptyTemplates: Schema = {
     },
   ],
 };
+
+const schemaWithTemplateWithEmptyFields: Schema = {
+  collections: [
+    {
+      name: 'foo',
+      label: 'Foo',
+      path: '/foo',
+      templates: [
+        {
+          name: 'bar',
+          label: 'Bar',
+          fields: [],
+        },
+      ],
+    },
+  ],
+};
 const schemaWithInvalidFiledNesterUnderRichText = {
   collections: [
     {
@@ -466,6 +483,11 @@ describe('validateSchema', () => {
     expect(() => {
       validateSchema({ schema: schemaWithEmptyTemplates });
     }).toThrow();
+  });
+  it('fails when a template has empty fields', () => {
+    expect(() => {
+      validateSchema({ schema: schemaWithTemplateWithEmptyFields });
+    }).toThrow('Property `fields` cannot be empty.');
   });
   it('fails when a deeply nested field under a template is invalid', () => {
     expect(() => {
