@@ -25,7 +25,7 @@
         "react-dom": ">=18.3.1 <20.0.0"
     },
     "devDependencies": {
-        "@babel/core": "^7.28.5",
+        "@babel/core": "^8.0.0",
         "@babel/preset-env": "^7.28.5",
         "@tinacms/scripts": "workspace:*",
         "@types/clear": "catalog:",
