@@ -1,5 +1,15 @@
 # @tinacms/app
 
+## 2.5.13
+
+### Patch Changes
+
+- [#7486](https://github.com/tinacms/tinacms/pull/7486) [`d340dab`](https://github.com/tinacms/tinacms/commit/d340dab38c0356a9aa86f1531e317924b25c68fa) Thanks [@kulesy](https://github.com/kulesy)! - Session expiry during a visual-editing save no longer paints the generic "There was a problem saving your document" dialog over the login modal; the save handler now lets `SessionExpiredError` pass through like the admin's other save paths.
+
+- Updated dependencies [[`d0593a3`](https://github.com/tinacms/tinacms/commit/d0593a37a42c9f393bbafea252cf0c1fd6a2f03a), [`dbd9234`](https://github.com/tinacms/tinacms/commit/dbd9234de2c8976e986faaeefd161e3f42520200), [`57707bf`](https://github.com/tinacms/tinacms/commit/57707bff31b1f7512119fe3e58009126ab0f1172), [`f48009e`](https://github.com/tinacms/tinacms/commit/f48009ec6cabe28427a430b80299fe92ede5da0d), [`2264a16`](https://github.com/tinacms/tinacms/commit/2264a164bd09682ee8cca69e8af5ba324ce20b22), [`fd6aaaf`](https://github.com/tinacms/tinacms/commit/fd6aaaf5b85a907c0803bbd20dd1d4f972677589), [`fd6aaaf`](https://github.com/tinacms/tinacms/commit/fd6aaaf5b85a907c0803bbd20dd1d4f972677589), [`7c21906`](https://github.com/tinacms/tinacms/commit/7c2190666b8717eee88c68531c5fd9efdd6ced0e), [`d340dab`](https://github.com/tinacms/tinacms/commit/d340dab38c0356a9aa86f1531e317924b25c68fa), [`aa686c6`](https://github.com/tinacms/tinacms/commit/aa686c64932fca9775fb4a4c06840a2480e6f560), [`16b9ca1`](https://github.com/tinacms/tinacms/commit/16b9ca173a8f26e885d8a924a6ff89f0eb062f18)]:
+  - @tinacms/mdx@2.2.2
+  - tinacms@3.13.0
+
 ## 2.5.12
 
 ### Patch Changes
