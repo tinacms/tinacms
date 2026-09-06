@@ -31,6 +31,18 @@
             "type": "rich-text"
           },
           {
+            "name": "authors",
+            "label": "Authors",
+            "fields": [
+              {
+                "name": "name",
+                "label": "Name",
+                "type": "string"
+              }
+            ],
+            "type": "array"
+		  },
+		  {
             "name": "status",
             "label": "Status",
             "options": [
@@ -56,6 +68,7 @@
     }
   },
   "primitives": {
+    "array": 1,
     "boolean": 1,
     "rating": 1,
     "rich-text": 1,

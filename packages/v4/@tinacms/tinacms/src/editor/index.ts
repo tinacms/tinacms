@@ -11,7 +11,12 @@ export {
   useIsFormDirty,
 } from '../form/form-store';
 export type { SaveHandler } from './context';
-export { Field, type FieldProps } from './field';
+export {
+  Field,
+  FieldNode,
+  type FieldNodeProps,
+  type FieldProps,
+} from './field';
 export {
   FormProvider,
   type FormProviderProps,

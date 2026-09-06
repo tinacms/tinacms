@@ -23,7 +23,7 @@ const codecsByFormat: Partial<Record<CollectionFormat, RichTextCodec>> = {
 
 export const codecFor = (
   node: FieldSchema,
-  context: FieldTransformContext = {}
+  context: Pick<FieldTransformContext, 'documentPath'> = {}
 ): RichTextCodec => {
   const declared = isRichTextFieldSchema(node) ? node.codec : undefined;
   if (declared) return declared;
@@ -61,7 +61,7 @@ export const writesSameSource = (
   a: unknown,
   b: unknown,
   node: FieldSchema,
-  context: FieldTransformContext
+  context: Pick<FieldTransformContext, 'documentPath'>
 ): boolean => {
   if (a === b) return true;
   if (!isRichTextValue(a) || !isRichTextValue(b)) return false;

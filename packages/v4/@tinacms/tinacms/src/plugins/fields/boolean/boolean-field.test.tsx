@@ -120,21 +120,21 @@ describe('BooleanField ingest and digest', () => {
   it('round-trips true and false through ingest and digest', async () => {
     const registry = await resolveRegistry();
     for (const featured of [true, false]) {
-      const ingested = ingestDocument(
-        { featured },
-        collection.fields,
-        registry
-      );
-      expect(ingested).toEqual({ featured });
-      expect(digestDocument(ingested, collection.fields, registry)).toEqual({
-        featured,
+      const ingested = ingestDocument({ featured }, collection.fields, {
+        registry,
       });
+      expect(ingested).toEqual({ featured });
+      expect(digestDocument(ingested, collection.fields, { registry })).toEqual(
+        {
+          featured,
+        }
+      );
     }
   });
 
   it('seeds the default value on ingest when the field is absent', async () => {
     const registry = await resolveRegistry();
-    expect(ingestDocument({}, collection.fields, registry)).toEqual({
+    expect(ingestDocument({}, collection.fields, { registry })).toEqual({
       featured: false,
     });
   });

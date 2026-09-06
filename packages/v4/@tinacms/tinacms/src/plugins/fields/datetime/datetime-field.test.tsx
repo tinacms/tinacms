@@ -241,15 +241,15 @@ describe('DatetimeField ingest and digest', () => {
   it('round-trips a stored string unchanged', async () => {
     const registry = await resolveRegistry();
     for (const published of ['2024-05-01T09:30:00.000Z', '2024-05-01']) {
-      const ingested = ingestDocument(
-        { published },
-        collection.fields,
-        registry
-      );
-      expect(ingested).toEqual({ published });
-      expect(digestDocument(ingested, collection.fields, registry)).toEqual({
-        published,
+      const ingested = ingestDocument({ published }, collection.fields, {
+        registry,
       });
+      expect(ingested).toEqual({ published });
+      expect(digestDocument(ingested, collection.fields, { registry })).toEqual(
+        {
+          published,
+        }
+      );
     }
   });
 
@@ -258,13 +258,13 @@ describe('DatetimeField ingest and digest', () => {
     const ingested = ingestDocument(
       { published: new Date('2024-05-01T09:30:00.000Z') },
       collection.fields,
-      registry
+      { registry }
     );
     expect(ingested).toEqual({ published: '2024-05-01T09:30:00.000Z' });
   });
 
   it('writes nothing for an absent value', async () => {
     const registry = await resolveRegistry();
-    expect(ingestDocument({}, collection.fields, registry)).toEqual({});
+    expect(ingestDocument({}, collection.fields, { registry })).toEqual({});
   });
 });

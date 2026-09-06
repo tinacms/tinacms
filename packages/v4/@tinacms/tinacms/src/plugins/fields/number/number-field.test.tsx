@@ -221,35 +221,35 @@ describe('NumberField ingest and digest', () => {
   it('round-trips numbers through parse (ingest) and serialize (digest)', async () => {
     const registry = await resolveRegistry();
     const stored = { rating: 3, count: 0, weight: -1.5 };
-    const ingested = ingestDocument(stored, collection.fields, registry);
+    const ingested = ingestDocument(stored, collection.fields, { registry });
     expect(ingested).toEqual({ rating: '3', count: '0', weight: '-1.5' });
-    expect(digestDocument(ingested, collection.fields, registry)).toEqual(
+    expect(digestDocument(ingested, collection.fields, { registry })).toEqual(
       stored
     );
   });
 
   it('leaves an absent field absent (no default seeding)', async () => {
     const registry = await resolveRegistry();
-    expect(ingestDocument({}, collection.fields, registry)).toEqual({});
-    expect(digestDocument({}, collection.fields, registry)).toEqual({});
+    expect(ingestDocument({}, collection.fields, { registry })).toEqual({});
+    expect(digestDocument({}, collection.fields, { registry })).toEqual({});
   });
 
   it('drops an empty (undefined) field on digest', async () => {
     const registry = await resolveRegistry();
     expect(
-      digestDocument({ weight: undefined }, collection.fields, registry)
+      digestDocument({ weight: undefined }, collection.fields, { registry })
     ).toEqual({});
   });
 
   it('normalises a stored null to empty rather than "null"/NaN', async () => {
     const registry = await resolveRegistry();
-    const ingested = ingestDocument(
-      { weight: null },
-      collection.fields,
-      registry
-    );
+    const ingested = ingestDocument({ weight: null }, collection.fields, {
+      registry,
+    });
     expect(ingested.weight).toBeUndefined();
-    expect(digestDocument(ingested, collection.fields, registry)).toEqual({});
+    expect(digestDocument(ingested, collection.fields, { registry })).toEqual(
+      {}
+    );
   });
 });
 

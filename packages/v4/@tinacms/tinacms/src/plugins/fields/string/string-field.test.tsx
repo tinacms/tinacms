@@ -219,20 +219,18 @@ describe('StringField schema optional', () => {
 describe('StringField ingest and digest', () => {
   it('ingests a stored value and digests it back unchanged', async () => {
     const registry = await resolveRegistry();
-    const ingested = ingestDocument(
-      { title: 'Hi there' },
-      collection.fields,
-      registry
-    );
+    const ingested = ingestDocument({ title: 'Hi there' }, collection.fields, {
+      registry,
+    });
     expect(ingested).toEqual({ title: 'Hi there' });
-    expect(digestDocument(ingested, collection.fields, registry)).toEqual({
+    expect(digestDocument(ingested, collection.fields, { registry })).toEqual({
       title: 'Hi there',
     });
   });
 
   it('seeds the default value on ingest when the field is absent', async () => {
     const registry = await resolveRegistry();
-    expect(ingestDocument({}, collection.fields, registry)).toEqual({
+    expect(ingestDocument({}, collection.fields, { registry })).toEqual({
       title: '',
     });
   });
@@ -240,9 +238,9 @@ describe('StringField ingest and digest', () => {
   it('preserves null vs absent on digest', async () => {
     const registry = await resolveRegistry();
     expect(
-      digestDocument({ title: null }, collection.fields, registry)
+      digestDocument({ title: null }, collection.fields, { registry })
     ).toEqual({ title: null });
-    expect(digestDocument({}, collection.fields, registry)).toEqual({});
+    expect(digestDocument({}, collection.fields, { registry })).toEqual({});
   });
 });
 
