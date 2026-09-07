@@ -1983,6 +1983,9 @@ importers:
       '@tinacms/bridge':
         specifier: workspace:^
         version: link:../bridge
+      '@tinacms/mdx':
+        specifier: workspace:^
+        version: link:../mdx
       dompurify:
         specifier: 'catalog:'
         version: 3.3.1
