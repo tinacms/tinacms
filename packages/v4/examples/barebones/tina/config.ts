@@ -27,6 +27,7 @@ export const postCollection = {
       label: 'Authors',
       fields: [t.string({ name: 'name', label: 'Name' })],
     }),
+    t.reference({ collections: ['page'], name: 'pages', label: 'Pages Reference' }),
     t.select({
       name: 'status',
       label: 'Status',
@@ -38,7 +39,20 @@ export const postCollection = {
   ],
 } satisfies CollectionSchema;
 
+
+export const pageCollection = {
+  name: 'page',
+  label: 'Pages',
+  path: 'content/pages',
+  format: 'mdx',
+  fields: [
+    t.string({ name: 'title', label: 'Title', required: true }),
+    t.boolean({ name: 'featured', label: 'Featured' }),
+    // The custom field of this project. tina/rating-field.tsx is the whole plugin.
+  ],
+} satisfies CollectionSchema;
+
 export default defineConfig({
   plugins: [localContentPlugin(), ratingFieldPlugin],
-  schema: { collections: [postCollection] },
+  schema: { collections: [postCollection, pageCollection] },
 });

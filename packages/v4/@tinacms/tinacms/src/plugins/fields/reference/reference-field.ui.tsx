@@ -72,6 +72,8 @@ export function ReferenceField() {
   useFieldActivation(() => triggerRef.current?.focus());
 
   const lookup = useReferenceOptions(field.collections);
+  console.log('field.collections', field.collections);
+  console.log('lookup' , lookup);
   const { options, isLoading, error } = lookup;
 
   const noneItem = { value: '', label: 'None' };
@@ -95,7 +97,7 @@ export function ReferenceField() {
           setValue(newValue === '' ? null : newValue)
         }
       >
-        <SelectTrigger ref={triggerRef} id={address} disabled={isLoading}>
+        <SelectTrigger ref={triggerRef} id={address} disabled={isLoading || !!error}>
           <SelectValue placeholder={placeholderFor(lookup)} />
         </SelectTrigger>
         <SelectContent>
