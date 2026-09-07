@@ -1,5 +1,21 @@
 # @tinacms/schema-tools
 
+## 2.10.0
+
+### Minor Changes
+
+- [#7477](https://github.com/tinacms/tinacms/pull/7477) [`fd6aaaf`](https://github.com/tinacms/tinacms/commit/fd6aaaf5b85a907c0803bbd20dd1d4f972677589) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Add `accept` to the image field, restricting which file types the field will take. It takes an extension, a category (`image`, `video`, `audio`, `document`), or an array of either. The field's own dropzone and the media picker's both refuse a file outside it, the picker narrows the library to matching files, and a selection outside it raises an alert instead of being written. `jpg` and `jpeg` are treated as the same type. Existing values are left alone.
+
+### Patch Changes
+
+- [#7486](https://github.com/tinacms/tinacms/pull/7486) [`d340dab`](https://github.com/tinacms/tinacms/commit/d340dab38c0356a9aa86f1531e317924b25c68fa) Thanks [@kulesy](https://github.com/kulesy)! - `AuthProvider` gains an optional `sessionExpiredListener`, invoked when a tokened `fetchWithToken` request comes back 401 so the CMS can return the user to login. The Tina client wires it automatically; custom auth providers can opt in.
+
+- [#7476](https://github.com/tinacms/tinacms/pull/7476) [`f48009e`](https://github.com/tinacms/tinacms/commit/f48009ec6cabe28427a430b80299fe92ede5da0d) Thanks [@kulesy](https://github.com/kulesy)! - chore(tinacms-pkgs): point `repository.directory` at each package's own folder
+
+  Eight packages declared a `repository.directory` copied from whichever package they were forked from, so the "repository" link on their npm pages resolved to unrelated source. Also drops a dead `generate:schema` script from `@tinacms/metrics`, `@tinacms/cli` and `@tinacms/schema-tools` - it referenced a `scripts/generateSchema.js` that has never existed in the repo and nothing invoked it.
+
+- [#7477](https://github.com/tinacms/tinacms/pull/7477) [`fd6aaaf`](https://github.com/tinacms/tinacms/commit/fd6aaaf5b85a907c0803bbd20dd1d4f972677589) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Make the image field's `accept` work on `list: true` fields, and filter by extension server-side everywhere. The list variant built each item input from a bare `{component: 'image'}`, so a gallery got no dropzone restriction and no insert guard. The local dev server now accepts an `ext` param on `/media/list`, filtering before it paginates, so the media manager's type filter no longer narrows a page after the fact. A `staticMedia` store reports no extension filtering and hides the control rather than showing one that would leave a near-empty grid.
+
 ## 2.9.0
 
 ### Minor Changes
