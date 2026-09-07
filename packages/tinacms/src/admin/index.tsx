@@ -180,11 +180,15 @@ const PreviewInner = ({ preview, config }) => {
   const ref = React.useRef<HTMLIFrameElement>(null);
 
   React.useEffect(() => {
-    if (offOrigin) {
-      cms.alerts.warn(
-        'This preview link points to a different site, so it was not opened.'
-      );
+    if (!offOrigin) {
+      return;
     }
+    cms.alerts.warn(
+      'This preview link points to a different site, so it was not opened.'
+    );
+    // Replace the rejected address so neither the address bar nor the back
+    // button keeps pointing at the other site.
+    navigate(`/~${paramURL}`, { replace: true });
   }, [splat, offOrigin]);
 
   React.useEffect(() => {
