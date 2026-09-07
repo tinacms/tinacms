@@ -22,10 +22,17 @@ export function resolvePreviewPath(
     if (resolved.origin !== baseOrigin) {
       return { path: '/', offOrigin: true };
     }
-    return {
-      path: `${resolved.pathname}${resolved.search}${resolved.hash}`,
-      offOrigin: false,
-    };
+    const path = `${resolved.pathname}${resolved.search}${resolved.hash}`;
+    /**
+     * The caller resolves this a second time, as an iframe src. A pathname that
+     * survives the check above can still begin with two slashes — `..//other`
+     * normalises to `//other` — which reads as protocol-relative on that second
+     * pass and would leave the origin after all. So resolve it again here.
+     */
+    if (new URL(path, baseOrigin).origin !== baseOrigin) {
+      return { path: '/', offOrigin: true };
+    }
+    return { path, offOrigin: false };
   } catch {
     return { path: '/', offOrigin: true };
   }

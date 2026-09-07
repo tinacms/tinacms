@@ -45,6 +45,13 @@ describe('resolvePreviewPath', () => {
     ['slash then backslash', '/\\other.example'],
     ['leading tab', '\t//other.example'],
     ['trailing path', '//other.example/admin'],
+    // These pass an origin check on the absolute URL, then normalise to a
+    // pathname beginning with two slashes, which leaves the origin when it is
+    // resolved a second time as an iframe src.
+    ['dot-dot then double slash', '..//other.example'],
+    ['dot-dot twice then double slash', '../..//other.example'],
+    ['segment, dot-dot, double slash', 'a/..//other.example'],
+    ['dot then double slash', './/other.example'],
   ])('rejects an off-origin value (%s)', (_label, splat) => {
     const { path, offOrigin } = resolvePreviewPath(splat, ORIGIN);
 
