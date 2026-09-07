@@ -1647,6 +1647,7 @@ describe('index', () => {
   describe('resolveDeleteDocument()', () => {
     const collection = { name: 'post', path: 'posts', format: 'md' } as any;
     const realPath = path.join('posts', 'hello.md');
+    const referenceValue = 'posts/hello.md';
 
     const setup = (overrides: { hasReferences?: boolean } = {}) => {
       const database = {
@@ -1724,8 +1725,14 @@ describe('index', () => {
       });
       resolver.getRaw = vi
         .fn()
-        .mockResolvedValueOnce({ _collection: 'post', relatedPost: realPath })
-        .mockResolvedValueOnce({ _collection: 'post', relatedPost: realPath });
+        .mockResolvedValueOnce({
+          _collection: 'post',
+          relatedPost: referenceValue,
+        })
+        .mockResolvedValueOnce({
+          _collection: 'post',
+          relatedPost: referenceValue,
+        });
 
       await resolver.resolveDeleteDocument({
         collectionName: 'post',
@@ -1755,7 +1762,7 @@ describe('index', () => {
         _collection: 'post',
         sections: [
           {
-            items: [{ author: realPath }, { author: 'authors/other.md' }],
+            items: [{ author: referenceValue }, { author: 'authors/other.md' }],
           },
         ],
       });
@@ -1805,6 +1812,44 @@ describe('index', () => {
       expect(
         await (resolverWithRefs as any).hasReferences('posts/x.md', collection)
       ).toBe(true);
+    });
+
+    it('hasReferences matches a POSIX refs-index entry given a Windows-style path', async () => {
+      const database = {
+        query: vi.fn().mockImplementation(async (queryOptions, cb) => {
+          if (queryOptions.filterChain[0].rightOperand === 'posts/hello.md') {
+            cb('posts/other.md', {});
+          }
+        }),
+      };
+      const resolver = createResolver({
+        database: database as any,
+        tinaSchema: {} as any,
+        isAudit: false,
+      });
+
+      expect(
+        await (resolver as any).hasReferences('posts\\hello.md', collection)
+      ).toBe(true);
+    });
+
+    it('findReferences matches a POSIX refs-index entry given a Windows-style path', async () => {
+      const database = {
+        query: vi.fn().mockImplementation(async (queryOptions, cb) => {
+          if (queryOptions.filterChain[0].rightOperand === 'posts/hello.md') {
+            cb('posts/other.md', { __tina_ref_path__: '$.author' });
+          }
+        }),
+      };
+      const resolver = createResolver({
+        database: database as any,
+        tinaSchema: {} as any,
+        isAudit: false,
+      });
+
+      expect(
+        await (resolver as any).findReferences('posts\\hello.md', collection)
+      ).toEqual({ post: { 'posts/other.md': ['$.author'] } });
     });
   });
 
@@ -1930,6 +1975,7 @@ describe('index', () => {
       expect(payload._sys.basename).toBe('index.mdx');
       expect(payload._sys.filename).toBe('index');
       expect(payload._sys.extension).toBe('.mdx');
+      expect(payload._sys.relativePath).toBe('index.mdx');
     });
 
     it('gives Windows-style and POSIX-style paths the same document identity', async () => {

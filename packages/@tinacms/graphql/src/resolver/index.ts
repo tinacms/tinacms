@@ -1001,7 +1001,7 @@ export class Resolver {
             const { object, updated } = updateObjectWithJsonPath(
               refDoc,
               path,
-              realPath,
+              normalizePath(realPath),
               null
             );
             refDoc = object;
@@ -1469,7 +1469,7 @@ export class Resolver {
               filterExpression: {
                 _type: 'string',
                 _list: false,
-                eq: id,
+                eq: normalizePath(id),
               },
             },
           ],
@@ -1506,7 +1506,7 @@ export class Resolver {
               filterExpression: {
                 _type: 'string',
                 _list: false,
-                eq: id,
+                eq: normalizePath(id),
               },
             },
           ],
