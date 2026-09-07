@@ -19,6 +19,15 @@ export default {
       searchable: true,
     },
     {
+      type: "reference",
+      label: "Author",
+      name: "author",
+      collections: ["author"],
+      ui: {
+        allowCreate: true,
+      },
+    },
+    {
       type: "string",
       label: "Blog Post Body",
       name: "body",
