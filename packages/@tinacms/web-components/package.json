@@ -22,10 +22,10 @@
   },
   "dependencies": {
     "@tinacms/bridge": "workspace:^",
-    "@tinacms/mdx": "workspace:^",
     "dompurify": "catalog:"
   },
   "devDependencies": {
+    "@tinacms/mdx": "workspace:*",
     "@tinacms/scripts": "workspace:*",
     "happy-dom": "catalog:",
     "vite": "^5.4.14",
