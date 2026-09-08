@@ -1,72 +1,14 @@
-import {
-  Collection,
-  TinaSchema,
-  normalizePath,
-  resolveForm,
-} from '@tinacms/schema-tools';
-import type { Template } from '@tinacms/schema-tools';
-import {
-  ERR_ALREADY_EXISTS,
-  RELATIVE_PATH_ALLOWED_CHARS_MESSAGE,
-  RELATIVE_PATH_REGEX,
-} from '@tinacms/schema-tools';
-import {
-  BillingWarning,
-  Form,
-  FormBuilder,
-  FormStatus,
-  TinaForm,
-  wrapFieldsWithMeta,
-} from '@tinacms/toolkit';
+import type { Collection } from '@tinacms/schema-tools';
+import { FormBuilder, FormStatus } from '@tinacms/toolkit';
 import type { TinaCMS } from '@tinacms/toolkit';
-import { isSessionExpiredError } from '@tinacms/toolkit';
-import { dispatchSessionExpired } from '@toolkit/core/session-expired';
 import { FormBreadcrumbs } from '@toolkit/react-sidebar/components/sidebar-body';
-import { Lock, Unlock } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { TinaAdminApi } from '../api';
-import { ErrorDialog } from '../components/ErrorDialog';
 import GetCMS from '../components/GetCMS';
 import GetCollection from '../components/GetCollection';
 import { PageWrapper } from '../components/Page';
+import { buildCreateDocumentForm } from './create-document-form';
 import { useCollectionFolder } from './utils';
-
-const createDocument = async (
-  cms: TinaCMS,
-  collection: Collection,
-  template: { name: string },
-  mutationInfo: { includeCollection: boolean; includeTemplate: boolean },
-  folder: string,
-  values: any
-) => {
-  const api = new TinaAdminApi(cms);
-  const { filename, ...leftover } = values;
-
-  if (typeof filename !== 'string') {
-    throw new Error('Filename must be a string');
-  }
-
-  // Append the folder if it exists and the filename does not start with a slash
-  const appendFolder =
-    folder && !filename.startsWith('/') ? `/${folder}/` : '/';
-  const relativePath = `${appendFolder}${filename}.${collection.format}`;
-
-  const params = api.schema.transformPayload(collection.name, {
-    _collection: collection.name,
-    ...(template && { _template: template.name }),
-    ...leftover,
-  });
-
-  if (await api.isAuthenticated()) {
-    await api.createDocument(collection, relativePath, params);
-  } else {
-    // the session is gone: send the user to the login modal, and tell the
-    // caller so it does not report success for a save that never ran
-    dispatchSessionExpired(cms.events);
-    return false;
-  }
-};
 
 const CollectionCreatePage = () => {
   const folder = useCollectionFolder();
@@ -103,44 +45,6 @@ const CollectionCreatePage = () => {
   );
 };
 
-const FilenameInput = (props) => {
-  const [filenameTouched, setFilenameTouched] = React.useState(false);
-
-  return (
-    <div
-      className='group relative block cursor-pointer'
-      onClick={() => {
-        setFilenameTouched(true);
-      }}
-    >
-      <input
-        type='text'
-        className={`shadow-inner focus:shadow-outline focus:border-blue-500 focus:outline-none block text-base pr-3 truncate py-2 w-full border transition-all ease-out duration-150 focus:text-gray-900 rounded ${
-          props.readonly || !filenameTouched
-            ? 'bg-gray-50 text-gray-300  border-gray-150 pointer-events-none pl-8 group-hover:bg-white group-hover:text-gray-600  group-hover:border-gray-200'
-            : 'bg-white text-gray-600  border-gray-200 pl-3'
-        }`}
-        {...props}
-        disabled={props.readonly || !filenameTouched}
-      />
-      <Lock
-        className={`text-gray-400 absolute top-1/2 left-2 -translate-y-1/2 pointer-events-none h-5 w-auto transition-opacity duration-150 ease-out ${
-          !filenameTouched && !props.readonly
-            ? 'opacity-20 group-hover:opacity-0 group-active:opacity-0'
-            : 'opacity-0'
-        }`}
-      />
-      <Unlock
-        className={`text-blue-500 absolute top-1/2 left-2 -translate-y-1/2 pointer-events-none h-5 w-auto transition-opacity duration-150 ease-out ${
-          !filenameTouched && !props.readonly
-            ? 'opacity-0 group-hover:opacity-80 group-active:opacity-80'
-            : 'opacity-0'
-        }`}
-      />
-    </div>
-  );
-};
-
 export const RenderForm = ({
   cms,
   collection,
@@ -158,188 +62,22 @@ export const RenderForm = ({
 }) => {
   const navigate = useNavigate();
   const [formIsPristine, setFormIsPristine] = useState(true);
-  const schema: TinaSchema | undefined = cms.api.tina.schema;
 
-  // the schema is being passed in from the frontend so we can use that
-  const schemaCollection = schema.getCollection(collection.name);
-  const template: Template<true> = schema.getTemplateForData({
-    collection: schemaCollection,
-    data: { _template: templateName },
-  }) as Template<true>;
+  const collectionListPath = `/collections/${collection.name}${
+    folder.fullyQualifiedName ? `/${folder.fullyQualifiedName}` : ''
+  }`;
 
-  const formInfo = resolveForm({
-    collection: schemaCollection,
-    basename: schemaCollection.name,
-    schema: schema,
-    template,
-  });
-
-  let slugFunction = schemaCollection.ui?.filename?.slugify;
-
-  if (!slugFunction) {
-    const titleField = template?.fields.find(
-      (x) => x.required && x.type === 'string' && x.isTitle
-    )?.name;
-    // If the collection does not a slugify function and is has a title field, use the default slugify function
-    if (titleField) {
-      // default slugify function strips out all non-alphanumeric characters
-      slugFunction = (values: unknown) =>
-        values[titleField]?.replace(/ /g, '-').replace(/[^a-zA-Z0-9-]/g, '');
-    }
-  }
-
-  const defaultItem =
-    customDefaults ||
-    // @ts-ignore internal types aren't up to date
-    template.ui?.defaultItem ||
-    // @ts-ignore
-    template?.defaultItem ||
-    {};
-
-  const fileReadOnly = schemaCollection?.ui?.filename?.readonly;
-  const parse = schemaCollection?.ui?.filename?.parse;
-  const filenameField = {
-    name: 'filename',
-    label: 'Filename',
-    parse,
-    component:
-      slugFunction && !fileReadOnly
-        ? wrapFieldsWithMeta(({ field, input, meta }) => {
-            return (
-              <FilenameInput
-                readOnly={schemaCollection?.ui?.filename?.readonly}
-                {...input}
-              />
-            );
-          })
-        : 'text',
-    disabled: schemaCollection?.ui?.filename?.readonly,
-    description: collection.ui?.filename?.description ? (
-      <span
-        dangerouslySetInnerHTML={{ __html: collection.ui.filename.description }}
-      />
-    ) : (
-      <span>
-        A unique filename for the content.
-        <br />
-        Examples: <code>My_Document</code>, <code>My_Document.en</code>,{' '}
-        <code>sub-folder/My_Document</code>
-      </span>
-    ),
-    placeholder: 'My_Document',
-    validate: (value, allValues, meta) => {
-      if (!value) {
-        if (meta.dirty) {
-          return 'Required';
-        }
-        return true;
-      }
-
-      if (!RELATIVE_PATH_REGEX.test(value)) {
-        return RELATIVE_PATH_ALLOWED_CHARS_MESSAGE;
-      }
-      // check if the filename is allowed by the collection.
-      if (schemaCollection.match?.exclude || schemaCollection.match?.include) {
-        const filePath = `${normalizePath(schemaCollection.path)}/${value}.${
-          schemaCollection.format || 'md'
-        }`;
-        const match = schema?.matchFiles({
-          files: [filePath],
-          collection: schemaCollection,
-        });
-        if (match?.length === 0) {
-          return `The filename "${value}" is not allowed for this collection.`;
-        }
-      }
-    },
-  };
-
-  const form = useMemo(() => {
-    const folderName = folder.fullyQualifiedName ? folder.name : '';
-    return new Form({
-      crudType: 'create',
-      initialValues:
-        typeof defaultItem === 'function'
-          ? { ...defaultItem(), _template: templateName }
-          : { ...defaultItem, _template: templateName },
-      extraSubscribeValues: { active: true, submitting: true, touched: true },
-      onChange: (values) => {
-        if (!values?.submitting) {
-          const filename: string = values?.values?.filename;
-
-          // If the filename starts with "/" then it is an absolute path and we should not append the folder name
-          const appendFolder =
-            folderName && !filename?.startsWith('/') ? `/${folderName}/` : '/';
-
-          // keeps the forms relative path in sync with the filename
-          form.path =
-            schemaCollection.path +
-            appendFolder +
-            `${filename}.${schemaCollection.format || 'md'}`;
-        }
-        if (
-          slugFunction &&
-          values?.active !== 'filename' &&
-          !values?.submitting &&
-          !values.touched?.filename
-        ) {
-          const value = slugFunction(values.values, {
-            template,
-            collection: schemaCollection,
-          });
-          form.finalForm.change('filename', value);
-        }
-      },
-      id:
-        schemaCollection.path +
-        folderName +
-        `/new-post.${schemaCollection.format || 'md'}`,
-      label: 'form',
-      fields: [
-        collection.ui?.filename?.showFirst && filenameField,
-        ...(formInfo.fields as any),
-        !collection.ui?.filename?.showFirst && filenameField,
-      ].filter((x) => !!x),
-      onSubmit: async (values) => {
-        try {
-          const folderName = folder.fullyQualifiedName ? folder.name : '';
-          const result = await createDocument(
-            cms,
-            collection,
-            template,
-            mutationInfo,
-            folderName,
-            values
-          );
-          if (result === false) return;
-          cms.alerts.success('Document created!');
-          setTimeout(() => {
-            navigate(
-              `/collections/${collection.name}${
-                folder.fullyQualifiedName ? `/${folder.fullyQualifiedName}` : ''
-              }`
-            );
-          }, 10);
-        } catch (error) {
-          if (isSessionExpiredError(error)) throw error;
-          const defaultErrorText = 'There was a problem saving your document.';
-          if (error.message && error.message.includes(ERR_ALREADY_EXISTS)) {
-            cms.alerts.error(
-              `${defaultErrorText} The filename "${form.values.filename}.${collection.format || 'md'}" is already used for another document, please modify it.`
-            );
-          } else {
-            cms.alerts.error(() =>
-              ErrorDialog({
-                title: defaultErrorText,
-                message: 'Tina caught an error while creating the file',
-                error,
-              })
-            );
-          }
-          throw new Error(
-            `[${error.name}] CreateDocument failed: ${error.message}`
-          );
-        }
+  const { form, formInfo } = useMemo(() => {
+    return buildCreateDocumentForm({
+      cms,
+      collection,
+      templateName,
+      folderName: folder.fullyQualifiedName ? folder.name : '',
+      customDefaults,
+      onCreated: () => {
+        setTimeout(() => {
+          navigate(collectionListPath);
+        }, 10);
       },
     });
   }, [cms, collection, mutationInfo]);
@@ -358,10 +96,6 @@ export const RenderForm = ({
   const activeForm = cms.state.forms.find(
     ({ tinaForm }) => tinaForm.id === form.id
   );
-
-  const collectionListPath = `/collections/${collection.name}${
-    folder.fullyQualifiedName ? `/${folder.fullyQualifiedName}` : ''
-  }`;
 
   return (
     <PageWrapper headerClassName='bg-white'>
