@@ -14,9 +14,9 @@ export const SidebarLoadingPlaceholder = () => (
     }}
   >
     <p className='block pb-5'>
-      Please wait while TinaCMS
+      Hang tight, TinaCMS is
       <br />
-      loads your content
+      looking for llamas 🦙 🦙 🦙
     </p>
     <LoadingDots color={'var(--tina-color-primary)'} />
   </div>

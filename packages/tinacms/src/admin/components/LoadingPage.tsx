@@ -101,7 +101,7 @@ const LoadingPage = () => (
             fontWeight: 'normal',
           }}
         >
-          Please wait, Tina is loading data...
+          Hang tight, TinaCMS is looking for llamas 🦙 🦙 🦙
         </p>
       </div>
     </div>

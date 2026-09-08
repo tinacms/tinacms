@@ -313,7 +313,7 @@ const Loader = (props: { children: React.ReactNode }) => {
               fontWeight: 'normal',
             }}
           >
-            Please wait, Tina is loading data...
+            Hang tight, TinaCMS is looking for llamas 🦙 🦙 🦙
           </p>
         </div>
       </div>
