@@ -8,12 +8,23 @@
  */
 
 /**
- * Characters that carry no meaning inside a scheme, so they cannot be used to
- * disguise one. Stripped before looking for a scheme, never from the URL itself.
+ * Removed before the value is tested for a scheme, so a disguised one is still
+ * found. Never removed from the URL itself.
+ *
+ * `Cc` (control) matters because the URL parser strips ASCII tab and newline
+ * from anywhere in its input, so `java<TAB>script:` reaches a browser as
+ * `javascript:`. `Cf` (format) — soft hyphen, zero-width joiners, byte order
+ * mark — render as nothing, so they hide a scheme from whoever reads the link.
+ *
+ * Categories: https://www.unicode.org/reports/tr44/#General_Category_Values
+ * Tab and newline removal: https://url.spec.whatwg.org/#url-parsing
  */
-const IGNORED_IN_SCHEME = /[\u0000-\u001f\u007f\u200b-\u200d\ufeff]/g;
+const IGNORED_IN_SCHEME = /[\p{Cc}\p{Cf}]/gu;
 
-/** A scheme, per RFC 3986: a letter, then letters, digits, `+`, `-` or `.`. */
+/**
+ * A scheme is one letter, then letters, digits, `+`, `-` or `.`.
+ * RFC 3986 3.1: https://datatracker.ietf.org/doc/html/rfc3986#section-3.1
+ */
 const SCHEME_PREFIX = /^[a-zA-Z][a-zA-Z0-9+.\-]*:/;
 
 const namesAScheme = (url: string) =>

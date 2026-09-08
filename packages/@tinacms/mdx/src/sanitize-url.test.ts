@@ -36,16 +36,28 @@ describe('sanitizeUrl', () => {
   // A value that names a scheme but does not parse used to be returned as it
   // was. These are the shapes that reach that branch, written as escapes so the
   // invisible characters stay visible in review.
+  // Cc (control)
   const NUL = '\u0000';
+  const TAB = '\u0009';
+  const DEL = '\u007f';
+  // Cf (format) — these render as nothing, so they hide a scheme from a reader
+  const SOFT_HYPHEN = '\u00ad';
   const ZWSP = '\u200b';
   const ZWJ = '\u200d';
+  const LRM = '\u200e';
+  const WORD_JOINER = '\u2060';
   const BOM = '\ufeff';
 
   it.each([
     ['a null byte in the scheme', `java${NUL}script:alert(1)`],
+    ['a delete character', `java${DEL}script:alert(1)`],
+    ['a tab in the scheme', `java${TAB}script:alert(1)`],
+    ['a soft hyphen', `java${SOFT_HYPHEN}script:alert(1)`],
     ['a zero-width space in the scheme', `java${ZWSP}script:alert(1)`],
     ['a zero-width space at the front', `j${ZWSP}avascript:alert(1)`],
     ['a zero-width joiner', `java${ZWJ}script:alert(1)`],
+    ['a left-to-right mark', `java${LRM}script:alert(1)`],
+    ['a word joiner', `java${WORD_JOINER}script:alert(1)`],
     ['a byte order mark', `java${BOM}script:alert(1)`],
   ])('drops a malformed url that still names a scheme (%s)', (_label, url) => {
     vi.spyOn(console, 'warn').mockImplementation(() => {});
