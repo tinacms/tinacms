@@ -1,12 +1,13 @@
 import { useQueries } from '@tanstack/react-query';
-import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@tinacms/ui/components/select';
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from '@tinacms/ui/components/combobox';
+import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
 import { useRef } from 'react';
 import {
   CONTENT_STALE_TIME,
@@ -32,8 +33,8 @@ interface ReferenceOptions {
 }
 
 // `useCollectionDocuments` reads one collection, and a reference field can name
-// several. The hook order stays stable because `useQueries` takes the whole set
-// in one call.
+// several. `useQueries` takes the whole set in one call, so the hook order
+// stays stable.
 const useReferenceOptions = (collections: string[]): ReferenceOptions => {
   const content = useContentSlice();
   return useQueries({
@@ -59,7 +60,7 @@ const useReferenceOptions = (collections: string[]): ReferenceOptions => {
 const placeholderFor = ({ isLoading, error }: ReferenceOptions): string => {
   if (isLoading) return 'Loading…';
   if (error) return 'Could not load documents';
-  return 'Select…';
+  return 'Search documents…';
 };
 
 export function ReferenceField() {
@@ -67,51 +68,51 @@ export function ReferenceField() {
   const field = useFieldSchema<ReferenceFieldSchema>();
   const [value, setValue] = useFieldValue<string | null>(address);
   const errors = useFieldErrors(address);
-  const triggerRef = useRef<HTMLButtonElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  useFieldActivation(() => triggerRef.current?.focus());
+  useFieldActivation(() => inputRef.current?.focus());
 
   const lookup = useReferenceOptions(field.collections);
-  console.log('field.collections', field.collections);
-  console.log('lookup', lookup);
   const { options, isLoading, error } = lookup;
 
-  const noneItem = { value: '', label: 'None' };
-  const missingItem =
+  // A stored path whose document is gone stays selectable, so opening the
+  // field does not silently drop the reference.
+  const missing =
     value && !isLoading && !error && !options.some((o) => o.value === value)
       ? { value, label: `${value} (missing)` }
       : null;
 
-  const items = [
-    ...(field.required ? [] : [noneItem]),
-    ...(missingItem ? [missingItem] : []),
-    ...options,
-  ];
+  const items = missing ? [missing, ...options] : options;
+  const selected = items.find((item) => item.value === value) ?? null;
+  const unusable = isLoading || error !== null;
 
   return (
-    <FieldWrapper errors={errors}>
-      <Select
+    <FieldWrapper errors={error ? [...errors, error.message] : errors}>
+      <Combobox
         items={items}
-        value={value ?? null}
-        onValueChange={(newValue) =>
-          setValue(newValue === '' ? null : newValue)
+        value={selected}
+        onValueChange={(next: ReferenceOption | null) =>
+          setValue(next?.value ?? null)
         }
       >
-        <SelectTrigger
-          ref={triggerRef}
+        <ComboboxInput
+          ref={inputRef}
           id={address}
-          disabled={isLoading || !!error}
-        >
-          <SelectValue placeholder={placeholderFor(lookup)} />
-        </SelectTrigger>
-        <SelectContent>
-          {items.map((item) => (
-            <SelectItem key={item.value} value={item.value}>
-              {item.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+          disabled={unusable}
+          showClear={!field.required}
+          placeholder={placeholderFor(lookup)}
+        />
+        <ComboboxContent>
+          <ComboboxEmpty>No documents match.</ComboboxEmpty>
+          <ComboboxList>
+            {(item: ReferenceOption) => (
+              <ComboboxItem key={item.value} value={item}>
+                {item.label}
+              </ComboboxItem>
+            )}
+          </ComboboxList>
+        </ComboboxContent>
+      </Combobox>
     </FieldWrapper>
   );
 }
