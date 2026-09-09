@@ -21,6 +21,7 @@ import { buildSchema, createDatabaseInternal } from '..';
 import type { Bridge } from './bridge';
 import type { Schema } from '@tinacms/schema-tools';
 import { atob } from '../util';
+import { INDEX_KEY_FIELD_SEPARATOR, SUBLEVEL_OPTIONS } from './level';
 
 // ─── InMemoryBridge ──────────────────────────────────────────────────────────
 
@@ -598,5 +599,97 @@ describe('Database.indexContent()', () => {
       hydrate
     );
     expect(result.edges).toHaveLength(2);
+  });
+});
+
+// ─── Regression: stale pre-2.4.3 datetime index rows (#7053) ───────────────
+//
+// @tinacms/graphql@2.4.3 (5c216dd, PR #6941) changed datetime index keys
+// from Unix-millisecond strings to ISO 8601 strings. On a persistent data
+// layer (TinaCloud, self-hosted Mongo/DynamoDB/SQLite level), a row indexed
+// under the old encoding is never cleaned up by a later put()/re-index,
+// because those paths delete a document's previous index rows by
+// *recomputing* the keys with the current encoder rather than deleting the
+// keys that were actually written. The stale row and the fresh row then
+// both point at the same document, so it appears twice in datetime-sorted
+// connection queries and the admin collection list.
+
+const datetimeSchema: Schema = {
+  collections: [
+    {
+      name: 'post',
+      label: 'Post',
+      path: 'content/posts',
+      format: 'json',
+      fields: [
+        { name: 'title', label: 'Title', type: 'string' },
+        { name: 'date', label: 'Date', type: 'datetime' },
+      ],
+    },
+  ],
+};
+
+async function setupDatetimeDatabase() {
+  const bridge = new InMemoryBridge();
+  bridge.seed(
+    'content/posts/a.json',
+    jsonDoc({ title: 'Post A', date: '2020-01-01T00:00:00.000Z' })
+  );
+
+  const level = new MemoryLevel<string, Record<string, any>>({
+    valueEncoding: 'json',
+  });
+  const database = createDatabaseInternal({
+    bridge,
+    level,
+    tinaDirectory: 'tina',
+  });
+
+  const builtSchema = await buildSchema({ schema: datetimeSchema });
+  await database.indexContent(builtSchema);
+
+  const hydrate = async (path: string, value: Record<string, any>) => ({
+    path,
+    ...value,
+  });
+
+  return { database, hydrate };
+}
+
+describe('Database — stale datetime index rows across an index key encoding change (#7053)', () => {
+  it('does not surface a document twice when a pre-2.4.3 (millisecond-keyed) datetime index row survives alongside the current (ISO-keyed) row after a re-index', async () => {
+    const { database, hydrate } = await setupDatetimeDatabase();
+    const filepath = 'content/posts/a.json';
+    const dateValue = '2020-01-01T00:00:00.000Z';
+
+    // Simulate a row left behind by @tinacms/graphql@2.4.2: the sort key for
+    // a datetime field used to be `String(new Date(value).getTime())`
+    // (Unix milliseconds) rather than the ISO 8601 string 2.4.3 uses. This
+    // is written directly into the same on-disk sublevel a pre-2.4.3
+    // deployment would have used, independent of whatever encoding the
+    // current code happens to write to.
+    const legacyMillisKey = `${String(
+      new Date(dateValue).getTime()
+    )}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`;
+    await database.contentLevel
+      .sublevel('post', SUBLEVEL_OPTIONS)
+      .sublevel('date', SUBLEVEL_OPTIONS)
+      .put(legacyMillisKey, {});
+
+    // Reproduce the reported trigger: edit the document without changing
+    // its datetime value, which forces Database.put() to re-index it.
+    await database.put(
+      filepath,
+      { title: 'Post A (edited)', date: dateValue },
+      'post'
+    );
+
+    const result = await database.query(
+      { collection: 'post', sort: 'date', filterChain: [] },
+      hydrate
+    );
+
+    expect(result.edges).toHaveLength(1);
+    expect((result.edges[0].node as any).path).toBe(filepath);
   });
 });

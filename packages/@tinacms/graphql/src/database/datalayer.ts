@@ -740,9 +740,9 @@ export const makeFolderOpsForCollection = <T extends object>(
     );
     let folderSortingIdx = 0;
     for (const path of Array.from(folder).sort()) {
-      for (const [sort] of Object.entries(indexDefinitions)) {
+      for (const [sort, definition] of Object.entries(indexDefinitions)) {
         const indexSublevel = folderCollectionSublevel.sublevel(
-          sort,
+          indexSublevelName(sort, definition),
           SUBLEVEL_OPTIONS
         );
         const subFolderKey = sha.hex(path);
@@ -789,6 +789,37 @@ export const makeFolderOpsForCollection = <T extends object>(
   return result;
 };
 
+/**
+ * @tinacms/graphql@2.4.3 (#6941) changed how datetime index keys are
+ * encoded, from Unix-millisecond strings to ISO 8601 strings (see
+ * parseDatetimeUTC above). On a persistent data layer, index rows written
+ * under the old encoding are never comparable to keys the new encoder
+ * computes, so a later put()/re-index — which deletes a document's stale
+ * rows by *recomputing* their keys with the current encoder — can never
+ * find and remove them. The old row lingers forever alongside the new one,
+ * surfacing as a duplicate document (#7053).
+ *
+ * Routing any index whose key includes a datetime field into its own
+ * sublevel, versioned by encoding, sidesteps that: rows written under a
+ * previous encoding simply live in a sublevel nothing reads from anymore,
+ * instead of colliding with fresh rows in the same keyspace. Bump this
+ * suffix again if the datetime key encoding ever changes in a
+ * non-backwards-compatible way.
+ */
+const DATETIME_INDEX_ENCODING_SUFFIX = '@dtv2';
+
+const usesDatetimeEncoding = (definition: IndexDefinition): boolean =>
+  definition.fields.some((field) => field.type === 'datetime');
+
+/** The sublevel name to use for a given sort key / index definition. */
+export const indexSublevelName = (
+  sort: string,
+  definition: IndexDefinition
+): string =>
+  usesDatetimeEncoding(definition)
+    ? `${sort}${DATETIME_INDEX_ENCODING_SUFFIX}`
+    : sort;
+
 export const makeIndexOpsForDocument = <T extends object>(
   filepath: string,
   collection: string | undefined,
@@ -804,7 +835,10 @@ export const makeIndexOpsForDocument = <T extends object>(
     const collectionSublevel = level.sublevel(collection, SUBLEVEL_OPTIONS);
     for (const [sort, definition] of Object.entries(indexDefinitions)) {
       const indexedValue = makeKeyForField<T>(definition, data, escapeStr);
-      const indexSublevel = collectionSublevel.sublevel(sort, SUBLEVEL_OPTIONS);
+      const indexSublevel = collectionSublevel.sublevel(
+        indexSublevelName(sort, definition),
+        SUBLEVEL_OPTIONS
+      );
       if (sort === DEFAULT_COLLECTION_SORT_KEY) {
         result.push({
           type: opType,
