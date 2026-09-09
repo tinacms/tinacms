@@ -45,6 +45,9 @@ v4 supplies four more examples:
   of item fields. Its items reuse the ordinary field contract through
   `<FieldNode>` and `validateField` — see
   [Compound fields](#compound-fields) below.
+- The `object` field ([`object-field.md`](./object-field.md)) groups a fixed
+  set of nested fields under one name. It is the `array` field without the
+  repetition, and it uses the same compound-field mechanism.
 - The `select` field ([`select-field.md`](./select-field.md)) picks one value
   from a fixed `options` list. Its Zod validator is a `z.enum` with a custom
   `errorMap`, and it has no `defaultValue`, `parse`, or `serialize`.

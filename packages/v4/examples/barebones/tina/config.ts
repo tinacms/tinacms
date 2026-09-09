@@ -35,6 +35,14 @@ export const postCollection = {
         { value: 'published', label: 'Published' },
       ],
     }),
+		t.object({
+			name: 'seo',
+			label: 'SEO',
+			fields: [
+				t.string({ name: 'title', label: 'Title', required: true }),
+				t.string({ name: 'description', label: 'Description' }),
+			],
+		}),
   ],
 } satisfies CollectionSchema;
 
