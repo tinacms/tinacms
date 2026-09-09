@@ -28,7 +28,7 @@
     "@tinacms/mdx": "workspace:*",
     "@tinacms/scripts": "workspace:*",
     "happy-dom": "catalog:",
-    "vite": "^5.4.14",
+    "vite": "^8.2.2",
     "vitest": "^2.1.9"
   },
   "publishConfig": {
