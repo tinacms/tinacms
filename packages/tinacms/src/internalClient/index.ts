@@ -761,6 +761,9 @@ mutation addPendingDocumentMutation(
             statusResponseBody.message || 'Editorial workflow failed'
           ) as EditorialWorkflowErrorDetails;
           error.errorCode = statusResponseBody.errorCode || 'WORKFLOW_FAILED';
+          if (statusResponseBody.filepath) {
+            error.filepath = statusResponseBody.filepath;
+          }
           throw error;
         }
 
@@ -809,6 +812,9 @@ mutation addPendingDocumentMutation(
     }
     if (responseBody?.conflictingBranch) {
       error.conflictingBranch = responseBody.conflictingBranch;
+    }
+    if (responseBody?.filepath) {
+      error.filepath = responseBody.filepath;
     }
     return error;
   }
