@@ -5,7 +5,9 @@ import * as React from 'react';
 import { PortalBody } from '@udecode/cn';
 import {
   type UseVirtualFloatingOptions,
+  autoUpdate,
   flip,
+  getRangeBoundingClientRect,
   limitShift,
   offset,
   shift,
@@ -81,14 +83,26 @@ export function LinkFloatingToolbar({
       ],
       placement:
         activeSuggestionId || activeCommentId ? 'top-start' : 'bottom-start',
+      whileElementsMounted: (reference, floating, update) =>
+        autoUpdate(
+          { ...reference, contextElement: editor.api.toDOMNode(editor) },
+          floating,
+          update
+        ),
     };
-  }, [activeCommentId, activeSuggestionId]);
+  }, [activeCommentId, activeSuggestionId, editor]);
+
+  const getSelectionRect = React.useCallback(
+    () => getRangeBoundingClientRect(editor, editor.selection),
+    [editor]
+  );
 
   //when adding a new link
   const insertState = useFloatingLinkInsertState({
     ...state,
     floatingOptions: {
       ...floatingOptions,
+      getBoundingClientRect: getSelectionRect,
       ...state?.floatingOptions,
     },
   });
