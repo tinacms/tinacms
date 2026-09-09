@@ -1,12 +1,7 @@
 import * as React from 'react';
-import { ERR_BRANCH_CONFLICT, ERR_BRANCH_EXISTS } from '@tinacms/schema-tools';
 import { useBranchData } from '@toolkit/plugin-branch-switcher';
 import { useCMS } from '../react-core';
-import {
-  EDITORIAL_WORKFLOW_ERROR,
-  EDITORIAL_WORKFLOW_STATUS,
-  EditorialWorkflowErrorDetails,
-} from './editorial-workflow-constants';
+import { EDITORIAL_WORKFLOW_STATUS } from './editorial-workflow-constants';
 import {
   CREATE_DOCUMENT_GQL,
   DELETE_DOCUMENT_GQL,
@@ -15,8 +10,15 @@ import {
 import { Form } from '@toolkit/forms';
 import {
   checkTargetBranchExists,
+  getEditorialWorkflowError,
   getEditorialWorkflowPrTitle,
   TARGET_BRANCH_EXISTS_ERROR,
+  type EditorialWorkflowErrorLink,
+} from './editorial-workflow-utils';
+
+export {
+  getEditorialWorkflowError,
+  getEditorialWorkflowErrorMessage,
 } from './editorial-workflow-utils';
 
 const pathRelativeToCollection = (
@@ -77,6 +79,7 @@ export interface ExecuteWorkflowOptions {
 export interface UseEditorialWorkflowResult {
   isExecuting: boolean;
   errorMessage: string;
+  errorLink?: EditorialWorkflowErrorLink;
   currentStep: number;
   elapsedTime: number;
   /** Resolves with the outcome; on failure `error` holds the message. */
@@ -87,39 +90,6 @@ export interface UseEditorialWorkflowResult {
   reset: () => void;
 }
 
-export const getEditorialWorkflowErrorMessage = (e: unknown): string => {
-  let errMessage =
-    'Branch operation failed. Talking to GitHub was unsuccessful, please try again. If the problem persists please contact support at https://tina.io/support 🦙';
-
-  const err = e as EditorialWorkflowErrorDetails;
-
-  if (err.errorCode) {
-    switch (err.errorCode) {
-      case EDITORIAL_WORKFLOW_ERROR.BRANCH_EXISTS:
-        errMessage = 'A branch with this name already exists';
-        break;
-      case EDITORIAL_WORKFLOW_ERROR.BRANCH_HIERARCHY_CONFLICT:
-        errMessage =
-          err.message || 'Branch name conflicts with an existing branch';
-        break;
-      case EDITORIAL_WORKFLOW_ERROR.VALIDATION_FAILED:
-        errMessage = err.message || 'Invalid branch name';
-        break;
-      default:
-        errMessage = err.message || errMessage;
-        break;
-    }
-  } else if (err.message) {
-    if (err.message.toLowerCase().includes(ERR_BRANCH_EXISTS)) {
-      errMessage = 'A branch with this name already exists';
-    } else if (err.message.toLowerCase().includes(ERR_BRANCH_CONFLICT)) {
-      errMessage = err.message;
-    }
-  }
-
-  return errMessage;
-};
-
 export function useEditorialWorkflow(): UseEditorialWorkflowResult {
   const cms = useCMS();
   const tinaApi = cms.api.tina;
@@ -127,6 +97,9 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
 
   const [isExecuting, setIsExecuting] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState('');
+  const [errorLink, setErrorLink] = React.useState<
+    EditorialWorkflowErrorLink | undefined
+  >(undefined);
   const [currentStep, setCurrentStep] = React.useState(0);
   const [elapsedTime, setElapsedTime] = React.useState(0);
 
@@ -146,6 +119,7 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
 
   const reset = () => {
     setErrorMessage('');
+    setErrorLink(undefined);
     setIsExecuting(false);
     setCurrentStep(0);
   };
@@ -177,6 +151,7 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
 
       if (targetBranchExists) {
         setErrorMessage(TARGET_BRANCH_EXISTS_ERROR);
+        setErrorLink(undefined);
         setIsExecuting(false);
         setCurrentStep(0);
         return { success: false, error: TARGET_BRANCH_EXISTS_ERROR };
@@ -270,19 +245,21 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
       return { success: true };
     } catch (e: unknown) {
       console.error(e);
-      const errMessage = getEditorialWorkflowErrorMessage(e);
+      const { message, link } = getEditorialWorkflowError(e);
 
-      setErrorMessage(errMessage);
+      setErrorMessage(message);
+      setErrorLink(link);
       setIsExecuting(false);
       setCurrentStep(0);
 
-      return { success: false, error: errMessage };
+      return { success: false, error: message };
     }
   };
 
   return {
     isExecuting,
     errorMessage,
+    errorLink,
     currentStep,
     elapsedTime,
     executeWorkflow,
