@@ -1,10 +1,9 @@
-import type {
-  CollectionSchema,
-  FieldSchema,
-  TinaDocument,
+import {
+  type CollectionSchema,
+  type FieldSchema,
+  REFERENCE_FIELD_TYPE,
+  type TinaDocument,
 } from '../schema/types';
-
-const REFERENCE_FIELD_TYPE = 'reference';
 
 export interface ReferenceTarget {
   collection: string;
@@ -39,6 +38,9 @@ const targetOf = (
   return owner ? { collection: owner.name, path: value } : null;
 };
 
+// TODO(#7534): this walk reads `node.fields` and matches on the type key
+// itself, so it misses any other way a plugin nests children. `templates` is
+// the live gap. Fold it into the registry-driven path that `ingest.ts` uses.
 export const collectReferences = (
   values: TinaDocument | undefined,
   fields: FieldSchema[],

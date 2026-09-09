@@ -51,7 +51,6 @@ export const pageCollection = {
   fields: [
     t.string({ name: 'title', label: 'Title', required: true }),
     t.boolean({ name: 'featured', label: 'Featured' }),
-    // The custom field of this project. tina/rating-field.tsx is the whole plugin.
   ],
 } satisfies CollectionSchema;
 

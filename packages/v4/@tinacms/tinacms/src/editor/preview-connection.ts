@@ -70,15 +70,24 @@ export function usePreviewConnection(
         fields,
         collections
       )) {
-        if (cachedDocument(collection, path)) continue;
+        const key = contentKeys.document(collection, path);
+        // Test the cache entry, not the document. `content.get` resolves null
+        // for a document that is gone, and that null is a cached answer.
+        if (queryClient.getQueryState(key)) continue;
         queryClient
           .fetchQuery({
-            queryKey: contentKeys.document(collection, path),
+            queryKey: key,
             queryFn: () => content.get(collection, path),
             staleTime: CONTENT_STALE_TIME,
           })
           .then(repost)
-          .catch(() => {});
+          .catch((cause: unknown) => {
+            const reason =
+              cause instanceof Error ? cause.message : String(cause);
+            console.warn(
+              `Tina could not read "${path}" from the "${collection}" collection, so the preview keeps its path. ${reason}`
+            );
+          });
       }
     };
 

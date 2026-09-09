@@ -17,6 +17,8 @@ export interface TemplateSchema {
   fields?: TemplateFieldSchema[];
 }
 
+export const REFERENCE_FIELD_TYPE = 'reference';
+
 export interface FieldSchema extends BaseFieldSchema {
   type: string;
   isBody?: boolean;

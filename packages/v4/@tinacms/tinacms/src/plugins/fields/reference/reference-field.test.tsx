@@ -169,21 +169,19 @@ describe('ReferenceField value updates', () => {
   });
 
   it('clears an optional reference through the clear button', async () => {
-    const { container } = renderField({ page: ABOUT });
+    renderField({ page: ABOUT });
     const input = await screen.findByLabelText('Page');
-    const clear = container.querySelector('[data-slot="combobox-clear"]');
-    expect(clear).not.toBeNull();
-    await userEvent.click(clear as Element);
+    await userEvent.click(screen.getByRole('button', { name: 'Clear' }));
     expect(valueOf('page')).toBeNull();
     expect(input).toHaveValue('');
   });
 
   it('offers no clear button on a required reference', async () => {
-    const { container } = renderField({ author: ADA });
+    renderField({ author: ADA });
     await screen.findByLabelText('Author');
     expect(
-      container.querySelectorAll('[data-slot="combobox-clear"]')
-    ).toHaveLength(0);
+      screen.queryByRole('button', { name: 'Clear' })
+    ).not.toBeInTheDocument();
   });
 });
 
