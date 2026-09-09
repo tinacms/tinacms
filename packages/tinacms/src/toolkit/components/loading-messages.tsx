@@ -19,7 +19,7 @@ export const LOADING_MESSAGES = [
   'One more llama, almost there 🦙',
 ];
 
-const CYCLE_MS = 1000;
+const CYCLE_MS = 2000;
 const FADE_MS = 200;
 
 const prefersReducedMotion = () =>

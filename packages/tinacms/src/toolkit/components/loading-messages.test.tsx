@@ -7,7 +7,7 @@ const MESSAGES = ['first', 'second', 'third'];
 
 const tick = () =>
   act(() => {
-    vi.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(2000);
   });
 
 describe('LoadingMessage', () => {
@@ -52,7 +52,7 @@ describe('LoadingMessage', () => {
     expect(opacity()).toBe('1');
 
     act(() => {
-      vi.advanceTimersByTime(800);
+      vi.advanceTimersByTime(1800);
     });
     expect(opacity()).toBe('0');
 
