@@ -369,12 +369,16 @@ export default databaseClient;
 import { queries } from "./types.js";
 export const client = createClient({ ${
       this.noClientBuildCache === false
-        ? `cacheDir: '${normalizePath(
-            this.configManager.generatedCachePath
-          )}', `
+        ? `cacheDir: ${JSON.stringify(
+            normalizePath(this.configManager.generatedCachePath)
+          )}, `
         : ''
-    }url: ${this.localContentBuild ? `process.env.TINA_LOCAL_URL || '${apiURL}'` : `'${apiURL}'`}, token: '${token}', queries, ${
-      errorPolicy ? `errorPolicy: '${errorPolicy}'` : ''
+    }url: ${
+      this.localContentBuild
+        ? `process.env.TINA_LOCAL_URL || ${JSON.stringify(apiURL)}`
+        : JSON.stringify(apiURL)
+    }, token: ${JSON.stringify(String(token))}, queries, ${
+      errorPolicy ? `errorPolicy: ${JSON.stringify(String(errorPolicy))}` : ''
     } });
 export default client;
   `;
