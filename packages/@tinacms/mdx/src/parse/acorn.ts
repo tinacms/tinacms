@@ -65,8 +65,8 @@ const extractAttribute = (
         const values = extractScalar(
           extractExpression(attribute),
           field
-        ) as string;
-        return values.split(',').map((value) => imageCallback(value));
+        ) as string[];
+        return values.map((value) => imageCallback(value));
       } else {
         const value = extractString(attribute, field);
         return imageCallback(value);
