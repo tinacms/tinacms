@@ -45,7 +45,7 @@
           {
             "type": "reference",
             "collections": [
-              "pages"
+              "page"
             ],
             "name": "pages",
             "label": "Pages Reference"
