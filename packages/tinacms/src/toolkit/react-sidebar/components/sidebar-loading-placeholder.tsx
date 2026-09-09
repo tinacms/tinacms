@@ -1,3 +1,4 @@
+import { LoadingMessage } from '@toolkit/components/loading-messages';
 import { LoadingDots } from '@toolkit/form-builder';
 import * as React from 'react';
 
@@ -13,11 +14,7 @@ export const SidebarLoadingPlaceholder = () => (
       animationDuration: '150ms',
     }}
   >
-    <p className='block pb-5'>
-      Hang tight, TinaCMS is
-      <br />
-      looking for llamas 🦙 🦙 🦙
-    </p>
+    <LoadingMessage className='block pb-5' />
     <LoadingDots color={'var(--tina-color-primary)'} />
   </div>
 );
