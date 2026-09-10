@@ -303,6 +303,52 @@ describe('TinaMediaStore — search query param', () => {
   });
 });
 
+describe('TinaMediaStore — cursor query param', () => {
+  it('url-encodes a cursor containing reserved characters', async () => {
+    const { store, fetchWithToken } = buildStore({ branch: 'main' });
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+    );
+
+    await store.list({
+      directory: '',
+      thumbnailSizes: [],
+      offset: 'aW1nL2Eg+Yg==',
+    });
+
+    const calledUrl = fetchWithToken.mock.calls[0][0];
+    expect(calledUrl).toContain('&cursor=aW1nL2Eg%2BYg%3D%3D');
+  });
+
+  it('round-trips the cursor through a query-string parser', async () => {
+    const cursor = Buffer.from('img/a 2025-03-14 at 11.43.03 am.gif').toString(
+      'base64'
+    );
+    const { store, fetchWithToken } = buildStore({ branch: 'main' });
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+    );
+
+    await store.list({ directory: '', thumbnailSizes: [], offset: cursor });
+
+    const calledUrl: string = fetchWithToken.mock.calls[0][0];
+    const parsed = new URLSearchParams(calledUrl.split('?')[1]);
+    expect(parsed.get('cursor')).toBe(cursor);
+  });
+
+  it('omits the cursor param when unset', async () => {
+    const { store, fetchWithToken } = buildStore({ branch: 'main' });
+    fetchWithToken.mockResolvedValueOnce(
+      makeJsonResponse(200, { files: [], directories: [], cursor: 0 })
+    );
+
+    await store.list({ directory: '', thumbnailSizes: [] });
+
+    const calledUrl = fetchWithToken.mock.calls[0][0];
+    expect(calledUrl).not.toContain('cursor=');
+  });
+});
+
 describe('TinaMediaStore — branch query param', () => {
   describe('list()', () => {
     it('appends single-encoded branch for a simple branch', async () => {
