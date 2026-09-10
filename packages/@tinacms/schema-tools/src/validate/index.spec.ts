@@ -2,8 +2,8 @@
 
 */
 
-import type { Schema } from '../types';
 import { validateSchema } from '.';
+import type { Schema } from '../types';
 
 let consoleErrMock: any;
 beforeEach(() => {
@@ -381,11 +381,11 @@ const schemaWithEmptyObjectFieldTemplateFields: Schema = {
     },
   ],
 };
-// A rich-text embed template with no fields is a legitimate, intentionally
-// supported shape (a prop-less self-closing element, e.g. `<Divider />`) -
-// unlike an object field's templates, a rich-text field's own GraphQL filter
-// type doesn't depend on its embed templates' field counts, so this must
-// keep validating successfully.
+// A rich-text field WITH templates goes through the same
+// _filterCollectionDocumentType/_buildTemplateFilter path an object field's
+// templates do (confirmed by tracing packages/@tinacms/graphql's builder),
+// so an empty-fields embed template is just as invalid here as it is for an
+// object field.
 const schemaWithEmptyRichTextTemplateFields: Schema = {
   collections: [
     {
@@ -539,10 +539,10 @@ describe('validateSchema', () => {
       validateSchema({ schema: schemaWithEmptyObjectFieldTemplateFields });
     }).toThrow('Property `fields` cannot be empty.');
   });
-  it('passes when a rich-text embed template fields is empty', () => {
+  it('fails when a rich-text embed template fields is empty', () => {
     expect(() => {
       validateSchema({ schema: schemaWithEmptyRichTextTemplateFields });
-    }).not.toThrow();
+    }).toThrow('Property `fields` cannot be empty.');
   });
   it('fails when a deeply nested field under a template is invalid', () => {
     expect(() => {

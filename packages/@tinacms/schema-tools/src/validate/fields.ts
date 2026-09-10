@@ -149,7 +149,9 @@ export const TinaFieldZod: z.ZodType<TinaFieldType> = z.lazy(() => {
     .object({
       label: z.string().optional(),
       name,
-      fields: z.array(TinaFieldZod),
+      fields: z
+        .array(TinaFieldZod)
+        .min(1, 'Property `fields` cannot be empty.'),
       match: z
         .object({
           start: z.string(),
@@ -199,20 +201,6 @@ export const TinaFieldZod: z.ZodType<TinaFieldType> = z.lazy(() => {
             message: duplicateTemplateErrorMessage(dups),
           });
         }
-        // An object field's templates each get their own generated GraphQL
-        // filter type (_buildTemplateFilter), which is invalid GraphQL when
-        // it has no fields. Rich-text embed templates don't have this
-        // problem (their containing rich-text field always gets one fixed
-        // generic filter regardless of embed shape), so this check is
-        // scoped to ObjectField's templates only, not RichTextField's.
-        val?.forEach((template) => {
-          if (template.fields.length === 0) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: 'Property `fields` cannot be empty.',
-            });
-          }
-        });
       }),
   });
 
