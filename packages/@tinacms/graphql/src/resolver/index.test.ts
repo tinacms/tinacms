@@ -1386,6 +1386,8 @@ describe('index', () => {
     const collection = { name: 'post', path: 'posts', format: 'md' } as any;
     const realPath = path.join('posts', 'hello.md');
     const newRealPath = path.join('posts', 'renamed.md');
+    const referenceValue = 'posts/hello.md';
+    const newReferenceValue = 'posts/renamed.md';
 
     const setup = () => {
       const database = {
@@ -1555,10 +1557,13 @@ describe('index', () => {
         });
         resolver.getRaw = vi
           .fn()
-          .mockResolvedValueOnce({ _collection: 'post', relatedPost: realPath })
           .mockResolvedValueOnce({
             _collection: 'post',
-            relatedPost: realPath,
+            relatedPost: referenceValue,
+          })
+          .mockResolvedValueOnce({
+            _collection: 'post',
+            relatedPost: referenceValue,
           });
 
         await resolver.resolveUpdateDocument({
@@ -1570,12 +1575,46 @@ describe('index', () => {
         expect(database.put).toHaveBeenCalledTimes(3);
         expect(database.put).toHaveBeenCalledWith(
           refDocA,
-          expect.objectContaining({ relatedPost: newRealPath }),
+          expect.objectContaining({ relatedPost: newReferenceValue }),
           'post'
         );
         expect(database.put).toHaveBeenCalledWith(
           refDocB,
-          expect.objectContaining({ relatedPost: newRealPath }),
+          expect.objectContaining({ relatedPost: newReferenceValue }),
+          'post'
+        );
+      });
+
+      it('rewrites a POSIX-stored reference when path segments are joined with Windows separators', async () => {
+        const { resolver, database } = setup();
+        const refDoc = 'posts/a.md';
+        database.documentExists.mockImplementation(
+          async (p: string) => p.replace(/\\/g, '/') === referenceValue
+        );
+        (resolver as any).findReferences.mockResolvedValue({
+          post: { [refDoc]: ['$.relatedPost'] },
+        });
+        resolver.getRaw = vi.fn().mockResolvedValue({
+          _collection: 'post',
+          relatedPost: referenceValue,
+        });
+        const joinSpy = vi
+          .spyOn(path, 'join')
+          .mockImplementation((...segments: string[]) => segments.join('\\'));
+
+        try {
+          await resolver.resolveUpdateDocument({
+            collectionName: 'post',
+            relativePath: 'hello.md',
+            newRelativePath: 'renamed.md',
+          });
+        } finally {
+          joinSpy.mockRestore();
+        }
+
+        expect(database.put).toHaveBeenCalledWith(
+          refDoc,
+          expect.objectContaining({ relatedPost: newReferenceValue }),
           'post'
         );
       });

@@ -748,7 +748,9 @@ export class Resolver {
    * @param collectionName - Name of the collection
    * @param relativePath - Relative path within the collection
    * @param options - Optional configuration
-   * @returns Object containing the collection and validated real path
+   * @returns Object containing the collection and the validated real path,
+   * normalized to POSIX separators so it matches the document identities and
+   * reference values stored in content files on every platform
    */
   private getValidatedPath = (
     collectionName: string,
@@ -769,7 +771,7 @@ export class Resolver {
       pathSegments.push(...options.extraSegments.map(Resolver.sanitizePath));
     }
 
-    const realPath = path.join(...pathSegments);
+    const realPath = normalizePath(path.join(...pathSegments));
     const shouldValidateExtension = options?.validateExtension !== false;
     this.validatePath(
       realPath,
@@ -1001,7 +1003,7 @@ export class Resolver {
             const { object, updated } = updateObjectWithJsonPath(
               refDoc,
               path,
-              normalizePath(realPath),
+              realPath,
               null
             );
             refDoc = object;
