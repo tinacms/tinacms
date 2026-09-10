@@ -120,24 +120,10 @@ way it would at the top level.
 absent stored value does not hide the nested fields — each nested field
 resolves its own absent value and shows an empty control.
 
-For each nested field, it renders a row — a `<label>` pointing at the nested
-field's own address (unless that field's descriptor sets `labelable: false`
-too), then `<FieldNode address node>`:
-
-```tsx
-function ObjectFieldRow({ address, node }: { address: string; node: FieldSchema }) {
-  const labelable =
-    useFieldRegistry().get(node.type)?.metadata?.labelable !== false;
-  return (
-    <div>
-      <Label id={`${address}-label`} htmlFor={labelable ? address : undefined}>
-        {node.label ?? node.name}
-      </Label>
-      <FieldNode address={toFieldAddress(address)} node={node} />
-    </div>
-  );
-}
-```
+For each nested field, it renders `<NestedFieldRow address node>`
+(`editor/field.tsx`) — the shared row that `array` also uses: a `<Label>`
+pointing at the nested field's own address (unless that field's descriptor
+sets `labelable: false` too), then `<FieldNode address node>`.
 
 `<FieldNode>` (`editor/field.tsx`) is the part of `<Field>` that resolves a
 descriptor and supplies `FieldAddressContext`/`FieldSchemaContext`. It does not
