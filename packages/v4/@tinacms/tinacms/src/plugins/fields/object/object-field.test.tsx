@@ -18,6 +18,7 @@ import { FormProvider, TinaProvider } from '../../../editor';
 import { formStatus, toFormId, useFormStore } from '../../../form/form-store';
 import { t } from '../../../index';
 import { LabelledFields } from '../../../test/labelled-fields';
+import arrayFieldPlugin from '../array/array-field.plugin';
 import numberFieldPlugin from '../number/number-field.plugin';
 import stringFieldPlugin from '../string/string-field.plugin';
 import objectFieldPlugin from './object-field.plugin';
@@ -25,7 +26,12 @@ import { asObjectFieldSchema } from './object-field.schema';
 
 const NO_COLLECTIONS = { collections: [] };
 const DOCUMENT_PATH = 'content/pages/home.mdx';
-const PLUGINS = [objectFieldPlugin, stringFieldPlugin, numberFieldPlugin];
+const PLUGINS = [
+  objectFieldPlugin,
+  arrayFieldPlugin,
+  stringFieldPlugin,
+  numberFieldPlugin,
+];
 
 const valueOf = (name: string) =>
   useFormStore.getState().forms[toFormId(DOCUMENT_PATH)]?.values[
@@ -62,10 +68,33 @@ const collection: CollectionSchema = {
         }),
       ],
     }),
+    t.array({
+      name: 'blocks',
+      label: 'Blocks',
+      fields: [
+        t.object({
+          name: 'hero',
+          label: 'Hero',
+          fields: [t.number({ name: 'height', label: 'Height' })],
+        }),
+      ],
+    }),
+    t.object({
+      name: 'layout',
+      label: 'Layout',
+      fields: [
+        t.array({
+          name: 'rows',
+          label: 'Rows',
+          fields: [t.string({ name: 'label', label: 'Label', required: true })],
+        }),
+      ],
+    }),
   ],
 };
 
 const [seoNode, metaNode] = collection.fields;
+const layoutNode = collection.fields[3];
 
 const resolveRegistry = (): Promise<FieldRegistry> =>
   resolveFieldPlugins(PLUGINS);
@@ -210,6 +239,42 @@ describe('ObjectField ingest and digest', () => {
         ingestDocument({ seo: bad }, collection.fields, { registry })
       ).toThrow(/expected an object/);
     }
+  });
+});
+
+describe('ObjectField composed with array', () => {
+  it('round-trips an object nested inside an array', async () => {
+    const registry = await resolveRegistry();
+    const stored = { blocks: [{ hero: { height: 10 } }] };
+    const ingested = ingestDocument(stored, collection.fields, { registry });
+    expect(ingested).toEqual({ blocks: [{ hero: { height: '10' } }] });
+    expect(digestDocument(ingested, collection.fields, { registry })).toEqual(
+      stored
+    );
+  });
+
+  it('round-trips an array nested inside an object', async () => {
+    const registry = await resolveRegistry();
+    const stored = {
+      layout: { rows: [{ label: 'top' }, { label: 'bottom' }] },
+    };
+    const ingested = ingestDocument(stored, collection.fields, { registry });
+    expect(ingested).toEqual(stored);
+    expect(digestDocument(ingested, collection.fields, { registry })).toEqual(
+      stored
+    );
+  });
+
+  it('recurses validation through an array nested inside an object', async () => {
+    const registry = await resolveRegistry();
+    const descriptor = registry.get('object');
+    const errors = descriptor?.validateChildren?.(
+      { rows: [{ label: 'ok' }, { label: '' }] },
+      layoutNode,
+      'layout',
+      registry
+    );
+    expect(errors).toEqual({ 'layout.rows.1.label': ['Label is required'] });
   });
 });
 

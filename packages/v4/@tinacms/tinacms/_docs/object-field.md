@@ -150,6 +150,9 @@ editing for the same reason.
   field's own address.
 - It recurses into an object nested inside an object, with the message at the
   doubly-nested address, via a direct `validateChildren` call.
+- It composes with the `array` field both ways: it round-trips an object
+  nested in an array, and an array nested in an object, through ingest and
+  digest, and it recurses validation through an array nested in an object.
 - It rolls a nested field's error up onto the object's own address.
 - It goes dirty on a nested edit, then back to clean once the edit is undone.
 - It round-trips the object through ingest and digest, including a nested field
