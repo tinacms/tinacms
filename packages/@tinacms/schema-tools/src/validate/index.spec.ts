@@ -345,6 +345,68 @@ const schemaWithEmptyTemplates: Schema = {
     },
   ],
 };
+const schemaWithEmptyTemplateFields: Schema = {
+  collections: [
+    {
+      name: 'foo',
+      path: 'foo/bar',
+      templates: [
+        {
+          name: 'bar',
+          label: 'Bar',
+          fields: [],
+        },
+      ],
+    },
+  ],
+};
+const schemaWithEmptyObjectFieldTemplateFields: Schema = {
+  collections: [
+    {
+      name: 'foo',
+      path: 'foo/bar',
+      fields: [
+        {
+          name: 'items',
+          type: 'object',
+          templates: [
+            {
+              name: 'bar',
+              label: 'Bar',
+              fields: [],
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
+// A rich-text embed template with no fields is a legitimate, intentionally
+// supported shape (a prop-less self-closing element, e.g. `<Divider />`) -
+// unlike an object field's templates, a rich-text field's own GraphQL filter
+// type doesn't depend on its embed templates' field counts, so this must
+// keep validating successfully.
+const schemaWithEmptyRichTextTemplateFields: Schema = {
+  collections: [
+    {
+      name: 'foo',
+      path: 'foo/bar',
+      fields: [
+        {
+          name: 'body',
+          type: 'rich-text',
+          templates: [
+            {
+              name: 'bar',
+              label: 'Bar',
+              fields: [],
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
 const schemaWithInvalidFiledNesterUnderRichText = {
   collections: [
     {
@@ -466,6 +528,21 @@ describe('validateSchema', () => {
     expect(() => {
       validateSchema({ schema: schemaWithEmptyTemplates });
     }).toThrow();
+  });
+  it('fails when a collection template fields is empty', () => {
+    expect(() => {
+      validateSchema({ schema: schemaWithEmptyTemplateFields });
+    }).toThrow('Property `fields` cannot be empty.');
+  });
+  it('fails when an object field template fields is empty', () => {
+    expect(() => {
+      validateSchema({ schema: schemaWithEmptyObjectFieldTemplateFields });
+    }).toThrow('Property `fields` cannot be empty.');
+  });
+  it('passes when a rich-text embed template fields is empty', () => {
+    expect(() => {
+      validateSchema({ schema: schemaWithEmptyRichTextTemplateFields });
+    }).not.toThrow();
   });
   it('fails when a deeply nested field under a template is invalid', () => {
     expect(() => {
