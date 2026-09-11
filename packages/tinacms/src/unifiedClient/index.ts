@@ -113,8 +113,7 @@ export class TinaClient<GenQueries> {
         typeof window === 'undefined' &&
         !isEdgeRuntimeWithoutFs()
       ) {
-        const { NodeCache } = await import('../cache/node-cache.js');
-        this.cache = await NodeCache(this.cacheDir);
+        this.cache = await this.createCache(this.cacheDir);
         if (this.cache) {
           this.cacheLock = new AsyncLock();
         }
@@ -123,6 +122,10 @@ export class TinaClient<GenQueries> {
       console.error(e);
     }
     this.initialized = true;
+  }
+
+  protected async createCache(_dir: string): Promise<Cache | null> {
+    return null;
   }
 
   public async request<DataType extends Record<string, any> = any>(
