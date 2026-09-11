@@ -27,6 +27,7 @@ export const EDITORIAL_WORKFLOW_ERROR = {
   BRANCH_EXISTS: 'BRANCH_EXISTS',
   BRANCH_HIERARCHY_CONFLICT: 'BRANCH_HIERARCHY_CONFLICT',
   VALIDATION_FAILED: 'VALIDATION_FAILED',
+  INDEXING_FAILED: 'INDEXING_FAILED',
 } as const;
 
 export type EditorialWorkflowError =
@@ -38,7 +39,11 @@ export type EditorialWorkflowError =
 export type EditorialWorkflowErrorDetails = Error & {
   errorCode?: string;
   conflictingBranch?: string;
+  filepath?: string;
 };
+
+export const EDITORIAL_WORKFLOW_EVENT_LOG_DOCS_URL =
+  'https://tina.io/docs/tinacloud/dashboard/event-log#common-causes';
 
 /**
  * Result from a completed editorial workflow operation
