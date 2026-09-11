@@ -11,9 +11,15 @@ import {
 const HELLO_RAW = `---
 title: Hello World
 featured: false
+author: content/authors/ada.md
 ---
 
 Body prose.
+`;
+
+const ADA_RAW = `---
+name: Ada
+---
 `;
 
 let rootDir: string;
@@ -23,6 +29,8 @@ beforeEach(async () => {
   rootDir = await fs.mkdtemp(path.join(tmpdir(), 'tina-graphql-'));
   await fs.mkdir(path.join(rootDir, 'content/posts'), { recursive: true });
   await fs.writeFile(path.join(rootDir, 'content/posts/hello.mdx'), HELLO_RAW);
+  await fs.mkdir(path.join(rootDir, 'content/authors'), { recursive: true });
+  await fs.writeFile(path.join(rootDir, 'content/authors/ada.md'), ADA_RAW);
   dataLayer = createLocalDataLayer({
     rootDir,
     collections: [
@@ -33,8 +41,15 @@ beforeEach(async () => {
         fields: [
           { name: 'title', type: 'string', required: true },
           { name: 'featured', type: 'boolean' },
+          { name: 'author', type: 'reference', collections: ['author'] },
           { name: 'body', type: 'rich-text', isBody: true },
         ],
+      },
+      {
+        name: 'author',
+        path: 'content/authors',
+        format: 'md',
+        fields: [{ name: 'name', type: 'string', required: true }],
       },
     ],
   });
@@ -52,6 +67,18 @@ describe('graphql (the v3 pipeline)', () => {
     expect(result.data?.post).toMatchObject({
       title: 'Hello World',
       featured: false,
+    });
+  });
+
+  it('resolves a reference into the document it points at', async () => {
+    const result = await dataLayer.graphql(
+      'query($relativePath: String!) { post(relativePath: $relativePath) { title author { ... on Author { name } } } }',
+      { relativePath: 'hello.mdx' }
+    );
+    expect(result.errors).toBeUndefined();
+    expect(result.data?.post).toMatchObject({
+      title: 'Hello World',
+      author: { name: 'Ada' },
     });
   });
 

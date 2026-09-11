@@ -21,6 +21,7 @@ export interface FieldSchema extends BaseFieldSchema {
   type: string;
   isBody?: boolean;
   templates?: TemplateSchema[];
+  collections?: string[];
 }
 
 export const COLLECTION_FORMATS = ['md', 'mdx', 'json', 'yaml'] as const;

@@ -23,4 +23,8 @@ export const sampleDocument = {
       },
     ],
   },
+  pages: {
+    title: 'Test Title',
+    featured: true,
+  },
 } satisfies TinaDocument;
