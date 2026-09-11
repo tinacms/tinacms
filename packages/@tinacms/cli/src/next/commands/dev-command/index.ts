@@ -13,7 +13,7 @@ import { dangerText, warnText } from '../../../utils/theme';
 import { Codegen } from '../../codegen';
 import { ConfigManager } from '../../config-manager';
 import { createAndInitializeDatabase, createDBServer } from '../../database';
-import { getBasePath } from '../../vite';
+import { getAdminApiURL, getBasePath, getDevServerUrl } from '../../vite';
 import { BaseCommand } from '../baseCommands';
 import { devHTML } from './html';
 import { createDevServer } from './server';
@@ -177,13 +177,15 @@ export class DevCommand extends BaseCommand {
         }
       }
     };
-    const { apiURL, graphQLSchema, tinaSchema } = await setup({
+    const { graphQLSchema, tinaSchema } = await setup({
       firstTime: true,
     });
 
+    const devServerUrl = getDevServerUrl(configManager, this.port);
+    const adminApiURL = getAdminApiURL(configManager, this.port);
     await fs.outputFile(
       configManager.outputHTMLFilePath,
-      devHTML(this.port, getBasePath(configManager))
+      devHTML(devServerUrl, getBasePath(configManager))
     );
     // Add the gitignore so the index.html and assets are committed to git
     await fs.outputFile(
@@ -249,7 +251,7 @@ export class DevCommand extends BaseCommand {
       configManager,
       database,
       searchIndexWithFuzzy,
-      apiURL,
+      adminApiURL,
       this.noWatch,
       dbLock
     );
@@ -298,7 +300,7 @@ export class DevCommand extends BaseCommand {
           },
           {
             key: 'API url',
-            value: apiURL,
+            value: adminApiURL,
           },
           ...subItems,
         ],

@@ -106,6 +106,57 @@ describe('getBasePath', () => {
   });
 });
 
+describe('createConfig server.url wiring', () => {
+  const stubWithServerUrl = (url: string) => {
+    const cm = stubConfigManager();
+    (cm.config as any).server = { url };
+    return cm;
+  };
+
+  it('allows the configured host so the dev server does not 403 it', async () => {
+    const config = await createConfig({
+      configManager: stubWithServerUrl(
+        'https://my-codespace-4001.app.github.dev'
+      ),
+      database: {} as Database,
+      apiURL: 'https://my-codespace-4001.app.github.dev/graphql',
+      noWatch: true,
+    });
+
+    expect(config.server!.allowedHosts).toEqual([
+      'my-codespace-4001.app.github.dev',
+    ]);
+  });
+
+  it('leaves allowedHosts at the Vite default when server.url is unset', async () => {
+    const config = await createConfig({
+      configManager: stubConfigManager(),
+      database: {} as Database,
+      apiURL: 'http://localhost:4001/graphql',
+      noWatch: true,
+    });
+
+    expect(config.server!.allowedHosts).toEqual([]);
+  });
+
+  it('accepts the admin origin through the CORS callback without extra config', async () => {
+    const config = await createConfig({
+      configManager: stubWithServerUrl('https://mycontainer.test'),
+      database: {} as Database,
+      apiURL: 'https://mycontainer.test/graphql',
+      noWatch: true,
+    });
+
+    const originFn = (config.server!.cors as any).origin;
+    const allowed = await new Promise<boolean>((resolve) => {
+      originFn('https://mycontainer.test', (_err: any, allow: boolean) =>
+        resolve(!!allow)
+      );
+    });
+    expect(allowed).toBe(true);
+  });
+});
+
 describe('createConfig', () => {
   let spy: jest.SpyInstance;
 
