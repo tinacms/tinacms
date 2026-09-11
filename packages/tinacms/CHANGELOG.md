@@ -1,5 +1,29 @@
 # tinacms
 
+## 3.13.1
+
+### Patch Changes
+
+- [#7539](https://github.com/tinacms/tinacms/pull/7539) [`901975f`](https://github.com/tinacms/tinacms/commit/901975f9974d92be3d881998741602ae0d99f05e) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Cycle the loading copy through a bank of llama-themed messages in a random order, with a short fade between them. The admin loading page, the sidebar loading placeholder, and the TinaCMS wrapper all share the same message list.
+
+- [#7551](https://github.com/tinacms/tinacms/pull/7551) [`2bbbaaf`](https://github.com/tinacms/tinacms/commit/2bbbaaf809453b4046b09692cec45ec5e4cc2c04) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - URL-encode the pagination cursor in the media list request, so folders whose cursor contains a reserved character load every page instead of repeating the first one.
+
+- [#7529](https://github.com/tinacms/tinacms/pull/7529) [`c5407b7`](https://github.com/tinacms/tinacms/commit/c5407b7f97c922ddace0062a3c8b04d34b921a91) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Replace generic "Please wait" loading copy with more on-brand messaging in the admin loading page, sidebar loading placeholder, and TinaCMS wrapper.
+
+- [#7538](https://github.com/tinacms/tinacms/pull/7538) [`a658075`](https://github.com/tinacms/tinacms/commit/a658075e87aa973a81620a6ff89ff48c11003a0f) Thanks [@kulesy](https://github.com/kulesy)! - Use absolute URLs for the README images so they render on the npm package page.
+
+- [#7520](https://github.com/tinacms/tinacms/pull/7520) [`60db64b`](https://github.com/tinacms/tinacms/commit/60db64bf3e80550fcaf6f9c4ec79c19191c1702c) Thanks [@kulesy](https://github.com/kulesy)! - Revert the final-form family to v4 so edits inside nested panels survive navigating back
+
+  `react-final-form` 7.0.1 resets a field to its initial value whenever it mounts at a path that has no registered field. The sidebar unmounts the parent field set every time you open a group, an object-list item or a block, so on the way back the parent field remounted and was reset, throwing away every unsaved edit made inside the panel. Reported in 3.12.1 as "I have to save each list item before backing out".
+
+  Back to `final-form` 4.20.10, `final-form-arrays` ^3.1.0 and `react-final-form` ^6.5.9 until the upstream fix (final-form/react-final-form#1096) ships.
+
+- [#7522](https://github.com/tinacms/tinacms/pull/7522) [`b57dbf4`](https://github.com/tinacms/tinacms/commit/b57dbf4b56201aef15cd92caa49fd12ab96bbecf) Thanks [@wicksipedia](https://github.com/wicksipedia)! - The admin preview route now resolves its path against the admin's own origin. When the resolved value points elsewhere the preview stays on the site root, raises a warning, and replaces the rejected address in history so neither the address bar nor the back button keeps pointing at the other site.
+
+  The origin trusted for the admin-to-preview message channel is now the admin's own origin rather than one derived from the preview URL, so a URL cannot nominate the origin it is then trusted from.
+
+  The active-field lookup also guards against a preview whose document it cannot read (a cross-origin or sandboxed frame), where it previously threw and unmounted the admin.
+
 ## 3.13.0
 
 ### Minor Changes

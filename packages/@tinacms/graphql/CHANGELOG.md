@@ -1,5 +1,13 @@
 # tina-graphql
 
+## 2.4.12
+
+### Patch Changes
+
+- [#7516](https://github.com/tinacms/tinacms/pull/7516) [`96d6efe`](https://github.com/tinacms/tinacms/commit/96d6efe03e7fc9515d2caa7fe81f54f41abcd2e6) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Normalize document IDs and `_sys.path` on Windows to prevent the same document from creating separate Visual Editing forms across query paths.
+
+  Mutation resolvers now also work from a POSIX path, so `_sys.hasReferences` is reported correctly and deleting or renaming a referenced document updates the referring documents instead of silently leaving them pointing at the old path.
+
 ## 2.4.11
 
 ### Patch Changes
