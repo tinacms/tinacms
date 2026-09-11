@@ -45,6 +45,9 @@ v4 supplies four more examples:
   of item fields. Its items reuse the ordinary field contract through
   `<FieldNode>` and `validateField` — see
   [Compound fields](#compound-fields) below.
+- The `object` field ([`object-field.md`](./object-field.md)) groups a fixed
+  set of nested fields under one name. It is the `array` field without the
+  repetition, and it uses the same compound-field mechanism.
 - The `select` field ([`select-field.md`](./select-field.md)) picks one value
   from a fixed `options` list. Its Zod validator is a `z.enum` with a custom
   `errorMap`, and it has no `defaultValue`, `parse`, or `serialize`.
@@ -251,9 +254,11 @@ need three extra pieces. Each one has a plain, ordinary counterpart; refer to
 
 - **Rendering** — `<FieldNode address node>` (`editor/field.tsx`) renders one
   resolved node at an address, the same way `<Field>` does after it resolves a
-  node by name. A compound field's component calls `<FieldNode>` directly,
-  once for each item field, with a nested address such as `items.0.title`.
-  Export it from your own component the same way `array-field.ui.tsx` does.
+  node by name. A compound field's component renders one child field per row
+  with `<NestedFieldRow address node>` (`editor/field.tsx`) — the label and
+  `<FieldNode>` pair, with a nested address such as `items.0.title`. `array`
+  and `object` both use it; a new compound field imports it, it does not copy
+  it.
 - **Parse and serialize** — `context.registry` (`FieldTransformContext`,
   `core/field/contract.ts`) carries the registry into `parse` and `serialize`.
   A compound field's `parse`/`serialize` calls `ingestDocument`/

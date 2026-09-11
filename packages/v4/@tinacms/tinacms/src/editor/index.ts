@@ -16,6 +16,8 @@ export {
   FieldNode,
   type FieldNodeProps,
   type FieldProps,
+  NestedFieldRow,
+  type NestedFieldRowProps,
 } from './field';
 export {
   FormProvider,

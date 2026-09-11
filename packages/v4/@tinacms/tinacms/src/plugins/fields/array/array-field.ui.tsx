@@ -1,12 +1,10 @@
 import { Button } from '@tinacms/ui/components/button';
 import { FieldWrapper } from '@tinacms/ui/components/field-wrapper';
-import { Label } from '@tinacms/ui/components/label';
 import { useFieldArray, useFormContext } from 'react-hook-form';
-import { toFieldAddress } from '../../../core/field/address';
 import { ingestDocument } from '../../../core/form/ingest';
-import type { FieldSchema, TinaDocument } from '../../../core/schema/types';
+import type { TinaDocument } from '../../../core/schema/types';
 import {
-  FieldNode,
+  NestedFieldRow,
   useDocumentPath,
   useFieldAddress,
   useFieldErrors,
@@ -14,29 +12,6 @@ import {
   useFieldSchema,
 } from '../../../editor';
 import { asArrayFieldSchema } from './array-field.schema';
-
-function ItemFieldRow({
-  address,
-  node,
-}: {
-  address: string;
-  node: FieldSchema;
-}) {
-  const labelable =
-    useFieldRegistry().get(node.type)?.metadata?.labelable !== false;
-  return (
-    <div className='mb-3 min-w-0 last:mb-0'>
-      <Label
-        className='mb-1'
-        id={`${address}-label`}
-        htmlFor={labelable ? address : undefined}
-      >
-        {node.label ?? node.name}
-      </Label>
-      <FieldNode address={toFieldAddress(address)} node={node} />
-    </div>
-  );
-}
 
 export function ArrayField() {
   const address = useFieldAddress();
@@ -103,7 +78,7 @@ export function ArrayField() {
               </div>
             </div>
             {field.fields.map((subfield) => (
-              <ItemFieldRow
+              <NestedFieldRow
                 key={subfield.name}
                 address={`${address}.${index}.${subfield.name}`}
                 node={subfield}

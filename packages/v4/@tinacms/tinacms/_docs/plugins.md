@@ -56,6 +56,7 @@ same time, one plugin for each schema `type` such as `string` or `image`.
   - [The `datetime` field](./datetime-field.md) — the datetime-local input that
     v4 supplies
   - [The `array` field](./array-field.md) — the repeatable field that v4 supplies
+  - [The `object` field](./object-field.md) — the field group that v4 supplies
   - [The `select` field](./select-field.md) — the fixed-option picker that v4
     supplies
   - [The `rich-text` field](./rich-text-field.md) — the Plate editor that v4
