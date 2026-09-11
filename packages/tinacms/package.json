@@ -7,7 +7,11 @@
   "module": "./dist/index.js",
   "exports": {
     ".": "./dist/index.js",
-    "./dist/client": "./dist/client.js",
+    "./dist/client": {
+      "types": "./dist/client.d.ts",
+      "browser": "./dist/client.browser.js",
+      "default": "./dist/client.js"
+    },
     "./react": "./dist/react.js",
     "./dist/react": "./dist/react.js",
     "./tina-field": "./dist/tina-field.js",
@@ -30,7 +34,8 @@
       {
         "name": "src/client.ts",
         "target": "node"
-      }
+      },
+      "src/client.browser.ts"
     ]
   },
   "license": "Apache-2.0",
