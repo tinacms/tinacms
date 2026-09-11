@@ -1,8 +1,7 @@
-import {
-  type CollectionSchema,
-  type FieldSchema,
-  REFERENCE_FIELD_TYPE,
-  type TinaDocument,
+import type {
+  CollectionSchema,
+  FieldSchema,
+  TinaDocument,
 } from '../schema/types';
 
 export interface ReferenceTarget {
@@ -18,9 +17,11 @@ const childFieldsOf = (node: FieldSchema): FieldSchema[] | undefined => {
   return Array.isArray(fields) ? fields : undefined;
 };
 
-// A reference stores the path of the document it points at. `collections`
-// narrows the candidates, and the one whose `path` contains that document owns
-// it — `content.get` needs a collection name, not a path.
+// A reference stores the path of the document it points at, and it is the only
+// node that declares `collections`. Reading that rather than the type key keeps
+// core from naming a field type. `collections` narrows the candidates, and the
+// one whose `path` contains that document owns it, because `content.get` needs
+// a collection name and not a path.
 const targetOf = (
   node: FieldSchema,
   value: unknown,
@@ -38,9 +39,9 @@ const targetOf = (
   return owner ? { collection: owner.name, path: value } : null;
 };
 
-// TODO(#7534): this walk reads `node.fields` and matches on the type key
-// itself, so it misses any other way a plugin nests children. `templates` is
-// the live gap. Fold it into the registry-driven path that `ingest.ts` uses.
+// TODO(#7534): this walk reads `node.fields`, so it misses any other way a
+// plugin nests children. `templates` is the live gap. Fold it into the
+// registry-driven path that `ingest.ts` uses.
 export const collectReferences = (
   values: TinaDocument | undefined,
   fields: FieldSchema[],
@@ -50,9 +51,9 @@ export const collectReferences = (
   const walk = (document: TinaDocument, nodes: FieldSchema[]): void => {
     for (const node of nodes) {
       const value = document[node.name];
-      if (node.type === REFERENCE_FIELD_TYPE) {
-        const target = targetOf(node, value, collections);
-        if (target) targets.push(target);
+      const target = targetOf(node, value, collections);
+      if (target) {
+        targets.push(target);
         continue;
       }
       const children = childFieldsOf(node);
@@ -85,9 +86,9 @@ export const resolveReferences = (
     const resolved: TinaDocument = { ...document };
     for (const node of nodes) {
       const value = document[node.name];
-      if (node.type === REFERENCE_FIELD_TYPE) {
-        const target = targetOf(node, value, collections);
-        const referenced = target ? resolve(target) : undefined;
+      const target = targetOf(node, value, collections);
+      if (target) {
+        const referenced = resolve(target);
         if (referenced) resolved[node.name] = referenced;
         continue;
       }

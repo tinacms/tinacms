@@ -1,14 +1,7 @@
 import { ZodType, z } from 'zod';
-import {
-  type BaseFieldSchema,
-  type FieldSchema,
-  REFERENCE_FIELD_TYPE,
-} from '../../../core/schema/types';
+import type { BaseFieldSchema, FieldSchema } from '../../../core/schema/types';
 
-// The key lives in core, which reads it to resolve references for the
-// preview. Re-exported so this file stays the plugin's schema surface, as
-// every other field's does.
-export { REFERENCE_FIELD_TYPE };
+export const REFERENCE_FIELD_TYPE = 'reference';
 
 export interface ReferenceFieldSchema extends BaseFieldSchema {
   type: typeof REFERENCE_FIELD_TYPE;
