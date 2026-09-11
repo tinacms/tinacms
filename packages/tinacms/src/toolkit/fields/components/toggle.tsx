@@ -12,7 +12,7 @@ export interface ToggleProps {
   onFocus?: <T>(_event?: React.FocusEvent<T>) => void;
 }
 
-interface ToggleFieldDefinition extends Field {
+export interface ToggleFieldDefinition extends Field {
   component: 'toggle';
   toggleLabels?: boolean | FieldLabels;
 }
