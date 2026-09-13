@@ -1,3 +1,5 @@
+import arrayFieldPlugin from './array/array-field.plugin';
+import { array } from './array/array-field.schema';
 import booleanFieldPlugin from './boolean/boolean-field.plugin';
 import { boolean } from './boolean/boolean-field.schema';
 import datetimeFieldPlugin from './datetime/datetime-field.plugin';
@@ -16,13 +18,15 @@ export const corePlugins = [
   booleanFieldPlugin,
   numberFieldPlugin,
   datetimeFieldPlugin,
+  arrayFieldPlugin,
   selectFieldPlugin,
   richTextFieldPlugin,
 ];
 
 // TODO: build `t` from the configured plugin set when defineConfig arrives
-export const t = { string, boolean, number, datetime, select, richText };
+export const t = { string, boolean, number, datetime, select, array, richText };
 
+export type { ArrayFieldSchema } from './array/array-field.schema';
 export type { BooleanFieldSchema } from './boolean/boolean-field.schema';
 export type { DatetimeFieldSchema } from './datetime/datetime-field.schema';
 export type { NumberFieldSchema } from './number/number-field.schema';

@@ -4,7 +4,28 @@ import type { FormatAdapter } from './format-adapters';
 const dropLayoutBlankLine = (body: string): string =>
   body.startsWith('\n') ? body.slice(1) : body;
 
-const NO_MATTER_CACHE = {};
+const refuse = (language: string) => {
+  const reject = () => {
+    throw new Error(
+      `${language} execution in frontmatter is not allowed for security reasons`
+    );
+  };
+  return { parse: reject, stringify: reject };
+};
+
+/**
+ * gray-matter runs `---js` front matter through eval(). Replace the engines
+ * that execute code, so a document cannot run code when the adapter reads or
+ * writes it. An options object also turns off the gray-matter parse cache.
+ */
+const MATTER_OPTIONS = {
+  engines: {
+    js: refuse('JavaScript'),
+    javascript: refuse('JavaScript'),
+    coffee: refuse('CoffeeScript'),
+    coffeescript: refuse('CoffeeScript'),
+  },
+};
 
 const CRLF = '\r\n';
 
@@ -37,14 +58,14 @@ const mergeFrontmatter = (
 export const markdownAdapter = (extension: string): FormatAdapter => ({
   extension,
   parse: (raw, bodyField) => {
-    const { data, content } = matter(toLineFeeds(raw), NO_MATTER_CACHE);
+    const { data, content } = matter(toLineFeeds(raw), MATTER_OPTIONS);
     return bodyField
       ? { ...data, [bodyField]: dropLayoutBlankLine(content) }
       : data;
   },
   serialize: (document, previousRaw, bodyField) => {
     const crlf = previousRaw?.includes(CRLF) ?? false;
-    const previous = matter(toLineFeeds(previousRaw ?? ''), NO_MATTER_CACHE);
+    const previous = matter(toLineFeeds(previousRaw ?? ''), MATTER_OPTIONS);
     const frontmatter = mergeFrontmatter(document, previous.data);
     if (bodyField != null) {
       delete frontmatter[bodyField];
@@ -63,7 +84,10 @@ export const markdownAdapter = (extension: string): FormatAdapter => ({
     ) {
       return previousRaw;
     }
-    return toDocumentEol(matter.stringify(content, frontmatter), crlf);
+    return toDocumentEol(
+      matter.stringify(content, frontmatter, MATTER_OPTIONS),
+      crlf
+    );
   },
 });
 

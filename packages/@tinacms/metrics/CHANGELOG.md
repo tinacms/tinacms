@@ -1,5 +1,13 @@
 # @tinacms/metrics
 
+## 2.1.3
+
+### Patch Changes
+
+- [#7476](https://github.com/tinacms/tinacms/pull/7476) [`f48009e`](https://github.com/tinacms/tinacms/commit/f48009ec6cabe28427a430b80299fe92ede5da0d) Thanks [@kulesy](https://github.com/kulesy)! - chore(tinacms-pkgs): point `repository.directory` at each package's own folder
+
+  Eight packages declared a `repository.directory` copied from whichever package they were forked from, so the "repository" link on their npm pages resolved to unrelated source. Also drops a dead `generate:schema` script from `@tinacms/metrics`, `@tinacms/cli` and `@tinacms/schema-tools` - it referenced a `scripts/generateSchema.js` that has never existed in the repo and nothing invoked it.
+
 ## 2.1.2
 
 ### Patch Changes

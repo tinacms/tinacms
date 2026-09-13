@@ -36,11 +36,7 @@ import {
   type TinaRuntime,
   TinaRuntimeContext,
 } from './context';
-import {
-  type FieldErrorEntry,
-  fieldErrorMessages,
-  toFieldErrorEntry,
-} from './field-errors';
+import { flattenFieldErrors, nestFieldErrors } from './field-errors';
 import { buildFormResolver } from './resolver';
 
 export interface TinaProviderProps {
@@ -159,15 +155,17 @@ export function FormProvider({
   const { registry } = runtime;
 
   const formId = toFormId(path);
-  const transformContext = useMemo(() => ({ documentPath: path }), [path]);
+  const transformContext = useMemo(
+    () => ({ documentPath: path, registry }),
+    [path, registry]
+  );
   const ingested = useMemo(
-    () =>
-      ingestDocument(document, collection.fields, registry, transformContext),
-    [document, collection, registry, transformContext]
+    () => ingestDocument(document, collection.fields, transformContext),
+    [document, collection, transformContext]
   );
   const equal = useMemo(
-    () => fieldEqualityFor(collection.fields, registry, transformContext),
-    [collection, registry, transformContext]
+    () => fieldEqualityFor(collection.fields, transformContext),
+    [collection, transformContext]
   );
   // What a fresh form instance adopts from the store. It samples the store one time,
   // because RHF replaces its full error state each time the `errors` option changes
@@ -176,11 +174,10 @@ export function FormProvider({
     const scope = readFormStore().forms[formId];
     if (!keepsValues(scope, toFormValues(ingested)))
       return { seed: null, errors: {} };
-    const errors: Record<string, FieldErrorEntry> = {};
-    for (const [address, messages] of Object.entries(scope.errors)) {
-      if (messages?.length) errors[address] = toFieldErrorEntry(messages);
-    }
-    return { seed: toDocument(scope.values), errors };
+    return {
+      seed: toDocument(scope.values),
+      errors: nestFieldErrors(scope.errors),
+    };
   }, [formId]);
   // Whether the scope still keeps its values against the document of this render. A
   // clean scope stops keeping them when another writer changes the file, so the test
@@ -239,14 +236,19 @@ export function FormProvider({
       callback: ({ values, errors, name }) => {
         const store = useFormStore.getState();
         if (name !== undefined) {
-          store.setFieldValue(formId, toFieldAddress(name), values[name]);
+          // The store's live-values mirror is flat, one entry per top-level
+          // field. A nested field name collapses to its top-level address.
+          const topLevel = name.split('.')[0];
+          store.setFieldValue(
+            formId,
+            toFieldAddress(topLevel),
+            values[topLevel]
+          );
         }
+        const flat = flattenFieldErrors(errors ?? {});
         const mirrored: FieldErrors = {};
-        for (const [field, entry] of Object.entries(
-          (errors ?? {}) as Record<string, FieldErrorEntry | undefined>
-        )) {
-          const messages = fieldErrorMessages(entry);
-          if (messages.length > 0) mirrored[toFieldAddress(field)] = messages;
+        for (const [address, messages] of Object.entries(flat)) {
+          mirrored[toFieldAddress(address)] = messages;
         }
         store.setFieldErrors(formId, mirrored);
       },

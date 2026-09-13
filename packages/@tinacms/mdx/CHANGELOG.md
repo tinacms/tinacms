@@ -1,5 +1,22 @@
 # @tinacms/mdx
 
+## 2.2.2
+
+### Patch Changes
+
+- [#7449](https://github.com/tinacms/tinacms/pull/7449) [`d0593a3`](https://github.com/tinacms/tinacms/commit/d0593a37a42c9f393bbafea252cf0c1fd6a2f03a) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Parse a hard break, and strikethrough, inside a link. `[a\`⏎`b](/x)` and `[~~a~~](/x)` both threw, collapsing the whole rich-text field to an `invalid_markdown` blob. Part of #7415.
+
+- [#7450](https://github.com/tinacms/tinacms/pull/7450) [`dbd9234`](https://github.com/tinacms/tinacms/commit/dbd9234de2c8976e986faaeefd161e3f42520200) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Stop writing a hard break where markdown cannot represent one. `one\` with nothing after it, or a break before raw HTML or an inline template, came back as a literal backslash the author never typed. Fixes #5426. Part of #7415.
+
+- [#7476](https://github.com/tinacms/tinacms/pull/7476) [`f48009e`](https://github.com/tinacms/tinacms/commit/f48009ec6cabe28427a430b80299fe92ede5da0d) Thanks [@kulesy](https://github.com/kulesy)! - chore(tinacms-pkgs): point `repository.directory` at each package's own folder
+
+  Eight packages declared a `repository.directory` copied from whichever package they were forked from, so the "repository" link on their npm pages resolved to unrelated source. Also drops a dead `generate:schema` script from `@tinacms/metrics`, `@tinacms/cli` and `@tinacms/schema-tools` - it referenced a `scripts/generateSchema.js` that has never existed in the repo and nothing invoked it.
+
+- [#7451](https://github.com/tinacms/tinacms/pull/7451) [`16b9ca1`](https://github.com/tinacms/tinacms/commit/16b9ca173a8f26e885d8a924a6ff89f0eb062f18) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Split an `h3`–`h6` on a hard break instead of losing it. Those levels have no setext form, so the break silently became a space. `#` and `##` are unchanged. Part of #7415.
+
+- Updated dependencies [[`d340dab`](https://github.com/tinacms/tinacms/commit/d340dab38c0356a9aa86f1531e317924b25c68fa), [`f48009e`](https://github.com/tinacms/tinacms/commit/f48009ec6cabe28427a430b80299fe92ede5da0d), [`fd6aaaf`](https://github.com/tinacms/tinacms/commit/fd6aaaf5b85a907c0803bbd20dd1d4f972677589), [`fd6aaaf`](https://github.com/tinacms/tinacms/commit/fd6aaaf5b85a907c0803bbd20dd1d4f972677589)]:
+  - @tinacms/schema-tools@2.10.0
+
 ## 2.2.1
 
 ### Patch Changes

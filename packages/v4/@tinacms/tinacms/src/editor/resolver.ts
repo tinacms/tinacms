@@ -1,8 +1,8 @@
 import type { Resolver } from 'react-hook-form';
 import type { FieldRegistry } from '../core/field/registry';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
-import { validateField } from '../core/validation';
-import { type FieldErrorEntry, toFieldErrorEntry } from './field-errors';
+import { validateFieldTree } from '../core/validation';
+import { nestFieldErrors } from './field-errors';
 
 export const buildFormResolver =
   (
@@ -10,15 +10,15 @@ export const buildFormResolver =
     registry: FieldRegistry
   ): Resolver<TinaDocument> =>
   (values) => {
-    const errors: Record<string, FieldErrorEntry> = {};
+    const flatErrors: Record<string, string[]> = {};
     for (const node of collection.fields) {
       const descriptor = registry.get(node.type);
-      const fieldErrors = validateField(node, descriptor, values[node.name]);
-      if (fieldErrors.length > 0) {
-        errors[node.name] = toFieldErrorEntry(fieldErrors);
-      }
+      const value = values[node.name];
+      Object.assign(
+        flatErrors,
+        validateFieldTree(node, descriptor, value, node.name, registry)
+      );
     }
-    return Object.keys(errors).length > 0
-      ? { values: {}, errors }
-      : { values, errors: {} };
+    if (Object.keys(flatErrors).length === 0) return { values, errors: {} };
+    return { values: {}, errors: nestFieldErrors(flatErrors) };
   };

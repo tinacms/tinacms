@@ -205,7 +205,11 @@ export const useFormStore = create<FormStore>()(
                 [formId]: {
                   ...scope,
                   status: 'edited',
-                  baseline: savedValues ?? scope.values,
+                  // A caller passes the form library's own value tree, which it
+                  // keeps mutating in place. The baseline must be a private
+                  // snapshot or a later edit mutates it too and never reads as
+                  // dirty.
+                  baseline: structuredClone(savedValues ?? scope.values),
                   errors: isEdited(scope) ? scope.errors : {},
                 },
               },

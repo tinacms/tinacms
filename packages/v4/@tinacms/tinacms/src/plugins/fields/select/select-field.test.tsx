@@ -151,30 +151,30 @@ describe('SelectField ingest and digest', () => {
   it('round-trips a stored value unchanged', async () => {
     const registry = await resolveRegistry();
     const stored = { status: 'published', priority: 'high' };
-    const ingested = ingestDocument(stored, collection.fields, registry);
+    const ingested = ingestDocument(stored, collection.fields, { registry });
     expect(ingested).toEqual(stored);
-    expect(digestDocument(ingested, collection.fields, registry)).toEqual(
+    expect(digestDocument(ingested, collection.fields, { registry })).toEqual(
       stored
     );
   });
 
   it('leaves an absent field absent (no default seeding)', async () => {
     const registry = await resolveRegistry();
-    expect(ingestDocument({}, collection.fields, registry)).toEqual({});
-    expect(digestDocument({}, collection.fields, registry)).toEqual({});
+    expect(ingestDocument({}, collection.fields, { registry })).toEqual({});
+    expect(digestDocument({}, collection.fields, { registry })).toEqual({});
   });
 
   it('digests a cleared (null) selection as absent, not literal null', async () => {
     const registry = await resolveRegistry();
     expect(
-      digestDocument({ priority: null }, collection.fields, registry)
+      digestDocument({ priority: null }, collection.fields, { registry })
     ).toEqual({});
   });
 
   it('ingests a stored null as absent', async () => {
     const registry = await resolveRegistry();
     expect(
-      ingestDocument({ priority: null }, collection.fields, registry)
+      ingestDocument({ priority: null }, collection.fields, { registry })
     ).toEqual({});
   });
 });

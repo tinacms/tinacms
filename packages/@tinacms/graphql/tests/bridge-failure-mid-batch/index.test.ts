@@ -72,3 +72,46 @@ it('surfaces a structured error to the caller when bridge.put throws during a cr
   expect(reported).toBeTruthy();
   expect(bridge.getWriteAttempts().length).toBeGreaterThan(0);
 });
+
+it('preserves the underlying bridge.put error message in the reported error', async () => {
+  class ProtectedBranchBridge extends FilesystemBridge {
+    async put(_filepath: string, _data: string): Promise<void> {
+      throw new Error(
+        'Could not create file: Changes must be made through a pull request.'
+      );
+    }
+  }
+
+  const bridge = new ProtectedBranchBridge(__dirname);
+  const level = new MemoryLevel<string, Record<string, any>>();
+  const database = createDatabaseInternal({
+    bridge,
+    level,
+    tinaDirectory: 'tina',
+  });
+  await database.indexContent(await buildSchema(config));
+
+  const result = await resolve({
+    database,
+    query: `
+      mutation {
+        createDocument(
+          collection: "author"
+          relativePath: "alice.md"
+          params: { author: { name: "Alice" } }
+        ) {
+          __typename
+        }
+      }
+    `,
+    variables: {},
+    silenceErrors: true,
+  });
+
+  expect(result.errors?.[0]?.message).toContain(
+    'Error in PUT for authors/alice.md'
+  );
+  expect(result.errors?.[0]?.message).toContain(
+    'Could not create file: Changes must be made through a pull request.'
+  );
+});
