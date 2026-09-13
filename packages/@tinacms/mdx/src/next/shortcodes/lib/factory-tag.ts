@@ -1,9 +1,9 @@
-import { ok as assert } from 'uvu/assert';
 import {
-  start as idStart,
   cont as idCont,
+  start as idStart,
 } from 'estree-util-is-identifier-name';
 import { factoryMdxExpression } from 'micromark-factory-mdx-expression';
+import type { Acorn, AcornOptions } from 'micromark-factory-mdx-expression';
 import { factorySpace } from 'micromark-factory-space';
 import {
   markdownLineEnding,
@@ -14,18 +14,18 @@ import {
 import { codes } from 'micromark-util-symbol/codes.js';
 import { constants } from 'micromark-util-symbol/constants.js';
 import { types } from 'micromark-util-symbol/types.js';
-import { VFileMessage } from 'vfile-message';
-import { findCode } from './util';
 import type {
-  Tokenizer,
-  TokenizeContext,
-  Effects,
   Code,
+  Effects,
   Point,
   State,
+  TokenizeContext,
+  Tokenizer,
 } from 'micromark-util-types';
-import type { Acorn, AcornOptions } from 'micromark-factory-mdx-expression';
+import { VFileMessage } from 'vfile-message';
+import { assert } from '../../../assert';
 import { Pattern } from './syntax';
+import { findCode } from './util';
 
 export function factoryTag(
   this: TokenizeContext,

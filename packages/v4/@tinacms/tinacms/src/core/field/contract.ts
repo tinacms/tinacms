@@ -1,26 +1,51 @@
 import type { ComponentType } from 'react';
 import type { ZodType } from 'zod';
 import type { FieldSchema } from '../schema/types';
+import type { FieldRegistry } from './registry';
 
-// Layout hint a composite (object/list/rich-text) reads to decide how to render a
-// child without branching on its type (ADR-009): `inline` = render in-line (e.g. a
-// single-line input), `block` = render as its own block/section.
 export type FieldLayout = 'inline' | 'block';
 
 export interface FieldMetadata {
   layout?: FieldLayout;
+  labelable?: boolean;
+}
+
+export interface FieldTransformContext {
+  documentPath?: string;
+  // A compound field reads this to parse, serialize, and validate its item
+  // fields.
+  registry: FieldRegistry;
 }
 
 export interface FieldDescriptor<TValue = unknown, TStored = unknown> {
-  type: string;
   Component: ComponentType;
   defaultValue?: TValue;
   metadata?: FieldMetadata;
   schema?: (node: FieldSchema) => ZodType;
   validate?: (value: TValue) => string | null;
-  // parse/serialize are the per-field ingest/digest transforms. string/boolean are
-  // identity; the number field uses them for string <-> number. image/datetime/reference
-  // will use them too (e.g. path <-> media object, ISO string <-> Date).
-  parse?: (stored: TStored) => TValue;
-  serialize?: (value: TValue) => TStored;
+  parse?: (
+    stored: TStored,
+    node: FieldSchema,
+    context: FieldTransformContext
+  ) => TValue;
+  serialize?: (
+    value: TValue,
+    node: FieldSchema,
+    context: FieldTransformContext
+  ) => TStored;
+  isEqual?: (
+    a: TValue,
+    b: TValue,
+    node: FieldSchema,
+    context: FieldTransformContext
+  ) => boolean;
+  // A compound field validates its own item fields and returns their
+  // messages as address -> messages. Key them off `address`, not `node.name`
+  // — a nested compound field is not addressed by its bare name.
+  validateChildren?: (
+    value: TValue,
+    node: FieldSchema,
+    address: string,
+    registry: FieldRegistry
+  ) => Record<string, string[]>;
 }

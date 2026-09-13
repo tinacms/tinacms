@@ -43,7 +43,11 @@ const errorHTML = `<style type="text/css">
   .trim()
   .replace(/[\r\n\s]+/g, ' ');
 
-export const devHTML = (port: string) => `<!DOCTYPE html>
+// `basePath` is Vite's configured `base` (e.g. `/admin/`); it starts and ends
+// with a slash. Vite 6 serves `@vite/client`, `@react-refresh`, and the SPA
+// entry under this base, so the injected dev endpoints must include it — Vite 4
+// served them at the server root, which is why omitting it 404s on Vite 6.
+export const devHTML = (port: string, basePath: string) => `<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -53,13 +57,13 @@ export const devHTML = (port: string) => `<!DOCTYPE html>
 
   <!-- if development -->
   <script type="module">
-    import RefreshRuntime from 'http://localhost:${port}/@react-refresh'
+    import RefreshRuntime from 'http://localhost:${port}${basePath}@react-refresh'
     RefreshRuntime.injectIntoGlobalHook(window)
     window.$RefreshReg$ = () => {}
     window.$RefreshSig$ = () => (type) => type
     window.__vite_plugin_react_preamble_installed__ = true
   </script>
-  <script type="module" src="http://localhost:${port}/@vite/client"></script>
+  <script type="module" src="http://localhost:${port}${basePath}@vite/client"></script>
   <script>
   function handleLoadError() {
     // Assets have failed to load
@@ -68,7 +72,7 @@ export const devHTML = (port: string) => `<!DOCTYPE html>
   </script>
   <script
     type="module"
-    src="http://localhost:${port}/src/main.tsx"
+    src="http://localhost:${port}${basePath}src/main.tsx"
     onerror="handleLoadError()"
   ></script>
   <body class="tina-tailwind">

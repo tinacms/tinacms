@@ -1,6 +1,6 @@
 {
 	"name": "@tinacms/mdx",
-	"version": "2.1.10",
+	"version": "2.2.2",
 	"type": "module",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -14,6 +14,10 @@
 			"types": "./dist/index.d.ts",
 			"browser": "./dist/index.browser.js",
 			"default": "./dist/index.js"
+		},
+		"./sanitize-url": {
+			"types": "./dist/sanitize-url.d.ts",
+			"default": "./dist/sanitize-url.js"
 		}
 	},
 	"license": "Apache-2.0",
@@ -23,20 +27,20 @@
 				"name": "src/index.ts",
 				"target": "node",
 				"bundleDeps": true
-			}
+			},
+			"src/sanitize-url.ts"
 		]
 	},
 	"scripts": {
 		"types": "tsc",
 		"build": "tinacms-scripts build",
-		"docs": "typedoc --plugin typedoc-plugin-markdown src/parse/plate.ts --theme markdown && concat-md --decrease-title-levels --dir-name-as-title docs > spec.md",
 		"serve": "nodemon dist/server.js",
 		"test": "vitest run",
 		"coverage": "vitest run --coverage",
 		"test-watch": "vitest"
 	},
 	"dependencies": {
-		"@tinacms/schema-tools": "workspace:*",
+		"@tinacms/schema-tools": "workspace:^",
 		"acorn": "catalog:",
 		"ccount": "catalog:",
 		"estree-util-is-identifier-name": "catalog:",
@@ -59,11 +63,9 @@
 		"remark-gfm": "catalog:",
 		"remark-mdx": "catalog:",
 		"stringify-entities": "catalog:",
-		"typedoc": "catalog:",
 		"unist-util-source": "catalog:",
 		"unist-util-stringify-position": "catalog:",
 		"unist-util-visit": "catalog:",
-		"uvu": "catalog:",
 		"vfile-message": "catalog:"
 	},
 	"publishConfig": {
@@ -71,7 +73,7 @@
 	},
 	"repository": {
 		"url": "https://github.com/tinacms/tinacms.git",
-		"directory": "packages/tina-graphql"
+		"directory": "packages/@tinacms/mdx"
 	},
 	"devDependencies": {
 		"@tinacms/scripts": "workspace:*",
@@ -81,10 +83,8 @@
 		"@types/prettier": "catalog:",
 		"@types/unist": "catalog:",
 		"c8": "catalog:",
-		"concat-md": "catalog:",
 		"jest-file-snapshot": "^0.5.0",
 		"ts-node": "catalog:",
-		"typedoc-plugin-markdown": "catalog:",
 		"typescript": "^5.7.3",
 		"vite": "^4.5.9",
 		"vitest": "^0.32.4"

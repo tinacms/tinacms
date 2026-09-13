@@ -1,5 +1,32 @@
 # @tinacms/search
 
+## 1.2.24
+
+### Patch Changes
+
+- [#7468](https://github.com/tinacms/tinacms/pull/7468) [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Remove the dead typedoc docs tooling
+
+  Both packages declared a `docs` script running `pnpm typedoc` without ever declaring `typedoc` as a dependency, so the script could not resolve its binary under pnpm's isolated `node_modules`. Their `typedoc.json` files were also written against the pre-0.20 option schema (`inputFiles`, `mode`, `excludeNotExported`), which the catalog's typedoc 0.26 no longer accepts. Nothing in `turbo.json` or any workflow invoked them, so the scripts and configs are removed along with the generated `spec.md` in `@tinacms/mdx`.
+
+- Updated dependencies [[`195087d`](https://github.com/tinacms/tinacms/commit/195087de7e617d9d91b06709db869787ac0c800f), [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe)]:
+  - @tinacms/graphql@2.4.10
+  - @tinacms/schema-tools@2.9.0
+
+## 1.2.23
+
+### Patch Changes
+
+- [#7213](https://github.com/tinacms/tinacms/pull/7213) [`056ffc2`](https://github.com/tinacms/tinacms/commit/056ffc22dc87b0040281054f4140c6260c22ea1f) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Publish internal package references as ranges instead of exact versions.
+
+  Internal dependencies were declared as `workspace:*`, which pnpm expands to an **exact version** when publishing (`"tinacms": "3.10.0"`), not a range. An exact pin cannot deduplicate against the version a consumer has already installed, so npm nests a second — and third — complete copy of `tinacms` and its dependency tree. In a stock Astro + TinaCMS blog this produced three copies of `tinacms`, three of `mermaid` (186 MB), five of `date-fns` (151 MB), and four of `typescript` (88 MB): about **320 MB of duplication**.
+
+  The same expansion applied to `peerDependencies`, so packages such as `next-tinacms-cloudinary` and `tinacms-authjs` published `"tinacms": "3.10.0"` as a _peer_ — requiring consumers to have that exact version or hit an `ERESOLVE` conflict, and forcing a republish of every dependent on each `tinacms` release.
+
+  Switching these to `workspace:^` publishes them as caret ranges (`^3.10.0`), which deduplicate normally and let `onlyUpdatePeerDependentsWhenOutOfRange` do its job.
+
+- Updated dependencies [[`056ffc2`](https://github.com/tinacms/tinacms/commit/056ffc22dc87b0040281054f4140c6260c22ea1f)]:
+  - @tinacms/graphql@2.4.9
+
 ## 1.2.22
 
 ### Patch Changes

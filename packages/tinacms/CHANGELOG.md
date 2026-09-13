@@ -1,5 +1,224 @@
 # tinacms
 
+## 3.13.0
+
+### Minor Changes
+
+- [#7477](https://github.com/tinacms/tinacms/pull/7477) [`fd6aaaf`](https://github.com/tinacms/tinacms/commit/fd6aaaf5b85a907c0803bbd20dd1d4f972677589) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Add `accept` to the image field, restricting which file types the field will take. It takes an extension, a category (`image`, `video`, `audio`, `document`), or an array of either. The field's own dropzone and the media picker's both refuse a file outside it, the picker narrows the library to matching files, and a selection outside it raises an alert instead of being written. `jpg` and `jpeg` are treated as the same type. Existing values are left alone.
+
+- [#7423](https://github.com/tinacms/tinacms/pull/7423) [`7c21906`](https://github.com/tinacms/tinacms/commit/7c2190666b8717eee88c68531c5fd9efdd6ced0e) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Add TinaCloud media rename support to the Media Manager.
+
+  Repo-backed media can now be renamed directly from the Media Manager. Renames on unprotected branches are applied directly, while renames on protected branches use the editorial workflow and create a pull request from a new workflow branch.
+
+  Local media rename behavior is unchanged, and static or self-hosted repo media stores still do not expose the Rename action.
+
+  Renaming does not update existing content references to the old media path. Rename failures from the assets API are surfaced in the UI with their specific error messages.
+
+- [#7494](https://github.com/tinacms/tinacms/pull/7494) [`37f2e6a`](https://github.com/tinacms/tinacms/commit/37f2e6ac4d7e33faed049d5bc224fcb030095ef1) Thanks [@lastenvoy30](https://github.com/lastenvoy30)! - Render semantic `<thead>`/`<th>` for markdown tables in TinaMarkdown
+
+  Markdown (GFM) tables previously rendered every row as `<tbody><td>`, with
+  no `<thead>` or `<th>`. That diverges from standard GFM output and breaks
+  accessibility (assistive tech relies on `<th>` to associate headers with
+  data cells) as well as the `th` component override.
+
+  The first row of a markdown table is now rendered as `<thead><th>`,
+  matching the existing behavior for editor-authored MDX tables. Remaining
+  rows render as `<tbody><td>` as before. Column alignment is preserved on
+  both `<th>` and `<td>`.
+
+  **Breaking change:** sites that styled table headers via `td` or
+  `tbody tr:first-child` selectors will need to update those selectors to
+  target `th`/`thead` instead.
+
+  **Breaking change:** the default inline `border: 1px solid #EDECF3` on
+  `<table>` and the `border`/`padding: 0.25rem` on cells are no longer
+  applied, and `align` is no longer leaked onto the DOM as a raw attribute.
+  Tables now inherit your stylesheet instead of the inline styles that used
+  to beat it on specificity, so a table that rendered as a boxed grid will
+  look different until you style it yourself.
+
+### Patch Changes
+
+- [#7495](https://github.com/tinacms/tinacms/pull/7495) [`57707bf`](https://github.com/tinacms/tinacms/commit/57707bff31b1f7512119fe3e58009126ab0f1172) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Show the configured Git author in the editorial workflow save dialog.
+
+  When saving to a new branch, the dialog now shows whether commits will be made as the TinaCloud bot or as you, with a link to change the setting.
+
+- [#7467](https://github.com/tinacms/tinacms/pull/7467) [`2264a16`](https://github.com/tinacms/tinacms/commit/2264a164bd09682ee8cca69e8af5ba324ce20b22) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Download the mermaid diagram library only when a document actually contains a mermaid code block. The rich-text editor imported mermaid at the top of its code-block component, so the admin shipped the whole library to every editor session even when no project file used a diagram. The import now happens inside the code that parses and renders a diagram, which lets the bundler split mermaid into its own chunk. In the kitchen-sink admin build the entry chunk drops from 6,339,116 to 5,698,025 bytes (1,974,875 to 1,823,566 gzipped), and the 635,594-byte mermaid chunk (150,677 gzipped) is fetched on demand instead. A diagram preview shows a placeholder while the chunk loads, and a chunk that fails to load is reported in the same place the editor already reports diagram syntax errors.
+
+- [#7477](https://github.com/tinacms/tinacms/pull/7477) [`fd6aaaf`](https://github.com/tinacms/tinacms/commit/fd6aaaf5b85a907c0803bbd20dd1d4f972677589) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Make the image field's `accept` work on `list: true` fields, and filter by extension server-side everywhere. The list variant built each item input from a bare `{component: 'image'}`, so a gallery got no dropzone restriction and no insert guard. The local dev server now accepts an `ext` param on `/media/list`, filtering before it paginates, so the media manager's type filter no longer narrows a page after the fact. A `staticMedia` store reports no extension filtering and hides the control rather than showing one that would leave a near-empty grid.
+
+- [#7486](https://github.com/tinacms/tinacms/pull/7486) [`d340dab`](https://github.com/tinacms/tinacms/commit/d340dab38c0356a9aa86f1531e317924b25c68fa) Thanks [@kulesy](https://github.com/kulesy)! - A session that expires mid-edit now returns the user to the login modal on every path. The content API client dispatches `cms:session-expired` and throws a typed `SessionExpiredError` when a GraphQL request comes back 401, and the REST transport (`fetchWithToken`, used by branch listing, billing, editorial-workflow polling, search indexing and the media store) notifies the same flow when a tokened request 401s, so saves, deletes, renames, folder creation and every panel land on the login modal instead of generic error dialogs, misleading unauthorized panels, or a success toast for a save that never ran. The auth wall suppresses new alerts between expiry and re-login so nothing paints over the login modal, session expiries are no longer recorded as save failures in analytics, a transient identity-API failure no longer reads as a logged-out session (one retry, then it surfaces as an error), and custom content APIs keep a console diagnostic for 401 loops caused by backend misconfiguration.
+
+  Also fixes the `registerApi` event bridge this rides on: `api.events` was forwarded to the global bus with an unbound `dispatch`, so the api-to-cms direction documented on `Client.events` has never delivered an event. Both directions now forward, with guards scoped to the in-flight event so nested dispatches still bridge.
+
+- [#7452](https://github.com/tinacms/tinacms/pull/7452) [`aa686c6`](https://github.com/tinacms/tinacms/commit/aa686c64932fca9775fb4a4c06840a2480e6f560) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Make `shift+Enter` produce a line break that survives a save. Plate inserted a literal `\n`, which markdown re-flowed into a space, so the break vanished everywhere except blockquotes. Code blocks and table cells are unchanged. Fixes #6555 and #7408.
+
+- Updated dependencies [[`d340dab`](https://github.com/tinacms/tinacms/commit/d340dab38c0356a9aa86f1531e317924b25c68fa), [`d0593a3`](https://github.com/tinacms/tinacms/commit/d0593a37a42c9f393bbafea252cf0c1fd6a2f03a), [`dbd9234`](https://github.com/tinacms/tinacms/commit/dbd9234de2c8976e986faaeefd161e3f42520200), [`f48009e`](https://github.com/tinacms/tinacms/commit/f48009ec6cabe28427a430b80299fe92ede5da0d), [`fd6aaaf`](https://github.com/tinacms/tinacms/commit/fd6aaaf5b85a907c0803bbd20dd1d4f972677589), [`fd6aaaf`](https://github.com/tinacms/tinacms/commit/fd6aaaf5b85a907c0803bbd20dd1d4f972677589), [`16b9ca1`](https://github.com/tinacms/tinacms/commit/16b9ca173a8f26e885d8a924a6ff89f0eb062f18)]:
+  - @tinacms/schema-tools@2.10.0
+  - @tinacms/mdx@2.2.2
+
+## 3.12.1
+
+### Patch Changes
+
+- [#7469](https://github.com/tinacms/tinacms/pull/7469) [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Bump the final-form family to the TypeScript releases
+
+  `final-form` 4.20.10 → ^5.0.1, `final-form-arrays` ^3.1.0 → ^4.0.1, `react-final-form` ^6.5.9 → ^7.0.1. All three majors are the same event: a coordinated Flow → TypeScript rewrite published on 2025-06-07 and labelled as carrying no API changes. `react-final-form@7` is where React 19 was added to the peer range, which clears the last unmet peer warning on install outside the GraphiQL chain.
+
+  They must move together because each peers on the next: `react-final-form@7` requires `final-form@^5`, and `final-form-arrays@3` peers on `final-form@^4`. `final-form-set-field-data` stays put — its peer is `>=1.2.0`.
+
+- [#7472](https://github.com/tinacms/tinacms/pull/7472) [`d7cdea7`](https://github.com/tinacms/tinacms/commit/d7cdea75219702574fa78b6adcc90c368e4e71eb) Thanks [@kulesy](https://github.com/kulesy)! - Fix `Button` and `IconButton` not passing `disabled` to the DOM. Both components used the prop only to pick styling (`pointer-events-none`), which blocks the pointer but not the keyboard, so every disabled button in the CMS stayed focusable and could still be activated with Enter or Space. `busy` is now treated as disabled too, closing a double-submit path on in-flight buttons. `disabled` is omitted when `Button` renders as a tag that does not support it (`as='a'`).
+
+- [#7468](https://github.com/tinacms/tinacms/pull/7468) [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Drop the deprecated `crypto-js` dependency
+
+  `@tinacms/cli` used it in one place, to generate the default `NEXTAUTH_SECRET` offered during `tinacms init`. `crypto.lib.WordArray.random(16).toString()` is replaced with `randomBytes(16).toString('hex')` from `node:crypto`, which produces the same 32-character hex string. `tinacms` declared the dependency without ever importing it.
+
+- [#7469](https://github.com/tinacms/tinacms/pull/7469) [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Declare the field props that `react-final-form`'s index signature used to cover
+
+  `FieldRenderProps` carried `[otherProp: string]: any` in v6, so the extras `FieldsBuilder` passes to every field plugin — `tinaForm`, `index`, `children`, `experimental_focusIntent` — type-checked implicitly. v7's TypeScript rewrite dropped that index signature, so they are now declared on `FieldProps` directly. The rich-text plugin's `rawMode`, `setRawMode` and `rawEditor` are declared on its own props rather than the shared type.
+
+  No runtime change; these props were always being passed.
+
+- [#6763](https://github.com/tinacms/tinacms/pull/6763) [`8d94e35`](https://github.com/tinacms/tinacms/commit/8d94e354d9bb62ce52defb56c1e25ac114b0d971) Thanks [@kulesy](https://github.com/kulesy)! - Fix "Save to new branch" failing with "Branch operation failed" when the derived branch name is not a valid Git ref, e.g. when a collection's `path` has a trailing slash, producing `content/articles//foo.mdx` and the invalid ref `tina/articles//foo`. The default branch name derived from the file path, and any user-typed name, are now normalised to a valid ref: repeated and leading/trailing slashes collapse, characters Git forbids in refs (whitespace, control characters, `~ ^ : ? * [ \` and the `@{` sequence) become hyphens, `..` runs collapse, and leading dots and trailing `.` / `.lock` are stripped per path component. Saving is disabled while the name normalises to an empty string. The same normalisation now runs when creating a branch from the branch switcher and from the deleted-branch recovery modal, and the duplicated `formatBranchName` helpers are unified into a single util (the legacy branch switcher previously deleted invalid characters; it now replaces them with hyphens like the main switcher).
+
+- [#7469](https://github.com/tinacms/tinacms/pull/7469) [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Add `data-test` hooks to group-list and blocks field controls
+
+  Mirrors the hooks already on simple list fields, so end-to-end tests can target the add button and field wrapper of an object list or a blocks field without depending on Tailwind classes. Nested fields carry their full path, e.g. `add-item-blocks.0.actions`.
+
+- [#7483](https://github.com/tinacms/tinacms/pull/7483) [`4d08c25`](https://github.com/tinacms/tinacms/commit/4d08c2546f96fa7b8fbef48b19e19c45e24b44d5) Thanks [@kulesy](https://github.com/kulesy)! - Fix two admin regressions that appear once the TinaCloud session check starts failing. Making the collection list settle instead of spinning left the previously fetched data in place, so switching collections rendered the last collection's documents under the new collection's heading; on a fresh mount it left `collection` undefined with no error set, so `GetCollection` ran its auto-open effect against it and threw, which the top-level error boundary caught and replaced the admin with a raw TypeError card. A failed session check now sends the user straight back to the login modal with a "Your session has ended" message, and signing back in returns them to the page they were on. `GetCollection` and `GetDocument` also stop handing `undefined` to their children, showing an "Unable to load" popup for non-auth load failures, and `GetCollection`'s auto-open effect bails out early, which clears the same crash on a failed `fetchCollection`.
+
+- [#7445](https://github.com/tinacms/tinacms/pull/7445) [`37ca62b`](https://github.com/tinacms/tinacms/commit/37ca62b66aadb2cb80daa280a25a390c0bc2e4af) Thanks [@kulesy](https://github.com/kulesy)! - Skip TinaCloud identity requests when no auth token is stored. Logged-out admin loads no longer produce misleading 401/CORS console errors; a clear console message now points at the login popup console instead. Also fixes an unawaited auth guard in GetDocument, stops the document view from loading forever when that guard rejects the request, and fixes an unhandled promise rejection when the project settings request fails.
+
+- [#7469](https://github.com/tinacms/tinacms/pull/7469) [`e24fc0e`](https://github.com/tinacms/tinacms/commit/e24fc0eef00ecd4facdcbcdc78548fa8d78627e7) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Add `data-test` hooks to list field controls
+
+  The add and delete buttons on `list: true` fields had no stable selector, so end-to-end tests had to target Tailwind classes. Adds `data-test="list-<name>"` on the field wrapper, `data-test="add-item-<name>"` on the add button, and `data-test="delete-item-<name>.<index>"` on the delete button shared with group-list and blocks fields.
+
+  Every hook carries the full field path. The wrapper hook lands on the outer field wrapper, so a nested list's delete buttons are descendants of the outer list's wrapper; a bare id would make `[data-test="list-x"] [data-test="delete-item"]` match the wrong row once lists nest.
+
+- [#7445](https://github.com/tinacms/tinacms/pull/7445) [`37ca62b`](https://github.com/tinacms/tinacms/commit/37ca62b66aadb2cb80daa280a25a390c0bc2e4af) Thanks [@kulesy](https://github.com/kulesy)! - Fix the collection list and collection search hanging on the loading screen when the session check says the user is not signed in. Both now settle and render instead of spinning until the page is reloaded.
+
+- Updated dependencies [[`4f90806`](https://github.com/tinacms/tinacms/commit/4f9080666308063332e16d96d00a75ff7348c011), [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe), [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe), [`de5c7d7`](https://github.com/tinacms/tinacms/commit/de5c7d72b67f589f1f5c4bccc5f5677e70cd7e2d)]:
+  - @tinacms/mdx@2.2.1
+  - @tinacms/search@1.2.24
+  - @tinacms/bridge@0.3.1
+  - @tinacms/schema-tools@2.9.0
+
+## 3.12.0
+
+### Minor Changes
+
+- [#7391](https://github.com/tinacms/tinacms/pull/7391) [`ece366b`](https://github.com/tinacms/tinacms/commit/ece366bd5aa86e048d22f829319e41fe3d1267ba) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Add a Rename action to the Media Manager, backed by the local dev server.
+
+  Selecting a file in the media preview now offers Rename alongside Insert and Delete. The modal edits the basename, keeps the extension, previews the sanitised result using the same rules uploads apply, and reports collisions and missing files specifically instead of a generic failure. Every open media picker refreshes afterwards, and pickers previewing the renamed file follow it to its new path.
+
+  Renaming does **not** update content that already references the old path — the modal says so explicitly.
+
+  The action only appears when the media store implements `rename`. `TinaMediaStore` implements it for local development via a new `POST /media/rename` route on the CLI dev server; TinaCloud, static and self-hosted repo-media stores do not advertise it, so the action stays hidden there rather than failing on click. Third-party stores (S3, Cloudinary, DigitalOcean Spaces, Azure) can opt in by implementing `MediaStore.rename`.
+
+  `MediaManager.rename()` dispatches `media:rename:start`, `media:rename:success` and `media:rename:failure`.
+
+- [#7323](https://github.com/tinacms/tinacms/pull/7323) [`4a19d66`](https://github.com/tinacms/tinacms/commit/4a19d669b069c0af959c6461cd60b5910aea6512) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Add media-manager search and a folder/file filter, and refresh the grid.
+
+  Search filters the library by file path (debounced, recursive across folders); the `All | Folders | Files` toggle narrows the view. Folders and files render in labelled sections, files show a type badge (JPEG/PNG/MP4…), and videos show a play overlay.
+
+  Search works against both TinaCloud media and local dev media. The local dev-server media endpoint (`@tinacms/cli`) now honours a `search` query param, matching paths recursively within the requested folder (case-insensitive) and staying within the media root. Matching is on the folder-relative path, so a folder name matches the files beneath it, and matching folders surface as their own folder results (local dev media; TinaCloud parity to follow). Results are paginated with the same `limit`/`cursor` contract as an unfiltered listing.
+
+  The search box is opt-in per media store via a new `searchable` flag on the `MediaStore` interface. The default (TinaCloud/local) store sets it; a custom or self-hosted store shows the box only once it sets `searchable` and reads `options.search` in its `list()`, so stores that don't support search don't get a box that returns unfiltered results.
+
+  Also fixes the breadcrumb rendering a duplicate root crumb — and Back not returning to the root — for folder names that carry a trailing slash.
+
+- [#7392](https://github.com/tinacms/tinacms/pull/7392) [`4b7d9b9`](https://github.com/tinacms/tinacms/commit/4b7d9b9f116f7f649aae1a573c838a663f97d99d) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: add tina-markdown web component
+  feat: add visual-editing library for web components
+
+### Patch Changes
+
+- [#7304](https://github.com/tinacms/tinacms/pull/7304) [`d7a1641`](https://github.com/tinacms/tinacms/commit/d7a16416b1b4bc1ba0e2aabdddcf39ed1e4135d7) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - refactor: facilitate token refresh through tinacloud
+
+- [#7422](https://github.com/tinacms/tinacms/pull/7422) [`f014558`](https://github.com/tinacms/tinacms/commit/f014558a7ece15964b3b2eda942c02fc609dc32f) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump `mermaid` to 11.16.1, picking up an upstream security fix (GHSA-c4c3-pg64-4m4v)
+
+- [#7388](https://github.com/tinacms/tinacms/pull/7388) [`17931b7`](https://github.com/tinacms/tinacms/commit/17931b72762afb575505c383ee6355476207a44e) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: add announcements banner
+
+- [#7216](https://github.com/tinacms/tinacms/pull/7216) [`cf75e5b`](https://github.com/tinacms/tinacms/commit/cf75e5b8dd3209203df9fe1ffbc12a9d965277f9) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Collapse three icon libraries into `lucide-react` (~85 MB).
+
+  `tinacms` declared `react-icons` (84 MB), `lucide-react` (32 MB) and `@heroicons/react` as production dependencies, so every user installed all three. Icon usage is entirely internal admin chrome — there is no icon-picker, no `icon` schema field type, and no dynamic whole-set import — so `react-icons` and `@heroicons/react` have been removed in favour of `lucide-react`, which was already the de-facto house set.
+
+  Not a breaking change for user content, schemas, or plugins: `ScreenPlugin.Icon` is typed `any`, and `CloudConfigOptions` is not publicly exported. The internal `IconType` prop type is now lucide's `LucideIcon`.
+
+  Six icons have no exact lucide counterpart and were substituted: `BsCheckCircleFill`/`BsExclamationOctagonFill` → `CircleCheck`/`OctagonAlert` (lucide is outline-only), `MdSyncProblem` → `RefreshCwOff`, `TbLogs` → `ScrollText`, `BiRename` → `SquarePen`, `MdOutlineDataSaverOff` → `Info`.
+
+- [#7327](https://github.com/tinacms/tinacms/pull/7327) [`5050709`](https://github.com/tinacms/tinacms/commit/5050709dcbbc99530d6b284021c259d098d6455d) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: when WorkOS is enabled, use a redirect-based workflow for authentication
+
+- [#7216](https://github.com/tinacms/tinacms/pull/7216) [`cf75e5b`](https://github.com/tinacms/tinacms/commit/cf75e5b8dd3209203df9fe1ffbc12a9d965277f9) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Drop `@headlessui/react` (~50 MB).
+
+  Headless UI v2 pulls in the entire React Aria stack (`react-aria` 34.8 MB, `react-stately` 9.4 MB, `@internationalized/*`) — about 50 MB installed — to provide components Radix already covers. `tinacms` was shipping three headless component libraries at once (`@radix-ui/*` in 22 files, `@headlessui/react` in 11, `@ariakit/react` in 1).
+
+  The 11 Headless UI files now use Radix (`Popover`, `DropdownMenu`) and local state, consolidating on the library that was already the majority. No new dependencies were added.
+
+  `Transition`/`TransitionChild` are replaced by a small local equivalent with the same prop API (`show`, `appear`, `enter*`/`leave*`). It uses `element.getAnimations({ subtree: true })` so a parent transition with no classes of its own still waits for its children to finish leaving before unmounting.
+
+- [#7214](https://github.com/tinacms/tinacms/pull/7214) [`bd4df92`](https://github.com/tinacms/tinacms/commit/bd4df92a7e00bd74ee13eaf9f9b584fbb1a864ab) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Stop shipping the `monaco-editor` package (~73 MB).
+
+  Every import of `monaco-editor` in shipped source was **types-only**. The editor itself has always been fetched from a CDN at runtime by `@monaco-editor/loader`, so the 73 MB installed on every user's disk was never executed — and was a different version (0.31.0) from the one that actually runs (0.55.1, the loader's default).
+
+  `monaco-editor` is a _required_ peer dependency of `@monaco-editor/react`, and npm 7+ auto-installs required peers, so removing it from our `dependencies` was not enough on its own. `@tinacms/app` now uses `@monaco-editor/loader` directly — the same loader `@monaco-editor/react` wraps, so the CDN and editor version are unchanged — and `monaco-editor` is kept as a devDependency for its types.
+
+  The copy of the raw editor in `packages/tinacms` was dead code: nothing imported it, it was not exported, and its `parseMDX`/`stringifyMDX` were stubs returning empty values. The live raw editor lives in `@tinacms/app` and is injected into `tinacms` as the `rawEditor` prop. It has been deleted, letting `tinacms` drop both monaco packages entirely.
+
+  No behaviour change: raw MDX mode still loads the same editor from the same CDN.
+
+- [#6403](https://github.com/tinacms/tinacms/pull/6403) [`566f977`](https://github.com/tinacms/tinacms/commit/566f9775bc306f1a41806a29eb22182700765974) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Fix the preview iframe going unresponsive after resizing the sidebar.
+
+  Dragging the resize handle used to disable pointer events on the entire app so the drag would survive the cursor crossing into the preview. Releasing the drag over the preview left it dead to clicks and scrolling until you clicked the sidebar again. The handle now uses pointer capture, which keeps the drag targeting the handle without touching the rest of the page, so the preview stays interactive throughout.
+
+  Also corrects the handle's fullscreen guard, which read a `fullscreen` key the sidebar context has never provided and so never fired. No behaviour change today, since nothing currently puts the sidebar into the fullscreen display state.
+
+- [#7233](https://github.com/tinacms/tinacms/pull/7233) [`5f14d96`](https://github.com/tinacms/tinacms/commit/5f14d96fdba3d7a143827fc1cac9c7964c3f9b01) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Add a dedicated `@tinacms/mdx/sanitize-url` subpath export containing just the URL-scheme sanitizer, and point `tinacms`'s rich-text renderer (`TinaMarkdown` / `StaticTinaMarkdown`) at it instead of the root `@tinacms/mdx` entry. Previously, importing `sanitizeUrl` pulled in `@tinacms/mdx`'s full remark/mdast/micromark markdown-parsing bundle (~2MB) into every site's client bundle, even though rich-text rendering only needs the ~15-line sanitizer. The root `@tinacms/mdx` export of `sanitizeUrl` is unchanged and still works.
+
+- [#7322](https://github.com/tinacms/tinacms/pull/7322) [`b6199da`](https://github.com/tinacms/tinacms/commit/b6199da1eeea7de01d5216c9b50c9e158440f891) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - The media manager now lists assets from the v2 assets-api endpoint. Uploads and deletes are unchanged and stay on v1. Listing behaviour is identical — this is a transport-only move that sets up media search.
+
+- [#7231](https://github.com/tinacms/tinacms/pull/7231) [`5112e60`](https://github.com/tinacms/tinacms/commit/5112e60bd0c98f6de36f63dbf068d252993e586f) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Remove dead code left over from the `monaco-editor` removal in the mdx field plugin.
+
+- [#7428](https://github.com/tinacms/tinacms/pull/7428) [`8c8e297`](https://github.com/tinacms/tinacms/commit/8c8e297efb12324f23785a5f8f7acbceeb3f0a4a) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Give the exported Plate plugin arrays (`plugins`, `viewPlugins`, `createEditorPlugins`) an explicit type, so their emitted declarations no longer carry a `.pnpm/` store path.
+
+  The Plate satellite packages take `@udecode/plate` as a peer and never depend on `@udecode/plate-core` directly, so pnpm resolves it through the hoisted store. Once `@tinacms/rich-text` brought in a React 19 copy, the hoisted pick could land on a variant that nothing in `tinacms` is able to name, and `tsc` then failed with TS2742 rather than emit a declaration. Which copy wins varies per install, so the failure came and went.
+
+- Updated dependencies [[`d7a1641`](https://github.com/tinacms/tinacms/commit/d7a16416b1b4bc1ba0e2aabdddcf39ed1e4135d7), [`5050709`](https://github.com/tinacms/tinacms/commit/5050709dcbbc99530d6b284021c259d098d6455d), [`064b78e`](https://github.com/tinacms/tinacms/commit/064b78e9407d5d7f91ab11dd8b99de8f8ac38ab1), [`a0e0d2e`](https://github.com/tinacms/tinacms/commit/a0e0d2e8d573abfbfb5a3d277ffe1c2b6d692e37), [`2860f56`](https://github.com/tinacms/tinacms/commit/2860f569b3f4f8f6115ee4399af855ea3baa61e1), [`5f14d96`](https://github.com/tinacms/tinacms/commit/5f14d96fdba3d7a143827fc1cac9c7964c3f9b01), [`4b7d9b9`](https://github.com/tinacms/tinacms/commit/4b7d9b9f116f7f649aae1a573c838a663f97d99d)]:
+  - @tinacms/schema-tools@2.9.0
+  - @tinacms/mdx@2.2.0
+  - @tinacms/bridge@0.3.1
+  - @tinacms/search@1.2.23
+
+## 3.11.0
+
+### Minor Changes
+
+- [#7235](https://github.com/tinacms/tinacms/pull/7235) [`908fe7d`](https://github.com/tinacms/tinacms/commit/908fe7ddc1c01a2c091f1e4f3c1b00f3696577b4) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Editorial-workflow saves (Save draft / Save to a new branch, and the media create-branch flow) now run a single branch-list lookup instead of two sequential ones, roughly halving the delay before the progress modal appears.
+
+### Patch Changes
+
+- [#7194](https://github.com/tinacms/tinacms/pull/7194) [`711ba30`](https://github.com/tinacms/tinacms/commit/711ba30f6e8955bbcea134fd22a5b498b7734325) Thanks [@kulesy](https://github.com/kulesy)! - `Button` now renders the shared loading-dots indicator automatically when `busy`, so every busy button gets a consistent spinner instead of each call site wiring its own (and some, like the account password form, were missing it entirely). The dots inherit the button text color so they stay visible across variants.
+
+- [#7161](https://github.com/tinacms/tinacms/pull/7161) [`566af78`](https://github.com/tinacms/tinacms/commit/566af78ded66891edeb6fdf928b6543d45ac76fd) Thanks [@ahfoysal](https://github.com/ahfoysal)! - Keep folder collection views open when they only contain one document.
+
+- [#7251](https://github.com/tinacms/tinacms/pull/7251) [`b8df6ee`](https://github.com/tinacms/tinacms/commit/b8df6eeee85b603406d204042a5ef95d49e8a9cf) Thanks [@kulesy](https://github.com/kulesy)! - Fix the rich-text link popover not appearing when adding or editing a link.
+
+  Since the popover was moved into a portal on `document.body`, `plate-floating`'s inline `z-index: 50` overrode its `z-[999999]` class, so it rendered behind the form field wrappers (which use z-index up to 1000) and was invisible. It now sits above them, so clicking the link button shows the URL input as expected.
+
+- [#7204](https://github.com/tinacms/tinacms/pull/7204) [`59efccc`](https://github.com/tinacms/tinacms/commit/59efcccd3f1713870e40ebd9db25659cd6357237) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Show a clear error when repo-based media is used with a self-hosted site, instead of a misleading "Bad Route" message.
+
+- [#7213](https://github.com/tinacms/tinacms/pull/7213) [`056ffc2`](https://github.com/tinacms/tinacms/commit/056ffc22dc87b0040281054f4140c6260c22ea1f) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Publish internal package references as ranges instead of exact versions.
+
+  Internal dependencies were declared as `workspace:*`, which pnpm expands to an **exact version** when publishing (`"tinacms": "3.10.0"`), not a range. An exact pin cannot deduplicate against the version a consumer has already installed, so npm nests a second — and third — complete copy of `tinacms` and its dependency tree. In a stock Astro + TinaCMS blog this produced three copies of `tinacms`, three of `mermaid` (186 MB), five of `date-fns` (151 MB), and four of `typescript` (88 MB): about **320 MB of duplication**.
+
+  The same expansion applied to `peerDependencies`, so packages such as `next-tinacms-cloudinary` and `tinacms-authjs` published `"tinacms": "3.10.0"` as a _peer_ — requiring consumers to have that exact version or hit an `ERESOLVE` conflict, and forcing a republish of every dependent on each `tinacms` release.
+
+  Switching these to `workspace:^` publishes them as caret ranges (`^3.10.0`), which deduplicate normally and let `onlyUpdatePeerDependentsWhenOutOfRange` do its job.
+
+- Updated dependencies [[`cdbf469`](https://github.com/tinacms/tinacms/commit/cdbf469d96d8a3bcf5d3096d53907a06eaaed7f2), [`056ffc2`](https://github.com/tinacms/tinacms/commit/056ffc22dc87b0040281054f4140c6260c22ea1f)]:
+  - @tinacms/bridge@0.3.1
+  - @tinacms/mdx@2.1.11
+  - @tinacms/search@1.2.23
+
 ## 3.10.1
 
 ### Patch Changes

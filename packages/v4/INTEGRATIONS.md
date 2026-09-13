@@ -1,75 +1,78 @@
 # v4 integration packages — repository moves
 
-The packages on this list ship as separate npm packages today, inside this
-monorepo, and are scoped to a single host framework (Next.js in most cases).
+The packages in this file are separate npm packages now, and they are in this
+monorepo. Each package operates with one host framework only. For most of them,
+that framework is Next.js.
 
-For v4 they move to their own TinaCMS-owned repos so they can:
+For v4, these packages move to their own repositories that TinaCMS owns. The
+move gives them these three abilities:
 
-- evolve on a release cadence independent of the core monorepo,
-- support more than one host framework (drop the `next-` framing where the
-  capability isn't actually Next-specific),
-- have their own CODEOWNERS, issue queue, and changelog.
+- They can release on a schedule that is independent of the core monorepo.
+- They can support more than one host framework. The `next-` name is not correct
+  when the capability is not specific to Next.js.
+- They can have their own CODEOWNERS file, issue queue, and changelog.
 
-The current npm names continue to exist. Repository ownership and the
-source-of-truth branch change; consumers don't have to re-install on day one.
+The npm names do not change. The repository owner and the primary branch change.
+A user does not have to install the package again immediately.
 
 ## Move table
 
-| Current package | Current path | New repo (TinaCMS-owned) | v4 npm name (planned) | Framework note |
+| Current package | Current path | New repository (TinaCMS owns it) | Planned v4 npm name | Framework note |
 |---|---|---|---|---|
-| `next-tinacms-cloudinary` | `packages/next-tinacms-cloudinary` | `github.com/tinacms/tinacms-cloudinary` | `@tinacms/cloudinary` | Drop the `next-` prefix; new package exposes a framework-neutral media store plus Next/Express/Astro adapter entries. |
-| `next-tinacms-s3` | `packages/next-tinacms-s3` | `github.com/tinacms/tinacms-s3` | `@tinacms/s3` | Framework-neutral media store; Next route handler becomes one adapter alongside Express/Astro/Hono. |
-| `next-tinacms-dos` | `packages/next-tinacms-dos` | `github.com/tinacms/tinacms-dos` | `@tinacms/digitalocean-spaces` | Same shape as the S3 move; DO Spaces sits on the S3 client so the framework-neutral core is shared with `@tinacms/s3` where practical. |
-| `next-tinacms-azure` | `packages/next-tinacms-azure` | `github.com/tinacms/tinacms-azure` | `@tinacms/azure-blob` | Framework-neutral media store on top of `@azure/storage-blob`. |
-| `tinacms-clerk` | `packages/tinacms-clerk` | `github.com/tinacms/tinacms-clerk` | `@tinacms/clerk` | Auth integration; gains adapter entries for non-Next frameworks (Express + Hono first, Astro alongside). |
-| `tinacms-authjs` *(formerly `tinacms-next-auth`)* | `packages/tinacms-authjs` | `github.com/tinacms/tinacms-authjs` | `@tinacms/authjs` | Auth.js integration; the Next-specific glue becomes one of several framework adapters. |
-| `tinacms-gitprovider-github` | `packages/tinacms-gitprovider-github` | `github.com/tinacms/tinacms-gitprovider-github` | `@tinacms/gitprovider-github` | Converted to a v4 plugin (server-segment + client-segment via the full-stack plugin model — see ADR-007 in the v4 spec). |
+| `next-tinacms-cloudinary` | `packages/next-tinacms-cloudinary` | `github.com/tinacms/tinacms-cloudinary` | `@tinacms/cloudinary` | Remove the `next-` prefix. The new package supplies a framework-neutral media store, and adapter entries for Next.js, Express, and Astro. |
+| `next-tinacms-s3` | `packages/next-tinacms-s3` | `github.com/tinacms/tinacms-s3` | `@tinacms/s3` | A framework-neutral media store. The Next.js route handler becomes one adapter. Express, Astro, and Hono get their own adapters. |
+| `next-tinacms-dos` | `packages/next-tinacms-dos` | `github.com/tinacms/tinacms-dos` | `@tinacms/digitalocean-spaces` | The same shape as the S3 move. DigitalOcean Spaces uses the S3 client. Thus it shares the framework-neutral core with `@tinacms/s3` where possible. |
+| `next-tinacms-azure` | `packages/next-tinacms-azure` | `github.com/tinacms/tinacms-azure` | `@tinacms/azure-blob` | A framework-neutral media store on `@azure/storage-blob`. |
+| `tinacms-clerk` | `packages/tinacms-clerk` | `github.com/tinacms/tinacms-clerk` | `@tinacms/clerk` | An auth integration. It gets adapter entries for frameworks other than Next.js: Express and Hono first, then Astro. |
+| `tinacms-authjs` *(the previous name was `tinacms-next-auth`)* | `packages/tinacms-authjs` | `github.com/tinacms/tinacms-authjs` | `@tinacms/authjs` | An Auth.js integration. The code that is specific to Next.js becomes one framework adapter of a set. |
+| `tinacms-gitprovider-github` | `packages/tinacms-gitprovider-github` | `github.com/tinacms/tinacms-gitprovider-github` | `@tinacms/gitprovider-github` | The team changes it to a v4 plugin with a server segment and a client segment. ADR-007 of the v4 specification gives this full-stack plugin model. |
 
-## What "moved" means in practice
+## The move procedure
 
-For each row above:
+Do these steps for each row above:
 
-1. **Repo is created** with the existing source copied over, CODEOWNERS
-   pointing at the TinaCMS core team, and the changesets / GitHub Actions
-   wired to publish to npm.
-2. **First independent release** ships under the v4 npm name (`@tinacms/*`)
-   with a framework-neutral core plus adapter entries (`/next`, `/express`,
-   `/astro`, `/hono`) following the same convention as
-   `@tinacms/tinacms`'s exports map.
-3. **In-monorepo source** is marked deprecated (npm `deprecated` field
-   pointing at the new package) and frozen — no new features, only critical
-   security fixes during the v3 support window.
-4. **Documentation** in the TinaCMS docs site swaps the install command and
-   import paths for the new package. The old install command continues to
-   work for v3 consumers.
+1. Create the repository. Copy the source code into it. Set CODEOWNERS to the
+   TinaCMS core team. Configure the changesets and the GitHub Actions that
+   release to npm.
+2. Make the first independent release with the v4 npm name (`@tinacms/*`). The
+   release contains a framework-neutral core, and the adapter entries `/next`,
+   `/express`, `/astro`, and `/hono`. Use the same convention as the `exports`
+   map of `@tinacms/tinacms`.
+3. Make the source code in the monorepo deprecated. Set the npm `deprecated`
+   field to point to the new package. Do not add features. Supply only necessary
+   security fixes during the v3 support period.
+4. Change the TinaCMS documentation site. Replace the installation command and
+   the import paths with the new package. The v3 installation command continues
+   to operate.
 
-## Framework-neutral core convention
+## The convention for a framework-neutral core
 
-Each new repo follows the same internal layout so a reviewer can move
-between them without re-learning the structure:
+Each new repository uses the same internal layout. Thus a reviewer can move
+between the repositories and does not learn a new structure.
 
 ```
 @tinacms/<name>/
 ├── src/
-│   ├── index.ts            # universal entry — config types + framework-neutral client
-│   ├── server/             # server primitives (request handler factory, signed-URL helpers, …)
+│   ├── index.ts            # universal entry: config types, framework-neutral client
+│   ├── server/             # server primitives: request handler factory, signed-URL helpers
 │   └── adapters/
-│       ├── next/index.ts   # Next route handler / App-Router handlers
+│       ├── next/index.ts   # Next.js route handler, App Router handlers
 │       ├── express/index.ts
 │       ├── astro/index.ts
 │       └── hono/index.ts
-└── package.json            # exports map with one entry per adapter
+└── package.json            # exports map with one entry for each adapter
 ```
 
-The Next.js code that lives at the top of the current `next-tinacms-*`
-packages moves into `src/adapters/next/`. The reusable bits (credential
-loading, signing, request validation) move into `src/` and `src/server/`.
+The Next.js code at the top of each current `next-tinacms-*` package moves into
+`src/adapters/next/`. The code that all frameworks use moves into `src/` and
+`src/server/`. This code loads the credentials, signs the requests, and
+validates the requests.
 
-## What is **not** moving
+## The packages that do not move
 
-- `mongodb-level`, `sqlite-level`, `upstash-redis-level` — already in their
-  own repos.
-- `create-tina-app` — stays in this monorepo (see
-  [`README.md`](./README.md)).
-- Any `@tinacms/*` package listed in the retained v4 surface in
+- `mongodb-level`, `sqlite-level`, and `upstash-redis-level`. They are already
+  in their own repositories.
+- `create-tina-app`. It stays in this monorepo. Refer to
+  [`README.md`](./README.md).
+- Each `@tinacms/*` package in the list of v4 packages in
   [`README.md`](./README.md).

@@ -8,8 +8,8 @@ import { FormBuilder } from '@toolkit/form-builder';
 import { Form } from '@toolkit/forms';
 import { ScreenPlugin } from '@toolkit/react-screens';
 import { useCMS } from '@toolkit/react-tinacms';
+import { Globe } from 'lucide-react';
 import * as React from 'react';
-import { MdOutlineLanguage } from 'react-icons/md';
 
 export class GlobalFormPlugin implements ScreenPlugin {
   __type: ScreenPlugin['__type'] = 'screen';
@@ -24,7 +24,7 @@ export class GlobalFormPlugin implements ScreenPlugin {
     layout?: ScreenPlugin['layout']
   ) {
     this.name = form.label;
-    this.Icon = icon || MdOutlineLanguage;
+    this.Icon = icon || Globe;
     this.layout = layout || 'popup';
     this.Component = () => {
       const cms = useCMS();

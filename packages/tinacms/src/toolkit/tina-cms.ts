@@ -35,13 +35,12 @@ import {
   MarkdownFieldPlaceholder,
 } from '@toolkit/plugin-fields/markdown';
 import { MediaManagerScreenPlugin } from '@toolkit/plugin-screens/media-manager-screen';
-import { PasswordScreenPlugin } from '@toolkit/plugin-screens/password-screen';
 import { MediaUsageDashboardScreenPlugin } from '@toolkit/plugin-screens/media-usage-dashboard-screen';
+import { PasswordScreenPlugin } from '@toolkit/plugin-screens/password-screen';
 import { createCloudConfig } from '@toolkit/react-cloud-config';
 import type { ScreenPlugin } from '@toolkit/react-screens';
 import { SidebarState, type SidebarStateOptions } from '@toolkit/react-sidebar';
-import { MdOutlinePerson } from 'react-icons/md';
-import { MdOutlineHelpOutline } from 'react-icons/md';
+import { CircleHelp, User } from 'lucide-react';
 import type { Client } from '../internalClient';
 import type { TinaAction, TinaState } from './tina-state';
 const DEFAULT_FIELDS = [
@@ -148,7 +147,7 @@ export class TinaCMS extends CMS {
               text: 'User Management',
               href: `https://app.tina.io/projects/${clientId}/collaborators`,
             },
-            Icon: MdOutlinePerson,
+            Icon: User,
           })
         );
         this.plugins.add(
@@ -158,7 +157,7 @@ export class TinaCMS extends CMS {
               text: 'Support',
               href: 'https://tina.io/docs/r/support',
             },
-            Icon: MdOutlineHelpOutline,
+            Icon: CircleHelp,
           })
         );
       } else if (!isSelfHosted) {

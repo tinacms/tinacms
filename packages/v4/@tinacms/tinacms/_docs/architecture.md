@@ -1,70 +1,122 @@
 # `@tinacms/tinacms` (v4) — architecture
 
-How a collection schema and its plugins become an editing form, and how edits are
-written back. For what a plugin is, see [plugins.md](./plugins.md).
+This document tells you how a collection schema and its plugins become an
+editing form. It also tells you how TinaCMS writes the changes back to the
+document. For a description of a plugin, refer to [plugins.md](./plugins.md).
 
-The flow: **schema + plugins → registry → form → `<Field>` → component ⇄ hooks →
-validate → digest**.
+The sequence is: schema and plugins → registry → form → `<Field>` → component ⇄
+hooks → validation → digest.
 
-## 1. Resolve plugins into a registry
+## 1. Resolve the plugins into a registry
 
-`<TinaProvider plugins={[…]}>` (`editor/provider.tsx`) calls `resolveFieldPlugins`
-(`core/field/registry.ts`): it awaits each manifest's `client()` import and builds
-the `FieldRegistry`, a `Map<type, FieldDescriptor>`. Two plugins at the same
-`type` throw unless one declares `overrides`. The registry rides down through
-`RegistryContext`.
+`<TinaAdmin config>` (`admin/admin.tsx`) mounts `<TinaProvider>` itself, so an
+app renders one component and does not compose the provider by hand.
+`<TinaProvider plugins={[...]}>` (`editor/provider.tsx`) calls
+`resolveFieldPlugins` (`core/field/registry.ts`). `resolveFieldPlugins` awaits
+the `client()` import of each manifest. Then it builds the `FieldRegistry`, a
+`Map<type, FieldDescriptor>`. If two plugins have the same `type`, the function
+throws an error. To prevent the error, one plugin must declare `overrides`.
+`RegistryContext` supplies the registry to the components below it.
 
 ## 2. Seed a form from the document
 
 `<FormProvider collection document>` builds the form:
 
-- `ingestDocument(document, fields, registry)` (`core/form/ingest.ts`) produces
-  react-hook-form's `defaultValues` — per field, the descriptor's `parse(stored)`,
-  or its `defaultValue` when the key is absent.
-- `buildFormResolver(collection, registry)` (`editor/resolver.ts`) is the RHF
-  resolver.
-- `useForm({ defaultValues, resolver, mode: 'onChange' })` holds the values;
-  switching documents re-seeds via `reset`.
+- `ingestDocument(document, fields, registry)` (`core/form/ingest.ts`) makes the
+  `defaultValues` object for react-hook-form. For each field, it calls the
+  `parse(stored, node, context)` function of the descriptor. If the document
+  does not contain that key, it uses `defaultValue`.
+- `buildFormResolver(collection, registry)` (`editor/resolver.ts`) is the
+  resolver for react-hook-form.
+- `useForm({ defaultValues, resolver, mode: 'onChange' })` holds the values. If
+  you open a different document, `reset` seeds the form again.
 
-The collection schema and active-field state ride down through context alongside
-RHF's own `FormProvider`.
+The context supplies the collection schema and the active-field state to the
+components below it. React-hook-form supplies its own `FormProvider`.
 
 ## 3. Render a field
 
-`<Field address="title" />` (`editor/field.tsx`) finds the schema node by `name`,
-reads its `type`, pulls the `descriptor` from the registry, and renders
-`descriptor.Component` inside a `FieldAddressContext` carrying the address and a
-`FieldSchemaContext` carrying the resolved node. The component takes no props.
+`<Field address="title" />` (`editor/field.tsx`) finds the schema node with the
+`name` property, then it renders `<FieldNode address node>` with that node.
+`<FieldNode>` gets the `descriptor` from the registry, then it renders
+`descriptor.Component` in two contexts. `FieldAddressContext` contains the
+address. `FieldSchemaContext` contains the resolved node. The component has no
+props.
 
-## 4. Read & write through hooks
+A compound field, such as `array`, does not read its item nodes from the
+collection schema. It reads them from its own config (`ArrayFieldSchema.fields`),
+and it renders `<FieldNode>` directly, with a nested address such as
+`items.0.title`. Thus an item field renders through the same descriptor
+resolution as a top-level field. Refer to
+[`array-field.md`](./array-field.md#the-component).
 
-The component pulls everything from address-keyed hooks (`editor/hooks.ts`):
+## 4. Read the value and write the value with hooks
 
-| Hook | Backed by |
+The component gets all its data from hooks that use the address
+(`editor/hooks.ts`):
+
+| Hook | Source |
 |---|---|
 | `useFieldAddress()` | `FieldAddressContext` |
-| `useFieldSchema()` | `FieldSchemaContext` (the field's resolved node) |
-| `useFieldValue(address)` | RHF `useController` → `[value, setValue]` |
-| `useFieldErrors(address)` | RHF `useFormState`, keyed by field name |
-| `useFieldActivation(handler)` | fires when the active field equals this address |
+| `useFieldSchema()` | `FieldSchemaContext`, which holds the resolved node of the field |
+| `useFieldValue(address)` | `useController` from react-hook-form, which gives `[value, setValue]` |
+| `useFieldErrors(address)` | `useFormState` from react-hook-form, then `collectFieldErrorMessages` walks everything react-hook-form kept under `address` |
+| `useFieldActivation(handler)` | Operates when the address of the active field is the same as this address |
 
-Each field is its own RHF subscription, so a keystroke re-renders only that field.
+Each field has its own react-hook-form subscription. Thus a keystroke renders
+that field again, but does not render the other fields again.
 
 ## 5. Validate
 
-On change, RHF runs the resolver, which calls `validateField(node, descriptor,
-value)` (`core/validation.ts`) per field: the descriptor's Zod `schema(node)` plus
-its optional `validate(value)`, concatenated. Messages are keyed by field name and
-surface through `useFieldErrors`.
+At each change, react-hook-form runs the resolver. For each field, the resolver
+calls `validateFieldTree(node, descriptor, value, address, registry)`
+(`core/validation.ts`), with `address` set to that field's own top-level name.
+That function calls `validateField(node, descriptor, value)`, which runs the
+Zod schema of the descriptor, `schema(node)`, then the optional `validate(value)`
+function. It joins the two sets of messages under `address`.
 
-## 6. Digest on save
+Then, if the descriptor is a compound field, `validateFieldTree` calls its
+optional `validateChildren(value, node, address, registry)` function — `address`
+lets a nested compound field key its own children off where it actually sits,
+not off `node.name` alone. `validateChildren` calls `validateFieldTree` again,
+once for each item field, at that item's own nested address, such as
+`items.0.title`. If an item field is itself compound — an array nested inside
+an array, or a future reference embedding one — that recursive call reaches
+its `validateChildren` too, at whatever depth it sits. The resolver merges
+every message this produces in beside the field's own. Thus an item field at
+any depth gets its errors from `useFieldErrors` the same way a top-level field
+does — see [`array-field.md`](./array-field.md#validation).
 
-`digestDocument(values, fields, registry)` (`core/form/ingest.ts`) reverses
-ingest — per field the descriptor's `serialize(value)`, or identity. `undefined`
-values are dropped; `null` is preserved.
+A message also reaches every ancestor address, not only its own — an item
+collapsed inside a closed array, or scrolled out of view, still needs to be
+visible from outside it. `useFieldErrors` (`editor/hooks.ts`) does this by
+reading, not writing: `collectFieldErrorMessages` (`editor/field-errors.ts`)
+walks every node under `address` in the tree react-hook-form actually kept,
+and collects every message it finds. This is a read, not something the
+resolver bakes into the tree ahead of time, because react-hook-form does not
+let it be: a registered `useFieldArray` address always ends up holding a real
+array of its items' errors, and drops any `type`/`message` of its own sitting
+alongside that array. So the array's own address is never itself an entry
+once it has a child error — `useFieldErrors` on that address only ever sees
+something because it went looking underneath it.
+
+## 6. Digest at save
+
+`digestDocument(values, fields, registry)` (`core/form/ingest.ts`) does the
+opposite operation to `ingestDocument`. For each field, it calls the
+`serialize(value, node, context)` function of the descriptor. If the
+descriptor has no `serialize` function, the value does not change. The
+function removes the `undefined` values, but keeps the `null` values.
+
+`context` (`FieldTransformContext`, `core/field/contract.ts`) carries the
+registry alongside `documentPath`. A compound field's `parse`/`serialize`
+reads `context.registry` to call `ingestDocument`/`digestDocument` again, once
+for each item, with its own `fields` config. Thus it reuses the same
+conversion path for its items as the top-level form uses for its fields.
 
 ## Form status
 
-Field values render through react-hook-form. Whether a form is clean, dirty, or
-pristine is held by the form-state store (`form/form-store.ts`), exposed read-only
-through `useFormStatus` / `useIsFormDirty` / `useIsFieldDirty`.
+React-hook-form renders the field values. The form-state store
+(`form/form-store.ts`) holds the status of the form: clean, dirty, or pristine.
+The read-only hooks `useFormStatus`, `useIsFormDirty`, and `useIsFieldDirty`
+give the status.

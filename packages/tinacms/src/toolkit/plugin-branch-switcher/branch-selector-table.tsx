@@ -1,51 +1,53 @@
 'use client';
 
 import { BaseTextField, Select } from '@toolkit/fields';
+import { TooltipProvider } from '@toolkit/fields/plugins/mdx-field-plugin/plate/components/plate-ui/tooltip';
 import { useCMS } from '@toolkit/react-core';
 import { Button } from '@toolkit/styles';
 import { formatDistanceToNow } from 'date-fns';
-import * as React from 'react';
 import {
-  BiError,
-  BiGitBranch,
-  BiLinkExternal,
-  BiLockAlt,
-  BiPencil,
-  BiSearch,
-} from 'react-icons/bi';
-import { AiFillWarning } from 'react-icons/ai';
-import { FaSpinner } from 'react-icons/fa';
-import { GrCircleQuestion } from 'react-icons/gr';
-import { MdOutlineClear } from 'react-icons/md';
-import { Branch } from './types';
-import { TooltipProvider } from '@toolkit/fields/plugins/mdx-field-plugin/plate/components/plate-ui/tooltip';
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  CircleAlert,
+  CircleHelp,
+  ExternalLink,
+  GitBranch,
+  Loader2,
+  Lock,
+  Pencil,
+  Search,
+  TriangleAlert,
+  X,
+} from 'lucide-react';
+import * as React from 'react';
 import { extractPullRequestId, getFilteredBranchList } from './branch-switcher';
+import { Branch } from './types';
 
 import {
   ColumnDef,
+  SortingState,
   flexRender,
   getCoreRowModel,
-  useReactTable,
-  SortingState,
   getSortedRowModel,
+  useReactTable,
 } from '@tanstack/react-table';
 import {
   Table,
-  TableHeader,
-  TableHead,
-  TableRow,
   TableBody,
   TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@toolkit/components/ui/table';
-import { ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
-import { cn } from '@utils/cn';
 import { Badge } from '@toolkit/react-sidebar/components/badge';
-import { captureEvent } from '../../lib/posthog/posthogProvider';
+import { cn } from '@utils/cn';
 import {
   BranchSwitcherDropDownEvent,
   BranchSwitcherPRClickedEvent,
   BranchSwitcherSearchEvent,
 } from '../../lib/posthog/posthog';
+import { captureEvent } from '../../lib/posthog/posthogProvider';
 
 type Status = 'failed' | 'unknown' | 'complete' | 'inprogress' | 'timeout';
 
@@ -64,7 +66,7 @@ const IndexStatus = ({ indexingStatus }: { indexingStatus: Status }) => {
       classes: 'text-blue-500 border-blue-500',
       content: () => (
         <>
-          <GrCircleQuestion className='w-3 h-auto' />
+          <CircleHelp className='w-3 h-auto' />
           <span>{`Unknown`}</span>
         </>
       ),
@@ -73,7 +75,7 @@ const IndexStatus = ({ indexingStatus }: { indexingStatus: Status }) => {
       classes: 'text-blue-500 border-blue-500',
       content: () => (
         <>
-          <FaSpinner className='w-3 h-auto animate-spin' />
+          <Loader2 className='w-3 h-auto animate-spin' />
           <span>{`Indexing`}</span>
         </>
       ),
@@ -82,7 +84,7 @@ const IndexStatus = ({ indexingStatus }: { indexingStatus: Status }) => {
       classes: 'text-red-500 border-red-500',
       content: () => (
         <>
-          <BiError className='w-3 h-auto' />
+          <CircleAlert className='w-3 h-auto' />
           <span>{`Indexing failed`}</span>
         </>
       ),
@@ -91,7 +93,7 @@ const IndexStatus = ({ indexingStatus }: { indexingStatus: Status }) => {
       classes: 'text-red-500 border-red-500',
       content: () => (
         <>
-          <BiError className='w-3 h-auto' />
+          <CircleAlert className='w-3 h-auto' />
           <span>{`Indexing timed out`}</span>
         </>
       ),
@@ -170,9 +172,9 @@ export default function BranchSelectorTable({
           >
             <div className='flex items-center gap-2'>
               {row.original.protected ? (
-                <BiLockAlt className='w-4 h-auto opacity-70 text-blue-500 flex-shrink-0' />
+                <Lock className='w-4 h-auto opacity-70 text-blue-500 flex-shrink-0' />
               ) : (
-                <BiGitBranch className='w-4 h-auto opacity-70 text-gray-600 flex-shrink-0' />
+                <GitBranch className='w-4 h-auto opacity-70 text-gray-600 flex-shrink-0' />
               )}
               {row.original.name}
             </div>
@@ -183,7 +185,7 @@ export default function BranchSelectorTable({
                   calloutStyle='info'
                   className='w-fit flex-shrink-0'
                 >
-                  <BiPencil className='w-3 h-auto inline-block mr-1' />
+                  <Pencil className='w-3 h-auto inline-block mr-1' />
                   Currently editing
                 </Badge>
               </div>
@@ -290,7 +292,7 @@ export default function BranchSelectorTable({
               }}
             />
             {search === '' ? (
-              <BiSearch className='absolute right-3 top-1/2 -translate-y-1/2 w-5 h-auto text-blue-500 opacity-70 group-hover:opacity-100 transition-all ease-out duration-150' />
+              <Search className='absolute right-3 top-1/2 -translate-y-1/2 w-5 h-auto text-blue-500 opacity-70 group-hover:opacity-100 transition-all ease-out duration-150' />
             ) : (
               <button
                 onClick={() => {
@@ -298,7 +300,7 @@ export default function BranchSelectorTable({
                 }}
                 className='outline-none focus:outline-none bg-transparent border-0 p-0 m-0 absolute right-2.5 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100 transition-all ease-out duration-150'
               >
-                <MdOutlineClear className='w-5 h-auto text-gray-600' />
+                <X className='w-5 h-auto text-gray-600' />
               </button>
             )}
           </div>
@@ -385,9 +387,9 @@ export default function BranchSelectorTable({
                     <div className='flex flex-col gap-2'>
                       <div className='flex items-center gap-2'>
                         {currentBranchData.protected ? (
-                          <BiLockAlt className='w-4 h-auto opacity-70 text-blue-500 flex-shrink-0' />
+                          <Lock className='w-4 h-auto opacity-70 text-blue-500 flex-shrink-0' />
                         ) : (
-                          <BiGitBranch className='w-4 h-auto opacity-70 text-gray-600 flex-shrink-0' />
+                          <GitBranch className='w-4 h-auto opacity-70 text-gray-600 flex-shrink-0' />
                         )}
                         <p className='font-bold'>{currentBranchData.name}</p>
                       </div>
@@ -397,7 +399,7 @@ export default function BranchSelectorTable({
                           calloutStyle='info'
                           className='w-fit flex-shrink-0'
                         >
-                          <BiPencil className='w-3 h-auto inline-block mr-1' />
+                          <Pencil className='w-3 h-auto inline-block mr-1' />
                           Currently editing
                         </Badge>
                       </div>
@@ -408,7 +410,7 @@ export default function BranchSelectorTable({
                             calloutStyle='warning'
                             className='w-fit flex-shrink-0'
                           >
-                            <AiFillWarning className='w-3 h-auto inline-block mr-1' />
+                            <TriangleAlert className='w-3 h-auto inline-block mr-1' />
                             Branch no longer exists
                           </Badge>
                         </div>
@@ -534,7 +536,7 @@ const PullRequestCell = ({
         className='flex items-center gap-2'
         onClick={(e) => e.stopPropagation()}
       >
-        <FaSpinner className='w-3 h-auto animate-spin text-blue-500' />
+        <Loader2 className='w-3 h-auto animate-spin text-blue-500' />
         <span className='text-sm text-blue-500'>Creating PR...</span>
       </div>
     );
@@ -555,7 +557,7 @@ const PullRequestCell = ({
           className='cursor-pointer h-9 px-2 flex items-center gap-1'
           title='Open Git Pull Request'
         >
-          <BiLinkExternal className='h-3.5 w-auto text-gray-700 flex-shrink-0' />
+          <ExternalLink className='h-3.5 w-auto text-gray-700 flex-shrink-0' />
           <span className='text-sm truncate max-w-[120px]'>
             PR: {extractPullRequestId(branch.githubPullRequestUrl)}
           </span>
@@ -575,7 +577,7 @@ const PullRequestCell = ({
           className='cursor-pointer h-9 px-2 flex items-center gap-1'
           title='Create Pull Request'
         >
-          <BiGitBranch className='h-3.5 w-auto text-gray-700 flex-shrink-0' />
+          <GitBranch className='h-3.5 w-auto text-gray-700 flex-shrink-0' />
           <span className='text-sm whitespace-nowrap'>Create PR</span>
         </Button>
       </div>

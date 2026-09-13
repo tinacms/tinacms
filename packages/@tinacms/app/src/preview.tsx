@@ -20,7 +20,7 @@ export const Preview = (
       data-test='tina-iframe'
       id='tina-iframe'
       ref={props.iframeRef}
-      className='h-screen w-full bg-white'
+      className='h-full w-full bg-white'
       src={props.url}
     />
   );

@@ -110,6 +110,12 @@ export const heroBlockSchema = {
   },
   fields: [
     {
+      type: 'image',
+      label: 'Background Image',
+      name: 'backgroundImage',
+      accept: 'png',
+    },
+    {
       type: 'string',
       label: 'Tagline',
       name: 'tagline',

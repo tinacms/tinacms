@@ -1,8 +1,8 @@
 import { useCMS } from '@toolkit/react-core';
-import * as React from 'react';
-import { BiError, BiRightArrowAlt } from 'react-icons/bi';
-import { Callout } from './callout';
 import { cn } from '@utils/cn';
+import { ArrowRight, CircleAlert } from 'lucide-react';
+import * as React from 'react';
+import { Callout } from './callout';
 
 export const LocalWarning = ({ className = '' }) => {
   const cms = useCMS();
@@ -54,7 +54,7 @@ export const BillingWarning = () => {
   return (
     <div className='flex-grow-0 flex flex-wrap w-full text-xs items-center justify-between gap-1.5 py-1.5 px-3 text-red-700 bg-gradient-to-br from-white via-red-50 to-red-100 border-b border-red-200'>
       <span className='flex items-center gap-1 font-bold'>
-        <BiError className='w-5 h-auto flex-shrink-0 flex-grow-0 inline-block opacity-70 text-red-600' />
+        <CircleAlert className='w-5 h-auto flex-shrink-0 flex-grow-0 inline-block opacity-70 text-red-600' />
         <span className='flex whitespace-nowrap'>
           There is an issue with your billing.
         </span>
@@ -65,7 +65,7 @@ export const BillingWarning = () => {
         target='_blank'
       >
         Visit Billing Page
-        <BiRightArrowAlt className='w-5 h-full opacity-70' />
+        <ArrowRight className='w-5 h-full opacity-70' />
       </a>
     </div>
   );

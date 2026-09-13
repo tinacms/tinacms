@@ -1,5 +1,11 @@
-import * as React from 'react';
-import { BiError } from 'react-icons/bi';
+import { CreateBranchPromptModal } from '@toolkit/form-builder/create-branch-modal';
+import { EditorialWorkflowProgressModal } from '@toolkit/form-builder/editorial-workflow-progress-modal';
+import {
+  type MediaWorkflowConfirmBranchEvent,
+  TARGET_BRANCH_EXISTS_ERROR,
+  checkBranchGuard,
+} from '@toolkit/form-builder/editorial-workflow-utils';
+import { getEditorialWorkflowErrorMessage } from '@toolkit/form-builder/use-editorial-workflow';
 import { useBranchData } from '@toolkit/plugin-branch-switcher';
 import { useCMS } from '@toolkit/react-core';
 import {
@@ -8,15 +14,9 @@ import {
   ModalHeader,
   PopupModal,
 } from '@toolkit/react-modals';
-import { CreateBranchPromptModal } from '@toolkit/form-builder/create-branch-modal';
-import {
-  checkBaseBranchExists,
-  checkTargetBranchExists,
-  type MediaWorkflowConfirmBranchEvent,
-  TARGET_BRANCH_EXISTS_ERROR,
-} from '@toolkit/form-builder/editorial-workflow-utils';
-import { EditorialWorkflowProgressModal } from '@toolkit/form-builder/editorial-workflow-progress-modal';
-import { getEditorialWorkflowErrorMessage } from '@toolkit/form-builder/use-editorial-workflow';
+import { normalizeBranchName } from '@utils/branch-name';
+import { CircleAlert } from 'lucide-react';
+import * as React from 'react';
 
 type WorkflowState =
   | { phase: 'idle' }
@@ -26,6 +26,7 @@ type WorkflowState =
       baseBranch: string;
       errorMessage?: string;
       isChecking?: boolean;
+      allowSaveToProtectedBranch: boolean;
       onConfirm: (branchName: string) => Promise<void>;
       onCancel: () => void;
       onSaveToProtectedBranch: () => void;
@@ -54,6 +55,7 @@ export const MediaWorkflowOverlay = () => {
           phase: 'confirming',
           branchName: event.branchName,
           baseBranch: event.baseBranch,
+          allowSaveToProtectedBranch: event.allowSaveToProtectedBranch,
           onConfirm: event.onConfirm,
           onCancel: event.onCancel,
           onSaveToProtectedBranch: event.onSaveToProtectedBranch,
@@ -117,7 +119,7 @@ export const MediaWorkflowOverlay = () => {
 
     const confirmState = state;
     const branchName = confirmState.branchName;
-    const targetBranch = `tina/${branchName}`;
+    const targetBranch = `tina/${normalizeBranchName(branchName)}`;
     abortPreflight();
     const abortController = new AbortController();
     preflightAbortRef.current = abortController;
@@ -127,9 +129,10 @@ export const MediaWorkflowOverlay = () => {
       errorMessage: '',
     });
 
-    const baseBranchExists = await checkBaseBranchExists(
+    const { baseBranchExists, targetBranchExists } = await checkBranchGuard(
       cms.api.tina,
       confirmState.baseBranch,
+      targetBranch,
       'media workflow',
       abortController.signal
     );
@@ -148,15 +151,6 @@ export const MediaWorkflowOverlay = () => {
       });
       return;
     }
-
-    const targetBranchExists = await checkTargetBranchExists(
-      cms.api.tina,
-      targetBranch,
-      'media workflow',
-      abortController.signal
-    );
-
-    if (abortController.signal.aborted) return;
 
     if (targetBranchExists) {
       if (preflightAbortRef.current === abortController) {
@@ -199,7 +193,9 @@ export const MediaWorkflowOverlay = () => {
           state.onCancel();
           setState({ phase: 'idle' });
         }}
-        disabled={state.branchName === '' || state.isChecking}
+        disabled={
+          normalizeBranchName(state.branchName) === '' || state.isChecking
+        }
         errorMessage={state.errorMessage}
         onBranchNameChange={(branchName) => {
           abortPreflight();
@@ -215,6 +211,7 @@ export const MediaWorkflowOverlay = () => {
           );
         }}
         onCreateBranch={handleCreateBranch}
+        allowSaveToProtectedBranch={state.allowSaveToProtectedBranch}
         onSaveToProtectedBranch={() => {
           abortPreflight();
           state.onSaveToProtectedBranch();
@@ -241,7 +238,7 @@ export const MediaWorkflowOverlay = () => {
         <ModalHeader close={dismissError}>Branch creation failed</ModalHeader>
         <ModalBody padded={true}>
           <div className='flex items-center gap-1 text-red-700 py-2 px-3 bg-red-50 border border-red-200 rounded max-w-sm'>
-            <BiError className='w-5 h-auto text-red-400 flex-shrink-0' />
+            <CircleAlert className='w-5 h-auto text-red-400 flex-shrink-0' />
             <span className='text-sm'>
               <b>Error:</b> {state.message}
             </span>

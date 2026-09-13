@@ -1,5 +1,80 @@
 # @tinacms/mdx
 
+## 2.2.2
+
+### Patch Changes
+
+- [#7449](https://github.com/tinacms/tinacms/pull/7449) [`d0593a3`](https://github.com/tinacms/tinacms/commit/d0593a37a42c9f393bbafea252cf0c1fd6a2f03a) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Parse a hard break, and strikethrough, inside a link. `[a\`⏎`b](/x)` and `[~~a~~](/x)` both threw, collapsing the whole rich-text field to an `invalid_markdown` blob. Part of #7415.
+
+- [#7450](https://github.com/tinacms/tinacms/pull/7450) [`dbd9234`](https://github.com/tinacms/tinacms/commit/dbd9234de2c8976e986faaeefd161e3f42520200) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Stop writing a hard break where markdown cannot represent one. `one\` with nothing after it, or a break before raw HTML or an inline template, came back as a literal backslash the author never typed. Fixes #5426. Part of #7415.
+
+- [#7476](https://github.com/tinacms/tinacms/pull/7476) [`f48009e`](https://github.com/tinacms/tinacms/commit/f48009ec6cabe28427a430b80299fe92ede5da0d) Thanks [@kulesy](https://github.com/kulesy)! - chore(tinacms-pkgs): point `repository.directory` at each package's own folder
+
+  Eight packages declared a `repository.directory` copied from whichever package they were forked from, so the "repository" link on their npm pages resolved to unrelated source. Also drops a dead `generate:schema` script from `@tinacms/metrics`, `@tinacms/cli` and `@tinacms/schema-tools` - it referenced a `scripts/generateSchema.js` that has never existed in the repo and nothing invoked it.
+
+- [#7451](https://github.com/tinacms/tinacms/pull/7451) [`16b9ca1`](https://github.com/tinacms/tinacms/commit/16b9ca173a8f26e885d8a924a6ff89f0eb062f18) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Split an `h3`–`h6` on a hard break instead of losing it. Those levels have no setext form, so the break silently became a space. `#` and `##` are unchanged. Part of #7415.
+
+- Updated dependencies [[`d340dab`](https://github.com/tinacms/tinacms/commit/d340dab38c0356a9aa86f1531e317924b25c68fa), [`f48009e`](https://github.com/tinacms/tinacms/commit/f48009ec6cabe28427a430b80299fe92ede5da0d), [`fd6aaaf`](https://github.com/tinacms/tinacms/commit/fd6aaaf5b85a907c0803bbd20dd1d4f972677589), [`fd6aaaf`](https://github.com/tinacms/tinacms/commit/fd6aaaf5b85a907c0803bbd20dd1d4f972677589)]:
+  - @tinacms/schema-tools@2.10.0
+
+## 2.2.1
+
+### Patch Changes
+
+- [#7407](https://github.com/tinacms/tinacms/pull/7407) [`4f90806`](https://github.com/tinacms/tinacms/commit/4f9080666308063332e16d96d00a75ff7348c011) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Ship one copy of the `acorn` parser in `@tinacms/mdx` instead of three, cutting `dist/index.browser.js` from 1,976,421 to 1,578,764 bytes (440,787 to 356,471 gzipped) and `dist/index.js` from 2,013,419 to 1,615,828 bytes (452,063 to 367,630 gzipped). The catalog pinned `acorn` to 8.8.2 while `micromark-extension-mdxjs` pulled 8.16.0, so two 8.x copies were bundled side by side; separately, `acorn-jsx` reaches `acorn` through `require`, which acorn's export map answers with its CJS build while every other importer gets the ESM build, bundling the parser a second time. Aligning the catalog to `^8.16.0` and aliasing `acorn` to its ESM entry in the `@tinacms/mdx` esbuild config collapses all three into one. Parser and serializer output is unchanged — `parseMDX`/`serializeMDX` round-trips over the package's 64 markdown fixtures produce byte-identical results from the old and new bundles.
+
+- [#7468](https://github.com/tinacms/tinacms/pull/7468) [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Drop the unused `typedoc` dependency
+
+  `typedoc` landed in `@tinacms/mdx`'s runtime dependencies by copy-paste and has shipped to every consumer since, dragging an unmet `typescript` peer range with it. Nothing in `src/` imports it and only the `docs` script used it, so both are removed along with the now-orphaned `typedoc-plugin-markdown` and `concat-md` catalog entries.
+
+- [#7466](https://github.com/tinacms/tinacms/pull/7466) [`de5c7d7`](https://github.com/tinacms/tinacms/commit/de5c7d72b67f589f1f5c4bccc5f5677e70cd7e2d) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Stop importing the `uvu` test runner from shipped source
+
+  `@tinacms/mdx` listed `uvu` as a runtime dependency and imported it in two shortcode parsing files, in both cases only for `ok` as a one-line assertion helper. A local `assert` function replaces those six call sites, so the dependency and its catalog entry are gone. Shortcode parsing behaviour is unchanged.
+
+  This does not remove `uvu` from a consumer's `node_modules`. `micromark` and its extensions still depend on it at runtime, and `@tinacms/mdx` depends on those.
+
+- Updated dependencies []:
+  - @tinacms/schema-tools@2.9.0
+
+## 2.2.0
+
+### Minor Changes
+
+- [#7233](https://github.com/tinacms/tinacms/pull/7233) [`5f14d96`](https://github.com/tinacms/tinacms/commit/5f14d96fdba3d7a143827fc1cac9c7964c3f9b01) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Add a dedicated `@tinacms/mdx/sanitize-url` subpath export containing just the URL-scheme sanitizer, and point `tinacms`'s rich-text renderer (`TinaMarkdown` / `StaticTinaMarkdown`) at it instead of the root `@tinacms/mdx` entry. Previously, importing `sanitizeUrl` pulled in `@tinacms/mdx`'s full remark/mdast/micromark markdown-parsing bundle (~2MB) into every site's client bundle, even though rich-text rendering only needs the ~15-line sanitizer. The root `@tinacms/mdx` export of `sanitizeUrl` is unchanged and still works.
+
+### Patch Changes
+
+- [#7431](https://github.com/tinacms/tinacms/pull/7431) [`064b78e`](https://github.com/tinacms/tinacms/commit/064b78e9407d5d7f91ab11dd8b99de8f8ac38ab1) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Serializer errors that a content editor can hit now say what to change.
+
+  The raw markdown editor prints the thrown message verbatim in the field, so these are read by whoever is editing, not only by developers. "Marks inside inline code are not supported" put a Slate term in front of someone who has never met it, and messages naming internal node types did the same.
+
+  Reworded: the two mark-combination errors, the block and inline node errors, and the one raised for a field type that cannot be written. Each now names what to remove. Schema and template errors are unchanged, since a developer hits those on first run and needs the exact term.
+
+- [#7403](https://github.com/tinacms/tinacms/pull/7403) [`a0e0d2e`](https://github.com/tinacms/tinacms/commit/a0e0d2e8d573abfbfb5a3d277ffe1c2b6d692e37) Thanks [@wicksipedia](https://github.com/wicksipedia)! - `parseMDX` now normalizes CRLF to LF before parsing. A carriage return used to survive micromark into the value of a text node, so a document authored on Windows carried `\r` into the editor.
+
+  GFM task list items now keep their checked state through a round trip. `parseMDX` reads `checked` onto the `li` node, and both stringifiers write it back. A ticked checkbox previously came back unticked on save. `ListItemElement` gains an optional `checked?: boolean` — set only on task list items.
+
+- [#7427](https://github.com/tinacms/tinacms/pull/7427) [`2860f56`](https://github.com/tinacms/tinacms/commit/2860f569b3f4f8f6115ee4399af855ea3baa61e1) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Bold, italic and strikethrough now survive a leading or trailing space in the selection. Selecting `word ` and applying bold used to save `**word **`. CommonMark cannot close emphasis that sits against a space, so the published page showed literal asterisks and the formatting was lost, even though the editor still looked right. The space now sits outside the markers, giving `a **word** more`.
+
+  Indentation at the start of a line is kept as well. A bare space there is whitespace a Markdown parser may discard, and four of them open an indented code block, so an indented line used to reload without its spaces on the `mdx` parser and as a code block on the `markdown` parser. This applies to the first line of a paragraph and to a line broken with Shift+Enter. The leading space is now written as `&#x20;`, so the text comes back the way it was left.
+
+  The fix also covers marks holding only whitespace, empty marks, marks spanning several text nodes, marks inside a link, and combined bold and italic. Whitespace inside a mark, as in `**Hello *world*, again**`, still round trips unchanged.
+
+- Updated dependencies [[`d7a1641`](https://github.com/tinacms/tinacms/commit/d7a16416b1b4bc1ba0e2aabdddcf39ed1e4135d7), [`5050709`](https://github.com/tinacms/tinacms/commit/5050709dcbbc99530d6b284021c259d098d6455d), [`4b7d9b9`](https://github.com/tinacms/tinacms/commit/4b7d9b9f116f7f649aae1a573c838a663f97d99d)]:
+  - @tinacms/schema-tools@2.9.0
+
+## 2.1.11
+
+### Patch Changes
+
+- [#7213](https://github.com/tinacms/tinacms/pull/7213) [`056ffc2`](https://github.com/tinacms/tinacms/commit/056ffc22dc87b0040281054f4140c6260c22ea1f) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Publish internal package references as ranges instead of exact versions.
+
+  Internal dependencies were declared as `workspace:*`, which pnpm expands to an **exact version** when publishing (`"tinacms": "3.10.0"`), not a range. An exact pin cannot deduplicate against the version a consumer has already installed, so npm nests a second — and third — complete copy of `tinacms` and its dependency tree. In a stock Astro + TinaCMS blog this produced three copies of `tinacms`, three of `mermaid` (186 MB), five of `date-fns` (151 MB), and four of `typescript` (88 MB): about **320 MB of duplication**.
+
+  The same expansion applied to `peerDependencies`, so packages such as `next-tinacms-cloudinary` and `tinacms-authjs` published `"tinacms": "3.10.0"` as a _peer_ — requiring consumers to have that exact version or hit an `ERESOLVE` conflict, and forcing a republish of every dependent on each `tinacms` release.
+
+  Switching these to `workspace:^` publishes them as caret ranges (`^3.10.0`), which deduplicate normally and let `onlyUpdatePeerDependentsWhenOutOfRange` do its job.
+
 ## 2.1.10
 
 ### Patch Changes

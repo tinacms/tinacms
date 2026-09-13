@@ -1,5 +1,11 @@
 # @tinacms/bridge
 
+## 0.3.1
+
+### Patch Changes
+
+- [#7215](https://github.com/tinacms/tinacms/pull/7215) [`cdbf469`](https://github.com/tinacms/tinacms/commit/cdbf469d96d8a3bcf5d3096d53907a06eaaed7f2) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Stop the quick-edit hover highlight from flooding the screen on touch devices. The blue fill (the full-bleed wash and the overlay reveal) is now gated behind `@media (hover: hover)`, so on a tablet it no longer stays stuck over the last-tapped field. The solid outline still appears on tap as selection feedback, and the resting dashed outline is unchanged.
+
 ## 0.3.0
 
 ### Minor Changes

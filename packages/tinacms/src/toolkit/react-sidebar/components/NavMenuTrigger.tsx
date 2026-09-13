@@ -1,5 +1,5 @@
+import { Menu } from 'lucide-react';
 import React from 'react';
-import { BiMenu } from 'react-icons/bi';
 import { useNav } from './nav-context';
 
 interface NavMenuTriggerProps {
@@ -29,7 +29,7 @@ export const NavMenuTrigger: React.FC<NavMenuTriggerProps> = ({
       aria-label={label}
       title={label}
     >
-      <BiMenu className='h-8 w-auto text-gray-600' />
+      <Menu className='h-8 w-auto text-gray-600' />
     </button>
   );
 };

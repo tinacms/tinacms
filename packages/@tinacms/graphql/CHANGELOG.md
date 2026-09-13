@@ -1,5 +1,44 @@
 # tina-graphql
 
+## 2.4.11
+
+### Patch Changes
+
+- [#7501](https://github.com/tinacms/tinacms/pull/7501) [`9a7092d`](https://github.com/tinacms/tinacms/commit/9a7092db53193e0d9942a061b35860fbc00e83a1) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Preserve underlying storage bridge error messages when document writes fail so actionable save errors are returned to the CMS.
+
+- Updated dependencies [[`d340dab`](https://github.com/tinacms/tinacms/commit/d340dab38c0356a9aa86f1531e317924b25c68fa), [`d0593a3`](https://github.com/tinacms/tinacms/commit/d0593a37a42c9f393bbafea252cf0c1fd6a2f03a), [`dbd9234`](https://github.com/tinacms/tinacms/commit/dbd9234de2c8976e986faaeefd161e3f42520200), [`f48009e`](https://github.com/tinacms/tinacms/commit/f48009ec6cabe28427a430b80299fe92ede5da0d), [`fd6aaaf`](https://github.com/tinacms/tinacms/commit/fd6aaaf5b85a907c0803bbd20dd1d4f972677589), [`fd6aaaf`](https://github.com/tinacms/tinacms/commit/fd6aaaf5b85a907c0803bbd20dd1d4f972677589), [`16b9ca1`](https://github.com/tinacms/tinacms/commit/16b9ca173a8f26e885d8a924a6ff89f0eb062f18)]:
+  - @tinacms/schema-tools@2.10.0
+  - @tinacms/mdx@2.2.2
+
+## 2.4.10
+
+### Patch Changes
+
+- [#7456](https://github.com/tinacms/tinacms/pull/7456) [`195087d`](https://github.com/tinacms/tinacms/commit/195087de7e617d9d91b06709db869787ac0c800f) Thanks [@kulesy](https://github.com/kulesy)! - Bump `js-yaml` to 3.15.1, picking up an upstream security fix (GHSA-5p4m-2wfm-xmqj)
+
+- [#7468](https://github.com/tinacms/tinacms/pull/7468) [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Remove the dead typedoc docs tooling
+
+  Both packages declared a `docs` script running `pnpm typedoc` without ever declaring `typedoc` as a dependency, so the script could not resolve its binary under pnpm's isolated `node_modules`. Their `typedoc.json` files were also written against the pre-0.20 option schema (`inputFiles`, `mode`, `excludeNotExported`), which the catalog's typedoc 0.26 no longer accepts. Nothing in `turbo.json` or any workflow invoked them, so the scripts and configs are removed along with the generated `spec.md` in `@tinacms/mdx`.
+
+- Updated dependencies [[`4f90806`](https://github.com/tinacms/tinacms/commit/4f9080666308063332e16d96d00a75ff7348c011), [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe), [`de5c7d7`](https://github.com/tinacms/tinacms/commit/de5c7d72b67f589f1f5c4bccc5f5677e70cd7e2d)]:
+  - @tinacms/mdx@2.2.1
+  - @tinacms/schema-tools@2.9.0
+
+## 2.4.9
+
+### Patch Changes
+
+- [#7213](https://github.com/tinacms/tinacms/pull/7213) [`056ffc2`](https://github.com/tinacms/tinacms/commit/056ffc22dc87b0040281054f4140c6260c22ea1f) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Publish internal package references as ranges instead of exact versions.
+
+  Internal dependencies were declared as `workspace:*`, which pnpm expands to an **exact version** when publishing (`"tinacms": "3.10.0"`), not a range. An exact pin cannot deduplicate against the version a consumer has already installed, so npm nests a second — and third — complete copy of `tinacms` and its dependency tree. In a stock Astro + TinaCMS blog this produced three copies of `tinacms`, three of `mermaid` (186 MB), five of `date-fns` (151 MB), and four of `typescript` (88 MB): about **320 MB of duplication**.
+
+  The same expansion applied to `peerDependencies`, so packages such as `next-tinacms-cloudinary` and `tinacms-authjs` published `"tinacms": "3.10.0"` as a _peer_ — requiring consumers to have that exact version or hit an `ERESOLVE` conflict, and forcing a republish of every dependent on each `tinacms` release.
+
+  Switching these to `workspace:^` publishes them as caret ranges (`^3.10.0`), which deduplicate normally and let `onlyUpdatePeerDependentsWhenOutOfRange` do its job.
+
+- Updated dependencies [[`056ffc2`](https://github.com/tinacms/tinacms/commit/056ffc22dc87b0040281054f4140c6260c22ea1f)]:
+  - @tinacms/mdx@2.1.11
+
 ## 2.4.8
 
 ### Patch Changes

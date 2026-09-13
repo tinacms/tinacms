@@ -10,15 +10,18 @@ import {
   type MediaWorkflowConfirmBranchEvent,
   getEditorialWorkflowPrTitle,
 } from '@toolkit/form-builder/editorial-workflow-utils';
-import { formatBranchName } from '@toolkit/plugin-branch-switcher/format-branch-name';
 import type { TinaCMS } from '@toolkit/tina-cms';
+import { formatBranchName } from '@utils/branch-name';
 import type { Client } from '../../internalClient';
 import {
   E_BAD_ROUTE,
+  E_SELF_HOSTED_MEDIA,
   E_UNAUTHORIZED,
   Media,
   MediaList,
   MediaListOptions,
+  MediaRenameError,
+  MediaRenameErrorCode,
   MediaStore,
   MediaUploadOptions,
 } from './media';
@@ -33,6 +36,14 @@ type MediaBranchDecision =
   | { kind: 'workflow'; context: MediaBranchContext }
   | { kind: 'cancelled' }
   | { kind: 'direct' };
+
+interface MediaWorkflowRequest {
+  opType: 'upload' | 'delete' | 'rename';
+  /** For a rename this is the source; the target is `targetRepoPath`. */
+  repoPath: string;
+  /** The rename destination. Sanitized here before sending, and again server-side. */
+  targetRepoPath?: string;
+}
 
 const MEDIA_WORKFLOW_STEP = {
   BRANCH: 1,
@@ -53,6 +64,31 @@ const MEDIA_WORKFLOW_STATUS_TO_STEP: Partial<
 };
 
 const s3ErrorRegex = /<Error>.*<Code>(.+)<\/Code>.*<Message>(.+)<\/Message>.*/;
+
+const CANONICAL_THUMBNAIL_SIZES = [
+  { w: 75, h: 75 },
+  { w: 400, h: 400 },
+  { w: 1000, h: 1000 },
+];
+
+const RENAME_ERROR_CODES: MediaRenameErrorCode[] = [
+  'NOT_FOUND',
+  'NAME_COLLISION',
+  'INVALID_FILENAME',
+  'INVALID_PATH',
+  'UNAUTHORIZED',
+  'UNSUPPORTED',
+  'BACKEND_FAILURE',
+];
+
+/** Rejecting is how a rename that must resolve to a `Media` says "nothing happened". */
+export class MediaRenameCancelled extends Error {
+  public ERR_TYPE = 'MediaRenameCancelled';
+
+  constructor() {
+    super('Media rename cancelled.');
+  }
+}
 
 export class DummyMediaStore implements MediaStore {
   accept = '*';
@@ -105,6 +141,7 @@ export class TinaMediaStore implements MediaStore {
   private cms: TinaCMS;
   private isLocal: boolean;
   private url: string;
+  private listUrl: string;
   private staticMedia: StaticMedia;
   isStatic?: boolean;
 
@@ -112,15 +149,48 @@ export class TinaMediaStore implements MediaStore {
   private workflowBranchOverride: string | undefined;
   private mediaWorkflowInProgress = false;
 
+  /**
+   * An instance property rather than a prototype method on purpose: the media
+   * manager decides whether to offer the action by checking whether the store
+   * defines `rename`, so an instance that cannot rename must not carry one — a
+   * prototype method would advertise support everywhere and surface an action
+   * that always fails.
+   */
+  rename?: (from: string, to: string) => Promise<Media>;
+
   constructor(cms: TinaCMS, staticMedia?: StaticMedia) {
     this.cms = cms;
     if (staticMedia && Object.keys(staticMedia).length > 0) {
       this.isStatic = true;
       this.staticMedia = staticMedia;
     }
+    if (!this.isStatic && !this.isUnsupportedSelfHostedRepoMedia()) {
+      this.rename = cms?.api?.tina?.isLocalMode
+        ? (from, to) => this.rename_local(from, to)
+        : (from, to) => this.rename_cloud(from, to);
+    }
+  }
+
+  /**
+   * Repo-backed media (`media.tina`) is served by TinaCloud's assets API. A
+   * self-hosted site (a custom content API, and not local dev) has no such
+   * endpoint, so these operations can never succeed there. Detecting the case
+   * lets us fail with a clear, actionable message instead of a misleading
+   * TinaCloud/provider error (e.g. a bogus 404 "Bad Route").
+   */
+  private isUnsupportedSelfHostedRepoMedia(): boolean {
+    const api = this.api ?? this.cms?.api?.tina;
+    return Boolean(api && !api.isLocalMode && api.isCustomContentApi);
   }
 
   setup() {
+    // Static repo media is generated at build time and served without the
+    // assets API, so it keeps working self-hosted (read-only) — only live
+    // repo-media operations hit the unsupported path.
+    if (!this.isStatic && this.isUnsupportedSelfHostedRepoMedia()) {
+      throw E_SELF_HOSTED_MEDIA;
+    }
+
     if (!this.api) {
       this.api = this.cms?.api?.tina;
 
@@ -141,6 +211,7 @@ export class TinaMediaStore implements MediaStore {
               'assets'
             )}/v1/${this.api.clientId}`;
           }
+          this.listUrl = this.url.replace('/v1/', '/v2/');
         }
       }
     }
@@ -153,31 +224,37 @@ export class TinaMediaStore implements MediaStore {
 
   accept = DEFAULT_MEDIA_UPLOAD_TYPES;
 
+  searchable = true;
+
+  /**
+   * The v2 cloud endpoint and the local dev server both filter by `ext` before
+   * paginating. `staticMedia` is a build-time snapshot with no such pass, and
+   * filtering a page client-side would leave a near-empty grid while matches
+   * sit further down — so a static store reports no support and the control
+   * stays hidden, the same way `searchable` is gated.
+   */
+  get extensionFilterable(): boolean {
+    return !this.isStatic;
+  }
+
   // allow up to 100MB uploads
   maxSize = 100 * 1024 * 1024;
 
   /**
-   * Returns the workflow branch override or current branch as a single-encoded
-   * query-param value, or an empty string when no branch is set.
-   *
-   * `this.api.branch` is already URL-encoded by `Client.setBranch()`, so we
-   * decode then re-encode here to defend against double-encoding when this
-   * value is concatenated into a URL.
-   *
-   * `Client.setBranch()` runs the constructor's `options.branch` through
-   * `encodeURIComponent` without a guard, so an unset `options.branch`
-   * lands here as the literal string `"undefined"`. We treat that and the
-   * empty case as no-branch so we don't send `?branch=undefined` to the
-   * assets-api (which would route the call to a non-existent staging path).
+   * `Client.setBranch()` encodes an unset branch to the literal `"undefined"`,
+   * which the assets API would read as a real (non-existent) staging path.
    */
-  private encodedBranchParam(): string {
-    if (this.workflowBranchOverride) {
-      return encodeURIComponent(this.workflowBranchOverride);
-    }
+  private currentBranch(): string {
+    if (this.workflowBranchOverride) return this.workflowBranchOverride;
     if (!this.api.branch) return '';
     const decoded = decodeURIComponent(this.api.branch);
-    if (!decoded || decoded === 'undefined') return '';
-    return encodeURIComponent(decoded);
+    return decoded === 'undefined' ? '' : decoded;
+  }
+
+  /** `this.api.branch` arrives encoded, so encode the decoded name once here. */
+  private encodedBranchParam(): string {
+    const branch = this.currentBranch();
+    return branch ? encodeURIComponent(branch) : '';
   }
 
   private shortStableHash(input: string): string {
@@ -235,8 +312,7 @@ export class TinaMediaStore implements MediaStore {
   private requestMediaBranchChoice(
     branchName: string,
     baseBranch: string,
-    opType: 'upload' | 'delete',
-    repoPath: string
+    request: MediaWorkflowRequest
   ): Promise<MediaBranchDecision> {
     // The decision is driven entirely by the branch prompt rendered by
     // <MediaWorkflowOverlay />. We can't infer its presence from
@@ -258,12 +334,13 @@ export class TinaMediaStore implements MediaStore {
         type: 'media:workflow:confirm-branch',
         branchName,
         baseBranch,
+        // A rename on a protected branch can only go through the workflow.
+        allowSaveToProtectedBranch: request.opType !== 'rename',
         onConfirm: async (selectedBranchName) => {
           const context = await this.prepareMediaBranch(
             selectedBranchName,
             baseBranch,
-            opType,
-            repoPath
+            request
           );
           resolve({
             kind: 'workflow',
@@ -279,8 +356,7 @@ export class TinaMediaStore implements MediaStore {
   private async prepareMediaBranch(
     branchName: string,
     baseBranch: string,
-    opType: 'upload' | 'delete',
-    repoPath: string
+    request: MediaWorkflowRequest
   ): Promise<MediaBranchContext> {
     if (this.mediaWorkflowInProgress) {
       throw new Error('A media workflow is already in progress.');
@@ -298,8 +374,9 @@ export class TinaMediaStore implements MediaStore {
         branchName,
         baseBranch,
         prTitle: getEditorialWorkflowPrTitle(branchName),
-        operation: opType,
-        repoPath,
+        operation: request.opType,
+        repoPath: request.repoPath,
+        targetRepoPath: request.targetRepoPath,
       });
       const branchContext = {
         branchName: workflow.branchName || branchName,
@@ -410,12 +487,10 @@ export class TinaMediaStore implements MediaStore {
     const repoFilename =
       opType === 'upload' && filename ? sanitizeFilename(filename) : filename;
     const repoPath = this.joinMediaPath(directory, repoFilename);
-    return this.requestMediaBranchChoice(
-      branchName,
-      baseBranch,
+    return this.requestMediaBranchChoice(branchName, baseBranch, {
       opType,
-      repoPath
-    );
+      repoPath,
+    });
   }
 
   private async waitForRequestStatus(
@@ -628,20 +703,15 @@ export class TinaMediaStore implements MediaStore {
     return results;
   }
 
-  private async persist_local(media: MediaUploadOptions[]): Promise<Media[]> {
-    const newFiles: Media[] = [];
+  /** Media root as a `/uploads/`-style prefix for local `src` values. */
+  private localMediaFolder(): string {
+    const tinaMedia = this.cms.api.tina.schema.schema?.config?.media?.tina;
     const hasTinaMedia =
-      Object.keys(
-        this.cms.api.tina.schema.schema?.config?.media?.tina || {}
-      ).includes('mediaRoot') &&
-      Object.keys(
-        this.cms.api.tina.schema.schema?.config?.media?.tina || {}
-      ).includes('publicFolder');
+      Object.keys(tinaMedia || {}).includes('mediaRoot') &&
+      Object.keys(tinaMedia || {}).includes('publicFolder');
 
     // Folder always has leading and trailing slashes
-    let folder: string = hasTinaMedia
-      ? this.cms.api.tina.schema.schema?.config?.media?.tina.mediaRoot
-      : '/';
+    let folder: string = hasTinaMedia ? tinaMedia.mediaRoot : '/';
 
     if (!folder.startsWith('/')) {
       // ensure folder always has a /
@@ -650,6 +720,45 @@ export class TinaMediaStore implements MediaStore {
     if (!folder.endsWith('/')) {
       folder = folder + '/';
     }
+    return folder;
+  }
+
+  /** Stripped directory does not have leading or trailing slashes */
+  private stripDirectorySlashes(directory: string): string {
+    let stripped = directory || '';
+    if (stripped.startsWith('/')) {
+      stripped = stripped.substr(1) || '';
+    }
+    if (stripped.endsWith('/')) {
+      stripped = stripped.substr(0, stripped.length - 1) || '';
+    }
+    return stripped;
+  }
+
+  /** Shared by local upload and local rename so both describe a file identically. */
+  private buildLocalMedia(directory: string, filename: string): Media {
+    const folder = this.localMediaFolder();
+    const strippedDirectory = this.stripDirectorySlashes(directory);
+    const src = strippedDirectory
+      ? `${folder}${strippedDirectory}/${filename}`
+      : `${folder}${filename}`;
+
+    return {
+      type: 'file',
+      id: filename,
+      filename,
+      directory,
+      src,
+      thumbnails: {
+        '75x75': src,
+        '400x400': src,
+        '1000x1000': src,
+      },
+    };
+  }
+
+  private async persist_local(media: MediaUploadOptions[]): Promise<Media[]> {
+    const newFiles: Media[] = [];
 
     for (const item of media) {
       const { file, directory } = item;
@@ -657,15 +766,7 @@ export class TinaMediaStore implements MediaStore {
       // upload URL, the on-disk path, and the value persisted into content,
       // so every layer agrees on the same bytes.
       const safeName = sanitizeFilename(file.name);
-      // Stripped directory does not have leading or trailing slashes
-      let strippedDirectory = directory;
-      if (strippedDirectory.startsWith('/')) {
-        strippedDirectory = strippedDirectory.substr(1) || '';
-      }
-      if (strippedDirectory.endsWith('/')) {
-        strippedDirectory =
-          strippedDirectory.substr(0, strippedDirectory.length - 1) || '';
-      }
+      const strippedDirectory = this.stripDirectorySlashes(directory);
 
       const formData = new FormData();
       // The third arg of FormData#append overrides the part filename — pass
@@ -680,11 +781,6 @@ export class TinaMediaStore implements MediaStore {
       if (uploadPath.startsWith('/')) {
         uploadPath = uploadPath.substr(1);
       }
-      const filePath = `${
-        strippedDirectory
-          ? `${folder}${strippedDirectory}/${safeName}`
-          : folder + safeName
-      }`;
       const res = await this.fetchFunction(`${this.url}/upload/${uploadPath}`, {
         method: 'POST',
         body: formData,
@@ -697,20 +793,7 @@ export class TinaMediaStore implements MediaStore {
 
       const fileRes = await res.json();
       if (fileRes?.success) {
-        const parsedRes: Media = {
-          type: 'file',
-          id: safeName,
-          filename: safeName,
-          directory,
-          src: filePath,
-          thumbnails: {
-            '75x75': filePath,
-            '400x400': filePath,
-            '1000x1000': filePath,
-          },
-        };
-
-        newFiles.push(parsedRes);
+        newFiles.push(this.buildLocalMedia(directory, safeName));
       } else {
         throw new Error('Unexpected error uploading media');
       }
@@ -718,8 +801,270 @@ export class TinaMediaStore implements MediaStore {
     return newFiles;
   }
 
+  /**
+   * `from`/`to` are media-root-relative `directory/filename` paths, matching
+   * what the delete route receives.
+   */
+  private async rename_local(from: string, to: string): Promise<Media> {
+    this.setup();
+
+    const res = await this.fetchFunction(`${this.url}/rename`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from, to }),
+    });
+
+    const body = await res.json().catch(() => null);
+
+    if (res.status !== 200 || !body?.success) {
+      throw this.toRenameError(res.status, body);
+    }
+
+    const lastSlash = to.lastIndexOf('/');
+    return this.buildLocalMedia(
+      lastSlash === -1 ? '' : to.slice(0, lastSlash),
+      lastSlash === -1 ? to : to.slice(lastSlash + 1)
+    );
+  }
+
+  /**
+   * `from`/`to` are media-root-relative `directory/filename` paths. `to` is
+   * already sanitised by `previewRename` and is passed through untouched.
+   */
+  private async rename_cloud(from: string, to: string): Promise<Media> {
+    this.setup();
+
+    if (!(await this.isAuthenticated())) {
+      throw new MediaRenameError({
+        code: 'UNAUTHORIZED',
+        message: "You don't have permission to rename this file.",
+      });
+    }
+
+    const decision = await this.prepareRenameBranch(from, to);
+    if (decision.kind === 'cancelled') {
+      throw new MediaRenameCancelled();
+    }
+    if (decision.kind === 'workflow') {
+      return this.renameCloudViaWorkflow(from, to, decision.context);
+    }
+    return this.renameCloudDirect(from, to);
+  }
+
+  /** `currentBranch()` is the workflow branch while one is active. */
+  private async postCloudRename(
+    from: string,
+    to: string
+  ): Promise<{ path?: string; src?: string; requestId?: string }> {
+    const branch = this.currentBranch() || undefined;
+    const res = await this.api.authProvider.fetchWithToken(
+      `${this.url}/rename`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ from, to, branch }),
+      }
+    );
+
+    const body = await res.json().catch(() => null);
+
+    if (res.status !== 200 || body?.success !== true) {
+      throw this.toCloudRenameError(res.status, body);
+    }
+    return body;
+  }
+
+  private async renameCloudDirect(from: string, to: string): Promise<Media> {
+    const result = await this.postCloudRename(from, to);
+
+    if (result.requestId) {
+      try {
+        await this.waitForRequestStatus(
+          result.requestId,
+          'Time out waiting for rename to complete'
+        );
+      } catch (error) {
+        // The media index already shows the rename, so don't claim it failed.
+        const detail =
+          error instanceof Error && error.message
+            ? `${error.message}. `
+            : 'Failed to confirm the rename. ';
+        throw new MediaRenameError({
+          code: 'BACKEND_FAILURE',
+          message: `${detail}The file may still have been renamed — refresh the media library to check.`,
+        });
+      }
+    }
+
+    return this.resolveRenamedMedia(result.path || to, result.src);
+  }
+
+  /**
+   * Completion is the workflow status, not the rename request status: only the
+   * former waits for the branch, the media index and the pull request.
+   */
+  private async renameCloudViaWorkflow(
+    from: string,
+    to: string,
+    branchContext: MediaBranchContext
+  ): Promise<Media> {
+    let renamed: Media | undefined;
+
+    try {
+      const result = await this.postCloudRename(from, to);
+
+      await this.finalizeMediaWorkflow(branchContext, async () => {
+        renamed = await this.resolveRenamedMedia(result.path || to, result.src);
+      });
+    } catch (err) {
+      // A failed rename leaves the progress modal up with no error of its own.
+      this.resetWorkflowState();
+      this.cms.events.dispatch({ type: 'media:workflow:finish' });
+      throw err;
+    }
+
+    // finalizeMediaWorkflow dispatches failures instead of throwing, so an
+    // unresolved entry is the only signal that it did not complete. Deliberately
+    // no `media:workflow:finish` here: it would hide the error the overlay shows.
+    if (!renamed) {
+      throw new MediaRenameError({
+        code: 'BACKEND_FAILURE',
+        message:
+          'The rename was staged but the branch workflow did not complete. ' +
+          'Check the branch in TinaCloud before trying again.',
+      });
+    }
+    return renamed;
+  }
+
+  private async prepareRenameBranch(
+    from: string,
+    to: string
+  ): Promise<MediaBranchDecision> {
+    if (!this.api.usingProtectedBranch()) return { kind: 'direct' };
+
+    const baseBranch = decodeURIComponent(this.api.branch || '');
+    const { directory, filename } = this.splitMediaPath(from);
+    const branchName = `media-rename-${this.branchSlugForMediaPath(
+      directory,
+      filename
+    )}`;
+
+    // `from` verbatim: re-sanitising could miss legacy or externally added files.
+    return this.requestMediaBranchChoice(branchName, baseBranch, {
+      opType: 'rename',
+      repoPath: from,
+      targetRepoPath: to,
+    });
+  }
+
+  private splitMediaPath(path: string): {
+    directory: string;
+    filename: string;
+  } {
+    const lastSlash = path.lastIndexOf('/');
+    return lastSlash === -1
+      ? { directory: '', filename: path }
+      : {
+          directory: path.slice(0, lastSlash),
+          filename: path.slice(lastSlash + 1),
+        };
+  }
+
+  /**
+   * The listing is the source of truth for `src` (staging path, per-stage CDN
+   * host) and thumbnails; the rename response is the fallback when the entry
+   * isn't on the first page.
+   */
+  private async resolveRenamedMedia(
+    targetPath: string,
+    srcFromResponse?: string
+  ): Promise<Media> {
+    const { directory, filename } = this.splitMediaPath(targetPath);
+
+    try {
+      const listed = await this.list({
+        directory,
+        limit: 100,
+        thumbnailSizes: CANONICAL_THUMBNAIL_SIZES,
+      });
+      const entry = listed.items.find(
+        (item) => item.type === 'file' && item.filename === filename
+      );
+      if (entry) return entry;
+    } catch (error) {
+      console.error('Failed to fetch the canonical media entry:', error);
+    }
+
+    const src = srcFromResponse || '';
+    return {
+      type: 'file',
+      id: filename,
+      filename,
+      directory,
+      src,
+      thumbnails: CANONICAL_THUMBNAIL_SIZES.reduce(
+        (acc, size) => {
+          acc[`${size.w}x${size.h}`] = this.genThumbnail(src, size);
+          return acc;
+        },
+        {} as Record<string, string>
+      ),
+    };
+  }
+
+  private toCloudRenameError(status: number, body: any): MediaRenameError {
+    const message =
+      typeof body?.message === 'string' && body.message
+        ? body.message
+        : 'Failed to rename the file.';
+
+    if (RENAME_ERROR_CODES.includes(body?.code)) {
+      return new MediaRenameError({ code: body.code, message });
+    }
+
+    // Unlike the local dev server, a 404 here means the asset is missing rather
+    // than the route being unavailable.
+    let code: MediaRenameErrorCode;
+    if (status === 401 || status === 403) {
+      code = 'UNAUTHORIZED';
+    } else if (status === 404) {
+      code = 'NOT_FOUND';
+    } else if (status === 409) {
+      code = 'NAME_COLLISION';
+    } else {
+      code = 'BACKEND_FAILURE';
+    }
+    return new MediaRenameError({ code, message });
+  }
+
+  private toRenameError(status: number, body: any): MediaRenameError {
+    if (body?.code) {
+      return new MediaRenameError({
+        code: body.code,
+        message: body.message || 'Failed to rename the file.',
+      });
+    }
+    // No structured body: a CLI predating the /media/rename route lets the
+    // request fall through to the dev server's own handling.
+    return new MediaRenameError({
+      code:
+        status === 404 || status === 200 ? 'UNSUPPORTED' : 'BACKEND_FAILURE',
+      message:
+        status === 404 || status === 200
+          ? 'This version of the TinaCMS CLI does not support renaming media. Update @tinacms/cli to rename files.'
+          : 'Failed to rename the file.',
+    });
+  }
+
   async persist(media: MediaUploadOptions[]): Promise<Media[]> {
     this.setup();
+
+    // Also covers static repo media, which browses read-only self-hosted but
+    // still can't accept uploads without an external store.
+    if (this.isUnsupportedSelfHostedRepoMedia()) {
+      throw E_SELF_HOSTED_MEDIA;
+    }
 
     if (this.isLocal) {
       return this.persist_local(media);
@@ -768,17 +1113,26 @@ export class TinaMediaStore implements MediaStore {
           nextOffset: hasMore ? Number(offset) + 20 : null,
         };
       }
-      return { items: media, nextOffset: hasMore ? Number(offset) + 20 : null };
+      return {
+        items: media,
+        nextOffset: hasMore ? Number(offset) + 20 : null,
+      };
     }
 
     let res;
     if (!this.isLocal) {
       const encodedBranch = this.encodedBranchParam();
       res = await this.api.authProvider.fetchWithToken(
-        `${this.url}/list/${options.directory || ''}?limit=${
+        `${this.listUrl}/list/${options.directory || ''}?limit=${
           options.limit || 20
-        }${options.offset ? `&cursor=${options.offset}` : ''}${
+        }${options.offset ? `&cursor=${encodeURIComponent(options.offset)}` : ''}${
           encodedBranch ? `&branch=${encodedBranch}` : ''
+        }${
+          options.search ? `&search=${encodeURIComponent(options.search)}` : ''
+        }${
+          options.ext?.length
+            ? `&ext=${encodeURIComponent(options.ext.join(','))}`
+            : ''
         }`
       );
 
@@ -793,7 +1147,13 @@ export class TinaMediaStore implements MediaStore {
       res = await this.fetchFunction(
         `${this.url}/list/${options.directory || ''}?limit=${
           options.limit || 20
-        }${options.offset ? `&cursor=${options.offset}` : ''}`
+        }${options.offset ? `&cursor=${encodeURIComponent(options.offset)}` : ''}${
+          options.search ? `&search=${encodeURIComponent(options.search)}` : ''
+        }${
+          options.ext?.length
+            ? `&ext=${encodeURIComponent(options.ext.join(','))}`
+            : ''
+        }`
       );
 
       if (res.status == 404) {
@@ -844,6 +1204,10 @@ export class TinaMediaStore implements MediaStore {
   };
 
   async delete(media: Media) {
+    if (this.isUnsupportedSelfHostedRepoMedia()) {
+      throw E_SELF_HOSTED_MEDIA;
+    }
+
     const path = this.joinMediaPath(media.directory, media.filename);
     if (!this.isLocal) {
       if (await this.isAuthenticated()) {

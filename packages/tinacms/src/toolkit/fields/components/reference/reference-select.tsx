@@ -1,8 +1,8 @@
 import { LoadingDots } from '@toolkit/form-builder';
 import type { Field } from '@toolkit/forms';
 import type { TinaCMS } from '@toolkit/tina-cms';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import * as React from 'react';
-import { IoMdArrowDropdown, IoMdArrowDropup } from 'react-icons/io';
 import { Button } from './components/button';
 import {
   Command,
@@ -190,11 +190,7 @@ const Combobox: React.FC<ReferenceSelectProps> = ({ cms, input, field }) => {
           className='w-full justify-between'
         >
           <p className='truncate'>{displayText ?? 'Choose an option...'}</p>
-          {open ? (
-            <IoMdArrowDropup size={20} />
-          ) : (
-            <IoMdArrowDropdown size={20} />
-          )}
+          {open ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
         </Button>
       </PopoverTrigger>
       <PopoverContent className='p-0 relative min-w-[var(--radix-popover-trigger-width)]'>

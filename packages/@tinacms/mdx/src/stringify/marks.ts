@@ -4,11 +4,11 @@
 
 */
 
-import { getMarks } from './index';
+import type { RichTextType } from '@tinacms/schema-tools';
 import type * as Md from 'mdast';
 import type * as Plate from '../parse/plate';
-import type { RichTextType } from '@tinacms/schema-tools';
 import { stringifyPropsInline } from './acorn';
+import { getMarks } from './index';
 
 const matches = (a: string[], b: string[]) => {
   return a.some((v) => b.includes(v));
@@ -130,7 +130,9 @@ const inlineElementExceptLink = (
       if (!content.type && typeof content.text === 'string') {
         return text(content);
       }
-      throw new Error(`InlineElement: ${content.type} is not supported`);
+      throw new Error(
+        `This content can't be saved as markdown ("${content.type}"). Remove it from the field to continue.`
+      );
   }
 };
 
@@ -294,7 +296,9 @@ export const eat = (
   }
   if (markToProcess === 'inlineCode') {
     if (nonMatchingSiblingIndex) {
-      throw new Error('Marks inside inline code are not supported');
+      throw new Error(
+        "Inline code can't have other formatting on it. Remove the formatting from the code text."
+      );
     }
     const f = first as Plate.TextElement & {
       linkifyTextNode?: (arg: Md.Text) => Md.Link;

@@ -1,7 +1,16 @@
-// Server-only — `tinacms/hono`.
-// Mounts the runtime-composed RPC handler as a Hono route.
-//
-// Intended exports:
-//   tinaRoute(config) → Hono — mountable via `app.route('/api/tina', tinaRoute(config))`
+import { type RpcHandlerConfig, createRpcHandler } from '../../rpc/handler';
 
-export {};
+export type { RpcHandlerConfig };
+
+export interface HonoRequestContext {
+  req: { raw: Request };
+}
+
+export type HonoRouteHandler = (
+  context: HonoRequestContext
+) => Promise<Response>;
+
+export const mountHandler = (config: RpcHandlerConfig): HonoRouteHandler => {
+  const handler = createRpcHandler(config);
+  return ({ req }) => handler(req.raw);
+};

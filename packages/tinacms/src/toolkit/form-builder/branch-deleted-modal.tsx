@@ -1,6 +1,8 @@
+import { Form } from '@toolkit/forms';
+import { Button } from '@toolkit/styles';
+import { formatBranchName, normalizeBranchName } from '@utils/branch-name';
+import { CircleAlert, GitBranchIcon } from 'lucide-react';
 import * as React from 'react';
-import { BiError } from 'react-icons/bi';
-import { GitBranchIcon } from 'lucide-react';
 import { useCMS } from '../react-core';
 import {
   Modal,
@@ -10,9 +12,6 @@ import {
   PopupModal,
 } from '../react-modals';
 import { PrefixedTextField } from './create-branch-modal';
-import { Form } from '@toolkit/forms';
-import { formatBranchName } from '@toolkit/plugin-branch-switcher';
-import { Button } from '@toolkit/styles';
 import { useEditorialWorkflow } from './use-editorial-workflow';
 import { WorkflowProgressIndicator } from './workflow-progress-indicator';
 
@@ -34,6 +33,7 @@ export const BranchDeletedModal = ({
   const cms = useCMS();
   const tinaApi = cms.api.tina;
   const [newBranchName, setNewBranchName] = React.useState('');
+  const normalizedBranchName = normalizeBranchName(newBranchName);
 
   const baseBranch =
     tinaApi.protectedBranches[0] ||
@@ -51,7 +51,7 @@ export const BranchDeletedModal = ({
 
   const handleCreate = async () => {
     const { success } = await executeWorkflow({
-      branchName: `tina/${newBranchName}`,
+      branchName: `tina/${normalizedBranchName}`,
       baseBranch,
       path,
       values,
@@ -99,7 +99,7 @@ export const BranchDeletedModal = ({
 
               {errorMessage && (
                 <div className='flex items-center gap-1 text-red-700 py-2 px-3 mb-4 bg-red-50 border border-red-200 rounded'>
-                  <BiError className='w-5 h-auto text-red-400 flex-shrink-0' />
+                  <CircleAlert className='w-5 h-auto text-red-400 flex-shrink-0' />
                   <span className='text-sm'>
                     <b>Error:</b> {errorMessage}
                   </span>
@@ -131,7 +131,7 @@ export const BranchDeletedModal = ({
             <Button
               variant='primary'
               className='w-full sm:w-auto'
-              disabled={!newBranchName}
+              disabled={!normalizedBranchName}
               onClick={handleCreate}
             >
               <GitBranchIcon

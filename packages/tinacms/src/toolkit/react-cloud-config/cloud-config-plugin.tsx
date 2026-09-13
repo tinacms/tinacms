@@ -1,7 +1,6 @@
-import { MdOutlineCloud } from 'react-icons/md';
+import { Cloud, type LucideIcon } from 'lucide-react';
 
 import { Plugin } from '@toolkit/core';
-import type { IconType } from 'react-icons';
 
 /**
  * Represents a TinaCloud Config that should be accessible via the CMS.
@@ -33,7 +32,7 @@ export interface CloudConfigOptions {
     text: string;
     href: string;
   };
-  Icon?: IconType;
+  Icon?: LucideIcon;
 }
 
 /**
@@ -46,7 +45,7 @@ export function createCloudConfig({
 }: CloudConfigOptions): CloudConfigPlugin {
   return {
     __type: 'cloud-config',
-    Icon: MdOutlineCloud,
+    Icon: Cloud,
     ...options,
   };
 }

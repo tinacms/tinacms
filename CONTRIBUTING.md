@@ -100,6 +100,14 @@ Build your changes with `pnpm build`
 
 Run `pnpm version:snapshot`
 
+Re-pin internal deps so the snapshot publishes exact versions (pnpm would otherwise expand `workspace:^` to a caret prerelease range, which npm can resolve to a different snapshot batch):
+
+```sh
+for f in packages/*/package.json packages/@tinacms/*/package.json; do
+  sed 's/"workspace:\^"/"workspace:*"/g' "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+done
+```
+
 Run `pnpm publish:dev`
 
 If you have 2FA, this will prompt you to enter you one-time code for each package you publish.

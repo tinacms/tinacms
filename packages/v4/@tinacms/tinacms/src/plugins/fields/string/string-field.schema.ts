@@ -24,9 +24,6 @@ const compileRegExp = (pattern: string): RegExp | null => {
   }
 };
 
-// Per-field validation only — `node` is this field alone. Cross-field rules
-// (validate against a sibling field) aren't supported here yet; they'll come via
-// useSiblingValue in the component, or a form-level refine / server segment.
 export const stringSchema = (node: FieldSchema): ZodType => {
   const field = node as StringFieldSchema;
   let schema = z.string();

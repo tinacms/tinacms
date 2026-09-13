@@ -15,6 +15,7 @@ interface ModalBuilderProps {
   actions: ButtonProps[];
   close(): void;
   children?: React.ReactNode;
+  busy?: boolean;
 }
 
 export function ModalBuilder(modalProps: ModalBuilderProps) {
@@ -34,7 +35,7 @@ export function ModalBuilder(modalProps: ModalBuilderProps) {
         </ModalBody>
         <ModalActions>
           {modalProps.actions.map((action) => (
-            <AsyncButton key={action.name} {...action} />
+            <AsyncButton key={action.name} {...action} busy={modalProps.busy} />
           ))}
         </ModalActions>
       </ModalPopup>
@@ -50,9 +51,10 @@ interface ButtonProps {
   name: string;
   action(): Promise<void>;
   primary: boolean;
+  busy?: boolean;
 }
 
-export const AsyncButton = ({ name, primary, action }: ButtonProps) => {
+export const AsyncButton = ({ name, primary, action, busy }: ButtonProps) => {
   const [submitting, setSubmitting] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -62,7 +64,7 @@ export const AsyncButton = ({ name, primary, action }: ButtonProps) => {
   }, []);
 
   const onClick = useCallback(async () => {
-    if (!mounted) return;
+    if (!mounted || busy) return;
     setSubmitting(true);
     try {
       await action();
@@ -71,15 +73,17 @@ export const AsyncButton = ({ name, primary, action }: ButtonProps) => {
       setSubmitting(false);
       throw e;
     }
-  }, [action, setSubmitting, mounted]);
+  }, [action, setSubmitting, mounted, busy]);
+
+  const isBusy = busy || submitting;
 
   return (
     <Button
       data-test={name.replace(/\s/g, '-').toLowerCase()}
       variant={primary ? 'primary' : 'secondary'}
       onClick={onClick}
-      busy={submitting}
-      disabled={submitting}
+      busy={isBusy}
+      disabled={isBusy}
     >
       {name}
     </Button>

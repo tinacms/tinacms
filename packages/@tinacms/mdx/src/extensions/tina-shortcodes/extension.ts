@@ -1,7 +1,7 @@
 import type { Construct, Extension } from 'micromark-util-types';
-import { directiveLeaf, findCode } from './shortcode-leaf';
 import type { Pattern } from '../../stringify';
 import { directiveContainer } from './shortcode-container';
+import { directiveLeaf, findCode } from './shortcode-leaf';
 
 export const tinaDirective: (patterns: Pattern[]) => Extension = function (
   patterns

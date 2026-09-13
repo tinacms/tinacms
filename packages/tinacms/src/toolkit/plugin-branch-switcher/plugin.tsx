@@ -1,12 +1,12 @@
-import * as React from 'react';
-import { BiGitRepoForked } from 'react-icons/bi';
 import { ScreenPlugin } from '@toolkit/react-screens';
+import { GitFork } from 'lucide-react';
+import * as React from 'react';
 import { BranchSwitcher } from './branch-switcher';
 import { BranchSwitcherProps } from './types';
 
 export class BranchSwitcherPlugin implements ScreenPlugin {
   __type = 'screen' as const;
-  Icon = BiGitRepoForked;
+  Icon = GitFork;
   name = 'Select Branch';
   layout = 'popup' as const;
 

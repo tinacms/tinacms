@@ -19,9 +19,11 @@ import {
   wrapFieldsWithMeta,
 } from '@tinacms/toolkit';
 import type { TinaCMS } from '@tinacms/toolkit';
+import { isSessionExpiredError } from '@tinacms/toolkit';
+import { dispatchSessionExpired } from '@toolkit/core/session-expired';
 import { FormBreadcrumbs } from '@toolkit/react-sidebar/components/sidebar-body';
+import { Lock, Unlock } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
-import { FaLock, FaUnlock } from 'react-icons/fa';
 import { useNavigate, useParams } from 'react-router-dom';
 import { TinaAdminApi } from '../api';
 import { ErrorDialog } from '../components/ErrorDialog';
@@ -59,9 +61,9 @@ const createDocument = async (
   if (await api.isAuthenticated()) {
     await api.createDocument(collection, relativePath, params);
   } else {
-    const authMessage = `CreateDocument failed: User is no longer authenticated; please login and try again.`;
-    cms.alerts.error(authMessage);
-    console.error(authMessage);
+    // the session is gone: send the user to the login modal, and tell the
+    // caller so it does not report success for a save that never ran
+    dispatchSessionExpired(cms.events);
     return false;
   }
 };
@@ -121,14 +123,14 @@ const FilenameInput = (props) => {
         {...props}
         disabled={props.readonly || !filenameTouched}
       />
-      <FaLock
+      <Lock
         className={`text-gray-400 absolute top-1/2 left-2 -translate-y-1/2 pointer-events-none h-5 w-auto transition-opacity duration-150 ease-out ${
           !filenameTouched && !props.readonly
             ? 'opacity-20 group-hover:opacity-0 group-active:opacity-0'
             : 'opacity-0'
         }`}
       />
-      <FaUnlock
+      <Unlock
         className={`text-blue-500 absolute top-1/2 left-2 -translate-y-1/2 pointer-events-none h-5 w-auto transition-opacity duration-150 ease-out ${
           !filenameTouched && !props.readonly
             ? 'opacity-0 group-hover:opacity-80 group-active:opacity-80'
@@ -301,7 +303,7 @@ export const RenderForm = ({
       onSubmit: async (values) => {
         try {
           const folderName = folder.fullyQualifiedName ? folder.name : '';
-          await createDocument(
+          const result = await createDocument(
             cms,
             collection,
             template,
@@ -309,6 +311,7 @@ export const RenderForm = ({
             folderName,
             values
           );
+          if (result === false) return;
           cms.alerts.success('Document created!');
           setTimeout(() => {
             navigate(
@@ -318,6 +321,7 @@ export const RenderForm = ({
             );
           }, 10);
         } catch (error) {
+          if (isSessionExpiredError(error)) throw error;
           const defaultErrorText = 'There was a problem saving your document.';
           if (error.message && error.message.includes(ERR_ALREADY_EXISTS)) {
             cms.alerts.error(

@@ -1,20 +1,33 @@
 import { invariant } from '../invariant';
 import {
+  REGISTRY_CONFLICTS,
   type RegistryConflict,
   composeOverridableRegistry,
 } from '../overridable-registry';
-import type { PluginManifest, ResolvedSegment } from '../plugin';
+import {
+  FIELD_CAPABILITY,
+  type PluginManifest,
+  type ResolvedSegment,
+  resolveClientSegments,
+} from '../plugin';
 import type { FieldDescriptor } from './contract';
 
 export type FieldRegistry = Map<string, FieldDescriptor>;
 
-const overridesFieldKey = (manifest: PluginManifest, key: string): boolean =>
-  (manifest.overrides ?? []).some(
-    (override) => override.capability === 'field' && override.key === key
+export const overridesFieldKey = (
+  manifest: PluginManifest,
+  key: string
+): boolean =>
+  manifest.overrides.some(
+    (override) =>
+      override.capability === FIELD_CAPABILITY && override.key === key
   );
 
-const fieldConflictError = (conflict: RegistryConflict, key: string): Error => {
-  if (conflict === 'duplicate-override') {
+export const fieldConflictError = (
+  conflict: RegistryConflict,
+  key: string
+): Error => {
+  if (conflict === REGISTRY_CONFLICTS.duplicateOverride) {
     return new Error(
       `Two plugins both declare an \`overrides\` for the \`field\` type "${key}". ` +
         'Only one may replace the built-in.'
@@ -26,37 +39,36 @@ const fieldConflictError = (conflict: RegistryConflict, key: string): Error => {
   );
 };
 
+const fieldEntryOf = ({ manifest, segment }: ResolvedSegment) => {
+  if (!(manifest.field || segment.field)) return [];
+  invariant(
+    manifest.field,
+    'field-plugin-no-provision',
+    `Plugin "${manifest.name}" has a field descriptor but declares no \`field: { type, contractVersion }\` on its manifest.`
+  );
+  invariant(
+    segment.field,
+    'field-plugin-no-descriptor',
+    `Plugin "${manifest.name}" declares the field type "${manifest.field.type}" but its client segment exports no field descriptor.`
+  );
+  return [
+    {
+      key: manifest.field.type,
+      value: segment.field,
+      isOverride: overridesFieldKey(manifest, manifest.field.type),
+    },
+  ];
+};
+
 export const createFieldRegistry = (
   resolved: ResolvedSegment[]
 ): FieldRegistry =>
   composeOverridableRegistry(
-    resolved.flatMap(({ manifest, segment }) =>
-      segment.field
-        ? [
-            {
-              key: segment.field.type,
-              value: segment.field,
-              isOverride: overridesFieldKey(manifest, segment.field.type),
-            },
-          ]
-        : []
-    ),
+    resolved.flatMap(fieldEntryOf),
     fieldConflictError
   );
 
 export const resolveFieldPlugins = async (
   plugins: PluginManifest[]
-): Promise<FieldRegistry> => {
-  const resolved: ResolvedSegment[] = [];
-  for (const manifest of plugins) {
-    if (!manifest.client) continue;
-    const clientModule = await manifest.client();
-    invariant(
-      clientModule?.default,
-      'plugin-client-no-default',
-      `Plugin "${manifest.name}" has a client segment with no default export.`
-    );
-    resolved.push({ manifest, segment: clientModule.default });
-  }
-  return createFieldRegistry(resolved);
-};
+): Promise<FieldRegistry> =>
+  createFieldRegistry(await resolveClientSegments(plugins));

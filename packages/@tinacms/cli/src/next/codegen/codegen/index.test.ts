@@ -1,8 +1,8 @@
 import { buildSchema } from 'graphql';
 import { generateTypes } from './index';
 
-// Mirrors the shape @tinacms/graphql emits: rich-text fields are typed with the
-// generic JSON scalar, the same one `_values` uses.
+// Mirrors the shape @tinacms/graphql emits: rich-text fields get their own
+// RichText scalar, while `_values` still rides on the generic JSON scalar.
 const schema = buildSchema(`
   scalar JSON
   scalar Reference
@@ -43,7 +43,10 @@ describe('generateTypes', () => {
   });
 
   it('leaves the JSON scalar as `any` — `_values` consumers still index it freely', () => {
+    // graphql-codegen defaults unmapped scalars to `unknown`, which does not
+    // assign to `any` and would break every `_values` consumer.
     expect(types).toContain('JSON: { input: any; output: any; }');
+    expect(types).not.toMatch(/JSON: \{ input: unknown/);
   });
 
   it('leaves the Reference scalar as `any`', () => {

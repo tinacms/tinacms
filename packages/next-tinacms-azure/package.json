@@ -1,7 +1,7 @@
 {
   "name": "next-tinacms-azure",
   "type": "module",
-  "version": "15.0.2",
+  "version": "15.0.4",
   "description": "",
   "main": "dist/index.js",
   "module": "./dist/index.js",
@@ -37,18 +37,17 @@
   },
   "devDependencies": {
     "@tinacms/scripts": "workspace:*",
-    "@types/crypto-js": "^3.1.47",
     "@types/js-cookie": "^2.2.7",
     "@types/node": "^22.13.1",
-    "next": "14.2.35",
+    "next": "15.5.21",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tinacms": "workspace:*",
     "typescript": "^5.7.3"
   },
   "peerDependencies": {
-    "tinacms": "workspace:*",
-    "@tinacms/auth": "workspace:*"
+    "tinacms": "workspace:^",
+    "@tinacms/auth": "workspace:^"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"

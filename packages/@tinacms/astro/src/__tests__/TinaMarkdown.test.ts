@@ -86,25 +86,97 @@ describe('TinaMarkdown', () => {
   });
 });
 
+/**
+ * Characterises what this renderer does with `html` / `html_inline` nodes, so
+ * the behaviour is pinned while `tinacms` and `@tinacms/web-components` are
+ * brought into line. The same cases exist in those packages' suites.
+ */
+describe('TinaMarkdown — raw HTML nodes', () => {
+  it('does not emit markup for a block html node', async () => {
+    const html = await render({
+      props: {
+        content: [
+          {
+            type: 'html',
+            value: '<div id="raw"><center><p>hi</p></center></div>',
+          },
+        ],
+      },
+    });
+
+    expect(html).not.toContain('<div id="raw">');
+    expect(html).toContain('&lt;div id=&quot;raw&quot;&gt;');
+  });
+
+  it('does not emit markup for an inline html node', async () => {
+    const html = await render({
+      props: {
+        content: [
+          {
+            type: 'p',
+            children: [
+              { type: 'text', text: 'Some ' },
+              { type: 'html_inline', value: '<b>bold</b>' },
+              { type: 'text', text: ' inline.' },
+            ],
+          },
+        ],
+      },
+    });
+
+    expect(html).not.toContain('<b>bold</b>');
+    expect(html).toContain('&lt;b&gt;bold&lt;/b&gt;');
+  });
+
+  it('does not emit an element carrying an inline event handler', async () => {
+    const html = await render({
+      props: {
+        content: [
+          { type: 'html', value: '<img src="x" onerror="globalThis.x = 1">' },
+        ],
+      },
+    });
+
+    expect(html).not.toContain('<img');
+    expect(html).not.toContain('onerror="');
+  });
+
+  it('emits raw HTML when the consumer opts in via components.html', async () => {
+    const RawHtml = await import('./fixtures/RawHtml.astro');
+    const html = await render({
+      props: {
+        content: [{ type: 'html', value: '<div id="raw">hi</div>' }],
+        components: { html: RawHtml.default },
+      },
+    });
+
+    expect(html).toContain('<div id="raw">hi</div>');
+  });
+});
+
 describe('TinaMarkdown — tables', () => {
-  it('renders a native table node with rows, cells and column alignment', async () => {
+  it('renders a native table node with a header row, cells and column alignment', async () => {
     const html = await render({ props: { content: table } });
     expect(html).toMatchSnapshot();
     expect(html).toContain('<table');
+    expect(html).toContain('<thead>');
+    expect(html).toContain('<th');
     expect(html).toContain('<tbody>');
     expect(html).toContain('<tr>');
     expect(html).toContain('<td');
-    // Per-column alignment from props.align.
+    // Per-column alignment from props.align, on both <th> and <td>.
+    expect(html).toContain('<th style="text-align:left">Name</th>');
+    expect(html).toContain('<th style="text-align:center">Role</th>');
+    expect(html).toContain('<th style="text-align:right">Score</th>');
     expect(html).toContain('text-align:left');
     expect(html).toContain('text-align:center');
     expect(html).toContain('text-align:right');
+    // Row 0 is the header and does not leak into the body.
+    expect(html).not.toMatch(/<tbody>.*Name/s);
     // Inline marks render inside cells.
     expect(html).toContain('<strong>Ada</strong>');
-    // No <thead>/<th> on the native path (matches the React renderer).
-    expect(html).not.toContain('<thead>');
-    expect(html).not.toContain('<th');
     // Cell content is not wrapped in an extra <p>.
-    expect(html).not.toMatch(/<td[^>]*><p[\s>]/);
+    expect(html).not.toMatch(/<t[hd][^>]*><p[\s>]/);
   });
 
   it('overrides the table tag via components.table', async () => {

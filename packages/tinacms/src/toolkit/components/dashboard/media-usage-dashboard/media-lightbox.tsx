@@ -1,4 +1,7 @@
+import { Clapperboard } from 'lucide-react';
 import React, { useEffect } from 'react';
+import { MediaUsageDashboardPreviewOpenedEvent } from '../../../../lib/posthog/posthog';
+import { captureEvent } from '../../../../lib/posthog/posthogProvider';
 import {
   Dialog,
   DialogContent,
@@ -6,9 +9,6 @@ import {
   DialogTitle,
 } from '../../ui/dialog';
 import type { MediaUsage } from './media-usage-scanner';
-import { BiMovie } from 'react-icons/bi';
-import { MediaUsageDashboardPreviewOpenedEvent } from '../../../../lib/posthog/posthog';
-import { captureEvent } from '../../../../lib/posthog/posthogProvider';
 
 export const MediaLightbox = ({
   item,
@@ -109,7 +109,7 @@ const VideoLightboxContent = ({
   if (playbackFailed) {
     return (
       <div className='flex min-h-[12rem] min-w-[16rem] flex-col items-center justify-center gap-3 rounded-md border border-dashed border-gray-300 bg-white px-6 py-8 text-center'>
-        <BiMovie className='h-10 w-10 text-gray-400' />
+        <Clapperboard className='h-10 w-10 text-gray-400' />
         <div className='text-sm font-medium text-gray-700'>{filename}</div>
         <div className='max-w-sm text-sm text-gray-500'>
           This video format is recognized, but this browser could not preview

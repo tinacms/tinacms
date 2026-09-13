@@ -1,8 +1,17 @@
-import NextAuth, { AuthOptions } from 'next-auth';
-import CredentialsProvider from 'next-auth/providers/credentials';
-import { getServerSession } from 'next-auth/next';
 import type { BackendAuthProvider } from '@tinacms/datalayer';
-import { TINA_CREDENTIALS_PROVIDER_NAME } from './tinacms';
+import NextAuthImport, { AuthOptions } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
+import CredentialsImport from 'next-auth/providers/credentials';
+// Not from './tinacms': that entry pulls the browser `tinacms` package into the
+// node build, and Node's ESM loader cannot resolve its transitive imports.
+import { TINA_CREDENTIALS_PROVIDER_NAME } from './constants';
+
+// next-auth v4 is CommonJS: webpack unwraps its `__esModule` default but Node's
+// ESM loader and esbuild do not, breaking every non-Next.js backend. See #7434.
+const interopDefault = <T>(mod: T & { default?: T }): T => mod.default ?? mod;
+
+const NextAuth = interopDefault(NextAuthImport);
+const CredentialsProvider = interopDefault(CredentialsImport);
 
 const authenticate = async (
   databaseClient: any,

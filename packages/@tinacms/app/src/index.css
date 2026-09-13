@@ -9,7 +9,15 @@
   @apply bg-blue-600 !important;
 }
 
-.icon-parent svg {
+/*
+ * Exists for the hand-written Tina SVGs (AddIcon, CloseIcon, TinaIcon, …), which
+ * are solid shapes and expect to be coloured via `fill`.
+ *
+ * lucide icons are stroke-based and ship `fill="none"`. CSS beats a presentation
+ * attribute, so without the :not() they get flooded with currentColor and their
+ * internal detail disappears — a filled disc instead of a refresh arrow.
+ */
+.icon-parent svg:not(.lucide) {
   fill: currentColor;
 }
 

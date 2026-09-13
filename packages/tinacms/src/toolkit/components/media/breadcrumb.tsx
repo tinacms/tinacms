@@ -29,10 +29,8 @@ const BreadcrumbItem = ({ className = '', ...props }) => (
 );
 
 export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
-  // Normalize: ensure non-root directories always have a leading slash so that
-  // split('/') produces '' as the first element, which renders as 'Media'.
-  const normalizedDir =
-    directory && !directory.startsWith('/') ? '/' + directory : directory;
+  const trimmed = directory.replace(/^\/+|\/+$/g, '');
+  const normalizedDir = trimmed ? '/' + trimmed : '';
   const directoryParts = normalizedDir.split('/');
 
   let prevDir: string = dirname(normalizedDir) || '';

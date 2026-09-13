@@ -1,0 +1,78 @@
+{
+  "version": 5,
+  "schema": {
+    "collections": [
+      {
+        "name": "post",
+        "label": "Posts",
+        "path": "content/posts",
+        "format": "mdx",
+        "fields": [
+          {
+            "name": "title",
+            "label": "Title",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "featured",
+            "label": "Featured",
+            "type": "boolean"
+          },
+          {
+            "name": "stars",
+            "label": "Stars",
+            "type": "rating"
+          },
+          {
+            "name": "body",
+            "label": "Body",
+            "isBody": true,
+            "type": "rich-text"
+          },
+          {
+            "name": "authors",
+            "label": "Authors",
+            "fields": [
+              {
+                "name": "name",
+                "label": "Name",
+                "type": "string"
+              }
+            ],
+            "type": "array"
+		  },
+		  {
+            "name": "status",
+            "label": "Status",
+            "options": [
+              {
+                "value": "draft",
+                "label": "Draft"
+              },
+              {
+                "value": "published",
+                "label": "Published"
+              }
+            ],
+            "type": "select"
+          }
+        ]
+      }
+    ],
+    "version": {
+      "fullVersion": "4.0.0-alpha.0",
+      "major": "4",
+      "minor": "0",
+      "patch": "0-alpha"
+    }
+  },
+  "primitives": {
+    "array": 1,
+    "boolean": 1,
+    "rating": 1,
+    "rich-text": 1,
+    "select": 1,
+    "string": 1
+  }
+}

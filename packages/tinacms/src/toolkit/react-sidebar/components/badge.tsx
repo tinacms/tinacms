@@ -1,11 +1,6 @@
-import * as React from 'react';
 import { cn } from '@utils/cn';
-import {
-  MdAccessTime,
-  MdCheckCircle,
-  MdOutlineDataSaverOff,
-  MdWifiOff,
-} from 'react-icons/md';
+import { CircleCheck, Clock, Info, WifiOff } from 'lucide-react';
+import * as React from 'react';
 
 export const Badge = ({
   children,
@@ -30,16 +25,16 @@ export const Badge = ({
 
   const icon = {
     warning: (
-      <MdAccessTime className='w-5 h-auto inline-block mr-1 opacity-70 text-amber-600' />
+      <Clock className='w-5 h-auto inline-block mr-1 opacity-70 text-amber-600' />
     ),
     info: (
-      <MdOutlineDataSaverOff className='w-5 h-auto inline-block mr-1 opacity-70 text-blue-600' />
+      <Info className='w-5 h-auto inline-block mr-1 opacity-70 text-blue-600' />
     ),
     success: (
-      <MdCheckCircle className='w-5 h-auto inline-block mr-1 opacity-70 text-green-600' />
+      <CircleCheck className='w-5 h-auto inline-block mr-1 opacity-70 text-green-600' />
     ),
     error: (
-      <MdWifiOff className='w-5 h-auto inline-block mr-1 opacity-70 text-red-700' />
+      <WifiOff className='w-5 h-auto inline-block mr-1 opacity-70 text-red-700' />
     ),
   };
 

@@ -1,10 +1,10 @@
+import type { Acorn, AcornOptions } from 'micromark-factory-mdx-expression';
 import { factorySpace } from 'micromark-factory-space';
 import { markdownLineEndingOrSpace } from 'micromark-util-character';
 import { codes } from 'micromark-util-symbol/codes.js';
 import { types } from 'micromark-util-symbol/types.js';
+import type { Construct, State, Tokenizer } from 'micromark-util-types';
 import { factoryTag } from './factory-tag';
-import type { Construct, Tokenizer, State } from 'micromark-util-types';
-import type { Acorn, AcornOptions } from 'micromark-factory-mdx-expression';
 import { findCode } from './util';
 
 export const jsxFlow: (

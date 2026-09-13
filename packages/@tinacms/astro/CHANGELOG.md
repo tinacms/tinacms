@@ -1,5 +1,35 @@
 # @tinacms/astro
 
+## 0.7.0
+
+### Minor Changes
+
+- [#7494](https://github.com/tinacms/tinacms/pull/7494) [`37f2e6a`](https://github.com/tinacms/tinacms/commit/37f2e6ac4d7e33faed049d5bc224fcb030095ef1) Thanks [@lastenvoy30](https://github.com/lastenvoy30)! - Render semantic `<thead>`/`<th>` for markdown tables in the Astro renderer
+
+  `TableNode.astro` mirrors the native `table` branch of the React renderer,
+  so it follows the same change: the first row becomes a `<thead>` of `<th>`
+  cells, the rest render as `<td>` in `<tbody>`, the `th` override now applies
+  to markdown tables, and the default inline table border and cell padding are
+  no longer applied.
+
+  **Breaking change:** the same selector and styling updates the `tinacms`
+  change requires apply here.
+
+## 0.6.1
+
+### Patch Changes
+
+- [#7213](https://github.com/tinacms/tinacms/pull/7213) [`056ffc2`](https://github.com/tinacms/tinacms/commit/056ffc22dc87b0040281054f4140c6260c22ea1f) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Publish internal package references as ranges instead of exact versions.
+
+  Internal dependencies were declared as `workspace:*`, which pnpm expands to an **exact version** when publishing (`"tinacms": "3.10.0"`), not a range. An exact pin cannot deduplicate against the version a consumer has already installed, so npm nests a second — and third — complete copy of `tinacms` and its dependency tree. In a stock Astro + TinaCMS blog this produced three copies of `tinacms`, three of `mermaid` (186 MB), five of `date-fns` (151 MB), and four of `typescript` (88 MB): about **320 MB of duplication**.
+
+  The same expansion applied to `peerDependencies`, so packages such as `next-tinacms-cloudinary` and `tinacms-authjs` published `"tinacms": "3.10.0"` as a _peer_ — requiring consumers to have that exact version or hit an `ERESOLVE` conflict, and forcing a republish of every dependent on each `tinacms` release.
+
+  Switching these to `workspace:^` publishes them as caret ranges (`^3.10.0`), which deduplicate normally and let `onlyUpdatePeerDependentsWhenOutOfRange` do its job.
+
+- Updated dependencies [[`cdbf469`](https://github.com/tinacms/tinacms/commit/cdbf469d96d8a3bcf5d3096d53907a06eaaed7f2)]:
+  - @tinacms/bridge@0.3.1
+
 ## 0.6.0
 
 ### Minor Changes

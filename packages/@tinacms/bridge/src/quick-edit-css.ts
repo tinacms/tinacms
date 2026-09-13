@@ -10,7 +10,6 @@ export const QUICK_EDIT_CSS = `
     transition: box-shadow ease-out 150ms;
   }
   [data-tina-field]:hover {
-    box-shadow: inset 100vi 100vh rgba(34,150,254,0.3);
     outline: 2px solid rgba(34,150,254,1);
     cursor: pointer;
   }
@@ -19,8 +18,8 @@ export const QUICK_EDIT_CSS = `
     position: relative;
   }
   [data-tina-field-overlay]:hover {
-    cursor: pointer;
     outline: 2px solid rgba(34,150,254,1);
+    cursor: pointer;
   }
   [data-tina-field-overlay]::after {
     content: '';
@@ -31,8 +30,20 @@ export const QUICK_EDIT_CSS = `
     background-color: rgba(34,150,254,0.3);
     opacity: 0;
   }
-  [data-tina-field-overlay]:hover::after {
-    opacity: 1;
+  /*
+   * Only the blue fill/wash is gated to hover-capable pointers. On touch
+   * screens (hover: none) :hover latches after a tap and never clears; a
+   * stuck solid outline is acceptable tap feedback, but the full-bleed wash
+   * flooding the tapped element is not. The solid outline above still applies
+   * on touch; only the box-shadow wash and the overlay reveal are held back.
+   */
+  @media (hover: hover) {
+    [data-tina-field]:hover {
+      box-shadow: inset 100vi 100vh rgba(34,150,254,0.3);
+    }
+    [data-tina-field-overlay]:hover::after {
+      opacity: 1;
+    }
   }
 `;
 
