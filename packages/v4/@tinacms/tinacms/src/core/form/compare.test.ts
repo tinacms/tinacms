@@ -24,10 +24,9 @@ const registryWith = (descriptors: Record<string, FieldDescriptor>) =>
 
 describe('fieldEqualityFor', () => {
   it('asks the descriptor of the field that declares one', () => {
-    const equal = fieldEqualityFor(
-      fields,
-      registryWith({ 'rich-text': sourceOnly })
-    );
+    const equal = fieldEqualityFor(fields, {
+      registry: registryWith({ 'rich-text': sourceOnly }),
+    });
     expect(
       equal(body, { source: 'Prose.', editorOnly: 1 }, { source: 'Prose.' })
     ).toBe(true);
@@ -37,10 +36,9 @@ describe('fieldEqualityFor', () => {
   });
 
   it('compares every other field as structure', () => {
-    const equal = fieldEqualityFor(
-      fields,
-      registryWith({ 'rich-text': sourceOnly })
-    );
+    const equal = fieldEqualityFor(fields, {
+      registry: registryWith({ 'rich-text': sourceOnly }),
+    });
     expect(equal(title, 'Hello', 'Hello')).toBe(true);
     expect(equal(title, 'Hello', 'Goodbye')).toBe(false);
     expect(equal(title, { source: 'x', editorOnly: 1 }, { source: 'x' })).toBe(
@@ -49,7 +47,7 @@ describe('fieldEqualityFor', () => {
   });
 
   it('compares as structure when no field declares an equality', () => {
-    const equal = fieldEqualityFor(fields, registryWith({}));
+    const equal = fieldEqualityFor(fields, { registry: registryWith({}) });
     expect(equal(body, { source: 'Prose.' }, { source: 'Prose.' })).toBe(true);
     expect(
       equal(body, { source: 'Prose.', editorOnly: 1 }, { source: 'Prose.' })
@@ -58,10 +56,9 @@ describe('fieldEqualityFor', () => {
 
   it('answers an address that belongs to no field', () => {
     const unknown = toFieldAddress('unknown');
-    const equal = fieldEqualityFor(
-      fields,
-      registryWith({ 'rich-text': sourceOnly })
-    );
+    const equal = fieldEqualityFor(fields, {
+      registry: registryWith({ 'rich-text': sourceOnly }),
+    });
     expect(equal(unknown, 'same', 'same')).toBe(true);
     expect(equal(unknown, 'same', 'other')).toBe(false);
   });

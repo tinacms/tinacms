@@ -1,4 +1,8 @@
-import { tinaField, useTina } from '@tinacms/tinacms/adapters/react';
+import {
+  TinaMarkdown,
+  tinaField,
+  useTina,
+} from '@tinacms/tinacms/adapters/react';
 import { sampleDocument } from '../content';
 
 // The site side of visual editing, written as a real site would write it. useTina seeds
@@ -39,6 +43,17 @@ export function PostPreview() {
           ? 'This preview renders the document streamed from the editor. Click the title or the badge to focus its field in the sidebar.'
           : 'Standalone preview — rendering the static document.'}
       </p>
+      <p>
+        Status: <span {...tinaField('status')}>{post.status}</span>
+      </p>
+      <div {...tinaField('body')}>
+        <TinaMarkdown content={post.body} />
+      </div>
+      {post.authors?.map((author, index) => (
+        <p key={index} {...tinaField(`authors.${index}.name`)}>
+          {author.name}
+        </p>
+      ))}
     </article>
   );
 }

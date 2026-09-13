@@ -35,4 +35,9 @@ export default defineConfig({
     restartOnTinaConfigChange(),
   ],
   resolve: { alias: playgroundAliases },
+  // `@tinacms/mdx` resolves through a workspace symlink, so Vite reads it as
+  // linked source and leaves it out of the dependency pre-bundle. Babel then
+  // parses two megabytes of built output on the first request for it. It is a
+  // built file, so nothing wants source-level HMR from it.
+  optimizeDeps: { include: ['@tinacms/mdx'] },
 });

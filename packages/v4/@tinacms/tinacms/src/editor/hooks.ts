@@ -1,5 +1,10 @@
 import { use, useCallback, useEffect, useEffectEvent, useMemo } from 'react';
-import { useController, useFormContext, useFormState } from 'react-hook-form';
+import {
+  get,
+  useController,
+  useFormContext,
+  useFormState,
+} from 'react-hook-form';
 import { useStore } from 'zustand';
 import type { ContentSlice } from '../core/content/contract';
 import type { FieldAddress } from '../core/field/address';
@@ -16,7 +21,7 @@ import {
   FormScopeContext,
   TinaRuntimeContext,
 } from './context';
-import { type FieldErrorEntry, fieldErrorMessages } from './field-errors';
+import { collectFieldErrorMessages } from './field-errors';
 
 export function useFieldRegistry(): FieldRegistry {
   const runtime = use(TinaRuntimeContext);
@@ -106,8 +111,9 @@ export function useFormSave(): () => Promise<void> {
   return useCallback(async () => {
     const { formId, path, collection, onSave } = scope;
     const values = getValues();
-    const digested = digestDocument(values, collection.fields, registry, {
+    const digested = digestDocument(values, collection.fields, {
       documentPath: path,
+      registry,
     });
     await onSave?.(digested);
     useFormStore.getState().markSaved(formId, toFormValues(values));
@@ -141,8 +147,11 @@ export function useFieldValue<T = unknown>(
 
 export function useFieldErrors(address: FieldAddress): string[] {
   const { errors } = useFormState({ name: address });
-  const fieldErrors = errors as Record<string, FieldErrorEntry | undefined>;
-  return fieldErrorMessages(fieldErrors[address]);
+  // `address` can nest through an index (`items.0.title`). `get` reads that
+  // path the same way react-hook-form does. `collectFieldErrorMessages` also
+  // walks down from it, so a compound field's address reports everything
+  // wrong underneath it, not only a message at that exact address.
+  return collectFieldErrorMessages(get(errors, address));
 }
 
 export function useFieldActivation(handler: () => void): void {

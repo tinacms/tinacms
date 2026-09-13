@@ -21,7 +21,6 @@ export function BooleanField() {
       <Checkbox
         ref={inputRef}
         id={address}
-        aria-label={address}
         checked={value ?? false}
         onCheckedChange={(checked) => setValue(checked === true)}
       />

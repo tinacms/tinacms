@@ -19,7 +19,8 @@
     "types": "tsc && tsc -p tsconfig.test.json",
     "test": "vitest run --passWithNoTests",
     "test:e2e": "playwright test",
-    "codegen": "node ./bin/tinacms.mjs codegen --root playground"
+    "codegen": "node ./bin/tinacms.mjs codegen --root playground",
+    "coverage": "vitest run --coverage"
   },
   "exports": {
     ".": {
@@ -79,6 +80,7 @@
     "@tanstack/react-query": "^5.101.4",
     "@tinacms/graphql": "workspace:*",
     "@tinacms/mdx": "workspace:*",
+    "@tinacms/rich-text": "workspace:*",
     "@tinacms/ui": "workspace:*",
     "gray-matter": "catalog:",
     "react-hook-form": "^7.80.0",
@@ -114,6 +116,7 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
     "abstract-level": "catalog:",
     "babel-plugin-react-compiler": "^1.0.0",
     "happy-dom": "catalog:",

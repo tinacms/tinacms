@@ -46,7 +46,12 @@ export const useGetEvents = (
     const fetchEvents = async () => {
       let doFetchEvents = false;
       if (!cms.api?.tina?.isCustomContentApi) {
-        doFetchEvents = await cms.api?.tina?.authProvider?.isAuthenticated();
+        try {
+          doFetchEvents = await cms.api?.tina?.authProvider?.isAuthenticated();
+        } catch {
+          // identity API unreachable: skip this poll rather than reject
+          doFetchEvents = false;
+        }
       }
       if (doFetchEvents) {
         try {
@@ -85,8 +90,12 @@ function useSyncStatus(cms: TinaCMS) {
     const interval = setInterval(async () => {
       let doFetchEvents = false;
       if (!cms.api?.tina?.isCustomContentApi) {
-        // update this?
-        doFetchEvents = await cms.api?.tina?.authProvider?.isAuthenticated();
+        try {
+          doFetchEvents = await cms.api?.tina?.authProvider?.isAuthenticated();
+        } catch {
+          // identity API unreachable: skip this poll rather than reject
+          doFetchEvents = false;
+        }
       }
       if (doFetchEvents) {
         const { events } = await cms.api.tina.fetchEvents();

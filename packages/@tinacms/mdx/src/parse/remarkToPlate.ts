@@ -179,6 +179,9 @@ export const remarkToSlate = (
 
     return {
       type: 'li',
+      ...(typeof content.checked === 'boolean'
+        ? { checked: content.checked }
+        : {}),
       // @ts-ignore
       children: content.children.map((child) => {
         switch (child.type) {
@@ -347,10 +350,13 @@ export const remarkToSlate = (
         );
       case 'text':
         return text(content);
+      case 'break':
+        return breakContent();
       case 'inlineCode':
       case 'emphasis':
       case 'image':
       case 'strong':
+      case 'delete':
         return phrashingMark(content);
       case 'html':
         return html_inline(content);

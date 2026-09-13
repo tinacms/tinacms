@@ -680,11 +680,16 @@ export class Database {
       if (error instanceof GraphQLError) {
         throw error;
       }
-      throw new TinaFetchError(`Error in PUT for ${filepath}`, {
-        originalError: error,
-        file: filepath,
-        collection: collectionName,
-      });
+      throw new TinaFetchError(
+        `Error in PUT for ${filepath}: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+        {
+          originalError: error,
+          file: filepath,
+          collection: collectionName,
+        }
+      );
     }
   };
 

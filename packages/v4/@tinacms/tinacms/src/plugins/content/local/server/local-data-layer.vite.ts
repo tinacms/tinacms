@@ -5,6 +5,10 @@ import { runCodegen } from '../../../../cli/commands/codegen';
 import { type ResolvedConfig, resolveBuild } from '../../../../config';
 import { DEFAULT_CONTENT_URL } from '../../../../core/content/contract';
 import { invariant } from '../../../../core/invariant';
+import {
+  MAX_REQUEST_BODY_BYTES,
+  RequestBodyTooLargeError,
+} from '../../../../core/request-body';
 import { dispatchContentRequest } from './content-request';
 import {
   type LocalDataLayerOptions,
@@ -24,15 +28,6 @@ const isLoopbackHost = (host: string | undefined): host is string =>
 
 const isSameOrigin = (origin: string | undefined, host: string): boolean =>
   !origin || origin === `http://${host}` || origin === `https://${host}`;
-
-const MAX_REQUEST_BODY_BYTES = 5 * 1024 * 1024;
-
-class RequestBodyTooLargeError extends Error {
-  constructor() {
-    super(`The request body is larger than ${MAX_REQUEST_BODY_BYTES} bytes.`);
-    this.name = 'RequestBodyTooLargeError';
-  }
-}
 
 const readRequestBody = (req: Connect.IncomingMessage): Promise<string> =>
   new Promise((resolve, reject) => {

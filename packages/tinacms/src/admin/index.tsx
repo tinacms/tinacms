@@ -1,3 +1,4 @@
+import { ERR_NOT_INDEXED } from '@tinacms/schema-tools';
 import {
   Button,
   Modal,
@@ -9,7 +10,7 @@ import {
   TinaCMS,
   useCMS,
 } from '@tinacms/toolkit';
-import { ERR_NOT_INDEXED } from '@tinacms/schema-tools';
+import { isSessionExpiredError } from '@tinacms/toolkit';
 import React, { useState, useEffect } from 'react';
 import {
   Route,
@@ -19,9 +20,9 @@ import {
   useParams,
 } from 'react-router-dom';
 
+import Sidebar from './components/AdminNav';
 import GetCMS from './components/GetCMS';
 import Layout from './components/Layout';
-import Sidebar from './components/AdminNav';
 
 import CollectionCreatePage from './pages/CollectionCreatePage';
 import CollectionDuplicatePage from './pages/CollectionDuplicatePage';
@@ -29,15 +30,20 @@ import CollectionListPage from './pages/CollectionListPage';
 import CollectionUpdatePage from './pages/CollectionUpdatePage';
 import DashboardPage from './pages/DashboardPage';
 import ScreenPage from './pages/ScreenPage';
+import { resolvePreviewPath } from './preview-url';
 
+import pkg from '../../package.json';
 import { Client, TinaCloudAuthProvider } from '../internalClient';
+import {
+  TelemetryMode,
+  TinaCMSStartedEvent,
+  initializePostHog,
+} from '../lib/posthog';
 import { TinaAdminApi } from './api';
 import {
-  initializePostHog,
-  TinaCMSStartedEvent,
-  TelemetryMode,
-} from '../lib/posthog';
-import pkg from '../../package.json';
+  AnnouncementsBanner,
+  AnnouncementsProvider,
+} from './components/AnnouncementsBanner';
 
 type AuthType = 'tinacloud' | 'self-hosted' | 'local' | 'other';
 
@@ -164,12 +170,26 @@ const SetPreviewFlag = ({
 };
 
 const PreviewInner = ({ preview, config }) => {
+  const cms = useCMS();
   const params = useParams();
   const navigate = useNavigate();
-  const [url, setURL] = React.useState(`/${params['*']}`);
+  const splat = params['*'];
+  const { path: paramURL, offOrigin } = resolvePreviewPath(splat);
+  const [url, setURL] = React.useState(paramURL);
   const [reportedURL, setReportedURL] = useState<string | null>(null);
   const ref = React.useRef<HTMLIFrameElement>(null);
-  const paramURL = `/${params['*']}`;
+
+  React.useEffect(() => {
+    if (!offOrigin) {
+      return;
+    }
+    cms.alerts.warn(
+      'This preview link points to a different site, so it was not opened.'
+    );
+    // Replace the rejected address so neither the address bar nor the back
+    // button keeps pointing at the other site.
+    navigate(`/~${paramURL}`, { replace: true });
+  }, [splat, offOrigin]);
 
   React.useEffect(() => {
     if (reportedURL !== paramURL && paramURL) {
@@ -195,7 +215,14 @@ const PreviewInner = ({ preview, config }) => {
     }, 100);
   }, [ref.current]);
   const Preview = preview;
-  return <Preview url={url} iframeRef={ref} {...config} />;
+  return (
+    <div className='flex flex-col h-screen'>
+      <AnnouncementsBanner />
+      <div className='flex-1 min-h-0'>
+        <Preview url={url} iframeRef={ref} {...config} />
+      </div>
+    </div>
+  );
 };
 
 const CheckSchema = ({
@@ -227,6 +254,10 @@ const CheckSchema = ({
           }
         })
         .catch((error) => {
+          if (isSessionExpiredError(error)) {
+            // request() already sent the user back to the login modal
+            return;
+          }
           // Matches a TinaCloud server contract (string owned upstream); see #6777.
           if (error.message.includes(ERR_NOT_INDEXED)) {
             setSchemaMissingError(true);
@@ -306,7 +337,7 @@ export const TinaAdmin = ({
             });
           const hasRouter = Boolean(collectionWithRouter);
           return (
-            <>
+            <AnnouncementsProvider>
               <PostHogTracker cms={cms} />
               <CheckSchema schemaJson={schemaJson}>
                 <Router>
@@ -416,7 +447,7 @@ export const TinaAdmin = ({
                   </Routes>
                 </Router>
               </CheckSchema>
-            </>
+            </AnnouncementsProvider>
           );
         } else {
           return (

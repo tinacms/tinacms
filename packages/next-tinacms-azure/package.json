@@ -1,7 +1,7 @@
 {
   "name": "next-tinacms-azure",
   "type": "module",
-  "version": "15.0.3",
+  "version": "15.0.4",
   "description": "",
   "main": "dist/index.js",
   "module": "./dist/index.js",
@@ -37,10 +37,9 @@
   },
   "devDependencies": {
     "@tinacms/scripts": "workspace:*",
-    "@types/crypto-js": "^3.1.47",
     "@types/js-cookie": "^2.2.7",
     "@types/node": "^22.13.1",
-    "next": "14.2.35",
+    "next": "15.5.21",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tinacms": "workspace:*",

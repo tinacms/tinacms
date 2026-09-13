@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import type {
   ContentSlice,
   DocumentEntry,
+  DocumentSummary,
 } from '../../../core/content/contract';
 import type { SliceSet, SliceState } from '../../../core/plugin';
 import { localContentPlugin } from './local-content.plugin';
@@ -10,6 +11,8 @@ const ENTRIES: DocumentEntry[] = [
   { path: 'content/posts/hello.mdx', document: { title: 'Hello' } },
   { path: 'content/posts/second.mdx', document: { title: 'Second' } },
 ];
+
+const SUMMARIES: DocumentSummary[] = ENTRIES.map(({ path }) => ({ path }));
 
 const createSliceHarness = async (responseBody: unknown, ok = true) => {
   const requests: unknown[] = [];
@@ -46,11 +49,11 @@ const createSliceHarness = async (responseBody: unknown, ok = true) => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe('content slice', () => {
-  it('posts a list op and returns the entries', async () => {
-    const harness = await createSliceHarness(ENTRIES);
+  it('posts a list op and returns the summaries', async () => {
+    const harness = await createSliceHarness(SUMMARIES);
     const listed = await harness.slice().list('post');
     expect(harness.requests).toEqual([{ op: 'list', collection: 'post' }]);
-    expect(listed).toEqual(ENTRIES);
+    expect(listed).toEqual(SUMMARIES);
   });
 
   it('posts a get op for one document', async () => {

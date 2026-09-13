@@ -39,7 +39,6 @@ The client segment (`string-field.client.tsx`) takes the `string` key:
 ```tsx
 defineClientPlugin({
   field: {
-    type: 'string',           // STRING_FIELD_TYPE
     Component: StringField,
     defaultValue: '',         // seeds a new/absent field on ingest
     metadata: { layout: 'inline' },
@@ -47,6 +46,11 @@ defineClientPlugin({
   },
 });
 ```
+
+The descriptor does not carry `type`. `string-field.plugin.ts` claims the
+`string` key with `field: { type: STRING_FIELD_TYPE, contractVersion: 1 }`
+on the manifest (see
+[`field-plugins.md`](./field-plugins.md#2-the-client-segment-and-the-descriptor-clienttsx)).
 
 The descriptor has no `validate`, `parse`, or `serialize` function. TinaCMS
 stores the value without a change, and `schema` holds all the rules.
@@ -98,7 +102,7 @@ export function StringField() {
 
   return (
     <div>
-      <input ref={inputRef} aria-label={address} value={value ?? ''}
+      <input ref={inputRef} id={address} value={value ?? ''}
         onChange={(e) => setValue(e.target.value)} />
       {errors.map((e) => <span key={e} role='alert'>{e}</span>)}
     </div>
@@ -109,8 +113,9 @@ export function StringField() {
 ## The connections
 
 - The manifest is `string-field.plugin.ts`. It calls `definePlugin({ name:
-  'tina:field:string', provides: ['field'], client: () =>
-  import('./string-field.client') })`, and it exports `stringFieldPlugin`.
+  'tina:field:string', provides: ['field'], field: { type: STRING_FIELD_TYPE,
+  contractVersion: 1 }, client: () => import('./string-field.client') })`, and
+  it exports `stringFieldPlugin`.
 - The registration is in `plugins/fields/index.ts`. That file adds the plugin to
   `corePlugins`, and it supplies `t.string`.
 

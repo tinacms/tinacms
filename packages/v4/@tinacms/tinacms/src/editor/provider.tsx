@@ -22,6 +22,7 @@ import {
   type FieldErrors,
   type FormId,
   isEdited,
+  keepsValues,
   readFormStore,
   toDocument,
   toFormId,
@@ -35,11 +36,7 @@ import {
   type TinaRuntime,
   TinaRuntimeContext,
 } from './context';
-import {
-  type FieldErrorEntry,
-  fieldErrorMessages,
-  toFieldErrorEntry,
-} from './field-errors';
+import { flattenFieldErrors, nestFieldErrors } from './field-errors';
 import { buildFormResolver } from './resolver';
 
 export interface TinaProviderProps {
@@ -158,26 +155,38 @@ export function FormProvider({
   const { registry } = runtime;
 
   const formId = toFormId(path);
-  const transformContext = useMemo(() => ({ documentPath: path }), [path]);
+  const transformContext = useMemo(
+    () => ({ documentPath: path, registry }),
+    [path, registry]
+  );
   const ingested = useMemo(
-    () =>
-      ingestDocument(document, collection.fields, registry, transformContext),
-    [document, collection, registry, transformContext]
+    () => ingestDocument(document, collection.fields, transformContext),
+    [document, collection, transformContext]
   );
   const equal = useMemo(
-    () => fieldEqualityFor(collection.fields, registry, transformContext),
-    [collection, registry, transformContext]
+    () => fieldEqualityFor(collection.fields, transformContext),
+    [collection, transformContext]
   );
+  // What a fresh form instance adopts from the store. It samples the store one time,
+  // because RHF replaces its full error state each time the `errors` option changes
+  // identity — a rebuild on each document would overwrite the live errors of the user.
   const kept = useMemo(() => {
     const scope = readFormStore().forms[formId];
-    if (!isEdited(scope)) return { seed: null, errors: {} };
-    const errors: Record<string, FieldErrorEntry> = {};
-    for (const [address, messages] of Object.entries(scope.errors)) {
-      if (messages?.length) errors[address] = toFieldErrorEntry(messages);
-    }
-    return { seed: toDocument(scope.values), errors };
+    if (!keepsValues(scope, toFormValues(ingested)))
+      return { seed: null, errors: {} };
+    return {
+      seed: toDocument(scope.values),
+      errors: nestFieldErrors(scope.errors),
+    };
   }, [formId]);
-  const seedValues = kept.seed ?? ingested;
+  // Whether the scope still keeps its values against the document of this render. A
+  // clean scope stops keeping them when another writer changes the file, so the test
+  // must follow the document, not only the form id.
+  const keepsIncoming = useMemo(
+    () => keepsValues(readFormStore().forms[formId], toFormValues(ingested)),
+    [formId, ingested]
+  );
+  const seedValues = keepsIncoming ? (kept.seed ?? ingested) : ingested;
   const resolver = buildFormResolver(collection, registry);
   const methods = useForm<TinaDocument>({
     defaultValues: seedValues,
@@ -206,7 +215,7 @@ export function FormProvider({
     }
     if (seededSignature.current !== signature) {
       seededSignature.current = signature;
-      methods.reset(seedValues, { keepErrors: kept.seed !== null });
+      methods.reset(seedValues, { keepErrors: seedValues === kept.seed });
       advanceSeedKey(formId);
     }
   }, [formId, seedValues, kept, methods, equal, advanceSeedKey]);
@@ -227,14 +236,19 @@ export function FormProvider({
       callback: ({ values, errors, name }) => {
         const store = useFormStore.getState();
         if (name !== undefined) {
-          store.setFieldValue(formId, toFieldAddress(name), values[name]);
+          // The store's live-values mirror is flat, one entry per top-level
+          // field. A nested field name collapses to its top-level address.
+          const topLevel = name.split('.')[0];
+          store.setFieldValue(
+            formId,
+            toFieldAddress(topLevel),
+            values[topLevel]
+          );
         }
+        const flat = flattenFieldErrors(errors ?? {});
         const mirrored: FieldErrors = {};
-        for (const [field, entry] of Object.entries(
-          (errors ?? {}) as Record<string, FieldErrorEntry | undefined>
-        )) {
-          const messages = fieldErrorMessages(entry);
-          if (messages.length > 0) mirrored[toFieldAddress(field)] = messages;
+        for (const [address, messages] of Object.entries(flat)) {
+          mirrored[toFieldAddress(address)] = messages;
         }
         store.setFieldErrors(formId, mirrored);
       },

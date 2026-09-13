@@ -1,17 +1,17 @@
-import type { Pattern } from '../../stringify';
-import type {
-  Construct,
-  ContentType,
-  Tokenizer,
-  State,
-  Token,
-} from 'micromark-util-types';
-import { ok as assert } from 'uvu/assert';
 import { factorySpace } from 'micromark-factory-space';
 import { markdownLineEnding, markdownSpace } from 'micromark-util-character';
 import { codes } from 'micromark-util-symbol/codes';
 import { constants } from 'micromark-util-symbol/constants';
 import { types } from 'micromark-util-symbol/types';
+import type {
+  Construct,
+  ContentType,
+  State,
+  Token,
+  Tokenizer,
+} from 'micromark-util-types';
+import { assert } from '../../assert';
+import type { Pattern } from '../../stringify';
 import { factoryAttributes } from './factory-attributes';
 import { factoryName } from './factory-name';
 import { findCode } from './shortcode-leaf';

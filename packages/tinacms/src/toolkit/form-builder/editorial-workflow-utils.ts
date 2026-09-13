@@ -2,6 +2,8 @@ export interface MediaWorkflowConfirmBranchEvent {
   type: 'media:workflow:confirm-branch';
   branchName: string;
   baseBranch: string;
+  /** Whether the prompt may offer the direct "Save to Protected Branch" action. */
+  allowSaveToProtectedBranch: boolean;
   onConfirm: (branchName: string) => Promise<void>;
   onCancel: () => void;
   onSaveToProtectedBranch: () => void;

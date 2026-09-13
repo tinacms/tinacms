@@ -38,6 +38,24 @@ describe('form-store registration', () => {
     expect(store.getState().forms[postA].values[title]).toBe('Edited');
     expect(statusOf(postA)).toBe('dirty');
   });
+
+  it('re-registering a saved form keeps the saved values', () => {
+    store.getState().registerForm(postA, { [title]: 'Hello' });
+    store.getState().setFieldValue(postA, title, 'Saved');
+    store.getState().markSaved(postA);
+    store.getState().registerForm(postA, { [title]: 'Saved' });
+    expect(store.getState().forms[postA].values[title]).toBe('Saved');
+    expect(statusOf(postA)).toBe('clean');
+  });
+
+  it('re-registering a saved form adopts content that changed after the save', () => {
+    store.getState().registerForm(postA, { [title]: 'Hello' });
+    store.getState().setFieldValue(postA, title, 'Saved');
+    store.getState().markSaved(postA);
+    store.getState().registerForm(postA, { [title]: 'Changed on disk' });
+    expect(store.getState().forms[postA].values[title]).toBe('Changed on disk');
+    expect(statusOf(postA)).toBe('pristine');
+  });
 });
 
 describe('form-store document round trip', () => {

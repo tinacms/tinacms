@@ -4,7 +4,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import type { DocumentEntry } from '../core/content/contract';
+import type { DocumentEntry, DocumentSummary } from '../core/content/contract';
 import type { TinaDocument } from '../core/schema/types';
 import { useContentSlice } from './hooks';
 
@@ -21,10 +21,10 @@ export const contentKeys = {
 
 export const CONTENT_STALE_TIME = 30_000;
 
-const EMPTY_DOCUMENTS: DocumentEntry[] = [];
+const EMPTY_DOCUMENTS: DocumentSummary[] = [];
 
 export interface CollectionDocuments {
-  documents: DocumentEntry[];
+  documents: DocumentSummary[];
   isLoading: boolean;
   error: Error | null;
 }
@@ -70,13 +70,13 @@ export const useDocument = (
 };
 
 const upsertByPath = (
-  entries: DocumentEntry[],
-  entry: DocumentEntry
-): DocumentEntry[] => {
-  const index = entries.findIndex((cached) => cached.path === entry.path);
-  if (index === -1) return [...entries, entry];
-  const next = [...entries];
-  next[index] = entry;
+  summaries: DocumentSummary[],
+  summary: DocumentSummary
+): DocumentSummary[] => {
+  const index = summaries.findIndex((cached) => cached.path === summary.path);
+  if (index === -1) return [...summaries, summary];
+  const next = [...summaries];
+  next[index] = summary;
   return next;
 };
 
@@ -98,9 +98,10 @@ export const useSaveDocument = (): DocumentSave => {
     mutationFn: ({ collection, path, value }: SaveDocumentInput) =>
       content.update(collection, path, value),
     onSuccess: (entry, { collection }) => {
-      queryClient.setQueryData<DocumentEntry[]>(
+      queryClient.setQueryData<DocumentSummary[]>(
         contentKeys.list(collection),
-        (cached) => (cached ? upsertByPath(cached, entry) : undefined)
+        (cached) =>
+          cached ? upsertByPath(cached, { path: entry.path }) : undefined
       );
       queryClient.setQueryData(
         contentKeys.document(collection, entry.path),

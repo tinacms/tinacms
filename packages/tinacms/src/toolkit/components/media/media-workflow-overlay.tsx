@@ -14,6 +14,7 @@ import {
   ModalHeader,
   PopupModal,
 } from '@toolkit/react-modals';
+import { normalizeBranchName } from '@utils/branch-name';
 import { CircleAlert } from 'lucide-react';
 import * as React from 'react';
 
@@ -25,6 +26,7 @@ type WorkflowState =
       baseBranch: string;
       errorMessage?: string;
       isChecking?: boolean;
+      allowSaveToProtectedBranch: boolean;
       onConfirm: (branchName: string) => Promise<void>;
       onCancel: () => void;
       onSaveToProtectedBranch: () => void;
@@ -53,6 +55,7 @@ export const MediaWorkflowOverlay = () => {
           phase: 'confirming',
           branchName: event.branchName,
           baseBranch: event.baseBranch,
+          allowSaveToProtectedBranch: event.allowSaveToProtectedBranch,
           onConfirm: event.onConfirm,
           onCancel: event.onCancel,
           onSaveToProtectedBranch: event.onSaveToProtectedBranch,
@@ -116,7 +119,7 @@ export const MediaWorkflowOverlay = () => {
 
     const confirmState = state;
     const branchName = confirmState.branchName;
-    const targetBranch = `tina/${branchName}`;
+    const targetBranch = `tina/${normalizeBranchName(branchName)}`;
     abortPreflight();
     const abortController = new AbortController();
     preflightAbortRef.current = abortController;
@@ -190,7 +193,9 @@ export const MediaWorkflowOverlay = () => {
           state.onCancel();
           setState({ phase: 'idle' });
         }}
-        disabled={state.branchName === '' || state.isChecking}
+        disabled={
+          normalizeBranchName(state.branchName) === '' || state.isChecking
+        }
         errorMessage={state.errorMessage}
         onBranchNameChange={(branchName) => {
           abortPreflight();
@@ -206,6 +211,7 @@ export const MediaWorkflowOverlay = () => {
           );
         }}
         onCreateBranch={handleCreateBranch}
+        allowSaveToProtectedBranch={state.allowSaveToProtectedBranch}
         onSaveToProtectedBranch={() => {
           abortPreflight();
           state.onSaveToProtectedBranch();

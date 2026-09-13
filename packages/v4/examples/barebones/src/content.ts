@@ -8,6 +8,12 @@ export const sampleDocument = {
   title: 'Hello World',
   featured: false,
   stars: 4,
+  authors: [
+    {
+      name: 'Author Name',
+    },
+  ],
+  status: 'draft',
   body: {
     type: 'root',
     children: [

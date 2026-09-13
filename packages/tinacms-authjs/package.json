@@ -1,7 +1,7 @@
 {
   "name": "tinacms-authjs",
   "type": "module",
-  "version": "24.0.2",
+  "version": "24.0.4",
   "main": "dist/index.js",
   "module": "./dist/index.js",
   "files": [
@@ -30,7 +30,7 @@
     "@tinacms/datalayer": "workspace:*",
     "@tinacms/scripts": "workspace:*",
     "next": "^15.5.16",
-    "next-auth": "^4.24.13",
+    "next-auth": "^4.24.15",
     "react": "^19.2.3",
     "tinacms": "workspace:*",
     "typescript": "^5.7.3"
@@ -47,6 +47,6 @@
   },
   "repository": {
     "url": "https://github.com/tinacms/tinacms.git",
-    "directory": "packages/next-auth"
+    "directory": "packages/tinacms-authjs"
   }
 }

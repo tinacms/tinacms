@@ -1,5 +1,8 @@
 import { z } from 'zod';
-import type { DocumentEntry } from '../../../../core/content/contract';
+import type {
+  DocumentEntry,
+  DocumentSummary,
+} from '../../../../core/content/contract';
 import type { GraphQLResult } from '../graphql/graphql-pipeline';
 import type { LocalDataLayer } from './local-data-layer';
 
@@ -88,7 +91,7 @@ export type ContentRequest = z.infer<typeof contentRequestSchema>;
 export const dispatchContentRequest = async (
   provider: LocalDataLayer,
   request: unknown
-): Promise<DocumentEntry[] | DocumentEntry | null | GraphQLResult> => {
+): Promise<DocumentSummary[] | DocumentEntry | null | GraphQLResult> => {
   const parsed = contentRequestSchema.parse(request);
   switch (parsed.op) {
     case 'list':

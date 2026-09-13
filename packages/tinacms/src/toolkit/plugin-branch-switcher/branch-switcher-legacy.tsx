@@ -3,6 +3,7 @@ import { BaseTextField, Input } from '@toolkit/fields';
 import { LoadingDots } from '@toolkit/form-builder';
 import { useCMS } from '@toolkit/react-core';
 import { Button } from '@toolkit/styles';
+import { formatBranchName, normalizeBranchName } from '@utils/branch-name';
 import {
   ArrowRight,
   CircleAlert,
@@ -21,11 +22,7 @@ import { Branch, BranchSwitcherProps } from './types';
 
 type ListState = 'loading' | 'ready' | 'error';
 
-export function formatBranchName(str: string): string {
-  const pattern = /[^/\w-]+/g; // regular expression pattern to match invalid special characters
-  const formattedStr = str.replace(pattern, ''); // remove special characters
-  return formattedStr.toLowerCase();
-}
+export { formatBranchName } from '@utils/branch-name';
 
 export const BranchSwitcherLegacy = ({
   listBranches,
@@ -50,7 +47,7 @@ export const BranchSwitcherLegacy = ({
   const handleCreateBranch = React.useCallback((value) => {
     setListState('loading');
     createBranch({
-      branchName: formatBranchName(value),
+      branchName: normalizeBranchName(formatBranchName(value)),
       baseBranch: currentBranch,
     }).then(async (createdBranchName) => {
       // @ts-ignore
@@ -334,6 +331,12 @@ export const CreateBranch: React.FC<{
   currentBranch: string;
   newBranchName: string;
 }> = ({ currentBranch, newBranchName, onCreateBranch, setNewBranchName }) => {
+  // Guard on the value actually sent: a slashes-only name would otherwise
+  // normalise away and be submitted as an empty branch name
+  const normalizedBranchName = normalizeBranchName(
+    formatBranchName(newBranchName)
+  );
+
   return (
     <div className='border-t border-gray-150 pt-4 mt-3 flex flex-col gap-3'>
       <div className='text-sm'>
@@ -350,8 +353,13 @@ export const CreateBranch: React.FC<{
           className='flex-0 flex items-center gap-2 whitespace-nowrap'
           size='medium'
           variant='white'
-          disabled={newBranchName === ''}
-          onClick={() => onCreateBranch(newBranchName)}
+          disabled={normalizedBranchName === ''}
+          onClick={() => {
+            // Button renders `disabled` as styling only, so keyboard activation
+            // still reaches this handler
+            if (!normalizedBranchName) return;
+            onCreateBranch(normalizedBranchName);
+          }}
         >
           <Plus className='w-5 h-auto opacity-70' /> Create Branch
         </Button>

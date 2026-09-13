@@ -1,15 +1,12 @@
 import type { FieldTransformContext } from '../field/contract';
-import type { FieldRegistry } from '../field/registry';
 import type { FieldSchema, TinaDocument } from '../schema/types';
-
-const NO_DOCUMENT: FieldTransformContext = {};
 
 export const ingestDocument = (
   storedDocument: TinaDocument | undefined,
   fields: FieldSchema[],
-  registry: FieldRegistry,
-  context: FieldTransformContext = NO_DOCUMENT
+  context: FieldTransformContext
 ): TinaDocument => {
+  const { registry } = context;
   const values: TinaDocument = {};
   for (const node of fields) {
     const descriptor = registry.get(node.type);
@@ -28,9 +25,9 @@ export const ingestDocument = (
 export const digestDocument = (
   values: TinaDocument | undefined,
   fields: FieldSchema[],
-  registry: FieldRegistry,
-  context: FieldTransformContext = NO_DOCUMENT
+  context: FieldTransformContext
 ): TinaDocument => {
+  const { registry } = context;
   const reconstructedDocument: TinaDocument = {};
   for (const node of fields) {
     const value = values?.[node.name];

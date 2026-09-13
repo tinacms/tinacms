@@ -1,9 +1,9 @@
-import { it, expect } from 'vitest';
-import { parseMDX } from '../../index';
+import { expect, it } from 'vitest';
+import * as util from '../../../next/tests/util';
 import { serializeMDX } from '../../../stringify';
+import { parseMDX } from '../../index';
 import { field } from './field';
 import input from './in.md?raw';
-import * as util from '../../../next/tests/util';
 
 it('matches input', () => {
   const tree = parseMDX(input, field, (v) => v);

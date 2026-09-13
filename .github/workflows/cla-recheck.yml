@@ -1,0 +1,32 @@
+name: CLA Recheck
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  statuses: read
+
+jobs:
+  cla-recheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Wait for cla-assistant's normal posting window
+        run: sleep 120
+
+      # cla-assistant.io sometimes never posts a status on a new head commit (e.g. after
+      # "Update branch"), leaving the required license/cla check waiting forever. Its
+      # public check URL makes it re-validate. Only nudge when NO license/cla status
+      # exists at all: a real "not signed" result must never be re-requested or overwritten.
+      - name: Nudge cla-assistant if the license/cla status never arrived
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh api "repos/${{ github.repository }}/commits/${{ github.event.pull_request.head.sha }}/status" \
+            --jq '.statuses[].context' | grep -qx 'license/cla'; then
+            echo "license/cla status already present; nothing to do."
+            exit 0
+          fi
+          echo "No license/cla status on ${{ github.event.pull_request.head.sha }}; asking cla-assistant.io to re-check."
+          curl -s -o /dev/null "https://cla-assistant.io/check/${{ github.repository }}?pullRequest=${{ github.event.pull_request.number }}"

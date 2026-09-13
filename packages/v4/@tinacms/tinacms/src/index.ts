@@ -17,6 +17,7 @@ export type {
   ContentProvider,
   ContentSlice,
   DocumentEntry,
+  DocumentSummary,
 } from './core/content/contract';
 export type { AdminScreen, AdminScreenProps } from './core/screen/contract';
 export {
@@ -36,5 +37,6 @@ export type {
   BooleanFieldSchema,
   DatetimeFieldSchema,
   NumberFieldSchema,
+  RichTextFieldSchema,
   StringFieldSchema,
 } from './plugins/fields';

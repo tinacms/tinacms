@@ -1,9 +1,10 @@
-import { AuthProvider, LoginStrategy } from '@tinacms/schema-tools';
 import {
-  authenticate,
-  AUTH_TOKEN_KEY,
+  AuthProvider,
+  LoginStrategy,
   TokenObject,
-} from '../auth/authenticate';
+} from '@tinacms/schema-tools';
+import { isErrorNamed } from '@toolkit/core/errors';
+import { AUTH_TOKEN_KEY, authenticate } from '../auth/authenticate';
 import DefaultSessionProvider from '../auth/defaultSessionProvider';
 
 type Input = Parameters<AuthProvider['fetchWithToken']>[0];
@@ -11,6 +12,13 @@ type Init = Parameters<AuthProvider['fetchWithToken']>[1];
 type FetchReturn = ReturnType<AuthProvider['fetchWithToken']>;
 
 export abstract class AbstractAuthProvider implements AuthProvider {
+  /**
+   * Turns a tokened 401 into the auth wall re-arming. The Client assigns this
+   * automatically; AbstractAuthProvider.fetchWithToken invokes it. A provider
+   * that implements its own fetchWithToken must invoke it itself.
+   */
+  sessionExpiredListener?: () => void;
+
   /**
    * Wraps the normal fetch function with same API but adds the authorization header token.
    *
@@ -22,14 +30,24 @@ export abstract class AbstractAuthProvider implements AuthProvider {
    */
   async fetchWithToken(input: Input, init: Init): FetchReturn {
     const headers = init?.headers || {};
-    const token = await this.getToken();
-    if (token?.id_token) {
-      headers['Authorization'] = 'Bearer ' + token?.id_token;
+    const accessToken = await this.getAccessToken();
+    if (accessToken) {
+      headers['Authorization'] = 'Bearer ' + accessToken;
     }
-    return await fetch(input, {
+    const res = await fetch(input, {
       ...(init || {}),
       headers: new Headers(headers),
     });
+    // a 401 without a token is just "not logged in", not an expired session
+    if (res.status === 401 && accessToken) {
+      this.sessionExpiredListener?.();
+    }
+    return res;
+  }
+
+  async getAccessToken(): Promise<string | null> {
+    const token = await this.getToken();
+    return token?.access_token ?? token?.id_token ?? null;
   }
 
   async authorize(context?: any): Promise<any> {
@@ -70,8 +88,9 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
   clientId: string;
   identityApiUrl: string;
   frontendUrl: string;
-  token: string; // used with memory storage
-  setToken: (_token: TokenObject) => void;
+  token: TokenObject; // used with memory storage
+  hasWarnedNoSession = false;
+  setToken: (_token: TokenObject | null) => void;
   getToken: () => Promise<TokenObject>;
 
   constructor({
@@ -94,7 +113,9 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
     switch (tokenStorage) {
       case 'LOCAL_STORAGE':
         this.getToken = async function () {
-          const tokens = localStorage.getItem(AUTH_TOKEN_KEY) || null;
+          const tokens = JSON.parse(
+            localStorage.getItem(AUTH_TOKEN_KEY) || null
+          );
           if (tokens) {
             return await this.getRefreshedToken(tokens);
           } else {
@@ -121,8 +142,8 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
             };
           }
         };
-        this.setToken = (token) => {
-          this.token = JSON.stringify(token, null, 2);
+        this.setToken = (token: TokenObject) => {
+          this.token = token;
         };
         break;
       case 'CUSTOM':
@@ -136,9 +157,15 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
     }
   }
   async authenticate() {
-    const token = await authenticate(this.clientId, this.frontendUrl);
-    this.setToken(token);
-    return token;
+    const result = await authenticate(
+      this.clientId,
+      this.identityApiUrl,
+      this.frontendUrl
+    );
+    if (result) {
+      this.setToken(result);
+      return result;
+    }
   }
   async getUser() {
     if (!this.clientId) {
@@ -148,16 +175,40 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
     const url = `${this.identityApiUrl}/v2/apps/${this.clientId}/currentUser`;
 
     try {
-      const res = await this.fetchWithToken(url, {
-        method: 'GET',
-      });
+      if (!(await this.getAccessToken())) {
+        if (!this.hasWarnedNoSession) {
+          this.hasWarnedNoSession = true;
+          console.warn(
+            'TinaCMS: no TinaCloud session found. If login fails, check the console inside the login popup window for the underlying error.'
+          );
+        }
+        return null;
+      }
+      let res: Awaited<FetchReturn>;
+      try {
+        res = await this.fetchWithToken(url, { method: 'GET' });
+      } catch (networkError) {
+        // one transient identity-API failure must not read as "logged out"
+        // and eject the user; retry once, then let callers treat it as an
+        // error rather than an expired session
+        console.warn('TinaCMS: session check failed, retrying.', networkError);
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        res = await this.fetchWithToken(url, { method: 'GET' });
+      }
       const val = await res.json();
       if (!res.status.toString().startsWith('2')) {
-        console.error(val.error);
+        console.error(
+          `TinaCMS: TinaCloud session check failed (status ${res.status}).`,
+          val?.error ?? val
+        );
         return null;
       }
       return val;
     } catch (e) {
+      if (e instanceof TypeError || isErrorNamed(e, 'AbortError')) {
+        // fetch network failures surface as TypeError: not an auth answer
+        throw e;
+      }
       console.error(e);
       return null;
     }
@@ -166,44 +217,50 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
     this.setToken(null);
   }
 
-  async getRefreshedToken(tokens: string): Promise<TokenObject> {
-    const { access_token, id_token, refresh_token } = JSON.parse(tokens);
-    const { exp, iss, client_id } = this.parseJwt(access_token);
+  async getRefreshedToken(tokens: TokenObject): Promise<TokenObject> {
+    const { access_token, id_token, refresh_token } = tokens;
+    if (!access_token) {
+      throw new Error('Unable to refresh auth tokens: missing access_token');
+    }
+    const { exp } = this.parseJwt(access_token);
 
     // if the token is going to expire within the next two minutes, refresh it now
     if (Date.now() / 1000 >= exp - 120) {
-      const refreshResponse = await fetch(iss, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-amz-json-1.1',
-          'x-amz-target': 'AWSCognitoIdentityProviderService.InitiateAuth',
-        },
-        body: JSON.stringify({
-          ClientId: client_id,
-          AuthFlow: 'REFRESH_TOKEN_AUTH',
-          AuthParameters: {
-            REFRESH_TOKEN: refresh_token,
-            DEVICE_KEY: null,
+      const url = `${this.identityApiUrl}/oauth/token`;
+
+      const params = new URLSearchParams();
+      params.set('grant_type', 'refresh_token');
+      params.set('refresh_token', refresh_token);
+      params.set('client_id', this.clientId);
+
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
           },
-        }),
-      });
-
-      if (refreshResponse.status !== 200) {
-        throw new Error('Unable to refresh auth tokens');
+          body: params.toString(),
+        });
+        const val = await res.json();
+        if (res.status !== 200) {
+          throw new Error(
+            `Unable to refresh auth tokens. Status: ${res.status} - Body: ${JSON.stringify(val)}`
+          );
+        }
+        const newToken = {
+          access_token: val.access_token,
+          id_token: val.id_token,
+          refresh_token: val.refresh_token ?? refresh_token,
+        };
+        this.setToken(newToken);
+        return newToken;
+      } catch (e) {
+        console.error(e);
+        throw new Error('Unable to refresh auth tokens', { cause: e });
       }
-
-      const responseJson = await refreshResponse.json();
-      const newToken = {
-        access_token: responseJson.AuthenticationResult.AccessToken,
-        id_token: responseJson.AuthenticationResult.IdToken,
-        refresh_token,
-      };
-      this.setToken(newToken);
-
-      return Promise.resolve(newToken);
     }
 
-    return Promise.resolve({ access_token, id_token, refresh_token });
+    return { access_token, id_token, refresh_token };
   }
   parseJwt(token) {
     const base64Url = token.split('.')[1];
@@ -236,7 +293,7 @@ export class LocalAuthProvider extends AbstractAuthProvider {
     return localStorage.getItem(LOCAL_CLIENT_KEY) === 'true';
   }
   async getToken() {
-    return Promise.resolve({ id_token: '' });
+    return Promise.resolve({ access_token: 'LOCAL', refresh_token: 'LOCAL' });
   }
   async logout() {
     localStorage.removeItem(LOCAL_CLIENT_KEY);

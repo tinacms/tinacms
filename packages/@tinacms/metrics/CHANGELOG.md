@@ -1,5 +1,21 @@
 # @tinacms/metrics
 
+## 2.1.3
+
+### Patch Changes
+
+- [#7476](https://github.com/tinacms/tinacms/pull/7476) [`f48009e`](https://github.com/tinacms/tinacms/commit/f48009ec6cabe28427a430b80299fe92ede5da0d) Thanks [@kulesy](https://github.com/kulesy)! - chore(tinacms-pkgs): point `repository.directory` at each package's own folder
+
+  Eight packages declared a `repository.directory` copied from whichever package they were forked from, so the "repository" link on their npm pages resolved to unrelated source. Also drops a dead `generate:schema` script from `@tinacms/metrics`, `@tinacms/cli` and `@tinacms/schema-tools` - it referenced a `scripts/generateSchema.js` that has never existed in the repo and nothing invoked it.
+
+## 2.1.2
+
+### Patch Changes
+
+- [#7468](https://github.com/tinacms/tinacms/pull/7468) [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Drop the `fs-extra` peer dependency
+
+  `@tinacms/metrics` declared `fs-extra@^9.0.1` as a peer while the repo itself ran `^11.3.0`, so the range was never satisfied and every install printed an unmet-peer warning. The one call site read `package.json` with `readFileSync`, which fs-extra re-exports unchanged from `node:fs`, so the peer is replaced with the builtin and `@types/node` covers the types that previously arrived through `@types/fs-extra`.
+
 ## 2.1.1
 
 ### Patch Changes

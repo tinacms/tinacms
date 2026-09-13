@@ -1,3 +1,4 @@
+import type { MediaAccept, MediaExtension } from '@tinacms/schema-tools';
 import { EventBus } from './event';
 import { DummyMediaStore } from './media-store.default';
 
@@ -120,6 +121,15 @@ export interface MediaStore {
   searchable?: boolean;
 
   /**
+   * Indicates that `list` honours the `ext` option. Stores that ignore it
+   * should leave this unset, so a field declaring `accept` falls back to
+   * showing everything rather than silently listing the wrong files.
+   *
+   * @default false
+   */
+  extensionFilterable?: boolean;
+
+  /**
    * Converts a Media object to the value stored in a form field.
    *
    * Typically returns `media.src`. If not implemented, the image field
@@ -139,6 +149,11 @@ export interface MediaListOptions {
   thumbnailSizes?: { w: number; h: number }[];
   filesOnly?: boolean;
   search?: string;
+  /**
+   * Restricts the listing to these file extensions. Resolved from categories
+   * before it reaches the store, so it is always concrete extensions here.
+   */
+  ext?: MediaExtension[];
 }
 
 /**
@@ -296,6 +311,10 @@ export interface SelectMediaOptions {
   allowDelete?: boolean;
   directory?: string;
   onSelect?(media: Media): void;
+  /**
+   * Narrows the picker to these file types, from a field's `accept`.
+   */
+  accept?: MediaAccept | MediaAccept[];
 }
 
 interface MediaListErrorConfig {

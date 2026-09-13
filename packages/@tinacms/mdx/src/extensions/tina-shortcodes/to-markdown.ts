@@ -1,17 +1,17 @@
-import type { Directive, LeafDirective, TextDirective } from './types';
 import type { BlockContent, DefinitionContent, Paragraph } from 'mdast';
+import { ConstructName } from 'mdast-util-directive/lib';
 import type {
-  Handle as ToMarkdownHandle,
   Options as ToMarkdownExtension,
+  Handle as ToMarkdownHandle,
 } from 'mdast-util-to-markdown';
-import { stringifyEntitiesLight } from 'stringify-entities';
+import { Context as State } from 'mdast-util-to-markdown';
+import { checkQuote } from 'mdast-util-to-markdown/lib/util/check-quote';
 import { containerFlow } from 'mdast-util-to-markdown/lib/util/container-flow';
 import { containerPhrasing } from 'mdast-util-to-markdown/lib/util/container-phrasing';
-import { checkQuote } from 'mdast-util-to-markdown/lib/util/check-quote';
 import { track } from 'mdast-util-to-markdown/lib/util/track';
+import { stringifyEntitiesLight } from 'stringify-entities';
 import { Pattern } from '../../stringify';
-import { ConstructName } from 'mdast-util-directive/lib';
-import { Context as State } from 'mdast-util-to-markdown';
+import type { Directive, LeafDirective, TextDirective } from './types';
 
 const own = {}.hasOwnProperty;
 

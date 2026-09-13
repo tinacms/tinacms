@@ -1,10 +1,10 @@
-import type * as Plate from './plate';
 import type { PhrasingContent } from 'mdast';
 import type {
   MdxJsxAttribute,
   MdxJsxExpressionAttribute,
   MdxJsxTextElement,
 } from 'mdast-util-mdx-jsx';
+import type * as Plate from './plate';
 
 export const getHighlightColorFromAttributes = (
   attributes: (MdxJsxAttribute | MdxJsxExpressionAttribute)[] = []
