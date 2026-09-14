@@ -1125,7 +1125,7 @@ export class TinaMediaStore implements MediaStore {
       res = await this.api.authProvider.fetchWithToken(
         `${this.listUrl}/list/${options.directory || ''}?limit=${
           options.limit || 20
-        }${options.offset ? `&cursor=${options.offset}` : ''}${
+        }${options.offset ? `&cursor=${encodeURIComponent(options.offset)}` : ''}${
           encodedBranch ? `&branch=${encodedBranch}` : ''
         }${
           options.search ? `&search=${encodeURIComponent(options.search)}` : ''
@@ -1147,7 +1147,7 @@ export class TinaMediaStore implements MediaStore {
       res = await this.fetchFunction(
         `${this.url}/list/${options.directory || ''}?limit=${
           options.limit || 20
-        }${options.offset ? `&cursor=${options.offset}` : ''}${
+        }${options.offset ? `&cursor=${encodeURIComponent(options.offset)}` : ''}${
           options.search ? `&search=${encodeURIComponent(options.search)}` : ''
         }${
           options.ext?.length

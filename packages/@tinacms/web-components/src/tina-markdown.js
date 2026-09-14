@@ -1,3 +1,4 @@
+import { sanitizeUrl } from '@tinacms/mdx/sanitize-url';
 import DOMPurify from 'dompurify';
 
 /**
@@ -72,8 +73,8 @@ function renderNode(node) {
   /** @type {HTMLElement} */
   const el = document.createElement(tag);
 
-  if (node.url && node.type === 'a') el.href = node.url;
-  if (node.url && node.type === 'img') el.src = node.url;
+  if (node.url && node.type === 'a') el.href = sanitizeUrl(node.url);
+  if (node.url && node.type === 'img') el.src = sanitizeUrl(node.url);
 
   if (node.type === 'mdxJsxTextElement' || node.type === 'mdxJsxFlowElement') {
     const override = TinaMarkdown.components[node.name];
