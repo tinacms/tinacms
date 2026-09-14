@@ -64,6 +64,24 @@
               }
             ],
             "type": "select"
+          },
+          {
+            "name": "seo",
+            "label": "SEO",
+            "fields": [
+              {
+                "name": "title",
+                "label": "Title",
+                "required": true,
+                "type": "string"
+              },
+              {
+                "name": "description",
+                "label": "Description",
+                "type": "string"
+              }
+            ],
+            "type": "object"
           }
         ]
       },
@@ -97,6 +115,7 @@
   "primitives": {
     "array": 1,
     "boolean": 1,
+    "object": 1,
     "rating": 1,
     "reference": 1,
     "rich-text": 1,

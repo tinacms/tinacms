@@ -8,6 +8,8 @@ import datetimeFieldPlugin from './datetime/datetime-field.plugin';
 import { datetime } from './datetime/datetime-field.schema';
 import numberFieldPlugin from './number/number-field.plugin';
 import { number } from './number/number-field.schema';
+import objectFieldPlugin from './object/object-field.plugin';
+import { object } from './object/object-field.schema';
 import richTextFieldPlugin from './rich-text/rich-text-field.plugin';
 import { richText } from './rich-text/rich-text-field.schema';
 import selectFieldPlugin from './select/select-field.plugin';
@@ -21,6 +23,7 @@ export const corePlugins = [
   numberFieldPlugin,
   datetimeFieldPlugin,
   arrayFieldPlugin,
+  objectFieldPlugin,
   selectFieldPlugin,
   richTextFieldPlugin,
   referenceFieldPlugin,
@@ -34,6 +37,7 @@ export const t = {
   datetime,
   select,
   array,
+  object,
   richText,
   reference,
 };
@@ -42,6 +46,7 @@ export type { ArrayFieldSchema } from './array/array-field.schema';
 export type { BooleanFieldSchema } from './boolean/boolean-field.schema';
 export type { DatetimeFieldSchema } from './datetime/datetime-field.schema';
 export type { NumberFieldSchema } from './number/number-field.schema';
+export type { ObjectFieldSchema } from './object/object-field.schema';
 export type { RichTextFieldSchema } from './rich-text/rich-text-field.schema';
 export type {
   SelectFieldOption,
