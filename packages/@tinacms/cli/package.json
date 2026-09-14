@@ -9,6 +9,9 @@
         "bin/*"
     ],
     "license": "Apache-2.0",
+    "engines": {
+        "node": "22.x || 24.x"
+    },
     "bin": {
         "tinacms": "bin/tinacms"
     },

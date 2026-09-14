@@ -1,5 +1,5 @@
 ---
-"@tinacms/cli": patch
+"@tinacms/cli": minor
 ---
 
 Bump `vite` from `^6.4.3` to `^7.3.6`.
