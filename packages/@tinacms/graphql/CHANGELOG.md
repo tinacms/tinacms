@@ -1,5 +1,33 @@
 # tina-graphql
 
+## 3.0.0
+
+### Major Changes
+
+- [#7229](https://github.com/tinacms/tinacms/pull/7229) [`2a70b77`](https://github.com/tinacms/tinacms/commit/2a70b77f023f9c6f042de4ae4dcada565c7b9be8) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Rich-text fields use a new `RichText` GraphQL scalar, and the generated TypeScript types map it to `TinaMarkdownContent` instead of `any`.
+
+  Rich-text fields used the generic `JSON` scalar, which `_values`, `templates` and `fields` also use. A scalar maps to one TypeScript type, and `any` was the only type that fit both a rich-text document and arbitrary JSON. So `data.post._body` came out as `any`, and TypeScript did not check code that read it.
+
+  ```
+  RichText -> TinaMarkdownContent   (new)
+  JSON     -> any                   (unchanged, so `_values` still indexes freely)
+  ```
+
+  GraphQL query documents do not change, and the server needs no resolver for the new scalar. `buildASTSchema` passes custom scalars through, so the server indexes and resolves rich text as before. In `schema.gql`, rich-text fields change from `JSON` to `RichText`.
+
+  This breaks TypeScript code that relied on `any`. TypeScript now reports reads of properties that `TinaMarkdownContent` does not declare, such as `.text` on a text node or `.slice` on the body. To read node properties such as `text`, add them to your own node type.
+
+  Update `tinacms` at the same time. `<TinaMarkdown>` in the latest `tinacms` accepts a `null` or `undefined` `content`, so you can pass an optional rich-text field to it without a guard.
+
+### Patch Changes
+
+- [#7516](https://github.com/tinacms/tinacms/pull/7516) [`96d6efe`](https://github.com/tinacms/tinacms/commit/96d6efe03e7fc9515d2caa7fe81f54f41abcd2e6) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Normalize document IDs and `_sys.path` on Windows to prevent the same document from creating separate Visual Editing forms across query paths.
+
+  Mutation resolvers now also work from a POSIX path, so `_sys.hasReferences` is reported correctly and deleting or renaming a referenced document updates the referring documents instead of silently leaving them pointing at the old path.
+
+- Updated dependencies [[`df35183`](https://github.com/tinacms/tinacms/commit/df351832c37fd0efaf5a06cb6cde9a5ec404201e)]:
+  - @tinacms/mdx@2.2.3
+
 ## 2.4.11
 
 ### Patch Changes

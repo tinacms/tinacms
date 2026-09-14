@@ -1,3 +1,4 @@
+import { Label } from '@tinacms/ui/components/label';
 import { use } from 'react';
 import type { FieldAddress } from '../core/field/address';
 import { toFieldAddress } from '../core/field/address';
@@ -49,6 +50,33 @@ export function FieldNode({ address, node }: FieldNodeProps) {
         </div>
       </FieldSchemaContext>
     </FieldAddressContext>
+  );
+}
+
+export interface NestedFieldRowProps {
+  address: string;
+  node: FieldSchema;
+}
+
+// The label + <FieldNode> pair a compound field (array, object) renders for
+// each of its child fields. A child whose descriptor sets `labelable: false`
+// gets no `htmlFor` — its widget reads the row's label id through
+// `aria-labelledby` instead.
+export function NestedFieldRow({ address, node }: NestedFieldRowProps) {
+  const runtime = use(TinaRuntimeContext);
+  const labelable =
+    runtime?.registry.get(node.type)?.metadata?.labelable !== false;
+  return (
+    <div className='mb-3 min-w-0 last:mb-0'>
+      <Label
+        className='mb-1'
+        id={`${address}-label`}
+        htmlFor={labelable ? address : undefined}
+      >
+        {node.label ?? node.name}
+      </Label>
+      <FieldNode address={toFieldAddress(address)} node={node} />
+    </div>
   );
 }
 
