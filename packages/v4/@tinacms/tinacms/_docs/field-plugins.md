@@ -48,6 +48,9 @@ v4 supplies four more examples:
 - The `select` field ([`select-field.md`](./select-field.md)) picks one value
   from a fixed `options` list. Its Zod validator is a `z.enum` with a custom
   `errorMap`, and it has no `defaultValue`, `parse`, or `serialize`.
+- The `reference` field ([`reference-field.md`](./reference-field.md)) points
+  at another document, and stores that document's path. Its options come from
+  the content capability, not from a fixed list.
 - The `rich-text` field ([`rich-text-field.md`](./rich-text-field.md)) uses the
   `block` layout. With `isBody`, it controls the markdown body of the file.
 
