@@ -128,8 +128,8 @@ export interface EditorialWorkflowErrorCopy {
   link?: EditorialWorkflowErrorLink;
 }
 
-const indexingFailureCopy = (filepath?: string): EditorialWorkflowErrorCopy => {
-  const subject = filepath ? `\u201c${filepath}\u201d` : 'your content';
+const indexingFailureCopy = (file?: string): EditorialWorkflowErrorCopy => {
+  const subject = file ? `\u201c${file}\u201d` : 'your content';
   return {
     message:
       `We couldn't index ${subject}, so your changes were not saved to the new branch.\n\n` +
@@ -162,7 +162,7 @@ export const getEditorialWorkflowError = (
         errMessage = err.message || 'Invalid branch name';
         break;
       case EDITORIAL_WORKFLOW_ERROR.INDEXING_FAILED:
-        return indexingFailureCopy(err.filepath);
+        return indexingFailureCopy(err.file);
       default:
         errMessage = err.message || errMessage;
         break;
