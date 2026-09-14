@@ -1,11 +1,24 @@
-import type { FieldDescriptor } from './field/contract';
+import type {
+  FieldDescriptor,
+  PluginValidationContext,
+} from './field/contract';
 import type { FieldRegistry } from './field/registry';
 import type { FieldSchema } from './schema/types';
+
+export interface ValidateFieldOptions {
+  address?: string;
+}
+
+const messagesOf = (result: string | string[] | null): string[] => {
+  if (result === null) return [];
+  return Array.isArray(result) ? result : [result];
+};
 
 export const validateField = (
   node: FieldSchema,
   descriptor: FieldDescriptor | undefined,
-  value: unknown
+  value: unknown,
+  options: ValidateFieldOptions = {}
 ): string[] => {
   const errors: string[] = [];
   const schema = descriptor?.schema?.(node);
@@ -15,8 +28,13 @@ export const validateField = (
       errors.push(...result.error.issues.map((issue) => issue.message));
     }
   }
-  const custom = descriptor?.validate?.(value);
-  if (custom) errors.push(custom);
+  const context: PluginValidationContext = {
+    node,
+    address: options.address ?? node.name,
+  };
+  if (descriptor?.validate) {
+    errors.push(...messagesOf(descriptor.validate(value, context)));
+  }
   return errors;
 };
 
@@ -36,7 +54,7 @@ export const validateFieldTree = (
   registry: FieldRegistry
 ): Record<string, string[]> => {
   const errors: Record<string, string[]> = {};
-  const messages = validateField(node, descriptor, value);
+  const messages = validateField(node, descriptor, value, { address });
   if (messages.length > 0) errors[address] = messages;
   const childErrors = descriptor?.validateChildren?.(
     value,

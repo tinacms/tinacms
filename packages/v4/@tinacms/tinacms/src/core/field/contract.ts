@@ -17,12 +17,22 @@ export interface FieldTransformContext {
   registry: FieldRegistry;
 }
 
+export interface PluginValidationContext {
+  node: FieldSchema;
+  address: string;
+}
+
+export type Validate<TValue = unknown, TContext = PluginValidationContext> = (
+  value: TValue,
+  context: TContext
+) => string | string[] | null;
+
 export interface FieldDescriptor<TValue = unknown, TStored = unknown> {
   Component: ComponentType;
   defaultValue?: TValue;
   metadata?: FieldMetadata;
   schema?: (node: FieldSchema) => ZodType;
-  validate?: (value: TValue) => string | null;
+  validate?: Validate<TValue>;
   parse?: (
     stored: TStored,
     node: FieldSchema,
