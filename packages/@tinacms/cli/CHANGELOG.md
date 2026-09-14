@@ -1,5 +1,34 @@
 # tinacms-cli
 
+## 3.0.0
+
+### Major Changes
+
+- [#7229](https://github.com/tinacms/tinacms/pull/7229) [`2a70b77`](https://github.com/tinacms/tinacms/commit/2a70b77f023f9c6f042de4ae4dcada565c7b9be8) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Rich-text fields use a new `RichText` GraphQL scalar, and the generated TypeScript types map it to `TinaMarkdownContent` instead of `any`.
+
+  Rich-text fields used the generic `JSON` scalar, which `_values`, `templates` and `fields` also use. A scalar maps to one TypeScript type, and `any` was the only type that fit both a rich-text document and arbitrary JSON. So `data.post._body` came out as `any`, and TypeScript did not check code that read it.
+
+  ```
+  RichText -> TinaMarkdownContent   (new)
+  JSON     -> any                   (unchanged, so `_values` still indexes freely)
+  ```
+
+  GraphQL query documents do not change, and the server needs no resolver for the new scalar. `buildASTSchema` passes custom scalars through, so the server indexes and resolves rich text as before. In `schema.gql`, rich-text fields change from `JSON` to `RichText`.
+
+  This breaks TypeScript code that relied on `any`. TypeScript now reports reads of properties that `TinaMarkdownContent` does not declare, such as `.text` on a text node or `.slice` on the body. To read node properties such as `text`, add them to your own node type.
+
+  Update `tinacms` at the same time. `<TinaMarkdown>` in the latest `tinacms` accepts a `null` or `undefined` `content`, so you can pass an optional rich-text field to it without a guard.
+
+### Patch Changes
+
+- [#7526](https://github.com/tinacms/tinacms/pull/7526) [`d030d41`](https://github.com/tinacms/tinacms/commit/d030d414d39e15de79bf36e4c728d57205e71dde) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Values written into the generated client are now emitted as JS literals rather than being interpolated between quotes. A branch name that contains a quote, a backslash or a newline is kept as part of the URL string instead of changing the surrounding code. The same applies to the token, the cache directory and the error policy.
+
+- Updated dependencies [[`901975f`](https://github.com/tinacms/tinacms/commit/901975f9974d92be3d881998741602ae0d99f05e), [`2bbbaaf`](https://github.com/tinacms/tinacms/commit/2bbbaaf809453b4046b09692cec45ec5e4cc2c04), [`c5407b7`](https://github.com/tinacms/tinacms/commit/c5407b7f97c922ddace0062a3c8b04d34b921a91), [`96d6efe`](https://github.com/tinacms/tinacms/commit/96d6efe03e7fc9515d2caa7fe81f54f41abcd2e6), [`a658075`](https://github.com/tinacms/tinacms/commit/a658075e87aa973a81620a6ff89ff48c11003a0f), [`60db64b`](https://github.com/tinacms/tinacms/commit/60db64bf3e80550fcaf6f9c4ec79c19191c1702c), [`2a70b77`](https://github.com/tinacms/tinacms/commit/2a70b77f023f9c6f042de4ae4dcada565c7b9be8), [`b57dbf4`](https://github.com/tinacms/tinacms/commit/b57dbf4b56201aef15cd92caa49fd12ab96bbecf), [`2a70b77`](https://github.com/tinacms/tinacms/commit/2a70b77f023f9c6f042de4ae4dcada565c7b9be8)]:
+  - tinacms@3.14.0
+  - @tinacms/graphql@3.0.0
+  - @tinacms/app@2.5.14
+  - @tinacms/search@1.2.25
+
 ## 2.7.0
 
 ### Minor Changes

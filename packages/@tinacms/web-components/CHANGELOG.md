@@ -1,5 +1,11 @@
 # @tinacms/web-components
 
+## 0.2.1
+
+### Patch Changes
+
+- [#7523](https://github.com/tinacms/tinacms/pull/7523) [`5295e07`](https://github.com/tinacms/tinacms/commit/5295e077f0d279c35686a0e481a15e33a4877e3b) Thanks [@wicksipedia](https://github.com/wicksipedia)! - The `tina-markdown` element now runs link and image URLs through the same `sanitizeUrl` guard the React and Astro renderers use, so a URL whose scheme is not on the allow list renders empty rather than being written to `href` or `src`.
+
 ## 0.2.0
 
 ### Minor Changes
