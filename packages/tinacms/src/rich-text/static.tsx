@@ -98,7 +98,7 @@ export const StaticTinaMarkdown = <
   content,
   components = {},
 }: {
-  content: TinaMarkdownContent | TinaMarkdownContent[];
+  content: TinaMarkdownContent | TinaMarkdownContent[] | null | undefined;
   components?:
     | Components<{}>
     | Components<{

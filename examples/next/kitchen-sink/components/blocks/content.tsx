@@ -24,9 +24,7 @@ export const Content = ({ data }: ContentProps) => {
         width='medium'
         data-tina-field={tinaField(data, 'body')}
       >
-        {data.body && (
-          <TinaMarkdown content={data.body} components={customComponents} />
-        )}
+        <TinaMarkdown content={data.body} components={customComponents} />
       </Container>
     </Section>
   );

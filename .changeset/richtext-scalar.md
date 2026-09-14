@@ -3,24 +3,17 @@
 "@tinacms/cli": major
 ---
 
-Give rich-text its own GraphQL scalar, so `_body` is actually typed.
+Rich-text fields use a new `RichText` GraphQL scalar, and the generated TypeScript types map it to `TinaMarkdownContent` instead of `any`.
 
-Rich-text fields were typed with the generic `JSON` scalar — the same one carrying `_values`, `templates` and `fields`. One scalar means one TypeScript mapping, and the only one that suited both an editable document AST and an arbitrary blob was `any`. So `data.post._body` came out untyped, even though TinaCMS already ships the exact type it should be: `TinaMarkdownContent`, which is what `<TinaMarkdown/>` demands.
-
-Rich-text fields now use a dedicated `RichText` scalar:
+Rich-text fields used the generic `JSON` scalar, which `_values`, `templates` and `fields` also use. A scalar maps to one TypeScript type, and `any` was the only type that fit both a rich-text document and arbitrary JSON. So `data.post._body` came out as `any`, and TypeScript did not check code that read it.
 
 ```
-RichText -> TinaMarkdownContent   (real type)
-JSON     -> any                   (unchanged — `_values` still indexes freely)
+RichText -> TinaMarkdownContent   (new)
+JSON     -> any                   (unchanged, so `_values` still indexes freely)
 ```
 
-Query documents are unchanged, and no resolver is needed — `buildASTSchema` gives custom scalars passthrough behaviour, so the server indexes and resolves rich text exactly as before. `schema.gql` gains `scalar RichText`.
+GraphQL query documents do not change, and the server needs no resolver for the new scalar. `buildASTSchema` passes custom scalars through, so the server indexes and resolves rich text as before. In `schema.gql`, rich-text fields change from `JSON` to `RichText`.
 
-**Breaking for TypeScript consumers, in the useful direction.** `_body` is now `Maybe<TinaMarkdownContent>` rather than `any`, so passing it straight to `<TinaMarkdown/>` fails to compile wherever the field is optional:
+This breaks TypeScript code that relied on `any`. TypeScript now reports reads of properties that `TinaMarkdownContent` does not declare, such as `.text` on a text node or `.slice` on the body. To read node properties such as `text`, add them to your own node type.
 
-```diff
-- <TinaMarkdown content={data.post._body} />
-+ {data.post._body && <TinaMarkdown content={data.post._body} />}
-```
-
-That is not busywork. It caught two latent null-safety bugs in our own kitchen-sink, both fixed here — `markdown-components.tsx` already guarded its equivalents; these two sites simply didn't, and nothing was checking.
+Update `tinacms` at the same time. `<TinaMarkdown>` in the latest `tinacms` accepts a `null` or `undefined` `content`, so you can pass an optional rich-text field to it without a guard.
