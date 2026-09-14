@@ -83,7 +83,7 @@ describe('getEditorialWorkflowError', () => {
     const { message, link } = getEditorialWorkflowError(
       workflowError('index failed: content/posts/hello.mdx', {
         errorCode: EDITORIAL_WORKFLOW_ERROR.INDEXING_FAILED,
-        filepath: 'content/posts/hello.mdx',
+        file: 'content/posts/hello.mdx',
       })
     );
 
@@ -109,7 +109,7 @@ describe('getEditorialWorkflowError', () => {
     const { message } = getEditorialWorkflowError(
       workflowError('[see docs](https://tina.io/x) raw server copy', {
         errorCode: EDITORIAL_WORKFLOW_ERROR.INDEXING_FAILED,
-        filepath: 'content/posts/hello.mdx',
+        file: 'content/posts/hello.mdx',
       })
     );
 
@@ -120,7 +120,7 @@ describe('getEditorialWorkflowError', () => {
   it('shows the server message for a code it does not recognise', () => {
     const { message, link } = getEditorialWorkflowError(
       workflowError('Something the CMS has never heard of', {
-        errorCode: 'WORKFLOW_FAILED',
+        errorCode: 'SOMETHING_NEW',
       })
     );
 

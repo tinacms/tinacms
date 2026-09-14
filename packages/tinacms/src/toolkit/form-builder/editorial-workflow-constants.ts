@@ -39,7 +39,7 @@ export type EditorialWorkflowError =
 export type EditorialWorkflowErrorDetails = Error & {
   errorCode?: string;
   conflictingBranch?: string;
-  filepath?: string;
+  file?: string;
 };
 
 export const EDITORIAL_WORKFLOW_EVENT_LOG_DOCS_URL =
