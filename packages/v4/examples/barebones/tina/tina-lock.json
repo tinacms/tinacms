@@ -43,6 +43,14 @@
             "type": "array"
           },
           {
+            "type": "reference",
+            "collections": [
+              "page"
+            ],
+            "name": "pages",
+            "label": "Pages Reference"
+          },
+          {
             "name": "status",
             "label": "Status",
             "options": [
@@ -76,6 +84,25 @@
             "type": "object"
           }
         ]
+      },
+      {
+        "name": "page",
+        "label": "Pages",
+        "path": "content/pages",
+        "format": "mdx",
+        "fields": [
+          {
+            "name": "title",
+            "label": "Title",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "featured",
+            "label": "Featured",
+            "type": "boolean"
+          }
+        ]
       }
     ],
     "version": {
@@ -90,6 +117,7 @@
     "boolean": 1,
     "object": 1,
     "rating": 1,
+    "reference": 1,
     "rich-text": 1,
     "select": 1,
     "string": 1
