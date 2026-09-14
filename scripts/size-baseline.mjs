@@ -632,7 +632,14 @@ async function measure() {
       writeFixtureLock(stripWorkspaceEntries(JSON.parse(committedLock)));
     }
     installFixture();
-    if (UPDATE) updateCommittedLock();
+    if (UPDATE) {
+      updateCommittedLock();
+      // A check run installs from the committed pins. Install again from those
+      // pins, so that the baseline measures the same tree.
+      cleanFixture();
+      writeFixtureLock(stripWorkspaceEntries(JSON.parse(readCommittedLock())));
+      installFixture();
+    }
     const installClosureBytes = measureInstallClosureBytes();
     const watchlist = measureWatchlistCopies();
 
