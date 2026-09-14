@@ -2,6 +2,7 @@
 
 */
 
+import { LoadingMessage } from '@toolkit/components/loading-messages';
 import React from 'react';
 
 const LoadingPage = () => (
@@ -91,7 +92,7 @@ const LoadingPage = () => (
             />
           </circle>
         </svg>
-        <p
+        <LoadingMessage
           style={{
             fontSize: '16px',
             color: '#716c7f',
@@ -100,9 +101,7 @@ const LoadingPage = () => (
             fontFamily: "'Inter', sans-serif",
             fontWeight: 'normal',
           }}
-        >
-          Hang tight, TinaCMS is looking for llamas 🦙 🦙 🦙
-        </p>
+        />
       </div>
     </div>
   </>

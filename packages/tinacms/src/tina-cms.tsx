@@ -1,10 +1,11 @@
 import React, { ReactNode, useState } from 'react';
 import { TinaCloudProvider } from './auth';
+import { LoadingMessage } from './toolkit/components/loading-messages';
 import { FontLoader } from './toolkit/styles/font-loader';
 
-import { LocalClient } from './internalClient/index';
-import { useDocumentCreatorPlugin } from './hooks/use-content-creator';
 import { parseURL } from '@tinacms/schema-tools';
+import { useDocumentCreatorPlugin } from './hooks/use-content-creator';
+import { LocalClient } from './internalClient/index';
 import type { TinaCMSProviderDefaultProps } from './types/cms';
 
 const errorButtonStyles = {
@@ -303,7 +304,7 @@ const Loader = (props: { children: React.ReactNode }) => {
               />
             </circle>
           </svg>
-          <p
+          <LoadingMessage
             style={{
               fontSize: '18px',
               color: '#252336',
@@ -312,9 +313,7 @@ const Loader = (props: { children: React.ReactNode }) => {
               fontFamily: "'Inter', sans-serif",
               fontWeight: 'normal',
             }}
-          >
-            Hang tight, TinaCMS is looking for llamas 🦙 🦙 🦙
-          </p>
+          />
         </div>
       </div>
       {props.children}
