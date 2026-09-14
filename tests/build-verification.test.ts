@@ -125,7 +125,8 @@ for (const pkg of packages) {
         )
 
         expect(clientExport.browser).toBe('./dist/client.browser.js')
-        expect(browserClient).not.toMatch(/node:(?:crypto|fs|os|path)/)
+        expect(browserClient).not.toContain('__vite-browser-external')
+        expect(browserClient).not.toMatch(/['"]node:/)
       })
     }
 
