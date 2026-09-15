@@ -26,6 +26,16 @@
           {
             "name": "featured",
             "label": "Featured",
+            "validators": [
+              {
+                "name": "requires",
+                "args": [
+                  "status",
+                  "published",
+                  "Only a published post can be featured"
+                ]
+              }
+            ],
             "type": "boolean"
           },
           {

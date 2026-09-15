@@ -10,7 +10,7 @@ import {
   t,
 } from '@tinacms/tinacms';
 import { rating, ratingFieldPlugin } from './rating-field';
-import { matches, validatorsPlugin } from './validators';
+import { matches, requires, validatorsPlugin } from './validators';
 
 export const postCollection = {
   name: 'post',
@@ -24,7 +24,18 @@ export const postCollection = {
       required: true,
       validators: [matches('^[A-Z]', 'Start with a capital letter')],
     }),
-    t.boolean({ name: 'featured', label: 'Featured' }),
+    t.boolean({
+      name: 'featured',
+      label: 'Featured',
+      // A sibling rule: reads `status` from the same document.
+      validators: [
+        requires(
+          'status',
+          'published',
+          'Only a published post can be featured'
+        ),
+      ],
+    }),
     // The custom field of this project. tina/rating-field.tsx is the whole plugin.
     rating({ name: 'stars', label: 'Stars' }),
     t.richText({ name: 'body', label: 'Body', isBody: true }),

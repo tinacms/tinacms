@@ -11,6 +11,16 @@ export const matches = (pattern: string, message?: string): ValidatorRef => ({
   args: message === undefined ? [pattern] : [pattern, message],
 });
 
+// This field may only be set while the sibling `other` equals `expected`.
+export const requires = (
+  other: string,
+  expected: string | number | boolean,
+  message?: string
+): ValidatorRef => ({
+  name: 'requires',
+  args: message === undefined ? [other, expected] : [other, expected, message],
+});
+
 const matchesFactory: ValidatorFactory =
   (pattern, message = 'Invalid format') =>
   (value) =>
@@ -18,11 +28,20 @@ const matchesFactory: ValidatorFactory =
       ? String(message)
       : null;
 
+const requiresFactory: ValidatorFactory =
+  (other, expected, message) =>
+  (value, { siblings }) => {
+    if (!value || siblings[String(other)] === expected) return null;
+    return String(message ?? `Needs ${other} to be ${expected}`);
+  };
+
 export const validatorsPlugin = definePlugin({
   name: 'example:validators',
   provides: ['validator'],
-  validators: ['matches'],
+  validators: ['matches', 'requires'],
   client: async () => ({
-    default: defineClientPlugin({ validators: { matches: matchesFactory } }),
+    default: defineClientPlugin({
+      validators: { matches: matchesFactory, requires: requiresFactory },
+    }),
   }),
 });
