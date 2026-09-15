@@ -7,6 +7,7 @@ import type {
   ValidatorRegistry,
 } from './field/contract';
 import { resolveFieldPlugins } from './field/registry';
+import type { ValidatorRef } from './schema/types';
 import { validateField, validateFieldTree } from './validation';
 
 const titleNode = t.string({ name: 'title', label: 'Title' });
@@ -128,6 +129,15 @@ describe('validateField field-level validators', () => {
       { validators, siblings: { title: 'ok' }, values: { title: 'ok' } }
     );
     expect(seen).toEqual({ node: titleNode, address: 'title' });
+  });
+
+  it('only accepts args that serialise to JSON', () => {
+    const ref: ValidatorRef = {
+      name: 'after',
+      // @ts-expect-error a function cannot live in tina-lock.json
+      args: [() => 'startDate'],
+    };
+    expect(ref.name).toBe('after');
   });
 
   it('throws on a validator name nothing registered', () => {

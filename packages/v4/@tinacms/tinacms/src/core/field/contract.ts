@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react';
 import type { ZodType } from 'zod';
+import type { JsonValue } from '../json';
 import type { FieldSchema, TinaDocument } from '../schema/types';
 import type { FieldRegistry } from './registry';
 
@@ -37,7 +38,7 @@ export type Validate<TValue = unknown, TContext = PluginValidationContext> = (
 // A validator takes its parameters from the collection (`{ name, args }` on
 // the field) and returns the rule. It never hard-codes a sibling name.
 export type ValidatorFactory = (
-  ...args: unknown[]
+  ...args: JsonValue[]
 ) => Validate<unknown, FieldValidationContext>;
 
 export type ValidatorRegistry = ReadonlyMap<string, ValidatorFactory>;
