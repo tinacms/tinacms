@@ -4,9 +4,10 @@ import { FieldRenderProps } from '@toolkit/form-builder';
 /**
  * Props every field plugin receives.
  *
- * `react-final-form` v6 declared `[otherProp: string]: any` on `FieldRenderProps`,
- * so the extras `FieldsBuilder` passes down type-checked implicitly. v7 dropped
- * that index signature, so they are declared here instead.
+ * `react-final-form` v6 declares `[otherProp: string]: any` on `FieldRenderProps`,
+ * so the extras `FieldsBuilder` passes down would type-check implicitly. They are
+ * declared explicitly anyway: v7 drops that index signature, and the next bump
+ * should not have to rediscover them.
  */
 export interface FieldProps<InputProps>
   extends FieldRenderProps<any, HTMLElement> {
