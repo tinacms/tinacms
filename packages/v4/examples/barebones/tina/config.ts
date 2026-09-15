@@ -10,6 +10,7 @@ import {
   t,
 } from '@tinacms/tinacms';
 import { rating, ratingFieldPlugin } from './rating-field';
+import { matches, validatorsPlugin } from './validators';
 
 export const postCollection = {
   name: 'post',
@@ -17,7 +18,12 @@ export const postCollection = {
   path: 'content/posts',
   format: 'mdx',
   fields: [
-    t.string({ name: 'title', label: 'Title', required: true }),
+    t.string({
+      name: 'title',
+      label: 'Title',
+      required: true,
+      validators: [matches('^[A-Z]', 'Start with a capital letter')],
+    }),
     t.boolean({ name: 'featured', label: 'Featured' }),
     // The custom field of this project. tina/rating-field.tsx is the whole plugin.
     rating({ name: 'stars', label: 'Stars' }),
@@ -63,6 +69,6 @@ export const pageCollection = {
 } satisfies CollectionSchema;
 
 export default defineConfig({
-  plugins: [localContentPlugin(), ratingFieldPlugin],
+  plugins: [localContentPlugin(), ratingFieldPlugin, validatorsPlugin],
   schema: { collections: [postCollection, pageCollection] },
 });

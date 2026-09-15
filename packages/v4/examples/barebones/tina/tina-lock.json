@@ -12,6 +12,15 @@
             "name": "title",
             "label": "Title",
             "required": true,
+            "validators": [
+              {
+                "name": "matches",
+                "args": [
+                  "^[A-Z]",
+                  "Start with a capital letter"
+                ]
+              }
+            ],
             "type": "string"
           },
           {
