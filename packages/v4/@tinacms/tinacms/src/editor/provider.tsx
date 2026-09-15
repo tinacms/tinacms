@@ -18,6 +18,7 @@ import { type PluginManifest, resolveClientSegments } from '../core/plugin';
 import { initializePlugins, validateCapabilityGraph } from '../core/resolve';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import { createScreenRegistry } from '../core/screen/registry';
+import { createValidatorRegistry } from '../core/validator/registry';
 import {
   type FieldErrors,
   type FormId,
@@ -87,6 +88,7 @@ export function TinaProvider({
       const resolved = await resolveClientSegments(composedPlugins);
       const runtime: BootedRuntime = {
         registry: createFieldRegistry(resolved),
+        validators: createValidatorRegistry(resolved),
         store: createTinaStore(resolved),
         screens: createScreenRegistry(resolved),
       };
@@ -152,7 +154,7 @@ export function FormProvider({
   if (!runtime) {
     throw new Error('FormProvider must be used within a TinaProvider');
   }
-  const { registry } = runtime;
+  const { registry, validators } = runtime;
 
   const formId = toFormId(path);
   const transformContext = useMemo(
@@ -187,7 +189,7 @@ export function FormProvider({
     [formId, ingested]
   );
   const seedValues = keepsIncoming ? (kept.seed ?? ingested) : ingested;
-  const resolver = buildFormResolver(collection, registry);
+  const resolver = buildFormResolver(collection, registry, validators);
   const methods = useForm<TinaDocument>({
     defaultValues: seedValues,
     errors: kept.errors,
