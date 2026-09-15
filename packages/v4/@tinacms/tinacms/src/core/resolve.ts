@@ -12,6 +12,10 @@ import {
   type ResolvedServerSegment,
   isSingletonSliceCapability,
 } from './plugin';
+import {
+  overridesValidatorKey,
+  validatorConflictError,
+} from './validator/registry';
 
 export const resolveServerSegments = async (
   plugins: PluginManifest[]
@@ -67,6 +71,17 @@ export const validateCapabilityGraph = (plugins: PluginManifest[]): void => {
         : []
     ),
     fieldConflictError
+  );
+
+  composeOverridableRegistry(
+    plugins.flatMap((plugin) =>
+      (plugin.validators ?? []).map((name) => ({
+        key: name,
+        value: plugin,
+        isOverride: overridesValidatorKey(plugin, name),
+      }))
+    ),
+    validatorConflictError
   );
 
   const capabilityEntries = plugins.flatMap((plugin) => {
