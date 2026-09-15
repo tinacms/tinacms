@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { defineClientPlugin } from '../client';
@@ -72,7 +72,7 @@ const renderForm = (document: Record<string, string>) =>
 
 describe('field-level validators in the editor', () => {
   it('shows a registered validator message beside the Zod one', async () => {
-    renderForm({ title: 'Hello', slug: 'Hello' });
+    renderForm({ title: 'Hello', slug: 'hi' });
     const title = await screen.findByRole('textbox', { name: 'Title' });
     await userEvent.clear(title);
     await userEvent.type(title, 'hi');
@@ -81,6 +81,18 @@ describe('field-level validators in the editor', () => {
       'Title must be at least 3 characters',
       'Must start with a capital',
     ]);
+  });
+
+  it('clears a sibling rule when the sibling changes, not only the field', async () => {
+    renderForm({ title: 'Hello', slug: 'Hello' });
+    const slug = await screen.findByRole('textbox', { name: 'Slug' });
+    await userEvent.type(slug, '!');
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Must equal title'
+    );
+    const title = await screen.findByRole('textbox', { name: 'Title' });
+    await userEvent.type(title, '!');
+    await waitFor(() => expect(screen.queryByRole('alert')).toBeNull());
   });
 
   it('gives a validator the sibling values of its field', async () => {

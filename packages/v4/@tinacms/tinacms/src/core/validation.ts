@@ -96,3 +96,33 @@ export const validateFieldTree = (
   }
   return errors;
 };
+
+const isPlainObject = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const hasItemFields = (
+  node: FieldSchema
+): node is FieldSchema & { fields: FieldSchema[] } =>
+  'fields' in node && Array.isArray(node.fields);
+
+// The addresses whose rules can depend on a sibling: every field that lists
+// a validator, expanded through arrays and objects against the live values.
+export const addressesWithValidators = (
+  fields: FieldSchema[],
+  values: unknown,
+  prefix = ''
+): string[] =>
+  fields.flatMap((node) => {
+    const address = prefix ? `${prefix}.${node.name}` : node.name;
+    const own = node.validators?.length ? [address] : [];
+    if (!hasItemFields(node)) return own;
+    const value = isPlainObject(values) ? values[node.name] : undefined;
+    if (Array.isArray(value)) {
+      return own.concat(
+        value.flatMap((item, index) =>
+          addressesWithValidators(node.fields, item, `${address}.${index}`)
+        )
+      );
+    }
+    return own.concat(addressesWithValidators(node.fields, value, address));
+  });

@@ -18,6 +18,7 @@ import { type PluginManifest, resolveClientSegments } from '../core/plugin';
 import { initializePlugins, validateCapabilityGraph } from '../core/resolve';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import { createScreenRegistry } from '../core/screen/registry';
+import { addressesWithValidators } from '../core/validation';
 import { createValidatorRegistry } from '../core/validator/registry';
 import {
   type FieldErrors,
@@ -257,6 +258,20 @@ export function FormProvider({
     });
     return () => unsubscribe();
   }, [formId, methods]);
+
+  // react-hook-form applies the resolver's result to the changed field only,
+  // so a field-level rule that reads a sibling would keep a stale error after
+  // the sibling changes. Re-validate the fields that carry validators, and
+  // only those, so an untouched `required` field stays quiet. `watch` fires on
+  // value changes alone, not on the state `trigger` emits, so this cannot loop.
+  useEffect(() => {
+    const { unsubscribe } = methods.watch((values, { name }) => {
+      if (name === undefined) return;
+      const dependents = addressesWithValidators(collection.fields, values);
+      if (dependents.length > 0) void methods.trigger(dependents);
+    });
+    return () => unsubscribe();
+  }, [methods, collection]);
 
   const formScope = useMemo(
     () => ({

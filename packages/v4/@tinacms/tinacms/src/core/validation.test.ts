@@ -8,7 +8,11 @@ import type {
 } from './field/contract';
 import { resolveFieldPlugins } from './field/registry';
 import type { ValidatorRef } from './schema/types';
-import { validateField, validateFieldTree } from './validation';
+import {
+  addressesWithValidators,
+  validateField,
+  validateFieldTree,
+} from './validation';
 
 const titleNode = t.string({ name: 'title', label: 'Title' });
 
@@ -210,5 +214,48 @@ describe('validateFieldTree field-level validators', () => {
         values: { seo: value },
       })
     ).toEqual({ 'seo.ogTitle': ['Must equal title'] });
+  });
+});
+
+describe('addressesWithValidators', () => {
+  const ref = { name: 'sameAs', args: ['name'] };
+
+  it('lists top-level fields that carry a validator', () => {
+    const fields = [
+      t.string({ name: 'title' }),
+      t.string({ name: 'slug', validators: [ref] }),
+    ];
+    expect(addressesWithValidators(fields, { title: 'a', slug: 'b' })).toEqual([
+      'slug',
+    ]);
+  });
+
+  it('expands array items to one address per item', () => {
+    const fields = [
+      t.array({
+        name: 'authors',
+        fields: [
+          t.string({ name: 'name' }),
+          t.string({ name: 'alias', validators: [ref] }),
+        ],
+      }),
+    ];
+    expect(
+      addressesWithValidators(fields, {
+        authors: [{ name: 'a' }, { name: 'b' }],
+      })
+    ).toEqual(['authors.0.alias', 'authors.1.alias']);
+  });
+
+  it('walks into an object field', () => {
+    const fields = [
+      t.object({
+        name: 'seo',
+        fields: [t.string({ name: 'ogTitle', validators: [ref] })],
+      }),
+    ];
+    expect(addressesWithValidators(fields, { seo: {} })).toEqual([
+      'seo.ogTitle',
+    ]);
   });
 });
