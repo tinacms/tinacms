@@ -12,7 +12,7 @@ export interface ValidateFieldOptions extends ValidationScope {
   address?: string;
 }
 
-const messagesOf = (result: string | string[] | null): string[] => {
+const toMessages = (result: string | string[] | null): string[] => {
   if (result === null) return [];
   return Array.isArray(result) ? result : [result];
 };
@@ -36,7 +36,7 @@ export const validateField = (
     address: options.address ?? node.name,
   };
   if (descriptor?.validate) {
-    errors.push(...messagesOf(descriptor.validate(value, context)));
+    errors.push(...toMessages(descriptor.validate(value, context)));
   }
   const fieldContext: FieldValidationContext = {
     ...context,
@@ -51,7 +51,7 @@ export const validateField = (
       `Field "${context.address}" lists the validator "${ref.name}", but no plugin registers it.`
     );
     const validate = factory(...(ref.args ?? []));
-    errors.push(...messagesOf(validate(value, fieldContext)));
+    errors.push(...toMessages(validate(value, fieldContext)));
   }
   return errors;
 };
