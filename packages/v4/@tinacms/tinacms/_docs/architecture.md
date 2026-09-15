@@ -69,14 +69,17 @@ that field again, but does not render the other fields again.
 ## 5. Validate
 
 At each change, react-hook-form runs the resolver. For each field, the resolver
-calls `validateFieldTree(node, descriptor, value, address, registry)`
+calls `validateFieldTree(node, descriptor, value, address, registry, scope)`
 (`core/validation.ts`), with `address` set to that field's own top-level name.
-That function calls `validateField(node, descriptor, value)`, which runs the
-Zod schema of the descriptor, `schema(node)`, then the optional `validate(value)`
-function. It joins the two sets of messages under `address`.
+That function calls `validateField(node, descriptor, value, { ...scope,
+address })`, which runs the Zod schema of the descriptor, `schema(node)`, then
+the optional plugin-level `validate(value, context)`, then each field-level
+validator the node lists. It joins the three sets of messages under `address`.
+Refer to [Validation in three layers](./field-plugins.md#validation-in-three-layers).
 
 Then, if the descriptor is a compound field, `validateFieldTree` calls its
-optional `validateChildren(value, node, address, registry)` function — `address`
+optional `validateChildren(value, node, address, registry, scope)` function —
+`address`
 lets a nested compound field key its own children off where it actually sits,
 not off `node.name` alone. `validateChildren` calls `validateFieldTree` again,
 once for each item field, at that item's own nested address, such as
