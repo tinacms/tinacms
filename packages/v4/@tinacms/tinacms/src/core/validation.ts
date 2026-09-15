@@ -12,7 +12,9 @@ export interface ValidateFieldOptions extends ValidationScope {
   address?: string;
 }
 
-const toMessages = (result: string | string[] | null): string[] => {
+const flattenRuleReturnMessage = (
+  result: string | string[] | null
+): string[] => {
   if (result === null) return [];
   return Array.isArray(result) ? result : [result];
 };
@@ -36,7 +38,9 @@ export const validateField = (
     address: options.address ?? node.name,
   };
   if (descriptor?.validate) {
-    errors.push(...toMessages(descriptor.validate(value, context)));
+    errors.push(
+      ...flattenRuleReturnMessage(descriptor.validate(value, context))
+    );
   }
   const fieldContext: FieldValidationContext = {
     ...context,
@@ -51,7 +55,7 @@ export const validateField = (
       `Field "${context.address}" lists the validator "${ref.name}", but no plugin registers it.`
     );
     const validate = factory(...(ref.args ?? []));
-    errors.push(...toMessages(validate(value, fieldContext)));
+    errors.push(...flattenRuleReturnMessage(validate(value, fieldContext)));
   }
   return errors;
 };
