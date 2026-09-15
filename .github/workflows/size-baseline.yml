@@ -69,9 +69,6 @@ jobs:
     if: needs.size-changes.outputs.should_run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    env:
-      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-      TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
 
     steps:
       - name: Check out code
@@ -112,6 +109,11 @@ jobs:
       # (admin bundle) runs `tinacms build`, so the workspace must be built first.
       - name: Build
         run: pnpm build
+        # Only Build uses turbo. The other steps run third-party code, so keep
+        # the token here.
+        env:
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+          TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
 
       - name: Size check
         if: inputs.update_size_baseline != true
