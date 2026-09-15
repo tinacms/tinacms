@@ -126,7 +126,9 @@ export const TOLERANCES = {
 // dead-code removal.
 const WARN_DECREASE_PCT = 0.1;
 
-const VERDACCIO_VERSION = '6';
+// pnpm dlx runs outside the workspace, so the lockfile and minimumReleaseAge
+// do not apply. The exact pin covers verdaccio only; its dependencies float.
+const VERDACCIO_VERSION = '6.10.3';
 const VERDACCIO_PORT = Number(process.env.SIZE_VERDACCIO_PORT || 4873);
 const VERDACCIO_URL = `http://localhost:${VERDACCIO_PORT}/`;
 const REAL_REGISTRY_URL = 'https://registry.npmjs.org/';
