@@ -102,7 +102,9 @@ const config = asResolvedConfig({
         label: 'Posts',
         path: 'content/posts',
         format: 'mdx',
-        fields: [{ name: 'title', label: 'Title', type: 'string' }],
+        fields: [
+          { name: 'title', label: 'Title', type: 'string', required: true },
+        ],
       },
       {
         name: 'page',
@@ -194,6 +196,31 @@ describe('TinaAdmin', () => {
       expect(screen.getByRole('status')).toHaveTextContent('Saved')
     );
     expect(input).toHaveValue('Hello!');
+  });
+
+  it('disables Save while the document has a validation error', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    const input = await screen.findByLabelText('Title');
+
+    await user.clear(input);
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Title is required'
+    );
+    expect(screen.getByRole('button', { name: 'Save' })).toHaveAttribute(
+      'aria-disabled',
+      'true'
+    );
+
+    await user.type(input, 'Hello again');
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Save' })).toHaveAttribute(
+        'aria-disabled',
+        'false'
+      )
+    );
   });
 
   it('opens the document a deep link names', async () => {
