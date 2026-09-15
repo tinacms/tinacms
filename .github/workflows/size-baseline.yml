@@ -81,6 +81,22 @@ jobs:
         with:
           node-version-file: ".nvmrc"
 
+      # Dependabot skips package-lock.fixture.json, so the weekly run audits it.
+      # Report only: some advisories need an upstream fix first.
+      # Audit a copy: the fixture .npmrc points at verdaccio, not yet running.
+      - name: Audit fixture lockfile
+        if: github.event_name == 'schedule'
+        run: |
+          dir=$(mktemp -d)
+          cp tests/size-fixture/package.json "$dir/"
+          cp tests/size-fixture/package-lock.fixture.json "$dir/package-lock.json"
+          {
+            echo '### Fixture npm audit'
+            echo '```'
+            npm audit --prefix "$dir" --package-lock-only 2>&1 || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
         name: Install pnpm
         id: pnpm-install
