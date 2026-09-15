@@ -106,7 +106,13 @@ alongside that array. So the array's own address is never itself an entry
 once it has a child error — `useFieldErrors` on that address only ever sees
 something because it went looking underneath it.
 
-## 6. Digest at save
+## 6. Validate, then digest at save
+
+`useFormSave` (`editor/hooks.ts`) first calls react-hook-form's `trigger()`
+with no arguments, so every field validates, including a field the editor
+never touched. If any field has a message, save throws `FormValidationError`
+and the form stays dirty (ADR-018 §2). The admin `SaveButton` also reads
+`useFormErrors(formId)` and is disabled while the form has a message.
 
 `digestDocument(values, fields, registry)` (`core/form/ingest.ts`) does the
 opposite operation to `ingestDocument`. For each field, it calls the
