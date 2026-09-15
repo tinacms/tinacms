@@ -1,11 +1,14 @@
 import type {
   FieldDescriptor,
+  FieldValidationContext,
   PluginValidationContext,
+  ValidationScope,
 } from './field/contract';
 import type { FieldRegistry } from './field/registry';
+import { invariant } from './invariant';
 import type { FieldSchema } from './schema/types';
 
-export interface ValidateFieldOptions {
+export interface ValidateFieldOptions extends ValidationScope {
   address?: string;
 }
 
@@ -35,6 +38,21 @@ export const validateField = (
   if (descriptor?.validate) {
     errors.push(...messagesOf(descriptor.validate(value, context)));
   }
+  const fieldContext: FieldValidationContext = {
+    ...context,
+    siblings: options.siblings ?? {},
+    values: options.values ?? {},
+  };
+  for (const ref of node.validators ?? []) {
+    const factory = options.validators?.get(ref.name);
+    invariant(
+      factory,
+      'validator-unknown',
+      `Field "${context.address}" lists the validator "${ref.name}", but no plugin registers it.`
+    );
+    const validate = factory(...(ref.args ?? []));
+    errors.push(...messagesOf(validate(value, fieldContext)));
+  }
   return errors;
 };
 
@@ -51,16 +69,21 @@ export const validateFieldTree = (
   descriptor: FieldDescriptor | undefined,
   value: unknown,
   address: string,
-  registry: FieldRegistry
+  registry: FieldRegistry,
+  scope: ValidationScope = {}
 ): Record<string, string[]> => {
   const errors: Record<string, string[]> = {};
-  const messages = validateField(node, descriptor, value, { address });
+  const messages = validateField(node, descriptor, value, {
+    ...scope,
+    address,
+  });
   if (messages.length > 0) errors[address] = messages;
   const childErrors = descriptor?.validateChildren?.(
     value,
     node,
     address,
-    registry
+    registry,
+    scope
   );
   for (const [childAddress, childMessages] of Object.entries(
     childErrors ?? {}
