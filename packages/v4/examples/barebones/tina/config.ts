@@ -10,7 +10,7 @@ import {
   t,
 } from '@tinacms/tinacms';
 import { rating, ratingFieldPlugin } from './rating-field';
-import { matches, requires, validatorsPlugin } from './validators';
+import { differentFrom, matches, validatorsPlugin } from './validators';
 
 export const postCollection = {
   name: 'post',
@@ -24,25 +24,24 @@ export const postCollection = {
       required: true,
       validators: [matches('^[A-Z]', 'Start with a capital letter')],
     }),
-    t.boolean({
-      name: 'featured',
-      label: 'Featured',
-      // A sibling rule: reads `status` from the same document.
-      validators: [
-        requires(
-          'status',
-          'published',
-          'Only a published post can be featured'
-        ),
-      ],
-    }),
+    t.boolean({ name: 'featured', label: 'Featured' }),
     // The custom field of this project. tina/rating-field.tsx is the whole plugin.
     rating({ name: 'stars', label: 'Stars' }),
     t.richText({ name: 'body', label: 'Body', isBody: true }),
     t.array({
       name: 'authors',
       label: 'Authors',
-      fields: [t.string({ name: 'name', label: 'Name' })],
+      fields: [
+        t.string({ name: 'name', label: 'Name' }),
+        t.string({
+          name: 'alias',
+          label: 'Alias',
+          // A sibling rule: `siblings` is this author, not the document root.
+          validators: [
+            differentFrom('name', 'Alias must differ from the name'),
+          ],
+        }),
+      ],
     }),
     t.reference({
       collections: ['page'],

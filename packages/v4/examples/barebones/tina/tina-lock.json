@@ -26,16 +26,6 @@
           {
             "name": "featured",
             "label": "Featured",
-            "validators": [
-              {
-                "name": "requires",
-                "args": [
-                  "status",
-                  "published",
-                  "Only a published post can be featured"
-                ]
-              }
-            ],
             "type": "boolean"
           },
           {
@@ -56,6 +46,20 @@
               {
                 "name": "name",
                 "label": "Name",
+                "type": "string"
+              },
+              {
+                "name": "alias",
+                "label": "Alias",
+                "validators": [
+                  {
+                    "name": "differentFrom",
+                    "args": [
+                      "name",
+                      "Alias must differ from the name"
+                    ]
+                  }
+                ],
                 "type": "string"
               }
             ],
