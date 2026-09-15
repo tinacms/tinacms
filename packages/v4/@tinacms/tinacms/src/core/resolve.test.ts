@@ -7,7 +7,7 @@ const plugin = (
   spec: {
     provides?: Capability[];
     dependsOn?: Capability[];
-    overrides?: { capability: Exclude<Capability, 'field'> }[];
+    overrides?: { capability: Exclude<Capability, 'field' | 'validator'> }[];
   } = {}
 ) => definePlugin({ name, ...spec });
 
@@ -30,6 +30,41 @@ describe('validateCapabilityGraph', () => {
       validateCapabilityGraph([
         plugin('tina:field:string', { provides: ['field'] }),
         plugin('tina:field:boolean', { provides: ['field'] }),
+      ])
+    ).not.toThrow();
+  });
+
+  it('rejects two plugins that register the same validator name', () => {
+    expect(() =>
+      validateCapabilityGraph([
+        definePlugin({
+          name: 'a',
+          provides: ['validator'],
+          validators: ['after'],
+        }),
+        definePlugin({
+          name: 'b',
+          provides: ['validator'],
+          validators: ['after'],
+        }),
+      ])
+    ).toThrow(/both register the validator "after"/);
+  });
+
+  it('lets an override replace a validator name', () => {
+    expect(() =>
+      validateCapabilityGraph([
+        definePlugin({
+          name: 'a',
+          provides: ['validator'],
+          validators: ['after'],
+        }),
+        definePlugin({
+          name: 'b',
+          provides: ['validator'],
+          validators: ['after'],
+          overrides: [{ capability: 'validator', key: 'after' }],
+        }),
       ])
     ).not.toThrow();
   });

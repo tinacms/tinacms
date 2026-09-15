@@ -12,7 +12,7 @@ const fieldPlugin = (type: string, contractVersion: number) =>
   });
 
 const configWith = (
-  fields: { name: string; type: string }[],
+  fields: FieldSchema[],
   plugins = [fieldPlugin('string', 1), fieldPlugin('rich-text', 1)]
 ): ResolvedConfig =>
   asResolvedConfig({
@@ -72,6 +72,50 @@ describe('compileSchema', () => {
     expect(() =>
       compileSchema(configWith([{ name: 'hero', type: 'image' }]))
     ).toThrow(/uses the field type "image"/);
+  });
+});
+
+describe('compileSchema field-level validators', () => {
+  const validatorPlugin = definePlugin({
+    name: 'test:validators',
+    provides: ['validator'],
+    validators: ['matches'],
+    client: async () => ({ default: {} }),
+  });
+  const slug: FieldSchema = {
+    name: 'slug',
+    type: 'string',
+    validators: [{ name: 'matches', args: ['^[a-z]+$'] }],
+  };
+
+  it('accepts a validator an installed plugin registers', () => {
+    const lock = compileSchema(
+      configWith([slug], [fieldPlugin('string', 1), validatorPlugin])
+    );
+    expect(lock.schema.collections[0].fields[0]).toEqual(slug);
+  });
+
+  it('rejects a validator no installed plugin registers', () => {
+    expect(() =>
+      compileSchema(configWith([slug], [fieldPlugin('string', 1)]))
+    ).toThrow(/uses the validator "matches"/);
+  });
+
+  it('rejects an unregistered validator nested inside a template', () => {
+    expect(() =>
+      compileSchema(
+        configWith(
+          [
+            {
+              name: 'blocks',
+              type: 'rich-text',
+              templates: [{ name: 'hero', fields: [slug] }],
+            },
+          ],
+          [fieldPlugin('string', 1), fieldPlugin('rich-text', 1)]
+        )
+      )
+    ).toThrow(/uses the validator "matches"/);
   });
 });
 

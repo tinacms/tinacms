@@ -36,7 +36,13 @@ export default defineClientPlugin({
       const field = asArrayFieldSchema(node);
       return value.map((item) => digestDocument(item, field.fields, context));
     },
-    validateChildren: (value: TinaDocument[], node, address, registry) => {
+    validateChildren: (
+      value: TinaDocument[],
+      node,
+      address,
+      registry,
+      scope
+    ) => {
       const field = asArrayFieldSchema(node);
       const items = Array.isArray(value) ? value : [];
       const errors: Record<string, string[]> = {};
@@ -50,7 +56,8 @@ export default defineClientPlugin({
               descriptor,
               item?.[subfield.name],
               `${address}.${index}.${subfield.name}`,
-              registry
+              registry,
+              { ...scope, siblings: item ?? {} }
             )
           );
         }

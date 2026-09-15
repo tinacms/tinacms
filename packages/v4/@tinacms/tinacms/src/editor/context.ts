@@ -2,6 +2,7 @@ import { createContext } from 'react';
 import type { StoreApi } from 'zustand';
 import type { TinaSchema } from '../config';
 import type { FieldAddress } from '../core/field/address';
+import type { ValidatorRegistry } from '../core/field/contract';
 import type { FieldRegistry } from '../core/field/registry';
 import type { TinaStoreState } from '../core/plugin';
 import type {
@@ -16,6 +17,7 @@ export type SaveHandler = (document: TinaDocument) => void | Promise<void>;
 
 export interface TinaRuntime {
   registry: FieldRegistry;
+  validators: ValidatorRegistry;
   store: StoreApi<TinaStoreState>;
   schema: TinaSchema;
   screens: ScreenRegistry;

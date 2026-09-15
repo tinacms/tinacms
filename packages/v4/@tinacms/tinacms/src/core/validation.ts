@@ -1,11 +1,29 @@
-import type { FieldDescriptor } from './field/contract';
+import type {
+  FieldDescriptor,
+  FieldValidationContext,
+  PluginValidationContext,
+  ValidationScope,
+} from './field/contract';
 import type { FieldRegistry } from './field/registry';
+import { invariant } from './invariant';
 import type { FieldSchema } from './schema/types';
+
+export interface ValidateFieldOptions extends ValidationScope {
+  address?: string;
+}
+
+const flattenRuleReturnMessage = (
+  result: string | string[] | null
+): string[] => {
+  if (result === null) return [];
+  return Array.isArray(result) ? result : [result];
+};
 
 export const validateField = (
   node: FieldSchema,
   descriptor: FieldDescriptor | undefined,
-  value: unknown
+  value: unknown,
+  options: ValidateFieldOptions = {}
 ): string[] => {
   const errors: string[] = [];
   const schema = descriptor?.schema?.(node);
@@ -15,8 +33,30 @@ export const validateField = (
       errors.push(...result.error.issues.map((issue) => issue.message));
     }
   }
-  const custom = descriptor?.validate?.(value);
-  if (custom) errors.push(custom);
+  const context: PluginValidationContext = {
+    node,
+    address: options.address ?? node.name,
+  };
+  if (descriptor?.validate) {
+    errors.push(
+      ...flattenRuleReturnMessage(descriptor.validate(value, context))
+    );
+  }
+  const fieldContext: FieldValidationContext = {
+    ...context,
+    siblings: options.siblings ?? {},
+    values: options.values ?? {},
+  };
+  for (const ref of node.validators ?? []) {
+    const factory = options.validators?.get(ref.name);
+    invariant(
+      factory,
+      'validator-unknown',
+      `Field "${context.address}" lists the validator "${ref.name}", but no plugin registers it.`
+    );
+    const validate = factory(...(ref.args ?? []));
+    errors.push(...flattenRuleReturnMessage(validate(value, fieldContext)));
+  }
   return errors;
 };
 
@@ -33,16 +73,21 @@ export const validateFieldTree = (
   descriptor: FieldDescriptor | undefined,
   value: unknown,
   address: string,
-  registry: FieldRegistry
+  registry: FieldRegistry,
+  scope: ValidationScope = {}
 ): Record<string, string[]> => {
   const errors: Record<string, string[]> = {};
-  const messages = validateField(node, descriptor, value);
+  const messages = validateField(node, descriptor, value, {
+    ...scope,
+    address,
+  });
   if (messages.length > 0) errors[address] = messages;
   const childErrors = descriptor?.validateChildren?.(
     value,
     node,
     address,
-    registry
+    registry,
+    scope
   );
   for (const [childAddress, childMessages] of Object.entries(
     childErrors ?? {}
@@ -51,3 +96,33 @@ export const validateFieldTree = (
   }
   return errors;
 };
+
+const isPlainObject = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const hasItemFields = (
+  node: FieldSchema
+): node is FieldSchema & { fields: FieldSchema[] } =>
+  'fields' in node && Array.isArray(node.fields);
+
+// The addresses whose rules can depend on a sibling: every field that lists
+// a validator, expanded through arrays and objects against the live values.
+export const addressesWithValidators = (
+  fields: FieldSchema[],
+  values: unknown,
+  prefix = ''
+): string[] =>
+  fields.flatMap((node) => {
+    const address = prefix ? `${prefix}.${node.name}` : node.name;
+    const own = node.validators?.length ? [address] : [];
+    if (!hasItemFields(node)) return own;
+    const value = isPlainObject(values) ? values[node.name] : undefined;
+    if (Array.isArray(value)) {
+      return own.concat(
+        value.flatMap((item, index) =>
+          addressesWithValidators(node.fields, item, `${address}.${index}`)
+        )
+      );
+    }
+    return own.concat(addressesWithValidators(node.fields, value, address));
+  });

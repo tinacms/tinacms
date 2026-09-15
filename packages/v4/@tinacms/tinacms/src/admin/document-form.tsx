@@ -11,7 +11,11 @@ import {
   useFormId,
   useFormSave,
 } from '../editor/hooks';
-import { useIsFieldDirty, useIsFormDirty } from '../form/form-store';
+import {
+  useFormErrors,
+  useIsFieldDirty,
+  useIsFormDirty,
+} from '../form/form-store';
 import { DocumentStatus } from './document-status';
 
 function FieldRow({ node }: { node: FieldSchema }) {
@@ -43,17 +47,20 @@ function FieldRow({ node }: { node: FieldSchema }) {
 }
 
 function SaveButton() {
-  const dirty = useIsFormDirty(useFormId());
+  const formId = useFormId();
+  const dirty = useIsFormDirty(formId);
+  const invalid = Object.keys(useFormErrors(formId)).length > 0;
   const save = useFormSave();
   const [failure, setFailure] = useState<string | null>(null);
+  const canSave = dirty && !invalid;
   return (
     <div className='flex flex-col items-start gap-2'>
       <Button
         type='button'
         className='aria-disabled:pointer-events-none aria-disabled:opacity-50'
-        aria-disabled={!dirty}
+        aria-disabled={!canSave}
         onClick={() => {
-          if (!dirty) return;
+          if (!canSave) return;
           setFailure(null);
           save().catch((cause) => {
             console.error('[tinacms] Save failed:', cause);

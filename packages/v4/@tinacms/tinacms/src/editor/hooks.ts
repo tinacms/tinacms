@@ -128,12 +128,25 @@ export function useActiveField(): ActiveField {
   return useMemo(() => ({ active, setActive }), [active, setActive]);
 }
 
+// Save refused because the document has validation errors. The form stays
+// dirty and every field keeps its messages (ADR-018 §2).
+export class FormValidationError extends Error {
+  constructor() {
+    super('The document has validation errors. Fix them, then save again.');
+    this.name = 'FormValidationError';
+  }
+}
+
 export function useFormSave(): () => Promise<void> {
   const registry = useFieldRegistry();
   const scope = useFormScope('form-save-outside-provider', 'useFormSave');
-  const { getValues } = useFormContext<TinaDocument>();
+  const { getValues, trigger } = useFormContext<TinaDocument>();
   return useCallback(async () => {
     const { formId, path, collection, onSave } = scope;
+    // Validate every field, not only the edited ones, so a required field the
+    // editor never touched surfaces its message at submit.
+    const valid = await trigger();
+    if (!valid) throw new FormValidationError();
     const values = getValues();
     const digested = digestDocument(values, collection.fields, {
       documentPath: path,
@@ -141,7 +154,7 @@ export function useFormSave(): () => Promise<void> {
     });
     await onSave?.(digested);
     useFormStore.getState().markSaved(formId, toFormValues(values));
-  }, [scope, getValues, registry]);
+  }, [scope, getValues, trigger, registry]);
 }
 
 export function useFieldAddress(): FieldAddress {

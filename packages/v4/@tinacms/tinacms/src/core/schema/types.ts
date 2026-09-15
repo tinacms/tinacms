@@ -1,7 +1,17 @@
+import type { JsonValue } from '../json';
+
+// A field-level validator, by the name a plugin registered it under. `args`
+// are plain JSON so the reference serialises into `tina-lock.json`.
+export interface ValidatorRef {
+  name: string;
+  args?: JsonValue[];
+}
+
 export interface BaseFieldSchema {
   name: string;
   label?: string;
   required?: boolean;
+  validators?: ValidatorRef[];
 }
 
 export interface TemplateFieldSchema extends BaseFieldSchema {

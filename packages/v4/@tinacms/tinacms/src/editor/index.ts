@@ -43,6 +43,7 @@ export {
 } from './content-queries';
 export {
   type ActiveField,
+  FormValidationError,
   useActiveField,
   useContentSlice,
   useDiscardEdits,

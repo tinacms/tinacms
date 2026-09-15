@@ -18,6 +18,8 @@ import { type PluginManifest, resolveClientSegments } from '../core/plugin';
 import { initializePlugins, validateCapabilityGraph } from '../core/resolve';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import { createScreenRegistry } from '../core/screen/registry';
+import { addressesWithValidators } from '../core/validation';
+import { createValidatorRegistry } from '../core/validator/registry';
 import {
   type FieldErrors,
   type FormId,
@@ -87,6 +89,7 @@ export function TinaProvider({
       const resolved = await resolveClientSegments(composedPlugins);
       const runtime: BootedRuntime = {
         registry: createFieldRegistry(resolved),
+        validators: createValidatorRegistry(resolved),
         store: createTinaStore(resolved),
         screens: createScreenRegistry(resolved),
       };
@@ -152,7 +155,7 @@ export function FormProvider({
   if (!runtime) {
     throw new Error('FormProvider must be used within a TinaProvider');
   }
-  const { registry } = runtime;
+  const { registry, validators } = runtime;
 
   const formId = toFormId(path);
   const transformContext = useMemo(
@@ -187,7 +190,7 @@ export function FormProvider({
     [formId, ingested]
   );
   const seedValues = keepsIncoming ? (kept.seed ?? ingested) : ingested;
-  const resolver = buildFormResolver(collection, registry);
+  const resolver = buildFormResolver(collection, registry, validators);
   const methods = useForm<TinaDocument>({
     defaultValues: seedValues,
     errors: kept.errors,
@@ -255,6 +258,20 @@ export function FormProvider({
     });
     return () => unsubscribe();
   }, [formId, methods]);
+
+  // react-hook-form applies the resolver's result to the changed field only,
+  // so a field-level rule that reads a sibling would keep a stale error after
+  // the sibling changes. Re-validate the fields that carry validators, and
+  // only those, so an untouched `required` field stays quiet. `watch` fires on
+  // value changes alone, not on the state `trigger` emits, so this cannot loop.
+  useEffect(() => {
+    const { unsubscribe } = methods.watch((values, { name }) => {
+      if (name === undefined) return;
+      const dependents = addressesWithValidators(collection.fields, values);
+      if (dependents.length > 0) void methods.trigger(dependents);
+    });
+    return () => unsubscribe();
+  }, [methods, collection]);
 
   const formScope = useMemo(
     () => ({

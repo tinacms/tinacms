@@ -1,11 +1,19 @@
 import type { StoreApi } from 'zustand';
-import type { FieldDescriptor } from './field/contract';
+import type { FieldDescriptor, ValidatorFactory } from './field/contract';
 import { invariant } from './invariant';
 import type { AdminScreen } from './screen/contract';
 
-export type Capability = 'field' | 'content' | 'auth' | 'media' | 'search';
+export type Capability =
+  | 'field'
+  | 'validator'
+  | 'content'
+  | 'auth'
+  | 'media'
+  | 'search';
 
 export const FIELD_CAPABILITY = 'field' as const satisfies Capability;
+
+export const VALIDATOR_CAPABILITY = 'validator' as const satisfies Capability;
 
 export const AUTH_CAPABILITY = 'auth' as const satisfies Capability;
 
@@ -32,6 +40,7 @@ export interface FieldProvision {
 
 export type CapabilityOverride =
   | { capability: typeof FIELD_CAPABILITY; key: string }
+  | { capability: typeof VALIDATOR_CAPABILITY; key: string }
   | { capability: SingletonSliceCapability };
 
 export type TinaStoreState = Record<string, SliceState>;
@@ -51,6 +60,7 @@ export type ClientSlice = (
 
 export interface ClientSegment {
   field?: FieldDescriptor;
+  validators?: Record<string, ValidatorFactory>;
   slice?: ClientSlice;
   screens?: AdminScreen[];
 }
@@ -79,6 +89,11 @@ export const resolveClientSegments = async (
       'field-plugin-no-client',
       `Plugin "${manifest.name}" declares the field type "${manifest.field?.type}" but has no client segment to render it.`
     );
+    invariant(
+      !(manifest.validators?.length && !manifest.client),
+      'validator-plugin-no-client',
+      `Plugin "${manifest.name}" declares validators but has no client segment to hold their factories.`
+    );
     if (!manifest.client) continue;
     const clientModule = await manifest.client();
     invariant(
@@ -96,6 +111,9 @@ export interface PluginManifestInput {
   provides?: Capability[];
   dependsOn?: Capability[];
   field?: FieldProvision;
+  // The names this plugin registers. Listed on the manifest so the build can
+  // check a collection's `validators` without loading client code.
+  validators?: string[];
   client?: () => Promise<{ default: ClientSegment }>;
   server?: () => Promise<{ default: ServerSegment }>;
   // TODO(ADR-008 §3): type `permissions` against codegen's Permission union once it lands.
