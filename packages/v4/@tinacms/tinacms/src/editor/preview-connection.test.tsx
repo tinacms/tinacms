@@ -9,10 +9,13 @@ import userEvent from '@testing-library/user-event';
 import { type ReactNode, type RefObject, useRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
+import type { ContentProvider } from '../core/content/contract';
 import { toFieldAddress } from '../core/field/address';
-import type { CollectionSchema } from '../core/schema/types';
+import { definePlugin } from '../core/plugin';
+import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import { toFormId, useFormStore } from '../form/form-store';
 import { t } from '../index';
+import referenceFieldPlugin from '../plugins/fields/reference/reference-field.plugin';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import {
   activateMessage,
@@ -86,6 +89,111 @@ const renderConnected = (iframeRef: RefObject<HTMLIFrameElement | null>) =>
       </FormProvider>
     </TinaProvider>
   );
+
+const REFERENCED_PATH = 'content/pages/deleted.mdx';
+
+const referenceCollection: CollectionSchema = {
+  name: 'post',
+  format: 'mdx',
+  fields: [
+    t.string({ name: 'title', label: 'Title' }),
+    t.reference({ name: 'page', label: 'Page', collections: ['page'] }),
+  ],
+};
+
+const pageCollection: CollectionSchema = {
+  name: 'page',
+  path: 'content/pages',
+  format: 'mdx',
+  fields: [t.string({ name: 'title', label: 'Title' })],
+};
+
+const renderWithReference = (
+  iframeRef: RefObject<HTMLIFrameElement | null>,
+  get: ContentProvider['get']
+) => {
+  const contentPlugin = definePlugin({
+    name: 'test:content:stub',
+    provides: ['content'],
+    client: async () => ({
+      default: {
+        slice: () => ({
+          get,
+          list: async () => [],
+          update: async (_c: string, p: string, value: TinaDocument) => ({
+            path: p,
+            document: value,
+          }),
+        }),
+      },
+    }),
+  });
+  return render(
+    <TinaProvider
+      config={asResolvedConfig({
+        plugins: [stringFieldPlugin, referenceFieldPlugin, contentPlugin],
+        schema: { collections: [referenceCollection, pageCollection] },
+      })}
+    >
+      <FormProvider
+        collection={referenceCollection}
+        path={path}
+        document={{ title: 'Hello', page: REFERENCED_PATH }}
+      >
+        <LabelledFields />
+        <Connection iframeRef={iframeRef} />
+      </FormProvider>
+    </TinaProvider>
+  );
+};
+
+describe('usePreviewConnection reference resolution', () => {
+  it('posts once per edit when a reference points at a document that is gone', async () => {
+    const get = vi.fn(async () => null);
+    const iframe = fakeIframe();
+    renderWithReference(iframe.ref, get);
+    const input = await screen.findByLabelText('Title');
+    await waitFor(() => expect(get).toHaveBeenCalledTimes(1));
+    iframe.postMessage.mockClear();
+
+    await userEvent.type(input, '!');
+    await waitFor(() => expect(iframe.postMessage).toHaveBeenCalled());
+
+    // `content.get` answers null for a document that is gone. Reading the
+    // cached document rather than the cache entry treats that null as a miss,
+    // so every edit re-enters the fetch and posts a second time.
+    expect(iframe.postMessage).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps the path when the document is gone', async () => {
+    const iframe = fakeIframe();
+    renderWithReference(iframe.ref, async () => null);
+    await screen.findByLabelText('Title');
+
+    await waitFor(() =>
+      expect(iframe.postMessage).toHaveBeenCalledWith(
+        valuesMessage({ title: 'Hello', page: REFERENCED_PATH }),
+        window.origin
+      )
+    );
+  });
+
+  it('swaps the path for the document it points at', async () => {
+    const iframe = fakeIframe();
+    renderWithReference(iframe.ref, async () => ({
+      path: REFERENCED_PATH,
+      document: { title: 'Deleted Page' },
+    }));
+    await screen.findByLabelText('Title');
+
+    await waitFor(() =>
+      expect(iframe.postMessage).toHaveBeenCalledWith(
+        valuesMessage({ title: 'Hello', page: { title: 'Deleted Page' } }),
+        window.origin
+      )
+    );
+  });
+});
 
 describe('usePreviewConnection', () => {
   it('answers the ready handshake with the registered document', async () => {

@@ -148,24 +148,11 @@ The registry is necessary: `invariant` throws `array-field-no-registry` if
 already-installed tool for exactly this job, with stable item keys so React
 does not misalign inputs across a reorder.
 
-For each item, for each item field, it renders a row — a `<label>` pointing at
-the item field's own nested address (unless that field's descriptor sets
-`labelable: false` too), then `<FieldNode address node>`:
-
-```tsx
-function ItemFieldRow({ address, node }: { address: string; node: FieldSchema }) {
-  const labelable =
-    useFieldRegistry().get(node.type)?.metadata?.labelable !== false;
-  return (
-    <div>
-      <Label id={`${address}-label`} htmlFor={labelable ? address : undefined}>
-        {node.label ?? node.name}
-      </Label>
-      <FieldNode address={toFieldAddress(address)} node={node} />
-    </div>
-  );
-}
-```
+For each item, for each item field, it renders `<NestedFieldRow address node>`
+(`editor/field.tsx`) — a `<Label>` pointing at the item field's own nested
+address (unless that field's descriptor sets `labelable: false` too), then
+`<FieldNode address node>`. `object` renders the same row, so the row is
+shared, not copied per field.
 
 `<FieldNode>` (`editor/field.tsx`) is the part of `<Field>` that resolves a
 descriptor and supplies `FieldAddressContext`/`FieldSchemaContext` — it does
