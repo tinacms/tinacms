@@ -9,6 +9,7 @@ import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import { LabelledFields } from '../test/labelled-fields';
 import {
   FormProvider,
+  FormValidationError,
   type SaveHandler,
   TinaProvider,
   useFieldAddress,
@@ -26,12 +27,21 @@ const collection: CollectionSchema = {
   fields: [t.string({ name: 'title', label: 'Title' })],
 };
 
-function SaveProbe() {
+const requiredTitle: CollectionSchema = {
+  name: 'post',
+  format: 'mdx',
+  fields: [t.string({ name: 'title', label: 'Title', required: true })],
+};
+
+function SaveProbe({ onFailure }: { onFailure?: (cause: unknown) => void }) {
   const save = useFormSave();
   const status = useFormStatus(useFormId());
   return (
     <div>
-      <button type='button' onClick={() => save().catch(() => {})}>
+      <button
+        type='button'
+        onClick={() => save().catch(onFailure ?? (() => {}))}
+      >
         save
       </button>
       <span data-testid='status'>{status}</span>
@@ -39,7 +49,12 @@ function SaveProbe() {
   );
 }
 
-const renderWithSave = (onSave: SaveHandler) =>
+const renderWithSave = (
+  onSave: SaveHandler,
+  schema: CollectionSchema = collection,
+  document: Record<string, unknown> = { title: 'Hi' },
+  onFailure?: (cause: unknown) => void
+) =>
   render(
     <TinaProvider
       config={asResolvedConfig({
@@ -48,13 +63,13 @@ const renderWithSave = (onSave: SaveHandler) =>
       })}
     >
       <FormProvider
-        collection={collection}
+        collection={schema}
         path='content/posts/save.mdx'
-        document={{ title: 'Hi' }}
+        document={document}
         onSave={onSave}
       >
         <LabelledFields />
-        <SaveProbe />
+        <SaveProbe onFailure={onFailure} />
       </FormProvider>
     </TinaProvider>
   );
@@ -70,6 +85,37 @@ describe('useFormSave', () => {
     await userEvent.click(screen.getByText('save'));
     expect(onSave).toHaveBeenCalledWith({ title: 'Hi!' });
     expect(await screen.findByTestId('status')).toHaveTextContent('clean');
+  });
+
+  it('refuses to save while a field has a validation error', async () => {
+    const onSave = vi.fn();
+    renderWithSave(onSave, requiredTitle);
+    const input = await screen.findByLabelText('Title');
+    await userEvent.clear(input);
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Title is required'
+    );
+
+    await userEvent.click(screen.getByText('save'));
+    expect(onSave).not.toHaveBeenCalled();
+    expect(screen.getByTestId('status')).toHaveTextContent('dirty');
+  });
+
+  it('validates untouched fields on save and rejects with a FormValidationError', async () => {
+    const onSave = vi.fn();
+    const failures: unknown[] = [];
+    renderWithSave(onSave, requiredTitle, { title: '' }, (cause) =>
+      failures.push(cause)
+    );
+    const save = await screen.findByText('save');
+    expect(screen.queryByRole('alert')).toBeNull();
+
+    await userEvent.click(save);
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Title is required'
+    );
+    expect(onSave).not.toHaveBeenCalled();
+    expect(failures[0]).toBeInstanceOf(FormValidationError);
   });
 
   it('leaves the form dirty when onSave rejects', async () => {
