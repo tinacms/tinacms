@@ -216,9 +216,13 @@ Layers 2 and 3 return the same shape, `string | string[] | null`
 (`Validate<TValue, TContext>` in `core/field/contract.ts`). Only layer 3 sees
 `siblings`; a plugin-level rule is scoped to its own field.
 
-`validateField` throws `validator-unknown` when a node lists a `name` that
-no plugin registers. Nothing fills the `ValidatorRegistry` yet; the `validator`
-plugin capability that does is a separate change.
+A plugin registers factories through the `validator` capability
+([plugins.md](./plugins.md#validator-plugins)). `TinaProvider` builds the
+`ValidatorRegistry` from every installed plugin at boot, and `FormProvider`
+hands it to the resolver. `compileSchema` fails on a `name` no installed
+plugin registers, and `validateField` throws `validator-unknown` for the same
+case at runtime. The barebones example registers `matches`
+(`packages/v4/examples/barebones/tina/validators.ts`).
 
 A compound field sets `siblings` for its children: the `array` field passes
 the item, the `object` field passes the object

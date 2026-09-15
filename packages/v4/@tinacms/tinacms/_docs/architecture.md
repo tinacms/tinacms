@@ -16,7 +16,10 @@ app renders one component and does not compose the provider by hand.
 the `client()` import of each manifest. Then it builds the `FieldRegistry`, a
 `Map<type, FieldDescriptor>`. If two plugins have the same `type`, the function
 throws an error. To prevent the error, one plugin must declare `overrides`.
-`RegistryContext` supplies the registry to the components below it.
+The same pass builds the `ValidatorRegistry`, a `Map<name, ValidatorFactory>`,
+from each plugin's `validators` (`core/validator/registry.ts`); the same
+conflict and `overrides` rules apply, keyed by name.
+`TinaRuntimeContext` supplies both registries to the components below it.
 
 ## 2. Seed a form from the document
 
