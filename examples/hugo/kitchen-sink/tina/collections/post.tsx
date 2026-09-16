@@ -52,6 +52,9 @@ const Post: Collection = {
       label: 'Author',
       name: 'author',
       collections: ['author'],
+      ui: {
+        allowCreate: true,
+      },
     },
     {
       type: 'datetime',
