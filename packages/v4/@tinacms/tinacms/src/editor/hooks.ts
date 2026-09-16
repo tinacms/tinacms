@@ -1,5 +1,10 @@
 import { use, useCallback, useEffect, useEffectEvent, useMemo } from 'react';
-import { useController, useFormContext, useFormState } from 'react-hook-form';
+import {
+  get,
+  useController,
+  useFormContext,
+  useFormState,
+} from 'react-hook-form';
 import { useStore } from 'zustand';
 import type { ContentSlice } from '../core/content/contract';
 import type { FieldAddress } from '../core/field/address';
@@ -7,7 +12,11 @@ import type { FieldRegistry } from '../core/field/registry';
 import { digestDocument } from '../core/form/ingest';
 import { invariant } from '../core/invariant';
 import type { SliceState, TinaStoreState } from '../core/plugin';
-import type { FieldSchema, TinaDocument } from '../core/schema/types';
+import type {
+  CollectionSchema,
+  FieldSchema,
+  TinaDocument,
+} from '../core/schema/types';
 import { type FormId, toFormValues, useFormStore } from '../form/form-store';
 import {
   FieldAddressContext,
@@ -16,7 +25,7 @@ import {
   FormScopeContext,
   TinaRuntimeContext,
 } from './context';
-import { type FieldErrorEntry, fieldErrorMessages } from './field-errors';
+import { collectFieldErrorMessages } from './field-errors';
 
 export function useFieldRegistry(): FieldRegistry {
   const runtime = use(TinaRuntimeContext);
@@ -47,10 +56,15 @@ const isContentSlice = (
   typeof slice.list === 'function' &&
   typeof slice.update === 'function';
 
-export function useContentSlice(): ContentSlice {
+export function useOptionalContentSlice(): ContentSlice | null {
   const slice = useTinaStore((state) => state.content);
+  return slice && isContentSlice(slice) ? slice : null;
+}
+
+export function useContentSlice(): ContentSlice {
+  const slice = useOptionalContentSlice();
   invariant(
-    slice && isContentSlice(slice),
+    slice,
     'content-capability-missing',
     'No content capability with get, list and update is mounted — pass a content plugin (e.g. localContentPlugin()) to <TinaProvider plugins>'
   );
@@ -65,6 +79,21 @@ function useFormScope(hookCode: string, hookName: string): FormScope {
 
 export function useFormId(): FormId {
   return useFormScope('form-id-outside-provider', 'useFormId').formId;
+}
+
+export function useFormCollection(): CollectionSchema {
+  return useFormScope('form-collection-outside-provider', 'useFormCollection')
+    .collection;
+}
+
+export function useSchemaCollections(): CollectionSchema[] {
+  const runtime = use(TinaRuntimeContext);
+  invariant(
+    runtime,
+    'schema-collections-outside-provider',
+    'useSchemaCollections must be used within a TinaProvider'
+  );
+  return runtime.schema.collections;
 }
 
 export function useDocumentPath(): string {
@@ -106,8 +135,9 @@ export function useFormSave(): () => Promise<void> {
   return useCallback(async () => {
     const { formId, path, collection, onSave } = scope;
     const values = getValues();
-    const digested = digestDocument(values, collection.fields, registry, {
+    const digested = digestDocument(values, collection.fields, {
       documentPath: path,
+      registry,
     });
     await onSave?.(digested);
     useFormStore.getState().markSaved(formId, toFormValues(values));
@@ -141,8 +171,11 @@ export function useFieldValue<T = unknown>(
 
 export function useFieldErrors(address: FieldAddress): string[] {
   const { errors } = useFormState({ name: address });
-  const fieldErrors = errors as Record<string, FieldErrorEntry | undefined>;
-  return fieldErrorMessages(fieldErrors[address]);
+  // `address` can nest through an index (`items.0.title`). `get` reads that
+  // path the same way react-hook-form does. `collectFieldErrorMessages` also
+  // walks down from it, so a compound field's address reports everything
+  // wrong underneath it, not only a message at that exact address.
+  return collectFieldErrorMessages(get(errors, address));
 }
 
 export function useFieldActivation(handler: () => void): void {

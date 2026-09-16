@@ -1,5 +1,47 @@
 # @tinacms/mdx
 
+## 2.2.3
+
+### Patch Changes
+
+- [#7525](https://github.com/tinacms/tinacms/pull/7525) [`df35183`](https://github.com/tinacms/tinacms/commit/df351832c37fd0efaf5a06cb6cde9a5ec404201e) Thanks [@wicksipedia](https://github.com/wicksipedia)! - `sanitizeUrl` no longer returns the value it was given when `new URL()` cannot parse it. A value that still names a scheme, including one disguised with a null byte or a zero-width character, now returns an empty string. Relative URLs name no scheme and are kept as they were.
+
+## 2.2.2
+
+### Patch Changes
+
+- [#7449](https://github.com/tinacms/tinacms/pull/7449) [`d0593a3`](https://github.com/tinacms/tinacms/commit/d0593a37a42c9f393bbafea252cf0c1fd6a2f03a) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Parse a hard break, and strikethrough, inside a link. `[a\`⏎`b](/x)` and `[~~a~~](/x)` both threw, collapsing the whole rich-text field to an `invalid_markdown` blob. Part of #7415.
+
+- [#7450](https://github.com/tinacms/tinacms/pull/7450) [`dbd9234`](https://github.com/tinacms/tinacms/commit/dbd9234de2c8976e986faaeefd161e3f42520200) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Stop writing a hard break where markdown cannot represent one. `one\` with nothing after it, or a break before raw HTML or an inline template, came back as a literal backslash the author never typed. Fixes #5426. Part of #7415.
+
+- [#7476](https://github.com/tinacms/tinacms/pull/7476) [`f48009e`](https://github.com/tinacms/tinacms/commit/f48009ec6cabe28427a430b80299fe92ede5da0d) Thanks [@kulesy](https://github.com/kulesy)! - chore(tinacms-pkgs): point `repository.directory` at each package's own folder
+
+  Eight packages declared a `repository.directory` copied from whichever package they were forked from, so the "repository" link on their npm pages resolved to unrelated source. Also drops a dead `generate:schema` script from `@tinacms/metrics`, `@tinacms/cli` and `@tinacms/schema-tools` - it referenced a `scripts/generateSchema.js` that has never existed in the repo and nothing invoked it.
+
+- [#7451](https://github.com/tinacms/tinacms/pull/7451) [`16b9ca1`](https://github.com/tinacms/tinacms/commit/16b9ca173a8f26e885d8a924a6ff89f0eb062f18) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Split an `h3`–`h6` on a hard break instead of losing it. Those levels have no setext form, so the break silently became a space. `#` and `##` are unchanged. Part of #7415.
+
+- Updated dependencies [[`d340dab`](https://github.com/tinacms/tinacms/commit/d340dab38c0356a9aa86f1531e317924b25c68fa), [`f48009e`](https://github.com/tinacms/tinacms/commit/f48009ec6cabe28427a430b80299fe92ede5da0d), [`fd6aaaf`](https://github.com/tinacms/tinacms/commit/fd6aaaf5b85a907c0803bbd20dd1d4f972677589), [`fd6aaaf`](https://github.com/tinacms/tinacms/commit/fd6aaaf5b85a907c0803bbd20dd1d4f972677589)]:
+  - @tinacms/schema-tools@2.10.0
+
+## 2.2.1
+
+### Patch Changes
+
+- [#7407](https://github.com/tinacms/tinacms/pull/7407) [`4f90806`](https://github.com/tinacms/tinacms/commit/4f9080666308063332e16d96d00a75ff7348c011) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Ship one copy of the `acorn` parser in `@tinacms/mdx` instead of three, cutting `dist/index.browser.js` from 1,976,421 to 1,578,764 bytes (440,787 to 356,471 gzipped) and `dist/index.js` from 2,013,419 to 1,615,828 bytes (452,063 to 367,630 gzipped). The catalog pinned `acorn` to 8.8.2 while `micromark-extension-mdxjs` pulled 8.16.0, so two 8.x copies were bundled side by side; separately, `acorn-jsx` reaches `acorn` through `require`, which acorn's export map answers with its CJS build while every other importer gets the ESM build, bundling the parser a second time. Aligning the catalog to `^8.16.0` and aliasing `acorn` to its ESM entry in the `@tinacms/mdx` esbuild config collapses all three into one. Parser and serializer output is unchanged — `parseMDX`/`serializeMDX` round-trips over the package's 64 markdown fixtures produce byte-identical results from the old and new bundles.
+
+- [#7468](https://github.com/tinacms/tinacms/pull/7468) [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Drop the unused `typedoc` dependency
+
+  `typedoc` landed in `@tinacms/mdx`'s runtime dependencies by copy-paste and has shipped to every consumer since, dragging an unmet `typescript` peer range with it. Nothing in `src/` imports it and only the `docs` script used it, so both are removed along with the now-orphaned `typedoc-plugin-markdown` and `concat-md` catalog entries.
+
+- [#7466](https://github.com/tinacms/tinacms/pull/7466) [`de5c7d7`](https://github.com/tinacms/tinacms/commit/de5c7d72b67f589f1f5c4bccc5f5677e70cd7e2d) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Stop importing the `uvu` test runner from shipped source
+
+  `@tinacms/mdx` listed `uvu` as a runtime dependency and imported it in two shortcode parsing files, in both cases only for `ok` as a one-line assertion helper. A local `assert` function replaces those six call sites, so the dependency and its catalog entry are gone. Shortcode parsing behaviour is unchanged.
+
+  This does not remove `uvu` from a consumer's `node_modules`. `micromark` and its extensions still depend on it at runtime, and `@tinacms/mdx` depends on those.
+
+- Updated dependencies []:
+  - @tinacms/schema-tools@2.9.0
+
 ## 2.2.0
 
 ### Minor Changes

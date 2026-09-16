@@ -11,11 +11,13 @@ import type { BlockTemplate } from '.';
 export const BlockSelector = ({
   templates,
   addItem,
+  fieldName,
 }: {
   templates: {
     [key: string]: BlockTemplate;
   };
   addItem: any;
+  fieldName?: string;
 }) => {
   const showFilter = React.useMemo(() => {
     return Object.entries(templates).length > 6;
@@ -36,6 +38,7 @@ export const BlockSelector = ({
       <PopoverTrigger asChild>
         <span>
           <IconButton
+            data-test={fieldName ? `add-item-${fieldName}` : undefined}
             variant={open ? 'secondary' : 'primary'}
             size='small'
             className={`${open ? `rotate-45 pointer-events-none` : ``}`}

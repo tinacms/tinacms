@@ -1,9 +1,9 @@
-import type { Collection } from 'tinacms';
-import { heroBlockSchema } from '@/components/blocks/hero';
-import { featureBlockSchema } from '@/components/blocks/features';
-import { ctaBlockSchema } from '@/components/blocks/cta';
-import { testimonialBlockSchema } from '@/components/blocks/testimonial';
 import { contentBlockSchema } from '@/components/blocks/content';
+import { ctaBlockSchema } from '@/components/blocks/cta';
+import { featureBlockSchema } from '@/components/blocks/features';
+import { heroBlockSchema } from '@/components/blocks/hero';
+import { testimonialBlockSchema } from '@/components/blocks/testimonial';
+import type { Collection } from 'tinacms';
 
 const Page: Collection = {
   label: 'Pages',
@@ -37,6 +37,12 @@ const Page: Collection = {
         testimonialBlockSchema,
         contentBlockSchema,
       ],
+    },
+    {
+      name: 'image',
+      label: 'Image',
+      type: 'image',
+      accept: 'image',
     },
   ],
 };

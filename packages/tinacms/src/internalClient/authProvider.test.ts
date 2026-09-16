@@ -195,3 +195,61 @@ describe('TinaCloudAuthProvider getAccessToken', () => {
     expect(await provider.getAccessToken()).toBe('id-token');
   });
 });
+
+describe('TinaCloudAuthProvider getUser resilience', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  const withSession = (provider: TinaCloudAuthProvider) => {
+    provider.getToken = vi
+      .fn()
+      .mockResolvedValue({ access_token: freshAccessToken } as TokenObject);
+    return provider;
+  };
+
+  it('retries once and succeeds after a transient network failure', async () => {
+    const provider = withSession(buildProvider());
+    const fetchMock = vi
+      .fn()
+      .mockRejectedValueOnce(new TypeError('Failed to fetch'))
+      .mockResolvedValueOnce({
+        status: 200,
+        json: vi.fn().mockResolvedValue({ id: 'user-1' }),
+      });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const user = await provider.getUser();
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(user).toEqual({ id: 'user-1' });
+  });
+
+  it('throws rather than reporting logged-out when the identity API stays unreachable', async () => {
+    const provider = withSession(buildProvider());
+    const fetchMock = vi
+      .fn()
+      .mockRejectedValue(new TypeError('Failed to fetch'));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(provider.getUser()).rejects.toThrow('Failed to fetch');
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('still reports null for a non-2xx session check', async () => {
+    const provider = withSession(buildProvider());
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        status: 401,
+        json: vi.fn().mockResolvedValue({ error: 'expired' }),
+      })
+    );
+
+    const user = await provider.getUser();
+
+    expect(user).toBeNull();
+  });
+});

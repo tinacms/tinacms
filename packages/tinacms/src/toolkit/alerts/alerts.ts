@@ -1,5 +1,5 @@
+import type { CMSEvent, Callback, EventBus } from '@toolkit/core';
 import React from 'react';
-import type { EventBus, Callback, CMSEvent } from '@toolkit/core';
 
 export interface EventsToAlerts {
   [key: string]: ToAlert | AlertArgs;
@@ -38,6 +38,15 @@ export class Alerts {
     private map: EventsToAlerts = {}
   ) {
     this.events.subscribe('*', this.mapEventToAlert);
+    // Self-managed gate, paired with the session lifecycle the way
+    // CMS.ENABLED/DISABLED pairs enablement with events: no caller can set
+    // the latch without the event that also clears it.
+    this.events.subscribe('cms:session-expired', () => {
+      this.suppressed = true;
+    });
+    this.events.subscribe('cms:login', () => {
+      this.suppressed = false;
+    });
   }
   setMap(eventsToAlerts: EventsToAlerts) {
     this.map = {
@@ -46,11 +55,21 @@ export class Alerts {
     };
   }
 
+  /**
+   * While suppressed (the window between a session expiring and the user
+   * signing back in), new alerts are dropped so nothing paints over the
+   * login modal. Alerts already showing are left alone.
+   */
+  private suppressed = false;
+
   add(
     level: AlertLevel,
     message: string | React.FunctionComponent,
     timeout = 4000
   ): () => void {
+    if (this.suppressed) {
+      return () => {};
+    }
     const alert = {
       level,
       message,

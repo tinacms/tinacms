@@ -1,7 +1,14 @@
 import { z } from 'zod';
 
 //@ts-ignore can't locate BranchChangeEvent
-import { BranchChangeEvent, BranchData, EventBus } from '@tinacms/toolkit';
+import {
+  BranchChangeEvent,
+  BranchData,
+  EventBus,
+  SessionExpiredError,
+} from '@tinacms/toolkit';
+import { dispatchSessionExpired } from '@toolkit/core/session-expired';
+
 import {
   DocumentNode,
   GraphQLSchema,
@@ -37,7 +44,7 @@ import {
 } from '../toolkit/form-builder/editorial-workflow-constants';
 import { AsyncData, asyncPoll } from './asyncPoll';
 import { LocalAuthProvider, TinaCloudAuthProvider } from './authProvider';
-import { TinaCloudProject } from './types';
+import { AuthenticatedUser, TinaCloudProject } from './types';
 
 export * from './authProvider';
 
@@ -124,6 +131,8 @@ export class Client {
   events = new EventBus(); // automatically hooked into global event bus when attached via cms.
   protectedBranches: string[] = [];
   usingEditorialWorkflow: boolean = false;
+  // Whatever the auth provider returned from getUser().
+  user?: AuthenticatedUser | boolean;
 
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
     this.tinaGraphQLVersion = options.tinaGraphQLVersion;
@@ -159,15 +168,26 @@ export class Client {
 
     // TODO: auth provider should be dynamically passed in
     // TODO: update auth provider whenever the clientID or url change
-    this.authProvider =
+    this.authProvider = this.adoptAuthProvider(
       this.schema?.config?.config?.authProvider ||
-      new TinaCloudAuthProvider({
-        clientId: options.clientId,
-        identityApiUrl: this.identityApiUrl,
-        getTokenFn: options.getTokenFn,
-        tokenStorage: tokenStorage,
-        frontendUrl: this.frontendUrl,
-      });
+        new TinaCloudAuthProvider({
+          clientId: options.clientId,
+          identityApiUrl: this.identityApiUrl,
+          getTokenFn: options.getTokenFn,
+          tokenStorage: tokenStorage,
+          frontendUrl: this.frontendUrl,
+        })
+    );
+  }
+
+  /**
+   * Every provider swap must come through here: the listener is what turns a
+   * REST 401 into the auth wall re-arming, and a bare field assignment would
+   * silently drop it.
+   */
+  protected adoptAuthProvider(provider: AuthProvider): AuthProvider {
+    provider.sessionExpiredListener = () => dispatchSessionExpired(this.events);
+    return provider;
   }
 
   public get isLocalMode() {
@@ -312,6 +332,20 @@ mutation addPendingDocumentMutation(
         variables,
       }),
     });
+
+    if (res.status === 401) {
+      // drain the body so pooled connections are released (undici/Node)
+      res.json().catch(() => {});
+      if (this.isCustomContentApi) {
+        // a misconfigured self-hosted backend 401s indistinguishably from a
+        // real expiry; leave developers the diagnostic the login loop hides
+        console.error(
+          `TinaCMS: the content API at ${this.contentApiUrl} returned 401. If signing in again does not resolve this, check the backend's auth configuration (clientId: ${this.options.clientId}, branch: ${this.branch}).`
+        );
+      }
+      dispatchSessionExpired(this.events);
+      throw new SessionExpiredError();
+    }
 
     if (res.status !== 200) {
       let errorMessage = `Unable to complete request, ${res.statusText}`;
@@ -856,12 +890,17 @@ mutation addPendingDocumentMutation(
     }
   }
 
+  /**
+   * The server normalises `branchName`, so follow-up calls must use the
+   * `branchName` from the response rather than the one they sent.
+   */
   async startMediaEditorialWorkflow(options: {
     branchName: string;
     baseBranch: string;
     prTitle?: string;
-    operation: 'upload' | 'delete';
+    operation: 'upload' | 'delete' | 'rename';
     repoPath: string;
+    targetRepoPath?: string;
   }): Promise<{ branchName: string; requestId: string; status?: string }> {
     const url = `${this.contentApiBase}/editorial-workflow/${this.clientId}/media`;
     return await this.postEditorialWorkflow(
@@ -901,8 +940,9 @@ export class LocalClient extends Client {
     };
     super(clientProps);
     // use whatever auth provider is passed in, or default to local auth provider
-    this.authProvider =
-      this.schema?.config?.config?.authProvider || new LocalAuthProvider();
+    this.authProvider = this.adoptAuthProvider(
+      this.schema?.config?.config?.authProvider || new LocalAuthProvider()
+    );
   }
   public get isLocalMode() {
     return true;

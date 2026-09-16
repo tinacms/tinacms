@@ -16,6 +16,7 @@ import {
   TinaField,
   TinaSchema,
   TinaState,
+  isSessionExpiredError,
   resolveField,
   useCMS,
 } from 'tinacms';
@@ -24,7 +25,7 @@ import { FormifyCallback, createForm, createGlobalForm } from './build-form';
 import { showErrorModal } from './errors';
 import { expandQuery, isConnectionType, isNodeType } from './expand-query';
 import {
-  getExpectedPreviewOrigin,
+  getPreviewOrigin,
   isFromTrustedPreviewOrigin,
   postMessageToPreview,
 } from './preview-origin';
@@ -204,12 +205,9 @@ export const useGraphQLReducer = (
 
   const activeField = searchParams.get('active-field');
 
-  // Origin of the preview document we load in the iframe. Used to validate
+  // The preview is always loaded from the admin's own origin. Used to validate
   // inbound messages and as the explicit `targetOrigin` for outbound ones.
-  const expectedOrigin = React.useMemo(
-    () => getExpectedPreviewOrigin(url),
-    [url]
-  );
+  const expectedOrigin = getPreviewOrigin();
 
   React.useEffect(() => {
     const run = async () => {
@@ -722,6 +720,8 @@ const onSubmit = async (
     });
     cms.alerts.success('Document saved!');
   } catch (e) {
+    // request() already sent the user back to the login modal; no alert over it
+    if (isSessionExpiredError(e)) throw e;
     cms.alerts.error(() =>
       ErrorDialog({
         title: 'There was a problem saving your document',

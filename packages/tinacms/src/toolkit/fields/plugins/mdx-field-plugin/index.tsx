@@ -88,7 +88,11 @@ export const MdxFieldPluginExtendible = {
     return undefined;
   },
   Component: wrapFieldsWithMeta<
-    InputProps,
+    InputProps & {
+      rawMode?: boolean;
+      setRawMode?: (rawMode: boolean) => void;
+      rawEditor?: React.ReactNode;
+    },
     {
       templates: MdxTemplate[];
       toolbarOverride?: ToolbarOverrideType[];

@@ -1,7 +1,7 @@
 {
     "name": "@tinacms/cli",
     "type": "module",
-    "version": "2.6.0",
+    "version": "3.0.0",
     "main": "dist/index.js",
     "typings": "dist/index.d.ts",
     "files": [
@@ -9,6 +9,9 @@
         "bin/*"
     ],
     "license": "Apache-2.0",
+    "engines": {
+        "node": "22.x || 24.x"
+    },
     "bin": {
         "tinacms": "bin/tinacms"
     },
@@ -31,7 +34,6 @@
         "@types/clear": "catalog:",
         "@types/cli-spinner": "catalog:",
         "@types/cors": "2.8.5",
-        "@types/crypto-js": "^4.2.2",
         "@types/express": "catalog:",
         "@types/figlet": "catalog:",
         "@types/fs-extra": "^11.0.4",
@@ -54,8 +56,7 @@
         "test:adapters": "NODE_OPTIONS='--experimental-vm-modules' jest --config jest.adapter-matrix.config.js --runTestsByPath src/next/adapter-matrix.adapter-test.ts",
         "types": "pnpm tsc",
         "test-watch": "jest  --passWithNoTests --watch",
-        "tinacms": "MONOREPO_DEV=true node ./bin/tinacms",
-        "generate:schema": "pnpm node scripts/generateSchema.js"
+        "tinacms": "MONOREPO_DEV=true node ./bin/tinacms"
     },
     "dependencies": {
         "@graphql-codegen/core": "catalog:",
@@ -86,7 +87,6 @@
         "cli-spinner": "catalog:",
         "clipanion": "catalog:",
         "cors": "catalog:",
-        "crypto-js": "catalog:",
         "dotenv": "catalog:",
         "esbuild": "catalog:",
         "fs-extra": "catalog:",
@@ -105,7 +105,7 @@
         "tinacms": "workspace:^",
         "typanion": "catalog:",
         "typescript": "^5.7.3",
-        "vite": "^6.4.3",
+        "vite": "catalog:",
         "yup": "^1.6.1",
         "zod": "catalog:"
     },

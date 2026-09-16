@@ -23,9 +23,6 @@ test.describe("Create Folder", () => {
     );
     await expect(validationError).toBeVisible();
 
-    // This Button disables via pointer-events-none styling, not a native disabled attr.
-    await expect(page.locator('button:has-text("Create")')).toHaveClass(
-      /pointer-events-none/
-    );
+    await expect(page.locator('button:has-text("Create")')).toBeDisabled();
   });
 });

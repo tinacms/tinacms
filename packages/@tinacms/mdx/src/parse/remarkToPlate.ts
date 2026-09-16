@@ -350,10 +350,13 @@ export const remarkToSlate = (
         );
       case 'text':
         return text(content);
+      case 'break':
+        return breakContent();
       case 'inlineCode':
       case 'emphasis':
       case 'image':
       case 'strong':
+      case 'delete':
         return phrashingMark(content);
       case 'html':
         return html_inline(content);

@@ -1,5 +1,11 @@
 # create-tina-app
 
+## 2.2.1
+
+### Patch Changes
+
+- [#7438](https://github.com/tinacms/tinacms/pull/7438) [`fc8ddd4`](https://github.com/tinacms/tinacms/commit/fc8ddd4e90558408fc649f0dd3ddbcdbdb7ed028) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump `tar` to 7.5.22
+
 ## 2.2.0
 
 ### Minor Changes

@@ -1,5 +1,57 @@
 # tina-graphql
 
+## 3.0.0
+
+### Major Changes
+
+- [#7229](https://github.com/tinacms/tinacms/pull/7229) [`2a70b77`](https://github.com/tinacms/tinacms/commit/2a70b77f023f9c6f042de4ae4dcada565c7b9be8) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Rich-text fields use a new `RichText` GraphQL scalar, and the generated TypeScript types map it to `TinaMarkdownContent` instead of `any`.
+
+  Rich-text fields used the generic `JSON` scalar, which `_values`, `templates` and `fields` also use. A scalar maps to one TypeScript type, and `any` was the only type that fit both a rich-text document and arbitrary JSON. So `data.post._body` came out as `any`, and TypeScript did not check code that read it.
+
+  ```
+  RichText -> TinaMarkdownContent   (new)
+  JSON     -> any                   (unchanged, so `_values` still indexes freely)
+  ```
+
+  GraphQL query documents do not change, and the server needs no resolver for the new scalar. `buildASTSchema` passes custom scalars through, so the server indexes and resolves rich text as before. In `schema.gql`, rich-text fields change from `JSON` to `RichText`.
+
+  This breaks TypeScript code that relied on `any`. TypeScript now reports reads of properties that `TinaMarkdownContent` does not declare, such as `.text` on a text node or `.slice` on the body. To read node properties such as `text`, add them to your own node type.
+
+  Update `tinacms` at the same time. `<TinaMarkdown>` in the latest `tinacms` accepts a `null` or `undefined` `content`, so you can pass an optional rich-text field to it without a guard.
+
+### Patch Changes
+
+- [#7516](https://github.com/tinacms/tinacms/pull/7516) [`96d6efe`](https://github.com/tinacms/tinacms/commit/96d6efe03e7fc9515d2caa7fe81f54f41abcd2e6) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Normalize document IDs and `_sys.path` on Windows to prevent the same document from creating separate Visual Editing forms across query paths.
+
+  Mutation resolvers now also work from a POSIX path, so `_sys.hasReferences` is reported correctly and deleting or renaming a referenced document updates the referring documents instead of silently leaving them pointing at the old path.
+
+- Updated dependencies [[`df35183`](https://github.com/tinacms/tinacms/commit/df351832c37fd0efaf5a06cb6cde9a5ec404201e)]:
+  - @tinacms/mdx@2.2.3
+
+## 2.4.11
+
+### Patch Changes
+
+- [#7501](https://github.com/tinacms/tinacms/pull/7501) [`9a7092d`](https://github.com/tinacms/tinacms/commit/9a7092db53193e0d9942a061b35860fbc00e83a1) Thanks [@Aibono1225](https://github.com/Aibono1225)! - Preserve underlying storage bridge error messages when document writes fail so actionable save errors are returned to the CMS.
+
+- Updated dependencies [[`d340dab`](https://github.com/tinacms/tinacms/commit/d340dab38c0356a9aa86f1531e317924b25c68fa), [`d0593a3`](https://github.com/tinacms/tinacms/commit/d0593a37a42c9f393bbafea252cf0c1fd6a2f03a), [`dbd9234`](https://github.com/tinacms/tinacms/commit/dbd9234de2c8976e986faaeefd161e3f42520200), [`f48009e`](https://github.com/tinacms/tinacms/commit/f48009ec6cabe28427a430b80299fe92ede5da0d), [`fd6aaaf`](https://github.com/tinacms/tinacms/commit/fd6aaaf5b85a907c0803bbd20dd1d4f972677589), [`fd6aaaf`](https://github.com/tinacms/tinacms/commit/fd6aaaf5b85a907c0803bbd20dd1d4f972677589), [`16b9ca1`](https://github.com/tinacms/tinacms/commit/16b9ca173a8f26e885d8a924a6ff89f0eb062f18)]:
+  - @tinacms/schema-tools@2.10.0
+  - @tinacms/mdx@2.2.2
+
+## 2.4.10
+
+### Patch Changes
+
+- [#7456](https://github.com/tinacms/tinacms/pull/7456) [`195087d`](https://github.com/tinacms/tinacms/commit/195087de7e617d9d91b06709db869787ac0c800f) Thanks [@kulesy](https://github.com/kulesy)! - Bump `js-yaml` to 3.15.1, picking up an upstream security fix (GHSA-5p4m-2wfm-xmqj)
+
+- [#7468](https://github.com/tinacms/tinacms/pull/7468) [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Remove the dead typedoc docs tooling
+
+  Both packages declared a `docs` script running `pnpm typedoc` without ever declaring `typedoc` as a dependency, so the script could not resolve its binary under pnpm's isolated `node_modules`. Their `typedoc.json` files were also written against the pre-0.20 option schema (`inputFiles`, `mode`, `excludeNotExported`), which the catalog's typedoc 0.26 no longer accepts. Nothing in `turbo.json` or any workflow invoked them, so the scripts and configs are removed along with the generated `spec.md` in `@tinacms/mdx`.
+
+- Updated dependencies [[`4f90806`](https://github.com/tinacms/tinacms/commit/4f9080666308063332e16d96d00a75ff7348c011), [`00a8b82`](https://github.com/tinacms/tinacms/commit/00a8b826d0f7bd663f5d9069e487606f71b98cfe), [`de5c7d7`](https://github.com/tinacms/tinacms/commit/de5c7d72b67f589f1f5c4bccc5f5677e70cd7e2d)]:
+  - @tinacms/mdx@2.2.1
+  - @tinacms/schema-tools@2.9.0
+
 ## 2.4.9
 
 ### Patch Changes

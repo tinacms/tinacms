@@ -106,6 +106,45 @@ describe('tina-markdown', () => {
     expect(root.querySelector('img')?.getAttribute('src')).toBe('/image.png');
   });
 
+  it('drops a link url whose scheme is not allowed', () => {
+    const root = render({
+      type: 'root',
+      children: [
+        {
+          type: 'a',
+          url: 'javascript:alert(1)',
+          children: [{ type: 'text', text: 'link' }],
+        },
+      ],
+    });
+
+    expect(root.querySelector('a')?.getAttribute('href')).toBe('');
+    expect(root.querySelector('a')?.textContent).toBe('link');
+  });
+
+  it('drops an image url whose scheme is not allowed', () => {
+    const root = render({
+      type: 'root',
+      children: [{ type: 'img', url: 'javascript:alert(1)' }],
+    });
+
+    expect(root.querySelector('img')?.getAttribute('src')).toBe('');
+  });
+
+  it('keeps the schemes a link is allowed to use', () => {
+    const root = render({
+      type: 'root',
+      children: [
+        { type: 'a', url: 'mailto:hi@example.com', children: [] },
+        { type: 'a', url: '/relative/page', children: [] },
+      ],
+    });
+
+    const [mail, relative] = [...root.querySelectorAll('a')];
+    expect(mail?.getAttribute('href')).toBe('mailto:hi@example.com');
+    expect(relative?.getAttribute('href')).toBe('/relative/page');
+  });
+
   it('renders ordered and unordered lists', () => {
     const root = render({
       type: 'root',

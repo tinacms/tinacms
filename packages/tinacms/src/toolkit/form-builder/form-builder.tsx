@@ -1,3 +1,4 @@
+import { isSessionExpiredError } from '@toolkit/core/session-expired';
 import type { Form } from '@toolkit/forms';
 import { Button } from '@toolkit/styles';
 import { cn } from '@utils/cn';
@@ -228,6 +229,12 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                 }
                 captureWorkflowChoice(false, errorMsg);
                 setDeletedBranchModalOpen(true);
+                return;
+              }
+
+              if (isSessionExpiredError(error)) {
+                // not a save failure: the auth wall is already re-arming
+                captureWorkflowChoice(false, errorMsg);
                 return;
               }
 
