@@ -1,22 +1,24 @@
-import * as React from 'react';
+import { Form } from '@toolkit/forms';
 import { useBranchData } from '@toolkit/plugin-branch-switcher';
-import { useCMS } from '../react-core';
-import { EDITORIAL_WORKFLOW_STATUS } from './editorial-workflow-constants';
+import * as React from 'react';
 import {
   CREATE_DOCUMENT_GQL,
   DELETE_DOCUMENT_GQL,
   UPDATE_DOCUMENT_GQL,
 } from '../../admin/api';
-import { Form } from '@toolkit/forms';
+import { useCMS } from '../react-core';
+import { EDITORIAL_WORKFLOW_STATUS } from './editorial-workflow-constants';
 import {
+  type EditorialWorkflowErrorLink,
+  TARGET_BRANCH_EXISTS_ERROR,
   checkTargetBranchExists,
+  collectionLabelResolver,
   getEditorialWorkflowError,
   getEditorialWorkflowPrTitle,
-  TARGET_BRANCH_EXISTS_ERROR,
-  type EditorialWorkflowErrorLink,
 } from './editorial-workflow-utils';
 
 export {
+  collectionLabelResolver,
   getEditorialWorkflowError,
   getEditorialWorkflowErrorMessage,
 } from './editorial-workflow-utils';
@@ -245,7 +247,10 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
       return { success: true };
     } catch (e: unknown) {
       console.error(e);
-      const { message, link } = getEditorialWorkflowError(e);
+      const { message, link } = getEditorialWorkflowError(
+        e,
+        collectionLabelResolver(cms.api.tina.schema)
+      );
 
       setErrorMessage(message);
       setErrorLink(link);

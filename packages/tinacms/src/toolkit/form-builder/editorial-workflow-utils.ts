@@ -134,11 +134,15 @@ const pageNameFrom = (file: string): string =>
     .pop()
     ?.replace(/\.[^.]+$/, '') || file;
 
-const indexingFailureCopy = (file?: string): EditorialWorkflowErrorCopy => {
+const indexingFailureCopy = (
+  file?: string,
+  collectionLabel?: string
+): EditorialWorkflowErrorCopy => {
   const subject = file ? `\u201c${pageNameFrom(file)}\u201d` : 'your content';
+  const location = collectionLabel ? ` in ${collectionLabel}` : '';
   return {
     message:
-      `We couldn't save your changes, because there's a problem with ${subject}.\n\n` +
+      `We couldn't save your changes, because there's a problem with ${subject}${location}.\n\n` +
       'Fix that page, then save again.',
     link: {
       url: EDITORIAL_WORKFLOW_EVENT_LOG_DOCS_URL,
@@ -147,8 +151,25 @@ const indexingFailureCopy = (file?: string): EditorialWorkflowErrorCopy => {
   };
 };
 
+interface CollectionLookup {
+  getCollectionByFullPath?: (
+    file: string
+  ) => { label?: string; name?: string } | undefined;
+}
+
+// NOTE: [17 Sep 2026] EK - Always resolve from the failing file's own path, never
+// from the collection being edited: indexing covers the whole branch, so the file
+// that failed can belong to a different collection.
+export const collectionLabelResolver =
+  (schema?: CollectionLookup) =>
+  (file: string): string | undefined => {
+    const collection = schema?.getCollectionByFullPath?.(file);
+    return collection?.label || collection?.name;
+  };
+
 export const getEditorialWorkflowError = (
-  e: unknown
+  e: unknown,
+  resolveCollectionLabel?: (file: string) => string | undefined
 ): EditorialWorkflowErrorCopy => {
   let errMessage =
     'Branch operation failed. Talking to GitHub was unsuccessful, please try again. If the problem persists please contact support at https://tina.io/support 🦙';
@@ -168,7 +189,10 @@ export const getEditorialWorkflowError = (
         errMessage = err.message || 'Invalid branch name';
         break;
       case EDITORIAL_WORKFLOW_ERROR.INDEXING_FAILED:
-        return indexingFailureCopy(err.file);
+        return indexingFailureCopy(
+          err.file,
+          err.file ? resolveCollectionLabel?.(err.file) : undefined
+        );
       default:
         errMessage = err.message || errMessage;
         break;
@@ -184,5 +208,7 @@ export const getEditorialWorkflowError = (
   return { message: errMessage };
 };
 
-export const getEditorialWorkflowErrorMessage = (e: unknown): string =>
-  getEditorialWorkflowError(e).message;
+export const getEditorialWorkflowErrorMessage = (
+  e: unknown,
+  resolveCollectionLabel?: (file: string) => string | undefined
+): string => getEditorialWorkflowError(e, resolveCollectionLabel).message;
