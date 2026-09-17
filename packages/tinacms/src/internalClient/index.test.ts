@@ -3,7 +3,12 @@ import {
   EDITORIAL_WORKFLOW_STATUS,
   EditorialWorkflowErrorDetails,
 } from '../toolkit/form-builder/editorial-workflow-constants';
-import { Client, LocalAuthProvider, LocalClient } from './index';
+import {
+  Client,
+  LocalAuthProvider,
+  LocalClient,
+  TinaCloudAuthProvider,
+} from './index';
 
 const makeResponse = ({
   status,
@@ -799,6 +804,74 @@ describe('Tina Client', () => {
       expect(fetchMock.mock.calls[1][1].headers).toMatchObject({
         Authorization: 'Bearer v2',
       });
+    });
+
+    it('prefers the id token when getToken returns both', async () => {
+      getToken.mockResolvedValue({ id_token: 'id', access_token: 'access' });
+      const fetchMock = stubFetchOnce(
+        makeResponse({ status: 200, body: { data: {} } })
+      );
+
+      await client.request('{ x }', { variables: {} });
+
+      const [, init] = fetchMock.mock.calls[0];
+      expect(init.headers).toMatchObject({ Authorization: 'Bearer id' });
+    });
+
+    it('falls back to the access token when there is no id token', async () => {
+      getToken.mockResolvedValue({ access_token: 'access' });
+      const fetchMock = stubFetchOnce(
+        makeResponse({ status: 200, body: { data: {} } })
+      );
+
+      await client.request('{ x }', { variables: {} });
+
+      const [, init] = fetchMock.mock.calls[0];
+      expect(init.headers).toMatchObject({ Authorization: 'Bearer access' });
+    });
+  });
+
+  describe('token sent to TinaCloud', () => {
+    const encode = (obj: Record<string, unknown>) =>
+      Buffer.from(JSON.stringify(obj)).toString('base64url');
+    const accessToken = `${encode({ alg: 'none' })}.${encode({
+      exp: Math.floor(Date.now() / 1000) + 3600,
+    })}.sig`;
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    it('is the same for content requests and editorial workflow requests', async () => {
+      const client = buildClient({
+        clientId: 'client-id',
+        customContentApiUrl: 'http://tina.io/fakeURL',
+      });
+      (client.authProvider as TinaCloudAuthProvider).setToken({
+        access_token: accessToken,
+        id_token: 'id-token',
+        refresh_token: 'refresh',
+      });
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValueOnce(
+          makeResponse({ status: 200, body: { data: {} } })
+        )
+        .mockResolvedValueOnce(
+          makeResponse({ status: 200, body: { branchName: 'feature/test' } })
+        );
+      vi.stubGlobal('fetch', fetchMock);
+
+      await client.request('{ x }', { variables: {} });
+      await client.executeEditorialWorkflow({
+        branchName: 'feature/test',
+        baseBranch: 'main',
+      });
+
+      const sent = fetchMock.mock.calls.map(([, init]) =>
+        new Headers(init.headers).get('Authorization')
+      );
+      expect(sent).toEqual(['Bearer id-token', 'Bearer id-token']);
     });
   });
 
