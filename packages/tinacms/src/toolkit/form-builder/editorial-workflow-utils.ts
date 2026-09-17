@@ -128,12 +128,18 @@ export interface EditorialWorkflowErrorCopy {
   link?: EditorialWorkflowErrorLink;
 }
 
+const pageNameFrom = (file: string): string =>
+  file
+    .split('/')
+    .pop()
+    ?.replace(/\.[^.]+$/, '') || file;
+
 const indexingFailureCopy = (file?: string): EditorialWorkflowErrorCopy => {
-  const subject = file ? `\u201c${file}\u201d` : 'your content';
+  const subject = file ? `\u201c${pageNameFrom(file)}\u201d` : 'your content';
   return {
     message:
-      `We couldn't index ${subject}, so your changes were not saved to the new branch.\n\n` +
-      'Fix the content and save again.',
+      `We couldn't save your changes, because there's a problem with ${subject}.\n\n` +
+      'Fix that page, then save again.',
     link: {
       url: EDITORIAL_WORKFLOW_EVENT_LOG_DOCS_URL,
       label: 'What causes this?',

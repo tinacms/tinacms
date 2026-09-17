@@ -79,7 +79,7 @@ const workflowError = (
   Object.assign(new Error(message), extras) as EditorialWorkflowErrorDetails;
 
 describe('getEditorialWorkflowError', () => {
-  it('names the file that failed to index', () => {
+  it('names the page that failed, not its repo path', () => {
     const { message, link } = getEditorialWorkflowError(
       workflowError('index failed: content/posts/hello.mdx', {
         errorCode: EDITORIAL_WORKFLOW_ERROR.INDEXING_FAILED,
@@ -87,7 +87,9 @@ describe('getEditorialWorkflowError', () => {
       })
     );
 
-    expect(message).toContain('content/posts/hello.mdx');
+    expect(message).toContain('hello');
+    expect(message).not.toContain('content/posts/hello.mdx');
+    expect(message).not.toContain('.mdx');
     expect(link).toEqual({
       url: EDITORIAL_WORKFLOW_EVENT_LOG_DOCS_URL,
       label: 'What causes this?',
