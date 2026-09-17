@@ -37,6 +37,8 @@ export const validatorConflictError = (
   );
 };
 
+// given a plugin returns its validator entries (i.e. KV pair of name to function)
+// needed because a plugin may declare numerous validators 
 const validatorEntriesOf = ({
   manifest,
   segment,
@@ -65,6 +67,8 @@ const validatorEntriesOf = ({
   });
 };
 
+// Creates a validator registry from the resolved plugin segments, handling overrides and conflicts.
+// registry is used by validateField() to find rule by name 
 export const createValidatorRegistry = (
   resolved: ResolvedSegment[]
 ): ValidatorRegistry =>

@@ -26,6 +26,8 @@ export const validateField = (
   options: ValidateFieldOptions = {}
 ): string[] => {
   const errors: string[] = [];
+
+  // declarative validation via the schema (i.e min, max, required) 
   const schema = descriptor?.schema?.(node);
   if (schema) {
     const result = schema.safeParse(value);
@@ -33,6 +35,8 @@ export const validateField = (
       errors.push(...result.error.issues.map((issue) => issue.message));
     }
   }
+
+  // imperative validation via the `validate` function on a field plugin 
   const context: PluginValidationContext = {
     node,
     address: options.address ?? node.name,
@@ -42,6 +46,7 @@ export const validateField = (
       ...flattenRuleReturnMessage(descriptor.validate(value, context))
     );
   }
+  // custom validation via the `validators` listed on the field
   const fieldContext: FieldValidationContext = {
     ...context,
     siblings: options.siblings ?? {},
@@ -107,6 +112,8 @@ const hasItemFields = (
 
 // The addresses whose rules can depend on a sibling: every field that lists
 // a validator, expanded through arrays and objects against the live values.
+
+// Returns a flat list of addresses for all fields that have validators, including nested fields. Used to combat a bug that saw React Hook Form applying errors to stale fields
 export const addressesWithValidators = (
   fields: FieldSchema[],
   values: unknown,
