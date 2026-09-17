@@ -16,12 +16,14 @@ import {
   collectionLabelResolver,
   getEditorialWorkflowError,
   getEditorialWorkflowPrTitle,
+  messageText,
+  plainMessage,
 } from './editorial-workflow-utils';
 
 export {
   collectionLabelResolver,
   getEditorialWorkflowError,
-  getEditorialWorkflowErrorMessage,
+  plainMessage,
 } from './editorial-workflow-utils';
 
 const pathRelativeToCollection = (
@@ -81,7 +83,6 @@ export interface ExecuteWorkflowOptions {
 
 export interface UseEditorialWorkflowResult {
   isExecuting: boolean;
-  errorMessage: string;
   errorMessageParts?: EditorialWorkflowMessagePart[];
   errorLink?: EditorialWorkflowErrorLink;
   currentStep: number;
@@ -100,7 +101,6 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
   const { setCurrentBranch } = useBranchData();
 
   const [isExecuting, setIsExecuting] = React.useState(false);
-  const [errorMessage, setErrorMessage] = React.useState('');
   const [errorMessageParts, setErrorMessageParts] = React.useState<
     EditorialWorkflowMessagePart[] | undefined
   >(undefined);
@@ -125,7 +125,6 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
   }, [isExecuting, currentStep]);
 
   const reset = () => {
-    setErrorMessage('');
     setErrorMessageParts(undefined);
     setErrorLink(undefined);
     setIsExecuting(false);
@@ -158,7 +157,7 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
       if (signal?.aborted) return { success: false };
 
       if (targetBranchExists) {
-        setErrorMessage(TARGET_BRANCH_EXISTS_ERROR);
+        setErrorMessageParts(plainMessage(TARGET_BRANCH_EXISTS_ERROR));
         setErrorLink(undefined);
         setIsExecuting(false);
         setCurrentStep(0);
@@ -253,24 +252,22 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
       return { success: true };
     } catch (e: unknown) {
       console.error(e);
-      const { message, messageParts, link } = getEditorialWorkflowError(
+      const { messageParts, link } = getEditorialWorkflowError(
         e,
         collectionLabelResolver(cms.api.tina.schema)
       );
 
-      setErrorMessage(message);
       setErrorMessageParts(messageParts);
       setErrorLink(link);
       setIsExecuting(false);
       setCurrentStep(0);
 
-      return { success: false, error: message };
+      return { success: false, error: messageText(messageParts) };
     }
   };
 
   return {
     isExecuting,
-    errorMessage,
     errorMessageParts,
     errorLink,
     currentStep,

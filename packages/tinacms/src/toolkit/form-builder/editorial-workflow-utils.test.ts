@@ -8,7 +8,8 @@ import {
   checkBranchGuard,
   collectionLabelResolver,
   getEditorialWorkflowError,
-  getEditorialWorkflowErrorMessage,
+  messageText,
+  plainMessage,
 } from './editorial-workflow-utils';
 
 describe('checkBranchGuard', () => {
@@ -81,12 +82,13 @@ const workflowError = (
 
 describe('getEditorialWorkflowError', () => {
   it('names the page that failed, not its repo path', () => {
-    const { message, link } = getEditorialWorkflowError(
+    const { messageParts, link } = getEditorialWorkflowError(
       workflowError('index failed: content/posts/hello.mdx', {
         errorCode: EDITORIAL_WORKFLOW_ERROR.INDEXING_FAILED,
         file: 'content/posts/hello.mdx',
       })
     );
+    const message = messageText(messageParts);
 
     expect(message).toContain('hello');
     expect(message).not.toContain('content/posts/hello.mdx');
@@ -98,7 +100,7 @@ describe('getEditorialWorkflowError', () => {
   });
 
   it('names the collection the failing file belongs to', () => {
-    const { message } = getEditorialWorkflowError(
+    const { messageParts } = getEditorialWorkflowError(
       workflowError('index failed', {
         errorCode: EDITORIAL_WORKFLOW_ERROR.INDEXING_FAILED,
         file: 'content/posts/hello.mdx',
@@ -107,6 +109,7 @@ describe('getEditorialWorkflowError', () => {
         getCollectionByFullPath: () => ({ name: 'post', label: 'Blog Posts' }),
       })
     );
+    const message = messageText(messageParts);
 
     expect(message).toContain('Blog Posts');
   });
@@ -130,7 +133,7 @@ describe('getEditorialWorkflowError', () => {
   });
 
   it('falls back to the collection name when it has no label', () => {
-    const { message } = getEditorialWorkflowError(
+    const { messageParts } = getEditorialWorkflowError(
       workflowError('index failed', {
         errorCode: EDITORIAL_WORKFLOW_ERROR.INDEXING_FAILED,
         file: 'content/posts/hello.mdx',
@@ -139,25 +142,27 @@ describe('getEditorialWorkflowError', () => {
         getCollectionByFullPath: () => ({ name: 'post' }),
       })
     );
+    const message = messageText(messageParts);
 
     expect(message).toContain('post');
   });
 
   it('omits the collection when the path matches none', () => {
-    const { message } = getEditorialWorkflowError(
+    const { messageParts } = getEditorialWorkflowError(
       workflowError('index failed', {
         errorCode: EDITORIAL_WORKFLOW_ERROR.INDEXING_FAILED,
         file: 'content/posts/hello.mdx',
       }),
       collectionLabelResolver({ getCollectionByFullPath: () => undefined })
     );
+    const message = messageText(messageParts);
 
     expect(message).toContain('hello');
     expect(message).not.toContain(' in ');
   });
 
   it('emphasises the page and collection, and keeps message in step with parts', () => {
-    const { message, messageParts } = getEditorialWorkflowError(
+    const { messageParts } = getEditorialWorkflowError(
       workflowError('index failed', {
         errorCode: EDITORIAL_WORKFLOW_ERROR.INDEXING_FAILED,
         file: 'content/posts/hello.mdx',
@@ -166,42 +171,48 @@ describe('getEditorialWorkflowError', () => {
         getCollectionByFullPath: () => ({ name: 'post', label: 'Blog Posts' }),
       })
     );
+    const message = messageText(messageParts);
 
     expect(
       messageParts?.filter((part) => part.emphasis).map((part) => part.text)
     ).toEqual(['\u201chello\u201d', 'Blog Posts']);
-    expect(messageParts?.map((part) => part.text).join('')).toBe(message);
+    expect(message).toBe(
+      "We couldn't save your changes, because there's a problem with \u201chello\u201d in Blog Posts.\n\nFix that page, then save again."
+    );
   });
 
   it('falls back to generic wording when no file is named', () => {
-    const { message, link } = getEditorialWorkflowError(
+    const { messageParts, link } = getEditorialWorkflowError(
       workflowError('index failed', {
         errorCode: EDITORIAL_WORKFLOW_ERROR.INDEXING_FAILED,
       })
     );
+    const message = messageText(messageParts);
 
     expect(message).toContain('your content');
     expect(link?.url).toBe(EDITORIAL_WORKFLOW_EVENT_LOG_DOCS_URL);
   });
 
   it('does not print the raw server copy for an indexing failure', () => {
-    const { message } = getEditorialWorkflowError(
+    const { messageParts } = getEditorialWorkflowError(
       workflowError('[see docs](https://tina.io/x) raw server copy', {
         errorCode: EDITORIAL_WORKFLOW_ERROR.INDEXING_FAILED,
         file: 'content/posts/hello.mdx',
       })
     );
+    const message = messageText(messageParts);
 
     expect(message).not.toContain('raw server copy');
     expect(message).not.toContain('](');
   });
 
   it('shows the server message for a code it does not recognise', () => {
-    const { message, link } = getEditorialWorkflowError(
+    const { messageParts, link } = getEditorialWorkflowError(
       workflowError('Something the CMS has never heard of', {
         errorCode: 'SOMETHING_NEW',
       })
     );
+    const message = messageText(messageParts);
 
     expect(message).toBe('Something the CMS has never heard of');
     expect(link).toBeUndefined();
@@ -214,18 +225,8 @@ describe('getEditorialWorkflowError', () => {
           errorCode: EDITORIAL_WORKFLOW_ERROR.BRANCH_EXISTS,
         })
       )
-    ).toEqual({ message: 'A branch with this name already exists' });
-  });
-});
-
-describe('getEditorialWorkflowErrorMessage', () => {
-  it('still returns just the message string', () => {
-    expect(
-      getEditorialWorkflowErrorMessage(
-        workflowError('Invalid branch name', {
-          errorCode: EDITORIAL_WORKFLOW_ERROR.VALIDATION_FAILED,
-        })
-      )
-    ).toBe('Invalid branch name');
+    ).toEqual({
+      messageParts: plainMessage('A branch with this name already exists'),
+    });
   });
 });

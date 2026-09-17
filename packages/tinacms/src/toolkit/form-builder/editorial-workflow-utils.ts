@@ -130,10 +130,17 @@ export interface EditorialWorkflowMessagePart {
 }
 
 export interface EditorialWorkflowErrorCopy {
-  message: string;
-  messageParts?: EditorialWorkflowMessagePart[];
+  messageParts: EditorialWorkflowMessagePart[];
   link?: EditorialWorkflowErrorLink;
 }
+
+/** One unemphasised run, for copy with nothing worth singling out. */
+export const plainMessage = (text: string): EditorialWorkflowMessagePart[] => [
+  { text },
+];
+
+export const messageText = (parts: EditorialWorkflowMessagePart[]): string =>
+  parts.map((part) => part.text).join('');
 
 const pageNameFrom = (file: string): string =>
   file
@@ -155,7 +162,6 @@ const indexingFailureCopy = (
     { text: '.\n\nFix that page, then save again.' },
   ];
   return {
-    message: messageParts.map((part) => part.text).join(''),
     messageParts,
     link: {
       url: EDITORIAL_WORKFLOW_EVENT_LOG_DOCS_URL,
@@ -218,10 +224,5 @@ export const getEditorialWorkflowError = (
     }
   }
 
-  return { message: errMessage };
+  return { messageParts: plainMessage(errMessage) };
 };
-
-export const getEditorialWorkflowErrorMessage = (
-  e: unknown,
-  resolveCollectionLabel?: (file: string) => string | undefined
-): string => getEditorialWorkflowError(e, resolveCollectionLabel).message;
