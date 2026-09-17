@@ -6,6 +6,7 @@ import {
 } from './editorial-workflow-constants';
 import {
   checkBranchGuard,
+  collectionLabelResolver,
   getEditorialWorkflowError,
   getEditorialWorkflowErrorMessage,
 } from './editorial-workflow-utils';
@@ -94,6 +95,65 @@ describe('getEditorialWorkflowError', () => {
       url: EDITORIAL_WORKFLOW_EVENT_LOG_DOCS_URL,
       label: 'What causes this?',
     });
+  });
+
+  it('names the collection the failing file belongs to', () => {
+    const { message } = getEditorialWorkflowError(
+      workflowError('index failed', {
+        errorCode: EDITORIAL_WORKFLOW_ERROR.INDEXING_FAILED,
+        file: 'content/posts/hello.mdx',
+      }),
+      collectionLabelResolver({
+        getCollectionByFullPath: () => ({ name: 'post', label: 'Blog Posts' }),
+      })
+    );
+
+    expect(message).toContain('Blog Posts');
+  });
+
+  it('resolves the collection from the failing file, not the edited one', () => {
+    const seen: string[] = [];
+    getEditorialWorkflowError(
+      workflowError('index failed', {
+        errorCode: EDITORIAL_WORKFLOW_ERROR.INDEXING_FAILED,
+        file: 'content/posts/hello.mdx',
+      }),
+      collectionLabelResolver({
+        getCollectionByFullPath: (file) => {
+          seen.push(file);
+          return { name: 'post' };
+        },
+      })
+    );
+
+    expect(seen).toEqual(['content/posts/hello.mdx']);
+  });
+
+  it('falls back to the collection name when it has no label', () => {
+    const { message } = getEditorialWorkflowError(
+      workflowError('index failed', {
+        errorCode: EDITORIAL_WORKFLOW_ERROR.INDEXING_FAILED,
+        file: 'content/posts/hello.mdx',
+      }),
+      collectionLabelResolver({
+        getCollectionByFullPath: () => ({ name: 'post' }),
+      })
+    );
+
+    expect(message).toContain('post');
+  });
+
+  it('omits the collection when the path matches none', () => {
+    const { message } = getEditorialWorkflowError(
+      workflowError('index failed', {
+        errorCode: EDITORIAL_WORKFLOW_ERROR.INDEXING_FAILED,
+        file: 'content/posts/hello.mdx',
+      }),
+      collectionLabelResolver({ getCollectionByFullPath: () => undefined })
+    );
+
+    expect(message).toContain('hello');
+    expect(message).not.toContain(' in ');
   });
 
   it('falls back to generic wording when no file is named', () => {

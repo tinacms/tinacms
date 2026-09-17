@@ -5,7 +5,10 @@ import {
   TARGET_BRANCH_EXISTS_ERROR,
   checkBranchGuard,
 } from '@toolkit/form-builder/editorial-workflow-utils';
-import { getEditorialWorkflowErrorMessage } from '@toolkit/form-builder/use-editorial-workflow';
+import {
+  collectionLabelResolver,
+  getEditorialWorkflowErrorMessage,
+} from '@toolkit/form-builder/use-editorial-workflow';
 import { useBranchData } from '@toolkit/plugin-branch-switcher';
 import { useCMS } from '@toolkit/react-core';
 import {
@@ -177,7 +180,10 @@ export const MediaWorkflowOverlay = () => {
         ...confirmState,
         branchName,
         isChecking: false,
-        errorMessage: getEditorialWorkflowErrorMessage(e),
+        errorMessage: getEditorialWorkflowErrorMessage(
+          e,
+          collectionLabelResolver(cms.api.tina.schema)
+        ),
       });
     }
   };
