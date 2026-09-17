@@ -123,8 +123,15 @@ export interface EditorialWorkflowErrorLink {
   label: string;
 }
 
+/** A run of message text, emphasised where it names something the editor must find. */
+export interface EditorialWorkflowMessagePart {
+  text: string;
+  emphasis?: boolean;
+}
+
 export interface EditorialWorkflowErrorCopy {
   message: string;
+  messageParts?: EditorialWorkflowMessagePart[];
   link?: EditorialWorkflowErrorLink;
 }
 
@@ -139,14 +146,20 @@ const indexingFailureCopy = (
   collectionLabel?: string
 ): EditorialWorkflowErrorCopy => {
   const subject = file ? `\u201c${pageNameFrom(file)}\u201d` : 'your content';
-  const location = collectionLabel ? ` in ${collectionLabel}` : '';
+  const messageParts: EditorialWorkflowMessagePart[] = [
+    { text: "We couldn't save your changes, because there's a problem with " },
+    { text: subject, emphasis: true },
+    ...(collectionLabel
+      ? [{ text: ' in ' }, { text: collectionLabel, emphasis: true }]
+      : []),
+    { text: '.\n\nFix that page, then save again.' },
+  ];
   return {
-    message:
-      `We couldn't save your changes, because there's a problem with ${subject}${location}.\n\n` +
-      'Fix that page, then save again.',
+    message: messageParts.map((part) => part.text).join(''),
+    messageParts,
     link: {
       url: EDITORIAL_WORKFLOW_EVENT_LOG_DOCS_URL,
-      label: 'What causes this?',
+      label: 'How to resolve this',
     },
   };
 };
