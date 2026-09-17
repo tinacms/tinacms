@@ -27,8 +27,9 @@ import {
 } from '../react-modals';
 import { EditorialWorkflowProgressModal } from './editorial-workflow-progress-modal';
 import {
-  checkBranchGuard,
   type EditorialWorkflowErrorLink,
+  type EditorialWorkflowMessagePart,
+  checkBranchGuard,
 } from './editorial-workflow-utils';
 import {
   SAVE_CHOICE_KEY,
@@ -67,6 +68,7 @@ export const CreateBranchModal = ({
   const {
     isExecuting,
     errorMessage,
+    errorMessageParts,
     errorLink,
     currentStep,
     elapsedTime,
@@ -164,6 +166,7 @@ export const CreateBranchModal = ({
         close();
       }}
       errorMessage={errorMessage}
+      errorMessageParts={errorMessageParts}
       errorLink={errorLink}
       disabled={normalizedBranchName === '' || isBranchGuardChecking}
       onBranchNameChange={(value) => {
@@ -239,6 +242,7 @@ export const CreateBranchPromptModal = ({
   close,
   disabled,
   errorMessage,
+  errorMessageParts,
   errorLink,
   onBranchNameChange,
   onCreateBranch,
@@ -251,6 +255,7 @@ export const CreateBranchPromptModal = ({
   close: () => void;
   disabled?: boolean;
   errorMessage?: string;
+  errorMessageParts?: EditorialWorkflowMessagePart[];
   errorLink?: EditorialWorkflowErrorLink;
   onBranchNameChange: (value: string) => void;
   onCreateBranch: (isDraft: boolean) => void;
@@ -318,7 +323,18 @@ export const CreateBranchPromptModal = ({
               <div className='flex items-start gap-1 text-red-700 py-2 px-3 mb-4 bg-red-50 border border-red-200 rounded'>
                 <CircleAlert className='w-5 h-auto text-red-400 flex-shrink-0' />
                 <span className='text-sm whitespace-pre-line'>
-                  <b>Error:</b> {errorMessage}
+                  <b>Error:</b>{' '}
+                  {errorMessageParts
+                    ? errorMessageParts.map((part, index) =>
+                        part.emphasis ? (
+                          <b key={index}>{part.text}</b>
+                        ) : (
+                          <React.Fragment key={index}>
+                            {part.text}
+                          </React.Fragment>
+                        )
+                      )
+                    : errorMessage}
                   {errorLink && (
                     <>
                       {' '}

@@ -93,7 +93,7 @@ describe('getEditorialWorkflowError', () => {
     expect(message).not.toContain('.mdx');
     expect(link).toEqual({
       url: EDITORIAL_WORKFLOW_EVENT_LOG_DOCS_URL,
-      label: 'What causes this?',
+      label: 'How to resolve this',
     });
   });
 
@@ -154,6 +154,23 @@ describe('getEditorialWorkflowError', () => {
 
     expect(message).toContain('hello');
     expect(message).not.toContain(' in ');
+  });
+
+  it('emphasises the page and collection, and keeps message in step with parts', () => {
+    const { message, messageParts } = getEditorialWorkflowError(
+      workflowError('index failed', {
+        errorCode: EDITORIAL_WORKFLOW_ERROR.INDEXING_FAILED,
+        file: 'content/posts/hello.mdx',
+      }),
+      collectionLabelResolver({
+        getCollectionByFullPath: () => ({ name: 'post', label: 'Blog Posts' }),
+      })
+    );
+
+    expect(
+      messageParts?.filter((part) => part.emphasis).map((part) => part.text)
+    ).toEqual(['\u201chello\u201d', 'Blog Posts']);
+    expect(messageParts?.map((part) => part.text).join('')).toBe(message);
   });
 
   it('falls back to generic wording when no file is named', () => {

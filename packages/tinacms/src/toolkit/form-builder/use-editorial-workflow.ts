@@ -10,6 +10,7 @@ import { useCMS } from '../react-core';
 import { EDITORIAL_WORKFLOW_STATUS } from './editorial-workflow-constants';
 import {
   type EditorialWorkflowErrorLink,
+  type EditorialWorkflowMessagePart,
   TARGET_BRANCH_EXISTS_ERROR,
   checkTargetBranchExists,
   collectionLabelResolver,
@@ -81,6 +82,7 @@ export interface ExecuteWorkflowOptions {
 export interface UseEditorialWorkflowResult {
   isExecuting: boolean;
   errorMessage: string;
+  errorMessageParts?: EditorialWorkflowMessagePart[];
   errorLink?: EditorialWorkflowErrorLink;
   currentStep: number;
   elapsedTime: number;
@@ -99,6 +101,9 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
 
   const [isExecuting, setIsExecuting] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState('');
+  const [errorMessageParts, setErrorMessageParts] = React.useState<
+    EditorialWorkflowMessagePart[] | undefined
+  >(undefined);
   const [errorLink, setErrorLink] = React.useState<
     EditorialWorkflowErrorLink | undefined
   >(undefined);
@@ -121,6 +126,7 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
 
   const reset = () => {
     setErrorMessage('');
+    setErrorMessageParts(undefined);
     setErrorLink(undefined);
     setIsExecuting(false);
     setCurrentStep(0);
@@ -247,12 +253,13 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
       return { success: true };
     } catch (e: unknown) {
       console.error(e);
-      const { message, link } = getEditorialWorkflowError(
+      const { message, messageParts, link } = getEditorialWorkflowError(
         e,
         collectionLabelResolver(cms.api.tina.schema)
       );
 
       setErrorMessage(message);
+      setErrorMessageParts(messageParts);
       setErrorLink(link);
       setIsExecuting(false);
       setCurrentStep(0);
@@ -264,6 +271,7 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
   return {
     isExecuting,
     errorMessage,
+    errorMessageParts,
     errorLink,
     currentStep,
     elapsedTime,
