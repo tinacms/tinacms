@@ -186,10 +186,9 @@ export interface FormHeaderProps {
   isLocalMode?: boolean;
   repoProvider?: {
     defaultBranchName?: string;
-    historyUrl?: (context: {
-      relativePath: string;
-      branch: string;
-    }) => { url: string };
+    historyUrl?: (context: { relativePath: string; branch: string }) => {
+      url: string;
+    };
   };
 }
 
@@ -256,10 +255,9 @@ interface RepositoryProviderProps {
   tinaBranch?: string;
   isLocalMode?: boolean;
   defaultBranchName?: string;
-  historyUrl?: (context: {
-    relativePath: string;
-    branch: string;
-  }) => { url: string };
+  historyUrl?: (context: { relativePath: string; branch: string }) => {
+    url: string;
+  };
 }
 
 export const FileHistoryProvider = ({
@@ -313,7 +311,10 @@ export const FileHistoryProvider = ({
 const BreadcrumbItemLink = ({
   breadcrumb,
   onClick,
-}: { breadcrumb: string; onClick: () => void }) => {
+}: {
+  breadcrumb: string;
+  onClick: () => void;
+}) => {
   return (
     <BreadcrumbItem className='shrink min-w-0'>
       <BreadcrumbLink
@@ -332,7 +333,10 @@ const BreadcrumbItemLink = ({
 const CollectionBreadcrumbItem = ({
   label,
   onClick,
-}: { label: string; onClick: () => void }) => {
+}: {
+  label: string;
+  onClick: () => void;
+}) => {
   return (
     <BreadcrumbItem className='shrink min-w-0'>
       <BreadcrumbLink

@@ -9,8 +9,9 @@ const Blog: Collection = {
   ui: {
     router: ({
       document,
-    }: { document: { _sys: { filename: string; breadcrumbs: string[] } } }) =>
-      `/blog/${document._sys.filename}`,
+    }: {
+      document: { _sys: { filename: string; breadcrumbs: string[] } };
+    }) => `/blog/${document._sys.filename}`,
     filename: {
       slugify: makeSlugify('blog'),
       readonly: true,
