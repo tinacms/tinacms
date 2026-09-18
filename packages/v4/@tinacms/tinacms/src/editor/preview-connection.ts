@@ -82,8 +82,12 @@ export function usePreviewConnection(
           })
           .then(repost)
           .catch((cause: unknown) => {
-            const reason =
-              cause instanceof Error ? cause.message : String(cause);
+            let reason: string;
+            if (cause instanceof Error) {
+              reason = cause.message;
+            } else {
+              reason = String(cause);
+            }
             console.warn(
               `Tina could not read "${path}" from the "${collection}" collection, so the preview keeps its path. ${reason}`
             );
