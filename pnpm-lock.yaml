@@ -1441,9 +1441,6 @@ importers:
       posthog-node:
         specifier: ^5.17.2
         version: 5.17.3
-      prettier:
-        specifier: 'catalog:'
-        version: 2.8.8
       progress:
         specifier: 'catalog:'
         version: 2.0.3

@@ -17,7 +17,6 @@ import { ConfigTemplateArgs, generateConfig } from './templates/config';
 import { databaseTemplate } from './templates/database';
 import { nextApiRouteTemplate } from './templates/tinaNextRoute';
 import { astroHelloWorldPost, helloWorldPost } from './templates/content';
-import { format } from 'prettier';
 import {
   extendAstroScripts,
   extendNextScripts,
@@ -390,13 +389,10 @@ const addConfigFile = async ({
   generatedFile: GeneratedFile;
   config: Config;
 }) => {
-  const content = format(generateConfig(configArgs), {
-    parser: 'babel',
-  });
   await writeGeneratedFile({
     overwrite: config.overwriteList?.includes('config'),
     generatedFile,
-    content,
+    content: generateConfig(configArgs),
     typescript: config.typescript,
   });
   const { exists } = generatedFile.resolve(config.typescript);
@@ -428,13 +424,10 @@ const addNextApiRoute = async ({
   config: Config;
   generatedFile: GeneratedFile;
 }) => {
-  const content = format(nextApiRouteTemplate({ config, env }), {
-    parser: 'babel',
-  });
   await writeGeneratedFile({
     generatedFile,
     overwrite: config.overwriteList?.includes('next-api-handler'),
-    content,
+    content: nextApiRouteTemplate({ config, env }),
     typescript: config.typescript,
   });
 };

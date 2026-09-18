@@ -108,17 +108,29 @@ export const askIfUsingSelfHosted = async () => {
   return answers as { hosting: 'tina-cloud' | 'self-host' };
 };
 
+// Merges and sorts imports the way Biome's organizer does, so the generated
+// file passes a formatter check as written.
 export const makeImportString = (imports?: ImportStatement[]) => {
-  if (!imports) {
-    return '';
+  const byModule = new Map<string, Set<string>>();
+  for (const { from, imported } of imports || []) {
+    if (imported.length === 0) {
+      continue;
+    }
+    const names = byModule.get(from) || new Set<string>();
+    for (const name of imported) {
+      names.add(name);
+    }
+    byModule.set(from, names);
   }
-  const filtered = imports.filter((x) => x.imported.length > 0);
-  if (filtered.length === 0) {
-    return '';
-  }
-  return filtered
-    .map((x) => {
-      return `import { ${x.imported.join(',')} } from '${x.from}'`;
+  return [...byModule.keys()]
+    .sort()
+    .map((from) => {
+      const names = [...byModule.get(from)].sort();
+      const oneLine = `import { ${names.join(', ')} } from '${from}';`;
+      if (oneLine.length <= 80) {
+        return oneLine;
+      }
+      return `import {\n${names.map((n) => `  ${n},`).join('\n')}\n} from '${from}';`;
     })
     .join('\n');
 };

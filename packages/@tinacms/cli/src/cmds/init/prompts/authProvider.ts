@@ -36,12 +36,13 @@ const supportedAuthProviders: {
       },
     ],
     extraTinaCollections: ['TinaUserCollection'],
+    // Indented for its slot in the generated API route.
     backendAuthProvider: `AuthJsBackendAuthProvider({
-          authOptions: TinaAuthJSOptions({
-            databaseClient: databaseClient,
-            secret: process.env.NEXTAUTH_SECRET,
-          }),
-        })`,
+        authOptions: TinaAuthJSOptions({
+          databaseClient: databaseClient,
+          secret: process.env.NEXTAUTH_SECRET,
+        }),
+      })`,
     backendAuthProviderImports: [
       {
         from: 'tinacms-authjs',
