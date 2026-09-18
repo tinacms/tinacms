@@ -136,7 +136,7 @@ describe('TinaCloudAuthProvider getUser', () => {
       'https://identity.example.com/v2/apps/client-id/currentUser'
     );
     expect(new Headers(init.headers).get('Authorization')).toBe(
-      `Bearer ${freshAccessToken}`
+      'Bearer id-token'
     );
   });
 
@@ -173,7 +173,7 @@ describe('TinaCloudAuthProvider getAccessToken', () => {
     expect(await buildProvider().getAccessToken()).toBeNull();
   });
 
-  it('prefers the access token', async () => {
+  it('prefers the id token when both are stored', async () => {
     const provider = buildProvider();
     provider.setToken({
       access_token: freshAccessToken,
@@ -181,18 +181,35 @@ describe('TinaCloudAuthProvider getAccessToken', () => {
       refresh_token: 'refresh',
     });
 
-    expect(await provider.getAccessToken()).toBe(freshAccessToken);
+    expect(await provider.getAccessToken()).toBe('id-token');
   });
 
-  it('falls back to the id token', async () => {
+  it('falls back to the access token when there is no id token', async () => {
     const provider = buildProvider();
     provider.getToken = async () => ({
-      access_token: null,
-      id_token: 'id-token',
+      access_token: freshAccessToken,
+      id_token: null,
       refresh_token: 'refresh',
     });
 
-    expect(await provider.getAccessToken()).toBe('id-token');
+    expect(await provider.getAccessToken()).toBe(freshAccessToken);
+  });
+
+  it('sends the id token from fetchWithToken when both are stored', async () => {
+    const provider = buildProvider();
+    provider.setToken({
+      access_token: freshAccessToken,
+      id_token: 'id-token',
+      refresh_token: 'refresh',
+    });
+    const fetchMock = stubFetch({});
+
+    await provider.fetchWithToken('https://content.example.com/x', {});
+
+    const [, init] = fetchMock.mock.calls[0];
+    expect(new Headers(init.headers).get('Authorization')).toBe(
+      'Bearer id-token'
+    );
   });
 });
 

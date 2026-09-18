@@ -1,5 +1,11 @@
 # @tinacms/mdx
 
+## 2.2.3
+
+### Patch Changes
+
+- [#7525](https://github.com/tinacms/tinacms/pull/7525) [`df35183`](https://github.com/tinacms/tinacms/commit/df351832c37fd0efaf5a06cb6cde9a5ec404201e) Thanks [@wicksipedia](https://github.com/wicksipedia)! - `sanitizeUrl` no longer returns the value it was given when `new URL()` cannot parse it. A value that still names a scheme, including one disguised with a null byte or a zero-width character, now returns an empty string. Relative URLs name no scheme and are kept as they were.
+
 ## 2.2.2
 
 ### Patch Changes

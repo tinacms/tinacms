@@ -35,6 +35,7 @@ const toV3Field = (field: FieldSchema) => ({
   required: field.required,
   isBody: field.isBody,
   ...(field.templates ? { templates: field.templates } : {}),
+  ...(field.collections ? { collections: field.collections } : {}),
 });
 
 const toV3Collection = (collection: CollectionSchema) => ({
