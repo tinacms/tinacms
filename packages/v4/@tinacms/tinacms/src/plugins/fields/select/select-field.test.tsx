@@ -16,6 +16,9 @@ import { validateField } from '../../../core/validation';
 import { FormProvider, TinaProvider } from '../../../editor';
 import { toFormId, useFormStore } from '../../../form/form-store';
 import { t } from '../../../index';
+import { required } from '../../../plugins/fields';
+import coreValidatorsPlugin from '../../../plugins/validators/core-validators.plugin';
+import { coreValidatorRegistry } from '../../../test/core-validators';
 import { LabelledFields } from '../../../test/labelled-fields';
 import selectFieldPlugin from './select-field.plugin';
 
@@ -35,7 +38,7 @@ const collection: CollectionSchema = {
     t.select({
       name: 'status',
       label: 'Status',
-      required: true,
+      validators: [required()],
       options: [
         { value: 'draft', label: 'Draft' },
         { value: 'published', label: 'Published' },
@@ -58,7 +61,7 @@ const renderField = (document?: TinaDocument) =>
   render(
     <TinaProvider
       config={asResolvedConfig({
-        plugins: [selectFieldPlugin],
+        plugins: [selectFieldPlugin, coreValidatorsPlugin],
         schema: NO_COLLECTIONS,
       })}
     >
@@ -124,8 +127,8 @@ describe('SelectField validation', () => {
   it('requires a value to be chosen', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('select');
-    expect(validateField(statusNode, descriptor, 'draft')).toEqual([]);
-    expect(validateField(statusNode, descriptor, undefined)).toEqual([
+    expect(validateFieldWithCore(statusNode, descriptor, 'draft')).toEqual([]);
+    expect(validateFieldWithCore(statusNode, descriptor, undefined)).toEqual([
       'Status is required',
     ]);
   });
@@ -133,7 +136,7 @@ describe('SelectField validation', () => {
   it('rejects a value outside the option list', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('select');
-    expect(validateField(statusNode, descriptor, 'archived')).toEqual([
+    expect(validateFieldWithCore(statusNode, descriptor, 'archived')).toEqual([
       'Status must be one of the listed options',
     ]);
   });
@@ -141,9 +144,11 @@ describe('SelectField validation', () => {
   it('passes an optional field left empty', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('select');
-    expect(validateField(priorityNode, descriptor, '')).toEqual([]);
-    expect(validateField(priorityNode, descriptor, undefined)).toEqual([]);
-    expect(validateField(priorityNode, descriptor, null)).toEqual([]);
+    expect(validateFieldWithCore(priorityNode, descriptor, '')).toEqual([]);
+    expect(validateFieldWithCore(priorityNode, descriptor, undefined)).toEqual(
+      []
+    );
+    expect(validateFieldWithCore(priorityNode, descriptor, null)).toEqual([]);
   });
 });
 
@@ -187,3 +192,14 @@ describe('SelectField metadata wrapping', () => {
     expect(descriptor?.defaultValue).toBeUndefined();
   });
 });
+
+const validateFieldWithCore: typeof validateField = (
+  node,
+  descriptor,
+  value,
+  options
+) =>
+  validateField(node, descriptor, value, {
+    validators: coreValidatorRegistry,
+    ...options,
+  });

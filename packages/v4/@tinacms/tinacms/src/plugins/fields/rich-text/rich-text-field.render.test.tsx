@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import coreValidatorsPlugin from '../../../plugins/validators/core-validators.plugin';
 // Warm the Plate editor chain at module scope. Boot dynamically imports the
 // rich-text client, and paying its transform cost inside a test's async
 // timeout flakes on contended CI runners.
@@ -45,7 +46,7 @@ const renderBody = (markdown: string) =>
   render(
     <TinaProvider
       config={asResolvedConfig({
-        plugins: [richTextFieldPlugin],
+        plugins: [richTextFieldPlugin, coreValidatorsPlugin],
         schema: NO_COLLECTIONS,
       })}
     >
@@ -72,7 +73,7 @@ describe('RichTextField rendering', () => {
     render(
       <TinaProvider
         config={asResolvedConfig({
-          plugins: [richTextFieldPlugin],
+          plugins: [richTextFieldPlugin, coreValidatorsPlugin],
           schema: NO_COLLECTIONS,
         })}
       >

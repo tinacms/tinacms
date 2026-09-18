@@ -19,30 +19,22 @@ export const select = (
 
 const labelOf = (node: SelectFieldSchema): string => node.label ?? node.name;
 
+// The shape of the value only: one of the listed options. `required` is a
+// validator the collection attaches.
 export const selectSchema = (node: FieldSchema): ZodType => {
   const field = node as SelectFieldSchema;
   const values = field.options.map((option) => option.value) as [
     string,
     ...string[],
   ];
-  const schema = z.enum(values, {
-    errorMap: (issue, ctx) => {
-      if (issue.code === 'invalid_type' && issue.received === 'undefined') {
-        return { message: `${labelOf(field)} is required` };
-      }
-      if (issue.code === 'invalid_enum_value') {
-        return {
-          message: `${labelOf(field)} must be one of the listed options`,
-        };
-      }
-      return { message: ctx.defaultError };
-    },
-  });
-  if (field.required) {
-    return schema;
-  }
   return z.preprocess(
     (value) => (value === '' || value == null ? undefined : value),
-    schema.optional()
+    z
+      .enum(values, {
+        errorMap: () => ({
+          message: `${labelOf(field)} must be one of the listed options`,
+        }),
+      })
+      .optional()
   );
 };
