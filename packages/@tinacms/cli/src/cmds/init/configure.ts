@@ -1,7 +1,6 @@
 import { GeneratedFile, InitEnvironment } from '.';
 import {
   askCommonSetUp,
-  askForestryMigrate,
   askIfUsingSelfHosted,
   askTinaCloudSetup,
   askTinaSetupPrompts,
@@ -58,7 +57,6 @@ async function configure(
     envVars: [],
     framework,
     packageManager,
-    forestryMigrate: false,
     isLocalEnvVarName: 'TINA_PUBLIC_IS_LOCAL',
     // TODO: give this a better default
     typescript: false,
@@ -82,15 +80,6 @@ async function configure(
     if (publicFolder) {
       config.publicFolder = publicFolder;
     }
-  }
-
-  if (env.forestryConfigExists) {
-    const { forestryMigrate, frontMatterFormat } = await askForestryMigrate({
-      env,
-      framework,
-    });
-    config.forestryMigrate = forestryMigrate;
-    config.frontMatterFormat = frontMatterFormat;
   }
 
   // This means we are running `tinacms init backend`
