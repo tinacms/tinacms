@@ -30,9 +30,18 @@ export type {
   CollectionSchema,
   FieldSchema,
   TinaDocument,
+  ValidatorRef,
 } from './core/schema/types';
 export { localContentPlugin } from './plugins/content/local/local-content.plugin';
-export { corePlugins, t } from './plugins/fields';
+export {
+  corePlugins,
+  max,
+  min,
+  pattern,
+  required,
+  t,
+  v,
+} from './plugins/fields';
 export type {
   BooleanFieldSchema,
   DatetimeFieldSchema,

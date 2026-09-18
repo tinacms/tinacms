@@ -43,9 +43,65 @@ replace a built-in field at a key that is already in use. Refer to
 
 ## Capabilities
 
-`Capability` has these values: `'field'`, `'content'`, `'auth'`, `'media'`, and
-`'search'`. `field` is a keyed capability. Many field plugins can operate at the
-same time, one plugin for each schema `type` such as `string` or `image`.
+`Capability` has these values: `'field'`, `'validator'`, `'content'`, `'auth'`,
+`'media'`, and `'search'`. `field` and `validator` are keyed capabilities. Many
+field plugins can operate at the same time, one plugin for each schema `type`
+such as `string` or `image`. Many validator plugins can operate at the same
+time, and one plugin can register many validators; the key is the validator's
+name.
+
+## Validator plugins
+
+A validator plugin registers named, parameterised rules that a collection
+attaches to individual fields. The manifest lists the names in `validators`,
+so `compileSchema` can check a collection without loading client code. The
+client segment holds one factory for each name. A name that the manifest lists
+without a factory, or a factory the manifest does not list, throws at boot.
+
+```ts
+// manifest
+definePlugin({
+  name: 'acme:validators',
+  provides: ['validator'],
+  validators: ['after'],
+  client: () => import('./validators.client'),
+});
+
+// validators.client.ts
+export default defineClientPlugin({
+  validators: {
+    after:
+      (other) =>
+      (value, { siblings }) =>
+        typeof value === 'string' &&
+        typeof siblings[String(other)] === 'string' &&
+        value <= siblings[String(other)]
+          ? `Must be after ${other}`
+          : null,
+  },
+});
+
+// in a collection
+t.datetime({ name: 'endDate', validators: [{ name: 'after', args: ['startDate'] }] });
+```
+
+### Names are global, so give them a prefix
+
+The registry key is the validator name alone, not the plugin name. Two plugins
+that register `after` are a conflict, and the second one throws at boot. Give
+each name a prefix that is unique to the plugin, in the same way that a plugin
+name does:
+
+```ts
+validators: ['acme.after', 'acme.matches'];
+```
+
+A first-party validator that v4 supplies uses a bare name, such as `after`.
+
+Declare `overrides: [{ capability: 'validator', key: 'after' }]` to replace a
+name on purpose.
+Refer to [Validation in two layers](./field-plugins.md#validation-in-two-layers)
+for the context a rule receives and the order the layers run in.
 
 ## More data
 

@@ -70,21 +70,23 @@ const isBlankParagraph = (node: RichTextNode): boolean => {
 const hasContent = (value: RichTextValue): boolean =>
   value.children.some((node) => !isBlankParagraph(node));
 
-export const richTextSchema = (node: FieldSchema): ZodType => {
-  const ast = z
-    .custom<RichTextValue>(
-      isRichTextValue,
-      `${labelOf(node)} must be rich text`
-    )
-    .refine((value) => !isUnparsedMarkdown(value), 'Unable to parse rich-text');
-  if (node.required) {
-    return z.preprocess(
-      (value) => value ?? { type: 'root', children: [] },
-      ast.refine(hasContent, `${labelOf(node)} is required`)
-    );
-  }
-  return z.preprocess(
+// The shape of the value only. `required` is a validator the collection
+// attaches, and it reads `isEmpty` on this field's descriptor, because an
+// empty paragraph is an empty document.
+export const richTextSchema = (node: FieldSchema): ZodType =>
+  z.preprocess(
     (value) => (value == null ? undefined : value),
-    ast.optional()
+    z
+      .custom<RichTextValue>(
+        isRichTextValue,
+        `${labelOf(node)} must be rich text`
+      )
+      .refine(
+        (value) => !isUnparsedMarkdown(value),
+        'Unable to parse rich-text'
+      )
+      .optional()
   );
-};
+
+export const isRichTextEmpty = (value: unknown): boolean =>
+  !isRichTextValue(value) || !hasContent(value);

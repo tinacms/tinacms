@@ -27,7 +27,7 @@ const collection = {
     t.select({
       name: 'status',
       label: 'Status',
-      required: true,
+      validators: [required()],
       options: [
         { value: 'draft', label: 'Draft' },
         { value: 'published', label: 'Published' },
@@ -44,6 +44,12 @@ an array of `SelectFieldOption`:
 |---|---|---|
 | `value` | `string` (required) | the value the document stores |
 | `label` | `string` | the text the trigger and the option list show; the field falls back to `value` when `label` is absent |
+
+> `required`, `min`, `max` and `pattern` are no longer config keys. They are
+> validators that a core plugin registers, and a collection attaches them with
+> `validators`. Refer to
+> [Validation in two layers](./field-plugins.md#validation-in-two-layers).
+
 
 ## The descriptor
 
@@ -76,7 +82,6 @@ custom `errorMap` tells apart the two ways a value can fail:
 
 | Config | Rule | Message |
 |---|---|---|
-| `required` | the value is `undefined` | `<label> is required` |
 | — | the value is not one of `options` | `<label> must be one of the listed options` |
 
 An optional field wraps the enum in `z.preprocess`, so `''` and `null` become

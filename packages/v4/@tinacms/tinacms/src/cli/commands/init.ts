@@ -1,3 +1,4 @@
+import { required } from '../../plugins/fields';
 // The `tinacms init` command. It writes the files that a v4 project commits (the CLI
 // rule in packages/v4/README.md): the starter tina/config.ts with the plugin
 // registration, and one document to open. It does not wrap a process, and it does not
@@ -24,7 +25,7 @@ export const postCollection = {
   path: 'content/posts',
   format: 'mdx',
   fields: [
-    t.string({ name: 'title', label: 'Title', required: true }),
+    t.string({ name: 'title', label: 'Title', validators: [required()] }),
     t.richText({ name: 'body', label: 'Body', isBody: true }),
   ],
 } satisfies CollectionSchema;

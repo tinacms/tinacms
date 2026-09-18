@@ -1,6 +1,14 @@
 import type { ClientSegment } from '../core/plugin';
 
-export type { FieldDescriptor } from '../core/field/contract';
+export type { JsonValue } from '../core/json';
+
+export type {
+  FieldDescriptor,
+  FieldValidationContext,
+  PluginValidationContext,
+  Validate,
+  ValidatorFactory,
+} from '../core/field/contract';
 export type { ClientSegment };
 export {
   createRpcClient,

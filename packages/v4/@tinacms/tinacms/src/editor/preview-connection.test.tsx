@@ -17,6 +17,7 @@ import { toFormId, useFormStore } from '../form/form-store';
 import { t } from '../index';
 import referenceFieldPlugin from '../plugins/fields/reference/reference-field.plugin';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
+import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import {
   activateMessage,
   readyMessage,
@@ -75,7 +76,7 @@ const renderConnected = (iframeRef: RefObject<HTMLIFrameElement | null>) =>
   render(
     <TinaProvider
       config={asResolvedConfig({
-        plugins: [stringFieldPlugin],
+        plugins: [stringFieldPlugin, coreValidatorsPlugin],
         schema: NO_COLLECTIONS,
       })}
     >
@@ -131,7 +132,12 @@ const renderWithReference = (
   return render(
     <TinaProvider
       config={asResolvedConfig({
-        plugins: [stringFieldPlugin, referenceFieldPlugin, contentPlugin],
+        plugins: [
+          stringFieldPlugin,
+          referenceFieldPlugin,
+          contentPlugin,
+          coreValidatorsPlugin,
+        ],
         schema: { collections: [referenceCollection, pageCollection] },
       })}
     >
@@ -283,7 +289,7 @@ describe('usePreviewConnection', () => {
     render(
       <TinaProvider
         config={asResolvedConfig({
-          plugins: [stringFieldPlugin],
+          plugins: [stringFieldPlugin, coreValidatorsPlugin],
           schema: NO_COLLECTIONS,
         })}
       >
@@ -326,7 +332,7 @@ describe('usePreviewConnection', () => {
     const tree = (documentPath: string) => (
       <TinaProvider
         config={asResolvedConfig({
-          plugins: [stringFieldPlugin],
+          plugins: [stringFieldPlugin, coreValidatorsPlugin],
           schema: NO_COLLECTIONS,
         })}
       >
