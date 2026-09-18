@@ -7,10 +7,15 @@ export interface ValidatorRef {
   args?: JsonValue[];
 }
 
+/** Whether a field carries a validator, by the name it was registered under. */
+export const hasValidator = (
+  node: { validators?: ValidatorRef[] },
+  name: string
+): boolean => (node.validators ?? []).some((ref) => ref.name === name);
+
 export interface BaseFieldSchema {
   name: string;
   label?: string;
-  required?: boolean;
   validators?: ValidatorRef[];
 }
 

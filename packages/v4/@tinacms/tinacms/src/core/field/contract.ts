@@ -35,6 +35,24 @@ export interface PluginValidationContext {
 export interface FieldValidationContext extends PluginValidationContext {
   siblings: TinaDocument;
   values: TinaDocument;
+  /**
+   * Whether the field holds no content. A field type that cannot answer this
+   * with a generic check declares `isEmpty` on its descriptor; the rich-text
+   * field does, because an empty paragraph is an empty document.
+   */
+  isEmpty: (value: unknown) => boolean;
+  /**
+   * The amount `min` and `max` compare, and the noun for their message.
+   * A string measures its length, an array its items, a number its own value.
+   * `null` means this field type has no amount to compare.
+   */
+  measure: (value: unknown) => FieldMeasure | null;
+}
+
+/** What `min` and `max` compare for a field type, and the noun for a message. */
+export interface FieldMeasure {
+  amount: number;
+  unit?: string;
 }
 
 export type Validate<TValue = unknown, TContext = PluginValidationContext> = (
@@ -63,6 +81,10 @@ export interface FieldDescriptor<TValue = unknown, TStored = unknown> {
   metadata?: FieldMetadata;
   schema?: (node: FieldSchema) => ZodType;
   validate?: Validate<TValue>;
+  /** Answers the built-in `required` validator for this field type. */
+  isEmpty?: (value: TValue) => boolean;
+  /** Answers the built-in `min` and `max` validators for this field type. */
+  measure?: (value: TValue) => FieldMeasure | null;
   parse?: (
     stored: TStored,
     node: FieldSchema,

@@ -1,5 +1,6 @@
 import type {
   FieldDescriptor,
+  FieldMeasure,
   FieldValidationContext,
   PluginValidationContext,
   ValidationScope,
@@ -11,6 +12,25 @@ import type { FieldSchema } from './schema/types';
 export interface ValidateFieldOptions extends ValidationScope {
   address?: string;
 }
+
+// What `required` means when a field type declares no `isEmpty` of its own.
+export const isEmptyValue = (value: unknown): boolean => {
+  if (value == null || value === '') return true;
+  if (Array.isArray(value)) return value.length === 0;
+  if (value instanceof Date) return false;
+  if (typeof value === 'object') return Object.keys(value).length === 0;
+  return false;
+};
+
+// What `min` and `max` compare when a field type declares no `measure`.
+export const measureValue = (value: unknown): FieldMeasure | null => {
+  if (typeof value === 'string') {
+    return { amount: value.length, unit: 'characters' };
+  }
+  if (Array.isArray(value)) return { amount: value.length, unit: 'items' };
+  if (typeof value === 'number') return { amount: value };
+  return null;
+};
 
 const flattenRuleReturnMessage = (
   result: string | string[] | null
@@ -51,6 +71,10 @@ export const validateField = (
     ...context,
     siblings: options.siblings ?? {},
     values: options.values ?? {},
+    isEmpty: (candidate) =>
+      descriptor?.isEmpty?.(candidate) ?? isEmptyValue(candidate),
+    measure: (candidate) =>
+      descriptor?.measure?.(candidate) ?? measureValue(candidate),
   };
   for (const ref of node.validators ?? []) {
     const factory = options.validators?.get(ref.name);
@@ -110,26 +134,41 @@ const hasItemFields = (
 ): node is FieldSchema & { fields: FieldSchema[] } =>
   'fields' in node && Array.isArray(node.fields);
 
-// The addresses whose rules can depend on a sibling: every field that lists
-// a validator, expanded through arrays and objects against the live values.
-
-// Returns a flat list of addresses for all fields that have validators, including nested fields. Used to combat a bug that saw React Hook Form applying errors to stale fields
+// The addresses whose rules can depend on a sibling, so the form knows what to
+// validate again when another field changes. `selfContained` names the rules
+// that read their own value alone: a field carrying only those needs no
+// refresh, because react-hook-form already refreshes the field being edited.
+//
+// Returns a flat list of addresses, including nested fields. Used to combat a
+// bug that saw react-hook-form applying errors to stale fields.
 export const addressesWithValidators = (
   fields: FieldSchema[],
   values: unknown,
+  selfContained: ReadonlySet<string> = new Set(),
   prefix = ''
 ): string[] =>
   fields.flatMap((node) => {
     const address = prefix ? `${prefix}.${node.name}` : node.name;
-    const own = node.validators?.length ? [address] : [];
+    const own = (node.validators ?? []).some(
+      (ref) => !selfContained.has(ref.name)
+    )
+      ? [address]
+      : [];
     if (!hasItemFields(node)) return own;
     const value = isPlainObject(values) ? values[node.name] : undefined;
     if (Array.isArray(value)) {
       return own.concat(
         value.flatMap((item, index) =>
-          addressesWithValidators(node.fields, item, `${address}.${index}`)
+          addressesWithValidators(
+            node.fields,
+            item,
+            selfContained,
+            `${address}.${index}`
+          )
         )
       );
     }
-    return own.concat(addressesWithValidators(node.fields, value, address));
+    return own.concat(
+      addressesWithValidators(node.fields, value, selfContained, address)
+    );
   });

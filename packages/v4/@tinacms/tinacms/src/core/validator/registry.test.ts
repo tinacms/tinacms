@@ -5,6 +5,7 @@ import {
   type ResolvedSegment,
   definePlugin,
 } from '../plugin';
+import { isEmptyValue, measureValue } from '../validation';
 import { createValidatorRegistry } from './registry';
 
 const factoryOf =
@@ -39,6 +40,8 @@ const tagOf = (
     address: 'x',
     siblings: {},
     values: {},
+    isEmpty: isEmptyValue,
+    measure: measureValue,
   });
 
 describe('createValidatorRegistry', () => {
