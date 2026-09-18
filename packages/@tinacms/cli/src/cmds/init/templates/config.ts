@@ -195,11 +195,14 @@ export const generateConfig = (args: ConfigTemplateArgs) => {
       outputFolder: "admin",
       publicFolder: "${args.publicFolder}",
     },
-    // Uncomment to allow cross-origin requests from non-localhost origins
-    // during local development (e.g. GitHub Codespaces, Gitpod, Docker).
-    // Use 'private' to allow all private-network IPs (WSL2, Docker, etc.)
+    // Uncomment when 'tinacms dev' is reached over something other than
+    // localhost (e.g. GitHub Codespaces, Gitpod, Docker, a custom local domain).
+    // 'url' is where the dev server is reachable in the browser; it is allowed
+    // automatically. 'allowedOrigins' is for the other origins that call it,
+    // typically your site. Use 'private' for all private-network IPs (WSL2, etc.)
     // server: {
-    //   allowedOrigins: ['https://your-codespace.github.dev'],
+    //   url: 'https://your-codespace-4001.app.github.dev',
+    //   allowedOrigins: ['https://your-codespace-3000.app.github.dev'],
     // },
     media: {
       tina: {

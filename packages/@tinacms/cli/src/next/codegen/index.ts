@@ -242,24 +242,19 @@ export class Codegen {
         )}. Please visit https://tina.io/docs/r/what-is-tinacloud for more information`
       );
     }
-    let localUrl = `http://localhost:${this.port}/graphql`;
-    let tinaCloudUrl = `${baseUrl}/${version}/content/${clientId}/github/${branch}`;
-
-    let apiURL: string;
-    if (this.isLocal && !this.localContentBuild) {
-      apiURL = `http://localhost:${this.port}/graphql`;
-    } else {
-      apiURL = `${baseUrl}/${version}/content/${clientId}/github/${branch}`;
-    }
-
-    if (this.configManager.config.contentApiUrlOverride) {
-      apiURL = this.configManager.config.contentApiUrlOverride;
-      localUrl = apiURL;
-      tinaCloudUrl = apiURL;
-    }
+    const overrideUrl = this.configManager.config.contentApiUrlOverride;
+    // Not `server.url`: the generated client is called by the user's own server
+    // runtime, which often cannot reach the external host. See getDevServerUrl.
+    const localUrl = overrideUrl || `http://localhost:${this.port}/graphql`;
+    const tinaCloudUrl =
+      overrideUrl ||
+      `${baseUrl}/${version}/content/${clientId}/github/${branch}`;
+    const apiURL =
+      this.isLocal && !this.localContentBuild ? localUrl : tinaCloudUrl;
     const localBuildUrl = this.port
       ? `http://localhost:${this.port}/graphql`
       : undefined;
+
     return { apiURL, localUrl, tinaCloudUrl, localBuildUrl };
   }
 
