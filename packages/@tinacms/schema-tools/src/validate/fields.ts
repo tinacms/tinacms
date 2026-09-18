@@ -149,7 +149,9 @@ export const TinaFieldZod: z.ZodType<TinaFieldType> = z.lazy(() => {
     .object({
       label: z.string().optional(),
       name,
-      fields: z.array(TinaFieldZod),
+      fields: z
+        .array(TinaFieldZod)
+        .min(1, 'Property `fields` cannot be empty.'),
       match: z
         .object({
           start: z.string(),
