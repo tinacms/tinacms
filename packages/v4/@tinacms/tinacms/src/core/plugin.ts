@@ -60,6 +60,11 @@ export type ClientSlice = (
 
 export interface ClientSegment {
   field?: FieldDescriptor;
+  /**
+   * One `ValidatorFactory` for each name the manifest declares in
+   * `validators`. A name the manifest does not declare, or a declared name
+   * with no factory here, throws at boot.
+   */
   validators?: Record<string, ValidatorFactory>;
   slice?: ClientSlice;
   screens?: AdminScreen[];
@@ -111,8 +116,16 @@ export interface PluginManifestInput {
   provides?: Capability[];
   dependsOn?: Capability[];
   field?: FieldProvision;
-  // The names this plugin registers. Listed on the manifest so the build can
-  // check a collection's `validators` without loading client code.
+  /**
+   * The validator names this plugin registers, as plain strings. They live on
+   * the manifest so `compileSchema` can check a collection's `validators`
+   * without loading client code; the factories themselves live on the client
+   * segment, under the same names.
+   *
+   * A name is the registry key, so it is global: two plugins registering
+   * `after` conflict at boot. Give a third-party name a prefix
+   * (`acme.after`); a name v4 supplies stays bare (`required`).
+   */
   validators?: string[];
   client?: () => Promise<{ default: ClientSegment }>;
   server?: () => Promise<{ default: ServerSegment }>;

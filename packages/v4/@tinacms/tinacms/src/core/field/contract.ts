@@ -30,8 +30,10 @@ export interface PluginValidationContext {
   address: string;
 }
 
-// A field-level validator sits in a collection, so it also sees the fields
-// around it. `siblings` is the object the field sits in, not the document root.
+/**
+ * What a validator a collection attaches receives. A field-level rule sits in
+ * a collection, so it also sees the fields around it.
+ */
 export interface FieldValidationContext extends PluginValidationContext {
   siblings: TinaDocument;
   values: TinaDocument;
@@ -55,17 +57,32 @@ export interface FieldMeasure {
   unit?: string;
 }
 
+/**
+ * One validation rule. Return `null` when the value passes, or the message to
+ * show under the field. Return an array to report more than one problem.
+ *
+ * `TContext` is `PluginValidationContext` for a rule a field plugin owns, and
+ * `FieldValidationContext` for a validator a collection attaches, which also
+ * sees the fields around it.
+ */
 export type Validate<TValue = unknown, TContext = PluginValidationContext> = (
   value: TValue,
   context: TContext
 ) => string | string[] | null;
 
-// A validator takes its parameters from the collection (`{ name, args }` on
-// the field) and returns the rule. It never hard-codes a sibling name.
+/**
+ * Builds a rule from the arguments a collection supplied. A factory is called
+ * once per validation pass with the `args` of the field's `{ name, args }`
+ * entry, and returns the `Validate` that then runs against the value, the way
+ * `z.string().min(5)` takes `5` and gives back a check.
+ *
+ * Take every parameter through `args`; never hard-code a sibling name.
+ */
 export type ValidatorFactory = (
   ...args: JsonValue[]
 ) => Validate<unknown, FieldValidationContext>;
 
+/** Every registered factory, keyed by the name a plugin declared it under. */
 export type ValidatorRegistry = ReadonlyMap<string, ValidatorFactory>;
 
 // What travels down a validation pass beside the field registry.
