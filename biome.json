@@ -19,11 +19,27 @@
     ],
     "maxSize": 3145728
   },
-  "css": {
-    "parser": {
-      "tailwindDirectives": true
+  "plugins": [
+    {
+      "path": "./scripts/biome/error-narrowing.grit",
+      "includes": [
+        "**/packages/v4/**",
+        "!**/packages/v4/@tinacms/rich-text/src/plate/components/plate-ui/**",
+        "!**/packages/v4/@tinacms/ui/src/components/**",
+        "**/packages/v4/@tinacms/ui/src/components/field-wrapper.tsx"
+      ]
+    },
+    {
+      "path": "./scripts/biome/conditional-jsx.grit",
+      "includes": [
+        "**/packages/v4/**/*.tsx",
+        "!**/packages/v4/@tinacms/rich-text/src/plate/components/plate-ui/**",
+        "!**/packages/v4/@tinacms/ui/src/components/**",
+        "**/packages/v4/@tinacms/ui/src/components/field-wrapper.tsx"
+      ]
     }
-  },
+  ],
+  "css": { "parser": { "tailwindDirectives": true } },
   "formatter": {
     "enabled": true,
     "useEditorconfig": true,
@@ -62,13 +78,7 @@
       "!**/_response.md"
     ]
   },
-  "assist": {
-    "actions": {
-      "source": {
-        "organizeImports": "on"
-      }
-    }
-  },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "linter": {
     "enabled": true,
     "rules": {
@@ -125,25 +135,13 @@
   },
   "overrides": [
     {
-      "includes": [
-        "**/tsconfig.*.json"
-      ],
-      "json": {
-        "parser": {
-          "allowComments": true
-        }
-      }
+      "includes": ["**/tsconfig.*.json"],
+      "json": { "parser": { "allowComments": true } }
     },
     {
-      "includes": [
-        "**/examples/astro/visual-editing/**/*.css"
-      ],
-      "linter": {
-        "enabled": false
-      },
-      "formatter": {
-        "enabled": false
-      }
+      "includes": ["**/examples/astro/visual-editing/**/*.css"],
+      "linter": { "enabled": false },
+      "formatter": { "enabled": false }
     },
     {
       "includes": [
@@ -160,12 +158,7 @@
       }
     },
     {
-      "includes": [
-        "**/*.ts",
-        "**/*.tsx",
-        "**/*.mts",
-        "**/*.cts"
-      ],
+      "includes": ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
       "linter": {
         "rules": {
           "correctness": {

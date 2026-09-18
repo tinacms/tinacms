@@ -1,0 +1,16 @@
+engine biome(1.0)
+language js(typescript, jsx)
+
+`$left && $right` as $expression where {
+  $right <: or {
+    JsxTagExpression(),
+    JsParenthesizedExpression(expression = or {
+      JsxTagExpression(),
+      JsParenthesizedExpression(expression = JsxTagExpression())
+    })
+  },
+  register_diagnostic(
+    span = $expression,
+    message = "Render a conditional element with a ternary and an explicit `null`, not `&&` (packages/v4/AGENTS.md: \"Don't use `&&` for conditional rendering\")."
+  )
+}
