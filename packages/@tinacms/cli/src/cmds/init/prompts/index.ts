@@ -1,19 +1,14 @@
 import prompts from 'prompts';
 import type { PromptObject } from 'prompts';
-import { Framework, InitEnvironment } from '../';
+import { Framework } from '../';
 import { linkText, logText } from '../../../utils/theme';
 import { Config, ImportStatement } from './types';
-import { ContentFrontmatterFormat } from '@tinacms/schema-tools';
 
 export * from './askTinaCloudSetup';
 export * from './types';
 export * from './gitProvider';
 export * from './databaseAdapter';
 export * from './authProvider';
-
-const forestryDisclaimer = logText(
-  `Note: This migration will update some of your content to match tina.  Please save a backup of your content before doing this migration. (This can be done with git)`
-);
 
 // Asks the user for the framework and package manager they are using
 export const askCommonSetUp = async () => {
@@ -56,47 +51,6 @@ export const askCommonSetUp = async () => {
     packageManager: 'pnpm' | 'yarn' | 'npm' | 'bun';
   };
 };
-export const askForestryMigrate = async ({
-  framework,
-  env,
-}: {
-  framework: Framework;
-  env: InitEnvironment;
-}) => {
-  const questions: PromptObject[] = [
-    {
-      name: 'forestryMigrate',
-      type: 'confirm',
-      initial: true,
-      message: `Would you like to migrate your Forestry templates?\n${forestryDisclaimer}`,
-    },
-  ];
-  if (framework.name === 'hugo') {
-    questions.push({
-      name: 'frontMatterFormat',
-      type: (_, answers) => {
-        if (answers.forestryMigrate) {
-          if (env.frontMatterFormat && env.frontMatterFormat[1]) {
-            return null;
-          }
-          return 'select';
-        }
-      },
-      choices: [
-        { title: 'yaml', value: 'yaml' },
-        { title: 'toml', value: 'toml' },
-        { title: 'json', value: 'json' },
-      ],
-      message: `What format are you using in your frontmatter?`,
-    });
-  }
-  const answers = await prompts(questions);
-  return answers as {
-    forestryMigrate: boolean;
-    frontMatterFormat?: ContentFrontmatterFormat;
-  };
-};
-
 export const askTinaSetupPrompts = async (params: {
   frameworkName: string;
   config: Config;

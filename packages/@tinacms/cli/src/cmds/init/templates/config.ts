@@ -1,21 +1,12 @@
 import { Config, makeImportString } from '../prompts';
 
 export type ConfigTemplateArgs = {
-  extraText?: string;
   publicFolder: string;
-  collections?: string;
   isLocalEnvVarName?: string;
   config: Config;
-  isForestryMigration?: boolean;
   selfHosted?: boolean;
 };
 
-const clientConfig = (isForestryMigration?: boolean) => {
-  if (isForestryMigration) {
-    return 'client: {skip: true},';
-  }
-  return '';
-};
 const baseFields = `[
   {
     type: 'string',
@@ -74,9 +65,6 @@ const astroHeroFields = `[
 ]`;
 
 const generateCollectionString = (args: ConfigTemplateArgs) => {
-  if (args.collections) {
-    return args.collections;
-  }
   let extraTinaCollections =
     args.config.authProvider?.extraTinaCollections?.join(',\n');
 
@@ -150,7 +138,6 @@ export const generateConfig = (args: ConfigTemplateArgs) => {
   return `
   import { defineConfig } from "tinacms";
   ${extraImports}
-  ${args.extraText || ''}
   
   // Your hosting provider likely exposes this as an environment variable
   const branch = process.env.GITHUB_BRANCH ||
@@ -190,7 +177,6 @@ export const generateConfig = (args: ConfigTemplateArgs) => {
         : ''
     }
 
-    ${clientConfig(args.isForestryMigration)}
     build: {
       outputFolder: "admin",
       publicFolder: "${args.publicFolder}",

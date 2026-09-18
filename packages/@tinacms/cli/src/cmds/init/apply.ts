@@ -1,6 +1,4 @@
 import path from 'path';
-import { generateCollections } from '../forestry-migrate';
-import { addVariablesToCode } from '../forestry-migrate/util/codeTransformer';
 import { logger } from '../../logger';
 import {
   cmdText,
@@ -39,7 +37,6 @@ import {
 } from './index';
 import { Config } from './prompts';
 import { addSelfHostedTinaAuthToConfig } from './codegen';
-import { ContentFrontmatterFormat } from '@tinacms/schema-tools';
 import { exec } from 'child_process';
 
 async function apply({
@@ -62,33 +59,11 @@ async function apply({
     );
     return;
   }
-  const { pathToForestryConfig, noTelemetry, baseDir = '' } = params;
-  let collections: string | null | undefined;
-  let templateCode: string | null | undefined;
-  let extraText: string | null | undefined;
-
-  let isForestryMigration = false;
-  if (env.forestryConfigExists) {
-    // CollectionsString is the string that will be added to the tina config
-    // importStatements are the import statements that will be added to the tina config
-    // templateCodeString is the string that will be added to the template.{ts,js} file
-    const res = await forestryMigrate({
-      frontMatterFormat: env.frontMatterFormat || config.frontMatterFormat,
-      pathToForestryConfig,
-      usingTypescript: config.typescript,
-    });
-    if (res) {
-      templateCode = res.templateCodeString;
-      collections = res.collectionString;
-      extraText = res.importStatements;
-      isForestryMigration = true;
-    }
-  }
+  const { noTelemetry, baseDir = '' } = params;
 
   // Report telemetry
   await reportTelemetry({
     usingTypescript: config.typescript,
-    hasForestryConfig: env.forestryConfigExists,
     noTelemetry: noTelemetry,
   });
 
@@ -119,14 +94,6 @@ async function apply({
     }
   }
 
-  // if we are migrating forestry files add the tina/template file
-  if (isForestryMigration && !env.tinaConfigExists) {
-    await addTemplateFile({
-      generatedFile: env.generatedFiles['templates'],
-      content: templateCode,
-      config,
-    });
-  }
   const usingDataLayer = config.hosting === 'self-host';
 
   if (usingDataLayer) {
@@ -166,7 +133,7 @@ async function apply({
   }
 
   // add NextJS Demo file (First time init only)
-  if (!env.forestryConfigExists && !env.tinaConfigExists) {
+  if (!env.tinaConfigExists) {
     // add /content/posts/hello-world.md
     await addContentFile({ config, env });
   }
@@ -189,11 +156,7 @@ async function apply({
   // Wire the Astro dev/build scripts + scaffold the visual-editing demo
   // (first-time init only)
   let astroSetup: AstroSetupResult | null = null;
-  if (
-    config.framework.name === 'astro' &&
-    !env.tinaConfigExists &&
-    !env.forestryConfigExists
-  ) {
+  if (config.framework.name === 'astro' && !env.tinaConfigExists) {
     await updateAstroPackageJson({ baseDir });
     astroSetup = setupAstroVisualEditing({ baseDir });
   }
@@ -205,14 +168,8 @@ async function apply({
     await addConfigFile({
       configArgs: {
         config,
-        publicFolder: path.join(
-          path.relative(process.cwd(), pathToForestryConfig),
-          config.publicFolder
-        ),
-        collections,
-        extraText,
+        publicFolder: config.publicFolder,
         isLocalEnvVarName: config.isLocalEnvVarName,
-        isForestryMigration,
         selfHosted: usingDataLayer,
       },
       baseDir,
@@ -248,44 +205,12 @@ async function apply({
   }
 }
 
-const forestryMigrate = async ({
-  pathToForestryConfig,
-  usingTypescript,
-  frontMatterFormat,
-}: {
-  usingTypescript: boolean;
-  pathToForestryConfig: string;
-  frontMatterFormat: ContentFrontmatterFormat;
-}) => {
-  const { collections, importStatements, templateCode } =
-    await generateCollections({
-      pathToForestryConfig,
-      usingTypescript,
-      frontMatterFormat,
-    });
-
-  // print errors
-  // This error is handled now so we do not need to print it
-  // ErrorSingleton.getInstance().printCollectionNameErrors()
-  const JSONString = JSON.stringify(collections, null, 2);
-
-  const { code } = addVariablesToCode(JSONString);
-
-  return {
-    collectionString: code,
-    importStatements,
-    templateCodeString: templateCode,
-  };
-};
-
 const reportTelemetry = async ({
-  hasForestryConfig,
   noTelemetry,
   usingTypescript,
 }: {
   usingTypescript: boolean;
   noTelemetry: boolean;
-  hasForestryConfig: boolean;
 }) => {
   if (noTelemetry) {
     logger.info(logText('Telemetry disabled'));
@@ -296,7 +221,6 @@ const reportTelemetry = async ({
     event: {
       name: 'tinacms:cli:init:invoke',
       schemaFileType,
-      hasForestryConfig,
     },
   });
 };
@@ -515,7 +439,6 @@ const addNextApiRoute = async ({
   });
 };
 
-// Adds tina/template.{ts,js} file
 export const addTemplateFile = async ({
   content,
   generatedFile,
