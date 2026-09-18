@@ -1,5 +1,7 @@
 import type { ClientSegment } from '../core/plugin';
 
+export type { JsonValue } from '../core/json';
+
 export type {
   FieldDescriptor,
   FieldValidationContext,

@@ -27,7 +27,7 @@ export const validateField = (
 ): string[] => {
   const errors: string[] = [];
 
-  // declarative validation via the schema (i.e min, max, required) 
+  // declarative validation via the schema (i.e min, max, required)
   const schema = descriptor?.schema?.(node);
   if (schema) {
     const result = schema.safeParse(value);
@@ -36,7 +36,7 @@ export const validateField = (
     }
   }
 
-  // imperative validation via the `validate` function on a field plugin 
+  // imperative validation via the `validate` function on a field plugin
   const context: PluginValidationContext = {
     node,
     address: options.address ?? node.name,
@@ -47,7 +47,6 @@ export const validateField = (
     );
   }
   // custom validation via the `validators` listed on the field
-  // TODO - see if we can merge level 1 validators into out-of-the box level 3 validators (update docs, makes it so we only have 2 diff types)
   const fieldContext: FieldValidationContext = {
     ...context,
     siblings: options.siblings ?? {},

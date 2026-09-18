@@ -39,6 +39,7 @@ export const postCollection = {
           // A sibling rule: `siblings` is this author, not the document root.
           validators: [
             differentFrom('name', 'Alias must differ from the name'),
+            min(<num>, '')
           ],
         }),
       ],

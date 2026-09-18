@@ -20,6 +20,13 @@ export interface FieldTransformContext {
 
 export interface PluginValidationContext {
   node: FieldSchema;
+  /**
+   * Where this field instance sits in the document, as a dotted path from the
+   * form root: `title`, or `authors.1.alias` for a field inside an array item.
+   * The same schema node validates at many addresses, one for each item, so a
+   * rule reads this to know which instance it has. The form also keys its
+   * errors by address, so a message returned here lands under this field.
+   */
   address: string;
 }
 

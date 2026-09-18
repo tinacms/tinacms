@@ -85,8 +85,21 @@ export default defineClientPlugin({
 t.datetime({ name: 'endDate', validators: [{ name: 'after', args: ['startDate'] }] });
 ```
 
-Two plugins that register the same name are a conflict. Declare
-`overrides: [{ capability: 'validator', key: 'after' }]` to replace one.
+### Names are global, so give them a prefix
+
+The registry key is the validator name alone, not the plugin name. Two plugins
+that register `after` are a conflict, and the second one throws at boot. Give
+each name a prefix that is unique to the plugin, in the same way that a plugin
+name does:
+
+```ts
+validators: ['acme.after', 'acme.matches'];
+```
+
+A first-party validator that v4 supplies uses a bare name, such as `after`.
+
+Declare `overrides: [{ capability: 'validator', key: 'after' }]` to replace a
+name on purpose.
 Refer to [Validation in three layers](./field-plugins.md#validation-in-three-layers)
 for the context a rule receives and the order the layers run in.
 
