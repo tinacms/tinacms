@@ -1,21 +1,21 @@
-import { Config, makeImportString } from '../prompts';
+import {
+  type Config,
+  type ImportStatement,
+  makeImportString,
+} from '../prompts';
 
 export type ConfigTemplateArgs = {
-  extraText?: string;
   publicFolder: string;
-  collections?: string;
   isLocalEnvVarName?: string;
   config: Config;
-  isForestryMigration?: boolean;
   selfHosted?: boolean;
 };
 
-const clientConfig = (isForestryMigration?: boolean) => {
-  if (isForestryMigration) {
-    return 'client: {skip: true},';
-  }
-  return '';
-};
+// Indents every line after the first, so a fragment written at column 0 can
+// be spliced in after a `key: ` prefix at any depth.
+const indent = (text: string, depth: number) =>
+  text.split('\n').join(`\n${' '.repeat(depth)}`);
+
 const baseFields = `[
   {
     type: 'string',
@@ -73,144 +73,119 @@ const astroHeroFields = `[
   },
 ]`;
 
+const nextRouter = `
+  ui: {
+    // This is an DEMO router. You can remove this to fit your site
+    router: ({ document }) => \`/demo/blog/\${document._sys.filename}\`,
+  },`;
+
+const astroRouter = `
+  ui: {
+    // Opens the /tinacms-demo page for visual editing. Change or remove to fit your site.
+    router: () => '/tinacms-demo',
+  },`;
+
+const postCollection = (fields: string, ui = '') => `{
+  name: 'post',
+  label: 'Posts',
+  path: 'content/posts',
+  fields: ${indent(fields, 2)},${ui}
+}`;
+
 const generateCollectionString = (args: ConfigTemplateArgs) => {
-  if (args.collections) {
-    return args.collections;
-  }
-  let extraTinaCollections =
-    args.config.authProvider?.extraTinaCollections?.join(',\n');
-
-  if (extraTinaCollections) {
-    extraTinaCollections = extraTinaCollections + ',';
-  }
-
-  const baseCollections = `[
-    ${extraTinaCollections || ''}
-    {
-      name: 'post',
-      label: 'Posts',
-      path: 'content/posts',
-      fields: ${baseFields},
-    },
-  ]`;
-  const nextExampleCollection = `[
-    ${extraTinaCollections || ''}
-    {
-      name: 'post',
-      label: 'Posts',
-      path: 'content/posts',
-      fields: ${baseFields},
-      ui: {
-        // This is an DEMO router. You can remove this to fit your site
-        router: ({ document }) => \`/demo/blog/\${document._sys.filename}\`,
-      },
-    },
-  ]`;
-  const astroExampleCollection = `[
-    ${extraTinaCollections || ''}
-    {
-      name: 'post',
-      label: 'Posts',
-      path: 'content/posts',
-      fields: ${astroHeroFields},
-      ui: {
-        // Opens the /tinacms-demo page for visual editing. Change or remove to fit your site.
-        router: () => '/tinacms-demo',
-      },
-    },
-  ]`;
+  let post = postCollection(baseFields);
   if (args.config?.framework?.name === 'next') {
-    return nextExampleCollection;
+    post = postCollection(baseFields, nextRouter);
   }
   if (args.config?.framework?.name === 'astro') {
-    return astroExampleCollection;
+    post = postCollection(astroHeroFields, astroRouter);
   }
-  return baseCollections;
+  const collections = [
+    ...(args.config.authProvider?.extraTinaCollections || []),
+    post,
+  ];
+  return `[\n${collections.map((c) => `  ${indent(c, 2)},`).join('\n')}\n]`;
 };
 
 export const generateConfig = (args: ConfigTemplateArgs) => {
   const isUsingTinaCloud =
     !args.selfHosted || args.config.authProvider?.name === 'tina-cloud';
 
-  let extraImports = '';
+  const imports: ImportStatement[] = [
+    { from: 'tinacms', imported: ['defineConfig'], packageName: 'tinacms' },
+  ];
   if (args.selfHosted) {
-    // add imports for auth provider
-    if (args.config.authProvider) {
-      extraImports =
-        extraImports +
-        makeImportString(args.config.authProvider?.configImports);
-    }
-    // if wer are not using TinaCloud, we need to import the local auth provider
+    imports.push(...(args.config.authProvider?.configImports || []));
     if (!isUsingTinaCloud) {
-      extraImports =
-        extraImports + `\nimport { LocalAuthProvider } from "tinacms";`;
+      imports.push({
+        from: 'tinacms',
+        imported: ['LocalAuthProvider'],
+        packageName: 'tinacms',
+      });
     }
   }
 
-  return `
-  import { defineConfig } from "tinacms";
-  ${extraImports}
-  ${args.extraText || ''}
-  
-  // Your hosting provider likely exposes this as an environment variable
-  const branch = process.env.GITHUB_BRANCH ||
-    process.env.VERCEL_GIT_COMMIT_REF ||
-    process.env.HEAD ||
-    "main"
-  ${
-    (args.isLocalEnvVarName &&
-      args.selfHosted &&
-      `const isLocal = process.env.${args.isLocalEnvVarName} === 'true'`) ||
-    ''
+  const declarations = [
+    '// Your hosting provider likely exposes this as an environment variable',
+    'const branch =',
+    '  process.env.GITHUB_BRANCH ||',
+    '  process.env.VERCEL_GIT_COMMIT_REF ||',
+    '  process.env.HEAD ||',
+    "  'main';",
+  ];
+  if (args.selfHosted && args.isLocalEnvVarName) {
+    declarations.push(
+      `const isLocal = process.env.${args.isLocalEnvVarName} === 'true';`
+    );
   }
-  export default defineConfig({
-    ${
-      args.selfHosted && !isUsingTinaCloud
-        ? `contentApiUrlOverride: "/api/tina/gql",`
-        : ''
-    }
-    branch,
-    ${
-      args.selfHosted && !isUsingTinaCloud
-        ? `authProvider: isLocal
-    ? new LocalAuthProvider()
-    :${args.config?.authProvider.configAuthProviderClass},`
-        : ''
-    }
-    ${
-      isUsingTinaCloud
-        ? `// Get this from tina.io
-        clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID,`
-        : ''
-    }
-    ${
-      isUsingTinaCloud
-        ? `// Get this from tina.io
-    token: process.env.TINA_TOKEN,`
-        : ''
-    }
 
-    ${clientConfig(args.isForestryMigration)}
-    build: {
-      outputFolder: "admin",
-      publicFolder: "${args.publicFolder}",
+  const options: string[] = [];
+  if (args.selfHosted && !isUsingTinaCloud) {
+    options.push("contentApiUrlOverride: '/api/tina/gql',");
+  }
+  options.push('branch,');
+  if (args.selfHosted && !isUsingTinaCloud) {
+    options.push(
+      'authProvider: isLocal',
+      '  ? new LocalAuthProvider()',
+      `  : ${args.config?.authProvider.configAuthProviderClass},`
+    );
+  }
+  if (isUsingTinaCloud) {
+    options.push(
+      '// Get this from tina.io',
+      'clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID,',
+      '// Get this from tina.io',
+      'token: process.env.TINA_TOKEN,'
+    );
+  }
+
+  return `${makeImportString(imports)}
+
+${declarations.join('\n')}
+
+export default defineConfig({
+${options.map((line) => `  ${line}`).join('\n')}
+  build: {
+    outputFolder: 'admin',
+    publicFolder: '${args.publicFolder}',
+  },
+  // Uncomment to allow cross-origin requests from non-localhost origins
+  // during local development (e.g. GitHub Codespaces, Gitpod, Docker).
+  // Use 'private' to allow all private-network IPs (WSL2, Docker, etc.)
+  // server: {
+  //   allowedOrigins: ['https://your-codespace.github.dev'],
+  // },
+  media: {
+    tina: {
+      mediaRoot: '',
+      publicFolder: '${args.publicFolder}',
     },
-    // Uncomment to allow cross-origin requests from non-localhost origins
-    // during local development (e.g. GitHub Codespaces, Gitpod, Docker).
-    // Use 'private' to allow all private-network IPs (WSL2, Docker, etc.)
-    // server: {
-    //   allowedOrigins: ['https://your-codespace.github.dev'],
-    // },
-    media: {
-      tina: {
-        mediaRoot: "",
-        publicFolder: "${args.publicFolder}",
-      },
-    },
-    // See docs on content modeling for more info on how to setup new content models: https://tina.io/docs/r/content-modelling-collections/
-    schema: {
-      collections: ${generateCollectionString(args)},
-    },
-  });  
+  },
+  // See docs on content modeling for more info on how to setup new content models: https://tina.io/docs/r/content-modelling-collections/
+  schema: {
+    collections: ${indent(generateCollectionString(args), 4)},
+  },
+});
 `;
 };
