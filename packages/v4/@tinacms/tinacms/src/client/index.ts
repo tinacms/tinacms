@@ -9,6 +9,7 @@ export type {
   Validate,
   ValidatorFactory,
 } from '../core/field/contract';
+export type { FieldEdit, FormHookScope, FormHooks } from '../core/form/hooks';
 export type { ClientSegment };
 export {
   createRpcClient,

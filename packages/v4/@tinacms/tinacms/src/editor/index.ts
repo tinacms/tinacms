@@ -55,6 +55,7 @@ export {
   useFieldSchema,
   useFieldValue,
   useFormId,
+  useFormHooks,
   useFormSave,
   useFormSeedKey,
   useTinaStore,
