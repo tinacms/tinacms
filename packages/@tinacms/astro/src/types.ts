@@ -144,6 +144,24 @@ export type TinaRichTextContent =
   | undefined;
 
 /**
+ * The type `@tinacms/cli` generates for a rich-text field. It is the same AST
+ * as `TinaRichTextContent`, but each `type` is a `string`, not a literal.
+ * Keep in sync with `TinaMarkdownContent` in `tinacms`.
+ */
+type GeneratedRichTextContent = {
+  type: string;
+  children: GeneratedRichTextContent[];
+};
+
+export interface TinaMarkdownProps {
+  content:
+    | TinaRichTextContent
+    | GeneratedRichTextContent
+    | GeneratedRichTextContent[];
+  components?: CustomComponentsMap;
+}
+
+/**
  * An Astro (or framework) component that accepts props `P`. Astro's language
  * server types an imported `.astro` component as `(props: Props) => any`, so
  * this both accepts such a component and checks that its `Props` match what
