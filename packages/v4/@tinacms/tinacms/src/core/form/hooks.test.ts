@@ -130,4 +130,28 @@ describe('runAfterEdit', () => {
     runAfterEdit([{ afterEdit: seen }, {}], edit, scope);
     expect(seen).toHaveBeenCalledWith(edit, scope);
   });
+
+  it('logs a throwing hook and still calls the next one', () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const later = vi.fn();
+    const edit = { address: toFieldAddress('title'), value: 'x' };
+    runAfterEdit(
+      [
+        {
+          afterEdit: () => {
+            throw new Error('observer broke');
+          },
+        },
+        { afterEdit: later },
+      ],
+      edit,
+      scope
+    );
+    expect(later).toHaveBeenCalledWith(edit, scope);
+    expect(error).toHaveBeenCalledWith(
+      '[tinacms] afterEdit hook failed:',
+      expect.objectContaining({ message: 'observer broke' })
+    );
+    error.mockRestore();
+  });
 });

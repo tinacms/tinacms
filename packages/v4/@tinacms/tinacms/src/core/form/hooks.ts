@@ -67,5 +67,11 @@ export const runAfterEdit = (
   edit: FieldEdit,
   scope: FormHookScope
 ): void => {
-  for (const hook of hooks) hook.afterEdit?.(edit, scope);
+  for (const hook of hooks) {
+    try {
+      hook.afterEdit?.(edit, scope);
+    } catch (cause) {
+      console.error('[tinacms] afterEdit hook failed:', cause);
+    }
+  }
 };
