@@ -77,8 +77,10 @@ calls `validateFieldTree(node, descriptor, value, address, registry, scope)`
 That function calls `validateField(node, descriptor, value, { ...scope,
 address })`, which runs the Zod schema of the descriptor, `schema(node)`, then
 the optional plugin-level `validate(value, context)`, then each field-level
-validator the node lists. It joins the three sets of messages under `address`.
-Refer to [Validation in three layers](./field-plugins.md#validation-in-three-layers).
+validator the node lists. It joins the sets of messages under `address`.
+`schema(node)` gives the shape of the value and its coercion, not the rules:
+`required`, `min`, `max` and `pattern` are validators a core plugin registers.
+Refer to [Validation in two layers](./field-plugins.md#validation-in-two-layers).
 
 Then, if the descriptor is a compound field, `validateFieldTree` calls its
 optional `validateChildren(value, node, address, registry, scope)` function —

@@ -11,8 +11,10 @@
           {
             "name": "title",
             "label": "Title",
-            "required": true,
             "validators": [
+              {
+                "name": "required"
+              },
               {
                 "name": "matches",
                 "args": [
@@ -95,7 +97,11 @@
               {
                 "name": "title",
                 "label": "Title",
-                "required": true,
+                "validators": [
+                  {
+                    "name": "required"
+                  }
+                ],
                 "type": "string"
               },
               {
@@ -117,7 +123,11 @@
           {
             "name": "title",
             "label": "Title",
-            "required": true,
+            "validators": [
+              {
+                "name": "required"
+              }
+            ],
             "type": "string"
           },
           {

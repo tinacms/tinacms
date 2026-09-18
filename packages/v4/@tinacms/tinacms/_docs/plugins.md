@@ -100,7 +100,7 @@ A first-party validator that v4 supplies uses a bare name, such as `after`.
 
 Declare `overrides: [{ capability: 'validator', key: 'after' }]` to replace a
 name on purpose.
-Refer to [Validation in three layers](./field-plugins.md#validation-in-three-layers)
+Refer to [Validation in two layers](./field-plugins.md#validation-in-two-layers)
 for the context a rule receives and the order the layers run in.
 
 ## More data

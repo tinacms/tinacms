@@ -116,7 +116,11 @@ The properties of the descriptor:
 - `metadata.labelable` — Set it to `false` to hide the outer field label. The
   `rich-text` field sets it to `false` because it renders its own label area.
 - `schema(node)` — It returns a Zod schema for the validation in layer 1.
-- `validate(value, context)` — A custom check for layer 2. It returns one
+- `isEmpty(value)` — What the built-in `required` validator asks of this field
+  type. Declare it when the generic check is wrong.
+- `measure(value)` — What the built-in `min` and `max` validators compare, as
+  `{ amount, unit? }`. Declare it when the generic measure is wrong.
+- `validate(value, context)` — A custom check for layer 1. It returns one
   message, a list of messages, or `null`. `context` is
   `{ node, address }`: the field's own schema node and its current address.
 - `parse` and `serialize` — Optional conversions between the stored value and
@@ -194,39 +198,64 @@ Hooks:
 | `useFieldErrors(address)` | Gives every validation message at `address` or under it |
 | `useFieldActivation(handler)` | Runs `handler` when this field becomes the active field, for visual editing |
 
-## Validation in three layers
+## Validation in two layers
 
 The form resolver (`editor/resolver.ts`) calls `validateField`
-(`core/validation.ts`). `validateField` runs the three layers in order and
-joins their messages. The spec is
+(`core/validation.ts`). `validateField` runs the two layers in order and joins
+their messages. The spec is
 [tinacmsv4-docs › field-plugins › Validation](https://github.com/tinacms/tinacmsv4-docs/blob/main/plugins/field-plugins.md#validation).
 
-1. **Zod** — `descriptor.schema(node).safeParse(value)`. This layer applies the
-   `required`, `min`, `max`, and `pattern` rules.
-2. **Plugin-level** — `descriptor.validate(value, context)`. It runs on every
+1. **Plugin-level** — `descriptor.validate(value, context)`. It runs on every
    field of the `type` the plugin owns. `context` is `PluginValidationContext`,
    `{ node, address }`.
-3. **Field-level** — each `{ name, args }` entry in the node's `validators`
+2. **Field-level** — each `{ name, args }` entry in the node's `validators`
    list, in order. A plugin registers a `ValidatorFactory` under `name`; the
    factory takes `args` and returns the rule. The rule gets
-   `FieldValidationContext`: `{ node, address, siblings, values }`, where
-   `siblings` is the object the field sits in and `values` is the document.
+   `FieldValidationContext`: `{ node, address, siblings, values, isEmpty,
+   measure }`.
 
-Layers 2 and 3 return the same shape, `string | string[] | null`
-(`Validate<TValue, TContext>` in `core/field/contract.ts`). Only layer 3 sees
+Both layers return the same shape, `string | string[] | null`
+(`Validate<TValue, TContext>` in `core/field/contract.ts`). Only layer 2 sees
 `siblings`; a plugin-level rule is scoped to its own field.
+
+`descriptor.schema(node)` still runs first, but it is not a layer of rules. It
+gives the shape of the value and the coercion the editor needs: a number field
+holds a string in the form and a number in the document. A field type declares
+no `required`, `min`, `max` or `pattern` there.
+
+### The rules that v4 supplies
+
+`required`, `min`, `max` and `pattern` are field-level validators that a core
+plugin registers (`plugins/validators/`). A collection attaches them like any
+other:
+
+```ts
+t.string({ name: 'title', validators: [required(), min(3)] });
+t.array({ name: 'tags', fields: [...], validators: [max(5)] });
+```
+
+Two descriptor hooks let a field type answer them:
+
+- `isEmpty(value)` — what `required` asks. The default counts `null`,
+  `undefined`, `''`, an empty array and an empty object as empty. The
+  rich-text field declares its own, because an empty paragraph is an empty
+  document. The boolean field declares `() => false`, so `required` has no
+  effect on a checkbox.
+- `measure(value)` — what `min` and `max` compare, as
+  `{ amount, unit? }`. A string measures its length in `characters`, an array
+  its `items`, a number its own value. The number field declares its own,
+  because the editor holds a string.
+
+`min` and `max` pass an empty value, so a field with `required()` and `min(3)`
+reports one message, not two.
 
 A plugin registers factories through the `validator` capability
 ([plugins.md](./plugins.md#validator-plugins)). `TinaProvider` builds the
 `ValidatorRegistry` from every installed plugin at boot, and `FormProvider`
 hands it to the resolver. `compileSchema` fails on a `name` no installed
 plugin registers, and `validateField` throws `validator-unknown` for the same
-case at runtime. The barebones example registers `matches`
+case at runtime. The barebones example registers `matches` and `differentFrom`
 (`packages/v4/examples/barebones/tina/validators.ts`).
-
-A compound field sets `siblings` for its children: the `array` field passes
-the item, the `object` field passes the object
-(`array-field.client.tsx`, `object-field.client.tsx`).
 
 ### `args` holds data, never a function
 
@@ -248,6 +277,10 @@ t.string({ name: 'slug', validators: [minLength(3)] });
 
 A rule that one collection needs, and that no data can configure, is a field
 plugin of its own, not a validator.
+
+A compound field sets `siblings` for its children: the `array` field passes
+the item, the `object` field passes the object
+(`array-field.client.tsx`, `object-field.client.tsx`).
 
 ## Replace a built-in field
 

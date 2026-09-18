@@ -7,6 +7,7 @@ import {
   type CollectionSchema,
   defineConfig,
   localContentPlugin,
+  required,
   t,
 } from '@tinacms/tinacms';
 import { rating, ratingFieldPlugin } from './rating-field';
@@ -21,8 +22,10 @@ export const postCollection = {
     t.string({
       name: 'title',
       label: 'Title',
-      required: true,
-      validators: [matches('^[A-Z]', 'Start with a capital letter')],
+      validators: [
+        required(),
+        matches('^[A-Z]', 'Start with a capital letter'),
+      ],
     }),
     t.boolean({ name: 'featured', label: 'Featured' }),
     // The custom field of this project. tina/rating-field.tsx is the whole plugin.
@@ -39,7 +42,6 @@ export const postCollection = {
           // A sibling rule: `siblings` is this author, not the document root.
           validators: [
             differentFrom('name', 'Alias must differ from the name'),
-            min(<num>, '')
           ],
         }),
       ],
@@ -61,7 +63,7 @@ export const postCollection = {
       name: 'seo',
       label: 'SEO',
       fields: [
-        t.string({ name: 'title', label: 'Title', required: true }),
+        t.string({ name: 'title', label: 'Title', validators: [required()] }),
         t.string({ name: 'description', label: 'Description' }),
       ],
     }),
@@ -74,7 +76,7 @@ export const pageCollection = {
   path: 'content/pages',
   format: 'mdx',
   fields: [
-    t.string({ name: 'title', label: 'Title', required: true }),
+    t.string({ name: 'title', label: 'Title', validators: [required()] }),
     t.boolean({ name: 'featured', label: 'Featured' }),
   ],
 } satisfies CollectionSchema;

@@ -35,7 +35,7 @@ const collection = {
       name: 'seo',
       label: 'SEO',
       fields: [
-        t.string({ name: 'title', label: 'Title', required: true }),
+        t.string({ name: 'title', label: 'Title', validators: [required()] }),
         t.string({ name: 'description', label: 'Description' }),
       ],
     }),
@@ -48,6 +48,12 @@ const collection = {
 | Key | Type | Effect |
 |---|---|---|
 | `fields` | `FieldSchema[]` (required) | the nested fields, keyed by each field's own `name` |
+
+> `required`, `min`, `max` and `pattern` are no longer config keys. They are
+> validators that a core plugin registers, and a collection attaches them with
+> `validators`. Refer to
+> [Validation in two layers](./field-plugins.md#validation-in-two-layers).
+
 
 The stored value is a plain object, keyed by each nested field's own `name`.
 
@@ -80,7 +86,6 @@ defineClientPlugin({
 
 | Config | Rule | Message |
 |---|---|---|
-| `required` | an empty or absent object | `<label> is required` |
 
 Each nested field's own rules run through `validateChildren(value, node,
 address, registry)`, which calls `validateFieldTree(subfield, descriptor,
