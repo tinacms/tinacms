@@ -31,6 +31,7 @@ import {
   toFormValues,
   useFormStore,
 } from '../form/form-store';
+import { SELF_CONTAINED_VALIDATORS } from '../plugins/validators/core-validators.schema';
 import { createTinaStore } from '../store/create-store';
 import {
   FormScopeContext,
@@ -267,7 +268,11 @@ export function FormProvider({
   useEffect(() => {
     const { unsubscribe } = methods.watch((values, { name }) => {
       if (name === undefined) return;
-      const dependents = addressesWithValidators(collection.fields, values);
+      const dependents = addressesWithValidators(
+        collection.fields,
+        values,
+        SELF_CONTAINED_VALIDATORS
+      );
       if (dependents.length > 0) void methods.trigger(dependents);
     });
     return () => unsubscribe();

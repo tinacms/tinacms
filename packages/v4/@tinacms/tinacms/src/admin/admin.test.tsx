@@ -9,7 +9,9 @@ import type { TinaDocument } from '../core/schema/types';
 import type { AdminScreenProps } from '../core/screen/contract';
 import { useFormId } from '../editor/hooks';
 import { useFormStore } from '../form/form-store';
+import { required } from '../plugins/fields';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
+import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { TinaAdmin } from './admin';
 import { useAdminRoute } from './use-admin-route';
 
@@ -94,7 +96,12 @@ const screenPlugin = definePlugin({
 });
 
 const config = asResolvedConfig({
-  plugins: [contentPlugin, screenPlugin, stringFieldPlugin],
+  plugins: [
+    contentPlugin,
+    screenPlugin,
+    stringFieldPlugin,
+    coreValidatorsPlugin,
+  ],
   schema: {
     collections: [
       {
@@ -103,7 +110,12 @@ const config = asResolvedConfig({
         path: 'content/posts',
         format: 'mdx',
         fields: [
-          { name: 'title', label: 'Title', type: 'string', required: true },
+          {
+            name: 'title',
+            label: 'Title',
+            type: 'string',
+            validators: [required()],
+          },
         ],
       },
       {

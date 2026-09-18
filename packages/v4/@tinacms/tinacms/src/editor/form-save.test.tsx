@@ -5,7 +5,9 @@ import { asResolvedConfig } from '../config';
 import { definePlugin } from '../core/plugin';
 import type { CollectionSchema } from '../core/schema/types';
 import { t } from '../index';
+import { required } from '../plugins/fields';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
+import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { LabelledFields } from '../test/labelled-fields';
 import {
   FormProvider,
@@ -30,7 +32,9 @@ const collection: CollectionSchema = {
 const requiredTitle: CollectionSchema = {
   name: 'post',
   format: 'mdx',
-  fields: [t.string({ name: 'title', label: 'Title', required: true })],
+  fields: [
+    t.string({ name: 'title', label: 'Title', validators: [required()] }),
+  ],
 };
 
 function SaveProbe({ onFailure }: { onFailure?: (cause: unknown) => void }) {
@@ -58,7 +62,7 @@ const renderWithSave = (
   render(
     <TinaProvider
       config={asResolvedConfig({
-        plugins: [stringFieldPlugin],
+        plugins: [stringFieldPlugin, coreValidatorsPlugin],
         schema: NO_COLLECTIONS,
       })}
     >
@@ -169,7 +173,7 @@ describe('useFormSave with a structured field value', () => {
     render(
       <TinaProvider
         config={asResolvedConfig({
-          plugins: [structureFieldPlugin],
+          plugins: [structureFieldPlugin, coreValidatorsPlugin],
           schema: NO_COLLECTIONS,
         })}
       >

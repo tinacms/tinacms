@@ -7,7 +7,9 @@ import type { ValidatorFactory } from '../core/field/contract';
 import { definePlugin } from '../core/plugin';
 import type { CollectionSchema } from '../core/schema/types';
 import { t } from '../index';
+import { min } from '../plugins/fields';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
+import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { LabelledFields } from '../test/labelled-fields';
 import { FormProvider, TinaProvider } from './index';
 
@@ -39,8 +41,8 @@ const collection: CollectionSchema = {
     t.string({
       name: 'title',
       label: 'Title',
-      min: 3,
       validators: [
+        min(3),
         { name: 'matches', args: ['^[A-Z]', 'Must start with a capital'] },
       ],
     }),
@@ -56,7 +58,7 @@ const renderForm = (document: Record<string, string>) =>
   render(
     <TinaProvider
       config={asResolvedConfig({
-        plugins: [stringFieldPlugin, validatorsPlugin],
+        plugins: [stringFieldPlugin, validatorsPlugin, coreValidatorsPlugin],
         schema: { collections: [] },
       })}
     >
