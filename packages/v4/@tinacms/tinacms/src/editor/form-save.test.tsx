@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
-import { definePlugin } from '../core/plugin';
+import { type PluginManifest, definePlugin } from '../core/plugin';
 import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import { t } from '../index';
 import { required } from '../plugins/fields';
@@ -10,6 +10,7 @@ import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { LabelledFields } from '../test/labelled-fields';
 import {
+  AfterSaveHookError,
   FormProvider,
   FormValidationError,
   type SaveHandler,
@@ -57,12 +58,13 @@ const renderWithSave = (
   onSave: SaveHandler,
   schema: CollectionSchema = collection,
   document: Record<string, unknown> = { title: 'Hi' },
-  onFailure?: (cause: unknown) => void
+  onFailure?: (cause: unknown) => void,
+  extraPlugins: PluginManifest[] = []
 ) =>
   render(
     <TinaProvider
       config={asResolvedConfig({
-        plugins: [stringFieldPlugin, coreValidatorsPlugin],
+        plugins: [stringFieldPlugin, coreValidatorsPlugin, ...extraPlugins],
         schema: NO_COLLECTIONS,
       })}
     >
@@ -163,24 +165,10 @@ describe('useFormSave', () => {
         },
       }),
     });
-    render(
-      <TinaProvider
-        config={asResolvedConfig({
-          plugins: [stringFieldPlugin, coreValidatorsPlugin, stamp, stampAgain],
-          schema: NO_COLLECTIONS,
-        })}
-      >
-        <FormProvider
-          collection={collection}
-          path='content/posts/save.mdx'
-          document={{ title: 'Hi' }}
-          onSave={onSave}
-        >
-          <LabelledFields />
-          <SaveProbe />
-        </FormProvider>
-      </TinaProvider>
-    );
+    renderWithSave(onSave, collection, { title: 'Hi' }, undefined, [
+      stamp,
+      stampAgain,
+    ]);
     const input = await screen.findByLabelText('Title');
     await userEvent.type(input, '!');
 
@@ -205,23 +193,12 @@ describe('useFormSave', () => {
         },
       }),
     });
-    render(
-      <TinaProvider
-        config={asResolvedConfig({
-          plugins: [stringFieldPlugin, coreValidatorsPlugin, veto],
-          schema: NO_COLLECTIONS,
-        })}
-      >
-        <FormProvider
-          collection={collection}
-          path='content/posts/save.mdx'
-          document={{ title: 'Hi' }}
-          onSave={onSave}
-        >
-          <LabelledFields />
-          <SaveProbe onFailure={(cause) => failures.push(cause)} />
-        </FormProvider>
-      </TinaProvider>
+    renderWithSave(
+      onSave,
+      collection,
+      { title: 'Hi' },
+      (cause) => failures.push(cause),
+      [veto]
     );
     const input = await screen.findByLabelText('Title');
     await userEvent.type(input, '!');
@@ -241,24 +218,7 @@ describe('useFormSave', () => {
       provides: ['hooks'],
       client: async () => ({ default: { hooks: { afterSave } } }),
     });
-    render(
-      <TinaProvider
-        config={asResolvedConfig({
-          plugins: [stringFieldPlugin, coreValidatorsPlugin, observer],
-          schema: NO_COLLECTIONS,
-        })}
-      >
-        <FormProvider
-          collection={collection}
-          path='content/posts/save.mdx'
-          document={{ title: 'Hi' }}
-          onSave={onSave}
-        >
-          <LabelledFields />
-          <SaveProbe />
-        </FormProvider>
-      </TinaProvider>
-    );
+    renderWithSave(onSave, collection, { title: 'Hi' }, undefined, [observer]);
     const input = await screen.findByLabelText('Title');
     await userEvent.type(input, '!');
 
@@ -271,6 +231,39 @@ describe('useFormSave', () => {
     expect(onSave.mock.invocationCallOrder[0]).toBeLessThan(
       afterSave.mock.invocationCallOrder[0]
     );
+  });
+
+  it('rejects with an AfterSaveHookError once the save has landed', async () => {
+    const onSave = vi.fn();
+    const failures: unknown[] = [];
+    const broken = definePlugin({
+      name: 'test:hooks:broken-after-save',
+      provides: ['hooks'],
+      client: async () => ({
+        default: {
+          hooks: {
+            afterSave: () => {
+              throw new Error('audit endpoint down');
+            },
+          },
+        },
+      }),
+    });
+    renderWithSave(
+      onSave,
+      collection,
+      { title: 'Hi' },
+      (cause) => failures.push(cause),
+      [broken]
+    );
+    const input = await screen.findByLabelText('Title');
+    await userEvent.type(input, '!');
+
+    await userEvent.click(screen.getByText('save'));
+    expect(onSave).toHaveBeenCalledWith({ title: 'Hi!' });
+    expect(await screen.findByTestId('status')).toHaveTextContent('clean');
+    expect(failures[0]).toBeInstanceOf(AfterSaveHookError);
+    expect((failures[0] as Error).cause).toBeInstanceOf(Error);
   });
 });
 

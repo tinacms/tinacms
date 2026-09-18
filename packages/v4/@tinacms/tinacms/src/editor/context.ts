@@ -4,15 +4,10 @@ import type { TinaSchema } from '../config';
 import type { FieldAddress } from '../core/field/address';
 import type { ValidatorRegistry } from '../core/field/contract';
 import type { FieldRegistry } from '../core/field/registry';
-import type { FormHookRegistry } from '../core/form/hooks';
+import type { FormHookRegistry, FormHookScope } from '../core/form/hooks';
 import type { TinaStoreState } from '../core/plugin';
-import type {
-  CollectionSchema,
-  FieldSchema,
-  TinaDocument,
-} from '../core/schema/types';
+import type { FieldSchema, TinaDocument } from '../core/schema/types';
 import type { ScreenRegistry } from '../core/screen/registry';
-import type { FormId } from '../form/form-store';
 
 export type SaveHandler = (document: TinaDocument) => void | Promise<void>;
 
@@ -26,10 +21,7 @@ export interface TinaRuntime {
 }
 export const TinaRuntimeContext = createContext<TinaRuntime | null>(null);
 
-export interface FormScope {
-  formId: FormId;
-  path: string;
-  collection: CollectionSchema;
+export interface FormScope extends FormHookScope {
   onSave: SaveHandler | null;
   seedKey: string;
   discardEdits: () => void;

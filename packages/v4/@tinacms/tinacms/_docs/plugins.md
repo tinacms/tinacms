@@ -48,8 +48,8 @@ replace a built-in field at a key that is already in use. Refer to
 capabilities. Many field plugins can operate at the same time, one plugin for
 each schema `type` such as `string` or `image`. Many validator plugins can
 operate at the same time, and one plugin can register many validators; the key
-is the validator's name. `hooks` is unkeyed: every plugin that provides it runs,
-in plugin order.
+is the validator's name. `hooks` is unkeyed. Every plugin that provides it
+runs, in the order of `config.plugins`.
 
 ## Validator plugins
 
@@ -123,7 +123,7 @@ export default defineClientPlugin({
   hooks: {
     beforeSave: (document) => ({ ...document, updatedAt: new Date().toISOString() }),
     afterSave: (document, { path }) => audit.log('saved', path),
-    afterEdit: ({ address, value }, { formId }) => analytics.track('edit', { formId, address }),
+    afterEdit: ({ address }, { formId }) => analytics.track('edit', { formId, address }),
   },
 });
 ```
@@ -136,12 +136,18 @@ export default defineClientPlugin({
 
 Every hook also receives a scope: `{ formId, path, collection }`.
 
+The form does not show a change that a `beforeSave` hook makes. The form
+keeps the values the editor typed until the host loads the saved document
+again. A key that the collection does not declare does not go through
+`serialize`.
+
 `beforeSave` hooks form a pipeline. Each one receives the document the
-previous one returned, in plugin order. A hook that throws stops the save;
-`onSave` does not run and the form stays dirty. A throw from `afterSave`
-propagates to the caller of `useFormSave`, but the save has already landed.
-An `afterEdit` hook that throws is logged to the console, and the next hook
-still runs.
+previous one returned, in the order of `config.plugins`. `dependsOn` does
+not change this order. A hook that throws stops the save. `onSave` does not
+run. The form stays dirty. A throw from `afterSave` reaches the caller of
+`useFormSave` as an `AfterSaveHookError`. The save has already landed. A
+throw from `afterEdit` goes to the console. The next hook still runs.
+TinaCMS does not await an `afterEdit` hook.
 
 A host application registers hooks the same way, with a `definePlugin` entry in
 `config.plugins`. There is no second registration path.

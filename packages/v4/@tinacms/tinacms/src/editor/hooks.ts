@@ -152,6 +152,13 @@ export class FormValidationError extends Error {
   }
 }
 
+export class AfterSaveHookError extends Error {
+  constructor(cause: unknown) {
+    super('The document was saved, but an afterSave hook failed.', { cause });
+    this.name = 'AfterSaveHookError';
+  }
+}
+
 export function useFormSave(): () => Promise<void> {
   const registry = useFieldRegistry();
   const hooks = useFormHooks();
@@ -175,7 +182,11 @@ export function useFormSave(): () => Promise<void> {
     );
     await onSave?.(digested);
     useFormStore.getState().markSaved(formId, toFormValues(values));
-    await runAfterSave(hooks, digested, hookScope);
+    try {
+      await runAfterSave(hooks, digested, hookScope);
+    } catch (cause) {
+      throw new AfterSaveHookError(cause);
+    }
   }, [scope, getValues, trigger, registry, hooks]);
 }
 

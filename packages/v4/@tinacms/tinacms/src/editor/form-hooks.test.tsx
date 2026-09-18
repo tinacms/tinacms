@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
 import { definePlugin } from '../core/plugin';
 import type { CollectionSchema } from '../core/schema/types';
+import { toFormId } from '../form/form-store';
 import { t } from '../index';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
@@ -47,7 +48,11 @@ describe('afterEdit hook', () => {
     expect(afterEdit).toHaveBeenCalledTimes(2);
     expect(afterEdit).toHaveBeenLastCalledWith(
       { address: 'title', value: 'Hi!?' },
-      expect.objectContaining({ path: 'content/posts/edit.mdx', collection })
+      expect.objectContaining({
+        formId: toFormId('content/posts/edit.mdx'),
+        path: 'content/posts/edit.mdx',
+        collection,
+      })
     );
   });
 });

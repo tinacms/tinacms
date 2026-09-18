@@ -104,6 +104,11 @@ export const resolveClientSegments = async (
       'validator-plugin-no-client',
       `Plugin "${manifest.name}" declares validators but has no client segment to hold their factories.`
     );
+    invariant(
+      !(manifest.provides.includes(HOOKS_CAPABILITY) && !manifest.client),
+      'hooks-plugin-no-client',
+      `Plugin "${manifest.name}" provides "hooks" but has no client segment to hold them.`
+    );
     if (!manifest.client) continue;
     const clientModule = await manifest.client();
     invariant(
