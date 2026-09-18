@@ -1,11 +1,13 @@
 import type { StoreApi } from 'zustand';
 import type { FieldDescriptor, ValidatorFactory } from './field/contract';
+import type { FormHooks } from './form/hooks';
 import { invariant } from './invariant';
 import type { AdminScreen } from './screen/contract';
 
 export type Capability =
   | 'field'
   | 'validator'
+  | 'hooks'
   | 'content'
   | 'auth'
   | 'media'
@@ -14,6 +16,8 @@ export type Capability =
 export const FIELD_CAPABILITY = 'field' as const satisfies Capability;
 
 export const VALIDATOR_CAPABILITY = 'validator' as const satisfies Capability;
+
+export const HOOKS_CAPABILITY = 'hooks' as const satisfies Capability;
 
 export const AUTH_CAPABILITY = 'auth' as const satisfies Capability;
 
@@ -66,6 +70,7 @@ export interface ClientSegment {
    * with no factory here, throws at boot.
    */
   validators?: Record<string, ValidatorFactory>;
+  hooks?: FormHooks;
   slice?: ClientSlice;
   screens?: AdminScreen[];
 }
