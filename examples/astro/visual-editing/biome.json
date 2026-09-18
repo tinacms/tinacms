@@ -1,16 +1,18 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-  "extends": ["../../../biome.json"],
+  "root": false,
+  "$schema": "https://biomejs.dev/schemas/2.5.14/schema.json",
+  "extends": "//",
   "files": {
-    "ignore": [
-      "**/node_modules/**",
-      "**/dist/**",
-      "**/.astro/**",
-      "**/public/admin/**",
-      "**/__generated__/**",
-      "**/test-results/**",
-      "**/.turbo/**",
-      "**/src/styles/global.css"
+    "includes": [
+      "**",
+      "!**/node_modules/**",
+      "!**/dist/**",
+      "!**/.astro/**",
+      "!**/public/admin/**",
+      "!**/__generated__/**",
+      "!**/test-results/**",
+      "!**/.turbo/**",
+      "!**/src/styles/global.css"
     ]
   }
 }

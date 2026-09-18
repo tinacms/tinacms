@@ -59,18 +59,13 @@ export const useGetCollection = (
   const api = new TinaAdminApi(cms);
   const schema = cms.api.tina.schema as TinaSchema;
   const collectionExtra = schema.getCollection(collectionName);
-  // biome-ignore lint/correctness/useHookAtTopLevel: not ready to fix these yet
   const [collection, setCollection] = useState<
     CollectionResponse | Collection | undefined
   >(undefined);
-  // biome-ignore lint/correctness/useHookAtTopLevel: not ready to fix these yet
   const [loading, setLoading] = useState<boolean>(true);
-  // biome-ignore lint/correctness/useHookAtTopLevel: not ready to fix these yet
   const [error, setError] = useState<Error | undefined>(undefined);
-  // biome-ignore lint/correctness/useHookAtTopLevel: not ready to fix these yet
   const [resetState, setResetSate] = useState(0);
 
-  // biome-ignore lint/correctness/useHookAtTopLevel: not ready to fix these yet
   useEffect(() => {
     let cancelled = false;
 
@@ -154,18 +149,13 @@ export const useSearchCollection = (
   const api = new TinaAdminApi(cms);
   const schema = cms.api.tina.schema as TinaSchema;
   const collectionExtra = schema.getCollection(collectionName);
-  // biome-ignore lint/correctness/useHookAtTopLevel: not ready to fix these yet
   const [collection, setCollection] = useState<
     CollectionResponse | Collection | undefined
   >(undefined);
-  // biome-ignore lint/correctness/useHookAtTopLevel: not ready to fix these yet
   const [loading, setLoading] = useState<boolean>(true);
-  // biome-ignore lint/correctness/useHookAtTopLevel: not ready to fix these yet
   const [error, setError] = useState<Error | undefined>(undefined);
-  // biome-ignore lint/correctness/useHookAtTopLevel: not ready to fix these yet
   const [resetState, setResetSate] = useState(0);
 
-  // biome-ignore lint/correctness/useHookAtTopLevel: not ready to fix these yet
   useEffect(() => {
     let cancelled = false;
 
