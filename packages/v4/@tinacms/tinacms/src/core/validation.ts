@@ -47,6 +47,7 @@ export const validateField = (
     );
   }
   // custom validation via the `validators` listed on the field
+  // TODO - see if we can merge level 1 validators into out-of-the box level 3 validators (update docs, makes it so we only have 2 diff types)
   const fieldContext: FieldValidationContext = {
     ...context,
     siblings: options.siblings ?? {},

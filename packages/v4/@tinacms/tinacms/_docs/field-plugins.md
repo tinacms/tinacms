@@ -228,6 +228,27 @@ A compound field sets `siblings` for its children: the `array` field passes
 the item, the `object` field passes the object
 (`array-field.client.tsx`, `object-field.client.tsx`).
 
+### `args` holds data, never a function
+
+`args` is `JsonValue[]` (`core/json.ts`), because `compileSchema` writes each
+`{ name, args }` entry into `tina-lock.json`. A function does not survive
+JSON, so it cannot be an argument. The logic of a rule stays in the factory,
+in the plugin; the collection supplies only the data that configures it.
+
+```ts
+// Wrong. A function is not JSON, and this does not compile.
+t.string({
+  name: 'slug',
+  validators: [{ name: 'custom', args: [(value) => value.length > 3] }],
+});
+
+// Correct. The plugin holds the logic; the collection supplies the number.
+t.string({ name: 'slug', validators: [minLength(3)] });
+```
+
+A rule that one collection needs, and that no data can configure, is a field
+plugin of its own, not a validator.
+
 ## Replace a built-in field
 
 If you register a second plugin at a `type` that is already in use, the registry
