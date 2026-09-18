@@ -11,7 +11,18 @@
           {
             "name": "title",
             "label": "Title",
-            "required": true,
+            "validators": [
+              {
+                "name": "required"
+              },
+              {
+                "name": "matches",
+                "args": [
+                  "^[A-Z]",
+                  "Start with a capital letter"
+                ]
+              }
+            ],
             "type": "string"
           },
           {
@@ -37,6 +48,20 @@
               {
                 "name": "name",
                 "label": "Name",
+                "type": "string"
+              },
+              {
+                "name": "alias",
+                "label": "Alias",
+                "validators": [
+                  {
+                    "name": "differentFrom",
+                    "args": [
+                      "name",
+                      "Alias must differ from the name"
+                    ]
+                  }
+                ],
                 "type": "string"
               }
             ],
@@ -72,7 +97,11 @@
               {
                 "name": "title",
                 "label": "Title",
-                "required": true,
+                "validators": [
+                  {
+                    "name": "required"
+                  }
+                ],
                 "type": "string"
               },
               {
@@ -94,7 +123,11 @@
           {
             "name": "title",
             "label": "Title",
-            "required": true,
+            "validators": [
+              {
+                "name": "required"
+              }
+            ],
             "type": "string"
           },
           {

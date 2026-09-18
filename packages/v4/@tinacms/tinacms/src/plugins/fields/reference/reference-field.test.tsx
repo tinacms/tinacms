@@ -21,6 +21,9 @@ import { validateField } from '../../../core/validation';
 import { FormProvider, TinaProvider } from '../../../editor';
 import { toFormId, useFormStore } from '../../../form/form-store';
 import { t } from '../../../index';
+import { required } from '../../../plugins/fields';
+import coreValidatorsPlugin from '../../../plugins/validators/core-validators.plugin';
+import { coreValidatorRegistry } from '../../../test/core-validators';
 import { LabelledFields } from '../../../test/labelled-fields';
 import referenceFieldPlugin from './reference-field.plugin';
 
@@ -47,7 +50,7 @@ const collection: CollectionSchema = {
     t.reference({
       name: 'author',
       label: 'Author',
-      required: true,
+      validators: [required()],
       collections: ['author'],
     }),
     t.reference({ name: 'page', label: 'Page', collections: ['page'] }),
@@ -87,7 +90,7 @@ const renderField = (document?: TinaDocument, content = contentPlugin()) =>
   render(
     <TinaProvider
       config={asResolvedConfig({
-        plugins: [referenceFieldPlugin, content],
+        plugins: [referenceFieldPlugin, content, coreValidatorsPlugin],
         schema: { collections: [collection] },
       })}
     >
@@ -209,11 +212,11 @@ describe('ReferenceField validation', () => {
   it('requires a reference to be chosen', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('reference');
-    expect(validateField(authorNode, descriptor, ADA)).toEqual([]);
-    expect(validateField(authorNode, descriptor, undefined)).toEqual([
+    expect(validateFieldWithCore(authorNode, descriptor, ADA)).toEqual([]);
+    expect(validateFieldWithCore(authorNode, descriptor, undefined)).toEqual([
       'Author is required',
     ]);
-    expect(validateField(authorNode, descriptor, '')).toEqual([
+    expect(validateFieldWithCore(authorNode, descriptor, '')).toEqual([
       'Author is required',
     ]);
   });
@@ -221,9 +224,9 @@ describe('ReferenceField validation', () => {
   it('passes an optional reference left empty', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('reference');
-    expect(validateField(pageNode, descriptor, '')).toEqual([]);
-    expect(validateField(pageNode, descriptor, undefined)).toEqual([]);
-    expect(validateField(pageNode, descriptor, null)).toEqual([]);
+    expect(validateFieldWithCore(pageNode, descriptor, '')).toEqual([]);
+    expect(validateFieldWithCore(pageNode, descriptor, undefined)).toEqual([]);
+    expect(validateFieldWithCore(pageNode, descriptor, null)).toEqual([]);
   });
 });
 
@@ -260,3 +263,14 @@ describe('ReferenceField metadata wrapping', () => {
     expect(descriptor?.defaultValue).toBeUndefined();
   });
 });
+
+const validateFieldWithCore: typeof validateField = (
+  node,
+  descriptor,
+  value,
+  options
+) =>
+  validateField(node, descriptor, value, {
+    validators: coreValidatorRegistry,
+    ...options,
+  });

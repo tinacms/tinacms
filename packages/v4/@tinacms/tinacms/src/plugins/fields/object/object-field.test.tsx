@@ -17,6 +17,9 @@ import { validateField } from '../../../core/validation';
 import { FormProvider, TinaProvider } from '../../../editor';
 import { formStatus, toFormId, useFormStore } from '../../../form/form-store';
 import { t } from '../../../index';
+import { required } from '../../../plugins/fields';
+import coreValidatorsPlugin from '../../../plugins/validators/core-validators.plugin';
+import { coreValidatorRegistry } from '../../../test/core-validators';
 import { LabelledFields } from '../../../test/labelled-fields';
 import arrayFieldPlugin from '../array/array-field.plugin';
 import numberFieldPlugin from '../number/number-field.plugin';
@@ -31,6 +34,7 @@ const PLUGINS = [
   arrayFieldPlugin,
   stringFieldPlugin,
   numberFieldPlugin,
+  coreValidatorsPlugin,
 ];
 
 const valueOf = (name: string) =>
@@ -49,9 +53,9 @@ const collection: CollectionSchema = {
     t.object({
       name: 'seo',
       label: 'SEO',
-      required: true,
+      validators: [required()],
       fields: [
-        t.string({ name: 'title', label: 'Title', required: true }),
+        t.string({ name: 'title', label: 'Title', validators: [required()] }),
         t.number({ name: 'views', label: 'Views' }),
       ],
     }),
@@ -63,7 +67,11 @@ const collection: CollectionSchema = {
           name: 'social',
           label: 'Social',
           fields: [
-            t.string({ name: 'handle', label: 'Handle', required: true }),
+            t.string({
+              name: 'handle',
+              label: 'Handle',
+              validators: [required()],
+            }),
           ],
         }),
       ],
@@ -86,7 +94,13 @@ const collection: CollectionSchema = {
         t.array({
           name: 'rows',
           label: 'Rows',
-          fields: [t.string({ name: 'label', label: 'Label', required: true })],
+          fields: [
+            t.string({
+              name: 'label',
+              label: 'Label',
+              validators: [required()],
+            }),
+          ],
         }),
       ],
     }),
@@ -166,9 +180,13 @@ describe('ObjectField validation', () => {
   it('rejects an empty value on a required object field', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('object');
-    expect(validateField(seoNode, descriptor, { title: 'Home' })).toEqual([]);
-    expect(validateField(seoNode, descriptor, {})).toEqual(['SEO is required']);
-    expect(validateField(seoNode, descriptor, undefined)).toEqual([
+    expect(
+      validateFieldWithCore(seoNode, descriptor, { title: 'Home' })
+    ).toEqual([]);
+    expect(validateFieldWithCore(seoNode, descriptor, {})).toEqual([
+      'SEO is required',
+    ]);
+    expect(validateFieldWithCore(seoNode, descriptor, undefined)).toEqual([
       'SEO is required',
     ]);
   });
@@ -180,7 +198,8 @@ describe('ObjectField validation', () => {
       { title: '', views: 10 },
       seoNode,
       'seo',
-      registry
+      registry,
+      { validators: coreValidatorRegistry }
     );
     expect(errors).toEqual({ 'seo.title': ['Title is required'] });
   });
@@ -192,7 +211,8 @@ describe('ObjectField validation', () => {
       { social: { handle: '' } },
       metaNode,
       'meta',
-      registry
+      registry,
+      { validators: coreValidatorRegistry }
     );
     expect(errors).toEqual({ 'meta.social.handle': ['Handle is required'] });
   });
@@ -272,7 +292,8 @@ describe('ObjectField composed with array', () => {
       { rows: [{ label: 'ok' }, { label: '' }] },
       layoutNode,
       'layout',
-      registry
+      registry,
+      { validators: coreValidatorRegistry }
     );
     expect(errors).toEqual({ 'layout.rows.1.label': ['Label is required'] });
   });
@@ -301,3 +322,14 @@ describe('ObjectField metadata', () => {
     expect(descriptor?.defaultValue).toBeUndefined();
   });
 });
+
+const validateFieldWithCore: typeof validateField = (
+  node,
+  descriptor,
+  value,
+  options
+) =>
+  validateField(node, descriptor, value, {
+    validators: coreValidatorRegistry,
+    ...options,
+  });

@@ -20,7 +20,7 @@ const collection = {
   name: 'post',
   format: 'mdx',
   fields: [
-    t.string({ name: 'title', required: true }),
+    t.string({ name: 'title', validators: [required()] }),
     t.richText({ name: 'body', label: 'Body', isBody: true }),
   ],
 };
@@ -32,10 +32,15 @@ The config (`RichTextFieldSchema`, which extends `BaseFieldSchema`):
 |---|---|---|
 | `name` | `string` (necessary) | The field key in the document. It is also the alternative label. |
 | `label` | `string` | The label on the screen. The validation messages use it. |
-| `required` | `boolean` | An empty body does not pass validation. |
 | `isBody` | `boolean` | This field is the markdown body of the file, and not a frontmatter key. |
 | `templates` | `MdxTemplate[]` | The MDX components that an author can embed in the text. |
 | `overrides` | `ToolbarOverrides` | The toolbar buttons and the heading levels that the editor shows. |
+
+> `required`, `min`, `max` and `pattern` are no longer config keys. They are
+> validators that a core plugin registers, and a collection attaches them with
+> `validators`. Refer to
+> [Validation in two layers](./field-plugins.md#validation-in-two-layers).
+
 
 v3 also took a bare list of buttons under `toolbarOverride`. v4 drops it:
 `overrides.toolbar` takes the same list, and it is the only shape the editor
@@ -148,7 +153,6 @@ import { TinaMarkdown } from '@tinacms/tinacms/adapters/react';
 |---|---|---|
 | — | The value must be an AST with the shape `{ type: 'root', children }` | `<label> must be rich text` |
 | — | The first child must not be `invalid_markdown` | `Unable to parse rich-text` |
-| `required` | The value must have children | `<label> is required` |
 
 If `@tinacms/mdx` cannot parse the markdown, it does not throw an error. It
 gives one `invalid_markdown` node, so the editor can still show the source text.
