@@ -13,6 +13,7 @@ import type { ResolvedConfig } from '../config';
 import { toFieldAddress } from '../core/field/address';
 import { createFieldRegistry } from '../core/field/registry';
 import { fieldEqualityFor } from '../core/form/compare';
+import { createFormHookRegistry } from '../core/form/hooks';
 import { ingestDocument } from '../core/form/ingest';
 import { type PluginManifest, resolveClientSegments } from '../core/plugin';
 import { initializePlugins, validateCapabilityGraph } from '../core/resolve';
@@ -91,6 +92,7 @@ export function TinaProvider({
       const runtime: BootedRuntime = {
         registry: createFieldRegistry(resolved),
         validators: createValidatorRegistry(resolved),
+        hooks: createFormHookRegistry(resolved),
         store: createTinaStore(resolved),
         screens: createScreenRegistry(resolved),
       };

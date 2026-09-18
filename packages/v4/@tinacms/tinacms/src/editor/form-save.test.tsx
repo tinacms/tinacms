@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
 import { definePlugin } from '../core/plugin';
-import type { CollectionSchema } from '../core/schema/types';
+import type { CollectionSchema, TinaDocument } from '../core/schema/types';
 import { t } from '../index';
 import { required } from '../plugins/fields';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
@@ -131,6 +131,146 @@ describe('useFormSave', () => {
     await userEvent.click(screen.getByText('save'));
     expect(onSave).toHaveBeenCalled();
     expect(screen.getByTestId('status')).toHaveTextContent('dirty');
+  });
+
+  it('threads the digested document through beforeSave hooks in plugin order', async () => {
+    const onSave = vi.fn();
+    const stamp = definePlugin({
+      name: 'test:hooks:stamp',
+      provides: ['hooks'],
+      client: async () => ({
+        default: {
+          hooks: {
+            beforeSave: (document: TinaDocument) => ({
+              ...document,
+              trail: `${String(document.trail ?? '')}a`,
+            }),
+          },
+        },
+      }),
+    });
+    const stampAgain = definePlugin({
+      name: 'test:hooks:stamp-again',
+      provides: ['hooks'],
+      client: async () => ({
+        default: {
+          hooks: {
+            beforeSave: (document: TinaDocument) => ({
+              ...document,
+              trail: `${String(document.trail ?? '')}b`,
+            }),
+          },
+        },
+      }),
+    });
+    render(
+      <TinaProvider
+        config={asResolvedConfig({
+          plugins: [stringFieldPlugin, coreValidatorsPlugin, stamp, stampAgain],
+          schema: NO_COLLECTIONS,
+        })}
+      >
+        <FormProvider
+          collection={collection}
+          path='content/posts/save.mdx'
+          document={{ title: 'Hi' }}
+          onSave={onSave}
+        >
+          <LabelledFields />
+          <SaveProbe />
+        </FormProvider>
+      </TinaProvider>
+    );
+    const input = await screen.findByLabelText('Title');
+    await userEvent.type(input, '!');
+
+    await userEvent.click(screen.getByText('save'));
+    expect(onSave).toHaveBeenCalledWith({ title: 'Hi!', trail: 'ab' });
+    expect(await screen.findByTestId('status')).toHaveTextContent('clean');
+  });
+
+  it('leaves the form dirty and skips onSave when a beforeSave hook throws', async () => {
+    const onSave = vi.fn();
+    const failures: unknown[] = [];
+    const veto = definePlugin({
+      name: 'test:hooks:veto',
+      provides: ['hooks'],
+      client: async () => ({
+        default: {
+          hooks: {
+            beforeSave: () => {
+              throw new Error('not today');
+            },
+          },
+        },
+      }),
+    });
+    render(
+      <TinaProvider
+        config={asResolvedConfig({
+          plugins: [stringFieldPlugin, coreValidatorsPlugin, veto],
+          schema: NO_COLLECTIONS,
+        })}
+      >
+        <FormProvider
+          collection={collection}
+          path='content/posts/save.mdx'
+          document={{ title: 'Hi' }}
+          onSave={onSave}
+        >
+          <LabelledFields />
+          <SaveProbe onFailure={(cause) => failures.push(cause)} />
+        </FormProvider>
+      </TinaProvider>
+    );
+    const input = await screen.findByLabelText('Title');
+    await userEvent.type(input, '!');
+
+    await userEvent.click(screen.getByText('save'));
+    expect(onSave).not.toHaveBeenCalled();
+    expect(screen.getByTestId('status')).toHaveTextContent('dirty');
+    expect(failures[0]).toBeInstanceOf(Error);
+    expect((failures[0] as Error).message).toBe('not today');
+  });
+
+  it('runs afterSave with the saved document once the form is clean', async () => {
+    const onSave = vi.fn();
+    const afterSave = vi.fn();
+    const observer = definePlugin({
+      name: 'test:hooks:observer',
+      provides: ['hooks'],
+      client: async () => ({ default: { hooks: { afterSave } } }),
+    });
+    render(
+      <TinaProvider
+        config={asResolvedConfig({
+          plugins: [stringFieldPlugin, coreValidatorsPlugin, observer],
+          schema: NO_COLLECTIONS,
+        })}
+      >
+        <FormProvider
+          collection={collection}
+          path='content/posts/save.mdx'
+          document={{ title: 'Hi' }}
+          onSave={onSave}
+        >
+          <LabelledFields />
+          <SaveProbe />
+        </FormProvider>
+      </TinaProvider>
+    );
+    const input = await screen.findByLabelText('Title');
+    await userEvent.type(input, '!');
+
+    await userEvent.click(screen.getByText('save'));
+    expect(await screen.findByTestId('status')).toHaveTextContent('clean');
+    expect(afterSave).toHaveBeenCalledWith(
+      { title: 'Hi!' },
+      expect.objectContaining({ path: 'content/posts/save.mdx' })
+    );
+    expect(onSave.mock.invocationCallOrder[0]).toBeLessThan(
+      afterSave.mock.invocationCallOrder[0]
+    );
   });
 });
 

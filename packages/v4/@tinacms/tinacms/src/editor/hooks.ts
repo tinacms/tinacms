@@ -9,6 +9,11 @@ import { useStore } from 'zustand';
 import type { ContentSlice } from '../core/content/contract';
 import type { FieldAddress } from '../core/field/address';
 import type { FieldRegistry } from '../core/field/registry';
+import {
+  type FormHookRegistry,
+  runAfterSave,
+  runBeforeSave,
+} from '../core/form/hooks';
 import { digestDocument } from '../core/form/ingest';
 import { invariant } from '../core/invariant';
 import type { SliceState, TinaStoreState } from '../core/plugin';
@@ -35,6 +40,16 @@ export function useFieldRegistry(): FieldRegistry {
     'useFieldRegistry must be used within a TinaProvider'
   );
   return runtime.registry;
+}
+
+export function useFormHooks(): FormHookRegistry {
+  const runtime = use(TinaRuntimeContext);
+  invariant(
+    runtime,
+    'form-hooks-outside-provider',
+    'useFormHooks must be used within a TinaProvider'
+  );
+  return runtime.hooks;
 }
 
 export function useTinaStore<Selected>(
@@ -139,6 +154,7 @@ export class FormValidationError extends Error {
 
 export function useFormSave(): () => Promise<void> {
   const registry = useFieldRegistry();
+  const hooks = useFormHooks();
   const scope = useFormScope('form-save-outside-provider', 'useFormSave');
   const { getValues, trigger } = useFormContext<TinaDocument>();
   return useCallback(async () => {
@@ -148,13 +164,19 @@ export function useFormSave(): () => Promise<void> {
     const valid = await trigger();
     if (!valid) throw new FormValidationError();
     const values = getValues();
-    const digested = digestDocument(values, collection.fields, {
-      documentPath: path,
-      registry,
-    });
+    const hookScope = { formId, path, collection };
+    const digested = await runBeforeSave(
+      hooks,
+      digestDocument(values, collection.fields, {
+        documentPath: path,
+        registry,
+      }),
+      hookScope
+    );
     await onSave?.(digested);
     useFormStore.getState().markSaved(formId, toFormValues(values));
-  }, [scope, getValues, trigger, registry]);
+    await runAfterSave(hooks, digested, hookScope);
+  }, [scope, getValues, trigger, registry, hooks]);
 }
 
 export function useFieldAddress(): FieldAddress {
