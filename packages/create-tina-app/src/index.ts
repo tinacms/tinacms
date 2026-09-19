@@ -238,77 +238,92 @@ export async function run() {
       );
     }
 
-    const res = await prompts({
-      message: 'Which package manager would you like to use?',
-      name: 'packageManager',
-      type: 'select',
-      initial: Math.max(0, installedPkgManagers.indexOf('pnpm')),
-      choices: installedPkgManagers.map((manager) => {
-        return {
-          title: manager === 'pnpm' ? 'pnpm (recommended)' : manager,
-          value: manager,
-        };
-      }),
-    });
-    if (!Object.hasOwn(res, 'packageManager')) {
-      postHogCaptureError(
-        posthogClient,
-        userId,
-        sessionId,
-        new Error('User cancelled package manager selection'),
-        {
-          errorCode: ERROR_CODES.ERR_CANCEL_PKG_MANAGER_PROMPT,
-          errorCategory: 'user-cancellation',
-          step: TRACKING_STEPS.PKG_MANAGER_SELECT,
-          fatal: true,
-          additionalProperties: telemetryData,
-        }
-      );
-      if (posthogClient) await posthogClient.shutdown();
-      exit(1);
+    if (opts.yes) {
+      pkgManager = installedPkgManagers.includes('pnpm')
+        ? 'pnpm'
+        : installedPkgManagers[0];
+      console.log(`Using ${pkgManager} as the package manager.`);
+    } else {
+      const res = await prompts({
+        message: 'Which package manager would you like to use?',
+        name: 'packageManager',
+        type: 'select',
+        initial: Math.max(0, installedPkgManagers.indexOf('pnpm')),
+        choices: installedPkgManagers.map((manager) => {
+          return {
+            title: manager === 'pnpm' ? 'pnpm (recommended)' : manager,
+            value: manager,
+          };
+        }),
+      });
+      if (!Object.hasOwn(res, 'packageManager')) {
+        postHogCaptureError(
+          posthogClient,
+          userId,
+          sessionId,
+          new Error('User cancelled package manager selection'),
+          {
+            errorCode: ERROR_CODES.ERR_CANCEL_PKG_MANAGER_PROMPT,
+            errorCategory: 'user-cancellation',
+            step: TRACKING_STEPS.PKG_MANAGER_SELECT,
+            fatal: true,
+            additionalProperties: telemetryData,
+          }
+        );
+        if (posthogClient) await posthogClient.shutdown();
+        exit(1);
+      }
+      pkgManager = res.packageManager;
     }
-    pkgManager = res.packageManager;
   }
   telemetryData['package-manager'] = pkgManager;
 
   let projectName = opts.projectName;
   if (!projectName) {
-    const res = await prompts({
-      name: 'name',
-      type: 'text',
-      message: 'What is your project named?',
-      initial: 'my-tina-app',
-      validate: (name) => {
-        const { message, isError } = validate(
-          path.basename(path.resolve(name))
+    if (opts.yes) {
+      projectName = 'my-tina-app';
+      console.log(`Using ${projectName} as the project name.`);
+    } else {
+      const res = await prompts({
+        name: 'name',
+        type: 'text',
+        message: 'What is your project named?',
+        initial: 'my-tina-app',
+        validate: (name) => {
+          const { message, isError } = validate(
+            path.basename(path.resolve(name))
+          );
+          if (isError) return `Invalid project name: ${message}`;
+          return true;
+        },
+      });
+      if (!Object.hasOwn(res, 'name')) {
+        postHogCaptureError(
+          posthogClient,
+          userId,
+          sessionId,
+          new Error('User cancelled project name input'),
+          {
+            errorCode: ERROR_CODES.ERR_CANCEL_PROJECT_NAME_PROMPT,
+            errorCategory: 'user-cancellation',
+            step: TRACKING_STEPS.PROJECT_NAME_INPUT,
+            fatal: true,
+            additionalProperties: telemetryData,
+          }
         );
-        if (isError) return `Invalid project name: ${message}`;
-        return true;
-      },
-    });
-    if (!Object.hasOwn(res, 'name')) {
-      postHogCaptureError(
-        posthogClient,
-        userId,
-        sessionId,
-        new Error('User cancelled project name input'),
-        {
-          errorCode: ERROR_CODES.ERR_CANCEL_PROJECT_NAME_PROMPT,
-          errorCategory: 'user-cancellation',
-          step: TRACKING_STEPS.PROJECT_NAME_INPUT,
-          fatal: true,
-          additionalProperties: telemetryData,
-        }
-      );
-      if (posthogClient) await posthogClient.shutdown();
-      exit(1);
+        if (posthogClient) await posthogClient.shutdown();
+        exit(1);
+      }
+      projectName = res.name;
     }
-    projectName = res.name;
   }
 
   if (!template) {
-    if (!process.stdin.isTTY) {
+    if (opts.yes || !process.stdin.isTTY) {
       template = DEFAULT_TEMPLATE;
+      if (opts.yes) {
+        console.log(`Using ${template.title} as the starter template.`);
+      }
     } else {
       const res = await prompts({
         name: 'template',
