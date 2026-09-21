@@ -1,7 +1,7 @@
 import { defineClientPlugin } from '../../../client';
 import { EMPTY_RICH_TEXT, type RichTextValue } from './rich-text-codec';
 import { codecFor, writesSameSource } from './rich-text-codecs';
-import { richTextSchema } from './rich-text-field.schema';
+import { isRichTextEmpty, richTextSchema } from './rich-text-field.schema';
 import { RichTextField } from './rich-text-field.ui';
 
 export default defineClientPlugin({
@@ -10,6 +10,7 @@ export default defineClientPlugin({
     defaultValue: EMPTY_RICH_TEXT,
     metadata: { layout: 'block', labelable: false },
     schema: richTextSchema,
+    isEmpty: isRichTextEmpty,
     parse: (stored, node, context) =>
       codecFor(node, context).parse(
         typeof stored === 'string' ? stored : '',

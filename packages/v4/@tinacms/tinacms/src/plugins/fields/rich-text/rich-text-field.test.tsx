@@ -1,5 +1,7 @@
 import { INVALID_MARKDOWN_TYPE } from '@tinacms/rich-text';
 import { describe, expect, it } from 'vitest';
+import { required } from '../../../plugins/fields';
+import { coreValidatorRegistry } from '../../../test/core-validators';
 // Warm the Plate editor chain at module scope. resolveFieldPlugins dynamically
 // imports the rich-text client, and paying its transform cost inside a test's
 // timeout flakes on contended CI runners.
@@ -21,7 +23,12 @@ const collection: CollectionSchema = {
   label: 'Posts',
   format: 'mdx',
   fields: [
-    t.richText({ name: 'body', label: 'Body', isBody: true, required: true }),
+    t.richText({
+      name: 'body',
+      label: 'Body',
+      isBody: true,
+      validators: [required()],
+    }),
   ],
 };
 
@@ -209,7 +216,10 @@ describe('RichTextField validation', () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('rich-text');
     expect(
-      validateField(bodyNode, descriptor, { type: 'root', children: [] })
+      validateFieldWithCore(bodyNode, descriptor, {
+        type: 'root',
+        children: [],
+      })
     ).not.toEqual([]);
   });
 
@@ -220,7 +230,7 @@ describe('RichTextField validation', () => {
       type: 'root',
       children: [{ type: 'p', children: [{ type: 'text', text: '' }] }],
     };
-    expect(validateField(bodyNode, descriptor, trailingBlock)).toEqual([
+    expect(validateFieldWithCore(bodyNode, descriptor, trailingBlock)).toEqual([
       'Body is required',
     ]);
   });
@@ -235,7 +245,7 @@ describe('RichTextField validation', () => {
         { type: 'p', children: [] },
       ],
     };
-    expect(validateField(bodyNode, descriptor, blank)).toEqual([
+    expect(validateFieldWithCore(bodyNode, descriptor, blank)).toEqual([
       'Body is required',
     ]);
   });
@@ -250,7 +260,7 @@ describe('RichTextField validation', () => {
         { type: 'p', children: [{ type: 'text', text: 'a' }] },
       ],
     };
-    expect(validateField(bodyNode, descriptor, typed)).toEqual([]);
+    expect(validateFieldWithCore(bodyNode, descriptor, typed)).toEqual([]);
   });
 
   it('accepts a body whose only content is an embed', async () => {
@@ -263,15 +273,15 @@ describe('RichTextField validation', () => {
         { type: 'img', url: '/a.png', children: [{ type: 'text', text: '' }] },
       ],
     };
-    expect(validateField(bodyNode, descriptor, embed)).toEqual([]);
+    expect(validateFieldWithCore(bodyNode, descriptor, embed)).toEqual([]);
   });
 
   it('accepts a body with content', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('rich-text');
-    expect(validateField(bodyNode, descriptor, ast('# Hi', registry))).toEqual(
-      []
-    );
+    expect(
+      validateFieldWithCore(bodyNode, descriptor, ast('# Hi', registry))
+    ).toEqual([]);
   });
 
   it('rejects markdown the parser could not read', async () => {
@@ -281,26 +291,30 @@ describe('RichTextField validation', () => {
       type: 'root',
       children: [{ type: INVALID_MARKDOWN_TYPE }],
     };
-    expect(validateField(bodyNode, descriptor, unparsed)).not.toEqual([]);
+    expect(validateFieldWithCore(bodyNode, descriptor, unparsed)).not.toEqual(
+      []
+    );
   });
 
   it('rejects a value that is not rich text at all', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('rich-text');
-    expect(validateField(bodyNode, descriptor, 'plain string')).not.toEqual([]);
+    expect(
+      validateFieldWithCore(bodyNode, descriptor, 'plain string')
+    ).not.toEqual([]);
   });
 
   it('accepts an absent value when the field is optional', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('rich-text');
     const optional = t.richText({ name: 'body' });
-    expect(validateField(optional, descriptor, undefined)).toEqual([]);
+    expect(validateFieldWithCore(optional, descriptor, undefined)).toEqual([]);
   });
 
   it('reports an absent required body as required, not as malformed', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('rich-text');
-    expect(validateField(bodyNode, descriptor, undefined)).toEqual([
+    expect(validateFieldWithCore(bodyNode, descriptor, undefined)).toEqual([
       'Body is required',
     ]);
   });
@@ -314,3 +328,14 @@ describe('RichTextField metadata wrapping', () => {
     expect(descriptor?.defaultValue).toEqual({ type: 'root', children: [] });
   });
 });
+
+const validateFieldWithCore: typeof validateField = (
+  node,
+  descriptor,
+  value,
+  options
+) =>
+  validateField(node, descriptor, value, {
+    validators: coreValidatorRegistry,
+    ...options,
+  });

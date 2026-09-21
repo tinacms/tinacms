@@ -16,6 +16,9 @@ import { validateField } from '../../../core/validation';
 import { FormProvider, TinaProvider } from '../../../editor';
 import { toFormId, useFormStore } from '../../../form/form-store';
 import { t } from '../../../index';
+import { max, min, required } from '../../../plugins/fields';
+import coreValidatorsPlugin from '../../../plugins/validators/core-validators.plugin';
+import { coreValidatorRegistry } from '../../../test/core-validators';
 import { LabelledFields } from '../../../test/labelled-fields';
 import numberFieldPlugin from './number-field.plugin';
 
@@ -35,12 +38,10 @@ const collection: CollectionSchema = {
     t.number({
       name: 'rating',
       label: 'Rating',
-      required: true,
-      min: 1,
-      max: 5,
+      validators: [required(), min(1), max(5)],
       step: 0.5,
     }),
-    t.number({ name: 'count', label: 'Count', required: true }),
+    t.number({ name: 'count', label: 'Count', validators: [required()] }),
     t.number({ name: 'weight', label: 'Weight' }),
   ],
 };
@@ -54,7 +55,7 @@ const renderField = (document?: TinaDocument) =>
   render(
     <TinaProvider
       config={asResolvedConfig({
-        plugins: [numberFieldPlugin],
+        plugins: [numberFieldPlugin, coreValidatorsPlugin],
         schema: NO_COLLECTIONS,
       })}
     >
@@ -158,11 +159,11 @@ describe('NumberField validation', () => {
   it('coerces the editor string and applies min/max bounds', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('number');
-    expect(validateField(ratingNode, descriptor, '3')).toEqual([]);
-    expect(validateField(ratingNode, descriptor, '0')).toEqual([
+    expect(validateFieldWithCore(ratingNode, descriptor, '3')).toEqual([]);
+    expect(validateFieldWithCore(ratingNode, descriptor, '0')).toEqual([
       'Rating must be at least 1',
     ]);
-    expect(validateField(ratingNode, descriptor, '6')).toEqual([
+    expect(validateFieldWithCore(ratingNode, descriptor, '6')).toEqual([
       'Rating must be at most 5',
     ]);
   });
@@ -170,8 +171,8 @@ describe('NumberField validation', () => {
   it('treats zero as present, not empty, for a required field', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('number');
-    expect(validateField(countNode, descriptor, '0')).toEqual([]);
-    expect(validateField(countNode, descriptor, '')).toEqual([
+    expect(validateFieldWithCore(countNode, descriptor, '0')).toEqual([]);
+    expect(validateFieldWithCore(countNode, descriptor, '')).toEqual([
       'Count is required',
     ]);
   });
@@ -179,7 +180,7 @@ describe('NumberField validation', () => {
   it('rejects a non-numeric value', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('number');
-    expect(validateField(countNode, descriptor, 'abc')).toEqual([
+    expect(validateFieldWithCore(countNode, descriptor, 'abc')).toEqual([
       'Count must be a number',
     ]);
   });
@@ -187,7 +188,7 @@ describe('NumberField validation', () => {
   it('rejects a non-finite value (Infinity)', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('number');
-    expect(validateField(countNode, descriptor, '1e999')).toEqual([
+    expect(validateFieldWithCore(countNode, descriptor, '1e999')).toEqual([
       'Count must be a finite number',
     ]);
   });
@@ -195,7 +196,7 @@ describe('NumberField validation', () => {
   it('treats a whitespace-only value as empty', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('number');
-    expect(validateField(countNode, descriptor, '   ')).toEqual([
+    expect(validateFieldWithCore(countNode, descriptor, '   ')).toEqual([
       'Count is required',
     ]);
   });
@@ -203,8 +204,10 @@ describe('NumberField validation', () => {
   it('passes an optional field left empty', async () => {
     const registry = await resolveRegistry();
     const descriptor = registry.get('number');
-    expect(validateField(weightNode, descriptor, '')).toEqual([]);
-    expect(validateField(weightNode, descriptor, undefined)).toEqual([]);
+    expect(validateFieldWithCore(weightNode, descriptor, '')).toEqual([]);
+    expect(validateFieldWithCore(weightNode, descriptor, undefined)).toEqual(
+      []
+    );
   });
 
   it('appends a descriptor-level custom validate error', () => {
@@ -213,7 +216,9 @@ describe('NumberField validation', () => {
       Component: () => null,
       validate: (value: unknown) => (value === '13' ? 'Unlucky' : null),
     };
-    expect(validateField(countNode, descriptor, '13')).toContain('Unlucky');
+    expect(validateFieldWithCore(countNode, descriptor, '13')).toContain(
+      'Unlucky'
+    );
   });
 });
 
@@ -261,3 +266,14 @@ describe('NumberField metadata wrapping', () => {
     expect(descriptor?.defaultValue).toBeUndefined();
   });
 });
+
+const validateFieldWithCore: typeof validateField = (
+  node,
+  descriptor,
+  value,
+  options
+) =>
+  validateField(node, descriptor, value, {
+    validators: coreValidatorRegistry,
+    ...options,
+  });

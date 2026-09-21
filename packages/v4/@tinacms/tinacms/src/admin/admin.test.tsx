@@ -9,7 +9,9 @@ import type { TinaDocument } from '../core/schema/types';
 import type { AdminScreenProps } from '../core/screen/contract';
 import { useFormId } from '../editor/hooks';
 import { useFormStore } from '../form/form-store';
+import { required } from '../plugins/fields';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
+import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { TinaAdmin } from './admin';
 import { useAdminRoute } from './use-admin-route';
 
@@ -94,7 +96,12 @@ const screenPlugin = definePlugin({
 });
 
 const config = asResolvedConfig({
-  plugins: [contentPlugin, screenPlugin, stringFieldPlugin],
+  plugins: [
+    contentPlugin,
+    screenPlugin,
+    stringFieldPlugin,
+    coreValidatorsPlugin,
+  ],
   schema: {
     collections: [
       {
@@ -102,7 +109,14 @@ const config = asResolvedConfig({
         label: 'Posts',
         path: 'content/posts',
         format: 'mdx',
-        fields: [{ name: 'title', label: 'Title', type: 'string' }],
+        fields: [
+          {
+            name: 'title',
+            label: 'Title',
+            type: 'string',
+            validators: [required()],
+          },
+        ],
       },
       {
         name: 'page',
@@ -194,6 +208,31 @@ describe('TinaAdmin', () => {
       expect(screen.getByRole('status')).toHaveTextContent('Saved')
     );
     expect(input).toHaveValue('Hello!');
+  });
+
+  it('disables Save while the document has a validation error', async () => {
+    const user = userEvent.setup();
+    renderAdmin();
+    await user.click(await screen.findByRole('button', { name: 'Posts' }));
+    await user.click(await screen.findByRole('button', { name: /hello\.mdx/ }));
+    const input = await screen.findByLabelText('Title');
+
+    await user.clear(input);
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Title is required'
+    );
+    expect(screen.getByRole('button', { name: 'Save' })).toHaveAttribute(
+      'aria-disabled',
+      'true'
+    );
+
+    await user.type(input, 'Hello again');
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Save' })).toHaveAttribute(
+        'aria-disabled',
+        'false'
+      )
+    );
   });
 
   it('opens the document a deep link names', async () => {

@@ -25,18 +25,7 @@ export const asObjectFieldSchema = (node: FieldSchema): ObjectFieldSchema => {
   return node as ObjectFieldSchema;
 };
 
-const labelOf = (node: ObjectFieldSchema): string => node.label ?? node.name;
-
-export const objectSchema = (node: FieldSchema): ZodType => {
-  const field = asObjectFieldSchema(node);
-  const base = z.record(z.string(), z.unknown());
-  if (field.required) {
-    return z.preprocess(
-      (value) => value ?? {},
-      base.refine((value) => Object.keys(value).length > 0, {
-        message: `${labelOf(field)} is required`,
-      })
-    );
-  }
-  return z.preprocess((value) => value ?? {}, base);
-};
+// The shape of the value only. `required` is a validator the collection
+// attaches, and an object with no keys is empty.
+export const objectSchema = (_node: FieldSchema): ZodType =>
+  z.preprocess((value) => value ?? {}, z.record(z.string(), z.unknown()));

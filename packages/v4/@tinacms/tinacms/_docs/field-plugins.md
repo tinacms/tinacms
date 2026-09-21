@@ -116,7 +116,13 @@ The properties of the descriptor:
 - `metadata.labelable` — Set it to `false` to hide the outer field label. The
   `rich-text` field sets it to `false` because it renders its own label area.
 - `schema(node)` — It returns a Zod schema for the validation in layer 1.
-- `validate(value)` — A custom check for layer 2. It returns `string` or `null`.
+- `isEmpty(value)` — What the built-in `required` validator asks of this field
+  type. Declare it when the generic check is wrong.
+- `measure(value)` — What the built-in `min` and `max` validators compare, as
+  `{ amount, unit? }`. Declare it when the generic measure is wrong.
+- `validate(value, context)` — A custom check for layer 1. It returns one
+  message, a list of messages, or `null`. `context` is
+  `{ node, address }`: the field's own schema node and its current address.
 - `parse` and `serialize` — Optional conversions between the stored value and
   the editor value. Do not add them if the two values are the same. Each one
   also receives the field's own schema node and a `FieldTransformContext`
@@ -133,8 +139,8 @@ The properties of the descriptor:
   applies `isEqual` to a top-level field only. A field nested in a compound
   field falls back to structural equality, because the form compares a
   compound field's value as one unit.
-- `validateChildren(value, node, address, registry)` — An optional function
-  for a compound field. It returns a flat map of nested address to messages.
+- `validateChildren(value, node, address, registry, scope)` — An optional
+  function for a compound field. It returns a flat map of nested address to messages.
   `address` is this field's own current address — not always `node.name`, since
   a nested compound field is not addressed by its bare name. Refer to
   [Compound fields](#compound-fields) below.
@@ -195,13 +201,86 @@ Hooks:
 ## Validation in two layers
 
 The form resolver (`editor/resolver.ts`) calls `validateField`
-(`core/validation.ts`). `validateField` runs the two layers and joins their
-messages:
+(`core/validation.ts`). `validateField` runs the two layers in order and joins
+their messages. The spec is
+[tinacmsv4-docs › field-plugins › Validation](https://github.com/tinacms/tinacmsv4-docs/blob/main/plugins/field-plugins.md#validation).
 
-1. **Zod** — `descriptor.schema(node).safeParse(value)`. This layer applies the
-   `required`, `min`, `max`, and `pattern` rules.
-2. **Custom** — `descriptor.validate(value)`. This layer returns one message or
-   `null`.
+1. **Plugin-level** — `descriptor.validate(value, context)`. It runs on every
+   field of the `type` the plugin owns. `context` is `PluginValidationContext`,
+   `{ node, address }`.
+2. **Field-level** — each `{ name, args }` entry in the node's `validators`
+   list, in order. A plugin registers a `ValidatorFactory` under `name`; the
+   factory takes `args` and returns the rule. The rule gets
+   `FieldValidationContext`: `{ node, address, siblings, values, isEmpty,
+   measure }`.
+
+Both layers return the same shape, `string | string[] | null`
+(`Validate<TValue, TContext>` in `core/field/contract.ts`). Only layer 2 sees
+`siblings`; a plugin-level rule is scoped to its own field.
+
+`descriptor.schema(node)` still runs first, but it is not a layer of rules. It
+gives the shape of the value and the coercion the editor needs: a number field
+holds a string in the form and a number in the document. A field type declares
+no `required`, `min`, `max` or `pattern` there.
+
+### The rules that v4 supplies
+
+`required`, `min`, `max` and `pattern` are field-level validators that a core
+plugin registers (`plugins/validators/`). A collection attaches them like any
+other:
+
+```ts
+t.string({ name: 'title', validators: [required(), min(3)] });
+t.array({ name: 'tags', fields: [...], validators: [max(5)] });
+```
+
+Two descriptor hooks let a field type answer them:
+
+- `isEmpty(value)` — what `required` asks. The default counts `null`,
+  `undefined`, `''`, an empty array and an empty object as empty. The
+  rich-text field declares its own, because an empty paragraph is an empty
+  document. The boolean field declares `() => false`, so `required` has no
+  effect on a checkbox.
+- `measure(value)` — what `min` and `max` compare, as
+  `{ amount, unit? }`. A string measures its length in `characters`, an array
+  its `items`, a number its own value. The number field declares its own,
+  because the editor holds a string.
+
+`min` and `max` pass an empty value, so a field with `required()` and `min(3)`
+reports one message, not two.
+
+A plugin registers factories through the `validator` capability
+([plugins.md](./plugins.md#validator-plugins)). `TinaProvider` builds the
+`ValidatorRegistry` from every installed plugin at boot, and `FormProvider`
+hands it to the resolver. `compileSchema` fails on a `name` no installed
+plugin registers, and `validateField` throws `validator-unknown` for the same
+case at runtime. The barebones example registers `matches` and `differentFrom`
+(`packages/v4/examples/barebones/tina/validators.ts`).
+
+### `args` holds data, never a function
+
+`args` is `JsonValue[]` (`core/json.ts`), because `compileSchema` writes each
+`{ name, args }` entry into `tina-lock.json`. A function does not survive
+JSON, so it cannot be an argument. The logic of a rule stays in the factory,
+in the plugin; the collection supplies only the data that configures it.
+
+```ts
+// Wrong. A function is not JSON, and this does not compile.
+t.string({
+  name: 'slug',
+  validators: [{ name: 'custom', args: [(value) => value.length > 3] }],
+});
+
+// Correct. The plugin holds the logic; the collection supplies the number.
+t.string({ name: 'slug', validators: [minLength(3)] });
+```
+
+A rule that one collection needs, and that no data can configure, is a field
+plugin of its own, not a validator.
+
+A compound field sets `siblings` for its children: the `array` field passes
+the item, the `object` field passes the object
+(`array-field.client.tsx`, `object-field.client.tsx`).
 
 ## Replace a built-in field
 
@@ -267,10 +346,12 @@ need three extra pieces. Each one has a plain, ordinary counterpart; refer to
   A compound field's `parse`/`serialize` calls `ingestDocument`/
   `digestDocument` again, with its own item `fields` and that registry, so its
   items go through the same conversion path as the top-level form.
-- **Validation** — `validateChildren(value, node, address, registry)` on the
-  descriptor calls `validateFieldTree(subfield, subDescriptor, subValue,
-  \`${address}.${index}.${subfield.name}\`, registry)` (`core/validation.ts`),
-  once for each item field, and merges what it returns. Build the item's
+- **Validation** — `validateChildren(value, node, address, registry, scope)`
+  on the descriptor calls `validateFieldTree(subfield, subDescriptor, subValue,
+  \`${address}.${index}.${subfield.name}\`, registry, { ...scope, siblings: item
+  })` (`core/validation.ts`), once for each item field, and merges what it
+  returns. Set `siblings` to the item, so a field-level validator on an item
+  field reads the item, not the document root. Build the item's
   address from the `address` parameter, not from `node.name` — a nested
   compound field (an array inside an array) is not addressed by its bare name.
   `validateFieldTree` runs `validateField`, then — if the item field is itself

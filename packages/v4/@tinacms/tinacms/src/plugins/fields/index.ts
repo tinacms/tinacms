@@ -1,6 +1,5 @@
+import coreValidatorsPlugin from '../validators/core-validators.plugin';
 import arrayFieldPlugin from './array/array-field.plugin';
-import referenceFieldPlugin from './reference/reference-field.plugin';
-import { reference } from './reference/reference-field.schema';
 import { array } from './array/array-field.schema';
 import booleanFieldPlugin from './boolean/boolean-field.plugin';
 import { boolean } from './boolean/boolean-field.schema';
@@ -10,6 +9,8 @@ import numberFieldPlugin from './number/number-field.plugin';
 import { number } from './number/number-field.schema';
 import objectFieldPlugin from './object/object-field.plugin';
 import { object } from './object/object-field.schema';
+import referenceFieldPlugin from './reference/reference-field.plugin';
+import { reference } from './reference/reference-field.schema';
 import richTextFieldPlugin from './rich-text/rich-text-field.plugin';
 import { richText } from './rich-text/rich-text-field.schema';
 import selectFieldPlugin from './select/select-field.plugin';
@@ -27,6 +28,7 @@ export const corePlugins = [
   selectFieldPlugin,
   richTextFieldPlugin,
   referenceFieldPlugin,
+  coreValidatorsPlugin,
 ];
 
 // TODO: build `t` from the configured plugin set when defineConfig arrives
@@ -54,3 +56,10 @@ export type {
 } from './select/select-field.schema';
 export type { StringFieldSchema } from './string/string-field.schema';
 export type { ReferenceFieldSchema } from './reference/reference-field.schema';
+export {
+  max,
+  min,
+  pattern,
+  required,
+  v,
+} from '../validators/core-validators.schema';

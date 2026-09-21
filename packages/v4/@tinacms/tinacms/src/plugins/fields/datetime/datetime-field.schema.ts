@@ -22,23 +22,23 @@ const labelOf = (field: DatetimeFieldSchema): string =>
 const ISO_8601 =
   /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})?)?$/;
 
+const toDateString = (value: unknown): unknown => {
+  if (value instanceof Date) return value.toISOString();
+  return value === '' || value == null ? undefined : value;
+};
+
+// The shape of the value only. `required` is a validator the collection
+// attaches.
 export const datetimeSchema = (node: FieldSchema): ZodType => {
   const field = node as DatetimeFieldSchema;
-  const schema = z
-    .string({
-      required_error: `${labelOf(field)} is required`,
-      invalid_type_error: `${labelOf(field)} must be a date string`,
-    })
-    .refine(
-      (value) => ISO_8601.test(value) && !Number.isNaN(Date.parse(value)),
-      `${labelOf(field)} must be a valid date`
-    );
-  const toDateString = (value: unknown): unknown => {
-    if (value instanceof Date) return value.toISOString();
-    return value === '' || value == null ? undefined : value;
-  };
-  if (field.required) {
-    return z.preprocess(toDateString, schema);
-  }
-  return z.preprocess(toDateString, schema.optional());
+  return z.preprocess(
+    toDateString,
+    z
+      .string({ invalid_type_error: `${labelOf(field)} must be a date string` })
+      .refine(
+        (value) => ISO_8601.test(value) && !Number.isNaN(Date.parse(value)),
+        `${labelOf(field)} must be a valid date`
+      )
+      .optional()
+  );
 };

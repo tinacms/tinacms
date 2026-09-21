@@ -6,8 +6,13 @@ import type { FieldProvision, PluginManifest } from '../core/plugin';
 import type {
   CollectionSchema,
   FieldSchema,
+  TemplateFieldSchema,
   TemplateSchema,
 } from '../core/schema/types';
+import {
+  overridesValidatorKey,
+  validatorConflictError,
+} from '../core/validator/registry';
 import { type PackageVersion, packageVersion } from './package-version';
 
 export const LOCK_VERSION = 5;
@@ -36,6 +41,20 @@ const fieldProvisionsOf = (
     fieldConflictError
   );
 
+const registeredValidatorsOf = (plugins: PluginManifest[]): Set<string> =>
+  new Set(
+    composeOverridableRegistry(
+      plugins.flatMap((plugin) =>
+        (plugin.validators ?? []).map((name) => ({
+          key: name,
+          value: plugin,
+          isOverride: overridesValidatorKey(plugin, name),
+        }))
+      ),
+      validatorConflictError
+    ).keys()
+  );
+
 const templateFieldTypesIn = (templates: TemplateSchema[] = []): string[] =>
   templates.flatMap((template) =>
     (template.fields ?? []).flatMap((nested) => [
@@ -56,6 +75,20 @@ const usedFieldTypes = (collections: CollectionSchema[]): string[] => [
   ),
 ];
 
+const validatorNamesIn = (fields: TemplateFieldSchema[]): string[] =>
+  fields.flatMap((field) => [
+    ...(field.validators ?? []).map((ref) => ref.name),
+    ...(field.templates ?? []).flatMap((template) =>
+      validatorNamesIn(template.fields ?? [])
+    ),
+  ]);
+
+const usedValidators = (collections: CollectionSchema[]): string[] => [
+  ...new Set(
+    collections.flatMap((collection) => validatorNamesIn(collection.fields))
+  ),
+];
+
 export const compileSchema = (config: ResolvedConfig): TinaLock => {
   const provisions = fieldProvisionsOf(config.plugins);
   const primitives: Record<string, number> = {};
@@ -68,6 +101,15 @@ export const compileSchema = (config: ResolvedConfig): TinaLock => {
         'the `field` capability at that type.'
     );
     primitives[type] = provision.contractVersion;
+  }
+  const registered = registeredValidatorsOf(config.plugins);
+  for (const name of usedValidators(config.schema.collections).sort()) {
+    invariant(
+      registered.has(name),
+      'schema-unknown-validator',
+      `The schema uses the validator "${name}", but no installed plugin ` +
+        'registers it.'
+    );
   }
   return {
     version: LOCK_VERSION,
