@@ -203,31 +203,10 @@ const rerank = async (target: Issue, shortlist: Issue[]) => {
   };
 };
 
-const errorLine = (issue: Issue) => {
-  const section = (issue.body ?? '')
-    .split(/^### /m)
-    .find((s) => s.startsWith('The exact error message'));
-  if (!section) return null;
-  const line = section
-    .split('\n')
-    .slice(1)
-    .map((l) => l.trim())
-    .find((l) => l && !l.startsWith('```') && l !== '_No response_');
-  return line ?? null;
-};
-
-const duplicateComment = (target: Issue, winner: Issue) => {
-  const line = errorLine(target);
-  const shared =
-    line && (winner.body ?? '').includes(line)
-      ? ` Both report \`${line}\`.`
-      : '';
-  return (
-    `This looks like a duplicate of #${winner.number} (${winner.title}).${shared}\n\n` +
-    `If that is the same problem, please add anything new (your versions, framework, or a repro) to #${winner.number} so the discussion stays in one place. A maintainer will confirm and close this one.\n\n` +
-    'If it is not the same problem, say so here and we will triage it separately.'
-  );
-};
+const duplicateComment = (winner: Issue) =>
+  `This looks like a duplicate of #${winner.number} (${winner.title}).\n\n` +
+  `If that is the same problem, please add anything new (your versions, framework, or a repro) to #${winner.number} so the discussion stays in one place. A maintainer will confirm and close this one.\n\n` +
+  'If it is not the same problem, say so here and we will triage it separately.';
 
 const relatedComment = (winner: Issue) =>
   `This may be related to #${winner.number} (${winner.title}).\n\n` +
@@ -291,9 +270,7 @@ summary([
 if (tier === 'none' || dryRun) process.exit(0);
 
 const body =
-  tier === 'duplicate'
-    ? duplicateComment(target, winner)
-    : relatedComment(winner);
+  tier === 'duplicate' ? duplicateComment(winner) : relatedComment(winner);
 await github(`/repos/${repo}/issues/${target.number}/comments`, { body });
 if (tier === 'duplicate') {
   await github(`/repos/${repo}/issues/${target.number}/labels`, {

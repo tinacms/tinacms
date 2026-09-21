@@ -14,6 +14,8 @@ on:
         type: boolean
         default: true
 
+# Set the repository variable DEDUPE_DRY_RUN to "true" to run in shadow mode on real issues.
+
 permissions:
   issues: write
 
@@ -43,4 +45,4 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TYPESAFE_API_KEY: ${{ secrets.TYPESAFE_API_KEY }}
           ISSUE_NUMBER: ${{ github.event.issue.number || inputs.issue_number }}
-          DRY_RUN: ${{ inputs.dry_run == true }}
+          DRY_RUN: ${{ inputs.dry_run == true || vars.DEDUPE_DRY_RUN == 'true' }}
