@@ -1,11 +1,12 @@
 import { CreateBranchPromptModal } from '@toolkit/form-builder/create-branch-modal';
+import { EditorialWorkflowErrorBox } from '@toolkit/form-builder/editorial-workflow-error-box';
 import { EditorialWorkflowProgressModal } from '@toolkit/form-builder/editorial-workflow-progress-modal';
 import {
   type MediaWorkflowConfirmBranchEvent,
   TARGET_BRANCH_EXISTS_ERROR,
   checkBranchGuard,
 } from '@toolkit/form-builder/editorial-workflow-utils';
-import type { EditorialWorkflowMessagePart } from '@toolkit/form-builder/editorial-workflow-utils';
+import type { EditorialWorkflowErrorCopy } from '@toolkit/form-builder/editorial-workflow-utils';
 import {
   collectionLabelResolver,
   getEditorialWorkflowError,
@@ -29,7 +30,7 @@ type WorkflowState =
       phase: 'confirming';
       branchName: string;
       baseBranch: string;
-      errorMessageParts?: EditorialWorkflowMessagePart[];
+      error?: EditorialWorkflowErrorCopy;
       isChecking?: boolean;
       allowSaveToProtectedBranch: boolean;
       onConfirm: (branchName: string) => Promise<void>;
@@ -37,7 +38,7 @@ type WorkflowState =
       onSaveToProtectedBranch: () => void;
     }
   | { phase: 'executing'; step: number; elapsed: number }
-  | { phase: 'error'; message: string };
+  | { phase: 'error'; error: EditorialWorkflowErrorCopy };
 
 export const MediaWorkflowOverlay = () => {
   const cms = useCMS();
@@ -86,12 +87,22 @@ export const MediaWorkflowOverlay = () => {
     }>('media:workflow:complete', (event) => {
       setCurrentBranch(event.branchName);
     });
-    const offError = cms.events.subscribe<{ type: string; message: string }>(
-      'media:workflow:error',
-      (event) => {
-        setState({ phase: 'error', message: event.message });
-      }
-    );
+    const offError = cms.events.subscribe<{
+      type: string;
+      message: string;
+      error?: unknown;
+    }>('media:workflow:error', (event) => {
+      setState({
+        phase: 'error',
+        error:
+          event.error === undefined
+            ? { messageParts: plainMessage(event.message) }
+            : getEditorialWorkflowError(
+                event.error,
+                collectionLabelResolver(cms.api.tina.schema)
+              ),
+      });
+    });
     const offFinish = cms.events.subscribe('media:workflow:finish', () => {
       setState({ phase: 'idle' });
     });
@@ -131,7 +142,7 @@ export const MediaWorkflowOverlay = () => {
     setState({
       ...confirmState,
       isChecking: true,
-      errorMessageParts: undefined,
+      error: undefined,
     });
 
     const { baseBranchExists, targetBranchExists } = await checkBranchGuard(
@@ -152,9 +163,11 @@ export const MediaWorkflowOverlay = () => {
         ...confirmState,
         branchName,
         isChecking: false,
-        errorMessageParts: plainMessage(
-          `The branch ${confirmState.baseBranch} no longer exists. It may have been merged or deleted. Your changes cannot be pushed to it.`
-        ),
+        error: {
+          messageParts: plainMessage(
+            `The branch ${confirmState.baseBranch} no longer exists. It may have been merged or deleted. Your changes cannot be pushed to it.`
+          ),
+        },
       });
       return;
     }
@@ -167,7 +180,7 @@ export const MediaWorkflowOverlay = () => {
         ...confirmState,
         branchName,
         isChecking: false,
-        errorMessageParts: plainMessage(TARGET_BRANCH_EXISTS_ERROR),
+        error: { messageParts: plainMessage(TARGET_BRANCH_EXISTS_ERROR) },
       });
       return;
     }
@@ -184,10 +197,10 @@ export const MediaWorkflowOverlay = () => {
         ...confirmState,
         branchName,
         isChecking: false,
-        errorMessageParts: getEditorialWorkflowError(
+        error: getEditorialWorkflowError(
           e,
           collectionLabelResolver(cms.api.tina.schema)
-        ).messageParts,
+        ),
       });
     }
   };
@@ -206,7 +219,7 @@ export const MediaWorkflowOverlay = () => {
         disabled={
           normalizeBranchName(state.branchName) === '' || state.isChecking
         }
-        errorMessageParts={state.errorMessageParts}
+        error={state.error}
         onBranchNameChange={(branchName) => {
           abortPreflight();
           setState((prev) =>
@@ -214,7 +227,7 @@ export const MediaWorkflowOverlay = () => {
               ? {
                   ...prev,
                   branchName,
-                  errorMessageParts: undefined,
+                  error: undefined,
                   isChecking: false,
                 }
               : prev
@@ -247,11 +260,8 @@ export const MediaWorkflowOverlay = () => {
       <PopupModal className='w-auto'>
         <ModalHeader close={dismissError}>Branch creation failed</ModalHeader>
         <ModalBody padded={true}>
-          <div className='flex items-center gap-1 text-red-700 py-2 px-3 bg-red-50 border border-red-200 rounded max-w-sm'>
-            <CircleAlert className='w-5 h-auto text-red-400 flex-shrink-0' />
-            <span className='text-sm'>
-              <b>Error:</b> {state.message}
-            </span>
+          <div className='max-w-sm'>
+            <EditorialWorkflowErrorBox error={state.error} />
           </div>
         </ModalBody>
       </PopupModal>

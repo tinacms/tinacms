@@ -147,13 +147,17 @@ describe('getEditorialWorkflowError', () => {
     expect(message).toContain('post');
   });
 
-  it('omits the collection when the path matches none', () => {
+  it('omits the collection when the lookup throws, as the real schema does', () => {
     const { messageParts } = getEditorialWorkflowError(
       workflowError('index failed', {
         errorCode: EDITORIAL_WORKFLOW_ERROR.INDEXING_FAILED,
         file: 'content/posts/hello.mdx',
       }),
-      collectionLabelResolver({ getCollectionByFullPath: () => undefined })
+      collectionLabelResolver({
+        getCollectionByFullPath: () => {
+          throw new Error('Unable to find collection for file at x');
+        },
+      } as unknown as Parameters<typeof collectionLabelResolver>[0])
     );
     const message = messageText(messageParts);
 
@@ -161,7 +165,7 @@ describe('getEditorialWorkflowError', () => {
     expect(message).not.toContain(' in ');
   });
 
-  it('emphasises the page and collection, and keeps message in step with parts', () => {
+  it('emphasises the page and collection', () => {
     const { messageParts } = getEditorialWorkflowError(
       workflowError('index failed', {
         errorCode: EDITORIAL_WORKFLOW_ERROR.INDEXING_FAILED,

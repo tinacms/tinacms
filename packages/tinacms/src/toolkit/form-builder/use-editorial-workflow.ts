@@ -9,8 +9,7 @@ import {
 import { useCMS } from '../react-core';
 import { EDITORIAL_WORKFLOW_STATUS } from './editorial-workflow-constants';
 import {
-  type EditorialWorkflowErrorLink,
-  type EditorialWorkflowMessagePart,
+  type EditorialWorkflowErrorCopy,
   TARGET_BRANCH_EXISTS_ERROR,
   checkTargetBranchExists,
   collectionLabelResolver,
@@ -83,8 +82,7 @@ export interface ExecuteWorkflowOptions {
 
 export interface UseEditorialWorkflowResult {
   isExecuting: boolean;
-  errorMessageParts?: EditorialWorkflowMessagePart[];
-  errorLink?: EditorialWorkflowErrorLink;
+  error?: EditorialWorkflowErrorCopy;
   currentStep: number;
   elapsedTime: number;
   /** Resolves with the outcome; on failure `error` holds the message. */
@@ -101,11 +99,8 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
   const { setCurrentBranch } = useBranchData();
 
   const [isExecuting, setIsExecuting] = React.useState(false);
-  const [errorMessageParts, setErrorMessageParts] = React.useState<
-    EditorialWorkflowMessagePart[] | undefined
-  >(undefined);
-  const [errorLink, setErrorLink] = React.useState<
-    EditorialWorkflowErrorLink | undefined
+  const [error, setError] = React.useState<
+    EditorialWorkflowErrorCopy | undefined
   >(undefined);
   const [currentStep, setCurrentStep] = React.useState(0);
   const [elapsedTime, setElapsedTime] = React.useState(0);
@@ -125,8 +120,7 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
   }, [isExecuting, currentStep]);
 
   const reset = () => {
-    setErrorMessageParts(undefined);
-    setErrorLink(undefined);
+    setError(undefined);
     setIsExecuting(false);
     setCurrentStep(0);
   };
@@ -157,8 +151,7 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
       if (signal?.aborted) return { success: false };
 
       if (targetBranchExists) {
-        setErrorMessageParts(plainMessage(TARGET_BRANCH_EXISTS_ERROR));
-        setErrorLink(undefined);
+        setError({ messageParts: plainMessage(TARGET_BRANCH_EXISTS_ERROR) });
         setIsExecuting(false);
         setCurrentStep(0);
         return { success: false, error: TARGET_BRANCH_EXISTS_ERROR };
@@ -252,24 +245,22 @@ export function useEditorialWorkflow(): UseEditorialWorkflowResult {
       return { success: true };
     } catch (e: unknown) {
       console.error(e);
-      const { messageParts, link } = getEditorialWorkflowError(
+      const copy = getEditorialWorkflowError(
         e,
         collectionLabelResolver(cms.api.tina.schema)
       );
 
-      setErrorMessageParts(messageParts);
-      setErrorLink(link);
+      setError(copy);
       setIsExecuting(false);
       setCurrentStep(0);
 
-      return { success: false, error: messageText(messageParts) };
+      return { success: false, error: messageText(copy.messageParts) };
     }
   };
 
   return {
     isExecuting,
-    errorMessageParts,
-    errorLink,
+    error,
     currentStep,
     elapsedTime,
     executeWorkflow,

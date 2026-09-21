@@ -12,7 +12,7 @@ import {
   PopupModal,
 } from '../react-modals';
 import { PrefixedTextField } from './create-branch-modal';
-import { EditorialWorkflowErrorText } from './editorial-workflow-error-text';
+import { EditorialWorkflowErrorBox } from './editorial-workflow-error-box';
 import { useEditorialWorkflow } from './use-editorial-workflow';
 import { WorkflowProgressIndicator } from './workflow-progress-indicator';
 
@@ -43,7 +43,7 @@ export const BranchDeletedModal = ({
 
   const {
     isExecuting,
-    errorMessageParts,
+    error,
     currentStep,
     elapsedTime,
     executeWorkflow,
@@ -98,15 +98,7 @@ export const BranchDeletedModal = ({
                 from the branch menu.
               </p>
 
-              {errorMessageParts && (
-                <div className='flex items-center gap-1 text-red-700 py-2 px-3 mb-4 bg-red-50 border border-red-200 rounded'>
-                  <CircleAlert className='w-5 h-auto text-red-400 flex-shrink-0' />
-                  <span className='text-sm'>
-                    <b>Error:</b>{' '}
-                    <EditorialWorkflowErrorText parts={errorMessageParts} />
-                  </span>
-                </div>
-              )}
+              {error && <EditorialWorkflowErrorBox error={error} />}
 
               <PrefixedTextField
                 name='new-branch-name'

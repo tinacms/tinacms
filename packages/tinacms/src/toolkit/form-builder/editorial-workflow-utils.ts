@@ -1,4 +1,8 @@
-import { ERR_BRANCH_CONFLICT, ERR_BRANCH_EXISTS } from '@tinacms/schema-tools';
+import {
+  ERR_BRANCH_CONFLICT,
+  ERR_BRANCH_EXISTS,
+  type TinaSchema,
+} from '@tinacms/schema-tools';
 import {
   EDITORIAL_WORKFLOW_ERROR,
   EDITORIAL_WORKFLOW_EVENT_LOG_DOCS_URL,
@@ -117,13 +121,11 @@ export const checkBranchGuard = async (
   }
 };
 
-/** A link the CMS offers alongside an error, rendered as an anchor. */
 export interface EditorialWorkflowErrorLink {
   url: string;
   label: string;
 }
 
-/** A run of message text, emphasised where it names something the editor must find. */
 export interface EditorialWorkflowMessagePart {
   text: string;
   emphasis?: boolean;
@@ -134,7 +136,6 @@ export interface EditorialWorkflowErrorCopy {
   link?: EditorialWorkflowErrorLink;
 }
 
-/** One unemphasised run, for copy with nothing worth singling out. */
 export const plainMessage = (text: string): EditorialWorkflowMessagePart[] => [
   { text },
 ];
@@ -170,20 +171,18 @@ const indexingFailureCopy = (
   };
 };
 
-interface CollectionLookup {
-  getCollectionByFullPath?: (
-    file: string
-  ) => { label?: string; name?: string } | undefined;
-}
-
-// NOTE: [17 Sep 2026] EK - Always resolve from the failing file's own path, never
-// from the collection being edited: indexing covers the whole branch, so the file
-// that failed can belong to a different collection.
+// Resolve from the failing file's own path, not the collection being edited:
+// indexing covers the whole branch, so the file that failed can belong to another
+// collection. getCollectionByFullPath throws when nothing matches.
 export const collectionLabelResolver =
-  (schema?: CollectionLookup) =>
+  (schema?: Pick<TinaSchema, 'getCollectionByFullPath'>) =>
   (file: string): string | undefined => {
-    const collection = schema?.getCollectionByFullPath?.(file);
-    return collection?.label || collection?.name;
+    try {
+      const collection = schema?.getCollectionByFullPath?.(file);
+      return collection?.label || collection?.name;
+    } catch {
+      return undefined;
+    }
   };
 
 export const getEditorialWorkflowError = (
