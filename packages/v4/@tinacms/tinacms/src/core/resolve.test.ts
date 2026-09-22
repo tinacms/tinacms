@@ -69,6 +69,41 @@ describe('validateCapabilityGraph', () => {
     ).not.toThrow();
   });
 
+  it('rejects two plugins that register the same form hook name', () => {
+    expect(() =>
+      validateCapabilityGraph([
+        definePlugin({
+          name: 'a',
+          provides: ['hooks'],
+          hooks: ['x'],
+        }),
+        definePlugin({
+          name: 'b',
+          provides: ['hooks'],
+          hooks: ['x'],
+        }),
+      ])
+    ).toThrow(/both register the form hook "x"/);
+  });
+
+  it('lets an override replace a form hook name', () => {
+    expect(() =>
+      validateCapabilityGraph([
+        definePlugin({
+          name: 'a',
+          provides: ['hooks'],
+          hooks: ['x'],
+        }),
+        definePlugin({
+          name: 'b',
+          provides: ['hooks'],
+          hooks: ['x'],
+          overrides: [{ capability: 'hooks', key: 'x' }],
+        }),
+      ])
+    ).not.toThrow();
+  });
+
   it('rejects two providers of a singleton capability', () => {
     expect(() =>
       validateCapabilityGraph([

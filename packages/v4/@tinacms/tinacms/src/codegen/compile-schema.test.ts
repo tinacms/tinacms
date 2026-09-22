@@ -119,6 +119,55 @@ describe('compileSchema field-level validators', () => {
   });
 });
 
+describe('compileSchema collection-level hooks', () => {
+  it('accepts a form hook an installed plugin registers', () => {
+    const hookPlugin = definePlugin({
+      name: 'test:hooks',
+      provides: ['hooks'],
+      hooks: ['logSave'],
+      client: async () => ({ default: { hooks: { logSave: () => ({}) } } }),
+    });
+    const lock = compileSchema(
+      asResolvedConfig({
+        plugins: [fieldPlugin('string', 1), hookPlugin],
+        schema: {
+          collections: [
+            {
+              name: 'post',
+              format: 'mdx',
+              hooks: [{ name: 'logSave', args: ['saved'] }],
+              fields: [{ name: 'title', type: 'string' }],
+            },
+          ],
+        },
+      })
+    );
+    expect(lock.schema.collections[0].hooks).toEqual([
+      { name: 'logSave', args: ['saved'] },
+    ]);
+  });
+
+  it('rejects a form hook no installed plugin registers', () => {
+    expect(() =>
+      compileSchema(
+        asResolvedConfig({
+          plugins: [fieldPlugin('string', 1)],
+          schema: {
+            collections: [
+              {
+                name: 'post',
+                format: 'mdx',
+                hooks: [{ name: 'logSave' }],
+                fields: [{ name: 'title', type: 'string' }],
+              },
+            ],
+          },
+        })
+      )
+    ).toThrow(/form hook "logSave"/);
+  });
+});
+
 describe('checkLock', () => {
   const config = configWith([{ name: 'title', type: 'string' }]);
 
