@@ -1098,6 +1098,40 @@ describe('Tina Client', () => {
       await rejection;
     });
 
+    it('carries the failing file from an indexing failure status', async () => {
+      fetchWithToken
+        .mockResolvedValueOnce(
+          makeResponse({
+            status: 200,
+            body: { requestId: 'req-123' },
+          })
+        )
+        .mockResolvedValueOnce(
+          makeResponse({
+            status: 200,
+            body: {
+              status: EDITORIAL_WORKFLOW_STATUS.ERROR,
+              message: 'Unable to seed content/posts/hello.mdx',
+              errorCode: EDITORIAL_WORKFLOW_ERROR.INDEXING_FAILED,
+              file: 'content/posts/hello.mdx',
+            },
+          })
+        );
+
+      const promise = client.executeEditorialWorkflow({
+        branchName: 'feature/test',
+        baseBranch: 'main',
+      });
+      const rejection = expect(promise).rejects.toMatchObject({
+        errorCode: EDITORIAL_WORKFLOW_ERROR.INDEXING_FAILED,
+        file: 'content/posts/hello.mdx',
+      });
+
+      await vi.advanceTimersByTimeAsync(5000);
+
+      await rejection;
+    });
+
     it('retries transient polling failures', async () => {
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
