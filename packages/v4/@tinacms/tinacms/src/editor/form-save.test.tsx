@@ -270,6 +270,41 @@ describe('useFormSave', () => {
     expect(failures[0]).toBeInstanceOf(AfterSaveHookError);
     expect((failures[0] as Error).cause).toBeInstanceOf(Error);
   });
+
+  it('does not run afterSave when onSave rejects', async () => {
+    const onSave = vi.fn().mockRejectedValue(new Error('save failed'));
+    observed.mockClear();
+    renderWithSave(
+      onSave,
+      withHooks([{ name: 'observe' }]),
+      { title: 'Hi' },
+      undefined,
+      [stampPlugin]
+    );
+    const input = await screen.findByLabelText('Title');
+    await userEvent.type(input, '!');
+
+    await userEvent.click(screen.getByText('save'));
+    expect(onSave).toHaveBeenCalled();
+    expect(observed).not.toHaveBeenCalled();
+    expect(screen.getByTestId('status')).toHaveTextContent('dirty');
+  });
+
+  it('does not run beforeSave when validation fails', async () => {
+    const onSave = vi.fn();
+    const schema: CollectionSchema = {
+      ...requiredTitle,
+      hooks: [{ name: 'stamp', args: ['a'] }],
+    };
+    renderWithSave(onSave, schema, { title: '' }, undefined, [stampPlugin]);
+    await screen.findByText('save');
+
+    await userEvent.click(screen.getByText('save'));
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Title is required'
+    );
+    expect(onSave).not.toHaveBeenCalled();
+  });
 });
 
 const structureFieldPlugin = definePlugin({

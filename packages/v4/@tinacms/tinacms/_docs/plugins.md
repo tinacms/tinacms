@@ -114,6 +114,9 @@ returns the hooks to run. Every hook is optional.
 
 ```ts
 // tina/hooks.ts
+export const requireStarsToPublish = (): HookRef => ({ name: 'requireStarsToPublish' });
+export const logSave = (prefix: string): HookRef => ({ name: 'logSave', args: [prefix] });
+
 export const hooksPlugin = definePlugin({
   name: 'example:hooks',
   provides: ['hooks'],
@@ -138,6 +141,8 @@ export const hooksPlugin = definePlugin({
 });
 
 // tina/config.ts
+import { hooksPlugin, logSave, requireStarsToPublish } from './hooks';
+
 export default defineConfig({
   plugins: [localContentPlugin(), hooksPlugin],
   schema: { collections: [postCollection] },
@@ -154,9 +159,13 @@ export const postCollection = {
 |---|---|---|---|
 | `beforeSave` | after validation passes, before `onSave` | the digested document | the document to save, or a Promise of it |
 | `afterSave` | after `onSave` resolves and the form is clean | the saved document | `void` or a Promise |
-| `onChange` | on every field value change | `{ address, value }` of the changed field | `void`, synchronously |
+| `onChange` | on every field value change | `{ address, value }` of the changed field; `value` is the form value, not the stored one | `void`, synchronously |
 
 Every hook also receives a scope: `{ formId, path, collection }`.
+
+These hooks run in the browser. A `beforeSave` throw stops the save in the
+form only. A direct call to the content API does not run it. Enforcement
+belongs in the server segment (ADR-014 §3), which v4 does not supply yet.
 
 A collection runs the hooks it lists, in the order it lists them. A
 collection with no `hooks` runs no hooks. `config.plugins` order and

@@ -115,7 +115,7 @@ describe('resolveFormHooks', () => {
 
   it('rejects a name no plugin registers', () => {
     expect(() => resolveFormHooks(registry, [{ name: 'missing' }])).toThrow(
-      /no installed plugin registers the form hook "missing"/
+      /form hook "missing"/
     );
   });
 });
@@ -181,6 +181,36 @@ describe('runAfterSave', () => {
       scope
     );
     expect(calls).toEqual(['a', 'b']);
+  });
+
+  it('runs every hook, then rethrows the first failure and logs the rest', async () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const later = vi.fn();
+    await expect(
+      runAfterSave(
+        [
+          {
+            afterSave: () => {
+              throw new Error('first');
+            },
+          },
+          { afterSave: later },
+          {
+            afterSave: () => {
+              throw new Error('second');
+            },
+          },
+        ],
+        { title: 'x' },
+        scope
+      )
+    ).rejects.toThrow('first');
+    expect(later).toHaveBeenCalled();
+    expect(error).toHaveBeenCalledWith(
+      '[tinacms] afterSave hook failed:',
+      expect.objectContaining({ message: 'second' })
+    );
+    error.mockRestore();
   });
 });
 

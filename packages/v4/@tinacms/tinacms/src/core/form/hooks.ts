@@ -26,6 +26,8 @@ export interface FieldEdit {
   value: unknown;
 }
 
+// TODO(ADR-014 §3): these hooks run in the browser. Enforcement needs a server
+// segment `beforeSave` in the save RPC path, which v4 does not supply yet.
 export interface FormHooks {
   beforeSave?: (
     document: TinaDocument,
@@ -112,7 +114,7 @@ export const resolveFormHooks = (
     invariant(
       factory,
       'schema-unknown-hook',
-      `The schema uses the form hook "${ref.name}", but no installed plugin registers the form hook "${ref.name}".`
+      `The schema uses the form hook "${ref.name}", but no installed plugin registers it.`
     );
     return factory(...(ref.args ?? []));
   });
@@ -134,7 +136,19 @@ export const runAfterSave = async (
   document: TinaDocument,
   scope: FormHookScope
 ): Promise<void> => {
-  for (const hook of hooks) await hook.afterSave?.(document, scope);
+  const failures: unknown[] = [];
+  for (const hook of hooks) {
+    try {
+      await hook.afterSave?.(document, scope);
+    } catch (cause) {
+      failures.push(cause);
+    }
+  }
+  if (failures.length === 0) return;
+  for (const cause of failures.slice(1)) {
+    console.error('[tinacms] afterSave hook failed:', cause);
+  }
+  throw failures[0];
 };
 
 export const runOnChange = (

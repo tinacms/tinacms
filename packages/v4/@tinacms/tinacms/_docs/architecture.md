@@ -129,7 +129,7 @@ for each item, with its own `fields` config. Thus it reuses the same
 conversion path for its items as the top-level form uses for its fields.
 
 `runBeforeSave` then threads the digested document through every `beforeSave`
-hook. After `markSaved`, `runAfterSave` runs. Refer to
+hook the collection lists. After `markSaved`, `runAfterSave` runs. Refer to
 [Form hook plugins](./plugins.md#form-hook-plugins).
 
 ## Form status
