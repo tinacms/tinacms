@@ -5,12 +5,15 @@ import {
   type CapabilityOverride,
   type ResolvedSegment,
   definePlugin,
+  resolveClientSegments,
 } from '../plugin';
 import type { TinaDocument } from '../schema/types';
 import {
   type FormHookFactory,
   type FormHooks,
   createFormHookRegistry,
+  defineHook,
+  defineHooksPlugin,
   resolveFormHooks,
   runAfterSave,
   runBeforeSave,
@@ -244,5 +247,59 @@ describe('runOnChange', () => {
       expect.objectContaining({ message: 'observer broke' })
     );
     error.mockRestore();
+  });
+});
+
+describe('defineHook', () => {
+  const logSave = defineHook('logSave', (prefix: string) => ({
+    afterSave: (_document, { path }) => {
+      console.info(`${prefix} ${path}`);
+    },
+  }));
+  const requireStars = defineHook('requireStars', () => ({}));
+
+  it('returns a ref helper that carries the name and args', () => {
+    expect(logSave('saved')).toEqual({ name: 'logSave', args: ['saved'] });
+  });
+
+  it('omits args when the hook takes none', () => {
+    expect(requireStars()).toEqual({ name: 'requireStars' });
+  });
+
+  it('exposes the name and the factory for the registry', () => {
+    expect(logSave.hookName).toBe('logSave');
+    expect(logSave.factory('x')).toHaveProperty('afterSave');
+  });
+
+  it('types the args', () => {
+    // @ts-expect-error a number is not a string
+    logSave(1);
+  });
+});
+
+describe('defineHooksPlugin', () => {
+  const stampHook = defineHook('stamp', (label: string) => ({
+    beforeSave: (document) => ({
+      ...document,
+      trail: `${String(document.trail ?? '')}${label}`,
+    }),
+  }));
+  const plugin = defineHooksPlugin('test:hooks', [stampHook]);
+
+  it('declares the hook names on the manifest', () => {
+    expect(plugin.name).toBe('test:hooks');
+    expect(plugin.provides).toEqual(['hooks']);
+    expect(plugin.hooks).toEqual(['stamp']);
+  });
+
+  it('ships the factories in its client segment', async () => {
+    const registry = createFormHookRegistry(
+      await resolveClientSegments([plugin])
+    );
+    const hooks = resolveFormHooks(registry, [stampHook('a'), stampHook('b')]);
+    expect(await runBeforeSave(hooks, { title: 'x' }, scope)).toEqual({
+      title: 'x',
+      trail: 'ab',
+    });
   });
 });

@@ -114,6 +114,58 @@ returns the hooks to run. Every hook is optional.
 
 ```ts
 // tina/hooks.ts
+import { defineHook, defineHooksPlugin } from '@tinacms/tinacms';
+
+export const requireStarsToPublish = defineHook(
+  'requireStarsToPublish',
+  () => ({
+    beforeSave: (document) => {
+      if (document.status === 'published' && !document.stars) {
+        throw new Error('Rate the post before you publish it');
+      }
+      return document;
+    },
+  })
+);
+
+export const logSave = defineHook('logSave', (prefix: string) => ({
+  afterSave: (_document, { path }) => {
+    console.info(`${prefix} ${path}`);
+  },
+}));
+
+export const hooksPlugin = defineHooksPlugin('example:hooks', [
+  requireStarsToPublish,
+  logSave,
+]);
+
+// tina/config.ts
+import { hooksPlugin, logSave, requireStarsToPublish } from './hooks';
+
+export default defineConfig({
+  plugins: [localContentPlugin(), hooksPlugin],
+  schema: { collections: [postCollection] },
+});
+
+export const postCollection = {
+  name: 'post',
+  hooks: [requireStarsToPublish(), logSave('saved')],
+  fields: [...],
+};
+```
+
+`defineHook` names a hook and types its arguments. The helper it returns
+builds the `HookRef` a collection lists. `defineHooksPlugin` builds the
+manifest and the client segment from a list of hooks. It loads the hook
+bodies with the manifest, so a hook that imports browser-only code uses the
+long form.
+
+### The long form
+
+```ts
+// tina/hooks.ts
+import type { HookRef } from '@tinacms/tinacms';
+
 export const requireStarsToPublish = (): HookRef => ({ name: 'requireStarsToPublish' });
 export const logSave = (prefix: string): HookRef => ({ name: 'logSave', args: [prefix] });
 
@@ -139,21 +191,10 @@ export const hooksPlugin = definePlugin({
     }),
   }),
 });
-
-// tina/config.ts
-import { hooksPlugin, logSave, requireStarsToPublish } from './hooks';
-
-export default defineConfig({
-  plugins: [localContentPlugin(), hooksPlugin],
-  schema: { collections: [postCollection] },
-});
-
-export const postCollection = {
-  name: 'post',
-  hooks: [requireStarsToPublish(), logSave('saved')],
-  fields: [...],
-};
 ```
+
+The long form keeps the client segment behind `() => import(...)`, the same
+as a field plugin.
 
 | Hook | Runs | Receives | Returns |
 |---|---|---|---|

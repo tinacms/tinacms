@@ -12,6 +12,7 @@ import {
   HOOKS_CAPABILITY,
   type PluginManifest,
   type ResolvedSegment,
+  definePlugin,
 } from '../plugin';
 import type { CollectionSchema, HookRef, TinaDocument } from '../schema/types';
 
@@ -164,3 +165,39 @@ export const runOnChange = (
     }
   }
 };
+
+export interface RegisteredHook {
+  readonly hookName: string;
+  readonly factory: FormHookFactory;
+}
+
+export interface HookDefinition<Args extends JsonValue[]>
+  extends RegisteredHook {
+  (...args: Args): HookRef;
+}
+
+export const defineHook = <Args extends JsonValue[]>(
+  name: string,
+  factory: (...args: Args) => FormHooks
+): HookDefinition<Args> =>
+  Object.assign(
+    (...args: Args): HookRef => (args.length > 0 ? { name, args } : { name }),
+    { hookName: name, factory: factory as FormHookFactory }
+  );
+
+export const defineHooksPlugin = (
+  name: string,
+  hooks: readonly RegisteredHook[]
+): PluginManifest =>
+  definePlugin({
+    name,
+    provides: [HOOKS_CAPABILITY],
+    hooks: hooks.map((hook) => hook.hookName),
+    client: async () => ({
+      default: {
+        hooks: Object.fromEntries(
+          hooks.map((hook) => [hook.hookName, hook.factory])
+        ),
+      },
+    }),
+  });
