@@ -7,7 +7,9 @@ const plugin = (
   spec: {
     provides?: Capability[];
     dependsOn?: Capability[];
-    overrides?: { capability: Exclude<Capability, 'field' | 'validator'> }[];
+    overrides?: {
+      capability: Exclude<Capability, 'field' | 'validator' | 'hooks'>;
+    }[];
   } = {}
 ) => definePlugin({ name, ...spec });
 
