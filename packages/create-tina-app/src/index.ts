@@ -123,7 +123,7 @@ export async function run() {
   if (!opts.noTelemetry) {
     console.log(`\n${TextStylesBold.bold('Telemetry Notice')}`);
     console.log(
-      'To help the TinaCMS team improve the developer experience, create-tina-app collects anonymous usage statistics. This data helps us understand which environments and features are most important to support. Usage analytics may include: Operating system and version, package manager name and version (local only), Node.js version (local only), and the selected TinaCMS starter template.\nNo personal or project-specific code is ever collected. You can opt out at any time by passing the --noTelemetry flag.\n'
+      'To help the TinaCMS team improve the developer experience, create-tina-app collects anonymous usage statistics. No personal or project-specific code is ever collected. Opt out at any time by passing the --noTelemetry flag.\n'
     );
 
     posthogClient = await initializePostHog(
