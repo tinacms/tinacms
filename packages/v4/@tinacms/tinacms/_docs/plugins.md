@@ -164,7 +164,8 @@ long form.
 
 ```ts
 // tina/hooks.ts
-import type { HookRef } from '@tinacms/tinacms';
+import { type HookRef, definePlugin } from '@tinacms/tinacms';
+import { type JsonValue, defineClientPlugin } from '@tinacms/tinacms/client';
 
 export const requireStarsToPublish = (): HookRef => ({ name: 'requireStarsToPublish' });
 export const logSave = (prefix: string): HookRef => ({ name: 'logSave', args: [prefix] });
@@ -184,8 +185,8 @@ export const hooksPlugin = definePlugin({
             return document;
           },
         }),
-        logSave: (prefix) => ({
-          afterSave: (_document, { path }) => console.info(`${prefix} ${path}`),
+        logSave: (prefix: JsonValue) => ({
+          afterSave: (_document, { path }) => console.info(`${String(prefix)} ${path}`),
         }),
       },
     }),
