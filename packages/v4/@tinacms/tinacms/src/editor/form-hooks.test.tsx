@@ -15,15 +15,19 @@ const collection: CollectionSchema = {
   name: 'post',
   format: 'mdx',
   fields: [t.string({ name: 'title', label: 'Title' })],
+  hooks: [{ name: 'track' }],
 };
 
-describe('afterEdit hook', () => {
+describe('onChange hook', () => {
   it('fires with the changed address and value on every edit', async () => {
-    const afterEdit = vi.fn();
+    const onChange = vi.fn();
     const observer = definePlugin({
       name: 'test:hooks:edit-observer',
       provides: ['hooks'],
-      client: async () => ({ default: { hooks: { afterEdit } } }),
+      hooks: ['track'],
+      client: async () => ({
+        default: { hooks: { track: () => ({ onChange }) } },
+      }),
     });
     render(
       <TinaProvider
@@ -42,11 +46,11 @@ describe('afterEdit hook', () => {
       </TinaProvider>
     );
     const input = await screen.findByLabelText('Title');
-    expect(afterEdit).not.toHaveBeenCalled();
+    expect(onChange).not.toHaveBeenCalled();
 
     await userEvent.type(input, '!?');
-    expect(afterEdit).toHaveBeenCalledTimes(2);
-    expect(afterEdit).toHaveBeenLastCalledWith(
+    expect(onChange).toHaveBeenCalledTimes(2);
+    expect(onChange).toHaveBeenLastCalledWith(
       { address: 'title', value: 'Hi!?' },
       expect.objectContaining({
         formId: toFormId('content/posts/edit.mdx'),

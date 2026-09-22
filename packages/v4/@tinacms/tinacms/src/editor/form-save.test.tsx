@@ -2,8 +2,13 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { asResolvedConfig } from '../config';
+import type { JsonValue } from '../core/json';
 import { type PluginManifest, definePlugin } from '../core/plugin';
-import type { CollectionSchema, TinaDocument } from '../core/schema/types';
+import type {
+  CollectionSchema,
+  HookRef,
+  TinaDocument,
+} from '../core/schema/types';
 import { t } from '../index';
 import { required } from '../plugins/fields';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
@@ -37,6 +42,42 @@ const requiredTitle: CollectionSchema = {
     t.string({ name: 'title', label: 'Title', validators: [required()] }),
   ],
 };
+
+const observed = vi.fn();
+
+const stampPlugin = definePlugin({
+  name: 'test:hooks:stamp',
+  provides: ['hooks'],
+  hooks: ['stamp', 'veto', 'observe', 'brokenAfterSave'],
+  client: async () => ({
+    default: {
+      hooks: {
+        stamp: (label: JsonValue) => ({
+          beforeSave: (document: TinaDocument) => ({
+            ...document,
+            trail: `${String(document.trail ?? '')}${String(label)}`,
+          }),
+        }),
+        veto: () => ({
+          beforeSave: () => {
+            throw new Error('not today');
+          },
+        }),
+        observe: () => ({ afterSave: observed }),
+        brokenAfterSave: () => ({
+          afterSave: () => {
+            throw new Error('audit endpoint down');
+          },
+        }),
+      },
+    },
+  }),
+});
+
+const withHooks = (hooks: HookRef[]): CollectionSchema => ({
+  ...collection,
+  hooks,
+});
 
 function SaveProbe({ onFailure }: { onFailure?: (cause: unknown) => void }) {
   const save = useFormSave();
@@ -135,70 +176,47 @@ describe('useFormSave', () => {
     expect(screen.getByTestId('status')).toHaveTextContent('dirty');
   });
 
-  it('threads the digested document through beforeSave hooks in plugin order', async () => {
+  it('runs beforeSave hooks in the order the collection lists them', async () => {
     const onSave = vi.fn();
-    const stamp = definePlugin({
-      name: 'test:hooks:stamp',
-      provides: ['hooks'],
-      client: async () => ({
-        default: {
-          hooks: {
-            beforeSave: (document: TinaDocument) => ({
-              ...document,
-              trail: `${String(document.trail ?? '')}a`,
-            }),
-          },
-        },
-      }),
-    });
-    const stampAgain = definePlugin({
-      name: 'test:hooks:stamp-again',
-      provides: ['hooks'],
-      client: async () => ({
-        default: {
-          hooks: {
-            beforeSave: (document: TinaDocument) => ({
-              ...document,
-              trail: `${String(document.trail ?? '')}b`,
-            }),
-          },
-        },
-      }),
-    });
+    renderWithSave(
+      onSave,
+      withHooks([
+        { name: 'stamp', args: ['b'] },
+        { name: 'stamp', args: ['a'] },
+      ]),
+      { title: 'Hi' },
+      undefined,
+      [stampPlugin]
+    );
+    const input = await screen.findByLabelText('Title');
+    await userEvent.type(input, '!');
+
+    await userEvent.click(screen.getByText('save'));
+    expect(onSave).toHaveBeenCalledWith({ title: 'Hi!', trail: 'ba' });
+    expect(await screen.findByTestId('status')).toHaveTextContent('clean');
+  });
+
+  it('runs no hooks on a collection that lists none', async () => {
+    const onSave = vi.fn();
     renderWithSave(onSave, collection, { title: 'Hi' }, undefined, [
-      stamp,
-      stampAgain,
+      stampPlugin,
     ]);
     const input = await screen.findByLabelText('Title');
     await userEvent.type(input, '!');
 
     await userEvent.click(screen.getByText('save'));
-    expect(onSave).toHaveBeenCalledWith({ title: 'Hi!', trail: 'ab' });
-    expect(await screen.findByTestId('status')).toHaveTextContent('clean');
+    expect(onSave).toHaveBeenCalledWith({ title: 'Hi!' });
   });
 
   it('leaves the form dirty and skips onSave when a beforeSave hook throws', async () => {
     const onSave = vi.fn();
     const failures: unknown[] = [];
-    const veto = definePlugin({
-      name: 'test:hooks:veto',
-      provides: ['hooks'],
-      client: async () => ({
-        default: {
-          hooks: {
-            beforeSave: () => {
-              throw new Error('not today');
-            },
-          },
-        },
-      }),
-    });
     renderWithSave(
       onSave,
-      collection,
+      withHooks([{ name: 'veto' }]),
       { title: 'Hi' },
       (cause) => failures.push(cause),
-      [veto]
+      [stampPlugin]
     );
     const input = await screen.findByLabelText('Title');
     await userEvent.type(input, '!');
@@ -206,55 +224,42 @@ describe('useFormSave', () => {
     await userEvent.click(screen.getByText('save'));
     expect(onSave).not.toHaveBeenCalled();
     expect(screen.getByTestId('status')).toHaveTextContent('dirty');
-    expect(failures[0]).toBeInstanceOf(Error);
     expect((failures[0] as Error).message).toBe('not today');
   });
 
   it('runs afterSave with the saved document once the form is clean', async () => {
     const onSave = vi.fn();
-    const afterSave = vi.fn();
-    const observer = definePlugin({
-      name: 'test:hooks:observer',
-      provides: ['hooks'],
-      client: async () => ({ default: { hooks: { afterSave } } }),
-    });
-    renderWithSave(onSave, collection, { title: 'Hi' }, undefined, [observer]);
+    observed.mockClear();
+    renderWithSave(
+      onSave,
+      withHooks([{ name: 'observe' }]),
+      { title: 'Hi' },
+      undefined,
+      [stampPlugin]
+    );
     const input = await screen.findByLabelText('Title');
     await userEvent.type(input, '!');
 
     await userEvent.click(screen.getByText('save'));
     expect(await screen.findByTestId('status')).toHaveTextContent('clean');
-    expect(afterSave).toHaveBeenCalledWith(
+    expect(observed).toHaveBeenCalledWith(
       { title: 'Hi!' },
       expect.objectContaining({ path: 'content/posts/save.mdx' })
     );
     expect(onSave.mock.invocationCallOrder[0]).toBeLessThan(
-      afterSave.mock.invocationCallOrder[0]
+      observed.mock.invocationCallOrder[0]
     );
   });
 
   it('rejects with an AfterSaveHookError once the save has landed', async () => {
     const onSave = vi.fn();
     const failures: unknown[] = [];
-    const broken = definePlugin({
-      name: 'test:hooks:broken-after-save',
-      provides: ['hooks'],
-      client: async () => ({
-        default: {
-          hooks: {
-            afterSave: () => {
-              throw new Error('audit endpoint down');
-            },
-          },
-        },
-      }),
-    });
     renderWithSave(
       onSave,
-      collection,
+      withHooks([{ name: 'brokenAfterSave' }]),
       { title: 'Hi' },
       (cause) => failures.push(cause),
-      [broken]
+      [stampPlugin]
     );
     const input = await screen.findByLabelText('Title');
     await userEvent.type(input, '!');

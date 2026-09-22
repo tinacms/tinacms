@@ -9,11 +9,7 @@ import { useStore } from 'zustand';
 import type { ContentSlice } from '../core/content/contract';
 import type { FieldAddress } from '../core/field/address';
 import type { FieldRegistry } from '../core/field/registry';
-import {
-  type FormHookRegistry,
-  runAfterSave,
-  runBeforeSave,
-} from '../core/form/hooks';
+import { runAfterSave, runBeforeSave } from '../core/form/hooks';
 import { digestDocument } from '../core/form/ingest';
 import { invariant } from '../core/invariant';
 import type { SliceState, TinaStoreState } from '../core/plugin';
@@ -40,16 +36,6 @@ export function useFieldRegistry(): FieldRegistry {
     'useFieldRegistry must be used within a TinaProvider'
   );
   return runtime.registry;
-}
-
-export function useFormHooks(): FormHookRegistry {
-  const runtime = use(TinaRuntimeContext);
-  invariant(
-    runtime,
-    'form-hooks-outside-provider',
-    'useFormHooks must be used within a TinaProvider'
-  );
-  return runtime.hooks;
 }
 
 export function useTinaStore<Selected>(
@@ -161,11 +147,10 @@ export class AfterSaveHookError extends Error {
 
 export function useFormSave(): () => Promise<void> {
   const registry = useFieldRegistry();
-  const hooks = useFormHooks();
   const scope = useFormScope('form-save-outside-provider', 'useFormSave');
   const { getValues, trigger } = useFormContext<TinaDocument>();
   return useCallback(async () => {
-    const { formId, path, collection, onSave } = scope;
+    const { formId, path, collection, onSave, hooks } = scope;
     // Validate every field, not only the edited ones, so a required field the
     // editor never touched surfaces its message at submit.
     const valid = await trigger();
@@ -187,7 +172,7 @@ export function useFormSave(): () => Promise<void> {
     } catch (cause) {
       throw new AfterSaveHookError(cause);
     }
-  }, [scope, getValues, trigger, registry, hooks]);
+  }, [scope, getValues, trigger, registry]);
 }
 
 export function useFieldAddress(): FieldAddress {
