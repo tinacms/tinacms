@@ -1,8 +1,19 @@
 import type { FormId } from '../../form/form-store';
 import type { FieldAddress } from '../field/address';
 import { invariant } from '../invariant';
-import { HOOKS_CAPABILITY, type ResolvedSegment } from '../plugin';
-import type { CollectionSchema, TinaDocument } from '../schema/types';
+import type { JsonValue } from '../json';
+import {
+  REGISTRY_CONFLICTS,
+  type RegistryConflict,
+  type RegistryEntry,
+  composeOverridableRegistry,
+} from '../overridable-registry';
+import {
+  HOOKS_CAPABILITY,
+  type PluginManifest,
+  type ResolvedSegment,
+} from '../plugin';
+import type { CollectionSchema, HookRef, TinaDocument } from '../schema/types';
 
 export interface FormHookScope {
   formId: FormId;
@@ -24,26 +35,90 @@ export interface FormHooks {
     document: TinaDocument,
     scope: FormHookScope
   ) => void | Promise<void>;
-  afterEdit?: (edit: FieldEdit, scope: FormHookScope) => void;
+  onChange?: (edit: FieldEdit, scope: FormHookScope) => void;
 }
 
-export type FormHookRegistry = readonly FormHooks[];
+export type FormHookFactory = (...args: JsonValue[]) => FormHooks;
+
+export type FormHookRegistry = ReadonlyMap<string, FormHookFactory>;
+
+export const overridesHookKey = (
+  manifest: PluginManifest,
+  key: string
+): boolean =>
+  manifest.overrides.some(
+    (override) =>
+      override.capability === HOOKS_CAPABILITY && override.key === key
+  );
+
+export const hookConflictError = (
+  conflict: RegistryConflict,
+  key: string
+): Error => {
+  if (conflict === REGISTRY_CONFLICTS.duplicateOverride) {
+    return new Error(
+      `Two plugins both declare an \`overrides\` for the form hook "${key}". ` +
+        'Only one may replace it.'
+    );
+  }
+  return new Error(
+    `Two plugins both register the form hook "${key}". ` +
+      'Declare `overrides: [{ capability: "hooks", key }]` to replace it.'
+  );
+};
+
+const hookEntriesOf = ({
+  manifest,
+  segment,
+}: ResolvedSegment): RegistryEntry<FormHookFactory>[] => {
+  const declared = manifest.hooks ?? [];
+  const factories = segment.hooks ?? {};
+  for (const name of Object.keys(factories)) {
+    invariant(
+      declared.includes(name),
+      'hooks-plugin-undeclared-factory',
+      `Plugin "${manifest.name}" exports a form hook factory for "${name}" but its manifest does not declare "${name}" in \`hooks\`.`
+    );
+  }
+  return declared.map((name) => {
+    const factory = factories[name];
+    invariant(
+      factory,
+      'hooks-plugin-missing-factory',
+      `Plugin "${manifest.name}" declares the form hook "${name}" but its client segment has no factory for "${name}".`
+    );
+    return {
+      key: name,
+      value: factory,
+      isOverride: overridesHookKey(manifest, name),
+    };
+  });
+};
 
 export const createFormHookRegistry = (
   resolved: ResolvedSegment[]
 ): FormHookRegistry =>
-  resolved.flatMap(({ manifest, segment }) => {
-    if (!segment.hooks) return [];
+  composeOverridableRegistry(
+    resolved.flatMap(hookEntriesOf),
+    hookConflictError
+  );
+
+export const resolveFormHooks = (
+  registry: FormHookRegistry,
+  refs: readonly HookRef[]
+): readonly FormHooks[] =>
+  refs.map((ref) => {
+    const factory = registry.get(ref.name);
     invariant(
-      manifest.provides.includes(HOOKS_CAPABILITY),
-      'hooks-plugin-no-provides',
-      `Plugin "${manifest.name}" has form hooks but does not declare provides: ["hooks"].`
+      factory,
+      'schema-unknown-hook',
+      `The schema uses the form hook "${ref.name}", but no installed plugin registers the form hook "${ref.name}".`
     );
-    return [segment.hooks];
+    return factory(...(ref.args ?? []));
   });
 
 export const runBeforeSave = async (
-  hooks: FormHookRegistry,
+  hooks: readonly FormHooks[],
   document: TinaDocument,
   scope: FormHookScope
 ): Promise<TinaDocument> => {
@@ -55,23 +130,23 @@ export const runBeforeSave = async (
 };
 
 export const runAfterSave = async (
-  hooks: FormHookRegistry,
+  hooks: readonly FormHooks[],
   document: TinaDocument,
   scope: FormHookScope
 ): Promise<void> => {
   for (const hook of hooks) await hook.afterSave?.(document, scope);
 };
 
-export const runAfterEdit = (
-  hooks: FormHookRegistry,
+export const runOnChange = (
+  hooks: readonly FormHooks[],
   edit: FieldEdit,
   scope: FormHookScope
 ): void => {
   for (const hook of hooks) {
     try {
-      hook.afterEdit?.(edit, scope);
+      hook.onChange?.(edit, scope);
     } catch (cause) {
-      console.error('[tinacms] afterEdit hook failed:', cause);
+      console.error('[tinacms] onChange hook failed:', cause);
     }
   }
 };
