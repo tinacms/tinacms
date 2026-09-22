@@ -29,6 +29,7 @@ export type {
   CollectionFormat,
   CollectionSchema,
   FieldSchema,
+  HookRef,
   TinaDocument,
   ValidatorRef,
 } from './core/schema/types';

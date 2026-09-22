@@ -44,12 +44,12 @@ replace a built-in field at a key that is already in use. Refer to
 ## Capabilities
 
 `Capability` has these values: `'field'`, `'validator'`, `'hooks'`, `'content'`,
-`'auth'`, `'media'`, and `'search'`. `field` and `validator` are keyed
+`'auth'`, `'media'`, and `'search'`. `field`, `validator` and `hooks` are keyed
 capabilities. Many field plugins can operate at the same time, one plugin for
 each schema `type` such as `string` or `image`. Many validator plugins can
 operate at the same time, and one plugin can register many validators; the key
-is the validator's name. `hooks` is unkeyed. Every plugin that provides it
-runs, in the order of `config.plugins`.
+is the validator's name. Many hook plugins can operate at the same time, and
+one plugin can register many hooks; the key is the hook's name.
 
 ## Validator plugins
 
@@ -106,35 +106,61 @@ for the context a rule receives and the order the layers run in.
 
 ## Form hook plugins
 
-A form hook plugin runs code at fixed points in a form's life. It declares
-`provides: ['hooks']` and puts a `hooks` object on its client segment. Every
-hook is optional.
+A form hook plugin registers named hooks that a collection attaches to its
+forms. The manifest lists the names in `hooks`, so `compileSchema` can check
+a collection without loading client code. The client segment holds one
+factory for each name. A factory takes the `args` the collection wrote and
+returns the hooks to run. Every hook is optional.
 
 ```ts
-// manifest
-definePlugin({
-  name: 'acme:audit',
+// tina/hooks.ts
+export const hooksPlugin = definePlugin({
+  name: 'example:hooks',
   provides: ['hooks'],
-  client: () => import('./audit.client'),
+  hooks: ['requireStarsToPublish', 'logSave'],
+  client: async () => ({
+    default: defineClientPlugin({
+      hooks: {
+        requireStarsToPublish: () => ({
+          beforeSave: (document) => {
+            if (document.status === 'published' && !document.stars) {
+              throw new Error('Rate the post before you publish it');
+            }
+            return document;
+          },
+        }),
+        logSave: (prefix) => ({
+          afterSave: (_document, { path }) => console.info(`${prefix} ${path}`),
+        }),
+      },
+    }),
+  }),
 });
 
-// audit.client.ts
-export default defineClientPlugin({
-  hooks: {
-    beforeSave: (document) => ({ ...document, updatedAt: new Date().toISOString() }),
-    afterSave: (document, { path }) => audit.log('saved', path),
-    afterEdit: ({ address }, { formId }) => analytics.track('edit', { formId, address }),
-  },
+// tina/config.ts
+export default defineConfig({
+  plugins: [localContentPlugin(), hooksPlugin],
+  schema: { collections: [postCollection] },
 });
+
+export const postCollection = {
+  name: 'post',
+  hooks: [requireStarsToPublish(), logSave('saved')],
+  fields: [...],
+};
 ```
 
 | Hook | Runs | Receives | Returns |
 |---|---|---|---|
 | `beforeSave` | after validation passes, before `onSave` | the digested document | the document to save, or a Promise of it |
 | `afterSave` | after `onSave` resolves and the form is clean | the saved document | `void` or a Promise |
-| `afterEdit` | on every field value change | `{ address, value }` of the changed field | `void`, synchronously |
+| `onChange` | on every field value change | `{ address, value }` of the changed field | `void`, synchronously |
 
 Every hook also receives a scope: `{ formId, path, collection }`.
+
+A collection runs the hooks it lists, in the order it lists them. A
+collection with no `hooks` runs no hooks. `config.plugins` order and
+`dependsOn` do not change hook order.
 
 The form does not show a change that a `beforeSave` hook makes. The form
 keeps the values the editor typed until the host loads the saved document
@@ -142,15 +168,17 @@ again. A key that the collection does not declare does not go through
 `serialize`.
 
 `beforeSave` hooks form a pipeline. Each one receives the document the
-previous one returned, in the order of `config.plugins`. `dependsOn` does
-not change this order. A hook that throws stops the save. `onSave` does not
+previous one returned. A hook that throws stops the save. `onSave` does not
 run. The form stays dirty. A throw from `afterSave` reaches the caller of
 `useFormSave` as an `AfterSaveHookError`. The save has already landed. A
-throw from `afterEdit` goes to the console. The next hook still runs.
-TinaCMS does not await an `afterEdit` hook.
+throw from `onChange` goes to the console. The next hook still runs.
+TinaCMS does not await an `onChange` hook.
 
-A host application registers hooks the same way, with a `definePlugin` entry in
-`config.plugins`. There is no second registration path.
+Names are global, so a third-party plugin gives them a prefix
+(`acme.logSave`). Declare `overrides: [{ capability: 'hooks', key }]` to
+replace a name on purpose. Refer to
+[ADR-025](https://github.com/tinacms/tinacmsv4-docs/blob/main/adr/025-form-hook-registration.md)
+for the decision.
 
 ## More data
 
