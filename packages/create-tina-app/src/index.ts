@@ -78,7 +78,7 @@ function formatTemplateChoice(template: Template) {
 
   if (template.features && template.features.length > 0) {
     const featuresText = template.features
-      .map((feature) => `  • ${feature.name}: ${feature.description}`)
+      .map((feature) => `  ${feature.description} ${feature.name}`)
       .join('\n');
     description = `${description}\n\nFeatures:\n${featuresText}`;
   }
@@ -107,7 +107,7 @@ export async function run() {
   }
   const require = createRequire(import.meta.url);
   const version = require('../package.json').version;
-  console.log(`Create Tina App v${version}`);
+  console.log(`NPM Package: create-tina-app v${version}`);
   const opts = extractOptions(process.argv);
 
   // check which package managers are installed
