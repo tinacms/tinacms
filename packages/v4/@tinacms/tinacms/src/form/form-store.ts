@@ -151,6 +151,26 @@ export const keepsValues = (
   return valuesEqual(scope.baseline, incoming, scope.equal);
 };
 
+// A kept form carries only the fields it changed onto the incoming document, so a
+// field another writer saved since the baseline is never reverted by a later save.
+export const rebaseEdits = (
+  scope: Extract<OpenForm, { status: 'edited' }>,
+  incoming: FormValues,
+  equal: FieldEquality = scope.equal
+): FormValues => {
+  const rebased = { ...incoming };
+  const addresses = new Set([
+    ...Object.keys(scope.values),
+    ...Object.keys(scope.baseline),
+  ]) as Set<FieldAddress>;
+  for (const address of addresses) {
+    if (!equal(address, scope.values[address], scope.baseline[address])) {
+      rebased[address] = scope.values[address];
+    }
+  }
+  return rebased;
+};
+
 export const fieldDirty = (
   scope: OpenForm | undefined,
   address: FieldAddress
@@ -192,11 +212,22 @@ export const useFormStore = create<FormStore>()(
             apply((state) => {
               const scope = state.forms[formId];
               if (keepsValues(scope, values)) {
+                const current = valuesEqual(scope.baseline, values, equal);
                 // A restored draft arrives with structural equality; adopt the
                 // field-aware one its form registers with.
-                if (scope.equal === equal) return state;
+                if (current && scope.equal === equal) return state;
                 return {
-                  forms: { ...state.forms, [formId]: { ...scope, equal } },
+                  forms: {
+                    ...state.forms,
+                    [formId]: current
+                      ? { ...scope, equal }
+                      : {
+                          ...scope,
+                          equal,
+                          values: rebaseEdits(scope, values, equal),
+                          baseline: { ...values },
+                        },
+                  },
                 };
               }
               return {

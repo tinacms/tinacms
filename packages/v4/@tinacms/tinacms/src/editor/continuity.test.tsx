@@ -23,6 +23,7 @@ import { t } from '../index';
 import { max, min, required } from '../plugins/fields';
 import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { LabelledFields } from '../test/labelled-fields';
+import { simulateReload } from '../test/simulate-reload';
 
 const errorsOf = (forms: FormStore['forms'], formId: FormId) => {
   const scope = forms[formId];
@@ -51,6 +52,14 @@ const collection: CollectionSchema = {
       label: 'Title',
       validators: [required(), min(3), max(20)],
     }),
+  ],
+};
+
+const withSummary: CollectionSchema = {
+  ...collection,
+  fields: [
+    ...collection.fields,
+    t.string({ name: 'summary', label: 'Summary' }),
   ],
 };
 
@@ -84,7 +93,12 @@ function SeedKeyProbe() {
   return <span data-testid='seed'>{useFormSeedKey()}</span>;
 }
 
-const host = (path: string, document: TinaDocument, onSave?: SaveHandler) => (
+const host = (
+  path: string,
+  document: TinaDocument,
+  onSave?: SaveHandler,
+  schema: CollectionSchema = collection
+) => (
   <TinaProvider
     config={asResolvedConfig({
       plugins: [stringFieldPlugin, coreValidatorsPlugin],
@@ -93,7 +107,7 @@ const host = (path: string, document: TinaDocument, onSave?: SaveHandler) => (
   >
     <FormProvider
       key={path}
-      collection={collection}
+      collection={schema}
       path={path}
       document={document}
       onSave={onSave}
@@ -533,5 +547,30 @@ describe('useFormErrors', () => {
       useFormStore.getState().setFieldErrors(formId, {});
     });
     expect(result.current).toEqual({});
+  });
+});
+
+describe('form drafts across a reload', () => {
+  it('saves its own edits without reverting a field another writer changed', async () => {
+    let stored: TinaDocument = { title: 'Hello', summary: 'Old' };
+    const onSave: SaveHandler = (document) => {
+      stored = document;
+    };
+    const { unmount } = render(host(pathA, stored, onSave, withSummary));
+    await userEvent.type(await screen.findByLabelText('Title'), '!');
+    unmount();
+    await act(simulateReload);
+
+    render(
+      host(pathA, { title: 'Hello', summary: 'Theirs' }, onSave, withSummary)
+    );
+    expect(await screen.findByLabelText('Title')).toHaveValue('Hello!');
+    expect(screen.getByLabelText('Summary')).toHaveValue('Theirs');
+    expect(screen.getByTestId('status')).toHaveTextContent('dirty');
+
+    await userEvent.click(screen.getByText('save'));
+    await waitFor(() =>
+      expect(stored).toEqual({ title: 'Hello!', summary: 'Theirs' })
+    );
   });
 });

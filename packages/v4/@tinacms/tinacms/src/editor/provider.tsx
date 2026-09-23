@@ -26,6 +26,7 @@ import {
   isEdited,
   keepsValues,
   readFormStore,
+  rebaseEdits,
   toDocument,
   toFormId,
   toFormValues,
@@ -176,10 +177,10 @@ export function FormProvider({
   // identity — a rebuild on each document would overwrite the live errors of the user.
   const kept = useMemo(() => {
     const scope = readFormStore().forms[formId];
-    if (!keepsValues(scope, toFormValues(ingested)))
-      return { seed: null, errors: {} };
+    const incoming = toFormValues(ingested);
+    if (!keepsValues(scope, incoming)) return { seed: null, errors: {} };
     return {
-      seed: toDocument(scope.values),
+      seed: toDocument(rebaseEdits(scope, incoming, equal)),
       errors: nestFieldErrors(scope.errors),
     };
   }, [formId]);
@@ -209,9 +210,7 @@ export function FormProvider({
 
   const seededSignature = useRef<string | null>(null);
   useEffect(() => {
-    useFormStore
-      .getState()
-      .registerForm(formId, toFormValues(seedValues), equal);
+    useFormStore.getState().registerForm(formId, toFormValues(ingested), equal);
     const signature = JSON.stringify([formId, seedValues]);
     if (seededSignature.current === null) {
       seededSignature.current = signature;
@@ -222,7 +221,7 @@ export function FormProvider({
       methods.reset(seedValues, { keepErrors: seedValues === kept.seed });
       advanceSeedKey(formId);
     }
-  }, [formId, seedValues, kept, methods, equal, advanceSeedKey]);
+  }, [formId, ingested, seedValues, kept, methods, equal, advanceSeedKey]);
 
   const discardEdits = useCallback(() => {
     const store = readFormStore();

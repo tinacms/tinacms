@@ -4,12 +4,14 @@ import { simulateReload } from '../test/simulate-reload';
 import {
   DRAFT_STORAGE_KEY,
   formStatus,
+  isEdited,
   toFormId,
   useFormStore,
 } from './form-store';
 
 const title = toFieldAddress('title');
 const seo = toFieldAddress('seo');
+const body = toFieldAddress('body');
 const postA = toFormId('posts/a.mdx');
 const postB = toFormId('posts/b.mdx');
 const store = useFormStore;
@@ -47,6 +49,33 @@ describe('form-store draft persistence', () => {
 
     store.getState().registerForm(postA, { [title]: 'Hello' });
     expect(store.getState().forms[postA]?.values[title]).toBe('Edited');
+    expect(formStatus(store.getState().forms[postA])).toBe('dirty');
+  });
+
+  it('keeps its own edits and adopts fields another writer changed', async () => {
+    store.getState().registerForm(postA, { [title]: 'Hello', [body]: 'Old' });
+    store.getState().setFieldValue(postA, title, 'Mine');
+    await simulateReload();
+
+    store
+      .getState()
+      .registerForm(postA, { [title]: 'Hello', [body]: 'Theirs' });
+    const scope = store.getState().forms[postA];
+    expect(scope?.values).toEqual({ [title]: 'Mine', [body]: 'Theirs' });
+    expect(isEdited(scope) && scope.baseline).toEqual({
+      [title]: 'Hello',
+      [body]: 'Theirs',
+    });
+    expect(formStatus(scope)).toBe('dirty');
+  });
+
+  it('keeps its own edit on a field another writer also changed', async () => {
+    store.getState().registerForm(postA, { [title]: 'Hello' });
+    store.getState().setFieldValue(postA, title, 'Mine');
+    await simulateReload();
+
+    store.getState().registerForm(postA, { [title]: 'Theirs' });
+    expect(store.getState().forms[postA]?.values[title]).toBe('Mine');
     expect(formStatus(store.getState().forms[postA])).toBe('dirty');
   });
 
