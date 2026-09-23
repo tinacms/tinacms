@@ -102,6 +102,8 @@ const DRAFT_STORAGE_VERSION = 1;
 type Draft = { values: FormValues; baseline: FormValues };
 type PersistedDrafts = { forms: Partial<Record<FormId, Draft>> };
 
+// Only a dirty form is a draft. A save or a discard leaves the form clean or
+// pristine, so the next write drops its draft with no extra step.
 export const pickDrafts = (state: FormStore): PersistedDrafts => {
   const forms: Partial<Record<FormId, Draft>> = {};
   for (const formId of Object.keys(state.forms) as FormId[]) {
@@ -116,6 +118,9 @@ export const pickDrafts = (state: FormStore): PersistedDrafts => {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
+// Storage is untrusted, so a draft in an unknown shape is skipped. The equality
+// function does not survive JSON, so a restored form compares by structure until
+// its form registers again.
 const restoreDrafts = (persisted: unknown): FormStore['forms'] => {
   const forms: FormStore['forms'] = {};
   if (!isRecord(persisted) || !isRecord(persisted.forms)) return forms;
@@ -187,6 +192,8 @@ export const useFormStore = create<FormStore>()(
             apply((state) => {
               const scope = state.forms[formId];
               if (keepsValues(scope, values)) {
+                // A restored draft arrives with structural equality; adopt the
+                // field-aware one its form registers with.
                 if (scope.equal === equal) return state;
                 return {
                   forms: { ...state.forms, [formId]: { ...scope, equal } },
