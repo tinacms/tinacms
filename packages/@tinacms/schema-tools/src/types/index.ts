@@ -425,6 +425,21 @@ export type ImageField = (
 type ReferenceFieldOptions = {
   optionComponent?: OptionComponent;
   /**
+   * Adds a "New <collection>" action under the picker that opens the
+   * referenced collection's create form in a modal. The new document is
+   * selected as soon as it is saved, so editors never leave the current form.
+   *
+   * ```ts
+   * {
+   *   type: 'reference',
+   *   name: 'author',
+   *   collections: ['author'],
+   *   ui: { allowCreate: true },
+   * }
+   * ```
+   */
+  allowCreate?: boolean;
+  /**
    * @deprecated use `collectionFilter` instead as experimental___Filter will be removed in a future release
    */
   experimental___filter?: (list: Array<any>, searchQuery: string) => Array<any>;
