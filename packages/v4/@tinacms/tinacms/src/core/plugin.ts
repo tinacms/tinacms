@@ -1,11 +1,13 @@
 import type { StoreApi } from 'zustand';
 import type { FieldDescriptor, ValidatorFactory } from './field/contract';
+import type { FormHookFactory } from './form/hooks';
 import { invariant } from './invariant';
 import type { AdminScreen } from './screen/contract';
 
 export type Capability =
   | 'field'
   | 'validator'
+  | 'hooks'
   | 'content'
   | 'auth'
   | 'media'
@@ -14,6 +16,8 @@ export type Capability =
 export const FIELD_CAPABILITY = 'field' as const satisfies Capability;
 
 export const VALIDATOR_CAPABILITY = 'validator' as const satisfies Capability;
+
+export const HOOKS_CAPABILITY = 'hooks' as const satisfies Capability;
 
 export const AUTH_CAPABILITY = 'auth' as const satisfies Capability;
 
@@ -41,6 +45,7 @@ export interface FieldProvision {
 export type CapabilityOverride =
   | { capability: typeof FIELD_CAPABILITY; key: string }
   | { capability: typeof VALIDATOR_CAPABILITY; key: string }
+  | { capability: typeof HOOKS_CAPABILITY; key: string }
   | { capability: SingletonSliceCapability };
 
 export type TinaStoreState = Record<string, SliceState>;
@@ -66,6 +71,11 @@ export interface ClientSegment {
    * with no factory here, throws at boot.
    */
   validators?: Record<string, ValidatorFactory>;
+  /**
+   * One `FormHookFactory` for each name the manifest declares in `hooks`.
+   * Same rules as `validators`.
+   */
+  hooks?: Record<string, FormHookFactory>;
   slice?: ClientSlice;
   screens?: AdminScreen[];
 }
@@ -99,6 +109,11 @@ export const resolveClientSegments = async (
       'validator-plugin-no-client',
       `Plugin "${manifest.name}" declares validators but has no client segment to hold their factories.`
     );
+    invariant(
+      !(manifest.hooks?.length && !manifest.client),
+      'hooks-plugin-no-client',
+      `Plugin "${manifest.name}" declares hooks but has no client segment to hold their factories.`
+    );
     if (!manifest.client) continue;
     const clientModule = await manifest.client();
     invariant(
@@ -127,6 +142,8 @@ export interface PluginManifestInput {
    * (`acme.after`); a name v4 supplies stays bare (`required`).
    */
   validators?: string[];
+  /** The form hook names this plugin registers. Same rules as `validators`. */
+  hooks?: string[];
   client?: () => Promise<{ default: ClientSegment }>;
   server?: () => Promise<{ default: ServerSegment }>;
   // TODO(ADR-008 §3): type `permissions` against codegen's Permission union once it lands.

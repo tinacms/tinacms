@@ -128,6 +128,10 @@ reads `context.registry` to call `ingestDocument`/`digestDocument` again, once
 for each item, with its own `fields` config. Thus it reuses the same
 conversion path for its items as the top-level form uses for its fields.
 
+`runBeforeSave` then threads the digested document through every `beforeSave`
+hook the collection lists. After `markSaved`, `runAfterSave` runs. Refer to
+[Form hook plugins](./plugins.md#form-hook-plugins).
+
 ## Form status
 
 React-hook-form renders the field values. The form-state store

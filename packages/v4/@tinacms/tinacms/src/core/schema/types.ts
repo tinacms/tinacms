@@ -21,6 +21,16 @@ export const hasValidator = (
   name: string
 ): boolean => (node.validators ?? []).some((ref) => ref.name === name);
 
+/**
+ * A form hook attached to one collection, by the name a plugin registered it
+ * under. Same rules as `ValidatorRef`: `args` is plain JSON, it lands in
+ * `tina-lock.json`, and the build fails on a name no installed plugin registers.
+ */
+export interface HookRef {
+  name: string;
+  args?: JsonValue[];
+}
+
 export interface BaseFieldSchema {
   name: string;
   label?: string;
@@ -73,6 +83,7 @@ export interface CollectionSchema {
   path?: string;
   format: CollectionFormat | CollectionFormat[];
   fields: FieldSchema[];
+  hooks?: HookRef[];
 }
 
 export type TinaDocument = Record<string, unknown>;

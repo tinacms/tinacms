@@ -10,6 +10,7 @@ import {
   required,
   t,
 } from '@tinacms/tinacms';
+import { hooksPlugin, logSave, requireStarsToPublish } from './hooks';
 import { rating, ratingFieldPlugin } from './rating-field';
 import { differentFrom, matches, validatorsPlugin } from './validators';
 
@@ -18,6 +19,7 @@ export const postCollection = {
   label: 'Posts',
   path: 'content/posts',
   format: 'mdx',
+  hooks: [requireStarsToPublish(), logSave('saved')],
   fields: [
     t.string({
       name: 'title',
@@ -82,6 +84,11 @@ export const pageCollection = {
 } satisfies CollectionSchema;
 
 export default defineConfig({
-  plugins: [localContentPlugin(), ratingFieldPlugin, validatorsPlugin],
+  plugins: [
+    localContentPlugin(),
+    ratingFieldPlugin,
+    validatorsPlugin,
+    hooksPlugin,
+  ],
   schema: { collections: [postCollection, pageCollection] },
 });

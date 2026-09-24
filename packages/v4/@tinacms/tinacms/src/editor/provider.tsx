@@ -8,11 +8,16 @@ import {
   useRef,
   useState,
 } from 'react';
-import { FormProvider as RhfFormProvider, useForm } from 'react-hook-form';
+import { FormProvider as RhfFormProvider, get, useForm } from 'react-hook-form';
 import type { ResolvedConfig } from '../config';
 import { toFieldAddress } from '../core/field/address';
 import { createFieldRegistry } from '../core/field/registry';
 import { fieldEqualityFor } from '../core/form/compare';
+import {
+  createFormHookRegistry,
+  resolveFormHooks,
+  runOnChange,
+} from '../core/form/hooks';
 import { ingestDocument } from '../core/form/ingest';
 import { type PluginManifest, resolveClientSegments } from '../core/plugin';
 import { initializePlugins, validateCapabilityGraph } from '../core/resolve';
@@ -91,6 +96,7 @@ export function TinaProvider({
       const runtime: BootedRuntime = {
         registry: createFieldRegistry(resolved),
         validators: createValidatorRegistry(resolved),
+        hooks: createFormHookRegistry(resolved),
         store: createTinaStore(resolved),
         screens: createScreenRegistry(resolved),
       };
@@ -156,7 +162,11 @@ export function FormProvider({
   if (!runtime) {
     throw new Error('FormProvider must be used within a TinaProvider');
   }
-  const { registry, validators } = runtime;
+  const { registry, validators, hooks } = runtime;
+  const formHooks = useMemo(
+    () => resolveFormHooks(hooks, collection.hooks ?? []),
+    [hooks, collection]
+  );
 
   const formId = toFormId(path);
   const transformContext = useMemo(
@@ -268,6 +278,11 @@ export function FormProvider({
   useEffect(() => {
     const { unsubscribe } = methods.watch((values, { name }) => {
       if (name === undefined) return;
+      runOnChange(
+        formHooks,
+        { address: toFieldAddress(name), value: get(values, name) },
+        { formId, path, collection }
+      );
       const dependents = addressesWithValidators(
         collection.fields,
         values,
@@ -276,7 +291,7 @@ export function FormProvider({
       if (dependents.length > 0) void methods.trigger(dependents);
     });
     return () => unsubscribe();
-  }, [methods, collection]);
+  }, [methods, collection, formHooks, formId, path]);
 
   const formScope = useMemo(
     () => ({
@@ -286,8 +301,9 @@ export function FormProvider({
       onSave: onSave ?? null,
       seedKey,
       discardEdits,
+      hooks: formHooks,
     }),
-    [formId, path, collection, onSave, seedKey, discardEdits]
+    [formId, path, collection, onSave, seedKey, discardEdits, formHooks]
   );
 
   return (
