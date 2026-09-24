@@ -29,9 +29,7 @@ describe('EditorialWorkflowWidget', () => {
   it('shows the current step and ticks the elapsed time', () => {
     render(<EditorialWorkflowWidget state={running} onDismiss={vi.fn()} />);
 
-    expect(
-      screen.getByText('tina/hello-updates · Step 2 of 3: Updating branch')
-    ).toBeTruthy();
+    expect(screen.getByText('tina/hello-updates · Step 2 of 3')).toBeTruthy();
     expect(screen.getByText('0:00')).toBeTruthy();
 
     act(() => {

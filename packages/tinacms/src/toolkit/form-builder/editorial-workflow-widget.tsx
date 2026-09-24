@@ -102,11 +102,6 @@ export const EditorialWorkflowWidget = ({
 
   if (state.phase === 'idle') return null;
 
-  const stepName =
-    running && state.step <= WORKFLOW_STEPS.length
-      ? WORKFLOW_STEPS[state.step - 1].name
-      : 'Finishing up';
-
   const card = (
     <section
       aria-live='polite'
@@ -138,16 +133,18 @@ export const EditorialWorkflowWidget = ({
             <div className='text-xs text-gray-500 truncate'>
               {state.branchName}
               {running &&
-                ` · Step ${Math.min(state.step, 3)} of 3: ${stepName}`}
+                ` · Step ${Math.min(state.step, WORKFLOW_STEPS.length)} of ${WORKFLOW_STEPS.length}`}
             </div>
           )}
         </div>
         <div className='ml-auto flex items-center gap-1'>
           {running ? (
             <>
-              <span className='text-xs text-gray-500 tabular-nums mr-1'>
-                {formatTime(elapsed)}
-              </span>
+              {!expanded && (
+                <span className='text-xs text-gray-500 tabular-nums mr-1'>
+                  {formatTime(elapsed)}
+                </span>
+              )}
               <IconButton
                 label={expanded ? 'Collapse' : 'Expand'}
                 onClick={() => setExpanded((prev) => !prev)}
