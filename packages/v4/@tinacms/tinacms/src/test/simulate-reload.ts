@@ -1,8 +1,13 @@
 import { DRAFT_STORAGE_KEY, useFormStore } from '../form/form-store';
 
+const draftEntries = () =>
+  Object.keys(localStorage)
+    .filter((key) => key.startsWith(`${DRAFT_STORAGE_KEY}:`))
+    .map((key) => [key, localStorage.getItem(key) ?? ''] as const);
+
 export const simulateReload = async () => {
-  const saved = localStorage.getItem(DRAFT_STORAGE_KEY);
+  const saved = draftEntries();
   useFormStore.setState({ forms: {}, active: null });
-  if (saved) localStorage.setItem(DRAFT_STORAGE_KEY, saved);
+  for (const [key, value] of saved) localStorage.setItem(key, value);
   await useFormStore.persist.rehydrate();
 };

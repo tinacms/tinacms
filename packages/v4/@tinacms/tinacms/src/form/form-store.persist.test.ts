@@ -16,12 +16,27 @@ const postA = toFormId('posts/a.mdx');
 const postB = toFormId('posts/b.mdx');
 const store = useFormStore;
 
+const keyOf = (formId: string) => `${DRAFT_STORAGE_KEY}:${formId}`;
+
 const storedDrafts = (): Record<string, unknown> => {
-  const raw = localStorage.getItem(DRAFT_STORAGE_KEY);
-  if (!raw) return {};
-  const parsed: { state: { forms: Record<string, unknown> } } = JSON.parse(raw);
-  return parsed.state.forms;
+  const drafts: Record<string, unknown> = {};
+  for (const key of Object.keys(localStorage)) {
+    const raw = localStorage.getItem(key);
+    if (!key.startsWith(keyOf('')) || !raw) continue;
+    const entry: { draft: unknown } = JSON.parse(raw);
+    drafts[key.slice(keyOf('').length)] = entry.draft;
+  }
+  return drafts;
 };
+
+const otherTabWrites = (formId: string, text: string) =>
+  localStorage.setItem(
+    keyOf(formId),
+    JSON.stringify({
+      version: 1,
+      draft: { values: { title: text }, baseline: { title: 'Hello' } },
+    })
+  );
 
 describe('form-store draft persistence', () => {
   it('stores the values and baseline of a dirty form', () => {
@@ -38,7 +53,6 @@ describe('form-store draft persistence', () => {
     store.getState().registerForm(postB, { [title]: 'Hello' });
     store.getState().setFieldValue(postB, title, 'Edited');
     store.getState().setFieldValue(postB, title, 'Hello');
-    expect(localStorage.getItem(DRAFT_STORAGE_KEY)).not.toBeNull();
     expect(storedDrafts()).toEqual({});
   });
 
@@ -123,10 +137,41 @@ describe('form-store draft persistence', () => {
 
   it('ignores stored drafts in an unknown shape', async () => {
     localStorage.setItem(
-      DRAFT_STORAGE_KEY,
-      JSON.stringify({ state: { forms: { [postA]: 'garbage' } }, version: 1 })
+      keyOf(postA),
+      JSON.stringify({ version: 1, draft: 'garbage' })
     );
     await store.persist.rehydrate();
     expect(store.getState().forms).toEqual({});
+  });
+
+  it('leaves a draft another tab wrote', () => {
+    otherTabWrites(postB, 'Theirs');
+    store.getState().registerForm(postA, { [title]: 'Hello' });
+    store.getState().setFieldValue(postA, title, 'Mine');
+    expect(storedDrafts()[postB]).toEqual({
+      values: { title: 'Theirs' },
+      baseline: { title: 'Hello' },
+    });
+  });
+
+  it('does not roll back a draft another tab updated after this tab loaded', async () => {
+    otherTabWrites(postB, 'First');
+    await simulateReload();
+    otherTabWrites(postB, 'Second');
+
+    store.getState().registerForm(postA, { [title]: 'Hello' });
+    store.getState().setFieldValue(postA, title, 'Mine');
+    expect(storedDrafts()[postB]).toEqual({
+      values: { title: 'Second' },
+      baseline: { title: 'Hello' },
+    });
+  });
+
+  it('removes only the draft of the form that saved', () => {
+    otherTabWrites(postB, 'Theirs');
+    store.getState().registerForm(postA, { [title]: 'Hello' });
+    store.getState().setFieldValue(postA, title, 'Mine');
+    store.getState().markSaved(postA);
+    expect(Object.keys(storedDrafts())).toEqual([postB]);
   });
 });

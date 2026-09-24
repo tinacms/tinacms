@@ -10,6 +10,7 @@ import {
 } from '../core/form/compare';
 import { invariant } from '../core/invariant';
 import type { TinaDocument } from '../core/schema/types';
+import { type PersistedDrafts, createDraftStorage } from './draft-storage';
 
 export type FormId = Brand<string, 'FormId'>;
 
@@ -100,12 +101,11 @@ export const DRAFT_STORAGE_KEY = 'tina-drafts';
 const DRAFT_STORAGE_VERSION = 1;
 
 type Draft = { values: FormValues; baseline: FormValues };
-type PersistedDrafts = { forms: Partial<Record<FormId, Draft>> };
 
 // Only a dirty form is a draft. A save or a discard leaves the form clean or
 // pristine, so the next write drops its draft with no extra step.
 export const pickDrafts = (state: FormStore): PersistedDrafts => {
-  const forms: Partial<Record<FormId, Draft>> = {};
+  const forms: Record<string, Draft> = {};
   for (const formId of Object.keys(state.forms) as FormId[]) {
     const scope = state.forms[formId];
     if (isEdited(scope) && formStatus(scope) === 'dirty') {
@@ -332,6 +332,7 @@ export const useFormStore = create<FormStore>()(
       {
         name: DRAFT_STORAGE_KEY,
         version: DRAFT_STORAGE_VERSION,
+        storage: createDraftStorage(DRAFT_STORAGE_VERSION),
         partialize: pickDrafts,
         merge: (persisted, current) => ({
           ...current,
