@@ -1,3 +1,4 @@
+import { EditorialWorkflowProvider } from '@toolkit/form-builder/editorial-workflow-provider';
 import * as React from 'react';
 import { TinaCMSProvider, TinaCMSProviderProps } from './tina-cms-provider';
 import { TinaUI, TinaUIProps } from './tina-ui';
@@ -12,9 +13,11 @@ export const TinaProvider: React.FC<TinaProviderProps> = ({
 }) => {
   return (
     <TinaCMSProvider cms={cms}>
-      <TinaUI position={position} styled={styled}>
-        {children}
-      </TinaUI>
+      <EditorialWorkflowProvider>
+        <TinaUI position={position} styled={styled}>
+          {children}
+        </TinaUI>
+      </EditorialWorkflowProvider>
     </TinaCMSProvider>
   );
 };

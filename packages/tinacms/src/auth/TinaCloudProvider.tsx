@@ -17,7 +17,6 @@ import { ModalBuilder } from './AuthModal';
 import loginLlama from './tina-login.png';
 
 import { isErrorNamed } from '@toolkit/core/errors';
-import { EditorialWorkflowProvider } from '@toolkit/form-builder/editorial-workflow-provider';
 import { TinaAdminApi } from '../admin/api';
 import {
   Client,
@@ -588,14 +587,8 @@ export const TinaCloudProvider = (
         }}
       >
         <TinaProvider cms={cms}>
-          <EditorialWorkflowProvider>
-            <MediaWorkflowOverlay />
-            <AuthWallInner
-              {...props}
-              cms={cms}
-              isAuthRedirect={isAuthRedirect}
-            />
-          </EditorialWorkflowProvider>
+          <MediaWorkflowOverlay />
+          <AuthWallInner {...props} cms={cms} isAuthRedirect={isAuthRedirect} />
         </TinaProvider>
       </BranchDataProvider>
     </SessionProvider>
