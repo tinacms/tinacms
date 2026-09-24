@@ -5,6 +5,7 @@ import { asResolvedConfig } from '../config';
 import type { CollectionSchema } from '../core/schema/types';
 import { t } from '../index';
 import stringFieldPlugin from '../plugins/fields/string/string-field.plugin';
+import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { LabelledFields } from '../test/labelled-fields';
 import { FormProvider, TinaProvider, useFormId, useFormStatus } from './index';
 
@@ -25,7 +26,7 @@ describe('FormProvider form-store wiring', () => {
     render(
       <TinaProvider
         config={asResolvedConfig({
-          plugins: [stringFieldPlugin],
+          plugins: [stringFieldPlugin, coreValidatorsPlugin],
           schema: NO_COLLECTIONS,
         })}
       >

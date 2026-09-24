@@ -14,7 +14,7 @@ import { t } from '@tinacms/tinacms';
 const collection = {
   name: 'post',
   fields: [
-    t.number({ name: 'rating', label: 'Rating', required: true, min: 1, max: 5, step: 0.5 }),
+    t.number({ name: 'rating', label: 'Rating', validators: [required(), min(1), max(5)], step: 0.5 }),
   ],
 };
 ```
@@ -25,10 +25,13 @@ The config (`NumberFieldSchema`, which extends `BaseFieldSchema`):
 |---|---|---|
 | `name` | `string` (necessary) | The field key in the document. It is also the alternative label. |
 | `label` | `string` | The label on the screen. The validation messages use it. |
-| `required` | `boolean` | An empty value does not pass validation. |
-| `min` | `number` | The minimum **value**, and not the minimum length |
-| `max` | `number` | The maximum **value** |
 | `step` | `number` | The `step` attribute of the input. It is a render hint, and it has no validation function. |
+
+> `required`, `min`, `max` and `pattern` are no longer config keys. They are
+> validators that a core plugin registers, and a collection attaches them with
+> `validators`. Refer to
+> [Validation in two layers](./field-plugins.md#validation-in-two-layers).
+
 
 ## The descriptor
 
@@ -76,9 +79,6 @@ would change an empty value into zero.
 
 | Config | Rule | Message |
 |---|---|---|
-| `min` | `.min(min)` | `<label> must be at least <min>` |
-| `max` | `.max(max)` | `<label> must be at most <max>` |
-| `required` | An empty value (`undefined`) does not pass `z.number()` | `<label> is required` |
 | — | A string that is not a number becomes `NaN` | `<label> must be a number` |
 
 Zero passes the `required` rule, because zero is a value and is not empty.

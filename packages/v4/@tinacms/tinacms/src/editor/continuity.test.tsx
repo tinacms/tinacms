@@ -20,6 +20,8 @@ import {
   useFormValues,
 } from '../form/form-store';
 import { t } from '../index';
+import { max, min, required } from '../plugins/fields';
+import coreValidatorsPlugin from '../plugins/validators/core-validators.plugin';
 import { LabelledFields } from '../test/labelled-fields';
 
 const errorsOf = (forms: FormStore['forms'], formId: FormId) => {
@@ -47,9 +49,7 @@ const collection: CollectionSchema = {
     t.string({
       name: 'title',
       label: 'Title',
-      required: true,
-      min: 3,
-      max: 20,
+      validators: [required(), min(3), max(20)],
     }),
   ],
 };
@@ -87,7 +87,7 @@ function SeedKeyProbe() {
 const host = (path: string, document: TinaDocument, onSave?: SaveHandler) => (
   <TinaProvider
     config={asResolvedConfig({
-      plugins: [stringFieldPlugin],
+      plugins: [stringFieldPlugin, coreValidatorsPlugin],
       schema: NO_COLLECTIONS,
     })}
   >
@@ -314,7 +314,7 @@ const unkeyedHost = (
 ) => (
   <TinaProvider
     config={asResolvedConfig({
-      plugins: [stringFieldPlugin],
+      plugins: [stringFieldPlugin, coreValidatorsPlugin],
       schema: NO_COLLECTIONS,
     })}
   >

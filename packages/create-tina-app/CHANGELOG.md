@@ -1,5 +1,11 @@
 # create-tina-app
 
+## 2.2.2
+
+### Patch Changes
+
+- [#7623](https://github.com/tinacms/tinacms/pull/7623) [`cb46575`](https://github.com/tinacms/tinacms/commit/cb46575822fa035f551943199593aaa7c35d58f0) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Tidy the `create-tina-app` startup output. The version line now reads `NPM Package: create-tina-app vX.Y.Z`, the telemetry notice is three sentences (usage is anonymous, no personal or project code is collected, `--noTelemetry` opts out), and each starter feature is listed as `✅ Visual Editing` instead of `• Visual Editing: ✅`.
+
 ## 2.2.1
 
 ### Patch Changes

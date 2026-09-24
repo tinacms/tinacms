@@ -9,6 +9,7 @@ import { useStore } from 'zustand';
 import type { ContentSlice } from '../core/content/contract';
 import type { FieldAddress } from '../core/field/address';
 import type { FieldRegistry } from '../core/field/registry';
+import { runAfterSave, runBeforeSave } from '../core/form/hooks';
 import { digestDocument } from '../core/form/ingest';
 import { invariant } from '../core/invariant';
 import type { SliceState, TinaStoreState } from '../core/plugin';
@@ -128,20 +129,50 @@ export function useActiveField(): ActiveField {
   return useMemo(() => ({ active, setActive }), [active, setActive]);
 }
 
+// Save refused because the document has validation errors. The form stays
+// dirty and every field keeps its messages (ADR-018 §2).
+export class FormValidationError extends Error {
+  constructor() {
+    super('The document has validation errors. Fix them, then save again.');
+    this.name = 'FormValidationError';
+  }
+}
+
+export class AfterSaveHookError extends Error {
+  constructor(cause: unknown) {
+    super('The document was saved, but an afterSave hook failed.', { cause });
+    this.name = 'AfterSaveHookError';
+  }
+}
+
 export function useFormSave(): () => Promise<void> {
   const registry = useFieldRegistry();
   const scope = useFormScope('form-save-outside-provider', 'useFormSave');
-  const { getValues } = useFormContext<TinaDocument>();
+  const { getValues, trigger } = useFormContext<TinaDocument>();
   return useCallback(async () => {
-    const { formId, path, collection, onSave } = scope;
+    const { formId, path, collection, onSave, hooks } = scope;
+    // Validate every field, not only the edited ones, so a required field the
+    // editor never touched surfaces its message at submit.
+    const valid = await trigger();
+    if (!valid) throw new FormValidationError();
     const values = getValues();
-    const digested = digestDocument(values, collection.fields, {
-      documentPath: path,
-      registry,
-    });
+    const hookScope = { formId, path, collection };
+    const digested = await runBeforeSave(
+      hooks,
+      digestDocument(values, collection.fields, {
+        documentPath: path,
+        registry,
+      }),
+      hookScope
+    );
     await onSave?.(digested);
     useFormStore.getState().markSaved(formId, toFormValues(values));
-  }, [scope, getValues, registry]);
+    try {
+      await runAfterSave(hooks, digested, hookScope);
+    } catch (cause) {
+      throw new AfterSaveHookError(cause);
+    }
+  }, [scope, getValues, trigger, registry]);
 }
 
 export function useFieldAddress(): FieldAddress {

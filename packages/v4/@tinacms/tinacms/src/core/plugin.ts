@@ -1,11 +1,23 @@
 import type { StoreApi } from 'zustand';
-import type { FieldDescriptor } from './field/contract';
+import type { FieldDescriptor, ValidatorFactory } from './field/contract';
+import type { FormHookFactory } from './form/hooks';
 import { invariant } from './invariant';
 import type { AdminScreen } from './screen/contract';
 
-export type Capability = 'field' | 'content' | 'auth' | 'media' | 'search';
+export type Capability =
+  | 'field'
+  | 'validator'
+  | 'hooks'
+  | 'content'
+  | 'auth'
+  | 'media'
+  | 'search';
 
 export const FIELD_CAPABILITY = 'field' as const satisfies Capability;
+
+export const VALIDATOR_CAPABILITY = 'validator' as const satisfies Capability;
+
+export const HOOKS_CAPABILITY = 'hooks' as const satisfies Capability;
 
 export const AUTH_CAPABILITY = 'auth' as const satisfies Capability;
 
@@ -32,6 +44,8 @@ export interface FieldProvision {
 
 export type CapabilityOverride =
   | { capability: typeof FIELD_CAPABILITY; key: string }
+  | { capability: typeof VALIDATOR_CAPABILITY; key: string }
+  | { capability: typeof HOOKS_CAPABILITY; key: string }
   | { capability: SingletonSliceCapability };
 
 export type TinaStoreState = Record<string, SliceState>;
@@ -51,6 +65,17 @@ export type ClientSlice = (
 
 export interface ClientSegment {
   field?: FieldDescriptor;
+  /**
+   * One `ValidatorFactory` for each name the manifest declares in
+   * `validators`. A name the manifest does not declare, or a declared name
+   * with no factory here, throws at boot.
+   */
+  validators?: Record<string, ValidatorFactory>;
+  /**
+   * One `FormHookFactory` for each name the manifest declares in `hooks`.
+   * Same rules as `validators`.
+   */
+  hooks?: Record<string, FormHookFactory>;
   slice?: ClientSlice;
   screens?: AdminScreen[];
 }
@@ -79,6 +104,16 @@ export const resolveClientSegments = async (
       'field-plugin-no-client',
       `Plugin "${manifest.name}" declares the field type "${manifest.field?.type}" but has no client segment to render it.`
     );
+    invariant(
+      !(manifest.validators?.length && !manifest.client),
+      'validator-plugin-no-client',
+      `Plugin "${manifest.name}" declares validators but has no client segment to hold their factories.`
+    );
+    invariant(
+      !(manifest.hooks?.length && !manifest.client),
+      'hooks-plugin-no-client',
+      `Plugin "${manifest.name}" declares hooks but has no client segment to hold their factories.`
+    );
     if (!manifest.client) continue;
     const clientModule = await manifest.client();
     invariant(
@@ -96,6 +131,19 @@ export interface PluginManifestInput {
   provides?: Capability[];
   dependsOn?: Capability[];
   field?: FieldProvision;
+  /**
+   * The validator names this plugin registers, as plain strings. They live on
+   * the manifest so `compileSchema` can check a collection's `validators`
+   * without loading client code; the factories themselves live on the client
+   * segment, under the same names.
+   *
+   * A name is the registry key, so it is global: two plugins registering
+   * `after` conflict at boot. Give a third-party name a prefix
+   * (`acme.after`); a name v4 supplies stays bare (`required`).
+   */
+  validators?: string[];
+  /** The form hook names this plugin registers. Same rules as `validators`. */
+  hooks?: string[];
   client?: () => Promise<{ default: ClientSegment }>;
   server?: () => Promise<{ default: ServerSegment }>;
   // TODO(ADR-008 §3): type `permissions` against codegen's Permission union once it lands.

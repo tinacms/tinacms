@@ -7,7 +7,9 @@ const plugin = (
   spec: {
     provides?: Capability[];
     dependsOn?: Capability[];
-    overrides?: { capability: Exclude<Capability, 'field'> }[];
+    overrides?: {
+      capability: Exclude<Capability, 'field' | 'validator' | 'hooks'>;
+    }[];
   } = {}
 ) => definePlugin({ name, ...spec });
 
@@ -30,6 +32,76 @@ describe('validateCapabilityGraph', () => {
       validateCapabilityGraph([
         plugin('tina:field:string', { provides: ['field'] }),
         plugin('tina:field:boolean', { provides: ['field'] }),
+      ])
+    ).not.toThrow();
+  });
+
+  it('rejects two plugins that register the same validator name', () => {
+    expect(() =>
+      validateCapabilityGraph([
+        definePlugin({
+          name: 'a',
+          provides: ['validator'],
+          validators: ['after'],
+        }),
+        definePlugin({
+          name: 'b',
+          provides: ['validator'],
+          validators: ['after'],
+        }),
+      ])
+    ).toThrow(/both register the validator "after"/);
+  });
+
+  it('lets an override replace a validator name', () => {
+    expect(() =>
+      validateCapabilityGraph([
+        definePlugin({
+          name: 'a',
+          provides: ['validator'],
+          validators: ['after'],
+        }),
+        definePlugin({
+          name: 'b',
+          provides: ['validator'],
+          validators: ['after'],
+          overrides: [{ capability: 'validator', key: 'after' }],
+        }),
+      ])
+    ).not.toThrow();
+  });
+
+  it('rejects two plugins that register the same form hook name', () => {
+    expect(() =>
+      validateCapabilityGraph([
+        definePlugin({
+          name: 'a',
+          provides: ['hooks'],
+          hooks: ['x'],
+        }),
+        definePlugin({
+          name: 'b',
+          provides: ['hooks'],
+          hooks: ['x'],
+        }),
+      ])
+    ).toThrow(/both register the form hook "x"/);
+  });
+
+  it('lets an override replace a form hook name', () => {
+    expect(() =>
+      validateCapabilityGraph([
+        definePlugin({
+          name: 'a',
+          provides: ['hooks'],
+          hooks: ['x'],
+        }),
+        definePlugin({
+          name: 'b',
+          provides: ['hooks'],
+          hooks: ['x'],
+          overrides: [{ capability: 'hooks', key: 'x' }],
+        }),
       ])
     ).not.toThrow();
   });

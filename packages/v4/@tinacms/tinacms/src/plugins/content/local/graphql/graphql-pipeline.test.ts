@@ -2,6 +2,7 @@ import { promises as fs } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { required } from '../../../../plugins/fields';
 import { dispatchContentRequest } from '../server/content-request';
 import {
   type LocalDataLayer,
@@ -39,7 +40,7 @@ beforeEach(async () => {
         path: 'content/posts',
         format: 'mdx',
         fields: [
-          { name: 'title', type: 'string', required: true },
+          { name: 'title', type: 'string', validators: [required()] },
           { name: 'featured', type: 'boolean' },
           { name: 'author', type: 'reference', collections: ['author'] },
           { name: 'body', type: 'rich-text', isBody: true },
@@ -49,7 +50,7 @@ beforeEach(async () => {
         name: 'author',
         path: 'content/authors',
         format: 'md',
-        fields: [{ name: 'name', type: 'string', required: true }],
+        fields: [{ name: 'name', type: 'string', validators: [required()] }],
       },
     ],
   });
@@ -152,7 +153,7 @@ describe('a mixed-format collection through the v3 pipeline', () => {
           name: 'post',
           path: 'content/posts',
           format: ['mdx', 'json'],
-          fields: [{ name: 'title', type: 'string', required: true }],
+          fields: [{ name: 'title', type: 'string', validators: [required()] }],
         },
       ],
     });

@@ -1,4 +1,5 @@
 import { fieldConflictError, overridesFieldKey } from './field/registry';
+import { hookConflictError, overridesHookKey } from './form/hooks';
 import { invariant } from './invariant';
 import { declaresCapabilityOverride } from './mount';
 import {
@@ -12,6 +13,10 @@ import {
   type ResolvedServerSegment,
   isSingletonSliceCapability,
 } from './plugin';
+import {
+  overridesValidatorKey,
+  validatorConflictError,
+} from './validator/registry';
 
 export const resolveServerSegments = async (
   plugins: PluginManifest[]
@@ -67,6 +72,28 @@ export const validateCapabilityGraph = (plugins: PluginManifest[]): void => {
         : []
     ),
     fieldConflictError
+  );
+
+  composeOverridableRegistry(
+    plugins.flatMap((plugin) =>
+      (plugin.validators ?? []).map((name) => ({
+        key: name,
+        value: plugin,
+        isOverride: overridesValidatorKey(plugin, name),
+      }))
+    ),
+    validatorConflictError
+  );
+
+  composeOverridableRegistry(
+    plugins.flatMap((plugin) =>
+      (plugin.hooks ?? []).map((name) => ({
+        key: name,
+        value: plugin,
+        isOverride: overridesHookKey(plugin, name),
+      }))
+    ),
+    hookConflictError
   );
 
   const capabilityEntries = plugins.flatMap((plugin) => {

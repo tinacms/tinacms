@@ -1,5 +1,24 @@
 # next-tinacms-azure
 
+## 15.1.0
+
+### Minor Changes
+
+- [#7316](https://github.com/tinacms/tinacms/pull/7316) [`6cd24ce`](https://github.com/tinacms/tinacms/commit/6cd24cea33eda2ebe44d9d3a56eeb2f42c8802e6) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Stop bundling Next.js into the published package.
+
+  `handlers.ts`, `delivery-handlers.ts` and `auth.ts` import values from `next/server` and `next/headers`, not just types. The build marks a package's `dependencies` and `peerDependencies` as external, and `next` sat in `devDependencies`, so esbuild inlined Next.js and part of React into three of the four entry points. `dist/handlers.js` was 288 KB, `dist/delivery-handlers.js` 287 KB and `dist/auth.js` 228 KB.
+
+  A consumer therefore loaded a second copy of the Next.js runtime alongside the one their app already had, which is a hazard around server-component and request-context boundaries as well as a size problem.
+
+  Declaring `next` as a peer dependency puts it back on the external list. `dist/` drops from 868 KB to 44 KB, and the three entry points now emit plain `import … from "next/server"` and `import … from "next/headers"`.
+
+  Every consumer of this package already has Next.js installed, so the peer requirement reflects what the code has always needed at runtime.
+
+### Patch Changes
+
+- Updated dependencies [[`ff3088e`](https://github.com/tinacms/tinacms/commit/ff3088e9aae28dea93bd8b9c8cad8f8a33d3a78d), [`288244e`](https://github.com/tinacms/tinacms/commit/288244efb544f4ad0712002c8609a5dc6f1d83db), [`b5ad014`](https://github.com/tinacms/tinacms/commit/b5ad014f1ec6c3009b8396315608f1a82efd31c1)]:
+  - tinacms@3.14.1
+
 ## 15.0.4
 
 ### Patch Changes
