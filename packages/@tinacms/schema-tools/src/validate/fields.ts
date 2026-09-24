@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { TinaField as TinaFieldType } from '../types/index';
+import { MEDIA_ACCEPT_VALUES } from '../types/index';
 import { findDuplicates } from '../util';
 import { name } from './properties';
 import {
@@ -49,6 +50,25 @@ const TinaField = z.object({
 const FieldWithList = TinaField.extend({ list: z.boolean().optional() });
 
 // ==========
+// Media accept values
+// ==========
+const validMediaAcceptList = MEDIA_ACCEPT_VALUES.map(
+  (value) => `\`${value}\``
+).join(', ');
+const MediaAcceptValue = z.enum(MEDIA_ACCEPT_VALUES, {
+  errorMap: (issue, ctx) => {
+    if (issue.code === 'invalid_enum_value') {
+      return {
+        message: `Invalid \`accept\` value \`${
+          typeof ctx.data === 'string' ? ctx.data : JSON.stringify(ctx.data)
+        }\`. Must be one of: ${validMediaAcceptList}.`,
+      };
+    }
+    return { message: ctx.defaultError };
+  },
+});
+
+// ==========
 // Scaler fields
 // ==========
 const TinaScalerBase = FieldWithList.extend({
@@ -86,6 +106,7 @@ const ImageField = TinaScalerBase.extend({
     required_error: typeRequiredError,
   }),
   uploadDir: z.function().args(z.any()).returns(z.string()).optional(),
+  accept: z.union([MediaAcceptValue, z.array(MediaAcceptValue)]).optional(),
 });
 
 const DateTimeField = TinaScalerBase.extend({
