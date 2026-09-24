@@ -9,7 +9,6 @@ import {
   messageText,
   plainMessage,
 } from './editorial-workflow-utils';
-import { EditorialWorkflowWidget } from './editorial-workflow-widget';
 import {
   type ExecuteWorkflowOptions,
   type WorkflowStep,
@@ -261,7 +260,6 @@ export const EditorialWorkflowProvider = ({
   return (
     <EditorialWorkflowContext.Provider value={value}>
       {children}
-      <EditorialWorkflowWidget state={state} onDismiss={dismiss} />
     </EditorialWorkflowContext.Provider>
   );
 };

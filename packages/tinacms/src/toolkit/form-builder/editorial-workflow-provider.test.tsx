@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, waitFor } from '@testing-library/react';
 import { EventBus } from '@toolkit/core/event';
 import { Form } from '@toolkit/forms';
 import * as React from 'react';
@@ -180,7 +180,9 @@ describe('EditorialWorkflowProvider', () => {
 
     expect(context.state.phase).toBe('error');
     expect(context.isExecuting).toBe(false);
-    expect(screen.getByText('Indexing failed')).toBeTruthy();
+    expect(context.state).toMatchObject({
+      error: { messageParts: [{ text: 'Indexing failed' }] },
+    });
   });
 
   it('marks the saved values clean and keeps edits made during the save', async () => {

@@ -8,8 +8,12 @@ import {
   X,
 } from 'lucide-react';
 import * as React from 'react';
+import { createPortal } from 'react-dom';
 import { EditorialWorkflowErrorBox } from './editorial-workflow-error-box';
-import type { EditorialWorkflowState } from './editorial-workflow-provider';
+import {
+  type EditorialWorkflowState,
+  useEditorialWorkflowState,
+} from './editorial-workflow-provider';
 import {
   WORKFLOW_STEPS,
   type WorkflowStep,
@@ -103,121 +107,131 @@ export const EditorialWorkflowWidget = ({
       ? WORKFLOW_STEPS[state.step - 1].name
       : 'Finishing up';
 
-  return (
-    <>
-      {expanded && (
-        <div
-          className='fixed inset-0 z-overlay bg-gray-900/25'
-          onClick={() => setExpanded(false)}
-        />
+  const card = (
+    <section
+      aria-live='polite'
+      aria-label='Save to new branch progress'
+      className={cn(
+        'bg-white border border-gray-200 rounded-md shadow-lg overflow-hidden text-left',
+        expanded
+          ? 'fixed z-[999999] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(560px,calc(100vw-2rem))]'
+          : 'mb-4 w-[min(350px,calc(100vw-2rem))]'
       )}
-      <section
-        aria-live='polite'
-        aria-label='Save to new branch progress'
-        className={cn(
-          'fixed z-overlay bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden',
-          expanded
-            ? 'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(560px,calc(100vw-2rem))]'
-            : 'right-4 bottom-4 w-[min(340px,calc(100vw-2rem))]'
+    >
+      <div className='flex items-center gap-3 px-4 py-3'>
+        {running && (
+          <Loader2 className='w-5 h-5 flex-shrink-0 animate-spin text-tina-orange' />
         )}
-      >
-        <div className='flex items-center gap-3 px-4 py-3'>
-          {running && (
-            <Loader2 className='w-5 h-5 flex-shrink-0 animate-spin text-tina-orange' />
-          )}
-          {state.phase === 'success' && (
-            <CircleCheck className='w-5 h-5 flex-shrink-0 text-green-600' />
-          )}
-          {state.phase === 'error' && (
-            <CircleAlert className='w-5 h-5 flex-shrink-0 text-red-500' />
-          )}
-          <div className='min-w-0'>
-            <div className='text-sm font-semibold text-gray-900'>
-              {running && 'Saving to a new branch'}
-              {state.phase === 'success' && 'Saved to a new branch'}
-              {state.phase === 'error' && "Couldn't save to a new branch"}
-            </div>
-            {state.phase !== 'error' && (
-              <div className='text-xs text-gray-500 truncate'>
-                {state.branchName}
-                {running &&
-                  ` · Step ${Math.min(state.step, 3)} of 3: ${stepName}`}
-              </div>
-            )}
+        {state.phase === 'success' && (
+          <CircleCheck className='w-5 h-5 flex-shrink-0 text-green-600' />
+        )}
+        {state.phase === 'error' && (
+          <CircleAlert className='w-5 h-5 flex-shrink-0 text-red-500' />
+        )}
+        <div className='min-w-0'>
+          <div className='text-sm font-semibold text-gray-900'>
+            {running && 'Saving to a new branch'}
+            {state.phase === 'success' && 'Saved to a new branch'}
+            {state.phase === 'error' && "Couldn't save to a new branch"}
           </div>
-          <div className='ml-auto flex items-center gap-1'>
-            {running ? (
+          {state.phase !== 'error' && (
+            <div className='text-xs text-gray-500 truncate'>
+              {state.branchName}
+              {running &&
+                ` · Step ${Math.min(state.step, 3)} of 3: ${stepName}`}
+            </div>
+          )}
+        </div>
+        <div className='ml-auto flex items-center gap-1'>
+          {running ? (
+            <>
+              <span className='text-xs text-gray-500 tabular-nums mr-1'>
+                {formatTime(elapsed)}
+              </span>
+              <IconButton
+                label={expanded ? 'Collapse' : 'Expand'}
+                onClick={() => setExpanded((prev) => !prev)}
+              >
+                {expanded ? (
+                  <Minimize2 className='w-4 h-4' />
+                ) : (
+                  <Maximize2 className='w-4 h-4' />
+                )}
+              </IconButton>
+            </>
+          ) : (
+            <IconButton label='Dismiss' onClick={onDismiss}>
+              <X className='w-4 h-4' />
+            </IconButton>
+          )}
+        </div>
+      </div>
+
+      {running &&
+        (expanded ? (
+          <div className='px-6 pb-5'>
+            <WorkflowProgressIndicator
+              currentStep={state.step}
+              isExecuting
+              elapsedTime={elapsed}
+            />
+            <p className='mt-4 text-xs text-gray-500 bg-gray-50 rounded px-3 py-2'>
+              Keep editing if you like. Saving, switching branch and uploading
+              media unlock when this finishes.
+            </p>
+          </div>
+        ) : (
+          <CompactSteps step={state.step} />
+        ))}
+
+      {state.phase === 'success' && (
+        <div className='px-4 pb-4 text-xs text-gray-700'>
+          <div className='bg-green-50 text-green-800 rounded px-3 py-2'>
+            {state.pullRequestUrl ? (
               <>
-                <span className='text-xs text-gray-500 tabular-nums mr-1'>
-                  {formatTime(elapsed)}
-                </span>
-                <IconButton
-                  label={expanded ? 'Collapse' : 'Expand'}
-                  onClick={() => setExpanded((prev) => !prev)}
+                Your{' '}
+                <a
+                  className='underline font-medium'
+                  href={state.pullRequestUrl}
+                  target='_blank'
+                  rel='noreferrer'
                 >
-                  {expanded ? (
-                    <Minimize2 className='w-4 h-4' />
-                  ) : (
-                    <Maximize2 className='w-4 h-4' />
-                  )}
-                </IconButton>
+                  pull request
+                </a>{' '}
+                is open.
               </>
             ) : (
-              <IconButton label='Dismiss' onClick={onDismiss}>
-                <X className='w-4 h-4' />
-              </IconButton>
+              'Your pull request is open.'
             )}
+            {state.hasNewEdits &&
+              ' You made changes while it was saving. Save again to add them to this branch.'}
           </div>
         </div>
+      )}
 
-        {running &&
-          (expanded ? (
-            <div className='px-6 pb-5'>
-              <WorkflowProgressIndicator
-                currentStep={state.step}
-                isExecuting
-                elapsedTime={elapsed}
-              />
-              <p className='mt-4 text-xs text-gray-500 bg-gray-50 rounded px-3 py-2'>
-                Keep editing if you like. Saving, switching branch and uploading
-                media unlock when this finishes.
-              </p>
-            </div>
-          ) : (
-            <CompactSteps step={state.step} />
-          ))}
-
-        {state.phase === 'success' && (
-          <div className='px-4 pb-4 text-xs text-gray-700'>
-            <div className='bg-green-50 text-green-800 rounded px-3 py-2'>
-              {state.pullRequestUrl ? (
-                <>
-                  Your{' '}
-                  <a
-                    className='underline font-medium'
-                    href={state.pullRequestUrl}
-                    target='_blank'
-                    rel='noreferrer'
-                  >
-                    pull request
-                  </a>{' '}
-                  is open.
-                </>
-              ) : (
-                'Your pull request is open.'
-              )}
-              {state.hasNewEdits &&
-                ' You made changes while it was saving. Save again to add them to this branch.'}
-            </div>
-          </div>
-        )}
-
-        {state.phase === 'error' && (
-          <div className='px-4 pb-1'>
-            <EditorialWorkflowErrorBox error={state.error} />
-          </div>
-        )}
-      </section>
-    </>
+      {state.phase === 'error' && (
+        <div className='px-4 pb-1'>
+          <EditorialWorkflowErrorBox error={state.error} />
+        </div>
+      )}
+    </section>
   );
+
+  if (!expanded) return card;
+
+  return createPortal(
+    <>
+      <div
+        className='fixed inset-0 z-[999999] bg-gray-900/25'
+        onClick={() => setExpanded(false)}
+      />
+      {card}
+    </>,
+    document.body
+  );
+};
+
+export const EditorialWorkflowToast = () => {
+  const { state, dismiss } = useEditorialWorkflowState();
+  return <EditorialWorkflowWidget state={state} onDismiss={dismiss} />;
 };

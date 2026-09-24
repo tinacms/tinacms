@@ -36,12 +36,13 @@ const parseUrlsInText = (text: string): React.ReactNode => {
 
 export interface AlertsProps {
   alerts: AlertsCollection;
+  footer?: React.ReactNode;
 }
 
-export function Alerts({ alerts }: AlertsProps) {
+export function Alerts({ alerts, footer }: AlertsProps) {
   useSubscribable(alerts);
 
-  if (!alerts.all.length) {
+  if (!alerts.all.length && !footer) {
     return null;
   }
 
@@ -75,6 +76,7 @@ export function Alerts({ alerts }: AlertsProps) {
               </Alert>
             );
           })}
+        {footer}
       </div>
       {alerts.all
         .filter((alert) => {
