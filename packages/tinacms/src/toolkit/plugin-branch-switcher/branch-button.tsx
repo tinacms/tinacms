@@ -2,6 +2,10 @@ import { useCMS } from '@toolkit/react-tinacms';
 import { cn } from '@utils/cn';
 import { ChevronDown, ExternalLink, GitBranch, Lock } from 'lucide-react';
 import * as React from 'react';
+import {
+  SAVE_IN_PROGRESS_MESSAGE,
+  useEditorialWorkflowState,
+} from '../form-builder/editorial-workflow-provider';
 import { BranchSwitcherOpenedEvent } from '../../lib/posthog/posthog';
 import { captureEvent } from '../../lib/posthog/posthogProvider';
 import { Button } from '../styles/button';
@@ -11,6 +15,7 @@ import { BranchModal } from './branch-modal';
 export const BranchButton = ({ className = '' }) => {
   const [open, setOpen] = React.useState(false);
   const { currentBranch } = useBranchData();
+  const { isExecuting } = useEditorialWorkflowState();
 
   const cms = useCMS();
   const branchingEnabled = cms.flags.get('branch-switcher');
@@ -23,30 +28,36 @@ export const BranchButton = ({ className = '' }) => {
 
   return (
     <>
-      <Button
-        variant={'secondary'}
-        size='custom'
-        className={cn(
-          'pointer-events-auto px-3 py-3 flex shrink gap-1 items-center justify-between max-w-sm',
-          className
-        )}
-        onClick={() => {
-          setOpen(true);
-          captureEvent(BranchSwitcherOpenedEvent, {});
-        }}
-        title={currentBranch}
+      <span
+        className='flex min-w-0'
+        title={isExecuting ? SAVE_IN_PROGRESS_MESSAGE : undefined}
       >
-        {isProtected ? (
-          <Lock className='flex-shrink-0 h-6 w-auto opacity-70' />
-        ) : (
-          <GitBranch className='flex-shrink-0 h-6 w-auto opacity-70 text-zinc-400' />
-        )}
-        <span className='truncate max-w-full -mr-1'>{currentBranch}</span>
-        <ChevronDown
-          className='-mr-1 h-4 w-4 opacity-70 shrink-0'
-          aria-hidden='true'
-        />
-      </Button>
+        <Button
+          variant={'secondary'}
+          size='custom'
+          className={cn(
+            'pointer-events-auto px-3 py-3 flex shrink gap-1 items-center justify-between max-w-sm',
+            className
+          )}
+          onClick={() => {
+            setOpen(true);
+            captureEvent(BranchSwitcherOpenedEvent, {});
+          }}
+          disabled={isExecuting}
+          title={currentBranch}
+        >
+          {isProtected ? (
+            <Lock className='flex-shrink-0 h-6 w-auto opacity-70' />
+          ) : (
+            <GitBranch className='flex-shrink-0 h-6 w-auto opacity-70 text-zinc-400' />
+          )}
+          <span className='truncate max-w-full -mr-1'>{currentBranch}</span>
+          <ChevronDown
+            className='-mr-1 h-4 w-4 opacity-70 shrink-0'
+            aria-hidden='true'
+          />
+        </Button>
+      </span>
       {open && <BranchModal close={() => setOpen(false)} />}
     </>
   );

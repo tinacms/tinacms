@@ -12,6 +12,10 @@ import {
   MediaListOffset,
 } from '@toolkit/core';
 import { LoadingDots } from '@toolkit/form-builder';
+import {
+  SAVE_IN_PROGRESS_MESSAGE,
+  useEditorialWorkflowState,
+} from '@toolkit/form-builder/editorial-workflow-provider';
 import { CloseIcon, TrashIcon } from '@toolkit/icons';
 import { FullscreenModal, Modal, ModalBody } from '@toolkit/react-modals';
 import { useCMS } from '@toolkit/react-tinacms';
@@ -406,6 +410,7 @@ export function MediaPicker({
   }
 
   const [uploading, setUploading] = useState(false);
+  const { isExecuting: isWorkflowRunning } = useEditorialWorkflowState();
   const globalAccept = Array.isArray(
     cms.api.tina.schema.schema?.config?.media?.accept
   )
@@ -419,6 +424,7 @@ export function MediaPicker({
       ),
     maxSize: cms.media.maxSize,
     multiple: true,
+    disabled: isWorkflowRunning,
     onDrop: async (files, fileRejections) => {
       try {
         setUploading(true);
@@ -665,7 +671,11 @@ export function MediaPicker({
                   New Folder
                   <Folder className='w-6 h-full ml-2 opacity-70 text-tina-orange' />
                 </Button>
-                <UploadButton onClick={onClick} uploading={uploading} />
+                <UploadButton
+                  onClick={onClick}
+                  uploading={uploading}
+                  disabled={isWorkflowRunning}
+                />
               </div>
             )}
           </div>
@@ -870,17 +880,28 @@ const ActiveItemPreview = ({
   );
 };
 
-const UploadButton = ({ onClick, uploading }: any) => {
+const UploadButton = ({
+  onClick,
+  uploading,
+  disabled,
+}: {
+  onClick: React.MouseEventHandler<HTMLButtonElement>;
+  uploading: boolean;
+  disabled: boolean;
+}) => {
   return (
-    <Button
-      variant='primary'
-      size='custom'
-      className='text-sm h-10 px-6'
-      busy={uploading}
-      onClick={onClick}
-    >
-      Upload <CloudUpload className='w-6 h-full ml-2 opacity-70' />
-    </Button>
+    <span title={disabled ? SAVE_IN_PROGRESS_MESSAGE : undefined}>
+      <Button
+        variant='primary'
+        size='custom'
+        className='text-sm h-10 px-6'
+        busy={uploading}
+        disabled={disabled}
+        onClick={onClick}
+      >
+        Upload <CloudUpload className='w-6 h-full ml-2 opacity-70' />
+      </Button>
+    </span>
   );
 };
 

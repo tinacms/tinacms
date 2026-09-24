@@ -38,6 +38,12 @@ vi.mock('./branch-modal', () => ({
   ),
 }));
 
+let mockIsExecuting = false;
+vi.mock('../form-builder/editorial-workflow-provider', () => ({
+  SAVE_IN_PROGRESS_MESSAGE: 'Unavailable while saving',
+  useEditorialWorkflowState: () => ({ isExecuting: mockIsExecuting }),
+}));
+
 import { BranchButton } from './branch-button';
 
 function renderBranchButton() {
@@ -51,6 +57,7 @@ function renderBranchButton() {
 describe('BranchButton telemetry', () => {
   beforeEach(() => {
     mockCaptureEvent.mockClear();
+    mockIsExecuting = false;
   });
 
   it('fires BranchSwitcherOpenedEvent when clicked', async () => {
@@ -59,5 +66,17 @@ describe('BranchButton telemetry', () => {
     await user.click(button);
 
     expect(mockCaptureEvent).toHaveBeenCalledWith('branch-switcher-opened', {});
+  });
+
+  it('is disabled while a save to a new branch runs', async () => {
+    mockIsExecuting = true;
+    const { user, getByTitle, queryByTestId } = renderBranchButton();
+
+    const button = getByTitle('main') as HTMLButtonElement;
+    expect(button.disabled).toBe(true);
+    expect(getByTitle('Unavailable while saving')).toBeTruthy();
+
+    await user.click(button);
+    expect(queryByTestId('branch-modal')).toBeNull();
   });
 });
