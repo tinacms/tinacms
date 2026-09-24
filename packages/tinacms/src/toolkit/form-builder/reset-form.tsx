@@ -12,12 +12,14 @@ import {
 interface ResetFormProps {
   children: any;
   pristine: boolean;
+  disabled?: boolean;
   reset(): void;
   style?: React.CSSProperties;
 }
 
 export const ResetForm: FC<ResetFormProps> = ({
   pristine,
+  disabled,
   reset,
   children,
   ...props
@@ -29,7 +31,7 @@ export const ResetForm: FC<ResetFormProps> = ({
         onClick={() => {
           setOpen((p) => !p);
         }}
-        disabled={pristine}
+        disabled={pristine || disabled}
         {...props}
       >
         {children}

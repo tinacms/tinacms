@@ -21,6 +21,10 @@ import {
 import { useCMS } from '../react-core';
 import { BranchDeletedModal } from './branch-deleted-modal';
 import { CreateBranchModal } from './create-branch-modal';
+import {
+  SAVE_IN_PROGRESS_MESSAGE,
+  useEditorialWorkflowState,
+} from './editorial-workflow-provider';
 import { FieldsBuilder } from './fields-builder';
 import { FormActionMenu } from './form-actions';
 import { FormPortalProvider } from './form-portal';
@@ -103,6 +107,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   const [deletedBranchModalOpen, setDeletedBranchModalOpen] =
     React.useState(false);
   const [isGuardChecking, setIsGuardChecking] = React.useState(false);
+  const { isExecuting: isWorkflowRunning } = useEditorialWorkflowState();
 
   const tinaForm = form.tinaForm;
   const finalForm = form.tinaForm.finalForm;
@@ -257,6 +262,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
         };
 
         const safeHandleSubmit = async () => {
+          if (isWorkflowRunning) return;
           setIsGuardChecking(true);
 
           const currentBranch = decodeURIComponent(cms.api.tina.getBranch());
@@ -344,25 +350,44 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                   <div className='relative flex-none w-full h-16 px-6 bg-white border-t border-gray-100 flex items-center justify-end'>
                     <div className='flex-1 w-full justify-end gap-2	flex items-center max-w-form'>
                       {tinaForm.reset && (
-                        <ResetForm
-                          pristine={pristine}
-                          reset={async () => {
-                            finalForm.reset();
-                            await tinaForm.reset!();
-                            captureEvent(FormResetEvent);
-                          }}
+                        <span
+                          title={
+                            isWorkflowRunning
+                              ? SAVE_IN_PROGRESS_MESSAGE
+                              : undefined
+                          }
                         >
-                          {tinaForm.buttons.reset}
-                        </ResetForm>
+                          <ResetForm
+                            pristine={pristine}
+                            disabled={isWorkflowRunning}
+                            reset={async () => {
+                              finalForm.reset();
+                              await tinaForm.reset!();
+                              captureEvent(FormResetEvent);
+                            }}
+                          >
+                            {tinaForm.buttons.reset}
+                          </ResetForm>
+                        </span>
                       )}
-                      <Button
-                        onClick={safeHandleSubmit}
-                        disabled={!canSubmit || isGuardChecking}
-                        busy={submitting}
-                        variant='primary'
+                      <span
+                        title={
+                          isWorkflowRunning
+                            ? SAVE_IN_PROGRESS_MESSAGE
+                            : undefined
+                        }
                       >
-                        {tinaForm.buttons.save}
-                      </Button>
+                        <Button
+                          onClick={safeHandleSubmit}
+                          disabled={
+                            !canSubmit || isGuardChecking || isWorkflowRunning
+                          }
+                          busy={submitting}
+                          variant='primary'
+                        >
+                          {tinaForm.buttons.save}
+                        </Button>
+                      </span>
                       {tinaForm.actions.length > 0 && (
                         <FormActionMenu
                           form={tinaForm as Form}

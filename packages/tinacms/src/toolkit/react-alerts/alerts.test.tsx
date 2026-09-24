@@ -21,6 +21,15 @@ describe('Alerts', () => {
       expect(container.children).toHaveLength(0);
     });
   });
+  it('renders the footer below the toasts even with no alerts', () => {
+    const alerts = createMockAlerts();
+
+    const output = render(
+      <Alerts alerts={alerts} footer={<span>Saving to a new branch</span>} />
+    );
+
+    output.getByText('Saving to a new branch');
+  });
   describe('when there are alerts', () => {
     it('renders one alert', () => {
       const alert: Alert = {

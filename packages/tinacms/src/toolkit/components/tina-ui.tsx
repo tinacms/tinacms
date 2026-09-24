@@ -4,6 +4,7 @@
 
 */
 
+import { EditorialWorkflowToast } from '@toolkit/form-builder/editorial-workflow-widget';
 import { Alerts } from '@toolkit/react-alerts';
 import { ModalProvider } from '@toolkit/react-modals';
 import { SidebarPosition, SidebarProvider } from '@toolkit/react-sidebar';
@@ -27,7 +28,7 @@ export const TinaUI: React.FC<TinaUIProps> = ({ children, position }) => {
   return (
     <MutationSignalProvider>
       <ModalProvider>
-        <Alerts alerts={cms.alerts} />
+        <Alerts alerts={cms.alerts} footer={<EditorialWorkflowToast />} />
         <MediaManager />
         {cms.sidebar && (
           <SidebarProvider

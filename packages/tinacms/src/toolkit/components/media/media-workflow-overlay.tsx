@@ -1,27 +1,19 @@
 import { CreateBranchPromptModal } from '@toolkit/form-builder/create-branch-modal';
-import { EditorialWorkflowErrorBox } from '@toolkit/form-builder/editorial-workflow-error-box';
-import { EditorialWorkflowProgressModal } from '@toolkit/form-builder/editorial-workflow-progress-modal';
+import {
+  SAVE_IN_PROGRESS_MESSAGE,
+  useEditorialWorkflowState,
+} from '@toolkit/form-builder/editorial-workflow-provider';
 import {
   type MediaWorkflowConfirmBranchEvent,
   TARGET_BRANCH_EXISTS_ERROR,
   checkBranchGuard,
-} from '@toolkit/form-builder/editorial-workflow-utils';
-import type { EditorialWorkflowErrorCopy } from '@toolkit/form-builder/editorial-workflow-utils';
-import {
   collectionLabelResolver,
   getEditorialWorkflowError,
   plainMessage,
-} from '@toolkit/form-builder/use-editorial-workflow';
-import { useBranchData } from '@toolkit/plugin-branch-switcher';
+} from '@toolkit/form-builder/editorial-workflow-utils';
+import type { EditorialWorkflowErrorCopy } from '@toolkit/form-builder/editorial-workflow-utils';
 import { useCMS } from '@toolkit/react-core';
-import {
-  Modal,
-  ModalBody,
-  ModalHeader,
-  PopupModal,
-} from '@toolkit/react-modals';
 import { normalizeBranchName } from '@utils/branch-name';
-import { CircleAlert } from 'lucide-react';
 import * as React from 'react';
 
 type WorkflowState =
@@ -36,13 +28,13 @@ type WorkflowState =
       onConfirm: (branchName: string) => Promise<void>;
       onCancel: () => void;
       onSaveToProtectedBranch: () => void;
-    }
-  | { phase: 'executing'; step: number; elapsed: number }
-  | { phase: 'error'; error: EditorialWorkflowErrorCopy };
+    };
 
 export const MediaWorkflowOverlay = () => {
   const cms = useCMS();
-  const { setCurrentBranch } = useBranchData();
+  const { isExecuting } = useEditorialWorkflowState();
+  const isExecutingRef = React.useRef(isExecuting);
+  isExecutingRef.current = isExecuting;
 
   const [state, setState] = React.useState<WorkflowState>({ phase: 'idle' });
   const preflightAbortRef = React.useRef<AbortController | null>(null);
@@ -56,6 +48,11 @@ export const MediaWorkflowOverlay = () => {
     const offConfirm = cms.events.subscribe<MediaWorkflowConfirmBranchEvent>(
       'media:workflow:confirm-branch',
       (event) => {
+        if (isExecutingRef.current) {
+          event.onCancel();
+          cms.alerts.warn(SAVE_IN_PROGRESS_MESSAGE);
+          return;
+        }
         abortPreflight();
         setState({
           phase: 'confirming',
@@ -68,67 +65,12 @@ export const MediaWorkflowOverlay = () => {
         });
       }
     );
-    const offStart = cms.events.subscribe('media:workflow:start', () => {
-      setState({ phase: 'executing', step: 1, elapsed: 0 });
-    });
-    const offStep = cms.events.subscribe<{ type: string; step: number }>(
-      'media:workflow:step',
-      (event) => {
-        setState((prev) =>
-          prev.phase === 'executing'
-            ? { ...prev, step: event.step }
-            : { phase: 'executing', step: event.step, elapsed: 0 }
-        );
-      }
-    );
-    const offComplete = cms.events.subscribe<{
-      type: string;
-      branchName: string;
-    }>('media:workflow:complete', (event) => {
-      setCurrentBranch(event.branchName);
-    });
-    const offError = cms.events.subscribe<{
-      type: string;
-      message: string;
-      error?: unknown;
-    }>('media:workflow:error', (event) => {
-      setState({
-        phase: 'error',
-        error:
-          event.error === undefined
-            ? { messageParts: plainMessage(event.message) }
-            : getEditorialWorkflowError(
-                event.error,
-                collectionLabelResolver(cms.api.tina.schema)
-              ),
-      });
-    });
-    const offFinish = cms.events.subscribe('media:workflow:finish', () => {
-      setState({ phase: 'idle' });
-    });
 
     return () => {
       offConfirm();
-      offStart();
-      offStep();
-      offComplete();
-      offError();
-      offFinish();
       abortPreflight();
     };
-  }, [abortPreflight, cms, setCurrentBranch]);
-
-  React.useEffect(() => {
-    if (state.phase !== 'executing') return;
-    const interval = setInterval(() => {
-      setState((prev) =>
-        prev.phase === 'executing'
-          ? { ...prev, elapsed: prev.elapsed + 1 }
-          : prev
-      );
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [state.phase]);
+  }, [abortPreflight, cms]);
 
   const handleCreateBranch = async () => {
     if (state.phase !== 'confirming') return;
@@ -189,8 +131,8 @@ export const MediaWorkflowOverlay = () => {
       if (preflightAbortRef.current === abortController) {
         preflightAbortRef.current = null;
       }
-      setState({ phase: 'executing', step: 1, elapsed: 0 });
       await confirmState.onConfirm(targetBranch);
+      setState({ phase: 'idle' });
     } catch (e) {
       console.error(e);
       setState({
@@ -207,64 +149,38 @@ export const MediaWorkflowOverlay = () => {
 
   if (state.phase === 'idle') return null;
 
-  if (state.phase === 'confirming') {
-    return (
-      <CreateBranchPromptModal
-        branchName={state.branchName}
-        close={() => {
-          abortPreflight();
-          state.onCancel();
-          setState({ phase: 'idle' });
-        }}
-        disabled={
-          normalizeBranchName(state.branchName) === '' || state.isChecking
-        }
-        error={state.error}
-        onBranchNameChange={(branchName) => {
-          abortPreflight();
-          setState((prev) =>
-            prev.phase === 'confirming'
-              ? {
-                  ...prev,
-                  branchName,
-                  error: undefined,
-                  isChecking: false,
-                }
-              : prev
-          );
-        }}
-        onCreateBranch={handleCreateBranch}
-        allowSaveToProtectedBranch={state.allowSaveToProtectedBranch}
-        onSaveToProtectedBranch={() => {
-          abortPreflight();
-          state.onSaveToProtectedBranch();
-          setState({ phase: 'idle' });
-        }}
-      />
-    );
-  }
-
-  if (state.phase === 'executing') {
-    return (
-      <EditorialWorkflowProgressModal
-        title='Save changes to new branch'
-        currentStep={state.step}
-        elapsedTime={state.elapsed}
-      />
-    );
-  }
-
-  const dismissError = () => setState({ phase: 'idle' });
   return (
-    <Modal className='flex'>
-      <PopupModal className='w-auto'>
-        <ModalHeader close={dismissError}>Branch creation failed</ModalHeader>
-        <ModalBody padded={true}>
-          <div className='max-w-sm'>
-            <EditorialWorkflowErrorBox error={state.error} />
-          </div>
-        </ModalBody>
-      </PopupModal>
-    </Modal>
+    <CreateBranchPromptModal
+      branchName={state.branchName}
+      close={() => {
+        abortPreflight();
+        state.onCancel();
+        setState({ phase: 'idle' });
+      }}
+      disabled={
+        normalizeBranchName(state.branchName) === '' || state.isChecking
+      }
+      error={state.error}
+      onBranchNameChange={(branchName) => {
+        abortPreflight();
+        setState((prev) =>
+          prev.phase === 'confirming'
+            ? {
+                ...prev,
+                branchName,
+                error: undefined,
+                isChecking: false,
+              }
+            : prev
+        );
+      }}
+      onCreateBranch={handleCreateBranch}
+      allowSaveToProtectedBranch={state.allowSaveToProtectedBranch}
+      onSaveToProtectedBranch={() => {
+        abortPreflight();
+        state.onSaveToProtectedBranch();
+        setState({ phase: 'idle' });
+      }}
+    />
   );
 };
