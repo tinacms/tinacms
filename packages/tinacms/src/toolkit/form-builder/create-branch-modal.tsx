@@ -26,19 +26,19 @@ import {
   PopupModal,
 } from '../react-modals';
 import { EditorialWorkflowErrorBox } from './editorial-workflow-error-box';
-import { EditorialWorkflowProgressModal } from './editorial-workflow-progress-modal';
+import { useEditorialWorkflowState } from './editorial-workflow-provider';
 import {
   type EditorialWorkflowErrorCopy,
   type EditorialWorkflowErrorLink,
   type EditorialWorkflowMessagePart,
   checkBranchGuard,
 } from './editorial-workflow-utils';
+import { WORKFLOW_ESTIMATE } from './run-editorial-workflow';
 import {
   SAVE_CHOICE_KEY,
   type SaveChoice,
   resolveSaveOptions,
 } from './save-options';
-import { useEditorialWorkflow } from './use-editorial-workflow';
 
 export const CreateBranchModal = ({
   close,
@@ -67,14 +67,8 @@ export const CreateBranchModal = ({
   const normalizedBranchName = normalizeBranchName(newBranchName);
   const branchGuardAbortRef = React.useRef<AbortController | null>(null);
 
-  const {
-    isExecuting,
-    error,
-    currentStep,
-    elapsedTime,
-    executeWorkflow,
-    reset,
-  } = useEditorialWorkflow();
+  const { startContentSave } = useEditorialWorkflowState();
+  const [error, setError] = React.useState<EditorialWorkflowErrorCopy>();
 
   const abortBranchGuard = React.useCallback(() => {
     branchGuardAbortRef.current?.abort();
@@ -118,7 +112,7 @@ export const CreateBranchModal = ({
 
     setIsBranchGuardChecking(false);
 
-    const { success, error } = await executeWorkflow({
+    const result = await startContentSave({
       branchName: targetBranch,
       baseBranch,
       path,
@@ -128,35 +122,23 @@ export const CreateBranchModal = ({
       signal: abortController.signal,
       targetBranchExists,
       isDraft,
+      onSettled: ({ success, error }) =>
+        captureEvent(EditorialWorkflowSaveEvent, {
+          choice: isDraft ? 'draft' : 'review',
+          success,
+          error,
+        }),
     });
     if (branchGuardAbortRef.current === abortController) {
       branchGuardAbortRef.current = null;
     }
 
-    // Cancelled mid-run (modal closed, branch renamed, another save started, or
-    // unmounted) — treat as a no-op and record nothing.
-    if (abortController.signal.aborted) return;
-
-    captureEvent(EditorialWorkflowSaveEvent, {
-      choice: isDraft ? 'draft' : 'review',
-      success,
-      error,
-    });
-
-    if (success) {
+    if (result.started) {
       close();
+    } else if (result.error) {
+      setError(result.error);
     }
   };
-
-  if (isExecuting) {
-    return (
-      <EditorialWorkflowProgressModal
-        title='Save changes to new branch'
-        currentStep={currentStep}
-        elapsedTime={elapsedTime}
-      />
-    );
-  }
 
   return (
     <CreateBranchPromptModal
@@ -169,7 +151,7 @@ export const CreateBranchModal = ({
       disabled={normalizedBranchName === '' || isBranchGuardChecking}
       onBranchNameChange={(value) => {
         abortBranchGuard();
-        reset();
+        setError(undefined);
         setNewBranchName(value);
       }}
       onCreateBranch={executeEditorialWorkflow}
@@ -341,6 +323,9 @@ export const CreateBranchPromptModal = ({
                 onBranchNameChange(e.target.value);
               }}
             />
+            <p className='mt-3 text-xs text-gray-500'>
+              {WORKFLOW_ESTIMATE}. You can keep editing while it saves.
+            </p>
             <CommittingAs />
           </div>
         </ModalBody>
