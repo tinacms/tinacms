@@ -13,7 +13,15 @@ export const VersionInfo = () => {
   return (
     <span className='font-sans font-light text-xs mb-3 mt-4 text-gray-500'>
       TinaCMS v{currentVersion + ' '}
-      {!optOutOfUpdateCheck && <LatestVersionCheck />}
+      {!optOutOfUpdateCheck && <LatestVersionCheck />}{' '}
+      <a
+        href='https://tina.io/whats-new/tinacms/'
+        target='_blank'
+        rel='noopener noreferrer'
+        className='text-blue-600 hover:text-blue-400 underline'
+      >
+        See latest Releases
+      </a>
     </span>
   );
 };
