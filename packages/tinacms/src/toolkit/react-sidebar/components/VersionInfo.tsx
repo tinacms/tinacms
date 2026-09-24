@@ -18,7 +18,7 @@ export const VersionInfo = () => {
         href='https://tina.io/whats-new/tinacms/'
         target='_blank'
         rel='noopener noreferrer'
-        className='text-blue-600 hover:text-blue-400 underline'
+        className='text-blue-600 hover:text-blue-400 underline whitespace-nowrap'
       >
         See latest Releases
       </a>
