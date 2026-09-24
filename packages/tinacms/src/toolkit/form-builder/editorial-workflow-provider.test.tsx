@@ -9,7 +9,7 @@ const setCurrentBranch = vi.fn();
 const events = new EventBus();
 const cms = {
   events,
-  alerts: { warn: vi.fn() },
+  alerts: { warn: vi.fn(), success: vi.fn(), info: vi.fn(), error: vi.fn() },
   api: { tina: { schema: {}, gitSettingsLink: 'https://app.tina.io/git' } },
 };
 
@@ -84,6 +84,7 @@ describe('EditorialWorkflowProvider', () => {
   beforeEach(() => {
     runEditorialWorkflow.mockReset();
     setCurrentBranch.mockReset();
+    for (const alert of Object.values(cms.alerts)) alert.mockReset();
   });
 
   it('runs a content save through to success and switches branch', async () => {
@@ -107,10 +108,12 @@ describe('EditorialWorkflowProvider', () => {
 
     await act(async () => run.resolve(succeeded));
 
-    expect(context.state).toMatchObject({
-      phase: 'success',
-      pullRequestUrl: succeeded.pullRequestUrl,
-    });
+    expect(context.state.phase).toBe('idle');
+    expect(cms.alerts.success).toHaveBeenCalledWith(
+      `Branch created successfully - Pull Request at ${succeeded.pullRequestUrl}`,
+      0
+    );
+    expect(cms.alerts.info).not.toHaveBeenCalled();
     expect(setCurrentBranch).toHaveBeenCalledWith('tina/hello-updates');
   });
 
@@ -178,11 +181,9 @@ describe('EditorialWorkflowProvider', () => {
       })
     );
 
-    expect(context.state.phase).toBe('error');
+    expect(context.state.phase).toBe('idle');
     expect(context.isExecuting).toBe(false);
-    expect(context.state).toMatchObject({
-      error: { messageParts: [{ text: 'Indexing failed' }] },
-    });
+    expect(cms.alerts.error).toHaveBeenCalledTimes(1);
   });
 
   it('marks the saved values clean and keeps edits made during the save', async () => {
@@ -210,10 +211,10 @@ describe('EditorialWorkflowProvider', () => {
     });
     expect(form.finalForm.getState().initialValues.title).toBe('Saved title');
     expect(form.dirty).toBe(true);
-    expect(context.state).toMatchObject({
-      phase: 'success',
-      hasNewEdits: true,
-    });
+    expect(cms.alerts.info).toHaveBeenCalledWith(
+      'You made changes while it was saving. Save again to add them to tina/hello-updates.',
+      0
+    );
   });
 
   it('keeps edits in a form that is no longer on screen', async () => {
@@ -235,10 +236,7 @@ describe('EditorialWorkflowProvider', () => {
     await act(async () => run.resolve(succeeded));
 
     expect(form.values.body).toBe('Typed during the save');
-    expect(context.state).toMatchObject({
-      phase: 'success',
-      hasNewEdits: true,
-    });
+    expect(cms.alerts.info).toHaveBeenCalled();
   });
 
   it('leaves the form clean when nothing changed during the save', async () => {
@@ -260,10 +258,7 @@ describe('EditorialWorkflowProvider', () => {
     await act(async () => run.resolve(succeeded));
 
     expect(form.dirty).toBe(false);
-    expect(context.state).toMatchObject({
-      phase: 'success',
-      hasNewEdits: false,
-    });
+    expect(cms.alerts.info).not.toHaveBeenCalled();
   });
 
   it('follows media workflow events', async () => {
@@ -286,11 +281,23 @@ describe('EditorialWorkflowProvider', () => {
       });
       events.dispatch({ type: 'media:workflow:finish' });
     });
-    expect(context.state).toMatchObject({
-      phase: 'success',
-      branchName: 'tina/m',
-    });
+    expect(context.state.phase).toBe('idle');
     expect(setCurrentBranch).toHaveBeenCalledWith('tina/m');
+  });
+
+  it('shows media workflow failures as an error alert', () => {
+    renderProvider();
+
+    act(() => {
+      events.dispatch({ type: 'media:workflow:start', branchName: 'tina/m' });
+      events.dispatch({
+        type: 'media:workflow:error',
+        message: 'Upload failed',
+      });
+    });
+
+    expect(context.state.phase).toBe('idle');
+    expect(cms.alerts.error).toHaveBeenCalledTimes(1);
   });
 
   it('warns before unload only while a save runs', async () => {

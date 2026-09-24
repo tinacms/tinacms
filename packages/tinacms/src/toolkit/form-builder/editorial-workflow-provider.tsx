@@ -2,6 +2,7 @@ import type { Form } from '@toolkit/forms';
 import { useBranchData } from '@toolkit/plugin-branch-switcher';
 import { useCMS } from '@toolkit/react-core';
 import * as React from 'react';
+import { EditorialWorkflowErrorMessage } from './editorial-workflow-error-box';
 import {
   type EditorialWorkflowErrorCopy,
   collectionLabelResolver,
@@ -22,16 +23,6 @@ export type EditorialWorkflowState =
       branchName: string;
       step: WorkflowStep;
       startedAt: number;
-    }
-  | {
-      phase: 'success';
-      branchName: string;
-      pullRequestUrl?: string;
-      hasNewEdits: boolean;
-    }
-  | {
-      phase: 'error';
-      error: EditorialWorkflowErrorCopy;
     };
 
 export type StartContentSaveResult = {
@@ -49,7 +40,6 @@ interface EditorialWorkflowContextValue {
   startContentSave: (
     opts: ContentSaveOptions
   ) => Promise<StartContentSaveResult>;
-  dismiss: () => void;
 }
 
 export const SAVE_IN_PROGRESS_MESSAGE =
@@ -65,7 +55,6 @@ const EditorialWorkflowContext =
         messageParts: plainMessage('Editorial workflow is not available.'),
       },
     }),
-    dismiss: () => {},
   });
 
 export const useEditorialWorkflowState = () =>
@@ -107,6 +96,12 @@ export const EditorialWorkflowProvider = ({
     return () => window.removeEventListener('beforeunload', warnBeforeUnload);
   }, [isExecuting]);
 
+  const showError = React.useCallback(
+    (error: EditorialWorkflowErrorCopy) =>
+      cms.alerts.error(() => <EditorialWorkflowErrorMessage error={error} />),
+    [cms]
+  );
+
   React.useEffect(() => {
     const setStep = (step: WorkflowStep) =>
       setState((prev) => (prev.phase === 'running' ? { ...prev, step } : prev));
@@ -133,40 +128,33 @@ export const EditorialWorkflowProvider = ({
         (event) => {
           busyRef.current = false;
           setCurrentBranch(event.branchName);
-          setState({
-            phase: 'success',
-            branchName: event.branchName,
-            hasNewEdits: false,
-          });
+          setState({ phase: 'idle' });
         }
       ),
       cms.events.subscribe<{ type: string; message: string; error?: unknown }>(
         'media:workflow:error',
         (event) => {
           busyRef.current = false;
-          setState({
-            phase: 'error',
-            error:
-              event.error === undefined
-                ? { messageParts: plainMessage(event.message) }
-                : getEditorialWorkflowError(
-                    event.error,
-                    collectionLabelResolver(cms.api.tina.schema)
-                  ),
-          });
+          setState({ phase: 'idle' });
+          showError(
+            event.error === undefined
+              ? { messageParts: plainMessage(event.message) }
+              : getEditorialWorkflowError(
+                  event.error,
+                  collectionLabelResolver(cms.api.tina.schema)
+                )
+          );
         }
       ),
       cms.events.subscribe('media:workflow:finish', () => {
         busyRef.current = false;
-        setState((prev) =>
-          prev.phase === 'running' ? { phase: 'idle' } : prev
-        );
+        setState({ phase: 'idle' });
       }),
     ];
     return () => {
       for (const off of offs) off();
     };
-  }, [cms, setCurrentBranch]);
+  }, [cms, setCurrentBranch, showError]);
 
   const startContentSave = React.useCallback(
     ({ onSettled, ...opts }: ContentSaveOptions) =>
@@ -210,10 +198,8 @@ export const EditorialWorkflowProvider = ({
               error: messageText(outcome.error.messageParts),
             });
             if (outcome.started) {
-              setState({
-                phase: 'error',
-                error: outcome.error,
-              });
+              setState({ phase: 'idle' });
+              showError(outcome.error);
             } else {
               resolve({ started: false, error: outcome.error });
             }
@@ -236,25 +222,26 @@ export const EditorialWorkflowProvider = ({
             window.location.hash = outcome.redirectHash;
           }
 
-          setState({
-            phase: 'success',
-            branchName: outcome.branchName,
-            pullRequestUrl: outcome.pullRequestUrl,
-            hasNewEdits,
-          });
+          setState({ phase: 'idle' });
+          cms.alerts.success(
+            `Branch created successfully - Pull Request at ${outcome.pullRequestUrl}`,
+            0
+          );
+          if (hasNewEdits) {
+            cms.alerts.info(
+              `You made changes while it was saving. Save again to add them to ${outcome.branchName}.`,
+              0
+            );
+          }
           onSettled?.({ success: true });
         });
       }),
-    [cms, setCurrentBranch]
+    [cms, setCurrentBranch, showError]
   );
 
-  const dismiss = React.useCallback(() => {
-    setState((prev) => (prev.phase === 'running' ? prev : { phase: 'idle' }));
-  }, []);
-
   const value = React.useMemo(
-    () => ({ state, isExecuting, startContentSave, dismiss }),
-    [state, isExecuting, startContentSave, dismiss]
+    () => ({ state, isExecuting, startContentSave }),
+    [state, isExecuting, startContentSave]
   );
 
   return (

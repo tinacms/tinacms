@@ -1,15 +1,7 @@
 import { cn } from '@utils/cn';
-import {
-  CircleAlert,
-  CircleCheck,
-  Loader2,
-  Maximize2,
-  Minimize2,
-  X,
-} from 'lucide-react';
+import { Loader2, Maximize2, Minimize2 } from 'lucide-react';
 import * as React from 'react';
 import { createPortal } from 'react-dom';
-import { EditorialWorkflowErrorBox } from './editorial-workflow-error-box';
 import {
   type EditorialWorkflowState,
   useEditorialWorkflowState,
@@ -87,10 +79,8 @@ const CompactSteps = ({ step }: { step: WorkflowStep }) => (
 
 export const EditorialWorkflowWidget = ({
   state,
-  onDismiss,
 }: {
   state: EditorialWorkflowState;
-  onDismiss: () => void;
 }) => {
   const [expanded, setExpanded] = React.useState(false);
   const running = state.phase === 'running';
@@ -100,7 +90,7 @@ export const EditorialWorkflowWidget = ({
     if (!running) setExpanded(false);
   }, [running]);
 
-  if (state.phase === 'idle') return null;
+  if (state.phase !== 'running') return null;
 
   const card = (
     <section
@@ -114,102 +104,50 @@ export const EditorialWorkflowWidget = ({
       )}
     >
       <div className='flex items-center gap-3 px-4 py-3'>
-        {running && (
-          <Loader2 className='w-5 h-5 flex-shrink-0 animate-spin text-tina-orange' />
-        )}
-        {state.phase === 'success' && (
-          <CircleCheck className='w-5 h-5 flex-shrink-0 text-green-600' />
-        )}
-        {state.phase === 'error' && (
-          <CircleAlert className='w-5 h-5 flex-shrink-0 text-red-500' />
-        )}
+        <Loader2 className='w-5 h-5 flex-shrink-0 animate-spin text-tina-orange' />
         <div className='min-w-0'>
           <div className='text-sm font-semibold text-gray-900'>
-            {running && 'Saving to a new branch'}
-            {state.phase === 'success' && 'Saved to a new branch'}
-            {state.phase === 'error' && "Couldn't save to a new branch"}
+            Saving to a new branch
           </div>
-          {state.phase !== 'error' && (
-            <div className='text-xs text-gray-500 truncate'>
-              {state.branchName}
-              {running &&
-                ` · Step ${Math.min(state.step, WORKFLOW_STEPS.length)} of ${WORKFLOW_STEPS.length}`}
-            </div>
-          )}
+          <div className='text-xs text-gray-500 truncate'>
+            {state.branchName} · Step{' '}
+            {Math.min(state.step, WORKFLOW_STEPS.length)} of{' '}
+            {WORKFLOW_STEPS.length}
+          </div>
         </div>
         <div className='ml-auto flex items-center gap-1'>
-          {running ? (
-            <>
-              {!expanded && (
-                <span className='text-xs text-gray-500 tabular-nums mr-1'>
-                  {formatTime(elapsed)}
-                </span>
-              )}
-              <IconButton
-                label={expanded ? 'Collapse' : 'Expand'}
-                onClick={() => setExpanded((prev) => !prev)}
-              >
-                {expanded ? (
-                  <Minimize2 className='w-4 h-4' />
-                ) : (
-                  <Maximize2 className='w-4 h-4' />
-                )}
-              </IconButton>
-            </>
-          ) : (
-            <IconButton label='Dismiss' onClick={onDismiss}>
-              <X className='w-4 h-4' />
-            </IconButton>
+          {!expanded && (
+            <span className='text-xs text-gray-500 tabular-nums mr-1'>
+              {formatTime(elapsed)}
+            </span>
           )}
+          <IconButton
+            label={expanded ? 'Collapse' : 'Expand'}
+            onClick={() => setExpanded((prev) => !prev)}
+          >
+            {expanded ? (
+              <Minimize2 className='w-4 h-4' />
+            ) : (
+              <Maximize2 className='w-4 h-4' />
+            )}
+          </IconButton>
         </div>
       </div>
 
-      {running &&
-        (expanded ? (
-          <div className='px-6 pb-5'>
-            <WorkflowProgressIndicator
-              currentStep={state.step}
-              isExecuting
-              elapsedTime={elapsed}
-            />
-            <p className='mt-4 text-xs text-gray-500 bg-gray-50 rounded px-3 py-2'>
-              Keep editing if you like. Saving, switching branch and uploading
-              media unlock when this finishes.
-            </p>
-          </div>
-        ) : (
-          <CompactSteps step={state.step} />
-        ))}
-
-      {state.phase === 'success' && (
-        <div className='px-4 pb-4 text-xs text-gray-700'>
-          <div className='bg-green-50 text-green-800 rounded px-3 py-2'>
-            {state.pullRequestUrl ? (
-              <>
-                Your{' '}
-                <a
-                  className='underline font-medium'
-                  href={state.pullRequestUrl}
-                  target='_blank'
-                  rel='noreferrer'
-                >
-                  pull request
-                </a>{' '}
-                is open.
-              </>
-            ) : (
-              'Your pull request is open.'
-            )}
-            {state.hasNewEdits &&
-              ' You made changes while it was saving. Save again to add them to this branch.'}
-          </div>
+      {expanded ? (
+        <div className='px-6 pb-5'>
+          <WorkflowProgressIndicator
+            currentStep={state.step}
+            isExecuting
+            elapsedTime={elapsed}
+          />
+          <p className='mt-4 text-xs text-gray-500 bg-gray-50 rounded px-3 py-2'>
+            Keep editing if you like. Saving, switching branch and uploading
+            media unlock when this finishes.
+          </p>
         </div>
-      )}
-
-      {state.phase === 'error' && (
-        <div className='px-4 pb-1'>
-          <EditorialWorkflowErrorBox error={state.error} />
-        </div>
+      ) : (
+        <CompactSteps step={state.step} />
       )}
     </section>
   );
@@ -229,6 +167,6 @@ export const EditorialWorkflowWidget = ({
 };
 
 export const EditorialWorkflowToast = () => {
-  const { state, dismiss } = useEditorialWorkflowState();
-  return <EditorialWorkflowWidget state={state} onDismiss={dismiss} />;
+  const { state } = useEditorialWorkflowState();
+  return <EditorialWorkflowWidget state={state} />;
 };
