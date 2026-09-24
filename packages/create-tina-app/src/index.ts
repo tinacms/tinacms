@@ -3,6 +3,7 @@ import path from 'node:path';
 import { createRequire } from 'node:module';
 import {
   isWriteable,
+  removeForeignLockFiles,
   setupProjectDirectory,
   updateProjectPackageName,
   updateProjectPackageVersion,
@@ -432,6 +433,7 @@ export async function run() {
 
     spinner.start('Downloading template...');
     await downloadTemplate(template, rootDir, spinner);
+    await removeForeignLockFiles(rootDir, pkgManager as PackageManager);
     spinner.succeed();
 
     spinner.start('Updating project metadata...');
