@@ -26,6 +26,7 @@ import {
   isEdited,
   keepsValues,
   readFormStore,
+  readOpeningScope,
   rebaseEdits,
   toDocument,
   toFormId,
@@ -176,7 +177,7 @@ export function FormProvider({
   // because RHF replaces its full error state each time the `errors` option changes
   // identity — a rebuild on each document would overwrite the live errors of the user.
   const kept = useMemo(() => {
-    const scope = readFormStore().forms[formId];
+    const scope = readOpeningScope(formId);
     const incoming = toFormValues(ingested);
     if (!keepsValues(scope, incoming)) return { seed: null, errors: {} };
     return {
@@ -188,7 +189,7 @@ export function FormProvider({
   // clean scope stops keeping them when another writer changes the file, so the test
   // must follow the document, not only the form id.
   const keepsIncoming = useMemo(
-    () => keepsValues(readFormStore().forms[formId], toFormValues(ingested)),
+    () => keepsValues(readOpeningScope(formId), toFormValues(ingested)),
     [formId, ingested]
   );
   const seedValues = keepsIncoming ? (kept.seed ?? ingested) : ingested;

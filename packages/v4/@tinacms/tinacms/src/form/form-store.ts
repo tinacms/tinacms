@@ -121,21 +121,32 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 // Storage is untrusted, so a draft in an unknown shape is skipped. The equality
 // function does not survive JSON, so a restored form compares by structure until
 // its form registers again.
-const restoreDrafts = (persisted: unknown): FormStore['forms'] => {
-  const forms: FormStore['forms'] = {};
-  if (!isRecord(persisted) || !isRecord(persisted.forms)) return forms;
-  for (const [formId, draft] of Object.entries(persisted.forms)) {
-    if (!isRecord(draft)) continue;
-    if (!isRecord(draft.values) || !isRecord(draft.baseline)) continue;
-    forms[toFormId(formId)] = {
-      status: 'edited',
-      values: toFormValues(draft.values),
-      baseline: toFormValues(draft.baseline),
-      errors: {},
-      equal: STRUCTURAL_EQUALITY,
-    };
-  }
-  return forms;
+const restoreDraft = (draft: unknown): OpenForm | undefined => {
+  if (!isRecord(draft)) return undefined;
+  if (!isRecord(draft.values) || !isRecord(draft.baseline)) return undefined;
+  return {
+    status: 'edited',
+    values: toFormValues(draft.values),
+    baseline: toFormValues(draft.baseline),
+    errors: {},
+    equal: STRUCTURAL_EQUALITY,
+  };
+};
+
+const draftStorage = createDraftStorage(
+  DRAFT_STORAGE_KEY,
+  DRAFT_STORAGE_VERSION
+);
+
+// The scope a form opens on. Storage wins over this tab's memory when another tab
+// saved, discarded or replaced the draft since this tab last read or wrote it.
+const openingScope = (
+  formId: FormId,
+  inMemory: OpenForm | undefined
+): OpenForm | undefined => {
+  const stored = draftStorage.peek(formId);
+  if (!stored.changed) return inMemory;
+  return restoreDraft(stored.draft);
 };
 
 // The edited state also covers a clean form, so a clean form must not keep values that
@@ -210,12 +221,17 @@ export const useFormStore = create<FormStore>()(
 
           registerForm: (formId, values, equal = STRUCTURAL_EQUALITY) =>
             apply((state) => {
-              const scope = state.forms[formId];
+              const scope = openingScope(formId, state.forms[formId]);
               if (keepsValues(scope, values)) {
                 const current = valuesEqual(scope.baseline, values, equal);
                 // A restored draft arrives with structural equality; adopt the
                 // field-aware one its form registers with.
-                if (current && scope.equal === equal) return state;
+                if (
+                  current &&
+                  scope.equal === equal &&
+                  scope === state.forms[formId]
+                )
+                  return state;
                 return {
                   forms: {
                     ...state.forms,
@@ -332,12 +348,8 @@ export const useFormStore = create<FormStore>()(
       {
         name: DRAFT_STORAGE_KEY,
         version: DRAFT_STORAGE_VERSION,
-        storage: createDraftStorage(DRAFT_STORAGE_VERSION),
+        storage: draftStorage.persist,
         partialize: pickDrafts,
-        merge: (persisted, current) => ({
-          ...current,
-          forms: { ...current.forms, ...restoreDrafts(persisted) },
-        }),
       }
     ),
     { name: DEVTOOLS_STORE_NAME }
@@ -345,6 +357,9 @@ export const useFormStore = create<FormStore>()(
 );
 
 export const readFormStore = (): FormStore => useFormStore.getState();
+
+export const readOpeningScope = (formId: FormId): OpenForm | undefined =>
+  openingScope(formId, readFormStore().forms[formId]);
 
 export const useFormStatus = (formId: FormId): FormStatus =>
   useFormStore((state) => formStatus(state.forms[formId]));

@@ -129,6 +129,10 @@ describe('form-store draft persistence', () => {
       .setFieldValue(postA, seo, { title: 'New', tags: ['a', 'b'] });
     await simulateReload();
 
+    store
+      .getState()
+      .registerForm(postA, { [seo]: { title: 'Old', tags: ['a'] } });
+
     expect(store.getState().forms[postA]?.values[seo]).toEqual({
       title: 'New',
       tags: ['a', 'b'],
@@ -141,7 +145,9 @@ describe('form-store draft persistence', () => {
       JSON.stringify({ version: 1, draft: 'garbage' })
     );
     await store.persist.rehydrate();
-    expect(store.getState().forms).toEqual({});
+    store.getState().registerForm(postA, { [title]: 'Hello' });
+    expect(store.getState().forms[postA]?.values[title]).toBe('Hello');
+    expect(formStatus(store.getState().forms[postA])).toBe('pristine');
   });
 
   it('leaves a draft another tab wrote', () => {
@@ -173,5 +179,36 @@ describe('form-store draft persistence', () => {
     store.getState().setFieldValue(postA, title, 'Mine');
     store.getState().markSaved(postA);
     expect(Object.keys(storedDrafts())).toEqual([postB]);
+  });
+
+  it('loads no draft until its form opens', async () => {
+    otherTabWrites(postB, 'Theirs');
+    await simulateReload();
+    expect(store.getState().forms).toEqual({});
+  });
+
+  it('opens on the file, not its stale draft, after another tab saved it', () => {
+    store.getState().registerForm(postA, { [title]: 'Hello' });
+    store.getState().setFieldValue(postA, title, 'Mine');
+    localStorage.removeItem(keyOf(postA));
+
+    store.getState().registerForm(postA, { [title]: 'Saved elsewhere' });
+    expect(store.getState().forms[postA]?.values[title]).toBe(
+      'Saved elsewhere'
+    );
+    expect(formStatus(store.getState().forms[postA])).toBe('pristine');
+    store.getState().registerForm(postB, { [title]: 'Hello' });
+    store.getState().setFieldValue(postB, title, 'Other');
+    expect(storedDrafts()).not.toHaveProperty([postA]);
+  });
+
+  it('opens on the newer draft another tab wrote', () => {
+    store.getState().registerForm(postA, { [title]: 'Hello' });
+    store.getState().setFieldValue(postA, title, 'Mine');
+    otherTabWrites(postA, 'Theirs');
+
+    store.getState().registerForm(postA, { [title]: 'Hello' });
+    expect(store.getState().forms[postA]?.values[title]).toBe('Theirs');
+    expect(formStatus(store.getState().forms[postA])).toBe('dirty');
   });
 });

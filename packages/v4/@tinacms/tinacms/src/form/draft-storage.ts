@@ -2,37 +2,48 @@ import type { PersistStorage } from 'zustand/middleware';
 
 export type PersistedDrafts = { forms: Record<string, unknown> };
 
-// Each document's draft lives under its own key, and a tab writes or removes only
-// the keys whose content differs from what it last read or wrote. Another tab's
-// drafts are never overwritten with this tab's stale copy of them.
+export type StoredDraft =
+  | { readonly changed: false }
+  | { readonly changed: true; readonly draft: unknown };
+
+// Each document's draft lives under its own key. A tab remembers what it last read
+// or wrote per key, writes or removes only the keys it changed, and reads a
+// document's draft only when that document opens. Another tab's drafts are never
+// overwritten with a stale copy, and a draft another tab saved or replaced is
+// noticed the next time its form opens here.
 export const createDraftStorage = (
+  name: string,
   version: number,
   storage: () => Storage = () => localStorage
-): PersistStorage<PersistedDrafts> => {
+) => {
   const known = new Map<string, string>();
-  const keysOf = (name: string) =>
-    Object.keys(storage()).filter((key) => key.startsWith(`${name}:`));
+  const keyOf = (formId: string) => `${name}:${formId}`;
 
-  return {
-    getItem: (name) => {
+  const parse = (raw: string): unknown => {
+    try {
+      const entry: { version?: unknown; draft?: unknown } = JSON.parse(raw);
+      return entry.version === version ? entry.draft : undefined;
+    } catch {
+      return undefined;
+    }
+  };
+
+  const peek = (formId: string): StoredDraft => {
+    const key = keyOf(formId);
+    const raw = storage().getItem(key);
+    if (raw === (known.get(key) ?? null)) return { changed: false };
+    return { changed: true, draft: raw === null ? undefined : parse(raw) };
+  };
+
+  const persist: PersistStorage<PersistedDrafts> = {
+    getItem: () => {
       known.clear();
-      const forms: Record<string, unknown> = {};
-      for (const key of keysOf(name)) {
-        const raw = storage().getItem(key);
-        if (raw === null) continue;
-        known.set(key, raw);
-        try {
-          const entry: { version?: unknown; draft?: unknown } = JSON.parse(raw);
-          if (entry.version !== version) continue;
-          forms[key.slice(name.length + 1)] = entry.draft;
-        } catch {}
-      }
-      return { state: { forms }, version };
+      return null;
     },
-    setItem: (name, value) => {
+    setItem: (_name, value) => {
       const written = new Set<string>();
       for (const [formId, draft] of Object.entries(value.state.forms)) {
-        const key = `${name}:${formId}`;
+        const key = keyOf(formId);
         written.add(key);
         const raw = JSON.stringify({ version, draft });
         if (known.get(key) === raw) continue;
@@ -45,9 +56,13 @@ export const createDraftStorage = (
         known.delete(key);
       }
     },
-    removeItem: (name) => {
-      for (const key of keysOf(name)) storage().removeItem(key);
+    removeItem: () => {
+      for (const key of Object.keys(storage())) {
+        if (key.startsWith(`${name}:`)) storage().removeItem(key);
+      }
       known.clear();
     },
   };
+
+  return { peek, persist };
 };
