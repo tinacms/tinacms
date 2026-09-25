@@ -1,5 +1,15 @@
 # @tinacms/schema-tools
 
+## 2.10.1
+
+### Patch Changes
+
+- [#7614](https://github.com/tinacms/tinacms/pull/7614) [`dff369c`](https://github.com/tinacms/tinacms/commit/dff369c296f84347ad816ab9f737e74fc8268073) Thanks [@Tyagiquamar](https://github.com/Tyagiquamar)! - Image fields with an unknown `accept` value now fail schema validation. The error names the value and lists the accepted extensions and categories, so a typo such as `accept: 'docx'` no longer silently disables the field's file filter.
+
+- [#7548](https://github.com/tinacms/tinacms/pull/7548) [`82a7c3b`](https://github.com/tinacms/tinacms/commit/82a7c3be6e493f403050791ed25715a59d824339) Thanks [@wakqasahmed](https://github.com/wakqasahmed)! - Schema validation now rejects a template with an empty `fields` array. Such a template generated a GraphQL filter input type with no fields, which is invalid per the GraphQL spec and broke every content API request for the project; on TinaCloud that surfaced later as a misleading "The remote GraphQL schema does not exist" error while indexing reported success. `tinacms build` and `tinacms dev` now fail fast with "Property `fields` cannot be empty."
+
+  This covers collection templates and the templates on `object` and `rich-text` fields. Any config it rejects could not serve queries before this change either, so no working setup is affected.
+
 ## 2.10.0
 
 ### Minor Changes

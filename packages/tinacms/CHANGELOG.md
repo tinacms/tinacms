@@ -1,5 +1,16 @@
 # tinacms
 
+## 3.14.2
+
+### Patch Changes
+
+- [#7659](https://github.com/tinacms/tinacms/pull/7659) [`36040e7`](https://github.com/tinacms/tinacms/commit/36040e7a94039d3138ba665600b584f6e82b5a80) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Clicking a number value in visual editing now focuses its input, so editors no longer have to click the field a second time. The number input also keeps the field's `name`.
+
+- [#7642](https://github.com/tinacms/tinacms/pull/7642) [`5b78903`](https://github.com/tinacms/tinacms/commit/5b78903558530ae2837c8ebafed615dd586b6259) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - The sidebar now shows a "See latest Releases" link next to the TinaCMS version. It opens the TinaCMS What's New page in a new tab.
+
+- Updated dependencies [[`dff369c`](https://github.com/tinacms/tinacms/commit/dff369c296f84347ad816ab9f737e74fc8268073), [`82a7c3b`](https://github.com/tinacms/tinacms/commit/82a7c3be6e493f403050791ed25715a59d824339)]:
+  - @tinacms/schema-tools@2.10.1
+
 ## 3.14.1
 
 ### Patch Changes
