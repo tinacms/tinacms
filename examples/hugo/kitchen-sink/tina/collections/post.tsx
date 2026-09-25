@@ -9,7 +9,9 @@ const Post: Collection = {
   ui: {
     router: ({
       document,
-    }: { document: { _sys: { filename: string; breadcrumbs: string[] } } }) => {
+    }: {
+      document: { _sys: { filename: string; breadcrumbs: string[] } };
+    }) => {
       return `/posts/${document._sys.breadcrumbs.join('/')}/`;
     },
     filename: {

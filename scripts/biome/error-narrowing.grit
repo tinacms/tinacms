@@ -1,0 +1,14 @@
+engine biome(1.0)
+language js(typescript, jsx)
+
+`$value instanceof $class` as $test where {
+  $class <: r"^[A-Za-z]*Error$",
+  not $test <: within or {
+    JsIfStatement(test = $condition),
+    JsWhileStatement(test = $condition)
+  } where { $condition <: contains $test },
+  register_diagnostic(
+    span = $test,
+    message = "Narrow an error in an `if` statement, not in an expression (AGENTS.md: \"Error narrowing is an `if`, not an expression\")."
+  )
+}

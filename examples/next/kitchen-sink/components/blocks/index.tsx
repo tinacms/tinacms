@@ -41,7 +41,9 @@ const typeNameMap: Record<string, string> = {
 
 export const Blocks = ({
   blocks = [],
-}: { blocks?: Array<PageBlocks | null> }) => {
+}: {
+  blocks?: Array<PageBlocks | null>;
+}) => {
   if (!blocks || blocks.length === 0) {
     return (
       <div className='p-6 text-center text-gray-500'>No blocks to render</div>
