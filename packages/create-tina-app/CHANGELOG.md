@@ -1,5 +1,11 @@
 # create-tina-app
 
+## 2.2.3
+
+### Patch Changes
+
+- [#7641](https://github.com/tinacms/tinacms/pull/7641) [`02a5a52`](https://github.com/tinacms/tinacms/commit/02a5a52939dae7508b619e6d035e466d37d97458) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Scaffolded projects now keep only the lock file for the chosen package manager. Lock files the starter ships for other package managers are deleted before install, so they no longer end up in the project's first commit.
+
 ## 2.2.2
 
 ### Patch Changes
