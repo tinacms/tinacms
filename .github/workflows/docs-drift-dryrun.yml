@@ -1,0 +1,26 @@
+name: Docs drift (dry run)
+on:
+  push:
+    branches: [jb/docs-drift-dryrun]
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: tinacms
+      - uses: actions/checkout@v4
+        with:
+          repository: tinacms/docs
+          path: docs
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: node tinacms/.github/scripts/docs-drift.mts
+        env:
+          TINA_DIR: ${{ github.workspace }}/tinacms
+          DOCS_DIR: ${{ github.workspace }}/docs/content
+          TYPESAFE_API_KEY: ${{ secrets.TYPESAFE_API_KEY }}
