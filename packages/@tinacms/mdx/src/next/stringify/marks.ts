@@ -1,4 +1,4 @@
-import type { RichTextField, RichTextType } from '@tinacms/schema-tools';
+import type { RichTextField } from '@tinacms/schema-tools';
 import type * as Md from 'mdast';
 import type * as Plate from '../../parse/plate';
 import { getMarks } from '../../stringify';
