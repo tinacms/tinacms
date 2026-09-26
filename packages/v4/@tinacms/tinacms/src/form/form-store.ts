@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { create } from 'zustand';
-import { devtools } from 'zustand/middleware';
+import { devtools, persist } from 'zustand/middleware';
 import type { Brand } from '../core/brand';
 import { type FieldAddress, toFieldAddress } from '../core/field/address';
 import {
@@ -10,6 +10,7 @@ import {
 } from '../core/form/compare';
 import { invariant } from '../core/invariant';
 import type { TinaDocument } from '../core/schema/types';
+import { type PersistedDrafts, createDraftStorage } from './draft-storage';
 
 export type FormId = Brand<string, 'FormId'>;
 
@@ -96,6 +97,58 @@ export const formStatus = (scope: OpenForm | undefined): FormStatus => {
     : 'dirty';
 };
 
+export const DRAFT_STORAGE_KEY = 'tina-drafts';
+const DRAFT_STORAGE_VERSION = 1;
+
+type Draft = { values: FormValues; baseline: FormValues };
+
+// Only a dirty form is a draft. A save or a discard leaves the form clean or
+// pristine, so the next write drops its draft with no extra step.
+export const pickDrafts = (state: FormStore): PersistedDrafts => {
+  const forms: Record<string, Draft> = {};
+  for (const formId of Object.keys(state.forms) as FormId[]) {
+    const scope = state.forms[formId];
+    if (isEdited(scope) && formStatus(scope) === 'dirty') {
+      forms[formId] = { values: scope.values, baseline: scope.baseline };
+    }
+  }
+  return { forms };
+};
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+// Storage is untrusted, so a draft in an unknown shape is skipped. The equality
+// function does not survive JSON, so a restored form compares by structure until
+// its form registers again.
+const restoreDraft = (draft: unknown): OpenForm | undefined => {
+  if (!isRecord(draft)) return undefined;
+  if (!isRecord(draft.values) || !isRecord(draft.baseline)) return undefined;
+  return {
+    status: 'edited',
+    values: toFormValues(draft.values),
+    baseline: toFormValues(draft.baseline),
+    errors: {},
+    equal: STRUCTURAL_EQUALITY,
+  };
+};
+
+const draftStorage = createDraftStorage(
+  DRAFT_STORAGE_KEY,
+  DRAFT_STORAGE_VERSION
+);
+
+// The scope a form opens on. Storage wins over this tab's memory when another tab
+// saved, discarded or replaced the draft since this tab last read or wrote it.
+const openingScope = (
+  formId: FormId,
+  inMemory: OpenForm | undefined
+): OpenForm | undefined => {
+  const stored = draftStorage.peek(formId);
+  if (!stored.changed) return inMemory;
+  return restoreDraft(stored.draft);
+};
+
 // The edited state also covers a clean form, so a clean form must not keep values that
 // hide a changed document. A dirty form keeps its edits across mounts. A clean form
 // keeps its values only while the document matches the baseline of the last save. A
@@ -107,6 +160,26 @@ export const keepsValues = (
   if (!isEdited(scope)) return false;
   if (formStatus(scope) === 'dirty') return true;
   return valuesEqual(scope.baseline, incoming, scope.equal);
+};
+
+// A kept form carries only the fields it changed onto the incoming document, so a
+// field another writer saved since the baseline is never reverted by a later save.
+export const rebaseEdits = (
+  scope: Extract<OpenForm, { status: 'edited' }>,
+  incoming: FormValues,
+  equal: FieldEquality = scope.equal
+): FormValues => {
+  const rebased = { ...incoming };
+  const addresses = new Set([
+    ...Object.keys(scope.values),
+    ...Object.keys(scope.baseline),
+  ]) as Set<FieldAddress>;
+  for (const address of addresses) {
+    if (!equal(address, scope.values[address], scope.baseline[address])) {
+      rebased[address] = scope.values[address];
+    }
+  }
+  return rebased;
 };
 
 export const fieldDirty = (
@@ -135,119 +208,158 @@ type DevtoolsActionLabel =
 
 export const useFormStore = create<FormStore>()(
   devtools(
-    (set) => {
-      const apply = (
-        patch: (state: FormStore) => FormStore | Partial<FormStore>,
-        action: DevtoolsActionLabel
-      ) => set(patch, false, action);
+    persist(
+      (set) => {
+        const apply = (
+          patch: (state: FormStore) => FormStore | Partial<FormStore>,
+          action: DevtoolsActionLabel
+        ) => set(patch, false, action);
 
-      return {
-        forms: {},
-        active: null,
+        return {
+          forms: {},
+          active: null,
 
-        registerForm: (formId, values, equal = STRUCTURAL_EQUALITY) =>
-          apply((state) => {
-            if (keepsValues(state.forms[formId], values)) return state;
-            return {
-              forms: {
-                ...state.forms,
-                [formId]: { status: 'pristine', values: { ...values }, equal },
-              },
-            };
-          }, DEVTOOLS_ACTION.register),
-
-        setFieldValue: (formId, address, value) =>
-          apply((state) => {
-            const scope = state.forms[formId];
-            if (!scope) return state;
-            if (scope.equal(address, scope.values[address], value))
-              return state;
-            return {
-              forms: {
-                ...state.forms,
-                [formId]: {
-                  ...scope,
-                  status: 'edited',
-                  values: { ...scope.values, [address]: value },
-                  baseline: isEdited(scope) ? scope.baseline : scope.values,
-                  errors: isEdited(scope) ? scope.errors : {},
+          registerForm: (formId, values, equal = STRUCTURAL_EQUALITY) =>
+            apply((state) => {
+              const scope = openingScope(formId, state.forms[formId]);
+              if (keepsValues(scope, values)) {
+                const current = valuesEqual(scope.baseline, values, equal);
+                // A restored draft arrives with structural equality; adopt the
+                // field-aware one its form registers with.
+                if (
+                  current &&
+                  scope.equal === equal &&
+                  scope === state.forms[formId]
+                )
+                  return state;
+                return {
+                  forms: {
+                    ...state.forms,
+                    [formId]: current
+                      ? { ...scope, equal }
+                      : {
+                          ...scope,
+                          equal,
+                          values: rebaseEdits(scope, values, equal),
+                          baseline: { ...values },
+                        },
+                  },
+                };
+              }
+              return {
+                forms: {
+                  ...state.forms,
+                  [formId]: {
+                    status: 'pristine',
+                    values: { ...values },
+                    equal,
+                  },
                 },
-              },
-            };
-          }, DEVTOOLS_ACTION.setFieldValue),
+              };
+            }, DEVTOOLS_ACTION.register),
 
-        setFieldErrors: (formId, errors) =>
-          apply((state) => {
-            const scope = state.forms[formId];
-            if (!isEdited(scope)) return state;
-            if (errorsEqual(scope.errors, errors)) return state;
-            return {
-              forms: {
-                ...state.forms,
-                [formId]: { ...scope, errors: { ...errors } },
-              },
-            };
-          }, DEVTOOLS_ACTION.setFieldErrors),
-
-        setActive: (formId, address) =>
-          apply(
-            () => ({ active: address == null ? null : { formId, address } }),
-            DEVTOOLS_ACTION.setActive
-          ),
-
-        markSaved: (formId, savedValues) =>
-          apply((state) => {
-            const scope = state.forms[formId];
-            if (!scope) return state;
-            return {
-              forms: {
-                ...state.forms,
-                [formId]: {
-                  ...scope,
-                  status: 'edited',
-                  // A caller passes the form library's own value tree, which it
-                  // keeps mutating in place. The baseline must be a private
-                  // snapshot or a later edit mutates it too and never reads as
-                  // dirty.
-                  baseline: structuredClone(savedValues ?? scope.values),
-                  errors: isEdited(scope) ? scope.errors : {},
+          setFieldValue: (formId, address, value) =>
+            apply((state) => {
+              const scope = state.forms[formId];
+              if (!scope) return state;
+              if (scope.equal(address, scope.values[address], value))
+                return state;
+              return {
+                forms: {
+                  ...state.forms,
+                  [formId]: {
+                    ...scope,
+                    status: 'edited',
+                    values: { ...scope.values, [address]: value },
+                    baseline: isEdited(scope) ? scope.baseline : scope.values,
+                    errors: isEdited(scope) ? scope.errors : {},
+                  },
                 },
-              },
-            };
-          }, DEVTOOLS_ACTION.markSaved),
+              };
+            }, DEVTOOLS_ACTION.setFieldValue),
 
-        discardEdits: (formId) =>
-          apply((state) => {
-            const scope = state.forms[formId];
-            if (!isEdited(scope)) return state;
-            return {
-              forms: {
-                ...state.forms,
-                [formId]: {
-                  status: 'pristine',
-                  values: scope.baseline,
-                  equal: scope.equal,
+          setFieldErrors: (formId, errors) =>
+            apply((state) => {
+              const scope = state.forms[formId];
+              if (!isEdited(scope)) return state;
+              if (errorsEqual(scope.errors, errors)) return state;
+              return {
+                forms: {
+                  ...state.forms,
+                  [formId]: { ...scope, errors: { ...errors } },
                 },
-              },
-            };
-          }, DEVTOOLS_ACTION.discardEdits),
+              };
+            }, DEVTOOLS_ACTION.setFieldErrors),
 
-        removeForm: (formId) =>
-          apply((state) => {
-            if (!state.forms[formId]) return state;
-            const { [formId]: _removed, ...rest } = state.forms;
-            return {
-              forms: rest,
-              active: state.active?.formId === formId ? null : state.active,
-            };
-          }, DEVTOOLS_ACTION.removeForm),
-      };
-    },
+          setActive: (formId, address) =>
+            apply(
+              () => ({ active: address == null ? null : { formId, address } }),
+              DEVTOOLS_ACTION.setActive
+            ),
+
+          markSaved: (formId, savedValues) =>
+            apply((state) => {
+              const scope = state.forms[formId];
+              if (!scope) return state;
+              return {
+                forms: {
+                  ...state.forms,
+                  [formId]: {
+                    ...scope,
+                    status: 'edited',
+                    // A caller passes the form library's own value tree, which it
+                    // keeps mutating in place. The baseline must be a private
+                    // snapshot or a later edit mutates it too and never reads as
+                    // dirty.
+                    baseline: structuredClone(savedValues ?? scope.values),
+                    errors: isEdited(scope) ? scope.errors : {},
+                  },
+                },
+              };
+            }, DEVTOOLS_ACTION.markSaved),
+
+          discardEdits: (formId) =>
+            apply((state) => {
+              const scope = state.forms[formId];
+              if (!isEdited(scope)) return state;
+              return {
+                forms: {
+                  ...state.forms,
+                  [formId]: {
+                    status: 'pristine',
+                    values: scope.baseline,
+                    equal: scope.equal,
+                  },
+                },
+              };
+            }, DEVTOOLS_ACTION.discardEdits),
+
+          removeForm: (formId) =>
+            apply((state) => {
+              if (!state.forms[formId]) return state;
+              const { [formId]: _removed, ...rest } = state.forms;
+              return {
+                forms: rest,
+                active: state.active?.formId === formId ? null : state.active,
+              };
+            }, DEVTOOLS_ACTION.removeForm),
+        };
+      },
+      {
+        name: DRAFT_STORAGE_KEY,
+        version: DRAFT_STORAGE_VERSION,
+        storage: draftStorage.persist,
+        partialize: pickDrafts,
+      }
+    ),
     { name: DEVTOOLS_STORE_NAME }
   )
 );
 
 export const readFormStore = (): FormStore => useFormStore.getState();
+
+export const readOpeningScope = (formId: FormId): OpenForm | undefined =>
+  openingScope(formId, readFormStore().forms[formId]);
 
 export const useFormStatus = (formId: FormId): FormStatus =>
   useFormStore((state) => formStatus(state.forms[formId]));

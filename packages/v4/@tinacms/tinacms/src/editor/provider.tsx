@@ -31,6 +31,8 @@ import {
   isEdited,
   keepsValues,
   readFormStore,
+  readOpeningScope,
+  rebaseEdits,
   toDocument,
   toFormId,
   toFormValues,
@@ -185,11 +187,11 @@ export function FormProvider({
   // because RHF replaces its full error state each time the `errors` option changes
   // identity — a rebuild on each document would overwrite the live errors of the user.
   const kept = useMemo(() => {
-    const scope = readFormStore().forms[formId];
-    if (!keepsValues(scope, toFormValues(ingested)))
-      return { seed: null, errors: {} };
+    const scope = readOpeningScope(formId);
+    const incoming = toFormValues(ingested);
+    if (!keepsValues(scope, incoming)) return { seed: null, errors: {} };
     return {
-      seed: toDocument(scope.values),
+      seed: toDocument(rebaseEdits(scope, incoming, equal)),
       errors: nestFieldErrors(scope.errors),
     };
   }, [formId]);
@@ -197,7 +199,7 @@ export function FormProvider({
   // clean scope stops keeping them when another writer changes the file, so the test
   // must follow the document, not only the form id.
   const keepsIncoming = useMemo(
-    () => keepsValues(readFormStore().forms[formId], toFormValues(ingested)),
+    () => keepsValues(readOpeningScope(formId), toFormValues(ingested)),
     [formId, ingested]
   );
   const seedValues = keepsIncoming ? (kept.seed ?? ingested) : ingested;
@@ -219,9 +221,7 @@ export function FormProvider({
 
   const seededSignature = useRef<string | null>(null);
   useEffect(() => {
-    useFormStore
-      .getState()
-      .registerForm(formId, toFormValues(seedValues), equal);
+    useFormStore.getState().registerForm(formId, toFormValues(ingested), equal);
     const signature = JSON.stringify([formId, seedValues]);
     if (seededSignature.current === null) {
       seededSignature.current = signature;
@@ -232,7 +232,7 @@ export function FormProvider({
       methods.reset(seedValues, { keepErrors: seedValues === kept.seed });
       advanceSeedKey(formId);
     }
-  }, [formId, seedValues, kept, methods, equal, advanceSeedKey]);
+  }, [formId, ingested, seedValues, kept, methods, equal, advanceSeedKey]);
 
   const discardEdits = useCallback(() => {
     const store = readFormStore();
