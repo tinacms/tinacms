@@ -49,21 +49,28 @@ export const BranchSwitcherLegacy = ({
     createBranch({
       branchName: normalizeBranchName(formatBranchName(value)),
       baseBranch: currentBranch,
-    }).then(async (createdBranchName) => {
-      // @ts-ignore
-      cms.alerts.success('Branch created.');
-      // add the newly created branch to the list
-      setBranchList((oldBranchList) => {
-        return [
-          ...oldBranchList,
-          {
-            indexStatus: { status: 'unknown' },
-            name: createdBranchName,
-          },
-        ];
+    })
+      .then(async (createdBranchName) => {
+        // @ts-ignore
+        cms.alerts.success('Branch created.');
+        // add the newly created branch to the list
+        setBranchList((oldBranchList) => {
+          return [
+            ...oldBranchList,
+            {
+              indexStatus: { status: 'unknown' },
+              name: createdBranchName,
+            },
+          ];
+        });
+        setListState('ready');
+      })
+      .catch((error) => {
+        cms.alerts.error(
+          error?.message || 'There was an error creating a new branch.'
+        );
+        setListState('ready');
       });
-      setListState('ready');
-    });
   }, []);
 
   const refreshBranchList = React.useCallback(async () => {
