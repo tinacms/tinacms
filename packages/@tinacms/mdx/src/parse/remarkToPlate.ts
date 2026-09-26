@@ -4,7 +4,7 @@
 
 */
 
-import type { RichTextType } from '@tinacms/schema-tools';
+import type { RichTextField } from '@tinacms/schema-tools';
 import type * as Md from 'mdast';
 import type { ContainerDirective } from 'mdast-util-directive';
 import type { MdxJsxFlowElement, MdxJsxTextElement } from 'mdast-util-mdx-jsx';
@@ -33,7 +33,7 @@ declare module 'mdast' {
 
 export const remarkToSlate = (
   root: Md.Root | MdxJsxFlowElement | MdxJsxTextElement | ContainerDirective,
-  field: RichTextType,
+  field: RichTextField,
   imageCallback: (url: string) => string,
   raw?: string,
   skipMDXProcess?: boolean

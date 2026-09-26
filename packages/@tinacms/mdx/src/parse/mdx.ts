@@ -1,4 +1,4 @@
-import type { RichTextType } from '@tinacms/schema-tools';
+import type { RichTextField } from '@tinacms/schema-tools';
 import { ContainerDirective } from 'mdast-util-directive';
 import { LeafDirective } from 'mdast-util-directive/lib';
 /**
@@ -17,19 +17,19 @@ export function mdxJsxElement(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   node: MdxJsxTextElement,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  field: RichTextType,
+  field: RichTextField,
   imageCallback: (url: string) => string
 ): Plate.MdxInlineElement;
 export function mdxJsxElement(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   node: MdxJsxFlowElement,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  field: RichTextType,
+  field: RichTextField,
   imageCallback: (url: string) => string
 ): Plate.MdxBlockElement;
 export function mdxJsxElement(
   node: MdxJsxTextElement | MdxJsxFlowElement,
-  field: RichTextType,
+  field: RichTextField,
   imageCallback: (url: string) => string
 ):
   | Plate.MdxInlineElement
@@ -88,7 +88,7 @@ export function mdxJsxElement(
 
 export const directiveElement = (
   node: ContainerDirective | LeafDirective,
-  field: RichTextType,
+  field: RichTextField,
   imageCallback: (url: string) => string,
   raw?: string
 ): Plate.BlockElement | Plate.ParagraphElement => {
