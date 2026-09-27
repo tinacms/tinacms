@@ -142,8 +142,8 @@ export const EditorialWorkflowWidget = ({
             elapsedTime={elapsed}
           />
           <p className='mt-4 text-xs text-gray-500 bg-gray-50 rounded px-3 py-2'>
-            Keep editing if you like. Saving, switching branch and uploading
-            media unlock when this finishes.
+            You can keep editing while this runs. Changes made during saving
+            won’t be included; save again when it finishes.
           </p>
         </div>
       ) : (
