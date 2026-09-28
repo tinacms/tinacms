@@ -371,6 +371,7 @@ describe('usePreviewConnection', () => {
           seedKey: path,
           discardEdits: () => {},
           hooks: [],
+          staleDraft: null,
         }}
       >
         {children}

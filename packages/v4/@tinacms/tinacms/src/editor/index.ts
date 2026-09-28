@@ -10,7 +10,7 @@ export {
   useIsFieldDirty,
   useIsFormDirty,
 } from '../form/form-store';
-export type { SaveHandler } from './context';
+export type { SaveHandler, StaleDraftActions } from './context';
 export {
   Field,
   FieldNode,
@@ -49,6 +49,7 @@ export {
   useContentSlice,
   useDiscardEdits,
   useDocumentPath,
+  useStaleDraft,
   useFieldActivation,
   useFieldAddress,
   useFieldErrors,

@@ -30,6 +30,12 @@ export interface FormScope extends FormHookScope {
   seedKey: string;
   discardEdits: () => void;
   hooks: readonly FormHooks[];
+  staleDraft: StaleDraftActions | null;
+}
+
+export interface StaleDraftActions {
+  resume: () => void;
+  discard: () => void;
 }
 export const FormScopeContext = createContext<FormScope | null>(null);
 
