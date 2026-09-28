@@ -31,6 +31,12 @@ export interface FormScope {
   onSave: SaveHandler | null;
   seedKey: string;
   discardEdits: () => void;
+  staleDraft: StaleDraftActions | null;
+}
+
+export interface StaleDraftActions {
+  resume: () => void;
+  discard: () => void;
 }
 export const FormScopeContext = createContext<FormScope | null>(null);
 

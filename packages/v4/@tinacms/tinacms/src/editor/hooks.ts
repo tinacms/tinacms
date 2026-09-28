@@ -23,6 +23,7 @@ import {
   FieldSchemaContext,
   type FormScope,
   FormScopeContext,
+  type StaleDraftActions,
   TinaRuntimeContext,
 } from './context';
 import { collectFieldErrorMessages } from './field-errors';
@@ -108,6 +109,13 @@ export function useFormSeedKey(): string {
 export function useDiscardEdits(): () => void {
   return useFormScope('discard-edits-outside-provider', 'useDiscardEdits')
     .discardEdits;
+}
+
+// Set when the form opened on its document because a stored draft of an older
+// version of it exists; the editor resumes the draft or discards it.
+export function useStaleDraft(): StaleDraftActions | null {
+  return useFormScope('stale-draft-outside-provider', 'useStaleDraft')
+    .staleDraft;
 }
 
 export interface ActiveField {

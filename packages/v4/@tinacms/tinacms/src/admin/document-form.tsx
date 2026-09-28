@@ -10,6 +10,7 @@ import {
   useFieldRegistry,
   useFormId,
   useFormSave,
+  useStaleDraft,
 } from '../editor/hooks';
 import {
   useFormErrors,
@@ -102,6 +103,32 @@ function DiscardButton() {
   );
 }
 
+function StaleDraftBanner() {
+  const stale = useStaleDraft();
+  if (!stale) return null;
+  return (
+    <div
+      role='status'
+      className='mb-4 flex flex-col gap-2 rounded-md border bg-muted p-3 text-sm'
+    >
+      <p>This document changed since your unsaved edits.</p>
+      <div className='flex gap-2'>
+        <Button type='button' size='sm' onClick={stale.resume}>
+          Resume edits
+        </Button>
+        <Button
+          type='button'
+          size='sm'
+          variant='outline'
+          onClick={stale.discard}
+        >
+          Discard them
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export function DocumentForm() {
   const scope = use(FormScopeContext);
   if (!scope) return null;
@@ -114,6 +141,7 @@ export function DocumentForm() {
         </h2>
         <DocumentStatus />
       </header>
+      <StaleDraftBanner />
       {scope.collection.fields.map((node) => (
         <FieldRow key={node.name} node={node} />
       ))}
