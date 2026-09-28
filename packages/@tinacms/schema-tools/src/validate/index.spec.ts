@@ -453,6 +453,48 @@ const schemaWithBadType = {
   ],
 };
 
+const schemaWithBadImageAccept = {
+  collections: [
+    {
+      name: 'foo',
+      path: 'foo/bar',
+      fields: [{ type: 'image', name: 'hero', accept: 'docx' }],
+    },
+  ],
+};
+const schemaWithBadImageAcceptArray = {
+  collections: [
+    {
+      name: 'foo',
+      path: 'foo/bar',
+      fields: [{ type: 'image', name: 'hero', accept: ['png', 'pgn'] }],
+    },
+  ],
+};
+const schemaWithBadImageAcceptList = {
+  collections: [
+    {
+      name: 'foo',
+      path: 'foo/bar',
+      fields: [{ type: 'image', name: 'hero', list: true, accept: 'docx' }],
+    },
+  ],
+};
+const schemaWithValidImageAccept = {
+  collections: [
+    {
+      name: 'foo',
+      path: 'foo/bar',
+      fields: [
+        { type: 'image', name: 'single', accept: 'pdf' },
+        { type: 'image', name: 'multiple', accept: ['png', 'svg'] },
+        { type: 'image', name: 'category', accept: 'image' },
+        { type: 'image', name: 'unfiltered' },
+      ],
+    },
+  ],
+};
+
 const schemaWithIsTitleValid = {
   collections: [
     {
@@ -566,6 +608,25 @@ describe('validateSchema', () => {
   });
   it('passes when a valid configuration for `isTitle` is given', () => {
     validateSchema({ schema: schemaWithIsTitleValid as Schema });
+    expect(consoleErrMock).not.toHaveBeenCalled();
+  });
+  it('fails when an image field has an unknown `accept` value', () => {
+    expect(() => {
+      validateSchema({ schema: schemaWithBadImageAccept as Schema });
+    }).toThrow(/docx/);
+  });
+  it('fails when an image field `accept` array has an unknown value', () => {
+    expect(() => {
+      validateSchema({ schema: schemaWithBadImageAcceptArray as Schema });
+    }).toThrow(/pgn/);
+  });
+  it('fails when a list image field has an unknown `accept` value', () => {
+    expect(() => {
+      validateSchema({ schema: schemaWithBadImageAcceptList as Schema });
+    }).toThrow(/docx/);
+  });
+  it('passes when image field `accept` values are valid', () => {
+    validateSchema({ schema: schemaWithValidImageAccept as Schema });
     expect(consoleErrMock).not.toHaveBeenCalled();
   });
 });
