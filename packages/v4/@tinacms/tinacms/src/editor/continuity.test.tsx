@@ -608,4 +608,17 @@ describe('form drafts across a reload', () => {
     await userEvent.type(screen.getByLabelText('Title'), '{Backspace}');
     expect(screen.queryByText('resume')).toBeNull();
   });
+
+  it('deletes a resumed draft that no longer changes anything', async () => {
+    await typeAndReload();
+    const { unmount } = render(host(pathA, { title: 'Hello!' }));
+    await userEvent.click(await screen.findByText('resume'));
+    expect(screen.getByTestId('status')).not.toHaveTextContent('dirty');
+    expect(readDraft(toFormId(pathA))).toBeUndefined();
+    unmount();
+
+    render(host(pathA, { title: 'Hello!' }));
+    await screen.findByLabelText('Title');
+    expect(screen.queryByText('resume')).toBeNull();
+  });
 });

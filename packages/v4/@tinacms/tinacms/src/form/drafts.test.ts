@@ -177,4 +177,20 @@ describe('form drafts', () => {
     expect(store.getState().forms[postA]?.values[title]).toBe('Edited');
     expect(staleDraft(postA, { [title]: 'Hello' })).toBeUndefined();
   });
+
+  it('treats a draft with a blank field name as no draft', () => {
+    localStorage.setItem(
+      draftKey(postA),
+      JSON.stringify({
+        version: 1,
+        values: { '': 'x', title: 'Mine' },
+        baseline: { title: 'Hello' },
+      })
+    );
+    expect(readDraft(postA)).toBeUndefined();
+    expect(() =>
+      store.getState().registerForm(postA, { [title]: 'Hello' })
+    ).not.toThrow();
+    expect(formStatus(store.getState().forms[postA])).toBe('pristine');
+  });
 });

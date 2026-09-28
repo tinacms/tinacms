@@ -275,8 +275,9 @@ export const useFormStore = create<FormStore>()(
             const scope = state.forms[formId];
             if (!scope) return state;
             const document = isEdited(scope) ? scope.baseline : scope.values;
-            // Resume applies only the fields that the draft changed. A field that
-            // another writer saved after the draft keeps its saved value.
+            // Resume applies only the fields that the draft changed. The other
+            // fields keep the value of the current document. A field that the
+            // draft and another writer both changed takes the draft value.
             const values = { ...document };
             const addresses = new Set([
               ...Object.keys(draft.values),

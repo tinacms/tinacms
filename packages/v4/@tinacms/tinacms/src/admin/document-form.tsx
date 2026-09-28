@@ -1,3 +1,11 @@
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@tinacms/ui/components/alert-dialog';
 import { Button } from '@tinacms/ui/components/button';
 import { Label } from '@tinacms/ui/components/label';
 import { use, useState } from 'react';
@@ -103,29 +111,30 @@ function DiscardButton() {
   );
 }
 
-function StaleDraftBanner() {
+// A modal, so no keystroke can overwrite the stored draft before the editor
+// decides what happens to it.
+function StaleDraftDialog() {
   const stale = useStaleDraft();
-  if (!stale) return null;
   return (
-    <div
-      role='status'
-      className='mb-4 flex flex-col gap-2 rounded-md border bg-muted p-3 text-sm'
-    >
-      <p>This document changed since your unsaved edits.</p>
-      <div className='flex gap-2'>
-        <Button type='button' size='sm' onClick={stale.resume}>
-          Resume edits
-        </Button>
-        <Button
-          type='button'
-          size='sm'
-          variant='outline'
-          onClick={stale.discard}
-        >
-          Discard them
-        </Button>
-      </div>
-    </div>
+    <AlertDialog open={stale !== null}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Resume your unsaved edits?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This document changed after you made these edits. Resume them on top
+            of the current version, or discard them.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <Button type='button' variant='outline' onClick={stale?.discard}>
+            Discard draft
+          </Button>
+          <Button type='button' onClick={stale?.resume}>
+            Resume edits
+          </Button>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
 
@@ -141,7 +150,7 @@ export function DocumentForm() {
         </h2>
         <DocumentStatus />
       </header>
-      <StaleDraftBanner />
+      <StaleDraftDialog />
       {scope.collection.fields.map((node) => (
         <FieldRow key={node.name} node={node} />
       ))}

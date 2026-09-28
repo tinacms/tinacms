@@ -29,6 +29,7 @@ import { removeDraft } from '../form/drafts';
 import {
   type FieldErrors,
   type FormId,
+  formStatus,
   isEdited,
   readFormStore,
   readOpeningScope,
@@ -262,7 +263,9 @@ export function FormProvider({
           values: toFormValues(stale.values),
           baseline: toFormValues(stale.baseline),
         });
-        methods.reset(toDocument(readFormStore().forms[formId]?.values ?? {}));
+        const resumed = readFormStore().forms[formId];
+        if (formStatus(resumed) !== 'dirty') removeDraft(formId);
+        methods.reset(toDocument(resumed?.values ?? {}));
         advanceSeedKey(formId);
         setDraftRevision((revision) => revision + 1);
       },

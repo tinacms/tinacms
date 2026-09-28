@@ -13,6 +13,9 @@ export const draftKey = (formId: string) => `${DRAFT_KEY_PREFIX}${formId}`;
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
+const hasBlankName = (fields: Record<string, unknown>) =>
+  Object.keys(fields).some((name) => name.length === 0);
+
 // A browser that blocks site data throws when code reads localStorage. Drafts
 // then stay off, and forms open as if no draft exists.
 const storage = (): Storage | undefined => {
@@ -36,6 +39,9 @@ export const readDraft = (formId: string): StoredDraft | undefined => {
   }
   if (!isRecord(entry) || entry.version !== DRAFT_VERSION) return undefined;
   if (!isRecord(entry.values) || !isRecord(entry.baseline)) return undefined;
+  if (hasBlankName(entry.values) || hasBlankName(entry.baseline)) {
+    return undefined;
+  }
   return { values: entry.values, baseline: entry.baseline };
 };
 
