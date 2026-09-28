@@ -41,8 +41,11 @@ describe('EditorialWorkflowWidget', () => {
   it('expands to the full indicator and collapses back', () => {
     render(<EditorialWorkflowWidget state={running} />);
 
+    expect(document.querySelectorAll('.animate-spin')).toHaveLength(1);
+
     fireEvent.click(screen.getByLabelText('Expand'));
     expect(screen.getByText('Syncing content to branch')).toBeTruthy();
+    expect(document.querySelectorAll('.animate-spin')).toHaveLength(1);
 
     fireEvent.click(screen.getByLabelText('Collapse'));
     expect(screen.queryByText('Syncing content to branch')).toBeNull();

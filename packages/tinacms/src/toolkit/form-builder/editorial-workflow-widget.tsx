@@ -104,7 +104,9 @@ export const EditorialWorkflowWidget = ({
       )}
     >
       <div className='flex items-center gap-3 px-4 py-3'>
-        <Loader2 className='w-5 h-5 flex-shrink-0 animate-spin text-tina-orange' />
+        {!expanded && (
+          <Loader2 className='w-5 h-5 flex-shrink-0 animate-spin text-tina-orange' />
+        )}
         <div className='min-w-0'>
           <div className='text-sm font-semibold text-gray-900'>
             Saving to a new branch
