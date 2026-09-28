@@ -72,6 +72,24 @@ const adoptSavedValues = (form: Form, saved: Record<string, unknown>) => {
   return JSON.stringify(current) !== JSON.stringify(saved);
 };
 
+const rebaseOntoSaved = (form: Form, saved: Record<string, unknown>) => {
+  const { finalForm } = form;
+  const { values, initialValues } = finalForm.getState();
+  const same = (a: unknown, b: unknown) =>
+    JSON.stringify(a) === JSON.stringify(b);
+  const edited = Object.entries(values).filter(
+    ([path, value]) =>
+      !same(value, initialValues?.[path]) && !same(value, saved[path])
+  );
+  finalForm.batch(() => {
+    finalForm.initialize(saved);
+    for (const [path, value] of edited) {
+      finalForm.change(path, value);
+    }
+  });
+  return edited.length > 0;
+};
+
 const warnBeforeUnload = (event: BeforeUnloadEvent) => {
   event.preventDefault();
   event.returnValue = '';
@@ -206,9 +224,15 @@ export const EditorialWorkflowProvider = ({
             return;
           }
 
-          const hasNewEdits = opts.tinaForm
+          const savedFormEdited = opts.tinaForm
             ? adoptSavedValues(opts.tinaForm, opts.values)
             : false;
+          const otherCopiesEdited = cms.state.forms
+            .map(({ tinaForm }) => tinaForm)
+            .filter((form) => form !== opts.tinaForm && form.path === opts.path)
+            .map((form) => rebaseOntoSaved(form, opts.values));
+          const hasNewEdits =
+            savedFormEdited || otherCopiesEdited.includes(true);
           setCurrentBranch(outcome.branchName);
 
           if (outcome.warning) {

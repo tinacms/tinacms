@@ -10,6 +10,7 @@ const events = new EventBus();
 const cms = {
   events,
   alerts: { warn: vi.fn(), success: vi.fn(), info: vi.fn(), error: vi.fn() },
+  state: { forms: [] as { tinaForm: Form }[] },
   api: { tina: { schema: {}, gitSettingsLink: 'https://app.tina.io/git' } },
 };
 
@@ -85,6 +86,7 @@ describe('EditorialWorkflowProvider', () => {
     runEditorialWorkflow.mockReset();
     setCurrentBranch.mockReset();
     for (const alert of Object.values(cms.alerts)) alert.mockReset();
+    cms.state.forms = [];
   });
 
   it('runs a content save through to success and switches branch', async () => {
@@ -237,6 +239,62 @@ describe('EditorialWorkflowProvider', () => {
 
     expect(form.values.body).toBe('Typed during the save');
     expect(cms.alerts.info).toHaveBeenCalled();
+  });
+
+  it('rebases a copy of the document reopened during the save', async () => {
+    const run = startedRun();
+    const saved = makeForm();
+    renderProvider();
+
+    saved.change('title', 'Saved title');
+    await act(async () => {
+      await context.startContentSave({
+        branchName: 'tina/a',
+        baseBranch: 'main',
+        path: saved.path,
+        values: saved.values,
+        crudType: 'update',
+        tinaForm: saved,
+      });
+    });
+    const reopened = makeForm();
+    cms.state.forms = [{ tinaForm: reopened }];
+    reopened.change('body', 'Typed in the reopened copy');
+    await act(async () => run.resolve(succeeded));
+
+    expect(reopened.values).toEqual({
+      title: 'Saved title',
+      body: 'Typed in the reopened copy',
+    });
+    expect(reopened.finalForm.getState().initialValues.title).toBe(
+      'Saved title'
+    );
+    expect(cms.alerts.info).toHaveBeenCalled();
+  });
+
+  it('brings an untouched reopened copy up to the saved content', async () => {
+    const run = startedRun();
+    const saved = makeForm();
+    renderProvider();
+
+    saved.change('title', 'Saved title');
+    await act(async () => {
+      await context.startContentSave({
+        branchName: 'tina/a',
+        baseBranch: 'main',
+        path: saved.path,
+        values: saved.values,
+        crudType: 'update',
+        tinaForm: saved,
+      });
+    });
+    const reopened = makeForm();
+    cms.state.forms = [{ tinaForm: reopened }];
+    await act(async () => run.resolve(succeeded));
+
+    expect(reopened.values.title).toBe('Saved title');
+    expect(reopened.dirty).toBe(false);
+    expect(cms.alerts.info).not.toHaveBeenCalled();
   });
 
   it('leaves the form clean when nothing changed during the save', async () => {
