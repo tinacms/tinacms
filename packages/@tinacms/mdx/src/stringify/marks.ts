@@ -4,7 +4,7 @@
 
 */
 
-import type { RichTextType } from '@tinacms/schema-tools';
+import type { RichTextField } from '@tinacms/schema-tools';
 import type * as Md from 'mdast';
 import type * as Plate from '../parse/plate';
 import { stringifyPropsInline } from './acorn';
@@ -87,7 +87,7 @@ const replaceLinksWithTextNodes = (content: Plate.InlineElement[]) => {
  */
 const inlineElementExceptLink = (
   content: InlineElementWithCallback,
-  field: RichTextType,
+  field: RichTextField,
   imageCallback: (url: string) => string
 ): Md.PhrasingContent => {
   switch (content.type) {
@@ -162,7 +162,7 @@ const markAttributes = (content: Plate.TextElement) => {
 
 export const eat = (
   c: InlineElementWithCallback[],
-  field: RichTextType,
+  field: RichTextField,
   imageCallback: (url: string) => string
 ): Md.PhrasingContent[] => {
   const content = replaceLinksWithTextNodes(c);

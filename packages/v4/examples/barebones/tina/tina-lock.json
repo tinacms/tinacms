@@ -7,6 +7,17 @@
         "label": "Posts",
         "path": "content/posts",
         "format": "mdx",
+        "hooks": [
+          {
+            "name": "requireStarsToPublish"
+          },
+          {
+            "name": "logSave",
+            "args": [
+              "saved"
+            ]
+          }
+        ],
         "fields": [
           {
             "name": "title",

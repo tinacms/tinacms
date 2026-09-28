@@ -1,5 +1,6 @@
 import type { ResolvedConfig, TinaSchema } from '../config';
 import { fieldConflictError, overridesFieldKey } from '../core/field/registry';
+import { hookConflictError, overridesHookKey } from '../core/form/hooks';
 import { invariant } from '../core/invariant';
 import { composeOverridableRegistry } from '../core/overridable-registry';
 import type { FieldProvision, PluginManifest } from '../core/plugin';
@@ -89,6 +90,28 @@ const usedValidators = (collections: CollectionSchema[]): string[] => [
   ),
 ];
 
+const registeredHooksOf = (plugins: PluginManifest[]): Set<string> =>
+  new Set(
+    composeOverridableRegistry(
+      plugins.flatMap((plugin) =>
+        (plugin.hooks ?? []).map((name) => ({
+          key: name,
+          value: plugin,
+          isOverride: overridesHookKey(plugin, name),
+        }))
+      ),
+      hookConflictError
+    ).keys()
+  );
+
+const usedHooks = (collections: CollectionSchema[]): string[] => [
+  ...new Set(
+    collections.flatMap((collection) =>
+      (collection.hooks ?? []).map((ref) => ref.name)
+    )
+  ),
+];
+
 export const compileSchema = (config: ResolvedConfig): TinaLock => {
   const provisions = fieldProvisionsOf(config.plugins);
   const primitives: Record<string, number> = {};
@@ -108,6 +131,15 @@ export const compileSchema = (config: ResolvedConfig): TinaLock => {
       registered.has(name),
       'schema-unknown-validator',
       `The schema uses the validator "${name}", but no installed plugin ` +
+        'registers it.'
+    );
+  }
+  const registeredHooks = registeredHooksOf(config.plugins);
+  for (const name of usedHooks(config.schema.collections).sort()) {
+    invariant(
+      registeredHooks.has(name),
+      'schema-unknown-hook',
+      `The schema uses the form hook "${name}", but no installed plugin ` +
         'registers it.'
     );
   }
