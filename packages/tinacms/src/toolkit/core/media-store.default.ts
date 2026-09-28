@@ -389,6 +389,7 @@ export class TinaMediaStore implements MediaStore {
       return branchContext;
     } catch (err) {
       this.resetWorkflowState();
+      this.cms.events.dispatch({ type: 'media:workflow:finish' });
       throw err;
     }
   }

@@ -882,6 +882,8 @@ describe('TinaMediaStore — protected-branch interception', () => {
     });
     const uploadFailure = vi.fn();
     events.subscribe('media:upload:failure', uploadFailure);
+    const workflowFinished = vi.fn();
+    events.subscribe('media:workflow:finish', workflowFinished);
 
     const confirmEventPromise = new Promise<MediaWorkflowConfirmBranchEvent>(
       (resolve) => {
@@ -902,6 +904,7 @@ describe('TinaMediaStore — protected-branch interception', () => {
       'There was an error creating a new branch'
     );
 
+    expect(workflowFinished).toHaveBeenCalledTimes(1);
     expect(uploadFailure).not.toHaveBeenCalled();
     expect(fetchWithToken).not.toHaveBeenCalled();
 
