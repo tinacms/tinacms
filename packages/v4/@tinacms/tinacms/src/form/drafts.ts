@@ -13,8 +13,15 @@ export const draftKey = (formId: string) => `${DRAFT_KEY_PREFIX}${formId}`;
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
-const storage = (): Storage | undefined =>
-  typeof localStorage === 'undefined' ? undefined : localStorage;
+// A browser that blocks site data throws when code reads localStorage. Drafts
+// then stay off, and forms open as if no draft exists.
+const storage = (): Storage | undefined => {
+  try {
+    return typeof localStorage === 'undefined' ? undefined : localStorage;
+  } catch {
+    return undefined;
+  }
+};
 
 // Storage is untrusted: an entry from another version or in an unknown shape is
 // treated as no draft.

@@ -37,6 +37,7 @@ import {
   toDocument,
   toFormId,
   toFormValues,
+  useFormStatus,
   useFormStore,
 } from '../form/form-store';
 import { SELF_CONTAINED_VALIDATORS } from '../plugins/validators/core-validators.schema';
@@ -247,16 +248,21 @@ export function FormProvider({
   }, [formId, methods, advanceSeedKey]);
 
   const [draftRevision, setDraftRevision] = useState(0);
+  const status = useFormStatus(formId);
   const stale = useMemo(
     () => staleDraft(formId, toFormValues(ingested), equal),
-    [formId, ingested, equal, draftRevision]
+    [formId, ingested, equal, draftRevision, status]
   );
   const staleDraftActions = useMemo(() => {
     if (!stale) return null;
     return {
       resume: () => {
-        readFormStore().resumeDraft(formId, toFormValues(stale.values));
-        methods.reset(stale.values);
+        const store = readFormStore();
+        store.resumeDraft(formId, {
+          values: toFormValues(stale.values),
+          baseline: toFormValues(stale.baseline),
+        });
+        methods.reset(toDocument(readFormStore().forms[formId]?.values ?? {}));
         advanceSeedKey(formId);
         setDraftRevision((revision) => revision + 1);
       },

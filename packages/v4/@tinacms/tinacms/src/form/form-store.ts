@@ -75,7 +75,7 @@ export interface FormStore {
   setActive: (formId: FormId, address: FieldAddress | null) => void;
   markSaved: (formId: FormId, savedValues?: FormValues) => void;
   discardEdits: (formId: FormId) => void;
-  resumeDraft: (formId: FormId, values: FormValues) => void;
+  resumeDraft: (formId: FormId, draft: FormDraft) => void;
   removeForm: (formId: FormId) => void;
 }
 
@@ -112,6 +112,11 @@ export const keepsValues = (
 };
 
 type EditedForm = Extract<OpenForm, { status: 'edited' }>;
+
+export interface FormDraft {
+  readonly values: FormValues;
+  readonly baseline: FormValues;
+}
 
 // The scope a form opens on: this tab's own edits first, then a stored draft whose
 // baseline still matches the document. A draft of an older document is stale and
@@ -265,17 +270,31 @@ export const useFormStore = create<FormStore>()(
             };
           }, DEVTOOLS_ACTION.discardEdits),
 
-        resumeDraft: (formId, values) =>
+        resumeDraft: (formId, draft) =>
           apply((state) => {
             const scope = state.forms[formId];
             if (!scope) return state;
+            const document = isEdited(scope) ? scope.baseline : scope.values;
+            // Resume applies only the fields that the draft changed. A field that
+            // another writer saved after the draft keeps its saved value.
+            const values = { ...document };
+            const addresses = new Set([
+              ...Object.keys(draft.values),
+              ...Object.keys(draft.baseline),
+            ]) as Set<FieldAddress>;
+            for (const address of addresses) {
+              const edited = draft.values[address];
+              if (!scope.equal(address, edited, draft.baseline[address])) {
+                values[address] = edited;
+              }
+            }
             return {
               forms: {
                 ...state.forms,
                 [formId]: {
                   status: 'edited',
-                  values: { ...values },
-                  baseline: isEdited(scope) ? scope.baseline : scope.values,
+                  values,
+                  baseline: document,
                   errors: {},
                   equal: scope.equal,
                 },

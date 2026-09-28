@@ -598,4 +598,14 @@ describe('form drafts across a reload', () => {
     expect(screen.getByLabelText('Title')).toHaveValue('Changed');
     expect(readDraft(toFormId(pathA))).toBeUndefined();
   });
+
+  it('hides the stale draft prompt once the editor starts typing', async () => {
+    await typeAndReload();
+    render(host(pathA, { title: 'Changed' }));
+    await screen.findByText('resume');
+    await userEvent.type(screen.getByLabelText('Title'), '?');
+    expect(screen.queryByText('resume')).toBeNull();
+    await userEvent.type(screen.getByLabelText('Title'), '{Backspace}');
+    expect(screen.queryByText('resume')).toBeNull();
+  });
 });

@@ -1,4 +1,4 @@
-import { describe, expect, it, onTestFinished } from 'vitest';
+import { describe, expect, it, onTestFinished, vi } from 'vitest';
 import { toFieldAddress } from '../core/field/address';
 import { simulateReload } from '../test/simulate-reload';
 import { draftKey, readDraft } from './drafts';
@@ -12,6 +12,7 @@ import {
 
 const title = toFieldAddress('title');
 const seo = toFieldAddress('seo');
+const summary = toFieldAddress('summary');
 const postA = toFormId('posts/a.mdx');
 const postB = toFormId('posts/b.mdx');
 const store = useFormStore;
@@ -135,7 +136,10 @@ describe('form drafts', () => {
     const changed = { [title]: 'Changed elsewhere' };
     store.getState().registerForm(postA, changed);
 
-    store.getState().resumeDraft(postA, { [title]: 'Mine' });
+    store.getState().resumeDraft(postA, {
+      values: { [title]: 'Mine' },
+      baseline: { [title]: 'Hello' },
+    });
     expect(store.getState().forms[postA]?.values[title]).toBe('Mine');
     expect(formStatus(store.getState().forms[postA])).toBe('dirty');
     expect(readDraft(postA)).toEqual({
@@ -143,5 +147,34 @@ describe('form drafts', () => {
       baseline: { title: 'Changed elsewhere' },
     });
     expect(staleDraft(postA, changed)).toBeUndefined();
+  });
+
+  it('resumes only the fields the draft changed, keeping newer fields of the file', () => {
+    store.getState().registerForm(postA, {
+      [title]: 'Hello',
+      [summary]: 'Theirs',
+    });
+    store.getState().resumeDraft(postA, {
+      values: { [title]: 'Mine', [summary]: 'Old' },
+      baseline: { [title]: 'Hello', [summary]: 'Old' },
+    });
+    expect(store.getState().forms[postA]?.values).toEqual({
+      [title]: 'Mine',
+      [summary]: 'Theirs',
+    });
+  });
+
+  it('opens and edits forms when the browser blocks site data', () => {
+    const blocked = vi
+      .spyOn(globalThis, 'localStorage', 'get')
+      .mockImplementation(() => {
+        throw new DOMException('Access denied', 'SecurityError');
+      });
+    onTestFinished(() => blocked.mockRestore());
+    syncing();
+
+    expect(() => editA('Edited')).not.toThrow();
+    expect(store.getState().forms[postA]?.values[title]).toBe('Edited');
+    expect(staleDraft(postA, { [title]: 'Hello' })).toBeUndefined();
   });
 });
