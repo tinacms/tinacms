@@ -12,10 +12,10 @@ export interface GlobalNavEntry {
   icon: ComponentType<{ className?: string }>;
   target: NavTarget;
   order?: number;
-  /** The entry renders only when an installed plugin provides each of these. */
+  // The entry renders only when an installed plugin provides each of these. 
   dependsOn?: Capability[];
 }
-
+// Definitions for global navigation slot options 
 export interface SlotContributions {
   globalNav?: GlobalNavEntry[];
 }
