@@ -9,6 +9,6 @@ language js(typescript, jsx)
   } where { $condition <: contains $test },
   register_diagnostic(
     span = $test,
-    message = "Narrow an error in an `if` statement, not in an expression (AGENTS.md: \"Error narrowing is an `if`, not an expression\")."
+    message = "Narrow an error in an `if` statement, not in an expression (AGENTS.md: 'Error narrowing is an `if`, not an expression')."
   )
 }

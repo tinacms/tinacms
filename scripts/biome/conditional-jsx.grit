@@ -11,6 +11,6 @@ language js(typescript, jsx)
   },
   register_diagnostic(
     span = $expression,
-    message = "Render a conditional element with a ternary and an explicit `null`, not `&&` (packages/v4/AGENTS.md: \"Don't use `&&` for conditional rendering\")."
+    message = "Render a conditional element with a ternary and an explicit `null`, not `&&` (packages/v4/AGENTS.md: 'Don't use `&&` for conditional rendering')."
   )
 }
