@@ -145,14 +145,14 @@ Pick the most specific that fits:
 
 ### Program / scope labels (apply alongside primary)
 
-- `v4` — part of the v4 architectural rewrite (epics #6830–#6837)
+- `v4.0` — part of the v4 architectural rewrite (epics #6830–#6837)
 - `For 4.1` — scheduled for the 4.1 release window
-- `Pre 4.0` — must land before v4 ships
 - `onboarding` — small, well-scoped task suitable for developers new to the project
 - `🤖AI` — could be implemented end-to-end by an AI agent in a single prompt
 
 ### Triage rules
 
+- **New issues are auto-classified.** `.github/workflows/classify-issue.yml` asks Jev for the primary category (and `onboarding`/`🤖AI`) against this table; the criteria live in `.github/scripts/classify-issue.mts`, so keep the two in sync.
 - **Taxonomy is fixed.** Don't invent new category labels. If nothing fits, leave the label off and surface the issue for human triage.
 - **Don't apply `onboarding` or `🤖AI` to v4-program issues** — those are intentionally coordinated work.
 - **Closing an issue:** always link evidence (PR number, comment URL, "fixed in version X.Y") in the closing comment. If the issue is a meta-tracker blocked on a parent epic, leave a "Triage note — do not close" comment instead.
@@ -162,4 +162,4 @@ Pick the most specific that fits:
 
 - Onboarding: <https://github.com/tinacms/tinacms/labels/onboarding>
 - AI-doable (one prompt): <https://github.com/tinacms/tinacms/labels/%F0%9F%A4%96AI>
-- v4 program: <https://github.com/tinacms/tinacms/labels/v4> · <https://github.com/tinacms/tinacms/labels/For%204.1> · <https://github.com/tinacms/tinacms/labels/Pre%204.0>
+- v4 program: <https://github.com/tinacms/tinacms/labels/v4.0> · <https://github.com/tinacms/tinacms/labels/For%204.1>
