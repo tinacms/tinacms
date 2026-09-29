@@ -29,6 +29,7 @@ const validateScreenName = (pluginName: string, screen: AdminScreen): void => {
   );
 };
 
+//gather all plugins screens into one Map keyed by screen name 
 export const createScreenRegistry = (
   resolved: ResolvedSegment[]
 ): ScreenRegistry =>
