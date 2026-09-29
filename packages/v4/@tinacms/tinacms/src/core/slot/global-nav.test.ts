@@ -1,0 +1,99 @@
+import { describe, expect, it } from 'vitest';
+import { type ResolvedSegment, definePlugin } from '../plugin';
+import type { AdminScreen } from '../screen/contract';
+import { createScreenRegistry } from '../screen/registry';
+import type { GlobalNavEntry } from './contract';
+import { createGlobalNav } from './global-nav';
+
+const Icon = () => null;
+
+const entry = (
+  label: string,
+  extra: Partial<GlobalNavEntry> = {}
+): GlobalNavEntry => ({
+  label,
+  icon: Icon,
+  target: { kind: 'url', href: `https://example.com/${label}` },
+  ...extra,
+});
+
+const segmentOf = (
+  name: string,
+  globalNav: GlobalNavEntry[],
+  screens: AdminScreen[] = []
+): ResolvedSegment => ({
+  manifest: definePlugin({ name }),
+  segment: { screens, slots: { globalNav } },
+});
+
+const labelsOf = (resolved: ResolvedSegment[], provides: string[] = []) =>
+  createGlobalNav(
+    resolved,
+    [
+      ...resolved.map(({ manifest }) => manifest),
+      definePlugin({
+        name: 'provider',
+        provides: provides as ('media' | 'search')[],
+      }),
+    ],
+    createScreenRegistry(resolved)
+  ).map(({ label }) => label);
+
+describe('global nav slot', () => {
+  it('stacks the entries of every plugin instead of conflicting', () => {
+    expect(
+      labelsOf([
+        segmentOf('one', [entry('Help')]),
+        segmentOf('two', [entry('Help'), entry('Docs')]),
+      ])
+    ).toEqual(['Help', 'Help', 'Docs']);
+  });
+
+  it('orders by `order`, then by plugin order', () => {
+    expect(
+      labelsOf([
+        segmentOf('one', [entry('Last', { order: 10 }), entry('Middle')]),
+        segmentOf('two', [entry('First', { order: -1 }), entry('Tie')]),
+      ])
+    ).toEqual(['First', 'Middle', 'Tie', 'Last']);
+  });
+
+  it('hides an entry whose dependency no plugin provides', () => {
+    const resolved = [
+      segmentOf('one', [
+        entry('Media', { dependsOn: ['media'] }),
+        entry('Search', { dependsOn: ['search'] }),
+      ]),
+    ];
+    expect(labelsOf(resolved, ['media'])).toEqual(['Media']);
+  });
+
+  it('accepts a screen target that an installed plugin contributes', () => {
+    const View = () => null;
+    expect(
+      labelsOf([
+        segmentOf(
+          'media',
+          [entry('Media', { target: { kind: 'screen', screen: 'media' } })],
+          [{ name: 'media', label: 'Media', component: View }]
+        ),
+      ])
+    ).toEqual(['Media']);
+  });
+
+  it('rejects a screen target no plugin contributes', () => {
+    expect(() =>
+      labelsOf([
+        segmentOf('one', [
+          entry('Ghost', { target: { kind: 'screen', screen: 'ghost' } }),
+        ]),
+      ])
+    ).toThrow(/no installed plugin contributes a screen named "ghost"/);
+  });
+
+  it('rejects an entry with an empty label', () => {
+    expect(() => labelsOf([segmentOf('one', [entry('')])])).toThrow(
+      /empty label/
+    );
+  });
+});

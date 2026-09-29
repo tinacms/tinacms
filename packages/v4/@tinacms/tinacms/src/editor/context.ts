@@ -12,6 +12,7 @@ import type {
 import type { TinaStoreState } from '../core/plugin';
 import type { FieldSchema, TinaDocument } from '../core/schema/types';
 import type { ScreenRegistry } from '../core/screen/registry';
+import type { GlobalNavEntry } from '../core/slot/contract';
 
 export type SaveHandler = (document: TinaDocument) => void | Promise<void>;
 
@@ -22,6 +23,7 @@ export interface TinaRuntime {
   store: StoreApi<TinaStoreState>;
   schema: TinaSchema;
   screens: ScreenRegistry;
+  globalNav: GlobalNavEntry[];
 }
 export const TinaRuntimeContext = createContext<TinaRuntime | null>(null);
 
