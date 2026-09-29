@@ -38,6 +38,7 @@ import {
 } from '@udecode/plate-list/react';
 import { NodeIdPlugin } from '@udecode/plate-node-id';
 import { ResetNodePlugin } from '@udecode/plate-reset-node/react';
+import { TextColorPlugin } from './text-color-plugin';
 import { SlashPlugin } from '@udecode/plate-slash-command/react';
 import { TablePlugin } from '@udecode/plate-table/react';
 import { TrailingBlockPlugin } from '@udecode/plate-trailing-block';
@@ -93,6 +94,7 @@ export const viewPlugins: any[] = [
   BasicMarksPlugin,
   UnderlinePlugin,
   HighlightPlugin,
+  TextColorPlugin,
   HeadingPlugin.configure({ options: { levels: 6 } }),
   ParagraphPlugin,
   CodeBlockPlugin.configure({
@@ -105,8 +107,15 @@ const CorrectNodeBehaviorPlugin = createSlatePlugin({
   key: 'WITH_CORRECT_NODE_BEHAVIOR',
 });
 
-const ClearHighlightOnEnterPlugin = createSlatePlugin({
-  key: 'CLEAR_HIGHLIGHT_ON_ENTER',
+/** Leaf props cleared when Enter starts a new block from a coloured run. */
+const COLOR_MARK_KEYS = ['highlight', 'highlightColor', 'textColor'];
+
+/**
+ * Plain Enter at the end of highlighted or coloured text starts the new
+ * block without the colour, so it doesn't bleed into the next paragraph.
+ */
+const ClearColorMarksOnEnterPlugin = createSlatePlugin({
+  key: 'CLEAR_COLOR_MARKS_ON_ENTER',
 }).overrideEditor(({ editor, tf: { insertBreak } }) => ({
   transforms: {
     insertBreak() {
@@ -118,20 +127,19 @@ const ClearHighlightOnEnterPlugin = createSlatePlugin({
         !keyboardEvent.ctrlKey &&
         !keyboardEvent.altKey;
       const activeMarks = editor.api.marks();
-      const hasHighlight = Boolean(
-        activeMarks?.highlight || activeMarks?.highlightColor
+      const hasColorMark = COLOR_MARK_KEYS.some((key) =>
+        Boolean(activeMarks?.[key])
       );
 
       insertBreak();
 
-      if (!isPlainEnter || !hasHighlight) {
+      if (!isPlainEnter || !hasColorMark) {
         return;
       }
 
-      editor.tf.removeMark('highlight');
-      editor.tf.removeMark('highlightColor');
+      editor.tf.removeMarks(COLOR_MARK_KEYS);
 
-      editor.tf.unsetNodes(['highlight', 'highlightColor'], {
+      editor.tf.unsetNodes(COLOR_MARK_KEYS, {
         at: editor.selection ?? undefined,
         match: (node) => editor.api.isText(node),
       });
@@ -159,7 +167,7 @@ export const createEditorPlugins = ({
   createHardBreakPlugin,
   createInvalidMarkdownPlugin,
   CorrectNodeBehaviorPlugin,
-  ClearHighlightOnEnterPlugin,
+  ClearColorMarksOnEnterPlugin,
   LinkPlugin.configure({
     options: {
       // Custom validation function to allow relative links, e.g., /about

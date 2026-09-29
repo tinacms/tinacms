@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import * as React from 'react';
 import { describe, expect, it } from 'vitest';
-import { TinaMarkdown } from './index';
+import { TinaMarkdown, type TinaMarkdownContent } from './index';
 import { StaticTinaMarkdown } from './static';
 
 describe('TinaMarkdown URL sanitization', () => {
@@ -244,5 +244,91 @@ describe('StaticTinaMarkdown table rendering', () => {
     expect(ths[0].textContent).toBe('Name');
     expect(container.querySelector('tbody')?.textContent).not.toContain('Name');
     expect(container.querySelectorAll('tbody td').length).toBe(2);
+  });
+});
+
+/** Wraps one text leaf in a paragraph. Text leaves aren't modelled by TinaMarkdownContent. */
+const paragraphWith = (leaf: { text: string } & Record<string, unknown>) =>
+  ({
+    type: 'root',
+    children: [{ type: 'p', children: [{ type: 'text', ...leaf }] }],
+  }) as unknown as TinaMarkdownContent;
+
+describe('TinaMarkdown colour marks', () => {
+  it('renders textColor as a coloured span', () => {
+    const { container } = render(
+      <TinaMarkdown
+        content={paragraphWith({ text: 'red', textColor: '#CC4141' })}
+      />
+    );
+    const span = container.querySelector('p > span');
+    expect(span?.textContent).toBe('red');
+    expect(span?.getAttribute('style')).toBe('color: #CC4141;');
+  });
+
+  it('folds textColor into a single mark when highlighted', () => {
+    const { container } = render(
+      <TinaMarkdown
+        content={paragraphWith({
+          text: 'both',
+          highlight: true,
+          highlightColor: '#FEF08A',
+          textColor: '#CC4141',
+        })}
+      />
+    );
+    const mark = container.querySelector('p > mark');
+    expect(mark?.getAttribute('style')).toBe(
+      'background-color: #FEF08A; color: #CC4141;'
+    );
+    expect(container.querySelector('span')).toBeNull();
+  });
+
+  it('passes textColor to a custom textColor component', () => {
+    const { container } = render(
+      <TinaMarkdown
+        content={paragraphWith({ text: 'x', textColor: '#2563EB' })}
+        components={{
+          textColor: ({ color, children }) => (
+            <b data-color={color}>{children}</b>
+          ),
+        }}
+      />
+    );
+    expect(container.querySelector('b')?.dataset.color).toBe('#2563EB');
+  });
+
+  it('drops unsafe colours but keeps the text', () => {
+    const { container } = render(
+      <TinaMarkdown
+        content={paragraphWith({
+          text: 'safe',
+          highlight: true,
+          highlightColor: 'red;position:fixed',
+          textColor: 'red;background:url(https://evil/x)',
+        })}
+      />
+    );
+    const mark = container.querySelector('p > mark');
+    expect(mark?.textContent).toBe('safe');
+    expect(mark?.hasAttribute('style')).toBe(false);
+  });
+
+  it('nests a custom textColor component inside the default mark', () => {
+    const { container } = render(
+      <TinaMarkdown
+        content={paragraphWith({
+          text: 'x',
+          highlight: true,
+          textColor: '#2563EB',
+        })}
+        components={{
+          textColor: ({ color, children }) => (
+            <b data-color={color}>{children}</b>
+          ),
+        }}
+      />
+    );
+    expect(container.querySelector('mark > b')?.dataset.color).toBe('#2563EB');
   });
 });

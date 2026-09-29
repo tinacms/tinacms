@@ -2,6 +2,7 @@
 
 */
 
+import { isSafeCssColor } from '@tinacms/mdx/sanitize-css-color';
 import { sanitizeUrl } from '@tinacms/mdx/sanitize-url';
 import React from 'react';
 
@@ -20,6 +21,7 @@ type BaseComponents = {
   underline?: { children: JSX.Element };
   code?: { children: JSX.Element };
   highlight?: { children: JSX.Element; color?: string };
+  textColor?: { children: JSX.Element; color: string };
   text?: { children: string };
   ul?: { children: JSX.Element };
   ol?: { children: JSX.Element };
@@ -120,6 +122,10 @@ export const TinaMarkdown = <
   );
 };
 
+/** A leaf colour that's safe to put in `style`, or `undefined` to drop it. */
+const safeColor = (value: string | undefined) =>
+  value && isSafeCssColor(value) ? value : undefined;
+
 const Leaf = (props: {
   type: 'text';
   text: string;
@@ -130,6 +136,7 @@ const Leaf = (props: {
   code?: boolean;
   highlight?: boolean;
   highlightColor?: string;
+  textColor?: string;
   components: Pick<
     BaseComponentSignature,
     | 'bold'
@@ -138,6 +145,7 @@ const Leaf = (props: {
     | 'strikethrough'
     | 'code'
     | 'highlight'
+    | 'textColor'
     | 'text'
   >;
 }) => {
@@ -223,20 +231,49 @@ const Leaf = (props: {
   }
   if (props.highlight) {
     const { highlight, highlightColor, ...rest } = props;
+    const color = safeColor(highlightColor);
     if (props.components.highlight) {
       const Component = props.components.highlight;
       return (
-        <Component color={highlightColor}>
+        <Component color={color}>
+          <Leaf {...rest} />
+        </Component>
+      );
+    }
+    // Fold the text colour into the same <mark> rather than nesting a <span>,
+    // unless a custom textColor component needs to render it.
+    const { textColor, ...markRest } = rest;
+    const foldedTextColor = props.components.textColor
+      ? undefined
+      : safeColor(textColor);
+    const style = {
+      ...(color && { backgroundColor: color }),
+      ...(foldedTextColor && { color: foldedTextColor }),
+    };
+    return (
+      <mark style={Object.keys(style).length ? style : undefined}>
+        <Leaf {...(props.components.textColor ? rest : markRest)} />
+      </mark>
+    );
+  }
+  if (props.textColor) {
+    const { textColor, ...rest } = props;
+    const color = safeColor(textColor);
+    if (!color) {
+      return <Leaf {...rest} />;
+    }
+    if (props.components.textColor) {
+      const Component = props.components.textColor;
+      return (
+        <Component color={color}>
           <Leaf {...rest} />
         </Component>
       );
     }
     return (
-      <mark
-        style={highlightColor ? { backgroundColor: highlightColor } : undefined}
-      >
+      <span style={{ color }}>
         <Leaf {...rest} />
-      </mark>
+      </span>
     );
   }
   if (props.components.text) {

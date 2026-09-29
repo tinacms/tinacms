@@ -500,6 +500,7 @@ export type ToolbarOverrideType =
   | 'italic'
   | 'strikethrough'
   | 'highlight'
+  | 'textColor'
   | 'raw'
   | 'embed'
   | 'mermaid'
@@ -518,6 +519,22 @@ export const ALL_HEADING_LEVELS: readonly HeadingLevel[] = [
   'h4',
   'h5',
   'h6',
+];
+/** A named colour offered by the rich-text colour dropdowns. `value` is any CSS colour. */
+export type RichTextColorOption = { label: string; value: string };
+/** Palette used by the "Highlight" toolbar button when `overrides.highlightColors` is omitted. */
+export const DEFAULT_HIGHLIGHT_COLORS: readonly RichTextColorOption[] = [
+  { label: 'Yellow', value: '#FEF08A' },
+  { label: 'Green', value: '#BBF7D0' },
+  { label: 'Blue', value: '#BFDBFE' },
+  { label: 'Red', value: '#CC4141' },
+];
+/** Palette used by the "Text color" toolbar button when `overrides.textColors` is omitted. */
+export const DEFAULT_TEXT_COLORS: readonly RichTextColorOption[] = [
+  { label: 'Red', value: '#DC2626' },
+  { label: 'Blue', value: '#2563EB' },
+  { label: 'Green', value: '#16A34A' },
+  { label: 'Gray', value: '#6B7280' },
 ];
 type RichTextAst = { type: 'root'; children: Record<string, unknown>[] };
 export type RichTextField<WithNamespace extends boolean = false> = (
@@ -550,6 +567,18 @@ export type RichTextField<WithNamespace extends boolean = false> = (
        * @example headingLevels: ['h1', 'h2', 'h3']
        */
       headingLevels?: HeadingLevel[];
+      /**
+       * Colours offered by the "Text color" toolbar button.
+       * Defaults to red, blue, green and gray.
+       *
+       * @example textColors: [{ label: 'Brand', value: '#CC4141' }]
+       */
+      textColors?: RichTextColorOption[];
+      /**
+       * Colours offered by the "Highlight" toolbar button.
+       * Defaults to yellow, green, blue and red.
+       */
+      highlightColors?: RichTextColorOption[];
     };
     /**
      * By default, Tina parses markdown with MDX, this is a more strict parser
